@@ -24,8 +24,8 @@ package org.oscarehr.ws.rest;
 
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Site;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
@@ -42,10 +42,10 @@ public class SitesService
 	SiteDao siteDao;
 
 	@GET
-	public RestResponse<List<Site>, String> getSiteList()
+	public RestSearchResponse<Site> getSiteList()
 	{
 		List<Site> sites = siteDao.getAllSites();
 
-		return new RestResponse<>(new HttpHeaders(), sites);
+		return RestSearchResponse.successResponseOnePage(sites);
 	}
 }

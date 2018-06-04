@@ -39,7 +39,6 @@ import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,8 +107,7 @@ public class ScheduleTemplateServiceTest
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
 		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), testEnd.format(
-			DateTimeFormatter.ISO_LOCAL_DATE_TIME), "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType, null));
+		expectedResult.add(new CalendarEvent(testStart, testEnd, "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType, null));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -162,7 +160,7 @@ public class ScheduleTemplateServiceTest
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
 		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), testEnd.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType, null));
+		expectedResult.add(new CalendarEvent(testStart, testEnd, "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType, null));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -229,7 +227,7 @@ public class ScheduleTemplateServiceTest
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
 		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), testEnd.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType, null));
+		expectedResult.add(new CalendarEvent(testStart, testEnd, "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType, null));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -310,7 +308,7 @@ public class ScheduleTemplateServiceTest
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
 		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), testEnd.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType, null));
+		expectedResult.add(new CalendarEvent(testStart, testEnd, "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType, null));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -363,12 +361,12 @@ public class ScheduleTemplateServiceTest
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
 		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), testEnd.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType, null));
+		expectedResult.add(new CalendarEvent(testStart, testEnd, "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType, null));
 
 		LocalDateTime testStart2 = LocalDateTime.of(2018, 1, 1, 0, 15, 0);
 		LocalDateTime testEnd2 = LocalDateTime.of(2018, 1, 1, 0, 30, 0);
 		AvailabilityType availabilityType2 = new AvailabilityType("color2", "description2", 15, null);
-		expectedResult.add(new CalendarEvent(testStart2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), testEnd2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), "color2", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code2", availabilityType2, null));
+		expectedResult.add(new CalendarEvent(testStart2, testEnd2, "color2", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code2", availabilityType2, null));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -463,12 +461,12 @@ public class ScheduleTemplateServiceTest
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
 		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), testEnd.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType, null));
+		expectedResult.add(new CalendarEvent(testStart, testEnd, "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType, null));
 
 		LocalDateTime testStart2 = LocalDateTime.of(2018, 1, 1, 0, 45, 0);
 		LocalDateTime testEnd2 = LocalDateTime.of(2018, 1, 1, 1, 0, 0);
 		AvailabilityType availabilityType2 = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), testEnd2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType2, null));
+		expectedResult.add(new CalendarEvent(testStart2, testEnd2, "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType2, null));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -563,17 +561,17 @@ public class ScheduleTemplateServiceTest
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
 		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), testEnd.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType, null));
+		expectedResult.add(new CalendarEvent(testStart, testEnd, "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType, null));
 
 		LocalDateTime testStart2 = LocalDateTime.of(2018, 1, 1, 0, 30, 0);
 		LocalDateTime testEnd2 = LocalDateTime.of(2018, 1, 1, 0, 45, 0);
 		AvailabilityType availabilityType2 = new AvailabilityType("color2", "description2", 15, null);
-		expectedResult.add(new CalendarEvent(testStart2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), testEnd2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), "color2", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code2", availabilityType2, null));
+		expectedResult.add(new CalendarEvent(testStart2, testEnd2, "color2", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code2", availabilityType2, null));
 
 		LocalDateTime testStart3 = LocalDateTime.of(2018, 1, 1, 0, 45, 0);
 		LocalDateTime testEnd3 = LocalDateTime.of(2018, 1, 1, 1, 0, 0);
 		AvailabilityType availabilityType3 = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart3.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), testEnd3.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType3, null));
+		expectedResult.add(new CalendarEvent(testStart3, testEnd3, "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType3, null));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -710,17 +708,17 @@ public class ScheduleTemplateServiceTest
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
 		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), testEnd.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType, null));
+		expectedResult.add(new CalendarEvent(testStart, testEnd, "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType, null));
 
 		LocalDateTime testStart2 = LocalDateTime.of(2018, 1, 1, 0, 45, 0);
 		LocalDateTime testEnd2 = LocalDateTime.of(2018, 1, 1, 1, 15, 0);
 		AvailabilityType availabilityType2 = new AvailabilityType("color2", "description2", 15, null);
-		expectedResult.add(new CalendarEvent(testStart2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), testEnd2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), "color2", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code2", availabilityType2, null));
+		expectedResult.add(new CalendarEvent(testStart2, testEnd2, "color2", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code2", availabilityType2, null));
 
 		LocalDateTime testStart3 = LocalDateTime.of(2018, 1, 1, 1, 15, 0);
 		LocalDateTime testEnd3 = LocalDateTime.of(2018, 1, 1, 1, 45, 0);
 		AvailabilityType availabilityType3 = new AvailabilityType("color", "description", 15, null);
-		expectedResult.add(new CalendarEvent(testStart3.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), testEnd3.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType3, null));
+		expectedResult.add(new CalendarEvent(testStart3, testEnd3, "color", CalendarEvent.RENDERING_BACKGROUND, className, providerId, "code", availabilityType3, null));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}

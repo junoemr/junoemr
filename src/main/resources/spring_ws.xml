@@ -20,18 +20,26 @@
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
+
+	<!-- ========================================================================================-->
+	<!-- Settings for the external SOAP web services -->
+	<!-- ========================================================================================-->
+
 	<!-- interceptors -->
 	<bean id="abstractLoggingInterceptor" abstract="true">
 		<property name="prettyLogging" value="true" />
 	</bean>
 	<bean id="loggingInInterceptor" class="org.apache.cxf.interceptor.LoggingInInterceptor" parent="abstractLoggingInterceptor" />
 	<bean id="loggingOutInterceptor" class="org.apache.cxf.interceptor.LoggingOutInterceptor" parent="abstractLoggingInterceptor" />
-	<bean id="restLoggingInInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingInInterceptor" parent="abstractLoggingInterceptor"/>
-	<bean id="restLoggingOutInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingOutInterceptor" parent="abstractLoggingInterceptor"/>
 
     <cxf:bus>
 		<cxf:properties>
 			<entry key="ws-security.ut.validator" value="org.oscarehr.ws.OscarUsernameTokenValidator" />
+			<!--
+			  This property needs to be set 'true' in order to give preference to JacksonJsonProvider
+			  over the default Jettison provider.
+			-->
+			<entry key="skip.default.json.provider.registration" value="true" ></entry>
 		</cxf:properties>
 
 		<!-- logging interceptors -->
@@ -141,11 +149,36 @@
 		</jaxws:inInterceptors>
 	</jaxws:endpoint>
 
+	<jaxws:endpoint implementor="#labUploadWs" address="/LabUploadService" >
+		<jaxws:inInterceptors>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+		</jaxws:inInterceptors>
+	</jaxws:endpoint>
+
+
+
+	<!-- ========================================================================================-->
+	<!-- Settings for the internal REST web services -->
+	<!-- ========================================================================================-->
 
 	<context:component-scan base-package="org.oscarehr.ws.rest"/>
 	<context:component-scan base-package="org.oscarehr.ws.rest.util"/>
 	<context:component-scan base-package="org.oscarehr.ws.rest.conversion"/>
 	<aop:aspectj-autoproxy/>
+
+	<!-- Also used by applicationContextREST.xml -->
+	<bean id="jaxb" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+		<property name="singleJaxbContext" value="true"/>
+
+		<property name="extraClass">
+			<list>
+				<value>org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="restLoggingInInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingInInterceptor" parent="abstractLoggingInterceptor"/>
+	<bean id="restLoggingOutInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingOutInterceptor" parent="abstractLoggingInterceptor"/>
 
 	<!-- RESTful web service  -->
 	<jaxrs:server address="/rs" id="jaxrServer">
@@ -154,6 +187,7 @@
 			<bean name="authInInterceptor" class="org.oscarehr.ws.rest.util.AuthenticationInInterceptor" />
 			<ref bean="restLoggingInInterceptor" />
 		</jaxrs:inInterceptors>
+
 		<jaxrs:outInterceptors>
 			<ref bean="restLoggingOutInterceptor" />
 		</jaxrs:outInterceptors>
@@ -161,6 +195,7 @@
 		<jaxrs:inFaultInterceptors>
 			<ref bean="restLoggingInInterceptor" />
 		</jaxrs:inFaultInterceptors>
+
 		<jaxrs:outFaultInterceptors>
 			<ref bean="restLoggingOutInterceptor" />
 		</jaxrs:outFaultInterceptors>
@@ -168,6 +203,7 @@
 		<jaxrs:providers>
 		    <ref bean="jaxb"/>
 			<bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+			<bean class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
 		</jaxrs:providers>
 
 		<jaxrs:features>
@@ -210,7 +246,6 @@
 			<bean class="org.oscarehr.ws.rest.StatusService" autowire="byName" />
 			<bean class="org.oscarehr.ws.rest.TicklerWebService"  autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.UserMetricsService"  autowire="byName"/>
-
 		</jaxrs:serviceBeans>
 
 		<jaxrs:extensionMappings>
@@ -218,21 +253,4 @@
 			<entry key="json" value="application/json" />
 		</jaxrs:extensionMappings>
 	</jaxrs:server>
-
-	<bean id="jaxb" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
-      <property name="singleJaxbContext" value="true"/>
-
-      <property name="extraClass">
-         <list>
-           <value>org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer</value>
-         </list>
-      </property>
-
-	</bean>
-
-	<jaxws:endpoint implementor="#labUploadWs" address="/LabUploadService" >
-		<jaxws:inInterceptors>
-			<ref bean="authenticationInWSS4JInterceptor"/>
-		</jaxws:inInterceptors>
-	</jaxws:endpoint>
 </beans>

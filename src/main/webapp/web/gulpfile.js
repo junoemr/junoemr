@@ -1,16 +1,20 @@
-var sass = require('gulp-sass'),
-		cssmin = require('gulp-clean-css'),
-    rename = require('gulp-rename'),
-    concatFilenames = require('gulp-concat-filenames'),
-    gulp = require('gulp');
+var sass = require('gulp-sass')
+//var cssmin = require('gulp-clean-css');
+//var rename = require('gulp-rename');
+var concatFilenames = require('gulp-concat-filenames');
+var gulp = require('gulp');
+var ts = require('gulp-typescript');
 
 
 var paths = {
     scss: 'scss/juno.scss',
-    jsp: ['./**/*.jsp', '!./index.jsp', '!./dist/**'],
-    dest: './dist/'
+    jsp: ['./src/**/*.jsp'],
+	ts: ['./src/**/*.ts'],
+    src: './src/',
+	dest: './dist/'
 };
 
+// Compile scss
 gulp.task('sass', function()
 {
 	// compiles juno.scss to juno.css
@@ -26,6 +30,7 @@ gulp.task('sass', function()
 	// .pipe(gulp.dest(paths.dest));
 });
 
+// Formatter for generating templates.
 function ngTemplateFormatter(filename)
 {
 	return '<script type="text/ng-template" id="' +
@@ -35,6 +40,8 @@ function ngTemplateFormatter(filename)
 		'"/>\n</script>';
 }
 
+// Finds all jsp template files and generates a file that will run them all and output the html.
+// This is done so that all of the template code can be loaded when the app is loaded.
 gulp.task('templates', function()
 {
 	gulp.src(paths.jsp)
@@ -46,4 +53,17 @@ gulp.task('templates', function()
   	.pipe(gulp.dest(paths.dest));
 });
 
-gulp.task('default', ['sass', 'templates'], function() {});
+// Compile typescript.  The .js files are created in the same place as the .ts files.
+gulp.task('typescript', function()
+{
+	return gulp.src(paths.ts)
+		.pipe(ts({
+			noImplicitAny: true,
+			target: 'es5',
+			lib: ['es5'],
+			//declaration: true // This will generate *.d.ts files
+		}))
+		.pipe(gulp.dest(paths.src));
+});
+
+gulp.task('default', ['sass', 'templates', 'typescript'], function() {});

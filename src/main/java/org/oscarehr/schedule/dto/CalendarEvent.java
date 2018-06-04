@@ -22,14 +22,15 @@
  */
 package org.oscarehr.schedule.dto;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class CalendarEvent
 {
 	public static final String RENDERING_BACKGROUND = "background";
 
-	private String start; // TODO change to LocalDateTime
-	private String end; // TODO change to LocalDateTime
+	private LocalDateTime start;
+	private LocalDateTime end;
 	private String color;
 	private String rendering;
 	private String className;
@@ -38,7 +39,7 @@ public class CalendarEvent
 	private AvailabilityType availabilityType;
 	private CalendarAppointment data;
 
-	public CalendarEvent(String start, String end, String color, String rendering, String className,
+	public CalendarEvent(LocalDateTime start, LocalDateTime end, String color, String rendering, String className,
 		Integer resourceId, String scheduleTemplateCode,
 		AvailabilityType availabilityType, CalendarAppointment data)
 	{
@@ -53,12 +54,12 @@ public class CalendarEvent
 		this.data = data;
 	}
 
-	public String getStart()
+	public LocalDateTime getStart()
 	{
 		return start;
 	}
 
-	public String getEnd()
+	public LocalDateTime getEnd()
 	{
 		return end;
 	}

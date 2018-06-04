@@ -67,14 +67,15 @@ import org.oscarehr.ws.rest.conversion.AppointmentStatusConverter;
 import org.oscarehr.ws.rest.conversion.AppointmentTypeConverter;
 import org.oscarehr.ws.rest.conversion.LookupListItemConverter;
 import org.oscarehr.ws.rest.conversion.NewAppointmentConverter;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.SchedulingResponse;
 import org.oscarehr.ws.rest.to.model.AppointmentStatusTo1;
 import org.oscarehr.ws.rest.to.model.AppointmentTo1;
 import org.oscarehr.ws.rest.to.model.NewAppointmentTo1;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
 
 @Path("/schedule")
 @Component("scheduleService")
@@ -385,47 +386,48 @@ public class ScheduleService extends AbstractServiceImpl {
 	@GET
 	@Path("/groups")
 	@Produces("application/json")
-	public RestResponse<List<ScheduleGroup>, String> getScheduleGroups()
+	public RestSearchResponse<ScheduleGroup> getScheduleGroups()
 	{
 		List<ScheduleGroup> scheduleGroups = scheduleGroupService.getScheduleGroups();
 
-		return new RestResponse<>(new HttpHeaders(), scheduleGroups);
+		// TODO: paginate?
+		return RestSearchResponse.successResponseOnePage(scheduleGroups);
 	}
 
 	@GET
 	@Path("/templateCodes")
 	@Produces("application/json")
-	public RestResponse<List<ScheduleTemplateCode>, String> getScheduleTemplateCodes()
+	public RestSearchResponse<ScheduleTemplateCode> getScheduleTemplateCodes()
 	{
 		List<ScheduleTemplateCode> scheduleTemplateCodes =
 			scheduleTemplateService.getScheduleTemplateCodes();
 
-		return new RestResponse<>(new HttpHeaders(), scheduleTemplateCodes);
+		return RestSearchResponse.successResponseOnePage(scheduleTemplateCodes);
 	}
 
 	@GET
 	@Path("/calendar/statuses")
 	@Produces("application/json")
-	public RestResponse<List<CalendarAppointmentStatus>, String> getCalendarAppointmentStatuses()
+	public RestSearchResponse<CalendarAppointmentStatus> getCalendarAppointmentStatuses()
 	{
 		List<CalendarAppointmentStatus> appointmentStatusList =
 			appointmentStatusService.getCalendarAppointmentStatusList();
 
-		return new RestResponse<>(new HttpHeaders(), appointmentStatusList);
+		return RestSearchResponse.successResponseOnePage(appointmentStatusList);
 	}
 
 	@GET
 	@Path("/calendar/{providerId}/")
 	@Produces("application/json")
-	public RestResponse<List<CalendarEvent>, String> getCalendarEvents(
+	public RestSearchResponse<CalendarEvent> getCalendarEvents(
 		@PathParam("providerId") Integer providerId,
 		@QueryParam("startDate") String startDateString,
 		@QueryParam("endDate") String endDateString,
 		@QueryParam("site") String siteName
 	)
 	{
-		LocalDate startDate = dateStringToNullableLocalDate(startDateString);
-		LocalDate endDate = dateStringToNullableLocalDate(endDateString);
+		LocalDate startDate = ConversionUtils.dateStringToNullableLocalDate(startDateString);
+		LocalDate endDate = ConversionUtils.dateStringToNullableLocalDate(endDateString);
 
 		// TODO: Change this to throw an exception
 		// Default to today if either date is null
@@ -438,6 +440,6 @@ public class ScheduleService extends AbstractServiceImpl {
 		List<CalendarEvent> calendarEvents =
 			scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
 
-		return new RestResponse<>(new HttpHeaders(), calendarEvents);
+		return RestSearchResponse.successResponseOnePage(calendarEvents);
 	}
 }

@@ -35,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,7 +92,7 @@ public class ScheduleTest
 		String scheduleTemplateCode1 = "code1";
 
 		List<CalendarEvent> templateMockData = new ArrayList<>();
-		templateMockData.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
+		templateMockData.add(new CalendarEvent(start1, end1, color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
 
 		List<CalendarEvent> appointmentMockData = new ArrayList<>();
 
@@ -104,7 +103,7 @@ public class ScheduleTest
 		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
-		expectedResult.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
+		expectedResult.add(new CalendarEvent(start1, end1, color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -127,7 +126,7 @@ public class ScheduleTest
 		List<CalendarEvent> templateMockData = new ArrayList<>();
 
 		List<CalendarEvent> appointmentMockData = new ArrayList<>();
-		appointmentMockData.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, null, className1, resourceId1, scheduleTemplateCode1, null, null));
+		appointmentMockData.add(new CalendarEvent(start1, end1, color1, null, className1, resourceId1, scheduleTemplateCode1, null, null));
 
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(templateMockData);
 		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
@@ -135,7 +134,7 @@ public class ScheduleTest
 		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
-		expectedResult.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, null, className1, resourceId1, scheduleTemplateCode1, null, null));
+		expectedResult.add(new CalendarEvent(start1, end1, color1, null, className1, resourceId1, scheduleTemplateCode1, null, null));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -163,10 +162,10 @@ public class ScheduleTest
 		String scheduleTemplateCode2 = "code2";
 
 		List<CalendarEvent> templateMockData = new ArrayList<>();
-		templateMockData.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
+		templateMockData.add(new CalendarEvent(start1, end1, color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
 
 		List<CalendarEvent> appointmentMockData = new ArrayList<>();
-		appointmentMockData.add(new CalendarEvent(start2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color2, null, className2, resourceId2, scheduleTemplateCode2, null, null));
+		appointmentMockData.add(new CalendarEvent(start2, end2, color2, null, className2, resourceId2, scheduleTemplateCode2, null, null));
 
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(templateMockData);
 		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
@@ -174,8 +173,8 @@ public class ScheduleTest
 		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
-		expectedResult.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
-		expectedResult.add(new CalendarEvent(start2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color2, null, className2, resourceId2, scheduleTemplateCode2, null, null));
+		expectedResult.add(new CalendarEvent(start1, end1, color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
+		expectedResult.add(new CalendarEvent(start2, end2, color2, null, className2, resourceId2, scheduleTemplateCode2, null, null));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -203,12 +202,12 @@ public class ScheduleTest
 		String scheduleTemplateCode2 = "code2";
 
 		List<CalendarEvent> templateMockData1 = new ArrayList<>();
-		templateMockData1.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
+		templateMockData1.add(new CalendarEvent(start1, end1, color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
 
 		List<CalendarEvent> templateMockData2 = new ArrayList<>();
 
 		List<CalendarEvent> templateMockData3 = new ArrayList<>();
-		templateMockData3.add(new CalendarEvent(start2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color2, CalendarEvent.RENDERING_BACKGROUND, className2, resourceId2, scheduleTemplateCode2, null, null));
+		templateMockData3.add(new CalendarEvent(start2, end2, color2, CalendarEvent.RENDERING_BACKGROUND, className2, resourceId2, scheduleTemplateCode2, null, null));
 
 		List<CalendarEvent> appointmentMockData = new ArrayList<>();
 
@@ -220,8 +219,8 @@ public class ScheduleTest
 		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
-		expectedResult.add(new CalendarEvent(start1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end1.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
-		expectedResult.add(new CalendarEvent(start2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), end2.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME), color2, CalendarEvent.RENDERING_BACKGROUND, className2, resourceId2, scheduleTemplateCode2, null, null));
+		expectedResult.add(new CalendarEvent(start1, end1, color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
+		expectedResult.add(new CalendarEvent(start2, end2, color2, CalendarEvent.RENDERING_BACKGROUND, className2, resourceId2, scheduleTemplateCode2, null, null));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}

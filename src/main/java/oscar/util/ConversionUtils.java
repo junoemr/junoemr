@@ -468,4 +468,14 @@ public class ConversionUtils {
 
 		return calendarA.getTime();
 	}
+
+	public static LocalDate dateStringToNullableLocalDate(String dateString)
+	{
+		if(dateString == null) return null;
+		return dateStringToLocalDate(dateString);
+	}
+	public static LocalDate dateStringToLocalDate(String dateString)
+	{
+		return LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE);
+	}
 }

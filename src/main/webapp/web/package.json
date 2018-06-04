@@ -1,7 +1,13 @@
 {
   "name": "juno",
   "version": "0.0.0",
-  "dependencies": {},
+  "dependencies": {
+    "@types/angular": "^1.6.45",
+    "@types/angular-ui-bootstrap": "^0.13.46",
+    "@types/angular-ui-router": "^1.1.40",
+    "gulp-typescript": "^4.0.2",
+    "typescript": "^2.9.1"
+  },
   "devDependencies": {
     "bower": "^1.8.0",
     "gulp": "^3.9.1",

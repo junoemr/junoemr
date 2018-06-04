@@ -122,7 +122,8 @@ public class AppointmentStatusList
 				getTitle(appointmentStatus.getStatus(), DEFAULT_CALENDAR_LOCALE),
 				rotates,
 				appointmentStatus.getId(),
-				systemCode
+				systemCode,
+				appointmentStatus.getIcon()
 			));
 		}
 

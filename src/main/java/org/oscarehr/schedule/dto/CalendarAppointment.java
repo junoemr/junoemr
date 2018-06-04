@@ -22,32 +22,36 @@
  */
 package org.oscarehr.schedule.dto;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class CalendarAppointment
 {
 	private Integer scheduleUuid;
-	private String demographicPatientDob; // TODO change to LocalDate
+	private LocalDate demographicPatientDob;
 	private String demographicPatientName;
 	private String demographicPatientPhone;
 	private Integer demographicPatientUuid;
 	private Integer demographicPractitionerUuid;
-	private String startTime; // TODO change to LocalDateTime
-	private String endTime; // TODO change to LocalDateTime
+	private LocalDateTime startTime;
+	private LocalDateTime endTime;
 	private String eventStatusUuid;
+	private String eventStatusModifier;
 	private Integer numInvoices;
 	private String reason;
 	private String tagNames;
+	private String site;
 	private boolean tagSelfBooked;
 	private boolean tagSelfCancelled;
 	private String tagSystemCodes;
 
-	public CalendarAppointment(Integer scheduleUuid, String demographicPatientDob,
+	public CalendarAppointment(Integer scheduleUuid, LocalDate demographicPatientDob,
 		String demographicPatientName, String demographicPatientPhone,
-		Integer demographicPatientUuid, Integer demographicPractitionerUuid, String startTime,
-		String endTime, String eventStatusUuid, Integer numInvoices, String reason,
-		String tagNames, boolean tagSelfBooked, boolean tagSelfCancelled,
-		String tagSystemCodes)
+		Integer demographicPatientUuid, Integer demographicPractitionerUuid,
+		LocalDateTime startTime, LocalDateTime endTime, String eventStatusUuid,
+		String eventStatusModifier, Integer numInvoices, String reason, String tagNames,
+		String site, boolean tagSelfBooked, boolean tagSelfCancelled, String tagSystemCodes)
 	{
 		this.scheduleUuid = scheduleUuid;
 		this.demographicPatientDob = demographicPatientDob;
@@ -58,9 +62,11 @@ public class CalendarAppointment
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.eventStatusUuid = eventStatusUuid;
+		this.eventStatusModifier = eventStatusModifier;
 		this.numInvoices = numInvoices;
 		this.reason = reason;
 		this.tagNames = tagNames;
+		this.site = site;
 		this.tagSelfBooked = tagSelfBooked;
 		this.tagSelfCancelled = tagSelfCancelled;
 		this.tagSystemCodes = tagSystemCodes;
@@ -71,7 +77,7 @@ public class CalendarAppointment
 		return scheduleUuid;
 	}
 
-	public String getDemographicPatientDob()
+	public LocalDate getDemographicPatientDob()
 	{
 		return demographicPatientDob;
 	}
@@ -96,12 +102,12 @@ public class CalendarAppointment
 		return demographicPractitionerUuid;
 	}
 
-	public String getStartTime()
+	public LocalDateTime getStartTime()
 	{
 		return startTime;
 	}
 
-	public String getEndTime()
+	public LocalDateTime getEndTime()
 	{
 		return endTime;
 	}
@@ -109,6 +115,11 @@ public class CalendarAppointment
 	public String getEventStatusUuid()
 	{
 		return eventStatusUuid;
+	}
+
+	public String getEventStatusModifier()
+	{
+		return eventStatusModifier;
 	}
 
 	public Integer getNumInvoices()
@@ -124,6 +135,11 @@ public class CalendarAppointment
 	public String getTagNames()
 	{
 		return tagNames;
+	}
+
+	public String getSite()
+	{
+		return site;
 	}
 
 	public boolean isTagSelfBooked()
@@ -158,9 +174,11 @@ public class CalendarAppointment
 			Objects.equals(startTime, that.startTime) &&
 			Objects.equals(endTime, that.endTime) &&
 			Objects.equals(eventStatusUuid, that.eventStatusUuid) &&
+			Objects.equals(eventStatusModifier, that.eventStatusModifier) &&
 			Objects.equals(numInvoices, that.numInvoices) &&
 			Objects.equals(reason, that.reason) &&
 			Objects.equals(tagNames, that.tagNames) &&
+			Objects.equals(site, that.site) &&
 			Objects.equals(tagSystemCodes, that.tagSystemCodes);
 	}
 
@@ -172,8 +190,8 @@ public class CalendarAppointment
 			.hash(scheduleUuid, demographicPatientDob, demographicPatientName,
 				demographicPatientPhone,
 				demographicPatientUuid, demographicPractitionerUuid, startTime, endTime,
-				eventStatusUuid, numInvoices, reason, tagNames, tagSelfBooked, tagSelfCancelled,
-				tagSystemCodes);
+				eventStatusUuid, eventStatusModifier, numInvoices, reason, tagNames, site,
+				tagSelfBooked, tagSelfCancelled, tagSystemCodes);
 	}
 
 	@Override
@@ -189,9 +207,11 @@ public class CalendarAppointment
 			", startTime=" + startTime +
 			", endTime=" + endTime +
 			", eventStatusUuid='" + eventStatusUuid + '\'' +
+			", eventStatusModifier='" + eventStatusModifier + '\'' +
 			", numInvoices=" + numInvoices +
 			", reason='" + reason + '\'' +
 			", tagNames='" + tagNames + '\'' +
+			", site='" + site + '\'' +
 			", tagSelfBooked=" + tagSelfBooked +
 			", tagSelfCancelled=" + tagSelfCancelled +
 			", tagSystemCodes='" + tagSystemCodes + '\'' +

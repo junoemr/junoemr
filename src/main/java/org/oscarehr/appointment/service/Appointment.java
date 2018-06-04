@@ -34,7 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
@@ -85,33 +84,42 @@ public class Appointment
 				LocalDateTime startDateTime = LocalDateTime.of(details.getDate(), details.getStartTime());
 				LocalDateTime endDateTime = LocalDateTime.of(details.getDate(), details.getEndTime());
 
-				String birthdayString = null;
-				if(details.getBirthday() != null)
+				String rawStatus = details.getStatus();
+				String status = null;
+				String statusModifier = null;
+				if(rawStatus != null && rawStatus.length() > 0)
 				{
-					birthdayString = details.getBirthday().format(DateTimeFormatter.ISO_LOCAL_DATE);
+					status = rawStatus.substring(0, 1);
+
+					if(rawStatus.length() > 1)
+					{
+						statusModifier = rawStatus.substring(1,2);
+					}
 				}
 
 				CalendarAppointment appointment = new CalendarAppointment(
 					details.getAppointmentNo(),
-					birthdayString,
+					details.getBirthday(),
 					formatName(details.getFirstName(), details.getLastName()),
 					null, // TODO get phone number
 					details.getDemographicNo(),
 					null, // TODO get patient's doctor
-					startDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-					endDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-					details.getStatus(),
+					startDateTime,
+					endDateTime,
+					status,
+					statusModifier,
 					null,
 					details.getReason(),
 					null,
+					details.getLocation(),
 					false,
 					false,
 					null
 				);
 
 				calendarEvents.add(new CalendarEvent(
-					startDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-					endDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+					startDateTime,
+					endDateTime,
 					details.getColor(),
 					null,
 					"text-dark",       // TODO remove?

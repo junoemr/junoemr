@@ -26,7 +26,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.oscarehr.appointment.dto.CalendarAppointmentStatus;
 import org.oscarehr.common.model.AppointmentStatus;
-import org.oscarehr.datasource.App;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +63,7 @@ public class AppointmentStatusListTest
 		appointmentStatus.setStatus("a");
 		appointmentStatus.setId(1);
 		appointmentStatus.setDescription("description1");
+		appointmentStatus.setIcon("icon1");
 
 		appointmentStatuses.add(appointmentStatus);
 
@@ -79,7 +79,8 @@ public class AppointmentStatusListTest
 			"",
 			true,
 			1,
-			null
+			null,
+			"icon1"
 		));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
@@ -99,6 +100,7 @@ public class AppointmentStatusListTest
 		appointmentStatus.setStatus("a");
 		appointmentStatus.setId(1);
 		appointmentStatus.setDescription("description1");
+		appointmentStatus.setIcon("icon1");
 
 		appointmentStatuses.add(appointmentStatus);
 
@@ -114,7 +116,8 @@ public class AppointmentStatusListTest
 			"descriptionManual",
 			true,
 			1,
-			null
+			null,
+			"icon1"
 		));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
@@ -134,6 +137,7 @@ public class AppointmentStatusListTest
 		appointmentStatus.setStatus("B");
 		appointmentStatus.setId(1);
 		appointmentStatus.setDescription("description1");
+		appointmentStatus.setIcon("icon1");
 
 		appointmentStatuses.add(appointmentStatus);
 
@@ -149,7 +153,8 @@ public class AppointmentStatusListTest
 			"Billed",
 			false,
 			1,
-			"billed"
+			"billed",
+			"icon1"
 		));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
@@ -169,6 +174,7 @@ public class AppointmentStatusListTest
 		appointmentStatus1.setStatus("a");
 		appointmentStatus1.setId(1);
 		appointmentStatus1.setDescription("description1");
+		appointmentStatus1.setIcon("icon1");
 
 		appointmentStatuses.add(appointmentStatus1);
 
@@ -177,6 +183,7 @@ public class AppointmentStatusListTest
 		appointmentStatus2.setStatus("B");
 		appointmentStatus2.setId(1);
 		appointmentStatus2.setDescription("description1");
+		appointmentStatus2.setIcon("icon1");
 
 		appointmentStatuses.add(appointmentStatus2);
 
@@ -192,7 +199,8 @@ public class AppointmentStatusListTest
 			"descriptionManual",
 			true,
 			1,
-			null
+			null,
+			"icon1"
 		));
 
 		expectedResult.add(new CalendarAppointmentStatus(
@@ -201,7 +209,8 @@ public class AppointmentStatusListTest
 			"Billed",
 			false,
 			1,
-		"billed"
+		"billed",
+			"icon1"
 		));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());

@@ -1,25 +1,15 @@
 <beans xmlns="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-	xmlns:cxf="http://cxf.apache.org/core"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
 		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
 	">
 
-	<cxf:bus>
-		<cxf:properties>
-			<!--
-			  This property needs to be set 'true' in order to give preference to JacksonJsonProvider
-			  over the default Jettison provider.
-			-->
-			<entry key="skip.default.json.provider.registration" value="true" ></entry>
-		</cxf:properties>
-	</cxf:bus>
 
-	<!--<bean id="restLoggingInInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingInInterceptor" parent="abstractLoggingInterceptor"/>-->
-	<!--<bean id="restLoggingOutInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingOutInterceptor" parent="abstractLoggingInterceptor"/>-->
+	<!-- ========================================================================================-->
+	<!-- Settings for the OAuth web services -->
+	<!-- ========================================================================================-->
 
 	<bean id="oauthProvider" class="oscar.login.OscarOAuthDataProvider" autowire="byName"/>
 
@@ -41,28 +31,8 @@
 		<property name="resourcePath" value="/login/3rdpartyLogin.jsp"/>
 	</bean>
 
-
 	<bean id="accessTokenService" class="org.apache.cxf.rs.security.oauth.services.AccessTokenService">
 		<property name="dataProvider" ref="oauthProvider"/>
-	</bean>
-
-	<bean id="validationExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.ValidationExceptionMapper"/>
-	<bean id="generalExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.GeneralExceptionMapper"/>
-	<bean id="invalidFormatExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.InvalidFormatExceptionMapper"/>
-	<bean id="jsonParseExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.JsonParseExceptionMapper"/>
-	<bean id="securityExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.SecurityExceptionMapper"/>
-	<bean id="missingArgumentExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.MissingArgumentExceptionMapper"/>
-	<bean id="rateLimitExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.RateLimitExceptionMapper"/>
-	<bean id="objectMapperProvider" class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
-
-	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider"/>
-
-	<bean id="validationInInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor">
-		<property name="provider" ref="validationProvider"/>
-	</bean>
-
-	<bean id="validationOutInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationOutInterceptor">
-		<property name="provider" ref="validationProvider"/>
 	</bean>
 
 	<jaxrs:server id="oauthService" address="/oauth">
@@ -83,27 +53,32 @@
 
 	</jaxrs:server>
 
+
+
+
+	<!-- ========================================================================================-->
+	<!-- Settings for the Juno external rest services -->
+	<!-- ========================================================================================-->
+
+	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider"/>
+
+	<bean id="validationInInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor">
+		<property name="provider" ref="validationProvider"/>
+	</bean>
+
+	<bean id="validationOutInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationOutInterceptor">
+		<property name="provider" ref="validationProvider"/>
+	</bean>
+
 	<jaxrs:server id="restServicesV1" address="/services/v1">
+
 		<jaxrs:inInterceptors>
 			<ref bean="validationInInterceptor"/>
-			<!--<ref bean="restLoggingInInterceptor"/>-->
 		</jaxrs:inInterceptors>
+
 		<jaxrs:outInterceptors>
 			<ref bean="validationOutInterceptor"/>
-			<!--<ref bean="restLoggingOutInterceptor"/>-->
 		</jaxrs:outInterceptors>
-
-		<jaxrs:inFaultInterceptors>
-			<!-- XXX: make sure failed calls get logged
-			<ref bean="restLoggingInInterceptor" />
-			-->
-		</jaxrs:inFaultInterceptors>
-		<jaxrs:outFaultInterceptors>
-			<!-- XXX: make sure failed calls get logged
-			<ref bean="restLoggingOutInterceptor" />
-			<ref bean="exceptionParsingOutInterceptor" />
-			-->
-		</jaxrs:outFaultInterceptors>
 
 		<!-- define which services are externally available -->
 		<jaxrs:serviceBeans>
@@ -116,19 +91,30 @@
 
 		<jaxrs:providers>
 			<ref bean="oAuthFilter"/>
-			<ref bean="jaxb"/>
-			<ref bean="validationExceptionMapper"/>
-			<ref bean="invalidFormatExceptionMapper"/>
-			<ref bean="jsonParseExceptionMapper"/>
-			<ref bean="rateLimitExceptionMapper"/>
-			<ref bean="securityExceptionMapper"/>
-			<ref bean="missingArgumentExceptionMapper"/>
-			<ref bean="generalExceptionMapper"/>
-			<ref bean="objectMapperProvider"/>
+			<ref bean="jaxb"/> <!-- Defined in spring_ws.xml -->
+
+			<!-- Switch to Jackson 2 from the cxf default of Jettison.  Also depends on the cxf -->
+			<!-- bus setting "skip.default.json.provider.registration" which is set in -->
+			<!-- spring_ws.xml -->
+			<bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+
+			<!-- Juno exception mappers.  Add more of these as new exceptions are thrown. -->
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.GeneralExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.InvalidFormatExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.JsonParseExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.MissingArgumentExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.RateLimitExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.SecurityExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.ValidationExceptionMapper"/>
+
+			<!-- Juno filters. -->
 			<bean class="org.oscarehr.ws.rest.filter.LoggingFilter"/>
 			<bean class="org.oscarehr.ws.rest.filter.RateLimitFilter"/>
 			<bean class="org.oscarehr.ws.rest.filter.IPRestrictionFilter"/>
-			<bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+
+			<!-- Custom ContextResolver to apply settings to the Jackson ObjectMapper -->
+			<bean class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
+
 		</jaxrs:providers>
 
 		<jaxrs:extensionMappings>

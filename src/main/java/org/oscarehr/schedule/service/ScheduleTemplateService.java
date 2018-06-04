@@ -40,7 +40,7 @@ import java.sql.Time;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+//import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -175,8 +175,8 @@ public class ScheduleTemplateService
 		);
 
 		return new CalendarEvent(
-			startDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-			endDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+			startDateTime, //.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+			endDateTime, //.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
 			color,
 			CalendarEvent.RENDERING_BACKGROUND,
 			SCHEDULE_TEMPLATE_CLASSNAME,

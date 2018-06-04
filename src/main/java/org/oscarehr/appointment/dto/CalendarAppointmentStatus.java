@@ -32,10 +32,11 @@ public class CalendarAppointmentStatus
 	private boolean rotates;
 	private Integer sortOrder;
 	private String systemCode;
+	private String icon;
 
 	public CalendarAppointmentStatus(String color, String displayLetter, String name,
 		boolean rotates,
-		Integer sortOrder, String systemCode)
+		Integer sortOrder, String systemCode, String icon)
 	{
 		this.color = color;
 		this.displayLetter = displayLetter;
@@ -43,6 +44,7 @@ public class CalendarAppointmentStatus
 		this.rotates = rotates;
 		this.sortOrder = sortOrder;
 		this.systemCode = systemCode;
+		this.icon = icon;
 	}
 
 	public String getColor()
@@ -76,6 +78,18 @@ public class CalendarAppointmentStatus
 	}
 
 	@Override
+	public int hashCode()
+	{
+
+		return Objects.hash(color, displayLetter, name, rotates, sortOrder, systemCode, icon);
+	}
+
+	public String getIcon()
+	{
+		return icon;
+	}
+
+	@Override
 	public boolean equals(Object o)
 	{
 		if (this == o) return true;
@@ -86,14 +100,8 @@ public class CalendarAppointmentStatus
 			Objects.equals(displayLetter, that.displayLetter) &&
 			Objects.equals(name, that.name) &&
 			Objects.equals(sortOrder, that.sortOrder) &&
-			Objects.equals(systemCode, that.systemCode);
-	}
-
-	@Override
-	public int hashCode()
-	{
-
-		return Objects.hash(color, displayLetter, name, rotates, sortOrder, systemCode);
+			Objects.equals(systemCode, that.systemCode) &&
+			Objects.equals(icon, that.icon);
 	}
 
 	@Override
@@ -106,6 +114,7 @@ public class CalendarAppointmentStatus
 			", rotates=" + rotates +
 			", sortOrder=" + sortOrder +
 			", systemCode='" + systemCode + '\'' +
+			", icon='" + icon + '\'' +
 			'}';
 	}
 }

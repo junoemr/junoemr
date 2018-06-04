@@ -72,7 +72,7 @@ public class DemographicServiceTest extends BaseRestServiceTest {
 		DemographicService demographicService = getResource(DemographicService.class);
 		
 		DemographicTo1 parent = newRandomDemograpic();
-		RestResponse<DemographicTo1, String> response = demographicService.createDemographicData(parent);
+		RestResponse<DemographicTo1> response = demographicService.createDemographicData(parent);
 		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
 
 		parent = response.getBody();
@@ -114,7 +114,7 @@ public class DemographicServiceTest extends BaseRestServiceTest {
 		logger.info("REST Tests are enabled. Continuing...");
 
 		DemographicTo1 demo = newRandomDemograpic();
-		RestResponse<DemographicTo1,String> response = demographicService.createDemographicData(demo);
+		RestResponse<DemographicTo1> response = demographicService.createDemographicData(demo);
 		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
 
 		demo = response.getBody();

@@ -48,56 +48,56 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('dashboardManager',
 		{
 			url: '/dashboard/admin',
-			templateUrl: 'dashboard/admin/DashboardManager.jsp',
+			templateUrl: 'src/dashboard/admin/DashboardManager.jsp',
 			controller: 'dashboardManagerController'
 		})
 		.state('dashboard',
 		{
 			url: '/dashboard',
-			templateUrl: 'dashboard/dashboard.jsp',
+			templateUrl: 'src/dashboard/dashboard.jsp',
 			controller: 'Dashboard.DashboardController'
 		})
 		.state('inbox',
 		{
 			url: '/inbox',
-			templateUrl: 'inbox/inbox_popup.jsp',
-			// templateUrl: 'inbox/inbox.jsp',
+			templateUrl: 'src/inbox/inbox_popup.jsp',
+			// templateUrl: 'src/inbox/inbox.jsp',
 			controller: 'Inbox.InboxController'
 		})
 		.state('consultRequests',
 		{
 			url: '/consults',
-			templateUrl: 'consults/consultRequestList.jsp',
+			templateUrl: 'src/consults/consultRequestList.jsp',
 			controller: 'Consults.ConsultRequestListController as consultRequestListCtrl'
 		})
 		.state('consultResponses',
 		{
 			url: '/consultResponses',
-			templateUrl: 'consults/consultResponseList.jsp',
+			templateUrl: 'src/consults/consultResponseList.jsp',
 			controller: 'Consults.ConsultResponseListController as consultResponseListCtrl'
 		})
 		.state('billing',
 		{
 			url: '/billing',
-			templateUrl: 'billing/billing_popup.jsp',
+			templateUrl: 'src/billing/billing_popup.jsp',
 			controller: 'BillingCtrl'
 		})
 		.state('schedule',
 		{
 			url: '/schedule',
-			templateUrl: 'schedule/view.jsp',
+			templateUrl: 'src/schedule/view.jsp',
 			controller: 'Schedule.ScheduleController'
 		})
 		.state('admin',
 		{
 			url: '/admin',
-			templateUrl: 'admin/admin_popup.jsp',
+			templateUrl: 'src/admin/admin_popup.jsp',
 			controller: 'AdminCtrl'
 		})
 		.state('ticklers',
 		{
 			url: '/ticklers',
-			templateUrl: 'tickler/ticklerList.jsp',
+			templateUrl: 'src/tickler/ticklerList.jsp',
 			controller: 'Tickler.TicklerListController as ticklerListCtrl',
 			resolve:
 			{
@@ -113,7 +113,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('search',
 		{
 			url: '/search',
-			templateUrl: 'patient/search/patientSearch.jsp',
+			templateUrl: 'src/patient/search/patientSearch.jsp',
 			controller: 'Patient.Search.PatientSearchController as patientSearchCtrl',
 			params:
 			{
@@ -123,20 +123,20 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('reports',
 		{
 			url: '/reports',
-			templateUrl: 'report/reports.jsp',
-			//templateUrl: 'report/reports_classic.jsp',
+			templateUrl: 'src/report/reports.jsp',
+			//templateUrl: 'src/report/reports_classic.jsp',
 			controller: 'Report.ReportsController as reportsCtrl',
 		})
 		.state('documents',
 		{
 			url: '/documents',
-			templateUrl: 'document/documents_classic.jsp',
+			templateUrl: 'src/document/documents_classic.jsp',
 			controller: 'Document.DocumentsController'
 		})
 		.state('settings',
 		{
 			url: '/settings',
-			templateUrl: 'settings/settings.jsp',
+			templateUrl: 'src/settings/settings.jsp',
 			controller: 'Settings.SettingsController as settingsCtrl',
 			resolve:
 			{
@@ -184,7 +184,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('settings.persona',
 			{
 				url: '/persona',
-				templateUrl: 'settings/settings.jsp',
+				templateUrl: 'src/settings/settings.jsp',
 				controller: 'Settings.SettingsController as settingsCtrl',
 				data: {
 					tab: 'persona'
@@ -193,7 +193,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('settings.general',
 			{
 				url: '/general',
-				templateUrl: 'settings/settings.jsp',
+				templateUrl: 'src/settings/settings.jsp',
 				controller: 'Settings.SettingsController as settingsCtrl',
 				data: {
 					tab: 'general'
@@ -202,7 +202,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('settings.schedule',
 			{
 				url: '/schedule',
-				templateUrl: 'settings/settings.jsp',
+				templateUrl: 'src/settings/settings.jsp',
 				controller: 'Settings.SettingsController as settingsCtrl',
 				data: {
 					tab: 'schedule'
@@ -211,7 +211,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('settings.billing',
 			{
 				url: '/billing',
-				templateUrl: 'settings/settings.jsp',
+				templateUrl: 'src/settings/settings.jsp',
 				controller: 'Settings.SettingsController as settingsCtrl',
 				data: {
 					tab: 'billing'
@@ -220,7 +220,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('settings.rx',
 			{
 				url: '/rx',
-				templateUrl: 'settings/settings.jsp',
+				templateUrl: 'src/settings/settings.jsp',
 				controller: 'Settings.SettingsController as settingsCtrl',
 				data: {
 					tab: 'rx'
@@ -229,7 +229,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('settings.masterdemo',
 			{
 				url: '/masterdemo',
-				templateUrl: 'settings/settings.jsp',
+				templateUrl: 'src/settings/settings.jsp',
 				controller: 'Settings.SettingsController as settingsCtrl',
 				data: {
 					tab: 'masterdemo'
@@ -238,7 +238,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('settings.consults',
 			{
 				url: '/consults',
-				templateUrl: 'settings/settings.jsp',
+				templateUrl: 'src/settings/settings.jsp',
 				controller: 'Settings.SettingsController as settingsCtrl',
 				data: {
 					tab: 'consults'
@@ -247,7 +247,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('settings.documents',
 			{
 				url: '/documents',
-				templateUrl: 'settings/settings.jsp',
+				templateUrl: 'src/settings/settings.jsp',
 				controller: 'Settings.SettingsController as settingsCtrl',
 				data: {
 					tab: 'documents'
@@ -256,7 +256,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('settings.summary',
 			{
 				url: '/summary',
-				templateUrl: 'settings/settings.jsp',
+				templateUrl: 'src/settings/settings.jsp',
 				controller: 'Settings.SettingsController as settingsCtrl',
 				data: {
 					tab: 'summary'
@@ -265,7 +265,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('settings.eforms',
 			{
 				url: '/eforms',
-				templateUrl: 'settings/settings.jsp',
+				templateUrl: 'src/settings/settings.jsp',
 				controller: 'Settings.SettingsController as settingsCtrl',
 				data: {
 					tab: 'eforms'
@@ -274,7 +274,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('settings.inbox',
 			{
 				url: '/inbox',
-				templateUrl: 'settings/settings.jsp',
+				templateUrl: 'src/settings/settings.jsp',
 				controller: 'Settings.SettingsController as settingsCtrl',
 				data: {
 					tab: 'inbox'
@@ -283,7 +283,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('settings.programs',
 			{
 				url: '/programs',
-				templateUrl: 'settings/settings.jsp',
+				templateUrl: 'src/settings/settings.jsp',
 				controller: 'Settings.SettingsController as settingsCtrl',
 				data: {
 					tab: 'programs'
@@ -292,7 +292,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('settings.integration',
 			{
 				url: '/integration',
-				templateUrl: 'settings/settings.jsp',
+				templateUrl: 'src/settings/settings.jsp',
 				controller: 'Settings.SettingsController as settingsCtrl',
 				data: {
 					tab: 'integration'
@@ -301,19 +301,19 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('support',
 		{
 			url: '/support',
-			templateUrl: 'help/support.jsp',
+			templateUrl: 'src/help/support.jsp',
 			controller: 'Help.SupportController'
 		})
 		.state('help',
 		{
 			url: '/help',
-			templateUrl: 'help/help.jsp',
+			templateUrl: 'src/help/help.jsp',
 			controller: 'Help.HelpController'
 		})
 		.state('record',
 		{
 			url: '/record/:demographicNo',
-			templateUrl: 'record/record.jsp',
+			templateUrl: 'src/record/record.jsp',
 			controller: 'Record.RecordController as recordCtrl',
 			resolve:
 			{
@@ -334,19 +334,19 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('record.details',
 		{
 			url: '/details',
-			templateUrl: 'record/details/details.jsp',
+			templateUrl: 'src/record/details/details.jsp',
 			controller: 'Record.Details.DetailsController as detailsCtrl'
 		})
 		.state('record.summary',
 		{
 			url: '/summary?appointmentNo&encType',
-			templateUrl: 'record/summary/summary.jsp',
+			templateUrl: 'src/record/summary/summary.jsp',
 			controller: 'Record.Summary.SummaryController as summaryCtrl'
 		})
 		.state('record.forms',
 		{
 			url: '/forms',
-			templateUrl: 'record/forms/forms.jsp',
+			templateUrl: 'src/record/forms/forms.jsp',
 			controller: 'Record.Forms.FormController as formCtrl',
 			params: {
 				formListId: 0
@@ -355,32 +355,32 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('record.forms.view',
 		{
 			url: '/view/:type/:id?name',
-			templateUrl: 'record/forms/forms.jsp',
+			templateUrl: 'src/record/forms/forms.jsp',
 			params: { name: { dynamic: true } },
 			controller: 'Record.Forms.FormController as formCtrl'
 		})
 		.state('record.forms.add',
 		{
 			url: '/add/:type/:id',
-			templateUrl: 'record/forms/forms.jsp',
+			templateUrl: 'src/record/forms/forms.jsp',
 			controller: 'Record.Forms.FormController as formCtrl'
 		})
 		.state('record.consultRequests',
 		{
 			url: '/consults',
-			templateUrl: 'consults/consultRequestList.jsp',
+			templateUrl: 'src/consults/consultRequestList.jsp',
 			controller: 'Consults.ConsultRequestListController as consultRequestListCtrl'
 		})
 		.state('record.consultResponses',
 		{
 			url: '/consultResponses',
-			templateUrl: 'consults/consultResponseList.jsp',
+			templateUrl: 'src/consults/consultResponseList.jsp',
 			controller: 'Consults.ConsultResponseListController as consultResponseListCtrl'
 		})
 		.state('record.consultRequest',
 		{
 			url: '/consult/:requestId',
-			templateUrl: 'consults/consultRequest.jsp',
+			templateUrl: 'src/consults/consultRequest.jsp',
 			controller: 'Consults.ConsultRequestController as consultRequestCtrl',
 			resolve:
 			{
@@ -400,7 +400,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('record.consultResponse',
 		{
 			url: '/consultResponse/:responseId',
-			templateUrl: 'consults/consultResponse.jsp',
+			templateUrl: 'src/consults/consultResponse.jsp',
 			controller: 'Consults.ConsultResponseController as consultResponseCtrl',
 			resolve:
 			{
@@ -417,7 +417,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		.state('record.tickler',
 		{
 			url: '/tickler',
-			templateUrl: 'tickler/ticklerList.jsp',
+			templateUrl: 'src/tickler/ticklerList.jsp',
 			controller: 'Tickler.TicklerListController as ticklerListCtrl',
 			resolve:
 			{
@@ -432,13 +432,13 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		}).state('record.tracker',
 		{
 			url: '/tracker',
-			templateUrl: 'record/tracker/tracker.jsp',
+			templateUrl: 'src/record/tracker/tracker.jsp',
 			controller: 'Record.Tracker.TrackerController as trackerCtrl'
 		})
 		.state('record.phr',
 		{
 			url: '/phr',
-			templateUrl: 'record/phr/phr.jsp',
+			templateUrl: 'src/record/phr/phr.jsp',
 			controller: 'Record.PHR.PHRController as phrCtrl'
 		})
 		// .state('admin.integration',
@@ -446,20 +446,20 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 			{
 			// url: '/admin/integration',
 			url:'/k2aConfig',
-			templateUrl: 'admin/integration/know2act/Know2actConfiguration.jsp',
+			templateUrl: 'src/admin/integration/know2act/Know2actConfiguration.jsp',
 			controller: 'Admin.Integration.Know2act.k2aConfigController as k2aConfigCtrl'
 		})
 		.state('k2aTemplate',
 			{
 				// url: '/admin/integration',
 				url:'/k2aTemplate',
-				templateUrl: 'admin/integration/know2act/Know2actTemplate.jsp',
+				templateUrl: 'src/admin/integration/know2act/Know2actTemplate.jsp',
 				controller: 'Admin.Integration.Know2act.k2aTemplateController as k2aTemplateCtrl'
 			})
 		.state('k2aNotification',
 		{
 			url:'/k2aNotification',
-			templateUrl: 'admin/integration/know2act/Know2actNotifications.jsp',
+			templateUrl: 'src/admin/integration/know2act/Know2actNotifications.jsp',
 			controller: 'Admin.Integration.Know2act.k2aNotificationController as k2aNoteCtrl'
 		});
 
@@ -505,28 +505,28 @@ oscarApp.config(['$routeProvider',
 					function($routeProvider) {
 
 						when('/settings', {
-							templateUrl: 'partials/settings-classic.jsp',
+							templateUrl: 'src/partials/settings-classic.jsp',
 							controller: 'Settings.SettingsController'
 						}).
 						when('/support', {
-							templateUrl: 'partials/support.jsp',
+							templateUrl: 'src/partials/support.jsp',
 							controller: 'Help.SupportController'
 						}).
 						when('/help', {
-							templateUrl: 'partials/help.jsp',
+							templateUrl: 'src/partials/help.jsp',
 							controller: 'Help.HelpController'
 						}).
 
 						when('/messenger', {
-							templateUrl: 'partials/messenger.jsp',
+							templateUrl: 'src/partials/messenger.jsp',
 							controller: 'MessengerCtrl'
 						}).
 						when('/eform', {
-							templateUrl: 'partials/eform.jsp',
+							templateUrl: 'src/partials/eform.jsp',
 							controller: 'EformFullCtrl'
 						}).
 						when('/eform2', {
-							templateUrl: 'partials/eform2.jsp',
+							templateUrl: 'src/partials/eform2.jsp',
 							controller: 'EformFull2Ctrl'
 						}).
 
