@@ -27,6 +27,7 @@ package org.oscarehr.common.io;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 
@@ -99,8 +100,15 @@ public class PDFFile extends GenericFile
 	{
 		int numOfPage = 0;
 
-		PDDocument doc = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
-		numOfPage = doc.getNumberOfPages();
+		try
+		{
+			PDDocument doc = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+			numOfPage = doc.getNumberOfPages();
+		}
+		catch(InvalidPasswordException e)
+		{
+			logger.warn("Encrypted PDF. Can't get page count");
+		}
 
 		return numOfPage;
 	}
@@ -149,7 +157,7 @@ public class PDFFile extends GenericFile
 	private File ghostscriptReEncode() throws IOException,InterruptedException
 	{
 		logger.info("BEGIN PDF RE-ENCODING");
-
+		boolean isEncrypted = false;
 		String gs = props.getProperty("document.ghostscript_path", "/usr/bin/gs");
 
 		File currentDir = javaFile.getParentFile();
@@ -169,6 +177,7 @@ public class PDFFile extends GenericFile
 				"-dNOPAUSE",
 				"-dQUIET",
 				"-dBATCH",
+				"-dUseCIEColor",
 				"-sOutputFile="+ newPdf.getPath(),
 				javaFile.getPath()};
 		
@@ -182,6 +191,11 @@ public class PDFFile extends GenericFile
 		while((line = in.readLine()) != null)
 		{
 			logger.warn("gs error line: " + line);
+
+			if(line.toLowerCase().contains("this file requires a password for access.")){
+				isEncrypted = true;
+			}
+
 			if (isAllowedWarning(line))
 				continue;
 
@@ -193,7 +207,13 @@ public class PDFFile extends GenericFile
 		int exitValue = process.exitValue();
 		if(exitValue != 0 || reasonInvalid != null)
 		{
-			throw new RuntimeException("Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue);
+			if(isEncrypted)
+			{
+				return javaFile;
+			} else
+			{
+				throw new RuntimeException("Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue);
+			}
 		}
 
 		logger.info("END PDF RE-ENCODING");
