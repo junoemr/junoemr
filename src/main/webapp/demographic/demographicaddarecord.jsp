@@ -399,7 +399,19 @@
 			document.setDoccreator(loggedInInfo.getLoggedInProviderNo());
 			document.setResponsible(loggedInInfo.getLoggedInProviderNo());
 			DocumentService documentService = SpringUtils.getBean(org.oscarehr.document.service.DocumentService.class);
-			documentService.uploadNewDocument(document, fileContent, Integer.parseInt(dem));
+			try
+			{
+				documentService.uploadNewDocument(document, fileContent, Integer.parseInt(dem));
+			} catch (Exception e)
+			{
+				MiscUtils.getLogger().error("Document Upload Error: ", e);
+			%>
+				<script language="JavaScript">
+					alert("Document Upload Failed");
+				</script>
+			<%
+			}
+
 		}
 
 	if (multipartParams.get("submitType").equals(oscarResources.getString("demographic.demographicaddrecordhtm.btnAddDocs")))
