@@ -209,7 +209,8 @@ public class PDFFile extends GenericFile
 		{
 			if(isEncrypted)
 			{
-				return javaFile;
+				this.moveFile(currentDir);
+				newPdf = javaFile;
 			} else
 			{
 				throw new RuntimeException("Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue);
