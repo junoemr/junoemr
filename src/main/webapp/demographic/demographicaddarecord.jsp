@@ -121,20 +121,20 @@
 <form method="post" name="addappt">
 <%!
 	static InputStream fileContent = null;
-	public static Hashtable getParamsFromMultipartForm(HttpServletRequest req) throws FileUploadException, IOException
+	public static Hashtable getParamsFromMultipartForm(HttpServletRequest request) throws FileUploadException, IOException
 	{
-        Hashtable<String,String> ret = new Hashtable<String,String>();
-        List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(req);
+        Hashtable<String,String> requestParameters = new Hashtable<String,String>();
+        List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
         for (FileItem item : items) {
             if (item.isFormField()) {
-                ret.put(item.getFieldName(), item.getString());
+				requestParameters.put(item.getFieldName(), item.getString());
             }
             else {
-				ret.put(item.getFieldName(), FilenameUtils.getName(item.getName()));
+				requestParameters.put(item.getFieldName(), FilenameUtils.getName(item.getName()));
             	fileContent = item.getInputStream();
 			}
         }
-        return ret;
+        return requestParameters;
     }
 %>
 
