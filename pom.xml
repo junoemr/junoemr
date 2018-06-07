@@ -141,12 +141,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>5.1.3.Final</version>
-		</dependency>
-
-		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 			<version>2.5</version>
@@ -156,7 +150,7 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<version>3.1.0</version>
-			<scope>provided</scope>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet.jsp</groupId>
@@ -1161,6 +1155,11 @@
 		</dependency>
 		<dependency>
 			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-models</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>io.swagger.core.v3</groupId>
 			<artifactId>swagger-jaxrs2</artifactId>
 			<version>2.0.1</version>
 		</dependency>
@@ -1433,78 +1432,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<id>set_timestamp</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-								<tstamp>
-									<format pattern="yyyy-MM-dd hh:mm aa" property="build.dateTime.value"/>
-								</tstamp>
-								<echo message="build time : ${build.dateTime.value}"/>
-								<replace file="target/classes/oscar_mcmaster.properties" token="${build.dateTime}" value="${build.dateTime.value}"/>
-								<property environment="env"/>
-								<echo message="JOB_NAME - BUILD_NUMBER : ${env.JOB_NAME} - ${env.BUILD_NUMBER}"/>
-								<replace file="target/classes/oscar_mcmaster.properties" token="${build.JOB_NAME}" value="${env.JOB_NAME}"/>
-								<replace file="target/classes/oscar_mcmaster.properties" token="${build.BUILD_NUMBER}" value="${env.BUILD_NUMBER}"/>
-							</target>
-
-						</configuration>
-					</execution>
-					<execution>
-						<!-- We're doing jspc this way because the codehaus jspc seems to be abandonded, it doesn't go beyond jdk 1.5 and the documentation is sparse, and the source code links to a broken page and I can't find the goals it supports. -->
-						<id>jspc</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-								<property name="build.compiler" value="extJavac"/>
-								<property name='jspc_target' value="${project.name}-${project.version}"/>
-								<ant antfile="jspc.xml" target="jspc"/>
-							</target>
-						</configuration>
-					</execution>
-					<execution>
-						<id>deploy_local_catalina_base</id>
-						<phase>package</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-								<copy todir="catalina_base/webapps/oscar">
-									<fileset dir="target/${project.name}-${project.version}"/>
-								</copy>
-							</target>
-						</configuration>
-					</execution>
-					<execution>
-						<id>clean_local_catalina_base</id>
-						<phase>clean</phase>
-						<configuration>
-							<target>
-								<delete dir="catalina_base/webapps/oscar"/>
-								<delete includeemptydirs="true" quiet="true">
-									<fileset dir="catalina_base/logs" excludes=".gitignore"/>
-									<fileset dir="catalina_base/work" excludes=".gitignore"/>
-								</delete>
-							</target>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>2.17</version>
@@ -1617,6 +1544,187 @@
 				</executions>
 			</plugin>
 
+			<!-- This plugin creates the openapi.json file for the internal REST api.  It is used -->
+			<!-- below to generate code.  This must be run before the generate-typescpipt-api -->
+			<!-- execution. -->
+			<!-- TODO: This plugin should be replaced with swagger-maven-plugin once that plugin -->
+			<!-- TODO: supports openapi V3 -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<executions>
+					<execution>
+						<id>generate-openapi-spec</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>org.oscarehr.maven.OpenApiSpecBuilder</mainClass>
+					<classpathScope>test</classpathScope>
+					<systemProperties>
+						<systemProperty>
+							<key>openApiSpecBuilder.resourceClassCsv</key>
+							<value>org.oscarehr.ws.rest.ScheduleService</value>
+						</systemProperty>
+						<systemProperty>
+							<key>openApiSpecBuilder.outputDirectory</key>
+							<value>${project.build.directory}/openapi/</value>
+						</systemProperty>
+					</systemProperties>
+				</configuration>
+			</plugin>
+
+			<!-- This plugin generates typescript models from the openapi.json file generated -->
+			<!-- above.  This must be run after the generate-openapi-spec execution -->
+			<!-- This script must also be run before gulp so the files are available to compile -->
+			<plugin>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<id>generate-typescript-api</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.build.directory}/openapi/openapi.json</inputSpec>
+							<generatorName>typescript-angularjs</generatorName>
+							<apiPackage>JunoInternalApi</apiPackage>
+							<output>src/main/webapp/web/generated/</output>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- This is a terrible hack to counteract a bug in the openapi-generator library.  -->
+			<!-- There is an open issue at the time of writing to prove they are aware of the -->
+			<!-- issue at https://github.com/OpenAPITools/openapi-generator/issues/189 -->
+			<!-- This plugin runs a script that replaces the string "models.models." in the -->
+			<!-- generated api with "models.".  It is being run using antrun because all plugins -->
+			<!-- of the same type in a pom.xml file are bundled together and run where the first -->
+			<!-- one is defined.  Since exec-maven-plugin needs to be run before the -->
+			<!-- openapi-generator-maven-plugin and this needs to be run after, they can't use -->
+			<!-- the same plugin. -->
+			<!-- TODO: scrap this once openapi-generator is fixed -->
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<id>fix-typescript-api</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<exec resolveexecutable="true" executable="fix_openapi_generate_hack.sh"></exec>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>set_timestamp</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<tstamp>
+									<format pattern="yyyy-MM-dd hh:mm aa" property="build.dateTime.value"/>
+								</tstamp>
+								<echo message="build time : ${build.dateTime.value}"/>
+								<replace file="target/classes/oscar_mcmaster.properties" token="${build.dateTime}" value="${build.dateTime.value}"/>
+								<property environment="env"/>
+								<echo message="JOB_NAME - BUILD_NUMBER : ${env.JOB_NAME} - ${env.BUILD_NUMBER}"/>
+								<replace file="target/classes/oscar_mcmaster.properties" token="${build.JOB_NAME}" value="${env.JOB_NAME}"/>
+								<replace file="target/classes/oscar_mcmaster.properties" token="${build.BUILD_NUMBER}" value="${env.BUILD_NUMBER}"/>
+							</target>
+
+						</configuration>
+					</execution>
+					<execution>
+						<!-- We're doing jspc this way because the codehaus jspc seems to be abandonded, it doesn't go beyond jdk 1.5 and the documentation is sparse, and the source code links to a broken page and I can't find the goals it supports. -->
+						<id>jspc</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<property name="build.compiler" value="extJavac"/>
+								<property name='jspc_target' value="${project.name}-${project.version}"/>
+								<ant antfile="jspc.xml" target="jspc"/>
+							</target>
+						</configuration>
+					</execution>
+					<execution>
+						<id>deploy_local_catalina_base</id>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<copy todir="catalina_base/webapps/oscar">
+									<fileset dir="target/${project.name}-${project.version}"/>
+								</copy>
+							</target>
+						</configuration>
+					</execution>
+					<execution>
+						<id>clean_local_catalina_base</id>
+						<phase>clean</phase>
+						<configuration>
+							<target>
+								<delete dir="catalina_base/webapps/oscar"/>
+								<delete includeemptydirs="true" quiet="true">
+									<fileset dir="catalina_base/logs" excludes=".gitignore"/>
+									<fileset dir="catalina_base/work" excludes=".gitignore"/>
+								</delete>
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+<!--			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<executions>
+					<execution>
+						<id>fix-typescript-api</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<executable>fix_openapi_generate_hack.sh</executable>
+				</configuration>
+			</plugin>-->
+
+
+
 			<!-- JunoUI -->
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
@@ -1635,6 +1743,7 @@
 					<!-- installs node and npm locally into target/node -->
 					<execution>
 						<id>install node and npm</id>
+						<phase>process-classes</phase>
 						<goals>
 							<goal>install-node-and-npm</goal>
 						</goals>
@@ -1642,6 +1751,7 @@
 					<!-- runs npm install on working directory -->
 					<execution>
 						<id>npm install</id>
+						<phase>process-classes</phase>
 						<goals>
 							<goal>npm</goal>
 						</goals>
@@ -1649,6 +1759,7 @@
 					<!-- runs bower prune on working directory -->
 					<execution>
 						<id>bower prune</id>
+						<phase>process-classes</phase>
 						<goals>
 							<goal>bower</goal>
 						</goals>
@@ -1659,6 +1770,7 @@
 					<!-- runs bower install on working directory -->
 					<execution>
 						<id>bower install</id>
+						<phase>process-classes</phase>
 						<goals>
 							<goal>bower</goal>
 						</goals>
@@ -1666,6 +1778,7 @@
 					<!-- runs gulp build on working directory -->
 					<execution>
 						<id>gulp build</id>
+						<phase>process-classes</phase>
 						<goals>
 							<goal>gulp</goal>
 						</goals>
@@ -1734,6 +1847,11 @@
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>1.6.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>

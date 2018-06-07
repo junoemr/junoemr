@@ -39,6 +39,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.util.DateUtils;
 import org.oscarehr.appointment.dto.CalendarAppointmentStatus;
@@ -79,6 +80,7 @@ import oscar.util.ConversionUtils;
 
 @Path("/schedule")
 @Component("scheduleService")
+@Tag(name = "schedule")
 public class ScheduleService extends AbstractServiceImpl {
 
 	Logger logger = MiscUtils.getLogger();

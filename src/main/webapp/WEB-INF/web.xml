@@ -251,10 +251,23 @@
 		  </init-param>
 		-->
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>OpenApi</servlet-name>
 		<url-pattern>/openapi/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>InternalOpenApi.Schedule</servlet-name>
+		<servlet-class>io.swagger.v3.jaxrs2.integration.OpenApiServlet</servlet-class>
+
+		<init-param>
+			<param-name>openApi.configuration.resourceClasses</param-name>
+			<param-value>org.oscarehr.ws.rest.ScheduleService</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>InternalOpenApi.Schedule</servlet-name>
+		<url-pattern>/openapi/internal/schedule/*</url-pattern>
 	</servlet-mapping>
 
     <servlet>
