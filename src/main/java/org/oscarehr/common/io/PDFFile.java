@@ -157,7 +157,7 @@ public class PDFFile extends GenericFile
 	private File ghostscriptReEncode() throws IOException,InterruptedException
 	{
 		logger.info("BEGIN PDF RE-ENCODING");
-		boolean isEncrypted = false;
+
 		String gs = props.getProperty("document.ghostscript_path", "/usr/bin/gs");
 
 		File currentDir = javaFile.getParentFile();
@@ -192,10 +192,6 @@ public class PDFFile extends GenericFile
 		{
 			logger.warn("gs error line: " + line);
 
-			if(line.toLowerCase().contains("this file requires a password for access.")){
-				isEncrypted = true;
-			}
-
 			if (isAllowedWarning(line))
 				continue;
 
@@ -207,16 +203,20 @@ public class PDFFile extends GenericFile
 		int exitValue = process.exitValue();
 		if(exitValue != 0 || reasonInvalid != null)
 		{
-			if(isEncrypted)
+			try
 			{
+				PDDocument document = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+			} catch(InvalidPasswordException e)
+			{
+				logger.warn("Encrypted PDF. Cannot re-encode");
 				this.moveFile(currentDir);
 				newPdf = javaFile;
-			} else
-			{
-				throw new RuntimeException("Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue);
+				return newPdf;
 			}
-		}
 
+			throw new RuntimeException("Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue);
+		}
+		javaFile.delete();
 		logger.info("END PDF RE-ENCODING");
 		return newPdf;
 	}
