@@ -22,18 +22,59 @@
  */
 package org.oscarehr.common.hl7.copd.model.v24.segment;
 
+import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Type;
+import ca.uhn.hl7v2.model.v24.datatype.CE;
+import ca.uhn.hl7v2.model.v24.datatype.NM;
+import ca.uhn.hl7v2.model.v24.datatype.SI;
+import ca.uhn.hl7v2.model.v24.datatype.ST;
+import ca.uhn.hl7v2.model.v24.datatype.TS;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
+/**
+ * Invoice Summary - Third party billing
+ */
 public class ZIS extends AbstractSegment
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public ZIS(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		Message message = this.getMessage();
+
+		try
+		{
+			this.add(SI.class, true, 1, 4, new Object[]{message}, "Set ID - ZIS");
+			this.add(ST.class, true, 1, 15, new Object[]{message}, "Invoice Number");
+			this.add(TS.class, true, 1, 8, new Object[]{message}, "Invoice Date");
+			this.add(CE.class, false, 1, 89, new Object[]{message}, "Agency ID");
+			this.add(ST.class, false, 1, 18, new Object[]{message}, "Agency File Number");
+			this.add(NM.class, false, 1, 10, new Object[]{message}, "Insurance Group Number");
+			this.add(ST.class, false, 1, 50, new Object[]{message}, "Payment Responsibility");
+			this.add(TS.class, false, 1, 8, new Object[]{message}, "Bill Date");
+			this.add(NM.class, false, 1, 10, new Object[]{message}, "GST Amount");
+			this.add(NM.class, false, 1, 10, new Object[]{message}, "PST Amount");
+			this.add(TS.class, true, 0, 8, new Object[]{message}, "Payment Date");
+			this.add(NM.class, false, 1, 2, new Object[]{message}, "Accounting Month");
+			this.add(NM.class, false, 1, 10, new Object[]{message}, "Amount Paid");
+			this.add(ST.class, false, 1, 10, new Object[]{message}, "Payment Method");
+			this.add(ST.class, false, 1, 11, new Object[]{message}, "Account Number");
+			this.add(ST.class, false, 1, 35, new Object[]{message}, "Created By");
+			this.add(TS.class, false, 0, 14, new Object[]{message}, "Creation Date/Time");
+			this.add(ST.class, false, 1, 35, new Object[]{message}, "Modified By");
+			this.add(TS.class, false, 0, 14, new Object[]{message}, "Modified Date/Time");
+		}
+		catch(HL7Exception e)
+		{
+			logger.error("Can't instantiate " + this.getClass().getName());
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

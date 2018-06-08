@@ -22,18 +22,39 @@
  */
 package org.oscarehr.common.hl7.copd.model.v24.segment;
 
+import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Type;
+import ca.uhn.hl7v2.model.v24.datatype.ST;
+import ca.uhn.hl7v2.model.v24.datatype.TS;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
+/**
+ * This segment contains observations about the fetus within a particular pregnancy
+ */
 public class ZPO extends AbstractSegment
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public ZPO(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		Message message = this.getMessage();
+
+		try
+		{
+			this.add(TS.class, false, 1, 8, new Object[]{message}, "Date of fundus height growth curve");
+			this.add(ST.class, false, 1, 10, new Object[]{message}, "Fundus height growth curve");
+		}
+		catch(HL7Exception e)
+		{
+			logger.error("Can't instantiate " + this.getClass().getName());
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

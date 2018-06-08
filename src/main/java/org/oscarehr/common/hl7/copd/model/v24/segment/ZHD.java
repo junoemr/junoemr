@@ -22,18 +22,43 @@
  */
 package org.oscarehr.common.hl7.copd.model.v24.segment;
 
+import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Type;
+import ca.uhn.hl7v2.model.v24.datatype.SI;
+import ca.uhn.hl7v2.model.v24.datatype.ST;
+import ca.uhn.hl7v2.model.v24.datatype.TS;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
+/**
+ * This segment contains Information that is specific to pediatric requirements.
+ */
 public class ZHD extends AbstractSegment
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public ZHD(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		Message message = this.getMessage();
+
+		try
+		{
+			this.add(SI.class, true, 1, 4, new Object[]{message}, "Set ID - ZHD");
+			this.add(ST.class, false, 1, 3, new Object[]{message}, "Gestation Age");
+			this.add(ST.class, false, 1, 5, new Object[]{message}, "Birth Weight");
+			this.add(TS.class, false, 5, 8, new Object[]{message}, "Infant apgar score time");
+			this.add(ST.class, false, 5, 5, new Object[]{message}, "Infant apgar score");
+		}
+		catch(HL7Exception e)
+		{
+			logger.error("Can't instantiate " + this.getClass().getName());
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

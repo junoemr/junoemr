@@ -22,18 +22,58 @@
  */
 package org.oscarehr.common.hl7.copd.model.v24.segment;
 
+import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Type;
+import ca.uhn.hl7v2.model.v24.datatype.CE;
+import ca.uhn.hl7v2.model.v24.datatype.ID;
+import ca.uhn.hl7v2.model.v24.datatype.NM;
+import ca.uhn.hl7v2.model.v24.datatype.ST;
+import ca.uhn.hl7v2.model.v24.datatype.TS;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
+/**
+ * This segment contains prescription-related information that is not present in the ORC, RXO or RXE segments. For
+ * POSP CoPD the ZRX.2, ZRX.6 and ZRX.7 components are used.
+ */
 public class ZRX extends AbstractSegment
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public ZRX(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		Message message = this.getMessage();
+
+		try
+		{
+			this.add(CE.class, false, 1, 4104, new Object[]{message}, "Prescription Source");
+			this.add(TS.class, true, 1, 24, new Object[]{message}, "Administration Start Date");
+			this.add(TS.class, false, 1, 24, new Object[]{message}, "Administration Stop Date");
+			this.add(TS.class, false, 1, 24, new Object[]{message}, "Expiry Date");
+			this.add(TS.class, false, 1, 24, new Object[]{message}, "First Fill Expiry Date");
+			this.add(CE.class, true, 1, 4104, new Object[]{message}, "Drug Use Type");
+			this.add(ID.class, false, 1, 1, new Object[]{message}, "Trial Dispenses Authorized");
+			this.add(CE.class, false, 1, 4104, new Object[]{message}, "Prescription Active Status");
+			this.add(TS.class, false, 1, 24, new Object[]{message}, "Modification Time");
+			this.add(ID.class, false, 1, 1, new Object[]{message}, "Contradictions Detected Indicator");
+			this.add(ID.class, false, 1, 1, new Object[]{message}, "Dispensing Revoked Indicator");
+			this.add(NM.class, false, 1, 4, new Object[]{message}, "Doses Remaining");
+			this.add(NM.class, false, 1, 4, new Object[]{message}, "Days Supply Remaining");
+			this.add(NM.class, false, 1, 31, new Object[]{message}, "Undispensed Days Supply Remaining");
+			this.add(ST.class, false, 1, 4, new Object[]{message}, "Percentage Dispensed");
+			this.add(TS.class, false, 1, 24, new Object[]{message}, "Supply Exhaustion Date");
+			this.add(TS.class, false, 1, 24, new Object[]{message}, "Prescription Exhaustion Date");
+		}
+		catch(HL7Exception e)
+		{
+			logger.error("Can't instantiate " + this.getClass().getName());
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

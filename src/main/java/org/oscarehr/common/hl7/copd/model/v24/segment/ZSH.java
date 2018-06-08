@@ -22,18 +22,46 @@
  */
 package org.oscarehr.common.hl7.copd.model.v24.segment;
 
+import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Type;
+import ca.uhn.hl7v2.model.v24.datatype.IS;
+import ca.uhn.hl7v2.model.v24.datatype.SI;
+import ca.uhn.hl7v2.model.v24.datatype.ST;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
+/**
+ * This segment contains social history about the patient.
+ */
 public class ZSH extends AbstractSegment
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public ZSH(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		Message message = this.getMessage();
+
+		try
+		{
+			this.add(SI.class, true, 1, 4, new Object[]{message}, "Set ID - ZSH");
+			this.add(ST.class, false, 1, 1000, new Object[]{message}, "Social Alert");
+			this.add(ST.class, false, 1, 2000, new Object[]{message}, "Journal Notes");
+			this.add(IS.class, false, 1, 5, new Object[]{message}, "Relationship Status");
+			this.add(ST.class, false, 1, 50, new Object[]{message}, "Occupation");
+			this.add(ST.class, false, 1, 1000, new Object[]{message}, "Employer");
+			this.add(ST.class, false, 1, 50, new Object[]{message}, "Education");
+			this.add(ST.class, false, 1, 1000, new Object[]{message}, "Leisure Activities");
+		}
+		catch(HL7Exception e)
+		{
+			logger.error("Can't instantiate " + this.getClass().getName());
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

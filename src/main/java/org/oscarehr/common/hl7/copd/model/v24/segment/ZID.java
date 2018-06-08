@@ -22,18 +22,50 @@
  */
 package org.oscarehr.common.hl7.copd.model.v24.segment;
 
+import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Type;
+import ca.uhn.hl7v2.model.v24.datatype.NM;
+import ca.uhn.hl7v2.model.v24.datatype.SI;
+import ca.uhn.hl7v2.model.v24.datatype.ST;
+import ca.uhn.hl7v2.model.v24.datatype.TS;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
+/**
+ * Invoice Details - Third party billing
+ */
 public class ZID extends AbstractSegment
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public ZID(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		Message message = this.getMessage();
+
+		try
+		{
+			this.add(SI.class, true, 1, 4, new Object[]{message}, "Set ID - ZID");
+			this.add(ST.class, true, 1, 10, new Object[]{message}, "Fee Code");
+			this.add(NM.class, true, 1, 3, new Object[]{message}, "Units");
+			this.add(ST.class, true, 1, 1, new Object[]{message}, "GST Indicator");
+			this.add(NM.class, true, 1, 10, new Object[]{message}, "Fee Amount");
+			this.add(ST.class, false, 1, 10, new Object[]{message}, "Part ID");
+			this.add(NM.class, true, 1, 10, new Object[]{message}, "Bill Amount");
+			this.add(ST.class, true, 1, 1, new Object[]{message}, "PST Indicator");
+			this.add(TS.class, false, 3, 8, new Object[]{message}, "Adjustment Date");
+			this.add(NM.class, false, 3, 10, new Object[]{message}, "Adjustment Amount");
+			this.add(ST.class, false, 3, 25, new Object[]{message}, "Adjustment Explanation");
+		}
+		catch(HL7Exception e)
+		{
+			logger.error("Can't instantiate " + this.getClass().getName());
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

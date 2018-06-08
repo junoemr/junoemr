@@ -47,7 +47,6 @@ public class ZPD_ZTR extends AbstractMessage
 	public ZPD_ZTR(ModelClassFactory theFactory)
 	{
 		super(theFactory);
-		logger.info("Init ZPD_ZTR");
 		try
 		{
 			this.add(MSH.class, true, false);
@@ -57,7 +56,7 @@ public class ZPD_ZTR extends AbstractMessage
 		}
 		catch(HL7Exception var3)
 		{
-			logger.error("ZPD_ZTR Init Error", var3);
+			logger.error("Can't instantiate " + this.getClass().getName());
 			throw new RuntimeException(var3);
 		}
 	}

@@ -22,18 +22,39 @@
  */
 package org.oscarehr.common.hl7.copd.model.v24.segment;
 
+import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Type;
+import ca.uhn.hl7v2.model.v24.datatype.ID;
+import ca.uhn.hl7v2.model.v24.datatype.XCN;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
+/**
+ * This segment provides additional information about an allergy or an intolerance.
+ */
 public class ZAS extends AbstractSegment
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public ZAS(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		Message message = this.getMessage();
+
+		try
+		{
+			this.add(ID.class, false, 1, 1, new Object[]{message}, "Security Indicator");
+			this.add(XCN.class, false, 1, 4789, new Object[]{message}, "Authorized By");
+		}
+		catch(HL7Exception e)
+		{
+			logger.error("Can't instantiate " + this.getClass().getName());
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

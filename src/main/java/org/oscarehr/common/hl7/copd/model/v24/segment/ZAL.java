@@ -22,18 +22,46 @@
  */
 package org.oscarehr.common.hl7.copd.model.v24.segment;
 
+import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Type;
+import ca.uhn.hl7v2.model.v24.datatype.IS;
+import ca.uhn.hl7v2.model.v24.datatype.SI;
+import ca.uhn.hl7v2.model.v24.datatype.ST;
+import ca.uhn.hl7v2.model.v24.datatype.TS;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
+/**
+ * A record of additional patient information that may indicate the need for early intervention or which may affect the
+ * delivery of service to the patient.
+ */
 public class ZAL extends AbstractSegment
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public ZAL(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		Message message = this.getMessage();
+
+		try
+		{
+			this.add(SI.class, true, 1, 4, new Object[]{message}, "Set ID - ZAL");
+			this.add(TS.class, true, 1, 8, new Object[]{message}, "Date of Alert");
+			this.add(IS.class, true, 1, 1, new Object[]{message}, "Confidential flag");
+			this.add(ST.class, false, 1, 2000, new Object[]{message}, "Alert text sent");
+			this.add(ST.class, false, 1, 2000, new Object[]{message}, "Comments to alert");
+			this.add(ST.class, false, 1, 1000, new Object[]{message}, "Advance dir flag");
+		}
+		catch(HL7Exception e)
+		{
+			logger.error("Can't instantiate " + this.getClass().getName());
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

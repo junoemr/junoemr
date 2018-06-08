@@ -22,18 +22,47 @@
  */
 package org.oscarehr.common.hl7.copd.model.v24.segment;
 
+import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Type;
+import ca.uhn.hl7v2.model.v24.datatype.SI;
+import ca.uhn.hl7v2.model.v24.datatype.ST;
+import ca.uhn.hl7v2.model.v24.datatype.TS;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
+/**
+ * This segment contains information related to a contact between a patient and a provider occurring at a given place
+ * and time where one or more services or products are provided to maintain or restore the patient's good health. ZPV
+ * repeats, allowing multiple encounters for the patient to this provider.
+ */
 public class ZPV extends AbstractSegment
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public ZPV(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		Message message = this.getMessage();
+
+		try
+		{
+			this.add(SI.class, true, 1, 4, new Object[]{message}, "Set ID - ZPV");
+			this.add(TS.class, false, 1, 8, new Object[]{message}, "Contact Date");
+			this.add(ST.class, false, 1, 2000, new Object[]{message}, "Contact reason");
+			this.add(ST.class, false, 1, 64000, new Object[]{message}, "Comment");
+			this.add(ST.class, false, 1, 100, new Object[]{message}, "Comment signature");
+			this.add(TS.class, true, 1, 8, new Object[]{message}, "Scheduled contact date due");
+			this.add(ST.class, false, 1, 1000, new Object[]{message}, "Reason for next appointment");
+		}
+		catch(HL7Exception e)
+		{
+			logger.error("Can't instantiate " + this.getClass().getName());
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

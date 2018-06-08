@@ -22,18 +22,52 @@
  */
 package org.oscarehr.common.hl7.copd.model.v24.segment;
 
+import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Type;
+import ca.uhn.hl7v2.model.v24.datatype.CE;
+import ca.uhn.hl7v2.model.v24.datatype.NM;
+import ca.uhn.hl7v2.model.v24.datatype.SI;
+import ca.uhn.hl7v2.model.v24.datatype.ST;
+import ca.uhn.hl7v2.model.v24.datatype.TS;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
+/**
+ * This segment contains information related to undiagnosed or diagnosed health problems, symptoms or chronic
+ * health conditions experience by the patient. These conditions may be ongoing, or may be part of the patient's
+ * history.
+ */
 public class ZPB extends AbstractSegment
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public ZPB(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		Message message = this.getMessage();
+
+		try
+		{
+			this.add(SI.class, true, 1, 4, new Object[]{message}, "Set ID - ZPB");
+			this.add(TS.class, true, 1, 8, new Object[]{message}, "Diagnosis Date");
+			this.add(ST.class, false, 1, 1600, new Object[]{message}, "Diagnosis Description");
+			this.add(CE.class, false, 1, 250, new Object[]{message}, "Diagnosis Description");
+			this.add(CE.class, false, 1, 82, new Object[]{message}, "Symptoms Present");
+			this.add(TS.class, true, 1, 8, new Object[]{message}, "Onset Date");
+			this.add(TS.class, false, 1, 8, new Object[]{message}, "Date Resolved");
+			this.add(ST.class, false, 1, 10, new Object[]{message}, "Problem Status");
+			this.add(NM.class, true, 1, 2, new Object[]{message}, "Outcome Code");
+			this.add(ST.class, false, 1, 1000, new Object[]{message}, "Note Text");
+		}
+		catch(HL7Exception e)
+		{
+			logger.error("Can't instantiate " + this.getClass().getName());
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

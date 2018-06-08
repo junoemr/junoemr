@@ -22,18 +22,47 @@
  */
 package org.oscarehr.common.hl7.copd.model.v24.segment;
 
+import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Type;
+import ca.uhn.hl7v2.model.v24.datatype.NM;
+import ca.uhn.hl7v2.model.v24.datatype.SI;
+import ca.uhn.hl7v2.model.v24.datatype.ST;
+import ca.uhn.hl7v2.model.v24.datatype.TS;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
+/**
+ * This segment conveys quantitative observations of the patient using discreet data points.
+ */
 public class ZQO extends AbstractSegment
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public ZQO(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		Message message = this.getMessage();
+
+		try
+		{
+			this.add(SI.class, true, 1, 4, new Object[]{message}, "Set ID - ZQO");
+			this.add(TS.class, true, 1, 8, new Object[]{message}, "Observation Date");
+			this.add(ST.class, false, 1, 5, new Object[]{message}, "Mini mental health status score");
+			this.add(NM.class, false, 1, 3, new Object[]{message}, "Systolic blood pressure");
+			this.add(NM.class, false, 1, 3, new Object[]{message}, "Diastolic blood pressure");
+			this.add(NM.class, false, 1, 4, new Object[]{message}, "height");
+			this.add(NM.class, false, 1, 3, new Object[]{message}, "weight");
+			this.add(NM.class, false, 1, 4, new Object[]{message}, "waist circumference");
+		}
+		catch(HL7Exception e)
+		{
+			logger.error("Can't instantiate " + this.getClass().getName());
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

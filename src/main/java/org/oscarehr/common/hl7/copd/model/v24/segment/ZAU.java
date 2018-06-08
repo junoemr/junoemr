@@ -28,12 +28,19 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Type;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
 
+/**
+ * This ZAU Segment is part of the AHW PIN Message Structure and is left in this conformance profile as a place
+ * holder for future potential POSP requirements. At this time the ZAU Segment is Not Supported by the POSP CoPD
+ * Schema and is therefore not required to be sent.
+ */
 public class ZAU extends AbstractSegment
 {
 	public ZAU(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		Message message = this.getMessage();
+
+		// spec does not contain data types
 	}
 
 	/**
