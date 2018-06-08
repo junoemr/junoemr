@@ -256,7 +256,7 @@ if (userAgent != null) {
         //console.log("rxPagesize  "+rxPageSize);
 
 
-  <% if(vecAddressName != null) {
+  <% if(vecAddressName != null && !vecAddressName.isEmpty()) {
     %>
         useSC=true;
    <%      for(int i=0; i<vecAddressName.size(); i++) {%>
