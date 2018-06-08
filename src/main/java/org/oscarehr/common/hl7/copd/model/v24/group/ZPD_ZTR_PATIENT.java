@@ -30,9 +30,6 @@ import ca.uhn.hl7v2.model.v24.segment.SCH;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
 import org.oscarehr.common.hl7.copd.model.v24.segment.ZBA;
 
-/**
- * Custom hl7 message class for TOPD formatted messages
- */
 public class ZPD_ZTR_PATIENT extends AbstractGroup
 {
 	public ZPD_ZTR_PATIENT(Group parent, ModelClassFactory factory)
@@ -41,9 +38,10 @@ public class ZPD_ZTR_PATIENT extends AbstractGroup
 		try
 		{
 			this.add(PID.class, true, false);
-			this.add(ZPD_ZTR_PROVIDER.class, true, false);
+			this.add(ZPD_ZTR_PATIENT_PROVIDER.class, true, true);
 			this.add(SCH.class, false, true);
 			this.add(ZBA.class, false, true);
+			this.add(ZPD_ZTR_PATIENT_THIRD_PARTY.class, false, true);
 		}
 		catch(HL7Exception var3)
 		{
