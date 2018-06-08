@@ -492,12 +492,24 @@ if(custom_logo_name != null ){
 																	startimageUrl=request.getContextPath()+"/images/1x1.gif";		
 																	statusUrl = request.getContextPath()+"/PMmodule/ClientManager/check_signature_status.jsp?" + DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY+"="+signatureRequestId;
                                                                     if(oscar.OscarProperties.getInstance().isPropertyActive("rx_preset_signatures")){
-                                                                        imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image","")+"doctor_signature_"+user.getProviderNo()+".png";
-                                                                        File f = new File(imgFile);
-                                                                        if(f.exists() && !f.isDirectory())
-                                                                        {
-                                                                            startimageUrl = request.getContextPath()+"/eform/displayImage.do?imagefile=doctor_signature_"+user.getProviderNo()+".png";
-                                                                        }
+																		if (rx.getProviderNo() != null)
+																		{
+																			imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image", "") + "doctor_signature_" + rx.getProviderNo() + ".png";
+																		} else
+																		{
+																			imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image", "") + "doctor_signature_" + user.getProviderNo() + ".png";
+																		}
+																		File f = new File(imgFile);
+																		if (f.exists() && !f.isDirectory())
+																		{
+																			if (rx.getProviderNo() != null)
+																			{
+																				startimageUrl = request.getContextPath() + "/eform/displayImage.do?imagefile=doctor_signature_" + rx.getProviderNo() + ".png";
+																			} else
+																			{
+																				startimageUrl = request.getContextPath() + "/eform/displayImage.do?imagefile=doctor_signature_" + user.getProviderNo() + ".png";
+																			}
+																		}
                                                                     }
 																	%>
 																	<input type="hidden" name="<%=DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY%>" value="<%=signatureRequestId%>" />	
