@@ -53,7 +53,6 @@ public class DemographicImportService
 	{
 		File file = genericFile.getFileObject();
 		InputStream is = new FileInputStream(file);
-//			is = new BufferedInputStream(is);
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
 		String messageStr = "";
@@ -62,21 +61,6 @@ public class DemographicImportService
 		while ((line = br.readLine()) != null) {
 			messageStr += line;
 		}
-
-//			Hl7InputStreamMessageIterator iter = new Hl7InputStreamMessageIterator(is);
-//
-//			while (iter.hasNext())
-//			{
-//				Message next = iter.next();
-//				logger.info(next.encode());
-//			}
-
-//			Hl7InputStreamMessageStringIterator iter2 = new Hl7InputStreamMessageStringIterator(is);
-//			while (iter2.hasNext())
-//			{
-//				String next = iter2.next();
-//				logger.info(next);
-//			}
 
 		//TODO
 		// parse xml
@@ -87,7 +71,9 @@ public class DemographicImportService
 
 		HapiContext context = new DefaultHapiContext();
 //		context.setValidationContext(new NoValidation());
-		ModelClassFactory modelClassFactory = new CustomModelClassFactory("org.oscarehr.demographicImport.copd.hl7");
+
+		// this package string needs to match the custom model location in the oscar source code.
+		ModelClassFactory modelClassFactory = new CustomModelClassFactory("org.oscarehr.common.hl7.copd.model");
 		context.setModelClassFactory(modelClassFactory);
 
 		Parser p = context.getXMLParser();

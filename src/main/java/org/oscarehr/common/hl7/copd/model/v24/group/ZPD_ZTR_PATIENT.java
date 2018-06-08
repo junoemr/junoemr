@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.copd.hl7.v24.group;
+package org.oscarehr.common.hl7.copd.model.v24.group;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractGroup;
@@ -28,20 +28,20 @@ import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.v24.segment.PID;
 import ca.uhn.hl7v2.model.v24.segment.SCH;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
-import org.oscarehr.demographicImport.copd.hl7.v24.segment.ZBA;
+import org.oscarehr.common.hl7.copd.model.v24.segment.ZBA;
 
 /**
  * Custom hl7 message class for TOPD formatted messages
  */
-public class ZPD_ZTR_PROVIDER extends AbstractGroup
+public class ZPD_ZTR_PATIENT extends AbstractGroup
 {
-	public ZPD_ZTR_PROVIDER(Group parent, ModelClassFactory factory)
+	public ZPD_ZTR_PATIENT(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		try
 		{
-			this.add(PID.class, false, false);
-//			this.add(PID.class, false, false);
+			this.add(PID.class, true, false);
+			this.add(ZPD_ZTR_PROVIDER.class, true, false);
 			this.add(SCH.class, false, true);
 			this.add(ZBA.class, false, true);
 		}

@@ -24,9 +24,8 @@ package org.oscarehr.demographicImport.copd;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.v24.segment.PID;
 import org.apache.log4j.Logger;
-import org.oscarehr.demographicImport.copd.hl7.v24.message.ZPD_ZTR;
+import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Component;
 
@@ -56,9 +55,9 @@ public class COPDHandler
 	public COPDHandler(Message message) throws HL7Exception
 	{
 		ZPD_ZTR zpd_ztr = (ZPD_ZTR) message;
-		PID pid = zpd_ztr.getMESSAGE().getPATIENT().getPID();
+//		PID pid = zpd_ztr.getMESSAGE().getPATIENT().getPID();
 
-		logger.info("PID-3-0 name:" + pid.getPid3_PatientIdentifierList(0).getName());
+//		logger.info("PID-3-0 name:" + pid.getPid3_PatientIdentifierList(0).getName());
 
 
 

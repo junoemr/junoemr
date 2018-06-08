@@ -53,18 +53,27 @@ public class TOPDImportDemographicAction extends Action
 	{
 
 		logger.info("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
+		GenericFile tempFile = null;
 
 		try
 		{
 			ImportDemographicDataForm frm = (ImportDemographicDataForm) form;
 			FormFile imp = frm.getImportFile();
-			GenericFile tempFile = FileFactory.createTempFile(imp.getInputStream());
+			tempFile = FileFactory.createTempFile(imp.getInputStream());
 
 			demographicImportService.importDemographicData(tempFile);
 		}
 		catch(Exception e)
 		{
 			logger.error("Import Error", e);
+		}
+		finally
+		{
+			// delete the temp file when done
+			if(tempFile != null)
+			{
+				tempFile.getFileObject().delete();
+			}
 		}
 		logger.info("IMPORT PROCESS COMPLETE");
 		return mapping.findForward("success");

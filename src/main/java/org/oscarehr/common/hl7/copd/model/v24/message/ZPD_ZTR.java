@@ -20,14 +20,17 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.copd.hl7.v24.message;
+package org.oscarehr.common.hl7.copd.model.v24.message;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractMessage;
+import ca.uhn.hl7v2.model.v24.segment.MSH;
 import ca.uhn.hl7v2.parser.DefaultModelClassFactory;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
 import org.apache.log4j.Logger;
-import org.oscarehr.demographicImport.copd.hl7.v24.group.ZPD_ZTR_MESSAGE;
+import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PATIENT;
+import org.oscarehr.common.hl7.copd.model.v24.segment.ZR1;
+import org.oscarehr.common.hl7.copd.model.v24.segment.ZS1;
 import org.oscarehr.util.MiscUtils;
 
 /**
@@ -47,28 +50,14 @@ public class ZPD_ZTR extends AbstractMessage
 		logger.info("Init ZPD_ZTR");
 		try
 		{
-			this.add(ZPD_ZTR_MESSAGE.class, true, false);
+			this.add(MSH.class, true, false);
+			this.add(ZS1.class, true, false);
+			this.add(ZR1.class, false, false);
+			this.add(ZPD_ZTR_PATIENT.class, true, false);
 		}
 		catch(HL7Exception var3)
 		{
 			logger.error("ZPD_ZTR Init Error", var3);
-			throw new RuntimeException(var3);
-		}
-	}
-
-	public ZPD_ZTR_MESSAGE getMESSAGE()
-	{
-		ZPD_ZTR_MESSAGE ret = null;
-
-		try
-		{
-			ret = (ZPD_ZTR_MESSAGE) this.get("MESSAGE");
-			logger.info("get ZPD_ZTR MESSAGE: " + String.valueOf(ret));
-			return ret;
-		}
-		catch(HL7Exception var3)
-		{
-			logger.error("ZPD_ZTR getMESSAGE Error", var3);
 			throw new RuntimeException(var3);
 		}
 	}

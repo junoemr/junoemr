@@ -20,15 +20,28 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.copd.hl7.v24.segment;
+package org.oscarehr.common.hl7.copd.model.v24.segment;
 
+import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
+import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.model.Type;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
 
-public class MSH extends ca.uhn.hl7v2.model.v24.segment.MSH
+public class ZBA extends AbstractSegment
 {
-	public MSH(Group parent, ModelClassFactory factory)
+	public ZBA(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
+		Message message = this.getMessage();
+	}
+
+	/**
+	 * This method must be overridden. The easiest way is just to return null.
+	 */
+	@Override
+	protected Type createNewTypeWithoutReflection(int field)
+	{
+		return null;
 	}
 }

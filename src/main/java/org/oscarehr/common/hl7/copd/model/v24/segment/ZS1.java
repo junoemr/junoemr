@@ -20,20 +20,26 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographicImport.copd.hl7.v24.segment;
+package org.oscarehr.common.hl7.copd.model.v24.segment;
 
 import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Type;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
-public class ZBA extends AbstractSegment
+public class ZS1 extends AbstractSegment
 {
-	public ZBA(Group parent, ModelClassFactory factory)
+	private static final Logger logger = MiscUtils.getLogger();
+
+	public ZS1(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		Message message = this.getMessage();
+
+		logger.info("Init ZS1");
 	}
 
 	/**
