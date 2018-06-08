@@ -102,8 +102,9 @@ public class PDFFile extends GenericFile
 
 		try
 		{
-			PDDocument doc = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
-			numOfPage = doc.getNumberOfPages();
+			PDDocument document = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+			numOfPage = document.getNumberOfPages();
+			document.close();
 		}
 		catch(InvalidPasswordException e)
 		{
@@ -206,6 +207,7 @@ public class PDFFile extends GenericFile
 			try
 			{
 				PDDocument document = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+				document.close();
 			} catch(InvalidPasswordException e)
 			{
 				logger.warn("Encrypted PDF. Cannot re-encode");
@@ -216,6 +218,16 @@ public class PDFFile extends GenericFile
 
 			throw new RuntimeException("Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue);
 		}
+
+		try
+		{
+			PDDocument document = PDDocument.load(newPdf, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+			document.close();
+		} catch(Exception e)
+		{
+			throw new RuntimeException("Failed to load re-encoded PDF: ", e);
+		}
+
 		javaFile.delete();
 		logger.info("END PDF RE-ENCODING");
 		return newPdf;
