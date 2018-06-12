@@ -28,10 +28,14 @@ import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.v24.segment.PID;
 import ca.uhn.hl7v2.model.v24.segment.SCH;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.segment.ZBA;
+import org.oscarehr.util.MiscUtils;
 
 public class ZPD_ZTR_PATIENT extends AbstractGroup
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public ZPD_ZTR_PATIENT(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
@@ -139,6 +143,19 @@ public class ZPD_ZTR_PATIENT extends AbstractGroup
 		} catch (HL7Exception var4) {
 			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
 			throw new RuntimeException(message);
+		}
+	}
+
+	public ZPD_ZTR_PATIENT_PROVIDER getPROVIDER()
+	{
+		try
+		{
+			return (ZPD_ZTR_PATIENT_PROVIDER) this.get("PATIENT_PROVIDER");
+		}
+		catch(HL7Exception var3)
+		{
+			logger.error("Unexpected error accessing data - this is probably a bug in the source code generator.", var3);
+			throw new RuntimeException(var3);
 		}
 	}
 }

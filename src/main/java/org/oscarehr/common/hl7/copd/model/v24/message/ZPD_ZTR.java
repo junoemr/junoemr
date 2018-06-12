@@ -61,6 +61,58 @@ public class ZPD_ZTR extends AbstractMessage
 		}
 	}
 
+	public MSH getMSH()
+	{
+		try
+		{
+			return (MSH) this.get("MSH");
+		}
+		catch(HL7Exception var3)
+		{
+			logger.error("Unexpected error accessing data - this is probably a bug in the source code generator.", var3);
+			throw new RuntimeException(var3);
+		}
+	}
+
+	public ZS1 getZS1()
+	{
+		try
+		{
+			return (ZS1) this.get("ZS1");
+		}
+		catch(HL7Exception var3)
+		{
+			logger.error("Unexpected error accessing data - this is probably a bug in the source code generator.", var3);
+			throw new RuntimeException(var3);
+		}
+	}
+
+	public ZR1 getZR1()
+	{
+		try
+		{
+			return (ZR1) this.get("ZR1");
+		}
+		catch(HL7Exception var3)
+		{
+			logger.error("Unexpected error accessing data - this is probably a bug in the source code generator.", var3);
+			throw new RuntimeException(var3);
+		}
+	}
+
+	public ZPD_ZTR_PATIENT getPATIENT()
+	{
+		try
+		{
+			return (ZPD_ZTR_PATIENT) this.get("PATIENT");
+		}
+		catch(HL7Exception var3)
+		{
+			logger.error("Unexpected error accessing data - this is probably a bug in the source code generator.", var3);
+			throw new RuntimeException(var3);
+		}
+	}
+
 	@Override
 	public String getVersion()
 	{

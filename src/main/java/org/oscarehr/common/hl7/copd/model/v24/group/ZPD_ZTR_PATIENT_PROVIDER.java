@@ -72,4 +72,19 @@ public class ZPD_ZTR_PATIENT_PROVIDER extends AbstractGroup
 			throw new RuntimeException(var3);
 		}
 	}
+
+	public PRD getPRD()
+	{
+		PRD ret = null;
+
+		try
+		{
+			ret = (PRD) this.get("PRD");
+			return ret;
+		}
+		catch(HL7Exception var3)
+		{
+			throw new RuntimeException(var3);
+		}
+	}
 }

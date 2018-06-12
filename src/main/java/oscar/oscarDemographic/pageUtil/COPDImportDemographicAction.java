@@ -41,7 +41,7 @@ import oscar.OscarProperties;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class TOPDImportDemographicAction extends Action
+public class COPDImportDemographicAction extends Action
 {
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarProperties oscarProperties = OscarProperties.getInstance();
@@ -61,7 +61,7 @@ public class TOPDImportDemographicAction extends Action
 			FormFile imp = frm.getImportFile();
 			tempFile = FileFactory.createTempFile(imp.getInputStream());
 
-			demographicImportService.importDemographicData(tempFile);
+			demographicImportService.importDemographicDataCOPD(tempFile);
 		}
 		catch(Exception e)
 		{

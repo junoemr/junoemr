@@ -23,17 +23,15 @@
 
 package org.oscarehr.common.dao;
 
+import org.oscarehr.common.model.ProviderData;
+import org.springframework.stereotype.Repository;
+import oscar.util.ConversionUtils;
+
+import javax.persistence.Query;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import javax.persistence.Query;
-
-import org.oscarehr.common.model.ProviderData;
-import org.springframework.stereotype.Repository;
-
-import oscar.util.ConversionUtils;
 
 @Repository
 public class ProviderDataDao extends AbstractDao<ProviderData> {
@@ -278,5 +276,15 @@ public class ProviderDataDao extends AbstractDao<ProviderData> {
 		if (result == null)
 			return 0;
 		return ConversionUtils.fromIntString(result);
+	}
+
+	public String getNextIdWithThreshold(int minThreshold, int ignoreThreshold)
+	{
+		Query query = entityManager.createQuery("SELECT (max(CAST(p.id AS integer))+1) FROM ProviderData p WHERE p.id < :ignoreThresh AND p.id > :minThresh");
+		query.setMaxResults(1);
+		query.setParameter("ignoreThresh", ignoreThreshold);
+		query.setParameter("minThresh", minThreshold);
+
+		return (String) query.getSingleResult();
 	}
 }
