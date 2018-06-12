@@ -23,12 +23,12 @@
     Ontario, Canada
 
 --%>
-<%@ page import="oscar.oscarProvider.data.*, oscar.oscarRx.data.*,oscar.OscarProperties, oscar.oscarClinic.ClinicData, java.util.*"%>
-<%@ page import="java.io.File" %>
+<%@ page import="org.oscarehr.common.dao.FaxConfigDao, org.oscarehr.common.dao.OscarAppointmentDao,org.oscarehr.common.dao.SiteDao, org.oscarehr.common.model.Appointment, org.oscarehr.common.model.FaxConfig"%>
 <%@ page import="org.oscarehr.common.model.PharmacyInfo" %>
-<%@ page import="org.oscarehr.common.model.DemographicPharmacy" %>
-<%@ page import="org.oscarehr.common.dao.DemographicPharmacyDao" %>
-<%@ page import="org.oscarehr.common.dao.PharmacyInfoDao" %>
+<%@ page import="org.oscarehr.common.model.Site" %>
+<%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet" %>
+<%@ page import="org.oscarehr.util.DigitalSignatureUtils" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -36,19 +36,18 @@
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 <%@ taglib uri="/WEB-INF/indivo-tag.tld" prefix="indivo" %>
-<%@ page import="org.oscarehr.util.DigitalSignatureUtils"%>
-<%@ page import="org.oscarehr.util.LoggedInInfo"%>
-<%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet"%>
+<%@ page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@ page import="oscar.OscarProperties"%>
 <%! boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable(); %>
 
 
-<%@page import="org.oscarehr.common.dao.SiteDao"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@page import="org.oscarehr.common.model.Site"%>
-<%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.common.model.Appointment"%>
-<%@page import="org.oscarehr.common.dao.OscarAppointmentDao"%>
-<%@ page import="org.oscarehr.common.dao.FaxConfigDao, org.oscarehr.common.model.FaxConfig" %>
+<%@page import="oscar.oscarClinic.ClinicData"%>
+<%@page import="oscar.oscarProvider.data.ProSignatureData"%>
+<%@page import="oscar.oscarRx.data.RxPharmacyData"%>
+<%@page import="java.io.File"%>
+<%@page import="java.util.List"%>
+<%@page import="java.util.Vector"%>
 <%
 	OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -102,9 +101,10 @@ vecPageSizeValues.add("PageSize.Letter");
 //String reprint = (String)request.getAttribute("rePrint") != null ? (String)request.getAttribute("rePrint") : "false";
 
 String reprint = (String)request.getSession().getAttribute("rePrint") != null ? (String)request.getSession().getAttribute("rePrint") : "false";
+Boolean isReprint = Boolean.parseBoolean(reprint);
 
 String createAnewRx;
-if(reprint.equalsIgnoreCase("true") ) {
+if(isReprint) {
     bean = (oscar.oscarRx.pageUtil.RxSessionBean)session.getAttribute("tmpBeanRX");
     createAnewRx = "window.location.href = '" + request.getContextPath() + "/oscarRx/SearchDrug.jsp'";
 }
@@ -362,7 +362,7 @@ function printPaste2Parent(print){
 
 
 function addressSelect() {
-   <% if(vecAddressName != null) {
+   <% if(vecAddressName != null && !isReprint) {
     %>
         setDefaultAddr();
    <%      for(int i=0; i<vecAddressName.size(); i++) {%>
@@ -590,19 +590,22 @@ function toggleView(form) {
                                         if(vecAddress != null) { %>
 					<tr>
 						<td align="left" colspan=2><bean:message key="ViewScript.msgAddress"/>
-                                                    <select	name="addressSel" id="addressSel" onChange="addressSelect()" style="width:200px;" >
-							<% String rxAddr = (String) session.getAttribute("RX_ADDR");
-                                                          for (int i =0; i < vecAddressName.size();i++){
-					                 String te = (String) vecAddressName.get(i);
-                                                         String tf = (String) vecAddress.get(i);%>
+							<select name="addressSel" id="addressSel" onChange="addressSelect()" style="width:200px;"
+									<%=(isReprint) ? "disabled='disabled'" : ""%>>
+								<% String rxAddr = (String) session.getAttribute("RX_ADDR");
+									for(int i = 0; i < vecAddressName.size(); i++)
+									{
+										String te = (String) vecAddressName.get(i);
+										String tf = (String) vecAddress.get(i);%>
 
-							<option value="<%=i%>"
-								<% if ( rxAddr != null && rxAddr.equals(""+i)){ %>SELECTED<%}%>
-                                                                ><%=te%></option>
-							<%  }%>
+								<option value="<%=i%>"
+								        <% if ( rxAddr != null && rxAddr.equals(""+i)){ %>SELECTED<%}%>
+								><%=te%>
+								</option>
+								<% }%>
 
-                                                    </select>
-                                                </td>
+							</select>
+						</td>
 					</tr>
 					<% } %>
 					<tr>
@@ -630,7 +633,7 @@ function toggleView(form) {
 						<!--td width=10px></td-->
 						<td>
 						<span>
-							<input type=button value="Print PDF" class="ControlPushButton" style="width: 150px" onClick="<%=reprint.equalsIgnoreCase("true") ? "javascript:return onPrint2('rePrint', "+request.getParameter("scriptId")+");" : "javascript:return onPrint2('print', "+request.getParameter("scriptId")+");" %>" />
+							<input type=button value="Print PDF" class="ControlPushButton" style="width: 150px" onClick="<%=isReprint ? "javascript:return onPrint2('rePrint', "+request.getParameter("scriptId")+");" : "javascript:return onPrint2('print', "+request.getParameter("scriptId")+");" %>" />
 						</span>
 						</td>
 					</tr>
@@ -643,7 +646,7 @@ function toggleView(form) {
 					</tr>
 					<tr>
 						<td><span><input type=button
-							<%=reprint.equals("true")?"disabled='true'":""%> value="<bean:message key="ViewScript.msgPrintPasteEmr"/>"
+							<%=isReprint?"disabled='true'":""%> value="<bean:message key="ViewScript.msgPrintPasteEmr"/>"
 							class="ControlPushButton" style="width: 150px"
 							onClick="javascript:printPaste2Parent(true);" /></span></td>
 					</tr>
