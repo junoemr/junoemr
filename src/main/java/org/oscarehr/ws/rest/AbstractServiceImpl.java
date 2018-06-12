@@ -23,20 +23,17 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.time.*;
-import java.time.format.*;
-import java.util.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.LoggedInInfo;
-import oscar.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Base class for RESTful web services
@@ -44,6 +41,8 @@ import oscar.*;
 @Produces({ "application/xml" })
 @Consumes({ "application/xml" })
 public abstract class AbstractServiceImpl {
+
+	private static final int MAX_PAGE_RESULTS = 100;
 
 	protected HttpServletRequest getHttpServletRequest()
 	{
@@ -85,6 +84,58 @@ public abstract class AbstractServiceImpl {
 	}
 
 	/**
+	 * ensure the requested result limit does not exceed the maximum
+	 * @param paramResultsPerPage - proposed limit
+	 * @param maximum - maximum result limit
+	 * @return - the new limit
+	 */
+	protected int limitedResultCount(int paramResultsPerPage, int maximum)
+	{
+		return (maximum < paramResultsPerPage) ? maximum : paramResultsPerPage;
+	}
+	protected int limitedResultCount(int paramResultsPerPage)
+	{
+		return limitedResultCount(paramResultsPerPage, MAX_PAGE_RESULTS);
+	}
+
+	/**
+	 * ensure the page number is valid (non negative)
+	 * @param pageNo proposed page number
+	 * @return valid page number
+	 */
+	protected int validPageNo(int pageNo)
+	{
+		if(pageNo < 1) pageNo = 1;
+		return pageNo;
+	}
+	/**
+	 * calculate the offset based on the current page number and resultCount
+	 * @param pageNo - page
+	 * @param resultsPerPage - limit of results
+	 * @return offset
+	 */
+	protected int calculatedOffset(int pageNo, int resultsPerPage)
+	{
+		return resultsPerPage * (pageNo - 1);
+	}
+
+	protected boolean parametersNotAllNull(Object... parameters)
+	{
+		for(Object parameter : parameters)
+		{
+			if(parameter != null)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	protected boolean parametersAllNull(Object... parameters)
+	{
+		return !parametersNotAllNull(parameters);
+	}
+
+	/**
 	 * Gets the login information associated with the current request.
 	 * 
 	 * @return
@@ -104,25 +155,4 @@ public abstract class AbstractServiceImpl {
 		}
 		return info;
 	}
-
-
-	protected LocalDate toNullableLocalDate(String dateString) {
-		if(dateString == null) return null;
-		return toLocalDate(dateString);
-	}
-	protected LocalDate toLocalDate(String dateString) {
-		ZonedDateTime result = ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
-		return result.toLocalDate();
-	}
-	protected Date toNullableLegacyDate(LocalDate localDate) {
-		if(localDate==null) return null;
-		return toLegacyDate(localDate);
-	}
-	protected Date toLegacyDate(LocalDate localDate) {
-		return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-	}
-	protected Date toLegacyDateTime(LocalDateTime localDateTime) {
-		return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-	}
-
 }

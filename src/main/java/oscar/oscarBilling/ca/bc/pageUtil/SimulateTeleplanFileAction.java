@@ -25,26 +25,20 @@
 
 package oscar.oscarBilling.ca.bc.pageUtil;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
 import oscar.OscarProperties;
 import oscar.oscarBilling.ca.bc.MSP.TeleplanFileWriter;
 import oscar.oscarBilling.ca.bc.MSP.TeleplanSubmission;
-import oscar.oscarBilling.ca.bc.data.BillingmasterDAO;
 import oscar.oscarProvider.data.ProviderData;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * Action Simulates a MSP teleplan file but doesn't commit any of the data. 
@@ -89,16 +83,10 @@ public class SimulateTeleplanFileAction extends Action{
         //To prevent multiple submissions being generated at the same time
         synchronized (this) {
             try {
-                WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
-                BillingmasterDAO billingmasterDAO = (BillingmasterDAO) ctx.getBean("BillingmasterDAO");
-                DemographicManager demographicManager =  ctx.getBean(DemographicManager.class);
-             
+
                 TeleplanFileWriter teleplanWr = new TeleplanFileWriter();
-                teleplanWr.setBillingmasterDAO(billingmasterDAO);
-                teleplanWr.setDemographicManager(demographicManager);
                 TeleplanSubmission submission = teleplanWr.getSubmission(LoggedInInfo.getLoggedInInfoFromSession(request), testRun, pdArr, dataCenterId);
 
-                //response.getWriter().print(submission.getHtmlFile());
                 request.setAttribute("TeleplanHtmlFile", submission.getHtmlFile());
                 
             }catch(Exception e){
@@ -106,6 +94,5 @@ public class SimulateTeleplanFileAction extends Action{
             }
         }
         return mapping.findForward("success");
-        //return null;
     }
 }

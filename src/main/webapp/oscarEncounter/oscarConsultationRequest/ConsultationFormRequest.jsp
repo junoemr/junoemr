@@ -69,13 +69,12 @@ if(!authed) {
 <%@ page import="org.oscarehr.util.DigitalSignatureUtils"%>
 <%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.util.MiscUtils"%>
 <%@page import="org.oscarehr.PMmodule.dao.ProgramDao, org.oscarehr.PMmodule.model.Program" %>
-<%@page import="oscar.oscarDemographic.data.DemographicData, oscar.oscarRx.data.RxProviderData, oscar.oscarRx.data.RxProviderData.Provider, oscar.oscarClinic.ClinicData"%>
+<%@page import="oscar.oscarRx.data.RxProviderData, oscar.oscarRx.data.RxProviderData.Provider"%>
 <%@page import="org.oscarehr.common.dao.ConsultationServiceDao" %>
 <%@page import="org.oscarehr.common.model.ConsultationServices" %>
-<%@ page import="org.oscarehr.common.model.DemographicExt" %>
-<%@ page import="org.oscarehr.common.dao.DemographicExtDao" %>
+<%@ page import="org.oscarehr.demographic.model.DemographicExt" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicExtDao" %>
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 
 <html:html locale="true">
@@ -213,6 +212,7 @@ if(!authed) {
 </script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/global.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/util/date.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/util/fax.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery_oscar_defaults.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/moment.min.js"></script>
@@ -311,6 +311,10 @@ font-size: 10pt;
 input.righty{
 text-align: right;
 }
+
+#faxRecipients .autoAdded {
+	display: none;
+}
 </style>
 </head>
 
@@ -323,7 +327,6 @@ text-align: right;
 var servicesName = new Object();   		// used as a cross reference table for name and number
 var services = new Array();				// the following are used as a 2D table for makes and models
 var specialists = new Array();
-var specialistFaxNumber = "";
 <%oscar.oscarEncounter.oscarConsultationRequest.config.data.EctConConfigurationJavascriptData configScript;
 				configScript = new oscar.oscarEncounter.oscarConsultationRequest.config.data.EctConConfigurationJavascriptData();
 				out.println(configScript.getJavascript());%>
@@ -337,7 +340,14 @@ function onDocumentLoad()
 	{ %>
 		updateSelectedMultisite(document.getElementById("siteName"));
 	<%
-	}%>
+	}
+
+	// update fax button state (enabled/disabled) on load
+	if (props.isConsultationFaxEnabled())
+	{ %>
+	Oscar.Util.Fax.updateFaxButton();
+	<%
+	} %>
 }
 
 jQuery(document).ready(onDocumentLoad);
@@ -633,20 +643,18 @@ function onSelectSpecialist(SelectedSpec)	{
 	var selectedIdx = SelectedSpec.selectedIndex;
 	var form=document.EctConsultationFormRequestForm;
 
+	<% if (props.isConsultationFaxEnabled())
+	{ %>
+		jQuery("#faxRecipients").find(".autoAdded").remove();
+	<% } %>
+
+
 	if (selectedIdx==null || selectedIdx==-1 || (SelectedSpec.options[ selectedIdx ]).value == "-1") {   		//if its the first item set everything to blank
 		form.phone.value = ("");
 		form.fax.value = ("");
 		form.address.value = ("");
 
 		enableDisableRemoteReferralButton(form, true);
-
-		<%
-		if (props.isConsultationFaxEnabled()) {//
-		%>
-		specialistFaxNumber = "";
-		updateFaxButton();
-		<% } %>
-		
 		return;
 	}
 	var selectedService = document.EctConsultationFormRequestForm.service.value;  				// get the service that is selected now
@@ -670,15 +678,14 @@ function onSelectSpecialist(SelectedSpec)	{
             	form.phone.value = (aSpeci.phoneNum.replace(null,""));
             	form.fax.value = (aSpeci.specFax.replace(null,""));					// load the text fields with phone fax and address
             	form.address.value = (aSpeci.specAddress.replace(null,""));
-            	
+
        			//since there is a match make sure the dislaimer is hidden
        			document.getElementById("consult-disclaimer").style.display='none';
         	
             	<%
-        		if (props.isConsultationFaxEnabled()) {//
-				%>
-				specialistFaxNumber = aSpeci.specFax.trim();
-				updateFaxButton();
+				if (props.isConsultationFaxEnabled())
+				{ %>
+					Oscar.Util.Fax.AddFax(aSpeci.specName, aSpeci.specFax.trim())
         		<% } %>
             	
             	jQuery.getJSON("getProfessionalSpecialist.json", {id: aSpeci.specNbr},
@@ -695,7 +702,12 @@ function onSelectSpecialist(SelectedSpec)	{
             	break;
             }
         }//spec loop
-	 
+
+	<% if (props.isConsultationFaxEnabled())
+	{ %>
+		Oscar.Util.Fax.updateFaxButton();
+	<% } %>
+
 	}
 
 //-----------------------------------------------------------------
@@ -715,8 +727,8 @@ function FillThreeBoxes(serNbr)	{
                 <%
         		if (props.isConsultationFaxEnabled()) {//
 				%>
-				specialistFaxNumber = aSpeci.specFax.trim();
-				updateFaxButton();
+					Oscar.Util.Fax.AddFax(aSpeci.specName, aSpeci.specFax.trim());
+					Oscar.Util.Fax.updateFaxButton();
 				<% } %>
                 break;
            }
@@ -841,7 +853,7 @@ function importFromEnct(reqInfo,txtArea)
 						oscar.oscarDemographic.data.EctInformation EctInfo = new oscar.oscarDemographic.data.EctInformation(LoggedInInfo.getLoggedInInfoFromSession(request), demo);
 						value = EctInfo.getMedicalHistory();
 					}
-					if (pasteFmt == null || pasteFmt.equalsIgnoreCase("single"))
+					if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 					{
 						value = StringUtils.lineBreaks(value);
 					}
@@ -861,7 +873,7 @@ function importFromEnct(reqInfo,txtArea)
 					oscar.oscarDemographic.data.EctInformation EctInfo = new oscar.oscarDemographic.data.EctInformation(LoggedInInfo.getLoggedInInfoFromSession(request), demo);
 					value = EctInfo.getSocialHistory();
 				}
-				if (pasteFmt == null || pasteFmt.equalsIgnoreCase("single"))
+				if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 				{
 					value = StringUtils.lineBreaks(value);
 				}
@@ -881,7 +893,7 @@ function importFromEnct(reqInfo,txtArea)
 						oscar.oscarDemographic.data.EctInformation EctInfo = new oscar.oscarDemographic.data.EctInformation(LoggedInInfo.getLoggedInInfoFromSession(request),demo);
 						value = EctInfo.getOngoingConcerns();
 					}
-					if (pasteFmt == null || pasteFmt.equalsIgnoreCase("single"))
+					if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 					{
 						value = StringUtils.lineBreaks(value);
 					}
@@ -909,7 +921,7 @@ function importFromEnct(reqInfo,txtArea)
 							value = EctInfo.getFamilyHistory();
 						}
 					}
-					if (pasteFmt == null || pasteFmt.equalsIgnoreCase("single"))
+					if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 					{
 						value = StringUtils.lineBreaks(value);
 					}
@@ -937,7 +949,7 @@ function importFromEnct(reqInfo,txtArea)
 							value = EctInfo.getFamilyHistory();
 						}
 					}
-					if (pasteFmt == null || pasteFmt.equalsIgnoreCase("single"))
+					if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 					{
 						value = StringUtils.lineBreaks(value);
 					}
@@ -959,7 +971,7 @@ function importFromEnct(reqInfo,txtArea)
 						value = EctInfo.getReminders();
 					}
 					//if( !value.equals("") ) {
-					if (pasteFmt == null || pasteFmt.equalsIgnoreCase("single"))
+					if (pasteFmt != null && pasteFmt.equalsIgnoreCase("single"))
 					{
 						value = StringUtils.lineBreaks(value);
 					}
@@ -1212,7 +1224,7 @@ function signatureHandler(e) {
 	<%
 	if (props.isConsultationFaxEnabled()) { //
 	%>
-	updateFaxButton();
+	Oscar.Util.Fax.updateFaxButton();
 	<% } %>
 	if (e.isSave) {
 		refreshImage();
@@ -1224,52 +1236,6 @@ function signatureHandler(e) {
 }
 
 var requestIdKey = "<%=signatureRequestId %>";
-
-function AddOtherFaxProvider() {
-	var selected = jQuery("#otherFaxSelect option:selected");
-	_AddOtherFax(selected.text(),selected.val());
-}
-function AddOtherFax() {
-	var number = jQuery("#otherFaxInput").val();
-	if (checkPhone(number)) {
-		_AddOtherFax(number,number);
-	}
-	else {
-		alert("The fax number you entered is invalid.");
-	}
-}
-
-function _AddOtherFax(name, number) {
-	var remove = "<a href='javascript:void(0);' onclick='removeRecipient(this)'>remove</a>";
-	var html = "<li>"+name+"<b>, Fax No: </b>"+number+ " " +remove+"<input type='hidden' name='faxRecipients' value='"+number+"'></input></li>";
-	jQuery("#faxRecipients").append(jQuery(html));
-	updateFaxButton();
-}
-
-function checkPhone(str)
-{
-	var phone =  /^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,5})|(\(?\d{2,6}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$/
-	if (str.match(phone)) {
-   		return true;
- 	} else {
- 		return false;
- 	}
-}
-
-function removeRecipient(el) {
-	var el = jQuery(el);
-	if (el) { el.parent().remove(); updateFaxButton(); }
-	else { alert("Unable to remove recipient."); }
-}
-
-function hasFaxNumber() {
-	return specialistFaxNumber.length > 0 || jQuery("#faxRecipients").children().size() > 0;
-}
-function updateFaxButton() {
-	var disabled = !hasFaxNumber();
-	document.getElementById("fax_button").disabled = disabled;
-	document.getElementById("fax_button2").disabled = disabled;
-}
 </script>
 
 <%=WebUtilsOld.popErrorMessagesAsAlert(session)%>
@@ -1500,14 +1466,14 @@ function updateFaxButton() {
 						<input name="printPreview" type="button" value="Print Preview" onclick="return checkForm('And Print Preview','EctConsultationFormRequestForm');" />
 						<input name="updateAndSendElectronicallyTop" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndSendElectronicReferral"/>" onclick="return checkForm('Update_esend','EctConsultationFormRequestForm');" />
 						<% if (faxEnabled) { %>
-						<input id="fax_button" name="updateAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndFax"/>" onclick="return checkForm('Update And Fax','EctConsultationFormRequestForm');" />
+						<input id="fax_button" class="faxButton" name="updateAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndFax"/>" onclick="return checkForm('Update And Fax','EctConsultationFormRequestForm');" />
 						<% } %>
 					<% } else { %>
 						<input name="submitSaveOnly" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmit"/>" onclick="return checkForm('Submit Consultation Request','EctConsultationFormRequestForm'); " />
 						<input name="submitAndPrint" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndPrint"/>" onclick="return checkForm('Submit Consultation Request And Print Preview','EctConsultationFormRequestForm'); " />
 						<input name="submitAndSendElectronicallyTop" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndSendElectronicReferral"/>" onclick="return checkForm('Submit_esend','EctConsultationFormRequestForm');" />
 						<% if (faxEnabled) { %>
-						<input id="fax_button" name="submitAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndFax"/>" onclick="return checkForm('Submit And Fax','EctConsultationFormRequestForm');" />
+						<input id="fax_button" class="faxButton" name="submitAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndFax"/>" onclick="return checkForm('Submit And Fax','EctConsultationFormRequestForm');" />
 					<% 	   }
 					   }
 					   if (thisForm.iseReferral()) { %>
@@ -1619,12 +1585,12 @@ function updateFaxButton() {
 						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formPhone" />:
 							</td>
-							<td align="right" class="tite2"><input type="text" name="phone" class="righty" value="<%=thisForm.getProfessionalSpecialistPhone()%>" /></td>
+							<td align="right" class="tite2"><input readonly="readonly" type="text" name="phone" class="righty" value="<%=thisForm.getProfessionalSpecialistPhone()%>" /></td>
 						</tr>
 						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formFax" />:
 							</td>
-							<td align="right" class="tite3"><input type="text" name="fax" class="righty" /></td>
+							<td align="right" class="tite3"><input readonly="readonly" type="text" onchange="onChangeSpecialistFax();" name="fax" class="righty" /></td>
 						</tr>
 
 						<tr>
@@ -1632,7 +1598,7 @@ function updateFaxButton() {
 								<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formAddr" />:
 							</td>
 							<td align="right" class="tite3">
-								<textarea name="address" cols=20 ><%=thisForm.getProfessionalSpecialistAddress()%></textarea>
+								<textarea readonly="readonly" name="address" cols=20 ><%=thisForm.getProfessionalSpecialistAddress()%></textarea>
 							</td>
 						</tr>
 						<tr>
@@ -2147,7 +2113,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 							<td class="tite4" width="10%">  Providers: </td>
 							<td class="tite3" width="20%">
 								<select id="otherFaxSelect">
-									<option value="">Select additional fax recipients</option>
+									<option value="">--Select Provider--</option>
 								<%
 								String rdName = "";
 								String rdFaxNo = "";
@@ -2175,7 +2141,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 								</select>
 							</td>
 							<td class="tite3">
-								<button onclick="AddOtherFaxProvider(); return false;">Add Provider</button>
+								<button onclick="Oscar.Util.Fax.AddOtherFaxProvider(); return false;">Add Provider</button>
 							</td>
 						</tr>
 						<tr>
@@ -2185,7 +2151,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 
 							<font size="1">(xxx-xxx-xxxx)  </font></td>
 							<td class="tite3">
-								<button onclick="AddOtherFax(); return false;">Add Other Fax Recipient</button>
+								<button onclick="Oscar.Util.Fax.AddOtherFax(); return false;">Add Other Fax Recipient</button>
 							</td>
 						</tr>
 						<tr>
@@ -2224,7 +2190,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 							if (props.getBooleanProperty("faxEnable", "yes"))
 										{
 						%>
-						<input id="fax_button2" name="updateAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndFax"/>" onclick="return checkForm('Update And Fax','EctConsultationFormRequestForm');" />
+						<input id="fax_button2" class="faxButton" name="updateAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndFax"/>" onclick="return checkForm('Update And Fax','EctConsultationFormRequestForm');" />
 						<%
 							}
 						%>
@@ -2240,7 +2206,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 							if (props.getBooleanProperty("faxEnable", "yes"))
 										{
 						%>
-						<input id="fax_button2" name="submitAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndFax"/>" onclick="return checkForm('Submit And Fax','EctConsultationFormRequestForm');" />
+						<input id="fax_button2" class="faxButton" name="submitAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndFax"/>" onclick="return checkForm('Submit And Fax','EctConsultationFormRequestForm');" />
 						<%
 							}
 						%>
@@ -2346,6 +2312,9 @@ Calendar.setup( { inputField : "appointmentDate", ifFormat : "%Y/%m/%d", showsTi
 
 		// need to apply issue filter
 		List<CaseManagementNote> notes = cmgmtMgr.getNotes(demoNo, issueIds);
+
+		// Order by position set in echart
+		Collections.sort(notes, CaseManagementNote.getPositionComparator());
 		StringBuffer noteStr = new StringBuffer();
 		for (CaseManagementNote n : notes)
 		{

@@ -90,6 +90,13 @@ public class BillingServiceDao extends AbstractDao<BillingService> {
 		List<BillingService> list = query.getResultList();
 		return list;
 	}
+	public BillingService findLatestServiceDateByServiceCode(String code) {
+		Query query = entityManager.createQuery("select bs from BillingService bs where bs.serviceCode = :serviceCode order by bs.billingserviceDate desc");
+		query.setParameter("serviceCode", code);
+
+		query.setMaxResults(1);
+		return this.getSingleResultOrNull(query);
+	}
 	
 	public List<BillingService> findByServiceCodeAndDate(String code, Date date) {
 		Query query = entityManager.createQuery("select bs  from BillingService bs where bs.serviceCode = ? and bs.billingserviceDate = ? order by bs.billingserviceDate desc");

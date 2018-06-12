@@ -14,15 +14,18 @@ if(!authed) {
 }
 %>
 
-<%@ page import="java.math.*,java.util.*, java.sql.*, oscar.*, java.net.*,oscar.oscarBilling.ca.bc.MSP.*,oscar.util.*"%>
+<%@ page import="org.oscarehr.common.dao.ReportProviderDao"%>
+<%@ page import="org.oscarehr.common.model.Provider"%>
+<%@ page import="org.oscarehr.common.model.ReportProvider"%>
+<%@ page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="oscar.oscarBilling.ca.bc.MSP.MSPReconcile"%>
+<%@ page import="oscar.util.DateUtils,java.math.BigDecimal"%>
 <%@taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.common.dao.ReportProviderDao" %>
-<%@page import="org.oscarehr.common.model.ReportProvider" %>
-<%@page import="org.oscarehr.common.model.Provider" %>
+<%@page import="java.util.Calendar" %>
+<%@page import="java.util.GregorianCalendar" %>
 
 <%
 	ReportProviderDao reportProviderDao = SpringUtils.getBean(ReportProviderDao.class);

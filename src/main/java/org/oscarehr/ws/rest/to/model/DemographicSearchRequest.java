@@ -23,6 +23,10 @@
  */
 package org.oscarehr.ws.rest.to.model;
 
+/**
+ * @deprecated - use the DemographicCriteriaSearch in future
+ */
+@Deprecated
 public class DemographicSearchRequest {
 	
 	public static enum SEARCHMODE {
@@ -54,6 +58,8 @@ public class DemographicSearchRequest {
 	private SORTDIR sortDir;
 
 	private STATUSMODE statusMode;
+
+	private boolean exactMatch = false;
 	
 
 	public SEARCHMODE getMode() {
@@ -111,5 +117,14 @@ public class DemographicSearchRequest {
 	public void setStatusMode(STATUSMODE statusMode) {
 		this.statusMode = statusMode;
 	}
-	
+
+	public boolean isExactMatch()
+	{
+		return exactMatch;
+	}
+
+	public void setExactMatch(boolean exactMatch)
+	{
+		this.exactMatch = exactMatch;
+	}
 }

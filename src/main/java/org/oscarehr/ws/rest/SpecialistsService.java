@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.ws.rest.conversion.ProfessionalSpecialistConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.ProfessionalSpecialistTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -55,7 +56,7 @@ public class SpecialistsService extends AbstractServiceImpl
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<ProfessionalSpecialistTo1>, String> searchSpecialists(@QueryParam("searchName") String searchName,
+	public RestResponse<List<ProfessionalSpecialistTo1>> searchSpecialists(@QueryParam("searchName") String searchName,
 	                                                                               @QueryParam("searchRefNo") String searchRefNo,
 	                                                                               @QueryParam("page") @DefaultValue("1") Integer page,
 	                                                                               @QueryParam("perPage") @DefaultValue("10") Integer perPage)

@@ -25,7 +25,8 @@
 
 --%>
 
-<%@page import="oscar.oscarDemographic.data.*,java.util.*,oscar.oscarBilling.ca.bc.Teleplan.*"%>
+<%@page import="oscar.oscarBilling.ca.bc.Teleplan.TeleplanSequenceDAO,
+oscar.oscarBilling.ca.bc.Teleplan.TeleplanUserPassDAO"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>

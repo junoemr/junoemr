@@ -35,6 +35,7 @@ import org.apache.struts.action.ActionMessages;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.eform.exception.EFormMeasurementException;
 import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.eform.service.EFormDataService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.match.IMatchManager;
@@ -67,7 +68,7 @@ public class AddEFormAction extends Action {
 
 	private static final Logger logger=MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	private org.oscarehr.eform.service.EForm eFormService = SpringUtils.getBean(org.oscarehr.eform.service.EForm.class);
+	private EFormDataService eFormService = SpringUtils.getBean(EFormDataService.class);
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) {
@@ -85,16 +86,14 @@ public class AddEFormAction extends Action {
 		boolean fax = "true".equals(request.getParameter("fax"));
 		boolean print = "true".equals(request.getParameter("print"));
 
-		String previousFormDataId = (String)session.getAttribute("eform_data_id");
-		session.removeAttribute("eform_data_id");
-
 		String fid = request.getParameter("efmfid");
+		String oldFormDataId = org.apache.commons.lang.StringUtils.trimToNull(request.getParameter("efmfdid"));
 		String demographicNoStr = request.getParameter("efmdemographic_no");
 		String eFormLink = request.getParameter("eform_link");
 		String subject = org.apache.commons.lang.StringUtils.trimToEmpty(request.getParameter("subject"));
 		boolean doDatabaseUpdate = "on".equalsIgnoreCase(request.getParameter("_oscardodatabaseupdate"));
 
-		Integer formId = Integer.parseInt(fid);
+		Integer eformTemplateId = Integer.parseInt(fid);
 		Integer demographicNo = Integer.parseInt(demographicNoStr);
 		Integer providerNo = Integer.parseInt(providerNoStr);
 
@@ -193,19 +192,19 @@ public class AddEFormAction extends Action {
 		try
 		{
 			EFormData eForm;
-			if(StringUtils.filled(previousFormDataId))
+			if(StringUtils.filled(oldFormDataId))
 			{
-				Integer oldFdid = Integer.parseInt(previousFormDataId);
-				eForm = eFormService.saveExistingEForm(oldFdid, demographicNo, providerNo, formId, subject, formOpenerMap, paramValueMap, eFormLink);
+				Integer oldFdid = Integer.parseInt(oldFormDataId);
+				eForm = eFormService.saveExistingEForm(oldFdid, demographicNo, providerNo, subject, formOpenerMap, paramValueMap, eFormLink);
 			}
 			else
 			{
-				eForm = eFormService.saveNewEForm(demographicNo, providerNo, formId, subject, formOpenerMap, paramValueMap, eFormLink);
+				eForm = eFormService.saveNewEForm(eformTemplateId, demographicNo, providerNo, subject, formOpenerMap, paramValueMap, eFormLink);
 			}
 
 
 			boolean sameForm = (eForm == null);
-			String fdid = (sameForm) ? previousFormDataId : eForm.getId().toString();
+			String fdid = (sameForm) ? oldFormDataId : eForm.getId().toString();
 
 			if(!sameForm)
 			{

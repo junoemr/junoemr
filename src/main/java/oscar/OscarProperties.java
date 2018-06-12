@@ -54,6 +54,7 @@ public class OscarProperties extends Properties {
 	private static final String INSTANCE_TYPE_ALBERTA = "AB";
 
 	private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+	private static final String DEFAULT_DATETIME_FORMAT = DEFAULT_DATE_FORMAT + " HH:mm:ss";
 
 	/* Do not use this constructor. Use getInstance instead */
 	private OscarProperties() {
@@ -188,9 +189,9 @@ public class OscarProperties extends Properties {
 	}
 
 	/**
-	 * Will check the properties to see if that property is set and if it's set to "true", "yes" or "on". 
+	 * Will check the properties to see if that property is set and if it's set to "true", "yes" or "on".
 	 * If it is method returns true if not method returns false.
-	 * 
+	 *
 	 * @param key key of property
 	 * @return boolean whether the property is active
 	 */
@@ -204,19 +205,31 @@ public class OscarProperties extends Properties {
 	// Methods for getting specific property values
 	// =========================================================================
 
-	public String getDisplayDateFormat() {
+	public String getDisplayDateFormat()
+	{
+		return getDisplayDateFormat(getProperty("display_date_format"), DEFAULT_DATE_FORMAT);
+	}
 
-		String dateFormat;
+	public String getDisplayDateTimeFormat()
+	{
+		return getDisplayDateFormat(getProperty("display_datetime_format"), DEFAULT_DATETIME_FORMAT);
+	}
 
-		try {
-			dateFormat = getProperty("display_date_format");
-			SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
-		} catch(NullPointerException | IllegalArgumentException e)  {
-			dateFormat = DEFAULT_DATE_FORMAT;
-			MiscUtils.getLogger().error("Error", e);
+	private String getDisplayDateFormat(String preferredFormat, String defaultFormat)
+	{
+		String dateTimeFormat;
+		try
+		{
+			dateTimeFormat = (preferredFormat != null)? preferredFormat : defaultFormat;
+			new SimpleDateFormat(dateTimeFormat);
+		}
+		catch(NullPointerException | IllegalArgumentException e)
+		{
+			dateTimeFormat = defaultFormat;
+			MiscUtils.getLogger().error("Invalid Date/Time display format", e);
 		}
 
-		return dateFormat;
+		return dateTimeFormat;
 	}
 
 	public Date getStartTime() {
@@ -465,6 +478,45 @@ public class OscarProperties extends Properties {
 		return Integer.parseInt(prop);
 	}
 
+	public boolean isAppointmentIntakeFormEnabled()
+	{
+		return isPropertyActive("appt_intake_form");
+	}
+
+	public boolean isNewEyeformEnabled()
+	{
+		return isPropertyActive("new_eyeform_enabled");
+	}
+
+	public boolean isSinglePageChartEnabled()
+	{
+		return isPropertyActive("SINGLE_PAGE_CHART");
+	}
+
+	public boolean isAppointmentShowShortLettersEnabled()
+	{
+		return isPropertyActive("APPT_SHOW_SHORT_LETTERS");
+	}
+
+	public boolean isToggleReasonByProviderEnabled()
+	{
+		return isPropertyActive("TOGGLE_REASON_BY_PROVIDER");
+	}
+
+	public boolean isDisplayAlertsOnScheduleScreenEnabled()
+	{
+		return isPropertyActive("displayAlertsOnScheduleScreen");
+	}
+
+	public boolean isAppoinmtnetAlwaysShowLinksEnabled()
+	{
+		return isPropertyActive("APPT_ALWAYS_SHOW_LINKS");
+	}
+
+	public boolean isEditAppointmentStatusEnabled()
+	{
+		return isPropertyActive("ENABLE_EDIT_APPT_STATUS");
+	}
 
 	// =========================================================================
 	// Static methods for getting specific property values

@@ -1,84 +1,129 @@
 <beans xmlns="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:cxf="http://cxf.apache.org/core"
-	xmlns:jaxws="http://cxf.apache.org/jaxws"
 	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:cxf="http://cxf.apache.org/core"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
-		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
 		http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-		http://cxf.apache.org/jaxws	http://cxf.apache.org/schemas/jaxws.xsd
 		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
 	">
-	
-	
-	
-	
-	    <bean id="oauthProvider" class="oscar.login.OscarOAuthDataProvider" autowire="byName"/>
+
+	<!--<bean id="restLoggingInInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingInInterceptor" parent="abstractLoggingInterceptor"/>-->
+	<!--<bean id="restLoggingOutInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingOutInterceptor" parent="abstractLoggingInterceptor"/>-->
+
+	<bean id="oauthProvider" class="oscar.login.OscarOAuthDataProvider" autowire="byName"/>
 
 	<bean id="requestTokenService" class="oscar.login.OscarRequestTokenService">
-	   <property name="dataProvider" ref="oauthProvider"/>
+		<property name="dataProvider" ref="oauthProvider"/>
 	</bean>
-	
+
 	<bean id="oAuthFilter" class="org.apache.cxf.rs.security.oauth.filters.OAuthRequestFilter">
-         <property name="dataProvider" ref="oauthProvider"/>
-         <property name="useUserSubject" value="true"/>
-     </bean>
-	
+		<property name="dataProvider" ref="oauthProvider"/>
+		<property name="useUserSubject" value="true"/>
+		<property name="supportUnknownParameters" value="true"/>
+	</bean>
+
 	<bean id="authorizationService" class="org.apache.cxf.rs.security.oauth.services.AuthorizationRequestService">
 		<property name="dataProvider" ref="oauthProvider"/>
 	</bean>
-     
-     <bean id="dispatchProvider" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
-      <property name="resourcePath" value="/login/3rdpartyLogin.jsp"/>
-	 </bean>
-	 
-	      
-	<bean id="accessTokenService" class="org.apache.cxf.rs.security.oauth.services.AccessTokenService">
-	  <property name="dataProvider" ref="oauthProvider"/>
+
+	<bean id="dispatchProvider" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
+		<property name="resourcePath" value="/login/3rdpartyLogin.jsp"/>
 	</bean>
-  
-	
-    <jaxrs:server id="oauthService" address="/oauth" >
 
-        <jaxrs:serviceBeans>
-            <ref bean="requestTokenService"/>
-            <ref bean="authorizationService"/>
-            <ref bean="accessTokenService"/>
-        </jaxrs:serviceBeans>
-         
-        <jaxrs:providers>
-      		<ref bean="dispatchProvider"/>
-   		</jaxrs:providers> 
-      
-        <jaxrs:extensionMappings>
-            <entry key="xml" value="application/xml" />         
-        </jaxrs:extensionMappings>
-        
-    </jaxrs:server>
 
-  <jaxrs:server id="restServices" address="/services">
-        <jaxrs:serviceBeans>
-            <bean class="org.oscarehr.ws.rest.ProviderService"  autowire="byName"/>
-        </jaxrs:serviceBeans>
-             
-      <jaxrs:providers>
-           <ref bean="oAuthFilter"/>
-           <ref bean="jaxb"/>
-            <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
-        </jaxrs:providers>
-      
-      
-        <jaxrs:extensionMappings>
-            <entry key="xml" value="application/xml" />
-            <entry key="json" value="application/json" />
-        </jaxrs:extensionMappings>
-    </jaxrs:server>
-    
-   
+	<bean id="accessTokenService" class="org.apache.cxf.rs.security.oauth.services.AccessTokenService">
+		<property name="dataProvider" ref="oauthProvider"/>
+	</bean>
+
+	<bean id="validationExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.ValidationExceptionMapper"/>
+	<bean id="generalExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.GeneralExceptionMapper"/>
+	<bean id="invalidFormatExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.InvalidFormatExceptionMapper"/>
+	<bean id="jsonParseExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.JsonParseExceptionMapper"/>
+	<bean id="securityExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.SecurityExceptionMapper"/>
+	<bean id="missingArgumentExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.MissingArgumentExceptionMapper"/>
+	<bean id="rateLimitExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.RateLimitExceptionMapper"/>
+	<bean id="objectMapperProvider" class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
+
+	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider"/>
+
+	<bean id="validationInInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor">
+		<property name="provider" ref="validationProvider"/>
+	</bean>
+
+	<bean id="validationOutInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationOutInterceptor">
+		<property name="provider" ref="validationProvider"/>
+	</bean>
+
+	<jaxrs:server id="oauthService" address="/oauth">
+
+		<jaxrs:serviceBeans>
+			<ref bean="requestTokenService"/>
+			<ref bean="authorizationService"/>
+			<ref bean="accessTokenService"/>
+		</jaxrs:serviceBeans>
+
+		<jaxrs:providers>
+			<ref bean="dispatchProvider"/>
+		</jaxrs:providers>
+
+		<jaxrs:extensionMappings>
+			<entry key="xml" value="application/xml"/>
+		</jaxrs:extensionMappings>
+
+	</jaxrs:server>
+
+	<jaxrs:server id="restServicesV1" address="/services/v1">
+		<jaxrs:inInterceptors>
+			<ref bean="validationInInterceptor"/>
+			<!--<ref bean="restLoggingInInterceptor"/>-->
+		</jaxrs:inInterceptors>
+		<jaxrs:outInterceptors>
+			<ref bean="validationOutInterceptor"/>
+			<!--<ref bean="restLoggingOutInterceptor"/>-->
+		</jaxrs:outInterceptors>
+
+		<jaxrs:inFaultInterceptors>
+			<!-- XXX: make sure failed calls get logged
+			<ref bean="restLoggingInInterceptor" />
+			-->
+		</jaxrs:inFaultInterceptors>
+		<jaxrs:outFaultInterceptors>
+			<!-- XXX: make sure failed calls get logged
+			<ref bean="restLoggingOutInterceptor" />
+			<ref bean="exceptionParsingOutInterceptor" />
+			-->
+		</jaxrs:outFaultInterceptors>
+
+		<!-- define which services are externally available -->
+		<jaxrs:serviceBeans>
+			<bean class="org.oscarehr.ws.external.rest.v1.DemographicWs" autowire="byName"/>
+			<bean class="org.oscarehr.ws.external.rest.v1.DemographicsWs" autowire="byName"/>
+			<bean class="org.oscarehr.ws.external.rest.v1.DocumentWs" autowire="byName"/>
+			<bean class="org.oscarehr.ws.external.rest.v1.ProviderWs" autowire="byName"/>
+			<bean class="org.oscarehr.ws.external.rest.v1.ProvidersWs" autowire="byName"/>
+		</jaxrs:serviceBeans>
+
+		<jaxrs:providers>
+			<ref bean="oAuthFilter"/>
+			<ref bean="jaxb"/>
+			<ref bean="validationExceptionMapper"/>
+			<ref bean="invalidFormatExceptionMapper"/>
+			<ref bean="jsonParseExceptionMapper"/>
+			<ref bean="rateLimitExceptionMapper"/>
+			<ref bean="securityExceptionMapper"/>
+			<ref bean="missingArgumentExceptionMapper"/>
+			<ref bean="generalExceptionMapper"/>
+			<ref bean="objectMapperProvider"/>
+			<bean class="org.oscarehr.ws.rest.filter.LoggingFilter"/>
+			<bean class="org.oscarehr.ws.rest.filter.RateLimitFilter"/>
+			<bean class="org.oscarehr.ws.rest.filter.IPRestrictionFilter"/>
+			<bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+		</jaxrs:providers>
+
+		<jaxrs:extensionMappings>
+			<entry key="xml" value="application/xml"/>
+			<entry key="json" value="application/json"/>
+		</jaxrs:extensionMappings>
+	</jaxrs:server>
 </beans>

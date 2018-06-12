@@ -48,7 +48,7 @@ import oscar.util.ConversionUtils;
 
 public class EctValidation{
 
-    public String regCharacterExp = "^[\\w\\s,.?]*$";        
+    public String regCharacterExp = "^[\\w\\s-/,.?]*$";
 
     public EctValidation(){
     }

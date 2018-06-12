@@ -28,7 +28,8 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="http://displaytag.sf.net" prefix="display"%>
-<%@ page import="java.util.*,oscar.oscarBilling.ca.bc.data.BillingCodeData,oscar.oscarBilling.ca.bc.pageUtil.*"%>
+<%@ page import="oscar.oscarBilling.ca.bc.data.BillingCodeData"%>
+<%@ page import="java.util.ArrayList"%>
 
 <html:html locale="true">
 <head>
@@ -36,41 +37,35 @@
 	<link href="<%=request.getContextPath() %>/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body>
+	<body>
 	<h3><bean:message key="admin.admin.ManagePrivFrm"/></h3>
 	<div class="container-fluid well">
-	
-	<a href="billingAddPrivateCode.jsp?addNew=true" class="btn btn-primary">Add Code</a>
-	
-	<form action="billingPrivateCodeAdjust.jsp" method="get">
-	<%if (request.getAttribute("returnMessage") != null) {      %>
-		<%=request.getAttribute("returnMessage")%>
-	<%}      %>
-	</form>
-	<%
 
-      String sortOrder = request.getParameter("sortOrder")!=null?request.getParameter("sortOrder"):"";
-        BillingCodeData bcds = new BillingCodeData();
-        ArrayList list = (ArrayList) bcds.findBillingCodesByCode("A",sortOrder.equals("desc")?1:0);
-        if (list != null) {
-          String arrow = "";
-          String newOrder =  "";
-          if(sortOrder.equals("desc")){
-            newOrder = "";
-            arrow = "&uarr;";
-          }
-          else if(sortOrder.equals("")){
-            newOrder = "desc";
-             arrow = "&darr;";
-          }
-      %> <% request.setAttribute( "test", list); %> 
-		<display:table	name="test" defaultsort="1" defaultorder="descending" decorator="oscar.oscarBilling.ca.bc.pageUtil.BillCodesTableWrapper" class="table table-hover table-striped">
-			<display:column property="serviceCode" title="Service Code" sortable="true" headerClass="sortable" />
-			<display:column property="description" title="Description" sortable="true" headerClass="sortable" />
-			<display:column property="value" title="Price" sortable="true" headerClass="sortable" />
-			<display:column property="billingserviceNo" title="Options" />
-		</display:table> 
-	<%}%>
-	</div>		
+		<a href="billingAddPrivateCode.jsp?addNew=true" class="btn btn-primary">Add Code</a>
+
+		<form action="billingPrivateCodeAdjust.jsp" method="get">
+			<%
+				if(request.getAttribute("returnMessage") != null)
+				{
+			%>
+			<%=request.getAttribute("returnMessage")%>
+			<%} %>
+		</form>
+		<%
+			String sortOrder = request.getParameter("sortOrder") != null ? request.getParameter("sortOrder") : "";
+			BillingCodeData bcds = new BillingCodeData();
+			ArrayList list = (ArrayList) bcds.findBillingCodesByCode("A", sortOrder.equals("desc") ? 1 : 0);
+			if(list != null)
+			{
+				request.setAttribute("test", list); %>
+		<display:table name="test" defaultsort="1" defaultorder="descending" decorator="oscar.oscarBilling.ca.bc.pageUtil.BillCodesTableWrapper"
+		               class="table table-hover table-striped">
+			<display:column property="serviceCode" title="Service Code" sortable="true" headerClass="sortable"/>
+			<display:column property="description" title="Description" sortable="true" headerClass="sortable"/>
+			<display:column property="value" title="Price" sortable="true" headerClass="sortable"/>
+			<display:column property="billingserviceNo" title="Options"/>
+		</display:table>
+		<%}%>
+	</div>
 </body>
 </html:html>

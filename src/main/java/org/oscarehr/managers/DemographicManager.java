@@ -24,42 +24,48 @@
 
 package org.oscarehr.managers;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.Gender;
 import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.dao.DemographicContactDao;
-import org.oscarehr.common.dao.DemographicCustArchiveDao;
-import org.oscarehr.common.dao.DemographicCustDao;
+import org.oscarehr.demographic.dao.DemographicCustArchiveDao;
+import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.dao.DemographicExtArchiveDao;
-import org.oscarehr.common.dao.DemographicExtDao;
-import org.oscarehr.common.dao.DemographicMergedDao;
+import org.oscarehr.demographic.dao.DemographicExtArchiveDao;
+import org.oscarehr.demographic.dao.DemographicExtDao;
+import org.oscarehr.demographic.dao.DemographicMergedDao;
 import org.oscarehr.common.dao.PHRVerificationDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Demographic.PatientStatus;
 import org.oscarehr.common.model.DemographicContact;
-import org.oscarehr.common.model.DemographicCust;
-import org.oscarehr.common.model.DemographicExt;
-import org.oscarehr.common.model.DemographicExtArchive;
-import org.oscarehr.common.model.DemographicMerged;
+import org.oscarehr.demographic.model.DemographicCust;
+import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.model.DemographicExtArchive;
+import org.oscarehr.demographic.model.DemographicMerged;
 import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.provider.dao.RecentDemographicAccessDao;
+import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
-import oscar.util.StringUtils;
+import oscar.log.LogAction;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Will provide access to demographic data, as well as closely related data such as 
@@ -104,11 +110,20 @@ public class DemographicManager {
 	
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
+
+	@Autowired
+	private RecentDemographicAccessDao recentDemographicAccessDao;
+
+	@Autowired
+	private ProgramManager programManager;
 	
 
 	public Demographic getDemographic(LoggedInInfo loggedInInfo, Integer demographicId) throws PatientDirectiveException {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ, demographicId);
-		
+		return getDemographic(loggedInInfo.getLoggedInProviderNo() , demographicId);
+	}
+	public Demographic getDemographic(String providerNo, Integer demographicId) throws PatientDirectiveException {
+		checkPrivilege(providerNo, SecurityInfoManager.READ, demographicId);
+
 		return demographicDao.getDemographicById(demographicId);
 	}
 		
@@ -166,13 +181,14 @@ public class DemographicManager {
 		return (results);
 	}
 
-	public List<DemographicExt> getDemographicExts(LoggedInInfo loggedInInfo, Integer id) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
-		List<DemographicExt> result = null;
-
-		result = demographicExtDao.getDemographicExtByDemographicNo(id);
-
-		return result;
+	public List<DemographicExt> getDemographicExts(LoggedInInfo loggedInInfo, Integer id)
+	{
+		return getDemographicExts(loggedInInfo.getLoggedInProviderNo(), id);
+	}
+	public List<DemographicExt> getDemographicExts(String providerNo, Integer id)
+	{
+		checkPrivilege(providerNo, SecurityInfoManager.READ);
+		return demographicExtDao.getDemographicExtByDemographicNo(id);
 	}
 
 	public DemographicExt getDemographicExt(LoggedInInfo loggedInInfo, Integer demographicNo, String key) {
@@ -183,20 +199,36 @@ public class DemographicManager {
 		return result;
 	}
 
-	public DemographicCust getDemographicCust(LoggedInInfo loggedInInfo, Integer id) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
-		DemographicCust result = demographicCustDao.find(id);
-
-		return result;
+	public DemographicCust getDemographicCust(LoggedInInfo loggedInInfo, Integer id)
+	{
+		return getDemographicCust(loggedInInfo.getLoggedInProviderNo(), id);
+	}
+	public DemographicCust getDemographicCust(String providerNo, Integer id)
+	{
+		checkPrivilege(providerNo, SecurityInfoManager.READ);
+		return demographicCustDao.find(id);
 	}
 
-	public void createUpdateDemographicCust(LoggedInInfo loggedInInfo, DemographicCust demoCust) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
-		if (demoCust != null) {
+	public void createUpdateDemographicCust(LoggedInInfo loggedInInfo, DemographicCust demoCust)
+	{
+		createUpdateDemographicCust(loggedInInfo.getLoggedInProviderNo(), demoCust);
+	}
+
+	public void createUpdateDemographicCust(String providerNo, DemographicCust demoCust)
+	{
+		checkPrivilege(providerNo, SecurityInfoManager.WRITE);
+		if(demoCust != null)
+		{
 			//Archive previous demoCust
 			DemographicCust prevCust = demographicCustDao.find(demoCust.getId());
-			if (prevCust != null) {
-				if (!(StringUtils.nullSafeEquals(prevCust.getAlert(), demoCust.getAlert()) && StringUtils.nullSafeEquals(prevCust.getMidwife(), demoCust.getMidwife()) && StringUtils.nullSafeEquals(prevCust.getNurse(), demoCust.getNurse()) && StringUtils.nullSafeEquals(prevCust.getResident(), demoCust.getResident()) && StringUtils.nullSafeEquals(prevCust.getNotes(), demoCust.getNotes()))) {
+			if(prevCust != null)
+			{
+				if(!(StringUtils.equals(prevCust.getAlert(), demoCust.getAlert()) &&
+						StringUtils.equals(prevCust.getMidwife(), demoCust.getMidwife()) &&
+						StringUtils.equals(prevCust.getNurse(), demoCust.getNurse()) &&
+						StringUtils.equals(prevCust.getResident(), demoCust.getResident()) &&
+						StringUtils.equals(prevCust.getNotes(), demoCust.getNotes())))
+				{
 					demographicCustArchiveDao.archiveDemographicCust(prevCust);
 				}
 			}
@@ -217,23 +249,33 @@ public class DemographicManager {
 		return result;
 	}
 
-	public void createDemographic(LoggedInInfo loggedInInfo, Demographic demographic, Integer admissionProgramId) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+	public void createDemographic(LoggedInInfo loggedInInfo, Demographic demographic, Integer admissionProgramId)
+	{
+		createDemographic(loggedInInfo.getLoggedInProviderNo(), demographic, admissionProgramId);
+	}
+	public void createDemographic(String providerNo, Demographic demographic, Integer admissionProgramId) {
+		checkPrivilege(providerNo, SecurityInfoManager.WRITE);
 		try {
 			demographic.getBirthDay();
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Birth date was specified for " + demographic.getFullName() + ": " + demographic.getBirthDayAsString());
 		}
 
-		demographic.setPatientStatus(PatientStatus.AC.name());
-		demographic.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
-		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
+		if(demographic.getPatientStatus() == null)
+		{
+			demographic.setPatientStatus(PatientStatus.AC.name());
+		}
+		if(demographic.getFamilyDoctor() == null)
+		{
+			demographic.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
+		}
+		demographic.setLastUpdateUser(providerNo);
 		demographicDao.save(demographic);
 
 		Admission admission = new Admission();
 		admission.setClientId(demographic.getDemographicNo());
 		admission.setProgramId(admissionProgramId);
-		admission.setProviderNo(loggedInInfo.getLoggedInProviderNo());
+		admission.setProviderNo(providerNo);
 		admission.setAdmissionDate(new Date());
 		admission.setAdmissionStatus(Admission.STATUS_CURRENT);
 		admission.setAdmissionNotes("");
@@ -242,7 +284,7 @@ public class DemographicManager {
 
 		if (demographic.getExtras() != null) {
 			for (DemographicExt ext : demographic.getExtras()) {
-				createExtension(loggedInInfo, ext);
+				createExtension(providerNo, ext);
 			}
 		}
 	}
@@ -293,8 +335,8 @@ public class DemographicManager {
 	}
 	
 
-	public void createExtension(LoggedInInfo loggedInInfo, DemographicExt ext) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+	public void createExtension(String providerNo, DemographicExt ext) {
+		checkPrivilege(providerNo, SecurityInfoManager.WRITE);
 		demographicExtDao.saveEntity(ext);
 	}
 
@@ -591,15 +633,314 @@ public class DemographicManager {
 		return (results);
 	}
 
-	private void checkPrivilege(LoggedInInfo loggedInInfo, String privilege) {
-		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_demographic", privilege, null)) {
-			throw new RuntimeException("missing required security object (_demographic)");
+	private void checkPrivilege(LoggedInInfo loggedInInfo, String privilege)
+	{
+		checkPrivilege(loggedInInfo.getLoggedInProviderNo(), privilege);
+	}
+	private void checkPrivilege(String providerNo, String privilege) {
+		if (!securityInfoManager.hasPrivilege(providerNo, "_demographic", privilege, null)) {
+			throw new SecurityException("missing required security object (_demographic)");
 		}
 	}
 
-	private void checkPrivilege(LoggedInInfo loggedInInfo, String privilege, int demographicNo) {
-		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_demographic", privilege, demographicNo)) {
-			throw new RuntimeException("missing required security object (_demographic)");
+	private void checkPrivilege(String providerNo, String privilege, int demographicNo) {
+		if (!securityInfoManager.hasPrivilege(providerNo, "_demographic", privilege, String.valueOf(demographicNo))) {
+			throw new SecurityException("missing required security object (_demographic)");
 		}
+	}
+
+	public void addDemographicWithValidation(LoggedInInfo loggedInInfo, Demographic demographic) throws Exception
+	{
+		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+
+		validateDemographic(demographic);
+		filterDemographic(demographic);
+
+		demographicDao.save(demographic);
+
+		LogAction.addLogEntrySynchronous("DemographicManager.addDemographicWithValidation", "demographicId=" + demographic.getDemographicNo());
+	}
+
+	public void addDemographicExts(LoggedInInfo loggedInInfo, Demographic demographic,
+									  DemographicTransfer demographicTransfer)
+	{
+		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+
+		if (demographicTransfer.getCellPhone() != null)
+		{
+			demographicExtDao.addKey(demographic.getProviderNo(),
+					demographic.getDemographicNo(), "demo_cell",
+					demographicTransfer.getCellPhone());
+		}
+	}
+
+	public void updateDemographicExtras(LoggedInInfo loggedInInfo, Demographic demographic)
+	{
+		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+
+		DemographicCust demoCust = getDemographicCust(loggedInInfo, demographic.getDemographicNo());
+		createUpdateDemographicCust(loggedInInfo, demoCust);
+	}
+
+	// When adding a demographic, entries are required in other tables.  This
+	// method adds those entries.
+	public void addDemographicExtras(LoggedInInfo loggedInInfo, Demographic demographic)
+	{
+		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
+
+		// demographiccust
+		DemographicCust demoCust = new DemographicCust();
+		demoCust.setId(demographic.getDemographicNo());
+		demoCust.setNotes("<unotes></unotes>");
+
+		demographicCustDao.persist(demoCust);
+
+		Date date = new Date();
+
+		// admission
+		Admission admission = new Admission();
+
+		admission.setProviderNo("");
+		admission.setClientId(demographic.getDemographicNo());
+		admission.setAdmissionDate(date);
+		admission.setDischargeDate(date);
+		admission.setProgramId(programManager.getDefaultProgramId());
+		admission.setTemporaryAdmission(false);
+		admission.setDischargeFromTransfer(false);
+		admission.setAdmissionFromTransfer(false);
+		admission.setAutomaticDischarge(false);
+		admission.setAdmissionStatus(Admission.STATUS_CURRENT);
+
+		admissionDao.saveAdmission(admission);
+
+		// provider_recent_demographic_access
+		RecentDemographicAccess recentDemographicAccess = new RecentDemographicAccess(
+				-1, demographic.getDemographicNo()
+		);
+		recentDemographicAccess.setAccessDateTimeToNow();
+		recentDemographicAccessDao.persist(recentDemographicAccess);
+	}
+
+	private void filterDemographic(Demographic demographic)
+	{
+		// Set some default values
+		if (demographic.getPatientStatus() == null)
+		{
+			demographic.setPatientStatus("AC");
+
+			if (demographic.getPatientStatusDate() == null)
+			{
+				Date date = new Date();
+				demographic.setPatientStatusDate(date);
+			}
+		}
+
+		if (StringUtils.isBlank(demographic.getFamilyDoctor()))
+		{
+			demographic.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
+		}
+
+		if (StringUtils.isBlank(demographic.getFamilyDoctor2()))
+		{
+			demographic.setFamilyDoctor2("<fd></fd><fdname></fdname>");
+		}
+
+		if (demographic.getLastUpdateDate() == null)
+		{
+			demographic.setLastUpdateDate(new Date());
+		}
+
+		if (demographic.getProviderNo() == null)
+		{
+			demographic.setProviderNo("");
+		}
+
+	}
+
+	private void validateDemographic(Demographic demographic)
+			throws Exception
+	{
+		boolean has_error = false;
+		String error_string = "";
+		if (demographic.getFirstName() == null)
+		{
+			error_string += "firstName is a required field.  ";
+			has_error = true;
+		}
+
+		if (demographic.getLastName() == null)
+		{
+			error_string += "lastName is a required field.  ";
+			has_error = true;
+		}
+
+		if (demographic.getSex() == null)
+		{
+			error_string += "sex is a required field.  ";
+			has_error = true;
+		}
+
+		else if (!demographic.getSex().equals("M")
+				&& !demographic.getSex().equals("F"))
+		{
+			error_string += "sex must be either \"M\" or \"F\" (received " +
+					demographic.getSex() + ").  ";
+
+			has_error = true;
+		}
+
+		if (demographic.getYearOfBirth() == null)
+		{
+			error_string += "yearOfBirth is a required field.  ";
+			has_error = true;
+		}
+
+		if (demographic.getMonthOfBirth() == null)
+		{
+			error_string += "monthOfBirth is a required field.  ";
+			has_error = true;
+		}
+
+		if (demographic.getDateOfBirth() == null)
+		{
+			error_string += "dateOfBirth is a required field.  ";
+			has_error = true;
+		}
+
+		String familyDoctor = demographic.getFamilyDoctor();
+		if (!StringUtils.isBlank(familyDoctor) && !validatePattern(familyDoctor, "<rdohip>(.*)<\\/rdohip><rd>(.*)<\\/rd>"))
+		{
+			error_string += "familyDoctor is formatted incorrectly.  It must ";
+			error_string += "be a string like <rdohip>{referral doctor number}";
+			error_string += "</rdohip><rd>{last name},{first name}</rd>.  ";
+			error_string += "Also no other tags and no quotes, line breaks ";
+			error_string += "or semicolons are allowed.";
+			has_error = true;
+		}
+
+		if (!validatePattern(demographic.getFamilyDoctor2(), "<fd>(.*)<\\/fd><fdname>(.*)<\\/fdname>"))
+		{
+			error_string += "familyDoctor2 is formatted incorrectly.  It must ";
+			error_string += "be a string like <fd>{family doctor number}";
+			error_string += "</fd><fdname>{last name},{first name}</fdname>.  ";
+			error_string += "Also no other tags and no quotes, line breaks ";
+			error_string += "or semicolons are allowed.";
+			has_error = true;
+		}
+
+		if (
+				!validateString(demographic.getPhone()) ||
+						!validateString(demographic.getPatientStatus()) ||
+						!validateString(demographic.getRosterStatus()) ||
+						!validateString(demographic.getProviderNo()) ||
+						!validateString(demographic.getMyOscarUserName()) ||
+						!validateString(demographic.getHin()) ||
+						!validateString(demographic.getAddress()) ||
+						!validateString(demographic.getProvince()) ||
+						!validateString(demographic.getMonthOfBirth()) ||
+						!validateString(demographic.getVer()) ||
+						!validateString(demographic.getDateOfBirth()) ||
+						!validateString(demographic.getSex()) ||
+						!validateString(demographic.getSexDesc()) ||
+						!validateString(demographic.getCity()) ||
+						!validateString(demographic.getFirstName()) ||
+						!validateString(demographic.getPostal()) ||
+						!validateString(demographic.getPhone2()) ||
+						!validateString(demographic.getPcnIndicator()) ||
+						!validateString(demographic.getLastName()) ||
+						!validateString(demographic.getHcType()) ||
+						!validateString(demographic.getChartNo()) ||
+						!validateString(demographic.getEmail()) ||
+						!validateString(demographic.getYearOfBirth()) ||
+						!validateString(demographic.getRosterTerminationReason()) ||
+						!validateString(demographic.getLinks()) ||
+						!validateString(demographic.getAlias()) ||
+						!validateString(demographic.getPreviousAddress()) ||
+						!validateString(demographic.getChildren()) ||
+						!validateString(demographic.getSourceOfIncome()) ||
+						!validateString(demographic.getCitizenship()) ||
+						!validateString(demographic.getSin()) ||
+						!validateString(demographic.getAnonymous()) ||
+						!validateString(demographic.getSpokenLanguage()) ||
+						!validateString(demographic.getDisplayName()) ||
+						!validateString(demographic.getLastUpdateUser()) ||
+						!validateString(demographic.getTitle()) ||
+						!validateString(demographic.getOfficialLanguage()) ||
+						!validateString(demographic.getCountryOfOrigin()) ||
+						!validateString(demographic.getNewsletter()) ||
+						!validateString(demographic.getVeteranNo())
+				)
+		{
+			error_string += "No html tags and no quotes, line breaks ";
+			error_string += "or semicolons are allowed.";
+			has_error = true;
+		}
+
+		if (has_error)
+		{
+			throw new Exception(error_string);
+		}
+	}
+
+	private boolean validatePattern(String value, String pattern)
+	{
+		if (value == null)
+		{
+			return true;
+		}
+
+		// Make sure it is formatted correctly
+		Pattern p = Pattern.compile(pattern);
+		Matcher m = p.matcher(value);
+
+		if (!m.matches())
+		{
+			return false;
+		}
+
+		// Fail if there are invalid characters in the contents
+		int numGroups = m.groupCount();
+		for (int group = 1; group <= numGroups; group++)
+		{
+			if (!validateString(m.group(group)))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private boolean validateString(String testValue)
+	{
+		if (testValue == null)
+		{
+			return true;
+		}
+
+		Pattern p = Pattern.compile(".*\\<.*?>.*");
+		Matcher m = p.matcher(testValue);
+
+		if (m.matches())
+		{
+			return false;
+		}
+
+		if (
+				testValue.matches("(?s).*;.*") ||
+						testValue.matches("(?s).*\".*") ||
+						testValue.matches("(?s).*'.*") ||
+						testValue.matches("(?s).*--.*") ||
+						testValue.matches("(?s).*\\n.*") ||
+						testValue.matches("(?s).*\\r.*") ||
+						testValue.matches("(?s).*\\\\.*") ||
+						testValue.matches("(?s).*\\x00.*") ||
+						testValue.matches("(?s).*\\x1a.*")
+				)
+		{
+			return false;
+		}
+
+		return true;
 	}
 }

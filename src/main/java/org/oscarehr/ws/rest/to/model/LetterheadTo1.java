@@ -24,7 +24,7 @@
 
 package org.oscarehr.ws.rest.to.model;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
 
