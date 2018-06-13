@@ -343,8 +343,9 @@ if(custom_logo_name != null ){
                                                     value="<%= StringEscapeUtils.escapeHtml(oscar.oscarRx.util.RxUtil.DateToString(rxDate, "MMMM d, yyyy")) %>" />
                                             <input type="hidden" name="sigDoctorName" value="<%= StringEscapeUtils.escapeHtml(doctorName) %>" /> <!--img src="img/rx.gif" border="0"-->
                                             </td>
-                                            <td valign=top height="100px" id="clinicAddress">
-	                                            <b><%=StringEscapeUtils.escapeHtml(doctorName)%></b><br>
+                                            <td valign=top height="100px" >
+	                                            <b id="clinicAddress-doctorName"><%=StringEscapeUtils.escapeHtml(doctorName)%></b><br>
+	                                            <div id="clinicAddress">
                                             <c:choose>
                                                     <c:when test="${empty infirmaryView_programAddress}">
                                                             <%= provider.getClinicName().replaceAll("\\(\\d{6}\\)","") %><br>
@@ -402,7 +403,9 @@ if(custom_logo_name != null ){
                                                         <bean:message key="RxPreview.msgFax"/>: <%=finalFax %>
                                                     </oscar:oscarPropertiesCheck>
                                                     </c:otherwise>
-                                            </c:choose></td>
+                                            </c:choose>
+	                                            </div>
+                                            </td>
                                     </tr>
                                     <tr>
                                             <td colspan=2 valign=top height="75px">

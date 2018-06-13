@@ -150,7 +150,7 @@ if(bMultisites) {
 	for (int i=0;i<sites.size();i++) {
 		Site s = sites.get(i);
         vecAddressName.add(s.getName());
-        vecAddress.add("<b>"+doctorName+"</b><br>"+s.getName()+"<br>"+s.getAddress() + "<br>" + s.getCity() + ", " + s.getProvince() + " " + s.getPostal() + "<br>"+rb.getString("RxPreview.msgTel")+": " + s.getPhone() + "<br>"+rb.getString("RxPreview.msgFax")+": " + s.getFax());
+        vecAddress.add(s.getName()+"<br>"+s.getAddress() + "<br>" + s.getCity() + ", " + s.getProvince() + " " + s.getPostal() + "<br>"+rb.getString("RxPreview.msgTel")+": " + s.getPhone() + "<br>"+rb.getString("RxPreview.msgFax")+": " + s.getFax());
         if (s.getName().equals(location))
         	session.setAttribute("RX_ADDR",String.valueOf(i));
 	}
@@ -183,7 +183,7 @@ if(bMultisites) {
 
     for(int i=0; i<temp0.length; i++) {
         vecAddressName.add(temp0[i]);
-        vecAddress.add("<b>"+doctorName+"</b><br>"+temp0[i]+"<br>"+temp1[i] + "<br>" + temp2[i] + ", " + temp3[i] + " " + temp4[i] + "<br>"+rb.getString("RxPreview.msgTel")+": " + temp5[i] + "<br>"+rb.getString("RxPreview.msgFax")+": " + temp6[i]);
+        vecAddress.add(temp0[i]+"<br>"+temp1[i] + "<br>" + temp2[i] + ", " + temp3[i] + " " + temp4[i] + "<br>"+rb.getString("RxPreview.msgTel")+": " + temp5[i] + "<br>"+rb.getString("RxPreview.msgFax")+": " + temp6[i]);
     }
 }
 String comment = (String) request.getSession().getAttribute("comment");
@@ -362,7 +362,7 @@ function printPaste2Parent(print){
 
 
 function addressSelect() {
-   <% if(vecAddressName != null && !isReprint) {
+   <% if(vecAddressName != null) {
     %>
         setDefaultAddr();
    <%      for(int i=0; i<vecAddressName.size(); i++) {%>
@@ -590,8 +590,8 @@ function toggleView(form) {
                                         if(vecAddress != null) { %>
 					<tr>
 						<td align="left" colspan=2><bean:message key="ViewScript.msgAddress"/>
-							<select name="addressSel" id="addressSel" onChange="addressSelect()" style="width:200px;"
-									<%=(isReprint) ? "disabled='disabled'" : ""%>>
+							<select name="addressSel" id="addressSel" onChange="addressSelect()" style="width:200px;">
+									<%--<%=(isReprint) ? "disabled='disabled'" : ""%>>--%>
 								<% String rxAddr = (String) session.getAttribute("RX_ADDR");
 									for(int i = 0; i < vecAddressName.size(); i++)
 									{
