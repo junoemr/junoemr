@@ -249,27 +249,30 @@ if (userAgent != null) {
                             }});
     }
 
-    function onPrint2(method, scriptId) {
-        var useSC=false;
-        var scAddress="";
-        var rxPageSize=$('printPageSize').value;
-        //console.log("rxPagesize  "+rxPageSize);
+    function onPrint2(method, scriptId)
+    {
+	    var useSC = false;
+	    var scAddress = "";
+	    var rxPageSize = $('printPageSize').value;
+	    var doctorName = frames['preview'].document.getElementById("clinicAddress-doctorName").value;
+	    //console.log("rxPagesize  "+rxPageSize);
 
 
-  <% if(vecAddressName != null) {
-    %>
-        useSC=true;
-   <%      for(int i=0; i<vecAddressName.size(); i++) {%>
-	    if(document.getElementById("addressSel").value=="<%=i%>") {
-    	       scAddress="<%=vecAddress.get(i)%>";
-            }
-<%       }
-      }%>
-              var action="../form/createcustomedpdf?__title=Rx&__method=" +  method+"&useSC="+useSC+"&scAddress="+scAddress+"&rxPageSize="+rxPageSize+"&scriptId="+scriptId;
-            document.getElementById("preview").contentWindow.document.getElementById("preview2Form").action = action;
-            document.getElementById("preview").contentWindow.document.getElementById("preview2Form").target="_blank";
-            document.getElementById("preview").contentWindow.document.getElementById("preview2Form").submit();
-       return true;
+	    <% if(vecAddressName != null) {
+		  %>
+	    useSC = true;
+	    <%      for(int i=0; i<vecAddressName.size(); i++) {%>
+	    if (document.getElementById("addressSel").value == "<%=i%>")
+	    {
+		    scAddress = "<%=vecAddress.get(i)%>";
+	    }
+	    <%       }
+			  }%>
+	    var action = "../form/createcustomedpdf?__title=Rx&__method=" + method + "&useSC=" + useSC + "&scAddress=" + scAddress + "&clinicDoctorName=" + doctorName + "&rxPageSize=" + rxPageSize + "&scriptId=" + scriptId;
+	    document.getElementById("preview").contentWindow.document.getElementById("preview2Form").action = action;
+	    document.getElementById("preview").contentWindow.document.getElementById("preview2Form").target = "_blank";
+	    document.getElementById("preview").contentWindow.document.getElementById("preview2Form").submit();
+	    return true;
     }
 
 function setComment(){

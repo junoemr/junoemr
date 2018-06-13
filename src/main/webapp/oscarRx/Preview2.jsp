@@ -344,7 +344,7 @@ if(custom_logo_name != null ){
                                             <input type="hidden" name="sigDoctorName" value="<%= StringEscapeUtils.escapeHtml(doctorName) %>" /> <!--img src="img/rx.gif" border="0"-->
                                             </td>
                                             <td valign=top height="100px" >
-	                                            <b id="clinicAddress-doctorName"><%=StringEscapeUtils.escapeHtml(doctorName)%></b><br>
+	                                            <b id="clinicAddress-doctorName" value = "<%=StringEscapeUtils.escapeHtml(doctorName)%>"><%=StringEscapeUtils.escapeHtml(doctorName)%></b><br>
 	                                            <div id="clinicAddress">
                                             <c:choose>
                                                     <c:when test="${empty infirmaryView_programAddress}">
