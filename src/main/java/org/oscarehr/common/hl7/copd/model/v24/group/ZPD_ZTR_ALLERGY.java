@@ -25,19 +25,26 @@ package org.oscarehr.common.hl7.copd.model.v24.group;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractGroup;
 import ca.uhn.hl7v2.model.Group;
+import ca.uhn.hl7v2.model.v24.segment.IAM;
+import ca.uhn.hl7v2.model.v24.segment.NTE;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
-import org.oscarehr.common.hl7.copd.model.v24.segment.ZID;
-import org.oscarehr.common.hl7.copd.model.v24.segment.ZIS;
+import org.oscarehr.common.hl7.copd.model.v24.segment.ZAS;
+import org.oscarehr.common.hl7.copd.model.v24.segment.ZAU;
 
-public class ZPD_ZTR_PATIENT_THIRD_PARTY_INV_SUMMARY extends AbstractGroup
+/**
+ * Custom hl7 message class for TOPD formatted messages
+ */
+public class ZPD_ZTR_ALLERGY extends AbstractGroup
 {
-	public ZPD_ZTR_PATIENT_THIRD_PARTY_INV_SUMMARY(Group parent, ModelClassFactory factory)
+	public ZPD_ZTR_ALLERGY(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		try
 		{
-			this.add(ZIS.class, false, false);
-			this.add(ZID.class, false, true);
+			this.add(IAM.class, true, false);
+			this.add(NTE.class, false, false);
+			this.add(ZAS.class, false, false);
+			this.add(ZAU.class, false, false);
 		}
 		catch(HL7Exception var3)
 		{

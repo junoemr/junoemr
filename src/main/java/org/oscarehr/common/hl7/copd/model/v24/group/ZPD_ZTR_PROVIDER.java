@@ -40,29 +40,29 @@ import org.oscarehr.common.hl7.copd.model.v24.segment.ZPV;
 import org.oscarehr.common.hl7.copd.model.v24.segment.ZQO;
 import org.oscarehr.common.hl7.copd.model.v24.segment.ZSH;
 
-public class ZPD_ZTR_PATIENT_PROVIDER extends AbstractGroup
+public class ZPD_ZTR_PROVIDER extends AbstractGroup
 {
-	public ZPD_ZTR_PATIENT_PROVIDER(Group parent, ModelClassFactory factory)
+	public ZPD_ZTR_PROVIDER(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		try
 		{
-			this.add(PRD.class, false, false);
+			this.add(PRD.class, true, false);
 			this.add(NK1.class, false, true);
 			this.add(ZAL.class, false, true);
 			this.add(ZSH.class, false, true);
 			this.add(ZQO.class, false, true);
 			this.add(ZPV.class, false, true);
 			this.add(ZPB.class, false, true);
-			this.add(ZPD_ZTR_PATIENT_PROVIDER_MEDS.class, false, true);
+			this.add(ZPD_ZTR_MEDS.class, false, true);
 			this.add(ZPR.class, false, true);
 			this.add(ZDV.class, false, true);
-			this.add(ZPD_ZTR_PATIENT_PROVIDER_DEV_HISTORY.class, false, false);
+			this.add(ZPD_ZTR_DEV_HISTORY.class, false, false);
 			this.add(ZHR.class, false, false);
-			this.add(ZPD_ZTR_PATIENT_PROVIDER_PREGNANCY.class, false, true);
-			this.add(ZPD_ZTR_PATIENT_PROVIDER_ALLERGY.class, false, true);
-			this.add(ZPD_ZTR_PATIENT_PROVIDER_IMMUNIZATION.class, false, true);
-			this.add(ZPD_ZTR_PATIENT_PROVIDER_LAB.class, false, true);
+			this.add(ZPD_ZTR_PREGNANCY.class, false, true);
+			this.add(ZPD_ZTR_ALLERGY.class, false, true);
+			this.add(ZPD_ZTR_IMMUNIZATION.class, false, true);
+			this.add(ZPD_ZTR_LAB.class, false, true);
 			this.add(ZHF.class, false, true);
 			this.add(ZCP.class, false, true);
 			this.add(ZAT.class, false, true);
@@ -75,16 +75,24 @@ public class ZPD_ZTR_PATIENT_PROVIDER extends AbstractGroup
 
 	public PRD getPRD()
 	{
-		PRD ret = null;
+		return this.getTyped("PRD", PRD.class);
+	}
 
+	public ZPD_ZTR_MEDS getMEDS(int rep)
+	{
+		return this.getTyped("MEDS", rep, ZPD_ZTR_MEDS.class);
+	}
+
+	public int getMEDSReps()
+	{
 		try
 		{
-			ret = (PRD) this.get("PRD");
-			return ret;
+			return this.getAll("MEDS").length;
 		}
-		catch(HL7Exception var3)
+		catch(HL7Exception var4)
 		{
-			throw new RuntimeException(var3);
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
 		}
 	}
 }

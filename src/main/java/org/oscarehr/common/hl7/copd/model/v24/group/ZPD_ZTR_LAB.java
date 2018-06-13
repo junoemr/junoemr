@@ -26,18 +26,20 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractGroup;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.v24.segment.NTE;
+import ca.uhn.hl7v2.model.v24.segment.OBR;
 import ca.uhn.hl7v2.model.v24.segment.OBX;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
 
-public class ZPD_ZTR_PATIENT_PROVIDER_MEDS_OBSERVATION extends AbstractGroup
+public class ZPD_ZTR_LAB extends AbstractGroup
 {
-	public ZPD_ZTR_PATIENT_PROVIDER_MEDS_OBSERVATION(Group parent, ModelClassFactory factory)
+	public ZPD_ZTR_LAB(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		try
 		{
-			this.add(OBX.class, false, false);
-			this.add(NTE.class, false, false);
+			this.add(OBR.class, true, false);
+			this.add(OBX.class, true, true);
+			this.add(NTE.class, false, true);
 		}
 		catch(HL7Exception var3)
 		{

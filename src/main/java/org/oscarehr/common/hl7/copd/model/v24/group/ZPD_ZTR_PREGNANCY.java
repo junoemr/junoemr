@@ -25,21 +25,19 @@ package org.oscarehr.common.hl7.copd.model.v24.group;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractGroup;
 import ca.uhn.hl7v2.model.Group;
-import ca.uhn.hl7v2.model.v24.segment.NTE;
-import ca.uhn.hl7v2.model.v24.segment.OBR;
-import ca.uhn.hl7v2.model.v24.segment.OBX;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.oscarehr.common.hl7.copd.model.v24.segment.ZPG;
+import org.oscarehr.common.hl7.copd.model.v24.segment.ZPO;
 
-public class ZPD_ZTR_PATIENT_PROVIDER_LAB extends AbstractGroup
+public class ZPD_ZTR_PREGNANCY extends AbstractGroup
 {
-	public ZPD_ZTR_PATIENT_PROVIDER_LAB(Group parent, ModelClassFactory factory)
+	public ZPD_ZTR_PREGNANCY(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		try
 		{
-			this.add(OBR.class, true, false);
-			this.add(OBX.class, true, true);
-			this.add(NTE.class, false, true);
+			this.add(ZPG.class, true, false);
+			this.add(ZPO.class, false, true);
 		}
 		catch(HL7Exception var3)
 		{

@@ -25,20 +25,19 @@ package org.oscarehr.common.hl7.copd.model.v24.group;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractGroup;
 import ca.uhn.hl7v2.model.Group;
-import ca.uhn.hl7v2.model.v25.segment.TQ1;
-import ca.uhn.hl7v2.model.v25.segment.TQ2;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.oscarehr.common.hl7.copd.model.v24.segment.ZID;
+import org.oscarehr.common.hl7.copd.model.v24.segment.ZIS;
 
-public class ZPD_ZTR_PATIENT_PROVIDER_MEDS_TIMING_QUANTITY extends AbstractGroup
+public class ZPD_ZTR_INV_SUMMARY extends AbstractGroup
 {
-	public ZPD_ZTR_PATIENT_PROVIDER_MEDS_TIMING_QUANTITY(Group parent, ModelClassFactory factory)
+	public ZPD_ZTR_INV_SUMMARY(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		try
 		{
-			// TODO -- figure out why this is v25 and up????
-			this.add(TQ1.class, true, true);
-			this.add(TQ2.class, false, false);
+			this.add(ZIS.class, false, false);
+			this.add(ZID.class, false, true);
 		}
 		catch(HL7Exception var3)
 		{

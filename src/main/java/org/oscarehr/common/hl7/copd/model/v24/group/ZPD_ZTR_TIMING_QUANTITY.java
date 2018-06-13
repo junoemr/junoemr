@@ -25,26 +25,20 @@ package org.oscarehr.common.hl7.copd.model.v24.group;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractGroup;
 import ca.uhn.hl7v2.model.Group;
-import ca.uhn.hl7v2.model.v24.segment.IAM;
-import ca.uhn.hl7v2.model.v24.segment.NTE;
+import ca.uhn.hl7v2.model.v25.segment.TQ1;
+import ca.uhn.hl7v2.model.v25.segment.TQ2;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
-import org.oscarehr.common.hl7.copd.model.v24.segment.ZAS;
-import org.oscarehr.common.hl7.copd.model.v24.segment.ZAU;
 
-/**
- * Custom hl7 message class for TOPD formatted messages
- */
-public class ZPD_ZTR_PATIENT_PROVIDER_ALLERGY extends AbstractGroup
+public class ZPD_ZTR_TIMING_QUANTITY extends AbstractGroup
 {
-	public ZPD_ZTR_PATIENT_PROVIDER_ALLERGY(Group parent, ModelClassFactory factory)
+	public ZPD_ZTR_TIMING_QUANTITY(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		try
 		{
-			this.add(IAM.class, true, false);
-			this.add(NTE.class, false, false);
-			this.add(ZAS.class, false, false);
-			this.add(ZAU.class, false, false);
+			// TODO -- figure out why this is v25 and up????
+			this.add(TQ1.class, true, true);
+			this.add(TQ2.class, false, false);
 		}
 		catch(HL7Exception var3)
 		{

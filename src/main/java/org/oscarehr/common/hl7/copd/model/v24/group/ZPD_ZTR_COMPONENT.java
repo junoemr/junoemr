@@ -29,9 +29,9 @@ import ca.uhn.hl7v2.model.v24.segment.NTE;
 import ca.uhn.hl7v2.model.v24.segment.RXC;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
 
-public class ZPD_ZTR_PATIENT_PROVIDER_MEDS_COMPONENT extends AbstractGroup
+public class ZPD_ZTR_COMPONENT extends AbstractGroup
 {
-	public ZPD_ZTR_PATIENT_PROVIDER_MEDS_COMPONENT(Group parent, ModelClassFactory factory)
+	public ZPD_ZTR_COMPONENT(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		try

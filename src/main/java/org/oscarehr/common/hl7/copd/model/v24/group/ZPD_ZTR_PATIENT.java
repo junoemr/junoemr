@@ -28,24 +28,20 @@ import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.v24.segment.PID;
 import ca.uhn.hl7v2.model.v24.segment.SCH;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
-import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.segment.ZBA;
-import org.oscarehr.util.MiscUtils;
 
 public class ZPD_ZTR_PATIENT extends AbstractGroup
 {
-	private static final Logger logger = MiscUtils.getLogger();
-
 	public ZPD_ZTR_PATIENT(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		try
 		{
 			this.add(PID.class, true, false);
-			this.add(ZPD_ZTR_PATIENT_PROVIDER.class, true, true);
+			this.add(ZPD_ZTR_PROVIDER.class, true, true);
 			this.add(SCH.class, false, true);
 			this.add(ZBA.class, false, true);
-			this.add(ZPD_ZTR_PATIENT_THIRD_PARTY.class, false, true);
+			this.add(ZPD_ZTR_THIRD_PARTY.class, false, true);
 		}
 		catch(HL7Exception var3)
 		{
@@ -54,54 +50,27 @@ public class ZPD_ZTR_PATIENT extends AbstractGroup
 	}
 	public PID getPID()
 	{
-		PID ret = null;
-
-		try
-		{
-			ret = (PID) this.get("PID");
-			return ret;
-		}
-		catch(HL7Exception var3)
-		{
-			throw new RuntimeException(var3);
-		}
+		return this.getTyped("PID", PID.class);
 	}
 
 	public SCH getSCH()
 	{
-		SCH ret = null;
-
-		try
-		{
-			ret = (SCH) this.get("SCH");
-			return ret;
-		}
-		catch(HL7Exception var3)
-		{
-			throw new RuntimeException(var3);
-		}
+		return this.getTyped("SCH", SCH.class);
 	}
 
 	public SCH getSCH(int rep)
 	{
-		SCH ret = null;
-
-		try
-		{
-			ret = (SCH) this.get("SCH", rep);
-			return ret;
-		}
-		catch(HL7Exception var3)
-		{
-			throw new RuntimeException(var3);
-		}
+		return this.getTyped("SCH", rep, SCH.class);
 	}
 
-	public int getSCHReps() {
-		try {
-			int reps = this.getAll("SCH").length;
-			return reps;
-		} catch (HL7Exception var4) {
+	public int getSCHReps()
+	{
+		try
+		{
+			return this.getAll("SCH").length;
+		}
+		catch(HL7Exception var4)
+		{
 			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
 			throw new RuntimeException(message);
 		}
@@ -109,53 +78,59 @@ public class ZPD_ZTR_PATIENT extends AbstractGroup
 
 	public ZBA getZBA()
 	{
-		ZBA ret = null;
-
-		try
-		{
-			ret = (ZBA) this.get("ZBA");
-			return ret;
-		}
-		catch(HL7Exception var3)
-		{
-			throw new RuntimeException(var3);
-		}
+		return this.getTyped("ZBA", ZBA.class);
 	}
 	public ZBA getZBA(int rep)
 	{
-		ZBA ret = null;
-
-		try
-		{
-			ret = (ZBA) this.get("ZBA", rep);
-			return ret;
-		}
-		catch(HL7Exception var3)
-		{
-			throw new RuntimeException(var3);
-		}
+		return this.getTyped("ZBA", rep, ZBA.class);
 	}
 
-	public int getZBAReps() {
-		try {
-			int reps = this.getAll("ZBA").length;
-			return reps;
-		} catch (HL7Exception var4) {
+	public int getZBAReps()
+	{
+		try
+		{
+			return this.getAll("ZBA").length;
+		}
+		catch(HL7Exception var4)
+		{
 			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
 			throw new RuntimeException(message);
 		}
 	}
 
-	public ZPD_ZTR_PATIENT_PROVIDER getPROVIDER()
+	public ZPD_ZTR_PROVIDER getPROVIDER(int rep)
+	{
+		return this.getTyped("PROVIDER", rep, ZPD_ZTR_PROVIDER.class);
+	}
+
+	public int getPROVIDERReps()
 	{
 		try
 		{
-			return (ZPD_ZTR_PATIENT_PROVIDER) this.get("PATIENT_PROVIDER");
+			return this.getAll("PROVIDER").length;
 		}
-		catch(HL7Exception var3)
+		catch(HL7Exception var4)
 		{
-			logger.error("Unexpected error accessing data - this is probably a bug in the source code generator.", var3);
-			throw new RuntimeException(var3);
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
+
+	public ZPD_ZTR_THIRD_PARTY getTHIRD_PARTY(int rep)
+	{
+		return this.getTyped("THIRD_PARTY", rep, ZPD_ZTR_THIRD_PARTY.class);
+	}
+
+	public int getTHIRD_PARTYReps()
+	{
+		try
+		{
+			return this.getAll("THIRD_PARTY").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
 		}
 	}
 }

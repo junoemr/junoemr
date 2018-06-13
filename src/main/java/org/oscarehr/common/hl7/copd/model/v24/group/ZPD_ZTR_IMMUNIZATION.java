@@ -25,18 +25,18 @@ package org.oscarehr.common.hl7.copd.model.v24.group;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractGroup;
 import ca.uhn.hl7v2.model.Group;
-import ca.uhn.hl7v2.model.v24.segment.IN1;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.oscarehr.common.hl7.copd.model.v24.segment.ZIM;
 
-public class ZPD_ZTR_PATIENT_THIRD_PARTY extends AbstractGroup
+public class ZPD_ZTR_IMMUNIZATION extends AbstractGroup
 {
-	public ZPD_ZTR_PATIENT_THIRD_PARTY(Group parent, ModelClassFactory factory)
+	public ZPD_ZTR_IMMUNIZATION(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		try
 		{
-			this.add(IN1.class, false, false);
-			this.add(ZPD_ZTR_PATIENT_THIRD_PARTY_INV_SUMMARY.class, false, false);
+			this.add(ZIM.class, true, false);
+
 		}
 		catch(HL7Exception var3)
 		{

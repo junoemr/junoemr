@@ -25,34 +25,18 @@ package org.oscarehr.common.hl7.copd.model.v24.group;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractGroup;
 import ca.uhn.hl7v2.model.Group;
-import ca.uhn.hl7v2.model.v24.segment.ORC;
-import ca.uhn.hl7v2.model.v24.segment.RXE;
-import ca.uhn.hl7v2.model.v24.segment.RXO;
-import ca.uhn.hl7v2.model.v24.segment.RXR;
+import ca.uhn.hl7v2.model.v24.segment.IN1;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
-import org.oscarehr.common.hl7.copd.model.v24.segment.ZRX;
-import org.oscarehr.common.hl7.copd.model.v24.segment.ZST;
 
-/**
- * Custom hl7 message class for TOPD formatted messages
- */
-public class ZPD_ZTR_PATIENT_PROVIDER_MEDS extends AbstractGroup
+public class ZPD_ZTR_THIRD_PARTY extends AbstractGroup
 {
-	public ZPD_ZTR_PATIENT_PROVIDER_MEDS(Group parent, ModelClassFactory factory)
+	public ZPD_ZTR_THIRD_PARTY(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		try
 		{
-			this.add(ORC.class, true, false);
-			this.add(RXO.class, true, false);
-			this.add(ZPD_ZTR_PATIENT_PROVIDER_MEDS_TIMING_QUANTITY.class, false, false);
-			this.add(ZPD_ZTR_PATIENT_PROVIDER_MEDS_NOTES.class, false, false);
-			this.add(RXE.class, true, false);
-			this.add(RXR.class, true, false);
-			this.add(ZPD_ZTR_PATIENT_PROVIDER_MEDS_COMPONENT.class, false, false);
-			this.add(ZPD_ZTR_PATIENT_PROVIDER_MEDS_OBSERVATION.class, false, false);
-			this.add(ZRX.class, true, false);
-			this.add(ZST.class, false, true);
+			this.add(IN1.class, false, false);
+			this.add(ZPD_ZTR_INV_SUMMARY.class, false, false);
 		}
 		catch(HL7Exception var3)
 		{

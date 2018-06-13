@@ -35,6 +35,7 @@ import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.ProviderData;
+import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
@@ -64,6 +65,9 @@ public class DemographicImportService
 
 	@Autowired
 	DemographicService demographicService;
+
+	@Autowired
+	DemographicDao demographicDao;
 
 	@Autowired
 	ProviderService providerService;
@@ -107,15 +111,25 @@ public class DemographicImportService
 			logger.info("Parse message " + counter + " of " + messageList.size());
 			ZPD_ZTR zpdZtrMessage = (ZPD_ZTR) p.parse(messageStr);
 
-			logger.info("Find/Create Provider Record ...");
-			ProviderData provider = importProviderData(zpdZtrMessage);
-
-			logger.info("Creating Demographic Record ...");
-			Demographic demographic = importDemographicData(zpdZtrMessage, provider);
-
+			importRecordData(zpdZtrMessage);
 			counter++;
 		}
 	}
+
+	private void importRecordData(ZPD_ZTR zpdZtrMessage) throws HL7Exception
+	{
+		logger.info("Creating Demographic Record ...");
+		Demographic demographic = importDemographicData(zpdZtrMessage);
+		logger.info("Created record " + demographic.getDemographicId() + " for patient: " + demographic.getLastName() + ", " + demographic.getFirstName());
+
+		logger.info("Find/Create Provider Record(s) ...");
+		ProviderData provider = importProviderData(zpdZtrMessage, demographic);
+
+		// set the mrp doctor after all the provider records are created
+		demographic.setProviderNo(provider.getId());
+		demographicDao.merge(demographic);
+	}
+
 	private List<String> seperateMessages(String messageStr)
 	{
 		List<String> messageList = new LinkedList<>();
@@ -126,61 +140,77 @@ public class DemographicImportService
 		return messageList;
 	}
 
-	private ProviderData importProviderData(ZPD_ZTR zpdZtrMessage) throws HL7Exception
+	/**
+	 * imports provider data for each provider group in the message
+	 * @param zpdZtrMessage the hl7 message to parse
+	 * @param demographic the new demographic record
+	 * @return the MRP doctor record. This should never be null, as all messages are required to have at least one provider record
+	 * @throws HL7Exception
+	 */
+	private ProviderData importProviderData(ZPD_ZTR zpdZtrMessage, Demographic demographic) throws HL7Exception
 	{
-		ProviderData provider = null;
+		ProviderData mrpProvider = null;
 		ProviderMapper providerMapper = new ProviderMapper(zpdZtrMessage);
-		if(providerMapper.hasProviderInfo())
-		{
-			String providerFirstName = providerMapper.getFirstName(0);
-			String providerLastName = providerMapper.getLastName(0);
 
+		int numProviders = providerMapper.getNumProviders();
+		logger.info("Found " + numProviders + " provider groups");
+		if(numProviders < 1)
+		{
+			throw new RuntimeException("No provider information found");
+		}
+
+		for(int i=0; i< numProviders; i++)
+		{
+			String providerFirstName = providerMapper.getFirstName(i);
+			String providerLastName = providerMapper.getLastName(i);
+
+			logger.info("First Name:" + providerFirstName);
+			logger.info("Last Name:" + providerLastName);
 			if(providerFirstName == null || providerLastName == null)
 			{
 				throw new RuntimeException("Not enough provider info found to link or create provider record (first and last name are required).");
 			}
 
-			List<ProviderData> matchedProviders = providerDataDao.findByName(providerFirstName, providerLastName, false);
-			if(matchedProviders.isEmpty())
-			{
-				provider = providerMapper.getProvider();
-				// providers don't have auto-generated id's, so we have to pick one
-				String newProviderId = providerService.getNextProviderNumberInSequence(10000, 900000);
-				newProviderId = (newProviderId == null) ? "10000" : newProviderId;
-				provider.set(newProviderId);
+			mrpProvider = findOrCreateProviderRecord(providerMapper.getProvider(i), providerFirstName, providerLastName);
+		}
 
-				provider = providerService.addNewProvider(IMPORT_PROVIDER, provider);
-				logger.info("Created new Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
-			}
-			else if(matchedProviders.size() == 1)
-			{
-				provider = matchedProviders.get(0);
-				logger.info("Use existing Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
-			}
-			else
-			{
-				throw new RuntimeException("Multiple providers exist in the system with the same name (" + providerLastName + "," + providerFirstName + ").");
-			}
+
+		return mrpProvider;
+	}
+
+	private ProviderData findOrCreateProviderRecord(ProviderData newProvider, String providerFirstName, String providerLastName)
+	{
+		ProviderData provider;
+		List<ProviderData> matchedProviders = providerDataDao.findByName(providerFirstName, providerLastName, false);
+		if(matchedProviders.isEmpty())
+		{
+			provider = newProvider;
+			// providers don't have auto-generated id's, so we have to pick one
+			String newProviderId = providerService.getNextProviderNumberInSequence(10000, 900000);
+			newProviderId = (newProviderId == null) ? "10000" : newProviderId;
+			provider.set(newProviderId);
+
+			provider = providerService.addNewProvider(IMPORT_PROVIDER, provider);
+			logger.info("Created new Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
+		}
+		else if(matchedProviders.size() == 1)
+		{
+			provider = matchedProviders.get(0);
+			logger.info("Use existing Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 		}
 		else
 		{
-			logger.info("No Provider info found");
+			throw new RuntimeException("Multiple providers exist in the system with the same name (" + providerLastName + "," + providerFirstName + ").");
 		}
 		return provider;
 	}
 
-	private Demographic importDemographicData(ZPD_ZTR zpdZtrMessage, ProviderData provider) throws HL7Exception
+	private Demographic importDemographicData(ZPD_ZTR zpdZtrMessage) throws HL7Exception
 	{
 		DemographicMapper demographicMapper = new DemographicMapper(zpdZtrMessage);
 		Demographic demographic = demographicMapper.getDemographic();
 		DemographicCust demographicCust = demographicMapper.getDemographicCust();
 		List<DemographicExt> demographicExtList = demographicMapper.getDemographicExtensions();
-
-		// assign the demographic to a provider if possible
-		if(provider != null)
-		{
-			demographic.setProviderNo(provider.getId());
-		}
 
 		demographicService.addNewDemographicRecord(IMPORT_PROVIDER, demographic, demographicCust, demographicExtList);
 		return demographic;

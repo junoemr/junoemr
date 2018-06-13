@@ -23,50 +23,59 @@
 package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.v24.segment.PRD;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.ProviderData;
+import org.oscarehr.util.MiscUtils;
 
 public class ProviderMapper
 {
+	private static final Logger logger = MiscUtils.getLogger();
 	private final ZPD_ZTR message;
-	private final PRD messagePRD;
 
 	public ProviderMapper()
 	{
 		message = null;
-		messagePRD = null;
 	}
 	public ProviderMapper(ZPD_ZTR message)
 	{
 		this.message = message;
-		this.messagePRD = message.getPATIENT().getPROVIDER().getPRD();
+
+
+		String[] names = message.getPATIENT().getPROVIDER(0).getPRD().getNames();
+		for(String name : names)
+		{
+			logger.info("Found PRD Names:" + name);
+		}
+
+		int medReps = message.getPATIENT().getPROVIDER(0).getMEDSReps();
+		logger.info("Found Med Reps:" + medReps);
 	}
 
 	/* Methods for converting to oscar model */
 
-	public ProviderData getProvider() throws HL7Exception
+	public ProviderData getProvider(int recordRep) throws HL7Exception
 	{
 		ProviderData provider = new ProviderData();
-		provider.setFirstName(getFirstName(0));
-		provider.setLastName(getLastName(0));
+		provider.setFirstName(getFirstName(recordRep));
+		provider.setLastName(getLastName(recordRep));
 		return provider;
 	}
 
-	public boolean hasProviderInfo()
+	public int getNumProviders()
 	{
-		return (messagePRD != null);
+		return message.getPATIENT().getPROVIDERReps();
 	}
 
 	/* Methods for accessing various values in the import message */
 
-	public String getFirstName(int rep) throws HL7Exception
+	public String getFirstName(int recordRep) throws HL7Exception
 	{
-		return StringUtils.trimToNull(messagePRD.getProviderName(rep).getGivenName().getValue());
+		return StringUtils.trimToNull(message.getPATIENT().getPROVIDER(recordRep).getPRD().getProviderName(0).getGivenName().getValue());
 	}
-	public String getLastName(int rep) throws HL7Exception
+	public String getLastName(int recordRep) throws HL7Exception
 	{
-		return StringUtils.trimToNull(messagePRD.getProviderName(rep).getFamilyName().getSurname().getValue());
+		return StringUtils.trimToNull(message.getPATIENT().getPROVIDER(recordRep).getPRD().getProviderName(0).getFamilyName().getSurname().getValue());
 	}
 }
