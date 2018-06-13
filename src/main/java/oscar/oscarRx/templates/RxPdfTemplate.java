@@ -105,11 +105,11 @@ public abstract class RxPdfTemplate {
 		HashMap<String, String> addressMap = new HashMap<>();
 		String[] addressFields = s.split("<br>");
 		ArrayList<String> addressFieldList = new ArrayList<>(Arrays.asList(addressFields));
-		String clinicName = req.getParameter("clinicDoctorName") + "\n" + addressFieldList.get(0) + "\n" + addressFieldList.get(1);
-		String tel = addressFieldList.get(2);
+		String clinicName = String.join("\n", addressFieldList.get(0), addressFieldList.get(1),addressFieldList.get(2));
+		String tel = addressFieldList.get(3);
 		tel = tel.replace("Tel: ", "");
 		tel = tel.replace("Tel", "");
-		String fax = addressFieldList.get(3);
+		String fax = addressFieldList.get(4);
 		fax = fax.replace("Fax: ", "");
 		logger.debug(tel);
 		logger.debug(fax);
