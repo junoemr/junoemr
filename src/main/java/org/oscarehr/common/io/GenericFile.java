@@ -82,6 +82,11 @@ public class GenericFile
 		return moveFile(DOCUMENT_CORRUPT_DIR);
 	}
 
+	public boolean moveToNew() throws IOException
+	{
+		return moveFile(DOCUMENT_NEW_DIR);
+	}
+
 	public boolean moveFile(String directory) throws IOException
 	{
 		File directoryFile = new File(directory);

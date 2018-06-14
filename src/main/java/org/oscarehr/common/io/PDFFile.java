@@ -162,7 +162,7 @@ public class PDFFile extends GenericFile
 		String gs = props.getProperty("document.ghostscript_path", "/usr/bin/gs");
 
 		File currentDir = javaFile.getParentFile();
-		this.moveToCorrupt();
+		this.moveToNew();
 
 		File newPdf = new File(currentDir, javaFile.getName());
 
@@ -216,6 +216,7 @@ public class PDFFile extends GenericFile
 				return newPdf;
 			}
 
+			this.moveToCorrupt();
 			throw new RuntimeException("Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue);
 		}
 
@@ -228,7 +229,6 @@ public class PDFFile extends GenericFile
 			throw new RuntimeException("Failed to load re-encoded PDF: ", e);
 		}
 
-		javaFile.delete();
 		logger.info("END PDF RE-ENCODING");
 		return newPdf;
 	}
