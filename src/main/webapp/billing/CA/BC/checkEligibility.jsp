@@ -29,7 +29,8 @@ String msgs   = oscar.Misc.safeString((String) request.getAttribute("Msgs"));
 String error  = oscar.Misc.safeString((String) request.getAttribute("error"));
 if ( error.length() != 0)
 {
-   error = "Error in connection : " + error;
+   %><%=error%>
+<%
 }
 %><%=result%>
-<%=msgs%><%=error%>
+<%=msgs%>
