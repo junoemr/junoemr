@@ -810,7 +810,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  MAX(t.tickler_no) AS max_tickler_no,\n" +
 				"  GROUP_CONCAT(t.message SEPARATOR '\n') AS tickler_messages\n" +
 				"FROM appointment a\n" +
-				"LEFT JOIN appointment_status aps ON SUBSTRING(a.status, 1, 1) = aps.status\n" +
+				"LEFT JOIN appointment_status aps ON BINARY SUBSTRING(a.status, 1, 1) = aps.status\n" +
 				"LEFT JOIN demographic d ON a.demographic_no = d.demographic_no\n" +
 				"LEFT JOIN demographiccust dc ON a.demographic_no = dc.demographic_no\n" +
 				"LEFT JOIN property p \n" +
