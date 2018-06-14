@@ -30,9 +30,9 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
-import org.oscarehr.common.dao.DemographicExtDao;
+import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.DemographicExt;
+import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;

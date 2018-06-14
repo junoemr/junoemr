@@ -24,39 +24,45 @@
 
 --%>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils, oscar.eform.EFormUtil, java.util.ArrayList, java.util.HashMap"%>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%
-HashMap<String, Object> curform = new HashMap<String, Object>();
-HashMap<String, String> errors = new HashMap<String, String>();
+	HashMap<String, Object> curform = new HashMap<String, Object>();
+	HashMap<String, String> errors = new HashMap<String, String>();
 
-if (request.getAttribute("submitted") != null) {
-    curform = (HashMap<String, Object>) request.getAttribute("submitted");
-    errors = (HashMap<String, String>) request.getAttribute("errors");
-} else if (request.getParameter("fid") != null ) {
-    String curfid = request.getParameter("fid");
-    curform = EFormUtil.loadEForm(curfid);
-}
+	if(request.getAttribute("submitted") != null)
+	{
+		curform = (HashMap<String, Object>) request.getAttribute("submitted");
+		errors = (HashMap<String, String>) request.getAttribute("errors");
+	}
+	else if(request.getParameter("fid") != null)
+	{
+		String curfid = request.getParameter("fid");
+		curform = EFormUtil.loadEForm(curfid);
+	}
 
-   //remove "null" values
-   if (curform.get("fid") == null) curform.put("fid", "");
-   if (curform.get("formName") == null) curform.put("formName", "");
-   if (curform.get("formSubject") == null) curform.put("formSubject", "");
-   if (curform.get("formFileName") == null) curform.put("formFileName", "");
-   if (curform.get("roleType") == null) curform.put("roleType", "");
-   
-   if (request.getParameter("formHtmlG") != null){
-       //load html from hidden form from eformGenerator.jsp,the html is then injected into edit-eform
-      curform.put("formHtml", StringEscapeUtils.unescapeHtml(request.getParameter("formHtmlG")));
-   }
-   if (curform.get("formDate") == null) curform.put("formDate", "--");
-   if (curform.get("formTime") == null) curform.put("formTime", "--");
-   
-   if (curform.get("showLatestFormOnly") ==null) curform.put("showLatestFormOnly", false);
-   if (curform.get("patientIndependent") ==null) curform.put("patientIndependent", false);
-   
-   String formHtml = StringEscapeUtils.escapeHtml((String) curform.get("formHtml"));
-	if(formHtml==null){formHtml="";}	
+	//remove "null" values
+	curform.putIfAbsent("fid", "");
+	curform.putIfAbsent("formName", "");
+	curform.putIfAbsent("formSubject", "");
+	curform.putIfAbsent("formFileName", "");
+	curform.putIfAbsent("roleType", "");
+
+	if(request.getParameter("formHtmlG") != null)
+	{
+		//load html from hidden form from eformGenerator.jsp,the html is then injected into edit-eform
+		curform.put("formHtml", StringEscapeUtils.unescapeHtml(request.getParameter("formHtmlG")));
+	}
+
+	curform.putIfAbsent("formDate", "--");
+	curform.putIfAbsent("formTime", "--");
+
+	curform.putIfAbsent("showLatestFormOnly", false);
+	curform.putIfAbsent("patientIndependent", false);
+	curform.putIfAbsent("instanced", true); //new eForms should be instanced by default
+
+	String formHtml = StringUtils.trimToEmpty(StringEscapeUtils.escapeHtml((String) curform.get("formHtml")));
 %>
 <!DOCTYPE html>
 <html:html locale="true">
@@ -64,16 +70,27 @@ if (request.getAttribute("submitted") != null) {
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <title><bean:message key="eform.edithtml.msgEditEform" /></title>
 
-<style>
-.input-error{   
-    border-color: rgba(229, 103, 23, 0.8) !important; 
-    box-shadow: 0 1px 1px rgba(229, 103, 23, 0.075) inset, 0 0 8px rgba(229, 103, 23, 0.6) !important; 
-    outline: 0 none !important;  
-}
+	<style>
+		.input-error {
+			border-color: rgba(229, 103, 23, 0.8) !important;
+			box-shadow: 0 1px 1px rgba(229, 103, 23, 0.075) inset, 0 0 8px rgba(229, 103, 23, 0.6) !important;
+			outline: 0 none !important;
+		}
 
-#popupDisplay{display:inline-block;}
-#panelDisplay{display:none;}
-</style>
+		#popupDisplay {
+			display: inline-block;
+		}
+
+		#panelDisplay {
+			display: none;
+		}
+		.eform_checkbox_list label {
+			display: inline-block;
+			width: 350px;
+			text-align: right;
+		}
+
+	</style>
 
 <script type="text/javascript" language="JavaScript">
 function openLastSaved() {
@@ -182,10 +199,23 @@ window.opener.location.href = '<%=request.getContextPath()%>/administration/?sho
 			</div>
 
 			<!--PATIENT INDEPENDANT-->
-			<div style="display:inline-block">
-			<bean:message key="eform.uploadhtml.showLatestFormOnly" />	<input type="checkbox" name="showLatestFormOnly" value="true" <%= (Boolean)curform.get("showLatestFormOnly")?"checked":"" %> />
-				<br/>
-			<bean:message key="eform.uploadhtml.patientIndependent" /> <input type="checkbox" name="patientIndependent" value="true" <%= (Boolean)curform.get("patientIndependent")?"checked":"" %> /><br />
+			<div class="eform_checkbox_list" style="display:inline-block">
+				<div>
+					<label for="showLatestFormOnly" title='<bean:message key="eform.uploadhtml.showLatestFormOnly.tooltip"/>'>
+						<bean:message key="eform.uploadhtml.showLatestFormOnly" />
+					</label>
+					<input type="checkbox" id="showLatestFormOnly" name="showLatestFormOnly" value="true" <%= (Boolean) curform.get("showLatestFormOnly") ? "checked" : "" %> />
+				</div>
+				<div>
+					<label for="instanced" title='<bean:message key="eform.uploadhtml.instanced.tooltip"/>'>
+						<bean:message key="eform.uploadhtml.instanced" />
+					</label>
+					<input type="checkbox" id="instanced" name="instanced" value="true" <%= (Boolean)curform.get("instanced")?"checked":"" %> />
+				</div>
+				<div>
+					<label for="patientIndependent"><bean:message key="eform.uploadhtml.patientIndependent" /></label>
+					<input type="checkbox" id="patientIndependent" name="patientIndependent" value="true" <%= (Boolean)curform.get("patientIndependent")?"checked":"" %> />
+				</div>
 			</div>
 
 			<br />			

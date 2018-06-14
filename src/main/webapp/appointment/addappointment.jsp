@@ -98,8 +98,8 @@
 <%@ page import="org.oscarehr.common.model.AppointmentStatus" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="oscar.oscarEncounter.data.EctFormData" %>
-<%@ page import="org.oscarehr.common.model.DemographicCust" %>
-<%@ page import="org.oscarehr.common.dao.DemographicCustDao" %>
+<%@ page import="org.oscarehr.demographic.model.DemographicCust" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicCustDao" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
@@ -1045,7 +1045,7 @@
 							%>
 						</select>
 						</br>
-						<textarea id="reason" name="reason" tabindex="2" rows="2" wrap="virtual"
+						<textarea id="reason" name="reason" tabindex="2" maxlength="80" rows="2" wrap="virtual"
 								  cols="18"><%=bFirstDisp ? "" : request.getParameter("reason").equals("") ? "" : request.getParameter("reason")%></textarea>
 					</div>
 					<div class="space">&nbsp;</div>

@@ -96,28 +96,43 @@
 					</div>
 				</div>
 
-
-
-				<div class="row" ng-hide="ticklerAddCtrl.showServiceDateEditor === true" ng-click="ticklerAddCtrl.showServiceDateEditor=true">
-					<div class="col-xs-6">
-						<strong><bean:message key="tickler.add.serviceDate" bundle="ui"/>:</strong> 
-						{{ticklerAddCtrl.tickler.serviceDateDate | date : 'yyyy-MM-dd'}} {{ticklerAddCtrl.tickler.serviceDateTime | date : 'HH:mm'}}
-						<br/><br/>
+				<div class="row">
+					<div class="col-xs-12">
+						<label><bean:message key="tickler.add.serviceDate" bundle="ui"/>:</label>
 					</div>
 				</div>
 
-				<div class="row" ng-show="ticklerAddCtrl.showServiceDateEditor === true">
-					<div class="col-xs-6">
-						<strong ng-click="ticklerAddCtrl.showServiceDateEditor=false"><bean:message key="tickler.add.serviceDate" bundle="ui"/>:</strong>
-						<datepicker ng-model="ticklerAddCtrl.tickler.serviceDateDate" show-weeks="true" class="well well-sm"></datepicker>
 
+				<div class="row vertical-align">
+					<div class="form-group col-xs-7">
+						<juno-datepicker-popup juno-model="ticklerAddCtrl.tickler.serviceDateDate"
+											   show-icon="true"
+											   type="Input">
+						</juno-datepicker-popup>
 					</div>
-					<div class="col-xs-6">
-						<timepicker ng-model="ticklerAddCtrl.tickler.serviceDateTime"  hour-step="1" minute-step="1" show-meridian="true"></timepicker>
 
+					<div class="form-group col-xs-2">
+						<a class="" ng-click="ticklerAddCtrl.addMonthsFromNow(6)"><bean:message key="tickler.ticklerEdit.add6month"/></a>
+					</div>
+					<div class="form-group col-xs-2">
+						<a class="" ng-click="ticklerAddCtrl.addMonthsFromNow(12)"><bean:message key="tickler.ticklerEdit.add1year"/></a>
 					</div>
 				</div>
 
+
+				<div class="row">
+					<div class="form-group col-xs-7">
+						<label><bean:message key="tickler.view.serviceTime" bundle="ui"/>:</label>
+						<div class="input-group bootstrap-timepicker timepicker">
+							<input ng-model="ticklerAddCtrl.tickler.serviceDateTime"
+								   type="text"
+								   class="form-control input-small" id="timepicker">
+							<span class="input-group-addon">
+								<i class="glyphicon glyphicon-time"></i>
+							</span>
+						</div>
+					</div>
+				</div>
 
 
 				<div class="row">

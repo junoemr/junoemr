@@ -143,18 +143,19 @@ public class CaseManagementPrintPdf {
         String dob = propResource.getString("oscarEncounter.pdfPrint.dob") + " " + (String)request.getAttribute("demoDOB") + "\n";
         String age = propResource.getString("oscarEncounter.pdfPrint.age") + " " + (String)request.getAttribute("demoAge") + "\n";
         String mrp = propResource.getString("oscarEncounter.pdfPrint.mrp") + " " + (String)request.getAttribute("mrp") + "\n";
+        String hin = propResource.getString("oscarEncounter.pdfPrint.hin") + " " + (String)request.getAttribute("hin") + "\n";
         String[] info = null;
         if("true".equals(OscarProperties.getInstance().getProperty("print.includeMRP", "true"))) {
-        	info = new String[] { title, gender, dob, age, mrp };
+        	info = new String[] { title, gender, dob, age, hin, mrp };
         } else {
-        	info = new String[] { title, gender, dob, age};
+        	info = new String[] { title, gender, dob, age, hin};
         }
 
         ClinicData clinicData = new ClinicData();
         clinicData.refreshClinicData();
         String[] clinic = new String[] {clinicData.getClinicName(), clinicData.getClinicAddress(),
         clinicData.getClinicCity() + ", " + clinicData.getClinicProvince(),
-        clinicData.getClinicPostal(), clinicData.getClinicPhone()};
+        clinicData.getClinicPostal(), "Phone: " + clinicData.getClinicPhone(), "Fax: " + clinicData.getClinicFax()};
 
         if("true".equals(OscarProperties.getInstance().getProperty("print.useCurrentProgramInfoInHeader", "false"))) {
         	ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);

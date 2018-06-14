@@ -23,12 +23,12 @@
     Ontario, Canada
 
 --%>
-<%@ page import="oscar.oscarProvider.data.*, oscar.oscarRx.data.*,oscar.OscarProperties, oscar.oscarClinic.ClinicData, java.util.*"%>
-<%@ page import="java.io.File" %>
+<%@ page import="org.oscarehr.common.dao.FaxConfigDao, org.oscarehr.common.dao.OscarAppointmentDao,org.oscarehr.common.dao.SiteDao, org.oscarehr.common.model.Appointment, org.oscarehr.common.model.FaxConfig"%>
 <%@ page import="org.oscarehr.common.model.PharmacyInfo" %>
-<%@ page import="org.oscarehr.common.model.DemographicPharmacy" %>
-<%@ page import="org.oscarehr.common.dao.DemographicPharmacyDao" %>
-<%@ page import="org.oscarehr.common.dao.PharmacyInfoDao" %>
+<%@ page import="org.oscarehr.common.model.Site" %>
+<%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet" %>
+<%@ page import="org.oscarehr.util.DigitalSignatureUtils" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -36,19 +36,18 @@
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 <%@ taglib uri="/WEB-INF/indivo-tag.tld" prefix="indivo" %>
-<%@ page import="org.oscarehr.util.DigitalSignatureUtils"%>
-<%@ page import="org.oscarehr.util.LoggedInInfo"%>
-<%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet"%>
+<%@ page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@ page import="oscar.OscarProperties"%>
 <%! boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable(); %>
 
 
-<%@page import="org.oscarehr.common.dao.SiteDao"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@page import="org.oscarehr.common.model.Site"%>
-<%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.common.model.Appointment"%>
-<%@page import="org.oscarehr.common.dao.OscarAppointmentDao"%>
-<%@ page import="org.oscarehr.common.dao.FaxConfigDao, org.oscarehr.common.model.FaxConfig" %>
+<%@page import="oscar.oscarClinic.ClinicData"%>
+<%@page import="oscar.oscarProvider.data.ProSignatureData"%>
+<%@page import="oscar.oscarRx.data.RxPharmacyData"%>
+<%@page import="java.io.File"%>
+<%@page import="java.util.List"%>
+<%@page import="java.util.Vector"%>
 <%
 	OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -102,9 +101,10 @@ vecPageSizeValues.add("PageSize.Letter");
 //String reprint = (String)request.getAttribute("rePrint") != null ? (String)request.getAttribute("rePrint") : "false";
 
 String reprint = (String)request.getSession().getAttribute("rePrint") != null ? (String)request.getSession().getAttribute("rePrint") : "false";
+Boolean isReprint = Boolean.parseBoolean(reprint);
 
 String createAnewRx;
-if(reprint.equalsIgnoreCase("true") ) {
+if(isReprint) {
     bean = (oscar.oscarRx.pageUtil.RxSessionBean)session.getAttribute("tmpBeanRX");
     createAnewRx = "window.location.href = '" + request.getContextPath() + "/oscarRx/SearchDrug.jsp'";
 }
@@ -150,7 +150,7 @@ if(bMultisites) {
 	for (int i=0;i<sites.size();i++) {
 		Site s = sites.get(i);
         vecAddressName.add(s.getName());
-        vecAddress.add("<b>"+doctorName+"</b><br>"+s.getName()+"<br>"+s.getAddress() + "<br>" + s.getCity() + ", " + s.getProvince() + " " + s.getPostal() + "<br>"+rb.getString("RxPreview.msgTel")+": " + s.getPhone() + "<br>"+rb.getString("RxPreview.msgFax")+": " + s.getFax());
+        vecAddress.add(s.getName()+"<br>"+s.getAddress() + "<br>" + s.getCity() + ", " + s.getProvince() + " " + s.getPostal() + "<br>"+rb.getString("RxPreview.msgTel")+": " + s.getPhone() + "<br>"+rb.getString("RxPreview.msgFax")+": " + s.getFax());
         if (s.getName().equals(location))
         	session.setAttribute("RX_ADDR",String.valueOf(i));
 	}
@@ -183,7 +183,7 @@ if(bMultisites) {
 
     for(int i=0; i<temp0.length; i++) {
         vecAddressName.add(temp0[i]);
-        vecAddress.add("<b>"+doctorName+"</b><br>"+temp0[i]+"<br>"+temp1[i] + "<br>" + temp2[i] + ", " + temp3[i] + " " + temp4[i] + "<br>"+rb.getString("RxPreview.msgTel")+": " + temp5[i] + "<br>"+rb.getString("RxPreview.msgFax")+": " + temp6[i]);
+        vecAddress.add(temp0[i]+"<br>"+temp1[i] + "<br>" + temp2[i] + ", " + temp3[i] + " " + temp4[i] + "<br>"+rb.getString("RxPreview.msgTel")+": " + temp5[i] + "<br>"+rb.getString("RxPreview.msgFax")+": " + temp6[i]);
     }
 }
 String comment = (String) request.getSession().getAttribute("comment");
@@ -249,27 +249,30 @@ if (userAgent != null) {
                             }});
     }
 
-    function onPrint2(method, scriptId) {
-        var useSC=false;
-        var scAddress="";
-        var rxPageSize=$('printPageSize').value;
-        //console.log("rxPagesize  "+rxPageSize);
+    function onPrint2(method, scriptId)
+    {
+	    var useSC = false;
+	    var scAddress = "";
+	    var rxPageSize = $('printPageSize').value;
+	    var doctorName = frames['preview'].document.getElementById("clinicAddress-doctorName").value;
+	    //console.log("rxPagesize  "+rxPageSize);
 
 
-  <% if(vecAddressName != null) {
-    %>
-        useSC=true;
-   <%      for(int i=0; i<vecAddressName.size(); i++) {%>
-	    if(document.getElementById("addressSel").value=="<%=i%>") {
-    	       scAddress="<%=vecAddress.get(i)%>";
-            }
-<%       }
-      }%>
-              var action="../form/createcustomedpdf?__title=Rx&__method=" +  method+"&useSC="+useSC+"&scAddress="+scAddress+"&rxPageSize="+rxPageSize+"&scriptId="+scriptId;
-            document.getElementById("preview").contentWindow.document.getElementById("preview2Form").action = action;
-            document.getElementById("preview").contentWindow.document.getElementById("preview2Form").target="_blank";
-            document.getElementById("preview").contentWindow.document.getElementById("preview2Form").submit();
-       return true;
+	    <% if(vecAddressName != null) {
+		  %>
+	    useSC = true;
+	    <%      for(int i=0; i<vecAddressName.size(); i++) {%>
+	    if (document.getElementById("addressSel").value == "<%=i%>")
+	    {
+		    scAddress = "<%=vecAddress.get(i)%>";
+	    }
+	    <%       }
+			  }%>
+	    var action = "../form/createcustomedpdf?__title=Rx&__method=" + method + "&useSC=" + useSC + "&scAddress=" + scAddress + "&clinicDoctorName=" + doctorName + "&rxPageSize=" + rxPageSize + "&scriptId=" + scriptId;
+	    document.getElementById("preview").contentWindow.document.getElementById("preview2Form").action = action;
+	    document.getElementById("preview").contentWindow.document.getElementById("preview2Form").target = "_blank";
+	    document.getElementById("preview").contentWindow.document.getElementById("preview2Form").submit();
+	    return true;
     }
 
 function setComment(){
@@ -590,19 +593,22 @@ function toggleView(form) {
                                         if(vecAddress != null) { %>
 					<tr>
 						<td align="left" colspan=2><bean:message key="ViewScript.msgAddress"/>
-                                                    <select	name="addressSel" id="addressSel" onChange="addressSelect()" style="width:200px;" >
-							<% String rxAddr = (String) session.getAttribute("RX_ADDR");
-                                                          for (int i =0; i < vecAddressName.size();i++){
-					                 String te = (String) vecAddressName.get(i);
-                                                         String tf = (String) vecAddress.get(i);%>
+							<select name="addressSel" id="addressSel" onChange="addressSelect()" style="width:200px;">
+									<%--<%=(isReprint) ? "disabled='disabled'" : ""%>>--%>
+								<% String rxAddr = (String) session.getAttribute("RX_ADDR");
+									for(int i = 0; i < vecAddressName.size(); i++)
+									{
+										String te = (String) vecAddressName.get(i);
+										String tf = (String) vecAddress.get(i);%>
 
-							<option value="<%=i%>"
-								<% if ( rxAddr != null && rxAddr.equals(""+i)){ %>SELECTED<%}%>
-                                                                ><%=te%></option>
-							<%  }%>
+								<option value="<%=i%>"
+								        <% if ( rxAddr != null && rxAddr.equals(""+i)){ %>SELECTED<%}%>
+								><%=te%>
+								</option>
+								<% }%>
 
-                                                    </select>
-                                                </td>
+							</select>
+						</td>
 					</tr>
 					<% } %>
 					<tr>
@@ -630,7 +636,7 @@ function toggleView(form) {
 						<!--td width=10px></td-->
 						<td>
 						<span>
-							<input type=button value="Print PDF" class="ControlPushButton" style="width: 150px" onClick="<%=reprint.equalsIgnoreCase("true") ? "javascript:return onPrint2('rePrint', "+request.getParameter("scriptId")+");" : "javascript:return onPrint2('print', "+request.getParameter("scriptId")+");" %>" />
+							<input type=button value="Print PDF" class="ControlPushButton" style="width: 150px" onClick="<%=isReprint ? "javascript:return onPrint2('rePrint', "+request.getParameter("scriptId")+");" : "javascript:return onPrint2('print', "+request.getParameter("scriptId")+");" %>" />
 						</span>
 						</td>
 					</tr>
@@ -643,7 +649,7 @@ function toggleView(form) {
 					</tr>
 					<tr>
 						<td><span><input type=button
-							<%=reprint.equals("true")?"disabled='true'":""%> value="<bean:message key="ViewScript.msgPrintPasteEmr"/>"
+							<%=isReprint?"disabled='true'":""%> value="<bean:message key="ViewScript.msgPrintPasteEmr"/>"
 							class="ControlPushButton" style="width: 150px"
 							onClick="javascript:printPaste2Parent(true);" /></span></td>
 					</tr>

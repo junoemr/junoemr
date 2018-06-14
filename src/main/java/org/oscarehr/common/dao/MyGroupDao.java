@@ -26,9 +26,12 @@ package org.oscarehr.common.dao;
 
 
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
 import org.oscarehr.common.model.MyGroup;
 import org.oscarehr.common.model.MyGroupPrimaryKey;
@@ -85,6 +88,61 @@ public class MyGroupDao extends AbstractDao<MyGroup> {
 
          return dList;
      }
+
+    /**
+     * Gets only the group members that have a schedule for the provided date.
+     * @param groupNo The group to get the records for
+	 * @param date The date to check for schedules
+     * @param providerNo Include this provider even if there is no schedule
+     * @return List of type MyGroup
+     */
+    public List<MyGroup> getGroupWithScheduleByGroupNo(String groupNo, LocalDate date, Integer providerNo)
+	{
+        String sql =
+			"SELECT \n" +
+			"  g.mygroup_no, \n" +
+			"  g.provider_no, \n" +
+			"  g.last_name,\n" +
+			"  g.first_name, \n" +
+			"  g.vieworder, \n" +
+			"  g.default_billing_form\n" +
+			"FROM mygroup g \n" +
+			"LEFT JOIN scheduledate sd \n" +
+			"ON sd.status = 'A' \n" +
+			"AND sd.sdate = :date \n" +
+			"AND sd.provider_no = g.provider_no\n" +
+			"WHERE g.mygroup_no = :groupNo \n" +
+			"AND (sd.id IS NOT NULL OR g.provider_no = :providerNo)";
+
+		Query query = entityManager.createNativeQuery(sql);
+
+		query.setParameter("date", java.sql.Date.valueOf(date), TemporalType.DATE);
+		query.setParameter("groupNo", groupNo);
+		query.setParameter("providerNo", providerNo);
+
+        @SuppressWarnings("unchecked")
+		List<Object[]> results = query.getResultList();
+
+		List<MyGroup> groupList = new ArrayList<>();
+		for(Object[] result: results)
+		{
+			MyGroup myGroup = new MyGroup();
+
+			MyGroupPrimaryKey id = new MyGroupPrimaryKey();
+			id.setMyGroupNo((String) result[0]);
+			id.setProviderNo((String) result[1]);
+
+			myGroup.setId(id);
+			myGroup.setLastName((String) result[2]);
+			myGroup.setFirstName((String) result[3]);
+			myGroup.setViewOrder((String) result[4]);
+			myGroup.setDefaultBillingForm((String) result[5]);
+
+			groupList.add(myGroup);
+		}
+
+        return groupList;
+    }
 
      public void deleteGroupMember(String myGroupNo, String providerNo){
     	 MyGroupPrimaryKey key = new MyGroupPrimaryKey();

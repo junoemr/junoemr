@@ -40,7 +40,7 @@ import org.oscarehr.caisi_integrator.ws.CachedDemographicNote;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicPrevention;
 import org.oscarehr.caisi_integrator.ws.DemographicWs;
 import org.oscarehr.caisi_integrator.ws.FacilityIdIntegerCompositePk;
-import org.oscarehr.common.dao.DemographicExtDao;
+import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.common.dao.RemoteIntegratedDataCopyDao;
 import org.oscarehr.common.model.RemoteIntegratedDataCopy;
 import org.oscarehr.util.LoggedInInfo;

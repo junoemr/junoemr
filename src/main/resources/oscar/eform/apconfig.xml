@@ -481,6 +481,46 @@
 		<ap-output>${sin}</ap-output>
 	</databaseap>
 
+	<!-- OHSUPPORT-2712 licensed Marijuana Producers (requires custom database tables)-->
+	<databaseap>
+		<ap-name>licensed_producer_by_demographic</ap-name>
+		<ap-sql>SELECT lp.producer_name AS producer_name FROM demographic_licensed_producer d JOIN licensed_producer lp ON (d.producer_id=lp.producer_id) where d.demographic_no=${demographic}</ap-sql>
+		<ap-output>${producer_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>licensed_producer2_by_demographic</ap-name>
+		<ap-sql>SELECT lp.producer_name AS producer_name FROM demographic_licensed_producer d JOIN licensed_producer lp ON (d.producer_id2=lp.producer_id) where d.demographic_no=${demographic}</ap-sql>
+		<ap-output>${producer_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>licensed_producer_address_name</ap-name>
+		<ap-sql>SELECT pa.display_name as address_name
+			FROM demographic_licensed_producer d JOIN licensed_producer_address pa ON (d.address_id=pa.address_id) where d.demographic_no=${demographic}
+		</ap-sql>
+		<ap-output>${address_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>licensed_producer_address_name_list</ap-name>
+		<ap-sql>SELECT GROUP_CONCAT(pa.display_name SEPARATOR ';') as list
+			FROM licensed_producer_address pa
+		</ap-sql>
+		<ap-output>${list}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>licensed_producer_full_address</ap-name>
+		<ap-sql>SELECT pa.address as address, pa.city as city, pa.province as province, pa.postal as postal
+			FROM demographic_licensed_producer d JOIN licensed_producer_address pa ON (d.address_id=pa.address_id) where d.demographic_no=${demographic}
+		</ap-sql>
+		<ap-output>${address}\n${city}, ${province}, ${postal}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>licensed_producer_full_address_list</ap-name>
+		<ap-sql>SELECT GROUP_CONCAT(pa.address, '\n', pa.city, ', ', pa.province, ', ', pa.postal SEPARATOR ';') AS list
+			FROM licensed_producer_address pa
+		</ap-sql>
+		<ap-output>${list}</ap-output>
+	</databaseap>
+
 	<!-- Multisite Information -->
 	<databaseap>
 		<ap-name>multisite_name_list</ap-name>
@@ -1042,6 +1082,22 @@
 		<ap-output>${practitionerNo}</ap-output>
 	</databaseap>
 	<databaseap>
+		<ap-name>appt_provider_cpsid</ap-name>
+		<ap-sql>SELECT provider.practitionerNo FROM provider, appointment
+			WHERE appointment.appointment_no=${appt_no} AND
+			appointment.provider_no=provider.provider_no
+		</ap-sql>
+		<ap-output>${practitionerNo}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>appt_provider_specialty</ap-name>
+		<ap-sql>SELECT provider.specialty FROM provider, appointment
+			WHERE appointment.appointment_no=${appt_no} AND
+			appointment.provider_no=provider.provider_no
+		</ap-sql>
+		<ap-output>${specialty}</ap-output>
+	</databaseap>
+	<databaseap>
 		<ap-name>doctor_title</ap-name>
 		<ap-sql>SELECT provider.title FROM provider, demographic WHERE
 			demographic.demographic_no=${demographic} AND
@@ -1201,8 +1257,8 @@
 	</databaseap>
 	<databaseap>
 		<ap-name>bc_referral_address</ap-name>
-		<ap-sql>SELECT CONCAT( b.address1, IF( b.address1 ='', '', '\n' ),
-			b.address2, IF( b.address2 ='', '', '\n' ) , b.city, ' ', b.province,
+		<ap-sql>SELECT CONCAT( COALESCE(b.address1, ''), IF( COALESCE(b.address1, '') ='', '', '\n' ),
+			COALESCE(b.address2, ''), IF( COALESCE(b.address2, '') ='', '', '\n' ) , b.city, ' ', b.province,
 			' ', b.postal ) AS raddress
 			FROM billingreferral b, demographic d
 			WHERE d.demographic_no=${demographic}
@@ -1776,4 +1832,62 @@
 		<ap-output>${referralNo}</ap-output>
 	</databaseap>
 	<!-- end family doctor -->
+	<!-- BC family doctor -->
+	<databaseap>
+		<ap-name>bc_family_doctor_name</ap-name>
+		<ap-sql>SELECT billingreferral.last_name, billingreferral.first_name
+			FROM billingreferral, demographic
+			WHERE demographic.demographic_no=${demographic}
+			AND LENGTH(billingreferral.referral_no) > 0
+			AND
+			EXTRACTVALUE(demographic.family_doctor_2, '/fd') = billingreferral.referral_no
+		</ap-sql>
+		<ap-output>${last_name}, ${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>bc_family_doctor_address</ap-name>
+		<ap-sql>SELECT CONCAT( b.address1, IF( b.address1 ='', '', '\n' ),
+			b.address2, IF( b.address2 ='', '', '\n' ) , b.city, ' ', b.province,
+			' ', b.postal ) AS raddress
+			FROM billingreferral b, demographic d
+			WHERE d.demographic_no=${demographic}
+			AND LENGTH(b.referral_no) > 0
+			AND EXTRACTVALUE(d.family_doctor_2, '/fd') = b.referral_no
+		</ap-sql>
+		<ap-output>${raddress}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>bc_family_doctor_phone</ap-name>
+		<ap-sql>SELECT b.phone
+			FROM billingreferral b, demographic d
+			WHERE d.demographic_no=${demographic}
+			AND LENGTH(b.referral_no) > 0
+			AND
+			EXTRACTVALUE(d.family_doctor_2, '/fd') = b.referral_no
+		</ap-sql>
+		<ap-output>${phone}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>bc_family_doctor_fax</ap-name>
+		<ap-sql>SELECT b.fax
+			FROM billingreferral b, demographic d
+			WHERE d.demographic_no=${demographic}
+			AND LENGTH(b.referral_no) > 0
+			AND
+			EXTRACTVALUE(d.family_doctor_2, '/fd') = b.referral_no
+		</ap-sql>
+		<ap-output>${fax}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>bc_family_doctor_no</ap-name>
+		<ap-sql>SELECT b.referral_no
+			FROM billingreferral b, demographic d
+			WHERE d.demographic_no=${demographic}
+			AND LENGTH(b.referral_no) > 0
+			AND
+			EXTRACTVALUE(d.family_doctor_2, '/fd') = b.referral_no
+		</ap-sql>
+		<ap-output>${referral_no}</ap-output>
+	</databaseap>
+	<!-- end BC family doctor -->
 </eformap-config>

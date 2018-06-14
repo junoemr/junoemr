@@ -26,13 +26,13 @@
 <%@page import="org.oscarehr.common.model.OcanStaffForm"%>
 <%@page import="org.oscarehr.common.model.Admission"%>
 <%@page import="org.oscarehr.common.model.Demographic"%>
-<%@page import="org.oscarehr.common.model.DemographicExt"%>
+<%@page import="org.oscarehr.demographic.model.DemographicExt"%>
 <%@page import="org.oscarehr.PMmodule.web.OcanForm"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@page import="java.util.List"%>
 <%@page import="org.oscarehr.common.dao.DemographicDao"%>
 <%@page import="org.oscarehr.common.dao.AdmissionDao"%>
-<%@page import="org.oscarehr.common.dao.DemographicExtDao"%>
+<%@page import="org.oscarehr.demographic.dao.DemographicExtDao"%>
 <%@page import="org.oscarehr.PMmodule.web.CdsForm4"%>
 <%@page import="org.oscarehr.util.SessionConstants"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>

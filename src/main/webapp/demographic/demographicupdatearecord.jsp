@@ -42,13 +42,13 @@
 <%@ page import="org.oscarehr.PMmodule.model.Program, org.oscarehr.PMmodule.service.AdmissionManager, org.oscarehr.PMmodule.service.ProgramManager, org.oscarehr.PMmodule.web.GenericIntakeEditAction, org.oscarehr.common.OtherIdManager" errorPage="errorpage.jsp"%>
 
 <%@page import="org.oscarehr.common.dao.DemographicArchiveDao"%>
-<%@page import="org.oscarehr.common.dao.DemographicCustDao"%>
+<%@page import="org.oscarehr.demographic.dao.DemographicCustDao"%>
 <%@page import="org.oscarehr.common.dao.DemographicDao" %>
 
 <%@page import="org.oscarehr.common.model.ConsentType" %>
 <%@page import="org.oscarehr.common.model.Demographic" %>
-<%@page import="org.oscarehr.common.model.DemographicCust" %>
-<%@page import="org.oscarehr.common.model.DemographicExt" %>
+<%@page import="org.oscarehr.demographic.model.DemographicCust" %>
+<%@page import="org.oscarehr.demographic.model.DemographicExt" %>
 <%@page import="org.oscarehr.managers.DemographicManager" %>
 <%@page import="org.oscarehr.managers.PatientConsentManager" %>
 <%@page import="org.oscarehr.provider.model.ProviderPreventionManager" %>
@@ -336,6 +336,22 @@
 
 	//save the demographic
 	demographicDao.save(demographic);
+
+	// save custom licensed producer if enabled
+	if(oscarVariables.isPropertyActive("show_demographic_licensed_producers")) {
+		try {
+			int licensedProducerID = Integer.parseInt(request.getParameter("licensed_producer"));
+			int licensedProducerID2 = Integer.parseInt(request.getParameter("licensed_producer2"));
+			int licensedProducerAddressID = Integer.parseInt(request.getParameter("licensed_producer_address"));
+			demographicDao.saveDemographicLicensedProducer(demographic.getDemographicNo(), licensedProducerID, licensedProducerID2, licensedProducerAddressID);
+		}
+		catch(NumberFormatException e) {
+			// unable to save licensed producer info
+			MiscUtils.getLogger().warn(
+					String.format("Failed to save licensed producer for demographic %d.", demographic.getDemographicNo())
+			);
+		}
+	}
 
 	// for the IBD clinic
 	OtherIdManager.saveIdDemographic(demographicNo, "meditech_id", request.getParameter("meditech_id"));

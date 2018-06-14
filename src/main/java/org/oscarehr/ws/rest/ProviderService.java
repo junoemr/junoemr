@@ -43,10 +43,11 @@ import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.PatientListApptItemBean;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.model.ProviderTo1;
-import org.oscarehr.ws.transfer_objects.ProviderTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -111,8 +112,8 @@ public class ProviderService extends AbstractServiceImpl {
     	   	
     	for(Provider p: providerDao.getActiveProviders()) {
     		lst.getContent().add(ProviderTransfer.toTransfer(p));
-    	} 
-      
+    	}
+
         return lst;
     }
  
@@ -195,7 +196,7 @@ public class ProviderService extends AbstractServiceImpl {
 	@GET
 	@Path("/getRecentDemographicsViewed")
 	@Produces("application/json")
-	public RestResponse<List<PatientListApptItemBean>,String> getRecentDemographicsViewed()
+	public RestResponse<List<PatientListApptItemBean>> getRecentDemographicsViewed()
 	{
 		List<PatientListApptItemBean> resultList = new ArrayList<>();
 

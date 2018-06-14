@@ -30,9 +30,10 @@
 <%@ page import="org.oscarehr.casemgmt.model.CaseManagementNoteLink" %>
 <%@ page import="org.oscarehr.casemgmt.service.CaseManagementManager" %>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.common.dao.DemographicExtDao" %>
+<%@page import="org.oscarehr.demographic.dao.DemographicExtDao" %>
 <%@page import="org.oscarehr.common.dao.PreventionsLotNrsDao" %>
 <%@page import="org.oscarehr.common.model.PreventionsLotNrs" %>
+<%@ page import="org.oscarehr.demographic.model.DemographicExt" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -424,7 +425,7 @@ function displayCloseWarning(){
                &nbsp;
 <!--
                <%
-                 org.oscarehr.common.model.DemographicExt ineligx = demographicExtDao.getDemographicExt(Integer.parseInt(demographic_no),prevention+"Inelig");
+                 DemographicExt ineligx = demographicExtDao.getDemographicExt(Integer.parseInt(demographic_no),prevention+"Inelig");
 				 String inelig = "";
 				 if(ineligx != null) {
 					 inelig = ineligx.getValue();

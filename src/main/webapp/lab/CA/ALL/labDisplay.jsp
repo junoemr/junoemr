@@ -1280,8 +1280,8 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                    	String obrName = handler.getOBRName(j);
                                    	b1 = !obrFlag && !obrName.equals("");
                                    	b2 = !(obxName.contains(obrName));
-                                   	b3 = obxCount < 2;
-                                       if( b1 && b2 && b3){
+
+                                       if( b1 && b2 && !isUnstructuredDoc){
                                        %>
                                            <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" >
                                                <td valign="top" align="left"><%=obrName%></td>
@@ -1481,7 +1481,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                     	if(isUnstructuredDoc){%>
                                    			<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>"><%
-                                   			if((obxCount>1) && k>1 && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1))) {%>
+                                   			if((obxCount>1) && k>0 && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1))) {%>
                                    				<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"></a><%
                                    				}
                                    			else{%> <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName %></a><%}%>
@@ -1500,7 +1500,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 											else {%>
                                            		<td align="left"><%= handler.getOBXResult( j, k) %></td><%
 											} %>
-	                                            <%if((obxCount>1) && k>1 && handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, k-1))) {
+	                                            <%if((obxCount>1) && k>0 && handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, k-1))) {
 	                                                    %><td align="center"></td><%
 	                                            }
 	                                                else{%>

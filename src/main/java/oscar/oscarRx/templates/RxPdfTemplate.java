@@ -24,22 +24,20 @@
 
 package oscar.oscarRx.templates;
 
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.PdfWriter;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.log4j.Logger;
-import org.oscarehr.util.MiscUtils;
-
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.PdfWriter;
 
 public abstract class RxPdfTemplate {
 
@@ -77,7 +75,7 @@ public abstract class RxPdfTemplate {
 		} catch (Exception e) {
 			logger.error("Error", e);
 		} finally {
-			if (document != null) {
+			if (document != null && document.isOpen()) {
 				document.close();
 			}
 			if (writer != null) {
@@ -100,25 +98,26 @@ public abstract class RxPdfTemplate {
 	 */
 	protected abstract void buildPdfLayout(Document document, PdfWriter writer) throws DocumentException, IOException;
 
-	protected HashMap<String,String> parseSCAddress(String s) {
-		HashMap<String,String> hm = new HashMap<String,String>();
-		String[] ar = s.split("</b>");
-		String[] ar2 = ar[1].split("<br>");
-		ArrayList<String> lst = new ArrayList<String>(Arrays.asList(ar2));
-		lst.remove(0);
-		String tel = lst.get(3);
+	//TODO this is stupid, make it not stupid
+	protected HashMap<String, String> parseSCAddress(String s)
+	{
+		logger.debug("Parse Address HTML:\n" + s);
+		HashMap<String, String> addressMap = new HashMap<>();
+		String[] addressFields = s.split("<br>");
+		ArrayList<String> addressFieldList = new ArrayList<>(Arrays.asList(addressFields));
+		String clinicName = String.join("\n", addressFieldList.get(0), addressFieldList.get(1),addressFieldList.get(2));
+		String tel = addressFieldList.get(3);
 		tel = tel.replace("Tel: ", "");
 		tel = tel.replace("Tel", "");
-		String fax = lst.get(4);
+		String fax = addressFieldList.get(4);
 		fax = fax.replace("Fax: ", "");
-		String clinicName = lst.get(0) + "\n" + lst.get(1) + "\n" + lst.get(2);
 		logger.debug(tel);
 		logger.debug(fax);
 		logger.debug(clinicName);
-		hm.put("clinicName", clinicName);
-		hm.put("clinicTel", tel);
-		hm.put("clinicFax", fax);
+		addressMap.put("clinicName", clinicName);
+		addressMap.put("clinicTel", tel);
+		addressMap.put("clinicFax", fax);
 
-		return hm;
+		return addressMap;
 	}
 }

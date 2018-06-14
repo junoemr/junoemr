@@ -33,7 +33,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
-import org.oscarehr.common.model.DemographicMerged;
+import org.oscarehr.demographic.model.DemographicMerged;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.ws.rest.conversion.DemographicMergedConverter;
 import org.oscarehr.ws.rest.to.OscarSearchResponse;

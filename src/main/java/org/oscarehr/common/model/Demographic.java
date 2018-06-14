@@ -24,27 +24,32 @@
 
 package org.oscarehr.common.model;
 
+import com.sun.istack.NotNull;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.oscarehr.PMmodule.utility.DateTimeFormatUtils;
+import org.oscarehr.PMmodule.utility.Utility;
+import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.util.MiscUtils;
+import oscar.OscarProperties;
+
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.oscarehr.PMmodule.utility.DateTimeFormatUtils;
-import org.oscarehr.PMmodule.utility.Utility;
-import org.oscarehr.util.MiscUtils;
-import oscar.OscarProperties;
+import java.util.regex.Pattern;
 
 /**
  * This is the object class that relates to the demographic table. Any customizations belong here.
+ * @deprecated use the jpa version instead
  */
+@Deprecated
 public class Demographic implements Serializable
 {
 
@@ -57,6 +62,10 @@ public class Demographic implements Serializable
 	private static final String DEFAULT_FUTURE_DATE = "2100-01-01";
 	public static final String ANONYMOUS = "ANONYMOUS";
 	public static final String UNIQUE_ANONYMOUS = "UNIQUE_ANONYMOUS";
+	public static final String ROSTER_STATUS_FEE_SERVICE = "FS";
+	public static final String ROSTER_STATUS_ROSTERED = "RO";
+	public static final String ROSTER_STATUS_NOT_ROSTERED = "NR";
+	public static final String ROSTER_STATUS_TERMINATED = "TE";
 
 	private final static Pattern FD_LAST_NAME = Pattern.compile(".*<rd>([^,]*),.*</rd>.*");
 	private final static Pattern FD_FIRST_NAME = Pattern.compile(".*<rd>[^,]*,(.*)</rd>.*");
@@ -521,6 +530,17 @@ public class Demographic implements Serializable
 	}
 
 	/**
+	 * Set the dateOfBirth,monthOfBirth,yearOfBirth using a localdate object
+	 */
+	@NotNull
+	public void setDateOfBirth(LocalDate dateOfBirth)
+	{
+		setDateOfBirth(StringUtils.leftPad(String.valueOf(dateOfBirth.getDayOfMonth()), 2,"0"));
+		setMonthOfBirth(StringUtils.leftPad(String.valueOf(dateOfBirth.getMonthValue()), 2,"0"));
+		setYearOfBirth(StringUtils.leftPad(String.valueOf(dateOfBirth.getYear()), 4,"0"));
+	}
+
+	/**
 	 * Return the value associated with the column: sex
 	 */
 	public String getSex()
@@ -631,21 +651,27 @@ public class Demographic implements Serializable
 		}
 		return "";
 	}
+	public String getFamilyDoctorName()
+	{
+		return StringUtils.substringBetween(getFamilyDoctor(), "<rd>", "</rd>");
+	}
+
+	public String getFamilyDoctor2Name()
+	{
+		return StringUtils.substringBetween(getFamilyDoctor2(), "<fdname>", "</fdname>");
+	}
 
 	/**
 	 * Return the doctor number as parsed from column: family_doctor
 	 */
 	public String getFamilyDoctorNumber()
 	{
+		return StringUtils.substringBetween(getFamilyDoctor(), "<rdohip>", "</rdohip>");
+	}
+	public String getFamilyDoctor2Number()
+	{
 
-		Matcher m = FD_OHIP.matcher(getFamilyDoctor());
-
-		if (m.find())
-		{
-			return m.group(1);
-		}
-
-		return "";
+		return StringUtils.substringBetween(getFamilyDoctor2(), "<fd>", "</fd>");
 	}
 
 	/**

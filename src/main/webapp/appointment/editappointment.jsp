@@ -74,8 +74,8 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session"/>
-<%@page import="org.oscarehr.common.model.DemographicCust" %>
-<%@page import="org.oscarehr.common.dao.DemographicCustDao" %>
+<%@page import="org.oscarehr.demographic.model.DemographicCust" %>
+<%@page import="org.oscarehr.demographic.dao.DemographicCustDao" %>
 <%@ page import="org.oscarehr.common.model.EncounterForm" %>
 <%@ page import="org.oscarehr.common.dao.EncounterFormDao" %>
 <%@page import="org.oscarehr.common.model.ProviderPreference" %>
@@ -813,7 +813,7 @@
 								%>
 							</select>
 							</br>
-							<textarea id="reason" name="reason" tabindex="2" rows="2" wrap="virtual"
+							<textarea id="reason" name="reason" tabindex="2" maxlength="80" rows="2" wrap="virtual"
 									  cols="18"><%=bFirstDisp ? appt.getReason() : request.getParameter("reason")%></textarea>
 						</div>
 						<div class="space">&nbsp;</div>

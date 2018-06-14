@@ -57,9 +57,9 @@
 <%@page import="org.oscarehr.common.OtherIdManager" %>
 <%@page import="org.oscarehr.common.dao.CountryCodeDao" %>
 <%@page import="org.oscarehr.common.dao.DemographicContactDao" %>
-<%@page import="org.oscarehr.common.dao.DemographicCustDao" %>
+<%@page import="org.oscarehr.demographic.dao.DemographicCustDao" %>
 <%@page import="org.oscarehr.common.dao.DemographicDao" %>
-<%@page import="org.oscarehr.common.dao.DemographicExtDao" %>
+<%@page import="org.oscarehr.demographic.dao.DemographicExtDao" %>
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@page import="org.oscarehr.common.dao.ProfessionalSpecialistDao" %>
 <%@page import="org.oscarehr.schedule.dao.ScheduleTemplateCodeDao" %>
@@ -100,7 +100,7 @@ if(!authed) {
 }
 
 %>
-<%@ page import="org.oscarehr.common.model.Admission, org.oscarehr.common.model.Appointment, org.oscarehr.common.model.CountryCode,org.oscarehr.common.model.Demographic, org.oscarehr.common.model.DemographicContact, org.oscarehr.common.model.DemographicCust, org.oscarehr.common.model.ProfessionalSpecialist, org.oscarehr.common.model.Provider,org.oscarehr.schedule.model.ScheduleTemplateCode"%>
+<%@ page import="org.oscarehr.common.model.Admission, org.oscarehr.common.model.Appointment, org.oscarehr.common.model.CountryCode,org.oscarehr.common.model.Demographic, org.oscarehr.common.model.DemographicContact, org.oscarehr.demographic.model.DemographicCust, org.oscarehr.common.model.ProfessionalSpecialist, org.oscarehr.common.model.Provider,org.oscarehr.schedule.model.ScheduleTemplateCode"%>
 <%@ page import="org.oscarehr.common.model.UserProperty"%>
 <%@ page import="org.oscarehr.common.model.WaitingListName" %>
 <%@ page import="org.oscarehr.common.web.ContactAction,org.oscarehr.managers.DemographicManager" %>
@@ -128,6 +128,7 @@ if(!authed) {
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
 	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+	ProviderPreferenceDao providerPreferenceDao = SpringUtils.getBean(ProviderPreferenceDao.class);
 	List<Provider> doctors = providerDao.getActiveProvidersByType("doctor");
 	List<Provider> nurses = providerDao.getActiveProvidersByRole("nurse");
 	List<Provider> midwifes = providerDao.getActiveProvidersByRole("midwife");
@@ -237,6 +238,35 @@ if(!authed) {
 		pageContext.setAttribute( "patientConsents", patientConsentManager.getAllConsentsByDemographic( loggedInInfo, demographicNo ) );
 	}
 
+	// Custom licensed producer fields
+	String licensedProducerDefault = "None";
+	String licensedProducer = licensedProducerDefault;
+
+	String licensedProducerDefault2 = "None";
+	String licensedProducer2 = licensedProducerDefault2;
+
+	String licensedProducerDefaultAddress = "None";
+	String licensedProducerAddress = licensedProducerDefaultAddress;
+
+	if (oscarProps.isPropertyActive("show_demographic_licensed_producers"))
+	{
+		String[] params = {demographic_no};
+		ResultSet demoProducerRs = apptMainBean.queryResults(params, "search_demo_licensed_producer");
+		if (demoProducerRs.next())
+		{
+			licensedProducer = demoProducerRs.getString("producer_name");
+		}
+		ResultSet demoProducerRs2 = apptMainBean.queryResults(params, "search_demo_licensed_producer2");
+		if (demoProducerRs2.next())
+		{
+			licensedProducer2 = demoProducerRs2.getString("producer_name");
+		}
+		ResultSet demoProducerAddrRs = apptMainBean.queryResults(params, "search_demo_licensed_producer_address_name");
+		if (demoProducerAddrRs.next())
+		{
+			licensedProducerAddress = demoProducerAddrRs.getString("display_name");
+		}
+	}
 %>
 
 
@@ -253,6 +283,9 @@ if(!authed) {
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.Vector" %>
+<%@ page import="org.oscarehr.common.dao.ProviderPreferenceDao" %>
+<%@ page import="org.oscarehr.common.model.ProviderPreference" %>
+<%@ page import="java.sql.ResultSet" %>
 <html:html locale="true">
 
 <head>
@@ -973,19 +1006,13 @@ if(wLReadonly.equals("")){
 							   target="_blank">
 							<bean:message key="demographic.demographiceditdemographic.msgInvoiceList"/>
 							</a>
-						<%
-						if ("BC".equals(instanceType))
-						{
-						    %>
-
 							<br/>
-                            <a  href="javascript: void();" onclick="return !showMenu('2', event);" onmouseover="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','returnTeleplanMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
+                            <a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
                             <div id='menu2' class='menu' onclick='event.cancelBubble = true;' style="width:350px;">
                                 <span id="search_spinner" ><bean:message key="demographic.demographiceditdemographic.msgLoading"/></span>
-                                <span id="returnTeleplanMsg"></span>
+                                <span id="eligibilityMsg"></span>
                             </div>
 					<%
-						}
 					}
 					else if("ON".equals(billRegion)) 
 					{
@@ -1004,17 +1031,34 @@ if(wLReadonly.equals("")){
 
 
 						<br/>
-						<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmouseover="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','returnTeleplanMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
+						<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
 						<div id='menu2' class='menu' onclick='event.cancelBubble = true;' style="width:350px;">
 							<span id="search_spinner" ><bean:message key="demographic.demographiceditdemographic.msgLoading"/></span>
-							<span id="returnTeleplanMsg"></span>
+							<span id="eligibilityMsg"></span>
 						</div>
 					<%}%>
 				</td>
 			</tr>
 			<tr>
+				<%
+					String referral_no_parameter = "";
+					String defaultBillingView = oscarVariables.getProperty("default_view");
+					if (oscarProps.isPropertyActive("auto_populate_billingreferral_bc"))
+					{
+						referral_no_parameter = "&referral_no_1=" + referralDoctorNo;
+					}
+					ProviderPreference preference = providerPreferenceDao.find(curProvider_no);
+					if(preference != null)
+					{
+						String preferredView = preference.getDefaultServiceType();
+						if(preferredView != null && !preferredView.equals("no"))
+						{
+							defaultBillingView = preferredView;
+						}
+					}
+				%>
 				<td><a
-					href="../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("default_view"))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t')"
+					href="../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(defaultBillingView)%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t<%=referral_no_parameter%>"
 					target="_blank"
 					title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></td>
 			</tr>
@@ -1618,10 +1662,12 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
                                                             key="demographic.demographiceditdemographic.RosterTerminationDate" />:</span>
                                                         <span class="info"><%=MyDateFormat.getMyStandardDate(demographic.getRosterTerminationDate())%></span>
                                                     </li>
-<%if (null != demographic.getRosterTerminationDate()) { %>
+<%
+	String terminationReason = demographic.getRosterTerminationReason();
+	if (null != demographic.getRosterTerminationDate() && StringUtils.isNotBlank(terminationReason)) { %>
 													<li><span class="label"><bean:message
                                                             key="demographic.demographiceditdemographic.RosterTerminationReason" />:</span>
-                                                        <span class="info"><%=Util.rosterTermReasonProperties.getReasonByCode(demographic.getRosterTerminationReason()) %></span>
+                                                        <span class="info"><%=Util.rosterTermReasonProperties.getReasonByCode(terminationReason) %></span>
                                                     </li>
 <%} %>
                                                     <li><span class="label"><bean:message
@@ -1838,10 +1884,21 @@ if ( Dead.equals(PatStat) ) {%>
                                                                                } %>:</span>
                                                        <span class="info"><%=StringUtils.trimToEmpty(demographic.getPostal())%></span></li>
 
-                                                    <li><span class="label"><bean:message
-                                                            key="demographic.demographiceditdemographic.formEmail" />:</span>
-                                                        <span class="info"><%=demographic.getEmail()!=null? demographic.getEmail() : ""%></span>
-							</li>
+                                                    <li><span class="label"><bean:message key="demographic.demographiceditdemographic.formEmail" />:</span>
+														<%
+															String patientEmail = StringUtils.trimToEmpty(demographic.getEmail());
+
+															if (oscarProps.isPropertyActive("enable_demographic_email_link"))
+															{
+														%>
+														<span class="info"><a href="mailto:<%=patientEmail%>"><%=patientEmail%></a></span>
+														<%	}
+															else
+															{
+														%>
+														<span class="info"><%=patientEmail%></span><%
+															}%>
+													</li>
                                                     <li><span class="label"><bean:message
                                                             key="demographic.demographiceditdemographic.formNewsLetter" />:</span>
                                                         <span class="info"><%=demographic.getNewsletter()!=null? demographic.getNewsletter() : "Unknown"%></span>
@@ -2222,7 +2279,24 @@ if ( Dead.equals(PatStat) ) {%>
 								</span>
 								<span class="info"><%=familyDoctorNo%></span>
 							</li>
+							<% }
+								//-- Licensed producer drop-down selection (display only)-->
+								if (oscarProps.isPropertyActive("show_demographic_licensed_producers"))
+								{ %>
+							<li>
+								<span class="label"><bean:message key="demographic.demographiceditdemographic.licensedProducer"/>:</span>
+								<span class="info"><%= licensedProducer %></span>
+							</li>
+							<li>
+								<span class="label"><bean:message key="demographic.demographiceditdemographic.licensedProducer2"/>:</span>
+								<span class="info"><%= licensedProducer2 %></span>
+							</li>
+							<li>
+								<span class="label"><bean:message key="demographic.demographiceditdemographic.licensedProducerAddress"/>:</span>
+								<span class="info"><%= licensedProducerAddress %></span>
+							</li>
 							<% } %>
+
 						</ul>
 						</div>
 
@@ -2674,7 +2748,11 @@ if ( Dead.equals(PatStat) ) {%>
 									<option value="BC" <%=hctype.equals("BC")?" selected":""%>>BC-British Columbia</option>
 									<option value="MB" <%=hctype.equals("MB")?" selected":""%>>MB-Manitoba</option>
 									<option value="NB" <%=hctype.equals("NB")?" selected":""%>>NB-New Brunswick</option>
+									<% if (oscarProps.isBritishColumbiaInstanceType() && !oscarProps.isClinicaidBillingType()) {%>
+									<option value="NF" <%=hctype.equals("NF")?" selected":""%>>NF-Newfoundland & Labrador</option>
+									<% } else { %>
 									<option value="NL" <%=hctype.equals("NL")?" selected":""%>>NL-Newfoundland & Labrador</option>
+									<% } %>
 									<option value="NT" <%=hctype.equals("NT")?" selected":""%>>NT-Northwest Territory</option>
 									<option value="NS" <%=hctype.equals("NS")?" selected":""%>>NS-Nova Scotia</option>
 									<option value="NU" <%=hctype.equals("NU")?" selected":""%>>NU-Nunavut</option>
@@ -3138,8 +3216,83 @@ document.updatedelete.referral_doctor_no.value = refNo;
 										<input name="veteranNo" type="text" value="<%= veteranNo %>">
 									</td>
 								</tr>
-								<%
-							}
+							<%
+								}
+								// Licensed producer drop-down selection
+								if (oscarProps.isPropertyActive("show_demographic_licensed_producers"))
+								{
+									ResultSet producerRs = apptMainBean.queryResults("search_licensed_producer");
+									ResultSet producerAddrRs = apptMainBean.queryResults("search_licensed_producer_address_name");
+							%>
+							<tr>
+								<td align="right"><b><bean:message
+										key="demographic.demographiceditdemographic.licensedProducer"/>:</b>
+								</td>
+								<td align="left">
+									<select name="licensed_producer">
+										<option value="0" <%=licensedProducerDefault.equals(licensedProducer) ? " selected" : ""%> ><%=licensedProducerDefault%>
+										</option>
+										<%
+											while (producerRs.next())
+											{
+												String producer_id = producerRs.getString("producer_id");
+												String producer_name = producerRs.getString("producer_name");
+										%>
+										<option value="<%=producer_id%>" <%=producer_name.equals(licensedProducer) ? " selected" : ""%> ><%=producer_name%>
+										</option>
+										<%
+											}
+										%>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td align="right"><b><bean:message
+										key="demographic.demographiceditdemographic.licensedProducer2"/>:</b>
+								</td>
+								<td align="left">
+									<select name="licensed_producer2">
+										<option value="0" <%=licensedProducerDefault2.equals(licensedProducer2) ? " selected" : ""%> ><%=licensedProducerDefault2%>
+										</option>
+										<%
+											producerRs.beforeFirst();
+											while (producerRs.next())
+											{
+												String producer_id = producerRs.getString("producer_id");
+												String producer_name = producerRs.getString("producer_name");
+										%>
+										<option value="<%=producer_id%>" <%=producer_name.equals(licensedProducer2) ? " selected" : ""%> ><%=producer_name%>
+										</option>
+										<%
+											}
+										%>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td align="right"><b><bean:message
+										key="demographic.demographiceditdemographic.licensedProducerAddress"/>:</b>
+								</td>
+								<td align="left">
+									<select name="licensed_producer_address">
+										<option value="0" <%=licensedProducerDefaultAddress.equals(licensedProducerAddress) ? " selected" : ""%> ><%=licensedProducerDefaultAddress%>
+										</option>
+										<%
+											while (producerAddrRs.next())
+											{
+												String address_id = producerAddrRs.getString("address_id");
+												String address_name = producerAddrRs.getString("display_name");
+										%>
+										<option value="<%=address_id%>" <%=address_name.equals(licensedProducerAddress) ? " selected" : ""%> ><%=address_name%>
+										</option>
+										<%
+											}
+										%>
+									</select>
+								</td>
+							</tr>
+							<%
+								}
 							%>
 							
 							<tr>

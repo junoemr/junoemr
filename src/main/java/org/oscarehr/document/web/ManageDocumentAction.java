@@ -425,7 +425,7 @@ public class ManageDocumentAction extends DispatchAction {
 			}
 
 		}catch(Exception e) {
-			log.error("Error decoding pdf file " + d.getDocfilename());
+			log.error("Error decoding pdf file " + d.getDocfilename(), e);
 			decode_pdf.closePdfFile();
 		}
 
@@ -764,7 +764,10 @@ public class ManageDocumentAction extends DispatchAction {
 		
 		String temp = request.getParameter("remoteFacilityId");
 		Integer remoteFacilityId = null;
-		if (temp != null) remoteFacilityId = Integer.parseInt(temp);
+		if(temp != null && !temp.trim().isEmpty())
+		{
+			remoteFacilityId = Integer.parseInt(temp);
+		}
 
 		String doc_no = request.getParameter("doc_no");
 		log.debug("Document No :" + doc_no);

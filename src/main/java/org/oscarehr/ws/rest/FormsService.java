@@ -65,6 +65,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.conversion.EFormConverter;
 import org.oscarehr.ws.rest.conversion.EncounterFormConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.model.EFormTo1;
 import org.oscarehr.ws.rest.to.model.EncounterFormTo1;
@@ -168,7 +169,7 @@ public class FormsService extends AbstractServiceImpl {
 	@GET
 	@Path("/{demographicNo}/completedEncounterForms")
 	@Produces("application/json")
-	public RestResponse<List<FormTo1>,String> getCompletedFormNames(@PathParam("demographicNo") String demographicNo){
+	public RestResponse<List<FormTo1>> getCompletedFormNames(@PathParam("demographicNo") String demographicNo){
 		List<FormTo1> formList = new ArrayList<FormTo1>();
 
 		List<EncounterForm> encounterForms = formsManager.getAllEncounterForms();

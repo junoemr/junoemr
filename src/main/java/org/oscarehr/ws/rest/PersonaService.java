@@ -104,7 +104,7 @@ public class PersonaService extends AbstractServiceImpl {
 		PersonaRightsResponse response = new PersonaRightsResponse();
 
 		SecuserroleConverter converter = new SecuserroleConverter();
-		response.setRoles(converter.getAllAsTransferObjects(getLoggedInInfo(),securityInfoManager.getRoles(getLoggedInInfo())));
+		response.setRoles(converter.getAllAsTransferObjects(getLoggedInInfo(),securityInfoManager.getRoles(getLoggedInInfo().getLoggedInProviderNo())));
 		
 		SecobjprivilegeConverter converter2 = new SecobjprivilegeConverter();
 		response.setPrivileges(converter2.getAllAsTransferObjects(getLoggedInInfo(),securityInfoManager.getSecurityObjects(getLoggedInInfo())));

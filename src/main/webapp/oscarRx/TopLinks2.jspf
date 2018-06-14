@@ -1,5 +1,5 @@
 <%@page import="java.io.StringWriter"%>
-<%@page import="org.codehaus.jackson.map.ObjectMapper"%>
+<%@page import="com.fasterxml.jackson.databind.ObjectMapper"%>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@page import="net.sf.json.JSONObject"%>
 <%@page import="org.oscarehr.common.model.PharmacyInfo"%>

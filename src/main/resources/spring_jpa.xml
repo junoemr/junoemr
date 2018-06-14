@@ -63,6 +63,7 @@
 	<tx:annotation-driven transaction-manager="txManager" />
 
 	<!-- Managed Beans -->
+	<context:component-scan base-package="org.oscarehr.appointment.dao" />
 	<context:component-scan base-package="org.oscarehr.common.dao" />
 	<context:component-scan base-package="org.oscarehr.consultations" />
 	<context:component-scan base-package="org.oscarehr.eyeform.dao" />
@@ -73,6 +74,7 @@
 	<context:component-scan base-package="org.oscarehr.billing.CA.dao" />
 	<context:component-scan base-package="org.oscarehr.PMmodule.dao" />
 	<context:component-scan base-package="org.oscarehr.provider" />
+	<context:component-scan base-package="org.oscarehr.demographic" />
 	<context:component-scan base-package="org.oscarehr.schedule" />
 	<!-- Sharing Center -->
 	<context:component-scan base-package="org.oscarehr.sharingcenter.dao" />
