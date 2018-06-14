@@ -95,4 +95,22 @@ public class ZPD_ZTR_PROVIDER extends AbstractGroup
 			throw new RuntimeException(message);
 		}
 	}
+
+	public ZPD_ZTR_LAB getLAB(int rep)
+	{
+		return this.getTyped("LAB", rep, ZPD_ZTR_LAB.class);
+	}
+
+	public int getLABReps()
+	{
+		try
+		{
+			return this.getAll("LAB").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
 }

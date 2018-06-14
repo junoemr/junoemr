@@ -278,13 +278,21 @@ public class ProviderDataDao extends AbstractDao<ProviderData> {
 		return ConversionUtils.fromIntString(result);
 	}
 
-	public String getNextIdWithThreshold(int minThreshold, int ignoreThreshold)
+	@SuppressWarnings("unchecked")
+	public Integer getNextIdWithThreshold(int minThreshold, int ignoreThreshold)
 	{
-		Query query = entityManager.createQuery("SELECT (max(CAST(p.id AS integer))+1) FROM ProviderData p WHERE p.id < :ignoreThresh AND p.id > :minThresh");
+//		Query query = entityManager.createQuery("SELECT (max(CAST(p.id AS integer))+1) FROM ProviderData p WHERE p.id < :ignoreThresh AND p.id > :minThresh");
+		Query query = entityManager.createQuery("SELECT p.id FROM ProviderData p WHERE CAST(p.id AS integer) < :ignoreThresh AND CAST(p.id AS integer) > :minThresh ORDER BY CAST(p.id AS integer) DESC");
 		query.setMaxResults(1);
 		query.setParameter("ignoreThresh", ignoreThreshold);
 		query.setParameter("minThresh", minThreshold);
 
-		return (String) query.getSingleResult();
+		List<String> resultList = query.getResultList();
+		if(resultList.isEmpty())
+		{
+			return null;
+		}
+		String result = resultList.get(0);
+		return (ConversionUtils.fromIntString(result)) + 1;
 	}
 }

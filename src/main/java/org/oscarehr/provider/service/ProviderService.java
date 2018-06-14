@@ -49,16 +49,25 @@ public class ProviderService
 		{
 			provider.setProviderType("doctor");
 		}
+		if(provider.getSex() == null || provider.getSex().trim().isEmpty())
+		{
+			provider.setSex("U");
+		}
+		if(provider.getSpecialty() == null)
+		{
+			provider.setSpecialty("");
+		}
+
 		// providers don't have auto-generated IDs, so we have to pick one if it has not been provided
 		if(provider.getId() == null)
 		{
-			String autoNumber = getNextProviderNumberInSequence(0, 900000);
+			Integer autoNumber = getNextProviderNumberInSequence(0, 900000);
 			if(autoNumber == null)
 			{
 				// no providers exist in the given range, use id 1
-				autoNumber = "1";
+				autoNumber = 1;
 			}
-			provider.set(autoNumber);
+			provider.set(String.valueOf(autoNumber));
 		}
 		providerDataDao.persist(provider);
 		return provider;
@@ -70,7 +79,7 @@ public class ProviderService
 	 * @param ignoreThreshold
 	 * @return null if there are no providers in the given range, or the highest provider number + 1 otherwise
 	 */
-	public String getNextProviderNumberInSequence(int minThreshold, int ignoreThreshold)
+	public Integer getNextProviderNumberInSequence(int minThreshold, int ignoreThreshold)
 	{
 		return providerDataDao.getNextIdWithThreshold(minThreshold, ignoreThreshold);
 	}

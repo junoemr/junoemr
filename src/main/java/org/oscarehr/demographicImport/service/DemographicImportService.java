@@ -55,6 +55,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -109,6 +111,8 @@ public class DemographicImportService
 		for(String messageStr : messageList)
 		{
 			logger.info("Parse message " + counter + " of " + messageList.size());
+
+			messageStr = preProcessMessage(messageStr);
 			ZPD_ZTR zpdZtrMessage = (ZPD_ZTR) p.parse(messageStr);
 
 			importRecordData(zpdZtrMessage);
@@ -138,6 +142,52 @@ public class DemographicImportService
 		messageList.add(messageStr);
 
 		return messageList;
+	}
+
+	/**
+	 * Preprocess the message string. This is for fixing hl7 messages that do not conform to the specs
+	 * @param message - the message string (xml)
+	 * @return - the fixed message string
+	 */
+	private String preProcessMessage(String message)
+	{
+		Pattern patt = Pattern.compile("<PRD>(.*?)<\\/PRD>", Pattern.DOTALL);
+		Matcher m = patt.matcher(message);
+		StringBuffer sb = new StringBuffer(message.length());
+		while(m.find())
+		{
+			// for each PRD segment in the message, fix the PRD numbers
+			String replacement = "<PRD>" + fixPRDSegmentNumbers(m.group(1)) + "</PRD>";
+			m.appendReplacement(sb, replacement);
+		}
+		m.appendTail(sb);
+		return sb.toString();
+	}
+
+	/**
+	 * PRD.1 is required, but the spec has an off by one error, putting it at PRD.2, and all subsequent segments are off by 1.
+	 * If this is the case, find them all and decrement them by 1 to match the regular hl7 standard
+	 */
+	private String fixPRDSegmentNumbers(String xmlPRD)
+	{
+		if(!xmlPRD.contains("<PRD.1>"))
+		{
+			Pattern patt = Pattern.compile("<(\\/?PRD)\\.([0-9]+)>");
+			Matcher m = patt.matcher(xmlPRD);
+			StringBuffer sb = new StringBuffer(xmlPRD.length());
+			while(m.find())
+			{
+				String segmentNumStr = m.group(2);
+				Integer segmentNumber = Integer.parseInt(segmentNumStr);
+				String replacement = "<" + m.group(1) + "." + String.valueOf(segmentNumber - 1) + ">";
+
+				m.appendReplacement(sb, replacement);
+				logger.info("Replace:" + m.group(0) + " -> " + replacement);
+			}
+			m.appendTail(sb);
+			xmlPRD = sb.toString();
+		}
+		return xmlPRD;
 	}
 
 	/**
@@ -186,9 +236,9 @@ public class DemographicImportService
 		{
 			provider = newProvider;
 			// providers don't have auto-generated id's, so we have to pick one
-			String newProviderId = providerService.getNextProviderNumberInSequence(10000, 900000);
-			newProviderId = (newProviderId == null) ? "10000" : newProviderId;
-			provider.set(newProviderId);
+			Integer newProviderId = providerService.getNextProviderNumberInSequence(9999, 900000);
+			newProviderId = (newProviderId == null) ? 10000 : newProviderId;
+			provider.set(String.valueOf(newProviderId));
 
 			provider = providerService.addNewProvider(IMPORT_PROVIDER, provider);
 			logger.info("Created new Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
