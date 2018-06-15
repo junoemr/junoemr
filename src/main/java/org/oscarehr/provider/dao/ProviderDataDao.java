@@ -21,9 +21,10 @@
  * Toronto, Ontario, Canada
  */
 
-package org.oscarehr.common.dao;
+package org.oscarehr.provider.dao;
 
-import org.oscarehr.common.model.ProviderData;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.springframework.stereotype.Repository;
 import oscar.util.ConversionUtils;
 
@@ -34,7 +35,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 @Repository
-public class ProviderDataDao extends AbstractDao<ProviderData> {
+public class ProviderDataDao extends AbstractDao<ProviderData>
+{
 
 	private static final String ACTIVE_WHERE_CLAUSE = " p.status = '1'";
 

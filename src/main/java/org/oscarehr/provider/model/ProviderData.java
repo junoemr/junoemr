@@ -23,12 +23,10 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.provider.model;
 
-import java.io.Serializable;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -36,8 +34,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.commons.lang.StringUtils;
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 
 @Entity
@@ -125,6 +125,15 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	public void set(String providerNo) {
 		id = providerNo;
 	}
+
+	public String getProviderNo()
+	{
+		return getId();
+	}
+	public void setProviderNo(String providerNo) {
+		set(providerNo);
+	}
+
 
 	public String getLastName() {
 		return lastName;

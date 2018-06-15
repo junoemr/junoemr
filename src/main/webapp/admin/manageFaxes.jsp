@@ -24,7 +24,7 @@
 
 --%>
 <%@ page import="org.oscarehr.common.dao.FaxConfigDao, org.oscarehr.common.model.FaxConfig, org.oscarehr.common.model.FaxJob, org.oscarehr.common.dao.FaxJobDao" %>
-<%@ page import="org.oscarehr.common.dao.ProviderDataDao, org.oscarehr.common.model.ProviderData" %>
+<%@ page import="org.oscarehr.provider.dao.ProviderDataDao, org.oscarehr.provider.model.ProviderData" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="java.util.List, java.util.Collections" %>
 

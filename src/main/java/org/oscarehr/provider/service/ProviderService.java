@@ -22,11 +22,13 @@
  */
 package org.oscarehr.provider.service;
 
-import org.oscarehr.common.dao.ProviderDataDao;
-import org.oscarehr.common.model.ProviderData;
+import org.apache.commons.lang.StringUtils;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.oscarProvider.data.ProviderBillCenter;
 
 import java.util.Date;
 
@@ -37,7 +39,7 @@ public class ProviderService
 	@Autowired
 	ProviderDataDao providerDataDao;
 
-	public ProviderData addNewProvider(String creatingProviderNo, ProviderData provider)
+	public ProviderData addNewProvider(String creatingProviderNo, ProviderData provider, String billCenterCode)
 	{
 		provider.setLastUpdateDate(new Date());
 		provider.setLastUpdateUser(creatingProviderNo);
@@ -70,6 +72,10 @@ public class ProviderService
 			provider.set(String.valueOf(autoNumber));
 		}
 		providerDataDao.persist(provider);
+
+		ProviderBillCenter billCenter = new ProviderBillCenter();
+		billCenter.addBillCenter(provider.getProviderNo(),StringUtils.trimToEmpty(billCenterCode));
+
 		return provider;
 	}
 

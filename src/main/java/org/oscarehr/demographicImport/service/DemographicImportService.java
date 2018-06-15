@@ -29,12 +29,12 @@ import ca.uhn.hl7v2.parser.CustomModelClassFactory;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.ProviderDataDao;
+import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
 import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.common.model.ProviderData;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
@@ -46,6 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.OscarProperties;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -221,7 +222,10 @@ public class DemographicImportService
 				throw new RuntimeException("Not enough provider info found to link or create provider record (first and last name are required).");
 			}
 
+			//TODO how to determine MRP doctor when there are more than 1
 			mrpProvider = findOrCreateProviderRecord(providerMapper.getProvider(i), providerFirstName, providerLastName);
+
+			importMedicationData(zpdZtrMessage, mrpProvider, demographic);
 		}
 
 
@@ -240,7 +244,8 @@ public class DemographicImportService
 			newProviderId = (newProviderId == null) ? 10000 : newProviderId;
 			provider.set(String.valueOf(newProviderId));
 
-			provider = providerService.addNewProvider(IMPORT_PROVIDER, provider);
+			String billCenterCode = OscarProperties.getInstance().getProperty("default_bill_center","");
+			provider = providerService.addNewProvider(IMPORT_PROVIDER, provider, billCenterCode);
 			logger.info("Created new Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 		}
 		else if(matchedProviders.size() == 1)
@@ -264,5 +269,10 @@ public class DemographicImportService
 
 		demographicService.addNewDemographicRecord(IMPORT_PROVIDER, demographic, demographicCust, demographicExtList);
 		return demographic;
+	}
+
+	private void importMedicationData(ZPD_ZTR zpdZtrMessage, ProviderData provider, Demographic demographic)
+	{
+
 	}
 }

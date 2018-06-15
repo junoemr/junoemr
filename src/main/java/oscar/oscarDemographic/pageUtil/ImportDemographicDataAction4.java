@@ -80,7 +80,7 @@ import org.oscarehr.common.dao.DrugDao;
 import org.oscarehr.common.dao.DrugReasonDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.PartialDateDao;
-import org.oscarehr.common.dao.ProviderDataDao;
+import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.Allergy;
 import org.oscarehr.common.model.Appointment;
@@ -2760,7 +2760,7 @@ import cdsDt.PersonNameStandard.OtherNames;
 		if (pd==null) return null; 
 		if( pd.getProviderNo().charAt(0)!='-') return pd.getProviderNo();
 
-		org.oscarehr.common.model.ProviderData newpd = providerDataDao.findByProviderNo(pd.getProviderNo());
+		org.oscarehr.provider.model.ProviderData newpd = providerDataDao.findByProviderNo(pd.getProviderNo());
 		if (StringUtils.empty(pd.getFirst_name()))
 			newpd.setFirstName(StringUtils.noNull(firstName));
 		if (StringUtils.empty(pd.getLast_name()))
