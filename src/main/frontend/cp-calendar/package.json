@@ -1,0 +1,15 @@
+{
+  "name": "cp-calendar",
+  "version": "1.0.0",
+  "description": "",
+  "main": "controller.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@git.oscarhost.ca/var/lib/git/cloudpractice/cp-calendar.git"
+  },
+  "author": "",
+  "license": "ISC"
+}

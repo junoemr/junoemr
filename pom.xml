@@ -46,6 +46,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
 		<tomcat.version>7.0.76</tomcat.version>
+		<webpack.env>prod</webpack.env>
 	</properties>
 	<repositories>
 		<repository>
@@ -1595,8 +1596,7 @@
 						<configuration>
 							<inputSpec>${project.build.directory}/openapi/openapi.json</inputSpec>
 							<generatorName>typescript-angularjs</generatorName>
-							<apiPackage>JunoInternalApi</apiPackage>
-							<output>src/main/webapp/web/generated/</output>
+							<output>src/main/frontend/generated/</output>
 						</configuration>
 					</execution>
 				</executions>
@@ -1705,25 +1705,6 @@
 				</executions>
 			</plugin>
 
-<!--			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.6.0</version>
-				<executions>
-					<execution>
-						<id>fix-typescript-api</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<executable>fix_openapi_generate_hack.sh</executable>
-				</configuration>
-			</plugin>-->
-
-
 
 			<!-- JunoUI -->
 			<plugin>
@@ -1732,7 +1713,7 @@
 				<version>1.3</version>
 
 				<configuration>
-					<workingDirectory>${basedir}/src/main/webapp/web</workingDirectory>
+					<workingDirectory>${basedir}/src/main/frontend</workingDirectory>
 					<!-- TODO switch to JUNO directory -->
 					<!-- <workingDirectory>${basedir}/src/main/webapp/juno</workingDirectory> -->
 					<installDirectory>target</installDirectory>
@@ -1756,32 +1737,16 @@
 							<goal>npm</goal>
 						</goals>
 					</execution>
-					<!-- runs bower prune on working directory -->
 					<execution>
-						<id>bower prune</id>
+						<id>webpack {webpack.env}</id>
 						<phase>process-classes</phase>
 						<goals>
-							<goal>bower</goal>
+							<goal>webpack</goal>
 						</goals>
+
 						<configuration>
-							<arguments>prune</arguments>
+							<arguments>--config webpack.${webpack.env}.js</arguments>
 						</configuration>
-					</execution>
-					<!-- runs bower install on working directory -->
-					<execution>
-						<id>bower install</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>bower</goal>
-						</goals>
-					</execution>
-					<!-- runs gulp build on working directory -->
-					<execution>
-						<id>gulp build</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>gulp</goal>
-						</goals>
 					</execution>
 				</executions>
 			</plugin>

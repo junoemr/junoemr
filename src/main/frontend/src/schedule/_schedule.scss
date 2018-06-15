@@ -1,0 +1,249 @@
+@mixin overflow-ellipsis {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+@mixin overflow-ellipsis-nowrap {
+	@include overflow-ellipsis();
+	white-space: nowrap;
+}
+
+
+.calendar-loading
+{
+	position: absolute;
+	right: 50%;
+	top: 65px;
+}
+
+.calendar
+{
+/*	overflow-x: auto;
+	table
+	{
+		table-layout: fixed;
+	}
+
+	.fc-widget-header
+	{
+		width:100px;
+	}
+	.fc-widget-content
+	{
+		width:100px;
+	}
+	.fc-resourceName
+	{
+		background-color:aliceblue;
+		width:150px;
+	}*/
+
+	.fc-toolbar
+	{
+		h2 { font-size: 1.571em; }
+		margin-bottom: 0.5em;
+	}
+
+	.fc-view-container
+	{
+		background: #f6f6f6;
+		overflow-x: scroll;
+
+		.text-light
+		{
+			color: #fff;
+			text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.8);
+		}
+
+		.text-dark
+		{
+			color: #000;
+			text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.8);
+		}
+
+		.fc-event
+		{
+			cursor: hand;
+
+			.fc-time
+			{
+				display: none;
+			}
+
+			.event-status
+			{
+				display: inline-block;
+				width: 18px;
+				text-align: center;
+			}
+
+			.event-status.rotate
+			{
+				background-color: #EEE;
+				color: #000;
+				text-shadow: none;
+			}
+
+			.event-invoice
+			{
+				display: inline-block;
+				width: 18px;
+				text-align: center;
+				margin: 0 2px 0 2px;
+				background-color: #EEE;
+				color: #000;
+				text-shadow: none;
+			}
+
+			.event-demographic
+			{
+				display: inline-block;
+				width: 18px;
+				text-align: center;
+				margin: 0 2px 0 0;
+				background-color: #EEE;
+				color: #000;
+				text-shadow: none;
+			}
+
+			.event-note
+			{
+				display: inline-block;
+				width: 18px;
+				text-align: center;
+				margin: 0 4px 0 0;
+				background-color: #EEE;
+				color: #000;
+				text-shadow: none;
+			}
+
+			.event-tags
+			{
+				display: inline-block;
+				text-align: center;
+				margin: 0 4px;
+			}
+
+			.event-details
+			{
+				margin-left: 3px;
+			}
+		}
+	}
+}
+
+.schedule-options
+{
+	@include clearfix;
+	margin-bottom: 15px;
+
+	.form-inline {
+		label { margin-right: 5px; }
+		button:focus { outline: none; }
+		#schedule-select { width: 220px; }
+		.form-group { margin-left: 20px; }
+		.form-group:first-child { margin-left: 0 }
+	}
+
+}
+
+.schedule-modal {
+
+	.panel { overflow-x: auto; }
+
+	.event-color {
+		width: 20px;
+		height: 20px;
+		display: inline-block;
+	}
+
+	&.legend {
+		.event-color {
+			float: left;
+			margin-right: 15px;
+		}
+	}
+
+	&.event {
+
+		.schedule-header {
+			@include clearfix;
+			border-bottom: 1px solid #CCC;
+			padding-bottom: 4px;
+			margin-bottom: 5px;
+
+			h4.schedule-title {
+				font-size: 1.571em;
+				margin: 0;
+			}
+
+			button { margin-left: 4px; }
+			.label { margin-left: 4px; }
+		}
+
+		.event-color {
+			position: relative;
+			top: 5px;
+		}
+
+		.time-wrapper { padding-left: 0 }
+
+		.availability {
+			@include clearfix;
+			margin-top: 5px;
+
+			.color { width: 30px; }
+			.info { width: 230px; }
+			.availability-detail { display: inline-block; }
+		}
+
+		.patient-image {
+
+			img { width: 120px; height: 120px; }
+
+			.upload-text {
+				position: absolute;
+				bottom: 0;
+				left: 33px;
+			}
+		}
+
+		.patient-health-number {
+			margin-right: 10px;
+		}
+
+		.modal-body .bootstrap-timepicker button {
+			height: 34px;
+		}
+	}
+}
+
+.schedule-daysheet {
+
+	table {
+
+		font-size: 0.929em;
+
+		@media print {
+			font-size: 0.643em;
+		}
+
+		thead tr th,
+		tbody tr td {
+
+			&.time, &.status, &.patient {
+				width: 1px;
+				white-space: nowrap;
+			}
+
+			&.text {
+				@include overflow-ellipsis;
+				max-width: 1px;
+
+				&.text-truncated {
+					@include overflow-ellipsis-nowrap;
+				}
+			}
+		}
+	}
+}

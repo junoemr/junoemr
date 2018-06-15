@@ -68,6 +68,7 @@ import org.oscarehr.ws.rest.conversion.AppointmentStatusConverter;
 import org.oscarehr.ws.rest.conversion.AppointmentTypeConverter;
 import org.oscarehr.ws.rest.conversion.LookupListItemConverter;
 import org.oscarehr.ws.rest.conversion.NewAppointmentConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.SchedulingResponse;
@@ -190,9 +191,10 @@ public class ScheduleService extends AbstractServiceImpl {
 
 		appointmentManager.addAppointment(getLoggedInInfo(), appt);
 
-		response.setAppointment(new AppointmentConverter().getAsTransferObject(getLoggedInInfo(), appt));
-		
-		return response;
+		//response.setAppointment(new AppointmentConverter().getAsTransferObject(getLoggedInInfo(), appt));
+		AppointmentTo1 appointment = new AppointmentConverter().getAsTransferObject(getLoggedInInfo(), appt));
+
+		return RestResponse.successResponse() <appointment>.;
 	}
 
 	@POST

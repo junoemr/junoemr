@@ -1,0 +1,43 @@
+
+@media (min-width: $screen-md-min) {
+	.modal-wide {
+		width: 1200px;
+	}
+}
+
+@media (min-width: 1000px) and (max-width: $screen-md-min)  {
+	.modal-wide {
+		width: 900px;
+	}
+}
+
+@media (min-width: 600px)  and (max-width: 1000px){
+	.modal-wide {
+		width: 654px;
+	}
+}
+
+.modal-header {
+	background-color: $color-bg-modal-header;
+
+	.close {
+		margin-top: 2px;
+	}
+
+	.form-inline .form-control {
+		margin-right: 15px;
+	}
+}
+
+.modal-content {
+	border-radius: 0;
+}
+
+.modal-title {
+	color: white;
+	//@include text-shadow(0 0 0.5px #888);
+}
+
+.close {
+	opacity: 0.3;
+}

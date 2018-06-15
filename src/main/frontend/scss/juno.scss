@@ -1,0 +1,37 @@
+// Less Variables
+@import "variables";
+// Custom Bootstrap
+@import "bootstrap/bootstrap_variables";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+@import "bootstrap/forms";
+@import "bootstrap/navbar";
+@import "bootstrap/dropdown";
+// UIB overrides
+@import "uib-datepicker";
+// bootstrap-timepicker does not provide a CSS file so compile as SCSS
+@import "bootstrap-timepicker/timepicker";
+// Global stuff
+@import "global";
+// TODO: pre-existing CSS files, need to be reorganized
+@import "navbar-fixed-top";
+@import "index";
+@import "note-editor";
+@import "date_picker";
+@import "time_picker";
+@import "forms";
+@import "modal";
+// Section-specific things
+@import "../src/schedule/schedule";
+@import "../src/common/directives/patientSelectorOption";
+@import "../src/dashboard/dashboard";
+@import "../src/patient/patient";
+@import "../src/patientlist/patient-list";
+@import "../src/record/record";
+@import "../src/record/details/details";
+@import "../src/record/summary/summary";
+@import "../src/settings/settings";
+@import "../src/tickler/tickler";
+@import "../src/consults/consults";
+@import "../src/admin/integration/know2act/Know2act";
+@import "../src/record/forms/forms";
+

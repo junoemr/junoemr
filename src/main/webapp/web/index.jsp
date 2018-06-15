@@ -51,20 +51,20 @@
 	<title><bean:message key="global.title" bundle="ui"/></title>
 
 	<%-- 3rd party CSS --%>
-	<link href="bower_components/ng-table-bundle/ng-table.min.css" rel="stylesheet">
+<%--	<link href="bower_components/components-font-awesome/css/font-awesome.min.css" rel="stylesheet">--%>
+<%--	<link href="bower_components/ng-table-bundle/ng-table.min.css" rel="stylesheet">
 	<link href="bower_components/angular-loading-bar/build/loading-bar.min.css" rel="stylesheet">
-	<link href="bower_components/components-font-awesome/css/font-awesome.min.css" rel="stylesheet">
 	<link href="bower_components/jquery-ui/themes/base/jquery-ui.min.css" rel="stylesheet">
 	<link href="bower_components/fullcalendar/dist/fullcalendar.min.css" rel="stylesheet">
-	<link href="bower_components/fullcalendar-scheduler/dist/scheduler.min.css" rel="stylesheet">
+	<link href="bower_components/fullcalendar-scheduler/dist/scheduler.min.css" rel="stylesheet">--%>
 
 	<%-- combined CSS from compiled SCSS --%>
-	<link href="dist/juno.css" rel="stylesheet">
+<%--	<link href="dist/juno.css" rel="stylesheet">--%>
 
 	<%-- TODO move to a SCSS file and include in Juno SCSS/CSS --%>
 	<link href="../library/bootstrap/3.0.0/assets/css/bootstrap3_badge_colours.css" rel="stylesheet">
 
-</head>
+<link href="vendors~bundle.96ab6297f4c5e006663b.css" rel="stylesheet"><link href="bundle.2ba867e4d9298b013631.css" rel="stylesheet"></head>
 
 <body ng-controller="Layout.BodyController as bodyCtrl"
 	  ng-init="bodyCtrl.init()"
@@ -408,199 +408,16 @@
 
 </script>
 
-<%-- third party libraries, managed with bower, combined and minified for production --%>
-<!-- build:component js/components.js -->
-<script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
-<script type="text/javascript" src="bower_components/jquery-ui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="bower_components/bootstrap-sass/assets/javascripts/bootstrap.min.js"></script>
-<script type="text/javascript" src="bower_components/moment/min/moment-with-locales.min.js"></script>
-<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
-<script type="text/javascript" src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
-<script type="text/javascript" src="bower_components/angular-ui-router/release/stateEvents.js"></script>
-<script type="text/javascript" src="bower_components/angular-ui-calendar/src/calendar.js"></script>
-<script type="text/javascript" src="bower_components/fullcalendar/dist/fullcalendar.js"></script>
-<script type="text/javascript" src="bower_components/fullcalendar-scheduler/dist/scheduler.js"></script>
-<script type="text/javascript" src="bower_components/angular-resource/angular-resource.min.js"></script>
-<script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
-<script type="text/javascript" src="bower_components/bootstrap-timepicker/js/bootstrap-timepicker.js"></script>
-<script type="text/javascript" src="bower_components/angular-loading-bar/build/loading-bar.min.js"></script>
-<script type="text/javascript" src="bower_components/ng-table-bundle/ng-table.min.js"></script>
-<script type="text/javascript" src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.min.js"></script>
-<script type="text/javascript" src="bower_components/pym.js/dist/pym.v1.min.js"></script>
-<script type="text/javascript" src="bower_components/ngstorage/ngStorage.js"></script>
-<script type="text/javascript" src="bower_components/cp-calendar/module.js"></script>
-<script type="text/javascript" src="bower_components/cp-calendar/directive.js"></script>
-<script type="text/javascript" src="bower_components/cp-calendar/controller.js"></script>
-<script type="text/javascript" src="bower_components/cp-calendar/event_controller.js"></script>
-<script type="text/javascript" src="bower_components/cp-calendar/util.js"></script>
-<!-- endbuild -->
+<!-- Legacy code written in javascript -->
+<%--<script type="text/javascript" src="dist_webpack/vendors~bundle.js"></script>
+<script type="text/javascript" src="dist_webpack/bundle.js"></script>--%>
+<%--<jsp:include page="webpack_includes.html" />--%>
 
-<%-- JunoUI application code, to be combined and minified for production --%>
-<%--IMPORTANT: Import non-angular javascript files before angular javacript--%>
-<!-- build:js js/scripts.js -->
-<script type="text/javascript" src="../share/javascript/Oscar.js"></script>
+<!-- Code written in typescript -->
+<%--<script type="text/javascript" src="dist_webpack/tsbundle.js"></script>--%>
 
-<%--Non-angular scripts--%>
-<script type="text/javascript" src="src/common/util/util.js"></script>
-<script type="text/javascript" src="src/common/util/serviceHelper.js"></script>
-<script type="text/javascript" src="src/consults/common.js"></script>
+<!-- Template code generated from the template jsps -->
+<jsp:include page="templates.jsp"/>
 
-<%--Angular scripts--%>
-<script type="text/javascript" src="app.js"></script>
-
-<script type="text/javascript" src="src/common/module.js"></script>
-
-<%--Angular Util Functions--%>
-<script type="text/javascript" src="src/common/util/module.js"></script>
-<script type="text/javascript" src="src/common/util/angular-util.js"></script>
-<script type="text/javascript" src="src/common/util/junoHttp.js"></script>
-
-<%--Angular Services--%>
-<script type="text/javascript" src="src/common/services/module.js"></script>
-<script type="text/javascript" src="src/common/services/appService.js"></script>
-<script type="text/javascript" src="src/common/services/autoCompleteService.js"></script>
-<script type="text/javascript" src="src/common/services/billingService.js"></script>
-<script type="text/javascript" src="src/common/services/consultService.js"></script>
-<script type="text/javascript" src="src/common/services/demographicService.js"></script>
-<script type="text/javascript" src="src/common/services/demographicsService.js"></script>
-<script type="text/javascript" src="src/common/services/diseaseRegistryService.js"></script>
-<script type="text/javascript" src="src/common/services/formService.js"></script>
-<script type="text/javascript" src="src/common/services/globalStateService.js"></script>
-<script type="text/javascript" src="src/common/services/inboxService.js"></script>
-<script type="text/javascript" src="src/common/services/k2aService.js"></script>
-<script type="text/javascript" src="src/common/services/messageService.js"></script>
-<script type="text/javascript" src="src/common/services/noteService.js"></script>
-<script type="text/javascript" src="src/common/services/patientDetailStatusService.js"></script>
-<script type="text/javascript" src="src/common/services/personaService.js"></script>
-<script type="text/javascript" src="src/common/services/programService.js"></script>
-<script type="text/javascript" src="src/common/services/providerService.js"></script>
-<script type="text/javascript" src="src/common/services/providersService.js"></script>
-<script type="text/javascript" src="src/common/services/resultsService.js"></script>
-<script type="text/javascript" src="src/common/services/scheduleService.js"></script>
-<script type="text/javascript" src="src/common/services/securityService.js"></script>
-<script type="text/javascript" src="src/common/services/staticDataService.js"></script>
-<script type="text/javascript" src="src/common/services/summaryService.js"></script>
-<script type="text/javascript" src="src/common/services/ticklerService.js"></script>
-<script type="text/javascript" src="src/common/services/reportByTemplateService.js"></script>
-<script type="text/javascript" src="src/common/services/uxService.js"></script>
-<script type="text/javascript" src="src/common/services/specialistsService.js"></script>
-<script type="text/javascript" src="src/common/services/referralDoctorsService.js"></script>
-
-<script type="text/javascript" src="src/common/filters/module.js"></script>
-<script type="text/javascript" src="src/common/filters/age.js"></script>
-<script type="text/javascript" src="src/common/filters/cut.js"></script>
-<script type="text/javascript" src="src/common/filters/offset.js"></script>
-<script type="text/javascript" src="src/common/filters/startFrom.js"></script>
-
-<script type="text/javascript" src="src/common/directives/module.js"></script>
-<script type="text/javascript" src="src/common/directives/typeaheadHelper.js"></script>
-<script type="text/javascript" src="src/common/directives/patientSearchTypeahead.js"></script>
-<script type="text/javascript" src="src/common/directives/patientTypeahead.js"></script>
-<script type="text/javascript" src="src/common/directives/datepickerPopup.js"></script>
-<script type="text/javascript" src="src/common/directives/jqueryUIResizable.js"></script>
-<script type="text/javascript" src="src/common/directives/jqueryUIDraggable.js"></script>
-
-<script type="text/javascript" src="src/layout/module.js"></script>
-<script type="text/javascript" src="src/layout/bodyController.js"></script>
-<script type="text/javascript" src="src/layout/navBarController.js"></script>
-
-<script type="text/javascript" src="src/patient/module.js"></script>
-<script type="text/javascript" src="src/patient/newPatientController.js"></script>
-
-<script type="text/javascript" src="src/dashboard/module.js"></script>
-<script type="text/javascript" src="src/dashboard/dashboardController.js"></script>
-<script type="text/javascript" src="src/dashboard/ticklerConfigureController.js"></script>
-
-<script type="text/javascript" src="src/patientlist/module.js"></script>
-<script type="text/javascript" src="src/patientlist/patientListState.js"></script>
-<script type="text/javascript" src="src/patientlist/patientListController.js"></script>
-<script type="text/javascript" src="src/patientlist/patientListAppointmentListController.js"></script>
-<script type="text/javascript" src="src/patientlist/patientListConfigController.js"></script>
-<script type="text/javascript" src="src/patientlist/patientListDemographicSetController.js"></script>
-<script type="text/javascript" src="src/patientlist/patientListProgramController.js"></script>
-
-<script type="text/javascript" src="src/record/module.js"></script>
-<script type="text/javascript" src="src/record/recordController.js"></script>
-<script type="text/javascript" src="src/record/summary/module.js"></script>
-<script type="text/javascript" src="src/record/summary/summaryController.js"></script>
-<script type="text/javascript" src="src/record/summary/recordPrintController.js"></script>
-<script type="text/javascript" src="src/record/summary/groupNotesController.js"></script>
-<script type="text/javascript" src="src/record/summary/saveWarningController.js"></script>
-<script type="text/javascript" src="src/record/forms/module.js"></script>
-<script type="text/javascript" src="src/record/forms/formsController.js"></script>
-<script type="text/javascript" src="src/record/details/module.js"></script>
-<script type="text/javascript" src="src/record/details/detailsController.js"></script>
-<script type="text/javascript" src="src/record/phr/module.js"></script>
-<script type="text/javascript" src="src/record/phr/phrController.js"></script>
-
-<script type="text/javascript" src="src/record/tracker/module.js"></script>
-<script type="text/javascript" src="src/record/tracker/trackerController.js"></script>
-
-<script type="text/javascript" src="src/tickler/module.js"></script>
-<script type="text/javascript" src="src/tickler/ticklerListController.js"></script>
-<script type="text/javascript" src="src/tickler/ticklerViewController.js"></script>
-<script type="text/javascript" src="src/tickler/ticklerAddController.js"></script>
-<script type="text/javascript" src="src/tickler/ticklerNoteController.js"></script>
-<script type="text/javascript" src="src/tickler/ticklerCommentController.js"></script>
-
-<script type="text/javascript" src="src/schedule/module.js"></script>
-<script type="text/javascript" src="src/schedule/scheduleController.js"></script>
-<script type="text/javascript" src="src/schedule/calendarApiAdapter.js"></script>
-<script type="text/javascript" src="src/schedule/appointmentAddController.js"></script>
-<script type="text/javascript" src="src/schedule/appointmentViewController.js"></script>
-
-<script type="text/javascript" src="src/admin/module.js"></script>
-<script type="text/javascript" src="src/admin/adminController.js"></script>
-<script type="text/javascript" src="src/admin/integration/module.js"></script>
-<script type="text/javascript" src="src/admin/integration/know2act/module.js"></script>
-<script type="text/javascript" src="src/admin/integration/know2act/Know2actConfigController.js"></script>
-<script type="text/javascript" src="src/admin/integration/know2act/Know2actNotificationController.js"></script>
-<script type="text/javascript" src="src/admin/integration/know2act/Know2actTemplateController.js"></script>
-
-<script type="text/javascript" src="src/billing/billingController.js"></script>
-
-<script type="text/javascript" src="src/consults/module.js"></script>
-<script type="text/javascript" src="src/consults/consultRequestAttachmentController.js"></script>
-<script type="text/javascript" src="src/consults/consultResponseAttachmentController.js"></script>
-<script type="text/javascript" src="src/consults/consultRequestListController.js"></script>
-<script type="text/javascript" src="src/consults/consultRequestController.js"></script>
-<script type="text/javascript" src="src/consults/consultResponseListController.js"></script>
-<script type="text/javascript" src="src/consults/consultResponseController.js"></script>
-
-<script type="text/javascript" src="src/inbox/module.js"></script>
-<script type="text/javascript" src="src/inbox/inboxController.js"></script>
-
-<script type="text/javascript" src="src/patient/search/module.js"></script>
-<script type="text/javascript" src="src/patient/search/patientSearchController.js"></script>
-<script type="text/javascript" src="src/patient/search/remotePatientResultsController.js"></script>
-
-<script type="text/javascript" src="src/report/module.js"></script>
-<script type="text/javascript" src="src/report/reportsController.js"></script>
-<script type="text/javascript" src="src/report/reportBadAppointmentSheetController.js"></script>
-<script type="text/javascript" src="src/report/reportDaySheetController.js"></script>
-<script type="text/javascript" src="src/report/reportEdbListController.js"></script>
-<script type="text/javascript" src="src/report/reportFollowUpIntakeController.js"></script>
-<script type="text/javascript" src="src/report/reportNoShowAppointmentSheetController.js"></script>
-<script type="text/javascript" src="src/report/reportOldPatientsController.js"></script>
-<script type="text/javascript" src="src/report/reportPatientChartListController.js"></script>
-<script type="text/javascript" src="src/report/reportRegistrationIntakeController.js"></script>
-<script type="text/javascript" src="src/report/reportSHMentalHealthController.js"></script>
-
-<script type="text/javascript" src="src/document/module.js"></script>
-<script type="text/javascript" src="src/document/documentsController.js"></script>
-
-<script type="text/javascript" src="src/settings/module.js"></script>
-<script type="text/javascript" src="src/settings/settingsController.js"></script>
-<script type="text/javascript" src="src/settings/changePasswordController.js"></script>
-<script type="text/javascript" src="src/settings/quickLinkController.js"></script>
-
-<script type="text/javascript" src="src/help/module.js"></script>
-<script type="text/javascript" src="src/help/supportController.js"></script>
-<script type="text/javascript" src="src/help/helpController.js"></script>
-
-<!-- endbuild -->
-
-<jsp:include page="dist/templates.jsp"/>
-
-</body>
+<script type="text/javascript" src="runtime~bundle.b9768e88f357c12a8f2d.js"></script><script type="text/javascript" src="vendors~bundle.96ab6297f4c5e006663b.js"></script><script type="text/javascript" src="bundle.2ba867e4d9298b013631.js"></script></body>
 </html>

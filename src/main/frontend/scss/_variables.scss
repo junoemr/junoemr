@@ -1,0 +1,54 @@
+// LESS variables for global use, imported first so can be referenced in bootstrap customization
+// Colours
+$primary-blue: #235ba3;
+$secondary-blue: #15417a;
+$primary-hover-blue: #1b4883;
+$secondary-hover-blue: #386fc1;
+$primary-blue-text: #235ba3;
+
+$primary-white: #fff;
+$secondary-white: #ebebeb;
+$hover-white: #fff;
+$primary-white-text: #fff;
+
+$light-grey: #ededed;
+$medium-grey: #c0c0c0;
+
+$modal-color: #996633;
+
+// Margins
+$margin-lg: 30px;
+$margin-md: 20px;
+$margin-sm: 10px;
+
+// Other
+$toggle-patient-list-btn-width: 25px;
+
+// Media queries breakpoints
+// $screen-nav-lg-max: 1305px;
+$screen-nav-lg: 1357px;
+$screen-nav-md: 1130px;
+$screen-nav-sm: 768px;
+
+// Imported from Clinicaid
+
+$color-btn-addon-bg: #FFF;
+$color-btn-addon-text: #333;
+$color-btn-addon-border: #CCC;
+
+$color-info-box-top-bg: #555;
+$color-info-box-top-text: #FFF;
+$color-info-box-top-border: #999;
+$color-info-box-content-bg: #F5F5F5;
+$color-info-box-content-border: #B9B9B9;
+$color-info-box-table-header-bg: #F5F5F5;
+$color-info-box-table-header-border: #B9B9B9;
+$color-info-box-table-bg: #EDEDED;
+$color-info-box-table-bg-odd: #E1E1E1;
+$color-info-box-table-border: #B9B9B9;
+
+$color-bg-modal-header: #A4A4A4;
+
+$color-timepicker-bg: #DDD;
+$color-timepicker-text: #333;
+$color-timepicker-border: #CCC;
