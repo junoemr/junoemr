@@ -45,6 +45,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
 
+import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.oscarDB.DBHandler;
 import oscar.oscarLab.ForwardingRules;
@@ -83,7 +84,7 @@ public class ProviderLabRouting {
     public void addToLabRouting(String labId, String provider_no, String labType) throws SQLException
 	{
 		ForwardingRules fr = new ForwardingRules();
-		ProviderLabRoutingDao providerLabRoutingDao = new ProviderLabRoutingDao();
+		ProviderLabRoutingDao providerLabRoutingDao = (ProviderLabRoutingDao) SpringUtils.getBean("providerLabRoutingDao");
 		List<ProviderLabRoutingModel> rs = providerLabRoutingDao.getProviderLabRoutingForLabProviderType(labId, provider_no, labType);
 
 		OscarProperties props = OscarProperties.getInstance();
@@ -118,7 +119,7 @@ public class ProviderLabRouting {
 
 	public void route(String labId, String provider_no, String labType) throws SQLException
 	{
-		ProviderLabRoutingDao providerLabRoutingDao = new ProviderLabRoutingDao();
+		ProviderLabRoutingDao providerLabRoutingDao = (ProviderLabRoutingDao) SpringUtils.getBean("providerLabRoutingDao");
 
         OscarProperties props = OscarProperties.getInstance();
         String autoFileLabs = props.getProperty("AUTO_FILE_LABS");

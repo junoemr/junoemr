@@ -69,11 +69,12 @@ public class ProviderLabRoutingDao extends AbstractDao<ProviderLabRoutingModel> 
 	}
 
 	public void updateStatus(String labNo, String labType) {
-		String updateString = "UPDATE " + modelClass.getName() + " x set x.status='N' WHERE x.labNo=? AND x.labType=?";
+		int labNoInt = Integer.parseInt(labNo);
+		String updateString = "UPDATE " + modelClass.getName() + " x set x.status='N' WHERE x.labNo=:labNo AND x.labType=:labType";
 
 		Query query = entityManager.createQuery(updateString);
-		query.setParameter(1, labNo);
-		query.setParameter(2, labType);
+		query.setParameter("labNo", labNoInt);
+		query.setParameter("labType", labType);
 
 		query.executeUpdate();
 	}
