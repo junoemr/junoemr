@@ -25,6 +25,8 @@
 --%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao"%>
+<%@page import="org.oscarehr.integration.medisprout.MediSprout"%>
+<%@page import="org.oscarehr.common.model.MediSproutAppointment"%>
 <%
   if (session.getAttribute("user") == null)    response.sendRedirect("../logout.jsp");
 
@@ -73,7 +75,8 @@
   DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
 %>
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
-<%@page import="org.oscarehr.common.model.Site"%><html:html locale="true">
+<%@ page import="org.oscarehr.common.model.Site" %>
+<html:html locale="true">
 <head>
 <% if (isMobileOptimized) { %>
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, width=device-width" />
@@ -723,6 +726,24 @@ if (bMultisites) { %>
                 <INPUT TYPE="hidden" NAME="appointment_no" VALUE="<%=appointment_no%>">
             </div>
         </li>
+        <% if (props.getProperty("medisproutplugin", "false").equalsIgnoreCase("true")) {
+        
+        	MediSprout mediSprout = new MediSprout();
+        	MediSproutAppointment mediSproutAppointment = mediSprout.getAppointment(appointment_no);
+        	
+        	if (mediSproutAppointment != null) {
+        %>
+	        <li class="row weak">
+				<div class="label">Provider:</div>
+	            <div class="input"><a href="<%= mediSproutAppointment.getProviderUrl() %>" target="_blank">LiveCare</a></div>
+	            <div class="space">&nbsp;</div>
+				<div class="label">Attendee:</div>
+	            <div class="input"><a href="<%= mediSproutAppointment.getAttendeesUrl() %>" target="_blank">LiveCare</a></div>
+	        </li>
+        <%
+        	} 
+        }
+        %>
         <li class="row weak">
             <div class="label">Create Date:</div>
             <div class="input">
@@ -764,6 +785,7 @@ if (bMultisites) { %>
 			<div class="label"></div>
             <div class="input"></div>
         </li>
+
     </ul>
 
 <% if (isSiteSelected) { %>
@@ -826,28 +848,33 @@ if (bMultisites) { %>
 <% if (isSiteSelected) { %>
 <table width="95%" align="center">
 	<tr>
-		<td><input type="submit"
-			onclick="document.forms['EDITAPPT'].displaymode.value='Cut';"
-			value="Cut" /> | <input type="submit"
-			onclick="document.forms['EDITAPPT'].displaymode.value='Copy';"
-			value="Copy" />
-                     <%
-                     if(bFirstDisp && apptObj!=null) {
+		<td>
+			<input type="submit"
+				   onclick="document.forms['EDITAPPT'].displaymode.value='Cut';"
+				   value="Cut"/> |
+			<input type="submit"
+				   onclick="document.forms['EDITAPPT'].displaymode.value='Copy';"
+				   value="Copy"/> |
+			<input type="submit"
+				   onclick="document.forms['EDITAPPT'].displaymode.value='Copy & Cancel';"
+				   value="Copy & Cancel"/>
+			 <%
+			 if(bFirstDisp && apptObj!=null) {
 
-                            long numSameDayGroupApptsPaste = 0;
+					long numSameDayGroupApptsPaste = 0;
 
-                            if (props.getProperty("allowMultipleSameDayGroupAppt", "").equalsIgnoreCase("no")) {
-                                String [] sqlParam = new String[3] ;
-                                sqlParam[0] = myGroupNo; //schedule group
-                                sqlParam[1] = apptObj.getDemographic_no();
-                                sqlParam[2] = (String) appt.get("appointment_date").toString();
+					if (props.getProperty("allowMultipleSameDayGroupAppt", "").equalsIgnoreCase("no")) {
+						String [] sqlParam = new String[3] ;
+						sqlParam[0] = myGroupNo; //schedule group
+						sqlParam[1] = apptObj.getDemographic_no();
+						sqlParam[2] = (String) appt.get("appointment_date").toString();
 
-                                List<Map<String,Object>> resultList = oscarSuperManager.find("appointmentDao", "search_group_day_appt", sqlParam);
-                                numSameDayGroupApptsPaste = resultList.size() > 0 ? (Long)resultList.get(0).get("numAppts") : 0;
-                            }
-                  %><a href=#
-			onclick="pasteAppt(<%=(numSameDayGroupApptsPaste > 0)%>);">Paste</a>
-		<% } %>
+						List<Map<String,Object>> resultList = oscarSuperManager.find("appointmentDao", "search_group_day_appt", sqlParam);
+						numSameDayGroupApptsPaste = resultList.size() > 0 ? (Long)resultList.get(0).get("numAppts") : 0;
+					}
+		  	%><a href=#
+				onclick="pasteAppt(<%=(numSameDayGroupApptsPaste > 0)%>);">Paste</a>
+			<% } %>
 		</td>
 	</tr>
 </table>

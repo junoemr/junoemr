@@ -35,6 +35,8 @@
 <%@ page import="org.oscarehr.common.dao.ClinicNbrDao"%>
 <%@ page import="org.oscarehr.common.model.ProviderData"%>
 <%@ page import="org.oscarehr.common.dao.ProviderDataDao"%>
+<%@ page import="org.oscarehr.common.dao.ProviderMediSproutDao"%>
+<%@ page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="oscar.OscarProperties"%>
 <jsp:useBean id="apptMainBean" class="oscar.AppointmentMainBean" scope="session" />
 
@@ -402,7 +404,7 @@ for (int i=0; i<sites.size(); i++) {
               %>
 			</select></td>
 		</tr>
-
+		
 		<input type="hidden" name="provider_activity" value="">
 
 
@@ -428,6 +430,14 @@ for (int i=0; i<sites.size(); i++) {
 			value="<%=apptMainBean.getString(rs,"signed_confidentiality")%>">
         </td>
 	</tr>
+	<% if (OscarProperties.getInstance().getProperty("medisproutplugin", "false").equalsIgnoreCase("true")) {
+			ProviderMediSproutDao providerMediSproutDao = (ProviderMediSproutDao) SpringUtils.getBean("providerMediSproutDao");
+	%>
+			<tr>
+				<td align="right">MediSprout API Key:</td>
+				<td><input type="text" name="mediSproutApiKey" value="<%=StringUtils.trimToEmpty(providerMediSproutDao.getProviderMediSproutApiKey(provider_no))%>" maxlength="64"></td>
+			</tr>
+	<%} %>
 	<tr>
 		<td colspan="2">
 		<div align="center"><input type="hidden" name="displaymode"

@@ -234,11 +234,17 @@ String proFirst="", proLast="", demoFirst="", demoLast="", apptDate="", apptTime
 </body>
 </html>
 <%!
-    String moneyFormat(String str){       
-        String moneyStr = "0.00";
-        try{             
-            moneyStr = new java.math.BigDecimal(str).movePointLeft(2).toString();
-        }catch (Exception moneyException) { MiscUtils.getLogger().error("Error", moneyException); }
-    return moneyStr;
-    }
+	String moneyFormat(String str)
+	{
+		String moneyStr = "0.00";
+		try
+		{
+			moneyStr = new java.math.BigDecimal(str).movePointLeft(2).toString();
+		}
+		catch(Exception moneyException)
+		{
+			MiscUtils.getLogger().error("Error", moneyException);
+		}
+		return moneyStr;
+	}
 %>

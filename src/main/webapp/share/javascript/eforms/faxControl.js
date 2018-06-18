@@ -20,7 +20,7 @@ var faxControl = {
 		
 		var demoNo ="";			
 		demoNo = getSearchValue("demographic_no");
-		if (demoNo == "") { demoNo = getSearchValue("efmdemographic_no", jQuery("form").attr('action')); }
+		if (demoNo == "") { demoNo = getSearchValue("efmdemographic_no", jQuery("form").first().attr('action')); }
 		placeholder.html(faxControlPlaceholder);
 		var faxEnabled = true;
 		
@@ -46,7 +46,7 @@ var faxControl = {
 					else {
 						buttonLocation = jQuery(".DoNotPrint");
 						if (buttonLocation == null || buttonLocation.size() == 0) {			
-							buttonLocation = jQuery(jQuery("form")[0]);
+							buttonLocation = jQuery("form").first();
 						}
 						if (buttonLocation != null) {
 							buttonLocation.append(jQuery(faxControlFaxButton));
@@ -114,15 +114,10 @@ function _AddOtherFax(name, number) {
 
 function checkPhone(str) 
 {
-	// matches numbers in the NANP format: NXX-NXX-XXXX where X is a digit 0-9 and N is a digit 2-9
-	// with optional country code at the front
-	// valid examples: 250-333-1234, +1 250 333 1234, 12503331234
-	var phone = /^(\+?\d)?[- ]?([2-9]\d{2}[- ]?){2}\d{4}$/;
-	if (str.match(phone)) {
-   		return true;
- 	} else {
- 		return false;
- 	}
+	var phone = str.replace(/\D/g,'');
+
+	// phone number must be 10 digits, optionally with country code 1 at the front
+	return phone.length === 10 || (phone.length === 11 && phone.charAt(0) === '1');
 }
 
 function removeRecipient(element) { 
@@ -143,16 +138,15 @@ function hasFaxNumber() {
 
 function submitFax(save) {
 	document.getElementById('faxEForm').value=true;
+	var form = jQuery("form").first();
 	
 	var saveHolder = jQuery("#saveHolder");
 	if (saveHolder == null || saveHolder.size() == 0) {
-		jQuery("form").append("<input id='saveHolder' type='hidden' name='skipSave' value='"+!save+"' >");
+		form.append("<input id='saveHolder' type='hidden' name='skipSave' value='"+!save+"' >");
 	}
 	saveHolder = jQuery("#saveHolder");
 	saveHolder.val(!save);
 	needToConfirm=false;
-	
-	var form = jQuery("form");
 
 	// preserve old RTL functionality
 	var formName=form.attr("name");

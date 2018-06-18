@@ -40,6 +40,10 @@ import org.oscarehr.caisi_integrator.ws.CachedDemographicLabResult;
 import org.oscarehr.caisi_integrator.ws.DemographicWs;
 import org.oscarehr.common.dao.DocumentResultsDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
+import org.oscarehr.common.dao.ProviderInboxRoutingDao;
+import org.oscarehr.common.dao.ProviderLabRoutingDao;
+import org.oscarehr.common.model.ProviderInboxItem;
+import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -66,6 +70,8 @@ public class CommonLabResultData {
 	public static final boolean UNATTACHED = false;
 
 	public static final String NOT_ASSIGNED_PROVIDER_NO = "0";
+
+	private static ProviderLabRoutingDao providerLabRoutingDao = SpringUtils.getBean(ProviderLabRoutingDao.class);
 
 	public CommonLabResultData() {
 
@@ -324,8 +330,9 @@ public class CommonLabResultData {
 		return true;
 	}
 
-	public static void updateReportStatus(int labNo, String providerNo, char status, String comment, String labType) throws SQLException
+	public static void updateReportStatus(int labNo, String providerNo, char charStatus, String comment, String labType) throws SQLException
 	{
+		String status = String.valueOf(charStatus);
 		DBPreparedHandler db = new DBPreparedHandler();
 		// handles the case where this provider/lab combination is not already in providerLabRouting table
 		String sql = "select id, status from providerLabRouting where lab_type = '" + labType + "' and provider_no = '" + providerNo + "' and lab_no = '" + labNo + "'";
@@ -336,7 +343,7 @@ public class CommonLabResultData {
 			empty = false;
 			String id = oscar.Misc.getString(rs, "id");
 			sql = "update providerLabRouting set status='" + status + "', comment=? where id = '" + id + "'";
-			if (!oscar.Misc.getString(rs, "status").equals("A")) {
+			if (!oscar.Misc.getString(rs, "status").equals(ProviderInboxItem.ACK)) {
 
 				db.queryExecute(sql, new String[] { comment });
 
@@ -348,12 +355,26 @@ public class CommonLabResultData {
 			db.queryExecute(sql, new String[] { comment });
 		}
 
-		if (!"0".equals(providerNo)) {
+		if (!NOT_ASSIGNED_PROVIDER_NO.equals(providerNo)) {
 			String recordsToDeleteSql = "select * from providerLabRouting where provider_no='0' and lab_no='" + labNo + "' and lab_type = '" + labType + "'";
 			sql = "delete from providerLabRouting where provider_no='0' and lab_no=? and lab_type = '" + labType + "'";
 			ArchiveDeletedRecords adr = new ArchiveDeletedRecords();
 			adr.recordRowsToBeDeleted(recordsToDeleteSql, "" + providerNo, "providerLabRouting");
 			db.queryExecute(sql, new String[] { Integer.toString(labNo) });
+		}
+
+		// If we updated the status to X, then we want to see if all other statuses for the labNo are also X.
+		// If they are then there are no more providers associated with the document, so move the document to the unclaimed inbox
+		if (status.equals(ProviderInboxItem.ARCHIVED))
+		{
+			ProviderInboxRoutingDao providerInboxRoutingDao = SpringUtils.getBean(ProviderInboxRoutingDao.class);
+			List<ProviderLabRoutingModel> allDocsWithLabNo = providerLabRoutingDao.getProviderLabRoutingDocuments(Integer.toString(labNo));
+			List<ProviderLabRoutingModel> docsWithStatusX = providerLabRoutingDao.findByStatusANDLabNoType(labNo, labType, ProviderInboxItem.ARCHIVED);
+
+			if (allDocsWithLabNo.size() == docsWithStatusX.size())
+			{
+				providerInboxRoutingDao.addToProviderInbox(NOT_ASSIGNED_PROVIDER_NO, Integer.toString(labNo), labType);
+			}
 		}
 	}
 

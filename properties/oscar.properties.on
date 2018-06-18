@@ -158,11 +158,6 @@ PGP_KEY: Name (Company) <email@address>
 #PGP ENVironment variable - location of PGP key and config files
 PGP_ENV: GNUPGHOME=/usr/local/gnupg/
 
-# Export information
-Vendor_Product = OSCARMcMaster, OSCARMcMaster ver12.1
-Support_Contact = Oscar Host (1-888-686-8560 support@oscarhost.ca)
-ontariomd_cds_diabetes_link = https://www.ontariomd.ca/cms/xml/ontariomd_cds_diabetes.xsd
-
 #### for IBD clinic
 #meditech_id = yes
 #mc_number = yes
@@ -645,10 +640,6 @@ QR_CODE_ENABLED_PROVIDER_DEFAULT=false
 # Do not change this unless you really know what you're doing. Valid values are positive integer values. A value of 1 means no scaling will be done.
 QR_CODE_IMAGE_SCALE_FACTOR=2
 
-
-#URL used to search the online manual for context sensitive help. The %s is replaced with the search term.
-HELP_SEARCH_URL=http://www.oscarmanual.org/search?SearchableText=%s
-
 # For clinic with multiple satellites, so that each provider can be assigned to multiple sites and have different location when set schedule, book appt., billing etc.
 ## off : turn off multisites support, oscar will behave as before
 ## on : turn on multisites support, use Admin-Misc-Satellite-sites Admin to manage sites and assign them to the provider in provider profile
@@ -831,9 +822,6 @@ consultation_dynamic_labelling_enabled=false
 # True if using indivica's consultation attachment and false otherwise.
 consultation_indivica_attachment_enabled=false
 
-#Help link URL
-resource_base_url=https://help.oscarhost.ca
-
 # MOH File Management
 moh_file_management_enabled=false
 ONEDT_INBOX=/var/lib/OscarDocument/{oscar_practice_id}/onEDTDocs/inbox/
@@ -903,7 +891,7 @@ web_service_client.received_timeout_ms=3000
 # clinicaid_domain=http://clinicly.com
 
 # OscarHost Login page
-oscarhost_login=https://www.oscarhost.ca/{oscar_practice_id}
+oscarhost_login=https://www.junoemr.com/{oscar_practice_id}
 
 # Set the location to write fax files to
 #fax_file_location=/var/lib/OscarDocument/{oscar_practice_id}/fax/

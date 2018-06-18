@@ -345,9 +345,9 @@ public class CategoryData {
 					    "        FROM providerLabRouting plr" + 
 					    "        GROUP BY lab_no, status" +
 					    "    ) lab_status_grouped GROUP BY lab_no HAVING count(lab_no) = 1" +
-					    ") proLR ON (proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no) ";
+					    ") proLR ON (proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no AND proLR.status <> 'X') ";
 		}else{
-			sql = sql + "LEFT JOIN providerLabRouting proLR ON (proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no) ";
+			sql = sql + "LEFT JOIN providerLabRouting proLR ON (proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no AND proLR.status <> 'X' ) ";
 		}
 		sql = sql + "WHERE (cdoc.module_id = -1) ";
 
@@ -566,9 +566,9 @@ public class CategoryData {
 					    "        FROM providerLabRouting plr" + 
 					    "        GROUP BY lab_no, status" +
 					    "    ) lab_status_grouped GROUP BY lab_no HAVING count(lab_no) = 1" +
-					    ") proLR ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = cd.document_no ) ";
+					    ") proLR ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = cd.document_no AND proLR.status <> 'X' ) ";
 		}else{
-			sql = sql + "INNER JOIN providerLabRouting proLR ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = cd.document_no ) ";
+			sql = sql + "INNER JOIN providerLabRouting proLR ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = cd.document_no AND proLR.status <> 'X' ) ";
 		}
 		sql = sql + "LEFT JOIN document doc ON ( doc.document_no = cd.document_no ) "
 					+ "WHERE cd.module='demographic' ";

@@ -369,28 +369,31 @@ public class ManageTeleplanAction extends DispatchAction {
            return mapping.findForward("submission");
     }
 
-    public ActionForward remit(ActionMapping mapping, ActionForm  form,
-           HttpServletRequest request, HttpServletResponse response)
-            {
+    public ActionForward remit(ActionMapping mapping, ActionForm form,
+                               HttpServletRequest request, HttpServletResponse response)
+    {
 
-           TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
-           String[] userpass = dao.getUsernamePassword();
-           TeleplanService tService = new TeleplanService();
+        TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
+        String[] userpass = dao.getUsernamePassword();
+        TeleplanService tService = new TeleplanService();
 
-           TeleplanAPI tAPI = null;
-           try{
-                tAPI = tService.getTeleplanAPI(userpass[0],userpass[1]);
-           }catch(Exception e){
-               log.debug(e.getMessage(),e);
-               request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
-               return mapping.findForward("error");
-           }
+        TeleplanAPI tAPI = null;
+        try
+        {
+            tAPI = tService.getTeleplanAPI(userpass[0], userpass[1]);
+        }
+        catch(Exception e)
+        {
+            log.debug(e.getMessage(), e);
+            request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
+            return mapping.findForward("error");
+        }
 
-           TeleplanResponse tr = tAPI.getRemittance(true);
-           log.debug(tr.toString());
-           log.debug("real filename "+tr.getRealFilename());
-           request.setAttribute("filename",tr.getRealFilename());
-           return mapping.findForward("remit");
+        TeleplanResponse tr = tAPI.getRemittance(true);
+        log.debug(tr.toString());
+        log.debug("real filename " + tr.getRealFilename());
+        request.setAttribute("filename", tr.getRealFilename());
+        return mapping.findForward("remit");
     }
 
     public ActionForward setPass(ActionMapping mapping, ActionForm  form,

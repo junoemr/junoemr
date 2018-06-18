@@ -276,6 +276,7 @@ public class InboxResultsDao {
 				+ "LEFT JOIN demographic d1 ON ( patLR.demographic_no = d1.demographic_no AND FALSE ) "
 				+ "LEFT JOIN demographic d2 ON ( cdoc.module_id IS NOT NULL AND cdoc.module_id > 0 AND cdoc.module_id = d2.demographic_no ) "
 				+ "WHERE proLR.lab_type = 'DOC' "
+				+ "AND proLR.status <> 'X' "
 				+ "AND doc.status <> 'D' ";
 
 

@@ -36,6 +36,8 @@
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="org.oscarehr.util.LoggedInInfo" %>
 <%@page import="org.oscarehr.casemgmt.common.Colour" %>
+<%@page import="java.net.URLEncoder" %>
+<%@page import="oscar.util.StringUtils" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -154,7 +156,7 @@ var Colour = {
 			paramValue = request.getParameter(paramName);
 
 		%>
-			params += "&<%=paramName%>=<%=StringEscapeUtils.escapeJavaScript(paramValue)%>";
+			params += "&<%=paramName%>=<%=URLEncoder.encode(StringUtils.transformNullInEmptyString(paramValue), "UTF-8")%>";
 		<%
 
 		 }
