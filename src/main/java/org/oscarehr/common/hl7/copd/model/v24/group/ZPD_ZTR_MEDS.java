@@ -30,14 +30,18 @@ import ca.uhn.hl7v2.model.v24.segment.RXE;
 import ca.uhn.hl7v2.model.v24.segment.RXO;
 import ca.uhn.hl7v2.model.v24.segment.RXR;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.segment.ZRX;
 import org.oscarehr.common.hl7.copd.model.v24.segment.ZST;
+import org.oscarehr.util.MiscUtils;
 
 /**
  * Custom hl7 message class for TOPD formatted messages
  */
 public class ZPD_ZTR_MEDS extends AbstractGroup
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public ZPD_ZTR_MEDS(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
@@ -56,7 +60,71 @@ public class ZPD_ZTR_MEDS extends AbstractGroup
 		}
 		catch(HL7Exception var3)
 		{
+			logger.error("Can't instantiate " + this.getClass().getName());
 			throw new RuntimeException(var3);
+		}
+	}
+
+	public ORC getORC()
+	{
+		return this.getTyped("ORC", ORC.class);
+	}
+
+	public RXO getRXO()
+	{
+		return this.getTyped("RXO", RXO.class);
+	}
+
+	public ZPD_ZTR_TIMING_QUANTITY getTIMING_QUANTITY()
+	{
+		return this.getTyped("TIMING_QUANTITY", ZPD_ZTR_TIMING_QUANTITY.class);
+	}
+
+	public ZPD_ZTR_NOTES getNOTES()
+	{
+		return this.getTyped("NOTES", ZPD_ZTR_NOTES.class);
+	}
+
+	public RXE getRXE()
+	{
+		return this.getTyped("RXE", RXE.class);
+	}
+
+	public RXR getRXR()
+	{
+		return this.getTyped("RXR", RXR.class);
+	}
+
+	public ZPD_ZTR_COMPONENT getCOMPONENT()
+	{
+		return this.getTyped("COMPONENT", ZPD_ZTR_COMPONENT.class);
+	}
+
+	public ZPD_ZTR_OBSERVATION getOBSERVATION()
+	{
+		return this.getTyped("OBSERVATION", ZPD_ZTR_OBSERVATION.class);
+	}
+
+	public ZRX getZRX()
+	{
+		return this.getTyped("ZRX", ZRX.class);
+	}
+
+	public ZST getZST(int rep)
+	{
+		return this.getTyped("ZST", rep, ZST.class);
+	}
+
+	public int getZSTReps()
+	{
+		try
+		{
+			return this.getAll("ZST").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
 		}
 	}
 }

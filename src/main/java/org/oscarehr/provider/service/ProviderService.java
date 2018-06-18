@@ -74,7 +74,7 @@ public class ProviderService
 		providerDataDao.persist(provider);
 
 		ProviderBillCenter billCenter = new ProviderBillCenter();
-		billCenter.addBillCenter(provider.getProviderNo(),StringUtils.trimToEmpty(billCenterCode));
+		billCenter.addBillCenter(String.valueOf(provider.getProviderNo()),StringUtils.trimToEmpty(billCenterCode));
 
 		return provider;
 	}

@@ -40,6 +40,9 @@ public class ZPD_ZTR extends AbstractMessage
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
+	// the CustomModelClassFactory requires the root package for the message as a string. exclude the version and sub-folders
+	public static final String ROOT_PACKAGE = "org.oscarehr.common.hl7.copd.model";
+
 	public ZPD_ZTR()
 	{
 		this(new DefaultModelClassFactory());

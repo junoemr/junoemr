@@ -29,9 +29,13 @@ import ca.uhn.hl7v2.model.v24.segment.NTE;
 import ca.uhn.hl7v2.model.v24.segment.OBR;
 import ca.uhn.hl7v2.model.v24.segment.OBX;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
 public class ZPD_ZTR_LAB extends AbstractGroup
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public ZPD_ZTR_LAB(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
@@ -43,7 +47,49 @@ public class ZPD_ZTR_LAB extends AbstractGroup
 		}
 		catch(HL7Exception var3)
 		{
+			logger.error("Can't instantiate " + this.getClass().getName());
 			throw new RuntimeException(var3);
+		}
+	}
+
+	public OBR getOBR()
+	{
+		return this.getTyped("OBR", OBR.class);
+	}
+
+	public OBX getOBX(int rep)
+	{
+		return this.getTyped("OBX", rep, OBX.class);
+	}
+
+	public int getOBXReps()
+	{
+		try
+		{
+			return this.getAll("OBX").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
+
+	public NTE getNTE(int rep)
+	{
+		return this.getTyped("NTE", rep, NTE.class);
+	}
+
+	public int getNTEReps()
+	{
+		try
+		{
+			return this.getAll("NTE").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
 		}
 	}
 }

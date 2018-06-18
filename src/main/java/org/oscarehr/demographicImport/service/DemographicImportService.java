@@ -29,17 +29,24 @@ import ca.uhn.hl7v2.parser.CustomModelClassFactory;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
 import org.apache.log4j.Logger;
-import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.hl7.copd.mapper.AppointmentMapper;
 import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
+import org.oscarehr.common.hl7.copd.mapper.DocumentMapper;
+import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
 import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.common.model.Appointment;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.document.model.Document;
+import org.oscarehr.document.service.DocumentService;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +72,7 @@ public class DemographicImportService
 {
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final String IMPORT_PROVIDER = "999900"; //TODO dont use this system forever
+	private static final OscarProperties properties = OscarProperties.getInstance();
 
 	@Autowired
 	DemographicService demographicService;
@@ -78,6 +86,12 @@ public class DemographicImportService
 	@Autowired
 	ProviderDataDao providerDataDao;
 
+	@Autowired
+	DocumentService documentService;
+
+	@Autowired
+	private OscarAppointmentDao appointmentDao;
+
 	public void importDemographicDataCOPD(GenericFile genericFile) throws IOException, HL7Exception
 	{
 		logger.info("Read import file");
@@ -85,23 +99,22 @@ public class DemographicImportService
 		InputStream is = new FileInputStream(file);
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
-		String messageStrTmp = "";
-
+		StringBuffer sb = new StringBuffer();
 		String line;
-		while ((line = br.readLine()) != null) {
-			messageStrTmp += line;
+		while((line = br.readLine()) != null)
+		{
+			sb.append(line);
 		}
-		//TODO fix namespace, hl7 version
 
 		logger.info("Split hl7 messages");
-		List<String> messageList = seperateMessages(messageStrTmp);
+		List<String> messageList = separateMessages(sb.toString());
 
 		logger.info("Initialize HL7 parser");
 		HapiContext context = new DefaultHapiContext();
 //		context.setValidationContext(new NoValidation());
 
 		// this package string needs to match the custom model location in the oscar source code.
-		ModelClassFactory modelClassFactory = new CustomModelClassFactory("org.oscarehr.common.hl7.copd.model");
+		ModelClassFactory modelClassFactory = new CustomModelClassFactory(ZPD_ZTR.ROOT_PACKAGE);
 		context.setModelClassFactory(modelClassFactory);
 
 		Parser p = context.getXMLParser();
@@ -133,15 +146,40 @@ public class DemographicImportService
 		// set the mrp doctor after all the provider records are created
 		demographic.setProviderNo(provider.getId());
 		demographicDao.merge(demographic);
+
+		logger.info("Create Appointments ...");
+		importAppointmentData(zpdZtrMessage, demographic, provider);
 	}
 
-	private List<String> seperateMessages(String messageStr)
+	/**
+	 * TODO  -- make this more efficient for larger files
+	 * @param messageStr the whole file as a string
+	 * @return - list of message strings
+	 */
+	private List<String> separateMessages(String messageStr)
 	{
 		List<String> messageList = new LinkedList<>();
 
-		//TODO split xml into messages
-		messageList.add(messageStr);
+		Pattern messagePattern = Pattern.compile("<ZPD_ZTR\\.MESSAGE>(.*?)<\\/ZPD_ZTR\\.MESSAGE>", Pattern.DOTALL);
+		Matcher messagePatternMatcher = messagePattern.matcher(messageStr);
+		while(messagePatternMatcher.find())
+		{
+			// split messages by each MESSAGE group segment in the file
+			String message = "<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\">" + messagePatternMatcher.group(1) + "</ZPD_ZTR>";
 
+			Pattern versionPattern = Pattern.compile("<VID\\.1>(.*?)<\\/VID\\.1>");
+			Matcher versionPatternMatcher = versionPattern.matcher(message);
+
+			StringBuffer sb = new StringBuffer(message.length());
+			while(versionPatternMatcher.find())
+			{
+				// the hl7 version must be 2.4
+				String replacement = "<VID\\.1>2.4</VID\\.1>";
+				versionPatternMatcher.appendReplacement(sb, replacement);
+			}
+			versionPatternMatcher.appendTail(sb);
+			messageList.add(sb.toString());
+		}
 		return messageList;
 	}
 
@@ -215,8 +253,6 @@ public class DemographicImportService
 			String providerFirstName = providerMapper.getFirstName(i);
 			String providerLastName = providerMapper.getLastName(i);
 
-			logger.info("First Name:" + providerFirstName);
-			logger.info("Last Name:" + providerLastName);
 			if(providerFirstName == null || providerLastName == null)
 			{
 				throw new RuntimeException("Not enough provider info found to link or create provider record (first and last name are required).");
@@ -225,7 +261,10 @@ public class DemographicImportService
 			//TODO how to determine MRP doctor when there are more than 1
 			mrpProvider = findOrCreateProviderRecord(providerMapper.getProvider(i), providerFirstName, providerLastName);
 
-			importMedicationData(zpdZtrMessage, mrpProvider, demographic);
+			logger.info("Import Medications ...");
+			importMedicationData(zpdZtrMessage, i, mrpProvider, demographic);
+			logger.info("Import Documents ...");
+			importDocumentData(zpdZtrMessage, i, mrpProvider, demographic);
 		}
 
 
@@ -244,7 +283,7 @@ public class DemographicImportService
 			newProviderId = (newProviderId == null) ? 10000 : newProviderId;
 			provider.set(String.valueOf(newProviderId));
 
-			String billCenterCode = OscarProperties.getInstance().getProperty("default_bill_center","");
+			String billCenterCode = properties.getProperty("default_bill_center","");
 			provider = providerService.addNewProvider(IMPORT_PROVIDER, provider, billCenterCode);
 			logger.info("Created new Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 		}
@@ -271,8 +310,43 @@ public class DemographicImportService
 		return demographic;
 	}
 
-	private void importMedicationData(ZPD_ZTR zpdZtrMessage, ProviderData provider, Demographic demographic)
+	private void importAppointmentData(ZPD_ZTR zpdZtrMessage, Demographic demographic, ProviderData provider) throws HL7Exception
 	{
+		AppointmentMapper appointmentMapper = new AppointmentMapper(zpdZtrMessage);
 
+		for(Appointment appointment : appointmentMapper.getAppointmentList())
+		{
+			appointment.setDemographicNo(demographic.getDemographicId());
+			appointment.setName(demographic.getLastName() + "," + demographic.getFirstName());
+			appointment.setCreator(IMPORT_PROVIDER);
+			appointment.setProviderNo(String.valueOf(provider.getProviderNo()));
+
+			if(properties.isPropertyActive("multisites"))
+			{
+				throw new RuntimeException("Multisite Imports not supported");
+			}
+
+			logger.info("Add appointment: " + appointment.getAppointmentDate());
+			appointmentDao.persist(appointment);
+		}
+
+	}
+
+	private void importMedicationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
+	{
+		MedicationMapper medicationMapper = new MedicationMapper(zpdZtrMessage, providerRep);
+	}
+
+	private void importDocumentData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
+	{
+		DocumentMapper documentMapper = new DocumentMapper(zpdZtrMessage, providerRep);
+
+		for(Document document : documentMapper.getDocumentList())
+		{
+			document.setDoccreator(String.valueOf(provider.getProviderNo()));
+			document.setResponsible(String.valueOf(provider.getProviderNo()));
+			documentService.addDocumentModel(document, demographic.getDemographicId());
+			documentService.routeToProviderInbox(document.getDocumentNo(), provider.getProviderNo());
+		}
 	}
 }

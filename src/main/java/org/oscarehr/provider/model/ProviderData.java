@@ -126,12 +126,12 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 		id = providerNo;
 	}
 
-	public String getProviderNo()
+	public Integer getProviderNo()
 	{
-		return getId();
+		return Integer.parseInt(getId());
 	}
-	public void setProviderNo(String providerNo) {
-		set(providerNo);
+	public void setProviderNo(Integer providerNo) {
+		set(String.valueOf(providerNo));
 	}
 
 

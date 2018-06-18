@@ -78,6 +78,114 @@ public class ZPD_ZTR_PROVIDER extends AbstractGroup
 		return this.getTyped("PRD", PRD.class);
 	}
 
+	public NK1 getNK1(int rep)
+	{
+		return this.getTyped("NK1", rep, NK1.class);
+	}
+
+	public int getNK1Reps()
+	{
+		try
+		{
+			return this.getAll("NK1").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
+
+	public ZAL getZAL(int rep)
+	{
+		return this.getTyped("ZAL", rep, ZAL.class);
+	}
+
+	public int getZALReps()
+	{
+		try
+		{
+			return this.getAll("ZAL").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
+
+	public ZSH getZSH(int rep)
+	{
+		return this.getTyped("ZSH", rep, ZSH.class);
+	}
+
+	public int getZSHReps()
+	{
+		try
+		{
+			return this.getAll("ZSH").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
+
+	public ZQO getZQO(int rep)
+	{
+		return this.getTyped("ZQO", rep, ZQO.class);
+	}
+
+	public int getZQOReps()
+	{
+		try
+		{
+			return this.getAll("ZQO").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
+
+	public ZPV getZPV(int rep)
+	{
+		return this.getTyped("ZPV", rep, ZPV.class);
+	}
+
+	public int getZPVReps()
+	{
+		try
+		{
+			return this.getAll("ZPV").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
+
+	public ZPB getZPB(int rep)
+	{
+		return this.getTyped("ZPB", rep, ZPB.class);
+	}
+
+	public int getZPBReps()
+	{
+		try
+		{
+			return this.getAll("ZPB").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
+
 	public ZPD_ZTR_MEDS getMEDS(int rep)
 	{
 		return this.getTyped("MEDS", rep, ZPD_ZTR_MEDS.class);
@@ -96,6 +204,52 @@ public class ZPD_ZTR_PROVIDER extends AbstractGroup
 		}
 	}
 
+	public ZPR getZPR(int rep)
+	{
+		return this.getTyped("ZPR", rep, ZPR.class);
+	}
+
+	public int getZPRReps()
+	{
+		try
+		{
+			return this.getAll("ZPR").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
+
+	public ZDV getZDV(int rep)
+	{
+		return this.getTyped("ZDV", rep, ZDV.class);
+	}
+
+	public int getZDVReps()
+	{
+		try
+		{
+			return this.getAll("ZDV").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
+
+	public ZPD_ZTR_DEV_HISTORY getDEV_HISTORY()
+	{
+		return this.getTyped("DEV_HISTORY", ZPD_ZTR_DEV_HISTORY.class);
+	}
+
+	public ZHR getZHR()
+	{
+		return this.getTyped("ZHR", ZHR.class);
+	}
+
 	public ZPD_ZTR_LAB getLAB(int rep)
 	{
 		return this.getTyped("LAB", rep, ZPD_ZTR_LAB.class);
@@ -106,6 +260,60 @@ public class ZPD_ZTR_PROVIDER extends AbstractGroup
 		try
 		{
 			return this.getAll("LAB").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
+
+	public ZHF getZHF(int rep)
+	{
+		return this.getTyped("ZHF", rep, ZHF.class);
+	}
+
+	public int getZHFReps()
+	{
+		try
+		{
+			return this.getAll("ZHR").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
+
+	public ZCP getZCP(int rep)
+	{
+		return this.getTyped("ZCP", rep, ZCP.class);
+	}
+
+	public int getZCPReps()
+	{
+		try
+		{
+			return this.getAll("ZCP").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
+
+	public ZAT getZAT(int rep)
+	{
+		return this.getTyped("ZAT", rep, ZAT.class);
+	}
+
+	public int getZATReps()
+	{
+		try
+		{
+			return this.getAll("ZAT").length;
 		}
 		catch(HL7Exception var4)
 		{

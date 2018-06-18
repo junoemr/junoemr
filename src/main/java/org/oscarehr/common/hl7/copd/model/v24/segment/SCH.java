@@ -23,38 +23,32 @@
 package org.oscarehr.common.hl7.copd.model.v24.segment;
 
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Type;
-import ca.uhn.hl7v2.model.v24.datatype.RP;
-import ca.uhn.hl7v2.model.v24.datatype.SI;
-import ca.uhn.hl7v2.model.v24.datatype.ST;
 import ca.uhn.hl7v2.model.v24.datatype.TS;
+import ca.uhn.hl7v2.model.v24.datatype.TX;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
 /**
- * This segment contains attachments information and reference pointers to the attachment files to be attached.
- * Includes Any additional documents attached to the MS, ie Discharge summaries, assessment scales, Psychology
- * reports, growth charts etc.
+ * This extends the regular SCH segment as the CoPD spec has extra data on the end
  */
-public class ZAT extends AbstractSegment
+public class SCH extends ca.uhn.hl7v2.model.v24.segment.SCH
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
-	public ZAT(Group parent, ModelClassFactory factory)
+	public SCH(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		Message message = this.getMessage();
 
 		try
 		{
-			this.add(SI.class, true, 1, 4, new Object[]{message}, "Set ID - ZAT");
-			this.add(TS.class, false, 1, 8, new Object[]{message}, "Date");
-			this.add(ST.class, true, 1, 255, new Object[]{message}, "Name");
-			this.add(RP.class, true, 1, 237, new Object[]{message}, "Attachment");
+			this.add(TS.class, false, 1, 8, new Object[]{message}, "zCreation Date");
+			this.add(TX.class, false, 1, 200, new Object[]{message}, "zAppointment Reason");
+			this.add(TX.class, false, 1, 500, new Object[]{message}, "zNotes");
 		}
 		catch(HL7Exception e)
 		{
@@ -63,65 +57,60 @@ public class ZAT extends AbstractSegment
 		}
 	}
 
-	public SI getZat2_SetId()
+	public TS getSch28_zCreationDate() throws HL7Exception
 	{
 		try
 		{
-			Type t = this.getField(1, 0);
-			return (SI) t;
-		}
-		catch(HL7Exception e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
-
-	public TS getZat2_Date()
-	{
-		try
-		{
-			Type t = this.getField(2, 0);
+			Type t = this.getField(28, 0);
 			return (TS) t;
 		}
-		catch(HL7Exception e)
+		catch(ClassCastException var4)
 		{
-			throw new RuntimeException(e);
+			throw new RuntimeException(var4);
 		}
 	}
 
-	public ST getZat3_Name()
+	public TX getSch29_zAppointmentReason() throws HL7Exception
 	{
 		try
 		{
-			Type t = this.getField(3, 0);
-			return (ST) t;
+			Type t = this.getField(29, 0);
+			return (TX) t;
 		}
-		catch(HL7Exception e)
+		catch(ClassCastException var4)
 		{
-			throw new RuntimeException(e);
+			throw new RuntimeException(var4);
 		}
 	}
 
-	public RP getZat4_Attachment()
+	public TX getSch30_zNotes() throws HL7Exception
 	{
 		try
 		{
-			Type t = this.getField(4, 0);
-			return (RP) t;
+			Type t = this.getField(30, 0);
+			return (TX) t;
 		}
-		catch(HL7Exception e)
+		catch(ClassCastException var4)
 		{
-			throw new RuntimeException(e);
+			throw new RuntimeException(var4);
 		}
 	}
-
 
 	/**
-	 * This method must be overridden. The easiest way is just to return null.
+	 * This method must be overridden.
 	 */
 	@Override
 	protected Type createNewTypeWithoutReflection(int field)
 	{
-		return null;
+		switch(field) {
+			case 27:
+				return new TS(this.getMessage());
+			case 28:
+				return new TX(this.getMessage());
+			case 29:
+				return new TX(this.getMessage());
+			default:
+				return super.createNewTypeWithoutReflection(field);
+		}
 	}
 }

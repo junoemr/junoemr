@@ -26,8 +26,8 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractGroup;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.v24.segment.PID;
-import ca.uhn.hl7v2.model.v24.segment.SCH;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.oscarehr.common.hl7.copd.model.v24.segment.SCH;
 import org.oscarehr.common.hl7.copd.model.v24.segment.ZBA;
 
 public class ZPD_ZTR_PATIENT extends AbstractGroup
@@ -53,11 +53,6 @@ public class ZPD_ZTR_PATIENT extends AbstractGroup
 		return this.getTyped("PID", PID.class);
 	}
 
-	public SCH getSCH()
-	{
-		return this.getTyped("SCH", SCH.class);
-	}
-
 	public SCH getSCH(int rep)
 	{
 		return this.getTyped("SCH", rep, SCH.class);
@@ -76,10 +71,6 @@ public class ZPD_ZTR_PATIENT extends AbstractGroup
 		}
 	}
 
-	public ZBA getZBA()
-	{
-		return this.getTyped("ZBA", ZBA.class);
-	}
 	public ZBA getZBA(int rep)
 	{
 		return this.getTyped("ZBA", rep, ZBA.class);
