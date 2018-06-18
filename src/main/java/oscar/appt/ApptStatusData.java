@@ -150,8 +150,11 @@ public final class ApptStatusData {
         String temp = null;
         if (status.length() == 1) {
             temp = status + s;
-        } else {
+        } else if (status.length() == 2){
             temp = status.substring(0, 1) + s;
+        }
+        else {
+            MiscUtils.getLogger().error("Invalid Status Parameter passed: " + status);
         }
         return temp;
     }

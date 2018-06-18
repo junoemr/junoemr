@@ -677,7 +677,7 @@ while(field_itr.hasNext()){
 		String skip = oscarProps.getProperty("SKIP_REFERRAL_NO_CHECK","false");
 		if(!skip.equals("true")) {
 	%>
-				var referralNo = document.updatedelete.r_doctor_ohip.value;
+				var referralNo = document.updatedelete.referral_doctor_ohip.value;
 				if (document.updatedelete.hc_type.value == 'ON' && referralNo.length > 0 && referralNo.length != 6)
 				{
 					alert("<bean:message key="demographic.demographiceditdemographic.msgWrongReferral"/>");
@@ -1051,9 +1051,15 @@ while(field_itr.hasNext()){
 						<td>
 							<%
 								java.util.Locale vLocale = (java.util.Locale) session.getAttribute(org.apache.struts.Globals.LOCALE_KEY);
-								//----------------------------REFERRAL DOCTOR------------------------------
-								String rdohip = "", rd = "", fd = "", family_doc = "";
-								String fd2ohip = "", fd2 = "", family_doctor_name = "";
+								// Referral doctor
+								String referralDoctorXML = "";
+								String referralDoctorOHIP = "";
+								String referralDoctorName = "";
+								
+								// Family doctor
+								String familyDoctorXML = "";
+								String familyDoctorName = "";
+								String familyDoctorOHIP = "";
 
 								String resident = "", nurse = "", alert = "", notes = "", midwife = "";
 								ResultSet rs = null;
@@ -1105,36 +1111,37 @@ while(field_itr.hasNext()){
 									if (true)
 									{
 										//----------------------------REFERRAL DOCTOR------------------------------
-										fd = demographic.getFamilyDoctor();
-										if (fd == null)
+										referralDoctorXML = demographic.getFamilyDoctor();
+										if (referralDoctorXML == null)
 										{
-											rd = "";
-											rdohip = "";
-											family_doc = "";
+											referralDoctorName = "";
+											referralDoctorOHIP = "";
 										}
 										else
 										{
-											rd = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()), "rd");
-											rd = rd != null ? rd : "";
-											rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()), "rdohip");
-											rdohip = rdohip != null ? rdohip : "";
-											family_doc = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()), "family_doc");
-											family_doc = family_doc != null ? family_doc : "";
+											referralDoctorName = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(referralDoctorXML), "rd");
+											if(referralDoctorName == null || referralDoctorName.equalsIgnoreCase("null") )
+												referralDoctorName = "";
+											referralDoctorOHIP = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(referralDoctorXML), "rdohip");
+											if(referralDoctorOHIP == null || referralDoctorOHIP.equalsIgnoreCase("null") )
+												referralDoctorOHIP = "";
 										}
 										//----------------------------REFERRAL DOCTOR --------------end-----------
 
-										fd2 = demographic.getFamilyDoctor2();
-										if (fd2 == null)
+										familyDoctorXML = demographic.getFamilyDoctor2();
+										if (familyDoctorXML == null)
 										{
-											fd2ohip = "";
-											family_doctor_name = "";
+											familyDoctorOHIP = "";
+											familyDoctorName = "";
 										}
 										else
 										{
-											fd2ohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(fd2), "fd");
-											fd2ohip = fd2ohip != null ? fd2ohip : "";
-											family_doctor_name = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(fd2), "fdname");
-
+											familyDoctorOHIP = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(familyDoctorXML), "fd");
+											if(familyDoctorOHIP == null || familyDoctorOHIP.equalsIgnoreCase("null") )
+												familyDoctorOHIP = "";
+											familyDoctorName = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(familyDoctorXML), "fdname");
+											if(familyDoctorName == null || familyDoctorName.equalsIgnoreCase("null") )
+												familyDoctorName = "";
 										}
 
 
@@ -1375,7 +1382,7 @@ while(field_itr.hasNext()){
 							String referral_no_parameter = "";
 							if (oscarProps.isPropertyActive("auto_populate_billingreferral_bc"))
 							{
-								referral_no_parameter = "&referral_no_1=" + rdohip;
+								referral_no_parameter = "&referral_no_1=" + referralDoctorOHIP;
 							}
 						%>
 						<tr>
@@ -1408,7 +1415,7 @@ while(field_itr.hasNext()){
 							<td><a
 									href="javascript: function myFunction() {return false; }"
 									onClick="window.open('../billing/CA/ON/specialtyBilling/fluBilling/addFluBilling.jsp?function=demographic&functionid=<%=demographic.getDemographicNo()%>&creator=<%=curProvider_no%>&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&hin=<%=URLEncoder.encode(demographic.getHin()!=null?demographic.getHin():"")%>
-											<%=URLEncoder.encode(demographic.getVer()!=null?demographic.getVer():"")%>&demo_sex=<%=URLEncoder.encode(demographic.getSex())%>&demo_hctype=<%=URLEncoder.encode(demographic.getHcType()==null?"null":demographic.getHcType())%>&rd=<%=URLEncoder.encode(rd==null?"null":rd)%>&rdohip=<%=URLEncoder.encode(rdohip==null?"null":rdohip)%>&dob=<%=MyDateFormat.getStandardDate(Integer.parseInt(birthYear),Integer.parseInt(birthMonth),Integer.parseInt(birthDate))%>','', 'scrollbars=yes,resizable=yes,width=720,height=500');return false;"
+											<%=URLEncoder.encode(demographic.getVer()!=null?demographic.getVer():"")%>&demo_sex=<%=URLEncoder.encode(demographic.getSex())%>&demo_hctype=<%=URLEncoder.encode(demographic.getHcType()==null?"null":demographic.getHcType())%>&referralDoctorName=<%=URLEncoder.encode(referralDoctorName==null?"null":referralDoctorName)%>&referralDoctorOHIP=<%=URLEncoder.encode(referralDoctorOHIP==null?"null":referralDoctorOHIP)%>&dob=<%=MyDateFormat.getStandardDate(Integer.parseInt(birthYear),Integer.parseInt(birthMonth),Integer.parseInt(birthDate))%>','', 'scrollbars=yes,resizable=yes,width=720,height=500');return false;"
 									title='<bean:message key="demographic.demographiceditdemographic.msgAddFluBill"/>'><bean:message
 									key="demographic.demographiceditdemographic.msgFluBilling"/></a>
 							</td>
@@ -2879,19 +2886,24 @@ while(field_itr.hasNext()){
 																<li><span
 																		class="label"><bean:message
 																		key="demographic.demographiceditdemographic.formRefDoc"/>:</span><span
-																		class="info"><%=rd%></span>
+																		class="info"><%=referralDoctorName%></span>
 																</li>
 																<li><span
 																		class="label"><bean:message
 																		key="demographic.demographiceditdemographic.formRefDocNo"/>:</span><span
-																		class="info"><%=rdohip%></span>
+																		class="info"><%=referralDoctorOHIP%></span>
 																</li>
 																<% if (oscarProps.isPropertyActive("demographic_family_doctor"))
 																{ %>
 																<li><span
 																		class="label"><bean:message
 																		key="demographic.demographiceditdemographic.familyDoctor"/>:</span><span
-																		class="info"><%=fd2ohip%> <%=family_doctor_name%></span>
+																		class="info"><%=familyDoctorName%></span>
+																</li>
+																<li><span
+																		class="label"><bean:message
+																		key="demographic.demographiceditdemographic.familyDoctorNo"/>:</span><span
+																		class="info"><%=familyDoctorOHIP%></span>
 																</li>
 																<% }
 																	//-- Licensed producer drop-down selection (display only)-->
@@ -4031,61 +4043,63 @@ while(field_itr.hasNext()){
 																vecRef.add(prop);
 															}
 
-														%> <select
-															name="r_doctor" <%=getDisabled("r_doctor")%>
-															onChange="changeRefDoc()"
-															style="width: 200px">
-														<option value=""></option>
-														<% for (int k = 0; k < vecRef.size(); k++)
-														{
-															prop = (Properties) vecRef.get(k);
 														%>
-														<option
-																value="<%=prop.getProperty("last_name")+","+prop.getProperty("first_name")%>"
-																<%=prop.getProperty("referral_no").equals(rdohip) ? "selected" : ""%>>
-															<%=Misc.getShortStr((prop.getProperty("last_name") + "," + prop.getProperty("first_name")), "", nStrShowLen)%>
-														</option>
-														<% }
-															rsdemo.close();
-														%>
-													</select>
-														<script type="text/javascript"
-																language="Javascript">
-															<!--
-															function changeRefDoc()
-															{
-//alert(document.updatedelete.r_doctor.value);
-																var refName = document.updatedelete.r_doctor.options[document.updatedelete.r_doctor.selectedIndex].value;
-																var refNo = "";
-																<% for(int k=0; k<vecRef.size(); k++) {
-  		prop= (Properties) vecRef.get(k);
-  	%>
-																if (refName == "<%=prop.getProperty("last_name")+","+prop.getProperty("first_name")%>")
+															<select
+																	name="referral_doctor_name" <%=getDisabled("referral_doctor_name")%>
+																	onChange="changeRefDoc()"
+																	style="width: 200px">
+																<option value=""></option>
+																<% for (int k = 0; k < vecRef.size(); k++)
 																{
-																	refNo = '<%=prop.getProperty("referral_no", "")%>';
+																	prop = (Properties) vecRef.get(k);
+																%>
+																<option
+																		value="<%=prop.getProperty("last_name")+","+prop.getProperty("first_name")%>"
+																		<%=prop.getProperty("referral_no").equals(referralDoctorOHIP) ? "selected" : ""%>>
+																	<%=Misc.getShortStr((prop.getProperty("last_name") + "," + prop.getProperty("first_name")), "", nStrShowLen)%>
+																</option>
+																<% }
+																	rsdemo.close();
+																%>
+															</select>
+															<script type="text/javascript"
+																	language="Javascript">
+																<!--
+																function changeRefDoc()
+																{
+																	var refName = document.updatedelete.referral_doctor_name.options[document.updatedelete.referral_doctor_name.selectedIndex].value;
+																	var refNo = "";
+																	<% for(int k=0; k<vecRef.size(); k++) {
+																		prop= (Properties) vecRef.get(k);
+																	%>
+																	if (refName == "<%=prop.getProperty("last_name")+","+prop.getProperty("first_name")%>")
+																	{
+																		refNo = '<%=prop.getProperty("referral_no", "")%>';
+																	}
+																	<% } %>
+																	document.updatedelete.referral_doctor_ohip.value = refNo;
 																}
-																<% } %>
-																document.updatedelete.r_doctor_ohip.value = refNo;
-															}
 
-															//-->
-														</script>
+																//-->
+															</script>
 														<% }
 														else
-														{%> <input type="text" name="r_doctor"
-																   size="30"
-																   maxlength="40" <%=getDisabled("r_doctor")%>
-																   value="<%=rd%>"> <% } %>
+														{%>
+														<input type="text" name="referral_doctor_name"
+															   size="30"
+															   maxlength="40" <%=getDisabled("referral_doctor_name")%>
+															   value="<%=referralDoctorName%>">
+														<% } %>
 													</td>
 													<td align="right" nowrap><b><bean:message
 															key="demographic.demographiceditdemographic.formRefDocNo"/>: </b>
 													</td>
 													<td align="left"><input type="text"
-																			name="r_doctor_ohip" <%=getDisabled("r_doctor_ohip")%>
+																			name="referral_doctor_ohip" <%=getDisabled("referral_doctor_ohip")%>
 																			size="20" maxlength="6"
-																			value="<%=rdohip%>">
+																			value="<%=referralDoctorOHIP%>">
 														<a
-																href="javascript:referralScriptAttach2('r_doctor_ohip','r_doctor')"><bean:message
+																href="javascript:referralScriptAttach2('referral_doctor_ohip','referral_doctor_name')"><bean:message
 																key="demographic.demographiceditdemographic.btnSearch"/>
 															#</a>
 													</td>
@@ -4093,43 +4107,69 @@ while(field_itr.hasNext()){
 												<!-- Family Doctor -->
 												<% if (oscarProps.isPropertyActive("demographic_family_doctor"))
 												{ %>
-												<tr>
-													<td align="right" nowrap><b><bean:message
-															key="demographic.demographiceditdemographic.familyDoctor"/>: </b>
-													</td>
-													<td align="left">
-														<%
-															Properties prop = null;
-															Vector vecRef = new Vector();
-															List<ProfessionalSpecialist> specialists = professionalSpecialistDao.findAll();
-															for (ProfessionalSpecialist specialist : specialists)
-															{
-																prop = new Properties();
-																//setProperties throws an exception if it's set to null
-																prop.setProperty("fd_referral_no", (specialist.getReferralNo() != null) ? specialist.getReferralNo() : "");
-																prop.setProperty("fd_last_name", (specialist.getLastName() != null) ? specialist.getLastName() : "");
-																prop.setProperty("fd_first_name", (specialist.getFirstName() != null) ? specialist.getFirstName() : "");
-																vecRef.add(prop);
-															}
+													<tr>
+														<%if (oscarProps.isPropertyActive("demographic_family_doctor_dropdown"))
+														{ %>
+															<td align="right" nowrap><b><bean:message
+																	key="demographic.demographiceditdemographic.familyDoctor"/>: </b>
+															</td>
+															<td align="left">
+																<%
+																	Properties prop = null;
+																	Vector vecRef = new Vector();
+																	List<ProfessionalSpecialist> specialists = professionalSpecialistDao.findAll();
+																	for (ProfessionalSpecialist specialist : specialists)
+																	{
+																		prop = new Properties();
+																		//setProperties throws an exception if it's set to null
+																		prop.setProperty("fd_referral_no", (specialist.getReferralNo() != null) ? specialist.getReferralNo() : "");
+																		prop.setProperty("fd_last_name", (specialist.getLastName() != null) ? specialist.getLastName() : "");
+																		prop.setProperty("fd_first_name", (specialist.getFirstName() != null) ? specialist.getFirstName() : "");
+																		vecRef.add(prop);
+																	}
 
-														%> <select name="family_doctor"
-																   onChange="document.updatedelete.family_doctor_name.value = this.options[this.selectedIndex].innerHTML.trim()"
-																   style="width: 200px">
-														<option value=""></option>
-														<% for (int k = 0; k < vecRef.size(); k++)
-														{
-															prop = (Properties) vecRef.get(k);
-														%>
-														<option value="<%=prop.getProperty("fd_referral_no","")%>"
-																<%=(prop.getProperty("fd_referral_no").equals(fd2ohip) && !fd2ohip.equals("")) ? "selected" : ""%>>
-															<%=Misc.getShortStr((prop.getProperty("fd_last_name") + ", " + prop.getProperty("fd_first_name")), "", nStrShowLen)%>
-														</option>
-														<% } %>
-													</select>
-														<input type="hidden"
-															   name="family_doctor_name" value=""/>
-													</td>
-												</tr>
+																%> <select name="family_doctor_name"
+																		onChange="document.updatedelete.family_doctor_name.value = this.options[this.selectedIndex].innerHTML.trim()"
+																		style="width: 200px">
+																<option value=""></option>
+																<% for (int k = 0; k < vecRef.size(); k++)
+																{
+																	prop = (Properties) vecRef.get(k);
+																%>
+																<option value="<%=prop.getProperty("fd_referral_no","")%>"
+																		<%=(prop.getProperty("fd_referral_no").equals(familyDoctorOHIP) && !familyDoctorOHIP.equals("")) ? "selected" : ""%>>
+																	<%=Misc.getShortStr((prop.getProperty("fd_last_name") + ", " + prop.getProperty("fd_first_name")), "", nStrShowLen)%>
+																</option>
+																<% } %>
+															</select>
+																<input type="hidden"
+																	name="family_doctor_name" value=""/>
+															</td>
+														<% } else { %>
+															<td align="right" nowrap>
+																<b>
+																	<bean:message key="demographic.demographiceditdemographic.familyDoctor"/>: 
+																</b>
+															</td>
+															<td align="left">
+																<input type="text" name="family_doctor_name"
+																   size="30"
+																   maxlength="40" <%=getDisabled("family_doctor_name")%>
+																   value="<%=familyDoctorName%>">
+															</td>
+															<td align="right" nowrap>
+																<b>
+																	<bean:message key="demographic.demographiceditdemographic.familyDoctorNo"/>: 
+																</b>
+															</td>
+															<td align="left">
+																<input type="text" name="family_doctor_ohip"
+																   size="30"
+																   maxlength="40" <%=getDisabled("family_doctor_ohip")%>
+																   value="<%=familyDoctorOHIP%>">
+															</td>
+														<%}%>
+													</tr>
 												<% } %>
 
 												<tr valign="top">
@@ -5020,26 +5060,44 @@ while(field_itr.hasNext()){
 		jQuery(document).ready(function()
 		{
 			// AJAX autocomplete referrer doctors
-			jQuery("input[name=r_doctor]").keypress(function()
+			jQuery("input[name=referral_doctor_name]").keypress(function()
 			{
-				jQuery("input[name=r_doctor]").autocomplete({
+				jQuery("input[name=referral_doctor_name]").autocomplete({
 					source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
 					select: function(event, ui)
 					{
-						jQuery("input[name=r_doctor_ohip]").val(ui.item.referral_no);
+						jQuery("input[name=referral_doctor_ohip]").val(ui.item.referral_no);
 					}
 				});
 			});
-			jQuery("input[name=r_doctor_ohip]").keypress(function()
+			jQuery("input[name=referral_doctor_ohip]").keypress(function()
 			{
-				jQuery("input[name=r_doctor_ohip]").autocomplete({
+				jQuery("input[name=referral_doctor_ohip]").autocomplete({
 					source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
 					select: function(event, ui)
 					{
-						jQuery("input[name=r_doctor]").val(ui.item.namedesc);
+						jQuery("input[name=referral_doctor_name]").val(ui.item.namedesc);
 					}
 				});
 			});
+
+			// AJAX autocomplete family doctors 
+			jQuery("input[name=family_doctor_name]").keypress(function(){
+				jQuery("input[name=family_doctor_name]").autocomplete({
+					source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=name",
+					select: function( event, ui){
+						jQuery("input[name=family_doctor_ohip]").val(ui.item.referral_no);
+					}
+				});
+			});
+			jQuery("input[name=family_doctor_ohip]").keypress(function(){
+				jQuery("input[name=family_doctor_ohip]").autocomplete({
+					source: "../billing/CA/BC/billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
+					select: function( event, ui){
+						jQuery("input[name=family_doctor_name]").val(ui.item.namedesc);
+					}
+				});
+			});	
 		});
 	</script>
 	<% } %>

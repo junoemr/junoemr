@@ -41,6 +41,8 @@
 <%@page import="org.oscarehr.common.model.ProviderSite"%>
 <%@page import="org.oscarehr.common.model.ProviderSitePK"%>
 <%@page import="org.oscarehr.common.dao.ProviderSiteDao"%>
+<%@page import="org.oscarehr.common.dao.ProviderMediSproutDao"%>
+<%@page import="org.oscarehr.common.model.ProviderExt"%>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <jsp:useBean id="apptMainBean" class="oscar.AppointmentMainBean" scope="session" />
 <%
@@ -49,7 +51,7 @@
 %>
 <html:html locale="true">
 <head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/global.js"></script>
 <title><bean:message key="admin.providerupdate.title" /></title>
 </head>
 <link rel="stylesheet" href="../web.css" />
@@ -64,7 +66,7 @@
 </table>
 
 <%
-  ProviderBillCenter billCenter = new ProviderBillCenter();
+	ProviderBillCenter billCenter = new ProviderBillCenter();
   billCenter.updateBillCenter(request.getParameter("provider_no"),request.getParameter("billcenter"));
   OscarProperties props = OscarProperties.getInstance();
 
@@ -189,6 +191,12 @@
                 	providerSiteDao.persist(ps);
                 }
             }
+        }
+        
+        if (OscarProperties.getInstance().getProperty("medisproutplugin", "false").equalsIgnoreCase("true")) {
+        	ProviderMediSproutDao providerMediSproutDao = (ProviderMediSproutDao) SpringUtils.getBean("providerMediSproutDao");
+    		
+        	ProviderExt providerExt = providerMediSproutDao.saveApiKey(request.getParameter("provider_no"), request.getParameter("mediSproutApiKey"));
         }
 %>
 <p>

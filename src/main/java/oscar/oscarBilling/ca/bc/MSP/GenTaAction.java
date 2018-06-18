@@ -54,8 +54,6 @@ public class GenTaAction  extends Action {
     public GenTaAction() {
     }
     
-    
-    
     public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response)
     throws IOException, ServletException, Exception{
         
@@ -74,6 +72,11 @@ public class GenTaAction  extends Action {
         int recFlag = 0;
         String raNo = "";
         String filename = (String) request.getAttribute("filename");// documentBean.getFilename();
+	    if(filename == null)
+	    {
+		    // only here for manual testing use. no oscar files use this
+		    filename = request.getParameter("filename");
+	    }
         
         String forwardPage = "S21";
         
@@ -108,13 +111,18 @@ public class GenTaAction  extends Action {
                         raNo = rsdemo.getString("s21_id");
                     }
                 }
-            }else if (header.equals("S01")){
+            }
+            else if(header.equals("S01"))
+            {
                 S01 s01 = new S01(nextline);
-                if(recFlag >0){
-                    int rowsAffected00 = dbhand.queryExecuteUpdate(save_tadt,s01.getParam(filename,raNo));
-                    mspReconcile.updateStat(MSPReconcile.SETTLED,s01.getBillingMasterNo());
+                if(recFlag > 0)
+                {
+                    int rowsAffected00 = dbhand.queryExecuteUpdate(save_tadt, s01.getParam(filename, raNo));
+                    mspReconcile.updateStat(MSPReconcile.SETTLED, s01.getBillingMasterNo());
                 }
-            }else if (header.equals("S02")  || header.equals("S00")  || header.equals("S03") ){
+            }
+            else if(header.equals("S02") || header.equals("S00") || header.equals("S03"))
+            {
                 S02 s02 = new S02(nextline);
                 if (recFlag >0) {
                     recFlag = recFlag +1;
@@ -158,40 +166,45 @@ public class GenTaAction  extends Action {
              *3.File with C12 records at the bottom.  
              *     one record with a status of N
              *
-             */    
-            }else if (header.equals("C12")){
+             */
+            }
+            else if(header.equals("C12"))
+            {
                 C12 c12 = new C12(nextline);
-                if (raNo.equals("")){
+                if(raNo.equals(""))
+                {
                     String[] param2 = {filename, "", ""};   // this way if a record is already saved it will create a new deleted record. 
-                    ResultSet rsdemo = dbhand.queryResults(search_tahd,param2 );
-                    while (rsdemo.next()){
+                    ResultSet rsdemo = dbhand.queryResults(search_tahd, param2);
+                    while(rsdemo.next())
+                    {
                         raNo = rsdemo.getString("s21_id");
                     }
-                    if (raNo.compareTo("") == 0 || raNo == null){
+                    if(raNo.compareTo("") == 0 || raNo == null)
+                    {
                         recFlag = 1;
                         String[] param = c12.getParams(filename);
-                        dbhand.queryExecuteUpdate(save_tahd,param);
-                        rsdemo = dbhand.queryResults(search_tahd,param2);
-                        while (rsdemo.next()){
+                        dbhand.queryExecuteUpdate(save_tahd, param);
+                        rsdemo = dbhand.queryResults(search_tahd, param2);
+                        while(rsdemo.next())
+                        {
                             raNo = rsdemo.getString("s21_id");
                         }
                     }
                 }  // This will be +1 if the records are at the bottom
-                if (recFlag > 0){
-                    dbhand.queryExecuteUpdate(save_tadt_C12,c12.getParams(filename,raNo));
-                    mspReconcile.updateStat(MSPReconcile.REJECTED,c12.getBillingMasterNo());
+                if(recFlag > 0)
+                {
+                    dbhand.queryExecuteUpdate(save_tadt_C12, c12.getParams(filename, raNo));
+                    mspReconcile.updateStat(MSPReconcile.REJECTED, c12.getBillingMasterNo());
                 }
                 forwardPage = "C12";
-           
-           }else if (header.equals("M01")){
-            
-           }
-            
+            }
+            else if(header.equals("M01"))
+            {
+
+            }
+
         }
-        
-        
-        
-        
+
         return mapping.findForward(forwardPage);
     }
 }

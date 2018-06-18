@@ -28,12 +28,14 @@
 	errorPage="errorpage.jsp"%>
 <%@ page import="org.oscarehr.common.dao.DemographicDao, org.oscarehr.common.model.Demographic,oscar.appt.AppointmentMailer, org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.event.EventService"%>
+<%@ page import="org.oscarehr.integration.medisprout.MediSprout" %>
+<%@ page import="org.oscarehr.common.model.MediSproutAppointment" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
 <html:html locale="true">
 <head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/global.js"></script>
 </head>
 <body>
 <center>
@@ -120,15 +122,16 @@
 
 		// turn off reminder of "remove patient from the waiting list"
 		oscar.OscarProperties pros = oscar.OscarProperties.getInstance();
+		
 		String strMWL = pros.getProperty("MANUALLY_CLEANUP_WL");
 		if (strMWL != null && strMWL.equalsIgnoreCase("yes")){
-			;
+	;
 		} else {
-			WaitingList wL = WaitingList.getInstance();
-			if (wL.getFound()) {
-				List<Map<String,Object>> resultList = oscarSuperManager.find("appointmentDao", "search_waitinglist", new Object [] {request.getParameter("demographic_no")});
-				if (resultList.size() > 0) {
-					Map wlEntry = resultList.get(0);
+	WaitingList wL = WaitingList.getInstance();
+	if (wL.getFound()) {
+		List<Map<String,Object>> resultList = oscarSuperManager.find("appointmentDao", "search_waitinglist", new Object [] {request.getParameter("demographic_no")});
+		if (resultList.size() > 0) {
+			Map wlEntry = resultList.get(0);
 %>
 <form name="updateWLFrm"
 	action="../oscarWaitingList/RemoveFromWaitingList.jsp"><input
@@ -144,8 +147,8 @@
 		}
 </script></form>
 <%
-				}
-			}
+	}
+	}
 		}
 %>
 <p>
@@ -157,6 +160,19 @@
 			OtherIdManager.saveIdAppointment(apptNo, "appt_mc_number", mcNumber);
 			EventService eventService = SpringUtils.getBean(EventService.class);
 			eventService.appointmentCreated(this,apptNo.toString(), param[0]); // called when adding an appointment
+
+			if (pros.getProperty("medisproutplugin", "false").equalsIgnoreCase("true")) {
+				if (pros.getProperty("medisproutappointmenttype").equalsIgnoreCase(param[9])) {
+					DemographicDao demoDao = (DemographicDao) SpringUtils.getBean("demographicDao");
+	                		Demographic demographic = demoDao.getDemographic(param[16]);
+					MediSprout medisprout = new MediSprout();
+					MediSproutAppointment mediSproutAppointment = medisprout.createAppointment(param[0], apptNo, param[1], param[2], demographic);
+					
+					if (mediSproutAppointment.getAttendeesUrl() == null) {
+						throw new Exception("Unable to book appointment with Livecare.");
+					}
+				}
+			}
 		}
 
 
