@@ -34,6 +34,7 @@ import org.oscarehr.common.hl7.copd.mapper.AppointmentMapper;
 import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
 import org.oscarehr.common.hl7.copd.mapper.DocumentMapper;
 import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
+import org.oscarehr.common.hl7.copd.mapper.NoteMapper;
 import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.io.GenericFile;
@@ -178,7 +179,22 @@ public class DemographicImportService
 				versionPatternMatcher.appendReplacement(sb, replacement);
 			}
 			versionPatternMatcher.appendTail(sb);
-			messageList.add(sb.toString());
+			message = sb.toString();
+
+			Pattern phonePattern = Pattern.compile("<XTN\\.7>(.*?)<\\/XTN\\.7>");
+			Matcher phonePatternMatcher = phonePattern.matcher(message);
+
+			sb = new StringBuffer(message.length());
+			while(phonePatternMatcher.find())
+			{
+				// strip non numeric characters from phone numbers
+				String replacement = "<XTN\\.7>" + phonePatternMatcher.group(1).replaceAll("[^\\d.]", "") + "</XTN\\.7>";
+				phonePatternMatcher.appendReplacement(sb, replacement);
+			}
+			phonePatternMatcher.appendTail(sb);
+			message = sb.toString();
+
+			messageList.add(message);
 		}
 		return messageList;
 	}
@@ -348,5 +364,10 @@ public class DemographicImportService
 			documentService.addDocumentModel(document, demographic.getDemographicId());
 			documentService.routeToProviderInbox(document.getDocumentNo(), provider.getProviderNo());
 		}
+	}
+
+	private void importProviderNotes(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
+	{
+		NoteMapper noteMapper = new NoteMapper(zpdZtrMessage, providerRep);
 	}
 }
