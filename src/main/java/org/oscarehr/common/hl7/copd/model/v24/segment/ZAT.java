@@ -27,10 +27,10 @@ import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Type;
+import ca.uhn.hl7v2.model.v24.datatype.DT;
 import ca.uhn.hl7v2.model.v24.datatype.RP;
 import ca.uhn.hl7v2.model.v24.datatype.SI;
 import ca.uhn.hl7v2.model.v24.datatype.ST;
-import ca.uhn.hl7v2.model.v24.datatype.TS;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
@@ -52,7 +52,7 @@ public class ZAT extends AbstractSegment
 		try
 		{
 			this.add(SI.class, true, 1, 4, new Object[]{message}, "Set ID - ZAT");
-			this.add(TS.class, false, 1, 8, new Object[]{message}, "Date");
+			this.add(DT.class, false, 1, 8, new Object[]{message}, "Date");
 			this.add(ST.class, true, 1, 255, new Object[]{message}, "Name");
 			this.add(RP.class, true, 1, 237, new Object[]{message}, "Attachment");
 		}
@@ -76,12 +76,12 @@ public class ZAT extends AbstractSegment
 		}
 	}
 
-	public TS getZat2_Date()
+	public DT getZat2_Date()
 	{
 		try
 		{
 			Type t = this.getField(2, 0);
-			return (TS) t;
+			return (DT) t;
 		}
 		catch(HL7Exception e)
 		{

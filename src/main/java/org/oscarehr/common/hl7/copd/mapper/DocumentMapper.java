@@ -26,7 +26,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.common.hl7.copd.model.v24.segment.ZAT;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
@@ -70,18 +69,35 @@ public class DocumentMapper
 
 	public Document getDocument(int rep)
 	{
-		ZAT zat = provider.getZAT(rep);
 		Document document = new Document();
 
-		Date observationDate = ConversionUtils.fromDateString(zat.getZat2_Date().getTimeOfAnEvent().getValue(), "yyyyMMdd");
-		document.setObservationdate(observationDate);
-
-		document.setDocdesc(zat.getZat3_Name().getValue());
-		document.setDocfilename(zat.getZat4_Attachment().getPointer().getValue());
-		document.setContenttype("application/" + StringUtils.lowerCase(zat.getZat4_Attachment().getSubtype().getValue()));
-		//TODO map to apllication/contenttype correctly
+		document.setObservationdate(getObservationDate(rep));
+		document.setDocdesc(getDescription(rep));
+		document.setDocfilename(getFileName(rep));
+		document.setContenttype(getContentType(rep));
 		document.setStatus(Document.STATUS_ACTIVE);
 
 		return document;
+	}
+
+	public Date getObservationDate(int rep)
+	{
+		return ConversionUtils.fromDateString(provider.getZAT(rep).getZat2_Date().getValue(), "yyyyMMdd");
+	}
+
+	public String getFileName(int rep)
+	{
+		return provider.getZAT(rep).getZat4_Attachment().getPointer().getValue();
+	}
+
+	public String getDescription(int rep)
+	{
+		return provider.getZAT(rep).getZat3_Name().getValue();
+	}
+
+	public String getContentType(int rep)
+	{
+		//TODO map to apllication/contenttype correctly
+		return "application/" + StringUtils.lowerCase(provider.getZAT(rep).getZat4_Attachment().getSubtype().getValue());
 	}
 }

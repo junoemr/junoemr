@@ -78,7 +78,7 @@ public class AppointmentMapper
 		appointment.setNotes(getNotes(rep));
 		appointment.setReason(getReason(rep));
 		appointment.setCreateDateTime(getCreationDate(rep));
-		appointment.setStatus("t"); //TODO how to determine status?
+		appointment.setStatus(getStatus(rep));
 
 		return appointment;
 	}
@@ -113,6 +113,19 @@ public class AppointmentMapper
 		String apptDurationUnit = sch.getSch10_AppointmentDurationUnits().getCe1_Identifier().getValue();
 
 		return calcEndTime(appointmentDate, apptDuration, apptDurationUnit);
+	}
+
+	public String getStatus(int rep) throws HL7Exception
+	{
+		//TODO how to determine status from import data?
+		Date apptDate = getAppointmentDate(rep);
+		if(apptDate.compareTo(new Date()) < 0)
+		{
+			// appointment date is before current date
+			return "B";
+		}
+		return "t";
+
 	}
 
 	private Date calcEndTime(Date startTime, Integer duration, String units)

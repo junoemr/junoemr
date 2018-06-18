@@ -62,6 +62,9 @@ public class DemographicMapper
 		demographic.setSex(getSex());
 		demographic.setDateOfBirth(getDOB());
 		demographic.setTitle(getTitle(0));
+		demographic.setHin(getPHN());
+		demographic.setHcType(getHCType());
+		demographic.setSin(getSIN());
 
 		demographic.setAddress(getStreetAddress(0));
 		demographic.setCity(getCity(0));
@@ -140,5 +143,60 @@ public class DemographicMapper
 		String phoneNumber = messagePID.getPhoneNumberHome(rep).getPhoneNumber().getValue();
 
 		return StringUtils.trimToNull(StringUtils.trimToEmpty(areaCode) + " " + StringUtils.trimToEmpty(phoneNumber));
+	}
+
+	public String getPHN() throws HL7Exception
+	{
+		Integer rep = getPatientIdentifierRepByCode("PHN");
+		if(rep != null)
+		{
+			return messagePID.getPid3_PatientIdentifierList(rep).getCx1_ID().getValue();
+		}
+		return null;
+	}
+
+	public String getHCType() throws HL7Exception
+	{
+		Integer rep = getPatientIdentifierRepByCode("PHN");
+		if(rep != null)
+		{
+			String assigningAuth = messagePID.getPid3_PatientIdentifierList(rep).getCx4_AssigningAuthority().getHd1_NamespaceID().getValue();
+			if(assigningAuth == null || assigningAuth.length() < 2)
+			{
+				return null;
+			}
+			switch(assigningAuth)
+			{
+				case "ACP": return "AB";
+				case "ACPS": return "AB";
+				case "AREG": return "AB";
+				case "ADA": return "AB";
+				default: return assigningAuth.substring(0,2);
+			}
+		}
+		return null;
+	}
+
+	public String getSIN() throws HL7Exception
+	{
+		Integer rep = getPatientIdentifierRepByCode("SIN");
+		if(rep != null)
+		{
+			return messagePID.getPid3_PatientIdentifierList(rep).getCx1_ID().getValue();
+		}
+		return null;
+	}
+
+	private Integer getPatientIdentifierRepByCode(String code) throws HL7Exception
+	{
+		for(int rep=0; rep < messagePID.getPid3_PatientIdentifierListReps(); rep++)
+		{
+			String typeCode = messagePID.getPid3_PatientIdentifierList(rep).getCx5_IdentifierTypeCode().getValue();
+			if(code.equalsIgnoreCase(typeCode))
+			{
+				return rep;
+			}
+		}
+		return null;
 	}
 }
