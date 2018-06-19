@@ -250,6 +250,24 @@ public class ZPD_ZTR_PROVIDER extends AbstractGroup
 		return this.getTyped("ZHR", ZHR.class);
 	}
 
+	public ZPD_ZTR_ALLERGY getALLERGY(int rep)
+	{
+		return this.getTyped("ALLERGY", rep, ZPD_ZTR_ALLERGY.class);
+	}
+
+	public int getALLERGYReps()
+	{
+		try
+		{
+			return this.getAll("ALLERGY").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
+
 	public ZPD_ZTR_LAB getLAB(int rep)
 	{
 		return this.getTyped("LAB", rep, ZPD_ZTR_LAB.class);

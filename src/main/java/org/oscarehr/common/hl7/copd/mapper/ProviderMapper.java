@@ -65,6 +65,9 @@ public class ProviderMapper
 		int medReps = message.getPATIENT().getPROVIDER(0).getMEDSReps();
 		logger.info("Found MEDS Reps:" + medReps);
 
+		int allergyReps = message.getPATIENT().getPROVIDER(0).getALLERGYReps();
+		logger.info("Found ALLERGY Reps:" + allergyReps);
+
 		try
 		{
 			Structure[] struct = message.getPATIENT().getPROVIDER(0).getAll("ZPR");

@@ -37,6 +37,7 @@ import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
 import org.oscarehr.common.hl7.copd.mapper.NoteMapper;
 import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
+import org.oscarehr.common.hl7.copd.parser.CoPDParser;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.demographic.dao.DemographicDao;
@@ -112,13 +113,15 @@ public class DemographicImportService
 
 		logger.info("Initialize HL7 parser");
 		HapiContext context = new DefaultHapiContext();
+		context.getParserConfiguration().setDefaultObx2Type("ST");
 //		context.setValidationContext(new NoValidation());
 
 		// this package string needs to match the custom model location in the oscar source code.
 		ModelClassFactory modelClassFactory = new CustomModelClassFactory(ZPD_ZTR.ROOT_PACKAGE);
 		context.setModelClassFactory(modelClassFactory);
 
-		Parser p = context.getXMLParser();
+		Parser p = new CoPDParser(context);
+//		Parser p = context.getXMLParser();
 //		p.getParserConfiguration().setAllowUnknownVersions(true);
 
 		logger.info("Parse Messages");
