@@ -153,12 +153,13 @@ public class AddEFormAction extends Action {
 			}
 		}
 
-		// filter incoming parameter values and remove unwanted (null/empty, etc.) pairs.
+		// filter incoming parameter values and remove unwanted (null, etc.) pairs.
+		// Need to keep empty values so things can be deleted from eforms 
 		for(Map.Entry<String, String[]> entry : unfilteredParamValueMap.entrySet())
 		{
 			String key = entry.getKey();
 			String value = String.join(",", entry.getValue());// most parameters will be single value.
-			if(value != null && !value.trim().isEmpty() && !value.equalsIgnoreCase("parentAjaxId"))
+			if(value != null && !value.equalsIgnoreCase("parentAjaxId"))
 			{
 				paramValueMap.put(key,value);
 			}
