@@ -710,6 +710,17 @@ public class EForm extends EFormBase {
 			int valueLoc = nextIndex(html, " value="+value, " value=\""+value, pointer);
 			if (valueLoc < 0 || valueLoc > endindex) return html;
 
+			//In the current select tag: find all occurrences of the string "selected" and replace with an empty string as we are changing what is selected anyway
+			int currentSelectedIndex = StringBuilderUtils.indexOfIgnoreCase(html, "selected", pointer);
+			while (currentSelectedIndex > 0)
+			{
+				html.replace(currentSelectedIndex, currentSelectedIndex + "selected".length(), "");
+				currentSelectedIndex = StringBuilderUtils.indexOfIgnoreCase(html, "selected", pointer);
+			}
+
+			//Update the value location as it may have changed due to removing selected strings
+			valueLoc = nextIndex(html, " value=" + value, " value=\"" + value, pointer);
+
 			pointer = nextSpot(html, valueLoc + 1);
 			html.insert(pointer, " selected");
 		} else if (type.equals("radio")) {
