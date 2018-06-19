@@ -54,7 +54,7 @@ import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.PreventionDao;
 import org.oscarehr.common.model.Admission;
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.CustomFilter;
 import org.oscarehr.common.model.Demographic;

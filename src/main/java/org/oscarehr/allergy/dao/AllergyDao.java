@@ -22,16 +22,18 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.allergy.dao;
 
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
+import org.oscarehr.common.dao.AbstractDao;
 
-public class AllergyDao extends AbstractDao<Allergy> {
+public class AllergyDao extends AbstractDao<Allergy>
+{
 
 	public AllergyDao() {
 		super(Allergy.class);

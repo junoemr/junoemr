@@ -22,7 +22,7 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.allergy.model;
 
 import java.util.Date;
 
@@ -39,10 +39,12 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.model.AbstractModel;
 
 @Entity
 @Table(name = "allergies")
-public class Allergy extends AbstractModel<Integer> {
+public class Allergy extends AbstractModel<Integer>
+{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

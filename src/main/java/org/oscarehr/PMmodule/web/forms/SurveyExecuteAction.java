@@ -54,7 +54,7 @@ import org.oscarehr.PMmodule.service.SurveyManager;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.model.Admission;
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.CaisiForm;
 import org.oscarehr.common.model.CaisiFormData;
 import org.oscarehr.common.model.CaisiFormDataTmpSave;

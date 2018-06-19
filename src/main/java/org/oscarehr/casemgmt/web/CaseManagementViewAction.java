@@ -91,7 +91,7 @@ import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.EncounterFormDao;
 import org.oscarehr.common.dao.GroupNoteDao;
 import org.oscarehr.common.model.Admission;
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.BillingONCHeader1;
 import org.oscarehr.common.model.CaseManagementTmpSave;
 import org.oscarehr.common.model.CustomFilter;

@@ -25,6 +25,7 @@
 --%>
 <%@page import="oscar.oscarRx.data.RxPatientData"%>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="org.oscarehr.allergy.model.Allergy" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
     String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -34,7 +35,7 @@
 <%
         oscar.oscarRx.pageUtil.RxSessionBean bean2 = (oscar.oscarRx.pageUtil.RxSessionBean)request.getSession().getAttribute("RxSessionBean");
 
-        org.oscarehr.common.model.Allergy[] allergies = RxPatientData.getPatient(LoggedInInfo.getLoggedInInfoFromSession(request), bean2.getDemographicNo()).getActiveAllergies();
+        Allergy[] allergies = RxPatientData.getPatient(LoggedInInfo.getLoggedInInfoFromSession(request), bean2.getDemographicNo()).getActiveAllergies();
         String alle = "";
         if (allergies.length > 0 ){ alle = "Red"; }
 
