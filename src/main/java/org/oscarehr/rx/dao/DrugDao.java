@@ -20,7 +20,7 @@
  * Centre for Research on Inner City Health, St. Michael's Hospital,
  * Toronto, Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.rx.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -31,10 +31,12 @@ import javax.persistence.Query;
 
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.NativeSql;
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.rx.model.Drug;
 import org.oscarehr.util.MiscUtils;
 
-public class DrugDao extends AbstractDao<Drug> {
+public class DrugDao extends AbstractDao<Drug>
+{
 
 	public DrugDao() {
 		super(Drug.class);

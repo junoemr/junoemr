@@ -96,7 +96,7 @@ import org.oscarehr.common.model.BillingONCHeader1;
 import org.oscarehr.common.model.CaseManagementTmpSave;
 import org.oscarehr.common.model.CustomFilter;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.model.Drug;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.GroupNoteLink;
 import org.oscarehr.common.model.Provider;

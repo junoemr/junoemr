@@ -280,8 +280,20 @@ public class DemographicImportService
 			//TODO how to determine MRP doctor when there are more than 1
 			mrpProvider = findOrCreateProviderRecord(providerMapper.getProvider(i), providerFirstName, providerLastName);
 
+			logger.info("Import Notes & History ...");
+			importProviderNotes(zpdZtrMessage, i, mrpProvider, demographic);
 			logger.info("Import Medications ...");
 			importMedicationData(zpdZtrMessage, i, mrpProvider, demographic);
+			logger.info("Import Pediatrics ...");
+			importPediatricsData(zpdZtrMessage, i, mrpProvider, demographic);
+			logger.info("Import Pregnancy ...");
+			importPregnancyData(zpdZtrMessage, i, mrpProvider, demographic);
+			logger.info("Import Allergies ...");
+			importAllergyData(zpdZtrMessage, i, mrpProvider, demographic);
+			logger.info("Import Immunizations ...");
+			importImmunizationData(zpdZtrMessage, i, mrpProvider, demographic);
+			logger.info("Import Labs ...");
+			importLabData(zpdZtrMessage, i, mrpProvider, demographic);
 			logger.info("Import Documents ...");
 			importDocumentData(zpdZtrMessage, i, mrpProvider, demographic);
 		}
@@ -354,6 +366,26 @@ public class DemographicImportService
 	private void importMedicationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
 	{
 		MedicationMapper medicationMapper = new MedicationMapper(zpdZtrMessage, providerRep);
+	}
+
+	private void importPediatricsData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
+	{
+	}
+	private void importPregnancyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
+	{
+	}
+
+	private void importAllergyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
+	{
+	}
+
+	private void importImmunizationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
+	{
+	}
+
+	private void importLabData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
+	{
+		//TODO
 	}
 
 	private void importDocumentData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)

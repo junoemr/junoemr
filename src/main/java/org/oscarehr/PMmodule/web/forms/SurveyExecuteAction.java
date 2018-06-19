@@ -61,7 +61,7 @@ import org.oscarehr.common.model.CaisiFormDataTmpSave;
 import org.oscarehr.common.model.CaisiFormInstance;
 import org.oscarehr.common.model.CaisiFormInstanceTmpSave;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.model.Drug;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.survey.service.SurveyModelManager;
 import org.oscarehr.survey.web.formbean.SurveyExecuteDataBean;

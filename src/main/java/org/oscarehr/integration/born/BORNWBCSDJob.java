@@ -46,7 +46,7 @@ import org.marc.shic.core.DocumentMetaData;
 import org.oscarehr.common.dao.ConsultationRequestDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicExtDao;
-import org.oscarehr.common.dao.DrugDao;
+import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.PreventionDao;

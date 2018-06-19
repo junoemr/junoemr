@@ -31,13 +31,13 @@ import java.util.Map;
 
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicExtDao;
-import org.oscarehr.common.dao.DrugDao;
+import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.FormLabReq07Dao;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.MeasurementMapDao;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.model.Drug;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.FormLabReq07;
 import org.oscarehr.common.model.Measurement;

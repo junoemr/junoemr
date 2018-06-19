@@ -22,7 +22,7 @@
  * Ontario, Canada
  */
 
-package org.oscarehr.common.model;
+package org.oscarehr.rx.model;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -40,6 +40,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.model.AbstractModel;
 
 @Entity
 @Table(name = "prescription")

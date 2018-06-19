@@ -21,7 +21,7 @@
  * Toronto, Ontario, Canada
  */
 
-package org.oscarehr.common.model;
+package org.oscarehr.rx.model;
 
 import java.io.Serializable;
 import java.util.Calendar;
@@ -45,6 +45,7 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import org.oscarehr.common.model.AbstractModel;
 import oscar.oscarRx.data.RxPrescriptionData;
 import oscar.oscarRx.util.RxUtil;
 import oscar.util.UtilDateUtilities;

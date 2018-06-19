@@ -21,18 +21,20 @@
  * Toronto, Ontario, Canada
  */
 
-package org.oscarehr.common.dao;
+package org.oscarehr.rx.dao;
 
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.model.Prescription;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.rx.model.Prescription;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class PrescriptionDao extends AbstractDao<Prescription> {
+public class PrescriptionDao extends AbstractDao<Prescription>
+{
 
 	public PrescriptionDao() {
 		super(Prescription.class);

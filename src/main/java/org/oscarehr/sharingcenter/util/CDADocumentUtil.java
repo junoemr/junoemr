@@ -76,7 +76,7 @@ import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Allergy;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.model.Drug;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.Prevention;
 import org.oscarehr.common.model.Provider;

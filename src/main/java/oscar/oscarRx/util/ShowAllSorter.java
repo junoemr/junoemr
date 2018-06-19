@@ -27,7 +27,7 @@ package oscar.oscarRx.util;
 
 import java.util.Comparator;
 
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.model.Drug;
 
 public class ShowAllSorter implements Comparator<Drug> {
 

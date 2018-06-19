@@ -28,13 +28,15 @@ import java.util.List;
 
 import org.oscarehr.common.merge.MergedDemographicSingleResultTemplate;
 import org.oscarehr.common.merge.MergedDemographicTemplate;
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.dao.DrugDao;
+import org.oscarehr.rx.model.Drug;
 import org.springframework.stereotype.Repository;
 
 import oscar.util.ConversionUtils;
 
 @Repository("drugDao")
-public class DrugMergedDemographicDao extends DrugDao {
+public class DrugMergedDemographicDao extends DrugDao
+{
 
 	@Override
 	public List<Drug> findByDemographicId(Integer demographicId) {
