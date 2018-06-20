@@ -29,7 +29,10 @@ import ca.uhn.hl7v2.parser.CustomModelClassFactory;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
 import org.apache.log4j.Logger;
+import org.oscarehr.allergy.model.Allergy;
+import org.oscarehr.allergy.service.AllergyService;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.hl7.copd.mapper.AllergyMapper;
 import org.oscarehr.common.hl7.copd.mapper.AppointmentMapper;
 import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
 import org.oscarehr.common.hl7.copd.mapper.DocumentMapper;
@@ -92,7 +95,10 @@ public class DemographicImportService
 	DocumentService documentService;
 
 	@Autowired
-	private OscarAppointmentDao appointmentDao;
+	OscarAppointmentDao appointmentDao;
+
+	@Autowired
+	AllergyService allergyService;
 
 	public void importDemographicDataCOPD(GenericFile genericFile) throws IOException, HL7Exception
 	{
@@ -375,8 +381,15 @@ public class DemographicImportService
 	{
 	}
 
-	private void importAllergyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
+	private void importAllergyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception
 	{
+		AllergyMapper allergyMapper = new AllergyMapper(zpdZtrMessage, providerRep);
+		for(Allergy allergy : allergyMapper.getAllergyList())
+		{
+			allergy.setDemographicNo(demographic.getDemographicId());
+			allergy.setProviderNo(String.valueOf(provider.getProviderNo()));
+			allergyService.addNewAllergy(allergy);
+		}
 	}
 
 	private void importImmunizationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)

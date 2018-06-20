@@ -24,7 +24,8 @@
 
 package org.oscarehr.allergy.model;
 
-import java.util.Date;
+import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -37,14 +38,21 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-
-import org.apache.commons.lang.StringUtils;
-import org.oscarehr.common.model.AbstractModel;
+import java.util.Date;
 
 @Entity
 @Table(name = "allergies")
 public class Allergy extends AbstractModel<Integer>
 {
+	public static final String SEVERITY_CODE_MILD="1";
+	public static final String SEVERITY_CODE_MODERATE="2";
+	public static final String SEVERITY_CODE_SEVERE="3";
+	public static final String SEVERITY_CODE_UNKNOWN="4";
+
+	public static final String ONSET_CODE_IMMEDIATE="1";
+	public static final String ONSET_CODE_GRADUAL="2";
+	public static final String ONSET_CODE_SLOW="3";
+	public static final String ONSET_CODE_UNKNOWN="4";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

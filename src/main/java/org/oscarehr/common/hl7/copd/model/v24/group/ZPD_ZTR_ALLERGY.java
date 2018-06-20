@@ -25,9 +25,9 @@ package org.oscarehr.common.hl7.copd.model.v24.group;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractGroup;
 import ca.uhn.hl7v2.model.Group;
-import ca.uhn.hl7v2.model.v24.segment.IAM;
 import ca.uhn.hl7v2.model.v24.segment.NTE;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
+import org.oscarehr.common.hl7.copd.model.v24.segment.IAM;
 import org.oscarehr.common.hl7.copd.model.v24.segment.ZAS;
 import org.oscarehr.common.hl7.copd.model.v24.segment.ZAU;
 
@@ -50,5 +50,25 @@ public class ZPD_ZTR_ALLERGY extends AbstractGroup
 		{
 			throw new RuntimeException(var3);
 		}
+	}
+
+	public IAM getIAM()
+	{
+		return this.getTyped("IAM", IAM.class);
+	}
+
+	public NTE getNTE()
+	{
+		return this.getTyped("NTE", NTE.class);
+	}
+
+	public ZAS getZAS()
+	{
+		return this.getTyped("ZAS", ZAS.class);
+	}
+
+	public ZAU getZAU()
+	{
+		return this.getTyped("ZAU", ZAU.class);
 	}
 }

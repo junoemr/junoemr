@@ -25,12 +25,6 @@
 
 package oscar.oscarRx.pageUtil;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -41,82 +35,96 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarRx.data.RxDrugData;
 import oscar.oscarRx.data.RxPatientData;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-public final class RxAddAllergyAction extends Action {
+
+public final class RxAddAllergyAction extends Action
+{
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		if (!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_allergy", "w", null)) {
-			throw new RuntimeException("missing required security object (_allergy)");
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+		String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(providerNo, "w", null, "_allergy");
+
+		int id = Integer.parseInt(request.getParameter("ID"));
+
+		String name = request.getParameter("name");
+		String type = request.getParameter("type");
+		String description = request.getParameter("reactionDescription");
+
+		String startDate = request.getParameter("startDate");
+		String ageOfOnset = request.getParameter("ageOfOnset");
+		String severityOfReaction = request.getParameter("severityOfReaction");
+		String onSetOfReaction = request.getParameter("onSetOfReaction");
+		String lifeStage = request.getParameter("lifeStage");
+
+		RxPatientData.Patient patient = (RxPatientData.Patient) request.getSession().getAttribute("Patient");
+
+		Allergy allergy = new Allergy();
+		allergy.setDrugrefId(String.valueOf(id));
+		allergy.setDescription(name);
+		allergy.setTypeCode(Integer.parseInt(type));
+		allergy.setReaction(description);
+
+		if(startDate.length() >= 8 && getCharOccur(startDate, '-') == 2)
+		{
+			allergy.setStartDate(oscar.oscarRx.util.RxUtil.StringToDate(startDate, "yyyy-MM-dd"));
 		}
-    	
-            int id = Integer.parseInt(request.getParameter("ID"));
+		else if(startDate.length() >= 6 && getCharOccur(startDate, '-') >= 1)
+		{
+			allergy.setStartDate(oscar.oscarRx.util.RxUtil.StringToDate(startDate, "yyyy-MM"));
+			allergy.setStartDateFormat(PartialDate.YEARMONTH);
+		}
+		else if(startDate.length() >= 4)
+		{
+			allergy.setStartDate(oscar.oscarRx.util.RxUtil.StringToDate(startDate, "yyyy"));
+			allergy.setStartDateFormat(PartialDate.YEARONLY);
+		}
+		allergy.setAgeOfOnset(ageOfOnset);
+		allergy.setSeverityOfReaction(severityOfReaction);
+		allergy.setOnsetOfReaction(onSetOfReaction);
+		allergy.setLifeStage(lifeStage);
 
-            String name = request.getParameter("name");
-            String type = request.getParameter("type");
-            String description = request.getParameter("reactionDescription");
+		if(type != null && type.equals("13"))
+		{
+			RxDrugData drugData = new RxDrugData();
+			try
+			{
+				RxDrugData.DrugMonograph f = drugData.getDrug("" + id);
+				allergy.setRegionalIdentifier(f.regionalIdentifier);
+			}
+			catch(Exception e)
+			{
+				MiscUtils.getLogger().error("Error", e);
+			}
+		}
 
-            String startDate = request.getParameter("startDate");
-            String ageOfOnset = request.getParameter("ageOfOnset");
-            String severityOfReaction = request.getParameter("severityOfReaction");
-            String onSetOfReaction = request.getParameter("onSetOfReaction");
-            String lifeStage = request.getParameter("lifeStage");
+		allergy.setDemographicNo(patient.getDemographicNo());
+		allergy.setArchived(false);
 
-            RxPatientData.Patient patient = (RxPatientData.Patient)request.getSession().getAttribute("Patient");
-            
-            Allergy allergy = new Allergy();
-            allergy.setDrugrefId(String.valueOf(id));
-            allergy.setDescription(name);
-            allergy.setTypeCode(Integer.parseInt(type));
-            allergy.setReaction(description);
+		Allergy allerg = patient.addAllergy(oscar.oscarRx.util.RxUtil.Today(), allergy);
 
-	    if (startDate.length()>=8 && getCharOccur(startDate,'-')==2) {
-	    	allergy.setStartDate(oscar.oscarRx.util.RxUtil.StringToDate(startDate, "yyyy-MM-dd"));
-	    } else if (startDate.length()>=6 && getCharOccur(startDate,'-')>=1) {
-	    	allergy.setStartDate(oscar.oscarRx.util.RxUtil.StringToDate(startDate, "yyyy-MM"));
-	    	allergy.setStartDateFormat(PartialDate.YEARMONTH);
-	    } else if (startDate.length()>=4) {
-	    	allergy.setStartDate(oscar.oscarRx.util.RxUtil.StringToDate(startDate, "yyyy"));
-	    	allergy.setStartDateFormat(PartialDate.YEARONLY);
-	    }
-            allergy.setAgeOfOnset(ageOfOnset);
-            allergy.setSeverityOfReaction(severityOfReaction);
-            allergy.setOnsetOfReaction(onSetOfReaction);
-            allergy.setLifeStage(lifeStage);
+		String ip = request.getRemoteAddr();
+		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, LogConst.CON_ALLERGY, "" + allerg.getAllergyId(), ip, "" + patient.getDemographicNo(), allergy.getAuditString());
 
-            if (type != null && type.equals("13")){
-                RxDrugData drugData = new RxDrugData();
-                try{
-                RxDrugData.DrugMonograph f = drugData.getDrug(""+id);
-                allergy.setRegionalIdentifier(f.regionalIdentifier);
-                }catch(Exception e){
-                    MiscUtils.getLogger().error("Error", e);
-                }
-            }
-
-            allergy.setDemographicNo(patient.getDemographicNo());
-            allergy.setArchived(false);
-
-            Allergy allerg = patient.addAllergy(oscar.oscarRx.util.RxUtil.Today(), allergy);
-
-            String ip = request.getRemoteAddr();
-            LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, LogConst.CON_ALLERGY, ""+allerg.getAllergyId() , ip,""+patient.getDemographicNo(), allergy.getAuditString());
-
-            return (mapping.findForward("success"));
-    }
-
-    private int getCharOccur(String str, char ch) {
-	int occurence=0, from=0;
-	while (str.indexOf(ch,from)>=0) {
-	    occurence++;
-	    from = str.indexOf(ch,from)+1;
+		return (mapping.findForward("success"));
 	}
-	return occurence;
-    }
+
+	private int getCharOccur(String str, char ch)
+	{
+		int occurence = 0, from = 0;
+		while(str.indexOf(ch, from) >= 0)
+		{
+			occurence++;
+			from = str.indexOf(ch, from) + 1;
+		}
+		return occurence;
+	}
 }

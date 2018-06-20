@@ -22,11 +22,37 @@
  */
 package org.oscarehr.allergy.service;
 
+import org.oscarehr.allergy.dao.AllergyDao;
+import org.oscarehr.allergy.model.Allergy;
+import org.oscarehr.common.dao.PartialDateDao;
+import org.oscarehr.common.model.PartialDate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+import java.util.Date;
+
+@Service("allergy.service.AllergyService")
 @Transactional
 public class AllergyService
 {
+	@Autowired
+	AllergyDao allergyDao;
+
+	@Autowired
+	PartialDateDao partialDateDao;
+
+	public Allergy addNewAllergy(Allergy allergy)
+	{
+		//set any missing default values
+		if(allergy.getEntryDate() == null)
+		{
+			allergy.setEntryDate(new Date());
+		}
+
+		allergyDao.persist(allergy);
+		partialDateDao.setPartialDate(PartialDate.ALLERGIES, allergy.getId(), PartialDate.ALLERGIES_STARTDATE, allergy.getStartDateFormat());
+
+		return allergy;
+	}
 }
