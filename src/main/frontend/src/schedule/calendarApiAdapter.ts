@@ -546,13 +546,15 @@ export class CalendarApiAdapter
 	}
 
 
-	public load_schedule(providerId: string)
+	public load_schedule(providerId: string, )
 	{
 		var deferred = this.$q.defer();
 
+		// TODO: fill up availabilities and relations, or figure out how to show that info without them
 		var schedule = {
 			uuid: providerId,
-			availabilities: [],
+			availabilities: [], // TODO: figure out if these have a Juno equivalent, I don't think
+								// TODO: they do.  They are things like holidays and vacation days
 			relations: []
 		};
 
@@ -610,14 +612,27 @@ export class CalendarApiAdapter
 		return deferred.promise;
 	}
 
-	public process_save_results(results)
+	// Read the implementation-specific results and return a calendar-compatible object.
+	public process_save_results(results, display_errors)
 	{
-		if(results.status == 'SUCCESS')
+		let status = (results || {}).status;
+
+		if(status == 'SUCCESS')
 		{
 			return true;
 		}
 
-		console.log(results);
+		let error_message = ((results || {}).error || {}).message;
+		let validation_error_array = ((results || {}).error || {}).validationErrors;
+
+		if(Array.isArray(validation_error_array))
+		{
+			display_errors.add_standard_error(error_message);
+			for(let error of validation_error_array)
+			{
+				display_errors.add_field_error(error.path, error.message);
+			}
+		}
 	}
 
 	/*

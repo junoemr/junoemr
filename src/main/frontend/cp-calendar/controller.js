@@ -78,7 +78,6 @@ function(
 	$scope.opening_dialog = false;
 	$scope.dialog = null;
 
-
 	$scope.calendar = function calendar()
 	{
 		return uiCalendarConfig.calendars[$scope.calendar_name];
@@ -271,6 +270,7 @@ function(
 
 	$scope.on_event_clicked = function on_event_clicked(calEvent, jsEvent, view)
 	{
+		console.log(jsEvent.target);
 		if($(jsEvent.target).is(".event-status.rotate"))
 		{
 			$scope.rotate_event_status(calEvent);
@@ -618,9 +618,11 @@ function(
 		$scope.opening_dialog = true;
 
 		var schedule_uuid = null;
+		var display_name = "";
 		if(util.exists(resource))
 		{
 			schedule_uuid = resource.id;
+			display_name = resource.display_name;
 		}
 		else if($scope.selected_schedule !== null)
 		{
@@ -632,17 +634,19 @@ function(
 		{
 			var default_event_status = schedule.new_event_status_uuid;
 
-			var data =
-				{
-					schedule: schedule,
-					default_event_status: default_event_status,
-					start_time: start,
-					end_time: end,
-					time_interval: $scope.time_interval_minutes(),
-					schedule_templates: $scope.schedule_templates,
-					availability_types: $scope.availability_types,
-					sites: $scope.sites
-				};
+			var modal_schedule = angular.copy(schedule);
+			modal_schedule.display_name = display_name;
+
+			var data = {
+				schedule: modal_schedule,
+				default_event_status: default_event_status,
+				start_time: start,
+				end_time: end,
+				time_interval: $scope.time_interval_minutes(),
+				schedule_templates: $scope.schedule_templates,
+				availability_types: $scope.availability_types,
+				sites: $scope.sites
+			};
 
 			$scope.dialog = $uibModal.open({
 				animation: false,
@@ -711,13 +715,16 @@ function(
 			animation: false,
 			backdrop: 'static',
 			controller: 'cpCalendar.EventController',
-			templateUrl: 'code/schedule/event.html',
+			templateUrl: 'src/schedule/event.jsp',
 			resolve: {
 				type: function() { return 'create_edit_event' },
 				label: function() { return 'Appointment' },
 				parent_scope: function() { return $scope },
 				data: function() { return data },
-				edit_mode: function() { return true }
+				edit_mode: function() { return true },
+				access_control: function() {return $scope.access_control},
+				key_binding: function() {return {bind_key_global: function(){}}},
+				focus: function() {return $scope.calendar_api_adapter.focus},
 			}
 		});
 

@@ -40,7 +40,7 @@
 		<div ng-show="is_initialized() && !is_working()">
 
 			<div class="schedule-header">
-				<h4 class="pull-left schedule-title">{{schedule.display_name}} schedule</h4>
+				<h4 class="pull-left schedule-title">{{schedule.display_name}}</h4>
 
 				<div class="pull-right" ng-show="edit_mode">
 					<span ng-repeat="tag in tag_names"
@@ -62,6 +62,7 @@
 			<ca-info-messages
 					ca-errors-object="display_messages"
 					ca-field-value-map="field_value_mapping"
+					ca-prepend-name-to-field-errors="false"
 			></ca-info-messages>
 
 			<div class="row form-horizontal stacked-labels">

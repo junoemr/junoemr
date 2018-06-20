@@ -43,7 +43,7 @@ public class ValidationExceptionMapper implements ExceptionMapper<ConstraintViol
 	@Override
 	public Response toResponse(ConstraintViolationException exception)
 	{
-		RestResponseValidationError responseError = new RestResponseValidationError("Constraint Violation Error");
+		RestResponseValidationError responseError = new RestResponseValidationError("Validation Error");
 		for(ConstraintViolation constraintViolation : exception.getConstraintViolations())
 		{
 			responseError.addError(constraintViolation.getPropertyPath().toString(), constraintViolation.getMessage());

@@ -180,8 +180,8 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Path("/add")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public SchedulingResponse addAppointment(NewAppointmentTo1 appointmentTo) {
-		SchedulingResponse response = new SchedulingResponse();
+	public RestResponse<AppointmentTo1> addAppointment(NewAppointmentTo1 appointmentTo) {
+		//SchedulingResponse response = new SchedulingResponse();
 
 		NewAppointmentConverter converter = new NewAppointmentConverter();
 
@@ -192,9 +192,9 @@ public class ScheduleService extends AbstractServiceImpl {
 		appointmentManager.addAppointment(getLoggedInInfo(), appt);
 
 		//response.setAppointment(new AppointmentConverter().getAsTransferObject(getLoggedInInfo(), appt));
-		AppointmentTo1 appointment = new AppointmentConverter().getAsTransferObject(getLoggedInInfo(), appt));
+		AppointmentTo1 appointment = new AppointmentConverter().getAsTransferObject(getLoggedInInfo(), appt);
 
-		return RestResponse.successResponse() <appointment>.;
+		return RestResponse.successResponse(appointment);
 	}
 
 	@POST

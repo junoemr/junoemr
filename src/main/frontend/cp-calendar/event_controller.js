@@ -168,13 +168,15 @@ angular.module('cpCalendar').controller(
 	{
 		var deferred = $q.defer();
 
-		if(util.exists($scope.patient.uuid))
+		console.log($scope.patient);
+		if(util.exists($scope.patient.uuid) && $scope.patient.uuid != 0)
 		{
 			parent_scope.autocomplete.init_autocomplete_values(
 				{ patient: $scope.patient.uuid },
 				$scope.autocomplete_values).then(
 				function(results)
 				{
+					console.log(results);
 					$scope.autocomplete_values = results.data;
 					$scope.patient.fill_data($scope.autocomplete_values.patient.data);
 					deferred.resolve();
@@ -340,16 +342,16 @@ angular.module('cpCalendar').controller(
 		$scope.display_messages.clear();
 
 		util.validate_date_string($scope.start_date,
-			$scope.display_messages, 'start_date', true);
+			$scope.display_messages, 'start_date', 'Start Time', true);
 
 		util.validate_time_string($scope.formatted_time($scope.start_time),
-			$scope.display_messages, 'start_time', true);
+			$scope.display_messages, 'start_time', 'Start Time', true);
 
 		util.validate_date_string($scope.end_date,
-			$scope.display_messages, 'end_date', true);
+			$scope.display_messages, 'end_date', 'End Time', true);
 
 		util.validate_time_string($scope.formatted_time($scope.end_time),
-			$scope.display_messages, 'end_time', true);
+			$scope.display_messages, 'end_time', 'End Time', true);
 
 		// if all the date/time fields look good, validate range
 		if(!$scope.display_messages.has_errors())
@@ -392,7 +394,7 @@ angular.module('cpCalendar').controller(
 		).then(
 				function(results)
 				{
-					if(parent_scope.calendar_api_adapter.process_save_results(results))
+					if(parent_scope.calendar_api_adapter.process_save_results(results, $scope.display_messages))
 					{
 						deferred.resolve(results);
 					}
@@ -403,7 +405,7 @@ angular.module('cpCalendar').controller(
 				},
 				function (results)
 				{
-					parent_scope.calendar_api_adapter.process_save_results(results);
+					parent_scope.calendar_api_adapter.process_save_results(results, $scope.display_messages);
 					deferred.reject();
 				});
 
@@ -546,7 +548,10 @@ angular.module('cpCalendar').controller(
 			$scope.working = false;
 		}, function()
 		{
-			$scope.display_messages.add_generic_fatal_error();
+			if(!$scope.display_messages.has_standard_errors())
+			{
+				$scope.display_messages.add_generic_fatal_error();
+			}
 			$scope.working = false;
 		});
 	};

@@ -106,36 +106,36 @@ angular.module('cpCalendar').factory(
 			};
 
 			service.validate_date_string = function validate_date_string(
-				date_string, display_errors, field, required)
+				date_string, display_errors, field, field_display_name, required)
 			{
 				if(Juno.Common.Util.exists(date_string))
 				{
 					var moment = service.get_date_moment(date_string);
 					if(!moment.isValid())
 					{
-						display_errors.add_field_error(field, 'is invalid');
+						display_errors.add_field_error(field, field_display_name + ' is invalid');
 					}
 				}
 				else if(required)
 				{
-					display_errors.add_field_error(field, 'is required');
+					display_errors.add_field_error(field, field_display_name + 'is required');
 				}
 			};
 
 			service.validate_time_string = function validate_time_string(
-				time_string, display_errors, field, required)
+				time_string, display_errors, field, field_display_name, required)
 			{
 				if (Juno.Common.Util.exists(time_string))
 				{
 					var moment = service.get_time_moment(time_string);
 					if (!moment.isValid())
 					{
-						display_errors.add_field_error(field, 'is invalid');
+						display_errors.add_field_error(field, field_display_name + 'is invalid');
 					}
 				}
 				else if (required)
 				{
-					display_errors.add_field_error(field, 'is required');
+					display_errors.add_field_error(field, field_display_name + 'is required');
 				}
 			};
 

@@ -26,9 +26,32 @@
 
  */
 angular.module("Common.Services").service("autoCompleteService", [
-	function()
+	"$q",
+	function(
+		$q
+	)
 	{
 		var service = {};
+
+		service.init_autocomplete_values = function init_autocomplete_values(patient){
+			var deferred = $q.defer();
+
+			console.log(patient);
+			deferred.resolve({data:{patient:{data:{
+				uuid: null,
+				full_name: null,
+				patient_photo_url: '/imageRenderingServlet?source=local_client&clientId=0',
+				data: {
+					birth_date: null,
+					health_number: null,
+					ontario_version_code: null,
+					phone_number_primary: null
+				}
+
+			}}}});
+
+			return deferred.promise;
+		};
 
 		return service;
 	}

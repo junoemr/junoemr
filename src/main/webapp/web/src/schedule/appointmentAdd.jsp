@@ -79,9 +79,15 @@
 
                     <div class="form-group col-sm-6">
                         <label class="control-label">Start Time</label>
+						<ca-field-time
+                                class="form-control form-control-details"
+                                ca-template="bare"
+                                ca-name="startTime"
+                                ca-model="appointmkentAddCtrl.appointment.startTime"
+                                placeholder="Start Time" />
                         <%--<div class="bootstrap-timepicker"> --%>
-                            <input ng-model="appointmentAddCtrl.appointment.startTime" id="startTime"
-                                placeholder="Start Time" class="form-control form-control-details"/>
+<%--                            <input ng-model="appointmentAddCtrl.appointment.startTime" id="startTime"
+                                placeholder="Start Time" class="form-control form-control-details"/>--%>
                         <%--</div>--%>
                     </div>
 
@@ -237,7 +243,7 @@
 </div>
 
 <script>
-    $(document).ready(function () {
+/*    $(document).ready(function () {
         $("#startTime").timepicker();
-    });
+    });*/
 </script>

@@ -167,6 +167,7 @@ angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 			x.urgency = controller.appointment.critical;
 			x.demographicNo = controller.appointment.demographicNo;
 
+			// TODO: make sure this works with the updated backend service (response changed)
 			console.log(JSON.stringify(x));
 			scheduleService.addAppointment(x).then(
 				function success(results)
