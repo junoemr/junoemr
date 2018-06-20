@@ -50,6 +50,8 @@ import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.service.ProviderService;
@@ -99,6 +101,9 @@ public class DemographicImportService
 
 	@Autowired
 	AllergyService allergyService;
+
+	@Autowired
+	EncounterNoteService encounterNoteService;
 
 	public void importDemographicDataCOPD(GenericFile genericFile) throws IOException, HL7Exception
 	{
@@ -384,11 +389,23 @@ public class DemographicImportService
 	private void importAllergyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception
 	{
 		AllergyMapper allergyMapper = new AllergyMapper(zpdZtrMessage, providerRep);
-		for(Allergy allergy : allergyMapper.getAllergyList())
+
+		for(int rep=0; rep < allergyMapper.getNumAllergies(); rep++)
 		{
+			Allergy allergy = allergyMapper.getAllergy(rep);
+			CaseManagementNote allergyNote = allergyMapper.getAllergyNote(rep);
+
 			allergy.setDemographicNo(demographic.getDemographicId());
 			allergy.setProviderNo(String.valueOf(provider.getProviderNo()));
 			allergyService.addNewAllergy(allergy);
+
+			if(allergyNote != null)
+			{
+				allergyNote.setProvider(provider);
+				allergyNote.setSigningProvider(provider);
+				allergyNote.setDemographic(demographic);
+				encounterNoteService.saveAllergyNote(allergyNote, allergy);
+			}
 		}
 	}
 

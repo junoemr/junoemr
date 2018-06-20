@@ -78,6 +78,7 @@
 	<context:component-scan base-package="org.oscarehr.schedule" />
 	<context:component-scan base-package="org.oscarehr.allergy" />
 	<context:component-scan base-package="org.oscarehr.rx" />
+	<context:component-scan base-package="org.oscarehr.encounterNote" />
 	<!-- Sharing Center -->
 	<context:component-scan base-package="org.oscarehr.sharingcenter.dao" />
 	<context:component-scan base-package="oscar.oscarLab.ca.all.upload.handlers"/>

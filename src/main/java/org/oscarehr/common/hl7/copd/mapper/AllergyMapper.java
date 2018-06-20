@@ -23,10 +23,12 @@
 package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
@@ -75,6 +77,7 @@ public class AllergyMapper
 		Allergy allergy = new Allergy();
 
 		allergy.setStartDate(getStartDate(rep));
+		allergy.setEntryDate(getStartDate(rep));
 		allergy.setDescription(getDescription(rep));
 		allergy.setArchived(false);
 		allergy.setTypeCode(0);// TODO can numeric code be mapped from string in IAM.2.1?
@@ -87,6 +90,30 @@ public class AllergyMapper
 		allergy.setAgeOfOnset(getAgeAtOnset(rep));
 
 		return allergy;
+	}
+
+	public List<CaseManagementNote> getAllergyNoteList() throws HL7Exception
+	{
+		int numAllergies = getNumAllergies();
+		List<CaseManagementNote> allergyNoteList = new ArrayList<>(numAllergies);
+		for(int i=0; i< numAllergies; i++)
+		{
+			allergyNoteList.add(getAllergyNote(i));
+		}
+		return allergyNoteList;
+	}
+
+	public CaseManagementNote getAllergyNote(int rep) throws HL7Exception
+	{
+		String nteNote = StringUtils.trimToNull(getComment(rep));
+		CaseManagementNote note = null;
+		if(nteNote != null)
+		{
+			note = new CaseManagementNote();
+			note.setNote(nteNote);
+			note.setObservationDate(getStartDate(rep));
+		}
+		return note;
 	}
 
 	public Date getStartDate(int rep)
@@ -129,5 +156,10 @@ public class AllergyMapper
 			return String.valueOf(Period.between(dob, startDate).getYears());
 		}
 		return "0";
+	}
+
+	public String getComment(int rep) throws HL7Exception
+	{
+		return provider.getALLERGY(rep).getNTE().getComment(0).getValue();
 	}
 }

@@ -1,0 +1,402 @@
+/**
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
+ * This software is published under the GPL GNU General Public License.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
+ */
+package org.oscarehr.encounterNote.model;
+
+import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.common.model.Appointment;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.provider.model.ProviderData;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import java.util.Date;
+import java.util.List;
+
+@Entity(name = "model.CaseManagementNote")
+@Table(name = "casemgmt_note")
+public class CaseManagementNote extends AbstractModel<Long>
+{
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "note_id")
+	private Long noteId;
+
+	@Column(name = "update_date")
+	@Temporal(TemporalType.DATE)
+	private Date updateDate;
+
+	@Column(name = "observation_date")
+	@Temporal(TemporalType.DATE)
+	private Date observationDate;
+
+	@Column(name = "note")
+	private String note;
+
+	@Column(name = "signed")
+	private Boolean signed = false;
+
+	@Column(name = "include_issue_innote")
+	private Boolean includeIssueInNote = false;
+
+	@Column(name = "encounter_type")
+	private String encounterType;
+
+	@Column(name = "billing_code")
+	private String billingCode;
+
+	@Column(name = "program_no")
+	private String programNo;
+
+	@Column(name = "reporter_caisi_role")
+	private String reporterCaisiRole;
+
+	@Column(name = "reporter_program_team")
+	private String reporterProgramTeam;
+
+	@Column(name = "history")
+	private String history;
+
+	@Column(name = "password")
+	private String password;
+
+	@Column(name = "locked")
+	private Boolean locked = false;
+
+	@Column(name = "archived")
+	private Boolean archived = false;
+
+	@Column(name = "position")
+	private Integer position;
+
+	@Column(name = "uuid")
+	private String uuid;
+
+	@Column(name = "hourOfEncounterTime")
+	private Integer hourOfEncounterTime;
+
+	@Column(name = "minuteOfEncounterTime")
+	private Integer minuteOfEncounterTime;
+
+	@Column(name = "hourOfEncTransportationTime")
+	private Integer hourOfEncTransportationTime;
+
+	@Column(name = "minuteOfEncTransportationTime")
+	private Integer minuteOfEncTransportationTime;
+
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "demographic_no")
+	private Demographic demographic;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "provider_no")
+	private ProviderData provider;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "signing_provider_no")
+	private ProviderData signingProvider;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "appointmentNo")
+	private Appointment appointment;
+
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "note")
+	private List<CaseManagementNoteExt> noteExtensionList;
+
+
+
+	public Long getId()
+	{
+		return noteId;
+	}
+
+	public Long getNoteId()
+	{
+		return noteId;
+	}
+
+	public void setNoteId(Long noteId)
+	{
+		this.noteId = noteId;
+	}
+
+	public Date getUpdateDate()
+	{
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate)
+	{
+		this.updateDate = updateDate;
+	}
+
+	public Date getObservationDate()
+	{
+		return observationDate;
+	}
+
+	public void setObservationDate(Date observationDate)
+	{
+		this.observationDate = observationDate;
+	}
+
+	public String getNote()
+	{
+		return note;
+	}
+
+	public void setNote(String note)
+	{
+		this.note = note;
+	}
+
+	public Boolean getSigned()
+	{
+		return signed;
+	}
+
+	public void setSigned(Boolean signed)
+	{
+		this.signed = signed;
+	}
+
+	public Boolean getIncludeIssueInNote()
+	{
+		return includeIssueInNote;
+	}
+
+	public void setIncludeIssueInNote(Boolean includeIssueInNote)
+	{
+		this.includeIssueInNote = includeIssueInNote;
+	}
+
+	public String getEncounterType()
+	{
+		return encounterType;
+	}
+
+	public void setEncounterType(String encounterType)
+	{
+		this.encounterType = encounterType;
+	}
+
+	public String getBillingCode()
+	{
+		return billingCode;
+	}
+
+	public void setBillingCode(String billingCode)
+	{
+		this.billingCode = billingCode;
+	}
+
+	public String getProgramNo()
+	{
+		return programNo;
+	}
+
+	public void setProgramNo(String programNo)
+	{
+		this.programNo = programNo;
+	}
+
+	public String getReporterCaisiRole()
+	{
+		return reporterCaisiRole;
+	}
+
+	public void setReporterCaisiRole(String reporterCaisiRole)
+	{
+		this.reporterCaisiRole = reporterCaisiRole;
+	}
+
+	public String getReporterProgramTeam()
+	{
+		return reporterProgramTeam;
+	}
+
+	public void setReporterProgramTeam(String reporterProgramTeam)
+	{
+		this.reporterProgramTeam = reporterProgramTeam;
+	}
+
+	public String getHistory()
+	{
+		return history;
+	}
+
+	public void setHistory(String history)
+	{
+		this.history = history;
+	}
+
+	public String getPassword()
+	{
+		return password;
+	}
+
+	public void setPassword(String password)
+	{
+		this.password = password;
+	}
+
+	public Boolean getLocked()
+	{
+		return locked;
+	}
+
+	public void setLocked(Boolean locked)
+	{
+		this.locked = locked;
+	}
+
+	public Boolean getArchived()
+	{
+		return archived;
+	}
+
+	public void setArchived(Boolean archived)
+	{
+		this.archived = archived;
+	}
+
+	public Integer getPosition()
+	{
+		return position;
+	}
+
+	public void setPosition(Integer position)
+	{
+		this.position = position;
+	}
+
+	public String getUuid()
+	{
+		return uuid;
+	}
+
+	public void setUuid(String uuid)
+	{
+		this.uuid = uuid;
+	}
+
+	public Integer getHourOfEncounterTime()
+	{
+		return hourOfEncounterTime;
+	}
+
+	public void setHourOfEncounterTime(Integer hourOfEncounterTime)
+	{
+		this.hourOfEncounterTime = hourOfEncounterTime;
+	}
+
+	public Integer getMinuteOfEncounterTime()
+	{
+		return minuteOfEncounterTime;
+	}
+
+	public void setMinuteOfEncounterTime(Integer minuteOfEncounterTime)
+	{
+		this.minuteOfEncounterTime = minuteOfEncounterTime;
+	}
+
+	public Integer getHourOfEncTransportationTime()
+	{
+		return hourOfEncTransportationTime;
+	}
+
+	public void setHourOfEncTransportationTime(Integer hourOfEncTransportationTime)
+	{
+		this.hourOfEncTransportationTime = hourOfEncTransportationTime;
+	}
+
+	public Integer getMinuteOfEncTransportationTime()
+	{
+		return minuteOfEncTransportationTime;
+	}
+
+	public void setMinuteOfEncTransportationTime(Integer minuteOfEncTransportationTime)
+	{
+		this.minuteOfEncTransportationTime = minuteOfEncTransportationTime;
+	}
+
+	public Demographic getDemographic()
+	{
+		return demographic;
+	}
+
+	public void setDemographic(Demographic demographic)
+	{
+		this.demographic = demographic;
+	}
+
+	public ProviderData getProvider()
+	{
+		return provider;
+	}
+
+	public void setProvider(ProviderData provider)
+	{
+		this.provider = provider;
+	}
+
+	public ProviderData getSigningProvider()
+	{
+		return signingProvider;
+	}
+
+	public void setSigningProvider(ProviderData signingProvider)
+	{
+		this.signingProvider = signingProvider;
+	}
+
+	public Appointment getAppointment()
+	{
+		return appointment;
+	}
+
+	public void setAppointment(Appointment appointment)
+	{
+		this.appointment = appointment;
+	}
+
+	public List<CaseManagementNoteExt> getNoteExtensionList()
+	{
+		return noteExtensionList;
+	}
+
+	public void setNoteExtensionList(List<CaseManagementNoteExt> noteExtensionList)
+	{
+		this.noteExtensionList = noteExtensionList;
+	}
+}
