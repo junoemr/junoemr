@@ -41,7 +41,6 @@ import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
 import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.parser.CoPDParser;
-import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
@@ -62,20 +61,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-public class DemographicImportService
+public class CoPDImportService
 {
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final String IMPORT_PROVIDER = "999900"; //TODO dont use this system forever
@@ -105,23 +95,8 @@ public class DemographicImportService
 	@Autowired
 	EncounterNoteService encounterNoteService;
 
-	public void importDemographicDataCOPD(GenericFile genericFile) throws IOException, HL7Exception
+	public void importFromHl7Message(String message) throws HL7Exception
 	{
-		logger.info("Read import file");
-		File file = genericFile.getFileObject();
-		InputStream is = new FileInputStream(file);
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
-		StringBuffer sb = new StringBuffer();
-		String line;
-		while((line = br.readLine()) != null)
-		{
-			sb.append(line);
-		}
-
-		logger.info("Split hl7 messages");
-		List<String> messageList = separateMessages(sb.toString());
-
 		logger.info("Initialize HL7 parser");
 		HapiContext context = new DefaultHapiContext();
 		context.getParserConfiguration().setDefaultObx2Type("ST");
@@ -132,21 +107,10 @@ public class DemographicImportService
 		context.setModelClassFactory(modelClassFactory);
 
 		Parser p = new CoPDParser(context);
-//		Parser p = context.getXMLParser();
-//		p.getParserConfiguration().setAllowUnknownVersions(true);
+		logger.info("Parse Message");
 
-		logger.info("Parse Messages");
-		int counter = 1;
-		for(String messageStr : messageList)
-		{
-			logger.info("Parse message " + counter + " of " + messageList.size());
-
-			messageStr = preProcessMessage(messageStr);
-			ZPD_ZTR zpdZtrMessage = (ZPD_ZTR) p.parse(messageStr);
-
-			importRecordData(zpdZtrMessage);
-			counter++;
-		}
+		ZPD_ZTR zpdZtrMessage = (ZPD_ZTR) p.parse(message);
+		importRecordData(zpdZtrMessage);
 	}
 
 	private void importRecordData(ZPD_ZTR zpdZtrMessage) throws HL7Exception
@@ -164,99 +128,6 @@ public class DemographicImportService
 
 		logger.info("Create Appointments ...");
 		importAppointmentData(zpdZtrMessage, demographic, provider);
-	}
-
-	/**
-	 * TODO  -- make this more efficient for larger files
-	 * @param messageStr the whole file as a string
-	 * @return - list of message strings
-	 */
-	private List<String> separateMessages(String messageStr)
-	{
-		List<String> messageList = new LinkedList<>();
-
-		Pattern messagePattern = Pattern.compile("<ZPD_ZTR\\.MESSAGE>(.*?)<\\/ZPD_ZTR\\.MESSAGE>", Pattern.DOTALL);
-		Matcher messagePatternMatcher = messagePattern.matcher(messageStr);
-		while(messagePatternMatcher.find())
-		{
-			// split messages by each MESSAGE group segment in the file
-			String message = "<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\">" + messagePatternMatcher.group(1) + "</ZPD_ZTR>";
-
-			Pattern versionPattern = Pattern.compile("<VID\\.1>(.*?)<\\/VID\\.1>");
-			Matcher versionPatternMatcher = versionPattern.matcher(message);
-
-			StringBuffer sb = new StringBuffer(message.length());
-			while(versionPatternMatcher.find())
-			{
-				// the hl7 version must be 2.4
-				String replacement = "<VID\\.1>2.4</VID\\.1>";
-				versionPatternMatcher.appendReplacement(sb, replacement);
-			}
-			versionPatternMatcher.appendTail(sb);
-			message = sb.toString();
-
-			Pattern phonePattern = Pattern.compile("<XTN\\.7>(.*?)<\\/XTN\\.7>");
-			Matcher phonePatternMatcher = phonePattern.matcher(message);
-
-			sb = new StringBuffer(message.length());
-			while(phonePatternMatcher.find())
-			{
-				// strip non numeric characters from phone numbers
-				String replacement = "<XTN\\.7>" + phonePatternMatcher.group(1).replaceAll("[^\\d.]", "") + "</XTN\\.7>";
-				phonePatternMatcher.appendReplacement(sb, replacement);
-			}
-			phonePatternMatcher.appendTail(sb);
-			message = sb.toString();
-
-			messageList.add(message);
-		}
-		return messageList;
-	}
-
-	/**
-	 * Preprocess the message string. This is for fixing hl7 messages that do not conform to the specs
-	 * @param message - the message string (xml)
-	 * @return - the fixed message string
-	 */
-	private String preProcessMessage(String message)
-	{
-		Pattern patt = Pattern.compile("<PRD>(.*?)<\\/PRD>", Pattern.DOTALL);
-		Matcher m = patt.matcher(message);
-		StringBuffer sb = new StringBuffer(message.length());
-		while(m.find())
-		{
-			// for each PRD segment in the message, fix the PRD numbers
-			String replacement = "<PRD>" + fixPRDSegmentNumbers(m.group(1)) + "</PRD>";
-			m.appendReplacement(sb, replacement);
-		}
-		m.appendTail(sb);
-		return sb.toString();
-	}
-
-	/**
-	 * PRD.1 is required, but the spec has an off by one error, putting it at PRD.2, and all subsequent segments are off by 1.
-	 * If this is the case, find them all and decrement them by 1 to match the regular hl7 standard
-	 */
-	private String fixPRDSegmentNumbers(String xmlPRD)
-	{
-		if(!xmlPRD.contains("<PRD.1>"))
-		{
-			Pattern patt = Pattern.compile("<(\\/?PRD)\\.([0-9]+)>");
-			Matcher m = patt.matcher(xmlPRD);
-			StringBuffer sb = new StringBuffer(xmlPRD.length());
-			while(m.find())
-			{
-				String segmentNumStr = m.group(2);
-				Integer segmentNumber = Integer.parseInt(segmentNumStr);
-				String replacement = "<" + m.group(1) + "." + String.valueOf(segmentNumber - 1) + ">";
-
-				m.appendReplacement(sb, replacement);
-				logger.info("Replace:" + m.group(0) + " -> " + replacement);
-			}
-			m.appendTail(sb);
-			xmlPRD = sb.toString();
-		}
-		return xmlPRD;
 	}
 
 	/**
