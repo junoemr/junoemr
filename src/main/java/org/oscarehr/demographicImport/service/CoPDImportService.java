@@ -31,17 +31,20 @@ import ca.uhn.hl7v2.parser.Parser;
 import org.apache.log4j.Logger;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.allergy.service.AllergyService;
+import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.hl7.copd.mapper.AllergyMapper;
 import org.oscarehr.common.hl7.copd.mapper.AppointmentMapper;
 import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
 import org.oscarehr.common.hl7.copd.mapper.DocumentMapper;
+import org.oscarehr.common.hl7.copd.mapper.DxMapper;
 import org.oscarehr.common.hl7.copd.mapper.EncounterNoteMapper;
 import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
 import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.parser.CoPDParser;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
@@ -94,6 +97,9 @@ public class CoPDImportService
 
 	@Autowired
 	EncounterNoteService encounterNoteService;
+
+	@Autowired
+	DxresearchDAO dxresearchDAO;
 
 	public void importFromHl7Message(String message) throws HL7Exception
 	{
@@ -164,6 +170,8 @@ public class CoPDImportService
 
 			logger.info("Import Notes & History ...");
 			importProviderNotes(zpdZtrMessage, i, mrpProvider, demographic);
+			logger.info("Import diagnosed health problems ...");
+			importDxData(zpdZtrMessage, i, mrpProvider, demographic);
 			logger.info("Import Medications ...");
 			importMedicationData(zpdZtrMessage, i, mrpProvider, demographic);
 			logger.info("Import Pediatrics ...");
@@ -248,6 +256,22 @@ public class CoPDImportService
 	private void importMedicationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
 	{
 		MedicationMapper medicationMapper = new MedicationMapper(zpdZtrMessage, providerRep);
+	}
+
+	private void importDxData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception
+	{
+		DxMapper dxMapper = new DxMapper(zpdZtrMessage, providerRep);
+
+		for(Dxresearch dx : dxMapper.getDxResearchList())
+		{
+			dx.setDemographicNo(demographic.getDemographicId());
+			dx.setProviderNo(String.valueOf(provider.getProviderNo()));
+
+			if (!dxresearchDAO.entryExists(dx.getDemographicNo(), dx.getCodingSystem(), dx.getDxresearchCode()))
+			{
+				this.dxresearchDAO.save(dx);
+			}
+		}
 	}
 
 	private void importPediatricsData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)

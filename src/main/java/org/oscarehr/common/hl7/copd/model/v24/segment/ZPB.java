@@ -55,7 +55,7 @@ public class ZPB extends AbstractSegment
 			this.add(SI.class, true, 1, 4, new Object[]{message}, "Set ID - ZPB");
 			this.add(TS.class, true, 1, 8, new Object[]{message}, "Diagnosis Date");
 			this.add(ST.class, false, 1, 1600, new Object[]{message}, "Diagnosis Description");
-			this.add(CE.class, false, 1, 250, new Object[]{message}, "Diagnosis Description");
+			this.add(CE.class, false, 1, 250, new Object[]{message}, "Diagnosis Code");
 			this.add(CE.class, false, 1, 82, new Object[]{message}, "Symptoms Present");
 			this.add(TS.class, true, 1, 8, new Object[]{message}, "Onset Date");
 			this.add(TS.class, false, 1, 8, new Object[]{message}, "Date Resolved");
@@ -69,6 +69,139 @@ public class ZPB extends AbstractSegment
 			throw new RuntimeException(e);
 		}
 	}
+
+	public SI getZpb1_setId() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(1, 0);
+			return (SI) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public TS getZpb2_diagnosisDate() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(2, 0);
+			return (TS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZpb3_diagnosisDescription() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(3, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public CE getZpb4_diagnosisCode() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(4, 0);
+			return (CE) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public CE getZpb5_symptomsPresent() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(5, 0);
+			return (CE) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public TS getZpb6_onsetDate() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(6, 0);
+			return (TS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public TS getZpb7_dateResolved() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(7, 0);
+			return (TS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZpb8_problemStatus() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(8, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public NM getZpb9_outcomeCode() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(9, 0);
+			return (NM) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZpb10_noteText() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(10, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+
+
 
 	/**
 	 * This method must be overridden. The easiest way is just to return null.

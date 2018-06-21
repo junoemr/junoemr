@@ -23,6 +23,7 @@
 package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
@@ -71,7 +72,10 @@ public class EncounterNoteMapper
 	{
 		CaseManagementNote note = new CaseManagementNote();
 
-		note.setNote(getEncounterNoteComment(rep));
+		String noteText = StringUtils.trimToEmpty(StringUtils.trimToEmpty(getEncounterNoteReason(rep)) +
+				"\n\n" + StringUtils.trimToEmpty(getEncounterNoteComment(rep)));
+
+		note.setNote(noteText);
 		note.setObservationDate(getEncounterNoteContactDate(rep));
 		note.setUpdateDate(getEncounterNoteContactDate(rep));
 
