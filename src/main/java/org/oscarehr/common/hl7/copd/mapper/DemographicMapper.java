@@ -33,6 +33,7 @@ import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -71,8 +72,8 @@ public class DemographicMapper
 		demographic.setProvince(getProvinceCode(0));
 		demographic.setPostal(getPostalCode(0));
 
-		demographic.setPhone(getPhone(0));
-		demographic.setPhone2(getPhone(1));
+		demographic.setPhone(getHomePhone());
+		demographic.setPhone2(getBuisnessPhone());
 
 		return demographic;
 	}
@@ -84,10 +85,20 @@ public class DemographicMapper
 		return demographicCust;
 	}
 
-	public List<DemographicExt> getDemographicExtensions()
+	public List<DemographicExt> getDemographicExtensions() throws HL7Exception
 	{
 		List<DemographicExt> extensionList = new LinkedList<>();
-//		DemographicExt demographic = new DemographicExt();
+
+		// attach cell number
+		String cellPhone = getPersonalPhone();
+		if(cellPhone != null)
+		{
+			DemographicExt extension = new DemographicExt();
+			extension.setDateCreated(new Date());
+			extension.setKey("demo_cell");
+			extension.setValue(cellPhone);
+			extensionList.add(extension);
+		}
 
 		return extensionList;
 	}
@@ -137,10 +148,39 @@ public class DemographicMapper
 	{
 		return messagePID.getPatientAddress(rep).getZipOrPostalCode().getValue();
 	}
+
+	public String getHomePhone() throws HL7Exception
+	{
+		Integer rep = getPhoneRepByUsageType("RESD");
+		if(rep != null)
+		{
+			return getPhone(rep);
+		}
+		return null;
+	}
+	public String getBuisnessPhone() throws HL7Exception
+	{
+		Integer rep = getPhoneRepByUsageType("BUSN");
+		if(rep != null)
+		{
+			return getPhone(rep);
+		}
+		return null;
+	}
+	public String getPersonalPhone() throws HL7Exception
+	{
+		Integer rep = getPhoneRepByUsageType("PERS");
+		if(rep != null)
+		{
+			return getPhone(rep);
+		}
+		return null;
+	}
+
 	public String getPhone(int rep) throws HL7Exception
 	{
-		String areaCode = messagePID.getPhoneNumberHome(rep).getAreaCityCode().getValue();
-		String phoneNumber = messagePID.getPhoneNumberHome(rep).getPhoneNumber().getValue();
+		String areaCode = messagePID.getPid13_PhoneNumberHome(rep).getAreaCityCode().getValue();
+		String phoneNumber = messagePID.getPid13_PhoneNumberHome(rep).getPhoneNumber().getValue();
 
 		return StringUtils.trimToNull(StringUtils.trimToEmpty(areaCode) + " " + StringUtils.trimToEmpty(phoneNumber));
 	}
@@ -193,6 +233,21 @@ public class DemographicMapper
 		{
 			String typeCode = messagePID.getPid3_PatientIdentifierList(rep).getCx5_IdentifierTypeCode().getValue();
 			if(code.equalsIgnoreCase(typeCode))
+			{
+				return rep;
+			}
+		}
+		return null;
+	}
+
+	private Integer getPhoneRepByUsageType(String phoneType) throws HL7Exception
+	{
+		for(int rep=0; rep<messagePID.getPid13_PhoneNumberHomeReps(); rep++)
+		{
+			String telecomUsage = messagePID.getPid13_PhoneNumberHome(rep).getXtn2_TelecommunicationUseCode().getValue();
+			String telecomType = messagePID.getPid13_PhoneNumberHome(rep).getXtn3_TelecommunicationEquipmentType().getValue();
+
+			if("PH".equalsIgnoreCase(telecomType) && phoneType.equalsIgnoreCase(telecomUsage))
 			{
 				return rep;
 			}

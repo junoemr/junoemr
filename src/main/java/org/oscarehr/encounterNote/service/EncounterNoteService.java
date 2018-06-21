@@ -30,11 +30,13 @@ import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteLinkDao;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
+import org.oscarehr.encounterNote.model.Issue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -55,7 +57,19 @@ public class EncounterNoteService
 
 	public CaseManagementNote saveChartNote(CaseManagementNote note)
 	{
-		return saveNote(note);
+		return saveChartNote(note, null);
+	}
+	public CaseManagementNote saveChartNote(CaseManagementNote note, List<Issue> issueList)
+	{
+		note.setIncludeIssueInNote(true);
+		note = saveNote(note);
+
+		if(issueList != null && !issueList.isEmpty())
+		{
+			//TODO merge/save issues as CaseManagementIssue models
+		}
+
+		return note;
 	}
 
 	public CaseManagementNote saveAllergyNote(CaseManagementNote note, Allergy allergy)
@@ -76,8 +90,10 @@ public class EncounterNoteService
 
 	private CaseManagementNote saveNote(CaseManagementNote note)
 	{
-		note.setUpdateDate(new Date());
-
+		if(note.getUpdateDate() == null)
+		{
+			note.setUpdateDate(new Date());
+		}
 		if(note.getObservationDate() == null)
 		{
 			note.setObservationDate(new Date());

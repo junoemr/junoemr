@@ -58,7 +58,7 @@ public class AllergyMapper
 
 	public int getNumAllergies()
 	{
-		return provider.getZATReps();
+		return provider.getALLERGYReps();
 	}
 
 	public List<Allergy> getAllergyList() throws HL7Exception
@@ -112,6 +112,7 @@ public class AllergyMapper
 			note = new CaseManagementNote();
 			note.setNote(nteNote);
 			note.setObservationDate(getStartDate(rep));
+			note.setUpdateDate(getStartDate(rep));
 		}
 		return note;
 	}

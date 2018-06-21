@@ -36,8 +36,8 @@ import org.oscarehr.common.hl7.copd.mapper.AllergyMapper;
 import org.oscarehr.common.hl7.copd.mapper.AppointmentMapper;
 import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
 import org.oscarehr.common.hl7.copd.mapper.DocumentMapper;
+import org.oscarehr.common.hl7.copd.mapper.EncounterNoteMapper;
 import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
-import org.oscarehr.common.hl7.copd.mapper.NoteMapper;
 import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.parser.CoPDParser;
@@ -431,8 +431,16 @@ public class DemographicImportService
 		}
 	}
 
-	private void importProviderNotes(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
+	private void importProviderNotes(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception
 	{
-		NoteMapper noteMapper = new NoteMapper(zpdZtrMessage, providerRep);
+		EncounterNoteMapper encounterNoteMapper = new EncounterNoteMapper(zpdZtrMessage, providerRep);
+		for(CaseManagementNote encounterNote: encounterNoteMapper.getEncounterNoteList())
+		{
+			encounterNote.setProvider(provider);
+			encounterNote.setSigned(true);
+			encounterNote.setSigningProvider(provider);
+			encounterNote.setDemographic(demographic);
+			encounterNoteService.saveChartNote(encounterNote);
+		}
 	}
 }

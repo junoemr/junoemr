@@ -65,6 +65,98 @@ public class ZPV extends AbstractSegment
 		}
 	}
 
+	public SI getZpv1_setId() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(1, 0);
+			return (SI) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public TS getZpv2_contactDate() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(2, 0);
+			return (TS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZpv3_contactReason() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(3, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZpv4_comment() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(4, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZpv5_commentSignature() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(5, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public TS getZpv6_scheduledContactDateDue() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(6, 0);
+			return (TS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZpv7_reasonForNextAppointment() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(7, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+
 	/**
 	 * This method must be overridden. The easiest way is just to return null.
 	 */
