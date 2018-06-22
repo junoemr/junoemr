@@ -35,9 +35,6 @@ import oscar.util.ConversionUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.joining;
 
 public class HistoryNoteMapper
 {
@@ -68,6 +65,11 @@ public class HistoryNoteMapper
 		return provider.getZPRReps();
 	}
 
+	public int getNumFamilyHistoryNotes()
+	{
+		return provider.getZHFReps();
+	}
+
 	public List<CaseManagementNote> getSocialHistoryNoteList() throws HL7Exception
 	{
 		int numNotes = getNumSocialHistoryNotes();
@@ -75,6 +77,21 @@ public class HistoryNoteMapper
 		for(int i=0; i< numNotes; i++)
 		{
 			CaseManagementNote note = getSocialHistoryNote(i);
+			if(note != null)
+			{
+				noteList.add(note);
+			}
+		}
+		return noteList;
+	}
+
+	public List<CaseManagementNote> getFamilyHistoryNoteList() throws HL7Exception
+	{
+		int numNotes = getNumFamilyHistoryNotes();
+		List<CaseManagementNote> noteList = new ArrayList<>(numNotes);
+		for(int i=0; i< numNotes; i++)
+		{
+			CaseManagementNote note = getFamilyHistoryNote(i);
 			if(note != null)
 			{
 				noteList.add(note);
@@ -118,12 +135,65 @@ public class HistoryNoteMapper
 			note.setUpdateDate(date);
 
 			// join values but ignore null
-			String noteText = Stream.of(socialAlert, journalNotes, occupation, employer, education, leisureActivities)
-					.filter(s -> s != null && !s.isEmpty())
-					.collect(joining("\n"));
+			String noteText = "";
+			if(socialAlert != null)
+			{
+				noteText += socialAlert + "\n";
+			}
+			if(journalNotes != null)
+			{
+				noteText += journalNotes + "\n";
+			}
+			if(occupation != null)
+			{
+				noteText += occupation + "\n";
+			}
+			if(employer != null)
+			{
+				noteText += employer + "\n";
+			}
+			if(education != null)
+			{
+				noteText += education + "\n";
+			}
+			if(leisureActivities != null)
+			{
+				noteText += leisureActivities + "\n";
+			}
 
-			note.setNote(noteText);
+			note.setNote(StringUtils.trim(noteText));
 		}
+		return note;
+	}
+
+	public CaseManagementNote getFamilyHistoryNote(int rep) throws HL7Exception
+	{
+		CaseManagementNote note = new CaseManagementNote();
+
+		String relation = getFamHistRelationshipToPatient(rep);
+		String diagnosisDescription  = getFamHistDiagnosisDescrption(rep);
+		String causeOfDeath = getFamHistCauseOfDeath(rep);
+		String comments = getFamHistComments(rep);
+
+		String noteText = relation + ": ";
+		if(diagnosisDescription != null)
+		{
+			noteText += diagnosisDescription + "\n";
+		}
+		if(causeOfDeath != null)
+		{
+			noteText += "Cause of death: " + causeOfDeath + "\n";
+		}
+		if(comments != null)
+		{
+			noteText += comments + "\n";
+		}
+		note.setNote(StringUtils.trim(noteText));
+
+		Date diagnosisDate = getFamHistDiagnosisDate(rep);
+		note.setObservationDate(diagnosisDate);
+		note.setUpdateDate(diagnosisDate);
+
 		return note;
 	}
 
@@ -210,5 +280,35 @@ public class HistoryNoteMapper
 	public String getSocHistLeisureActivities(int rep) throws HL7Exception
 	{
 		return StringUtils.trimToNull(provider.getZSH(rep).getZsh8_leisureActivities().getValue());
+	}
+
+	public Date getFamHistDiagnosisDate(int rep) throws HL7Exception
+	{
+		String dateStr = provider.getZHF(rep).getZhf2_diagnosisDate().getTs1_TimeOfAnEvent().getValue();
+		if(dateStr==null || dateStr.trim().isEmpty() || dateStr.equals("00000000"))
+		{
+			return null;
+		}
+		return ConversionUtils.fromDateString(dateStr, "yyyyMMdd");
+	}
+
+	public String getFamHistDiagnosisDescrption(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getZHF(rep).getZhf3_diagnosisDescription().getValue());
+	}
+
+	public String getFamHistRelationshipToPatient(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getZHF(rep).getZhf4_relationshipToPatient().getValue());
+	}
+
+	public String getFamHistCauseOfDeath(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getZHF(rep).getZhf7_causeOfDeath().getValue());
+	}
+
+	public String getFamHistComments(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getZHF(rep).getZhf8_comments().getValue());
 	}
 }

@@ -354,6 +354,12 @@ public class CoPDImportService
 			socHistNote.setDemographic(demographic);
 			encounterNoteService.saveSocialHistoryNote(socHistNote);
 		}
-
+		for(CaseManagementNote famHistNote : historyNoteMapper.getFamilyHistoryNoteList())
+		{
+			famHistNote.setProvider(provider);
+			famHistNote.setSigningProvider(provider);
+			famHistNote.setDemographic(demographic);
+			encounterNoteService.saveFamilyHistoryNote(famHistNote);
+		}
 	}
 }

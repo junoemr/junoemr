@@ -313,7 +313,7 @@ public class ZPD_ZTR_PROVIDER extends AbstractGroup
 	{
 		try
 		{
-			return this.getAll("ZHR").length;
+			return this.getAll("ZHF").length;
 		}
 		catch(HL7Exception var4)
 		{

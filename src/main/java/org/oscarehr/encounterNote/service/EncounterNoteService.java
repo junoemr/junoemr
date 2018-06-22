@@ -123,6 +123,12 @@ public class EncounterNoteService
 		CaseManagementIssue caseManagementIssue = caseManagementIssueDao.findByIssueCode(
 				note.getDemographic().getDemographicId(), summaryCode);
 
+		// save the base note
+		note.setSigned(true);
+		note.setIncludeIssueInNote(true);
+		note.setPosition(1);
+		note = saveNote(note);
+
 		// create the demographic specific issue if it does not exist
 		if(caseManagementIssue == null)
 		{
@@ -142,12 +148,6 @@ public class EncounterNoteService
 
 			caseManagementIssueDao.persist(caseManagementIssue);
 		}
-
-		// save the note
-		note.setSigned(true);
-		note.setIncludeIssueInNote(true);
-		note.setPosition(1);
-		note = saveNote(note);
 
 		// link the note and the issue
 		CaseManagementIssueNotePK caseManagementIssueNotePK = new CaseManagementIssueNotePK();
