@@ -96,20 +96,4 @@ public class EncounterNoteMapper
 	{
 		return ConversionUtils.fromDateString(provider.getZPV(rep).getZpv2_contactDate().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
 	}
-
-	// ---------------------------------------------------------------------------------------
-
-	public int getNumSocialHistoryNotes()
-	{
-		return provider.getZSHReps();
-	}
-
-	public CaseManagementNote getSocialHistoryNote(int rep)
-	{
-		CaseManagementNote note = new CaseManagementNote();
-
-
-
-		return note;
-	}
 }

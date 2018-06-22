@@ -27,6 +27,9 @@ import org.oscarehr.encounterNote.model.CaseManagementIssue;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Query;
+import java.util.List;
+
 @SuppressWarnings("unchecked")
 @Transactional
 @Repository("encounterNote.dao.CaseManagementIssueDao")
@@ -35,5 +38,27 @@ public class CaseManagementIssueDao extends AbstractDao<CaseManagementIssue>
 	public CaseManagementIssueDao()
 	{
 		super(CaseManagementIssue.class);
+	}
+
+	public CaseManagementIssue findByIssueCode(Integer demographicId, String code)
+	{
+		// select model name must match specified @Entity name in model object
+		String queryString = "SELECT x FROM model.CaseManagementIssue x " +
+				"INNER JOIN x.issue i " +
+				"INNER JOIN x.demographic d " +
+				"WHERE d.demographicId = :demographicId " +
+				"AND i.code = :code " +
+				"ORDER BY x.id ASC";
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("demographicId", demographicId);
+		query.setParameter("code", code);
+		query.setMaxResults(1);
+
+		List<CaseManagementIssue> resultList = query.getResultList();
+		if(resultList.isEmpty())
+		{
+			return null;
+		}
+		return resultList.get(0);
 	}
 }

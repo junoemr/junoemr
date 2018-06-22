@@ -26,8 +26,14 @@ import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.SecRole;
+import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
+import org.oscarehr.encounterNote.dao.CaseManagementIssueNoteDao;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteLinkDao;
+import org.oscarehr.encounterNote.dao.IssueDao;
+import org.oscarehr.encounterNote.model.CaseManagementIssue;
+import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
+import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.oscarehr.encounterNote.model.Issue;
@@ -47,7 +53,16 @@ public class EncounterNoteService
 	CaseManagementNoteDao caseManagementNoteDao;
 
 	@Autowired
+	CaseManagementIssueNoteDao caseManagementIssueNoteDao;
+
+	@Autowired
 	CaseManagementNoteLinkDao caseManagementNoteLinkDao;
+
+	@Autowired
+	CaseManagementIssueDao caseManagementIssueDao;
+
+	@Autowired
+	IssueDao issueDao;
 
 	@Autowired
 	ProgramManager programManager;
@@ -85,6 +100,63 @@ public class EncounterNoteService
 		link.setAllergy(allergy.getAllergyId());
 		caseManagementNoteLinkDao.persist(link);
 
+		return note;
+	}
+
+	public CaseManagementNote saveMedicalHistoryNote(CaseManagementNote note)
+	{
+		return saveHistoryNote(note, Issue.SUMMARY_CODE_MEDICAL_HISTORY);
+	}
+
+	public CaseManagementNote saveSocialHistoryNote(CaseManagementNote note)
+	{
+		return saveHistoryNote(note, Issue.SUMMARY_CODE_SOCIAL_HISTORY);
+	}
+
+	public CaseManagementNote saveFamilyHistoryNote(CaseManagementNote note)
+	{
+		return saveHistoryNote(note, Issue.SUMMARY_CODE_FAMILY_HISTORY);
+	}
+
+	private CaseManagementNote saveHistoryNote(CaseManagementNote note, String summaryCode)
+	{
+		CaseManagementIssue caseManagementIssue = caseManagementIssueDao.findByIssueCode(
+				note.getDemographic().getDemographicId(), summaryCode);
+
+		// create the demographic specific issue if it does not exist
+		if(caseManagementIssue == null)
+		{
+			// grab the master issue for reference/link
+			Issue issue = issueDao.findByCode(summaryCode);
+
+			caseManagementIssue = new CaseManagementIssue();
+			caseManagementIssue.setAcute(false);
+			caseManagementIssue.setCertain(false);
+			caseManagementIssue.setMajor(false);
+			caseManagementIssue.setProgramId(programManager.getDefaultProgramId());
+			caseManagementIssue.setResolved(false);
+			caseManagementIssue.setIssue(issue);
+			caseManagementIssue.setType(issue.getRole());
+			caseManagementIssue.setDemographic(note.getDemographic());
+			caseManagementIssue.setUpdateDate(note.getUpdateDate());
+
+			caseManagementIssueDao.persist(caseManagementIssue);
+		}
+
+		// save the note
+		note.setSigned(true);
+		note.setIncludeIssueInNote(true);
+		note = saveNote(note);
+
+		// link the note and the issue
+		CaseManagementIssueNotePK caseManagementIssueNotePK = new CaseManagementIssueNotePK();
+		caseManagementIssueNotePK.setCaseManagementIssue(caseManagementIssue);
+		caseManagementIssueNotePK.setCaseManagementNote(note);
+
+		CaseManagementIssueNote caseManagementIssueNote = new CaseManagementIssueNote();
+		caseManagementIssueNote.setId(caseManagementIssueNotePK);
+
+		caseManagementIssueNoteDao.persist(caseManagementIssueNote);
 		return note;
 	}
 

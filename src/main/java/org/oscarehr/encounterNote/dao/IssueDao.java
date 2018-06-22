@@ -27,6 +27,8 @@ import org.oscarehr.encounterNote.model.Issue;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Query;
+
 @SuppressWarnings("unchecked")
 @Transactional
 @Repository("encounterNote.dao.IssueDao")
@@ -35,5 +37,16 @@ public class IssueDao extends AbstractDao<Issue>
 	public IssueDao()
 	{
 		super(Issue.class);
+	}
+
+	public Issue findByCode(String code)
+	{
+		// select model name must match specified @Entity name in model object
+		String queryString = "SELECT x FROM model.Issue x WHERE x.code=:code ORDER BY x.issueId ASC";
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("code", code);
+		query.setMaxResults(1);
+
+		return (Issue) query.getSingleResult();
 	}
 }

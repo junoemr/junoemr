@@ -39,6 +39,7 @@ import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
 import org.oscarehr.common.hl7.copd.mapper.DocumentMapper;
 import org.oscarehr.common.hl7.copd.mapper.DxMapper;
 import org.oscarehr.common.hl7.copd.mapper.EncounterNoteMapper;
+import org.oscarehr.common.hl7.copd.mapper.HistoryNoteMapper;
 import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
 import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
@@ -337,5 +338,15 @@ public class CoPDImportService
 			encounterNote.setDemographic(demographic);
 			encounterNoteService.saveChartNote(encounterNote);
 		}
+
+		HistoryNoteMapper historyNoteMapper = new HistoryNoteMapper(zpdZtrMessage, providerRep);
+		for(CaseManagementNote medHistNote : historyNoteMapper.getMedicalHistoryNoteList())
+		{
+			medHistNote.setProvider(provider);
+			medHistNote.setSigningProvider(provider);
+			medHistNote.setDemographic(demographic);
+			encounterNoteService.saveMedicalHistoryNote(medHistNote);
+		}
+
 	}
 }

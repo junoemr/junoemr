@@ -35,6 +35,11 @@ public class CaseManagementIssueNote extends AbstractModel<CaseManagementIssueNo
 	@EmbeddedId
 	private CaseManagementIssueNotePK id;
 
+	public CaseManagementIssueNote()
+	{
+		this.id = new CaseManagementIssueNotePK();
+	}
+
 	@Override
 	public CaseManagementIssueNotePK getId()
 	{

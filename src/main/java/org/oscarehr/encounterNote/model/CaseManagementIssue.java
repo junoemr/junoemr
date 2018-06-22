@@ -22,13 +22,11 @@
  */
 package org.oscarehr.encounterNote.model;
 
-import org.oscarehr.common.listeners.BeanValidationEventListener;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.demographic.model.Demographic;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -38,11 +36,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Entity(name = "model.CaseManagementIssue")
-@EntityListeners(BeanValidationEventListener.class)
 @Table(name = "casemgmt_issue")
 public class CaseManagementIssue extends AbstractModel<Long>
 {
@@ -51,40 +47,32 @@ public class CaseManagementIssue extends AbstractModel<Long>
 	@Column(name = "id")
 	private Long id;
 
-	@NotNull
 	@Column(name = "acute")
 	private Boolean acute = false;
 
-	@NotNull
 	@Column(name = "certain")
 	private Boolean certain = false;
 
-	@NotNull
 	@Column(name = "major")
 	private Boolean major = false;
 
-	@NotNull
 	@Column(name = "resolved")
 	private Boolean resolved = false;
 
 	@Column(name = "program_id")
 	private Integer programId;
 
-	@NotNull
 	@Column(name = "type")
 	private String type;
 
-	@NotNull
 	@Column(name = "update_date")
 	@Temporal(TemporalType.DATE)
 	private Date updateDate;
 
-	@NotNull
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "demographic_no")
 	private Demographic demographic;
 
-	@NotNull
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "issue_id")
 	private Issue issue;

@@ -65,6 +65,84 @@ public class ZPR extends AbstractSegment
 		}
 	}
 
+	public SI getZpr1_setId() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(1, 0);
+			return (SI) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZpr2_procedureName() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(2, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public TS getZpr3_procedureDateTime() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(3, 0);
+			return (TS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public TS getZpr4_followUpDate() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(4, 0);
+			return (TS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public CE getZpr5_serviceCode() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(5, 0);
+			return (CE) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZpr6_results() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(6, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
 	/**
 	 * This method must be overridden. The easiest way is just to return null.
 	 */

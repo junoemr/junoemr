@@ -91,8 +91,9 @@ public class CoPDPreProcessorService
 		message = setHl7Version(message);
 		message = fixPRDSegment(message);
 		message = fixPhoneNumbers(message);
+		message = fixDateTimeNumbers(message);
 
-		message = message.replaceAll("~crlf~", "\n");
+		message = message.replaceAll("~crlf~", "\\\n");
 
 		return message;
 	}
@@ -134,6 +135,27 @@ public class CoPDPreProcessorService
 			phonePatternMatcher.appendReplacement(sb, replacement);
 		}
 		phonePatternMatcher.appendTail(sb);
+		message = sb.toString();
+
+		return message;
+	}
+
+	/**
+	 * Some date numbers have non-numeric characters in illegal places (TS segments fail). this strips them
+	 */
+	private String fixDateTimeNumbers(String message)
+	{
+		Pattern timePattern = Pattern.compile("<TS\\.1>(.*?)<\\/TS\\.1>");
+		Matcher timePatternMatcher = timePattern.matcher(message);
+
+		StringBuffer sb = new StringBuffer(message.length());
+		while(timePatternMatcher.find())
+		{
+			// strip non numeric characters from dates
+			String replacement = "<TS\\.1>" + timePatternMatcher.group(1).replaceAll("\\D", "") + "</TS\\.1>";
+			timePatternMatcher.appendReplacement(sb, replacement);
+		}
+		timePatternMatcher.appendTail(sb);
 		message = sb.toString();
 
 		return message;

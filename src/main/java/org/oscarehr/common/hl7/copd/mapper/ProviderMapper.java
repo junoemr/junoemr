@@ -23,7 +23,6 @@
 package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.Structure;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
@@ -42,69 +41,6 @@ public class ProviderMapper
 	public ProviderMapper(ZPD_ZTR message)
 	{
 		this.message = message;
-
-		try
-		{
-			Structure[] struct = message.getPATIENT().getPROVIDER(0).getAll("PRD");
-			logger.info("found " + struct.length + " structures for PRD");
-
-			Structure[] struct2 = message.getPATIENT().getPROVIDER(0).getAll("ZSH");
-			logger.info("found " + struct2.length + " structures for ZSH");
-
-			Structure[] struct3 = message.getPATIENT().getPROVIDER(0).getAll("ZPV");
-			logger.info("found " + struct3.length + " structures for ZPV");
-
-			Structure[] struct4 = message.getPATIENT().getPROVIDER(0).getAll("MEDS");
-			logger.info("found " + struct4.length + " structures for MEDS");
-		}
-		catch(HL7Exception e)
-		{
-			logger.error("Error", e);
-		}
-
-		int medReps = message.getPATIENT().getPROVIDER(0).getMEDSReps();
-		logger.info("Found MEDS Reps:" + medReps);
-
-		int allergyReps = message.getPATIENT().getPROVIDER(0).getALLERGYReps();
-		logger.info("Found ALLERGY Reps:" + allergyReps);
-
-		try
-		{
-			Structure[] struct = message.getPATIENT().getPROVIDER(0).getAll("ZPR");
-			logger.info("found " + struct.length + " structures for ZPR");
-
-			Structure[] struct2 = message.getPATIENT().getPROVIDER(0).getAll("ZDV");
-			logger.info("found " + struct2.length + " structures for ZDV");
-
-			Structure[] struct3 = message.getPATIENT().getPROVIDER(0).getAll("ZHR");
-			logger.info("found " + struct3.length + " structures for ZHR");
-
-			Structure[] struct4 = message.getPATIENT().getPROVIDER(0).getAll("LAB");
-			logger.info("found " + struct4.length + " structures for LAB");
-		}
-		catch(HL7Exception e)
-		{
-			logger.error("Error", e);
-		}
-
-		int labReps = message.getPATIENT().getPROVIDER(0).getLABReps();
-		logger.info("Found LAB Reps:" + labReps);
-
-		try
-		{
-			Structure[] struct = message.getPATIENT().getPROVIDER(0).getAll("ZHF");
-			logger.info("found " + struct.length + " structures for ZHF");
-
-			Structure[] struct2 = message.getPATIENT().getPROVIDER(0).getAll("ZCP");
-			logger.info("found " + struct2.length + " structures for ZCP");
-
-			Structure[] struct3 = message.getPATIENT().getPROVIDER(0).getAll("ZAT");
-			logger.info("found " + struct3.length + " structures for ZAT");
-		}
-		catch(HL7Exception e)
-		{
-			logger.error("Error", e);
-		}
 	}
 
 	/* Methods for converting to oscar model */
