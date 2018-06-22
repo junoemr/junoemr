@@ -49,7 +49,7 @@ import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.MeasurementDao;
-import org.oscarehr.common.dao.PreventionDao;
+import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.common.jobs.OscarRunnable;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.demographic.model.DemographicExt;

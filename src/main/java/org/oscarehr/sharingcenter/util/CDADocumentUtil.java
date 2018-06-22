@@ -78,7 +78,7 @@ import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.rx.model.Drug;
 import org.oscarehr.common.model.Measurement;
-import org.oscarehr.common.model.Prevention;
+import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.sharingcenter.OidType;
 import org.oscarehr.sharingcenter.OidUtil;

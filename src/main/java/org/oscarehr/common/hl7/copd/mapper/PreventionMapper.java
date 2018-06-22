@@ -27,7 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.common.model.Prevention;
+import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 

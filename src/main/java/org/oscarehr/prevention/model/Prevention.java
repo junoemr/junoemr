@@ -21,21 +21,27 @@
  * Toronto, Ontario, Canada
  */
 
-package org.oscarehr.common.model;
+package org.oscarehr.prevention.model;
 
-import java.io.Serializable;
-import java.util.Date;
+import org.oscarehr.common.model.AbstractModel;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "preventions")
@@ -77,6 +83,11 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 	private String creatorProviderNo = null;
 	
 	private Date lastUpdateDate = null;
+
+	// with cascade, these entities will be persisted when this class is.
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "prevention_id", cascade = CascadeType.PERSIST)
+	private List<PreventionExt> preventionExtensionList;
+
 
 	public Integer getDemographicId() {
 		return demographicId;
@@ -192,5 +203,24 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 	
 	public String getDeletedRawValue() {
 		return String.valueOf(deleted);
+	}
+
+	public List<PreventionExt> getPreventionExtensionList()
+	{
+		return preventionExtensionList;
+	}
+
+	public void setPreventionExtensionList(List<PreventionExt> preventionExtensionList)
+	{
+		this.preventionExtensionList = preventionExtensionList;
+	}
+
+	public void addExtension(PreventionExt ext)
+	{
+		if(preventionExtensionList == null)
+		{
+			preventionExtensionList = new ArrayList<>(1);
+		}
+		preventionExtensionList.add(ext);
 	}
 }

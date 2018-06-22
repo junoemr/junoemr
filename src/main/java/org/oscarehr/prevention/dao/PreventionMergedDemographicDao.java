@@ -21,17 +21,18 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.prevention.dao;
 
 import java.util.Date;
 import java.util.List;
 
 import org.oscarehr.common.merge.MergedDemographicTemplate;
-import org.oscarehr.common.model.Prevention;
+import org.oscarehr.prevention.model.Prevention;
 import org.springframework.stereotype.Repository;
 
 @Repository("preventionDao")
-public class PreventionMergedDemographicDao extends PreventionDao {
+public class PreventionMergedDemographicDao extends PreventionDao
+{
 
 	@Override
 	public List<Prevention> findByDemographicId(Integer demographicId) {

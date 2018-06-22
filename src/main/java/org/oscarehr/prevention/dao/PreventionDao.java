@@ -20,16 +20,18 @@
  * Centre for Research on Inner City Health, St. Michael's Hospital,
  * Toronto, Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.prevention.dao;
 
 import org.oscarehr.common.NativeSql;
-import org.oscarehr.common.model.Prevention;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.prevention.model.Prevention;
 
 import javax.persistence.Query;
 import java.util.Date;
 import java.util.List;
 
-public class PreventionDao extends AbstractDao<Prevention> {
+public class PreventionDao extends AbstractDao<Prevention>
+{
 
 	public PreventionDao() {
 		super(Prevention.class);

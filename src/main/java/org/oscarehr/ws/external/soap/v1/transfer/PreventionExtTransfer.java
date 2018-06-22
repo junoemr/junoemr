@@ -26,7 +26,7 @@ package org.oscarehr.ws.external.soap.v1.transfer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.oscarehr.common.model.PreventionExt;
+import org.oscarehr.prevention.model.PreventionExt;
 
 public class PreventionExtTransfer {
 	

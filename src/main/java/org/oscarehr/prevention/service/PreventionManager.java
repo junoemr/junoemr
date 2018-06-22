@@ -22,7 +22,21 @@
  * Ontario, Canada
  */
 
-package org.oscarehr.managers;
+package org.oscarehr.prevention.service;
+
+import org.oscarehr.common.dao.PropertyDao;
+import org.oscarehr.common.model.Property;
+import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.dao.PreventionExtDao;
+import org.oscarehr.prevention.model.Prevention;
+import org.oscarehr.prevention.model.PreventionExt;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import oscar.oscarPrevention.PreventionDisplayConfig;
+import oscar.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,165 +45,170 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.oscarehr.common.dao.PreventionDao;
-import org.oscarehr.common.dao.PreventionExtDao;
-import org.oscarehr.common.dao.PropertyDao;
-import org.oscarehr.common.model.Prevention;
-import org.oscarehr.common.model.PreventionExt;
-import org.oscarehr.common.model.Property;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.SpringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import oscar.log.LogAction;
-import oscar.oscarPrevention.PreventionDisplayConfig;
-import oscar.util.StringUtils;
-
 @Service
-public class PreventionManager {
+@Transactional
+public class PreventionManager
+{
 	@Autowired
 	private PreventionDao preventionDao;
 	@Autowired
 	private PreventionExtDao preventionExtDao;
 	@Autowired
 	private PropertyDao propertyDao;
-		
+
 	private static final String HIDE_PREVENTION_ITEM = "hide_prevention_item";
 
-	private ArrayList<String> preventionTypeList = new ArrayList<String>();
+	private ArrayList<String> preventionTypeList = new ArrayList<>();
 
-	public List<Prevention> getUpdatedAfterDate(LoggedInInfo loggedInInfo, Date updatedAfterThisDateExclusive, int itemsToReturn) {
+	public List<Prevention> getUpdatedAfterDate(LoggedInInfo loggedInInfo, Date updatedAfterThisDateExclusive, int itemsToReturn)
+	{
 		List<Prevention> results = preventionDao.findByUpdateDate(updatedAfterThisDateExclusive, itemsToReturn);
-
-		LogAction.addLogSynchronous(loggedInInfo, "PreventionManager.getUpdatedAfterDate", "updatedAfterThisDateExclusive=" + updatedAfterThisDateExclusive);
-
 		return (results);
 	}
 
-	public Prevention getPrevention(LoggedInInfo loggedInInfo, Integer id) {
+	public Prevention getPrevention(LoggedInInfo loggedInInfo, Integer id)
+	{
 		Prevention result = preventionDao.find(id);
-
-		//--- log action ---
-		if (result != null) {
-			LogAction.addLogSynchronous(loggedInInfo, "PreventionManager.getPrevention", "id=" + id);
-		}
-
 		return (result);
 	}
 
-	public List<PreventionExt> getPreventionExtByPrevention(LoggedInInfo loggedInInfo, Integer preventionId) {
+	public List<PreventionExt> getPreventionExtByPrevention(LoggedInInfo loggedInInfo, Integer preventionId)
+	{
 		List<PreventionExt> results = preventionExtDao.findByPreventionId(preventionId);
-
-		LogAction.addLogSynchronous(loggedInInfo, "PreventionManager.getPreventionExtByPrevention", "preventionId=" + preventionId);
-
 		return (results);
 	}
 
-	public ArrayList<String> getPreventionTypeList() {
-		if (preventionTypeList.isEmpty()) {
+	public ArrayList<String> getPreventionTypeList()
+	{
+		if(preventionTypeList.isEmpty())
+		{
 			PreventionDisplayConfig pdc = PreventionDisplayConfig.getInstance();
-			for (HashMap<String, String> prevTypeHash : pdc.getPreventions()) {
-				if (prevTypeHash != null && StringUtils.filled(prevTypeHash.get("name"))) {
+			for(HashMap<String, String> prevTypeHash : pdc.getPreventions())
+			{
+				if(prevTypeHash != null && StringUtils.filled(prevTypeHash.get("name")))
+				{
 					preventionTypeList.add(prevTypeHash.get("name").trim());
 				}
 			}
 		}
 		return preventionTypeList;
 	}
-	
-	public ArrayList<HashMap<String,String>> getPreventionTypeDescList() {
+
+	@Deprecated
+	public ArrayList<HashMap<String, String>> getPreventionTypeDescList()
+	{
 		PreventionDisplayConfig pdc = PreventionDisplayConfig.getInstance();
-		ArrayList<HashMap<String,String>> preventionTypeDescList = pdc.getPreventions();
-		
+		ArrayList<HashMap<String, String>> preventionTypeDescList = pdc.getPreventions();
+
 		return preventionTypeDescList;
 	}
-	
-	public boolean isHidePrevItemExist() {
+
+	public boolean isHidePrevItemExist()
+	{
 		List<Property> props = propertyDao.findByName(HIDE_PREVENTION_ITEM);
-		if(props.size()>0){
+		if(props.size() > 0)
+		{
 			return true;
-		}		
+		}
 		return false;
 	}
-	
-	public boolean hideItem(String item) {
+
+	public boolean hideItem(String item)
+	{
 		String itemsToRemove = null;
 		Property p = propertyDao.checkByName(HIDE_PREVENTION_ITEM);
-		
-		if(p!=null && p.getValue()!=null){
+
+		if(p != null && p.getValue() != null)
+		{
 			itemsToRemove = p.getValue();
 			List<String> items = Arrays.asList(itemsToRemove.split("\\s*,\\s*"));
-			for(String i:items){
-				if(i.equals(item)){
+			for(String i : items)
+			{
+				if(i.equals(item))
+				{
 					return true;
 				}
 			}
 		}
 		return false;
 	}
-	
-	public static String getCustomPreventionItems() {
+
+	public static String getCustomPreventionItems()
+	{
 		String itemsToRemove = "";
-		PropertyDao propertyDao = (PropertyDao)SpringUtils.getBean("propertyDao");
+		PropertyDao propertyDao = (PropertyDao) SpringUtils.getBean("propertyDao");
 		Property p = propertyDao.checkByName(HIDE_PREVENTION_ITEM);
-		if(p!=null && p.getValue()!=null){
-		itemsToRemove = p.getValue();
+		if(p != null && p.getValue() != null)
+		{
+			itemsToRemove = p.getValue();
 		}
 		return itemsToRemove;
 	}
-	
-	public void addCustomPreventionItems(String items){
+
+	public void addCustomPreventionItems(String items)
+	{
 		boolean propertyExists = isHidePrevItemExist();
-		if(propertyExists){
+		if(propertyExists)
+		{
 			Property p = propertyDao.checkByName(HIDE_PREVENTION_ITEM);
 			p.setValue(items);
 			propertyDao.merge(p);
-		}else{
+		}
+		else
+		{
 			Property x = new Property();
 			x.setName("hide_prevention_item");
 			x.setValue(items);
 			propertyDao.persist(x);
 		}
-	}	
+	}
 
-	public void addPreventionWithExts(Prevention prevention, HashMap<String, String> exts) {
-		if (prevention == null) return;
+	/**
+	 *
+	 * @param prevention the prevention model to add
+	 * @param exts the map of extension models
+	 * @deprecated - add preventionExt to the prevention and call addPrevention instead.
+	 */
+	@Deprecated
+	public void addPreventionWithExts(Prevention prevention, HashMap<String, String> exts)
+	{
+		if(prevention == null) return;
 
-		preventionDao.persist(prevention);
-		if (exts != null) {
-			for (String keyval : exts.keySet()) {
-				if (StringUtils.filled(keyval) && StringUtils.filled(exts.get(keyval))) {
+		if(exts != null)
+		{
+			for(String keyval : exts.keySet())
+			{
+				if(StringUtils.filled(keyval) && StringUtils.filled(exts.get(keyval)))
+				{
 					PreventionExt preventionExt = new PreventionExt();
 					preventionExt.setPreventionId(prevention.getId());
 					preventionExt.setKeyval(keyval);
 					preventionExt.setVal(exts.get(keyval));
-					preventionExtDao.persist(preventionExt);
+
+					prevention.addExtension(preventionExt);
 				}
 			}
 		}
+		addPrevention(prevention);
+	}
+
+	public void addPrevention(Prevention prevention)
+	{
+		preventionDao.persist(prevention);
 	}
 
 	/**
 	 * programId is ignored for now as oscar doesn't support it yet.
 	 */
-	public List<Prevention> getPreventionsByProgramProviderDemographicDate(LoggedInInfo loggedInInfo, Integer programId, String providerNo, Integer demographicId, Calendar updatedAfterThisDateExclusive, int itemsToReturn) {
+	public List<Prevention> getPreventionsByProgramProviderDemographicDate(LoggedInInfo loggedInInfo, Integer programId, String providerNo, Integer demographicId, Calendar updatedAfterThisDateExclusive, int itemsToReturn)
+	{
 		List<Prevention> results = preventionDao.findByProviderDemographicLastUpdateDate(providerNo, demographicId, updatedAfterThisDateExclusive.getTime(), itemsToReturn);
-
-		LogAction.addLogSynchronous(loggedInInfo, "PreventionManager.getUpdatedAfterDate",
-				"programId=" + programId + ", providerNo=" + providerNo + ", demographicId=" +
-						demographicId + ", updatedAfterThisDateExclusive=" +
-						updatedAfterThisDateExclusive.getTime());
-
 		return (results);
 	}
-	
-	public List<Prevention> getPreventionsByDemographicNo(LoggedInInfo loggedInInfo, Integer demographicNo) {
-		List<Prevention> results = preventionDao.findUniqueByDemographicId(demographicNo);
-		
-		LogAction.addLogSynchronous(loggedInInfo, "PreventionManager.getPreventionsByDemographicNo",
-				"demographicNo=" + demographicNo);
 
+	public List<Prevention> getPreventionsByDemographicNo(LoggedInInfo loggedInInfo, Integer demographicNo)
+	{
+		List<Prevention> results = preventionDao.findUniqueByDemographicId(demographicNo);
 		return (results);
 	}
 }
