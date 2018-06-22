@@ -347,6 +347,13 @@ public class CoPDImportService
 			medHistNote.setDemographic(demographic);
 			encounterNoteService.saveMedicalHistoryNote(medHistNote);
 		}
+		for(CaseManagementNote socHistNote : historyNoteMapper.getSocialHistoryNoteList())
+		{
+			socHistNote.setProvider(provider);
+			socHistNote.setSigningProvider(provider);
+			socHistNote.setDemographic(demographic);
+			encounterNoteService.saveSocialHistoryNote(socHistNote);
+		}
 
 	}
 }

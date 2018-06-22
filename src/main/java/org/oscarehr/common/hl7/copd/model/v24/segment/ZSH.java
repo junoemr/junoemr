@@ -64,6 +64,110 @@ public class ZSH extends AbstractSegment
 		}
 	}
 
+	public SI getZsh1_setId() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(1, 0);
+			return (SI) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZsh2_socialAlert() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(2, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZsh3_journalNotes() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(3, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public IS getZsh4_relationshipStatus() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(4, 0);
+			return (IS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZsh5_occupation() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(5, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZsh6_employer() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(6, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZsh7_education() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(7, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZsh8_leisureActivities() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(8, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
 	/**
 	 * This method must be overridden. The easiest way is just to return null.
 	 */

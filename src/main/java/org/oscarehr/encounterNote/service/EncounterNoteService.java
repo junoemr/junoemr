@@ -146,6 +146,7 @@ public class EncounterNoteService
 		// save the note
 		note.setSigned(true);
 		note.setIncludeIssueInNote(true);
+		note.setPosition(1);
 		note = saveNote(note);
 
 		// link the note and the issue

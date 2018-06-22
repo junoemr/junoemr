@@ -27,6 +27,7 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.provider.model.ProviderData;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -39,6 +40,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -130,9 +132,9 @@ public class CaseManagementNote extends AbstractModel<Long>
 	@JoinColumn(name = "appointmentNo")
 	private Appointment appointment;
 
-	@OneToMany(fetch=FetchType.LAZY, mappedBy = "note")
+	// with cascade, these entities will be persisted/merged/deleted when this class is.
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "note", cascade = CascadeType.ALL)
 	private List<CaseManagementNoteExt> noteExtensionList;
-
 
 
 	public Long getId()
@@ -398,5 +400,14 @@ public class CaseManagementNote extends AbstractModel<Long>
 	public void setNoteExtensionList(List<CaseManagementNoteExt> noteExtensionList)
 	{
 		this.noteExtensionList = noteExtensionList;
+	}
+
+	public void addExtension(CaseManagementNoteExt ext)
+	{
+		if(noteExtensionList == null)
+		{
+			noteExtensionList = new ArrayList<>(1);
+		}
+		noteExtensionList.add(ext);
 	}
 }

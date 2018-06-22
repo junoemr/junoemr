@@ -28,12 +28,16 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.joining;
 
 public class HistoryNoteMapper
 {
@@ -70,7 +74,11 @@ public class HistoryNoteMapper
 		List<CaseManagementNote> noteList = new ArrayList<>(numNotes);
 		for(int i=0; i< numNotes; i++)
 		{
-			noteList.add(getSocialHistoryNote(i));
+			CaseManagementNote note = getSocialHistoryNote(i);
+			if(note != null)
+			{
+				noteList.add(note);
+			}
 		}
 		return noteList;
 	}
@@ -81,7 +89,11 @@ public class HistoryNoteMapper
 		List<CaseManagementNote> noteList = new ArrayList<>(numNotes);
 		for(int i=0; i< numNotes; i++)
 		{
-			noteList.add(getMedicalHistoryNote(i));
+			CaseManagementNote note = getMedicalHistoryNote(i);
+			if(note != null)
+			{
+				noteList.add(note);
+			}
 		}
 		return noteList;
 	}
@@ -90,21 +102,56 @@ public class HistoryNoteMapper
 	{
 		CaseManagementNote note = null;
 
+		String socialAlert = getSocHistSocialAlert(rep);
+		String journalNotes = getSocHistJournalNotes(rep);
+		String occupation = getSocHistOccupation(rep);
+		String employer = getSocHistEmployer(rep);
+		String education = getSocHistEducation(rep);
+		String leisureActivities = getSocHistLeisureActivities(rep);
 
-		note = new CaseManagementNote();
+		if(socialAlert != null || journalNotes != null || occupation != null || employer != null || education != null || leisureActivities != null)
+		{
+			note = new CaseManagementNote();
 
+			Date date = new Date();
+			note.setObservationDate(date);
+			note.setUpdateDate(date);
 
+			// join values but ignore null
+			String noteText = Stream.of(socialAlert, journalNotes, occupation, employer, education, leisureActivities)
+					.filter(s -> s != null && !s.isEmpty())
+					.collect(joining("\n"));
 
+			note.setNote(noteText);
+		}
 		return note;
 	}
 
 	public CaseManagementNote getMedicalHistoryNote(int rep) throws HL7Exception
 	{
 		CaseManagementNote note = new CaseManagementNote();
-		note.setObservationDate(getMedHistProcedureDate(rep));
-		note.setUpdateDate(getMedHistProcedureDate(rep));
 
-		String resultText = StringUtils.trimToNull(getMedHistResults(rep));
+		// the only date included in the import is the procedure date, use that for everything
+		Date procedureDate = getMedHistProcedureDate(rep);
+		if(procedureDate == null)
+		{
+			procedureDate = new Date(); //TODO pick a good default
+		}
+		else
+		{
+			// if the procedure date was actually valid, set the extended property
+			CaseManagementNoteExt ext = new CaseManagementNoteExt();
+			ext.setNote(note);
+			ext.setKey(CaseManagementNoteExt.PROCEDUREDATE);
+			ext.setDateValue(procedureDate);
+
+			note.addExtension(ext);
+		}
+
+		note.setObservationDate(procedureDate);
+		note.setUpdateDate(procedureDate);
+
+		String resultText = getMedHistResults(rep);
 		String noteText = StringUtils.trimToEmpty(getMedHistProcedureName(rep));
 		if(resultText != null)
 		{
@@ -117,16 +164,51 @@ public class HistoryNoteMapper
 
 	public Date getMedHistProcedureDate(int rep) throws HL7Exception
 	{
-		return ConversionUtils.fromDateString(provider.getZPR(rep).getZpr3_procedureDateTime().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
+		String dateStr = provider.getZPR(rep).getZpr3_procedureDateTime().getTs1_TimeOfAnEvent().getValue();
+		if(dateStr==null || dateStr.trim().isEmpty() || dateStr.equals("00000000"))
+		{
+			return null;
+		}
+		return ConversionUtils.fromDateString(dateStr, "yyyyMMdd");
 	}
 
 	public String getMedHistProcedureName(int rep) throws HL7Exception
 	{
-		return provider.getZPR(rep).getZpr2_procedureName().getValue();
+		return StringUtils.trimToNull(provider.getZPR(rep).getZpr2_procedureName().getValue());
 	}
 
 	public String getMedHistResults(int rep) throws HL7Exception
 	{
-		return provider.getZPR(rep).getZpr6_results().getValue();
+		return StringUtils.trimToNull(provider.getZPR(rep).getZpr6_results().getValue());
+	}
+
+	public String getSocHistSocialAlert(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getZSH(rep).getZsh2_socialAlert().getValue());
+	}
+
+	public String getSocHistJournalNotes(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getZSH(rep).getZsh3_journalNotes().getValue());
+	}
+
+	public String getSocHistOccupation(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getZSH(rep).getZsh5_occupation().getValue());
+	}
+
+	public String getSocHistEmployer(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getZSH(rep).getZsh6_employer().getValue());
+	}
+
+	public String getSocHistEducation(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getZSH(rep).getZsh7_education().getValue());
+	}
+
+	public String getSocHistLeisureActivities(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(provider.getZSH(rep).getZsh8_leisureActivities().getValue());
 	}
 }
