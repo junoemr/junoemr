@@ -60,6 +60,58 @@ public class ZIM extends AbstractSegment
 		}
 	}
 
+	public SI getZim1_setId() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(1, 0);
+			return (SI) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public TS getZim2_immunizationDate() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(2, 0);
+			return (TS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public IS getZim3_vaccineCode() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(3, 0);
+			return (IS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public IS getZim4_vaccineStatus() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(4, 0);
+			return (IS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
 	/**
 	 * This method must be overridden. The easiest way is just to return null.
 	 */

@@ -36,11 +36,15 @@ public class ZPD_ZTR_IMMUNIZATION extends AbstractGroup
 		try
 		{
 			this.add(ZIM.class, true, false);
-
 		}
 		catch(HL7Exception var3)
 		{
 			throw new RuntimeException(var3);
 		}
+	}
+
+	public ZIM getZIM()
+	{
+		return this.getTyped("ZIM", ZIM.class);
 	}
 }

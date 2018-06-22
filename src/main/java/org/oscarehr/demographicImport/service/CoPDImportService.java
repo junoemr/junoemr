@@ -33,6 +33,7 @@ import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.allergy.service.AllergyService;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.dao.PreventionDao;
 import org.oscarehr.common.hl7.copd.mapper.AllergyMapper;
 import org.oscarehr.common.hl7.copd.mapper.AppointmentMapper;
 import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
@@ -41,11 +42,13 @@ import org.oscarehr.common.hl7.copd.mapper.DxMapper;
 import org.oscarehr.common.hl7.copd.mapper.EncounterNoteMapper;
 import org.oscarehr.common.hl7.copd.mapper.HistoryNoteMapper;
 import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
+import org.oscarehr.common.hl7.copd.mapper.PreventionMapper;
 import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.parser.CoPDParser;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Dxresearch;
+import org.oscarehr.common.model.Prevention;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
@@ -55,6 +58,7 @@ import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.managers.PreventionManager;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.service.ProviderService;
@@ -101,6 +105,12 @@ public class CoPDImportService
 
 	@Autowired
 	DxresearchDAO dxresearchDAO;
+
+	@Autowired
+	PreventionDao preventionDao;
+
+	@Autowired
+	PreventionManager preventionManager;
 
 	public void importFromHl7Message(String message) throws HL7Exception
 	{
@@ -182,7 +192,7 @@ public class CoPDImportService
 			logger.info("Import Allergies ...");
 			importAllergyData(zpdZtrMessage, i, mrpProvider, demographic);
 			logger.info("Import Immunizations ...");
-			importImmunizationData(zpdZtrMessage, i, mrpProvider, demographic);
+			importPreventionData(zpdZtrMessage, i, mrpProvider, demographic);
 			logger.info("Import Labs ...");
 			importLabData(zpdZtrMessage, i, mrpProvider, demographic);
 			logger.info("Import Documents ...");
@@ -245,6 +255,7 @@ public class CoPDImportService
 
 			if(properties.isPropertyActive("multisites"))
 			{
+				//TODO how to handle multisite assignment
 				throw new RuntimeException("Multisite Imports not supported");
 			}
 
@@ -277,9 +288,11 @@ public class CoPDImportService
 
 	private void importPediatricsData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
 	{
+		//TODO - not implemented
 	}
 	private void importPregnancyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
 	{
+		//TODO - not implemented
 	}
 
 	private void importAllergyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception
@@ -305,13 +318,25 @@ public class CoPDImportService
 		}
 	}
 
-	private void importImmunizationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
+	private void importPreventionData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception
 	{
+		PreventionMapper preventionMapper = new PreventionMapper(zpdZtrMessage, providerRep);
+		preventionMapper.setValidPreventionTypes(preventionManager.getPreventionTypeList());
+
+		for(Prevention prevention : preventionMapper.getPreventionList())
+		{
+			prevention.setDemographicId(demographic.getDemographicId());
+			prevention.setProviderNo(String.valueOf(provider.getProviderNo()));
+			prevention.setProviderName(provider.getFirstName() + " " + provider.getLastName());
+			prevention.setCreatorProviderNo(String.valueOf(provider.getProviderNo()));
+
+			preventionDao.persist(prevention);
+		}
 	}
 
 	private void importLabData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
 	{
-		//TODO
+		//TODO - not implemented
 	}
 
 	private void importDocumentData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)

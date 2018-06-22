@@ -34,13 +34,17 @@ import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HistoryNoteMapper
 {
 	private static final Logger logger = MiscUtils.getLogger();
 	private final ZPD_ZTR message;
 	private final ZPD_ZTR_PROVIDER provider;
+
+	private static Map<String, String> relationshipTypeMap = new HashMap<>();
 
 	public HistoryNoteMapper()
 	{
@@ -171,7 +175,7 @@ public class HistoryNoteMapper
 		CaseManagementNote note = new CaseManagementNote();
 
 		String relation = getFamHistRelationshipToPatient(rep);
-		String diagnosisDescription  = getFamHistDiagnosisDescrption(rep);
+		String diagnosisDescription  = getFamHistDiagnosisDescription(rep);
 		String causeOfDeath = getFamHistCauseOfDeath(rep);
 		String comments = getFamHistComments(rep);
 
@@ -292,14 +296,20 @@ public class HistoryNoteMapper
 		return ConversionUtils.fromDateString(dateStr, "yyyyMMdd");
 	}
 
-	public String getFamHistDiagnosisDescrption(int rep) throws HL7Exception
+	public String getFamHistDiagnosisDescription(int rep) throws HL7Exception
 	{
 		return StringUtils.trimToNull(provider.getZHF(rep).getZhf3_diagnosisDescription().getValue());
 	}
 
 	public String getFamHistRelationshipToPatient(int rep) throws HL7Exception
 	{
-		return StringUtils.trimToNull(provider.getZHF(rep).getZhf4_relationshipToPatient().getValue());
+		String relationCode = StringUtils.trimToNull(provider.getZHF(rep).getZhf4_relationshipToPatient().getValue());
+		if(relationCode != null && relationshipTypeMap.containsKey(relationCode.toUpperCase()))
+		{
+			return relationshipTypeMap.get(relationCode.toUpperCase());
+		}
+		logger.error("Invalid relationship code: " + relationCode);
+		return (relationCode != null)? relationCode : relationshipTypeMap.get("UNK");//unknown
 	}
 
 	public String getFamHistCauseOfDeath(int rep) throws HL7Exception
@@ -310,5 +320,45 @@ public class HistoryNoteMapper
 	public String getFamHistComments(int rep) throws HL7Exception
 	{
 		return StringUtils.trimToNull(provider.getZHF(rep).getZhf8_comments().getValue());
+	}
+
+	static
+	{
+		relationshipTypeMap.put("ANT", "Aunt");
+		relationshipTypeMap.put("BRO", "Brother");
+		relationshipTypeMap.put("COM", "Common-Law");
+		relationshipTypeMap.put("CSN", "Cousin");
+		relationshipTypeMap.put("DAU", "Daughter");
+		relationshipTypeMap.put("EMP", "Employer");
+		relationshipTypeMap.put("FAT", "Father");
+		relationshipTypeMap.put("FIL", "Father-in-law");
+		relationshipTypeMap.put("FRE", "Friend");
+		relationshipTypeMap.put("FTC", "Foster Child");
+		relationshipTypeMap.put("FTP", "Foster Parent");
+		relationshipTypeMap.put("GRC", "Grandchild");
+		relationshipTypeMap.put("GRP", "Grandparent");
+		relationshipTypeMap.put("GUA", "Guardian");
+		relationshipTypeMap.put("HUS", "Husband");
+		relationshipTypeMap.put("MIL", "Mother-in-law");
+		relationshipTypeMap.put("MOT", "Mother");
+		relationshipTypeMap.put("NEI", "Neighbor");
+		relationshipTypeMap.put("NEP", "Nephew");
+		relationshipTypeMap.put("NIE", "Niece");
+		relationshipTypeMap.put("OTH", "Other");
+		relationshipTypeMap.put("PAR", "Parent");
+		relationshipTypeMap.put("REL", "Relative");
+		relationshipTypeMap.put("ROM", "Roommate");
+		relationshipTypeMap.put("SEL", "Self");
+		relationshipTypeMap.put("SIS", "Sister");
+		relationshipTypeMap.put("SON", "Son");
+		relationshipTypeMap.put("SOW", "Social Worker");
+		relationshipTypeMap.put("SPO", "Spouse");
+		relationshipTypeMap.put("STD", "Step Daughter");
+		relationshipTypeMap.put("STF", "Step Father");
+		relationshipTypeMap.put("STM", "Step Mother");
+		relationshipTypeMap.put("STS", "Step Son");
+		relationshipTypeMap.put("UNC", "Uncle");
+		relationshipTypeMap.put("UNK", "Unknown");
+		relationshipTypeMap.put("WIF", "Wife");
 	}
 }
