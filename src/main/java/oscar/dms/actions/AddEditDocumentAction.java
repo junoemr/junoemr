@@ -78,7 +78,7 @@ public class AddEditDocumentAction extends DispatchAction {
 	private static Logger logger = MiscUtils.getLogger();
 
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	private org.oscarehr.document.service.Document documentService = SpringUtils.getBean(org.oscarehr.document.service.Document.class);
+	private org.oscarehr.document.service.DocumentService documentService = SpringUtils.getBean(org.oscarehr.document.service.DocumentService.class);
 
 	public ActionForward html5MultiUpload(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ResourceBundle props = ResourceBundle.getBundle("oscarResources");

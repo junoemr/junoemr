@@ -24,40 +24,23 @@
 
 --%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
-<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
-<%@page import="org.oscarehr.util.WebUtilsOld"%>
+<%@page import="org.oscarehr.common.model.ProviderPreference"%>
 <%@page import="org.oscarehr.myoscar.utils.MyOscarLoggedInInfo"%>
-<%@page import="org.oscarehr.common.dao.DrugDao"%>
-<%@page import="org.oscarehr.common.model.Drug"%>
-<%@ page import="org.oscarehr.common.model.PharmacyInfo"%>
-<%@page import="org.oscarehr.util.WebUtils"%>
 <%@page import="org.oscarehr.phr.util.MyOscarUtils"%>
-<%@page import="org.oscarehr.util.LocaleUtils"%>
+<%@page import="org.oscarehr.study.Study"%>
+<%@page import="org.oscarehr.study.StudyFactory"%>
+<%@ page import="org.oscarehr.util.LocaleUtils"%>
+<%@page import="org.oscarehr.util.WebUtilsOld"%>
+<%@page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%>
+<%@page import="oscar.oscarRx.data.RxPharmacyData"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 <%@ taglib uri="/WEB-INF/indivo-tag.tld" prefix="indivo" %>
-<%@ page import="oscar.oscarRx.data.*,oscar.oscarProvider.data.ProviderMyOscarIdData,oscar.oscarDemographic.data.DemographicData,oscar.OscarProperties,oscar.log.*"%>
-<%@page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
-<%@page import="java.text.SimpleDateFormat" %>
-<%@page import="java.util.*" %>
-<%@page import="java.util.Enumeration"%>
-<%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.util.SessionConstants"%>
-<%@page import="java.util.List"%>
-<%@page import="org.oscarehr.casemgmt.web.PrescriptDrug"%>
-<%@page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager"%>
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="java.util.ArrayList,oscar.oscarRx.data.RxPrescriptionData"%>
-<%@page import="org.oscarehr.common.model.ProviderPreference"%>
-<%@page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%>
-<%@page import="org.oscarehr.study.StudyFactory, org.oscarehr.study.Study, org.oscarehr.study.types.MyMedsStudy" %>
+<%@ page import="java.util.ArrayList,java.util.HashMap"%>
 <bean:define id="patient" type="oscar.oscarRx.data.RxPatientData.Patient" name="Patient" />
-<%@page import="org.oscarehr.casemgmt.service.CaseManagementManager" %>
-<%@page import="org.oscarehr.casemgmt.model.CaseManagementNote" %>
-<%@page import="org.oscarehr.casemgmt.model.Issue" %>
 
 <%
 String rx_enhance = OscarProperties.getInstance().getProperty("rx_enhance");

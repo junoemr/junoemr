@@ -57,14 +57,22 @@ public class RestServiceLog extends AbstractModel<Long> implements Serializable 
 	private String providerNo;
 	@Column(name = "ip")
 	private String ip;
-	@Column(name = "url")
-	private String url;
 	@Column(name = "user_agent")
 	private String userAgent;
+	@Column(name = "url")
+	private String url;
+	@Column(name = "request_media_type")
+	private String requestMediaType;
+	@Column(name = "method")
+	private String method;
 	@Column(name = "raw_query_string")
 	private String rawQueryString;
 	@Column(name = "raw_post")
 	private String rawPost;
+	@Column(name = "status_code")
+	private Integer statusCode;
+	@Column(name = "response_media_type")
+	private String responseMediaType;
 	@Column(name = "raw_output")
 	private String rawOutput;
 	@Column(name = "error_message")
@@ -131,6 +139,26 @@ public class RestServiceLog extends AbstractModel<Long> implements Serializable 
 		this.url = url;
 	}
 
+	public String getRequestMediaType()
+	{
+		return requestMediaType;
+	}
+
+	public void setRequestMediaType(String requestMediaType)
+	{
+		this.requestMediaType = requestMediaType;
+	}
+
+	public String getMethod()
+	{
+		return method;
+	}
+
+	public void setMethod(String method)
+	{
+		this.method = method;
+	}
+
 	public String getUserAgent() {
 		return userAgent;
 	}
@@ -157,6 +185,26 @@ public class RestServiceLog extends AbstractModel<Long> implements Serializable 
 
 	public String getRawOutput() {
 		return rawOutput;
+	}
+
+	public Integer getStatusCode()
+	{
+		return statusCode;
+	}
+
+	public void setStatusCode(Integer statusCode)
+	{
+		this.statusCode = statusCode;
+	}
+
+	public String getResponseMediaType()
+	{
+		return responseMediaType;
+	}
+
+	public void setResponseMediaType(String responseMediaType)
+	{
+		this.responseMediaType = responseMediaType;
 	}
 
 	public void setRawOutput(String rawOutput) {

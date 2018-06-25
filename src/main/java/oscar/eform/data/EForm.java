@@ -155,6 +155,7 @@ public class EForm extends EFormBase {
 		this.demographicNo = demographicNo;
 		this.showLatestFormOnly = (Boolean)loaded.get("showLatestFormOnly");
 		this.patientIndependent = (Boolean)loaded.get("patientIndependent");
+		this.instanced = (Boolean)loaded.get("instanced");
 		this.roleType = (String) loaded.get("roleType");
 	}
 
@@ -176,9 +177,14 @@ public class EForm extends EFormBase {
 		this.eform_link = el;
 	}
 
-	public void setAction(String pAjaxId) {
-		parentAjaxId = pAjaxId;
-		setAction();
+	public String getParentAjaxId()
+	{
+		return parentAjaxId;
+	}
+
+	public void setParentAjaxId(String parentAjaxId)
+	{
+		this.parentAjaxId = parentAjaxId;
 	}
 
 	public void setAction() {
@@ -217,7 +223,9 @@ public class EForm extends EFormBase {
 			return;
 		}
 		index += 5;
-		StringBuilder action = new StringBuilder("action=\"../eform/addEForm.do?efmfid="+this.fid+"&efmdemographic_no="+this.demographicNo+"&efmprovider_no="+this.providerNo+"&eform_link="+this.eform_link);
+
+		String formDataId = StringUtils.trimToEmpty(this.fdid);
+		StringBuilder action = new StringBuilder("action=\"../eform/addEForm.do?efmfid="+this.fid+"&efmfdid="+formDataId+"&efmdemographic_no="+this.demographicNo+"&efmprovider_no="+this.providerNo+"&eform_link="+this.eform_link);
 		if (this.parentAjaxId != null) action.append("&parentAjaxId=" + this.parentAjaxId);
 
 		action.append("\"");
@@ -244,7 +252,8 @@ public class EForm extends EFormBase {
 			if(i < 0) {
 				// If this fieldName doesn't contain checked="checked", it's not a prechecked checkbox
 				if( !fieldHeader.contains(PRECHECKED)) {
-					continue; // Continue to next iteration of while loop
+					// Save an empty string over all values that don't have values in eform values
+					val = "";
 				} else {
 					// putValue method needs to know if the current fieldHeader is prechecked or not
 					val = "prechecked";
@@ -689,7 +698,7 @@ public class EForm extends EFormBase {
 			html.delete(pointer, endPointer);
 			html.insert(pointer, value);
 		} else if (type.equals("checkbox")) {
-			if( value.equals("prechecked") ) {
+			if( "prechecked".equals(value) ) {
 				pointer = html.indexOf(PRECHECKED, pointer);
 				html.delete(pointer, pointer + PRECHECKED.length());
 			} else {

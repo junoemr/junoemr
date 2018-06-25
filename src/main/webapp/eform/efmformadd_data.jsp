@@ -46,7 +46,7 @@ function hideDiv() {
 </script>
 <div id="hideshow" style="position: relative; z-index: 999;"><a
 	href="javascript:hideDiv()">Hide Errors</a> <font
-	style="font-size: 10; font-color: darkred;"> <html:errors /> </font></div>
+	style="font-size: 10px; font-color: darkred;"> <html:errors /> </font></div>
 <% } %>
 
 <%

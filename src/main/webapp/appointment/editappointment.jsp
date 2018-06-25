@@ -74,8 +74,8 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session"/>
-<%@page import="org.oscarehr.common.model.DemographicCust" %>
-<%@page import="org.oscarehr.common.dao.DemographicCustDao" %>
+<%@page import="org.oscarehr.demographic.model.DemographicCust" %>
+<%@page import="org.oscarehr.demographic.dao.DemographicCustDao" %>
 <%@ page import="org.oscarehr.common.model.EncounterForm" %>
 <%@ page import="org.oscarehr.common.dao.EncounterFormDao" %>
 <%@page import="org.oscarehr.common.model.ProviderPreference" %>
@@ -618,7 +618,7 @@
 
 
 								String signOrVerify = "";
-								if (statusCode.length() >= 2)
+								if (statusCode != null && statusCode.length() >= 2)
 								{
 									signOrVerify = statusCode.substring(1, 2);
 									statusCode = statusCode.substring(0, 1);
@@ -626,7 +626,11 @@
 								if (strEditable != null && strEditable.equalsIgnoreCase("yes"))
 								{ %>
 							<select name="status" STYLE="width: 154px">
-								<% for (int i = 0; i < allStatus.size(); i++)
+								<% if(statusCode == null)
+								{%>
+									<option value="" selected></option>
+								<%}
+								for (int i = 0; i < allStatus.size(); i++)
 								{ %>
 								<option
 										value="<%=((AppointmentStatus)allStatus.get(i)).getStatus()+signOrVerify%>"

@@ -62,7 +62,7 @@ public class FormsSummary implements Summary{
 	
 	private  void fillEforms(LoggedInInfo loggedInInfo,List<SummaryItemTo1> list,Integer demographicNo,int count){
 
-		List<EFormData> completedEforms = formsManager.findByDemographicId(loggedInInfo,demographicNo);
+		List<EFormData> completedEforms = formsManager.findInstancedByDemographicId(loggedInInfo,demographicNo);
 		Collections.sort(completedEforms, Collections.reverseOrder(EFormData.FORM_DATE_COMPARATOR));
 			
 		for(EFormData eformData: completedEforms){	

@@ -187,7 +187,13 @@ public class AppointmentDisplayController
 
 	public boolean isBilled()
 	{
-		return (appointment.getStatus().equals(BILLED_STATUS));
+		if (appointment.getStatus() == null)
+		{
+			return false;
+		} else
+		{
+			return (appointment.getStatus().equals(BILLED_STATUS));
+		}
 	}
 
 	public boolean isShowDocumentLink()
@@ -271,13 +277,18 @@ public class AppointmentDisplayController
 	{
 		String iconImage = appointment.getIconImage();
 		String status = appointment.getStatus();
-
-		if(status.length() >= 2)
+		if (status == null)
 		{
-			iconImage = status.substring(1,2) + iconImage;
-		}
+			return null;
+		} else
+		{
+			if (status.length() >= 2)
+			{
+				iconImage = status.substring(1, 2) + iconImage;
+			}
 
-		return iconImage;
+			return iconImage;
+		}
 	}
 
 	public String getStatusTitle()
@@ -364,7 +375,7 @@ public class AppointmentDisplayController
 				"&appointmentNo=" + appointment.getAppointmentNo().toString() +
 				"&demographicNo=" + appointment.getDemographicNo() +
 				"&curProviderNo=" + parameterProviderNo +
-				"&reason=" + getReason() +
+				"&reason=" + URLEncoder.encode(appointment.getReason()) +
 				"&encType=" + URLEncoder.encode("face to face encounter with client","UTF-8") +
 				"&userName=" + URLEncoder.encode( userFirstName + " " + userLastName, "UTF-8") +
 				"&curDate=" + LocalDate.now().format(dateFormatter) +
@@ -608,7 +619,7 @@ public class AppointmentDisplayController
 	{
 		String name = getName();
 
-		if (view == 0 && numAvailProvider != 1 && name.length() > nameLength)
+		if (view == 0 && name.length() > nameLength)
 		{
 			return name.substring(0, nameLength);
 		}
@@ -618,6 +629,13 @@ public class AppointmentDisplayController
 
 	public String getTruncatedUpperName()
 	{
+		String name = getName();
+
+		if (view == 0 && numAvailProvider != 1 && name.length() > nameLength)
+		{
+			return name.substring(0, nameLength).toUpperCase();
+		}
+
 		return getTruncatedName().toUpperCase();
 	}
 

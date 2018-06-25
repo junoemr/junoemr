@@ -76,6 +76,7 @@ li.cpp-note-list:last-child {
 }
 
 #main-nav {
+	height: 50px;
 	.navbar-right-menu {
 		.fa {
 			color: $primary-white-text;
@@ -86,7 +87,7 @@ li.cpp-note-list:last-child {
 #patient-list-template {
 	#left-pane {
 		position: fixed;
-		top: 51px;
+		top: 50px;
 		bottom: 0;
 		left: 0;
 		z-index: 1000;
@@ -149,7 +150,7 @@ li.cpp-note-list:last-child {
 	}
 	#left-pane-hidden {
 		position: fixed;
-		top: 51px;
+		top: 50px;
 		bottom: 0;
 		left: 0;
 		z-index: 1000;

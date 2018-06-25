@@ -47,7 +47,7 @@ angular.module('Common.Util').service("junoHttp", [
                     else if (request_result.data.status === 'ERROR'){
                         var errors = {
                             meta: angular.copy(request_result.data.headers),
-                            data: angular.copy(request_result.data.error)
+                            data: angular.copy(request_result.data.error.message)
                         };
                         deferred.reject(errors);
                     }

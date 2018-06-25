@@ -68,46 +68,46 @@
 	<form>
 
 		<div class="row" ng-show="settingsCtrl.currentTab.path == 'persona'">
-			<div class="col-sm-6 col-sm-offset-3">
-				<div class="col-sm-12 no-padding">			
+			<div class="col-sm-6">
+				<div class="col-sm-12">
 					<h3>Dashboard</h3>
 					<hr>
-					<div class="form-group col-sm-12">
-						Enable New UI on login:<br>
-						<label class="radio-inline" for="radios-per-0">
-							<input ng-model="settingsCtrl.pref.useCobaltOnLogin" name="radios-per-0" id="radios-per-0" ng-value="true" type="radio">
-							Enable
-						</label>
-						<label class="radio-inline" for="radios-1">
-							<input ng-model="settingsCtrl.pref.useCobaltOnLogin" name="radios-per-0" id="radios-per-1" ng-value="false" type="radio">
-							Disable
-						</label>
-					</div>
 				</div>
-				<div class="col-sm-12 no-padding">		
+				<div class="form-group col-sm-12">
+					Enable New UI on login:<br>
+					<label class="radio-inline" for="radios-per-0">
+						<input ng-model="settingsCtrl.pref.useCobaltOnLogin" name="radios-per-0" id="radios-per-0" ng-value="true" type="radio">
+						Enable
+					</label>
+					<label class="radio-inline" for="radios-1">
+						<input ng-model="settingsCtrl.pref.useCobaltOnLogin" name="radios-per-0" id="radios-per-1" ng-value="false" type="radio">
+						Disable
+					</label>
+				</div>
+				<div class="col-sm-12">
 					<h3>Recent Patient List</h3>
 					<hr>
-					<div class="form-group col-sm-4">
-						Number of recent patients to display:<br>
-						<select ng-model="settingsCtrl.pref.recentPatients" class="form-control">
-							<option value="1">1</option>
-							<option value="2">2</option>
-							<option value="3">3</option>
-							<option value="4">4</option>
-							<option value="5">5</option>
-							<option value="6">6</option>
-							<option value="7">7</option>
-							<option value="8">8</option>
-							<option value="9">9</option>
-							<option value="10">10</option>
-							<option value="11">11</option>
-							<option value="12">12</option>
-							<option value="13">13</option>
-							<option value="14">14</option>
-							<option value="15">15</option>
-							<option value="16">16</option>
-						</select>
-					</div>
+				</div>
+				<div class="form-group col-sm-4">
+					Number of recent patients to display:<br>
+					<select ng-model="settingsCtrl.pref.recentPatients" class="form-control">
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+						<option value="8">8</option>
+						<option value="9">9</option>
+						<option value="10">10</option>
+						<option value="11">11</option>
+						<option value="12">12</option>
+						<option value="13">13</option>
+						<option value="14">14</option>
+						<option value="15">15</option>
+						<option value="16">16</option>
+					</select>
 				</div>
 				<!-- Dashboard -->
 			</div>
@@ -115,9 +115,11 @@
 		<!-- persona -->
 		
 		<div class="row" ng-show="settingsCtrl.currentTab.path == 'general'">
-			<div class="col-sm-6 col-sm-offset-3">
-				<h3>Override Clinic</h3>
-				<hr>
+			<div class="col-sm-6">
+				<div class="col-sm-12">
+					<h3>Override Clinic</h3>
+					<hr>
+				</div>
 				<div class="form-group col-sm-6">
 					<label class="control-label">Address:</label>
 					<input ng-model="settingsCtrl.pref.rxAddress" placeholder="Address" class="form-control" type="text">
@@ -180,7 +182,7 @@
 		<!--  end row -->
 
 		<div class="row" ng-show="settingsCtrl.currentTab.path == 'schedule'">
-			<div class="col-md-8 col-md-offset-2 col-sm-12" >
+			<div class="col-md-8 col-sm-12 md-margin-top" >
 				<div class="form-group col-sm-6">
 					<label>Start Hour (0-23):</label>
 					<input ng-model="settingsCtrl.pref.startHour" placeholder="Start Hour" class="form-control" type="text">
@@ -243,7 +245,7 @@
 
 
 		<div class="row" ng-show="settingsCtrl.currentTab.path == 'billing'">
-			<div class="col-sm-6 col-sm-offset-3">
+			<div class="col-sm-6 md-margin-top">
 				<div class="form-group col-sm-6">
 					<label>Default Billing Form:</label>
 					<select class="form-control" ng-model="settingsCtrl.pref.defaultServiceType" 
@@ -277,8 +279,8 @@
 		</div>
 
 		<div class="row" ng-show="settingsCtrl.currentTab.path == 'rx'">
-			<div class="col-sm-6 col-sm-offset-3">
-				<div class="col-sm-6 no-padding">
+			<div class="col-sm-6">
+				<div class="col-sm-6 no-padding md-margin-top">
 					<div class="form-group col-sm-12">
 						<label>RX3:</label>
 						<div class="controls">
@@ -341,8 +343,10 @@
 					</div>
 				</div>
 				<div class="col-sm-6 no-padding">
-					<h3>External Prescriber</h3>
-					<hr>
+					<div class="col-sm-12">
+						<h3>External Prescriber</h3>
+						<hr>
+					</div>
 					<div class="form-group col-sm-12">
 						<label></label>
 						<div class="controls">
@@ -390,7 +394,7 @@
 		</div>
 
 		<div class="row" ng-show="settingsCtrl.currentTab.path == 'masterdemo'">
-			<div class="col-lg-4 col-sm-6 col-sm-offset-3 col-lg-offset-4">
+			<div class="col-lg-4 col-sm-6 md-margin-top">
 				<div class="form-group col-sm-12">
 					<label>Default HC Type:</label>
 					<select class="form-control" ng-model="settingsCtrl.pref.defaultHcType">
@@ -482,7 +486,7 @@
 		</div>
 
 		<div class="row" ng-show="settingsCtrl.currentTab.path == 'consults'">
-			<div class="col-lg-4 col-sm-6 col-lg-offset-4 col-sm-offset-3">
+			<div class="col-lg-4 col-sm-6 md-margin-top">
 				<div class="form-group col-sm-12">
 					<label>Consultation Cutoff Time Warning:</label>
 					<input ng-model="settingsCtrl.pref.consultationTimePeriodWarning" placeholder="Cutoff Time Warning" class="form-control" type="text">
@@ -507,7 +511,7 @@
 		</div>
 
 		<div class="row" ng-show="settingsCtrl.currentTab.path == 'documents'">
-			<div class="col-lg-4 col-sm-6 col-lg-offset-4 col-sm-offset-3">
+			<div class="col-lg-4 col-sm-6 md-margin-top">
 				<div class="form-group col-sm-12">
 					<label>Document Browser In Document Report:</label>
 					<div class="controls">
@@ -544,69 +548,70 @@
 		</div>
 
 		<div class="row" ng-show="settingsCtrl.currentTab.path == 'summary'" id="summary">
-			<div class="col-md-7 col-md-offset-2">
-				<div class="col-sm-12 no-padding">
+			<div class="col-md-7">
+				<div class="col-sm-12">
 					<h3>Notes</h3>
 					<hr>
-					<div class="form-group col-sm-12">
-						<label>CPP Single Line</label>
-						<div class="controls">
-							<label class="radio-inline" for="radios-enc-0">
-								<input name="radios-enc-0" id="radios-enc-0" ng-model="settingsCtrl.pref.cppSingleLine" ng-value="true" type="radio">
-								Enable
-							</label>
-							<label class="radio-inline" for="radios-enc-1">
-								<input name="radios-enc-1" id="radios-enc-1" ng-model="settingsCtrl.pref.cppSingleLine" ng-value="false" type="radio">
-								Disable
-							</label>
-						</div>
-					</div>
-					<div class="form-group col-sm-12">
-						<label>Use Single View</label>
-						<div class="controls">
-							<label class="radio-inline" for="radios-enc-2">
-								<input name="radios-enc-2" id="radios-enc-2" ng-model="settingsCtrl.pref.cmeNoteFormat" ng-value="true" type="radio">
-								Enable
-							</label>
-							<label class="radio-inline" for="radios-enc-3">
-								<input name="radios-enc-3" id="radios-enc-3" ng-model="settingsCtrl.pref.cmeNoteFormat" ng-value="false" type="radio">
-								Disable
-							</label>
-						</div>
-					</div>
-
-					<div class="form-group col-sm-12">
-						<label>Stale Date</label>
-						<small><em>Please set how many months in the past before a Case Management Note is fully visible e.g. Set to 6 will display fully all notes within the last 6 months</em></small>
-						<select ng-model="settingsCtrl.pref.cmeNoteDate" class="form-control" ng-options="p.value as p.label for p in settingsCtrl.staleDates">
-						</select>
-					</div>
-
-					<div class="form-group col-sm-12">
-						<label>Default Quick Chart Size</label>
-						<small><em>Enter the number of notes for quick chart size.</em></small>
-						<input ng-model="settingsCtrl.pref.quickChartSize" class="form-control" type="text">
+				</div>
+				<div class="form-group col-sm-12">
+					<label>CPP Single Line</label>
+					<div class="controls">
+						<label class="radio-inline" for="radios-enc-0">
+							<input name="radios-enc-0" id="radios-enc-0" ng-model="settingsCtrl.pref.cppSingleLine" ng-value="true" type="radio">
+							Enable
+						</label>
+						<label class="radio-inline" for="radios-enc-1">
+							<input name="radios-enc-1" id="radios-enc-1" ng-model="settingsCtrl.pref.cppSingleLine" ng-value="false" type="radio">
+							Disable
+						</label>
 					</div>
 				</div>
-				<div class="col-sm-12 no-padding" id="summary-items">
-					<h3>Patient Summary Viewable Items</h3>
-					<hr>
-					<div class="form-group col-sm-12">
-						<label>Enable Custom Summary</label>
-						<small><em>Enabling this feature will allow you to to hide or display CPP and Summary Items.</em></small>
-						<div class="controls">
-							<label class="radio-inline" for="radios-enc-4">
-								<input name="radios-enc-4" id="radios-enc-4" ng-model="settingsCtrl.pref.summaryItemCustomDisplay" ng-value="true" type="radio">
-								Enable
-							</label>
-							<label class="radio-inline" for="radios-enc-5">
-								<input name="radios-enc-5" id="radios-enc-5" ng-model="settingsCtrl.pref.summaryItemCustomDisplay" ng-value="false" type="radio">
-								Disable
-							</label>
-						</div>
+				<div class="form-group col-sm-12">
+					<label>Use Single View</label>
+					<div class="controls">
+						<label class="radio-inline" for="radios-enc-2">
+							<input name="radios-enc-2" id="radios-enc-2" ng-model="settingsCtrl.pref.cmeNoteFormat" ng-value="true" type="radio">
+							Enable
+						</label>
+						<label class="radio-inline" for="radios-enc-3">
+							<input name="radios-enc-3" id="radios-enc-3" ng-model="settingsCtrl.pref.cmeNoteFormat" ng-value="false" type="radio">
+							Disable
+						</label>
 					</div>
 				</div>
-				<ng-include ng-if="settingsCtrl.pref.summaryItemCustomDisplay" src="'settings/partials/patientSummaryItems.html'"></ng-include>
+
+				<div class="form-group col-sm-12">
+					<label>Stale Date</label>
+					<small><em>Please set how many months in the past before a Case Management Note is fully visible e.g. Set to 6 will display fully all notes within the last 6 months</em></small>
+					<select ng-model="settingsCtrl.pref.cmeNoteDate" class="form-control" ng-options="p.value as p.label for p in settingsCtrl.staleDates">
+					</select>
+				</div>
+
+				<div class="form-group col-sm-12">
+					<label>Default Quick Chart Size</label>
+					<small><em>Enter the number of notes for quick chart size.</em></small>
+					<input ng-model="settingsCtrl.pref.quickChartSize" class="form-control" type="text">
+				</div>
+			<div class="col-sm-12">
+				<h3>Patient Summary Viewable Items</h3>
+				<hr>
+			</div>
+
+			<div class="form-group col-sm-12" id="summary-items">
+				<label>Enable Custom Summary</label>
+				<small><em>Enabling this feature will allow you to to hide or display CPP and Summary Items.</em></small>
+				<div class="controls">
+					<label class="radio-inline" for="radios-enc-4">
+						<input name="radios-enc-4" id="radios-enc-4" ng-model="settingsCtrl.pref.summaryItemCustomDisplay" ng-value="true" type="radio">
+						Enable
+					</label>
+					<label class="radio-inline" for="radios-enc-5">
+						<input name="radios-enc-5" id="radios-enc-5" ng-model="settingsCtrl.pref.summaryItemCustomDisplay" ng-value="false" type="radio">
+						Disable
+					</label>
+				</div>
+			</div>
+			<ng-include ng-if="settingsCtrl.pref.summaryItemCustomDisplay" src="'settings/partials/patientSummaryItems.html'"></ng-include>
 			</div>
 			<div class="col-md-3 pull-right col-xs-12">
 				<h4>Classic Encounter Preferences:</h4>
@@ -621,7 +626,7 @@
 		<!--  row summary  -->
 
 		<div class="row" ng-show="settingsCtrl.currentTab.path == 'eforms'">
-			<div class="col-lg-4 col-sm-6 col-lg-offset-4 col-sm-offset-3">
+			<div class="col-lg-4 col-sm-6 md-margin-top">
 				<div class="form-group col-sm-12">
 					<label>Favorite Group:</label>
 					<select ng-model="settingsCtrl.pref.favoriteFormGroup" class="form-control" ng-options="p.value as p.label for p in settingsCtrl.formGroupNames">
@@ -631,7 +636,7 @@
 		</div>
 
 		<div class="row" ng-show="settingsCtrl.currentTab.path == 'inbox'">
-			<div class="col-lg-4 col-sm-6 col-lg-offset-4 col-sm-offset-3">
+			<div class="col-lg-4 col-sm-6 md-margin-top">
 				<div class="form-group col-sm-12">
 					<label>Disable comment on acknowledgment:</label>
 					<div class="controls">
@@ -650,7 +655,7 @@
 		</div>
 
 		<div class="row" ng-show="settingsCtrl.currentTab.path == 'programs'">
-			<div class="col-lg-4 col-sm-6 col-lg-offset-4 col-sm-offset-3">
+			<div class="col-lg-4 col-sm-6 md-margin-top">
 				<div class="form-group col-sm-6">
 					<label>Default PMM:</label>
 					<div class="controls">
@@ -668,7 +673,7 @@
 		</div>
 
 		<div class="row" ng-show="settingsCtrl.currentTab.path == 'integration'">
-			<div class="col-lg-6 col-sm-10 col-lg-offset-3 col-sm-offset-1">
+			<div class="col-lg-6 col-sm-10 md-margin-top">
 					<div class="form-group col-sm-6">
 						<label>OLIS Default Reporting Laboratory:</label>
 						<select class="form-control" ng-model="settingsCtrl.pref.olisDefaultReportingLab" 
@@ -745,7 +750,7 @@
 			</div>
 	</form>
 	
-	<div class="col-sm-4 col-sm-offset-4 settings-footer text-center">
+	<div class="col-sm-4 settings-footer">
 		<button class="btn btn-primary" ng-click="settingsCtrl.cancel()">Cancel</button>
 		<button class="btn btn-success" ng-click="settingsCtrl.save()">Save All Settings</button>
 	</div>

@@ -25,6 +25,7 @@
 
 package org.oscarehr.schedule.dao;
 
+import java.math.BigInteger;
 import java.sql.Time;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -136,13 +137,18 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
 	public RangeMap<LocalTime, ScheduleSlot> findScheduleSlots(LocalDate date, Integer providerNo)
 	{
-		String sql = "SELECT \n" +
+		// This query is a bit hard to read.  The mess with all of the UNION ALLs is a way to make a
+		// sequence of numbers.  This is then used to find the position in the scheduletemplate.timecode
+		// value to split it into rows so it can be joined.
+		// It uses the STRAIGHT_JOIN planner hint because the scheduletemplatecode table was being
+		// joined too soon by default.
+		String sql = "SELECT STRAIGHT_JOIN\n" +
 				"  (n3.i + (10 * n2.i) + (100 * n1.i))+1 AS position, \n" +
 				"  SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1) AS code_char,\n" +
 				"  sd.sdate AS appt_date,\n" +
 				"  SEC_TO_TIME(ROUND((24*60*60)*(n3.i + (10 * n2.i) + (100 * n1.i))/LENGTH(st.timecode))) AS appt_time,\n" +
 				"  stc.code,\n" +
-				"  CAST(stc.duration AS integer),\n" +
+				"  CAST(COALESCE(stc.duration, ((24*60)/LENGTH(st.timecode))) AS integer) AS duration,\n" +
 				"  stc.description,\n" +
 				"  stc.color,\n" +
 				"  stc.confirm,\n" +
@@ -155,9 +161,9 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n3 \n" +
 				"CROSS JOIN scheduledate sd\n" +
 				"JOIN scheduletemplate st ON sd.hour = st.name\n" +
-				"LEFT JOIN scheduletemplatecode stc ON stc.code = SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1)\n" +
+				"LEFT JOIN scheduletemplatecode stc " +
+				"  ON BINARY stc.code = SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1)\n" +
 				"WHERE sd.status = 'A'\n" +
-				"AND stc.duration IS NOT NULL\n" + // Ignore blank durations because they'll have 0 range
 				"AND sd.sdate = :date\n" +
 				"AND sd.provider_no = :providerNo\n" +
 				"AND (n3.i + (10 * n2.i) + (100 * n1.i)) < LENGTH(st.timecode)\n" +
@@ -175,7 +181,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 			java.sql.Date appointmentDate = (java.sql.Date) result[2];
 			Time appointmentTime = (java.sql.Time) result[3];
 			String code = (String) result[1];
-			Integer durationMinutes = (Integer) result[5];
+			Integer durationMinutes = ((BigInteger) result[5]).intValue();
 			String description = (String) result[6];
 			String color = (String) result[7];
 			String confirm = (String) result[8];
@@ -187,9 +193,23 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 			LocalDateTime appointmentDateTime = LocalDateTime.of(slotDate, slotTime);
 
 			// Get the end time by adding the duration
-			LocalTime endTime = slotTime.plus(Duration.ofMinutes(durationMinutes));
+			Range range;
+			Duration slotDuration = Duration.ofMinutes(durationMinutes);
+			if(
+				// Use Max time if the duration is more than a day or if the slot duration will wrap
+				// to the next day
+				slotDuration.compareTo(Duration.ofDays(1)) >= 0 ||
+				LocalTime.MAX.minus(slotDuration).compareTo(slotTime) <= 0)
+			{
+				LocalTime endTime = LocalTime.MAX;
+				range = Range.closed(slotTime, endTime);
+			}
+			else
+			{
+				LocalTime endTime = slotTime.plus(Duration.ofMinutes(durationMinutes));
+				range = Range.closedOpen(slotTime, endTime);
+			}
 
-			Range range = Range.closedOpen(slotTime, endTime);
 			slots.put(range, new ScheduleSlot(appointmentDateTime, code, durationMinutes, description,
 					color, confirm, bookingLimit));
 		}
