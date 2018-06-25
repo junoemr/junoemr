@@ -96,7 +96,7 @@ public class DocumentService
 
 		if(!file.validate())
 		{
-			file.reEncode();
+			file.process();
 		}
 		file.moveToDocuments();
 
