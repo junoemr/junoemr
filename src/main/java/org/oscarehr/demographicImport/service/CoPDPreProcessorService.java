@@ -93,8 +93,6 @@ public class CoPDPreProcessorService
 		message = fixPhoneNumbers(message);
 		message = fixDateTimeNumbers(message);
 
-		message = message.replaceAll("~crlf~", "\\\n");
-
 		return message;
 	}
 

@@ -165,7 +165,7 @@ public class HistoryNoteMapper
 				noteText += leisureActivities + "\n";
 			}
 
-			note.setNote(StringUtils.trim(noteText));
+			note.setNote(StringUtils.trim(noteText).replaceAll("~crlf~", "\n"));
 		}
 		return note;
 	}
@@ -192,7 +192,7 @@ public class HistoryNoteMapper
 		{
 			noteText += comments + "\n";
 		}
-		note.setNote(StringUtils.trim(noteText));
+		note.setNote(StringUtils.trim(noteText).replaceAll("~crlf~", "\n"));
 
 		Date diagnosisDate = getFamHistDiagnosisDate(rep);
 		note.setObservationDate(diagnosisDate);
@@ -226,7 +226,7 @@ public class HistoryNoteMapper
 		note.setUpdateDate(procedureDate);
 
 		String resultText = getMedHistResults(rep);
-		String noteText = StringUtils.trimToEmpty(getMedHistProcedureName(rep));
+		String noteText = StringUtils.trimToEmpty(getMedHistProcedureName(rep)).replaceAll("~crlf~", "\n");
 		if(resultText != null)
 		{
 			noteText += " - " + resultText;

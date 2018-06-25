@@ -72,8 +72,9 @@ public class EncounterNoteMapper
 	{
 		CaseManagementNote note = new CaseManagementNote();
 
-		String noteText = StringUtils.trimToEmpty(StringUtils.trimToEmpty(getEncounterNoteReason(rep)) +
-				"\n\n" + StringUtils.trimToEmpty(getEncounterNoteComment(rep)));
+		String commentText = StringUtils.trimToEmpty(getEncounterNoteReason(rep));
+		String reasonText = StringUtils.trimToEmpty(getEncounterNoteComment(rep));
+		String noteText = StringUtils.trimToEmpty( commentText + "\n\n" + reasonText).replaceAll("~crlf~", "\n");
 
 		note.setNote(noteText);
 		note.setObservationDate(getEncounterNoteContactDate(rep));
