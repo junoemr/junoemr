@@ -311,11 +311,11 @@ public class ClinicaidAPIService
 			data.put("hc_province", StringUtils.upperCase(demo.getHcType()));
 			data.put("city", demo.getCity());
 			data.put("postal_code", demo.getPostal());
-			data.put("chart_number", request.getParameter("chart_no"));
+			data.put("chart_number", request.getParameter("chart_no")==null ? "" : request.getParameter("chart_no"));
 			data.put("service_recipient_birth_date", demo.getYearOfBirth() + "-" + demo.getMonthOfBirth() + "-" + demo.getDateOfBirth());
 			data.put("appointment_number", request.getParameter("appointment_no"));
 			data.put("appointment_start_time", request.getParameter("start_time"));
-			data.put("referral_number", referral_no);
+			data.put("referral_number", referral_no==null ? "" : referral_no);
 			data.put("referral_first_name", referral_first_name);
 			data.put("referral_last_name", referral_last_name);
 			data.put("diagnostic_code", dx_codes);
