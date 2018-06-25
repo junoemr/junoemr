@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.prevention.model.Prevention;
+import org.oscarehr.prevention.model.PreventionExt;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
@@ -91,9 +92,15 @@ public class PreventionMapper
 
 		prevention.setPreventionDate(immunizationDate);
 		prevention.setLastUpdateDate(immunizationDate);
-		prevention.setPreventionType(getVaccineCode(rep));
+		prevention.setPreventionType(getTranslatedVaccineCode(rep));
 		prevention.setRefused(false);
 		prevention.setNever(false);
+
+		// set the original data in the 'comment' extension
+		PreventionExt commentExt = new PreventionExt();
+		commentExt.setPrevention(prevention);
+		commentExt.setCommentKeyValue(getVaccineCode(rep));
+		prevention.addExtension(commentExt);
 
 		return prevention;
 	}
@@ -110,7 +117,12 @@ public class PreventionMapper
 
 	public String getVaccineCode(int rep) throws HL7Exception
 	{
-		String typeCode = StringUtils.trimToNull(provider.getIMMUNIZATION(rep).getZIM().getZim3_vaccineCode().getValue());
+		return StringUtils.trimToNull(provider.getIMMUNIZATION(rep).getZIM().getZim3_vaccineCode().getValue());
+	}
+
+	public String getTranslatedVaccineCode(int rep) throws HL7Exception
+	{
+		String typeCode = getVaccineCode(rep);
 
 		// according to the CoPD spec, the hl7 should contain a correct code that can be directly added to the database
 		// however we have found that we need to map some values to codes sometimes
