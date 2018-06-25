@@ -75,7 +75,7 @@ public class PreventionExtTransfer {
 		
 		PreventionExtTransfer transfer = new PreventionExtTransfer();
 		transfer.setId(preventionExt.getId());
-		transfer.setPreventionId(preventionExt.getPreventionId());
+		transfer.setPreventionId(preventionExt.getPrevention().getId());
 		transfer.setKey(preventionExt.getkeyval());
 		transfer.setValue(preventionExt.getVal());
 

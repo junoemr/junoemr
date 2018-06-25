@@ -25,11 +25,16 @@ package org.oscarehr.prevention.dao;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.prevention.model.Prevention;
+import org.oscarehr.prevention.model.PreventionExt;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
 import java.util.Date;
 import java.util.List;
 
+@Repository("dao.preventionDao")
+@Transactional
 public class PreventionDao extends AbstractDao<Prevention>
 {
 
@@ -38,7 +43,7 @@ public class PreventionDao extends AbstractDao<Prevention>
 	}
 
 	public List<Prevention> findByDemographicId(Integer demographicId) {
-		Query query = entityManager.createQuery("select x from "+modelClass.getSimpleName()+" x where demographicId=?1");
+		Query query = entityManager.createQuery("select x from "+modelClass.getSimpleName()+" x where x.demographicId=?1");
 		query.setParameter(1, demographicId);
 
 		List<Prevention> results = query.getResultList();
@@ -62,7 +67,7 @@ public class PreventionDao extends AbstractDao<Prevention>
 	}
 
     public List<Prevention> findByDemographicIdAfterDatetime(Integer demographicId, Date dateTime) {
-    	Query query = entityManager.createQuery("select x from Prevention x where demographicId=?1 and lastUpdateDate>=?2 and deleted='0'");
+    	Query query = entityManager.createQuery("select x from Prevention x where x.demographicId=?1 and x.lastUpdateDate>=?2 and x.deleted='0'");
     	query.setParameter(1, demographicId);
 		query.setParameter(2, dateTime);
 
@@ -100,7 +105,7 @@ public class PreventionDao extends AbstractDao<Prevention>
 	}
 
 	public List<Prevention> findNotDeletedByDemographicIdAfterDatetime(Integer demographicId, Date dateTime) {
-		Query query = entityManager.createQuery("select x from Prevention x where demographicId=?1 and lastUpdateDate> ?2");
+		Query query = entityManager.createQuery("select x from Prevention x where x.demographicId=?1 and x.lastUpdateDate> ?2");
 		query.setParameter(1, demographicId);
 		query.setParameter(2, dateTime);
 
@@ -111,7 +116,7 @@ public class PreventionDao extends AbstractDao<Prevention>
 	}
 	
 	public List<Integer> findNonDeletedIdsByDemographic(Integer demographicId) {
-		Query query = entityManager.createQuery("select x.id from Prevention x where demographicId=?1 and deleted='0'");
+		Query query = entityManager.createQuery("select x.id from Prevention x where x.demographicId=?1 and x.deleted='0'");
 		query.setParameter(1, demographicId);
 	
 		@SuppressWarnings("unchecked")
@@ -122,7 +127,7 @@ public class PreventionDao extends AbstractDao<Prevention>
 	
 
 	public List<Prevention> findNotDeletedByDemographicId(Integer demographicId) {
-		Query query = entityManager.createQuery("select x from "+modelClass.getSimpleName()+" x where demographicId=?1 and deleted=?2");
+		Query query = entityManager.createQuery("select x from "+modelClass.getSimpleName()+" x where x.demographicId=?1 and x.deleted=?2");
 		query.setParameter(1, demographicId);
 		query.setParameter(2, '0');
 
@@ -133,7 +138,7 @@ public class PreventionDao extends AbstractDao<Prevention>
 	}
 
 	public List<Prevention> findByTypeAndDate(String preventionType, Date startDate, Date endDate) {
-		Query query = entityManager.createQuery("select x from "+modelClass.getSimpleName()+" x where preventionType=?1 and preventionDate>=?2 and preventionDate<=?3 and deleted='0' and refused='0' order by preventionDate");
+		Query query = entityManager.createQuery("select x from "+modelClass.getSimpleName()+" x where x.preventionType=?1 and x.preventionDate>=?2 and x.preventionDate<=?3 and x.deleted='0' and x.refused='0' order by x.preventionDate");
 		query.setParameter(1, preventionType);
 		query.setParameter(2, startDate);
 		query.setParameter(3, endDate);
@@ -145,7 +150,7 @@ public class PreventionDao extends AbstractDao<Prevention>
 	}
 
 	public List<Prevention> findByTypeAndDemoNo(String preventionType, Integer demoNo) {
-		Query query = entityManager.createQuery("select x from "+modelClass.getSimpleName()+" x where preventionType=?1 and demographicId=?2 and deleted='0' order by preventionDate");
+		Query query = entityManager.createQuery("select x from "+modelClass.getSimpleName()+" x where x.preventionType=?1 and x.demographicId=?2 and x.deleted='0' order by x.preventionDate");
 		query.setParameter(1, preventionType);
 		query.setParameter(2, demoNo);
 		
@@ -163,7 +168,7 @@ public class PreventionDao extends AbstractDao<Prevention>
 	
 
 	public List<Prevention> findUniqueByDemographicId(Integer demographicId) {
-		Query query = entityManager.createQuery("select x from "+modelClass.getSimpleName()+" x where demographicId=?1 and deleted='0' GROUP BY preventionType ORDER BY preventionDate DESC");
+		Query query = entityManager.createQuery("select x from "+modelClass.getSimpleName()+" x where x.demographicId=?1 and x.deleted='0' GROUP BY x.preventionType ORDER BY x.preventionDate DESC");
 		query.setParameter(1, demographicId);
 
 		@SuppressWarnings("unchecked")
@@ -199,6 +204,9 @@ public class PreventionDao extends AbstractDao<Prevention>
 		query.setParameter(1,keyName);
 		return query.getResultList();
 	}
-	
-	
+
+	public Prevention getPreventionFromExt(PreventionExt ext)
+	{
+		return ext.getPrevention();
+	}
 }

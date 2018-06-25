@@ -85,7 +85,7 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 	private Date lastUpdateDate = null;
 
 	// with cascade, these entities will be persisted when this class is.
-	@OneToMany(fetch=FetchType.LAZY, mappedBy = "prevention_id", cascade = CascadeType.PERSIST)
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "prevention", cascade = CascadeType.PERSIST)
 	private List<PreventionExt> preventionExtensionList;
 
 

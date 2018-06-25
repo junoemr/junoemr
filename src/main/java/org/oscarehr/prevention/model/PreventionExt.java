@@ -27,35 +27,49 @@ package org.oscarehr.prevention.model;
 
 import org.oscarehr.common.model.AbstractModel;
 
-import java.io.Serializable;
-import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "preventionsExt")
 public class PreventionExt extends AbstractModel<Integer> implements Serializable {
 
+	public static final String KEY_NAME = "name";
+	public static final String KEY_DOSE = "dose";
+	public static final String KEY_MANUFACTURE = "manufacture";
+	public static final String KEY_ROUTE = "route";
+	public static final String KEY_LOT = "lot";
+	public static final String KEY_LOCATION = "location";
+	public static final String KEY_COMMENT = "comments";
+	public static final String KEY_REASON = "reason";
+	public static final String KEY_RESULT = "result";
+
+	public static final String KEY_RESULT_PENDING = "pending";
+	public static final String KEY_RESULT_NORMAL = "normal";
+	public static final String KEY_RESULT_ABNORMAL = "abnormal";
+	public static final String KEY_RESULT_OTHER = "other";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id = null;
 
-	@Column(name = "prevention_id")
-	private Integer preventionId = null;
-
 	private String keyval = null;
 	private String val = null;
 
-	
-	public Integer getPreventionId() {
-		return preventionId;
-	}
-	
-	public void setPreventionId(Integer preventionId) {
-		this.preventionId = preventionId;
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name = "prevention_id")
+	private Prevention prevention;
+
+	@Override
+	public Integer getId() {
+		return id;
 	}
 	
 	public String getkeyval() {
@@ -74,8 +88,76 @@ public class PreventionExt extends AbstractModel<Integer> implements Serializabl
 		this.val = val;
 	}
 
-	@Override
-    public Integer getId() {
-		return id;
+	public Prevention getPrevention()
+	{
+		return prevention;
+	}
+
+	public void setPrevention(Prevention prevention)
+	{
+		this.prevention = prevention;
+	}
+
+	/* quick methods for setting specific key-value pairs */
+
+	private void setKeyValue(String key, String value)
+	{
+		setKeyval(key);
+		setVal(value);
+	}
+
+	public void setNameKeyValue(String value)
+	{
+		setKeyValue(KEY_NAME, value);
+	}
+
+	public void setDoseKeyValue(String value)
+	{
+		setKeyValue(KEY_DOSE, value);
+	}
+
+	public void setManufactureKeyValue(String value)
+	{
+		setKeyValue(KEY_MANUFACTURE, value);
+	}
+
+	public void setRouteKeyValue(String value)
+	{
+		setKeyValue(KEY_ROUTE, value);
+	}
+
+	public void setLotKeyValue(String value)
+	{
+		setKeyValue(KEY_LOT, value);
+	}
+
+	public void setDLocationKeyValue(String value)
+	{
+		setKeyValue(KEY_LOCATION, value);
+	}
+
+	public void setCommentKeyValue(String value)
+	{
+		setKeyValue(KEY_COMMENT, value);
+	}
+
+	public void setReasonKeyValue(String value)
+	{
+		setKeyValue(KEY_REASON, value);
+	}
+
+	public void setResultKeyValue(String value)
+	{
+		if(KEY_RESULT_ABNORMAL.equals(value) ||
+				KEY_RESULT_NORMAL.equals(value) ||
+				KEY_RESULT_PENDING.equals(value) ||
+				KEY_RESULT_OTHER.equals(value))
+		{
+			setKeyValue(KEY_RESULT, value);
+		}
+		else
+		{
+			throw new RuntimeException("Invalid prevention result value: " + value);
+		}
 	}
 }

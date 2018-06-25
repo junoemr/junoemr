@@ -176,24 +176,19 @@ public class PreventionManager
 
 		if(exts != null)
 		{
-			for(String keyval : exts.keySet())
+			for(String key : exts.keySet())
 			{
-				if(StringUtils.filled(keyval) && StringUtils.filled(exts.get(keyval)))
+				if(StringUtils.filled(key) && StringUtils.filled(exts.get(key)))
 				{
 					PreventionExt preventionExt = new PreventionExt();
-					preventionExt.setPreventionId(prevention.getId());
-					preventionExt.setKeyval(keyval);
-					preventionExt.setVal(exts.get(keyval));
+					preventionExt.setPrevention(prevention);
+					preventionExt.setKeyval(key);
+					preventionExt.setVal(exts.get(key));
 
 					prevention.addExtension(preventionExt);
 				}
 			}
 		}
-		addPrevention(prevention);
-	}
-
-	public void addPrevention(Prevention prevention)
-	{
 		preventionDao.persist(prevention);
 	}
 

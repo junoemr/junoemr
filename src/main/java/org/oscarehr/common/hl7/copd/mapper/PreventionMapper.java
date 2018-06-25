@@ -71,9 +71,9 @@ public class PreventionMapper
 
 	public List<Prevention> getPreventionList() throws HL7Exception
 	{
-		int numImmunizations = getNumPreventions();
-		List<Prevention> preventionList = new ArrayList<>(numImmunizations);
-		for(int i=0; i< numImmunizations; i++)
+		int numPreventions = getNumPreventions();
+		List<Prevention> preventionList = new ArrayList<>(numPreventions);
+		for(int i=0; i< numPreventions; i++)
 		{
 			Prevention prevention = getPrevention(i);
 			if(prevention != null)
@@ -112,18 +112,24 @@ public class PreventionMapper
 	{
 		String typeCode = StringUtils.trimToNull(provider.getIMMUNIZATION(rep).getZIM().getZim3_vaccineCode().getValue());
 
+		// according to the CoPD spec, the hl7 should contain a correct code that can be directly added to the database
+		// however we have found that we need to map some values to codes sometimes
 		if(validPreventionTypes.contains(typeCode))
 		{
 			return typeCode;
 		}
 		if(preventionTypeMap.containsKey(typeCode))
 		{
-			logger.warn("Invalid vaccine code was mapped: " + typeCode);
-			return preventionTypeMap.get(typeCode);
+			String mapValue = preventionTypeMap.get(typeCode);
+			logger.warn("Invalid vaccine code '" + typeCode + "' was mapped to '" + mapValue + "'");
+			if(!validPreventionTypes.contains(mapValue))
+			{
+				logger.warn("Mapped vaccine code value does not exist in oscar's preventions. default value used");
+				return "OtherA";
+			}
+			return mapValue;
 		}
 		logger.error("Invalid or unknown vaccine code: " + typeCode);
-		//TODO attempt to map values to valid codes
-
 		return "OtherA";// default to generic 'other' type
 	}
 
