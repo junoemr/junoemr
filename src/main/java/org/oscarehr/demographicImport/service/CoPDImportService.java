@@ -287,13 +287,14 @@ public class CoPDImportService
 			Prescription prescription = medicationMapper.getPrescription(i);
 			CaseManagementNote note = medicationMapper.getDrugNote(i);
 
-			drug.setDemographicId(demographic.getDemographicId());
-			drug.setProviderNo(String.valueOf(provider.getProviderNo()));
-			drugDao.persist(drug);
-
 			prescription.setDemographicId(demographic.getDemographicId());
 			prescription.setProviderNo(String.valueOf(provider.getProviderNo()));
 			prescriptionDao.persist(prescription);
+
+			drug.setDemographicId(demographic.getDemographicId());
+			drug.setProviderNo(String.valueOf(provider.getProviderNo()));
+			drug.setScriptNo(prescription.getId());
+			drugDao.persist(drug);
 
 			if(note != null)
 			{

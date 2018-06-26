@@ -33,7 +33,9 @@ import org.oscarehr.rx.model.Prescription;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class MedicationMapper
 {
@@ -69,36 +71,23 @@ public class MedicationMapper
 
 		// import drugs as custom
 		drug.setCustomName(getRequestedGiveCodeText(rep));
-		drug.setCustomInstructions(true);
+		drug.setCustomInstructions(false);
 
 		drug.setQuantity(String.valueOf(getRequestedDispenseAmount(rep)));
-		drug.setUnit(getRequestedDispenseUnits(rep));
+		drug.setUnitName(getRequestedDispenseUnits(rep));
 		drug.setRepeat(getNumberOfRefills(rep));
 		drug.setNoSubs(!allowSubstitutions(rep));
 
 		drug.setRoute(getRouteId(rep));
 		drug.setFreqCode(getFrequencyCode(rep, 0));
 
-
-//		drug.setDuration();
-//		drug.setDurUnit();
-
 		drug.setDispenseInterval(getDispenseInterval(rep));
 		drug.setDrugForm(getDispenseUnitsId(rep));
 
 		drug.setPosition(rep+1); // this is for display order
-
 		drug.setSpecialInstruction(getPharmacyInstructions(rep));
-		String special = String.join("\n",
-				StringUtils.trimToEmpty(drug.getCustomName()), //brand or custom name
-				// dosage
-				// route
-				// frequency code
-				// duration
-				StringUtils.trimToEmpty(getPharmacyInstructions(rep)),
-				"Qty:" + drug.getQuantity() + " Repeats:"+drug.getRepeat());
-		drug.setSpecial(special); //TODO figure out special
 
+		drug.setSpecial(generateSpecial(drug));
 		return drug;
 	}
 
@@ -109,6 +98,35 @@ public class MedicationMapper
 		prescription.setDatePrescribed(writtenDate);
 
 		return prescription;
+	}
+
+	public String generateSpecial(Drug drug)
+	{
+		List<String> valueList = new ArrayList<>();
+		valueList.add(StringUtils.trimToEmpty(drug.getCustomName()));
+		if(drug.getDosage() != null)
+		{
+			valueList.add(drug.getDosage());
+		}
+		if(drug.getRoute() != null)
+		{
+			valueList.add(drug.getRoute());
+		}
+		if(drug.getFreqCode() != null)
+		{
+			valueList.add(drug.getFreqCode());
+		}
+		if(drug.getSpecialInstruction() != null)
+		{
+			valueList.add(drug.getSpecialInstruction());
+		}
+
+		String quantity = "Qty:" + (drug.getQuantity() == null ? "0" : drug.getQuantity());
+		String quantityUnits = " " + (drug.getUnitName() == null ? "" : drug.getUnitName());
+		String repeat = "Repeats:" + (drug.getRepeat() == null ? 0 : drug.getRepeat());
+		valueList.add(quantity + quantityUnits + " " + repeat);
+
+		return String.join("\n", valueList);
 	}
 
 	public CaseManagementNote getDrugNote(int rep) throws HL7Exception
