@@ -45,4 +45,27 @@ public class ZPD_ZTR_TIMING_QUANTITY extends AbstractGroup
 			throw new RuntimeException(var3);
 		}
 	}
+
+	public TQ1 getTQ1(int rep)
+	{
+		return this.getTyped("TQ1", rep, TQ1.class);
+	}
+
+	public int getTQ1Reps()
+	{
+		try
+		{
+			return this.getAll("TQ1").length;
+		}
+		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
+
+	public TQ2 getTQ2()
+	{
+		return this.getTyped("TQ2", TQ2.class);
+	}
 }

@@ -37,6 +37,7 @@ import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.oscarehr.encounterNote.model.Issue;
+import org.oscarehr.rx.model.Drug;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,6 +103,22 @@ public class EncounterNoteService
 
 		return note;
 	}
+	public CaseManagementNote saveDrugNote(CaseManagementNote note, Drug drug)
+	{
+		note.setIncludeIssueInNote(true);
+		note.setSigned(true);
+		note.setArchived(false);
+
+		note = saveNote(note);
+
+		CaseManagementNoteLink link = new CaseManagementNoteLink();
+		link.setNote(note);
+		link.setDrug(drug.getId());
+		caseManagementNoteLinkDao.persist(link);
+
+		return note;
+	}
+
 
 	public CaseManagementNote saveMedicalHistoryNote(CaseManagementNote note)
 	{

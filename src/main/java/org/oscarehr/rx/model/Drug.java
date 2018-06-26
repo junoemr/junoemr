@@ -344,7 +344,7 @@ public class Drug extends AbstractModel<Integer> implements Serializable {
 		return dispenseInterval;
 	}
 
-	public void setDispenseInterval(int dispenseInterval) {
+	public void setDispenseInterval(Integer dispenseInterval) {
 		this.dispenseInterval = dispenseInterval;
 	}
 

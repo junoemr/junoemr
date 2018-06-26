@@ -33,7 +33,6 @@ import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.allergy.service.AllergyService;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.OscarAppointmentDao;
-import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.common.hl7.copd.mapper.AllergyMapper;
 import org.oscarehr.common.hl7.copd.mapper.AppointmentMapper;
 import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
@@ -48,7 +47,6 @@ import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.parser.CoPDParser;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Dxresearch;
-import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
@@ -58,10 +56,16 @@ import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.service.PreventionManager;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.service.ProviderService;
+import org.oscarehr.rx.dao.DrugDao;
+import org.oscarehr.rx.dao.PrescriptionDao;
+import org.oscarehr.rx.model.Drug;
+import org.oscarehr.rx.model.Prescription;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -111,6 +115,12 @@ public class CoPDImportService
 
 	@Autowired
 	PreventionManager preventionManager;
+
+	@Autowired
+	DrugDao drugDao;
+
+	@Autowired
+	PrescriptionDao prescriptionDao;
 
 	public void importFromHl7Message(String message) throws HL7Exception
 	{
@@ -265,9 +275,34 @@ public class CoPDImportService
 
 	}
 
-	private void importMedicationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
+	private void importMedicationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception
 	{
 		MedicationMapper medicationMapper = new MedicationMapper(zpdZtrMessage, providerRep);
+
+		int numMedications = medicationMapper.getNumMedications();
+
+		for(int i=0; i<numMedications; i++)
+		{
+			Drug drug = medicationMapper.getDrug(i);
+			Prescription prescription = medicationMapper.getPrescription(i);
+			CaseManagementNote note = medicationMapper.getDrugNote(i);
+
+			drug.setDemographicId(demographic.getDemographicId());
+			drug.setProviderNo(String.valueOf(provider.getProviderNo()));
+			drugDao.persist(drug);
+
+			prescription.setDemographicId(demographic.getDemographicId());
+			prescription.setProviderNo(String.valueOf(provider.getProviderNo()));
+			prescriptionDao.persist(prescription);
+
+			if(note != null)
+			{
+				note.setProvider(provider);
+				note.setSigningProvider(provider);
+				note.setDemographic(demographic);
+				encounterNoteService.saveDrugNote(note, drug);
+			}
+		}
 	}
 
 	private void importDxData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception

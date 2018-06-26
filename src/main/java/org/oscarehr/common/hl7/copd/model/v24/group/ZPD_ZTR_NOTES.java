@@ -44,4 +44,14 @@ public class ZPD_ZTR_NOTES extends AbstractGroup
 			throw new RuntimeException(var3);
 		}
 	}
+
+	public NTE getNTE()
+	{
+		return this.getTyped("NTE", NTE.class);
+	}
+
+	public ZUP getZUP()
+	{
+		return this.getTyped("ZUP", ZUP.class);
+	}
 }
