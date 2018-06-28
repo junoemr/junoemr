@@ -294,32 +294,32 @@ public class ClinicaidAPIService
 			}
 
 			HashMap<String, String> data = new HashMap<>();
-			data.put("service_recipient_uli", demo.getHin());
-			data.put("service_recipient_ver", demo.getVer());
-			data.put("service_recipient_first_name", UtilMisc.toUpperLowerCase(demo.getFirstName()));
-			data.put("service_recipient_last_name", UtilMisc.toUpperLowerCase(demo.getLastName()));
-			data.put("service_recipient_oscar_number", service_recipient_oscar_number);
-			data.put("service_recipient_status", demo.getPatientStatus());
-			data.put("service_recipient_age", demo.getAge());
-			data.put("service_recipient_gender", demo.getSex());
-			data.put("service_provider_oscar_number", provider_no);
-			data.put("service_provider_first_name", provider_first_name);
-			data.put("service_provider_last_name", provider_last_name);
-			data.put("service_provider_uli", provider_uli);
-			data.put("service_start_date", request.getParameter("appointment_date"));
-			data.put("province", StringUtils.upperCase(demo.getProvince()));
-			data.put("hc_province", StringUtils.upperCase(demo.getHcType()));
-			data.put("city", demo.getCity());
-			data.put("postal_code", demo.getPostal());
-			data.put("chart_number", request.getParameter("chart_no")==null ? "" : request.getParameter("chart_no"));
-			data.put("service_recipient_birth_date", demo.getYearOfBirth() + "-" + demo.getMonthOfBirth() + "-" + demo.getDateOfBirth());
-			data.put("appointment_number", request.getParameter("appointment_no"));
-			data.put("appointment_start_time", request.getParameter("start_time"));
-			data.put("referral_number", referral_no==null ? "" : referral_no);
-			data.put("referral_first_name", referral_first_name);
-			data.put("referral_last_name", referral_last_name);
-			data.put("diagnostic_code", dx_codes);
-			data.put("address", demo.getAddress());
+			data.put("service_recipient_uli", StringUtils.trimToEmpty(demo.getHin()));
+			data.put("service_recipient_ver", StringUtils.trimToEmpty(demo.getVer()));
+			data.put("service_recipient_first_name", StringUtils.trimToEmpty(UtilMisc.toUpperLowerCase(demo.getFirstName())));
+			data.put("service_recipient_last_name", StringUtils.trimToEmpty(UtilMisc.toUpperLowerCase(demo.getLastName())));
+			data.put("service_recipient_oscar_number", StringUtils.trimToEmpty(service_recipient_oscar_number));
+			data.put("service_recipient_status", StringUtils.trimToEmpty(demo.getPatientStatus()));
+			data.put("service_recipient_age", StringUtils.trimToEmpty(demo.getAge()));
+			data.put("service_recipient_gender", StringUtils.trimToEmpty(demo.getSex()));
+			data.put("service_provider_oscar_number", StringUtils.trimToEmpty(provider_no));
+			data.put("service_provider_first_name", StringUtils.trimToEmpty(provider_first_name));
+			data.put("service_provider_last_name", StringUtils.trimToEmpty(provider_last_name));
+			data.put("service_provider_uli", StringUtils.trimToEmpty(provider_uli));
+			data.put("service_start_date", StringUtils.trimToEmpty(request.getParameter("appointment_date")));
+			data.put("province", StringUtils.trimToEmpty(StringUtils.upperCase(demo.getProvince())));
+			data.put("hc_province", StringUtils.trimToEmpty(StringUtils.upperCase(demo.getHcType())));
+			data.put("city", StringUtils.trimToEmpty(demo.getCity()));
+			data.put("postal_code", StringUtils.trimToEmpty(demo.getPostal()));
+			data.put("chart_number", StringUtils.trimToEmpty(request.getParameter("chart_no")));
+			data.put("service_recipient_birth_date", StringUtils.trimToEmpty(demo.getYearOfBirth()) + "-" + StringUtils.trimToEmpty(demo.getMonthOfBirth()) + "-" + StringUtils.trimToEmpty(demo.getDateOfBirth()));
+			data.put("appointment_number", StringUtils.trimToEmpty(request.getParameter("appointment_no")));
+			data.put("appointment_start_time", StringUtils.trimToEmpty(request.getParameter("start_time")));
+			data.put("referral_number", StringUtils.trimToEmpty(referral_no));
+			data.put("referral_first_name", StringUtils.trimToEmpty(referral_first_name));
+			data.put("referral_last_name", StringUtils.trimToEmpty(referral_last_name));
+			data.put("diagnostic_code", StringUtils.trimToEmpty(dx_codes));
+			data.put("address", StringUtils.trimToEmpty(demo.getAddress()));
 
 			clinicaidLink = clinicaidLink + "/?nonce=" + nonce +
 					"#/invoice/add" + sessionManager.buildQueryString(data);
