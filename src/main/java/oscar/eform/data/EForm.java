@@ -252,7 +252,8 @@ public class EForm extends EFormBase {
 			if(i < 0) {
 				// If this fieldName doesn't contain checked="checked", it's not a prechecked checkbox
 				if( !fieldHeader.contains(PRECHECKED)) {
-					continue; // Continue to next iteration of while loop
+					// Save an empty string over all values that don't have values in eform values
+					val = "";
 				} else {
 					// putValue method needs to know if the current fieldHeader is prechecked or not
 					val = "prechecked";
