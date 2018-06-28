@@ -147,7 +147,7 @@ public class FileFactory
 	 * @param folder - directory of the file to load
 	 * @return - the file, or null if no file exists with the given filename
 	 */
-	private static GenericFile getExistingFile(String folder, String fileName) throws IOException
+	public static GenericFile getExistingFile(String folder, String fileName) throws IOException
 	{
 		return getExistingFile(new File(folder, fileName));
 	}
