@@ -543,15 +543,4 @@ Varicella Immunoglobulin	VarIg
 		layout="injection"
 		showIfMinRecordNum="1" />
 
-	<item
-		resultDesc=""
-		desc="RZV=herpes zoster recomb subunit vaccine"
-		name="RZV"
-		healthCanadaType="HerpR"
-		layout="injection"
-		atc="J07BK03"
-		minAge="50"
-		maxAge="100"
-		showIfMinRecordNum="1"/>
-
 </preventions>
