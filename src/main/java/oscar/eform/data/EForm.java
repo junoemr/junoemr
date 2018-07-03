@@ -252,8 +252,12 @@ public class EForm extends EFormBase {
 			if(i < 0) {
 				// If this fieldName doesn't contain checked="checked", it's not a prechecked checkbox
 				if( !fieldHeader.contains(PRECHECKED)) {
-					if (getFieldType(fieldHeader).equals("checkbox")) {
+					if (fieldName == null) {
 						continue;
+					} else if (getFieldType(fieldHeader).equals("checkbox"))
+					{
+						//Default checkboxes to off. Unchecked checkboxes are not submitted with form, so the values stay as what they were previously
+						val = "off";
 					} else
 					{
 						// Save an empty string over all values that don't have values in eform values
@@ -706,8 +710,13 @@ public class EForm extends EFormBase {
 			if( "prechecked".equals(value) ) {
 				pointer = html.indexOf(PRECHECKED, pointer);
 				html.delete(pointer, pointer + PRECHECKED.length());
-			} else {
+			} else if (value.equals("on")) {
 				html.insert(pointer, " checked");
+			} else {
+				if(html.substring(pointer, pointer + " checked".length()).equals(" checked"))
+				{
+					html.delete(pointer, pointer + " checked".length());
+				}
 			}
 		} else if (type.equals("select")) {
 			int endindex = StringBuilderUtils.indexOfIgnoreCase(html, "</select>", pointer);
