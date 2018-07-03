@@ -39,7 +39,6 @@ if(!authed) {
 }
 %>
 
-<%@page import="org.oscarehr.util.WebUtilsOld"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -51,30 +50,38 @@ if(!authed) {
 <!-- end -->
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 
-
-<%@page import="java.util.ArrayList, java.util.Collections, java.util.List, java.util.*, oscar.util.StringUtils, oscar.OscarProperties"%>
-<%@page import="org.oscarehr.casemgmt.service.CaseManagementManager,org.oscarehr.casemgmt.model.CaseManagementNote,org.oscarehr.casemgmt.model.Issue,org.oscarehr.common.model.UserProperty,org.oscarehr.common.dao.UserPropertyDAO,org.springframework.web.context.support.*,org.springframework.web.context.*"%>
-
+<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
+<%@page import="org.oscarehr.PMmodule.dao.ProgramDao"%>
+<%@page import="org.oscarehr.PMmodule.model.Program"%>
+<%@page import="org.oscarehr.casemgmt.model.CaseManagementNote"%>
+<%@page import="org.oscarehr.casemgmt.model.Issue"%>
+<%@page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
+<%@page import="org.oscarehr.common.dao.ConsultationServiceDao"%>
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@page import="org.oscarehr.common.dao.UserPropertyDAO"%>
+<%@page import="org.oscarehr.common.model.ConsultationServices"%>
 <%@page import="org.oscarehr.common.model.Site"%>
-<%@page import="oscar.SxmlMisc"%>
+<%@page import="org.oscarehr.common.model.UserProperty"%>
+<%@page import="org.oscarehr.demographic.dao.DemographicExtDao"%>
+<%@page import="org.oscarehr.demographic.model.DemographicExt"%>
+<%@page import="org.oscarehr.ui.servlet.ImageRenderingServlet"%>
+<%@page import="org.oscarehr.util.DigitalSignatureUtils"%>
+<%@page import="org.oscarehr.util.LoggedInInfo"%>
+<%@page import="org.oscarehr.util.MiscUtils"%>
+<%@page import="org.oscarehr.util.SpringUtils"%>
+<%@page import="org.oscarehr.util.WebUtilsOld"%>
+<%@page import="org.springframework.web.context.WebApplicationContext"%>
+<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@page import="oscar.OscarProperties,oscar.SxmlMisc"%>
+<%@page import="oscar.oscarClinic.ClinicData" %>
+<%@page import="oscar.oscarDemographic.data.DemographicData"%>
 <%@page import="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestForm"%>
 <%@page import="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestUtil"%>
-<%@page import="oscar.oscarDemographic.data.DemographicData"%>
 <%@page import="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctViewRequestAction"%>
-<%@page import="org.oscarehr.util.MiscUtils,oscar.oscarClinic.ClinicData"%>
-<%@page import="org.apache.commons.lang.StringEscapeUtils" %>
-<%@ page import="org.oscarehr.util.LoggedInInfo"%>
-<%@ page import="org.oscarehr.util.DigitalSignatureUtils"%>
-<%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet"%>
-<%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.PMmodule.dao.ProgramDao, org.oscarehr.PMmodule.model.Program" %>
-<%@page import="oscar.oscarRx.data.RxProviderData, oscar.oscarRx.data.RxProviderData.Provider"%>
-<%@page import="org.oscarehr.common.dao.ConsultationServiceDao" %>
-<%@page import="org.oscarehr.common.model.ConsultationServices" %>
-<%@ page import="org.oscarehr.demographic.model.DemographicExt" %>
-<%@ page import="org.oscarehr.demographic.dao.DemographicExtDao" %>
+<%@page import="oscar.oscarRx.data.RxProviderData, oscar.oscarRx.data.RxProviderData.Provider" %>
+<%@page import="oscar.util.StringUtils, java.util.ArrayList"%>
+<%@page import="java.util.Collections" %>
+<%@page import="java.util.List" %>
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 
 <html:html locale="true">
@@ -534,7 +541,9 @@ function fillSpecialistSelect1( makeNbr )
 	<%if(requestId!=null){ %>
 		if(!match){ 
 			//if no match then most likely doctor has been removed from specialty list so just add specialist
-			document.EctConsultationFormRequestForm.specialist.options[0] = new Option("<%=consultUtil.getSpecailistsName(consultUtil.specialist)%>", "<%=consultUtil.specialist%>",false ,true );
+			document.EctConsultationFormRequestForm.specialist.options[0] = new Option(
+				"<%=StringEscapeUtils.escapeJavaScript(consultUtil.getSpecailistsName(consultUtil.specialist))%>",
+				"<%=consultUtil.specialist%>",false ,true );
 
 			//don't display if no consultant was saved
 			<%if(!consultUtil.specialist.equals("null")){%>
@@ -1192,7 +1201,7 @@ function showSignatureImage()
 String userAgent = request.getHeader("User-Agent");
 String browserType = "";
 if (userAgent != null) {
-	if (userAgent.toLowerCase().indexOf("ipad") > -1) {
+	if (userAgent.toLowerCase().contains("ipad")) {
 		browserType = "IPAD";
 	} else {
 		browserType = "ALL";
@@ -1548,11 +1557,9 @@ var requestIdKey = "<%=signatureRequestId %>";
 								{
 									%>
 
-									<span id="consult-disclaimer" title="When consult was saved this was the saved consultant but is no longer on this specialist list." style="display:none;font-size:24px;">*</span> <html:select styleId="specialist" property="specialist" size="1" onchange="onSelectSpecialist(this)">
-
+									<span id="consult-disclaimer" title="When consult was saved this was the saved consultant but is no longer on this specialist list." style="display:none;font-size:24px;">*</span>
+									<html:select styleId="specialist" property="specialist" size="1" onchange="onSelectSpecialist(this)">
 									</html:select>
-
-
 									<%
 								}
 							%>
@@ -2226,7 +2233,13 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 				<script type="text/javascript">
 
 	        initMaster();
-	        initService('<%=consultUtil.service%>','<%=((consultUtil.service==null)?"":StringEscapeUtils.escapeJavaScript(consultUtil.getServiceName(consultUtil.service.toString())))%>','<%=consultUtil.specialist%>','<%=((consultUtil.specialist==null)?"":StringEscapeUtils.escapeJavaScript(consultUtil.getSpecailistsName(consultUtil.specialist.toString())))%>','<%=StringEscapeUtils.escapeJavaScript(consultUtil.specPhone)%>','<%=StringEscapeUtils.escapeJavaScript(consultUtil.specFax)%>','<%=StringEscapeUtils.escapeJavaScript(consultUtil.specAddr)%>');
+	        initService('<%=consultUtil.service%>',
+		        '<%=((consultUtil.service==null)?"":StringEscapeUtils.escapeJavaScript(consultUtil.getServiceName(consultUtil.service.toString())))%>',
+		        '<%=consultUtil.specialist%>',
+		        '<%=((consultUtil.specialist==null)?"":StringEscapeUtils.escapeJavaScript(consultUtil.getSpecailistsName(consultUtil.specialist.toString())))%>',
+		        '<%=StringEscapeUtils.escapeJavaScript(consultUtil.specPhone)%>',
+		        '<%=StringEscapeUtils.escapeJavaScript(consultUtil.specFax)%>',
+		        '<%=StringEscapeUtils.escapeJavaScript(consultUtil.specAddr)%>');
             initSpec();
             document.EctConsultationFormRequestForm.phone.value = ("");
         	document.EctConsultationFormRequestForm.fax.value = ("");
