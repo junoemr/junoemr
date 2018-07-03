@@ -407,7 +407,7 @@ public class AppointmentDisplayController
 				"&billForm=" + URLEncoder.encode(default_view, "UTF-8") +
 				"&hotclick=" +
 				"&appointment_no=" + appointment.getAppointmentNo().toString() +
-				"&demographic_name=" + getName() +
+				"&demographic_name=" + URLEncoder.encode(getName(), "UTF-8") +
 				"&status=" + appointment.getStatus() +
 				"&demographic_no=" + appointment.getDemographicNo().toString() +
 				"&providerview=" + scheduleProviderNo+
