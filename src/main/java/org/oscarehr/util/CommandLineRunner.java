@@ -29,6 +29,7 @@ import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.demographicImport.service.CoPDPreProcessorService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import oscar.OscarProperties;
 
 import java.util.List;
 
@@ -38,24 +39,36 @@ public class CommandLineRunner
 
 	public static void main (String [] args)
 	{
-		ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
-
-		logger.info("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
-
-		CoPDImportService coPDImportService = ctx.getBean(CoPDImportService.class);
-		CoPDPreProcessorService coPDPreProcessorService = ctx.getBean(CoPDPreProcessorService.class);
-
-		GenericFile tempFile = null;
-
-		if(args[0] == null)
+		if(args == null || args.length < 2)
 		{
-			logger.error("parameter 0 should provide import file");
+			logger.error("arguments required");
+			System.out.println("arguments required");
 			return;
 		}
-
 		try
 		{
-			tempFile = FileFactory.getExistingFile(args[0], args[1]);
+			String propertiesFileName = args[0];
+			String copdFileName = args[1];
+
+			// load properties from file
+			OscarProperties properties = OscarProperties.getInstance();
+			// This has been used to look in the users home directory that started tomcat
+			properties.readFromFile(propertiesFileName);
+			logger.info("loading properties from " + propertiesFileName);
+			System.out.println("loading properties from " + propertiesFileName);
+
+			ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+			// initialize spring bean factory for old style access
+			SpringUtils.beanFactory = ((ClassPathXmlApplicationContext) ctx).getBeanFactory();
+
+			CoPDImportService coPDImportService = ctx.getBean(CoPDImportService.class);
+			CoPDPreProcessorService coPDPreProcessorService = ctx.getBean(CoPDPreProcessorService.class);
+
+			// -------------------------------------------------------------------
+			logger.info("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
+			System.out.println("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
+
+			GenericFile tempFile = FileFactory.getExistingFile(copdFileName);
 
 			List<String> messageList = coPDPreProcessorService.readMessagesFromFile(tempFile);
 			for(String message : messageList)
@@ -67,6 +80,9 @@ public class CommandLineRunner
 		catch(Exception e)
 		{
 			logger.error("Import Error", e);
+			System.out.println("Import Error");
+			e.printStackTrace();
 		}
+		System.out.println("Import Process Complete");
 	}
 }

@@ -152,6 +152,11 @@ public class FileFactory
 		return getExistingFile(new File(folder, fileName));
 	}
 
+	public static GenericFile getExistingFile(String fileName) throws IOException
+	{
+		return getExistingFile(new File(fileName));
+	}
+
 	/**
 	 * load an existing file with the given name and folder location
 	 * @param file - the file to load
