@@ -169,7 +169,6 @@ public class ManageTeleplanAction extends DispatchAction {
      *  2 = MSP ICD9 Codes (3 char)
 	*      1 = MSP Explanatory Codes List
      */
-
 	public ActionForward updateExplanatoryCodesList(ActionMapping mapping, ActionForm form,
 	                                                HttpServletRequest request, HttpServletResponse response) throws IOException
 	{
@@ -507,8 +506,7 @@ public class ManageTeleplanAction extends DispatchAction {
 
 		Date billingDate = new Date();
 
-		String billingRegion = oscarProperties.getBillingTypeUpperCase();
-		if ("CLINICAID".equals(billingRegion))
+		if (oscarProperties.isClinicaidBillingType())
 		{
 			ClinicaidAPIService clinicaidAPIService = SpringUtils.getBean(ClinicaidAPIService.class);
 

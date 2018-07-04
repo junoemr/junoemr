@@ -1130,6 +1130,12 @@
 			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>2.9.5</version>
 		</dependency>
+		<dependency>
+			<!-- json support for java 8 localDate -->
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<version>2.9.5</version>
+		</dependency>
         <dependency>
             <groupId>io.prometheus</groupId>
             <artifactId>simpleclient</artifactId>
@@ -1143,7 +1149,7 @@
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>javax.ws.rs-api</artifactId>
-			<version>2.0.1</version>
+			<version>2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>io.swagger.core.v3</groupId>

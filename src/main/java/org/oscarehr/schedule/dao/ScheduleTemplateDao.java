@@ -137,7 +137,12 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
 	public RangeMap<LocalTime, ScheduleSlot> findScheduleSlots(LocalDate date, Integer providerNo)
 	{
-		String sql = "SELECT \n" +
+		// This query is a bit hard to read.  The mess with all of the UNION ALLs is a way to make a
+		// sequence of numbers.  This is then used to find the position in the scheduletemplate.timecode
+		// value to split it into rows so it can be joined.
+		// It uses the STRAIGHT_JOIN planner hint because the scheduletemplatecode table was being
+		// joined too soon by default.
+		String sql = "SELECT STRAIGHT_JOIN\n" +
 				"  (n3.i + (10 * n2.i) + (100 * n1.i))+1 AS position, \n" +
 				"  SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1) AS code_char,\n" +
 				"  sd.sdate AS appt_date,\n" +

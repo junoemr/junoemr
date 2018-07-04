@@ -41,6 +41,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 @Path("/eforms")
@@ -80,6 +81,7 @@ public class EFormsService extends AbstractServiceImpl
 		File directory = new File(imageHomeDir);
 
 		List<String> imagesNames = DisplayImageAction.getFiles(directory, ".*\\.(jpg|jpeg|png|gif)$", null);
+		Collections.sort(imagesNames);
 		return RestResponse.successResponse(imagesNames);
 	}
 

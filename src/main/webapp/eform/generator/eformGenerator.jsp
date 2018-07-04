@@ -1,6 +1,6 @@
 <%--
 
-    Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
+    Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -16,16 +16,14 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-    This software was written for the
-    Department of Family Medicine
-    McMaster University
-    Hamilton
-    Ontario, Canada
+    This software was written for
+    CloudPractice Inc.
+    Victoria, British Columbia
+    Canada
 
 --%>
 <html>
-<!-- 2016 OscarHost Eform Generator 0.1.01 -->
-<!-- Copyright CloudPractice Inc. 2016 -->
+<!-- Eform Generator 0.1.01 -->
 <!-- Author: Robert Martin -->
 <head>
 	<META http-equiv='Content-Type' content='text/html; charset=UTF-8'>

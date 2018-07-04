@@ -21,83 +21,53 @@
  * Hamilton
  * Ontario, Canada
  */
-
 package org.oscarehr.integration.clinicaid.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ClinicaidResultTo1 implements Serializable
+public class ClinicaidApiLimitInfoTo1 implements Serializable
 {
-	private final String ERROR_STRING = "error";
+	@JsonProperty("current_call_count")
+	private int currentCallCount;
 
+	@JsonProperty("call_limit")
+	private int callLimit;
 
-	private String result;
+	@JsonProperty("reset_interval")
+	private int resetInterval;
 
-	@JsonProperty("data")
-	private ClinicaidResultDataTo1 data;
+	@JsonProperty("interval_expire_seconds")
+	private int intervalExpireSeconds;
 
-	private ClinicaidErrorResultTo1 errors;
+	@JsonProperty("limit_reached")
+	private boolean limitReached;
 
-	private ClinicaidApiLimitInfoTo1 apiLimitInfo;
-
-	private String nonce;
-
-	private boolean hasError = false;
-
-	@JsonProperty("meta")
-	private void unpackApiLimitInfo(Map<String, Object> metaInfo) throws IOException
+	public int getCurrentCallCount()
 	{
-		this.apiLimitInfo = new ObjectMapper().convertValue(metaInfo.get("api_rate_limit_info"), ClinicaidApiLimitInfoTo1.class);
+		return currentCallCount;
 	}
 
-	public ClinicaidApiLimitInfoTo1 getApiLimitInfo()
+	public int getCallLimit()
 	{
-		return apiLimitInfo;
+		return callLimit;
 	}
 
-	public String getResult()
+	public int getResetInterval()
 	{
-		return this.result;
+		return resetInterval;
 	}
 
-	public void setResult(String result)
+	public int getIntervalExpireSeconds()
 	{
-		this.result = result;
-		if (this.result.equals(ERROR_STRING))
-		{
-			this.hasError = true;
-		}
+		return intervalExpireSeconds;
 	}
 
-	public String getNonce()
+	public boolean isLimitReached()
 	{
-		return this.nonce;
-	}
-
-	public ClinicaidResultDataTo1 getData()
-	{
-		return this.data;
-	}
-
-	public ClinicaidErrorResultTo1 getErrors()
-	{
-		return this.errors;
-	}
-
-	public void setErrors(ClinicaidErrorResultTo1 errors)
-	{
-		this.errors = errors;
-	}
-
-	public boolean hasError()
-	{
-		return this.hasError;
+		return limitReached;
 	}
 }

@@ -618,7 +618,7 @@
 
 
 								String signOrVerify = "";
-								if (statusCode.length() >= 2)
+								if (statusCode != null && statusCode.length() >= 2)
 								{
 									signOrVerify = statusCode.substring(1, 2);
 									statusCode = statusCode.substring(0, 1);
@@ -626,7 +626,11 @@
 								if (strEditable != null && strEditable.equalsIgnoreCase("yes"))
 								{ %>
 							<select name="status" STYLE="width: 154px">
-								<% for (int i = 0; i < allStatus.size(); i++)
+								<% if(statusCode == null)
+								{%>
+									<option value="" selected></option>
+								<%}
+								for (int i = 0; i < allStatus.size(); i++)
 								{ %>
 								<option
 										value="<%=((AppointmentStatus)allStatus.get(i)).getStatus()+signOrVerify%>"
@@ -1032,7 +1036,7 @@
 								   value="<bean:message key="appointment.editappointment.btnGroupAction"/>">
 							<% }%>
 							<input TYPE="submit" id="printReceiptButton"
-								   onclick="document.forms['EDITAPPT'].displaymode.value='Update Appt';document.forms['EDITAPPT'].printReceipt.value='1';"
+								   onclick="document.forms['EDITAPPT'].displaymode.value='Update Appt';document.forms['EDITAPPT'].printReceipt.value='1';onButUpdate();"
 								   VALUE="<bean:message key='appointment.editappointment.btnPrintReceipt'/>">
 							<input type="hidden" name="printReceipt" value="">
 							<input type="submit" class="redButton button" id="deleteButton"
