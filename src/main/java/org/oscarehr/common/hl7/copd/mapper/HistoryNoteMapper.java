@@ -142,30 +142,30 @@ public class HistoryNoteMapper
 			String noteText = "";
 			if(socialAlert != null)
 			{
-				noteText += socialAlert + "\n";
+				noteText += StringUtils.trimToEmpty(socialAlert + "\n");
 			}
 			if(journalNotes != null)
 			{
-				noteText += journalNotes + "\n";
+				noteText += StringUtils.trimToEmpty(journalNotes + "\n");
 			}
 			if(occupation != null)
 			{
-				noteText += occupation + "\n";
+				noteText += StringUtils.trimToEmpty(occupation + "\n");
 			}
 			if(employer != null)
 			{
-				noteText += employer + "\n";
+				noteText += StringUtils.trimToEmpty(employer + "\n");
 			}
 			if(education != null)
 			{
-				noteText += education + "\n";
+				noteText += StringUtils.trimToEmpty(education + "\n");
 			}
 			if(leisureActivities != null)
 			{
-				noteText += leisureActivities + "\n";
+				noteText += StringUtils.trimToEmpty(leisureActivities + "\n");
 			}
 
-			note.setNote(StringUtils.trim(noteText).replaceAll("~crlf~", "\n"));
+			note.setNote(StringUtils.trim(noteText.replaceAll("~crlf~", "\n")));
 		}
 		return note;
 	}
@@ -182,17 +182,17 @@ public class HistoryNoteMapper
 		String noteText = relation + ": ";
 		if(diagnosisDescription != null)
 		{
-			noteText += diagnosisDescription + "\n";
+			noteText += StringUtils.trimToEmpty(diagnosisDescription + "\n");
 		}
 		if(causeOfDeath != null)
 		{
-			noteText += "Cause of death: " + causeOfDeath + "\n";
+			noteText += "Cause of death: " + StringUtils.trimToEmpty(causeOfDeath) + "\n";
 		}
 		if(comments != null)
 		{
-			noteText += comments + "\n";
+			noteText += StringUtils.trimToEmpty(comments + "\n");
 		}
-		note.setNote(StringUtils.trim(noteText).replaceAll("~crlf~", "\n"));
+		note.setNote(StringUtils.trim(noteText.replaceAll("~crlf~", "\n")));
 
 		Date diagnosisDate = getFamHistDiagnosisDate(rep);
 		note.setObservationDate(diagnosisDate);

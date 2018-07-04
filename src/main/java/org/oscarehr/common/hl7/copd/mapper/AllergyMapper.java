@@ -110,7 +110,7 @@ public class AllergyMapper
 		if(nteNote != null)
 		{
 			note = new CaseManagementNote();
-			note.setNote(nteNote);
+			note.setNote(nteNote.replaceAll("~crlf~", "\n"));
 			note.setObservationDate(getStartDate(rep));
 			note.setUpdateDate(getStartDate(rep));
 		}
