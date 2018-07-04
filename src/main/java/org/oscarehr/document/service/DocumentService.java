@@ -121,7 +121,7 @@ public class DocumentService
 	 * @param demographicNo - demographic id of the attached demographic
 	 * @return - The document model that was persisted
 	 */
-	public Document addDocumentModel(Document document, Integer demographicNo)
+	private Document addDocumentModel(Document document, Integer demographicNo)
 	{
 		// default some values if they are missing
 		if(document.getObservationdate() == null)

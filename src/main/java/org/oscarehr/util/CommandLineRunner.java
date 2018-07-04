@@ -22,33 +22,51 @@
  */
 package org.oscarehr.util;
 
+import ca.uhn.hl7v2.HL7Exception;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.demographicImport.service.CoPDPreProcessorService;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import oscar.OscarProperties;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class CommandLineRunner
 {
-	private static final Logger logger = Logger.getLogger(CommandLineRunner.class);
+	private static final Logger logger = MiscUtils.getLogger();
 
+	private static CoPDImportService coPDImportService;
+	private static CoPDPreProcessorService coPDPreProcessorService;
+
+	/**
+	 * Run this in the WEB-INF folder in one of 2 ways:
+	 *
+	 * deployed: in ~tomcat/webapps/context_path/WEB-INF
+	 * un-deployed: in [code_source]/target/oscar-14.0.0-SNAPSHOT/WEB-INF
+	 * java -cp "classes/:lib/*:/usr/java/apache-tomcat/lib/*" org.oscarehr.util.CommandLineRunner [props_file] [topd_files_directory] [topd_documents_directory]
+	 *
+	 * @param args
+	 */
 	public static void main (String [] args)
 	{
-		if(args == null || args.length < 2)
+		if(args == null || args.length != 3)
 		{
-			logger.error("arguments required");
-			System.out.println("arguments required");
+			logger.error("Invalid Argument Count");
+			System.out.println("Invalid Argument Count");
 			return;
 		}
+
+		ClassPathXmlApplicationContext ctx = null;
 		try
 		{
 			String propertiesFileName = args[0];
-			String copdFileName = args[1];
+			String copdFileLocation = args[1];
+			String copdDocumentLocation = args[2];
 
 			// load properties from file
 			OscarProperties properties = OscarProperties.getInstance();
@@ -57,32 +75,74 @@ public class CommandLineRunner
 			logger.info("loading properties from " + propertiesFileName);
 			System.out.println("loading properties from " + propertiesFileName);
 
-			ApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
+			ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
 			// initialize spring bean factory for old style access
-			SpringUtils.beanFactory = ((ClassPathXmlApplicationContext) ctx).getBeanFactory();
+			SpringUtils.beanFactory = ctx.getBeanFactory();
 
-			CoPDImportService coPDImportService = ctx.getBean(CoPDImportService.class);
-			CoPDPreProcessorService coPDPreProcessorService = ctx.getBean(CoPDPreProcessorService.class);
+			coPDImportService = ctx.getBean(CoPDImportService.class);
+			coPDPreProcessorService = ctx.getBean(CoPDPreProcessorService.class);
 
 			// -------------------------------------------------------------------
 			logger.info("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
 			System.out.println("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
 
-			GenericFile tempFile = FileFactory.getExistingFile(copdFileName);
+			File copdDirectory = new File(copdFileLocation);
+			File[] fileList = copdDirectory.listFiles();
 
-			List<String> messageList = coPDPreProcessorService.readMessagesFromFile(tempFile);
-			for(String message : messageList)
+			for(File file : fileList)
 			{
-				message = coPDPreProcessorService.preProcessMessage(message);
-				coPDImportService.importFromHl7Message(message);
+				GenericFile copdFile = FileFactory.getExistingFile(file);
+				if(copdFile instanceof XMLFile)
+				{
+					String fileString = coPDPreProcessorService.getFileString(copdFile);
+					if(coPDPreProcessorService.looksLikeCoPDFormat(fileString))
+					{
+						logger.info("Import from file: " + copdFile.getName());
+						System.out.println("Import from file: " + copdFile.getName());
+
+						try
+						{
+							importFileString(fileString, copdDocumentLocation);
+						}
+						catch(Exception e)
+						{
+							logger.error("Failed to import " + copdFile.getName(), e);
+							System.out.println("Failed to import " + copdFile.getName());
+							e.printStackTrace();
+						}
+					}
+					else
+					{
+						logger.warn(copdFile.getName() + " does not look like a valid import xml file.");
+						System.out.println(copdFile.getName() + " does not look like a valid import xml file.");
+					}
+				}
 			}
 		}
 		catch(Exception e)
 		{
-			logger.error("Import Error", e);
-			System.out.println("Import Error");
+			logger.error("CommandLineRunner Error", e);
+			System.out.println("CommandLineRunner Error");
 			e.printStackTrace();
 		}
-		System.out.println("Import Process Complete");
+		finally
+		{
+			if(ctx != null)
+			{
+				ctx.close();
+			}
+		}
+		logger.info("IMPORT PROCESS COMPLETE");
+		System.out.println("IMPORT PROCESS COMPLETE");
+	}
+
+	private static void importFileString(String fileString, String documentDirectory) throws HL7Exception, IOException, InterruptedException
+	{
+		List<String> messageList = coPDPreProcessorService.separateMessages(fileString);
+		for(String message : messageList)
+		{
+			message = coPDPreProcessorService.preProcessMessage(message);
+			coPDImportService.importFromHl7Message(message, documentDirectory);
+		}
 	}
 }

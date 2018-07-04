@@ -45,6 +45,8 @@ import org.oscarehr.common.hl7.copd.mapper.PreventionMapper;
 import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.parser.CoPDParser;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.demographic.dao.DemographicDao;
@@ -73,6 +75,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @Service
@@ -122,7 +127,7 @@ public class CoPDImportService
 	@Autowired
 	PrescriptionDao prescriptionDao;
 
-	public void importFromHl7Message(String message) throws HL7Exception
+	public void importFromHl7Message(String message, String documentLocation) throws HL7Exception, IOException, InterruptedException
 	{
 		logger.info("Initialize HL7 parser");
 		HapiContext context = new DefaultHapiContext();
@@ -137,17 +142,17 @@ public class CoPDImportService
 		logger.info("Parse Message");
 
 		ZPD_ZTR zpdZtrMessage = (ZPD_ZTR) p.parse(message);
-		importRecordData(zpdZtrMessage);
+		importRecordData(zpdZtrMessage, documentLocation);
 	}
 
-	private void importRecordData(ZPD_ZTR zpdZtrMessage) throws HL7Exception
+	private void importRecordData(ZPD_ZTR zpdZtrMessage, String documentLocation) throws HL7Exception, IOException, InterruptedException
 	{
 		logger.info("Creating Demographic Record ...");
 		Demographic demographic = importDemographicData(zpdZtrMessage);
 		logger.info("Created record " + demographic.getDemographicId() + " for patient: " + demographic.getLastName() + ", " + demographic.getFirstName());
 
 		logger.info("Find/Create Provider Record(s) ...");
-		ProviderData provider = importProviderData(zpdZtrMessage, demographic);
+		ProviderData provider = importProviderData(zpdZtrMessage, demographic, documentLocation);
 
 		// set the mrp doctor after all the provider records are created
 		demographic.setProviderNo(provider.getId());
@@ -164,7 +169,7 @@ public class CoPDImportService
 	 * @return the MRP doctor record. This should never be null, as all messages are required to have at least one provider record
 	 * @throws HL7Exception
 	 */
-	private ProviderData importProviderData(ZPD_ZTR zpdZtrMessage, Demographic demographic) throws HL7Exception
+	private ProviderData importProviderData(ZPD_ZTR zpdZtrMessage, Demographic demographic, String documentLocation) throws HL7Exception, IOException, InterruptedException
 	{
 		ProviderData mrpProvider = null;
 		ProviderMapper providerMapper = new ProviderMapper(zpdZtrMessage);
@@ -206,7 +211,7 @@ public class CoPDImportService
 			logger.info("Import Labs ...");
 			importLabData(zpdZtrMessage, i, mrpProvider, demographic);
 			logger.info("Import Documents ...");
-			importDocumentData(zpdZtrMessage, i, mrpProvider, demographic);
+			importDocumentData(zpdZtrMessage, i, mrpProvider, demographic, documentLocation);
 		}
 
 
@@ -375,7 +380,7 @@ public class CoPDImportService
 		//TODO - not implemented
 	}
 
-	private void importDocumentData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
+	private void importDocumentData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, String documentLocation) throws IOException, InterruptedException
 	{
 		DocumentMapper documentMapper = new DocumentMapper(zpdZtrMessage, providerRep);
 
@@ -383,7 +388,10 @@ public class CoPDImportService
 		{
 			document.setDoccreator(String.valueOf(provider.getProviderNo()));
 			document.setResponsible(String.valueOf(provider.getProviderNo()));
-			documentService.addDocumentModel(document, demographic.getDemographicId());
+
+			GenericFile documentFile = FileFactory.getExistingFile(documentLocation, document.getDocfilename());
+			InputStream stream = new FileInputStream(documentFile.getFileObject());
+			documentService.uploadNewDocument(document, stream, demographic.getDemographicId());
 			documentService.routeToProviderInbox(document.getDocumentNo(), provider.getProviderNo());
 		}
 	}

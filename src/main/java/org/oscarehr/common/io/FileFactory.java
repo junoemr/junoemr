@@ -163,7 +163,7 @@ public class FileFactory
 	 * @return - the file as a GenericFile
 	 * @throws FileNotFoundException - if the given file is invalid for use as a GenericFile
 	 */
-	private static GenericFile getExistingFile(File file) throws IOException
+	public static GenericFile getExistingFile(File file) throws IOException
 	{
 		logger.info("Load File: " + file.getPath());
 

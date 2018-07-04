@@ -43,7 +43,7 @@ public class CoPDPreProcessorService
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
-	public List<String> readMessagesFromFile(GenericFile genericFile) throws IOException
+	public String getFileString(GenericFile genericFile) throws IOException
 	{
 		logger.info("Read import file");
 		File file = genericFile.getFileObject();
@@ -56,16 +56,21 @@ public class CoPDPreProcessorService
 		{
 			sb.append(line);
 		}
-
-		logger.info("Split hl7 messages");
-		return separateMessages(sb.toString());
+		return sb.toString();
 	}
+
+	public boolean looksLikeCoPDFormat(String fileString)
+	{
+		//TODO make this more robust or whatever
+		return fileString.contains("<ZPD_ZTR");
+	}
+
 	/**
 	 * TODO  -- make this more efficient for larger files
 	 * @param messageStr the whole file as a string
 	 * @return - list of message strings
 	 */
-	private List<String> separateMessages(String messageStr)
+	public List<String> separateMessages(String messageStr)
 	{
 		List<String> messageList = new LinkedList<>();
 

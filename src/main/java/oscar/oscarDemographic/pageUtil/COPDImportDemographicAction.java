@@ -34,7 +34,6 @@ import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.demographicImport.service.CoPDPreProcessorService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import oscar.OscarProperties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,7 +42,6 @@ import java.util.List;
 public class COPDImportDemographicAction extends Action
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final OscarProperties oscarProperties = OscarProperties.getInstance();
 
 	private CoPDImportService coPDImportService = SpringUtils.getBean(CoPDImportService.class);
 	private CoPDPreProcessorService coPDPreProcessorService = SpringUtils.getBean(CoPDPreProcessorService.class);
@@ -61,11 +59,12 @@ public class COPDImportDemographicAction extends Action
 			FormFile imp = frm.getImportFile();
 			tempFile = FileFactory.createTempFile(imp.getInputStream());
 
-			List<String> messageList = coPDPreProcessorService.readMessagesFromFile(tempFile);
+			String fileString = coPDPreProcessorService.getFileString(tempFile);
+			List<String> messageList = coPDPreProcessorService.separateMessages(fileString);
 			for(String message : messageList)
 			{
 				message = coPDPreProcessorService.preProcessMessage(message);
-				coPDImportService.importFromHl7Message(message);
+				coPDImportService.importFromHl7Message(message, "/root/");
 			}
 		}
 		catch(Exception e)
