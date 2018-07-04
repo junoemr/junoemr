@@ -1036,7 +1036,7 @@
 								   value="<bean:message key="appointment.editappointment.btnGroupAction"/>">
 							<% }%>
 							<input TYPE="submit" id="printReceiptButton"
-								   onclick="document.forms['EDITAPPT'].displaymode.value='Update Appt';document.forms['EDITAPPT'].printReceipt.value='1';"
+								   onclick="document.forms['EDITAPPT'].displaymode.value='Update Appt';document.forms['EDITAPPT'].printReceipt.value='1';onButUpdate();"
 								   VALUE="<bean:message key='appointment.editappointment.btnPrintReceipt'/>">
 							<input type="hidden" name="printReceipt" value="">
 							<input type="submit" class="redButton button" id="deleteButton"
