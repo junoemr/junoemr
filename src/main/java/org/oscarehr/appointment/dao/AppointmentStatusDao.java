@@ -24,6 +24,7 @@
 package org.oscarehr.appointment.dao;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -93,12 +94,13 @@ public class AppointmentStatusDao extends AbstractDao<AppointmentStatus>
     }
     
     /**
-     * I don't know about this one...but i'm just converting it to a JPA entity for now.
+     * Find all inactive statuses that are currently used in any appointment. Return a list of these statuses.
      * @param allStatus
      * @return int
      */
-    public int checkStatusUsuage(List<AppointmentStatus> allStatus){
-        int iUsuage = 0;
+    public List<String> checkStatusUsuage(List<AppointmentStatus> allStatus){
+        int inactiveUseCount = 0;
+        List<String> inactiveUsedStatuses = new ArrayList<String>();
         AppointmentStatus apptStatus = null;
         String sql= null;
         for(int i=0; i<allStatus.size();i++){
@@ -111,13 +113,13 @@ public class AppointmentStatusDao extends AbstractDao<AppointmentStatus>
             Query q = entityManager.createNativeQuery(sql);
             q.setParameter(1,apptStatus.getStatus()+"%");
             Object result = q.getSingleResult();
-           
-            iUsuage = ((BigInteger)result).intValue();
-            if(iUsuage > 0){
-                iUsuage =i;
-                break;
-            }
-        }
-        return iUsuage;
+
+			inactiveUseCount = ((BigInteger)result).intValue();
+			if (inactiveUseCount > 0)
+			{
+				inactiveUsedStatuses.add(apptStatus.getStatus());
+			}
+		}
+        return inactiveUsedStatuses;
     }
 }

@@ -91,7 +91,7 @@ public class AppointmentStatusMgrImpl implements AppointmentStatusMgr {
         appointStatusDao.modifyStatus(ID, strDesc, strColor);
     }
 
-    public int checkStatusUsuage(List<AppointmentStatus> allStatus){
+    public List<String> checkStatusUsuage(List<AppointmentStatus> allStatus){
         return appointStatusDao.checkStatusUsuage(allStatus);
     }
     
