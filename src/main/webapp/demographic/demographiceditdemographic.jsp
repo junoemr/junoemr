@@ -4212,7 +4212,7 @@ while(field_itr.hasNext()){
 																ResultSet rsstatus1 = apptMainBean.queryResults("search_rsstatus");
 																while (rsstatus1.next())
 																{ %>
-															<option
+															<option value="<%=rsstatus1.getString("roster_status")%>"
 																	<%=rosterStatus.equals(rsstatus1.getString("roster_status")) ? " selected" : ""%>><%=rsstatus1.getString("roster_status")%>
 															</option>
 															<% }
