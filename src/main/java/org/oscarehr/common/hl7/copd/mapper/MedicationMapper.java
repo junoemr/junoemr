@@ -193,13 +193,13 @@ public class MedicationMapper
 		return (subsCode.equalsIgnoreCase("Y"));
 	}
 
-	public Integer getRequestedDispenseAmount(int rep)
+	public Double getRequestedDispenseAmount(int rep)
 	{
 		String dosageStr = StringUtils.trimToNull(provider.getMEDS(rep).getRXO().
 				getRxo11_RequestedDispenseAmount().getValue());
 		if(dosageStr != null)
 		{
-			return Integer.parseInt(dosageStr);
+			return Double.parseDouble(dosageStr);
 		}
 		return null;
 	}
@@ -207,6 +207,7 @@ public class MedicationMapper
 	{
 		String dosageUnitStr = StringUtils.trimToNull(provider.getMEDS(rep).getRXO()
 				.getRxo12_RequestedDispenseUnits().getCe1_Identifier().getValue());
+		// default to Rxo4 (Requested Give Units) if blank
 		if(dosageUnitStr == null)
 		{
 			dosageUnitStr = StringUtils.trimToNull(provider.getMEDS(rep).getRXO()

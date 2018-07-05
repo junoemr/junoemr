@@ -76,9 +76,15 @@ public class AllergyMapper
 	{
 		Allergy allergy = new Allergy();
 
+		String description = getDescription(rep);
+		if(description == null)
+		{
+			description = "INVALID/MISSING DESCRIPTION";
+			logger.warn("Missing allergy description. values set to:" + description);
+		}
 		allergy.setStartDate(getStartDate(rep));
 		allergy.setEntryDate(getStartDate(rep));
-		allergy.setDescription(getDescription(rep));
+		allergy.setDescription(description);
 		allergy.setArchived(false);
 		allergy.setTypeCode(0);// TODO can numeric code be mapped from string in IAM.2.1?
 		allergy.setDrugrefId("0");
@@ -124,21 +130,21 @@ public class AllergyMapper
 
 	public String getDescription(int rep)
 	{
-		return provider.getALLERGY(rep).getIAM().getIam3_AllergenCodeMnemonicDescription().getCwe9_OriginalText().getValue();
+		return StringUtils.trimToNull(provider.getALLERGY(rep).getIAM().getIam3_AllergenCodeMnemonicDescription().getCwe9_OriginalText().getValue());
 	}
 
 	public String getReaction(int rep) throws HL7Exception
 	{
-		return provider.getALLERGY(rep).getIAM().getIam5_AllergyReactionCode(0).getCwe2_Text().getValue();
+		return StringUtils.trimToNull(provider.getALLERGY(rep).getIAM().getIam5_AllergyReactionCode(0).getCwe2_Text().getValue());
 	}
 
 	public String getSeverity(int rep)
 	{
-		String severityCode = provider.getALLERGY(rep).getIAM().getIam4_AllergySeverityCode().getCe1_Identifier().getValue();
+		String severityCode = StringUtils.trimToEmpty(provider.getALLERGY(rep).getIAM().getIam4_AllergySeverityCode().getCe1_Identifier().getValue());
 		switch(severityCode)
 		{
-//			case "MI": return Allergy.SEVERITY_CODE_MILD;
-//			case "MO": return Allergy.SEVERITY_CODE_MODERATE;
+			case "MI": return Allergy.SEVERITY_CODE_MILD;
+			case "MO": return Allergy.SEVERITY_CODE_MODERATE;
 			case "SV": return Allergy.SEVERITY_CODE_SEVERE;
 			default: return Allergy.SEVERITY_CODE_UNKNOWN;
 		}
@@ -161,6 +167,6 @@ public class AllergyMapper
 
 	public String getComment(int rep) throws HL7Exception
 	{
-		return provider.getALLERGY(rep).getNTE().getComment(0).getValue();
+		return StringUtils.trimToNull(provider.getALLERGY(rep).getNTE().getComment(0).getValue());
 	}
 }

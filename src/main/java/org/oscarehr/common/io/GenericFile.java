@@ -43,11 +43,16 @@ public class GenericFile
 	protected static final OscarProperties props = oscar.OscarProperties.getInstance();
 
 	private static final Set<String> ALLOWED_CONTENT_TYPE = Sets.newHashSet(
+			"application/vnd.openxmlformats-officedocument.wordprocessingml.document",//docx
 			"application/pdf",
 			"application/xml",
 			"application/image",
 			"application/doc",
-			"text/plain");
+			"application/msword",
+			"text/plain",
+			"image/tiff",
+			"image/jpeg",
+			"image/png");
 
 	public static final String BASE_DIRECTORY = props.getProperty("BASE_DOCUMENT_DIR");
 

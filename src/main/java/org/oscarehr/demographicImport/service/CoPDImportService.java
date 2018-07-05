@@ -85,8 +85,11 @@ import java.util.List;
 public class CoPDImportService
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final String IMPORT_PROVIDER = "999900"; //TODO dont use this system forever
 	private static final OscarProperties properties = OscarProperties.getInstance();
+
+	private static final String IMPORT_PROVIDER = properties.getProperty("copd_import_service.system_provider_no", "999900");
+	private static final String DEFAULT_PROVIDER_LAST_NAME = properties.getProperty("copd_import_service.default_provider.last_name", "CoPD-provider");
+	private static final String DEFAULT_PROVIDER_FIRST_NAME = properties.getProperty("copd_import_service.default_provider.first_name", "CoPD-missing");
 
 	@Autowired
 	DemographicService demographicService;
@@ -183,16 +186,20 @@ public class CoPDImportService
 
 		for(int i=0; i< numProviders; i++)
 		{
-			String providerFirstName = providerMapper.getFirstName(i);
-			String providerLastName = providerMapper.getLastName(i);
+			ProviderData provider = providerMapper.getProvider(i);
 
-			if(providerFirstName == null || providerLastName == null)
+			// CoPD spec does not require the provider PRD to have a name. in this case, assign a default
+			if(provider.getFirstName() == null || provider.getLastName() == null)
 			{
-				throw new RuntimeException("Not enough provider info found to link or create provider record (first and last name are required).");
+				logger.warn("Not enough provider info found to link or create provider record (first and last name are required). \n" +
+						"Default provider (" + DEFAULT_PROVIDER_LAST_NAME + "," + DEFAULT_PROVIDER_FIRST_NAME + ") will be assigned.");
+
+				provider.setLastName(DEFAULT_PROVIDER_LAST_NAME);
+				provider.setFirstName(DEFAULT_PROVIDER_FIRST_NAME);
 			}
 
 			//TODO how to determine MRP doctor when there are more than 1
-			mrpProvider = findOrCreateProviderRecord(providerMapper.getProvider(i), providerFirstName, providerLastName);
+			mrpProvider = findOrCreateProviderRecord(provider);
 
 			logger.info("Import Notes & History ...");
 			importProviderNotes(zpdZtrMessage, i, mrpProvider, demographic);
@@ -214,14 +221,13 @@ public class CoPDImportService
 			importDocumentData(zpdZtrMessage, i, mrpProvider, demographic, documentLocation);
 		}
 
-
 		return mrpProvider;
 	}
 
-	private ProviderData findOrCreateProviderRecord(ProviderData newProvider, String providerFirstName, String providerLastName)
+	private ProviderData findOrCreateProviderRecord(ProviderData newProvider)
 	{
 		ProviderData provider;
-		List<ProviderData> matchedProviders = providerDataDao.findByName(providerFirstName, providerLastName, false);
+		List<ProviderData> matchedProviders = providerDataDao.findByName(newProvider.getFirstName(), newProvider.getLastName(), false);
 		if(matchedProviders.isEmpty())
 		{
 			provider = newProvider;
@@ -241,7 +247,7 @@ public class CoPDImportService
 		}
 		else
 		{
-			throw new RuntimeException("Multiple providers exist in the system with the same name (" + providerLastName + "," + providerFirstName + ").");
+			throw new RuntimeException("Multiple providers exist in the system with the same name (" + newProvider.getLastName() + "," + newProvider.getFirstName() + ").");
 		}
 		return provider;
 	}

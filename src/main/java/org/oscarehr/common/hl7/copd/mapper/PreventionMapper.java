@@ -155,5 +155,14 @@ public class PreventionMapper
 		preventionTypeMap.put("Varicella", "MMR-Var");
 		preventionTypeMap.put("Pneumococcal 7-Conjugate", "PNEU-C");
 		preventionTypeMap.put("dPT/Polio/HIB", "DPT");
+		preventionTypeMap.put("dPT/Polio", "DPT");
+		preventionTypeMap.put("Adacel", "DPT");
+		preventionTypeMap.put("Adacel/Polio", "DPT");
+		preventionTypeMap.put("Adacel/Polio (Quad)", "DPT");
+		preventionTypeMap.put("Td Adsorbed", "Td");
+		preventionTypeMap.put("flu shot", "Flu");
+		preventionTypeMap.put("Quadracel", "OtherA");
+		preventionTypeMap.put("penta", "OtherA");
+		preventionTypeMap.put("Pneumovax 23", "Pneumovax");
 	}
 }
