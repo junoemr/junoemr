@@ -102,12 +102,14 @@ public class AppointmentStatusAction extends DispatchAction {
         return new AppointmentStatusMgrImpl();
     }
 
-    private void populateAllStatus(HttpServletRequest request) {
+    private void populateAllStatus(HttpServletRequest request)
+    {
         AppointmentStatusMgr apptStatusMgr = getApptStatusMgr();
         List allStatus = apptStatusMgr.getAllStatus();
         request.setAttribute("allStatus", allStatus);
         List<String> inactiveUseStatus = apptStatusMgr.checkStatusUsuage(allStatus);
-        if (inactiveUseStatus.size() > 0) {
+        if (inactiveUseStatus.size() > 0)
+        {
             request.setAttribute("useStatus", inactiveUseStatus);
         }
     }

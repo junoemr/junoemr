@@ -116,17 +116,17 @@
 <br>
 
 <%
-    List inactiveUseStatus = (List)request.getAttribute("useStatus");
-    if (null!=inactiveUseStatus && inactiveUseStatus.size()>0)
-    {
-    	for(int i = 0; i < inactiveUseStatus.size(); i++)
+	List inactiveUseStatus = (List) request.getAttribute("useStatus");
+	if (null != inactiveUseStatus && inactiveUseStatus.size() > 0)
+	{
+		for (int i = 0; i < inactiveUseStatus.size(); i++)
 		{
 %>
 			The code [<%=inactiveUseStatus.get(i)%>] has been used before, please enable that
 			status.<br/>
 <%
 		}
-    }
+	}
 %>
 </body>
 </html>
