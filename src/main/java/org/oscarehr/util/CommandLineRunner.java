@@ -24,8 +24,8 @@ package org.oscarehr.util;
 
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
@@ -50,29 +50,37 @@ public class CommandLineRunner
 	 *
 	 * deployed: in ~tomcat/webapps/context_path/WEB-INF
 	 * un-deployed: in [code_source]/target/oscar-14.0.0-SNAPSHOT/WEB-INF
-	 * java -cp "classes/:lib/*:/usr/java/apache-tomcat/lib/*" org.oscarehr.util.CommandLineRunner [props_file] [topd_files_directory] [topd_documents_directory]
-	 *
-	 * @param args
+	 * java -cp "classes/:lib/*:/usr/java/apache-tomcat/lib/*" org.oscarehr.util.CommandLineRunner
+	 *   [logger_config.properties] [oscar_config.properties] [topd_files_directory] [topd_documents_directory]
 	 */
 	public static void main (String [] args)
 	{
-		logger.setLevel(Level.INFO);
-		// Set up a simple configuration that logs on the console.
-		BasicConfigurator.configure();
 
-		if(args == null || args.length != 3)
+		if(args == null || args.length != 4)
 		{
-			logger.error("Invalid Argument Count");
+			BasicConfigurator.configure();
+			logger.error("Invalid argument count");
 			return;
 		}
+		else if(!(new File(args[0]).exists()))
+		{
+			BasicConfigurator.configure();
+			logger.error("Invalid log configuration file. Default logger initialized");
+		}
+		else
+		{
+			// set up the logger
+			PropertyConfigurator.configure(args[0]);
+			logger.info("Log properties loaded success");
+		}
+
+		String propertiesFileName = args[1];
+		String copdFileLocation = args[2];
+		String copdDocumentLocation = args[3];
 
 		ClassPathXmlApplicationContext ctx = null;
 		try
 		{
-			String propertiesFileName = args[0];
-			String copdFileLocation = args[1];
-			String copdDocumentLocation = args[2];
-
 			// load properties from file
 			OscarProperties properties = OscarProperties.getInstance();
 			// This has been used to look in the users home directory that started tomcat
@@ -109,7 +117,6 @@ public class CommandLineRunner
 						catch(Exception e)
 						{
 							logger.error("Failed to import " + copdFile.getName(), e);
-							e.printStackTrace();
 						}
 					}
 					else
