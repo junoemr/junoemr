@@ -249,7 +249,7 @@ function showHideERxPref() {
 					<bean:message key="provider.preference.formGroupNo" />
 				</td>
 				<td class="preferenceValue">
-					<INPUT TYPE="TEXT" NAME="mygroup_no" VALUE='<%=request.getParameter("mygroup_no")%>' size="12" maxlength="10">
+					<INPUT TYPE="TEXT" NAME="mygroup_no" VALUE="<%=request.getParameter("mygroup_no")%>" size="12" maxlength="10">
 					<input type="button" value="<bean:message key="provider.providerpreference.viewedit" />" onClick="popupPage(360,680,'providercontrol.jsp?displaymode=displaymygroup&dboperation=searchmygroupall' );return false;" />
 				</td>
 			</tr>
