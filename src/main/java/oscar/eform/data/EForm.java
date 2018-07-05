@@ -726,15 +726,15 @@ public class EForm extends EFormBase {
 			{
 				pointer = html.indexOf(PRECHECKED, pointer);
 				html.delete(pointer, pointer + PRECHECKED.length());
-			} else if (value.equals("on"))
-			{
-				html.insert(pointer, " checked");
-			} else
+			} else if (value.equals("off"))
 			{
 				if (html.substring(pointer, pointer + " checked".length()).equals(" checked"))
 				{
 					html.delete(pointer, pointer + " checked".length());
 				}
+			} else
+			{
+				html.insert(pointer, " checked");
 			}
 		} else if (type.equals("select"))
 		{
