@@ -23,6 +23,8 @@
 package org.oscarehr.util;
 
 import ca.uhn.hl7v2.HL7Exception;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
@@ -38,7 +40,7 @@ import java.util.List;
 
 public class CommandLineRunner
 {
-	private static final Logger logger = MiscUtils.getLogger();
+	private static final Logger logger = Logger.getLogger(CommandLineRunner.class);
 
 	private static CoPDImportService coPDImportService;
 	private static CoPDPreProcessorService coPDPreProcessorService;
@@ -54,10 +56,13 @@ public class CommandLineRunner
 	 */
 	public static void main (String [] args)
 	{
+		logger.setLevel(Level.INFO);
+		// Set up a simple configuration that logs on the console.
+		BasicConfigurator.configure();
+
 		if(args == null || args.length != 3)
 		{
 			logger.error("Invalid Argument Count");
-			System.out.println("Invalid Argument Count");
 			return;
 		}
 
@@ -73,7 +78,6 @@ public class CommandLineRunner
 			// This has been used to look in the users home directory that started tomcat
 			properties.readFromFile(propertiesFileName);
 			logger.info("loading properties from " + propertiesFileName);
-			System.out.println("loading properties from " + propertiesFileName);
 
 			ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
 			// initialize spring bean factory for old style access
@@ -84,7 +88,6 @@ public class CommandLineRunner
 
 			// -------------------------------------------------------------------
 			logger.info("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
-			System.out.println("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
 
 			File copdDirectory = new File(copdFileLocation);
 			File[] fileList = copdDirectory.listFiles();
@@ -98,7 +101,6 @@ public class CommandLineRunner
 					if(coPDPreProcessorService.looksLikeCoPDFormat(fileString))
 					{
 						logger.info("Import from file: " + copdFile.getName());
-						System.out.println("Import from file: " + copdFile.getName());
 
 						try
 						{
@@ -107,14 +109,12 @@ public class CommandLineRunner
 						catch(Exception e)
 						{
 							logger.error("Failed to import " + copdFile.getName(), e);
-							System.out.println("Failed to import " + copdFile.getName());
 							e.printStackTrace();
 						}
 					}
 					else
 					{
 						logger.warn(copdFile.getName() + " does not look like a valid import xml file.");
-						System.out.println(copdFile.getName() + " does not look like a valid import xml file.");
 					}
 				}
 			}
@@ -122,8 +122,6 @@ public class CommandLineRunner
 		catch(Exception e)
 		{
 			logger.error("CommandLineRunner Error", e);
-			System.out.println("CommandLineRunner Error");
-			e.printStackTrace();
 		}
 		finally
 		{
@@ -133,7 +131,6 @@ public class CommandLineRunner
 			}
 		}
 		logger.info("IMPORT PROCESS COMPLETE");
-		System.out.println("IMPORT PROCESS COMPLETE");
 	}
 
 	private static void importFileString(String fileString, String documentDirectory) throws HL7Exception, IOException, InterruptedException

@@ -308,7 +308,7 @@ public class HistoryNoteMapper
 		{
 			return relationshipTypeMap.get(relationCode.toUpperCase());
 		}
-		logger.error("Invalid relationship code: " + relationCode);
+		logger.warn("Invalid relationship code: " + relationCode);
 		return (relationCode != null)? relationCode : relationshipTypeMap.get("UNK");//unknown
 	}
 
