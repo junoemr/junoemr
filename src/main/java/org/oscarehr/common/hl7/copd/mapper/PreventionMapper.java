@@ -147,22 +147,26 @@ public class PreventionMapper
 
 	static
 	{
-		preventionTypeMap.put("Infanrix", "OtherA");
-		preventionTypeMap.put("Meningococcal C-TT Conjugate", "MenconC");
-		preventionTypeMap.put("rotovirus", "Rot");
-		preventionTypeMap.put("Prevnar", "OtherA");
-		preventionTypeMap.put("MMR/Varicella", "MMR-Var");
-		preventionTypeMap.put("Varicella", "MMR-Var");
-		preventionTypeMap.put("Pneumococcal 7-Conjugate", "PNEU-C");
-		preventionTypeMap.put("dPT/Polio/HIB", "DPT");
-		preventionTypeMap.put("dPT/Polio", "DPT");
 		preventionTypeMap.put("Adacel", "DPT");
 		preventionTypeMap.put("Adacel/Polio", "DPT");
 		preventionTypeMap.put("Adacel/Polio (Quad)", "DPT");
-		preventionTypeMap.put("Td Adsorbed", "Td");
+		preventionTypeMap.put("dPT/Polio/HIB", "DPT");
+		preventionTypeMap.put("dPT/Polio", "DPT");
+		preventionTypeMap.put("Fluad", "OtherA");
 		preventionTypeMap.put("flu shot", "Flu");
-		preventionTypeMap.put("Quadracel", "OtherA");
+		preventionTypeMap.put("Infanrix", "OtherA");
+		preventionTypeMap.put("Meningococcal C-TT Conjugate", "MenconC");
+		preventionTypeMap.put("MMR/Varicella", "MMR-Var");
 		preventionTypeMap.put("penta", "OtherA");
+		preventionTypeMap.put("Pentacel", "OtherA");
+		preventionTypeMap.put("Pneumococcal 7-Conjugate", "PNEU-C");
+		preventionTypeMap.put("Pneumococcal 13-Conjugate", "PNEU-C");
 		preventionTypeMap.put("Pneumovax 23", "Pneumovax");
+		preventionTypeMap.put("Prevnar", "Pneu-C");
+		preventionTypeMap.put("quad", "OtherA");
+		preventionTypeMap.put("Quadracel", "OtherA");
+		preventionTypeMap.put("rotovirus", "Rot");
+		preventionTypeMap.put("Td Adsorbed", "Td");
+		preventionTypeMap.put("Varicella", "MMR-Var");
 	}
 }

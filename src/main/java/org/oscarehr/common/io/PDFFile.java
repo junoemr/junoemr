@@ -96,6 +96,7 @@ public class PDFFile extends GenericFile
 		{
 			PDDocument doc = PDDocument.load(javaFile);
 			numOfPage = doc.getNumberOfPages();
+			doc.close();
 		}
 		catch(IOException e)
 		{
