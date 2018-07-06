@@ -61,7 +61,7 @@ public class Billingreferral  extends AbstractModel<Integer> implements java.io.
      private String fax;
     @Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "deleted_at")
-	 private Date deleted_at;
+	 private Date deletedAt;
 
     public Billingreferral() {
     }
@@ -84,7 +84,7 @@ public class Billingreferral  extends AbstractModel<Integer> implements java.io.
        this.postal = postal;
        this.phone = phone;
        this.fax = fax;
-       this.deleted_at = null;
+       this.deletedAt = null;
     }
 
     public Integer getId() {
@@ -183,11 +183,11 @@ public class Billingreferral  extends AbstractModel<Integer> implements java.io.
         this.fax = fax;
     }
     public Date getDeletedAt() {
-        return this.deleted_at;
+        return this.deletedAt;
     }
 
-    public void setDeletedAt(Date deleted_at) {
-        this.deleted_at = deleted_at;
+    public void setDeletedAt(Date deletedAt) {
+        this.deletedAt = deletedAt;
     }
 
     @Override
