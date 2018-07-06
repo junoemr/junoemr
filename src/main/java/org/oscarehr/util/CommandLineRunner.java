@@ -65,7 +65,7 @@ public class CommandLineRunner
 		else if(!(new File(args[0]).exists()))
 		{
 			BasicConfigurator.configure();
-			logger.error("Invalid log configuration file. Default logger initialized");
+			logger.warn("Invalid log configuration file. Default logger initialized");
 		}
 		else
 		{
@@ -78,7 +78,25 @@ public class CommandLineRunner
 		String copdFileLocation = args[2];
 		String copdDocumentLocation = args[3];
 
+		File copdDirectory = new File(copdFileLocation);
+		File documentDirectory = new File(copdDocumentLocation);
+
+		if(!(copdDirectory.exists() && copdDirectory.isDirectory()))
+		{
+			logger.error("Invalid CoPD directory");
+			return;
+		}
+		if(!(documentDirectory.exists() && documentDirectory.isDirectory()))
+		{
+			logger.error("Invalid document directory");
+			return;
+		}
+
+
 		ClassPathXmlApplicationContext ctx = null;
+		long importCount = 0;
+		long failureCount = 0;
+
 		try
 		{
 			// load properties from file
@@ -97,11 +115,15 @@ public class CommandLineRunner
 			// -------------------------------------------------------------------
 			logger.info("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
 
-			File copdDirectory = new File(copdFileLocation);
 			File[] fileList = copdDirectory.listFiles();
 
 			for(File file : fileList)
 			{
+				// skip sub directories
+				if(file.isDirectory())
+				{
+					continue;
+				}
 				GenericFile copdFile = FileFactory.getExistingFile(file);
 				if(copdFile instanceof XMLFile)
 				{
@@ -113,10 +135,14 @@ public class CommandLineRunner
 						try
 						{
 							importFileString(fileString, copdDocumentLocation);
+							importCount++;
+							moveToCompleted(copdFile, copdDirectory);
 						}
 						catch(Exception e)
 						{
 							logger.error("Failed to import " + copdFile.getName(), e);
+							failureCount++;
+							moveToFailed(copdFile, copdDirectory);
 						}
 					}
 					else
@@ -128,7 +154,7 @@ public class CommandLineRunner
 		}
 		catch(Exception e)
 		{
-			logger.error("CommandLineRunner Error", e);
+			logger.error("Unknown Error", e);
 		}
 		finally
 		{
@@ -137,7 +163,7 @@ public class CommandLineRunner
 				ctx.close();
 			}
 		}
-		logger.info("IMPORT PROCESS COMPLETE");
+		logger.info("IMPORT PROCESS COMPLETE (" + importCount + " files imported. " + failureCount + " failures)");
 	}
 
 	private static void importFileString(String fileString, String documentDirectory) throws HL7Exception, IOException, InterruptedException
@@ -147,6 +173,32 @@ public class CommandLineRunner
 		{
 			message = coPDPreProcessorService.preProcessMessage(message);
 			coPDImportService.importFromHl7Message(message, documentDirectory);
+		}
+	}
+
+	private static void moveToFailed(GenericFile genericFile, File baseDir)
+	{
+		File failedDir = new File(baseDir, "failed");
+		try
+		{
+			genericFile.moveFile(failedDir);
+		}
+		catch(IOException e)
+		{
+			logger.error("IO ERROR: Failed to move " + genericFile.getName() + " to failed folder!", e);
+		}
+	}
+
+	private static void moveToCompleted(GenericFile genericFile, File baseDir)
+	{
+		File failedDir = new File(baseDir, "completed");
+		try
+		{
+			genericFile.moveFile(failedDir);
+		}
+		catch(IOException e)
+		{
+			logger.error("IO ERROR: Failed to move " + genericFile.getName() + " to failed folder!", e);
 		}
 	}
 }

@@ -22,6 +22,7 @@
  */
 package org.oscarehr.common.hl7.copd.mapper;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
@@ -87,12 +88,15 @@ public class DocumentMapper
 
 	public String getFileName(int rep)
 	{
-		return provider.getZAT(rep).getZat4_Attachment().getPointer().getValue();
+		String fileName = provider.getZAT(rep).getZat4_Attachment().getPointer().getValue();
+		fileName = fileName.replaceAll("'amp;", "&");
+		return fileName;
 	}
 
 	public String getDescription(int rep)
 	{
-		return provider.getZAT(rep).getZat3_Name().getValue();
+		String description = provider.getZAT(rep).getZat3_Name().getValue();
+		return StringEscapeUtils.unescapeXml(description);
 	}
 
 	public String getContentType(int rep)
