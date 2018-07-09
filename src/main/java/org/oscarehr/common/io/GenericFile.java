@@ -52,7 +52,8 @@ public class GenericFile
 			"text/plain",
 			"image/tiff",
 			"image/jpeg",
-			"image/png");
+			"image/png",
+			"image/bmp");
 
 	public static final String BASE_DIRECTORY = props.getProperty("BASE_DOCUMENT_DIR");
 

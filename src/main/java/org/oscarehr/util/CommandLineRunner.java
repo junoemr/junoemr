@@ -198,7 +198,7 @@ public class CommandLineRunner
 		}
 		catch(IOException e)
 		{
-			logger.error("IO ERROR: Failed to move " + genericFile.getName() + " to failed folder!", e);
+			logger.error("IO ERROR: Failed to move " + genericFile.getName() + " to completed folder!", e);
 		}
 	}
 }
