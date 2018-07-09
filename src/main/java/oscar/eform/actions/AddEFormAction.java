@@ -56,9 +56,6 @@ import oscar.util.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -163,15 +160,7 @@ public class AddEFormAction extends Action {
 			String value = String.join(",", entry.getValue());// most parameters will be single value.
 			if(value != null && !value.trim().isEmpty() && !value.equalsIgnoreCase("parentAjaxId"))
 			{
-				try
-				{
-					value = URLEncoder.encode(value, "ISO-8859-1");
-					value = URLDecoder.decode(value, "UTF-8");
-					paramValueMap.put(key, value);
-				} catch (UnsupportedEncodingException e)
-				{
-					MiscUtils.getLogger().error("DECODING EXCEPTION: ", e);
-				}
+				paramValueMap.put(key, value);
 			}
 		}
 		// java 8 filtering
