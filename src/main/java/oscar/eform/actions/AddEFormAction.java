@@ -160,7 +160,7 @@ public class AddEFormAction extends Action {
 			String value = String.join(",", entry.getValue());// most parameters will be single value.
 			if(value != null && !value.trim().isEmpty() && !value.equalsIgnoreCase("parentAjaxId"))
 			{
-				paramValueMap.put(key,value);
+				paramValueMap.put(key, value);
 			}
 		}
 		// java 8 filtering
