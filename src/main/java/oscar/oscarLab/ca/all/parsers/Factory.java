@@ -58,6 +58,7 @@ import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.GLSHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.ProvlabHandler;
+import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -68,7 +69,7 @@ public final class Factory {
 
 	private static Logger logger = MiscUtils.getLogger();
 
-	private static final HashSet<String> REFACTORED_LAB_TYPES = Sets.newHashSet("AHS","CLS","CLSDI");
+	private static final HashSet<String> REFACTORED_LAB_TYPES = Sets.newHashSet("AHS","CLS","CLSDI", JunoGenericLabHandler.LAB_TYPE_VALUE);
 
 	private Factory() {
 		// static methods no need for instance
@@ -150,11 +151,13 @@ public final class Factory {
 			handler = new GLSHandler(msg);
 		else if(ProvlabHandler.handlerTypeMatch(msg))
 			handler = new ProvlabHandler(msg);
+		else if(JunoGenericLabHandler.handlerTypeMatch(msg))
+			handler = new JunoGenericLabHandler(msg);
 
 		if(handler == null)
 			throw new RuntimeException("Hl7 message/type does not match a known lab handler.");
 
-		logger.debug("Loaded " + handler.getMsgType() + " HL7 Handler");
+		logger.info("Loaded " + handler.getMsgType() + " HL7 Handler");
 		return handler;
 	}
 

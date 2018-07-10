@@ -40,6 +40,7 @@ import org.oscarehr.common.hl7.copd.mapper.DocumentMapper;
 import org.oscarehr.common.hl7.copd.mapper.DxMapper;
 import org.oscarehr.common.hl7.copd.mapper.EncounterNoteMapper;
 import org.oscarehr.common.hl7.copd.mapper.HistoryNoteMapper;
+import org.oscarehr.common.hl7.copd.mapper.LabMapper;
 import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
 import org.oscarehr.common.hl7.copd.mapper.PreventionMapper;
 import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
@@ -74,6 +75,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
+import oscar.oscarLab.ca.all.parsers.Factory;
+import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
+import oscar.oscarLab.ca.all.upload.MessageUploader;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -381,9 +386,39 @@ public class CoPDImportService
 		}
 	}
 
-	private void importLabData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic)
+	private void importLabData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception, IOException
 	{
-		//TODO - not implemented
+		LabMapper labMapper = new LabMapper(zpdZtrMessage, providerRep);
+
+		for(String msg : labMapper.getLabList())
+		{
+			MessageHandler parser = Factory.getHandler(JunoGenericLabHandler.LAB_TYPE_VALUE, msg);
+			// just in case
+			if(parser == null)
+				throw new RuntimeException("No Parser available for lab");
+
+			// allow each lab type to make modifications to the hl7 if needed.
+			// This is for special cases only most labs return an identical string to the input parameter
+			msg = parser.preUpload(msg);
+
+			// check if the lab has passed validation and can be saved
+			if(parser.canUpload())
+			{
+				try
+				{
+					MessageUploader.routeReport(IMPORT_PROVIDER, "CoPD-Import", parser.getMsgType(), msg, 0);
+					parser.postUpload();
+				}
+				catch(Exception e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
+			else
+			{
+				logger.warn("Hl7 Report Could Not be Uploaded");
+			}
+		}
 	}
 
 	private void importDocumentData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, String documentLocation) throws IOException, InterruptedException
