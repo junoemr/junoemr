@@ -46,7 +46,7 @@ public class EFormDatabaseTagService
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
-	public Map<String,String> getAPValueMap(String htmlString, Integer demographicNo, Integer providerNo)
+	public Map<String,String> getDatabaseTagNameValueMap(String htmlString, Integer demographicNo, Integer providerNo)
 	{
 		EFormHtmlParser htmlParser = new EFormHtmlParser(htmlString);
 
@@ -56,12 +56,11 @@ public class EFormDatabaseTagService
 		nameMap.putAll(htmlParser.getElementNamesWithUpdateDatabaseTag());
 
 		// map of tag_name:database_value
-		Map<String, String> tagMap = getAllDatabaseTagValues(new ArrayList<>(nameMap.values()), demographicNo, providerNo);
+		Map<String, String> tagMap = loadDatabaseTagValues(new ArrayList<>(nameMap.values()), demographicNo, providerNo);
 
 		Map<String, String> aPValueMap = new HashMap<>(nameMap.size());
 		for(Map.Entry<String, String> entry : nameMap.entrySet())
 		{
-			logger.info("PUT " + entry.getKey() + ":" + tagMap.get(entry.getValue()));
 			aPValueMap.put(entry.getKey(), tagMap.get(entry.getValue()));
 		}
 		return  aPValueMap;
@@ -71,7 +70,7 @@ public class EFormDatabaseTagService
 	 * Load the values for each tag name and return them as a map
 	 * @return - key value map of with oscar database tags being the keys, and their current database values
 	 */
-	public Map<String, String> getAllDatabaseTagValues(List<String> tagList, Integer demographicId, Integer providerId)
+	public Map<String, String> loadDatabaseTagValues(List<String> tagList, Integer demographicId, Integer providerId)
 	{
 		Map<String, String> tagMap = new HashMap<>();
 		EFormLoader.getInstance();
@@ -96,7 +95,7 @@ public class EFormDatabaseTagService
 			String value = getValueFromDatabase(databaseAP, demographicId, providerId);
 			if(value != null)
 			{
-				logger.info("value: " + value);
+				logger.debug("value: " + value);
 				tagMap.put(tagName, value);
 			}
 		}

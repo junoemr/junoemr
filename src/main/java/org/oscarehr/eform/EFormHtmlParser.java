@@ -72,7 +72,7 @@ public class EFormHtmlParser
 		{
 			String name = element.attr("name");
 			String dbTagName = element.attr(marker);
-			logger.info("Element: " + element.id() + ", Name: " + name + ", dbTag: " + marker + ", dbTagValue: " + dbTagName);
+			logger.debug("Element: " + element.id() + ", Name: " + name + ", dbTag: " + marker + ", dbTagValue: " + dbTagName);
 
 			nameTagMap.put(name, dbTagName);
 		}

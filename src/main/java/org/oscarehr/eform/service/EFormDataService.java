@@ -114,7 +114,7 @@ public class EFormDataService
 
 		// hash maps use the latest value added when there are duplicate keys
 		// specified keys in the incoming map should have priority over AP tag values
-		Map<String, String> combinedValueMap = databaseTagService.getAPValueMap(template.getFormHtml(), demographicNo, providerNo);
+		Map<String, String> combinedValueMap = databaseTagService.getDatabaseTagNameValueMap(template.getFormHtml(), demographicNo, providerNo);
 		combinedValueMap.putAll(eFormValueMap);
 
 		return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, combinedValueMap, eformLink);
