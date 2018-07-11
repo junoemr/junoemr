@@ -207,9 +207,9 @@ public class DemographicMapper
 			}
 			switch(assigningAuth)
 			{
-				case "ACP": return "AB";
-				case "ACPS": return "AB";
-				case "AREG": return "AB";
+				case "ACP":
+				case "ACPS":
+				case "AREG":
 				case "ADA": return "AB";
 				default: return assigningAuth.substring(0,2);
 			}

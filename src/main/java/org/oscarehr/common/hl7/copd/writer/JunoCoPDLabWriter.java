@@ -31,8 +31,9 @@ import ca.uhn.hl7v2.model.v24.segment.PID;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.DeepCopy;
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_LAB;
-import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PATIENT;
+import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.writer.HL7LabWriter;
 import oscar.util.ConversionUtils;
 
@@ -45,10 +46,14 @@ public class JunoCoPDLabWriter extends HL7LabWriter
 
 	private ORU_R01 oru_r01;
 
-	public JunoCoPDLabWriter(ZPD_ZTR_PATIENT patient, ZPD_ZTR_LAB zpdZtrLab) throws IOException, HL7Exception
+	public JunoCoPDLabWriter(ZPD_ZTR message, ZPD_ZTR_LAB zpdZtrLab) throws IOException, HL7Exception
 	{
 		super(new ORU_R01(), new PipeParser());
 		oru_r01 = (ORU_R01) this.message;
+
+		// use the demographic mapper to pull some values into the new hl7, because the incoming data
+		// doesn't always match the usual format
+		DemographicMapper demographicMapper = new DemographicMapper(message);
 
 		//initialize an MSH header segment with some custom CoPD values
 		oru_r01.initQuickstart("ORU", "R01", "P");
@@ -61,7 +66,8 @@ public class JunoCoPDLabWriter extends HL7LabWriter
 
 		//copy the CoPD incoming segment info to the newly created hl7 message segments
 		PID pid = oru_r01.getPATIENT_RESULT().getPATIENT().getPID();
-		DeepCopy.copy(patient.getPID(), pid);
+		DeepCopy.copy(message.getPATIENT().getPID(), pid);
+		terser.set("/.PID-2", demographicMapper.getPHN());
 
 		OBR obr = oru_r01.getPATIENT_RESULT().getORDER_OBSERVATION().getOBR();
 		DeepCopy.copy(zpdZtrLab.getOBR(), obr);
@@ -82,7 +88,6 @@ public class JunoCoPDLabWriter extends HL7LabWriter
 			NTE nte = oru_r01.getPATIENT_RESULT().getORDER_OBSERVATION().getOBSERVATION(i).getNTE();
 			DeepCopy.copy(zpdZtrLab.getNTE(i), nte);
 		}
-
 	}
 
 	private String getLabDate(ZPD_ZTR_LAB zpdZtrLab)
@@ -92,6 +97,6 @@ public class JunoCoPDLabWriter extends HL7LabWriter
 		{
 			dateString = ConversionUtils.toDateString(new Date(), "yyyyMMdd");
 		}
-		return  dateString;
+		return dateString;
 	}
 }

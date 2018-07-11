@@ -24,8 +24,6 @@ package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_LAB;
-import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PATIENT;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.writer.JunoCoPDLabWriter;
@@ -71,10 +69,7 @@ public class LabMapper
 
 	public String getLabMessage(int rep) throws IOException, HL7Exception
 	{
-		ZPD_ZTR_PATIENT patient = message.getPATIENT();
-		ZPD_ZTR_LAB lab = provider.getLAB(rep);
-
-		JunoCoPDLabWriter labWriter = new JunoCoPDLabWriter(patient, lab);
+		JunoCoPDLabWriter labWriter = new JunoCoPDLabWriter(message, provider.getLAB(rep));
 		return labWriter.encode().replaceAll("~crlf~", "\n");
 	}
 }

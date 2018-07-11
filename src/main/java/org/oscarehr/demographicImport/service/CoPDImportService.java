@@ -59,6 +59,7 @@ import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.labs.service.LabService;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.service.PreventionManager;
@@ -78,11 +79,11 @@ import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
-import oscar.oscarLab.ca.all.upload.MessageUploader;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -134,6 +135,9 @@ public class CoPDImportService
 
 	@Autowired
 	PrescriptionDao prescriptionDao;
+
+	@Autowired
+	LabService labService;
 
 	public void importFromHl7Message(String message, String documentLocation) throws HL7Exception, IOException, InterruptedException
 	{
@@ -406,7 +410,10 @@ public class CoPDImportService
 			{
 				try
 				{
-					MessageUploader.routeReport(IMPORT_PROVIDER, "CoPD-Import", parser.getMsgType(), msg, 0);
+					ArrayList<ProviderData> routeProviders = new ArrayList<>(1);
+					routeProviders.add(provider);
+
+					labService.persistNewHL7Lab(parser, msg, "CoPD-Import", 0, demographic, routeProviders);
 					parser.postUpload();
 				}
 				catch(Exception e)
