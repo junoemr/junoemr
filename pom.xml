@@ -539,6 +539,12 @@
 			<artifactId>batik-xml</artifactId>
 			<version>1.6-1</version>
 		</dependency>
+		<!-- jsoup - for html parsing -->
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.11.3</version>
+		</dependency>
 		<!-- cds -->
 		<dependency>
 			<groupId>cds</groupId>
