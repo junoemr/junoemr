@@ -43,7 +43,6 @@ import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -72,9 +71,6 @@ public class EFormDataService
 
 	@Autowired
 	private EFormDatabaseTagService databaseTagService;
-
-	@Autowired
-	private EFormHtmlParsingService htmlParsingService;
 
 	public EFormData saveExistingEForm(Integer oldFormDataId, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
 	{
@@ -118,35 +114,10 @@ public class EFormDataService
 
 		// hash maps use the latest value added when there are duplicate keys
 		// specified keys in the incoming map should have priority over AP tag values
-		Map<String, String> combinedValueMap = getAPValueMap(template, demographicNo, providerNo);
+		Map<String, String> combinedValueMap = databaseTagService.getAPValueMap(template.getFormHtml(), demographicNo, providerNo);
 		combinedValueMap.putAll(eFormValueMap);
 
-		for(Map.Entry<String, String> entry : combinedValueMap.entrySet())
-		{
-			logger.info("COMBINED MAP ENTRY: " + entry.getKey() + ":" + entry.getValue());
-		}
-
 		return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, combinedValueMap, eformLink);
-	}
-
-	private Map<String,String> getAPValueMap(EForm template, Integer demographicNo, Integer providerNo)
-	{
-		// for new eforms, both regular dbTags and updateDbTags work the same way, so load both and combine them
-		// map of tag_name:database_value
-		Map<String, String> tagMap = databaseTagService.getAllDatabaseTagValues(template.getFormHtml(), demographicNo, providerNo);
-		tagMap.putAll(databaseTagService.getAllDatabaseUpdateTagValues(template.getFormHtml(), demographicNo, providerNo));
-
-		// map of name:tag_name
-		Map<String, String> nameMap = htmlParsingService.getElementNamesWithDatabaseTag(template.getFormHtml());
-		nameMap.putAll(htmlParsingService.getElementNamesWithUpdateDatabaseTag(template.getFormHtml()));
-
-		Map<String, String> aPValueMap = new HashMap<>(nameMap.size());
-		for(Map.Entry<String, String> entry : nameMap.entrySet())
-		{
-			logger.info("PUT " + entry.getKey() + ":" + tagMap.get(entry.getValue()));
-			aPValueMap.put(entry.getKey(), tagMap.get(entry.getValue()));
-		}
-		return  aPValueMap;
 	}
 
 	/**

@@ -24,6 +24,7 @@ package org.oscarehr.eform.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.eform.EFormHtmlParser;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +34,8 @@ import oscar.eform.data.DatabaseAP;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * This class is responsible for all services that deal with loading/manipulating eform database tags
@@ -46,45 +46,38 @@ public class EFormDatabaseTagService
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
-	/**
-	 * Parse the html and find all of the oscarDB tags. load the values for each one and return them as a map
-	 * @param html - the html to parse
-	 * @return - key value map of with oscar database tags being the keys, and their current database values
-	 */
-	public Map<String, String> getAllDatabaseTagValues(String html, Integer demographicId, Integer providerId)
+	public Map<String,String> getAPValueMap(String htmlString, Integer demographicNo, Integer providerNo)
 	{
-		return getAllDatabaseTagValues(EFormLoader.getMarker(), html, demographicId, providerId);
+		EFormHtmlParser htmlParser = new EFormHtmlParser(htmlString);
+
+		// for new eforms, both regular dbTags and updateDbTags work the same way, so load both and combine them
+		// map of name:tag_name
+		Map<String, String> nameMap = htmlParser.getElementNamesWithDatabaseTag();
+		nameMap.putAll(htmlParser.getElementNamesWithUpdateDatabaseTag());
+
+		// map of tag_name:database_value
+		Map<String, String> tagMap = getAllDatabaseTagValues(new ArrayList<>(nameMap.values()), demographicNo, providerNo);
+
+		Map<String, String> aPValueMap = new HashMap<>(nameMap.size());
+		for(Map.Entry<String, String> entry : nameMap.entrySet())
+		{
+			logger.info("PUT " + entry.getKey() + ":" + tagMap.get(entry.getValue()));
+			aPValueMap.put(entry.getKey(), tagMap.get(entry.getValue()));
+		}
+		return  aPValueMap;
 	}
 
 	/**
-	 * Parse the html and find all of the oscarUpdateDB tags. load the values for each one and return them as a map
-	 * @param html - the html to parse
+	 * Load the values for each tag name and return them as a map
 	 * @return - key value map of with oscar database tags being the keys, and their current database values
 	 */
-	public Map<String, String> getAllDatabaseUpdateTagValues(String html, Integer demographicId, Integer providerId)
-	{
-		return getAllDatabaseTagValues(EFormLoader.getUpdateMarker(), html, demographicId, providerId);
-	}
-
-	private Map<String, String> getAllDatabaseTagValues(String marker, String html, Integer demographicId, Integer providerId)
+	public Map<String, String> getAllDatabaseTagValues(List<String> tagList, Integer demographicId, Integer providerId)
 	{
 		Map<String, String> tagMap = new HashMap<>();
 		EFormLoader.getInstance();
 
-		Pattern tagPattern = Pattern.compile(marker + "=[\"'](.*?)[\"\']", Pattern.CASE_INSENSITIVE);
-		Matcher tagPatternMatcher = tagPattern.matcher(html);
-		while(tagPatternMatcher.find())
+		for(String tagName : tagList)
 		{
-			String tagName = tagPatternMatcher.group(1);
-			logger.info("Load EForm AP tag data: " + tagName);
-
-			if(tagMap.containsKey(tagName))
-			{
-				// skip duplicate keys
-				logger.info("Skip duplicate key");
-				continue;
-			}
-
 			DatabaseAP databaseAP = EFormLoader.getAP(tagName);
 			// if the normal AP doesn't have it, check the extras
 			if(databaseAP == null)
@@ -95,7 +88,7 @@ public class EFormDatabaseTagService
 			// if it's still null, skip the rest
 			if(databaseAP == null)
 			{
-				logger.info("null databaseAP");
+				logger.warn("Invalid database tag (" + tagName + ") was skipped.");
 				continue;
 			}
 
@@ -119,12 +112,10 @@ public class EFormDatabaseTagService
 
 		if (StringUtils.isNotEmpty(sql))
 		{
-			logger.info("sql: " + sql);
 			sql = replaceAllFields(sql, String.valueOf(demographicId), String.valueOf(providerId));
 			ArrayList<String> names = DatabaseAP.parserGetNames(output);
 			sql = DatabaseAP.parserClean(sql); // replaces all other ${apName} expressions with 'apName'
 
-			logger.info("sql final: " + sql);
 			ArrayList<String> values = EFormUtil.getValues(names, sql);
 			if(values.size() != names.size())
 			{

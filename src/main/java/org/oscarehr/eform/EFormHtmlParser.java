@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.eform.service;
+package org.oscarehr.eform;
 
 import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -28,8 +28,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.oscarehr.util.MiscUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import oscar.eform.EFormLoader;
 
 import java.util.HashMap;
@@ -39,26 +37,34 @@ import java.util.Map;
  * This service should handle all eform html parsing interactions,
  * and is meant to eventually replace EFormUtils and the .data.EForm classes that do this.
  */
-@Service
-@Transactional
-public class EFormHtmlParsingService
+public class EFormHtmlParser
 {
 	private static Logger logger = MiscUtils.getLogger();
 
-	public Map<String, String> getElementNamesWithDatabaseTag(String htmlString)
+	private final Document soupDocument;
+
+	public EFormHtmlParser()
 	{
-		return getElementNamesWithDatabaseTag(EFormLoader.getMarker(), htmlString);
+		this("");
 	}
-	public Map<String, String> getElementNamesWithUpdateDatabaseTag(String htmlString)
+	public EFormHtmlParser(String htmlString)
 	{
-		return getElementNamesWithDatabaseTag(EFormLoader.getUpdateMarker(), htmlString);
+		soupDocument = Jsoup.parse(htmlString);
+	}
+
+	public Map<String, String> getElementNamesWithDatabaseTag()
+	{
+		return getElementNamesWithDatabaseTag(EFormLoader.getMarker());
+	}
+	public Map<String, String> getElementNamesWithUpdateDatabaseTag()
+	{
+		return getElementNamesWithDatabaseTag(EFormLoader.getUpdateMarker());
 	}
 	/**
 	 * Retrieve a map of element names to database tag names.
 	 */
-	private Map<String, String> getElementNamesWithDatabaseTag(String marker, String htmlString)
+	private Map<String, String> getElementNamesWithDatabaseTag(String marker)
 	{
-		Document soupDocument = Jsoup.parse(htmlString);
 		Elements elements = soupDocument.select("["+ marker +"]");
 		HashMap<String, String> nameTagMap = new HashMap<>(elements.size());
 
