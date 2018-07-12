@@ -440,7 +440,7 @@ public class CoPDImportService
 			GenericFile documentFile = FileFactory.getExistingFile(documentLocation, document.getDocfilename());
 			InputStream stream = new FileInputStream(documentFile.getFileObject());
 			documentService.uploadNewDocument(document, stream, demographic.getDemographicId());
-			documentService.routeToProviderInbox(document.getDocumentNo(), provider.getProviderNo());
+			documentService.routeToProviderInbox(document.getDocumentNo(), provider.getProviderNo(), true);
 		}
 	}
 

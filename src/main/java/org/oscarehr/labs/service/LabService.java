@@ -30,6 +30,7 @@ import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.PatientLabRouting;
+import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.provider.model.ProviderData;
@@ -40,7 +41,6 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.oscarLab.ForwardingRules;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
-import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
 import oscar.util.ConversionUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -210,7 +210,7 @@ public class LabService
 		String status;
 		if(alwaysFileLabs)
 		{
-			status = ProviderLabRouting.STATUS_FILED;
+			status = ProviderInboxItem.FILE;
 		}
 		else
 		{
