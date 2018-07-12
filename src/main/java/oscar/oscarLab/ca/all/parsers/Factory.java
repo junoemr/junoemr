@@ -78,15 +78,26 @@ public final class Factory {
 	/**
 	 * Find the lab corresponding to segmentID and return the appropriate MessageHandler for it
 	 */
-	public static MessageHandler getHandler(String segmentID) {
-		try {
+	public static MessageHandler getHandler(String segmentID)
+	{
+		return getHandler(Integer.parseInt(segmentID));
+	}
+	/**
+	 * Find the lab corresponding to segmentID and return the appropriate MessageHandler for it
+	 */
+	public static MessageHandler getHandler(Integer segmentID)
+	{
+		try
+		{
 			Hl7TextMessageDao hl7TextMessageDao = (Hl7TextMessageDao) SpringUtils.getBean("hl7TextMessageDao");
-			Hl7TextMessage hl7TextMessage = hl7TextMessageDao.find(Integer.parseInt(segmentID));
+			Hl7TextMessage hl7TextMessage = hl7TextMessageDao.find(segmentID);
 
 			String type = hl7TextMessage.getType();
 			String hl7Body = new String(Base64.decodeBase64(hl7TextMessage.getBase64EncodedeMessage()), MiscUtils.DEFAULT_UTF8_ENCODING);
 			return getHandler(type, hl7Body);
-		} catch (Exception e) {
+		}
+		catch(Exception e)
+		{
 			logger.error("Could not retrieve lab for segmentID(" + segmentID + ")", e);
 		}
 		return new DefaultGenericHandler();

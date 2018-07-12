@@ -38,7 +38,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.oscarLab.ForwardingRules;
+import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
 import oscar.util.ConversionUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -71,11 +73,11 @@ public class LabService
 
 		//TODO find providers for routing
 
-		persistNewHL7Lab(messageHandler, hl7Message, serviceName, fileId, null, null);
+		persistNewHL7Lab(messageHandler, hl7Message, serviceName, fileId, null, null, false);
 	}
 
 	public void persistNewHL7Lab(MessageHandler messageHandler, String hl7Message, String serviceName, int fileId,
-	                             Demographic demographic, List<ProviderData> providerList) throws UnsupportedEncodingException
+	                             Demographic demographic, List<ProviderData> providerList, boolean alwaysFileLabs) throws UnsupportedEncodingException
 	{
 		String labType = messageHandler.getMsgType();
 		String firstName = messageHandler.getFirstName();
@@ -117,7 +119,7 @@ public class LabService
 
 		//TODO additional logic for lab uploads. Most of the lab specific stuff that should get moved to the handler
 
-		persistNewHL7Lab(hl7TextMessage, hl7TextInfo, demographic, providerList);
+		persistNewHL7Lab(hl7TextMessage, hl7TextInfo, demographic, providerList, alwaysFileLabs);
 	}
 
 	/**
@@ -157,7 +159,7 @@ public class LabService
 		return discipline;
 	}
 
-	private void persistNewHL7Lab(Hl7TextMessage hl7TextMessage, Hl7TextInfo hl7TextInfo, Demographic demographic, List<ProviderData> providerList)
+	private void persistNewHL7Lab(Hl7TextMessage hl7TextMessage, Hl7TextInfo hl7TextInfo, Demographic demographic, List<ProviderData> providerList, boolean alwaysFileLabs)
 	{
 		hl7TextMessageDao.persist(hl7TextMessage);
 
@@ -165,26 +167,22 @@ public class LabService
 		hl7TextInfoDao.persist(hl7TextInfo);
 
 		// route to the given demographic
-		if(demographic != null)
-		{
-			routeToDemographic(hl7TextMessage.getId(), demographic.getDemographicId());
-		}
-		else
-		{
-			routeToDemographic(hl7TextMessage.getId(), PatientLabRoutingDao.UNMATCHED);
-		}
+		Integer demographicNo = (demographic != null)? demographic.getDemographicId() : PatientLabRoutingDao.UNMATCHED;
+
+		routeToDemographic(hl7TextMessage.getId(), demographicNo);
+		addMeasurements(hl7TextMessage.getId(), demographicNo);
 
 		// route to the providers inbox
 		if(providerList != null && !providerList.isEmpty())
 		{
 			for(ProviderData provider : providerList)
 			{
-				routeToProvider(hl7TextMessage.getId(), provider.getProviderNo());
+				routeToProvider(hl7TextMessage.getId(), provider.getProviderNo(), alwaysFileLabs);
 			}
 		}
 		else
 		{
-			routeToProvider(hl7TextMessage.getId(), ProviderLabRoutingDao.PROVIDER_UNMATCHED);
+			routeToProvider(hl7TextMessage.getId(), ProviderLabRoutingDao.PROVIDER_UNMATCHED, alwaysFileLabs);
 		}
 	}
 
@@ -200,16 +198,31 @@ public class LabService
 		patientLabRoutingDao.persist(patientLabRouting);
 	}
 
-	private void routeToProvider(int labId, Integer providerNo)
+	private void addMeasurements(int labId, Integer demographicNo)
+	{
+		Hl7textResultsData.populateMeasurementsTable(String.valueOf(labId), String.valueOf(demographicNo));
+	}
+
+	private void routeToProvider(int labId, Integer providerNo, boolean alwaysFileLabs)
 	{
 		String providerNoStr = String.valueOf(providerNo);
-		ForwardingRules fr = new ForwardingRules();
+
+		String status;
+		if(alwaysFileLabs)
+		{
+			status = ProviderLabRouting.STATUS_FILED;
+		}
+		else
+		{
+			ForwardingRules fr = new ForwardingRules();
+			status = fr.getStatus(providerNoStr);
+		}
 
 		ProviderLabRoutingModel newRoute = new ProviderLabRoutingModel();
 		newRoute.setProviderNo(providerNoStr);
 		newRoute.setLabNo(labId);
 		newRoute.setLabType(ProviderLabRoutingDao.LAB_TYPE_HL7);
-		newRoute.setStatus(fr.getStatus(providerNoStr));
+		newRoute.setStatus(status);
 
 		providerLabRoutingDao.persist(newRoute);
 	}

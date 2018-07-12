@@ -413,7 +413,7 @@ public class CoPDImportService
 					ArrayList<ProviderData> routeProviders = new ArrayList<>(1);
 					routeProviders.add(provider);
 
-					labService.persistNewHL7Lab(parser, msg, "CoPD-Import", 0, demographic, routeProviders);
+					labService.persistNewHL7Lab(parser, msg, "CoPD-Import", 0, demographic, routeProviders, true);
 					parser.postUpload();
 				}
 				catch(Exception e)

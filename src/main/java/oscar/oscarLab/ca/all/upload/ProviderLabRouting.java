@@ -57,6 +57,10 @@ public class ProviderLabRouting {
 	private static final Logger logger = Logger.getLogger(ProviderLabRouting.class);
 	private ProviderLabRoutingDao providerLabRoutingDao = SpringUtils.getBean(ProviderLabRoutingDao.class);
 
+	public static final String STATUS_NEW = "N";
+	public static final String STATUS_ACK = "A";
+	public static final String STATUS_FILED = "F";
+
 	public ProviderLabRouting() {
 	}
 
