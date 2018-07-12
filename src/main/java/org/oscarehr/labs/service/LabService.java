@@ -30,7 +30,6 @@ import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.PatientLabRouting;
-import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.provider.model.ProviderData;
@@ -73,11 +72,17 @@ public class LabService
 
 		//TODO find providers for routing
 
-		persistNewHL7Lab(messageHandler, hl7Message, serviceName, fileId, null, null, false);
+		persistNewHL7Lab(messageHandler, hl7Message, serviceName, fileId, null, null, null);
 	}
 
 	public void persistNewHL7Lab(MessageHandler messageHandler, String hl7Message, String serviceName, int fileId,
-	                             Demographic demographic, List<ProviderData> providerList, boolean alwaysFileLabs) throws UnsupportedEncodingException
+	                             Demographic demographic, List<ProviderData> providerList) throws UnsupportedEncodingException
+	{
+		persistNewHL7Lab(messageHandler, hl7Message, serviceName, fileId, demographic, providerList, null);
+	}
+
+	public void persistNewHL7Lab(MessageHandler messageHandler, String hl7Message, String serviceName, int fileId,
+	                             Demographic demographic, List<ProviderData> providerList, String inboxRouteStatus) throws UnsupportedEncodingException
 	{
 		String labType = messageHandler.getMsgType();
 		String firstName = messageHandler.getFirstName();
@@ -119,7 +124,7 @@ public class LabService
 
 		//TODO additional logic for lab uploads. Most of the lab specific stuff that should get moved to the handler
 
-		persistNewHL7Lab(hl7TextMessage, hl7TextInfo, demographic, providerList, alwaysFileLabs);
+		persistNewHL7Lab(hl7TextMessage, hl7TextInfo, demographic, providerList, inboxRouteStatus);
 	}
 
 	/**
@@ -159,7 +164,7 @@ public class LabService
 		return discipline;
 	}
 
-	private void persistNewHL7Lab(Hl7TextMessage hl7TextMessage, Hl7TextInfo hl7TextInfo, Demographic demographic, List<ProviderData> providerList, boolean alwaysFileLabs)
+	private void persistNewHL7Lab(Hl7TextMessage hl7TextMessage, Hl7TextInfo hl7TextInfo, Demographic demographic, List<ProviderData> providerList, String inboxRouteStatus)
 	{
 		hl7TextMessageDao.persist(hl7TextMessage);
 
@@ -177,12 +182,12 @@ public class LabService
 		{
 			for(ProviderData provider : providerList)
 			{
-				routeToProvider(hl7TextMessage.getId(), provider.getProviderNo(), alwaysFileLabs);
+				routeToProvider(hl7TextMessage.getId(), provider.getProviderNo(), inboxRouteStatus);
 			}
 		}
 		else
 		{
-			routeToProvider(hl7TextMessage.getId(), ProviderLabRoutingDao.PROVIDER_UNMATCHED, alwaysFileLabs);
+			routeToProvider(hl7TextMessage.getId(), ProviderLabRoutingDao.PROVIDER_UNMATCHED, inboxRouteStatus);
 		}
 	}
 
@@ -203,26 +208,20 @@ public class LabService
 		Hl7textResultsData.populateMeasurementsTable(String.valueOf(labId), String.valueOf(demographicNo));
 	}
 
-	private void routeToProvider(int labId, Integer providerNo, boolean alwaysFileLabs)
+	private void routeToProvider(int labId, Integer providerNo, String inboxRouteStatus)
 	{
 		String providerNoStr = String.valueOf(providerNo);
-
-		String status;
-		if(alwaysFileLabs)
-		{
-			status = ProviderInboxItem.FILE;
-		}
-		else
+		if(inboxRouteStatus == null)
 		{
 			ForwardingRules fr = new ForwardingRules();
-			status = fr.getStatus(providerNoStr);
+			inboxRouteStatus = fr.getStatus(providerNoStr);
 		}
 
 		ProviderLabRoutingModel newRoute = new ProviderLabRoutingModel();
 		newRoute.setProviderNo(providerNoStr);
 		newRoute.setLabNo(labId);
 		newRoute.setLabType(ProviderLabRoutingDao.LAB_TYPE_HL7);
-		newRoute.setStatus(status);
+		newRoute.setStatus(inboxRouteStatus);
 
 		providerLabRoutingDao.persist(newRoute);
 	}

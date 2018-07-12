@@ -50,6 +50,7 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Dxresearch;
+import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
@@ -413,7 +414,7 @@ public class CoPDImportService
 					ArrayList<ProviderData> routeProviders = new ArrayList<>(1);
 					routeProviders.add(provider);
 
-					labService.persistNewHL7Lab(parser, msg, "CoPD-Import", 0, demographic, routeProviders, true);
+					labService.persistNewHL7Lab(parser, msg, "CoPD-Import", 0, demographic, routeProviders, ProviderInboxItem.FILE);
 					parser.postUpload();
 				}
 				catch(Exception e)
