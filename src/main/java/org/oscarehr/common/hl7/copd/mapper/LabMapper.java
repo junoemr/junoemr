@@ -70,6 +70,6 @@ public class LabMapper
 	public String getLabMessage(int rep) throws IOException, HL7Exception
 	{
 		JunoCoPDLabWriter labWriter = new JunoCoPDLabWriter(message, provider.getLAB(rep));
-		return labWriter.encode().replaceAll("~crlf~", "\n");
+		return labWriter.encode().replaceAll("\\\\R\\\\crlf\\\\R\\\\", "\n");
 	}
 }
