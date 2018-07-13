@@ -40,6 +40,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -194,37 +195,47 @@ public class MeasurementMapConfig {
         return ret;
     }
 
-    public ArrayList<Hashtable<String,Object>> getUnmappedMeasurements(String type) {
-        ArrayList<Hashtable<String,Object>> ret = new ArrayList<Hashtable<String,Object>>();
-        String sql = "SELECT DISTINCT h.type, me1.val AS identifier, me2.val AS name " +
-                "FROM measurementsExt me1 " +
-                "JOIN measurementsExt me2 ON me1.measurement_id = me2.measurement_id AND me2.keyval='name' " +
-                "JOIN measurementsExt me3 ON me1.measurement_id = me3.measurement_id AND me3.keyval='lab_no' " +
-                "JOIN hl7TextMessage h ON me3.val = h.lab_id " +
-                "WHERE me1.keyval='identifier' AND h.type LIKE '" + type + "%' " +
-                "AND me1.val NOT IN (SELECT ident_code FROM measurementMap) ORDER BY h.type";
+	public ArrayList<HashMap<String, Object>> getUnmappedMeasurements(List<String> labTypeFilter)
+	{
+		ArrayList<HashMap<String, Object>> ret = new ArrayList<>();
+		String sql = "SELECT DISTINCT h.type, me1.val AS identifier, me2.val AS name " +
+				"FROM measurementsExt me1 " +
+				"JOIN measurementsExt me2 ON me1.measurement_id = me2.measurement_id AND me2.keyval='name' " +
+				"JOIN measurementsExt me3 ON me1.measurement_id = me3.measurement_id AND me3.keyval='lab_no' " +
+				"JOIN hl7TextMessage h ON me3.val = h.lab_id " +
+				"WHERE me1.keyval='identifier' ";
+		if(labTypeFilter != null)
+		{
+			sql += "AND h.type IN ('" +String.join("','", labTypeFilter)+ "') ";
+		}
+		sql += "AND me1.val NOT IN (SELECT ident_code FROM measurementMap) " +
+				"ORDER BY h.type ";
 
-        try {
+		try
+		{
 
-            Connection conn = DbConnectionFilter.getThreadLocalDbConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            logger.info(sql);
+			Connection conn = DbConnectionFilter.getThreadLocalDbConnection();
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			logger.info(sql);
 
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-            	Hashtable<String,Object> ht = new Hashtable<String,Object>();
-                ht.put("type", getString(oscar.Misc.getString(rs, "type")));
-                ht.put("identifier", getString(oscar.Misc.getString(rs, "identifier")));
-                ht.put("name", getString(oscar.Misc.getString(rs, "name")));
-                ret.add(ht);
-            }
+			ResultSet rs = pstmt.executeQuery();
+			while(rs.next())
+			{
+				HashMap<String, Object> ht = new HashMap<>();
+				ht.put("type", getString(oscar.Misc.getString(rs, "type")));
+				ht.put("identifier", getString(oscar.Misc.getString(rs, "identifier")));
+				ht.put("name", getString(oscar.Misc.getString(rs, "name")));
+				ret.add(ht);
+			}
 
-            pstmt.close();
-        } catch (SQLException e) {
-            logger.error("Exception in getUnmappedMeasurements", e);
-        }
+			pstmt.close();
+		}
+		catch(SQLException e)
+		{
+			logger.error("Exception in getUnmappedMeasurements", e);
+		}
 
-        return ret;
+		return ret;
     }
 
     public void mapMeasurement(String identifier, String loinc, String name, String type)  {

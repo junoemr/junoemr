@@ -29,7 +29,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ page
-	import="java.util.*, oscar.oscarEncounter.oscarMeasurements.data.MeasurementMapConfig, oscar.OscarProperties, oscar.util.StringUtils"%>
+	import="oscar.oscarEncounter.oscarMeasurements.data.MeasurementMapConfig, java.util.ArrayList, java.util.HashMap, java.util.Hashtable"%>
 
 <%
 
@@ -115,14 +115,18 @@ MeasurementMapConfig mmc = new MeasurementMapConfig();
 				<td class="Cell" width="20%">Select unmapped code:</td>
 				<td class="Cell" width="80%"><select name="identifier">
 					<option value="0">None Selected</option>
-					<%String identifier = request.getParameter("identifier"); 
-                                                if (identifier == null) identifier = "";
-                                                ArrayList measurements = mmc.getUnmappedMeasurements("");
-                                                for (int i=0; i < measurements.size(); i++) { 
-                                                Hashtable ht = (Hashtable) measurements.get(i);  
-                                                String value = (String) ht.get("identifier")+","+(String) ht.get("type")+","+(String) ht.get("name");%>
+					<%
+						String identifier = request.getParameter("identifier");
+						if(identifier == null) identifier = "";
+						ArrayList<HashMap<String,Object>> measurements = mmc.getUnmappedMeasurements(null);
+						for(int i = 0; i < measurements.size(); i++)
+						{
+							HashMap ht = measurements.get(i);
+							String value = ht.get("identifier") + "," + ht.get("type") + "," + ht.get("name");
+					%>
 					<option value="<%= value %>"
-						<%= value.equals(identifier) ? "selected" : "" %>><%= "("+(String) ht.get("type")+") "+(String) ht.get("identifier")+" - "+((String) ht.get("name")).trim() %></option>
+							<%= value.equals(identifier) ? "selected" : "" %>><%= "(" + ht.get("type") + ") " + ht.get("identifier") + " - " + ((String) ht.get("name")).trim() %>
+					</option>
 					<% }%>
 				</select></td>
 			</tr>

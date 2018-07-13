@@ -27,12 +27,11 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
-<%@ page
-	import="java.util.*, oscar.oscarEncounter.oscarMeasurements.data.MeasurementMapConfig, oscar.OscarProperties, oscar.util.StringUtils"%>
-
-<%
-
-%>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.data.MeasurementMapConfig"%>
+<%@ page import="java.util.ArrayList"%>
+<%@ page import="java.util.HashMap"%>
+<%@ page import="java.util.Hashtable"%>
+<%@ page import="java.util.List" %>
 
 <link rel="stylesheet" type="text/css"
 	href="../../oscarMDS/encounterStyles.css">
@@ -234,30 +233,52 @@ window.onload = stripe;
                         odd = !odd;
                         }%>
 					</tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="<%=4+types.size()%>" style="background-color:black;color:white" align="center"> Unmapped Codes</td>
-                            </tr>
-                            <tr>
-                                <td colspan="4">&nbsp;</td>
-                                <%for(String type:types){%>
-                                
-                                <td valign="top" style="border: 1px solid black;">
-                                
-                                <h4 class="Header" style="text-align:center"><%=type%></h4>
-                                    <ul>
-                                    <li>test</li>
-                                    <%
-                                    ArrayList<Hashtable<String,Object>> unList = map.getUnmappedMeasurements(type);
-                                    for (Hashtable<String,Object> h:unList){
-                                    %>
-                                       <li><%=h.get(("name"))%></li>
-                                    <%}%>
-                                    </ul>
-                                </td>
-                                <%}%>
-                            </tr>
-                        </tfoot>
+			<tfoot>
+			<tr>
+				<td colspan="<%=4+types.size()%>" style="background-color:black;color:white" align="center"> Unmapped Codes</td>
+			</tr>
+			<tr>
+				<td colspan="4">&nbsp;</td>
+				<%
+					// really long query, so we want to avoid running it multiple times
+					ArrayList<HashMap<String, Object>> unMapped = map.getUnmappedMeasurements(types);
+
+					String currentType = "";
+					int typeCount = 0;
+					for(HashMap<String, Object> hash : unMapped)
+					{
+						String type = (String) hash.get("type");
+						String name = (String) hash.get("name");
+
+						if(!currentType.equals(type))
+						{
+							if(typeCount != 0)
+							{
+								%>
+								</ul>
+								</td>
+								<%
+							}
+							typeCount++;
+								%>
+							<td valign="top" style="border: 1px solid black;">
+							<h4 class="Header" style="text-align:center"><%=type%></h4>
+							<ul><%
+						}
+						%><li><%=name%></li><%
+						if(typeCount >= unMapped.size())
+						{
+							%>
+							</ul>
+							</td>
+							<%
+						}
+						currentType = type;
+					}
+				%>
+			</tr>
+
+			</tfoot>
 		</table>
 
 		</td>
