@@ -96,6 +96,7 @@ public class CommandLineRunner
 		ClassPathXmlApplicationContext ctx = null;
 		long importCount = 0;
 		long failureCount = 0;
+		long fileCounter = 0;
 
 		try
 		{
@@ -116,12 +117,15 @@ public class CommandLineRunner
 			logger.info("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
 
 			File[] fileList = copdDirectory.listFiles();
-
 			for(File file : fileList)
 			{
+				fileCounter++;
+				logger.info("Process file " + fileCounter + "/" + fileList.length);
+
 				// skip sub directories
 				if(file.isDirectory())
 				{
+					logger.info("Skip Directory");
 					continue;
 				}
 				GenericFile copdFile = FileFactory.getExistingFile(file);
