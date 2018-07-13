@@ -500,7 +500,7 @@
 	</table>
 
 	<%@ include file="zdemographicfulltitlesearch.jsp"%>
-	<form method="post" name="adddemographic" enctype="multipart/form-data" action="demographicaddarecord.jsp" onsubmit="return onSubmit()">
+	<form method="post" name="adddemographic" enctype="multipart/form-data" action="../demographic/AddDemographic.do" onsubmit="return onSubmit()">
 		<%
 			for(int i=0; i<custom_demographic_fields.size(); i++){
 				if(hidden_demographic_fields.indexOf(custom_demographic_fields.get(i)) >= 0){
