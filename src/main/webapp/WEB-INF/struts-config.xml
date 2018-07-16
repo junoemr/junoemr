@@ -2889,6 +2889,7 @@
 
 		<action input="/demographic/demographicaddrecordcustom.jsp" name="eDocsAddEditDocument" path="/demographic/AddDemographic" type="oscar.oscarDemographic.pageUtil.AddDemographicAction" scope="request" validate="false">
 			<forward name="successAdd" path="/demographic/demographicSuccess.jsp"></forward>
+			<forward name="duplicateHin" path="/demographic/demographicaddrecordcustom.jsp"></forward>
 		</action>
 	</action-mappings>
 	<controller processorClass="org.apache.struts.tiles.TilesRequestProcessor" maxFileSize="100M" ></controller>

@@ -83,13 +83,13 @@
 </center>
 <script language="JavaScript">
 <%
-	if(request.getParameter("docError").equals("true"))
+	if(request.getParameter("docError") != null && request.getParameter("docError").equals("true"))
 	{
 %>
 		alert("Document Upload Failed");
 <%
 	}
-	if (URLDecoder.decode(request.getParameter("submitType")).equals(oscarResources.getString("demographic.demographicaddrecordhtm.btnAddDocs")))
+	if (request.getParameter("submitType") != null && URLDecoder.decode(request.getParameter("submitType")).equals(oscarResources.getString("demographic.demographicaddrecordhtm.btnAddDocs")))
 	{
 %>
 

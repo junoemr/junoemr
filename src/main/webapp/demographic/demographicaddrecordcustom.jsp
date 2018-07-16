@@ -1654,6 +1654,14 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) {
 		google.load("jqueryui", "1");
 	</script>
 	<script type="text/javascript">
+	<%
+		if(request.getParameter("dupHin") != null && request.getParameter("dupHin").equals("true"))
+		{
+	%>
+			alert("<bean:message key="demographic.demographicaddarecord.msgDuplicatedHIN"/>");
+	<%
+		}
+	%>
 		$(document).ready(function()
 		{
 			// AJAX autocomplete referrer doctors
