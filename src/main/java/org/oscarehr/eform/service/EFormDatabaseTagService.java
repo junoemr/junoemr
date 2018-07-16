@@ -24,18 +24,27 @@ package org.oscarehr.eform.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.PreventionDao;
+import org.oscarehr.common.model.Prevention;
 import org.oscarehr.eform.EFormHtmlParser;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.eform.EFormLoader;
 import oscar.eform.EFormUtil;
 import oscar.eform.data.DatabaseAP;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
+import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class is responsible for all services that deal with loading/manipulating eform database tags
@@ -45,6 +54,9 @@ import java.util.Map;
 public class EFormDatabaseTagService
 {
 	private static final Logger logger = MiscUtils.getLogger();
+
+	@Autowired
+	PreventionDao preventionDao;
 
 	public Map<String,String> getDatabaseTagNameValueMap(String htmlString, Integer demographicNo, Integer providerNo)
 	{
@@ -61,7 +73,8 @@ public class EFormDatabaseTagService
 		Map<String, String> aPValueMap = new HashMap<>(nameMap.size());
 		for(Map.Entry<String, String> entry : nameMap.entrySet())
 		{
-			aPValueMap.put(entry.getKey(), tagMap.get(entry.getValue()));
+			String databaseValue = tagMap.get(entry.getValue());
+			aPValueMap.put(entry.getKey(), (databaseValue == null ? "" : databaseValue));
 		}
 		return  aPValueMap;
 	}
@@ -77,12 +90,17 @@ public class EFormDatabaseTagService
 
 		for(String tagName : tagList)
 		{
+			// no need to load the same tag multiple times
+			if(tagMap.containsKey(tagName))
+			{
+				continue;
+			}
+
 			DatabaseAP databaseAP = EFormLoader.getAP(tagName);
 			// if the normal AP doesn't have it, check the extras
 			if(databaseAP == null)
 			{
-				//TODO get ExtraAp???
-				// this is things like m$measurement#stuff
+				databaseAP = getAPExtra(tagName, demographicId);
 			}
 			// if it's still null, skip the rest
 			if(databaseAP == null)
@@ -166,12 +184,186 @@ public class EFormDatabaseTagService
 		return sql;
 	}
 
-	private String getSqlParams(String key) {
+	private String getSqlParams(String key)
+	{
 		//TODO
 //		if (sql_params.containsKey(key)) {
 //			String val =  sql_params.get(key);
 //			return val==null ? "" : StringEscapeUtils.escapeSql(val);
 //		}
 		return "";
+	}
+
+	private DatabaseAP getAPExtra(String tagName, Integer demographicId)
+	{
+		// --------------------------Process extra attributes for APs --------------------------------
+		Pattern p = Pattern.compile("\\b[a-z]\\$[^\\$#]+#[^\n]+");
+		Matcher m = p.matcher(tagName);
+		if(!m.matches())
+		{
+			return null;
+		}
+
+		String module = tagName.substring(0, tagName.indexOf("$"));
+		String type = tagName.substring(tagName.indexOf("$") + 1, tagName.indexOf("#"));
+		String field = tagName.substring(tagName.indexOf("#") + 1, tagName.length());
+
+		DatabaseAP databaseAP;
+		switch(module)
+		{
+			case "m": databaseAP = getMeasurementsAP(type, field, demographicId); break;
+			case "p": databaseAP = getPreventionsAP(type, field, demographicId); break;
+			case "e": databaseAP = getEformValuesAP(type, field, demographicId); break;
+			case "o": databaseAP = getOtherAP(type, field, demographicId); break;
+			default: return null;
+		}
+		databaseAP.setApName(tagName);
+		return databaseAP;
+	}
+
+	private DatabaseAP getMeasurementsAP(String type, String field, Integer demographicId)
+	{
+		logger.debug("SWITCHING TO MEASUREMENTS");
+
+		int maxResults = 1;
+		int startAt = type.indexOf('@');
+		if(startAt != -1)
+		{
+			String count = type.substring(startAt + 1);
+			type = type.substring(0, startAt);
+			maxResults = StringUtils.isNumeric(count) ? Integer.parseInt(count) : 1;
+		}
+
+		Hashtable<String, String> data = EctMeasurementsDataBeanHandler.getLast(String.valueOf(demographicId), type, maxResults);
+
+		DatabaseAP databaseAP = null;
+		if(!data.isEmpty())
+		{
+			databaseAP = new DatabaseAP();
+			databaseAP.setApOutput(data.get(field));
+		}
+		return databaseAP;
+	}
+
+	private DatabaseAP getPreventionsAP(String type, String field, Integer demographicId)
+	{
+		logger.debug("SWITCHING TO PREVENTIONS");
+
+		DatabaseAP databaseAP = null;
+		// get the latest prevention
+		Prevention prevention = preventionDao.findMostRecentByTypeAndDemoNo(type, demographicId);
+		if(prevention != null)
+		{
+			databaseAP = new DatabaseAP();
+			String value = "";
+
+			switch(field.toUpperCase())
+			{
+				case "ID":              value = String.valueOf(prevention.getId()); break;
+				case "DEMOGRAPHIC_NO":  value = String.valueOf(prevention.getDemographicId()); break;
+				case "CREATION_DATE":   value = dateStringOrEmpty(prevention.getCreationDate()); break;
+				case "CREATOR":         value = String.valueOf(prevention.getCreatorProviderNo()); break;
+				case "PREVENTION_DATE": value = dateStringOrEmpty(prevention.getPreventionDate()); break;
+				case "PROVIDER_NO":     value = String.valueOf(prevention.getProviderNo()); break;
+				case "REFUSED":         value = String.valueOf(prevention.isRefused()); break;
+				case "UPDATE_DATE":     value = dateStringOrEmpty(prevention.getLastUpdateDate()); break;
+			}
+			databaseAP.setApOutput(value);
+		}
+		return databaseAP;
+	}
+
+	private DatabaseAP getEformValuesAP(String type, String field, Integer demographicId)
+	{
+		logger.debug("SWITCHING TO EFORM_VALUES");
+
+		//TODO implement this?
+//			String eform_name = EFormUtil.removeQuotes(EFormUtil.getAttribute("eform$name", fieldHeader));
+//			String var_value = EFormUtil.removeQuotes(EFormUtil.getAttribute("var$value", fieldHeader));
+//			String ref = EFormUtil.removeQuotes(EFormUtil.getAttribute("ref$", fieldHeader, true));
+//
+//			String eform_demographic = this.demographicNo;
+//			if(this.patientIndependent) eform_demographic = "%";
+//
+//			String ref_name = null, ref_value = null, ref_fid = fid;
+//			if(!StringUtils.isBlank(ref) && ref.contains("="))
+//			{
+//				ref_name = ref.substring(4, ref.indexOf("="));
+//				ref_value = EFormUtil.removeQuotes(ref.substring(ref.indexOf("=") + 1));
+//			}
+//			else
+//			{
+//				ref_name = StringUtils.isBlank(ref) ? "" : ref.substring(4);
+//			}
+//			if(!StringUtils.isBlank(eform_name)) ref_fid = getRefFid(eform_name);
+//			if((!StringUtils.isBlank(var_value) && var_value.trim().startsWith("{")) || (!StringUtils.isBlank(ref_value) && ref_value.trim().startsWith("{")))
+//			{
+//				if(setAP2nd)
+//				{ // 2nd run, put value in required field
+//					var_value = findValueInForm(var_value);
+//					ref_value = findValueInForm(ref_value);
+//					needValueInForm--;
+//				}
+//				else
+//				{ // 1st run, note the need to reference other value in form
+//					needValueInForm++;
+//					return null;
+//				}
+//			}
+//
+//			if(type.equalsIgnoreCase("count") && var_value == null)
+//			{
+//				type = "countname";
+//			}
+//			else if((type.equalsIgnoreCase("first") || type.equalsIgnoreCase("last")) && field.equals("*"))
+//			{
+//				type += "_all_json";
+//			}
+//			if(!ref_name.equals(""))
+//			{
+//				type += "_ref";
+//				if(ref_value == null) type += "name";
+//			}
+//
+//			EFormLoader.getInstance();
+//			curAP = EFormLoader.getAP("_eform_values_" + type);
+//
+//			if(curAP != null)
+//			{
+//				setSqlParams(EFORM_DEMOGRAPHIC, eform_demographic);
+//				setSqlParams(VAR_NAME, field);
+//				setSqlParams(REF_VAR_NAME, ref_name);
+//				setSqlParams(VAR_VALUE, var_value);
+//				setSqlParams(REF_VAR_VALUE, ref_value);
+//				setSqlParams(REF_FID, ref_fid);
+//			}
+		return new DatabaseAP();
+	}
+
+	private DatabaseAP getOtherAP(String type, String field, Integer demographicId)
+	{
+		logger.debug("SWITCHING TO OTHER_ID");
+
+		//TODO
+//			String table_name = "", table_id = "";
+//			EFormLoader.getInstance();
+//			curAP = EFormLoader.getAP("_other_id");
+//			if (type.equalsIgnoreCase("patient")) {
+//				table_name = OtherIdManager.DEMOGRAPHIC.toString();
+//				table_id = this.demographicNo;
+//			} else if (type.equalsIgnoreCase("appointment")) {
+//				table_name = OtherIdManager.APPOINTMENT.toString();
+//				table_id = appointment_no;
+//				if (StringUtils.isBlank(table_id)) table_id = "-1";
+//			}
+//			setSqlParams(OTHER_KEY, field);
+//			setSqlParams(TABLE_NAME, table_name);
+//			setSqlParams(TABLE_ID, table_id);
+		return new DatabaseAP();
+	}
+
+	private String dateStringOrEmpty(Date date)
+	{
+		return ConversionUtils.toDateString(date, ConversionUtils.DEFAULT_DATE_PATTERN);
 	}
 }
