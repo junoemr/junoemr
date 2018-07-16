@@ -144,41 +144,6 @@ if (!Util.checkDir(op.getProperty("TMP_DIR"))) { %>
 			<p><input class="btn btn-primary" type="submit" name="Submit" value="Import (CMS spec 4.0)"></p>
 		</html:form>
 
-	<html:form action="/TOPDImportDemographic.do" method="POST"
-	           enctype="multipart/form-data" onsubmit="displayAndDisable()">
-		<p><html:file property="importFile" value=""/>
-			<span id="uploadWarn" title="<bean:message key="global.uploadWarningBody"/>"
-			      style="vertical-align:middle;font-family:arial;font-size:20px;font-weight:bold;color:#ABABAB;cursor:pointer">
-					<img border="0" src="../images/icon_alertsml.gif"/>
-				</span>
-		</p>
-		<%
-			if(learningEnabled != null && learningEnabled.equalsIgnoreCase("yes"))
-			{
-		%>
-		<!-- Drop Down box of courses -->
-		Course:&nbsp;<html:select property="courseId">
-		<option value="0">Choose One</option>
-		<%
-			for(Program course : courses)
-			{
-		%>
-		<option value="<%=course.getId().intValue()%>"><%=course.getName()%>
-		</option>
-		<% } %>
-	</html:select><br/>
-		Timeshift (in days +/-):&nbsp;<html:text property="timeshiftInDays" value="0" size="5"/></br/>
-		<%} %>
-		If patient's providers do not have OHIP numbers:<br>
-		<html:radio property="matchProviderNames" value="true">
-			Match providers in database by first and last names (Recommended)
-		</html:radio><br>
-		<html:radio property="matchProviderNames" value="false">
-			Import as new - same provider may have multiple entries
-		</html:radio><br><br>
-		<p><input class="btn btn-primary" type="submit" name="Submit" value="Import ToPD"></p>
-	</html:form>
-
 		<div id="waitingMessage" style="display: none;">
 		<h2>This may take several minutes</h2>
 		</div>
