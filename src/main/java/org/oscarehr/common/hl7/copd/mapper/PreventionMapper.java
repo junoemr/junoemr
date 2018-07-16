@@ -176,5 +176,6 @@ public class PreventionMapper
 		preventionTypeMap.put("rotovirus", "Rot");
 		preventionTypeMap.put("Td Adsorbed", "Td");
 		preventionTypeMap.put("Varicella", "MMR-Var");
+		preventionTypeMap.put("varivax", "OtherA");
 	}
 }
