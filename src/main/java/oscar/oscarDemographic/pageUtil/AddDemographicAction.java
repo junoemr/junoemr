@@ -61,6 +61,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -92,9 +94,20 @@ public class AddDemographicAction extends Action
 
 		String year, month, day;
 		String curUser_no = loggedInInfo.getLoggedInProviderNo();
-		year = StringUtils.trimToNull(request.getParameter("year_of_birth"));
-		month = StringUtils.trimToNull(request.getParameter("month_of_birth") != null && request.getParameter("month_of_birth").length() == 1 ? "0" + request.getParameter("month_of_birth") : request.getParameter("month_of_birth"));
-		day = StringUtils.trimToNull(request.getParameter("date_of_birth") != null && request.getParameter("date_of_birth").length() == 1 ? "0" + request.getParameter("date_of_birth") : request.getParameter("date_of_birth"));
+
+		LocalDate dateOfBirth;
+		try
+		{
+			dateOfBirth = LocalDate.of(Integer.parseInt(request.getParameter("year_of_birth")), Integer.parseInt(request.getParameter("month_of_birth")), Integer.parseInt(request.getParameter("day_of_birth")));
+		}
+		catch (NumberFormatException | DateTimeException e)
+		{
+			// Return error message to user
+			MiscUtils.getLogger().error("Date of Birth Format Exception: ", e);
+			ActionForward invalidDOB = mapping.findForward("validationFail");
+			invalidDOB = new ActionForward(invalidDOB.getPath() + "?invalidDOB=true", invalidDOB.getRedirect());
+			return invalidDOB;
+		}
 
 		Demographic demographic = new Demographic();
 		demographic.setLastName(StringUtils.trimToNull(request.getParameter("last_name")));
@@ -106,9 +119,7 @@ public class AddDemographicAction extends Action
 		demographic.setPhone(StringUtils.trimToNull(request.getParameter("phone")));
 		demographic.setPhone2(StringUtils.trimToNull(request.getParameter("phone2")));
 		demographic.setEmail(StringUtils.trimToNull(request.getParameter("email")));
-		demographic.setYearOfBirth(year);
-		demographic.setMonthOfBirth(month);
-		demographic.setDayOfBirth(day);
+		demographic.setDateOfBirth(dateOfBirth);
 		demographic.setHin(StringUtils.trimToNull(request.getParameter("hin")));
 		demographic.setVer(StringUtils.trimToNull(request.getParameter("ver")));
 		demographic.setRosterStatus(StringUtils.trimToNull(request.getParameter("roster_status")));
@@ -191,7 +202,7 @@ public class AddDemographicAction extends Action
 		if(paramNameHin!=null && paramNameHin.length()>5 && !hinDupCheckException) {
 			int demographics = demographicDao.searchByHealthCard(paramNameHin.trim()).size();
 			if(demographics > 0){
-				ActionForward dupHin = mapping.findForward("duplicateHin");
+				ActionForward dupHin = mapping.findForward("validationFail");
 				dupHin = new ActionForward(dupHin.getPath() + "?dupHin=true", dupHin.getRedirect());
 				return dupHin;
 			}

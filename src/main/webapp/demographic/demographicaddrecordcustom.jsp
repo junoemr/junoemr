@@ -1662,6 +1662,14 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) {
 	<%
 		}
 	%>
+	<%
+		if(request.getParameter("invalidDOB") != null && request.getParameter("invalidDOB").equals("true"))
+		{
+	%>
+			alert("Error: Invalid Date Of Birth");
+	<%
+		}
+	%>
 		$(document).ready(function()
 		{
 			// AJAX autocomplete referrer doctors
