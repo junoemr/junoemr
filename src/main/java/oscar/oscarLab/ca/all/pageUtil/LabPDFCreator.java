@@ -206,40 +206,50 @@ public class LabPDFCreator extends PdfPageEventHelper{
         font = new Font(bf, 9, Font.NORMAL);
         boldFont = new Font(bf, 10, Font.BOLD);
       //  redFont = new Font(bf, 9, Font.NORMAL, Color.RED);
-
-        // add the header table containing the patient and lab info to the document
-        createInfoTable();
-
-        // add the tests and test info for each header
-        ArrayList<String> headers = handler.getHeaders();
-        for (int i=0; i < headers.size(); i++)
-            addLabCategory( headers.get(i) ,null);
-
-        for(MessageHandler extraHandler:handlers) {
-        	ArrayList<String> extraHeaders = extraHandler.getHeaders();
-            for (int i=0; i < extraHeaders.size(); i++)
-                addLabCategory( extraHeaders.get(i) , extraHandler);
-        }
-        // add end of report table
-        PdfPTable table = new PdfPTable(1);
-        table.setWidthPercentage(100);
-        PdfPCell cell = new PdfPCell();
-        cell.setBorder(0);
-        cell.setPhrase(new Phrase("  "));
-        table.addCell(cell);
-        cell.setBorder(15);
-        cell.setBackgroundColor(new Color(210, 212, 255));
-		if(handler.getMsgType().equals("CLS")) { // intentionally skip CLSDI
-			cell.setPhrase(new Phrase("Legend:  A=Abnormal  L=Low  H=High  C=Critical", boldFont));
-		}
-		else
+		if(handler.getHeaders().get(0).equals("CELLPATHR")){
+			PdfPTable table = new PdfPTable(1);
+			table.setWidthPercentage(100);
+			PdfPCell cell = new PdfPCell();
+			cell.setPhrase(new Phrase("The attached CELLPATHR lab type is not compatible with consultation prints", boldFont));
+			table.addCell(cell);
+			document.add(table);
+		} else
 		{
-        	cell.setPhrase(new Phrase("END OF REPORT", boldFont));
+			// add the header table containing the patient and lab info to the document
+			createInfoTable();
+
+			// add the tests and test info for each header
+			ArrayList<String> headers = handler.getHeaders();
+			for (int i = 0; i < headers.size(); i++)
+				addLabCategory(headers.get(i), null);
+
+			for (MessageHandler extraHandler : handlers)
+			{
+				ArrayList<String> extraHeaders = extraHandler.getHeaders();
+				for (int i = 0; i < extraHeaders.size(); i++)
+					addLabCategory(extraHeaders.get(i), extraHandler);
+			}
+			// add end of report table
+			PdfPTable table = new PdfPTable(1);
+			table.setWidthPercentage(100);
+			PdfPCell cell = new PdfPCell();
+			cell.setBorder(0);
+			cell.setPhrase(new Phrase("  "));
+			table.addCell(cell);
+			cell.setBorder(15);
+			cell.setBackgroundColor(new Color(210, 212, 255));
+			if (handler.getMsgType().equals("CLS"))
+			{ // intentionally skip CLSDI
+				cell.setPhrase(new Phrase("Legend:  A=Abnormal  L=Low  H=High  C=Critical", boldFont));
+			} else
+			{
+				cell.setPhrase(new Phrase("END OF REPORT", boldFont));
+			}
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			table.addCell(cell);
+			document.add(table);
 		}
-        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        table.addCell(cell);
-        document.add(table);
 
         document.close();
 
