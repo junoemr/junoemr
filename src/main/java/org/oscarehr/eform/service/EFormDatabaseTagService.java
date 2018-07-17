@@ -150,21 +150,11 @@ public class EFormDatabaseTagService
 		return output;
 	}
 
-
-	/* These are here for legacy purposes */
-	private static final String EFORM_DEMOGRAPHIC = "eform_demographic";
-	private static final String VAR_NAME = "var_name";
-	private static final String VAR_VALUE = "var_value";
-	private static final String REF_FID = "fid";
-	private static final String REF_VAR_NAME = "ref_var_name";
-	private static final String REF_VAR_VALUE = "ref_var_value";
-	private static final String TABLE_NAME = "table_name";
-	private static final String TABLE_ID = "table_id";
-	private static final String OTHER_KEY = "other_key";
-	private static final String OPENER_VALUE = "link$eform";
-	private static final String PRECHECKED = "checked=\"checked\"";
-
-
+	/**
+	 * This replaces specific tags with actual values in the sql.
+	 * This is not performed on the object itself since the objects returned are shared across multiple uses,
+	 * so calling a method like DatabaseAP.setTag(A,B) would not work with current architecture.
+	 */
 	public String replaceAllFields(String sql, String demographicId, String providerId)
 	{
 		sql = DatabaseAP.parserReplace("demographic", demographicId, sql);
@@ -172,28 +162,12 @@ public class EFormDatabaseTagService
 		sql = DatabaseAP.parserReplace("loggedInProvider", providerId, sql);
 		sql = DatabaseAP.parserReplace("appt_no", "0", sql);
 
-		sql = DatabaseAP.parserReplace(EFORM_DEMOGRAPHIC, getSqlParams(EFORM_DEMOGRAPHIC), sql);
-		sql = DatabaseAP.parserReplace(REF_FID, getSqlParams(REF_FID), sql);
-		sql = DatabaseAP.parserReplace(VAR_NAME, getSqlParams(VAR_NAME), sql);
-		sql = DatabaseAP.parserReplace(VAR_VALUE, getSqlParams(VAR_VALUE), sql);
-		sql = DatabaseAP.parserReplace(REF_VAR_NAME, getSqlParams(REF_VAR_NAME), sql);
-		sql = DatabaseAP.parserReplace(REF_VAR_VALUE, getSqlParams(REF_VAR_VALUE), sql);
-		sql = DatabaseAP.parserReplace(TABLE_NAME, getSqlParams(TABLE_NAME), sql);
-		sql = DatabaseAP.parserReplace(TABLE_ID, getSqlParams(TABLE_ID), sql);
-		sql = DatabaseAP.parserReplace(OTHER_KEY, getSqlParams(OTHER_KEY), sql);
 		return sql;
 	}
 
-	private String getSqlParams(String key)
-	{
-		//TODO
-//		if (sql_params.containsKey(key)) {
-//			String val =  sql_params.get(key);
-//			return val==null ? "" : StringEscapeUtils.escapeSql(val);
-//		}
-		return "";
-	}
-
+	/**
+	 * This handles database tags not defined in the standard apconfig file (measurements/preventions, etc.).
+	 */
 	private DatabaseAP getAPExtra(String tagName, Integer demographicId)
 	{
 		// --------------------------Process extra attributes for APs --------------------------------
@@ -277,89 +251,28 @@ public class EFormDatabaseTagService
 	{
 		logger.debug("SWITCHING TO EFORM_VALUES");
 
-		//TODO implement this?
-//			String eform_name = EFormUtil.removeQuotes(EFormUtil.getAttribute("eform$name", fieldHeader));
-//			String var_value = EFormUtil.removeQuotes(EFormUtil.getAttribute("var$value", fieldHeader));
-//			String ref = EFormUtil.removeQuotes(EFormUtil.getAttribute("ref$", fieldHeader, true));
-//
-//			String eform_demographic = this.demographicNo;
-//			if(this.patientIndependent) eform_demographic = "%";
-//
-//			String ref_name = null, ref_value = null, ref_fid = fid;
-//			if(!StringUtils.isBlank(ref) && ref.contains("="))
-//			{
-//				ref_name = ref.substring(4, ref.indexOf("="));
-//				ref_value = EFormUtil.removeQuotes(ref.substring(ref.indexOf("=") + 1));
-//			}
-//			else
-//			{
-//				ref_name = StringUtils.isBlank(ref) ? "" : ref.substring(4);
-//			}
-//			if(!StringUtils.isBlank(eform_name)) ref_fid = getRefFid(eform_name);
-//			if((!StringUtils.isBlank(var_value) && var_value.trim().startsWith("{")) || (!StringUtils.isBlank(ref_value) && ref_value.trim().startsWith("{")))
-//			{
-//				if(setAP2nd)
-//				{ // 2nd run, put value in required field
-//					var_value = findValueInForm(var_value);
-//					ref_value = findValueInForm(ref_value);
-//					needValueInForm--;
-//				}
-//				else
-//				{ // 1st run, note the need to reference other value in form
-//					needValueInForm++;
-//					return null;
-//				}
-//			}
-//
-//			if(type.equalsIgnoreCase("count") && var_value == null)
-//			{
-//				type = "countname";
-//			}
-//			else if((type.equalsIgnoreCase("first") || type.equalsIgnoreCase("last")) && field.equals("*"))
-//			{
-//				type += "_all_json";
-//			}
-//			if(!ref_name.equals(""))
-//			{
-//				type += "_ref";
-//				if(ref_value == null) type += "name";
-//			}
-//
-//			EFormLoader.getInstance();
-//			curAP = EFormLoader.getAP("_eform_values_" + type);
-//
-//			if(curAP != null)
-//			{
-//				setSqlParams(EFORM_DEMOGRAPHIC, eform_demographic);
-//				setSqlParams(VAR_NAME, field);
-//				setSqlParams(REF_VAR_NAME, ref_name);
-//				setSqlParams(VAR_VALUE, var_value);
-//				setSqlParams(REF_VAR_VALUE, ref_value);
-//				setSqlParams(REF_FID, ref_fid);
-//			}
-		return new DatabaseAP();
+		/*
+		 TODO It looks like oscar tries to allow eforms to pull information from other eforms using a tag in the form of e$_#_
+		 but it also expects other markers on the element in this case, 'eform$name', 'var$value', and 'ref$'
+		 This functionality should be ported here before this service replaces the current EForm parsing.
+
+		 This is not yet implemented here, but exists in the old EForm code.
+		 */
+		throw new RuntimeException("Not Implemented");
 	}
 
 	private DatabaseAP getOtherAP(String type, String field, Integer demographicId)
 	{
 		logger.debug("SWITCHING TO OTHER_ID");
 
-		//TODO
-//			String table_name = "", table_id = "";
-//			EFormLoader.getInstance();
-//			curAP = EFormLoader.getAP("_other_id");
-//			if (type.equalsIgnoreCase("patient")) {
-//				table_name = OtherIdManager.DEMOGRAPHIC.toString();
-//				table_id = this.demographicNo;
-//			} else if (type.equalsIgnoreCase("appointment")) {
-//				table_name = OtherIdManager.APPOINTMENT.toString();
-//				table_id = appointment_no;
-//				if (StringUtils.isBlank(table_id)) table_id = "-1";
-//			}
-//			setSqlParams(OTHER_KEY, field);
-//			setSqlParams(TABLE_NAME, table_name);
-//			setSqlParams(TABLE_ID, table_id);
-		return new DatabaseAP();
+		/*
+		TODO oscar attempts to allow a generic database tag in the form of o$_#_
+		You can load values from arbitrary tables.
+		This functionality should be ported here before this service replaces the current EForm parsing.
+
+		This is not yet implemented here, but exists in the old EForm code.
+		 */
+		throw new RuntimeException("Not Implemented");
 	}
 
 	private String dateStringOrEmpty(Date date)
