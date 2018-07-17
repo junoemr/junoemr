@@ -164,6 +164,7 @@
 	  {"Search " , "demographicsearch2apptresults.jsp"},
 	  {"Search" , "demographicsearchresults.jsp"},
 	  {"edit" , "demographiceditdemographic.jsp"},
+	  {"add" , "demographicaddarecordhtm.jsp"},
 	  {"pdflabel" , "demographicpdflabel.jsp"},
 	  {"pdfaddresslabel" , "demographicpdfaddresslabel.jsp"},
 	  {"pdfchartlabel" , "demographicpdfchartlabel.jsp"},

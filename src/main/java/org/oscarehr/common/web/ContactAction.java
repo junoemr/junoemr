@@ -747,17 +747,23 @@ public class ContactAction extends DispatchAction {
 			
 			// assuming that the address String is always csv.
 			address = professionalSpecialist.getStreetAddress();
-			
-			if( address.contains(",") ) {		
+
+			if (address.contains(","))
+			{
 				String[] addressArray = address.split(",");
 				address = addressArray[0].trim();
-				if(addressArray.length > 3) {
+				if (addressArray.length > 3)
+				{
 					city = addressArray[1].trim();
 					province = addressArray[2].trim();
 					country = addressArray[3].trim();
-				} else {
+				} else if (addressArray.length == 3)
+				{
 					province = addressArray[1].trim();
 					country = addressArray[2].trim();
+				} else
+				{
+					province = addressArray[1].trim();
 				}
 			}
 			
