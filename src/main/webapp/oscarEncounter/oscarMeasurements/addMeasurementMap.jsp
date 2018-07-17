@@ -29,7 +29,8 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ page
-	import="oscar.oscarEncounter.oscarMeasurements.data.MeasurementMapConfig, java.util.ArrayList, java.util.HashMap, java.util.Hashtable"%>
+	import="oscar.oscarEncounter.oscarMeasurements.data.MeasurementMapConfig, java.util.ArrayList, java.util.Hashtable, java.util.List"%>
+<%@ page import="java.util.Map" %>
 
 <%
 
@@ -118,16 +119,22 @@ MeasurementMapConfig mmc = new MeasurementMapConfig();
 					<%
 						String identifier = request.getParameter("identifier");
 						if(identifier == null) identifier = "";
-						ArrayList<HashMap<String,Object>> measurements = mmc.getUnmappedMeasurements(null);
-						for(int i = 0; i < measurements.size(); i++)
+						Map<String, List<Map<String, String>>> LabMap = mmc.getUnmappedMeasurements(null);
+						for(List<Map<String, String>> typeList : LabMap.values())
 						{
-							HashMap ht = measurements.get(i);
-							String value = ht.get("identifier") + "," + ht.get("type") + "," + ht.get("name");
+							for(Map<String, String> measurement : typeList)
+							{
+								String id = measurement.get("identifier");
+								String type = measurement.get("type");
+								String name = measurement.get("name");
+								String value = String.join(",", id, type, name);
 					%>
-					<option value="<%= value %>"
-							<%= value.equals(identifier) ? "selected" : "" %>><%= "(" + ht.get("type") + ") " + ht.get("identifier") + " - " + ((String) ht.get("name")).trim() %>
-					</option>
-					<% }%>
+								<option value="<%= value %>"
+										<%= value.equals(identifier) ? "selected" : "" %>><%= "(" + type + ") " + id + " - " + name.trim() %>
+								</option>
+					<%      }
+						}%>
+
 				</select></td>
 			</tr>
 			<tr>

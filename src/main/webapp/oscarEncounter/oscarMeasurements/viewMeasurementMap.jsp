@@ -28,17 +28,16 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ page import="oscar.oscarEncounter.oscarMeasurements.data.MeasurementMapConfig"%>
-<%@ page import="java.util.ArrayList"%>
-<%@ page import="java.util.HashMap"%>
 <%@ page import="java.util.Hashtable"%>
-<%@ page import="java.util.List" %>
+<%@ page import="java.util.List"%>
+<%@ page import="java.util.Map"%>
 
 <link rel="stylesheet" type="text/css"
-	href="../../oscarMDS/encounterStyles.css">
+      href="../../oscarMDS/encounterStyles.css">
 
 <html>
 <head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <title>Measurement Mapping Configuration</title>
 
 <script type="text/javascript" language=javascript>
@@ -235,45 +234,34 @@ window.onload = stripe;
 					</tbody>
 			<tfoot>
 			<tr>
-				<td colspan="<%=4+types.size()%>" style="background-color:black;color:white" align="center"> Unmapped Codes</td>
+				<td colspan="<%=4+types.size()%>" style="background-color:black;color:white" align="center">Unmapped Codes</td>
 			</tr>
 			<tr>
 				<td colspan="4">&nbsp;</td>
 				<%
 					// really long query, so we want to avoid running it multiple times
-					ArrayList<HashMap<String, Object>> unMapped = map.getUnmappedMeasurements(types);
+					Map<String, List<Map<String, String>>> unMappedLabtypes = map.getUnmappedMeasurements(null);
 
-					String currentType = "";
-					int typeCount = 0;
-					for(HashMap<String, Object> hash : unMapped)
+					for(Map.Entry<String, List<Map<String, String>>> entry : unMappedLabtypes.entrySet())
 					{
-						String type = (String) hash.get("type");
-						String name = (String) hash.get("name");
+						String labType = entry.getKey();
+						List<Map<String, String>> labList = entry.getValue();
 
-						if(!currentType.equals(type))
+					%>
+					<td valign="top" style="border: 1px solid black;">
+						<h4 class="Header" style="text-align:center"><%=labType%></h4>
+						<ul><%
+
+						for(Map<String, String> measurement : labList)
 						{
-							if(typeCount != 0)
-							{
-								%>
-								</ul>
-								</td>
-								<%
-							}
-							typeCount++;
-								%>
-							<td valign="top" style="border: 1px solid black;">
-							<h4 class="Header" style="text-align:center"><%=type%></h4>
-							<ul><%
+							String name = measurement.get("name");
+							%><li><%=name%></li><%
 						}
-						%><li><%=name%></li><%
-						if(typeCount >= unMapped.size())
-						{
-							%>
-							</ul>
-							</td>
-							<%
-						}
-						currentType = type;
+
+						%>
+						</ul>
+					</td>
+					<%
 					}
 				%>
 			</tr>

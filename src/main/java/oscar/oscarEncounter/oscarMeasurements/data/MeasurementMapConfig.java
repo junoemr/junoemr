@@ -33,6 +33,14 @@
  */
 package oscar.oscarEncounter.oscarMeasurements.data;
 
+import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.MeasurementMapDao;
+import org.oscarehr.common.dao.RecycleBinDao;
+import org.oscarehr.common.model.MeasurementMap;
+import org.oscarehr.common.model.RecycleBin;
+import org.oscarehr.util.DbConnectionFilter;
+import org.oscarehr.util.SpringUtils;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,14 +52,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.MeasurementMapDao;
-import org.oscarehr.common.dao.RecycleBinDao;
-import org.oscarehr.common.model.MeasurementMap;
-import org.oscarehr.common.model.RecycleBin;
-import org.oscarehr.util.DbConnectionFilter;
-import org.oscarehr.util.SpringUtils;
+import java.util.Map;
 
 /**
  *
@@ -195,9 +196,16 @@ public class MeasurementMapConfig {
         return ret;
     }
 
-	public ArrayList<HashMap<String, Object>> getUnmappedMeasurements(List<String> labTypeFilter)
+	/**
+	 *
+	 * @param labTypeFilter - list of lab types to filter on, null to include all lab types
+	 * @return - List of Lists of results
+	 *  |--Map => (lab_type, list) one result list for each lab type
+	 *      |--List => list of Maps for labs of the given type.
+	 *          |--Map (property, values) -- map of the lab values representing the query results
+	 */
+	public Map<String, List<Map<String, String>>> getUnmappedMeasurements(List<String> labTypeFilter)
 	{
-		ArrayList<HashMap<String, Object>> ret = new ArrayList<>();
 		String sql = "SELECT DISTINCT h.type, me1.val AS identifier, me2.val AS name " +
 				"FROM measurementsExt me1 " +
 				"JOIN measurementsExt me2 ON me1.measurement_id = me2.measurement_id AND me2.keyval='name' " +
@@ -211,23 +219,35 @@ public class MeasurementMapConfig {
 		sql += "AND me1.val NOT IN (SELECT ident_code FROM measurementMap) " +
 				"ORDER BY h.type ";
 
+		Map<String, List<Map<String, String>>> labTypeHash = new HashMap<>();
 		try
 		{
-
 			Connection conn = DbConnectionFilter.getThreadLocalDbConnection();
 			PreparedStatement pstmt = conn.prepareStatement(sql);
-			logger.info(sql);
 
 			ResultSet rs = pstmt.executeQuery();
 			while(rs.next())
 			{
-				HashMap<String, Object> ht = new HashMap<>();
-				ht.put("type", getString(oscar.Misc.getString(rs, "type")));
-				ht.put("identifier", getString(oscar.Misc.getString(rs, "identifier")));
-				ht.put("name", getString(oscar.Misc.getString(rs, "name")));
-				ret.add(ht);
-			}
+				String labType = getString(oscar.Misc.getString(rs, "type"));
 
+				// create the data hash
+				HashMap<String, String> resultHash = new HashMap<>();
+				resultHash.put("type", labType);
+				resultHash.put("identifier", getString(oscar.Misc.getString(rs, "identifier")));
+				resultHash.put("name", getString(oscar.Misc.getString(rs, "name")));
+
+				// add it to existing list, or add new list if the type is unknown
+				if(labTypeHash.containsKey(labType))
+				{
+					labTypeHash.get(labType).add(resultHash);
+				}
+				else
+				{
+					List<Map<String, String>> labList = new ArrayList<>();
+					labList.add(resultHash);
+					labTypeHash.put(labType, labList);
+				}
+			}
 			pstmt.close();
 		}
 		catch(SQLException e)
@@ -235,7 +255,8 @@ public class MeasurementMapConfig {
 			logger.error("Exception in getUnmappedMeasurements", e);
 		}
 
-		return ret;
+		// convert the lab type hash to a list
+		return labTypeHash;
     }
 
     public void mapMeasurement(String identifier, String loinc, String name, String type)  {
