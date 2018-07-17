@@ -98,7 +98,7 @@ public class AddDemographicAction extends Action
 		LocalDate dateOfBirth;
 		try
 		{
-			dateOfBirth = LocalDate.of(Integer.parseInt(request.getParameter("year_of_birth")), Integer.parseInt(request.getParameter("month_of_birth")), Integer.parseInt(request.getParameter("day_of_birth")));
+			dateOfBirth = LocalDate.of(Integer.parseInt(request.getParameter("year_of_birth")), Integer.parseInt(request.getParameter("month_of_birth")), Integer.parseInt(request.getParameter("date_of_birth")));
 		}
 		catch (NumberFormatException | DateTimeException e)
 		{
@@ -364,7 +364,7 @@ public class AddDemographicAction extends Action
 		{
 			FormFile docFile = fm.getDocFile();
 
-			if (docFile.getInputStream() != null && docFile.getInputStream().available() != 0)
+			if (docFile != null && docFile.getInputStream() != null && docFile.getInputStream().available() != 0)
 			{
 				Document document = new Document();
 				document.setDoctype("");
