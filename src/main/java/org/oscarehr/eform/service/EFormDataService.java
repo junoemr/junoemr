@@ -69,6 +69,9 @@ public class EFormDataService
 	@Autowired
 	private EFormDao eFormTemplateDao;
 
+	@Autowired
+	private EFormDatabaseTagService databaseTagService;
+
 	public EFormData saveExistingEForm(Integer oldFormDataId, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
 	{
 		logger.info("Save Existing EForm (Previous eform_data fdid " + oldFormDataId + ")");
@@ -81,6 +84,9 @@ public class EFormDataService
 
 		return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
 	}
+	/**
+	 * Save a new EForm record to the database
+	 */
 	public EFormData saveNewEForm(Integer templateId, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
 	{
 		logger.info("Save New EForm (template id " + templateId + ")");
@@ -90,6 +96,28 @@ public class EFormDataService
 		newVersion.setEFormInstance(getNewPersistedEFormInstance(template));
 
 		return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
+	}
+
+	/**
+	 * Same as saveNewEForm but it also loads all databaseAP tags before saving.
+	 * This should only be used in cases where a new eform is loaded without having the usual ui initialization steps (such as the API)
+	 */
+	public EFormData saveNewEFormWithDatabaseTags(Integer templateId, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
+	{
+		logger.info("Save New EForm (template id " + templateId + ") - Include AP values");
+
+		// in order to populate all oscar database tag fields, load them into a map, and add the values to the provided
+		EForm template = getEFormTemplate(templateId);
+		EFormData newVersion = copyFromTemplate(template);
+		// must have a persisted instance in order to save the id
+		newVersion.setEFormInstance(getNewPersistedEFormInstance(template));
+
+		// hash maps use the latest value added when there are duplicate keys
+		// specified keys in the incoming map should have priority over AP tag values
+		Map<String, String> combinedValueMap = databaseTagService.getDatabaseTagNameValueMap(template.getFormHtml(), demographicNo, providerNo);
+		combinedValueMap.putAll(eFormValueMap);
+
+		return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, combinedValueMap, eformLink);
 	}
 
 	/**
@@ -174,7 +202,8 @@ public class EFormDataService
 	/**
 	 * Handle all of the major eForm creation logic. save an eForm data model for a demographic.
 	 */
-	private EFormData saveEForm(EFormData eForm, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
+	private EFormData saveEForm(EFormData eForm, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap,
+	                            Map<String,String> eFormValueMap, String eformLink)
 	{
 		Date currentDate = new Date();
 		eForm.setFormDate(currentDate);
