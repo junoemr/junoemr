@@ -147,8 +147,10 @@ public class ConversionUtils {
 	 * 		Returns the formatted date as a string, or an empty string for 
 	 * 		null date parameter.
 	 */
-	public static String toDateString(Date date, String formatPattern) {
-		if (date == null) {
+	public static String toDateString(Date date, String formatPattern)
+	{
+		if (date == null)
+		{
 			return "";
 		}
 
