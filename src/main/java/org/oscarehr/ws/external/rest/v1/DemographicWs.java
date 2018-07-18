@@ -158,7 +158,7 @@ public class DemographicWs extends AbstractExternalRestWs
 		String ip = getHttpServletRequest().getRemoteAddr();
 		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, demographicId, "_demographic", "_eform");
 
-		EFormData eForm = eFormService.saveNewEForm(transfer.getTemplateId(), demographicId, providerNo,
+		EFormData eForm = eFormService.saveNewEFormWithDatabaseTags(transfer.getTemplateId(), demographicId, providerNo,
 				transfer.getSubject(), new HashMap<>(), transfer.getFormValues(), null);
 
 		LogAction.addLogEntry(providerNoStr, demographicId, LogConst.ACTION_ADD, LogConst.CON_EFORM_DATA, LogConst.STATUS_SUCCESS,
