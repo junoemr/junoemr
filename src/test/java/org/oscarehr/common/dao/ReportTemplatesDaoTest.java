@@ -33,7 +33,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.ReportTemplates;
+import org.oscarehr.report.reportByTemplate.dao.ReportTemplatesDao;
+import org.oscarehr.report.reportByTemplate.model.ReportTemplates;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 

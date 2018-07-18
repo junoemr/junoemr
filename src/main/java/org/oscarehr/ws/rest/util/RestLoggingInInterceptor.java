@@ -32,7 +32,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.model.RestServiceLog;
+import org.oscarehr.log.model.RestServiceLog;
 import org.oscarehr.util.LoggedInInfo;
 import oscar.log.LogAction;
 

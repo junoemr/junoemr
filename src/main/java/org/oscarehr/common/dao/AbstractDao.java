@@ -26,6 +26,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.common.model.Explain;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.transaction.annotation.Propagation;
@@ -36,7 +37,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Transactional(propagation = Propagation.REQUIRED)
 public abstract class AbstractDao<T extends AbstractModel<?>> {
@@ -44,8 +48,11 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 
 	protected Class<T> modelClass;
 
-	@PersistenceContext
+	@PersistenceContext(unitName = "persistenceUnit")
 	protected EntityManager entityManager = null;
+
+	@PersistenceContext(unitName = "readOnlyPersistenceUnit")
+	protected EntityManager readOnlyEntityManager = null;
 
 	protected AbstractDao(Class<T> modelClass) {
 		setModelClass(modelClass);
@@ -385,5 +392,125 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 	{
 		query.setFirstResult(startIndex);
 		setLimit(query, itemsToReturn);
+	}
+
+
+	/**
+	 * Run explain on a raw sql statement
+	 * This will run the query string as unescaped natural sql. when using this method, ensure that all sql is safe before hand
+	 * @param userQueryString raw sql string
+	 * @return list of Explain results
+	 */
+	@Transactional(readOnly = true)
+	public List<Explain> getExplainResultList(String userQueryString)
+	{
+		// use string concat with explain over setParameter, as the parameter gives invalid sql syntax
+		Query query = readOnlyEntityManager.createNativeQuery("EXPLAIN " + userQueryString);
+		@SuppressWarnings("unchecked")
+		List<Object[]> list = query.getResultList();
+		return toExplainList(list);
+	}
+	/**
+	 * Run explain on a raw sql statement
+	 * This will run the query string as unescaped natural sql. when using this method, ensure that all sql is safe before hand
+	 * @param jpaPreparedSQL jpa native sql string
+	 * @param jpaParams jpa prepared parameter map
+	 * @return list of Explain results
+	 */
+	@Transactional(readOnly = true)
+	public List<Explain> getPreparedExplainResultList(String jpaPreparedSQL, Map<String, String[]> jpaParams)
+	{
+		// use string concat with explain over setParameter, as the parameter gives invalid sql syntax
+		@SuppressWarnings("unchecked")
+		List<Object[]> list = runPreparedNativeQuery("EXPLAIN " + jpaPreparedSQL, jpaParams);
+		return toExplainList(list);
+	}
+	@Transactional(readOnly = true)
+	public List<Explain> getIndexPreparedExplainResultList(String jpaPreparedSQL, Map<Integer, String[]> jpaParams)
+	{
+		// use string concat with explain over setParameter, as the parameter gives invalid sql syntax
+		@SuppressWarnings("unchecked")
+		List<Object[]> list = runIndexPreparedNativeQuery("EXPLAIN " + jpaPreparedSQL, jpaParams);
+		return toExplainList(list);
+	}
+
+	/**
+	 * convert a list of object[] to Explain results
+	 * @param list
+	 * @return
+	 */
+	private List<Explain> toExplainList(List<Object[]> list)
+	{
+		List<Explain> results = new ArrayList<>(list.size());
+
+		for(Object[] result : list)
+		{
+			Explain explain = new Explain();
+			explain.setId((BigInteger) result[0]);
+			explain.setSelectType((String) result[1]);
+			explain.setTable((String) result[2]);
+			explain.setType((String) result[3]);
+			explain.setPossibleKeys((String) result[4]);
+			explain.setKey((String) result[5]);
+			explain.setKeyLen((String) result[6]);
+			explain.setRef((String) result[7]);
+			explain.setRows((BigInteger) result[8]);
+			explain.setExtra((String) result[9]);
+
+			results.add(explain);
+		}
+		return results;
+	}
+
+	/**
+	 * TODO - code left here for future use if spring upgraded to version 2.0 or higher.
+	 * Reason: the Tuple object can be used to retrieve column names as alias.
+	 * This code runs fine, but there was no way to display the column names for user queries.
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Transactional(readOnly = true)
+	public List<Object[]> runPreparedNativeQuery(String jpaPreparedSQL, Map<String, String[]> jpaParams)
+	{
+		Query query = readOnlyEntityManager.createNativeQuery(jpaPreparedSQL);
+
+		for(String parameter : jpaParams.keySet())
+		{
+			String[] paramValue = jpaParams.get(parameter);
+			if(paramValue.length == 1)
+			{
+				// for single parameters, use the value
+				query.setParameter(parameter, paramValue[0]);
+			}
+			else
+			{
+				// otherwise use the list
+				query.setParameter(parameter, paramValue);
+			}
+		}
+		List<Object[]> results = query.getResultList();
+		return results;
+	}
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Transactional(readOnly = true)
+	public List<Object[]> runIndexPreparedNativeQuery(String jpaPreparedSQL, Map<Integer, String[]> indexedParams)
+	{
+		Query query = readOnlyEntityManager.createNativeQuery(jpaPreparedSQL);
+
+		for(Integer parameter : indexedParams.keySet())
+		{
+			String[] paramValue = indexedParams.get(parameter);
+			if(paramValue.length == 1)
+			{
+				// for single parameters, use the value
+				query.setParameter(parameter, paramValue[0]);
+			}
+			else
+			{
+				// otherwise use the list
+				query.setParameter(parameter, paramValue);
+			}
+		}
+		List<Object[]> results = query.getResultList();
+		return results;
 	}
 }

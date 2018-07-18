@@ -35,7 +35,7 @@ import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.model.RestServiceLog;
+import org.oscarehr.log.model.RestServiceLog;
 
 import oscar.log.LogAction;
 

@@ -31,6 +31,7 @@ package oscar.oscarReport.reportByTemplate;
  */
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Parameter {
     public static final String LIST = "list";
@@ -46,6 +47,7 @@ public class Parameter {
     private String paramDescription = "";
     private String paramType;
     private ArrayList paramChoices; //must be a str array, uninstantiated or empty if the type is TEXT and DATE
+    private HashMap<String, String> attributes;
     
     public Parameter() {
     }
@@ -56,6 +58,20 @@ public class Parameter {
         this.setParamType(paramType);
         this.setParamDescription(paramDescription);
         this.setParamChoices(paramChoices);
+        this.attributes = new HashMap<>();
+    }
+
+    public void addAttribute(String key, String value) {
+        this.attributes.put(key, value);
+    }
+    public boolean hasAttribute(String key) {
+        return this.attributes.containsKey(key);
+    }
+    public String getAttribute(String key) {
+        return this.attributes.get(key);
+    }
+    public HashMap<String, String> getAttributMap() {
+        return this.attributes;
     }
     
     public String getParamDescription() {

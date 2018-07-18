@@ -45,6 +45,7 @@ public class ReportObjectGeneric implements ReportObject {
     private String description = "";
     private String type = "";
     private int active;
+    private boolean superAdminVerified = false;
     private ArrayList parameters = new ArrayList(0);
     
     private boolean sequence;
@@ -102,6 +103,16 @@ public class ReportObjectGeneric implements ReportObject {
     
     public void setType(String type) {
         this.type = type;
+    }
+
+    public boolean isSuperAdminVerified()
+    {
+        return superAdminVerified;
+    }
+
+    public void setSuperAdminVerified(boolean superAdminVerified)
+    {
+        this.superAdminVerified = superAdminVerified;
     }
 
     public ArrayList getParameters() {

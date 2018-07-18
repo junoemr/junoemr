@@ -23,18 +23,39 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.report.reportByTemplate.dao;
 
 import java.util.List;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.model.ReportTemplates;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.report.reportByTemplate.model.ReportTemplates;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class ReportTemplatesDao extends AbstractDao<ReportTemplates>{
+public class ReportTemplatesDao extends AbstractDao<ReportTemplates>
+{
+	public List<ReportTemplates> getTemplateList(Integer limit, Integer offset)
+	{
+		String sqlCommand = "SELECT x FROM ReportTemplates x WHERE x.active=:active";
+
+		Query query = readOnlyEntityManager.createQuery(sqlCommand);
+		query.setParameter("active", 1);
+
+		if(limit != null)
+		{
+			query.setMaxResults(limit);
+		}
+		if(offset != null)
+		{
+			query.setFirstResult(offset);
+		}
+
+		List<ReportTemplates> results = query.getResultList();
+		return results;
+	}
 
 	public ReportTemplatesDao() {
 		super(ReportTemplates.class);

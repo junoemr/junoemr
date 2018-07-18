@@ -34,10 +34,62 @@
 		<property name="logAbandoned" value="${db_log_abandoned}" />
 		 
 	</bean>
+	<bean id="readOnlyDataSource" class="org.oscarehr.util.TrackingBasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${db_driver}" />
+		<property name="url" value="${db_uri_readonly}${db_name_readonly}" />
+		<property name="defaultAutoCommit" value="true" />
+
+		<property name="username" value="${db_username_readonly}" />
+		<property name="password" value="${db_password_readonly}" />
+
+		<property name="maxActive" value="${db_max_active_readonly}" />
+		<property name="maxIdle" value="${db_max_idle_readonly}" />
+		<property name="maxWait" value="${db_max_wait_readonly}" />
+
+		<property name="testOnBorrow" value="true" />
+		<property name="validationQuery" value="${db_validationQuery}" />
+
+		<property name="maxOpenPreparedStatements" value="320" />
+		<!-- bug in the connector 3.11 driver which prevents this from being used, we need to upgrade drivers before re-enabling -->
+		<property name="poolPreparedStatements" value="false" />
+		<!-- abandoned features are deprecated and have no effect, don't expect the below to do anything -->
+		<!--
+		<property name="removeAbandoned" value="${db_remove_abandoned}" />
+		<property name="removeAbandonedTimeout" value="${db_remove_abandoned_timeout}" />
+		<property name="logAbandoned" value="${db_log_abandoned}" />
+		 -->
+	</bean>
+
 
 	<!-- JPA -->
 	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="dataSource" ref="dataSource" />
+		<property name="persistenceUnitName" value="persistenceUnit" />
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+		</property>
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.generate_statistics">${hibernate.generate_statistics}</prop>
+
+				<prop key="hibernate.cache.use_second_level_cache">false</prop>
+				<prop key="hibernate.cache.use_query_cache">false</prop>
+				<prop key="hibernate.jdbc.factory_class">net.bull.javamelody.HibernateBatcherFactory</prop>
+				<prop key="hibernate.max_fetch_depth">3</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="entityManagerFactoryReadonly" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="readOnlyDataSource" />
+		<property name="persistenceUnitName" value="readOnlyPersistenceUnit" />
+		<property name="packagesToScan">
+			<list>
+				<value>org.oscarehr.report</value>
+				<value>org.oscarehr.common.dao</value>
+			</list>
+		</property>
 		<property name="jpaVendorAdapter">
 			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
 		</property>
@@ -58,8 +110,15 @@
 	<bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
 
 	<!-- TransactionManager -->
-	<bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager" autowire="byName" />
+	<bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager" autowire="byName">
+		<property name="entityManagerFactory" ref="entityManagerFactory"/>
+	</bean>
+	<bean id="txManagerReadonly" class="org.springframework.orm.jpa.JpaTransactionManager" autowire="byName">
+		<property name="entityManagerFactory" ref="entityManagerFactoryReadonly"/>
+	</bean>
+
 	<tx:annotation-driven transaction-manager="txManager" />
+	<tx:annotation-driven transaction-manager="txManagerReadonly" />
 
 	<!-- Managed Beans -->
 	<context:component-scan base-package="org.oscarehr.appointment.dao" />
@@ -81,6 +140,8 @@
 	<context:component-scan base-package="org.oscarehr.encounterNote" />
 	<context:component-scan base-package="org.oscarehr.prevention" />
 	<context:component-scan base-package="org.oscarehr.labs" />
+	<context:component-scan base-package="org.oscarehr.log" />
+	<context:component-scan base-package="org.oscarehr.report" />
 	<!-- Sharing Center -->
 	<context:component-scan base-package="org.oscarehr.sharingcenter.dao" />
 	<context:component-scan base-package="oscar.oscarLab.ca.all.upload.handlers"/>

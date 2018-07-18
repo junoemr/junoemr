@@ -26,12 +26,15 @@
 
 # mysql database name
 db_name = {oscar_db_name}?zeroDateTimeBehavior=round&useOldAliasMetadataBehavior=true&jdbcCompliantTruncation=false
+db_name_readonly = {oscar_db_name}?zeroDateTimeBehavior=round&useOldAliasMetadataBehavior=true&jdbcCompliantTruncation=false
 
 # username
 db_username = {oscar_db_username}
+db_username_readonly = {oscar_db_username}
 
 # password for the username above
 db_password = {oscar_db_user_password}
+db_password_readonly = {oscar_db_user_password}
 
 db_type = mysql
 db_driver = com.mysql.jdbc.Driver

@@ -27,7 +27,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.model.RestServiceLog;
+import org.oscarehr.log.model.RestServiceLog;
 import org.oscarehr.util.MiscUtils;
 import oscar.log.LogAction;
 

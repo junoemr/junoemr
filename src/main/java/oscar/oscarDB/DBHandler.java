@@ -24,10 +24,13 @@
 
 package oscar.oscarDB;
 
+import java.sql.Array;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
 
 import org.oscarehr.util.DbConnectionFilter;
 
@@ -62,6 +65,37 @@ public final class DBHandler {
 		PreparedStatement ps = DbConnectionFilter.getThreadLocalDbConnection().prepareStatement(SQLStatement);
 		ps.setString(1, para1);
 		ResultSet result = ps.executeQuery();
+		return result;
+	}
+
+	/**
+	 * TODO use the EntityManager native SQL after spring 2.0.
+	 * Reason: the Tuple object (introduced in 2.0) can be used to retrieve column names as alias.
+	 * Until then, finding the column names can't be done in the EM, so we are using this for now.
+	 * @throws SQLException
+	 */
+	public static ResultSet GetSQL(String preparedSql, Map<Integer, String[]> indexedParams) throws SQLException
+	{
+		Connection connection = DbConnectionFilter.getThreadLocalDbConnection();
+		PreparedStatement query = connection.prepareStatement(preparedSql);
+
+		for(Integer paramIndex : indexedParams.keySet())
+		{
+			String[] paramValues = indexedParams.get(paramIndex);
+			if(paramValues.length == 1)
+			{
+				// for single parameters, use the value
+				query.setString(paramIndex, paramValues[0]);
+			}
+			else
+			{
+				Array sqlArray = connection.createArrayOf("varchar", paramValues);
+				// otherwise use the list
+				query.setArray(paramIndex, sqlArray);
+			}
+		}
+
+		ResultSet result = query.executeQuery();
 		return result;
 	}
 

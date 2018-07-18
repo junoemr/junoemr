@@ -25,16 +25,29 @@
 
 
 package oscar.oscarReport.reportByTemplate;
+
 import java.util.ArrayList;
 import java.util.Map;
-public interface ReportObject {
-    public String getTemplateId();
-    public String getTitle();
-    public String getDescription();
-    public String getType();
-    public ArrayList getParameters();
-    public String getPreparedSQL(Map parameters);
-    public int getActive();
-    public boolean isSequence();
-    public String getPreparedSQL(int sequenceNo, Map parameters);
+
+public interface ReportObject
+{
+	public String getTemplateId();
+
+	public String getTitle();
+
+	public String getDescription();
+
+	public String getType();
+
+	public ArrayList getParameters();
+
+	public String getPreparedSQL(Map parameters);
+
+	public int getActive();
+
+	public boolean isSuperAdminVerified();
+
+	public boolean isSequence();
+
+	public String getPreparedSQL(int sequenceNo, Map parameters);
 }

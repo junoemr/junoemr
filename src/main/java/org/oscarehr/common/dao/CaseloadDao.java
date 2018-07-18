@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CaseloadDao {
 
-	@PersistenceContext
+	@PersistenceContext(unitName = "persistenceUnit")
 	protected EntityManager entityManager = null;
 
 	public CaseloadDao() {
