@@ -1,6 +1,7 @@
 
 import {ScheduleApi} from "../../generated/JunoInternalApi/ScheduleApi";
 import {
+	AppointmentTo1,
 	CalendarAppointmentStatus, NewAppointmentTo1, SchedulingResponse
 } from "../../generated";
 import {modal} from 'angular-ui-bootstrap/src/modal';
@@ -27,6 +28,7 @@ export class CalendarApiAdapter
 
         'cpCalendar.Util',
 
+		'autoCompleteService',
         'demographicsService',
         'scheduleService',
         'globalStateService',
@@ -44,7 +46,8 @@ export class CalendarApiAdapter
 
         private util,
 
-        private demographicsService,
+        private autoCompleteService,
+		private demographicsService,
         private scheduleService,
         private globalStateService,
 		public focus
@@ -71,7 +74,7 @@ export class CalendarApiAdapter
 		fill_data: function fill_data(data){
 			this.uuid = data.uuid;
 			this.full_name = data.full_name;
-			this.patient_photo_url = '/imageRenderingServlet?source=local_client&clientId=' + data.uuid;
+			this.patient_photo_url = '/imageRenderingServlet?source=local_client&clientId=' + (data.uuid ? data.uuid : 0);
 			this.data.birth_date = data.birth_date;
 			this.data.health_number = data.health_number;
 			this.data.ontario_version_code = data.ontario_version_code;
@@ -107,13 +110,7 @@ export class CalendarApiAdapter
 				{
 					resp.push({
 						value_field: 'uuid',
-						data: {
-							uuid: results.content[x].demographicNo,
-							full_name: results.content[x].lastName + ',' + results.content[x].firstName,
-							birth_date: results.content[x].dob,
-							health_number: results.content[x].hin,
-							phone_number_primary: results.content[x].phone
-						}
+						data: this.autocompleteService.formatDemographic(results.content[x])
 					});
 				}
 				return resp;
@@ -148,21 +145,23 @@ export class CalendarApiAdapter
 		{
 			// Transform from camel to snake.  Normally this wouldn't need to happen, but
 			// this is an external library that requires a certain format.
-			deferred.resolve({data: this.snake_schedule_results(results)});
+			deferred.resolve({data: this.snake_schedule_results(results, providerId)});
 		});
 
 		return deferred.promise;
 	}
 
-	private snake_appointment_data(data)
+	private snake_appointment_data(data, providerId)
 	{
 		if(data == null)
 		{
 			return data;
 		}
 
+		console.log(data);
 		return {
-			schedule_uuid: data.scheduleUuid,
+			appointment_uuid: data.scheduleUuid,
+			schedule_uuid: providerId,
 			event_status_uuid: data.eventStatusUuid,
 			event_status_modifier: data.eventStatusModifier,
 			start_time: data.startTime,
@@ -197,7 +196,7 @@ export class CalendarApiAdapter
 		};
 	}
 
-	private snake_schedule_results(results)
+	private snake_schedule_results(results, providerId)
 	{
 		if(!angular.isArray(results))
 		{
@@ -218,7 +217,7 @@ export class CalendarApiAdapter
 				schedule_template_code: result.scheduleTemplateCode,
 				className: result.className,
 				availability_type: this.snake_availability_type(result.availabilityType),
-				data: this.snake_appointment_data(result.data),
+				data: this.snake_appointment_data(result.data, providerId),
 			});
 		}
 
@@ -555,7 +554,8 @@ export class CalendarApiAdapter
 			uuid: providerId,
 			availabilities: [], // TODO: figure out if these have a Juno equivalent, I don't think
 								// TODO: they do.  They are things like holidays and vacation days
-			relations: []
+			relations: [],
+			events: []
 		};
 
 		deferred.resolve({data: schedule});
@@ -565,7 +565,7 @@ export class CalendarApiAdapter
 
 
 	public save_event(
-		edit_mode: string,
+		edit_mode: boolean,
 		event_uuid: string,
 		start_datetime: moment.Moment,
 		end_datetime: moment.Moment,
@@ -580,26 +580,46 @@ export class CalendarApiAdapter
 
 		var dateString: string = this.util.get_date_string(start_datetime);
 		var startTimeString: string = this.util.get_time_string(start_datetime, "HH:mm");
+		var endTimeString: string = this.util.get_time_string(end_datetime, "HH:mm");
 		var duration: number = moment.duration(end_datetime.diff(start_datetime)).asMinutes();
 
-		var appointment: NewAppointmentTo1 =  {
-			"appointmentDate": dateString,
-			"startTime": startTimeString,
-			"duration": duration,
-			"status": selected_event_status_uuid,
-			"demographicNo": patient_uuid,
-			"notes": event_data.description,
-			"reason": event_data.reason,
-			"location": site_uuid,
-			"providerNo": schedule_uuid,
-			//"name": string,
-/*			"resources": string,
-			"type": string,
-			"urgency": string,*/
-		};
 
-		//this.scheduleService.addAppointment(appointment).then(
-		this.scheduleApi.addAppointment(appointment).then(
+		if(edit_mode)
+		{
+			var appointment: AppointmentTo1 =  {
+				"id": 0,
+				"providerNo": schedule_uuid,
+				"appointmentDate": start_datetime.toDate(),
+				"startTime": start_datetime.toDate(),
+				"endTime": end_datetime.toDate(),
+				//"name": string,
+				"demographicNo": patient_uuid,
+				//"programId": number,
+				"notes": event_data.description,
+				"reason": event_data.reason,
+				"location": site_uuid,
+				//"resources": string,
+				//"type": string,
+				//"style": string,
+				//"billing": string,
+				"status": selected_event_status_uuid,
+				//"importedStatus": string,
+				//"createDateTime": Date,
+				//"updateDateTime": Date,
+				//"creator": string,
+				//"lastUpdateUser": string,
+				//"remarks": string,
+				//"urgency": string,
+				//"creatorSecurityId": number,
+				//"bookingSource": AppointmentTo1.BookingSourceEnum,
+				//"reasonCode": number,
+				//"demographic": models.Demographic,
+				//"provider": models.Provider,
+			};
+			console.log(appointment);
+			deferred.reject();
+
+/*			this.scheduleApi.updateAppointment(appointment).then(
 			function(result: IHttpResponse<SchedulingResponse>)
 			{
 				deferred.resolve(result.data);
@@ -607,7 +627,39 @@ export class CalendarApiAdapter
 			function (result)
 			{
 				deferred.reject(result.data);
-			});
+			});*/
+		}
+		else
+		{
+			var newAppointment: NewAppointmentTo1 =  {
+				"appointmentDate": dateString,
+				"startTime": startTimeString,
+				"duration": duration,
+				"status": selected_event_status_uuid,
+				"demographicNo": patient_uuid,
+				"notes": event_data.description,
+				"reason": event_data.reason,
+				"location": site_uuid,
+				"providerNo": schedule_uuid,
+				//"name": string,
+				/*			"resources": string,
+							"type": string,
+							"urgency": string,*/
+			};
+
+
+			console.log(edit_mode);
+			this.scheduleApi.addAppointment(newAppointment).then(
+				function(result: IHttpResponse<SchedulingResponse>)
+				{
+					deferred.resolve(result.data);
+				},
+				function (result)
+				{
+					deferred.reject(result.data);
+				});
+		}
+
 
 		return deferred.promise;
 	}

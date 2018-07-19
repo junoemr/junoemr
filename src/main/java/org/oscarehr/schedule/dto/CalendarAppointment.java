@@ -28,7 +28,7 @@ import java.util.Objects;
 
 public class CalendarAppointment
 {
-	private Integer scheduleUuid;
+	private Integer appointmentUuid;
 	private LocalDate demographicPatientDob;
 	private String demographicPatientName;
 	private String demographicPatientPhone;
@@ -46,14 +46,14 @@ public class CalendarAppointment
 	private boolean tagSelfCancelled;
 	private String tagSystemCodes;
 
-	public CalendarAppointment(Integer scheduleUuid, LocalDate demographicPatientDob,
+	public CalendarAppointment(Integer appointmentUuid, LocalDate demographicPatientDob,
 		String demographicPatientName, String demographicPatientPhone,
 		Integer demographicPatientUuid, Integer demographicPractitionerUuid,
 		LocalDateTime startTime, LocalDateTime endTime, String eventStatusUuid,
 		String eventStatusModifier, Integer numInvoices, String reason, String tagNames,
 		String site, boolean tagSelfBooked, boolean tagSelfCancelled, String tagSystemCodes)
 	{
-		this.scheduleUuid = scheduleUuid;
+		this.appointmentUuid = appointmentUuid;
 		this.demographicPatientDob = demographicPatientDob;
 		this.demographicPatientName = demographicPatientName;
 		this.demographicPatientPhone = demographicPatientPhone;
@@ -72,9 +72,9 @@ public class CalendarAppointment
 		this.tagSystemCodes = tagSystemCodes;
 	}
 
-	public Integer getScheduleUuid()
+	public Integer getAppointmentUuid()
 	{
-		return scheduleUuid;
+		return appointmentUuid;
 	}
 
 	public LocalDate getDemographicPatientDob()
@@ -165,7 +165,7 @@ public class CalendarAppointment
 		CalendarAppointment that = (CalendarAppointment) o;
 		return tagSelfBooked == that.tagSelfBooked &&
 			tagSelfCancelled == that.tagSelfCancelled &&
-			Objects.equals(scheduleUuid, that.scheduleUuid) &&
+			Objects.equals(appointmentUuid, that.appointmentUuid) &&
 			Objects.equals(demographicPatientDob, that.demographicPatientDob) &&
 			Objects.equals(demographicPatientName, that.demographicPatientName) &&
 			Objects.equals(demographicPatientPhone, that.demographicPatientPhone) &&
@@ -187,7 +187,7 @@ public class CalendarAppointment
 	{
 
 		return Objects
-			.hash(scheduleUuid, demographicPatientDob, demographicPatientName,
+			.hash(appointmentUuid, demographicPatientDob, demographicPatientName,
 				demographicPatientPhone,
 				demographicPatientUuid, demographicPractitionerUuid, startTime, endTime,
 				eventStatusUuid, eventStatusModifier, numInvoices, reason, tagNames, site,
@@ -198,7 +198,7 @@ public class CalendarAppointment
 	public String toString()
 	{
 		return "CalendarAppointment{" +
-			"scheduleUuid=" + scheduleUuid +
+			"appointmentUuid=" + appointmentUuid +
 			", demographicPatientDob=" + demographicPatientDob +
 			", demographicPatientName='" + demographicPatientName + '\'' +
 			", demographicPatientPhone='" + demographicPatientPhone + '\'' +

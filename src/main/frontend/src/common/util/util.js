@@ -7,6 +7,14 @@ if (!Juno.Common) Juno.Common = {};
 
 Juno.Common.Util = {};
 
+Juno.Common.Util.settings = {
+	datetime_format: "YYYY-MM-DDTHH:mm:ssZ",
+	datetime_no_timezone_format: "YYYY-MM-DDTHH:mm:ss",
+	time_format: "h:mma",
+	date_format: "YYYY-MM-DD",
+	dayofweek_format: "dddd"
+};
+
 Juno.Common.Util.exists = function exists(object) {
 	// not undefined and not null
 	return angular.isDefined(object) && object !== null;
@@ -51,6 +59,10 @@ Juno.Common.Util.formatTime = function formatTime(d) {
 		d = Juno.Common.Util.pad0(d.getHours()) + ":" + Juno.Common.Util.pad0(d.getMinutes());
 	}
 	return d;
+};
+
+Juno.Common.Util.formatMomentDate = function formatMomentDate(d) {
+	return d.format(Juno.Common.Util.settings.date_format);
 };
 
 Juno.Common.Util.addNewLine = function addNewLine(line, mssg) {

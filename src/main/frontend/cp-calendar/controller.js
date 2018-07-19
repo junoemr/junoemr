@@ -29,7 +29,7 @@ function(
 	$scope.availability_type_model = null;
 
 	$scope.calendar_name = 'cpCalendar';
-	$scope.event_sources = [];
+	$scope.event_sources = [{}];
 
 	$scope.min_height = 650;
 
@@ -112,24 +112,46 @@ function(
 				//$scope.global_state.global_settings.interface_preferences.scheduler_license_key,
 		$scope.ui_config.calendar.defaultView = $scope.calendar_view_name();
 
-		$scope.load_schedule_templates().then(
-			$scope.load_availability_types).then(
-			$scope.load_event_statuses).then(
-			$scope.load_schedule_options).then(
-			$scope.load_site_options).then(
-			$scope.load_default_selections).then(
-			$scope.load_selected_schedules).then(
-			$scope.set_calendar_resources).then(
-			$scope.set_event_sources).then(
-			$scope.init_events_auto_refresh).then(
-				function success()
+		$scope.load_schedule_templates().then(function()
+		{
+			$scope.load_availability_types().then(function()
+			{
+				$scope.load_event_statuses().then(function()
 				{
-					$scope.initialized = true;
+					$scope.load_schedule_options().then(function()
+					{
+						$scope.load_site_options().then(function()
+						{
+							$scope.load_default_selections();
+
+							$scope.load_selected_schedules().then(function()
+							{
+								$scope.set_calendar_resources();
+
+								$scope.set_event_sources();
+
+								$scope.init_events_auto_refresh();
+
+								$scope.apply_ui_config($scope.ui_config);
+								console.log("-- Calendar Initialized ----------------------------");
+								$scope.initialized = true;
+							});
+						});
+					});
 				});
+			});
+		});
+	};
+
+	$scope.apply_ui_config = function apply_ui_config(ui_config)
+	{
+		$scope.ui_config_applied = angular.copy(ui_config);
 	};
 
 	$scope.init_events_auto_refresh = function init_events_auto_refresh()
 	{
+		var deferred = $q.defer();
+
 		// if there is already a refresh set up, stop it
 		var refresh = $scope.get_global_state('schedule_auto_refresh');
 		if(refresh !== null)
@@ -155,6 +177,10 @@ function(
 			$scope.save_global_state('schedule_auto_refresh',
 					setInterval($scope.refetch_events, minutes * 60 * 1000));
 		}
+
+		deferred.resolve();
+
+		return deferred.promise;
 	};
 
 
@@ -219,14 +245,18 @@ function(
 		$scope.load_selected_schedules().then($scope.refetch_events);
 	};
 
-	$scope.on_time_interval_changed = function()
+	$scope.on_time_interval_changed = function on_time_interval_changed(selected_time_interval)
 	{
+		$scope.selected_time_interval = selected_time_interval;
+
 		$scope.save_global_state(
 				'schedule_time_interval', $scope.selected_time_interval);
 
 		// updating the config will automatically trigger an events refresh
 		$scope.ui_config.calendar.slotDuration = $scope.selected_time_interval;
 		$scope.ui_config.calendar.slotLabelInterval = $scope.selected_time_interval;
+
+		$scope.apply_ui_config($scope.ui_config);
 	};
 
 	$scope.on_resources_changed = function(selected_resource_uuids)
@@ -247,7 +277,10 @@ function(
 
 		// reload the schedules and then update the calendar config,
 		// triggering a refetch events and rerender
-		$scope.load_selected_schedules().then($scope.set_calendar_resources);
+		$scope.load_selected_schedules().then(function()
+		{
+			$scope.set_calendar_resources();
+		});
 	};
 
 	$scope.on_view_render = function on_view_render()
@@ -270,7 +303,6 @@ function(
 
 	$scope.on_event_clicked = function on_event_clicked(calEvent, jsEvent, view)
 	{
-		console.log(jsEvent.target);
 		if($(jsEvent.target).is(".event-status.rotate"))
 		{
 			$scope.rotate_event_status(calEvent);
@@ -600,6 +632,7 @@ function(
 	$scope.update_calendar_view = function update_calendar_view()
 	{
 		$scope.ui_config.calendar.defaultView = $scope.calendar_view_name();
+		$scope.apply_ui_config($scope.ui_config);
 	};
 
 	$scope.open_create_event_dialog = function open_create_event_dialog(
@@ -697,16 +730,15 @@ function(
 
 		var data = angular.extend({}, calEvent.data);
 
-		data.start_time = util.get_datetime_moment(
-				calEvent.data.start_time);
-		data.end_time = util.get_datetime_moment(
-				calEvent.data.end_time);
+		data.start_time = calEvent.start;
+		data.end_time = calEvent.end;
 		data.num_invoices = calEvent.data.num_invoices;
 
 		data.schedule =
 				$scope.get_loaded_schedule(calEvent.data.schedule_uuid);
 
 		data.time_interval = $scope.time_interval_minutes();
+		data.selected_site_name = calEvent.data.site;
 
 		data.schedule_templates = $scope.schedule_templates;
 		data.availability_types = $scope.availability_types;
@@ -725,6 +757,13 @@ function(
 				access_control: function() {return $scope.access_control},
 				key_binding: function() {return {bind_key_global: function(){}}},
 				focus: function() {return $scope.calendar_api_adapter.focus},
+			}
+		});
+
+		$scope.dialog.result.catch(function(res) {
+			if(!(res === 'cancel' || res === 'escape key press'))
+			{
+				throw res;
 			}
 		});
 
@@ -772,7 +811,7 @@ function(
 	{
 		var schedule =
 				$scope.get_loaded_schedule(schedule_uuid);
-		
+
 		var url = $scope.calendar_api_adapter.get_create_invoice_url(event_uuid,
 				schedule.demographics_practitioner_uuid, demographics_patient_uuid);
 
@@ -864,6 +903,11 @@ function(
 
 	$scope.calendar_events = function(start, end, timezone, callback)
 	{
+		console.log("-- Load Calendar Events ------------------------------------------");
+		console.log(start.toString());
+		console.log(end.toString());
+		console.log("------------------------------------------------------------------");
+
 		// load the events for each of the loaded schedules
 		var promise_array = [];
 		for(var i = 0; i < $scope.schedules.length; i++)
@@ -876,24 +920,62 @@ function(
 
 		// once all the events are loaded, concat them together and callback
 		$q.all(promise_array).then(
-				function success(results_array)
+			function success(results_array)
+			{
+				var schedule_events = [];
+				for(var i = 0; i < results_array.length; i++)
 				{
-					var schedule_events = [];
-					for(var i=0; i<results_array.length; i++)
-					{
-						schedule_events.push(results_array[i].data);
-					}
-					$scope.events = Array.prototype.concat.apply([], schedule_events);
+					// Pull the relations out of the result
+					var schedule = $scope.schedules[i];
+					var events = results_array[i];
 
-					try
+					if(events && angular.isArray(events.data))
 					{
-						callback($scope.events);
+						console.log('-- schedule templates ---------------------');
+						schedule.events = events.data;
+						//$scope.extract_data_from_events(events.data, schedule, $scope.schedule_templates);
 					}
-					catch(err)
-					{
-						// the callback throws an error on first load, ignore
-					}
+
+					// Display the result
+					schedule_events.push(results_array[i].data);
+				}
+
+				$scope.events = Array.prototype.concat.apply([], schedule_events);
+
+				try
+				{
+					callback($scope.events);
+				}
+				catch(err)
+				{
+					// the callback throws an error on first load, ignore
+				}
+			});
+	};
+
+	// Get background events and populate schedule.releations and schedule_templates.
+	$scope.extract_data_from_events = function extract_data_from_events(
+		event_array, schedule, schedule_templates)
+	{
+		var relation_array = [];
+
+		for(var i = 0; i < event_array.length; i++)
+		{
+			var event = event_array[i];
+
+			if(event.availability_type)
+			{
+				schedule.relations.push({
+					schedule_template_uuid: event.schedule_template_code,
+					start_date: event.start,
+					end_date: event.end,
+					schedule_uuid: null
 				});
+				schedule_templates[event.schedule_template_code] = {
+
+				};
+			}
+		}
 	};
 
 
@@ -1089,6 +1171,8 @@ function(
 				$scope.save_global_state("schedule_view_name", "agendaWeek");
 				$scope.ui_config.calendar.resources = false;
 			}
+
+			$scope.apply_ui_config($scope.ui_config);
 		}
 		else if(
 			$scope.view_name() !== 'resourceDay' &&
@@ -1131,6 +1215,7 @@ function(
 	// Schedule config methods
 	// ===============================================================================================
 
+	// TODO: is this used anywhere?
 	$scope.set_schedule_hour_range = function set_schedule_hour_range()
 	{
 		// restrict day view if user preferences are set
@@ -1162,7 +1247,7 @@ function(
 				$scope.resource_options);
 
 		$scope.selected_time_interval = $scope.calendar_api_adapter.get_selected_time_interval(
-				$scope.time_interval_options, $scope.default_time_interval);
+			$scope.time_interval_options, $scope.default_time_interval);
 		$scope.ui_config.calendar.slotDuration = $scope.selected_time_interval;
 		$scope.ui_config.calendar.slotLabelInterval = $scope.selected_time_interval;
 
@@ -1171,6 +1256,7 @@ function(
 
 		// scroll so that one hour ago is the top of the calendar
 		$scope.ui_config.calendar.scrollTime = moment().subtract(1, 'hours').format('HH:mm:ss');
+
 	};
 
 	$scope.set_calendar_resources = function set_calendar_resources()
@@ -1183,6 +1269,8 @@ function(
 		{
 			$scope.ui_config.calendar.resources = false;
 		}
+
+		$scope.apply_ui_config($scope.ui_config);
 	};
 
 	$scope.set_event_sources = function set_event_sources()
@@ -1232,6 +1320,8 @@ function(
 	//=========================================================================
 	// Config Array
 	//=========================================================================/
+
+	// Any changes to this array need to be applied by calling apply_ui_config()
 	$scope.ui_config = {
 		calendar: {
 			height: $scope.get_schedule_height(),

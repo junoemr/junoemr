@@ -85,24 +85,20 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.onScheduleChanged = function onScheduleChanged()
 		{
+			console.log("-- Schedule Changed ----------------------------");
 			return $scope.callCalendarMethod("on_schedule_changed", [$scope.selectedSchedule, $scope.selectedSiteName]);
 		};
 
 		$scope.onSiteChanged = function onSiteChanged()
 		{
+			console.log("-- Site Changed ----------------------------");
 			return $scope.callCalendarMethod("on_schedule_changed", [$scope.selectedSchedule, $scope.selectedSiteName]);
 		};
 
 		$scope.onTimeIntervalChanged = function onTimeIntervalChanged()
 		{
-			$scope.saveGlobalState('schedule_time_interval', $scope.selectedTimeInterval);
-
-			// updating the config will automatically trigger an events refresh
-			if($scope.uiConfig.calendar)
-			{
-				$scope.uiConfig.calendar.slotDuration = $scope.selectedTimeInterval;
-				$scope.uiConfig.calendar.slotLabelInterval = $scope.selectedTimeInterval;
-			}
+			console.log("-- Time Changed ----------------------------");
+			$scope.callCalendarMethod("on_time_interval_changed", [$scope.selectedTimeInterval]);
 		};
 
 		$scope.changeView = function changeView(view)

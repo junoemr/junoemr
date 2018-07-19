@@ -123,6 +123,10 @@ angular.module('cpCalendar').controller(
 		$scope.start_date = util.get_date_string(moment_start);
 		$scope.end_date = util.get_date_string(moment_end);
 
+		console.log('start_time');
+		console.log($scope.start_date);
+		console.log($scope.start_time);
+
 		$scope.last_event_length = moment_end.diff(moment_start, 'minutes');
 
 		// maintain a list of the 'active' templates based on start time
@@ -138,6 +142,7 @@ angular.module('cpCalendar').controller(
 		$scope.default_event_status = data.default_event_status;
 		$scope.set_selected_event_status(data.event_status_uuid);
 
+
 		if(edit_mode)
 		{
 			$scope.event_data.reason = data.reason;
@@ -149,6 +154,7 @@ angular.module('cpCalendar').controller(
 			$scope.init_patient_autocomplete().then(function() {
 				$scope.initialized = true;
 			});
+			$scope.selected_site_name = data.selected_site_name;
 		}
 		else
 		{
@@ -168,7 +174,6 @@ angular.module('cpCalendar').controller(
 	{
 		var deferred = $q.defer();
 
-		console.log($scope.patient);
 		if(util.exists($scope.patient.uuid) && $scope.patient.uuid != 0)
 		{
 			parent_scope.autocomplete.init_autocomplete_values(
@@ -176,7 +181,6 @@ angular.module('cpCalendar').controller(
 				$scope.autocomplete_values).then(
 				function(results)
 				{
-					console.log(results);
 					$scope.autocomplete_values = results.data;
 					$scope.patient.fill_data($scope.autocomplete_values.patient.data);
 					deferred.resolve();
@@ -234,69 +238,42 @@ angular.module('cpCalendar').controller(
 
 	$scope.set_active_template_events = function set_active_template_events()
 	{
-		var active_events = [];
+		if(!($scope.schedule || {}).events)
+		{
+			return;
+		}
 
-		// find the active template events based on the current event date/times
-		// if the date/times are currently valid, otherwise leave as-is
+		// Get templates that happen during the time period
 
 		var moment_start = util.get_date_and_time_moment(
 			$scope.start_date, $scope.formatted_time($scope.start_time));
 		var moment_end = util.get_date_and_time_moment(
 			$scope.end_date, $scope.formatted_time($scope.end_time));
 
-		if(moment_start.isValid() && moment_end.isValid())
+		var active_events = [];
+
+		for(var i = 0; i < $scope.schedule.events.length; i++)
 		{
-			// use the parent functions to get a list of non-overlapping
-			// background events for the day(s) in the range
+			var event = angular.copy($scope.schedule.events[i]);
 
-			var date_start = util.get_date_moment($scope.start_date);
-			var date_end = util.get_date_moment(
-				$scope.end_date).add(1, 'day');
-
-			if(util.exists($scope.schedule.availabilities))
+			if(!event.availability_type)
 			{
-				for(var j = 0; j < $scope.schedule.availabilities.length; j++)
-				{
-					util.create_availability_events(
-							active_events, $scope.schedule.availabilities[j], $scope.availability_types,
-							date_start, date_end);
-				}
+				continue;
 			}
 
-			if(util.exists($scope.schedule.relations))
+			// if start time is before event end time or if end time is after event start
+			event.start = util.get_datetime_no_timezone_moment(event.start);
+			event.end = util.get_datetime_no_timezone_moment(event.end);
+
+			if(moment_start.isValid() && moment_end.isValid() &&
+				event.start.isValid() && event.end.isValid() &&
+				moment_start.isBefore(event.end) && moment_end.isAfter(event.start))
 			{
-				for(var k = 0; k < $scope.schedule.relations.length; k++)
-				{
-					util.create_relation_events(
-						active_events, $scope.schedule_templates, $scope.availability_types,
-						$scope.schedule.relations[k], date_start, date_end);
-				}
+				active_events.push(event);
 			}
-
-			// filter out the ones that aren't in the appointment time range
-		active_events = $.grep(active_events, function(ev) {
-			return ev.start.isBefore(moment_end) &&
-				ev.end.isAfter(moment_start);
-		});
-
-		// sort them: unavailable first, then by date
-		active_events.sort(function(a, b)
-		{
-			if(a.availability_type.system_code ===
-				b.availability_type.system_code)
-			{
-				return a.start.unix() - b.start.unix();
-			}
-			else
-			{
-				return a.availability_type.system_code -
-					b.availability_type.system_code;
-			}
-
-		});
-
-			$scope.active_template_events = active_events;
 		}
+
+		$scope.active_template_events = active_events;
 	};
 
 	$scope.adjust_end_datetime = function adjust_end_datetime(length_minutes)

@@ -61,6 +61,11 @@ angular.module('cpCalendar')
 						return $scope.on_schedule_changed(schedule_uuid, site);
 					};
 
+					this.on_time_interval_changed = function on_time_interval_changed(selected_time_interval)
+					{
+						return $scope.on_time_interval_changed(selected_time_interval);
+					};
+
 					this.change_view = function change_view(view)
 					{
 						return $scope.change_view(view);
@@ -111,7 +116,7 @@ angular.module('cpCalendar')
 					restrict: 'A',
 					scope: scope,
 					controller: 'cpCalendar.Controller',
-					template: '<div><div id="cp-calendar" class="calendar" ng-model="event_sources" calendar="cpCalendar" ui-calendar="ui_config.calendar"></div></div>',
+					template: '<div><div id="cp-calendar" class="calendar" ng-model="event_sources" calendar="cpCalendar" ui-calendar="ui_config_applied.calendar" ng-enabled="initialized"></div></div>',
 					replace: true,
 					link: link_function
 				};

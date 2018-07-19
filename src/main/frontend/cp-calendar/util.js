@@ -10,6 +10,7 @@ angular.module('cpCalendar').factory(
 			var service = {
 				settings: {
 					datetime_format: "YYYY-MM-DDTHH:mm:ssZ",
+					datetime_no_timezone_format: "YYYY-MM-DDTHH:mm:ss",
 					time_format: "h:mma",
 					date_format: "YYYY-MM-DD",
 					dayofweek_format: "dddd"
@@ -73,6 +74,12 @@ angular.module('cpCalendar').factory(
 			{
 				return moment.utc(datetime_string,
 					service.settings.datetime_format, true);
+			};
+
+			service.get_datetime_no_timezone_moment = function get_datetime_no_timezone_moment(datetime_string)
+			{
+				return moment.utc(datetime_string,
+					service.settings.datetime_no_timezone_format, true);
 			};
 
 			service.get_date_string = function get_date_string(moment)
@@ -199,12 +206,16 @@ angular.module('cpCalendar').factory(
 			service.create_relation_events = function create_relation_events(
 					event_array, schedule_templates, availability_types, relation, start, end)
 			{
+				console.log(relation);
+				console.log(schedule_templates);
 				var template = schedule_templates[relation.schedule_template_uuid];
+				console.log(template);
 
 				var relation_start = service.exists(relation.start_date) ?
 						moment(relation.start_date) : null;
 				var relation_end = service.exists(relation.end_date) ?
 						moment(relation.end_date) : null;
+				console.log(relation_start);
 
 				// go through each day that is visible on the calendar
 				// and if the schedule template relation is on the day,

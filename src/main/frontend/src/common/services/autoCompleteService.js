@@ -27,30 +27,43 @@
  */
 angular.module("Common.Services").service("autoCompleteService", [
 	"$q",
+	"demographicService",
 	function(
-		$q
+		$q,
+		demographicService
 	)
 	{
 		var service = {};
 
-		service.init_autocomplete_values = function init_autocomplete_values(patient){
+		service.init_autocomplete_values = function init_autocomplete_values(patient, autocomplete_values){
 			var deferred = $q.defer();
 
-			console.log(patient);
-			deferred.resolve({data:{patient:{data:{
-				uuid: null,
-				full_name: null,
-				patient_photo_url: '/imageRenderingServlet?source=local_client&clientId=0',
-				data: {
-					birth_date: null,
-					health_number: null,
-					ontario_version_code: null,
-					phone_number_primary: null
-				}
+			demographicService.getDemographic(patient.patient).then(function(result){
+				console.log(result);
+				result.dob = moment([result.dobYear, result.dobMonth, result.dobDay]);
 
-			}}}});
+				deferred.resolve({
+					data:{
+						patient:{
+							data: service.formatDemographic(result)
+						}
+					}
+				});
+
+			});
 
 			return deferred.promise;
+		};
+
+		service.formatDemographic = function formatDemographic(result)
+		{
+			return {
+				uuid: result.demographicNo,
+				full_name: result.lastName + ',' + result.firstName,
+				birth_date: Juno.Common.Util.formatMomentDate(result.dob),
+				health_number: result.hin,
+				phone_number_primary: result.phone
+			};
 		};
 
 		return service;

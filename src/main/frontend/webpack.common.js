@@ -158,6 +158,7 @@ module.exports = {
 			'./src/common/directives/datepickerPopup.js',
 			'./src/common/directives/jqueryUIResizable.js',
 			'./src/common/directives/jqueryUIDraggable.js',
+			'./src/common/directives/angular-ui-calendar.js',
 
 			'./src/common/directives/clinicaid/ca_field_alphadate.js',
 			'./src/common/directives/clinicaid/ca_field_alpha.js',

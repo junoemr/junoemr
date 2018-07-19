@@ -9,7 +9,6 @@ require('angular');
 require('angular-ui-bootstrap');
 require('angular-ui-router');
 require('angular-ui-router/release/stateEvents');
-require('angular-ui-calendar');
 require('fullcalendar-scheduler');
 require('fullcalendar/dist/fullcalendar.min.css');
 require('fullcalendar-scheduler/dist/scheduler.min.css');
