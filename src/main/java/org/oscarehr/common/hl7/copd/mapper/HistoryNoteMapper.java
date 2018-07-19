@@ -33,6 +33,7 @@ import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,7 @@ public class HistoryNoteMapper
 	private static final Logger logger = MiscUtils.getLogger();
 	private final ZPD_ZTR message;
 	private final ZPD_ZTR_PROVIDER provider;
+	private final Date oldestEncounterNoteDate; // used as a default for notes with no date info
 
 	private static Map<String, String> relationshipTypeMap = new HashMap<>();
 
@@ -50,11 +52,33 @@ public class HistoryNoteMapper
 	{
 		message = null;
 		provider = null;
+		oldestEncounterNoteDate = null;
 	}
-	public HistoryNoteMapper(ZPD_ZTR message, int providerRep)
+	public HistoryNoteMapper(ZPD_ZTR message, int providerRep) throws HL7Exception
 	{
 		this.message = message;
 		this.provider = message.getPATIENT().getPROVIDER(providerRep);
+		this.oldestEncounterNoteDate = getOldestEncounterNoteContactDate();
+	}
+
+	private Date getOldestEncounterNoteContactDate() throws HL7Exception
+	{
+		int reps = provider.getZPVReps();
+		List<Date> noteDateList = new ArrayList<>(reps);
+
+		for(int rep = 0; rep < reps; rep++)
+		{
+			Date noteDate = ConversionUtils.fromDateString(provider.getZPV(rep).getZpv2_contactDate().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
+			if(noteDate != null)
+			{
+				noteDateList.add(noteDate);
+			}
+		}
+		if(noteDateList.isEmpty())
+		{
+			return new Date();
+		}
+		return Collections.min(noteDateList);
 	}
 
 	// ---------------------------------------------------------------------------------------
@@ -134,7 +158,7 @@ public class HistoryNoteMapper
 		{
 			note = new CaseManagementNote();
 
-			Date date = new Date();
+			Date date = oldestEncounterNoteDate;
 			note.setObservationDate(date);
 			note.setUpdateDate(date);
 
@@ -195,6 +219,10 @@ public class HistoryNoteMapper
 		note.setNote(StringUtils.trim(noteText.replaceAll("~crlf~", "\n")));
 
 		Date diagnosisDate = getFamHistDiagnosisDate(rep);
+		if(diagnosisDate == null)
+		{
+			diagnosisDate = oldestEncounterNoteDate;
+		}
 		note.setObservationDate(diagnosisDate);
 		note.setUpdateDate(diagnosisDate);
 
@@ -209,7 +237,7 @@ public class HistoryNoteMapper
 		Date procedureDate = getMedHistProcedureDate(rep);
 		if(procedureDate == null)
 		{
-			procedureDate = new Date(); //TODO pick a good default
+			procedureDate = oldestEncounterNoteDate;
 		}
 		else
 		{

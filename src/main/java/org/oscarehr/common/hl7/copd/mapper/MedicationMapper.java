@@ -66,8 +66,17 @@ public class MedicationMapper
 		Date writtenDate = getTransactionDate(rep);
 		drug.setCreateDate(writtenDate);
 		drug.setWrittenDate(writtenDate);
-		drug.setRxDate(writtenDate);
-		drug.setEndDate(writtenDate);
+
+		Date startDate = getAdministrationStartDate(rep);
+		drug.setRxDate(startDate);
+
+		Date endDate = getAdministrationStopDate(rep);
+		if(endDate == null)
+		{
+			endDate = startDate; //end date can't be null
+		}
+		drug.setEndDate(endDate);
+		drug.setLongTerm(isLongTerm(rep));
 
 		// import drugs as custom
 		drug.setCustomName(getRequestedGiveCodeText(rep));
@@ -285,6 +294,37 @@ public class MedicationMapper
 	public String getRouteText(int rep)
 	{
 		return StringUtils.trimToNull(provider.getMEDS(rep).getRXR().getRxr1_Route().getCe2_Text().getValue());
+	}
+
+	// ---- ZRX ----
+
+	public Date getAdministrationStartDate(int rep) throws HL7Exception
+	{
+		return ConversionUtils.fromDateString(provider.getMEDS(rep).getZRX()
+				.getZrx2_administrationStartDate().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
+	}
+	public Date getAdministrationStopDate(int rep) throws HL7Exception
+	{
+		String adminStopDateStr = provider.getMEDS(rep).getZRX()
+				.getZrx3_administrationStopDate().getTs1_TimeOfAnEvent().getValue();
+
+		if("00000000".equalsIgnoreCase(adminStopDateStr))
+		{
+			return null;
+		}
+		return ConversionUtils.fromDateString(adminStopDateStr, "yyyyMMdd");
+	}
+
+	public boolean isLongTerm(int rep) throws HL7Exception
+	{
+		String drugUseType = StringUtils.trimToEmpty(provider.getMEDS(rep).getZRX().getZrx6_drugUseType().getCe1_Identifier().getValue());
+
+		switch(drugUseType.toUpperCase())
+		{
+			case "C" : return true; // for Continuous, long term use
+			case "S" :              // for Short term use
+			default  : return false;
+		}
 	}
 
 	// ---- NOTES ----
