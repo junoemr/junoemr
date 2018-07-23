@@ -29,7 +29,8 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ page
-	import="java.util.*, oscar.oscarEncounter.oscarMeasurements.data.MeasurementMapConfig, oscar.OscarProperties, oscar.util.StringUtils"%>
+	import="oscar.oscarEncounter.oscarMeasurements.data.MeasurementMapConfig, java.util.ArrayList, java.util.Hashtable, java.util.List"%>
+<%@ page import="java.util.Map" %>
 
 <%
 
@@ -115,15 +116,25 @@ MeasurementMapConfig mmc = new MeasurementMapConfig();
 				<td class="Cell" width="20%">Select unmapped code:</td>
 				<td class="Cell" width="80%"><select name="identifier">
 					<option value="0">None Selected</option>
-					<%String identifier = request.getParameter("identifier"); 
-                                                if (identifier == null) identifier = "";
-                                                ArrayList measurements = mmc.getUnmappedMeasurements("");
-                                                for (int i=0; i < measurements.size(); i++) { 
-                                                Hashtable ht = (Hashtable) measurements.get(i);  
-                                                String value = (String) ht.get("identifier")+","+(String) ht.get("type")+","+(String) ht.get("name");%>
-					<option value="<%= value %>"
-						<%= value.equals(identifier) ? "selected" : "" %>><%= "("+(String) ht.get("type")+") "+(String) ht.get("identifier")+" - "+((String) ht.get("name")).trim() %></option>
-					<% }%>
+					<%
+						String identifier = request.getParameter("identifier");
+						if(identifier == null) identifier = "";
+						Map<String, List<Map<String, String>>> LabMap = mmc.getUnmappedMeasurements(null);
+						for(List<Map<String, String>> typeList : LabMap.values())
+						{
+							for(Map<String, String> measurement : typeList)
+							{
+								String id = measurement.get("identifier");
+								String type = measurement.get("type");
+								String name = measurement.get("name");
+								String value = String.join(",", id, type, name);
+					%>
+								<option value="<%= value %>"
+										<%= value.equals(identifier) ? "selected" : "" %>><%= "(" + type + ") " + id + " - " + name.trim() %>
+								</option>
+					<%      }
+						}%>
+
 				</select></td>
 			</tr>
 			<tr>
