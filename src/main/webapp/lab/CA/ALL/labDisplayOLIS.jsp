@@ -223,6 +223,7 @@ div.Title3   { font-weight: bolder; font-size: 12pt; color: black; font-family:
 .title1      { font-size: 9pt; color: black; font-family: Verdana, Arial }
 div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                Verdana, Arial, Helvetica }
+pre          { white-space: pre-wrap; }
             -->
         </style>
         <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>

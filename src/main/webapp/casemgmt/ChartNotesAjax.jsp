@@ -796,11 +796,27 @@ int maxId = 0;
 	
 <script type="text/javascript">
 	maxNcId = <%=maxId%>;
+
+	// wire onclick listeners
+	<%Integer num;
+		Iterator<Integer> iterator = lockedNotes.iterator();
+		while (iterator.hasNext())
+		{
+			num = iterator.next();%>
+	Element.observe('n<%=num%>', 'click', unlockNote);
+	<%}
+
+			iterator = unLockedNotes.iterator();
+			while (iterator.hasNext())
+			{
+				num = iterator.next();%>
+	Element.observe('n<%=num%>', 'click', fullView);
+	<%}%>
 </script>
 
 
 <% if (request.getAttribute("moreNotes") == null) { %>
-<script type="text/javascript">	
+<script type="text/javascript">
 
 	jQuery(document).ready(function() {
 		<%
@@ -859,20 +875,6 @@ int maxId = 0;
     setupNotes();
     Element.observe(caseNote, "keyup", monitorCaseNote);
     Element.observe(caseNote, 'click', getActiveText);
-    <%Integer num;
-			Iterator<Integer> iterator = lockedNotes.iterator();
-			while (iterator.hasNext())
-			{
-				num = iterator.next();%>
-            Element.observe('n<%=num%>', 'click', unlockNote);
-    <%}
-
-			iterator = unLockedNotes.iterator();
-			while (iterator.hasNext())
-			{
-				num = iterator.next();%>
-            Element.observe('n<%=num%>', 'click', fullView);
-    <%}%>
 
     //flag for determining if we want to submit case management entry form with enter key pressed in auto completer text box
     var submitIssues = false;

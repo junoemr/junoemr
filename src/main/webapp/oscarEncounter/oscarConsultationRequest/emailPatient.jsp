@@ -48,6 +48,10 @@
 <%@ page import="java.io.File" %>
 <%@ page import="java.io.FileInputStream" %>
 <%@ page import="org.apache.log4j.Logger" %>
+<%@ page import="oscar.oscarProvider.data.ProviderData" %>
+<%@ page import="org.oscarehr.common.model.EmailLog" %>
+<%@ page import="org.oscarehr.common.dao.EmailLogDao" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 
 <%
 	ConsultationRequestDao consultationRequestDao = (ConsultationRequestDao) SpringUtils.getBean("consultationRequestDao");
@@ -61,25 +65,24 @@
 
 	<body background="../images/gray_bg.jpg" bgproperties="fixed">
 	<center>
-		<table border="0" cellspacing="0" cellpadding="0" width="90%">
-			<tr bgcolor="#486ebd">
-				<th align="CENTER"><font face="Helvetica" color="#FFFFFF">
-					<bean:message key="oscarEncounter.oscarConsultationRequest.msgMainLabel"/></font></th>
-			</tr>
-		</table>
 		<%
 			Logger logger = MiscUtils.getLogger();
 
+			String consult_request_id = (String) request.getAttribute("consult_request_id");
+			String template = (String) request.getAttribute("template");
+
 			boolean sentEmail = false;
+			boolean useDetailsTemplate = ("details").equals(template);
 			String emailAddress = "";
 			String errorMsg = "";
 			String statusMsg = "";
 			ConsultationRequest consultRequest = null;
 
+			EmailLog logEntry = new EmailLog();
+			EmailLogDao emailLogDao = (EmailLogDao) SpringUtils.getBean("emailLogDao");
+
 			try
 			{
-
-				String consult_request_id = (String) request.getAttribute("consult_request_id");
 				if (consult_request_id == null)
 				{
 					throw new IllegalArgumentException("Unable to find consultation request ID");
@@ -116,42 +119,60 @@
 				}
 
 				String templateFolder = props.getProperty("template_file_location");
-				String detailsTemplateTxt = props.getProperty("email.consult_request_details_template.txt");
-				String detailsTemplateHtml = props.getProperty("email.consult_request_details_template.html");
-				if (templateFolder == null || (detailsTemplateTxt == null && detailsTemplateHtml == null))
+
+				if (!(("notification").equals(template) || ("details").equals(template)))
+				{
+					throw new IllegalArgumentException("Unable to find requested email template.");
+				}
+
+				String templateFileName = useDetailsTemplate ?
+						"email.consult_request_details_template" : "email.consult_request_notification_template";
+
+				String templateTxt = props.getProperty(String.format("%s.txt", templateFileName));
+				String templateHtml = props.getProperty(String.format("%s.html", templateFileName));
+				if (templateFolder == null || (templateTxt == null && templateHtml == null))
 				{
 					throw new IllegalArgumentException("Application email templates misconfigured.");
 				}
 
-				Calendar apptTime = Calendar.getInstance();
-				apptTime.setTime(consultRequest.getAppointmentTime());
-
-				Calendar apptDate = Calendar.getInstance();
-				apptDate.setTime(consultRequest.getAppointmentDate());
-				apptDate.set(Calendar.HOUR_OF_DAY, apptTime.get(Calendar.HOUR_OF_DAY));
-				apptDate.set(Calendar.MINUTE, apptTime.get(Calendar.MINUTE));
-
-				String formattedApptDate = DateUtils.format(dateFormat, apptDate.getTime(), null);
-
-				String specialistFullName = "Dr. " + specialist.getFirstName() + " " + specialist.getLastName();
-				if (specialist.getProfessionalLetters() != null && specialist.getProfessionalLetters().length() > 0)
-				{
-					specialistFullName += " " + specialist.getProfessionalLetters();
-				}
-
 				VelocityContext velocityContext = VelocityUtils.createVelocityContextWithTools();
-				velocityContext.put("consultRequest", consultRequest);
 				velocityContext.put("demographic", demo);
 				velocityContext.put("specialist", specialist);
-				velocityContext.put("appointmentDateTime", formattedApptDate);
-				velocityContext.put("specialistFullName", specialistFullName);
 				velocityContext.put("service", service);
+
+				if (useDetailsTemplate)
+				{
+					Calendar apptTime = Calendar.getInstance();
+					apptTime.setTime(consultRequest.getAppointmentTime());
+
+					Calendar apptDate = Calendar.getInstance();
+					apptDate.setTime(consultRequest.getAppointmentDate());
+					apptDate.set(Calendar.HOUR_OF_DAY, apptTime.get(Calendar.HOUR_OF_DAY));
+					apptDate.set(Calendar.MINUTE, apptTime.get(Calendar.MINUTE));
+
+					String formattedApptDate = DateUtils.format(dateFormat, apptDate.getTime(), null);
+
+					String specialistFullName = "Dr. " + specialist.getFirstName() + " " + specialist.getLastName();
+					if (specialist.getProfessionalLetters() != null && specialist.getProfessionalLetters().length() > 0)
+					{
+						specialistFullName += " " + specialist.getProfessionalLetters();
+					}
+
+					velocityContext.put("appointmentDateTime", formattedApptDate);
+					velocityContext.put("consultRequest", consultRequest);
+					velocityContext.put("specialistFullName", specialistFullName);
+				}
+				else
+				{
+					ProviderData providerData = new ProviderData(consultRequest.getProviderNo());
+					velocityContext.put("referringDoctorName", providerData.getLast_name());
+				}
 
 				String emailBodyTxt = null;
 				String emailBodyHtml = null;
-				if (detailsTemplateTxt != null)
+				if (templateTxt != null)
 				{
-					File templateFile = new File(templateFolder, detailsTemplateTxt);
+					File templateFile = new File(templateFolder, templateTxt);
 					if (templateFile.exists() && templateFile.isFile())
 					{
 						InputStream templateInputStream = new FileInputStream(templateFile);
@@ -164,9 +185,9 @@
 						logger.warn("Missing template file: " + templateFile.getPath());
 					}
 				}
-				if (detailsTemplateHtml != null)
+				if (templateHtml != null)
 				{
-					File templateFile = new File(templateFolder, detailsTemplateHtml);
+					File templateFile = new File(templateFolder, templateHtml);
 					if (templateFile.exists() && templateFile.isFile())
 					{
 						InputStream templateInputStream = new FileInputStream(templateFile);
@@ -180,13 +201,21 @@
 					}
 				}
 
+				logEntry.setLoggedInProviderNo(LoggedInInfo.loggedInInfo.get().loggedInProvider.getProviderNo());
+				logEntry.setReferralDoctorId(specialist != null ? specialist.getId() : null);
+				logEntry.setReferringProviderNo(consultRequest.getProviderNo());
+				logEntry.setDemographicNo(demo.getDemographicNo());
+				logEntry.setEmailAddress(emailAddress);
+				logEntry.setEmailContent(emailBodyHtml != null ? emailBodyHtml : emailBodyTxt);
+
 				// don't send blank emails
 				if (!(emailBodyTxt == null && emailBodyHtml == null))
 				{
 					EmailUtils.sendEmail(emailAddress, fullName, fromEmail, fromName, subject, emailBodyTxt, emailBodyHtml);
 					sentEmail = true;
 				}
-				else {
+				else
+				{
 					logger.error("Email failed to send: no available templates");
 				}
 
@@ -197,9 +226,46 @@
 				errorMsg = e.getMessage();
 			}
 
+			logEntry.setEmailSuccess(sentEmail);
+			emailLogDao.persist(logEntry);
+
+		%>
+		<table border="0" cellspacing="0" cellpadding="0" width="90%">
+			<tr bgcolor="#486ebd">
+				<th align="CENTER">
+					<font face="Helvetica" color="#FFFFFF">
+						<%
+							if (useDetailsTemplate)
+							{
+						%>
+						<bean:message
+								key="oscarEncounter.oscarConsultationRequest.msgEmailDetailsLabel"/>
+						<%
+						}
+						else
+						{
+						%>
+						<bean:message
+								key="oscarEncounter.oscarConsultationRequest.msgEmailNotificationLabel"/>
+						<%}%>
+					</font>
+				</th>
+			</tr>
+		</table>
+
+		<%
 			if (sentEmail)
 			{
-
+				consultRequest.setNotificationSent(true);
+				consultationRequestDao.merge(consultRequest);
+		%>
+		<p>
+		<h1><bean:message key="oscarEncounter.oscarConsultationRequest.msgEmailSuccess"/></h1>
+		<h3><%= emailAddress %>
+		</h3>
+		<%
+			if (useDetailsTemplate)
+			{
 				try
 				{
 					// update the status of the consultation request to 4 (Completed)
@@ -214,16 +280,11 @@
 					MiscUtils.getLogger().error("Unable to update consultation request status", e);
 					statusMsg = "Error updating status to 'Completed': " + e.getMessage();
 				}
-
 		%>
-		<p>
-		<h1><bean:message key="oscarEncounter.oscarConsultationRequest.msgEmailSuccess"/></h1>
-		<h3><%= emailAddress %>
-		</h3>
 		<h3><%= statusMsg %>
 		</h3>
-
 		<%
+			}
 		}
 		else
 		{
@@ -241,7 +302,8 @@
 		<p></p>
 		<hr width="90%"/>
 		<form>
-			<input type="button" value="<bean:message key="global.btnClose"/>" onClick="window.close();">
+			<input type="button" value="<bean:message key="global.btnClose"/>"
+				   onClick="window.close();">
 		</form>
 	</center>
 	</body>

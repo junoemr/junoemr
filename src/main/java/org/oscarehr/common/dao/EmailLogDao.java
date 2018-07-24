@@ -21,27 +21,14 @@
  * Toronto, Ontario, Canada
  */
 
-package oscar.oscarEncounter.oscarMeasurements.util;
+package org.oscarehr.common.dao;
 
+import org.oscarehr.common.model.EmailLog;
 
-import java.util.List;
-
-import oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet;
-import oscar.oscarEncounter.oscarMeasurements.MeasurementInfo;
-
-/**
- */
-public class MeasurementHelper {
-
-    public static boolean flowSheetRequiresWork(String demographic_no, MeasurementFlowSheet mFlowsheet) throws Exception
-    {
-        if(mFlowsheet == null)
-        {
-            throw new IllegalArgumentException("MeasurementFlowSheet cannot be null");
-        }
-        MeasurementInfo mi = new MeasurementInfo(demographic_no);
-        List<String> measurements = mFlowsheet.getMeasurementList();
-        mi.getMeasurements(measurements);
-        return mFlowsheet.getMessages(mi).getWarnings().size() != 0;
-    }
+public class EmailLogDao extends AbstractDao<EmailLog>
+{
+	public EmailLogDao()
+	{
+		super(EmailLog.class);
+	}
 }

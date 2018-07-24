@@ -52,6 +52,9 @@ String AbnFlag = "";
 <link rel="stylesheet" type="text/css"
 	href="../../../share/css/OscarStandardLayout.css">
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
+<style>
+	pre         { white-space: pre-wrap; }
+</style>
 </head>
 
 <script language="JavaScript">

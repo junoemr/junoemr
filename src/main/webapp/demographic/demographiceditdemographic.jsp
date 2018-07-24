@@ -1038,7 +1038,7 @@ while(field_itr.hasNext()){
 			}
 		</style>
 	</head>
-	<body onLoad="setfocus(); checkONReferralNo(); formatPhoneNum();checkRosterStatus();"
+	<body onLoad="setfocus();formatPhoneNum();checkRosterStatus();"
 		  topmargin="0" leftmargin="0" rightmargin="0">
 	<table class="MainTable" id="scrollNumber1" name="encounterTable">
 		<tr class="MainTableTopRow">
@@ -4212,7 +4212,7 @@ while(field_itr.hasNext()){
 																ResultSet rsstatus1 = apptMainBean.queryResults("search_rsstatus");
 																while (rsstatus1.next())
 																{ %>
-															<option
+															<option value="<%=rsstatus1.getString("roster_status")%>"
 																	<%=rosterStatus.equals(rsstatus1.getString("roster_status")) ? " selected" : ""%>><%=rsstatus1.getString("roster_status")%>
 															</option>
 															<% }

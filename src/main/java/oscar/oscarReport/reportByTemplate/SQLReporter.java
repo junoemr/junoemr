@@ -24,20 +24,21 @@
 
 package oscar.oscarReport.reportByTemplate;
 
-import java.io.StringWriter;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.oscarehr.util.MiscUtils;
-
 import com.Ostermiller.util.CSVPrinter;
-
+import org.oscarehr.common.dao.LogReportByTemplateDao;
+import org.oscarehr.common.model.LogReportByTemplate;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import oscar.oscarDB.DBHandler;
 import oscar.oscarReport.data.RptResultStruct;
 import oscar.util.UtilMisc;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.StringWriter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.Map;
 
 
 /**
@@ -45,13 +46,17 @@ import oscar.util.UtilMisc;
  * @author rjonasz
  */
 public class SQLReporter implements Reporter {
-    
+
+	private LogReportByTemplateDao logReportByTemplateDao = SpringUtils.getBean(LogReportByTemplateDao.class);
+
     /** Creates a new instance of SQLReporter */
     public SQLReporter() {
     }
     
     public boolean generateReport( HttpServletRequest request) {
         String templateId = request.getParameter("templateId");
+	    String providerNo = (String) request.getSession().getAttribute("user");
+
         ReportObject curReport = (new ReportManager()).getReportTemplateNoParam(templateId);
         Map parameterMap = request.getParameterMap();
         String sql = curReport.getPreparedSQL(parameterMap);
@@ -63,9 +68,11 @@ public class SQLReporter implements Reporter {
         ResultSet rs = null;
         String rsHtml = "An SQL querry error has occured";
         String csv = "";
-        try {
-            
-            rs = DBHandler.GetSQL(sql);
+	    try
+	    {
+		    LogReportByTemplate logEntry = saveInitialLog(Integer.parseInt(templateId), Integer.parseInt(providerNo), sql);
+
+	        rs = DBHandler.GetSQL(sql);
             rsHtml = RptResultStruct.getStructure2(rs);  //makes html from the result set
             StringWriter swr = new StringWriter();
             CSVPrinter csvp = new CSVPrinter(swr);
@@ -74,6 +81,8 @@ public class SQLReporter implements Reporter {
             //csv = csv.replace("\\", "\"");  //natural quotes in the data create '\' characters in CSV, xls works fine
                                               //this line fixes it but messes up XLS generation.
             //csv = UtilMisc.getCSV(rs);
+		    logEntry.setDatetimeEnd(new Date());
+		    logReportByTemplateDao.merge(logEntry);
         } 
         // since users can write custom queries this error is expected and should not generate an error in the log
         catch (SQLException sqe) {
@@ -89,5 +98,17 @@ public class SQLReporter implements Reporter {
         request.setAttribute("resultsethtml", rsHtml);
         
         return true;
+    }
+
+    private LogReportByTemplate saveInitialLog(Integer templateId, Integer providerNo, String querySql)
+    {
+	    LogReportByTemplate logReportByTemplate = new LogReportByTemplate();
+	    logReportByTemplate.setTemplateId(templateId);
+	    logReportByTemplate.setProviderNo(providerNo);
+	    logReportByTemplate.setQueryString(querySql);
+	    logReportByTemplate.setDatetimeStart(new Date());
+	    logReportByTemplateDao.persist(logReportByTemplate);
+
+	    return logReportByTemplate;
     }
 }

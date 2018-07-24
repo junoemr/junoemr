@@ -917,6 +917,9 @@ casemgmt_photo_enabled=false
 # OHSUPPORT-1839 override date of birth format on master file (use SimpleDateFormat format syntax)
 #demographic_dob_format_override=MMM dd/yyyy
 
+# OHSUPPORT-4715
+#consultation_notification_enabled=true
+
 # OHSUPPORT-1928 appointment reminder emails
 #appointment_reminder_enabled=true
 #appointment_reminder_from_email_address=from_email_address@domain.com

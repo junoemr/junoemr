@@ -42,7 +42,7 @@
 	</tr>
 </table>
 <%
-	String[] param = new String[19];
+	String[] param = new String[20];
 	param[0]=request.getParameter("provider_no");
 	param[1]=request.getParameter("appointment_date");
 	param[2]=MyDateFormat.getTimeXX_XX_XX(request.getParameter("start_time"));
@@ -69,6 +69,7 @@
         param[16] = "0";
     }
     param[18]=request.getParameter("urgency");
+	param[19]=(request.getParameter("partial_booking")!=null)?request.getParameter("partial_booking"):"0";
 
     int rowsAffected = oscarSuperManager.update("appointmentDao", request.getParameter("dboperation"), param);
 	if (rowsAffected == 1) {
@@ -76,11 +77,6 @@
 <p>
 <h1><bean:message key="appointment.addappointment.msgAddSuccess" /></h1>
 
-<script LANGUAGE="JavaScript">
-	self.opener.refresh();
-	popupPage(350,750,'../report/reportdaysheet.jsp?dsmode=new&provider_no=<%=param[0]%>&sdate=<%=param[1]%>') ;
-	self.close();
-</script>
 <%
 		String[] param2 = new String[7];
 		param2[0]=param[0]; //provider_no
@@ -99,7 +95,13 @@
 			
 			EventService eventService = SpringUtils.getBean(EventService.class); //Add Appointment and print preview
 			eventService.appointmentCreated(this,apptNo.toString(), param[0]);
-			
+%>
+	<script LANGUAGE="JavaScript">
+		self.opener.refresh();
+		popupPage(350,750,'../report/reportdaysheet.jsp?dsmode=newappt&provider_no=<%=param[0]%>&sdate=<%=param[1]%>&appointment_no=<%=apptNo%>') ;
+		self.close();
+	</script>
+<%
 		}
 	} else {
 %>

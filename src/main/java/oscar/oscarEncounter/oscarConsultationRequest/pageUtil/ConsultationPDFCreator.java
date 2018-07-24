@@ -9,6 +9,7 @@
 
 package oscar.oscarEncounter.oscarConsultationRequest.pageUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ResourceBundle;
@@ -19,9 +20,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProgramDao;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.dao.DigitalSignatureDao;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.DigitalSignature;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
@@ -456,44 +455,64 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 		}
 		infoTable.addCell(setFooterCell(cell, getResource("msgAssociated2"), reqFrm.getProviderName(reqFrm.providerNo) + ((getlen(billingNo) > 0) ? " (" + billingNo + ")" : "")));
 		infoTable.addCell(setFooterCell(cell, getResource("msgFamilyDoc2"), reqFrm.getFamilyDoctor() + ((getlen(famDocBillingNo) > 0) ? " (" + famDocBillingNo + ")" : "")));
-		if (getlen(reqFrm.signatureImg) > 0) {
+		if (props.isPropertyActive("printPDF_referring_prac_signature"))
+		{
 			addSignature(infoTable);
 		}
+
 		return infoTable;
 	}
 
-private void addSignature(PdfPTable infoTable) {
-		float[] tableWidths;
-		PdfPCell cell;
-		tableWidths = new float[]{ 0.55f, 2.75f };
-		PdfPTable table = new PdfPTable(tableWidths);
-		cell = new PdfPCell(new Phrase(getResource("msgSignature") + ":", infoFont));
-		cell.setBorder(0);
-		cell.setHorizontalAlignment(PdfPCell.ALIGN_BOTTOM);
-		table.addCell(cell);
-		try {
-			DigitalSignatureDao digitalSignatureDao = (DigitalSignatureDao) SpringUtils.getBean("digitalSignatureDao");
-			DigitalSignature digitalSignature = digitalSignatureDao.find(Integer.parseInt(reqFrm.signatureImg));
-			if (digitalSignature != null) {
-				Image image = Image.getInstance(digitalSignature.getSignatureImage());
-				image.scalePercent(80f);
-				image.setBorder(0);
-				cell = new PdfPCell(image);
-				cell.setBorder(0);
-				table.addCell(cell);
-				cell = new PdfPCell(table);
-				cell.setBorder(0);
-				cell.setPadding(0);
-				cell.setColspan(1);
-				infoTable.addCell(cell);
+	private void addSignature(PdfPTable parentTable) {
+		String filePath;
+		if (props.isPropertyActive("referring_prac_signature_with_cpsid"))
+		{
+			ProviderDao proDAO = (ProviderDao) SpringUtils.getBean("providerDao");
+			org.oscarehr.common.model.Provider pro = proDAO.getProvider(reqFrm.providerNo);
 
-				return;
-			}
-		} catch (Exception e) {
-			logger.error("Unexpected error.", e);
+			String CPSID = pro.getPractitionerNo();
+			filePath = String.format("%sdoctor_signature_%s.png", props.getProperty("eform_image", ""), CPSID);
+		} else
+		{
+			filePath = String.format("%sdoctor_signature_%s.png", props.getProperty("eform_image", ""), reqFrm.providerNo);
+		}
+
+
+		File file = new File(filePath);
+		if(!file.exists() || !file.isFile())
+		{
+			logger.warn("Signature file does not exist for provider " + reqFrm.providerNo);
 			return;
 		}
+
+		try
+		{
+			float[] tableWidths;
+			PdfPCell cell;
+			tableWidths = new float[]{ 0.55f, 2.75f };
+			PdfPTable table = new PdfPTable(tableWidths);
+			cell = new PdfPCell(new Phrase(getResource("msgSignature") + ":", infoFont));
+			cell.setBorder(0);
+			cell.setHorizontalAlignment(PdfPCell.ALIGN_BOTTOM);
+			table.addCell(cell);
+
+			Image image = Image.getInstance(filePath);
+			image.scalePercent(80f);
+			image.setBorder(0);
+			cell = new PdfPCell(image);
+			cell.setBorder(0);
+			table.addCell(cell);
+			cell = new PdfPCell(table);
+			cell.setBorder(0);
+			cell.setPadding(0);
+			cell.setColspan(1);
+			parentTable.addCell(cell);
+
+		} catch (Exception e) {
+			logger.error("Failed to add provider signature to consultation PDF.", e);
+		}
 	}
+
 	/**
 	 * Formats a cell to display information provided in a regular font with an underline.
 	 * @param cell the cell to format
