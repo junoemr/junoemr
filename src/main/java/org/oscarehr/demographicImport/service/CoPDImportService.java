@@ -198,16 +198,6 @@ public class CoPDImportService
 		{
 			ProviderData provider = providerMapper.getProvider(i);
 
-			// CoPD spec does not require the provider PRD to have a name. in this case, assign a default
-			if(provider.getFirstName() == null || provider.getLastName() == null)
-			{
-				logger.warn("Not enough provider info found to link or create provider record (first and last name are required). \n" +
-						"Default provider (" + DEFAULT_PROVIDER_LAST_NAME + "," + DEFAULT_PROVIDER_FIRST_NAME + ") will be assigned.");
-
-				provider.setLastName(DEFAULT_PROVIDER_LAST_NAME);
-				provider.setFirstName(DEFAULT_PROVIDER_FIRST_NAME);
-			}
-
 			//TODO how to determine MRP doctor when there are more than 1
 			mrpProvider = findOrCreateProviderRecord(provider);
 
@@ -236,6 +226,16 @@ public class CoPDImportService
 
 	private ProviderData findOrCreateProviderRecord(ProviderData newProvider)
 	{
+		// CoPD spec does not require the provider PRD to have a name. in this case, assign a default
+		if(newProvider.getFirstName() == null || newProvider.getLastName() == null)
+		{
+			logger.warn("Not enough provider info found to link or create provider record (first and last name are required). \n" +
+					"Default provider (" + DEFAULT_PROVIDER_LAST_NAME + "," + DEFAULT_PROVIDER_FIRST_NAME + ") will be assigned.");
+
+			newProvider.setLastName(DEFAULT_PROVIDER_LAST_NAME);
+			newProvider.setFirstName(DEFAULT_PROVIDER_FIRST_NAME);
+		}
+
 		ProviderData provider;
 		List<ProviderData> matchedProviders = providerDataDao.findByName(newProvider.getFirstName(), newProvider.getLastName(), false);
 		if(matchedProviders.isEmpty())
@@ -273,27 +273,35 @@ public class CoPDImportService
 		return demographic;
 	}
 
-	private void importAppointmentData(ZPD_ZTR zpdZtrMessage, Demographic demographic, ProviderData provider) throws HL7Exception
+	private void importAppointmentData(ZPD_ZTR zpdZtrMessage, Demographic demographic, ProviderData defaultProvider) throws HL7Exception
 	{
+		if(properties.isPropertyActive("multisites"))
+		{
+			//TODO how to handle multisite assignment
+			throw new RuntimeException("Multisite Imports not supported");
+		}
+
 		AppointmentMapper appointmentMapper = new AppointmentMapper(zpdZtrMessage);
 
-		for(Appointment appointment : appointmentMapper.getAppointmentList())
+		int numAppointments = appointmentMapper.getNumAppointments();
+
+		for(int i=0; i<numAppointments; i++)
 		{
+			Appointment appointment = appointmentMapper.getAppointment(i);
+			ProviderData apptProvider = appointmentMapper.getAppointmentProvider(i);
+			ProviderData assignedProvider = defaultProvider;
+			if(apptProvider != null)
+			{
+				assignedProvider = findOrCreateProviderRecord(apptProvider);
+			}
 			appointment.setDemographicNo(demographic.getDemographicId());
 			appointment.setName(demographic.getLastName() + "," + demographic.getFirstName());
 			appointment.setCreator(IMPORT_PROVIDER);
-			appointment.setProviderNo(String.valueOf(provider.getProviderNo()));
-
-			if(properties.isPropertyActive("multisites"))
-			{
-				//TODO how to handle multisite assignment
-				throw new RuntimeException("Multisite Imports not supported");
-			}
+			appointment.setProviderNo(String.valueOf(assignedProvider.getProviderNo()));
 
 			logger.info("Add appointment: " + appointment.getAppointmentDate());
 			appointmentDao.persist(appointment);
 		}
-
 	}
 
 	private void importMedicationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception

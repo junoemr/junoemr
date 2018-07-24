@@ -148,34 +148,34 @@ public class PreventionMapper
 	static
 	{
 		// unofficial mapping of values we have encountered during imports
-		preventionTypeMap.put("Adacel", "DPT");
-		preventionTypeMap.put("Adacel/Polio", "DPT");
-		preventionTypeMap.put("Adacel/Polio (Quad)", "DPT");
-		preventionTypeMap.put("dPT/Polio/HIB", "DPT");
-		preventionTypeMap.put("dPT/Polio", "DPT");
-		preventionTypeMap.put("Engerix B", "OtherA");
-		preventionTypeMap.put("Fluad", "OtherA");
+		preventionTypeMap.put("Adacel", "dTap");
+		preventionTypeMap.put("Adacel/Polio", "Tdap-IPV");
+		preventionTypeMap.put("Adacel/Polio (Quad)", "Tdap-IPV");
+		preventionTypeMap.put("dPT/Polio/HIB", "TdP-IPV-Hib");
+		preventionTypeMap.put("dPT/Polio", "DT-IPV");
+		preventionTypeMap.put("Engerix B", "HepB");
+		preventionTypeMap.put("Fluad", "Flu");
 		preventionTypeMap.put("flu shot", "Flu");
 		preventionTypeMap.put("Hepatitis A", "HepA");
 		preventionTypeMap.put("Hepatitis B", "HepB");
 		preventionTypeMap.put("Hepatitis B Recombinant", "HepB");
 		preventionTypeMap.put("Hep A and Hep B Combined", "HepAB");
-		preventionTypeMap.put("Infanrix", "OtherA");
+		preventionTypeMap.put("Infanrix", "DTaP");
 		preventionTypeMap.put("Influenza", "Flu");
 		preventionTypeMap.put("Meningococcal C-TT Conjugate", "MenconC");
-		preventionTypeMap.put("MMR/Varicella", "MMR-Var");
-		preventionTypeMap.put("penta", "OtherA");
-		preventionTypeMap.put("Pentacel", "OtherA");
-		preventionTypeMap.put("Pneumococcal 7-Conjugate", "PNEU-C");
+		preventionTypeMap.put("MMR/Varicella", "MMRV");
+		preventionTypeMap.put("penta", "DPTP-IPV-Hib");
+		preventionTypeMap.put("Pentacel", "DTaP-IPV-Hib");
+		preventionTypeMap.put("Pneumococcal 7-Conjugate", "PNEU-C7");
 		preventionTypeMap.put("Pneumococcal 13-Conjugate", "PNEU-C");
-		preventionTypeMap.put("Pneumococcal 23-Polyvalent", "PNEU-C");
+		preventionTypeMap.put("Pneumococcal 23-Polyvalent", "Pneumovax");
 		preventionTypeMap.put("Pneumovax 23", "Pneumovax");
 		preventionTypeMap.put("Prevnar", "Pneu-C");
-		preventionTypeMap.put("quad", "OtherA");
-		preventionTypeMap.put("Quadracel", "OtherA");
+		preventionTypeMap.put("quad", "DPTP-IPV");
+		preventionTypeMap.put("Quadracel", "Tdap-IPV");
 		preventionTypeMap.put("rotovirus", "Rot");
 		preventionTypeMap.put("Td Adsorbed", "Td");
-		preventionTypeMap.put("Varicella", "MMR-Var");
-		preventionTypeMap.put("varivax", "OtherA");
+		preventionTypeMap.put("Varicella", "VZ");
+		preventionTypeMap.put("varivax", "VZ");
 	}
 }

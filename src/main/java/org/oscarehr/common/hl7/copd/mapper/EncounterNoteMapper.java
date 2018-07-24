@@ -72,20 +72,45 @@ public class EncounterNoteMapper
 	{
 		CaseManagementNote note = new CaseManagementNote();
 
-		String commentText = StringUtils.trimToEmpty(getEncounterNoteReason(rep));
-		String reasonText = StringUtils.trimToEmpty(getEncounterNoteComment(rep));
-		String noteText = StringUtils.trimToEmpty( commentText + "\n\n" + reasonText).replaceAll("~crlf~", "\n");
-
-		note.setNote(noteText);
+		note.setNote(getEncounterNoteText(rep));
 		note.setObservationDate(getEncounterNoteContactDate(rep));
 		note.setUpdateDate(getEncounterNoteContactDate(rep));
 
 		return note;
 	}
 
-	public String getEncounterNoteComment(int rep) throws HL7Exception
+	private String getEncounterNoteText(int rep) throws HL7Exception
 	{
-		return provider.getZPV(rep).getZpv4_comment().getValue();
+		String reasonText = StringUtils.trimToEmpty(getEncounterNoteReason(rep));
+		String commentText = StringUtils.trimToEmpty(getEncounterNoteComment(rep));
+		String signatureText = StringUtils.trimToEmpty(getEncounterNoteSignature(rep));
+
+		String text = "";
+
+		if(!reasonText.isEmpty())
+		{
+			text += reasonText + "\n";
+		}
+
+		if(!commentText.isEmpty())
+		{
+			text += "\n" + commentText + "\n";
+		}
+
+		if(!signatureText.isEmpty())
+		{
+			Date noteDate = getEncounterNoteContactDate(rep);
+			String dateStr = ConversionUtils.toDateString(noteDate, "dd-MMM-yyyy HH:mm");
+			signatureText = "[Signed on " + dateStr + " by " + signatureText + "]";
+			text += signatureText;
+		}
+
+		return StringUtils.trimToEmpty(text.replaceAll("~crlf~", "\n"));
+	}
+
+	public Date getEncounterNoteContactDate(int rep) throws HL7Exception
+	{
+		return ConversionUtils.fromDateString(provider.getZPV(rep).getZpv2_contactDate().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
 	}
 
 	public String getEncounterNoteReason(int rep) throws HL7Exception
@@ -93,8 +118,13 @@ public class EncounterNoteMapper
 		return provider.getZPV(rep).getZpv3_contactReason().getValue();
 	}
 
-	public Date getEncounterNoteContactDate(int rep) throws HL7Exception
+	public String getEncounterNoteComment(int rep) throws HL7Exception
 	{
-		return ConversionUtils.fromDateString(provider.getZPV(rep).getZpv2_contactDate().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
+		return provider.getZPV(rep).getZpv4_comment().getValue();
+	}
+
+	public String getEncounterNoteSignature(int rep) throws HL7Exception
+	{
+		return provider.getZPV(rep).getZpv5_commentSignature().getValue();
 	}
 }
