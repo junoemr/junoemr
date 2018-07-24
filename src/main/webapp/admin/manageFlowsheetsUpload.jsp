@@ -80,21 +80,31 @@ try {
             //TODO: make sure no duplicates
             MeasurementFlowSheet fs = null;
             fs = MeasurementTemplateFlowSheetConfig.getInstance().validateFlowsheet(contents);
+			FlowsheetDao flowsheetDao = (FlowsheetDao)SpringUtils.getBean("flowsheetDao");
+			Flowsheet existingFlowsheet = flowsheetDao.findByName(fs.getName());
             if(fs != null) {
-            	//save to db
-            	Flowsheet f = new Flowsheet();
-            	f.setContent(contents);
-            	f.setCreatedDate(new java.util.Date());
-            	f.setEnabled(true);
-            	f.setExternal(false);
-            	f.setName(fs.getName());
-            	
-            	FlowsheetDao flowsheetDao = (FlowsheetDao)SpringUtils.getBean("flowsheetDao");
-            	flowsheetDao.persist(f);
-            	MeasurementTemplateFlowSheetConfig.getInstance().reloadFlowsheets();            	
+				if(existingFlowsheet == null)
+				{
+					//save to db
+					Flowsheet f = new Flowsheet();
+					f.setContent(contents);
+					f.setCreatedDate(new java.util.Date());
+					f.setEnabled(true);
+					f.setExternal(false);
+					f.setName(fs.getName());
+
+					//FlowsheetDao flowsheetDao = (FlowsheetDao)SpringUtils.getBean("flowsheetDao");
+					flowsheetDao.persist(f);
+					MeasurementTemplateFlowSheetConfig.getInstance().reloadFlowsheets();
+				} else
+				{
+					existingFlowsheet.setContent(contents);
+					flowsheetDao.merge(existingFlowsheet);
+				}
+
             } else {
-            	//error            	
-            }                                   
+            	//error
+            }
         }
     }
 } catch (FileUploadException e) {
