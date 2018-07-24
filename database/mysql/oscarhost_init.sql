@@ -232,3 +232,4 @@ CREATE TABLE log_emails(
 
 ALTER TABLE consultationRequests ADD COLUMN notification_sent tinyint(1) NOT NULL DEFAULT 0;
 
+ALTER TABLE billingreferral ADD deleted_at date;
