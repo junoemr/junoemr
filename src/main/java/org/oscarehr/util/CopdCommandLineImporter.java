@@ -38,9 +38,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class CommandLineRunner
+public class CopdCommandLineImporter
 {
-	private static final Logger logger = Logger.getLogger(CommandLineRunner.class);
+	private static final Logger logger = Logger.getLogger(CopdCommandLineImporter.class);
 
 	private static CoPDImportService coPDImportService;
 	private static CoPDPreProcessorService coPDPreProcessorService;
@@ -56,7 +56,7 @@ public class CommandLineRunner
 	public static void main (String [] args)
 	{
 
-		if(args == null || args.length != 4)
+		if(args == null || args.length != 5)
 		{
 			BasicConfigurator.configure();
 			logger.error("Invalid argument count");
@@ -92,6 +92,14 @@ public class CommandLineRunner
 			return;
 		}
 
+		String importSourceStr = args[4];
+		CoPDImportService.IMPORT_SOURCE importSource = CoPDImportService.IMPORT_SOURCE.UNKNOWN;
+
+		if(importSourceStr.equalsIgnoreCase("WOLF"))
+		{
+			importSource = CoPDImportService.IMPORT_SOURCE.WOLF;
+		}
+
 
 		ClassPathXmlApplicationContext ctx = null;
 		long importCount = 0;
@@ -115,6 +123,7 @@ public class CommandLineRunner
 
 			// -------------------------------------------------------------------
 			logger.info("BEGIN DEMOGRAPHIC IMPORT PROCESS ...");
+			logger.info("DATA TYPE: " + importSource.name());
 
 			File[] fileList = copdDirectory.listFiles();
 			for(File file : fileList)
@@ -138,7 +147,7 @@ public class CommandLineRunner
 
 						try
 						{
-							importFileString(fileString, copdDocumentLocation);
+							importFileString(fileString, copdDocumentLocation, importSource);
 							importCount++;
 							moveToCompleted(copdFile, copdDirectory);
 						}
@@ -170,13 +179,13 @@ public class CommandLineRunner
 		logger.info("IMPORT PROCESS COMPLETE (" + importCount + " files imported. " + failureCount + " failures)");
 	}
 
-	private static void importFileString(String fileString, String documentDirectory) throws HL7Exception, IOException, InterruptedException
+	private static void importFileString(String fileString, String documentDirectory, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception, IOException, InterruptedException
 	{
 		List<String> messageList = coPDPreProcessorService.separateMessages(fileString);
 		for(String message : messageList)
 		{
 			message = coPDPreProcessorService.preProcessMessage(message);
-			coPDImportService.importFromHl7Message(message, documentDirectory);
+			coPDImportService.importFromHl7Message(message, documentDirectory, importSource);
 		}
 	}
 

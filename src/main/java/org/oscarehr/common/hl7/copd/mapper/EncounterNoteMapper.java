@@ -27,7 +27,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
+import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
@@ -41,15 +43,19 @@ public class EncounterNoteMapper
 	private final ZPD_ZTR message;
 	private final ZPD_ZTR_PROVIDER provider;
 
+	private final CoPDImportService.IMPORT_SOURCE importSource;
+
 	public EncounterNoteMapper()
 	{
 		message = null;
 		provider = null;
+		importSource = CoPDImportService.IMPORT_SOURCE.UNKNOWN;
 	}
-	public EncounterNoteMapper(ZPD_ZTR message, int providerRep)
+	public EncounterNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
 		this.message = message;
 		this.provider = message.getPATIENT().getPROVIDER(providerRep);
+		this.importSource = importSource;
 	}
 
 	public int getNumEncounterNotes()
@@ -108,6 +114,35 @@ public class EncounterNoteMapper
 		return StringUtils.trimToEmpty(text.replaceAll("~crlf~", "\n"));
 	}
 
+	public ProviderData getSigningProvider(int rep) throws HL7Exception
+	{
+		ProviderData signingProvider = null;
+
+		/* Wolf puts provider names for a note in the form of 'first last' in the comment signature.
+		 * Here we attempt to parse the names out and match them to a provider record */
+		if(importSource.equals(CoPDImportService.IMPORT_SOURCE.WOLF))
+		{
+			String noteProviderStr = getEncounterNoteSignature(rep);
+			if(noteProviderStr != null && noteProviderStr.contains(" "))
+			{
+				// no idea how to handle a name with a space in it here.
+				String[] providerNames = noteProviderStr.split(" ");
+				if(providerNames.length > 2)
+				{
+					logger.error("Malformed provider name contains too many spaces: '" + noteProviderStr + "'");
+				}
+				signingProvider = new ProviderData();
+				signingProvider.setFirstName(providerNames[0]);
+				signingProvider.setLastName(providerNames[1]);
+			}
+			else
+			{
+				logger.error("WOLF signing provider data is empty or malformed. This is NOT expected!");
+			}
+		}
+		return signingProvider;
+	}
+
 	public Date getEncounterNoteContactDate(int rep) throws HL7Exception
 	{
 		return ConversionUtils.fromDateString(provider.getZPV(rep).getZpv2_contactDate().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
@@ -115,16 +150,16 @@ public class EncounterNoteMapper
 
 	public String getEncounterNoteReason(int rep) throws HL7Exception
 	{
-		return provider.getZPV(rep).getZpv3_contactReason().getValue();
+		return StringUtils.trimToNull(provider.getZPV(rep).getZpv3_contactReason().getValue());
 	}
 
 	public String getEncounterNoteComment(int rep) throws HL7Exception
 	{
-		return provider.getZPV(rep).getZpv4_comment().getValue();
+		return StringUtils.trimToNull(provider.getZPV(rep).getZpv4_comment().getValue());
 	}
 
 	public String getEncounterNoteSignature(int rep) throws HL7Exception
 	{
-		return provider.getZPV(rep).getZpv5_commentSignature().getValue();
+		return StringUtils.trimToNull(provider.getZPV(rep).getZpv5_commentSignature().getValue());
 	}
 }

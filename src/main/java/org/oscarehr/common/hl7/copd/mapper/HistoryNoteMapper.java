@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
+import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.oscarehr.util.MiscUtils;
@@ -45,6 +46,7 @@ public class HistoryNoteMapper
 	private final ZPD_ZTR message;
 	private final ZPD_ZTR_PROVIDER provider;
 	private final Date oldestEncounterNoteDate; // used as a default for notes with no date info
+	private final CoPDImportService.IMPORT_SOURCE importSource;
 
 	private static Map<String, String> relationshipTypeMap = new HashMap<>();
 
@@ -53,12 +55,14 @@ public class HistoryNoteMapper
 		message = null;
 		provider = null;
 		oldestEncounterNoteDate = null;
+		importSource = null;
 	}
-	public HistoryNoteMapper(ZPD_ZTR message, int providerRep) throws HL7Exception
+	public HistoryNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		this.message = message;
 		this.provider = message.getPATIENT().getPROVIDER(providerRep);
 		this.oldestEncounterNoteDate = getOldestEncounterNoteContactDate();
+		this.importSource = importSource;
 	}
 
 	private Date getOldestEncounterNoteContactDate() throws HL7Exception
@@ -237,6 +241,13 @@ public class HistoryNoteMapper
 		Date procedureDate = getMedHistProcedureDate(rep);
 		if(procedureDate == null)
 		{
+			/* Wolf has stated that this field gets used for releationships & family related diseases,
+			 * and that if the date is missing the data can be ignored,
+			 * since it indicates a relationship that does not have enough info for the transfer */
+			if(importSource.equals(CoPDImportService.IMPORT_SOURCE.WOLF))
+			{
+				return null;
+			}
 			procedureDate = oldestEncounterNoteDate;
 		}
 		else

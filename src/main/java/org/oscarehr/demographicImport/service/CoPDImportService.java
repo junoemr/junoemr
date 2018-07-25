@@ -48,6 +48,7 @@ import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.parser.CoPDParser;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.ProviderInboxItem;
@@ -98,6 +99,12 @@ public class CoPDImportService
 	private static final String DEFAULT_PROVIDER_LAST_NAME = properties.getProperty("copd_import_service.default_provider.last_name", "CoPD-provider");
 	private static final String DEFAULT_PROVIDER_FIRST_NAME = properties.getProperty("copd_import_service.default_provider.first_name", "CoPD-missing");
 
+	public enum IMPORT_SOURCE
+	{
+		WOLF,
+		UNKNOWN
+	}
+
 	@Autowired
 	DemographicService demographicService;
 
@@ -140,7 +147,7 @@ public class CoPDImportService
 	@Autowired
 	LabService labService;
 
-	public void importFromHl7Message(String message, String documentLocation) throws HL7Exception, IOException, InterruptedException
+	public void importFromHl7Message(String message, String documentLocation, IMPORT_SOURCE importSource) throws HL7Exception, IOException, InterruptedException
 	{
 		logger.info("Initialize HL7 parser");
 		HapiContext context = new DefaultHapiContext();
@@ -155,17 +162,17 @@ public class CoPDImportService
 		logger.info("Parse Message");
 
 		ZPD_ZTR zpdZtrMessage = (ZPD_ZTR) p.parse(message);
-		importRecordData(zpdZtrMessage, documentLocation);
+		importRecordData(zpdZtrMessage, documentLocation, importSource);
 	}
 
-	private void importRecordData(ZPD_ZTR zpdZtrMessage, String documentLocation) throws HL7Exception, IOException, InterruptedException
+	private void importRecordData(ZPD_ZTR zpdZtrMessage, String documentLocation, IMPORT_SOURCE importSource) throws HL7Exception, IOException, InterruptedException
 	{
 		logger.info("Creating Demographic Record ...");
-		Demographic demographic = importDemographicData(zpdZtrMessage);
+		Demographic demographic = importDemographicData(zpdZtrMessage, importSource);
 		logger.info("Created record " + demographic.getDemographicId() + " for patient: " + demographic.getLastName() + ", " + demographic.getFirstName());
 
 		logger.info("Find/Create Provider Record(s) ...");
-		ProviderData provider = importProviderData(zpdZtrMessage, demographic, documentLocation);
+		ProviderData provider = importProviderData(zpdZtrMessage, demographic, documentLocation, importSource);
 
 		// set the mrp doctor after all the provider records are created
 		demographic.setProviderNo(provider.getId());
@@ -182,7 +189,7 @@ public class CoPDImportService
 	 * @return the MRP doctor record. This should never be null, as all messages are required to have at least one provider record
 	 * @throws HL7Exception
 	 */
-	private ProviderData importProviderData(ZPD_ZTR zpdZtrMessage, Demographic demographic, String documentLocation) throws HL7Exception, IOException, InterruptedException
+	private ProviderData importProviderData(ZPD_ZTR zpdZtrMessage, Demographic demographic, String documentLocation, IMPORT_SOURCE importSource) throws HL7Exception, IOException, InterruptedException
 	{
 		ProviderData mrpProvider = null;
 		ProviderMapper providerMapper = new ProviderMapper(zpdZtrMessage);
@@ -202,7 +209,7 @@ public class CoPDImportService
 			mrpProvider = findOrCreateProviderRecord(provider);
 
 			logger.info("Import Notes & History ...");
-			importProviderNotes(zpdZtrMessage, i, mrpProvider, demographic);
+			importProviderNotes(zpdZtrMessage, i, mrpProvider, demographic, importSource);
 			logger.info("Import diagnosed health problems ...");
 			importDxData(zpdZtrMessage, i, mrpProvider, demographic);
 			logger.info("Import Medications ...");
@@ -218,7 +225,7 @@ public class CoPDImportService
 			logger.info("Import Labs ...");
 			importLabData(zpdZtrMessage, i, mrpProvider, demographic);
 			logger.info("Import Documents ...");
-			importDocumentData(zpdZtrMessage, i, mrpProvider, demographic, documentLocation);
+			importDocumentData(zpdZtrMessage, i, mrpProvider, demographic, documentLocation, importSource);
 		}
 
 		return mrpProvider;
@@ -262,7 +269,7 @@ public class CoPDImportService
 		return provider;
 	}
 
-	private Demographic importDemographicData(ZPD_ZTR zpdZtrMessage) throws HL7Exception
+	private Demographic importDemographicData(ZPD_ZTR zpdZtrMessage, IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		DemographicMapper demographicMapper = new DemographicMapper(zpdZtrMessage);
 		Demographic demographic = demographicMapper.getDemographic();
@@ -437,7 +444,7 @@ public class CoPDImportService
 		}
 	}
 
-	private void importDocumentData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, String documentLocation) throws IOException, InterruptedException
+	private void importDocumentData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, String documentLocation, IMPORT_SOURCE importSource) throws IOException, InterruptedException
 	{
 		DocumentMapper documentMapper = new DocumentMapper(zpdZtrMessage, providerRep);
 
@@ -447,25 +454,51 @@ public class CoPDImportService
 			document.setResponsible(String.valueOf(provider.getProviderNo()));
 
 			GenericFile documentFile = FileFactory.getExistingFile(documentLocation, document.getDocfilename());
+
+			if(importSource.equals(IMPORT_SOURCE.WOLF) && documentFile instanceof XMLFile)
+			{
+				/* Wolf has instructed us not to import the xml files they include.
+				 * The content of their internal wolf referral docs are also included as regular documents in the data.
+				 * Not sure why they include the xml in the export, but we don't want/need them */
+				continue;
+			}
 			InputStream stream = new FileInputStream(documentFile.getFileObject());
 			documentService.uploadNewDocument(document, stream, demographic.getDemographicId());
 			documentService.routeToProviderInbox(document.getDocumentNo(), provider.getProviderNo(), true);
 		}
 	}
 
-	private void importProviderNotes(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception
+	private void importProviderNotes(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		EncounterNoteMapper encounterNoteMapper = new EncounterNoteMapper(zpdZtrMessage, providerRep);
-		for(CaseManagementNote encounterNote: encounterNoteMapper.getEncounterNoteList())
+		EncounterNoteMapper encounterNoteMapper = new EncounterNoteMapper(zpdZtrMessage, providerRep, importSource);
+
+		int numNotes = encounterNoteMapper.getNumEncounterNotes();
+		for(int i=0; i< numNotes; i++)
 		{
-			encounterNote.setProvider(provider);
+			CaseManagementNote encounterNote = encounterNoteMapper.getEncounterNote(i);
+			ProviderData signingProvider = encounterNoteMapper.getSigningProvider(i);
+			ProviderData noteProvider = provider;
+			if(signingProvider == null)
+			{
+				signingProvider = provider;
+			}
+			else
+			{
+				signingProvider = findOrCreateProviderRecord(signingProvider);
+			}
+			/* Wolf wants us to use the parsed provider name in the notes as the note creator and signature */
+			if(importSource.equals(IMPORT_SOURCE.WOLF))
+			{
+				noteProvider = signingProvider;
+			}
+			encounterNote.setProvider(noteProvider);
 			encounterNote.setSigned(true);
-			encounterNote.setSigningProvider(provider);
+			encounterNote.setSigningProvider(signingProvider);
 			encounterNote.setDemographic(demographic);
 			encounterNoteService.saveChartNote(encounterNote);
 		}
 
-		HistoryNoteMapper historyNoteMapper = new HistoryNoteMapper(zpdZtrMessage, providerRep);
+		HistoryNoteMapper historyNoteMapper = new HistoryNoteMapper(zpdZtrMessage, providerRep, importSource);
 		for(CaseManagementNote medHistNote : historyNoteMapper.getMedicalHistoryNoteList())
 		{
 			medHistNote.setProvider(provider);

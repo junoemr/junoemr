@@ -59,6 +59,18 @@ public class ProviderService
 		{
 			provider.setSpecialty("");
 		}
+		if(provider.getTeam() == null)
+		{
+			provider.setTeam("");
+		}
+		if(provider.getPhone() == null)
+		{
+			provider.setPhone("");
+		}
+		if(provider.getWorkPhone() == null)
+		{
+			provider.setWorkPhone("");
+		}
 
 		// providers don't have auto-generated IDs, so we have to pick one if it has not been provided
 		if(provider.getId() == null)
