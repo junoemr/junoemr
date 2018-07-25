@@ -476,38 +476,44 @@
 													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgPatient"/>
 										</a>
 									</th>
-									<th align="left" class="VCRheads">
+									<th align="left" class="VCRheads" width="75">
 										<a href=# onclick="setOrder('4'); return false;">
 											<bean:message
-													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgProvider"/>
+													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgPatientEmail"/>
 										</a>
 									</th>
 									<th align="left" class="VCRheads">
 										<a href=# onclick="setOrder('5'); return false;">
 											<bean:message
-													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgService"/>
+													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgProvider"/>
 										</a>
 									</th>
 									<th align="left" class="VCRheads">
 										<a href=# onclick="setOrder('6'); return false;">
 											<bean:message
-													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgConsultant"/>
+													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgService"/>
 										</a>
 									</th>
 									<th align="left" class="VCRheads">
 										<a href=# onclick="setOrder('7'); return false;">
 											<bean:message
-													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgRefDate"/>
+													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgConsultant"/>
 										</a>
 									</th>
 									<th align="left" class="VCRheads">
 										<a href=# onclick="setOrder('8'); return false;">
 											<bean:message
-													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgAppointmentDate"/>
+													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgRefDate"/>
 										</a>
 									</th>
 									<th align="left" class="VCRheads">
 										<a href=# onclick="setOrder('9'); return false;">
+											<bean:message
+													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgAppointmentDate"/>
+										</a>
+									</th>
+									<th align="left" class="VCRheads">
+										<a href=# onclick="setOrder('10'); return false;">
 											<bean:message
 													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgFollowUpDate"/>
 										</a>
@@ -515,7 +521,7 @@
 									<% if (bMultisites)
 									{ %>
 									<th align="left" class="VCRheads">
-										<a href=# onclick="setOrder('10'); return false;">
+										<a href=# onclick="setOrder('11'); return false;">
 											<bean:message
 													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgSiteName"/>
 										</a>
@@ -550,6 +556,7 @@
 										String id = theRequests.ids.elementAt(i);
 										String status = theRequests.status.elementAt(i);
 										String patient = theRequests.patient.elementAt(i);
+										String patientEmail = theRequests.patientEmailAddresses.elementAt(i);
 										String provide = theRequests.provider.elementAt(i);
 										String service = theRequests.service.elementAt(i);
 										String date = theRequests.date.elementAt(i);
@@ -647,6 +654,11 @@
 									<td class="stat<%=status%>">
 										<a href="javascript:popupOscarRx(700,960,'<%=request.getContextPath()%>/oscarEncounter/ViewRequest.do?requestId=<%=id%>')">
 											<%=patient%>
+										</a>
+									</td>
+									<td class="stat<%=status%>">
+										<a href="mailto:<%=patientEmail%>">
+											<%=patientEmail%>
 										</a>
 									</td>
 									<td class="stat<%=status%>">
