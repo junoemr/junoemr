@@ -225,6 +225,13 @@ public class HistoryNoteMapper
 		Date diagnosisDate = getFamHistDiagnosisDate(rep);
 		if(diagnosisDate == null)
 		{
+			/* Wolf has stated that this field gets used for relationships & family related diseases,
+			 * and that if the date is missing or the description is 'unknown', the data can be ignored,
+			 * since it indicates a relationship that does not have enough info for the transfer */
+			if(importSource.equals(CoPDImportService.IMPORT_SOURCE.WOLF))
+			{
+				return null;
+			}
 			diagnosisDate = oldestEncounterNoteDate;
 		}
 		note.setObservationDate(diagnosisDate);
@@ -241,13 +248,6 @@ public class HistoryNoteMapper
 		Date procedureDate = getMedHistProcedureDate(rep);
 		if(procedureDate == null)
 		{
-			/* Wolf has stated that this field gets used for releationships & family related diseases,
-			 * and that if the date is missing the data can be ignored,
-			 * since it indicates a relationship that does not have enough info for the transfer */
-			if(importSource.equals(CoPDImportService.IMPORT_SOURCE.WOLF))
-			{
-				return null;
-			}
 			procedureDate = oldestEncounterNoteDate;
 		}
 		else
