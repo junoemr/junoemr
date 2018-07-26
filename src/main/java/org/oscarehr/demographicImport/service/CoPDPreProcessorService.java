@@ -127,10 +127,23 @@ public class CoPDPreProcessorService
 	 */
 	private String fixPhoneNumbers(String message)
 	{
-		Pattern phonePattern = Pattern.compile("<XTN\\.7>(.*?)<\\/XTN\\.7>");
+		Pattern phonePattern = Pattern.compile("<XTN\\.6>(.*?)<\\/XTN\\.6>");
 		Matcher phonePatternMatcher = phonePattern.matcher(message);
 
 		StringBuffer sb = new StringBuffer(message.length());
+		while(phonePatternMatcher.find())
+		{
+			// strip non numeric characters from phone numbers
+			String replacement = "<XTN\\.6>" + phonePatternMatcher.group(1).replaceAll("[^\\d.]", "") + "</XTN\\.6>";
+			phonePatternMatcher.appendReplacement(sb, replacement);
+		}
+		phonePatternMatcher.appendTail(sb);
+		message = sb.toString();
+
+		phonePattern = Pattern.compile("<XTN\\.7>(.*?)<\\/XTN\\.7>");
+		phonePatternMatcher = phonePattern.matcher(message);
+
+		sb = new StringBuffer(message.length());
 		while(phonePatternMatcher.find())
 		{
 			// strip non numeric characters from phone numbers

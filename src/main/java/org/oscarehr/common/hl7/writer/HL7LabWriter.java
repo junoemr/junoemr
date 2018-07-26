@@ -27,9 +27,17 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
+
+import java.nio.ByteBuffer;
+import java.util.UUID;
 
 public class HL7LabWriter
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	protected Parser parser;
 	protected Message message;
 	protected Terser terser;
@@ -69,5 +77,23 @@ public class HL7LabWriter
 	public void setParser(Parser parser)
 	{
 		this.parser = parser;
+	}
+
+	public static String generateRandomAccessionNumber()
+	{
+		// generate a unique uuid to use as accession number of 36 characters
+		UUID uuid = UUID.randomUUID();
+
+		// base 64 encode the uuid to shorten the length to 22 characters (just happens to be the max length of ORC-3 in hl7 2.4)
+		ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
+		bb.putLong(uuid.getMostSignificantBits());
+		bb.putLong(uuid.getLeastSignificantBits());
+		String base64Key = Base64.encodeBase64URLSafeString(bb.array());
+
+		if(base64Key.length() != 22)
+		{
+			logger.error("Invalid key length: " + base64Key.length() + "; key: " + base64Key);
+		}
+		return base64Key;
 	}
 }

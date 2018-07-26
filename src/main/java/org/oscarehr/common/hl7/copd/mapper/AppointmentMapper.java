@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.model.v24.segment.SCH;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
@@ -75,12 +76,33 @@ public class AppointmentMapper
 		appointment.setStartTime(appointmentDate);
 		appointment.setEndTime(getAppointmentEnd(rep));
 
-		appointment.setNotes(getNotes(rep));
-		appointment.setReason(getReason(rep));
+		// hopefully one day appointments will handle null values correctly. until then, trim to empty
+		appointment.setNotes(StringUtils.trimToEmpty(getNotes(rep)));
+		appointment.setReason(StringUtils.trimToEmpty(getReason(rep)));
 		appointment.setCreateDateTime(getCreationDate(rep));
 		appointment.setStatus(getStatus(rep));
+		appointment.setType("");
+		appointment.setLocation("");
+		appointment.setResources("");
+		appointment.setReasonCode(17); // TODO look this up somewhere
 
 		return appointment;
+	}
+
+	public ProviderData getAppointmentProvider(int rep) throws HL7Exception
+	{
+		ProviderData provider = null;
+
+		String firstName = getProviderGivenName(rep);
+		String lastName = getProviderFamilyName(rep);
+
+		if(lastName != null && firstName != null)
+		{
+			provider = new ProviderData();
+			provider.setFirstName(firstName);
+			provider.setLastName(lastName);
+		}
+		return provider;
 	}
 
 	public String getNotes(int rep) throws HL7Exception
@@ -144,5 +166,17 @@ public class AppointmentMapper
 
 		cal.add(Calendar.SECOND, -1); // subtract 1 second from appointment time for oscar
 		return cal.getTime();
+	}
+
+	public String getProviderGivenName(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(message.getPATIENT().getSCH(rep).
+				getSch16_FillerContactPerson(0).getXcn3_GivenName().getValue());
+	}
+
+	public String getProviderFamilyName(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToNull(message.getPATIENT().getSCH(rep).
+				getSch16_FillerContactPerson(0).getXcn2_FamilyName().getFn1_Surname().getValue());
 	}
 }

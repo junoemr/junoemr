@@ -76,6 +76,227 @@ public class ZRX extends AbstractSegment
 		}
 	}
 
+	public CE getZrx1_prescriptionSource() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(1, 0);
+			return (CE) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public TS getZrx2_administrationStartDate() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(2, 0);
+			return (TS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public TS getZrx3_administrationStopDate() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(3, 0);
+			return (TS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public TS getZrx4_expiryDateDate() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(4, 0);
+			return (TS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public TS getZrx5_firstFillExpiryDate() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(5, 0);
+			return (TS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public CE getZrx6_drugUseType() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(6, 0);
+			return (CE) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ID getZrx7_trialDispensesAuthorized() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(7, 0);
+			return (ID) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public CE getZrx8_prescriptionActiveStatus() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(8, 0);
+			return (CE) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public TS getZrx9_modificationTime() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(9, 0);
+			return (TS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ID getZrx10_contradictionsDetectedIndicator() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(10, 0);
+			return (ID) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ID getZrx11_dispensingRevokedIndicatortrial() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(11, 0);
+			return (ID) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public NM getZrx12_dosesRemaining() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(12, 0);
+			return (NM) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public NM getZrx13_daysSupplyRemaining() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(13, 0);
+			return (NM) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public NM getZrx14_undispensedDaysSupplyRemaining() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(14, 0);
+			return (NM) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZrx15_percentageDispensed() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(15, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public TS getZrx16_supplyExhaustionDate() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(16, 0);
+			return (TS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public TS getZrx17_prescriptionExhaustionDate() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(17, 0);
+			return (TS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
 	/**
 	 * This method must be overridden. The easiest way is just to return null.
 	 */
