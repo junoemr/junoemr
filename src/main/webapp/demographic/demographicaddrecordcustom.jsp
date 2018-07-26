@@ -43,6 +43,7 @@
 <%@ page
 		import="org.springframework.web.context.*,org.springframework.web.context.support.*,org.oscarehr.common.dao.*,org.oscarehr.common.model.*"%>
 <%@page import="org.oscarehr.common.dao.CountryCodeDao" %>
+<%@ page import="oscar.dms.EDocUtil" %>
 <jsp:useBean id="providerBean" class="java.util.Properties"
              scope="session" />
 <jsp:useBean id="addDemoBean" class="oscar.AppointmentMainBean"/>
@@ -200,7 +201,7 @@
 		<style>
 			label{ width: 200px; display: inline-block; }
 			form div{ width: 600px; }
-			form{ width: 680px; margin-left: auto; margin-right: auto; background-color: #CCCCFF; padding: 10px; }
+			form{ width: 790px; margin-left: auto; margin-right: auto; background-color: #CCCCFF; padding: 10px; padding-left:200px}
 			h2{ text-align: center; }
 		</style>
 		<script language="JavaScript">
@@ -986,7 +987,18 @@
 				</b>
 			</label>
 			<span>
-				<input type="text" name="docDesc" size="19"	placeholder="Enter Title">
+				<input type="text" name="docDesc" size="19"	placeholder="Enter Title" style="width: 170px">
+				<select id="docType" name="docType" >
+					<option value=""><bean:message key="dms.addDocument.formSelect" /></option>
+					<%
+						ArrayList doctypes = EDocUtil.getActiveDocTypes("demographic");
+					   	for (int k=0; k<doctypes.size(); k++)
+					   	{
+						  	String doctype = (String) doctypes.get(k); %>
+							<option value="<%= doctype%>"><%= doctype%></option>
+					<%	}
+					%>
+				</select>
 				<input type="file" name="docFile" size="20" class="warning" >
 			</span>
 

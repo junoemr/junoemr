@@ -367,7 +367,7 @@ public class AddDemographicAction extends Action
 			if (docFile != null && docFile.getInputStream() != null && docFile.getInputStream().available() != 0)
 			{
 				Document document = new Document();
-				document.setDoctype("");
+				document.setDoctype(request.getParameter("docType"));
 				document.setDocdesc(request.getParameter("docDesc"));
 				document.setDocfilename(docFile.getFileName());
 				document.setDoccreator(loggedInInfo.getLoggedInProviderNo());
