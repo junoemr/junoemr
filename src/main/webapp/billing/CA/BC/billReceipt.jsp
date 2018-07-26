@@ -455,7 +455,7 @@
                                                                     <td align="right" colspan="2"></td>
                                                                 </tr>
                                                                 <tr class="secHead">
-                                                                    <td height="14" colspan="2">Please Make Cheque Payable To: </td>
+                                                                    <td height="14" colspan="2"><%=props.hasProperty("invoice_payment_message")?props.getProperty("invoice_payment_message"):"Please Make Cheque Payable To: "%></td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td class="title4">
