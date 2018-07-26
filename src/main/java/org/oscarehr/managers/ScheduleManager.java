@@ -26,6 +26,7 @@
 package org.oscarehr.managers;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TreeMap;
@@ -208,4 +209,23 @@ public class ScheduleManager {
 		// save new changes
 		oscarAppointmentDao.merge(appointment);
     }
+
+	public List<Appointment> getAppointmentsForDateRangeAndProvider(Date startTime, Date endTime, String providerNo)
+	{
+		List<Appointment> appointments = oscarAppointmentDao.findByDateRangeAndProvider(startTime, endTime, providerNo);
+
+		//--- log action ---
+		LogAction.addLogSynchronous("AppointmentManager.getAppointmentsForDateRangeAndProvider", "appointments for providerNo=" + providerNo + ", appointments for " + startTime + " to: " + endTime);
+
+		return (appointments);
+	}
+
+	public List<Appointment> getAppointmentUpdatedAfterDate(Date updatedAfterThisDateExclusive, int itemsToReturn)
+	{
+		List<Appointment> results = oscarAppointmentDao.findByUpdateDate(updatedAfterThisDateExclusive, itemsToReturn);
+
+		LogAction.addLogSynchronous("ScheduleManager.getAppointmentUpdatedAfterDate", "updatedAfterThisDateExclusive=" + updatedAfterThisDateExclusive);
+
+		return (results);
+	}
 }

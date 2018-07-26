@@ -304,4 +304,15 @@ public final class AppointmentTransfer {
 
 		return (result);
 	}
+
+	public static AppointmentTransfer[] toTransfers(List<Appointment> appointments)
+	{
+		AppointmentTransfer[] result = new AppointmentTransfer[appointments.size()];
+		for(int i = 0; i < appointments.size(); i++)
+		{
+			result[i] = toTransfer(appointments.get(i));
+		}
+
+		return (result);
+	}
 }

@@ -26,6 +26,7 @@
 package org.oscarehr.ws;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.jws.WebService;
@@ -134,5 +135,17 @@ public class ScheduleWs extends AbstractWs {
 		
 		appointment.setStatus("B");
 		scheduleManager.updateAppointment(appointment);
+	}
+
+	public AppointmentTransfer[] getAppointmentsForDateRangeAndProvider(Date startTime, Date endTime, String providerNo)
+	{
+		List<Appointment> appointments = scheduleManager.getAppointmentsForDateRangeAndProvider(startTime, endTime, providerNo);
+		return (AppointmentTransfer.toTransfers(appointments));
+	}
+
+	public AppointmentTransfer[] getAppointmentsUpdatedAfterDate(Date updatedAfterThisDateExclusive, int itemsToReturn, boolean useGMTTime)
+	{
+		List<Appointment> appointments = scheduleManager.getAppointmentUpdatedAfterDate(updatedAfterThisDateExclusive, itemsToReturn);
+		return (AppointmentTransfer.toTransfers(appointments));
 	}
 }
