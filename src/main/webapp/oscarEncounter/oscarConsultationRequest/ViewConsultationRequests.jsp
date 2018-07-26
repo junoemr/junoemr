@@ -53,6 +53,7 @@
 
 <%@ page import="org.oscarehr.common.model.ProviderData" %>
 <%@ page import="org.oscarehr.common.dao.ProviderDataDao" %>
+<%@ page import="oscar.OscarProperties" %>
 
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -271,10 +272,10 @@
 
 		function setOrder(val)
 		{
-			if (document.forms[0].orderby.value == val)
+			if (document.forms[0].orderby.value === val)
 			{
 				//alert( document.forms[0].desc.value);
-				if (document.forms[0].desc.value == '1')
+				if (document.forms[0].desc.value === '1')
 				{
 					document.forms[0].desc.value = '0';
 				}
@@ -476,12 +477,15 @@
 													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgPatient"/>
 										</a>
 									</th>
-									<th align="left" class="VCRheads" width="75">
+									<%	if (OscarProperties.getInstance().isPropertyActive("view_consultation_requests.showPatientEmails"))
+									{ %>
+										<th align="left" class="VCRheads" width="75">
 										<a href=# onclick="setOrder('4'); return false;">
 											<bean:message
 													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgPatientEmail"/>
 										</a>
-									</th>
+										</th>
+									<% } %>
 									<th align="left" class="VCRheads">
 										<a href=# onclick="setOrder('5'); return false;">
 											<bean:message
@@ -656,11 +660,14 @@
 											<%=patient%>
 										</a>
 									</td>
+									<%	if (OscarProperties.getInstance().isPropertyActive("view_consultation_requests.showPatientEmails"))
+									{ %>
 									<td class="stat<%=status%>">
 										<a href="mailto:<%=patientEmail%>">
 											<%=patientEmail%>
 										</a>
 									</td>
+									<% } %>
 									<td class="stat<%=status%>">
 										<%=provide%>
 									</td>
