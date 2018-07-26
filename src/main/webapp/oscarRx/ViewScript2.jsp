@@ -657,12 +657,20 @@ function toggleView(form) {
 					    	FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
 					    	List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
 
-                        // enable the fax button if there is a pre-set signature
+                        // enable the fax button if there is a pre-set signature for the creator of the prescription or the logged in user
 					    String disabled = "disabled";
+						oscar.oscarRx.data.RxPrescriptionData.Prescription rx = bean.getStashItem(bean.getStashSize()-1);
                         if(oscar.OscarProperties.getInstance().isPropertyActive("rx_preset_signatures"))
                         {
-                            String imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image","")+"doctor_signature_"+bean.getProviderNo()+".png";
-                            File f = new File(imgFile);
+							String imgFile;
+                        	if (rx.getProviderNo() != null)
+							{
+								imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image", "") + "doctor_signature_" + rx.getProviderNo() + ".png";
+							} else
+							{
+								imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image", "") + "doctor_signature_" + bean.getProviderNo() + ".png";
+							}
+							File f = new File(imgFile);
                             if(f.exists() && !f.isDirectory())
                             {
                                 disabled = "";
