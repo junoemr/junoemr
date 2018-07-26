@@ -203,7 +203,18 @@ public class CoPDImportService
 
 		for(int i=0; i< numProviders; i++)
 		{
-			ProviderData provider = providerMapper.getProvider(i);
+			ProviderData provider;
+
+			switch(importSource)
+			{
+				/*
+				 * Wolf has stated that most of their information is not associated with a provider, and that the provider information in the
+				 * PRD segment is not a reliable indicator of who created anything nested within the provider group.
+				 * So we always assign the default provider
+				 */
+				case WOLF: provider = getDefaultProvider(); break;
+				default: provider = providerMapper.getProvider(i); break;
+			}
 
 			//TODO how to determine MRP doctor when there are more than 1
 			mrpProvider = findOrCreateProviderRecord(provider);
@@ -231,6 +242,14 @@ public class CoPDImportService
 		return mrpProvider;
 	}
 
+	private ProviderData getDefaultProvider()
+	{
+		ProviderData defaultProvider = new ProviderData();
+		defaultProvider.setLastName(DEFAULT_PROVIDER_LAST_NAME);
+		defaultProvider.setFirstName(DEFAULT_PROVIDER_FIRST_NAME);
+		return defaultProvider;
+	}
+
 	private ProviderData findOrCreateProviderRecord(ProviderData newProvider)
 	{
 		// CoPD spec does not require the provider PRD to have a name. in this case, assign a default
@@ -238,9 +257,7 @@ public class CoPDImportService
 		{
 			logger.warn("Not enough provider info found to link or create provider record (first and last name are required). \n" +
 					"Default provider (" + DEFAULT_PROVIDER_LAST_NAME + "," + DEFAULT_PROVIDER_FIRST_NAME + ") will be assigned.");
-
-			newProvider.setLastName(DEFAULT_PROVIDER_LAST_NAME);
-			newProvider.setFirstName(DEFAULT_PROVIDER_FIRST_NAME);
+			newProvider = getDefaultProvider();
 		}
 
 		ProviderData provider;

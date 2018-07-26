@@ -137,7 +137,8 @@ public class EncounterNoteMapper
 			}
 			else
 			{
-				logger.error("WOLF signing provider data is empty or malformed. This is NOT expected!");
+				/* Wolf exports their internal communication notes sometimes as notes without associated provider information. */
+				logger.debug("WOLF signing provider data is empty or malformed.");
 			}
 		}
 		return signingProvider;
