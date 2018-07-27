@@ -232,7 +232,7 @@ for (String reportClass : reportClasses) {
 				<%for (int i=0; i<doctypes.size(); i++) {
                              String doctype = (String) doctypes.get(i); %>
 				<option value="<%= doctype%>"
-					<%=(formdata.getDocType().equals(doctype))?" selected":""%>><%= doctype%></option>
+					<%=(formdata.getDocType() != null && formdata.getDocType().equals(doctype)) ?" selected":""%>><%= doctype%></option>
 				<%}%>
 			</select></td>
 		</tr>
@@ -248,7 +248,7 @@ for (String reportClass : reportClasses) {
         consultShown = true;
     }
 %>
-                                <option value="<%=reportClass%>" <%=reportClass.equals(formdata.getDocClass())?"selected":""%>><%=reportClass%></option>
+                                <option value="<%=reportClass%>" <%=(formdata.getDocClass() != null && reportClass.equals(formdata.getDocClass()))?"selected":""%>><%=reportClass%></option>
 <% } %>
                             </select>
                         </td>
