@@ -38,6 +38,7 @@ import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.BillingONCHeader1;
 import org.oscarehr.common.model.BillingONItem;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.report.reportByTemplate.service.ReportByTemplateService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
@@ -47,29 +48,36 @@ import oscar.util.ConversionUtils;
  *
  * @author rjonasz
  */
-public class DepressionContinuityReporter implements Reporter{
-    private StringBuilder rsHtml = new StringBuilder();
-    private StringBuilder csv = new StringBuilder();
-    private HashMap<String,StringBuilder>demographics = new HashMap<String,StringBuilder>();
-    private HashMap<String,StringBuilder>csvMap = new HashMap<String,StringBuilder>();
-    /**
-     * Creates a new instance of DepressionContinuityReporter
-     */
-    public DepressionContinuityReporter() {
-    }
-    
-    public boolean generateReport( HttpServletRequest request ) {
-        String templateId = request.getParameter("templateId");
-        ReportObject curReport = (new ReportManager()).getReportTemplateNoParam(templateId);
-        Date diag_date_from = ConversionUtils.fromDateString(request.getParameter("diag_date_from"));
-        Date diag_date_to = ConversionUtils.fromDateString(request.getParameter("diag_date_to"));
-        Date visit_date_from = ConversionUtils.fromDateString(request.getParameter("visit_date_from"));
-        Date visit_date_to = ConversionUtils.fromDateString(request.getParameter("visit_date_to"));
-        String strDxCodes = request.getParameter("dxCodes:list");
-        List<String> dxCodes = null;
-        if( strDxCodes != null ) {
-            dxCodes = Arrays.asList(strDxCodes.split(","));
-        }
+public class DepressionContinuityReporter implements Reporter
+{
+	private StringBuilder rsHtml = new StringBuilder();
+	private StringBuilder csv = new StringBuilder();
+	private HashMap<String, StringBuilder> demographics = new HashMap<String, StringBuilder>();
+	private HashMap<String, StringBuilder> csvMap = new HashMap<String, StringBuilder>();
+
+	private static ReportByTemplateService reportByTemplateService = SpringUtils.getBean(ReportByTemplateService.class);
+
+	/**
+	 * Creates a new instance of DepressionContinuityReporter
+	 */
+	public DepressionContinuityReporter()
+	{
+	}
+
+	public boolean generateReport(HttpServletRequest request)
+	{
+		String templateId = request.getParameter("templateId");
+		ReportObject curReport = reportByTemplateService.getAsLegacyReport(Integer.parseInt(templateId), false);
+		Date diag_date_from = ConversionUtils.fromDateString(request.getParameter("diag_date_from"));
+		Date diag_date_to = ConversionUtils.fromDateString(request.getParameter("diag_date_to"));
+		Date visit_date_from = ConversionUtils.fromDateString(request.getParameter("visit_date_from"));
+		Date visit_date_to = ConversionUtils.fromDateString(request.getParameter("visit_date_to"));
+		String strDxCodes = request.getParameter("dxCodes:list");
+		List<String> dxCodes = null;
+		if(strDxCodes != null)
+		{
+			dxCodes = Arrays.asList(strDxCodes.split(","));
+		}
         
         
         if( diag_date_from == null ||  diag_date_to == null || visit_date_from == null || visit_date_to == null || dxCodes == null ) {

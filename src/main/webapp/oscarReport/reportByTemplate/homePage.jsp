@@ -28,7 +28,13 @@
 <%-- This JSP is the first page you see when you enter 'report by template' --%>
 
 
-<%@ page import="java.util.*,oscar.oscarReport.reportByTemplate.*"%>
+<%@ page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="org.oscarehr.report.reportByTemplate.service.ReportByTemplateService"%>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.oscarReport.reportByTemplate.ReportObject" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.Comparator" %>
+<%@ page import="java.util.List" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -42,9 +48,23 @@
 	<%response.sendRedirect("../../securityError.jsp?type=_report&type=_admin.reporting&type=_admin");%>
 </security:oscarSec>
 <%
-if(!authed) {
-	return;
-}
+	if(!authed)
+	{
+		return;
+	}
+	ReportByTemplateService reportByTemplateService = SpringUtils.getBean(ReportByTemplateService.class);
+	List<ReportObject> templates = reportByTemplateService.getLegacyReportObjectList(false);
+
+	String templateViewId = StringUtils.trimToEmpty(request.getParameter("templateviewid"));
+
+	class CustomComparator implements Comparator<ReportObject>
+	{
+		public int compare(ReportObject r1, ReportObject r2)
+		{
+			return r1.getTitle().compareTo(r2.getTitle());
+		}
+	}
+	Collections.sort(templates, new CustomComparator());
 %>
 
 
@@ -86,33 +106,30 @@ if(!authed) {
 			<jsp:param name="templateviewid" value="0" />
 		</jsp:include></td>
 		<td class="MainTableRightColumn" valign="top">
-		<%ArrayList templates = (new ReportManager()).getReportTemplatesNoParam();
-            String templateViewId = request.getParameter("templateviewid");
-            if (templateViewId == null) templateViewId = "";
-            %>
 		<div class="titleHP">Report By Template</div>
 		Select a template:
 		<div class="templatelistdivHP">
 		<ul class="templatelistHP">
 			<%
-				class CustomComparator implements Comparator<ReportObject>{
-                	public int compare(ReportObject r1, ReportObject r2){
-                    	return r1.getTitle().compareTo(r2.getTitle());
-            		}
-    			}
-				Collections.sort(templates,new CustomComparator());
-			for (int i=0; i<templates.size(); i++) {
-                    ReportObject curReport = (ReportObject) templates.get(i);%>
-			<li><%=String.valueOf(i+1)%>. <a
-				href="reportConfiguration.jsp?templateid=<%=curReport.getTemplateId()%>"><%=curReport.getTitle()%></a></li>
+				for(int i = 0; i < templates.size(); i++)
+				{
+					ReportObject curReport = templates.get(i);
+			%>
+			<li><%=String.valueOf(i + 1)%>. <a
+					href="reportConfiguration.jsp?templateid=<%=curReport.getTemplateId()%>"><%=curReport.getTitle()%>
+			</a></li>
 			<div class="templateDescriptionHP"><%=curReport.getDescription()%>
 			</div>
 			<% } %>
 		</ul>
-		<%if (templates.isEmpty()) {%>
-		<div class="warning">No templates in the database, please create
-		a template file by clicking on "Edit Templates"</div>
-		<%}%>
+			<%
+				if(templates.isEmpty())
+				{
+			%>
+			<div class="warning">No templates in the database, please create
+				a template file by clicking on "Edit Templates"
+			</div>
+			<%}%>
 		</div>
 		</td>
 	</tr>

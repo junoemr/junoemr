@@ -28,9 +28,12 @@
    "http://www.w3.org/TR/html4/loose.dtd">
 <%--This JSP is to configure the report before it is run, this is where the user fills in all the param--%>
 
-
-
-<%@ page import="java.util.*,oscar.oscarReport.reportByTemplate.*"%>
+<%@ page import="org.oscarehr.report.reportByTemplate.service.ReportByTemplateService"%>
+<%@ page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="oscar.oscarReport.reportByTemplate.Choice" %>
+<%@ page import="oscar.oscarReport.reportByTemplate.Parameter" %>
+<%@ page import="oscar.oscarReport.reportByTemplate.ReportObject" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
@@ -43,9 +46,12 @@
 	<%response.sendRedirect("../../securityError.jsp?type=_report&type=_admin.reporting&type=_admin");%>
 </security:oscarSec>
 <%
-if(!authed) {
-	return;
-}
+	if(!authed)
+	{
+		return;
+	}
+
+	ReportByTemplateService reportByTemplateService = SpringUtils.getBean(ReportByTemplateService.class);
 %>
 
 <html:html locale="true">
@@ -103,12 +109,13 @@ if(!authed) {
 			<jsp:param name="templateviewid" value="<%=templateid%>" />
 		</jsp:include></td>
 		<td class="MainTableRightColumn" valign="top">
-		<%ReportObject curreport = (new ReportManager()).getReportTemplate(templateid);
-		  		 String xml = (new ReportManager()).getTemplateXml(templateid);
-                 ArrayList parameters = curreport.getParameters();
-                 int step = 0;
-                 if (request.getAttribute("errormsg") != null) {
-                    String errormsg = (String) request.getAttribute("errormsg");%>
+			<%
+			ReportObject curreport = reportByTemplateService.getAsLegacyReport(Integer.parseInt(templateid), true);
+			ArrayList parameters = curreport.getParameters();
+			int step = 0;
+			if(request.getAttribute("errormsg") != null)
+			{
+			String errormsg = (String) request.getAttribute("errormsg");%>
 		<div class="warning"><%=errormsg%></div>
 		<%}%>
 		<div class="reportTitle"

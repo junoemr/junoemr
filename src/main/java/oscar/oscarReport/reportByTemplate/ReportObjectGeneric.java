@@ -28,11 +28,6 @@
 package oscar.oscarReport.reportByTemplate;
 
 import java.util.ArrayList;
-import java.util.Map;
-
-import org.oscarehr.util.MiscUtils;
-
-import oscar.util.StringUtils;
 
 /*
  * Created on December 19, 2006, 10:46 AM
@@ -123,80 +118,80 @@ public class ReportObjectGeneric implements ReportObject {
         this.parameters = parameters;
     }
     
-    public String getPreparedSQL(Map parameters) {
-        String sql = (new ReportManager()).getSQL(this.templateId);
-        int cursor1 = 0;
-        while ((cursor1 = sql.indexOf("{")) != -1) {
-            int cursor2 = sql.indexOf("}", cursor1);
-            String paramId = sql.substring(cursor1+1, cursor2);
-
-            String[] substValues = (String[]) parameters.get(paramId);
-            if (substValues == null) { //if type textlist or this param isn't in the request
-                substValues = (String[]) parameters.get(paramId + ":list");
-                if (substValues != null) {
-                    substValues[0] = substValues[0].replaceAll(" ", "");
-                    substValues = StringUtils.splitToStringArray(substValues[0], ",");
-                } else if (parameters.get(paramId + ":check") != null) {
-                    substValues = new String[0];
-                } else return "";
-            }
-            if (substValues.length == 1) //if one valuemnmmnm
-                sql = sql.substring(0, cursor1) + substValues[0] + sql.substring(cursor2+1);
-            else { //if multiple values
-                //DynamicElement curelement = getDynamicElement(dynamicElementId);
-                if (cursor1 != 0 && (sql.charAt(cursor1-1) == '\'' || sql.charAt(cursor1-1) == '\"')) {
-                    sql = sql.substring(0, cursor1) + StringUtils.join(substValues, sql.charAt(cursor1-1) + "," + sql.charAt(cursor1-1)) + sql.substring(cursor2+1);
-                } else {
-                    sql = sql.substring(0, cursor1) + StringUtils.join(substValues, ",") + sql.substring(cursor2+1);
-                }
-                
-            }
-        }
-        MiscUtils.getLogger().debug("<REPORT BY TEMPLATE> SQL: " + sql);
-        return sql;
-    }
-    
-    public String getPreparedSQL(int sequenceNo, Map parameters) {
-        String sql = (new ReportManager()).getSQL(this.templateId);
-        
-        String parts[] = sql.split(";");
-        
-        if(parts.length <= sequenceNo) {
-        	return null;
-        }
-        sql = parts[sequenceNo];
-        
-        
-        int cursor1 = 0;
-        while ((cursor1 = sql.indexOf("{")) != -1) {
-            int cursor2 = sql.indexOf("}", cursor1);
-            String paramId = sql.substring(cursor1+1, cursor2);
-
-            String[] substValues = (String[]) parameters.get(paramId);
-            if (substValues == null) { //if type textlist or this param isn't in the request
-                substValues = (String[]) parameters.get(paramId + ":list");
-                if (substValues != null) {
-                    substValues[0] = substValues[0].replaceAll(" ", "");
-                    substValues = StringUtils.splitToStringArray(substValues[0], ",");
-                } else if (parameters.get(paramId + ":check") != null) {
-                    substValues = new String[0];
-                } else return "";
-            }
-            if (substValues.length == 1) //if one valuemnmmnm
-                sql = sql.substring(0, cursor1) + substValues[0] + sql.substring(cursor2+1);
-            else { //if multiple values
-                //DynamicElement curelement = getDynamicElement(dynamicElementId);
-                if (cursor1 != 0 && (sql.charAt(cursor1-1) == '\'' || sql.charAt(cursor1-1) == '\"')) {
-                    sql = sql.substring(0, cursor1) + StringUtils.join(substValues, sql.charAt(cursor1-1) + "," + sql.charAt(cursor1-1)) + sql.substring(cursor2+1);
-                } else {
-                    sql = sql.substring(0, cursor1) + StringUtils.join(substValues, ",") + sql.substring(cursor2+1);
-                }
-                
-            }
-        }
-        MiscUtils.getLogger().debug("<REPORT BY TEMPLATE> SQL: " + sql);
-        return sql;
-    }
+//    public String getPreparedSQL(Map parameters) {
+//        String sql = (new ReportManager()).getSQL(this.templateId);
+//        int cursor1 = 0;
+//        while ((cursor1 = sql.indexOf("{")) != -1) {
+//            int cursor2 = sql.indexOf("}", cursor1);
+//            String paramId = sql.substring(cursor1+1, cursor2);
+//
+//            String[] substValues = (String[]) parameters.get(paramId);
+//            if (substValues == null) { //if type textlist or this param isn't in the request
+//                substValues = (String[]) parameters.get(paramId + ":list");
+//                if (substValues != null) {
+//                    substValues[0] = substValues[0].replaceAll(" ", "");
+//                    substValues = StringUtils.splitToStringArray(substValues[0], ",");
+//                } else if (parameters.get(paramId + ":check") != null) {
+//                    substValues = new String[0];
+//                } else return "";
+//            }
+//            if (substValues.length == 1) //if one valuemnmmnm
+//                sql = sql.substring(0, cursor1) + substValues[0] + sql.substring(cursor2+1);
+//            else { //if multiple values
+//                //DynamicElement curelement = getDynamicElement(dynamicElementId);
+//                if (cursor1 != 0 && (sql.charAt(cursor1-1) == '\'' || sql.charAt(cursor1-1) == '\"')) {
+//                    sql = sql.substring(0, cursor1) + StringUtils.join(substValues, sql.charAt(cursor1-1) + "," + sql.charAt(cursor1-1)) + sql.substring(cursor2+1);
+//                } else {
+//                    sql = sql.substring(0, cursor1) + StringUtils.join(substValues, ",") + sql.substring(cursor2+1);
+//                }
+//
+//            }
+//        }
+//        MiscUtils.getLogger().debug("<REPORT BY TEMPLATE> SQL: " + sql);
+//        return sql;
+//    }
+//
+//    public String getPreparedSQL(int sequenceNo, Map parameters) {
+//        String sql = (new ReportManager()).getSQL(this.templateId);
+//
+//        String parts[] = sql.split(";");
+//
+//        if(parts.length <= sequenceNo) {
+//        	return null;
+//        }
+//        sql = parts[sequenceNo];
+//
+//
+//        int cursor1 = 0;
+//        while ((cursor1 = sql.indexOf("{")) != -1) {
+//            int cursor2 = sql.indexOf("}", cursor1);
+//            String paramId = sql.substring(cursor1+1, cursor2);
+//
+//            String[] substValues = (String[]) parameters.get(paramId);
+//            if (substValues == null) { //if type textlist or this param isn't in the request
+//                substValues = (String[]) parameters.get(paramId + ":list");
+//                if (substValues != null) {
+//                    substValues[0] = substValues[0].replaceAll(" ", "");
+//                    substValues = StringUtils.splitToStringArray(substValues[0], ",");
+//                } else if (parameters.get(paramId + ":check") != null) {
+//                    substValues = new String[0];
+//                } else return "";
+//            }
+//            if (substValues.length == 1) //if one valuemnmmnm
+//                sql = sql.substring(0, cursor1) + substValues[0] + sql.substring(cursor2+1);
+//            else { //if multiple values
+//                //DynamicElement curelement = getDynamicElement(dynamicElementId);
+//                if (cursor1 != 0 && (sql.charAt(cursor1-1) == '\'' || sql.charAt(cursor1-1) == '\"')) {
+//                    sql = sql.substring(0, cursor1) + StringUtils.join(substValues, sql.charAt(cursor1-1) + "," + sql.charAt(cursor1-1)) + sql.substring(cursor2+1);
+//                } else {
+//                    sql = sql.substring(0, cursor1) + StringUtils.join(substValues, ",") + sql.substring(cursor2+1);
+//                }
+//
+//            }
+//        }
+//        MiscUtils.getLogger().debug("<REPORT BY TEMPLATE> SQL: " + sql);
+//        return sql;
+//    }
     
     public int getActive() {
         return active;

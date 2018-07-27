@@ -35,56 +35,84 @@
 package oscar.oscarReport.reportByTemplate.actions;
 
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.jcs.access.exception.InvalidArgumentException;
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
-import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.report.reportByTemplate.exception.ReportByTemplateException;
+import org.oscarehr.report.reportByTemplate.model.ReportTemplates;
+import org.oscarehr.report.reportByTemplate.service.ReportByTemplateService;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 
-import oscar.oscarReport.reportByTemplate.ReportManager;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  *
  * @author apavel (Paul)
  */
 public class UploadTemplates extends Action {
+    private static final Logger logger = MiscUtils.getLogger();
+    private static ReportByTemplateService reportByTemplateService = SpringUtils.getBean(ReportByTemplateService.class);
+
     public ActionForward execute(ActionMapping mapping, ActionForm form,
-                                 HttpServletRequest request, HttpServletResponse response) {
-    	
-    	String roleName$ = (String)request.getSession().getAttribute("userrole") + "," + (String) request.getSession().getAttribute("user");
-    	if(!com.quatro.service.security.SecurityManager.hasPrivilege("_admin", roleName$)  && !com.quatro.service.security.SecurityManager.hasPrivilege("_report", roleName$)) {
-    		throw new SecurityException("Insufficient Privileges");
-    	}
-		
-         String action = request.getParameter("action");
-         String message = "Error: Improper request - Action param missing";
-         FormFile file = (FormFile) form.getMultipartRequestHandler().getFileElements().get("templateFile");
-         String xml = "";
-         try {
+                                 HttpServletRequest request, HttpServletResponse response)
+    {
+        String action = request.getParameter("action");
+        boolean adminVerifiedChecked = Boolean.parseBoolean(request.getParameter("admin_verified"));
+        String sessionProviderNo = (String) request.getSession().getAttribute("user");
+        String templateIdStr = request.getParameter("templateid");
+        String templateIdStrReturn = templateIdStr;
+
+        String message;
+        try
+        {
+            FormFile file = (FormFile) form.getMultipartRequestHandler().getFileElements().get("templateFile");
+
             byte[] bytes = file.getFileData();
-            xml = new String(bytes);
-         } catch (IOException ioe) {
-             message = "Exception: File Not Found";
-             MiscUtils.getLogger().error("Error", ioe);
-         }
-         ReportManager reportManager = new ReportManager();
-         if (action.equals("add")) {
-             message = reportManager.addTemplate(null, xml, LoggedInInfo.getLoggedInInfoFromSession(request));
-         } else if (action.equals("edit")) {
-             String templateId = request.getParameter("templateid");
-             message = reportManager.updateTemplate(null, templateId, xml, LoggedInInfo.getLoggedInInfoFromSession(request));
-         }
-         request.setAttribute("message", message);
-         request.setAttribute("action", action);
-         request.setAttribute("templateid", request.getParameter("templateid"));
-         request.setAttribute("opentext", request.getParameter("opentext"));
-         return mapping.findForward("success");
+            String xml = new String(bytes);
+
+            ReportTemplates template;
+            if(action.equals("add"))
+            {
+                template = reportByTemplateService.addTemplate(xml, sessionProviderNo, adminVerifiedChecked);
+            }
+            else if(action.equals("edit"))
+            {
+                template = reportByTemplateService.updateTemplate(Integer.parseInt(templateIdStr), xml, sessionProviderNo, adminVerifiedChecked);
+            }
+            else
+            {
+                throw new InvalidArgumentException("Invalid action: " + action);
+            }
+            templateIdStrReturn = String.valueOf(template.getId());
+            message = "Success";
+        }
+        catch(ReportByTemplateException e)
+        {
+            logger.warn(e.getMessage());
+            message = e.getPublicMessage();
+        }
+        catch(IOException ioe)
+        {
+            message = "File Not Found";
+            logger.error("Error", ioe);
+        }
+        catch(Exception e)
+        {
+            logger.error("Error", e);
+            message = "Error, invalid.";
+        }
+
+        request.setAttribute("message", message);
+        request.setAttribute("action", action);
+        request.setAttribute("templateid", templateIdStrReturn);
+        request.setAttribute("opentext", request.getParameter("opentext"));
+        return mapping.findForward("success");
     }
 }

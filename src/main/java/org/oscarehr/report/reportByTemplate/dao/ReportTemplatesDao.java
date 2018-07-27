@@ -37,6 +37,12 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unchecked")
 public class ReportTemplatesDao extends AbstractDao<ReportTemplates>
 {
+
+	public ReportTemplatesDao()
+	{
+		super(ReportTemplates.class);
+	}
+
 	public List<ReportTemplates> getTemplateList(Integer limit, Integer offset)
 	{
 		String sqlCommand = "SELECT x FROM ReportTemplates x WHERE x.active=:active";
@@ -55,10 +61,6 @@ public class ReportTemplatesDao extends AbstractDao<ReportTemplates>
 
 		List<ReportTemplates> results = query.getResultList();
 		return results;
-	}
-
-	public ReportTemplatesDao() {
-		super(ReportTemplates.class);
 	}
 	
 	public List<ReportTemplates> findAll() {

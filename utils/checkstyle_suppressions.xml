@@ -13,4 +13,5 @@
 	 -->
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="2017-06-14.addSnomedCoreTable.sql" />
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="2018-02-08.change_log_tables_to_MyISAM.sql" />
+	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="SQLReporter.java" />
 </suppressions>

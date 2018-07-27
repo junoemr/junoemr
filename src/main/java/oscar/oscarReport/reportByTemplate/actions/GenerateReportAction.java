@@ -27,39 +27,48 @@
 
 package oscar.oscarReport.reportByTemplate.actions;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import oscar.oscarReport.reportByTemplate.ReportFactory;
 import oscar.oscarReport.reportByTemplate.Reporter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created on December 21, 2006, 10:47 AM
  * @author apavel (Paul)
  */
-public class GenerateReportAction extends Action {
-    public ActionForward execute(ActionMapping mapping, ActionForm form,
-                                 HttpServletRequest request, HttpServletResponse response) {
-       
-    	String roleName$ = (String)request.getSession().getAttribute("userrole") + "," + (String) request.getSession().getAttribute("user");
-    	if(!com.quatro.service.security.SecurityManager.hasPrivilege("_admin", roleName$)  && !com.quatro.service.security.SecurityManager.hasPrivilege("_report", roleName$)) {
-    		throw new SecurityException("Insufficient Privileges");
-    	}
-    	
-        Reporter reporter = ReportFactory.getReporter(request.getParameter("type"));
-        
-        if( reporter.generateReport(request)) {
-            return mapping.findForward("success");
-        }
-                
-        return mapping.findForward("fail");
-        
-        
-    }
-    
+public class GenerateReportAction extends Action
+{
+	private static final Logger logger = MiscUtils.getLogger();
+	private static SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+	                             HttpServletRequest request, HttpServletResponse response)
+	{
+		String sessionProviderNo = (String) request.getSession().getAttribute("user");
+		securityInfoManager.requireAllPrivilege(sessionProviderNo, SecurityInfoManager.READ, null, "_admin", "_report");
+
+		try
+		{
+			Reporter reporter = ReportFactory.getReporter(request.getParameter("type"));
+			if(reporter.generateReport(request))
+			{
+				return mapping.findForward("success");
+			}
+		}
+		catch(Exception e)
+		{
+			logger.error("Error", e);
+		}
+		return mapping.findForward("fail");
+	}
+
 }

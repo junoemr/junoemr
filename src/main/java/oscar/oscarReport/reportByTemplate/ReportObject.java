@@ -27,7 +27,6 @@
 package oscar.oscarReport.reportByTemplate;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 public interface ReportObject
 {
@@ -41,13 +40,9 @@ public interface ReportObject
 
 	public ArrayList getParameters();
 
-	public String getPreparedSQL(Map parameters);
-
 	public int getActive();
 
 	public boolean isSuperAdminVerified();
 
 	public boolean isSequence();
-
-	public String getPreparedSQL(int sequenceNo, Map parameters);
 }
