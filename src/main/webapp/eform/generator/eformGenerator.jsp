@@ -36,7 +36,7 @@
 	<link href= "<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0/themes/vader/jquery-ui.min.css" rel="stylesheet">
 
 	<!-- javascript file for the signature pads -- optional -->
-	<script src="<%= request.getContextPath() %>/eform/displayImage.do?imagefile=signature_pad.min.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/signature_pad.min.js"></script>
 
 	<script>
 		/* Hack to load jquery requirements from jquery site when run outside of oscar */
@@ -725,7 +725,7 @@
 				source += "\<script src='\$\{oscar_javascript_path\}eforms/faxControl.js'\>\<\/script\>";
 			}
 			if ($signature_data.length > 0) {
-				source += "\<script src='\$\{oscar_image_path\}signature_pad.min.js'\>\<\/script\>";
+				source += "\<script src='\$\{oscar_javascript_path\}signature_pad.min.js'\>\<\/script\>";
 			}
 			source += "<style>";
 			var baseStyle = document.getElementById('eform_style');
@@ -1938,7 +1938,7 @@
 		/** signature tab init */
 		function initSignatureTemplateTab($tab) {
 			if (!signaturePadLoaded) {
-				$tab.append($("<span>", {text: "Missing External Signature File. Ensure signature_pad.js is in the same directory as the generator and refresh"}));
+				$tab.append($("<span>", {text: "Missing External Signature Source Code File"}));
 				return;
 			}
 			var $dragFrame1 = createStitchFrame();
