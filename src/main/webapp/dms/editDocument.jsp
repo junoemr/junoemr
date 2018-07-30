@@ -253,11 +253,12 @@ for (String reportClass : reportClasses) {
                             </select>
                         </td>
 		</tr>
-                <tr>
-                        <td><bean:message key="dms.addDocument.msgDocSubClass"/>:</td>
-                        <td><input type="text" name="docSubClass" id="docSubClass" value="<%=formdata.getDocSubClass()%>" style="width:330px">
-                            <div class="autocomplete_style" id="docSubClass_list"></div>
-                        </td>
+		<tr>
+			<td><bean:message key="dms.addDocument.msgDocSubClass"/>:</td>
+			<td><input type="text" name="docSubClass" id="docSubClass"
+					   value="<%=(formdata.getDocSubClass() != null) ? formdata.getDocSubClass() : ""%>" style="width:330px">
+				<div class="autocomplete_style" id="docSubClass_list"></div>
+			</td>
 		</tr>
 		<tr>
 			<td>Description:</td>
@@ -301,11 +302,13 @@ for (String reportClass : reportClasses) {
 		</tr>
 		<tr>
 			<td>Source Author:</td>
-			<td><input type="text" name="source" size="15" value="<%=formdata.getSource()%>"/></td>
+			<td><input type="text" name="source" size="15"
+					   value="<%=(formdata.getSource() != null) ? formdata.getSource() : ""%>"/></td>
 		</tr>
 		<tr>
 			<td>Source Facility:</td>
-			<td><input type="text" name="sourceFacility" size="15" value="<%=formdata.getSourceFacility()%>"/></td>
+			<td><input type="text" name="sourceFacility" size="15"
+					   value="<%=(formdata.getSourceFacility() != null) ? formdata.getSourceFacility() : ""%>"/></td>
 		</tr>
 		<% if (module.equals("provider")) {%>
 		<tr>
