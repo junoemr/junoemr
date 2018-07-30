@@ -444,6 +444,7 @@ function signatureHandler(e) {
 	e.target.onbeforeunload = null;
 	<% if (OscarProperties.getInstance().isRxFaxEnabled()) { //%>
 	e.target.document.getElementById("faxButton").disabled = !hasFaxNumber || !e.isSave;
+	e.target.document.getElementById("faxAndPasteButton").disabled = !hasFaxNumber || !e.isSave;
 	<% } %>
 	if (e.isSave) {
 		<% if (OscarProperties.getInstance().isRxFaxEnabled()) { //%>
@@ -654,6 +655,7 @@ function toggleView(form) {
 							onClick="javascript:printPaste2Parent(true);" /></span></td>
 					</tr>
 					<% if (OscarProperties.getInstance().isRxFaxEnabled()) {
+							boolean hasFaxNumber = pharmacy != null && pharmacy.getFax().trim().length() > 0 ? true : false;
 					    	FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
 					    	List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
 
@@ -671,16 +673,22 @@ function toggleView(form) {
 								imgFile += bean.getProviderNo() + ".png";
 							}
 							File f = new File(imgFile);
-                            if(f.exists() && !f.isDirectory())
+                            if(f.exists() && !f.isDirectory() && hasFaxNumber)
                             {
                                 disabled = "";
                             }
                         }
 					    %>
+					<tr>
+						<td><span><input type=button value="Fax"
+										 class="ControlPushButton" id="faxButton" style="width: 150px"
+										 onClick="sendFax();" <%= disabled %> /></span>
+						</td>
+					</tr>
 					<tr>                            
                             <td><span><input type=button value="Fax & Paste into EMR"
-                                    class="ControlPushButton" id="faxButton" style="width: 150px"
-                                    onClick="printPaste2Parent(false);sendFax();" <%= disabled %> /></span>
+                                    class="ControlPushButton" id="faxAndPasteButton" style="width: 150px"
+                                    onClick="printPaste2Parent(false);sendFax();" <%= isReprint || !hasFaxNumber?"disabled='true'":"" %> /></span>
                            </td>
                     </tr>
                     <% } %>
