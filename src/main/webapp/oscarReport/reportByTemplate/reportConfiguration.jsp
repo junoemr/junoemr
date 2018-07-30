@@ -34,6 +34,9 @@
 <%@ page import="oscar.oscarReport.reportByTemplate.Parameter" %>
 <%@ page import="oscar.oscarReport.reportByTemplate.ReportObject" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="org.oscarehr.common.model.Explain" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
@@ -116,8 +119,32 @@
 			if(request.getAttribute("errormsg") != null)
 			{
 			String errormsg = (String) request.getAttribute("errormsg");%>
-		<div class="warning"><%=errormsg%></div>
-		<%}%>
+			<div class="warning"><%=errormsg%>
+			</div>
+			<% if(request.getAttribute("explainResults") != null)
+			{ %>
+			<table class="table-explain">
+				<tr>
+					<th>Table</th>
+					<th>Rows</th>
+				</tr>
+				<%
+					List<Explain> explainResultList = (List<Explain>) request.getAttribute("explainResults");
+					for(Explain result : explainResultList)
+					{
+				%>
+				<tr>
+					<td><%=StringUtils.trimToEmpty(result.getTable())%> </td>
+					<td><%=(result.getRows() != null) ? result.getRows() : ""%></td>
+				</tr>
+				<%
+					}
+				%>
+			</table>
+			<%
+
+					}
+				}%>
 		<div class="reportTitle"
 			<%if (curreport.getTitle().indexOf("Error") != -1) {%>
 			style="color: red;" <%}%>><%=curreport.getTitle()%></div>

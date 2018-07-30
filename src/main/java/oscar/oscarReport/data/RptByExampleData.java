@@ -25,94 +25,86 @@
 
 package oscar.oscarReport.data;
 
+import oscar.oscarDB.DBPreparedHandler;
+
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import org.oscarehr.util.MiscUtils;
-
-import oscar.oscarDB.DBPreparedHandler;
-
 
 /**
-*This classes main function FluReportGenerate collects a group of patients with flu in the last specified date
-*/
-public class RptByExampleData {
+ * This classes main function FluReportGenerate collects a group of patients with flu in the last specified date
+ */
+public class RptByExampleData
+{
 
-    public ArrayList demoList = null;
-    public String sql= "";
-    public String results= null;
-    public String connect = null;
-    DBPreparedHandler accessDB=null;
-  Properties oscarVariables = null;
+	public ArrayList demoList = null;
+	public String sql = "";
+	public String results = null;
+	public String connect = null;
+	private DBPreparedHandler accessDB = null;
+	private Properties oscarVariables = null;
 
+	public RptByExampleData()
+	{
+	}
 
-    public RptByExampleData() {
-    }
+	public String exampleTextGenerate(String sql, Properties oscarVariables) throws SQLException
+	{
+		return exampleReportGenerate(sql, oscarVariables);
+	}
 
+	public String exampleReportGenerate(String sql, Properties oscarVariables) throws SQLException
+	{
+		this.sql = prepareUserQuery(sql);
+		this.oscarVariables = oscarVariables;
 
-    public String exampleTextGenerate (String sql, Properties oscarVariables ){
-	return exampleReportGenerate(sql, oscarVariables);
-    }
+		accessDB = new DBPreparedHandler();
 
-    public String exampleReportGenerate( String sql, Properties oscarVariables ){
+		ResultSet rs = accessDB.queryResults(this.sql);
 
-           if (sql.compareTo("") != 0){
+		if(rs != null)
+		{
+			results = RptResultStruct.getStructure(rs);
+			rs.close();
+		}
+		else
+		{
+			results = "";
+		}
+		return results;
+	}
 
+	public static String prepareUserQuery(String userQuery)
+	{
+		if(userQuery == null || userQuery.trim().isEmpty())
+		{
+			return null;
+		}
+		userQuery = replaceSQLString(";", "", userQuery);
+		userQuery = replaceSQLString("\"", "\'", userQuery);
 
+		return userQuery;
+	}
 
-             sql = replaceSQLString (";","",sql);
-             sql =  replaceSQLString("\"", "\'", sql);
+	private static String replaceSQLString(String oldString, String newString, String inputString)
+	{
 
-		 }
-        this.sql = sql;
-        this.oscarVariables = oscarVariables;
-
-       try{
-
-accessDB = new DBPreparedHandler();
-
-
-ResultSet rs = null;
-rs = accessDB.queryResults(this.sql);
-
-
-
-      if (rs != null){
-
-             results =  RptResultStruct.getStructure(rs);
-} else {
-	results = "";
-
-}
-
-              rs.close();
-
-
-
-        }catch (java.sql.SQLException e){ MiscUtils.getLogger().debug("Problems");   MiscUtils.getLogger().error("Error", e);  }
-
-     return results;
-    }
-
-
-
-public static String replaceSQLString
-(String oldString, String newString, String inputString){
-
-String outputString = "";
-int i;
-for (i=0; i<inputString.length(); i++) {
-if (!(inputString.regionMatches (true, i, oldString,
-0, oldString.length())))
-outputString += inputString.charAt(i);
-else {
-outputString += newString;
-i += oldString.length()-1;
-}
-}
-return outputString;
-}
-
-
+		String outputString = "";
+		int i;
+		for(i = 0; i < inputString.length(); i++)
+		{
+			if(!(inputString.regionMatches(true, i, oldString, 0, oldString.length())))
+			{
+				outputString += inputString.charAt(i);
+			}
+			else
+			{
+				outputString += newString;
+				i += oldString.length() - 1;
+			}
+		}
+		return outputString;
+	}
 };

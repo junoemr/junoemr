@@ -1,4 +1,6 @@
-<%--
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.oscarehr.common.model.Explain" %>
+<%@ page import="java.util.List" %><%--
 
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
@@ -25,110 +27,158 @@
 --%>
 
 
-<%@ page import="java.util.*,oscar.oscarReport.data.*"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 
-<%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
+<%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 <%
-      String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-      boolean authed=true;
+	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+	boolean authed = true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.userAdmin" rights="r" reverse="<%=true%>">
-	<%authed=false; %>
+	<%authed = false; %>
 	<%response.sendRedirect("../securityError.jsp?type=_report&type=_admin.reporting");%>
 </security:oscarSec>
 <%
-if(!authed) {
-	return;
-}
+	if(!authed)
+	{
+		return;
+	}
 %>
 
 <link rel="stylesheet" type="text/css"
-	href="../oscarEncounter/encounterStyles.css">
+      href="../oscarEncounter/encounterStyles.css">
 <html:html locale="true">
-<script language="JavaScript" type="text/JavaScript">
+	<script language="JavaScript" type="text/JavaScript">
 <!--
-function reloadPage(init) {  //reloads the window if Nav4 resized
-  if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
-    document.pgW=innerWidth; document.pgH=innerHeight; onresize=reloadPage; }}
-  else if (innerWidth!=document.pgW || innerHeight!=document.pgH) location.reload();
+function reloadPage(init)
+{  //reloads the window if Nav4 resized
+	if (init == true) with (navigator)
+	{
+		if ((appName == "Netscape") && (parseInt(appVersion) == 4))
+		{
+			document.pgW = innerWidth;
+			document.pgH = innerHeight;
+			onresize = reloadPage;
+		}
+	}
+	else if (innerWidth != document.pgW || innerHeight != document.pgH) location.reload();
 }
+
 reloadPage(true);
 
-function findObj(n, d) { //v4.01
-  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
-    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
-  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
-  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=findObj(n,d.layers[i].document);
-  if(!x && d.getElementById) x=d.getElementById(n); return x;
+function findObj(n, d)
+{ //v4.01
+	var p, i, x;
+	if (!d) d = document;
+	if ((p = n.indexOf("?")) > 0 && parent.frames.length)
+	{
+		d = parent.frames[n.substring(p + 1)].document;
+		n = n.substring(0, p);
+	}
+	if (!(x = d[n]) && d.all) x = d.all[n];
+	for (i = 0; !x && i < d.forms.length; i++) x = d.forms[i][n];
+	for (i = 0; !x && d.layers && i < d.layers.length; i++) x = findObj(n, d.layers[i].document);
+	if (!x && d.getElementById) x = d.getElementById(n);
+	return x;
 }
 
-function showHideLayers() { //v6.0
-  var i,p,v,obj,args=showHideLayers.arguments;
-  for (i=0; i<(args.length-2); i+=3) if ((obj=findObj(args[i]))!=null) { v=args[i+2];
-    if (obj.style) { obj=obj.style; v=(v=='show')?'visible':(v=='hide')?'hidden':v; }
-    obj.visibility=v; }
+function showHideLayers()
+{ //v6.0
+	var i, p, v, obj, args = showHideLayers.arguments;
+	for (i = 0; i < (args.length - 2); i += 3) if ((obj = findObj(args[i])) != null)
+	{
+		v = args[i + 2];
+		if (obj.style)
+		{
+			obj = obj.style;
+			v = (v == 'show') ? 'visible' : (v == 'hide') ? 'hidden' : v;
+		}
+		obj.visibility = v;
+	}
+}
+
+var remote = null;
+function rs(n, u, w, h, x)
+{
+	args = "width=" + w + ",height=" + h + ",resizable=yes,scrollbars=yes,status=0,top=60,left=30";
+	remote = window.open(u, n, args);
+	// if (remote != null) {
+	//    if (remote.opener == null)
+	//        remote.opener = self;
+	// }
+	// if (x == 1) { return remote; }
+}
+
+function popupOscarFluConfig(vheight, vwidth, varpage)
+{ //open a new popup window
+	var page = varpage;
+	windowprops = "height=" + vheight + ",width=" + vwidth + ",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=0,left=0";
+	var popup = window.open(varpage, "OscarFluConfig", windowprops);
+	if (popup != null)
+	{
+		if (popup.opener == null)
+		{
+			popup.opener = self;
+		}
+	}
+}
+
+
+function write2TextArea()
+{
+	if (document.forms[0].selectedRecentSearch.options[document.forms[0].selectedRecentSearch.selectedIndex].value == 'Recent Search')
+		document.forms[0].sql.value = '';
+	else
+	{
+		var selectedQuery = document.forms[0].selectedRecentSearch.options[document.forms[0].selectedRecentSearch.selectedIndex].value;
+		document.forms[0].sql.value = selectedQuery;
+	}
 }
 //-->
-</script>
-<head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<title><bean:message
-	key="oscarReport.RptByExample.MsgQueryByExamples" /></title>
+	</script>
+	<head>
+		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+		<title><bean:message
+				key="oscarReport.RptByExample.MsgQueryByExamples"/></title>
+		<link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"/>
+		<style type="text/css" media="print">
+			.header {
+				display: none;
+			}
 
-<link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
-<style type="text/css" media="print">
-.header {
-	display: none;
-}
+			.header INPUT {
+				display: none;
+			}
 
-.header INPUT {
-	display: none;
-}
+			.header A {
+				display: none;
+			}
 
-.header A {
-	display: none;
-}
-</style>
-<script type="text/javascript">
-   var remote=null;
-
-   function rs(n,u,w,h,x) {
-      args="width="+w+",height="+h+",resizable=yes,scrollbars=yes,status=0,top=60,left=30";
-      remote=window.open(u,n,args);
-     // if (remote != null) {
-     //    if (remote.opener == null)
-     //        remote.opener = self;
-     // }
-     // if (x == 1) { return remote; }
-   }
-
-   function popupOscarFluConfig(vheight,vwidth,varpage) { //open a new popup window
-     var page = varpage;
-     windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=0,left=0";
-     var popup=window.open(varpage, "OscarFluConfig", windowprops);
-     if (popup != null) {
-       if (popup.opener == null) {
-        popup.opener = self;
-       }
-    }
-  }
-  
-    
-
-    function write2TextArea(){ 
-        if (document.forms[0].selectedRecentSearch.options[document.forms[0].selectedRecentSearch.selectedIndex].value=='Recent Search')
-            document.forms[0].sql.value = '';
-        else{
-            var selectedQuery = document.forms[0].selectedRecentSearch.options[document.forms[0].selectedRecentSearch.selectedIndex].value;
-            document.forms[0].sql.value = selectedQuery;
-        }
-     }
-</script>
-
-</head>
+			.error-message {
+				color: red;
+				font-size: 24px;
+			}
+			.table-explain {
+				border: 1px solid black;
+				border-collapse: collapse;
+			}
+			.table-explain th {
+				border: 1px solid black;
+				text-align: left;
+				font-size: 16px;
+				font-weight: bold;
+				padding: 8px;
+			}
+			.table-explain td {
+				border: 1px solid black;
+				text-align: left;
+				font-size: 14px;
+				padding: 8px;
+			}
+		</style>
+	</head>
 
 <body vlink="#0000FF" class="BodyStyle">
 <div id="Layer1"
@@ -216,6 +266,31 @@ function showHideLayers() { //v6.0
 			<td class="MainTableBottomRowRightColumn">&nbsp;</td>
 		</tr>
 </table>
+
+<logic:present name="errorMessage">
+	<div><span class="error-message"><bean:write name="errorMessage" filter="false"/></span></div>
+
+	<logic:present name="explainResults">
+		<table class="table-explain">
+			<tr>
+				<th>Table</th>
+				<th>Rows</th>
+			</tr>
+			<%
+				List<Explain> explainResultList = (List<Explain>) request.getAttribute("explainResults");
+				for(Explain result : explainResultList)
+				{
+			%>
+			<tr>
+				<td><%=StringUtils.trimToEmpty(result.getTable())%></td>
+				<td><%=(result.getRows() != null)?result.getRows(): ""%></td>
+			</tr>
+			<%
+				}
+			%>
+		</table>
+	</logic:present>
+</logic:present>
 
 </html:form>
 </body>

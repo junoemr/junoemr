@@ -1513,6 +1513,7 @@
 		</action>
 		<action input="/oscarReport/RptByExample.jsp" name="RptByExampleForm" path="/oscarReport/RptByExample" scope="request" type="oscar.oscarReport.pageUtil.RptByExampleAction">
 			<forward name="success" path="/oscarReport/RptByExample.jsp" />
+			<forward name="failure" path="/oscarReport/RptByExample.jsp" />
 		</action>
 		<action input="/admin/gstControl.jsp" name="GstControlForm" path="/admin/GstControl" scope="request" type="oscar.oscarBilling.ca.on.administration.GstControlAction">
 			<forward name="success" path="/admin/gstControl.jsp" />
