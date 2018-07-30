@@ -477,7 +477,7 @@
 													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgPatient"/>
 										</a>
 									</th>
-									<%	if (OscarProperties.getInstance().isPropertyActive("view_consultation_requests.showPatientEmails"))
+									<%	if (OscarProperties.getInstance().isPropertyActive("view_consultation_requests.show_patient_emails"))
 									{ %>
 									<th align="left" class="VCRheads" width="75">
 											<a href=# onclick="setOrder('11'); return false;">
@@ -659,7 +659,7 @@
 											<%=patient%>
 										</a>
 									</td>
-									<%	if (OscarProperties.getInstance().isPropertyActive("view_consultation_requests.showPatientEmails"))
+									<%	if (OscarProperties.getInstance().isPropertyActive("view_consultation_requests.show_patient_emails"))
 									{ %>
 									<td class="stat<%=status%>">
 										<a href="mailto:<%=patientEmail%>">
