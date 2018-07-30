@@ -662,13 +662,13 @@ function toggleView(form) {
 						oscar.oscarRx.data.RxPrescriptionData.Prescription rx = bean.getStashItem(bean.getStashSize()-1);
                         if(oscar.OscarProperties.getInstance().isPropertyActive("rx_preset_signatures"))
                         {
-							String imgFile;
+							String imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image", "") + "doctor_signature_";
                         	if (rx.getProviderNo() != null)
 							{
-								imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image", "") + "doctor_signature_" + rx.getProviderNo() + ".png";
+								imgFile += rx.getProviderNo() + ".png";
 							} else
 							{
-								imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image", "") + "doctor_signature_" + bean.getProviderNo() + ".png";
+								imgFile += bean.getProviderNo() + ".png";
 							}
 							File f = new File(imgFile);
                             if(f.exists() && !f.isDirectory())
