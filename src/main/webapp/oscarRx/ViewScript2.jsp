@@ -655,7 +655,7 @@ function toggleView(form) {
 							onClick="javascript:printPaste2Parent(true);" /></span></td>
 					</tr>
 					<% if (OscarProperties.getInstance().isRxFaxEnabled()) {
-							boolean hasFaxNumber = pharmacy != null && pharmacy.getFax().trim().length() > 0 ? true : false;
+							boolean hasFaxNumber = (pharmacy != null) && (pharmacy.getFax().trim().length() > 0);
 					    	FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
 					    	List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
 
