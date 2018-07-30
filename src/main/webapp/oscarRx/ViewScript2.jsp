@@ -688,7 +688,7 @@ function toggleView(form) {
 					<tr>                            
                             <td><span><input type=button value="Fax & Paste into EMR"
                                     class="ControlPushButton" id="faxAndPasteButton" style="width: 150px"
-                                    onClick="printPaste2Parent(false);sendFax();" <%= isReprint || !hasFaxNumber?"disabled='true'":"" %> /></span>
+                                    onClick="printPaste2Parent(false);sendFax();" <%= isReprint?"disabled='true'":disabled %> /></span>
                            </td>
                     </tr>
                     <% } %>
