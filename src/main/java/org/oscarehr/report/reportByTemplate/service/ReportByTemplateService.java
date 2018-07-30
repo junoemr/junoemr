@@ -265,7 +265,7 @@ public class ReportByTemplateService
 		Matcher matcher = pattern.matcher(rawSQL);
 		String jpaSQL;
 
-		Map<Integer,String[]> indexedParams = new HashMap<Integer, String[]>();
+		Map<Integer,String[]> indexedParams = new HashMap<>();
 
 
 		StringBuffer sb = new StringBuffer();

@@ -23,9 +23,6 @@
  */
 package oscar.oscarReport.reportByTemplate.actions;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -35,17 +32,22 @@ import org.oscarehr.common.dao.AppDefinitionDao;
 import org.oscarehr.common.dao.AppUserDao;
 import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
+import org.oscarehr.report.reportByTemplate.dao.ReportTemplatesDao;
+import org.oscarehr.report.reportByTemplate.model.ReportTemplates;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.to.model.RssItem;
 
-import oscar.oscarReport.reportByTemplate.ReportManager;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-public class ExportTemplateAction extends Action {
+public class ExportTemplateAction extends Action
+{
 	private static final AppDefinitionDao appDefinitionDao = SpringUtils.getBean(AppDefinitionDao.class);
 	private static final AppUserDao appUserDao = SpringUtils.getBean(AppUserDao.class);
-	
+	private static final ReportTemplatesDao reportTemplatesDao = SpringUtils.getBean(ReportTemplatesDao.class);
+
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
             HttpServletRequest request, HttpServletResponse response) {
 		MiscUtils.getLogger().debug("Entered manage template action");
@@ -68,9 +70,10 @@ public class ExportTemplateAction extends Action {
 				AppUser k2aUser = appUserDao.findForProvider(k2aApp.getId(),loggedInInfo.getLoggedInProvider().getProviderNo());
 				
 				if(k2aUser != null) {
-					ReportManager reportManager = new ReportManager();
-					String xml = reportManager.getTemplateXml(templateId);
-					
+
+					ReportTemplates template = reportTemplatesDao.find(templateId);
+					String xml = template.getTemplateXml();
+
 					if(xml != null) {
 						RssItem report = new RssItem();
 						report.setName(name);

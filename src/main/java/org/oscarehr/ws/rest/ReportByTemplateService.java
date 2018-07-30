@@ -23,12 +23,8 @@
  */
 package org.oscarehr.ws.rest;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONObject;
 import org.oscarehr.app.AppOAuth1Config;
@@ -39,13 +35,19 @@ import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
 import org.oscarehr.managers.AppManager;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.report.reportByTemplate.dao.ReportTemplatesDao;
+import org.oscarehr.report.reportByTemplate.model.ReportTemplates;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import oscar.oscarReport.reportByTemplate.ReportManager;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 
 @Path("/reportByTemplate")
 public class ReportByTemplateService extends AbstractServiceImpl {
@@ -63,6 +65,12 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 	
 	@Autowired
 	private AppUserDao appUserDao;
+
+	@Autowired
+	private org.oscarehr.report.reportByTemplate.service.ReportByTemplateService reportService;
+
+	@Autowired
+	private ReportTemplatesDao reportTemplatesDao;
 	
 	@GET
 	@Path("/K2AActive/")
@@ -138,10 +146,9 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "w", null)) {
 			throw new RuntimeException("Access Denied");
 		}
-    	
-		ReportManager reportManager = new ReportManager();
-		
-		try {
+
+		try
+		{
 			AppDefinition k2aApp = appDefinitionDao.findByName("K2A");
 			if(k2aApp != null) {
 				AppUser k2aUser = appUserDao.findForProvider(k2aApp.getId(),loggedInInfo.getLoggedInProvider().getProviderNo());
@@ -154,11 +161,21 @@ public class ReportByTemplateService extends AbstractServiceImpl {
 		    		if(jsonString != null && !jsonString.isEmpty()) {
 		    			JSONObject post = new JSONObject(jsonString);
 		    	        	
-		    	        uuid = post.getString("uuid");
+		    	        uuid = StringUtils.trimToNull(post.getString("uuid"));
 		    	        xml = post.getString("body");
 		    		}
-		    		
-					return reportManager.addTemplate(uuid, StringEscapeUtils.unescapeXml(xml), loggedInInfo);
+
+		    		if(uuid != null)
+				    {
+					    ReportTemplates template = reportTemplatesDao.findByUuid(uuid);
+					    reportService.updateTemplate(template.getId(), StringEscapeUtils.unescapeXml(xml), loggedInInfo.getLoggedInProviderNo(), template.isAdminVerified());
+				    }
+				    else
+				    {
+					    reportService.addTemplate(StringEscapeUtils.unescapeXml(xml), loggedInInfo.getLoggedInProviderNo(), false);
+				    }
+		    		return "Saved Successfully";
+
 				} else {
 					return "Failed to download K2A Report By Templates, please contact an administrator";
 				}
