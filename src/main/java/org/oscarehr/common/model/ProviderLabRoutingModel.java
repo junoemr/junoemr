@@ -76,7 +76,7 @@ public class ProviderLabRoutingModel extends AbstractModel<Integer> implements S
 	}
 	
 	public void setStatus(String status) {
-		this.status = StringUtils.trimToNull(providerNo);
+		this.status = status;
 	}
 	
 	public String getComment() {

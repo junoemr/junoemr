@@ -119,22 +119,7 @@ public class ProviderLabRouting {
 
 	public void route(String labId, String provider_no, String labType) throws SQLException
 	{
-		ProviderLabRoutingDao providerLabRoutingDao = (ProviderLabRoutingDao) SpringUtils.getBean("providerLabRoutingDao");
-
-        OscarProperties props = OscarProperties.getInstance();
-        String autoFileLabs = props.getProperty("AUTO_FILE_LABS");
-
         addToLabRouting(labId, provider_no, labType);
-
-		// check to make sure that the lab is set as a new lab for at least one provider
-		// if not, update lab to new for all providers (unless AUTO_FILE_LABS is enabled)
-		if (autoFileLabs == null || !autoFileLabs.equalsIgnoreCase("yes")) {
-			List<ProviderLabRoutingModel> rs = providerLabRoutingDao.getProviderLabRoutingForLabAndType(labId, labType);
-		   if (rs.isEmpty()) {
-			   providerLabRoutingDao.updateStatus(labId,labType);
-		   }
-		}
-
     }
 
     public static HashMap<String,Object> getInfo(String lab_no, String lab_type) throws SQLException {
