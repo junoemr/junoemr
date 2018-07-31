@@ -33,6 +33,7 @@
                  oscar.MyDateFormat,
                  java.util.Date"
 	errorPage="../appointment/errorpage.jsp"%>
+<%@ page import="java.net.URLEncoder" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
@@ -47,6 +48,7 @@
 		Schedule scheduleService = SpringUtils.getBean(Schedule.class);
 
 		String provider_no = request.getParameter("provider_no");
+		String provider_name = request.getParameter("provider_name");
 		String available = request.getParameter("available");
 		String priority = "c";
 		String reason = request.getParameter("reason");
@@ -64,18 +66,19 @@
 				String availHour = scheduleRscheduleBean.getDateAvailHour(dateStr);
 				scheduleService.saveScheduleByDate(provider_no, date, "1", "b", "", availHour, user_name, scheduleRscheduleBean.active);
 			}
+			scheduleDateBean.remove(dateStr);
 		}
 		if(" Save ".equals(request.getParameter("Submit")))
 		{
 			scheduleService.saveScheduleByDate(provider_no, date, available, priority, reason, hour, user_name, scheduleRscheduleBean.active);
 			scheduleDateBean.put(dateStr, new HScheduleDate(available, priority, reason, hour, user_name));
 		}
-		scheduleDateBean.remove(dateStr);
 	%>
 
 <script language="JavaScript">
 <!--
-  opener.location.reload();
+  opener.location.href=opener.location.href+"?provider_no=<%=provider_no%>&provider_name=<%=URLEncoder.encode(provider_name, "UTF-8")%>";
+  opener.location.reload(true);
   self.close();
 //-->
 </script>
