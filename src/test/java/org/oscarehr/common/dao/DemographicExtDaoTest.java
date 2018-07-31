@@ -35,7 +35,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.DemographicExt;
+import org.oscarehr.demographic.dao.DemographicExtDao;
+import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.util.SpringUtils;
 
 public class DemographicExtDaoTest extends DaoTestFixtures {

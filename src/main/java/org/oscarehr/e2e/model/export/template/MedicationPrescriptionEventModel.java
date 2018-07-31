@@ -40,7 +40,7 @@ import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.EntryRelationship;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.SubstanceAdministration;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActRelationshipEntryRelationship;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_DocumentSubstanceMood;
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.model.Drug;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.model.export.template.observation.DoseObservationModel;
 import org.oscarehr.e2e.model.export.template.observation.InstructionObservationModel;

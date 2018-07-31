@@ -27,7 +27,7 @@ package org.oscarehr.ws.external.soap.v1;
 import org.apache.cxf.annotations.GZIP;
 import org.oscarehr.common.model.Facility;
 import org.oscarehr.managers.FacilityManager;
-import org.oscarehr.ws.transfer_objects.FacilityTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.FacilityTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

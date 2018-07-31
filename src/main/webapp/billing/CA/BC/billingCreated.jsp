@@ -39,7 +39,7 @@ if(!authed) {
 }
 %>
 
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
+<%@ page import="org.oscarehr.common.dao.BillingreferralDao"%>
 <%
   if(session.getValue("user") == null)
     response.sendRedirect("../../../logout.jsp");
@@ -48,29 +48,23 @@ if(!authed) {
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 
-<%@ page import="java.util.*, oscar.oscarDemographic.data.*"%>
-<%@ page import="oscar.oscarBilling.ca.bc.data.*,oscar.oscarBilling.ca.bc.pageUtil.*"%>
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.common.model.Billingreferral" %>
-<%@page import="org.oscarehr.common.dao.BillingreferralDao" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.oscarBilling.ca.bc.data.BillingFormData" %>
+<%@ page import="oscar.oscarBilling.ca.bc.pageUtil.BillingBillingManager"%>
+<%@ page import="oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean" %>
+<%@ page import="oscar.oscarBilling.ca.bc.pageUtil.WCBForm" %>
+<%@ page import="java.util.ArrayList" %>
 <%
-	BillingreferralDao billingReferralDao = (BillingreferralDao)SpringUtils.getBean("BillingreferralDAO");
+	BillingreferralDao billingReferralDao = (BillingreferralDao) SpringUtils.getBean("BillingreferralDAO");
+
+	BillingSessionBean bean = (BillingSessionBean) pageContext.findAttribute("billingSessionBean");
+	oscar.oscarDemographic.data.DemographicData demoData = new oscar.oscarDemographic.data.DemographicData();
+	org.oscarehr.common.model.Demographic demo = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), bean.getPatientNo());
+
+	ArrayList billItem = bean.getBillItem();
+	BillingFormData billform = new BillingFormData();
 %>
-<%
-
-String color = "", colorflag ="";
-BillingSessionBean bean = (BillingSessionBean)pageContext.findAttribute("billingSessionBean");
-oscar.oscarDemographic.data.DemographicData demoData = new oscar.oscarDemographic.data.DemographicData();
-org.oscarehr.common.model.Demographic demo = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), bean.getPatientNo());
-
-ArrayList billItem = bean.getBillItem();
-BillingFormData billform = new BillingFormData();
-
-
-%>
-
-
-
 <html>
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
@@ -106,16 +100,11 @@ function rs(n,u,w,h,x) {
 
 var awnd=null;
 function ScriptAttach() {
-
-
   t0 = escape(document.serviceform.xml_diagnostic_detail1.value);
   t1 = escape(document.serviceform.xml_diagnostic_detail2.value);
   t2 = escape(document.serviceform.xml_diagnostic_detail3.value);
   awnd=rs('att','/billingDigSearch.jsp?name='+t0 + '&name1=' + t1 + '&name2=' + t2 + '&search=',600,600,1);
   awnd.focus();
-
-
-
 }
 
 

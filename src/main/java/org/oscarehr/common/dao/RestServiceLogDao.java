@@ -47,4 +47,17 @@ public class RestServiceLogDao extends AbstractDao<RestServiceLog> {
 		List<RestServiceLog> results = query.getResultList();
 		return (results);
 	}
+
+	public List<RestServiceLog> findList(int offset, int limit) {
+		String sqlCommand = "SELECT x FROM " + modelClass.getSimpleName() + " x ORDER BY x.createdAt DESC";
+
+		Query query = entityManager.createQuery(sqlCommand);
+
+		query.setMaxResults(limit);
+		query.setFirstResult(offset);
+
+		List<RestServiceLog> results = query.getResultList();
+		return (results);
+	}
+
 }

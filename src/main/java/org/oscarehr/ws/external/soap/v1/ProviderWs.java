@@ -29,8 +29,8 @@ import org.oscarehr.common.model.Property;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.ws.transfer_objects.ProviderPropertyTransfer;
-import org.oscarehr.ws.transfer_objects.ProviderTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.ProviderPropertyTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

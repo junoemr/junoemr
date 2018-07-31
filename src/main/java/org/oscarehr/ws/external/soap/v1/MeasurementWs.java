@@ -30,8 +30,8 @@ import org.oscarehr.common.model.MeasurementMap;
 import org.oscarehr.managers.MeasurementManager;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.ScheduleManager;
-import org.oscarehr.ws.transfer_objects.MeasurementMapTransfer;
-import org.oscarehr.ws.transfer_objects.MeasurementTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.MeasurementMapTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.MeasurementTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

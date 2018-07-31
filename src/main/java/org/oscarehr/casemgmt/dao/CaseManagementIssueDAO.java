@@ -38,6 +38,10 @@ import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
+/**
+ * @deprecated use the jpa version instead
+ */
+@Deprecated
 public class CaseManagementIssueDAO extends HibernateDaoSupport {
 	
 	private static final Logger logger = MiscUtils.getLogger();

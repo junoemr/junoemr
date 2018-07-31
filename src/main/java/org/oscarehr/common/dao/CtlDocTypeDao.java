@@ -97,4 +97,13 @@ public class CtlDocTypeDao extends AbstractDao<CtlDocType>{
 		}
 		return result;
     }
+
+    public List<CtlDocType> findByModule(String module)
+    {
+	    Query query = entityManager.createQuery("select c from CtlDocType c where c.module=:module order by c.docType asc");
+	    query.setParameter("module", module);
+	    @SuppressWarnings("unchecked")
+	    List<CtlDocType> results = query.getResultList();
+	    return results;
+    }
 }

@@ -47,7 +47,7 @@ import org.oscarehr.common.dao.TicklerDao;
 import org.oscarehr.common.model.ConsultationRequest;
 import org.oscarehr.common.model.EFormGroup;
 import org.oscarehr.common.model.OscarMsgType;
-import org.oscarehr.common.model.Prevention;
+import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.SecRole;
 import org.oscarehr.common.model.Tickler;
@@ -55,7 +55,7 @@ import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.eform.dao.EFormDao.EFormSortOrder;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
-import org.oscarehr.managers.PreventionManager;
+import org.oscarehr.prevention.service.PreventionManager;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -250,11 +250,7 @@ public class EFormUtil {
 		if (deleted.equals("deleted")) current = false;
 		else if (deleted.equals("current")) current = true;
 		
-		List<EFormData> allEformDatas = eFormDataDao.findByDemographicIdCurrent(Integer.parseInt(demographic_no), current, offset, itemsToReturn,sortBy);
-
-	//	if (NAME.equals(sortBy)) Collections.sort(allEformDatas, EFormData.FORM_NAME_COMPARATOR);
-	//	else if (SUBJECT.equals(sortBy)) Collections.sort(allEformDatas, EFormData.FORM_SUBJECT_COMPARATOR);
-	//	else Collections.sort(allEformDatas, EFormData.FORM_DATE_COMPARATOR);
+		List<EFormData> allEformDatas = eFormDataDao.findInstancedByDemographicId(Integer.parseInt(demographic_no), offset, itemsToReturn, current, sortBy);
 
 		ArrayList<HashMap<String, ? extends Object>> results = new ArrayList<HashMap<String, ? extends Object>>();
 		try {
@@ -295,11 +291,7 @@ public class EFormUtil {
 		if (deleted.equals("deleted")) current = false;
 		else if (deleted.equals("current")) current = true;
 		
-		List<EFormData> allEformDatas = eFormDataDao.findByDemographicIdCurrent(Integer.parseInt(demographic_no), current);
-
-		if (NAME.equals(sortBy)) Collections.sort(allEformDatas, EFormData.FORM_NAME_COMPARATOR);
-		else if (SUBJECT.equals(sortBy)) Collections.sort(allEformDatas, EFormData.FORM_SUBJECT_COMPARATOR);
-		else Collections.sort(allEformDatas, EFormData.FORM_DATE_COMPARATOR);
+		List<EFormData> allEformDatas = eFormDataDao.findInstancedByDemographicId(Integer.parseInt(demographic_no), null, null, current, sortBy);
 
 		ArrayList<HashMap<String, ? extends Object>> results = new ArrayList<HashMap<String, ? extends Object>>();
 		try {
@@ -453,6 +445,7 @@ public class EFormUtil {
 		curht.put("formHtml", eform.getFormHtml());
 		curht.put("showLatestFormOnly", eform.isShowLatestFormOnly());
 		curht.put("patientIndependent", eform.isPatientIndependent());
+		curht.put("instanced", eform.isInstanced());
 		curht.put("roleType", eform.getRoleType());
 
 		return (curht);
@@ -766,7 +759,7 @@ public class EFormUtil {
 		}
 		
 		
-		List<EFormData> results1 = eFormDataDao.findInGroups(current, Integer.valueOf(demographic_no), groupName, sortBy, offset, numToReturn, privs);
+		List<EFormData> results1 = eFormDataDao.findInstancedInGroups(current, Integer.valueOf(demographic_no), groupName, sortBy, offset, numToReturn, privs);
 		ArrayList<HashMap<String, ? extends Object>> results = new ArrayList<HashMap<String, ? extends Object>>();
 		
 		for(EFormData x:results1) {

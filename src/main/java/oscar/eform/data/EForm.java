@@ -31,8 +31,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionMessages;
 import org.oscarehr.common.OtherIdManager;
-import org.oscarehr.common.dao.PreventionDao;
-import org.oscarehr.common.model.Prevention;
+import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.ui.servlet.ImageRenderingServlet;
@@ -155,6 +155,7 @@ public class EForm extends EFormBase {
 		this.demographicNo = demographicNo;
 		this.showLatestFormOnly = (Boolean)loaded.get("showLatestFormOnly");
 		this.patientIndependent = (Boolean)loaded.get("patientIndependent");
+		this.instanced = (Boolean)loaded.get("instanced");
 		this.roleType = (String) loaded.get("roleType");
 	}
 
@@ -176,9 +177,14 @@ public class EForm extends EFormBase {
 		this.eform_link = el;
 	}
 
-	public void setAction(String pAjaxId) {
-		parentAjaxId = pAjaxId;
-		setAction();
+	public String getParentAjaxId()
+	{
+		return parentAjaxId;
+	}
+
+	public void setParentAjaxId(String parentAjaxId)
+	{
+		this.parentAjaxId = parentAjaxId;
 	}
 
 	public void setAction() {
@@ -217,7 +223,9 @@ public class EForm extends EFormBase {
 			return;
 		}
 		index += 5;
-		StringBuilder action = new StringBuilder("action=\"../eform/addEForm.do?efmfid="+this.fid+"&efmdemographic_no="+this.demographicNo+"&efmprovider_no="+this.providerNo+"&eform_link="+this.eform_link);
+
+		String formDataId = StringUtils.trimToEmpty(this.fdid);
+		StringBuilder action = new StringBuilder("action=\"../eform/addEForm.do?efmfid="+this.fid+"&efmfdid="+formDataId+"&efmdemographic_no="+this.demographicNo+"&efmprovider_no="+this.providerNo+"&eform_link="+this.eform_link);
 		if (this.parentAjaxId != null) action.append("&parentAjaxId=" + this.parentAjaxId);
 
 		action.append("\"");
@@ -228,11 +236,13 @@ public class EForm extends EFormBase {
 	}
 
 	// ------------------Saving the Form (inserting value= statements)---------------------
-	public void setValues(List<String> allNames, List<String> allValues) {
+	public void setValues(List<String> allNames, List<String> allValues)
+	{
 		StringBuilder html = new StringBuilder(this.formHtml);
 		int pointer = -1;
 		// Iterates through every relevant html tag in 'this.formHtml'
-		while ((pointer = getFieldIndex(html, pointer+1)) >= 0) {
+		while ((pointer = getFieldIndex(html, pointer + 1)) >= 0)
+		{
 			String fieldHeader = getFieldHeader(html, pointer);
 			// fieldName is set to the 'name' attribute of the current html tag the while loop is on
 			String fieldName = EFormUtil.removeQuotes(EFormUtil.getAttribute("name", fieldHeader));
@@ -241,15 +251,30 @@ public class EForm extends EFormBase {
 			// allNames is an array of all the values submitted from the form
 			int i = allNames.indexOf(fieldName);
 			// If the current fieldName isn't in allNames, it wasn't submitted in the form.
-			if(i < 0) {
+			if (i < 0)
+			{
 				// If this fieldName doesn't contain checked="checked", it's not a prechecked checkbox
-				if( !fieldHeader.contains(PRECHECKED)) {
-					continue; // Continue to next iteration of while loop
-				} else {
+				if (!fieldHeader.contains(PRECHECKED))
+				{
+					if (fieldName == null)
+					{
+						continue;
+					} else if (getFieldType(fieldHeader).equals("checkbox"))
+					{
+						//Default checkboxes to off. Unchecked checkboxes are not submitted with form, so the values stay as what they were previously
+						val = "off";
+					} else
+					{
+						// Save an empty string over all values that don't have values in eform values
+						val = "";
+					}
+				} else
+				{
 					// putValue method needs to know if the current fieldHeader is prechecked or not
 					val = "prechecked";
 				}
-			} else {
+			} else
+			{
 				val = allValues.get(i);
 			}
 
@@ -667,44 +692,73 @@ public class EForm extends EFormBase {
 		return curAP;
 	}
 
-	private StringBuilder putValue(String value, String type, int pointer, StringBuilder html) {
+	private StringBuilder putValue(String value, String type, int pointer, StringBuilder html)
+	{
 
 		value = StringEscapeUtils.escapeHtml(value);
 		// inserts value= into tag or textarea
-		if (type.equals("onclick") || type.equals("onclick_append")) {
-			if (type.equals("onclick_append")) {
-				if (html.charAt(pointer-1)=='"') pointer -= 1;
-				if (html.charAt(pointer-1)!=';') value = ";"+value;
-			} else {
+		if (type.equals("onclick") || type.equals("onclick_append"))
+		{
+			if (type.equals("onclick_append"))
+			{
+				if (html.charAt(pointer - 1) == '"') pointer -= 1;
+				if (html.charAt(pointer - 1) != ';') value = ";" + value;
+			} else
+			{
 				value = "onclick=\"" + value + "\"";
 			}
 			html.insert(pointer, " " + value);
-		} else if (type.equals(OPENER_VALUE)) {
-			html.insert(pointer, " "+OPENER_VALUE+"=\""+value+"\"");
-		} else if (type.equals("text") || type.equals("hidden")) {
-			html.insert(pointer, " value=\""+value+"\"");
-		} else if(type.equals("textarea")) {
+		} else if (type.equals(OPENER_VALUE))
+		{
+			html.insert(pointer, " " + OPENER_VALUE + "=\"" + value + "\"");
+		} else if (type.equals("text") || type.equals("hidden"))
+		{
+			html.insert(pointer, " value=\"" + value + "\"");
+		} else if (type.equals("textarea"))
+		{
 			pointer = html.indexOf(">", pointer) + 1;
 			int endPointer = html.indexOf("<", pointer);
 			html.delete(pointer, endPointer);
 			html.insert(pointer, value);
-		} else if (type.equals("checkbox")) {
-			if( value.equals("prechecked") ) {
+		} else if (type.equals("checkbox"))
+		{
+			if ("prechecked".equals(value))
+			{
 				pointer = html.indexOf(PRECHECKED, pointer);
 				html.delete(pointer, pointer + PRECHECKED.length());
-			} else {
+			} else if (value.equals("off"))
+			{
+				if (html.substring(pointer, pointer + " checked".length()).equals(" checked"))
+				{
+					html.delete(pointer, pointer + " checked".length());
+				}
+			} else
+			{
 				html.insert(pointer, " checked");
 			}
-		} else if (type.equals("select")) {
+		} else if (type.equals("select"))
+		{
 			int endindex = StringBuilderUtils.indexOfIgnoreCase(html, "</select>", pointer);
 			if (endindex < 0) return html; // if closing tag not found
 
-			int valueLoc = nextIndex(html, " value="+value, " value=\""+value, pointer);
+			int valueLoc = nextIndex(html, " value=" + value, " value=\"" + value, pointer);
 			if (valueLoc < 0 || valueLoc > endindex) return html;
+
+			//In the current select tag: find all occurrences of the string "selected" and replace with an empty string as we are changing what is selected anyway
+			int currentSelectedIndex = StringBuilderUtils.indexOfIgnoreCase(html, "selected", pointer);
+			while (currentSelectedIndex > 0)
+			{
+				html.replace(currentSelectedIndex, currentSelectedIndex + "selected".length(), "");
+				currentSelectedIndex = StringBuilderUtils.indexOfIgnoreCase(html, "selected", pointer);
+			}
+
+			//Update the value location as it may have changed due to removing selected strings
+			valueLoc = nextIndex(html, " value=" + value, " value=\"" + value, pointer);
 
 			pointer = nextSpot(html, valueLoc + 1);
 			html.insert(pointer, " selected");
-		} else if (type.equals("radio")) {
+		} else if (type.equals("radio"))
+		{
 			int endindex = html.indexOf(">", pointer);
 			int valindexS = nextIndex(html, " value=", " value=", pointer);
 			if (valindexS < 0 || valindexS > endindex) return html; // if value= not found in tag
@@ -712,7 +766,8 @@ public class EForm extends EFormBase {
 			valindexS += 7;
 			if (html.charAt(valindexS) == '"') valindexS++;
 			int valindexE = valindexS + value.length();
-			if (html.substring(valindexS, valindexE).equals(value)) {
+			if (html.substring(valindexS, valindexE).equals(value))
+			{
 				pointer = nextSpot(html, valindexE);
 				html.insert(pointer, " checked");
 			}

@@ -41,6 +41,10 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import com.quatro.model.security.Secrole;
 
+/**
+ * @deprecated use the jpa version instead
+ */
+@Deprecated
 public class IssueDAO extends HibernateDaoSupport {
 	private static Logger logger = MiscUtils.getLogger();
 

@@ -23,7 +23,7 @@
  */
 package org.oscarehr.ws.rest.conversion;
 
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.AllergyTo1;
 

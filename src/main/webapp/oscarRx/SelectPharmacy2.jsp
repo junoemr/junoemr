@@ -24,7 +24,7 @@
 
 --%>
 <%@page import="java.io.StringWriter"%>
-<%@page import="org.codehaus.jackson.map.ObjectMapper"%>
+<%@page import="com.fasterxml.jackson.databind.ObjectMapper"%>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>

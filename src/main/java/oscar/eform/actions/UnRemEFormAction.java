@@ -25,43 +25,42 @@
 
 package oscar.eform.actions;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.eform.dao.EFormDataDao;
-import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.eform.service.EFormDataService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 public class UnRemEFormAction extends Action {
-    
+
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	
-    public ActionForward execute(ActionMapping mapping, ActionForm form,
-                                HttpServletRequest request, HttpServletResponse response) {
-    	
-    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "w", null)) {
+	private EFormDataService eFormDataService = SpringUtils.getBean(EFormDataService.class);
+
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+	                             HttpServletRequest request, HttpServletResponse response)
+	{
+		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "w", null))
+		{
 			throw new SecurityException("missing required security object (_eform)");
 		}
-    	
-         String fdid = request.getParameter("fdid");
-         if (!(fdid == null)) {
-        	 EFormDataDao eFormDataDao=(EFormDataDao) SpringUtils.getBean("EFormDataDao");
-        	 EFormData eFormData=eFormDataDao.find(Integer.parseInt(fdid));
-        	 eFormData.setCurrent(true);
-        	 eFormDataDao.merge(eFormData);
-         }
-         
-         if ("independent".equals(request.getParameter("callpage")))
-         {
-        	 return mapping.findForward("independent");
-         }
-         return mapping.findForward("success");
-    }
-    
+
+		String fdid = request.getParameter("fdid");
+		if(fdid != null)
+		{
+			eFormDataService.restoreEForm(Integer.parseInt(fdid));
+		}
+
+		if("independent".equals(request.getParameter("callpage")))
+		{
+			return mapping.findForward("independent");
+		}
+		return mapping.findForward("success");
+	}
+
 }

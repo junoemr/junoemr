@@ -203,16 +203,23 @@ public class DisplayImageAction extends DownloadAction{
 		ArrayList<String> results = getFiles(dir, ".*(rtl)$", null);				
 		return results.toArray(new String[0]);
 	}
-	
-	public static ArrayList<String> getFiles(File dir, String ext, ArrayList<String> files) {
-		if (files == null) { files = new ArrayList<String>(); }
-		if (dir.isDirectory()) {			
-			for (String fileName : dir.list()) {
-				if (fileName.toLowerCase().matches(ext)) {
-					files.add(fileName);
-				}
-			}
-		}
-		return files;
-	}
+
+    public static ArrayList<String> getFiles(File dir, String ext, ArrayList<String> files)
+    {
+        if(files == null)
+        {
+            files = new ArrayList<String>();
+        }
+        if(dir.isDirectory())
+        {
+            for(String fileName : dir.list())
+            {
+                if(fileName.toLowerCase().matches(ext))
+                {
+                    files.add(fileName);
+                }
+            }
+        }
+        return files;
+    }
 }

@@ -28,7 +28,7 @@ package oscar.oscarBilling.ca.bc.quickbilling;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.struts.action.ActionForm;
-import org.oscarehr.common.model.ProviderData;
+import org.oscarehr.provider.model.ProviderData;
 
 import oscar.oscarBilling.ca.bc.data.BillingFormData.BillingVisit;
 import oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean;

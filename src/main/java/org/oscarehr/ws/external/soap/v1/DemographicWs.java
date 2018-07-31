@@ -31,14 +31,20 @@ import org.oscarehr.common.Gender;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.transfer_objects.DemographicTransfer;
-import org.oscarehr.ws.transfer_objects.PhrVerificationTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.PhrVerificationTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.log.LogAction;
 
+import javax.annotation.Resource;
 import javax.jws.WebParam;
 import javax.jws.WebService;
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -48,7 +54,10 @@ import java.util.List;
 @GZIP(threshold= AbstractWs.GZIP_THRESHOLD)
 public class DemographicWs extends AbstractWs {
 	private static Logger logger=MiscUtils.getLogger();
-	
+
+	@Resource
+	private WebServiceContext wsContext;
+
 	@Autowired
 	private DemographicManager demographicManager;
 	
@@ -128,5 +137,56 @@ public class DemographicWs extends AbstractWs {
 		
 		List<Demographic> demographics=demographicManager.getDemographics(getLoggedInInfo(),ids);
 		return(DemographicTransfer.toTransfers(demographics));	
+	}
+
+	/**
+	 * @return the ID of the demographic just added
+	 */
+	public Integer addDemographic(DemographicTransfer demographicTransfer) throws Exception
+	{
+		MessageContext mc = wsContext.getMessageContext();
+		HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+
+		LogAction.addLogEntrySynchronous("DemographicWs.addDemographic", "Client IP = " + req.getRemoteAddr());
+
+		Demographic demographic = new Demographic();
+		demographicTransfer.copyTo(demographic);
+
+		if (demographic.getDemographicNo() != null)
+		{
+			throw new Exception("Demographic number can not be specified on creation. It is automatically generated.");
+		}
+
+		demographicManager.addDemographicWithValidation(loggedInInfo, demographic);
+		demographicManager.addDemographicExtras(loggedInInfo, demographic);
+		demographicManager.addDemographicExts(loggedInInfo, demographic, demographicTransfer);
+
+		return demographic.getDemographicNo();
+	}
+
+	public void updateDemographic(DemographicTransfer demographicTransfer) throws Exception
+	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+
+		Demographic demographic = new Demographic();
+		demographicTransfer.copyTo(demographic);
+
+		Integer demo_no = demographic.getDemographicNo();
+
+		if (demo_no == null)
+		{
+			throw new Exception("You must specify a demographic number.");
+		}
+
+		if (demographicManager.getDemographic(loggedInInfo, demo_no) == null)
+		{
+			throw new Exception("Demographic " + demo_no + " doesn't exist.");
+		}
+
+		demographicManager.addDemographicWithValidation(loggedInInfo, demographic);
+		demographicManager.updateDemographicExtras(loggedInInfo, demographic);
+		demographicManager.addDemographicExts(loggedInInfo, demographic, demographicTransfer);
+
 	}
 }

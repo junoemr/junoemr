@@ -18,8 +18,6 @@
 
 package org.oscarehr.common.model;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,6 +28,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.Date;
 
 
 @Entity
@@ -115,6 +114,10 @@ public class Dxresearch  extends AbstractModel<Integer> implements java.io.Seria
     public void setStatus(Character status) {
         this.status = status;
     }
+    public void setStatus(String status) {
+        this.status = status.charAt(0);
+    }
+
     public String getDxresearchCode() {
         return this.dxresearchCode;
     }
@@ -135,6 +138,11 @@ public class Dxresearch  extends AbstractModel<Integer> implements java.io.Seria
 
     public void setAssociation(byte association) {
         this.association = association;
+    }
+
+    public void setAssociation(boolean association)
+    {
+        this.association = (association ? (byte) 1 : (byte) 0);
     }
     
     

@@ -48,7 +48,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.xmlrpc.XmlRpcClient;
 import org.apache.xmlrpc.XmlRpcException;
 import org.oscarehr.common.dao.MeasurementDao;
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;

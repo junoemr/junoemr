@@ -26,6 +26,8 @@ package org.oscarehr.integration.clinicaid.service;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.codec.binary.Base64;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.integration.clinicaid.dto.ClinicaidResultTo1;
@@ -60,7 +62,7 @@ public class ClinicaidSessionManager
 	private final String apiDomain = oscarProps.getProperty("clinicaid_api_domain", clinicaidDomain);
 	private final String instanceName = oscarProps.getProperty("clinicaid_instance_name");
 	private final String apiKey = oscarProps.getProperty("clinicaid_api_key");
-	private final String loginEndPoint = apiDomain + "/auth/pushed_login/";
+	private final String loginEndPoint = clinicaidDomain + "/auth/pushed_login/";
 
 	private ClinicaidUserTo1 clinicaidUser;
 
@@ -133,6 +135,8 @@ public class ClinicaidSessionManager
 			writer.close();
 		}
 
+		connection.setReadTimeout(5000);
+
 		// Read the result
 		String inputLine;
 		String response = "";
@@ -149,6 +153,9 @@ public class ClinicaidSessionManager
 
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(MapperFeature.USE_ANNOTATIONS, true);
+		mapper.registerModule(new JavaTimeModule());
+		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
 		ClinicaidResultTo1 result = mapper.readValue(response, ClinicaidResultTo1.class);
 
 		if (result.hasError())
@@ -175,7 +182,9 @@ public class ClinicaidSessionManager
 
 		for (Map.Entry<String, String> pair : data.entrySet())
 		{
-			stringBuilder.append(String.format("%s=%s&", pair.getKey(), pair.getValue()));
+			stringBuilder.append(
+					String.format("%s=%s&", pair.getKey(), urlEncode(pair.getValue()))
+			);
 		}
 		return stringBuilder.toString();
 	}

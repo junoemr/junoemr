@@ -53,9 +53,14 @@ public class AppointmentDisplayController
 	private static final String ROSTER_STATUS_PL = "PL";
 
 	private DateTimeFormatter timeFormatter;
+	private DateTimeFormatter timeFormatterWithSeconds;
 	private DateTimeFormatter dateFormatter;
 
 	private AppointmentDetails appointment;
+	private String sessionProviderNo;   // Logged in provider from the session
+	private Integer scheduleProviderNo; // Provider for the schedule column
+	private String parameterProviderNo; // Provider passed in via curProvider parameter
+	private String parameterProviderName;
 	private boolean multisitesEnabled;
 	private Map<String, String> siteBgColour;
 	private AppointmentStatusList appointmentStatusList;
@@ -65,10 +70,7 @@ public class AppointmentDisplayController
 	private int numAvailProvider;
 	private int nameLength;
 	private int longLengthLimit;
-	private String currentProvider;
-	private String currentProviderName;
 	private String viewAll;
-	private Integer providerNo;
 	private Map<Integer,LookupListItem> reasonCodesMap;
 	private boolean showDocumentLink;
 	private boolean showEncounterLink;
@@ -88,6 +90,10 @@ public class AppointmentDisplayController
 
 	public void init(
 		AppointmentDetails appointment,
+		String sessionProviderNo,
+		Integer scheduleProviderNo,
+		String parameterProviderNo,
+		String parameterProviderName,
 		boolean multisitesEnabled,
 		Map<String, String> siteBgColour,
 		AppointmentStatusList appointmentStatusList,
@@ -97,10 +103,7 @@ public class AppointmentDisplayController
 		int numAvailProvider,
 		int nameLength,
 		int longLengthLimit,
-		String currentProvider,
-		String currentProviderName,
 		String viewAll,
-		Integer providerNo,
 		Map<Integer,LookupListItem> reasonCodesMap,
 		boolean showDocumentLink,
 		boolean showEncounterLink,
@@ -120,9 +123,14 @@ public class AppointmentDisplayController
 	)
 	{
 		this.timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+		this.timeFormatterWithSeconds = DateTimeFormatter.ofPattern("HH:mm:ss");
 		this.dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
 
 		this.appointment = appointment;
+		this.sessionProviderNo = sessionProviderNo;
+		this.scheduleProviderNo = scheduleProviderNo;
+		this.parameterProviderNo = parameterProviderNo;
+		this.parameterProviderName = parameterProviderName;
 		this.multisitesEnabled = multisitesEnabled;
 		this.siteBgColour = siteBgColour;
 		this.appointmentStatusList = appointmentStatusList;
@@ -132,10 +140,7 @@ public class AppointmentDisplayController
 		this.numAvailProvider = numAvailProvider;
 		this.nameLength = nameLength;
 		this.longLengthLimit = longLengthLimit;
-		this.currentProvider = currentProvider;
-		this.currentProviderName = currentProviderName;
 		this.viewAll = viewAll;
-		this.providerNo = providerNo;
 		this.reasonCodesMap = reasonCodesMap;
 		this.showDocumentLink = showDocumentLink;
 		this.showEncounterLink = showEncounterLink;
@@ -182,7 +187,13 @@ public class AppointmentDisplayController
 
 	public boolean isBilled()
 	{
-		return (appointment.getStatus().equals(BILLED_STATUS));
+		if (appointment.getStatus() == null)
+		{
+			return false;
+		} else
+		{
+			return (appointment.getStatus().equals(BILLED_STATUS));
+		}
 	}
 
 	public boolean isShowDocumentLink()
@@ -266,13 +277,18 @@ public class AppointmentDisplayController
 	{
 		String iconImage = appointment.getIconImage();
 		String status = appointment.getStatus();
-
-		if(status.length() >= 2)
+		if (status == null)
 		{
-			iconImage = status.substring(1,2) + iconImage;
-		}
+			return null;
+		} else
+		{
+			if (status.length() >= 2)
+			{
+				iconImage = status.substring(1, 2) + iconImage;
+			}
 
-		return iconImage;
+			return iconImage;
+		}
 	}
 
 	public String getStatusTitle()
@@ -289,15 +305,15 @@ public class AppointmentDisplayController
 			String curProviderName = "";
 			try
 			{
-				curProviderName = URLEncoder.encode(currentProviderName, "UTF-8");
+				curProviderName = URLEncoder.encode(parameterProviderName, "UTF-8");
 			}
 			catch(UnsupportedEncodingException e)
 			{
 				MiscUtils.getLogger().error("Refresh URL encoding error with string: " +
-					currentProviderName, e);
+					parameterProviderName, e);
 			}
 
-			viewValue = "1&curProvider=" + currentProvider + "&curProviderName=" + curProviderName;
+			viewValue = "1&curProvider=" + parameterProviderNo + "&curProviderName=" + curProviderName;
 		}
 
 		String viewAllValue = "0";
@@ -314,7 +330,7 @@ public class AppointmentDisplayController
 
 		return "providercontrol.jsp" +
 			"?appointment_no=" + appointment.getAppointmentNo() +
-			"&provider_no=" + providerNo.toString() +
+			"&provider_no=" + scheduleProviderNo.toString() +
 			"&status=" +
 			"&statusch=" + appointmentStatusList.getStatusAfter(appointment.getStatus()) +
 			"&year=" + appointment.getDate().getYear() +
@@ -332,7 +348,7 @@ public class AppointmentDisplayController
 	{
 		return "../appointment/appointmentcontrol.jsp" +
 			"?appointment_no=" + appointment.getAppointmentNo() +
-			"&provider_no=" + providerNo.toString() +
+			"&provider_no=" + scheduleProviderNo.toString() +
 			"&year=" + appointment.getDate().getYear() +
 			"&month=" + appointment.getDate().getMonthValue() +
 			"&day=" + appointment.getDate().getDayOfMonth() +
@@ -355,25 +371,25 @@ public class AppointmentDisplayController
 		try
 		{
 			return "../oscarEncounter/IncomingEncounter.do" +
-				"?providerNo=" + providerNo +
+				"?providerNo=" + sessionProviderNo +
 				"&appointmentNo=" + appointment.getAppointmentNo().toString() +
 				"&demographicNo=" + appointment.getDemographicNo() +
-				"&curProviderNo=" + currentProvider +
-				"&reason=" + getReason() +
+				"&curProviderNo=" + parameterProviderNo +
+				"&reason=" + URLEncoder.encode(appointment.getReason()) +
 				"&encType=" + URLEncoder.encode("face to face encounter with client","UTF-8") +
 				"&userName=" + URLEncoder.encode( userFirstName + " " + userLastName, "UTF-8") +
 				"&curDate=" + LocalDate.now().format(dateFormatter) +
 				"&appointmentDate=" + appointment.getDate().format(dateFormatter) +
-				"&start_time=" + appointment.getStartTime().format(timeFormatter) +
+				"&startTime=" + appointment.getStartTime().format(timeFormatterWithSeconds) +
 				"&status=" + appointment.getStatus() +
-				"&apptProvider_no=" + currentProvider +
-				"&providerview=" + currentProvider;
+				"&apptProvider_no=" + scheduleProviderNo +
+				"&providerview=" + scheduleProviderNo;
 
 		}
 		catch(UnsupportedEncodingException e)
 		{
 			MiscUtils.getLogger().error("Incoming URL encoding error with string: " +
-				currentProviderName, e);
+				parameterProviderName, e);
 		}
 
 		return "";
@@ -391,20 +407,20 @@ public class AppointmentDisplayController
 				"&billForm=" + URLEncoder.encode(default_view, "UTF-8") +
 				"&hotclick=" +
 				"&appointment_no=" + appointment.getAppointmentNo().toString() +
-				"&demographic_name=" + getName() +
+				"&demographic_name=" + URLEncoder.encode(getName(), "UTF-8") +
 				"&status=" + appointment.getStatus() +
 				"&demographic_no=" + appointment.getDemographicNo().toString() +
-				"&providerview=" + currentProvider +
+				"&providerview=" + scheduleProviderNo+
 				"&user_no=" + currentUserNo +
-				"&apptProvider_no=" + currentProvider +
-				"&appointmentDate=" + appointment.getDate().format(dateFormatter) +
+				"&apptProvider_no=" + scheduleProviderNo +
+				"&appointment_date=" + appointment.getDate().format(dateFormatter) +
 				"&start_time=" + appointment.getStartTime().format(timeFormatter) +
 				"&bNewForm=1";
 		}
 		catch(UnsupportedEncodingException e)
 		{
 			MiscUtils.getLogger().error("Billing link URL encoding error with string: " +
-				currentProviderName, e);
+				parameterProviderName, e);
 		}
 
 		return "";
@@ -603,7 +619,7 @@ public class AppointmentDisplayController
 	{
 		String name = getName();
 
-		if (view == 0 && numAvailProvider != 1 && name.length() > nameLength)
+		if (view == 0 && name.length() > nameLength)
 		{
 			return name.substring(0, nameLength);
 		}
@@ -613,17 +629,29 @@ public class AppointmentDisplayController
 
 	public String getTruncatedUpperName()
 	{
+		String name = getName();
+
+		if (view == 0 && numAvailProvider != 1 && name.length() > nameLength)
+		{
+			return name.substring(0, nameLength).toUpperCase();
+		}
+
 		return getTruncatedName().toUpperCase();
 	}
 
-	public String getProviderNo()
+	public String getSessionProviderNo()
 	{
-		return providerNo.toString();
+		return sessionProviderNo;
+	}
+
+	public String getScheduleProviderNo()
+	{
+		return scheduleProviderNo.toString();
 	}
 
 	public String getCurrentProviderNo()
 	{
-		return currentProvider;
+		return parameterProviderNo;
 	}
 
 	public String getDemographicNo()

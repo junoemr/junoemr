@@ -87,14 +87,27 @@ public final class MessageUploader {
 		// there's no reason to instantiate a class with no fields.
 	}
 
+	@Deprecated
 	public static String routeReport(LoggedInInfo loggedInInfo, String serviceName, String type, String hl7Body, int fileId) throws Exception {
 		return routeReport(loggedInInfo, serviceName, type, hl7Body, fileId, null);
+	}
+	public static String routeReport(String loggedInProviderNo, String serviceName, String type, String hl7Body, int fileId) throws Exception {
+		return routeReport(loggedInProviderNo, serviceName, type, hl7Body, fileId, null);
 	}
 
 	/**
 	 * Insert the lab into the proper tables of the database
 	 */
-	public static String routeReport(LoggedInInfo loggedInInfo, String serviceName, String type, String hl7Body, int fileId, RouteReportResults results) throws Exception {
+	@Deprecated
+	public static String routeReport(LoggedInInfo loggedInInfo, String serviceName, String type, String hl7Body, int fileId, RouteReportResults results) throws Exception
+	{
+		return routeReport(loggedInInfo.getLoggedInProviderNo(), serviceName, type, hl7Body, fileId, results);
+	}
+	/**
+	 * Insert the lab into the proper tables of the database
+	 */
+	public static String routeReport(String loggedInProviderNo, String serviceName, String type, String hl7Body, int fileId, RouteReportResults results) throws Exception
+	{
 
 		String retVal = "";
 		try {
@@ -121,7 +134,7 @@ public final class MessageUploader {
 	            	String chartNo = ((HHSEmrDownloadHandler)messageHandler).getPatientIdByType("MR");
 	            	if(chartNo != null) {
 	            		//let's get the hin
-	            		List<Demographic> clients = demographicManager.getDemosByChartNo(loggedInInfo, chartNo);
+	            		List<Demographic> clients = demographicManager.getDemosByChartNo(loggedInProviderNo, chartNo);
 	            		if(clients!=null && clients.size()>0) {
 	            			hin = clients.get(0).getHin();
 	            		}
@@ -228,7 +241,7 @@ public final class MessageUploader {
 			String demProviderNo = "0";
 			try
 			{
-				demProviderNo = patientRouteReport(loggedInInfo, insertID, lastName,
+				demProviderNo = patientRouteReport(loggedInProviderNo, insertID, lastName,
 						firstName, sex, dob, hin);
 			} catch (Exception ignored)
 			{
@@ -401,7 +414,7 @@ public final class MessageUploader {
 	/**
 	 * Attempt to match the patient from the lab to a demographic, return the patients provider which is to be used then no other provider can be found to match the patient to.
 	 */
-	private static String patientRouteReport(LoggedInInfo loggedInInfo, int labId,
+	private static String patientRouteReport(String loggedInProviderNo, int labId,
 											 String lastName, String firstName,
 											 String sex, String dob, String hin) throws Exception {
 
@@ -442,7 +455,7 @@ public final class MessageUploader {
 		DemographicMerged demographicMerged = new DemographicMerged();
 		Integer headDemo = demographicMerged.getHead(demographicNumber);
 		if(headDemo != null && headDemo.intValue() != demographicNumber.intValue()) {
-			Demographic demoTmp = demographicManager.getDemographic(loggedInInfo, headDemo);
+			Demographic demoTmp = demographicManager.getDemographic(loggedInProviderNo, headDemo);
 			if(demoTmp != null) {
 				patientLabRoutingResult.setDemographicNo(demoTmp.getDemographicNo());
 				patientLabRoutingResult.setProviderNo(demoTmp.getProviderNo());

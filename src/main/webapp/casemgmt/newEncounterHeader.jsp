@@ -32,8 +32,8 @@
 <%@ page import="org.oscarehr.util.MiscUtils"%>
 <%@ page import="java.net.URLEncoder"%>
 <%@ page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager, org.oscarehr.util.LoggedInInfo, org.oscarehr.common.model.Facility" %>
-<%@ page import="org.oscarehr.common.dao.DemographicExtDao" %>
-<%@ page import="org.oscarehr.common.model.DemographicExt" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicExtDao" %>
+<%@ page import="org.oscarehr.demographic.model.DemographicExt" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="oscar.OscarProperties" %>

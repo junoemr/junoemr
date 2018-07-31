@@ -151,13 +151,20 @@
     {"search_demo_waiting_list", "select * from waitingList where demographic_no=? AND listID=?  AND is_history='N' "},
     {"search_future_appt", "select a.demographic_no, a.appointment_date from appointment a where a.appointment_date >= now() AND a.demographic_no=?"},
     {"search_hin", "select demographic_no, ver from demographic where hin=?"},
-   };
+	// custom licensed producer info
+	{"search_licensed_producer", "SELECT producer_id, producer_name FROM licensed_producer ORDER BY producer_name"},
+	{"search_demo_licensed_producer", "SELECT lp.producer_id, lp.producer_name FROM demographic_licensed_producer d JOIN licensed_producer lp ON (d.producer_id=lp.producer_id) where d.demographic_no=?"},
+	{"search_demo_licensed_producer2", "SELECT lp.producer_id, lp.producer_name FROM demographic_licensed_producer d JOIN licensed_producer lp ON (d.producer_id2=lp.producer_id) where d.demographic_no=?"},
+	{"search_licensed_producer_address_name", "SELECT address_id, display_name FROM licensed_producer_address ORDER BY display_name"},
+	{"search_demo_licensed_producer_address_name", "SELECT pa.address_id, pa.display_name FROM demographic_licensed_producer d JOIN licensed_producer_address pa ON (d.address_id=pa.address_id) where d.demographic_no=?"},
+  };
 
 	//associate each operation with an output JSP file -- displaymode
 	String[][] responseTargets=new String[][] {
 	  {"Search " , "demographicsearch2apptresults.jsp"},
 	  {"Search" , "demographicsearchresults.jsp"},
 	  {"edit" , "demographiceditdemographic.jsp"},
+	  {"add" , "demographicaddarecordhtm.jsp"},
 	  {"pdflabel" , "demographicpdflabel.jsp"},
 	  {"pdfaddresslabel" , "demographicpdfaddresslabel.jsp"},
 	  {"pdfchartlabel" , "demographicpdfchartlabel.jsp"},
