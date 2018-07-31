@@ -49,8 +49,11 @@
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@page import="org.oscarehr.common.model.Appointment" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.appt.status.dao.AppointmentStatusDAO" %>
+<%@ page import="oscar.appt.status.model.AppointmentStatus" %>
 <%
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
+	AppointmentStatusDAO appointmentStatusDao = (AppointmentStatusDAO)SpringUtils.getBean("appointmentStatusDao");
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
 	SimpleDateFormat dayFormatter = new SimpleDateFormat("yyyy-MM-dd");
 %>
@@ -201,96 +204,123 @@ function printDaysheet() {
 </table>
 
 <%
-  boolean bFistL = true; //first line in a table for TH
-  String strTemp = "";
-  String dateTemp = "";
-  String [] param = new String[4];
-  param[0] = (String) session.getAttribute("user");
-  param[1] = sdate;
-  param[2] = provider_no;
-  param[3] = appointment_no;
-  String [] parama = new String[6];
-  parama[0] = sdate;
-  parama[1] = edate;
-  parama[2] = sTime;
-  parama[3] = eTime;
-  parama[4] = provider_no;
-  parama[5] = appointment_no;
-  if(request.getParameter("dsmode")!=null && request.getParameter("dsmode").equals("all") ) {
-	  if(!provider_no.equals("*") && !provider_no.startsWith("_grp_") ) {
-		  rsdemo = daySheetBean.queryResults(new String[] {parama[0], parama[1], parama[2], parama[3], parama[4]}, "search_daysheetsingleproviderall");
+	boolean bFistL = true; //first line in a table for TH
+	String strTemp = "";
+	String dateTemp = "";
+	String[] param = new String[4];
+	param[0] = (String) session.getAttribute("user");
+	param[1] = sdate;
+	param[2] = provider_no;
+	param[3] = appointment_no;
+	String[] parama = new String[6];
+	parama[0] = sdate;
+	parama[1] = edate;
+	parama[2] = sTime;
+	parama[3] = eTime;
+	parama[4] = provider_no;
+	parama[5] = appointment_no;
+	if (request.getParameter("dsmode") != null && request.getParameter("dsmode").equals("all"))
+	{
+		if (!provider_no.equals("*") && !provider_no.startsWith("_grp_"))
+		{
+			rsdemo = daySheetBean.queryResults(new String[]{parama[0], parama[1], parama[2], parama[3], parama[4]}, "search_daysheetsingleproviderall");
 
-    } else { //select all providers
-	  rsdemo = daySheetBean.queryResults(new String[] {parama[0], parama[1], sTime, eTime}, "search_daysheetall");
-    }
-  } else if(request.getParameter("dsmode")!=null && request.getParameter("dsmode").equals("new")){ //new appt, need to update status
-    if(!provider_no.equals("*") && !provider_no.startsWith("_grp_") ) {
-	  rsdemo = daySheetBean.queryResults(new String[] {param[1],param[2]}, "search_daysheetsingleprovidernew");
-	  try {
-		  	List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(param[2], dayFormatter.parse(param[1]), "t");
-		  	for(Appointment appt:appts) {
-		  		appointmentArchiveDao.archiveAppointment(appt);
-		  	}
-		  }catch(java.text.ParseException e) {
-			  org.oscarehr.util.MiscUtils.getLogger().error("Cannot archive appt",e);
-		  }
-    } else { //select all providers
-	  rsdemo = daySheetBean.queryResults(param[0], "search_daysheetnew");
-	  try {
-		  	List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(param[2], dayFormatter.parse(param[1]), "t");
-		  	for(Appointment appt:appts) {
-		  		appointmentArchiveDao.archiveAppointment(appt);
-		  	}
-		  }catch(java.text.ParseException e) {
-			  org.oscarehr.util.MiscUtils.getLogger().error("Cannot archive appt",e);
-		  }
-    }
-  } else {
-  	if(!provider_no.equals("*") && !provider_no.startsWith("_grp_") ) {
-	  rsdemo = daySheetBean.queryResults(new String[] {param[1],param[2],param[3]}, "search_daysheetsingleapptnew");
-	  try {
-		  	List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(param[2], dayFormatter.parse(param[1]), "t");
-		  	for(Appointment appt:appts) {
-		  		appointmentArchiveDao.archiveAppointment(appt);
-		  	}
-		  }catch(java.text.ParseException e) {
-			  org.oscarehr.util.MiscUtils.getLogger().error("Cannot archive appt",e);
-		  }
-    } else { //select all providers
-	  rsdemo = daySheetBean.queryResults(param[0], "search_daysheetnewappt");
-	  try {
-		  	List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(param[2], dayFormatter.parse(param[1]), "t");
-		  	for(Appointment appt:appts) {
-		  		appointmentArchiveDao.archiveAppointment(appt);
-		  	}
-		  }catch(java.text.ParseException e) {
-			  org.oscarehr.util.MiscUtils.getLogger().error("Cannot archive appt",e);
-		  }
-    }
-  }
-  //Update statues if the print button was pressed
-  if(print.equals("yes"))
-  {
-	  if(request.getParameter("dsmode")!=null && request.getParameter("dsmode").equals("new"))
-	  {
-		  if (!provider_no.equals("*") && !provider_no.startsWith("_grp_"))
-		  {
-			  daySheetBean.queryExecuteUpdate(new String[]{param[0], param[1], param[2]}, "update_apptstatussingleprovider");
-		  } else
-		  {
-			  daySheetBean.queryExecuteUpdate(new String[]{param[0], param[1]}, "update_apptstatus");
-		  }
-	  } else
-	  {
-		  if (!provider_no.equals("*") && !provider_no.startsWith("_grp_"))
-		  {
-			  daySheetBean.queryExecuteUpdate(param, "update_singleapptstatus");
-		  } else
-		  {
-			  daySheetBean.queryExecuteUpdate(new String[]{param[0], param[1]}, "update_apptstatus");
-		  }
-	  }
-  }
+		} else
+		{ //select all providers
+			rsdemo = daySheetBean.queryResults(new String[]{parama[0], parama[1], sTime, eTime}, "search_daysheetall");
+		}
+	} else if (request.getParameter("dsmode") != null && request.getParameter("dsmode").equals("new"))
+	{ //new appt, need to update status
+		if (!provider_no.equals("*") && !provider_no.startsWith("_grp_"))
+		{
+			rsdemo = daySheetBean.queryResults(new String[]{param[1], param[2]}, "search_daysheetsingleprovidernew");
+		} else
+		{ //select all providers
+			rsdemo = daySheetBean.queryResults(param[0], "search_daysheetnew");
+		}
+	} else
+	{
+		if (!provider_no.equals("*") && !provider_no.startsWith("_grp_"))
+		{
+			rsdemo = daySheetBean.queryResults(new String[]{param[1], param[2], param[3]}, "search_daysheetsingleapptnew");
+		} else
+		{ //select all providers
+			rsdemo = daySheetBean.queryResults(param[0], "search_daysheetnewappt");
+		}
+	}
+
+	//Update statues if the print button was pressed and status code T is still Daysheet Printed and enabled
+	AppointmentStatus daysheetPrintedStatus = appointmentStatusDao.getStatus(2);
+	if (print.equals("yes") && daysheetPrintedStatus.getDescription().equals("Daysheet Printed") && daysheetPrintedStatus.getActive() == 1)
+	{
+		if (request.getParameter("dsmode") != null && request.getParameter("dsmode").equals("new"))
+		{
+			if (!provider_no.equals("*") && !provider_no.startsWith("_grp_"))
+			{
+				//Archive the appointments for the selected provider on the selected day before updating the status
+				try
+				{
+					List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(param[2], dayFormatter.parse(param[1]), "t");
+					for (Appointment appt : appts)
+					{
+						appointmentArchiveDao.archiveAppointment(appt);
+					}
+				} catch (java.text.ParseException e)
+				{
+					org.oscarehr.util.MiscUtils.getLogger().error("Cannot archive appt", e);
+				}
+
+				//Update the status for all appointments for the selected provider on the selected day
+				daySheetBean.queryExecuteUpdate(new String[]{param[0], param[1], param[2]}, "update_apptstatussingleprovider");
+			} else
+			{
+				//Archive the appointments for all providers on the selected day before updating the status
+				try
+				{
+					List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(param[2], dayFormatter.parse(param[1]), "t");
+					for (Appointment appt : appts)
+					{
+						appointmentArchiveDao.archiveAppointment(appt);
+					}
+				} catch (java.text.ParseException e)
+				{
+					org.oscarehr.util.MiscUtils.getLogger().error("Cannot archive appt", e);
+				}
+
+				//Update the status for all providers on the selected day
+				daySheetBean.queryExecuteUpdate(new String[]{param[0], param[1]}, "update_apptstatus");
+			}
+		} else
+		{
+			if (!provider_no.equals("*") && !provider_no.startsWith("_grp_"))
+			{
+				Appointment appt = appointmentDao.find(Integer.parseInt(appointment_no));
+
+				//Archive the single appointment
+				appointmentArchiveDao.archiveAppointment(appt);
+
+				//Update the status of the single appointment
+				daySheetBean.queryExecuteUpdate(param, "update_singleapptstatus");
+			} else
+			{
+				//Archive all appointments for the selected day before updating the status
+				try
+				{
+					List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(param[2], dayFormatter.parse(param[1]), "t");
+					for (Appointment appt : appts)
+					{
+						appointmentArchiveDao.archiveAppointment(appt);
+					}
+				} catch (java.text.ParseException e)
+				{
+					org.oscarehr.util.MiscUtils.getLogger().error("Cannot archive appt", e);
+				}
+
+				//Update the appointment statuses for all appointments on the selected day
+				daySheetBean.queryExecuteUpdate(new String[]{param[0], param[1]}, "update_apptstatus");
+			}
+		}
+	}
 
   while (rsdemo.next()) {
     //if it is a group and a group member
