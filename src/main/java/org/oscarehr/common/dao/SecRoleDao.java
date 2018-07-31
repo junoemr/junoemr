@@ -69,9 +69,9 @@ public class SecRoleDao extends AbstractDao<SecRole> {
  	}
 
     public SecRole findByName(String name) {
-    	Query q = entityManager.createQuery("select x from SecRole x where x.name=?");
+    	Query q = entityManager.createQuery("select x from SecRole x where x.name=:name");
 
-    	q.setParameter(1, name);
+    	q.setParameter("name", name);
     	
     	return this.getSingleResultOrNull(q);
     }
@@ -79,6 +79,21 @@ public class SecRoleDao extends AbstractDao<SecRole> {
     public List<SecRole> findAllOrderByRole()
 	{
 		Query query = entityManager.createQuery("select x from SecRole x order by x.name");
+
+		@SuppressWarnings("unchecked")
+		List<SecRole> results = query.getResultList();
+
+		return(results);
+	}
+
+	public List<SecRole> findAllOrderByRole(String[] ignoreList)
+	{
+		if(ignoreList == null || ignoreList.length < 1)
+		{
+			return findAllOrderByRole();
+		}
+		Query query = entityManager.createQuery("select x from SecRole x WHERE x.name NOT IN (:ignoreList) order by x.name");
+		query.setParameter("ignoreList", ignoreList);
 
 		@SuppressWarnings("unchecked")
 		List<SecRole> results = query.getResultList();

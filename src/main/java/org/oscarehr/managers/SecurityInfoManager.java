@@ -23,24 +23,24 @@
  */
 package org.oscarehr.managers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Vector;
-
-import org.apache.commons.lang.StringUtils;
-import org.oscarehr.common.exception.PatientDirectiveException;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import oscar.util.OscarRoleObjectPrivilege;
-
 import com.quatro.dao.security.SecobjprivilegeDao;
 import com.quatro.dao.security.SecuserroleDao;
 import com.quatro.model.security.Secobjprivilege;
 import com.quatro.model.security.Secuserrole;
+import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.exception.PatientDirectiveException;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import oscar.util.OscarRoleObjectPrivilege;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.Vector;
 
 @Service
 public class SecurityInfoManager {
@@ -56,6 +56,9 @@ public class SecurityInfoManager {
 	
 	@Autowired
 	private SecobjprivilegeDao secobjprivilegeDao;
+
+	@Autowired
+	private ProviderDataDao providerDataDao;
 
 	public List<Secuserrole> getRoles(String providerNo)
 	{
@@ -220,5 +223,30 @@ public class SecurityInfoManager {
 		}
 		throw new SecurityException("missing one or more required privileges: " + privilege + " for security objects (" + String.join(",", requiredObjList) + ")");
 
+	}
+
+	public void requireSuperAdminFlag(String providerNo)
+	{
+		ProviderData provider = providerDataDao.find(providerNo);
+		if(!provider.isSuperAdmin())
+		{
+			throw new SecurityException("Super Admin privileges are required");
+		}
+	}
+
+	/**
+	 * throws a security exception if the current provider attempts to modify a non super-admin provider
+	 * @param currentProviderNo - the providerId of the current user
+	 * @param providerNoToModify - the providerId of the user they are attempting to modify
+	 */
+	public void superAdminModificationCheck(String currentProviderNo, String providerNoToModify)
+	{
+		ProviderData providerToModify = providerDataDao.find(providerNoToModify);
+		ProviderData currentProvider = providerDataDao.find(currentProviderNo);
+
+		if(!currentProvider.isSuperAdmin() && providerToModify.isSuperAdmin())
+		{
+			throw new SecurityException("Super Admin privileges are required");
+		}
 	}
 }

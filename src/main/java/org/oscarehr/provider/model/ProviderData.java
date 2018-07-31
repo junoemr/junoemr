@@ -353,6 +353,10 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	public Boolean getSuperAdmin() {
 		return superAdmin;
 	}
+
+	public Boolean isSuperAdmin() {
+		return superAdmin;
+	}
         
 	/* -- Comparators -- */
 	

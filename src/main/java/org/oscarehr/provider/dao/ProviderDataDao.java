@@ -26,15 +26,20 @@ package org.oscarehr.provider.dao;
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import oscar.admin.transfer.ProviderRoleTransfer;
 import oscar.util.ConversionUtils;
 
 import javax.persistence.Query;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 @Repository
+@Transactional
 public class ProviderDataDao extends AbstractDao<ProviderData>
 {
 
@@ -149,17 +154,46 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
     	return proList;
     }
 
-    public List<Object[]> findProviderSecUserRoles(String lastName, String firstName) {
+    public List<ProviderRoleTransfer> findProviderSecUserRoles(String lastName, String firstName) {
     	
-		String queryStr = "select u.id, u.role_name, p.provider_no, p.first_name, p.last_name, p.super_admin from provider p LEFT JOIN secUserRole u ON  p.provider_no=u.provider_no "
-				+ " where p.last_name like '" + lastName + "' and p.first_name like '" + firstName + "' and p.status='1' order by p.first_name, p.last_name, u.role_name";
+		String queryStr = "select p.provider_no, p.first_name, p.last_name, p.super_admin, u.id, u.role_name, pp.role_id " +
+				"FROM provider p " +
+				"LEFT JOIN secUserRole u ON  p.provider_no=u.provider_no " +
+				"LEFT JOIN secRole r ON (r.role_name = u.role_name) " +
+				"LEFT JOIN program_provider pp ON (p.provider_no = pp.provider_no AND r.role_no = pp.role_id) " +
+				"WHERE p.last_name like :lastName and p.first_name like :firstName and p.status='1' " +
+				"order by p.first_name, p.last_name, u.role_name";
 
 		Query query = entityManager.createNativeQuery(queryStr);
+		query.setParameter("lastName", lastName);
+		query.setParameter("firstName", firstName);
 
     	@SuppressWarnings("unchecked")
         List<Object[]> proList = query.getResultList();
-    	
-    	return proList;
+    	List<ProviderRoleTransfer> transferList = new ArrayList<>(proList.size());
+
+    	for(Object[] result : proList)
+	    {
+		    ProviderRoleTransfer transfer = new ProviderRoleTransfer();
+
+		    transfer.setProviderId((String)result[0]);
+		    transfer.setFirstName((String) result[1]);
+		    transfer.setLastName((String) result[2]);
+		    boolean superAdmin = (result[3]).equals("1");
+		    transfer.setSuperAdmin(superAdmin);
+
+		    if(result[4] != null)
+		    {
+			    transfer.setRoleId(new Long((Integer) result[4]));
+			    transfer.setRoleName((String) result[5]);
+		    }
+			if(result[6] != null)
+			{
+				transfer.setPrimaryRoleId(((BigInteger) result[6]).longValue());
+			}
+			transferList.add(transfer);
+	    }
+    	return transferList;
     }
 
     public List<ProviderData> findByProviderTeam(String providerNo) {
