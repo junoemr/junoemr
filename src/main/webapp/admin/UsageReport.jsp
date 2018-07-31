@@ -51,8 +51,8 @@ if(!authed) {
 <%@page import="java.util.Date"%>
 <%@page import="org.oscarehr.casemgmt.dao.CaseManagementNoteDAO" %>
 <%@page import="org.oscarehr.common.dao.BillingDao" %>
-<%@page import="org.oscarehr.common.model.Drug" %>
-<%@page import="org.oscarehr.common.dao.DrugDao" %>
+<%@page import="org.oscarehr.rx.model.Drug" %>
+<%@page import="org.oscarehr.rx.dao.DrugDao" %>
 <%@page import="org.oscarehr.common.dao.ProviderInboxRoutingDao" %>
 <%@page import="org.oscarehr.common.model.ProviderInboxItem" %>
 <%@page import="org.oscarehr.managers.TicklerManager" %>

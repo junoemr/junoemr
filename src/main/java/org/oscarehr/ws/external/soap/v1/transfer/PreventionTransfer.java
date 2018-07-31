@@ -24,16 +24,16 @@
 
 package org.oscarehr.ws.external.soap.v1.transfer;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.oscarehr.prevention.model.Prevention;
+import org.oscarehr.prevention.model.PreventionExt;
+import org.oscarehr.prevention.service.PreventionManager;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.SpringUtils;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.oscarehr.common.model.Prevention;
-import org.oscarehr.common.model.PreventionExt;
-import org.oscarehr.managers.PreventionManager;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.SpringUtils;
 
 public final class PreventionTransfer {
 
@@ -177,14 +177,14 @@ public final class PreventionTransfer {
 		preventionTransfer.setProviderNo(prevention.getProviderNo());
 		preventionTransfer.setRefused(prevention.isRefused());
 		
-		preventionTransfer.setPreventionExts(PreventionExtTransfer.toTransfers(preventionExts));
+		preventionTransfer.setPreventionExts(PreventionExtTransfer.toTransfers(prevention, preventionExts));
 
 		return (preventionTransfer);
 	}
 
 	public static PreventionTransfer[] getTransfers(LoggedInInfo loggedInInfo, List<Prevention> preventions)
 	{
-		ArrayList<PreventionTransfer> results=new ArrayList<PreventionTransfer>();
+		ArrayList<PreventionTransfer> results=new ArrayList<>();
 		PreventionManager preventionManager=SpringUtils.getBean(PreventionManager.class);
 		
 		for (Prevention prevention : preventions)

@@ -28,6 +28,10 @@ import java.util.Date;
 
 import oscar.util.UtilDateUtilities;
 
+/**
+ * @deprecated use the jpa model instead
+ */
+@Deprecated
 public class CaseManagementNoteExt {
 
 	// Key Value constants ***All date value key must be in format "XXX Date"

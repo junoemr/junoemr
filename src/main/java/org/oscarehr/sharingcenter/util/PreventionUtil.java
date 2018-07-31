@@ -28,10 +28,10 @@
 package org.oscarehr.sharingcenter.util;
 
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.common.model.Prevention;
-import org.oscarehr.common.model.PreventionExt;
-import org.oscarehr.common.dao.PreventionDao;
-import org.oscarehr.common.dao.PreventionExtDao;
+import org.oscarehr.prevention.model.Prevention;
+import org.oscarehr.prevention.model.PreventionExt;
+import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.dao.PreventionExtDao;
 import org.oscarehr.util.SpringUtils;
 
 import java.util.HashMap;

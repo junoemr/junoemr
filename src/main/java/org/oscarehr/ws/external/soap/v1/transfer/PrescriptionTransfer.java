@@ -29,8 +29,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.oscarehr.common.model.Drug;
-import org.oscarehr.common.model.Prescription;
+import org.oscarehr.rx.model.Drug;
+import org.oscarehr.rx.model.Prescription;
 import org.oscarehr.managers.PrescriptionManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
