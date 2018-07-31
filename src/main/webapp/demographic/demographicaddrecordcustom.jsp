@@ -43,6 +43,7 @@
 <%@ page
 		import="org.springframework.web.context.*,org.springframework.web.context.support.*,org.oscarehr.common.dao.*,org.oscarehr.common.model.*"%>
 <%@page import="org.oscarehr.common.dao.CountryCodeDao" %>
+<%@ page import="oscar.dms.EDocUtil" %>
 <jsp:useBean id="providerBean" class="java.util.Properties"
              scope="session" />
 <jsp:useBean id="addDemoBean" class="oscar.AppointmentMainBean"/>
@@ -103,7 +104,7 @@
 	if(demographic_string == null){
 		demographic_string = "";
 	}
-	String all_fields = "last_name,first_name,official_lang,title,address,city,province,postal,phone,phone2,cellphone,newsletter,email,pin,dob,sex,hin,eff_date,hc_type,countryOfOrigin,sin,cytolNum,doctor,nurse,midwife,resident,referral_doc,roster_status,patient_status,chart_no,waiting_list,date_joined,end_date,alert,form_notes";
+	String all_fields = "last_name,first_name,official_lang,title,address,city,province,postal,phone,phone2,cellphone,newsletter,email,pin,dob,sex,hin,eff_date,hc_type,countryOfOrigin,sin,cytolNum,doctor,nurse,midwife,resident,referral_doc,roster_status,patient_status,chart_no,waiting_list,date_joined,end_date,alert,form_notes,document";
 	if(oscarProps.isPropertyActive("demographic_veteran_no")) {
 		all_fields += ",veteran_no";
 	}
@@ -200,13 +201,15 @@
 		<style>
 			label{ width: 200px; display: inline-block; }
 			form div{ width: 600px; }
-			form{ width: 680px; margin-left: auto; margin-right: auto; background-color: #CCCCFF; padding: 10px; }
+			form{ width: 790px; margin-left: auto; margin-right: auto; background-color: #CCCCFF; padding: 10px; padding-left:200px}
 			h2{ text-align: center; }
 		</style>
 		<script language="JavaScript">
 
 			function onSubmit()
 			{
+
+				document.adddemographic.submitType.value = document.adddemographic.submited;
 				document.adddemographic.submit.disabled = true;
 				if (!checkFormTypeIn())
 				{
@@ -498,7 +501,7 @@
 	</table>
 
 	<%@ include file="zdemographicfulltitlesearch.jsp"%>
-	<form method="post" name="adddemographic" action="demographicaddarecord.jsp" onsubmit="return onSubmit()">
+	<form method="post" name="adddemographic" enctype="multipart/form-data" action="../demographic/AddDemographic.do" onsubmit="return onSubmit()">
 		<%
 			for(int i=0; i<custom_demographic_fields.size(); i++){
 				if(hidden_demographic_fields.indexOf(custom_demographic_fields.get(i)) >= 0){
@@ -975,6 +978,32 @@
 				<option value=""></option>
 			</select>
 		</div>
+		<%
+		}else if(custom_demographic_fields.get(i).equals("document")){
+		%>
+			<label>
+				<b>
+					Add a Document:
+				</b>
+			</label>
+			<span>
+				<input type="text" name="docDesc" size="19"	placeholder="Enter Title" style="width: 170px">
+				<select id="docType" name="docType" >
+					<option value=""><bean:message key="dms.addDocument.formSelect" /></option>
+					<%
+						ArrayList doctypes = EDocUtil.getActiveDocTypes("demographic");
+					   	for (int k=0; k<doctypes.size(); k++)
+					   	{
+						  	String doctype = (String) doctypes.get(k); %>
+							<option value="<%= doctype%>"><%= doctype%></option>
+					<%	}
+					%>
+				</select>
+				<input type="file" name="docFile" size="20" class="warning" >
+			</span>
+
+
+			<br />
 		<%
 		}else if(custom_demographic_fields.get(i).equals("nurse")){
 		%>
@@ -1611,14 +1640,22 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) {
 
 %>
 
-		<div style="background-color: #CCCCFF;">
+		<div style="background-color: #CCCCFF; text-align: center;">
 			<input type="hidden" name="dboperation"	value="add_record">
-			<label></label>
 			<%if (vLocale.getCountry().equals("BR")) { %>
 			<input type="hidden" name="dboperation2" value="add_record_ptbr">
 			<%}%>
+			<input type="hidden" name="submitType" value="test">
 			<input type="hidden" name="displaymode" value="Add Record">
-			<input type="submit" name="submit" value="<bean:message key="demographic.demographicaddrecordhtm.btnAddRecord"/>">
+			<input type="submit" name="submit" onclick="this.form.submited=this.value;" value="<bean:message key="demographic.demographicaddrecordhtm.btnAddRecord"/>">
+			<%if (custom_demographic_fields.contains("document"))
+				{
+			%>
+					<input type="submit" name="submit" onclick="this.form.submited=this.value;" value="<bean:message key="demographic.demographicaddrecordhtm.btnAddDocs"/>">
+			<%
+				}
+			%>
+
 			<input type="button" name="Button" value="<bean:message key="demographic.demographicaddrecordhtm.btnSwipeCard"/>" onclick="window.open('zadddemographicswipe.htm','', 'scrollbars=yes,resizable=yes,width=600,height=300')";>
 			<input type="button" name="Button" value="<bean:message key="demographic.demographicaddrecordhtm.btnCancel"/>" onclick=self.close();>
 		</div>
@@ -1629,6 +1666,22 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) {
 		google.load("jqueryui", "1");
 	</script>
 	<script type="text/javascript">
+	<%
+		if(request.getParameter("dupHin") != null && request.getParameter("dupHin").equals("true"))
+		{
+	%>
+			alert("<bean:message key="demographic.demographicaddarecord.msgDuplicatedHIN"/>");
+	<%
+		}
+	%>
+	<%
+		if(request.getParameter("invalidDOB") != null && request.getParameter("invalidDOB").equals("true"))
+		{
+	%>
+			alert("Error: Invalid Date Of Birth");
+	<%
+		}
+	%>
 		$(document).ready(function()
 		{
 			// AJAX autocomplete referrer doctors
