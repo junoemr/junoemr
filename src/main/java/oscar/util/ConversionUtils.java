@@ -147,8 +147,10 @@ public class ConversionUtils {
 	 * 		Returns the formatted date as a string, or an empty string for 
 	 * 		null date parameter.
 	 */
-	public static String toDateString(Date date, String formatPattern) {
-		if (date == null) {
+	public static String toDateString(Date date, String formatPattern)
+	{
+		if (date == null)
+		{
 			return "";
 		}
 
@@ -423,22 +425,37 @@ public class ConversionUtils {
 	public static LocalDate toNullableLocalDate(String dateString)
 	{
 		if(dateString == null) return null;
-		return toLocalDate(dateString);
+		return toZonedLocalDate(dateString);
 	}
 
 	public static LocalDate toNullableLocalDate(Date legacyDate)
 	{
 		if(legacyDate == null) return null;
-		return toLocalDate(legacyDate);
+		return toZonedLocalDate(legacyDate);
 	}
 
-	public static LocalDate toLocalDate(String dateString)
+
+	public static LocalDate toZonedLocalDate(String dateString)
 	{
-		ZonedDateTime result = ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
+		return toZonedLocalDate(dateString, DateTimeFormatter.ISO_DATE_TIME);
+	}
+
+	public static LocalDate toZonedLocalDate(String dateString, DateTimeFormatter dateTimeFormatter)
+	{
+		ZonedDateTime result = ZonedDateTime.parse(dateString, dateTimeFormatter);
 		return result.toLocalDate();
 	}
+	public static LocalDate toLocalDate(String dateString)
+	{
+		return toLocalDate(dateString, DateTimeFormatter.ISO_DATE);
+	}
 
-	public static LocalDate toLocalDate(Date legacyDate)
+	public static LocalDate toLocalDate(String dateString, DateTimeFormatter dateTimeFormatter)
+	{
+		return LocalDate.parse(dateString, dateTimeFormatter);
+	}
+
+	public static LocalDate toZonedLocalDate(Date legacyDate)
 	{
 		LocalDate date = Instant
 				// get the millis value to build the Instant

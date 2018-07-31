@@ -167,7 +167,9 @@ if (request.getParameter("casetoEncounter")==null)
 
 
 
-<%@page import="org.oscarehr.util.MiscUtils"%><html:html locale="true">
+<%@page import="org.oscarehr.util.MiscUtils"%>
+<%@ page import="org.oscarehr.allergy.model.Allergy" %>
+<html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <title><bean:message key="oscarEncounter.Index.title" /> - <oscar:nameage
@@ -1334,7 +1336,7 @@ function removeSaveFeedback()  {
 						<div class="presBox" id="allergyBox">
 						<ul>
 							<%
-								org.oscarehr.common.model.Allergy[] allergies = RxPatientData.getPatient(loggedInInfo, Integer.parseInt(demoNo)).getAllergies(loggedInInfo);
+								Allergy[] allergies = RxPatientData.getPatient(loggedInInfo, Integer.parseInt(demoNo)).getAllergies(loggedInInfo);
 
                                             for (int j=0; j<allergies.length; j++){%>
 							<li><a

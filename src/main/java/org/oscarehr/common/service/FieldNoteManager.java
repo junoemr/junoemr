@@ -35,12 +35,12 @@ import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.dao.EFormValueDao;
 import org.oscarehr.common.dao.PropertyDao;
-import org.oscarehr.common.dao.ProviderDataDao;
+import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.eform.model.EForm;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.eform.model.EFormValue;
 import org.oscarehr.common.model.Property;
-import org.oscarehr.common.model.ProviderData;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.util.StringUtils;

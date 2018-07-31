@@ -26,7 +26,7 @@
 package oscar.oscarRx.pageUtil;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.phr.model.PHRMedication;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;

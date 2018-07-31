@@ -72,22 +72,22 @@ import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.AdmissionDao;
-import org.oscarehr.common.dao.AllergyDao;
+import org.oscarehr.allergy.dao.AllergyDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.dao.DemographicContactDao;
 import org.oscarehr.demographic.dao.DemographicExtDao;
-import org.oscarehr.common.dao.DrugDao;
+import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.common.dao.DrugReasonDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.PartialDateDao;
-import org.oscarehr.common.dao.ProviderDataDao;
+import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.common.model.Admission;
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicArchive;
 import org.oscarehr.common.model.DemographicContact;
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.model.Drug;
 import org.oscarehr.common.model.Facility;
 import org.oscarehr.common.model.MeasurementsExt;
 import org.oscarehr.common.model.PartialDate;
@@ -2760,7 +2760,7 @@ import cdsDt.PersonNameStandard.OtherNames;
 		if (pd==null) return null; 
 		if( pd.getProviderNo().charAt(0)!='-') return pd.getProviderNo();
 
-		org.oscarehr.common.model.ProviderData newpd = providerDataDao.findByProviderNo(pd.getProviderNo());
+		org.oscarehr.provider.model.ProviderData newpd = providerDataDao.findByProviderNo(pd.getProviderNo());
 		if (StringUtils.empty(pd.getFirst_name()))
 			newpd.setFirstName(StringUtils.noNull(firstName));
 		if (StringUtils.empty(pd.getLast_name()))

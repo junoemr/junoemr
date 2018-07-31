@@ -39,7 +39,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.managers.PreventionManager;
+import org.oscarehr.prevention.service.PreventionManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;

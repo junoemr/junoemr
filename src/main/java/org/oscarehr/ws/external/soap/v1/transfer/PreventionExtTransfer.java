@@ -23,10 +23,11 @@
  */
 package org.oscarehr.ws.external.soap.v1.transfer;
 
+import org.oscarehr.prevention.model.Prevention;
+import org.oscarehr.prevention.model.PreventionExt;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.oscarehr.common.model.PreventionExt;
 
 public class PreventionExtTransfer {
 	
@@ -70,23 +71,23 @@ public class PreventionExtTransfer {
 	/**
 	 * We will not support null key entries
 	 */
-	public static PreventionExtTransfer toTransfer(PreventionExt preventionExt) {
+	public static PreventionExtTransfer toTransfer(Prevention prevention, PreventionExt preventionExt) {
 		if (preventionExt==null) return(null);
 		
 		PreventionExtTransfer transfer = new PreventionExtTransfer();
 		transfer.setId(preventionExt.getId());
-		transfer.setPreventionId(preventionExt.getPreventionId());
+		transfer.setPreventionId(prevention.getId());
 		transfer.setKey(preventionExt.getkeyval());
 		transfer.setValue(preventionExt.getVal());
 
 		return (transfer);
 	}
 
-	public static PreventionExtTransfer[] toTransfers(List<PreventionExt> preventionExts) {
-		ArrayList<PreventionExtTransfer> results = new ArrayList<PreventionExtTransfer>();
+	public static PreventionExtTransfer[] toTransfers(Prevention prevention, List<PreventionExt> preventionExts) {
+		ArrayList<PreventionExtTransfer> results = new ArrayList<>();
 
 		for (PreventionExt preventionExt : preventionExts) {
-			results.add(toTransfer(preventionExt));
+			results.add(toTransfer(prevention, preventionExt));
 		}
 
 		return (results.toArray(new PreventionExtTransfer[0]));

@@ -29,8 +29,8 @@
 
 <%@ page import="java.sql.*, java.util.*, oscar.*" buffer="none" errorPage="errorpage.jsp"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
-<%@ page import="org.oscarehr.common.model.ProviderData"%>
-<%@ page import="org.oscarehr.common.dao.ProviderDataDao"%>
+<%@ page import="org.oscarehr.provider.model.ProviderData"%>
+<%@ page import="org.oscarehr.provider.dao.ProviderDataDao"%>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%

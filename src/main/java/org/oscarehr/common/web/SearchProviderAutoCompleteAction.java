@@ -42,7 +42,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.oscarProvider.data.ProviderData;
-import org.oscarehr.common.dao.ProviderDataDao;
+import org.oscarehr.provider.dao.ProviderDataDao;
 /**
  *
  * @author jackson
@@ -86,11 +86,11 @@ public class SearchProviderAutoCompleteAction extends DispatchAction{
     	}
     	
     	ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
-    	List<org.oscarehr.common.model.ProviderData> provList = providerDataDao.findByName(firstName, lastName, true);
+    	List<org.oscarehr.provider.model.ProviderData> provList = providerDataDao.findByName(firstName, lastName, true);
     	StringBuilder searchResults = new StringBuilder("[");
     	int idx = 0;
     	
-    	for( org.oscarehr.common.model.ProviderData provData : provList ) {
+    	for( org.oscarehr.provider.model.ProviderData provData : provList ) {
     		searchResults.append("{\"label\":\"" + provData.getLastName() + ", " + provData.getFirstName() + "\",\"value\":\"" + provData.getId() + "\"}");
     		if( idx < provList.size() - 1 ) {
     			searchResults.append(",");

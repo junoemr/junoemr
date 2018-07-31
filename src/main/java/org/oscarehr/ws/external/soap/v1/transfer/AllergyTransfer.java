@@ -29,7 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.springframework.beans.BeanUtils;
 
 public final class AllergyTransfer {
