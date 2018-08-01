@@ -334,8 +334,7 @@ public class PreventionData {
 		oscar.oscarPrevention.Prevention prevention = getPrevention(loggedInInfo, demographicId);
 
 		List<CachedDemographicPrevention> cachedPreventions = getRemotePreventions(loggedInInfo, demographicId);
-
-		if (cachedPreventions != null) {
+		if (cachedPreventions != null && prevention != null) {
 			for (CachedDemographicPrevention cdp : cachedPreventions) {
 				PreventionItem pi = new PreventionItem(cdp);
 				prevention.addPreventionItem(pi);

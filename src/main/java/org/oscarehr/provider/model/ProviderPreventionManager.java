@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,164 +57,159 @@ public class ProviderPreventionManager
 {
 	private static Logger logger = MiscUtils.getLogger();
 	private static final QueueCache<String, String> dataCache=new QueueCache<String, String>(4, 500, DateUtils.MILLIS_PER_HOUR, null);
-	
-    @Autowired
-    private PreventionDS pf = null;
-    
-  
 
-    public  String getWarnings(LoggedInInfo loggedInInfo, String demo) {
-        String ret = dataCache.get(demo);
-      
-        if( ret == null ) {
-                try {
-
-                	Prevention prev = PreventionData.getLocalandRemotePreventions(loggedInInfo, Integer.parseInt(demo));
-                    pf.getMessages(prev);
-                    
-                    @SuppressWarnings("unchecked")
-                    Map<String,Object> m = prev.getWarningMsgs();
-                    
-                    @SuppressWarnings("rawtypes")
-                    Set set = m.entrySet();
-                    
-                    @SuppressWarnings("rawtypes")
-                    Iterator i = set.iterator();
-                    // Display elements
-                    String k="";
-                    if(ret==null || ret.equals("null")){
-                    	ret="";
-                    }
-                    
-	                 while(i.hasNext()) {
-	                 @SuppressWarnings("rawtypes")
-	                 Map.Entry me = (Map.Entry)i.next();
-
-	                 k="["+me.getKey()+"="+me.getValue()+"]";
-	                 boolean prevCheck = ProviderPreventionManager.isPrevDisabled(me.getKey().toString());
-	                 	if(prevCheck==false){
-		                 ret=ret+k;
-	                 	}
-
-	                 } 	
-                                         
-	                 dataCache.put(demo, ret);
-
-                } catch(Exception e) {
-                    ret = "";
-                    MiscUtils.getLogger().error("Error", e);
-                }
-            
-        }
-        
-        return ret;
-        
-    }
-
-     public void removePrevention(String demo) {
-    	 dataCache.remove(demo);
-     }
-
-   
-
-public static String checkNames(String k){
-	String rebuilt="";
-  	Pattern pattern = Pattern.compile("(\\[)(.*?)(\\])");
-  	Matcher matcher = pattern.matcher(k);
-  	
-  	while(matcher.find()){
-  		String[] key = matcher.group(2).split("=");
-	  	boolean prevCheck = ProviderPreventionManager.isPrevDisabled(key[0]);
-	  	
-	  	if(prevCheck==false){
-	  		rebuilt=rebuilt+"["+key[1]+"]";
-	  	}
-  	} 
-  	
-	return rebuilt;
-}
-     
-     
-public static boolean isDisabled(){
-	String getStatus="";
-	PropertyDao propDao = (PropertyDao)SpringUtils.getBean("propertyDao");
-	List<Property> pList = propDao.findByName("hide_prevention_stop_signs"); 
-	
-  	Iterator<Property> i = pList.iterator();
-
-  	while (i.hasNext()) {
-  	Property item = i.next();
-  	getStatus  = item.getValue();
-  	
-  	}
-  	
-  	//disable all preventions warnings if result is master
-  	return getStatus.equals("master");
-}
+	@Autowired
+	private PreventionDS pf = null;
 
 
-public static boolean isCreated(){
-	String getStatus="";
-	PropertyDao propDao = (PropertyDao)SpringUtils.getBean("propertyDao");
-	List<Property> pList = propDao.findByName("hide_prevention_stop_signs"); 
-	
-  	Iterator<Property> i = pList.iterator();
+	public String getWarnings(LoggedInInfo loggedInInfo, String demo)
+	{
+		String toReturn = dataCache.get(demo);
 
-  	while (i.hasNext()) {
-  	Property item = i.next();
-  	getStatus  = item.getName();
-  	
-  	}
-  	
-  	if(getStatus.equals("hide_prevention_stop_signs")){
-  		return true;
-  	}else{
-  		return false;
-  	}
-	
-}
+		if (toReturn == null)
+		{
+			try
+			{
+				Prevention prevention = PreventionData.getLocalandRemotePreventions(loggedInInfo, Integer.parseInt(demo));
+				StringBuilder preventionWarnings = new StringBuilder();
 
-public static boolean isPrevDisabled(String name){
-	String getStatus="";
-	PropertyDao propDao = (PropertyDao)SpringUtils.getBean("propertyDao");
-	List<Property> pList = propDao.findByName("hide_prevention_stop_signs"); 
-	
-  	Iterator<Property> i = pList.iterator();
+				if (prevention != null)
+				{
+					pf.getMessages(prevention);
 
-  	while (i.hasNext()) {
-  	Property item = i.next();
-  	getStatus  = item.getValue();
-  	
-  	}
-  	
-  	Pattern pattern = Pattern.compile("(\\[)(.*?)(\\])");
-  	Matcher matcher = pattern.matcher(getStatus);
-  	List<String> listMatches = new ArrayList<String>();
+					@SuppressWarnings("unchecked")
+					Map<String, Object> warningsMap = prevention.getWarningMsgs();
+					for (Map.Entry<String, Object> entry : warningsMap.entrySet())
+					{
+						boolean isPreventionDisabled = ProviderPreventionManager.isPrevDisabled(entry.getKey().toString());
 
-  	while(matcher.find()){
+						if (!isPreventionDisabled)
+						{
+							// The java compiler currently doesn't optimize string concatenation from inside->outside loops
+							// so we will use StringBuilder to finish the concatenation.
+							String warning = "[" + entry.getKey() + "=" + entry.getValue() + "]";
+							preventionWarnings.append(warning);
+						}
+					}
 
-  	listMatches.add(matcher.group(2));
+					dataCache.put(demo, preventionWarnings.toString());
+				}
 
-  	} 
-  	
-  	int x=0;
-  	for(String s : listMatches){
-		
-        if(name.equals(s)){
-        	x++;
-        }
-	
-  	}
-  	
-  	if(x>0){
-  		return true;
-  	}else{
-  		return false;
-  	}
-  	
-  	
-}
+				toReturn = preventionWarnings.toString();
+			}
+			catch (Exception e)
+			{
+				toReturn = "";
+				MiscUtils.getLogger().error("Error retrieving prevention warnings for demographic " + demo, e);
+			}
+		}
+
+		return toReturn;
+	}
+
+	public void removePrevention(String demo) {
+		dataCache.remove(demo);
+	}
 
 
-  	
+	public static String checkNames(String k){
+		String rebuilt="";
+		Pattern pattern = Pattern.compile("(\\[)(.*?)(\\])");
+		Matcher matcher = pattern.matcher(k);
+
+		while(matcher.find()){
+			String[] key = matcher.group(2).split("=");
+			boolean prevCheck = ProviderPreventionManager.isPrevDisabled(key[0]);
+
+			if(prevCheck==false){
+				rebuilt=rebuilt+"["+key[1]+"]";
+			}
+		}
+
+		return rebuilt;
+	}
+
+
+	public static boolean isDisabled(){
+		String getStatus="";
+		PropertyDao propDao = (PropertyDao)SpringUtils.getBean("propertyDao");
+		List<Property> pList = propDao.findByName("hide_prevention_stop_signs");
+
+		Iterator<Property> i = pList.iterator();
+
+		while (i.hasNext()) {
+			Property item = i.next();
+			getStatus  = item.getValue();
+
+		}
+
+		//disable all preventions warnings if result is master
+		return getStatus.equals("master");
+	}
+
+
+	public static boolean isCreated(){
+		String getStatus="";
+		PropertyDao propDao = (PropertyDao)SpringUtils.getBean("propertyDao");
+		List<Property> pList = propDao.findByName("hide_prevention_stop_signs");
+
+		Iterator<Property> i = pList.iterator();
+
+		while (i.hasNext()) {
+			Property item = i.next();
+			getStatus  = item.getName();
+
+		}
+
+		if(getStatus.equals("hide_prevention_stop_signs")){
+			return true;
+		}else{
+			return false;
+		}
+
+	}
+
+	public static boolean isPrevDisabled(String name){
+		String getStatus="";
+		PropertyDao propDao = (PropertyDao)SpringUtils.getBean("propertyDao");
+		List<Property> pList = propDao.findByName("hide_prevention_stop_signs");
+
+		Iterator<Property> i = pList.iterator();
+
+		while (i.hasNext()) {
+			Property item = i.next();
+			getStatus  = item.getValue();
+
+		}
+
+		Pattern pattern = Pattern.compile("(\\[)(.*?)(\\])");
+		Matcher matcher = pattern.matcher(getStatus);
+		List<String> listMatches = new ArrayList<String>();
+
+		while(matcher.find()){
+
+			listMatches.add(matcher.group(2));
+
+		}
+
+		int x=0;
+		for(String s : listMatches){
+
+			if(name.equals(s)){
+				x++;
+			}
+
+		}
+
+		if(x>0){
+			return true;
+		}else{
+			return false;
+		}
+
+
+	}
+
+
+
 }
