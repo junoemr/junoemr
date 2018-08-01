@@ -45,7 +45,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.Prevention;
+import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 

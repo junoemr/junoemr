@@ -33,10 +33,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.dao.ProviderDataDao;
+import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.Drug;
-import org.oscarehr.common.model.ProviderData;
+import org.oscarehr.rx.model.Drug;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.oscarRx.erx.controller.ERxChartUpdater;
 import org.oscarehr.oscarRx.erx.controller.ERxCommunicator;
 import org.oscarehr.oscarRx.erx.controller.ERxPrescriptionTranslator;

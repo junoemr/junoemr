@@ -25,7 +25,7 @@
 
 package oscar.oscarDemographic.data;
 
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.util.LoggedInInfo;
 
 import oscar.oscarRx.data.RxPatientData;

@@ -30,7 +30,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.managers.AllergyManager;
 import org.oscarehr.ws.rest.conversion.AllergyConverter;
 import org.oscarehr.ws.rest.to.AllergyResponse;

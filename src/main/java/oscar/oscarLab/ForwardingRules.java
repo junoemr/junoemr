@@ -33,14 +33,15 @@
 
 package oscar.oscarLab;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.IncomingLabRulesDao;
 import org.oscarehr.common.model.IncomingLabRules;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.util.SpringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -71,7 +72,7 @@ public class ForwardingRules {
 	}
 
 	public String getStatus(String providerNo) {
-		String ret = "N";
+		String ret = ProviderInboxItem.NEW;
 		IncomingLabRulesDao dao = SpringUtils.getBean(IncomingLabRulesDao.class);
 		List<IncomingLabRules> rules = dao.findCurrentByProviderNo(providerNo);
 		if (!rules.isEmpty()) {

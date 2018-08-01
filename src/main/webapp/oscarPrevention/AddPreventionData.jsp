@@ -24,16 +24,23 @@
 
 --%>
 
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="oscar.oscarProvider.data.ProviderData"%>
-<%@ page import="oscar.oscarDemographic.data.DemographicData,java.text.SimpleDateFormat, java.util.*,oscar.oscarPrevention.*,oscar.oscarProvider.data.*,oscar.util.*"%>
-<%@ page import="org.oscarehr.casemgmt.model.CaseManagementNoteLink" %>
-<%@ page import="org.oscarehr.casemgmt.service.CaseManagementManager" %>
+<%@ page import="org.oscarehr.casemgmt.model.CaseManagementNoteLink"%>
+<%@ page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
+<%@ page import="org.oscarehr.common.dao.PreventionsLotNrsDao"%>
+<%@ page import="org.oscarehr.demographic.dao.DemographicExtDao"%>
+<%@ page import="org.oscarehr.demographic.model.DemographicExt"%>
+<%@ page import="org.oscarehr.util.LoggedInInfo"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.demographic.dao.DemographicExtDao" %>
-<%@page import="org.oscarehr.common.dao.PreventionsLotNrsDao" %>
-<%@page import="org.oscarehr.common.model.PreventionsLotNrs" %>
-<%@ page import="org.oscarehr.demographic.model.DemographicExt" %>
+<%@ page import="oscar.oscarDemographic.data.DemographicData"%>
+<%@ page import="oscar.oscarPrevention.PreventionData" %>
+<%@ page import="oscar.oscarPrevention.PreventionDisplayConfig" %>
+<%@ page import="oscar.oscarProvider.data.ProviderData"%>
+<%@ page import="oscar.util.UtilDateUtilities" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>

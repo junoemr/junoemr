@@ -24,8 +24,8 @@
 
 package org.oscarehr.sharingcenter.util;
 
-import org.oscarehr.common.dao.AllergyDao;
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.dao.AllergyDao;
+import org.oscarehr.allergy.model.Allergy;
 
 import org.oscarehr.util.SpringUtils;
 import java.util.List;

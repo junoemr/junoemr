@@ -44,8 +44,8 @@
 <%@ page import="com.quatro.dao.security.SecuserroleDao" %>
 <%@ page import="org.oscarehr.common.model.RecycleBin" %>
 <%@ page import="org.oscarehr.common.dao.RecycleBinDao" %>
-<%@ page import="org.oscarehr.common.dao.ProviderDataDao" %>
-<%@ page import="org.oscarehr.common.model.ProviderData" %>
+<%@ page import="org.oscarehr.provider.dao.ProviderDataDao" %>
+<%@ page import="org.oscarehr.provider.model.ProviderData" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
 
 <%

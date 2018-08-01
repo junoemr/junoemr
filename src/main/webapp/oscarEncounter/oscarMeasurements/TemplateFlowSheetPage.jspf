@@ -48,6 +48,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Vector" %>
+<%@ page import="org.oscarehr.allergy.model.Allergy" %>
 
 <%
 	if(session.getValue("user") == null) response.sendRedirect("../../logout.jsp");
@@ -591,7 +592,7 @@ div.recommendations li{
             <div class="wrapper" id="allergFullListing"  >
 
                 <%
-			org.oscarehr.common.model.Allergy[] allergies;
+			Allergy[] allergies;
                     allergies = RxPatientData.getPatient(loggedInInfo, Integer.parseInt(demographic_no)).getActiveAllergies();
 
 // oscar.oscarRx.data.RxPatientData.Patient.Allergy[] allergies;
