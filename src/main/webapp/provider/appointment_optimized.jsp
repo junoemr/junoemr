@@ -368,16 +368,17 @@ private long getAppointmentRowSpan(
 	String [] curProvider_no;
 	String [] curProviderName;
 
-	//initial provider bean for all the application
-	if(providerBean.isEmpty())
+
+	// Regenerate provider beans every time this page is reloaded in case the new providers were added, or existing
+	// providers are changed.
+	providerBean.clear();
+	for (Provider p : providerDao.getActiveProviders())
 	{
-		for(Provider p : providerDao.getActiveProviders())
-		{
-			providerBean.setProperty(p.getProviderNo(),p.getFormattedName());
-		}
+	    providerBean.setProperty(p.getProviderNo(),p.getFormattedName());
 	}
 
 	ProviderPreference providerPreference2=(ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE);
+
 	String mygroupno = providerPreference2.getMyGroupNo();
 	if(mygroupno == null)
 	{
