@@ -31,7 +31,6 @@ angular.module('Common.Directives').directive('selectOptionTooltip', [
 
 		var linkFunction = function link_function($scope, element, attribute, controller)
 		{
-
 			$scope.addCustomAttr = function (attr, element, data, fnDisableIfTrue)
 			{
 				$("option", element).each(function (i, e)
@@ -46,8 +45,7 @@ angular.module('Common.Directives').directive('selectOptionTooltip', [
 			var attrToWatch = expElements[3];
 			var fnDisableIfTrue = $parse(expElements[1]);
 
-			//TODO handle changes to the options list somehow
-			$scope.$watch(attrToWatch, function (newValue)
+			$scope.$watchCollection(attrToWatch, function (newValue)
 			{
 				if (newValue)
 					$scope.addCustomAttr(expElements[2], element, newValue, fnDisableIfTrue);
