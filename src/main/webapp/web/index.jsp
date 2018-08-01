@@ -486,6 +486,7 @@
 <script type="text/javascript" src="common/directives/datepickerPopup.js"></script>
 <script type="text/javascript" src="common/directives/jqueryUIResizable.js"></script>
 <script type="text/javascript" src="common/directives/jqueryUIDraggable.js"></script>
+<script type="text/javascript" src="common/directives/selectOptionTooltip.js"></script>
 
 <script type="text/javascript" src="layout/module.js"></script>
 <script type="text/javascript" src="layout/bodyController.js"></script>

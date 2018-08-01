@@ -43,7 +43,9 @@
 			<select id="selAvailDoc" class="form-control" 
 				size="8" 
 				ng-model="consultAttachmentCtrl.atth.selectedAvailableDoc" 
-				ng-options="doc.displayName group by doc.documentTypeDisplay for doc in consultAttachmentCtrl.atth.availableDocs" 
+				ng-options="doc.displayName group by doc.documentTypeDisplay for doc in consultAttachmentCtrl.atth.availableDocs"
+			    <%--ng-options="doc.displayName for doc in consultAttachmentCtrl.atth.availableDocs" --%>
+			    select-option-tooltip="doc.displayName for doc in consultAttachmentCtrl.atth.availableDocs"
 				ng-dblclick="consultAttachmentCtrl.openDoc(consultAttachmentCtrl.atth.selectedAvailableDoc)">
 			</select>
 		</div>
@@ -57,7 +59,8 @@
 			<select id="selAttachDoc" class="form-control" 
 				size="8" 
 				ng-model="consultAttachmentCtrl.atth.selectedAttachedDoc" 
-				ng-options="doc.displayName group by doc.documentTypeDisplay for doc in consultAttachmentCtrl.atth.attachedDocs" 
+				ng-options="doc.displayName group by doc.documentTypeDisplay for doc in consultAttachmentCtrl.atth.attachedDocs"
+			    select-option-tooltip="doc.displayName for doc in consultAttachmentCtrl.atth.attachedDocs"
 				ng-dblclick="consultAttachmentCtrl.openDoc(consultAttachmentCtrl.atth.selectedAttachedDoc)"></select>
 		</div>
 		<div class="clear"></div>
