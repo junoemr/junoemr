@@ -53,7 +53,7 @@
 <%@ page import="oscar.appt.status.model.AppointmentStatus" %>
 <%
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
-	AppointmentStatusDAO appointmentStatusDao = (AppointmentStatusDAO)SpringUtils.getBean("appointmentStatusDao");
+	AppointmentStatusDAO appointmentStatusDao = (AppointmentStatusDAO)SpringUtils.getBean("appointStatusDao");
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
 	SimpleDateFormat dayFormatter = new SimpleDateFormat("yyyy-MM-dd");
 %>
