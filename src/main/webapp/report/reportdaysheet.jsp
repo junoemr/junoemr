@@ -238,15 +238,9 @@ function printDaysheet() {
 		{ //select all providers
 			rsdemo = daySheetBean.queryResults(param[0], "search_daysheetnew");
 		}
-	} else
+	} else if (request.getParameter("dsmode") != null && request.getParameter("dsmode").equals("newappt"))
 	{
-		if (!provider_no.equals("*") && !provider_no.startsWith("_grp_"))
-		{
-			rsdemo = daySheetBean.queryResults(new String[]{param[1], param[2], param[3]}, "search_daysheetsingleapptnew");
-		} else
-		{ //select all providers
-			rsdemo = daySheetBean.queryResults(param[0], "search_daysheetnewappt");
-		}
+		rsdemo = daySheetBean.queryResults(new String[]{param[1], param[2], param[3]}, "search_daysheetsingleapptnew");
 	}
 
 	//Update statues if the print button was pressed and status code T is still Daysheet Printed and enabled
@@ -290,35 +284,16 @@ function printDaysheet() {
 				//Update the status for all providers on the selected day
 				daySheetBean.queryExecuteUpdate(new String[]{param[0], param[1]}, "update_apptstatus");
 			}
-		} else
+		} else if (request.getParameter("dsmode") != null && request.getParameter("dsmode").equals("newappt"))
 		{
-			if (!provider_no.equals("*") && !provider_no.startsWith("_grp_"))
-			{
-				Appointment appt = appointmentDao.find(Integer.parseInt(appointment_no));
+			//We're updating a single appointment
+			Appointment appt = appointmentDao.find(Integer.parseInt(appointment_no));
 
-				//Archive the single appointment
-				appointmentArchiveDao.archiveAppointment(appt);
+			//Archive the single appointment
+			appointmentArchiveDao.archiveAppointment(appt);
 
-				//Update the status of the single appointment
-				daySheetBean.queryExecuteUpdate(param, "update_singleapptstatus");
-			} else
-			{
-				//Archive all appointments for the selected day before updating the status
-				try
-				{
-					List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(param[2], dayFormatter.parse(param[1]), "t");
-					for (Appointment appt : appts)
-					{
-						appointmentArchiveDao.archiveAppointment(appt);
-					}
-				} catch (java.text.ParseException e)
-				{
-					org.oscarehr.util.MiscUtils.getLogger().error("Cannot archive appt", e);
-				}
-
-				//Update the appointment statuses for all appointments on the selected day
-				daySheetBean.queryExecuteUpdate(new String[]{param[0], param[1]}, "update_apptstatus");
-			}
+			//Update the status of the single appointment
+			daySheetBean.queryExecuteUpdate(param, "update_singleapptstatus");
 		}
 	}
 
