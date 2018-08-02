@@ -107,23 +107,19 @@ public class ProviderRoleService
 		programProviderDao.saveProgramProvider(programProvider);
 		return secUserRole;
 	}
-	public Secuserrole addRoleIfMissing(Integer roleProviderId, String roleName)
+
+	public boolean hasRole(Integer roleProviderId, String roleName)
 	{
 		List<Secuserrole> existingRoles = secUserRoleDao.findByProviderAndRoleName(String.valueOf(roleProviderId), roleName);
-		// prevent saving a role already assigned
-		if(existingRoles.isEmpty())
-		{
-			return addRole(roleProviderId, roleName);
-		}
-		return null;
+		return !existingRoles.isEmpty();
 	}
 
 	public void updateRole(Integer currentProviderId, Integer roleProviderId, Integer roleId, String roleName)
 	{
-		Secuserrole role = addRoleIfMissing(roleProviderId, roleName);
-		if(role != null)
+		if(!hasRole(roleProviderId, roleName))
 		{
 			deleteRole(currentProviderId, roleProviderId, roleId);
+			addRole(roleProviderId, roleName);
 		}
 	}
 

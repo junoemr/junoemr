@@ -235,7 +235,7 @@ public class SecurityInfoManager {
 	}
 
 	/**
-	 * throws a security exception if the current provider attempts to modify a non super-admin provider
+	 * throws a security exception if the current non super-admin provider attempts to modify a super-admin provider
 	 * @param currentProviderNo - the providerId of the current user
 	 * @param providerNoToModify - the providerId of the user they are attempting to modify
 	 */

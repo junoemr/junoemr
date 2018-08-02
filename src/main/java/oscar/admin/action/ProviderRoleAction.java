@@ -48,23 +48,23 @@ public class ProviderRoleAction extends DispatchAction
 	{
 		String currentProviderNo = (String) request.getSession().getAttribute("user");
 		String ip = request.getRemoteAddr();
-		String providerId = request.getParameter("providerId");
+		Integer providerId = Integer.parseInt(request.getParameter("providerId"));
 		String roleNew = request.getParameter("roleNew");
 
 		try
 		{
 			logger.info("ADD ROLE");
 			securityInfoManager.requireOnePrivilege(currentProviderNo, SecurityInfoManager.WRITE, null, "_admin", "_admin.userAdmin");
-			securityInfoManager.superAdminModificationCheck(currentProviderNo, providerId);
+			securityInfoManager.superAdminModificationCheck(currentProviderNo, String.valueOf(providerId));
 
 			if(!providerRoleService.validRoleName(roleNew))
 			{
 				return mapping.findForward("failure");
 			}
-			Secuserrole role = providerRoleService.addRoleIfMissing(Integer.parseInt(providerId), roleNew);
 
-			if(role != null)
+			if(!providerRoleService.hasRole(providerId, roleNew))
 			{
+				Secuserrole role = providerRoleService.addRole(providerId, roleNew);
 				LogAction.addLogEntry(currentProviderNo, null, LogConst.ACTION_ADD, LogConst.CON_ROLE, LogConst.STATUS_SUCCESS,
 						String.valueOf(role.getId()), ip, providerId + "|" + roleNew);
 				request.setAttribute("message", "Role " + roleNew + " is added. (" + providerId + ")");
