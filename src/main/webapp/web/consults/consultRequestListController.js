@@ -370,10 +370,12 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 							//add notification if outstanding (incomplete requests > 1 month)
 							if (consult.status != 4 && consult.status != 5 && consult.status != 7)
 							{
-								var dp = consult.referralDate.split("-");
-								var rDate = new Date(dp[0], dp[1] - 1, dp[2]);
-								rDate.setMonth(rDate.getMonth() + 1);
-								if ((new Date()) >= rDate) consult.outstanding = true;
+								var refDate = moment(consult.referralDate).toDate();
+								refDate.setMonth(refDate.getMonth() + 1);
+								if ((new Date()) >= refDate)
+								{
+									consult.outstanding = true;
+								}
 							}
 						}
 						controller.lastResponse = result.data;

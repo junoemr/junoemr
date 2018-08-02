@@ -52,7 +52,7 @@ angular.module("Common.Services").service("consultService", [
 				function error(errors)
 				{
 					console.log("consultService::searchRequests error", errors);
-					deferred.reject("An error occured while searching consult requests");
+					deferred.reject("An error occurred while searching consult requests");
 				});
 
 			return deferred.promise;
