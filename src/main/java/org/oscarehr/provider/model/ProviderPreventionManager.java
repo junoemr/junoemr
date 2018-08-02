@@ -81,7 +81,7 @@ public class ProviderPreventionManager
 					Map<String, Object> warningsMap = prevention.getWarningMsgs();
 					for (Map.Entry<String, Object> entry : warningsMap.entrySet())
 					{
-						boolean isPreventionDisabled = ProviderPreventionManager.isPrevDisabled(entry.getKey().toString());
+						boolean isPreventionDisabled = ProviderPreventionManager.isPrevDisabled(entry.getKey());
 
 						if (!isPreventionDisabled)
 						{
@@ -100,7 +100,7 @@ public class ProviderPreventionManager
 			catch (Exception e)
 			{
 				toReturn = "";
-				MiscUtils.getLogger().error("Error retrieving prevention warnings for demographic " + demo, e);
+				logger.error("Error retrieving prevention warnings for demographic " + demo, e);
 			}
 		}
 
