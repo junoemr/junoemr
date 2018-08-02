@@ -144,7 +144,8 @@ public class ProviderManager2 {
 		return providerDao.getActiveTeams();
 	}
 	
-	public ProviderSettings getProviderSettings(LoggedInInfo loggedInInfo, String providerNo) {
+	public ProviderSettings getProviderSettings(String providerNo)
+	{
 		ProviderSettings settings = new ProviderSettings();
 	
 		ProviderPreference pp = providerPreferenceDao.find(providerNo);

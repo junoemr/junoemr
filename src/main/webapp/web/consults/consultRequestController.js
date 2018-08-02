@@ -34,7 +34,6 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		controller.consult = consult;
 
-		consult.letterheadList = Juno.Common.Util.toArray(consult.letterheadList);
 		consult.faxList = Juno.Common.Util.toArray(consult.faxList);
 		consult.serviceList = Juno.Common.Util.toArray(consult.serviceList);
 		consult.sendToList = Juno.Common.Util.toArray(consult.sendToList);
@@ -46,15 +45,6 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		//set appointment time
 		console.log('initial appointment time: ', angular.copy(consult.appointmentTime));
-
-		controller.changeLetterhead = function changeLetterhead()
-		{
-			if (consult.letterhead === null) return;
-
-			consult.letterheadName = consult.letterhead.id;
-			consult.letterheadAddress = consult.letterhead.address;
-			consult.letterheadPhone = consult.letterhead.phone;
-		};
 
 		controller.parseTime = function parseTime(time)
 		{
@@ -122,29 +112,48 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				console.log(errors);
 			});
 
-		//set default letterhead
-		if (consult.letterheadName == null)
+		controller.changeLetterhead = function changeLetterhead()
 		{
-			consult.letterhead = consult.letterheadList[0];
-			controller.changeLetterhead();
-		}
-		else
-		{
-			for (var i = 0; i < consult.letterheadList.length; i++)
-			{
-				if (consult.letterheadList[i].id === consult.letterheadName)
-				{
-					consult.letterhead = consult.letterheadList[i];
-					break;
-				}
-			}
-		}
+			if (consult.letterhead === null) return;
 
-		//set default fax if there's only 1
-		if (consult.letterhead.fax == null && consult.faxList.length == 1)
-		{
-			consult.letterhead.fax = consult.faxList[0].faxNumber;
-		}
+			consult.letterheadName = consult.letterhead.id;
+			consult.letterheadAddress = consult.letterhead.address;
+			consult.letterheadPhone = consult.letterhead.phone;
+		};
+		consultService.getLetterheadList().then(
+			function success(results)
+			{
+				consult.letterheadList = Juno.Common.Util.toArray(results.data);
+
+				//set default letterhead
+				if (consult.letterheadName == null)
+				{
+					consult.letterhead = consult.letterheadList[0];
+					controller.changeLetterhead();
+				}
+				else
+				{
+					for (var i = 0; i < consult.letterheadList.length; i++)
+					{
+						if (consult.letterheadList[i].id === consult.letterheadName)
+						{
+							consult.letterhead = consult.letterheadList[i];
+							break;
+						}
+					}
+				}
+
+				//set default fax if there's only 1
+				if (consult.letterhead.fax == null && consult.faxList.length == 1)
+				{
+					consult.letterhead.fax = consult.faxList[0].faxNumber;
+				}
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			}
+		);
 
 		//set specialist list
 		for (var i = 0; i < consult.serviceList.length; i++)

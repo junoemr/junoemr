@@ -218,6 +218,15 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 	}
 
 	@SuppressWarnings("unchecked")
+	public List<ProviderData> findByActiveStatus(boolean isActive)
+	{
+		Query query = createQuery("p", " p.status = :status order by p.lastName, p.firstName");
+		query.setParameter("status", isActive? "1":"0");
+		return query.getResultList();
+	}
+
+
+	@SuppressWarnings("unchecked")
 	public List<ProviderData> findByName(String firstName, String lastName, boolean onlyActive) {
 		StringBuilder buf = createQueryString("p", "");
 		boolean isAppended = false;

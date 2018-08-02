@@ -60,7 +60,6 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			});
 
 		controller.consult = consult;
-		consult.letterheadList = Juno.Common.Util.toArray(consult.letterheadList);
 		consult.referringDoctorList = Juno.Common.Util.toArray(consult.referringDoctorList);
 		consult.faxList = Juno.Common.Util.toArray(consult.faxList);
 		consult.sendToList = Juno.Common.Util.toArray(consult.sendToList);
@@ -69,26 +68,47 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 		consult.attachments = Juno.Common.Util.toArray(consult.attachments);
 		Juno.Consults.Common.sortAttachmentDocs(consult.attachments);
 
-		//set default letterhead
-		if (consult.letterheadName == null)
-		{
-			for (var i = 0; i < consult.letterheadList.length; i++)
-			{
-				if (consult.letterheadList[i].id == user.providerNo)
-				{
-					consult.letterheadName = consult.letterheadList[i].id;
-					consult.letterheadAddress = consult.letterheadList[i].address;
-					consult.letterheadPhone = consult.letterheadList[i].phone;
-					break;
-				}
-			}
-		}
 
-		//set default fax if there's only 1
-		if (consult.letterheadFax == null && consult.faxList.length == 1)
+		consultService.getLetterheadList().then(
+			function success(results)
+			{
+				consult.letterheadList = Juno.Common.Util.toArray(results.data);
+
+				//set default letterhead
+				if (consult.letterheadName == null)
+				{
+					for (var i = 0; i < consult.letterheadList.length; i++)
+					{
+						if (consult.letterheadList[i].id == user.providerNo)
+						{
+							consult.letterheadName = consult.letterheadList[i].id;
+							consult.letterheadAddress = consult.letterheadList[i].address;
+							consult.letterheadPhone = consult.letterheadList[i].phone;
+							break;
+						}
+					}
+				}
+
+				//set default fax if there's only 1
+				if (consult.letterheadFax == null && consult.faxList.length == 1)
+				{
+					consult.letterheadFax = consult.faxList[0].faxNumber;
+				}
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			}
+		);
+		controller.changeLetterhead = function changeLetterhead()
 		{
-			consult.letterheadFax = consult.faxList[0].faxNumber;
-		}
+			var index = $("#letterhead").selectedIndex;
+			if (index == null) return;
+
+			consult.letterheadAddress = consult.letterheadList[index].address;
+			consult.letterheadPhone = consult.letterheadList[index].phone;
+		};
+
 
 		//show referringDoctor in list
 		angular.forEach(consult.referringDoctorList, function(referringDoc)
@@ -151,15 +171,6 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				if (!discard) event.preventDefault();
 			}
 		});
-
-		controller.changeLetterhead = function changeLetterhead()
-		{
-			var index = $("#letterhead").selectedIndex;
-			if (index == null) return;
-
-			consult.letterheadAddress = consult.letterheadList[index].address;
-			consult.letterheadPhone = consult.letterheadList[index].phone;
-		};
 
 		controller.writeToBox = function writeToBox(data, boxId)
 		{

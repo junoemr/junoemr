@@ -288,6 +288,25 @@ angular.module("Common.Services").service("consultService", [
 			return deferred.promise;
 		};
 
+		service.getLetterheadList = function getLetterheadList()
+		{
+			var deferred = $q.defer();
+
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			junoHttp.get(service.apiPath + 'getLetterheadList', config).then(
+				function success(results)
+				{
+					deferred.resolve(results);
+				},
+				function error(errors)
+				{
+					console.log("consultService::getLetterheadList error", errors);
+					deferred.reject("An error occurred while fetching letterheads");
+				});
+
+			return deferred.promise;
+		};
+
 		return service;
 	}
 ]);

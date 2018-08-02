@@ -32,7 +32,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ConsultDocsDao;
-import org.oscarehr.common.dao.ConsultResponseDocDao;
+import org.oscarehr.consultations.dao.ConsultResponseDocDao;
 import org.oscarehr.common.dao.LabPatientPhysicianInfoDao;
 import org.oscarehr.common.dao.LabTestResultsDao;
 import org.oscarehr.common.dao.MdsMSHDao;

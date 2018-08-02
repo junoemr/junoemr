@@ -23,18 +23,13 @@
  */
 package org.oscarehr.ws.rest;
 
-import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.BORNPathwayMappingDao;
-import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.dao.ConsultationServiceDao;
 import org.oscarehr.common.dao.FaxConfigDao;
-import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.BORNPathwayMapping;
-import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.ConsultDocs;
 import org.oscarehr.common.model.ConsultResponseDoc;
 import org.oscarehr.common.model.ConsultationRequest;
@@ -43,14 +38,12 @@ import org.oscarehr.common.model.ConsultationServices;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.FaxConfig;
 import org.oscarehr.common.model.ProfessionalSpecialist;
-import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.consultations.ConsultationRequestSearchFilter;
 import org.oscarehr.consultations.ConsultationResponseSearchFilter;
+import org.oscarehr.consultations.service.ConsultationService;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.managers.ConsultationManager;
 import org.oscarehr.managers.DemographicManager;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.conversion.ConsultationRequestConverter;
 import org.oscarehr.ws.rest.conversion.ConsultationResponseConverter;
@@ -90,10 +83,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Path("/consults")
 @Component("consultationWebService")
@@ -101,31 +91,23 @@ public class ConsultationWebService extends AbstractServiceImpl {
 
 	private static Logger logger = Logger.getLogger(ConsultationWebService.class);
 
-	Pattern namePtrn = Pattern.compile("sorting\\[(\\w+)\\]");
+	@Autowired
+	private ConsultationManager consultationManager;
 	
 	@Autowired
-	ConsultationManager consultationManager;
+	private DemographicManager demographicManager;
 	
 	@Autowired
-	CaseManagementManager caseManagementManager;
+	private ProviderDao providerDao;
 	
 	@Autowired
-	DemographicManager demographicManager;
+	private FaxConfigDao faxConfigDao;
 	
 	@Autowired
-	ProviderDao providerDao;
-	
+	private ConsultationServiceDao consultationServiceDao;
+
 	@Autowired
-	FaxConfigDao faxConfigDao;
-	
-	@Autowired
-	ClinicDAO clinicDAO;
-	
-	@Autowired
-	UserPropertyDAO userPropertyDAO;
-	
-	@Autowired
-	ConsultationServiceDao consultationServiceDao;
+	private ConsultationService consultationService;
 	
 	private ConsultationRequestConverter requestConverter = new ConsultationRequestConverter();
 	private ConsultationResponseConverter responseConverter = new ConsultationResponseConverter();
@@ -208,7 +190,6 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			request = requestConverter.getAsTransferObject(getLoggedInInfo(), consult);
 			request.setAttachments(getRequestAttachments(requestId, request.getDemographicId(), ConsultationAttachmentTo1.ATTACHED).getBody());
 
-			request.setLetterheadList(getLetterheadList());
 			request.setFaxList(getFaxList());
 			request.setServiceList(serviceConverter.getAllAsTransferObjects(getLoggedInInfo(), consultationManager.getConsultationServices()));
 			request.setSendToList(providerDao.getActiveTeams());
@@ -225,31 +206,39 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@GET
 	@Path("/getNewRequest")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<ConsultationRequestTo1> getNewRequest(@QueryParam("demographicNo") Integer demographicId) {
-
+	public RestResponse<ConsultationRequestTo1> getNewRequest(@QueryParam("demographicNo") Integer demographicId)
+	{
 		ConsultationRequestTo1 request;
-		try {
-			if(demographicId == null || demographicId <= 0) {
+		try
+		{
+			if(demographicId == null || demographicId <= 0)
+			{
 				return RestResponse.errorResponse("Invalid demographicNo: " + demographicId);
 			}
+			String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 
 			request = new ConsultationRequestTo1();
 			request.setDemographicId(demographicId);
 
 			RxInformation rx = new RxInformation();
 			String info = rx.getAllergies(getLoggedInInfo(), demographicId.toString());
-			if (StringUtils.isNotBlank(info)) request.setAllergies(info);
+			if(StringUtils.isNotBlank(info)) request.setAllergies(info);
 			info = rx.getCurrentMedication(demographicId.toString());
-			if (StringUtils.isNotBlank(info)) request.setCurrentMeds(info);
+			if(StringUtils.isNotBlank(info)) request.setCurrentMeds(info);
 
-			request.setLetterheadList(getLetterheadList());
 			request.setFaxList(getFaxList());
 			request.setServiceList(serviceConverter.getAllAsTransferObjects(getLoggedInInfo(), consultationManager.getConsultationServices()));
 			request.setSendToList(providerDao.getActiveTeams());
-			request.setProviderNo(getLoggedInInfo().getLoggedInProviderNo());
+			request.setProviderNo(loggedInProviderNo);
 			request.setPatientWillBook(true);
+
+			LetterheadTo1 defaultLetterhead = consultationService.getDefaultLetterhead(loggedInProviderNo, demographicId);
+			request.setLetterheadName(defaultLetterhead.getId());
+			request.setLetterheadAddress(defaultLetterhead.getAddress());
+			request.setLetterheadPhone(defaultLetterhead.getPhone());
 		}
-		catch(Exception e) {
+		catch(Exception e)
+		{
 			logger.error("Unexpected Error", e);
 			return RestResponse.errorResponse("Unexpected Error");
 		}
@@ -399,17 +388,23 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			
 			response.setAttachments(getResponseAttachments(responseId, demographicNo, ConsultationAttachmentTo1.ATTACHED));
 		} else {
-			response.setProviderNo(getLoggedInInfo().getLoggedInProviderNo());
+			String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
+			response.setProviderNo(loggedInProviderNo);
 			RxInformation rx = new RxInformation();
 			String info = rx.getAllergies(getLoggedInInfo(), demographicNo.toString());
 			if (StringUtils.isNotBlank(info)) response.setAllergies(info);
 			info = rx.getCurrentMedication(demographicNo.toString());
 			if (StringUtils.isNotBlank(info)) response.setCurrentMeds(info);
+
+
+			LetterheadTo1 defaultLetterhead = consultationService.getDefaultLetterhead(loggedInProviderNo, demographicNo);
+			response.setLetterheadName(defaultLetterhead.getId());
+			response.setLetterheadAddress(defaultLetterhead.getAddress());
+			response.setLetterheadPhone(defaultLetterhead.getPhone());
 		}
 
 		Demographic demographicD = demographicManager.getDemographicWithExt(getLoggedInInfo(), demographicNo);
 		response.setDemographic(demographicConverter.getAsTransferObject(getLoggedInInfo(), demographicD));
-		response.setLetterheadList(getLetterheadList());
 		response.setReferringDoctorList(getReferringDoctorList());
 		response.setFaxList(getFaxList());
 		response.setSendToList(providerDao.getActiveTeams());
@@ -495,119 +490,33 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		
 		return response;
 	}
-	
+
 	@GET
 	@Path("/getProfessionalSpecialist")
 	@Produces(MediaType.APPLICATION_JSON)
-	public ProfessionalSpecialistTo1 getProfessionalSpecialist(@QueryParam("specId") Integer specId) {
-		
+	public ProfessionalSpecialistTo1 getProfessionalSpecialist(@QueryParam("specId") Integer specId)
+	{
 		ProfessionalSpecialist ps = consultationManager.getProfessionalSpecialist(specId);
-		if(ps != null) {
+		if(ps != null)
+		{
 			ProfessionalSpecialistConverter converter = new ProfessionalSpecialistConverter();
-			return converter.getAsTransferObject(getLoggedInInfo(), ps);	
+			return converter.getAsTransferObject(getLoggedInInfo(), ps);
 		}
-		
 		return null;
 	}
-	
-	
-	
+
+	@GET
+	@Path("/getLetterheadList")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestSearchResponse<LetterheadTo1> getLetterheadList()
+	{
+		List<LetterheadTo1> letterheadList = consultationService.getLetterheadList();
+		return RestSearchResponse.successResponse(letterheadList, 1, letterheadList.size(), letterheadList.size());
+	}
+
 	/*******************
 	 * private methods *
 	 *******************/
-	private Date convertJSONDate(String val) {
-		try {
-			return javax.xml.bind.DatatypeConverter.parseDateTime(val).getTime();
-		}catch(Exception e) {
-			MiscUtils.getLogger().warn("Error parsing date - " + val);
-		}
-		return null;
-	}
-
-	private ConsultationResponseSearchFilter convertResponseJSON(JSONObject json) {
-		ConsultationResponseSearchFilter filter = new ConsultationResponseSearchFilter();
-		
-		filter.setAppointmentEndDate(convertJSONDate((String)json.get("appointmentEndDate")));
-		filter.setAppointmentStartDate(convertJSONDate((String)json.get("appointmentStartDate")));
-		filter.setDemographicNo((Integer)json.get("demographicNo"));
-		filter.setMrpNo((Integer)json.get("mrpNo"));
-		filter.setNumToReturn((Integer)json.get("numToReturn"));
-		filter.setReferralEndDate(convertJSONDate((String)json.get("referralEndDate")));
-		filter.setReferralStartDate(convertJSONDate((String)json.get("referralStartDate")));
-		filter.setResponseEndDate(convertJSONDate((String)json.get("responseEndDate")));
-		filter.setResponseStartDate(convertJSONDate((String)json.get("responseStartDate")));
-		filter.setStartIndex((Integer)json.get("startIndex"));
-		filter.setStatus((Integer)json.get("status"));
-		filter.setTeam((String)json.get("team"));
-		
-		JSONObject params = json.getJSONObject("params");
-		if(params != null) {
-			for(Object key:params.keySet()) {
-				Matcher nameMtchr = namePtrn.matcher((String)key);
-				if (nameMtchr.find()) {
-				   String var = nameMtchr.group(1);
-				   filter.setSortMode(ConsultationResponseSearchFilter.SORTMODE.valueOf(var));
-				   filter.setSortDir(ConsultationResponseSearchFilter.SORTDIR.valueOf(params.getString((String)key)));
-				}
-			}
-		}
-		return filter;
-	}
-
-	private List<LetterheadTo1> getLetterheadList() {
-		List<LetterheadTo1> letterheadList = new ArrayList<LetterheadTo1>();
-		
-		//clinic letterhead
-		Clinic clinic = clinicDAO.getClinic();
-		LetterheadTo1 letterhead = new LetterheadTo1("-1", clinic.getClinicName());
-		
-		String clinicPhone = StringUtils.trimToEmpty(clinic.getClinicPhone());
-		String clinicAddress = buildAddress(clinic.getClinicAddress(), clinic.getClinicCity(), clinic.getClinicProvince(), clinic.getClinicPostal());
-		
-		letterhead.setPhone(clinicPhone);
-		letterhead.setAddress(clinicAddress);
-		
-		letterheadList.add(letterhead);
-		
-		//provider letterheads
-		//- find non-empty phone/address in the following priority:
-		//- 1) UserProperty ("property" table)
-		//- 2) Provider
-		//- 3) Clinic
-		List<Provider> providerList = providerDao.getActiveProviders();
-		for (Provider provider : providerList) {
-			String providerNo = provider.getProviderNo();
-			if (providerNo.equals("-1")) continue; //skip user "system"
-
-			letterhead = new LetterheadTo1(providerNo, provider.getFormattedName());
-			
-        	String propValue = readProperty(providerNo, "rxPhone");
-        	if (propValue!=null) {
-        		letterhead.setPhone(propValue);
-        	}
-        	else if (StringUtils.isNotBlank(provider.getWorkPhone())) {
-        		letterhead.setPhone(provider.getWorkPhone().trim());
-        	}
-        	else {
-        		letterhead.setPhone(clinicPhone);
-        	}
-			
-			propValue = readProperty(providerNo, "rxAddress");
-			if (propValue!=null) {
-				letterhead.setAddress(buildAddress(propValue, readProperty(providerNo, "rxCity"), readProperty(providerNo, "rxProvince"), readProperty(providerNo, "rxPostal")));
-			}
-			else if (StringUtils.isNotBlank(provider.getAddress())) {
-				letterhead.setAddress(provider.getAddress().trim());
-			}
-			else {
-				letterhead.setAddress(clinicAddress);
-			}
-			
-			letterheadList.add(letterhead);
-		}
-		
-		return letterheadList;
-	}
 	
 	private List<FaxConfigTo1> getFaxList() {
 		List<FaxConfigTo1> faxList = new ArrayList<FaxConfigTo1>();
@@ -632,20 +541,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		}
 		return refDocList;
 	}
-	
-	private String buildAddress(String address, String city, String province, String postal) {
-		address = StringUtils.trimToEmpty(address) + " " + StringUtils.trimToEmpty(city);
-		address = StringUtils.trimToEmpty(address) + " " + StringUtils.trimToEmpty(province);
-		address = StringUtils.trimToEmpty(address) + " " + StringUtils.trimToEmpty(postal);
-		return StringUtils.trimToEmpty(address);
-	}
-	
-	private String readProperty(String providerNo, String key) {
-		UserProperty prop = userPropertyDAO.getProp(providerNo, key);
-		if (prop!=null) return StringUtils.trimToNull(prop.getValue());
-		else return null;
-	}
-	
+
 	private void getDocuments(List<EDoc> edocs, boolean attached, List<ConsultationAttachmentTo1> attachments) {
 		for (EDoc edoc : edocs) {
 			String url = "dms/ManageDocument.do?method=display&doc_no="+edoc.getDocId();

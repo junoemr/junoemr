@@ -38,6 +38,7 @@ import org.oscarehr.common.model.ConsultationRequest;
 import org.oscarehr.common.model.ConsultationServices;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.consultations.ConsultationRequestSearchFilter;
+import org.oscarehr.consultations.dao.ConsultRequestDao;
 import org.oscarehr.util.SpringUtils;
 
 public class ConsultRequestDaoTest extends DaoTestFixtures {
