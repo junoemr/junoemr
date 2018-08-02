@@ -2334,9 +2334,6 @@
 			<forward name="fail" path="/oscarReport/reportByTemplate/addEditTemplate.jsp"></forward>
 			<forward name="deleted" path="/oscarReport/reportByTemplate/homePage.jsp"></forward>
 		</action>
-		<action input="/oscarReport/reportByTemplate/resultReport.jsp" name="FrmForm" path="/oscarReport/reportByTemplate/generateOutFilesAction" scope="request" type="oscar.oscarReport.reportByTemplate.actions.GenerateOutFilesAction">
-			<forward name="success" path="/oscarReport/reportByTemplate/resultReport.jsp"></forward>
-		</action>
 		<action input="/oscarReport/reportByTemplate/addEditTemplate.jsp" name="FrmForm" path="/oscarReport/reportByTemplate/uploadTemplates" scope="request" type="oscar.oscarReport.reportByTemplate.actions.UploadTemplates">
 			<forward name="success" path="/oscarReport/reportByTemplate/addEditTemplate.jsp"></forward>
 		</action>
