@@ -268,7 +268,7 @@ function printDaysheet() {
 				//Archive the appointments for the selected provider on the selected day before updating the status
 				try
 				{
-					List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(provider_no, dayFormatter.parse(sdate), AppointmentStatus.APPOINTMENT_STATUS_DAYSHEET_NEW);
+					List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(provider_no, dayFormatter.parse(sdate), AppointmentStatus.APPOINTMENT_STATUS_NEW);
 					for (Appointment appt : appts)
 					{
 						appointmentArchiveDao.archiveAppointment(appt);
@@ -278,7 +278,7 @@ function printDaysheet() {
 					logger.error("Cannot archive appt", e);
 				}
 
-				for (Appointment a : appointmentDao.findByProviderDayAndStatus(provider_no, dayFormatter.parse(sdate), AppointmentStatus.APPOINTMENT_STATUS_DAYSHEET_NEW))
+				for (Appointment a : appointmentDao.findByProviderDayAndStatus(provider_no, dayFormatter.parse(sdate), AppointmentStatus.APPOINTMENT_STATUS_NEW))
 				{
 					updateAppointment(a, user, appointmentDao);
 				}
@@ -287,7 +287,7 @@ function printDaysheet() {
 				//Update all new appointments for all providers. Archive the appointments for all providers on the selected day before updating the status
 				try
 				{
-					List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(provider_no, dayFormatter.parse(sdate), AppointmentStatus.APPOINTMENT_STATUS_DAYSHEET_NEW);
+					List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(provider_no, dayFormatter.parse(sdate), AppointmentStatus.APPOINTMENT_STATUS_NEW);
 					for (Appointment appt : appts)
 					{
 						appointmentArchiveDao.archiveAppointment(appt);
@@ -297,7 +297,7 @@ function printDaysheet() {
 					logger.error("Cannot archive appt", e);
 				}
 
-				for (Appointment a : appointmentDao.findByDayAndStatus(dayFormatter.parse(sdate), AppointmentStatus.APPOINTMENT_STATUS_DAYSHEET_NEW))
+				for (Appointment a : appointmentDao.findByDayAndStatus(dayFormatter.parse(sdate), AppointmentStatus.APPOINTMENT_STATUS_NEW))
 				{
 					updateAppointment(a, user, appointmentDao);
 				}
