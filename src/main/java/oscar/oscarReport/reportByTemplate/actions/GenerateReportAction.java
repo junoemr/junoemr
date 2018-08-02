@@ -80,7 +80,7 @@ public class GenerateReportAction extends Action {
 						generateCsvZip(request, response ,sequenceLength);
 					} catch(IOException io)
 					{
-						MiscUtils.getLogger().error("Error generating csv zip file: ", io);
+						MiscUtils.getLogger().error("Error Generating CSV Zip File: ", io);
 					}
 
 				}
@@ -92,6 +92,9 @@ public class GenerateReportAction extends Action {
 				if(sequenceLength == null)
 				{
 					String csv = (String) request.getSession().getAttribute("csv");
+					response.setContentType("application/octet-stream");
+					response.setHeader("Content-Disposition", "attachment; filename=\"oscarReport.xls\"");
+
 					HSSFWorkbook xlsFile = generateXlsWorkbook(csv);
 
 					try
@@ -99,7 +102,7 @@ public class GenerateReportAction extends Action {
 						xlsFile.write(response.getOutputStream());
 					} catch (Exception e)
 					{
-						MiscUtils.getLogger().error("Error", e);
+						MiscUtils.getLogger().error("Error Writing XLS file: ", e);
 					}
 				} else
 				{
@@ -108,7 +111,7 @@ public class GenerateReportAction extends Action {
 						generateXlsZip(request, response, sequenceLength);
 					} catch(IOException io)
 					{
-						MiscUtils.getLogger().error("Error generating xls zip file: ", io);
+						MiscUtils.getLogger().error("Error Generating XLS Zip File: ", io);
 					}
 
 				}
@@ -136,9 +139,9 @@ public class GenerateReportAction extends Action {
 		try
 		{
 			response.getWriter().write(csv);
-		} catch (Exception ioe)
+		} catch (Exception e)
 		{
-			MiscUtils.getLogger().error("Error", ioe);
+			MiscUtils.getLogger().error("Error Writing CSV file: ", e);
 		}
 	}
 
