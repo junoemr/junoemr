@@ -52,6 +52,8 @@ if(!authed) {
 <%@ page import="org.oscarehr.common.dao.ProviderDataDao"%>
 <%@ page import="org.oscarehr.appointment.dao.AppointmentStatusDao" %>
 <%@ page import="org.oscarehr.common.model.AppointmentStatus" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page import="org.apache.log4j.Logger" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -65,6 +67,8 @@ if(!authed) {
 
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <%
+
+	Logger logger = MiscUtils.getLogger();
 
 	String curProvider_no = (String) session.getAttribute("user");
 	String orderby = request.getParameter("orderby")!=null?request.getParameter("orderby"):("start_time") ;
@@ -156,6 +160,15 @@ function printDaysheet() {
 }
 </script>
 </head>
+<%!
+	public void updateAppointment(Appointment appt, String user, OscarAppointmentDao appointmentDao)
+	{
+		appt.setStatus(AppointmentStatus.APPOINTMENT_STATUS_DAYSHEET_PRINTED);
+		appt.setLastUpdateUser(user);
+		appt.setUpdateDateTime(new java.util.Date());
+		appointmentDao.merge(appt);
+	}
+%>
 <%
 	boolean bDob = oscarVariables.getProperty("daysheet_dob", "").equalsIgnoreCase("true") ? true : false;
 
@@ -173,6 +186,7 @@ function printDaysheet() {
     String provider_no = request.getParameter("provider_no")!=null?request.getParameter("provider_no"):"175" ;
 	String appointment_no = request.getParameter("appointment_no")!=null?request.getParameter("appointment_no"):"NULL" ;
 	String print = request.getParameter("print")!=null?request.getParameter("print"):"no" ;
+	String dsmode = request.getParameter("dsmode");
     ResultSet rsdemo = null ;
     boolean bodd = false;
 
@@ -203,60 +217,50 @@ function printDaysheet() {
 	boolean bFistL = true; //first line in a table for TH
 	String strTemp = "";
 	String dateTemp = "";
-	String [] param = new String[4];
-	param[0] = (String) session.getAttribute("user");
-	param[1] = sdate;
-	param[2] = provider_no;
-	param[3] = appointment_no;
-	String [] parama = new String[5];
-	parama[0] = sdate;
-	parama[1] = edate;
-	parama[2] = sTime;
-	parama[3] = eTime;
-	parama[4] = provider_no;
+	String user = (String) session.getAttribute("user");
 
 	/*
 		Generate the daysheet
 	 */
-	if (request.getParameter("dsmode") != null && request.getParameter("dsmode").equals("all"))
+	if ("all".equals(dsmode))
 	{
 		//Get all appointments
 		if (!provider_no.equals("*") && !provider_no.startsWith("_grp_"))
 		{
 			//Get all the appointments for the selected provider on the selected date.
-			rsdemo = daySheetBean.queryResults(parama, "search_daysheetsingleproviderall");
+			rsdemo = daySheetBean.queryResults(new String[]{sdate, edate, sTime, eTime, provider_no}, "search_daysheetsingleproviderall");
 		} else
 		{
 			//Get all the appointments for all providers on the selected date.
-			rsdemo = daySheetBean.queryResults(new String[]{parama[0], parama[1], sTime, eTime}, "search_daysheetall");
+			rsdemo = daySheetBean.queryResults(new String[]{sdate, edate, sTime, eTime}, "search_daysheetall");
 		}
-	} else if (request.getParameter("dsmode") != null && request.getParameter("dsmode").equals("new"))
+	} else if ("new".equals(dsmode))
 	{
 		//Get only the 'new' appointments. New appointments have status code 't'.
 		if (!provider_no.equals("*") && !provider_no.startsWith("_grp_"))
 		{
 			//Get the new appointments for the selected provider on the selected date
-			rsdemo = daySheetBean.queryResults(new String[]{param[1], param[2]}, "search_daysheetsingleprovidernew");
+			rsdemo = daySheetBean.queryResults(new String[]{sdate, provider_no}, "search_daysheetsingleprovidernew");
 		} else
 		{
 			//Get the new appointments for all providers on the selected date
-			rsdemo = daySheetBean.queryResults(param[0], "search_daysheetnew");
+			rsdemo = daySheetBean.queryResults(user, "search_daysheetnew");
 		}
-	} else if (request.getParameter("dsmode") != null && request.getParameter("dsmode").equals("newappt"))
+	} else if ("newappt".equals(dsmode))
 	{
 		//Get a single new appointment for the selected provider
-		rsdemo = daySheetBean.queryResults(new String[]{param[1], param[2], param[3]}, "search_daysheetsingleapptnew");
+		rsdemo = daySheetBean.queryResults(new String[]{sdate, provider_no, appointment_no}, "search_daysheetsingleapptnew");
 	}
 
 	/*
 		Update statues if the print button was pressed and status code T is still Daysheet Printed and enabled
 	 */
-	AppointmentStatus daysheetPrintedStatus = appointmentStatusDao.findByStatus("T");
+	AppointmentStatus daysheetPrintedStatus = appointmentStatusDao.findByStatus(AppointmentStatus.APPOINTMENT_STATUS_DAYSHEET_PRINTED);
 
 	if (print.equals("yes") && daysheetPrintedStatus.getDescription().equals("Daysheet Printed") && daysheetPrintedStatus.getActive() == 1)
 	{
-		//If dsmode is equal to 'new' we're coming from the daysheet report function. Else we're coming from the add appointment and print preview function
-		if (request.getParameter("dsmode") != null && request.getParameter("dsmode").equals("new"))
+		//If dsmode is equal to 'new' we're coming from the daysheet report function. If 'newappt' we're coming from the add appointment and print preview function
+		if ("new".equals(dsmode))
 		{
 			//Update all new appointments for the selected provider
 			if (!provider_no.equals("*") && !provider_no.startsWith("_grp_"))
@@ -264,66 +268,50 @@ function printDaysheet() {
 				//Archive the appointments for the selected provider on the selected day before updating the status
 				try
 				{
-					List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(param[2], dayFormatter.parse(param[1]), "t");
+					List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(provider_no, dayFormatter.parse(sdate), AppointmentStatus.APPOINTMENT_STATUS_DAYSHEET_NEW);
 					for (Appointment appt : appts)
 					{
 						appointmentArchiveDao.archiveAppointment(appt);
 					}
 				} catch (java.text.ParseException e)
 				{
-					org.oscarehr.util.MiscUtils.getLogger().error("Cannot archive appt", e);
+					logger.error("Cannot archive appt", e);
 				}
 
-				//Update the status for all appointments for the selected provider on the selected day
-				for (Appointment a : appointmentDao.findByDayAndStatus(oscar.util.ConversionUtils.fromDateString(sdate), "t"))
+				for (Appointment a : appointmentDao.findByProviderDayAndStatus(provider_no, dayFormatter.parse(sdate), AppointmentStatus.APPOINTMENT_STATUS_DAYSHEET_NEW))
 				{
-					if (a.getProviderNo().equals(provider_no))
-					{
-						a.setStatus("T");
-						a.setLastUpdateUser((String) session.getAttribute("user"));
-						a.setUpdateDateTime(new java.util.Date());
-						appointmentDao.merge(a);
-					}
+					updateAppointment(a, user, appointmentDao);
 				}
 			} else
 			{
 				//Update all new appointments for all providers. Archive the appointments for all providers on the selected day before updating the status
 				try
 				{
-					List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(param[2], dayFormatter.parse(param[1]), "t");
+					List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(provider_no, dayFormatter.parse(sdate), AppointmentStatus.APPOINTMENT_STATUS_DAYSHEET_NEW);
 					for (Appointment appt : appts)
 					{
 						appointmentArchiveDao.archiveAppointment(appt);
 					}
 				} catch (java.text.ParseException e)
 				{
-					org.oscarehr.util.MiscUtils.getLogger().error("Cannot archive appt", e);
+					logger.error("Cannot archive appt", e);
 				}
 
-				//Update the status for all providers on the selected day
-				for (Appointment a : appointmentDao.findByDayAndStatus(oscar.util.ConversionUtils.fromDateString(sdate), "t"))
+				for (Appointment a : appointmentDao.findByDayAndStatus(dayFormatter.parse(sdate), AppointmentStatus.APPOINTMENT_STATUS_DAYSHEET_NEW))
 				{
-					a.setStatus("T");
-					a.setLastUpdateUser((String) session.getAttribute("user"));
-					a.setUpdateDateTime(new java.util.Date());
-					appointmentDao.merge(a);
+					updateAppointment(a, user, appointmentDao);
 				}
 			}
-		} else if (request.getParameter("dsmode") != null && request.getParameter("dsmode").equals("newappt"))
+		} else if ("newappt".equals(dsmode))
 		{
 			//We're updating a single new appointment
 			Appointment appt = appointmentDao.find(Integer.parseInt(appointment_no));
 
-			//Archive the single appointment
 			appointmentArchiveDao.archiveAppointment(appt);
 
-			//Update the status of the single appointment
 			if (appt != null)
 			{
-				appt.setStatus("T");
-				appt.setLastUpdateUser((String) session.getAttribute("user"));
-				appt.setUpdateDateTime(new java.util.Date());
-				appointmentDao.merge(appt);
+				updateAppointment(appt, user, appointmentDao);
 			}
 		}
 	}
