@@ -256,6 +256,7 @@ public class HtmlToPdfServlet extends HttpServlet
 		}
 	}
 
+	// This will not work for eForms
 	public byte[] convertToPdf(HttpServletRequest req, String content) throws IOException, HtmlToPdfConversionException
 	{
 		File contentFile = File.createTempFile("pdfservlet.", ".html");

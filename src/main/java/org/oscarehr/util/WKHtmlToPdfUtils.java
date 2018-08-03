@@ -40,7 +40,9 @@ import oscar.OscarProperties;
 
 public class WKHtmlToPdfUtils
 {
+	private static final OscarProperties props = OscarProperties.getInstance();
 	private static final Logger logger = MiscUtils.getLogger();
+
 	private static final int TIMEOUT_SECONDS = 40;
 	private static final String CONVERT_COMMAND;
 	private static final String CONVERT_ARGS;
@@ -48,16 +50,16 @@ public class WKHtmlToPdfUtils
 
 	static
 	{
-		String convertCommand = OscarProperties.getInstance().getProperty("WKHTMLTOPDF_COMMAND");
+		String convertCommand = props.getProperty("WKHTMLTOPDF_COMMAND");
 		if (convertCommand != null) CONVERT_COMMAND = convertCommand;
 		else
 			throw (new RuntimeException("Properties file is missing property : WKHTMLTOPDF_COMMAND"));
 
-		String convertParameters = OscarProperties.getInstance().getProperty("WKHTMLTOPDF_ARGS");
+		String convertParameters = props.getProperty("WKHTMLTOPDF_ARGS");
 		if (convertParameters != null) CONVERT_ARGS = convertParameters;
 		else CONVERT_ARGS = null;
 
-		String convertParametersLabel = OscarProperties.getInstance().getProperty("WKHTMLTOPDF_ARGS_LABEL");
+		String convertParametersLabel = props.getProperty("WKHTMLTOPDF_ARGS_LABEL");
 		if (convertParametersLabel != null) CONVERT_ARGS_LABEL = convertParametersLabel;
 		else CONVERT_ARGS_LABEL = null;
 	}
@@ -65,6 +67,51 @@ public class WKHtmlToPdfUtils
 	private WKHtmlToPdfUtils()
 	{
 		// not meant for instantiation
+	}
+
+
+	/**
+	 * This method is a copy of Apache Tomcat's ApplicationHttpRequest getRequestURL method with the exception that the uri is removed and replaced with our eform viewing uri. Note that this requires that the remote url is valid for local access. i.e. the
+	 * host name from outside needs to resolve inside as well. The result needs to look something like this : https://127.0.0.1:8443/oscar/eformViewForPdfGenerationServlet?fdid=2&parentAjaxId=eforms
+	 */
+	public static String getEformRequestUrl(String providerId, String formId, String httpScheme, String contextPath)
+	{
+		StringBuilder url = new StringBuilder();
+		String scheme = httpScheme;
+		String prop_scheme = props.getProperty("oscar_protocol");
+		if (prop_scheme != null && !prop_scheme.isEmpty())
+		{
+			scheme = prop_scheme;
+		}
+
+		Integer port;
+		try
+		{
+			port = new Integer(props.getProperty("oscar_port"));
+		}
+		catch (Exception e)
+		{
+			port = 8443;
+		}
+		if (port < 0) port = 80; // Work around java.net.URL bug
+
+		url.append(scheme);
+		url.append("://");
+		//url.append(request.getServerName());
+		url.append("127.0.0.1");
+
+		if ((scheme.equals("http") && (port != 80)) || (scheme.equals("https") && (port != 443)))
+		{
+			url.append(':');
+			url.append(port);
+		}
+		url.append(contextPath);
+		url.append("/EFormViewForPdfGenerationServlet?parentAjaxId=eforms&prepareForFax=true&providerId=");
+		url.append(providerId);
+		url.append("&fdid=");
+		url.append(formId);
+
+		return (url.toString());
 	}
 
 	/**
@@ -102,8 +149,10 @@ public class WKHtmlToPdfUtils
 	}
 
 	/**
-	 * This method should convert the html page at the sourceUrl into a pdf written to the outputFile. This method requires wkhtmltopdf to be installed on the machine. In general the outputFile should be a unique temp file. If you're not sure what you're
-	 * doing don't call this method as you will leave lingering data everywhere or you may overwrite important files...
+	 * This method should convert the html page at the sourceUrl into a pdf written to the outputFile.
+	 * This method requires wkhtmltopdf to be installed on the machine.
+	 * In general the outputFile should be a unique temp file.
+	 * If you're not sure what you're doing don't call this method as you will leave lingering data everywhere or you may overwrite important files...
 	 * @throws IOException
 	 * @throws HtmlToPdfConversionException
 	 */

@@ -16,14 +16,9 @@
 package oscar.oscarEncounter.oscarConsultationRequest.pageUtil;
 
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.lowagie.text.DocumentException;
+import com.sun.xml.messaging.saaj.util.ByteInputStream;
+import com.sun.xml.messaging.saaj.util.ByteOutputStream;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -32,14 +27,13 @@ import org.apache.struts.action.ActionMapping;
 import org.oscarehr.common.dao.ConsultDocsDao;
 import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.common.model.ConsultDocs;
-import org.oscarehr.common.printing.HtmlToPdfServlet;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
+import org.oscarehr.util.WKHtmlToPdfUtils;
 import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
@@ -50,9 +44,12 @@ import oscar.util.ConcatPDF;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
-import com.lowagie.text.DocumentException;
-import com.sun.xml.messaging.saaj.util.ByteInputStream;
-import com.sun.xml.messaging.saaj.util.ByteOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -159,16 +156,18 @@ public class EctConsultationFormRequestPrintAction2 extends Action {
 			}
 
 			// Iterating over requested eforms.
-			HtmlToPdfServlet htmlToPdfServlet = new HtmlToPdfServlet();
-			for (int i = 0; eforms != null && i < eforms.size(); i++)
+			for(Integer eFormId : eforms)
 			{
-				EFormData eFormData = eFormDataDao.find(eforms.get(i));
+				EFormData eFormData = eFormDataDao.find(eFormId);
 				if (eFormData == null)
 				{
-					MiscUtils.getLogger().warn("Could not find data for eform fdid " + eforms.get(i));
+					MiscUtils.getLogger().warn("Could not find data for eform fdid " + eFormId);
 					continue;
 				}
-				buffer = htmlToPdfServlet.convertToPdf(request, eFormData.getFormData());
+
+				String eFormRequestUrl = WKHtmlToPdfUtils.getEformRequestUrl(request.getParameter("providerId"),
+						String.valueOf(eFormId), request.getScheme(), request.getContextPath());
+				buffer = WKHtmlToPdfUtils.convertToPdf(eFormRequestUrl);
 				bis = new ByteInputStream(buffer, buffer.length);
 				streams.add(bis);
 				alist.add(bis);
