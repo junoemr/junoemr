@@ -70,7 +70,7 @@ public final class FaxAction
 			tempFile = File.createTempFile(pdfFile, ".pdf");
 
 			// convert to PDF
-			String viewUri = localUri + formId;
+			String viewUri = localUri + formId + "&prepareForFax=true";
 			logger.info("Converting eForm content to pdf. Target file: " + tempFile.getCanonicalPath());
 			WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
 

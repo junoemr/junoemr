@@ -142,7 +142,7 @@ public class ConsultRequestDao extends AbstractDao<ConsultationRequest>
 	
 	public int getConsultationCount2(ConsultationRequestSearchFilter filter) {
 		String sql = getSearchQuery(filter,true);
-		MiscUtils.getLogger().info("sql="+sql);
+		MiscUtils.getLogger().debug("sql="+sql);
 		Query query = entityManager.createQuery(sql);
 		Long count = this.getCountResult(query);
 		
@@ -152,7 +152,7 @@ public class ConsultRequestDao extends AbstractDao<ConsultationRequest>
 
 	public List<Object[]> search(ConsultationRequestSearchFilter filter) {
 		String sql = this.getSearchQuery(filter,false);
-		MiscUtils.getLogger().info("sql="+sql);
+		MiscUtils.getLogger().debug("sql="+sql);
 		Query query = entityManager.createQuery(sql);
 		query.setFirstResult(filter.getStartIndex());
 		query.setMaxResults(filter.getNumToReturn());

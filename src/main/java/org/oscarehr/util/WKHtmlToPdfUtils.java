@@ -106,7 +106,7 @@ public class WKHtmlToPdfUtils
 			url.append(port);
 		}
 		url.append(contextPath);
-		url.append("/EFormViewForPdfGenerationServlet?parentAjaxId=eforms&prepareForFax=true&providerId=");
+		url.append("/EFormViewForPdfGenerationServlet?parentAjaxId=eforms&providerId=");
 		url.append(providerId);
 		url.append("&fdid=");
 		url.append(formId);
