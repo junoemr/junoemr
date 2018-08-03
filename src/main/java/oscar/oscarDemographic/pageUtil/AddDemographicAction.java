@@ -261,7 +261,6 @@ public class AddDemographicAction extends Action
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "given_consent", StringUtils.trimToEmpty(request.getParameter("given_consent"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "rxInteractionWarningLevel", StringUtils.trimToEmpty(request.getParameter("rxInteractionWarningLevel"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "primaryEMR", StringUtils.trimToEmpty(request.getParameter("primaryEMR"))));
-		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "aboriginal", StringUtils.trimToEmpty(request.getParameter("aboriginal"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "phoneComment", StringUtils.trimToEmpty(request.getParameter("phoneComment"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "usSigned", StringUtils.trimToEmpty(request.getParameter("usSigned"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "privacyConsent", StringUtils.trimToEmpty(request.getParameter("privacyConsent"))));
