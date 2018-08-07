@@ -110,24 +110,24 @@ public class AddDemographicAction extends Action
 		}
 
 		Demographic demographic = new Demographic();
-		demographic.setLastName(StringUtils.trimToEmpty(request.getParameter("last_name")));
-		demographic.setFirstName(StringUtils.trimToEmpty(request.getParameter("first_name")));
-		demographic.setAddress(StringUtils.trimToEmpty(request.getParameter("address")));
-		demographic.setCity(StringUtils.trimToEmpty(request.getParameter("city")));
-		demographic.setProvince(StringUtils.trimToEmpty(request.getParameter("province")));
-		demographic.setPostal(StringUtils.trimToEmpty(request.getParameter("postal")));
-		demographic.setPhone(StringUtils.trimToEmpty(request.getParameter("phone")));
-		demographic.setPhone2(StringUtils.trimToEmpty(request.getParameter("phone2")));
-		demographic.setEmail(StringUtils.trimToEmpty(request.getParameter("email")));
+		demographic.setLastName(StringUtils.trimToNull(request.getParameter("last_name")));
+		demographic.setFirstName(StringUtils.trimToNull(request.getParameter("first_name")));
+		demographic.setAddress(StringUtils.trimToNull(request.getParameter("address")));
+		demographic.setCity(StringUtils.trimToNull(request.getParameter("city")));
+		demographic.setProvince(StringUtils.trimToNull(request.getParameter("province")));
+		demographic.setPostal(StringUtils.trimToNull(request.getParameter("postal")));
+		demographic.setPhone(StringUtils.trimToNull(request.getParameter("phone")));
+		demographic.setPhone2(StringUtils.trimToNull(request.getParameter("phone2")));
+		demographic.setEmail(StringUtils.trimToNull(request.getParameter("email")));
 		demographic.setDateOfBirth(dateOfBirth);
-		demographic.setHin(StringUtils.trimToEmpty(request.getParameter("hin")));
-		demographic.setVer(StringUtils.trimToEmpty(request.getParameter("ver")));
-		demographic.setRosterStatus(StringUtils.trimToEmpty(request.getParameter("roster_status")));
-		demographic.setPatientStatus(StringUtils.trimToEmpty(request.getParameter("patient_status")));
+		demographic.setHin(StringUtils.trimToNull(request.getParameter("hin")));
+		demographic.setVer(StringUtils.trimToNull(request.getParameter("ver")));
+		demographic.setRosterStatus(StringUtils.trimToNull(request.getParameter("roster_status")));
+		demographic.setPatientStatus(StringUtils.trimToNull(request.getParameter("patient_status")));
 		demographic.setDateJoined(MyDateFormat.getSysDate(request.getParameter("date_joined_year") + "-" + request.getParameter("date_joined_month") + "-" + request.getParameter("date_joined_date")));
-		demographic.setChartNo(StringUtils.trimToEmpty(request.getParameter("chart_no")));
-		demographic.setProviderNo(StringUtils.trimToEmpty(request.getParameter("staff")));
-		demographic.setSex(StringUtils.trimToEmpty(request.getParameter("sex")));
+		demographic.setChartNo(StringUtils.trimToNull(request.getParameter("chart_no")));
+		demographic.setProviderNo(StringUtils.trimToNull(request.getParameter("staff")));
+		demographic.setSex(StringUtils.trimToNull(request.getParameter("sex")));
 
 		year = StringUtils.trimToNull(request.getParameter("end_date_year"));
 		month = StringUtils.trimToNull(request.getParameter("end_date_month"));
