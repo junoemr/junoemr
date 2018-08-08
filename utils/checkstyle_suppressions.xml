@@ -12,6 +12,7 @@
 	<suppress checks="org.oscarehr.utils.checkstyle.TrackingRegexpCheck" files="2017-02-16.OHSUPPORT-3662.OPTIONAL.licensedProducers-newColumn.sql" />
 	<suppress checks="org.oscarehr.utils.checkstyle.TrackingRegexpCheck" files="MsgDisplayMessagesBean.java" />
 	<suppress checks="org.oscarehr.utils.checkstyle.TrackingRegexpCheck" files="demographiceditdemographic.jsp" />
+	<suppress checks="org.oscarehr.utils.checkstyle.TrackingRegexpCheck" files="EctViewConsultationRequestsUtil.java" />
 
 	<!-- 
 	<suppress checks="RegexpMultiline" files="ResponseDefaultsFilter.java" lines="54" />
