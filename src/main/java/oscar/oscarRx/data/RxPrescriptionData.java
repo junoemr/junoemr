@@ -37,11 +37,11 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.DrugDao;
+import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.common.dao.FavoriteDao;
 import org.oscarehr.common.dao.IndivoDocsDao;
-import org.oscarehr.common.dao.PrescriptionDao;
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.dao.PrescriptionDao;
+import org.oscarehr.rx.model.Drug;
 import org.oscarehr.common.model.IndivoDocs;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -331,14 +331,14 @@ public class RxPrescriptionData {
 		DrugDao dao = SpringUtils.getBean(DrugDao.class);
 		for (Object[] pair : dao.findDrugsAndPrescriptions(demographicNo)) {
 			Drug drug = (Drug) pair[0];
-			org.oscarehr.common.model.Prescription rx = (org.oscarehr.common.model.Prescription) pair[1];
+			org.oscarehr.rx.model.Prescription rx = (org.oscarehr.rx.model.Prescription) pair[1];
 			MiscUtils.getLogger().debug("Looking at drug " + drug + " and rx " + rx);
 			lst.add(toPrescription(demographicNo, drug, rx));
 		}
 		return lst.toArray(new Prescription[lst.size()]);
 	}
 
-	private Prescription toPrescription(int demographicNo, Drug drug, org.oscarehr.common.model.Prescription rx) {
+	private Prescription toPrescription(int demographicNo, Drug drug, org.oscarehr.rx.model.Prescription rx) {
 		Prescription prescription = toPrescription(drug, demographicNo);
 		if (!rx.isReprinted()) prescription.setNumPrints(1);
 		else prescription.setNumPrints(rx.getReprintCount() + 1);
@@ -353,7 +353,7 @@ public class RxPrescriptionData {
 		DrugDao dao = SpringUtils.getBean(DrugDao.class);
 		for (Object[] pair : dao.findDrugsAndPrescriptionsByScriptNumber(script_no)) {
 			Drug drug = (Drug) pair[0];
-			org.oscarehr.common.model.Prescription rx = (org.oscarehr.common.model.Prescription) pair[1];
+			org.oscarehr.rx.model.Prescription rx = (org.oscarehr.rx.model.Prescription) pair[1];
 
 			lst.add(toPrescription(demographicNo, drug, rx));
 		}
@@ -547,7 +547,7 @@ public class RxPrescriptionData {
 		}
 		// textView.append();
 
-		org.oscarehr.common.model.Prescription rx = new org.oscarehr.common.model.Prescription();
+		org.oscarehr.rx.model.Prescription rx = new org.oscarehr.rx.model.Prescription();
 		rx.setProviderNo(provider_no);
 		rx.setDemographicId(demographic_no);
 		rx.setDatePrescribed(today);
@@ -566,7 +566,7 @@ public class RxPrescriptionData {
 
 	public String getScriptComment(String scriptNo) {
 		PrescriptionDao dao = SpringUtils.getBean(PrescriptionDao.class);
-		org.oscarehr.common.model.Prescription p = dao.find(ConversionUtils.fromIntString(scriptNo));
+		org.oscarehr.rx.model.Prescription p = dao.find(ConversionUtils.fromIntString(scriptNo));
 		if (p == null) return null;
 
 		return p.getComments();
@@ -1500,7 +1500,7 @@ public class RxPrescriptionData {
 
 		public boolean Print(LoggedInInfo loggedInInfo) {
 			PrescriptionDao dao = SpringUtils.getBean(PrescriptionDao.class);
-			org.oscarehr.common.model.Prescription p = dao.find(ConversionUtils.fromIntString(getScript_no()));
+			org.oscarehr.rx.model.Prescription p = dao.find(ConversionUtils.fromIntString(getScript_no()));
 			String providerNo = loggedInInfo.getLoggedInProviderNo();
 
 			if (p == null) return false;

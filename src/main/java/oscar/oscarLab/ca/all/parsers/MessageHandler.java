@@ -576,6 +576,21 @@ public abstract class MessageHandler {
 	    return !("N".equals(abnormalFlags));
     }
 
+	public boolean isAbnormal()
+	{
+		for(int i = 0; i < getOBRCount(); i++)
+		{
+			for(int j = 0; j < getOBXCount(i); j++)
+			{
+				if(isOBXAbnormal(i, j))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
     /**
      * Return the obx value type
      * @param i

@@ -29,7 +29,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.model.Drug;
 import org.oscarehr.oscarRx.erx.model.ERxPrescription;
 
 import oscar.oscarRx.util.RxDrugRef;

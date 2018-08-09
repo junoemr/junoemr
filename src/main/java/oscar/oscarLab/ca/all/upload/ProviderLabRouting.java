@@ -54,7 +54,7 @@ import oscar.util.ConversionUtils;
  */
 public class ProviderLabRouting {
 
-	Logger logger = Logger.getLogger(ProviderLabRouting.class);
+	private static final Logger logger = Logger.getLogger(ProviderLabRouting.class);
 	private ProviderLabRoutingDao providerLabRoutingDao = SpringUtils.getBean(ProviderLabRoutingDao.class);
 
 	public ProviderLabRouting() {

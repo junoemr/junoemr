@@ -70,7 +70,7 @@ sites = siteDao.getAllSites();
   
   ProviderPreference providerPreference=(ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE);
   int nStartTime=providerPreference.getStartHour();
-  int nEndTime=providerPreference.getEndHour();
+  int nEndTime=providerPreference.getEndHour() + 1;     // +1 here, because we want to display up to the end of the last preferred hour.
   int nStep=providerPreference.getEveryMin();
   String mygroupno = providerPreference.getMyGroupNo();  
 
@@ -127,7 +127,7 @@ function t(s1,s2,s3,s4,s5,s6) {
 </head>
 <%
   //int nStartTime=9, nEndTime=17, nStep = 15;
-  int colscode = (nEndTime-nStartTime)*60/nStep;
+  int colscode = (nEndTime - nStartTime) * 60 / nStep;
   String rColor1 = "#FFFFE0", rColor2 = "#FFFFE0", bgcolor = "gold";
   String startDate = request.getParameter("startDate")!=null?request.getParameter("startDate"):"today";
   SimpleDateFormat inform = new SimpleDateFormat ("yyyy-MM-dd", request.getLocale());
@@ -207,7 +207,7 @@ function t(s1,s2,s3,s4,s5,s6) {
   	starttime = Integer.parseInt(ConversionUtils.toTimeString(a.getStartTime()).substring(0,2) )*60 + Integer.parseInt(ConversionUtils.toTimeString(a.getStartTime()).substring(3,5) );
   	endtime = Integer.parseInt(ConversionUtils.toTimeString(a.getEndTime()).substring(0,2) )*60 + Integer.parseInt(ConversionUtils.toTimeString(a.getEndTime()).substring(3,5) );
         
-    for(int k=nStartTime*60; k<(nEndTime+1)*60; k+=nStep) {
+    for(int k=nStartTime*60; k<(nEndTime)*60; k+=nStep) {
 	    if(starttime>k) continue;
 	    else {
 	      if(endtime>k && !a.getStatus().equals("C")) {

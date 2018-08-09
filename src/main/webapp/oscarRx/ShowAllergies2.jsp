@@ -42,6 +42,7 @@
 <%@page import="org.oscarehr.casemgmt.model.CaseManagementNoteLink" %>
 <%@page import="org.oscarehr.common.dao.PartialDateDao" %>
 <%@page import="org.oscarehr.common.model.PartialDate" %>
+<%@ page import="org.oscarehr.allergy.model.Allergy" %>
 
 <%
 	String roleName2$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -340,7 +341,7 @@ padding-right:6;
 							String strSOR;
 							int intSOR;
 							
-							for(org.oscarehr.common.model.Allergy allergy : patient.getAllergies(LoggedInInfo.getLoggedInInfoFromSession(request))) {
+							for(Allergy allergy : patient.getAllergies(LoggedInInfo.getLoggedInInfoFromSession(request))) {
 						
 
 								String title = "";

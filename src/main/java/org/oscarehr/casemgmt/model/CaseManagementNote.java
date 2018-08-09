@@ -23,6 +23,12 @@
 
 package org.oscarehr.casemgmt.model;
 
+import org.caisi.model.BaseObject;
+import org.oscarehr.casemgmt.dao.CaseManagementNoteLinkDAO;
+import org.oscarehr.common.model.Provider;
+import org.oscarehr.util.SpringUtils;
+import oscar.oscarRx.data.RxPrescriptionData;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -33,13 +39,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.caisi.model.BaseObject;
-import org.oscarehr.casemgmt.dao.CaseManagementNoteLinkDAO;
-import org.oscarehr.common.model.Provider;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.oscarRx.data.RxPrescriptionData;
-
+/**
+ * @deprecated use the jpa model instead
+ */
+@Deprecated
 public class CaseManagementNote extends BaseObject {
 
 	private Long id;
@@ -77,7 +80,7 @@ public class CaseManagementNote extends BaseObject {
 	private int hashCode = Integer.MIN_VALUE;
 	private int position = 0;
 
-	private int appointmentNo;
+	private Integer appointmentNo = 0;
 	private Integer hourOfEncounterTime;
 	private Integer minuteOfEncounterTime;
 	private Integer hourOfEncTransportationTime;
@@ -117,7 +120,7 @@ public class CaseManagementNote extends BaseObject {
 		map.put("archived", archived);
 		map.put("remote", remote);
 		map.put("facility_name", facilityName);
-		map.put("appointment_no", appointmentNo);
+		map.put("appointment_no", (appointmentNo==null)?0:appointmentNo);
 
 		return map;
 	}
@@ -558,11 +561,13 @@ public class CaseManagementNote extends BaseObject {
 		return null;
 	}
 
-	public int getAppointmentNo() {
-		return appointmentNo;
+	public int getAppointmentNo()
+	{
+		return (appointmentNo == null) ? 0 : appointmentNo;
 	}
 
-	public void setAppointmentNo(int appointmentNo) {
+	public void setAppointmentNo(Integer appointmentNo)
+	{
 		this.appointmentNo = appointmentNo;
 	}
 

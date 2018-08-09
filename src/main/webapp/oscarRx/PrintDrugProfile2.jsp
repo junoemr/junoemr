@@ -33,7 +33,8 @@
 <%@page import="org.oscarehr.util.SessionConstants"%>
 <%@page import="java.util.List"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="java.util.ArrayList,oscar.util.*,java.util.*,org.oscarehr.common.model.Drug,org.oscarehr.common.dao.*"%>
+<%@page import="java.util.ArrayList,oscar.util.*,java.util.*,org.oscarehr.rx.model.Drug,org.oscarehr.common.dao.*"%>
+<%@ page import="org.oscarehr.rx.dao.DrugDao" %>
 <logic:notPresent name="RxSessionBean" scope="session">
     <logic:redirect href="error.html" />
 </logic:notPresent>
