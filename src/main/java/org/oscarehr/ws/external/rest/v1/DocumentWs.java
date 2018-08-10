@@ -89,7 +89,7 @@ public class DocumentWs extends AbstractExternalRestWs
 
 		// upload the document record
 		Document document = DocumentConverter.getInboundAsDomainObject(transfer);
-		document = documentService.uploadNewDocument(document, inputStream);
+		document = documentService.uploadNewDemographicDocument(document, inputStream);
 
 		String ip = getHttpServletRequest().getRemoteAddr();
 		LogAction.addLogEntry(providerNoStr, null, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,

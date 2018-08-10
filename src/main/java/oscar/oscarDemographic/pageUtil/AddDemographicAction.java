@@ -374,7 +374,7 @@ public class AddDemographicAction extends Action
 				DocumentService documentService = SpringUtils.getBean(org.oscarehr.document.service.DocumentService.class);
 				try
 				{
-					documentService.uploadNewDocument(document, docFile.getInputStream(), Integer.parseInt(demoNo));
+					documentService.uploadNewDemographicDocument(document, docFile.getInputStream(), Integer.parseInt(demoNo));
 				} catch (Exception e)
 				{
 					docError = true;

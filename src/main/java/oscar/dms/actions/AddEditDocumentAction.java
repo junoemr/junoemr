@@ -47,6 +47,8 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.DocumentStorage;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.SecRole;
+import org.oscarehr.document.model.CtlDocument;
+import org.oscarehr.document.model.Document;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -56,12 +58,13 @@ import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import oscar.MyDateFormat;
-import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.dms.data.AddEditDocumentForm;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarEncounter.data.EctProgram;
+import oscar.oscarLab.ca.on.LabResultData;
+import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -85,39 +88,14 @@ public class AddEditDocumentAction extends DispatchAction {
 		
 		AddEditDocumentForm fm = (AddEditDocumentForm) form;
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
-			throw new SecurityException("missing required security object (_edoc)");
-		}
-		
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
+
 		FormFile docFile = fm.getFiledata();
 		String fileName = docFile.getFileName();
 		String user = (String) request.getSession().getAttribute("user");
+		Integer programId = null;
 
-		GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName);
-		if(!file.validate())
-		{
-			file.reEncode();
-		}
-		file.moveToDocuments();
-
-		EDoc newDoc = new EDoc("", "", fileName, "", user, user, fm.getSource(), 'A',
-				oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1",
-				file.getPageCount());
-		newDoc.setDocPublic("0");
-		newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
-		newDoc.setContentType(file.getContentType());
-		newDoc.setFileName(file.getName());
-		
-        // if the document was added in the context of a program
-		ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
-		LoggedInInfo loggedInInfo  = LoggedInInfo.getLoggedInInfoFromSession(request);
-		ProgramProvider pp = programManager.getCurrentProgramInDomain(loggedInInfo, loggedInInfo.getLoggedInProviderNo());
-		if(pp != null && pp.getProgramId() != null) {
-			newDoc.setProgramId(pp.getProgramId().intValue());
-		}
-		
-		fileName = newDoc.getFileName();
-		// save local file;
 		if (docFile.getFileSize() == 0) {
 			//errors.put("uploaderror", "dms.error.uploadError");
 			response.setHeader("oscar_error",props.getString("dms.addDocument.errorZeroSize") );
@@ -125,14 +103,35 @@ public class AddEditDocumentAction extends DispatchAction {
 			return null;
 		}
 
-		String doc_no = EDocUtil.addDocumentSQL(newDoc);
-		LogAction.addLogEntry(user, null, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr(), fileName);
+		// if the document was added in the context of a program
+		ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
+		LoggedInInfo loggedInInfo  = LoggedInInfo.getLoggedInInfoFromSession(request);
+		ProgramProvider pp = programManager.getCurrentProgramInDomain(loggedInInfo, loggedInInfo.getLoggedInProviderNo());
+		if(pp != null && pp.getProgramId() != null) {
+			programId = pp.getProgramId().intValue();
+		}
+
+		Document document = new Document();
+		document.setPublic1(false);
+		document.setResponsible(user);
+		document.setDoccreator(user);
+		document.setDocdesc("");
+		document.setDoctype("");
+		document.setDocfilename(fileName);
+		document.setSource(fm.getSource());
+		document.setObservationdate(new Date());
+		document.setProgramId(programId);
+
+		document = documentService.uploadNewDemographicDocument(document, docFile.getInputStream());
+
+		LogAction.addLogEntry(user, null, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
+				String.valueOf(document.getDocumentNo()), request.getRemoteAddr(), fileName);
 		String providerId = request.getParameter("provider");
 
 		if (providerId != null) { // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
 			ProviderInboxRoutingDao providerInboxRoutingDao = (ProviderInboxRoutingDao) ctx.getBean("providerInboxRoutingDAO");
-			providerInboxRoutingDao.addToProviderInbox(providerId, Integer.parseInt(doc_no), "DOC");
+			providerInboxRoutingDao.addToProviderInbox(providerId, document.getDocumentNo(), LabResultData.DOCUMENT);
 		}
 		// add to queuelinkdocument
 		String queueId = request.getParameter("queue");
@@ -141,8 +140,7 @@ public class AddEditDocumentAction extends DispatchAction {
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
 			QueueDocumentLinkDao queueDocumentLinkDAO = (QueueDocumentLinkDao) ctx.getBean("queueDocumentLinkDAO");
 			Integer qid = Integer.parseInt(queueId.trim());
-			Integer did = Integer.parseInt(doc_no.trim());
-			queueDocumentLinkDAO.addActiveQueueDocumentLink(qid, did);
+			queueDocumentLinkDAO.addActiveQueueDocumentLink(qid, document.getDocumentNo());
 			request.getSession().setAttribute("preferredQueue", queueId);
 		}
 		
@@ -151,36 +149,22 @@ public class AddEditDocumentAction extends DispatchAction {
 
 	public ActionForward fastUpload(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		AddEditDocumentForm fm = (AddEditDocumentForm) form;
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
-			throw new SecurityException("missing required security object (_edoc)");
-		}
+
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
+
 		FormFile docFile = fm.getDocFile();
 		String fileName = docFile.getFileName();
-		HashMap<String, String> errors = new HashMap<String, String>();
+		HashMap<String, String> errors = new HashMap<>();
 		String user = (String) request.getSession().getAttribute("user");
-
-		GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName);
-
-		if(!file.validate())
-		{
-			file.reEncode();
-		}
-		file.moveToDocuments();
-
-		EDoc newDoc = new EDoc("", "", fileName, "", user, user, fm.getSource(), 'A',
-				oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1");
-		newDoc.setDocPublic("0");
-		newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
-		newDoc.setContentType(file.getContentType());
-		newDoc.setNumberOfPages(file.getPageCount());
+		Integer programId = null;
 		
         // if the document was added in the context of a program
 		ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
 		LoggedInInfo loggedInInfo  = LoggedInInfo.getLoggedInInfoFromSession(request);
 		ProgramProvider pp = programManager.getCurrentProgramInDomain(loggedInInfo, loggedInInfo.getLoggedInProviderNo());
 		if(pp != null && pp.getProgramId() != null) {
-			newDoc.setProgramId(pp.getProgramId().intValue());
+			programId = pp.getProgramId().intValue();
 		}
 		
 		// save local file;
@@ -189,7 +173,19 @@ public class AddEditDocumentAction extends DispatchAction {
 			throw new FileNotFoundException();
 		}
 
-		EDocUtil.addDocumentSQL(newDoc);
+		Document document = new Document();
+		document.setPublic1(false);
+		document.setResponsible(user);
+		document.setDoccreator(user);
+		document.setDocdesc("");
+		document.setDoctype("");
+		document.setDocfilename(fileName);
+		document.setSource(fm.getSource());
+		document.setObservationdate(new Date());
+		document.setProgramId(programId);
+		document.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
+
+		documentService.uploadNewDemographicDocument(document, docFile.getInputStream());
 
 		return mapping.findForward("fastUploadSuccess");
 	}
@@ -200,10 +196,9 @@ public class AddEditDocumentAction extends DispatchAction {
 
 	public ActionForward execute2(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		AddEditDocumentForm fm = (AddEditDocumentForm) form;
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
-			throw new SecurityException("missing required security object (_edoc)");
-		}
+
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
 		
 		if (fm.getMode().equals("") && fm.getFunction().equals("") && fm.getFunctionId().equals("")) {
 			// file size exceeds the upload limit
@@ -253,7 +248,7 @@ public class AddEditDocumentAction extends DispatchAction {
 	 * @return true if successful, false otherwise */
 	private boolean addDocument(AddEditDocumentForm fm, ActionMapping mapping, HttpServletRequest request) {
 
-		HashMap<String, String> errors = new HashMap<String, String>();
+		HashMap<String, String> errors = new HashMap<>();
 		boolean documentValid = true;
 		try {
 			if ((fm.getDocDesc().length() == 0) || (fm.getDocDesc().equals("Enter Title"))) {
@@ -272,59 +267,65 @@ public class AddEditDocumentAction extends DispatchAction {
 			
 			if(documentValid) {
 				// original file name
+				Document document = new Document();
 				String fileName1 = docFile.getFileName();
-
-				GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName1);
-
-				if(!file.validate())
-				{
-					file.reEncode();
-				}
-				file.moveToDocuments();
-
-				EDoc newDoc = new EDoc(fm.getDocDesc(), fm.getDocType(), fileName1, "", fm.getDocCreator(), fm.getResponsibleId(), fm.getSource(), 'A', fm.getObservationDate(), "", "", fm.getFunction(), fm.getFunctionId());
-				newDoc.setDocPublic(fm.getDocPublic());
-				newDoc.setDocClass(fm.getDocClass());
-				newDoc.setDocSubClass(fm.getDocSubClass());
-				newDoc.setContentType(file.getContentType());
-				newDoc.setNumberOfPages(file.getPageCount());
-				newDoc.setFileName(file.getName());
-
-				MiscUtils.getLogger().info("Content Type:" + newDoc.getContentType());
 
 				// if the document was added in the context of a program
 				ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
 				LoggedInInfo loggedInInfo  = LoggedInInfo.getLoggedInInfoFromSession(request);
 				ProgramProvider pp = programManager.getCurrentProgramInDomain(loggedInInfo, loggedInInfo.getLoggedInProviderNo());
 				if(pp != null && pp.getProgramId() != null) {
-					newDoc.setProgramId(pp.getProgramId().intValue());
+					document.setProgramId(pp.getProgramId().intValue());
 				}
 				String restrictToProgramStr = request.getParameter("restrictToProgram");
-				newDoc.setRestrictToProgram("on".equals(restrictToProgramStr));
+				document.setRestrictToProgram("on".equals(restrictToProgramStr));
 				
 				// if the document was added in the context of an appointment
 				if(fm.getAppointmentNo() != null && fm.getAppointmentNo().length()>0) {
-					newDoc.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
+					document.setAppointmentNo(Integer.parseInt(fm.getAppointmentNo()));
 				}
 				
 			 	// If a new document type is added, include it in the database to create filters
 			 	if (!EDocUtil.getDoctypes(fm.getFunction()).contains(fm.getDocType())){
 			 		EDocUtil.addDocTypeSQL(fm.getDocType(),fm.getFunction());
 			 	}
-	
-				String doc_no = EDocUtil.addDocumentSQL(newDoc);
-				if(ConformanceTestHelper.enableConformanceOnlyTestFeatures){
-					storeDocumentInDatabase(file.getFileObject(), Integer.parseInt(doc_no));
-				}
-				// add note if document is added under a patient
-				String module = fm.getFunction().trim();
-				String moduleId = fm.getFunctionId().trim();
-				
-				Integer demoNo = module.equals("demographic") ? Integer.parseInt(moduleId) : null;
-				LogAction.addLogEntry((String) request.getSession().getAttribute("user"), demoNo, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr(), fileName1);
 
-				
-				if (module.equals("demographic")) {// doc is uploaded under a patient,moduleId become demo no.
+				document.setPublic1(fm.getDocPublic().equals("1"));
+				document.setResponsible(fm.getResponsibleId());
+				document.setDoccreator(fm.getDocCreator());
+				document.setDocdesc(fm.getDocDesc());
+				document.setDoctype(fm.getDocType());
+				document.setDocfilename(fileName1);
+				document.setSource(fm.getSource());
+				document.setDocClass(fm.getDocClass());
+				document.setDocSubClass(fm.getDocSubClass());
+				document.setObservationdate(ConversionUtils.fromDateString(fm.getObservationDate()));
+
+				String module = fm.getFunction().trim();
+				Integer moduleId = Integer.parseInt(fm.getFunctionId().trim());
+				Integer demoNo = null;
+
+				if(module.equalsIgnoreCase(CtlDocument.MODULE_PROVIDER))
+				{
+					document = documentService.uploadNewProviderDocument(document, docFile.getInputStream(), moduleId);
+				}
+				else
+				{
+					demoNo = moduleId;
+					document = documentService.uploadNewDemographicDocument(document, docFile.getInputStream(), demoNo);
+				}
+				GenericFile file = FileFactory.getDocumentFile(document.getDocfilename());
+
+				if(ConformanceTestHelper.enableConformanceOnlyTestFeatures){
+					storeDocumentInDatabase(file.getFileObject(), document.getDocumentNo());
+				}
+
+				Integer documentNo = document.getDocumentNo();
+				LogAction.addLogEntry((String) request.getSession().getAttribute("user"), demoNo, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT,
+						LogConst.STATUS_SUCCESS, String.valueOf(documentNo), request.getRemoteAddr(), fileName1);
+
+				// add note if document is added under a patient
+				if (module.equals(CtlDocument.MODULE_DEMOGRAPHIC)) {// doc is uploaded under a patient,moduleId become demo no.
 	
 					Date now = EDocUtil.getDmsDateTimeAsDate();
 	
@@ -332,9 +333,9 @@ public class AddEditDocumentAction extends DispatchAction {
 	
 					CaseManagementNote cmn = new CaseManagementNote();
 					cmn.setUpdate_date(now);
-					java.sql.Date od1 = MyDateFormat.getSysDate(newDoc.getObservationDate());
+					java.sql.Date od1 = MyDateFormat.getSysDate(ConversionUtils.toDateString(document.getObservationdate()));
 					cmn.setObservation_date(od1);
-					cmn.setDemographic_no(moduleId);
+					cmn.setDemographic_no(String.valueOf(demoNo));
 					HttpSession se = request.getSession();
 					String user_no = (String) se.getAttribute("user");
 					String prog_no = new EctProgram(se).getProgram(user_no);
@@ -378,8 +379,8 @@ public class AddEditDocumentAction extends DispatchAction {
 					cmnl.setTableId(Long.parseLong(EDocUtil.getLastDocumentNo()));
 					cmnl.setNoteId(note_id);
 	
-					request.setAttribute("document_no", doc_no);
-					MiscUtils.getLogger().info(" document no"+doc_no);
+					request.setAttribute("document_no", documentNo);
+					MiscUtils.getLogger().info(" document no"+documentNo);
 	
 					EDocUtil.addCaseMgmtNoteLink(cmnl);
 				}
@@ -398,11 +399,11 @@ public class AddEditDocumentAction extends DispatchAction {
 		return documentValid;
 	}
 
-	private ActionForward editDocument(AddEditDocumentForm fm, ActionMapping mapping, HttpServletRequest request) {
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
-			throw new SecurityException("missing required security object (_edoc)");
-		}
+	private ActionForward editDocument(AddEditDocumentForm fm, ActionMapping mapping, HttpServletRequest request)
+	{
+
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
 
 		HashMap<String, String> errors = new HashMap<>();
 		boolean documentValid = true;
@@ -465,10 +466,5 @@ public class AddEditDocumentAction extends DispatchAction {
 			IOUtils.closeQuietly(fin);
 		}
 		return ret;
-	}
-
-
-	private boolean filled(String s) {
-		return (s != null && s.trim().length() > 0);
 	}
 }

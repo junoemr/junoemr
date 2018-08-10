@@ -8,18 +8,7 @@
  */
 package org.oscarehr.document.web;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import net.sf.json.JSONObject;
-
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -27,21 +16,31 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
-import org.oscarehr.document.model.Document;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
+import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.document.model.Document;
+import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
-
-import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
+import oscar.oscarLab.ca.on.LabResultData;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Date;
+import java.util.List;
 
 public class SplitDocumentAction extends DispatchAction {
 	
@@ -52,6 +51,7 @@ public class SplitDocumentAction extends DispatchAction {
 	private ProviderLabRoutingDao providerLabRoutingDao = (ProviderLabRoutingDao) SpringUtils.getBean("providerLabRoutingDao");
 	private PatientLabRoutingDao patientLabRoutingDao = (PatientLabRoutingDao) SpringUtils.getBean("patientLabRoutingDao");
 	private QueueDocumentLinkDao queueDocumentLinkDAO = (QueueDocumentLinkDao) SpringUtils.getBean("queueDocumentLinkDAO");
+	private DocumentService documentService = SpringUtils.getBean(DocumentService.class);
 
 	public ActionForward split(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String docNum = request.getParameter("document");
@@ -61,19 +61,18 @@ public class SplitDocumentAction extends DispatchAction {
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		String providerNo = loggedInInfo.getLoggedInProviderNo();
 
-		Document doc = documentDao.getDocument(docNum);
+		Document existingDocument = documentDao.getDocument(docNum);
 
-		String documentDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-
-		String newFilename = doc.getDocfilename();
+		String newFilename = existingDocument.getDocfilename();
 
 		PDDocument pdf = null;
 		PDDocument newPdf = null;
 		
-		try {
-		
-			File inputFile = new File(documentDir, doc.getDocfilename());
-			pdf = PDDocument.load(inputFile);
+		try
+		{
+			GenericFile existingPdf = FileFactory.getDocumentFile(existingDocument.getDocfilename());
+
+			pdf = PDDocument.load(existingPdf.getFileObject());
 			newPdf = new PDDocument();
 			
 			if (commands != null) {
@@ -90,36 +89,42 @@ public class SplitDocumentAction extends DispatchAction {
 				}
 			}
 
-			if (newPdf.getNumberOfPages() > 0) {
-
-				/* Save the new pdf */
-				EDoc newDoc = new EDoc("", "", newFilename, "", providerNo, doc.getDoccreator(), "", 'A', 
-						DateFormatUtils.format(new Date(), "yyyy-MM-dd"), "", "", "demographic", "-1", 0);
-				newDoc.setDocPublic("0");
-				newDoc.setContentType("application/pdf");
-				newDoc.setNumberOfPages(newPdf.getNumberOfPages());
-
-				// Saves the document and adds links in ctl_document
-				String newDocNo = EDocUtil.addDocumentSQL(newDoc);
-
-				newPdf.save(documentDir + newDoc.getFileName());
+			if(newPdf.getNumberOfPages() > 0)
+			{
+				File tempFile = File.createTempFile("juno-doc-split", "tempfile");
+				newPdf.save(tempFile);
 				newPdf.close();
 
+				GenericFile newPdfFile = FileFactory.getExistingFile(tempFile);
+
+				Document document = new Document();
+				document.setDocdesc("");
+				document.setDoctype(existingDocument.getDoctype());
+				document.setDocSubClass(existingDocument.getDocSubClass());
+				document.setDocfilename(newFilename);
+				document.setDoccreator(providerNo);
+				document.setResponsible(existingDocument.getDoccreator());
+				document.setSource(existingDocument.getSource());
+				document.setObservationdate(new Date());
+				document.setPublic1(false);
+
+				document = documentService.uploadNewDemographicDocument(document, newPdfFile, null);
+				Integer newDocumentNo = document.getDocumentNo();
+
 				/* add link in providerInbox */
-				List<ProviderInboxItem> routeList = providerInboxRoutingDao.getProvidersWithRoutingForDocument("DOC", Integer.parseInt(docNum));
+				List<ProviderInboxItem> routeList = providerInboxRoutingDao.getProvidersWithRoutingForDocument(LabResultData.DOCUMENT, Integer.parseInt(docNum));
 				for (ProviderInboxItem i : routeList) {
-					providerInboxRoutingDao.addToProviderInbox(i.getProviderNo(), Integer.parseInt(newDocNo), "DOC");
+					providerInboxRoutingDao.addToProviderInbox(i.getProviderNo(), newDocumentNo, LabResultData.DOCUMENT);
 				}
-				providerInboxRoutingDao.addToProviderInbox(providerNo, Integer.parseInt(newDocNo), "DOC");
+				providerInboxRoutingDao.addToProviderInbox(providerNo, newDocumentNo, LabResultData.DOCUMENT);
 
 				/* add link in document queue */
 				Integer qid = (queueId == null || queueId.equalsIgnoreCase("null")) ? 1 : Integer.parseInt(queueId);
-				Integer did = Integer.parseInt(newDocNo.trim());
-				queueDocumentLinkDAO.addActiveQueueDocumentLink(qid, did);
+				queueDocumentLinkDAO.addActiveQueueDocumentLink(qid, newDocumentNo);
 
 				List<ProviderLabRoutingModel> result = providerLabRoutingDao.getProviderLabRoutingDocuments(Integer.parseInt(docNum));
 				if (!result.isEmpty()) {
-					new ProviderLabRouting().route(newDocNo, result.get(0).getProviderNo(), "DOC");
+					new ProviderLabRouting().route(newDocumentNo, result.get(0).getProviderNo(), ProviderLabRoutingDao.LAB_TYPE_DOC);
 				}
 
 				/* add link in patientLabRouting */
@@ -128,14 +133,14 @@ public class SplitDocumentAction extends DispatchAction {
 					PatientLabRouting newPatientRoute = new PatientLabRouting();
 
 					newPatientRoute.setDemographicNo(result2.get(0).getDemographicNo());
-					newPatientRoute.setLabNo(Integer.parseInt(newDocNo));
-					newPatientRoute.setLabType("DOC");
+					newPatientRoute.setLabNo(newDocumentNo);
+					newPatientRoute.setLabType(PatientLabRoutingDao.DOC);
 
 					patientLabRoutingDao.persist(newPatientRoute);
 				}
 				
 				if (result.isEmpty() || result2.isEmpty()) {
-					String json = "{newDocNum:" + newDocNo + "}";
+					String json = "{newDocNum:" + newDocumentNo + "}";
 					JSONObject jsonObject = JSONObject.fromObject(json);
 					response.setContentType("application/json");
 					PrintWriter printWriter = response.getWriter();

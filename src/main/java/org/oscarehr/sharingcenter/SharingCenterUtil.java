@@ -24,30 +24,10 @@
 
 package org.oscarehr.sharingcenter;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import org.apache.tika.mime.MimeType;
 import org.apache.commons.io.IOUtils;
-
 import org.apache.log4j.Logger;
 import org.apache.tika.config.TikaConfig;
+import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 import org.marc.everest.datatypes.II;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_BasicConfidentialityKind;
@@ -100,16 +80,16 @@ import org.marc.xds.profiles.IDocumentRetrieveable;
 import org.marc.xds.profiles.IStoredQueryable;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.document.dao.DocumentDao;
-import org.oscarehr.eform.dao.EFormDataDao;
-import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.common.dao.RelationshipsDao;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.document.model.Document;
-import org.oscarehr.eform.model.EFormData;
-import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.common.model.Relationships;
+import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.document.model.Document;
+import org.oscarehr.eform.dao.EFormDataDao;
+import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.sharingcenter.actions.DocumentPermissionStatus;
 import org.oscarehr.sharingcenter.dao.AffinityDomainDao;
 import org.oscarehr.sharingcenter.dao.ClinicInfoDao;
@@ -139,8 +119,26 @@ import org.oscarehr.sharingcenter.util.CDADocumentUtil;
 import org.oscarehr.sharingcenter.util.EformParser;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.dms.EDocUtil;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class SharingCenterUtil {
 
@@ -315,34 +313,38 @@ public class SharingCenterUtil {
                 MiscUtils.getLogger().error("Unable to find extension for MimeType " + metaData.getMimeType(), e);
             }
             String fileName = doc.getTitle() + System.currentTimeMillis() + ext;
+            InputStream fileInputStream = new ByteArrayInputStream(metaData.getContent());
 
-            FileOutputStream out = new FileOutputStream(oscarProperties.getProperty("DOCUMENT_DIR") + "/" + fileName);
-            out.write(metaData.getContent());
-
-            // Add edoc entry
-            Calendar cal = Calendar.getInstance();
-            DateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
-            DateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            EDocUtil.addDocument(demographicId, fileName, doc.getTitle(), "others", "", "", doc.getMimetype(), dayFormat.format(cal.getTime()), timeFormat.format(cal.getTime()), providerId, "", // responsible
-                    "", // reviewer
-                    null, "", // source
-                    "" // sourceFacility
-            );
+	        // Add edoc entry
+	        Calendar cal = Calendar.getInstance();
+	        DateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
+	        DateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	        EDocUtil.addDocument(
+			        fileInputStream,
+			        demographicId,
+			        fileName,
+			        doc.getTitle(),
+			        "others",
+			        "",
+			        "",
+			        doc.getMimetype(),
+			        dayFormat.format(cal.getTime()),
+			        timeFormat.format(cal.getTime()),
+			        providerId, "", // responsible
+			        "", // reviewer
+			        null, "", // source
+			        "" // sourceFacility
+	        );
 
             // mark the document as downloaded
             doc.setDownloaded(true);
             patientDocumentDao.merge(doc);
-
-            out.close();
-
-        } catch (CommunicationsException ex) {
-            throw ex;
-        } catch (FileNotFoundException ex) {
-            LOGGER.error("Unable to open file for writing", ex);
-        } catch (IOException ex) {
-            LOGGER.error("I/O Exception while writing to file", ex);
         }
-
+        catch(CommunicationsException ex)
+        {
+        	MiscUtils.getLogger().error("Error", ex);
+	        throw ex;
+        }
         return doc;
     }
 

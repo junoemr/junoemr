@@ -124,7 +124,7 @@ public class Document extends AbstractModel<Integer> implements Serializable {
     private Date updatedatetime;
     @Basic(optional = false)
     @Column(name = "status")
-    private char status;
+    private char status = 'A';
     @Basic(optional = false)
     @Column(name = "contenttype")
     private String contenttype;
@@ -259,28 +259,11 @@ public class Document extends AbstractModel<Integer> implements Serializable {
         this.contenttype = contenttype;
     }
 
-    /**
-     * legacy public flag getter
-     * @deprecated use the boolean version
-     */
-    @Deprecated
-    public int getPublic1() {
-        return public1 ? 1 : 0;
-    }
     public boolean isPublic()
     {
         return public1;
     }
 
-    /**
-     * legacy public flag setter
-     * @deprecated use the boolean version
-     * @param public1 1 or 0
-     */
-    @Deprecated
-    public void setPublic1(int public1) {
-	    setPublic1(public1 == 1);
-    }
     public void setPublic1(Boolean isPublic)
     {
         this.public1 = isPublic;
@@ -353,7 +336,7 @@ public class Document extends AbstractModel<Integer> implements Serializable {
 	/**
 	 * @return a string representing the path of the file on disk, i.e. document_dir+'/'+filename
 	 */
-	public String getDocumentFileFullPath()
+	private String getDocumentFileFullPath()
 	{
 		String docDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 		return(docDir+'/'+docfilename);

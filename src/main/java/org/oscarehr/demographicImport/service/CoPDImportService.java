@@ -480,7 +480,7 @@ public class CoPDImportService
 				continue;
 			}
 			InputStream stream = new FileInputStream(documentFile.getFileObject());
-			documentService.uploadNewDocument(document, stream, demographic.getDemographicId());
+			documentService.uploadNewDemographicDocument(document, stream, demographic.getDemographicId());
 			documentService.routeToProviderInbox(document.getDocumentNo(), provider.getProviderNo(), true);
 		}
 	}

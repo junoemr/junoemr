@@ -50,6 +50,8 @@ import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.dao.SecRoleDao;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.SecRole;
@@ -57,6 +59,7 @@ import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
+import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.sharingcenter.SharingCenterUtil;
@@ -116,6 +119,7 @@ public class ManageDocumentAction extends DispatchAction {
 	private CtlDocumentDao ctlDocumentDao = SpringUtils.getBean(CtlDocumentDao.class);
 	private ProviderInboxRoutingDao providerInboxRoutingDAO = SpringUtils.getBean(ProviderInboxRoutingDao.class);
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private DocumentService documentService = SpringUtils.getBean(DocumentService.class);
 
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
@@ -133,9 +137,8 @@ public class ManageDocumentAction extends DispatchAction {
 		Integer demographicNo = Integer.parseInt(demographic);
 		String[] flagProviders = request.getParameterValues("flagproviders");
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
-        	throw new SecurityException("missing required security object (_edoc)");
-        }
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, demographicNo, "_edoc");
 
 		// TODO: if demoLink is "on", check if msp is in flagproviders, if not save to providerInboxRouting, if yes, don't save.
 
@@ -942,113 +945,92 @@ public class ManageDocumentAction extends DispatchAction {
                 
         }
 
-        public ActionForward addIncomingDocument(ActionMapping mapping, ActionForm form,
-            HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ActionForward addIncomingDocument(ActionMapping mapping, ActionForm form,
+	                                         HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
 
-        String pdfDir = request.getParameter("pdfDir");
-        String pdfName = request.getParameter("pdfName");
-        String demographic_no = request.getParameter("demog");
-        String observationDate = request.getParameter("observationDate");
-        String documentDescription = request.getParameter("documentDescription");
-        String docType = request.getParameter("docType");
-        String docClass = request.getParameter("docClass");
-        String docSubClass = request.getParameter("docSubClass");
-        String[] flagproviders = request.getParameterValues("flagproviders");
-        String queueId1 = request.getParameter("queueId");
-        String sourceFilePath = IncomingDocUtil.getIncomingDocumentFilePathName(queueId1, pdfDir, pdfName);
-        String destFilePath;
+		String demographicNoStr = request.getParameter("demog");
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		Integer demographicNo = demographicNoStr != null ? Integer.parseInt(demographicNoStr) : null;
 
-        if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
-        	throw new SecurityException("missing required security object (_edoc)");
-        }
-        
-        Integer demographicNo = demographic_no != null ? Integer.parseInt(demographic_no) : null;
-        
-        String savePath = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-        if (!savePath.endsWith(File.separator)) {
-            savePath += File.separator;
-        }
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, demographicNo, "_edoc");
 
+		String pdfDir = request.getParameter("pdfDir");
+		String fileName = request.getParameter("pdfName");
+		String observationDate = request.getParameter("observationDate");
+		String documentDescription = request.getParameter("documentDescription");
+		String docType = request.getParameter("docType");
+		String docClass = request.getParameter("docClass");
+		String docSubClass = request.getParameter("docSubClass");
+		String[] flagproviders = request.getParameterValues("flagproviders");
+		String queueId1 = request.getParameter("queueId");
+		String sourceFilePath = IncomingDocUtil.getIncomingDocumentFilePathName(queueId1, pdfDir, fileName);
         Date obDate = UtilDateUtilities.StringToDate(observationDate);
-        String formattedDate = UtilDateUtilities.DateToString(obDate, EDocUtil.DMS_DATE_FORMAT);
         String source = "";
+        Integer programId = null;
+        Integer documentNo = null;
 
-
-        int numberOfPages = 0;
-        String fileName = pdfName;
         String user = (String) request.getSession().getAttribute("user");
-        EDoc newDoc = new EDoc(documentDescription, docType, fileName, "", user, user, source, 'A', formattedDate, "", "", "demographic", demographic_no, 0);
-        
+
         // if the document was added in the context of a program
 		ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
 		LoggedInInfo loggedInInfo  = LoggedInInfo.getLoggedInInfoFromSession(request);
 		ProgramProvider pp = programManager.getCurrentProgramInDomain(loggedInInfo, loggedInInfo.getLoggedInProviderNo());
 		if(pp != null && pp.getProgramId() != null) {
-			newDoc.setProgramId(pp.getProgramId().intValue());
+			programId = pp.getProgramId().intValue();
 		}
-		
-        newDoc.setDocClass(docClass);
-        newDoc.setDocSubClass(docSubClass);
-        newDoc.setDocPublic("0");
-        fileName = newDoc.getFileName();
-        destFilePath = savePath + fileName;
-        String doc_no = "";
 
+		GenericFile sourceFile = FileFactory.getExistingFile(sourceFilePath);
+		boolean success = sourceFile.moveToDocuments();
+		if(!success)
+		{
+			log.error("Not able to move " + sourceFile.getName() + " to documents");
+			// File was not successfully moved
+		}
+		else
+		{
+            try
+            {
+	            Document document = new Document();
+	            document.setPublic1(false);
+	            document.setDocClass(docClass);
+	            document.setDocSubClass(docSubClass);
+	            document.setResponsible(user);
+	            document.setDoccreator(user);
+	            document.setDocdesc(documentDescription);
+	            document.setDoctype(docType);
+	            document.setDocfilename(fileName);
+	            document.setSource(source);
+	            document.setObservationdate(obDate);
+	            document.setProgramId(programId);
 
-        newDoc.setContentType(docType);
-        File f1 = new File(sourceFilePath);
-        boolean success = f1.renameTo(new File(destFilePath));
-        if (!success) {
-            log.error("Not able to move " + f1.getName() + " to " + destFilePath);
-            // File was not successfully moved
-        } else {
+	            document = documentService.uploadNewDemographicDocument(document, sourceFile, demographicNo);
+	            documentNo = document.getDocumentNo();
 
-            newDoc.setContentType("application/pdf");
-            if (fileName.endsWith(".PDF") || fileName.endsWith(".pdf")) {
-                newDoc.setContentType("application/pdf");
-                numberOfPages = countNumOfPages(fileName);
+	            if(flagproviders != null && flagproviders.length > 0)
+	            {
+		            try
+		            {
+			            for(String proNo : flagproviders)
+			            {
+				            providerInboxRoutingDAO.addToProviderInbox(proNo, documentNo, LabResultData.DOCUMENT);
+			            }
+		            }
+		            catch(Exception e)
+		            {
+			            MiscUtils.getLogger().error("Error routing to provider ", e);
+		            }
+	            }
+	            success = true;
             }
-            newDoc.setNumberOfPages(numberOfPages);
-            doc_no = EDocUtil.addDocumentSQL(newDoc);
-
-            if (flagproviders != null && flagproviders.length > 0) { 
-                try {
-                    for (String proNo : flagproviders) {
-                        providerInboxRoutingDAO.addToProviderInbox(proNo, Integer.parseInt(doc_no), LabResultData.DOCUMENT);
-                    }
-                } catch (Exception e) {
-                    MiscUtils.getLogger().error("Error", e);
-                }
-            }
-
-            //Check to see if we have to route document to patient
-            PatientLabRoutingDao patientLabRoutingDao = SpringUtils.getBean(PatientLabRoutingDao.class);
-            List<PatientLabRouting> patientLabRoutingList = patientLabRoutingDao.findByLabNoAndLabType(Integer.parseInt(doc_no), docType);
-            if (patientLabRoutingList == null || patientLabRoutingList.isEmpty()) {
-                PatientLabRouting patientLabRouting = new PatientLabRouting();
-                patientLabRouting.setDemographicNo(Integer.parseInt(demographic_no));
-                patientLabRouting.setLabNo(Integer.parseInt(doc_no));
-                patientLabRouting.setLabType("DOC");
-                patientLabRoutingDao.persist(patientLabRouting);
-            }
-
-            try {
-
-                CtlDocument ctlDocument = ctlDocumentDao.getCtrlDocument(Integer.parseInt(doc_no));
-
-                ctlDocument.getId().setModuleId(Integer.parseInt(demographic_no));
-                ctlDocumentDao.merge(ctlDocument);
-                //save a document created note
-                if (ctlDocument.isDemographicDocument()) {
-                    //save note
-                    saveDocNote(request, documentDescription, demographic_no, doc_no);
-                }
-            } catch (Exception e) {
+            catch (IOException e) {
                 MiscUtils.getLogger().error("Error", e);
+	            success = false;
             }
         }
         String logStatus = success ? LogConst.STATUS_SUCCESS : LogConst.STATUS_FAILURE;
-        LogAction.addLogEntry(user, demographicNo, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, logStatus, doc_no, request.getRemoteAddr(), fileName);
+        LogAction.addLogEntry(user, demographicNo, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT,
+		        logStatus, (documentNo==null)?null:String.valueOf(documentNo), request.getRemoteAddr(), fileName);
 
         return (mapping.findForward("nextIncomingDoc"));
     }

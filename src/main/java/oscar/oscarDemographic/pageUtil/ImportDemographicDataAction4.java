@@ -25,103 +25,6 @@
 
 package oscar.oscarDemographic.pageUtil;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.upload.FormFile;
-import org.apache.xmlbeans.XmlException;
-import org.oscarehr.PMmodule.model.Program;
-import org.oscarehr.PMmodule.model.ProgramProvider;
-import org.oscarehr.PMmodule.service.AdmissionManager;
-import org.oscarehr.PMmodule.service.ProgramManager;
-import org.oscarehr.casemgmt.dao.CaseManagementIssueDAO;
-import org.oscarehr.casemgmt.model.CaseManagementIssue;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
-import org.oscarehr.casemgmt.model.CaseManagementNoteExt;
-import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
-import org.oscarehr.casemgmt.model.Issue;
-import org.oscarehr.casemgmt.service.CaseManagementManager;
-import org.oscarehr.common.dao.AdmissionDao;
-import org.oscarehr.allergy.dao.AllergyDao;
-import org.oscarehr.common.dao.DemographicArchiveDao;
-import org.oscarehr.common.dao.DemographicContactDao;
-import org.oscarehr.demographic.dao.DemographicExtDao;
-import org.oscarehr.rx.dao.DrugDao;
-import org.oscarehr.common.dao.DrugReasonDao;
-import org.oscarehr.common.dao.OscarAppointmentDao;
-import org.oscarehr.common.dao.PartialDateDao;
-import org.oscarehr.provider.dao.ProviderDataDao;
-import org.oscarehr.common.model.Admission;
-import org.oscarehr.allergy.model.Allergy;
-import org.oscarehr.common.model.Appointment;
-import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.DemographicArchive;
-import org.oscarehr.common.model.DemographicContact;
-import org.oscarehr.rx.model.Drug;
-import org.oscarehr.common.model.Facility;
-import org.oscarehr.common.model.MeasurementsExt;
-import org.oscarehr.common.model.PartialDate;
-import org.oscarehr.common.model.Provider;
-import org.oscarehr.hospitalReportManager.dao.HRMDocumentCommentDao;
-import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
-import org.oscarehr.hospitalReportManager.dao.HRMDocumentSubClassDao;
-import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
-import org.oscarehr.hospitalReportManager.model.HRMDocument;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentComment;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
-import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SessionConstants;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.OscarProperties;
-import oscar.appt.ApptStatusData;
-import oscar.dms.EDocUtil;
-import oscar.oscarDemographic.data.DemographicAddResult;
-import oscar.oscarDemographic.data.DemographicData;
-import oscar.oscarDemographic.data.DemographicRelationship;
-import oscar.oscarEncounter.data.EctProgram;
-import oscar.oscarEncounter.oscarMeasurements.data.ImportExportMeasurements;
-import oscar.oscarEncounter.oscarMeasurements.data.Measurements;
-import oscar.oscarLab.LabRequestReportLink;
-import oscar.oscarLab.ca.on.LabResultImport;
-import oscar.oscarPrevention.PreventionData;
-import oscar.oscarProvider.data.ProviderData;
-import oscar.util.ConversionUtils;
-import oscar.util.StringUtils;
-import oscar.util.UtilDateUtilities;
 import cds.AlertsAndSpecialNeedsDocument.AlertsAndSpecialNeeds;
 import cds.AllergiesAndAdverseReactionsDocument.AllergiesAndAdverseReactions;
 import cds.AppointmentsDocument.Appointments;
@@ -144,6 +47,102 @@ import cdsDt.DiabetesComplicationScreening.ExamCode;
 import cdsDt.DiabetesMotivationalCounselling.CounsellingPerformed;
 import cdsDt.PersonNameStandard.LegalName;
 import cdsDt.PersonNameStandard.OtherNames;
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.log4j.Logger;
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.upload.FormFile;
+import org.apache.xmlbeans.XmlException;
+import org.oscarehr.PMmodule.model.Program;
+import org.oscarehr.PMmodule.model.ProgramProvider;
+import org.oscarehr.PMmodule.service.AdmissionManager;
+import org.oscarehr.PMmodule.service.ProgramManager;
+import org.oscarehr.allergy.dao.AllergyDao;
+import org.oscarehr.allergy.model.Allergy;
+import org.oscarehr.casemgmt.dao.CaseManagementIssueDAO;
+import org.oscarehr.casemgmt.model.CaseManagementIssue;
+import org.oscarehr.casemgmt.model.CaseManagementNote;
+import org.oscarehr.casemgmt.model.CaseManagementNoteExt;
+import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
+import org.oscarehr.casemgmt.model.Issue;
+import org.oscarehr.casemgmt.service.CaseManagementManager;
+import org.oscarehr.common.dao.AdmissionDao;
+import org.oscarehr.common.dao.DemographicArchiveDao;
+import org.oscarehr.common.dao.DemographicContactDao;
+import org.oscarehr.common.dao.DrugReasonDao;
+import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.dao.PartialDateDao;
+import org.oscarehr.common.model.Admission;
+import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.DemographicArchive;
+import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.common.model.Facility;
+import org.oscarehr.common.model.MeasurementsExt;
+import org.oscarehr.common.model.PartialDate;
+import org.oscarehr.common.model.Provider;
+import org.oscarehr.demographic.dao.DemographicExtDao;
+import org.oscarehr.hospitalReportManager.dao.HRMDocumentCommentDao;
+import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
+import org.oscarehr.hospitalReportManager.dao.HRMDocumentSubClassDao;
+import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
+import org.oscarehr.hospitalReportManager.model.HRMDocument;
+import org.oscarehr.hospitalReportManager.model.HRMDocumentComment;
+import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
+import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.rx.dao.DrugDao;
+import org.oscarehr.rx.model.Drug;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SessionConstants;
+import org.oscarehr.util.SpringUtils;
+import oscar.OscarProperties;
+import oscar.appt.ApptStatusData;
+import oscar.dms.EDocUtil;
+import oscar.oscarDemographic.data.DemographicAddResult;
+import oscar.oscarDemographic.data.DemographicData;
+import oscar.oscarDemographic.data.DemographicRelationship;
+import oscar.oscarEncounter.data.EctProgram;
+import oscar.oscarEncounter.oscarMeasurements.data.ImportExportMeasurements;
+import oscar.oscarEncounter.oscarMeasurements.data.Measurements;
+import oscar.oscarLab.LabRequestReportLink;
+import oscar.oscarLab.ca.on.LabResultImport;
+import oscar.oscarPrevention.PreventionData;
+import oscar.oscarProvider.data.ProviderData;
+import oscar.util.ConversionUtils;
+import oscar.util.StringUtils;
+import oscar.util.UtilDateUtilities;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  *
@@ -1957,16 +1956,15 @@ import cdsDt.PersonNameStandard.OtherNames;
                         }
                         cdsDt.ReportContent repCt = repR[i].getContent();
                         if (repCt!=null) {
-                            byte[] b = null;
-                            if (repCt.getMedia()!=null) b = repCt.getMedia();
-                            else if (repCt.getTextContent()!=null) b = repCt.getTextContent().getBytes();
-                            if (b==null) {
+                            byte[] byteArray = null;
+                            if (repCt.getMedia()!=null) byteArray = repCt.getMedia();
+                            else if (repCt.getTextContent()!=null) byteArray = repCt.getTextContent().getBytes();
+                            if (byteArray==null) {
                                 err_othe.add("Error! No report file in xml ("+(i+1)+")");
                             } else {
                                 String docFileName = "ImportReport"+(i+1)+"-"+UtilDateUtilities.getToday("yyyy-MM-dd.HH.mm.ss");
                                 String docClass=null, docSubClass=null, contentType="", contentDateTime=null, observationDate=null, updateDateTime=null, docCreator=admProviderNo;
                                 String reviewer=null, reviewDateTime=null, source=null, sourceFacility=null, reportExtra=null;
-                                Integer docNum=null;
 
                                 if (StringUtils.filled(repR[i].getFileExtensionAndVersion())) {
                                     contentType = repR[i].getFileExtensionAndVersion();
@@ -1977,10 +1975,6 @@ import cdsDt.PersonNameStandard.OtherNames;
                                 String docDesc = repR[i].getSubClass();
                                 if (StringUtils.empty(docDesc)) docDesc = repR[i].getNotes();
                                 if (StringUtils.empty(docDesc)) docDesc = "ImportReport"+(i+1);
-                                FileOutputStream f = new FileOutputStream(docDir + docFileName);
-                                
-                                f.write(b);
-                                f.close();
 
                                 if (repR[i].getClass1()!=null) {
                                     docClass = repR[i].getClass1().toString();
@@ -2016,11 +2010,28 @@ import cdsDt.PersonNameStandard.OtherNames;
                                     reviewDateTime = dateFPtoString(reportReviewed[0].getDateTimeReportReviewed(), timeShiftInDays);
                                 }
 
+                                InputStream fileInputStream = new ByteArrayInputStream(byteArray);
                                 observationDate = dateFPtoString(repR[i].getEventDateTime(), timeShiftInDays);
                                 updateDateTime = dateFPtoString(repR[i].getReceivedDateTime(), timeShiftInDays);
                                 contentDateTime= dateFPtoString(repR[i].getReceivedDateTime(), timeShiftInDays);
-                                docNum = EDocUtil.addDocument(demographicNo,docFileName,docDesc,"",docClass,docSubClass,contentType,contentDateTime,observationDate,updateDateTime,docCreator,admProviderNo,reviewer,reviewDateTime,source,sourceFacility);
-                                if (docNum==null) docNum = 0;
+                                EDocUtil.addDocument(
+                                		fileInputStream,
+		                                demographicNo,
+		                                docFileName,
+		                                docDesc,
+		                                "",
+		                                docClass,
+		                                docSubClass,
+		                                contentType,
+		                                contentDateTime,
+		                                observationDate,
+		                                updateDateTime,
+		                                docCreator,
+		                                admProviderNo,
+		                                reviewer,
+		                                reviewDateTime,
+		                                source,
+		                                sourceFacility);
                                 if (binaryFormat) addOneEntry(REPORTBINARY);
                                 else addOneEntry(REPORTTEXT);
                             }
