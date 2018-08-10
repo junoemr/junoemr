@@ -120,7 +120,7 @@ public class FormUpdateAction extends Action {
 	        FlowSheetItem item =  mFlowsheet.getFlowSheetItem(measure);
 					
 	               mFlowsheet.getMeasurementFlowSheetInfo(measure);
-					EctMeasurementTypesBean mtypeBean = mType.getMeasurementType(measure);
+					EctMeasurementTypesBean mtypeBean = mFlowsheet.getFlowsheetMeasurement(measure);
 
 					String name = h2.get("display_name").toString().replaceAll("\\W","");
 					String displayName=h2.get("display_name").toString();

@@ -52,6 +52,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarProperties;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.oscarEncounter.oscarMeasurements.util.MeasurementDSHelper;
 import oscar.oscarEncounter.oscarMeasurements.util.Recommendation;
@@ -91,6 +92,7 @@ public class MeasurementFlowSheet {
 
 
     private ListOrderedMap itemList = new ListOrderedMap();
+    private ListOrderedMap measurementList = new ListOrderedMap();
 
     public FlowSheetItem addListItem(FlowSheetItem item){
         log.debug("ITEM "+ item.getItemName());
@@ -106,6 +108,13 @@ public class MeasurementFlowSheet {
         itemList.put(item.getItemName(), item);
         log.debug("ADDED "+item);
         return item;
+    }
+
+    public EctMeasurementTypesBean addMeasurements(EctMeasurementTypesBean measurements)
+    {
+        measurementList.put(measurements.getType(), measurements);
+
+        return measurements;
     }
 
     private List<MeasurementTemplateFlowSheetConfig.Node> itemHeirarchy = new ArrayList<MeasurementTemplateFlowSheetConfig.Node>();
@@ -201,6 +210,11 @@ public class MeasurementFlowSheet {
         FlowSheetItem item = (FlowSheetItem) itemList.get(measurement);
 
         return item;
+    }
+
+    public EctMeasurementTypesBean getFlowsheetMeasurement(String measurementType)
+    {
+        return (EctMeasurementTypesBean) measurementList.get(measurementType);
     }
 
 

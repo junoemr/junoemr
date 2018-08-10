@@ -59,6 +59,7 @@ import org.springframework.beans.factory.InitializingBean;
 
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctValidationsBean;
 import oscar.oscarEncounter.oscarMeasurements.data.ExportMeasurementType;
 import oscar.oscarEncounter.oscarMeasurements.data.ImportMeasurementTypes;
 import oscar.oscarEncounter.oscarMeasurements.util.DSCondition;
@@ -480,10 +481,46 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 
     }
 
+    private void processMeasurementTypes(List<Element> elements, Node parent, MeasurementFlowSheet mFlowSheet)
+    {
+        Hashtable<String, String> flowsheetMeasurements = new Hashtable<String, String>();
+        for( Element e: elements)
+        {
+            List<Attribute> attributes = e.getAttributes();
+            for (Attribute att : attributes) {
+                flowsheetMeasurements.put(att.getName(), att.getValue());
+            }
+
+            EctMeasurementTypesBean measurements = new EctMeasurementTypesBean(flowsheetMeasurements);
+
+            Node node = new Node();
+            node.parent = parent;
+
+            Element validations  = e.getChild("validationRule");
+            if (validations !=null)
+            {
+                EctValidationsBean vb = new EctValidationsBean();
+                vb.setName(validations.getAttributeValue("name"));
+                vb.setMaxValue(validations.getAttributeValue("maxValue"));
+                vb.setMinValue(validations.getAttributeValue("minValue"));
+                vb.setIsDate(validations.getAttributeValue("isDate"));
+                vb.setIsNumeric(validations.getAttributeValue("isNumeric"));
+                vb.setRegularExp(validations.getAttributeValue("regularExp"));
+                vb.setMaxLength(validations.getAttributeValue("maxLength"));
+                vb.setMinLength(validations.getAttributeValue("minLength"));
+
+                measurements.addValidationRule(vb);
+            }
+            measurements = mFlowSheet.addMeasurements(measurements);
+            node.flowSheetMeasurement = measurements;
+        }
+    }
+
     public class Node {
         public Node parent;
         public List<Node> children;
         public FlowSheetItem flowSheetItem;
+        public EctMeasurementTypesBean flowSheetMeasurement;
         public int numSibling = -1;
 
         public Node getFirstChild() {
@@ -532,6 +569,10 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
             //MAKE SURE ALL MEASUREMENTS HAVE BEEN INITIALIZED
             ImportMeasurementTypes importMeasurementTypes = new ImportMeasurementTypes();
             importMeasurementTypes.importMeasurements(root);
+
+            List<Element> measurements = root.getChildren("measurement");
+
+            processMeasurementTypes(measurements, null, d);
 
             List indi = root.getChildren("indicator"); // key="LOW" colour="blue">
             for (int i = 0; i < indi.size(); i++) {
@@ -609,6 +650,10 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
             //MAKE SURE ALL MEASUREMENTS HAVE BEEN INITIALIZED
             ImportMeasurementTypes importMeasurementTypes = new ImportMeasurementTypes();
             importMeasurementTypes.importMeasurements(root);
+
+            List<Element> measurements = root.getChildren("measurement");
+
+            processMeasurementTypes(measurements, null, d);
 
             List indi = root.getChildren("indicator"); // key="LOW" colour="blue">
             for (int i = 0; i < indi.size(); i++) {
