@@ -39,7 +39,6 @@ import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.DocumentStorageDao;
-import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.io.FileFactory;
@@ -49,6 +48,7 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.SecRole;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
+import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -63,7 +63,6 @@ import oscar.dms.data.AddEditDocumentForm;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarEncounter.data.EctProgram;
-import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -81,7 +80,7 @@ public class AddEditDocumentAction extends DispatchAction {
 	private static Logger logger = MiscUtils.getLogger();
 
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	private org.oscarehr.document.service.DocumentService documentService = SpringUtils.getBean(org.oscarehr.document.service.DocumentService.class);
+	private DocumentService documentService = SpringUtils.getBean(DocumentService.class);
 
 	public ActionForward html5MultiUpload(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ResourceBundle props = ResourceBundle.getBundle("oscarResources");
@@ -128,10 +127,9 @@ public class AddEditDocumentAction extends DispatchAction {
 				String.valueOf(document.getDocumentNo()), request.getRemoteAddr(), fileName);
 		String providerId = request.getParameter("provider");
 
-		if (providerId != null) { // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
-			ProviderInboxRoutingDao providerInboxRoutingDao = (ProviderInboxRoutingDao) ctx.getBean("providerInboxRoutingDAO");
-			providerInboxRoutingDao.addToProviderInbox(providerId, document.getDocumentNo(), LabResultData.DOCUMENT);
+		if (providerId != null) // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
+		{
+			documentService.routeToProviderInbox(document.getDocumentNo(), Integer.parseInt(providerId));
 		}
 		// add to queuelinkdocument
 		String queueId = request.getParameter("queue");

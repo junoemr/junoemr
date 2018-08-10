@@ -30,7 +30,6 @@ import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
-import oscar.dms.EDocUtil;
 import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
 import oscar.oscarLab.ca.on.LabResultData;
 
@@ -170,9 +169,8 @@ public class SplitDocumentAction extends DispatchAction {
 
 	private ActionForward rotate(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response, int degrees) throws Exception {
 		Document doc = documentDao.getDocument(request.getParameter("document"));
-		String docDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 
-		File pdfFile = new File(docDir, doc.getDocfilename());
+		File pdfFile = FileFactory.getDocumentFile(doc.getDocfilename()).getFileObject();
 		PDDocument pdf = PDDocument.load(pdfFile);
 		
 		for(int i=0; i<pdf.getNumberOfPages(); i++) {
@@ -196,27 +194,27 @@ public class SplitDocumentAction extends DispatchAction {
 		return rotate(mapping, form, request, response, 90);
 	}
 
-	public ActionForward removeFirstPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ActionForward removeFirstPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
 		Document doc = documentDao.getDocument(request.getParameter("document"));
 
-		String docDir = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		
-		File pdfFile = new File(docDir, doc.getDocfilename());
+		File pdfFile = FileFactory.getDocumentFile(doc.getDocfilename()).getFileObject();
 		PDDocument pdf = PDDocument.load(pdfFile);
 
 		// Documents must have at least 2 pages, for the first page to be removed.
-		if (pdf.getNumberOfPages() > 1) {
-			for(int i=0; i<pdf.getNumberOfPages(); i++) {
-				ManageDocumentAction.deleteCacheVersion(doc, (i+1));
+		if(pdf.getNumberOfPages() > 1)
+		{
+			for(int i = 0; i < pdf.getNumberOfPages(); i++)
+			{
+				ManageDocumentAction.deleteCacheVersion(doc, (i + 1));
 			}
 			pdf.removePage(0);
-
-			EDocUtil.subtractOnePage(request.getParameter("document"));
-
 			pdf.save(pdfFile);
+			doc.setNumberofpages(doc.getNumberofpages() - 1);
+			documentDao.merge(doc);
 		}
 		pdf.close();
-		
+
 		return null;
 	}
 }

@@ -1020,13 +1020,6 @@ public final class EDocUtil {
 
 		return (eDoc);
 	}
-
-	public static void subtractOnePage(String docId) {
-		Document doc = documentDao.find(ConversionUtils.fromIntString(docId));
-		doc.setNumberofpages(doc.getNumberofpages() - 1);
-
-		documentDao.merge(doc);
-	}
         
 	public static String getHtmlTicklers(LoggedInInfo loggedInInfo,String docId ) {
                                       
