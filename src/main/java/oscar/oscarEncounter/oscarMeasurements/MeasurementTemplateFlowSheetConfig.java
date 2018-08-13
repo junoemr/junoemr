@@ -246,6 +246,9 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
     	FlowsheetDao flowsheetDao = (FlowsheetDao)SpringUtils.getBean("flowsheetDao");
     	FlowSheetUserCreatedDao flowSheetUserCreatedDao = (FlowSheetUserCreatedDao) SpringUtils.getBean("flowSheetUserCreatedDao");
 
+        List<Flowsheet> dbFlowsheets = flowsheetDao.findAll();
+        List<FlowSheetUserCreated> userCreatedFlowsheets = flowSheetUserCreatedDao.getAllUserCreatedFlowSheets();
+
         flowsheets = new Hashtable<String, MeasurementFlowSheet>();
         flowsheetSettings = new HashMap<String,Flowsheet>();
 
@@ -257,22 +260,30 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
         	try {
 	            is = new FileInputStream(flowSheet);
 	            MeasurementFlowSheet d = createflowsheet(mType, is);
-	            flowsheets.put(d.getName(), d);
-	            if (d.isUniversal())
-	                universalFlowSheets.add(d.getName());
-	            else if(d.getDxTriggers()!=null && d.getDxTriggers().length>0){
-	                String[] dxTrig = d.getDxTriggers();
-	                addTriggers(dxTrig, d.getName());
-	            } else if(d.getProgramTriggers()!=null && d.getProgramTriggers().length>0) {
-	            	String[] programTrig = d.getProgramTriggers();
-	            	addProgramTriggers(programTrig,d.getName());
-	            }
 
-	            flowsheetDisplayNames.put(d.getName(), d.getDisplayName());
-	            Flowsheet tmp = flowsheetDao.findByName(d.getName());
-	            if(tmp!=null) {
-	            	flowsheetSettings.put(d.getName(), tmp);
-	            }
+	            //If the system flowsheet is not in the database, then load it normally. Otherwise, it has been overwritten, so only load it once from the database
+	            if(flowsheetDao.findByName(d.getName()) == null && flowSheetUserCreatedDao.findByName(d.getName()) == null)
+                {
+                    flowsheets.put(d.getName(), d);
+                    if (d.isUniversal())
+                        universalFlowSheets.add(d.getName());
+                    else if (d.getDxTriggers() != null && d.getDxTriggers().length > 0)
+                    {
+                        String[] dxTrig = d.getDxTriggers();
+                        addTriggers(dxTrig, d.getName());
+                    } else if (d.getProgramTriggers() != null && d.getProgramTriggers().length > 0)
+                    {
+                        String[] programTrig = d.getProgramTriggers();
+                        addProgramTriggers(programTrig, d.getName());
+                    }
+
+                    flowsheetDisplayNames.put(d.getName(), d.getDisplayName());
+                    Flowsheet tmp = flowsheetDao.findByName(d.getName());
+                    if (tmp != null)
+                    {
+                        flowsheetSettings.put(d.getName(), tmp);
+                    }
+                }
         	}catch(Exception e) {
         		MiscUtils.getLogger().error("error",e);
         	} finally {
@@ -285,8 +296,8 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
         		}
         	}
         }
-        List<FlowSheetUserCreated> flowSheetUserCreateds = flowSheetUserCreatedDao.getAllUserCreatedFlowSheets();
-        for(FlowSheetUserCreated flowSheetUserCreated: flowSheetUserCreateds){
+
+        for(FlowSheetUserCreated flowSheetUserCreated: userCreatedFlowsheets){
 
         	MeasurementFlowSheet m = new MeasurementFlowSheet();
         	m.setName(flowSheetUserCreated.getName());
@@ -304,7 +315,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
             }
         }
 
-        for(Flowsheet fs:flowsheetDao.findAll()) {
+        for(Flowsheet fs:dbFlowsheets) {
         	if(fs.isExternal()){
         		continue;
         	}

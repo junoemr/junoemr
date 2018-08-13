@@ -77,9 +77,10 @@ try {
             String contents = item.getString();
             
             //validate the data
-            //TODO: make sure no duplicates
             MeasurementFlowSheet fs = null;
             fs = MeasurementTemplateFlowSheetConfig.getInstance().validateFlowsheet(contents);
+
+            //Check if flowsheet is in the flowsheet table
 			FlowsheetDao flowsheetDao = (FlowsheetDao)SpringUtils.getBean("flowsheetDao");
 			Flowsheet existingFlowsheet = flowsheetDao.findByName(fs.getName());
             if(fs != null) {
@@ -93,15 +94,14 @@ try {
 					f.setExternal(false);
 					f.setName(fs.getName());
 
-					//FlowsheetDao flowsheetDao = (FlowsheetDao)SpringUtils.getBean("flowsheetDao");
 					flowsheetDao.persist(f);
-					MeasurementTemplateFlowSheetConfig.getInstance().reloadFlowsheets();
 				} else
 				{
 					existingFlowsheet.setContent(contents);
 					flowsheetDao.merge(existingFlowsheet);
 				}
 
+				MeasurementTemplateFlowSheetConfig.getInstance().reloadFlowsheets();
             } else {
             	//error
             }

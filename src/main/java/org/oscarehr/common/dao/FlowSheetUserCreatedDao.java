@@ -45,5 +45,12 @@ public class FlowSheetUserCreatedDao extends AbstractDao<FlowSheetUserCreated> {
         //@SuppressWarnings("unchecked")
         return query.getResultList();                
      }
+
+	public FlowSheetUserCreated findByName(String name) {
+		Query query = entityManager.createQuery("select f from FlowSheetUserCreated f where f.name=?");
+		query.setParameter(1, name);
+
+		return getSingleResultOrNull(query);
+	}
 	
 }
