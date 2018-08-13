@@ -50,6 +50,13 @@ if(!authed) {
 	String ajaxSearch = "";
 	long numOfSpecialists;
 	int pageLimit = 25;
+	String searchType = request.getParameter("searchType") == null ? "active" : request.getParameter("searchType");
+	boolean activateSpecialists = false;
+
+	if (searchType.equals("deleted"))
+	{
+		activateSpecialists = true;
+	}
 
 	if ( request.getParameter("page") != null ) {
 		currentPage = Integer.parseInt(request.getParameter("page"));
@@ -65,15 +72,15 @@ if(!authed) {
 	if ( request.getParameter("search") != null ) { // If the current request to the page was requested by searching via search input
 		ajaxSearch = request.getParameter("search");
 		if ( !ajaxSearch.trim().equals("") ) {
-			displayServiceUtil.estSpecialistVector(ajaxSearch, currentPage, pageLimit); // Pass the search query to the DB method
-			numOfSpecialists = displayServiceUtil.getNumOfSpecialists(ajaxSearch); // Get count of search results for pagination
+			displayServiceUtil.estSpecialistVector(ajaxSearch, currentPage, pageLimit, searchType); // Pass the search query to the DB method
+			numOfSpecialists = displayServiceUtil.getNumOfSpecialists(ajaxSearch, searchType); // Get count of search results for pagination
 		} else {
-			numOfSpecialists = displayServiceUtil.getNumOfSpecialists(); // Get all specialists
-			displayServiceUtil.estSpecialistVector(currentPage, pageLimit); // Get count of all specialists for pagination
+			numOfSpecialists = displayServiceUtil.getNumOfSpecialists(searchType); // Get all specialists
+			displayServiceUtil.estSpecialistVector(currentPage, pageLimit, searchType); // Get count of all specialists for pagination
 		}
 	} else {
-		numOfSpecialists = displayServiceUtil.getNumOfSpecialists(); // Get all specialists
-		displayServiceUtil.estSpecialistVector(currentPage, pageLimit); // Get count of all specialists for pagination
+		numOfSpecialists = displayServiceUtil.getNumOfSpecialists(searchType); // Get all specialists
+		displayServiceUtil.estSpecialistVector(currentPage, pageLimit, searchType); // Get count of all specialists for pagination
 	}
 
 	int resultSize = displayServiceUtil.specIdVec.size();
@@ -138,9 +145,8 @@ if(!authed) {
 			display: inline-block;
 		}
 		.ajaxSearch {
-			position: absolute;
-			top: 20px;
-			right: 20px;
+			padding-top: 10px;
+			text-align: center;
 		}
 		.pageLimiter {
 			padding-bottom: 8px;
@@ -192,20 +198,25 @@ function BackToOscar()
 		<table cellpadding="0" cellspacing="2"
 			style="border-collapse: collapse" bordercolor="#111111" width="100%"
 			height="100%">
-			<div class="ajaxSearch">
-				<div class="pageLimiter">
-					<label>Page Limit:</label>
-					<select name="limit" onchange="nextPage(this.options[this.selectedIndex].value, 1, '')">
-						<option value="25" <%= pageLimit != 50 && pageLimit != 100 ? "selected='selected'" : "" %> >25</option>
-						<option value="50" <%= pageLimit == 50 ? "selected='selected'" : "" %> >50</option>
-						<option value="100" <%= pageLimit == 100 ? "selected='selected'" : "" %> >100</option>
-					</select>
-				</div>
-				<div class="searchInput">
-					<input type="text" id="searchInput" placeholder="Search specialists..." onkeypress="runUpdate(event)" autofocus>
-					<input type="button" onclick="updateBySearch()" value="Search">
-				</div>
-			</div>
+			<tr>
+				<td>
+					<div class="ajaxSearch">
+						<div class="searchInput">
+							<input type="text" id="searchInput" placeholder="Search specialists..." onkeypress="runUpdate(event)" autofocus>
+							<input type="button" onclick="updateBySearch('active')" value="Search">
+							<input type="button" onclick="updateBySearch('deleted')" value="Search Deleted">
+							<input type="button" onclick="updateBySearch('all')" value="Search All">
+
+							<label>Page Limit:</label>
+							<select name="limit" onchange="nextPage(this.options[this.selectedIndex].value, 1, '', <%=searchType%>)">
+								<option value="25" <%= pageLimit != 50 && pageLimit != 100 ? "selected='selected'" : "" %> >25</option>
+								<option value="50" <%= pageLimit == 50 ? "selected='selected'" : "" %> >50</option>
+								<option value="100" <%= pageLimit == 100 ? "selected='selected'" : "" %> >100</option>
+							</select>
+						</div>
+					</div>
+				</td>
+			</tr>
 			<!----Start new rows here-->
 			<tr>
 							<td><%--bean:message
@@ -218,8 +229,20 @@ function BackToOscar()
 			</tr>
 			<tr>
 				<td><html:form action="/oscarEncounter/EditSpecialists">
-					<input type="submit" name="delete"
-						value="<bean:message key="oscarEncounter.oscarConsultationRequest.config.EditSpecialists.btnDeleteSpecialist"/>">
+					<% if(activateSpecialists)
+					{
+					%>
+						<input type="submit" name="activate" value="<bean:message key="oscarEncounter.oscarConsultationRequest.config.EditSpecialists.btnActivateSpecialist"/>">
+					<%
+					} else
+					{
+					%>
+						<input type="submit" name="delete" value="<bean:message key="oscarEncounter.oscarConsultationRequest.config.EditSpecialists.btnDeleteSpecialist"/>">
+					<%
+					}
+					%>
+
+
 					<div class="ChooseRecipientsBox1">
 					<table>
 						<tr>
@@ -271,14 +294,14 @@ function BackToOscar()
 
 					</table>
 						<div style="text-align: center; padding-top: 20px; font-size: 1.3em;">
-                            <a href="javascript:void(0)" class="navBtn" onclick="toPage('first')"><<</a>
-                            <a href="javascript:void(0)" class="navBtn" onclick="toPage('previous')"><</a>
+                            <a href="javascript:void(0)" class="navBtn" onclick="toPage('first', <%=searchType%>)"><<</a>
+                            <a href="javascript:void(0)" class="navBtn" onclick="toPage('previous', <%=searchType%>)"><</a>
 							<% for(int i = startIdx; i < endIdx; i++) {
 								int pageNum = i + 1;%>
-								<a href="javascript:void(0)" class="specialistPageLink" id="page<%=pageNum%>" onclick="nextPage(<%=pageLimit%>, <%=pageNum%>, '<%=ajaxSearch%>')"><%=pageNum%></a>
+								<a href="javascript:void(0)" class="specialistPageLink" id="page<%=pageNum%>" onclick="nextPage(<%=pageLimit%>, <%=pageNum%>, '<%=ajaxSearch%>', <%=searchType%>)"><%=pageNum%></a>
 							<% } %>
-                            <a href="javascript:void(0)" class="navBtn" onclick="toPage('next')">></a>
-                            <a href="javascript:void(0)" class="navBtn" onclick="toPage('last')">>></a>
+                            <a href="javascript:void(0)" class="navBtn" onclick="toPage('next', <%=searchType%>)">></a>
+                            <a href="javascript:void(0)" class="navBtn" onclick="toPage('last', <%=searchType%>)">>></a>
 						</div>
 					</div>
 				</html:form></td>
@@ -318,17 +341,17 @@ function BackToOscar()
 		currentPage.style.textDecoration = "none";
 	}
 
-	function nextPage(pageLimit, page, searchText) {
-		$(document.body).load("<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp?pageLimit=" + pageLimit + "&page=" + page + "&search=" + searchText);
+	function nextPage(pageLimit, page, searchText, type) {
+		$(document.body).load("<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp?pageLimit=" + pageLimit + "&page=" + page + "&search=" + searchText + "&searchType=" + type);
 	}
 
-	function updateBySearch() {
+	function updateBySearch(type) {
 		var searchText = searchInput.value;
 		var page = 1;
-		$(document.body).load("<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp?pageLimit=" + <%=pageLimit%> + "&page=" + page + "&search=" + searchText);
+		$(document.body).load("<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp?pageLimit=" + <%=pageLimit%> + "&page=" + page + "&search=" + searchText + "&searchType=" + type);
 	}
 
-	function toPage(toPagePosition) {
+	function toPage(toPagePosition, type) {
 	    var searchText = searchInput.value;
 	    var page = 1;
 	    var currentPage = <%=currentPage%>;
@@ -350,12 +373,12 @@ function BackToOscar()
                 page = 1;
         }
 
-        $(document.body).load("<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp?pageLimit=" + <%=pageLimit%> + "&page=" + page + "&search=" + searchText);
+        $(document.body).load("<%=request.getContextPath()%>/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp?pageLimit=" + <%=pageLimit%> + "&page=" + page + "&search=" + searchText + "&searchType=" + type);
     }
 
 	function runUpdate(e) {
 		if ( e.keyCode == 13 ) {
-			updateBySearch();
+			updateBySearch('active');
 		}
 	}
 

@@ -61,8 +61,48 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 		return numOfSpecialists;
 	}
 
+	public long getNumOfSpecialistsDeleted(String searchText) {
+		Query query = entityManager.createQuery("select count(x) from " + modelClass.getSimpleName() + " x where (x.firstName like ? or x.lastName like ?) AND x.hideFromView=1");
+		query.setParameter(1, searchText+"%");
+		query.setParameter(2, searchText+"%");
+
+		Long numOfSpecialists = (Long) query.getSingleResult();
+		return numOfSpecialists;
+	}
+
+	public long getNumOfSpecialistsActive(String searchText) {
+		Query query = entityManager.createQuery("select count(x) from " + modelClass.getSimpleName() + " x where (x.firstName like ? or x.lastName like ?) AND x.hideFromView=0");
+		query.setParameter(1, searchText+"%");
+		query.setParameter(2, searchText+"%");
+
+		Long numOfSpecialists = (Long) query.getSingleResult();
+		return numOfSpecialists;
+	}
+
 	public List<ProfessionalSpecialist> findBySearchName(String searchText, int offset, int maxResults) {
 		Query query = entityManager.createQuery("select x from " + modelClass.getSimpleName() + " x where x.firstName like ? or x.lastName like ? order by x.lastName");
+		query.setParameter(1, searchText+"%");
+		query.setParameter(2, searchText+"%");
+		query.setFirstResult(offset);
+		query.setMaxResults(maxResults);
+
+		List<ProfessionalSpecialist> results = query.getResultList();
+		return results;
+	}
+
+	public List<ProfessionalSpecialist> findBySearchNameDeleted(String searchText, int offset, int maxResults) {
+		Query query = entityManager.createQuery("select x from " + modelClass.getSimpleName() + " x where (x.firstName like ? or x.lastName like ?) AND x.hideFromView=1 order by x.lastName");
+		query.setParameter(1, searchText+"%");
+		query.setParameter(2, searchText+"%");
+		query.setFirstResult(offset);
+		query.setMaxResults(maxResults);
+
+		List<ProfessionalSpecialist> results = query.getResultList();
+		return results;
+	}
+
+	public List<ProfessionalSpecialist> findBySearchNameActive(String searchText, int offset, int maxResults) {
+		Query query = entityManager.createQuery("select x from " + modelClass.getSimpleName() + " x where (x.firstName like ? or x.lastName like ?) AND x.hideFromView=0 order by x.lastName");
 		query.setParameter(1, searchText+"%");
 		query.setParameter(2, searchText+"%");
 		query.setFirstResult(offset);

@@ -59,6 +59,20 @@ public final class EctConEditSpecialistsForm extends ActionForm
         delete = str;
     }
 
+    public String getActivate()
+    {
+        MiscUtils.getLogger().debug("getter activate");
+        if(activate == null)
+            activate = new String();
+        return activate;
+    }
+
+    public void setActivate(String str)
+    {
+        MiscUtils.getLogger().debug("setter activate");
+        activate = str;
+    }
+
     public String[] getSpecialists()
     {
         MiscUtils.getLogger().debug("getter specialists");
@@ -75,5 +89,6 @@ public final class EctConEditSpecialistsForm extends ActionForm
 
     String specId;
     String delete;
+    String activate;
     String specialists[];
 }

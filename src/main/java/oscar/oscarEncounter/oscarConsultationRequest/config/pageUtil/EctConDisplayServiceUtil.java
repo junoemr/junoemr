@@ -103,17 +103,28 @@ public class EctConDisplayServiceUtil
 		}
 	}
 
-	public void estSpecialistVector(int currentPage, int maxResults)
+	public void estSpecialistVector(int currentPage, int maxResults, String searchType)
 	{
-		this.estSpecialistVector("", currentPage, maxResults);
+		this.estSpecialistVector("", currentPage, maxResults, searchType);
 	}
 
-	public void estSpecialistVector(String searchText, int currentPage, int maxResults)
+	public void estSpecialistVector(String searchText, int currentPage, int maxResults, String searchType)
 	{
 		currentPage = currentPage - 1;
 		int offset = maxResults * currentPage;
+		List<ProfessionalSpecialist> specialists;
 		ProfessionalSpecialistDao dao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
-		List<ProfessionalSpecialist> specialists = dao.findBySearchName(searchText, offset, maxResults);
+		if (searchType.equals("all"))
+		{
+			specialists = dao.findBySearchName(searchText, offset, maxResults);
+		} else if (searchType.equals("active"))
+		{
+			specialists = dao.findBySearchNameActive(searchText, offset, maxResults);
+		} else
+		{
+			specialists = dao.findBySearchNameDeleted(searchText, offset, maxResults);
+		}
+
 
 		fNameVec = new Vector<String>();
 		lNameVec = new Vector<String>();
@@ -151,15 +162,25 @@ public class EctConDisplayServiceUtil
 		return vector;
 	}
 
-	public long getNumOfSpecialists() {
-		numOfSpecialists = this.getNumOfSpecialists("");
+	public long getNumOfSpecialists(String searchType) {
+		numOfSpecialists = this.getNumOfSpecialists("", searchType);
 
 		return numOfSpecialists;
 	}
 
-	public long getNumOfSpecialists(String searchText) {
+	public long getNumOfSpecialists(String searchText, String searchType) {
 		ProfessionalSpecialistDao proSpecDao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
-		numOfSpecialists = proSpecDao.getNumOfSpecialists(searchText);
+		if (searchType.equals("all"))
+		{
+			numOfSpecialists = proSpecDao.getNumOfSpecialists(searchText);
+		} else if (searchType.equals("active"))
+		{
+			numOfSpecialists = proSpecDao.getNumOfSpecialistsActive(searchText);
+		} else
+		{
+			numOfSpecialists = proSpecDao.getNumOfSpecialistsDeleted(searchText);
+		}
+
 
 		return numOfSpecialists;
 	}

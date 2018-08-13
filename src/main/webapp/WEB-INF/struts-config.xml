@@ -1252,6 +1252,7 @@
 		<action input="/oscarConsultationRequest/config/EditSpecialists.jsp" name="EctConEditSpecialistsForm" path="/oscarEncounter/EditSpecialists" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConEditSpecialistsAction">
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/config/AddSpecialist.jsp" />
 			<forward name="delete" path="/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp" />
+			<forward name="activate" path="/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp" />
 		</action>
 		<action input="/oscarConsultationRequest/config/EditInstitutions.jsp" name="EctConEditInstitutionsForm" path="/oscarEncounter/EditInstitutions" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConEditInstitutionsAction">
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/config/AddInstitution.jsp" />
