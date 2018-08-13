@@ -28,15 +28,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 import javax.persistence.PersistenceException;
 
@@ -320,7 +312,8 @@ public class DemographicDao extends HibernateDaoSupport {
         }
         // optionally limit search to active demographics
         if(hasActiveStatus){
-        	hql += " and patient_status = 'AC'";
+        	// This is the same set of status codes used by the demographic search, in order to mirror functionality.
+        	hql += " and patient_status not in ('IN', 'DE', 'IC', 'ID', 'MO', 'FI')";
         }
         HibernateTemplate template = getHibernateTemplate();
         if(limit > 0) { //optionally add a result limit
