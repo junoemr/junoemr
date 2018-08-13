@@ -481,7 +481,7 @@ public class CoPDImportService
 			}
 			InputStream stream = new FileInputStream(documentFile.getFileObject());
 			documentService.uploadNewDemographicDocument(document, stream, demographic.getDemographicId());
-			documentService.routeToProviderInbox(document.getDocumentNo(), provider.getProviderNo(), true);
+			documentService.routeToProviderInbox(document.getDocumentNo(), true, provider.getProviderNo());
 		}
 	}
 

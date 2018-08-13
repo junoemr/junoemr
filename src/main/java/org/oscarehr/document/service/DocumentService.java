@@ -317,23 +317,26 @@ public class DocumentService
 	/**
 	 * Add the document to the given provider inbox
 	 * @param documentNo - document id to route
-	 * @param providerNo - provider id to route to
+	 * @param providerNoList - list of provider id(s) to route to
 	 */
-	public void routeToProviderInbox(Integer documentNo, Integer providerNo)
+	public void routeToProviderInbox(Integer documentNo, Integer...providerNoList)
 	{
-		routeToProviderInbox(documentNo, providerNo, false);
+		routeToProviderInbox(documentNo, false, providerNoList);
 	}
 	/**
-	 * Add the document to the given provider inbox
+	 * Add the document to the given provider(s) inbox
 	 * @param documentNo - document id to route
-	 * @param providerNo - provider id to route to
 	 * @param alwaysFile - when true, all routes will be set as filed. otherwise default routing rules are applied
+	 * @param providerNoList - list of provider id(s) to route to
 	 */
-	public void routeToProviderInbox(Integer documentNo, Integer providerNo, boolean alwaysFile)
+	public void routeToProviderInbox(Integer documentNo, boolean alwaysFile, Integer...providerNoList)
 	{
 		//TODO handle the routing weirdness
-		providerInboxRoutingDao.addToProviderInbox(String.valueOf(providerNo), documentNo, LabResultData.DOCUMENT, alwaysFile);
-		logger.info("Added route to provider " + providerNo + " for document " + documentNo);
+		for(Integer providerNo : providerNoList)
+		{
+			providerInboxRoutingDao.addToProviderInbox(String.valueOf(providerNo), documentNo, LabResultData.DOCUMENT, alwaysFile);
+			logger.info("Added route to provider " + providerNo + " for document " + documentNo);
+		}
 	}
 	/**
 	 * Add the document to the unclaimed/general inbox

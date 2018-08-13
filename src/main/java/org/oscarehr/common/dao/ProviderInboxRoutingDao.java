@@ -48,9 +48,6 @@ public class ProviderInboxRoutingDao extends AbstractDao<ProviderInboxItem> {
 	public ProviderInboxRoutingDao() {
 		super(ProviderInboxItem.class);
 	}
-    
-
-
 
     public void removeLinkFromDocument(Integer docId, String providerNo) throws SQLException
 	{
@@ -147,14 +144,14 @@ public class ProviderInboxRoutingDao extends AbstractDao<ProviderInboxItem> {
 				}
 			}
 
-			ProviderInboxItem p = new ProviderInboxItem();
-			p.setProviderNo(providerNo);
-			p.setLabNo(labNo);
-			p.setLabType(labType);
-			p.setStatus(fileForMainProvider ? ProviderInboxItem.FILE : ProviderInboxItem.NEW);
-
+			// prevent duplicates
 			if(!hasProviderBeenLinkedWithDocument(labType, labNo, providerNo))
 			{
+				ProviderInboxItem p = new ProviderInboxItem();
+				p.setProviderNo(providerNo);
+				p.setLabNo(labNo);
+				p.setLabType(labType);
+				p.setStatus(fileForMainProvider ? ProviderInboxItem.FILE : ProviderInboxItem.NEW);
 				persist(p);
 			}
 
