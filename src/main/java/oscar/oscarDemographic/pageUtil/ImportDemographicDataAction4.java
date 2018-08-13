@@ -85,6 +85,8 @@ import org.oscarehr.common.model.MeasurementsExt;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.demographic.dao.DemographicExtDao;
+import org.oscarehr.document.model.Document;
+import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentCommentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentSubClassDao;
@@ -101,9 +103,9 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SessionConstants;
 import org.oscarehr.util.SpringUtils;
+import oscar.MyDateFormat;
 import oscar.OscarProperties;
 import oscar.appt.ApptStatusData;
-import oscar.dms.EDocUtil;
 import oscar.oscarDemographic.data.DemographicAddResult;
 import oscar.oscarDemographic.data.DemographicData;
 import oscar.oscarDemographic.data.DemographicRelationship;
@@ -192,8 +194,9 @@ import java.util.zip.ZipInputStream;
     DemographicExtDao demographicExtDao = (DemographicExtDao) SpringUtils.getBean("demographicExtDao");
     OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
     CaseManagementIssueDAO caseManagementIssueDAO = (CaseManagementIssueDAO) SpringUtils.getBean("caseManagementIssueDAO");
+	private DocumentService documentService = SpringUtils.getBean(DocumentService.class);
 
-    @Override
+	@Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception  {
     	
     	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_demographic", "w", null)) {
@@ -2012,26 +2015,26 @@ import java.util.zip.ZipInputStream;
 
                                 InputStream fileInputStream = new ByteArrayInputStream(byteArray);
                                 observationDate = dateFPtoString(repR[i].getEventDateTime(), timeShiftInDays);
-                                updateDateTime = dateFPtoString(repR[i].getReceivedDateTime(), timeShiftInDays);
                                 contentDateTime= dateFPtoString(repR[i].getReceivedDateTime(), timeShiftInDays);
-                                EDocUtil.addDocument(
-                                		fileInputStream,
-		                                demographicNo,
-		                                docFileName,
-		                                docDesc,
-		                                "",
-		                                docClass,
-		                                docSubClass,
-		                                contentType,
-		                                contentDateTime,
-		                                observationDate,
-		                                updateDateTime,
-		                                docCreator,
-		                                admProviderNo,
-		                                reviewer,
-		                                reviewDateTime,
-		                                source,
-		                                sourceFacility);
+
+	                            Document document = new Document();
+	                            document.setPublic1(false);
+	                            document.setResponsible(admProviderNo);
+	                            document.setDoccreator(docCreator);
+	                            document.setDocdesc(docDesc);
+	                            document.setDoctype("");
+	                            document.setDocfilename(docFileName);
+	                            document.setSource(source);
+	                            document.setSourceFacility(sourceFacility);
+	                            document.setDocClass(docClass);
+	                            document.setDocSubClass(docSubClass);
+	                            document.setObservationdate(MyDateFormat.getSysDate(observationDate));
+	                            document.setContentdatetime(MyDateFormat.getSysDate(contentDateTime));
+	                            document.setReviewer(reviewer);
+	                            document.setReviewdatetime(MyDateFormat.getSysDate(reviewDateTime));
+
+	                            documentService.uploadNewDemographicDocument(document, fileInputStream, Integer.parseInt(demographicNo));
+
                                 if (binaryFormat) addOneEntry(REPORTBINARY);
                                 else addOneEntry(REPORTTEXT);
                             }

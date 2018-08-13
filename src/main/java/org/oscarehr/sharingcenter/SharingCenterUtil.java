@@ -86,6 +86,7 @@ import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Relationships;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
+import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.provider.dao.ProviderDataDao;
@@ -119,7 +120,6 @@ import org.oscarehr.sharingcenter.util.CDADocumentUtil;
 import org.oscarehr.sharingcenter.util.EformParser;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import oscar.dms.EDocUtil;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -130,7 +130,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -162,6 +161,8 @@ public class SharingCenterUtil {
     private static final EFormMappingDao eFormMappingDao = SpringUtils.getBean(EFormMappingDao.class);
     private static final MiscMappingDao miscMappingDao = SpringUtils.getBean(MiscMappingDao.class);
     private static final ExportedDocumentDao exportedDocumentDao = SpringUtils.getBean(ExportedDocumentDao.class);
+    private static final DocumentService documentService = SpringUtils.getBean(DocumentService.class);
+
 
     public static CodeValue generateCodeValue(MappingCodeType codeType, Integer domainId, String docType, String mappedEntity) {
         CodeValue retVal = null;
@@ -284,7 +285,8 @@ public class SharingCenterUtil {
         return doc;
     }
 
-    public static PatientDocument downloadSharedDocument(int patientDocumentId, String demographicId, String providerId) throws CommunicationsException {
+    public static PatientDocument downloadSharedDocument(int patientDocumentId, String demographicId, String providerId) throws CommunicationsException, IOException
+    {
         PatientDocument doc = patientDocumentDao.find(patientDocumentId);
 
         DocumentMetaData docMetaData = new DocumentMetaData();
@@ -300,47 +302,41 @@ public class SharingCenterUtil {
         DocumentMetaData metaData = new DocumentMetaData(doc.getUniqueDocumentId(), doc.getRepositoryUniqueId());
         metaData.setPatient(createPatientDemographic(Integer.parseInt(demographicId)));
 
-        try {
-            metaData = communicator.retrieveDocumentSet(metaData);
-            
-            // proper way to find extension for mimetype (using Apache Tika)
-            String ext = "";
-            try {
-                TikaConfig tikaConfig = TikaConfig.getDefaultConfig();
-                MimeType mimeType = tikaConfig.getMimeRepository().forName(metaData.getMimeType());
-                ext = mimeType.getExtension();
-            } catch (MimeTypeException e) {
-                MiscUtils.getLogger().error("Unable to find extension for MimeType " + metaData.getMimeType(), e);
-            }
-            String fileName = doc.getTitle() + System.currentTimeMillis() + ext;
-            InputStream fileInputStream = new ByteArrayInputStream(metaData.getContent());
+	    try
+	    {
+		    metaData = communicator.retrieveDocumentSet(metaData);
 
-	        // Add edoc entry
-	        Calendar cal = Calendar.getInstance();
-	        DateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
-	        DateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	        EDocUtil.addDocument(
-			        fileInputStream,
-			        demographicId,
-			        fileName,
-			        doc.getTitle(),
-			        "others",
-			        "",
-			        "",
-			        doc.getMimetype(),
-			        dayFormat.format(cal.getTime()),
-			        timeFormat.format(cal.getTime()),
-			        providerId, "", // responsible
-			        "", // reviewer
-			        null, "", // source
-			        "" // sourceFacility
-	        );
+		    // proper way to find extension for mimetype (using Apache Tika)
+		    String ext = "";
+	        try
+	        {
+		        TikaConfig tikaConfig = TikaConfig.getDefaultConfig();
+		        MimeType mimeType = tikaConfig.getMimeRepository().forName(metaData.getMimeType());
+		        ext = mimeType.getExtension();
+	        }
+	        catch(MimeTypeException e)
+	        {
+		        MiscUtils.getLogger().error("Unable to find extension for MimeType " + metaData.getMimeType(), e);
+	        }
+	        String fileName = doc.getTitle() + System.currentTimeMillis() + ext;
+	        InputStream fileInputStream = new ByteArrayInputStream(metaData.getContent());
+
+	        // Add document entry
+            Document document = new Document();
+            document.setPublic1(false);
+            document.setResponsible("");
+            document.setDoccreator(providerId);
+            document.setDocdesc(doc.getTitle());
+            document.setDoctype("others");
+            document.setDocfilename(fileName);
+
+            documentService.uploadNewDemographicDocument(document, fileInputStream, Integer.parseInt(demographicId));
 
             // mark the document as downloaded
             doc.setDownloaded(true);
             patientDocumentDao.merge(doc);
         }
-        catch(CommunicationsException ex)
+        catch(IOException | CommunicationsException ex)
         {
         	MiscUtils.getLogger().error("Error", ex);
 	        throw ex;

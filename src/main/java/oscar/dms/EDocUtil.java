@@ -54,7 +54,6 @@ import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.dao.DocumentDao.Module;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
-import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.TicklerManager;
@@ -92,8 +91,6 @@ public final class EDocUtil {
 	private static IndivoDocsDao indivoDocsDao = (IndivoDocsDao) SpringUtils.getBean(IndivoDocsDao.class);
 	private static Logger logger = MiscUtils.getLogger();
 	private static ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);
-	private static DocumentService documentService = SpringUtils.getBean(DocumentService.class);
-	
 	
 	public static final String PUBLIC = "public";
 	public static final String PRIVATE = "private";
@@ -823,43 +820,6 @@ public final class EDocUtil {
 
 	public static Date getDmsDateTimeAsDate() {
 		return new Date();
-	}
-
-	public static int addDocument(InputStream fileStream, String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String contentDateTime, String observationDate, String updateDateTime, String docCreator, String responsible, String reviewer, String reviewDateTime, String source) {
-		return addDocument(fileStream, demoNo, docFileName, docDesc, docType, docClass, docSubClass, contentType, contentDateTime, observationDate, updateDateTime, docCreator, responsible, reviewer, reviewDateTime, source, null);
-	}
-
-	public static int addDocument(InputStream fileStream, String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String contentDateTime, String observationDate, String updateDateTime, String docCreator, String responsible, String reviewer, String reviewDateTime, String source, String sourceFacility) {
-
-		Document doc = new Document();
-		doc.setDoctype(docType);
-		doc.setDocClass(docClass);
-		doc.setDocSubClass(docSubClass);
-		doc.setDocdesc(docDesc);
-		doc.setDocfilename(docFileName);
-		doc.setDoccreator(docCreator);
-		doc.setResponsible(responsible);
-		doc.setUpdatedatetime(MyDateFormat.getSysDate(updateDateTime));
-		doc.setStatus('A');
-		doc.setContenttype(contentType);
-		doc.setPublic1(false);
-		doc.setObservationdate(MyDateFormat.getSysDate(observationDate));
-		doc.setReviewer(reviewer);
-		doc.setReviewdatetime(MyDateFormat.getSysDate(reviewDateTime));
-		doc.setContentdatetime(MyDateFormat.getSysDate(contentDateTime));
-		doc.setSource(source);
-		doc.setSourceFacility(sourceFacility);
-
-		try
-		{
-			documentService.uploadNewDemographicDocument(doc, fileStream, Integer.parseInt(demoNo));
-		}
-		catch(IOException e)
-		{
-			logger.error("Error", e);
-			throw new RuntimeException(e);
-		}
-		return 1;
 	}
 
 	// private static String getLastDocumentNo() {

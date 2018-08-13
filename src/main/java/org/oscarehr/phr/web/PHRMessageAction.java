@@ -38,6 +38,7 @@ import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.myoscar.client.ws_manager.AccountManager;
 import org.oscarehr.myoscar.client.ws_manager.MessageManager;
@@ -53,15 +54,12 @@ import org.oscarehr.phr.model.PHRAction;
 import org.oscarehr.phr.model.PHRDocument;
 import org.oscarehr.phr.service.PHRService;
 import org.oscarehr.phr.util.MyOscarUtils;
-import org.oscarehr.util.DateUtils;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WebUtils;
 import org.oscarehr.util.XmlUtils;
 import org.w3c.dom.Document;
-import oscar.dms.EDoc;
-import oscar.dms.EDocUtil;
 import oscar.dms.actions.AddEditDocumentAction;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
@@ -84,6 +82,7 @@ import java.util.List;
 public class PHRMessageAction extends DispatchAction {
 
 	private static Logger logger = MiscUtils.getLogger();
+	private static DocumentService documentService = SpringUtils.getBean(DocumentService.class);
 
 	PHRDocumentDAO phrDocumentDAO;
 	PHRActionDAO phrActionDAO;
@@ -387,29 +386,27 @@ public class PHRMessageAction extends DispatchAction {
 	public static void saveAttachmentToEchartDocuments(LoggedInInfo loggedInInfo, Integer demographicNo, String messageSubject, Calendar messageSentDate, String filename, String mimeType, byte[] fileBytes) throws Exception {
 		String description = "Attachment : " + messageSubject;
 
-		String date = DateUtils.getIsoDate(messageSentDate);
-		date = date.replaceAll("-", "/");
 		String providerNo = loggedInInfo.getLoggedInProviderNo();
 
-		GenericFile file = FileFactory.createDocumentFile(new ByteArrayInputStream(fileBytes), filename);
-		if(!file.validate())
+		org.oscarehr.document.model.Document document = new org.oscarehr.document.model.Document();
+		document.setPublic1(false);
+		document.setResponsible("");
+		document.setDoccreator(providerNo);
+		document.setDocdesc(description);
+		document.setDoctype("others");
+		document.setDocfilename(filename);
+		document.setSource("");
+		document.setObservationdate(messageSentDate.getTime());
+
+		document = documentService.uploadNewDemographicDocument(document, new ByteArrayInputStream(fileBytes), demographicNo);
+		Integer documentNo = document.getDocumentNo();
+
+		if(ConformanceTestHelper.enableConformanceOnlyTestFeatures)
 		{
-			file.reEncode();
-		}
-		file.moveToDocuments();
-
-		EDoc newDoc = new EDoc(description, "others", file.getName(), "", providerNo,
-				"", "", 'A', date, "", "", "demographic", demographicNo.toString());
-
-		newDoc.setContentType(file.getContentType());
-		newDoc.setNumberOfPages(file.getPageCount());
-		newDoc.setFileName(file.getName());
-
-		String doc_no = EDocUtil.addDocumentSQL(newDoc);
-		if (ConformanceTestHelper.enableConformanceOnlyTestFeatures) {
-			AddEditDocumentAction.storeDocumentInDatabase(file.getFileObject(), Integer.parseInt(doc_no));
+			GenericFile file = FileFactory.getDocumentFile(document.getDocfilename());
+			AddEditDocumentAction.storeDocumentInDatabase(file.getFileObject(), documentNo);
 		}
 		LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
-				doc_no, loggedInInfo.getIp(), file.getName());
+				String.valueOf(documentNo), loggedInInfo.getIp(), document.getDocfilename());
 	}
 }
