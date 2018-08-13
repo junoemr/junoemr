@@ -64,13 +64,9 @@ public class CtlDocument extends AbstractModel<CtlDocumentPK>
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	
-    public boolean isDemographicDocument(){
-        if(id.getModule() != null && id.getModule().equals("demographic")){
-            return true;
-        }
-        return false;
-    }
 
-	
+	public boolean isDemographicDocument()
+	{
+		return (id.getModule() != null && id.getModule().equals(MODULE_DEMOGRAPHIC));
+	}
 }

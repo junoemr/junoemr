@@ -42,6 +42,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.model.PatientLabRouting;
+import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -78,7 +79,7 @@ public class ReportStatusUpdateAction extends DispatchAction {
         int labNo = Integer.parseInt(request.getParameter("segmentID"));
         String multiID = request.getParameter("multiID");
         String providerNo = request.getParameter("providerNo");
-        char status = request.getParameter("status").charAt(0);
+        String status = request.getParameter("status");
         String comment = request.getParameter("comment");
         String lab_type = request.getParameter("labType");
         String ajaxcall=request.getParameter("ajaxcall");
@@ -87,7 +88,7 @@ public class ReportStatusUpdateAction extends DispatchAction {
 		{
 			CommonLabResultData.updateReportStatus(labNo, providerNo, status, comment,lab_type);
 
-			if(status == 'A'){
+			if(status.equals(ProviderInboxItem.ACK)){
 				String demographicID = getDemographicIdFromLab(lab_type, labNo);
 				LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACK, LogConst.CON_HL7_LAB, ""+labNo, request.getRemoteAddr(),demographicID);
 			}
@@ -97,7 +98,7 @@ public class ReportStatusUpdateAction extends DispatchAction {
                 int i=0;
                 int idNum = Integer.parseInt(id[i]);
                 while(idNum != labNo){
-                	CommonLabResultData.updateReportStatus(idNum, providerNo, 'F', "", lab_type);
+                	CommonLabResultData.updateReportStatus(idNum, providerNo, ProviderInboxItem.FILE, "", lab_type);
                     i++;
                     idNum = Integer.parseInt(id[i]);
                 }
@@ -118,7 +119,7 @@ public class ReportStatusUpdateAction extends DispatchAction {
     public ActionForward addComment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
     	int labNo = Integer.parseInt(request.getParameter("segmentID"));
     	String providerNo = request.getParameter("providerNo");
-    	char status = request.getParameter("status").charAt(0);
+    	String status = request.getParameter("status");
         String comment = request.getParameter("comment");
         String lab_type = request.getParameter("labType");
 

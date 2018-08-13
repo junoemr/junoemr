@@ -65,14 +65,13 @@ public class SplitDocumentAction extends DispatchAction {
 		String newFilename = existingDocument.getDocfilename();
 
 		PDDocument pdf = null;
-		PDDocument newPdf = null;
-		
+
 		try
 		{
 			GenericFile existingPdf = FileFactory.getDocumentFile(existingDocument.getDocfilename());
 
 			pdf = PDDocument.load(existingPdf.getFileObject());
-			newPdf = new PDDocument();
+			PDDocument newPdf = new PDDocument();
 			
 			if (commands != null) {
 				for (String c : commands) {
@@ -113,9 +112,9 @@ public class SplitDocumentAction extends DispatchAction {
 				/* add link in providerInbox */
 				List<ProviderInboxItem> routeList = providerInboxRoutingDao.getProvidersWithRoutingForDocument(LabResultData.DOCUMENT, Integer.parseInt(docNum));
 				for (ProviderInboxItem i : routeList) {
-					providerInboxRoutingDao.addToProviderInbox(i.getProviderNo(), newDocumentNo, LabResultData.DOCUMENT);
+					documentService.routeToProviderInbox(newDocumentNo, Integer.parseInt(i.getProviderNo()));
 				}
-				providerInboxRoutingDao.addToProviderInbox(providerNo, newDocumentNo, LabResultData.DOCUMENT);
+				documentService.routeToProviderInbox(newDocumentNo, Integer.parseInt(providerNo));
 
 				/* add link in document queue */
 				Integer qid = (queueId == null || queueId.equalsIgnoreCase("null")) ? 1 : Integer.parseInt(queueId);
@@ -126,19 +125,15 @@ public class SplitDocumentAction extends DispatchAction {
 					new ProviderLabRouting().route(newDocumentNo, result.get(0).getProviderNo(), ProviderLabRoutingDao.LAB_TYPE_DOC);
 				}
 
-				/* add link in patientLabRouting */
-				List<PatientLabRouting> result2 = patientLabRoutingDao.findDocByDemographic(Integer.parseInt(docNum));
-				if (!result2.isEmpty()) {
-					PatientLabRouting newPatientRoute = new PatientLabRouting();
-
-					newPatientRoute.setDemographicNo(result2.get(0).getDemographicNo());
-					newPatientRoute.setLabNo(newDocumentNo);
-					newPatientRoute.setLabType(PatientLabRoutingDao.DOC);
-
-					patientLabRoutingDao.persist(newPatientRoute);
+				/* add link in patientLabRouting and ctl_document */
+				PatientLabRouting patientLabRoute = patientLabRoutingDao.findSingleDocRoute(Integer.parseInt(docNum));
+				if(patientLabRoute != null)
+				{
+					documentService.assignDocumentToDemographic(document, patientLabRoute.getDemographicNo());
 				}
-				
-				if (result.isEmpty() || result2.isEmpty()) {
+
+				if(result.isEmpty() || patientLabRoute == null)
+				{
 					String json = "{newDocNum:" + newDocumentNo + "}";
 					JSONObject jsonObject = JSONObject.fromObject(json);
 					response.setContentType("application/json");
@@ -147,9 +142,7 @@ public class SplitDocumentAction extends DispatchAction {
 					printWriter.flush();
 					return null;
 				}
-
 			}
-
 		}
 		catch (Exception e) {
 			logger.error(e.getMessage(), e);

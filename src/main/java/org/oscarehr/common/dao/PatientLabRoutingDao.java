@@ -24,11 +24,6 @@
 
 package org.oscarehr.common.dao;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.oscarehr.common.model.LabPatientPhysicianInfo;
 import org.oscarehr.common.model.LabTestResults;
@@ -37,6 +32,10 @@ import org.oscarehr.common.model.MdsOBX;
 import org.oscarehr.common.model.MdsZRG;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.Date;
+import java.util.List;
 
 @Repository
 public class PatientLabRoutingDao extends AbstractDao<PatientLabRouting> {
@@ -78,17 +77,6 @@ public class PatientLabRoutingDao extends AbstractDao<PatientLabRouting> {
 		return(getSingleResultOrNull(query));
 	}
 
-    @SuppressWarnings("unchecked")
-    public List<PatientLabRouting> findDocByDemographic(Integer docNum) {
-
-    	String query = "select x from " + modelClass.getName() + " x where x.labNo=? and x.labType=?";
-    	Query q = entityManager.createQuery(query);
-
-    	q.setParameter(1, docNum);
-    	q.setParameter(2, DOC);
-
-    	return q.getResultList();
-    }
     /**
      * Retrieves a single PatientLabRoute from the database of type DOC, with the given lab id
      * @param labNo
@@ -111,8 +99,11 @@ public class PatientLabRoutingDao extends AbstractDao<PatientLabRouting> {
      * @param labType
      * @return PatientLabRoute or null
      */
-    public PatientLabRouting findSingleRoute(Integer labNo, String labType) {
-		String sqlCommand="SELECT x FROM "+ this.modelClass.getName() +" x WHERE x.labType=:labType AND x.labNo=:labNo";
+    public PatientLabRouting findSingleRoute(Integer labNo, String labType)
+    {
+		String sqlCommand="SELECT x FROM "+ this.modelClass.getName() +" x " +
+				"WHERE x.labType=:labType AND x.labNo=:labNo " +
+				"ORDER BY x.id DESC"; // some databases may have duplicates, always get the latest version.
 		Query query = entityManager.createQuery(sqlCommand);
 		query.setParameter("labType", labType);
 		query.setParameter("labNo", labNo);

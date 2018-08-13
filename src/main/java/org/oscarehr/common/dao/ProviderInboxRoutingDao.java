@@ -36,6 +36,7 @@ import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
 import oscar.oscarLab.ca.on.CommonLabResultData;
+import oscar.oscarLab.ca.on.LabResultData;
 
 /**
  *
@@ -51,9 +52,9 @@ public class ProviderInboxRoutingDao extends AbstractDao<ProviderInboxItem> {
 
 
 
-    public void removeLinkFromDocument(String docType, Integer docId, String providerNo) throws SQLException
+    public void removeLinkFromDocument(Integer docId, String providerNo) throws SQLException
 	{
-		CommonLabResultData.updateReportStatus(docId, providerNo, 'X', "Archived", "DOC");
+		CommonLabResultData.updateReportStatus(docId, providerNo, ProviderInboxItem.ARCHIVED, "Archived", LabResultData.DOCUMENT);
     }
 
 	public List<ProviderInboxItem> getProvidersWithRoutingForDocument(String docType, Integer docId) {
@@ -163,7 +164,7 @@ public class ProviderInboxRoutingDao extends AbstractDao<ProviderInboxItem> {
 			//If the document is archived for the provider, move the document from the archive back to their inbox as they've been re-linked to the document
 			if(labForProvider.getStatus().equals(ProviderInboxItem.ARCHIVED))
 			{
-				CommonLabResultData.updateReportStatus(labNo, providerNo, 'N', null, labType);
+				CommonLabResultData.updateReportStatus(labNo, providerNo, ProviderInboxItem.NEW, null, labType);
 			}
 
 			for(String s : listofAdditionalProviders)
