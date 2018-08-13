@@ -311,9 +311,10 @@ public class DemographicDao extends HibernateDaoSupport {
             object = new Object[] { lastfirst[0].trim() + "%" };
         }
         // optionally limit search to active demographics
-        if(hasActiveStatus){
+        if(hasActiveStatus) {
+			String inactiveStatuses = OscarProperties.getInstance().getProperty("inactive_statuses", "'IN','DE','IC', 'ID', 'MO', 'FI'");
         	// This is the same set of status codes used by the demographic search, in order to mirror functionality.
-        	hql += " and patient_status not in ('IN', 'DE', 'IC', 'ID', 'MO', 'FI')";
+        	hql += " and patient_status not in (" + inactiveStatuses + ")";
         }
         HibernateTemplate template = getHibernateTemplate();
         if(limit > 0) { //optionally add a result limit
