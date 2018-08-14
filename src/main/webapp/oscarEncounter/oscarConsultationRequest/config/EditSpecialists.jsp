@@ -64,11 +64,11 @@ if(!authed) {
 
 
 	if ( request.getParameter("search") != null ) { // If the current request to the page was requested by searching via search input
-		ajaxSearch = URLDecoder.decode(request.getParameter("search"), "UTF-8");
+		ajaxSearch = URLDecoder.decode(request.getParameter("search"), "UTF-8").trim();
 
-		if ( !ajaxSearch.trim().equals("") ) {
-			displayServiceUtil.estSpecialistVector(ajaxSearch.trim(), currentPage, pageLimit); // Pass the search query to the DB method
-			numOfSpecialists = displayServiceUtil.getNumOfSpecialists(ajaxSearch.trim()); // Get count of search results for pagination
+		if ( !ajaxSearch.equals("") ) {
+			displayServiceUtil.estSpecialistVector(ajaxSearch, currentPage, pageLimit); // Pass the search query to the DB method
+			numOfSpecialists = displayServiceUtil.getNumOfSpecialists(ajaxSearch); // Get count of search results for pagination
 		} else {
 			numOfSpecialists = displayServiceUtil.getNumOfSpecialists(); // Get all specialists
 			displayServiceUtil.estSpecialistVector(currentPage, pageLimit); // Get count of all specialists for pagination
@@ -277,7 +277,7 @@ function BackToOscar()
                             <a href="javascript:void(0)" class="navBtn" onclick="toPage('previous')"><</a>
 							<% for(int i = startIdx; i < endIdx; i++) {
 								int pageNum = i + 1;%>
-								<a href="javascript:void(0)" class="specialistPageLink" id="page<%=pageNum%>" onclick="nextPage(<%=pageLimit%>, <%=pageNum%>, '<%=ajaxSearch.trim()%>')"><%=pageNum%></a>
+								<a href="javascript:void(0)" class="specialistPageLink" id="page<%=pageNum%>" onclick="nextPage(<%=pageLimit%>, <%=pageNum%>, '<%=ajaxSearch%>')"><%=pageNum%></a>
 							<% } %>
                             <a href="javascript:void(0)" class="navBtn" onclick="toPage('next')">></a>
                             <a href="javascript:void(0)" class="navBtn" onclick="toPage('last')">>></a>
@@ -292,8 +292,8 @@ function BackToOscar()
 			</tr>
 			<span class="queryResult">
 			<%
-				if ( !ajaxSearch.trim().equals("") ) {
-					out.print("Showing " + resultSize + " of " + numOfSpecialists + " results for '"  + ajaxSearch.trim() + "' (" + currentPage + " of " + numOfPages + ")");
+				if ( !ajaxSearch.equals("") ) {
+					out.print("Showing " + resultSize + " of " + numOfSpecialists + " results for '"  + ajaxSearch + "' (" + currentPage + " of " + numOfPages + ")");
 				} else {
 					out.print("Showing " + resultSize + " of " + numOfSpecialists + " results (" + currentPage + " of " + numOfPages + ")");
 				}
