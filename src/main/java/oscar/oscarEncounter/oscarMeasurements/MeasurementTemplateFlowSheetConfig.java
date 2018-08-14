@@ -255,46 +255,49 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
         EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
         //TODO: Will change this when there are more flowsheets
         log.debug("LOADING FLOWSSHEETS");
-        for (File flowSheet : flowSheets) {
-        	InputStream is = null;
-        	try {
-	            is = new FileInputStream(flowSheet);
-	            MeasurementFlowSheet d = createflowsheet(mType, is);
+        for (File flowSheet : flowSheets)
+        {
+            InputStream is = null;
+            try
+            {
+                is = new FileInputStream(flowSheet);
+                MeasurementFlowSheet measurementFlowsheet = createflowsheet(mType, is);
 
-	            //If the system flowsheet is not in the database, then load it normally. Otherwise, it has been overwritten, so only load it once from the database
-	            if(flowsheetDao.findByName(d.getName()) == null && flowSheetUserCreatedDao.findByName(d.getName()) == null)
+                //If the system flowsheet is not in the database, then load it normally. Otherwise, it has been overwritten, so only load it once from the database
+                if (flowsheetDao.findByName(measurementFlowsheet.getName()) == null && flowSheetUserCreatedDao.findByName(measurementFlowsheet.getName()) == null)
                 {
-                    flowsheets.put(d.getName(), d);
-                    if (d.isUniversal())
-                        universalFlowSheets.add(d.getName());
-                    else if (d.getDxTriggers() != null && d.getDxTriggers().length > 0)
+                    flowsheets.put(measurementFlowsheet.getName(), measurementFlowsheet);
+                    if (measurementFlowsheet.isUniversal())
                     {
-                        String[] dxTrig = d.getDxTriggers();
-                        addTriggers(dxTrig, d.getName());
-                    } else if (d.getProgramTriggers() != null && d.getProgramTriggers().length > 0)
+                        universalFlowSheets.add(measurementFlowsheet.getName());
+                    } else if (measurementFlowsheet.getDxTriggers() != null && measurementFlowsheet.getDxTriggers().length > 0)
                     {
-                        String[] programTrig = d.getProgramTriggers();
-                        addProgramTriggers(programTrig, d.getName());
+                        String[] dxTrig = measurementFlowsheet.getDxTriggers();
+                        addTriggers(dxTrig, measurementFlowsheet.getName());
+                    } else if (measurementFlowsheet.getProgramTriggers() != null && measurementFlowsheet.getProgramTriggers().length > 0)
+                    {
+                        String[] programTrig = measurementFlowsheet.getProgramTriggers();
+                        addProgramTriggers(programTrig, measurementFlowsheet.getName());
                     }
 
-                    flowsheetDisplayNames.put(d.getName(), d.getDisplayName());
-                    Flowsheet tmp = flowsheetDao.findByName(d.getName());
-                    if (tmp != null)
+                    flowsheetDisplayNames.put(measurementFlowsheet.getName(), measurementFlowsheet.getDisplayName());
+                }
+            } catch (Exception e)
+            {
+                MiscUtils.getLogger().error("Flowsheet error: ", e);
+            } finally
+            {
+                if (is != null)
+                {
+                    try
                     {
-                        flowsheetSettings.put(d.getName(), tmp);
+                        is.close();
+                    } catch (IOException e)
+                    {
+                        MiscUtils.getLogger().error("Error Closing the Input Stream: ", e);
                     }
                 }
-        	}catch(Exception e) {
-        		MiscUtils.getLogger().error("error",e);
-        	} finally {
-        		if(is != null) {
-        			try {
-        				is.close();
-        			}catch(IOException e) {
-        				MiscUtils.getLogger().error("error",e);
-        			}
-        		}
-        	}
+            }
         }
 
         for(FlowSheetUserCreated flowSheetUserCreated: userCreatedFlowsheets){

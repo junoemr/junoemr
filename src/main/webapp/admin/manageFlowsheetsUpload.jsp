@@ -58,6 +58,7 @@
 <%@ page import="org.oscarehr.common.model.Flowsheet" %>
 <%@ page import="org.oscarehr.common.dao.FlowsheetDao" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 
 <%
 boolean isMultipart = FileUpload.isMultipartContent(request);
@@ -103,14 +104,15 @@ try {
 
 				MeasurementTemplateFlowSheetConfig.getInstance().reloadFlowsheets();
             } else {
-            	//error
+				MiscUtils.getLogger().error("Invalid Flowsheet XML Format");
             }
         }
     }
-} catch (FileUploadException e) {
-    
+} catch (FileUploadException e)
+{
+	MiscUtils.getLogger().error("Flowsheet Upload Error: ", e);
 } catch (Exception e) {
-    
+	MiscUtils.getLogger().error("Error Uploading Flowsheet: ", e);
 }   
 
 response.sendRedirect("manageFlowsheets.jsp");
