@@ -90,7 +90,7 @@ public class ProfessionalSpecialist extends AbstractModel<Integer> implements Se
     private String pagerNumber;
     private String salutation;
 
-    private boolean hideFromView=false;
+    private Boolean hideFromView=false;
     
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date lastUpdated=new Date();
@@ -350,11 +350,11 @@ public class ProfessionalSpecialist extends AbstractModel<Integer> implements Se
 	    return true;
     }
 
-	public boolean getHideFromView() {
+	public Boolean getHideFromView() {
 		return hideFromView;
 	}
 
-	public void setHideFromView(boolean hideFromView) {
+	public void setHideFromView(Boolean hideFromView) {
 		this.hideFromView = hideFromView;
 	}
 

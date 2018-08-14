@@ -52,37 +52,36 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 		return(results);
 	}
 
-	public long getNumOfSpecialists(String searchText) {
-		Query query = entityManager.createQuery("select count(x) from " + modelClass.getSimpleName() + " x where x.firstName like ? or x.lastName like ?");
-		query.setParameter(1, searchText+"%");
-		query.setParameter(2, searchText+"%");
+	public long getNumOfSpecialists(String searchText, Boolean hideFromView)
+	{
+		String queryString = "SELECT COUNT(x) FROM " + modelClass.getSimpleName() + " x WHERE (x.firstName LIKE :searchText OR x.lastName LIKE :searchText) AND (:hideFromView IS NULL OR x.hideFromView=:hideFromView)";
+
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("searchText", searchText + "%");
+		query.setParameter("hideFromView", hideFromView);
 
 		Long numOfSpecialists = (Long) query.getSingleResult();
 		return numOfSpecialists;
 	}
 
-	public long getNumOfSpecialistsDeleted(String searchText) {
-		Query query = entityManager.createQuery("select count(x) from " + modelClass.getSimpleName() + " x where (x.firstName like ? or x.lastName like ?) AND x.hideFromView=1");
-		query.setParameter(1, searchText+"%");
-		query.setParameter(2, searchText+"%");
-
-		Long numOfSpecialists = (Long) query.getSingleResult();
-		return numOfSpecialists;
+	public long getNumOfSpecialistsDeleted(String searchText)
+	{
+		return getNumOfSpecialists(searchText, true);
 	}
 
-	public long getNumOfSpecialistsActive(String searchText) {
-		Query query = entityManager.createQuery("select count(x) from " + modelClass.getSimpleName() + " x where (x.firstName like ? or x.lastName like ?) AND x.hideFromView=0");
-		query.setParameter(1, searchText+"%");
-		query.setParameter(2, searchText+"%");
-
-		Long numOfSpecialists = (Long) query.getSingleResult();
-		return numOfSpecialists;
+	public long getNumOfSpecialistsActive(String searchText)
+	{
+		return getNumOfSpecialists(searchText, false);
 	}
 
-	public List<ProfessionalSpecialist> findBySearchName(String searchText, int offset, int maxResults) {
-		Query query = entityManager.createQuery("select x from " + modelClass.getSimpleName() + " x where x.firstName like ? or x.lastName like ? order by x.lastName");
-		query.setParameter(1, searchText+"%");
-		query.setParameter(2, searchText+"%");
+	public List<ProfessionalSpecialist> findBySearchName(String searchText, int offset, int maxResults, Boolean hideFromView)
+	{
+		String queryString = "SELECT x FROM " + modelClass.getSimpleName() + " x WHERE (x.firstName LIKE :searchText OR x.lastName LIKE :searchText) AND (:hideFromView IS NULL OR x.hideFromView=:hideFromView) ORDER BY x.lastName";
+
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("searchText", searchText + "%");
+		query.setParameter("hideFromView", hideFromView);
+
 		query.setFirstResult(offset);
 		query.setMaxResults(maxResults);
 
@@ -90,26 +89,14 @@ public class ProfessionalSpecialistDao extends AbstractDao<ProfessionalSpecialis
 		return results;
 	}
 
-	public List<ProfessionalSpecialist> findBySearchNameDeleted(String searchText, int offset, int maxResults) {
-		Query query = entityManager.createQuery("select x from " + modelClass.getSimpleName() + " x where (x.firstName like ? or x.lastName like ?) AND x.hideFromView=1 order by x.lastName");
-		query.setParameter(1, searchText+"%");
-		query.setParameter(2, searchText+"%");
-		query.setFirstResult(offset);
-		query.setMaxResults(maxResults);
-
-		List<ProfessionalSpecialist> results = query.getResultList();
-		return results;
+	public List<ProfessionalSpecialist> findBySearchNameDeleted(String searchText, int offset, int maxResults)
+	{
+		return findBySearchName(searchText, offset, maxResults, true);
 	}
 
-	public List<ProfessionalSpecialist> findBySearchNameActive(String searchText, int offset, int maxResults) {
-		Query query = entityManager.createQuery("select x from " + modelClass.getSimpleName() + " x where (x.firstName like ? or x.lastName like ?) AND x.hideFromView=0 order by x.lastName");
-		query.setParameter(1, searchText+"%");
-		query.setParameter(2, searchText+"%");
-		query.setFirstResult(offset);
-		query.setMaxResults(maxResults);
-
-		List<ProfessionalSpecialist> results = query.getResultList();
-		return results;
+	public List<ProfessionalSpecialist> findBySearchNameActive(String searchText, int offset, int maxResults)
+	{
+		return findBySearchName(searchText, offset, maxResults, false);
 	}
 
 	/**

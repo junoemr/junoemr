@@ -56,14 +56,16 @@ public class EctConEditSpecialistsAction extends Action {
 
 		EctConEditSpecialistsForm editSpecialistsForm = (EctConEditSpecialistsForm) form;
 		String specId = editSpecialistsForm.getSpecId();
-		String delete = editSpecialistsForm.getDelete();
-		String activate = editSpecialistsForm.getActivate();
+		String delete = request.getParameter("delete");
+		String activate = request.getParameter("activate");
 		String specialists[] = editSpecialistsForm.getSpecialists();
 
 		ResourceBundle oscarR = ResourceBundle.getBundle("oscarResources", request.getLocale());
 
-		if (delete.equals(oscarR.getString("oscarEncounter.oscarConsultationRequest.config.EditSpecialists.btnDeleteSpecialist"))) {
-			if (specialists.length > 0) {
+		if (delete != null)
+		{
+			if (specialists.length > 0)
+			{
 				for (int i = 0; i < specialists.length; i++)
 				{
 					ProfessionalSpecialist proSpec = professionalSpecialistDao.find(Integer.parseInt(specialists[i]));
@@ -76,8 +78,10 @@ public class EctConEditSpecialistsAction extends Action {
 			return mapping.findForward("delete");
 		}
 
-		if (activate.equals(oscarR.getString("oscarEncounter.oscarConsultationRequest.config.EditSpecialists.btnActivateSpecialist"))) {
-			if (specialists.length > 0) {
+		if (activate != null)
+		{
+			if (specialists.length > 0)
+			{
 				for (int i = 0; i < specialists.length; i++)
 				{
 					ProfessionalSpecialist proSpec = professionalSpecialistDao.find(Integer.parseInt(specialists[i]));

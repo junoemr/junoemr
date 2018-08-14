@@ -232,12 +232,12 @@ function BackToOscar()
 					<% if(activateSpecialists)
 					{
 					%>
-						<input type="submit" name="activate" value="<bean:message key="oscarEncounter.oscarConsultationRequest.config.EditSpecialists.btnActivateSpecialist"/>">
+						<button type="submit" name="activate" value="activate"><bean:message key="oscarEncounter.oscarConsultationRequest.config.EditSpecialists.btnActivateSpecialist"/></button>
 					<%
 					} else
 					{
 					%>
-						<input type="submit" name="delete" value="<bean:message key="oscarEncounter.oscarConsultationRequest.config.EditSpecialists.btnDeleteSpecialist"/>">
+						<button type="submit" name="delete" value="delete"><bean:message key="oscarEncounter.oscarConsultationRequest.config.EditSpecialists.btnDeleteSpecialist"/></button>
 					<%
 					}
 					%>

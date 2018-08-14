@@ -116,7 +116,7 @@ public class EctConDisplayServiceUtil
 		ProfessionalSpecialistDao dao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
 		if (searchType.equals("all"))
 		{
-			specialists = dao.findBySearchName(searchText, offset, maxResults);
+			specialists = dao.findBySearchName(searchText, offset, maxResults, null);
 		} else if (searchType.equals("active"))
 		{
 			specialists = dao.findBySearchNameActive(searchText, offset, maxResults);
@@ -172,7 +172,7 @@ public class EctConDisplayServiceUtil
 		ProfessionalSpecialistDao proSpecDao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
 		if (searchType.equals("all"))
 		{
-			numOfSpecialists = proSpecDao.getNumOfSpecialists(searchText);
+			numOfSpecialists = proSpecDao.getNumOfSpecialists(searchText, null);
 		} else if (searchType.equals("active"))
 		{
 			numOfSpecialists = proSpecDao.getNumOfSpecialistsActive(searchText);
