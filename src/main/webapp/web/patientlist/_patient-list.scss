@@ -48,17 +48,20 @@
 
 #patient-list {
 	.list-group-item {
-		background-color: #ebebeb;
-		&:hover,
-		&:active {
-			background-color: #fff;
-		}
-		.patient-time {
-			color: #5b5b5b;
-		}
-		.patient-name {
-			color: $primary-blue-text;
-		}
+	  background-color: #ebebeb;
+	  &.patient-list-show-status {
+		border-left-width: 10px;
+	  }
+	  &:hover,
+	  &:active {
+		  background-color: #fff;
+	  }
+	  .patient-time {
+		  color: #5b5b5b;
+	  }
+	  .patient-name {
+		  color: $primary-blue-text;
+	  }
 	}
 }
 

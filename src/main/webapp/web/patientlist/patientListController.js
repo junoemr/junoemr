@@ -189,7 +189,6 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 				function success(resultList)
 				{
 					controller.patients = resultList;
-					console.info('controller patient list', controller.patients);
 
 					controller.nPages = 1;
 					if (controller.patients != null && controller.patients.length > 0)
@@ -224,7 +223,6 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 
 		$scope.$on('juno:patientListRefresh', function()
 		{
-			console.info("refresh patient list");
 			controller.refresh();
 		});
 

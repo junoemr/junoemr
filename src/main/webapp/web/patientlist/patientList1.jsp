@@ -76,8 +76,10 @@
 	</div>
 
 	<div id="patient-list">
-		<a ng-repeat="patient in patientListCtrl.patients | offset:currentPage*pageSize | limitTo:pageSize | filter:query" class="list-group-item default hand-hover"
-			ng-click="patientListCtrl.goToRecord(patient)" ng-dblclick="patientListAppointmentListCtrl.viewAppointment(patient.appointmentNo)">
+		<a ng-repeat="patient in patientListCtrl.patients | offset:currentPage*pageSize | limitTo:pageSize | filter:query" class="list-group-item default hand-hover patient-list-show-status"
+		   ng-click="patientListCtrl.goToRecord(patient)" ng-dblclick="patientListAppointmentListCtrl.viewAppointment(patient.appointmentNo)"
+		   ng-style="{'border-left-color': patientListAppointmentListCtrl.getAppointmentStatusColourByStatusCode(patient.status)}"
+		>
 			<!--
 			<span ng-if="patient.status.length>0 && patient.status != 't'" class="badge">{{patient.status}}</span>
 			-->
