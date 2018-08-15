@@ -24,21 +24,39 @@
 
 package org.oscarehr.ws.rest.to.model;
 
-public class PatientListConfigTo1 {
+public class PatientListConfigTo1
+{
 	private Integer numberOfApptstoShow = 8;
 	private boolean showReason = true;
-	
-	public Integer getNumberOfApptstoShow() {
-	    return numberOfApptstoShow;
-    }
-	public void setNumberOfApptstoShow(Integer numberOfApptstoShow) {
-	    this.numberOfApptstoShow = numberOfApptstoShow;
-    }
-	public boolean isShowReason() {
-	    return showReason;
-    }
-	public void setShowReason(boolean showReason) {
-	    this.showReason = showReason;
-    }
-	
+	private boolean showStatus = false;
+
+	public Integer getNumberOfApptstoShow()
+	{
+		return numberOfApptstoShow;
+	}
+
+	public void setNumberOfApptstoShow(Integer numberOfApptstoShow)
+	{
+		this.numberOfApptstoShow = numberOfApptstoShow;
+	}
+
+	public boolean isShowReason()
+	{
+		return showReason;
+	}
+
+	public void setShowReason(boolean showReason)
+	{
+		this.showReason = showReason;
+	}
+
+	public boolean isShowStatus()
+	{
+		return showStatus;
+	}
+
+	public void setShowStatus(boolean showStatus)
+	{
+		this.showStatus = showStatus;
+	}
 }

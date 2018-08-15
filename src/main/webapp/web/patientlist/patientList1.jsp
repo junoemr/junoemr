@@ -89,6 +89,10 @@
 			<p class="list-group-item-text" ng-if="patient.demographicNo != 0" ng-show="patientListCtrl.patientListConfig.showReason">
 				<bean:message key="provider.appointmentProviderAdminDay.Reason"/>: {{patient.reason}}  
 			</p>
+
+			<p class="list-group-item-text" ng-if="patient.demographicNo != 0" ng-show="patientListCtrl.patientListConfig.showStatus">
+				<bean:message key="provider.appointmentProviderAdminDay.StatusDescription"/>: {{patientListAppointmentListCtrl.getAppointmentStatusDescriptionByStatusCode(patient.status)}}
+			</p>
 		</a>
 	</div>
 

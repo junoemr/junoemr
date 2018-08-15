@@ -43,9 +43,15 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 				console.log(errors);
 			});
 
-		controller.getAppointmentStatusByStatusCode = function (statusCode)
+		controller.getAppointmentStatusDescriptionByStatusCode = function (statusCode)
 		{
-			return controller.statusCodeMap.get(statusCode);
+			let status = controller.statusCodeMap.get(statusCode);
+			let description = "";
+			if(status)
+			{
+				description = status.description;
+			}
+			return description;
 		};
 		controller.getAppointmentStatusColourByStatusCode = function (statusCode)
 		{
@@ -53,7 +59,7 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 			let colour = "#000000";
 			if(status)
 			{
-				colour = controller.statusCodeMap.get(statusCode).color;
+				colour = status.color;
 			}
 			return colour;
 		};

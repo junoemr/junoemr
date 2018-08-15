@@ -319,6 +319,15 @@ public class PersonaService extends AbstractServiceImpl {
 				logger.error("showReason is not a boolean"+showReason,e);
 			}
 		}
+
+		String showStatus = propDao.getStringValue(provider.getProviderNo(), "patientListConfig.showStatus");
+		if(showStatus != null){
+			try{
+				patientListConfigTo1.setShowStatus(Boolean.parseBoolean(showStatus));
+			}catch(Exception e){
+				logger.error("showReason is not a boolean"+showStatus,e);
+			}
+		}
 		
 		return patientListConfigTo1;
 	}
@@ -357,7 +366,21 @@ public class PersonaService extends AbstractServiceImpl {
 			prop.setValue(Boolean.toString(showReason));
 		}
 		propDao.saveProp(prop);
-		
+
+		boolean showStatus = patientListConfigTo1.isShowStatus();
+		UserProperty propShowStatus = propDao.getProp(provider.getProviderNo(), "patientListConfig.showStatus");
+		if(propShowStatus != null)
+		{
+			propShowStatus.setValue(Boolean.toString(showStatus));
+		}
+		else
+		{
+			propShowStatus = new UserProperty();
+			propShowStatus.setName("patientListConfig.showStatus");
+			propShowStatus.setProviderNo(provider.getProviderNo());
+			propShowStatus.setValue(Boolean.toString(showStatus));
+		}
+		propDao.saveProp(propShowStatus);
 		
 		return patientListConfigTo1;
 	}
