@@ -26,8 +26,10 @@
 
  */
 angular.module("Common.Services").service("scheduleService", [
-	'$http', '$q',
-	function($http, $q)
+	'$http',
+	'$q',
+	'junoHttp',
+	function($http, $q, junoHttp)
 	{
 		var service = {};
 
@@ -46,7 +48,7 @@ angular.module("Common.Services").service("scheduleService", [
 				function error(errors)
 				{
 					console.log("scheduleService::getStatuses error", errors);
-					deferred.reject("An error occured while fetching statuses");
+					deferred.reject("An error occurred while fetching statuses");
 				});
 
 			return deferred.promise;
@@ -65,7 +67,7 @@ angular.module("Common.Services").service("scheduleService", [
 				function error(errors)
 				{
 					console.log("scheduleService::getStatuses error", errors);
-					deferred.reject("An error occured while fetching types");
+					deferred.reject("An error occurred while fetching types");
 				});
 
 			return deferred.promise;
@@ -75,8 +77,8 @@ angular.module("Common.Services").service("scheduleService", [
 		{
 			var deferred = $q.defer();
 
-			$http.get(service.apiPath + 'schedule/day/' +
-				encodeURIComponent(day)).then(
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			junoHttp.get(service.apiPath + 'schedule/day/' + encodeURIComponent(day), config).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);
@@ -84,7 +86,7 @@ angular.module("Common.Services").service("scheduleService", [
 				function error(errors)
 				{
 					console.log("scheduleService::getAppointments error", errors);
-					deferred.reject("An error occured while getting appointments");
+					deferred.reject("An error occurred while getting appointments");
 				});
 
 			return deferred.promise;
@@ -108,7 +110,7 @@ angular.module("Common.Services").service("scheduleService", [
 				function error(errors)
 				{
 					console.log("scheduleService::addAppointment error", errors);
-					deferred.reject("An error occured while saving appointment");
+					deferred.reject("An error occurred while saving appointment");
 				});
 
 			return deferred.promise;
@@ -135,7 +137,7 @@ angular.module("Common.Services").service("scheduleService", [
 				function error(errors)
 				{
 					console.log("scheduleService::getAppointment error", errors);
-					deferred.reject("An error occured while getting appointment");
+					deferred.reject("An error occurred while getting appointment");
 				});
 
 			return deferred.promise;
@@ -162,7 +164,7 @@ angular.module("Common.Services").service("scheduleService", [
 				function error(errors)
 				{
 					console.log("scheduleService::deleteAppointment error", errors);
-					deferred.reject("An error occured while deleting appointment");
+					deferred.reject("An error occurred while deleting appointment");
 				});
 
 			return deferred.promise;
@@ -186,7 +188,7 @@ angular.module("Common.Services").service("scheduleService", [
 				function error(errors)
 				{
 					console.log("scheduleService::appointmentHistory error", errors);
-					deferred.reject("An error occured while getting appointment history");
+					deferred.reject("An error occurred while getting appointment history");
 				});
 
 			return deferred.promise;
@@ -214,7 +216,7 @@ angular.module("Common.Services").service("scheduleService", [
 				function error(errors)
 				{
 					console.log("scheduleService::cancelAppointment error", errors);
-					deferred.reject("An error occured while cancelling appointment");
+					deferred.reject("An error occurred while cancelling appointment");
 				});
 
 			return deferred.promise;
@@ -242,7 +244,7 @@ angular.module("Common.Services").service("scheduleService", [
 				function error(errors)
 				{
 					console.log("scheduleService::noShowAppointment error", errors);
-					deferred.reject("An error occured while setting no show appointment");
+					deferred.reject("An error occurred while setting no show appointment");
 				});
 
 			return deferred.promise;

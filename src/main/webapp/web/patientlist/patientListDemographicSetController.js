@@ -1,29 +1,20 @@
 angular.module('PatientList').controller('PatientList.PatientListDemographicSetController', [
-
 	'$scope',
 	'$http',
-	'Navigation',
+	'reportingService',
 
 	function(
 		$scope,
 		$http,
-		Navigation)
+		reportingService)
 	{
 
 		var controller = this;
 
-		$http(
-		{
-			url: '../ws/rs/reporting/demographicSets/list',
-			method: "GET",
-			headers:
-			{
-				'Content-Type': 'application/json'
-			}
-		}).then(
+		reportingService.getDemographicSetList().then(
 			function success(results)
 			{
-				controller.sets = results.data.content;
+				controller.sets = results.content;
 			},
 			function error(error)
 			{

@@ -82,7 +82,7 @@
 			<span ng-if="patient.status.length>0 && patient.status != 't'" class="badge">{{patient.status}}</span>
 			-->
 			<h5 class="list-group-item-heading pull-right patient-time" >{{patient.startTime}}</h5>
-			<h4 class="list-group-item-heading patient-name" >{{patient.name}}</h5>
+			<h4 class="list-group-item-heading patient-name" >{{patient.name}}</h4>
 
 			<p class="list-group-item-text" ng-if="patient.demographicNo != 0" ng-show="patientListCtrl.patientListConfig.showReason">
 				<bean:message key="provider.appointmentProviderAdminDay.Reason"/>: {{patient.reason}}  

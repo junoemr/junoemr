@@ -35,6 +35,8 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 	'personaService',
 	'providerService',
 	'patientListState',
+	'scheduleService',
+	'reportingService',
 
 	function(
 		$scope,
@@ -45,7 +47,9 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		Navigation,
 		personaService,
 		providerService,
-		patientListState)
+		patientListState,
+		scheduleService,
+		reportingService)
 	{
 
 		var controller = this;
@@ -109,21 +113,21 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			$scope.$emit('configureShowPatientList', false);
 		};
 
-		controller.changeMoreTab = function changeMoreTab(temp, filter)
+		controller.changeMoreTab = function changeMoreTab(moreTabItemsIndex, filter)
 		{
 			var beforeChangeTab = controller.currentmoretab;
-			controller.currentmoretab = controller.moreTabItems[temp];
+			controller.currentmoretab = controller.moreTabItems[moreTabItemsIndex];
 
 			controller.showFilter = true;
 			controller.currenttab = null;
 			controller.refresh(filter);
 		};
 
-		controller.changeTab = function changeTab(temp, filter)
+		controller.changeTab = function changeTab(tabItemIndex, filter)
 		{
-			if(controller.currenttab !== patientListState.tabItems[temp])
+			if(controller.currenttab !== patientListState.tabItems[tabItemIndex])
 			{
-				controller.currenttab = patientListState.tabItems[temp];
+				controller.currenttab = patientListState.tabItems[tabItemIndex];
 				controller.showFilter = true;
 				controller.currentmoretab = null;
 				controller.refresh(filter);
@@ -172,11 +176,6 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			});
 		};
 
-
-		//  $scope.$watch("currentPage", function(newValue, oldValue) {
-		//     console.log('currentPage changes from ' + oldValue + ' to ' + newValue);
-		//   });
-
 		$scope.$on('togglePatientListFilter', function(event, data)
 		{
 			console.log("received a togglePatientListFilter event:" + data);
@@ -186,69 +185,27 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 
 		controller.process = function process(tab, filter)
 		{
-			if (tab.url != null)
-			{
-
-				var d = undefined;
-				if (tab.httpType == 'POST')
+			tab.serviceMethod().then(
+				function success(resultList)
 				{
-					d = filter != null ? JSON.stringify(filter) :
-					{}
-				}
+					controller.patients = resultList;
+					console.info('controller patient list', controller.patients);
 
-				$http(
-				{
-					url: tab.url,
-					dataType: 'json',
-					data: d,
-					method: tab.httpType,
-					headers:
+					controller.nPages = 1;
+					if (controller.patients != null && controller.patients.length > 0)
 					{
-						"Content-Type": "application/json"
+						controller.nPages = Math.ceil(controller.patients.length / controller.pageSize);
 					}
-				}).then(
-					function success(results)
-					{
-						controller.template = tab.template;
-						Navigation.load(controller.template);
 
-						controller.currentPage = 0;
-
-						if (results.data.patients instanceof Array)
-						{
-							controller.patients = results.data.patients;
-						}
-						else if (results.data.patients == undefined)
-						{
-							controller.patients = [];
-						}
-						else
-						{
-							var arr = new Array();
-							arr[0] = results.data.patients;
-							controller.patients = arr;
-						}
-
-						controller.nPages = 1;
-						if (controller.patients != null && controller.patients.length > 0)
-						{
-							controller.nPages = Math.ceil(controller.patients.length / controller.pageSize);
-						}
-
-					},
-					function error(error)
-					{
-						alert('error loading data for patient list:' + error);
-					});
-			}
-			else
-			{
-				controller.changePage(controller.currentPage);
-				controller.currentPage = 0;
-				controller.nPages = 1;
-				controller.template = tab.template;
-				Navigation.load(controller.template);
-			}
+					controller.template = tab.template;
+					Navigation.load(controller.template);
+					controller.changePage(0);
+				},
+				function error(error)
+				{
+					alert('error loading data for patient list:' + error);
+				}
+			);
 		};
 
 		controller.refresh = function refresh(filter)
@@ -267,6 +224,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 
 		$scope.$on('juno:patientListRefresh', function()
 		{
+			console.info("refresh patient list");
 			controller.refresh();
 		});
 
@@ -339,15 +297,31 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 				id: 0,
 				label: "Appts.",
 				template: "patientlist/patientList1.jsp",
-				url: "../ws/rs/schedule/day/today",
-				httpType: "GET"
+				serviceMethod: function ()
+				{
+					// this gets overwritten by the appointmentListController, when it sets specific dates
+					return scheduleService.getAppointments('today').then(
+						function success(results)
+						{
+							return results.patients;
+						}
+					);
+				}
 			},
 			{
 				id: 1,
 				label: "Recent",
 				template: "patientlist/recent.jsp",
-				url: "../ws/rs/providerService/getRecentDemographicsViewed",
-				httpType: "GET"
+				serviceMethod: function ()
+				{
+					return providerService.getRecentPatientList().then(
+						function success(results)
+						{
+							controller.recentPatientList = results;
+							return results;
+						}
+					);
+				}
 			}
 		];
 		controller.moreTabItems = [
@@ -355,15 +329,24 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 				id: 0,
 				label: "Patient Sets",
 				template: "patientlist/demographicSets.jsp",
-				url: "../ws/rs/reporting/demographicSets/patientList",
-				httpType: "POST"
+				serviceMethod: function ()
+				{
+					return reportingService.getDemographicSetList().then(
+						function success(results)
+						{
+							return results.content;
+						}
+					);
+				}
 			},
 			{
 				id: 1,
 				label: "Caseload",
 				template: "patientlist/program.jsp",
-				url: null,
-				httpType: null
+				serviceMethod: function ()
+				{
+					return Promise.resolve([]);
+				}
 			}
 		];
 		controller.changeTab(0);

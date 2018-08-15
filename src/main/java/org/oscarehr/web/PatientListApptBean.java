@@ -23,47 +23,38 @@
  */
 package org.oscarehr.web;
 
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-
 @XmlRootElement()
-@XmlType(name = "", propOrder = {"template", "patients" })
-public class PatientListApptBean implements Serializable{
-	
+@XmlType(name = "", propOrder = {"template", "patients"})
+public class PatientListApptBean implements Serializable
+{
+
 	private String template = "patientlist/patientList1.jsp";
-	
-	private List<PatientListApptItemBean> patients = new ArrayList<PatientListApptItemBean>(); 
-	
-	
-	
-	public String getTemplate() {
+
+	private List<PatientListApptItemBean> patients = new ArrayList<>();
+
+	public String getTemplate()
+	{
 		return template;
 	}
 
-
-
-	public void setTemplate(String template) {
+	public void setTemplate(String template)
+	{
 		this.template = template;
 	}
 
-
-
-	public List<PatientListApptItemBean> getPatients() {
+	public List<PatientListApptItemBean> getPatients()
+	{
 		return patients;
 	}
 
-
-
-	public void setPatients(List<PatientListApptItemBean> patients) {
+	public void setPatients(List<PatientListApptItemBean> patients)
+	{
 		this.patients = patients;
 	}
-
-
-
-
-	
 }

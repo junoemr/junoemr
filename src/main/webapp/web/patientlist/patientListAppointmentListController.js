@@ -126,12 +126,16 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 
 		controller.changeApptList = function changeApptList(day)
 		{
-
-			temp = 0;
-
-			controller.currenttab = patientListState.tabItems[temp];
-			var lastIndx = controller.currenttab.url.lastIndexOf("/");
-			controller.currenttab.url = controller.currenttab.url.slice(0, lastIndx + 1) + day;
+			controller.currenttab = patientListState.tabItems[0];
+			controller.currenttab.serviceMethod = function ()
+			{
+				return scheduleService.getAppointments(day).then(
+					function success(results)
+					{
+						return results.patients;
+					}
+				);
+			};
 			controller.showFilter = true;
 			$scope.$emit('juno:patientListRefresh');
 		};
