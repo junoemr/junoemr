@@ -24,6 +24,26 @@
 
 package oscar.oscarPrevention;
 
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.log4j.Logger;
+import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
+import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
+import org.oscarehr.PMmodule.caisi_integrator.RemotePreventionHelper;
+import org.oscarehr.caisi_integrator.ws.CachedDemographicPrevention;
+import org.oscarehr.caisi_integrator.ws.CachedFacility;
+import org.oscarehr.common.model.Demographic;
+import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.dao.PreventionExtDao;
+import org.oscarehr.prevention.model.Prevention;
+import org.oscarehr.prevention.model.PreventionExt;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import oscar.oscarProvider.data.ProviderData;
+import oscar.util.DateUtils;
+import oscar.util.UtilDateUtilities;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -32,27 +52,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.log4j.Logger;
-import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
-import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
-import org.oscarehr.PMmodule.caisi_integrator.RemotePreventionHelper;
-import org.oscarehr.caisi_integrator.ws.CachedDemographicPrevention;
-import org.oscarehr.caisi_integrator.ws.CachedFacility;
-import org.oscarehr.common.dao.PreventionDao;
-import org.oscarehr.common.dao.PreventionExtDao;
-import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.Prevention;
-import org.oscarehr.common.model.PreventionExt;
-import org.oscarehr.managers.DemographicManager;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.oscarProvider.data.ProviderData;
-import oscar.util.DateUtils;
-import oscar.util.UtilDateUtilities;
 
 public class PreventionData {
 
@@ -99,8 +98,10 @@ public class PreventionData {
 
 	public static void addPreventionKeyValue(String preventionId, String keyval, String val) {
 		try {
+			Prevention prevention = preventionDao.find(Integer.valueOf(preventionId));
+
 			PreventionExt preventionExt = new PreventionExt();
-			preventionExt.setPreventionId(Integer.valueOf(preventionId));
+			preventionExt.setPrevention(prevention);
 			preventionExt.setKeyval(keyval);
 			preventionExt.setVal(val);
 
@@ -170,7 +171,7 @@ public class PreventionData {
 		try {
 			List<PreventionExt> preventionExts = preventionExtDao.findByKeyAndValue(extKey, extVal);
 			for (PreventionExt preventionExt : preventionExts) {
-				Map<String, Object> hash = getPreventionById(preventionDao.find(preventionExt.getPreventionId()).toString());
+				Map<String, Object> hash = getPreventionById(preventionDao.getPreventionFromExt(preventionExt).getId().toString());
 				if (hash.get("deleted") != null && ((String) hash.get("deleted")).equals("0")) {
 					list.add(hash);
 				}
@@ -334,8 +335,7 @@ public class PreventionData {
 		oscar.oscarPrevention.Prevention prevention = getPrevention(loggedInInfo, demographicId);
 
 		List<CachedDemographicPrevention> cachedPreventions = getRemotePreventions(loggedInInfo, demographicId);
-
-		if (cachedPreventions != null) {
+		if (cachedPreventions != null && prevention != null) {
 			for (CachedDemographicPrevention cdp : cachedPreventions) {
 				PreventionItem pi = new PreventionItem(cdp);
 				prevention.addPreventionItem(pi);

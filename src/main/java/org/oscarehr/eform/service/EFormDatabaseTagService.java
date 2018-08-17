@@ -24,9 +24,9 @@ package org.oscarehr.eform.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.PreventionDao;
-import org.oscarehr.common.model.Prevention;
 import org.oscarehr.eform.EFormHtmlParser;
+import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -103,9 +103,9 @@ public class EFormDatabaseTagService
 				databaseAP = getAPExtra(tagName, demographicId);
 			}
 			// if it's still null, skip the rest
+			// this will happen for invalid tags, but also when a measurement is not present for the demographic, etc.
 			if(databaseAP == null)
 			{
-				logger.warn("Invalid database tag (" + tagName + ") was skipped.");
 				continue;
 			}
 
@@ -182,16 +182,19 @@ public class EFormDatabaseTagService
 		String type = tagName.substring(tagName.indexOf("$") + 1, tagName.indexOf("#"));
 		String field = tagName.substring(tagName.indexOf("#") + 1, tagName.length());
 
-		DatabaseAP databaseAP;
+		DatabaseAP databaseAP = null;
 		switch(module)
 		{
 			case "m": databaseAP = getMeasurementsAP(type, field, demographicId); break;
 			case "p": databaseAP = getPreventionsAP(type, field, demographicId); break;
 			case "e": databaseAP = getEformValuesAP(type, field, demographicId); break;
 			case "o": databaseAP = getOtherAP(type, field, demographicId); break;
-			default: return null;
+			default: logger.warn("Invalid database tag (" + tagName + ") was skipped."); break;
 		}
-		databaseAP.setApName(tagName);
+		if(databaseAP != null)
+		{
+			databaseAP.setApName(tagName);
+		}
 		return databaseAP;
 	}
 
@@ -258,7 +261,7 @@ public class EFormDatabaseTagService
 
 		 This is not yet implemented here, but exists in the old EForm code.
 		 */
-		throw new RuntimeException("Not Implemented");
+		return null;
 	}
 
 	private DatabaseAP getOtherAP(String type, String field, Integer demographicId)
@@ -272,7 +275,7 @@ public class EFormDatabaseTagService
 
 		This is not yet implemented here, but exists in the old EForm code.
 		 */
-		throw new RuntimeException("Not Implemented");
+		return null;
 	}
 
 	private String dateStringOrEmpty(Date date)

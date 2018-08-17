@@ -51,10 +51,9 @@
 <%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.common.dao.SiteDao" %>
 
-<%@ page import="org.oscarehr.common.model.ProviderData" %>
-<%@ page import="org.oscarehr.common.dao.ProviderDataDao" %>
+<%@ page import="org.oscarehr.provider.model.ProviderData" %>
+<%@ page import="org.oscarehr.provider.dao.ProviderDataDao" %>
 <%@ page import="oscar.OscarProperties" %>
-
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>

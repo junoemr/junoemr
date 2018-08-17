@@ -37,7 +37,7 @@ import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.AssignedAuthor;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Author;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Person;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.ContextControl;
-import org.oscarehr.common.model.ProviderData;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.model.export.header.AuthorModel;
 import org.oscarehr.e2e.util.EverestUtils;

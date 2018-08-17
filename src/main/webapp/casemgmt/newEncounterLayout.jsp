@@ -35,8 +35,8 @@
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="org.oscarehr.util.LoggedInInfo" %>
 <%@page import="org.oscarehr.casemgmt.common.Colour" %>
-<%@page import="org.oscarehr.common.dao.ProviderDataDao" %>
-<%@page import="org.oscarehr.common.model.ProviderData"%>
+<%@page import="org.oscarehr.provider.dao.ProviderDataDao" %>
+<%@page import="org.oscarehr.provider.model.ProviderData"%>
 <%@page import="java.util.List"%>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="oscar.util.StringUtils" %>

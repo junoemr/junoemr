@@ -199,8 +199,7 @@
 			<tr bgcolor='ivory'>
 				<td nowrap><bean:message
 					key="schedule.scheduleedittemplate.formTemplateName" />:</td>
-				<td><input type="text" name="name" size="30" maxlength="<%=nameMaxLength%>"
-					<%=bEdit?("value='"+myTempBean.getName().replaceFirst("^" + publicPrefix, "")+"'"):"value=''"%>>
+				<td><input type="text" name="name" size="30" maxlength="<%=nameMaxLength%>" value="<%=bEdit?myTempBean.getName().replaceFirst("^" + publicPrefix, ""):""%>">
 				<font size='-2'><bean:message
 					key="schedule.scheduleedittemplate.msgLessTwentyChars" /></font></td>
 				<td></td>

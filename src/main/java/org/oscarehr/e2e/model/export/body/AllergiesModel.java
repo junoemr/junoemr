@@ -48,7 +48,7 @@ import org.marc.everest.rmim.uv.cdar2.vocabulary.EntityClassRoot;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.ParticipationType;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActMoodDocumentObservation;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActRelationshipEntryRelationship;
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.constant.Mappings;
 import org.oscarehr.e2e.model.export.template.observation.LifestageObservationModel;
