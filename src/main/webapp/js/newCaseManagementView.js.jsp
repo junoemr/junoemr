@@ -133,33 +133,6 @@
 
 	}
 
-	function urlencode(str)
-	{
-		var ns = (navigator.appName == "Netscape") ? 1 : 0;
-		if (ns)
-		{
-			return escape(str);
-		}
-		var ms = "%25#23 20+2B?3F<3C>3E{7B}7D[5B]5D|7C^5E~7E`60";
-		var msi = 0;
-		var i, c, rs, ts;
-		while (msi < ms.length)
-		{
-			c = ms.charAt(msi);
-			rs = ms.substring(++msi, msi + 2);
-			msi += 2;
-			i = 0;
-			while (true)
-			{
-				i = str.indexOf(c, i);
-				if (i == -1) break;
-				ts = str.substring(0, i);
-				str = ts + "%" + rs + str.substring(++i, str.length);
-			}
-		}
-		return str;
-	}
-
 	function measurementLoaded(name)
 	{
 		measurementWindows.push(openWindows[name]);
@@ -2575,7 +2548,7 @@
 		var encType = "encTypeSelect" + noteId;
 		var caseMgtEntryfrm = document.forms["caseManagementEntryForm"];
 		var url = ctx + "/CaseManagementEntry.do";
-		var params = "nId=" + noteId + issueParams + "&demographicNo=" + demographicNo + "&providerNo=" + providerNo + "&numIssues=" + idx + "&obsDate=" + $F("observationDate") + "&encType=" + encodeURI($F(encType)) + "&noteTxt=" + encodeURI(noteTxt);
+		var params = "nId=" + noteId + issueParams + "&demographicNo=" + demographicNo + "&providerNo=" + providerNo + "&numIssues=" + idx + "&obsDate=" + $F("observationDate") + "&encType=" + encodeURIComponent($F(encType)) + "&noteTxt=" + encodeURIComponent(noteTxt);
 		params += "&" + Form.serialize(caseMgtEntryfrm);
 
 		var objAjax = new Ajax.Updater(
@@ -3332,7 +3305,7 @@
 		var demoNo = demographicNo;
 		var cmeFrm = document.forms["caseManagementEntryForm"];
 		var nId = cmeFrm.noteId.value < 0 ? 0 : cmeFrm.noteId.value;
-		var params = "method=autosave&demographicNo=" + demoNo + "&programId=" + programId + "&note_id=" + nId + "&note=" + escape($F(caseNote));
+		var params = "method=autosave&demographicNo=" + demoNo + "&programId=" + programId + "&note_id=" + nId + "&note=" + encodeURIComponent($F(caseNote));
 
 		new Ajax.Request(url, {
 				method: 'post',
