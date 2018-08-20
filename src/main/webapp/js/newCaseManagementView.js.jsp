@@ -133,6 +133,12 @@
 
 	}
 
+    function urlencode(str)
+    {
+        console.log("method newCaseManagementView urlencode is deprecated");
+        return encodeURIComponent(str);
+    }
+
 	function measurementLoaded(name)
 	{
 		measurementWindows.push(openWindows[name]);
