@@ -139,8 +139,6 @@
 
 <%
 	String ptstatus = request.getParameter("ptstatus") == null ? "active" : request.getParameter("ptstatus");
-
-	org.oscarehr.util.MiscUtils.getLogger().info("PSTATUS " + ptstatus);
 	OscarProperties props = OscarProperties.getInstance();
 %>
 
@@ -516,70 +514,89 @@ List<DemographicSearchResult> doSearch(DemographicDao demographicDao,LoggedInInf
 	searchRequest.setOutOfDomain(outOfDomain);
 	searchRequest.setKeyword(searchKeyword);
 
-	// Set Status Mode
-	if (("").equals(searchStatus))
+	searchStatus = (searchStatus == null) ? "" : searchStatus;
+	searchMode = (searchMode == null) ? "" : searchMode;
+	orderBy = (orderBy == null) ? "" : orderBy;
+
+	switch (searchStatus)
 	{
-		searchRequest.setStatusMode(STATUSMODE.all);
-	} else if (("active").equals(searchStatus))
-	{
-		searchRequest.setStatusMode(STATUSMODE.active);
-	} else if (("inactive").equals(searchStatus))
-	{
-		searchRequest.setStatusMode(STATUSMODE.inactive);
+	    // starting in Java 7 it's more efficient to compare strings using switches instead of if-else blocks.
+		// in cases like these, where there are also many expected conditions, it's more readable as well.
+		case "active":
+			searchRequest.setStatusMode(STATUSMODE.active);
+			break;
+		case "inactive":
+			searchRequest.setStatusMode(STATUSMODE.inactive);
+			break;
+		default:
+			searchRequest.setStatusMode(STATUSMODE.all);
+			break;
 	}
 
-	// Set Search Mode
-	if ("search_name".equals(searchMode))
+	switch(searchMode)
 	{
-		searchRequest.setMode(SEARCHMODE.Name);
-	} else if ("search_phone".equals(searchMode))
-	{
-		searchRequest.setMode(SEARCHMODE.Phone);
-	} else if ("search_dob".equals(searchMode))
-	{
-		searchRequest.setMode(SEARCHMODE.DOB);
-	} else if ("search_address".equals(searchMode))
-	{
-		searchRequest.setMode(SEARCHMODE.Address);
-	} else if ("search_hin".equals(searchMode))
-	{
-		searchRequest.setMode(SEARCHMODE.HIN);
-	} else if ("search_chart_no".equals(searchMode))
-	{
-		searchRequest.setMode(SEARCHMODE.ChartNo);
-	} else if ("search_demographic_no".equals(searchMode))
-	{
-		searchRequest.setMode(SEARCHMODE.DemographicNo);
+		case "search_name":
+			searchRequest.setMode(SEARCHMODE.Name);
+			break;
+		case "search_phone":
+			searchRequest.setMode(SEARCHMODE.Phone);
+			break;
+		case "search_dob":
+			searchRequest.setMode(SEARCHMODE.DOB);
+			break;
+		case "search_address":
+			searchRequest.setMode(SEARCHMODE.Address);
+			break;
+		case "search_hin":
+			searchRequest.setMode(SEARCHMODE.HIN);
+			break;
+		case "search_chart_no":
+			searchRequest.setMode(SEARCHMODE.ChartNo);
+			break;
+		case "search_demographic_no":
+			searchRequest.setMode(SEARCHMODE.DemographicNo);
+			break;
+		default:
+			MiscUtils.getLogger().error("Invalid search mode specified [" + searchMode + "], falling back to search by name");
+			searchRequest.setMode(SEARCHMODE.Name);
+			break;
 	}
 
-	// Set Order By
-	if ("demographic_no".equals(orderBy))
+	switch (orderBy)
 	{
-		searchRequest.setSortMode(SORTMODE.DemographicNo);
-	} else if ("last_name".equals(orderBy))
-	{
-		searchRequest.setSortMode(SORTMODE.Name);
-	} else if ("chart_no".equals(orderBy))
-	{
-		searchRequest.setSortMode(SORTMODE.ChartNo);
-	} else if ("dob".equals(orderBy))
-	{
-		searchRequest.setSortMode(SORTMODE.DOB);
-	} else if ("sex".equals(orderBy))
-	{
-		searchRequest.setSortMode(SORTMODE.Sex);
-	} else if ("patient_status".equals(orderBy))
-	{
-		searchRequest.setSortMode(SORTMODE.PS);
-	} else if ("roster_status".equals(orderBy))
-	{
-		searchRequest.setSortMode(SORTMODE.RS);
-	} else if ("phone".equals(orderBy))
-	{
-		searchRequest.setSortMode(SORTMODE.Phone);
-	} else if ("provider_name".equals(orderBy))
-	{
-		searchRequest.setSortMode(SORTMODE.ProviderName);
+		case "demographic_no":
+			searchRequest.setSortMode(SORTMODE.DemographicNo);
+			break;
+		case "last_name":
+			searchRequest.setSortMode(SORTMODE.Name);
+			break;
+		case "chart_no":
+		    searchRequest.setSortMode(SORTMODE.ChartNo);
+		    break;
+		case "dob":
+		    searchRequest.setSortMode(SORTMODE.DOB);
+		    break;
+		case "sex":
+			searchRequest.setSortMode(SORTMODE.Sex);
+			break;
+		case "patient_status":
+		    searchRequest.setSortMode(SORTMODE.PatientStatus);
+		    break;
+		case "roster_status":
+		    searchRequest.setSortMode(SORTMODE.RosterStatus);
+		    break;
+		case "phone":
+		    searchRequest.setSortMode(SORTMODE.Phone);
+		    break;
+		case "provider_name":
+		    searchRequest.setSortMode(SORTMODE.ProviderName);
+		    break;
+		case "hin":
+			searchRequest.setSortMode(SORTMODE.HIN);
+			break;
+		default:
+	    	searchRequest.setSortMode(SORTMODE.Default);
+	    	break;
 	}
 
 	demoList = demographicDao.searchPatients(loggedInInfo, searchRequest, offset, limit);

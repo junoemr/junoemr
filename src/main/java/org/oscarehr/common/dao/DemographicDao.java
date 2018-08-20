@@ -62,7 +62,6 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SEARCHMODE;
-import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SORTMODE;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.STATUSMODE;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.context.ApplicationEventPublisher;
@@ -2161,35 +2160,49 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		  params.put("providerNo", loggedInInfo.getLoggedInProviderNo());
 		}
 
-		String orderBy = "d.last_name,d.first_name";
+		String orderBy = " ORDER BY ";
+		String orderDir = (searchRequest.getSortDir() == null) ? "asc" : searchRequest.getSortDir().toString();
 
-		String orderDir = "asc";
-		if(searchRequest.getSortDir() != null) {
-		  orderDir = searchRequest.getSortDir().toString();
-		}
-		if(SORTMODE.Address.equals(searchRequest.getSortMode())) {
-		  orderBy = "d.address " + orderDir;
-		} else if(SORTMODE.ChartNo.equals(searchRequest.getSortMode())) {
-		  orderBy = "d.chart_no " + orderDir;
-		} else if(SORTMODE.DemographicNo.equals(searchRequest.getSortMode())) {
-		  orderBy = "d.demographic_no " + orderDir;
-		} else if(SORTMODE.DOB.equals(searchRequest.getSortMode())) {
-		  orderBy = "year_of_birth "+ orderDir+",month_of_birth "+ orderDir+",date_of_birth "+ orderDir;
-		} else if(SORTMODE.Name.equals(searchRequest.getSortMode())) {
-		  orderBy =  "d.last_name "+ orderDir+",d.first_name " + orderDir;
-		} else if(SORTMODE.Phone.equals(searchRequest.getSortMode())) {
-		  orderBy =  "d.phone " + orderDir;
-		} else if(SORTMODE.ProviderName.equals(searchRequest.getSortMode())) {
-		  orderBy =  "p.last_name "+ orderDir+",p.first_name " + orderDir;
-		}  else if(SORTMODE.PS.equals(searchRequest.getSortMode())) {
-		  orderBy =  "d.patient_status "+ orderDir;
-		} else if(SORTMODE.RS.equals(searchRequest.getSortMode())) {
-		  orderBy =  "d.roster_status "+ orderDir;
-		} else if(SORTMODE.Sex.equals(searchRequest.getSortMode())) {
-		  orderBy =  "d.sex "+ orderDir;
+		switch (searchRequest.getSortMode())
+		{
+			case Address:
+				orderBy += "d.address" + orderDir;
+				break;
+			case ChartNo:
+				orderBy += "d.chart_no " + orderDir;
+				break;
+			case DemographicNo:
+				orderBy += "d.demographic_no " + orderDir;
+				break;
+			case DOB:
+				orderBy += "year_of_birth " + orderDir + ",month_of_birth " + orderDir + ",date_of_birth " + orderDir;
+				break;
+			case Name:
+				orderBy += "d.last_name " + orderDir + ",d.first_name " + orderDir;
+				break;
+			case Phone:
+				orderBy += "d.phone " + orderDir;
+				break;
+			case ProviderName:
+				orderBy += "p.last_name " + orderDir + ",p.first_name " + orderDir;
+				break;
+			case PatientStatus:
+				orderBy += "d.patient_status " + orderDir;
+				break;
+			case RosterStatus:
+				orderBy += "d.roster_status " + orderDir;
+				break;
+			case Sex:
+				orderBy += "d.sex " + orderDir;
+				break;
+			case HIN:
+				orderBy += "d.hin " + orderDir;
+				break;
+			case Default:
+				orderBy += "d.last_name,d.first_name";
+				break;
 		}
 
-		orderBy = " ORDER BY " + orderBy;
 		return "select " + select + " " +
 				"from demographic d " +
 				"left join provider p on d.provider_no = p.provider_no " +

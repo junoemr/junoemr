@@ -34,7 +34,7 @@ public class DemographicSearchRequest {
 	}
 	
 	public static enum SORTMODE {
-        DemographicNo, Name, Phone, Address, DOB, ChartNo, Sex, ProviderName, RS, PS
+        DemographicNo, Name, Phone, Address, DOB, ChartNo, Sex, ProviderName, RosterStatus, PatientStatus, HIN, Default
 	}
 
 	public static enum STATUSMODE {
