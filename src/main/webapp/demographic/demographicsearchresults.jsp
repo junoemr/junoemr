@@ -50,7 +50,6 @@
 <%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchRequest"%>
 <%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SEARCHMODE"%>
 <%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SORTMODE"%>
-<%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SORTDIR"%>
 <%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchRequest.STATUSMODE"%>
 <%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchResult"%>
 <%@page import="org.oscarehr.caisi_integrator.ws.MatchingDemographicTransferScore"%>
@@ -82,7 +81,6 @@
 <%@page import="org.oscarehr.common.dao.DemographicDao" %>
 <%@ page import="oscar.oscarDemographic.data.DemographicMerged" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="org.apache.http.HttpRequest" %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties"	scope="session" />
 
