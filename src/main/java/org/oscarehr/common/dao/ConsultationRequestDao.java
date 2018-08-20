@@ -97,7 +97,7 @@ public class ConsultationRequestDao extends AbstractDao<ConsultationRequest> {
                 sql.append("order by cr.referralDate desc ");
             }else if(orderby.equals("1")){               //1 = msgStatus
                 sql.append("order by cr.status " + orderDesc);
-             }else if(orderby.equals("2")){               //2 = msgTeam
+            }else if(orderby.equals("2")){               //2 = msgTeam
                 sql.append("order by cr.sendTo " + orderDesc);
             }else if(orderby.equals("3")){               //3 = msgPatient
                 sql.append("order by d.LastName " + orderDesc);
@@ -111,8 +111,12 @@ public class ConsultationRequestDao extends AbstractDao<ConsultationRequest> {
                 sql.append("order by cr.referralDate " + orderDesc);
             }else if(orderby.equals("8")){               //8 = Appointment Date
                 sql.append("order by cr.appointmentDate " + orderDesc);
-            }else if(orderby.equals("9")){               //9 = FollowUp Date
+            }else if(orderby.equals("9")) {               //9 = FollowUp Date
                 sql.append("order by cr.followUpDate " + orderDesc);
+            } else if (orderby.equals("10")) {            //10 = Site name
+                sql.append("order by cr.siteName " + orderDesc + ", cr.referralDate desc");
+            } else if (orderby.equals("11")) {            //11 = Patient email
+                sql.append("order by d.Email " + orderDesc);
             }else{
                 sql.append("order by cr.referralDate desc");
             }
