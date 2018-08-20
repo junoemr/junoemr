@@ -78,6 +78,11 @@
 			OscarProperties props = OscarProperties.getInstance();
 
 			String providerNo = request.getParameter("providerNo");
+			if(providerNo == null)
+			{
+				providerNo = (String) session.getAttribute("user");
+			}
+
 			UserProperty uProp = userPropertyDAO.getProp(providerNo, UserProperty.LAB_ACK_COMMENT);
 			boolean skipComment = false;
 			boolean autoLinkDocsToProvider = props.isPropertyActive("assign_document.link_docs_to_provider");
