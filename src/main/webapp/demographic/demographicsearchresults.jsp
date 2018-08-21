@@ -140,7 +140,6 @@
 <%
 	String ptstatus = request.getParameter("ptstatus") == null ? "active" : request.getParameter("ptstatus");
 
-	org.oscarehr.util.MiscUtils.getLogger().info("PSTATUS " + ptstatus);
 	OscarProperties props = OscarProperties.getInstance();
 %>
 
@@ -517,69 +516,98 @@ List<DemographicSearchResult> doSearch(DemographicDao demographicDao,LoggedInInf
 	searchRequest.setKeyword(searchKeyword);
 
 	// Set Status Mode
-	if (("").equals(searchStatus))
-	{
-		searchRequest.setStatusMode(STATUSMODE.all);
-	} else if (("active").equals(searchStatus))
+	if (("active").equals(searchStatus))
 	{
 		searchRequest.setStatusMode(STATUSMODE.active);
-	} else if (("inactive").equals(searchStatus))
+	}
+	else if (("inactive").equals(searchStatus))
 	{
 		searchRequest.setStatusMode(STATUSMODE.inactive);
+	}
+	else
+	{
+	    searchRequest.setStatusMode(STATUSMODE.all);
 	}
 
 	// Set Search Mode
 	if ("search_name".equals(searchMode))
 	{
 		searchRequest.setMode(SEARCHMODE.Name);
-	} else if ("search_phone".equals(searchMode))
+	}
+	else if ("search_phone".equals(searchMode))
 	{
 		searchRequest.setMode(SEARCHMODE.Phone);
-	} else if ("search_dob".equals(searchMode))
+	}
+	else if ("search_dob".equals(searchMode))
 	{
 		searchRequest.setMode(SEARCHMODE.DOB);
-	} else if ("search_address".equals(searchMode))
+	}
+	else if ("search_address".equals(searchMode))
 	{
 		searchRequest.setMode(SEARCHMODE.Address);
-	} else if ("search_hin".equals(searchMode))
+	}
+	else if ("search_hin".equals(searchMode))
 	{
 		searchRequest.setMode(SEARCHMODE.HIN);
-	} else if ("search_chart_no".equals(searchMode))
+	}
+	else if ("search_chart_no".equals(searchMode))
 	{
 		searchRequest.setMode(SEARCHMODE.ChartNo);
-	} else if ("search_demographic_no".equals(searchMode))
+	}
+	else if ("search_demographic_no".equals(searchMode))
 	{
 		searchRequest.setMode(SEARCHMODE.DemographicNo);
+	}
+	else
+	{
+	    MiscUtils.getLogger().error("Invalid search mode set [" + searchMode + "], defaulting to name");
+	    searchRequest.setMode(SEARCHMODE.Name);
 	}
 
 	// Set Order By
 	if ("demographic_no".equals(orderBy))
 	{
 		searchRequest.setSortMode(SORTMODE.DemographicNo);
-	} else if ("last_name".equals(orderBy))
+	}
+	else if ("last_name".equals(orderBy))
 	{
 		searchRequest.setSortMode(SORTMODE.Name);
-	} else if ("chart_no".equals(orderBy))
+	}
+	else if ("chart_no".equals(orderBy))
 	{
 		searchRequest.setSortMode(SORTMODE.ChartNo);
-	} else if ("dob".equals(orderBy))
+	}
+	else if ("dob".equals(orderBy))
 	{
 		searchRequest.setSortMode(SORTMODE.DOB);
-	} else if ("sex".equals(orderBy))
+	}
+	else if ("sex".equals(orderBy))
 	{
 		searchRequest.setSortMode(SORTMODE.Sex);
-	} else if ("patient_status".equals(orderBy))
+	}
+	else if ("patient_status".equals(orderBy))
 	{
-		searchRequest.setSortMode(SORTMODE.PS);
-	} else if ("roster_status".equals(orderBy))
+		searchRequest.setSortMode(SORTMODE.PatientStatus);
+	}
+	else if ("roster_status".equals(orderBy))
 	{
-		searchRequest.setSortMode(SORTMODE.RS);
-	} else if ("phone".equals(orderBy))
+		searchRequest.setSortMode(SORTMODE.RosterStatus);
+	}
+	else if ("phone".equals(orderBy))
 	{
 		searchRequest.setSortMode(SORTMODE.Phone);
-	} else if ("provider_name".equals(orderBy))
+	}
+	else if ("provider_name".equals(orderBy))
 	{
 		searchRequest.setSortMode(SORTMODE.ProviderName);
+	}
+	else if ("hin".equals(orderBy))
+	{
+	    searchRequest.setSortMode(SORTMODE.HIN);
+	}
+	else
+	{
+	    searchRequest.setSortMode(SORTMODE.Default);
 	}
 
 	demoList = demographicDao.searchPatients(loggedInInfo, searchRequest, offset, limit);
