@@ -53,7 +53,7 @@
 
 <%@ page import="org.oscarehr.provider.model.ProviderData" %>
 <%@ page import="org.oscarehr.provider.dao.ProviderDataDao" %>
-
+<%@ page import="oscar.OscarProperties" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -271,10 +271,10 @@
 
 		function setOrder(val)
 		{
-			if (document.forms[0].orderby.value == val)
+			if (document.forms[0].orderby.value === val)
 			{
 				//alert( document.forms[0].desc.value);
-				if (document.forms[0].desc.value == '1')
+				if (document.forms[0].desc.value === '1')
 				{
 					document.forms[0].desc.value = '0';
 				}
@@ -476,6 +476,14 @@
 													key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgPatient"/>
 										</a>
 									</th>
+									<%	if (OscarProperties.getInstance().isPropertyActive("view_consultation_requests.show_patient_emails"))
+									{ %>
+									<th align="left" class="VCRheads" width="75">
+											<a href=# onclick="setOrder('11'); return false;">
+											<bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgPatientEmail"/>
+											</a>
+									</th>
+									<% } %>
 									<th align="left" class="VCRheads">
 										<a href=# onclick="setOrder('4'); return false;">
 											<bean:message
@@ -550,6 +558,7 @@
 										String id = theRequests.ids.elementAt(i);
 										String status = theRequests.status.elementAt(i);
 										String patient = theRequests.patient.elementAt(i);
+										String patientEmail = theRequests.patientEmailAddresses.elementAt(i);
 										String provide = theRequests.provider.elementAt(i);
 										String service = theRequests.service.elementAt(i);
 										String date = theRequests.date.elementAt(i);
@@ -649,6 +658,14 @@
 											<%=patient%>
 										</a>
 									</td>
+									<%	if (OscarProperties.getInstance().isPropertyActive("view_consultation_requests.show_patient_emails"))
+									{ %>
+									<td class="stat<%=status%>">
+										<a href="mailto:<%=patientEmail%>">
+											<%=patientEmail%>
+										</a>
+									</td>
+									<% } %>
 									<td class="stat<%=status%>">
 										<%=provide%>
 									</td>

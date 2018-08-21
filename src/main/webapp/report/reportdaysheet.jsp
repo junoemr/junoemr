@@ -50,6 +50,10 @@ if(!authed) {
 
 <%@ page import="org.oscarehr.provider.model.ProviderData"%>
 <%@ page import="org.oscarehr.provider.dao.ProviderDataDao"%>
+<%@ page import="org.oscarehr.appointment.dao.AppointmentStatusDao" %>
+<%@ page import="org.oscarehr.common.model.AppointmentStatus" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page import="org.apache.log4j.Logger" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -64,7 +68,9 @@ if(!authed) {
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <%
 
-	String curProvider_no = (String) session.getAttribute("user");
+	Logger logger = MiscUtils.getLogger();
+
+	String curProviderNo = (String) session.getAttribute("user");
 	String orderby = request.getParameter("orderby")!=null?request.getParameter("orderby"):("start_time") ;
     
     java.util.Properties oscarVariables = oscar.OscarProperties.getInstance();
@@ -75,6 +81,7 @@ if(!authed) {
     int count = 0;	
 
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
+	AppointmentStatusDao appointmentStatusDao = (AppointmentStatusDao)SpringUtils.getBean("appointmentStatusDao");
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
 	MyGroupDao myGroupDao = SpringUtils.getBean(MyGroupDao.class);
 	ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
@@ -83,9 +90,14 @@ if(!authed) {
 	String [][] dbQueries;
     dbQueries=new String[][] {
 		{"search_daysheetall",       "select concat(d.year_of_birth,'/',d.month_of_birth,'/',d.date_of_birth)as dob, d.family_doctor, a.appointment_date, a.provider_no, a.start_time, a.end_time, a.reason, a.name,a.bookingSource, p.last_name, p.first_name, d.sex, d.hin, d.ver, d.family_doctor, d.provider_no as doc_no, d.phone, d.roster_status, p2.last_name as doc_last_name, p2.first_name as doc_first_name, d.chart_no from (appointment a, provider p) left join demographic d on a.demographic_no=d.demographic_no left join provider p2 on d.provider_no=p2.provider_no where a.appointment_date>=? and a.appointment_date<=? and a.start_time>=? and a.end_time<? and a.provider_no=p.provider_no and BINARY a.status not like 'C%' order by p.last_name, p.first_name, a.appointment_date, "+orderby },
-		{"search_daysheetsingleall", "select concat(d.year_of_birth,'/',d.month_of_birth,'/',d.date_of_birth)as dob, d.family_doctor, a.appointment_date, a.provider_no, a.start_time, a.end_time, a.reason, a.name,a.bookingSource, p.last_name, p.first_name, d.sex, d.hin, d.ver, d.family_doctor, d.provider_no as doc_no, d.phone, d.roster_status, p2.last_name as doc_last_name, p2.first_name as doc_first_name, d.chart_no  from (appointment a, provider p )left join demographic d on a.demographic_no=d.demographic_no left join provider p2 on d.provider_no=p2.provider_no where a.appointment_date>=? and a.appointment_date<=? and a.start_time>=? and a.end_time<? and a.provider_no=? and BINARY a.status not like 'C%' and a.provider_no=p.provider_no order by a.appointment_date,"+orderby },
+		{"search_daysheetsingleproviderall", "select concat(d.year_of_birth,'/',d.month_of_birth,'/',d.date_of_birth)as dob, d.family_doctor, a.appointment_date, a.provider_no, a.start_time, a.end_time, a.reason, a.name,a.bookingSource, p.last_name, p.first_name, d.sex, d.hin, d.ver, d.family_doctor, d.provider_no as doc_no, d.phone, d.roster_status, p2.last_name as doc_last_name, p2.first_name as doc_first_name, d.chart_no  from (appointment a, provider p )left join demographic d on a.demographic_no=d.demographic_no left join provider p2 on d.provider_no=p2.provider_no where a.appointment_date>=? and a.appointment_date<=? and a.start_time>=? and a.end_time<? and a.provider_no=? and BINARY a.status not like 'C%' and a.provider_no=p.provider_no order by a.appointment_date,"+orderby },
 		{"search_daysheetnew",       "select concat(d.year_of_birth,'/',d.month_of_birth,'/',d.date_of_birth)as dob, d.family_doctor, a.appointment_date, a.provider_no, a.start_time, a.end_time, a.reason, a.name,a.bookingSource, p.last_name, p.first_name, d.sex, d.hin, d.ver, d.family_doctor, d.provider_no as doc_no, d.phone, d.roster_status, p2.last_name as doc_last_name, p2.first_name as doc_first_name, d.chart_no  from (appointment a, provider p) left join demographic d on a.demographic_no=d.demographic_no left join provider p2 on d.provider_no=p2.provider_no where a.appointment_date=? and a.provider_no=p.provider_no and a.status like binary 't' order by p.last_name, p.first_name, a.appointment_date,"+orderby },
-		{"search_daysheetsinglenew", "select concat(d.year_of_birth,'/',d.month_of_birth,'/',d.date_of_birth)as dob, d.family_doctor, a.appointment_date, a.provider_no, a.start_time, a.end_time, a.reason, a.name,a.bookingSource, p.last_name, p.first_name, d.sex, d.hin, d.ver, d.family_doctor, d.provider_no as doc_no, d.phone, d.roster_status, p2.last_name as doc_last_name, p2.first_name as doc_first_name, d.chart_no  from (appointment a, provider p) left join demographic d on a.demographic_no=d.demographic_no left join provider p2 on d.provider_no=p2.provider_no where a.appointment_date=? and a.provider_no=? and a.status like binary 't' and a.provider_no=p.provider_no order by a.appointment_date,"+orderby }
+		{"search_daysheetsingleprovidernew", "select concat(d.year_of_birth,'/',d.month_of_birth,'/',d.date_of_birth)as dob, d.family_doctor, a.appointment_date, a.provider_no, a.start_time, a.end_time, a.reason, a.name,a.bookingSource, p.last_name, p.first_name, d.sex, d.hin, d.ver, d.family_doctor, d.provider_no as doc_no, d.phone, d.roster_status, p2.last_name as doc_last_name, p2.first_name as doc_first_name, d.chart_no  " +
+				"from (appointment a, provider p) left join demographic d on a.demographic_no=d.demographic_no left join provider p2 on d.provider_no=p2.provider_no " +
+				"where a.appointment_date=? and a.provider_no=? and a.status like binary 't' and a.provider_no=p.provider_no order by a.appointment_date,"+orderby },
+		{"search_daysheetsingleapptnew", "select concat(d.year_of_birth,'/',d.month_of_birth,'/',d.date_of_birth)as dob, d.family_doctor, a.appointment_date, a.provider_no, a.start_time, a.end_time, a.reason, a.name,a.bookingSource, p.last_name, p.first_name, d.sex, d.hin, d.ver, d.family_doctor, d.provider_no as doc_no, d.phone, d.roster_status, p2.last_name as doc_last_name, p2.first_name as doc_first_name, d.chart_no  " +
+				"from (appointment a, provider p) left join demographic d on a.demographic_no=d.demographic_no left join provider p2 on d.provider_no=p2.provider_no " +
+				"where a.appointment_date=? and a.provider_no=? and a.status like binary 't' and a.appointment_no=? and a.provider_no=p.provider_no order by a.appointment_date,"+orderby }
 	};
    
 
@@ -106,10 +118,10 @@ HashMap<String,String> providerMap = new HashMap<String,String>();
 if (isSiteAccessPrivacy || isTeamAccessPrivacy) {
 
 	if (isSiteAccessPrivacy) 
-		pdList = providerDataDao.findByProviderSite(curProvider_no);
+		pdList = providerDataDao.findByProviderSite(curProviderNo);
 	
 	if (isTeamAccessPrivacy) 
-		pdList = providerDataDao.findByProviderTeam(curProvider_no);
+		pdList = providerDataDao.findByProviderTeam(curProviderNo);
 
 	for(ProviderData providerData : pdList) {
 		providerMap.put(providerData.getId(), "true");
@@ -119,6 +131,7 @@ if (isSiteAccessPrivacy || isTeamAccessPrivacy) {
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery.js"></script>
 <title><bean:message key="report.reportdaysheet.title" /></title>
 <link rel="stylesheet" href="../web.css">
 <style> td {font-size: 16px;}</style>
@@ -135,8 +148,27 @@ function hideOnSource(){
 		list.invoke('show');
 	}
 }
+
+function printDaysheet() {
+	jQuery.ajax({
+		type: "post",
+		data: "print=yes",
+		success: function(msg){
+			window.print();
+		}
+	});
+}
 </script>
 </head>
+<%!
+	public void setAppointmentStatus(String status, Appointment appt, String user, OscarAppointmentDao appointmentDao)
+	{
+		appt.setStatus(status);
+		appt.setLastUpdateUser(user);
+		appt.setUpdateDateTime(new java.util.Date());
+		appointmentDao.merge(appt);
+	}
+%>
 <%
 	boolean bDob = oscarVariables.getProperty("daysheet_dob", "").equalsIgnoreCase("true") ? true : false;
 
@@ -151,13 +183,16 @@ function hideOnSource(){
     String edate = request.getParameter("edate")!=null?request.getParameter("edate"):"" ;
     String sTime = request.getParameter("sTime")!=null? (request.getParameter("sTime")+":00:00") : "00:00:00" ;
     String eTime = request.getParameter("eTime")!=null? (request.getParameter("eTime")+":00:00") : "24:00:00" ;
-    String provider_no = request.getParameter("provider_no")!=null?request.getParameter("provider_no"):"175" ;
+    String providerNo = request.getParameter("provider_no")!=null?request.getParameter("provider_no"):"175" ;
+	String appointmentNo = request.getParameter("appointment_no")!=null?request.getParameter("appointment_no"):"NULL" ;
+	String print = request.getParameter("print")!=null?request.getParameter("print"):"no" ;
+	String dsmode = request.getParameter("dsmode");
     ResultSet rsdemo = null ;
     boolean bodd = false;
 
     //initial myGroupBean if neccessary
-    if(provider_no.startsWith("_grp_")) {
-    	List<MyGroup> myGroups = myGroupDao.getGroupByGroupNo(provider_no.substring(5));
+    if(providerNo.startsWith("_grp_")) {
+    	List<MyGroup> myGroups = myGroupDao.getGroupByGroupNo(providerNo.substring(5));
         for(MyGroup myGroup:myGroups) {
         	myGroupBean.setProperty(myGroup.getId().getProviderNo(),"true");
         }
@@ -173,70 +208,113 @@ function hideOnSource(){
 		<th width="10%" nowrap><%=createtime%> <input type="button"
 			name="Button"
 			value="<bean:message key="report.reportdaysheet.btnPrint"/>"
-			onClick="window.print()"><input type="button" name="Button"
+			onClick="printDaysheet();"><input type="button" name="Button"
 			value="<bean:message key="global.btnExit"/>" onClick="window.close()"></th>
 	</tr>
 </table>
 
 <%
-  boolean bFistL = true; //first line in a table for TH
-  String strTemp = "";
-  String dateTemp = "";
-  String [] param = new String[3];
-  param[0] = (String) session.getAttribute("user");
-  param[1] = sdate;
-  param[2] = provider_no;
-  String [] parama = new String[5];
-  parama[0] = sdate;
-  parama[1] = edate;
-  parama[2] = sTime;
-  parama[3] = eTime;
-  parama[4] = provider_no;
-  if(request.getParameter("dsmode")!=null && request.getParameter("dsmode").equals("all") ) {
-	  if(!provider_no.equals("*") && !provider_no.startsWith("_grp_") ) {
-		  rsdemo = daySheetBean.queryResults(parama, "search_daysheetsingleall");
+	boolean bFistL = true; //first line in a table for TH
+	String strTemp = "";
+	String dateTemp = "";
 
-    } else { //select all providers
-	  rsdemo = daySheetBean.queryResults(new String[] {parama[0], parama[1], sTime, eTime}, "search_daysheetall");
-    }
-  } else { //new appt, need to update status
-    if(!provider_no.equals("*") && !provider_no.startsWith("_grp_") ) {
-	  rsdemo = daySheetBean.queryResults(new String[] {param[1],param[2]}, "search_daysheetsinglenew");
-	  try {
-		  	List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(param[2], dayFormatter.parse(param[1]), "t");
-		  	for(Appointment appt:appts) {
-		  		appointmentArchiveDao.archiveAppointment(appt);
-		  	}
-		  }catch(java.text.ParseException e) {
-			  org.oscarehr.util.MiscUtils.getLogger().error("Cannot archive appt",e);
-		  }
-	  for(Appointment a : appointmentDao.findByDayAndStatus(oscar.util.ConversionUtils.fromDateString(sdate), "t")) {
-		  if(a.getProviderNo().equals(provider_no)) {
-			  a.setStatus("T");
-			  a.setLastUpdateUser((String) session.getAttribute("user"));
-			  a.setUpdateDateTime(new java.util.Date());
-			  appointmentDao.merge(a);
-		  }
-	  }
-	  
-    } else { //select all providers
-	  rsdemo = daySheetBean.queryResults(param[0], "search_daysheetnew");
-	  try {
-		  	List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(param[2], dayFormatter.parse(param[1]), "t");
-		  	for(Appointment appt:appts) {
-		  		appointmentArchiveDao.archiveAppointment(appt);
-		  	}
-		  }catch(java.text.ParseException e) {
-			  org.oscarehr.util.MiscUtils.getLogger().error("Cannot archive appt",e);
-		  }
-	  for(Appointment a : appointmentDao.findByDayAndStatus(oscar.util.ConversionUtils.fromDateString(sdate), "t")) {
-		  a.setStatus("T");
-		  a.setLastUpdateUser((String) session.getAttribute("user"));
-		  a.setUpdateDateTime(new java.util.Date());
-		  appointmentDao.merge(a);
-	  }
-    }
-  }
+	/*
+		Generate the daysheet
+	 */
+	if ("all".equals(dsmode))
+	{
+		//Get all appointments
+		if (!providerNo.equals("*") && !providerNo.startsWith("_grp_"))
+		{
+			//Get all the appointments for the selected provider on the selected date.
+			rsdemo = daySheetBean.queryResults(new String[]{sdate, edate, sTime, eTime, providerNo}, "search_daysheetsingleproviderall");
+		} else
+		{
+			//Get all the appointments for all providers on the selected date.
+			rsdemo = daySheetBean.queryResults(new String[]{sdate, edate, sTime, eTime}, "search_daysheetall");
+		}
+	} else if ("new".equals(dsmode))
+	{
+		//Get only the 'new' appointments. New appointments have status code 't'.
+		if (!providerNo.equals("*") && !providerNo.startsWith("_grp_"))
+		{
+			//Get the new appointments for the selected provider on the selected date
+			rsdemo = daySheetBean.queryResults(new String[]{sdate, providerNo}, "search_daysheetsingleprovidernew");
+		} else
+		{
+			//Get the new appointments for all providers on the selected date
+			rsdemo = daySheetBean.queryResults(curProviderNo, "search_daysheetnew");
+		}
+	} else if ("newappt".equals(dsmode))
+	{
+		//Get a single new appointment for the selected provider
+		rsdemo = daySheetBean.queryResults(new String[]{sdate, providerNo, appointmentNo}, "search_daysheetsingleapptnew");
+	}
+
+	/*
+		Update statues if the print button was pressed and status code T is still Daysheet Printed and enabled
+	 */
+	AppointmentStatus daysheetPrintedStatus = appointmentStatusDao.findByStatus(AppointmentStatus.APPOINTMENT_STATUS_DAYSHEET_PRINTED);
+
+	if (print.equals("yes") && daysheetPrintedStatus.getDescription().equals("Daysheet Printed") && daysheetPrintedStatus.getActive() == 1)
+	{
+		//If dsmode is equal to 'new' we're coming from the daysheet report function. If 'newappt' we're coming from the add appointment and print preview function
+		if ("new".equals(dsmode))
+		{
+			//Update all new appointments for the selected provider
+			if (!providerNo.equals("*") && !providerNo.startsWith("_grp_"))
+			{
+				//Archive the appointments for the selected provider on the selected day before updating the status
+				try
+				{
+					List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(providerNo, dayFormatter.parse(sdate), AppointmentStatus.APPOINTMENT_STATUS_NEW);
+					for (Appointment appt : appts)
+					{
+						appointmentArchiveDao.archiveAppointment(appt);
+					}
+				} catch (java.text.ParseException e)
+				{
+					logger.error("Cannot archive appt", e);
+				}
+
+				for (Appointment a : appointmentDao.findByProviderDayAndStatus(providerNo, dayFormatter.parse(sdate), AppointmentStatus.APPOINTMENT_STATUS_NEW))
+				{
+					setAppointmentStatus(AppointmentStatus.APPOINTMENT_STATUS_DAYSHEET_PRINTED, a, curProviderNo, appointmentDao);
+				}
+			} else
+			{
+				//Update all new appointments for all providers. Archive the appointments for all providers on the selected day before updating the status
+				try
+				{
+					List<Appointment> appts = appointmentDao.findByProviderDayAndStatus(providerNo, dayFormatter.parse(sdate), AppointmentStatus.APPOINTMENT_STATUS_NEW);
+					for (Appointment appt : appts)
+					{
+						appointmentArchiveDao.archiveAppointment(appt);
+					}
+				} catch (java.text.ParseException e)
+				{
+					logger.error("Cannot archive appt", e);
+				}
+
+				for (Appointment a : appointmentDao.findByDayAndStatus(dayFormatter.parse(sdate), AppointmentStatus.APPOINTMENT_STATUS_NEW))
+				{
+					setAppointmentStatus(AppointmentStatus.APPOINTMENT_STATUS_DAYSHEET_PRINTED, a, curProviderNo, appointmentDao);
+				}
+			}
+		} else if ("newappt".equals(dsmode))
+		{
+			//We're updating a single new appointment
+			Appointment appt = appointmentDao.find(Integer.parseInt(appointmentNo));
+
+			appointmentArchiveDao.archiveAppointment(appt);
+
+			if (appt != null)
+			{
+				setAppointmentStatus(AppointmentStatus.APPOINTMENT_STATUS_DAYSHEET_PRINTED, appt, curProviderNo, appointmentDao);
+			}
+		}
+	}
+
   while (rsdemo.next()) {
     //if it is a group and a group member
 	if(!myGroupBean.isEmpty()) {
@@ -269,37 +347,37 @@ function hideOnSource(){
 <table width="100%" border="1" bgcolor="#ffffff" cellspacing="0"
 	cellpadding="1">
 	<tr bgcolor="#CCCCFF" align="center">
-		<!--<TH width="14%"><b><a href="reportdaysheet.jsp?provider_no=<%=provider_no%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=appointment_date"><bean:message key="report.reportdaysheet.msgAppointmentDate"/></a></b></TH>-->
+		<!--<TH width="14%"><b><a href="reportdaysheet.jsp?provider_no=<%=providerNo%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=appointment_date"><bean:message key="report.reportdaysheet.msgAppointmentDate"/></a></b></TH>-->
 		<TH width="6%"><b><a
-			href="reportdaysheet.jsp?provider_no=<%=provider_no%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=start_time<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>"><bean:message
+			href="reportdaysheet.jsp?provider_no=<%=providerNo%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=start_time<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>"><bean:message
 			key="report.reportdaysheet.msgAppointmentTime" /></a></b></TH>
 		<TH width="15%"><b><a
-			href="reportdaysheet.jsp?provider_no=<%=provider_no%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=name<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>"><bean:message
+			href="reportdaysheet.jsp?provider_no=<%=providerNo%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=name<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>"><bean:message
 			key="report.reportdaysheet.msgPatientLastName" /></a> </b></TH>
-		<!--<TH width="20%"><b><a href="reportdaysheet.jsp?provider_no=<%=provider_no%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=p_first_name"><bean:message key="report.reportdaysheet.msgPatientFirstName"/></a> </b></TH>-->
+		<!--<TH width="20%"><b><a href="reportdaysheet.jsp?provider_no=<%=providerNo%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=p_first_name"><bean:message key="report.reportdaysheet.msgPatientFirstName"/></a> </b></TH>-->
 
  		<TH width="10%"><b><a
-                        href="reportdaysheet.jsp?provider_no=<%=provider_no%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=phone<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>">
+                        href="reportdaysheet.jsp?provider_no=<%=providerNo%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=phone<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>">
                         Phone</a></b></TH>
          <TH width="3%"><b><a
-                        href="reportdaysheet.jsp?provider_no=<%=provider_no%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=sex<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>">
+                        href="reportdaysheet.jsp?provider_no=<%=providerNo%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=sex<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>">
                         Gender </a></b></TH>
          <TH width="9%"><b><a
-                        href="reportdaysheet.jsp?provider_no=<%=provider_no%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=hin<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>">
+                        href="reportdaysheet.jsp?provider_no=<%=providerNo%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=hin<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>">
                         Health Card </a></b></TH>
          <TH width="5%"><b><a
-                        href="reportdaysheet.jsp?provider_no=<%=provider_no%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=ver<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>">
+                        href="reportdaysheet.jsp?provider_no=<%=providerNo%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=ver<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>">
                         Version </a></b></TH>
 
 		<TH width="6%"><b><a
-			href="reportdaysheet.jsp?provider_no=<%=provider_no%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=chart_no<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>"><bean:message
+			href="reportdaysheet.jsp?provider_no=<%=providerNo%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=chart_no<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>"><bean:message
 			key="report.reportdaysheet.msgChartNo" /></a></b></TH>
                 <!--<TH width="6%"><b><a
-			href="reportdaysheet.jsp?provider_no=<%=provider_no%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=hin<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>"><bean:message
+			href="reportdaysheet.jsp?provider_no=<%=providerNo%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=hin<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>"><bean:message
 			key="oscarEncounter.search.demographicSearch.msgHin" /></a></b></TH>-->
 		<% if(!bDob) {%>
 		<TH width="6%"><b><a
-			href="reportdaysheet.jsp?provider_no=<%=provider_no%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=roster_status<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>"><bean:message
+			href="reportdaysheet.jsp?provider_no=<%=providerNo%>&sdate=<%=sdate%>&edate=<%=edate%>&orderby=roster_status<%=request.getParameter("dsmode")==null?"":"&dsmode="+request.getParameter("dsmode")%>"><bean:message
 			key="report.reportdaysheet.msgRosterStatus" /></a></b></TH>
 		<% } else {%>
 		<TH width="10%"><b>DOB</b></TH>

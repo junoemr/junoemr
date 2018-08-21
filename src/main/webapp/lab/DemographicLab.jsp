@@ -70,6 +70,7 @@ if(!authed) {
        ArrayList<LabResultData> remoteResults=CommonLabResultData.getRemoteLabs(loggedInInfo,Integer.parseInt(demographicNo));
        labs.addAll(remoteResults);
     }
+    Collections.sort(labs); // order results by date
     
     int pageNum = 1;
     if ( request.getParameter("pageNum") != null ) {

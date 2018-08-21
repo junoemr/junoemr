@@ -39,6 +39,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.util.MiscUtils;
@@ -46,6 +48,7 @@ import org.oscarehr.util.SpringUtils;
 
 public final class IncomingDocUtil {
 
+    private static final Logger logger = MiscUtils.getLogger();
     private ArrayList<String> pdfListModifiedDate = new ArrayList<String>();
     private static final Comparator<File> lastModified = new Comparator<File>() {
         @Override
@@ -545,35 +548,45 @@ public final class IncomingDocUtil {
         }
     }
 
-    public static String getAndSetIncomingDocQueue(String user_no, String selectedQueue) {
-        String queue;
-        UserPropertyDAO pref = (UserPropertyDAO) SpringUtils.getBean("UserPropertyDAO");
+	public static String getAndSetIncomingDocQueue(String user_no, String selectedQueue)
+	{
+		String queue = "1";
+		if(user_no == null)
+		{
+			logger.error("Null provider value. default property used");
+			return queue;
+		}
 
-        UserProperty up = pref.getProp(user_no, UserProperty.INCOMING_DOCUMENT_DEFAULT_QUEUE);
-        if (up == null) {
-            up = new UserProperty();
-            up.setName(UserProperty.INCOMING_DOCUMENT_DEFAULT_QUEUE);
-            up.setProviderNo(user_no);
-        }
+		UserPropertyDAO pref = (UserPropertyDAO) SpringUtils.getBean("UserPropertyDAO");
+
+		UserProperty up = pref.getProp(user_no, UserProperty.INCOMING_DOCUMENT_DEFAULT_QUEUE);
+		if(up == null)
+		{
+			up = new UserProperty();
+			up.setName(UserProperty.INCOMING_DOCUMENT_DEFAULT_QUEUE);
+			up.setProviderNo(user_no);
+		}
 
 
-        if (selectedQueue == null) {
+		if(selectedQueue == null)
+		{
+			if(up.getValue() != null)
+			{
+				queue = up.getValue();
+			}
+		}
+		else
+		{
+			queue = selectedQueue;
+		}
 
-            if (up.getValue() == null) {
-                queue = "1";
-            } else {
-                queue = up.getValue();
-            }
-        } else {
-            queue = selectedQueue;
-        }
-
-        if (up.getValue() == null || !(up.getValue().equals(queue))) {
-            up.setValue(queue);
-            pref.saveProp(up);
-        }
-        return queue;
-    }
+		if(up.getValue() == null || !(up.getValue().equals(queue)))
+		{
+			up.setValue(queue);
+			pref.saveProp(up);
+		}
+		return queue;
+	}
 
     public static String getAndSetViewDocumentAs(String user_no, String selectedImageType) {
 
