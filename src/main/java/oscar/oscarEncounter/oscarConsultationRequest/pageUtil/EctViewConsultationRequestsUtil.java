@@ -166,6 +166,7 @@ public class EctViewConsultationRequestsUtil {
       ids = new Vector<String>();
       status = new Vector<String>();
       patient = new Vector<String>();
+      patientEmail = new Vector<String>();
       provider = new Vector<String>();
       service = new Vector<String>();
       date = new Vector<String>();
