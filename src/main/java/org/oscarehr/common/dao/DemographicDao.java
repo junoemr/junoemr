@@ -2177,9 +2177,6 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 			case DOB:
 				orderBy += "year_of_birth " + orderDir + ",month_of_birth " + orderDir + ",date_of_birth " + orderDir;
 				break;
-			case Name:
-				orderBy += "d.last_name " + orderDir + ",d.first_name " + orderDir;
-				break;
 			case Phone:
 				orderBy += "d.phone " + orderDir;
 				break;
@@ -2198,8 +2195,9 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 			case HIN:
 				orderBy += "d.hin " + orderDir;
 				break;
-			case Default:
-				orderBy += "d.last_name,d.first_name";
+			case Name:
+			default:
+				orderBy += "d.last_name " + orderDir + ",d.first_name " + orderDir;
 				break;
 		}
 

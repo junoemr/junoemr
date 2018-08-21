@@ -607,7 +607,7 @@ List<DemographicSearchResult> doSearch(DemographicDao demographicDao,LoggedInInf
 	}
 	else
 	{
-	    searchRequest.setSortMode(SORTMODE.Default);
+	    searchRequest.setSortMode(SORTMODE.Name);
 	}
 
 	demoList = demographicDao.searchPatients(loggedInInfo, searchRequest, offset, limit);
