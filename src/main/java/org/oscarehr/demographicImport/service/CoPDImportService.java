@@ -172,14 +172,14 @@ public class CoPDImportService
 		logger.info("Created record " + demographic.getDemographicId() + " for patient: " + demographic.getLastName() + ", " + demographic.getFirstName());
 
 		logger.info("Find/Create Provider Record(s) ...");
-		ProviderData provider = importProviderData(zpdZtrMessage, demographic, documentLocation, importSource);
+		ProviderData mrpProvider = importProviderData(zpdZtrMessage, demographic, documentLocation, importSource);
 
 		// set the mrp doctor after all the provider records are created
-		demographic.setProviderNo(provider.getId());
+		demographic.setProviderNo(mrpProvider.getId());
 		demographicDao.merge(demographic);
 
 		logger.info("Create Appointments ...");
-		importAppointmentData(zpdZtrMessage, demographic, provider);
+		importAppointmentData(zpdZtrMessage, demographic, mrpProvider);
 	}
 
 	/**
@@ -201,42 +201,47 @@ public class CoPDImportService
 			throw new RuntimeException("No provider information found");
 		}
 
+		//TODO how to determine MRP doctor when there are more than 1 (most vendors will send 1 apparently)
 		for(int i=0; i< numProviders; i++)
 		{
-			ProviderData provider;
+			ProviderData assignedProvider;
+			mrpProvider = findOrCreateProviderRecord(providerMapper.getProvider(i));
 
 			switch(importSource)
 			{
 				/*
 				 * Wolf has stated that most of their information is not associated with a provider, and that the provider information in the
 				 * PRD segment is not a reliable indicator of who created anything nested within the provider group.
-				 * So we always assign the default provider
+				 * So we only use the provider information to indicate the MRP
 				 */
-				case WOLF: provider = getDefaultProvider(); break;
-				default: provider = providerMapper.getProvider(i); break;
+				case WOLF:
+				{
+					assignedProvider = findOrCreateProviderRecord(getDefaultProvider()); break;
+				}
+				default:
+				{
+					assignedProvider = mrpProvider; break;
+				}
 			}
 
-			//TODO how to determine MRP doctor when there are more than 1
-			mrpProvider = findOrCreateProviderRecord(provider);
-
 			logger.info("Import Notes & History ...");
-			importProviderNotes(zpdZtrMessage, i, mrpProvider, demographic, importSource);
+			importProviderNotes(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 			logger.info("Import diagnosed health problems ...");
-			importDxData(zpdZtrMessage, i, mrpProvider, demographic);
+			importDxData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Medications ...");
-			importMedicationData(zpdZtrMessage, i, mrpProvider, demographic);
+			importMedicationData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Pediatrics ...");
-			importPediatricsData(zpdZtrMessage, i, mrpProvider, demographic);
+			importPediatricsData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Pregnancy ...");
-			importPregnancyData(zpdZtrMessage, i, mrpProvider, demographic);
+			importPregnancyData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Allergies ...");
-			importAllergyData(zpdZtrMessage, i, mrpProvider, demographic);
+			importAllergyData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Immunizations ...");
-			importPreventionData(zpdZtrMessage, i, mrpProvider, demographic);
+			importPreventionData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Labs ...");
-			importLabData(zpdZtrMessage, i, mrpProvider, demographic);
+			importLabData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Documents ...");
-			importDocumentData(zpdZtrMessage, i, mrpProvider, demographic, documentLocation, importSource);
+			importDocumentData(zpdZtrMessage, i, assignedProvider, demographic, documentLocation, importSource);
 		}
 
 		return mrpProvider;
