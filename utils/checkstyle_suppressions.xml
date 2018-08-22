@@ -7,7 +7,7 @@
 <suppressions>
 	<suppress checks="RegexpMultiline" files="MSHSegment.java" lines="50" />
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="oscar_15.creation_db.2017.02.23.sql" />
-	<!-- 
+	<!--
 	<suppress checks="RegexpMultiline" files="ResponseDefaultsFilter.java" lines="54" />
 	<suppress checks="RegexpMultiline" files="ResponseDefaultsChangeDetectingWrapper.java" lines="44" />
 	 -->
