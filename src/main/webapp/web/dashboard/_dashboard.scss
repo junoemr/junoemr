@@ -20,7 +20,7 @@
 	#dashboard-header {
 		margin-top: -$margin-sm;
 		background-color: #ededed;
-		height: 72px;
+		height: $dashboard-header-height;
 		margin-bottom: $margin-md;
 		h3 {
 			color: $primary-blue-text;
