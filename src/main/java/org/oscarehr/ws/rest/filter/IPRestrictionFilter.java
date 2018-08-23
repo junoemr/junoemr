@@ -36,7 +36,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Provider
 @PreMatching
@@ -47,8 +49,19 @@ public class IPRestrictionFilter implements ContainerRequestFilter
 	private static final OscarProperties props = OscarProperties.getInstance();
 	private static final boolean enabled = props.isPropertyActive("web_service_allowed_ips.enabled");
 	private static final String allowedIPs = props.getProperty("web_service_allowed_ips");
-	private static final List<String> allowedIPList = (allowedIPs!=null)? Arrays.asList(allowedIPs.split("\\s*,\\s*")) : new ArrayList<>(0);
+	private static final String systemAllowedIPs = props.getProperty("web_service_allowed_system_ips");
 	private static final String localhost = "127.0.0.1";
+
+	private static final Set<String> whitelistedIPs;
+	static
+	{
+		List<String> systemIPList = (systemAllowedIPs!=null)? Arrays.asList(systemAllowedIPs.split("\\s*,\\s*")) : new ArrayList<>(0);
+		List<String> allowedIPList = (allowedIPs!=null)? Arrays.asList(allowedIPs.split("\\s*,\\s*")) : new ArrayList<>(0);
+
+		whitelistedIPs = new HashSet<>();
+		whitelistedIPs.addAll(systemIPList);
+		whitelistedIPs.addAll(allowedIPList);
+	}
 
 	@Context
 	private HttpServletRequest httpRequest;
@@ -60,12 +73,21 @@ public class IPRestrictionFilter implements ContainerRequestFilter
 	public void filter(ContainerRequestContext request)
 	{
 		String requestIp = httpRequest.getRemoteAddr();
-		if(enabled && !localhost.equals(requestIp) && !allowedIPList.contains(requestIp))
+		if(isIpBlocked(requestIp))
 		{
 			//don't log the request. This filter may execute before the rate limiting filter
 			request.setProperty(LoggingFilter.PROP_SKIP_LOGGING, true);
 			logger.warn("Request from unauthorized IP blocked: " + requestIp);
 			throw new SecurityException("Unauthorized IP Address");
 		}
+	}
+
+	public static boolean isIpBlocked(String requestIp)
+	{
+		logger.debug("WHITELIST ENABLED: " + enabled);
+		logger.debug("CHECK IP: " + requestIp);
+		logger.debug("IP WHITELIST SET: " + String.join(",", whitelistedIPs));
+
+		return (enabled && !localhost.equals(requestIp) && !whitelistedIPs.contains(requestIp));
 	}
 }

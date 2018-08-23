@@ -116,8 +116,12 @@ public class ConsultationRequestDao extends AbstractDao<ConsultationRequest> {
                 sql.append("order by cr.referralDate " + orderDesc);
             }else if(orderby.equals("8")){               //8 = Appointment Date
                 sql.append("order by cr.appointmentDate " + orderDesc);
-            }else if(orderby.equals("9")){               //9 = FollowUp Date
+            }else if(orderby.equals("9")) {               //9 = FollowUp Date
                 sql.append("order by cr.followUpDate " + orderDesc);
+            }else if (orderby.equals("10")) {             //10 = siteName
+                sql.append("order by cr.siteName " + orderDesc + ", cr.referralDate desc");
+            }else if (orderby.equals("11")) {            //11 = patientEmail
+                sql.append("order by d.Email " + orderDesc + service);
             }else{
                 sql.append("order by cr.referralDate desc");
             }

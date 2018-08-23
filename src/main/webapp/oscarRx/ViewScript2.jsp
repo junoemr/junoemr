@@ -217,6 +217,7 @@ if (userAgent != null) {
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
 <script type="text/javascript" src="../share/javascript/prototype.js"></script>
 <script type="text/javascript" src="../share/javascript/Oscar.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/util/fax.js"></script>
 
 <script type="text/javascript">
     function resetStash(){
@@ -420,10 +421,20 @@ function refreshImage()
 
 function sendFax()
 {
-	frames['preview'].document.getElementById('pdfId').value='<%=signatureRequestId%>';	
-	frames['preview'].onPrint2('oscarRxFax');
-	frames['preview'].document.FrmForm.submit();	
-	window.onbeforeunload = null;
+	var faxNumber = frames['preview'].document.getElementsByName("pharmaFax")[0].value;
+
+	if (Oscar.Util.Fax.checkPhone(faxNumber))
+	{
+		frames['preview'].document.getElementById('pdfId').value = '<%=signatureRequestId%>';
+		frames['preview'].onPrint2('oscarRxFax');
+		frames['preview'].document.FrmForm.submit();
+		window.onbeforeunload = null;
+	}
+	else
+	{
+		alert("The fax number for this pharmacy is invalid");
+	}
+
 }
 
 function unloadMess(){

@@ -402,14 +402,26 @@
 				typeInOK = checkDateYMD( document.adddemographic.end_date_year.value , document.adddemographic.end_date_month.value , document.adddemographic.end_date_date.value , "End Date" );
 				if (!typeInOK) { return false; }
 
-				typeInOK = checkDateYMD( document.adddemographic.hc_renew_date_year.value , document.adddemographic.hc_renew_date_month.value , document.adddemographic.hc_renew_date_date.value , "PCN Date" );
-				if (!typeInOK) { return false; }
-
 				typeInOK = checkDateYMD( document.adddemographic.eff_date_year.value , document.adddemographic.eff_date_month.value , document.adddemographic.eff_date_date.value , "EFF Date" );
 				if (!typeInOK) { return false; }
 
 				return typeInOK;
 			}
+
+			function checkDocType()
+			{
+				var docType = document.getElementById("docType");
+				var docFile = document.getElementById("docFile");
+
+				if (!!docType && docFile.files.length>0 && docType.value==="")
+				{
+					alert("Please Select a Document Type");
+					return false;
+				}
+
+				return true;
+			}
+
 			function checkDateYMD(yy, mm, dd, fieldName) {
 				var typeInOK = false;
 				if((yy.length==0) && (mm.length==0) && (dd.length==0) ){
@@ -441,6 +453,7 @@
 				if ( !checkDob() ) return false;
 				if ( !checkHin() ) return false;
 				if ( !checkAllDate() ) return false;
+				if ( !checkDocType() ) return false;
 				return true;
 			}
 
@@ -999,7 +1012,7 @@
 					<%	}
 					%>
 				</select>
-				<input type="file" name="docFile" size="20" class="warning" >
+				<input type="file" id="docFile" name="docFile" size="20" class="warning" >
 			</span>
 
 
