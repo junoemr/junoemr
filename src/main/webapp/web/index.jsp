@@ -456,6 +456,7 @@
 <script type="text/javascript" src="common/services/formService.js"></script>
 <script type="text/javascript" src="common/services/inboxService.js"></script>
 <script type="text/javascript" src="common/services/k2aService.js"></script>
+<script type="text/javascript" src="common/services/SRFaxService.js"></script>
 <script type="text/javascript" src="common/services/messageService.js"></script>
 <script type="text/javascript" src="common/services/noteService.js"></script>
 <script type="text/javascript" src="common/services/patientDetailStatusService.js"></script>
@@ -542,6 +543,11 @@
 <script type="text/javascript" src="admin/integration/know2act/Know2actConfigController.js"></script>
 <script type="text/javascript" src="admin/integration/know2act/Know2actNotificationController.js"></script>
 <script type="text/javascript" src="admin/integration/know2act/Know2actTemplateController.js"></script>
+
+<script type="text/javascript" src="admin/integration/fax/module.js"></script>
+<script type="text/javascript" src="admin/integration/fax/srfax/module.js"></script>
+<script type="text/javascript" src="admin/integration/fax/srfax/SRFaxConfiguration.jsp"></script>
+<script type="text/javascript" src="admin/integration/fax/srfax/SRFaxConfigurationController.js"></script>
 
 <script type="text/javascript" src="billing/billingController.js"></script>
 

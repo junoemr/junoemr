@@ -1,0 +1,16 @@
+.srfax-config {
+  .input-label {
+	width: 200px;
+	text-align: right;
+  }
+  .connection-status-indicator {
+	background-color: $medium-grey;
+	&.success {
+	  background-color: $success-green;
+	}
+	&.failure {
+	  background-color: $failure-red;
+	}
+  }
+
+}

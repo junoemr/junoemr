@@ -947,6 +947,7 @@ OscarProperties props = OscarProperties.getInstance();
 						<ul>
 							<security:oscarSec roleName="<%=roleName$%>" objectName="_admin" rights="r" reverse="<%=false%>">
 								<li><a href='javascript:void(0);' class="xlink" rel="${ctx}/admin/configureFax.jsp">Configure Fax</a></li>
+								<li><a href="javascript:void(0);" class="xlink" rel="${ctx}/web/#!/SRFaxConfig" >SRFax Configuration</a></li>
 							</security:oscarSec>
 							<li><a href='javascript:void(0);' class="xlink" rel="${ctx}/admin/manageFaxes.jsp">Manage Faxes</a></li>
 						</ul>

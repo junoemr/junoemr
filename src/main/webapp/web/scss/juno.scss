@@ -16,6 +16,7 @@
 @import "navbar-fixed-top";
 @import "index";
 @import "note-editor";
+@import "juno-toggle-switch";
 // Section-specific things
 @import "../common/directives/patientSelectorOption";
 @import "../dashboard/dashboard";
@@ -28,4 +29,5 @@
 @import "../tickler/tickler";
 @import "../consults/consults";
 @import "../admin/integration/know2act/Know2act";
+@import "../admin/integration/fax/srfax/SRFax";
 @import "../record/forms/forms";
