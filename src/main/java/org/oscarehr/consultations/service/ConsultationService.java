@@ -95,6 +95,7 @@ public class ConsultationService
 
 		LetterheadTo1 letterhead;
 		String setting = providerSettings.getConsultationLetterHeadNameDefault();
+		setting = (setting == null)? "" : setting; // prevent null values in switch statement
 		switch(setting)
 		{
 			case "3": letterhead = getClinicLetterhead(); break;
