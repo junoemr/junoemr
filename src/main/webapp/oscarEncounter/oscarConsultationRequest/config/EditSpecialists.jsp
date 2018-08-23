@@ -229,20 +229,6 @@ function BackToOscar()
 			</tr>
 			<tr>
 				<td><html:form action="/oscarEncounter/EditSpecialists">
-					<% if(activateSpecialists)
-					{
-					%>
-						<button type="submit" name="activate" value="activate"><bean:message key="oscarEncounter.oscarConsultationRequest.config.EditSpecialists.btnActivateSpecialist"/></button>
-					<%
-					} else
-					{
-					%>
-						<button type="submit" name="delete" value="delete"><bean:message key="oscarEncounter.oscarConsultationRequest.config.EditSpecialists.btnDeleteSpecialist"/></button>
-					<%
-					}
-					%>
-
-
 					<div class="ChooseRecipientsBox1">
 					<table>
 						<tr>
@@ -293,6 +279,19 @@ function BackToOscar()
 						</tr>
 
 					</table>
+						</br>
+						<% if(activateSpecialists)
+						{
+						%>
+							<button type="submit" name="activate" value="activate"><bean:message key="oscarEncounter.oscarConsultationRequest.config.EditSpecialists.btnActivateSpecialist"/></button>
+						<%
+						} else
+						{
+						%>
+							<button type="submit" name="delete" value="delete"><bean:message key="oscarEncounter.oscarConsultationRequest.config.EditSpecialists.btnDeleteSpecialist"/></button>
+						<%
+							}
+						%>
 						<div style="text-align: center; padding-top: 20px; font-size: 1.3em;">
                             <a href="javascript:void(0)" class="navBtn" onclick="toPage('first', <%=searchType%>)"><<</a>
                             <a href="javascript:void(0)" class="navBtn" onclick="toPage('previous', <%=searchType%>)"><</a>
