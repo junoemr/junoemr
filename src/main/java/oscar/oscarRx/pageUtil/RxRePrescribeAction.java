@@ -345,14 +345,23 @@ public final class RxRePrescribeAction extends DispatchAction {
 		List<Drug> prescriptDrugs = drugDao.getPrescriptions(demoNo, showall);
 		List<Integer> listLongTermMed = new ArrayList<>();
 
-		for (Drug prescriptDrug : prescriptDrugs) {
-			// add all expired long term med drugIds to an array.
-			if (prescriptDrug.isLongTerm() && !prescriptDrug.isExpired()) {
+		// Depending on where this method was called, we want to show only the expired long term meds,
+		// or only unexpired long term meds, not both at once.
+		boolean showExpiredLongTermMedsOnly = false;
 
-				listLongTermMed.add(prescriptDrug.getId());
-			}
+		if (request.getParameter("reRxExpiredLTM") != null &&
+				request.getParameter("reRxExpiredLTM").equals("true"))
+		{
+			showExpiredLongTermMedsOnly = true;
 		}
 
+		for (Drug prescriptDrug : prescriptDrugs) {
+
+			if (prescriptDrug.isLongTerm() && (prescriptDrug.isExpired() == showExpiredLongTermMedsOnly))
+			{
+					listLongTermMed.add(prescriptDrug.getId());
+			}
+		}
 
         oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBean) request.getSession().getAttribute("RxSessionBean");
         

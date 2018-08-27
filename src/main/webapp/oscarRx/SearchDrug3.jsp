@@ -272,14 +272,21 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
             }
           }
 
-            function resetReRxDrugList(){
-            	var rand = Math.floor(Math.random()*10001);
-                var url="<c:out value="${ctx}"/>" + "/oscarRx/deleteRx.do?parameterValue=clearReRxDrugList";
-                       var data = "rand="+rand;
-                       new Ajax.Request(url, {method: 'post',parameters:data,onSuccess:function(transport){
-                    	   updateCurrentInteractions();
-                        }});
-            }
+        function resetReRxDrugList() {
+            var rand = Math.floor(Math.random()*10001);
+            var url="<c:out value="${ctx}"/>" + "/oscarRx/deleteRx.do?parameterValue=clearReRxDrugList";
+            var data = "rand="+rand;
+            new Ajax.Request(url,
+                {
+                    method: 'post',
+                    parameters:data,
+                    onSuccess:function(transport) {
+                        updateCurrentInteractions();
+                    }
+                });
+        }
+
+
             function onPrint(cfgPage) {
                 var docF = $('printFormDD');
 
@@ -414,7 +421,6 @@ function ts_makeSortable(table) {
         var firstRow = table.rows[0];
     }
     if (!firstRow) return;
-    oscarLog('Gets past here');
 
     // We have a first row: assume it's the header, and make its contents clickable links
     for (var i=0;i<firstRow.cells.length;i++) {
@@ -913,7 +919,7 @@ THEME 2*/
 													<%if(securityManager.hasWriteAccess("_rx",roleName2$,true)) {%>
                                                     <a href="#" onclick="$('reprint').toggle();return false;"><bean:message key="SearchDrug.Reprint"/></a>
                                                     &nbsp;
-                                                    <a href="javascript:void(0);"name="cmdRePrescribe"  onclick="javascript:RePrescribeLongTerm();" style="width: 200px" ><bean:message key="SearchDrug.msgReprescribeLongTermMed"/></a>
+                                                    <a href="javascript:void(0);"name="cmdRePrescribe"  onclick="javascript:RePrescribeLongTerm(false);" style="width: 200px" ><bean:message key="SearchDrug.msgReprescribeLongTermMed"/></a>
                                                     &nbsp;
 													<% } %>
                                                     <a href="javascript:popupWindow(720,920,'chartDrugProfile.jsp?demographic_no=<%=demoNo%>','PrintDrugProfile2')">Timeline Drug Profile</a>
@@ -1292,7 +1298,7 @@ function changeLt(drugId){
         var url=window.location.href;
         var match=url.indexOf('ltm=true');
         if(match>-1){
-            RePrescribeLongTerm();
+            RePrescribeLongTerm(true);
         }
     }
     function changeContainerHeight(ele){
@@ -1672,15 +1678,38 @@ function changeLt(drugId){
                                         }});
                             }});
     }
-//represcribe long term meds
-    function RePrescribeLongTerm(){
-       var demoNo='<%=patient.getDemographicNo()%>';
-        var data="demoNo="+demoNo+"&showall=<%=showall%>&rand=" +  Math.floor(Math.random()*10001);
-        var url= "<c:out value="${ctx}"/>" + "/oscarRx/rePrescribe2.do?method=repcbAllLongTerm";
-        new Ajax.Updater('rxText',url, {method:'get',parameters:data,asynchronous:true,insertion: Insertion.Bottom,onSuccess:function(transport){
-                            updateCurrentInteractions();
-            }});
-        return false;
+
+    function RePrescribeLongTerm (shouldReRxExpiredMeds) {
+
+        var rand = Math.floor(Math.random()*10001),
+            clearReRxURL = '<c:out value="${ctx}"/>' + '/oscarRx/deleteRx.do?parameterValue=clearReRxDrugList',
+            clearReRxData = 'rand=' + rand,
+
+            updateReRxURL = '<c:out value="${ctx}"/>' + '/oscarRx/rePrescribe2.do?method=repcbAllLongTerm',
+            updateReRxData = 'demoNo=<%=patient.getDemographicNo()%>&showall=<%=showall%>&rand=' + rand;
+
+            if (shouldReRxExpiredMeds)
+            {
+                updateReRxData += "&reRxExpiredLTM=<%=request.getParameter("reRxExpiredLTM") != null ? request.getParameter("reRxExpiredLTM") : "false"%>";
+            }
+
+        //new Ajax.Request(clearReRxURL,
+          //  {
+            //    method: 'post',
+              //  parameters:clearReRxData,
+               // onSuccess: function() {
+                 //   console.log("clearReRx done");
+                    new Ajax.Updater('rxText', updateReRxURL,
+                        {
+                            method:'get',
+                            parameters: updateReRxData,
+                            onSuccess: function() {
+                                console.log("updateReRxDone");
+                                updateCurrentInteractions();
+                            }
+                        });
+            //    }
+          //  });
     }
 
 function customNoteWarning(){
