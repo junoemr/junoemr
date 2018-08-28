@@ -214,7 +214,7 @@
 			<bean class="org.oscarehr.ws.rest.DiseaseRegistryService" autowire="byName" />
 			<bean class="org.oscarehr.ws.rest.SpecialistsService" autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.ReferralDoctorsService" autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.SRFaxWebService" autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.FaxWebService" autowire="byName"/>
 
 		</jaxrs:serviceBeans>
 

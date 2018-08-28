@@ -33,8 +33,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Admin',
 	'Admin.Integration',
 	'Admin.Integration.Know2act',
-	'Admin.Integration.Fax',
-	'Admin.Integration.Fax.SRFax'
+	'Admin.Integration.Fax'
 ]);
 
 oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider)
@@ -462,11 +461,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 				templateUrl: 'admin/integration/know2act/Know2actNotifications.jsp',
 				controller: 'Admin.Integration.Know2act.k2aNotificationController as k2aNoteCtrl'
 			})
-		.state('SRFaxConfig',
+		.state('faxConfig',
 			{
-				url: '/SRFaxConfig',
-				templateUrl: 'admin/integration/fax/srfax/SRFaxConfiguration.jsp',
-				controller: 'Admin.Integration.Fax.SRFax.SRFaxConfigurationController as SRFaxController'
+				url: '/faxConfig',
+				templateUrl: 'admin/integration/fax/faxConfiguration.jsp',
+				controller: 'Admin.Integration.Fax.FaxConfigurationController as faxController'
 			})
 	;
 

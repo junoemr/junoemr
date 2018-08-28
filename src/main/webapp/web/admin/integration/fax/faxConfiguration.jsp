@@ -46,49 +46,49 @@
 <!-- Hide the main program nav as a fix for having angular in an iframe -->
 <link rel="stylesheet" href="<%=request.getContextPath() %>/web/admin/integration/know2act/Know2actHideNavBars.css">
 
-<title>SRFAX Title</title>
+<title>FAX Title</title>
 
-<div class="srfax-config">
+<div class="fax-config">
 	<div>
-		<label class="input-label" for="input-srfax-enabled">ENABLED</label>
+		<label class="input-label" for="input-fax-enabled">ENABLED</label>
 		<label class="switch">
-			<input id="input-srfax-enabled" type="checkbox"
-			       ng-model="SRFaxController.settings.enabled"/>
+			<input id="input-fax-enabled" type="checkbox"
+			       ng-model="faxController.settings.enabled"/>
 			<span class="slider"></span>
 		</label>
 	</div>
 	<div>
-		<label class="input-label" for="input-srfax-account-id">Account Login</label>
-		<input id="input-srfax-account-id" type="text"
-		       ng-model="SRFaxController.settings.accountLogin">
-		<label for="input-srfax-account-pw">Password</label>
-		<input id="input-srfax-account-pw" type="password"
-		       ng-model="SRFaxController.settings.password">
+		<label class="input-label" for="input-fax-account-id">User Number</label>
+		<input id="input-fax-account-id" type="text"
+		       ng-model="faxController.settings.accountLogin">
+		<label for="input-fax-account-pw">Password</label>
+		<input id="input-fax-account-pw" type="password"
+		       ng-model="faxController.settings.password">
 	</div>
 	<div>
 		<label class="input-label">Connection Status</label>
-		<button type="button"
-		        ng-click="SRFaxController.testConnection()">
+		<button type="button" class="btn"
+		        ng-click="faxController.testConnection()">
 			Test Connection
 		</button>
 		<div style="display: inline-block;">
 			<div class="connection-status-indicator"
-			      ng-show="SRFaxController.connectionStatus == SRFaxController.connectionStatusEnum.unknown">
+			      ng-show="faxController.connectionStatus == faxController.connectionStatusEnum.unknown">
 				<span class="glyphicon">Unknown</span>
 			</div>
 			<div class="connection-status-indicator success"
-			      ng-show="SRFaxController.connectionStatus == SRFaxController.connectionStatusEnum.success">
+			      ng-show="faxController.connectionStatus == faxController.connectionStatusEnum.success">
 				<span class="glyphicon">Success</span>
 			</div>
 			<div class="connection-status-indicator failure"
-			      ng-show="SRFaxController.connectionStatus == SRFaxController.connectionStatusEnum.failure">
+			      ng-show="faxController.connectionStatus == faxController.connectionStatusEnum.failure">
 				<span class="glyphicon">Failure</span>
 			</div>
 		</div>
 	</div>
 	<div>
-		<button type="button"
-		        ng-click="SRFaxController.saveSettings()">
+		<button type="button" class="btn btn-success"
+		        ng-click="faxController.saveSettings()">
 			SAVE SETTINGS
 		</button>
 	</div>

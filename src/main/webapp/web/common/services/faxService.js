@@ -25,14 +25,14 @@
 
  */
 
-angular.module("Common.Services").service("SRFaxService", [
+angular.module("Common.Services").service("faxService", [
 	'$q',
 	'junoHttp',
 	function($q, junoHttp)
 	{
 		var service = {};
 
-		service.apiPath = '../ws/rs/srfax';
+		service.apiPath = '../ws/rs/fax';
 
 		service.isEnabled = function isEnabled()
 		{
@@ -44,8 +44,8 @@ angular.module("Common.Services").service("SRFaxService", [
 					deferred.resolve(response.data);
 				},
 				function error(error) {
-					console.log("SRFaxService::isEnabled error", error);
-					deferred.reject("An error occurred while getting SRFax account data");
+					console.log("faxService::isEnabled error", error);
+					deferred.reject("An error occurred while getting fax account data");
 				});
 			return deferred.promise;
 		};
@@ -59,8 +59,8 @@ angular.module("Common.Services").service("SRFaxService", [
 					deferred.resolve(response.data);
 				},
 				function error(error) {
-					console.log("SRFaxService::getAccountSettings error", error);
-					deferred.reject("An error occurred while getting SRFax account data");
+					console.log("faxService::getAccountSettings error", error);
+					deferred.reject("An error occurred while getting fax account data");
 				});
 			return deferred.promise;
 		};
@@ -76,8 +76,8 @@ angular.module("Common.Services").service("SRFaxService", [
 				},
 				function error(error)
 				{
-					console.log("SRFaxService::setAccountSettings error", error);
-					deferred.reject("An error occurred while setting SRFax account data");
+					console.log("faxService::setAccountSettings error", error);
+					deferred.reject("An error occurred while setting fax account data");
 				});
 			return deferred.promise;
 		};
@@ -93,7 +93,7 @@ angular.module("Common.Services").service("SRFaxService", [
 				},
 				function error(error)
 				{
-					console.log("SRFaxService::validateLogin error", error);
+					console.log("faxService::validateLogin error", error);
 					deferred.reject("An error occurred while testing connection");
 				});
 			return deferred.promise;

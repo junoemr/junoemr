@@ -29,7 +29,7 @@ import java.io.Serializable;
 
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class SRFaxAccountSettingsTo1 implements Serializable
+public class FaxAccountSettingsTo1 implements Serializable
 {
 	private Boolean enabled;
 	private String accountLogin;

@@ -25,7 +25,7 @@ package org.oscarehr.ws.rest;
 import org.apache.log4j.Logger;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.to.model.SRFaxAccountSettingsTo1;
+import org.oscarehr.ws.rest.to.model.FaxAccountSettingsTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,11 +36,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("/srfax")
-@Component("SRFaxWebService")
-public class SRFaxWebService extends AbstractServiceImpl
+@Path("/fax")
+@Component("FaxWebService")
+public class FaxWebService extends AbstractServiceImpl
 {
-	private static Logger logger = Logger.getLogger(SRFaxWebService.class);
+	private static Logger logger = Logger.getLogger(FaxWebService.class);
 
 	@Autowired
 	SecurityInfoManager securityInfoManager;
@@ -59,12 +59,12 @@ public class SRFaxWebService extends AbstractServiceImpl
 	@GET
 	@Path("/account")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<SRFaxAccountSettingsTo1> getAccountSettings()
+	public RestResponse<FaxAccountSettingsTo1> getAccountSettings()
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
 
-		SRFaxAccountSettingsTo1 settings = new SRFaxAccountSettingsTo1();
+		FaxAccountSettingsTo1 settings = new FaxAccountSettingsTo1();
 		settings.setEnabled(false);
 		settings.setAccountLogin("test value");
 
@@ -75,7 +75,7 @@ public class SRFaxWebService extends AbstractServiceImpl
 	@Path("/account")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<SRFaxAccountSettingsTo1> setAccountSettings(SRFaxAccountSettingsTo1 accountSettingsTo1)
+	public RestResponse<FaxAccountSettingsTo1> setAccountSettings(FaxAccountSettingsTo1 accountSettingsTo1)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin");
@@ -88,7 +88,7 @@ public class SRFaxWebService extends AbstractServiceImpl
 	@Path("/testConnection")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> testConnection(SRFaxAccountSettingsTo1 accountSettingsTo1)
+	public RestResponse<Boolean> testConnection(FaxAccountSettingsTo1 accountSettingsTo1)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");

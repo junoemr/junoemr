@@ -1,6 +1,6 @@
-angular.module("Admin.Integration.Fax.SRFax").controller('Admin.Integration.Fax.SRFax.SRFaxConfigurationController', [
-	"SRFaxService",
-	function (SRFaxService)
+angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxConfigurationController', [
+	"faxService",
+	function (faxService)
 	{
 		var controller = this;
 		controller.settings = {};
@@ -11,7 +11,7 @@ angular.module("Admin.Integration.Fax.SRFax").controller('Admin.Integration.Fax.
 
 		controller.loadSettings = function()
 		{
-			SRFaxService.getAccountSettings().then(
+			faxService.getAccountSettings().then(
 				function success(response)
 				{
 					controller.settings = response;
@@ -24,7 +24,7 @@ angular.module("Admin.Integration.Fax.SRFax").controller('Admin.Integration.Fax.
 		};
 		controller.saveSettings = function()
 		{
-			SRFaxService.setAccountSettings(controller.settings).then(
+			faxService.setAccountSettings(controller.settings).then(
 				function success(response)
 				{
 					console.info("settings saved");
@@ -38,7 +38,7 @@ angular.module("Admin.Integration.Fax.SRFax").controller('Admin.Integration.Fax.
 		};
 		controller.testConnection = function()
 		{
-			SRFaxService.testConnection(controller.settings).then(
+			faxService.testConnection(controller.settings).then(
 				function success(response)
 				{
 					if(response)
