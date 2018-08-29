@@ -345,8 +345,6 @@ public final class RxRePrescribeAction extends DispatchAction {
 		List<Drug> prescriptDrugs = drugDao.getPrescriptions(demoNo, showall);
 		List<Integer> listLongTermMed = new ArrayList<>();
 
-		// Depending on where this method was called, we want to show only the expired long term meds,
-		// or only unexpired long term meds, not both at once.
 		boolean showExpiredLongTermMedsOnly = false;
 
 		if (request.getParameter("reRxExpiredLTM") != null &&
@@ -357,9 +355,14 @@ public final class RxRePrescribeAction extends DispatchAction {
 
 		for (Drug prescriptDrug : prescriptDrugs) {
 
-			if (prescriptDrug.isLongTerm() && (prescriptDrug.isExpired() == showExpiredLongTermMedsOnly))
+			if (prescriptDrug.isLongTerm())
 			{
-					listLongTermMed.add(prescriptDrug.getId());
+				if (showExpiredLongTermMedsOnly && !prescriptDrug.isExpired())
+				{
+					continue;
+				}
+
+				listLongTermMed.add(prescriptDrug.getId());
 			}
 		}
 
@@ -402,6 +405,7 @@ public final class RxRePrescribeAction extends DispatchAction {
 			if (RxUtil.isRxUniqueInStash(beanRX, rx)) {
 				listLongTerm.add(rx);
 			}
+
 			int rxStashIndex = beanRX.addStashItem(loggedInInfo, rx);
 			beanRX.setStashIndex(rxStashIndex);
 			auditStr.append(rx.getAuditString() + "\n");

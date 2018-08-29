@@ -860,38 +860,56 @@ THEME 2*/
 
                                     <html:hidden property="demographicNo" value="<%=new Integer(patient.getDemographicNo()).toString()%>" />
                                     <table border="0">
-                                        <tr valign="top">
-                                            <td style="width:320px;"><bean:message key="SearchDrug.drugSearchTextBox"  />
-                                                <html:text styleId="searchString" property="searchString" onfocus="changeContainerHeight();" onblur="changeContainerHeight();" onclick="changeContainerHeight();" onkeydown="changeContainerHeight();" style="width:248px;\" autocomplete=\"off"  />
+                                        <tr valign="top" style="height:35px">
+                                            <td style="vertical-align: middle"> <bean:message key="SearchDrug.drugSearchTextBox"/>
+                                            </td>
+                                            <td style="width:auto">
+                                                <html:text styleId="searchString" property="searchString" onfocus="changeContainerHeight();" onblur="changeContainerHeight();" onclick="changeContainerHeight();" onkeydown="changeContainerHeight();" style="width:252px;\" autocomplete=\"off"  />
                                                 <div id="autocomplete_choices" style="overflow:auto;width:600px"></div>
                                                 <span id="indicator1" style="display: none"> <!--img src="/images/spinner.gif" alt="Working..." --></span>
                                             </td>
-                                            <td>
-                                                <input type="button" name="search" class="ControlPushButton" style="width:48px" value="<bean:message key="SearchDrug.msgSearch"/>" onclick="popupRxSearchWindow();" title="<bean:message key="SearchDrug.help.Search"/>">
-                                                <input id="customDrug" type="button" class="ControlPushButton" style="width:86px" onclick="customWarning2();" value="<bean:message key="SearchDrug.msgCustomDrugRx3"/>" title="<bean:message key="SearchDrug.help.CustomDrug"/>" />
-                                                <input id="customNote" type="button" class="ControlPushButton" style="width:40px"   onclick="customNoteWarning();" value="<bean:message key="SearchDrug.msgNoteRx3"/>" title="<bean:message key="SearchDrug.help.CustomNote"/>"/>
-                                                <input id="reset" type="button" class="ControlPushButton" style="width:42px" title="Clear pending prescriptions"   onclick="resetStash();" value="<bean:message key="SearchDrug.msgResetPrescriptionRx3"/>"/>
-                                                <% if(!OscarProperties.getInstance().getProperty("rx.drugofchoice.hide","false").equals("true")) { %>
-                                                <input type="button" class="ControlPushButton" style="width:92px" onclick="callTreatments('searchString','treatmentsMyD')" value="<bean:message key="SearchDrug.msgDrugOfChoiceRx3"/>" title="<bean:message key="SearchDrug.help.DrugOfChoice"/>"/>
-                                                <%} %>
-                                                <%if (OscarProperties.getInstance().hasProperty("ONTARIO_MD_INCOMINGREQUESTOR")) {%>
-                                                <a href="javascript:goOMD();" title="<bean:message key="SearchDrug.help.OMD"/>"><bean:message key="SearchDrug.msgOMDLookup"/></a>
-                                                <%}%>
-                                                <br>
+                                            <td style="padding-left:10px; vertical-align: middle">
+                                                <!-- search controls -->
+                                                <input type="button" name="search" class="ControlPushButton" style="display: inline-block" value="<bean:message key="SearchDrug.msgSearch"/>" onclick="popupRxSearchWindow();" title="<bean:message key="SearchDrug.help.Search"/>">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><!-- empty cell --></td>
+                                            <td style="padding-top:5px">
+                                                <!-- main controls -->
+                                                <input id="customDrug" type="button" class="ControlPushButton" style="display: inline-block" onclick="customWarning2();" value="<bean:message key="SearchDrug.msgCustomDrugRx3"/>" title="<bean:message key="SearchDrug.help.CustomDrug"/>" />
+                                                <input id="customNote" type="button" class="ControlPushButton" style="display: inline-block"   onclick="customNoteWarning();" value="<bean:message key="SearchDrug.msgNoteRx3"/>" title="<bean:message key="SearchDrug.help.CustomNote"/>"/>
+                                                <input id="reset" type="button" class="ControlPushButton" style="display: inline-block" title="Clear pending prescriptions"   onclick="resetStash();" value="<bean:message key="SearchDrug.msgResetPrescriptionRx3"/>"/>
+                                            </td>
+                                            <td style="padding-left:10px; padding-top:5px">
+                                                <!-- Rx save controls -->
                                                 <security:oscarSec roleName="<%=roleName2$%>" objectName="_rx" rights="x">
-                                                <input id="saveButton" type="button"  class="ControlPushButton" onclick="updateSaveAllDrugsPrint();" value="<bean:message key="SearchDrug.msgSaveAndPrint"/>" title="<bean:message key="SearchDrug.help.SaveAndPrint"/>" />
+                                                <input id="saveButton" type="button" style="display: inline-block" class="ControlPushButton" onclick="updateSaveAllDrugsPrint();" value="<bean:message key="SearchDrug.msgSaveAndPrint"/>" title="<bean:message key="SearchDrug.help.SaveAndPrint"/>" />
                                                 </security:oscarSec>
-
-                                                <input id="saveOnlyButton" type="button"  class="ControlPushButton" onclick="updateSaveAllDrugs();" value="<bean:message key="SearchDrug.msgSaveOnly"/>" title="<bean:message key="SearchDrug.help.Save"/>"/>
-												<%
-                                                    	if(OscarProperties.getInstance().getProperty("oscarrx.medrec","false").equals("true")) {
-                                                %>
-                                                    <input id="completeMedRecButton" type="button"  onclick="completeMedRec();" value="Complete Med Rec" />
-                                                <% } %>
-                                                
-                                                <% if(eRxEnabled) { %>
-													<a href="<%=eRx_SSO_URL%>User=<%=eRxUsername%>&Password=<%=eRxPassword%>&Clinic=<%=eRxFacility%>&PatientIdPMIS=<%=patient.getDemographicNo()%>&IsTraining=<%=eRxTrainingMode%>"><bean:message key="SearchDrug.eRx.msgExternalPrescriber"/></a>
-                                                <% } %>
+                                                <input id="saveOnlyButton" type="button" style="display: inline-block" class="ControlPushButton" onclick="updateSaveAllDrugs();" value="<bean:message key="SearchDrug.msgSaveOnly"/>" title="<bean:message key="SearchDrug.help.Save"/>"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><!-- empty cell --></td>
+                                            <td>
+                                            <!-- optional controls -->
+                                            <% //if(!OscarProperties.getInstance().getProperty("rx.drugofchoice.hide","false").equals("true")) { %>
+                                            <input type="button" class="ControlPushButton" style="display: inline-block" onclick="callTreatments('searchString','treatmentsMyD')" value="<bean:message key="SearchDrug.msgDrugOfChoiceRx3"/>" title="<bean:message key="SearchDrug.help.DrugOfChoice"/>"/>
+                                            <% //} %>
+                                            <% //if(OscarProperties.getInstance().getProperty("oscarrx.medrec","false").equals("true")) { %>
+                                            <input id="completeMedRecButton" type="button" class="ControlPushButton" style="display: inline-block" onclick="completeMedRec();" value="Complete Med Rec" />
+                                            <% //} %>
+                                            </td>
+                                            <td style="text-align:center">
+                                                <!-- optional links -->
+                                                <%//if (OscarProperties.getInstance().hasProperty("ONTARIO_MD_INCOMINGREQUESTOR")) { %>
+                                                <a href="javascript:goOMD();" title="<bean:message key="SearchDrug.help.OMD"/>"
+                                                   style="display: inline-block"><bean:message key="SearchDrug.msgOMDLookup"/></a>
+                                                <%// } %>
+                                                <%// if (eRxEnabled) { %>
+                                                <a href="<%=eRx_SSO_URL%>User=<%=eRxUsername%>&Password=<%=eRxPassword%>&Clinic=<%=eRxFacility%>&PatientIdPMIS=<%=patient.getDemographicNo()%>&IsTraining=<%=eRxTrainingMode%>"
+                                                   style="display: inline-block; padding-left:10px"><bean:message key="SearchDrug.eRx.msgExternalPrescriber"/></a>
+                                                <%// } %>
                                             </td>
                                         </tr>
                                         <tr>
@@ -1694,22 +1712,23 @@ function changeLt(drugId){
             }
 
         //new Ajax.Request(clearReRxURL,
-          //  {
-            //    method: 'post',
-              //  parameters:clearReRxData,
-               // onSuccess: function() {
-                 //   console.log("clearReRx done");
+           // {
+         //       method: 'post',
+          //      parameters:clearReRxData,
+           //     onSuccess: function() {
+            //        console.log("clearReRx done");
                     new Ajax.Updater('rxText', updateReRxURL,
                         {
                             method:'get',
                             parameters: updateReRxData,
+                            insertion: Insertion.Bottom,
                             onSuccess: function() {
                                 console.log("updateReRxDone");
                                 updateCurrentInteractions();
                             }
                         });
-            //    }
-          //  });
+             //   }
+           // });
     }
 
 function customNoteWarning(){
