@@ -893,23 +893,23 @@ THEME 2*/
                                             <td><!-- empty cell --></td>
                                             <td>
                                             <!-- optional controls -->
-                                            <% //if(!OscarProperties.getInstance().getProperty("rx.drugofchoice.hide","false").equals("true")) { %>
+                                            <% if (!OscarProperties.getInstance().getProperty("rx.drugofchoice.hide","false").equals("true")) { %>
                                             <input type="button" class="ControlPushButton" style="display: inline-block" onclick="callTreatments('searchString','treatmentsMyD')" value="<bean:message key="SearchDrug.msgDrugOfChoiceRx3"/>" title="<bean:message key="SearchDrug.help.DrugOfChoice"/>"/>
-                                            <% //} %>
-                                            <% //if(OscarProperties.getInstance().getProperty("oscarrx.medrec","false").equals("true")) { %>
+                                            <% } %>
+                                            <% if (OscarProperties.getInstance().getProperty("oscarrx.medrec","false").equals("true")) { %>
                                             <input id="completeMedRecButton" type="button" class="ControlPushButton" style="display: inline-block" onclick="completeMedRec();" value="Complete Med Rec" />
-                                            <% //} %>
+                                            <% } %>
                                             </td>
                                             <td style="text-align:center">
                                                 <!-- optional links -->
-                                                <%//if (OscarProperties.getInstance().hasProperty("ONTARIO_MD_INCOMINGREQUESTOR")) { %>
+                                                <% if (OscarProperties.getInstance().hasProperty("ONTARIO_MD_INCOMINGREQUESTOR")) { %>
                                                 <a href="javascript:goOMD();" title="<bean:message key="SearchDrug.help.OMD"/>"
                                                    style="display: inline-block"><bean:message key="SearchDrug.msgOMDLookup"/></a>
-                                                <%// } %>
-                                                <%// if (eRxEnabled) { %>
+                                                <% } %>
+                                                <%if (eRxEnabled) { %>
                                                 <a href="<%=eRx_SSO_URL%>User=<%=eRxUsername%>&Password=<%=eRxPassword%>&Clinic=<%=eRxFacility%>&PatientIdPMIS=<%=patient.getDemographicNo()%>&IsTraining=<%=eRxTrainingMode%>"
                                                    style="display: inline-block; padding-left:10px"><bean:message key="SearchDrug.eRx.msgExternalPrescriber"/></a>
-                                                <%// } %>
+                                                <% } %>
                                             </td>
                                         </tr>
                                         <tr>
