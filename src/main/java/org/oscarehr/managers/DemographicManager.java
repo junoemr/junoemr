@@ -118,6 +118,7 @@ public class DemographicManager {
 	private ProgramManager programManager;
 	
 
+	@Deprecated
 	public Demographic getDemographic(LoggedInInfo loggedInInfo, Integer demographicId) throws PatientDirectiveException {
 		return getDemographic(loggedInInfo.getLoggedInProviderNo() , demographicId);
 	}
@@ -595,9 +596,13 @@ public class DemographicManager {
 		return ids;
 	}
 
+	@Deprecated
 	public List<Demographic> getDemosByChartNo(LoggedInInfo loggedInInfo, String chartNo) {
-		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
-		if (loggedInInfo == null) throw (new SecurityException("user not logged in?"));
+		return getDemosByChartNo(loggedInInfo.getLoggedInProviderNo(), chartNo);
+	}
+	public List<Demographic> getDemosByChartNo(String loggedInProviderNo, String chartNo) {
+		checkPrivilege(loggedInProviderNo, SecurityInfoManager.READ);
+		if (loggedInProviderNo == null) throw (new SecurityException("user not logged in?"));
 
 		List<Demographic> demographics = demographicDao.getClientsByChartNo(chartNo);
 

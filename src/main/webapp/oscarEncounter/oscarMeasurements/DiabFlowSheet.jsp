@@ -18,8 +18,8 @@
 <%@page import="org.oscarehr.common.dao.FlowSheetDrugDao,org.oscarehr.common.model.FlowSheetDrug"%>
 <%@page import="org.oscarehr.common.dao.UserPropertyDAO,org.oscarehr.common.model.UserProperty"%>
 
-<%@page import="org.oscarehr.common.dao.AllergyDao"%>
-<%@page import="org.oscarehr.common.model.Allergy"%>
+<%@page import="org.oscarehr.allergy.dao.AllergyDao"%>
+<%@page import="org.oscarehr.allergy.model.Allergy"%>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>

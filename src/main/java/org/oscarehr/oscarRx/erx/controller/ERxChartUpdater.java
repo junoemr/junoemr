@@ -32,8 +32,8 @@ import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
-import org.oscarehr.common.dao.DrugDao;
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.dao.DrugDao;
+import org.oscarehr.rx.model.Drug;
 import org.oscarehr.util.SpringUtils;
 
 //import oscar.oscarRx.data.RxPrescriptionData.Prescription;

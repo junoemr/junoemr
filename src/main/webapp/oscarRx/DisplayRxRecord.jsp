@@ -23,7 +23,7 @@
     Ontario, Canada
 
 --%>
-<%@page import="org.oscarehr.common.dao.DrugDao,org.oscarehr.common.model.Drug,org.oscarehr.util.MiscUtils,org.oscarehr.util.SpringUtils,org.oscarehr.PMmodule.dao.ProviderDao,org.oscarehr.common.dao.DemographicDao" %>
+<%@page import="org.oscarehr.rx.dao.DrugDao,org.oscarehr.rx.model.Drug,org.oscarehr.util.MiscUtils,org.oscarehr.util.SpringUtils,org.oscarehr.PMmodule.dao.ProviderDao,org.oscarehr.common.dao.DemographicDao" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -56,9 +56,9 @@ Drug drug = drugDao.find(drugId);
 
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<%@page import="org.oscarehr.util.MiscUtils"%><html>
-    <head>
-        <script type="text/javascript" src="<%= request.getContextPath()%>/js/global.js"></script>
+<html>
+<head>
+	<script type="text/javascript" src="<%= request.getContextPath()%>/js/global.js"></script>
         <html:base />
         <title><bean:message key="oscarRx.DisplayRxRecord.title" /></title>
         <link rel="stylesheet" type="text/css" href="../../../share/css/OscarStandardLayout.css">

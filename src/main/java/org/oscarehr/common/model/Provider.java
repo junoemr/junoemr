@@ -31,7 +31,9 @@ import java.util.Date;
 import org.apache.commons.lang.StringUtils;
 /**
  * This is the object class that relates to the provider table. Any customizations belong here.
+ * @deprecated - use the JPA version instead
  */
+@Deprecated
 public class Provider implements Serializable, Comparable<Provider>{
 
 	/**

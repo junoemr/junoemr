@@ -55,8 +55,8 @@
 <%@ page import="org.oscarehr.common.dao.SecPrivilegeDao"%>
 <%@ page import="org.oscarehr.common.model.SecObjectName"%>
 <%@ page import="org.oscarehr.common.dao.SecObjectNameDao"%>
-<%@ page import="org.oscarehr.common.model.ProviderData"%>
-<%@ page import="org.oscarehr.common.dao.ProviderDataDao"%>
+<%@ page import="org.oscarehr.provider.model.ProviderData"%>
+<%@ page import="org.oscarehr.provider.dao.ProviderDataDao"%>
 <%@ page import="org.oscarehr.common.model.SecObjPrivilege"%>
 <%@ page import="org.oscarehr.common.model.SecObjPrivilegePrimaryKey"%>
 <%@ page import="org.oscarehr.common.dao.SecObjPrivilegeDao"%>

@@ -390,7 +390,6 @@
         <ViolationValue>/src/main/java/oscar/oscarRx/pageUtil/RxSessionBean.java:private ArrayList&lt;RxPrescriptionData.Prescription&gt; stash = new ArrayList();</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/pageUtil/RxSessionBean.java:private HashMap randomIdDrugIdPair=new HashMap();</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/pageUtil/RxSessionBean.java:private Hashtable allergyWarnings = new Hashtable();</ViolationValue>
-        <ViolationValue>/src/main/java/oscar/oscarRx/pageUtil/RxSessionBean.java:private Hashtable workingAllergyWarnings = new Hashtable();</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/pageUtil/RxSessionBean.java:private List&lt;HashMap&lt;String,String&gt;&gt; listMedHistory=new ArrayList();</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/pageUtil/RxSessionBean.java:private List&lt;String&gt; reRxDrugIdList=new ArrayList();</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/pageUtil/RxSessionBean.java:reRxDrugIdList=new ArrayList();</ViolationValue>
@@ -2235,14 +2234,9 @@
         <ViolationValue>/src/main/java/oscar/oscarRx/data/RxInteractionData.java:import java.util.Vector;</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/data/RxInteractionData.java:public RxDrugData.Interaction[] getInteractions(Vector atccodes){</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/data/RxInteractionData.java:public void addToHash(Vector atccodes,RxDrugData.Interaction[] interact ){</ViolationValue>
-        <ViolationValue>/src/main/java/oscar/oscarRx/data/RxInteractionData.java:public void addToWorking(Vector atccodes,RxInteractionWorker worker){</ViolationValue>
-        <ViolationValue>/src/main/java/oscar/oscarRx/data/RxInteractionData.java:public void preloadInteraction(Vector atccodes){</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/data/RxInteractionData.java:public void removeFromWorking(Vector atccodes){</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/data/RxInteractionData.java:static Hashtable  htable = new Hashtable();</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/data/RxInteractionData.java:static Hashtable working = new Hashtable();</ViolationValue>
-        <ViolationValue>/src/main/java/oscar/oscarRx/data/RxInteractionWorker.java:Vector atcCodes = null;</ViolationValue>
-        <ViolationValue>/src/main/java/oscar/oscarRx/data/RxInteractionWorker.java:import java.util.Vector;</ViolationValue>
-        <ViolationValue>/src/main/java/oscar/oscarRx/data/RxInteractionWorker.java:public RxInteractionWorker(RxInteractionData rxInt, Vector v) {</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/data/RxPrescriptionData.java:import java.util.Vector;</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/data/RxPrescriptionData.java:public Vector getCurrentATCCodesByPatient(int demographicNo) {</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/data/RxPrescriptionData.java:return new Vector(result);</ViolationValue>
@@ -2314,7 +2308,6 @@
         <ViolationValue>/src/main/java/oscar/oscarRx/pageUtil/RxSessionBean.java:import java.util.Hashtable;</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/pageUtil/RxSessionBean.java:import java.util.Vector;</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/pageUtil/RxSessionBean.java:private Hashtable allergyWarnings = new Hashtable();</ViolationValue>
-        <ViolationValue>/src/main/java/oscar/oscarRx/pageUtil/RxSessionBean.java:private Hashtable workingAllergyWarnings = new Hashtable();</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/pageUtil/RxSessionBean.java:public Vector getAtcCodes(){</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/pageUtil/RxWriteScriptAction.java:Vector comps = dmono.components;</ViolationValue>
         <ViolationValue>/src/main/java/oscar/oscarRx/pageUtil/RxWriteScriptAction.java:import java.util.Vector;</ViolationValue>

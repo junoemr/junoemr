@@ -59,7 +59,7 @@ import org.indivo.xml.phr.types.CodingSystemReferenceType;
 import org.indivo.xml.phr.types.DurationType;
 import org.indivo.xml.phr.urns.ContentTypeQNames;
 import org.indivo.xml.phr.urns.DocumentClassificationUrns;
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.model.Drug;
 import org.oscarehr.myoscar.commons.MedicalDataType;
 import org.oscarehr.myoscar_server.ws.MedicalDataTransfer4;
 import org.oscarehr.util.MiscUtils;

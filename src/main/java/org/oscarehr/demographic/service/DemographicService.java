@@ -24,7 +24,9 @@ package org.oscarehr.demographic.service;
 
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.dao.AdmissionDao;
+import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.model.Admission;
+import org.oscarehr.common.model.DemographicArchive;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicExtDao;
@@ -57,6 +59,9 @@ public class DemographicService
 
 	@Autowired
 	DemographicExtDao demographicExtDao;
+
+	@Autowired
+	DemographicArchiveDao demographicArchiveDao;
 
 	@Autowired
 	private ProgramManager programManager;
@@ -131,5 +136,12 @@ public class DemographicService
 		admission.setAdmissionNotes("");
 
 		admissionDao.saveAdmission(admission);
+	}
+
+	public Long archiveDemographicRecord(Demographic demographic)
+	{
+		DemographicArchive da = new DemographicArchive(demographic);
+		demographicArchiveDao.persist(da);
+		return da.getId();
 	}
 }

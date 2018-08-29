@@ -24,9 +24,9 @@ package org.oscarehr.eform.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.PreventionDao;
-import org.oscarehr.common.model.Prevention;
 import org.oscarehr.eform.EFormHtmlParser;
+import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

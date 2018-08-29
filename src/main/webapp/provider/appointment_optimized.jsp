@@ -368,16 +368,17 @@ private long getAppointmentRowSpan(
 	String [] curProvider_no;
 	String [] curProviderName;
 
-	//initial provider bean for all the application
-	if(providerBean.isEmpty())
+
+	// Regenerate provider beans every time this page is reloaded in case the new providers were added, or existing
+	// providers are changed.
+	providerBean.clear();
+	for (Provider p : providerDao.getActiveProviders())
 	{
-		for(Provider p : providerDao.getActiveProviders())
-		{
-			providerBean.setProperty(p.getProviderNo(),p.getFormattedName());
-		}
+	    providerBean.setProperty(p.getProviderNo(),p.getFormattedName());
 	}
 
 	ProviderPreference providerPreference2=(ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE);
+
 	String mygroupno = providerPreference2.getMyGroupNo();
 	if(mygroupno == null)
 	{
@@ -672,7 +673,7 @@ private long getAppointmentRowSpan(
 			self.location.href = "providercontrol.jsp?year=<%=year%>&month=<%=month%>&day=<%=day%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1&provider_no="+s;
 		}
 		function goZoomView(s, n) {
-			self.location.href = "providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=1&curProvider="+s+"&curProviderName="+encodeURIComponent(n)+"&displaymode=day&dboperation=searchappointmentday" ;
+			self.location.href = "providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=1&curProvider="+s+"&curProviderName="+encodeURIComponent(n)+"&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>" ;
 		}
 		function findProvider(p,m,d) {
 			popupPage(300,400, "receptionistfindprovider.jsp?pyear=" +p+ "&pmonth=" +m+ "&pday=" +d+ "&providername="+ document.findprovider.providername.value );
@@ -1069,7 +1070,7 @@ private long getAppointmentRowSpan(
 			<%
 				} } } else { if (view==1) {
 			%>
-			<a href='providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=0&displaymode=day&dboperation=searchappointmentday'><bean:message key="provider.appointmentProviderAdminDay.grpView"/></a>
+			<a href='providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>'><bean:message key="provider.appointmentProviderAdminDay.grpView"/></a>
 			<% } else { %>
 			<bean:message key="global.hello"/>
 			<% out.println( userFirstName+" "+userLastName); %>

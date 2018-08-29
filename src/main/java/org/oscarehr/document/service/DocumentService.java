@@ -104,6 +104,25 @@ public class DocumentService
 		document.setContenttype(file.getContentType());
 		document.setNumberofpages(file.getPageCount());
 
+		document = addDocumentModel(document, demographicNo);
+		logger.info("Uploaded Document " + document.getDocumentNo());
+		return document;
+	}
+
+	public Document uploadNewDocument(Document document, InputStream fileInputStream) throws IOException, InterruptedException
+	{
+		return uploadNewDocument(document, fileInputStream, null);
+	}
+
+	/**
+	 * Persist a document record without an associated filestream.
+	 * Use other methods for creating documents whenever there is an available filestream
+	 * @param document - the un-persisted document model
+	 * @param demographicNo - demographic id of the attached demographic
+	 * @return - The document model that was persisted
+	 */
+	private Document addDocumentModel(Document document, Integer demographicNo)
+	{
 		// default some values if they are missing
 		if(document.getObservationdate() == null)
 		{
@@ -128,12 +147,7 @@ public class DocumentService
 		{
 			assignDocumentToDemographic(document, demographicNo);
 		}
-		logger.info("Uploaded Document " + document.getDocumentNo());
 		return document;
-	}
-	public Document uploadNewDocument(Document document, InputStream fileInputStream) throws IOException, InterruptedException
-	{
-		return uploadNewDocument(document, fileInputStream, null);
 	}
 
 	public void updateDocument(AddEditDocumentForm fm,
@@ -260,8 +274,18 @@ public class DocumentService
 	 */
 	public void routeToProviderInbox(Integer documentNo, Integer providerNo)
 	{
+		routeToProviderInbox(documentNo, providerNo, false);
+	}
+	/**
+	 * Add the document to the given provider inbox
+	 * @param documentNo - document id to route
+	 * @param providerNo - provider id to route to
+	 * @param alwaysFile - when true, all routes will be set as filed. otherwise default routing rules are applied
+	 */
+	public void routeToProviderInbox(Integer documentNo, Integer providerNo, boolean alwaysFile)
+	{
 		//TODO handle the routing weirdness
-		providerInboxRoutingDao.addToProviderInbox(String.valueOf(providerNo), documentNo, LabResultData.DOCUMENT);
+		providerInboxRoutingDao.addToProviderInbox(String.valueOf(providerNo), documentNo, LabResultData.DOCUMENT, alwaysFile);
 		logger.info("Added route to provider " + providerNo + " for document " + documentNo);
 	}
 	/**

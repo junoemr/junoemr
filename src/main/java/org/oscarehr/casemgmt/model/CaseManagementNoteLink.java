@@ -24,7 +24,10 @@
 
 package org.oscarehr.casemgmt.model;
 
-
+/**
+ * @deprecated use the jpa model instead
+ */
+@Deprecated
 public class CaseManagementNoteLink {
 	
 	// Table Name constants
