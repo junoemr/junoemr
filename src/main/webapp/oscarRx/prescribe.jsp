@@ -186,7 +186,9 @@
 
 		    String jsEscapedDrugName = StringEscapeUtils.escapeJavaScript(drugName);
 		    String htmlEscapedDrugName = StringEscapeUtils.escapeHtml(drugName);
+		    // These two characters are not escaped correctly.  Successfully escapes & < > characters
 		    htmlEscapedDrugName = htmlEscapedDrugName.replaceAll("\"", "&quote;");
+		    htmlEscapedDrugName = htmlEscapedDrugName.replaceAll("'", "&apos;");
 %>
 <%if (OscarProperties.getInstance().getProperty("rx_enhance")!=null && OscarProperties.getInstance().getProperty("rx_enhance").equals("true")) { %>
 <fieldset style="margin-top:2px;width:580px;" id="set_<%=rand%>">

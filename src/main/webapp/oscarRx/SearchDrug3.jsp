@@ -859,7 +859,7 @@ THEME 2*/
                                     <input type="hidden" id="deleteOnCloseRxBox" value="false">
 
                                     <html:hidden property="demographicNo" value="<%=new Integer(patient.getDemographicNo()).toString()%>" />
-                                    <table border="0">
+                                    <table border="0" style="padding-top:10px">
                                         <tr valign="top" style="height:35px">
                                             <td style="vertical-align: middle"> <bean:message key="SearchDrug.drugSearchTextBox"/>
                                             </td>
@@ -910,11 +910,6 @@ THEME 2*/
                                                 <a href="<%=eRx_SSO_URL%>User=<%=eRxUsername%>&Password=<%=eRxPassword%>&Clinic=<%=eRxFacility%>&PatientIdPMIS=<%=patient.getDemographicNo()%>&IsTraining=<%=eRxTrainingMode%>"
                                                    style="display: inline-block; padding-left:10px"><bean:message key="SearchDrug.eRx.msgExternalPrescriber"/></a>
                                                 <% } %>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="3">
-                                                <%-- input type="button" class="ControlPushButton" onclick="customWarning();" value="<bean:message key="SearchDrug.msgCustomDrug"/>" / --%>
                                             </td>
                                         </tr>
                                     </table>
@@ -1700,35 +1695,24 @@ function changeLt(drugId){
     function RePrescribeLongTerm (shouldReRxExpiredMeds) {
 
         var rand = Math.floor(Math.random()*10001),
-            clearReRxURL = '<c:out value="${ctx}"/>' + '/oscarRx/deleteRx.do?parameterValue=clearReRxDrugList',
-            clearReRxData = 'rand=' + rand,
 
             updateReRxURL = '<c:out value="${ctx}"/>' + '/oscarRx/rePrescribe2.do?method=repcbAllLongTerm',
             updateReRxData = 'demoNo=<%=patient.getDemographicNo()%>&showall=<%=showall%>&rand=' + rand;
 
-            if (shouldReRxExpiredMeds)
-            {
-                updateReRxData += "&reRxExpiredLTM=<%=request.getParameter("reRxExpiredLTM") != null ? request.getParameter("reRxExpiredLTM") : "false"%>";
-            }
+        if (shouldReRxExpiredMeds)
+        {
+            updateReRxData += "&reRxExpiredLTM=<%=request.getParameter("reRxExpiredLTM") != null ? request.getParameter("reRxExpiredLTM") : "false"%>";
+        }
 
-        //new Ajax.Request(clearReRxURL,
-           // {
-         //       method: 'post',
-          //      parameters:clearReRxData,
-           //     onSuccess: function() {
-            //        console.log("clearReRx done");
-                    new Ajax.Updater('rxText', updateReRxURL,
-                        {
-                            method:'get',
-                            parameters: updateReRxData,
-                            insertion: Insertion.Bottom,
-                            onSuccess: function() {
-                                console.log("updateReRxDone");
-                                updateCurrentInteractions();
-                            }
-                        });
-             //   }
-           // });
+        new Ajax.Updater('rxText', updateReRxURL,
+            {
+                method:'get',
+                parameters: updateReRxData,
+                insertion: Insertion.Bottom,
+                onSuccess: function() {
+                    updateCurrentInteractions();
+                }
+            });
     }
 
 function customNoteWarning(){
