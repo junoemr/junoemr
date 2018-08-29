@@ -25,7 +25,7 @@
 
  */
 
-angular.module("Common.Services").service("faxService", [
+angular.module("Common.Services").service("faxConfigService", [
 	'$q',
 	'junoHttp',
 	function($q, junoHttp)
@@ -34,12 +34,32 @@ angular.module("Common.Services").service("faxService", [
 
 		service.apiPath = '../ws/rs/fax';
 
-		service.isEnabled = function isEnabled()
+		service.listAccounts = function listAccounts(page, perPage)
+		{
+			var deferred = $q.defer();
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			config.param = {
+				page: page,
+				perPage: perPage
+			};
+
+			junoHttp.get(service.apiPath + '/', config).then(
+				function success(response) {
+					deferred.resolve(response.data);
+				},
+				function error(error) {
+					console.log("faxService::listAccounts error", error);
+					deferred.reject("An error occurred while getting fax account data");
+				});
+			return deferred.promise;
+		};
+
+		service.isEnabled = function isEnabled(id)
 		{
 			var deferred = $q.defer();
 			var config = Juno.Common.ServiceHelper.configHeaders();
 
-			junoHttp.get(service.apiPath + '/enabled', config).then(
+			junoHttp.get(service.apiPath + '/' + id + '/enabled', config).then(
 				function success(response) {
 					deferred.resolve(response.data);
 				},
@@ -49,12 +69,12 @@ angular.module("Common.Services").service("faxService", [
 				});
 			return deferred.promise;
 		};
-		service.getAccountSettings = function getAccountSettings()
+		service.getAccountSettings = function getAccountSettings(id)
 		{
 			var deferred = $q.defer();
 			var config = Juno.Common.ServiceHelper.configHeaders();
 
-			junoHttp.get(service.apiPath + '/account', config).then(
+			junoHttp.get(service.apiPath + '/' + id + '/account', config).then(
 				function success(response) {
 					deferred.resolve(response.data);
 				},
@@ -65,7 +85,7 @@ angular.module("Common.Services").service("faxService", [
 			return deferred.promise;
 		};
 
-		service.setAccountSettings = function setAccountSettings(transfer)
+		service.addAccountSettings = function addAccountSettings(transfer)
 		{
 			var deferred = $q.defer();
 
@@ -78,6 +98,23 @@ angular.module("Common.Services").service("faxService", [
 				{
 					console.log("faxService::setAccountSettings error", error);
 					deferred.reject("An error occurred while setting fax account data");
+				});
+			return deferred.promise;
+		};
+
+		service.updateAccountSettings = function updateAccountSettings(id, transfer)
+		{
+			var deferred = $q.defer();
+
+			junoHttp.put(service.apiPath + '/' + id + '/account', transfer).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("faxService::setAccountSettings error", error);
+					deferred.reject("An error occurred while updating fax account data");
 				});
 			return deferred.promise;
 		};

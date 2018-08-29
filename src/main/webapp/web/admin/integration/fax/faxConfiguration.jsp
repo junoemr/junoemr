@@ -49,49 +49,58 @@
 <title>FAX Title</title>
 
 <div class="fax-config">
-	<div>
-		<label class="input-label" for="input-fax-enabled">ENABLED</label>
-		<label class="switch">
-			<input id="input-fax-enabled" type="checkbox"
-			       ng-model="faxController.settings.enabled"/>
-			<span class="slider"></span>
-		</label>
-	</div>
-	<div>
-		<label class="input-label" for="input-fax-account-id">User Number</label>
-		<input id="input-fax-account-id" type="text"
-		       ng-model="faxController.settings.accountLogin">
-		<label for="input-fax-account-pw">Password</label>
-		<input id="input-fax-account-pw" type="password"
-		       ng-model="faxController.settings.password">
-	</div>
-	<div>
-		<label class="input-label">Connection Status</label>
-		<button type="button" class="btn"
-		        ng-click="faxController.testConnection()">
-			Test Connection
-		</button>
-		<div style="display: inline-block;">
-			<div class="connection-status-indicator"
-			      ng-show="faxController.connectionStatus == faxController.connectionStatusEnum.unknown">
-				<span class="glyphicon">Unknown</span>
+	<div ng-repeat="faxAccount in faxController.faxAccountList">
+		<div>
+			<label class="switch">
+				<input id="input-fax-enabled-{{faxAccount.id}}" type="checkbox"
+				       ng-model="faxAccount.enabled"/>
+				<span class="slider"></span>
+			</label>
+			<label for="input-fax-enabled-{{faxAccount.id}}">ENABLED</label>
+		</div>
+		<div>
+			<div>
+				<label class="input-label" for="input-fax-account-id-{{faxAccount.id}}">User Number</label>
+				<input id="input-fax-account-id-{{faxAccount.id}}" type="text"
+				       ng-model="faxAccount.accountLogin">
+				<label for="input-fax-account-pw-{{faxAccount.id}}">Password</label>
+				<input id="input-fax-account-pw-{{faxAccount.id}}" type="password"
+				       ng-model="faxAccount.password">
 			</div>
-			<div class="connection-status-indicator success"
-			      ng-show="faxController.connectionStatus == faxController.connectionStatusEnum.success">
-				<span class="glyphicon">Success</span>
+			<div>
+				<label class="input-label">Connection Status</label>
+				<button type="button" class="btn"
+				        ng-click="faxController.testConnection(faxAccount)">
+					Test Connection
+				</button>
+				<div style="display: inline-block;">
+					<div class="connection-status-indicator"
+					      ng-show="faxAccount.connectionStatus == faxController.connectionStatusEnum.unknown">
+						<span class="glyphicon">Unknown</span>
+					</div>
+					<div class="connection-status-indicator success"
+					      ng-show="faxAccount.connectionStatus == faxController.connectionStatusEnum.success">
+						<span class="glyphicon">Success</span>
+					</div>
+					<div class="connection-status-indicator failure"
+					      ng-show="faxAccount.connectionStatus == faxController.connectionStatusEnum.failure">
+						<span class="glyphicon">Failure</span>
+					</div>
+				</div>
 			</div>
-			<div class="connection-status-indicator failure"
-			      ng-show="faxController.connectionStatus == faxController.connectionStatusEnum.failure">
-				<span class="glyphicon">Failure</span>
+			<div>
+				<button type="button" class="btn btn-success"
+				        ng-click="faxController.saveSettings(faxAccount)">
+					SAVE SETTINGS
+				</button>
 			</div>
 		</div>
 	</div>
-	<div>
-		<button type="button" class="btn btn-success"
-		        ng-click="faxController.saveSettings()">
-			SAVE SETTINGS
-		</button>
-	</div>
+	<button type="button" class="btn btn-success"
+	        ng-click="faxController.addNewAccount()"
+	        ng-show="faxController.faxAccountList.length == 0">
+		Add New Account
+	</button>
 </div>
 
 

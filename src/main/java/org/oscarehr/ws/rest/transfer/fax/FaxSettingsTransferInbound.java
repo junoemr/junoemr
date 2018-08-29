@@ -20,40 +20,17 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.to.model;
+package org.oscarehr.ws.rest.transfer.fax;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
 
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class FaxAccountSettingsTo1 implements Serializable
+public class FaxSettingsTransferInbound extends FaxSettingsTransferBasic
 {
-	private Boolean enabled;
-	private String accountLogin;
 	private String password;
-
-	public Boolean isEnabled()
-	{
-		return enabled;
-	}
-
-	public void setEnabled(Boolean enabled)
-	{
-		this.enabled = enabled;
-	}
-
-	public String getAccountLogin()
-	{
-		return accountLogin;
-	}
-
-	public void setAccountLogin(String accountLogin)
-	{
-		this.accountLogin = accountLogin;
-	}
 
 	public String getPassword()
 	{

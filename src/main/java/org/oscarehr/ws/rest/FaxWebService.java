@@ -23,18 +23,28 @@
 package org.oscarehr.ws.rest;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.FaxConfigDao;
+import org.oscarehr.common.model.FaxConfig;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.ws.rest.conversion.FaxSettingsConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.to.model.FaxAccountSettingsTo1;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
+import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferInbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 @Path("/fax")
 @Component("FaxWebService")
@@ -45,50 +55,96 @@ public class FaxWebService extends AbstractServiceImpl
 	@Autowired
 	SecurityInfoManager securityInfoManager;
 
+	@Autowired
+	FaxConfigDao faxConfigDao;
+
 	@GET
-	@Path("/enabled")
+	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> isEnabled()
+	public RestSearchResponse<FaxSettingsTransferOutbound> listAccounts(@QueryParam("page")
+	                                                                    @DefaultValue("1")
+			                                                                    Integer page,
+	                                                                    @QueryParam("perPage")
+	                                                                    @DefaultValue("10")
+			                                                                    Integer perPage)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
 
-		return RestResponse.successResponse(false);
+		page = validPageNo(page);
+		perPage = limitedResultCount(perPage);
+		int offset = calculatedOffset(page, perPage);
+
+		List<FaxConfig> configList = faxConfigDao.findAll(offset, perPage);
+
+		return RestSearchResponse.successResponse(FaxSettingsConverter.getAllAsOutboundTransferObject(configList), page, perPage, -1);
 	}
 
 	@GET
-	@Path("/account")
+	@Path("/{id}/enabled")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<FaxAccountSettingsTo1> getAccountSettings()
+	public RestResponse<Boolean> isEnabled(@PathParam("id") Integer id)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
 
-		FaxAccountSettingsTo1 settings = new FaxAccountSettingsTo1();
-		settings.setEnabled(false);
-		settings.setAccountLogin("test value");
+		FaxConfig config = faxConfigDao.find(id);
+		return RestResponse.successResponse(config.isActive());
+	}
 
-		return RestResponse.successResponse(settings);
+	@GET
+	@Path("/{id}/account")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<FaxSettingsTransferOutbound> getAccountSettings(@PathParam("id") Integer id)
+	{
+		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
+
+		FaxSettingsTransferOutbound accountSettingsTo1 = FaxSettingsConverter.getAsOutboundTransferObject(faxConfigDao.find(id));
+		return RestResponse.successResponse(accountSettingsTo1);
 	}
 
 	@POST
 	@Path("/account")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<FaxAccountSettingsTo1> setAccountSettings(FaxAccountSettingsTo1 accountSettingsTo1)
+	public RestResponse<FaxSettingsTransferOutbound> addAccountSettings(FaxSettingsTransferInbound accountSettingsTo1)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin");
 
-		accountSettingsTo1.setPassword(null);
-		return RestResponse.successResponse(accountSettingsTo1);
+		FaxConfig config = FaxSettingsConverter.getAsDomainObject(accountSettingsTo1);
+		faxConfigDao.persist(config);
+
+		return RestResponse.successResponse(FaxSettingsConverter.getAsOutboundTransferObject(config));
+	}
+
+	@PUT
+	@Path("/{id}/account")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<FaxSettingsTransferOutbound> updateAccountSettings(@PathParam("id") Integer id,
+	                                                                       FaxSettingsTransferInbound accountSettingsTo1)
+	{
+		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin");
+
+		FaxConfig config = faxConfigDao.find(id);
+		if(config == null)
+		{
+			throw new RuntimeException("Invalid Fax Config Id: " + id);
+		}
+		config = FaxSettingsConverter.getAsDomainObject(accountSettingsTo1);
+		config.setId(id);
+		faxConfigDao.merge(config);
+		return RestResponse.successResponse(FaxSettingsConverter.getAsOutboundTransferObject(config));
 	}
 
 	@POST
 	@Path("/testConnection")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> testConnection(FaxAccountSettingsTo1 accountSettingsTo1)
+	public RestResponse<Boolean> testConnection(FaxSettingsTransferInbound accountSettingsTo1)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");

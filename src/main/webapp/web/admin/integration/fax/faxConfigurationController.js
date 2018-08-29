@@ -1,20 +1,23 @@
 angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxConfigurationController', [
-	"faxService",
-	function (faxService)
+	"faxConfigService",
+	function (faxConfigService)
 	{
 		var controller = this;
-		controller.settings = {};
-		controller.settings.enabled = false;
 
+		controller.faxAccountList = [];
 		controller.connectionStatusEnum = Object.freeze({"unknown":1, "success":2, "failure":3});
-		controller.connectionStatus = controller.connectionStatusEnum.unknown;
 
-		controller.loadSettings = function()
+
+		controller.initialize = function()
 		{
-			faxService.getAccountSettings().then(
+			faxConfigService.listAccounts().then(
 				function success(response)
 				{
-					controller.settings = response;
+					controller.faxAccountList = response;
+					for(let i=0; i< controller.faxAccountList.length; i++)
+					{
+						controller.faxAccountList[i].connectionStatus = controller.connectionStatusEnum.unknown;
+					}
 				},
 				function error(error)
 				{
@@ -22,42 +25,71 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxCon
 				}
 			)
 		};
-		controller.saveSettings = function()
+
+		controller.addNewAccount = function()
 		{
-			faxService.setAccountSettings(controller.settings).then(
-				function success(response)
-				{
-					console.info("settings saved");
-					controller.settings = response;
-				},
-				function error(error)
-				{
-					console.error(error);
-				}
-			)
+			let newAccountSettings = {
+				enabled: true,
+				connectionStatus: controller.connectionStatusEnum.unknown,
+				accountLogin: '',
+				password: ''
+			};
+			controller.faxAccountList.push(newAccountSettings);
 		};
-		controller.testConnection = function()
+
+		controller.saveSettings = function (faxAccount)
 		{
-			faxService.testConnection(controller.settings).then(
+			if (faxAccount.id)
+			{
+				faxConfigService.updateAccountSettings(faxAccount.id, faxAccount).then(
+					function success(response)
+					{
+						console.info("settings saved");
+						faxAccount = response;
+					},
+					function error(error)
+					{
+						console.error(error);
+					}
+				)
+			}
+			else
+			{
+				faxConfigService.addAccountSettings(faxAccount).then(
+					function success(response)
+					{
+						console.info("settings saved");
+						faxAccount = response;
+					},
+					function error(error)
+					{
+						console.error(error);
+					}
+				)
+			}
+		};
+		controller.testConnection = function(faxAccount)
+		{
+			faxConfigService.testConnection(faxAccount).then(
 				function success(response)
 				{
 					if(response)
 					{
-						controller.connectionStatus = controller.connectionStatusEnum.success;
+						faxAccount.connectionStatus = controller.connectionStatusEnum.success;
 					}
 					else
 					{
-						controller.connectionStatus = controller.connectionStatusEnum.failure;
+						faxAccount.connectionStatus = controller.connectionStatusEnum.failure;
 					}
 				},
 				function error(error)
 				{
 					console.error(error);
-					controller.connectionStatus = controller.connectionStatusEnum.unknown;
+					faxAccount.connectionStatus = controller.connectionStatusEnum.unknown;
 				}
 			)
 		};
 
-		controller.loadSettings();
+		controller.initialize();
 	}
 ]);
