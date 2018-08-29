@@ -34,6 +34,7 @@
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
 <%@page import="org.oscarehr.common.dao.UserPropertyDAO, org.oscarehr.common.model.UserProperty, org.springframework.web.context.support.WebApplicationContextUtils" %>
 <%@page import="org.oscarehr.common.model.Site"%>
+<%@page import="oscar.OscarProperties" %>
 
 <%
     if(session.getAttribute("user") == null ) response.sendRedirect("../../logout.jsp");
@@ -317,6 +318,13 @@ function setOrder(val){
                                    <bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgPatient"/>
                                    </a>
                                 </th>
+                                <% if (OscarProperties.getInstance().isPropertyActive("view_consultation_requests.show_patient_emails")) { %>
+                                <th align="left" class="VCRheads" width="75">
+                                    <a href=# onclick="setOrder('11'); return false;">
+                                        <bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgPatientEmail"/>
+                                    </a>
+                                </th>
+                                <%} %>
                                 <th align="left" class="VCRheads">
                                    <a href=# onclick="setOrder('4'); return false;">
                                    <bean:message key="oscarEncounter.oscarConsultationRequest.ViewConsultationRequests.msgProvider"/>
@@ -379,6 +387,7 @@ function setOrder(val){
                             String id      = (String) theRequests.ids.elementAt(i);
                             String status  = (String) theRequests.status.elementAt(i);
                             String patient = (String) theRequests.patient.elementAt(i);
+                            String patientEmail = (String) theRequests.patientEmail.elementAt(i);
                             String provide = (String) theRequests.provider.elementAt(i);
                             String service = (String) theRequests.service.elementAt(i);
                             String date    = (String) theRequests.date.elementAt(i);
@@ -389,7 +398,8 @@ function setOrder(val){
                             String sendTo = theRequests.teams.elementAt(i);
                             String specialist = theRequests.vSpecialist.elementAt(i);
                             String followUpDate = theRequests.followUpDate.elementAt(i);
-                            String siteName = ""; 
+                            String siteName = "";
+
                             if (bMultisites) {
                             	siteName = (String) theRequests.siteName.elementAt(i);
                             }
@@ -459,6 +469,13 @@ function setOrder(val){
                                     <%=patient%>
                                     </a>
                                 </td>
+                                <% if (OscarProperties.getInstance().isPropertyActive("view_consultation_requests.show_patient_emails")) { %>
+                                <td class="stat<%=status%>">
+                                    <a href="mailto:<%=patientEmail%>">
+                                    <%=patientEmail%>
+                                    </a>
+                                </td>
+                                <% } %>
                                 <td class="stat<%=status%>">
                                     <%=provide%>
                                 </td>
