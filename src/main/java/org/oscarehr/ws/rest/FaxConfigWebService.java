@@ -23,8 +23,8 @@
 package org.oscarehr.ws.rest;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.FaxConfigDao;
-import org.oscarehr.common.model.FaxConfig;
+import org.oscarehr.fax.dao.FaxConfigDao;
+import org.oscarehr.fax.model.FaxConfig;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.conversion.FaxSettingsConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -46,11 +46,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
-@Path("/fax")
-@Component("FaxWebService")
-public class FaxWebService extends AbstractServiceImpl
+@Path("/faxConfig")
+@Component("FaxConfigWebService")
+public class FaxConfigWebService extends AbstractServiceImpl
 {
-	private static Logger logger = Logger.getLogger(FaxWebService.class);
+	private static Logger logger = Logger.getLogger(FaxConfigWebService.class);
 
 	@Autowired
 	SecurityInfoManager securityInfoManager;
@@ -59,7 +59,7 @@ public class FaxWebService extends AbstractServiceImpl
 	FaxConfigDao faxConfigDao;
 
 	@GET
-	@Path("/")
+	@Path("/search")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<FaxSettingsTransferOutbound> listAccounts(@QueryParam("page")
 	                                                                    @DefaultValue("1")
@@ -93,7 +93,7 @@ public class FaxWebService extends AbstractServiceImpl
 	}
 
 	@GET
-	@Path("/{id}/account")
+	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxSettingsTransferOutbound> getAccountSettings(@PathParam("id") Integer id)
 	{
@@ -105,7 +105,7 @@ public class FaxWebService extends AbstractServiceImpl
 	}
 
 	@POST
-	@Path("/account")
+	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxSettingsTransferOutbound> addAccountSettings(FaxSettingsTransferInbound accountSettingsTo1)
@@ -120,7 +120,7 @@ public class FaxWebService extends AbstractServiceImpl
 	}
 
 	@PUT
-	@Path("/{id}/account")
+	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxSettingsTransferOutbound> updateAccountSettings(@PathParam("id") Integer id,

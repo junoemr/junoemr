@@ -21,7 +21,9 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.model;
+package org.oscarehr.fax.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,7 +33,8 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="fax_config")
-public class FaxConfig extends AbstractModel<Integer> {
+public class FaxConfig extends AbstractModel<Integer>
+{
 	
 	private static final long serialVersionUID = 1L;
 	

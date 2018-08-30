@@ -21,9 +21,10 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.fax.dao;
 
-import org.oscarehr.common.model.FaxConfig;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.fax.model.FaxConfig;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;

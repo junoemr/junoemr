@@ -22,7 +22,7 @@
  */
 package org.oscarehr.ws.rest.conversion;
 
-import org.oscarehr.common.model.FaxConfig;
+import org.oscarehr.fax.model.FaxConfig;
 import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferInbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferOutbound;
 

@@ -32,7 +32,7 @@ angular.module("Common.Services").service("faxConfigService", [
 	{
 		var service = {};
 
-		service.apiPath = '../ws/rs/fax';
+		service.apiPath = '../ws/rs/faxConfig';
 
 		service.listAccounts = function listAccounts(page, perPage)
 		{
@@ -43,7 +43,7 @@ angular.module("Common.Services").service("faxConfigService", [
 				perPage: perPage
 			};
 
-			junoHttp.get(service.apiPath + '/', config).then(
+			junoHttp.get(service.apiPath + '/search', config).then(
 				function success(response) {
 					deferred.resolve(response.data);
 				},
@@ -74,7 +74,7 @@ angular.module("Common.Services").service("faxConfigService", [
 			var deferred = $q.defer();
 			var config = Juno.Common.ServiceHelper.configHeaders();
 
-			junoHttp.get(service.apiPath + '/' + id + '/account', config).then(
+			junoHttp.get(service.apiPath + '/' + id, config).then(
 				function success(response) {
 					deferred.resolve(response.data);
 				},
@@ -89,7 +89,7 @@ angular.module("Common.Services").service("faxConfigService", [
 		{
 			var deferred = $q.defer();
 
-			junoHttp.post(service.apiPath + '/account', transfer).then(
+			junoHttp.post(service.apiPath, transfer).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);
@@ -106,7 +106,7 @@ angular.module("Common.Services").service("faxConfigService", [
 		{
 			var deferred = $q.defer();
 
-			junoHttp.put(service.apiPath + '/' + id + '/account', transfer).then(
+			junoHttp.put(service.apiPath + '/' + id, transfer).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);

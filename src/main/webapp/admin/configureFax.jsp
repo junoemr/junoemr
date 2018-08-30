@@ -39,8 +39,8 @@ if(!authed) {
 }
 %>
 
-<%@page import="org.oscarehr.common.dao.FaxConfigDao"%>
-<%@page import="org.oscarehr.common.model.FaxConfig"%>
+<%@page import="org.oscarehr.fax.dao.FaxConfigDao"%>
+<%@page import="org.oscarehr.fax.model.FaxConfig"%>
 <%@page import="org.oscarehr.common.dao.QueueDao"%>
 <%@page import="org.oscarehr.common.model.Queue" %>
 <%@page import="org.oscarehr.util.SpringUtils"%>

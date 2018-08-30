@@ -23,7 +23,7 @@
     Ontario, Canada
 
 --%>
-<%@ page import="org.oscarehr.common.dao.FaxConfigDao, org.oscarehr.common.dao.OscarAppointmentDao,org.oscarehr.common.dao.SiteDao, org.oscarehr.common.model.Appointment, org.oscarehr.common.model.FaxConfig"%>
+<%@ page import="org.oscarehr.fax.dao.FaxConfigDao, org.oscarehr.common.dao.OscarAppointmentDao,org.oscarehr.common.dao.SiteDao, org.oscarehr.common.model.Appointment, org.oscarehr.fax.model.FaxConfig"%>
 <%@ page import="org.oscarehr.common.model.PharmacyInfo" %>
 <%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet" %>
