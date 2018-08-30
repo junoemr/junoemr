@@ -22,19 +22,20 @@
  */
 package org.oscarehr.fax.externalApi;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -292,36 +293,51 @@ public class SRFaxApiConnector
 		{
 			HttpClient httpClient = new DefaultHttpClient();
 
-			String queryString = _prepareQueryString(postVariables);
-			HttpPost httpPost = new HttpPost(serverUrl + "?" + queryString);
+			logger.info("POST URL: " + serverUrl);
+			HttpPost httpPost = new HttpPost(serverUrl);
 
+			// convert map to post-able list
+			ArrayList<NameValuePair> postParameters = new ArrayList<>(postVariables.size());
+			for(Map.Entry<String, String> entry : postVariables.entrySet())
+			{
+				postParameters.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+			}
+			UrlEncodedFormEntity urlEntity = new UrlEncodedFormEntity(postParameters);
+			httpPost.setEntity(urlEntity);
+
+			// execute api call
 			HttpResponse httpResponse = httpClient.execute(httpPost);
+			logger.info("RESPONSE INFO:\nstatusCode=>" + httpResponse.getStatusLine().getStatusCode() + ",\nreason=>" + httpResponse.getStatusLine().getReasonPhrase());
 
 			HttpEntity entity = httpResponse.getEntity();
 
-			byte[] buffer = new byte[1024];
+//			byte[] buffer = new byte[1024];
 			if(entity != null)
 			{
-				InputStream inputStream = entity.getContent();
-				try
+				try(InputStream inputStream = entity.getContent())
 				{
-					int bytesRead = 0;
-					BufferedInputStream bis = new BufferedInputStream(inputStream);
-					while((bytesRead = bis.read(buffer)) != -1)
-					{
-						String chunk = new String(buffer, 0, bytesRead);
-					}
+					result = IOUtils.toString(inputStream, "UTF-8");
 				}
-				finally
-				{
-					try
-					{
-						inputStream.close();
-					}
-					catch(Exception ignore)
-					{
-					}
-				}
+//
+//				try
+//				{
+//					int bytesRead = 0;
+//					BufferedInputStream bis = new BufferedInputStream(inputStream);
+//					while((bytesRead = bis.read(buffer)) != -1)
+//					{
+//						String chunk = new String(buffer, 0, bytesRead);
+//					}
+//				}
+//				finally
+//				{
+//					try
+//					{
+//						inputStream.close();
+//					}
+//					catch(Exception ignore)
+//					{
+//					}
+//				}
 			}
 		}
 		catch(IOException e)
@@ -330,22 +346,6 @@ public class SRFaxApiConnector
 			throw new RuntimeException(e);
 		}
 		return result;
-	}
-
-
-	private String _prepareQueryString(Map<String, String> postVariables) throws UnsupportedEncodingException
-	{
-		ArrayList<String> variables = new ArrayList<>(postVariables.size());
-		for(Map.Entry<String, String> entry : postVariables.entrySet())
-		{
-			variables.add(entry.getKey() + "=" + UrlEncode(entry.getValue()));
-		}
-		return String.join("&", variables);
-	}
-
-	public static String UrlEncode(String str) throws UnsupportedEncodingException
-	{
-		return URLEncoder.encode(str, "UTF-8");
 	}
 
 	private Map<String, String> _preparePostVariables(String[] requiredFields, String[] optionalFields, Map<String, String> parameters)
