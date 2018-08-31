@@ -1,16 +1,72 @@
 .fax-config {
-  .input-label {
-	width: 200px;
-	text-align: right;
+  .fax-config-header {
+	padding: 15px;
   }
-  .connection-status-indicator {
-	background-color: $medium-grey;
-	&.success {
-	  background-color: $success-green;
-	}
-	&.failure {
-	  background-color: $failure-red;
-	}
-  }
+  .fax-config-body {
+	.account-list {
+	  padding: 5px;
+	  background-color: $primary-white;
+	  .account-item {
+		background-color: $light-grey;
+		border: 2px $medium-grey;
+		padding: 10px;
 
+		display: flex;
+		flex-direction: row;
+		justify-content: start;
+		align-items: center;
+	  }
+	  .glyphicon {
+		font-size: 30px;
+		&.enabled {
+		  color: $success-green;
+		}
+		&.disabled {
+		  color: $failure-red;
+		}
+	  }
+	}
+  }
+  .fax-config-footer {
+
+  }
+}
+
+//hack to re-center modal for now
+.modal-dialog {
+  left: auto !important;
+}
+.faxEditModal {
+  .modal-content {
+	background-color: $primary-blue;
+  }
+  .modal-body {
+	padding:30px;
+	background-color: $primary-white;
+
+	.input-label {
+	  width: 200px;
+	  text-align: right;
+	}
+	.glyphicon {
+	  font-size: 25px;
+	  &.unknown {
+		color: $dark-grey;
+	  }
+	  &.success {
+		color: $success-green;
+	  }
+	  &.failure {
+		color: $failure-red;
+	  }
+	}
+  }
+  .modal-header {
+	color: $primary-white;
+  }
+  .modal-footer {
+	background-color: $light-grey;
+	padding-top: 20px;
+	padding-bottom: 20px;
+  }
 }

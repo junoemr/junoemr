@@ -49,58 +49,37 @@
 <title>FAX Title</title>
 
 <div class="fax-config">
-	<div ng-repeat="faxAccount in faxController.faxAccountList">
-		<div>
-			<label class="switch">
-				<input id="input-fax-enabled-{{faxAccount.id}}" type="checkbox"
-				       ng-model="faxAccount.enabled"/>
-				<span class="slider"></span>
-			</label>
-			<label for="input-fax-enabled-{{faxAccount.id}}">ENABLED</label>
-		</div>
-		<div>
-			<div>
-				<label class="input-label" for="input-fax-account-id-{{faxAccount.id}}">User Number</label>
-				<input id="input-fax-account-id-{{faxAccount.id}}" type="text"
-				       ng-model="faxAccount.accountLogin">
-				<label for="input-fax-account-pw-{{faxAccount.id}}">Password</label>
-				<input id="input-fax-account-pw-{{faxAccount.id}}" type="password"
-				       ng-model="faxAccount.password">
-			</div>
-			<div>
-				<label class="input-label">Connection Status</label>
-				<button type="button" class="btn"
-				        ng-click="faxController.testConnection(faxAccount)">
-					Test Connection
-				</button>
-				<div style="display: inline-block;">
-					<div class="connection-status-indicator"
-					      ng-show="faxAccount.connectionStatus == faxController.connectionStatusEnum.unknown">
-						<span class="glyphicon">Unknown</span>
-					</div>
-					<div class="connection-status-indicator success"
-					      ng-show="faxAccount.connectionStatus == faxController.connectionStatusEnum.success">
-						<span class="glyphicon">Success</span>
-					</div>
-					<div class="connection-status-indicator failure"
-					      ng-show="faxAccount.connectionStatus == faxController.connectionStatusEnum.failure">
-						<span class="glyphicon">Failure</span>
-					</div>
+	<div class="fax-config-header">
+		<button type="button" class="btn btn-success"
+		<%--ng-show="faxController.faxAccountList.length == 0"--%>
+		        ng-click="faxController.editNewFaxAccount()">
+			Add New Account
+		</button>
+	</div>
+	<div class="fax-config-body">
+		<div class="account-list" ng-repeat="faxAccount in faxController.faxAccountList">
+			<div class="account-item">
+				<div>
+					<span class="glyphicon enabled glyphicon-ok" ng-show="faxAccount.enabled"></span>
+					<span class="glyphicon disabled glyphicon-remove" ng-hide="faxAccount.enabled"></span>
 				</div>
-			</div>
-			<div>
+				<div>
+					<span>{{faxAccount.accountLogin}}</span>
+				</div>
+				<div>
+					<span>{{faxAccount.displayName}}</span>
+				</div>
 				<button type="button" class="btn btn-success"
-				        ng-click="faxController.saveSettings(faxAccount)">
-					SAVE SETTINGS
+				        <%-- TODO disable button for non-admin users? --%>
+				        ng-click="faxController.editFaxAccount(faxAccount)">
+					Edit Account
 				</button>
 			</div>
 		</div>
 	</div>
-	<button type="button" class="btn btn-success"
-	        ng-click="faxController.addNewAccount()"
-	        ng-show="faxController.faxAccountList.length == 0">
-		Add New Account
-	</button>
+	<div class="fax-config-footer">
+
+	</div>
 </div>
 
 

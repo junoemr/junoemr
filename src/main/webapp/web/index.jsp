@@ -547,6 +547,8 @@
 <script type="text/javascript" src="admin/integration/fax/module.js"></script>
 <script type="text/javascript" src="admin/integration/fax/faxConfiguration.jsp"></script>
 <script type="text/javascript" src="admin/integration/fax/faxConfigurationController.js"></script>
+<script type="text/javascript" src="admin/integration/fax/faxConfigurationEdit.jsp"></script>
+<script type="text/javascript" src="admin/integration/fax/faxConfigurationEditController.js"></script>
 
 <script type="text/javascript" src="billing/billingController.js"></script>
 

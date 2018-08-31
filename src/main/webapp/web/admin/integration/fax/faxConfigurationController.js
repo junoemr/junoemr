@@ -1,12 +1,11 @@
 angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxConfigurationController', [
+	"$uibModal",
 	"faxConfigService",
-	function (faxConfigService)
+	function ($uibModal,
+	          faxConfigService)
 	{
 		var controller = this;
-
 		controller.faxAccountList = [];
-		controller.connectionStatusEnum = Object.freeze({"unknown":1, "success":2, "failure":3});
-
 
 		controller.initialize = function()
 		{
@@ -14,10 +13,6 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxCon
 				function success(response)
 				{
 					controller.faxAccountList = response;
-					for(let i=0; i< controller.faxAccountList.length; i++)
-					{
-						controller.faxAccountList[i].connectionStatus = controller.connectionStatusEnum.unknown;
-					}
 				},
 				function error(error)
 				{
@@ -26,68 +21,52 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxCon
 			)
 		};
 
-		controller.addNewAccount = function()
+		controller.editNewFaxAccount = function editNewFaxAccount()
 		{
-			let newAccountSettings = {
-				enabled: true,
-				connectionStatus: controller.connectionStatusEnum.unknown,
-				accountLogin: '',
-				password: ''
-			};
-			controller.faxAccountList.push(newAccountSettings);
+			controller.editFaxAccount();
 		};
+		controller.editFaxAccount = function editFaxAccount(faxAccount)
+		{
+			let isNewAcct = true;
+			if(faxAccount)
+			{
+				isNewAcct = false;
+			}
 
-		controller.saveSettings = function (faxAccount)
-		{
-			if (faxAccount.id)
-			{
-				faxConfigService.updateAccountSettings(faxAccount.id, faxAccount).then(
-					function success(response)
-					{
-						console.info("settings saved");
-						faxAccount = response;
-					},
-					function error(error)
-					{
-						console.error(error);
-					}
-				)
-			}
-			else
-			{
-				faxConfigService.addAccountSettings(faxAccount).then(
-					function success(response)
-					{
-						console.info("settings saved");
-						faxAccount = response;
-					},
-					function error(error)
-					{
-						console.error(error);
-					}
-				)
-			}
-		};
-		controller.testConnection = function(faxAccount)
-		{
-			faxConfigService.testConnection(faxAccount).then(
-				function success(response)
+			var modalInstance = $uibModal.open(
 				{
-					if(response)
+					templateUrl: 'admin/integration/fax/faxConfigurationEdit.jsp',
+					controller: 'Admin.Integration.Fax.FaxConfigurationEditController as faxConfigEditController',
+					backdrop: 'static',
+					windowClass: 'faxEditModal',
+					resolve:
+						{
+							faxAccount: function()
+							{
+								return faxAccount;
+							}
+						}
+				});
+
+			modalInstance.result.then(
+				// the object passed back on closing
+				function success(updatedAccount)
+				{
+					if(isNewAcct)
 					{
-						faxAccount.connectionStatus = controller.connectionStatusEnum.success;
+						// new accounts get added to the account list
+						controller.faxAccountList.push(updatedAccount);
 					}
 					else
 					{
-						faxAccount.connectionStatus = controller.connectionStatusEnum.failure;
+						// clear the existing properties and replace with the updated ones
+						angular.copy(updatedAccount, faxAccount);
 					}
 				},
-				function error(error)
+				function error(errors)
 				{
-					console.error(error);
-					faxAccount.connectionStatus = controller.connectionStatusEnum.unknown;
-				}
-			)
+					// do nothing on dismissal
+				});
 		};
 
 		controller.initialize();
