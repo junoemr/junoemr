@@ -31,7 +31,6 @@ import org.oscarehr.phr.model.PHRMedication;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
-import oscar.oscarRx.data.RxAllergyWarningWorker;
 import oscar.oscarRx.data.RxDrugData;
 import oscar.oscarRx.data.RxInteractionData;
 import oscar.oscarRx.data.RxPatientData;
@@ -57,7 +56,6 @@ public class RxSessionBean implements Serializable
    // private ArrayList stash=new ArrayList();
     private int stashIndex = -1;
     private Hashtable<String, Allergy[]> allergyWarnings = new Hashtable<>();
-    private Hashtable<String, RxAllergyWarningWorker> workingAllergyWarnings = new Hashtable<>();
     private ArrayList attributeNames = new ArrayList();
     private String interactingDrugList="";//contains hash tables, each hashtable has the a
     private List<String> reRxDrugIdList=new ArrayList<>();
@@ -259,8 +257,6 @@ public class RxSessionBean implements Serializable
 	    else
 	    {
 		    stash.add(item);
-		    preloadInteractions();
-		    preloadAllergyWarnings(loggedInInfo, item.getAtcCode());
 		    return this.getStashSize() - 1;
 	    }
     }
@@ -284,97 +280,48 @@ public class RxSessionBean implements Serializable
         return (this.demographicNo > 0 && this.providerNo != null && this.providerNo.length() > 0);
     }
 
-    private void preloadInteractions(){
-       RxInteractionData interact = RxInteractionData.getInstance();
-       interact.preloadInteraction(this.getAtcCodes());
-    }
-
     public void clearAllergyWarnings(){
        allergyWarnings =null;
        allergyWarnings = new Hashtable<>();
     }
 
-
-	private void preloadAllergyWarnings(LoggedInInfo loggedInInfo, String atccode)
-	{
-		try
-		{
-			if(atccode != null)
-			{
-				Allergy[] allergies = RxPatientData.getPatient(loggedInInfo, getDemographicNo()).getActiveAllergies();
-				RxAllergyWarningWorker worker = new RxAllergyWarningWorker(this, atccode, allergies);
-				addToWorkingAllergyWarnings(atccode, worker);
-				worker.start();
-			}
-			else
-			{
-				logger.error("Aborted attempt to preload Rx Allergy Warnings with null ATC code.");
-			}
-		}
-		catch(Exception e)
-		{
-			logger.error("Error for demographic " + getDemographicNo(), e);
-		}
-	}
-
     public void addAllergyWarnings(String atc,Allergy[] allergy){
        allergyWarnings.put(atc, allergy);
     }
 
-    public void addToWorkingAllergyWarnings(String atc,RxAllergyWarningWorker worker){
-       workingAllergyWarnings.put(atc,worker);
-    }
-    public void removeFromWorkingAllergyWarnings(String atc){
-       workingAllergyWarnings.remove(atc);
-    }
+	public Allergy[] getAllergyWarnings(LoggedInInfo loggedInInfo, String atccode)
+	{
+		Allergy[] allergies = null;
 
-
-    public Allergy[] getAllergyWarnings(LoggedInInfo loggedInInfo, String atccode){
-      Allergy[] allergies = null;
-
-      //Check to see if Allergy checking property is on and if atccode is not null and if atccode is not "" or "null"
-
-      if (OscarProperties.getInstance().getBooleanProperty("RX_ALLERGY_CHECKING","yes") && atccode != null && !atccode.equals("") && !atccode.equals("null")){
-      	logger.debug("Checking allergy reaction : "+atccode);
-      	if (allergyWarnings.containsKey(atccode) ){
-
-             allergies = allergyWarnings.get(atccode);
-          }else if(workingAllergyWarnings.containsKey(atccode) ){
-
-             RxAllergyWarningWorker worker = workingAllergyWarnings.get(atccode);
-             if (worker != null){
-                 try {
-                    worker.join();
-
-                    // Finished
-                 } catch (InterruptedException e) {
-                    // Thread was interrupted
-
-                    logger.error("Error", e);
-                 }
-
-
-             }
-             allergies = allergyWarnings.get(atccode);
-
-          }else{
-         	 logger.debug("NEW ATC CODE for allergy");
-             try{
-                RxDrugData drugData = new RxDrugData();
-                Allergy[]  allAllergies = RxPatientData.getPatient(loggedInInfo, getDemographicNo()).getActiveAllergies();
-                allergies = drugData.getAllergyWarnings(atccode,allAllergies);
-                    if (allergies != null){
-                       addAllergyWarnings(atccode,allergies);
-                    }
-             }catch(Exception e){
-            	 logger.error("Error", e);
-             }
-          }
-      }
-      return allergies;
-   }
-
-
+		if (OscarProperties.getInstance().getBooleanProperty("RX_ALLERGY_CHECKING", "yes")
+				&& atccode != null && !atccode.equals("") && !atccode.equals("null"))
+		{
+			logger.debug("Checking allergy reaction : " + atccode);
+			if (allergyWarnings.containsKey(atccode))
+			{
+				allergies = allergyWarnings.get(atccode);
+			}
+			else
+			{
+				logger.debug("NEW ATC CODE for allergy");
+				try
+				{
+					RxDrugData drugData = new RxDrugData();
+					Allergy[] allAllergies = RxPatientData.getPatient(loggedInInfo, getDemographicNo()).getActiveAllergies();
+					allergies = drugData.getAllergyWarnings(atccode, allAllergies);
+					if (allergies != null)
+					{
+						addAllergyWarnings(atccode, allergies);
+					}
+				}
+				catch (Exception e)
+				{
+					logger.error("Error getting allergy warnings.", e);
+				}
+			}
+		}
+		return allergies;
+	}
 
     public Vector getAtcCodes(){
        RxPrescriptionData rxData = new RxPrescriptionData();
@@ -427,7 +374,7 @@ public class RxSessionBean implements Serializable
 			{
 				try
 				{
-					interactions = rxInteract.getInteractions(atcCodes);
+						interactions = rxInteract.getInteractions(atcCodes);
 					logger.debug("interactions " + interactions.length);
 					for(int i = 0; i < interactions.length; i++)
 					{
