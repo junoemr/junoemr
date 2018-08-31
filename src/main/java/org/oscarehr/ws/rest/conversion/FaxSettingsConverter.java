@@ -46,6 +46,7 @@ public class FaxSettingsConverter
 		transfer.setId(config.getId());
 		transfer.setAccountLogin(config.getFaxUser());
 		transfer.setEnabled(config.isActive());
+		// never include password in outbound transfers
 		return transfer;
 	}
 

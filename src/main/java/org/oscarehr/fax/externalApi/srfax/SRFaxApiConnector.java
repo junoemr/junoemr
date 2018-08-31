@@ -20,8 +20,10 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.externalApi;
+package org.oscarehr.fax.externalApi.srfax;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -32,6 +34,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
+import org.oscarehr.fax.externalApi.srfax.result.SRFaxGetUsageResult;
+import org.oscarehr.fax.externalApi.srfax.result.SRFaxListResultWrapper;
+import org.oscarehr.fax.externalApi.srfax.result.SRFaxSingleResultWrapper;
 import org.oscarehr.util.MiscUtils;
 
 import java.io.IOException;
@@ -45,13 +50,9 @@ import java.util.Map;
 public class SRFaxApiConnector
 {
 	private static final Logger logger = MiscUtils.getLogger();
-
-	private String serverUrl = "https://www.srfax.com/SRF_SecWebSvc.php";
-
-	private String access_id;
-	private String access_pwd;
-	private boolean lastStatus;
-	private String lastResponse;
+	private static final String serverUrl = "https://www.srfax.com/SRF_SecWebSvc.php";
+	private final String access_id;
+	private final String access_pwd;
 
 	public SRFaxApiConnector(String username, String password)
 	{
@@ -59,8 +60,7 @@ public class SRFaxApiConnector
 		this.access_pwd = password;
 	}
 
-
-	public boolean Queue_Fax(Map<String, String> parameters)
+	public SRFaxSingleResultWrapper<String> Queue_Fax(Map<String, String> parameters)
 	{
 		String[] requiredFields = {"sCallerID", "sSenderEmail", "sFaxType", "sToFaxNumber"};
 		String[] optionalFields = {"sResponseFormat", "sAccountCode", "sRetries", "sCoverPage", "sCPFromName", "sCPToName", "sCPOrganization",
@@ -76,13 +76,10 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		_processResponse(result);
-
-		return lastStatus;
-
+		return _processResponse(result, new TypeReference<SRFaxSingleResultWrapper<String>>(){});
 	}
 
-	public boolean Get_FaxStatus(Map<String, String> parameters)
+	public SRFaxSingleResultWrapper<String> Get_FaxStatus(Map<String, String> parameters)
 	{
 		String[] requiredFields = {"sFaxDetailsID"};
 		String[] optionalFields = {"sResponseFormat"};
@@ -97,12 +94,10 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		_processResponse(result);
-
-		return lastStatus;
+		return _processResponse(result, new TypeReference<SRFaxListResultWrapper<String>>(){});
 	}
 
-	public boolean Get_MultiFaxStatus(Map<String, String> parameters)
+	public SRFaxListResultWrapper<String> Get_MultiFaxStatus(Map<String, String> parameters)
 	{
 		String[] requiredFields = {"sFaxDetailsID"};
 		String[] optionalFields = {"sResponseFormat"};
@@ -117,13 +112,10 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		_processResponse(result);
-
-		return lastStatus;
+		return _processResponse(result, new TypeReference<SRFaxListResultWrapper<String>>(){});
 	}
 
-
-	public boolean Get_Fax_Inbox(Map<String, String> parameters)
+	public SRFaxListResultWrapper<String> Get_Fax_Inbox(Map<String, String> parameters)
 	{
 
 		String[] requiredFields = {};
@@ -138,13 +130,10 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		_processResponse(result);
-
-		return lastStatus;
-
+		return _processResponse(result, new TypeReference<SRFaxListResultWrapper<String>>(){});
 	}
 
-	public boolean Get_Fax_Outbox(Map<String, String> parameters)
+	public SRFaxListResultWrapper<String> Get_Fax_Outbox(Map<String, String> parameters)
 	{
 
 		String[] requiredFields = {};
@@ -159,13 +148,10 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		_processResponse(result);
-
-		return lastStatus;
-
+		return _processResponse(result, new TypeReference<SRFaxListResultWrapper<String>>(){});
 	}
 
-	public boolean Retrieve_Fax(Map<String, String> parameters)
+	public SRFaxSingleResultWrapper<String> Retrieve_Fax(Map<String, String> parameters)
 	{
 		String[] requiredFields = {"sFaxFileName|sFaxDetailsID", "sDirection"};
 		String[] optionalFields = {"sFaxFormat", "sMarkasViewed", "sResponseFormat", "sSubUserID"};
@@ -180,12 +166,10 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		_processResponse(result);
-
-		return lastStatus;
+		return _processResponse(result, new TypeReference<SRFaxSingleResultWrapper<String>>(){});
 	}
 
-	public boolean Update_Viewed_Status(Map<String, String> parameters)
+	public SRFaxSingleResultWrapper<String> Update_Viewed_Status(Map<String, String> parameters)
 	{
 		String[] requiredFields = {"sFaxFileName|sFaxDetailsID", "sDirection", "sMarkasViewed"};
 		String[] optionalFields = {"sResponseFormat"};
@@ -200,13 +184,10 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		_processResponse(result);
-
-		return lastStatus;
-
+		return _processResponse(result, new TypeReference<SRFaxSingleResultWrapper<String>>(){});
 	}
 
-	public boolean Delete_Fax(Map<String, String> parameters)
+	public SRFaxSingleResultWrapper<String> Delete_Fax(Map<String, String> parameters)
 	{
 		String[] requiredFields = {"sDirection", "sFaxFileName_*|sFaxDetailsID_*"};
 		String[] optionalFields = {"sResponseFormat"};
@@ -221,13 +202,10 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		_processResponse(result);
-
-		return lastStatus;
-
+		return _processResponse(result, new TypeReference<SRFaxSingleResultWrapper<String>>(){});
 	}
 
-	public boolean Stop_Fax(Map<String, String> parameters)
+	public SRFaxSingleResultWrapper<String> Stop_Fax(Map<String, String> parameters)
 	{
 		String[] requiredFields = {"sFaxDetailsID"};
 		String[] optionalFields = {"sResponseFormat"};
@@ -242,12 +220,10 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		_processResponse(result);
-
-		return lastStatus;
+		return _processResponse(result, new TypeReference<SRFaxSingleResultWrapper<String>>(){});
 	}
 
-	public boolean Get_Fax_Usage(Map<String, String> parameters)
+	public SRFaxListResultWrapper<SRFaxGetUsageResult> Get_Fax_Usage(Map<String, String> parameters)
 	{
 		String[] requiredFields = {};
 		String[] optionalFields = {"sResponseFormat", "sPeriod", "sStartDate", "sEndDate", "sIncludeSubUsers"};
@@ -262,28 +238,34 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		_processResponse(result);
-
-		return lastStatus;
-	}
-
-	public String Get_Last_Response()
-	{
-		return lastResponse;
-	}
-
-	public boolean Get_Last_Status()
-	{
-		return lastStatus;
+		return SRFaxApiConnector._processResponse(result, new TypeReference<SRFaxListResultWrapper<SRFaxGetUsageResult>>(){});
 	}
 
 	/*******************INTERNAL FUNCTIONS*********************************/
 
 
-	private void _processResponse(String response)
+	private static <Wrapper> Wrapper _processResponse(String response, TypeReference typeReference)
 	{
-		lastStatus = response.contains("Success");
-		lastResponse = response;
+		Wrapper result = null;
+
+		try
+		{
+			if(response.contains("Success"))
+			{
+				ObjectMapper mapper = new ObjectMapper();
+				result = mapper.readValue(response, typeReference);
+			}
+			else
+			{
+				//TODO handle errors
+				logger.warn("API Response Failure: " + response);
+			}
+		}
+		catch(IOException e)
+		{
+			logger.error("Error", e);
+		}
+		return result;
 	}
 
 	private String _processRequest(Map<String, String> postVariables)
@@ -293,7 +275,7 @@ public class SRFaxApiConnector
 		{
 			HttpClient httpClient = new DefaultHttpClient();
 
-			logger.info("POST URL: " + serverUrl);
+			logger.debug("POST URL: " + serverUrl);
 			HttpPost httpPost = new HttpPost(serverUrl);
 
 			// convert map to post-able list
@@ -307,37 +289,17 @@ public class SRFaxApiConnector
 
 			// execute api call
 			HttpResponse httpResponse = httpClient.execute(httpPost);
-			logger.info("RESPONSE INFO:\nstatusCode=>" + httpResponse.getStatusLine().getStatusCode() + ",\nreason=>" + httpResponse.getStatusLine().getReasonPhrase());
+			logger.debug("RESPONSE INFO:\n" +
+					"statusCode=>" + httpResponse.getStatusLine().getStatusCode() + ",\n" +
+					"reason=>" + httpResponse.getStatusLine().getReasonPhrase());
 
 			HttpEntity entity = httpResponse.getEntity();
-
-//			byte[] buffer = new byte[1024];
 			if(entity != null)
 			{
 				try(InputStream inputStream = entity.getContent())
 				{
 					result = IOUtils.toString(inputStream, "UTF-8");
 				}
-//
-//				try
-//				{
-//					int bytesRead = 0;
-//					BufferedInputStream bis = new BufferedInputStream(inputStream);
-//					while((bytesRead = bis.read(buffer)) != -1)
-//					{
-//						String chunk = new String(buffer, 0, bytesRead);
-//					}
-//				}
-//				finally
-//				{
-//					try
-//					{
-//						inputStream.close();
-//					}
-//					catch(Exception ignore)
-//					{
-//					}
-//				}
 			}
 		}
 		catch(IOException e)

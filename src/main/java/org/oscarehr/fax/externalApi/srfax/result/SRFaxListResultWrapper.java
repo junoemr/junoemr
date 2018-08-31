@@ -20,14 +20,49 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.service;
+package org.oscarehr.fax.externalApi.srfax.result;
 
-import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * This service should be responsible for handling all logic around fax setup
- */
-@Service
-public class FaxConfigurationService
+import java.util.List;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class SRFaxListResultWrapper<T>
 {
+	@JsonProperty("Status")
+	private String status;
+	@JsonProperty("Result")
+	private List<T> result;
+
+	public String getStatus()
+	{
+		return status;
+	}
+
+	public boolean isSuccess()
+	{
+		return "Success".equals(status);
+	}
+
+	public void setStatus(String status)
+	{
+		this.status = status;
+	}
+
+	public List<T> getResult()
+	{
+		return result;
+	}
+
+	public void setResult(List<T> result)
+	{
+		this.result = result;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "status:" + status + ", result:" + result.toString();
+	}
 }

@@ -24,7 +24,9 @@ package org.oscarehr.util;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.oscarehr.fax.externalApi.SRFaxApiConnector;
+import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
+import org.oscarehr.fax.externalApi.srfax.result.SRFaxGetUsageResult;
+import org.oscarehr.fax.externalApi.srfax.result.SRFaxListResultWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,9 +61,9 @@ public class SRFaxCommandLineRunner
 		SRFaxApiConnector apiConnector = new SRFaxApiConnector(srfax_login, srfax_password);
 
 		Map<String, String> parameters = new HashMap<>();
-		apiConnector.Get_Fax_Usage(parameters);
+		SRFaxListResultWrapper<SRFaxGetUsageResult> responseWrapper = apiConnector.Get_Fax_Usage(parameters);
 
-		logger.info("STATUS: " + apiConnector.Get_Last_Status());
-		logger.info("DATA: " + apiConnector.Get_Last_Response());
+		logger.info("STATUS: " + responseWrapper.getStatus());
+		logger.info("DATA: " + responseWrapper.getResult().toString());
 	}
 }

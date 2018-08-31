@@ -24,6 +24,9 @@ package org.oscarehr.ws.rest;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.fax.dao.FaxConfigDao;
+import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
+import org.oscarehr.fax.externalApi.srfax.result.SRFaxGetUsageResult;
+import org.oscarehr.fax.externalApi.srfax.result.SRFaxListResultWrapper;
 import org.oscarehr.fax.model.FaxConfig;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.conversion.FaxSettingsConverter;
@@ -44,7 +47,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Path("/faxConfig")
 @Component("FaxConfigWebService")
@@ -134,8 +139,15 @@ public class FaxConfigWebService extends AbstractServiceImpl
 		{
 			throw new RuntimeException("Invalid Fax Config Id: " + id);
 		}
+
+		// TODO refactor this merge code
+		String currentPw = config.getFaxPasswd();
 		config = FaxSettingsConverter.getAsDomainObject(accountSettingsTo1);
 		config.setId(id);
+		if(config.getFaxPasswd() == null || config.getFaxPasswd().trim().isEmpty())
+		{
+			config.setFaxPasswd(currentPw);// keep current password if a new one is not set
+		}
 		faxConfigDao.merge(config);
 		return RestResponse.successResponse(FaxSettingsConverter.getAsOutboundTransferObject(config));
 	}
@@ -149,6 +161,12 @@ public class FaxConfigWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
 
-		return RestResponse.successResponse(false);
+		SRFaxApiConnector apiConnector = new SRFaxApiConnector(accountSettingsTo1.getAccountLogin(), accountSettingsTo1.getPassword());
+
+		Map<String, String> parameters = new HashMap<>();
+		SRFaxListResultWrapper<SRFaxGetUsageResult> result = apiConnector.Get_Fax_Usage(parameters);
+		boolean success = (result != null && result.isSuccess());
+
+		return RestResponse.successResponse(success);
 	}
 }
