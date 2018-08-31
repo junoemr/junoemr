@@ -299,8 +299,8 @@
 			</tr>
 			<INPUT TYPE="hidden" NAME="orderby" VALUE="last_name">
 			<%
-				// This is linked to a form label which specifies a name search, so we will give the user one here
-				// rather than using the default search mode specified in the parameters file.
+				// This is linked to a form label which specifies a name search,
+				// so we will use that here, rather than whatever the default is specified as
 				String searchMode = "search_name";
 			%>
 			<INPUT TYPE="hidden" NAME="search_mode" VALUE="<%=searchMode%>">
