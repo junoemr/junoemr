@@ -23,16 +23,22 @@
  */
 package org.oscarehr.fax.model;
 
+import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import java.util.Date;
 
 @Entity
 @Table(name="fax_config")
+@Where(clause="deleted_at IS NULL")
 public class FaxConfig extends AbstractModel<Integer>
 {
 	
@@ -48,8 +54,26 @@ public class FaxConfig extends AbstractModel<Integer>
 	private String faxUser;
 	private String faxPasswd;
 	private String faxNumber;
-	private Boolean active;
 	private Integer queue;
+
+	@Column(name = "display_name")
+	private String displayName;
+
+	@Column(name = "cover_letter_option")
+	private String coverLetterOption;
+
+	@Column(name = "active")
+	private Boolean active;
+
+	@Column(name = "active_inbound")
+	private Boolean activeInbound;
+
+	@Column(name = "active_outbound")
+	private boolean activeOutbound;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "deleted_at")
+	private Date deletedAt;
 	
 
 	@Override
@@ -205,4 +229,54 @@ public class FaxConfig extends AbstractModel<Integer>
 		this.queue = queue;
 	}
 
+
+	public String getDisplayName()
+	{
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName)
+	{
+		this.displayName = displayName;
+	}
+
+	public Boolean isActiveInbound()
+	{
+		return activeInbound;
+	}
+
+	public void setActiveInbound(Boolean activeInbound)
+	{
+		this.activeInbound = activeInbound;
+	}
+
+	public boolean isActiveOutbound()
+	{
+		return activeOutbound;
+	}
+
+	public void setActiveOutbound(boolean activeOutbound)
+	{
+		this.activeOutbound = activeOutbound;
+	}
+
+	public Date getDeletedAt()
+	{
+		return deletedAt;
+	}
+
+	public void setDeletedAt(Date deletedAt)
+	{
+		this.deletedAt = deletedAt;
+	}
+
+	public String getCoverLetterOption()
+	{
+		return coverLetterOption;
+	}
+
+	public void setCoverLetterOption(String coverLetterOption)
+	{
+		this.coverLetterOption = coverLetterOption;
+	}
 }

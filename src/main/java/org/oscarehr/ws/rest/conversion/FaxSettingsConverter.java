@@ -31,26 +31,33 @@ import java.util.List;
 
 public class FaxSettingsConverter
 {
-	public static FaxConfig getAsDomainObject(FaxSettingsTransferInbound transfer) throws ConversionException
+	public static FaxConfig getAsDomainObject(FaxSettingsTransferInbound transfer)
 	{
 		FaxConfig config = new FaxConfig();
 		config.setActive(transfer.isEnabled());
 		config.setFaxPasswd(transfer.getPassword());
 		config.setFaxUser(transfer.getAccountLogin());
+		config.setActiveInbound(transfer.isEnableInbound());
+		config.setActiveOutbound(transfer.isEnableOutbound());
+		config.setDisplayName(transfer.getDisplayName());
+		config.setCoverLetterOption(transfer.getCoverLetterOption());
 		return config;
 	}
 
-	public static FaxSettingsTransferOutbound getAsOutboundTransferObject(FaxConfig config) throws ConversionException
+	public static FaxSettingsTransferOutbound getAsOutboundTransferObject(FaxConfig config)
 	{
 		FaxSettingsTransferOutbound transfer = new FaxSettingsTransferOutbound();
 		transfer.setId(config.getId());
 		transfer.setAccountLogin(config.getFaxUser());
 		transfer.setEnabled(config.isActive());
-		// never include password in outbound transfers
+		transfer.setEnableInbound(config.isActiveInbound());
+		transfer.setEnableOutbound(config.isActiveOutbound());
+		transfer.setDisplayName(config.getDisplayName());
+		transfer.setCoverLetterOption(config.getCoverLetterOption());
 		return transfer;
 	}
 
-	public static List<FaxSettingsTransferOutbound> getAllAsOutboundTransferObject(List<FaxConfig> configList) throws ConversionException
+	public static List<FaxSettingsTransferOutbound> getAllAsOutboundTransferObject(List<FaxConfig> configList)
 	{
 		List<FaxSettingsTransferOutbound> transferList = new ArrayList<>(configList.size());
 		for(FaxConfig config : configList)

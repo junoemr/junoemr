@@ -50,7 +50,8 @@
 
 <div class="fax-config">
 	<div class="fax-config-header">
-		<button type="button" class="btn btn-success"
+		<h1>Fax Accounts</h1>
+		<button type="button" class="btn btn-primary"
 		<%--ng-show="faxController.faxAccountList.length == 0"--%>
 		        ng-click="faxController.editNewFaxAccount()">
 			Add New Account
@@ -60,16 +61,32 @@
 		<div class="account-list" ng-repeat="faxAccount in faxController.faxAccountList">
 			<div class="account-item">
 				<div>
-					<span class="glyphicon enabled glyphicon-ok" ng-show="faxAccount.enabled"></span>
-					<span class="glyphicon disabled glyphicon-remove" ng-hide="faxAccount.enabled"></span>
+					<span class="glyphicon enabled glyphicon-ok glyphicon-lrg" ng-show="faxAccount.enabled"
+					      title="Account Active"></span>
+					<span class="glyphicon disabled glyphicon-remove glyphicon-lrg" ng-hide="faxAccount.enabled"
+					      title="Account Disabled"></span>
 				</div>
 				<div>
-					<span>{{faxAccount.accountLogin}}</span>
+					<h5>Inbound:
+						<span class="glyphicon enabled glyphicon-ok glyphicon-sml" ng-show="faxAccount.enableInbound"
+						      title="Inbound Faxing Enabled"></span>
+						<span class="glyphicon disabled glyphicon-remove glyphicon-sml" ng-hide="faxAccount.enableInbound"
+						      title="Inbound Faxing Disabled"></span>
+					</h5>
+					<h5>Outbound:
+						<span class="glyphicon enabled glyphicon-ok glyphicon-sml" ng-show="faxAccount.enableOutbound"
+						      title="Outbound Faxing Enabled"></span>
+						<span class="glyphicon disabled glyphicon-remove glyphicon-sml" ng-hide="faxAccount.enableOutbound"
+						      title="Outbound Faxing Disabled"></span>
+					</h5>
 				</div>
 				<div>
-					<span>{{faxAccount.displayName}}</span>
+					<h4>{{faxAccount.displayName}}</h4>
 				</div>
-				<button type="button" class="btn btn-success"
+				<div>
+					<h4>{{faxAccount.coverLetterOption}}</h4>
+				</div>
+				<button type="button" class="btn btn-default"
 				        <%-- TODO disable button for non-admin users? --%>
 				        ng-click="faxController.editFaxAccount(faxAccount)">
 					Edit Account

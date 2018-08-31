@@ -33,7 +33,7 @@
 	</div>
 	<div class="modal-body">
 		<div class="switch-container">
-			<label class="input-label" for="input-fax-enabled">ENABLED</label>
+			<label class="input-label" for="input-fax-enabled">Account Enabled</label>
 			<label class="switch">
 				<input id="input-fax-enabled" type="checkbox"
 				       ng-model="faxConfigEditController.faxAccount.enabled"/>
@@ -61,32 +61,44 @@
 		<div>
 			<label class="input-label" for="input-fax-account-cover-letter-type">Cover Letter</label>
 			<select id="input-fax-account-cover-letter-type"
-			        ng-model="faxConfigEditController.faxAccount.coverLetter"
+			        ng-model="faxConfigEditController.faxAccount.coverLetterOption"
 			        ng-options="coverLetter for coverLetter in faxConfigEditController.coverLetterOptions">
 			</select>
 		</div>
+		<div class="switch-container">
+			<label class="input-label" for="input-fax-enabled-inbound">Inbound Faxing</label>
+			<label class="switch">
+				<input id="input-fax-enabled-inbound" type="checkbox"
+				       ng-model="faxConfigEditController.faxAccount.enableInbound"/>
+				<span class="slider"></span>
+			</label>
+		</div>
+		<div class="switch-container">
+			<label class="input-label" for="input-fax-enabled-outbound">Outbound Faxing</label>
+			<label class="switch">
+				<input id="input-fax-enabled-outbound" type="checkbox"
+				       ng-model="faxConfigEditController.faxAccount.enableOutbound"/>
+				<span class="slider"></span>
+			</label>
+		</div>
 		<hr>
 		<div>
-			<label class="input-label">Connection Status</label>
-			<div style="display: inline-block;">
-				<div class="connection-status-indicator"
-				      ng-show="faxConfigEditController.faxAccount.connectionStatus == faxConfigEditController.connectionStatusEnum.unknown">
-					<span class="glyphicon unknown glyphicon-question-sign"></span>
-				</div>
-				<div class="connection-status-indicator"
-				      ng-show="faxConfigEditController.faxAccount.connectionStatus == faxConfigEditController.connectionStatusEnum.success">
-					<span class="glyphicon success glyphicon-ok-sign"></span>
-				</div>
-				<div class="connection-status-indicator"
-				      ng-show="faxConfigEditController.faxAccount.connectionStatus == faxConfigEditController.connectionStatusEnum.failure">
-					<span class="glyphicon failure glyphicon-remove-sign"></span>
-				</div>
+			<%--<label class="input-label">Connection Status</label>--%>
+			<div class="input-label">
+				<button type="button" class="btn"
+				        ng-click="faxConfigEditController.testConnection(faxConfigEditController.faxAccount)">
+					Test Connection
+				</button>
+			</div>
+			<div>
+				<span ng-show="faxConfigEditController.faxAccount.connectionStatus == faxConfigEditController.connectionStatusEnum.unknown"
+				      class="glyphicon unknown glyphicon-question-sign"></span>
+				<span ng-show="faxConfigEditController.faxAccount.connectionStatus == faxConfigEditController.connectionStatusEnum.success"
+				      class="glyphicon success glyphicon-ok-sign"></span>
+				<span ng-show="faxConfigEditController.faxAccount.connectionStatus == faxConfigEditController.connectionStatusEnum.failure"
+				      class="glyphicon failure glyphicon-remove-sign"></span>
 			</div>
 		</div>
-		<button type="button" class="btn"
-		        ng-click="faxConfigEditController.testConnection(faxConfigEditController.faxAccount)">
-			Test Connection
-		</button>
 	</div>
 	<div class="modal-footer">
 		<button ng-click="faxConfigEditController.cancel()" type="button" class="btn" data-dismiss="modal">

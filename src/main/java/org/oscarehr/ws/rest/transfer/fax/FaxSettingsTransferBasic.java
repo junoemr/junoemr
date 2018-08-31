@@ -32,7 +32,11 @@ import java.io.Serializable;
 public class FaxSettingsTransferBasic implements Serializable
 {
 	private Boolean enabled;
+	private Boolean enableInbound;
+	private Boolean enableOutbound;
 	private String accountLogin;
+	private String displayName;
+	private String coverLetterOption;
 
 	public Boolean isEnabled()
 	{
@@ -44,6 +48,26 @@ public class FaxSettingsTransferBasic implements Serializable
 		this.enabled = enabled;
 	}
 
+	public Boolean isEnableInbound()
+	{
+		return enableInbound;
+	}
+
+	public void setEnableInbound(Boolean enableInbound)
+	{
+		this.enableInbound = enableInbound;
+	}
+
+	public Boolean isEnableOutbound()
+	{
+		return enableOutbound;
+	}
+
+	public void setEnableOutbound(Boolean enableOutbound)
+	{
+		this.enableOutbound = enableOutbound;
+	}
+
 	public String getAccountLogin()
 	{
 		return accountLogin;
@@ -52,5 +76,25 @@ public class FaxSettingsTransferBasic implements Serializable
 	public void setAccountLogin(String accountLogin)
 	{
 		this.accountLogin = accountLogin;
+	}
+
+	public String getDisplayName()
+	{
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName)
+	{
+		this.displayName = displayName;
+	}
+
+	public String getCoverLetterOption()
+	{
+		return coverLetterOption;
+	}
+
+	public void setCoverLetterOption(String coverLetterOption)
+	{
+		this.coverLetterOption = coverLetterOption;
 	}
 }

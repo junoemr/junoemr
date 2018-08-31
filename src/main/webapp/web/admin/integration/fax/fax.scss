@@ -13,11 +13,16 @@
 
 		display: flex;
 		flex-direction: row;
-		justify-content: start;
+		justify-content: space-between;
 		align-items: center;
 	  }
 	  .glyphicon {
-		font-size: 30px;
+		&.glyphicon-lrg {
+		  font-size: 30px;
+		}
+		&.glyphicon-sml {
+		  font-size: 15px;
+		}
 		&.enabled {
 		  color: $success-green;
 		}

@@ -31,10 +31,12 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxCon
 			{
 				controller.faxAccount = {
 					enabled: true,
+					enableInbound: false,
+					enableOutbound: false,
 					accountLogin: '',
 					password: '',
 					displayName: '',
-					coverLetter: '',
+					coverLetterOption: '',
 					connectionStatus: controller.connectionStatusEnum.unknown
 				};
 			}
