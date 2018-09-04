@@ -38,6 +38,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.model.ProfessionalSpecialist;
+import org.oscarehr.consultations.dao.ServiceSpecialistsDao;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
@@ -53,6 +54,7 @@ public class EctConEditSpecialistsAction extends Action {
 		}
 		
 		ProfessionalSpecialistDao professionalSpecialistDao=(ProfessionalSpecialistDao)SpringUtils.getBean("professionalSpecialistDao");
+		ServiceSpecialistsDao serviceSpecialistDao=(ServiceSpecialistsDao)SpringUtils.getBean("serviceSpecialistsDao");
 
 		EctConEditSpecialistsForm editSpecialistsForm = (EctConEditSpecialistsForm) form;
 		String specId = editSpecialistsForm.getSpecId();
@@ -68,9 +70,13 @@ public class EctConEditSpecialistsAction extends Action {
 			{
 				for (int i = 0; i < specialists.length; i++)
 				{
+					//Hide professional specialist from search
 					ProfessionalSpecialist proSpec = professionalSpecialistDao.find(Integer.parseInt(specialists[i]));
 					proSpec.setHideFromView(true);
 					professionalSpecialistDao.merge(proSpec);
+
+					//Remove specialist from the services they are assigned to
+					serviceSpecialistDao.removeSpecialistFromAllServices(Integer.parseInt(specialists[i]));
 				}
 			}
 			EctConConstructSpecialistsScriptsFile constructSpecialistsScriptsFile = new EctConConstructSpecialistsScriptsFile();
