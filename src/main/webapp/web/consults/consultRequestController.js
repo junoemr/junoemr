@@ -43,9 +43,6 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		controller.hours = staticDataService.getHours();
 		controller.minutes = staticDataService.getMinutes();
 
-		//set appointment time
-		console.log('initial appointment time: ', angular.copy(consult.appointmentTime));
-
 		controller.parseTime = function parseTime(time)
 		{
 			var tArray = time.split(":");
@@ -68,7 +65,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			},
 			function error(errors)
 			{
-				console.log(errors);
+				console.error(errors);
 			});
 		securityService.hasRight("_con", "u").then(
 			function success(results)
@@ -77,7 +74,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			},
 			function error(errors)
 			{
-				console.log(errors);
+				console.error(errors);
 			});
 		securityService.hasRight("_con", "w").then(
 			function success(results)
@@ -86,14 +83,13 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			},
 			function error(errors)
 			{
-				console.log(errors);
+				console.error(errors);
 			});
 
 		//set demographic info
 		demographicService.getDemographic(consult.demographicId).then(
 			function success(results)
 			{
-				console.log('SUCCESS, DEMO: ', results);
 				consult.demographic = results;
 
 				//set cell phone
@@ -109,7 +105,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			},
 			function error(errors)
 			{
-				console.log(errors);
+				console.error(errors);
 			});
 
 		controller.changeLetterhead = function changeLetterhead()
@@ -151,7 +147,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			},
 			function error(errors)
 			{
-				console.log(errors);
+				console.error(errors);
 			}
 		);
 
@@ -234,7 +230,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function error(errors)
 				{
 					alert("Error grabbing family history!");
-					console.log(errors);
+					console.error(errors);
 				});
 		};
 
@@ -250,7 +246,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function error(errors)
 				{
 					alert("Error grabbing medical history!");
-					console.log(errors);
+					console.error(errors);
 				});
 		};
 
@@ -266,7 +262,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function error(errors)
 				{
 					alert("Error grabbing social history!");
-					console.log(errors);
+					console.error(errors);
 				});
 		};
 
@@ -282,7 +278,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function error(errors)
 				{
 					alert("Error grabbing ongoing concerns!");
-					console.log(errors);
+					console.error(errors);
 				});
 		};
 
@@ -298,7 +294,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function error(errors)
 				{
 					alert("Error grabbing other meds!");
-					console.log(errors);
+					console.error(errors);
 				});
 		};
 
@@ -314,15 +310,13 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function error(errors)
 				{
 					alert("Error grabbing reminders!");
-					console.log(errors);
+					console.error(errors);
 				});
 		};
 
 		// New function, doesn't work
 		controller.getAllergies = function getAllergies(boxId)
 		{
-			console.log('CONSULT: ', consult);
-
 			summaryService.getAllergies(consult.demographicId).then(
 				function success(results)
 				{
@@ -330,40 +324,10 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				},
 				function error(errors)
 				{
-					console.log(errors);
+					console.error(errors);
 				});
 		};
-
-		// controller.invalidData = function invalidData()
-		// {
-		// 	if (controller.urgencies[$("#urgency").val()] == null)
-		// 	{
-		// 		alert("Please select an Urgency");
-		// 		return true;
-		// 	}
-		// 	if (consult.letterheadList[$("#letterhead").val()] == null)
-		// 	{
-		// 		alert("Please select a Letterhead");
-		// 		return true;
-		// 	}
-		// 	if (consult.serviceList[$("#serviceId").val()] == null)
-		// 	{
-		// 		alert("Please select a Specialist Service");
-		// 		return true;
-		// 	}
-		// 	if (consult.professionalSpecialist == null)
-		// 	{
-		// 		alert("Please select a Specialist");
-		// 		return true;
-		// 	}
-		// 	if (consult.demographic == null || consult.demographic == "")
-		// 	{
-		// 		alert("Error! Invalid patient!");
-		// 		return true;
-		// 	}
-		// 	return false;
-		// };
-
+		
 		controller.invalidData = function invalidData()
 		{
 			if (!controller.consult.urgency)
@@ -376,11 +340,6 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				alert("Please select a Letterhead");
 				return true;
 			}
-			// if (!controller.consult.prof)
-			// {
-			// 	alert("Please select a Specialist Service");
-			// 	return true;
-			// }
 			if (!controller.consult.professionalSpecialist)
 			{
 				alert("Please select a Specialist");
@@ -442,7 +401,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				},
 				function error(errors)
 				{
-					console.log(errors);
+					console.error(errors);
 				});
 		};
 
@@ -483,7 +442,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 					},
 					function error(errors)
 					{
-						console.log(errors);
+						console.error(errors);
 					})
 				.finally(
 					function()
@@ -528,7 +487,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 					},
 					function error(errors)
 					{
-						console.log(errors);
+						console.error(errors);
 					});
 			}
 		};
