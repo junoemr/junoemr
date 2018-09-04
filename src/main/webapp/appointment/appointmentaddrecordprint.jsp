@@ -120,11 +120,6 @@ if (request.getParameter("demographic_no") != null && !(request.getParameter("de
 <p>
 <h1><bean:message key="appointment.addappointment.msgAddSuccess" /></h1>
 
-<script LANGUAGE="JavaScript">
-	self.opener.refresh();
-	popupPage(350,750,'../report/reportdaysheet.jsp?dsmode=new&provider_no=<%=request.getParameter("provider_no")%>&sdate=<%=request.getParameter("appointment_date")%>') ;
-	self.close();
-</script>
 <%
 
 		Appointment appt1 = appointmentDao.search_appt_no(request.getParameter("provider_no"), ConversionUtils.fromDateString(request.getParameter("appointment_date")), 
@@ -137,7 +132,13 @@ if (request.getParameter("demographic_no") != null && !(request.getParameter("de
 			
 			EventService eventService = SpringUtils.getBean(EventService.class); //Add Appointment and print preview
 			eventService.appointmentCreated(this,apptNo.toString(), request.getParameter("provider_no"));
-			
+%>
+			<script LANGUAGE="JavaScript">
+				self.opener.refresh();
+				popupPage(350,750,'../report/reportdaysheet.jsp?dsmode=newappt&provider_no=<%=request.getParameter("provider_no")%>&sdate=<%=request.getParameter("appointment_date")%>&appointment_no=<%=apptNo%>') ;
+				self.close();
+			</script>
+<%
 		}
 	} else {
 %>
