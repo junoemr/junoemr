@@ -1425,6 +1425,7 @@ jQuery(document).ready(function(){
 	// AJAX autocomplete referrer doctors 
 	jQuery("input[name=xml_refer1]").keypress(function(){
 		jQuery("input[name=xml_refer1]").autocomplete({
+            minLength: 3,
 	    	source: "billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
 	    	close: function(event, ui){
 	    		jQuery("input[name=xml_refer1]").keypress(function(event){
