@@ -250,7 +250,7 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 
 	/**
 	 * Creates a special header cell with a message
-	 * @return
+	 * @return pdfCell
 	 */
 	private PdfPCell createHeaderMessage() {
 		PdfPCell cell = new PdfPCell(new Phrase("", headerFont));
@@ -259,6 +259,12 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 
 		boolean patientWillBook = reqFrm.pwb.equals("1");
 
+		// allow properties custom header message override
+		String customHeaderMessage = props.getProperty("consultation_fax_custom_header_message");
+		if(customHeaderMessage != null)
+		{
+			cell.setPhrase(new Phrase(customHeaderMessage, boldFont));
+		}
 		// multisite reply message
 		if (!patientWillBook && org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
 			cell.setPhrase(new Phrase("Please reply", boldFont));
@@ -285,7 +291,7 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 		PdfPTable infoTable = new PdfPTable(tableWidths);
 
 		infoTable.addCell(setInfoCell(cell, getResource("msgDate")));
-		infoTable.addCell(setDataCell(cell, reqFrm.pwb.equals("1") ? getResource("pwb") : reqFrm.referalDate));
+		infoTable.addCell(setDataCell(cell, reqFrm.referalDate));
 
 		infoTable.addCell(setInfoCell(cell, getResource("msgStatus")));
 		infoTable.addCell(setDataCell(cell, (reqFrm.urgency.equals("1") ?  getResource("msgUrgent") :
@@ -339,6 +345,7 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 	 * @return the table produced
 	 */
 	private PdfPTable createPatientTable() {
+		boolean patientWillBook = reqFrm.pwb.equals("1");
 		float[] tableWidths;
 		PdfPCell cell;
 		tableWidths = new float[]{ 2, 2.5f };
@@ -373,9 +380,10 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 														    reqFrm.patientHealthNum,
 														    reqFrm.patientHealthCardVersionCode)));
 
-		if (!reqFrm.pwb.equals("1")) {
-			infoTable.addCell(setInfoCell(cell, getResource("msgappDate")));
-			infoTable.addCell(setDataCell(cell, reqFrm.pwb.equals("1") ? getResource("pwb") : reqFrm.appointmentDate));
+		infoTable.addCell(setInfoCell(cell, getResource("msgappDate")));
+		infoTable.addCell(setDataCell(cell, patientWillBook ? getResource("pwb") : reqFrm.appointmentDate));
+		if (!patientWillBook)
+		{
 			infoTable.addCell(setInfoCell(cell, getResource("msgTime")));
 			infoTable.addCell(setDataCell(cell, String.format("%s%s%s %s", reqFrm.appointmentHour,
 					 !reqFrm.appointmentMinute.equals("") ? ":" : "",

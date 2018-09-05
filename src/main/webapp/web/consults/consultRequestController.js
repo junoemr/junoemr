@@ -416,50 +416,68 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		controller.save = function save()
 		{
 			var deferred = $q.defer();
+			var valid = true;
 
 			if (!controller.consultWriteAccess && consult.id == null)
 			{
 				alert("You don't have right to save new consult");
-				deferred.reject();
+				valid = false;
 			}
 			if (!controller.consultUpdateAccess)
 			{
 				alert("You don't have right to update consult");
-				deferred.reject();
+				valid = false;
+			}
+			if (controller.invalidData())
+			{
+				valid = false;
 			}
 
-			if (controller.invalidData()) deferred.reject();
+			if(valid)
+			{
+				controller.consultSaving = true; //show saving banner
+				controller.setAppointmentTime();
 
-			controller.consultSaving = true; //show saving banner
-			controller.setAppointmentTime();
-
-			deferred = consultService.saveRequest(consult)
-				.then(
+				consultService.saveRequest(consult).then(
 					function success(results)
 					{
-						if (consult.id == null) $location.path("/record/" + consult.demographicId + "/consult/" + results.id);
-						return results.id;
+						if (consult.id == null)
+						{
+							$location.path("/record/" + consult.demographicId + "/consult/" + results.id);
+						}
+						deferred.resolve(results.id);
 					},
 					function error(errors)
 					{
 						console.error(errors);
+						deferred.reject(errors);
 					})
-				.finally(
-					function()
-					{
-						controller.setESendEnabled();
-						controller.consultSaving = false; //hide saving banner
-						controller.consultChanged = 0; //reset change count
-					}
-				);
-
-			return deferred;
+					.finally(
+						function()
+						{
+							controller.setESendEnabled();
+							controller.consultSaving = false; //hide saving banner
+							controller.consultChanged = 0; //reset change count
+						}
+					);
+			}
+			else
+			{
+				deferred.reject("Invalid");
+			}
+			return deferred.promise;
 		};
 
 		controller.close = function close()
 		{
-			if ($location.search().list === "patient") $location.path("/record/" + consult.demographicId + "/consults");
-			else $location.path("/consults");
+			if ($location.search().list === "patient")
+			{
+				$location.path("/record/" + consult.demographicId + "/consults");
+			}
+			else
+			{
+				$location.path("/consults");
+			}
 		};
 
 		controller.saveAndFax = function saveAndPrint()
@@ -472,6 +490,9 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 					var fax = Juno.Common.Util.noNull(consult.professionalSpecialist.faxNumber);
 
 					window.open("../fax/CoverPage.jsp?reqId=" + reqId + "&demographicNo=" + demographicNo + "&letterheadFax=" + letterheadFax + "&fax=" + fax);
+				},
+				function failure(error)
+				{
 				}
 			);
 		};
@@ -497,8 +518,10 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			controller.save().then(
 				function success(reqId)
 				{
-					if (controller.invalidData()) return;
 					controller.print(reqId);
+				},
+				function failure(error)
+				{
 				}
 			);
 		};
