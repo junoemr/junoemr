@@ -468,9 +468,10 @@ function ReferralScriptAttach2(){
 
 
 function ReferralScriptAttach(elementName) {
-     var d = elementName;
-     t0 = escape(document.BillingCreateBillingForm.elements[d].value);
-     t1 = escape("");
+     var d = elementName,
+         t0 = encodeURIComponent(document.BillingCreateBillingForm.elements[d].value),
+         t1 = encodeURIComponent("");
+
      awnd=rs('att','<rewrite:reWrite jspPage="billingReferCodeSearch.jsp"/>?name='+t0 + '&name1=' + t1 + '&name2=&search=&formElement=' +d+ '&formName=BillingCreateBillingForm',600,600,1);
      awnd.focus();
 }
@@ -1419,26 +1420,30 @@ if(wcbneeds != null){%>
 <script type="text/javascript">
 jQuery.noConflict();
 jQuery(document).ready(function(){
-	jQuery("input[name=xml_refer1]").removeAttr('onkeypress');
-	jQuery("input[name=xml_refer2]").removeAttr('onkeypress');
+    var xml_refer1 = jQuery('input[name=xml_refer1]'),
+        xml_refer2 = jQuery('input[name=xml_refer2]');
+
+	xml_refer1.removeAttr('onkeypress');
+	xml_refer2.removeAttr('onkeypress');
 	
 	// AJAX autocomplete referrer doctors 
-	jQuery("input[name=xml_refer1]").keypress(function(){
-		jQuery("input[name=xml_refer1]").autocomplete({
+	xml_refer1.keypress(function(){
+		xml_refer1.autocomplete({
             minLength: 3,
+            delay: 300,
 	    	source: "billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
 	    	close: function(event, ui){
-	    		jQuery("input[name=xml_refer1]").keypress(function(event){
+	    		xml_refer1.keypress(function(event){
 	    			return grabEnter(event,'ReferralScriptAttach1()');
 	    		});
 	    	}
     	});
 	});
-	jQuery("input[name=xml_refer2]").keypress(function(){
-		jQuery("input[name=xml_refer2]").autocomplete({
+	xml_refer2.keypress(function(){
+		xml_refer2.autocomplete({
 	    	source: "billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
 	    	close: function(event, ui){
-	    		jQuery("input[name=xml_refer2]").keypress(function(event){
+	    		xml_refer2.keypress(function(event){
 	    			return grabEnter(event,'ReferralScriptAttach2 ()');
 	    		});
 	    	}
