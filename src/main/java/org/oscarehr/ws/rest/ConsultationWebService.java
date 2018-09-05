@@ -518,7 +518,8 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	 * private methods *
 	 *******************/
 	
-	private List<FaxConfigTo1> getFaxList() {
+	private List<FaxConfigTo1> getFaxList()
+	{
 		List<FaxConfigTo1> faxList = new ArrayList<FaxConfigTo1>();
 		List<FaxConfig> faxConfigList = faxConfigDao.findAll(null, null);
 		for (FaxConfig faxConfig : faxConfigList) {

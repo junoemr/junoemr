@@ -48,16 +48,16 @@ public class ConsultationService
 	private ConsultRequestDao consultRequestDao;
 
 	@Autowired
-	ClinicDAO clinicDAO;
+	private ClinicDAO clinicDAO;
 
 	@Autowired
-	ProviderDataDao providerDao;
+	private ProviderDataDao providerDao;
 
 	@Autowired
-	ProviderManager2 providerManager;
+	private ProviderManager2 providerManager;
 
 	@Autowired
-	DemographicDao demographicDao;
+	private DemographicDao demographicDao;
 
 	public List<LetterheadTo1> getLetterheadList()
 	{
@@ -65,6 +65,8 @@ public class ConsultationService
 
 		LetterheadTo1 clinicLetterhead = getClinicLetterhead();
 		letterheadList.add(clinicLetterhead);
+
+		//TODO add multi-site letterheads
 
 		//provider letterheads
 		//- find non-empty phone/address in the following priority:
@@ -139,6 +141,7 @@ public class ConsultationService
 		LetterheadTo1 letterhead = new LetterheadTo1(providerNoStr, provider.getDisplayName());
 		letterhead.setPhone(coalesceProperty(providerSettings.getRxPhone(), StringUtils.trimToNull(provider.getWorkPhone()), defaultLetterhead.getPhone()));
 		letterhead.setAddress(coalesceProperty(settingsAddr, StringUtils.trimToNull(provider.getAddress()), defaultLetterhead.getAddress()));
+		letterhead.setFax(coalesceProperty(providerSettings.getFaxNumber(), StringUtils.trimToNull(provider.getFaxNumber()), defaultLetterhead.getFax()));
 		return letterhead;
 	}
 
@@ -151,9 +154,11 @@ public class ConsultationService
 		String clinicPhone = StringUtils.trimToEmpty(clinic.getClinicPhone());
 		String clinicAddress = buildAddress(clinic.getClinicAddress(), clinic.getClinicCity(),
 				clinic.getClinicProvince(), clinic.getClinicPostal());
+		String clinicFax = StringUtils.trimToEmpty(clinic.getClinicFax());
 
 		letterhead.setPhone(clinicPhone);
 		letterhead.setAddress(clinicAddress);
+		letterhead.setFax(clinicFax);
 		return letterhead;
 	}
 

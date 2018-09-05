@@ -57,120 +57,118 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		}
 
-		//get access rights
-		securityService.hasRight("_con", "r").then(
-			function success(results)
-			{
-				controller.consultReadAccess = results;
-			},
-			function error(errors)
-			{
-				console.error(errors);
-			});
-		securityService.hasRight("_con", "u").then(
-			function success(results)
-			{
-				controller.consultUpdateAccess = results;
-			},
-			function error(errors)
-			{
-				console.error(errors);
-			});
-		securityService.hasRight("_con", "w").then(
-			function success(results)
-			{
-				controller.consultWriteAccess = results;
-			},
-			function error(errors)
-			{
-				console.error(errors);
-			});
-
-		//set demographic info
-		demographicService.getDemographic(consult.demographicId).then(
-			function success(results)
-			{
-				consult.demographic = results;
-
-				//set cell phone
-				consult.demographic.extras = Juno.Common.Util.toArray(consult.demographic.extras);
-				for (var i = 0; i < consult.demographic.extras.length; i++)
-				{
-					if (consult.demographic.extras[i].key == "demo_cell")
-					{
-						consult.demographic.cellPhone = consult.demographic.extras[i].value;
-						break;
-					}
-				}
-			},
-			function error(errors)
-			{
-				console.error(errors);
-			});
-
-		controller.changeLetterhead = function changeLetterhead()
+		controller.initialize = function()
 		{
-			if (consult.letterhead === null) return;
-
-			consult.letterheadName = consult.letterhead.id;
-			consult.letterheadAddress = consult.letterhead.address;
-			consult.letterheadPhone = consult.letterhead.phone;
-		};
-		consultService.getLetterheadList().then(
-			function success(results)
-			{
-				consult.letterheadList = Juno.Common.Util.toArray(results.data);
-
-				//set default letterhead
-				if (consult.letterheadName == null)
+			//get access rights
+			securityService.hasRight("_con", "r").then(
+				function success(results)
 				{
-					consult.letterhead = consult.letterheadList[0];
-					controller.changeLetterhead();
-				}
-				else
+					controller.consultReadAccess = results;
+				},
+				function error(errors)
 				{
-					for (var i = 0; i < consult.letterheadList.length; i++)
+					console.error(errors);
+				});
+			securityService.hasRight("_con", "u").then(
+				function success(results)
+				{
+					controller.consultUpdateAccess = results;
+				},
+				function error(errors)
+				{
+					console.error(errors);
+				});
+			securityService.hasRight("_con", "w").then(
+				function success(results)
+				{
+					controller.consultWriteAccess = results;
+				},
+				function error(errors)
+				{
+					console.error(errors);
+				});
+
+			//set demographic info
+			demographicService.getDemographic(consult.demographicId).then(
+				function success(results)
+				{
+					consult.demographic = results;
+
+					//set cell phone
+					consult.demographic.extras = Juno.Common.Util.toArray(consult.demographic.extras);
+					for (var i = 0; i < consult.demographic.extras.length; i++)
 					{
-						if (consult.letterheadList[i].id === consult.letterheadName)
+						if (consult.demographic.extras[i].key == "demo_cell")
 						{
-							consult.letterhead = consult.letterheadList[i];
+							consult.demographic.cellPhone = consult.demographic.extras[i].value;
 							break;
 						}
 					}
-				}
-
-				//set default fax if there's only 1
-				if (consult.letterhead.fax == null && consult.faxList.length == 1)
+				},
+				function error(errors)
 				{
-					consult.letterhead.fax = consult.faxList[0].faxNumber;
+					console.error(errors);
+				});
+
+			consultService.getLetterheadList().then(
+				function success(results)
+				{
+					consult.letterheadList = Juno.Common.Util.toArray(results.data);
+					if(consult.letterhead === null)
+					{
+						controller.changeLetterhead(consult.letterheadList[0]);
+					}
+					else
+					{
+						for (var i = 0; i < consult.letterheadList.length; i++)
+						{
+							if (consult.letterheadList[i].id === consult.letterheadName)
+							{
+								controller.changeLetterhead(consult.letterheadList[i]);
+								break;
+							}
+						}
+					}
+				},
+				function error(errors)
+				{
+					console.error(errors);
 				}
-			},
-			function error(errors)
-			{
-				console.error(errors);
-			}
-		);
+			);
 
-		//set specialist list
-		for (var i = 0; i < consult.serviceList.length; i++)
-		{
-			if (consult.serviceList[i].serviceId == consult.serviceId)
+			//set specialist list
+			for (var i = 0; i < consult.serviceList.length; i++)
 			{
-				controller.specialists = Juno.Common.Util.toArray(consult.serviceList[i].specialists);
-				break;
+				if (consult.serviceList[i].serviceId == consult.serviceId)
+				{
+					controller.specialists = Juno.Common.Util.toArray(consult.serviceList[i].specialists);
+					break;
+				}
 			}
-		}
-		angular.forEach(controller.specialists, function(spec)
-		{
-			if (consult.professionalSpecialist && spec.id == consult.professionalSpecialist.id)
+			angular.forEach(controller.specialists, function(spec)
 			{
-				consult.professionalSpecialist = spec;
-			}
-		});
+				if (consult.professionalSpecialist && spec.id == consult.professionalSpecialist.id)
+				{
+					consult.professionalSpecialist = spec;
+				}
+			});
 
-		//set attachments
-		consult.attachments = Juno.Common.Util.toArray(consult.attachments);
-		Juno.Consults.Common.sortAttachmentDocs(consult.attachments);
+			//set attachments
+			consult.attachments = Juno.Common.Util.toArray(consult.attachments);
+			Juno.Consults.Common.sortAttachmentDocs(consult.attachments);
+		};
+		controller.initialize();
+
+		controller.changeLetterhead = function changeLetterhead(letterhead)
+		{
+			consult.letterhead = letterhead;
+
+			// these are required for current print functionality
+			consult.letterheadName = consult.letterhead.id;
+			consult.letterheadAddress = consult.letterhead.address;
+			consult.letterheadPhone = consult.letterhead.phone;
+			consult.letterheadFax = consult.letterhead.fax;
+		};
 
 		//monitor data changed
 		controller.consultChanged = 0;

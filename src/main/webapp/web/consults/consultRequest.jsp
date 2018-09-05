@@ -83,7 +83,7 @@
 									<select id="letterhead" class="form-control"
 											ng-model="consultRequestCtrl.consult.letterhead"
 											ng-options="letterhead.name for letterhead in consultRequestCtrl.consult.letterheadList track by letterhead.id"
-											ng-change="consultRequestCtrl.changeLetterhead()">
+											ng-change="consultRequestCtrl.changeLetterhead(consultRequestCtrl.consult.letterhead)">
 									</select>
 								</div>
 							</div>
@@ -99,11 +99,6 @@
 								<div class="col-sm-12">
 									<label>Fax: </label>
 									{{consultRequestCtrl.consult.letterheadFax}}
-									<select id="letterheadFax" class="form-control inline" style="width: auto;"
-											ng-model="consultRequestCtrl.consult.letterheadFax"
-											ng-options="fax.faxNumber as fax.faxUser for fax in consultRequestCtrl.consult.faxList">
-										<option value="" disabled selected>Select Fax</option>
-									</select>
 								</div>
 							</div>
 						</form>
@@ -183,12 +178,16 @@
 						<div class="well">
 							<div>
 								<label class="control-label">Patient Will Book</label>
-								<input class="form-control big-checkbox" type="checkbox" id="willBook" ng-model="consultRequestCtrl.consult.patientWillBook"/>
+								<input class="form-control big-checkbox" type="checkbox" id="willBook"
+								       ng-model="consultRequestCtrl.consult.patientWillBook"/>
 							</div>
 							<div class="appointment-date-time-select">
 								<div class="date-select-wrapper">
 									<label class="control-label">Appointment Date</label>
-									<juno-datepicker-popup juno-model="consultRequestCtrl.consult.appointmentDate" show-icon="true" type="Input" disable-input="consultRequestCtrl.consult.patientWillBook"> </juno-datepicker-popup>
+									<juno-datepicker-popup juno-model="consultRequestCtrl.consult.appointmentDate"
+									                       show-icon="true" type="Input"
+									                       disable-input="consultRequestCtrl.consult.patientWillBook">
+									</juno-datepicker-popup>
 								</div>
 								<div class="time-select-wrapper">
 									<label class="control-label">Appointment Time</label>
@@ -196,13 +195,15 @@
 										<select class="form-control"
 										        ng-model="consultRequestCtrl.consult.appointmentHour"
 										        ng-options="hour for hour in consultRequestCtrl.hours"
-										        ng-change="consultRequestCtrl.setAppointmentTime()" ng-disabled="consultRequestCtrl.consult.patientWillBook">
+										        ng-change="consultRequestCtrl.setAppointmentTime()"
+										        ng-disabled="consultRequestCtrl.consult.patientWillBook">
 										</select>
 										<span>:</span>
 										<select class="form-control"
 										        ng-model="consultRequestCtrl.consult.appointmentMinute"
 										        ng-options="minute for minute in consultRequestCtrl.minutes"
-										        ng-change="consultRequestCtrl.setAppointmentTime()" ng-disabled="consultRequestCtrl.consult.patientWillBook">
+										        ng-change="consultRequestCtrl.setAppointmentTime()"
+										        ng-disabled="consultRequestCtrl.consult.patientWillBook">
 										</select>
 									</div>
 								</div>
@@ -312,80 +313,11 @@
 
 					<div class="form-group col-md-12"><!-- Alergies / Current Medications -->
 						<label class="control-label">Allergies</label>
-						<%--<div class="col-md-12">
-							<button type="button" class="btn btn-sm btn-success" ng-click="getAllergies('allergies');">
-								<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-								Allergies
-							</button>
-						</div>--%>
 						<textarea id="allergies" rows="5" class="form-control" ng-model="consultRequestCtrl.consult.allergies"></textarea>
 					</div>
 				</form>
 				<hr>
 			</div><!-- Appointment End -->
-			<%--<div class="col-md-12"><!-- Reason for Consultation -->
-				<h4>Reason for Consultation:</h4>
-				<div class="well">
-					<textarea cols="120" rows="4" class="form-control" ng-model="consult.reasonForReferral"></textarea>
-				</div>
-			</div><!-- Reason End -->
-			<div class="clear"></div>
-			
-			<div id="clinical-note" class="col-md-6"><!-- Clinic Notes -->
-				<div>
-					<h4>Pertinent clinical information:</h4>
-					<p>
-						<button type="button" class="btn btn-tall btn-success" ng-click="getFamilyHistory('clinicalInfo');">Family<br/>History</button>
-						<button type="button" class="btn btn-tall btn-success" ng-click="getMedicalHistory('clinicalInfo');">Medical<br/>History</button>
-						<button type="button" class="btn btn-tall btn-success" ng-click="getOngoingConcerns('clinicalInfo');">Ongoing<br/>Concerns</button>
-						<button type="button" class="btn btn-tall btn-success" ng-click="getOtherMeds('clinicalInfo');">Other<br/>Meds</button>
-						<button type="button" class="btn btn-tall btn-success" ng-click="getReminders('clinicalInfo');">Reminders</button>
-					</p>					
-					<div class="well">
-						<div>
-							<textarea id="clinicalInfo" cols="80" rows="5" class="form-control" placeholder="Use the buttons above to insert data from the patients chart"
-								ng-model="consult.clinicalInfo"></textarea>
-						</div>
-					</div>
-					<div class="clear"></div>
-				</div>
-			</div>
-			
-			<div id="concurrent-problem" class="col-md-6"><!-- Concurrent Problem -->
-				<div>
-					<h4>Significant Concurrent Problems:</h4>
-					<p>
-						<button type="button" class="btn btn-tall btn-success" ng-click="getFamilyHistory('concurrentProblems');">Family<br/>History</button>
-						<button type="button" class="btn btn-tall btn-success" ng-click="getMedicalHistory('concurrentProblems');">Medical<br/>History</button>
-						<button type="button" class="btn btn-tall btn-success" ng-click="getOngoingConcerns('concurrentProblems');">Ongoing<br/>Concerns</button>
-						<button type="button" class="btn btn-tall btn-success" ng-click="getOtherMeds('concurrentProblems');">Other<br/>Meds</button>
-						<button type="button" class="btn btn-tall btn-success" ng-click="getReminders('concurrentProblems');">Reminders</button>
-					</p>						
-					<div class="well">
-						<div>
-							<textarea id="concurrentProblems" cols="80" rows="5" class="form-control" placeholder="Use the buttons above to insert data from the patients chart"
-								ng-model="consult.concurrentProblems"></textarea>
-						</div>
-					</div>
-					<div class="clear"></div>
-				</div>
-			</div>
-			<div class="clear"></div>
-			
-			<div class="col-md-6"><!-- Alergies / Current Medications -->
-				<h4>Allergies:</h4>
-				<div class="well">
-					<textarea cols="80" rows="5" class="form-control" ng-model="consult.allergies"></textarea>
-				</div>
-			</div><!-- Alergies End -->	
-			<div class="col-md-6">
-				<h4>Current Medications: <button type="button" class="btn btn-success" style="padding:0px 10px;" ng-click="getOtherMeds('currentMeds');">Other Meds</button></h4>
-				
-				<div class="well">
-					<textarea id="currentMeds" cols="80" rows="5" class="form-control" ng-model="consult.currentMeds" placeholder="Use the button above to insert Other Meds data from the patients chart"></textarea>
-				</div>
-			</div><!-- Current Medications End -->	
-			<div class="clear"></div>--%>
 		</div><!-- Right pane End -->
 	</div>
 	<div class="wrapper-action col-sm-12" ng-show="consultRequestCtrl.consultReadAccess"><!-- Action Buttons -->

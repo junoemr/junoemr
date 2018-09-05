@@ -30,108 +30,111 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 
 		var controller = this;
 
-		//get access rights
-		securityService.hasRight("_con", "r").then(
-			function success(results)
-			{
-				controller.consultReadAccess = results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-		securityService.hasRight("_con", "u").then(
-			function success(results)
-			{
-				controller.consultUpdateAccess = results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-		securityService.hasRight("_con", "w").then(
-			function success(results)
-			{
-				controller.consultWriteAccess = results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-
-		controller.consult = consult;
-		consult.referringDoctorList = Juno.Common.Util.toArray(consult.referringDoctorList);
-		consult.faxList = Juno.Common.Util.toArray(consult.faxList);
-		consult.sendToList = Juno.Common.Util.toArray(consult.sendToList);
-
-		//set attachments
-		consult.attachments = Juno.Common.Util.toArray(consult.attachments);
-		Juno.Consults.Common.sortAttachmentDocs(consult.attachments);
-
-
-		consultService.getLetterheadList().then(
-			function success(results)
-			{
-				consult.letterheadList = Juno.Common.Util.toArray(results.data);
-
-				//set default letterhead
-				if (consult.letterheadName == null)
+		controller.initialize = function()
+		{
+			//get access rights
+			securityService.hasRight("_con", "r").then(
+				function success(results)
 				{
-					for (var i = 0; i < consult.letterheadList.length; i++)
+					controller.consultReadAccess = results;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
+			securityService.hasRight("_con", "u").then(
+				function success(results)
+				{
+					controller.consultUpdateAccess = results;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
+			securityService.hasRight("_con", "w").then(
+				function success(results)
+				{
+					controller.consultWriteAccess = results;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
+
+			controller.consult = consult;
+			consult.referringDoctorList = Juno.Common.Util.toArray(consult.referringDoctorList);
+			consult.faxList = Juno.Common.Util.toArray(consult.faxList);
+			consult.sendToList = Juno.Common.Util.toArray(consult.sendToList);
+
+			//set attachments
+			consult.attachments = Juno.Common.Util.toArray(consult.attachments);
+			Juno.Consults.Common.sortAttachmentDocs(consult.attachments);
+
+
+			consultService.getLetterheadList().then(
+				function success(results)
+				{
+					consult.letterheadList = Juno.Common.Util.toArray(results.data);
+
+					//set default letterhead
+					if(consult.letterhead === null)
 					{
-						if (consult.letterheadList[i].id == user.providerNo)
+						controller.changeLetterhead(consult.letterheadList[0]);
+					}
+					else
+					{
+						for (var i = 0; i < consult.letterheadList.length; i++)
 						{
-							consult.letterheadName = consult.letterheadList[i].id;
-							consult.letterheadAddress = consult.letterheadList[i].address;
-							consult.letterheadPhone = consult.letterheadList[i].phone;
-							break;
+							if (consult.letterheadList[i].id === consult.letterheadName)
+							{
+								controller.changeLetterhead(consult.letterheadList[i]);
+								break;
+							}
 						}
 					}
-				}
-
-				//set default fax if there's only 1
-				if (consult.letterheadFax == null && consult.faxList.length == 1)
+				},
+				function error(errors)
 				{
-					consult.letterheadFax = consult.faxList[0].faxNumber;
+					console.log(errors);
 				}
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			}
-		);
-		controller.changeLetterhead = function changeLetterhead()
-		{
-			var index = $("#letterhead").selectedIndex;
-			if (index == null) return;
+			);
 
-			consult.letterheadAddress = consult.letterheadList[index].address;
-			consult.letterheadPhone = consult.letterheadList[index].phone;
+			//show referringDoctor in list
+			angular.forEach(consult.referringDoctorList, function(referringDoc)
+			{
+				if(consult.referringDoctor !== null)
+				{
+					if (referringDoc.id === consult.referringDoctor.id)
+					{
+						consult.referringDoctor = referringDoc;
+					}
+				}
+			});
+
+			//set patient cell phone
+			consult.demographic.extras = Juno.Common.Util.toArray(consult.demographic.extras);
+			for (var i = 0; i < consult.demographic.extras.length; i++)
+			{
+				if (consult.demographic.extras[i].key == "demo_cell")
+				{
+					consult.demographic.cellPhone = consult.demographic.extras[i].value;
+					break;
+				}
+			}
+		};
+		controller.initialize();
+
+		controller.changeLetterhead = function changeLetterhead(letterhead)
+		{
+			consult.letterhead = letterhead;
+
+			// these are required for current print functionality
+			consult.letterheadName = consult.letterhead.id;
+			consult.letterheadAddress = consult.letterhead.address;
+			consult.letterheadPhone = consult.letterhead.phone;
+			consult.letterheadFax = consult.letterhead.fax;
 		};
 
-
-		//show referringDoctor in list
-		angular.forEach(consult.referringDoctorList, function(referringDoc)
-		{
-			if(consult.referringDoctor !== null)
-			{
-				if (referringDoc.id === consult.referringDoctor.id)
-				{
-					consult.referringDoctor = referringDoc;
-				}
-			}
-		});
-
-		//set patient cell phone
-		consult.demographic.extras = Juno.Common.Util.toArray(consult.demographic.extras);
-		for (var i = 0; i < consult.demographic.extras.length; i++)
-		{
-			if (consult.demographic.extras[i].key == "demo_cell")
-			{
-				consult.demographic.cellPhone = consult.demographic.extras[i].value;
-				break;
-			}
-		}
 
 		controller.urgencies = staticDataService.getConsultUrgencies();
 		controller.statuses = staticDataService.getConsultResponseStatuses();
@@ -395,7 +398,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 		};
 
 		//fax & print functions
-		var p_page1 = "<html><style>body{width:800px;font-family:arial,verdana,tahoma,helvetica,sans serif}table{width:100%}th{text-align:left;font-weight:bold;width:1;white-space:nowrap}td{vertical-align:top}label{font-weight:bold}em{font-size:small}.large{font-size:large}.center{text-align:center}</style><style media='print'>button{display:none}.noprint{display:none}</style><script>function printAttachments(url){window.open('../'+url);}</script><body>";
+		var p_page1 = "<html><style>body{width:800px;font-family:arial,verdana,tahoma,helvetica,sans serif}table{width:100%}th{text-align:left;font-weight:bold;width:1px;white-space:nowrap}td{vertical-align:top}label{font-weight:bold}em{font-size:small}.large{font-size:large}.center{text-align:center}</style><style media='print'>button{display:none}.noprint{display:none}</style><script>function printAttachments(url){window.open('../'+url);}</script><body>";
 
 		controller.sendFax = function sendFax()
 		{

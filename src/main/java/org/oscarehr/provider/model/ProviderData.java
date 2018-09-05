@@ -259,6 +259,18 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 		comments = s;
 	}
 
+	public String getFaxNumber()
+	{
+		String comments = getComments();
+		String faxNo = null;
+		if(comments != null && comments.contains("<xml_p_fax>"))
+		{
+			faxNo = StringUtils.substringBetween(getComments(), "<xml_p_fax>", "</xml_p_fax>");
+		}
+		return faxNo;
+	}
+
+
 	public String getProviderActivity() {
 		return providerActivity;
 	}
