@@ -266,7 +266,7 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 			cell.setPhrase(new Phrase(customHeaderMessage, boldFont));
 		}
 		// multisite reply message
-		if (!patientWillBook && org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
+		else if (!patientWillBook && org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
 			cell.setPhrase(new Phrase("Please reply", boldFont));
 		}
 		// default reply message
