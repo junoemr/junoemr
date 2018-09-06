@@ -30,14 +30,13 @@
 <%
 	EFormDataService eFormDataService = SpringUtils.getBean(EFormDataService.class);
 
-	String id = request.getParameter("fid");
 	String messageOnFailure = "No eform or appointment is available";
 	String providerNo = (String) session.getValue("user");
 	boolean showInstancedWarning = false;
 
-	if(id == null)
+	if(request.getParameter("fdid") != null)
 	{  // form exists in patient
-		id = request.getParameter("fdid");
+		String id = request.getParameter("fdid");
 		String appointmentNo = request.getParameter("appointment");
 		String eformLink = request.getParameter("eform_link");
 
@@ -57,7 +56,8 @@
 		out.print(eForm.getFormHtml());
 	}
 	else
-	{  //if form is viewed from admin screen
+	{  // if form is viewed from admin screen
+		String id = request.getParameter("fid");
 		EForm eForm = new EForm(id, "-1"); //form cannot be submitted, demographic_no "-1" indicate this specialty
 		eForm.setLoggedInProvider(providerNo);
 		eForm.setContextPath(request.getContextPath());
@@ -78,11 +78,10 @@
 </script>
 <%
 	}
-	if(showInstancedWarning)
-	{
+	if(showInstancedWarning) {
 %>
 	<script>
-		alert("You are editing an outdated version of an instanced eForm. Saving this version will overwrite the existing version and could result in a data loss.");
+		alert("You are editing an outdated version of an instanced eForm. Saving this version will overwrite the existing version and could result in a data loss.";);
 	</script>
 <%
 	}
