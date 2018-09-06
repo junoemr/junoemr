@@ -50,6 +50,7 @@
 		final String SQL_WILDCARD = "%";
 		ArrayList<String> toReturn = new ArrayList<String>();
 
+		// Entering an empty name on the web page results in an empty (not null) string here.
 		name = name.trim();
 
 		if (!name.isEmpty())
@@ -96,7 +97,7 @@
 		formName = "";
 		formElement = "";
 	}
-	ArrayList<String> paramList = new ArrayList();
+	ArrayList<String> paramList = new ArrayList<String>();
 
 	paramList.add(formatReferralCodeForSearch(codeName));
 	paramList.add(formatReferralCodeForSearch(codeName1));
@@ -116,8 +117,8 @@
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 	<title>Diagnostic Code Search</title>
 	<style>
-		tr:nth-child(2n) {background-color: #FFFFFF;}
-		tr:nth-child(2n+1) {background-color: #FFEEFF;}
+		tr:nth-child(even) {background-color: #FFFFFF;}
+		tr:nth-child(odd) {background-color: #FFEEFF;}
 		tr:first-child {background-color: #CCCCFF;}
 		td {
 			font-family: Arial, Helvetica, sans-serif;
@@ -128,7 +129,7 @@
 	</style>
 </head>
 
-<body bgcolor="#FFFFFF" text="#000000" topmargin="0" leftmargin="0" rightmargin="0">
+<body bgcolor="#FFFFFF" text="#000000">
 <table border="0" cellspacing="0" cellpadding="0" width="100%">
 	<tr>
 		<th align=CENTER NOWRAP class="header">
