@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SRFaxGetUsageResult
+public class SRFaxResult_GetUsage
 {
 	@JsonProperty("UserID")
 	private String userId;

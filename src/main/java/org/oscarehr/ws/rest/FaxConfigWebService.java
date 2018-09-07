@@ -25,8 +25,8 @@ package org.oscarehr.ws.rest;
 import org.apache.log4j.Logger;
 import org.oscarehr.fax.dao.FaxConfigDao;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
-import org.oscarehr.fax.externalApi.srfax.result.SRFaxGetUsageResult;
-import org.oscarehr.fax.externalApi.srfax.result.SRFaxListResultWrapper;
+import org.oscarehr.fax.externalApi.srfax.result.SRFaxResult_GetUsage;
+import org.oscarehr.fax.externalApi.srfax.result.SRFaxResultWrapper_List;
 import org.oscarehr.fax.model.FaxConfig;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.conversion.FaxSettingsConverter;
@@ -164,7 +164,7 @@ public class FaxConfigWebService extends AbstractServiceImpl
 		SRFaxApiConnector apiConnector = new SRFaxApiConnector(accountSettingsTo1.getAccountLogin(), accountSettingsTo1.getPassword());
 
 		Map<String, String> parameters = new HashMap<>();
-		SRFaxListResultWrapper<SRFaxGetUsageResult> result = apiConnector.Get_Fax_Usage(parameters);
+		SRFaxResultWrapper_List<SRFaxResult_GetUsage> result = apiConnector.Get_Fax_Usage(parameters);
 		boolean success = (result != null && result.isSuccess());
 
 		return RestResponse.successResponse(success);

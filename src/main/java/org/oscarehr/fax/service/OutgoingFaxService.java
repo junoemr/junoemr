@@ -29,7 +29,7 @@ import org.oscarehr.fax.dao.FaxJobDao;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.model.FaxJob;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
-import org.oscarehr.fax.externalApi.srfax.result.SRFaxSingleResultWrapper;
+import org.oscarehr.fax.externalApi.srfax.result.SRFaxResultWrapper_Single;
 import org.oscarehr.fax.model.FaxConfig;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +94,7 @@ public class OutgoingFaxService
 		}
 
 		// external api call
-		SRFaxSingleResultWrapper<String> resultWrapper = apiConnector.Queue_Fax(parameters);
+		SRFaxResultWrapper_Single<String> resultWrapper = apiConnector.Queue_Fax(parameters);
 
 
 		for(GenericFile fileToFax : filesToFax)

@@ -25,8 +25,10 @@ package org.oscarehr.util;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
-import org.oscarehr.fax.externalApi.srfax.result.SRFaxGetUsageResult;
-import org.oscarehr.fax.externalApi.srfax.result.SRFaxListResultWrapper;
+import org.oscarehr.fax.externalApi.srfax.result.SRFaxResult_GetFaxInbox;
+import org.oscarehr.fax.externalApi.srfax.result.SRFaxResult_GetFaxOutbox;
+import org.oscarehr.fax.externalApi.srfax.result.SRFaxResult_GetUsage;
+import org.oscarehr.fax.externalApi.srfax.result.SRFaxResultWrapper_List;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,8 +62,38 @@ public class SRFaxCommandLineRunner
 
 		SRFaxApiConnector apiConnector = new SRFaxApiConnector(srfax_login, srfax_password);
 
+		testGetFaxUsage(apiConnector);
+		testGetFaxInbox(apiConnector);
+		testGetFaxOutbox(apiConnector);
+
+		logger.info("COMPLETE");
+	}
+
+	public static void testGetFaxUsage(SRFaxApiConnector apiConnector)
+	{
+		logger.info("TEST GET FAX USAGE");
 		Map<String, String> parameters = new HashMap<>();
-		SRFaxListResultWrapper<SRFaxGetUsageResult> responseWrapper = apiConnector.Get_Fax_Usage(parameters);
+		SRFaxResultWrapper_List<SRFaxResult_GetUsage> responseWrapper = apiConnector.Get_Fax_Usage(parameters);
+
+		logger.info("STATUS: " + responseWrapper.getStatus());
+		logger.info("DATA: " + responseWrapper.getResult());
+	}
+
+	public static void testGetFaxInbox(SRFaxApiConnector apiConnector)
+	{
+		logger.info("TEST GET FAX INBOX");
+		Map<String, String> parameters = new HashMap<>();
+		SRFaxResultWrapper_List<SRFaxResult_GetFaxInbox> responseWrapper = apiConnector.Get_Fax_Inbox(parameters);
+
+		logger.info("STATUS: " + responseWrapper.getStatus());
+		logger.info("DATA: " + responseWrapper.getResult());
+	}
+
+	public static void testGetFaxOutbox(SRFaxApiConnector apiConnector)
+	{
+		logger.info("TEST GET FAX OUTBOX");
+		Map<String, String> parameters = new HashMap<>();
+		SRFaxResultWrapper_List<SRFaxResult_GetFaxOutbox> responseWrapper = apiConnector.Get_Fax_Outbox(parameters);
 
 		logger.info("STATUS: " + responseWrapper.getStatus());
 		logger.info("DATA: " + responseWrapper.getResult());

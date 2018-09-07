@@ -25,15 +25,13 @@ package org.oscarehr.fax.externalApi.srfax.result;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SRFaxListResultWrapper<T>
+public class SRFaxResultWrapper_Single<T>
 {
 	@JsonProperty("Status")
 	private String status;
 	@JsonProperty("Result")
-	private List<T> result;
+	private T result;
 
 	private String error;
 
@@ -42,22 +40,22 @@ public class SRFaxListResultWrapper<T>
 		return status;
 	}
 
-	public boolean isSuccess()
-	{
-		return "Success".equals(status);
-	}
-
 	public void setStatus(String status)
 	{
 		this.status = status;
 	}
 
-	public List<T> getResult()
+	public boolean isSuccess()
+	{
+		return "Success".equals(status);
+	}
+
+	public T getResult()
 	{
 		return result;
 	}
 
-	public void setResult(List<T> result)
+	public void setResult(T result)
 	{
 		this.result = result;
 	}
