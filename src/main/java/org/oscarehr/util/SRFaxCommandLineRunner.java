@@ -64,6 +64,6 @@ public class SRFaxCommandLineRunner
 		SRFaxListResultWrapper<SRFaxGetUsageResult> responseWrapper = apiConnector.Get_Fax_Usage(parameters);
 
 		logger.info("STATUS: " + responseWrapper.getStatus());
-		logger.info("DATA: " + responseWrapper.getResult().toString());
+		logger.info("DATA: " + responseWrapper.getResult());
 	}
 }

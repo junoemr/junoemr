@@ -33,6 +33,8 @@ public class SRFaxSingleResultWrapper<T>
 	@JsonProperty("Result")
 	private T result;
 
+	private String error;
+
 	public String getStatus()
 	{
 		return status;
@@ -56,6 +58,16 @@ public class SRFaxSingleResultWrapper<T>
 	public void setResult(T result)
 	{
 		this.result = result;
+	}
+
+	public String getError()
+	{
+		return error;
+	}
+
+	public void setError(String error)
+	{
+		this.error = error;
 	}
 
 	@Override

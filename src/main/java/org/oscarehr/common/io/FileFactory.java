@@ -23,6 +23,7 @@
 
 package org.oscarehr.common.io;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
@@ -82,9 +83,11 @@ public class FileFactory
 	 */
 	public static GenericFile copy(GenericFile fileToCopy) throws IOException
 	{
-		File file = File.createTempFile("juno", "tempfile");
-		Files.copy(fileToCopy.getFileObject().toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-		return getExistingFile(file);
+		File fileObjToCopy = fileToCopy.getFileObject();
+		String extension = FilenameUtils.getExtension(fileObjToCopy.getPath());
+		File newFile = File.createTempFile("juno", "." + extension);
+		Files.copy(fileObjToCopy.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		return getExistingFile(newFile);
 	}
 
 

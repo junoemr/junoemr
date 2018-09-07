@@ -34,6 +34,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 import org.oscarehr.fax.externalApi.srfax.result.SRFaxGetUsageResult;
 import org.oscarehr.fax.externalApi.srfax.result.SRFaxListResultWrapper;
 import org.oscarehr.fax.externalApi.srfax.result.SRFaxSingleResultWrapper;
@@ -76,7 +77,7 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		return _processResponse(result, new TypeReference<SRFaxSingleResultWrapper<String>>(){});
+		return processSingleResponse(result);
 	}
 
 	public SRFaxSingleResultWrapper<String> Get_FaxStatus(Map<String, String> parameters)
@@ -94,7 +95,7 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		return _processResponse(result, new TypeReference<SRFaxListResultWrapper<String>>(){});
+		return processSingleResponse(result);
 	}
 
 	public SRFaxListResultWrapper<String> Get_MultiFaxStatus(Map<String, String> parameters)
@@ -112,7 +113,7 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		return _processResponse(result, new TypeReference<SRFaxListResultWrapper<String>>(){});
+		return processListResponse(result);
 	}
 
 	public SRFaxListResultWrapper<String> Get_Fax_Inbox(Map<String, String> parameters)
@@ -130,7 +131,7 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		return _processResponse(result, new TypeReference<SRFaxListResultWrapper<String>>(){});
+		return processListResponse(result);
 	}
 
 	public SRFaxListResultWrapper<String> Get_Fax_Outbox(Map<String, String> parameters)
@@ -148,7 +149,7 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		return _processResponse(result, new TypeReference<SRFaxListResultWrapper<String>>(){});
+		return processListResponse(result);
 	}
 
 	public SRFaxSingleResultWrapper<String> Retrieve_Fax(Map<String, String> parameters)
@@ -166,7 +167,7 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		return _processResponse(result, new TypeReference<SRFaxSingleResultWrapper<String>>(){});
+		return processSingleResponse(result);
 	}
 
 	public SRFaxSingleResultWrapper<String> Update_Viewed_Status(Map<String, String> parameters)
@@ -184,7 +185,7 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		return _processResponse(result, new TypeReference<SRFaxSingleResultWrapper<String>>(){});
+		return processSingleResponse(result);
 	}
 
 	public SRFaxSingleResultWrapper<String> Delete_Fax(Map<String, String> parameters)
@@ -202,7 +203,7 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		return _processResponse(result, new TypeReference<SRFaxSingleResultWrapper<String>>(){});
+		return processSingleResponse(result);
 	}
 
 	public SRFaxSingleResultWrapper<String> Stop_Fax(Map<String, String> parameters)
@@ -220,7 +221,7 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		return _processResponse(result, new TypeReference<SRFaxSingleResultWrapper<String>>(){});
+		return processSingleResponse(result);
 	}
 
 	public SRFaxListResultWrapper<SRFaxGetUsageResult> Get_Fax_Usage(Map<String, String> parameters)
@@ -238,27 +239,57 @@ public class SRFaxApiConnector
 
 		String result = _processRequest(postVariables);
 
-		return SRFaxApiConnector._processResponse(result, new TypeReference<SRFaxListResultWrapper<SRFaxGetUsageResult>>(){});
+		return processListResponse(result);
 	}
 
 	/*******************INTERNAL FUNCTIONS*********************************/
 
-
-	private static <Wrapper> Wrapper _processResponse(String response, TypeReference typeReference)
+	private static <T> SRFaxListResultWrapper processListResponse(String response)
 	{
-		Wrapper result = null;
-
+		SRFaxListResultWrapper<T> result = null;
 		try
 		{
-			if(response.contains("Success"))
+			JSONObject json = new JSONObject(response);
+			String status = json.getString("Status");
+			if(status.equals("Success"))
 			{
 				ObjectMapper mapper = new ObjectMapper();
-				result = mapper.readValue(response, typeReference);
+				result = mapper.readValue(response, new TypeReference<SRFaxListResultWrapper<T>>(){});
 			}
 			else
 			{
-				//TODO handle errors
 				logger.warn("API Response Failure: " + response);
+				result = new SRFaxListResultWrapper<>();
+				result.setStatus(status);
+				result.setError(json.getString("Result"));
+			}
+		}
+		catch(IOException e)
+		{
+			logger.error("Error", e);
+		}
+		return result;
+	}
+
+	private static <T> SRFaxSingleResultWrapper processSingleResponse(String response)
+	{
+		JSONObject json = new JSONObject(response);
+		String status = json.getString("Status");
+		SRFaxSingleResultWrapper<T> result = null;
+
+		try
+		{
+			if(status.equals("Success"))
+			{
+				ObjectMapper mapper = new ObjectMapper();
+				result = mapper.readValue(response, new TypeReference<SRFaxSingleResultWrapper<T>>(){});
+			}
+			else
+			{
+				logger.warn("API Response Failure: " + response);
+				result = new SRFaxSingleResultWrapper<>();
+				result.setStatus(status);
+				result.setError(json.getString("Result"));
 			}
 		}
 		catch(IOException e)
