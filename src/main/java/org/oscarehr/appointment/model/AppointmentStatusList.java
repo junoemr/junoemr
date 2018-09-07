@@ -70,7 +70,7 @@ public class AppointmentStatusList
 			String status = appointmentStatus.getStatus();
 
 			// Leave billed out of status rotation
-			if(!STATUS_BILLED.equals(status))
+			if(!STATUS_BILLED.equals(status) && appointmentStatus.getActive() != 0)
 			{
 				orderedStatusList.add(appointmentStatus.getStatus());
 			}
