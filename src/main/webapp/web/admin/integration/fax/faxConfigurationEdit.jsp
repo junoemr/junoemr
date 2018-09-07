@@ -59,6 +59,16 @@
 			       ng-model="faxConfigEditController.faxAccount.displayName">
 		</div>
 		<div>
+			<label class="input-label" for="input-fax-account-email">Response Email</label>
+			<input id="input-fax-account-email" type="text"
+			       ng-model="faxConfigEditController.faxAccount.accountEmail">
+		</div>
+		<div>
+			<label class="input-label" for="input-fax-account-fax-no">Response Fax Number</label>
+			<input id="input-fax-account-fax-no" type="text"
+			       ng-model="faxConfigEditController.faxAccount.faxNumber">
+		</div>
+		<div>
 			<label class="input-label" for="input-fax-account-cover-letter-type">Cover Letter</label>
 			<select id="input-fax-account-cover-letter-type"
 			        ng-model="faxConfigEditController.faxAccount.coverLetterOption"

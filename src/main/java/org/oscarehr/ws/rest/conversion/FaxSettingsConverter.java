@@ -41,6 +41,8 @@ public class FaxSettingsConverter
 		config.setActiveOutbound(transfer.isEnableOutbound());
 		config.setDisplayName(transfer.getDisplayName());
 		config.setCoverLetterOption(transfer.getCoverLetterOption());
+		config.setSiteUser(transfer.getAccountEmail());
+		config.setFaxNumber(transfer.getFaxNumber());
 		return config;
 	}
 
@@ -54,6 +56,8 @@ public class FaxSettingsConverter
 		transfer.setEnableOutbound(config.isActiveOutbound());
 		transfer.setDisplayName(config.getDisplayName());
 		transfer.setCoverLetterOption(config.getCoverLetterOption());
+		transfer.setFaxNumber(config.getFaxNumber());
+		transfer.setAccountEmail(config.getSiteUser());
 		return transfer;
 	}
 

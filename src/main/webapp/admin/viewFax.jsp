@@ -38,7 +38,7 @@ if(!authed) {
 }
 %>
 
-<%@ page import="org.oscarehr.common.dao.FaxJobDao, org.oscarehr.common.model.FaxJob"%>
+<%@ page import="org.oscarehr.fax.dao.FaxJobDao, org.oscarehr.fax.model.FaxJob"%>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="java.util.List" %>
 

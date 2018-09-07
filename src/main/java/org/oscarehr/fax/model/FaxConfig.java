@@ -41,7 +41,6 @@ import java.util.Date;
 @Where(clause="deleted_at IS NULL")
 public class FaxConfig extends AbstractModel<Integer>
 {
-	
 	private static final long serialVersionUID = 1L;
 	
 	@Id

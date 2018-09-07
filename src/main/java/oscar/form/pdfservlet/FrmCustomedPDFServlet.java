@@ -50,9 +50,9 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.fax.dao.FaxConfigDao;
-import org.oscarehr.common.dao.FaxJobDao;
+import org.oscarehr.fax.dao.FaxJobDao;
 import org.oscarehr.fax.model.FaxConfig;
-import org.oscarehr.common.model.FaxJob;
+import org.oscarehr.fax.model.FaxJob;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;

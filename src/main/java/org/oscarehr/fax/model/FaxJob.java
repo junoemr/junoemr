@@ -21,7 +21,9 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.model;
+package org.oscarehr.fax.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import java.util.Date;
 
@@ -42,12 +44,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @Table(name="faxes")
 public class FaxJob extends AbstractModel<Integer> implements Comparable<FaxJob> {
-	
-	public enum STATUS {
-		
-		RECEIVED,SENT,COMPLETE,ERROR,WAITING,CANCELLED,RESOLVED;				
-				
-	};
+
+	public enum STATUS
+	{
+		RECEIVED, SENT, COMPLETE, ERROR, WAITING, CANCELLED, RESOLVED
+	}
 	
 	public FaxJob() {
 		

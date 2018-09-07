@@ -41,10 +41,10 @@ import org.apache.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.oscarehr.fax.dao.FaxConfigDao;
-import org.oscarehr.common.dao.FaxJobDao;
+import org.oscarehr.fax.dao.FaxJobDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.fax.model.FaxConfig;
-import org.oscarehr.common.model.FaxJob;
+import org.oscarehr.fax.model.FaxJob;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 

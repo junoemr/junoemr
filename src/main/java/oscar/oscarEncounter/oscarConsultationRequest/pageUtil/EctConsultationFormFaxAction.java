@@ -9,19 +9,10 @@
 
 package oscar.oscarEncounter.oscarConsultationRequest.pageUtil;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.itextpdf.text.pdf.PdfReader;
+import com.lowagie.text.DocumentException;
+import com.sun.xml.messaging.saaj.util.ByteInputStream;
+import com.sun.xml.messaging.saaj.util.ByteOutputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -29,17 +20,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.tika.io.IOUtils;
-import org.oscarehr.fax.dao.FaxConfigDao;
-import org.oscarehr.common.dao.FaxJobDao;
 import org.oscarehr.common.exception.HtmlToPdfConversionException;
-import org.oscarehr.fax.model.FaxConfig;
-import org.oscarehr.common.model.FaxJob;
 import org.oscarehr.fax.util.PdfCoverPageCreator;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
@@ -50,10 +36,16 @@ import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ConcatPDF;
 
-import com.itextpdf.text.pdf.PdfReader;
-import com.lowagie.text.DocumentException;
-import com.sun.xml.messaging.saaj.util.ByteInputStream;
-import com.sun.xml.messaging.saaj.util.ByteOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 
 public class EctConsultationFormFaxAction extends Action
 {
@@ -210,7 +202,7 @@ public class EctConsultationFormFaxAction extends Action
 				ArrayList<String> recipients = tmpRecipients == null ? new ArrayList<String>() : new ArrayList<String>(Arrays.asList(tmpRecipients));
 
 				// Removing duplicate phone numbers.
-				recipients = new ArrayList<String>(new HashSet<String>(recipients));
+				recipients = new ArrayList<>(new HashSet<>(recipients));
 
 				// Writing consultation request to disk as a pdf.
 				String faxPath = path;
@@ -235,15 +227,7 @@ public class EctConsultationFormFaxAction extends Action
 
 
 				PdfReader pdfReader = new PdfReader(faxPdf);
-				int numPages = pdfReader.getNumberOfPages();
 				pdfReader.close();
-
-				FaxJob faxJob = null;
-				FaxJobDao faxJobDao = SpringUtils.getBean(FaxJobDao.class);
-				FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
-
-				List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
-				boolean validFaxNumber;
 
 				for (int i = 0; i < recipients.size(); i++)
 				{

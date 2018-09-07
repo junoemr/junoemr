@@ -34,9 +34,11 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxCon
 					enableInbound: false,
 					enableOutbound: false,
 					accountLogin: '',
+					accountEmail: '',
 					password: '',
 					displayName: '',
 					coverLetterOption: '',
+					faxNumber: '',
 					connectionStatus: controller.connectionStatusEnum.unknown
 				};
 			}

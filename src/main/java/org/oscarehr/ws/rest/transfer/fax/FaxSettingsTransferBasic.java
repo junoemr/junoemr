@@ -35,7 +35,9 @@ public class FaxSettingsTransferBasic implements Serializable
 	private Boolean enableInbound;
 	private Boolean enableOutbound;
 	private String accountLogin;
+	private String accountEmail;
 	private String displayName;
+	private String faxNumber;
 	private String coverLetterOption;
 
 	public Boolean isEnabled()
@@ -78,6 +80,16 @@ public class FaxSettingsTransferBasic implements Serializable
 		this.accountLogin = accountLogin;
 	}
 
+	public String getAccountEmail()
+	{
+		return accountEmail;
+	}
+
+	public void setAccountEmail(String accountEmail)
+	{
+		this.accountEmail = accountEmail;
+	}
+
 	public String getDisplayName()
 	{
 		return displayName;
@@ -86,6 +98,16 @@ public class FaxSettingsTransferBasic implements Serializable
 	public void setDisplayName(String displayName)
 	{
 		this.displayName = displayName;
+	}
+
+	public String getFaxNumber()
+	{
+		return faxNumber;
+	}
+
+	public void setFaxNumber(String faxNumber)
+	{
+		this.faxNumber = faxNumber;
 	}
 
 	public String getCoverLetterOption()

@@ -34,8 +34,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.fax.dao.FaxConfigDao;
+import org.oscarehr.fax.model.FaxConfig;
+import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.MiscUtils;
 
+import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.dms.EDocUtil;
 import oscar.util.FaxUtils;
@@ -58,6 +64,9 @@ import java.io.IOException;
  * @author jay
  */
 public class SendFaxPDFAction extends DispatchAction {
+
+	private static final OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
+	private static final FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
 
     public ActionForward faxDocument(ActionMapping mapping, ActionForm form,
 		HttpServletRequest request, HttpServletResponse response) 
@@ -91,25 +100,33 @@ public class SendFaxPDFAction extends DispatchAction {
             for (int i =0 ; i < docNoArray.length ; i++)
 			{
 				String docNo = docNoArray[i];
-				String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+//				String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 				String filename =  docData.getDocumentName(docNo);
-				String faxPdf = path + filename;
+//				String faxPdf = path + filename;
 
 				for (int j = 0; j < recipients.length; j++)
 				{
 					String faxNo = recipients[j].replaceAll("\\D", "");
 
-					String error = "";
-					String message = "";
-					Exception exception = null;
+//					String error = "";
+//					String message = "";
+//					Exception exception = null;
 					try
 					{
-						sendFax("DOC-" + docNo, faxPdf, faxNo);
+//						sendFax("DOC-" + docNo, faxPdf, faxNo);
+						GenericFile fileToCopy = FileFactory.getDocumentFile(docData.getDocumentName(docNo));
+						GenericFile fileToFax = FileFactory.copy(fileToCopy);
+
+						String faxFileName = "DOC-"+ docNo + "_" + filename + "-" + faxNo + "." + System.currentTimeMillis();
+						fileToFax.rename(faxFileName + ".pdf");
+
+						FaxConfig faxSettings = faxConfigDao.findAll(0, 10).get(0);
+						outgoingFaxService.sendFax(faxSettings, faxNo, fileToFax);
 					}
 					catch(Exception e)
 					{
 						MiscUtils.getLogger().error(e.getClass().getCanonicalName() +
-								" occurred while preparing document fax files.");
+								" occurred while preparing document fax files.", e);
 						String errorAt = " (Document: " + filename + " Recipient: " + recipients[j] + ")";
 						errorList.add(getUserFriendlyError(e) + errorAt);
 						continue;

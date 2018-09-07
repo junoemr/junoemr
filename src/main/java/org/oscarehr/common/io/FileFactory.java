@@ -54,7 +54,7 @@ public class FileFactory
 	 * Write the input stream to a tempfile
 	 * @param fileInputStream - input stream of the new file
 	 * @return the file
-	 * @throws IOException
+	 * @throws IOException - if an error occurs
 	 */
 	public static GenericFile createTempFile(InputStream fileInputStream) throws IOException
 	{
@@ -72,6 +72,21 @@ public class FileFactory
 	{
 		return getExistingFile(GenericFile.DOCUMENT_BASE_DIR, fileName);
 	}
+
+	/**
+	 * Copy the given file to a new file.
+	 * This will be placed in the tempfile location, and should be moved afterwards
+	 * @param fileToCopy - the file to be copied
+	 * @return a new copy of the file
+	 * @throws IOException - if an error occurs
+	 */
+	public static GenericFile copy(GenericFile fileToCopy) throws IOException
+	{
+		File file = File.createTempFile("juno", "tempfile");
+		Files.copy(fileToCopy.getFileObject().toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		return getExistingFile(file);
+	}
+
 
 	/**
 	 * Overwrite an existing file with new stream content

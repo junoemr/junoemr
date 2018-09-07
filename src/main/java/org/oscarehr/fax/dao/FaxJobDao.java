@@ -21,7 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.fax.dao;
 
 import java.util.Collections;
 import java.util.Date;
@@ -29,11 +29,13 @@ import java.util.List;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.model.FaxJob;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.fax.model.FaxJob;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class FaxJobDao extends AbstractDao<FaxJob> {
+public class FaxJobDao extends AbstractDao<FaxJob>
+{
     
     public FaxJobDao() {
     	super(FaxJob.class);
