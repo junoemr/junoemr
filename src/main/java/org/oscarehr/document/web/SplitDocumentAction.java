@@ -89,7 +89,7 @@ public class SplitDocumentAction extends DispatchAction {
 
 			if(newPdf.getNumberOfPages() > 0)
 			{
-				File tempFile = File.createTempFile("juno-doc-split", "tempfile");
+				File tempFile = File.createTempFile("juno-doc-split", ".pdf");
 				newPdf.save(tempFile);
 				newPdf.close();
 
@@ -99,7 +99,7 @@ public class SplitDocumentAction extends DispatchAction {
 				document.setDocdesc("");
 				document.setDoctype(existingDocument.getDoctype());
 				document.setDocSubClass(existingDocument.getDocSubClass());
-				document.setDocfilename(newFilename);
+				document.setDocfilename(tempFile.getName());
 				document.setDoccreator(providerNo);
 				document.setResponsible(existingDocument.getDoccreator());
 				document.setSource(existingDocument.getSource());
