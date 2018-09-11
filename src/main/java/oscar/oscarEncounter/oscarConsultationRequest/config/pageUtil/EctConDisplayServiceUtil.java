@@ -41,6 +41,8 @@ import oscar.util.ConversionUtils;
 
 public class EctConDisplayServiceUtil
 {
+	private static final String STATUS_ALL = "all";
+	private static final String STATUS_ACTIVE = "active";
 	private ConsultationServiceDao consultationServiceDao = (ConsultationServiceDao)SpringUtils.getBean("consultationServiceDao");
 	
 	public Vector<String> fNameVec;
@@ -114,10 +116,10 @@ public class EctConDisplayServiceUtil
 		int offset = maxResults * currentPage;
 		List<ProfessionalSpecialist> specialists;
 		ProfessionalSpecialistDao dao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
-		if (searchType.equals("all"))
+		if (searchType.equals(STATUS_ALL))
 		{
 			specialists = dao.findBySearchName(searchText, offset, maxResults, null);
-		} else if (searchType.equals("active"))
+		} else if (searchType.equals(STATUS_ACTIVE))
 		{
 			specialists = dao.findBySearchNameActive(searchText, offset, maxResults);
 		} else
@@ -170,10 +172,10 @@ public class EctConDisplayServiceUtil
 
 	public long getNumOfSpecialists(String searchText, String searchType) {
 		ProfessionalSpecialistDao proSpecDao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
-		if (searchType.equals("all"))
+		if (searchType.equals(STATUS_ALL))
 		{
 			numOfSpecialists = proSpecDao.getNumOfSpecialists(searchText, null);
-		} else if (searchType.equals("active"))
+		} else if (searchType.equals(STATUS_ACTIVE))
 		{
 			numOfSpecialists = proSpecDao.getNumOfSpecialistsActive(searchText);
 		} else
