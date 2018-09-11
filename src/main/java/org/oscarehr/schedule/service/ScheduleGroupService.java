@@ -24,9 +24,9 @@ package org.oscarehr.schedule.service;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.MyGroupDao;
-import org.oscarehr.common.dao.ProviderDataDao;
+import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.common.model.MyGroup;
-import org.oscarehr.common.model.ProviderData;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.schedule.dto.ScheduleGroup;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
