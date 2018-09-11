@@ -2259,19 +2259,6 @@ function updateQty(element){
         return x;
     }
 
-    
-    
-	<%
-		ArrayList<Object> args = new ArrayList<Object>();
-		args.add(String.valueOf(bean.getDemographicNo()));
-		args.add(bean.getProviderNo());
-				
-
-		// This is some stupid shit that injects useless javascript into the main page
-
-		//Study myMeds = StudyFactory.getFactoryInstance().makeStudy(Study.MYMEDS, args);
-		//out.write(myMeds.printInitcode());
-	%>
     /*
      * validate instruction text value for non-empty values
      */
@@ -2328,16 +2315,12 @@ function updateQty(element){
         return false;
     }
 
-function checkEnterSendRx(){
+    function checkEnterSendRx() {
         popupRxSearchWindow();
         return false;
-}
-
-
+    }
 
 $("searchString").focus();
-
-
 
 </script>
 
