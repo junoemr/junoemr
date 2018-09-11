@@ -187,6 +187,32 @@ public class EForm extends EFormBase {
 		this.parentAjaxId = parentAjaxId;
 	}
 
+	public void disableSubmitControls()
+	{
+		StringBuilder html = new StringBuilder(this.formHtml);
+		int bottomButtonsIndex = StringBuilderUtils.indexOfIgnoreCase(html, "id=\"BottomButtons\"",0);
+		if (bottomButtonsIndex < 0)
+		{
+			bottomButtonsIndex = 0;
+		}
+
+		disableInput(html, "SubmitButton", bottomButtonsIndex);
+		disableInput(html, "PrintSubmitButton", bottomButtonsIndex);
+		disableInput(html, "subject", bottomButtonsIndex);
+
+		this.formHtml = html.toString();
+	}
+
+	private void disableInput(StringBuilder htmlStringBuilder, String inputID, int searchStartIndex)
+	{
+		int inputStart = StringBuilderUtils.indexOfIgnoreCase(htmlStringBuilder, "id=\"" + inputID + "\"", searchStartIndex);
+		if (inputStart > 0)
+		{
+			int inputEnd = htmlStringBuilder.indexOf(">", inputStart + 1);
+			htmlStringBuilder.insert(inputEnd, "disabled");
+		}
+	}
+
 	public void setAction() {
 		setAction(false);
 	}

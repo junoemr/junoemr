@@ -56,15 +56,16 @@
 		out.print(eForm.getFormHtml());
 	}
 	else
-	{  // if form is viewed from admin screen
+	{  // the form is viewed from admin screen
 		String id = request.getParameter("fid");
-		EForm eForm = new EForm(id, "-1"); //form cannot be submitted, demographic_no "-1" indicate this specialty
+		EForm eForm = new EForm(id, "-1");		// demographicID -1 is a placeholder.  We will not be submitting this form.
 		eForm.setLoggedInProvider(providerNo);
 		eForm.setContextPath(request.getContextPath());
 		eForm.setupInputFields();
 		eForm.setOscarOPEN(request.getRequestURI());
 		eForm.setImagePath();
 		eForm.setDatabaseUpdateAPs();
+		eForm.disableSubmitControls();
 		out.print(eForm.getFormHtml());
 	}
 
