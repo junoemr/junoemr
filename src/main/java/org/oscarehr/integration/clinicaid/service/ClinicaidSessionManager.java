@@ -26,6 +26,8 @@ package org.oscarehr.integration.clinicaid.service;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.codec.binary.Base64;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.integration.clinicaid.dto.ClinicaidResultTo1;
@@ -133,6 +135,8 @@ public class ClinicaidSessionManager
 			writer.close();
 		}
 
+		connection.setReadTimeout(5000);
+
 		// Read the result
 		String inputLine;
 		String response = "";
@@ -149,6 +153,9 @@ public class ClinicaidSessionManager
 
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(MapperFeature.USE_ANNOTATIONS, true);
+		mapper.registerModule(new JavaTimeModule());
+		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
 		ClinicaidResultTo1 result = mapper.readValue(response, ClinicaidResultTo1.class);
 
 		if (result.hasError())

@@ -39,7 +39,7 @@
 			  This property needs to be set 'true' in order to give preference to JacksonJsonProvider
 			  over the default Jettison provider.
 			-->
-			<entry key="skip.default.json.provider.registration" value="true" ></entry>
+			<entry key="skip.default.json.provider.registration" value="true" />
 		</cxf:properties>
 
 		<!-- logging interceptors -->

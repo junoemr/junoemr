@@ -10,6 +10,8 @@
 	<!-- ========================================================================================-->
 	<!-- Settings for the OAuth web services -->
 	<!-- ========================================================================================-->
+	<!--<bean id="restLoggingInInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingInInterceptor" parent="abstractLoggingInterceptor"/>-->
+	<!--<bean id="restLoggingOutInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingOutInterceptor" parent="abstractLoggingInterceptor"/>-->
 
 	<bean id="oauthProvider" class="oscar.login.OscarOAuthDataProvider" autowire="byName"/>
 

@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.oscarehr.common.dao.ProviderDataDao;
+import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.common.dao.ProviderPreferenceDao;
 import org.oscarehr.common.model.ProviderPreference;
 import org.oscarehr.util.SpringUtils;
@@ -50,7 +50,7 @@ import oscar.util.ConversionUtils;
  * @author  Jay Gallagher
  * Used to access data in provider table
  * 
- * @deprecated use {@link org.oscarehr.common.model.ProviderData} instead
+ * @deprecated use {@link org.oscarehr.provider.model.ProviderData} instead
  */
 public class ProviderData {
 	private static final int EXTERNAL_PROVIDER_ID_CONSTRAINT = -1000;
@@ -134,8 +134,8 @@ public class ProviderData {
 	 * 		Returns a new {@link org.oscarehr.common.model.ProviderData} instance containing
 	 * a copy of information in this instance. 
 	 */
-	private org.oscarehr.common.model.ProviderData toProvider() {
-		org.oscarehr.common.model.ProviderData result = new org.oscarehr.common.model.ProviderData();
+	private org.oscarehr.provider.model.ProviderData toProvider() {
+		org.oscarehr.provider.model.ProviderData result = new org.oscarehr.provider.model.ProviderData();
 		result.set(provider_no);
 		result.setLastName(last_name);
 		result.setFirstName(first_name);
@@ -165,7 +165,7 @@ public class ProviderData {
 		return result;
 	}
 
-	private void fromProvider(org.oscarehr.common.model.ProviderData p) {
+	private void fromProvider(org.oscarehr.provider.model.ProviderData p) {
 		provider_no = p.getId();
 		last_name = p.getLastName();
 		first_name = p.getFirstName();
@@ -196,10 +196,10 @@ public class ProviderData {
 
 	public List<String> getProviderListWithInsuranceNo(String insurerNo) {
 		ProviderDataDao dao = SpringUtils.getBean(ProviderDataDao.class);
-		List<org.oscarehr.common.model.ProviderData> providers = dao.findByTypeAndOhip(PROVIDER_TYPE_DOCTOR, insurerNo);
+		List<org.oscarehr.provider.model.ProviderData> providers = dao.findByTypeAndOhip(PROVIDER_TYPE_DOCTOR, insurerNo);
 
 		List<String> result = new ArrayList<String>();
-		for (org.oscarehr.common.model.ProviderData p : providers) {
+		for (org.oscarehr.provider.model.ProviderData p : providers) {
 			result.add(p.getId());
 		}
 		return result;
@@ -207,7 +207,7 @@ public class ProviderData {
 
 	public void getProvider(String providerNo) {
 		ProviderDataDao dao = SpringUtils.getBean(ProviderDataDao.class);
-		org.oscarehr.common.model.ProviderData provider = dao.findByProviderNo(providerNo);
+		org.oscarehr.provider.model.ProviderData provider = dao.findByProviderNo(providerNo);
 		if (provider != null) {
 			fromProvider(provider);
 		}
@@ -580,17 +580,17 @@ public class ProviderData {
 
 	public static List<Map<String, String>> getProviderList() {
 		ProviderDataDao dao = SpringUtils.getBean(ProviderDataDao.class);
-		List<org.oscarehr.common.model.ProviderData> providers = dao.findByType(PROVIDER_TYPE_DOCTOR);
+		List<org.oscarehr.provider.model.ProviderData> providers = dao.findByType(PROVIDER_TYPE_DOCTOR);
 
 		List<Map<String, String>> result = new ArrayList<Map<String, String>>();
-		for (org.oscarehr.common.model.ProviderData p : providers) {
+		for (org.oscarehr.provider.model.ProviderData p : providers) {
 			result.add(toMap(p));
 		}
 		return result;
 
 	}
 
-	private static Map<String, String> toMap(org.oscarehr.common.model.ProviderData p) {
+	private static Map<String, String> toMap(org.oscarehr.provider.model.ProviderData p) {
 	    Map<String, String> result = new HashMap<String, String>();
 	    result.put("providerNo", p.getId());
 	    result.put("firstName", p.getFirstName());
@@ -616,11 +616,11 @@ public class ProviderData {
 		}
 		
 		ProviderDataDao dao = SpringUtils.getBean(ProviderDataDao.class);
-		List<org.oscarehr.common.model.ProviderData> providers = dao.findByName(firstname, lastname, onlyActive);
+		List<org.oscarehr.provider.model.ProviderData> providers = dao.findByName(firstname, lastname, onlyActive);
 		
 		List<Map<String, String>> result = new ArrayList<Map<String,String>>();
 		
-		for(org.oscarehr.common.model.ProviderData p : providers) {
+		for(org.oscarehr.provider.model.ProviderData p : providers) {
 			result.add(toMap(p));
 		}
 		return result;
@@ -630,8 +630,8 @@ public class ProviderData {
 		ProviderDataDao dao = SpringUtils.getBean(ProviderDataDao.class);
 		List<Map<String, String>> result = new ArrayList<Map<String,String>>();
 		
-		List<org.oscarehr.common.model.ProviderData> providers = dao.findAll(inactive);
-		for(org.oscarehr.common.model.ProviderData p : providers) {
+		List<org.oscarehr.provider.model.ProviderData> providers = dao.findAll(inactive);
+		for(org.oscarehr.provider.model.ProviderData p : providers) {
 			result.add(toMap(p));
 		}
 		return result;
@@ -643,7 +643,7 @@ public class ProviderData {
 
 	public static String getProviderName(String providerNo) {
 		ProviderDataDao dao = SpringUtils.getBean(ProviderDataDao.class);
-		org.oscarehr.common.model.ProviderData p = dao.findByProviderNo(providerNo);
+		org.oscarehr.provider.model.ProviderData p = dao.findByProviderNo(providerNo);
 		if (p == null)
 			return "";
 		
@@ -673,7 +673,7 @@ public class ProviderData {
 	public void getProviderWithOHIP(String ohipNo) {
 		if (filled(ohipNo)) {
 			ProviderDataDao dao = SpringUtils.getBean(ProviderDataDao.class);
-			org.oscarehr.common.model.ProviderData p = dao.findByOhipNumber(ohipNo);
+			org.oscarehr.provider.model.ProviderData p = dao.findByOhipNumber(ohipNo);
 			if (p != null)
 				fromProvider(p);			
 		}
@@ -682,7 +682,7 @@ public class ProviderData {
 	public void getProviderWithNames(String firstName, String lastName) {
 		if (filled(firstName) && filled(lastName)) {
 			ProviderDataDao dao = SpringUtils.getBean(ProviderDataDao.class);
-			List<org.oscarehr.common.model.ProviderData> providers = dao.findByName(firstName, lastName, false);
+			List<org.oscarehr.provider.model.ProviderData> providers = dao.findByName(firstName, lastName, false);
 			if (providers.isEmpty()) {
 				return;
 			}
@@ -693,12 +693,12 @@ public class ProviderData {
 	public void getExternalProviderWithNames(String firstName, String lastName) {
 		if (filled(firstName) && filled(lastName)) {
 			ProviderDataDao dao = SpringUtils.getBean(ProviderDataDao.class);
-			List<org.oscarehr.common.model.ProviderData> providers = dao.findByName(firstName, lastName, false);
+			List<org.oscarehr.provider.model.ProviderData> providers = dao.findByName(firstName, lastName, false);
 			if (providers.isEmpty()) {
 				return;
 			}
 			
-			for(org.oscarehr.common.model.ProviderData p : providers) {
+			for(org.oscarehr.provider.model.ProviderData p : providers) {
 				if (ConversionUtils.fromIntString(p.getId()) < EXTERNAL_PROVIDER_ID_CONSTRAINT) {
 					fromProvider(p);
 					return;

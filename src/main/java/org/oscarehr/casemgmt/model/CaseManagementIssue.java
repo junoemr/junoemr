@@ -41,6 +41,10 @@ import org.oscarehr.util.SpringUtils;
 
 import com.quatro.model.security.Secrole;
 
+/**
+ * @deprecated use the jpa model instead
+ */
+@Deprecated
 public class CaseManagementIssue extends BaseObject {
 
 	private transient ProgramProviderDAO programProviderDao=(ProgramProviderDAO)SpringUtils.getBean("programProviderDAO");

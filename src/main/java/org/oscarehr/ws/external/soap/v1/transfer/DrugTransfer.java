@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.model.Drug;
 import org.springframework.beans.BeanUtils;
 
 public class DrugTransfer {

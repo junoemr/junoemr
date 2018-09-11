@@ -27,10 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.oscarehr.common.dao.DrugDao;
+import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.common.dao.DrugDispensingDao;
 import org.oscarehr.common.dao.DrugProductDao;
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.model.Drug;
 import org.oscarehr.common.model.DrugDispensing;
 import org.oscarehr.common.model.DrugProduct;
 import org.oscarehr.util.MiscUtils;

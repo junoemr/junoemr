@@ -51,7 +51,7 @@ import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.casemgmt.web.CaseManagementViewAction.IssueDisplay;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.model.Drug;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;

@@ -31,6 +31,7 @@
 
 <%
 String curProvider_no = (String)session.getAttribute("user");
+OscarProperties props = OscarProperties.getInstance();
 %>
 
 
@@ -99,160 +100,348 @@ String curProvider_no = (String)session.getAttribute("user");
 				<div class="accordion-inner">
 				<ul>
 		            <security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.billing" rights="r" reverse="<%=false%>">
-		            
-		            <oscar:oscarPropertiesCheck property="billing_type" value="CLINICAID">
 
-					<li><a href="../billing.do?billRegion=CLINICAID&action=invoice_reports" target="_blank">Manage Invoices</a></li>
-					
-					<oscar:oscarPropertiesCheck property="instance_type" value="BC">
-					<!-- BC clinicaid users still need to be able to edit billingreferral for consultations etc. -->
-					<li><a href="${ctx}/billing/CA/BC/billingManageReferralDoc.jsp" class="contentLink defaultManageReferralDoc"><bean:message key="admin.admin.ManageReferralDoc"/></a></li>
-					</oscar:oscarPropertiesCheck>
-					
+					<%
+						if(props.isClinicaidBillingType())
+						{
+					%>
+							<li><a href="../billing.do?billRegion=CLINICAID&action=invoice_reports" target="_blank">Manage Invoices</a></li>
 
-					</oscar:oscarPropertiesCheck>
+					<%
+							if(props.isBritishColumbiaInstanceType())
+							{
+					%>
+								<!--oscar:oscarPropertiesCheck property="instance_type" value="BC"-->
+								<li><a href="${ctx}/billing/CA/BC/billingManageReferralDoc.jsp" class="contentLink defaultManageReferralDoc"><bean:message key="admin.admin.ManageReferralDoc"/></a></li>
+					<%
+							}
+						}
 
 
-		            <oscar:oscarPropertiesCheck property="billing_type" value="BC">
+						if(props.isBritishColumbiaBillingType())
+						{
+					%>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/manageBillingform.jsp"><bean:message key="admin.admin.ManageBillFrm"/></a></li>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/BC/billingPrivateCodeAdjust.jsp"><bean:message key="admin.admin.ManagePrivFrm"/></a></li>
+							<oscar:oscarPropertiesCheck property="BC_BILLING_CODE_MANAGEMENT"
+								value="yes">
+								<li><a href='javascript:void(0);'
+									class="xlink" rel="${ctx}/billing/CA/BC/billingCodeAdjust.jsp"><bean:message key="admin.admin.ManageBillCodes"/></a></li>
+							</oscar:oscarPropertiesCheck>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/BC/showServiceCodeAssocs.do"><bean:message key="admin.admin.ManageServiceDiagnosticCodeAssoc"/></a></li>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/BC/supServiceCodeAssocAction.do"><bean:message key="admin.admin.ManageProcedureFeeCodeAssoc"/></a></li>
 
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/manageBillingform.jsp"><bean:message key="admin.admin.ManageBillFrm"/></a></li>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/BC/billingPrivateCodeAdjust.jsp"><bean:message key="admin.admin.ManagePrivFrm"/></a></li>
-					<oscar:oscarPropertiesCheck property="BC_BILLING_CODE_MANAGEMENT"
-						value="yes">
-						<li><a href='javascript:void(0);'
-							class="xlink" rel="${ctx}/billing/CA/BC/billingCodeAdjust.jsp"><bean:message key="admin.admin.ManageBillCodes"/></a></li>
-					</oscar:oscarPropertiesCheck>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/BC/showServiceCodeAssocs.do"><bean:message key="admin.admin.ManageServiceDiagnosticCodeAssoc"/></a></li>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/BC/supServiceCodeAssocAction.do"><bean:message key="admin.admin.ManageProcedureFeeCodeAssoc"/></a></li>
+							<li><a href="${ctx}/billing/CA/BC/billingManageReferralDoc.jsp" class="contentLink defaultManageReferralDoc"><bean:message key="admin.admin.ManageReferralDoc"/></a></li>
 
-					<li><a href="${ctx}/billing/CA/BC/billingManageReferralDoc.jsp" class="contentLink defaultManageReferralDoc"><bean:message key="admin.admin.ManageReferralDoc"/></a></li>
+							<li>
+								<a href="javascript:void(0);" class="xlink" rel="${ ctx }/quickBillingBC.do" >
+									<bean:message key="admin.admin.bcQuickBilling" />
+								</a>
+							</li>
 
-					<li>
-						<a href="javascript:void(0);" class="xlink" rel="${ ctx }/quickBillingBC.do" >
-							<bean:message key="admin.admin.bcQuickBilling" />
-						</a>
-					</li>
+							<oscar:oscarPropertiesCheck property="NEW_BC_TELEPLAN" value="no" defaultVal="true">
+								<li><a href='javascript:void(0);'
+									class="xlink" rel="${ctx}/billing/CA/BC/billingSim.jsp"><bean:message key="admin.admin.SimulateSubFile"/></a></li>
+								<li><a href='javascript:void(0);'
+									class="xlink" rel="${ctx}/billing/CA/BC/billingTeleplanGroupReport.jsp"><bean:message key="admin.admin.genTeleplanFile"/></a></li>
+							</oscar:oscarPropertiesCheck>
+							<oscar:oscarPropertiesCheck property="NEW_BC_TELEPLAN" value="yes">
+								<li><a href='javascript:void(0);'
+									class="xlink" rel="${ctx}/billing/CA/BC/TeleplanSimulation.jsp"><bean:message key="admin.admin.simulateSubFile2"/></a></li>
+								<li><a href='javascript:void(0);'
+									class="xlink" rel="${ctx}/billing/CA/BC/TeleplanSubmission.jsp"><bean:message key="admin.admin.genTeleplanFile2"/></a></li>
+								<li><a href='javascript:void(0);'
+									class="xlink" rel="${ctx}/billing/CA/BC/teleplan/ManageTeleplan.jsp"><bean:message key="admin.admin.manageTeleplan"/></a></li>
+							</oscar:oscarPropertiesCheck>
+							<oscar:oscarPropertiesCheck property="NEW_BC_TELEPLAN" value="no"
+								defaultVal="true">
+								<li><a href='javascript:void(0);'
+									class="xlink" rel="${ctx}/billing/CA/BC/billingTA.jsp"><bean:message key="admin.admin.uploadRemittance"/></a></li>
+							</oscar:oscarPropertiesCheck>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/BC/viewReconcileReports.jsp"><bean:message key="admin.admin.reconciliationReports"/></a></li>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/BC/billingAccountReports.jsp"><bean:message key="admin.admin.AccountingRpts"/></a></li>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/BC/billStatus.jsp"><bean:message key="admin.admin.editInvoices"/></a></li>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/BC/settleBG.jsp"><bean:message key="admin.admin.settlePaidClaims"/></a></li>
+					<%
+						}
 
-					<oscar:oscarPropertiesCheck property="NEW_BC_TELEPLAN" value="no" defaultVal="true">
-						<li><a href='javascript:void(0);'
-							class="xlink" rel="${ctx}/billing/CA/BC/billingSim.jsp"><bean:message key="admin.admin.SimulateSubFile"/></a></li>
-						<li><a href='javascript:void(0);'
-							class="xlink" rel="${ctx}/billing/CA/BC/billingTeleplanGroupReport.jsp"><bean:message key="admin.admin.genTeleplanFile"/></a></li>
-					</oscar:oscarPropertiesCheck>
-					<oscar:oscarPropertiesCheck property="NEW_BC_TELEPLAN" value="yes">
-						<li><a href='javascript:void(0);'
-							class="xlink" rel="${ctx}/billing/CA/BC/TeleplanSimulation.jsp"><bean:message key="admin.admin.simulateSubFile2"/></a></li>
-						<li><a href='javascript:void(0);'
-							class="xlink" rel="${ctx}/billing/CA/BC/TeleplanSubmission.jsp"><bean:message key="admin.admin.genTeleplanFile2"/></a></li>
-						<li><a href='javascript:void(0);'
-							class="xlink" rel="${ctx}/billing/CA/BC/teleplan/ManageTeleplan.jsp"><bean:message key="admin.admin.manageTeleplan"/></a></li>
-					</oscar:oscarPropertiesCheck>
-					<oscar:oscarPropertiesCheck property="NEW_BC_TELEPLAN" value="no"
-						defaultVal="true">
-						<li><a href='javascript:void(0);'
-							class="xlink" rel="${ctx}/billing/CA/BC/billingTA.jsp"><bean:message key="admin.admin.uploadRemittance"/></a></li>
-					</oscar:oscarPropertiesCheck>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/BC/viewReconcileReports.jsp"><bean:message key="admin.admin.reconciliationReports"/></a></li>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/BC/billingAccountReports.jsp"><bean:message key="admin.admin.AccountingRpts"/></a></li>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/BC/billStatus.jsp"><bean:message key="admin.admin.editInvoices"/></a></li>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/BC/settleBG.jsp"><bean:message key="admin.admin.settlePaidClaims"/></a></li>
-					</oscar:oscarPropertiesCheck>
-			
-					<oscar:oscarPropertiesCheck property="billing_type" value="ON">
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/ON/ScheduleOfBenefitsUpload.jsp"><bean:message key="admin.admin.scheduleOfBenefits"/></a></li>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/ON/addEditServiceCode.jsp"><bean:message key="admin.admin.manageBillingServiceCode"/></a></li>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/ON/billingONEditPrivateCode.jsp"><bean:message key="admin.admin.managePrivBillingCode"/></a></li>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/admin/manageCSSStyles.do"><bean:message key="admin.admin.manageCodeStyles"/></a></li>
-					<li><a href='#'
-						class="xlink" rel="${ctx}/admin/gstControl.jsp"><bean:message key="admin.admin.manageGSTControl"/></a></li>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/admin/gstreport.jsp"><bean:message key="admin.admin.gstReport"/></a></li>
-					<li><a href='#'
-						class="xlink" rel="${ctx}/billing/CA/ON/manageBillingLocation.jsp"><bean:message
-						key="admin.admin.btnAddBillingLocation" /></a></li>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/ON/manageBillingform.jsp"><bean:message
-						key="admin.admin.btnManageBillingForm" /></a></li>
+						if(props.isOntarioBillingType())
+						{
+					%>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/ON/ScheduleOfBenefitsUpload.jsp"><bean:message key="admin.admin.scheduleOfBenefits"/></a></li>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/ON/addEditServiceCode.jsp"><bean:message key="admin.admin.manageBillingServiceCode"/></a></li>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/ON/billingONEditPrivateCode.jsp"><bean:message key="admin.admin.managePrivBillingCode"/></a></li>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/admin/manageCSSStyles.do"><bean:message key="admin.admin.manageCodeStyles"/></a></li>
+							<li><a href='#'
+								class="xlink" rel="${ctx}/admin/gstControl.jsp"><bean:message key="admin.admin.manageGSTControl"/></a></li>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/admin/gstreport.jsp"><bean:message key="admin.admin.gstReport"/></a></li>
+							<li><a href='#'
+								class="xlink" rel="${ctx}/billing/CA/ON/manageBillingLocation.jsp"><bean:message
+								key="admin.admin.btnAddBillingLocation" /></a></li>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/ON/manageBillingform.jsp"><bean:message
+								key="admin.admin.btnManageBillingForm" /></a></li>
 
-					<li><a href="${ctx}/billing/CA/ON/billingOHIPsimulation.jsp?html=" class="contentLink"><bean:message
-						key="admin.admin.btnSimulationOHIPDiskette" /></a></li>
+							<li><a href="${ctx}/billing/CA/ON/billingOHIPsimulation.jsp?html=" class="contentLink"><bean:message
+								key="admin.admin.btnSimulationOHIPDiskette" /></a></li>
 
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/ON/billingOHIPreport.jsp"><bean:message
-						key="admin.admin.btnGenerateOHIPDiskette" /></a></li>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/ON/billingCorrection.jsp?admin&billing_no="><bean:message
-						key="admin.admin.btnBillingCorrection" /></a></li>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/ON/batchBilling.jsp?service_code=all"><bean:message
-						key="admin.admin.btnBatchBilling" /></a></li>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/ON/inr/reportINR.jsp?provider_no=all"><bean:message
-						key="admin.admin.btnINRBatchBilling" /></a></li>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/ON/billingONUpload.jsp"><bean:message key="admin.admin.uploadMOHFile"/></a></li>
-					
-						
-					<oscar:oscarPropertiesCheck property="moh_file_management_enabled" value="true" defaultVal="false">
-					<li><a href='javascript:void(0);' class="xlink" rel="${ctx}/billing/CA/ON/viewMOHFiles.jsp"><bean:message key="admin.admin.viewMOHFiles"/></a></li>
-					</oscar:oscarPropertiesCheck>
-					
-					<oscar:oscarPropertiesCheck property="mcedt.mailbox.enabled" value="false" defaultVal="false">
-					<li>
-						<a href="javascript:void(0);" class="xlink" rel="${ctx}/mcedt/mcedt.do">
-							<bean:message key="admin.admin.mcedt"/>
-						</a>
-					</li>
-					</oscar:oscarPropertiesCheck>
-					
-					<oscar:oscarPropertiesCheck property="mcedt.mailbox.enabled" value="true" defaultVal="false">
-					<li>
-						<a href="javascript:void(0);" class="xlink" rel="${ctx}/mcedt/kaimcedt.do">
-							<bean:message key="admin.admin.mcedt.mailbox"/>
-						</a>
-					</li>
-					</oscar:oscarPropertiesCheck>
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/servlet/oscar.DocumentUploadServlet"><bean:message
-						key="admin.admin.btnBillingReconciliation" /></a></li>                       
-		                        <!--  li><a href='javascript:void(0);' onclick ='popupPage(600,900,"${ctx}/billing/CA/ON/billingRA.jsp");return false;'><bean:message key="admin.admin.btnBillingReconciliation"/></a></li-->
-					<!--  li><a href='javascript:void(0);' onclick ='popupPage(600,1000,"${ctx}/billing/CA/ON/billingOBECEA.jsp");return false;'><bean:message key="admin.admin.btnEDTBillingReportGenerator"/></a></li-->
-					<li><a href='javascript:void(0);'
-						class="xlink" rel="${ctx}/billing/CA/ON/billStatus.jsp"><bean:message key="admin.admin.invoiceRpts"/></a></li>
-		                        <li><a href='javascript:void(0);'
-		                                class="xlink" rel="${ctx}/billing/CA/ON/endYearStatement.do"><bean:message key="admin.admin.endYearStatement"/></a></li>
-					
-					<oscar:oscarPropertiesCheck property="rma_enabled" value="true" defaultVal="false">
-						<li>
-							<a href='#'	class="xlink" rel="${ctx}/admin/clinicNbrManage.jsp">Manage Clinic NBR Codes</a>
-						</li>
-					</oscar:oscarPropertiesCheck>
-					
-					</oscar:oscarPropertiesCheck>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/ON/billingOHIPreport.jsp"><bean:message
+								key="admin.admin.btnGenerateOHIPDiskette" /></a></li>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/ON/billingCorrection.jsp?admin&billing_no="><bean:message
+								key="admin.admin.btnBillingCorrection" /></a></li>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/ON/batchBilling.jsp?service_code=all"><bean:message
+								key="admin.admin.btnBatchBilling" /></a></li>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/ON/inr/reportINR.jsp?provider_no=all"><bean:message
+								key="admin.admin.btnINRBatchBilling" /></a></li>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/ON/billingONUpload.jsp"><bean:message key="admin.admin.uploadMOHFile"/></a></li>
+
+
+							<oscar:oscarPropertiesCheck property="moh_file_management_enabled" value="true" defaultVal="false">
+							<li><a href='javascript:void(0);' class="xlink" rel="${ctx}/billing/CA/ON/viewMOHFiles.jsp"><bean:message key="admin.admin.viewMOHFiles"/></a></li>
+							</oscar:oscarPropertiesCheck>
+
+							<oscar:oscarPropertiesCheck property="mcedt.mailbox.enabled" value="false" defaultVal="false">
+							<li>
+								<a href="javascript:void(0);" class="xlink" rel="${ctx}/mcedt/mcedt.do">
+									<bean:message key="admin.admin.mcedt"/>
+								</a>
+							</li>
+							</oscar:oscarPropertiesCheck>
+
+							<oscar:oscarPropertiesCheck property="mcedt.mailbox.enabled" value="true" defaultVal="false">
+							<li>
+								<a href="javascript:void(0);" class="xlink" rel="${ctx}/mcedt/kaimcedt.do">
+									<bean:message key="admin.admin.mcedt.mailbox"/>
+								</a>
+							</li>
+							</oscar:oscarPropertiesCheck>
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/servlet/oscar.DocumentUploadServlet"><bean:message
+								key="admin.admin.btnBillingReconciliation" /></a></li>
+										<!--  li><a href='javascript:void(0);' onclick ='popupPage(600,900,"${ctx}/billing/CA/ON/billingRA.jsp");return false;'><bean:message key="admin.admin.btnBillingReconciliation"/></a></li-->
+							<!--  li><a href='javascript:void(0);' onclick ='popupPage(600,1000,"${ctx}/billing/CA/ON/billingOBECEA.jsp");return false;'><bean:message key="admin.admin.btnEDTBillingReportGenerator"/></a></li-->
+							<li><a href='javascript:void(0);'
+								class="xlink" rel="${ctx}/billing/CA/ON/billStatus.jsp"><bean:message key="admin.admin.invoiceRpts"/></a></li>
+										<li><a href='javascript:void(0);'
+												class="xlink" rel="${ctx}/billing/CA/ON/endYearStatement.do"><bean:message key="admin.admin.endYearStatement"/></a></li>
+
+							<oscar:oscarPropertiesCheck property="rma_enabled" value="true" defaultVal="false">
+								<li>
+									<a href='#'	class="xlink" rel="${ctx}/admin/clinicNbrManage.jsp">Manage Clinic NBR Codes</a>
+								</li>
+							</oscar:oscarPropertiesCheck>
+					<%
+						}
+					%>
+
 		            </security:oscarSec>
-		                        
-		               
-		                <oscar:oscarPropertiesCheck property="billing_type" value="ON">             	
-		                        <li><a href='javascript:void(0);' class="xlink" rel='${ctx}/billing/CA/ON/billingONPayment.jsp'><bean:message key="admin.admin.paymentReceived"/></a></li>
-		                        <li><a href='javascript:void(0);' class="xlink" rel='${ctx}/billing/CA/ON/managePaymentType.do'><bean:message key="admin.admin.managePaymentType"/></a></li>
-		                </oscar:oscarPropertiesCheck>
+
+					<%
+						if(props.isOntarioBillingType())
+						{
+					%>
+							<li><a href='javascript:void(0);' class="xlink" rel='${ctx}/billing/CA/ON/billingONPayment.jsp'><bean:message key="admin.admin.paymentReceived"/></a></li>
+							<li><a href='javascript:void(0);' class="xlink" rel='${ctx}/billing/CA/ON/managePaymentType.do'><bean:message key="admin.admin.managePaymentType"/></a></li>
+					<%
+						}
+					%>
+
 				</ul>
 				</div>
 				</div>
 </security:oscarSec>
 <!-- #BILLING END-->
+
+<!-- #OLD OSCAR BILLING -->
+<security:oscarSec roleName="<%=roleName$%>" objectName="_admin.invoices,_admin,_admin.billing" rights="r" reverse="<%=false%>">
+	<%
+		boolean showOldBillingLinks = (props.isClinicaidBillingType() && props.isPropertyActive("admin.show_old_billing"));
+
+		if(showOldBillingLinks)
+		{
+	%>
+			<div class="accordion-heading">
+			<a class="accordion-toggle" data-toggle="collapse" data-parent="#adminNav" href="#collapseOld">
+			<bean:message key="admin.admin.billingOld" />
+			<i class="icon-chevron-right"></i>
+			</a>
+			</div>
+			<div id="collapseOld" class="accordion-body collapse">
+			<div class="accordion-inner">
+			<ul>
+				<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.billing" rights="r" reverse="<%=false%>">
+	<%
+				if(props.isBritishColumbiaInstanceType())
+				{
+	%>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/manageBillingform.jsp"><bean:message key="admin.admin.ManageBillFrm"/></a></li>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/BC/billingPrivateCodeAdjust.jsp"><bean:message key="admin.admin.ManagePrivFrm"/></a></li>
+						<oscar:oscarPropertiesCheck property="BC_BILLING_CODE_MANAGEMENT"
+													value="yes">
+							<li><a href='javascript:void(0);'
+								   class="xlink" rel="${ctx}/billing/CA/BC/billingCodeAdjust.jsp"><bean:message key="admin.admin.ManageBillCodes"/></a></li>
+						</oscar:oscarPropertiesCheck>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/BC/showServiceCodeAssocs.do"><bean:message key="admin.admin.ManageServiceDiagnosticCodeAssoc"/></a></li>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/BC/supServiceCodeAssocAction.do"><bean:message key="admin.admin.ManageProcedureFeeCodeAssoc"/></a></li>
+
+						<li><a href="${ctx}/billing/CA/BC/billingManageReferralDoc.jsp" class="contentLink defaultManageReferralDoc"><bean:message key="admin.admin.ManageReferralDoc"/></a></li>
+
+						<li>
+							<a href="javascript:void(0);" class="xlink" rel="${ ctx }/quickBillingBC.do" >
+								<bean:message key="admin.admin.bcQuickBilling" />
+							</a>
+						</li>
+
+						<oscar:oscarPropertiesCheck property="NEW_BC_TELEPLAN" value="no" defaultVal="true">
+							<li><a href='javascript:void(0);'
+								   class="xlink" rel="${ctx}/billing/CA/BC/billingSim.jsp"><bean:message key="admin.admin.SimulateSubFile"/></a></li>
+							<li><a href='javascript:void(0);'
+								   class="xlink" rel="${ctx}/billing/CA/BC/billingTeleplanGroupReport.jsp"><bean:message key="admin.admin.genTeleplanFile"/></a></li>
+						</oscar:oscarPropertiesCheck>
+						<oscar:oscarPropertiesCheck property="NEW_BC_TELEPLAN" value="yes">
+							<li><a href='javascript:void(0);'
+								   class="xlink" rel="${ctx}/billing/CA/BC/TeleplanSimulation.jsp"><bean:message key="admin.admin.simulateSubFile2"/></a></li>
+							<li><a href='javascript:void(0);'
+								   class="xlink" rel="${ctx}/billing/CA/BC/TeleplanSubmission.jsp"><bean:message key="admin.admin.genTeleplanFile2"/></a></li>
+							<li><a href='javascript:void(0);'
+								   class="xlink" rel="${ctx}/billing/CA/BC/teleplan/ManageTeleplan.jsp"><bean:message key="admin.admin.manageTeleplan"/></a></li>
+						</oscar:oscarPropertiesCheck>
+						<oscar:oscarPropertiesCheck property="NEW_BC_TELEPLAN" value="no"
+													defaultVal="true">
+							<li><a href='javascript:void(0);'
+								   class="xlink" rel="${ctx}/billing/CA/BC/billingTA.jsp"><bean:message key="admin.admin.uploadRemittance"/></a></li>
+						</oscar:oscarPropertiesCheck>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/BC/viewReconcileReports.jsp"><bean:message key="admin.admin.reconciliationReports"/></a></li>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/BC/billingAccountReports.jsp"><bean:message key="admin.admin.AccountingRpts"/></a></li>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/BC/billStatus.jsp"><bean:message key="admin.admin.editInvoices"/></a></li>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/BC/settleBG.jsp"><bean:message key="admin.admin.settlePaidClaims"/></a></li>
+	<%
+					}
+
+					if(props.isOntarioInstanceType())
+					{
+	%>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/ON/ScheduleOfBenefitsUpload.jsp"><bean:message key="admin.admin.scheduleOfBenefits"/></a></li>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/ON/addEditServiceCode.jsp"><bean:message key="admin.admin.manageBillingServiceCode"/></a></li>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/ON/billingONEditPrivateCode.jsp"><bean:message key="admin.admin.managePrivBillingCode"/></a></li>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/admin/manageCSSStyles.do"><bean:message key="admin.admin.manageCodeStyles"/></a></li>
+						<li><a href='#'
+							   class="xlink" rel="${ctx}/admin/gstControl.jsp"><bean:message key="admin.admin.manageGSTControl"/></a></li>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/admin/gstreport.jsp"><bean:message key="admin.admin.gstReport"/></a></li>
+						<li><a href='#'
+							   class="xlink" rel="${ctx}/billing/CA/ON/manageBillingLocation.jsp"><bean:message
+								key="admin.admin.btnAddBillingLocation" /></a></li>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/ON/manageBillingform.jsp"><bean:message
+								key="admin.admin.btnManageBillingForm" /></a></li>
+
+						<li><a href="${ctx}/billing/CA/ON/billingOHIPsimulation.jsp?html=" class="contentLink"><bean:message
+								key="admin.admin.btnSimulationOHIPDiskette" /></a></li>
+
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/ON/billingOHIPreport.jsp"><bean:message
+								key="admin.admin.btnGenerateOHIPDiskette" /></a></li>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/ON/billingCorrection.jsp?admin&billing_no="><bean:message
+								key="admin.admin.btnBillingCorrection" /></a></li>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/ON/batchBilling.jsp?service_code=all"><bean:message
+								key="admin.admin.btnBatchBilling" /></a></li>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/ON/inr/reportINR.jsp?provider_no=all"><bean:message
+								key="admin.admin.btnINRBatchBilling" /></a></li>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/ON/billingONUpload.jsp"><bean:message key="admin.admin.uploadMOHFile"/></a></li>
+
+
+						<oscar:oscarPropertiesCheck property="moh_file_management_enabled" value="true" defaultVal="false">
+							<li><a href='javascript:void(0);' class="xlink" rel="${ctx}/billing/CA/ON/viewMOHFiles.jsp"><bean:message key="admin.admin.viewMOHFiles"/></a></li>
+						</oscar:oscarPropertiesCheck>
+
+						<oscar:oscarPropertiesCheck property="mcedt.mailbox.enabled" value="false" defaultVal="false">
+							<li>
+								<a href="javascript:void(0);" class="xlink" rel="${ctx}/mcedt/mcedt.do">
+									<bean:message key="admin.admin.mcedt"/>
+								</a>
+							</li>
+						</oscar:oscarPropertiesCheck>
+
+						<oscar:oscarPropertiesCheck property="mcedt.mailbox.enabled" value="true" defaultVal="false">
+							<li>
+								<a href="javascript:void(0);" class="xlink" rel="${ctx}/mcedt/kaimcedt.do">
+									<bean:message key="admin.admin.mcedt.mailbox"/>
+								</a>
+							</li>
+						</oscar:oscarPropertiesCheck>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/servlet/oscar.DocumentUploadServlet"><bean:message
+								key="admin.admin.btnBillingReconciliation" /></a></li>
+						<!--  li><a href='javascript:void(0);' onclick ='popupPage(600,900,"${ctx}/billing/CA/ON/billingRA.jsp");return false;'><bean:message key="admin.admin.btnBillingReconciliation"/></a></li-->
+						<!--  li><a href='javascript:void(0);' onclick ='popupPage(600,1000,"${ctx}/billing/CA/ON/billingOBECEA.jsp");return false;'><bean:message key="admin.admin.btnEDTBillingReportGenerator"/></a></li-->
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/ON/billStatus.jsp"><bean:message key="admin.admin.invoiceRpts"/></a></li>
+						<li><a href='javascript:void(0);'
+							   class="xlink" rel="${ctx}/billing/CA/ON/endYearStatement.do"><bean:message key="admin.admin.endYearStatement"/></a></li>
+
+						<oscar:oscarPropertiesCheck property="rma_enabled" value="true" defaultVal="false">
+							<li>
+								<a href='#'	class="xlink" rel="${ctx}/admin/clinicNbrManage.jsp">Manage Clinic NBR Codes</a>
+							</li>
+						</oscar:oscarPropertiesCheck>
+	<%
+					}
+	%>
+
+				</security:oscarSec>
+
+	<%
+					if(props.isOntarioInstanceType())
+					{
+	%>
+						<li><a href='javascript:void(0);' class="xlink" rel='${ctx}/billing/CA/ON/billingONPayment.jsp'><bean:message key="admin.admin.paymentReceived"/></a></li>
+						<li><a href='javascript:void(0);' class="xlink" rel='${ctx}/billing/CA/ON/managePaymentType.do'><bean:message key="admin.admin.managePaymentType"/></a></li>
+	<%
+					}
+	%>
+			</ul>
+			</div>
+			</div>
+	<%
+		}
+	%>
+</security:oscarSec>
+<!-- #OLD OSCAR BILLING END -->
 
 <!-- #LABS/INBOX -->
 <security:oscarSec roleName="<%=roleName$%>" objectName="_admin," rights="r" reverse="<%=false%>">

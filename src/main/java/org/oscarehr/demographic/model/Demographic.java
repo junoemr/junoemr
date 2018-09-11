@@ -40,7 +40,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
-@Entity(name = "service.model.Demographic") // use a name to prevent autowire conflict with old model
+@Entity(name = "model.Demographic") // use a name to prevent autowire conflict with old model
 @Table(name = "demographic")
 public class Demographic extends AbstractModel<Integer> implements Serializable
 {

@@ -28,6 +28,10 @@ import java.util.Date;
 import org.caisi.model.BaseObject;
 import org.oscarehr.util.MiscUtils;
 
+/**
+ * @deprecated use the jpa model instead
+ */
+@Deprecated
 public class Issue extends BaseObject {
 	public static String CUSTOM_ISSUE = "userDefined";
 	public static String SYSTEM = "system";

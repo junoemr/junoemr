@@ -26,12 +26,12 @@
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@page import="oscar.oscarRx.data.RxDrugData,java.util.*" %>
-<%@page import="java.text.SimpleDateFormat" %>
-<%@page import="java.util.Calendar" %>
-<%@page import="oscar.oscarRx.data.*" %>
-<%@page import="oscar.oscarRx.util.*" %>
-<%@page import="oscar.OscarProperties"%>
+<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
+<%@page import="oscar.OscarProperties" %>
+<%@page import="oscar.oscarRx.data.RxPrescriptionData" %>
+<%@page import="oscar.oscarRx.util.RxUtil" %>
+<%@page import="java.util.List" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
@@ -49,140 +49,164 @@
 	}
 %>
 
-    <%
+<%
 
-List<RxPrescriptionData.Prescription> listRxDrugs=(List)request.getAttribute("listRxDrugs");
-oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBean)request.getSession().getAttribute("RxSessionBean");
+	List<RxPrescriptionData.Prescription> listRxDrugs = (List) request.getAttribute("listRxDrugs");
+	oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBean) request.getSession().getAttribute("RxSessionBean");
 
-if(listRxDrugs!=null){
-            String specStr=RxUtil.getSpecialInstructions();
+    if(listRxDrugs != null)
+    {
+	    String specStr = RxUtil.getSpecialInstructions();
 
-  for(RxPrescriptionData.Prescription rx : listRxDrugs ){
-         String rand            = Long.toString(rx.getRandomId());
-         String instructions    = rx.getSpecial();
-         String specialInstruction=rx.getSpecialInstruction();
-         String startDate       = RxUtil.DateToString(rx.getRxDate(), "yyyy-MM-dd");
-         String writtenDate     = RxUtil.DateToString(rx.getWrittenDate(), "yyyy-MM-dd");
-         String lastRefillDate  = RxUtil.DateToString(rx.getLastRefillDate(), "yyyy-MM-dd");
-         int gcn=rx.getGCN_SEQNO();//if gcn is 0, rx is customed drug.
-         String customName      = rx.getCustomName();
-         Boolean patientCompliance  = rx.getPatientCompliance();
-         String frequency       = rx.getFrequencyCode();
-         String route           = rx.getRoute();
-         String durationUnit    = rx.getDurationUnit();
-         boolean prn            = rx.getPrn();
-         String repeats         = Integer.toString(rx.getRepeat());
-         String takeMin         = rx.getTakeMinString();
-         String takeMax         = rx.getTakeMaxString();
-         boolean longTerm       = rx.getLongTerm();
-      //   boolean isCustomNote   =rx.isCustomNote();
-         String outsideProvOhip = rx.getOutsideProviderOhip();
-         String brandName       = rx.getBrandName();
-         String ATC             = rx.getAtcCode();
-         String ATCcode			= rx.getAtcCode();
-         String genericName     = rx.getGenericName();
-         String dosage = rx.getDosage();
- 
-         String pickupDate      = RxUtil.DateToString(rx.getPickupDate(), "yyyy-MM-dd");
-         String pickupTime      = RxUtil.DateToString(rx.getPickupTime(), "hh:mm");
-         String eTreatmentType  = rx.getETreatmentType()!=null ? rx.getETreatmentType() : "";
-         String rxStatus        = rx.getRxStatus()!=null ? rx.getRxStatus() : "";
-         String drugForm		= rx.getDrugForm();
-         //remove from the rerx list
-         int DrugReferenceId = rx.getDrugReferenceId();
-         
-         if( ATCcode == null || ATCcode.trim().length() == 0 ) {
-             ATCcode = "";
-         }
-         
-         if(ATC != null && ATC.trim().length()>0)
-             ATC="ATC: "+ATC;
-         String drugName;
-         boolean isSpecInstPresent=false;
-         if(gcn==0){//it's a custom drug
-            drugName=customName;
-         }else{
-            drugName=brandName;
-         }
-         if(specialInstruction!=null&&!specialInstruction.equalsIgnoreCase("null")&&specialInstruction.trim().length()>0){
-            isSpecInstPresent=true;
-         }
-         //for display
-         if(drugName==null || drugName.equalsIgnoreCase("null"))
-             drugName="" ;
-         // prevent displaying null when there is an invalid string retrieved.
-         if(instructions == null || instructions.equalsIgnoreCase("null") ){
-        	 instructions = "";
-         }
+	    for(RxPrescriptionData.Prescription rx : listRxDrugs)
+	    {
+		    String rand = Long.toString(rx.getRandomId());
+		    String instructions = rx.getSpecial();
+		    String specialInstruction = rx.getSpecialInstruction();
+		    String startDate = RxUtil.DateToString(rx.getRxDate(), "yyyy-MM-dd");
+		    String writtenDate = RxUtil.DateToString(rx.getWrittenDate(), "yyyy-MM-dd");
+		    String lastRefillDate = RxUtil.DateToString(rx.getLastRefillDate(), "yyyy-MM-dd");
+		    int gcn = rx.getGCN_SEQNO();//if gcn is 0, rx is customed drug.
+		    String customName = rx.getCustomName();
+		    Boolean patientCompliance = rx.getPatientCompliance();
+		    String frequency = rx.getFrequencyCode();
+		    String route = rx.getRoute();
+		    String durationUnit = rx.getDurationUnit();
+		    boolean prn = rx.getPrn();
+		    String repeats = Integer.toString(rx.getRepeat());
+		    String takeMin = rx.getTakeMinString();
+		    String takeMax = rx.getTakeMaxString();
+		    boolean longTerm = rx.getLongTerm();
+		    //   boolean isCustomNote   =rx.isCustomNote();
+		    String outsideProvOhip = rx.getOutsideProviderOhip();
+		    String brandName = rx.getBrandName();
+		    String ATC = rx.getAtcCode();
+		    String ATCcode = rx.getAtcCode();
+		    String genericName = rx.getGenericName();
+		    String dosage = rx.getDosage();
 
-         String comment  = rx.getComment();
-         if(rx.getComment() == null) {
-        	 comment = "";
-         }
-         boolean pastMed            = rx.getPastMed();
-         boolean dispenseInternal = rx.getDispenseInternal();
-         boolean startDateUnknown	= rx.getStartDateUnknown();
-         boolean nonAuthoritative   = rx.isNonAuthoritative();
-         String quantity            = rx.getQuantity();
-         String quantityText="";
-         String unitName=rx.getUnitName();
-         if(unitName==null || unitName.equalsIgnoreCase("null") || unitName.trim().length()==0){
-             quantityText=quantity;
-         }
-         else{
-             quantityText=quantity+" "+rx.getUnitName();
-         }
-         String duration        = rx.getDuration();
-         String method          = rx.getMethod();
-         String outsideProvName = rx.getOutsideProviderName();
-         boolean isDiscontinuedLatest = rx.isDiscontinuedLatest();
-         String archivedDate="";
-         String archivedReason="";
-         boolean isOutsideProvider ;
-         int refillQuantity=rx.getRefillQuantity();
-         int refillDuration=rx.getRefillDuration();
-         int dispenseInterval=rx.getDispenseInterval();
-         if(isDiscontinuedLatest){
-                archivedReason=rx.getLastArchReason();
-                archivedDate=rx.getLastArchDate();
-         }
+		    String pickupDate = RxUtil.DateToString(rx.getPickupDate(), "yyyy-MM-dd");
+		    String pickupTime = RxUtil.DateToString(rx.getPickupTime(), "hh:mm");
+		    String eTreatmentType = rx.getETreatmentType() != null ? rx.getETreatmentType() : "";
+		    String rxStatus = rx.getRxStatus() != null ? rx.getRxStatus() : "";
+		    String drugForm = rx.getDrugForm();
+		    //remove from the rerx list
+		    int DrugReferenceId = rx.getDrugReferenceId();
 
-          if((outsideProvOhip!=null && !outsideProvOhip.equals("")) || (outsideProvName!=null && !outsideProvName.equals(""))){
-             isOutsideProvider=true;
-         }
-         else{
-             isOutsideProvider=false;
-         }
-         if(route==null || route.equalsIgnoreCase("null")) route="";
-                    String methodStr = method;
-                    String routeStr = route;
-                    String frequencyStr = frequency;
-                    String minimumStr = takeMin;
-                    String maximumStr = takeMax;
-                    String durationStr = duration;
-                    String durationUnitStr = durationUnit;
-                    String quantityStr = quantityText;
-                    String unitNameStr="";
-                    if(rx.getUnitName()!=null && !rx.getUnitName().equalsIgnoreCase("null"))
-                        unitNameStr=rx.getUnitName();
-                    String prnStr="";
-                    if(prn)
-                        prnStr="prn";
-                drugName=drugName.replace("'", "\\'");
-                drugName=drugName.replace("\"","\\\"");
-                byte[] drugNameBytes = drugName.getBytes("ISO-8859-1");
-                drugName= new String(drugNameBytes, "UTF-8");
-                
+		    if(ATCcode == null || ATCcode.trim().length() == 0)
+		    {
+			    ATCcode = "";
+		    }
+
+		    if(ATC != null && ATC.trim().length() > 0)
+			    ATC = "ATC: " + ATC;
+		    String drugName;
+		    boolean isSpecInstPresent = false;
+		    if(gcn == 0)
+		    {//it's a custom drug
+			    drugName = customName;
+		    }
+		    else
+		    {
+			    drugName = brandName;
+		    }
+		    if(specialInstruction != null && !specialInstruction.equalsIgnoreCase("null") && specialInstruction.trim().length() > 0)
+		    {
+			    isSpecInstPresent = true;
+		    }
+		    //for display
+		    if(drugName == null || drugName.equalsIgnoreCase("null"))
+			    drugName = "";
+		    // prevent displaying null when there is an invalid string retrieved.
+		    if(instructions == null || instructions.equalsIgnoreCase("null"))
+		    {
+			    instructions = "";
+		    }
+
+		    String comment = rx.getComment();
+		    if(rx.getComment() == null)
+		    {
+			    comment = "";
+		    }
+		    boolean pastMed = rx.getPastMed();
+		    boolean dispenseInternal = rx.getDispenseInternal();
+		    boolean startDateUnknown = rx.getStartDateUnknown();
+		    boolean nonAuthoritative = rx.isNonAuthoritative();
+		    String quantity = rx.getQuantity();
+		    String quantityText = "";
+		    String unitName = rx.getUnitName();
+		    if(unitName == null || unitName.equalsIgnoreCase("null") || unitName.trim().length() == 0)
+		    {
+			    quantityText = quantity;
+		    }
+		    else
+		    {
+			    quantityText = quantity + " " + rx.getUnitName();
+		    }
+		    String duration = rx.getDuration();
+		    String method = rx.getMethod();
+		    String outsideProvName = rx.getOutsideProviderName();
+		    boolean isDiscontinuedLatest = rx.isDiscontinuedLatest();
+		    String archivedDate = "";
+		    String archivedReason = "";
+		    boolean isOutsideProvider;
+		    int refillQuantity = rx.getRefillQuantity();
+		    int refillDuration = rx.getRefillDuration();
+		    int dispenseInterval = rx.getDispenseInterval();
+		    if(isDiscontinuedLatest)
+		    {
+			    archivedReason = rx.getLastArchReason();
+			    archivedDate = rx.getLastArchDate();
+		    }
+
+		    if((outsideProvOhip != null && !outsideProvOhip.equals("")) || (outsideProvName != null && !outsideProvName.equals("")))
+		    {
+			    isOutsideProvider = true;
+		    }
+		    else
+		    {
+			    isOutsideProvider = false;
+		    }
+		    if(route == null || route.equalsIgnoreCase("null"))
+			    route = "";
+		    String methodStr = method;
+		    String routeStr = route;
+		    String frequencyStr = frequency;
+		    String minimumStr = takeMin;
+		    String maximumStr = takeMax;
+		    String durationStr = duration;
+		    String durationUnitStr = durationUnit;
+		    String quantityStr = quantityText;
+		    String unitNameStr = "";
+		    if(rx.getUnitName() != null && !rx.getUnitName().equalsIgnoreCase("null"))
+			    unitNameStr = rx.getUnitName();
+		    String prnStr = "";
+		    if(prn)
+			    prnStr = "prn";
+
+		    String jsEscapedDrugName = StringEscapeUtils.escapeJavaScript(drugName);
+		    String htmlEscapedDrugName = StringEscapeUtils.escapeHtml(drugName);
+		    htmlEscapedDrugName = htmlEscapedDrugName.replaceAll("\"", "&quote;");
 %>
 <%if (OscarProperties.getInstance().getProperty("rx_enhance")!=null && OscarProperties.getInstance().getProperty("rx_enhance").equals("true")) { %>
 <fieldset style="margin-top:2px;width:580px;" id="set_<%=rand%>">
     <a tabindex="-1" href="javascript:void(0);"  style="float:right;margin-left:5px;margin-top:0px;padding-top:0px;" onclick="$('set_<%=rand%>').remove();deletePrescribe('<%=rand%>');">X</a>
-    <a tabindex="-1" href="javascript:void(0);"  style="float:right;;margin-left:5px;margin-top:0px;padding-top:0px;" title="Add to Favorites" onclick="addFav('<%=rand%>','<%=drugName%>');return false;">F</a>
+    <a tabindex="-1" href="javascript:void(0);"  style="float:right;;margin-left:5px;margin-top:0px;padding-top:0px;" title="Add to Favorites" onclick="addFav('<%=rand%>','<%=jsEscapedDrugName%>');return false;">F</a>
     <a tabindex="-1" href="javascript:void(0);" style="float:right;margin-top:0px;padding-top:0px;" onclick="$('rx_more_<%=rand%>').toggle();">  <span id="moreLessWord_<%=rand%>" onclick="updateMoreLess(id)" >more</span> </a>
 
     <label style="float:left;width:80px;" title="<%=ATC%>" >Name:</label>
     <input type="hidden" name="atcCode" value="<%=ATCcode%>" />
-    <input tabindex="-1" type="text" id="drugName_<%=rand%>"  name="drugName_<%=rand%>"  size="60" <%if(gcn==0){%> onkeyup="saveCustomName(this);" value="<%=drugName%>"<%} else{%> value='<%=drugName%>'  onchange="changeDrugName('<%=rand%>','<%=drugName%>');" <%}%>/><span id="alleg_<%=rand%>" style="color:red;"></span>&nbsp;&nbsp;<span id="inactive_<%=rand%>" style="color:red;"></span><br>
+    <input tabindex="-1" type="text" id="drugName_<%=rand%>"  name="drugName_<%=rand%>"  size="60" <%
+	    if(gcn==0){%>
+           value="<%=htmlEscapedDrugName%>" onkeyup="saveCustomName(this);" <%
+	    }
+        else{%>
+           value="<%=htmlEscapedDrugName%>" onchange="changeDrugName('<%=rand%>','<%=jsEscapedDrugName%>');" <%
+	    }%>/>
+	<span id="alleg_<%=rand%>" style="color:red;"></span>
+	&nbsp;&nbsp;
+	<span id="inactive_<%=rand%>" style="color:red;"></span>
+	<br>
     <a tabindex="-1" href="javascript:void(0);" onclick="showHideSpecInst('siAutoComplete_<%=rand%>')" style="float:left;width:80px;">Instructions:</a>
     <input type="text" id="instructions_<%=rand%>" name="instructions_<%=rand%>" onkeypress="handleEnter(this,event);" value="<%=instructions%>" size="60" onchange="parseIntr(this);" /><a href="javascript:void(0);" tabindex="-1" onclick="displayMedHistory('<%=rand%>');" style="color:red;font-size:13pt;vertical-align:super;text-decoration:none" ><b>*</b></a>  <a href="javascript:void(0);" tabindex="-1" onclick="displayInstructions('<%=rand%>');"><img src="<c:out value="${ctx}/images/icon_help_sml.gif"/>" border="0" TITLE="Instructions Field Reference"></a> 
        <br>
@@ -261,7 +285,7 @@ if(listRxDrugs!=null){
 	<br/>
         <label style="float:left;width:80px;">Written Date:</label>
            <input type="text" id="writtenDate_<%=rand%>"  name="writtenDate_<%=rand%>" value="<%=writtenDate%>" />
-           <a href="javascript:void(0);" style="float:right;margin-top:0px;padding-top:0px;"  title="Add to Favorites" onclick="addFav('<%=rand%>','<%=drugName%>');return false;">Add to Favorite</a>
+           <a href="javascript:void(0);" style="float:right;margin-top:0px;padding-top:0px;"  title="Add to Favorites" onclick="addFav('<%=rand%>','<%=jsEscapedDrugName%>');return false;">Add to Favorite</a>
        </div>
        
        <bean:message key="WriteScript.msgComment"/>:
@@ -312,12 +336,18 @@ if(listRxDrugs!=null){
 <%}else{%>
 <fieldset style="margin-top:2px;width:620px;" id="set_<%=rand%>">
     <a tabindex="-1" href="javascript:void(0);"  style="float:right;margin-left:5px;margin-top:0px;padding-top:0px;" onclick="$('set_<%=rand%>').remove();deletePrescribe('<%=rand%>');removeReRxDrugId('<%=DrugReferenceId%>')"><img src='<c:out value="${ctx}/images/close.png"/>' border="0"></a>
-    <a tabindex="-1" href="javascript:void(0);"  style="float:right;;margin-left:5px;margin-top:0px;padding-top:0px;" title="Add to Favorites" onclick="addFav('<%=rand%>','<%=drugName%>')">F</a>
+    <a tabindex="-1" href="javascript:void(0);"  style="float:right;;margin-left:5px;margin-top:0px;padding-top:0px;" title="Add to Favorites" onclick="addFav('<%=rand%>','<%=jsEscapedDrugName%>')">F</a>
     <a tabindex="-1" href="javascript:void(0);" style="float:right;margin-top:0px;padding-top:0px;" onclick="$('rx_more_<%=rand%>').toggle();">  <span id="moreLessWord_<%=rand%>" onclick="updateMoreLess(id)" >more</span> </a>
 
     <label style="float:left;width:80px;" title="<%=ATC%>" >Name:</label>
     <input type="hidden" name="atcCode" value="<%=ATCcode%>" />
-    <input tabindex="-1" type="text" id="drugName_<%=rand%>"  name="drugName_<%=rand%>"  size="30" <%if(gcn==0){%> onkeyup="saveCustomName(this);" value="<%=drugName%>"<%} else{%> value='<%=drugName%>'  onchange="changeDrugName('<%=rand%>','<%=drugName%>');" <%}%> TITLE="<%=drugName%>"/>&nbsp;<span id="inactive_<%=rand%>" style="color:red;"></span>
+    <input tabindex="-1" type="text" id="drugName_<%=rand%>"  name="drugName_<%=rand%>"  size="30" <%
+	    if(gcn==0){%>
+           value='<%=htmlEscapedDrugName%>' onkeyup="saveCustomName(this);" <%}
+        else{%>
+           value='<%=htmlEscapedDrugName%>' onchange="changeDrugName('<%=rand%>','<%=jsEscapedDrugName%>');" <%
+	    }
+    %> TITLE="<%=htmlEscapedDrugName%>"/>&nbsp;<span id="inactive_<%=rand%>" style="color:red;"></span>
 
 	<!-- Allergy Alert Table-->
 	<table width="570px" border="1" bordercolor="#CCCCCC" cellspacing="0" cellpadding="0" style="border-collapse: collapse;display: none;" id="alleg_tbl_<%=rand%>">
@@ -432,7 +462,7 @@ if(listRxDrugs!=null){
 	<br/>
         <label style="float:left;width:80px;">Written Date:</label>
            <input type="text" id="writtenDate_<%=rand%>"  name="writtenDate_<%=rand%>" value="<%=writtenDate%>" />
-           <a href="javascript:void(0);" style="float:right;margin-top:0px;padding-top:0px;" onclick="addFav('<%=rand%>','<%=drugName%>');return false;">Add to Favorite</a>
+           <a href="javascript:void(0);" style="float:right;margin-top:0px;padding-top:0px;" onclick="addFav('<%=rand%>','<%=jsEscapedDrugName%>');return false;">Add to Favorite</a>
        
            <br />
            
@@ -653,7 +683,7 @@ if(listRxDrugs!=null){
 
 
         <script type="text/javascript">
-            $('drugName_'+'<%=rand%>').value=decodeURIComponent(encodeURIComponent('<%=drugName%>'));
+            $('drugName_'+'<%=rand%>').value='<%=jsEscapedDrugName%>';
             calculateRxData('<%=rand%>');
             handleEnter=function handleEnter(inField, ev){
                 var charCode;
@@ -666,14 +696,14 @@ if(listRxDrugs!=null){
                 var id=inField.id.split("_")[1];
                 if(charCode==13)
                     showHideSpecInst('siAutoComplete_'+id);
-            }
+            };
             showHideSpecInst=function showHideSpecInst(elementId){
               if($(elementId).getStyle('display')=='none'){
                   Effect.BlindDown(elementId);
               }else{
                   Effect.BlindUp(elementId);
               }
-            }
+            };
 
             var specArr=new Array();
             var specStr='<%=org.apache.commons.lang.StringEscapeUtils.escapeJavaScript(specStr)%>';

@@ -95,12 +95,20 @@ public final class ApptStatusData {
 
 
 	public String getImageName() {
+		String baseIcon;
 		// icon images exists for all statuses including up to 11 custom statuses
-		String baseIcon = statusData.getIcon();
+		if(statusData != null)
+		{
+			baseIcon = statusData.getIcon();
+		}
+		else
+		{
+			return null;
+		}
 		String status = apptStatus;
 		String returnIcon = baseIcon;
 
-		if(status.length() >= 2) {
+		if(status.length() >= 2 && !status.equalsIgnoreCase("null")) {
 			String otherIcon = status.substring(1,2);
 			returnIcon = otherIcon + baseIcon;
 		}
@@ -109,8 +117,17 @@ public final class ApptStatusData {
 
 	public String getNextStatus() {
 
-		int currentStatusIndex = allStatus.indexOf(statusData);
-		int nextStatusIndex = getNextStatusIndex(currentStatusIndex);
+		int currentStatusIndex;
+		int nextStatusIndex;
+
+		if(statusData != null)
+		{
+			currentStatusIndex = allStatus.indexOf(statusData);
+			nextStatusIndex = getNextStatusIndex(currentStatusIndex);
+		}
+		else {
+			nextStatusIndex = 0;
+		}
 		String currentStatus = apptStatus;
 		String nextStatus = allStatus.get(nextStatusIndex).getStatus();
 
@@ -124,7 +141,7 @@ public final class ApptStatusData {
 		}
 
 		// have to preserver billed/verified status
-		if(currentStatus.length() >= 2) {
+		if(currentStatus.length() >= 2 && !currentStatus.equalsIgnoreCase("null")) {
 			nextStatus = nextStatus.charAt(0) + currentStatus.substring(1);
 		}
 
@@ -153,7 +170,14 @@ public final class ApptStatusData {
 	 */
 	public String getTitleString(Locale locale) {
 		ResourceBundle bundle = ResourceBundle.getBundle("oscarResources", locale);
-		String status = statusData.getStatus();
+		String status;
+		if(statusData != null)
+		{
+			status = statusData.getStatus();
+		}
+		else {
+			return null;
+		}
 		String localeTitle = getTitle();
 
 		if(bundle != null && !strEditable.equalsIgnoreCase("yes")) {
@@ -166,7 +190,13 @@ public final class ApptStatusData {
 	}
 
 	public String getBgColor() {
-		return statusData.getColor();
+		if (statusData == null)
+		{
+			return null;
+		} else
+		{
+			return statusData.getColor();
+		}
 	}
 
 	/**

@@ -27,13 +27,19 @@ package org.oscarehr.integration.clinicaid.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PatientEligibilityDataTo1 implements Serializable
 {
+	private static final String CHECKED_STATUS_CHECKED = "checked";
+	private static final String CHECKED_STATUS_UNKNOWN = "unknown";
+	private static final String CHECKED_STATUS_PENDING = "pending";
 
 	@JsonProperty("eligible_for_provincial_billing")
 	private boolean eligible;
@@ -45,9 +51,32 @@ public class PatientEligibilityDataTo1 implements Serializable
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date queuedAt;
 
+	@JsonProperty("eligibility_checked_at")
+	@JsonDeserialize(using = LocalDateDeserializer.class)
+	private LocalDate checkedAt;
+
 	@JsonProperty("eligibility_expiry_date")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private Date expiryAt;
+	@JsonDeserialize(using = LocalDateDeserializer.class)
+	private LocalDate expiryAt;
+
+	@JsonProperty("check_status")
+	private String checkStatus;
+
+	@JsonProperty("first_name")
+	private String firstName;
+
+	@JsonProperty("middle_name")
+	private String middleName;
+
+	@JsonProperty("last_name")
+	private String lastName;
+
+	@JsonProperty("gender")
+	private String gender;
+
+	@JsonProperty("birth_date")
+	@JsonDeserialize(using = LocalDateDeserializer.class)
+	private LocalDate birthDate;
 
 	public boolean isEligible()
 	{
@@ -79,13 +108,78 @@ public class PatientEligibilityDataTo1 implements Serializable
 		this.queuedAt = queuedAt;
 	}
 
-	public Date getExpiryAt()
+	public LocalDate getExpiryAt()
 	{
 		return expiryAt;
 	}
 
-	public void setExpiryAt(Date expiryAt)
+	public void setExpiryAt(LocalDate expiryAt)
 	{
 		this.expiryAt = expiryAt;
+	}
+
+	public LocalDate getCheckedAt()
+	{
+		return checkedAt;
+	}
+
+	public String getCheckStatus()
+	{
+		return checkStatus;
+	}
+
+	public boolean isChecked()
+	{
+		return CHECKED_STATUS_CHECKED.equals(checkStatus);
+	}
+
+	public String getFirstName()
+	{
+		return firstName;
+	}
+
+	public void setFirstName(String firstName)
+	{
+		this.firstName = firstName;
+	}
+
+	public String getMiddleName()
+	{
+		return middleName;
+	}
+
+	public void setMiddleName(String middleName)
+	{
+		this.middleName = middleName;
+	}
+
+	public String getLastName()
+	{
+		return lastName;
+	}
+
+	public void setLastName(String lastName)
+	{
+		this.lastName = lastName;
+	}
+
+	public String getGender()
+	{
+		return gender;
+	}
+
+	public void setGender(String gender)
+	{
+		this.gender = gender;
+	}
+
+	public LocalDate getBirthDate()
+	{
+		return birthDate;
+	}
+
+	public void setBirthDate(LocalDate birthDate)
+	{
+		this.birthDate = birthDate;
 	}
 }

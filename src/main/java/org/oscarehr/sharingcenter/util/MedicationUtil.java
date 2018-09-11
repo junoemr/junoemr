@@ -29,9 +29,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.marc.shic.cda.datatypes.Code;
-import org.oscarehr.common.dao.DrugDao;
+import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.common.dao.DrugReasonDao;
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.model.Drug;
 import org.oscarehr.common.model.DrugReason;
 import org.oscarehr.util.SpringUtils;
 
