@@ -175,17 +175,17 @@ public class AddDemographicAction extends Action
 			demographic.setHcRenewDate(null);
 		}
 
-		year = StringUtils.trimToNull(request.getParameter("hc_renew_date_year"));
-		month = StringUtils.trimToNull(request.getParameter("hc_renew_date_month"));
-		day = StringUtils.trimToNull(request.getParameter("hc_renew_date_date"));
-		if (year != null && month != null && day != null)
-		{
-			demographic.setHcRenewDate(MyDateFormat.getSysDate(year + "-" + month + "-" + day));
-		} else
-		{
-			demographic.setHcRenewDate(null);
-		}
-
+		demographic.setReferralDoctor("<rdohip>" + StringUtils.trimToEmpty(request.getParameter("referral_doctor_no")) + "</rdohip>" + "<rd>" + StringUtils.trimToEmpty(request.getParameter("referral_doctor_name")) + "</rd>");
+		demographic.setFamilyDoctor("<fd>" + StringUtils.trimToEmpty(request.getParameter("family_doctor_no")) + "</fd>" + "<fdname>" + StringUtils.trimToEmpty( request.getParameter("family_doctor_name"))+ "</fdname>");
+		demographic.setCountryOfOrigin(StringUtils.trimToNull(request.getParameter("countryOfOrigin")));
+		demographic.setNewsletter(StringUtils.trimToNull(request.getParameter("newsletter")));
+		demographic.setSin(StringUtils.trimToNull(request.getParameter("sin")));
+		demographic.setTitle(StringUtils.trimToNull(request.getParameter("title")));
+		demographic.setOfficialLanguage(StringUtils.trimToNull(request.getParameter("official_lang")));
+		demographic.setSpokenLanguage(StringUtils.trimToNull(request.getParameter("spoken_lang")));
+		demographic.setLastUpdateUser(curUser_no);
+		demographic.setLastUpdateDate(new java.util.Date());
+		demographic.setPatientStatusDate(new java.util.Date());
 
 		// add checking hin duplicated record, if there is a HIN number
 		// added check to see if patient has a bc health card and has a version code of 66, in this case you are aloud to have dup hin
@@ -222,7 +222,6 @@ public class AddDemographicAction extends Action
 		demographicCust.setAlert(StringUtils.trimToNull(request.getParameter("cust3")));
 		demographicCust.setMidwife(StringUtils.trimToNull(request.getParameter("cust4")));
 		demographicCust.setNotes("<unotes>" + StringUtils.trimToEmpty(request.getParameter("content")) + "</unotes>");
-		demographicCust.setId(demographic.getDemographicId());
 
 
 		// Save the patient consent values.
@@ -261,7 +260,6 @@ public class AddDemographicAction extends Action
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "given_consent", StringUtils.trimToEmpty(request.getParameter("given_consent"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "rxInteractionWarningLevel", StringUtils.trimToEmpty(request.getParameter("rxInteractionWarningLevel"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "primaryEMR", StringUtils.trimToEmpty(request.getParameter("primaryEMR"))));
-		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "aboriginal", StringUtils.trimToEmpty(request.getParameter("aboriginal"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "phoneComment", StringUtils.trimToEmpty(request.getParameter("phoneComment"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "usSigned", StringUtils.trimToEmpty(request.getParameter("usSigned"))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "privacyConsent", StringUtils.trimToEmpty(request.getParameter("privacyConsent"))));

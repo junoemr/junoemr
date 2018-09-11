@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -36,94 +36,51 @@ import java.util.Vector;
  */
 public class RxInteractionData
 {
-   private static RxInteractionData rxInteractionData = new RxInteractionData();
-   private static Hashtable<Integer, RxDrugData.Interaction[]> interactionHash = new Hashtable<>();
-   private static Hashtable<Integer, RxInteractionWorker> workingThreadHash = new Hashtable<>();
+	private static RxInteractionData rxInteractionData = new RxInteractionData();
+	private static Hashtable<Integer, RxDrugData.Interaction[]> interactionHash = new Hashtable<>();
 
-   public static RxInteractionData getInstance()
-   {
-      return rxInteractionData;
-   }
+	public static RxInteractionData getInstance()
+	{
+		return rxInteractionData;
+	}
 
-   private RxInteractionData()
-   {
-   }
+	private RxInteractionData()
+	{
+	}
 
-   public void preloadInteraction(Vector atccodes)
-   {
-      //launch thread that searches database for them
-      MiscUtils.getLogger().debug("PRELOADING" + atccodes.hashCode());
-      if(!interactionHash.containsKey(atccodes.hashCode()))
-      {
-         RxInteractionWorker worker = new RxInteractionWorker(rxInteractionData, atccodes);
-         worker.start();
-         addToWorking(atccodes, worker);
-      }
-   }
+	public void addToHash(Vector atcCodes, RxDrugData.Interaction[] interact)
+	{
+		interactionHash.put(atcCodes.hashCode(), interact);
+	}
 
-   public void addToHash(Vector atcCodes, RxDrugData.Interaction[] interact)
-   {
-      interactionHash.put(atcCodes.hashCode(), interact);
-   }
+	public RxDrugData.Interaction[] getInteractions(Vector atcCodes)
+	{
+		RxDrugData.Interaction[] interact = null;
+		MiscUtils.getLogger().debug("hash table size " + interactionHash.size() + "RxInteractionData.getInteraction atc code val  " + atcCodes.hashCode());
 
-   public void addToWorking(Vector atcCodes, RxInteractionWorker worker)
-   {
-      workingThreadHash.put(atcCodes.hashCode(), worker);
-   }
-
-   public void removeFromWorking(Vector atcCodes)
-   {
-      workingThreadHash.remove(atcCodes.hashCode());
-   }
-
-   public RxDrugData.Interaction[] getInteractions(Vector atcCodes)
-   {
-      RxDrugData.Interaction[] interact = null;
-      MiscUtils.getLogger().debug("hash table size " + interactionHash.size() + "RxInteractionData.getInteraction atc code val  " + atcCodes.hashCode());
-      Integer atcHashCode = atcCodes.hashCode();
-      if(interactionHash.containsKey(atcHashCode))
-      {
-         MiscUtils.getLogger().debug("Already been searched!");
-         interact = interactionHash.get(atcHashCode);
-      }
-      else if(workingThreadHash.containsKey(atcHashCode))
-      {
-         MiscUtils.getLogger().debug("Already been searched but not finished !");
-         RxInteractionWorker worker = workingThreadHash.get(atcHashCode);
-         if(worker != null)
-         {
-            try
-            {
-               worker.join();
-               MiscUtils.getLogger().debug("Already been searched now finished!");
-               // Finished
-            }
-            catch(InterruptedException e)
-            {
-               // Thread was interrupted
-               MiscUtils.getLogger().debug("Already been searched PROBLEM!");
-               MiscUtils.getLogger().error("Error", e);
-            }
-         }
-         interact = interactionHash.get(atcHashCode);
-      }
-      else
-      {
-         MiscUtils.getLogger().debug("NEW ATC CODES");
-         try
-         {
-            RxDrugData drugData = new RxDrugData();
-            interact = drugData.getInteractions(atcCodes);
-            if(interact != null)
-            {
-               addToHash(atcCodes, interact);
-            }
-         }
-         catch(Exception e)
-         {
-            MiscUtils.getLogger().error("Error", e);
-         }
-      }
-      return interact;
-   }
+		Integer atcHashCode = atcCodes.hashCode();
+		if (interactionHash.containsKey(atcHashCode))
+		{
+			MiscUtils.getLogger().debug("Already been searched!");
+			interact = interactionHash.get(atcHashCode);
+		}
+		else
+		{
+			MiscUtils.getLogger().debug("NEW ATC CODES");
+			try
+			{
+				RxDrugData drugData = new RxDrugData();
+				interact = drugData.getInteractions(atcCodes);
+				if (interact != null)
+				{
+					addToHash(atcCodes, interact);
+				}
+			}
+			catch (Exception e)
+			{
+				MiscUtils.getLogger().error("Error getting drug interactions. ", e);
+			}
+		}
+		return interact;
+	}
 }
