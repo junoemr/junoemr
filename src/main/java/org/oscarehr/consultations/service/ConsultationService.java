@@ -139,9 +139,9 @@ public class ConsultationService
 				providerSettings.getRxProvince(), providerSettings.getRxPostal());
 
 		LetterheadTo1 letterhead = new LetterheadTo1(providerNoStr, provider.getDisplayName());
-		letterhead.setPhone(coalesceProperty(providerSettings.getRxPhone(), StringUtils.trimToNull(provider.getWorkPhone()), defaultLetterhead.getPhone()));
-		letterhead.setAddress(coalesceProperty(settingsAddr, StringUtils.trimToNull(provider.getAddress()), defaultLetterhead.getAddress()));
-		letterhead.setFax(coalesceProperty(providerSettings.getFaxNumber(), StringUtils.trimToNull(provider.getFaxNumber()), defaultLetterhead.getFax()));
+		letterhead.setPhone(coalesceProperty(providerSettings.getRxPhone(), provider.getWorkPhone(), defaultLetterhead.getPhone()));
+		letterhead.setAddress(coalesceProperty(settingsAddr, provider.getAddress(), defaultLetterhead.getAddress()));
+		letterhead.setFax(coalesceProperty(providerSettings.getFaxNumber(), provider.getFaxNumber(), defaultLetterhead.getFax()));
 		return letterhead;
 	}
 
@@ -174,6 +174,7 @@ public class ConsultationService
 	{
 		for(String value : valueList)
 		{
+			value = StringUtils.trimToNull(value);
 			if(value != null)
 			{
 				return value;
