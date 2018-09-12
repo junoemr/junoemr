@@ -85,4 +85,12 @@ public class ServiceSpecialistsDao extends AbstractDao<ServiceSpecialists>
 		query.executeUpdate();
 	}
 
+	public void removeSpecialistFromAllServices(int specId)
+	{
+		Query query = entityManager.createQuery("delete from ServiceSpecialists x where x.id.specId = :specId");
+
+		query.setParameter("specId", specId);
+		query.executeUpdate();
+	}
+
 }

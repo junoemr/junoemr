@@ -42,6 +42,7 @@ import org.oscarehr.common.model.MeasurementGroupStyle;
 import org.oscarehr.common.model.MessageTbl;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarProperties;
@@ -72,6 +73,7 @@ public class EctSessionBean implements java.io.Serializable {
     public String patientLastName;
     public String patientSex;
     public String patientAge;
+    public String chartNo;
     public String familyDoctorNo;
     public String monthOfBirth;
     public String yearOfBirth;
@@ -111,6 +113,7 @@ public class EctSessionBean implements java.io.Serializable {
         dateOfBirth = "";
         patientSex = "";
         patientAge = "";
+        chartNo = "";
         familyDoctorNo = "";
         socialHistory = "";
         familyHistory = "";
@@ -140,36 +143,7 @@ public class EctSessionBean implements java.io.Serializable {
         templateNames = new ArrayList<String>();
         measurementGroupNames = new ArrayList<String>();
 
-        //This block gets the patient age and
-        DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-        Demographic d  = demographicManager.getDemographic(loggedInInfo, demographicNo);
-        
-        patientLastName = d.getLastName();
-        patientFirstName = d.getFirstName();
-        address = d.getAddress();
-        city = d.getCity();
-        postal = d.getPostal();
-        phone = d.getPhone();
-        familyDoctorNo = d.getProviderNo();
-        yearOfBirth = d.getYearOfBirth();
-        monthOfBirth = d.getMonthOfBirth();
-        dateOfBirth = d.getDateOfBirth();
-        roster = d.getRosterStatus();
-        patientSex = d.getSex();
-
-        if (yearOfBirth.equals("null") || yearOfBirth=="") {
-            yearOfBirth = "0";
-        }
-        if (monthOfBirth.equals("null") || monthOfBirth=="") {
-            monthOfBirth = "0";
-        }
-        if (dateOfBirth.equals("null") || dateOfBirth=="") {
-            dateOfBirth = "0";
-        }
-    
-        if(yearOfBirth!="" && yearOfBirth!=null)
-        	patientAge = UtilDateUtilities
-                .calcAge(UtilDateUtilities.calcDate(yearOfBirth, monthOfBirth, dateOfBirth));
+        setupDemographicInfo(loggedInInfo, demographicNo);
 
         OscarAppointmentDao apptDao = SpringUtils.getBean(OscarAppointmentDao.class);
         for(Appointment appt : apptDao.findByProviderAndDate(curProviderNo, ConversionUtils.fromDateString(appointmentDate))){
@@ -189,29 +163,7 @@ public class EctSessionBean implements java.io.Serializable {
 
         OscarProperties properties = OscarProperties.getInstance();
 		if( !Boolean.parseBoolean(properties.getProperty("AbandonOldChart", "false"))) {
-			EChartDao ecDao = SpringUtils.getBean(EChartDao.class);
-			List<EChart> ecs = ecDao.getChartsForDemographic(ConversionUtils.fromIntString(demographicNo));
-			if (!ecs.isEmpty()) {
-				EChart ec = ecs.get(0); 
-                eChartId = ec.getId().toString();
-                eChartTimeStamp =  ec.getTimestamp();
-                socialHistory = ec.getSocialHistory();
-                familyHistory = ec.getFamilyHistory();
-                medicalHistory = ec.getMedicalHistory();
-                ongoingConcerns = ec.getOngoingConcerns();
-                reminders = ec.getReminders();
-                encounter = ec.getEncounter();
-                subject = ec.getSubject();
-            } else {
-                eChartTimeStamp = null;
-                socialHistory = "";
-                familyHistory = "";
-                medicalHistory = "";
-                ongoingConcerns = "";
-                reminders = "";
-                encounter = "";
-                subject = "";
-            }
+            setupOldEchart();
 		}
 
         if (oscarMsgID != null) {
@@ -249,7 +201,7 @@ public class EctSessionBean implements java.io.Serializable {
 
         OscarAppointmentDao apptDao = SpringUtils.getBean(OscarAppointmentDao.class);
 		Appointment appt = apptDao.find(ConversionUtils.fromIntString(appointmentNo));
-		demographicNo = "" + appt.getDemographicNo();
+		demographicNo = Integer.toString(appt.getDemographicNo());
 		this.appointmentNo = appointmentNo;
 		reason = appt.getReason();
 		encType = new String("face to face encounter with client");
@@ -269,63 +221,13 @@ public class EctSessionBean implements java.io.Serializable {
         
     	OscarProperties properties = OscarProperties.getInstance();
 		if( !Boolean.parseBoolean(properties.getProperty("AbandonOldChart", "false"))) {
-			EChartDao ecDao = SpringUtils.getBean(EChartDao.class);
-			List<EChart> ecs = ecDao.getChartsForDemographic(ConversionUtils.fromIntString(demographicNo));
-			if (!ecs.isEmpty()) {
-				EChart ec = ecs.get(0); 
-                eChartId = ec.getId().toString();
-                eChartTimeStamp =  ec.getTimestamp();
-                socialHistory = ec.getSocialHistory();
-                familyHistory = ec.getFamilyHistory();
-                medicalHistory = ec.getMedicalHistory();
-                ongoingConcerns = ec.getOngoingConcerns();
-                reminders = ec.getReminders();
-                encounter = ec.getEncounter();
-                subject = ec.getSubject();
-            } else {
-                eChartTimeStamp = null;
-                socialHistory = "";
-                familyHistory = "";
-                medicalHistory = "";
-                ongoingConcerns = "";
-                reminders = "";
-                encounter = "";
-                subject = "";
-            }
+            setupOldEchart();
 		}
       
         //apointmentsIdArray and the appointmentsNamesArray are
         //already set up so no need to get them again
-    
-        //
-		DemographicManager demogaphicManager = SpringUtils.getBean(DemographicManager.class);
-		Demographic demo = demogaphicManager.getDemographic(loggedInInfo, demographicNo);
-        if (demo != null) {
-            patientLastName = demo.getLastName(); 
-            patientFirstName = demo.getFirstName();
-            address = demo.getAddress();
-            city = demo.getCity();
-            postal = demo.getPostal();
-            phone = demo.getPhone();
-            familyDoctorNo = demo.getProviderNo();
-            yearOfBirth = demo.getYearOfBirth();
-            monthOfBirth = demo.getMonthOfBirth();
-            dateOfBirth = demo.getDateOfBirth();
-            roster = demo.getRosterStatus();
-            patientSex = demo.getSex();
-            if (yearOfBirth.equals("null")) {
-                yearOfBirth = "0";
-            }
-            if (monthOfBirth.equals("null")) {
-                monthOfBirth = "0";
-            }
-            if (dateOfBirth.equals("null")) {
-                dateOfBirth = "0";
-            }
-        }
-        patientAge = UtilDateUtilities
-                    .calcAge(UtilDateUtilities.calcDate(yearOfBirth, monthOfBirth, dateOfBirth));
-        
+
+        setupDemographicInfo(loggedInInfo, demographicNo);
     }
 
  /**
@@ -357,33 +259,8 @@ public class EctSessionBean implements java.io.Serializable {
 	        }
 		}
 
-		DemographicManager demogaphicManager = SpringUtils.getBean(DemographicManager.class);
-		Demographic demo = demogaphicManager.getDemographic(loggedInInfo, demographicNo);
-		if (demo != null) {
-            patientLastName = demo.getLastName(); 
-            patientFirstName = demo.getFirstName();
-            address = demo.getAddress();
-            city = demo.getCity();
-            postal = demo.getPostal();
-            phone = demo.getPhone();
-            familyDoctorNo = demo.getProviderNo();
-            yearOfBirth = demo.getYearOfBirth();
-            monthOfBirth = demo.getMonthOfBirth();
-            dateOfBirth = demo.getDateOfBirth();
-            roster = demo.getRosterStatus();
-            patientSex = demo.getSex();
-            if (yearOfBirth.equals("null")) {
-                yearOfBirth = "0";
-            }
-            if (monthOfBirth.equals("null")) {
-                monthOfBirth = "0";
-            }
-            if (dateOfBirth.equals("null")) {
-                dateOfBirth = "0";
-            }
-        }
-        patientAge = UtilDateUtilities
-                    .calcAge(UtilDateUtilities.calcDate(yearOfBirth, monthOfBirth, dateOfBirth));
+        this.demographicNo = demographicNo;
+		setupDemographicInfo(loggedInInfo, demographicNo);
     }
 
     public String getTeam() {
@@ -463,4 +340,77 @@ public class EctSessionBean implements java.io.Serializable {
         return patientAge;
     }
 
+    private void setupDemographicInfo(LoggedInInfo loggedInInfo, String demoNo)
+    {
+        // Note: We do not set the demographicNo in this method because the natural overload to
+        // SetupEncounterPage(LoggedInInfo, String) is already used with appointmentNo as a parameter.
+        // Therefore, we assume that the demographic number is already set prior to calling this method.
+
+        DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
+        Demographic d = demographicManager.getDemographic(loggedInInfo, demoNo);
+
+        patientLastName = d.getLastName();
+        patientFirstName = d.getFirstName();
+        address = d.getAddress();
+        city = d.getCity();
+        postal = d.getPostal();
+        phone = d.getPhone();
+        familyDoctorNo = d.getProviderNo();
+        chartNo = d.getChartNo();
+        yearOfBirth = d.getYearOfBirth();
+        monthOfBirth = d.getMonthOfBirth();
+        dateOfBirth = d.getDateOfBirth();
+        roster = d.getRosterStatus();
+        patientSex = d.getSex();
+
+        if (yearOfBirth.equals("null") || yearOfBirth.equals(""))
+        {
+            yearOfBirth = "0";
+        }
+        if (monthOfBirth.equals("null") || monthOfBirth.equals(""))
+        {
+            monthOfBirth = "0";
+        }
+        if (dateOfBirth.equals("null") || dateOfBirth.equals(""))
+        {
+            dateOfBirth = "0";
+        }
+
+        if (yearOfBirth.equals("0") || yearOfBirth == null)
+        {
+            MiscUtils.getLogger().warn("Demographic no " + demographicNo + " does not have birth year. Unable to calculate age");
+        }
+        else
+        {
+            patientAge = UtilDateUtilities.calcAge(UtilDateUtilities.calcDate(yearOfBirth, monthOfBirth, dateOfBirth));
+
+        }
+    }
+
+    private void setupOldEchart()
+    {
+        EChartDao ecDao = SpringUtils.getBean(EChartDao.class);
+        List<EChart> ecs = ecDao.getChartsForDemographic(ConversionUtils.fromIntString(demographicNo));
+        if (!ecs.isEmpty()) {
+            EChart ec = ecs.get(0);
+            eChartId = ec.getId().toString();
+            eChartTimeStamp =  ec.getTimestamp();
+            socialHistory = ec.getSocialHistory();
+            familyHistory = ec.getFamilyHistory();
+            medicalHistory = ec.getMedicalHistory();
+            ongoingConcerns = ec.getOngoingConcerns();
+            reminders = ec.getReminders();
+            encounter = ec.getEncounter();
+            subject = ec.getSubject();
+        } else {
+            eChartTimeStamp = null;
+            socialHistory = "";
+            familyHistory = "";
+            medicalHistory = "";
+            ongoingConcerns = "";
+            reminders = "";
+            encounter = "";
+            subject = "";
+        }
+    }
 }
