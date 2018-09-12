@@ -32,81 +32,83 @@
 		<h3 class="modal-title">Edit Fax Account</h3>
 	</div>
 	<div class="modal-body">
-		<div class="switch-container">
-			<label class="input-label" for="input-fax-enabled">Account Enabled</label>
-			<label class="switch">
+		<div class="flex-row">
+			<label class="flex-row-label" for="input-fax-enabled">Account Enabled</label>
+			<label class="flex-row-content switch">
 				<input id="input-fax-enabled" type="checkbox"
 				       ng-model="faxConfigEditController.faxAccount.enabled"/>
 				<span class="slider"></span>
 			</label>
 		</div>
-		<div>
-			<label class="input-label" for="input-fax-account-id">Account Number</label>
-			<input id="input-fax-account-id" type="text"
+		<div class="flex-row">
+			<label class="flex-row-label" for="input-fax-account-id">Account Number</label>
+			<input class="flex-row-content" id="input-fax-account-id" type="text"
 			       ng-change="faxConfigEditController.setDefaultConnectionStatus()"
 			       ng-model="faxConfigEditController.faxAccount.accountLogin">
 		</div>
-		<div>
-			<label class="input-label" for="input-fax-account-pw">Password</label>
-			<input id="input-fax-account-pw" type="password"
+		<div class="flex-row">
+			<label class="flex-row-label" for="input-fax-account-pw">Password</label>
+			<input class="flex-row-content" id="input-fax-account-pw" type="password"
 			       ng-change="faxConfigEditController.setDefaultConnectionStatus()"
 			       ng-model="faxConfigEditController.faxAccount.password">
 		</div>
 		<hr>
-		<div>
-			<label class="input-label" for="input-fax-account-name">Display Name</label>
-			<input id="input-fax-account-name" type="text"
+		<div class="flex-row">
+			<label class="flex-row-label" for="input-fax-account-name">Display Name</label>
+			<input class="flex-row-content" id="input-fax-account-name" type="text"
 			       ng-model="faxConfigEditController.faxAccount.displayName">
 		</div>
-		<div>
-			<label class="input-label" for="input-fax-account-email">Response Email</label>
-			<input id="input-fax-account-email" type="text"
+		<div class="flex-row">
+			<label class="flex-row-label" for="input-fax-account-email">Response Email</label>
+			<input class="flex-row-content" id="input-fax-account-email" type="text"
 			       ng-model="faxConfigEditController.faxAccount.accountEmail">
 		</div>
-		<div>
-			<label class="input-label" for="input-fax-account-fax-no">Response Fax Number</label>
-			<input id="input-fax-account-fax-no" type="text"
+		<div class="flex-row">
+			<label class="flex-row-label" for="input-fax-account-fax-no">Response Fax Number</label>
+			<input class="flex-row-content" id="input-fax-account-fax-no" type="text"
 			       ng-model="faxConfigEditController.faxAccount.faxNumber">
 		</div>
-		<div>
-			<label class="input-label" for="input-fax-account-cover-letter-type">Cover Letter</label>
-			<select id="input-fax-account-cover-letter-type"
+		<div class="flex-row">
+			<label class="flex-row-label" for="input-fax-account-cover-letter-type">Cover Letter</label>
+			<select class="flex-row-content" id="input-fax-account-cover-letter-type"
 			        ng-model="faxConfigEditController.faxAccount.coverLetterOption"
 			        ng-options="coverLetter for coverLetter in faxConfigEditController.coverLetterOptions">
 			</select>
 		</div>
-		<div class="switch-container">
-			<label class="input-label" for="input-fax-enabled-inbound">Inbound Faxing</label>
-			<label class="switch">
+		<div class="flex-row">
+			<label class="flex-row-label" for="input-fax-enabled-inbound">Inbound Faxing</label>
+			<label class="flex-row-content switch">
 				<input id="input-fax-enabled-inbound" type="checkbox"
 				       ng-model="faxConfigEditController.faxAccount.enableInbound"/>
 				<span class="slider"></span>
 			</label>
 		</div>
-		<div class="switch-container">
-			<label class="input-label" for="input-fax-enabled-outbound">Outbound Faxing</label>
-			<label class="switch">
+		<div class="flex-row">
+			<label class="flex-row-label" for="input-fax-enabled-outbound">Outbound Faxing</label>
+			<label class="flex-row-content switch">
 				<input id="input-fax-enabled-outbound" type="checkbox"
 				       ng-model="faxConfigEditController.faxAccount.enableOutbound"/>
 				<span class="slider"></span>
 			</label>
 		</div>
 		<hr>
-		<div>
-			<%--<label class="input-label">Connection Status</label>--%>
-			<div class="input-label">
-				<button type="button" class="btn"
-				        ng-click="faxConfigEditController.testConnection(faxConfigEditController.faxAccount)">
-					Test Connection
-				</button>
-			</div>
-			<div>
+		<div class="flex-row">
+			<label class="flex-row-label">Connection Status</label>
+			<div class="flex-row-content">
 				<span ng-show="faxConfigEditController.faxAccount.connectionStatus == faxConfigEditController.connectionStatusEnum.unknown"
 				      class="glyphicon unknown glyphicon-question-sign"></span>
 				<span ng-show="faxConfigEditController.faxAccount.connectionStatus == faxConfigEditController.connectionStatusEnum.success"
 				      class="glyphicon success glyphicon-ok-sign"></span>
 				<span ng-show="faxConfigEditController.faxAccount.connectionStatus == faxConfigEditController.connectionStatusEnum.failure"
 				      class="glyphicon failure glyphicon-remove-sign"></span>
+			</div>
+		</div>
+		<div class="flex-row">
+			<div class="flex-row-label">
+				<button type="button" class="btn input-content"
+				        ng-click="faxConfigEditController.testConnection(faxConfigEditController.faxAccount)">
+					Test Connection
+				</button>
 			</div>
 		</div>
 	</div>

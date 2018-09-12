@@ -28,6 +28,7 @@ import org.oscarehr.fax.model.FaxConfig;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
+import java.util.List;
 
 @Repository
 public class FaxConfigDao extends AbstractDao<FaxConfig>
@@ -43,5 +44,15 @@ public class FaxConfigDao extends AbstractDao<FaxConfig>
 		query.setParameter("number", number);
 
 		return getSingleResultOrNull(query);
+	}
+
+	public List<FaxConfig> findByActiveStatus(boolean isActive, int offset, int limit)
+	{
+		Query query = entityManager.createQuery("SELECT config FROM FaxConfig config WHERE config.active = :active");
+		query.setParameter("active", isActive);
+		query.setMaxResults(limit);
+		query.setFirstResult(offset);
+
+		return query.getResultList();
 	}
 }

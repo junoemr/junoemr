@@ -60,9 +60,9 @@ public class GenericFile
 	public static final String DOCUMENT_BASE_DIR = props.getProperty("DOCUMENT_DIR");
 	public static final String DOCUMENT_NEW_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("DOCUMENT_NEW_DIR")).getPath();
 	public static final String DOCUMENT_CORRUPT_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("DOCUMENT_CORRUPT_DIR")).getPath();
-	public static final String DOCUMENT_FAX_DIR = props.getProperty("fax_file_location");
-	public static final String DOCUMENT_FAX_DIR_SENT = new File(DOCUMENT_FAX_DIR, "sent").getPath();
-	public static final String DOCUMENT_FAX_DIR_UNSENT = new File(DOCUMENT_FAX_DIR, "unsent").getPath();
+	public static final String DOCUMENT_FAX_DIR_PENDING = props.getProperty("fax_file_location");
+	public static final String DOCUMENT_FAX_DIR_SENT = new File(DOCUMENT_FAX_DIR_PENDING, "sent").getPath();
+	public static final String DOCUMENT_FAX_DIR_UNSENT = new File(DOCUMENT_FAX_DIR_PENDING, "unsent").getPath();
 
 	// file info
 	protected File javaFile;
@@ -91,9 +91,9 @@ public class GenericFile
 		return moveFile(DOCUMENT_CORRUPT_DIR);
 	}
 
-	public boolean moveToOutgoingFax() throws IOException
+	public boolean moveToOutgoingFaxPending() throws IOException
 	{
-		return moveFile(DOCUMENT_FAX_DIR);
+		return moveFile(DOCUMENT_FAX_DIR_PENDING);
 	}
 	public boolean moveToOutgoingFaxSent() throws IOException
 	{

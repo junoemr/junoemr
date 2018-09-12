@@ -64,7 +64,7 @@ public class SRFaxApiConnector
 		this.access_pwd = password;
 	}
 
-	public SRFaxResultWrapper_Single<String> Queue_Fax(Map<String, String> parameters)
+	public SRFaxResultWrapper_Single<Integer> Queue_Fax(Map<String, String> parameters)
 	{
 		String[] requiredFields = {"sCallerID", "sSenderEmail", "sFaxType", "sToFaxNumber"};
 		String[] optionalFields = {"sResponseFormat", "sAccountCode", "sRetries", "sCoverPage", "sCPFromName", "sCPToName", "sCPOrganization",

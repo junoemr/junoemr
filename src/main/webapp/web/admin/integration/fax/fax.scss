@@ -49,9 +49,19 @@
 	padding:30px;
 	background-color: $primary-white;
 
-	.input-label {
-	  width: 200px;
-	  text-align: right;
+	.flex-row {
+	  display: flex;
+	  flex-direction: row;
+	  align-items: center;
+	  justify-content: flex-start;
+	  .flex-row-label {
+		width: 40%;
+		padding: 0 5px;
+		text-align: right;
+	  }
+	  .flex-row-content {
+		text-align: left;
+	  }
 	}
 	.glyphicon {
 	  font-size: 25px;

@@ -11,6 +11,7 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxCon
 		var controller = this;
 		controller.connectionStatusEnum = Object.freeze({"unknown":1, "success":2, "failure":3});
 		controller.coverLetterOptions = [
+			"None",
 			"Basic",
 			"Standard",
 			"Company",

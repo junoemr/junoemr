@@ -25,38 +25,27 @@
 
 package oscar.dms.actions;
 
-import java.util.ArrayList;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.lowagie.text.DocumentException;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.fax.dao.FaxConfigDao;
-import org.oscarehr.fax.model.FaxConfig;
 import org.oscarehr.fax.service.OutgoingFaxService;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.dms.EDocUtil;
-import oscar.util.FaxUtils;
 import oscar.oscarEncounter.data.EctProgram;
+import oscar.util.FaxUtils;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
-
-import org.apache.commons.io.FileUtils;
-
-import com.lowagie.text.DocumentException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
+import java.util.ArrayList;
 
 
 /**
@@ -66,7 +55,6 @@ import java.io.IOException;
 public class SendFaxPDFAction extends DispatchAction {
 
 	private static final OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
-	private static final FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
 
     public ActionForward faxDocument(ActionMapping mapping, ActionForm form,
 		HttpServletRequest request, HttpServletResponse response) 
@@ -84,6 +72,8 @@ public class SendFaxPDFAction extends DispatchAction {
 		MiscUtils.getLogger().info(providerNo);
 		MiscUtils.getLogger().info("======================================================");
 
+		Integer demographicId = Integer.parseInt(demoNo);
+		Integer providerId = Integer.parseInt(providerNo);
 
         String[] docNoArray = request.getParameterValues("docNo");
 		String[] recipients = request.getParameterValues("faxRecipients");
@@ -100,28 +90,20 @@ public class SendFaxPDFAction extends DispatchAction {
             for (int i =0 ; i < docNoArray.length ; i++)
 			{
 				String docNo = docNoArray[i];
-//				String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 				String filename =  docData.getDocumentName(docNo);
-//				String faxPdf = path + filename;
 
 				for (int j = 0; j < recipients.length; j++)
 				{
 					String faxNo = recipients[j].replaceAll("\\D", "");
-
-//					String error = "";
-//					String message = "";
-//					Exception exception = null;
 					try
 					{
-//						sendFax("DOC-" + docNo, faxPdf, faxNo);
 						GenericFile fileToCopy = FileFactory.getDocumentFile(docData.getDocumentName(docNo));
 						GenericFile fileToFax = FileFactory.copy(fileToCopy);
 
-						String faxFileName = "DOC-"+ docNo + "_" + filename + "-" + faxNo + "." + System.currentTimeMillis();
+						String faxFileName = "DOC-"+ docNo + "-" + filename + "-" + faxNo + "." + System.currentTimeMillis();
 						fileToFax.rename(faxFileName + ".pdf");
 
-						FaxConfig faxSettings = faxConfigDao.findAll(0, 10).get(0);
-						outgoingFaxService.sendFax(faxSettings, faxNo, fileToFax);
+						outgoingFaxService.sendFax(providerId, demographicId, faxNo, fileToFax);
 					}
 					catch(Exception e)
 					{
@@ -161,6 +143,7 @@ public class SendFaxPDFAction extends DispatchAction {
 		{
 			return mapping.findForward("failed");
 		}
+		String providerNo = LoggedInInfo.getLoggedInInfoFromRequest(request).getLoggedInProviderNo();
 
 		String[] recipients = request.getParameterValues("faxRecipients");
 		String pdfPath = (String) request.getAttribute("pdfPath");
@@ -171,7 +154,9 @@ public class SendFaxPDFAction extends DispatchAction {
 		{
 			try
 			{
-				faxTempFile("Form-" + formName, pdfPath, recipients[i]);
+				GenericFile fileToFax = FileFactory.getExistingFile(pdfPath);
+				fileToFax.rename("Form-" + formName);
+				outgoingFaxService.sendFax(Integer.parseInt(providerNo), null, recipients[i], fileToFax);
 			}
 			catch (Exception e)
 			{
@@ -184,49 +169,6 @@ public class SendFaxPDFAction extends DispatchAction {
 
 		request.setAttribute("errors", errorList);
 		return mapping.findForward("success");
-	}
-
-	private void faxTempFile(String fileName, String tmpPdf, String faxNo)
-		throws DocumentException, IOException
-	{
-		sendFax(fileName, tmpPdf, faxNo);
-
-		// clear temp files on JVM exit
-		new File(tmpPdf).deleteOnExit();
-	}
-
-
-	private void sendFax(String fileName, String pdf, String faxNo)
-		throws DocumentException, IOException
-	{
-		String tempPath = OscarProperties.getInstance().getProperty("fax_file_location");
-		String tempName = fileName + "-" + faxNo + "." + System.currentTimeMillis();
-
-		String faxPdf = String.format("%s%s%s.pdf", tempPath, File.separator, tempName);
-		String faxTxt = String.format("%s%s%s.txt", tempPath, File.separator, tempName);
-
-		MiscUtils.getLogger().info("======================================================");
-		MiscUtils.getLogger().info(pdf);
-		MiscUtils.getLogger().info(faxPdf);
-		MiscUtils.getLogger().info(faxTxt);
-		MiscUtils.getLogger().info("======================================================");
-
-		// Copying the fax pdf.
-		FileUtils.copyFile(new File(pdf), new File(faxPdf));
-
-		// Creating text file with the specialists fax number.
-		FileOutputStream fos = new FileOutputStream(faxTxt);
-		PrintWriter pw = new PrintWriter(fos);
-		pw.println(faxNo);
-		pw.close();
-		fos.close();
-
-		// A little sanity check to ensure both files exist.
-		if (!new File(faxPdf).exists() || !new File(faxTxt).exists())
-		{
-			throw new DocumentException(
-				"Unable to create files for fax of " + fileName + ".");
-		}
 	}
 
 	private String getUserFriendlyError(Exception e)

@@ -24,7 +24,10 @@ package org.oscarehr.fax.service;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.fax.dao.FaxConfigDao;
 import org.oscarehr.fax.dao.FaxJobDao;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.model.FaxJob;
@@ -36,10 +39,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * This service should be responsible for handling all logic around sending outgoing faxes
@@ -53,28 +58,41 @@ public class OutgoingFaxService
 	@Autowired
 	FaxJobDao faxJobDao;
 
-	public void sendFax(FaxConfig faxSettings, String faxNumber, GenericFile...filesToFax) throws IOException
+	@Autowired
+	FaxConfigDao faxConfigDao;
+
+	public void sendFax(Integer providerId, Integer demographicId, String faxNumber, GenericFile...filesToFax) throws IOException
 	{
-		if(faxSettings == null)
+
+		List<FaxConfig> faxConfigList = faxConfigDao.findByActiveStatus(true, 0, 1);
+		if(faxConfigList.isEmpty())
 		{
-			sendFaxDefault(faxNumber, filesToFax);
+			writeToFaxOutgoing(faxNumber, filesToFax);
 		}
 		else
 		{
-			sendBySRFax(faxSettings, faxNumber, filesToFax);
+			FaxConfig faxSettings = faxConfigList.get(0); //TODO determine which fax route to use
+			sendBySRFax(providerId, demographicId, faxSettings, faxNumber, filesToFax);
 		}
 	}
 
 	/**
 	 * When there are no direct integration fax routes, write file to outbound location (old fax system)
 	 */
-	private void sendFaxDefault(String faxNumber, GenericFile...filesToFax) throws IOException
+	private void writeToFaxOutgoing(String faxNumber, GenericFile...filesToFax) throws IOException
 	{
-//		fileToFax.moveToOutgoingFax();
-		//TODO write fax number to txt file
+		for(GenericFile fileToFax : filesToFax)
+		{
+			GenericFile faxNoFile = FileFactory.createTempFile(new ByteArrayInputStream(faxNumber.getBytes()));
+			String filenameWithoutExt = FilenameUtils.removeExtension(fileToFax.getFileObject().getName());
+			faxNoFile.rename(filenameWithoutExt + ".txt");
+
+			fileToFax.moveToOutgoingFaxPending();
+			faxNoFile.moveToOutgoingFaxPending();
+		}
 	}
 
-	private void sendBySRFax(FaxConfig faxSettings, String faxNumber, GenericFile...filesToFax) throws IOException
+	private void sendBySRFax(Integer providerId, Integer demographicId, FaxConfig faxSettings, String faxNumber, GenericFile...filesToFax) throws IOException
 	{
 		SRFaxApiConnector apiConnector = new SRFaxApiConnector(faxSettings.getFaxUser(), faxSettings.getFaxPasswd());
 
@@ -94,8 +112,7 @@ public class OutgoingFaxService
 		}
 
 		// external api call
-		SRFaxResultWrapper_Single<String> resultWrapper = apiConnector.Queue_Fax(parameters);
-
+		SRFaxResultWrapper_Single<Integer> resultWrapper = apiConnector.Queue_Fax(parameters);
 
 		for(GenericFile fileToFax : filesToFax)
 		{
@@ -103,19 +120,17 @@ public class OutgoingFaxService
 
 			if(resultWrapper.isSuccess())
 			{
-				logger.info("Fax send success " + resultWrapper.getResult());
+				logger.info("Fax send success " + String.valueOf(resultWrapper.getResult()));
 				fileToFax.moveToOutgoingFaxSent();
 				faxJob.setStatus(FaxJob.STATUS.SENT);
-				faxJob.setJobId(Long.parseLong(resultWrapper.getResult()));
+				faxJob.setJobId(resultWrapper.getResult().longValue());
 			}
 			else
 			{
-				logger.warn("Fax send failure " + resultWrapper.getResult());
+				logger.warn("Fax send failure " + resultWrapper.getError());
 				fileToFax.moveToOutgoingFaxUnsent();
 				faxJob.setStatus(FaxJob.STATUS.ERROR);
 			}
-
-			//TODO log results
 
 			faxJob.setDestination("SRFAX");
 			faxJob.setFax_line(null);
@@ -123,9 +138,13 @@ public class OutgoingFaxService
 			faxJob.setUser(faxSettings.getFaxUser());
 			faxJob.setNumPages(fileToFax.getPageCount());
 			faxJob.setStamp(new Date());
-//			faxJob.setOscarUser(providerId);
-//			faxJob.setDemographicNo(null);
+			faxJob.setOscarUser(String.valueOf(providerId));
+			faxJob.setDemographicNo(demographicId);
 			faxJobDao.persist(faxJob);
+		}
+		if(!resultWrapper.isSuccess())
+		{
+			throw new RuntimeException("Failed to fax: " + resultWrapper.getError());
 		}
 	}
 

@@ -1,7 +1,4 @@
 /* The switch - the box around the slider */
-.switch-container {
-  display: flex;
-  align-items:center;
   .switch {
     position: relative;
     display: inline-block;
@@ -59,4 +56,4 @@
   .slider.round:before {
     border-radius: 50%;
   }
-}
+
