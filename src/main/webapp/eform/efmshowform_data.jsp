@@ -27,6 +27,7 @@
 <%@ page import="org.oscarehr.eform.service.EFormDataService" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="oscar.eform.data.EForm" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 <%
 	EFormDataService eFormDataService = SpringUtils.getBean(EFormDataService.class);
 
@@ -56,17 +57,26 @@
 		out.print(eForm.getFormHtml());
 	}
 	else
-	{  // the form is viewed from admin screen
+	{   // the form is viewed from admin screen
 		String id = request.getParameter("fid");
-		EForm eForm = new EForm(id, "-1");		// demographicID -1 is a placeholder.  We will not be submitting this form.
-		eForm.setLoggedInProvider(providerNo);
-		eForm.setContextPath(request.getContextPath());
-		eForm.setupInputFields();
-		eForm.setOscarOPEN(request.getRequestURI());
-		eForm.setImagePath();
-		eForm.setDatabaseUpdateAPs();
-		eForm.disableSubmitControls();
-		out.print(eForm.getFormHtml());
+
+		if (id != null)
+		{
+			EForm eForm = new EForm(id, "-1");        // demographicID -1 is a placeholder.  We will not be submitting this form.
+			eForm.setLoggedInProvider(providerNo);
+			eForm.setContextPath(request.getContextPath());
+			eForm.setupInputFields();
+			eForm.setOscarOPEN(request.getRequestURI());
+			eForm.setImagePath();
+			eForm.setDatabaseUpdateAPs();
+			eForm.disableSubmitControls();
+			out.print(eForm.getFormHtml());
+		}
+		else
+		{
+		    // If despite our best efforts, a user still manages to submit an invalid e-form from the admin screen or otherwise.
+			MiscUtils.getLogger().warn("An e-form was submitted without a fdid or fid, ignoring submission.\n Params: " + request.getParameterMap().toString());
+		}
 	}
 
 	String iframeResize = (String) session.getAttribute("useIframeResizing");
