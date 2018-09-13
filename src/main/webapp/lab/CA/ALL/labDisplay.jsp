@@ -1280,8 +1280,8 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                    	String obrName = handler.getOBRName(j);
                                    	b1 = !obrFlag && !obrName.equals("");
                                    	b2 = !(obxName.contains(obrName));
-                                   	b3 = obxCount < 2;
-                                       if( b1 && b2 && b3){
+
+                                       if( b1 && b2 && !isUnstructuredDoc){
                                        %>
                                            <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" >
                                                <td valign="top" align="left"><%=obrName%></td>

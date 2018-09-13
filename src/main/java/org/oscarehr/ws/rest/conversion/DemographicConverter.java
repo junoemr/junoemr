@@ -25,9 +25,10 @@ package org.oscarehr.ws.rest.conversion;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.DemographicExt;
+import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
+import oscar.OscarProperties;
 
 public class DemographicConverter extends AbstractConverter<Demographic, DemographicTo1> {
 	
@@ -61,6 +62,10 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		d.setSexDesc(t.getSexDesc());
 		d.setDateJoined(t.getDateJoined());
 		d.setFamilyDoctor(t.getFamilyDoctor());
+		if (OscarProperties.getInstance().isPropertyActive("demographic_family_doctor"))
+		{
+			d.setFamilyDoctor2(t.getFamilyDoctor2());
+		}
 		d.setCity(t.getAddress().getCity());
 		d.setFirstName(t.getFirstName());
 		d.setPostal(t.getAddress().getPostal());
@@ -136,6 +141,10 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		t.setSexDesc(d.getSexDesc());
 		t.setDateJoined(d.getDateJoined());
 		t.setFamilyDoctor(d.getFamilyDoctor());
+		if (OscarProperties.getInstance().isPropertyActive("demographic_family_doctor"))
+		{
+			t.setFamilyDoctor2(d.getFamilyDoctor2());
+		}
 		t.getAddress().setCity(d.getCity());
 		t.setFirstName(d.getFirstName());
 		t.getAddress().setPostal(d.getPostal());

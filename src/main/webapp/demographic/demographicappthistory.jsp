@@ -66,8 +66,8 @@
 <%@page import="org.oscarehr.common.model.AppointmentStatus" %>
 
 
-<%@ page import="org.oscarehr.common.model.ProviderData"%>
-<%@ page import="org.oscarehr.common.dao.ProviderDataDao"%>
+<%@ page import="org.oscarehr.provider.model.ProviderData"%>
+<%@ page import="org.oscarehr.provider.dao.ProviderDataDao"%>
 
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>

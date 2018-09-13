@@ -173,6 +173,10 @@ if(!authed) {
 		<td>Token Request URI:</td>
 		<td><%=here%>/ws/token</td>
 	</tr>
+	<tr>
+		<td>Service Base URI:</td>
+		<td><%=here%>/ws/services/v1</td>
+	</tr>
 </table>
 
 <div id="new-form" title="Create Client">

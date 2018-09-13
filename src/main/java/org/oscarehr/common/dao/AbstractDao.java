@@ -22,18 +22,21 @@
  */
 package org.oscarehr.common.dao;
 
-import java.util.List;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
+import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.common.search.AbstractCriteriaSearch;
+import org.oscarehr.util.MiscUtils;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import oscar.util.ParamAppender;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-
-import org.oscarehr.common.model.AbstractModel;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import oscar.util.ParamAppender;
+import java.util.List;
 
 @Transactional(propagation = Propagation.REQUIRED)
 public abstract class AbstractDao<T extends AbstractModel<?>> {
@@ -101,6 +104,37 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 		query.setMaxResults(intLimit);
 		
 		return query.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<T> criteriaSearch(AbstractCriteriaSearch criteriaSearch)
+	{
+		Session session = (Session) entityManager.getDelegate();
+
+		Criteria criteria = session.createCriteria(modelClass);
+		criteria = criteriaSearch.setCriteriaProperties(criteria);
+
+		criteria.setMaxResults(criteriaSearch.getLimit());
+		criteria.setFirstResult(criteriaSearch.getOffset());
+
+		return criteria.list();
+	}
+	@SuppressWarnings("unchecked")
+	public Integer criteriaSearchCount(AbstractCriteriaSearch criteriaSearch)
+	{
+		Session session = (Session) entityManager.getDelegate();
+
+		Criteria criteria = session.createCriteria(modelClass);
+		criteria = criteriaSearch.setCriteriaProperties(criteria);
+		criteria.setProjection(Projections.rowCount());
+
+		Object result = criteria.uniqueResult();
+		if(result == null)
+		{
+			MiscUtils.getLogger().error("Criteria search count returned null result");
+			result = -1;
+		}
+		return ((Integer)result);
 	}
 	
 	protected int getMaxSelectSize() {

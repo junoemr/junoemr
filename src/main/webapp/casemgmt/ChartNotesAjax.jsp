@@ -24,44 +24,16 @@
 
 --%>
 
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="oscar.Misc"%>
-<%@page import="oscar.util.UtilMisc"%>
+<%@page import="org.oscarehr.casemgmt.model.CaseManagementNoteLink"%>
+<%@page import="org.oscarehr.casemgmt.web.CaseManagementViewAction"%>
+<%@page import="org.oscarehr.casemgmt.web.NoteDisplay"%>
 <%@include file="/casemgmt/taglibs.jsp"%>
 <%@taglib uri="/WEB-INF/caisi-tag.tld" prefix="caisi"%>
-<%@page import="java.util.Enumeration"%>
-<%@page import="oscar.oscarEncounter.pageUtil.NavBarDisplayDAO"%>
-<%@page	import="java.util.Arrays,java.util.Properties,java.util.List,java.util.Set,java.util.ArrayList,java.util.Enumeration,java.util.HashSet,java.util.Iterator,java.text.SimpleDateFormat,java.util.Calendar,java.util.Date,java.text.ParseException"%>
-<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
-<%@page import="org.oscarehr.common.model.UserProperty,org.oscarehr.casemgmt.model.*,org.oscarehr.casemgmt.service.* "%>
-<%@page import="org.oscarehr.casemgmt.web.formbeans.*"%>
-<%@page import="org.oscarehr.PMmodule.model.*"%>
-<%@page import="org.oscarehr.common.model.*"%>
-<%@page import="oscar.util.DateUtils"%>
-<%@page import="oscar.dms.EDocUtil"%>
-<%@page import="org.springframework.web.context.WebApplicationContext"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@page import="org.oscarehr.casemgmt.common.Colour"%>
-<%@page import="oscar.dms.EDoc"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@page import="com.quatro.dao.security.*,com.quatro.model.security.Secrole"%>
-<%@page import="org.oscarehr.util.EncounterUtil"%>
-<%@page import="org.apache.cxf.common.i18n.UncheckedException"%>
-<%@page import="org.oscarehr.casemgmt.web.NoteDisplay"%>
-<%@page import="org.oscarehr.casemgmt.web.CaseManagementViewAction"%>
-<%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="oscar.oscarRx.data.RxPrescriptionData"%>
-<%@page import="org.oscarehr.casemgmt.dao.CaseManagementNoteLinkDAO"%>
-<%@page import="org.oscarehr.common.dao.ProfessionalSpecialistDao"%>
-<%@page import="oscar.OscarProperties"%>
-<%@page import="org.oscarehr.util.MiscUtils"%>
-<%@page import="org.oscarehr.PMmodule.model.Program"%>
-<%@page import="org.oscarehr.PMmodule.dao.ProgramDao"%>
-<%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="oscar.util.UtilDateUtilities"%>
 <%@page import="org.oscarehr.casemgmt.web.NoteDisplayNonNote"%>
-<%@page import="org.oscarehr.common.dao.EncounterTemplateDao"%>
-<%@page import="org.oscarehr.casemgmt.web.CheckBoxBean"%>
+<%@page import="org.oscarehr.common.dao.ProfessionalSpecialistDao"%>
+<%@page	import="org.oscarehr.common.model.UserProperty,org.oscarehr.util.EncounterUtil,org.oscarehr.util.MiscUtils,oscar.OscarProperties,oscar.dms.EDoc,oscar.dms.EDocUtil,oscar.oscarRx.data.RxPrescriptionData,oscar.util.DateUtils,java.text.ParseException,java.text.SimpleDateFormat,java.util.ArrayList,java.util.Calendar"%>
+<%@page import="java.util.Date"%>
+<%@page import="java.util.Enumeration,java.util.Iterator "%>
 
 <%
     String roleName2$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -450,7 +422,7 @@ int maxId = 0;
 						{
 					 	%>
 						 	<div style="background-color:#33FFCC; text-align:right">
-						 		Group Note - Editable note in this <a  href="javascript:void()" onClick="popupPage(700,1000,'Master1','<%=request.getContextPath()%>/demographic/demographiccontrol.jsp?demographic_no=<%=note.getLocation() %>&displaymode=edit&dboperation=search_detail');return false;">client</a>
+						 		Group Note - Editable note in this <a  href="javascript:void(false);" onClick="popupPage(700,1000,'Master1','<%=request.getContextPath()%>/demographic/demographiccontrol.jsp?demographic_no=<%=note.getLocation() %>&displaymode=edit&dboperation=search_detail');return false;">client</a>
 						 	</div>
 						<%
 						}

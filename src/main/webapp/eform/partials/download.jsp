@@ -24,11 +24,16 @@
 
 --%>
 <!DOCTYPE html>
-<%@page import="java.io.*,java.util.*,java.net.*,org.oscarehr.common.dao.*,org.oscarehr.common.model.*,org.oscarehr.util.*"%>
-<%@page import="org.codehaus.jettison.json.*"%>
-<%@page import="org.joda.time.*"%>
-<%@page import="org.oscarehr.ws.rest.FormsService"%>
+<%@page import="org.codehaus.jettison.json.JSONArray"%>
+<%@page import="org.codehaus.jettison.json.JSONObject,org.joda.time.DateTime"%>
 <%@page import="org.oscarehr.app.AppOAuth1Config"%>
+<%@page import="org.oscarehr.common.dao.AppDefinitionDao"%>
+<%@page import="org.oscarehr.common.dao.AppUserDao"%>
+<%@page import="org.oscarehr.common.model.AppDefinition"%>
+<%@page import="org.oscarehr.common.model.AppUser"%>
+<%@page import="org.oscarehr.util.LoggedInInfo"%>
+<%@page import="org.oscarehr.util.SpringUtils"%>
+<%@page import="org.oscarehr.ws.rest.FormsService"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <html:html locale="true">

@@ -39,29 +39,38 @@
 if(!authed) {
 	return;
 }
-%>
 
-<%
+	OscarProperties properties = OscarProperties.getInstance();
 
-// Defaults    		
-String strOffset="0";
-String strLimit="10";
+	// Defaults
+	String strOffset = "0";
+	String strLimit = "10";
 
-//OFFSET
-if(request.getParameter("limit1")!=null) 
-	strOffset = request.getParameter("limit1");
-//LIMIT
-if(request.getParameter("limit2")!=null) 
-	strLimit = request.getParameter("limit2");
+	//OFFSET
+	if(request.getParameter("limit1") != null)
+		strOffset = request.getParameter("limit1");
+	//LIMIT
+	if(request.getParameter("limit2") != null)
+		strLimit = request.getParameter("limit2");
 
-int offset = Integer.parseInt(strOffset);
-int limit = Integer.parseInt(strLimit);
+	int offset = Integer.parseInt(strOffset);
+	int limit = Integer.parseInt(strLimit);
 
-String outcome = request.getParameter("outcome");
-boolean mergedSearch = false;
-if(request.getParameter("dboperation")!=null && request.getParameter("dboperation").equals("demographic_search_merged")) mergedSearch = true;
-if( outcome !=null){
-    if (outcome.equals("success")){
+	String outcome = request.getParameter("outcome");
+	String dbOperation = request.getParameter("dboperation");
+	boolean mergedSearch = "demographic_search_merged".equals(dbOperation);
+
+	String keyword=request.getParameter("keyword");
+	String orderBy = request.getParameter("orderby");
+	String searchMode = request.getParameter("search_mode");
+	if(searchMode == null)
+		searchMode = "search_name";
+
+
+	if(outcome != null)
+	{
+		if(outcome.equals("success"))
+		{
 %>
 <script language="JavaScript">
 	alert("Records merged successfully");
@@ -89,29 +98,24 @@ if( outcome !=null){
 	}
 %>
 
-<%@ page import="java.util.*, java.sql.*, oscar.*, oscar.oscarDemographic.data.DemographicMerged"%>
-<%@ page import="java.lang.System" %>
-<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.common.dao.DemographicDao"%>
 <%@ page import="org.oscarehr.common.model.Demographic"%>
-<%@ page import="org.oscarehr.common.dao.DemographicDao" %>
-<%@page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo"%>
+<%@ page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="oscar.OscarProperties"%>
+<%@ page import="oscar.oscarDemographic.data.DemographicMerged"%>
+<%@ page import="java.util.Collections"%>
+<%@ page import="java.util.List" %>
 
 <%
-	List<Demographic> demoList = null;  //demographicDao.getDemographicByProvider( "55");
-	DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
+	List<Demographic> demoList = null;
+	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 
-	String dboperation = request.getParameter("dboperation");
-	String keyword=request.getParameter("keyword");
-	String orderBy = request.getParameter("orderby");
-	String searchMode = request.getParameter("search_mode");
-	if(searchMode == null)
-		searchMode = "search_name";
-	
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 	String providerNo = loggedInInfo.getLoggedInProviderNo();
 	boolean outOfDomain = true;
-	if(OscarProperties.getInstance().getProperty("ModuleNames","").indexOf("Caisi") != -1) {
-		if(!"true".equals(OscarProperties.getInstance().getProperty("pmm.client.search.outside.of.domain.enabled","true"))) {
+	if(properties.getProperty("ModuleNames","").contains("Caisi")) {
+		if(!"true".equals(properties.getProperty("pmm.client.search.outside.of.domain.enabled","true"))) {
 			outOfDomain=false;
 		}
 		if(request.getParameter("outofdomain")!=null && request.getParameter("outofdomain").equals("true")) {
@@ -171,11 +175,11 @@ if( outcome !=null){
 </SCRIPT>
 <!--base target="pt_srch_main"-->
 
-<style>
-input[type="radio"]{
-margin-left:8px;
-}
-</style>
+	<style>
+		input[type="radio"] {
+			margin-left: 8px;
+		}
+	</style>
 
 
 </head>
@@ -219,19 +223,19 @@ Search:
 		<th align="center" width="5%">Main Record</th>
 		<%}%>
 		<TH align="center" width="10%"><b><a
-			href="demographicmergerecord.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&orderby=demographic_no&limit1=0&limit2=<%=strLimit%>">Demographic</a></b></font></TH>
+			href="demographicmergerecord.jsp?keyword=<%=keyword%>&search_mode=<%=searchMode%>&dboperation=<%=dbOperation%>&orderby=demographic_no&limit1=0&limit2=<%=strLimit%>">Demographic</a></b></TH>
 		<TH align="center" width="20%"><b><a
-			href="demographicmergerecord.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&orderby=last_name&limit1=0&limit2=<%=strLimit%>">Last Name</a> </b></font></TH>
+			href="demographicmergerecord.jsp?keyword=<%=keyword%>&search_mode=<%=searchMode%>&dboperation=<%=dbOperation%>&orderby=last_name&limit1=0&limit2=<%=strLimit%>">Last Name</a> </b></TH>
 		<TH align="center" width="20%"><b><a
-			href="demographicmergerecord.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&orderby=first_name&limit1=0&limit2=<%=strLimit%>">First Name</a> </b></font></TH>
+			href="demographicmergerecord.jsp?keyword=<%=keyword%>&search_mode=<%=searchMode%>&dboperation=<%=dbOperation%>&orderby=first_name&limit1=0&limit2=<%=strLimit%>">First Name</a> </b></TH>
 		<TH align="center" width="10%"><b><a
-			href="demographicmergerecord.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&orderby=age&limit1=0&limit2=<%=strLimit%>">Age</a></b></font></TH>
+			href="demographicmergerecord.jsp?keyword=<%=keyword%>&search_mode=<%=searchMode%>&dboperation=<%=dbOperation%>&orderby=age&limit1=0&limit2=<%=strLimit%>">Age</a></b></TH>
 		<TH align="center" width="10%"><b><a
-			href="demographicmergerecord.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&orderby=roster_status&limit1=0&limit2=<%=strLimit%>">Roster Status</a></b></font></TH>
+			href="demographicmergerecord.jsp?keyword=<%=keyword%>&search_mode=<%=searchMode%>&dboperation=<%=dbOperation%>&orderby=roster_status&limit1=0&limit2=<%=strLimit%>">Roster Status</a></b></TH>
 		<TH align="center" width="10%"><b><a
-			href="demographicmergerecord.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&orderby=sex&limit1=0&limit2=<%=strLimit%>">Sex</a></B></font></TH>
+			href="demographicmergerecord.jsp?keyword=<%=keyword%>&search_mode=<%=searchMode%>&dboperation=<%=dbOperation%>&orderby=sex&limit1=0&limit2=<%=strLimit%>">Sex</a></B></TH>
 		<TH align="center" width="10%"><b><a
-			href="demographicmergerecord.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&orderby=date_of_birth&limit1=0&limit2=<%=strLimit%>">DOB(yy/mm/dd)</a></B></Font></TH>
+			href="demographicmergerecord.jsp?keyword=<%=keyword%>&search_mode=<%=searchMode%>&dboperation=<%=dbOperation%>&orderby=date_of_birth&limit1=0&limit2=<%=strLimit%>">DOB(yy/mm/dd)</a></B></TH>
 	</tr>
 <%
 
@@ -301,8 +305,8 @@ if(demoList == null) {
 } 
 else {
 
-	for(Demographic demo : demoList) {
-		
+	for(Demographic demo : demoList)
+	{
 		toggleLine = !toggleLine;
         nItems++; //to calculate if it is the end of records
 %>
@@ -347,9 +351,7 @@ else {
     }
 }
 %>
-
 </table>
-
 <br>
 <% if (mergedSearch){%> 
 
@@ -362,29 +364,29 @@ else {
 <%}%> <br />
 
 </form>
-<%
-int nLastPage=0,nNextPage=0;
-nNextPage=Integer.parseInt(strLimit)+Integer.parseInt(strOffset);
-nLastPage=Integer.parseInt(strOffset)-Integer.parseInt(strLimit);
-if(nLastPage>=0) {
-%> <a
-	href="demographicmergerecord.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&orderby=<%=request.getParameter("orderby")%>&limit1=<%=nLastPage%>&limit2=<%=strLimit%>">Last
-Page</a> | <%
-}
-if(nItems==Integer.parseInt(strLimit)) {
-%> <a
-	href="demographicmergerecord.jsp?keyword=<%=request.getParameter("keyword")%>&search_mode=<%=request.getParameter("search_mode")%>&orderby=<%=request.getParameter("orderby")%>&limit1=<%=nNextPage%>&limit2=<%=strLimit%>">
-Next Page</a> <%
-}
+	<%
+		int nNextPage = limit + offset;
+		int nLastPage = offset - limit;
+		if(nLastPage >= 0)
+		{
+		%> <a
+			href="demographicmergerecord.jsp?keyword=<%=keyword%>&search_mode=<%=searchMode%>&dboperation=<%=dbOperation%>&orderby=<%=orderBy%>&limit1=<%=nLastPage%>&limit2=<%=strLimit%>">
+		Last Page</a> | <%
+		}
+		if(nItems == limit)
+		{
+		%> <a
+			href="demographicmergerecord.jsp?keyword=<%=keyword%>&search_mode=<%=searchMode%>&dboperation=<%=dbOperation%>&orderby=<%=orderBy%>&limit1=<%=nNextPage%>&limit2=<%=strLimit%>">
+		Next Page</a> <%
+		}
+	}
+	else
+	{// end if (request.getParameter("keyword") != null)
+	%>
+	</center>
 
-
-}else{// end if (request.getParameter("keyword") != null)
-%>
-</center>
-
-<h3 align="center">Please search for the records you wish to merge.</h3>
-<% } %>
-
-
+	<h3 align="center">Please search for the records you wish to merge.</h3>
+	<%
+	} %>
 </body>
 </html>

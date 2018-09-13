@@ -34,11 +34,11 @@ import org.oscarehr.managers.DayWorkSchedule;
 import org.oscarehr.managers.ScheduleManager;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.transfer_objects.AppointmentArchiveTransfer;
-import org.oscarehr.ws.transfer_objects.AppointmentTransfer;
-import org.oscarehr.ws.transfer_objects.AppointmentTypeTransfer;
-import org.oscarehr.ws.transfer_objects.DayWorkScheduleTransfer;
-import org.oscarehr.ws.transfer_objects.ScheduleTemplateCodeTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.AppointmentArchiveTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.AppointmentTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.AppointmentTypeTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.DayWorkScheduleTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.ScheduleTemplateCodeTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

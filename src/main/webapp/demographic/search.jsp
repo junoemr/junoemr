@@ -119,7 +119,7 @@ OscarProperties oscarProps = OscarProperties.getInstance();
     <!-- Search Box -->
     <%@ include file="zdemographicfulltitlesearch.jsp"%>
 <div>
-	<a href="../demographic/demographicaddarecordhtm.jsp"><bean:message
+	<a href="../demographic/demographiccontrol.jsp?displaymode=add"><bean:message
 		key="demographic.search.btnCreateNew" /></a>
 </div>
 <% if (!oscarProps.isPropertyActive("hide_quickform")) { %>
@@ -132,7 +132,7 @@ OscarProperties oscarProps = OscarProperties.getInstance();
 <!-- we may want to not allow students to create new patients? -->
 <!-- <security:oscarSec roleName="<%=roleName$%>" objectName="_demographic.addnew" rights="r">  -->
     <div class="createNew">
-	<a href="demographicaddarecordhtm.jsp"><b><font size="+1"><bean:message
+	<a href="../demographic/demographiccontrol.jsp?displaymode=add"><b><font size="+1"><bean:message
 	key="demographic.search.btnCreateNew" /></font></b></a> 
     </div>
 <!-- </security:oscarSec> -->

@@ -39,9 +39,9 @@ import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.DemographicCust;
+import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.common.model.Provider;
 
 /*

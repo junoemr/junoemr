@@ -53,6 +53,8 @@
 <%@page import="oscar.util.UtilDateUtilities"%>
 <%@ page import="org.oscarehr.event.EventService"%>
 <%@page import="org.oscarehr.managers.DemographicManager" %>
+<%@ page import="javax.validation.ConstraintViolationException" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <html:html locale="true">
@@ -146,7 +148,13 @@ if (request.getParameter("demographic_no") != null && !(request.getParameter("de
 	a.setProgramId(Integer.parseInt((String)request.getSession().getAttribute("programId_oscarView")));
 	a.setUrgency((request.getParameter("urgency")!=null)?request.getParameter("urgency"):"");
 	
-	appointmentDao.persist(a);
+	try{
+		appointmentDao.persist(a);
+	} catch (ConstraintViolationException e)
+	{
+		MiscUtils.getLogger().error("ConstraintViolation", e);
+	}
+
 	int rowsAffected=1;
 	
 	if (rowsAffected == 1) {

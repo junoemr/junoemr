@@ -35,8 +35,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.Drug;
-import org.oscarehr.common.model.Prescription;
+import org.oscarehr.rx.model.Drug;
+import org.oscarehr.rx.model.Prescription;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.MiscUtils;
 

@@ -25,7 +25,7 @@ package org.oscarehr.ws.rest.conversion.summary;
 
 import java.util.List;
 
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.managers.AllergyManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.SummaryItemTo1;

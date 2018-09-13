@@ -31,9 +31,9 @@
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 
 <%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.common.dao.DrugDao"%>
+<%@page import="org.oscarehr.rx.dao.DrugDao"%>
 <%@page import="java.util.List"%>
-<%@page import="org.oscarehr.common.model.Drug"%>
+<%@page import="org.oscarehr.rx.model.Drug"%>
 <%@page import="oscar.oscarRx.data.RxPrescriptionData"%>
 <%@page import="org.oscarehr.util.SessionConstants"%>
 <%@page import="org.oscarehr.oscarRx.StaticScriptBean"%>

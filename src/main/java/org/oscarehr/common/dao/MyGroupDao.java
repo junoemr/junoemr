@@ -94,7 +94,7 @@ public class MyGroupDao extends AbstractDao<MyGroup> {
      * @param groupNo The group to get the records for
 	 * @param date The date to check for schedules
      * @param providerNo Include this provider even if there is no schedule
-     * @return
+     * @return List of type MyGroup
      */
     public List<MyGroup> getGroupWithScheduleByGroupNo(String groupNo, LocalDate date, Integer providerNo)
 	{

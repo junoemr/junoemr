@@ -322,6 +322,10 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 				user: function(providerService)
 				{
 					return providerService.getMe();
+				},
+				properties: function(uxService)
+				{
+					return uxService.getDisplayProperties();
 				}
 			}
 		})

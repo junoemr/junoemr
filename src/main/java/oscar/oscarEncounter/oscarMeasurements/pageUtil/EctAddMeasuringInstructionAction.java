@@ -108,8 +108,9 @@ public class EctAddMeasuringInstructionAction extends Action {
         	String typeDesc = mt.getTypeDescription();
         	
         	MeasurementType m = new MeasurementType();
-        	m.setType(typeDesc);
+        	m.setType(type);
         	m.setTypeDisplayName(typeDisplayName);
+        	m.setTypeDescription(typeDesc);
         	m.setMeasuringInstruction(measuringInstrc);
         	m.setValidation(validation);
         	dao.persist(m);

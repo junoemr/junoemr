@@ -34,7 +34,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.Prescription;
+import org.oscarehr.rx.dao.PrescriptionDao;
+import org.oscarehr.rx.model.Prescription;
 import org.oscarehr.util.SpringUtils;
 
 public class PrescriptionDaoTest extends DaoTestFixtures {

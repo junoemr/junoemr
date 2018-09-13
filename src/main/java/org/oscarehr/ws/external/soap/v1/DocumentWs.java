@@ -36,7 +36,7 @@ import org.oscarehr.document.model.Document;
 import org.oscarehr.managers.DocumentManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.transfer_objects.DocumentTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.DocumentTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;

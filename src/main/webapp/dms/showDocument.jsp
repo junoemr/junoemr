@@ -78,6 +78,11 @@
 			OscarProperties props = OscarProperties.getInstance();
 
 			String providerNo = request.getParameter("providerNo");
+			if(providerNo == null)
+			{
+				providerNo = (String) session.getAttribute("user");
+			}
+
 			UserProperty uProp = userPropertyDAO.getProp(providerNo, UserProperty.LAB_ACK_COMMENT);
 			boolean skipComment = false;
 			boolean autoLinkDocsToProvider = props.isPropertyActive("assign_document.link_docs_to_provider");
@@ -311,8 +316,8 @@
 					<td colspan="8">
 						<div style="text-align: right;font-weight: bold">
 						<% if( numOfPage > 1 && displayDocumentAs.equals(UserProperty.IMAGE) ) {%>
-							<a id="firstP_<%=docId%>" style="display: none;" href="javascript:void(0);" onclick="firstPage('<%=docId%>','<%=contextPath%>');">First</a>
-							<a id="prevP_<%=docId%>" style="display: none;"  href="javascript:void(0);" onclick="prevPage('<%=docId%>','<%=contextPath%>');">Prev</a>
+							<a id="firstP_<%=docId%>" style="visibility: hidden;" href="javascript:void(0);" onclick="firstPage('<%=docId%>','<%=contextPath%>');">First</a>
+							<a id="prevP_<%=docId%>" style="visibility: hidden;"  href="javascript:void(0);" onclick="prevPage('<%=docId%>','<%=contextPath%>');">Prev</a>
 							<a id="nextP_<%=docId%>" href="javascript:void(0);" onclick="nextPage('<%=docId%>','<%=contextPath%>');">Next</a>
 							<a id="lastP_<%=docId%>" href="javascript:void(0);" onclick="lastPage('<%=docId%>','<%=contextPath%>');">Last</a>
 							<%} %>
@@ -382,7 +387,7 @@
 												<option value=""><bean:message key="dms.addDocument.formSelect" /></option>
 												<%for (int j = 0; j < doctypes.size(); j++) {
 				String doctype = (String) doctypes.get(j);%>
-												<option value="<%= doctype%>" <%=(curdoc.getType().equals(doctype)) ? " selected" : ""%>><%= doctype%></option>
+												<option value="<%= doctype%>" <%=(doctype.equals(curdoc.getType())) ? " selected" : ""%>><%= doctype%></option>
 												<%}%>
 											</select>
 										</td>
@@ -585,8 +590,8 @@
 					<td colspan="8">
 						<div style="text-align: right;font-weight: bold">
 							<% if( numOfPage > 1 && displayDocumentAs.equals(UserProperty.IMAGE)) {%>
-							<a id="firstP2_<%=docId%>" style="display: none;" href="javascript:void(0);" onclick="firstPage('<%=docId%>','<%=contextPath%>');">First</a>
-							<a id="prevP2_<%=docId%>" style="display: none;"  href="javascript:void(0);" onclick="prevPage('<%=docId%>','<%=contextPath%>');">Prev</a>
+							<a id="firstP2_<%=docId%>" style="visibility: hidden;" href="javascript:void(0);" onclick="firstPage('<%=docId%>','<%=contextPath%>');">First</a>
+							<a id="prevP2_<%=docId%>" style="visibility: hidden;"  href="javascript:void(0);" onclick="prevPage('<%=docId%>','<%=contextPath%>');">Prev</a>
 							<a id="nextP2_<%=docId%>" href="javascript:void(0);" onclick="nextPage('<%=docId%>','<%=contextPath%>');">Next</a>
 							<a id="lastP2_<%=docId%>" href="javascript:void(0);" onclick="lastPage('<%=docId%>','<%=contextPath%>');">Last</a>
 							<%} %>

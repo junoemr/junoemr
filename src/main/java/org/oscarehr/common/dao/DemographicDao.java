@@ -62,7 +62,6 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SEARCHMODE;
-import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SORTMODE;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.STATUSMODE;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.context.ApplicationEventPublisher;
@@ -75,7 +74,9 @@ import oscar.OscarProperties;
 import oscar.util.SqlUtils;
 
 /**
+ * @deprecated use the jpa version instead
  */
+@Deprecated
 public class DemographicDao extends HibernateDaoSupport implements ApplicationEventPublisherAware {
 
 	private static final int MAX_SELECT_SIZE = 500;
@@ -2159,35 +2160,47 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		  params.put("providerNo", loggedInInfo.getLoggedInProviderNo());
 		}
 
-		String orderBy = "d.last_name,d.first_name";
+		String orderBy = " ORDER BY ";
+		String orderDir = (searchRequest.getSortDir() == null) ? "asc" : searchRequest.getSortDir().toString();
 
-		String orderDir = "asc";
-		if(searchRequest.getSortDir() != null) {
-		  orderDir = searchRequest.getSortDir().toString();
-		}
-		if(SORTMODE.Address.equals(searchRequest.getSortMode())) {
-		  orderBy = "d.address " + orderDir;
-		} else if(SORTMODE.ChartNo.equals(searchRequest.getSortMode())) {
-		  orderBy = "d.chart_no " + orderDir;
-		} else if(SORTMODE.DemographicNo.equals(searchRequest.getSortMode())) {
-		  orderBy = "d.demographic_no " + orderDir;
-		} else if(SORTMODE.DOB.equals(searchRequest.getSortMode())) {
-		  orderBy = "year_of_birth "+ orderDir+",month_of_birth "+ orderDir+",date_of_birth "+ orderDir;
-		} else if(SORTMODE.Name.equals(searchRequest.getSortMode())) {
-		  orderBy =  "d.last_name "+ orderDir+",d.first_name " + orderDir;
-		} else if(SORTMODE.Phone.equals(searchRequest.getSortMode())) {
-		  orderBy =  "d.phone " + orderDir;
-		} else if(SORTMODE.ProviderName.equals(searchRequest.getSortMode())) {
-		  orderBy =  "p.last_name "+ orderDir+",p.first_name " + orderDir;
-		}  else if(SORTMODE.PS.equals(searchRequest.getSortMode())) {
-		  orderBy =  "d.patient_status "+ orderDir;
-		} else if(SORTMODE.RS.equals(searchRequest.getSortMode())) {
-		  orderBy =  "d.roster_status "+ orderDir;
-		} else if(SORTMODE.Sex.equals(searchRequest.getSortMode())) {
-		  orderBy =  "d.sex "+ orderDir;
+		switch (searchRequest.getSortMode())
+		{
+			case Address:
+				orderBy += "d.address" + orderDir;
+				break;
+			case ChartNo:
+				orderBy += "d.chart_no " + orderDir;
+				break;
+			case DemographicNo:
+				orderBy += "d.demographic_no " + orderDir;
+				break;
+			case DOB:
+				orderBy += "year_of_birth " + orderDir + ",month_of_birth " + orderDir + ",date_of_birth " + orderDir;
+				break;
+			case Phone:
+				orderBy += "d.phone " + orderDir;
+				break;
+			case ProviderName:
+				orderBy += "p.last_name " + orderDir + ",p.first_name " + orderDir;
+				break;
+			case PatientStatus:
+				orderBy += "d.patient_status " + orderDir;
+				break;
+			case RosterStatus:
+				orderBy += "d.roster_status " + orderDir;
+				break;
+			case Sex:
+				orderBy += "d.sex " + orderDir;
+				break;
+			case HIN:
+				orderBy += "d.hin " + orderDir;
+				break;
+			case Name:
+			default:
+				orderBy += "d.last_name " + orderDir + ",d.first_name " + orderDir;
+				break;
 		}
 
-		orderBy = " ORDER BY " + orderBy;
 		return "select " + select + " " +
 				"from demographic d " +
 				"left join provider p on d.provider_no = p.provider_no " +
@@ -2259,6 +2272,43 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 			return ids;
 		} finally {
 			this.releaseSession(session);
+		}
+	}
+
+	/**
+	 * Save custom licensed producer info for a demographic.
+	 *
+	 * @param demo_no
+	 * @param producer_id
+	 * @param producer_id2
+	 * @param address_id
+	 */
+	public void saveDemographicLicensedProducer(int demo_no, int producer_id, int producer_id2, int address_id)
+	{
+		Connection c = null;
+		try
+		{
+			c = DbConnectionFilter.getThreadLocalDbConnection();
+			PreparedStatement ps = c.prepareStatement("INSERT INTO demographic_licensed_producer (demographic_no, producer_id, producer_id2, address_id) "
+					+ "VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE producer_id=?, producer_id2=?, address_id=?");
+			ps.setInt(1, demo_no);
+			ps.setInt(2, producer_id);
+			ps.setInt(3, producer_id2);
+			ps.setInt(4, address_id);
+
+			ps.setInt(5, producer_id);
+			ps.setInt(6, producer_id2);
+			ps.setInt(7, address_id);
+
+			ps.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			log.error("SQL Exception", e);
+		}
+		finally
+		{
+			SqlUtils.closeResources(c, null, null);
 		}
 	}
 }

@@ -53,6 +53,7 @@ import org.oscarehr.managers.AppManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.NotificationTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -87,7 +88,7 @@ public class ResourceService extends AbstractServiceImpl {
 	@GET
 	@Path("/K2AActive/")
 	@Produces("application/json")
-	public RestResponse<Boolean, String> isK2AActive(@Context HttpServletRequest request) {
+	public RestResponse<Boolean> isK2AActive(@Context HttpServletRequest request) {
 		String roleName$ = (String)request.getSession().getAttribute("userrole") + "," + (String) request.getSession().getAttribute("user");
     	if(!com.quatro.service.security.SecurityManager.hasPrivilege("_admin", roleName$)  && !com.quatro.service.security.SecurityManager.hasPrivilege("_report", roleName$)) {
 		    return RestResponse.errorResponse("Insufficient Privileges");
@@ -109,7 +110,7 @@ public class ResourceService extends AbstractServiceImpl {
 	@GET
 	@Path("/preventionRulesList")
 	@Produces("application/json")
-	public RestResponse<JSONArray, String> getPreventionRulesListFromK2A(@Context HttpServletRequest request) {
+	public RestResponse<JSONArray> getPreventionRulesListFromK2A(@Context HttpServletRequest request) {
 		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_admin", "r", null)) {
 			return RestResponse.errorResponse("Access Denied");
 		}
@@ -150,7 +151,7 @@ public class ResourceService extends AbstractServiceImpl {
 	@GET
 	@Path("/currentPreventionRulesVersion")
 	@Produces("application/json")
-	public RestResponse<String, String> getCurrentPreventionRulesVersion() {
+	public RestResponse<String> getCurrentPreventionRulesVersion() {
 		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "w", null)) {
 			return RestResponse.errorResponse("Access Denied");
 		}
@@ -180,7 +181,7 @@ public class ResourceService extends AbstractServiceImpl {
 	@Path("/loadPreventionRulesById/{id}")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public RestResponse<String,String> addK2AReport(@PathParam("id") String id, @Context HttpServletRequest request,JSONObject jSONObject) {
+	public RestResponse<String> addK2AReport(@PathParam("id") String id, @Context HttpServletRequest request,JSONObject jSONObject) {
 		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_admin", "r", null) && !securityInfoManager.hasPrivilege(getLoggedInInfo(), "_report", "w", null)) {
 			return RestResponse.errorResponse("Access Denied");
 		}
@@ -235,7 +236,7 @@ public class ResourceService extends AbstractServiceImpl {
 	@GET
 	@Path("/notifications")
 	@Produces("application/json")
-	public RestResponse<List<NotificationTo1>, String> getNotifications(@Context HttpServletRequest request) {
+	public RestResponse<List<NotificationTo1>> getNotifications(@Context HttpServletRequest request) {
 		List<NotificationTo1> list = new ArrayList<NotificationTo1>();
 		try {
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -262,7 +263,7 @@ public class ResourceService extends AbstractServiceImpl {
 	@GET
 	@Path("/notifications/number")
 	@Produces("application/json")
-	public RestResponse<String, String> getNotificationsNumber(@Context HttpServletRequest request) {
+	public RestResponse<String> getNotificationsNumber(@Context HttpServletRequest request) {
 		try {
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 			String notificationStr = getK2aResource(loggedInInfo, "/ws/api/notification", "/ws/api/notification");
@@ -283,7 +284,7 @@ public class ResourceService extends AbstractServiceImpl {
 	@Path("/notifications/readmore")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public RestResponse<String, String> getMoreInfoNotificationURL(@Context HttpServletRequest request, JSONObject jSONObject) {
+	public RestResponse<String> getMoreInfoNotificationURL(@Context HttpServletRequest request, JSONObject jSONObject) {
 		String retval = "";
 		try {
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -308,7 +309,7 @@ public class ResourceService extends AbstractServiceImpl {
 	@Path("/notifications/{id}/ack/")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public RestResponse<String, String> markNotificationAsAck(@PathParam("id") String id, @Context HttpServletRequest request, JSONObject jSONObject) {
+	public RestResponse<String> markNotificationAsAck(@PathParam("id") String id, @Context HttpServletRequest request, JSONObject jSONObject) {
 		String retval = "";
 		try {
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);

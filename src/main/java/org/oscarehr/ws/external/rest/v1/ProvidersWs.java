@@ -1,6 +1,5 @@
 /**
- *
- * Copyright (c) 2005-2012. Centre for Research on Inner City Health, St. Michael's Hospital, Toronto. All Rights Reserved.
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,18 +16,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * This software was written for
- * Centre for Research on Inner City Health, St. Michael's Hospital,
- * Toronto, Ontario, Canada
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
  */
 
 package org.oscarehr.ws.external.rest.v1;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import net.sf.json.JsonConfig;
 import net.sf.json.processors.JsDateJsonBeanProcessor;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.AbstractServiceImpl;
+import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.model.ProviderTo1;
@@ -38,12 +39,13 @@ import org.springframework.stereotype.Component;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 @Component("ProviderWs")
-@Path("/v1/providers/")
-@Produces("application/json")
-public class ProvidersWs extends AbstractServiceImpl
+@Path("/providers")
+@Produces(MediaType.APPLICATION_JSON)
+public class ProvidersWs extends AbstractExternalRestWs
 {
 	private static Logger logger = MiscUtils.getLogger();
 
@@ -55,6 +57,7 @@ public class ProvidersWs extends AbstractServiceImpl
 	 */
 	@GET
 	@Path("/providers_json")
+	@Hidden
 	public AbstractSearchResponse<ProviderTo1> getProvidersAsJSON() {
 		JsonConfig config = new JsonConfig();
 		config.registerJsonBeanProcessor(java.sql.Date.class, new JsDateJsonBeanProcessor());

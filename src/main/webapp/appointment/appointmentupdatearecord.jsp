@@ -74,7 +74,7 @@
   appointmentArchiveDao.archiveAppointment(appt);
   
   //Did the appt status change ?
-  if(!appt.getStatus().equals(request.getParameter("status"))){
+  if(appt.getStatus()!=null && !appt.getStatus().equals(request.getParameter("status"))){
 	  changedStatus = request.getParameter("status");
   }
   

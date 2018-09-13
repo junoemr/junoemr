@@ -49,6 +49,7 @@ public class EFormBase {
     protected String formTime;
     protected boolean showLatestFormOnly=false;
     protected boolean patientIndependent=false;
+    protected boolean instanced=false;
     protected String roleType;
 
     protected ArrayList<String> updateFields = new ArrayList<String>();
@@ -189,4 +190,14 @@ public class EFormBase {
     public void setPatientIndependent(boolean patientIndependent) {
         this.patientIndependent = patientIndependent;
     }
+
+	public boolean isInstanced()
+	{
+		return instanced;
+	}
+
+	public void setInstanced(boolean instanced)
+	{
+		this.instanced = instanced;
+	}
 }

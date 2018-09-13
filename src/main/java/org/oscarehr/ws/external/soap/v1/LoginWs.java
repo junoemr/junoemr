@@ -33,9 +33,9 @@ import org.oscarehr.common.model.Security;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.NotAuthorisedException;
 import org.oscarehr.ws.WsUtils;
-import org.oscarehr.ws.transfer_objects.LoginResultTransfer;
-import org.oscarehr.ws.transfer_objects.LoginResultTransfer2;
-import org.oscarehr.ws.transfer_objects.ProviderTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.LoginResultTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.LoginResultTransfer2;
+import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

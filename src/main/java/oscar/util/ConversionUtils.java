@@ -29,12 +29,16 @@ import org.oscarehr.util.MiscUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -143,13 +147,35 @@ public class ConversionUtils {
 	 * 		Returns the formatted date as a string, or an empty string for 
 	 * 		null date parameter.
 	 */
-	public static String toDateString(Date date, String formatPattern) {
-		if (date == null) {
+	public static String toDateString(Date date, String formatPattern)
+	{
+		if (date == null)
+		{
 			return "";
 		}
 
 		SimpleDateFormat format = new SimpleDateFormat(formatPattern);
 		return format.format(date);
+	}
+
+	/**
+	 * Formats date instance using the provided date format pattern
+	 *
+	 * @param date
+	 * 		LocalDate to be formatted
+	 * @param formatPattern
+	 * 		Format pattern to apply
+	 * @return
+	 * 		Returns the formatted date as a string, or an empty string for
+	 * 		null date parameter.
+	 */
+	public static String toDateString(LocalDate date, String formatPattern) {
+		if (date == null) {
+			return "";
+		}
+
+		DateTimeFormatter format = DateTimeFormatter.ofPattern(formatPattern);
+		return date.format(format);
 	}
 
 	/**
@@ -173,6 +199,19 @@ public class ConversionUtils {
 	 * 		Returns the formatted string
 	 */
 	public static String toDateString(Date date) {
+		return toDateString(date, DEFAULT_DATE_PATTERN);
+	}
+
+	/**
+	 * Formats the local date instance into a string.
+	 *
+	 * @param date
+	 * 		LocalDate to be formatted using {@link #DEFAULT_DATE_PATTERN}
+	 * @return
+	 * 		Returns the formatted string
+	 */
+	public static String toDateString(LocalDate date)
+	{
 		return toDateString(date, DEFAULT_DATE_PATTERN);
 	}
 
@@ -361,4 +400,95 @@ public class ConversionUtils {
 		return returnDate;
 	}
 
+
+	public static Date toNullableLegacyDate(LocalDate localDate)
+	{
+		if(localDate == null) return null;
+		return toLegacyDate(localDate);
+	}
+
+	public static Date toLegacyDate(LocalDate localDate)
+	{
+		return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+	}
+
+	public static Date toNullableLegacyDateTime(LocalDateTime localDateTime)
+	{
+		if(localDateTime == null) return null;
+		return toLegacyDateTime(localDateTime);
+	}
+	public static Date toLegacyDateTime(LocalDateTime localDateTime)
+	{
+		return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+	}
+
+	public static LocalDate toNullableLocalDate(String dateString)
+	{
+		if(dateString == null) return null;
+		return toZonedLocalDate(dateString);
+	}
+
+	public static LocalDate toNullableLocalDate(Date legacyDate)
+	{
+		if(legacyDate == null) return null;
+		return toZonedLocalDate(legacyDate);
+	}
+
+
+	public static LocalDate toZonedLocalDate(String dateString)
+	{
+		return toZonedLocalDate(dateString, DateTimeFormatter.ISO_DATE_TIME);
+	}
+
+	public static LocalDate toZonedLocalDate(String dateString, DateTimeFormatter dateTimeFormatter)
+	{
+		ZonedDateTime result = ZonedDateTime.parse(dateString, dateTimeFormatter);
+		return result.toLocalDate();
+	}
+	public static LocalDate toLocalDate(String dateString)
+	{
+		return toLocalDate(dateString, DateTimeFormatter.ISO_DATE);
+	}
+
+	public static LocalDate toLocalDate(String dateString, DateTimeFormatter dateTimeFormatter)
+	{
+		return LocalDate.parse(dateString, dateTimeFormatter);
+	}
+
+	public static LocalDate toZonedLocalDate(Date legacyDate)
+	{
+		LocalDate date = Instant
+				// get the millis value to build the Instant
+				.ofEpochMilli(legacyDate.getTime())
+				// convert to JVM default timezone
+				.atZone(ZoneId.systemDefault())
+				// convert to LocalDate
+				.toLocalDate();
+		return date;
+	}
+	public static LocalDateTime toNullableLocalDateTime(Date legacyDate)
+	{
+		if(legacyDate == null) return null;
+		return toLocalDateTime(legacyDate);
+	}
+	public static LocalDateTime toLocalDateTime(Date legacyDate)
+	{
+		return new java.sql.Timestamp(legacyDate.getTime()).toLocalDateTime();
+	}
+
+
+	public static Date combineDateAndTime(Date date, Date time)
+	{
+		Calendar calendarA = Calendar.getInstance();
+		calendarA.setTime(date);
+		Calendar calendarB = Calendar.getInstance();
+		calendarB.setTime(time);
+
+		calendarA.set(Calendar.HOUR_OF_DAY, calendarB.get(Calendar.HOUR_OF_DAY));
+		calendarA.set(Calendar.MINUTE, calendarB.get(Calendar.MINUTE));
+		calendarA.set(Calendar.SECOND, calendarB.get(Calendar.SECOND));
+		calendarA.set(Calendar.MILLISECOND, calendarB.get(Calendar.MILLISECOND));
+
+		return calendarA.getTime();
+	}
 }

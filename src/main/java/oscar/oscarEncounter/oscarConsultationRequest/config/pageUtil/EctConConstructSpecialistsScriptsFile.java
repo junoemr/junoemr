@@ -32,6 +32,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ConsultationServiceDao;
 import org.oscarehr.consultations.dao.ServiceSpecialistsDao;
 import org.oscarehr.common.model.ConsultationServices;
@@ -43,7 +45,9 @@ import org.oscarehr.util.SpringUtils;
 import oscar.oscarEncounter.oscarConsultationRequest.config.data.EctConConfigurationJavascriptData;
 import oscar.util.ConversionUtils;
 
-public class EctConConstructSpecialistsScriptsFile {
+public class EctConConstructSpecialistsScriptsFile
+{
+	private static final Logger logger=MiscUtils.getLogger();
 	private ConsultationServiceDao consultationServiceDao = (ConsultationServiceDao) SpringUtils.getBean("consultationServiceDao");
 
 	Vector<String> serviceId;
@@ -56,6 +60,8 @@ public class EctConConstructSpecialistsScriptsFile {
 	}
 
 	public String makeFile() {
+
+		logger.debug("EctConConstructSpecialistsScriptsFile makefile");
 		serviceId = new Vector<String>();
 		serviceDesc = new Vector<String>();
 		File file = new File("oscarEncounter/consult.js");
@@ -84,10 +90,11 @@ public class EctConConstructSpecialistsScriptsFile {
 					ProfessionalSpecialist pro = (ProfessionalSpecialist) o[1];
 
 					String name = pro.getLastName() + ", " + pro.getFirstName() + " " + pro.getProfessionalLetters();
-
+					name = this.escapeString(name);
 					String specId = "" + ser.getId().getSpecId();
 					String phone = pro.getPhoneNumber();
 					String address = pro.getStreetAddress();
+					address = this.escapeString(address);
 					String fax = pro.getFaxNumber();
 					fileWriter.write("D(" + servId + ",\"" + specId + "\",\"" + phone + "\",\"" + name + "\",\"" + fax + "\",\"" + address + "\");\n");
 				}
@@ -99,12 +106,15 @@ public class EctConConstructSpecialistsScriptsFile {
 			fileWriter.write("}\n");
 			fileWriter.close();
 		} catch (IOException io) {
-			MiscUtils.getLogger().debug(io.getMessage());
+			logger.error("Error", io);
 		}
+		logger.debug(retval);
 		return retval;
 	}
 
-	public void makeString(Locale locale) {
+	public void makeString(Locale locale)
+	{
+		logger.debug("EctConConstructSpecialistsScriptsFile makeString");
 		serviceId = new Vector<String>();
 		serviceDesc = new Vector<String>();
 		ResourceBundle props = ResourceBundle.getBundle("oscarResources", locale);
@@ -149,12 +159,12 @@ public class EctConConstructSpecialistsScriptsFile {
 		stringBuffer.append("}\n");
 		javaScriptString = stringBuffer.toString();
 		EctConConfigurationJavascriptData configurationJavascriptData = new EctConConfigurationJavascriptData();
+		logger.debug(javaScriptString);
 		configurationJavascriptData.setJavascript(javaScriptString);
 	}
 
 	private String escapeString(String s) {
-		s = org.apache.commons.lang.StringEscapeUtils.escapeJavaScript(s);
-		s = org.apache.commons.lang.StringEscapeUtils.escapeJava(s);
+		s = StringEscapeUtils.escapeJavaScript(s);
 		return s;
 	}
 }

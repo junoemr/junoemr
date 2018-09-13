@@ -35,14 +35,17 @@
   String appointment = request.getParameter("appointment");
   
   LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-%>  
+%>
 
-<%@ page import = "java.util.*, java.sql.*, oscar.eform.*"%>
-<%@ page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
+<%@ page import="org.oscarehr.common.model.UserProperty" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.eform.EFormUtil" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
-<%@page import="org.oscarehr.common.dao.UserPropertyDAO, org.oscarehr.common.model.UserProperty" %>
 <%
 String user = (String) session.getAttribute("user");
 if(session.getAttribute("userrole") == null )  response.sendRedirect("../logout.jsp");
@@ -68,7 +71,7 @@ if (groupView == null) {
 %>
 
 
-<%@page import="org.oscarehr.util.LoggedInInfo"%><html:html locale="true">
+<%@page import="java.util.HashMap"%><html:html locale="true">
 
 <head>
 <title>
@@ -131,9 +134,14 @@ function updateAjax() {
                     <a href="../demographic/demographiccontrol.jsp?demographic_no=<%=demographic_no%>&appointment=<%=appointment%>&displaymode=edit&dboperation=search_detail"><bean:message key="demographic.demographiceditdemographic.btnMasterFile" /></a>
                
                 <br>
-                <a href="efmformslistadd.jsp?demographic_no=<%=demographic_no%>&appointment=<%=appointment%>&parentAjaxId=<%=parentAjaxId%>" class="current"> <bean:message key="eform.showmyform.btnAddEForm"/></a><br/>
-                <a href="efmpatientformlist.jsp?demographic_no=<%=demographic_no%>&appointment=<%=appointment%>&parentAjaxId=<%=parentAjaxId%>"><bean:message key="eform.calldeletedformdata.btnGoToForm"/></a><br/>
-                <a href="efmpatientformlistdeleted.jsp?demographic_no=<%=demographic_no%>&appointment=<%=appointment%>&parentAjaxId=<%=parentAjaxId%>"><bean:message key="eform.showmyform.btnDeleted"/></a>
+	            <a href="efmformslistadd.jsp?demographic_no=<%=demographic_no%>&appointment=<%=appointment%>&parentAjaxId=<%=parentAjaxId%>" class="current">
+		            <bean:message key="eform.showmyform.btnAddEForm"/></a><br/>
+	            <a href="efmpatientformlist.jsp?demographic_no=<%=demographic_no%>&appointment=<%=appointment%>&parentAjaxId=<%=parentAjaxId%>">
+		            <bean:message key="eform.calldeletedformdata.btnGoToForm"/></a><br/>
+	            <a href="efmpatientformlistinstanced.jsp?demographic_no=<%=demographic_no%>&appointment=<%=appointment%>&parentAjaxId=<%=parentAjaxId%>">
+		            <bean:message key="eform.showmyform.btnInstanced"/></a><br/>
+	            <a href="efmpatientformlistdeleted.jsp?demographic_no=<%=demographic_no%>&appointment=<%=appointment%>&parentAjaxId=<%=parentAjaxId%>">
+		            <bean:message key="eform.showmyform.btnDeleted"/></a>
                 
                 <security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.eform" rights="w" reverse="<%=false%>" >
                 <br/>

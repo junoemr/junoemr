@@ -713,16 +713,8 @@ public class InboxResultsDao {
 					lbData.requestingClient = "";
 					lbData.reportStatus = "F";
 
-					lbData.discipline = getStringValue(r[docTypeLoc]);
-					if (lbData.discipline.trim().equals("")) {
-						lbData.discipline = null;
-					}
-
-					lbData.description = getStringValue(r[descriptionLoc]);
-					if( lbData.description.trim().equals("") ) {
-						lbData.description = null;
-					}
-				
+					lbData.discipline = StringUtils.trimToNull(getStringValue(r[docTypeLoc]));
+					lbData.description = StringUtils.trimToNull(getStringValue(r[descriptionLoc]));
 					lbData.lastUpdateDate = getStringValue(r[updateDateLoc]);				
 				
 					lbData.finalResultsCount = 0;
@@ -1211,19 +1203,8 @@ public class InboxResultsDao {
 					lbData.finalRes = false;
 				}
 
-
-
-
-				lbData.discipline = getStringValue(r[docTypeLoc]);
-				if (lbData.discipline.trim().equals("")) {
-					lbData.discipline = null;
-				}
-
-				lbData.description = getStringValue(r[descriptionLoc]);
-				if( lbData.description.trim().equals("") ) {
-					lbData.description = null;
-				}
-				
+				lbData.discipline = StringUtils.trimToNull(getStringValue(r[docTypeLoc]));
+				lbData.description = StringUtils.trimToNull(getStringValue(r[descriptionLoc]));
 				lbData.lastUpdateDate = getStringValue(r[updateDateLoc]);				
 				
 				lbData.finalResultsCount = 0;//rs.getInt("final_result_count");

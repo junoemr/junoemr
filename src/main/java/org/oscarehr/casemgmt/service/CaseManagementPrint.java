@@ -41,6 +41,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.PMmodule.model.ProgramProvider;
@@ -105,6 +106,7 @@ public class CaseManagementPrint {
 		request.setAttribute("demoSex", getDemoSex(demono));
 		request.setAttribute("demoAge", getDemoAge(demono));
 		request.setAttribute("mrp", getMRP(request,demono));
+		request.setAttribute("hin", StringUtils.trimToEmpty(getDemoHIN(demono)));
 		String dob = getDemoDOB(demono);
 		dob = convertDateFmt(dob, request);
 		request.setAttribute("demoDOB", dob);
@@ -403,6 +405,15 @@ public class CaseManagementPrint {
 	protected String getDemoDOB(String demoNo){
 		if (demoNo==null) return "";
 		return caseManagementMgr.getDemoDOB(demoNo);
+	}
+
+	protected String getDemoHIN(String demoNo)
+	{
+		if (demoNo == null)
+		{
+			return null;
+		}
+		return caseManagementMgr.getDemoHIN(demoNo);
 	}
 	
 	protected String getMRP(HttpServletRequest request,String demographicNo) {

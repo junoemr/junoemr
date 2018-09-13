@@ -1,6 +1,6 @@
 <%--
 
-    Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
+    Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
@@ -16,16 +16,14 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-    This software was written for the
-    Department of Family Medicine
-    McMaster University
-    Hamilton
-    Ontario, Canada
+    This software was written for
+    CloudPractice Inc.
+    Victoria, British Columbia
+    Canada
 
 --%>
 <html>
-<!-- 2016 OscarHost Eform Generator 0.1.01 -->
-<!-- Copyright CloudPractice Inc. 2016 -->
+<!-- Eform Generator 0.1.01 -->
 <!-- Author: Robert Martin -->
 <head>
 	<META http-equiv='Content-Type' content='text/html; charset=UTF-8'>
@@ -38,7 +36,7 @@
 	<link href= "<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0/themes/vader/jquery-ui.min.css" rel="stylesheet">
 
 	<!-- javascript file for the signature pads -- optional -->
-	<script src="<%= request.getContextPath() %>/eform/displayImage.do?imagefile=signature_pad.min.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/eforms/signature_pad.min.js"></script>
 
 	<script>
 		/* Hack to load jquery requirements from jquery site when run outside of oscar */
@@ -727,7 +725,7 @@
 				source += "\<script src='\$\{oscar_javascript_path\}eforms/faxControl.js'\>\<\/script\>";
 			}
 			if ($signature_data.length > 0) {
-				source += "\<script src='\$\{oscar_image_path\}signature_pad.min.js'\>\<\/script\>";
+				source += "\<script src='\$\{oscar_javascript_path\}eforms/signature_pad.min.js'\>\<\/script\>";
 			}
 			source += "<style>";
 			var baseStyle = document.getElementById('eform_style');
@@ -1332,8 +1330,8 @@
 
                         var status = data.status;
 						if(status === "SUCCESS") {
-	                        var options = [];
-	                        var values = [];
+	                        var options = [""];
+	                        var values = [0];
 	                        var selectedId = 0;
 	                        for(var i=0; i<data.body.length; i++) {
 	                            options.push(data.body[i].formName);
@@ -1940,7 +1938,7 @@
 		/** signature tab init */
 		function initSignatureTemplateTab($tab) {
 			if (!signaturePadLoaded) {
-				$tab.append($("<span>", {text: "Missing External Signature File. Ensure signature_pad.js is in the same directory as the generator and refresh"}));
+				$tab.append($("<span>", {text: "Missing External Signature Source Code File"}));
 				return;
 			}
 			var $dragFrame1 = createStitchFrame();
@@ -2395,8 +2393,8 @@
 					};
 					// initialize the signature pad
 					var signPad = new SignaturePad(canvas, {
-						minWidth: 2,
-						maxWidth: 4,
+						minWidth: 1,
+						maxWidth: 2,
 						onEnd: function () {
 							$this.trigger("signatureChange");
 						}

@@ -29,6 +29,7 @@ import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.ProviderTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -56,7 +57,7 @@ public class ProvidersService extends AbstractServiceImpl
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<ProviderTo1, String> search(@QueryParam("searchText") String searchText,
+	public RestResponse<ProviderTo1> search(@QueryParam("searchText") String searchText,
 	                                                @QueryParam("searchMode") @DefaultValue("NAME") String searchMode,
 	                                                @QueryParam("page") @DefaultValue("1") Integer page,
 	                                                @QueryParam("perPage") @DefaultValue("10") Integer perPage)
@@ -76,7 +77,7 @@ public class ProvidersService extends AbstractServiceImpl
 	@GET
 	@Path("/bySecurityRole")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<ProviderTo1>, String> getBySecurityRole(@QueryParam("role") String role)
+	public RestResponse<List<ProviderTo1>> getBySecurityRole(@QueryParam("role") String role)
 	{
 		try
 		{
@@ -94,7 +95,7 @@ public class ProvidersService extends AbstractServiceImpl
 	@GET
 	@Path("/byType")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<ProviderTo1>, String> getByType(@QueryParam("type") String type)
+	public RestResponse<List<ProviderTo1>> getByType(@QueryParam("type") String type)
 	{
 		try
 		{

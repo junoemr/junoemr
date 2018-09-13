@@ -26,13 +26,16 @@ package org.oscarehr.integration.clinicaid.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClinicaidResultTo1 implements Serializable
 {
-	final String ERROR_STRING = "error";
+	private final String ERROR_STRING = "error";
 
 
 	private String result;
@@ -42,10 +45,22 @@ public class ClinicaidResultTo1 implements Serializable
 
 	private ClinicaidErrorResultTo1 errors;
 
+	private ClinicaidApiLimitInfoTo1 apiLimitInfo;
+
 	private String nonce;
 
 	private boolean hasError = false;
 
+	@JsonProperty("meta")
+	private void unpackApiLimitInfo(Map<String, Object> metaInfo) throws IOException
+	{
+		this.apiLimitInfo = new ObjectMapper().convertValue(metaInfo.get("api_rate_limit_info"), ClinicaidApiLimitInfoTo1.class);
+	}
+
+	public ClinicaidApiLimitInfoTo1 getApiLimitInfo()
+	{
+		return apiLimitInfo;
+	}
 
 	public String getResult()
 	{

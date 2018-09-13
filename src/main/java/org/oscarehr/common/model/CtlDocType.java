@@ -36,6 +36,9 @@ import javax.persistence.Table;
 @Table(name="ctl_doctype")
 public class CtlDocType extends AbstractModel<Integer>{
 
+	public static final String MODULE_DEMOGRAPHIC = "demographic";
+	public static final String MODULE_PROVIDER = "provider";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;

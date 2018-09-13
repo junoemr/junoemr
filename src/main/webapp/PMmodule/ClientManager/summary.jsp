@@ -63,9 +63,8 @@
 <%@page import="org.oscarehr.common.model.CdsClientForm"%>
 <%@page import="org.oscarehr.common.model.OcanStaffForm"%>
 <%@page import="org.oscarehr.PMmodule.web.ClientManagerAction"%>
-<%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.common.model.DemographicCust"%>
-<%@page import="org.oscarehr.common.dao.DemographicCustDao"%>
+<%@page import="org.oscarehr.demographic.model.DemographicCust"%>
+<%@page import="org.oscarehr.demographic.dao.DemographicCustDao"%>
 <%@page import="org.oscarehr.PMmodule.web.AdmissionForDisplay"%>
 <%@ page import="org.oscarehr.PMmodule.service.ProgramManager"%>
 

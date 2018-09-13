@@ -23,24 +23,24 @@
  */
 package org.oscarehr.managers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Vector;
-
-import org.apache.commons.lang.StringUtils;
-import org.oscarehr.common.exception.PatientDirectiveException;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import oscar.util.OscarRoleObjectPrivilege;
-
 import com.quatro.dao.security.SecobjprivilegeDao;
 import com.quatro.dao.security.SecuserroleDao;
 import com.quatro.model.security.Secobjprivilege;
 import com.quatro.model.security.Secuserrole;
+import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.exception.PatientDirectiveException;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import oscar.util.OscarRoleObjectPrivilege;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.Vector;
 
 @Service
 public class SecurityInfoManager {
@@ -56,30 +56,33 @@ public class SecurityInfoManager {
 	
 	@Autowired
 	private SecobjprivilegeDao secobjprivilegeDao;
-    
-	
-	public List<Secuserrole> getRoles(LoggedInInfo loggedInInfo) {
+
+	@Autowired
+	private ProviderDataDao providerDataDao;
+
+	public List<Secuserrole> getRoles(String providerNo)
+	{
 		@SuppressWarnings("unchecked")
-        List<Secuserrole> results =  secUserRoleDao.findByProviderNo(loggedInInfo.getLoggedInProviderNo());
-					
+		List<Secuserrole> results = secUserRoleDao.findByProviderNo(providerNo);
 		return results;
 	}
-	
-	public List<Secobjprivilege> getSecurityObjects(LoggedInInfo loggedInInfo) {
-		
-		List<String> roleNames = new ArrayList<String>();
-		for(Secuserrole role:getRoles(loggedInInfo)) {
+
+	public List<Secobjprivilege> getSecurityObjects(LoggedInInfo loggedInInfo)
+	{
+		return getSecurityObjects(loggedInInfo.getLoggedInProviderNo());
+	}
+	public List<Secobjprivilege> getSecurityObjects(String providerNo)
+	{
+		List<String> roleNames = new ArrayList<>();
+		for(Secuserrole role : getRoles(providerNo))
+		{
 			roleNames.add(role.getRoleName());
 		}
-		roleNames.add(loggedInInfo.getLoggedInProviderNo());
-		
+		roleNames.add(providerNo);
+
 		List<Secobjprivilege> results = secobjprivilegeDao.getByRoles(roleNames);
-					
+
 		return results;
-	}
-	
-	public boolean hasPrivilege(LoggedInInfo loggedInInfo, String objectName, String privilege, int demographicNo) {
-		return hasPrivilege(loggedInInfo, objectName, privilege, String.valueOf(demographicNo));
 	}
 	
 	/**
@@ -108,13 +111,26 @@ public class SecurityInfoManager {
 	 * @param demographicNo
 	 * @return boolean
 	 */
-	public boolean hasPrivilege(LoggedInInfo loggedInInfo, String objectName, String privilege, String demographicNo) {
-		try {
-			List<String> roleNameLs = new ArrayList<String>();
-			for(Secuserrole role:getRoles(loggedInInfo)) {
+	public boolean hasPrivilege(LoggedInInfo loggedInInfo, String objectName, String privilege, String demographicNo)
+	{
+		return hasPrivilege(loggedInInfo.getLoggedInProviderNo(), objectName, privilege, demographicNo);
+	}
+
+	public boolean hasPrivilege(LoggedInInfo loggedInInfo, String objectName, String privilege, int demographicNo)
+	{
+		return hasPrivilege(loggedInInfo, objectName, privilege, String.valueOf(demographicNo));
+	}
+
+	public boolean hasPrivilege(String providerNo, String objectName, String privilege, String demographicNo)
+	{
+		try
+		{
+			List<String> roleNameLs = new ArrayList<>();
+			for(Secuserrole role : getRoles(providerNo))
+			{
 				roleNameLs.add(role.getRoleName());
 			}
-			roleNameLs.add(loggedInInfo.getLoggedInProviderNo());
+			roleNameLs.add(providerNo);
 			String roleNames = StringUtils.join(roleNameLs, ",");
 			
 			boolean noMatchingRoleToSpecificPatient = true;
@@ -158,14 +174,17 @@ public class SecurityInfoManager {
 		
 		return false;
 	}
-	
 	public boolean isAllowedAccessToPatientRecord(LoggedInInfo loggedInInfo, Integer demographicNo) {
+		return isAllowedAccessToPatientRecord(loggedInInfo.getLoggedInProviderNo(), demographicNo);
+	}
+
+	public boolean isAllowedAccessToPatientRecord(String providerNo, Integer demographicNo) {
 		
-		List<String> roleNameLs = new ArrayList<String>();
-		for(Secuserrole role:getRoles(loggedInInfo)) {
+		List<String> roleNameLs = new ArrayList<>();
+		for(Secuserrole role:getRoles(providerNo)) {
 			roleNameLs.add(role.getRoleName());
 		}
-		roleNameLs.add(loggedInInfo.getLoggedInProviderNo());
+		roleNameLs.add(providerNo);
 		String roleNames = StringUtils.join(roleNameLs, ",");
 		
 		
@@ -180,5 +199,54 @@ public class SecurityInfoManager {
 		}
 		
 		return true;
+	}
+
+	public void requireAllPrivilege(String providerNo, String privilege, Integer demographicNo, String... requiredObjList)
+	{
+		for(String objectName:requiredObjList)
+		{
+			if(!hasPrivilege(providerNo, objectName, privilege, (demographicNo != null ? String.valueOf(demographicNo):null)))
+			{
+				throw new SecurityException("missing required privilege: " + privilege + " for security object (" + objectName + ")");
+			}
+		}
+	}
+
+	public void requireOnePrivilege(String providerNo, String privilege, Integer demographicNo, String... requiredObjList)
+	{
+		for(String objectName:requiredObjList)
+		{
+			if(hasPrivilege(providerNo, objectName, privilege, (demographicNo != null ? String.valueOf(demographicNo):null)))
+			{
+				return;
+			}
+		}
+		throw new SecurityException("missing one or more required privileges: " + privilege + " for security objects (" + String.join(",", requiredObjList) + ")");
+
+	}
+
+	public void requireSuperAdminFlag(String providerNo)
+	{
+		ProviderData provider = providerDataDao.find(providerNo);
+		if(!provider.isSuperAdmin())
+		{
+			throw new SecurityException("Super Admin privileges are required");
+		}
+	}
+
+	/**
+	 * throws a security exception if the current non super-admin provider attempts to modify a super-admin provider
+	 * @param currentProviderNo - the providerId of the current user
+	 * @param providerNoToModify - the providerId of the user they are attempting to modify
+	 */
+	public void superAdminModificationCheck(String currentProviderNo, String providerNoToModify)
+	{
+		ProviderData providerToModify = providerDataDao.find(providerNoToModify);
+		ProviderData currentProvider = providerDataDao.find(currentProviderNo);
+
+		if(!currentProvider.isSuperAdmin() && providerToModify.isSuperAdmin())
+		{
+			throw new SecurityException("Super Admin privileges are required");
+		}
 	}
 }

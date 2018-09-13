@@ -24,12 +24,6 @@
 
 package org.oscarehr.ws.rest.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.cxf.interceptor.AbstractLoggingInterceptor;
 import org.apache.cxf.interceptor.Fault;
@@ -40,8 +34,12 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.RestServiceLog;
 import org.oscarehr.util.LoggedInInfo;
-
 import oscar.log.LogAction;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
 
 /**
  * This class is responsible for intercepting and logging webservice calls to REST services.
@@ -85,9 +83,10 @@ public class RestLoggingInInterceptor extends AbstractLoggingInterceptor {
 		}
 	}
 	@Override
-	public void handleFault(Message message) {
+	public void handleFault(Message message)
+	{
 		Exception e = message.getContent(Exception.class);
-		
+
 		logger.error("Incoming Interceptor Fault", e);
 		
 		// ensure we log something if the fault occurs after the interceptor stores the incoming data
@@ -97,7 +96,8 @@ public class RestLoggingInInterceptor extends AbstractLoggingInterceptor {
 			long duration  = new Date().getTime() - createdAt.getTime();
 			
 			restLog.setDuration(duration);
-			restLog.setErrorMessage(e.getMessage());
+			String errorMessage = e.getClass().getSimpleName() + ": " + String.valueOf(e.getMessage());
+			restLog.setErrorMessage(errorMessage);
 			
 			LogAction.saveRestLogEntry(restLog);
 		}

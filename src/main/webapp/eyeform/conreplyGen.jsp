@@ -51,6 +51,7 @@ if(!authed) {
 <%@page import="org.oscarehr.eyeform.web.EyeformAction"%>
 <%@page import="java.util.List"%>
 <%@page import="org.oscarehr.common.model.DemographicContact"%>
+<%@ page import="org.oscarehr.allergy.model.Allergy" %>
 
 <html:html>
 <head>
@@ -77,7 +78,7 @@ select {
 <%
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 	String demographicNo = (String) request.getAttribute("demographicNo");
-	org.oscarehr.common.model.Allergy[] allergies = RxPatientData.getPatient(loggedInInfo, Integer.parseInt(demographicNo)).getAllergies(loggedInInfo);
+	Allergy[] allergies = RxPatientData.getPatient(loggedInInfo, Integer.parseInt(demographicNo)).getAllergies(loggedInInfo);
 		String aller = "";
 		for (int j = 0; j < allergies.length; j++) {
 			aller += allergies[j].getShortDesc(13, 8,

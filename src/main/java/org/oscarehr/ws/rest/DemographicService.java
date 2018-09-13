@@ -23,20 +23,6 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.ContactDao;
@@ -48,8 +34,8 @@ import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.Contact;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicContact;
-import org.oscarehr.common.model.DemographicCust;
-import org.oscarehr.common.model.DemographicExt;
+import org.oscarehr.demographic.model.DemographicCust;
+import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.WaitingList;
@@ -60,16 +46,30 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
 import org.oscarehr.ws.rest.conversion.WaitingListNameConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.OscarSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.oscarehr.ws.rest.to.model.WaitingListNameTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarWaitingList.util.WLWaitingListUtil;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -154,7 +154,7 @@ public class DemographicService extends AbstractServiceImpl {
 	@GET
 	@Path("/{dataId}")
 	@Produces({MediaType.APPLICATION_JSON , MediaType.APPLICATION_XML})
-	public RestResponse<DemographicTo1,String> getDemographicData(@PathParam("dataId") Integer id) throws PatientDirectiveException {
+	public RestResponse<DemographicTo1> getDemographicData(@PathParam("dataId") Integer id) throws PatientDirectiveException {
 		try
 		{
 			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
@@ -221,15 +221,15 @@ public class DemographicService extends AbstractServiceImpl {
 	@GET
 	@Path("/{dataId}/contacts")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<DemographicContactFewTo1>,String> getDemographicContacts(@PathParam("dataId") Integer demographicNo,
-	                                                                                  @QueryParam("category") String category)
+	public RestSearchResponse<DemographicContactFewTo1> getDemographicContacts(@PathParam("dataId") Integer demographicNo,
+	                                                                           @QueryParam("category") String category)
 	{
 		try
 		{
 			// return error if invalid category
 			if(!DemographicContact.ALL_CATEGORIES.contains(category))
 			{
-				return RestResponse.errorResponse("Invalid Category");
+				return RestSearchResponse.errorResponse("Invalid Category");
 			}
 
 			List<DemographicContactFewTo1> results = new ArrayList<>();
@@ -274,14 +274,14 @@ public class DemographicService extends AbstractServiceImpl {
 					results.add(demoContactTo1);
 				}
 			}
-			return RestResponse.successResponse(results);
+			return RestSearchResponse.successResponse(results, 0, 0, 0);
 
 		}
 		catch (Exception e)
 		{
 			logger.error("Error",e);
 		}
-		return RestResponse.errorResponse("Error");
+		return RestSearchResponse.errorResponse("Error");
 	}
 
 	/**
@@ -295,7 +295,7 @@ public class DemographicService extends AbstractServiceImpl {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces({MediaType.APPLICATION_JSON , MediaType.APPLICATION_XML})
-	public RestResponse<DemographicTo1,String> createDemographicData(DemographicTo1 data) {
+	public RestResponse<DemographicTo1> createDemographicData(DemographicTo1 data) {
 		try
 		{
 			Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
@@ -327,7 +327,7 @@ public class DemographicService extends AbstractServiceImpl {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1,String> updateDemographicData(DemographicTo1 data) {
+	public RestResponse<DemographicTo1> updateDemographicData(DemographicTo1 data) {
 
 		try
 		{
@@ -383,7 +383,7 @@ public class DemographicService extends AbstractServiceImpl {
 	@DELETE
 	@Path("/{dataId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1,String> deleteDemographicData(@PathParam("dataId") Integer id) {
+	public RestResponse<DemographicTo1> deleteDemographicData(@PathParam("dataId") Integer id) {
 		try
 		{
 			Demographic demo = demographicManager.getDemographic(getLoggedInInfo(), id);

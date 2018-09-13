@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.managers.FormsManager;
 import org.oscarehr.ws.rest.conversion.EFormConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.EFormTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -40,6 +41,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 @Path("/eforms")
@@ -59,7 +61,7 @@ public class EFormsService extends AbstractServiceImpl
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<EFormTo1>, String> getEFormList()
+	public RestResponse<List<EFormTo1>> getEFormList()
 	{
 		List<EFormTo1> allEforms = new EFormConverter(true).getAllAsTransferObjects(getLoggedInInfo(),
 				formsManager.findByStatus(getLoggedInInfo(), true, EFormDao.EFormSortOrder.NAME));
@@ -73,12 +75,13 @@ public class EFormsService extends AbstractServiceImpl
 	@GET
 	@Path("/images")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<String>, String> getEFormImageList()
+	public RestResponse<List<String>> getEFormImageList()
 	{
 		String imageHomeDir = OscarProperties.getInstance().getProperty("eform_image");
 		File directory = new File(imageHomeDir);
 
 		List<String> imagesNames = DisplayImageAction.getFiles(directory, ".*\\.(jpg|jpeg|png|gif)$", null);
+		Collections.sort(imagesNames);
 		return RestResponse.successResponse(imagesNames);
 	}
 
@@ -89,7 +92,7 @@ public class EFormsService extends AbstractServiceImpl
 	@GET
 	@Path("/databaseTags")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<String>, String> getEFormDatabaseTagList()
+	public RestResponse<List<String>> getEFormDatabaseTagList()
 	{
 		List<String> dbTagList;
 		try

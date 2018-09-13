@@ -42,7 +42,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" scope="request"/>
 <%@page import="java.util.ArrayList"%>
-<%@page import="org.oscarehr.common.model.ProviderData"%>
+<%@page import="org.oscarehr.provider.model.ProviderData"%>
 <%@page import="org.marc.shic.core.FolderMetaData"%>
 <%@page import="java.util.List"%>
 <%@page import="org.oscarehr.sharingcenter.model.PolicyDefinitionDataObject"%>

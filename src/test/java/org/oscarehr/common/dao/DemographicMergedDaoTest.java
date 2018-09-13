@@ -34,7 +34,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.DemographicMerged;
+import org.oscarehr.demographic.model.DemographicMerged;
+import org.oscarehr.demographic.dao.DemographicMergedDao;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 

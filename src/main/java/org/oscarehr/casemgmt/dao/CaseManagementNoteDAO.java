@@ -55,6 +55,10 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import oscar.OscarProperties;
 import oscar.util.SqlUtils;
 
+/**
+ * @deprecated use the jpa version instead
+ */
+@Deprecated
 public class CaseManagementNoteDAO extends HibernateDaoSupport {
 
 	private static Logger log = MiscUtils.getLogger();

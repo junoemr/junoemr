@@ -57,6 +57,7 @@
 <%@ page import="org.oscarehr.common.model.MyGroup" %>
 <%@ page import="org.oscarehr.common.model.MyGroupAccessRestriction" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
+<%@ page import="org.oscarehr.common.model.ProviderSite" %>
 <%@ page import="org.oscarehr.common.model.ProviderPreference"%>
 <%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
@@ -227,6 +228,7 @@ private long getAppointmentRowSpan(
 	HashMap<String,String> currentSiteMap = new HashMap<String,String>();
 	boolean isSiteAccessPrivacy = false;
 	boolean isTeamAccessPrivacy = false;
+	boolean hasSite=true;
 
 	String selectedSite = null;
 
@@ -301,7 +303,14 @@ private long getAppointmentRowSpan(
 	// Required for menu bar
 	LoggedInInfo loggedInInfo1=LoggedInInfo.getLoggedInInfoFromSession(request);
 
-
+	if (bMultisites)
+	{
+		List<ProviderSite> psList = providerSiteDao.findByProviderNo(loggedInInfo1.getLoggedInProviderNo());
+		if (psList.size() == 0)
+		{
+			hasSite=false;
+		}
+	}
 	OscarProperties oscarProperties = OscarProperties.getInstance();
 
 	String resourceBaseUrl =  oscarProperties.getProperty("resource_base_url");
@@ -359,16 +368,17 @@ private long getAppointmentRowSpan(
 	String [] curProvider_no;
 	String [] curProviderName;
 
-	//initial provider bean for all the application
-	if(providerBean.isEmpty())
+
+	// Regenerate provider beans every time this page is reloaded in case the new providers were added, or existing
+	// providers are changed.
+	providerBean.clear();
+	for (Provider p : providerDao.getActiveProviders())
 	{
-		for(Provider p : providerDao.getActiveProviders())
-		{
-			providerBean.setProperty(p.getProviderNo(),p.getFormattedName());
-		}
+	    providerBean.setProperty(p.getProviderNo(),p.getFormattedName());
 	}
 
 	ProviderPreference providerPreference2=(ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE);
+
 	String mygroupno = providerPreference2.getMyGroupNo();
 	if(mygroupno == null)
 	{
@@ -663,7 +673,7 @@ private long getAppointmentRowSpan(
 			self.location.href = "providercontrol.jsp?year=<%=year%>&month=<%=month%>&day=<%=day%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1&provider_no="+s;
 		}
 		function goZoomView(s, n) {
-			self.location.href = "providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=1&curProvider="+s+"&curProviderName="+encodeURIComponent(n)+"&displaymode=day&dboperation=searchappointmentday" ;
+			self.location.href = "providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=1&curProvider="+s+"&curProviderName="+encodeURIComponent(n)+"&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>" ;
 		}
 		function findProvider(p,m,d) {
 			popupPage(300,400, "receptionistfindprovider.jsp?pyear=" +p+ "&pmonth=" +m+ "&pday=" +d+ "&providername="+ document.findprovider.providername.value );
@@ -698,6 +708,9 @@ private long getAppointmentRowSpan(
 			padding-top:17px;
 		}
 		<% } %>
+		.appt.noStatus a {
+			color: #FFFFFF;
+		}
 	</style>
 
 
@@ -1057,7 +1070,7 @@ private long getAppointmentRowSpan(
 			<%
 				} } } else { if (view==1) {
 			%>
-			<a href='providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=0&displaymode=day&dboperation=searchappointmentday'><bean:message key="provider.appointmentProviderAdminDay.grpView"/></a>
+			<a href='providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>'><bean:message key="provider.appointmentProviderAdminDay.grpView"/></a>
 			<% } else { %>
 			<bean:message key="global.hello"/>
 			<% out.println( userFirstName+" "+userLastName); %>
@@ -1480,9 +1493,9 @@ private long getAppointmentRowSpan(
 									String url = "../appointment/addappointment.jsp" +
 											"?provider_no=" + scheduleProviderNo +
 											"&bFirstDisp=true" +
-											"&year=" + strYear +
-											"&month=" + strMonth +
-											"&day=" + strDay +
+											"&year=" + schedule.getScheduleDate().getYear() +
+											"&month=" + schedule.getScheduleDate().getMonthValue() +
+											"&day=" + schedule.getScheduleDate().getDayOfMonth() +
 											"&start_time=" + slotTime.format(formatter) +
 											"&end_time=" + slotTime.plusMinutes(slotLengthInMinutes - 1) +
 											"&duration=" + durationString;
@@ -1504,7 +1517,7 @@ private long getAppointmentRowSpan(
 										<td align="RIGHT" class="<%=isExactHour?"scheduleTime00":"scheduleTimeNot00"%>" NOWRAP>
 											<a
 													href=#
-													onClick="confirmPopupPage(400,780,'<%= url %>','<%= confirmString %>','<%=allowDay%>','<%=allowWeek%>');return false;"
+													onClick="confirmPopupPage(400,780,'<%= url %>','<%= confirmString %>','<%=allowDay%>','<%=allowWeek%>', <%=hasSite%>);return false;"
 													title='<%= timeTitle %>' class="adhour"
 											>
 												<%= slotTime.format(formatter) %>&nbsp;
@@ -1623,7 +1636,7 @@ private long getAppointmentRowSpan(
 
 											%>
 
-											<td class="appt" bgcolor='<%= appointment.getColor() %>' rowspan="<%= appointmentRowSpan %>" nowrap>
+											<td class="appt <%=appointment.getColor()==null?"noStatus":""%>" bgcolor='<%= appointment.getColor() %>' rowspan="<%= appointmentRowSpan %>" nowrap>
 
 												<!-- Self booking notice -->
 												<c:if test="${appointmentInfo.selfBooked}">

@@ -23,6 +23,10 @@
  */
 package org.oscarehr.ws.rest.to.model;
 
+/**
+ * @deprecated - use the DemographicCriteriaSearch in future
+ */
+@Deprecated
 public class DemographicSearchRequest {
 	
 	public static enum SEARCHMODE {
@@ -30,7 +34,7 @@ public class DemographicSearchRequest {
 	}
 	
 	public static enum SORTMODE {
-        DemographicNo, Name, Phone, Address, DOB, ChartNo, Sex, ProviderName, RS, PS
+        DemographicNo, Name, Phone, Address, DOB, ChartNo, Sex, ProviderName, RosterStatus, PatientStatus, HIN
 	}
 
 	public static enum STATUSMODE {

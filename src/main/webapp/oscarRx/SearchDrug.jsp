@@ -109,7 +109,9 @@
 <%@page import="java.util.List"%>
 <%@page import="org.oscarehr.casemgmt.web.PrescriptDrug"%>
 <%@page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager"%>
-<%@page import="org.oscarehr.util.LoggedInInfo"%><html:html locale="true">
+<%@page import="org.oscarehr.util.LoggedInInfo"%>
+<%@ page import="org.oscarehr.rx.model.Drug" %>
+<html:html locale="true">
 <head>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/global.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/share/javascript/prototype.js"></script>

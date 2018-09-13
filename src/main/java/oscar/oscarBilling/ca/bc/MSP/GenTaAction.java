@@ -276,9 +276,18 @@ public class GenTaAction  extends Action {
                     t.setLineCode(s04.t_linecode.toCharArray()[0]);
                     t.setPayeeNo(s04.t_payeeno);
                     t.setMspCtlNo(s04.t_mspctlno);
-                    
-                	t.setPractitionerNo("");
-                	t.setMspRcdDate("");
+
+					try
+					{
+						t.setPractitionerNo(s04.t_practitionerno);
+						t.setMspRcdDate(s04.t_msprcddate);
+					} catch (Exception e)
+					{
+						t.setPractitionerNo("");
+						t.setMspRcdDate("");
+						MiscUtils.getLogger().error("Failed to parse practitioner number and MSP received date: ", e);
+					}
+
                     t.setInitial("");
                     t.setSurname("");
                     t.setPhn("");

@@ -23,7 +23,7 @@
  */
 package org.oscarehr.ws.rest.conversion;
 
-import org.oscarehr.common.model.Prevention;
+import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.PreventionTo1;
 

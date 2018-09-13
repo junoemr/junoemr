@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,11 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * This software was written for the
- * Department of Family Medicine
- * McMaster University
- * Hamilton
- * Ontario, Canada
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
  */
 
 package org.oscarehr.common.io;
@@ -97,6 +96,7 @@ public class PDFFile extends GenericFile
 		{
 			PDDocument doc = PDDocument.load(javaFile);
 			numOfPage = doc.getNumberOfPages();
+			doc.close();
 		}
 		catch(IOException e)
 		{
@@ -109,6 +109,7 @@ public class PDFFile extends GenericFile
 	{
 		logger.info("BEGIN PDF VALIDATION");
 		boolean isValid = true;
+		boolean isEncrypted = false;
 
 		String pdfInfo = props.getProperty("document.pdfinfo_path", "/usr/bin/pdfinfo");
 
@@ -123,14 +124,22 @@ public class PDFFile extends GenericFile
 			logger.warn("validator error line: " + line);
 			// if error is allowed and flag not already set to fail
 			isValid = (isValid && allowedErrors.contains(line.toLowerCase()));
+			isEncrypted = (line.toLowerCase().equals("command line error: incorrect password"));
 			this.reasonInvalid = (this.reasonInvalid == null)? line : this.reasonInvalid + ", " + line;
 		}
 		process.waitFor();
 		in.close();
 
 		int exitValue = process.exitValue();
-		if(exitValue != 0) {
-			isValid = false;
+		if (exitValue != 0)
+		{
+			if (isEncrypted)
+			{
+				isValid = true;
+			} else
+			{
+				isValid = false;
+			}
 		}
 
 		logger.info("Passed PDF Validation: " + isValid);

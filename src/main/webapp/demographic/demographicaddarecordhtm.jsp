@@ -1,3 +1,4 @@
+
 <%--
 
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
@@ -40,7 +41,12 @@
 
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%
-  String curUser_no = (String) session.getAttribute("user");
+	String curUser_no = (String) session.getAttribute("user");
+
+	// Custom licensed producer fields
+	String licensedProducerDefault = "None";
+	String licensedProducerDefault2 = "None";
+	String licensedProducerDefaultAddress = "None";
 %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
@@ -74,6 +80,7 @@
 
 <%@page import="org.oscarehr.managers.PatientConsentManager" %>
 <%@ page import="org.oscarehr.eform.model.EForm" %>
+<%@ page import="java.sql.ResultSet" %>
 
 <jsp:useBean id="apptMainBean" class="oscar.AppointmentMainBean" scope="session" />
 <%
@@ -1310,6 +1317,62 @@ document.forms[1].referral_doctor_no.value = refNo;
 				<td id="chartNo" align="left"><input type="text" id="chart_no" name="chart_no" value="<%=StringEscapeUtils.escapeHtml(chartNoVal)%>">
 				</td>
 			</tr>
+
+			<!-- Licensed producer drop-down selection -->
+			<%
+				if(oscarProps.isPropertyActive("show_demographic_licensed_producers")) {
+					ResultSet producerRs = apptMainBean.queryResults("search_licensed_producer");
+					ResultSet producerAddrRs = apptMainBean.queryResults("search_licensed_producer_address_name");
+			%>
+			<tr>
+				<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.licensedProducer" />:</b></td>
+				<td align="left">
+					<select name="licensed_producer">
+						<option selected value="0"><%=licensedProducerDefault%></option>
+						<%
+							while(producerRs.next()) {
+						%>
+						<option value="<%=producerRs.getString("producer_id")%>"><%=producerRs.getString("producer_name")%></option>
+						<%
+							}
+						%>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.licensedProducer2" />:</b></td>
+				<td align="left">
+					<select name="licensed_producer2">
+						<option selected value="0"><%=licensedProducerDefault2%></option>
+						<%
+							producerRs.beforeFirst();
+							while(producerRs.next()) {
+						%>
+						<option value="<%=producerRs.getString("producer_id")%>"><%=producerRs.getString("producer_name")%></option>
+						<%
+							}
+						%>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td align="right"><b><bean:message key="demographic.demographicaddrecordhtm.licensedProducerAddress" />:</b></td>
+				<td align="left">
+					<select name="licensed_producer_address">
+						<option selected value="0"><%=licensedProducerDefaultAddress%></option>
+						<%
+							while(producerAddrRs.next()) {
+						%>
+						<option value="<%=producerAddrRs.getString("address_id")%>"><%=producerAddrRs.getString("display_name")%></option>
+						<%
+							}
+						%>
+					</select>
+				</td>
+			</tr>
+			<%
+				}
+			%>
 			<%
 			if(oscarProps.isPropertyActive("demographic_veteran_no")) { %>
 			<tr>

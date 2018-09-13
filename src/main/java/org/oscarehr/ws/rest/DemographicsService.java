@@ -44,6 +44,7 @@ import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.DemographicSearchHelper;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SEARCHMODE;
@@ -85,7 +86,7 @@ public class DemographicsService extends AbstractServiceImpl {
 	@GET
 	@Path("/quickSearch")
 	@Produces("application/json")
-	public RestResponse<AbstractSearchResponse<DemographicSearchResult>,String> search(@QueryParam("query") String query) {
+	public RestResponse<AbstractSearchResponse<DemographicSearchResult>> search(@QueryParam("query") String query) {
 
 		try
 		{
@@ -154,7 +155,7 @@ public class DemographicsService extends AbstractServiceImpl {
 	@GET
 	@Path("/search")
 	@Produces("application/json")
-	public RestResponse<AbstractSearchResponse<DemographicSearchResult>,String> search(@QueryParam("jsonData") String jsonStr,
+	public RestResponse<AbstractSearchResponse<DemographicSearchResult>> search(@QueryParam("jsonData") String jsonStr,
 	                                                                                   @QueryParam("startIndex") Integer startIndex,
 	                                                                                   @QueryParam("itemsToReturn") Integer itemsToReturn )
 	{
@@ -201,7 +202,7 @@ public class DemographicsService extends AbstractServiceImpl {
 	@GET
 	@Path("/searchIntegrator")
 	@Produces("application/json")
-	public RestResponse<AbstractSearchResponse<DemographicSearchResult>,String> searchIntegrator(@QueryParam("jsonData") String jsonStr,
+	public RestResponse<AbstractSearchResponse<DemographicSearchResult>> searchIntegrator(@QueryParam("jsonData") String jsonStr,
 	                                                                                             @QueryParam("itemsToReturn") Integer itemsToReturn ) {
 		AbstractSearchResponse<DemographicSearchResult> response = new AbstractSearchResponse<DemographicSearchResult>();
 		try
@@ -272,7 +273,7 @@ public class DemographicsService extends AbstractServiceImpl {
 	@GET
 	@Path("/statusList")
 	@Produces("application/json")
-	public RestResponse<List<StatusValueTo1>, String> getStatusList(@QueryParam("type") String listType)
+	public RestResponse<List<StatusValueTo1>> getStatusList(@QueryParam("type") String listType)
 	{
 		try
 		{

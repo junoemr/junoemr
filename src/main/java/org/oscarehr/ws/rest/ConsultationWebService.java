@@ -23,23 +23,7 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
@@ -57,13 +41,13 @@ import org.oscarehr.common.model.ConsultationRequest;
 import org.oscarehr.common.model.ConsultationResponse;
 import org.oscarehr.common.model.ConsultationServices;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.common.model.FaxConfig;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.consultations.ConsultationRequestSearchFilter;
 import org.oscarehr.consultations.ConsultationResponseSearchFilter;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.managers.ConsultationManager;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.MiscUtils;
@@ -73,7 +57,8 @@ import org.oscarehr.ws.rest.conversion.ConsultationResponseConverter;
 import org.oscarehr.ws.rest.conversion.ConsultationServiceConverter;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
 import org.oscarehr.ws.rest.conversion.ProfessionalSpecialistConverter;
-import org.oscarehr.ws.rest.to.AbstractSearchResponse;
+import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.ReferralResponse;
 import org.oscarehr.ws.rest.to.model.ConsultationAttachmentTo1;
 import org.oscarehr.ws.rest.to.model.ConsultationRequestSearchResult;
@@ -84,10 +69,7 @@ import org.oscarehr.ws.rest.to.model.FaxConfigTo1;
 import org.oscarehr.ws.rest.to.model.LetterheadTo1;
 import org.oscarehr.ws.rest.to.model.ProfessionalSpecialistTo1;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-
-import net.sf.json.JSONObject;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.eform.EFormUtil;
@@ -95,6 +77,22 @@ import oscar.oscarDemographic.data.RxInformation;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ConversionUtils;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Path("/consults")
 @Component("consultationWebService")
@@ -141,7 +139,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@GET
 	@Path("/searchRequests")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<ConsultationRequestSearchResult>, String> searchRequests(
+	public RestSearchResponse<ConsultationRequestSearchResult> searchRequests(
 			@QueryParam("demographicNo") Integer demographicNo,
 			@QueryParam("mrpNo") Integer mrpNo,
 			@QueryParam("status") Integer status,
@@ -154,14 +152,14 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			@QueryParam("team") String team,
 			@QueryParam("sortColumn") @DefaultValue("ReferralDate") String sortColumn,
 			@QueryParam("sortDirection") @DefaultValue("desc") String sortDirection
-			) {
-
-		HttpHeaders headers = new HttpHeaders();
+			)
+	{
 		ConsultationRequestSearchFilter filter = new ConsultationRequestSearchFilter();
 		List<ConsultationRequestSearchResult> resultList;
 
 		if(page < 1) page = 1;
 		int offset = perPage * (page-1);
+		int resultTotal;
 
 		try {
 			filter.setDemographicNo(demographicNo);
@@ -169,45 +167,42 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			filter.setStatus(status);
 			filter.setStartIndex(offset);
 			filter.setNumToReturn(perPage);
-			filter.setReferralStartDate(toNullableLegacyDate(toNullableLocalDate(referralStartDateString)));
-			filter.setReferralEndDate(toNullableLegacyDate(toNullableLocalDate(referralEndDate)));
-			filter.setAppointmentStartDate(toNullableLegacyDate(toNullableLocalDate(appointmentStartDate)));
-			filter.setAppointmentEndDate(toNullableLegacyDate(toNullableLocalDate(appointmentEndDate)));
+			filter.setReferralStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(referralStartDateString)));
+			filter.setReferralEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(referralEndDate)));
+			filter.setAppointmentStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(appointmentStartDate)));
+			filter.setAppointmentEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(appointmentEndDate)));
 			filter.setTeam(team);
 
 			filter.setSortMode(ConsultationRequestSearchFilter.SORTMODE.valueOf(sortColumn));
 			filter.setSortDir(ConsultationRequestSearchFilter.SORTDIR.valueOf(sortDirection));
 
-			int resultTotal = consultationManager.getConsultationCount(filter);
-			headers.set("total", String.valueOf(resultTotal));
-			headers.set("page", String.valueOf(page));
-			headers.set("perPage", String.valueOf(perPage));
-
+			resultTotal = consultationManager.getConsultationCount(filter);
 			resultList = consultationManager.search(getLoggedInInfo(), filter);
 		}
 		catch(DateTimeParseException e) {
 			logger.error("Unparseable Date", e);
-			return RestResponse.errorResponse(headers, "Unparseable Date");
+			return RestSearchResponse.errorResponse("Unparseable Date");
 		}
 		catch(Exception e) {
 			logger.error("Search Error", e);
-			return RestResponse.errorResponse(headers, "Search Error");
+			return RestSearchResponse.errorResponse("Search Error");
 		}
-		return RestResponse.successResponse(headers, resultList);
+		return RestSearchResponse.successResponse(resultList, page, perPage, resultTotal);
 	}
 	
 	@GET
 	@Path("/getRequest/{requestId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<ConsultationRequestTo1,String> getRequest(@PathParam("requestId") Integer requestId) {
-
-		HttpHeaders headers = new HttpHeaders();
+	public RestResponse<ConsultationRequestTo1> getRequest(@PathParam("requestId") Integer requestId)
+	{
 		ConsultationRequestTo1 request;
-		try {
+		try
+		{
 
 			ConsultationRequest consult = consultationManager.getRequest(getLoggedInInfo(), requestId);
-			if (consult == null) {
-				return RestResponse.errorResponse(headers, "No Consult found with id " + requestId);
+			if(consult == null)
+			{
+				return RestResponse.errorResponse("No Consult found with id " + requestId);
 			}
 			request = requestConverter.getAsTransferObject(getLoggedInInfo(), consult);
 			request.setAttachments(getRequestAttachments(requestId, request.getDemographicId(), ConsultationAttachmentTo1.ATTACHED).getBody());
@@ -218,23 +213,23 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			request.setSendToList(providerDao.getActiveTeams());
 			request.setProviderNo(getLoggedInInfo().getLoggedInProviderNo());
 		}
-		catch(Exception e) {
+		catch(Exception e)
+		{
 			logger.error("Unexpected Error", e);
-			return RestResponse.errorResponse(headers, "Unexpected Error");
+			return RestResponse.errorResponse("Unexpected Error");
 		}
-		return RestResponse.successResponse(headers, request);
+		return RestResponse.successResponse(request);
 	}
 
 	@GET
 	@Path("/getNewRequest")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<ConsultationRequestTo1,String> getNewRequest(@QueryParam("demographicNo") Integer demographicId) {
+	public RestResponse<ConsultationRequestTo1> getNewRequest(@QueryParam("demographicNo") Integer demographicId) {
 
-		HttpHeaders headers = new HttpHeaders();
 		ConsultationRequestTo1 request;
 		try {
 			if(demographicId == null || demographicId <= 0) {
-				return RestResponse.errorResponse(headers, "Invalid demographicNo: " + demographicId);
+				return RestResponse.errorResponse("Invalid demographicNo: " + demographicId);
 			}
 
 			request = new ConsultationRequestTo1();
@@ -254,15 +249,15 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		}
 		catch(Exception e) {
 			logger.error("Unexpected Error", e);
-			return RestResponse.errorResponse(headers, "Unexpected Error");
+			return RestResponse.errorResponse("Unexpected Error");
 		}
-		return RestResponse.successResponse(headers, request);
+		return RestResponse.successResponse(request);
 	}
 	
 	@GET
 	@Path("/getRequestAttachments/{requestId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<ConsultationAttachmentTo1>,String> getRequestAttachments(@PathParam("requestId")Integer requestId,
+	public RestResponse<List<ConsultationAttachmentTo1>> getRequestAttachments(@PathParam("requestId")Integer requestId,
 	                                                                                  @QueryParam("demographicId")Integer demographicIdInt,
 	                                                                                  @QueryParam("attached")boolean attached) {
 		try {
@@ -277,11 +272,11 @@ public class ConsultationWebService extends AbstractServiceImpl {
 
 			List<LabResultData> labs = new CommonLabResultData().populateLabResultsData(getLoggedInInfo(), demographicId, requestId.toString(), attached);
 			getLabs(labs, demographicId, attached, attachments);
-			return RestResponse.successResponse(new HttpHeaders(), attachments);
+			return RestResponse.successResponse(attachments);
 		}
 		catch(Exception e) {
 			logger.error("Error", e);
-			return RestResponse.errorResponse(new HttpHeaders(), "Failed to retrieve Attachments");
+			return RestResponse.errorResponse("Failed to retrieve Attachments");
 		}
 	}
 
@@ -289,7 +284,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Path("/saveRequest")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<ConsultationRequestTo1,String> saveRequest(ConsultationRequestTo1 data) {
+	public RestResponse<ConsultationRequestTo1> saveRequest(ConsultationRequestTo1 data) {
 		try {
 			ConsultationRequest request;
 			if (data.getId() == null) { //new consultation request
@@ -304,25 +299,25 @@ public class ConsultationWebService extends AbstractServiceImpl {
 
 			//save attachments
 			saveRequestAttachments(data);
-			return RestResponse.successResponse(new HttpHeaders(), data);
+			return RestResponse.successResponse(data);
 		}
 		catch(Exception e) {
 			logger.error("Error saving Consult Request", e);
-			return RestResponse.errorResponse(new HttpHeaders(), "Failed to save Consult");
+			return RestResponse.errorResponse("Failed to save Consult");
 		}
 	}
 	
 	@GET
 	@Path("/eSendRequest/{requestId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<String,String> eSendRequest(@PathParam("requestId")Integer requestId) {
+	public RestResponse<String> eSendRequest(@PathParam("requestId")Integer requestId) {
 		try {
 			consultationManager.doHl7Send(getLoggedInInfo(), requestId);
-			return RestResponse.successResponse(new HttpHeaders(), "Referral Electronically Sent");
+			return RestResponse.successResponse("Referral Electronically Sent");
 		}
 		catch (Exception e) {
 			logger.error("Error contacting remote server.", e);
-			return RestResponse.errorResponse(new HttpHeaders(), "There was an error sending electronically, please try again or manually process the referral.");
+			return RestResponse.errorResponse("There was an error sending electronically, please try again or manually process the referral.");
 		}
 	}
 	
@@ -334,7 +329,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Path("/searchResponses")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public RestResponse<List<ConsultationResponseSearchResult>, String> searchResponses(
+	public RestSearchResponse<ConsultationResponseSearchResult> searchResponses(
 			@QueryParam("demographicNo") Integer demographicNo,
 			@QueryParam("mrpNo") Integer mrpNo,
 			@QueryParam("status") Integer status,
@@ -348,13 +343,12 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			@QueryParam("sortColumn") @DefaultValue("ReferralDate") String sortColumn,
 			@QueryParam("sortDirection") @DefaultValue("desc") String sortDirection
 	) {
-		HttpHeaders headers = new HttpHeaders();
-		AbstractSearchResponse<ConsultationResponseSearchResult> rp = new AbstractSearchResponse<ConsultationResponseSearchResult>();
 		ConsultationResponseSearchFilter filter = new ConsultationResponseSearchFilter();
 		List<ConsultationResponseSearchResult> resultList;
 
 		if(page < 1) page = 1;
 		int offset = perPage * (page-1);
+		int resultTotal;
 
 		try {
 			filter.setDemographicNo(demographicNo);
@@ -362,32 +356,28 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			filter.setStatus(status);
 			filter.setStartIndex(offset);
 			filter.setNumToReturn(perPage);
-			filter.setReferralStartDate(toNullableLegacyDate(toNullableLocalDate(referralStartDateString)));
-			filter.setReferralEndDate(toNullableLegacyDate(toNullableLocalDate(referralEndDate)));
-			filter.setAppointmentStartDate(toNullableLegacyDate(toNullableLocalDate(appointmentStartDate)));
-			filter.setAppointmentEndDate(toNullableLegacyDate(toNullableLocalDate(appointmentEndDate)));
+			filter.setReferralStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(referralStartDateString)));
+			filter.setReferralEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(referralEndDate)));
+			filter.setAppointmentStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(appointmentStartDate)));
+			filter.setAppointmentEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(appointmentEndDate)));
 			filter.setTeam(team);
 
 			filter.setSortMode(ConsultationResponseSearchFilter.SORTMODE.valueOf(sortColumn));
 			filter.setSortDir(ConsultationResponseSearchFilter.SORTDIR.valueOf(sortDirection));
 
-			int resultTotal = consultationManager.getConsultationCount(filter);
-			headers.set("total", String.valueOf(resultTotal));
-			headers.set("page", String.valueOf(page));
-			headers.set("perPage", String.valueOf(perPage));
-
+			resultTotal = consultationManager.getConsultationCount(filter);
 			resultList = consultationManager.search(getLoggedInInfo(), filter);
 		}
 		catch(DateTimeParseException e) {
 			logger.error("Unparseable Date", e);
-			return RestResponse.errorResponse(headers, "Unparseable Date");
+			return RestSearchResponse.errorResponse("Unparseable Date");
 		}
 		catch(Exception e) {
 			logger.error("Search Error", e);
-			return RestResponse.errorResponse(headers, "Search Error");
+			return RestSearchResponse.errorResponse("Search Error");
 		}
 
-		return RestResponse.successResponse(headers, resultList);
+		return RestSearchResponse.successResponse(resultList, page, perPage, resultTotal);
 	}
 	
 	@GET
@@ -448,7 +438,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	@Path("/saveResponse")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<ConsultationResponseTo1,String> saveRequest(ConsultationResponseTo1 data) {
+	public RestResponse<ConsultationResponseTo1> saveRequest(ConsultationResponseTo1 data) {
 		try {
 			ConsultationResponse response;
 
@@ -463,11 +453,11 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			//save attachments
 			saveResponseAttachments(data);
 
-			return RestResponse.successResponse(new HttpHeaders(), data);
+			return RestResponse.successResponse(data);
 		}
 		catch(Exception e) {
 			logger.error("Error saving Consult Request", e);
-			return RestResponse.errorResponse(new HttpHeaders(), "Failed to save Consult");
+			return RestResponse.errorResponse("Failed to save Consult");
 		}
 	}
 

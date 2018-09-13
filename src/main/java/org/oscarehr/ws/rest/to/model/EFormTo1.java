@@ -52,6 +52,8 @@ public class EFormTo1 implements Serializable {
 
 	private boolean patientIndependent;
 
+	private boolean instanced;
+
 	private String roleType;
 
 	public Integer getId() {
@@ -140,6 +142,16 @@ public class EFormTo1 implements Serializable {
 
 	public void setPatientIndependent(boolean patientIndependent) {
 		this.patientIndependent = patientIndependent;
+	}
+
+	public boolean isInstanced()
+	{
+		return instanced;
+	}
+
+	public void setInstanced(boolean instanced)
+	{
+		this.instanced = instanced;
 	}
 
 	public String getRoleType() {
