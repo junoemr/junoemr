@@ -26,9 +26,11 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.appointment.model.AppointmentStatusList;
 import org.oscarehr.common.dao.DemographicDao;
+import org.oscarehr.common.dao.ProviderPreferenceDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.LookupListItem;
+import org.oscarehr.common.model.ProviderPreference;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -92,7 +94,8 @@ public class AppointmentDisplayController
 	private boolean showBilling;
 	private boolean showEChart;
 
-	DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
+	private DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
+	private ProviderPreferenceDao providerPreferenceDao = SpringUtils.getBean(ProviderPreferenceDao.class);
 
 	public void init(
 		AppointmentDetails appointment,
@@ -407,11 +410,22 @@ public class AppointmentDisplayController
 		String default_view = OscarProperties.getInstance().getProperty("default_view");
 		Demographic demographic = demographicDao.getDemographicById(appointment.getDemographicNo());
 		String referral_no_parameter = "";
+
 		if(oscar.OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc"))
 		{
 			String rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
 			rdohip = rdohip !=null ? rdohip : "" ;
 			referral_no_parameter = "&referral_no_1=" + rdohip;
+		}
+
+		ProviderPreference preference = providerPreferenceDao.find(sessionProviderNo);
+		if(preference != null)
+		{
+			String preferredView = preference.getDefaultServiceType();
+			if(preferredView != null && !preferredView.equals("no"))
+			{
+				default_view = preferredView;
+			}
 		}
 
 		try
