@@ -23,11 +23,15 @@
 package org.oscarehr.appointment;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.appointment.model.AppointmentStatusList;
+import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.LookupListItem;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.SxmlMisc;
 import oscar.util.UtilMisc;
@@ -87,6 +91,8 @@ public class AppointmentDisplayController
 	private boolean showMasterLink;
 	private boolean showBilling;
 	private boolean showEChart;
+
+	DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
 
 	public void init(
 		AppointmentDetails appointment,
@@ -399,6 +405,14 @@ public class AppointmentDisplayController
 	{
 		String province = OscarProperties.getInstance().getBillingTypeUpperCase();
 		String default_view = OscarProperties.getInstance().getProperty("default_view");
+		Demographic demographic = demographicDao.getDemographicById(appointment.getDemographicNo());
+		String referral_no_parameter = "";
+		if(oscar.OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc"))
+		{
+			String rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
+			rdohip = rdohip !=null ? rdohip : "" ;
+			referral_no_parameter = "&referral_no_1=" + rdohip;
+		}
 
 		try
 		{
@@ -415,7 +429,7 @@ public class AppointmentDisplayController
 				"&apptProvider_no=" + scheduleProviderNo +
 				"&appointment_date=" + appointment.getDate().format(dateFormatter) +
 				"&start_time=" + appointment.getStartTime().format(timeFormatter) +
-				"&bNewForm=1";
+				"&bNewForm=1" + referral_no_parameter;
 		}
 		catch(UnsupportedEncodingException e)
 		{
