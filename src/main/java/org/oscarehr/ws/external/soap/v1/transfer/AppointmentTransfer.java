@@ -34,7 +34,6 @@ import org.oscarehr.common.model.Appointment.BookingSource;
 import org.springframework.beans.BeanUtils;
 
 import oscar.util.DateUtils;
-import oscar.util.plugin.OscarProperties;
 
 public final class AppointmentTransfer {
 	
@@ -247,7 +246,7 @@ public final class AppointmentTransfer {
 
 	public Appointment copyTo(Appointment appointment) {
 
-		String[] ignored = { "id", "appointmentDate", "startTime", "endTime", "createDateTime", "updateDateTime", "creator", "lastUpdateUser", "creatorSecurityId", "reasonCode"};
+		String[] ignored = { "id", "appointmentDate", "startTime", "endTime", "createDateTime", "updateDateTime", "creator", "lastUpdateUser", "creatorSecurityId" };
 		BeanUtils.copyProperties(this, appointment, ignored);
 
 		if (appointmentStartDateTime != null) {
@@ -263,16 +262,6 @@ public final class AppointmentTransfer {
 			// also oscar sets end time funny, it is not exclusive so we need to calculate exclusivity ourselves.
 			appointmentEndDateTime.add(Calendar.MILLISECOND, -1);
 			appointment.setEndTime(appointmentEndDateTime.getTime());
-		}
-
-		// MyHealthAccess doesn't currently serialize a reason code, which leads to null values for that field.
-		// However, when booking via OSCAR itself, this value can never be null as it's populated from a dropdown menu with a default selection.
-		if (bookingSource == BookingSource.MYOSCAR_SELF_BOOKING)
-		{
-			// Setting the default value to null in this case will not change the existing behaviour, if the property is not defined.
-			// Another possible value is "17", which corresponds to "Other" in systems with a default configuration.
-			String selfBookingReasonCode = OscarProperties.getProperties().getProperty("self_booking_reason_code",null);
-			appointment.setReasonCode(Integer.valueOf(selfBookingReasonCode));
 		}
 
 		return (appointment);
