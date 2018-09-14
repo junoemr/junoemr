@@ -160,7 +160,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"    CROSS JOIN \n" +
 				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n3 \n" +
 				"CROSS JOIN scheduledate sd\n" +
-				"JOIN scheduletemplate st ON sd.hour = st.name\n" +
+				"JOIN scheduletemplate st ON (sd.hour = st.name AND sd.provider_no = st.provider_no)\n" +
 				"LEFT JOIN scheduletemplatecode stc " +
 				"  ON BINARY stc.code = SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1)\n" +
 				"WHERE sd.status = 'A'\n" +
