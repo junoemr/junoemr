@@ -42,10 +42,10 @@ if(!authed) {
 String curUser_no = (String) session.getAttribute("user");
 String deepcolor = "#CCCCFF", weakcolor = "#EEEEFF";
 
-String strLimit1="0";
-String strLimit2="5000";  
-if(request.getParameter("limit1")!=null) strLimit1 = request.getParameter("limit1");  
-if(request.getParameter("limit2")!=null) strLimit2 = request.getParameter("limit2");
+String limit="15";
+String offset="0";
+if(request.getParameter("limit1")!=null) limit = request.getParameter("limit1");
+if(request.getParameter("limit2")!=null) offset = request.getParameter("limit2");
 
 String startDate =null, endDate=null;
 if(request.getParameter("startDate")!=null) startDate = request.getParameter("startDate");  
@@ -59,6 +59,8 @@ if(request.getParameter("endDate")!=null) endDate = request.getParameter("endDat
 <%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ page import="org.oscarehr.common.dao.forms.FormsDao" %>
 <%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 
 <%
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
@@ -132,21 +134,21 @@ if(request.getParameter("endDate")!=null) endDate = request.getParameter("endDat
   boolean bodd=false;
   int nItems=0;
   
-  for(Object[] result : formsDao.selectBcFormAr(startDate, endDate, Integer.parseInt(strLimit1), Integer.parseInt(strLimit2))) {
+  for(Object[] result : formsDao.selectBcFormAr2007(startDate, endDate, Integer.parseInt(limit), Integer.parseInt(offset))) {
 
 	 	String demographicNo = ((Integer)result[0]).toString();
 	 	String cEDD = ConversionUtils.toDateString((java.util.Date)result[1]);
 	 	String surname = (String)result[2];
 	 	String givenName  = (String)result[3];
 	 	String pg1_ageAtEDD = (String)result[4];
-	 	String dob = (String)result[5];
+	 	Date dob = (Date)result[5];
 	 	String langPref = (String)result[6];
 	 	String phn = (String)result[7];
 	 	String gravida = (String)result[8];
 	 	String term = (String)result[9];
 	 	String phone = (String)result[10];
 	 	String doula = (String)result[12];
-	 	String doulaNo = (String)result[13];
+	 	String doulaNo = String.valueOf(result[13]);
 	 	
     if (demoProp.containsKey(demographicNo) ) continue;
     else demoProp.setProperty(demographicNo, "1");
@@ -174,17 +176,20 @@ if(request.getParameter("endDate")!=null) endDate = request.getParameter("endDat
 </table>
 <br>
 <%
-  int nLastPage=0,nNextPage=0;
-  nNextPage=Integer.parseInt(strLimit2)+Integer.parseInt(strLimit1);
-  nLastPage=Integer.parseInt(strLimit1)-Integer.parseInt(strLimit2);
-  if(nLastPage>=0) {
+  //int nLastPage=0,nNextPage=0;
+  //nNextPage=Integer.parseInt(strLimit2)+Integer.parseInt(strLimit1);
+  //nLastPage=Integer.parseInt(strLimit1)-Integer.parseInt(strLimit2);
+  int nextOffset = Integer.parseInt(offset) + Integer.parseInt(limit);
+  int prevOffset = Integer.parseInt(offset) - Integer.parseInt(limit);
+  if(prevOffset>=0) {
 %> <a
-	href="reportbcedblist.jsp?startDate=<%=request.getParameter("startDate")%>&endDate=<%=request.getParameter("endDate")%>&limit1=<%=nLastPage%>&limit2=<%=strLimit2%>"><bean:message
+	href="reportbcedblist2007.jsp?startDate=<%=request.getParameter("startDate")%>&endDate=<%=request.getParameter("endDate")%>&limit1=<%=limit%>&limit2=<%=prevOffset%>"><bean:message
 	key="report.reportnewdblist.msgLastPage" /></a> | <%
   }
-  if(nItems==Integer.parseInt(strLimit2)) {
+  if(nItems==Integer.parseInt(limit)) {
+  	MiscUtils.getLogger().info("HERE");
 %> <a
-	href="reportbcedblist.jsp?startDate=<%=request.getParameter("startDate")%>&endDate=<%=request.getParameter("endDate")%>&limit1=<%=nNextPage%>&limit2=<%=strLimit2%>">
+	href="reportbcedblist2007.jsp?startDate=<%=request.getParameter("startDate")%>&endDate=<%=request.getParameter("endDate")%>&limit1=<%=limit%>&limit2=<%=nextOffset%>">
 <bean:message key="report.reportnewdblist.msgNextPage" /></a> <%
 }
 %>
