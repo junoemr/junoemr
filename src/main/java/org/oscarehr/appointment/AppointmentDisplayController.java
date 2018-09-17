@@ -442,7 +442,7 @@ public class AppointmentDisplayController
 				"&user_no=" + currentUserNo +
 				"&apptProvider_no=" + scheduleProviderNo +
 				"&appointment_date=" + appointment.getDate().format(dateFormatter) +
-				"&start_time=" + appointment.getStartTime().format(timeFormatter) +
+				"&start_time=" + appointment.getStartTime().format(timeFormatterWithSeconds) +
 				"&bNewForm=1" + referralNoParameter;
 		}
 		catch(UnsupportedEncodingException e)
