@@ -46,6 +46,8 @@ import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.common.dao.AbstractDao;
 import org.springframework.stereotype.Repository;
 
+import static org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey.DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES;
+
 @Repository
 @SuppressWarnings("unchecked")
 public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
@@ -72,12 +74,13 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
         		"AND sd.status = 'A' " +
         		"AND (" +
         		"	st.id.providerNo = sd.providerNo " +
-        		"	OR st.id.providerNo = 'Public' " +
+        		"	OR st.id.providerNo = :publicCode " +
         		") ORDER BY sd.date";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("date_from", date_from);
 		query.setParameter("date_to", date_to);
 		query.setParameter("provider_no", provider_no);
+		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
 		return query.getResultList();
     }
 
@@ -89,11 +92,12 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"AND sd.status = 'A' " +
 				"AND (" +
 				"	st.providerNo = sd.providerNo " +
-				"	OR st.providerNo = 'Public' " +
+				"	OR st.providerNo = :publicCode " +
 				") ORDER BY sd.date";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("dateFrom", dateFrom);
 		query.setParameter("providerIds", providerIds);
+		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
 		return query.getResultList();
     }
 
@@ -116,20 +120,22 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 	
 	@NativeSql({"scheduletemplate", "scheduledate"})
 	public List<Object> findTimeCodeByProviderNo(String providerNo, Date date) {
-		String sql = "select timecode from scheduletemplate, (select hour from (select provider_no, hour, status from scheduledate where sdate = :date) as df where status = 'A' and provider_no= :providerNo) as hf where scheduletemplate.name=hf.hour and (scheduletemplate.provider_no= :providerNo or scheduletemplate.provider_no='Public')";
+		String sql = "select timecode from scheduletemplate, (select hour from (select provider_no, hour, status from scheduledate where sdate = :date) as df where status = 'A' and provider_no= :providerNo) as hf where scheduletemplate.name=hf.hour and (scheduletemplate.provider_no= :providerNo or scheduletemplate.provider_no= :publicCode)";
 		Query query = entityManager.createNativeQuery(sql, modelClass);
 		query.setParameter("date", date);
 		query.setParameter("providerNo", providerNo);
+		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
 		return query.getResultList();
 	}
 	
 	//TODO:modelClass causing error on master record
 	@NativeSql({"scheduletemplate", "scheduledate"})
 	public List<Object> findTimeCodeByProviderNo2(String providerNo, Date date) {
-		String sql = "select timecode from scheduletemplate, (select hour from (select provider_no, hour, status from scheduledate where sdate = :date) as df where status = 'A' and provider_no= :providerNo) as hf where scheduletemplate.name=hf.hour and (scheduletemplate.provider_no= :providerNo or scheduletemplate.provider_no='Public')";
+		String sql = "select timecode from scheduletemplate, (select hour from (select provider_no, hour, status from scheduledate where sdate = :date) as df where status = 'A' and provider_no= :providerNo) as hf where scheduletemplate.name=hf.hour and (scheduletemplate.provider_no= :providerNo or scheduletemplate.provider_no= :publicCode)";
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter("date", date);
 		query.setParameter("providerNo", providerNo);
+		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
 		return query.getResultList();
 	}
 
@@ -160,7 +166,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"    CROSS JOIN \n" +
 				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n3 \n" +
 				"CROSS JOIN scheduledate sd\n" +
-				"JOIN scheduletemplate st ON (sd.hour = st.name AND sd.provider_no = st.provider_no)\n" +
+				"JOIN scheduletemplate st ON (sd.hour = st.name AND (sd.provider_no = st.provider_no OR st.provider_no = :publicCode ))\n" +
 				"LEFT JOIN scheduletemplatecode stc " +
 				"  ON BINARY stc.code = SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1)\n" +
 				"WHERE sd.status = 'A'\n" +
@@ -172,6 +178,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter("date", java.sql.Date.valueOf(date), TemporalType.DATE);
 		query.setParameter("providerNo", providerNo);
+		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
 
 		List<Object[]> results = query.getResultList();
 
