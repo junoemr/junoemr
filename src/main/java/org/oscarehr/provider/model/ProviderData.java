@@ -118,6 +118,17 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	public ProviderData() {
 	}
 
+	/** returns a formatted name String in the form of 'first_name, last_name' */
+	public String getDisplayName()
+	{
+		String lastName  = (getLastName()  == null) ? "" : getLastName().trim();
+		String firstName = (getFirstName() == null) ? "" : getFirstName().trim();
+		if(!lastName.isEmpty() && !firstName.isEmpty()) {
+			lastName += ", ";
+		}
+		return lastName + firstName;
+	}
+
 	@Override
 	public String getId() {
 		return id;
@@ -247,6 +258,18 @@ public class ProviderData extends AbstractModel<String> implements Serializable 
 	public void setComments(String s) {
 		comments = s;
 	}
+
+	public String getFaxNumber()
+	{
+		String comments = getComments();
+		String faxNo = null;
+		if(comments != null && comments.contains("<xml_p_fax>"))
+		{
+			faxNo = StringUtils.substringBetween(getComments(), "<xml_p_fax>", "</xml_p_fax>");
+		}
+		return faxNo;
+	}
+
 
 	public String getProviderActivity() {
 		return providerActivity;

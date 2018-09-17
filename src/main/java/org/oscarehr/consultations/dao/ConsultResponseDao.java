@@ -21,7 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.consultations.dao;
 
 import java.util.List;
 
@@ -32,6 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.common.model.ConsultationResponse;
 import org.oscarehr.consultations.ConsultationResponseSearchFilter;
 import org.oscarehr.consultations.ConsultationResponseSearchFilter.SORTMODE;
@@ -39,7 +40,8 @@ import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ConsultResponseDao extends AbstractDao<ConsultationResponse> {
+public class ConsultResponseDao extends AbstractDao<ConsultationResponse>
+{
 	private Logger logger = MiscUtils.getLogger();
 	
 	public ConsultResponseDao() {

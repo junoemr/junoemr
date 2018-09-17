@@ -23,7 +23,6 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
-import oscar.OscarProperties;
 import oscar.util.UtilDateUtilities;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,7 +56,8 @@ public class PrintAction extends Action
 			throw new SecurityException("missing required security object (_eform)");
 		}
 
-		localUri = getEformRequestUrl(request);
+		localUri = WKHtmlToPdfUtils.getEformRequestUrl(request.getParameter("providerId"),
+				"", request.getScheme(), request.getContextPath());
 		this.response = response;
 		String id = (String) request.getAttribute("fdid");
 		String providerId = request.getParameter("providerId");
@@ -73,50 +73,6 @@ public class PrintAction extends Action
 			return mapping.findForward("error");
 		}
 		return mapping.findForward("success");
-	}
-
-	/**
-	 * This method is a copy of Apache Tomcat's ApplicationHttpRequest getRequestURL method with the exception that the uri is removed and replaced with our eform viewing uri. Note that this requires that the remote url is valid for local access. i.e. the
-	 * host name from outside needs to resolve inside as well. The result needs to look something like this : https://127.0.0.1:8443/oscar/eformViewForPdfGenerationServlet?fdid=2&parentAjaxId=eforms
-	 */
-	private String getEformRequestUrl(HttpServletRequest request)
-	{
-		StringBuilder url = new StringBuilder();
-		String scheme = request.getScheme();
-		String prop_scheme = OscarProperties.getInstance().getProperty("oscar_protocol");
-		if (prop_scheme != null && prop_scheme != "")
-		{
-			scheme = prop_scheme;
-		}
-
-		Integer port;
-		try
-		{
-			port = new Integer(OscarProperties.getInstance().getProperty("oscar_port"));
-		}
-		catch (Exception e)
-		{
-			port = 8443;
-		}
-		//int port = request.getServerPort();
-		if (port < 0) port = 80; // Work around java.net.URL bug
-
-		url.append(scheme);
-		url.append("://");
-		//url.append(request.getServerName());
-		url.append("127.0.0.1");
-
-		if ((scheme.equals("http") && (port != 80)) || (scheme.equals("https") && (port != 443)))
-		{
-			url.append(':');
-			url.append(port);
-		}
-		url.append(request.getContextPath());
-		url.append("/EFormViewForPdfGenerationServlet?parentAjaxId=eforms&providerId=");
-		url.append(request.getParameter("providerId"));
-		url.append("&fdid=");
-
-		return (url.toString());
 	}
 
 	/**
