@@ -156,7 +156,9 @@ public class FaxConfig extends AbstractModel<Integer>
 	/**
 	 * @param faxPasswd the faxPasswd to set
 	 */
-	public void setFaxPasswd(String faxPasswd) {
+	public void setFaxPasswd(String faxPasswd)
+	{
+		//TODO encrypt password
 		this.faxPasswd = faxPasswd;
 	}
 
@@ -165,6 +167,7 @@ public class FaxConfig extends AbstractModel<Integer>
 	 * @return the faxNumber
 	 */
     public String getFaxNumber() {
+    	//TODO decrypt password
 	    return faxNumber;
     }
 

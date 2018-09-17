@@ -73,6 +73,6 @@ public class SRFaxResultWrapper_Single<T>
 	@Override
 	public String toString()
 	{
-		return "status:" + status + ", result:" + result.toString();
+		return "status:" + status + ", error:" + error + ", result:" + result;
 	}
 }

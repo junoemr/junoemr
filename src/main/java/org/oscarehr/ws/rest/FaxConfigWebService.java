@@ -24,10 +24,8 @@ package org.oscarehr.ws.rest;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.fax.dao.FaxConfigDao;
-import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
-import org.oscarehr.fax.externalApi.srfax.result.SRFaxResult_GetUsage;
-import org.oscarehr.fax.externalApi.srfax.result.SRFaxResultWrapper_List;
 import org.oscarehr.fax.model.FaxConfig;
+import org.oscarehr.fax.service.FaxConfigService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.conversion.FaxSettingsConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -47,9 +45,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Path("/faxConfig")
 @Component("FaxConfigWebService")
@@ -62,6 +58,9 @@ public class FaxConfigWebService extends AbstractServiceImpl
 
 	@Autowired
 	FaxConfigDao faxConfigDao;
+
+	@Autowired
+	FaxConfigService faxConfigService;
 
 	@GET
 	@Path("/search")
@@ -161,12 +160,28 @@ public class FaxConfigWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
 
-		SRFaxApiConnector apiConnector = new SRFaxApiConnector(accountSettingsTo1.getAccountLogin(), accountSettingsTo1.getPassword());
+		boolean success = faxConfigService.testConnectionStatus(accountSettingsTo1.getAccountLogin(), accountSettingsTo1.getPassword());
+		return RestResponse.successResponse(success);
+	}
+	@POST
+	@Path("/{id}/testConnection")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> testConnection(@PathParam("id") Integer id,
+	                                            FaxSettingsTransferInbound accountSettingsTo1)
+	{
+		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
 
-		Map<String, String> parameters = new HashMap<>();
-		SRFaxResultWrapper_List<SRFaxResult_GetUsage> result = apiConnector.Get_Fax_Usage(parameters);
-		boolean success = (result != null && result.isSuccess());
+		FaxConfig config = faxConfigDao.find(id);
 
+		// if the password is not changed, use the saved one
+		String password = accountSettingsTo1.getPassword();
+		if(password == null || password.isEmpty())
+		{
+			password = config.getFaxPasswd();
+		}
+		boolean success = faxConfigService.testConnectionStatus(config.getFaxUser(), password);
 		return RestResponse.successResponse(success);
 	}
 }

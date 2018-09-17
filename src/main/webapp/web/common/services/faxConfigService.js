@@ -123,7 +123,15 @@ angular.module("Common.Services").service("faxConfigService", [
 		{
 			var deferred = $q.defer();
 
-			junoHttp.post(service.apiPath + '/testConnection', transfer).then(
+			let id = transfer.id;
+			let url = service.apiPath + '/testConnection';
+
+			if(id && id != null && id !== '')
+			{
+				url = service.apiPath + '/' + transfer.id + '/testConnection'
+			}
+
+			junoHttp.post(url, transfer).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);
@@ -133,6 +141,7 @@ angular.module("Common.Services").service("faxConfigService", [
 					console.log("faxService::validateLogin error", error);
 					deferred.reject("An error occurred while testing connection");
 				});
+
 			return deferred.promise;
 		};
 

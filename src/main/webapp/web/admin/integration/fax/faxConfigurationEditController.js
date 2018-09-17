@@ -34,7 +34,7 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxCon
 					enabled: true,
 					enableInbound: false,
 					enableOutbound: false,
-					accountLogin: '',
+					accountLogin: null,
 					accountEmail: '',
 					password: '',
 					displayName: '',
