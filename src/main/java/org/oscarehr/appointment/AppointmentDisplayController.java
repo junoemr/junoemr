@@ -407,15 +407,15 @@ public class AppointmentDisplayController
 	public String getBillLink()
 	{
 		String province = OscarProperties.getInstance().getBillingTypeUpperCase();
-		String default_view = OscarProperties.getInstance().getProperty("default_view");
+		String defaultView = OscarProperties.getInstance().getProperty("default_view");
 		Demographic demographic = demographicDao.getDemographicById(appointment.getDemographicNo());
-		String referral_no_parameter = "";
+		String referralNoParameter = "";
 
 		if(oscar.OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc"))
 		{
 			String rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
 			rdohip = rdohip !=null ? rdohip : "" ;
-			referral_no_parameter = "&referral_no_1=" + rdohip;
+			referralNoParameter = "&referral_no_1=" + rdohip;
 		}
 
 		ProviderPreference preference = providerPreferenceDao.find(sessionProviderNo);
@@ -424,7 +424,7 @@ public class AppointmentDisplayController
 			String preferredView = preference.getDefaultServiceType();
 			if(preferredView != null && !preferredView.equals("no"))
 			{
-				default_view = preferredView;
+				defaultView = preferredView;
 			}
 		}
 
@@ -432,7 +432,7 @@ public class AppointmentDisplayController
 		{
 			return "../billing.do" +
 				"?billRegion=" + URLEncoder.encode(province, "UTF-8") +
-				"&billForm=" + URLEncoder.encode(default_view, "UTF-8") +
+				"&billForm=" + URLEncoder.encode(defaultView, "UTF-8") +
 				"&hotclick=" +
 				"&appointment_no=" + appointment.getAppointmentNo().toString() +
 				"&demographic_name=" + URLEncoder.encode(getName(), "UTF-8") +
@@ -443,7 +443,7 @@ public class AppointmentDisplayController
 				"&apptProvider_no=" + scheduleProviderNo +
 				"&appointment_date=" + appointment.getDate().format(dateFormatter) +
 				"&start_time=" + appointment.getStartTime().format(timeFormatter) +
-				"&bNewForm=1" + referral_no_parameter;
+				"&bNewForm=1" + referralNoParameter;
 		}
 		catch(UnsupportedEncodingException e)
 		{
