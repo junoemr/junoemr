@@ -38,6 +38,8 @@ import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.parser.CustomModelClassFactory;
+import ca.uhn.hl7v2.parser.ModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import com.google.common.collect.Sets;
@@ -47,11 +49,14 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
+import org.oscarehr.common.hl7.AHS.model.v23.message.ORM_002;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.parsers.AHS.v22.SpecimenGateHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIORMHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestORMHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.AITLHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIHandler;
@@ -145,30 +150,48 @@ public final class Factory {
 		HapiContext context = new DefaultHapiContext();
 		context.setValidationContext(new NoValidation());
 		Parser p = context.getPipeParser();
-		Message msg = p.parse(hl7Body);
 
-		// attempt to read the msh header and determine lab type handler
-		if(CLSHandler.handlerTypeMatch(msg))
-			handler = new CLSHandler(msg);
-		else if(CLSDIHandler.handlerTypeMatch(msg))
-			handler = new CLSDIHandler(msg);
-		else if(SunquestHandler.handlerTypeMatch(msg))
-			handler = new SunquestHandler(msg);
-		else if(SpecimenGateHandler.handlerTypeMatch(msg))
-			handler = new SpecimenGateHandler(msg);
-		else if(AITLHandler.handlerTypeMatch(msg))
-			handler = new AITLHandler(msg);
-		else if(GLSHandler.handlerTypeMatch(msg))
-			handler = new GLSHandler(msg);
-		else if(ProvlabHandler.handlerTypeMatch(msg))
-			handler = new ProvlabHandler(msg);
-		else if(JunoGenericLabHandler.handlerTypeMatch(msg))
-			handler = new JunoGenericLabHandler(msg);
+		if(hl7Body.contains("ORM^002"))
+		{
+			/* We need to use a custom HL7 message object because ORM^002 is not an official message type */
+			context.getParserConfiguration().setDefaultObx2Type("ST");
+			// this package string needs to match the custom model location in the oscar source code.
+			ModelClassFactory modelClassFactory = new CustomModelClassFactory(ORM_002.ROOT_PACKAGE);
+			context.setModelClassFactory(modelClassFactory);
+			Message msg = p.parse(hl7Body);
+
+			if(SunquestORMHandler.handlerTypeMatch(msg))
+				handler = new SunquestORMHandler(msg);
+			else if(CLSDIORMHandler.handlerTypeMatch(msg))
+				handler = new CLSDIORMHandler(msg);
+		}
+		else //handle default ORU^R01 messages
+		{
+			Message msg = p.parse(hl7Body);
+
+			// attempt to read the msh header and determine lab type handler
+			if(CLSHandler.handlerTypeMatch(msg))
+				handler = new CLSHandler(msg);
+			else if(CLSDIHandler.handlerTypeMatch(msg))
+				handler = new CLSDIHandler(msg);
+			else if(SunquestHandler.handlerTypeMatch(msg))
+				handler = new SunquestHandler(msg);
+			else if(SpecimenGateHandler.handlerTypeMatch(msg))
+				handler = new SpecimenGateHandler(msg);
+			else if(AITLHandler.handlerTypeMatch(msg))
+				handler = new AITLHandler(msg);
+			else if(GLSHandler.handlerTypeMatch(msg))
+				handler = new GLSHandler(msg);
+			else if(ProvlabHandler.handlerTypeMatch(msg))
+				handler = new ProvlabHandler(msg);
+			else if(JunoGenericLabHandler.handlerTypeMatch(msg))
+				handler = new JunoGenericLabHandler(msg);
+		}
 
 		if(handler == null)
 			throw new RuntimeException("Hl7 message/type does not match a known lab handler.");
 
-		logger.info("Loaded " + handler.getMsgType() + " HL7 Handler");
+		logger.info("Loaded " + handler.getMsgType() + " HL7 Handler " + handler.getClass().getSimpleName());
 		return handler;
 	}
 

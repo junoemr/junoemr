@@ -96,8 +96,7 @@ public class CLSDIHandler extends CLSHandler {
 	@Override
 	public String getServiceDate() {
 		try {
-			//String serviceDate = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getORC().getOrderEffectiveDateTime().getTimeOfAnEvent().getValue());
-			String serviceDate = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getObservationEndDateTime().getTimeOfAnEvent().getValue());
+			String serviceDate = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getObr8_ObservationEndDateTime().getTimeOfAnEvent().getValue());
 			return (formatDateTime(serviceDate));
 		}
 		catch (Exception e) {
@@ -109,7 +108,6 @@ public class CLSDIHandler extends CLSHandler {
 	public String getOBXResultStatus(int i, int j) {
 		String status = "";
 		try {
-			//status = getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservResultStatus().getValue());
 			status = getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getResultStatus().getValue());
 			if (status.equalsIgnoreCase("C")) {
 				status = "Corrected";
