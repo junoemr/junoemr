@@ -15,9 +15,15 @@ if(!authed) {
 
 <%
 
-String curUser_no = (String) session.getAttribute("user");
 String deepcolor = "#CCCCFF", weakcolor = "#EEEEFF";
 
+String limit = request.getParameter("limit")==null?"100":request.getParameter("limit");
+String offset = request.getParameter("offset")==null?"0":request.getParameter("offset");
+
+if(request.getParameter("resultLimit")!=null)
+{
+	limit = request.getParameter("resultLimit");
+}
 String startDate =null, endDate=null;
 if(request.getParameter("startDate")!=null) startDate = request.getParameter("startDate");  
 if(request.getParameter("endDate")!=null) endDate = request.getParameter("endDate");
@@ -48,20 +54,36 @@ if(request.getParameter("endDate")!=null) endDate = request.getParameter("endDat
 <title><bean:message key="report.reportnewdblist.title" /></title>
 <link rel="stylesheet" href="../css/receptionistapptstyle.css">
 <script language="JavaScript">
-<!--
 
-//-->
-</SCRIPT>
+function onResultLimitChange()
+{
+	var resultLimit = document.getElementById("resultLimit");
+	document.location.href='reportbcedblist.jsp?startDate=<%=request.getParameter("startDate")%>&endDate=<%=request.getParameter("endDate")%>&limit=' + resultLimit.options[resultLimit.selectedIndex].value + '&offset=<%=offset%>';
+}
+
+</script>
 <!--base target="pt_srch_main"-->
 </head>
 <body onLoad="setfocus()" topmargin="0" leftmargin="0" rightmargin="0">
 
 <table border="0" cellspacing="0" cellpadding="0" width="100%">
 	<tr bgcolor="<%=deepcolor%>">
-		<th><font face="Helvetica"><bean:message
-			key="report.reportnewdblist.msgEDDList" /></font></th>
+		<th colspan="2">
+			<font face="Helvetica"><bean:message key="report.reportnewdblist.msgEDDList" /></font>
+		</th>
 	</tr>
 	<tr>
+		<td>
+			<div class="pageLimiter">
+				<label>Result Limit:</label>
+				<select name="resultLimit" id="resultLimit" onchange="onResultLimitChange();">
+					<option value="100" <%= limit.equals("100") ? "selected='selected'" : "" %>>100</option>
+					<option value="250" <%= limit.equals("250") ? "selected='selected'" : "" %>>250</option>
+					<option value="500" <%= limit.equals("500") ? "selected='selected'" : "" %>>500</option>
+					<option value="1000"<%= limit.equals("1000") ? "selected='selected'" : "" %>>1000</option>
+				</select>
+			</div>
+		</td>
 		<td align="right"><input type="button" name="Button"
 			value="<bean:message key="global.btnPrint"/>"
 			onClick="window.print()"> <input type="button" name="Button"
@@ -104,7 +126,7 @@ if(request.getParameter("endDate")!=null) endDate = request.getParameter("endDat
   boolean bodd=false;
   int nItems=0;
 
-  for(Object[] result : formsDao.selectBcFormAr(startDate, endDate)) {
+  for(Object[] result : formsDao.selectBcFormAr(startDate, endDate, Integer.parseInt(limit), Integer.parseInt(offset))) {
  	String demographicNo = ((Integer)result[0]).toString();
  	Date cEDD = (Date)result[1];
  	String surname = (String)result[2];
@@ -145,5 +167,21 @@ if(request.getParameter("endDate")!=null) endDate = request.getParameter("endDat
 %>
 
 </table>
+<br>
+<%
+  int nextOffset = Integer.parseInt(offset) + Integer.parseInt(limit);
+  int prevOffset = Integer.parseInt(offset) - Integer.parseInt(limit);
+  if(prevOffset>=0) {
+%> <a
+		href="reportbcedblist.jsp?startDate=<%=request.getParameter("startDate")%>&endDate=<%=request.getParameter("endDate")%>&limit=<%=limit%>&offset=<%=prevOffset%>"><bean:message
+		key="report.reportnewdblist.msgLastPage" /></a> | <%
+  }
+
+  if(nItems==Integer.parseInt(limit)) {
+%> <a
+		href="reportbcedblist.jsp?startDate=<%=request.getParameter("startDate")%>&endDate=<%=request.getParameter("endDate")%>&limit=<%=limit%>&offset=<%=nextOffset%>">
+	<bean:message key="report.reportnewdblist.msgNextPage" /></a> <%
+}
+%>
 </body>
 </html:html>

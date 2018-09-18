@@ -74,21 +74,25 @@ public class FormsDao {
 	}
 
 	@NativeSql("formBCAR")
-	public List<Object[]> selectBcFormAr(String beginEdd, String endEdd) {
+	public List<Object[]> selectBcFormAr(String beginEdd, String endEdd, int limit, int offset) {
 		String sql = "select demographic_no, c_EDD, c_surname,c_givenName, pg1_ageAtEDD, pg1_dateOfBirth, pg1_langPref, c_phn, pg1_gravida, pg1_term, c_phone, c_phyMid, ar2_doula, ar2_doulaNo, provider_no from formBCAR where c_EDD >= ? and c_EDD <= ? order by c_EDD desc, ID desc";
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter(1, beginEdd);
 		query.setParameter(2, endEdd);
+		query.setMaxResults(limit);
+		query.setFirstResult(offset);
 		
 		return query.getResultList();
 	}
 	
 	@NativeSql("formBCAR2007")
-	public List<Object[]> selectBcFormAr2007(String beginEdd, String endEdd) {
+	public List<Object[]> selectBcFormAr2007(String beginEdd, String endEdd, int limit, int offset) {
 		String sql = "select demographic_no, c_EDD, c_surname,c_givenName, pg1_ageAtEDD, pg1_dateOfBirth, pg1_langPref, c_phn, pg1_gravida, pg1_term, c_phone, pg2_doula, pg2_doulaNo, provider_no from formBCAR2007 f1 where c_EDD >= ? and c_EDD <= ? and formEdited = (SELECT MAX(formEdited) FROM formBCAR2007 f2 WHERE f1.demographic_no = f2.demographic_no) order by c_EDD desc, ID desc";
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter(1, beginEdd);
 		query.setParameter(2, endEdd);
+		query.setMaxResults(limit);
+		query.setFirstResult(offset);
 		
 		return query.getResultList();
 	}
