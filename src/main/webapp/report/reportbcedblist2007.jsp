@@ -42,11 +42,6 @@ if(!authed) {
 String curUser_no = (String) session.getAttribute("user");
 String deepcolor = "#CCCCFF", weakcolor = "#EEEEFF";
 
-String limit="15";
-String offset="0";
-if(request.getParameter("limit1")!=null) limit = request.getParameter("limit1");
-if(request.getParameter("limit2")!=null) offset = request.getParameter("limit2");
-
 String startDate =null, endDate=null;
 if(request.getParameter("startDate")!=null) startDate = request.getParameter("startDate");  
 if(request.getParameter("endDate")!=null) endDate = request.getParameter("endDate");
@@ -134,7 +129,7 @@ if(request.getParameter("endDate")!=null) endDate = request.getParameter("endDat
   boolean bodd=false;
   int nItems=0;
   
-  for(Object[] result : formsDao.selectBcFormAr2007(startDate, endDate, Integer.parseInt(limit), Integer.parseInt(offset))) {
+  for(Object[] result : formsDao.selectBcFormAr2007(startDate, endDate)) {
 
 	 	String demographicNo = ((Integer)result[0]).toString();
 	 	String cEDD = ConversionUtils.toDateString((java.util.Date)result[1]);
@@ -174,25 +169,6 @@ if(request.getParameter("endDate")!=null) endDate = request.getParameter("endDat
 %>
 
 </table>
-<br>
-<%
-  //int nLastPage=0,nNextPage=0;
-  //nNextPage=Integer.parseInt(strLimit2)+Integer.parseInt(strLimit1);
-  //nLastPage=Integer.parseInt(strLimit1)-Integer.parseInt(strLimit2);
-  int nextOffset = Integer.parseInt(offset) + Integer.parseInt(limit);
-  int prevOffset = Integer.parseInt(offset) - Integer.parseInt(limit);
-  if(prevOffset>=0) {
-%> <a
-	href="reportbcedblist2007.jsp?startDate=<%=request.getParameter("startDate")%>&endDate=<%=request.getParameter("endDate")%>&limit1=<%=limit%>&limit2=<%=prevOffset%>"><bean:message
-	key="report.reportnewdblist.msgLastPage" /></a> | <%
-  }
-  if(nItems==Integer.parseInt(limit)) {
-  	MiscUtils.getLogger().info("HERE");
-%> <a
-	href="reportbcedblist2007.jsp?startDate=<%=request.getParameter("startDate")%>&endDate=<%=request.getParameter("endDate")%>&limit1=<%=limit%>&limit2=<%=nextOffset%>">
-<bean:message key="report.reportnewdblist.msgNextPage" /></a> <%
-}
-%>
 
 </body>
 </html:html>

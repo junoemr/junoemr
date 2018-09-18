@@ -18,11 +18,6 @@ if(!authed) {
 String curUser_no = (String) session.getAttribute("user");
 String deepcolor = "#CCCCFF", weakcolor = "#EEEEFF";
 
-String limit="15";
-String offset="0";
-if(request.getParameter("limit")!=null) limit = request.getParameter("limit");
-if(request.getParameter("offset")!=null) offset = request.getParameter("offset");
-
 String startDate =null, endDate=null;
 if(request.getParameter("startDate")!=null) startDate = request.getParameter("startDate");  
 if(request.getParameter("endDate")!=null) endDate = request.getParameter("endDate");
@@ -109,9 +104,8 @@ if(request.getParameter("endDate")!=null) endDate = request.getParameter("endDat
     
   boolean bodd=false;
   int nItems=0;
-		MiscUtils.getLogger().info("LIMIT: " + Integer.parseInt(limit));
-		MiscUtils.getLogger().info("OFFSET: " + Integer.parseInt(offset));
-  for(Object[] result : formsDao.selectBcFormAr(startDate, endDate, Integer.parseInt(limit), Integer.parseInt(offset))) {
+
+  for(Object[] result : formsDao.selectBcFormAr(startDate, endDate)) {
  	String demographicNo = ((Integer)result[0]).toString();
  	Date cEDD = (Date)result[1];
  	String surname = (String)result[2];
@@ -152,24 +146,5 @@ if(request.getParameter("endDate")!=null) endDate = request.getParameter("endDat
 %>
 
 </table>
-<br>
-<%
-  //int nLastPage=0,nNextPage=0;
-  //nNextPage=Integer.parseInt(offset)+Integer.parseInt(limit);
-  //nLastPage=Integer.parseInt(limit)-Integer.parseInt(offset);
-  int nextOffset = Integer.parseInt(offset) + Integer.parseInt(limit);
-  int prevOffset = Integer.parseInt(offset) - Integer.parseInt(limit);
-  if(prevOffset>=0) {
-%> <a
-	href="reportbcedblist.jsp?startDate=<%=request.getParameter("startDate")%>&endDate=<%=request.getParameter("endDate")%>&limit=<%=limit%>&offset<%=prevOffset%>"><bean:message
-	key="report.reportnewdblist.msgLastPage" /></a> | <%
-  }
-  if(nItems>Integer.parseInt(limit)) {
-%> <a
-	href="reportbcedblist.jsp?startDate=<%=request.getParameter("startDate")%>&endDate=<%=request.getParameter("endDate")%>&limit=<%=limit%>&offset=<%=nextOffset%>">
-<bean:message key="report.reportnewdblist.msgNextPage" /></a> <%
-}
-%>
-
 </body>
 </html:html>
