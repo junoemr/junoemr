@@ -55,7 +55,6 @@ if(request.getParameter("endDate")!=null) endDate = request.getParameter("endDat
 <%@ page import="org.oscarehr.common.dao.forms.FormsDao" %>
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@ page import="java.util.Date" %>
-<%@ page import="org.oscarehr.util.MiscUtils" %>
 
 <%
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);

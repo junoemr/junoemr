@@ -31,7 +31,6 @@ if(request.getParameter("endDate")!=null) endDate = request.getParameter("endDat
 <%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ page import="org.oscarehr.common.dao.forms.FormsDao" %>
-<%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.text.DateFormat" %>
