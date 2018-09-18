@@ -38,6 +38,8 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.dms.EDocUtil;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.oscarEncounter.data.EctProgram;
 import oscar.util.FaxUtils;
 
@@ -125,6 +127,8 @@ public class SendFaxPDFAction extends DispatchAction {
 							programNo, faxNo, Long.valueOf(docNo));
 					}
 				}
+				LogAction.addLogEntry(providerNo, demographicId, LogConst.SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
+						docNo, request.getRemoteAddr(), "Document " + docNo);
 			}
 			if (errorList.size() != 0)
 			{

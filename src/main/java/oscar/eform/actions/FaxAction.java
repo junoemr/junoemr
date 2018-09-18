@@ -18,6 +18,8 @@ import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -31,12 +33,14 @@ public final class FaxAction
 
 	private final String localUri;
 	private final boolean skipSave;
+	private final String requestIp;
 
 	public FaxAction(HttpServletRequest request)
 	{
 		localUri = WKHtmlToPdfUtils.getEformRequestUrl(request.getParameter("providerId"),
 				"", request.getScheme(), request.getContextPath());
 		skipSave = "true".equals(request.getParameter("skipSave"));
+		requestIp = request.getRemoteAddr();
 	}
 
 	/**
@@ -66,6 +70,8 @@ public final class FaxAction
 			GenericFile fileToFax = FileFactory.getExistingFile(tempFile);
 			outgoingFaxService.sendFax(providerId, null, recipient, fileToFax);
 		}
+		LogAction.addLogEntry(providerId, null, LogConst.SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
+				formId, requestIp, "EForm " + formId);
 
 		if (skipSave)
 		{

@@ -162,7 +162,12 @@ public class OutgoingFaxService
 		HashSet<String> recipients = new HashSet<>(faxNumberList.length);
 		for(String faxNumber : faxNumberList)
 		{
-			recipients.add(faxNumber.trim().replaceAll("\\D", ""));
+			String formattedFaxNo = faxNumber.trim().replaceAll("\\D", "");
+			if(formattedFaxNo.length() < 7)
+			{
+				throw new RuntimeException("Invalid Fax Number: " + faxNumber);
+			}
+			recipients.add(formattedFaxNo);
 		}
 		return recipients;
 	}

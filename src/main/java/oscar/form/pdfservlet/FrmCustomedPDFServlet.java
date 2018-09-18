@@ -74,8 +74,8 @@ public class FrmCustomedPDFServlet extends HttpServlet {
 	private OscarProperties props = OscarProperties.getInstance();
 
 	@Override
-    public void service(HttpServletRequest req, HttpServletResponse res) throws javax.servlet.ServletException, java.io.IOException {
-
+    public void service(HttpServletRequest req, HttpServletResponse res) throws java.io.IOException
+	{
 		logger.info("CREATE CUSTOM RX PDF SERVICE");
 
 		ByteArrayOutputStream baosPDF = null;
