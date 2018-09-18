@@ -141,7 +141,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 
 	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
-	public RangeMap<LocalTime, ScheduleSlot> findScheduleSlots(LocalDate date, Integer providerNo)
+	public RangeMap<LocalTime, ScheduleSlot> findScheduleSlots(LocalDate date, String providerNo)
 	{
 		// This query is a bit hard to read.  The mess with all of the UNION ALLs is a way to make a
 		// sequence of numbers.  This is then used to find the position in the scheduletemplate.timecode
