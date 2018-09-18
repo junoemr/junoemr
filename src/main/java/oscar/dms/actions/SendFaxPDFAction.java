@@ -46,6 +46,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Set;
 
 
 /**
@@ -73,7 +74,6 @@ public class SendFaxPDFAction extends DispatchAction {
 		MiscUtils.getLogger().info("======================================================");
 
 		Integer demographicId = Integer.parseInt(demoNo);
-		Integer providerId = Integer.parseInt(providerNo);
 
         String[] docNoArray = request.getParameterValues("docNo");
 		String[] recipients = request.getParameterValues("faxRecipients");
@@ -92,9 +92,9 @@ public class SendFaxPDFAction extends DispatchAction {
 				String docNo = docNoArray[i];
 				String filename =  docData.getDocumentName(docNo);
 
-				for (int j = 0; j < recipients.length; j++)
+				Set<String> faxNoList = OutgoingFaxService.preProcessFaxNumbers(recipients);
+				for(String faxNo : faxNoList)
 				{
-					String faxNo = recipients[j].replaceAll("\\D", "");
 					try
 					{
 						GenericFile fileToCopy = FileFactory.getDocumentFile(docData.getDocumentName(docNo));
@@ -103,20 +103,20 @@ public class SendFaxPDFAction extends DispatchAction {
 						String faxFileName = "DOC-"+ docNo + "-" + filename + "-" + faxNo + "." + System.currentTimeMillis();
 						fileToFax.rename(faxFileName + ".pdf");
 
-						outgoingFaxService.sendFax(providerId, demographicId, faxNo, fileToFax);
+						outgoingFaxService.sendFax(providerNo, demographicId, faxNo, fileToFax);
 					}
 					catch(Exception e)
 					{
 						MiscUtils.getLogger().error(e.getClass().getCanonicalName() +
 								" occurred while preparing document fax files.", e);
-						String errorAt = " (Document: " + filename + " Recipient: " + recipients[j] + ")";
+						String errorAt = " (Document: " + filename + " Recipient: " + faxNo + ")";
 						errorList.add(getUserFriendlyError(e) + errorAt);
 						continue;
 					}
 
 					/* -- OHSUPPORT-2932 -- */
 					if(OscarProperties.getInstance().isPropertyActive(
-						"encounter_notes_add_fax_notes_consult") && demoNo != "-1")
+						"encounter_notes_add_fax_notes_consult") && !demoNo.equals("-1"))
 					{
 						MiscUtils.getLogger().info("SAVING NOTE FOR " + demoNo);
 						String programNo = 
@@ -149,14 +149,14 @@ public class SendFaxPDFAction extends DispatchAction {
 		String pdfPath = (String) request.getAttribute("pdfPath");
 		String formName = (String) request.getAttribute("formName");
 
-		ArrayList<Object> errorList = new ArrayList<Object>();
+		ArrayList<Object> errorList = new ArrayList<>();
 		for (int i = 0; i < recipients.length; i++)
 		{
 			try
 			{
 				GenericFile fileToFax = FileFactory.getExistingFile(pdfPath);
 				fileToFax.rename("Form-" + formName);
-				outgoingFaxService.sendFax(Integer.parseInt(providerNo), null, recipients[i], fileToFax);
+				outgoingFaxService.sendFax(providerNo, null, recipients[i], fileToFax);
 			}
 			catch (Exception e)
 			{

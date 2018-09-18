@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.result.SRFaxResultWrapper_List;
 import org.oscarehr.fax.externalApi.srfax.result.SRFaxResult_GetUsage;
-import org.oscarehr.ws.rest.FaxConfigWebService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +41,7 @@ import java.util.Map;
 @Transactional
 public class FaxConfigService
 {
-	private static Logger logger = Logger.getLogger(FaxConfigService.class);
+	private static final Logger logger = Logger.getLogger(FaxConfigService.class);
 
 	/**
 	 * Test the connection to the fax service based on the configuration settings
@@ -63,7 +62,7 @@ public class FaxConfigService
 		parameters.put("sEndDate", currentDateStr);
 		SRFaxResultWrapper_List<SRFaxResult_GetUsage> result = apiConnector.Get_Fax_Usage(parameters);
 
-		logger.debug( result == null ? "null" : result.toString());
+		logger.info(String.valueOf(result));
 
 		return (result != null && result.isSuccess());
 	}

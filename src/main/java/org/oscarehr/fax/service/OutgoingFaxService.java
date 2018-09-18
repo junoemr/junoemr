@@ -27,13 +27,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.dao.FaxConfigDao;
 import org.oscarehr.fax.dao.FaxJobDao;
-import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.fax.model.FaxJob;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.result.SRFaxResultWrapper_Single;
 import org.oscarehr.fax.model.FaxConfig;
+import org.oscarehr.fax.model.FaxJob;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -55,16 +56,18 @@ public class OutgoingFaxService
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
+	private static final String TYPE_SRFAX = "SRFAX";
+
 	@Autowired
 	FaxJobDao faxJobDao;
 
 	@Autowired
 	FaxConfigDao faxConfigDao;
 
-	public void sendFax(Integer providerId, Integer demographicId, String faxNumber, GenericFile...filesToFax) throws IOException
+	public void sendFax(String providerId, Integer demographicId, String faxNumber, GenericFile...filesToFax) throws IOException
 	{
 
-		List<FaxConfig> faxConfigList = faxConfigDao.findByActiveStatus(true, 0, 1);
+		List<FaxConfig> faxConfigList = faxConfigDao.findByActiveOutbound(true, true, 0, 1);
 		if(faxConfigList.isEmpty())
 		{
 			writeToFaxOutgoing(faxNumber, filesToFax);
@@ -92,7 +95,7 @@ public class OutgoingFaxService
 		}
 	}
 
-	private void sendBySRFax(Integer providerId, Integer demographicId, FaxConfig faxSettings, String faxNumber, GenericFile...filesToFax) throws IOException
+	private void sendBySRFax(String providerId, Integer demographicId, FaxConfig faxSettings, String faxNumber, GenericFile...filesToFax) throws IOException
 	{
 		SRFaxApiConnector apiConnector = new SRFaxApiConnector(faxSettings.getFaxUser(), faxSettings.getFaxPasswd());
 
@@ -101,7 +104,12 @@ public class OutgoingFaxService
 		parameters.put("sSenderEmail", faxSettings.getSiteUser());
 		parameters.put("sFaxType", "SINGLE");
 		parameters.put("sToFaxNumber", faxNumber);
-		parameters.put("sCoverPage", faxSettings.getCoverLetterOption());
+
+		String coverLetterOption = faxSettings.getCoverLetterOption();
+		if(coverLetterOption != null && SRFaxApiConnector.validCoverLetterNames.contains(coverLetterOption))
+		{
+			parameters.put("sCoverPage", coverLetterOption);
+		}
 
 		int counter = 1;
 		for(GenericFile fileToFax : filesToFax)
@@ -132,13 +140,13 @@ public class OutgoingFaxService
 				faxJob.setStatus(FaxJob.STATUS.ERROR);
 			}
 
-			faxJob.setDestination("SRFAX");
-			faxJob.setFax_line(null);
+			faxJob.setDestination(faxNumber);
+			faxJob.setFax_line(TYPE_SRFAX);
 			faxJob.setFile_name(fileToFax.getName());
 			faxJob.setUser(faxSettings.getFaxUser());
 			faxJob.setNumPages(fileToFax.getPageCount());
 			faxJob.setStamp(new Date());
-			faxJob.setOscarUser(String.valueOf(providerId));
+			faxJob.setOscarUser(providerId);
 			faxJob.setDemographicNo(demographicId);
 			faxJobDao.persist(faxJob);
 		}
@@ -146,6 +154,17 @@ public class OutgoingFaxService
 		{
 			throw new RuntimeException("Failed to fax: " + resultWrapper.getError());
 		}
+	}
+
+	/** Remove duplicate phone numbers and all non digit characters from fax numbers. */
+	public static HashSet<String> preProcessFaxNumbers(String...faxNumberList)
+	{
+		HashSet<String> recipients = new HashSet<>(faxNumberList.length);
+		for(String faxNumber : faxNumberList)
+		{
+			recipients.add(faxNumber.trim().replaceAll("\\D", ""));
+		}
+		return recipients;
 	}
 
 	private String toBase64String(GenericFile file) throws IOException

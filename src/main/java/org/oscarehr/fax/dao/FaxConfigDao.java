@@ -55,4 +55,34 @@ public class FaxConfigDao extends AbstractDao<FaxConfig>
 
 		return query.getResultList();
 	}
+
+	public List<FaxConfig> findByActiveInbound(boolean isActive, boolean activeInbound, int offset, int limit)
+	{
+		Query query = entityManager.createQuery(
+				"SELECT config FROM FaxConfig config " +
+				"WHERE config.active = :active " +
+				"AND config.activeInbound = :activeInbound"
+		);
+		query.setParameter("active", isActive);
+		query.setParameter("activeInbound", activeInbound);
+		query.setMaxResults(limit);
+		query.setFirstResult(offset);
+
+		return query.getResultList();
+	}
+
+	public List<FaxConfig> findByActiveOutbound(boolean isActive, boolean activeOutbound, int offset, int limit)
+	{
+		Query query = entityManager.createQuery(
+				"SELECT config FROM FaxConfig config " +
+						"WHERE config.active = :active " +
+						"AND config.activeOutbound = :activeOutbound"
+		);
+		query.setParameter("active", isActive);
+		query.setParameter("activeOutbound", activeOutbound);
+		query.setMaxResults(limit);
+		query.setFirstResult(offset);
+
+		return query.getResultList();
+	}
 }

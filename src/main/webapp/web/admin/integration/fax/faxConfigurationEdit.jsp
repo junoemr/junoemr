@@ -54,12 +54,12 @@
 		</div>
 		<hr>
 		<div class="flex-row">
-			<label class="flex-row-label" for="input-fax-account-name">Display Name</label>
+			<label class="flex-row-label" for="input-fax-account-name">Internal Name</label>
 			<input class="flex-row-content" id="input-fax-account-name" type="text"
 			       ng-model="faxConfigEditController.faxAccount.displayName">
 		</div>
 		<div class="flex-row">
-			<label class="flex-row-label" for="input-fax-account-email">Response Email</label>
+			<label class="flex-row-label" for="input-fax-account-email">Notification Email</label>
 			<input class="flex-row-content" id="input-fax-account-email" type="text"
 			       ng-model="faxConfigEditController.faxAccount.accountEmail">
 		</div>

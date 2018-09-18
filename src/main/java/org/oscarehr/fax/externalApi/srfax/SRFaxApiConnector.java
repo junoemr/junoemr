@@ -58,6 +58,13 @@ public class SRFaxApiConnector
 	private final String access_id;
 	private final String access_pwd;
 
+	public static final List<String> validCoverLetterNames = new ArrayList<String>(4) {{
+		add("Basic");
+		add("Standard");
+		add("Company");
+		add("Personal");
+	}};
+
 	public SRFaxApiConnector(String username, String password)
 	{
 		this.access_id = username;
