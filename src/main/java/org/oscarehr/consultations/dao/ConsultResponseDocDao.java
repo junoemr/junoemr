@@ -23,18 +23,20 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.consultations.dao;
 
 import java.util.List;
 
 import javax.persistence.Query;
 
+import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.common.model.ConsultResponseDoc;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class ConsultResponseDocDao extends AbstractDao<ConsultResponseDoc>{
+public class ConsultResponseDocDao extends AbstractDao<ConsultResponseDoc>
+{
 	public ConsultResponseDocDao() {
 		super(ConsultResponseDoc.class);
 	}
