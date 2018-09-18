@@ -37,6 +37,7 @@ import org.oscarehr.common.model.ConsultationResponse;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.consultations.ConsultationResponseSearchFilter;
+import org.oscarehr.consultations.dao.ConsultResponseDao;
 import org.oscarehr.util.SpringUtils;
 
 public class ConsultResponseDaoTest extends DaoTestFixtures {

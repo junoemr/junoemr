@@ -32,16 +32,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class LetterheadTo1 implements Serializable {
+public class LetterheadTo1 implements Serializable
+{
 	private static final long serialVersionUID = 1L;
 	
 	private String id;
 	private String name;
 	private String address;
 	private String phone;
+	private String fax;
 	
 	public LetterheadTo1() {}
-	public LetterheadTo1(String id, String name) {
+	public LetterheadTo1(String id, String name)
+	{
 		setId(id);
 		setName(name);
 	}
@@ -76,5 +79,15 @@ public class LetterheadTo1 implements Serializable {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public String getFax()
+	{
+		return fax;
+	}
+
+	public void setFax(String fax)
+	{
+		this.fax = fax;
 	}
 }
