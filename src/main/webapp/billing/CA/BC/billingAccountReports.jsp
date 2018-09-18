@@ -67,21 +67,24 @@
             var frm = document.forms[0],
                 repType = frm.repType.value;
 
-            if(repType === "REP_INVOICE" || repType === "REP_ACCOUNT_REC" || repType === "REP_REJ"){
+            if (repType === "REP_INVOICE" || repType === "REP_ACCOUNT_REC" || repType === "REP_REJ") {
+                // Forms won't submit disabled elements, this is a purely cosmetic indicator for the user.
+                frm.selProv.value = 'ALL';
+                frm.selPayee.value = 'ALL';
+
                 frm.selProv.disabled = true;
                 frm.selPayee.disabled = true;
+            } else {
+            	frm.selProv.disabled = false;
+            	frm.selPayee.disabled = false;
             }
-
-            frm.selProv.disabled = false;
-            frm.selPayee.disabled = false;
-            frm.selAccount.disabled = false;
         }
 
         function clearField(field){
-            if(field === "xml_appointment_date"){
+            if (field === "xml_appointment_date") {
                 document.forms[0].xml_appointment_date.value = ""
             }
-            else if(field === "xml_vdate"){
+            else if (field === "xml_vdate") {
                 document.forms[0].xml_vdate.value = ""
             }
         }
@@ -124,11 +127,14 @@
 		<td>
 			<table width="100%" border="1" cellspacing="0" cellpadding="0">
 				<tr bgcolor="#FFFFFF">
-					<div align="right">
-						<a href="javascript: return false;" class="rowText"
-						   onClick="popupPage(700,720,'../../../oscarReport/manageProvider.jsp?action=billingreport', 'attachment')">
-							Manage Provider List</a>
-					</div>
+					<td>
+						<div align="right">
+							<a href="javascript: return false;" class="rowText"
+							   onClick="popupPage(700,720,'../../../oscarReport/manageProvider.jsp?action=billingreport', 'attachment')">
+								Manage Provider List
+							</a>
+						</div>
+					</td>
 				</tr>
 			</table>
 			<table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -137,8 +143,8 @@
 					<td class="pageTitle" align="right"><%=DateUtils.sumDate("yyyy-M-d","0")%></td>
 				</tr>
 			</table>
-			<table width="100%" border="0" bgcolor="#EEEEFF">
-				<form action="createBillingReportAction.do">
+			<form action="createBillingReportAction.do">
+				<table width="100%" border="0" bgcolor="#EEEEFF">
 					<tr>
 						<td width="34%" class="rowLabel">Select Payee</td>
 						<td width="66%" class="bCellData">
@@ -251,15 +257,17 @@
 							</div>
 						</td>
 					</tr>
-				</form>
-			</table>
+				</table>
+			</form>
+
 			<script language='javascript'>
                 Calendar.setup ({
                     inputField:"xml_vdate",
                     ifFormat:"%Y-%m-%d",
                     showsTime:false,
                     button:"hlSDate",
-                    singleClick:true,step:1
+                    singleClick:true,
+					step:1
                 });
                 Calendar.setup ({
                     inputField:"xml_appointment_date",
