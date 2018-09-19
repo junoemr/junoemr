@@ -1329,12 +1329,12 @@ private long getAppointmentRowSpan(
 
 						for(UserDateSchedule schedule: schedules)
 						{
-							Integer scheduleProviderNo = schedule.getProviderNo();
+							String scheduleProviderNo = schedule.getProviderNo();
 
 							headerColor = !headerColor;
 
 							boolean notOnSchedule = false;
-							if(!viewall.equals("1") && scheduleProviderNo == Integer.parseInt(curUser_no) && !schedule.hasSchedule())
+							if(!viewall.equals("1") && scheduleProviderNo.equals(curUser_no) && !schedule.hasSchedule())
 							{
 								notOnSchedule = true;
 							}
