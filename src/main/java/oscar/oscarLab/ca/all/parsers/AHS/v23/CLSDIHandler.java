@@ -41,8 +41,10 @@ import org.oscarehr.util.SpringUtils;
 public class CLSDIHandler extends CLSHandler {
 
 	private static Logger logger = Logger.getLogger(CLSDIHandler.class);
-
 	private static Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
+
+	protected static final String CLSDI_SENDING_APPLICATION = "OPEN ENGINE";
+	protected static final String CLSDI_SENDING_FACILITY = "DI";
 
 	public static boolean handlerTypeMatch(Message message)
 	{
@@ -55,8 +57,8 @@ public class CLSDIHandler extends CLSHandler {
 			String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
 
-			return "OPEN ENGINE".equalsIgnoreCase(sendingApplication) &&
-					"DI".equalsIgnoreCase(sendingFacility);
+			return CLSDI_SENDING_APPLICATION.equalsIgnoreCase(sendingApplication) &&
+					CLSDI_SENDING_FACILITY.equalsIgnoreCase(sendingFacility);
 		}
 		return false;
 	}

@@ -27,7 +27,7 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import org.oscarehr.common.hl7.AHS.model.v23.message.ORM_002;
 
-public class CLSDIORMHandler extends SunquestHandler
+public class CLSDIORMHandler extends CLSDIHandler
 {
 	public static boolean handlerTypeMatch(Message message)
 	{
@@ -40,8 +40,8 @@ public class CLSDIORMHandler extends SunquestHandler
 			String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
 
-			return "OPEN ENGINE".equalsIgnoreCase(sendingApplication) &&
-					"DI".equalsIgnoreCase(sendingFacility);
+			return CLSDI_SENDING_APPLICATION.equalsIgnoreCase(sendingApplication) &&
+					CLSDI_SENDING_FACILITY.equalsIgnoreCase(sendingFacility);
 		}
 		return false;
 	}

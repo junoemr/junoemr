@@ -151,7 +151,8 @@ public final class Factory {
 		context.setValidationContext(new NoValidation());
 		Parser p = context.getPipeParser();
 
-		if(hl7Body.contains("ORM^002"))
+		String[] mshSplit = hl7Body.split("\\|", 12);
+		if(mshSplit[8].equals("ORM^002"))
 		{
 			/* We need to use a custom HL7 message object because ORM^002 is not an official message type */
 			context.getParserConfiguration().setDefaultObx2Type("ST");
