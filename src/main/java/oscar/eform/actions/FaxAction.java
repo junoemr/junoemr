@@ -54,19 +54,19 @@ public final class FaxAction
 	 */
 	public void faxForms(String[] numbers, String formId, String providerId) throws IOException, HtmlToPdfConversionException
 	{
-		logger.info("Generating PDF for eForm with fdid = " + formId);
-
-		String pdfFile = "EForm." + formId + "-" + System.currentTimeMillis();
-		File tempFile = File.createTempFile(pdfFile, ".pdf");
-
-		// convert to PDF
-		String viewUri = localUri + formId;
-		logger.info("Converting eForm content to pdf. Target file: " + tempFile.getCanonicalPath());
-		WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
-
 		HashSet<String> recipients = OutgoingFaxService.preProcessFaxNumbers(numbers);
 		for (String recipient : recipients)
 		{
+			logger.info("Generating PDF for eForm with fdid = " + formId);
+
+			String pdfFile = "EForm." + formId + "-" + System.currentTimeMillis();
+			File tempFile = File.createTempFile(pdfFile, ".pdf");
+
+			// convert to PDF
+			String viewUri = localUri + formId;
+			logger.info("Converting eForm content to pdf. Target file: " + tempFile.getCanonicalPath());
+			WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
+
 			GenericFile fileToFax = FileFactory.getExistingFile(tempFile);
 			outgoingFaxService.sendFax(providerId, null, recipient, fileToFax);
 		}

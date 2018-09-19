@@ -208,7 +208,7 @@ public class DocumentService
 			{
 				formattedFileName = GenericFile.getFormattedFileName(documentFileName);
 				// get a tempfile. it will replace the existing doc at last step of the transaction
-				tempFile = FileFactory.createTempFile(documentInputStream);
+				tempFile = FileFactory.createTempFile(documentInputStream, "_tempdoc");
 				// validate the file & content
 				if(!tempFile.validate())
 				{

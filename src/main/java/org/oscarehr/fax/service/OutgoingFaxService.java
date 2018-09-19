@@ -88,7 +88,7 @@ public class OutgoingFaxService
 	{
 		for(GenericFile fileToFax : filesToFax)
 		{
-			GenericFile faxNoFile = FileFactory.createTempFile(new ByteArrayInputStream(faxNumber.getBytes()));
+			GenericFile faxNoFile = FileFactory.createTempFile(new ByteArrayInputStream(faxNumber.getBytes()), ".txt");
 			String filenameWithoutExt = FilenameUtils.removeExtension(fileToFax.getFileObject().getName());
 			faxNoFile.rename(filenameWithoutExt + ".txt");
 
@@ -123,12 +123,13 @@ public class OutgoingFaxService
 
 		// external api call
 		SRFaxResultWrapper_Single<Integer> resultWrapper = apiConnector.Queue_Fax(parameters);
+		boolean sendSuccess = resultWrapper.isSuccess();
 
 		for(GenericFile fileToFax : filesToFax)
 		{
 			FaxJob faxJob = new FaxJob();
 
-			if(resultWrapper.isSuccess())
+			if(sendSuccess)
 			{
 				logger.info("Fax send success " + String.valueOf(resultWrapper.getResult()));
 				faxJob.setStatus(FaxJob.STATUS.SENT);
@@ -149,12 +150,10 @@ public class OutgoingFaxService
 			faxJob.setProviderNo(providerId);
 			faxJob.setDemographicNo(demographicId);
 			faxJobDao.persist(faxJob);
-		}
-		try
-		{
-			for(GenericFile fileToFax : filesToFax)
+
+			try
 			{
-				if(resultWrapper.isSuccess())
+				if(sendSuccess)
 				{
 					fileToFax.moveToOutgoingFaxSent();
 				}
@@ -163,16 +162,17 @@ public class OutgoingFaxService
 					fileToFax.moveToOutgoingFaxUnsent();
 				}
 			}
-		}
-		catch(IOException e)
-		{
-			// don't throw exceptions here.
-			// fax may have been sent in which case we want to report a success
-			logger.error("Error Moving File", e);
+			catch(IOException e)
+			{
+				// don't throw exceptions here.
+				// fax may have been sent in which case we want to report a success
+				logger.error("Error Moving Fax File", e);
+			}
 		}
 
-		if(!resultWrapper.isSuccess())
+		if(!sendSuccess)
 		{
+			// throw special exception that will not rollback the above transaction
 			throw new FaxApiException("Failed to fax: " + resultWrapper.getError());
 		}
 	}

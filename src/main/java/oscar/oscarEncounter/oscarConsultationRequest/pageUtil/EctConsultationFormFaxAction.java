@@ -105,6 +105,7 @@ public class EctConsultationFormFaxAction extends Action
 
 		String error = "";
 		Exception exception = null;
+		File tempfile = null;
 		try
 		{
 			// ensure valid fax number formatting. Throw exception if invalid
@@ -194,9 +195,8 @@ public class EctConsultationFormFaxAction extends Action
 			if (alist.size() > 0)
 			{
 				// Writing consultation request to disk as a pdf.
-				String filename = "Consult_" + reqId + System.currentTimeMillis() + ".pdf";
-				String faxPdf = String.format("%s%s%s", path, File.separator, filename);
-
+				tempfile = File.createTempFile("Consult_" + reqId + "-", ".pdf");
+				String faxPdf = tempfile.getPath();
 				FileOutputStream fos = null;
 
 				try
@@ -213,22 +213,23 @@ public class EctConsultationFormFaxAction extends Action
 
 				PdfReader pdfReader = new PdfReader(faxPdf);
 				pdfReader.close();
+				GenericFile fileToCopy = FileFactory.getExistingFile(faxPdf);
 
 				for (String faxNo : recipients)
 				{
 					String tempName = String.format("CRF-%s%s.%s.%d.pdf", faxClinicId, reqId, faxNo, System.currentTimeMillis());
 
-					GenericFile fileToCopy = FileFactory.getExistingFile(faxPdf);
 					GenericFile fileToFax = FileFactory.copy(fileToCopy);
 					fileToFax.rename(tempName);
 					outgoingFaxService.sendFax(providerNo, Integer.parseInt(demoNo), faxNo, fileToFax);
 				}
-
 				LogAction.addLogEntry(providerNo, Integer.parseInt(demoNo), LogConst.SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
 						reqId, loggedInInfo.getIp(), "CONSULT " + reqId);
 				request.setAttribute("faxSuccessful", true);
-				return mapping.findForward("success");
-
+			}
+			else
+			{
+				throw new DocumentException("No faxable objects");
 			}
 		}
 		catch (HtmlToPdfConversionException e)
@@ -265,13 +266,18 @@ public class EctConsultationFormFaxAction extends Action
 					error = "IOException";
 				}
 			}
+			if(tempfile != null)
+			{
+				logger.info("delete consult fax tempfile: " + tempfile.getPath());
+				tempfile.delete();
+			}
 		}
 		if (!error.equals(""))
 		{
-			logger.error(error + " occured insided ConsultationPrintAction", exception);
+			logger.error(error + " occurred inside ConsultationPrintAction", exception);
 			request.setAttribute("printError", new Boolean(true));
 			return mapping.findForward("error");
 		}
-		return null;
+		return mapping.findForward("success");
 	}
 }

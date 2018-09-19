@@ -66,12 +66,13 @@ public class FileFactory
 	/**
 	 * Write the input stream to a tempfile
 	 * @param fileInputStream - input stream of the new file
+	 * @param suffix - suffix of filename, usually the desired extension
 	 * @return the file
 	 * @throws IOException - if an error occurs
 	 */
-	public static GenericFile createTempFile(InputStream fileInputStream) throws IOException
+	public static GenericFile createTempFile(InputStream fileInputStream, String suffix) throws IOException
 	{
-		File file = File.createTempFile("juno", "tempfile");
+		File file = File.createTempFile("juno", suffix);
 		logger.info("Created tempfile: " + file.getPath());
 		return writeInputStream(fileInputStream, file, true);
 	}

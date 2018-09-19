@@ -30,6 +30,8 @@ import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -215,6 +217,11 @@ public class GenericFile
 	public String getName()
 	{
 		return javaFile.getName();
+	}
+
+	public FileInputStream toFileInputStream() throws FileNotFoundException
+	{
+		return new FileInputStream(javaFile);
 	}
 	/**
 	 * returns the file content type, or null if it cannot be determined
