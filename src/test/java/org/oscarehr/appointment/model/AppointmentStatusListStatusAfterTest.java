@@ -72,9 +72,9 @@ public class AppointmentStatusListStatusAfterTest
 				{"a", "b"},
 				{"b", "c"},
 				{"d", "a"},
-				{"aS", "b"},
-				{"bV", "c"},
-				{"dN", "a"},
+				{"aS", "bS"},
+				{"bV", "cV"},
+				{"dN", "aN"},
 			});
 	}
 
