@@ -52,7 +52,7 @@ angular.module("Common.Services").service("consultService", [
 				function error(errors)
 				{
 					console.log("consultService::searchRequests error", errors);
-					deferred.reject("An error occured while searching consult requests");
+					deferred.reject("An error occurred while searching consult requests");
 				});
 
 			return deferred.promise;
@@ -283,6 +283,25 @@ angular.module("Common.Services").service("consultService", [
 				{
 					console.log("consultService::getReferralPathwaysByService error", errors);
 					deferred.reject("An error occured while fetching referral pathways");
+				});
+
+			return deferred.promise;
+		};
+
+		service.getLetterheadList = function getLetterheadList()
+		{
+			var deferred = $q.defer();
+
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			junoHttp.get(service.apiPath + 'getLetterheadList', config).then(
+				function success(results)
+				{
+					deferred.resolve(results);
+				},
+				function error(errors)
+				{
+					console.log("consultService::getLetterheadList error", errors);
+					deferred.reject("An error occurred while fetching letterheads");
 				});
 
 			return deferred.promise;
