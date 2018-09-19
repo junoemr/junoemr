@@ -111,7 +111,7 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 			var search = {
 				type: 'Name',
 				'term': term,
-				active: true,
+				status: 'active',
 				integrator: false,
 				outofdomain: true
 			};

@@ -63,7 +63,17 @@ public class EctDisplayTicklerAction extends EctDisplayAction {
     }
     else {
         pathview = request.getContextPath() + "/tickler/ticklerMain.jsp?demoview=" + bean.demographicNo + "&parentAjaxId=" + cmd;
-        pathedit = request.getContextPath() + "/appointment/appointmentcontrol.jsp?keyword=" + encode(bean) + "&displaymode=" + encode("Search ") + "&search_mode=search_name&originalpage=" + encode(request.getContextPath() + "/tickler/ticklerAdd.jsp") + "&orderby=last_name&appointment_date=2000-01-01&limit1=0&limit2=5&status=t&start_time=10:45&end_time=10:59&duration=15&dboperation=search_demorecord&type=&demographic_no=" + bean.demographicNo + "&parentAjaxId=" + cmd + "&updateParent=false";
+        pathedit = request.getContextPath() + "/tickler/ticklerAdd.jsp" +
+                                              "?demographic_no=" + bean.demographicNo +
+                                              "&name=" + encode(bean) +
+                                              "&chart_no=" + ((bean.chartNo != null) ? bean.chartNo : "") +
+                                              "&bFirstDisp=false" +
+                                              "&doctor_no=" + bean.familyDoctorNo +         // despite the name, the bean loads it as demo.provider_no
+                                              "&search_mode=search_name" +                  // This is required.  The default search mode may not be search name.  Since we forward the name, we want to search on that.
+                                              "&orderby=last_name" +                        // Just to make sure that the order also isn't affected by a property override.
+                                              "&originalpage=" + encode(request.getContextPath() + "/tickler/ticklerAdd.jsp") +
+                                              "&parentAjaxId=" + cmd +
+                                              "&updateParent=true";
     }
 
     String url = "popupPage(500,900,'" + winName + "','" + pathview + "')";

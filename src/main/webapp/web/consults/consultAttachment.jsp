@@ -36,21 +36,21 @@
 		<h3 class="modal-title">Documents for {{consultAttachmentCtrl.atth.patientName}}</h3>
 	</div>
 
-	<div class="modal-body">
+	<div class="modal-body text-center">
 		<div class="col-sm-5 middle">
 			<label>Available Documents</label>
 			<br/>
 			<select id="selAvailDoc" class="form-control" 
 				size="8" 
 				ng-model="consultAttachmentCtrl.atth.selectedAvailableDoc" 
-				ng-options="doc.displayName group by doc.documentTypeDisplay for doc in consultAttachmentCtrl.atth.availableDocs" 
+				ng-options="doc.displayName group by doc.documentTypeDisplay for doc in consultAttachmentCtrl.atth.availableDocs"
+			    select-option-tooltip="doc.displayName for doc in consultAttachmentCtrl.atth.availableDocs"
 				ng-dblclick="consultAttachmentCtrl.openDoc(consultAttachmentCtrl.atth.selectedAvailableDoc)">
 			</select>
 		</div>
 		<div class="middle">
-			<button type="button" class="btn btn-default" ng-click="consultAttachmentCtrl.attach()">&gt;&gt;</button>
-			<br/>
-			<button type="button" class="btn btn-default" ng-click="consultAttachmentCtrl.detach()">&lt;&lt;</button>
+			<button type="button" class="btn btn-block btn-default" ng-click="consultAttachmentCtrl.attach()">&gt;&gt;</button>
+			<button type="button" class="btn btn-block btn-default" ng-click="consultAttachmentCtrl.detach()">&lt;&lt;</button>
 		</div>
 		<div class="col-sm-5 middle">
 			<label>Attached Documents</label>
@@ -58,7 +58,8 @@
 			<select id="selAttachDoc" class="form-control" 
 				size="8" 
 				ng-model="consultAttachmentCtrl.atth.selectedAttachedDoc" 
-				ng-options="doc.displayName group by doc.documentTypeDisplay for doc in consultAttachmentCtrl.atth.attachedDocs" 
+				ng-options="doc.displayName group by doc.documentTypeDisplay for doc in consultAttachmentCtrl.atth.attachedDocs"
+			    select-option-tooltip="doc.displayName for doc in consultAttachmentCtrl.atth.attachedDocs"
 				ng-dblclick="consultAttachmentCtrl.openDoc(consultAttachmentCtrl.atth.selectedAttachedDoc)"></select>
 		</div>
 		<div class="clear"></div>

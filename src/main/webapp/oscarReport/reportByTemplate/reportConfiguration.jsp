@@ -165,6 +165,8 @@ if(!authed) {
 					<th>Step <%=step+1%>:</th>
 					<td>Generate Query</td>
 					<td><input type="submit" name="submitButton" value="Run Query"></td>
+					<td><input type="submit" name="getCSV" value="Export to CSV"></td>
+					<td><input type="submit" name="getXLS" value="Export to XLS"></td>
 				</tr>
 			</table>
 			<div><a
