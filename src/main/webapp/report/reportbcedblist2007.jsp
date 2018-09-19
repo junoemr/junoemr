@@ -41,8 +41,8 @@ if(!authed) {
 <%
 String deepcolor = "#CCCCFF", weakcolor = "#EEEEFF";
 
-String limit = request.getParameter("limit")==null?"100":request.getParameter("limit");
-String offset = request.getParameter("offset")==null?"0":request.getParameter("offset");
+String limit = request.getParameter("limit") == null ? "100" : request.getParameter("limit");
+String offset = request.getParameter("offset") == null ? "0" : request.getParameter("offset");
 
 if(request.getParameter("resultLimit")!=null)
 {
