@@ -229,9 +229,19 @@
 			</td>
 			<td class="fieldValue">
 				<html:hidden property="tickler.taskAssignedToName" />
-	            <html:select property="tickler.taskAssignedTo" value="none">
-        		    <option value="none">- select -</option>
-        		    <html:options collection="providers" property="providerNo" labelProperty="formattedName"/>
+				<%
+					String defaultTicklerID = "none";
+
+					if (OscarProperties.getInstance().getProperty("default_tickler_provider") != null)
+					{
+					    defaultTicklerID = OscarProperties.getInstance().getProperty("default_tickler_provider");
+					}
+				%>
+	            <html:select property="tickler.taskAssignedTo" value="<%=defaultTicklerID%>">
+					<% if (defaultTicklerID.equals("none")) { %>
+						<option value="none">- <bean:message key="global.select"/> -</option>
+        		    <% } %>
+					<html:options collection="providers" property="providerNo" labelProperty="formattedName"/>
             	</html:select>
 				<%--html:hidden property="tickler.taskAssignedTo" />
 				<html:text property="tickler.taskAssignedToName" />

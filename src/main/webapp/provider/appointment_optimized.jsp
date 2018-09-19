@@ -673,7 +673,7 @@ private long getAppointmentRowSpan(
 			self.location.href = "providercontrol.jsp?year=<%=year%>&month=<%=month%>&day=<%=day%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1&provider_no="+s;
 		}
 		function goZoomView(s, n) {
-			self.location.href = "providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=1&curProvider="+s+"&curProviderName="+encodeURIComponent(n)+"&displaymode=day&dboperation=searchappointmentday" ;
+			self.location.href = "providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=1&curProvider="+s+"&curProviderName="+encodeURIComponent(n)+"&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>" ;
 		}
 		function findProvider(p,m,d) {
 			popupPage(300,400, "receptionistfindprovider.jsp?pyear=" +p+ "&pmonth=" +m+ "&pday=" +d+ "&providername="+ document.findprovider.providername.value );
@@ -1070,7 +1070,7 @@ private long getAppointmentRowSpan(
 			<%
 				} } } else { if (view==1) {
 			%>
-			<a href='providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=0&displaymode=day&dboperation=searchappointmentday'><bean:message key="provider.appointmentProviderAdminDay.grpView"/></a>
+			<a href='providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>'><bean:message key="provider.appointmentProviderAdminDay.grpView"/></a>
 			<% } else { %>
 			<bean:message key="global.hello"/>
 			<% out.println( userFirstName+" "+userLastName); %>
@@ -1329,12 +1329,12 @@ private long getAppointmentRowSpan(
 
 						for(UserDateSchedule schedule: schedules)
 						{
-							Integer scheduleProviderNo = schedule.getProviderNo();
+							String scheduleProviderNo = schedule.getProviderNo();
 
 							headerColor = !headerColor;
 
 							boolean notOnSchedule = false;
-							if(!viewall.equals("1") && scheduleProviderNo == Integer.parseInt(curUser_no) && !schedule.hasSchedule())
+							if(!viewall.equals("1") && scheduleProviderNo.equals(curUser_no) && !schedule.hasSchedule())
 							{
 								notOnSchedule = true;
 							}

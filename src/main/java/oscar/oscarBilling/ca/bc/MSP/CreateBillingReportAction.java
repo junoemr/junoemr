@@ -268,6 +268,7 @@ public class CreateBillingReportAction extends OscarAction
 		finally
 		{
 			IOUtils.closeQuietly(reportInstream);
+			IOUtils.closeQuietly(outputStream);
 		}
 
 		return actionMapping.findForward(this.target);

@@ -31,7 +31,7 @@ import java.util.SortedMap;
 
 public class UserDateSchedule
 {
-	private Integer providerNo;
+	private String providerNo;
 	private LocalDate scheduleDate;
 
 	private String firstName;
@@ -41,7 +41,7 @@ public class UserDateSchedule
 	private SortedMap<LocalTime, List<AppointmentDetails>> appointments;
 
 	public UserDateSchedule(
-		Integer providerNo, LocalDate scheduleDate, String firstName, String lastName,
+		String providerNo, LocalDate scheduleDate, String firstName, String lastName,
 		RangeMap<LocalTime, ScheduleSlot> scheduleSlots,
 		SortedMap<LocalTime, List<AppointmentDetails>> appointments)
 	{
@@ -53,7 +53,7 @@ public class UserDateSchedule
 		this.appointments = appointments;
 	}
 
-	public Integer getProviderNo()
+	public String getProviderNo()
 	{
 		return providerNo;
 	}

@@ -314,7 +314,7 @@ public class Schedule
 		// get a UserDateSchedule for each
 		UserDateSchedule userDateSchedule = getUserDateSchedule(
 			date,
-			new Integer(provider.getProviderNo()),
+			provider.getProviderNo(),
 			provider.getFirstName(),
 			provider.getLastName(),
 			site
@@ -359,7 +359,7 @@ public class Schedule
 			// get a UserDateSchedule for each
 			userDateSchedules.add(getUserDateSchedule(
 				date,
-				new Integer(result.getId().getProviderNo()),
+				result.getId().getProviderNo(),
 				result.getFirstName(),
 				result.getLastName(),
 				site
@@ -395,7 +395,7 @@ public class Schedule
 			// get a UserDateSchedule for each
 			userDateSchedules.add(getUserDateSchedule(
 				currentDay,
-				new Integer(provider.getProviderNo()),
+				provider.getProviderNo(),
 				provider.getFirstName(),
 				provider.getLastName(),
 				site
@@ -408,7 +408,7 @@ public class Schedule
 
 	private UserDateSchedule getUserDateSchedule(
 		LocalDate date,
-		Integer providerNo,
+		String providerNo,
 		String firstName,
 		String lastName,
 		String site
