@@ -139,7 +139,7 @@ public class FrmCustomedPDFServlet extends HttpServlet {
 							faxJob.setNumPages(pdfReader.getNumberOfPages());
 							faxJob.setStamp(new Date());
 							faxJob.setStatus(FaxJob.STATUS.SENT);
-							faxJob.setOscarUser(provider_no);
+							faxJob.setProviderNo(provider_no);
 							faxJob.setDemographicNo(Integer.parseInt(demo));
 
 							faxJobDao.persist(faxJob);

@@ -30,6 +30,7 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.dao.FaxConfigDao;
 import org.oscarehr.fax.dao.FaxJobDao;
+import org.oscarehr.fax.exception.FaxApiException;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.result.SRFaxResultWrapper_Single;
 import org.oscarehr.fax.model.FaxConfig;
@@ -37,6 +38,7 @@ import org.oscarehr.fax.model.FaxJob;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
@@ -51,7 +53,7 @@ import java.util.List;
  * This service should be responsible for handling all logic around sending outgoing faxes
  */
 @Service
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class, noRollbackFor = FaxApiException.class)
 public class OutgoingFaxService
 {
 	private static final Logger logger = MiscUtils.getLogger();
@@ -129,14 +131,12 @@ public class OutgoingFaxService
 			if(resultWrapper.isSuccess())
 			{
 				logger.info("Fax send success " + String.valueOf(resultWrapper.getResult()));
-				fileToFax.moveToOutgoingFaxSent();
 				faxJob.setStatus(FaxJob.STATUS.SENT);
 				faxJob.setJobId(resultWrapper.getResult().longValue());
 			}
 			else
 			{
 				logger.warn("Fax send failure " + resultWrapper.getError());
-				fileToFax.moveToOutgoingFaxUnsent();
 				faxJob.setStatus(FaxJob.STATUS.ERROR);
 			}
 
@@ -146,13 +146,34 @@ public class OutgoingFaxService
 			faxJob.setUser(faxSettings.getFaxUser());
 			faxJob.setNumPages(fileToFax.getPageCount());
 			faxJob.setStamp(new Date());
-			faxJob.setOscarUser(providerId);
+			faxJob.setProviderNo(providerId);
 			faxJob.setDemographicNo(demographicId);
 			faxJobDao.persist(faxJob);
 		}
+		try
+		{
+			for(GenericFile fileToFax : filesToFax)
+			{
+				if(resultWrapper.isSuccess())
+				{
+					fileToFax.moveToOutgoingFaxSent();
+				}
+				else
+				{
+					fileToFax.moveToOutgoingFaxUnsent();
+				}
+			}
+		}
+		catch(IOException e)
+		{
+			// don't throw exceptions here.
+			// fax may have been sent in which case we want to report a success
+			logger.error("Error Moving File", e);
+		}
+
 		if(!resultWrapper.isSuccess())
 		{
-			throw new RuntimeException("Failed to fax: " + resultWrapper.getError());
+			throw new FaxApiException("Failed to fax: " + resultWrapper.getError());
 		}
 	}
 

@@ -52,10 +52,10 @@ if(!authed) {
     
 	    String providerName = "N/A";
 	    String demographicName = "N/A";
-	    String oscarUser = faxJob.getOscarUser();
+	    String oscarUser = faxJob.getProviderNo();
 	    if( oscarUser != null ) {
 			    
-	    	ProviderData providerData = providerDataDao.find(faxJob.getOscarUser());
+	    	ProviderData providerData = providerDataDao.find(faxJob.getProviderNo());
 	    	providerName = providerData.getLastName() + ", " + providerData.getFirstName();
 	    		
 	    }

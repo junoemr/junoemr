@@ -111,8 +111,9 @@ public class FaxJob extends AbstractModel<Integer> implements Comparable<FaxJob>
     private String document;
     
     private Long jobId;
-    
-    private String oscarUser;
+
+	@Column(name="oscarUser")
+    private String providerNo;
     
     private String statusString;
     
@@ -267,15 +268,15 @@ public class FaxJob extends AbstractModel<Integer> implements Comparable<FaxJob>
 	/**
 	 * @return the oscarUser
 	 */
-    public String getOscarUser() {
-	    return oscarUser;
+    public String getProviderNo() {
+	    return providerNo;
     }
 
 	/**
 	 * @param oscarUser the oscarUser to set
 	 */
-    public void setOscarUser(String oscarUser) {
-	    this.oscarUser = oscarUser;
+    public void setProviderNo(String oscarUser) {
+	    this.providerNo = oscarUser;
     }
 
 	/**

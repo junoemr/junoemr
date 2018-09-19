@@ -52,6 +52,18 @@ public class FileFactory
 	}
 
 	/**
+	 * save and load a new document with the given name and input stream
+	 * @param fileInputStream - input stream of the new file
+	 * @param fileName - name of the file to be saved and opened
+	 * @return - the file
+	 * @throws FileNotFoundException - if the given file is invalid for use as a GenericFile
+	 */
+	public static GenericFile createOutboundFaxFile(InputStream fileInputStream, String fileName) throws IOException
+	{
+		return createNewFile(fileInputStream, fileName, GenericFile.OUTBOUND_FAX_DIR_PENDING);
+	}
+
+	/**
 	 * Write the input stream to a tempfile
 	 * @param fileInputStream - input stream of the new file
 	 * @return the file
