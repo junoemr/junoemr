@@ -136,7 +136,7 @@ public class EctConsultationFormRequestUtil {
 			patientHealthCardVersionCode = StringUtils.noNull(demographic.getVer());
 			patientChartNo = StringUtils.noNull(demographic.getChartNo());
 			patientAge = demographic.getAge();
-			mrp = demographic.getFamilyDoctor();
+			mrp = demographic.getProviderNo();
 
 			estPatient = true;
 			DemographicExt demoExt = demographicManager.getDemographicExt(loggedInInfo,demographic.getDemographicNo(),"demo_cell");

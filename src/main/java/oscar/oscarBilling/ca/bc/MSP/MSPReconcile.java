@@ -1028,35 +1028,27 @@ public class MSPReconcile {
 			currStat = bm.getBillingstatus();
 		}
 		
-		if (!currStat.equals(SETTLED)) {
-			if (stat.equals(REJECTED)) {
-				newStat = REJECTED;
-			} else if (stat.equals(NOTSUBMITTED)) {
-				newStat = NOTSUBMITTED;
-			} else if (stat.equals(SUBMITTED)) {
-				newStat = SUBMITTED;
-			} else if (stat.equals(SETTLED)) {
-				newStat = SETTLED;
-			} else if (stat.equals(DELETED)) {
-				newStat = DELETED;
-			} else if (stat.equals(HELD)) {
-				newStat = HELD;
-			} else if (stat.equals(DATACENTERCHANGED)) {
-				newStat = DATACENTERCHANGED;
-			} else if (stat.equals(PAIDWITHEXP)) {
-				newStat = PAIDWITHEXP;
-			} else if (stat.equals(BADDEBT)) {
-				newStat = BADDEBT;
-			} else if (stat.equals(WCB)) {
-				newStat = WCB;
-			} else if (stat.equals(CAPITATED)) {
-				newStat = CAPITATED;
-			} else if (stat.equals(DONOTBILL)) {
-				newStat = DONOTBILL;
-			} else if (stat.equals(BILLPATIENT)) {
-				newStat = BILLPATIENT;
+		if (!currStat.equals(SETTLED))
+		{
+			switch (stat) {
+				case REJECTED:
+				case NOTSUBMITTED:
+				case SUBMITTED:
+				case SETTLED:
+				case DELETED:
+				case HELD:
+				case DATACENTERCHANGED:
+				case PAIDWITHEXP:
+				case BADDEBT:
+				case WCB:
+				case CAPITATED:
+				case DONOTBILL:
+				case BILLPATIENT:
+					newStat = stat;
 			}
-		} else {
+		}
+
+		else {
 			updated = false;
 			MiscUtils.getLogger().debug("billing No " + billingNo + " is settled, will not be updated");
 		}
@@ -1363,7 +1355,6 @@ public class MSPReconcile {
 					b.amount = String.valueOf(getAmountPaid(rs.getString("bm.billingmaster_no"), MSPReconcile.BILLTYPE_PRI));
 					if (!StringUtils.isNumeric(b.amount)) {
 						throw new RuntimeException("Amount not a number");
-						//     b.amount = this.convCurValue(rs.getString("t_paidamt"));
 					}
 				}
 				b.status = b.reason;
@@ -1518,67 +1509,15 @@ public class MSPReconcile {
 	 */
 	@Deprecated
 	public MSPReconcile.BillSearch getPrivatePayments(String account, String payeeNo, String providerNo, 
-			String startDate, String endDate, @SuppressWarnings("unused") boolean excludePrivate) {
-
-		startDate = UtilMisc.replace(startDate, "-", "");
-
-		endDate = UtilMisc.replace(endDate, "-", "");
-		BillSearch billSearch = new BillSearch();
-		String criteriaQry = createCriteriaString(account, payeeNo, providerNo, startDate, endDate, true, true, false, true, "", "creation_date");
-		String p = "SELECT b.billingtype,bm.billingmaster_no,b.demographic_no,b.demographic_name,bm.service_date,b.apptProvider_no ,b.provider_no,bm.payee_no," + " bh.creation_date,bh.amount_received,payment_type_id" + " FROM billing_history bh left join billingmaster bm on bh.billingmaster_no = bm.billingmaster_no ,billing b" + " where bm.billing_no = b.billing_no " + " and bh.payment_type_id != " + MSPReconcile.PAYTYPE_IA + " " + criteriaQry + " and bm.billingstatus != '" + MSPReconcile.DELETED + "'";
-		MiscUtils.getLogger().debug(p);
-		billSearch.list = new ArrayList<Object>();
-
-		ResultSet rs = null;
-		try {
-
-			rs = DBHandler.GetSQL(p);
-			while (rs.next()) {
-				MSPBill b = new MSPBill();
-				b.billMasterNo = rs.getString("bm.billingmaster_no");
-				b.billingtype = rs.getString("b.billingtype");
-				b.demoNo = rs.getString("demographic_no");
-				b.demoName = rs.getString("demographic_name");
-				b.status = b.reason;
-				b.serviceDate = rs.getString("service_date");
-				b.apptDoctorNo = rs.getString("apptProvider_no");
-				b.userno = rs.getString("provider_no");
-				b.payeeNo = rs.getString("payee_no");
-
-				Provider actProv = this.getProvider(b.userno, 0);
-				b.accountName = actProv.getFullName();
-				b.acctInit = actProv.getInitials();
-
-				b.payeeName = this.getProvider(b.payeeNo, 1).getInitials();
-				b.provName = this.getProvider(b.apptDoctorNo, 0).getInitials();
-
-				b.amount = rs.getString("amount_received");
-				b.paymentDate = this.fmt.format(rs.getDate("creation_date"));
-				b.paymentMethod = rs.getString("payment_type_id");
-				b.setPaymentMethodName(this.getPaymentMethodDesc(b.paymentMethod));
-				double dblAmount = UtilMisc.safeParseDouble(b.amount);
-				b.type = dblAmount > 0 ? "PMT" : "RFD";
-				if (dblAmount != 0) {
-					billSearch.list.add(b);
-				}
-			}
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("Error", e);
-		} finally {
-			try {
-				rs.close();
-			} catch (SQLException ex) {
-				MiscUtils.getLogger().error("Error", ex);
-			}
-
-		}
-		return billSearch;
+			String startDate, String endDate, @SuppressWarnings("unused") boolean excludePrivate)
+	{
+		return getPrivatePayments(account, payeeNo, providerNo, startDate, endDate);
 	}
 
 	/**
 	 * Returns a string description of a billing payment method
 	 * @todo This should actually be a cached lookup map to improve performance
-	 * @param string String
+	 * @param string
 	 * @return String
 	 */
 	private String getPaymentMethodDesc(String id) {
@@ -1591,7 +1530,7 @@ public class MSPReconcile {
 	}
 
 	/**
-	 * Creates an SQL fragment that is used as the criteria(WHERE Clause) in the retrieval
+	 * Creates an SQL fragment that is used as the criteria(WHERE Clause) in the retrievaly
 	 * of MSP Bills
 	 * @param account String
 	 * @param payeeNo String
