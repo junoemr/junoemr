@@ -31,6 +31,7 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.dao.FaxConfigDao;
 import org.oscarehr.fax.dao.FaxJobDao;
 import org.oscarehr.fax.exception.FaxApiException;
+import org.oscarehr.fax.exception.FaxNumberException;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.result.SRFaxResultWrapper_Single;
 import org.oscarehr.fax.model.FaxConfig;
@@ -186,7 +187,7 @@ public class OutgoingFaxService
 			String formattedFaxNo = faxNumber.trim().replaceAll("\\D", "");
 			if(formattedFaxNo.length() < 7)
 			{
-				throw new RuntimeException("Invalid Fax Number: " + faxNumber);
+				throw new FaxNumberException("Invalid Fax Number: " + faxNumber);
 			}
 			recipients.add(formattedFaxNo);
 		}

@@ -28,8 +28,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -75,6 +77,19 @@ public class FileFactory
 		File file = File.createTempFile("juno", suffix);
 		logger.info("Created tempfile: " + file.getPath());
 		return writeInputStream(fileInputStream, file, true);
+	}
+	/**
+	 * Write the input stream to a tempfile
+	 * @param outputStream - input stream of the new file
+	 * @param suffix - suffix of filename, usually the desired extension
+	 * @return the file
+	 * @throws IOException - if an error occurs
+	 */
+	public static GenericFile createTempFile(ByteArrayOutputStream outputStream, String suffix) throws IOException
+	{
+		File file = File.createTempFile("juno", suffix);
+		logger.info("Created tempfile: " + file.getPath());
+		return writeOutputStream(outputStream, file);
 	}
 
 	/**
@@ -161,15 +176,30 @@ public class FileFactory
 		IOUtils.closeQuietly(fileInputStream);
 
 		GenericFile returnFile = getExistingFile(file);
+		checkAllowedContentType(returnFile);
+		return returnFile;
+	}
 
+	private static GenericFile writeOutputStream(ByteArrayOutputStream outputStream, File file) throws IOException
+	{
+		FileOutputStream fos = new FileOutputStream(file);
+		outputStream.writeTo(fos);
+		fos.close();
+		IOUtils.closeQuietly(fos);
+
+		GenericFile returnFile = getExistingFile(file);
+		checkAllowedContentType(returnFile);
+		return returnFile;
+	}
+	private static void checkAllowedContentType(GenericFile genericFile) throws IOException
+	{
 		// for now, only warn with unknown file content types.
-		String contentType = returnFile.getContentType();
+		String contentType = genericFile.getContentType();
 		if(!GenericFile.getAllowedContent().contains(contentType))
 		{
 			//TODO - how to handle unknown content type. must have complete list of allowed types first
 			logger.warn("Unknown file content type: " + contentType);
 		}
-		return returnFile;
 	}
 
 	/**
