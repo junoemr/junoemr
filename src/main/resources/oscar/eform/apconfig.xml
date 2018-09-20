@@ -523,6 +523,13 @@
 
 	<!-- Multisite Information -->
 	<databaseap>
+		<ap-name>multisite_appointment_location</ap-name>
+		<ap-sql>
+			SELECT location FROM appointment WHERE appointment_no=${appt_no}
+		</ap-sql>
+		<ap-output>${location}</ap-output>
+	</databaseap>
+	<databaseap>
 		<ap-name>multisite_name_list</ap-name>
 		<ap-sql>SELECT GROUP_CONCAT(REPLACE(name,';','') SEPARATOR ';') AS
 			name_list FROM site WHERE status=1 ORDER BY site_id;
