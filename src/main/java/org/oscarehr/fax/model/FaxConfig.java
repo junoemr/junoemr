@@ -24,6 +24,7 @@
 package org.oscarehr.fax.model;
 
 import org.hibernate.annotations.Where;
+import org.oscarehr.common.encryption.StringEncryptor;
 import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
@@ -149,7 +150,7 @@ public class FaxConfig extends AbstractModel<Integer>
 	 * @return the faxPasswd
 	 */
 	public String getFaxPasswd() {
-		return faxPasswd;
+		return StringEncryptor.decrypt(this.faxPasswd);
 	}
 
 
@@ -158,17 +159,16 @@ public class FaxConfig extends AbstractModel<Integer>
 	 */
 	public void setFaxPasswd(String faxPasswd)
 	{
-		//TODO encrypt password
-		this.faxPasswd = faxPasswd;
+		this.faxPasswd = StringEncryptor.encrypt(faxPasswd);
 	}
 
 
 	/**
 	 * @return the faxNumber
 	 */
-    public String getFaxNumber() {
-    	//TODO decrypt password
-	    return faxNumber;
+    public String getFaxNumber()
+    {
+	    return this.faxNumber;
     }
 
 

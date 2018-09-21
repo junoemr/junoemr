@@ -143,7 +143,7 @@ public class FaxConfigWebService extends AbstractServiceImpl
 		String currentPw = config.getFaxPasswd();
 		config = FaxSettingsConverter.getAsDomainObject(accountSettingsTo1);
 		config.setId(id);
-		if(config.getFaxPasswd() == null || config.getFaxPasswd().trim().isEmpty())
+		if(accountSettingsTo1.getPassword() == null || accountSettingsTo1.getPassword().trim().isEmpty())
 		{
 			config.setFaxPasswd(currentPw);// keep current password if a new one is not set
 		}
@@ -173,15 +173,15 @@ public class FaxConfigWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
 
-		FaxConfig config = faxConfigDao.find(id);
-
 		// if the password is not changed, use the saved one
 		String password = accountSettingsTo1.getPassword();
+		String username = accountSettingsTo1.getAccountLogin();
 		if(password == null || password.isEmpty())
 		{
+			FaxConfig config = faxConfigDao.find(id);
 			password = config.getFaxPasswd();
 		}
-		boolean success = faxConfigService.testConnectionStatus(config.getFaxUser(), password);
+		boolean success = faxConfigService.testConnectionStatus(username, password);
 		return RestResponse.successResponse(success);
 	}
 }

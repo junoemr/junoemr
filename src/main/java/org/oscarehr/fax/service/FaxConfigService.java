@@ -22,6 +22,7 @@
  */
 package org.oscarehr.fax.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.result.SRFaxResultWrapper_List;
@@ -49,12 +50,17 @@ public class FaxConfigService
 	 */
 	public boolean testConnectionStatus(String accountId, String password)
 	{
+		// don't hit the api if username or password are empty/missing
+		if(StringUtils.trimToNull(accountId) == null || StringUtils.trimToNull(password) == null)
+		{
+			return false;
+		}
+
 		SRFaxApiConnector apiConnector = new SRFaxApiConnector(accountId, password);
 
 		LocalDate localDate = LocalDate.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 		String currentDateStr = localDate.format(formatter);
-
 
 		Map<String, String> parameters = new HashMap<>();
 		parameters.put("sPeriod", "RANGE");
