@@ -26,7 +26,12 @@
 package oscar.oscarBilling.ca.bc.pageUtil;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.*;
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.oscarehr.decisionSupport.model.DSConsequence;
 import org.oscarehr.integration.clinicaid.service.ClinicaidAPIService;
 import org.oscarehr.util.LoggedInInfo;
@@ -43,152 +48,115 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+public final class BillingAction extends Action {
+  private static Logger _log = MiscUtils.getLogger();
+  private ServiceCodeValidationLogic vldt = new ServiceCodeValidationLogic();
+  public ActionForward execute(ActionMapping mapping,
+                               ActionForm form,
+                               HttpServletRequest request,
+                               HttpServletResponse response) throws IOException,
+      ServletException {
+	  LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+    // Setup variables
+    ActionMessages errors = new ActionMessages();
+    oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean bean = null;
+    String encounter = request.getAttribute("encounter") != null ?
+        (String) request.getAttribute("encounter") : "";
+    String region = request.getParameter("billRegion");
 
-public final class BillingAction extends Action
-{
-	private static Logger _log = MiscUtils.getLogger();
-	private ServiceCodeValidationLogic vldt = new ServiceCodeValidationLogic();
+    if ("ON".equals(region)) {
+      String newURL = mapping.findForward("ON").getPath();
+      newURL = newURL + "?" + request.getQueryString();
+      ActionForward ON = new ActionForward();
+      ON.setPath(newURL);
+      ON.setRedirect(true);
+      return ON;
+    }
+	else if ("CLINICAID".equals(region)) {
 
-	private String clinicaidURL;
+	  ClinicaidAPIService clinicaidAPIService = SpringUtils.getBean(ClinicaidAPIService.class);
 
-	public String getClinicaidUrl()
-	{
-		return clinicaidURL;
-	}
+	  String action = "";
+	  if( request.getParameter("action") != null) {
+		  action = request.getParameter("action");
+	  }
+	  else {
+		  action = "create_invoice";
+	  }
 
-	public ActionForward execute(
-			ActionMapping mapping,
-			ActionForm form,
-			HttpServletRequest request,
-			HttpServletResponse response
-	) throws IOException, ServletException
-	{
-		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+	  String clinicaidURL = clinicaidAPIService.buildClinicaidURL(request, action);
+      String newURL = mapping.findForward("CLINICAID").getPath();
+      newURL = newURL + "?" + request.getQueryString();
+      ActionForward Clinicaid = new ActionForward();
+      Clinicaid.setPath(clinicaidURL);
+      _log.info(clinicaidURL);
 
-		// Setup variables
-		ActionMessages errors = new ActionMessages();
-		oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean bean = null;
-		String encounter = request.getAttribute("encounter") != null ?
-				(String) request.getAttribute("encounter") : "";
-		String region = request.getParameter("billRegion");
+      Clinicaid.setRedirect(true);
+      return Clinicaid;
+    }
+    else {
+      BillingCreateBillingForm frm = (BillingCreateBillingForm) form;
+      if (request.getParameter("demographic_no") != null &
+          request.getParameter("appointment_no") != null) {
+        String newWCBClaim = request.getParameter("newWCBClaim");
+        //If newWCBClaim == 1, this action was invoked from the WCB form
+        //Therefore, we need to set the appropriate parameters to set up the subsequent bill
+        if ("1".equals(newWCBClaim)) {
+          
+          frm.setXml_billtype("WCB");
+          
+          List l = (List) request.getAttribute("billingcodes");
+          if (l != null && l.size() > 0 ){
+              frm.setXml_other1(""+l.get(0));
+              if (l.size() > 1){
+                frm.setXml_other2(""+l.get(1));
+              }
+            
+          }
+          
+          frm.setXml_diagnostic_detail1(""+request.getAttribute("icd9"));
+          request.setAttribute("WCBFormId",request.getAttribute("WCBFormId"));
+          request.setAttribute("newWCBClaim",request.getParameter("newWCBClaim"));
+          request.setAttribute("loadFromSession", "y");
+        }
+        bean = new oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean();
+        fillBean(request, bean);
+        if(request.getAttribute("serviceDate") != null){
+            MiscUtils.getLogger().debug("service Date set to the appointment Date"+(String) request.getAttribute("serviceDate"));
+           bean.setApptDate((String) request.getAttribute("serviceDate"));
+        }
 
-		if ("ON".equals(region)) {
-			String newURL = mapping.findForward("ON").getPath();
-			newURL = newURL + "?" + request.getQueryString();
-			ActionForward ON = new ActionForward();
-			ON.setPath(newURL);
-			ON.setRedirect(true);
-			return ON;
-		}
-		else if ("CLINICAID".equals(region)) {
-
-/*			String login_param = request.getParameter("login");
-
-			boolean login = true;
-			if(login_param == null || login_param.equals("0"))
-			{
-				login = false;
-			}*/
-
-
-			ClinicaidAPIService clinicaidAPIService = SpringUtils.getBean(ClinicaidAPIService.class);
-
-			String action = "";
-			if( request.getParameter("action") != null) {
-				  action = request.getParameter("action");
-			}
-			else {
-				  action = "create_invoice";
-			}
-
-			clinicaidURL = clinicaidAPIService.buildClinicaidURL(request, action, true);
-
-
-			/*
-			ActionRedirect redirect = new ActionRedirect(mapping.findForward(region));
-
-			redirect.addParameter("clinicaidUrl", clinicaidURL);
-
-			return redirect;
-			*/
-
-
-			//String newURL = mapping.findForward("CLINICAID").getPath();
-			//newURL = newURL + "?" + request.getQueryString();
-
-			ActionForward Clinicaid = new ActionForward();
-			Clinicaid.setPath(clinicaidURL);
-			_log.info(clinicaidURL);
-
-			Clinicaid.setRedirect(true);
-			return Clinicaid;
-		}
-		else {
-			BillingCreateBillingForm frm = (BillingCreateBillingForm) form;
-			if (request.getParameter("demographic_no") != null &
-					request.getParameter("appointment_no") != null) {
-				String newWCBClaim = request.getParameter("newWCBClaim");
-				//If newWCBClaim == 1, this action was invoked from the WCB form
-				//Therefore, we need to set the appropriate parameters to set up the subsequent bill
-				if ("1".equals(newWCBClaim)) {
-
-					frm.setXml_billtype("WCB");
-
-					List l = (List) request.getAttribute("billingcodes");
-					if (l != null && l.size() > 0 ){
-						frm.setXml_other1(""+l.get(0));
-						if (l.size() > 1){
-							frm.setXml_other2(""+l.get(1));
-						}
-
-					}
-
-					frm.setXml_diagnostic_detail1(""+request.getAttribute("icd9"));
-					request.setAttribute("WCBFormId",request.getAttribute("WCBFormId"));
-					request.setAttribute("newWCBClaim",request.getParameter("newWCBClaim"));
-					request.setAttribute("loadFromSession", "y");
-				}
-				bean = new oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean();
-				fillBean(request, bean);
-				if(request.getAttribute("serviceDate") != null){
-					MiscUtils.getLogger().debug("service Date set to the appointment Date"+(String) request.getAttribute("serviceDate"));
-					bean.setApptDate((String) request.getAttribute("serviceDate"));
-				}
-
-				request.getSession().setAttribute("billingSessionBean", bean);
-				//       this.validateCodeLastBilled(request, errors,
-				//                                   request.getParameter("demographic_no"));
-				try{
-					_log.debug("Start of billing rules");
-					List<DSConsequence> list = BillingGuidelines.getInstance().evaluateAndGetConsequences(
-							loggedInInfo,
-							request.getParameter("demographic_no"),
-							(String) request.getSession().getAttribute("user"));
-
-					for (DSConsequence dscon : list){
-						_log.debug("DSTEXT "+dscon.getText());
-						errors.add("",new ActionMessage("message.custom",dscon.getText()));
-					}
-				}catch(Exception e){
-					MiscUtils.getLogger().error("Error", e);
-				}
-			}else if ("true".equals(encounter)) {
-				bean = (oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean) request.
-						getSession().getAttribute("billingSessionBean");
-				frm.setXml_provider(request.getParameter("user_no"));
-				region = bean.getBillRegion();
-			}
-			/**
-			 * @todo Test this, it looks unnecessary
-			 */
-			else {
-				bean = (oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean) request.
-						getSession().getAttribute("billingSessionBean");
-			}
-		}
-		this.saveErrors(request, errors);
-		return (mapping.findForward(region));
-	}
+        request.getSession().setAttribute("billingSessionBean", bean);
+ //       this.validateCodeLastBilled(request, errors,
+ //                                   request.getParameter("demographic_no"));
+        try{
+            _log.debug("Start of billing rules");
+            List<DSConsequence> list = BillingGuidelines.getInstance().evaluateAndGetConsequences(loggedInInfo, request.getParameter("demographic_no"), (String) request.getSession().getAttribute("user"));
+        
+            for (DSConsequence dscon : list){
+                _log.debug("DSTEXT "+dscon.getText());
+                errors.add("",new ActionMessage("message.custom",dscon.getText()));
+           }
+        }catch(Exception e){
+            MiscUtils.getLogger().error("Error", e);
+        }
+      }else if ("true".equals(encounter)) {
+        bean = (oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean) request.
+            getSession().getAttribute("billingSessionBean");
+        frm.setXml_provider(request.getParameter("user_no"));
+        region = bean.getBillRegion();
+      }
+      /**
+       * @todo Test this, it looks unnecessary
+       */
+      else {
+        bean = (oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean) request.
+            getSession().getAttribute("billingSessionBean");
+      }
+    }
+    this.saveErrors(request, errors);
+    return (mapping.findForward(region));
+  }
 
 	private void fillBean(HttpServletRequest request, BillingSessionBean bean)
 	{

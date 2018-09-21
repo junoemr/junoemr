@@ -1820,8 +1820,6 @@ private long getAppointmentRowSpan(
 																			</a>
 																		</c:when>
 																		<c:otherwise>
-<%--
-
 																			&#124; <a
 																				href="${appointmentInfo.billLink}"
 																				target="_blank"
@@ -1829,21 +1827,6 @@ private long getAppointmentRowSpan(
 																			>
 																				<bean:message key="provider.appointmentProviderAdminDay.btnB"/>
 																			</a>
---%>
-
-
-																			&#124; <a
-																				href="#"
-																				onclick="window.open('${appointmentInfo.billLink}', 'junoBillingWindow')"
-																				title="<bean:message key="global.billingtag"/>"
-																			>
-
-
-																				<bean:message key="provider.appointmentProviderAdminDay.btnB"/>
-																			</a>
-
-
-
 																		</c:otherwise>
 																	</c:choose>
 																</c:if>
