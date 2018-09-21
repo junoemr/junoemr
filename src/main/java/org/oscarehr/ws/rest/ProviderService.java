@@ -255,7 +255,7 @@ public class ProviderService extends AbstractServiceImpl {
 	public AbstractSearchResponse<ProviderSettings> getProviderSettings() {	
 		AbstractSearchResponse<ProviderSettings> response = new AbstractSearchResponse<ProviderSettings>();
 		
-		ProviderSettings settings = providerManager.getProviderSettings(getLoggedInInfo(), getLoggedInInfo().getLoggedInProviderNo());
+		ProviderSettings settings = providerManager.getProviderSettings(getLoggedInInfo().getLoggedInProviderNo());
 		List<ProviderSettings> content = new ArrayList<ProviderSettings>();
 		content.add(settings);
 		response.setContent(content);
