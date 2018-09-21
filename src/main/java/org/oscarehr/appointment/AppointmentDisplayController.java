@@ -30,7 +30,6 @@ import org.oscarehr.common.dao.ProviderPreferenceDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.LookupListItem;
-import org.oscarehr.integration.clinicaid.service.ClinicaidAPIService;
 import org.oscarehr.common.model.ProviderPreference;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.util.MiscUtils;
@@ -429,45 +428,9 @@ public class AppointmentDisplayController
 			}
 		}
 
-		//try
-		//{
-			ClinicaidAPIService clinicaidAPIService = SpringUtils.getBean(ClinicaidAPIService.class);
-
-			String action = "create_invoice";
-
-			return clinicaidAPIService.buildClinicaidURL( //request, action, false);
-				null,
-				action,
-				this.currentUserNo,
-				this.userFirstName,
-				this.userLastName,
-				appointment.getDemographicNo().toString(),
-				scheduleProviderNo.toString(),
-				appointment.getDate().format(dateFormatter),
-				null, // There doesn't seem to be a chart number available
-				appointment.getAppointmentNo().toString(),
-				appointment.getStartTime().format(timeFormatter),
-				appointment.getDemoProviderNo(),
-				appointment.getDemoHin(),
-				appointment.getVer(),
-				appointment.getFirstName(),
-				appointment.getLastName(),
-				appointment.getDemoPatientStatus(),
-				appointment.getDemoAge().toString(),
-				appointment.getDemoSex(),
-				appointment.getDemoProvince(),
-				appointment.getDemoHcType(),
-				appointment.getDemoCity(),
-				appointment.getDemoPostal(),
-				appointment.getDemoFamilyDoctorNumber(),
-				appointment.getDemoFamilyDoctorFirstName(),
-				appointment.getDemoFamilyDoctorLastName(),
-				appointment.getBirthday().format(dateFormatter),
-				appointment.getDemoAddress(),
-				null
-			);
-
-/*			return "../billing.do" +
+		try
+		{
+			return "../billing.do" +
 				"?billRegion=" + URLEncoder.encode(province, "UTF-8") +
 				"&billForm=" + URLEncoder.encode(defaultView, "UTF-8") +
 				"&hotclick=" +
@@ -480,15 +443,15 @@ public class AppointmentDisplayController
 				"&apptProvider_no=" + scheduleProviderNo +
 				"&appointment_date=" + appointment.getDate().format(dateFormatter) +
 				"&start_time=" + appointment.getStartTime().format(timeFormatterWithSeconds) +
-				"&bNewForm=1";*/
-/*		}
+				"&bNewForm=1" + referralNoParameter;
+		}
 		catch(UnsupportedEncodingException e)
 		{
 			MiscUtils.getLogger().error("Billing link URL encoding error with string: " +
 				parameterProviderName, e);
-		}*/
+		}
 
-		//return "";
+		return "";
 	}
 
 	public String getUnbillURL()

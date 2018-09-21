@@ -22,11 +22,8 @@
  */
 package org.oscarehr.schedule.dto;
 
-//import org.oscarehr.PMmodule.utility.Utility;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.Period;
 
 public class AppointmentDetails
 {
@@ -63,19 +60,6 @@ public class AppointmentDetails
 	private LocalDate birthday;
 	private boolean hasTicklers;
 	private String ticklerMessages;
-	private String demoFamilyDoctorNumber;
-	private String demoFamilyDoctorFirstName;
-	private String demoFamilyDoctorLastName;
-	private String demoProviderNo;
-	private String demoHin;
-	private String demoPatientStatus;
-	private String demoSex;
-	private String demoProvince;
-	private String demoHcType;
-	private String demoCity;
-	private String demoPostal;
-	private String demoAddress;
-
 
 	public AppointmentDetails(
 		Integer appointmentNo,
@@ -109,19 +93,7 @@ public class AppointmentDetails
 		String colorProperty,
 		LocalDate birthday,
 		boolean hasTicklers,
-		String ticklerMessages,
-		String demoFamilyDoctorNumber,
-		String demoFamilyDoctorFirstName,
-		String demoFamilyDoctorLastName,
-		String demoProviderNo,
-		String demoHin,
-		String demoPatientStatus,
-		String demoSex,
-		String demoProvince,
-		String demoHcType,
-		String demoCity,
-		String demoPostal,
-		String demoAddress
+		String ticklerMessages
 	)
 	{
 		this.appointmentNo = appointmentNo;
@@ -156,18 +128,6 @@ public class AppointmentDetails
 		this.birthday = birthday;
 		this.hasTicklers = hasTicklers;
 		this.ticklerMessages = ticklerMessages;
-		this.demoFamilyDoctorNumber = demoFamilyDoctorNumber;
-		this.demoFamilyDoctorFirstName = demoFamilyDoctorFirstName;
-		this.demoFamilyDoctorLastName = demoFamilyDoctorLastName;
-		this.demoProviderNo = demoProviderNo;
-		this.demoHin = demoHin;
-		this.demoPatientStatus = demoPatientStatus;
-		this.demoSex = demoSex;
-		this.demoProvince = demoProvince;
-		this.demoHcType = demoHcType;
-		this.demoCity = demoCity;
-		this.demoPostal = demoPostal;
-		this.demoAddress = demoAddress;
 	}
 
 	public Integer getAppointmentNo()
@@ -320,12 +280,6 @@ public class AppointmentDetails
 		return birthday;
 	}
 
-	public Integer getDemoAge()
-	{
-		Period p = Period.between(this.birthday, LocalDate.now());
-		return p.getYears();
-	}
-
 	public boolean hasTicklers()
 	{
 		return hasTicklers;
@@ -334,65 +288,5 @@ public class AppointmentDetails
 	public String getTicklerMessages()
 	{
 		return ticklerMessages;
-	}
-
-	public String getDemoFamilyDoctorNumber()
-	{
-		return demoFamilyDoctorNumber;
-	}
-
-	public String getDemoFamilyDoctorFirstName()
-	{
-		return demoFamilyDoctorFirstName;
-	}
-
-	public String getDemoFamilyDoctorLastName()
-	{
-		return demoFamilyDoctorLastName;
-	}
-
-	public String getDemoProviderNo()
-	{
-		return demoProviderNo;
-	}
-
-	public String getDemoHin()
-	{
-		return demoHin;
-	}
-
-	public String getDemoPatientStatus()
-	{
-		return demoPatientStatus;
-	}
-
-	public String getDemoSex()
-	{
-		return demoSex;
-	}
-
-	public String getDemoProvince()
-	{
-		return demoProvince;
-	}
-
-	public String getDemoHcType()
-	{
-		return demoHcType;
-	}
-
-	public String getDemoCity()
-	{
-		return demoCity;
-	}
-
-	public String getDemoPostal()
-	{
-		return demoPostal;
-	}
-
-	public String getDemoAddress()
-	{
-		return demoAddress;
 	}
 }
