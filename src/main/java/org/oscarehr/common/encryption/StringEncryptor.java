@@ -35,6 +35,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -44,16 +45,18 @@ public class StringEncryptor
 {
 	private static final Logger logger = Logger.getLogger(StringEncryptor.class);
 
-	private static final String secretKey = "1234567890123456";
+	private static final String SECRET_KEY_ENV_NAME = "TOMCAT_ENCRYPTION_KEY";
 	private static final String TRANSFORM = "AES/CBC/PKCS5Padding";
+	private static final String AES = "AES";
 
 	public static byte[] encrypt(byte[] plaintext)
 	{
-		final SecureRandom rng = new SecureRandom();
 		try
 		{
 			Cipher cipher = Cipher.getInstance(TRANSFORM);
-			SecretKeySpec skeySpec = getSecretKeySpec(secretKey);
+			final SecureRandom rng = new SecureRandom();
+
+			SecretKeySpec skeySpec = getSecretKeySpec(loadSecretKey());
 			IvParameterSpec iv = createIV(cipher.getBlockSize(), Optional.of(rng));
 
 			cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
@@ -61,7 +64,7 @@ public class StringEncryptor
 			byte[] encrypted = cipher.doFinal(plaintext);
 			return concat(iv.getIV(), encrypted);
 		}
-		catch(Exception e)
+		catch(IOException | GeneralSecurityException e)
 		{
 			logger.error("Encryption Error", e);
 			throw new EncryptionException(e);
@@ -70,9 +73,7 @@ public class StringEncryptor
 	public static String encrypt(String plaintextString)
 	{
 		byte[] encryptedWithIV = encrypt(plaintextString.getBytes());
-		String encryptedString = Base64.encodeBase64String(encryptedWithIV);
-		logger.info("encrypted: " + encryptedString); //TODO remove this
-		return encryptedString;
+		return Base64.encodeBase64String(encryptedWithIV);
 	}
 
 	public static byte[] decrypt(byte[] encryptedWithIV)
@@ -81,7 +82,7 @@ public class StringEncryptor
 		{
 			Cipher cipher = Cipher.getInstance(TRANSFORM);
 
-			SecretKeySpec skeySpec = getSecretKeySpec(secretKey);
+			SecretKeySpec skeySpec = getSecretKeySpec(loadSecretKey());
 			IvParameterSpec iv = readIV(cipher.getBlockSize(), new ByteArrayInputStream(encryptedWithIV));
 
 			cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
@@ -89,7 +90,7 @@ public class StringEncryptor
 			byte[] encrypted = Arrays.copyOfRange(encryptedWithIV, iv.getIV().length, encryptedWithIV.length);
 			return cipher.doFinal(encrypted);
 		}
-		catch(Exception e)
+		catch(IOException | GeneralSecurityException e)
 		{
 			logger.error("Decryption Error", e);
 			throw new EncryptionException(e);
@@ -98,20 +99,26 @@ public class StringEncryptor
 	public static String decrypt(String encryptedStringWithIV)
 	{
 		byte[] original = decrypt(Base64.decodeBase64(encryptedStringWithIV));
-
-		String decryptedString = new String(original);
-		logger.info("decrypted: " + decryptedString); //TODO remove this
-		return decryptedString;
+		return new String(original);
 	}
 
 	private static SecretKeySpec getSecretKeySpec(String secretKey) throws UnsupportedEncodingException
 	{
-		return new SecretKeySpec(secretKey.getBytes("UTF-8"), "AES");
+		return new SecretKeySpec(secretKey.getBytes("UTF-8"), AES);
+	}
+	private static String loadSecretKey()
+	{
+		String secretKey = System.getenv(SECRET_KEY_ENV_NAME);
+		if(secretKey == null)
+		{
+			throw new IllegalStateException("Missing environment variable: " + SECRET_KEY_ENV_NAME);
+		}
+		return secretKey;
 	}
 
 	public static SecretKey generateKey() throws NoSuchAlgorithmException
 	{
-		KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+		KeyGenerator keyGenerator = KeyGenerator.getInstance(AES);
 		keyGenerator.init(128); // 128 default; 192 and 256 also possible
 		return keyGenerator.generateKey();
 	}

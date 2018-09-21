@@ -150,7 +150,7 @@ public class FaxConfig extends AbstractModel<Integer>
 	 * @return the faxPasswd
 	 */
 	public String getFaxPasswd() {
-		return StringEncryptor.decrypt(this.faxPasswd);
+		return (faxPasswd == null)? null : StringEncryptor.decrypt(faxPasswd);
 	}
 
 
@@ -159,7 +159,7 @@ public class FaxConfig extends AbstractModel<Integer>
 	 */
 	public void setFaxPasswd(String faxPasswd)
 	{
-		this.faxPasswd = StringEncryptor.encrypt(faxPasswd);
+		this.faxPasswd = (faxPasswd == null)? null : StringEncryptor.encrypt(faxPasswd);
 	}
 
 

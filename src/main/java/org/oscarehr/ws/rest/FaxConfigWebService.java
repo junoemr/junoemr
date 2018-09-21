@@ -139,15 +139,15 @@ public class FaxConfigWebService extends AbstractServiceImpl
 			throw new RuntimeException("Invalid Fax Config Id: " + id);
 		}
 
-		// TODO refactor this merge code
-		String currentPw = config.getFaxPasswd();
-		config = FaxSettingsConverter.getAsDomainObject(accountSettingsTo1);
-		config.setId(id);
+		// keep current password if a new one is not set
 		if(accountSettingsTo1.getPassword() == null || accountSettingsTo1.getPassword().trim().isEmpty())
 		{
-			config.setFaxPasswd(currentPw);// keep current password if a new one is not set
+			accountSettingsTo1.setPassword(config.getFaxPasswd());
 		}
+		config = FaxSettingsConverter.getAsDomainObject(accountSettingsTo1);
+		config.setId(id);
 		faxConfigDao.merge(config);
+
 		return RestResponse.successResponse(FaxSettingsConverter.getAsOutboundTransferObject(config));
 	}
 
