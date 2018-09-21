@@ -26,8 +26,10 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.oscarehr.appointment.model.AppointmentStatusList;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.LookupListItem;
+import org.oscarehr.integration.clinicaid.service.ClinicaidAPIService;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.SxmlMisc;
 import oscar.util.UtilMisc;
@@ -400,9 +402,45 @@ public class AppointmentDisplayController
 		String province = OscarProperties.getInstance().getBillingTypeUpperCase();
 		String default_view = OscarProperties.getInstance().getProperty("default_view");
 
-		try
-		{
-			return "../billing.do" +
+		//try
+		//{
+			ClinicaidAPIService clinicaidAPIService = SpringUtils.getBean(ClinicaidAPIService.class);
+
+			String action = "create_invoice";
+
+			return clinicaidAPIService.buildClinicaidURL( //request, action, false);
+				null,
+				action,
+				this.currentUserNo,
+				this.userFirstName,
+				this.userLastName,
+				appointment.getDemographicNo().toString(),
+				scheduleProviderNo.toString(),
+				appointment.getDate().format(dateFormatter),
+				null, // There doesn't seem to be a chart number available
+				appointment.getAppointmentNo().toString(),
+				appointment.getStartTime().format(timeFormatter),
+				appointment.getDemoProviderNo(),
+				appointment.getDemoHin(),
+				appointment.getVer(),
+				appointment.getFirstName(),
+				appointment.getLastName(),
+				appointment.getDemoPatientStatus(),
+				appointment.getDemoAge().toString(),
+				appointment.getDemoSex(),
+				appointment.getDemoProvince(),
+				appointment.getDemoHcType(),
+				appointment.getDemoCity(),
+				appointment.getDemoPostal(),
+				appointment.getDemoFamilyDoctorNumber(),
+				appointment.getDemoFamilyDoctorFirstName(),
+				appointment.getDemoFamilyDoctorLastName(),
+				appointment.getBirthday().format(dateFormatter),
+				appointment.getDemoAddress(),
+				null
+			);
+
+/*			return "../billing.do" +
 				"?billRegion=" + URLEncoder.encode(province, "UTF-8") +
 				"&billForm=" + URLEncoder.encode(default_view, "UTF-8") +
 				"&hotclick=" +
@@ -415,15 +453,15 @@ public class AppointmentDisplayController
 				"&apptProvider_no=" + scheduleProviderNo +
 				"&appointment_date=" + appointment.getDate().format(dateFormatter) +
 				"&start_time=" + appointment.getStartTime().format(timeFormatter) +
-				"&bNewForm=1";
-		}
+				"&bNewForm=1";*/
+/*		}
 		catch(UnsupportedEncodingException e)
 		{
 			MiscUtils.getLogger().error("Billing link URL encoding error with string: " +
 				parameterProviderName, e);
-		}
+		}*/
 
-		return "";
+		//return "";
 	}
 
 	public String getUnbillURL()

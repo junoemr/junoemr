@@ -166,48 +166,174 @@ public class ClinicaidAPIService
 		return response;
 	}
 
-	public String buildClinicaidURL(HttpServletRequest request, String action)
+	public String buildClinicaidURL(HttpServletRequest request, String action, boolean login)
 	{
-		String clinicaidLink = sessionManager.getClinicaidDomain();
-		String nonce = "";
 
 		HttpSession session = request.getSession();
 		String user_no = (String) session.getAttribute("user");
 		String user_first_name = (String) session.getAttribute("userfirstname");
 		String user_last_name = (String) session.getAttribute("userlastname");
+		String service_recipient_oscar_number = request.getParameter("demographic_no");
+		String appointment_provider_no = request.getParameter("apptProvider_no");
 
-		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		Provider loggedInProvider = loggedInInfo.getLoggedInProvider();
+		String appointment_date = request.getParameter("appointment_date");
+		String chart_number = request.getParameter("chart_no");
+		String appointment_number = request.getParameter("appointment_no");
+		String appointment_start_time = request.getParameter("start_time");
 
-		try
+		oscar.oscarDemographic.data.DemographicData demoData =
+				new oscar.oscarDemographic.data.DemographicData();
+		org.oscarehr.common.model.Demographic demo =
+				demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), service_recipient_oscar_number);
+
+		String nonce = "";
+		if(login)
 		{
-			nonce = sessionManager.getLoginToken(loggedInProvider);
-		}
-		catch (IOException error)
-		{
-			String message = "Failed to get login token for Clinicaid integration.";
-			MiscUtils.getLogger().error(message, error);
-			return clinicaidLink;
+			try
+			{
+				LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+				Provider loggedInProvider = loggedInInfo.getLoggedInProvider();
+				nonce = sessionManager.getLoginToken(loggedInProvider);
+			} catch (IOException error)
+			{
+				String message = "Failed to get login token for Clinicaid integration.";
+				MiscUtils.getLogger().error(message, error);
+				return "";
+			}
 		}
 
+/*		String birthdayString =
+			StringUtils.trimToEmpty(demo.getYearOfBirth()) + "-" +
+			StringUtils.trimToEmpty(demo.getMonthOfBirth()) + "-" +
+			StringUtils.trimToEmpty(demo.getDateOfBirth());*/
+
+		//String patientRemoteId = request.getParameter("patient_remote_id");
+
+		HashMap<String, String> rootQuerystringData = new HashMap<>();
+		rootQuerystringData.put("nonce", nonce);
+		rootQuerystringData.put("oscar_domain", "localhost");
+		rootQuerystringData.put("oscar_instance", "9090");
+		rootQuerystringData.put("billRegion", "CLINICAID");
+		rootQuerystringData.put("login", "1");
+
+		String clinicaidLink = sessionManager.getClinicaidDomain();
+		return clinicaidLink + "/" + sessionManager.buildQueryString(rootQuerystringData);
+
+/*		return buildClinicaidURL(
+				nonce,
+				action,
+				user_no,
+				user_first_name,
+				user_last_name,
+				service_recipient_oscar_number,
+				appointment_provider_no,
+				appointment_date,
+				chart_number,
+				appointment_number,
+				appointment_start_time,
+				demo.getProviderNo(),
+				demo.getHin(),
+				demo.getVer(),
+				demo.getFirstName(),
+				demo.getLastName(),
+				demo.getPatientStatus(),
+				demo.getAge(),
+				demo.getSex(),
+				demo.getProvince(),
+				demo.getHcType(),
+				demo.getCity(),
+				demo.getPostal(),
+				demo.getFamilyDoctorNumber(),
+				demo.getFamilyDoctorFirstName(),
+				demo.getFamilyDoctorLastName(),
+				birthdayString,
+				demo.getAddress(),
+				patientRemoteId
+		);*/
+	}
+
+	public String buildClinicaidURL(
+		String nonce,
+		String action,
+		String user_no,
+		String user_first_name,
+		String user_last_name,
+		String service_recipient_oscar_number,
+		String appointment_provider_no,
+		String appointment_date,
+		String chart_number,
+		String appointment_number,
+		String appointment_start_time,
+		String demographic_provider_no,
+		String hin,
+		String ver,
+		String firstName,
+		String lastName,
+		String patientStatus,
+		String age,
+		String sex,
+		String province,
+		String hcType,
+		String city,
+		String postal,
+		String familyDoctorNumber,
+		String familyDoctorFirstName,
+		String familyDoctorLastName,
+		String birthday,
+		String address,
+		String patientRemoteId
+	)
+	{
+		String clinicaidLink = sessionManager.getClinicaidDomain();
+
+/*		HttpSession session = request.getSession();
+		String user_no = (String) session.getAttribute("user");
+		String user_first_name = (String) session.getAttribute("userfirstname");
+		String user_last_name = (String) session.getAttribute("userlastname");*/
+
+
+/*		if(login)
+		{
+			try
+			{
+				LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+				Provider loggedInProvider = loggedInInfo.getLoggedInProvider();
+				nonce = sessionManager.getLoginToken(loggedInProvider);
+			} catch (IOException error)
+			{
+				String message = "Failed to get login token for Clinicaid integration.";
+				MiscUtils.getLogger().error(message, error);
+				return clinicaidLink;
+			}
+		}*/
+
+		HashMap<String, String> rootQuerystringData = new HashMap<>();
+		rootQuerystringData.put("oscar_domain", "localhost");
+		rootQuerystringData.put("oscar_instance", "9090");
+		rootQuerystringData.put("billRegion", "CLINICAID");
+		rootQuerystringData.put("login", "1");
+		//rootQuerystringData.put("demographic_no", service_recipient_oscar_number);
+
+		if(nonce != null)
+		{
+			rootQuerystringData.put("nonce", nonce);
+		}
+
+		MiscUtils.getLogger().info("The action is: " + action);
 		// If creating a new invoice in Clinicaid
 		if (action.equals("create_invoice"))
 		{
 			BillingFormData billform = new BillingFormData();
-			String service_recipient_oscar_number = request.getParameter("demographic_no");
-			String appointment_provider_no = request.getParameter("apptProvider_no");
+			//String service_recipient_oscar_number = request.getParameter("demographic_no");
+			//String appointment_provider_no = request.getParameter("apptProvider_no");
 
-			oscar.oscarDemographic.data.DemographicData demoData =
+/*			oscar.oscarDemographic.data.DemographicData demoData =
 					new oscar.oscarDemographic.data.DemographicData();
 			org.oscarehr.common.model.Demographic demo =
-					demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), service_recipient_oscar_number);
+					demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), service_recipient_oscar_number);*/
 
 			// Get latest diagnostic code
 			String dx_codes = "";
-
-			String referral_no = demo.getFamilyDoctorNumber();
-			String referral_first_name = demo.getFamilyDoctorFirstName();
-			String referral_last_name = demo.getFamilyDoctorLastName();
 
 			String provider_no = "";
 			String provider_uli = "";
@@ -250,7 +376,7 @@ public class ClinicaidAPIService
 			{
 				try
 				{
-					provider_no = demo.getProviderNo();
+					provider_no = demographic_provider_no;
 
 					// Make sure the provider_no is a valid integer. If a patient doesn't
 					// have a provider assigned to them, the demo returns an invalid provider_no
@@ -293,47 +419,46 @@ public class ClinicaidAPIService
 				provider_uli = "";
 			}
 
-			HashMap<String, String> data = new HashMap<>();
-			data.put("service_recipient_uli", StringUtils.trimToEmpty(demo.getHin()));
-			data.put("service_recipient_ver", StringUtils.trimToEmpty(demo.getVer()));
-			data.put("service_recipient_first_name", StringUtils.trimToEmpty(UtilMisc.toUpperLowerCase(demo.getFirstName())));
-			data.put("service_recipient_last_name", StringUtils.trimToEmpty(UtilMisc.toUpperLowerCase(demo.getLastName())));
-			data.put("service_recipient_oscar_number", StringUtils.trimToEmpty(service_recipient_oscar_number));
-			data.put("service_recipient_status", StringUtils.trimToEmpty(demo.getPatientStatus()));
-			data.put("service_recipient_age", StringUtils.trimToEmpty(demo.getAge()));
-			data.put("service_recipient_gender", StringUtils.trimToEmpty(demo.getSex()));
-			data.put("service_provider_oscar_number", StringUtils.trimToEmpty(provider_no));
-			data.put("service_provider_first_name", StringUtils.trimToEmpty(provider_first_name));
-			data.put("service_provider_last_name", StringUtils.trimToEmpty(provider_last_name));
-			data.put("service_provider_uli", StringUtils.trimToEmpty(provider_uli));
-			data.put("service_start_date", StringUtils.trimToEmpty(request.getParameter("appointment_date")));
-			data.put("province", StringUtils.trimToEmpty(StringUtils.upperCase(demo.getProvince())));
-			data.put("hc_province", StringUtils.trimToEmpty(StringUtils.upperCase(demo.getHcType())));
-			data.put("city", StringUtils.trimToEmpty(demo.getCity()));
-			data.put("postal_code", StringUtils.trimToEmpty(demo.getPostal()));
-			data.put("chart_number", StringUtils.trimToEmpty(request.getParameter("chart_no")));
-			data.put("service_recipient_birth_date", StringUtils.trimToEmpty(demo.getYearOfBirth()) + "-" + StringUtils.trimToEmpty(demo.getMonthOfBirth()) + "-" + StringUtils.trimToEmpty(demo.getDateOfBirth()));
-			data.put("appointment_number", StringUtils.trimToEmpty(request.getParameter("appointment_no")));
-			data.put("appointment_start_time", StringUtils.trimToEmpty(request.getParameter("start_time")));
-			data.put("referral_number", StringUtils.trimToEmpty(referral_no));
-			data.put("referral_first_name", StringUtils.trimToEmpty(referral_first_name));
-			data.put("referral_last_name", StringUtils.trimToEmpty(referral_last_name));
-			data.put("diagnostic_code", StringUtils.trimToEmpty(dx_codes));
-			data.put("address", StringUtils.trimToEmpty(demo.getAddress()));
+			HashMap<String, String> querystringData = new HashMap<>();
+			querystringData.put("service_recipient_uli", StringUtils.trimToEmpty(hin));
+			querystringData.put("service_recipient_ver", StringUtils.trimToEmpty(ver));
+			querystringData.put("service_recipient_first_name", StringUtils.trimToEmpty(UtilMisc.toUpperLowerCase(firstName)));
+			querystringData.put("service_recipient_last_name", StringUtils.trimToEmpty(UtilMisc.toUpperLowerCase(lastName)));
+			querystringData.put("service_recipient_oscar_number", StringUtils.trimToEmpty(service_recipient_oscar_number));
+			querystringData.put("service_recipient_status", StringUtils.trimToEmpty(patientStatus));
+			querystringData.put("service_recipient_age", StringUtils.trimToEmpty(age));
+			querystringData.put("service_recipient_gender", StringUtils.trimToEmpty(sex));
+			querystringData.put("service_provider_oscar_number", StringUtils.trimToEmpty(provider_no));
+			querystringData.put("service_provider_first_name", StringUtils.trimToEmpty(provider_first_name));
+			querystringData.put("service_provider_last_name", StringUtils.trimToEmpty(provider_last_name));
+			querystringData.put("service_provider_uli", StringUtils.trimToEmpty(provider_uli));
+			querystringData.put("service_start_date", StringUtils.trimToEmpty(appointment_date));
+			querystringData.put("province", StringUtils.trimToEmpty(StringUtils.upperCase(province)));
+			querystringData.put("hc_province", StringUtils.trimToEmpty(StringUtils.upperCase(hcType)));
+			querystringData.put("city", StringUtils.trimToEmpty(city));
+			querystringData.put("postal_code", StringUtils.trimToEmpty(postal));
+			querystringData.put("chart_number", StringUtils.trimToEmpty(chart_number));
+			querystringData.put("service_recipient_birth_date", StringUtils.trimToEmpty(birthday));
+			querystringData.put("appointment_number", StringUtils.trimToEmpty(appointment_number));
+			querystringData.put("appointment_start_time", StringUtils.trimToEmpty(appointment_start_time));
+			querystringData.put("referral_number", StringUtils.trimToEmpty(familyDoctorNumber));
+			querystringData.put("referral_first_name", StringUtils.trimToEmpty(familyDoctorFirstName));
+			querystringData.put("referral_last_name", StringUtils.trimToEmpty(familyDoctorLastName));
+			querystringData.put("diagnostic_code", StringUtils.trimToEmpty(dx_codes));
+			querystringData.put("address", StringUtils.trimToEmpty(address));
 
-			clinicaidLink = clinicaidLink + "/?nonce=" + nonce +
-					"#/invoice/add" + sessionManager.buildQueryString(data);
-
+			clinicaidLink = clinicaidLink + "/" + sessionManager.buildQueryString(rootQuerystringData) +
+					"#/invoice/add" + sessionManager.buildQueryString(querystringData);
 		}
 		else if (action.equals("invoice_reports"))
 		{
-			if (request.getParameter("patient_remote_id") != null && !request.getParameter("patient_remote_id").isEmpty())
+			if (patientRemoteId != null && !patientRemoteId.isEmpty())
 			{
-				clinicaidLink = clinicaidLink + "/?nonce=" + nonce + "#/reports?patient_remote_id=" + request.getParameter("patient_remote_id");
+				clinicaidLink = clinicaidLink + "/" + sessionManager.buildQueryString(rootQuerystringData) + "#/reports?patient_remote_id=" + patientRemoteId;
 			}
 			else
 			{
-				clinicaidLink = clinicaidLink + "/?nonce=" + nonce + "#/reports";
+				clinicaidLink = clinicaidLink + "/" + sessionManager.buildQueryString(rootQuerystringData) + "#/reports";
 			}
 		}
 		return clinicaidLink;

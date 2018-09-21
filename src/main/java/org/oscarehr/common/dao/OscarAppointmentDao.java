@@ -42,6 +42,7 @@ import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentArchive;
+import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Facility;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.util.MiscUtils;
@@ -804,6 +805,16 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  d.year_of_birth,\n" +
 				"  d.month_of_birth,\n" +
 				"  d.date_of_birth,\n" +
+				"  d.family_doctor,\n" +
+				"  d.provider_no,\n" +
+				"  d.hin,\n" +
+				"  d.patient_status,\n" +
+				"  CAST(d.sex AS char(2)) AS sex,\n" +
+				"  d.province,\n" +
+				"  d.hc_type,\n" +
+				"  d.city,\n" +
+				"  d.postal,\n" +
+				"  d.address,\n" +
 				"  dc.content AS cust_notes,\n" +
 				"  dc.cust3 AS cust_alert,\n" +
 				"  p.value AS color_property,\n" +
@@ -857,6 +868,16 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  d.year_of_birth,\n" +
 				"  d.month_of_birth,\n" +
 				"  d.date_of_birth,\n" +
+				"  d.family_doctor,\n" +
+				"  d.provider_no,\n" +
+				"  d.hin,\n" +
+				"  d.patient_status,\n" +
+				"  d.sex,\n" +
+				"  d.province,\n" +
+				"  d.hc_type,\n" +
+				"  d.city,\n" +
+				"  d.postal,\n" +
+				"  d.address,\n" +
 				"  dc.content,\n" +
 				"  dc.cust3,\n" +
 				"  p.value\n" +
@@ -908,6 +929,16 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 			String yearOfBirth = (String) result[index++];
 			String monthOfBirth = (String) result[index++];
 			String dayOfBirth = (String) result[index++];
+			String familyDoctor = (String) result[index++];
+			String dbProviderNo = (String) result[index++];
+			String hin = (String) result[index++];
+			String patientStatus = (String) result[index++];
+			String sex = (String) result[index++];
+			String province = (String) result[index++];
+			String hcType = (String) result[index++];
+			String city = (String) result[index++];
+			String postal = (String) result[index++];
+			String address = (String) result[index++];
 			String custNotes = (String) result[index++];
 			String custAlert = (String) result[index++];
 			String colorProperty = (String) result[index++];
@@ -945,10 +976,12 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				int day = Integer.parseInt(dayOfBirth);
 
 				birthday = LocalDate.of(year, month, day);
-
 			}
 
 			boolean hasTicklers = (maxTicklerNo != null);
+
+			Demographic demographic = new Demographic();
+			demographic.setFamilyDoctor(familyDoctor);
 
 			appointmentDetails.get(startTime).add(new AppointmentDetails(
 				appointmentNo,
@@ -982,7 +1015,19 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				colorProperty,
 				birthday,
 				hasTicklers,
-				ticklerMessages
+				ticklerMessages,
+				demographic.getFamilyDoctorNumber(),
+				demographic.getFamilyDoctorFirstName(),
+				demographic.getFamilyDoctorLastName(),
+				dbProviderNo,
+				hin,
+				patientStatus,
+				sex,
+				province,
+				hcType,
+				city,
+				postal,
+				address
 			));
 		}
 
