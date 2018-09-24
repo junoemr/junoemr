@@ -23,11 +23,17 @@
 package org.oscarehr.appointment;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.appointment.model.AppointmentStatusList;
+import org.oscarehr.common.dao.DemographicDao;
+import org.oscarehr.common.dao.ProviderPreferenceDao;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.LookupListItem;
+import org.oscarehr.common.model.ProviderPreference;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.SxmlMisc;
 import oscar.util.UtilMisc;
@@ -87,6 +93,9 @@ public class AppointmentDisplayController
 	private boolean showMasterLink;
 	private boolean showBilling;
 	private boolean showEChart;
+
+	private DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
+	private ProviderPreferenceDao providerPreferenceDao = SpringUtils.getBean(ProviderPreferenceDao.class);
 
 	public void init(
 		AppointmentDetails appointment,
@@ -398,13 +407,32 @@ public class AppointmentDisplayController
 	public String getBillLink()
 	{
 		String province = OscarProperties.getInstance().getBillingTypeUpperCase();
-		String default_view = OscarProperties.getInstance().getProperty("default_view");
+		String defaultView = OscarProperties.getInstance().getProperty("default_view");
+		Demographic demographic = demographicDao.getDemographicById(appointment.getDemographicNo());
+		String referralNoParameter = "";
+
+		if(oscar.OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc"))
+		{
+			String rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
+			rdohip = rdohip !=null ? rdohip : "" ;
+			referralNoParameter = "&referral_no_1=" + rdohip;
+		}
+
+		ProviderPreference preference = providerPreferenceDao.find(sessionProviderNo);
+		if(preference != null)
+		{
+			String preferredView = preference.getDefaultServiceType();
+			if(preferredView != null && !preferredView.equals("no"))
+			{
+				defaultView = preferredView;
+			}
+		}
 
 		try
 		{
 			return "../billing.do" +
 				"?billRegion=" + URLEncoder.encode(province, "UTF-8") +
-				"&billForm=" + URLEncoder.encode(default_view, "UTF-8") +
+				"&billForm=" + URLEncoder.encode(defaultView, "UTF-8") +
 				"&hotclick=" +
 				"&appointment_no=" + appointment.getAppointmentNo().toString() +
 				"&demographic_name=" + URLEncoder.encode(getName(), "UTF-8") +
@@ -414,8 +442,8 @@ public class AppointmentDisplayController
 				"&user_no=" + currentUserNo +
 				"&apptProvider_no=" + scheduleProviderNo +
 				"&appointment_date=" + appointment.getDate().format(dateFormatter) +
-				"&start_time=" + appointment.getStartTime().format(timeFormatter) +
-				"&bNewForm=1";
+				"&start_time=" + appointment.getStartTime().format(timeFormatterWithSeconds) +
+				"&bNewForm=1" + referralNoParameter;
 		}
 		catch(UnsupportedEncodingException e)
 		{

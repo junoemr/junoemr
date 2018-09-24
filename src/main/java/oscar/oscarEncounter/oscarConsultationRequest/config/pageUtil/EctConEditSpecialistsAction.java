@@ -38,6 +38,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.model.ProfessionalSpecialist;
+import org.oscarehr.consultations.dao.ServiceSpecialistsDao;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
@@ -53,26 +54,50 @@ public class EctConEditSpecialistsAction extends Action {
 		}
 		
 		ProfessionalSpecialistDao professionalSpecialistDao=(ProfessionalSpecialistDao)SpringUtils.getBean("professionalSpecialistDao");
+		ServiceSpecialistsDao serviceSpecialistDao=(ServiceSpecialistsDao)SpringUtils.getBean("serviceSpecialistsDao");
 
 		EctConEditSpecialistsForm editSpecialistsForm = (EctConEditSpecialistsForm) form;
 		String specId = editSpecialistsForm.getSpecId();
-		String delete = editSpecialistsForm.getDelete();
+		String delete = request.getParameter("delete");
+		String activate = request.getParameter("activate");
 		String specialists[] = editSpecialistsForm.getSpecialists();
 
 		ResourceBundle oscarR = ResourceBundle.getBundle("oscarResources", request.getLocale());
 
-		if (delete.equals(oscarR.getString("oscarEncounter.oscarConsultationRequest.config.EditSpecialists.btnDeleteSpecialist"))) {
-			if (specialists.length > 0) {
+		if (delete != null)
+		{
+			if (specialists.length > 0)
+			{
 				for (int i = 0; i < specialists.length; i++)
 				{
+					//Hide professional specialist from search
 					ProfessionalSpecialist proSpec = professionalSpecialistDao.find(Integer.parseInt(specialists[i]));
 					proSpec.setHideFromView(true);
 					professionalSpecialistDao.merge(proSpec);
+
+					//Remove specialist from the services they are assigned to
+					serviceSpecialistDao.removeSpecialistFromAllServices(Integer.parseInt(specialists[i]));
 				}
 			}
 			EctConConstructSpecialistsScriptsFile constructSpecialistsScriptsFile = new EctConConstructSpecialistsScriptsFile();
 			constructSpecialistsScriptsFile.makeString(request.getLocale());
 			return mapping.findForward("delete");
+		}
+
+		if (activate != null)
+		{
+			if (specialists.length > 0)
+			{
+				for (int i = 0; i < specialists.length; i++)
+				{
+					ProfessionalSpecialist proSpec = professionalSpecialistDao.find(Integer.parseInt(specialists[i]));
+					proSpec.setHideFromView(false);
+					professionalSpecialistDao.merge(proSpec);
+				}
+			}
+			EctConConstructSpecialistsScriptsFile constructSpecialistsScriptsFile = new EctConConstructSpecialistsScriptsFile();
+			constructSpecialistsScriptsFile.makeString(request.getLocale());
+			return mapping.findForward("activate");
 		}
 
 		// not delete request, just update one entry

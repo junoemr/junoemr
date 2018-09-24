@@ -91,9 +91,9 @@
 					<div class="form-group">
 						<div class="col-sm-12">
 							<select id="letterhead" class="form-control"
-									ng-model="consultResponseCtrl.consult.letterheadName"
-									ng-options="letterhead.id as letterhead.name for letterhead in consultResponseCtrl.consult.letterheadList"
-									ng-change="consultResponseCtrl.changeLetterhead(consultRequestCtrl.consult.letterheadName)">
+									ng-model="consultResponseCtrl.consult.letterhead"
+									ng-options="letterhead.name for letterhead in consultResponseCtrl.consult.letterheadList track by letterhead.id"
+									ng-change="consultResponseCtrl.changeLetterhead(consultResponseCtrl.consult.letterhead)">
 							</select>
 						</div>
 					</div>
@@ -109,27 +109,9 @@
 						<div class="col-sm-12">
 							<label>Fax: </label>
 							{{consultResponseCtrl.consult.letterheadFax}}
-							<select id="letterheadFax" class="form-control inline" style="width: auto;"
-									ng-model="consultResponseCtrl.consult.letterheadFax"
-									ng-options="fax.faxNumber as fax.faxUser for fax in consultResponseCtrl.consult.faxList">
-								<option value="" disabled selected>Select Fax</option>
-							</select>
 						</div>
 					</div>
 				</form>
-
-
-				<%--<p class="letterheadDetails">--%>
-					<%--<address>--%>
-						<%--<label>Address:</label> <span style="white-space:nowrap">{{consultResponseCtrl.consult.letterheadAddress}}</span><br/>--%>
-						<%--<label>Phone:</label> {{consultResponseCtrl.consult.letterheadPhone}} <br/>--%>
-						<%--<label>Fax:</label>--%>
-						<%--<select id="letterheadFax" class="form-control inline" style="width: auto;"--%>
-								<%--ng-model="consultResponseCtrl.consult.letterheadFax"--%>
-								<%--ng-options="fax.faxNumber as fax.faxUser for fax in consultResponseCtrl.consult.faxList">--%>
-						<%--</select>--%>
-					<%--</address>--%>
-				<%--</p>--%>
 			</div>
 		</div><!-- Letterhead End-->
 		<div class="col-md-6"><!-- Specialist -->
@@ -161,14 +143,6 @@
 						</div>
 					</div>
 				</form>
-
-				<%--<p class="referringDoctorDetails">--%>
-					<%--<address>--%>
-						<%--<label>Address:</label> {{consultResponseCtrl.consult.referringDoctor.streetAddress}}<br/>--%>
-						<%--<label>Phone:</label> {{consultResponseCtrl.consult.referringDoctor.phoneNumber}} <br/>--%>
-						<%--<label>Fax:</label> {{consultResponseCtrl.consult.referringDoctor.faxNumber}}<br />--%>
-					<%--</address>--%>
-				<%--</p>--%>
 			</div>
 		</div><!-- Specialist End -->
 		<div class="clear"></div>
@@ -182,23 +156,14 @@
 							show-icon="true"
 							type="Input">
 					</juno-datepicker-popup>
-					<%--<input id="dp-responseDate" type="text"--%>
-						   <%--class="form-control inline"--%>
-						   <%--ng-model="consultResponseCtrl.consult.responseDate"--%>
-						   <%--placeholder="Response Date"--%>
-						   <%--datepicker-popup="yyyy-MM-dd"--%>
-						   <%--datepicker-append-to-body="true"--%>
-						   <%--is-open="consultResponseCtrl.page.respDatePicker"--%>
-						   <%--ng-click="consultResponseCtrl.page.respDatePicker=true"--%>
-					<%--/>--%>
 				</div>
 				<div class="form-group col-md-6">
 					<label class="control-label">Send To</label>
 					<select id="sendTo" class="form-control inline"
 							ng-model="consultResponseCtrl.consult.sendTo"
 							ng-required="true"
-							ng-options="sendTo for sendTo in consultResponseCtrl.consult.sendToList"
-					/>
+							ng-options="sendTo for sendTo in consultResponseCtrl.consult.sendToList">
+					</select>
 				</div>
 				<div class="form-group col-md-6">
 					<label class="control-label">Referral Date</label>
@@ -207,15 +172,6 @@
 							show-icon="true"
 							type="Input">
 					</juno-datepicker-popup>
-					<%--<input id="dp-referralDate" type="text"--%>
-						   <%--class="form-control inline"--%>
-						   <%--ng-model="consultResponseCtrl.consult.referralDate"--%>
-						   <%--placeholder="Referral Date"--%>
-						   <%--datepicker-popup="yyyy-MM-dd"--%>
-						   <%--datepicker-append-to-body="true"--%>
-						   <%--is-open="consultResponseCtrl.page.refDatePicker"--%>
-						   <%--ng-click="consultResponseCtrl.page.refDatePicker=true"--%>
-					<%--/>--%>
 				</div>
 				<div class="form-group col-md-6">
 					<label class="control-label">Urgency</label>
@@ -231,45 +187,6 @@
 					<textarea rows="4" class="form-control" readOnly>{{consultResponseCtrl.consult.referringDoctor.annotation}}</textarea>
 				</div>
 
-				<div class="col-md-12 form-group"><!-- Reason for Consultation -->
-					<label class="control-label">Reason for Consultation</label>
-					<textarea rows="4" class="form-control" ng-model="consultResponseCtrl.consult.reasonForReferral"></textarea>
-				</div><!-- Reason End -->
-
-				<div class="form-group col-md-6">
-					<label class="control-label">Appointment Date</label>
-					<juno-datepicker-popup
-							juno-model="consultResponseCtrl.consult.appointmentDate"
-							show-icon="true"
-							type="Input">
-					</juno-datepicker-popup>
-					<%--<input id="dp-appointmentDate"--%>
-						   <%--type="text"--%>
-						   <%--class="form-control inline"--%>
-						   <%--ng-model="consultResponseCtrl.consult.appointmentDate"--%>
-						   <%--placeholder="Appointment Date"--%>
-						   <%--datepicker-popup="yyyy-MM-dd"--%>
-						   <%--datepicker-append-to-body="true"--%>
-						   <%--is-open="consultResponseCtrl.page.aptDatePicker"--%>
-						   <%--ng-click="consultResponseCtrl.page.aptDatePicker=true"/>--%>
-				</div>
-
-				<div class="form-group col-md-6">
-					<label class="control-label">Appointment Time</label>
-					<span>
-						<select class="form-control"
-								ng-model="consultResponseCtrl.consult.appointmentHour"
-								ng-options="hour for hour in consultResponseCtrl.hours"
-								ng-change="consultResponseCtrl.setAppointmentTime()">
-						</select> :
-						<select class="form-control"
-								ng-model="consultResponseCtrl.consult.appointmentMinute"
-								ng-options="minute for minute in consultResponseCtrl.minutes"
-								ng-change="consultResponseCtrl.setAppointmentTime()">
-							</select>
-					</span>
-				</div>
-
 				<div class="form-group col-md-6">
 					<label class="control-label">Last Follow-up Date</label>
 					<juno-datepicker-popup
@@ -277,16 +194,42 @@
 							show-icon="true"
 							type="Input">
 					</juno-datepicker-popup>
-					<%--<input id="dp-followUpDate"--%>
-						   <%--type="text"--%>
-						   <%--class="form-control inline"--%>
-						   <%--ng-model="consultResponseCtrl.consult.followUpDate"--%>
-						   <%--placeholder="Follow Up Date"--%>
-						   <%--datepicker-popup="yyyy-MM-dd"--%>
-						   <%--datepicker-append-to-body="true"--%>
-						   <%--is-open="consultResponseCtrl.page.lfdDatePicker"--%>
-						   <%--ng-click="consultResponseCtrl.page.lfdDatePicker=true"/>--%>
 				</div>
+
+				<div class="form-group col-md-6">
+					<div class="well">
+						<div class="appointment-date-time-select">
+							<div class="date-select-wrapper">
+								<label class="control-label">Appointment Date</label>
+								<juno-datepicker-popup juno-model="consultResponseCtrl.consult.appointmentDate"
+								                       show-icon="true"
+								                       type="Input">
+								</juno-datepicker-popup>
+							</div>
+							<div class="time-select-wrapper">
+								<label class="control-label">Appointment Time</label>
+								<div class="time-select">
+									<select class="form-control"
+									        ng-model="consultResponseCtrl.consult.appointmentHour"
+									        ng-options="hour for hour in consultResponseCtrl.hours"
+									        ng-change="consultResponseCtrl.setAppointmentTime()">
+									</select>
+									<span>:</span>
+									<select class="form-control"
+									        ng-model="consultResponseCtrl.consult.appointmentMinute"
+									        ng-options="minute for minute in consultResponseCtrl.minutes"
+									        ng-change="consultResponseCtrl.setAppointmentTime()">
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-12 form-group"><!-- Reason for Consultation -->
+					<label class="control-label">Reason for Consultation</label>
+					<textarea rows="4" class="form-control" ng-model="consultResponseCtrl.consult.reasonForReferral"></textarea>
+				</div><!-- Reason End -->
 
 				<div class="form-group col-md-12">
 					<label class="control-label">Appointment Notes</label>

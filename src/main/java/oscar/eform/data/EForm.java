@@ -187,6 +187,62 @@ public class EForm extends EFormBase {
 		this.parentAjaxId = parentAjaxId;
 	}
 
+	/**
+	 * Disable commonly used e-form controls which are used to submit the form.  These are the submit button,
+	 * print submit button and the subject field (as a cue).  Since the names of these controls can vary in the wild,
+	 * this method is only a best attempt at disabling these inputs.
+	 */
+	public void disableSubmitControls()
+	{
+		StringBuilder html = new StringBuilder(this.formHtml);
+
+		// Our e-form generator labels the control buttons using this div.
+		// For other e-forms that don't do this, we'll have to search the whole document.
+		int bottomButtonsIndex = StringBuilderUtils.indexOfIgnoreCase(html, "id=\"BottomButtons\"",0);
+		if (bottomButtonsIndex < 0)
+		{
+			bottomButtonsIndex = 0;
+		}
+
+		disableInput(html, "SubmitButton", bottomButtonsIndex);
+		disableInput(html, "PrintSubmitButton", bottomButtonsIndex);
+		disableInput(html, "subject", bottomButtonsIndex);
+
+		this.formHtml = html.toString();
+	}
+
+	/**
+	 * Append a disabled tag to the first html element with a name or id matching inputIdentifier.
+	 *
+	 * @param html StringBuilder containing the html to parse
+	 * @param inputIdentifier Html input element name or id to disable
+	 * @param searchStartIndex The character index in the html to start the search
+	 */
+	private void disableInput(StringBuilder html, String inputIdentifier, int searchStartIndex)
+	{
+		int identifierStart = StringBuilderUtils.indexOfIgnoreCase(html, inputIdentifier, searchStartIndex);
+
+		while (identifierStart >= 0)
+		{
+			int identifierEnd = identifierStart + inputIdentifier.length();
+
+			// Forms in the wild are inconsistent with regards to name or id.  We'll search for both to be safe.
+			if ((identifierStart >= 4 && html.substring(identifierStart - 4, identifierStart).toLowerCase().equals("id=\"")) ||
+				(identifierStart >= 6 && html.substring(identifierStart - 6, identifierStart).toLowerCase().equals("name=\"")))
+			{
+				if ((html.length() > identifierEnd + 1) && html.substring(identifierEnd, identifierEnd + 1).equals("\""))
+				{
+					int elementEnd = html.indexOf(">", identifierEnd);
+					html.insert(elementEnd, " disabled");
+				}
+
+				break;
+			}
+
+			identifierStart = StringBuilderUtils.indexOfIgnoreCase(html, inputIdentifier, identifierEnd + 1);
+		}
+	}
+
 	public void setAction() {
 		setAction(false);
 	}
