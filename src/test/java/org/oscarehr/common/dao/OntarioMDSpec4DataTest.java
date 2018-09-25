@@ -154,7 +154,7 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures {
 		document.setUpdatedatetime(updatedatetime);
 		document.setStatus(status.charAt(0));
 		document.setContenttype(contenttype);
-		document.setPublic1(public1.byteValue());
+		document.setPublic1(public1 == 1);
 		document.setNumberofpages(number_of_pages);
 		document.setResponsible(responsible);
 		document.setProgramId(program_id);
