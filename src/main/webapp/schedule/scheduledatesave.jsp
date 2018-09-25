@@ -34,6 +34,8 @@
                  java.util.Date"
 	errorPage="../appointment/errorpage.jsp"%>
 <%@ page import="java.net.URLEncoder" %>
+<%@ page import="org.oscarehr.schedule.model.ScheduleDate" %>
+<%@ page import="org.oscarehr.schedule.dao.ScheduleDateDao" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
@@ -46,6 +48,7 @@
 </head>
 	<%
 		Schedule scheduleService = SpringUtils.getBean(Schedule.class);
+		ScheduleDateDao scheduleDateDao = SpringUtils.getBean(ScheduleDateDao.class);
 
 		String provider_no = request.getParameter("provider_no");
 		String provider_name = request.getParameter("provider_name");
@@ -55,6 +58,12 @@
 		String hour = request.getParameter("hour");
 		String dateStr = request.getParameter("date");
 		Date date = MyDateFormat.getSysDate(dateStr);
+
+		ScheduleDate sd = scheduleDateDao.findByProviderNoAndDate(provider_no, MyDateFormat.getSysDate(request.getParameter("date")));
+		if(sd != null) {
+			sd.setStatus('D');
+			scheduleDateDao.merge(sd);
+		}
 
 		//save the record first, change holidaybean next
 
