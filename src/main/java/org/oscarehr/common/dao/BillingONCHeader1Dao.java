@@ -573,7 +573,7 @@ public class BillingONCHeader1Dao extends AbstractDao<BillingONCHeader1>{
 	public List<BillingONCHeader1> findByProviderStatusAndDateRange(String providerNo, List<String> statuses, DateRange dateRange) {
 		String dateRangeSubquery = "";
 		if (dateRange.getTo() != null && dateRange.getFrom() != null ) {
-			dateRangeSubquery = " AND h.billingDate > :dateBegin AND h.billingDate <= :dateEnd ";
+			dateRangeSubquery = " AND h.billingDate >= :dateBegin AND h.billingDate <= :dateEnd ";
 		} else if (dateRange.getTo() != null) {
 			dateRangeSubquery = " AND h.billingDate <= :dateEnd ";
 		}

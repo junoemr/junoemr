@@ -1890,4 +1890,15 @@
 		<ap-output>${referral_no}</ap-output>
 	</databaseap>
 	<!-- end BC family doctor -->
+	<!-- Roster Status -->
+	<databaseap>
+		<ap-name>roster_status</ap-name>
+		<ap-sql>
+			SELECT d.roster_status
+			FROM demographic d
+			WHERE d.demographic_no=${demographic}
+		</ap-sql>
+		<ap-output>${roster_status}</ap-output>
+	</databaseap>
+	<!-- end Roster Status -->
 </eformap-config>

@@ -30,6 +30,10 @@ import java.util.List;
 import org.oscarehr.casemgmt.model.CaseManagementNoteExt;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
+/**
+ * @deprecated use the jpa version instead
+ */
+@Deprecated
 public class CaseManagementNoteExtDAO extends HibernateDaoSupport {
 
 	public CaseManagementNoteExt getNoteExt(Long id) {

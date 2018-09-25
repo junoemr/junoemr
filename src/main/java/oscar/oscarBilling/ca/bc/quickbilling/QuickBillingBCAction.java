@@ -37,7 +37,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.common.model.ProviderData;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 
 import oscar.oscarBilling.ca.bc.data.BillingFormData;

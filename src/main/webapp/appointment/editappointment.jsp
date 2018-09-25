@@ -42,7 +42,7 @@
 	}
 %>
 
-<%@page import="org.oscarehr.common.dao.ProviderDataDao" %>
+<%@page import="org.oscarehr.provider.dao.ProviderDataDao" %>
 <%@page import="org.oscarehr.managers.DemographicManager" %>
 
 <%@page import="oscar.appt.status.service.impl.AppointmentStatusMgrImpl" %>
@@ -79,7 +79,7 @@
 <%@ page import="org.oscarehr.common.model.EncounterForm" %>
 <%@ page import="org.oscarehr.common.dao.EncounterFormDao" %>
 <%@page import="org.oscarehr.common.model.ProviderPreference" %>
-<%@page import="org.oscarehr.common.model.ProviderData" %>
+<%@page import="org.oscarehr.provider.model.ProviderData" %>
 <%@page import="org.oscarehr.util.SessionConstants" %>
 <%@page import="org.oscarehr.common.model.Appointment" %>
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
@@ -1036,7 +1036,7 @@
 								   value="<bean:message key="appointment.editappointment.btnGroupAction"/>">
 							<% }%>
 							<input TYPE="submit" id="printReceiptButton"
-								   onclick="document.forms['EDITAPPT'].displaymode.value='Update Appt';document.forms['EDITAPPT'].printReceipt.value='1';"
+								   onclick="document.forms['EDITAPPT'].displaymode.value='Update Appt';document.forms['EDITAPPT'].printReceipt.value='1';onButUpdate();"
 								   VALUE="<bean:message key='appointment.editappointment.btnPrintReceipt'/>">
 							<input type="hidden" name="printReceipt" value="">
 							<input type="submit" class="redButton button" id="deleteButton"

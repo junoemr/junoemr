@@ -26,6 +26,10 @@ import org.apache.commons.lang.StringUtils;
 @SuppressWarnings("unchecked")
 public class ProviderLabRoutingDao extends AbstractDao<ProviderLabRoutingModel> {
 
+	public static final Integer PROVIDER_UNMATCHED = 0;
+	public static final String LAB_TYPE_HL7 = "HL7";
+	public static final String LAB_TYPE_DOC = "DOC";
+
 	public ProviderLabRoutingDao() {
 		super(ProviderLabRoutingModel.class);
 	}

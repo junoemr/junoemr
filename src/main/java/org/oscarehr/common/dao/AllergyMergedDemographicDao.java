@@ -26,12 +26,14 @@ package org.oscarehr.common.dao;
 import java.util.Date;
 import java.util.List;
 
+import org.oscarehr.allergy.dao.AllergyDao;
 import org.oscarehr.common.merge.MergedDemographicTemplate;
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.springframework.stereotype.Repository;
 
 @Repository("AllergyDao")
-public class AllergyMergedDemographicDao extends AllergyDao {
+public class AllergyMergedDemographicDao extends AllergyDao
+{
 
 	@Override
 	public List<Allergy> findAllergies(final Integer demographic_no) {

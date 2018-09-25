@@ -26,7 +26,7 @@ package org.oscarehr.ws.external.soap.v1.transfer;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 
 public class AllergyTransferTest {
 

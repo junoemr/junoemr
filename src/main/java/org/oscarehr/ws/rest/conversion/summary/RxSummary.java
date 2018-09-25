@@ -25,7 +25,7 @@ package org.oscarehr.ws.rest.conversion.summary;
 
 import java.util.List;
 
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.model.Drug;
 import org.oscarehr.managers.PrescriptionManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.SummaryItemTo1;

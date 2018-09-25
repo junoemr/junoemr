@@ -3070,7 +3070,7 @@ document.updatedelete.referral_doctor_no.value = refNo;
 									<% 
 									for(String status: demographicDao.getRosterStatuses()) {
 									%>
-									<option
+									<option value="<%=status%>"
 										<%=rosterStatus.equals(status)?" selected":""%>><%=status%></option>
 									<% }
                                     

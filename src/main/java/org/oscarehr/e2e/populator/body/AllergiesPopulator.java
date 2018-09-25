@@ -36,7 +36,7 @@ import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.EntryRelationship;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActClassDocumentEntryAct;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActRelationshipEntry;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_DocumentActMood;
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.e2e.constant.BodyConstants.Allergies;
 import org.oscarehr.e2e.model.PatientExport;
 import org.oscarehr.e2e.model.export.body.AllergiesModel;

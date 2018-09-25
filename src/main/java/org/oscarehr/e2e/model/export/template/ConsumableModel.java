@@ -38,7 +38,7 @@ import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Material;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.DrugEntity;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.EntityDeterminerDetermined;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.RoleClassManufacturedProduct;
-import org.oscarehr.common.model.Drug;
+import org.oscarehr.rx.model.Drug;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.model.PatientExport.Immunization;
 import org.oscarehr.e2e.util.EverestUtils;

@@ -33,7 +33,7 @@ import org.marc.everest.datatypes.TelecommunicationsAddressUse;
 import org.marc.everest.datatypes.generic.SET;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.AuthoringDevice;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Person;
-import org.oscarehr.common.model.ProviderData;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.constant.Constants.TelecomType;
 import org.oscarehr.e2e.util.EverestUtils;

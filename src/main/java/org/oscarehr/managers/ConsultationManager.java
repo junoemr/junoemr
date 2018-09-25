@@ -41,9 +41,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.dao.ConsultDocsDao;
-import org.oscarehr.common.dao.ConsultRequestDao;
-import org.oscarehr.common.dao.ConsultResponseDao;
-import org.oscarehr.common.dao.ConsultResponseDocDao;
+import org.oscarehr.consultations.dao.ConsultRequestDao;
+import org.oscarehr.consultations.dao.ConsultResponseDao;
+import org.oscarehr.consultations.dao.ConsultResponseDocDao;
 import org.oscarehr.common.dao.ConsultationServiceDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;

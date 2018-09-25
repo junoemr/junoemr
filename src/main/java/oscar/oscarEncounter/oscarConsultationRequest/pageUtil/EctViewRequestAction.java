@@ -25,16 +25,10 @@
 
 package oscar.oscarEncounter.oscarConsultationRequest.pageUtil;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.v26.message.REF_I12;
+import ca.uhn.hl7v2.model.v26.segment.PID;
+import ca.uhn.hl7v2.model.v26.segment.PRD;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -59,12 +53,16 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.util.UtilDateUtilities;
-import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.v26.message.REF_I12;
-import ca.uhn.hl7v2.model.v26.segment.PID;
-import ca.uhn.hl7v2.model.v26.segment.PRD;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class EctViewRequestAction extends Action {
 	

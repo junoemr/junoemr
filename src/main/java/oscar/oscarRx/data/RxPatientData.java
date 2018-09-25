@@ -34,8 +34,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicAllergy;
-import org.oscarehr.common.dao.AllergyDao;
+import org.oscarehr.allergy.dao.AllergyDao;
 import org.oscarehr.common.dao.DiseasesDao;
 import org.oscarehr.common.dao.PartialDateDao;
 import org.oscarehr.common.model.Demographic;
@@ -196,18 +197,18 @@ public class RxPatientData {
 			else return "";
 		}
 
-		public org.oscarehr.common.model.Allergy getAllergy(int id) {
+		public Allergy getAllergy(int id) {
 
 			// I know none of this method makes sense, but I'm only converting this to JPA right now, too much work to fix it all to make sense.
-			org.oscarehr.common.model.Allergy allergy = allergyDao.find(id);
+			Allergy allergy = allergyDao.find(id);
 
 			return allergy;
 		}
 
-		public org.oscarehr.common.model.Allergy[] getAllergies(LoggedInInfo loggedInInfo) {
-			ArrayList<org.oscarehr.common.model.Allergy> results = new ArrayList<org.oscarehr.common.model.Allergy>();
+		public Allergy[] getAllergies(LoggedInInfo loggedInInfo) {
+			ArrayList<Allergy> results = new ArrayList<Allergy>();
 			Integer demographicNo = getDemographicNo();
-			List<org.oscarehr.common.model.Allergy> allergies = allergyDao.findAllergies(demographicNo);
+			List<Allergy> allergies = allergyDao.findAllergies(demographicNo);
 			results.addAll(allergies);
 
 			if (loggedInInfo.getCurrentFacility().isIntegratorEnabled()) {
@@ -230,7 +231,7 @@ public class RxPatientData {
 						Date date = null;
 						if (remoteAllergy.getEntryDate() != null) date = remoteAllergy.getEntryDate().getTime();
 
-						org.oscarehr.common.model.Allergy a = new org.oscarehr.common.model.Allergy();
+						Allergy a = new Allergy();
 						a.setDemographicNo(demographicNo);
 						a.setId(remoteAllergy.getFacilityIdIntegerCompositePk().getCaisiItemId().intValue());
 						a.setEntryDate(date);
@@ -260,15 +261,15 @@ public class RxPatientData {
 				}
 			}
 
-			return (results.toArray(new org.oscarehr.common.model.Allergy[0]));
+			return (results.toArray(new Allergy[0]));
 		}
 
-		public org.oscarehr.common.model.Allergy[] getActiveAllergies() {
-			List<org.oscarehr.common.model.Allergy> allergies = allergyDao.findActiveAllergies(getDemographicNo());
-			return allergies.toArray(new org.oscarehr.common.model.Allergy[allergies.size()]);
+		public Allergy[] getActiveAllergies() {
+			List<Allergy> allergies = allergyDao.findActiveAllergies(getDemographicNo());
+			return allergies.toArray(new Allergy[allergies.size()]);
 		}
 
-		public org.oscarehr.common.model.Allergy addAllergy(java.util.Date entryDate, org.oscarehr.common.model.Allergy allergy) {
+		public Allergy addAllergy(java.util.Date entryDate, Allergy allergy) {
 			allergy.setEntryDate(entryDate);
 			allergyDao.persist(allergy);
 			this.getPartialDateDao().setPartialDate(PartialDate.ALLERGIES, allergy.getId(), PartialDate.ALLERGIES_STARTDATE, allergy.getStartDateFormat());
@@ -276,7 +277,7 @@ public class RxPatientData {
 		}
 
 		private static boolean setAllergyArchive(int allergyId, boolean archive) {
-			org.oscarehr.common.model.Allergy allergy = allergyDao.find(allergyId);
+			Allergy allergy = allergyDao.find(allergyId);
 			if (allergy != null) {
 				allergy.setArchived(archive);
 				allergyDao.merge(allergy);

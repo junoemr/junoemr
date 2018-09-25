@@ -31,8 +31,8 @@ import java.util.Map;
 
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.managers.DemographicManager;
-import org.oscarehr.managers.PreventionManager;
-import org.oscarehr.common.model.Prevention;
+import org.oscarehr.prevention.service.PreventionManager;
+import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.to.model.SummaryItemTo1;

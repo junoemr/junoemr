@@ -102,8 +102,6 @@ function submitFax(save) {
 	{
 		form = $("form[name='RichTextLetter']");
 		document.getElementById('Letter').value=editControlContents('edit');
-		window.open('', 'faxResponse', 'height=300,width=800');
-		form.attr('target', 'faxResponse');
 		form.submit();
 	}
 

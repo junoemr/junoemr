@@ -91,11 +91,12 @@ public class AppointmentStatusMgrImpl implements AppointmentStatusMgr {
         appointStatusDao.modifyStatus(ID, strDesc, strColor);
     }
 
-    public int checkStatusUsuage(List<AppointmentStatus> allStatus){
-        return appointStatusDao.checkStatusUsuage(allStatus);
-    }
-    
-    public void reset(){
+	public List<String> checkStatusUsuage(List<AppointmentStatus> allStatus)
+	{
+		return appointStatusDao.checkStatusUsuage(allStatus);
+	}
+
+	public void reset(){
         appointStatusDao.modifyStatus(1, "To Do", "#FDFEC7");
         appointStatusDao.modifyStatus(2, "Daysheet Printed", "#FDFEC7");
         appointStatusDao.modifyStatus(3, "Here", "#00ee00");

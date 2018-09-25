@@ -25,18 +25,6 @@
 
 package org.oscarehr.ws;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.soap.SOAPConstants;
-import javax.xml.namespace.QName;
-
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
@@ -44,9 +32,15 @@ import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.OscarLog;
 import org.oscarehr.util.MiscUtils;
-
-import oscar.OscarProperties;
+import org.oscarehr.ws.rest.filter.IPRestrictionFilter;
 import oscar.log.LogAction;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPConstants;
+import java.util.HashMap;
 
 /**
  * As of WSS 1.6 we no longer need InInterceptors for authentication, that's now moved to the Validator classes.
@@ -57,12 +51,9 @@ public class IPInWSS4JInterceptor extends WSS4JInInterceptor implements Callback
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
-	private ArrayList<String> excludes = null;
-
 	public IPInWSS4JInterceptor()
 	{
-		HashMap<String, Object> properties = new HashMap<String, Object>();
-
+		HashMap<String, Object> properties = new HashMap<>();
 		setProperties(properties);
 	}
 
@@ -73,7 +64,7 @@ public class IPInWSS4JInterceptor extends WSS4JInInterceptor implements Callback
 		if (request==null) return; // it's an outgoing request
 		String ip = request.getRemoteAddr();
 
-		if(!isIPAllowed(ip))
+		if(IPRestrictionFilter.isIpBlocked(ip))
 		{
 			String errorMessage = "Invalid IP Address (" + ip + ")";
 			logger.error(errorMessage);
@@ -84,26 +75,8 @@ public class IPInWSS4JInterceptor extends WSS4JInInterceptor implements Callback
 			LogAction.addLogSynchronous(oscarLog);
 
 			QName faultName = new QName(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE, "Server");
-			SoapFault fault = new SoapFault(errorMessage, faultName);
-
-			throw fault;
+			throw new SoapFault(errorMessage, faultName);
 		}
-	}
-
-	private boolean isIPAllowed(String ip)
-	{
-		Properties oscarVariables = OscarProperties.getInstance();
-		String allowedIPs = oscarVariables.getProperty("web_service_allowed_ips");
-
-		// Allow access if there is no whitelist
-		if(allowedIPs == null)
-		{
-			return true;
-		}
-
-		List<String> items = Arrays.asList(allowedIPs.split("\\s*,\\s*"));
-
-		return items.contains(ip);
 	}
 
 	@Override

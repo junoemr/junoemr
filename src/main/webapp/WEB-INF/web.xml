@@ -21,7 +21,20 @@
         <location>/400.jsp</location>
     </error-page>
 
-    <filter>
+	<filter>
+		<filter-name>CharsetFilter</filter-name>
+		<filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>CharsetFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
            <filter-name>monitoring</filter-name>
            <filter-class>net.bull.javamelody.MonitoringFilter</filter-class>
            <init-param>
