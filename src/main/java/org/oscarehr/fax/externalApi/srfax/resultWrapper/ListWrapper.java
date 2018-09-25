@@ -30,6 +30,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ListWrapper<T>
 {
+	public static final String STATUS_SUCCESS = "Success";
+
 	@JsonProperty("Status")
 	private String status;
 	@JsonProperty("Result")

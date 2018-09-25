@@ -53,11 +53,61 @@ import java.util.Map;
 
 public class SRFaxApiConnector
 {
+	private static final String SERVER_URL = "https://www.srfax.com/SRF_SecWebSvc.php";
+
+	private static final String ACCESS_ID = "access_id";
+	private static final String ACCESS_PW = "access_pwd";
+	private static final String ACTION = "action";
+	private static final String ACTION_QUEUE_FAX = "Queue_Fax";
+	private static final String ACTION_GET_FAX_STATUS = "Get_FaxStatus";
+	private static final String ACTION_GET_MULTI_FAX_STATUS = "Get_MultiFaxStatus";
+	private static final String ACTION_GET_FAX_INBOX = "Get_Fax_Inbox";
+	private static final String ACTION_GET_FAX_OUTBOX = "Get_Fax_Outbox";
+	private static final String ACTION_RETRIEVE_FAX = "Retrieve_Fax";
+	private static final String ACTION_UPDATE_VIEWED_STATUS = "Update_Viewed_Status";
+	private static final String ACTION_DELETE_FAX = "Delete_Fax";
+	private static final String ACTION_STOP_FAX = "Stop_Fax";
+	private static final String ACTION_GET_FAX_USAGE = "Get_Fax_Usage";
+
+	private static final String S_CALLER_ID = "sCallerID";
+	private static final String S_SENDER_EMAIL = "sSenderEmail";
+	private static final String S_FAX_TYPE = "sFaxType";
+	private static final String S_TO_FAX_NUMBER = "sToFaxNumber";
+	private static final String S_RESPONSE_FORMAT = "sResponseFormat";
+	private static final String S_ACCOUNT_CODE = "sAccountCode";
+	private static final String S_RETRIES = "sRetries";
+	private static final String S_COVER_PAGE = "sCoverPage";
+	private static final String S_CP_FROM_NAME = "sCPFromName";
+	private static final String S_CP_TO_NAME = "sCPToName";
+	private static final String S_CP_ORGANIZATION = "sCPOrganization";
+	private static final String S_CP_SUBJECT = "sCPSubject";
+	private static final String S_CP_COMMENTS = "sCPComments";
+	private static final String S_FILE_NAME_BASE = "sFileName_";
+	private static final String S_FILE_NAME_WILDCARD = S_FILE_NAME_BASE + "*";
+	private static final String S_FILE_CONTENT_BASE = "sFileContent_";
+	private static final String S_FILE_CONTENT_WILDCARD = S_FILE_CONTENT_BASE + "*";
+	private static final String S_NOTIFY_URL = "sNotifyURL";
+	private static final String S_FAX_FROM_HEADER = "sFaxFromHeader";
+	private static final String S_QUEUE_FAX_DATE = "sQueueFaxDate";
+	private static final String S_QUEUE_FAX_TIME = "sQueueFaxTime";
+	private static final String S_PERIOD = "sPeriod";
+	private static final String S_START_DATE = "sStartDate";
+	private static final String S_END_DATE = "sEndDate";
+	private static final String S_INCLUDE_SUB_USERS = "sIncludeSubUsers";
+	private static final String S_FAX_DETAILS_ID = "sFaxDetailsID";
+	private static final String S_FAX_FILE_NAME = "sFaxFileName";
+	private static final String S_VIEWED_STATUS = "sViewedStatus";
+	private static final String S_DIRECTION = "sDirection";
+	private static final String S_MARKAS_VIEWED = "sMarkasViewed";
+	private static final String S_FAX_FORMAT = "sFaxFormat";
+	private static final String S_SUB_USER_ID = "sSubUserID";
+
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final String serverUrl = "https://www.srfax.com/SRF_SecWebSvc.php";
 	private final String access_id;
 	private final String access_pwd;
 
+	public static final String RESPONSE_FORMAT_JSON = "JSON";
+	public static final String RESPONSE_FORMAT_XML = "XML";
 	public static final List<String> validCoverLetterNames = new ArrayList<String>(4) {{
 		add("Basic");
 		add("Standard");
@@ -71,188 +121,243 @@ public class SRFaxApiConnector
 		this.access_pwd = password;
 	}
 
-	public SingleWrapper<Integer> Queue_Fax(Map<String, String> parameters)
+	private SingleWrapper<Integer> Queue_Fax(Map<String, String> parameters)
 	{
-		String[] requiredFields = {"sCallerID", "sSenderEmail", "sFaxType", "sToFaxNumber"};
-		String[] optionalFields = {"sResponseFormat", "sAccountCode", "sRetries", "sCoverPage", "sCPFromName", "sCPToName", "sCPOrganization",
-				"sCPSubject", "sCPComments", "sFileName_*", "sFileContent_*", "sNotifyURL", "sFaxFromHeader", "sQueueFaxDate", "sQueueFaxTime"};
-
-		_validateRequiredVariables(requiredFields, parameters);
-
-		Map<String, String> postVariables = _preparePostVariables(requiredFields, optionalFields, parameters);
-
-		postVariables.put("action", "Queue_Fax");
-		postVariables.put("access_id", access_id);
-		postVariables.put("access_pwd", access_pwd);
-
-		String result = _processRequest(postVariables);
-
+		String[] requiredFields = {S_CALLER_ID, S_SENDER_EMAIL, S_FAX_TYPE, S_TO_FAX_NUMBER};
+		String[] optionalFields = {
+				S_RESPONSE_FORMAT, S_ACCOUNT_CODE, S_RETRIES, S_COVER_PAGE,
+				S_CP_FROM_NAME, S_CP_TO_NAME, S_CP_ORGANIZATION,
+				S_CP_SUBJECT, S_CP_COMMENTS, S_FILE_NAME_WILDCARD, S_FILE_CONTENT_WILDCARD,
+				S_NOTIFY_URL, S_FAX_FROM_HEADER, S_QUEUE_FAX_DATE, S_QUEUE_FAX_TIME
+		};
+		String result = processRequest(ACTION_QUEUE_FAX, requiredFields, optionalFields, parameters);
 		return processSingleResponse(result);
 	}
 
-	public SingleWrapper<GetFaxStatusResult> Get_FaxStatus(Map<String, String> parameters)
+	public SingleWrapper<Integer> Queue_Fax(String sCallerID, String sSenderEmail, String sFaxType, String sToFaxNumber,
+	                                        Map<String,String> sFileMap,
+	                                        String sResponseFormat,
+	                                        String sAccountCode,
+	                                        String sRetries,
+	                                        String sCoverPage,
+	                                        String sCPFromName,
+	                                        String sCPToName,
+	                                        String sCPOrganization,
+	                                        String sCPSubject,
+	                                        String sCPComments,
+	                                        String sNotifyURL,
+	                                        String sFaxFromHeader,
+	                                        String sQueueFaxDate,
+	                                        String sQueueFaxTime)
 	{
-		String[] requiredFields = {"sFaxDetailsID"};
-		String[] optionalFields = {"sResponseFormat"};
+		Map<String, String> parameters = new HashMap<>();
+		parameters.put(S_CALLER_ID, sCallerID);
+		parameters.put(S_SENDER_EMAIL, sSenderEmail);
+		parameters.put(S_FAX_TYPE, sFaxType);
+		parameters.put(S_TO_FAX_NUMBER, sToFaxNumber);
 
-		_validateRequiredVariables(requiredFields, parameters);
+		if(sFileMap != null)
+		{
+			int counter = 1;
+			for(Map.Entry<String,String> entry : sFileMap.entrySet())
+			{
+				parameters.put(S_FILE_NAME_BASE + counter, entry.getKey());
+				parameters.put(S_FILE_CONTENT_BASE + counter, entry.getValue());
+				counter++;
+			}
+		}
+		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
+		putIfPresent(parameters, S_ACCOUNT_CODE, sAccountCode);
+		putIfPresent(parameters, S_RETRIES, sRetries);
+		putIfPresent(parameters, S_COVER_PAGE, sCoverPage);
+		putIfPresent(parameters, S_CP_FROM_NAME, sCPFromName);
+		putIfPresent(parameters, S_CP_TO_NAME, sCPToName);
+		putIfPresent(parameters, S_CP_ORGANIZATION, sCPOrganization);
+		putIfPresent(parameters, S_CP_SUBJECT, sCPSubject);
+		putIfPresent(parameters, S_CP_COMMENTS, sCPComments);
+		putIfPresent(parameters, S_NOTIFY_URL, sNotifyURL);
+		putIfPresent(parameters, S_FAX_FROM_HEADER, sFaxFromHeader);
+		putIfPresent(parameters, S_QUEUE_FAX_DATE, sQueueFaxDate);
+		putIfPresent(parameters, S_QUEUE_FAX_TIME, sQueueFaxTime);
 
-		Map<String, String> postVariables = _preparePostVariables(requiredFields, optionalFields, parameters);
-
-		postVariables.put("action", "Get_FaxStatus");
-		postVariables.put("access_id", access_id);
-		postVariables.put("access_pwd", access_pwd);
-
-		String result = _processRequest(postVariables);
-
-		return processSingleResponse(result);
+		return Queue_Fax(parameters);
 	}
 
-	public ListWrapper<GetFaxStatusResult> Get_MultiFaxStatus(Map<String, String> parameters)
+	private SingleWrapper<GetFaxStatusResult> Get_FaxStatus(Map<String, String> parameters)
 	{
-		String[] requiredFields = {"sFaxDetailsID"};
-		String[] optionalFields = {"sResponseFormat"};
+		String[] requiredFields = {S_FAX_DETAILS_ID};
+		String[] optionalFields = {S_RESPONSE_FORMAT};
+		String result = processRequest(ACTION_GET_FAX_STATUS, requiredFields, optionalFields, parameters);
+		return processSingleResponse(result);
+	}
+	public SingleWrapper<GetFaxStatusResult> Get_FaxStatus(String sFaxDetailsID, String sResponseFormat)
+	{
+		Map<String, String> parameters = new HashMap<>();
+		parameters.put(S_FAX_DETAILS_ID, sFaxDetailsID);
+		parameters.put(S_RESPONSE_FORMAT, sResponseFormat);
+		return Get_FaxStatus(parameters);
+	}
 
-		_validateRequiredVariables(requiredFields, parameters);
-
-		Map<String, String> postVariables = _preparePostVariables(requiredFields, optionalFields, parameters);
-
-		postVariables.put("action", "Get_MultiFaxStatus");
-		postVariables.put("access_id", access_id);
-		postVariables.put("access_pwd", access_pwd);
-
-		String result = _processRequest(postVariables);
-
+	private ListWrapper<GetFaxStatusResult> Get_MultiFaxStatus(Map<String, String> parameters)
+	{
+		String[] requiredFields = {S_FAX_DETAILS_ID};
+		String[] optionalFields = {S_RESPONSE_FORMAT};
+		String result = processRequest(ACTION_GET_MULTI_FAX_STATUS, requiredFields, optionalFields, parameters);
 		return processListResponse(result);
 	}
-
-	public ListWrapper<GetFaxInboxResult> Get_Fax_Inbox(Map<String, String> parameters)
+	public ListWrapper<GetFaxStatusResult> Get_MultiFaxStatus(String sFaxDetailsID, String sResponseFormat)
 	{
-
-		String[] requiredFields = {};
-		String[] optionalFields = {"sResponseFormat", "sPeriod", "sStartDate", "sEndDate", "sViewedStatus", "sIncludeSubUsers", "sFaxDetailsID"};
-
-
-		Map<String, String> postVariables = _preparePostVariables(requiredFields, optionalFields, parameters);
-
-		postVariables.put("action", "Get_Fax_Inbox");
-		postVariables.put("access_id", access_id);
-		postVariables.put("access_pwd", access_pwd);
-
-		String result = _processRequest(postVariables);
-
-		return processListResponse(result);
+		Map<String, String> parameters = new HashMap<>();
+		parameters.put(S_FAX_DETAILS_ID, sFaxDetailsID);
+		parameters.put(S_RESPONSE_FORMAT, sResponseFormat);
+		return Get_MultiFaxStatus(parameters);
 	}
 
-	public ListWrapper<GetFaxOutboxResult> Get_Fax_Outbox(Map<String, String> parameters)
-	{
-
-		String[] requiredFields = {};
-		String[] optionalFields = {"sResponseFormat", "sPeriod", "sStartDate", "sEndDate", "sIncludeSubUsers", "sFaxDetailsID"};
-
-
-		Map<String, String> postVariables = _preparePostVariables(requiredFields, optionalFields, parameters);
-
-		postVariables.put("action", "Get_Fax_Outbox");
-		postVariables.put("access_id", access_id);
-		postVariables.put("access_pwd", access_pwd);
-
-		String result = _processRequest(postVariables);
-
-		return processListResponse(result);
-	}
-
-	public SingleWrapper<String> Retrieve_Fax(Map<String, String> parameters)
-	{
-		String[] requiredFields = {"sFaxFileName|sFaxDetailsID", "sDirection"};
-		String[] optionalFields = {"sFaxFormat", "sMarkasViewed", "sResponseFormat", "sSubUserID"};
-
-		_validateRequiredVariables(requiredFields, parameters);
-
-		Map<String, String> postVariables = _preparePostVariables(requiredFields, optionalFields, parameters);
-
-		postVariables.put("action", "Retrieve_Fax");
-		postVariables.put("access_id", access_id);
-		postVariables.put("access_pwd", access_pwd);
-
-		String result = _processRequest(postVariables);
-
-		return processSingleResponse(result);
-	}
-
-	public SingleWrapper<String> Update_Viewed_Status(Map<String, String> parameters)
-	{
-		String[] requiredFields = {"sFaxFileName|sFaxDetailsID", "sDirection", "sMarkasViewed"};
-		String[] optionalFields = {"sResponseFormat"};
-
-		_validateRequiredVariables(requiredFields, parameters);
-
-		Map<String, String> postVariables = _preparePostVariables(requiredFields, optionalFields, parameters);
-
-		postVariables.put("action", "Update_Viewed_Status");
-		postVariables.put("access_id", access_id);
-		postVariables.put("access_pwd", access_pwd);
-
-		String result = _processRequest(postVariables);
-
-		return processSingleResponse(result);
-	}
-
-	public SingleWrapper<String> Delete_Fax(Map<String, String> parameters)
-	{
-		String[] requiredFields = {"sDirection", "sFaxFileName_*|sFaxDetailsID_*"};
-		String[] optionalFields = {"sResponseFormat"};
-
-		_validateRequiredVariables(requiredFields, parameters);
-
-		Map<String, String> postVariables = _preparePostVariables(requiredFields, optionalFields, parameters);
-
-		postVariables.put("action", "Delete_Fax");
-		postVariables.put("access_id", access_id);
-		postVariables.put("access_pwd", access_pwd);
-
-		String result = _processRequest(postVariables);
-
-		return processSingleResponse(result);
-	}
-
-	public SingleWrapper<String> Stop_Fax(Map<String, String> parameters)
-	{
-		String[] requiredFields = {"sFaxDetailsID"};
-		String[] optionalFields = {"sResponseFormat"};
-
-		_validateRequiredVariables(requiredFields, parameters);
-
-		Map<String, String> postVariables = _preparePostVariables(requiredFields, optionalFields, parameters);
-
-		postVariables.put("action", "Stop_Fax");
-		postVariables.put("access_id", access_id);
-		postVariables.put("access_pwd", access_pwd);
-
-		String result = _processRequest(postVariables);
-
-		return processSingleResponse(result);
-	}
-
-	public ListWrapper<GetUsageResult> Get_Fax_Usage(Map<String, String> parameters)
+	private ListWrapper<GetFaxInboxResult> Get_Fax_Inbox(Map<String, String> parameters)
 	{
 		String[] requiredFields = {};
-		String[] optionalFields = {"sResponseFormat", "sPeriod", "sStartDate", "sEndDate", "sIncludeSubUsers"};
-
-		_validateRequiredVariables(requiredFields, parameters);
-
-		Map<String, String> postVariables = _preparePostVariables(requiredFields, optionalFields, parameters);
-
-		postVariables.put("action", "Get_Fax_Usage");
-		postVariables.put("access_id", access_id);
-		postVariables.put("access_pwd", access_pwd);
-
-		String result = _processRequest(postVariables);
-
+		String[] optionalFields = {S_RESPONSE_FORMAT, S_PERIOD, S_START_DATE, S_END_DATE, S_VIEWED_STATUS, S_INCLUDE_SUB_USERS, S_FAX_DETAILS_ID};
+		String result = processRequest(ACTION_GET_FAX_INBOX, requiredFields, optionalFields, parameters);
 		return processListResponse(result);
+	}
+	public ListWrapper<GetFaxInboxResult> Get_Fax_Inbox(String sResponseFormat, String sPeriod,
+	                                                     String sStartDate, String sEndDate, String sViewedStatus,
+	                                                     String sIncludeSubUsers, String sFaxDetailsID)
+	{
+		Map<String, String> parameters = new HashMap<>();
+		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
+		putIfPresent(parameters, S_PERIOD, sPeriod);
+		putIfPresent(parameters, S_START_DATE, sStartDate);
+		putIfPresent(parameters, S_END_DATE, sEndDate);
+		putIfPresent(parameters, S_VIEWED_STATUS, sViewedStatus);
+		putIfPresent(parameters, S_INCLUDE_SUB_USERS, sIncludeSubUsers);
+		putIfPresent(parameters, S_FAX_DETAILS_ID, sFaxDetailsID);
+		return Get_Fax_Inbox(parameters);
+	}
+
+	private ListWrapper<GetFaxOutboxResult> Get_Fax_Outbox(Map<String, String> parameters)
+	{
+		String[] requiredFields = {};
+		String[] optionalFields = {S_RESPONSE_FORMAT, S_PERIOD, S_START_DATE, S_END_DATE, S_INCLUDE_SUB_USERS, S_FAX_DETAILS_ID};
+		String result = processRequest(ACTION_GET_FAX_OUTBOX, requiredFields, optionalFields, parameters);
+		return processListResponse(result);
+	}
+	public ListWrapper<GetFaxOutboxResult> Get_Fax_Outbox(String sResponseFormat, String sPeriod,
+	                                                     String sStartDate, String sEndDate,
+	                                                     String sIncludeSubUsers, String sFaxDetailsID)
+	{
+		Map<String, String> parameters = new HashMap<>();
+		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
+		putIfPresent(parameters, S_PERIOD, sPeriod);
+		putIfPresent(parameters, S_START_DATE, sStartDate);
+		putIfPresent(parameters, S_END_DATE, sEndDate);
+		putIfPresent(parameters, S_INCLUDE_SUB_USERS, sIncludeSubUsers);
+		putIfPresent(parameters, S_FAX_DETAILS_ID, sFaxDetailsID);
+		return Get_Fax_Outbox(parameters);
+	}
+
+	private SingleWrapper<String> Retrieve_Fax(Map<String, String> parameters)
+	{
+		String[] requiredFields = {S_FAX_FILE_NAME + "|" + S_FAX_DETAILS_ID, S_DIRECTION};
+		String[] optionalFields = {S_FAX_FORMAT, S_MARKAS_VIEWED, S_RESPONSE_FORMAT, S_SUB_USER_ID};
+		String result = processRequest(ACTION_RETRIEVE_FAX, requiredFields, optionalFields, parameters);
+		return processSingleResponse(result);
+	}
+	public SingleWrapper<String> Retrieve_Fax(String sFaxFileName, String sFaxDetailsID, String sDirection,
+	                                           String sFaxFormat, String sMarkasViewed, String sResponseFormat, String sSubUserID)
+	{
+		Map<String, String> parameters = new HashMap<>();
+		putIfPresent(parameters, S_FAX_FILE_NAME, sFaxFileName);
+		putIfPresent(parameters, S_FAX_DETAILS_ID, sFaxDetailsID);
+		putIfPresent(parameters, S_DIRECTION, sDirection);
+		putIfPresent(parameters, S_FAX_FORMAT, sFaxFormat);
+		putIfPresent(parameters, S_MARKAS_VIEWED, sMarkasViewed);
+		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
+		putIfPresent(parameters, S_SUB_USER_ID, sSubUserID);
+		return Retrieve_Fax(parameters);
+	}
+
+	private SingleWrapper<String> Update_Viewed_Status(Map<String, String> parameters)
+	{
+		String[] requiredFields = {S_FAX_FILE_NAME + "|" + S_FAX_DETAILS_ID, S_DIRECTION, S_MARKAS_VIEWED};
+		String[] optionalFields = {S_RESPONSE_FORMAT};
+		String result = processRequest(ACTION_UPDATE_VIEWED_STATUS, requiredFields, optionalFields, parameters);
+		return processSingleResponse(result);
+	}
+	public SingleWrapper<String> Update_Viewed_Status(String sFaxFileName, String sFaxDetailsID, String sDirection,
+	                                                  String sMarkasViewed, String sResponseFormat)
+	{
+		Map<String, String> parameters = new HashMap<>();
+		putIfPresent(parameters, S_FAX_FILE_NAME, sFaxFileName);
+		putIfPresent(parameters, S_FAX_DETAILS_ID, sFaxDetailsID);
+		putIfPresent(parameters, S_DIRECTION, sDirection);
+		putIfPresent(parameters, S_MARKAS_VIEWED, sMarkasViewed);
+		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
+		return Update_Viewed_Status(parameters);
+	}
+
+	private SingleWrapper<String> Delete_Fax(Map<String, String> parameters)
+	{
+		String[] requiredFields = {S_DIRECTION, S_FAX_FILE_NAME + "_*|" + S_FAX_DETAILS_ID + "_*"};
+		String[] optionalFields = {S_RESPONSE_FORMAT};
+		String result = processRequest(ACTION_DELETE_FAX, requiredFields, optionalFields, parameters);
+		return processSingleResponse(result);
+	}
+	public SingleWrapper<String> Delete_Fax(String sDirection, String sFaxFileName, String sFaxDetailsID, String sResponseFormat)
+	{
+		Map<String, String> parameters = new HashMap<>();
+		putIfPresent(parameters, S_FAX_FILE_NAME, sFaxFileName);
+		putIfPresent(parameters, S_FAX_DETAILS_ID, sFaxDetailsID);
+		putIfPresent(parameters, S_DIRECTION, sDirection);
+		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
+		return Delete_Fax(parameters);
+	}
+
+	private SingleWrapper<String> Stop_Fax(Map<String, String> parameters)
+	{
+		String[] requiredFields = {S_FAX_DETAILS_ID};
+		String[] optionalFields = {S_RESPONSE_FORMAT};
+		String result = processRequest(ACTION_STOP_FAX, requiredFields, optionalFields, parameters);
+		return processSingleResponse(result);
+	}
+	public SingleWrapper<String> Stop_Fax(String sFaxDetailsID, String sResponseFormat)
+	{
+		Map<String, String> parameters = new HashMap<>();
+		putIfPresent(parameters, S_FAX_DETAILS_ID, sFaxDetailsID);
+		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
+		return Stop_Fax(parameters);
+	}
+
+	private ListWrapper<GetUsageResult> Get_Fax_Usage(Map<String, String> parameters)
+	{
+		String[] requiredFields = {};
+		String[] optionalFields = {S_RESPONSE_FORMAT, S_PERIOD, S_START_DATE, S_END_DATE, S_INCLUDE_SUB_USERS};
+		String result = processRequest(ACTION_GET_FAX_USAGE, requiredFields, optionalFields, parameters);
+		return processListResponse(result);
+	}
+
+	public ListWrapper<GetUsageResult> Get_Fax_Usage(String sResponseFormat, String sPeriod, String sStartDate, String sEndDate, String sIncludeSubUsers)
+	{
+		Map<String, String> parameters = new HashMap<>();
+		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
+		putIfPresent(parameters, S_PERIOD, sPeriod);
+		putIfPresent(parameters, S_START_DATE, sStartDate);
+		putIfPresent(parameters, S_END_DATE, sEndDate);
+		putIfPresent(parameters, S_INCLUDE_SUB_USERS, sIncludeSubUsers);
+		return Get_Fax_Usage(parameters);
 	}
 
 	/*******************INTERNAL FUNCTIONS*********************************/
+
+	private static boolean putIfPresent(Map<String,String> parameterMap, String key, String optionalValue)
+	{
+		if(optionalValue != null)
+		{
+			parameterMap.put(key, optionalValue);
+			return true;
+		}
+		return false;
+	}
 
 	private static <T> ListWrapper processListResponse(String response)
 	{
@@ -261,7 +366,7 @@ public class SRFaxApiConnector
 		{
 			JSONObject json = new JSONObject(response);
 			String status = json.getString("Status");
-			if(status.equals("Success"))
+			if(ListWrapper.STATUS_SUCCESS.equals(status))
 			{
 				ObjectMapper mapper = new ObjectMapper();
 				result = mapper.readValue(response, new TypeReference<ListWrapper<T>>(){});
@@ -289,7 +394,7 @@ public class SRFaxApiConnector
 
 		try
 		{
-			if(status.equals("Success"))
+			if(SingleWrapper.STATUS_SUCCESS.equals(status))
 			{
 				ObjectMapper mapper = new ObjectMapper();
 				result = mapper.readValue(response, new TypeReference<SingleWrapper<T>>(){});
@@ -309,15 +414,27 @@ public class SRFaxApiConnector
 		return result;
 	}
 
-	private String _processRequest(Map<String, String> postVariables)
+	private String processRequest(String action, String[] requiredFields, String[] optionalFields, Map<String, String> parameters)
+	{
+		validateRequiredVariables(requiredFields, parameters);
+		Map<String, String> postVariables = preparePostVariables(requiredFields, optionalFields, parameters);
+
+		postVariables.put(ACTION, action);
+		postVariables.put(ACCESS_ID, access_id);
+		postVariables.put(ACCESS_PW, access_pwd);
+
+		return postRequest(postVariables);
+	}
+
+	private String postRequest(Map<String, String> postVariables)
 	{
 		String result = "";
 		try
 		{
 			HttpClient httpClient = new DefaultHttpClient();
 
-			logger.debug("POST URL: " + serverUrl);
-			HttpPost httpPost = new HttpPost(serverUrl);
+			logger.debug("POST URL: " + SERVER_URL);
+			HttpPost httpPost = new HttpPost(SERVER_URL);
 
 			// convert map to post-able list
 			ArrayList<NameValuePair> postParameters = new ArrayList<>(postVariables.size());
@@ -351,7 +468,7 @@ public class SRFaxApiConnector
 		return result;
 	}
 
-	private Map<String, String> _preparePostVariables(String[] requiredFields, String[] optionalFields, Map<String, String> parameters)
+	private Map<String, String> preparePostVariables(String[] requiredFields, String[] optionalFields, Map<String, String> parameters)
 	{
 		Map<String, String> postVariables = new HashMap<>();
 
@@ -450,7 +567,7 @@ public class SRFaxApiConnector
 
 	}
 
-	private void _validateRequiredVariables(String[] requiredVariables, Map<String, String> parameters)
+	private void validateRequiredVariables(String[] requiredVariables, Map<String, String> parameters)
 	{
 
 		for(String field : requiredVariables)

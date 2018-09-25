@@ -25,15 +25,13 @@ package org.oscarehr.fax.service;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
-import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
 import org.oscarehr.fax.externalApi.srfax.result.GetUsageResult;
+import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This service should be responsible for handling all logic around fax setup and configuration
@@ -62,11 +60,12 @@ public class FaxConfigService
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 		String currentDateStr = localDate.format(formatter);
 
-		Map<String, String> parameters = new HashMap<>();
-		parameters.put("sPeriod", "RANGE");
-		parameters.put("sStartDate", currentDateStr);
-		parameters.put("sEndDate", currentDateStr);
-		ListWrapper<GetUsageResult> result = apiConnector.Get_Fax_Usage(parameters);
+		ListWrapper<GetUsageResult> result = apiConnector.Get_Fax_Usage(
+				SRFaxApiConnector.RESPONSE_FORMAT_JSON,
+				"RANGE",
+				currentDateStr,
+				currentDateStr,
+				null);
 
 		logger.info(String.valueOf(result));
 

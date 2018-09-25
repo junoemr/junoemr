@@ -49,7 +49,26 @@ public class StringEncryptor
 	private static final String TRANSFORM = "AES/CBC/PKCS5Padding";
 	private static final String AES = "AES";
 
-	public static byte[] encrypt(byte[] plaintext)
+	public static String encrypt(String plaintextString)
+	{
+		byte[] encryptedWithIV = encrypt(plaintextString.getBytes());
+		return Base64.encodeBase64String(encryptedWithIV);
+	}
+
+	public static String decrypt(String encryptedStringWithIV)
+	{
+		byte[] original = decrypt(Base64.decodeBase64(encryptedStringWithIV));
+		return new String(original);
+	}
+
+	public static SecretKey generateKey() throws NoSuchAlgorithmException
+	{
+		KeyGenerator keyGenerator = KeyGenerator.getInstance(AES);
+		keyGenerator.init(128); // 128 default; 192 and 256 also possible
+		return keyGenerator.generateKey();
+	}
+
+	private static byte[] encrypt(byte[] plaintext)
 	{
 		try
 		{
@@ -70,13 +89,8 @@ public class StringEncryptor
 			throw new EncryptionException(e);
 		}
 	}
-	public static String encrypt(String plaintextString)
-	{
-		byte[] encryptedWithIV = encrypt(plaintextString.getBytes());
-		return Base64.encodeBase64String(encryptedWithIV);
-	}
 
-	public static byte[] decrypt(byte[] encryptedWithIV)
+	private static byte[] decrypt(byte[] encryptedWithIV)
 	{
 		try
 		{
@@ -96,11 +110,6 @@ public class StringEncryptor
 			throw new EncryptionException(e);
 		}
 	}
-	public static String decrypt(String encryptedStringWithIV)
-	{
-		byte[] original = decrypt(Base64.decodeBase64(encryptedStringWithIV));
-		return new String(original);
-	}
 
 	private static SecretKeySpec getSecretKeySpec(String secretKey) throws UnsupportedEncodingException
 	{
@@ -114,13 +123,6 @@ public class StringEncryptor
 			throw new IllegalStateException("Missing environment variable: " + SECRET_KEY_ENV_NAME);
 		}
 		return secretKey;
-	}
-
-	public static SecretKey generateKey() throws NoSuchAlgorithmException
-	{
-		KeyGenerator keyGenerator = KeyGenerator.getInstance(AES);
-		keyGenerator.init(128); // 128 default; 192 and 256 also possible
-		return keyGenerator.generateKey();
 	}
 
 	private static IvParameterSpec createIV(final int ivSizeBytes, final Optional<SecureRandom> rng)

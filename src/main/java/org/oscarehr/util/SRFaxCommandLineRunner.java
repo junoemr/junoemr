@@ -30,9 +30,6 @@ import org.oscarehr.fax.externalApi.srfax.result.GetFaxOutboxResult;
 import org.oscarehr.fax.externalApi.srfax.result.GetUsageResult;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class SRFaxCommandLineRunner
 {
 	private static final Logger logger = Logger.getLogger(SRFaxCommandLineRunner.class);
@@ -72,8 +69,7 @@ public class SRFaxCommandLineRunner
 	public static void testGetFaxUsage(SRFaxApiConnector apiConnector)
 	{
 		logger.info("TEST GET FAX USAGE");
-		Map<String, String> parameters = new HashMap<>();
-		ListWrapper<GetUsageResult> responseWrapper = apiConnector.Get_Fax_Usage(parameters);
+		ListWrapper<GetUsageResult> responseWrapper = apiConnector.Get_Fax_Usage(null,null, null, null, null);
 
 		logger.info("STATUS: " + responseWrapper.getStatus());
 		logger.info("DATA: " + responseWrapper.getResult());
@@ -82,8 +78,7 @@ public class SRFaxCommandLineRunner
 	public static void testGetFaxInbox(SRFaxApiConnector apiConnector)
 	{
 		logger.info("TEST GET FAX INBOX");
-		Map<String, String> parameters = new HashMap<>();
-		ListWrapper<GetFaxInboxResult> responseWrapper = apiConnector.Get_Fax_Inbox(parameters);
+		ListWrapper<GetFaxInboxResult> responseWrapper = apiConnector.Get_Fax_Inbox(null, null, null, null, null, null, null);
 
 		logger.info("STATUS: " + responseWrapper.getStatus());
 		logger.info("DATA: " + responseWrapper.getResult());
@@ -92,8 +87,7 @@ public class SRFaxCommandLineRunner
 	public static void testGetFaxOutbox(SRFaxApiConnector apiConnector)
 	{
 		logger.info("TEST GET FAX OUTBOX");
-		Map<String, String> parameters = new HashMap<>();
-		ListWrapper<GetFaxOutboxResult> responseWrapper = apiConnector.Get_Fax_Outbox(parameters);
+		ListWrapper<GetFaxOutboxResult> responseWrapper = apiConnector.Get_Fax_Outbox(null, null, null, null, null, null);
 
 		logger.info("STATUS: " + responseWrapper.getStatus());
 		logger.info("DATA: " + responseWrapper.getResult());

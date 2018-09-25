@@ -102,28 +102,39 @@ public class OutgoingFaxService
 	{
 		SRFaxApiConnector apiConnector = new SRFaxApiConnector(faxSettings.getFaxUser(), faxSettings.getFaxPasswd());
 
-		HashMap<String, String> parameters = new HashMap<>();
-		parameters.put("sCallerID", faxSettings.getFaxNumber());
-		parameters.put("sSenderEmail", faxSettings.getSiteUser());
-		parameters.put("sFaxType", "SINGLE");
-		parameters.put("sToFaxNumber", faxNumber);
-
 		String coverLetterOption = faxSettings.getCoverLetterOption();
-		if(coverLetterOption != null && SRFaxApiConnector.validCoverLetterNames.contains(coverLetterOption))
+		if(coverLetterOption == null || !SRFaxApiConnector.validCoverLetterNames.contains(coverLetterOption))
 		{
-			parameters.put("sCoverPage", coverLetterOption);
+			coverLetterOption = null;
 		}
 
-		int counter = 1;
+		HashMap<String, String> fileMap = new HashMap<>(filesToFax.length);
 		for(GenericFile fileToFax : filesToFax)
 		{
-			parameters.put("sFileName_"+counter, fileToFax.getName());
-			parameters.put("sFileContent_"+counter, toBase64String(fileToFax));
-			counter++;
+			fileMap.put(fileToFax.getName(), toBase64String(fileToFax));
 		}
 
 		// external api call
-		SingleWrapper<Integer> resultWrapper = apiConnector.Queue_Fax(parameters);
+		SingleWrapper<Integer> resultWrapper = apiConnector.Queue_Fax(
+				faxSettings.getFaxNumber(),
+				faxSettings.getSiteUser(),
+				"SINGLE",
+				faxNumber,
+				fileMap,
+				SRFaxApiConnector.RESPONSE_FORMAT_JSON,
+				null,
+				null,
+				coverLetterOption,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null
+		);
 		boolean sendSuccess = resultWrapper.isSuccess();
 
 		for(GenericFile fileToFax : filesToFax)

@@ -28,6 +28,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SingleWrapper<T>
 {
+	public static final String STATUS_SUCCESS = "Success";
+
 	@JsonProperty("Status")
 	private String status;
 	@JsonProperty("Result")
@@ -47,7 +49,7 @@ public class SingleWrapper<T>
 
 	public boolean isSuccess()
 	{
-		return "Success".equals(status);
+		return STATUS_SUCCESS.equals(status);
 	}
 
 	public T getResult()
