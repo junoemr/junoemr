@@ -21,7 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.consultations.dao;
 
 import java.util.Date;
 import java.util.List;
@@ -33,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.oscarehr.common.PaginationQuery;
+import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.common.model.ConsultationRequest;
 import org.oscarehr.consultations.ConsultationQuery;
 import org.oscarehr.consultations.ConsultationRequestSearchFilter;
@@ -41,7 +42,8 @@ import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ConsultRequestDao extends AbstractDao<ConsultationRequest> {
+public class ConsultRequestDao extends AbstractDao<ConsultationRequest>
+{
 
 	public ConsultRequestDao() {
 		super(ConsultationRequest.class);
@@ -140,7 +142,7 @@ public class ConsultRequestDao extends AbstractDao<ConsultationRequest> {
 	
 	public int getConsultationCount2(ConsultationRequestSearchFilter filter) {
 		String sql = getSearchQuery(filter,true);
-		MiscUtils.getLogger().info("sql="+sql);
+		MiscUtils.getLogger().debug("sql="+sql);
 		Query query = entityManager.createQuery(sql);
 		Long count = this.getCountResult(query);
 		
@@ -150,7 +152,7 @@ public class ConsultRequestDao extends AbstractDao<ConsultationRequest> {
 
 	public List<Object[]> search(ConsultationRequestSearchFilter filter) {
 		String sql = this.getSearchQuery(filter,false);
-		MiscUtils.getLogger().info("sql="+sql);
+		MiscUtils.getLogger().debug("sql="+sql);
 		Query query = entityManager.createQuery(sql);
 		query.setFirstResult(filter.getStartIndex());
 		query.setMaxResults(filter.getNumToReturn());

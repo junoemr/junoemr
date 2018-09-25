@@ -27,10 +27,34 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
+
+<script>
+    /**
+	 * If the back button doesn't bring you to a new window (you are are at the first point in your history),
+	 * then it will close the window instead.  This is an alternative to determining the length of the window.history object
+	 * because different browsers start the count at 0 or 1 (in both cases the current page will add +1 to the length).
+     */
+	function goBackOrClose() {
+		var close = true;
+
+		window.addEventListener("beforeunload", function() {
+			close = false;
+		});
+
+		history.go(-1);
+
+		setTimeout(function() {
+			if (close) {
+				self.close()
+			}
+		}, 100);
+	}
+</script>
+
 <hr width="100%">
 <table border="0" cellspacing="0" cellpadding="0" width="100%" class="noprint">
 	<tr>
-		<td><a href=# onClick="javascript:history.go(-1);return false;">
+		<td><a href=# onClick="javascript:goBackOrClose(); return false;">
 		<img src="../images/leftarrow.gif" border="0" width="25" height="20"
 			align="absmiddle"> <bean:message
 			key="demographic.zfooterbackclose.btnBack" /> </a></td>
