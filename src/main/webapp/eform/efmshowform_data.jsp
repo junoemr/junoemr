@@ -27,17 +27,17 @@
 <%@ page import="org.oscarehr.eform.service.EFormDataService" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="oscar.eform.data.EForm" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 <%
 	EFormDataService eFormDataService = SpringUtils.getBean(EFormDataService.class);
 
-	String id = request.getParameter("fid");
 	String messageOnFailure = "No eform or appointment is available";
 	String providerNo = (String) session.getValue("user");
 	boolean showInstancedWarning = false;
 
-	if(id == null)
+	if(request.getParameter("fdid") != null)
 	{  // form exists in patient
-		id = request.getParameter("fdid");
+		String id = request.getParameter("fdid");
 		String appointmentNo = request.getParameter("appointment");
 		String eformLink = request.getParameter("eform_link");
 
@@ -57,15 +57,26 @@
 		out.print(eForm.getFormHtml());
 	}
 	else
-	{  //if form is viewed from admin screen
-		EForm eForm = new EForm(id, "-1"); //form cannot be submitted, demographic_no "-1" indicate this specialty
-		eForm.setLoggedInProvider(providerNo);
-		eForm.setContextPath(request.getContextPath());
-		eForm.setupInputFields();
-		eForm.setOscarOPEN(request.getRequestURI());
-		eForm.setImagePath();
-		eForm.setDatabaseUpdateAPs();
-		out.print(eForm.getFormHtml());
+	{   // the form is viewed from admin screen
+		String id = request.getParameter("fid");
+
+		if (id != null)
+		{
+			EForm eForm = new EForm(id, "-1");        // demographicID -1 is a placeholder.  We will not be submitting this form.
+			eForm.setLoggedInProvider(providerNo);
+			eForm.setContextPath(request.getContextPath());
+			eForm.setupInputFields();
+			eForm.setOscarOPEN(request.getRequestURI());
+			eForm.setImagePath();
+			eForm.setDatabaseUpdateAPs();
+			eForm.disableSubmitControls();
+			out.print(eForm.getFormHtml());
+		}
+		else
+		{
+		    // If despite our best efforts, a user still manages to submit an invalid e-form from the admin screen or otherwise.
+			MiscUtils.getLogger().warn("An e-form was submitted without a fdid or fid, ignoring submission.\n Params: " + request.getParameterMap().toString());
+		}
 	}
 
 	String iframeResize = (String) session.getAttribute("useIframeResizing");
@@ -78,11 +89,10 @@
 </script>
 <%
 	}
-	if(showInstancedWarning)
-	{
+	if(showInstancedWarning) {
 %>
 	<script>
-		alert("You are editing an outdated version of an instanced eForm. Saving this version will overwrite the existing version and could result in a data loss.");
+		alert("You are editing an outdated version of an instanced eForm. Saving this version will overwrite the existing version and could result in a data loss.";);
 	</script>
 <%
 	}

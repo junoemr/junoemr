@@ -661,9 +661,11 @@
 									<%	if (OscarProperties.getInstance().isPropertyActive("view_consultation_requests.show_patient_emails"))
 									{ %>
 									<td class="stat<%=status%>">
+										<% if (patientEmail != null) { %>
 										<a href="mailto:<%=patientEmail%>">
 											<%=patientEmail%>
 										</a>
+										<% } %>
 									</td>
 									<% } %>
 									<td class="stat<%=status%>">

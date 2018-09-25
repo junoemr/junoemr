@@ -10,6 +10,27 @@
 			margin-bottom: $margin-sm;
 		}
 	}
+  	.appointment-date-time-select {
+	  display: flex;
+	  flex-flow: row nowrap;
+	  justify-content: start;
+
+	  .check-wrapper {
+		padding: 2px;
+	  }
+	  .date-select-wrapper{
+		width: 40%;
+		padding: 2px;
+	  }
+	  .time-select-wrapper {
+		width: 40%;
+		padding: 2px;
+		.time-select {
+		  display: flex;
+		  align-items: center;
+		}
+	  }
+	}
 }
 
 #search-form {

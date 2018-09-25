@@ -24,27 +24,15 @@
 
 package org.oscarehr.consultations;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.consultations.dao.ConsultRequestDao;
 import org.oscarehr.common.dao.ConsultationServiceDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.ConsultationRequest;
@@ -57,10 +45,21 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.PaginationUtils;
 import org.oscarehr.util.SpringUtils;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Deprecated
 public class ConsultationAction extends Action {
 
-	private ConsultationService consultationRequestService = SpringUtils.getBean(ConsultationService.class);
+	private ConsultRequestDao consultationDao = SpringUtils.getBean(ConsultRequestDao.class);
 	private ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 	private DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 	private ConsultationServiceDao consultationServiceDao = SpringUtils.getBean(ConsultationServiceDao.class);
@@ -86,13 +85,13 @@ public class ConsultationAction extends Action {
 		
 		//sort out the totals
 		Map<String, Object> map = new HashMap<String, Object>();
-		int total = consultationRequestService.getConsultationCount(query);
+		int total = consultationDao.getConsultationCount(query);
 		map.put("iTotalRecords", total);
 		map.put("iTotalDisplayRecords", total);
 		
 		//these are our display objects
 		List<ConsultationData> list = new ArrayList<ConsultationData>();
-		for (ConsultationRequest consult : consultationRequestService.listConsultationRequests(loggedInInfo, query)) {
+		for (ConsultationRequest consult : consultationDao.listConsultationRequests(query)) {
 			ConsultationData data = convertToConsultationDataObject(consult);
 			list.add(data);
 		}
