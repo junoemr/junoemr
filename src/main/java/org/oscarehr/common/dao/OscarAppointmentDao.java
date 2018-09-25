@@ -772,7 +772,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 	}
 
 	public SortedMap<LocalTime, List<AppointmentDetails>> findAppointmentDetailsByDateAndProvider(
-		LocalDate date, String providerNo, String site)
+		LocalDate date, Integer providerNo, String site)
 	{
 		String sql = "SELECT\n" +
 				"  a.appointment_no,\n" +
