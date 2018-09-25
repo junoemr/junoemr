@@ -33,7 +33,7 @@ import org.oscarehr.fax.dao.FaxJobDao;
 import org.oscarehr.fax.exception.FaxApiException;
 import org.oscarehr.fax.exception.FaxNumberException;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
-import org.oscarehr.fax.externalApi.srfax.result.SRFaxResultWrapper_Single;
+import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
 import org.oscarehr.fax.model.FaxConfig;
 import org.oscarehr.fax.model.FaxJob;
 import org.oscarehr.util.MiscUtils;
@@ -123,7 +123,7 @@ public class OutgoingFaxService
 		}
 
 		// external api call
-		SRFaxResultWrapper_Single<Integer> resultWrapper = apiConnector.Queue_Fax(parameters);
+		SingleWrapper<Integer> resultWrapper = apiConnector.Queue_Fax(parameters);
 		boolean sendSuccess = resultWrapper.isSuccess();
 
 		for(GenericFile fileToFax : filesToFax)

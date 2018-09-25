@@ -26,26 +26,34 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SRFaxResult_GetFaxInbox
+public class GetFaxOutboxResult
 {
 	@JsonProperty("FileName")
 	private String fileName;
-	@JsonProperty("ReceiveStatus")
-	private String recieveStatus;
-	@JsonProperty("Date")
-	private String date;
+	@JsonProperty("SentStatus")
+	private String sentStatus;
+	@JsonProperty("DateQueued")
+	private String dateQueued;
+	@JsonProperty("DateSent")
+	private String dateSent;
 	@JsonProperty("EpochTime")
 	private String epochTime;
-	@JsonProperty("CallerID")
+	@JsonProperty("ToFaxNumber")
 	private String callerId;
-	@JsonProperty("RemoteID")
-	private String remoteId;
 	@JsonProperty("Pages")
 	private String pages;
+	@JsonProperty("Duration")
+	private String duration;
+	@JsonProperty("RemoteID")
+	private String remoteId;
+	@JsonProperty("ErrorCode")
+	private String errorCode;
+	@JsonProperty("AccountCode")
+	private String accountCode;
+	@JsonProperty("Subject")
+	private String subject;
 	@JsonProperty("Size")
 	private String size;
-	@JsonProperty("ViewedStatus")
-	private String viewedStatus;
 
 	@JsonProperty("User_ID")
 	private String userId;
@@ -62,24 +70,34 @@ public class SRFaxResult_GetFaxInbox
 		this.fileName = fileName;
 	}
 
-	public String getRecieveStatus()
+	public String getSentStatus()
 	{
-		return recieveStatus;
+		return sentStatus;
 	}
 
-	public void setRecieveStatus(String recieveStatus)
+	public void setSentStatus(String sentStatus)
 	{
-		this.recieveStatus = recieveStatus;
+		this.sentStatus = sentStatus;
 	}
 
-	public String getDate()
+	public String getDateQueued()
 	{
-		return date;
+		return dateQueued;
 	}
 
-	public void setDate(String date)
+	public void setDateQueued(String dateQueued)
 	{
-		this.date = date;
+		this.dateQueued = dateQueued;
+	}
+
+	public String getDateSent()
+	{
+		return dateSent;
+	}
+
+	public void setDateSent(String dateSent)
+	{
+		this.dateSent = dateSent;
 	}
 
 	public String getEpochTime()
@@ -102,16 +120,6 @@ public class SRFaxResult_GetFaxInbox
 		this.callerId = callerId;
 	}
 
-	public String getRemoteId()
-	{
-		return remoteId;
-	}
-
-	public void setRemoteId(String remoteId)
-	{
-		this.remoteId = remoteId;
-	}
-
 	public String getPages()
 	{
 		return pages;
@@ -122,6 +130,56 @@ public class SRFaxResult_GetFaxInbox
 		this.pages = pages;
 	}
 
+	public String getDuration()
+	{
+		return duration;
+	}
+
+	public void setDuration(String duration)
+	{
+		this.duration = duration;
+	}
+
+	public String getRemoteId()
+	{
+		return remoteId;
+	}
+
+	public void setRemoteId(String remoteId)
+	{
+		this.remoteId = remoteId;
+	}
+
+	public String getErrorCode()
+	{
+		return errorCode;
+	}
+
+	public void setErrorCode(String errorCode)
+	{
+		this.errorCode = errorCode;
+	}
+
+	public String getAccountCode()
+	{
+		return accountCode;
+	}
+
+	public void setAccountCode(String accountCode)
+	{
+		this.accountCode = accountCode;
+	}
+
+	public String getSubject()
+	{
+		return subject;
+	}
+
+	public void setSubject(String subject)
+	{
+		this.subject = subject;
+	}
+
 	public String getSize()
 	{
 		return size;
@@ -130,16 +188,6 @@ public class SRFaxResult_GetFaxInbox
 	public void setSize(String size)
 	{
 		this.size = size;
-	}
-
-	public String getViewedStatus()
-	{
-		return viewedStatus;
-	}
-
-	public void setViewedStatus(String viewedStatus)
-	{
-		this.viewedStatus = viewedStatus;
 	}
 
 	public String getUserId()

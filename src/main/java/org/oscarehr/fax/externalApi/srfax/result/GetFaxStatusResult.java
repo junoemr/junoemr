@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SRFaxResult_GetFaxOutbox
+public class GetFaxStatusResult
 {
 	@JsonProperty("FileName")
 	private String fileName;
@@ -36,10 +36,8 @@ public class SRFaxResult_GetFaxOutbox
 	private String dateQueued;
 	@JsonProperty("DateSent")
 	private String dateSent;
-	@JsonProperty("EpochTime")
-	private String epochTime;
 	@JsonProperty("ToFaxNumber")
-	private String callerId;
+	private String toFaxNumber;
 	@JsonProperty("Pages")
 	private String pages;
 	@JsonProperty("Duration")
@@ -48,17 +46,11 @@ public class SRFaxResult_GetFaxOutbox
 	private String remoteId;
 	@JsonProperty("ErrorCode")
 	private String errorCode;
-	@JsonProperty("AccountCode")
-	private String accountCode;
-	@JsonProperty("Subject")
-	private String subject;
 	@JsonProperty("Size")
 	private String size;
+	@JsonProperty("AccountCode")
+	private String accountCode;
 
-	@JsonProperty("User_ID")
-	private String userId;
-	@JsonProperty("User_FaxNumber")
-	private String userFaxNumber;
 
 	public String getFileName()
 	{
@@ -100,24 +92,14 @@ public class SRFaxResult_GetFaxOutbox
 		this.dateSent = dateSent;
 	}
 
-	public String getEpochTime()
+	public String getToFaxNumber()
 	{
-		return epochTime;
+		return toFaxNumber;
 	}
 
-	public void setEpochTime(String epochTime)
+	public void setToFaxNumber(String toFaxNumber)
 	{
-		this.epochTime = epochTime;
-	}
-
-	public String getCallerId()
-	{
-		return callerId;
-	}
-
-	public void setCallerId(String callerId)
-	{
-		this.callerId = callerId;
+		this.toFaxNumber = toFaxNumber;
 	}
 
 	public String getPages()
@@ -160,26 +142,6 @@ public class SRFaxResult_GetFaxOutbox
 		this.errorCode = errorCode;
 	}
 
-	public String getAccountCode()
-	{
-		return accountCode;
-	}
-
-	public void setAccountCode(String accountCode)
-	{
-		this.accountCode = accountCode;
-	}
-
-	public String getSubject()
-	{
-		return subject;
-	}
-
-	public void setSubject(String subject)
-	{
-		this.subject = subject;
-	}
-
 	public String getSize()
 	{
 		return size;
@@ -190,23 +152,13 @@ public class SRFaxResult_GetFaxOutbox
 		this.size = size;
 	}
 
-	public String getUserId()
+	public String getAccountCode()
 	{
-		return userId;
+		return accountCode;
 	}
 
-	public void setUserId(String userId)
+	public void setAccountCode(String accountCode)
 	{
-		this.userId = userId;
-	}
-
-	public String getUserFaxNumber()
-	{
-		return userFaxNumber;
-	}
-
-	public void setUserFaxNumber(String userFaxNumber)
-	{
-		this.userFaxNumber = userFaxNumber;
+		this.accountCode = accountCode;
 	}
 }

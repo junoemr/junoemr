@@ -25,8 +25,8 @@ package org.oscarehr.fax.service;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
-import org.oscarehr.fax.externalApi.srfax.result.SRFaxResultWrapper_List;
-import org.oscarehr.fax.externalApi.srfax.result.SRFaxResult_GetUsage;
+import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
+import org.oscarehr.fax.externalApi.srfax.result.GetUsageResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,7 +66,7 @@ public class FaxConfigService
 		parameters.put("sPeriod", "RANGE");
 		parameters.put("sStartDate", currentDateStr);
 		parameters.put("sEndDate", currentDateStr);
-		SRFaxResultWrapper_List<SRFaxResult_GetUsage> result = apiConnector.Get_Fax_Usage(parameters);
+		ListWrapper<GetUsageResult> result = apiConnector.Get_Fax_Usage(parameters);
 
 		logger.info(String.valueOf(result));
 
