@@ -426,8 +426,9 @@
 
 										<%}
 										if (!demographicID.equals("-1")) {%>
-											<input id="mrp_<%=docId%>" onclick="sendMRP(this)" type="checkbox" name="linkMRP" />Send to MRP
+											<button id="mrp_<%=docId%>" onclick="sendMRP(this, 'DOC')" name="linkMRP">Send to MRP</button>
 											<a id="mrp_fail_<%=docId%>" style="color:red;font-style: italic;display: none;" ><bean:message key="inboxmanager.document.SendToMRPFailedMsg" /></a>
+											<a id="mrp_success_<%=docId%>" style="color:green;font-style: italic;display: none;" ><bean:message key="inboxmanager.document.SendToMRPSuccessMsg" /></a>
 										<%}else if (!inChart){%>
 											<input type="button" id="createNewDemo" value="Create New Demographic"  onclick="popup(700,960,'<%= contextPath %>/demographic/demographicaddarecordhtm.jsp','demographic')"/>
 										<%}%>

@@ -262,7 +262,7 @@ function addPatientIdName(pid,name){
 	}
 
 }
-function sendMRP(ele){
+function sendMRP(ele, docType){
 	var doclabid=ele.id;
 	doclabid=doclabid.split('_')[1];
 	var demoId=$('demofind'+doclabid).value;
@@ -271,15 +271,21 @@ function sendMRP(ele){
 		ele.checked=false;
 	}else{
 		if(confirm('Send to Most Responsible Provider?')){
-			var type=checkType(doclabid);
+			var type=docType;
+			if(!type)
+			{
+				type = checkType(doclabid);
+			}
 			var url=contextPath + "/oscarMDS/SendMRP.do";
 			var data='demoId='+demoId+'&docLabType='+type+'&docLabId='+doclabid;
 			new Ajax.Request(url, {method: 'post',parameters:data,onSuccess:function(transport){
 				ele.disabled=true;
 				$('mrp_fail_'+doclabid).hide();
+				$('mrp_success_'+doclabid).show();
 			},onFailure:function(transport){
 				ele.checked=false;
 				$('mrp_fail_'+doclabid).show();
+				$('mrp_success_'+doclabid).hide();
 			}});
 		}else{
 			ele.checked=false;
