@@ -24,10 +24,20 @@
 
 --%>
 
-<%@page import="oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*,oscar.oscarProvider.data.*,oscar.util.*,oscar.oscarEncounter.oscarMeasurements.*,oscar.oscarEncounter.oscarMeasurements.bean.*,oscar.oscarEncounter.oscarMeasurements.pageUtil.*"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@page import="org.oscarehr.common.dao.FlowSheetCustomizationDao"%>
+<%@page import="org.oscarehr.common.model.FlowSheetCustomization"%>
 <%@page import="org.springframework.web.context.WebApplicationContext"%>
-<%@page import="org.oscarehr.common.dao.*,org.oscarehr.common.model.FlowSheetCustomization"%>
+<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet"%>
+<%@page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig"%>
+<%@page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler"%>
+<%@page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean"%>
+<%@page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler"%>
+<%@page import="oscar.oscarEncounter.oscarMeasurements.pageUtil.EctMeasurementsForm"%>
+<%@page import="oscar.util.UtilDateUtilities"%>
+<%@page import="java.util.Hashtable"%>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
@@ -45,26 +55,13 @@
   MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
 
 
-
   List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( temp,(String) session.getAttribute("user"),Integer.parseInt(demographic_no));
   MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(temp,custList);
 
   EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
 
-
-
-  Hashtable existingPrevention = null;
-
-
-  String providerName ="";
   String provider = (String) session.getValue("user");
   String prevDate = UtilDateUtilities.getToday("yyyy-MM-dd H:mm");
-  String completed = "0";
-  String nextDate = "";
-  boolean never = false;
-  Hashtable extraData = new Hashtable();
-
-  List providers = ProviderData.getProviderList();
 %>
 
 
@@ -92,160 +89,176 @@
   div.ImmSet li a:hover { text-decoration:none; color:red; }
   div.ImmSet li a:visited { text-decoration:none; color:blue;}
 
-
-  ////////
   div.prevention {  background-color: #999999; }
   div.prevention fieldset {width:35em; font-weight:bold; }
   div.prevention legend {font-weight:bold; }
-
-  ////////
 </style>
 
-<SCRIPT LANGUAGE="JavaScript">
+	<SCRIPT LANGUAGE="JavaScript">
 
-function showHideItem(id){
-    if(document.getElementById(id).style.display == 'none')
-        document.getElementById(id).style.display = '';
-    else
-        document.getElementById(id).style.display = 'none';
-}
+		function showHideItem(id)
+		{
+			if (document.getElementById(id).style.display == 'none')
+				document.getElementById(id).style.display = '';
+			else
+				document.getElementById(id).style.display = 'none';
+		}
 
-function showItem(id){
-        document.getElementById(id).style.display = '';
-}
+		function showItem(id)
+		{
+			document.getElementById(id).style.display = '';
+		}
 
-function hideItem(id){
-        document.getElementById(id).style.display = 'none';
-}
+		function hideItem(id)
+		{
+			document.getElementById(id).style.display = 'none';
+		}
 
-function showHideNextDate(id,nextDate,nexerWarn){
-    if(document.getElementById(id).style.display == 'none'){
-        showItem(id);
-    }else{
-        hideItem(id);
-        document.getElementById(nextDate).value = "";
-        document.getElementById(nexerWarn).checked = false ;
+		function showHideNextDate(id, nextDate, nexerWarn)
+		{
+			if (document.getElementById(id).style.display == 'none')
+			{
+				showItem(id);
+			}
+			else
+			{
+				hideItem(id);
+				document.getElementById(nextDate).value = "";
+				document.getElementById(nexerWarn).checked = false;
 
-    }
-}
+			}
+		}
 
-function disableifchecked(ele,nextDate){
-    if(ele.checked == true){
-       document.getElementById(nextDate).disabled = true;
-    }else{
-       document.getElementById(nextDate).disabled = false;
-    }
-}
+		function disableifchecked(ele, nextDate)
+		{
+			if (ele.checked == true)
+			{
+				document.getElementById(nextDate).disabled = true;
+			}
+			else
+			{
+				document.getElementById(nextDate).disabled = false;
+			}
+		}
 
-function masterDateFill(v){
-	var x=<%=measurements.length%>;
-
-
-	for(i = 0; i <= x; i++){
-	document.getElementById('prevDate'+ i).value=v;
-	}
-
-}
-</SCRIPT>
-
-<style type="text/css">
-	Body{background-color: #fff;}
-	
-	table.outline{
-	   margin-top:50px;
-	   border-bottom: 1pt solid #888888;
-	   border-left: 1pt solid #888888;
-	   border-top: 1pt solid #888888;
-	   border-right: 1pt solid #888888;
-	}
-	table.grid{
-	   border-bottom: 1pt solid #888888;
-	   border-left: 1pt solid #888888;
-	   border-top: 1pt solid #888888;
-	   border-right: 1pt solid #888888;
-	}
-	td.gridTitles{
-		border-bottom: 2pt solid #888888;
-		font-weight: bold;
-		text-align: center;
-	}
-        td.gridTitlesWOBottom{
-                font-weight: bold;
-                text-align: center;
-        }
-	td.middleGrid{
-	   border-left: 1pt solid #888888;
-	   border-right: 1pt solid #888888;
-           text-align: center;
-	}
+		function masterDateFill(v)
+		{
+			var x =<%=measurements.length%>;
 
 
-label{
-float: left;
-width: 120px;
-font-weight: bold;
-}
+			for (i = 0; i <= x; i++)
+			{
+				document.getElementById('prevDate' + i).value = v;
+			}
 
-label.checkbox{
-float: left;
-width: 116px;
-font-weight: bold;
-}
+		}
+	</SCRIPT>
 
-label.fields{
-float: left;
-width: 125px;
-font-weight: bold;
-}
+	<style type="text/css">
+		Body {
+			background-color: #fff;
+		}
 
-span.labelLook{
-font-weight:bold;
+		table.outline {
+			margin-top: 50px;
+			border-bottom: 1pt solid #888888;
+			border-left: 1pt solid #888888;
+			border-top: 1pt solid #888888;
+			border-right: 1pt solid #888888;
+		}
 
-}
+		table.grid {
+			border-bottom: 1pt solid #888888;
+			border-left: 1pt solid #888888;
+			border-top: 1pt solid #888888;
+			border-right: 1pt solid #888888;
+		}
 
-input, textarea,select{
+		td.gridTitles {
+			border-bottom: 2pt solid #888888;
+			font-weight: bold;
+			text-align: center;
+		}
 
-//margin-bottom: 5px;
-}
+		td.gridTitlesWOBottom {
+			font-weight: bold;
+			text-align: center;
+		}
 
-textarea{
-width: 450px;
-height: 100px;
-}
+		td.middleGrid {
+			border-left: 1pt solid #888888;
+			border-right: 1pt solid #888888;
+			text-align: center;
+		}
 
+		label {
+			float: left;
+			width: 120px;
+			font-weight: bold;
+		}
 
-.boxes{
-width: 1em;
-}
+		label.checkbox {
+			float: left;
+			width: 116px;
+			font-weight: bold;
+		}
 
-#submitbutton{
-margin-left: 120px;
-margin-top: 5px;
-width: 90px;
-}
+		label.fields {
+			float: left;
+			width: 125px;
+			font-weight: bold;
+		}
 
-br{
-clear: left;
-}
-</style>
+		span.labelLook {
+			font-weight: bold;
 
-<script type="text/javascript">
-  function hideExtraName(ele){
-   //alert(ele);
-    if (ele.options[ele.selectedIndex].value != -1){
-       hideItem('providerName');
-       //alert('hidding');
-    }else{
-       showItem('providerName');
-       document.getElementById('providerName').focus();
-       //alert('showing');
-    }
-  }
-</script>
+		}
+
+		input, textarea, select {
+
+		/ / margin-bottom: 5 px;
+		}
+
+		textarea {
+			width: 450px;
+			height: 100px;
+		}
+
+		.boxes {
+			width: 1em;
+		}
+
+		#submitbutton {
+			margin-left: 120px;
+			margin-top: 5px;
+			width: 90px;
+		}
+
+		br {
+			clear: left;
+		}
+	</style>
+
+	<script type="text/javascript">
+		function hideExtraName(ele)
+		{
+			//alert(ele);
+			if (ele.options[ele.selectedIndex].value != -1)
+			{
+				hideItem('providerName');
+				//alert('hidding');
+			}
+			else
+			{
+				showItem('providerName');
+				document.getElementById('providerName').focus();
+				//alert('showing');
+			}
+		}
+	</script>
 </head>
 
 <body class="BodyStyle" vlink="#0000FF" onload="Field.focus('value(inputValue-0)');">
-<!--  -->
     <table  class="MainTable" id="scrollNumber1" name="encounterTable">
         <tr class="MainTableTopRow">
             <td class="MainTableTopRowLeftColumn" width="100" >
@@ -270,7 +283,6 @@ clear: left;
         <tr>
             <td class="MainTableLeftColumn" valign="top">
                &nbsp;
-
             </td>
             <td valign="top" class="MainTableRightColumn">
                <html:errors/>
@@ -297,8 +309,7 @@ clear: left;
             <fieldset>
                <legend><b>Master Date/Time</b></legend>
                <div style="float:left;margin-left:30px;">
-        		<label for="prevDate" class="fields" >Obs Date/Time: </label>
-
+        		<label for="prevDate<%=iDate%>" class="fields" >Obs Date/Time: </label>
 				<input type="text" name="value(date-<%=iDate%>)" id="prevDate<%=iDate%>" value="<%=prevDate%>" size="17" onchange="javascript:masterDateFill(this.value);">
 				<% if ( id == null ) { %>
 				<a id="date<%=iDate%>"><img title="Calendar" src="../../images/cal.gif" alt="Calendar" border="0" /></a>
@@ -340,12 +351,6 @@ clear: left;
                    prevDate = (String) h.get("date-"+ctr);
                    val = (String) h.get("inputValue-" + ctr);
                    comment = (String) h.get("comments-" + ctr);
-
-
-
-
-
-
                 }
                 %>
 
@@ -368,8 +373,7 @@ clear: left;
                            <input type="radio" name="<%= "value(inputMInstrc-" + ctr + ")" %>" value="<%=mtypeBean.getMeasuringInstrc()%>" checked/>
                          </div>
                          <div style="float:left;margin-left:30px;">
-                            <label for="prevDate" class="fields" >Obs Date/Time:</label>
-
+                            <label for="prevDate<%=ctr%>" class="fields" >Obs Date/Time:</label>
 							<input type="text" name="<%= "value(date-" + ctr + ")" %>" id="prevDate<%=ctr%>" value="<%=prevDate%>" size="17" >
 
 							<% if ( id == null ) { %>
@@ -431,61 +435,77 @@ clear: left;
             </td>
         </tr>
     </table>
-<script type="text/javascript">
-    <% if ( id != null ) { %>
-        Form.disable('measurementForm');
-        document.getElementById('deleteButton').disabled = false;
-        document.getElementById('deleteCheck').disabled = false;
+    <script type="text/javascript">
+	    <% if ( id != null ) { %>
+	    Form.disable('measurementForm');
+	    document.getElementById('deleteButton').disabled = false;
+	    document.getElementById('deleteCheck').disabled = false;
 
-    <% } %>
-  <% for (int i =0; i < iDate; i++){ %>
-Calendar.setup( { inputField : "prevDate<%=i%>", ifFormat : "%Y-%m-%d %H:%M", showsTime :true, button : "date<%=i%>", singleClick : true, step : 1 } );
-  <%}%>
-//Calendar.setup( { inputField : "nextDate", ifFormat : "%Y-%m-%d", showsTime :false, button : "nextDateCal", singleClick : true, step : 1 } );
-</script>
+	    <% } %>
+	    <% for (int i =0; i < iDate; i++){ %>
+	    Calendar.setup({inputField: "prevDate<%=i%>", ifFormat: "%Y-%m-%d %H:%M", showsTime: true, button: "date<%=i%>", singleClick: true, step: 1});
+	    <%}%>
+    </script>
 </body>
 </html:html>
 <%!
+	String completed(boolean b)
+	{
+		String ret = "";
+		if(b)
+		{
+			ret = "checked";
+		}
+		return ret;
+	}
 
-String completed(boolean b){
-    String ret ="";
-    if(b){ret="checked";}
-    return ret;
-    }
+	String refused(boolean b)
+	{
+		String ret = "";
+		if(!b)
+		{
+			ret = "checked";
+		}
+		return ret;
+	}
 
-String refused(boolean b){
-    String ret ="";
-    if(!b){ret="checked";}
-    return ret;
-    }
+	String str(String first, String second)
+	{
+		String ret = "";
+		if(first != null)
+		{
+			ret = first;
+		}
+		else if(second != null)
+		{
+			ret = second;
+		}
+		return ret;
+	}
 
-String str(String first,String second){
-    String ret = "";
-    if(first != null){
-       ret = first;
-    }else if ( second != null){
-       ret = second;
-    }
-    return ret;
-  }
+	String checked(String first, String second)
+	{
+		String ret = "";
+		if(first != null && second != null)
+		{
+			if(first.equals(second))
+			{
+				ret = "checked";
+			}
+		}
+		return ret;
+	}
 
-String checked(String first,String second){
-    String ret = "";
-    if(first != null && second != null){
-       if(first.equals(second)){
-           ret = "checked";
-       }
-    }
-    return ret;
-  }
-
-String sel(String first,String second){
-    String ret = "";
-    if(first != null && second != null){
-       if(first.equals(second)){
-           ret = "selected";
-       }
-    }
-    return ret;
-  }
+	String sel(String first, String second)
+	{
+		String ret = "";
+		if(first != null && second != null)
+		{
+			if(first.equals(second))
+			{
+				ret = "selected";
+			}
+		}
+		return ret;
+	}
 %>
