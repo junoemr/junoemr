@@ -25,7 +25,7 @@
 --%>
 
 <%
-	String user_name = (String) session.getAttribute("userlastname") + "," + (String) session.getAttribute("userfirstname");
+	String userName = (String) session.getAttribute("userlastname") + "," + (String) session.getAttribute("userfirstname");
 %>
 <%@ page import="org.oscarehr.schedule.service.Schedule,
                  org.oscarehr.util.SpringUtils,
@@ -50,8 +50,8 @@
 		Schedule scheduleService = SpringUtils.getBean(Schedule.class);
 		ScheduleDateDao scheduleDateDao = SpringUtils.getBean(ScheduleDateDao.class);
 
-		String provider_no = request.getParameter("provider_no");
-		String provider_name = request.getParameter("provider_name");
+		String providerNo = request.getParameter("provider_no");
+		String providerName = request.getParameter("provider_name");
 		String available = request.getParameter("available");
 		String priority = "c";
 		String reason = request.getParameter("reason");
@@ -59,10 +59,10 @@
 		String dateStr = request.getParameter("date");
 		Date date = MyDateFormat.getSysDate(dateStr);
 
-		ScheduleDate sd = scheduleDateDao.findByProviderNoAndDate(provider_no, MyDateFormat.getSysDate(request.getParameter("date")));
-		if(sd != null) {
-			sd.setStatus('D');
-			scheduleDateDao.merge(sd);
+		ScheduleDate scheduleDate = scheduleDateDao.findByProviderNoAndDate(providerNo, MyDateFormat.getSysDate(request.getParameter("date")));
+		if(scheduleDate != null) {
+			scheduleDate.setStatus(ScheduleDate.STATUS_DELETED);
+			scheduleDateDao.merge(scheduleDate);
 		}
 
 		//save the record first, change holidaybean next
@@ -73,20 +73,20 @@
 			if(scheduleRscheduleBean.getDateAvail(dateStr))
 			{
 				String availHour = scheduleRscheduleBean.getDateAvailHour(dateStr);
-				scheduleService.saveScheduleByDate(provider_no, date, "1", "b", "", availHour, user_name, scheduleRscheduleBean.active);
+				scheduleService.saveScheduleByDate(providerNo, date, "1", "b", "", availHour, userName, scheduleRscheduleBean.active);
 			}
 			scheduleDateBean.remove(dateStr);
 		}
 		if(" Save ".equals(request.getParameter("Submit")))
 		{
-			scheduleService.saveScheduleByDate(provider_no, date, available, priority, reason, hour, user_name, scheduleRscheduleBean.active);
-			scheduleDateBean.put(dateStr, new HScheduleDate(available, priority, reason, hour, user_name));
+			scheduleService.saveScheduleByDate(providerNo, date, available, priority, reason, hour, userName, scheduleRscheduleBean.active);
+			scheduleDateBean.put(dateStr, new HScheduleDate(available, priority, reason, hour, userName));
 		}
 	%>
 
 <script language="JavaScript">
 <!--
-  opener.location.href=opener.location.href+"?provider_no=<%=provider_no%>&provider_name=<%=URLEncoder.encode(provider_name, "UTF-8")%>";
+  opener.location.href=opener.location.href+"?provider_no=<%=providerNo%>&provider_name=<%=URLEncoder.encode(providerName, "UTF-8")%>";
   opener.location.reload(true);
   self.close();
 //-->
