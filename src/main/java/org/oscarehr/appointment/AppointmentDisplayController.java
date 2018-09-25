@@ -548,10 +548,10 @@ public class AppointmentDisplayController
 
 		if (appointment.getReason() != null && !appointment.getReason().isEmpty())
 		{
-			title += " - " + StringEscapeUtils.escapeHtml(appointment.getReason()) + "\n";
+			title += " - " + StringEscapeUtils.escapeHtml(appointment.getReason());
 		}
 
-		title += "notes: " + StringEscapeUtils.escapeHtml(appointment.getNotes());
+		title += "\nnotes: " + StringEscapeUtils.escapeHtml(appointment.getNotes());
 
 		return " title=\"" + title + "\"";
 	}
