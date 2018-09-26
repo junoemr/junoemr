@@ -315,7 +315,8 @@ public class EctMeasurementsAction extends Action
 			return (new ActionForward(mapping.getInput()));
 		}
 
-		// append info to open encounter note
+		// append info to open encounter note (unsigned)
+		// if no unsigned notes, a new note is used
 		encounterNoteService.appendToOpenNoteAndPersist(providerNo, Integer.parseInt(demographicNo), "\n" + textOnEncounter);
 
 		request.setAttribute("textOnEncounter", StringEscapeUtils.escapeJavaScript(textOnEncounter));

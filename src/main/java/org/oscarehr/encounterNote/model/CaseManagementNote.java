@@ -136,6 +136,10 @@ public class CaseManagementNote extends AbstractModel<Long>
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "note", cascade = CascadeType.ALL)
 	private List<CaseManagementNoteExt> noteExtensionList;
 
+	// with cascade, these entities will be persisted/merged/deleted when this class is.
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "note", cascade = CascadeType.ALL)
+	private List<CaseManagementNoteLink> noteLinkList;
+
 
 	public Long getId()
 	{
@@ -409,5 +413,24 @@ public class CaseManagementNote extends AbstractModel<Long>
 			noteExtensionList = new ArrayList<>(1);
 		}
 		noteExtensionList.add(ext);
+	}
+
+	public List<CaseManagementNoteLink> getNoteLinkList()
+	{
+		return noteLinkList;
+	}
+
+	public void setNoteLinkList(List<CaseManagementNoteLink> noteLinkList)
+	{
+		this.noteLinkList = noteLinkList;
+	}
+
+	public void addNoteLink(CaseManagementNoteLink link)
+	{
+		if(noteLinkList == null)
+		{
+			noteLinkList = new ArrayList<>(1);
+		}
+		noteLinkList.add(link);
 	}
 }

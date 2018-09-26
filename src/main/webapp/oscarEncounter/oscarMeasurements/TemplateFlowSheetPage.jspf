@@ -262,21 +262,25 @@ div.headPrevention p {
 <link rel="stylesheet" type="text/css" href="../../share/css/niftyPrint.css" media="print" />
 <script type="text/javascript" src="../../share/javascript/nifty.js"></script>
 
-<script type="text/javascript">
-    window.onload=function(){
-        if(!NiftyCheck())
-            return;
+	<script type="text/javascript">
+		window.onload = function ()
+		{
+			// force encounter page reload. This will ensure notes are all saved
+			self.opener.location.reload();
 
-//Rounded("div.news","all","transparent","#FFF","small border #999");
-        Rounded("div.headPrevention","all","#CCF","#efeadc","small border blue");
-        Rounded("div.preventionProcedure","all","transparent","#F0F0E7","small border #999");
+			if (!NiftyCheck())
+				return;
 
-//Rounded("span.footnote","all","transparent","#F0F0E7","small border #999");
+			//Rounded("div.news","all","transparent","#FFF","small border #999");
+			Rounded("div.headPrevention", "all", "#CCF", "#efeadc", "small border blue");
+			Rounded("div.preventionProcedure", "all", "transparent", "#F0F0E7", "small border #999");
 
-        Rounded("div.leftBox","top","transparent","#CCCCFF","small border #ccccff");
-        Rounded("div.leftBox","bottom","transparent","#EEEEFF","small border #ccccff");
+			//Rounded("span.footnote","all","transparent","#F0F0E7","small border #999");
 
-    };
+			Rounded("div.leftBox", "top", "transparent", "#CCCCFF", "small border #ccccff");
+			Rounded("div.leftBox", "bottom", "transparent", "#EEEEFF", "small border #ccccff");
+
+		};
 
 
    function loadDifferentElements(){

@@ -39,14 +39,24 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 		super(CaseManagementNote.class);
 	}
 
+	/**
+	 * get the most recent revision of the most recent unsigned chart note
+	 * @param providerNo
+	 * @param demographicNo
+	 * @return the note object
+	 */
 	public CaseManagementNote getNewestUnsignedNote(String providerNo, Integer demographicNo)
 	{
 		Query query = entityManager.createQuery(
 				"SELECT x FROM model.CaseManagementNote x " +
-				"WHERE x.provider.id = :provNo " +
+				"LEFT JOIN x.noteLinkList l " +
+				"WHERE x.noteId = (SELECT MAX(cmn2.noteId) FROM model.CaseManagementNote cmn2 " +
+						"WHERE x.uuid = cmn2.uuid GROUP BY cmn2.uuid) " +
+				"AND x.provider.id = :provNo " +
 				"AND x.demographic.demographicId = :demoNo " +
+				"AND l IS NULL " +
 				"AND x.signed = :signed " +
-				"ORDER BY x.noteId DESC ");
+				"ORDER BY x.noteId DESC, l.id DESC");
 		query.setParameter("provNo", providerNo);
 		query.setParameter("demoNo", demographicNo);
 		query.setParameter("signed", false);

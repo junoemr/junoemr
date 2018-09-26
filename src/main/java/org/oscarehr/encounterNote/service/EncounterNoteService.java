@@ -39,7 +39,6 @@ import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
-import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
@@ -297,25 +296,9 @@ public class EncounterNoteService
 	 */
 	public CaseManagementNote appendToOpenNoteAndPersist(ProviderData provider, Demographic demographic, String textToAppend)
 	{
-		CaseManagementNote openNoteCopy;
-
-		CaseManagementTmpSave tmpNote = caseManagementTmpSaveDao.find(provider.getId(),
-				demographic.getDemographicId(), programManager.getDefaultProgramId());
-		if(tmpNote != null) // get tempsave note and convert it to a regular note. delete the tempsave note
-		{
-			openNoteCopy = new CaseManagementNote();
-			openNoteCopy.setProvider(provider);
-			openNoteCopy.setDemographic(demographic);
-			openNoteCopy.setNote(tmpNote.getNote() + textToAppend);
-			caseManagementTmpSaveDao.remove(tmpNote);
-		}
-		else // get unsigned or new regular chart note
-		{
-			openNoteCopy = getOpenNoteCopy(provider, demographic);
-			openNoteCopy.setNote(openNoteCopy.getNote() + textToAppend);
-			openNoteCopy.setHistory(openNoteCopy.getHistory() + "\n" + openNoteCopy.getNote());
-		}
-
+		CaseManagementNote openNoteCopy = getOpenNoteCopy(provider, demographic);
+		openNoteCopy.setNote(openNoteCopy.getNote() + textToAppend);
+		openNoteCopy.setHistory(openNoteCopy.getHistory() + "\n" + openNoteCopy.getNote());
 		saveChartNote(openNoteCopy);
 		return openNoteCopy;
 	}
