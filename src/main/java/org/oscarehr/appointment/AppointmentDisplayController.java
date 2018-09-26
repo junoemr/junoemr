@@ -289,7 +289,8 @@ public class AppointmentDisplayController
 		if (status == null)
 		{
 			return null;
-		} else
+		}
+		else
 		{
 			if (status.length() >= 2)
 			{
@@ -687,6 +688,16 @@ public class AppointmentDisplayController
 		return appointment.getDemographicNo().toString();
 	}
 
+	public String getDemographicHin() 
+	{ 
+		return appointment.getHin(); 
+	}
+
+	public String getDemographicChartNo() 
+	{ 
+		return appointment.getChart_no(); 
+	}
+
 	public boolean isShowVerLink()
 	{
 		return "##".equals(appointment.getVer());
@@ -706,6 +717,7 @@ public class AppointmentDisplayController
 	{
 		return ROSTER_STATUS_RO.equalsIgnoreCase(appointment.getRosterStatus());
 	}
+
 	public boolean isShowNRorPLRosterLink()
 	{
 		return (

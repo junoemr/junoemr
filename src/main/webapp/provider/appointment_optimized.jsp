@@ -1865,6 +1865,29 @@ private long getAppointmentRowSpan(
 
 																</c:if>
 
+																<oscar:oscarPropertiesCheck property="SHOW_PATIENT_APPOINTMENT_PHN_CHART" value="true" defaultVal="false">
+																	<c:if test="${appointmentInfo.demographicNo != null }">
+																		&#124;
+																		<c:choose>
+																			<c:when test="${not empty appointmentInfo.demographicHin}">
+																				${appointmentInfo.demographicHin}
+																			</c:when>
+																			<c:otherwise>
+																				-
+																			</c:otherwise>
+																		</c:choose>
+																		&#124;
+																		<c:choose>
+																			<c:when test="${not empty appointmentInfo.demographicChartNo}">
+																				${appointmentInfo.demographicChartNo}
+																			</c:when>
+																			<c:otherwise>
+																				-
+																			</c:otherwise>
+																		</c:choose>
+																	</c:if>
+																</oscar:oscarPropertiesCheck>
+
 																<!-- add one link to caisi Program Management Module -->
 																<c:if test="${appointmentInfo.birthday}">
 																	&#124; <img src="../images/cake.gif" height="20" alt="Happy Birthday"/>
