@@ -26,28 +26,36 @@ import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.SecRole;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueNoteDao;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteLinkDao;
+import org.oscarehr.encounterNote.dao.CaseManagementTmpSaveDao;
 import org.oscarehr.encounterNote.dao.IssueDao;
 import org.oscarehr.encounterNote.model.CaseManagementIssue;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
+import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.encounterNote.model.Issue;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.rx.model.Drug;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class EncounterNoteService
 {
 	@Autowired
@@ -63,6 +71,9 @@ public class EncounterNoteService
 	CaseManagementIssueDao caseManagementIssueDao;
 
 	@Autowired
+	CaseManagementTmpSaveDao caseManagementTmpSaveDao;
+
+	@Autowired
 	IssueDao issueDao;
 
 	@Autowired
@@ -70,6 +81,12 @@ public class EncounterNoteService
 
 	@Autowired
 	SecRoleDao secRoleDao;
+
+	@Autowired
+	ProviderDataDao providerDataDao;
+
+	@Autowired
+	DemographicDao demographicDao;
 
 	public CaseManagementNote saveChartNote(CaseManagementNote note)
 	{
@@ -238,5 +255,83 @@ public class EncounterNoteService
 			return String.valueOf(secRole.getId());
 		}
 		return "0";
+	}
+
+
+	private CaseManagementNote getOpenNoteCopy(ProviderData provider, Demographic demographic)
+	{
+		CaseManagementNote openNoteCopy = new CaseManagementNote();
+		openNoteCopy.setProvider(provider);
+		openNoteCopy.setDemographic(demographic);
+
+		CaseManagementNote unsignedNote = caseManagementNoteDao.getNewestUnsignedNote(provider.getId(), demographic.getDemographicId());
+		if(unsignedNote != null) //copy of existing note
+		{
+			openNoteCopy.setNote(unsignedNote.getNote());
+			openNoteCopy.setHistory(unsignedNote.getHistory());
+			openNoteCopy.setUuid(unsignedNote.getUuid());
+			openNoteCopy.setObservationDate(unsignedNote.getObservationDate());
+			openNoteCopy.setAppointment(unsignedNote.getAppointment());
+			openNoteCopy.setArchived(unsignedNote.getArchived());
+			openNoteCopy.setIncludeIssueInNote(unsignedNote.getIncludeIssueInNote());
+		}
+		else // new note
+		{
+			SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+			Date date = new Date();
+			String formattedDate = "[" + df.format(date) + " .: ]";
+
+			openNoteCopy.setNote(formattedDate + "\n");
+			openNoteCopy.setHistory(formattedDate + "\n");
+		}
+		return openNoteCopy;
+	}
+
+	/**
+	 * Append the given text to the open chart note.
+	 * Use the following logic:
+	 *      if a tempNote exists, get the tempNote
+	 *      else if an unsigned note exists, get a copy of the unsigned note (will have matching uuid so a revision will be saved)
+	 *      else get a new empty note
+	 * @return the note object
+	 */
+	public CaseManagementNote appendToOpenNoteAndPersist(ProviderData provider, Demographic demographic, String textToAppend)
+	{
+		CaseManagementNote openNoteCopy;
+
+		CaseManagementTmpSave tmpNote = caseManagementTmpSaveDao.find(provider.getId(),
+				demographic.getDemographicId(), programManager.getDefaultProgramId());
+		if(tmpNote != null) // get tempsave note and convert it to a regular note. delete the tempsave note
+		{
+			openNoteCopy = new CaseManagementNote();
+			openNoteCopy.setProvider(provider);
+			openNoteCopy.setDemographic(demographic);
+			openNoteCopy.setNote(tmpNote.getNote() + textToAppend);
+			caseManagementTmpSaveDao.remove(tmpNote);
+		}
+		else // get unsigned or new regular chart note
+		{
+			openNoteCopy = getOpenNoteCopy(provider, demographic);
+			openNoteCopy.setNote(openNoteCopy.getNote() + textToAppend);
+			openNoteCopy.setHistory(openNoteCopy.getHistory() + "\n" + openNoteCopy.getNote());
+		}
+
+		saveChartNote(openNoteCopy);
+		return openNoteCopy;
+	}
+
+	/**
+	 * Append the given text to the open chart note.
+	 * Use the following logic:
+	 *      if a tempNote exists, get the tempNote
+	 *      else if an unsigned note exists, get a copy of the unsigned note (will have matching uuid so a revision will be saved)
+	 *      else get a new empty note
+	 * @return the note object
+	 */
+	public CaseManagementNote appendToOpenNoteAndPersist(String providerNo, Integer demographicId, String textToAppend)
+	{
+		Demographic demographic = demographicDao.find(demographicId);
+		ProviderData provider = providerDataDao.find(providerNo);
+		return appendToOpenNoteAndPersist(provider, demographic, textToAppend);
 	}
 }

@@ -54,11 +54,11 @@ public class CaseManagementNote extends AbstractModel<Long>
 	private Long noteId;
 
 	@Column(name = "update_date")
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date updateDate;
 
 	@Column(name = "observation_date")
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date observationDate;
 
 	@Column(name = "note")

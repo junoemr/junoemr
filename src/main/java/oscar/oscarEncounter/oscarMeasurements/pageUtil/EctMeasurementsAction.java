@@ -25,17 +25,6 @@
 
 package oscar.oscarEncounter.oscarMeasurements.pageUtil;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.validator.GenericValidator;
 import org.apache.struts.action.Action;
@@ -44,22 +33,18 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
-import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.FlowSheetCustomizationDao;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.MeasurementDao.SearchCriteria;
-import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.FlowSheetCustomization;
 import org.oscarehr.common.model.Measurement;
-import org.oscarehr.common.model.SecRole;
 import org.oscarehr.common.model.Validations;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-
 import oscar.oscarEncounter.data.EctProgram;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
@@ -67,11 +52,20 @@ import oscar.oscarEncounter.pageUtil.EctSessionBean;
 import oscar.oscarMessenger.util.MsgStringQuote;
 import oscar.util.ConversionUtils;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.List;
+import java.util.Properties;
+
 
 public class EctMeasurementsAction extends Action
 {
 
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException
@@ -82,7 +76,6 @@ public class EctMeasurementsAction extends Action
 		}
 
 		EctMeasurementsForm frm = (EctMeasurementsForm) form;
-
 		HttpSession session = request.getSession();
 		//request.getSession().setAttribute("EctMeasurementsForm", frm);
 
@@ -269,7 +262,6 @@ public class EctMeasurementsAction extends Action
 				validation = (String) frm.getValue(validationName);
 				dateObserved = (String) frm.getValue(dateName);
 
-				org.apache.commons.validator.GenericValidator gValidator = new org.apache.commons.validator.GenericValidator();
 				if(!GenericValidator.isBlankOrNull(inputValue))
 				{
 
@@ -323,43 +315,8 @@ public class EctMeasurementsAction extends Action
 			return (new ActionForward(mapping.getInput()));
 		}
 
-		if(valid)
-		{
-			//create note
-			CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
-
-
-			SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
-			SecRole doctorRole = secRoleDao.findByName("doctor");
-			String reporter_caisi_role = doctorRole.getId().toString();
-
-			SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-			Date date = new Date();
-			String formattedDate = "[" + df.format(date) + " .: ]";
-			textOnEncounter = formattedDate + "\n" + textOnEncounter;
-
-
-			CaseManagementNote cmn = new CaseManagementNote();
-			cmn.setUpdate_date(date);
-			cmn.setObservation_date(date);
-			cmn.setDemographic_no(demographicNo);
-			cmn.setProviderNo(providerNo);
-			cmn.setNote(textOnEncounter);
-			cmn.setSigned(true);
-			cmn.setSigning_provider_no(providerNo);
-			cmn.setProgram_no(prog_no);
-			cmn.setReporter_caisi_role(reporter_caisi_role);
-
-			cmn.setReporter_program_team("0");
-			cmn.setPassword("NULL");
-			cmn.setLocked(false);
-			cmn.setHistory(textOnEncounter + "-----hi story----");
-			cmn.setPosition(0);
-			cmn.setAppointmentNo(0);
-
-			cmm.saveNoteSimple(cmn);
-
-		}//create note
+		// append info to open encounter note
+		encounterNoteService.appendToOpenNoteAndPersist(providerNo, Integer.parseInt(demographicNo), "\n" + textOnEncounter);
 
 		request.setAttribute("textOnEncounter", StringEscapeUtils.escapeJavaScript(textOnEncounter));
 		return mapping.findForward("success");
