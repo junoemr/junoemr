@@ -68,6 +68,7 @@ public class EctViewConsultationRequestsUtil {
       ids = new Vector<String>();
       status = new Vector<String>();
       patient = new Vector<String>();
+      patientEmail = new Vector<String>();
       provider = new Vector<String>();
       providerNo = new Vector();
       teams = new Vector<String>();
@@ -127,6 +128,7 @@ public class EctViewConsultationRequestsUtil {
               ids.add(consult.getId().toString());
               status.add(consult.getStatus());
               patient.add(demo.getFormattedName());
+              patientEmail.add(demo.getEmail());
               provider.add(providerName);
               service.add(services.getServiceDesc());
               vSpecialist.add(specialistName);
@@ -164,6 +166,7 @@ public class EctViewConsultationRequestsUtil {
       ids = new Vector<String>();
       status = new Vector<String>();
       patient = new Vector<String>();
+      patientEmail = new Vector<String>();
       provider = new Vector<String>();
       service = new Vector<String>();
       date = new Vector<String>();
@@ -203,6 +206,7 @@ public class EctViewConsultationRequestsUtil {
               ids.add(consult.getId().toString());
               status.add(consult.getStatus());
               patient.add(demo.getFormattedName());
+              patientEmail.add(demo.getEmail());
               provider.add(providerName);
               service.add(services.getServiceDesc());
               urgency.add(consult.getUrgency());
@@ -220,6 +224,7 @@ public class EctViewConsultationRequestsUtil {
    public Vector<String> ids;
    public Vector<String> status;
    public Vector<String> patient;
+   public Vector<String> patientEmail;
    public Vector<String> teams;
    public Vector<String> provider;
    public Vector<String> service;

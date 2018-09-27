@@ -256,4 +256,20 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 
 		return appointment;
 	}
+
+	/**
+	 * @return results ordered by lastUpdateDate
+	 */
+	public List<Appointment> findByUpdateDate(Date updatedAfterThisDateExclusive, int itemsToReturn)
+	{
+		String sqlCommand = "select x from " + modelClass.getSimpleName() + " x where x.updateDateTime>?1 order by x.updateDateTime";
+
+		Query query = entityManager.createQuery(sqlCommand);
+		query.setParameter(1, updatedAfterThisDateExclusive);
+		query.setMaxResults(itemsToReturn);
+
+		@SuppressWarnings("unchecked")
+		List<Appointment> results = query.getResultList();
+		return (results);
+	}
 }
