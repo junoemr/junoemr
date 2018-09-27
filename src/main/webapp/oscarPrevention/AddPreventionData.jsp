@@ -41,6 +41,7 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="java.text.ParseException" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -133,7 +134,7 @@ if(!authed) {
   }
 
   List<Map<String, String>>  providers = ProviderData.getProviderList();
-  if (creatorProviderNo == "")
+  if (creatorProviderNo.equals(""))
   { 
 	  creatorProviderNo = provider;
   }
@@ -148,11 +149,21 @@ if(!authed) {
   //calc age at time of prevention
   Date dob = PreventionData.getDemographicDateOfBirth(LoggedInInfo.getLoggedInInfoFromSession(request), Integer.valueOf(demographic_no));
   SimpleDateFormat fmt = new SimpleDateFormat(dateFmt);
-  Date dateOfPrev = fmt.parse(prevDate);
-  String age = UtilDateUtilities.calcAgeAtDate(dob, dateOfPrev);
+
+  String age;
+  try
+  {
+      Date dateOfPrev = fmt.parse(prevDate);
+      age = UtilDateUtilities.calcAgeAtDate(dob, dateOfPrev);
+  }
+  catch (ParseException e)
+  {
+     age = "Unknown";
+  }
+
   DemographicData demoData = new DemographicData();
   String[] demoInfo = demoData.getNameAgeSexArray(LoggedInInfo.getLoggedInInfoFromSession(request), Integer.valueOf(demographic_no));
-  String nameage = demoInfo[0] + ", " + demoInfo[1] + " " + demoInfo[2] + " " + age;
+  String nameage = demoInfo[0] + ", " + demoInfo[1] + ": " + demoInfo[2] + ", " + age;
 
   HashMap<String,String> genders = new HashMap<String,String>();
   genders.put("M", "Male");
