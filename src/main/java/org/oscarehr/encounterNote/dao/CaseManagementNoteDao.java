@@ -27,8 +27,6 @@ import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Query;
-
 @SuppressWarnings("unchecked")
 @Transactional
 @Repository("encounterNote.dao.CaseManagementNoteDao")
@@ -37,30 +35,5 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 	public CaseManagementNoteDao()
 	{
 		super(CaseManagementNote.class);
-	}
-
-	/**
-	 * get the most recent revision of the most recent unsigned chart note
-	 * @param providerNo
-	 * @param demographicNo
-	 * @return the note object
-	 */
-	public CaseManagementNote getNewestUnsignedNote(String providerNo, Integer demographicNo)
-	{
-		Query query = entityManager.createQuery(
-				"SELECT x FROM model.CaseManagementNote x " +
-				"LEFT JOIN x.noteLinkList l " +
-				"WHERE x.noteId = (SELECT MAX(cmn2.noteId) FROM model.CaseManagementNote cmn2 " +
-						"WHERE x.uuid = cmn2.uuid GROUP BY cmn2.uuid) " +
-				"AND x.provider.id = :provNo " +
-				"AND x.demographic.demographicId = :demoNo " +
-				"AND l IS NULL " +
-				"AND x.signed = :signed " +
-				"ORDER BY x.noteId DESC, l.id DESC");
-		query.setParameter("provNo", providerNo);
-		query.setParameter("demoNo", demographicNo);
-		query.setParameter("signed", false);
-
-		return this.getSingleResultOrNull(query);
 	}
 }

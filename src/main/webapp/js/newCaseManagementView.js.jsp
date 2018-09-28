@@ -169,16 +169,13 @@
 		var openFlowsheetPopup = function()
 		{
 			var cmeFrm = document.forms["caseManagementEntryForm"];
-			console.info(cmeFrm.serialize(), cmeFrm.noteId.value);
 			var noteId = cmeFrm.noteId.value < 0 ? 0 : cmeFrm.noteId.value;
 
 			url += "&note_id=" + noteId;
-			console.info("url after:\n", url);
 			popupPage(700,1000,hash,url);
 			return false;
 		};
 
-		console.info("url before:\n", url);
 		if (origCaseNote != $F(caseNote))
 		{
 			saveNoteAjax('save', 'list');
@@ -313,7 +310,6 @@
 
 		if(notesLoaderCallback && typeof notesLoaderCallback === "function")
 		{
-			console.info(notesLoaderCallback, typeof notesLoaderCallback === "function");
 			notesLoaderCallback();
 			notesLoaderCallback = null;
 		}
@@ -2711,7 +2707,6 @@
 
 		$("notCPP").update("Loading...");
 
-		console.info("1. call ajax");
 		var objAjax = new Ajax.Request(
 			url,
 			{
@@ -2721,7 +2716,6 @@
 				evalScripts: true,
 				onSuccess: function (request)
 				{
-					console.info("2. process response");
 					$("notCPP").update(request.responseText);
 					$("notCPP").style.height = "50%";
 					if (fullChart == "true")
@@ -2747,7 +2741,6 @@
 				}
 			}
 		);
-		console.info("3. return");
 		return false;
 	}
 	function cancelResident()
