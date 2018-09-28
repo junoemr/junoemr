@@ -27,7 +27,6 @@ import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.SecRole;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueNoteDao;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
@@ -38,17 +37,16 @@ import org.oscarehr.encounterNote.model.CaseManagementIssue;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.provider.dao.ProviderDataDao;
-import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.rx.model.Drug;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -90,6 +88,16 @@ public class EncounterNoteService
 	public CaseManagementNote saveChartNote(CaseManagementNote note)
 	{
 		return saveChartNote(note, null);
+	}
+	public CaseManagementNote saveChartNote(CaseManagementNote note, String providerNo, Integer demographicNo)
+	{
+		return saveChartNote(note, null, providerNo, demographicNo);
+	}
+	public CaseManagementNote saveChartNote(CaseManagementNote note, List<Issue> issueList, String providerNo, Integer demographicNo)
+	{
+		note.setDemographic(demographicDao.find(demographicNo));
+		note.setProvider(providerDataDao.find(providerNo));
+		return saveChartNote(note, issueList);
 	}
 	public CaseManagementNote saveChartNote(CaseManagementNote note, List<Issue> issueList)
 	{
@@ -256,65 +264,27 @@ public class EncounterNoteService
 		return "0";
 	}
 
-
-	private CaseManagementNote getOpenNoteCopy(ProviderData provider, Demographic demographic)
+	public CaseManagementNote getNoteCopy(Long noteId)
 	{
-		CaseManagementNote openNoteCopy = new CaseManagementNote();
-		openNoteCopy.setProvider(provider);
-		openNoteCopy.setDemographic(demographic);
+		// set all the relevant id's to null, making them detached objects. They will be persisted with new ID's if saved
+		CaseManagementNote noteToCopy = caseManagementNoteDao.find(noteId);
+		List<CaseManagementNoteExt> extList = noteToCopy.getNoteExtensionList();
+		List<CaseManagementNoteLink> linkList = noteToCopy.getNoteLinkList();
 
-		CaseManagementNote unsignedNote = caseManagementNoteDao.getNewestUnsignedNote(provider.getId(), demographic.getDemographicId());
-		if(unsignedNote != null) //copy of existing note
+		noteToCopy.setNoteId(null);
+
+		for(CaseManagementNoteExt ext : extList)
 		{
-			openNoteCopy.setNote(unsignedNote.getNote());
-			openNoteCopy.setHistory(unsignedNote.getHistory());
-			openNoteCopy.setUuid(unsignedNote.getUuid());
-			openNoteCopy.setObservationDate(unsignedNote.getObservationDate());
-			openNoteCopy.setAppointment(unsignedNote.getAppointment());
-			openNoteCopy.setArchived(unsignedNote.getArchived());
-			openNoteCopy.setIncludeIssueInNote(unsignedNote.getIncludeIssueInNote());
+			ext.setId(null);
 		}
-		else // new note
+		noteToCopy.setNoteExtensionList(extList);
+
+		for(CaseManagementNoteLink link : linkList)
 		{
-			SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-			Date date = new Date();
-			String formattedDate = "[" + df.format(date) + " .: ]";
-
-			openNoteCopy.setNote(formattedDate + "\n");
-			openNoteCopy.setHistory(formattedDate + "\n");
+			link.setId(null);
 		}
-		return openNoteCopy;
-	}
+		noteToCopy.setNoteLinkList(linkList);
 
-	/**
-	 * Append the given text to the open chart note.
-	 * Use the following logic:
-	 *      if a tempNote exists, get the tempNote
-	 *      else if an unsigned note exists, get a copy of the unsigned note (will have matching uuid so a revision will be saved)
-	 *      else get a new empty note
-	 * @return the note object
-	 */
-	public CaseManagementNote appendToOpenNoteAndPersist(ProviderData provider, Demographic demographic, String textToAppend)
-	{
-		CaseManagementNote openNoteCopy = getOpenNoteCopy(provider, demographic);
-		openNoteCopy.setNote(openNoteCopy.getNote() + textToAppend);
-		openNoteCopy.setHistory(openNoteCopy.getHistory() + "\n" + openNoteCopy.getNote());
-		saveChartNote(openNoteCopy);
-		return openNoteCopy;
-	}
-
-	/**
-	 * Append the given text to the open chart note.
-	 * Use the following logic:
-	 *      if a tempNote exists, get the tempNote
-	 *      else if an unsigned note exists, get a copy of the unsigned note (will have matching uuid so a revision will be saved)
-	 *      else get a new empty note
-	 * @return the note object
-	 */
-	public CaseManagementNote appendToOpenNoteAndPersist(String providerNo, Integer demographicId, String textToAppend)
-	{
-		Demographic demographic = demographicDao.find(demographicId);
-		ProviderData provider = providerDataDao.find(providerNo);
-		return appendToOpenNoteAndPersist(provider, demographic, textToAppend);
+		return noteToCopy;
 	}
 }

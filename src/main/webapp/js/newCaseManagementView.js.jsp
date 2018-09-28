@@ -162,6 +162,35 @@
 		}
 	}
 
+	var notesLoaderCallback = null;
+	function onFlowsheetOpen(element, hash, url)
+	{
+
+		var openFlowsheetPopup = function()
+		{
+			var cmeFrm = document.forms["caseManagementEntryForm"];
+			console.info(cmeFrm.serialize(), cmeFrm.noteId.value);
+			var noteId = cmeFrm.noteId.value < 0 ? 0 : cmeFrm.noteId.value;
+
+			url += "&note_id=" + noteId;
+			console.info("url after:\n", url);
+			popupPage(700,1000,hash,url);
+			return false;
+		};
+
+		console.info("url before:\n", url);
+		if (origCaseNote != $F(caseNote))
+		{
+			saveNoteAjax('save', 'list');
+			notesLoaderCallback = openFlowsheetPopup;
+		}
+		else
+		{
+			openFlowsheetPopup();
+		}
+		return false;
+	}
+
 	var numMenus = 3;
 	function showMenu(menuNumber, eventObj)
 	{
@@ -281,6 +310,13 @@
 		setCaretPosition($(caseNote), $(caseNote).value.length);
 
 		$(caseNote).focus();
+
+		if(notesLoaderCallback && typeof notesLoaderCallback === "function")
+		{
+			console.info(notesLoaderCallback, typeof notesLoaderCallback === "function");
+			notesLoaderCallback();
+			notesLoaderCallback = null;
+		}
 	}
 
 	function setupOneNote(note)
@@ -2675,6 +2711,7 @@
 
 		$("notCPP").update("Loading...");
 
+		console.info("1. call ajax");
 		var objAjax = new Ajax.Request(
 			url,
 			{
@@ -2682,29 +2719,35 @@
 				asynchronous: false,
 				postBody: params,
 				evalScripts: true,
-				onSuccess: function(request)
+				onSuccess: function (request)
 				{
+					console.info("2. process response");
 					$("notCPP").update(request.responseText);
 					$("notCPP").style.height = "50%";
 					if (fullChart == "true")
 					{
 						$("quickChart").innerHTML = quickChartMsg;
-						$("quickChart").onclick = function() {return viewFullChart(false);}
+						$("quickChart").onclick = function ()
+						{
+							return viewFullChart(false);
 						}
-					else {
+					}
+					else
+					{
 						$("quickChart").innerHTML = fullChartMsg;
-						$("quickChart").onclick = function()
+						$("quickChart").onclick = function ()
 						{
 							return viewFullChart(true);
 						}
 					}
 				},
-				onFailure: function(request)
+				onFailure: function (request)
 				{
 					$("notCPP").update("Error: " + request.status + request.responseText);
 				}
 			}
 		);
+		console.info("3. return");
 		return false;
 	}
 	function cancelResident()

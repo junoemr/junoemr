@@ -43,25 +43,29 @@
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 
 <%
-  if(session.getValue("user") == null) response.sendRedirect("../logout.jsp");
-  String demographic_no = request.getParameter("demographic_no");
-  String id = request.getParameter("id");
-  String measurement = request.getParameter("measurement");
-  String[] measurements = request.getParameterValues("measurement");
-  String temp = request.getParameter("template");
+	if(session.getValue("user") == null)
+	{
+		response.sendRedirect("../logout.jsp");
+	}
+	String demographic_no = request.getParameter("demographic_no");
+	String id = request.getParameter("id");
+	String measurement = request.getParameter("measurement");
+	String[] measurements = request.getParameterValues("measurement");
+	String template = request.getParameter("template");
+	String noteId = request.getParameter("note_id");
 
-  WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-  FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
-  MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
+	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+	FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
+	MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
 
 
-  List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( temp,(String) session.getAttribute("user"),Integer.parseInt(demographic_no));
-  MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(temp,custList);
+	List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations(template, (String) session.getAttribute("user"), Integer.parseInt(demographic_no));
+	MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(template, custList);
 
-  EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
+	EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
 
-  String provider = (String) session.getValue("user");
-  String prevDate = UtilDateUtilities.getToday("yyyy-MM-dd H:mm");
+	String provider = (String) session.getValue("user");
+	String prevDate = UtilDateUtilities.getToday("yyyy-MM-dd H:mm");
 %>
 
 
@@ -333,7 +337,8 @@
                <input type="hidden" name="value(css)" value=""/>
                <input type="hidden" name="demographic_no" value="<%=demographic_no%>"/>
                <input type="hidden" name="inputFrom" value="AddMeasurementData"/>
-               <input type="hidden" name="template" value="<%=temp%>"/>
+               <input type="hidden" name="template" value="<%=template%>"/>
+               <input type="hidden" name="noteId" value="<%=noteId%>"/>
 
                <%
                 int ctr = 0;

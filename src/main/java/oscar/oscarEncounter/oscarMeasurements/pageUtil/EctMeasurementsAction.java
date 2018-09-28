@@ -26,6 +26,7 @@
 package oscar.oscarEncounter.oscarMeasurements.pageUtil;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.GenericValidator;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -39,6 +40,7 @@ import org.oscarehr.common.dao.MeasurementDao.SearchCriteria;
 import org.oscarehr.common.model.FlowSheetCustomization;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.Validations;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -48,8 +50,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import oscar.oscarEncounter.data.EctProgram;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
-import oscar.oscarEncounter.pageUtil.EctSessionBean;
-import oscar.oscarMessenger.util.MsgStringQuote;
 import oscar.util.ConversionUtils;
 
 import javax.servlet.ServletException;
@@ -57,8 +57,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 
 public class EctMeasurementsAction extends Action
@@ -74,17 +75,14 @@ public class EctMeasurementsAction extends Action
 		{
 			throw new SecurityException("missing required security object (_measurement)");
 		}
-
 		EctMeasurementsForm frm = (EctMeasurementsForm) form;
 		HttpSession session = request.getSession();
-		//request.getSession().setAttribute("EctMeasurementsForm", frm);
-
-		EctSessionBean bean = (EctSessionBean) request.getSession().getAttribute("EctSessionBean");
-
 
 		String demographicNo = request.getParameter("demographic_no");
 		String providerNo = (String) session.getAttribute("user");
 		String prog_no = new EctProgram(session).getProgram(providerNo);
+		String noteIdStr = StringUtils.trimToNull(request.getParameter("noteId"));
+		Long noteId = (noteIdStr != null)? Long.parseLong(noteIdStr):null;
 
 		String template = request.getParameter("template");
 		MeasurementFlowSheet mFlowsheet = null;
@@ -98,30 +96,8 @@ public class EctMeasurementsAction extends Action
 			mFlowsheet = templateConfig.getFlowSheet(template, custList);
 		}
 
-
-		//request.getSession().setAttribute("EctSessionBean", bean);
-		//TODO replace with a date format call.  Actually revamp to use hibernate
-		java.util.Calendar calender = java.util.Calendar.getInstance();
-		String day = Integer.toString(calender.get(java.util.Calendar.DAY_OF_MONTH));
-		String month = Integer.toString(calender.get(java.util.Calendar.MONTH) + 1);
-		String year = Integer.toString(calender.get(java.util.Calendar.YEAR));
-		String hour = Integer.toString(calender.get(java.util.Calendar.HOUR_OF_DAY));
-		String min = Integer.toString(calender.get(java.util.Calendar.MINUTE));
-		String second = Integer.toString(calender.get(java.util.Calendar.SECOND));
-		String dateEntered = year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + second;
-
 		String numType = (String) frm.getValue("numType");
 		int iType = Integer.parseInt(numType);
-
-
-		MsgStringQuote str = new MsgStringQuote();
-
-		Properties p = (Properties) session.getAttribute("providerBean");
-		String by = "";
-		if(p != null)
-		{
-			by = p.getProperty(providerNo, "");
-		}
 
 		String textOnEncounter = ""; //"**"+StringUtils.rightPad(by,80,"*")+"\\n";
 
@@ -315,9 +291,24 @@ public class EctMeasurementsAction extends Action
 			return (new ActionForward(mapping.getInput()));
 		}
 
-		// append info to open encounter note (unsigned)
-		// if no unsigned notes, a new note is used
-		encounterNoteService.appendToOpenNoteAndPersist(providerNo, Integer.parseInt(demographicNo), "\n" + textOnEncounter);
+		/* if given a note id, append encounter text to the note (as a new note revision) */
+		if(noteId != null && noteId > 0)
+		{
+			CaseManagementNote noteCopy = encounterNoteService.getNoteCopy(noteId);
+			noteCopy.setNote(noteCopy.getNote() + "\n" + textOnEncounter);
+			noteCopy.setHistory(noteCopy.getHistory() + "\n" + noteCopy.getNote());
+			encounterNoteService.saveChartNote(noteCopy, providerNo, Integer.parseInt(demographicNo));
+		}
+		else /* save a new note with the encounter text */
+		{
+			SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+			Date date = new Date();
+			String formattedDate = "[" + df.format(date) + " .: ]";
+
+			CaseManagementNote newNote = new CaseManagementNote();
+			newNote.setNote(formattedDate + "\n" + textOnEncounter);
+			encounterNoteService.saveChartNote(newNote, providerNo, Integer.parseInt(demographicNo));
+		}
 
 		request.setAttribute("textOnEncounter", StringEscapeUtils.escapeJavaScript(textOnEncounter));
 		return mapping.findForward("success");
