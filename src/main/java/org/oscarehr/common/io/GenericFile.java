@@ -58,7 +58,7 @@ public class GenericFile
 	public static final String BASE_DIRECTORY = props.getProperty("BASE_DOCUMENT_DIR");
 
 	public static final String DOCUMENT_BASE_DIR = props.getProperty("DOCUMENT_DIR");
-	public static final String DOCUMENT_NEW_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("DOCUMENT_NEW_DIR")).getPath();
+	public static final String DOCUMENT_ORIGINAL_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("DOCUMENT_ORIGINAL_DIR")).getPath();
 	public static final String DOCUMENT_CORRUPT_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("DOCUMENT_CORRUPT_DIR")).getPath();
 
 	// file info
@@ -88,9 +88,9 @@ public class GenericFile
 		return moveFile(DOCUMENT_CORRUPT_DIR);
 	}
 
-	public boolean moveToNew() throws IOException
+	public boolean moveToOriginal() throws IOException
 	{
-		return moveFile(DOCUMENT_NEW_DIR);
+		return moveFile(DOCUMENT_ORIGINAL_DIR);
 	}
 
 	public boolean moveFile(String directory) throws IOException

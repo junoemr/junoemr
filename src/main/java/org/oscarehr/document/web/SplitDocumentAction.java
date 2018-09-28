@@ -56,7 +56,6 @@ public class SplitDocumentAction extends DispatchAction {
 	private QueueDocumentLinkDao queueDocumentLinkDAO = (QueueDocumentLinkDao) SpringUtils.getBean("queueDocumentLinkDAO");
 	private DocumentService documentService = SpringUtils.getBean(DocumentService.class);
 
-	private String documentDir = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
 	private long maxMemoryUsage = OscarProperties.getInstance().getPDFMaxMemUsage();
 
 	public ActionForward split(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {

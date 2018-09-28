@@ -161,7 +161,7 @@ public class PDFFile extends GenericFile
 		String gs = props.getProperty("document.ghostscript_path", "/usr/bin/gs");
 
 		File currentDir = javaFile.getParentFile();
-		this.moveToNew();
+		this.moveToOriginal();
 
 		File newPdf = new File(currentDir, javaFile.getName());
 
