@@ -353,7 +353,7 @@ public class MSPReconcile {
 					officeNumbers.add(forwardZero(justBillingMaster.get(i), 7));
 				}
 
-				for (TeleplanS00 ts : dao.findByOfficeNumbers(justBillingMaster)) {
+				for (TeleplanS00 ts : dao.findByOfficeNumbers(officeNumbers)) {
 					try {
 						int i = Integer.parseInt(ts.getOfficeNo()); // this kludge rids leading zeros
 						String exp[] = ts.getExps();
