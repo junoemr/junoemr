@@ -70,7 +70,7 @@ public class AppointmentStatusList
 			String status = appointmentStatus.getStatus();
 
 			// Leave billed out of status rotation
-			if(!STATUS_BILLED.equals(status))
+			if(!STATUS_BILLED.equals(status) && appointmentStatus.getActive() != 0)
 			{
 				orderedStatusList.add(appointmentStatus.getStatus());
 			}
@@ -97,10 +97,10 @@ public class AppointmentStatusList
 			String statusChar = status.substring(0, 1);
 			int currentStatusIndex = orderedStatusList.indexOf(statusChar);
 
-			// Return current status if not found
+			// Return current status if not found, return first status
 			if (currentStatusIndex < 0)
 			{
-				return status;
+				return orderedStatusList.get(0);
 			}
 
 			int nextStatusIndex = (currentStatusIndex + 1) % orderedStatusList.size();

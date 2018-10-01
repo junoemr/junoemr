@@ -488,30 +488,24 @@
 			</div>
 
 			<%
-				Appointment appt = null;
+				Appointment appt = appointmentDao.find(Integer.parseInt(appointment_no));
+				if (appt == null)
+				{
+			%>
+					<bean:message key="appointment.editappointment.msgNoSuchAppointment"/>
+			<%
+					return;
+				}
+
 				String demono = "", chartno = "", phone = "", rosterstatus = "", alert = "", doctorNo = "";
 				String strApptDate = bFirstDisp ? "" : request.getParameter("appointment_date");
 
 
 				if (bFirstDisp)
 				{
-					appt = appointmentDao.find(Integer.parseInt(appointment_no));
-
-
-					if (appt == null)
-					{
-			%>
-			<bean:message key="appointment.editappointment.msgNoSuchAppointment"/>
-			<%
-						return;
-					}
-				}
-
-
-				if (bFirstDisp)
-				{
 					demono = String.valueOf(appt.getDemographicNo());
-				} else if (request.getParameter("demographic_no") != null && !request.getParameter("demographic_no").equals(""))
+				}
+				else if (request.getParameter("demographic_no") != null && !request.getParameter("demographic_no").equals(""))
 				{
 					demono = request.getParameter("demographic_no");
 				}
@@ -794,27 +788,24 @@
 						<div class="label"><bean:message key="Appointment.formReason"/>:</div>
 						<div class="input">
 							<select name="reasonCode">
-								<%
-									Integer apptReasonCode = bFirstDisp ? (appt.getReasonCode() == null ? 0 : appt.getReasonCode()) : Integer.parseInt(request.getParameter("reasonCode"));
-									if (reasonCodes != null)
-									{
-										for (LookupListItem reasonCode : reasonCodes.getItems())
-										{
-											if (reasonCode.isActive() || (apptReasonCode.equals(reasonCode.getId()) && !reasonCode.isActive()))
-											{
-								%>
-								<option value="<%=reasonCode.getId()%>" <%=apptReasonCode.equals(reasonCode.getId()) ? "selected=\"selected\"" : "" %>><%=StringEscapeUtils.escapeHtml(reasonCode.getValue())%>
-								</option>
-								<%
-										}
-									} //end of for loop
-								} else
-								{
-								%>
+								<% 	boolean isSelfBooked = appt.getBookingSource() == Appointment.BookingSource.MYOSCAR_SELF_BOOKING;
+									if (appt.getReasonCode() == null && isSelfBooked) { %>
+								<option value="-1" selected="selected" disabled="disabled"><bean:message key="provider.appointmentProviderAdminDay.SelfBookedMarker"/> Click to set a reason</option>
+								<% 	} else if (appt.getReasonCode() == null) { %>
+								<option value ="-1" selected="selected" disabled="disabled">Click to set a reason</option>
+								<%	}
+
+									Integer apptReasonCode = bFirstDisp ? (appt.getReasonCode() == null ? -1 : appt.getReasonCode()) : Integer.parseInt(request.getParameter("reasonCode"));
+									if (reasonCodes != null) {
+									    for (LookupListItem reasonCode : reasonCodes.getItems()) {
+									        boolean isApptReason = apptReasonCode.equals(reasonCode.getId());
+									        if (reasonCode.isActive() || isApptReason) { %>
+								<option value="<%=reasonCode.getId()%>" <%=isApptReason ? "selected=\"selected\"" : "" %>><%=StringEscapeUtils.escapeHtml(reasonCode.getValue())%></option>
+								<%			}
+									    }
+									} else { %>
 								<option value="-1">Other</option>
-								<%
-									}
-								%>
+								<%	} %>
 							</select>
 							</br>
 							<textarea id="reason" name="reason" tabindex="2" maxlength="80" rows="2" wrap="virtual"
@@ -1330,12 +1321,12 @@
 	</body>
 	<script type="text/javascript">
 		var loc = document.forms['EDITAPPT'].location;
-		if (loc.nodeName.toUpperCase() == 'SELECT') loc.style.backgroundColor = loc.options[loc.selectedIndex].style.backgroundColor;
+		if (loc.nodeName.toUpperCase() === 'SELECT') loc.style.backgroundColor = loc.options[loc.selectedIndex].style.backgroundColor;
 
 		jQuery(document).ready(function()
 		{
 			var belowTbl = jQuery("#belowTbl");
-			if (belowTbl != null && belowTbl.length > 0 && belowTbl.find("tr").length == 2)
+			if (belowTbl != null && belowTbl.length > 0 && belowTbl.find("tr").length === 2)
 			{
 				jQuery(belowTbl.find("tr")[1]).remove();
 			}

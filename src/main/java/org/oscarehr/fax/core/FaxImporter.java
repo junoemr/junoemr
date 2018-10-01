@@ -23,11 +23,10 @@
  */
 package org.oscarehr.fax.core;
 
-import java.io.IOException;
-import java.util.List;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lowagie.text.pdf.codec.Base64;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -38,21 +37,21 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.oscarehr.common.dao.FaxConfigDao;
 import org.oscarehr.common.dao.FaxJobDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.model.FaxConfig;
 import org.oscarehr.common.model.FaxJob;
+import org.oscarehr.document.model.Document;
+import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
-import com.lowagie.text.pdf.codec.Base64;
-
 import oscar.OscarProperties;
-import oscar.dms.EDoc;
-import oscar.dms.EDocUtil;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 public class FaxImporter {
 	
@@ -62,8 +61,10 @@ public class FaxImporter {
 	private FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
 	private FaxJobDao faxJobDao = SpringUtils.getBean(FaxJobDao.class);
 	private QueueDocumentLinkDao queueDocumentLinkDao = SpringUtils.getBean(QueueDocumentLinkDao.class);
-	private Logger log = MiscUtils.getLogger();
-	
+	private Logger logger = MiscUtils.getLogger();
+	private DocumentService documentService = SpringUtils.getBean(DocumentService.class);
+
+
 	public void poll() {
 		
 		List<FaxConfig> faxConfigList = faxConfigDao.findAll(null,null);
@@ -81,7 +82,7 @@ public class FaxImporter {
 				
 				try {
 	                HttpResponse response = client.execute(mGet);
-	                log.info("RESPONSE: " + response.getStatusLine().getStatusCode());
+	                logger.info("RESPONSE: " + response.getStatusLine().getStatusCode());
 	                
 	                if( response.getStatusLine().getStatusCode() == HttpStatus.SC_OK ) {
 	                	
@@ -89,7 +90,7 @@ public class FaxImporter {
 	                	String content = EntityUtils.toString(httpEntity);
 	                
 	                	
-	                	log.info("CONTENT: " + content);
+	                	logger.info("CONTENT: " + content);
 	                	ObjectMapper mapper = new ObjectMapper();
 	                	
 	                	List<FaxJob> faxList =  mapper.readValue(content, new TypeReference<List<FaxJob>>(){});
@@ -107,13 +108,13 @@ public class FaxImporter {
 	                
 	                mGet.releaseConnection();
 	            } catch (ClientProtocolException e) {
-	            	log.error("HTTP WS CLIENT ERROR", e);
+	            	logger.error("HTTP WS CLIENT ERROR", e);
 	            
 	            } catch (IOException e) {
-	            	log.error("IO ERROR", e);
+	            	logger.error("IO ERROR", e);
 	            	
 	            } catch( Exception e ) {
-	            	log.error("UNKNOWN ERROR ",e);
+	            	logger.error("UNKNOWN ERROR ",e);
 	            }				
 				finally {
 					mGet.releaseConnection();
@@ -149,10 +150,10 @@ public class FaxImporter {
 			}
 			
 	      } catch (ClientProtocolException e) {
-          	log.error("HTTP WS CLIENT ERROR", e);
+          	logger.error("HTTP WS CLIENT ERROR", e);
           
           } catch (IOException e) {
-          	log.error("IO ERROR", e);
+          	logger.error("IO ERROR", e);
           }
 		  finally {
 			  mGet.releaseConnection();
@@ -177,36 +178,43 @@ public class FaxImporter {
 		
 		
 	}
-	
-	private boolean saveAndInsertIntoQueue( FaxConfig faxConfig, FaxJob receivedFax, FaxJob faxFile ) {		 		
-		
-		boolean retval = false;	
-		
-		String filename = receivedFax.getFile_name().replace("tif", "pdf");		
+
+	private boolean saveAndInsertIntoQueue(FaxConfig faxConfig, FaxJob receivedFax, FaxJob faxFile)
+	{
+		boolean retval = false;
+
+		String fileName = receivedFax.getFile_name().replace("tif", "pdf");
 		String user = "-1";
-		
-		EDoc newDoc = new EDoc("", "", filename, "", user, user, "", 'A', DateFormatUtils.format(receivedFax.getStamp(), "yyyy-MM-dd"), "", "", "demographic", "-1", 0);
-		newDoc.setDocPublic("0");
-		
-		filename = newDoc.getFileName();
-		if( Base64.decodeToFile(faxFile.getDocument(), DOCUMENT_DIR + "/" + filename) ) {
-		
-			newDoc.setContentType("application/pdf");
-			newDoc.setNumberOfPages(receivedFax.getNumPages());
-			String doc_no = EDocUtil.addDocumentSQL(newDoc);
-		
+
+		Document document = new Document();
+		document.setPublic1(false);
+		document.setResponsible(user);
+		document.setDoccreator(user);
+		document.setDocdesc("");
+		document.setDoctype("");
+		document.setDocfilename(fileName);
+		document.setSource("");
+		document.setObservationdate(receivedFax.getStamp());
+
+		byte[] fileByteArray = Base64.decode(faxFile.getDocument());
+		InputStream fileInputStream = new ByteArrayInputStream(fileByteArray);
+
+		try
+		{
+			document = documentService.uploadNewDemographicDocument(document, fileInputStream);
+
 			Integer queueId = faxConfig.getQueue();
-			Integer docNum = Integer.parseInt(doc_no);
-			
-			queueDocumentLinkDao.addActiveQueueDocumentLink(queueId, docNum);
+			queueDocumentLinkDao.addActiveQueueDocumentLink(queueId, document.getDocumentNo());
+
 			FaxJob saveFax = new FaxJob(receivedFax);
-			saveFax.setFile_name(filename);
+			saveFax.setFile_name(fileName);
 			faxJobDao.persist(saveFax);
 			retval = true;
 		}
-		
+		catch(IOException e)
+		{
+			logger.error("IO Error", e);
+		}
 		return retval;
-		
 	}
-
 }

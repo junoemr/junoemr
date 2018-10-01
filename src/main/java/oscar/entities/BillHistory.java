@@ -46,6 +46,7 @@ public class BillHistory {
 	private double amountReceived;
 	private String paymentTypeId;
 	private String paymentTypeDesc;
+	private String createDate;
 
 	public BillHistory() {
 	}
@@ -158,6 +159,16 @@ public class BillHistory {
 
 	public String getPaymentTypeDesc() {
 		return paymentTypeDesc;
+	}
+
+	public String getCreateDate()
+	{
+		return createDate;
+	}
+
+	public void setCreateDate(String createDate)
+	{
+		this.createDate = createDate;
 	}
 
 }

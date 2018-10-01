@@ -19,12 +19,11 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
 import org.oscarehr.PMmodule.model.ProgramProvider;
-import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
-import org.oscarehr.common.io.FileFactory;
-import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.document.model.Document;
+import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -32,8 +31,6 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import oscar.dms.EDoc;
-import oscar.dms.EDocUtil;
 import oscar.dms.IncomingDocUtil;
 import oscar.dms.data.DocumentUploadForm;
 import oscar.log.LogAction;
@@ -46,24 +43,23 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
 public class DocumentUploadAction extends DispatchAction
 {
-
 	private static Logger logger = MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private DocumentService documentService = SpringUtils.getBean(DocumentService.class);
 
 	public ActionForward executeUpload(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	                                   HttpServletResponse response) throws Exception
 	{
 		DocumentUploadForm fm = (DocumentUploadForm) form;
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null))
-		{
-			throw new SecurityException("missing required security object (_edoc)");
-		}
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
 		logger.info("BEGIN DOCUMENT UPLOAD");
 
 		HashMap<String, Object> responseMap = new HashMap<>();
@@ -142,7 +138,6 @@ public class DocumentUploadAction extends DispatchAction
 
 	private void uploadRegularDocument(HttpServletRequest request, String fmSource, FormFile docFile, HashMap<String, Object> responseMap) throws IOException, InterruptedException
 	{
-		String fileName = docFile.getFileName();
 		String user = (String) request.getSession().getAttribute("user");
 		if(docFile.getFileSize() == 0)
 		{
@@ -151,42 +146,37 @@ public class DocumentUploadAction extends DispatchAction
 		responseMap.put("name", docFile.getFileName());
 		responseMap.put("size", docFile.getFileSize());
 
-		GenericFile file = FileFactory.createDocumentFile(docFile.getInputStream(), fileName);
-		docFile.destroy();
-
-		if(!file.validate())
-		{
-			file.reEncode();
-		}
-		file.moveToDocuments();
-
-		EDoc newDoc = new EDoc("", "", fileName, "", user, user, fmSource, 'A',
-				oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "",
-				"demographic", "-1", file.getPageCount());
-
-		newDoc.setDocPublic("0");
-		newDoc.setContentType(file.getContentType());
-		newDoc.setFileName(file.getName());
-
+		Integer programId = null;
 		// if the document was added in the context of a program
 		ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		ProgramProvider pp = programManager.getCurrentProgramInDomain(loggedInInfo, loggedInInfo.getLoggedInProviderNo());
 		if(pp != null && pp.getProgramId() != null)
 		{
-			newDoc.setProgramId(pp.getProgramId().intValue());
+			programId = pp.getProgramId().intValue();
 		}
 
+		Document document = new Document();
+		document.setPublic1(false);
+		document.setResponsible(user);
+		document.setDoccreator(user);
+		document.setDocdesc("");
+		document.setDoctype("");
+		document.setDocfilename(docFile.getFileName());
+		document.setSource(fmSource);
+		document.setObservationdate(new Date());
+		document.setProgramId(programId);
 
-		String doc_no = EDocUtil.addDocumentSQL(newDoc);
-		LogAction.addLogEntry(user, null, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr(), fileName);
+		document = documentService.uploadNewDemographicDocument(document, docFile.getInputStream());
+		docFile.destroy();
+
+		LogAction.addLogEntry(user, null, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
+				String.valueOf(document.getDocumentNo()), request.getRemoteAddr(), document.getDocfilename());
 
 		String providerId = request.getParameter("provider");
 		if(providerId != null)
 		{
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
-			ProviderInboxRoutingDao providerInboxRoutingDao = (ProviderInboxRoutingDao) ctx.getBean("providerInboxRoutingDAO");
-			providerInboxRoutingDao.addToProviderInbox(providerId, Integer.parseInt(doc_no), "DOC");
+			documentService.routeToProviderInbox(document.getDocumentNo(), Integer.parseInt(providerId));
 		}
 
 		String queueId = request.getParameter("queue");
@@ -195,7 +185,7 @@ public class DocumentUploadAction extends DispatchAction
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
 			QueueDocumentLinkDao queueDocumentLinkDAO = (QueueDocumentLinkDao) ctx.getBean("queueDocumentLinkDAO");
 			Integer qid = Integer.parseInt(queueId.trim());
-			Integer did = Integer.parseInt(doc_no.trim());
+			Integer did = document.getDocumentNo();
 			queueDocumentLinkDAO.addActiveQueueDocumentLink(qid, did);
 			request.getSession().setAttribute("preferredQueue", queueId);
 		}

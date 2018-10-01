@@ -64,7 +64,7 @@ public class AppointmentDisplayController
 
 	private AppointmentDetails appointment;
 	private String sessionProviderNo;   // Logged in provider from the session
-	private String scheduleProviderNo; // Provider for the schedule column
+	private Integer scheduleProviderNo; // Provider for the schedule column
 	private String parameterProviderNo; // Provider passed in via curProvider parameter
 	private String parameterProviderName;
 	private boolean multisitesEnabled;
@@ -100,7 +100,7 @@ public class AppointmentDisplayController
 	public void init(
 		AppointmentDetails appointment,
 		String sessionProviderNo,
-		String scheduleProviderNo,
+		Integer scheduleProviderNo,
 		String parameterProviderNo,
 		String parameterProviderName,
 		boolean multisitesEnabled,
@@ -549,10 +549,10 @@ public class AppointmentDisplayController
 
 		if (appointment.getReason() != null && !appointment.getReason().isEmpty())
 		{
-			title += "- " + StringEscapeUtils.escapeHtml(appointment.getReason() + "\n");
+			title += " - " + StringEscapeUtils.escapeHtml(appointment.getReason());
 		}
 
-		title += "notes: " + StringEscapeUtils.escapeHtml(appointment.getNotes());
+		title += "\nnotes: " + StringEscapeUtils.escapeHtml(appointment.getNotes());
 
 		return " title=\"" + title + "\"";
 	}
@@ -675,7 +675,7 @@ public class AppointmentDisplayController
 
 	public String getScheduleProviderNo()
 	{
-		return scheduleProviderNo;
+		return scheduleProviderNo.toString();
 	}
 
 	public String getCurrentProviderNo()
