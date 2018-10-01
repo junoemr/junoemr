@@ -291,7 +291,7 @@
 						key="tickler.ticklerAdd.formDemoName"/>: </b></font></font></td>
 				<td colspan="2" width="65%">
 					<div align="left"><INPUT TYPE="TEXT" NAME="keyword" size="25"
-											 VALUE="<%=bFirstDisp?"":demoName.equals("")?session.getAttribute("appointmentname"):demoName%>">
+											 VALUE="<%=bFirstDisp ? "" : demoName.equals("") ? session.getAttribute("appointmentname") == null ? "" : session.getAttribute("appointmentname") : demoName%>">
 						<input type="submit" name="Submit"
 							   value="<bean:message key="tickler.ticklerAdd.btnSearch"/>">
 					</div>
