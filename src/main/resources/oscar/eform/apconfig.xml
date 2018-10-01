@@ -31,11 +31,15 @@
 	<databaseap>
 		<ap-name>appt_end_time</ap-name>
 		<ap-sql>
-			SELECT DATE_FORMAT(end_time, '%H:%i') AS end_time
+			<!-- Here we add a minute to the appointment end time because oscar stores appointments with the end time
+			one minute lower to avoid formatting issues in the main chart.  For example, a 15 minute appointment at
+			15:00 will be stored from 15:00 - 15:14.  We round the seconds down to zero first, in case the data came from
+			an import which does something differently like storing the example appointment until 15:14:59 instead-->
+			SELECT DATE_FORMAT(ADDTIME(DATE_FORMAT(end_time, '%H:%i:00'), '00:01:00'), '%H:%i') AS rounded_endtime_plus_1_minute
 			FROM appointment
 			WHERE appointment_no=${appt_no}
 		</ap-sql>
-		<ap-output>${end_time}</ap-output>
+		<ap-output>${rounded_endtime_plus_1_minute}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>appointment_location</ap-name>

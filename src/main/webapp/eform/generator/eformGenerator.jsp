@@ -523,9 +523,9 @@
 
 		// store the list of images on the oscar server so only one load is needed.
 		var eFormImageList = [];
-		/** oscar db tags hardcoded for standalone. list update date: 2016-10-13 */
-		var oscarDatabaseTags = ["today", "appt_date", "appt_start_time", "appt_end_time", "next_appt_date",
-			"next_appt_time", "nextf_appt_date", "current_form_id", "current_form_data_id", "current_user",
+		/** oscar db tags hardcoded for standalone. list update date: 2018-10-01 */
+		var oscarDatabaseTags = ["today", "appt_date", "appt_start_time", "appt_end_time", "appt_location", "next_appt_date",
+			"next_appt_time", "nextf_appt_date", "next_appt_location", "current_form_id", "current_form_data_id", "current_user",
 			"current_user_fname_lname", "current_user_ohip_no", "current_user_specialty", "current_user_specialty_code",
 			"current_user_cpsid", "current_user_id", "current_user_signature", "current_logged_in_user",
 			"current_logged_in_user_roles", "current_logged_in_user_type", "current_logged_in_user_id", "patient_name",
