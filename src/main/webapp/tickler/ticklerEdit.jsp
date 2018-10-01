@@ -32,11 +32,7 @@
 <%@page import="org.oscarehr.common.model.TicklerTextSuggest" %>
 <%@ page import="org.oscarehr.common.model.Tickler" %>
 <%@ page import="org.oscarehr.common.model.TicklerComment" %>
-<%@ page import="org.oscarehr.common.model.TicklerUpdate" %>
-<%@ page import="org.oscarehr.common.model.TicklerLink" %>
-<%@ page import="org.oscarehr.common.dao.TicklerLinkDao" %>
 <%@ page import="oscar.util.UtilDateUtilities" %>
-<%@page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ page import="org.oscarehr.managers.TicklerManager" %>
 <%@ page import="java.text.SimpleDateFormat" %>
@@ -363,7 +359,7 @@
 				</td>
 				<td colspan="2">
 					<select name="priority">
-						<% if (t.getPriority().equals(prHigh))
+						<% if (t.getPriority() == Tickler.PRIORITY.High)
 						{
 							selected = "selected";
 						} else
@@ -373,7 +369,7 @@
 						<option <%=selected%>
 								value="<bean:message key="tickler.ticklerMain.priority.high"/>">
 							<bean:message key="tickler.ticklerMain.priority.high"/></option>
-						<% if (t.getPriority().equals(prNormal))
+						<% if (t.getPriority() == Tickler.PRIORITY.Normal)
 						{
 							selected = "selected";
 						} else
@@ -383,7 +379,7 @@
 						<option <%=selected%>
 								value="<bean:message key="tickler.ticklerMain.priority.normal"/>">
 							<bean:message key="tickler.ticklerMain.priority.normal"/></option>
-						<% if (t.getPriority().equals(prLow))
+						<% if (t.getPriority() == Tickler.PRIORITY.Low)
 						{
 							selected = "selected";
 						} else

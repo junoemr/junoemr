@@ -28,7 +28,6 @@
 <%--This JSP displays the result of the report query--%>
 
 
-<%@ page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@ page import="oscar.oscarReport.reportByTemplate.ReportObjectGeneric"%>
 <%@ page import="java.util.ArrayList"%>
 <%@ page import="java.util.List"%>
@@ -102,18 +101,15 @@ function clearSession(){
 		
 		List<String> sqlList = new ArrayList<String>();
 		List<String> htmlList = new ArrayList<String>();
-		List<String> csvList = new ArrayList<String>();
 		
 		if(curreport.isSequence()) {
 			for(int x=0;x<sequenceLength;x++) {
 				sqlList.add((String) request.getAttribute("sql-" + x));
 				htmlList.add((String) request.getAttribute("resultsethtml-" + x));
-				csvList.add((String) request.getAttribute("csv-" + x));
 			}
 		} else {
 			sqlList.add((String) request.getAttribute("sql"));
 			htmlList.add((String) request.getAttribute("resultsethtml"));
-			csvList.add((String) request.getAttribute("csv"));
 		}
             
           %>
@@ -157,24 +153,6 @@ function clearSession(){
 			<input type="button" value="Print"
 				onclick="javascript: window.print();">
 			<br/><br/>
-	
-	<%
-		for(int x=0;x<csvList.size();x++)
-		{
-	%>			
-
-			<html:form action="/oscarReport/reportByTemplate/generateOutFilesAction">
-			<%if(x>1){ %>
-			<label><%=(x+1)%></label>
-			<%}%>
-			<input type="hidden" name="csv"
-				value="<%=StringEscapeUtils.escapeHtml(csvList.get(x))%>">
-
-			<input type="submit" name="getCSV" value="Export to CSV">
-			<input type="submit" name="getXLS" value="Export to XLS">
-		</html:form>
-		
-	<% } %>	
 		</div>
 		</td>
 	</tr>

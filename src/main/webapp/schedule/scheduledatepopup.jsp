@@ -58,6 +58,7 @@
   }
 
   String providerNoStr = request.getParameter("provider_no");
+  String providerName = request.getParameter("provider_name");
 
 %>
 
@@ -185,6 +186,8 @@ function upCaseCtrl(ctrl) {
 					<div align="right"><input type="hidden" name="Submit" value="">
 						<input type="hidden" name="provider_no"
 						       value="<%=providerNoStr%>">
+						<input type="hidden" name="provider_name"
+							   value="<%=providerName%>">
 						<input type="button"
 						       value='<bean:message key="schedule.scheduledatepopup.btnSave"/>'
 						       onclick="document.forms['schedule'].Submit.value=' Save '; document.forms['schedule'].submit();">

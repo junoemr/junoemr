@@ -588,6 +588,7 @@
 
         <form-bean name="ValidateSwipeCard" type="org.oscarehr.integration.mchcv.ValidateSwipeCard" />
         <form-bean name="bpmh" type="oscar.form.pharmaForms.formBPMH.bean.BpmhFormBean" />
+
 	</form-beans>
 
 	<global-forwards>
@@ -1203,13 +1204,13 @@
 			<forward name="fax" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormFax.jsp" />
 			<forward name="faxIndivica" path="/fax/CoverPage.jsp" />
 		</action>
-		<action input="/oscarEncounter/oscarconsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/printPdf" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestPrintAction">
+		<action input="/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/printPdf" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestPrintAction">
 			<forward name="error" path="/oscarEncounter/ViewRequest.do?error=error" />
 		</action>
-		<action input="/oscarEncounter/oscarconsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/printPdf2" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestPrintAction2">
+		<action input="/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/printPdf2" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestPrintAction2">
 			<forward name="error" path="/oscarEncounter/ViewRequest.do?error=error" />
 		</action>
-		<action input="/oscarEncounter/oscarconsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormFax" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormFaxAction">
+		<action input="/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormFax" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormFaxAction">
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/ConfirmConsultationRequest.jsp" />
 			<forward name="error" path="/oscarEncounter/ViewRequest.do?error=error" />
 		</action>
@@ -1252,6 +1253,7 @@
 		<action input="/oscarConsultationRequest/config/EditSpecialists.jsp" name="EctConEditSpecialistsForm" path="/oscarEncounter/EditSpecialists" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConEditSpecialistsAction">
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/config/AddSpecialist.jsp" />
 			<forward name="delete" path="/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp" />
+			<forward name="activate" path="/oscarEncounter/oscarConsultationRequest/config/EditSpecialists.jsp" />
 		</action>
 		<action input="/oscarConsultationRequest/config/EditInstitutions.jsp" name="EctConEditInstitutionsForm" path="/oscarEncounter/EditInstitutions" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConEditInstitutionsAction">
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/config/AddInstitution.jsp" />
@@ -1971,6 +1973,14 @@
 		<action input="/admin/uploadEntryText.jsp" name="LabUploadForm" path="/admin/uploadEntryText" scope="request" type="oscar.login.UploadLoginTextAction">
 			<forward name="success" path="/admin/uploadEntryText.jsp" />
 		</action>
+		<action input="/admin/providerRole.jsp" path="/admin/providerRole" type="oscar.admin.action.ProviderRoleAction" parameter="method" scope="request" validate="false">
+			<forward name="success" path="/admin/providerRole.jsp" />
+			<forward name="failure" path="/admin/providerRole.jsp" />
+		</action>
+		<action input="/admin/providerRole.jsp" path="/admin/programProviderRole" type="oscar.admin.action.ProgramProviderRoleAction" parameter="method" scope="request" validate="false">
+			<forward name="success" path="/admin/providerRole.jsp" />
+			<forward name="failure" path="/admin/providerRole.jsp" />
+		</action>
 		<action input="/demographic/demographicImport.jsp" name="FrmForm" path="/billing/CA/ON/benefitScheduleChange" scope="request" type="oscar.oscarBilling.ca.on.OHIP.ScheduleOfBenefitsUpdateAction">
 			<forward name="success" path="/billing/CA/ON/ScheduleOfBenefitsUpload.jsp" />
 		</action>
@@ -2334,9 +2344,6 @@
 			<forward name="success" path="/oscarReport/reportByTemplate/addEditTemplate.jsp"></forward>
 			<forward name="fail" path="/oscarReport/reportByTemplate/addEditTemplate.jsp"></forward>
 			<forward name="deleted" path="/oscarReport/reportByTemplate/homePage.jsp"></forward>
-		</action>
-		<action input="/oscarReport/reportByTemplate/resultReport.jsp" name="FrmForm" path="/oscarReport/reportByTemplate/generateOutFilesAction" scope="request" type="oscar.oscarReport.reportByTemplate.actions.GenerateOutFilesAction">
-			<forward name="success" path="/oscarReport/reportByTemplate/resultReport.jsp"></forward>
 		</action>
 		<action input="/oscarReport/reportByTemplate/addEditTemplate.jsp" name="FrmForm" path="/oscarReport/reportByTemplate/uploadTemplates" scope="request" type="oscar.oscarReport.reportByTemplate.actions.UploadTemplates">
 			<forward name="success" path="/oscarReport/reportByTemplate/addEditTemplate.jsp"></forward>
@@ -2888,6 +2895,10 @@
 		</action>
 		<action input="/billing/CA/ON/billingON3rdInv.jsp" name="FrmForm" path="/billing/ca/on/DisplayInvoiceLogo" scope="request" type="org.oscarehr.billing.CA.ON.util.DisplayInvoiceLogo"></action>
 
+		<action input="/demographic/demographicaddrecordcustom.jsp" name="eDocsAddEditDocument" path="/demographic/AddDemographic" type="oscar.oscarDemographic.pageUtil.AddDemographicAction" scope="request" validate="false">
+			<forward name="successAdd" path="/demographic/demographicSuccess.jsp"></forward>
+			<forward name="validationFail" path="/demographic/demographicaddrecordcustom.jsp"></forward>
+		</action>
 	</action-mappings>
 	<controller processorClass="org.apache.struts.tiles.TilesRequestProcessor" maxFileSize="100M" ></controller>
 	<message-resources parameter="oscarResources" null="false" />

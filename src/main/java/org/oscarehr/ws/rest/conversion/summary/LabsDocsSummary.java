@@ -169,7 +169,7 @@ public class LabsDocsSummary implements Summary {
 	
 			
 			if( curDoc.getRemoteFacilityId()==null && curDoc.isPDF() ) {
-				url = "../dms/showDocument.jsp?segmentID=" + dispDocNo + "&searchProviderNo=" + loggedInInfo.getLoggedInProviderNo() + "&status=A&inWindow=true&chartView&demoName=";//'); return false;";
+				url = "../dms/showDocument.jsp?segmentID=" + dispDocNo + "&providerNo=" + loggedInInfo.getLoggedInProviderNo() + "&status=A&inWindow=true&chartView&demoName=";//'); return false;";
 			}
 			else {
 				url = "../dms/ManageDocument.do?method=display&doc_no=" + dispDocNo +
