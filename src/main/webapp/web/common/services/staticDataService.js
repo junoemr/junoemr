@@ -46,7 +46,7 @@ angular.module("Common.Services").service("staticDataService", [
 			genders.push(
 			{
 				"value": "T",
-				"label": "Transgendered"
+				"label": "Transgender"
 			});
 			genders.push(
 			{
