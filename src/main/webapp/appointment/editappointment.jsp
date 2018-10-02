@@ -488,30 +488,24 @@
 			</div>
 
 			<%
-				Appointment appt = null;
+				Appointment appt = appointmentDao.find(Integer.parseInt(appointment_no));
+				if (appt == null)
+				{
+			%>
+					<bean:message key="appointment.editappointment.msgNoSuchAppointment"/>
+			<%
+					return;
+				}
+
 				String demono = "", chartno = "", phone = "", rosterstatus = "", alert = "", doctorNo = "";
 				String strApptDate = bFirstDisp ? "" : request.getParameter("appointment_date");
 
 
 				if (bFirstDisp)
 				{
-					appt = appointmentDao.find(Integer.parseInt(appointment_no));
-
-
-					if (appt == null)
-					{
-			%>
-			<bean:message key="appointment.editappointment.msgNoSuchAppointment"/>
-			<%
-						return;
-					}
-				}
-
-
-				if (bFirstDisp)
-				{
 					demono = String.valueOf(appt.getDemographicNo());
-				} else if (request.getParameter("demographic_no") != null && !request.getParameter("demographic_no").equals(""))
+				}
+				else if (request.getParameter("demographic_no") != null && !request.getParameter("demographic_no").equals(""))
 				{
 					demono = request.getParameter("demographic_no");
 				}
