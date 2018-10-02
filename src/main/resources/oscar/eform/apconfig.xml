@@ -42,7 +42,7 @@
 		<ap-output>${rounded_endtime_plus_1_minute}</ap-output>
 	</databaseap>
 	<databaseap>
-		<ap-name>appointment_location</ap-name>
+		<ap-name>appt_location</ap-name>
 		<ap-sql>
 			SELECT location
 			FROM appointment
@@ -92,7 +92,7 @@
 		<ap-output>${nextf_appt_date}</ap-output>
 	</databaseap>
 	<databaseap>
-		<ap-name>next_appointment_location</ap-name>
+		<ap-name>next_appt_location</ap-name>
 		<ap-sql>
 			SELECT location
 			FROM appointment
