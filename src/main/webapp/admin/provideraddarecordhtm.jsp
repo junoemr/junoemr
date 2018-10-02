@@ -36,8 +36,8 @@
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@ page import="org.oscarehr.common.dao.SiteDao"%>
 <%@ page import="org.oscarehr.common.model.Site"%>
-<%@ page import="org.oscarehr.common.dao.ProviderDataDao"%>
-<%@page  import="org.oscarehr.common.model.ProviderData"%>
+<%@ page import="org.oscarehr.provider.dao.ProviderDataDao"%>
+<%@page  import="org.oscarehr.provider.model.ProviderData"%>
 
 
 <%@page import="org.oscarehr.common.Gender" %>

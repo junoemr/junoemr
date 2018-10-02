@@ -41,7 +41,7 @@ import org.oscarehr.common.dao.AppUserDao;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.common.dao.UserDSMessagePrefsDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
 import org.oscarehr.demographic.model.DemographicExt;

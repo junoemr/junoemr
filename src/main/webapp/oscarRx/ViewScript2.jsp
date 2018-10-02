@@ -217,6 +217,7 @@ if (userAgent != null) {
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
 <script type="text/javascript" src="../share/javascript/prototype.js"></script>
 <script type="text/javascript" src="../share/javascript/Oscar.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/js/util/fax.js"></script>
 
 <script type="text/javascript">
     function resetStash(){
@@ -420,10 +421,20 @@ function refreshImage()
 
 function sendFax()
 {
-	frames['preview'].document.getElementById('pdfId').value='<%=signatureRequestId%>';	
-	frames['preview'].onPrint2('oscarRxFax');
-	frames['preview'].document.FrmForm.submit();	
-	window.onbeforeunload = null;
+	var faxNumber = frames['preview'].document.getElementsByName("pharmaFax")[0].value;
+
+	if (Oscar.Util.Fax.checkPhone(faxNumber))
+	{
+		frames['preview'].document.getElementById('pdfId').value = '<%=signatureRequestId%>';
+		frames['preview'].onPrint2('oscarRxFax');
+		frames['preview'].document.FrmForm.submit();
+		window.onbeforeunload = null;
+	}
+	else
+	{
+		alert("The fax number for this pharmacy is invalid");
+	}
+
 }
 
 function unloadMess(){
@@ -444,6 +455,7 @@ function signatureHandler(e) {
 	e.target.onbeforeunload = null;
 	<% if (OscarProperties.getInstance().isRxFaxEnabled()) { //%>
 	e.target.document.getElementById("faxButton").disabled = !hasFaxNumber || !e.isSave;
+	e.target.document.getElementById("faxAndPasteButton").disabled = !hasFaxNumber || !e.isSave;
 	<% } %>
 	if (e.isSave) {
 		<% if (OscarProperties.getInstance().isRxFaxEnabled()) { //%>
@@ -654,25 +666,40 @@ function toggleView(form) {
 							onClick="javascript:printPaste2Parent(true);" /></span></td>
 					</tr>
 					<% if (OscarProperties.getInstance().isRxFaxEnabled()) {
+							boolean hasFaxNumber = (pharmacy != null) && (pharmacy.getFax().trim().length() > 0);
 					    	FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
 					    	List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
 
-                        // enable the fax button if there is a pre-set signature
+                        // enable the fax button if there is a pre-set signature for the creator of the prescription or the logged in user
 					    String disabled = "disabled";
+						oscar.oscarRx.data.RxPrescriptionData.Prescription rx = bean.getStashItem(bean.getStashSize()-1);
                         if(oscar.OscarProperties.getInstance().isPropertyActive("rx_preset_signatures"))
                         {
-                            String imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image","")+"doctor_signature_"+bean.getProviderNo()+".png";
-                            File f = new File(imgFile);
-                            if(f.exists() && !f.isDirectory())
+							String imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image", "") + "doctor_signature_";
+                        	if (rx.getProviderNo() != null)
+							{
+								imgFile += rx.getProviderNo() + ".png";
+							} else
+							{
+								imgFile += bean.getProviderNo() + ".png";
+							}
+							File f = new File(imgFile);
+                            if(f.exists() && !f.isDirectory() && hasFaxNumber)
                             {
                                 disabled = "";
                             }
                         }
 					    %>
+					<tr>
+						<td><span><input type=button value="Fax"
+										 class="ControlPushButton" id="faxButton" style="width: 150px"
+										 onClick="sendFax();" <%= disabled %> /></span>
+						</td>
+					</tr>
 					<tr>                            
                             <td><span><input type=button value="Fax & Paste into EMR"
-                                    class="ControlPushButton" id="faxButton" style="width: 150px"
-                                    onClick="printPaste2Parent(false);sendFax();" <%= disabled %> /></span>
+                                    class="ControlPushButton" id="faxAndPasteButton" style="width: 150px"
+                                    onClick="printPaste2Parent(false);sendFax();" <%= isReprint?"disabled='true'":disabled %> /></span>
                            </td>
                     </tr>
                     <% } %>

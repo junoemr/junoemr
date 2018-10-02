@@ -30,8 +30,8 @@
 <%@ page import="org.oscarehr.billing.CA.model.BillActivity" %>
 <%@ page import="org.oscarehr.billing.CA.dao.BillActivityDao" %>
 
-<%@ page import="org.oscarehr.common.model.ProviderData"%>
-<%@ page import="org.oscarehr.common.dao.ProviderDataDao"%>
+<%@ page import="org.oscarehr.provider.model.ProviderData"%>
+<%@ page import="org.oscarehr.provider.dao.ProviderDataDao"%>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
@@ -41,7 +41,6 @@
 
 <%@page import="org.oscarehr.common.model.ProviderBillCenter" %>
 <%@page import="org.oscarehr.common.dao.ProviderBillCenterDao" %>
-<%@page import="org.oscarehr.util.SpringUtils" %>
 
 <%
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);

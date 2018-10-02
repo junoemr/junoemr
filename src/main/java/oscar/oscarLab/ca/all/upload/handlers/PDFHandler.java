@@ -24,34 +24,35 @@
 
 package oscar.oscarLab.ca.all.upload.handlers;
 
-import com.lowagie.text.pdf.PdfReader;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.QueueDocumentLinkDao;
+import org.oscarehr.document.model.Document;
+import org.oscarehr.document.service.DocumentService;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.SpringUtils;
+import oscar.OscarProperties;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.ProviderInboxRoutingDao;
-import org.oscarehr.common.dao.QueueDocumentLinkDao;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.OscarProperties;
-import oscar.dms.EDoc;
-import oscar.dms.EDocUtil;
-import oscar.log.LogAction;
-import oscar.log.LogConst;
+import java.util.Date;
 
 /**
  *
  * @author mweston4
  */
-public class PDFHandler  implements MessageHandler{
-    protected static Logger logger = Logger.getLogger(PDFHandler.class);
-    
-    @Override
-    public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, String ipAddr) {
+public class PDFHandler implements MessageHandler
+{
+	protected static Logger logger = Logger.getLogger(PDFHandler.class);
+
+	private DocumentService documentService = SpringUtils.getBean(DocumentService.class);
+
+	@Override
+	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, String ipAddr)
+	{
 
         String providerNo = "-1";
         String filePath = fileName;              
@@ -63,60 +64,66 @@ public class PDFHandler  implements MessageHandler{
             int fileNameIdx = fileName.lastIndexOf("/");
             fileName = fileName.substring(fileNameIdx+1);
         }
-                
-        EDoc newDoc = new EDoc("", "", fileName, "", providerNo, providerNo, "", 'A',
-				oscar.util.UtilDateUtilities.getToday("yyyy-MM-dd"), "", "", "demographic", "-1", false);
-                
-        newDoc.setDocPublic("0");                       
-        
-        InputStream fis = null; 
-                
-        try {            
-            fis = new FileInputStream(filePath);                                                   
-            newDoc.setContentType("application/pdf");
 
-            //Find the number of pages
-            PdfReader reader = new PdfReader(filePath);          
-            int numPages = reader.getNumberOfPages();
-            reader.close();
-            newDoc.setNumberOfPages(numPages);
-            
-            String doc_no = EDocUtil.addDocumentSQL(newDoc);
+	    Document document = new Document();
+	    document.setPublic1(false);
+	    document.setResponsible(providerNo);
+	    document.setDoccreator(providerNo);
+	    document.setDocdesc("");
+	    document.setDoctype("");
+	    document.setDocfilename(fileName);
+	    document.setSource("");
+	    document.setObservationdate(new Date());
 
-			LogAction.addLogEntry(providerNo, null, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, ipAddr, fileName);
+	    InputStream fileInputStream = null;
 
-            
-            //Get provider to route document to
-            String batchPDFProviderNo = OscarProperties.getInstance().getProperty("batch_pdf_provider_no");            
-            if ((batchPDFProviderNo != null) && !batchPDFProviderNo.isEmpty()) {
-                
-                ProviderInboxRoutingDao providerInboxRoutingDao = (ProviderInboxRoutingDao) SpringUtils.getBean("providerInboxRoutingDAO");
-                providerInboxRoutingDao.addToProviderInbox(batchPDFProviderNo, Integer.parseInt(doc_no), "DOC");
-                
-                //Add to default queue for now, not sure how or if any other queues can be used anyway (MAB)                 
-                QueueDocumentLinkDao queueDocumentLinkDAO = (QueueDocumentLinkDao) SpringUtils.getBean("queueDocumentLinkDAO");          
-                Integer did=Integer.parseInt(doc_no.trim());
-                queueDocumentLinkDAO.addToQueueDocumentLink(1,did);  
-            }                                                
-        }
-        catch (FileNotFoundException e) {
-            logger.info("An unexpected error has occurred:" + e.toString());
-            return null;
-        }
-        catch (Exception e) {
-                logger.info("An unexpected error has occurred:" + e.toString());
-                return null;
-        } finally {
-            try {
-                if (fis != null) {
-                        fis.close();
-                }                
-            } catch (IOException e1) {
-                logger.info("An unexpected error has occurred:" + e1.toString());
-                return null;
-            }
-        }			      	              
-		
-        return "success";
-    }
+	    try
+	    {
+		    fileInputStream = new FileInputStream(filePath);
+
+		    document = documentService.uploadNewDemographicDocument(document, fileInputStream);
+		    Integer documentNo = document.getDocumentNo();
+
+		    LogAction.addLogEntry(providerNo, null, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, String.valueOf(documentNo), ipAddr, fileName);
+
+
+		    //Get provider to route document to
+		    String batchPDFProviderNo = OscarProperties.getInstance().getProperty("batch_pdf_provider_no");
+		    if((batchPDFProviderNo != null) && !batchPDFProviderNo.isEmpty())
+		    {
+			    documentService.routeToProviderInbox(documentNo, Integer.parseInt(batchPDFProviderNo));
+
+			    //Add to default queue for now, not sure how or if any other queues can be used anyway (MAB)
+			    QueueDocumentLinkDao queueDocumentLinkDAO = (QueueDocumentLinkDao) SpringUtils.getBean("queueDocumentLinkDAO");
+			    queueDocumentLinkDAO.addToQueueDocumentLink(1, documentNo);
+		    }
+	    }
+	    catch(FileNotFoundException e)
+	    {
+		    logger.info("Error, missing file (" + fileName + ")", e);
+		    return null;
+	    }
+	    catch(Exception e)
+	    {
+		    logger.info("An unexpected error has occurred", e);
+		    return null;
+	    }
+	    finally
+	    {
+		    try
+		    {
+			    if(fileInputStream != null)
+			    {
+				    fileInputStream.close();
+			    }
+		    }
+		    catch(IOException e1)
+		    {
+			    logger.info("An unexpected error has occurred:" + e1.toString());
+			    return null;
+		    }
+	    }
+
+		return "success";
+	}
 }

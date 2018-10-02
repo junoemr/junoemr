@@ -35,7 +35,7 @@
 <%@page import="org.oscarehr.util.LocaleUtils"%>
 <%@page import="org.oscarehr.util.WebUtils"%>
 <%@page import="org.oscarehr.util.MiscUtils" %>
-<%@page import="org.oscarehr.managers.PreventionManager" %>
+<%@page import="org.oscarehr.prevention.service.PreventionManager" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>

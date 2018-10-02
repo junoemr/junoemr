@@ -28,9 +28,9 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.common.dao.DrugDao"%>
+<%@page import="org.oscarehr.rx.dao.DrugDao"%>
 <%@page import="java.util.List"%>
-<%@page import="org.oscarehr.common.model.Drug"%>
+<%@page import="org.oscarehr.rx.model.Drug"%>
 <%@page import="oscar.oscarRx.data.RxPrescriptionData"%>
 <%@page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager"%>
 <%@page import="org.oscarehr.caisi_integrator.ws.DemographicWs"%>

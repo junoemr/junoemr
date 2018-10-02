@@ -28,7 +28,7 @@ import org.apache.commons.lang.StringUtils;
 @Entity
 @Table(name = "providerLabRouting")
 public class ProviderLabRoutingModel extends AbstractModel<Integer> implements Serializable {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;

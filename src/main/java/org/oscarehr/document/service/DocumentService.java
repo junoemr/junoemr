@@ -80,6 +80,35 @@ public class DocumentService
 	ProgramManager programManager;
 
 	/**
+	 * Create a new document from the given document model and a file
+	 * This method will move the file to the documents directory and persist the record
+	 * NOTE: It is recommended to use the file input stream version wherever possible
+	 * Document metadata fields that can be read from the file directly will replace the values in the model.
+	 * @param document - the un-persisted document model
+	 * @param file - an existing file that has no database record.
+	 * @param demographicNo - demographic id of the attached demographic
+	 * @return - the persisted document model
+	 * @throws IOException
+	 */
+	public Document uploadNewDemographicDocument(Document document, GenericFile file, Integer demographicNo) throws IOException
+	{
+		file.moveToDocuments();
+
+		document = setDocumentProperties(document, file);
+		document = addDocumentModel(document);
+		if(demographicNo == null || demographicNo < 1)
+		{
+			// unassigned documents still get a link with id -1
+			createDemographicCtlLink(document, -1);
+		}
+		else
+		{
+			assignDocumentToDemographic(document, demographicNo);
+		}
+		logger.info("Uploaded Demographic Document " + document.getDocumentNo());
+		return document;
+	}
+	/**
 	 * Create a new document from the given document model and a file input stream.
 	 * This method will write the file from the stream and persist the document record.
 	 * Document metadata fields that can be read from the file directly will replace the values in the model.
@@ -88,22 +117,61 @@ public class DocumentService
 	 * @param demographicNo - demographic id of the attached demographic
 	 * @return - the persisted document model
 	 * @throws IOException
-	 * @throws InterruptedException
 	 */
-	public Document uploadNewDocument(Document document, InputStream fileInputStream, Integer demographicNo) throws IOException, InterruptedException
+	public Document uploadNewDemographicDocument(Document document, InputStream fileInputStream, Integer demographicNo) throws IOException
 	{
 		GenericFile file = FileFactory.createDocumentFile(fileInputStream, document.getDocfilename());
+		return uploadNewDemographicDocument(document, file, demographicNo);
+	}
 
-		if(!file.validate())
-		{
-			file.reEncode();
-		}
+	public Document uploadNewDemographicDocument(Document document, InputStream fileInputStream) throws IOException
+	{
+		return uploadNewDemographicDocument(document, fileInputStream, null);
+	}
+
+	/**
+	 * Create a new document from the given document model and a file
+	 * This method will move the file to the documents directory and persist the record
+	 * NOTE: It is recommended to use the file input stream version wherever possible
+	 * Document metadata fields that can be read from the file directly will replace the values in the model.
+	 * @param document - the un-persisted document model
+	 * @param file - an existing file that has no database record.
+	 * @param providerNo - demographic id of the attached demographic
+	 * @return - the persisted document model
+	 * @throws IOException
+	 */
+	public Document uploadNewProviderDocument(Document document, GenericFile file, Integer providerNo) throws IOException
+	{
 		file.moveToDocuments();
 
-		document.setDocfilename(file.getName());
-		document.setContenttype(file.getContentType());
-		document.setNumberofpages(file.getPageCount());
+		document = setDocumentProperties(document, file);
+		document = addDocumentModel(document);
+		if(providerNo == null || providerNo < 1)
+		{
+			// unassigned documents still get a link with id -1
+			createProviderCtlLink(document, -1);
+		}
+		else
+		{
+			createProviderCtlLink(document, providerNo);
+		}
+		logger.info("Uploaded Provider Document " + document.getDocumentNo());
+		return document;
+	}
+	public Document uploadNewProviderDocument(Document document, InputStream fileInputStream, Integer providerNo) throws IOException
+	{
+		GenericFile file = FileFactory.createDocumentFile(fileInputStream, document.getDocfilename());
+		return uploadNewProviderDocument(document, file, providerNo);
+	}
 
+	/**
+	 * Persist a document record without an associated filestream.
+	 * Use other methods for creating documents whenever there is an available filestream
+	 * @param document - the un-persisted document model
+	 * @return - The document model that was persisted
+	 */
+	private Document addDocumentModel(Document document)
+	{
 		// default some values if they are missing
 		if(document.getObservationdate() == null)
 		{
@@ -118,22 +186,15 @@ public class DocumentService
 			document.setProgramId(programManager.getDefaultProgramId());
 		}
 		documentDao.persist(document);
-
-		if(demographicNo == null || demographicNo < 1)
-		{
-			// unassigned documents still get a link with id -1
-			createDemographicCtlLink(document, -1);
-		}
-		else
-		{
-			assignDocumentToDemographic(document, demographicNo);
-		}
-		logger.info("Uploaded Document " + document.getDocumentNo());
 		return document;
 	}
-	public Document uploadNewDocument(Document document, InputStream fileInputStream) throws IOException, InterruptedException
+
+	private Document setDocumentProperties(Document document, GenericFile file) throws IOException
 	{
-		return uploadNewDocument(document, fileInputStream, null);
+		document.setDocfilename(file.getName());
+		document.setContenttype(file.getContentType());
+		document.setNumberofpages(file.getPageCount());
+		return document;
 	}
 
 	public void updateDocument(AddEditDocumentForm fm,
@@ -256,13 +317,26 @@ public class DocumentService
 	/**
 	 * Add the document to the given provider inbox
 	 * @param documentNo - document id to route
-	 * @param providerNo - provider id to route to
+	 * @param providerNoList - list of provider id(s) to route to
 	 */
-	public void routeToProviderInbox(Integer documentNo, Integer providerNo)
+	public void routeToProviderInbox(Integer documentNo, Integer...providerNoList)
+	{
+		routeToProviderInbox(documentNo, false, providerNoList);
+	}
+	/**
+	 * Add the document to the given provider(s) inbox
+	 * @param documentNo - document id to route
+	 * @param alwaysFile - when true, all routes will be set as filed. otherwise default routing rules are applied
+	 * @param providerNoList - list of provider id(s) to route to
+	 */
+	public void routeToProviderInbox(Integer documentNo, boolean alwaysFile, Integer...providerNoList)
 	{
 		//TODO handle the routing weirdness
-		providerInboxRoutingDao.addToProviderInbox(String.valueOf(providerNo), documentNo, LabResultData.DOCUMENT);
-		logger.info("Added route to provider " + providerNo + " for document " + documentNo);
+		for(Integer providerNo : providerNoList)
+		{
+			providerInboxRoutingDao.addToProviderInbox(String.valueOf(providerNo), documentNo, LabResultData.DOCUMENT, alwaysFile);
+			logger.info("Added route to provider " + providerNo + " for document " + documentNo);
+		}
 	}
 	/**
 	 * Add the document to the unclaimed/general inbox
@@ -317,12 +391,22 @@ public class DocumentService
 
 	private void createDemographicCtlLink(Document document, Integer demographicNo)
 	{
+		createCtlLink(document, demographicNo, CtlDocument.MODULE_DEMOGRAPHIC);
+	}
+
+	private void createProviderCtlLink(Document document, Integer providerNo)
+	{
+		createCtlLink(document, providerNo, CtlDocument.MODULE_PROVIDER);
+	}
+
+	private void createCtlLink(Document document, Integer moduleId, String moduleType)
+	{
 		CtlDocumentPK cdpk = new CtlDocumentPK();
 		CtlDocument cd = new CtlDocument();
 		cd.setId(cdpk);
-		cdpk.setModule(CtlDocument.MODULE_DEMOGRAPHIC);
+		cdpk.setModule(moduleType);
 		cdpk.setDocumentNo(document.getDocumentNo());
-		cd.getId().setModuleId(demographicNo);
+		cd.getId().setModuleId(moduleId);
 		cd.setStatus(String.valueOf(document.getStatus()));
 		ctlDocumentDao.persist(cd);
 	}

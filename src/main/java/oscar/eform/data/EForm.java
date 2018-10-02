@@ -31,10 +31,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionMessages;
 import org.oscarehr.common.OtherIdManager;
-import org.oscarehr.common.dao.PreventionDao;
-import org.oscarehr.common.model.Prevention;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.ui.servlet.ImageRenderingServlet;
 import org.oscarehr.util.DigitalSignatureUtils;
 import org.oscarehr.util.MiscUtils;
@@ -185,6 +185,62 @@ public class EForm extends EFormBase {
 	public void setParentAjaxId(String parentAjaxId)
 	{
 		this.parentAjaxId = parentAjaxId;
+	}
+
+	/**
+	 * Disable commonly used e-form controls which are used to submit the form.  These are the submit button,
+	 * print submit button and the subject field (as a cue).  Since the names of these controls can vary in the wild,
+	 * this method is only a best attempt at disabling these inputs.
+	 */
+	public void disableSubmitControls()
+	{
+		StringBuilder html = new StringBuilder(this.formHtml);
+
+		// Our e-form generator labels the control buttons using this div.
+		// For other e-forms that don't do this, we'll have to search the whole document.
+		int bottomButtonsIndex = StringBuilderUtils.indexOfIgnoreCase(html, "id=\"BottomButtons\"",0);
+		if (bottomButtonsIndex < 0)
+		{
+			bottomButtonsIndex = 0;
+		}
+
+		disableInput(html, "SubmitButton", bottomButtonsIndex);
+		disableInput(html, "PrintSubmitButton", bottomButtonsIndex);
+		disableInput(html, "subject", bottomButtonsIndex);
+
+		this.formHtml = html.toString();
+	}
+
+	/**
+	 * Append a disabled tag to the first html element with a name or id matching inputIdentifier.
+	 *
+	 * @param html StringBuilder containing the html to parse
+	 * @param inputIdentifier Html input element name or id to disable
+	 * @param searchStartIndex The character index in the html to start the search
+	 */
+	private void disableInput(StringBuilder html, String inputIdentifier, int searchStartIndex)
+	{
+		int identifierStart = StringBuilderUtils.indexOfIgnoreCase(html, inputIdentifier, searchStartIndex);
+
+		while (identifierStart >= 0)
+		{
+			int identifierEnd = identifierStart + inputIdentifier.length();
+
+			// Forms in the wild are inconsistent with regards to name or id.  We'll search for both to be safe.
+			if ((identifierStart >= 4 && html.substring(identifierStart - 4, identifierStart).toLowerCase().equals("id=\"")) ||
+				(identifierStart >= 6 && html.substring(identifierStart - 6, identifierStart).toLowerCase().equals("name=\"")))
+			{
+				if ((html.length() > identifierEnd + 1) && html.substring(identifierEnd, identifierEnd + 1).equals("\""))
+				{
+					int elementEnd = html.indexOf(">", identifierEnd);
+					html.insert(elementEnd, " disabled");
+				}
+
+				break;
+			}
+
+			identifierStart = StringBuilderUtils.indexOfIgnoreCase(html, inputIdentifier, identifierEnd + 1);
+		}
 	}
 
 	public void setAction() {
@@ -595,6 +651,7 @@ public class EForm extends EFormBase {
 				curAP = new DatabaseAP();
 				curAP.setApName(apName);
 				curAP.setApOutput((String) data.get(field));
+				log.info("SET Measurement AP: " + apName + "=" + data.get(field));
 			}
 		} else if (module.equals("e")) {
 			log.debug("SWITCHING TO EFORM_VALUES");
@@ -903,6 +960,7 @@ public class EForm extends EFormBase {
 		} else { //type=input
 			output = output.replace("\"", "&quot;");
 			html.insert(pointer, " value=\""+output+"\"");
+			log.debug("insert: (" + pointer + ")' value=\""+output+"\"'");
 		}
 		return (html);
 	}
@@ -1047,57 +1105,63 @@ public class EForm extends EFormBase {
 		String output = ap.getApOutput();
 		int end_tag;
 
-		if (!EFormUtil.blank(sql)) {
+		if (!EFormUtil.blank(sql))
+		{
 			sql = replaceAllFields(sql);
 			log.debug("SQL----" + sql);
 			ArrayList<String> names = DatabaseAP.parserGetNames(output);
 			sql = DatabaseAP.parserClean(sql); // replaces all other ${apName} expressions with 'apName'
 
 			ArrayList<String> values = EFormUtil.getValues(names, sql);
-			if (values.size() != names.size()) {
+			if(values.size() != names.size())
+			{
 				output = "";
 			}
-			else {
-				for (int i = 0; i < names.size(); i++) {
+			else
+			{
+				for(int i = 0; i < names.size(); i++)
+				{
 					output = DatabaseAP.parserReplace(names.get(i), values.get(i), output);
 				}
 			}
-			//put values into according controls
+		}
 
-			if (type.equals("textarea")) {
-				pointer = html.indexOf(">", pointer) + 1;
-				end_tag = html.indexOf("</textarea>", pointer);
-				// html.insert(pointer, output);
-				html.replace(pointer, end_tag, output);
-			}
-			else if (type.equals("select")) {
-				int selectEnd = StringBuilderUtils.indexOfIgnoreCase(html, "</select>", pointer);
-				if (selectEnd >= 0) {
-					int valueLoc = nextIndex(html, " value=" + output, " value=\"" + output, pointer);
-					if (valueLoc < 0 || valueLoc > selectEnd) return html;
-					pointer = nextSpot(html, valueLoc);
-					html = html.insert(pointer, " selected");
-				}
-			}
-			else {
-				int end_value, start_value;
-				start_value = html.indexOf("value=\"", pointer);
-				end_tag = html.indexOf(">", pointer);
-				String quote = output.contains("\"") ? "'" : "\"";
-
-				if(start_value > 0 && start_value < end_tag) {
-					end_value = html.indexOf("\"", start_value + 7 ) + 1;
-					log.debug(start_value);
-					log.debug(end_tag);
-					log.debug(end_value);
-					html.replace(start_value, end_value, "value="+quote+output+quote);
-				}
-				else {
-					start_value = html.indexOf(">", pointer);
-					html.insert(start_value, " value=" + quote + output + quote);
-				}
+		//put values into according controls
+		if (type.equals("textarea")) {
+			pointer = html.indexOf(">", pointer) + 1;
+			end_tag = html.indexOf("</textarea>", pointer);
+			// html.insert(pointer, output);
+			html.replace(pointer, end_tag, output);
+		}
+		else if (type.equals("select")) {
+			int selectEnd = StringBuilderUtils.indexOfIgnoreCase(html, "</select>", pointer);
+			if (selectEnd >= 0) {
+				int valueLoc = nextIndex(html, " value=" + output, " value=\"" + output, pointer);
+				if (valueLoc < 0 || valueLoc > selectEnd) return html;
+				pointer = nextSpot(html, valueLoc);
+				html = html.insert(pointer, " selected");
 			}
 		}
+		else {
+			int end_value, start_value;
+			start_value = html.indexOf("value=\"", pointer);
+			end_tag = html.indexOf(">", pointer);
+			String quote = output.contains("\"") ? "'" : "\"";
+
+			if(start_value > 0 && start_value < end_tag) {
+				end_value = html.indexOf("\"", start_value + 7 ) + 1;
+				log.debug(start_value);
+				log.debug(end_tag);
+				log.debug(end_value);
+				html.replace(start_value, end_value, "value="+quote+output+quote);
+			}
+			else {
+				start_value = html.indexOf(">", pointer);
+				html.insert(start_value, " value=" + quote + output + quote);
+				log.debug("insert: (" + pointer + ")' value=\""+output+"\"'");
+			}
+		}
+
 		return (html);
 	}
 

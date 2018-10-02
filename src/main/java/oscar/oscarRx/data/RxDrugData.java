@@ -30,7 +30,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.util.MiscUtils;
 
 import oscar.oscarRx.util.RxDrugRef;

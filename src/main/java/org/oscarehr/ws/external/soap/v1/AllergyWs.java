@@ -25,7 +25,7 @@
 package org.oscarehr.ws.external.soap.v1;
 
 import org.apache.cxf.annotations.GZIP;
-import org.oscarehr.common.model.Allergy;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.managers.AllergyManager;
 import org.oscarehr.ws.external.soap.v1.transfer.AllergyTransfer;
 import org.springframework.beans.factory.annotation.Autowired;

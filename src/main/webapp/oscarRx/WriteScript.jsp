@@ -1387,7 +1387,7 @@ int i;
                          <input type=button class="ControlPushButton" style="width:200px" onclick="javascript:addWarning();" value="FillWarning" /-->
 					<br>
 					<!-- peice Went Here --> <%//RxPatientData.Patient.Allergy[] allerg = (RxPatientData.Patient.Allergy[]) request.getAttribute("ALLERGIES");
-                          org.oscarehr.common.model.Allergy[] allerg = bean.getAllergyWarnings(loggedInInfo, atcCode);
+                          Allergy[] allerg = bean.getAllergyWarnings(loggedInInfo, atcCode);
                           if (allerg != null && allerg.length > 0){
                             for (int i = 0 ; i < allerg.length; i++){  %>
 					<div

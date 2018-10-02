@@ -29,59 +29,57 @@
  */
 
 package oscar.oscarMDS.pageUtil;
-import java.io.IOException;
-import java.util.ArrayList;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.common.model.Demographic;
-import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.oscarLab.ca.on.CommonLabResultData;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
 /**
  *
  * @author jackson
  */
-public class SendMostResponProvAction extends Action{
-        
-	private DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	
-        public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws ServletException, IOException {
+public class SendMostResponProvAction extends Action
+{
+	private final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private final DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
 
-        	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_lab", "w", null)) {
-    			throw new SecurityException("missing required security object (_lab)");
-    		}
-        	
-                String demoId=request.getParameter("demoId");
-                String docLabId=request.getParameter("docLabId");
-                String docLabType=request.getParameter("docLabType");
-                //MiscUtils.getLogger().info(demoId+"--"+docLabId+"--"+docLabType);
-                ArrayList listFlaggedLabs = new ArrayList();
-                if(demoId!=null && docLabId!=null && docLabType!=null){
-                    demoId=demoId.trim();
-                    Demographic demog=demographicManager.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), Integer.parseInt(demoId));
-                    String mrp=demog.getProviderNo();
-                    //MiscUtils.getLogger().info(mrp);
-                     String[] la =  new String[] {docLabId,docLabType};
-                      listFlaggedLabs.add(la);
-                      CommonLabResultData.updateLabRouting(listFlaggedLabs, mrp);
-                }else{
-                    //return error in json
-                }
-            return null;
-        }
+	public ActionForward execute(ActionMapping mapping,
+	                             ActionForm form,
+	                             HttpServletRequest request,
+	                             HttpServletResponse response)
+			throws ServletException, IOException
+	{
+
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		Integer demographicId = Integer.parseInt(request.getParameter("demoId").trim());
+		String docLabId = request.getParameter("docLabId");
+		String docLabType = request.getParameter("docLabType");
+
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, demographicId, "_lab");
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, demographicId, "_demographic");
+
+		Demographic demographic = demographicDao.find(demographicId);
+		String mrpNo = StringUtils.trimToNull(demographic.getProviderNo());
+
+		if(mrpNo != null)
+		{
+			ArrayList<String[]> listFlaggedLabs = new ArrayList<>(1);
+			listFlaggedLabs.add(new String[]{docLabId, docLabType});
+			CommonLabResultData.updateLabRouting(listFlaggedLabs, mrpNo);
+		}
+		return null;
+	}
 }
