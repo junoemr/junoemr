@@ -140,6 +140,48 @@ public class CaseManagementNote extends AbstractModel<Long>
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "note", cascade = CascadeType.ALL)
 	private List<CaseManagementNoteLink> noteLinkList;
 
+	public CaseManagementNote() {}
+
+	/** construct a copy of the given note */
+	public CaseManagementNote(CaseManagementNote noteToCopy)
+	{
+		this.noteId = null;
+		this.appointment = noteToCopy.appointment;
+		this.archived = noteToCopy.archived;
+		this.billingCode = noteToCopy.billingCode;
+		this.demographic = noteToCopy.demographic;
+		this.encounterType = noteToCopy.encounterType;
+		this.history = noteToCopy.history;
+		this.hourOfEncounterTime = noteToCopy.hourOfEncounterTime;
+		this.hourOfEncTransportationTime = noteToCopy.hourOfEncTransportationTime;
+		this.includeIssueInNote = noteToCopy.includeIssueInNote;
+		this.locked = noteToCopy.locked;
+		this.minuteOfEncounterTime = noteToCopy.minuteOfEncounterTime;
+		this.minuteOfEncTransportationTime = noteToCopy.minuteOfEncTransportationTime;
+		this.note = noteToCopy.note;
+		this.observationDate = noteToCopy.observationDate;
+		this.password = noteToCopy.password;
+		this.position = noteToCopy.position;
+		this.programNo = noteToCopy.programNo;
+		this.provider = noteToCopy.provider;
+		this.reporterCaisiRole = noteToCopy.reporterCaisiRole;
+		this.reporterProgramTeam = noteToCopy.reporterProgramTeam;
+		this.signed = noteToCopy.signed;
+		this.signingProvider = noteToCopy.signingProvider;
+		this.updateDate = noteToCopy.updateDate;
+		this.uuid = noteToCopy.uuid;
+
+		this.noteExtensionList = new ArrayList<>(noteToCopy.noteExtensionList.size());
+		for(CaseManagementNoteExt extToCopy : noteToCopy.noteExtensionList)
+		{
+			noteExtensionList.add(new CaseManagementNoteExt(extToCopy, this));
+		}
+		this.noteLinkList = new ArrayList<>(noteToCopy.noteLinkList.size());
+		for(CaseManagementNoteLink linkToCopy : noteToCopy.noteLinkList)
+		{
+			noteLinkList.add(new CaseManagementNoteLink(linkToCopy, this));
+		}
+	}
 
 	public Long getId()
 	{

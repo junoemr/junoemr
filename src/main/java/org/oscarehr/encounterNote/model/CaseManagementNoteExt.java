@@ -76,6 +76,23 @@ public class CaseManagementNoteExt extends AbstractModel<Long>
 	@JoinColumn(name = "note_id")
 	private CaseManagementNote note;
 
+	public CaseManagementNoteExt() {}
+
+	/** construct a copy of the given note */
+	public CaseManagementNoteExt(CaseManagementNoteExt extToCopy)
+	{
+		this(extToCopy, null);
+	}
+
+	public CaseManagementNoteExt(CaseManagementNoteExt extToCopy, CaseManagementNote referenceNote)
+	{
+		this.id = null;
+		this.note = referenceNote;
+		this.dateValue = extToCopy.dateValue;
+		this.key = extToCopy.key;
+		this.value = extToCopy.value;
+	}
+
 	@Override
 	public Long getId()
 	{

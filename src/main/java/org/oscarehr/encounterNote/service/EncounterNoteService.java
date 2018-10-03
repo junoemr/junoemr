@@ -37,7 +37,6 @@ import org.oscarehr.encounterNote.model.CaseManagementIssue;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
-import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.provider.dao.ProviderDataDao;
@@ -264,27 +263,14 @@ public class EncounterNoteService
 		return "0";
 	}
 
+	/**
+	 * create a new copy of the existing note, without an ID
+	 * @param noteId - id of the note to copy
+	 * @return a copy of the note
+	 */
 	public CaseManagementNote getNoteCopy(Long noteId)
 	{
-		// set all the relevant id's to null, making them detached objects. They will be persisted with new ID's if saved
 		CaseManagementNote noteToCopy = caseManagementNoteDao.find(noteId);
-		List<CaseManagementNoteExt> extList = noteToCopy.getNoteExtensionList();
-		List<CaseManagementNoteLink> linkList = noteToCopy.getNoteLinkList();
-
-		noteToCopy.setNoteId(null);
-
-		for(CaseManagementNoteExt ext : extList)
-		{
-			ext.setId(null);
-		}
-		noteToCopy.setNoteExtensionList(extList);
-
-		for(CaseManagementNoteLink link : linkList)
-		{
-			link.setId(null);
-		}
-		noteToCopy.setNoteLinkList(linkList);
-
-		return noteToCopy;
+		return new CaseManagementNote(noteToCopy);
 	}
 }
