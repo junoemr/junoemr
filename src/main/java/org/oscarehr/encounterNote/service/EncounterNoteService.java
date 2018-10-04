@@ -105,9 +105,32 @@ public class EncounterNoteService
 
 		if(issueList != null && !issueList.isEmpty())
 		{
-			//TODO merge/save issues as CaseManagementIssue models
-		}
+			for(Issue issue : issueList)
+			{
+				// if there exists a casemgmt_issue for the demographic, use that
+				// otherwise, create a new casemgmt_issue
+				CaseManagementIssue caseManagementIssue = caseManagementIssueDao.findByIssueId(issue.getId());
+				if(caseManagementIssue == null)
+				{
+					caseManagementIssue = new CaseManagementIssue();
+					caseManagementIssue.setAcute(false);
+					caseManagementIssue.setCertain(false);
+					caseManagementIssue.setMajor(false);
+					caseManagementIssue.setProgramId(programManager.getDefaultProgramId());
+					caseManagementIssue.setResolved(false);
+					caseManagementIssue.setIssue(issue);
+					caseManagementIssue.setType(issue.getRole());
+					caseManagementIssue.setDemographic(note.getDemographic());
+					caseManagementIssue.setUpdateDate(note.getUpdateDate());
 
+					caseManagementIssueDao.persist(caseManagementIssue);
+				}
+				// link the note and the issue
+				CaseManagementIssueNotePK caseManagementIssueNotePK = new CaseManagementIssueNotePK(caseManagementIssue, note);
+				CaseManagementIssueNote caseManagementIssueNote = new CaseManagementIssueNote(caseManagementIssueNotePK);
+				caseManagementIssueNoteDao.persist(caseManagementIssueNote);
+			}
+		}
 		return note;
 	}
 
@@ -126,6 +149,7 @@ public class EncounterNoteService
 
 		return note;
 	}
+
 	public CaseManagementNote saveDrugNote(CaseManagementNote note, Drug drug)
 	{
 		note.setIncludeIssueInNote(true);
@@ -141,7 +165,6 @@ public class EncounterNoteService
 
 		return note;
 	}
-
 
 	public CaseManagementNote saveMedicalHistoryNote(CaseManagementNote note)
 	{
@@ -190,13 +213,8 @@ public class EncounterNoteService
 		}
 
 		// link the note and the issue
-		CaseManagementIssueNotePK caseManagementIssueNotePK = new CaseManagementIssueNotePK();
-		caseManagementIssueNotePK.setCaseManagementIssue(caseManagementIssue);
-		caseManagementIssueNotePK.setCaseManagementNote(note);
-
-		CaseManagementIssueNote caseManagementIssueNote = new CaseManagementIssueNote();
-		caseManagementIssueNote.setId(caseManagementIssueNotePK);
-
+		CaseManagementIssueNotePK caseManagementIssueNotePK = new CaseManagementIssueNotePK(caseManagementIssue, note);
+		CaseManagementIssueNote caseManagementIssueNote = new CaseManagementIssueNote(caseManagementIssueNotePK);
 		caseManagementIssueNoteDao.persist(caseManagementIssueNote);
 		return note;
 	}
