@@ -24,6 +24,8 @@
 
 package oscar.oscarBilling.ca.bc.data;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -109,7 +111,26 @@ public class BillingHistoryDAO {
 		BillingHistory b = new BillingHistory();
 		b.setBillingMasterNo(history.getBillingMasterNo());
 		b.setStatus(history.getBillingStatus());
-		b.setCreationDate(new Date());
+
+		try
+		{
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+			if (history.getCreateDate() == null)
+			{
+				Date currentDate = new Date();
+				String currentDateString = dateFormat.format(currentDate);
+				Date currentDateFormatted = dateFormat.parse(currentDateString);
+				b.setCreationDate(currentDateFormatted);
+			} else
+			{
+				b.setCreationDate(dateFormat.parse(history.getCreateDate()));
+			}
+		} catch (ParseException e)
+		{
+			MiscUtils.getLogger().error("Error Parsing Payment Date: ", e);
+		}
+
 		b.setPractitionerNo(history.getPractitioner_no());
 		b.setBillingType(history.getBillingtype());
 		b.setSeqNum(history.getSeqNum());
@@ -179,7 +200,25 @@ public class BillingHistoryDAO {
 	}
 
 	/**
-	 * Creates a history archive initiialized with the supplied parameters
+	 * Creates a history archive initialized with the supplied parameters
+	 *
+	 * @param billingMasterNo int
+	 * @param amount double
+	 * @param paymentType int
+	 * @param paymentDate String
+	 */
+	public void createBillingHistoryArchiveWithDate(String billingMasterNo, double amount, String paymentType, String paymentDate) {
+		BillHistory item = this.getCurrentBillItemState(billingMasterNo);
+		if (item != null) {
+			item.setAmountReceived(amount);
+			item.setPaymentTypeId(paymentType);
+			item.setCreateDate(paymentDate);
+			this.createBillingHistoryArchive(item);
+		}
+	}
+
+	/**
+	 * Creates a history archive initialized with the supplied parameters
 	 *
 	 * @param billingMasterNo int
 	 * @param amount double

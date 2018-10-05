@@ -52,6 +52,8 @@ public class AppointmentDetails
 	private String firstName;
 	private String lastName;
 	private String ver;
+	private String hin;
+	private String chart_no;
 	private String rosterStatus;
 	private LocalDate hcRenewDate;
 	private String custNotes;
@@ -86,6 +88,8 @@ public class AppointmentDetails
 		String firstName,
 		String lastName,
 		String ver,
+		String hin,
+		String chart_no,
 		String rosterStatus,
 		LocalDate hcRenewDate,
 		String custNotes,
@@ -120,6 +124,8 @@ public class AppointmentDetails
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.ver = ver;
+		this.hin = hin;
+		this.chart_no = chart_no;
 		this.rosterStatus = rosterStatus;
 		this.hcRenewDate = hcRenewDate;
 		this.custNotes = custNotes;
@@ -288,5 +294,15 @@ public class AppointmentDetails
 	public String getTicklerMessages()
 	{
 		return ticklerMessages;
+	}
+
+	public String getHin()
+	{
+		return hin;
+	}
+
+	public String getChart_no()
+	{
+		return chart_no;
 	}
 }
