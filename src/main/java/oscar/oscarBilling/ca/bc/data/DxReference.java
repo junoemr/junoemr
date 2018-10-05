@@ -110,7 +110,7 @@ public class DxReference {
     private void fillDxCodeDescrition(DxCode code){
 
          List<DiagnosticCode> dxCodeList = diagnosticCodeDao.getByDxCode(code.getDx());
-         if(dxCodeList.size() != 0)
+         if(!dxCodeList.isEmpty())
          {
              DiagnosticCode bdc = dxCodeList.get(0);
              code.setDesc(bdc.getDescription());
