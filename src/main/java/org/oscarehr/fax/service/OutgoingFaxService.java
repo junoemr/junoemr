@@ -28,13 +28,13 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.fax.dao.FaxConfigDao;
+import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxJobDao;
 import org.oscarehr.fax.exception.FaxApiException;
 import org.oscarehr.fax.exception.FaxNumberException;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
-import org.oscarehr.fax.model.FaxConfig;
+import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxJob;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,19 +65,19 @@ public class OutgoingFaxService
 	FaxJobDao faxJobDao;
 
 	@Autowired
-	FaxConfigDao faxConfigDao;
+	FaxAccountDao faxAccountDao;
 
 	public void sendFax(String providerId, Integer demographicId, String faxNumber, GenericFile...filesToFax) throws IOException
 	{
 
-		List<FaxConfig> faxConfigList = faxConfigDao.findByActiveOutbound(true, true, 0, 1);
-		if(faxConfigList.isEmpty())
+		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveOutbound(true, true, 0, 1);
+		if(faxAccountList.isEmpty())
 		{
 			writeToFaxOutgoing(faxNumber, filesToFax);
 		}
 		else
 		{
-			FaxConfig faxSettings = faxConfigList.get(0); //TODO determine which fax route to use
+			FaxAccount faxSettings = faxAccountList.get(0); //TODO determine which fax route to use
 			sendBySRFax(providerId, demographicId, faxSettings, faxNumber, filesToFax);
 		}
 	}
@@ -98,9 +98,9 @@ public class OutgoingFaxService
 		}
 	}
 
-	private void sendBySRFax(String providerId, Integer demographicId, FaxConfig faxSettings, String faxNumber, GenericFile...filesToFax) throws IOException
+	private void sendBySRFax(String providerId, Integer demographicId, FaxAccount faxSettings, String faxNumber, GenericFile...filesToFax) throws IOException
 	{
-		SRFaxApiConnector apiConnector = new SRFaxApiConnector(faxSettings.getFaxUser(), faxSettings.getFaxPasswd());
+		SRFaxApiConnector apiConnector = new SRFaxApiConnector(faxSettings.getLoginId(), faxSettings.getLoginPassword());
 
 		String coverLetterOption = faxSettings.getCoverLetterOption();
 		if(coverLetterOption == null || !SRFaxApiConnector.validCoverLetterNames.contains(coverLetterOption))
@@ -116,8 +116,8 @@ public class OutgoingFaxService
 
 		// external api call
 		SingleWrapper<Integer> resultWrapper = apiConnector.Queue_Fax(
-				faxSettings.getFaxNumber(),
-				faxSettings.getSiteUser(),
+				faxSettings.getReplyFaxNumber(),
+				faxSettings.getLoginId(),
 				"SINGLE",
 				faxNumber,
 				fileMap,
@@ -156,7 +156,7 @@ public class OutgoingFaxService
 			faxJob.setDestination(faxNumber);
 			faxJob.setFax_line(TYPE_SRFAX);
 			faxJob.setFile_name(fileToFax.getName());
-			faxJob.setUser(faxSettings.getFaxUser());
+			faxJob.setUser(faxSettings.getLoginId());
 			faxJob.setNumPages(fileToFax.getPageCount());
 			faxJob.setStamp(new Date());
 			faxJob.setProviderNo(providerId);

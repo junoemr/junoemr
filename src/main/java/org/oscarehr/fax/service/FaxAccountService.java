@@ -38,9 +38,9 @@ import java.time.format.DateTimeFormatter;
  */
 @Service
 @Transactional
-public class FaxConfigService
+public class FaxAccountService
 {
-	private static final Logger logger = Logger.getLogger(FaxConfigService.class);
+	private static final Logger logger = Logger.getLogger(FaxAccountService.class);
 
 	/**
 	 * Test the connection to the fax service based on the configuration settings

@@ -40,8 +40,8 @@ import org.oscarehr.consultations.ConsultationRequestSearchFilter;
 import org.oscarehr.consultations.ConsultationResponseSearchFilter;
 import org.oscarehr.consultations.service.ConsultationService;
 import org.oscarehr.eform.model.EFormData;
-import org.oscarehr.fax.dao.FaxConfigDao;
-import org.oscarehr.fax.model.FaxConfig;
+import org.oscarehr.fax.dao.FaxAccountDao;
+import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.managers.ConsultationManager;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.SpringUtils;
@@ -101,7 +101,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	private ProviderDao providerDao;
 	
 	@Autowired
-	private FaxConfigDao faxConfigDao;
+	private FaxAccountDao faxAccountDao;
 	
 	@Autowired
 	private ConsultationServiceDao consultationServiceDao;
@@ -521,12 +521,12 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	private List<FaxConfigTo1> getFaxList()
 	{
 		List<FaxConfigTo1> faxList = new ArrayList<FaxConfigTo1>();
-		List<FaxConfig> faxConfigList = faxConfigDao.findAll(null, null);
-		for (FaxConfig faxConfig : faxConfigList) {
+		List<FaxAccount> faxAccountList = faxAccountDao.findAll(null, null);
+		for (FaxAccount faxAccount : faxAccountList) {
 			FaxConfigTo1 faxConfigTo1 = new FaxConfigTo1();
 			faxList.add(faxConfigTo1);
-			faxConfigTo1.setFaxUser(faxConfig.getFaxUser());
-			faxConfigTo1.setFaxNumber(faxConfig.getFaxNumber());
+			faxConfigTo1.setFaxUser(faxAccount.getLoginId());
+			faxConfigTo1.setFaxNumber(faxAccount.getReplyFaxNumber());
 		}
 		return faxList;
 	}

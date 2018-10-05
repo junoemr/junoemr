@@ -22,7 +22,7 @@
  */
 package org.oscarehr.ws.rest.conversion;
 
-import org.oscarehr.fax.model.FaxConfig;
+import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferInbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferOutbound;
 
@@ -31,40 +31,40 @@ import java.util.List;
 
 public class FaxSettingsConverter
 {
-	public static FaxConfig getAsDomainObject(FaxSettingsTransferInbound transfer)
+	public static FaxAccount getAsDomainObject(FaxSettingsTransferInbound transfer)
 	{
-		FaxConfig config = new FaxConfig();
-		config.setActive(transfer.isEnabled());
-		config.setFaxPasswd(transfer.getPassword());
-		config.setFaxUser(transfer.getAccountLogin());
-		config.setActiveInbound(transfer.isEnableInbound());
-		config.setActiveOutbound(transfer.isEnableOutbound());
+		FaxAccount config = new FaxAccount();
+		config.setIntegrationEnabled(transfer.isEnabled());
+		config.setLoginPassword(transfer.getPassword());
+		config.setLoginId(transfer.getAccountLogin());
+		config.setInboundEnabled(transfer.isEnableInbound());
+		config.setOutboundEnabled(transfer.isEnableOutbound());
 		config.setDisplayName(transfer.getDisplayName());
 		config.setCoverLetterOption(transfer.getCoverLetterOption());
-		config.setSiteUser(transfer.getAccountEmail());
-		config.setFaxNumber(transfer.getFaxNumber());
+		config.setEmail(transfer.getAccountEmail());
+		config.setReplyFaxNumber(transfer.getFaxNumber());
 		return config;
 	}
 
-	public static FaxSettingsTransferOutbound getAsOutboundTransferObject(FaxConfig config)
+	public static FaxSettingsTransferOutbound getAsOutboundTransferObject(FaxAccount config)
 	{
 		FaxSettingsTransferOutbound transfer = new FaxSettingsTransferOutbound();
 		transfer.setId(config.getId());
-		transfer.setAccountLogin(config.getFaxUser());
-		transfer.setEnabled(config.isActive());
-		transfer.setEnableInbound(config.isActiveInbound());
-		transfer.setEnableOutbound(config.isActiveOutbound());
+		transfer.setAccountLogin(config.getLoginId());
+		transfer.setEnabled(config.isIntegrationEnabled());
+		transfer.setEnableInbound(config.isInboundEnabled());
+		transfer.setEnableOutbound(config.isOutoundEnabled());
 		transfer.setDisplayName(config.getDisplayName());
 		transfer.setCoverLetterOption(config.getCoverLetterOption());
-		transfer.setFaxNumber(config.getFaxNumber());
-		transfer.setAccountEmail(config.getSiteUser());
+		transfer.setFaxNumber(config.getReplyFaxNumber());
+		transfer.setAccountEmail(config.getEmail());
 		return transfer;
 	}
 
-	public static List<FaxSettingsTransferOutbound> getAllAsOutboundTransferObject(List<FaxConfig> configList)
+	public static List<FaxSettingsTransferOutbound> getAllAsOutboundTransferObject(List<FaxAccount> configList)
 	{
 		List<FaxSettingsTransferOutbound> transferList = new ArrayList<>(configList.size());
-		for(FaxConfig config : configList)
+		for(FaxAccount config : configList)
 		{
 			transferList.add(getAsOutboundTransferObject(config));
 		}

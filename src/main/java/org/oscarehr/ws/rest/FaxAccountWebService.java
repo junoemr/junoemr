@@ -23,9 +23,9 @@
 package org.oscarehr.ws.rest;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.fax.dao.FaxConfigDao;
-import org.oscarehr.fax.model.FaxConfig;
-import org.oscarehr.fax.service.FaxConfigService;
+import org.oscarehr.fax.dao.FaxAccountDao;
+import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.service.FaxAccountService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.conversion.FaxSettingsConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -47,20 +47,20 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
-@Path("/faxConfig")
-@Component("FaxConfigWebService")
-public class FaxConfigWebService extends AbstractServiceImpl
+@Path("/faxAccount")
+@Component("FaxAccountWebService")
+public class FaxAccountWebService extends AbstractServiceImpl
 {
-	private static Logger logger = Logger.getLogger(FaxConfigWebService.class);
+	private static Logger logger = Logger.getLogger(FaxAccountWebService.class);
 
 	@Autowired
 	SecurityInfoManager securityInfoManager;
 
 	@Autowired
-	FaxConfigDao faxConfigDao;
+	FaxAccountDao faxAccountDao;
 
 	@Autowired
-	FaxConfigService faxConfigService;
+	FaxAccountService faxAccountService;
 
 	@GET
 	@Path("/search")
@@ -79,7 +79,7 @@ public class FaxConfigWebService extends AbstractServiceImpl
 		perPage = limitedResultCount(perPage);
 		int offset = calculatedOffset(page, perPage);
 
-		List<FaxConfig> configList = faxConfigDao.findAll(offset, perPage);
+		List<FaxAccount> configList = faxAccountDao.findAll(offset, perPage);
 
 		return RestSearchResponse.successResponse(FaxSettingsConverter.getAllAsOutboundTransferObject(configList), page, perPage, -1);
 	}
@@ -87,24 +87,24 @@ public class FaxConfigWebService extends AbstractServiceImpl
 	@GET
 	@Path("/{id}/enabled")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> isEnabled(@PathParam("id") Integer id)
+	public RestResponse<Boolean> isEnabled(@PathParam("id") Long id)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
 
-		FaxConfig config = faxConfigDao.find(id);
-		return RestResponse.successResponse(config.isActive());
+		FaxAccount config = faxAccountDao.find(id);
+		return RestResponse.successResponse(config.isIntegrationEnabled());
 	}
 
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<FaxSettingsTransferOutbound> getAccountSettings(@PathParam("id") Integer id)
+	public RestResponse<FaxSettingsTransferOutbound> getAccountSettings(@PathParam("id") Long id)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
 
-		FaxSettingsTransferOutbound accountSettingsTo1 = FaxSettingsConverter.getAsOutboundTransferObject(faxConfigDao.find(id));
+		FaxSettingsTransferOutbound accountSettingsTo1 = FaxSettingsConverter.getAsOutboundTransferObject(faxAccountDao.find(id));
 		return RestResponse.successResponse(accountSettingsTo1);
 	}
 
@@ -117,8 +117,8 @@ public class FaxConfigWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin");
 
-		FaxConfig config = FaxSettingsConverter.getAsDomainObject(accountSettingsTo1);
-		faxConfigDao.persist(config);
+		FaxAccount config = FaxSettingsConverter.getAsDomainObject(accountSettingsTo1);
+		faxAccountDao.persist(config);
 
 		return RestResponse.successResponse(FaxSettingsConverter.getAsOutboundTransferObject(config));
 	}
@@ -127,13 +127,13 @@ public class FaxConfigWebService extends AbstractServiceImpl
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<FaxSettingsTransferOutbound> updateAccountSettings(@PathParam("id") Integer id,
+	public RestResponse<FaxSettingsTransferOutbound> updateAccountSettings(@PathParam("id") Long id,
 	                                                                       FaxSettingsTransferInbound accountSettingsTo1)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin");
 
-		FaxConfig config = faxConfigDao.find(id);
+		FaxAccount config = faxAccountDao.find(id);
 		if(config == null)
 		{
 			throw new RuntimeException("Invalid Fax Config Id: " + id);
@@ -142,11 +142,11 @@ public class FaxConfigWebService extends AbstractServiceImpl
 		// keep current password if a new one is not set
 		if(accountSettingsTo1.getPassword() == null || accountSettingsTo1.getPassword().trim().isEmpty())
 		{
-			accountSettingsTo1.setPassword(config.getFaxPasswd());
+			accountSettingsTo1.setPassword(config.getLoginPassword());
 		}
 		config = FaxSettingsConverter.getAsDomainObject(accountSettingsTo1);
 		config.setId(id);
-		faxConfigDao.merge(config);
+		faxAccountDao.merge(config);
 
 		return RestResponse.successResponse(FaxSettingsConverter.getAsOutboundTransferObject(config));
 	}
@@ -160,14 +160,14 @@ public class FaxConfigWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
 
-		boolean success = faxConfigService.testConnectionStatus(accountSettingsTo1.getAccountLogin(), accountSettingsTo1.getPassword());
+		boolean success = faxAccountService.testConnectionStatus(accountSettingsTo1.getAccountLogin(), accountSettingsTo1.getPassword());
 		return RestResponse.successResponse(success);
 	}
 	@POST
 	@Path("/{id}/testConnection")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> testConnection(@PathParam("id") Integer id,
+	public RestResponse<Boolean> testConnection(@PathParam("id") Long id,
 	                                            FaxSettingsTransferInbound accountSettingsTo1)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
@@ -178,10 +178,10 @@ public class FaxConfigWebService extends AbstractServiceImpl
 		String username = accountSettingsTo1.getAccountLogin();
 		if(password == null || password.isEmpty())
 		{
-			FaxConfig config = faxConfigDao.find(id);
-			password = config.getFaxPasswd();
+			FaxAccount config = faxAccountDao.find(id);
+			password = config.getLoginPassword();
 		}
-		boolean success = faxConfigService.testConnectionStatus(username, password);
+		boolean success = faxAccountService.testConnectionStatus(username, password);
 		return RestResponse.successResponse(success);
 	}
 }

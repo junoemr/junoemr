@@ -24,46 +24,38 @@
 package org.oscarehr.fax.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.fax.model.FaxConfig;
+import org.oscarehr.fax.model.FaxAccount;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
 import java.util.List;
 
 @Repository
-public class FaxConfigDao extends AbstractDao<FaxConfig>
+public class FaxAccountDao extends AbstractDao<FaxAccount>
 {
-	public FaxConfigDao()
+	public FaxAccountDao()
 	{
-		super(FaxConfig.class);
+		super(FaxAccount.class);
 	}
 
-	public FaxConfig getConfigByNumber(String number)
+	public List<FaxAccount> findByActiveStatus(boolean enabled, int offset, int limit)
 	{
-		Query query = entityManager.createQuery("select config from FaxConfig config where config.faxNumber = :number");
-		query.setParameter("number", number);
-
-		return getSingleResultOrNull(query);
-	}
-
-	public List<FaxConfig> findByActiveStatus(boolean isActive, int offset, int limit)
-	{
-		Query query = entityManager.createQuery("SELECT config FROM FaxConfig config WHERE config.active = :active");
-		query.setParameter("active", isActive);
+		Query query = entityManager.createQuery("SELECT config FROM FaxAccount config WHERE config.integrationEnabled = :enabled");
+		query.setParameter("enabled", enabled);
 		query.setMaxResults(limit);
 		query.setFirstResult(offset);
 
 		return query.getResultList();
 	}
 
-	public List<FaxConfig> findByActiveInbound(boolean isActive, boolean activeInbound, int offset, int limit)
+	public List<FaxAccount> findByActiveInbound(boolean enabled, boolean activeInbound, int offset, int limit)
 	{
 		Query query = entityManager.createQuery(
-				"SELECT config FROM FaxConfig config " +
-				"WHERE config.active = :active " +
-				"AND config.activeInbound = :activeInbound"
+				"SELECT config FROM FaxAccount config " +
+				"WHERE config.integrationEnabled = :enabled " +
+				"AND config.inboundEnabled = :activeInbound"
 		);
-		query.setParameter("active", isActive);
+		query.setParameter("enabled", enabled);
 		query.setParameter("activeInbound", activeInbound);
 		query.setMaxResults(limit);
 		query.setFirstResult(offset);
@@ -71,14 +63,14 @@ public class FaxConfigDao extends AbstractDao<FaxConfig>
 		return query.getResultList();
 	}
 
-	public List<FaxConfig> findByActiveOutbound(boolean isActive, boolean activeOutbound, int offset, int limit)
+	public List<FaxAccount> findByActiveOutbound(boolean enabled, boolean activeOutbound, int offset, int limit)
 	{
 		Query query = entityManager.createQuery(
-				"SELECT config FROM FaxConfig config " +
-						"WHERE config.active = :active " +
-						"AND config.activeOutbound = :activeOutbound"
+				"SELECT config FROM FaxAccount config " +
+						"WHERE config.integrationEnabled = :enabled " +
+						"AND config.outboundEnabled = :activeOutbound"
 		);
-		query.setParameter("active", isActive);
+		query.setParameter("enabled", enabled);
 		query.setParameter("activeOutbound", activeOutbound);
 		query.setMaxResults(limit);
 		query.setFirstResult(offset);

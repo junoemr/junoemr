@@ -23,7 +23,7 @@
     Ontario, Canada
 
 --%>
-<%@ page import="org.oscarehr.fax.dao.FaxConfigDao, org.oscarehr.common.dao.OscarAppointmentDao,org.oscarehr.common.dao.SiteDao, org.oscarehr.common.model.Appointment, org.oscarehr.fax.model.FaxConfig"%>
+<%@ page import="org.oscarehr.fax.dao.FaxAccountDao, org.oscarehr.common.dao.OscarAppointmentDao,org.oscarehr.common.dao.SiteDao, org.oscarehr.common.model.Appointment, org.oscarehr.fax.model.FaxAccount"%>
 <%@ page import="org.oscarehr.common.model.PharmacyInfo" %>
 <%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet" %>
@@ -667,8 +667,8 @@ function toggleView(form) {
 					</tr>
 					<% if (OscarProperties.getInstance().isRxFaxEnabled()) {
 							boolean hasFaxNumber = (pharmacy != null) && (pharmacy.getFax().trim().length() > 0);
-					    	FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
-					    	List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
+					    	FaxAccountDao faxAccountDao = SpringUtils.getBean(FaxAccountDao.class);
+					    	List<FaxAccount> faxAccounts = faxAccountDao.findAll(null, null);
 
                         // enable the fax button if there is a pre-set signature for the creator of the prescription or the logged in user
 					    String disabled = "disabled";

@@ -32,7 +32,7 @@ angular.module("Common.Services").service("faxConfigService", [
 	{
 		var service = {};
 
-		service.apiPath = '../ws/rs/faxConfig';
+		service.apiPath = '../ws/rs/faxAccount';
 
 		service.listAccounts = function listAccounts(page, perPage)
 		{
