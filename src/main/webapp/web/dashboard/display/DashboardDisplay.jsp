@@ -144,7 +144,7 @@
 <!-- end container -->
 
 
-<%-- COMMENTING OUT NON-TEMPLATE CODE, SHOULD BE REMOVED
+<%-- COMMENTING OUT NON-TEMPLATE CODE, SHOULD BE REMOVED --%>
 </body>
 </html>
---%>
+<%-- --%>git
