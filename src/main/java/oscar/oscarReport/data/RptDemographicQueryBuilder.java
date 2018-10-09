@@ -245,6 +245,36 @@ public class RptDemographicQueryBuilder {
 			}
 			theFirstFlag = 1;
 			break;
+		case 5:
+			whereClause();
+
+			if (!ageStyle.equals("2"))
+			{
+				MiscUtils.getLogger().debug("VERIFYING INT" + startYear);
+				//check to see if its a number
+				if (verifyInt(startYear))
+				{
+					stringBuffer.append(" ( ( YEAR(" + asofDate + ") -YEAR (DATE_FORMAT(CONCAT((d.year_of_birth), '-', (d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d'))) - (RIGHT(" + asofDate + ",5)<=RIGHT(DATE_FORMAT(CONCAT((d.year_of_birth),'-',(d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d'),5)) >=  " + startYear + " ) ");
+				} else
+				{
+					String interval = getInterval(startYear);
+					stringBuffer.append(" ( date_sub(" + asofDate + ",interval " + interval + ") >= DATE_FORMAT(CONCAT((d.year_of_birth),'-',(d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d')   ) ");
+				}
+				stringBuffer.append(" and ");
+				if (verifyInt(endYear))
+				{
+					stringBuffer.append(" ( ( YEAR(" + asofDate + ") -YEAR (DATE_FORMAT(CONCAT((d.year_of_birth), '-', (d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d'))) - (RIGHT(" + asofDate + ",5)<=RIGHT(DATE_FORMAT(CONCAT((d.year_of_birth),'-',(d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d'),5)) <=  " + endYear + "  ) ");
+				} else
+				{
+					String interval = getInterval(endYear);
+					stringBuffer.append(" ( date_sub(" + asofDate + ",interval " + interval + ") <= DATE_FORMAT(CONCAT((d.year_of_birth),'-',(d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d')   ) ");
+				}
+			} else
+			{
+				stringBuffer.append(" ( YEAR(" + asofDate + ") - d.year_of_birth >= " + startYear + "  and YEAR(" + asofDate + ") - d.year_of_birth <= " + endYear + "  ) ");
+			}
+			theFirstFlag = 1;
+			break;
 		}
 
 		if (rosterStatus != null) {
