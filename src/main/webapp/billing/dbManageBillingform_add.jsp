@@ -50,19 +50,25 @@ group3 = request.getParameter("group3");
 %>
 
 <%
-if (type.compareTo("") == 0 || group1.compareTo("") == 0 || group2.compareTo("") == 0 || group3.compareTo("") == 0) {
- String errormsg = "Error: Type Description, Groups Descrption  must be entered.";
+if (typeid.compareTo("") == 0)
+{
+	response.sendRedirect("manageBillingform.jsp?billingform=000&noTypeId=true");
 
-%>
-<jsp:forward page='../dms/errorpage.jsp'>
-	<jsp:param name="msg" value='<%=errormsg%>' />
-	<jsp:param name="type" value='<%=type%>' />
-	<jsp:param name="typeid" value='<%=typeid%>' />
-	<jsp:param name="group1" value='<%=group1%>' />
-	<jsp:param name="group2" value='<%=group2%>' />
-	<jsp:param name="group2" value='<%=group3%>' />
-</jsp:forward>
-<%
+} else if (type.compareTo("") == 0)
+{
+	response.sendRedirect("manageBillingform.jsp?billingform=000&noType=true");
+
+} else if (group1.compareTo("") == 0)
+{
+	response.sendRedirect("manageBillingform.jsp?billingform=000&noGroup1=true");
+
+} else if (group2.compareTo("") == 0)
+{
+	response.sendRedirect("manageBillingform.jsp?billingform=000&noGroup2=true");
+
+} else if (group3.compareTo("") == 0)
+{
+	response.sendRedirect("manageBillingform.jsp?billingform=000&noGroup3=true");
 
 }
 else {
