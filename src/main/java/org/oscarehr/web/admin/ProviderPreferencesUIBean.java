@@ -140,14 +140,16 @@ public final class ProviderPreferencesUIBean {
 			}
 		}
 
-		// get eForms for appointment screen
+		// Regenerate the list of e-forms to show on the appointment screen.
 		String[] formIds = request.getParameterValues("eformId");
 		Collection<Integer> eFormsIdsList = providerPreference.getAppointmentScreenEForms();		
-		
 
-		if( formIds != null ) {
-			eFormsIdsList.clear();
-			for (String formId : formIds) {
+		eFormsIdsList.clear();
+
+		if (formIds != null)
+		{
+			for (String formId : formIds)
+			{
 				eFormsIdsList.add(Integer.parseInt(formId));
 			}
 		}
