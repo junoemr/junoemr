@@ -39,7 +39,7 @@ public class GetFaxOutboxResult
 	@JsonProperty("EpochTime")
 	private String epochTime;
 	@JsonProperty("ToFaxNumber")
-	private String callerId;
+	private String toFaxNumber;
 	@JsonProperty("Pages")
 	private String pages;
 	@JsonProperty("Duration")
@@ -110,14 +110,14 @@ public class GetFaxOutboxResult
 		this.epochTime = epochTime;
 	}
 
-	public String getCallerId()
+	public String getToFaxNumber()
 	{
-		return callerId;
+		return toFaxNumber;
 	}
 
-	public void setCallerId(String callerId)
+	public void setToFaxNumber(String toFaxNumber)
 	{
-		this.callerId = callerId;
+		this.toFaxNumber = toFaxNumber;
 	}
 
 	public String getPages()

@@ -145,6 +145,52 @@ angular.module("Common.Services").service("faxAccountService", [
 			return deferred.promise;
 		};
 
+		service.getInbox = function testConnection(accountId, page, perPage)
+		{
+			var deferred = $q.defer();
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			config.param = {
+				page: page,
+				perPage: perPage
+			};
+
+			junoHttp.get(service.apiPath + '/' + accountId + '/getInbox', config).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("faxService::getInbox error", error);
+					deferred.reject("An error occurred while retrieving inbox data");
+				});
+
+			return deferred.promise;
+		};
+
+		service.getOutbox = function testConnection(accountId, page, perPage)
+		{
+			var deferred = $q.defer();
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			config.param = {
+				page: page,
+				perPage: perPage
+			};
+
+			junoHttp.get(service.apiPath + '/' + accountId + '/getOutbox', config).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("faxService::getOutbox error", error);
+					deferred.reject("An error occurred while retrieving outbox data");
+				});
+
+			return deferred.promise;
+		};
+
 		return service;
 	}
 ]);

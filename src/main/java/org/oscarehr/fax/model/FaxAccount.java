@@ -43,6 +43,8 @@ import java.util.Date;
 public class FaxAccount extends AbstractModel<Long>
 {
 	private static final long serialVersionUID = 1L;
+
+	public static final String INTEGRATION_TYPE_SRFAX = "SRFAX";
 	
 	@Id
 	@Column(name="id")

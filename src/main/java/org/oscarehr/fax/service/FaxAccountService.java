@@ -24,14 +24,20 @@ package org.oscarehr.fax.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.fax.exception.FaxApiException;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
+import org.oscarehr.fax.externalApi.srfax.result.GetFaxOutboxResult;
 import org.oscarehr.fax.externalApi.srfax.result.GetUsageResult;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
+import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This service should be responsible for handling all logic around fax setup and configuration
@@ -62,7 +68,7 @@ public class FaxAccountService
 
 		ListWrapper<GetUsageResult> result = apiConnector.Get_Fax_Usage(
 				SRFaxApiConnector.RESPONSE_FORMAT_JSON,
-				"RANGE",
+				SRFaxApiConnector.PERIOD_RANGE,
 				currentDateStr,
 				currentDateStr,
 				null);
@@ -70,5 +76,42 @@ public class FaxAccountService
 		logger.info(String.valueOf(result));
 
 		return (result != null && result.isSuccess());
+	}
+
+	public List<FaxOutboxTransferOutbound> getOutboxResults(FaxAccount faxAccount, LocalDate startDate, LocalDate endDate)
+	{
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+		SRFaxApiConnector apiConnector = new SRFaxApiConnector(faxAccount.getLoginId(), faxAccount.getLoginPassword());
+		ListWrapper<GetFaxOutboxResult> resultList = apiConnector.Get_Fax_Outbox(
+				SRFaxApiConnector.RESPONSE_FORMAT_JSON,
+				SRFaxApiConnector.PERIOD_RANGE,
+				startDate.format(formatter),
+				endDate.format(formatter),
+				null
+		);
+
+		ArrayList<FaxOutboxTransferOutbound> transferList;
+		if(resultList.isSuccess())
+		{
+			transferList = new ArrayList<>(resultList.getResult().size());
+			for(GetFaxOutboxResult result : resultList.getResult())
+			{
+				FaxOutboxTransferOutbound transfer = new FaxOutboxTransferOutbound();
+				transfer.setFaxAccountId(faxAccount.getId());
+				transfer.setFileName(result.getFileName());
+				transfer.setSubject(result.getSubject());
+				transfer.setDateQueued(result.getDateQueued());
+				transfer.setDateSent(result.getDateSent());
+				transfer.setSentStatus(result.getSentStatus());
+				transfer.setToFaxNumber(result.getToFaxNumber());
+				transferList.add(transfer);
+			}
+		}
+		else
+		{
+			throw new FaxApiException("Fax API Error:" + resultList.getError());
+		}
+		return transferList;
 	}
 }

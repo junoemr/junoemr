@@ -108,6 +108,10 @@ public class SRFaxApiConnector
 
 	public static final String RESPONSE_FORMAT_JSON = "JSON";
 	public static final String RESPONSE_FORMAT_XML = "XML";
+	public static final String PERIOD_ALL = "ALL";
+	public static final String PERIOD_RANGE = "RANGE";
+	public static final String FAX_TYPE_SINGLE = "SINGLE";
+	public static final String FAX_TYPE_BROADCAST = "BROADCAST";
 	public static final List<String> validCoverLetterNames = new ArrayList<String>(4) {{
 		add("Basic");
 		add("Standard");
@@ -244,7 +248,7 @@ public class SRFaxApiConnector
 	}
 	public ListWrapper<GetFaxOutboxResult> Get_Fax_Outbox(String sResponseFormat, String sPeriod,
 	                                                     String sStartDate, String sEndDate,
-	                                                     String sIncludeSubUsers, String sFaxDetailsID)
+	                                                     String sIncludeSubUsers)
 	{
 		Map<String, String> parameters = new HashMap<>();
 		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
@@ -252,7 +256,6 @@ public class SRFaxApiConnector
 		putIfPresent(parameters, S_START_DATE, sStartDate);
 		putIfPresent(parameters, S_END_DATE, sEndDate);
 		putIfPresent(parameters, S_INCLUDE_SUB_USERS, sIncludeSubUsers);
-		putIfPresent(parameters, S_FAX_DETAILS_ID, sFaxDetailsID);
 		return Get_Fax_Outbox(parameters);
 	}
 

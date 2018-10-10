@@ -30,10 +30,12 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.conversion.FaxSettingsConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
+import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferInbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -45,6 +47,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.time.LocalDate;
 import java.util.List;
 
 @Path("/faxAccount")
@@ -79,9 +82,10 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		perPage = limitedResultCount(perPage);
 		int offset = calculatedOffset(page, perPage);
 
-		List<FaxAccount> configList = faxAccountDao.findAll(offset, perPage);
+		List<FaxAccount> accountList = faxAccountDao.findAll(offset, perPage);
 
-		return RestSearchResponse.successResponse(FaxSettingsConverter.getAllAsOutboundTransferObject(configList), page, perPage, -1);
+		//TODO get total result count correctly
+		return RestSearchResponse.successResponse(FaxSettingsConverter.getAllAsOutboundTransferObject(accountList), page, perPage, -1);
 	}
 
 	@GET
@@ -92,8 +96,8 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
 
-		FaxAccount config = faxAccountDao.find(id);
-		return RestResponse.successResponse(config.isIntegrationEnabled());
+		FaxAccount faxSettings = faxAccountDao.find(id);
+		return RestResponse.successResponse(faxSettings.isIntegrationEnabled());
 	}
 
 	@GET
@@ -117,10 +121,11 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin");
 
-		FaxAccount config = FaxSettingsConverter.getAsDomainObject(accountSettingsTo1);
-		faxAccountDao.persist(config);
+		FaxAccount faxAccount = FaxSettingsConverter.getAsDomainObject(accountSettingsTo1);
+		faxAccount.setIntegrationType(FaxAccount.INTEGRATION_TYPE_SRFAX);// hardcoded until more than one type exists
+		faxAccountDao.persist(faxAccount);
 
-		return RestResponse.successResponse(FaxSettingsConverter.getAsOutboundTransferObject(config));
+		return RestResponse.successResponse(FaxSettingsConverter.getAsOutboundTransferObject(faxAccount));
 	}
 
 	@PUT
@@ -133,8 +138,8 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin");
 
-		FaxAccount config = faxAccountDao.find(id);
-		if(config == null)
+		FaxAccount faxAccount = faxAccountDao.find(id);
+		if(faxAccount == null)
 		{
 			throw new RuntimeException("Invalid Fax Config Id: " + id);
 		}
@@ -142,13 +147,13 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		// keep current password if a new one is not set
 		if(accountSettingsTo1.getPassword() == null || accountSettingsTo1.getPassword().trim().isEmpty())
 		{
-			accountSettingsTo1.setPassword(config.getLoginPassword());
+			accountSettingsTo1.setPassword(faxAccount.getLoginPassword());
 		}
-		config = FaxSettingsConverter.getAsDomainObject(accountSettingsTo1);
-		config.setId(id);
-		faxAccountDao.merge(config);
+		faxAccount = FaxSettingsConverter.getAsDomainObject(accountSettingsTo1);
+		faxAccount.setId(id);
+		faxAccountDao.merge(faxAccount);
 
-		return RestResponse.successResponse(FaxSettingsConverter.getAsOutboundTransferObject(config));
+		return RestResponse.successResponse(FaxSettingsConverter.getAsOutboundTransferObject(faxAccount));
 	}
 
 	@POST
@@ -178,10 +183,51 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		String username = accountSettingsTo1.getAccountLogin();
 		if(password == null || password.isEmpty())
 		{
-			FaxAccount config = faxAccountDao.find(id);
-			password = config.getLoginPassword();
+			FaxAccount faxAccount = faxAccountDao.find(id);
+			password = faxAccount.getLoginPassword();
 		}
 		boolean success = faxAccountService.testConnectionStatus(username, password);
 		return RestResponse.successResponse(success);
+	}
+
+	@GET
+	@Path("/{id}/getInbox")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> getInbox(@PathParam("id") Long id)
+	{
+		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
+		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin", "_admin.fax");
+		return RestResponse.successResponse(false);
+	}
+
+	@GET
+	@Path("/{id}/getOutbox")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestSearchResponse<FaxOutboxTransferOutbound> getOutbox(@PathParam("id") Long id,
+	                                                               @QueryParam("page") @DefaultValue("1") Integer page,
+	                                                               @QueryParam("perPage") @DefaultValue("10") Integer perPage,
+	                                                               @QueryParam("startDate") String startDateStr,
+	                                                               @QueryParam("endDate") String endDateStr)
+	{
+		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
+		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin", "_admin.fax");
+
+		page = validPageNo(page);
+		perPage = limitedResultCount(perPage);
+		int offset = calculatedOffset(page, perPage);
+
+		LocalDate startDate = (startDateStr != null)? ConversionUtils.toLocalDate(startDateStr) : LocalDate.now();
+		LocalDate endDate = (endDateStr != null)? ConversionUtils.toLocalDate(endDateStr) : startDate;
+
+
+		FaxAccount faxAccount = faxAccountDao.find(id);
+		List<FaxOutboxTransferOutbound> resultList = faxAccountService.getOutboxResults(faxAccount, startDate, endDate);
+
+		/* SRFAX doesn't page their results, instead they return all results in the date range.
+		* Truncate the results to enforce pagination for our services */
+		List<FaxOutboxTransferOutbound> resultSubList = resultList.subList(offset, offset + perPage);
+		return RestSearchResponse.successResponse(resultSubList, page, perPage, resultList.size());
 	}
 }

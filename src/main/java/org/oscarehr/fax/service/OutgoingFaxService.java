@@ -59,8 +59,6 @@ public class OutgoingFaxService
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
-	private static final String TYPE_SRFAX = "SRFAX";
-
 	@Autowired
 	FaxJobDao faxJobDao;
 
@@ -118,7 +116,7 @@ public class OutgoingFaxService
 		SingleWrapper<Integer> resultWrapper = apiConnector.Queue_Fax(
 				faxSettings.getReplyFaxNumber(),
 				faxSettings.getLoginId(),
-				"SINGLE",
+				SRFaxApiConnector.FAX_TYPE_SINGLE,
 				faxNumber,
 				fileMap,
 				SRFaxApiConnector.RESPONSE_FORMAT_JSON,
@@ -154,7 +152,7 @@ public class OutgoingFaxService
 			}
 
 			faxJob.setDestination(faxNumber);
-			faxJob.setFax_line(TYPE_SRFAX);
+			faxJob.setFax_line(FaxAccount.INTEGRATION_TYPE_SRFAX);
 			faxJob.setFile_name(fileToFax.getName());
 			faxJob.setUser(faxSettings.getLoginId());
 			faxJob.setNumPages(fileToFax.getPageCount());
