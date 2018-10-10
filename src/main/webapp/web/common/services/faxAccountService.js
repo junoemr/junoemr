@@ -25,7 +25,7 @@
 
  */
 
-angular.module("Common.Services").service("faxConfigService", [
+angular.module("Common.Services").service("faxAccountService", [
 	'$q',
 	'junoHttp',
 	function($q, junoHttp)

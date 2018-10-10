@@ -1,15 +1,15 @@
 angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxConfigurationController', [
 	"$uibModal",
-	"faxConfigService",
+	"faxAccountService",
 	function ($uibModal,
-	          faxConfigService)
+	          faxAccountService)
 	{
 		var controller = this;
 		controller.faxAccountList = [];
 
 		controller.initialize = function()
 		{
-			faxConfigService.listAccounts().then(
+			faxAccountService.listAccounts().then(
 				function success(response)
 				{
 					controller.faxAccountList = response;

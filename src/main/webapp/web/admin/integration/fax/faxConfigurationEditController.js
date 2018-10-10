@@ -1,11 +1,11 @@
 angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxConfigurationEditController', [
 	"$uibModal",
 	"$uibModalInstance",
-	"faxConfigService",
+	"faxAccountService",
 	"faxAccount",
 	function ($uibModal,
 	          $uibModalInstance,
-	          faxConfigService,
+	          faxAccountService,
 	          faxAccount)
 	{
 		var controller = this;
@@ -60,14 +60,14 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxCon
 
 			if (controller.faxAccount.id)
 			{
-				faxConfigService.updateAccountSettings(controller.faxAccount.id, controller.faxAccount).then(
+				faxAccountService.updateAccountSettings(controller.faxAccount.id, controller.faxAccount).then(
 					closeSuccess,
 					closeError
 				)
 			}
 			else
 			{
-				faxConfigService.addAccountSettings(controller.faxAccount).then(
+				faxAccountService.addAccountSettings(controller.faxAccount).then(
 					closeSuccess,
 					closeError
 				)
@@ -80,7 +80,7 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxCon
 
 		controller.testConnection = function()
 		{
-			faxConfigService.testConnection(controller.faxAccount).then(
+			faxAccountService.testConnection(controller.faxAccount).then(
 				function success(response)
 				{
 					if(response)
