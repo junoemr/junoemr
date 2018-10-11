@@ -24,98 +24,116 @@
 
 --%>
 
-<%@ page import="java.math.*, java.util.*, java.io.*, java.sql.*, oscar.*, java.net.*,oscar.MyDateFormat"%>
 
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.common.model.CtlBillingService" %>
 <%@ page import="org.oscarehr.common.dao.CtlBillingServiceDao" %>
 <%@ page import="org.oscarehr.common.model.CtlDiagCode" %>
 <%@ page import="org.oscarehr.common.dao.CtlDiagCodeDao" %>
+<%@ page import="java.util.List" %>
 <%
 	CtlBillingServiceDao ctlBillingServiceDao = SpringUtils.getBean(CtlBillingServiceDao.class);
 	CtlDiagCodeDao ctlDiagCodeDao = SpringUtils.getBean(CtlDiagCodeDao.class);
 %>
 <%
 
+	String typeid = request.getParameter("typeid");
+	String type = request.getParameter("type");
+	String group1 = request.getParameter("group1");
+	String group2 = request.getParameter("group2");
+	String group3 = request.getParameter("group3");
 
-String group1="",group2="", group3="";
-String typeid = "", type="";
+	boolean noTypeId = false;
+	boolean noType = false;
+	boolean noGroup1 = false;
+	boolean noGroup2 = false;
+	boolean noGroup3 = false;
 
-typeid = request.getParameter("typeid");
-type = request.getParameter("type");
-group1 = request.getParameter("group1");
-group2 = request.getParameter("group2");
-group3 = request.getParameter("group3");
+	boolean typeIdInUse = false;
+	boolean typeInUse = false;
 
-%>
+	List<CtlBillingService> existingIds = ctlBillingServiceDao.findByServiceTypeId(typeid);
+	List<CtlBillingService> existingTypes = ctlBillingServiceDao.findByServiceTypeName(type);
 
-<%
-if (typeid.compareTo("") == 0)
-{
-	response.sendRedirect("manageBillingform.jsp?billingform=000&noTypeId=true");
+	if (typeid.compareTo("") == 0)
+	{
+		noTypeId = true;
+	} else if (!existingIds.isEmpty())
+	{
+		typeIdInUse = true;
+	}
 
-} else if (type.compareTo("") == 0)
-{
-	response.sendRedirect("manageBillingform.jsp?billingform=000&noType=true");
+	if (type.compareTo("") == 0)
+	{
+		noType = true;
+	} else if (!existingTypes.isEmpty())
+	{
+		typeInUse = true;
+	}
 
-} else if (group1.compareTo("") == 0)
-{
-	response.sendRedirect("manageBillingform.jsp?billingform=000&noGroup1=true");
+	if (group1.compareTo("") == 0)
+	{
+		noGroup1 = true;
+	}
 
-} else if (group2.compareTo("") == 0)
-{
-	response.sendRedirect("manageBillingform.jsp?billingform=000&noGroup2=true");
+	if (group2.compareTo("") == 0)
+	{
+		noGroup2 = true;
+	}
 
-} else if (group3.compareTo("") == 0)
-{
-	response.sendRedirect("manageBillingform.jsp?billingform=000&noGroup3=true");
+	if (group3.compareTo("") == 0)
+	{
+		noGroup2 = true;
+	}
 
-}
-else {
-	CtlBillingService cbs = new CtlBillingService();
-	cbs.setServiceTypeName(type);
-	cbs.setServiceType(typeid);
-	cbs.setServiceCode("A007A");
-	cbs.setServiceGroupName(group1);
-	cbs.setServiceGroup("Group1");
-	cbs.setStatus("A");
-	cbs.setServiceOrder(1);
-    ctlBillingServiceDao.persist(cbs);
-
-
-    cbs = new CtlBillingService();
-	cbs.setServiceTypeName(type);
-	cbs.setServiceType(typeid);
-	cbs.setServiceCode("A007A");
-	cbs.setServiceGroupName(group2);
-	cbs.setServiceGroup("Group2");
-	cbs.setStatus("A");
-	cbs.setServiceOrder(1);
-    ctlBillingServiceDao.persist(cbs);
-
-    cbs = new CtlBillingService();
-	cbs.setServiceTypeName(type);
-	cbs.setServiceType(typeid);
-	cbs.setServiceCode("A007A");
-	cbs.setServiceGroupName(group3);
-	cbs.setServiceGroup("Group3");
-	cbs.setStatus("A");
-	cbs.setServiceOrder(1);
-    ctlBillingServiceDao.persist(cbs);
-
-	String[] param3 =new String[3];
+	if (noTypeId || noType || noGroup1 || noGroup2 || noGroup3 || typeIdInUse || typeInUse)
+	{
+		response.sendRedirect("manageBillingform.jsp?billingform=000&noTypeId=" + noTypeId + "&noType=" + noType + "&noGroup1=" + noGroup1 + "&noGroup2=" + noGroup2
+								+ "&noGroup3=" + noGroup3+ "&typeIdInUse=" + typeIdInUse + "&typeInUse=" + typeInUse);
+	} else
+	{
+		CtlBillingService cbs = new CtlBillingService();
+		cbs.setServiceTypeName(type);
+		cbs.setServiceType(typeid);
+		cbs.setServiceCode("A007A");
+		cbs.setServiceGroupName(group1);
+		cbs.setServiceGroup("Group1");
+		cbs.setStatus("A");
+		cbs.setServiceOrder(1);
+		ctlBillingServiceDao.persist(cbs);
 
 
-	CtlDiagCode cdc = new CtlDiagCode();
-	cdc.setServiceType(typeid);
-	cdc.setDiagnosticCode("000");
-	cdc.setStatus("A");
-	ctlDiagCodeDao.persist(cdc);
+		cbs = new CtlBillingService();
+		cbs.setServiceTypeName(type);
+		cbs.setServiceType(typeid);
+		cbs.setServiceCode("A007A");
+		cbs.setServiceGroupName(group2);
+		cbs.setServiceGroup("Group2");
+		cbs.setStatus("A");
+		cbs.setServiceOrder(1);
+		ctlBillingServiceDao.persist(cbs);
 
-%>
-<% response.sendRedirect("manageBillingform.jsp"); %>
-<%
-}
+		cbs = new CtlBillingService();
+		cbs.setServiceTypeName(type);
+		cbs.setServiceType(typeid);
+		cbs.setServiceCode("A007A");
+		cbs.setServiceGroupName(group3);
+		cbs.setServiceGroup("Group3");
+		cbs.setStatus("A");
+		cbs.setServiceOrder(1);
+		ctlBillingServiceDao.persist(cbs);
+
+		String[] param3 = new String[3];
 
 
+		CtlDiagCode cdc = new CtlDiagCode();
+		cdc.setServiceType(typeid);
+		cdc.setDiagnosticCode("000");
+		cdc.setStatus("A");
+		ctlDiagCodeDao.persist(cdc);
+
+
+		response.sendRedirect("manageBillingform.jsp");
+
+	}
 %>

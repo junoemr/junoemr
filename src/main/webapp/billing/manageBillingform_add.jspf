@@ -45,7 +45,15 @@
 					if ("true".equals(request.getParameter("noTypeId")))
 					{
 				%>
-				<td width="74%" class="white"><span style="color:red">Service Type ID is Required</span></td>
+						<td width="74%" class="white"><span style="color:red">Service Type ID is Required</span></td>
+				<%
+					}
+				%>
+				<%
+					if ("true".equals(request.getParameter("typeIdInUse")))
+					{
+				%>
+						<td width="74%" class="white"><span style="color:red">Service Type ID is Already in Use</span></td>
 				<%
 					}
 				%>
@@ -68,6 +76,14 @@
 				<%
 					}
 				%>
+				<%
+					if ("true".equals(request.getParameter("typeInUse")))
+					{
+				%>
+						<td width="74%" class="white"><span style="color:red">Service Type is Already in Use</span></td>
+				<%
+					}
+				%>
 			</tr>
 			<tr>
 				<td width="26%" class="white"><bean:message
@@ -82,7 +98,7 @@
 					if ("true".equals(request.getParameter("noGroup1")))
 					{
 				%>
-				<td width="74%" class="white"><span style="color:red">Group1 Name is Required</span></td>
+						<td width="74%" class="white"><span style="color:red">Group1 Name is Required</span></td>
 				<%
 					}
 				%>
@@ -100,7 +116,7 @@
 					if ("true".equals(request.getParameter("noGroup2")))
 					{
 				%>
-				<td width="74%" class="white"><span style="color:red">Group2 Name is Required</span></td>
+						<td width="74%" class="white"><span style="color:red">Group2 Name is Required</span></td>
 				<%
 					}
 				%>
@@ -118,7 +134,7 @@
 					if ("true".equals(request.getParameter("noGroup3")))
 					{
 				%>
-				<td width="74%" class="white"><span style="color:red">Group3 Name is Required</span></td>
+						<td width="74%" class="white"><span style="color:red">Group3 Name is Required</span></td>
 				<%
 					}
 				%>
