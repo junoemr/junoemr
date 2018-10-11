@@ -145,7 +145,7 @@ angular.module("Common.Services").service("faxAccountService", [
 			return deferred.promise;
 		};
 
-		service.getInbox = function testConnection(accountId, page, perPage)
+		service.getInbox = function getInbox(accountId, page, perPage)
 		{
 			var deferred = $q.defer();
 			var config = Juno.Common.ServiceHelper.configHeaders();
@@ -154,7 +154,7 @@ angular.module("Common.Services").service("faxAccountService", [
 				perPage: perPage
 			};
 
-			junoHttp.get(service.apiPath + '/' + accountId + '/getInbox', config).then(
+			junoHttp.get(service.apiPath + '/' + accountId + '/inbox', config).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);
@@ -168,7 +168,7 @@ angular.module("Common.Services").service("faxAccountService", [
 			return deferred.promise;
 		};
 
-		service.getOutbox = function testConnection(accountId, page, perPage)
+		service.getOutbox = function getOutbox(accountId, page, perPage)
 		{
 			var deferred = $q.defer();
 			var config = Juno.Common.ServiceHelper.configHeaders();
@@ -177,7 +177,7 @@ angular.module("Common.Services").service("faxAccountService", [
 				perPage: perPage
 			};
 
-			junoHttp.get(service.apiPath + '/' + accountId + '/getOutbox', config).then(
+			junoHttp.get(service.apiPath + '/' + accountId + '/outbox', config).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);

@@ -207,7 +207,7 @@ public class SRFaxApiConnector
 		String[] requiredFields = {S_FAX_DETAILS_ID};
 		String[] optionalFields = {S_RESPONSE_FORMAT};
 		String result = processRequest(ACTION_GET_MULTI_FAX_STATUS, requiredFields, optionalFields, parameters);
-		return processListResponse(result);
+		return processListResponse(result, new TypeReference<ListWrapper<GetFaxStatusResult>>(){});
 	}
 	public ListWrapper<GetFaxStatusResult> Get_MultiFaxStatus(String sFaxDetailsID, String sResponseFormat)
 	{
@@ -222,7 +222,7 @@ public class SRFaxApiConnector
 		String[] requiredFields = {};
 		String[] optionalFields = {S_RESPONSE_FORMAT, S_PERIOD, S_START_DATE, S_END_DATE, S_VIEWED_STATUS, S_INCLUDE_SUB_USERS, S_FAX_DETAILS_ID};
 		String result = processRequest(ACTION_GET_FAX_INBOX, requiredFields, optionalFields, parameters);
-		return processListResponse(result);
+		return processListResponse(result, new TypeReference<ListWrapper<GetFaxInboxResult>>(){});
 	}
 	public ListWrapper<GetFaxInboxResult> Get_Fax_Inbox(String sResponseFormat, String sPeriod,
 	                                                     String sStartDate, String sEndDate, String sViewedStatus,
@@ -242,9 +242,9 @@ public class SRFaxApiConnector
 	private ListWrapper<GetFaxOutboxResult> Get_Fax_Outbox(Map<String, String> parameters)
 	{
 		String[] requiredFields = {};
-		String[] optionalFields = {S_RESPONSE_FORMAT, S_PERIOD, S_START_DATE, S_END_DATE, S_INCLUDE_SUB_USERS, S_FAX_DETAILS_ID};
+		String[] optionalFields = {S_RESPONSE_FORMAT, S_PERIOD, S_START_DATE, S_END_DATE, S_INCLUDE_SUB_USERS};
 		String result = processRequest(ACTION_GET_FAX_OUTBOX, requiredFields, optionalFields, parameters);
-		return processListResponse(result);
+		return processListResponse(result, new TypeReference<ListWrapper<GetFaxOutboxResult>>(){});
 	}
 	public ListWrapper<GetFaxOutboxResult> Get_Fax_Outbox(String sResponseFormat, String sPeriod,
 	                                                     String sStartDate, String sEndDate,
@@ -336,7 +336,7 @@ public class SRFaxApiConnector
 		String[] requiredFields = {};
 		String[] optionalFields = {S_RESPONSE_FORMAT, S_PERIOD, S_START_DATE, S_END_DATE, S_INCLUDE_SUB_USERS};
 		String result = processRequest(ACTION_GET_FAX_USAGE, requiredFields, optionalFields, parameters);
-		return processListResponse(result);
+		return processListResponse(result, new TypeReference<ListWrapper<GetUsageResult>>(){});
 	}
 
 	public ListWrapper<GetUsageResult> Get_Fax_Usage(String sResponseFormat, String sPeriod, String sStartDate, String sEndDate, String sIncludeSubUsers)
@@ -362,7 +362,7 @@ public class SRFaxApiConnector
 		return false;
 	}
 
-	private static <T> ListWrapper processListResponse(String response)
+	private static <T> ListWrapper processListResponse(String response, TypeReference typeReference)
 	{
 		ListWrapper<T> result = null;
 		try
@@ -372,7 +372,7 @@ public class SRFaxApiConnector
 			if(ListWrapper.STATUS_SUCCESS.equals(status))
 			{
 				ObjectMapper mapper = new ObjectMapper();
-				result = mapper.readValue(response, new TypeReference<ListWrapper<T>>(){});
+				result = mapper.readValue(response, typeReference);
 			}
 			else
 			{

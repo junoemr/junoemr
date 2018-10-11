@@ -191,7 +191,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	}
 
 	@GET
-	@Path("/{id}/getInbox")
+	@Path("/{id}/inbox")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> getInbox(@PathParam("id") Long id)
@@ -202,7 +202,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	}
 
 	@GET
-	@Path("/{id}/getOutbox")
+	@Path("/{id}/outbox")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<FaxOutboxTransferOutbound> getOutbox(@PathParam("id") Long id,
@@ -227,7 +227,15 @@ public class FaxAccountWebService extends AbstractServiceImpl
 
 		/* SRFAX doesn't page their results, instead they return all results in the date range.
 		* Truncate the results to enforce pagination for our services */
-		List<FaxOutboxTransferOutbound> resultSubList = resultList.subList(offset, offset + perPage);
+		List<FaxOutboxTransferOutbound> resultSubList;
+		if(resultList.size() > (offset + perPage))
+		{
+			resultSubList = resultList.subList(offset, offset + perPage);
+		}
+		else
+		{
+			resultSubList = resultList.subList(offset, resultList.size());
+		}
 		return RestSearchResponse.successResponse(resultSubList, page, perPage, resultList.size());
 	}
 }

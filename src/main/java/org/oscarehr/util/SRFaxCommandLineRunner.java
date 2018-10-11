@@ -87,7 +87,7 @@ public class SRFaxCommandLineRunner
 	public static void testGetFaxOutbox(SRFaxApiConnector apiConnector)
 	{
 		logger.info("TEST GET FAX OUTBOX");
-		ListWrapper<GetFaxOutboxResult> responseWrapper = apiConnector.Get_Fax_Outbox(null, null, null, null, null, null);
+		ListWrapper<GetFaxOutboxResult> responseWrapper = apiConnector.Get_Fax_Outbox(null, null, null, null, null);
 
 		logger.info("STATUS: " + responseWrapper.getStatus());
 		logger.info("DATA: " + responseWrapper.getResult());

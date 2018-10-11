@@ -91,6 +91,9 @@ public class FaxAccountService
 				null
 		);
 
+		logger.info(resultList);
+		logger.info(resultList.getResult());
+
 		ArrayList<FaxOutboxTransferOutbound> transferList;
 		if(resultList.isSuccess())
 		{

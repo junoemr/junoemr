@@ -46,7 +46,7 @@ public class ListWrapper<T>
 
 	public boolean isSuccess()
 	{
-		return "Success".equals(status);
+		return STATUS_SUCCESS.equals(status);
 	}
 
 	public void setStatus(String status)

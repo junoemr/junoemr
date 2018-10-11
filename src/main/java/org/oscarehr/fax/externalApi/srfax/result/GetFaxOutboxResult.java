@@ -54,6 +54,8 @@ public class GetFaxOutboxResult
 	private String subject;
 	@JsonProperty("Size")
 	private String size;
+	@JsonProperty("SubmittedFiles")
+	private String submittedFiles;
 
 	@JsonProperty("User_ID")
 	private String userId;
@@ -188,6 +190,16 @@ public class GetFaxOutboxResult
 	public void setSize(String size)
 	{
 		this.size = size;
+	}
+
+	public String getSubmittedFiles()
+	{
+		return submittedFiles;
+	}
+
+	public void setSubmittedFiles(String submittedFiles)
+	{
+		this.submittedFiles = submittedFiles;
 	}
 
 	public String getUserId()

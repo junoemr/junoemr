@@ -550,6 +550,8 @@
 <script type="text/javascript" src="admin/integration/fax/faxConfigurationController.js"></script>
 <script type="text/javascript" src="admin/integration/fax/faxConfigurationEdit.jsp"></script>
 <script type="text/javascript" src="admin/integration/fax/faxConfigurationEditController.js"></script>
+<script type="text/javascript" src="admin/integration/fax/faxOutbox.jsp"></script>
+<script type="text/javascript" src="admin/integration/fax/faxOutboxController.js"></script>
 
 <script type="text/javascript" src="billing/billingController.js"></script>
 

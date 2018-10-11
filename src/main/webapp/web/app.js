@@ -467,6 +467,12 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 				templateUrl: 'admin/integration/fax/faxConfiguration.jsp',
 				controller: 'Admin.Integration.Fax.FaxConfigurationController as faxController'
 			})
+		.state('faxOutbox',
+			{
+				url: '/faxOutbox',
+				templateUrl: 'admin/integration/fax/faxOutbox.jsp',
+				controller: 'Admin.Integration.Fax.FaxOutboxController as faxOutboxController'
+			})
 	;
 
 }]);
