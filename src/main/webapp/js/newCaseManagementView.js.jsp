@@ -323,8 +323,7 @@
 
 	function popperup(vheight, vwidth, varpage, pageName)
 	{ //open a new popup window
-		var page = varpage;
-		windowprops = "height=" + vheight + ",width=" + vwidth + ",status=yes,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=100,left=100";
+		var windowprops = "height=" + vheight + ",width=" + vwidth + ",status=yes,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=100,left=100";
 		var popup = window.open(varpage, pageName, windowprops);
 		popup.pastewin = opener;
 		popup.focus();
@@ -428,6 +427,12 @@
 				notesLoader(notesOffset, notesIncrement, demographicNo);
 			}
 		}
+	}
+
+
+	function caclulatorsLoader()
+	{
+	    console.log("calculator loader called");
 	}
 
 	/**
