@@ -155,6 +155,8 @@ try
     jQuery(document).ready(function(){
     	notesLoader(0, notesIncrement, demographicNo);
     	notesScrollCheckInterval = setInterval('notesIncrementAndLoadMore()', 2000);
+
+        bindCalculatorListener();
     });
 
     <% if( request.getAttribute("NoteLockError") != null ) { %>

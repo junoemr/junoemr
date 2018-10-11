@@ -15,39 +15,38 @@
 %>
 
 
-  <select style="width:100px;">
-	<option><bean:message key="oscarEncounter.Header.Calculators"/></option>
-	<option>----------------------</option>
+  <select id='calculators_menu' style="width:100px;">
+	<option selected="selected" disabled="disabled" value="none"><bean:message key="oscarEncounter.Header.Calculators"/></option>
 	
-	<option onclick="popperup(650,775,'http://www.mcw.edu/calculators/body-mass-index.htm','BodyMassIndex');">
+	<option value='http://www.mcw.edu/calculators/body-mass-index.htm' x_size='650' y_size='775'>
 		<bean:message key="oscarEncounter.Index.bodyMass" />
 	</option>
 	
-	<option onclick="popperup(525,775,'../oscarEncounter/calculators/CoronaryArteryDiseaseRiskPrediction.jsp?sex=<%=bean.patientSex%>&age=<%=pAge%>','CoronaryArteryDiseaseRisk');">
+	<option value='../oscarEncounter/calculators/CoronaryArteryDiseaseRiskPrediction.jsp?sex=<%=bean.patientSex%>&age=<%=pAge%>' x_size='525' y_size='775'>
 		<bean:message key="oscarEncounter.Index.coronary" />
 	</option>
 	
-	<option onclick="popperup(525,775,'../oscarEncounter/calculators/riskcalc/index.html?sex=<%=bean.patientSex%>&age=<%=pAge%>','Framingham');">
+	<option value='../oscarEncounter/calculators/riskcalc/index.html?sex=<%=bean.patientSex%>&age=<%=pAge%>' x_size='525' y_size='775'>
 		Framingham/UKPDS Risk Calculator
 	</option>
 	
-	<option onclick="popperup(525,775,'http://cvrisk.mvm.ed.ac.uk/calculator/calc.asp','CVRisk');">
+	<option value='http://cvrisk.mvm.ed.ac.uk/calculator/calc.asp' x_size='525' y_size='775'>
 		CV Risk
 	</option>
 	
-	<option onclick="popperup(525,775,'../oscarEncounter/calculators/OsteoporoticFracture.jsp?sex=<%=bean.patientSex%>&age=<%=pAge%>','OsteoporoticFracture');">
+	<option value='../oscarEncounter/calculators/OsteoporoticFracture.jsp?sex=<%=bean.patientSex%>&age=<%=pAge%>' x_size='525' y_size='775'>
 		<bean:message key="oscarEncounter.Index.msgOsteoporotic" />
 	</option>
 	
-	<option onclick="popperup(650,775,'http://www.mcw.edu/calculators/pregnancydate.htm','PregancyCalculator');">
+	<option value='http://www.mcw.edu/calculators/pregnancydate.htm' x_size='650' y_size='775'>
 		<bean:message key="oscarEncounter.Index.pregnancy" />
 	</option>
 	
-	<option onclick="popperup(400,500,'../oscarEncounter/calculators/SimpleCalculator.jsp','SimpleCalc');">
+	<option value='../oscarEncounter/calculators/SimpleCalculator.jsp' x_size='400' y_size='500'>
 		<bean:message key="oscarEncounter.Index.simpleCalculator" />
 	</option>
 	
-	<option onclick="popperup(650,775,'../oscarEncounter/calculators/GeneralCalculators.jsp','GeneralConversions'); ">
+	<option value='../oscarEncounter/calculators/GeneralCalculators.jsp' x_size='650' y_size='775'>
 		<bean:message key="oscarEncounter.Index.generalConversions" />
 	</option>
 </select>

@@ -323,8 +323,7 @@
 
 	function popperup(vheight, vwidth, varpage, pageName)
 	{ //open a new popup window
-		var page = varpage;
-		windowprops = "height=" + vheight + ",width=" + vwidth + ",status=yes,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=100,left=100";
+		var windowprops = "height=" + vheight + ",width=" + vwidth + ",status=yes,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=100,left=100";
 		var popup = window.open(varpage, pageName, windowprops);
 		popup.pastewin = opener;
 		popup.focus();
@@ -430,8 +429,28 @@
 		}
 	}
 
-	/**
 
+    /**
+	 * Bind a listener to select option elements for cross-platform use.  onClick on the option element doesn't
+	 * work in Chrome (or IE), and onClick on the select doesn't work in FireFox.
+     */
+	function bindCalculatorListener()
+	{
+	    var calculatorMenu = jQuery('#calculators_menu');
+
+	    calculatorMenu.change(
+			function() {
+                var x_size = calculatorMenu.attr('x_size'),
+                    y_size = calculatorMenu.attr('y_size');
+
+                popperup(x_size, y_size, calculatorMenu.val(), calculatorMenu.text());
+				// Since we are listening for the change event, we need to account for the same calculator
+				// selected twice in a row.  Unfortunately, this will also trigger a UI change.
+                calculatorMenu.val("none");
+			});
+	}
+
+	/**
 	 Responsible for loading notes on the eChart
 	 @param {offset}
 		 Offset from the beginning of the notes
