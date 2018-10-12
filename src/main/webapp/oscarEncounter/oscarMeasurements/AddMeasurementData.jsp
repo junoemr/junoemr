@@ -52,7 +52,7 @@
 	String measurement = request.getParameter("measurement");
 	String[] measurements = request.getParameterValues("measurement");
 	String template = request.getParameter("template");
-	String noteId = request.getParameter("note_id");
+	String uuid = request.getParameter("uuid");
 
 	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 	FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
@@ -338,7 +338,7 @@
                <input type="hidden" name="demographic_no" value="<%=demographic_no%>"/>
                <input type="hidden" name="inputFrom" value="AddMeasurementData"/>
                <input type="hidden" name="template" value="<%=template%>"/>
-               <input type="hidden" name="noteId" value="<%=noteId%>"/>
+               <input type="hidden" name="uuid" value="<%=uuid%>"/>
 
                <%
                 int ctr = 0;

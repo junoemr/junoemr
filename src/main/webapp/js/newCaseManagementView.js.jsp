@@ -162,32 +162,6 @@
 		}
 	}
 
-	var notesLoaderCallback = null;
-	function onFlowsheetOpen(element, hash, url)
-	{
-
-		var openFlowsheetPopup = function()
-		{
-			var cmeFrm = document.forms["caseManagementEntryForm"];
-			var noteId = cmeFrm.noteId.value < 0 ? 0 : cmeFrm.noteId.value;
-
-			url += "&note_id=" + noteId;
-			popupPage(700,1000,hash,url);
-			return false;
-		};
-
-		if (origCaseNote != $F(caseNote))
-		{
-			saveNoteAjax('save', 'list');
-			notesLoaderCallback = openFlowsheetPopup;
-		}
-		else
-		{
-			openFlowsheetPopup();
-		}
-		return false;
-	}
-
 	var numMenus = 3;
 	function showMenu(menuNumber, eventObj)
 	{
@@ -307,12 +281,6 @@
 		setCaretPosition($(caseNote), $(caseNote).value.length);
 
 		$(caseNote).focus();
-
-		if(notesLoaderCallback && typeof notesLoaderCallback === "function")
-		{
-			notesLoaderCallback();
-			notesLoaderCallback = null;
-		}
 	}
 
 	function setupOneNote(note)

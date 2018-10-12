@@ -27,6 +27,7 @@ import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.SecRole;
 import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueNoteDao;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
@@ -40,12 +41,14 @@ import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.rx.model.Drug;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -286,9 +289,49 @@ public class EncounterNoteService
 	 * @param noteId - id of the note to copy
 	 * @return a copy of the note
 	 */
-	public CaseManagementNote getNoteCopy(Long noteId)
+	public CaseManagementNote getNoteRevisionCopy(Long noteId)
 	{
 		CaseManagementNote noteToCopy = caseManagementNoteDao.find(noteId);
 		return new CaseManagementNote(noteToCopy);
+	}
+
+	/**
+	 * This method is intended for use in the case that multiple saves are required for constructing a single note revision,
+	 * specifically multiple flowsheet measurements.
+	 * This should be avoided in any other use case if at all possible.
+	 * @deprecated to discourage future use
+	 * @return the persisted note model
+	 */
+	@Deprecated
+	public CaseManagementNote appendTextToNoteOrNewNoteByUUID(String uuid, String textToAppend, String providerNo, Integer demographicNo)
+	{
+		CaseManagementNote note = caseManagementNoteDao.findLatestByUUID(uuid);
+		ProviderData provider = providerDataDao.find(providerNo);
+		Demographic demographic = demographicDao.find(demographicNo);
+
+		CaseManagementNote returnNote;
+		if(note == null)
+		{
+			SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+			Date date = new Date();
+			String formattedDate = "[" + df.format(date) + " .: ]";
+
+			CaseManagementNote newNote = new CaseManagementNote();
+			newNote.setNote(formattedDate + "\n" + textToAppend);
+			newNote.setProvider(provider);
+			newNote.setDemographic(demographic);
+			newNote.setSigned(true);
+			newNote.setSigningProvider(provider);
+			newNote.setUuid(uuid);
+			returnNote = saveChartNote(newNote);
+		}
+		else
+		{
+			note.setNote(note.getNote() + "\n" + textToAppend);
+			note.setHistory(note.getNote());
+			caseManagementNoteDao.merge(note);
+			returnNote = note;
+		}
+		return returnNote;
 	}
 }

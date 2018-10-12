@@ -40,7 +40,7 @@ import org.oscarehr.common.dao.MeasurementDao.SearchCriteria;
 import org.oscarehr.common.model.FlowSheetCustomization;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.Validations;
-import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -57,8 +57,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 
@@ -67,6 +65,7 @@ public class EctMeasurementsAction extends Action
 
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	private EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
+	private CaseManagementNoteDao caseManagementNoteDao = (CaseManagementNoteDao) SpringUtils.getBean("encounterNote.dao.CaseManagementNoteDao");
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException
@@ -81,8 +80,7 @@ public class EctMeasurementsAction extends Action
 		String demographicNo = request.getParameter("demographic_no");
 		String providerNo = (String) session.getAttribute("user");
 		String prog_no = new EctProgram(session).getProgram(providerNo);
-		String noteIdStr = StringUtils.trimToNull(request.getParameter("noteId"));
-		Long noteId = (noteIdStr != null)? Long.parseLong(noteIdStr):null;
+		String noteUUID = StringUtils.trimToNull(request.getParameter("uuid"));
 
 		String template = request.getParameter("template");
 		MeasurementFlowSheet mFlowsheet = null;
@@ -291,24 +289,8 @@ public class EctMeasurementsAction extends Action
 			return (new ActionForward(mapping.getInput()));
 		}
 
-		/* if given a note id, append encounter text to the note (as a new note revision) */
-		if(noteId != null && noteId > 0)
-		{
-			CaseManagementNote noteCopy = encounterNoteService.getNoteCopy(noteId);
-			noteCopy.setNote(noteCopy.getNote() + "\n" + textOnEncounter);
-			noteCopy.setHistory(noteCopy.getHistory() + "\n" + noteCopy.getNote());
-			encounterNoteService.saveChartNote(noteCopy, providerNo, Integer.parseInt(demographicNo));
-		}
-		else /* save a new note with the encounter text */
-		{
-			SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-			Date date = new Date();
-			String formattedDate = "[" + df.format(date) + " .: ]";
-
-			CaseManagementNote newNote = new CaseManagementNote();
-			newNote.setNote(formattedDate + "\n" + textOnEncounter);
-			encounterNoteService.saveChartNote(newNote, providerNo, Integer.parseInt(demographicNo));
-		}
+		/* save a new note OR append encounter text to the note if a matching uuid exists */
+		encounterNoteService.appendTextToNoteOrNewNoteByUUID(noteUUID, textOnEncounter, providerNo, Integer.parseInt(demographicNo));
 
 		request.setAttribute("textOnEncounter", StringEscapeUtils.escapeJavaScript(textOnEncounter));
 		return mapping.findForward("success");
