@@ -183,11 +183,7 @@
 
 				);
 				<%}%>
-
-
 			});
-
-
 
 			function assembleMainChartParams(displayFullChart) {
 
@@ -206,7 +202,6 @@
 				 %>
 				params += "&<%=paramName%>=<%=URLEncoder.encode(StringUtils.transformNullInEmptyString(paramValue), "UTF-8")%>";
 				<%
-
 				 }
 			   %>
 
