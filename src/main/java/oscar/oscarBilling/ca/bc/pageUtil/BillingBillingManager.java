@@ -322,24 +322,26 @@ public class BillingBillingManager {
 			{
 				bs = dao.findLatestServiceDateByServiceCode(service_code);
 			}
-			this.description = bs.getDescription();
-			this.price = Double.parseDouble(bs.getValue());
 
-			try
+			if (bs != null)
 			{
-				String percRes = bs.getPercentage();
-				if(percRes != null && !"".equals(percRes))
+				this.description = bs.getDescription();
+				this.price = Double.parseDouble(bs.getValue());
+
+				try
 				{
-					this.percentage = Double.parseDouble(percRes);
-				}
-				else
+					String percRes = bs.getPercentage();
+					if (percRes != null && !"".equals(percRes))
+					{
+						this.percentage = Double.parseDouble(percRes);
+					} else
+					{
+						this.percentage = 100.00;
+					}
+				} catch (NumberFormatException eNum)
 				{
-					this.percentage = 100.00;
+					this.percentage = 100;
 				}
-			}
-			catch(NumberFormatException eNum)
-			{
-				this.percentage = 100;
 			}
 		}
 
