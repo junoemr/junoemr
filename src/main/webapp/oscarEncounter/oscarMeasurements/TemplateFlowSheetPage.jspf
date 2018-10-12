@@ -58,8 +58,10 @@
     String demographic_no = request.getParameter("demographic_no");
     String providerNo = (String) session.getAttribute("user");
     String template = request.getParameter("template");
-	Boolean forceNewUuid = Boolean.parseBoolean(request.getParameter("forceNewUuid"));
+	String randomParamStr = request.getParameter("random");
+	Integer randomParam = randomParamStr != null ? Integer.parseInt(randomParamStr) : null;
 	String uuid = (String) session.getAttribute("TemplateFlowSheetPage.uuid");
+	Integer randomSession = (Integer) session.getAttribute("TemplateFlowSheetPage.random");
     
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 %>
@@ -95,10 +97,11 @@
 	LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_FLOWSHEET, template, request.getRemoteAddr(),demographic_no);
 
 	/* generate a UUID so all measurements added can be added to the same note */
-	if(forceNewUuid || uuid == null)
+	if(uuid == null || (randomSession == null || !randomSession.equals(randomParam)))
 	{
 		uuid = UUID.randomUUID().toString();
 		session.setAttribute("TemplateFlowSheetPage.uuid", uuid);
+		session.setAttribute("TemplateFlowSheetPage.random", randomParam);
 	}
 	String UUIDParamStr = "&uuid="+uuid;
 

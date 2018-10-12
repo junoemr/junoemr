@@ -27,6 +27,7 @@ package oscar.oscarEncounter.pageUtil;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
@@ -67,6 +68,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 
 			String menuId = "3"; //div id for popup menu
 			String roleName$ = request.getSession().getAttribute("userrole") + "," + request.getSession().getAttribute("user");
+			Random random = new Random();
 
 			//set text for lefthand module title
 			Dao.setLeftHeading(messages.getMessage(request.getLocale(), "oscarEncounter.Index.measurements"));
@@ -104,7 +106,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 
 					winName = flowsheetName + bean.demographicNo;
 					hash = Math.abs(winName.hashCode());
-					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?forceNewUuid=true&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "');return false;";
+					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?random=" + random.nextInt() + "&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "');return false;";
 					item.setLinkTitle(dispname);
 					dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 					item.setTitle(dispname);
@@ -146,7 +148,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 
 					winName = flowsheetName + bean.demographicNo;
 					hash = Math.abs(winName.hashCode());
-					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?forceNewUuid=true&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "');return false;";
+					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?random=" + random.nextInt() + "&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "');return false;";
 					item.setLinkTitle(dispname);
 					dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 					item.setTitle(dispname);
@@ -177,7 +179,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 
 					winName = flowsheetName + bean.demographicNo;
 					hash = Math.abs(winName.hashCode());
-					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?forceNewUuid=true&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "');return false;";
+					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?random=" + random.nextInt() + "&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "');return false;";
 					item.setLinkTitle(dispname);
 					dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 					item.setTitle(dispname);
