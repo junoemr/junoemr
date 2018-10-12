@@ -156,7 +156,7 @@ try
     	notesLoader(0, notesIncrement, demographicNo);
     	notesScrollCheckInterval = setInterval('notesIncrementAndLoadMore()', 2000);
 
-    	calculatorLoader();
+        bindCalculatorListener();
     });
 
     <% if( request.getAttribute("NoteLockError") != null ) { %>

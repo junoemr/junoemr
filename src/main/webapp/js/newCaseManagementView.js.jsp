@@ -430,13 +430,27 @@
 	}
 
 
-	function caclulatorsLoader()
+    /**
+	 * Bind a listener to select option elements for cross-platform use.  onClick on the option element doesn't
+	 * work in Chrome (or IE), and onClick on the select doesn't work in FireFox.
+     */
+	function bindCalculatorListener()
 	{
-	    console.log("calculator loader called");
+	    var calculatorMenu = jQuery('#calculators_menu');
+
+	    calculatorMenu.change(
+			function() {
+                var x_size = calculatorMenu.attr('x_size'),
+                    y_size = calculatorMenu.attr('y_size');
+
+                popperup(x_size, y_size, calculatorMenu.val(), calculatorMenu.text());
+				// Since we are listening for the change event, we need to account for the same calculator
+				// selected twice in a row.  Unfortunately, this will also trigger a UI change.
+                calculatorMenu.val("none");
+			});
 	}
 
 	/**
-
 	 Responsible for loading notes on the eChart
 	 @param {offset}
 		 Offset from the beginning of the notes
