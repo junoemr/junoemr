@@ -445,7 +445,10 @@
 
                 popperup(x_size, y_size, calculatorMenu.val(), calculatorMenu.text());
 				// Since we are listening for the change event, we need to account for the same calculator
-				// selected twice in a row.  Unfortunately, this will also trigger a UI change.
+				// selected twice in a row.  A side effect is that the UI will be updated when we reset the
+				// value of the select menu to the default.  Here we're using the value "none" over a -1 index
+				// because this is the key to a disabled "title" element, whereas -1 will display an empty
+				// select menu.
                 calculatorMenu.val("none");
 			});
 	}
