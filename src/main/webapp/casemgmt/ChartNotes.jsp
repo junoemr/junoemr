@@ -152,11 +152,13 @@ try
 
 	notesIncrement = parseInt("<%=OscarProperties.getInstance().getProperty("num_loaded_notes", "20") %>");
 
-    jQuery(document).ready(function(){
-    	notesLoader(0, notesIncrement, demographicNo);
+    jQuery(document).ready(function() {
+        var calculatorMenu = jQuery('#calculators_menu');
+
+        notesLoader(0, notesIncrement, demographicNo);
     	notesScrollCheckInterval = setInterval('notesIncrementAndLoadMore()', 2000);
 
-        bindCalculatorListener();
+        bindCalculatorListener(calculatorMenu);
     });
 
     <% if( request.getAttribute("NoteLockError") != null ) { %>

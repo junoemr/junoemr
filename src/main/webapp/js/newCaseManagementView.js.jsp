@@ -429,15 +429,15 @@
 		}
 	}
 
-
     /**
-	 * Bind a listener to select option elements for cross-platform use.  onClick on the option element doesn't
-	 * work in Chrome (or IE), and onClick on the select doesn't work in FireFox.
+     * Allows calculators to be opened by clicking on them in a select menu.  This is needed for cross-platform
+	 * functionality to achieve an effect similar to onClick for a select option element.
+	 * (onClick on the option element doesn't work in Chrome (or IE), and onClick on the select doesn't work in FireFox)
+	 *
+     * @param calculatorMenu jQuery element referencing a select with urls as option values
      */
-	function bindCalculatorListener()
+	function bindCalculatorListener(calculatorMenu)
 	{
-	    var calculatorMenu = jQuery('#calculators_menu');
-
 	    calculatorMenu.change(
 			function() {
                 var x_size = calculatorMenu.attr('x_size'),
