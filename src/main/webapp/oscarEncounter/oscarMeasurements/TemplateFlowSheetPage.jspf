@@ -23,20 +23,21 @@
     Ontario, Canada
 
 --%>
-<%@page import="org.oscarehr.allergy.model.Allergy"%>
-<%@page  import="org.oscarehr.common.dao.FlowSheetCustomizationDao,org.oscarehr.common.dao.FlowSheetDrugDao,org.oscarehr.common.dao.FlowSheetDxDao,org.oscarehr.common.model.FlowSheetCustomization,org.oscarehr.common.model.FlowSheetDrug,org.oscarehr.util.LoggedInInfo"%>
-<%@page import="org.oscarehr.util.MiscUtils,org.springframework.web.context.WebApplicationContext"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils,oscar.OscarProperties"%>
-<%@page import="oscar.log.LogAction,oscar.log.LogConst"%>
-<%@page import="oscar.oscarEncounter.oscarMeasurements.FlowSheetItem,oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet,oscar.oscarEncounter.oscarMeasurements.MeasurementInfo,oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig"%>
-<%@page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler,oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean,oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler" %>
-<%@page import="oscar.oscarPrevention.PreventionData" %>
+<%@page import="org.apache.commons.lang.StringUtils"%>
+<%@page  import="org.oscarehr.allergy.model.Allergy,org.oscarehr.common.dao.FlowSheetCustomizationDao,org.oscarehr.common.dao.FlowSheetDrugDao,org.oscarehr.common.dao.FlowSheetDxDao,org.oscarehr.common.model.FlowSheetCustomization,org.oscarehr.common.model.FlowSheetDrug"%>
+<%@page import="org.oscarehr.util.LoggedInInfo,org.oscarehr.util.MiscUtils"%>
+<%@page import="org.springframework.web.context.WebApplicationContext,org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@page import="oscar.OscarProperties,oscar.log.LogAction"%>
+<%@page import="oscar.log.LogConst,oscar.oscarEncounter.oscarMeasurements.FlowSheetItem,oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet,oscar.oscarEncounter.oscarMeasurements.MeasurementInfo"%>
+<%@page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig,oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler,oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean" %>
+<%@page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@ taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
-<%@page import="oscar.oscarResearch.oscarDxResearch.bean.dxResearchBean"%>
+<%@page import="oscar.oscarPrevention.PreventionData"%>
+<%@ page import="oscar.oscarResearch.oscarDxResearch.bean.dxResearchBean" %>
 <%@ page import="oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler" %>
 <%@ page import="oscar.oscarRx.data.RxPatientData" %>
 <%@ page import="oscar.util.UtilDateUtilities" %>
@@ -47,7 +48,6 @@
 <%@ page import="java.util.Hashtable" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="java.util.UUID" %>
 <%@ page import="java.util.Vector" %>
 
 <%
@@ -58,11 +58,9 @@
     String demographic_no = request.getParameter("demographic_no");
     String providerNo = (String) session.getAttribute("user");
     String template = request.getParameter("template");
-	String randomParamStr = request.getParameter("random");
-	Integer randomParam = randomParamStr != null ? Integer.parseInt(randomParamStr) : null;
-	String uuid = (String) session.getAttribute("TemplateFlowSheetPage.uuid");
-	Integer randomSession = (Integer) session.getAttribute("TemplateFlowSheetPage.random");
-    
+	String uuid = request.getParameter("uuid");
+	String UUIDParamStr = "&uuid="+StringUtils.trimToEmpty(uuid);
+
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 %>
 <oscar:oscarPropertiesCheck property="SPEC3" value="yes">
@@ -95,15 +93,6 @@
 
 <%
 	LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_FLOWSHEET, template, request.getRemoteAddr(),demographic_no);
-
-	/* generate a UUID so all measurements added can be added to the same note */
-	if(uuid == null || (randomSession == null || !randomSession.equals(randomParam)))
-	{
-		uuid = UUID.randomUUID().toString();
-		session.setAttribute("TemplateFlowSheetPage.uuid", uuid);
-		session.setAttribute("TemplateFlowSheetPage.random", randomParam);
-	}
-	String UUIDParamStr = "&uuid="+uuid;
 
 	int numElementsToShow = 4;
     Date sdate = null;

@@ -41,6 +41,7 @@ import org.oscarehr.common.model.FlowSheetCustomization;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.Validations;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -290,7 +291,15 @@ public class EctMeasurementsAction extends Action
 		}
 
 		/* save a new note OR append encounter text to the note if a matching uuid exists */
-		encounterNoteService.appendTextToNoteOrNewNoteByUUID(noteUUID, textOnEncounter, providerNo, Integer.parseInt(demographicNo));
+		CaseManagementNote existingNote = (noteUUID != null) ? caseManagementNoteDao.findLatestByUUID(noteUUID) : null;
+		if(existingNote != null)
+		{
+			encounterNoteService.appendTextToNote(existingNote, textOnEncounter, providerNo, Integer.parseInt(demographicNo));
+		}
+		else
+		{
+			encounterNoteService.addNewNoteWithUUID(noteUUID, textOnEncounter, providerNo, Integer.parseInt(demographicNo));
+		}
 
 		request.setAttribute("textOnEncounter", StringEscapeUtils.escapeJavaScript(textOnEncounter));
 		return mapping.findForward("success");
