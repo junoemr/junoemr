@@ -28,6 +28,7 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.RestServiceLog;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import oscar.log.LogAction;
 
@@ -106,7 +107,9 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 			return;
 		}
 
-		String providerNo = (String) request.getProperty(PROP_REQUEST_PROVIDER);
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(httpRequest);
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
+
 		String rawPostData = (String) request.getProperty(PROP_REQUEST_BODY);
 		Date requestDateTime = (Date) request.getProperty(PROP_REQUEST_DATETIME);
 		String rawResponseData = null;
