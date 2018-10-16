@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -274,9 +275,16 @@ public class FrmPDFServlet extends HttpServlet {
                     printCfg[idx2] = getCfgProp(cfgFile[idx2]);
                 }
             }
-            
-                    
-            
+
+			//specify the page of the picture using __graphicPage, it may be used multiple times to specify multiple pages
+			//however the same graphic will be applied to all pages
+			//ie. __graphicPage=2&__graphicPage=3
+			String[] graphicPage = req.getParameterValues("__graphicPage");
+			ArrayList<String> graphicPageArray = new ArrayList<String>();
+			if (graphicPage != null){
+				graphicPageArray = new ArrayList<String>(Arrays.asList(graphicPage));
+			}
+
             Properties[][] graphicCfg = new Properties[numPages][];
             String[] cfgGraphicFile;
             String paramName;
@@ -649,15 +657,27 @@ public class FrmPDFServlet extends HttpServlet {
                     int origY = 0;
 
                     String className = null;
-                    Properties[] tempPropertiesArray;
-                    if( i <= graphicCfg.length ) {
-                    	tempPropertiesArray = graphicCfg[i-1];
-                    	MiscUtils.getLogger().debug("Plotting page " + i);
-                    }
-                    else {
-                    	tempPropertiesArray = null;
-                    	MiscUtils.getLogger().debug("Skipped Plotting page " + i);
-                    }
+                    Properties[] tempPropertiesArray = null;
+
+					if (graphicPage != null)
+					{
+						if (graphicPageArray.contains(Integer.toString(i)))
+						{
+							tempPropertiesArray = graphicCfg[i - 1];
+							MiscUtils.getLogger().debug("Plotting page " + i);
+						}
+					} else
+					{
+						if (i <= graphicCfg.length)
+						{
+							tempPropertiesArray = graphicCfg[i - 1];
+							MiscUtils.getLogger().debug("Plotting page " + i);
+						} else
+						{
+							tempPropertiesArray = null;
+							MiscUtils.getLogger().debug("Skipped Plotting page " + i);
+						}
+					}
                     String[] tempYcoords;
                     
                     //if there are properties to plot
