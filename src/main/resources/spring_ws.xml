@@ -20,14 +20,17 @@
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
+
+	<!-- ========================================================================================-->
+	<!-- Settings for the external SOAP web services -->
+	<!-- ========================================================================================-->
+
 	<!-- interceptors -->
 	<bean id="abstractLoggingInterceptor" abstract="true">
 		<property name="prettyLogging" value="true" />
 	</bean>
 	<bean id="loggingInInterceptor" class="org.apache.cxf.interceptor.LoggingInInterceptor" parent="abstractLoggingInterceptor" />
 	<bean id="loggingOutInterceptor" class="org.apache.cxf.interceptor.LoggingOutInterceptor" parent="abstractLoggingInterceptor" />
-	<bean id="restLoggingInInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingInInterceptor" parent="abstractLoggingInterceptor"/>
-	<bean id="restLoggingOutInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingOutInterceptor" parent="abstractLoggingInterceptor"/>
 
     <cxf:bus>
 		<cxf:properties>
@@ -146,33 +149,76 @@
 		</jaxws:inInterceptors>
 	</jaxws:endpoint>
 
+	<jaxws:endpoint implementor="#labUploadWs" address="/LabUploadService" >
+		<jaxws:inInterceptors>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+		</jaxws:inInterceptors>
+	</jaxws:endpoint>
+
+	<!-- ========================================================================================-->
+	<!-- Settings for the internal REST web services -->
+	<!-- ========================================================================================-->
 
 	<context:component-scan base-package="org.oscarehr.ws.rest"/>
 	<context:component-scan base-package="org.oscarehr.ws.rest.util"/>
 	<context:component-scan base-package="org.oscarehr.ws.rest.conversion"/>
 	<aop:aspectj-autoproxy/>
 
+	<!-- Also used by applicationContextREST.xml -->
+	<bean id="jaxb" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+		<property name="singleJaxbContext" value="true"/>
+
+		<property name="extraClass">
+			<list>
+				<value>org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider"/>
+
+	<bean id="validationInInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor">
+		<property name="provider" ref="validationProvider"/>
+	</bean>
+
+	<bean id="validationOutInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationOutInterceptor">
+		<property name="provider" ref="validationProvider"/>
+	</bean>
+
 	<!-- RESTful web service  -->
 	<jaxrs:server address="/rs" id="jaxrServer">
 
 		<jaxrs:inInterceptors>
 			<bean name="authInInterceptor" class="org.oscarehr.ws.rest.util.AuthenticationInInterceptor" />
-			<ref bean="restLoggingInInterceptor" />
+			<ref bean="validationInInterceptor"/>
 		</jaxrs:inInterceptors>
+
 		<jaxrs:outInterceptors>
-			<ref bean="restLoggingOutInterceptor" />
+			<ref bean="validationOutInterceptor"/>
 		</jaxrs:outInterceptors>
-		
-		<jaxrs:inFaultInterceptors>
-			<ref bean="restLoggingInInterceptor" />
-		</jaxrs:inFaultInterceptors>
-		<jaxrs:outFaultInterceptors>
-			<ref bean="restLoggingOutInterceptor" />
-		</jaxrs:outFaultInterceptors>
-		
+
 		<jaxrs:providers>
-		    <ref bean="jaxb"/>
+			<ref bean="jaxb"/>
+
+			<!-- Switch to Jackson 2 from the cxf default of Jettison.  Also depends on the cxf -->
+			<!-- bus setting "skip.default.json.provider.registration" which is set in -->
+			<!-- spring_ws.xml -->
 			<bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+
+			<!-- Juno exception mappers.  Add more of these as new exceptions are thrown. -->
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.GeneralExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.InvalidFormatExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.JsonParseExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.MissingArgumentExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.RateLimitExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.SecurityExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.ValidationExceptionMapper"/>
+
+			<!-- Juno filters. -->
+			<bean class="org.oscarehr.ws.rest.filter.LoggingFilter"/>
+
+			<!-- Custom ContextResolver to apply settings to the Jackson ObjectMapper -->
+			<bean class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
 		</jaxrs:providers>
 
 		<jaxrs:features>
@@ -180,41 +226,49 @@
 		</jaxrs:features>
 
 		<jaxrs:serviceBeans>
-			<bean class="org.oscarehr.ws.rest.PharmacyService"  autowire="byName"/>
+			<!-- Alphabetically Please! -->
+			<bean class="org.oscarehr.ws.rest.AllergyService" autowire="byName" />
+			<bean class="org.oscarehr.ws.rest.AppService" autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.BillingService" autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.ConsultationWebService" autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.DemographicMergeService"  autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.DemographicService"  autowire="byName"/>
             <bean class="org.oscarehr.ws.rest.DemographicsService"  autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.UserMetricsService"  autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.ScheduleService"  autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.DemographicMergeService"  autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.MessagingService"  autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.InboxService"  autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.TicklerWebService"  autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.ProviderService"  autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.ProvidersService"  autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.PatientDetailStatusService"  autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.RSSFeedService"  autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.PersonaService"  autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.FormsService"  autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.DiseaseRegistryService" autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.EFormService" autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.EFormsService" autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.OscarJobService"  autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.FormsService"  autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.InboxService"  autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.MessagingService"  autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.NotesService" autowire="byName" />
-			<bean class="org.oscarehr.ws.rest.ProductDispensingService"  autowire="byName"/>
-			<bean class="org.oscarehr.ws.rest.RecordUxService" autowire="byName" />
-			<bean class="org.oscarehr.ws.rest.ReportingService" autowire="byName" />
-			<bean class="org.oscarehr.ws.rest.BillingService" autowire="byName" />
-			<bean class="org.oscarehr.ws.rest.StatusService" autowire="byName" />
-			<bean class="org.oscarehr.ws.rest.ProgramService" autowire="byName" />
-			<bean class="org.oscarehr.ws.rest.ConsultationWebService" autowire="byName" />
-			<bean class="org.oscarehr.ws.rest.AppService" autowire="byName" />
-			<bean class="org.oscarehr.ws.rest.AllergyService" autowire="byName" />
+			<bean class="org.oscarehr.ws.rest.OscarJobService"  autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.PatientDetailStatusService"  autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.PersonaService"  autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.PharmacyService"  autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.PreventionService" autowire="byName" />
-			<bean class="org.oscarehr.ws.rest.ReportByTemplateService" autowire="byName" />
-			<bean class="org.oscarehr.ws.rest.ResourceService" autowire="byName" />
-			<bean class="org.oscarehr.ws.rest.DiseaseRegistryService" autowire="byName" />
-			<bean class="org.oscarehr.ws.rest.SpecialistsService" autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.ProductDispensingService"  autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.ProgramService" autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.ProviderService"  autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.ProvidersService"  autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.RecordUxService" autowire="byName" />
 			<bean class="org.oscarehr.ws.rest.ReferralDoctorsService" autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.ReportByTemplateService" autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.ReportingService" autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.ResourceService" autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.RSSFeedService"  autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.ScheduleService"  autowire="byName"/>
 
+			<bean class="org.oscarehr.ws.rest.SpecialistsService" autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.StatusService" autowire="byName" />
+			<bean class="org.oscarehr.ws.rest.TicklerWebService"  autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.UserMetricsService"  autowire="byName"/>
+
+			<!--  Not yet implemented
+
+			<bean class="org.oscarehr.ws.rest.SitesService"  autowire="byName"/>
+			<bean class="org.oscarehr.ws.rest.WaitListWebService" autowire="byName"/>
+			
+			-->
 		</jaxrs:serviceBeans>
 
 		<jaxrs:extensionMappings>
@@ -222,21 +276,4 @@
 			<entry key="json" value="application/json" />
 		</jaxrs:extensionMappings>
 	</jaxrs:server>
-
-	<bean id="jaxb" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
-      <property name="singleJaxbContext" value="true"/>
-
-      <property name="extraClass">
-         <list>
-           <value>org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer</value>
-         </list>
-      </property>
-
-	</bean>
-
-	<jaxws:endpoint implementor="#labUploadWs" address="/LabUploadService" >
-		<jaxws:inInterceptors>
-			<ref bean="authenticationInWSS4JInterceptor"/>
-		</jaxws:inInterceptors>
-	</jaxws:endpoint>
 </beans>

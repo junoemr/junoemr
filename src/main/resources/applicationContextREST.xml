@@ -1,4 +1,5 @@
-<beans xmlns="http://www.springframework.org/schema/beans" 
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
 	xmlns:cxf="http://cxf.apache.org/core"
@@ -7,10 +8,6 @@
 		http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
 		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
 	">
-
-	<!--<bean id="restLoggingInInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingInInterceptor" parent="abstractLoggingInterceptor"/>-->
-	<!--<bean id="restLoggingOutInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingOutInterceptor" parent="abstractLoggingInterceptor"/>-->
-
 	<bean id="oauthProvider" class="oscar.login.OscarOAuthDataProvider" autowire="byName"/>
 
 	<bean id="requestTokenService" class="oscar.login.OscarRequestTokenService">
@@ -43,6 +40,7 @@
 	<bean id="securityExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.SecurityExceptionMapper"/>
 	<bean id="missingArgumentExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.MissingArgumentExceptionMapper"/>
 	<bean id="rateLimitExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.RateLimitExceptionMapper"/>
+
 	<bean id="objectMapperProvider" class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
 
 	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider"/>
@@ -73,26 +71,22 @@
 
 	</jaxrs:server>
 
+	<!--
+					EXTERNAL REST SERVICES
+	!-->
 	<jaxrs:server id="restServicesV1" address="/services/v1">
 		<jaxrs:inInterceptors>
 			<ref bean="validationInInterceptor"/>
-			<!--<ref bean="restLoggingInInterceptor"/>-->
 		</jaxrs:inInterceptors>
+
 		<jaxrs:outInterceptors>
 			<ref bean="validationOutInterceptor"/>
-			<!--<ref bean="restLoggingOutInterceptor"/>-->
 		</jaxrs:outInterceptors>
 
 		<jaxrs:inFaultInterceptors>
-			<!-- XXX: make sure failed calls get logged
-			<ref bean="restLoggingInInterceptor" />
-			-->
 		</jaxrs:inFaultInterceptors>
+
 		<jaxrs:outFaultInterceptors>
-			<!-- XXX: make sure failed calls get logged
-			<ref bean="restLoggingOutInterceptor" />
-			<ref bean="exceptionParsingOutInterceptor" />
-			-->
 		</jaxrs:outFaultInterceptors>
 
 		<!-- define which services are externally available -->
