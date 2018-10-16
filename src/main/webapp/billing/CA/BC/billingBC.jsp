@@ -150,12 +150,15 @@ if(!authed) {
 </title>
 <html:base/>
 <link rel="stylesheet" type="text/css" media="all" href="../../../share/calendar/calendar.css" title="win2k-cold-1"/>
+<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/js/jquery_css/smoothness/jquery-ui-1.10.2.custom.min.css"/>
 <script type="text/javascript" src="../../../share/calendar/calendar.js"></script>
 <script type="text/javascript" src="../../../share/calendar/lang/<bean:message key="global.javascript.calendar"/>"></script>
 <script type="text/javascript" src="../../../share/calendar/calendar-setup.js"></script>
 <script type="text/javascript" src="../../../share/javascript/prototype.js"></script>
 <script type="text/javascript" src="../../../share/javascript/Oscar.js"></script>
 <script type="text/javascript" src="../../../share/javascript/boxover.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-ui-1.10.2.custom.min.js"></script>
 <style type="text/css">
   <!--
     A, BODY, INPUT, OPTION ,SELECT , TABLE, TEXTAREA, TD, TR {font-family:tahoma,Verdana, Arial, Helvetica,sans-serif; font-size:10px;}
@@ -179,6 +182,49 @@ if(!authed) {
   }
 </style>
 <script language="JavaScript">
+
+    jQuery.noConflict();
+
+    // Autocompletion of referral doctors
+    jQuery(document).ready(function(){
+        var xml_refer1 = jQuery('input[name=xml_refer1]'),
+            xml_refer2 = jQuery('input[name=xml_refer2]');
+
+        xml_refer1.removeAttr('onkeypress');
+        xml_refer2.removeAttr('onkeypress');
+
+        xml_refer1.keypress(function(){
+            xml_refer1.autocomplete({
+                minLength: 3,
+                delay: 300,
+                source: "billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
+                close: function(event, ui) {
+                    xml_refer1.keypress(function(event) {
+                        return grabEnter(event, function()
+                        {
+                            return ReferralScriptAttach('xml_refer1');
+                        });
+                    });
+                }
+            });
+        });
+
+        xml_refer2.keypress(function() {
+            xml_refer2.autocomplete({
+                minLength: 3,
+                delay: 300,
+                source: "billingReferCodeSearchApi.jsp?name=&name1=&name2=&search=&outputType=json&valueType=",
+                close: function(event, ui) {
+                    xml_refer2.keypress(function(event){
+                        return grabEnter(event, function()
+                        {
+                            return ReferralScriptAttach('xml_refer2');
+                        });
+                    });
+                }
+            });
+        });
+    });
 
 //creates a javaspt array of associated dx codes
 <%=createAssociationJS(assocCodeMap,"jsAssocCodes")%>
@@ -464,13 +510,16 @@ function RecordAttachments(Files, File0, File1, File2) {
 var remote=null;
 
 function rs(n,u,w,h,x) {
-  args="width="+w+",height="+h+",resizable=yes,scrollbars=yes,status=0,top=60,left=30";
+  var args = "width=" + w +",height=" + h + ",resizable=yes,scrollbars=yes,status=0,top=60,left=30";
+
   remote=window.open(u,n,args);
-  if (remote != null) {
-    if (remote.opener == null)
+  if (remote !== null && remote.opener === null) {
       remote.opener = self;
   }
-  if (x == 1) { return remote; }
+
+  if (x === 1) {
+      return remote;
+  }
 }
 
 
@@ -488,8 +537,6 @@ function ScriptAttach() {
 
 }
 
-
-
 function OtherScriptAttach() {
   t0 = escape(document.BillingCreateBillingForm.xml_other1.value);
   t1 = escape(document.BillingCreateBillingForm.xml_other2.value);
@@ -501,20 +548,12 @@ function OtherScriptAttach() {
   awnd.focus();
 }
 
-function ReferralScriptAttach1(){
-    ReferralScriptAttach('xml_refer1');
-}
-
-function ReferralScriptAttach2(){
-    ReferralScriptAttach('xml_refer2');
-}
-
 
 function ReferralScriptAttach(elementName) {
-     var d = elementName;
-     t0 = escape(document.BillingCreateBillingForm.elements[d].value);
-     t1 = escape("");
-     awnd=rs('att','<rewrite:reWrite jspPage="billingReferCodeSearch.jsp"/>?name='+t0 + '&name1=' + t1 + '&name2=&search=&formElement=' +d+ '&formName=BillingCreateBillingForm',600,600,1);
+     var d = elementName,
+         t0 = encodeURIComponent(document.BillingCreateBillingForm.elements[d].value),
+         t1 = encodeURIComponent("");
+     awnd=rs('att','<rewrite:reWrite jspPage="billingReferCodeSearch.jsp"/>?name='+ t0 + '&name1=' + t1 + '&name2=&search=&formElement=' + d + '&formName=BillingCreateBillingForm', 600, 600,1);
      awnd.focus();
 }
 
@@ -532,15 +571,14 @@ function POP(n,h,v) {
 }
 
 
-function grabEnter(event,callb){
-  if( (window.event && window.event.keyCode == 13) || (event && event.which == 13) )  {
-     eval(callb);
-     return false;
-  }
-}
+function grabEnter(event, callback) {
+    var enterCode = 13;
 
-</SCRIPT>
-<script language="JavaScript">
+    if ((window.event && window.event.keyCode === enterCode) || (event && event.which === enterCode)) {
+        callback();
+        return false;
+    }
+}
 
 function reloadPage(init) {  //reloads the window if Nav4 resized
   if (init==true) with (navigator) {if ((appName=="Netscape")&&(parseInt(appVersion)==4)) {
@@ -673,7 +711,20 @@ function checkifSet(icd9,feeitem,extrafeeitem){
    oscarLog("extra feeitem did put"+codeEntered(extrafeeitem));
 }
 
+function updateBillForm(formCode)
+{
+	var start_hr = jQuery('[name=xml_starttime_hr]').val();
+	var start_min = jQuery('[name=xml_starttime_min]').val();
+	var end_hr = jQuery('[name=xml_endtime_hr]').val();
+	var end_min = jQuery('[name=xml_endtime_min]').val();
 
+	document.location.href = "../../../billing.do?billRegion=<%=bean.getBillRegion()%>&billForm="+formCode+"&hotclick=&appointment_no=<%=bean.getApptNo()%>"+
+								"&demographic_name=<%=StringEscapeUtils.escapeHtml(bean.getPatientName())%>&demographic_no=<%=bean.getPatientNo()%>"+
+								"&user_no=<%=bean.getCreator()%>&apptProvider_no=<%=bean.getApptProviderNo()%>&providerview=<%=bean.getProviderView()%>"+
+								"&appointment_date=<%=bean.getApptDate()%>&status=<%=bean.getApptStatus()%>&start_time=<%=bean.getApptStart()%>"+
+								"&bNewForm=1&billType=<%=bean.getBillForm()%>&xml_starttime_hr="+start_hr+"&xml_starttime_min="+start_min+
+								"&xml_endtime_hr="+end_hr+"&xml_endtime_min="+end_min;
+}
 
 </script>
 <link rel="stylesheet" href="../billing/billing.css" type="text/css">
@@ -757,7 +808,7 @@ function checkifSet(icd9,feeitem,extrafeeitem){
   %>
     <tr class="<%=rowClass%>">
       <td colspan="2">
-        <a href="../../../billing.do?billRegion=<%=bean.getBillRegion()%>&billForm=<%=billformlist[i].getFormCode()%>&hotclick=&appointment_no=<%=bean.getApptNo()%>&demographic_name=<%=StringEscapeUtils.escapeHtml(bean.getPatientName())%>&demographic_no=<%=bean.getPatientNo()%>&user_no=<%=bean.getCreator()%>&apptProvider_no=<%=bean.getApptProviderNo()%>&providerview=<%=bean.getProviderView()%>&appointment_date=<%=bean.getApptDate()%>&status=<%=bean.getApptStatus()%>&start_time=<%=bean.getApptStart()%>&bNewForm=1&billType=<%=bean.getBillForm()%>" onClick="showHideLayers('Layer1','','hide')"><%=billformlist[i].getDescription()%>        </a>
+        <a href="javascript: updateBillForm('<%=billformlist[i].getFormCode()%>')"><%=billformlist[i].getDescription()%></a>
       </td>
     </tr>
   <%}  %>
@@ -1196,7 +1247,7 @@ if(wcbneeds != null){%>
                       </tr>
                       <tr>
                         <td>
-                            <html:text property="xml_refer1" size="40" onkeypress="return grabEnter(event,'ReferralScriptAttach1()')"/>
+                            <html:text property="xml_refer1" size="40"/>
                         </td>
                         <td>
                             <html:select property="refertype1">
@@ -1215,7 +1266,7 @@ if(wcbneeds != null){%>
                       </tr>
                       <tr>
                         <td>
-                            <html:text property="xml_refer2" size="40" onkeypress="return grabEnter(event,'ReferralScriptAttach2()')"/>
+                            <html:text property="xml_refer2" size="40"/>
                         </td>
                         <td>
                             <html:select property="refertype2">
@@ -1293,7 +1344,7 @@ if(wcbneeds != null){%>
                       </tr>
                       <tr>
                         <td nowrap>
-                            <html:text property="xml_other1" onblur="checkSelectedCodes()" size="40" onkeypress="return grabEnter(event,'OtherScriptAttach()')"/>
+                            <html:text property="xml_other1" onblur="checkSelectedCodes()" size="40" onkeypress="return grabEnter(event, OtherScriptAttach)"/>
                             <input type="button" value=".5" onClick="$('xml_other1_unit').value = '0.5'"/>
                         </td>
                         <td>
@@ -1302,7 +1353,7 @@ if(wcbneeds != null){%>
                       </tr>
                       <tr>
                         <td nowrap>
-                            <html:text property="xml_other2" onblur="checkSelectedCodes()" size="40" onkeypress="return grabEnter(event,'OtherScriptAttach()')"/>
+                            <html:text property="xml_other2" onblur="checkSelectedCodes()" size="40" onkeypress="return grabEnter(event, OtherScriptAttach)"/>
                             <input type="button" value=".5" onClick="$('xml_other2_unit').value = '0.5'"/>
                         </td>
                         <td>
@@ -1311,7 +1362,7 @@ if(wcbneeds != null){%>
                       </tr>
                       <tr>
                         <td nowrap>
-                            <html:text property="xml_other3" onblur="checkSelectedCodes()" size="40" onkeypress="return grabEnter(event,'OtherScriptAttach()')"/>
+                            <html:text property="xml_other3" onblur="checkSelectedCodes()" size="40" onkeypress="return grabEnter(event, OtherScriptAttach)"/>
                             <input type="button" value=".5" onClick="$('xml_other3_unit').value = '0.5'"/>
                         </td>
                         <td>
@@ -1382,17 +1433,17 @@ if(wcbneeds != null){%>
                       </tr>
                       <tr>
                         <td>
-                            <html:text property="xml_diagnostic_detail1" size="25" onkeypress="return grabEnter(event,'ScriptAttach()')"/>
+                            <html:text property="xml_diagnostic_detail1" size="25" onkeypress="return grabEnter(event, ScriptAttach)"/>
                         </td>
                       </tr>
                       <tr>
                         <td>
-                            <html:text property="xml_diagnostic_detail2" size="25" onkeypress="return grabEnter(event,'ScriptAttach()')"/>
+                            <html:text property="xml_diagnostic_detail2" size="25" onkeypress="return grabEnter(event, ScriptAttach)"/>
                         </td>
                       </tr>
                       <tr>
                         <td>
-                            <html:text property="xml_diagnostic_detail3" size="25" onkeypress="return grabEnter(event,'ScriptAttach()')"/>
+                            <html:text property="xml_diagnostic_detail3" size="25" onkeypress="return grabEnter(event, ScriptAttach)"/>
                         </td>
                       </tr>
                       <tr>

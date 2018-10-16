@@ -69,7 +69,6 @@ public class ConsultationResponseTo1 implements Serializable {
     private String letterheadFax;
     private List<ConsultationAttachmentTo1> attachments;
 	
-	private List<LetterheadTo1> letterheadList;
 	private List<ProfessionalSpecialistTo1> referringDoctorList;
 	private List<FaxConfigTo1> faxList;
 	private List<String> sendToList;
@@ -237,13 +236,7 @@ public class ConsultationResponseTo1 implements Serializable {
 	public void setAttachments(List<ConsultationAttachmentTo1> attachments) {
 		this.attachments = attachments;
 	}
-	
-	public List<LetterheadTo1> getLetterheadList() {
-		return letterheadList;
-	}
-	public void setLetterheadList(List<LetterheadTo1> letterheadList) {
-		this.letterheadList = letterheadList;
-	}
+
 	public List<ProfessionalSpecialistTo1> getReferringDoctorList() {
 		return referringDoctorList;
 	}

@@ -299,7 +299,7 @@ function BackToOscar()
                             <a href="javascript:void(0)" class="navBtn" onclick="toPage('previous', <%=searchType%>)"><</a>
 							<% for(int i = startIdx; i < endIdx; i++) {
 								int pageNum = i + 1;%>
-								<a href="javascript:void(0)" class="specialistPageLink" id="page<%=pageNum%>" onclick="nextPage(<%=pageLimit%>, <%=pageNum%>, '<%=ajaxSearch%>', <%=searchType%>)"><%=pageNum%></a>
+								<a href="javascript:void(0)" class="specialistPageLink" id="page<%=pageNum%>" onclick="nextPage(<%=pageLimit%>, <%=pageNum%>, '<%=ajaxSearch%>', '<%=searchType%>')"><%=pageNum%></a>
 							<% } %>
                             <a href="javascript:void(0)" class="navBtn" onclick="toPage('next', <%=searchType%>)">></a>
                             <a href="javascript:void(0)" class="navBtn" onclick="toPage('last', <%=searchType%>)">>></a>

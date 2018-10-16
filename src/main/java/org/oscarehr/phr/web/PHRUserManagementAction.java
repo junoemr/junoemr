@@ -24,38 +24,32 @@
 
 package org.oscarehr.phr.web;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
-
-import javax.persistence.PersistenceException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.ws.soap.SOAPFaultException;
-
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Element;
+import com.lowagie.text.Font;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.BaseFont;
+import com.lowagie.text.pdf.ColumnText;
+import com.lowagie.text.pdf.PdfContentByte;
+import com.lowagie.text.pdf.PdfImportedPage;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfWriter;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
 import org.apache.struts.actions.DispatchAction;
-import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.common.dao.PropertyDao;
-import org.oscarehr.document.model.CtlDocument;
-import org.oscarehr.common.model.CtlDocumentPK;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Property;
 import org.oscarehr.common.printing.FontSettings;
 import org.oscarehr.common.printing.PdfWriterFactory;
+import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.myoscar.client.ws_manager.AccountManager;
 import org.oscarehr.myoscar.utils.MyOscarLoggedInInfo;
 import org.oscarehr.myoscar_server.ws.InvalidRelationshipException_Exception;
@@ -75,30 +69,31 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WebUtils;
-
 import oscar.OscarProperties;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarDemographic.data.DemographicData;
 import oscar.util.UtilDateUtilities;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Element;
-import com.lowagie.text.Font;
-import com.lowagie.text.PageSize;
-import com.lowagie.text.Phrase;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.BaseFont;
-import com.lowagie.text.pdf.ColumnText;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfImportedPage;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfWriter;
+import javax.persistence.PersistenceException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.ws.soap.SOAPFaultException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Properties;
 
 public class PHRUserManagementAction extends DispatchAction {
 
 	private static Logger log = MiscUtils.getLogger();
+	private static DocumentService documentService = SpringUtils.getBean(DocumentService.class);
 
 	PHRDocumentDAO phrDocumentDAO;
 	PHRActionDAO phrActionDAO;
@@ -453,21 +448,15 @@ public class PHRUserManagementAction extends DispatchAction {
 			}
 			//Then create the record in the demographic file for record.
 			boas = generateUserRegistrationLetter(demographicNo, newAccount.getUserName(), request.getParameter("password"));
-			String docDir = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-			File docDirectory = new File(docDir);
 			Date registrationDate = new Date();
 			String filename = "PHRRegistrationLetter." + demographicNo + "." + registrationDate.getTime() + ".pdf";
-			File patientRegistrationDocument = new File(docDirectory, filename);
-			fos = new FileOutputStream(patientRegistrationDocument);
-			boas.writeTo(fos);
-
 
 			org.oscarehr.document.model.Document document = new org.oscarehr.document.model.Document();
 			document.setContenttype("application/pdf");
 			document.setDocdesc("PHR Registration");
 			document.setDocfilename(filename);
 			document.setDoccreator(user);
-			document.setPublic1(new Byte("0"));
+			document.setPublic1(false);
 			document.setStatus('A');
 			document.setNumberofpages(1);
 			document.setResponsible("");
@@ -476,18 +465,7 @@ public class PHRUserManagementAction extends DispatchAction {
             document.setContentdatetime(registrationDate);
 			document.setDoctype("others");
 
-			DocumentDao documentDAO = (DocumentDao) SpringUtils.getBean("documentDao");
-			documentDAO.persist(document);
-
-			CtlDocumentPK ctlDocumentPK = new CtlDocumentPK(Integer.parseInt("" + document.getId()), "demographic");
-
-			CtlDocument ctlDocument = new CtlDocument();
-			ctlDocument.setId(ctlDocumentPK);
-			ctlDocument.getId().setModuleId(Integer.parseInt(demographicNo));
-			ctlDocument.setStatus("A");
-			
-			CtlDocumentDao ctlDocumentDao = SpringUtils.getBean(CtlDocumentDao.class);
-			ctlDocumentDao.persist(ctlDocument);
+			documentService.uploadNewDemographicDocument(document, new ByteArrayInputStream(boas.toByteArray()), Integer.parseInt(demographicNo));
 
 			ar.addParameter("DocId", "" + document.getId());
 		} catch (PersistenceException pe) {

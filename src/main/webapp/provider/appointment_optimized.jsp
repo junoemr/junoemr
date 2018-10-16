@@ -1698,9 +1698,34 @@ private long getAppointmentRowSpan(
 														</c:if>
 
 
-														<a href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;" title="${appointmentInfo.appointmentLinkTitle}" >
+														<a href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;" ${appointmentInfo.appointmentLinkTitle} >
 															.${appointmentInfo.truncatedUpperName}
-														</a><!--Inline display of reason -->
+														</a>
+
+														<% if (OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true") || OscarProperties.getInstance().getProperty("APPT_THREE_LINE", "true").equals("true"))
+														{ %>
+														<%
+															if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
+															{
+														%>
+																<%=StringEscapeUtils.escapeHtml(appointment.getType())%>&nbsp;|&nbsp;<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
+														<% 	} %>
+														<%
+															if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() == null || appointmentInfo.getReason().length() == 0))
+															{
+														%>
+																<%=StringEscapeUtils.escapeHtml(appointment.getType())%>
+														<% 	} %>
+														<%
+															if ((appointment.getType() == null || appointment.getType().length() == 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
+															{
+														%>
+																<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
+														<% 	} %>
+
+														<% } %>
+
+														<!--Inline display of reason -->
 														<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
 															<span class="${appointmentInfo.reasonToggleableClass} reason reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
 																<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:${appointmentInfo.reason}
@@ -1864,6 +1889,29 @@ private long getAppointmentRowSpan(
 																	</oscar:oscarPropertiesCheck>
 
 																</c:if>
+
+																<oscar:oscarPropertiesCheck property="SHOW_PATIENT_APPOINTMENT_PHN_CHART" value="true" defaultVal="false">
+																	<c:if test="${appointmentInfo.demographicNo != null }">
+																		&#124;
+																		<c:choose>
+																			<c:when test="${not empty appointmentInfo.demographicHin}">
+																				${appointmentInfo.demographicHin}
+																			</c:when>
+																			<c:otherwise>
+																				-
+																			</c:otherwise>
+																		</c:choose>
+																		&#124;
+																		<c:choose>
+																			<c:when test="${not empty appointmentInfo.demographicChartNo}">
+																				${appointmentInfo.demographicChartNo}
+																			</c:when>
+																			<c:otherwise>
+																				-
+																			</c:otherwise>
+																		</c:choose>
+																	</c:if>
+																</oscar:oscarPropertiesCheck>
 
 																<!-- add one link to caisi Program Management Module -->
 																<c:if test="${appointmentInfo.birthday}">
