@@ -287,7 +287,7 @@ public class AddEditDocumentAction extends DispatchAction {
 			 	if (!EDocUtil.getDoctypes(fm.getFunction()).contains(fm.getDocType())){
 			 		EDocUtil.addDocTypeSQL(fm.getDocType(),fm.getFunction());
 			 	}
-			 	
+
 				boolean isPublicDoc = ("1".equals(fm.getDocPublic()) || "checked".equalsIgnoreCase(fm.getDocPublic()));
 				document.setPublic1(isPublicDoc);
 				document.setResponsible(fm.getResponsibleId());

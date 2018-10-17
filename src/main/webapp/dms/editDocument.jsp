@@ -100,7 +100,7 @@
 	}
 	else if(editDocumentNo != null && !editDocumentNo.equals(""))
 	{
-		EDoc currentDoc = EDocUtil.getDoc(editDocumentNo);
+		EDoc currentDoc = EDocUtil.getDoc(editDocumentNo, module);
 		formdata.setFunction(currentDoc.getModule());
 		formdata.setFunctionId(currentDoc.getModuleId());
 		formdata.setDocType(currentDoc.getType());
@@ -257,22 +257,23 @@
 	<table class="layouttable">
 		<tr>
 			<td>Type:</td>
-			<td><select name="docType" id="docType"
-					<% if(docerrors.containsKey("typemissing"))
-					{%> class="warning"
-					<%}%>>
-				<option value=""><bean:message
-						key="dms.addDocument.formSelect"/></option>
-				<%
-					for(int i = 0; i < doctypes.size(); i++)
-					{
-						String doctype = (String) doctypes.get(i);
-				%>
-				<option value="<%= doctype%>"
-						<%=(formdata.getDocType() != null && formdata.getDocType().equals(doctype)) ? " selected" : ""%>><%= doctype%>
-				</option>
-				<%}%>
-			</select></td>
+			<td>
+				<select name="docType" id="docType"
+						<% if(docerrors.containsKey("typemissing"))
+						{%> class="warning"
+						<%}%>>
+					<option value=""><bean:message
+							key="dms.addDocument.formSelect"/></option>
+					<%
+						for(int i = 0; i < doctypes.size(); i++)
+						{
+							String doctype = (String) doctypes.get(i);
+					%>
+					<option value="<%= doctype%>" <%=(formdata.getDocType() != null && formdata.getDocType().equals(doctype)) ? " selected" : ""%>><%= doctype%>
+					</option>
+					<%}%>
+				</select>
+			</td>
 		</tr>
 		<tr>
 			<td><bean:message key="dms.addDocument.msgDocClass"/>:</td>
