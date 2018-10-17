@@ -372,8 +372,7 @@ var docSubClassList = [
 					<% if (docerrors.containsKey("descmissing")) {%> class="warning" <%}%>>
 			<input type="hidden" name="docCreator"
 			       value="<%=formdata.getDocCreator()%>" size="20">
-			<span class="fieldlabel" title="Observation Date">Obs Date
-	(yyyy/mm/dd): </span>
+			<span class="fieldlabel" title="Observation Date">Obs Date(yyyy/mm/dd): </span>
 			<input type="text" name="observationDate" id="observationDate"
 			       value="<%=formdata.getObservationDate()%>"
 			       onclick="checkDefaultDate(this, '<%=UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd")%>')"
@@ -432,7 +431,7 @@ var docSubClassList = [
 		<input type="hidden" name="observationDate"
 		       value="<%=formdata.getObservationDate()%>">
 		<input type="hidden" name="appointmentNo" value="<%=formdata.getAppointmentNo()%>"/>
-		<select id="docType1" name="docType" style="width: 160">
+		<select id="docType1" name="docType" style="width: 160px">
 			<option value=""><bean:message key="dms.addDocument.formSelect"/></option>
 			<%
 				for(int i1 = 0; i1 < doctypes.size(); i1++)
