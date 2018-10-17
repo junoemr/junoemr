@@ -42,18 +42,18 @@
 			<tr>
 				<td width="26%"></td>
 				<%
-					if ("true".equals(request.getParameter("noTypeId")))
+					if ("true".equalsIgnoreCase(request.getParameter("noTypeId")))
 					{
 				%>
-						<td width="74%" class="white"><span style="color:red">Service Type ID is Required</span></td>
+						<td width="74%" class="white"><span style="color:red"><bean:message key="billing.manageBillingform_add.formServiceIDRequired"/></span></td>
 				<%
 					}
 				%>
 				<%
-					if ("true".equals(request.getParameter("typeIdInUse")))
+					if ("true".equalsIgnoreCase(request.getParameter("typeIdInUse")))
 					{
 				%>
-						<td width="74%" class="white"><span style="color:red">Service Type ID is Already in Use</span></td>
+						<td width="74%" class="white"><span style="color:red"><bean:message key="billing.manageBillingform_add.formServiceIDInUse"/></span></td>
 				<%
 					}
 				%>
@@ -69,18 +69,18 @@
 			<tr>
 				<td width="26%"></td>
 				<%
-					if ("true".equals(request.getParameter("noType")))
+					if ("true".equalsIgnoreCase(request.getParameter("noType")))
 					{
 				%>
-						<td width="74%" class="white"><span style="color:red">Service Type is Required</span></td>
+						<td width="74%" class="white"><span style="color:red"><bean:message key="billing.manageBillingform_add.formServiceRequired"/></span></td>
 				<%
 					}
 				%>
 				<%
-					if ("true".equals(request.getParameter("typeInUse")))
+					if ("true".equalsIgnoreCase(request.getParameter("typeInUse")))
 					{
 				%>
-						<td width="74%" class="white"><span style="color:red">Service Type is Already in Use</span></td>
+						<td width="74%" class="white"><span style="color:red"><bean:message key="billing.manageBillingform_add.formServiceInUse"/></span></td>
 				<%
 					}
 				%>
@@ -95,10 +95,10 @@
 			<tr>
 				<td width="26%"></td>
 				<%
-					if ("true".equals(request.getParameter("noGroup1")))
+					if ("true".equalsIgnoreCase(request.getParameter("noGroup1")))
 					{
 				%>
-						<td width="74%" class="white"><span style="color:red">Group1 Name is Required</span></td>
+						<td width="74%" class="white"><span style="color:red"><bean:message key="billing.manageBillingform_add.formGroup1Required"/></span></td>
 				<%
 					}
 				%>
@@ -113,10 +113,10 @@
 			<tr>
 				<td width="26%"></td>
 				<%
-					if ("true".equals(request.getParameter("noGroup2")))
+					if ("true".equalsIgnoreCase(request.getParameter("noGroup2")))
 					{
 				%>
-						<td width="74%" class="white"><span style="color:red">Group2 Name is Required</span></td>
+						<td width="74%" class="white"><span style="color:red"><bean:message key="billing.manageBillingform_add.formGroup2Required"/></span></td>
 				<%
 					}
 				%>
@@ -131,10 +131,10 @@
 			<tr>
 				<td width="26%"></td>
 				<%
-					if ("true".equals(request.getParameter("noGroup3")))
+					if ("true".equalsIgnoreCase(request.getParameter("noGroup3")))
 					{
 				%>
-						<td width="74%" class="white"><span style="color:red">Group3 Name is Required</span></td>
+						<td width="74%" class="white"><span style="color:red"><bean:message key="billing.manageBillingform_add.formGroup3Required"/></span></td>
 				<%
 					}
 				%>

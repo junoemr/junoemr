@@ -55,7 +55,7 @@
 	List<CtlBillingService> existingIds = ctlBillingServiceDao.findByServiceTypeId(typeid);
 	List<CtlBillingService> existingTypes = ctlBillingServiceDao.findByServiceTypeName(type);
 
-	if (typeid.compareTo("") == 0)
+	if (typeid.isEmpty())
 	{
 		noTypeId = true;
 	} else if (!existingIds.isEmpty())
@@ -63,7 +63,7 @@
 		typeIdInUse = true;
 	}
 
-	if (type.compareTo("") == 0)
+	if (type.isEmpty())
 	{
 		noType = true;
 	} else if (!existingTypes.isEmpty())
@@ -71,19 +71,19 @@
 		typeInUse = true;
 	}
 
-	if (group1.compareTo("") == 0)
+	if (group1.isEmpty())
 	{
 		noGroup1 = true;
 	}
 
-	if (group2.compareTo("") == 0)
+	if (group2.isEmpty())
 	{
 		noGroup2 = true;
 	}
 
-	if (group3.compareTo("") == 0)
+	if (group3.isEmpty())
 	{
-		noGroup2 = true;
+		noGroup3 = true;
 	}
 
 	if (noTypeId || noType || noGroup1 || noGroup2 || noGroup3 || typeIdInUse || typeInUse)
