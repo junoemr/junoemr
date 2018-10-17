@@ -16,7 +16,7 @@ var printControl = {
 		if (pdfSave.size() == 0) { pdfSave = jQuery("input[name='pdfSaveButton']"); }
 	
 		pdf.insertAfter(submit);	
-		pdfSave.insertAfter(submit);
+		//pdfSave.insertAfter(submit);
 
 		if (pdf.size() != 0) {
 			pdf.attr("onclick", "").unbind("click");
