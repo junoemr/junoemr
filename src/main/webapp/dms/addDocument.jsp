@@ -38,103 +38,132 @@
 	}
 %>
 
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
-<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@ page
-	import="java.util.*, oscar.util.*, oscar.OscarProperties, oscar.dms.*, oscar.dms.data.*, org.oscarehr.util.SpringUtils, org.oscarehr.common.dao.CtlDocClassDao"%>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
+<%@ page import="org.oscarehr.common.dao.CtlDocClassDao" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.OscarProperties" %>
+<%@ page import="oscar.dms.EDocUtil" %>
+<%@ page import="oscar.dms.data.AddEditDocumentForm" %>
+<%@ page import="oscar.util.UtilDateUtilities" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.Enumeration" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Hashtable" %>
+<%@ page import="java.util.List" %>
 <%--This is included in documentReport.jsp - wasn't meant to be displayed as a separate page --%>
 <%
-String user_no = (String) session.getAttribute("user");
-String appointment = request.getParameter("appointmentNo");
+	String user_no = (String) session.getAttribute("user");
+	String appointment = request.getParameter("appointmentNo");
 
-String module = "";
-String moduleid = "";
-if (request.getParameter("function") != null) {
-    module = request.getParameter("function");
-    moduleid = request.getParameter("functionid");
-} else if (request.getAttribute("function") != null) {
-    module = (String) request.getAttribute("function");
-    moduleid = (String) request.getAttribute("functionid");
-}
+	String module = "";
+	String moduleid = "";
+	if(request.getParameter("function") != null)
+	{
+		module = request.getParameter("function");
+		moduleid = request.getParameter("functionid");
+	}
+	else if(request.getAttribute("function") != null)
+	{
+		module = (String) request.getAttribute("function");
+		moduleid = (String) request.getAttribute("functionid");
+	}
 
-String curUser = "";
-if (request.getParameter("curUser") != null) {
-    curUser = request.getParameter("curUser");
-} else if (request.getAttribute("curUser") != null) {
-    curUser = (String) request.getAttribute("curUser");
-}
+	String curUser = "";
+	if(request.getParameter("curUser") != null)
+	{
+		curUser = request.getParameter("curUser");
+	}
+	else if(request.getAttribute("curUser") != null)
+	{
+		curUser = (String) request.getAttribute("curUser");
+	}
 
-OscarProperties props = OscarProperties.getInstance();
+	OscarProperties props = OscarProperties.getInstance();
 
-AddEditDocumentForm formdata = new AddEditDocumentForm();
-formdata.setAppointmentNo(appointment);
-String defaultType = (String) props.getProperty("eDocAddTypeDefault", "");
-String defaultDesc = "Enter Title"; //if defaultType isn't defined, this value is used for the title/description
-String defaultHtml = "Enter Link URL";
+	AddEditDocumentForm formdata = new AddEditDocumentForm();
+	formdata.setAppointmentNo(appointment);
+	String defaultType = (String) props.getProperty("eDocAddTypeDefault", "");
+	String defaultDesc = "Enter Title"; //if defaultType isn't defined, this value is used for the title/description
+	String defaultHtml = "Enter Link URL";
 
-if(request.getParameter("defaultDocType") != null) {
-	defaultType = request.getParameter("defaultDocType");
-}
-HashMap<String, String> docerrors = new HashMap<String, String>();
-if (request.getAttribute("docerrors") != null) {
-	docerrors = (HashMap<String, String>) request.getAttribute("docerrors");
-}
+	if(request.getParameter("defaultDocType") != null)
+	{
+		defaultType = request.getParameter("defaultDocType");
+	}
+	HashMap<String, String> docerrors = new HashMap<String, String>();
+	if(request.getAttribute("docerrors") != null)
+	{
+		docerrors = (HashMap<String, String>) request.getAttribute("docerrors");
+	}
 
-Hashtable linkhtmlerrors = new Hashtable();
-if (request.getAttribute("linkhtmlerrors") != null) {
-    linkhtmlerrors = (Hashtable) request.getAttribute("linkhtmlerrors");
-}
+	Hashtable linkhtmlerrors = new Hashtable();
+	if(request.getAttribute("linkhtmlerrors") != null)
+	{
+		linkhtmlerrors = (Hashtable) request.getAttribute("linkhtmlerrors");
+	}
 
 //for "add document" link from the patient master page - the "mode" variable allows the add div to open up
-String mode = "";
-if (request.getAttribute("mode") != null) {
-    mode = (String) request.getAttribute("mode");
-} else if (request.getParameter("mode") != null) {
-    mode = request.getParameter("mode");
-}
+	String mode = "";
+	if(request.getAttribute("mode") != null)
+	{
+		mode = (String) request.getAttribute("mode");
+	}
+	else if(request.getParameter("mode") != null)
+	{
+		mode = request.getParameter("mode");
+	}
 
 //Retrieve encounter id for updating encounter navbar if info this page changes anything
-String parentAjaxId;
-if( request.getParameter("parentAjaxId") != null )
-    parentAjaxId = request.getParameter("parentAjaxId");
-else if( request.getAttribute("parentAjaxId") != null )
-    parentAjaxId = (String)request.getAttribute("parentAjaxId");
-else
-    parentAjaxId = "";
+	String parentAjaxId;
+	if(request.getParameter("parentAjaxId") != null)
+		parentAjaxId = request.getParameter("parentAjaxId");
+	else if(request.getAttribute("parentAjaxId") != null)
+		parentAjaxId = (String) request.getAttribute("parentAjaxId");
+	else
+		parentAjaxId = "";
 
-if (request.getAttribute("completedForm") != null) {
-formdata = (AddEditDocumentForm) request.getAttribute("completedForm");
-} else {
-    formdata.setFunction(module);  //"module" and "function" are the same
-    formdata.setFunctionId(moduleid);
-    formdata.setDocType(defaultType);
-    formdata.setDocDesc(defaultType.equals("")?defaultDesc:defaultType);
-    formdata.setDocCreator(user_no);
-    formdata.setObservationDate(UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
-    formdata.setHtml(defaultHtml);
-    formdata.setAppointmentNo(appointment);
-}
-ArrayList doctypes = EDocUtil.getActiveDocTypes(formdata.getFunction());
+	if(request.getAttribute("completedForm") != null)
+	{
+		formdata = (AddEditDocumentForm) request.getAttribute("completedForm");
+	}
+	else
+	{
+		formdata.setFunction(module);  //"module" and "function" are the same
+		formdata.setFunctionId(moduleid);
+		formdata.setDocType(defaultType);
+		formdata.setDocDesc(defaultType.equals("") ? defaultDesc : defaultType);
+		formdata.setDocCreator(user_no);
+		formdata.setObservationDate(UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
+		formdata.setHtml(defaultHtml);
+		formdata.setAppointmentNo(appointment);
+	}
+	ArrayList doctypes = EDocUtil.getActiveDocTypes(formdata.getFunction());
 
-CtlDocClassDao docClassDao = (CtlDocClassDao)SpringUtils.getBean("ctlDocClassDao");
-List<String> reportClasses = docClassDao.findUniqueReportClasses();
-ArrayList<String> subClasses = new ArrayList<String>();
-ArrayList<String> consultA = new ArrayList<String>();
-ArrayList<String> consultB = new ArrayList<String>();
-for (String reportClass : reportClasses) {
-    List<String> subClassList = docClassDao.findSubClassesByReportClass(reportClass);
-    if (reportClass.equals("Consultant ReportA")) consultA.addAll(subClassList);
-    else if (reportClass.equals("Consultant ReportB")) consultB.addAll(subClassList);
-    else subClasses.addAll(subClassList);
+	CtlDocClassDao docClassDao = (CtlDocClassDao) SpringUtils.getBean("ctlDocClassDao");
+	List<String> reportClasses = docClassDao.findUniqueReportClasses();
+	ArrayList<String> subClasses = new ArrayList<String>();
+	ArrayList<String> consultA = new ArrayList<String>();
+	ArrayList<String> consultB = new ArrayList<String>();
+	for(String reportClass : reportClasses)
+	{
+		List<String> subClassList = docClassDao.findSubClassesByReportClass(reportClass);
+		if(reportClass.equals("Consultant ReportA")) consultA.addAll(subClassList);
+		else if(reportClass.equals("Consultant ReportB")) consultB.addAll(subClassList);
+		else subClasses.addAll(subClassList);
 
-    if (!consultA.isEmpty() && !consultB.isEmpty()) {
-        for (String partA : consultA) {
-            for (String partB : consultB) {
-                subClasses.add(partA+" "+partB);
-            }
-        }
-    }
-}
+		if(!consultA.isEmpty() && !consultB.isEmpty())
+		{
+			for(String partA : consultA)
+			{
+				for(String partB : consultB)
+				{
+					subClasses.add(partA + " " + partB);
+				}
+			}
+		}
+	}
 %>
 <script src="../share/javascript/Oscar.js" type="text/javascript language='JavaScript'"></script>
 <script type="text/javascript" src="../share/javascript/prototype.js"></script>
@@ -163,7 +192,7 @@ for (String reportClass : reportClasses) {
 
 <script type="text/javascript" src="../share/calendar/calendar.js"></script>
 <script type="text/javascript"
-	src="../share/calendar/lang/<bean:message key="global.javascript.calendar"/>"></script>
+        src="../share/calendar/lang/<bean:message key="global.javascript.calendar"/>"></script>
 <script type="text/javascript" src="../share/calendar/calendar-setup.js"></script>
 <script type="text/javascript" language="JavaScript">
 function onloadfunction() {
@@ -293,158 +322,175 @@ var docSubClassList = [
 ];
 </script>
 <div class="topplane">
-<div class="docHeading" style="background-color: #d1d5bd;">
-    <a id="plusminusAddDocA" href="javascript: showhide('addDocDiv', 'plusminusAddDocA');"> +<bean:message key="dms.addDocument.msgAddDocument"/></a>
-    <%-- a id="plusminusAddDocA" href="undocumentReport2.jsp"> +<bean:message key="dms.addDocument.msgManageUploadDocument"/></a --%>
-    <a id="plusminusLinkA" href="javascript: showhide('addLinkDiv', 'plusminusLinkA')"> +<bean:message key="dms.addDocument.AddLink"/> </a>
-    <a href="javascript:;" onclick="popup(450, 600, 'addedithtmldocument.jsp?function=<%=module%>&functionid=<%=moduleid%>&mode=addHtml', 'addhtml')">+<bean:message key="dms.addDocument.AddHTML"/></a>
-</div>
-<div id="addDocDiv" class="addDocDiv"
-	style="background-color: #f2f5e3; display: none;"><html:form
-	action="/dms/addEditDocument" method="POST"
-	enctype="multipart/form-data" styleClass="forms"
-	onsubmit="return submitUpload(this)">
-	<%-- Lists Errors --%>
-	<% for (String key : docerrors.keySet()) {%>
-	<font class="warning">Error: <bean:message
-		key="<%=docerrors.get(key)%>" /></font>
-	<br />
-	<% } %>
-	<input type="hidden" name="function"
-		value="<%=formdata.getFunction()%>" size="20">
-	<input type="hidden" name="functionId"
-		value="<%=formdata.getFunctionId()%>" size="20">
-	<input type="hidden" name="functionid" value="<%=moduleid%>" size="20">
-	<input type="hidden" name="parentAjaxId" value="<%=parentAjaxId%>">
-	<input type="hidden" name="curUser" value="<%=curUser%>">
-	<input type="hidden" name="appointmentNo" value="<%=formdata.getAppointmentNo()%>"/>
-	<select id="docType" name="docType" style="width: 160" > 
-		<option value=""><bean:message key="dms.addDocument.formSelect" /></option>
-		<%
-                                   for (int i=0; i<doctypes.size(); i++) {
-                                      String doctype = (String) doctypes.get(i); %>
-		<option value="<%= doctype%>"
-			<%=(formdata.getDocType().equals(doctype))?" selected":""%>><%= doctype%></option>
-		<%}%>
-	</select>
-	<input id="docTypeinput1" type="button" size="20" onClick="newDocType();" value="<bean:message key="dms.documentEdit.formAddNewDocType"/>" /> 
-	<% if (module.equals("provider")) {%>
-                                Public: <input type="checkbox"
-		name="docPublic" <%=formdata.getDocPublic() + " "%> value="checked">
-	<% } %>
-	<input type="text" name="docDesc" size="30"
-		value="<%=formdata.getDocDesc()%>" onfocus="checkDefaultValue(this)"
-		<% if (docerrors.containsKey("descmissing")) {%> class="warning" <%}%>>
-	<input type="hidden" name="docCreator"
-		value="<%=formdata.getDocCreator()%>" size="20">
-	<span class="fieldlabel" title="Observation Date">Obs Date
+	<div class="docHeading" style="background-color: #d1d5bd;">
+		<a id="plusminusAddDocA" href="javascript: showhide('addDocDiv', 'plusminusAddDocA');"> +<bean:message key="dms.addDocument.msgAddDocument"/></a>
+		<%-- a id="plusminusAddDocA" href="undocumentReport2.jsp"> +<bean:message key="dms.addDocument.msgManageUploadDocument"/></a --%>
+		<a id="plusminusLinkA" href="javascript: showhide('addLinkDiv', 'plusminusLinkA')"> +<bean:message key="dms.addDocument.AddLink"/> </a>
+		<a href="javascript:;" onclick="popup(450, 600, 'addedithtmldocument.jsp?function=<%=module%>&functionid=<%=moduleid%>&mode=addHtml', 'addhtml')">+<bean:message
+				key="dms.addDocument.AddHTML"/></a>
+	</div>
+	<div id="addDocDiv" class="addDocDiv"
+	     style="background-color: #f2f5e3; display: none;">
+		<html:form
+				action="/dms/addEditDocument" method="POST"
+				enctype="multipart/form-data" styleClass="forms"
+				onsubmit="return submitUpload(this)">
+			<%-- Lists Errors --%>
+			<% for(String key : docerrors.keySet())
+			{%>
+			<font class="warning">Error: <bean:message
+					key="<%=docerrors.get(key)%>"/></font>
+			<br/>
+			<% } %>
+			<input type="hidden" name="function"
+			       value="<%=formdata.getFunction()%>" size="20">
+			<input type="hidden" name="functionId"
+			       value="<%=formdata.getFunctionId()%>" size="20">
+			<input type="hidden" name="functionid" value="<%=moduleid%>" size="20">
+			<input type="hidden" name="parentAjaxId" value="<%=parentAjaxId%>">
+			<input type="hidden" name="curUser" value="<%=curUser%>">
+			<input type="hidden" name="appointmentNo" value="<%=formdata.getAppointmentNo()%>"/>
+			<select id="docType" name="docType" style="width: 160px">
+				<option value=""><bean:message key="dms.addDocument.formSelect"/></option>
+				<%
+					for(int i = 0; i < doctypes.size(); i++)
+					{
+						String doctype = (String) doctypes.get(i); %>
+				<option value="<%= doctype%>"
+						<%=(formdata.getDocType().equals(doctype)) ? " selected" : ""%>><%= doctype%>
+				</option>
+				<%}%>
+			</select>
+			<input id="docTypeinput1" type="button" size="20" onClick="newDocType();" value="<bean:message key="dms.documentEdit.formAddNewDocType"/>"/>
+			<% if(module.equals("provider"))
+			{%>
+			Public: <input type="checkbox"
+			               name="docPublic" <%=formdata.getDocPublic() + " "%> value="checked">
+			<% } %>
+			<input type="text" name="docDesc" size="30"
+			       value="<%=formdata.getDocDesc()%>" onfocus="checkDefaultValue(this)"
+					<% if (docerrors.containsKey("descmissing")) {%> class="warning" <%}%>>
+			<input type="hidden" name="docCreator"
+			       value="<%=formdata.getDocCreator()%>" size="20">
+			<span class="fieldlabel" title="Observation Date">Obs Date
 	(yyyy/mm/dd): </span>
-	<input type="text" name="observationDate" id="observationDate"
-		value="<%=formdata.getObservationDate()%>"
-		onclick="checkDefaultDate(this, '<%=UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd")%>')"
-		size="10" style="text-align: center;">
-	<a id="obsdate"><img title="Calendar" src="../images/cal.gif"
-		alt="Calendar" border="0" /></a>
-	<input type="file" name="docFile" size="20"
-		<% if (docerrors.containsKey("uploaderror")) {%> class="warning" <%}%>>
-	<br />
-        <bean:message key="dms.addDocument.msgDocClass"/>:
-        <select name="docClass" id="docClass">
-            <option value=""><bean:message key="dms.addDocument.formSelectClass"/></option>
-<% boolean consult1Shown = false;
-for (String reportClass : reportClasses) {
-    if (reportClass.startsWith("Consultant Report")) {
-        if (consult1Shown) continue;
-        reportClass = "Consultant Report";
-        consult1Shown = true;
-    }
-%>
-            <option value="<%=reportClass%>"><%=reportClass%></option>
-<% } %>
-        </select>
-        &nbsp;&nbsp;&nbsp;
-        <bean:message key="dms.addDocument.msgDocSubClass"/>:
-        <input type="text" name="docSubClass" id="docSubClass" style="width:330px">
-        <div class="autocomplete_style" id="docSubClass_list"></div>
-        &nbsp;
-        <input type="checkbox" name="restrictToProgram"> Restrict to current program
-        <br />
-	<input type="hidden" name="mode" value="add">
-	<input type="submit" name="Submit" value="Add">
-	<input type="button" name="Button"
-		value="<bean:message key="global.btnCancel"/>"
-		onclick="javascript: window.location='documentReport.jsp?function=<%=module%>&functionid=<%=moduleid%>'">
-</html:form></div>
-<div id="addLinkDiv" class="addDocDiv"
-	style="background-color: #f2f5e3; display: none;"><html:form
-	action="/dms/addLink" method="POST" styleClass="forms"
-	onsubmit="return submitUploadLink(this)">
-	<%-- Lists Errors --%>
-	<% for (Enumeration errorkeys = linkhtmlerrors.keys(); errorkeys.hasMoreElements();) {%>
-	<font class="warning">Error: <bean:message
-		key="<%=(String) linkhtmlerrors.get(errorkeys.nextElement())%>" /></font>
-	<br />
-	<% } %>
-	<input type="hidden" name="function"
-		value="<%=formdata.getFunction()%>" size="20">
-	<input type="hidden" name="functionId"
-		value="<%=formdata.getFunctionId()%>" size="20">
-	<input type="hidden" name="functionid" value="<%=moduleid%>" size="20">
-	<input type="hidden" name="observationDate"
-		value="<%=formdata.getObservationDate()%>">
+			<input type="text" name="observationDate" id="observationDate"
+			       value="<%=formdata.getObservationDate()%>"
+			       onclick="checkDefaultDate(this, '<%=UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd")%>')"
+			       size="10" style="text-align: center;">
+			<a id="obsdate"><img title="Calendar" src="../images/cal.gif"
+			                     alt="Calendar" border="0"/></a>
+			<input type="file" name="docFile" size="20"
+					<% if (docerrors.containsKey("uploaderror")) {%> class="warning" <%}%>>
+			<br/>
+			<bean:message key="dms.addDocument.msgDocClass"/>:
+			<select name="docClass" id="docClass">
+				<option value=""><bean:message key="dms.addDocument.formSelectClass"/></option>
+				<% boolean consult1Shown = false;
+					for(String reportClass : reportClasses)
+					{
+						if(reportClass.startsWith("Consultant Report"))
+						{
+							if(consult1Shown) continue;
+							reportClass = "Consultant Report";
+							consult1Shown = true;
+						}
+				%>
+				<option value="<%=reportClass%>"><%=reportClass%>
+				</option>
+				<% } %>
+			</select>
+			&nbsp;&nbsp;&nbsp;
+			<bean:message key="dms.addDocument.msgDocSubClass"/>:
+			<input type="text" name="docSubClass" id="docSubClass" style="width:330px">
+			<div class="autocomplete_style" id="docSubClass_list"></div>
+			&nbsp;
+			<input type="checkbox" name="restrictToProgram"> Restrict to current program
+			<br/>
+			<input type="hidden" name="mode" value="add">
+			<input type="submit" name="Submit" value="Add">
+			<input type="button" name="Button"
+			       value="<bean:message key="global.btnCancel"/>"
+			       onclick="javascript: window.location='documentReport.jsp?function=<%=module%>&functionid=<%=moduleid%>'">
+		</html:form></div>
+	<div id="addLinkDiv" class="addDocDiv"
+	     style="background-color: #f2f5e3; display: none;"><html:form
+			action="/dms/addLink" method="POST" styleClass="forms"
+			onsubmit="return submitUploadLink(this)">
+		<%-- Lists Errors --%>
+		<% for(Enumeration errorkeys = linkhtmlerrors.keys(); errorkeys.hasMoreElements(); )
+		{%>
+		<font class="warning">Error: <bean:message
+				key="<%=(String) linkhtmlerrors.get(errorkeys.nextElement())%>"/></font>
+		<br/>
+		<% } %>
+		<input type="hidden" name="function"
+		       value="<%=formdata.getFunction()%>" size="20">
+		<input type="hidden" name="functionId"
+		       value="<%=formdata.getFunctionId()%>" size="20">
+		<input type="hidden" name="functionid" value="<%=moduleid%>" size="20">
+		<input type="hidden" name="observationDate"
+		       value="<%=formdata.getObservationDate()%>">
 		<input type="hidden" name="appointmentNo" value="<%=formdata.getAppointmentNo()%>"/>
-	<select id="docType1" name="docType" style="width: 160" > 
- 		<option value=""><bean:message key="dms.addDocument.formSelect" /></option> 
-		<%
-         for (int i1=0; i1<doctypes.size(); i1++) {
-                                      String doctype = (String) doctypes.get(i1); %>
-		<option value="<%= doctype%>"
-			<%=(formdata.getDocType().equals(doctype))?" selected":""%>><%= doctype%></option>
-		<%}%>
-	</select>
-	<input id="docTypeinput1" type="button" size="20" onClick="newDocTypeLink();" value="<bean:message key="dms.documentEdit.formAddNewDocType"/>" />  
-	<% if (module.equals("provider")) {%>
-                                Public: <input type="checkbox"
-		name="docPublic" <%=formdata.getDocPublic() + " "%> value="checked">
-	<% } %>
-	<input type="text" name="docDesc" size="30"
-		value="<%=formdata.getDocDesc()%>" onfocus="checkDefaultValue(this)"
-		<% if (linkhtmlerrors.containsKey("descmissing")) {%> class="warning"
-		<%}%>>
-	<input type="text" name="html" size="30"
-		value="<%=formdata.getHtml()%>" onfocus="checkDefaultValue(this)">
-	<input type="hidden" name="docCreator"
-		value="<%=formdata.getDocCreator()%>" size="20">
+		<select id="docType1" name="docType" style="width: 160">
+			<option value=""><bean:message key="dms.addDocument.formSelect"/></option>
+			<%
+				for(int i1 = 0; i1 < doctypes.size(); i1++)
+				{
+					String doctype = (String) doctypes.get(i1); %>
+			<option value="<%= doctype%>"
+					<%=(formdata.getDocType().equals(doctype)) ? " selected" : ""%>><%= doctype%>
+			</option>
+			<%}%>
+		</select>
+		<input id="docTypeinput1" type="button" size="20" onClick="newDocTypeLink();" value="<bean:message key="dms.documentEdit.formAddNewDocType"/>"/>
+		<% if(module.equals("provider"))
+		{%>
+		Public: <input type="checkbox"
+		               name="docPublic" <%=formdata.getDocPublic() + " "%> value="checked">
+		<% } %>
+		<input type="text" name="docDesc" size="30"
+		       value="<%=formdata.getDocDesc()%>" onfocus="checkDefaultValue(this)"
+				<% if (linkhtmlerrors.containsKey("descmissing")) {%> class="warning"
+				<%}%>>
+		<input type="text" name="html" size="30"
+		       value="<%=formdata.getHtml()%>" onfocus="checkDefaultValue(this)">
+		<input type="hidden" name="docCreator"
+		       value="<%=formdata.getDocCreator()%>" size="20">
 		<input type="hidden" name="appointmentNo" value="<%=formdata.getAppointmentNo()%>"/>
-	<br />
-        <bean:message key="dms.addDocument.msgDocClass"/>:
-        <select name="docClass" id="docClass">
-            <option value=""><bean:message key="dms.addDocument.formSelectClass"/></option>
-<% boolean consult2Shown = false;
-for (String reportClass : reportClasses) {
-    if (reportClass.startsWith("Consultant Report")) {
-        if (consult2Shown) continue;
-        reportClass = "Consultant Report";
-        consult2Shown = true;
-    }
-%>
-            <option value="<%=reportClass%>"><%=reportClass%></option>
-<% } %>
-        </select>
-        &nbsp;&nbsp;&nbsp;
-        <bean:message key="dms.addDocument.msgDocSubClass"/>:
-        <input type="text" name="docSubClass" id="docSubClass2" style="width:330px">
-        <div class="autocomplete_style" id="docSubClass_list2"></div>
-        
-        
-		
-        <br />
-	<input type="hidden" name="mode" value="addLink">
-	<input type="SUBMIT" name="Submit" value="Add">
-	<input type="button" name="Button"
-		value="<bean:message key="global.btnCancel"/>"
-		onclick="javascript: window.location='documentReport.jsp?function=<%=module%>&functionid=<%=moduleid%>'">
-</html:form> <script type="text/javascript">
-                            Calendar.setup( { inputField : "observationDate", ifFormat : "%Y/%m/%d", showsTime :false, button : "obsdate", singleClick : true, step : 1 } );
-                           </script></div>
+		<br/>
+		<bean:message key="dms.addDocument.msgDocClass"/>:
+		<select name="docClass" id="docClass">
+			<option value=""><bean:message key="dms.addDocument.formSelectClass"/></option>
+			<% boolean consult2Shown = false;
+				for(String reportClass : reportClasses)
+				{
+					if(reportClass.startsWith("Consultant Report"))
+					{
+						if(consult2Shown) continue;
+						reportClass = "Consultant Report";
+						consult2Shown = true;
+					}
+			%>
+			<option value="<%=reportClass%>"><%=reportClass%>
+			</option>
+			<% } %>
+		</select>
+		&nbsp;&nbsp;&nbsp;
+		<bean:message key="dms.addDocument.msgDocSubClass"/>:
+		<input type="text" name="docSubClass" id="docSubClass2" style="width:330px">
+		<div class="autocomplete_style" id="docSubClass_list2"></div>
+
+
+		<br/>
+		<input type="hidden" name="mode" value="addLink">
+		<input type="SUBMIT" name="Submit" value="Add">
+		<input type="button" name="Button"
+		       value="<bean:message key="global.btnCancel"/>"
+		       onclick="javascript: window.location='documentReport.jsp?function=<%=module%>&functionid=<%=moduleid%>'">
+	</html:form>
+		<script type="text/javascript">
+			Calendar.setup({inputField: "observationDate", ifFormat: "%Y/%m/%d", showsTime: false, button: "obsdate", singleClick: true, step: 1});
+		</script>
+	</div>
 </div>
