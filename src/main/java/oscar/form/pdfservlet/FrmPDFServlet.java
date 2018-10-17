@@ -281,7 +281,8 @@ public class FrmPDFServlet extends HttpServlet {
 			//ie. __graphicPage=2&__graphicPage=3
 			String[] graphicPage = req.getParameterValues("__graphicPage");
 			ArrayList<String> graphicPageArray = new ArrayList<String>();
-			if (graphicPage != null){
+			if (graphicPage != null)
+			{
 				graphicPageArray = new ArrayList<String>(Arrays.asList(graphicPage));
 			}
 
