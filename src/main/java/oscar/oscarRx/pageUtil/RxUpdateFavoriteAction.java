@@ -83,32 +83,30 @@ public final class RxUpdateFavoriteAction extends DispatchAction {
             return (mapping.findForward("success"));
     }
 
-    public ActionForward ajaxEditFavorite(ActionMapping mapping,
-				 ActionForm form,
-				 HttpServletRequest request,
-				 HttpServletResponse response)
-	{
-		if (!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_rx", "u", null)) {
-			throw new RuntimeException("missing required security object (_rx)");
-		}
-		
-            // Setup variables
+    public ActionForward ajaxEditFavorite(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+    {
+            if (!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_rx", "u", null))
+            {
+                    throw new RuntimeException("missing required security object (_rx)");
+            }
+
             int favId = Integer.parseInt(request.getParameter("favoriteId"));
+            String favName = request.getParameter("favoriteName");
+            String customName = request.getParameter("customName");
+            String takeMin = request.getParameter("takeMin");
+            String takeMax = request.getParameter("takeMax");
+            String freqCode = request.getParameter("frequencyCode");
+            String duration = request.getParameter("duration");
+            String durationUnit = request.getParameter("durationUnit");
+            String quantity = request.getParameter("quantity");
+            String repeat = request.getParameter("repeat");
+            String noSubs = request.getParameter("nosubs");
+            String prn = request.getParameter("prn");
+            String special = request.getParameter("special");
+            String customInstr = request.getParameter("customInstr");
 
             RxPrescriptionData.Favorite fav = new RxPrescriptionData().getFavorite(favId);
-            String favName=request.getParameter("favoriteName");
-            String customName=request.getParameter("customName");
-            String takeMin=request.getParameter("takeMin");
-            String takeMax=request.getParameter("takeMax");
-            String freqCode=request.getParameter("frequencyCode");
-            String duration=request.getParameter("duration");
-            String durationUnit=request.getParameter("durationUnit");
-            String quantity=request.getParameter("quantity");
-            String repeat=request.getParameter("repeat");
-            String noSubs=request.getParameter("nosubs");
-            String prn=request.getParameter("prn");
-            String special=request.getParameter("special");
-            String customInstr=request.getParameter("customInstr");
+
             fav.setFavoriteName(favName);
             fav.setCustomName(customName);
             fav.setTakeMin(RxUtil.StringToFloat(takeMin));
@@ -118,24 +116,17 @@ public final class RxUpdateFavoriteAction extends DispatchAction {
             fav.setDurationUnit(durationUnit);
             fav.setQuantity(quantity);
             fav.setRepeat(Integer.parseInt(repeat));
-            if(noSubs.equalsIgnoreCase("true"))
-                fav.setNosubs(true);
-            else
-                fav.setNosubs(false);
-            if(prn.equalsIgnoreCase("true"))
-                fav.setPrn(true);
-            else
-                fav.setPrn(false);
             fav.setSpecial(special);
-            if(customInstr.equalsIgnoreCase("true"))
-                fav.setCustomInstr(true);
-            else
-                fav.setCustomInstr(false);
+            fav.setNosubs(Boolean.parseBoolean(noSubs));
+            fav.setPrn(Boolean.parseBoolean(prn));
+            fav.setCustomInstr(Boolean.parseBoolean(customInstr));
 
-            if(request.getParameter("dispenseInternal") != null && request.getParameter("dispenseInternal").length()>0) { 
-            	fav.setDispenseInternal(true);
+            if (request.getParameter("dispenseInternal") != null &&
+                    !request.getParameter("dispenseInternal").isEmpty())
+            {
+                    fav.setDispenseInternal(true);
             }
-            
+
             fav.Save();
 
             return null;
