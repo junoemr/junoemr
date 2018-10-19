@@ -153,11 +153,11 @@ public class EctDisplayDocsAction extends EctDisplayAction {
     				isURLjavaScript = true;
     			}
     			else if( curDoc.getRemoteFacilityId()==null && curDoc.isPDF() ) {
-					url = "popupPage(window.screen.width,window.screen.height,'" + hash + "','" + request.getContextPath() + "/dms/showDocument.jsp?segmentID=" + dispDocNo + "&searchProviderNo=" + user + "&status=A&inWindow=true&chartView'); return false;";
+					url = "window.open('" + request.getContextPath() + "/dms/showDocument.jsp?segmentID=" + dispDocNo + "&searchProviderNo=" + user + "&status=A&inWindow=true&chartView', '"+curDoc.getFileName()+"', 'height=700,width=800'); return false;";
 					isURLjavaScript = true;
     			}
     			else {
-    				url = "popupPage(700,800,'" + hash + "', '" +  request.getContextPath() + "/dms/ManageDocument.do?method=display&doc_no=" + dispDocNo + "&providerNo=" + user + (curDoc.getRemoteFacilityId()!=null?"&remoteFacilityId="+curDoc.getRemoteFacilityId():"") + "'); return false;";
+    				url = "window.open('" + request.getContextPath() + "/dms/ManageDocument.do?method=display&doc_no=" + dispDocNo + "&providerNo=" + user + (curDoc.getRemoteFacilityId()!=null?"&remoteFacilityId="+curDoc.getRemoteFacilityId():"") + "', '"+curDoc.getFileName()+"', 'height=700,width=800'); return false;";
     			}
     			
     			item.setLinkTitle(title + serviceDateStr);
