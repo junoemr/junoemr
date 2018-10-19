@@ -53,12 +53,15 @@
 </logic:present>
 
 <link rel="stylesheet" type="text/css" href="styles.css">
+	<style type="text/css">
+		.drugForm {
+			background-color: #F5F5F5;
+		}
+	</style>
 </head>
 
 
-
 <%
-	// Get the bean injected into the page by struts instead of requesting it from spring
 	RxSessionBean rxSessionBean = (RxSessionBean) pageContext.getAttribute("bean");
 
 	RxPrescriptionData rxData = new oscar.oscarRx.data.RxPrescriptionData();
@@ -68,23 +71,49 @@
 
 <script language=javascript>
 
-    function deleteRow(rowId) {
-        var fId = eval('document.forms.DispForm.FavoriteId' + rowId).value;
-        var fName = eval('document.forms.DispForm.FavoriteName' + rowId).value;
+    function deleteRow(favoriteID, favoriteName) {
+        var deleteObj = {favoriteId: favoriteID};
+        var endpoint = '/oscarRx/deleteFavorite2.do';
 
-        if(confirm('Are you sure you want to delete favorite: \n' + fName + '?')){
-            document.forms.RxDeleteFavoriteForm.favoriteId.value = fId;
-            document.forms.RxDeleteFavoriteForm.submit();
+        if (confirm('Are you sure you want to delete favorite: \n' + favoriteName + '?')) {
+            new Ajax.Request('<c:out value="${ctx}"/>' + endpoint,
+                {
+                    method: 'delete',
+                    parameters: deleteObj,
+                    onSuccess:function(result)
+                    {
+                        location.reload(true);
+                    },
+                    onFailure:function(err)
+                    {
+                        alert("An error occured while deleting");
+                    }
+                });
         }
     }
 
-    function ajaxUpdateRow(formID) {
+    function ajaxUpdateRow(formID, saveNotificationID) {
         var form = document.getElementById(formID)
         var formObj = formToObject(form);
+        var endpoint =  '/oscarRx/updateFavorite2.do?method=ajaxEditFavorite';
 
         if (validateUpdate(formObj))
 		{
-		    updateFavoriteByREST(formObj)
+            new Ajax.Request('<c:out value="${ctx}"/>' + endpoint,
+                {
+                    method: 'post',
+                    parameters: formObj,
+                    onSuccess:function(result)
+                    {
+						var saveElement = document.getElementById(saveNotificationID);
+                        saveElement.style.visibility = "visible";
+                        saveElement.scrollIntoView();
+                    },
+                    onFailure:function(err)
+                    {
+                        alert("An error occured while saving");
+                    }
+                });
 		}
 	}
 
@@ -109,25 +138,6 @@
 
         return formObj;
     }
-
-	function updateFavoriteByREST(formObj)
-    {
-        var url= '<c:out value="${ctx}"/>' + '/oscarRx/updateFavorite2.do?method=ajaxEditFavorite';
-        new Ajax.Request(url,
-            {
-                method:'post',
-                parameters: formObj,
-                onSuccess:function(result)
-                {
-                    alert("Save successful");
-                },
-                onFailure:function(err)
-                {
-                    alert("An error occured while saving");
-                }
-            });
-    }
-
 
 	/**
 	 * Pre-validate the form on the front end
@@ -176,9 +186,7 @@
 </script>
 
 <body topmargin="0" leftmargin="0" vlink="#0000FF">
-<table border="0" cellpadding="0" cellspacing="0"
-	style="border-collapse: collapse; position: absolute; left: 0; top:0;" bordercolor="#111111" width="100%"
-	id="AutoNumber1" height="100%">
+<table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; position: absolute; left: 0; top:0;" bordercolor="#111111" width="100%" id="AutoNumber1" height="100%">
 	<%@ include file="TopLinks.jsp"%><!-- Row One included here-->
 	<tr>
 		<td></td>
@@ -214,36 +222,34 @@
 				<div class="DivContentPadding">
 				<table cellspacing=0 cellpadding=2>
 				<%
-					String style = "style='background-color:#F5F5F5'";
-
 					for (RxPrescriptionData.Favorite fav : favorites)
 					{
 						boolean isCustom = fav.getGCN_SEQNO() == 0;
                 %>
 					<form name="DispForm" id="DispForm_<%=fav.getFavoriteId()%>">
 					<!-- Record line 1 -->
-					<tr class=tblRow <%= style %>>
+					<tr class='tblRow drugForm'>
 						<td colspan=2><b>Favorite Name:&nbsp;</b><input type=hidden name="favoriteId" value="<%=fav.getFavoriteId()%>" />
-							<input type=text size="50" name="favoriteName" class=tblRow size=80 value="<%=fav.getFavoriteName()%>" />&nbsp;&nbsp;&nbsp;
+							<input type=text size="50" name="favoriteName" class=tblRow value="<%=fav.getFavoriteName()%>" />&nbsp;&nbsp;&nbsp;
 						</td>
 						<td>
-							<a id="saveSuccess_<%=fav.getFavoriteId()%>" style="display:none; color:red">Changes saved!</a>
+							<a id="SaveSuccess_<%=fav.getFavoriteId()%>" style="visibility: hidden; color:red">Changes saved!</a>
 						</td>
 						<td colspan=5>
-							<a href="javascript:void(0);" onclick='ajaxUpdateRow("DispForm_<%=fav.getFavoriteId()%>")'>Save Changes</a>&nbsp;&nbsp;&nbsp;
-							<a href="javascript:deleteRow(this);">Delete Favorite</a>
+							<a href="javascript:void(0);" onclick='ajaxUpdateRow("DispForm_<%=fav.getFavoriteId()%>", "SaveSuccess_<%=fav.getFavoriteId()%>")'>Save Changes</a>&nbsp;&nbsp;&nbsp;
+							<a href="javascript:deleteRow('<%=fav.getFavoriteId()%>', '<%=fav.getFavoriteName()%>');">Delete Favorite</a>
                         </td>
 					</tr>
 					<% if(!isCustom) { %>
 					<!-- Record line 2 -->
-					<tr class=tblRow <%=style%>>
+					<tr class='tblRow drugForm'>
 						<input type=hidden name="customName" value="" />
 						<td><b>Brand Name:&nbsp;</b><%=fav.getBN()%></td>
 						<td colspan=5><b>Generic Name:&nbsp;</b><%=fav.getGN()%></td>
 					</tr>
 					<% } else { %>
 					<!-- Record line 2 -->
-					<tr class=tblRow <%=style%>>
+					<tr class='tblRow drugForm'>
 						<td colspan=7>
 							<b>Custom Drug Name:&nbsp;</b>
 							<input type=text name="customName" class=tblRow size=80 value="<%=fav.getCustomName()%>"/>
@@ -251,8 +257,9 @@
 					</tr>
 					<% } %>
 					<!-- Record line 3 -->
-					<tr class=tblRow <%=style%>>
-						<td nowrap><b>Take:</b> <input type=text name="takeMin" class=tblRow size=3 value="<%=fav.getTakeMin()%>" /> <span>to</span>
+					<tr class='tblRow drugForm'>
+						<td nowrap><b>Take:</b>
+							<input type=text name="takeMin" class=tblRow size=3 value="<%=fav.getTakeMin()%>" /> <span>to</span>
 							<input type=text name="takeMax" class=tblRow size=3 value="<%=fav.getTakeMax()%>"/>
 							<select name="frequencyCode" class=tblRow>
 							<%
@@ -290,7 +297,7 @@
 							<input type=checkbox name="prn" <%=fav.getPrn() ? "checked" : ""%> class=tblRow size=1/>
 						</td>
 					</tr>
-					<tr <%= style %>>
+					<tr class='drugForm'>
 						<td colspan=7>
 							<table>
 								<tr>
@@ -300,15 +307,14 @@
 									<td width="100%">
 										<%
 											String specialInst = fav.getSpecial();
-											StringUtils.trimToEmpty(specialInst);
 										%>
-										<textarea name="special" style="width: 100%" rows=5 ><%=specialInst%></textarea></td>
+										<textarea name="special" style="width: 100%" rows=5 ><%=StringUtils.trimToEmpty(specialInst)%></textarea></td>
 								</tr>
 							</table>
 						</td>
 					</tr>
 
-					<tr <%= style %>>
+					<tr class='drugform'>
 						<td colspan=7>
 							<% boolean dispenseInternal = fav.getDispenseInternal() != null && fav.getDispenseInternal();%>
 							Dispense Internally:&nbsp; <input type="checkbox" name="dispenseInternal" <%=dispenseInternal ? "checked" : ""%>>
