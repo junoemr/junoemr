@@ -24,21 +24,6 @@
 
 package oscar.dms;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -54,28 +39,27 @@ import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.common.dao.ConsultDocsDao;
 import org.oscarehr.common.dao.CtlDocTypeDao;
-import org.oscarehr.document.dao.CtlDocumentDao;
-import org.oscarehr.document.dao.DocumentDao;
-import org.oscarehr.document.dao.DocumentDao.Module;
 import org.oscarehr.common.dao.IndivoDocsDao;
 import org.oscarehr.common.dao.TicklerLinkDao;
 import org.oscarehr.common.model.ConsultDocs;
 import org.oscarehr.common.model.CtlDocType;
-import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.common.model.CtlDocumentPK;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.document.model.Document;
 import org.oscarehr.common.model.IndivoDocs;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.common.model.TicklerLink;
+import org.oscarehr.document.dao.CtlDocumentDao;
+import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.document.dao.DocumentDao.Module;
+import org.oscarehr.document.model.CtlDocument;
+import org.oscarehr.document.model.Document;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.TicklerManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.MyDateFormat;
 import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.AcknowledgementData;
@@ -83,6 +67,21 @@ import oscar.oscarMDS.data.ReportStatus;
 import oscar.util.ConversionUtils;
 import oscar.util.DateUtils;
 import oscar.util.UtilDateUtilities;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 // all SQL statements here
 public final class EDocUtil {
@@ -92,7 +91,6 @@ public final class EDocUtil {
 	private static IndivoDocsDao indivoDocsDao = (IndivoDocsDao) SpringUtils.getBean(IndivoDocsDao.class);
 	private static Logger logger = MiscUtils.getLogger();
 	private static ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);
-	
 	
 	public static final String PUBLIC = "public";
 	public static final String PRIVATE = "private";
@@ -211,7 +209,9 @@ public final class EDocUtil {
 	/**
 	 * @return the new documentId
 	 */
-	public static String addDocumentSQL(EDoc newDocument) {
+	@Deprecated
+	public static String addDocumentSQL(EDoc newDocument)
+	{
 		Document doc = new Document();
 		doc.setDoctype(newDocument.getType());
 		doc.setDocClass(newDocument.getDocClass());
@@ -225,16 +225,15 @@ public final class EDocUtil {
 		doc.setResponsible(newDocument.getResponsibleId());
 		doc.setProgramId(newDocument.getProgramId());
 		doc.setUpdatedatetime(newDocument.getDateTimeStampAsDate());
-                doc.setContentdatetime(newDocument.getContentDateTime());
+		doc.setContentdatetime(newDocument.getContentDateTime());
 		doc.setStatus(newDocument.getStatus());
 		doc.setContenttype(newDocument.getContentType());
-		doc.setPublic1(ConversionUtils.fromIntString(newDocument.getDocPublic()));
+		doc.setPublic1(ConversionUtils.fromIntString(newDocument.getDocPublic()) == 1);
 		doc.setObservationdate(MyDateFormat.getSysDate(newDocument.getObservationDate()));
 		doc.setNumberofpages(newDocument.getNumberOfPages());
 		doc.setAppointmentNo(newDocument.getAppointmentNo());
 		doc.setRestrictToProgram(newDocument.isRestrictToProgram());
 		documentDao.persist(doc);
-
 		Integer document_no = doc.getId();
 
 		CtlDocumentPK cdpk = new CtlDocumentPK();
@@ -297,7 +296,7 @@ public final class EDocUtil {
 			doc.setSourceFacility(newDocument.getSourceFacility());
 			doc.setDocxml(newDocument.getHtml());
 			doc.setResponsible(newDocument.getResponsibleId());
-			doc.setPublic1(ConversionUtils.fromIntString(newDocument.getDocPublic()));
+			doc.setPublic1(ConversionUtils.fromIntString(newDocument.getDocPublic())==1);
 			if(doReview)
 			{
 				doc.setReviewer(newDocument.getReviewerId());
@@ -700,14 +699,15 @@ public final class EDocUtil {
 		return dao.findModules();
 	}
 
-	public static EDoc getDoc(String documentNo) {
+	public static EDoc getDoc(String documentNo, String module) {
 		
 		DocumentDao dao = SpringUtils.getBean(DocumentDao.class);
 		IndivoDocsDao iDao = SpringUtils.getBean(IndivoDocsDao.class);
 
 		EDoc currentdoc = new EDoc();
 
-		for (Object[] o : dao.findCtlDocsAndDocsByDocNo(ConversionUtils.fromIntString(documentNo))) {
+		for (Object[] o : dao.findCtlDocsAndDocsByDocNo(ConversionUtils.fromIntString(documentNo), module))
+		{
 			Document d = (Document) o[0];
 			CtlDocument c = (CtlDocument) o[1];
 
@@ -725,7 +725,7 @@ public final class EDocUtil {
 			currentdoc.setDateTimeStampAsDate(d.getUpdatedatetime());
 			currentdoc.setDateTimeStamp(ConversionUtils.toTimestampString(d.getUpdatedatetime()));
 			currentdoc.setFileName(d.getDocfilename());
-			currentdoc.setDocPublic("" + d.getPublic1());
+			currentdoc.setDocPublic((d.isPublic()?"1":"0"));
 			currentdoc.setObservationDate(d.getObservationdate());
 			currentdoc.setReviewerId(d.getReviewer());
 			currentdoc.setReviewDateTime(ConversionUtils.toTimestampString(d.getReviewdatetime()));
@@ -751,6 +751,9 @@ public final class EDocUtil {
 		}
 
 		return currentdoc;
+	}
+	public static EDoc getDoc(String documentNo) {
+		return getDoc(documentNo, CtlDocument.MODULE_DEMOGRAPHIC);
 	}
 
 	public String getDocumentName(String id) {
@@ -821,56 +824,6 @@ public final class EDocUtil {
 
 	public static Date getDmsDateTimeAsDate() {
 		return new Date();
-	}
-
-	public static int addDocument(String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String contentDateTime, String observationDate, String updateDateTime, String docCreator, String responsible) {
-		return addDocument(demoNo, docFileName, docDesc, docType, docClass, docSubClass, contentType, contentDateTime, observationDate, updateDateTime, docCreator, responsible, null, null, null);
-	}
-
-	public static int addDocument(String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String contentDateTime, String observationDate, String updateDateTime, String docCreator, String responsible, String reviewer, String reviewDateTime) {
-		return addDocument(demoNo, docFileName, docDesc, docType, docClass, docSubClass, contentType, contentDateTime, observationDate, updateDateTime, docCreator, responsible, reviewer, reviewDateTime, null, null);
-	}
-
-	public static int addDocument(String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String contentDateTime, String observationDate, String updateDateTime, String docCreator, String responsible, String reviewer, String reviewDateTime, String source) {
-		return addDocument(demoNo, docFileName, docDesc, docType, docClass, docSubClass, contentType, contentDateTime, observationDate, updateDateTime, docCreator, responsible, reviewer, reviewDateTime, source, null);
-	}
-
-	public static int addDocument(String demoNo, String docFileName, String docDesc, String docType, String docClass, String docSubClass, String contentType, String contentDateTime, String observationDate, String updateDateTime, String docCreator, String responsible, String reviewer, String reviewDateTime, String source, String sourceFacility) {
-
-		Document doc = new Document();
-		doc.setDoctype(docType);
-		doc.setDocClass(docClass);
-		doc.setDocSubClass(docSubClass);
-		doc.setDocdesc(docDesc);
-		doc.setDocfilename(docFileName);
-		doc.setDoccreator(docCreator);
-		doc.setResponsible(responsible);
-		doc.setUpdatedatetime(MyDateFormat.getSysDate(updateDateTime));
-		doc.setStatus('A');
-		doc.setContenttype(contentType);
-		doc.setPublic1(0);
-		doc.setObservationdate(MyDateFormat.getSysDate(observationDate));
-		doc.setReviewer(reviewer);
-		doc.setReviewdatetime(MyDateFormat.getSysDate(reviewDateTime));
-                doc.setContentdatetime(MyDateFormat.getSysDate(contentDateTime));
-		doc.setSource(source);
-		doc.setSourceFacility(sourceFacility);
-		doc.setNumberofpages(1);
-		documentDao.persist(doc);
-
-		int key = 0;
-		if (doc.getDocumentNo() > 0) {
-			CtlDocumentPK cdpk = new CtlDocumentPK();
-			CtlDocument cd = new CtlDocument();
-			cd.setId(cdpk);
-			cdpk.setModule("demographic");
-			cdpk.setDocumentNo(doc.getDocumentNo());
-			cd.getId().setModuleId(ConversionUtils.fromIntString(demoNo));
-			cd.setStatus(String.valueOf('A'));
-			ctlDocumentDao.persist(cd);
-			key = 1;
-		}
-		return key;
 	}
 
 	// private static String getLastDocumentNo() {
@@ -1030,13 +983,6 @@ public final class EDocUtil {
 		eDoc.setType(remoteDocument.getContentType());
 
 		return (eDoc);
-	}
-
-	public static void subtractOnePage(String docId) {
-		Document doc = documentDao.find(ConversionUtils.fromIntString(docId));
-		doc.setNumberofpages(doc.getNumberofpages() - 1);
-
-		documentDao.merge(doc);
 	}
         
 	public static String getHtmlTicklers(LoggedInInfo loggedInInfo,String docId ) {

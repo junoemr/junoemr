@@ -111,7 +111,11 @@
 			appt.setRemarks(request.getParameter("remarks"));
 			appt.setUpdateDateTime(new java.util.Date());
 			appt.setUrgency((request.getParameter("urgency")!=null)?request.getParameter("urgency"):"");
-			appt.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
+
+			if (request.getParameter("reasonCode") != null)
+			{
+			    appt.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
+			}
 			
 			appointmentDao.merge(appt);
 			rowsAffected=1;

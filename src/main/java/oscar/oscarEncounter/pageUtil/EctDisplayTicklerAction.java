@@ -66,7 +66,7 @@ public class EctDisplayTicklerAction extends EctDisplayAction {
         pathedit = request.getContextPath() + "/tickler/ticklerAdd.jsp" +
                                               "?demographic_no=" + bean.demographicNo +
                                               "&name=" + encode(bean) +
-                                              "&chart_no=" + ((bean.chartNo != null) ? bean.chartNo : "") +
+                                              "&chart_no=" + encode(((bean.chartNo != null) ? bean.chartNo : "")) +
                                               "&bFirstDisp=false" +
                                               "&doctor_no=" + bean.familyDoctorNo +         // despite the name, the bean loads it as demo.provider_no
                                               "&search_mode=search_name" +                  // This is required.  The default search mode may not be search name.  Since we forward the name, we want to search on that.

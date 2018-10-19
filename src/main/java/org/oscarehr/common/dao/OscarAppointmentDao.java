@@ -772,7 +772,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 	}
 
 	public SortedMap<LocalTime, List<AppointmentDetails>> findAppointmentDetailsByDateAndProvider(
-		LocalDate date, String providerNo, String site)
+		LocalDate date, Integer providerNo, String site)
 	{
 		String sql = "SELECT\n" +
 				"  a.appointment_no,\n" +
@@ -804,6 +804,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  d.year_of_birth,\n" +
 				"  d.month_of_birth,\n" +
 				"  d.date_of_birth,\n" +
+				"  d.hin,\n" +
+				"  d.chart_no,\n" +
 				"  dc.content AS cust_notes,\n" +
 				"  dc.cust3 AS cust_alert,\n" +
 				"  p.value AS color_property,\n" +
@@ -857,6 +859,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  d.year_of_birth,\n" +
 				"  d.month_of_birth,\n" +
 				"  d.date_of_birth,\n" +
+				"  d.hin,\n" +
+				"  d.chart_no,\n" +
 				"  dc.content,\n" +
 				"  dc.cust3,\n" +
 				"  p.value\n" +
@@ -908,6 +912,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 			String yearOfBirth = (String) result[index++];
 			String monthOfBirth = (String) result[index++];
 			String dayOfBirth = (String) result[index++];
+			String hin = (String) result[index++];
+			String chartNo = (String) result[index++];
 			String custNotes = (String) result[index++];
 			String custAlert = (String) result[index++];
 			String colorProperty = (String) result[index++];
@@ -975,6 +981,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				firstName,
 				lastName,
 				ver,
+				hin,
+				chartNo,
 				rosterStatus,
 				hcRenewDate,
 				custNotes,

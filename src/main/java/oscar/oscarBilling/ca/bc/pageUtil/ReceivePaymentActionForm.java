@@ -46,6 +46,8 @@ public class ReceivePaymentActionForm
   private boolean paymentReceived;
   private String isRefund;
   private String payeeProviderNo;
+  private String paymentDate;
+
   public String getAmountReceived() {
     return amountReceived;
   }
@@ -72,6 +74,10 @@ public class ReceivePaymentActionForm
 
   public void setBillNo(String billNo) {
     this.billNo = billNo;
+  }
+
+  public void setPaymentDate(String paymentDate) {
+    this.paymentDate = paymentDate;
   }
 
   public void setPaymentReceived(boolean paymentReceived) {
@@ -105,6 +111,10 @@ public class ReceivePaymentActionForm
 
   public String getBillNo() {
     return billNo;
+  }
+
+  public String getPaymentDate() {
+    return paymentDate;
   }
 
   public boolean isPaymentReceived() {
