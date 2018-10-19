@@ -145,7 +145,7 @@ public class EctDisplayDocsAction extends EctDisplayAction {
     
     			String user = (String) request.getSession().getAttribute("user");
     			item.setDate(date);
-    			winName = curDoc.getFileName();
+    			winName = curDoc.getFileName() + bean.demographicNo;
     			hash = Math.abs(winName.hashCode());
     			
     			if (inboxflag) {
