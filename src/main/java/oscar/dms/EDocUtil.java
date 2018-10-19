@@ -699,14 +699,15 @@ public final class EDocUtil {
 		return dao.findModules();
 	}
 
-	public static EDoc getDoc(String documentNo) {
+	public static EDoc getDoc(String documentNo, String module) {
 		
 		DocumentDao dao = SpringUtils.getBean(DocumentDao.class);
 		IndivoDocsDao iDao = SpringUtils.getBean(IndivoDocsDao.class);
 
 		EDoc currentdoc = new EDoc();
 
-		for (Object[] o : dao.findCtlDocsAndDocsByDocNo(ConversionUtils.fromIntString(documentNo))) {
+		for (Object[] o : dao.findCtlDocsAndDocsByDocNo(ConversionUtils.fromIntString(documentNo), module))
+		{
 			Document d = (Document) o[0];
 			CtlDocument c = (CtlDocument) o[1];
 
@@ -750,6 +751,9 @@ public final class EDocUtil {
 		}
 
 		return currentdoc;
+	}
+	public static EDoc getDoc(String documentNo) {
+		return getDoc(documentNo, CtlDocument.MODULE_DEMOGRAPHIC);
 	}
 
 	public String getDocumentName(String id) {

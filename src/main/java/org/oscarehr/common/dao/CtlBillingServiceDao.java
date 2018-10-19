@@ -87,6 +87,19 @@ public class CtlBillingServiceDao extends AbstractDao<CtlBillingService> {
 
 		return results;
 	}
+
+	public List<CtlBillingService> findByServiceTypeName(String serviceTypeName)
+	{
+		String queryString = "SELECT b FROM CtlBillingService b WHERE b.status=:status and b.serviceTypeName like :serviceTypeName";
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("status", DEFAULT_STATUS);
+		query.setParameter("serviceTypeName", serviceTypeName);
+
+
+		List<CtlBillingService> results = query.getResultList();
+
+		return results;
+	}
         
         public List<CtlBillingService> findByServiceGroupAndServiceTypeId(String serviceGroup, String serviceTypeId) {
             Query query = entityManager.createQuery("select b from CtlBillingService b where b.status='A' and b.serviceGroup = ? and b.serviceType like ?");

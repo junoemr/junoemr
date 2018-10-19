@@ -232,9 +232,9 @@ public class DocumentService
 		boolean isPublicDoc = ("1".equals(fm.getDocPublic()) || "checked".equalsIgnoreCase(fm.getDocPublic()));
 
 		// update the model info
+		// intentionally skip updating doc creator
 		documentModel.setDocdesc(fm.getDocDesc());
 		documentModel.setDoctype(fm.getDocType());
-		documentModel.setDoccreator(fm.getDocCreator());
 		documentModel.setResponsible(fm.getResponsibleId());
 		documentModel.setObservationdate(MyDateFormat.getSysDate(fm.getObservationDate()));
 		documentModel.setSource(fm.getSource());

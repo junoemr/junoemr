@@ -672,11 +672,15 @@ function toggleView(form) {
 
                         // enable the fax button if there is a pre-set signature for the creator of the prescription or the logged in user
 					    String disabled = "disabled";
-						oscar.oscarRx.data.RxPrescriptionData.Prescription rx = bean.getStashItem(bean.getStashSize()-1);
+						oscar.oscarRx.data.RxPrescriptionData.Prescription rx = null;
+						if(bean.getStashSize() != 0)
+						{
+							rx = bean.getStashItem(bean.getStashSize() - 1);
+						}
                         if(oscar.OscarProperties.getInstance().isPropertyActive("rx_preset_signatures"))
                         {
 							String imgFile = oscar.OscarProperties.getInstance().getProperty("eform_image", "") + "doctor_signature_";
-                        	if (rx.getProviderNo() != null)
+                        	if (rx != null && rx.getProviderNo() != null)
 							{
 								imgFile += rx.getProviderNo() + ".png";
 							} else
