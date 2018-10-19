@@ -279,7 +279,7 @@ public class BillingmasterDAO {
 		Query query = entityManager.createQuery("FROM Billingmaster bm " +
 				"WHERE bm.demographicNo = :demoNo " +
 				"AND bm.billingCode = :billingCode " +
-				"AND bm.billingstatus NOT IN (:statuses)");
+				"AND bm.billingstatus NOT IN (:statuses) ORDER BY bm.serviceDate DESC");
         query.setParameter("demoNo", demoNo);
         query.setParameter("billingCode", billingCode);
         query.setParameter("statuses", statuses);

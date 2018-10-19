@@ -76,16 +76,22 @@
 	</div>
 
 	<div id="patient-list">
-		<a ng-repeat="patient in patientListCtrl.patients | offset:currentPage*pageSize | limitTo:pageSize | filter:query" class="list-group-item default hand-hover"
-			ng-click="patientListCtrl.goToRecord(patient)" ng-dblclick="patientListAppointmentListCtrl.viewAppointment(patient.appointmentNo)">
+		<a ng-repeat="patient in patientListCtrl.patients | offset:currentPage*pageSize | limitTo:pageSize | filter:query" class="list-group-item default hand-hover patient-list-show-status"
+		   ng-click="patientListCtrl.goToRecord(patient)" ng-dblclick="patientListAppointmentListCtrl.viewAppointment(patient.appointmentNo)"
+		   ng-style="{'border-left-color': patientListAppointmentListCtrl.getAppointmentStatusColourByStatusCode(patient.status)}"
+		>
 			<!--
 			<span ng-if="patient.status.length>0 && patient.status != 't'" class="badge">{{patient.status}}</span>
 			-->
 			<h5 class="list-group-item-heading pull-right patient-time" >{{patient.startTime}}</h5>
-			<h4 class="list-group-item-heading patient-name" >{{patient.name}}</h5>
+			<h4 class="list-group-item-heading patient-name" >{{patient.name}}</h4>
 
 			<p class="list-group-item-text" ng-if="patient.demographicNo != 0" ng-show="patientListCtrl.patientListConfig.showReason">
 				<bean:message key="provider.appointmentProviderAdminDay.Reason"/>: {{patient.reason}}  
+			</p>
+
+			<p class="list-group-item-text" ng-if="patient.demographicNo != 0" ng-show="patientListCtrl.patientListConfig.showStatus">
+				<bean:message key="provider.appointmentProviderAdminDay.StatusDescription"/>: {{patientListAppointmentListCtrl.getAppointmentStatusDescriptionByStatusCode(patient.status)}}
 			</p>
 		</a>
 	</div>

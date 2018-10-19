@@ -42,7 +42,7 @@ public class BillingPaymentTypeDao extends AbstractDao<BillingPaymentType>{
     
     @SuppressWarnings("unchecked")
 	public List<BillingPaymentType> findAll() {
-		Query query = entityManager.createQuery("SELECT x FROM " + modelClass.getSimpleName() + " x");
+		Query query = entityManager.createQuery("SELECT x FROM " + modelClass.getSimpleName() + " x ORDER BY x.id ASC");
 		List<BillingPaymentType> results = query.getResultList();
 		return results;
 	}

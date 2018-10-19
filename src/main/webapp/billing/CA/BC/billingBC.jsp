@@ -711,7 +711,20 @@ function checkifSet(icd9,feeitem,extrafeeitem){
    oscarLog("extra feeitem did put"+codeEntered(extrafeeitem));
 }
 
+function updateBillForm(formCode)
+{
+	var start_hr = jQuery('[name=xml_starttime_hr]').val();
+	var start_min = jQuery('[name=xml_starttime_min]').val();
+	var end_hr = jQuery('[name=xml_endtime_hr]').val();
+	var end_min = jQuery('[name=xml_endtime_min]').val();
 
+	document.location.href = "../../../billing.do?billRegion=<%=bean.getBillRegion()%>&billForm="+formCode+"&hotclick=&appointment_no=<%=bean.getApptNo()%>"+
+								"&demographic_name=<%=StringEscapeUtils.escapeHtml(bean.getPatientName())%>&demographic_no=<%=bean.getPatientNo()%>"+
+								"&user_no=<%=bean.getCreator()%>&apptProvider_no=<%=bean.getApptProviderNo()%>&providerview=<%=bean.getProviderView()%>"+
+								"&appointment_date=<%=bean.getApptDate()%>&status=<%=bean.getApptStatus()%>&start_time=<%=bean.getApptStart()%>"+
+								"&bNewForm=1&billType=<%=bean.getBillForm()%>&xml_starttime_hr="+start_hr+"&xml_starttime_min="+start_min+
+								"&xml_endtime_hr="+end_hr+"&xml_endtime_min="+end_min;
+}
 
 </script>
 <link rel="stylesheet" href="../billing/billing.css" type="text/css">
@@ -795,7 +808,7 @@ function checkifSet(icd9,feeitem,extrafeeitem){
   %>
     <tr class="<%=rowClass%>">
       <td colspan="2">
-        <a href="../../../billing.do?billRegion=<%=bean.getBillRegion()%>&billForm=<%=billformlist[i].getFormCode()%>&hotclick=&appointment_no=<%=bean.getApptNo()%>&demographic_name=<%=StringEscapeUtils.escapeHtml(bean.getPatientName())%>&demographic_no=<%=bean.getPatientNo()%>&user_no=<%=bean.getCreator()%>&apptProvider_no=<%=bean.getApptProviderNo()%>&providerview=<%=bean.getProviderView()%>&appointment_date=<%=bean.getApptDate()%>&status=<%=bean.getApptStatus()%>&start_time=<%=bean.getApptStart()%>&bNewForm=1&billType=<%=bean.getBillForm()%>" onClick="showHideLayers('Layer1','','hide')"><%=billformlist[i].getDescription()%>        </a>
+        <a href="javascript: updateBillForm('<%=billformlist[i].getFormCode()%>')"><%=billformlist[i].getDescription()%></a>
       </td>
     </tr>
   <%}  %>
