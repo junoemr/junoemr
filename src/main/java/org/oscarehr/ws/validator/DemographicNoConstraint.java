@@ -20,23 +20,25 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographic.dao;
+package org.oscarehr.ws.validator;
 
-import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.demographic.model.Demographic;
-import org.springframework.stereotype.Repository;
+import javax.validation.Constraint;
+import javax.validation.Payload;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@SuppressWarnings("unchecked")
-@Repository("demographic.dao.DemographicDao")
-public class DemographicDao extends AbstractDao<Demographic>
+@Documented
+@Constraint(validatedBy = DemographicNoValidator.class)
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface DemographicNoConstraint
 {
-	public DemographicDao()
-	{
-		super(Demographic.class);
-	}
+	String message() default "Invalid Demographic Number";
+	Class<?>[] groups() default{};
+	Class<? extends Payload>[] payload() default{};
 
-	public boolean demographicExists(Integer demographicNo)
-	{
-		return (this.find(demographicNo) != null);
-	}
+	boolean allowNull() default false;
 }

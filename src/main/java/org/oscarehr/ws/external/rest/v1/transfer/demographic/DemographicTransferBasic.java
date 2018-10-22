@@ -40,8 +40,6 @@ import java.time.LocalDate;
 public class DemographicTransferBasic implements Serializable
 {
 	// demographic base info
-	@Schema(description = "patient demographic record identifier")
-	private Integer demographicNo;
 	@NotNull
 	@Size(min=1, max=30)
 	@Schema(description = "patient first name")
@@ -196,16 +194,6 @@ public class DemographicTransferBasic implements Serializable
 	@Schema(description = "The alert on the patient master file")
 	private String alert;
 
-
-	public Integer getDemographicNo()
-	{
-		return demographicNo;
-	}
-
-	public void setDemographicNo(Integer demographicNo)
-	{
-		this.demographicNo = demographicNo;
-	}
 
 	public String getFirstName()
 	{

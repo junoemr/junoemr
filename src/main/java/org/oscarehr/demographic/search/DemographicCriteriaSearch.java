@@ -30,7 +30,6 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
-import org.oscarehr.util.MiscUtils;
 
 import java.time.LocalDate;
 
