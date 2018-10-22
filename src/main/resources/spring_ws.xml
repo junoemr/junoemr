@@ -215,7 +215,7 @@
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.ValidationExceptionMapper"/>
 
 			<!-- Juno filters. -->
-			<bean class="org.oscarehr.ws.rest.filter.LoggingFilter"/>
+			<bean class="org.oscarehr.ws.rest.filter.LoggingFilterInternal"/>
 
 			<!-- Custom ContextResolver to apply settings to the Jackson ObjectMapper -->
 			<bean class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>

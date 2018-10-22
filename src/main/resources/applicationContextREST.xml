@@ -109,7 +109,7 @@
 			<ref bean="missingArgumentExceptionMapper"/>
 			<ref bean="generalExceptionMapper"/>
 			<ref bean="objectMapperProvider"/>
-			<bean class="org.oscarehr.ws.rest.filter.LoggingFilter"/>
+			<bean class="org.oscarehr.ws.rest.filter.LoggingFilterExternal"/>
 			<bean class="org.oscarehr.ws.rest.filter.RateLimitFilter"/>
 			<bean class="org.oscarehr.ws.rest.filter.IPRestrictionFilter"/>
 			<bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>

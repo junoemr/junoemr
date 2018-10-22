@@ -25,10 +25,8 @@ package org.oscarehr.ws.rest.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.rs.security.oauth.data.OAuthContext;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.RestServiceLog;
-import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import oscar.log.LogAction;
 
@@ -50,37 +48,40 @@ import java.net.MalformedURLException;
 import java.util.Date;
 
 @Priority(Priorities.USER)
-public class LoggingFilter implements ContainerRequestFilter, ContainerResponseFilter
+public abstract class LoggingFilter implements ContainerRequestFilter, ContainerResponseFilter
 {
 	private static Logger logger = MiscUtils.getLogger();
-
 	private static final String PROP_REQUEST_BODY = "LoggingFilter.requestBody";
-	private static final String PROP_REQUEST_PROVIDER = "LoggingFilter.requestProviderNo";
 	private static final String PROP_REQUEST_DATETIME = "LoggingFilter.requestDateTime";
-
-	public static final String PROP_SKIP_LOGGING = "LoggingFilter.doNotLog";
-
-	@Context
-	private ContextResolver<ObjectMapper> mapperResolver;
+    private static final String PROP_REQUEST_PROVIDER = "LoggingFilter.requestProviderNo";
+	static final String PROP_SKIP_LOGGING = "LoggingFilter.doNotLog";
 
 	@Context
-	private HttpServletRequest httpRequest;
+	ContextResolver<ObjectMapper> mapperResolver;
 
 	@Context
-	private MessageContext messageContext;
+	HttpServletRequest httpRequest;
 
-	/** Request filter
-	 * This collects data that is only available in the request filter and stores it in the
+	@Context
+	MessageContext messageContext;
+
+    /**
+     * Retrieve the providerNo (ie: the User).  Filters for different REST services should override this method
+     * with the their own implementation.
+     *
+     * @return The providerNo
+     */
+    protected abstract String getProviderNo();
+
+	/**
+     * Request filter
+	 *
+     * This collects data that is only available in the request filter and stores it in the
 	 * request properties.
 	 */
 	public void filter(ContainerRequestContext request)
 	{
-		OAuthContext oAuthContext = messageContext.getContent(OAuthContext.class);
-
-		if(oAuthContext != null && oAuthContext.getSubject() != null)
-		{
-			request.setProperty(PROP_REQUEST_PROVIDER, oAuthContext.getSubject().getLogin());
-		}
+	    request.setProperty(PROP_REQUEST_PROVIDER, getProviderNo());
 
 		// Get the message body and put it in a property
 		String body = null;
@@ -100,16 +101,14 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 	 */
 	public void filter(ContainerRequestContext request, ContainerResponseContext response)
 	{
-		// some things should not be logged, if they set this property, we deliberatly skip the logging process
+		// some things should not be logged, if they set this property, we deliberately skip the logging process
 		Boolean skipLogging = (Boolean) request.getProperty(PROP_SKIP_LOGGING);
 		if(skipLogging != null && skipLogging)
 		{
 			return;
 		}
 
-		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(httpRequest);
-		String providerNo = loggedInInfo.getLoggedInProviderNo();
-
+		String providerNo = (String) request.getProperty(PROP_REQUEST_PROVIDER);
 		String rawPostData = (String) request.getProperty(PROP_REQUEST_BODY);
 		Date requestDateTime = (Date) request.getProperty(PROP_REQUEST_DATETIME);
 		String rawResponseData = null;
