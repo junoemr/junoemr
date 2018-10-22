@@ -129,7 +129,7 @@ public class AddEditDocumentAction extends DispatchAction {
 
 		if (providerId != null) // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
 		{
-			documentService.routeToProviderInbox(document.getDocumentNo(), Integer.parseInt(providerId));
+			documentService.routeToProviderInbox(document.getDocumentNo(), providerId);
 		}
 		// add to queuelinkdocument
 		String queueId = request.getParameter("queue");

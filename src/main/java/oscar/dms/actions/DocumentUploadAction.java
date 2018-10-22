@@ -176,7 +176,7 @@ public class DocumentUploadAction extends DispatchAction
 		String providerId = request.getParameter("provider");
 		if(providerId != null)
 		{
-			documentService.routeToProviderInbox(document.getDocumentNo(), Integer.parseInt(providerId));
+			documentService.routeToProviderInbox(document.getDocumentNo(), providerId);
 		}
 
 		String queueId = request.getParameter("queue");

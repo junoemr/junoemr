@@ -91,7 +91,7 @@ public class PDFHandler implements MessageHandler
 		    String batchPDFProviderNo = OscarProperties.getInstance().getProperty("batch_pdf_provider_no");
 		    if((batchPDFProviderNo != null) && !batchPDFProviderNo.isEmpty())
 		    {
-			    documentService.routeToProviderInbox(documentNo, Integer.parseInt(batchPDFProviderNo));
+			    documentService.routeToProviderInbox(documentNo, batchPDFProviderNo);
 
 			    //Add to default queue for now, not sure how or if any other queues can be used anyway (MAB)
 			    QueueDocumentLinkDao queueDocumentLinkDAO = (QueueDocumentLinkDao) SpringUtils.getBean("queueDocumentLinkDAO");

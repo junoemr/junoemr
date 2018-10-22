@@ -319,7 +319,7 @@ public class DocumentService
 	 * @param documentNo - document id to route
 	 * @param providerNoList - list of provider id(s) to route to
 	 */
-	public void routeToProviderInbox(Integer documentNo, Integer...providerNoList)
+	public void routeToProviderInbox(Integer documentNo, String...providerNoList)
 	{
 		routeToProviderInbox(documentNo, false, providerNoList);
 	}
@@ -329,12 +329,12 @@ public class DocumentService
 	 * @param alwaysFile - when true, all routes will be set as filed. otherwise default routing rules are applied
 	 * @param providerNoList - list of provider id(s) to route to
 	 */
-	public void routeToProviderInbox(Integer documentNo, boolean alwaysFile, Integer...providerNoList)
+	public void routeToProviderInbox(Integer documentNo, boolean alwaysFile, String...providerNoList)
 	{
 		//TODO handle the routing weirdness
-		for(Integer providerNo : providerNoList)
+		for(String providerNo : providerNoList)
 		{
-			providerInboxRoutingDao.addToProviderInbox(String.valueOf(providerNo), documentNo, LabResultData.DOCUMENT, alwaysFile);
+			providerInboxRoutingDao.addToProviderInbox(providerNo, documentNo, LabResultData.DOCUMENT, alwaysFile);
 			logger.info("Added route to provider " + providerNo + " for document " + documentNo);
 		}
 	}
@@ -344,7 +344,7 @@ public class DocumentService
 	 */
 	public void routeToGeneralInbox(Integer documentNo)
 	{
-		routeToProviderInbox(documentNo, 0);
+		routeToProviderInbox(documentNo, "0");
 	}
 
 	/**

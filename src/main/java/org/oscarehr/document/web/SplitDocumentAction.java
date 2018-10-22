@@ -112,9 +112,9 @@ public class SplitDocumentAction extends DispatchAction {
 				/* add link in providerInbox */
 				List<ProviderInboxItem> routeList = providerInboxRoutingDao.getProvidersWithRoutingForDocument(LabResultData.DOCUMENT, Integer.parseInt(docNum));
 				for (ProviderInboxItem i : routeList) {
-					documentService.routeToProviderInbox(newDocumentNo, Integer.parseInt(i.getProviderNo()));
+					documentService.routeToProviderInbox(newDocumentNo, i.getProviderNo());
 				}
-				documentService.routeToProviderInbox(newDocumentNo, Integer.parseInt(providerNo));
+				documentService.routeToProviderInbox(newDocumentNo, providerNo);
 
 				/* add link in document queue */
 				Integer qid = (queueId == null || queueId.equalsIgnoreCase("null")) ? 1 : Integer.parseInt(queueId);

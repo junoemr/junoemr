@@ -472,8 +472,8 @@ public class CoPDImportService
 
 		for(Document document : documentMapper.getDocumentList())
 		{
-			document.setDoccreator(String.valueOf(provider.getProviderNo()));
-			document.setResponsible(String.valueOf(provider.getProviderNo()));
+			document.setDoccreator(provider.getId());
+			document.setResponsible(provider.getId());
 
 			GenericFile documentFile = FileFactory.getExistingFile(documentLocation, document.getDocfilename());
 
@@ -486,7 +486,7 @@ public class CoPDImportService
 			}
 			InputStream stream = new FileInputStream(documentFile.getFileObject());
 			documentService.uploadNewDemographicDocument(document, stream, demographic.getDemographicId());
-			documentService.routeToProviderInbox(document.getDocumentNo(), true, provider.getProviderNo());
+			documentService.routeToProviderInbox(document.getDocumentNo(), true, provider.getId());
 		}
 	}
 

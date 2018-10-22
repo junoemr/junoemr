@@ -163,7 +163,7 @@ public class ManageDocumentAction extends DispatchAction {
 
 				for(String proNo : flagProviders)
 				{
-					documentService.routeToProviderInbox(documentId, Integer.parseInt(proNo));
+					documentService.routeToProviderInbox(documentId, proNo);
 				}
 
 				// Removes the link to the "0" provider so that the document no longer shows up as "unclaimed"

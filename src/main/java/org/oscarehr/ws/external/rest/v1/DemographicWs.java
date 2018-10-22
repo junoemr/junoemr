@@ -39,6 +39,7 @@ import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransfer
 import org.oscarehr.ws.external.rest.v1.transfer.eform.EFormTransferInbound;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.validator.DemographicNoConstraint;
+import org.oscarehr.ws.validator.DocumentNoConstraint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.log.LogAction;
@@ -130,7 +131,7 @@ public class DemographicWs extends AbstractExternalRestWs
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Assign a document in the system to the demographic chart")
 	public RestResponse<Integer> assignDocument(@DemographicNoConstraint @PathParam("demographicId") Integer demographicId,
-	                                            @PathParam("documentId") Integer documentId)
+	                                            @DocumentNoConstraint @PathParam("documentId") Integer documentId)
 	{
 		String providerNoStr = getOAuthProviderNo();
 		String ip = getHttpServletRequest().getRemoteAddr();

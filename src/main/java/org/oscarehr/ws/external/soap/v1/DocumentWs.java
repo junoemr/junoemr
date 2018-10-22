@@ -110,7 +110,7 @@ public class DocumentWs extends AbstractWs {
 		document.setObservationdate(new Date());
 
 		documentService.uploadNewDemographicDocument(document, fileInputStream);
-		documentService.routeToProviderInbox(document.getDocumentNo(), Integer.parseInt(providerId));
+		documentService.routeToProviderInbox(document.getDocumentNo(), providerId);
 
 		return "{\"success\":1,\"message\":\"\"}";
 	}
