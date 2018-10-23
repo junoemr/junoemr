@@ -56,7 +56,7 @@ public class DemographicTransferBasic implements Serializable
 	@Schema(description = "patient gender", allowableValues = {"M", "F", "T", "O", "U"})
 	@StringValueConstraint(allows = {"M","F","T","O","U"})
 	private String sex;
-	@Size(max=10)
+	@Size(max=12)
 	@Schema(description = "patient health insurance number")
 	private String hin;
 	@Size(max=15)
