@@ -310,13 +310,16 @@ public class BillingBillingManager {
 
 		public void fill(String billType) {
 			BillingServiceDao dao = SpringUtils.getBean(BillingServiceDao.class);
-			BillingService bs;
-			//make sure to load private fee if required,but defaqult to MSP fee if Private fee unavailable
+			BillingService bs = null;
+			//make sure to load private fee if required,but default to MSP fee if Private fee unavailable
 			if("pri".equalsIgnoreCase(billType))
 			{
 				//TODO rewrite this query method
 				List<BillingService> bss = dao.findByServiceCodes(Arrays.asList(new String[]{service_code, "A" + service_code}));
-				bs = bss.get(bss.size()-1);
+				if (!bss.isEmpty())
+				{
+					bs = bss.get(bss.size() - 1);
+				}
 			}
 			else
 			{
