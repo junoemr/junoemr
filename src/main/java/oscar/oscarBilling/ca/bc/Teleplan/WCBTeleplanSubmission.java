@@ -310,7 +310,7 @@ public class WCBTeleplanSubmission {
       dLine.append( Misc.zero(2));
       dLine.append( "W");//Misc.zero(1) //Submission Code
       dLine.append( Misc.space(1));
-      dLine.append( Misc.forwardZero(bm.getDxCode1(), 5));
+      dLine.append( Misc.backwardSpace(bm.getDxCode1(), 5));
       dLine.append( Misc.space(5 + 5 + 15));
       dLine.append( Misc.backwardSpace(bm.getServiceLocation(),1));// wcb.getW_servicelocation(), 1)
 
