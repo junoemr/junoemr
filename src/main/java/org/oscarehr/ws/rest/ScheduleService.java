@@ -95,7 +95,7 @@ public class ScheduleService extends AbstractServiceImpl {
 	 *
 	 * @param providerNo
 	 * @param dateStr
-	 * @return
+	 * @return list of appointments by provider and date
 	 */
 	@GET
 	@Path("/{providerNo}/day/{date}")

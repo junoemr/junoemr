@@ -46,7 +46,7 @@ angular.module("Common.Services").service("demographicsService", [
 			junoHttp.get(service.apiPath + '/quickSearch', config).then(
 				function success(results)
 				{
-					deferred.resolve(results.data);
+					deferred.resolve(results);
 				},
 				function error(errors)
 				{

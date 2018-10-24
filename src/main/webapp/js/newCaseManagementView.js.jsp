@@ -323,8 +323,7 @@
 
 	function popperup(vheight, vwidth, varpage, pageName)
 	{ //open a new popup window
-		var page = varpage;
-		windowprops = "height=" + vheight + ",width=" + vwidth + ",status=yes,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=100,left=100";
+		var windowprops = "height=" + vheight + ",width=" + vwidth + ",status=yes,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=100,left=100";
 		var popup = window.open(varpage, pageName, windowprops);
 		popup.pastewin = opener;
 		popup.focus();
@@ -430,8 +429,31 @@
 		}
 	}
 
-	/**
+    /**
+     * Allows calculators to be opened by clicking on them in a select menu.  This is needed for cross-platform
+	 * functionality to achieve an effect similar to onClick for a select option element.
+	 * (onClick on the option element doesn't work in Chrome (or IE), and onClick on the select doesn't work in FireFox)
+	 *
+     * @param calculatorMenu jQuery element referencing a select with urls as option values
+     */
+	function bindCalculatorListener(calculatorMenu)
+	{
+	    calculatorMenu.change(
+			function() {
+                var x_size = calculatorMenu.attr('x_size'),
+                    y_size = calculatorMenu.attr('y_size');
 
+                popperup(x_size, y_size, calculatorMenu.val(), calculatorMenu.text());
+				// Since we are listening for the change event, we need to account for the same calculator
+				// selected twice in a row.  A side effect is that the UI will be updated when we reset the
+				// value of the select menu to the default.  Here we're using the value "none" over a -1 index
+				// because this is the key to a disabled "title" element, whereas -1 will display an empty
+				// select menu.
+                calculatorMenu.val("none");
+			});
+	}
+
+	/**
 	 Responsible for loading notes on the eChart
 	 @param {offset}
 		 Offset from the beginning of the notes
