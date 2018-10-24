@@ -100,7 +100,7 @@ public class SplitDocumentAction extends DispatchAction {
 				document.setDoctype(existingDocument.getDoctype());
 				document.setDocSubClass(existingDocument.getDocSubClass());
 				document.setDocfilename(tempFile.getName());
-				document.setDoccreator(providerNo);
+				document.setDocCreator(providerNo);
 				document.setResponsible(existingDocument.getDoccreator());
 				document.setSource(existingDocument.getSource());
 				document.setObservationdate(new Date());

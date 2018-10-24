@@ -65,13 +65,13 @@ public class HinValidator
 			case "QC":
 				return (hin.length() == 12);
 			default:
-				return (StringUtils.isNumeric(hin) && hin.length() == 10);
+				return true;
 		}
 	}
 
 	private static boolean isValidOntario(String hin)
 	{
-		return (StringUtils.isNumeric(hin) && hin.length() == 10 && validMD10ChecksumON(hin));
+		return (StringUtils.isNumeric(hin) && hin.length() == 10 && validMod10ChecksumON(hin));
 	}
 
 	private static boolean isValidBritishColumbia(String hin)
@@ -83,7 +83,7 @@ public class HinValidator
 		/* A PHN is 10 digits, starting with a 9 */
 		if(hin.length() == 10 && hin.startsWith("9"))
 		{
-			return validMD11ChecksumBC(hin);
+			return validMod11ChecksumBC(hin);
 		}
 		/* Allow 8 digit numbers because OGW has some correctional ids that are
 		 * 8 digits long but don't follow the mod10 scheme */
@@ -93,11 +93,11 @@ public class HinValidator
 		}
 		else
 		{
-			return validMD10ChecksumBC(hin);
+			return validMod10ChecksumBC(hin);
 		}
 	}
 
-	private static boolean validMD10ChecksumON(String hin)
+	private static boolean validMod10ChecksumON(String hin)
 	{
 		int sum = 0;
 		char[] base_number = new char[9];
@@ -123,7 +123,7 @@ public class HinValidator
 		return ((sum / 10) + (sum % 10));
 	}
 
-	private static boolean validMD10ChecksumBC(String hin)
+	private static boolean validMod10ChecksumBC(String hin)
 	{
 		// Pad with 0's if it's shorter
 		hin = StringUtils.leftPad(hin, 9, "0");
@@ -148,7 +148,7 @@ public class HinValidator
 		return (calculated_check_digit == check_digit);
 	}
 
-	private static boolean validMD11ChecksumBC(String hin)
+	private static boolean validMod11ChecksumBC(String hin)
 	{
 		int check_digit = digitAt(hin, 9);
 		int sum = 0;

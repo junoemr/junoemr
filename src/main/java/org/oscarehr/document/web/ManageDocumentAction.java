@@ -970,7 +970,7 @@ public class ManageDocumentAction extends DispatchAction {
 	            document.setDocClass(docClass);
 	            document.setDocSubClass(docSubClass);
 	            document.setResponsible(user);
-	            document.setDoccreator(user);
+	            document.setDocCreator(user);
 	            document.setDocdesc(documentDescription);
 	            document.setDoctype(docType);
 	            document.setDocfilename(fileName);

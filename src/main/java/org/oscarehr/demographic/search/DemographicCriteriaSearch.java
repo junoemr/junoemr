@@ -105,7 +105,7 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		// birthdate searches are always exact due to how the values are stored
 		if(getDateOfBirth() != null)
 		{
-			criteria.add(Restrictions.eq("yearOfBirth", StringUtils.leftPad(String.valueOf(getDateOfBirth().getYear()), 4, "0")));
+			criteria.add(Restrictions.eq("yearOfBirth", String.valueOf(getDateOfBirth().getYear())));
 			criteria.add(Restrictions.eq("monthOfBirth", StringUtils.leftPad(String.valueOf(getDateOfBirth().getMonthValue()), 2, "0")));
 			criteria.add(Restrictions.eq("dayOfBirth", StringUtils.leftPad(String.valueOf(getDateOfBirth().getDayOfMonth()), 2, "0")));
 		}

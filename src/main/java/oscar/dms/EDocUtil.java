@@ -219,7 +219,7 @@ public final class EDocUtil {
 		doc.setDocdesc(newDocument.getDescription());
 		doc.setDocxml(newDocument.getHtml());
 		doc.setDocfilename(newDocument.getFileName());
-		doc.setDoccreator(newDocument.getCreatorId());
+		doc.setDocCreator(newDocument.getCreatorId());
 		doc.setSource(newDocument.getSource());
 		doc.setSourceFacility(newDocument.getSourceFacility());
 		doc.setResponsible(newDocument.getResponsibleId());

@@ -472,7 +472,7 @@ public class CoPDImportService
 
 		for(Document document : documentMapper.getDocumentList())
 		{
-			document.setDoccreator(provider.getId());
+			document.setDocCreator(provider.getId());
 			document.setResponsible(provider.getId());
 
 			GenericFile documentFile = FileFactory.getExistingFile(documentLocation, document.getDocfilename());

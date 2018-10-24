@@ -325,7 +325,7 @@ public class SharingCenterUtil {
             Document document = new Document();
             document.setPublic1(false);
             document.setResponsible("");
-            document.setDoccreator(providerId);
+            document.setDocCreator(providerId);
             document.setDocdesc(doc.getTitle());
             document.setDoctype("others");
             document.setDocfilename(fileName);

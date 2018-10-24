@@ -102,7 +102,7 @@ public class DocumentWs extends AbstractWs {
 		Document document = new Document();
 		document.setPublic1(false);
 		document.setResponsible(responsibleId);
-		document.setDoccreator(providerId);
+		document.setDocCreator(providerId);
 		document.setDocdesc("");
 		document.setDoctype("");
 		document.setDocfilename(docFilename);

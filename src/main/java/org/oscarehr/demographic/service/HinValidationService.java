@@ -36,13 +36,15 @@ import javax.validation.ValidationException;
 @Transactional
 public class HinValidationService
 {
+	private static final String BC_NEWBORN_CODE = "66";
+
 	@Autowired
-	DemographicDao demographicDao;
+	private DemographicDao demographicDao;
 
 	/**
 	 * returns the HinValidator isValid
 	 */
-	public boolean validateHin(String hin, String provinceCode)
+	public boolean isHinValid(String hin, String provinceCode)
 	{
 		return HinValidator.isValid(hin, provinceCode);
 	}
@@ -63,6 +65,19 @@ public class HinValidationService
 	}
 
 	/**
+	 * some cases exist where a duplicated health insurance number is allowable in the system.
+	 * this method is used to determine if those conditions are met
+	 * @param hin - the hin
+	 * @param versionCode - hin version code
+	 * @param provinceCode - hin province/type
+	 * @return - true if the hin can be duplicated, false otherwise
+	 */
+	public boolean isDuplicateAllowable(String hin, String versionCode, String provinceCode)
+	{
+		return ("BC".equalsIgnoreCase(provinceCode) && BC_NEWBORN_CODE.equals(versionCode));
+	}
+
+	/**
 	 * performs province specific validation checks on the hin.
 	 * Throws validation exception if hin is invalid or if it already exists in the system.
 	 * @param hin - the hin to validate
@@ -75,12 +90,11 @@ public class HinValidationService
 		// allow null/empty hin
 		if(hin != null)
 		{
-			if(!validateHin(hin, provinceCode))
+			if(!isHinValid(hin, provinceCode))
 			{
 				throw new ValidationException("Invalid Hin");
 			}
-			if(!("BC".equalsIgnoreCase(provinceCode) && "66".equals(versionCode))
-					&& hinInSystem(hin))
+			if(!isDuplicateAllowable(hin, versionCode, provinceCode) && hinInSystem(hin))
 			{
 				throw new ValidationException("Duplicate Hin");
 			}

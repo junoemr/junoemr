@@ -29,7 +29,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 /**
- * Custom validator to ensure provider numbers match existing providers
+ * Custom validator to ensure document numbers match existing documents
  */
 public class DocumentNoValidator implements ConstraintValidator<DocumentNoConstraint, Integer>
 {

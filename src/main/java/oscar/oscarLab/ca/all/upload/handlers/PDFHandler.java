@@ -68,7 +68,7 @@ public class PDFHandler implements MessageHandler
 	    Document document = new Document();
 	    document.setPublic1(false);
 	    document.setResponsible(providerNo);
-	    document.setDoccreator(providerNo);
+	    document.setDocCreator(providerNo);
 	    document.setDocdesc("");
 	    document.setDoctype("");
 	    document.setDocfilename(fileName);
