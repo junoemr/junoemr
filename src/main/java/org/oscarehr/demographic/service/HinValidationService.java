@@ -22,12 +22,15 @@
  */
 package org.oscarehr.demographic.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.util.HinValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.validation.ValidationException;
 
 @Service
 @Transactional
@@ -36,10 +39,19 @@ public class HinValidationService
 	@Autowired
 	DemographicDao demographicDao;
 
+	/**
+	 * returns the HinValidator isValid
+	 */
 	public boolean validateHin(String hin, String provinceCode)
 	{
 		return HinValidator.isValid(hin, provinceCode);
 	}
+
+	/**
+	 * checks if there is a already a demographic with the hin in the system.
+	 * @param hin - the hin to check
+	 * @return - true if the hin is found, false otherwise
+	 */
 	public boolean hinInSystem(String hin)
 	{
 		DemographicCriteriaSearch searchQuery = new DemographicCriteriaSearch();
@@ -50,13 +62,28 @@ public class HinValidationService
 		return totalResultCount > 0;
 	}
 
-	public boolean canAddHin(String hin, String versionCode, String provinceCode)
+	/**
+	 * performs province specific validation checks on the hin.
+	 * Throws validation exception if hin is invalid or if it already exists in the system.
+	 * @param hin - the hin to validate
+	 * @param versionCode - the version code (some version codes allow hin duplication)
+	 * @param provinceCode - the province
+	 */
+	public void validateNoDuplication(String hin, String versionCode, String provinceCode)
 	{
-		// allow duplicated hin when BC version code is 66 (newborn)
-		if("BC".equalsIgnoreCase(provinceCode) && "66".equals(versionCode))
+		hin = StringUtils.trimToNull(hin);
+		// allow null/empty hin
+		if(hin != null)
 		{
-			return validateHin(hin, provinceCode);
+			if(!validateHin(hin, provinceCode))
+			{
+				throw new ValidationException("Invalid Hin");
+			}
+			if(!("BC".equalsIgnoreCase(provinceCode) && "66".equals(versionCode))
+					&& hinInSystem(hin))
+			{
+				throw new ValidationException("Duplicate Hin");
+			}
 		}
-		return (validateHin(hin, provinceCode) && !hinInSystem(hin));
 	}
 }

@@ -52,11 +52,11 @@ public class HinValidator
 	 */
 	public static boolean isValid(String hin, String provinceCode)
 	{
-		if(hin == null || hin.trim().isEmpty())
+		if(hin == null || hin.trim().isEmpty() || provinceCode == null || provinceCode.length() != 2)
 		{
 			return false;
 		}
-		switch(StringUtils.trimToEmpty(provinceCode).toUpperCase())
+		switch(provinceCode.toUpperCase())
 		{
 			case "BC":
 				return isValidBritishColumbia(hin);

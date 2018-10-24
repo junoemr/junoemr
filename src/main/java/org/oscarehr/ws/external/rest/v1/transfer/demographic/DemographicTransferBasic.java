@@ -25,6 +25,7 @@ package org.oscarehr.ws.external.rest.v1.transfer.demographic;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.oscarehr.ws.validator.DemographicTransferHinConstraint;
 import org.oscarehr.ws.validator.ProviderNoConstraint;
 import org.oscarehr.ws.validator.StringValueConstraint;
 
@@ -37,6 +38,7 @@ import java.time.LocalDate;
 @XmlRootElement
 @Schema(description = "Demographic record data transfer object")
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
+@DemographicTransferHinConstraint(allowNull = true)
 public class DemographicTransferBasic implements Serializable
 {
 	// demographic base info

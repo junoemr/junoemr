@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.apache.log4j.Logger;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.eform.service.EFormDataService;
@@ -64,16 +65,19 @@ public class DemographicWs extends AbstractExternalRestWs
 	private static Logger logger = MiscUtils.getLogger();
 
 	@Autowired
-	RecentDemographicAccessService recentDemographicAccessService;
+	private RecentDemographicAccessService recentDemographicAccessService;
 
 	@Autowired
-	DemographicService demographicService;
+	private DemographicService demographicService;
 
 	@Autowired
-	DocumentService documentService;
+	private HinValidationService hinValidationService;
 
 	@Autowired
-	EFormDataService eFormService;
+	private DocumentService documentService;
+
+	@Autowired
+	private EFormDataService eFormService;
 
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
@@ -87,7 +91,7 @@ public class DemographicWs extends AbstractExternalRestWs
 		int providerNo = Integer.parseInt(providerNoStr);
 
 		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.READ, demographicNo, "_demographic");
-		DemographicTransferOutbound demographicTransfer = demographicService.getDemographicTransferOutbound(providerNoStr, demographicNo);
+		DemographicTransferOutbound demographicTransfer = demographicService.getDemographicTransferOutbound(demographicNo);
 
 		LogAction.addLogEntry(providerNoStr, demographicTransfer.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
 		recentDemographicAccessService.updateAccessRecord(providerNo, demographicTransfer.getDemographicNo());
@@ -118,6 +122,7 @@ public class DemographicWs extends AbstractExternalRestWs
 		String ip = getHttpServletRequest().getRemoteAddr();
 
 		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_demographic");
+		hinValidationService.validateNoDuplication(demographicTo.getHin(), demographicTo.getHcVersion(), demographicTo.getHcType());
 		Demographic demographic = demographicService.addNewDemographicRecord(providerNoStr, demographicTo);
 
 		// log the action and update the access record
