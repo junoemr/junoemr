@@ -184,6 +184,9 @@
 	function getContextPath() {
 		return '<%=request.getContextPath()%>';
 	}
+	function getUuid() {
+		return '<%=StringUtils.trimToEmpty(uuid)%>'
+    }
 
 	function refreshEncounter()
 	{
@@ -824,7 +827,7 @@ function createAddAll(d,t,h){
    				out.print("&measurement="+ addAllLink[i]);
    				}%>';
 
-	return fsPopup(760,670,'AddMeasurementData.jsp?demographic_no='+d+'&template='+t+newMtype + UUIDParamStr,'addMeasurementData'+h);
+	return fsPopup(760,670,'AddMeasurementData.jsp?demographic_no='+d+'&template='+t+newMtype + '<%=UUIDParamStr%>','addMeasurementData'+h);
 }
 </script>
 
