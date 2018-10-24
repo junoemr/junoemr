@@ -288,7 +288,8 @@ public class AddEditDocumentAction extends DispatchAction {
 			 		EDocUtil.addDocTypeSQL(fm.getDocType(),fm.getFunction());
 			 	}
 
-				document.setPublic1(fm.getDocPublic().equals("1"));
+				boolean isPublicDoc = ("1".equals(fm.getDocPublic()) || "checked".equalsIgnoreCase(fm.getDocPublic()));
+				document.setPublic1(isPublicDoc);
 				document.setResponsible(fm.getResponsibleId());
 				document.setDoccreator(fm.getDocCreator());
 				document.setDocdesc(fm.getDocDesc());
@@ -297,7 +298,7 @@ public class AddEditDocumentAction extends DispatchAction {
 				document.setSource(fm.getSource());
 				document.setDocClass(fm.getDocClass());
 				document.setDocSubClass(fm.getDocSubClass());
-				document.setObservationdate(ConversionUtils.fromDateString(fm.getObservationDate()));
+				document.setObservationdate(ConversionUtils.fromDateString(fm.getObservationDate(), "yyyy/MM/dd"));
 
 				String module = fm.getFunction().trim();
 				Integer moduleId = Integer.parseInt(fm.getFunctionId().trim());
