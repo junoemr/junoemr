@@ -10,8 +10,15 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxOut
 		controller.faxAccountList = [];
 		controller.outboxItemList = [];
 
-		controller.page = 1;
-		controller.perPage = 10;
+		// ngTable object for storing search parameters
+		controller.search = {
+			page: 1,
+			count: 10,
+			sorting: {
+				DateSent: "desc"
+			}
+		}
+		;
 
 		controller.initialize = function()
 		{
@@ -35,16 +42,13 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxOut
 		controller.loadOutboxItems = function()
 		{
 			controller.tableParams = new NgTableParams(
+				controller.search,
 				{
-					page: controller.page,
-					count: controller.perPage,
-					sorting: {
-						DateSent: "desc"
-					}
-				},
-				{
-					getData: function(params) {
-						return faxAccountService.getOutbox(controller.selectedFaxAccount.id, controller.page, controller.perPage).then(
+					getData: function(params)
+					{
+						console.info(params.url());
+						controller.search = params.url();
+						return faxAccountService.getOutbox(controller.selectedFaxAccount.id, controller.search.page, controller.search.count).then(
 							function success(response)
 							{
 								controller.outboxItemList = response;

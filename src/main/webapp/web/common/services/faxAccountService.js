@@ -38,7 +38,7 @@ angular.module("Common.Services").service("faxAccountService", [
 		{
 			var deferred = $q.defer();
 			var config = Juno.Common.ServiceHelper.configHeaders();
-			config.param = {
+			config.params = {
 				page: page,
 				perPage: perPage
 			};
@@ -149,7 +149,7 @@ angular.module("Common.Services").service("faxAccountService", [
 		{
 			var deferred = $q.defer();
 			var config = Juno.Common.ServiceHelper.configHeaders();
-			config.param = {
+			config.params = {
 				page: page,
 				perPage: perPage
 			};
@@ -172,7 +172,7 @@ angular.module("Common.Services").service("faxAccountService", [
 		{
 			var deferred = $q.defer();
 			var config = Juno.Common.ServiceHelper.configHeaders();
-			config.param = {
+			config.params = {
 				page: page,
 				perPage: perPage
 			};
