@@ -93,7 +93,7 @@ import org.oscarehr.common.dao.GroupNoteDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.BillingONCHeader1;
-import org.oscarehr.common.model.CaseManagementTmpSave;
+import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.common.model.CustomFilter;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.rx.model.Drug;

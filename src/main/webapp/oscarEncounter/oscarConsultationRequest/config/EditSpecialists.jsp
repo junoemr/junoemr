@@ -141,7 +141,7 @@ if(!authed) {
 <%--<link rel="stylesheet" type="text/css" media="all" href="../../../share/css/extractedFromPages.css"  />--%>
 	<style>
 		.specialistPageLink {
-			width: 14.45px;
+			width: 25px;
 			height: 12px;
 			text-align: center;
 			display: inline-block;
@@ -210,7 +210,7 @@ function BackToOscar()
 							<input type="button" onclick="updateBySearch('all')" value="Search All">
 
 							<label>Page Limit:</label>
-							<select name="limit" onchange="nextPage(this.options[this.selectedIndex].value, 1, '', <%=searchType%>)">
+							<select name="limit" onchange="nextPage(this.options[this.selectedIndex].value, 1, '', '<%=searchType%>')">
 								<option value="25" <%= pageLimit != 50 && pageLimit != 100 ? "selected='selected'" : "" %> >25</option>
 								<option value="50" <%= pageLimit == 50 ? "selected='selected'" : "" %> >50</option>
 								<option value="100" <%= pageLimit == 100 ? "selected='selected'" : "" %> >100</option>
@@ -295,14 +295,20 @@ function BackToOscar()
 							}
 						%>
 						<div style="text-align: center; padding-top: 20px; font-size: 1.3em;">
-                            <a href="javascript:void(0)" class="navBtn" onclick="toPage('first', <%=searchType%>)"><<</a>
-                            <a href="javascript:void(0)" class="navBtn" onclick="toPage('previous', <%=searchType%>)"><</a>
-							<% for(int i = startIdx; i < endIdx; i++) {
+							<% if (currentPageIdx != 0)
+							{%>
+                            	<a href="javascript:void(0)" class="navBtn" onclick="toPage('first', '<%=searchType%>')"><<</a>
+                            	<a href="javascript:void(0)" class="navBtn" onclick="toPage('previous', '<%=searchType%>')"><</a>
+							<%}
+							for(int i = startIdx; i < endIdx; i++) {
 								int pageNum = i + 1;%>
 								<a href="javascript:void(0)" class="specialistPageLink" id="page<%=pageNum%>" onclick="nextPage(<%=pageLimit%>, <%=pageNum%>, '<%=ajaxSearch%>', '<%=searchType%>')"><%=pageNum%></a>
-							<% } %>
-                            <a href="javascript:void(0)" class="navBtn" onclick="toPage('next', <%=searchType%>)">></a>
-                            <a href="javascript:void(0)" class="navBtn" onclick="toPage('last', <%=searchType%>)">>></a>
+							<% }
+							if (currentPageIdx != endIdx-1)
+							{%>
+                            	<a href="javascript:void(0)" class="navBtn" onclick="toPage('next', '<%=searchType%>')">></a>
+                            	<a href="javascript:void(0)" class="navBtn" onclick="toPage('last', '<%=searchType%>')">>></a>
+							<%}%>
 						</div>
 					</div>
 				</html:form></td>
