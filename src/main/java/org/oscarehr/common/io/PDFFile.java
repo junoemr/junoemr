@@ -177,7 +177,6 @@ public class PDFFile extends GenericFile
 				"-dNOPAUSE",
 				"-dQUIET",
 				"-dBATCH",
-				"-dUseCIEColor",
 				"-sOutputFile="+ newPdf.getPath(),
 				javaFile.getPath()};
 		
