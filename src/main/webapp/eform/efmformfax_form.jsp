@@ -13,16 +13,21 @@
 This Page creates the fax form for eforms.
  
 --%>
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@ page import="java.sql.*, java.util.ArrayList, oscar.eform.data.*, oscar.SxmlMisc, org.oscarehr.common.model.Demographic, oscar.oscarDemographic.data.DemographicData,oscar.OscarProperties,org.springframework.web.context.support.WebApplicationContextUtils, org.springframework.web.context.WebApplicationContext"%>
-<%@page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="org.oscarehr.common.dao.UserPropertyDAO"%>
+<%@ page import="org.oscarehr.common.model.Demographic"%>
+<%@ page import="org.oscarehr.common.model.UserProperty"%>
+<%@ page import="org.oscarehr.fax.service.OutgoingFaxService"%>
+<%@ page import="org.oscarehr.util.LoggedInInfo"%>
+<%@ page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="org.springframework.web.context.WebApplicationContext"%>
+<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils,oscar.SxmlMisc"%>
+<%@ page import="oscar.oscarDemographic.data.DemographicData" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
-<%@ page import="org.oscarehr.common.model.*,org.oscarehr.common.dao.*"%>
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 <%
-	OscarProperties props = OscarProperties.getInstance();
+	OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
 
 	displayServiceUtil.estSpecialist();
 	String demo = request.getParameter("demographicNo");
@@ -32,10 +37,9 @@ This Page creates the fax form for eforms.
 	if (!"".equals(demo)) {
 		demoData = new oscar.oscarDemographic.data.DemographicData();
 		demographic = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demo);
-		rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()), "rdohip");
 		rdohip = SxmlMisc.getXmlContent(demographic.getFamilyDoctor(), "rdohip").trim();
 	}
-	boolean faxEnabled = props.isEFormFaxEnabled();
+	boolean faxEnabled = outgoingFaxService.isOutboundFaxEnabled();
 %>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/util/fax.js"></script>
 <script type="text/javascript">
@@ -43,7 +47,7 @@ This Page creates the fax form for eforms.
 </script>
 
 <table width="100%">
-	<input type="hidden" value=<%=faxEnabled%> id="faxControl_faxEnabled"></input>
+	<input type="hidden" value=<%=faxEnabled%> id="faxControl_faxEnabled">
 	<%
 		String rdName = "";
 		String rdFaxNo = "";

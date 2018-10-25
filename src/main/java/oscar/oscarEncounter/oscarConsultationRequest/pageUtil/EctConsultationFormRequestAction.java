@@ -25,23 +25,10 @@
 
 package oscar.oscarEncounter.oscarConsultationRequest.pageUtil;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Set;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.v26.message.ORU_R01;
+import ca.uhn.hl7v2.model.v26.message.REF_I12;
+import com.lowagie.text.DocumentException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
@@ -67,6 +54,7 @@ import org.oscarehr.common.model.DigitalSignature;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.DigitalSignatureUtils;
@@ -74,19 +62,28 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WebUtils;
-
-import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.oscarLab.ca.all.pageUtil.LabPDFCreator;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ParameterActionForward;
-import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.v26.message.ORU_R01;
-import ca.uhn.hl7v2.model.v26.message.REF_I12;
 
-import com.lowagie.text.DocumentException;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Set;
 
 public class EctConsultationFormRequestAction extends Action {
 
@@ -98,6 +95,8 @@ public class EctConsultationFormRequestAction extends Action {
 			.getBean("consultationRequestExtDao");
 	private static ProfessionalSpecialistDao professionalSpecialistDao = (ProfessionalSpecialistDao) SpringUtils
 			.getBean("professionalSpecialistDao");
+	private static OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
+	private static boolean faxEnabled = outgoingFaxService.isOutboundFaxEnabled();
 	
 	private static String[] format = new String[] {"yyyy-MM-dd","yyyy/MM/dd"};
 	
@@ -233,7 +232,7 @@ public class EctConsultationFormRequestAction extends Action {
 		if (submission.endsWith("And Print Preview")) {
 
 			request.setAttribute("reqId", requestId);
-			if (OscarProperties.getInstance().isConsultationFaxEnabled()
+			if (faxEnabled
 					|| IsPropertiesOn.propertiesOn("consultation_pdf_enabled")) {
 				return mapping.findForward("printIndivica");
 			}
@@ -251,7 +250,7 @@ public class EctConsultationFormRequestAction extends Action {
 		else if (submission.endsWith("And Fax")) {
 
 			request.setAttribute("reqId", requestId);
-			if (OscarProperties.getInstance().isConsultationFaxEnabled()) {
+			if (faxEnabled) {
 				return mapping.findForward("faxIndivica");
 			}
 			else {

@@ -62,7 +62,7 @@ public class SendFaxPDFAction extends DispatchAction {
     public ActionForward faxDocument(ActionMapping mapping, ActionForm form,
 		HttpServletRequest request, HttpServletResponse response) 
 	{
-		if (!OscarProperties.getInstance().isDocumentFaxEnabled())
+		if (!outgoingFaxService.isOutboundFaxEnabled())
 		{
 			return mapping.findForward("failed");
 		}
@@ -143,7 +143,7 @@ public class SendFaxPDFAction extends DispatchAction {
 	public ActionForward faxForm(ActionMapping mapping, ActionForm form,
 								 HttpServletRequest request, HttpServletResponse response)
 	{
-		if (!OscarProperties.getInstance().isFormFaxEnabled())
+		if (!outgoingFaxService.isOutboundFaxEnabled())
 		{
 			return mapping.findForward("failed");
 		}

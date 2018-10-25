@@ -375,29 +375,15 @@ public class OscarProperties extends Properties {
 	public boolean isOscarLearning() {
 		return isPropertyActive("OSCAR_LEARNING");
 	}
-	
-	public boolean isRxFaxEnabled() {
-		return isPropertyActive("faxEnable") && isPropertyActive("rx_fax_enabled");
-	}
-		
-	public boolean isConsultationFaxEnabled() {
-		return isPropertyActive("faxEnable") && isPropertyActive("consultation_fax_enabled");
-	}
 
-	public boolean isEFormFaxEnabled() {
-		return isPropertyActive("faxEnable") && isPropertyActive("eform_fax_enabled");
-	}
-
-	public boolean isFormFaxEnabled() {
-		return isPropertyActive("faxEnable") && isPropertyActive("form_fax_enabled");
-	}
-
-	public boolean isDocumentFaxEnabled() {
-		return isPropertyActive("faxEnable") && isPropertyActive("document_fax_enabled");
+	/** for legacy faxing setup, use the outboundFaxService check */
+	public boolean isFaxEnabled()
+	{
+		return isPropertyActive("faxEnable");
 	}
 
 	public boolean isRxSignatureEnabled() {
-		return isRxFaxEnabled() || isPropertyActive("rx_signature_enabled");
+		return isFaxEnabled() || isPropertyActive("rx_signature_enabled");
 	}
 	
 	public boolean isConsultationSignatureEnabled() {

@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.OscarProperties;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -58,6 +59,7 @@ import java.util.List;
 public class OutgoingFaxService
 {
 	private static final Logger logger = MiscUtils.getLogger();
+	private static final OscarProperties props = OscarProperties.getInstance();
 
 	@Autowired
 	FaxJobDao faxJobDao;
@@ -65,18 +67,30 @@ public class OutgoingFaxService
 	@Autowired
 	FaxAccountDao faxAccountDao;
 
+	public boolean isOutboundFaxEnabled()
+	{
+		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveOutbound(true, true, 0, 1);
+		return (!faxAccountList.isEmpty() || props.isFaxEnabled());
+	}
+
 	public void sendFax(String providerId, Integer demographicId, String faxNumber, GenericFile...filesToFax) throws IOException
 	{
-
+		//TODO determine which fax route to use
 		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveOutbound(true, true, 0, 1);
-		if(faxAccountList.isEmpty())
+		// check for enabled fax routes
+		if(!faxAccountList.isEmpty())
+		{
+			FaxAccount faxSettings = faxAccountList.get(0);
+			sendBySRFax(providerId, demographicId, faxSettings, faxNumber, filesToFax);
+		}
+		// if legacy faxing is enabled, write to the outgoing folder.
+		else if(props.isFaxEnabled())
 		{
 			writeToFaxOutgoing(faxNumber, filesToFax);
 		}
 		else
 		{
-			FaxAccount faxSettings = faxAccountList.get(0); //TODO determine which fax route to use
-			sendBySRFax(providerId, demographicId, faxSettings, faxNumber, filesToFax);
+			throw new RuntimeException("No outbound fax routes enabled!");
 		}
 	}
 
@@ -115,7 +129,7 @@ public class OutgoingFaxService
 		// external api call
 		SingleWrapper<Integer> resultWrapper = apiConnector.Queue_Fax(
 				faxSettings.getReplyFaxNumber(),
-				faxSettings.getLoginId(),
+				faxSettings.getEmail(),
 				SRFaxApiConnector.FAX_TYPE_SINGLE,
 				faxNumber,
 				fileMap,

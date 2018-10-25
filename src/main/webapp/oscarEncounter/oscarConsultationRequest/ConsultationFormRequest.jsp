@@ -82,6 +82,7 @@ if(!authed) {
 <%@page import="oscar.util.StringUtils, java.util.ArrayList"%>
 <%@page import="java.util.Collections" %>
 <%@page import="java.util.List" %>
+<%@ page import="org.oscarehr.fax.service.OutgoingFaxService" %>
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 
 <html:html locale="true">
@@ -89,81 +90,85 @@ if(!authed) {
 <%! boolean bMultisites=org.oscarehr.common.IsPropertiesOn.isMultisitesEnable(); %>
 
 <%
-	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
-	DemographicExtDao demographicExtDao = (DemographicExtDao)SpringUtils.getBean("demographicExtDao");
+	DemographicExtDao demographicExtDao = (DemographicExtDao) SpringUtils.getBean("demographicExtDao");
+	OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
+	boolean faxEnabled = outgoingFaxService.isOutboundFaxEnabled();
 
-	displayServiceUtil.estSpecialist();	
+	displayServiceUtil.estSpecialist();
 
 	//multi-site support
 	String appNo = request.getParameter("appNo");
-	appNo = (appNo==null ? "" : appNo);
+	appNo = (appNo == null ? "" : appNo);
 
 	String multisiteLetterheadSelectionName = "Referring Site Name";
 	String defaultSiteName = "";
 	Integer defaultSiteId = 0;
-	List<Site> sites = new ArrayList<Site>();
-	if (bMultisites) {
-		SiteDao siteDao = (SiteDao)WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
+	List<Site> sites = new ArrayList<>();
+	if(bMultisites)
+	{
+		SiteDao siteDao = (SiteDao) WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
 
 		sites = siteDao.getActiveSitesByProviderNo((String) session.getAttribute("user"));
-		if (appNo != "") {
+		if(!appNo.isEmpty())
+		{
 			defaultSiteName = siteDao.getSiteNameByAppointmentNo(appNo);
 		}
 	}
 
 	String demo = request.getParameter("de");
-		String requestId = request.getParameter("requestId");
-		boolean isNewConsultation = (requestId == null);
-		// segmentId is != null when viewing a remote consultation request from an hl7 source
-		String segmentId = request.getParameter("segmentId");
-		String team = request.getParameter("teamVar");
-		String providerNo = (String)session.getAttribute("user");
-		String providerNoFromChart = null;
-		DemographicData demoData = null;
-		org.oscarehr.common.model.Demographic demographic = null;
+	String requestId = request.getParameter("requestId");
+	boolean isNewConsultation = (requestId == null);
+	// segmentId is != null when viewing a remote consultation request from an hl7 source
+	String segmentId = request.getParameter("segmentId");
+	String team = request.getParameter("teamVar");
+	String providerNo = (String) session.getAttribute("user");
+	String providerNoFromChart = null;
+	DemographicData demoData = null;
+	org.oscarehr.common.model.Demographic demographic = null;
 
-		RxProviderData rx = new RxProviderData();
-		List<Provider> prList = rx.getAllProviders();
-		Provider thisProvider = rx.getProvider(providerNo);
-		ClinicData clinic = new ClinicData();
-		
-		EctConsultationFormRequestUtil consultUtil = new EctConsultationFormRequestUtil();
-		
-		if (requestId != null) consultUtil.estRequestFromId(loggedInInfo, requestId);
-		if (demo == null) demo = consultUtil.demoNo;
+	RxProviderData rx = new RxProviderData();
+	List<Provider> prList = rx.getAllProviders();
+	Provider thisProvider = rx.getProvider(providerNo);
+	ClinicData clinic = new ClinicData();
 
-		ArrayList<String> users = (ArrayList<String>)session.getServletContext().getAttribute("CaseMgmtUsers");
-		boolean useNewCmgmt = false;
-		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-		CaseManagementManager cmgmtMgr = null;
-		if (users != null && users.size() > 0 && (users.get(0).equalsIgnoreCase("all") || Collections.binarySearch(users, providerNo) >= 0))
-		{
-			useNewCmgmt = true;
-			cmgmtMgr = (CaseManagementManager)ctx.getBean("caseManagementManager");
-		}
+	EctConsultationFormRequestUtil consultUtil = new EctConsultationFormRequestUtil();
 
-		UserPropertyDAO userPropertyDAO = (UserPropertyDAO)ctx.getBean("UserPropertyDAO");
-		UserProperty fmtProperty = userPropertyDAO.getProp(providerNo, UserProperty.CONSULTATION_REQ_PASTE_FMT);
-		String pasteFmt = fmtProperty != null?fmtProperty.getValue():null;
+	if(requestId != null) consultUtil.estRequestFromId(loggedInInfo, requestId);
+	if(demo == null) demo = consultUtil.demoNo;
 
-		if (demo != null)
-		{
-			demoData = new oscar.oscarDemographic.data.DemographicData();
-			demographic = demoData.getDemographic(loggedInInfo, demo);
-			
-			providerNoFromChart = demographic.getProviderNo();
-		}
-		else if (requestId == null && segmentId == null)
-		{
-			MiscUtils.getLogger().debug("Missing both requestId and segmentId.");
-		}
+	ArrayList<String> users = (ArrayList<String>) session.getServletContext().getAttribute("CaseMgmtUsers");
+	boolean useNewCmgmt = false;
+	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+	CaseManagementManager cmgmtMgr = null;
+	if(users != null && users.size() > 0 && (users.get(0).equalsIgnoreCase("all") || Collections.binarySearch(users, providerNo) >= 0))
+	{
+		useNewCmgmt = true;
+		cmgmtMgr = (CaseManagementManager) ctx.getBean("caseManagementManager");
+	}
 
-		if (demo != null) consultUtil.estPatient(loggedInInfo, demo);
-		consultUtil.estActiveTeams();
+	UserPropertyDAO userPropertyDAO = (UserPropertyDAO) ctx.getBean("UserPropertyDAO");
+	UserProperty fmtProperty = userPropertyDAO.getProp(providerNo, UserProperty.CONSULTATION_REQ_PASTE_FMT);
+	String pasteFmt = fmtProperty != null ? fmtProperty.getValue() : null;
 
-		if (request.getParameter("error") != null)
-		{
+	if(demo != null)
+	{
+		demoData = new oscar.oscarDemographic.data.DemographicData();
+		demographic = demoData.getDemographic(loggedInInfo, demo);
+
+		providerNoFromChart = demographic.getProviderNo();
+	}
+	else if(requestId == null && segmentId == null)
+	{
+		MiscUtils.getLogger().debug("Missing both requestId and segmentId.");
+	}
+
+	if(demo != null) consultUtil.estPatient(loggedInInfo, demo);
+	consultUtil.estActiveTeams();
+
+	if(request.getParameter("error") != null)
+	{
 %>
 <SCRIPT LANGUAGE="JavaScript">
         alert("The form could not be printed due to an error. Please refer to the server logs for more details.");
@@ -350,7 +355,7 @@ function onDocumentLoad()
 	}
 
 	// update fax button state (enabled/disabled) on load
-	if (props.isConsultationFaxEnabled())
+	if (faxEnabled)
 	{ %>
 	Oscar.Util.Fax.updateFaxButton();
 	<%
@@ -652,7 +657,7 @@ function onSelectSpecialist(SelectedSpec)	{
 	var selectedIdx = SelectedSpec.selectedIndex;
 	var form=document.EctConsultationFormRequestForm;
 
-	<% if (props.isConsultationFaxEnabled())
+	<% if (faxEnabled)
 	{ %>
 		jQuery("#faxRecipients").find(".autoAdded").remove();
 	<% } %>
@@ -692,7 +697,7 @@ function onSelectSpecialist(SelectedSpec)	{
        			document.getElementById("consult-disclaimer").style.display='none';
         	
             	<%
-				if (props.isConsultationFaxEnabled())
+				if (faxEnabled)
 				{ %>
 					Oscar.Util.Fax.AddFax(aSpeci.specName, aSpeci.specFax.trim())
         		<% } %>
@@ -712,7 +717,7 @@ function onSelectSpecialist(SelectedSpec)	{
             }
         }//spec loop
 
-	<% if (props.isConsultationFaxEnabled())
+	<% if (faxEnabled)
 	{ %>
 		Oscar.Util.Fax.updateFaxButton();
 	<% } %>
@@ -734,7 +739,7 @@ function FillThreeBoxes(serNbr)	{
                 document.EctConsultationFormRequestForm.fax.value = (aSpeci.specFax);					// load the text fields with phone fax and address
                 document.EctConsultationFormRequestForm.address.value = (aSpeci.specAddress);
                 <%
-        		if (props.isConsultationFaxEnabled()) {//
+        		if (faxEnabled) {//
 				%>
 					Oscar.Util.Fax.AddFax(aSpeci.specName, aSpeci.specFax.trim());
 					Oscar.Util.Fax.updateFaxButton();
@@ -1231,7 +1236,7 @@ function signatureHandler(e) {
 	isSignatureDirty = e.isDirty;
 	isSignatureSaved = e.isSave;
 	<%
-	if (props.isConsultationFaxEnabled()) { //
+	if (faxEnabled) { //
 	%>
 	Oscar.Util.Fax.updateFaxButton();
 	<% } %>
@@ -1318,7 +1323,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 
 	%>
 
-	<% if (!props.isConsultationFaxEnabled() || !OscarProperties.getInstance().isPropertyActive("consultation_dynamic_labelling_enabled")) { %>
+	<% if (!faxEnabled || !OscarProperties.getInstance().isPropertyActive("consultation_dynamic_labelling_enabled")) { %>
 	<input type="hidden" name="providerNo" value="<%=providerNo%>">
 	<% } %>
 	<input type="hidden" name="demographicNo" value="<%=demo%>">
@@ -1468,7 +1473,6 @@ var requestIdKey = "<%=signatureRequestId %>";
 				<!----Start new rows here-->
 				<tr>
 					<td class="tite4" colspan=2>
-					<% boolean faxEnabled = props.getBooleanProperty("faxEnable", "yes"); %>
 					<% if (request.getAttribute("id") != null) { %>
 						<input name="update" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdate"/>" onclick="return checkForm('Update Consultation Request','EctConsultationFormRequestForm');" />
 						<input name="updateAndPrint" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndPrint"/>" onclick="return checkForm('Update Consultation Request And Print Preview','EctConsultationFormRequestForm');" />
@@ -1494,7 +1498,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 					<td>
 
 					<table border=0 width="100%">
-						<% if (props.isConsultationFaxEnabled() && OscarProperties.getInstance().isPropertyActive("consultation_dynamic_labelling_enabled")) { %>
+						<% if (faxEnabled && OscarProperties.getInstance().isPropertyActive("consultation_dynamic_labelling_enabled")) { %>
 						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgAssociated2" />:</td>
 							<td align="right" class="tite1">
@@ -1873,7 +1877,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 								<% }
 								}%>
 								</select>
-								<%if ( props.isPropertyActive("consultation_fax_enabled")) {
+								<%if (faxEnabled) {
 										// This checkbox adds the doctor name to the letterhead when checked. 
 										// Because of how it gets stored in a key value table, the entry only exists when it is checked:
 										boolean defaultChecked = props.isPropertyActive("consultation_letterhead_title.include_dr_by_default");
@@ -2102,7 +2106,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 						property="allergies"></html:textarea></td>
 				</tr>
 				<%
-				if (props.isConsultationFaxEnabled()) {
+				if (faxEnabled) {
 				%>
 				<tr><td colspan=2 class="tite4">Additional Fax Recipients:</td></tr>
 				<tr>
@@ -2194,7 +2198,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 						<input name="updateAndPrint" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndPrint"/>" onclick="return checkForm('Update Consultation Request And Print Preview','EctConsultationFormRequestForm');" />
 						<input name="updateAndSendElectronically" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndSendElectronicReferral"/>" onclick="return checkForm('Update_esend','EctConsultationFormRequestForm');" />
 						<%
-							if (props.getBooleanProperty("faxEnable", "yes"))
+							if (faxEnabled)
 										{
 						%>
 						<input id="fax_button2" class="faxButton" name="updateAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndFax"/>" onclick="return checkForm('Update And Fax','EctConsultationFormRequestForm');" />
@@ -2210,7 +2214,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 						<input name="submitAndPrint" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndPrint"/>" onclick="return checkForm('Submit Consultation Request And Print Preview','EctConsultationFormRequestForm'); " />
 						<input name="submitAndSendElectronically" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndSendElectronicReferral"/>" onclick="return checkForm('Submit_esend','EctConsultationFormRequestForm');" />
 						<%
-							if (props.getBooleanProperty("faxEnable", "yes"))
+							if (faxEnabled)
 										{
 						%>
 						<input id="fax_button2" class="faxButton" name="submitAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndFax"/>" onclick="return checkForm('Submit And Fax','EctConsultationFormRequestForm');" />
