@@ -46,42 +46,48 @@ import org.oscarehr.util.SpringUtils;
 import oscar.util.ConversionUtils;
 import oscar.util.ParameterActionForward;
 
-public class EctDeleteDataAction extends Action {
+public class EctDeleteDataAction extends Action
+{
 
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	
-	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_measurement", "d", null)) {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	{
+
+		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_measurement", "d", null))
+		{
 			throw new SecurityException("missing required security object (_measurement)");
 		}
-		
+
 		EctDeleteDataForm frm = (EctDeleteDataForm) form;
 		request.getSession().setAttribute("EctDeleteDataForm", frm);
 		String[] deleteCheckbox = frm.getDeleteCheckbox();
 
 		MeasurementsDeletedDao measurementsDeletedDao = (MeasurementsDeletedDao) SpringUtils.getBean("measurementsDeletedDao");
 		MeasurementDao measurementDao = SpringUtils.getBean(MeasurementDao.class);
-		if (deleteCheckbox != null) {
+		if(deleteCheckbox != null)
+		{
 
 			MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
-			for (int i = 0; i < deleteCheckbox.length; i++) {
+			for(int i = 0; i < deleteCheckbox.length; i++)
+			{
 				MiscUtils.getLogger().debug(deleteCheckbox[i]);
 
 				Measurement m = dao.find(ConversionUtils.fromIntString(deleteCheckbox[i]));
-				if (m != null) {
+				if(m != null)
+				{
 					measurementsDeletedDao.persist(new MeasurementsDeleted(m));
 					measurementDao.remove(Integer.parseInt(deleteCheckbox[i]));
 				}
 			}
 		}
 
-		if (frm.getType() != null) {
+		if(frm.getType() != null)
+		{
 			ParameterActionForward forward = new ParameterActionForward(mapping.findForward("success"));
 			forward.addParameter("type", frm.getType());
 			return forward;
 		}
 		return mapping.findForward("success");
 	}
-
 }

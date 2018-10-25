@@ -37,8 +37,20 @@ public class CaseManagementIssueNote extends AbstractModel<CaseManagementIssueNo
 
 	public CaseManagementIssueNote()
 	{
-		this.id = new CaseManagementIssueNotePK();
+		this(new CaseManagementIssueNotePK());
 	}
+	public CaseManagementIssueNote(CaseManagementIssueNotePK pk)
+	{
+		this.id = pk;
+	}
+
+	/** construct a copy of the given issue note */
+	public CaseManagementIssueNote(CaseManagementIssueNote issueNoteToCopy, CaseManagementNote referenceNote)
+	{
+		/* we want a new issue note (this), but not a new issue. use the existing linked issue for this demographic */
+		this.id = new CaseManagementIssueNotePK(issueNoteToCopy.getId().getCaseManagementIssue(), referenceNote);
+	}
+
 
 	@Override
 	public CaseManagementIssueNotePK getId()
