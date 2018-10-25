@@ -292,9 +292,10 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				//header table for patient's information.
 				PdfPTable head = new PdfPTable(1);
 				String newline = System.getProperty("line.separator");
-				StringBuilder hStr = new StringBuilder(this.patientName);
+				StringBuilder hStr = new StringBuilder(newline);
+				hStr = hStr.append(this.patientName);
 				if(showPatientDOB){
-					hStr.append("   DOB:").append(this.patientDOB).append(newline);}
+					hStr.append("   DOB: ").append(this.patientDOB).append(newline);}
 				else{
 					hStr.append(newline);
 				}
@@ -350,15 +351,15 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				// render clnicaTel;
 				// bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
 				//bf = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-				if (this.clinicTel.length() <= 13) {
+				if (this.clinicTel.length() <= 14) {
 					//RxPreview.msgTel
 
 					writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_LEFT, geti18nTagValue(locale, "RxPreview.msgTel")+":" + this.clinicTel, 188, (page.getHeight() - 70), 0);
 					// render clinicFax;
 					writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_LEFT, geti18nTagValue(locale, "RxPreview.msgFax")+":" + this.clinicFax, 188, (page.getHeight() - 80), 0);
 				} else {
-					String str1 = this.clinicTel.substring(0, 13);
-					String str2 = this.clinicTel.substring(13);
+					String str1 = this.clinicTel.substring(0, 14);
+					String str2 = this.clinicTel.substring(14);
 					writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_LEFT, geti18nTagValue(locale, "RxPreview.msgTel")+":" + str1, 188, (page.getHeight() - 70), 0);
 					writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_LEFT, str2, 188, (page.getHeight() - 80), 0);
 					writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_LEFT, geti18nTagValue(locale, "RxPreview.msgFax")+":" + this.clinicFax, 188, (page.getHeight() - 88), 0);

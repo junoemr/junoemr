@@ -310,8 +310,8 @@ public class DSGuidelineDrools extends DSGuideline {
 
 			RuleBaseCreator ruleBaseCreator = new RuleBaseCreator();
 			try {
-				_ruleBase = ruleBaseCreator.getRuleBase(ruleBaseFactoryKey, rules);
 				RuleBaseFactory.putRuleBase(ruleBaseFactoryKey, _ruleBase);
+				_ruleBase = ruleBaseCreator.getRuleBase(ruleBaseFactoryKey, rules);
 			} catch (Exception e) {
 				throw new DecisionSupportException("Could not create a rule base for guideline '" + this.getTitle() + "'", e);
 			}

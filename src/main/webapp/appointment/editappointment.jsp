@@ -488,30 +488,24 @@
 			</div>
 
 			<%
-				Appointment appt = null;
+				Appointment appt = appointmentDao.find(Integer.parseInt(appointment_no));
+				if (appt == null)
+				{
+			%>
+					<bean:message key="appointment.editappointment.msgNoSuchAppointment"/>
+			<%
+					return;
+				}
+
 				String demono = "", chartno = "", phone = "", rosterstatus = "", alert = "", doctorNo = "";
 				String strApptDate = bFirstDisp ? "" : request.getParameter("appointment_date");
 
 
 				if (bFirstDisp)
 				{
-					appt = appointmentDao.find(Integer.parseInt(appointment_no));
-
-
-					if (appt == null)
-					{
-			%>
-			<bean:message key="appointment.editappointment.msgNoSuchAppointment"/>
-			<%
-						return;
-					}
-				}
-
-
-				if (bFirstDisp)
-				{
 					demono = String.valueOf(appt.getDemographicNo());
-				} else if (request.getParameter("demographic_no") != null && !request.getParameter("demographic_no").equals(""))
+				}
+				else if (request.getParameter("demographic_no") != null && !request.getParameter("demographic_no").equals(""))
 				{
 					demono = request.getParameter("demographic_no");
 				}
@@ -794,24 +788,35 @@
 						<div class="label"><bean:message key="Appointment.formReason"/>:</div>
 						<div class="input">
 							<select name="reasonCode">
-								<% 	boolean isSelfBooked = appt.getBookingSource() == Appointment.BookingSource.MYOSCAR_SELF_BOOKING;
-									if (appt.getReasonCode() == null && isSelfBooked) { %>
-								<option value="-1" selected="selected" disabled="disabled"><bean:message key="provider.appointmentProviderAdminDay.SelfBookedMarker"/> Click to set a reason</option>
-								<% 	} else if (appt.getReasonCode() == null) { %>
-								<option value ="-1" selected="selected" disabled="disabled">Click to set a reason</option>
-								<%	}
+							<%
+								Integer apptReasonCode;
 
-									Integer apptReasonCode = bFirstDisp ? (appt.getReasonCode() == null ? -1 : appt.getReasonCode()) : Integer.parseInt(request.getParameter("reasonCode"));
-									if (reasonCodes != null) {
-									    for (LookupListItem reasonCode : reasonCodes.getItems()) {
-									        boolean isApptReason = apptReasonCode.equals(reasonCode.getId());
-									        if (reasonCode.isActive() || isApptReason) { %>
+								if (bFirstDisp)
+								{
+								    apptReasonCode = appt.getReasonCode();
+								}
+								else
+								{
+								    apptReasonCode = (request.getParameter("reasonCode") == null) ? null : Integer.parseInt(request.getParameter("reasonCode"));
+								}
+
+								boolean isSelfBooked = appt.getBookingSource() == Appointment.BookingSource.MYOSCAR_SELF_BOOKING;
+
+								if (apptReasonCode == null && isSelfBooked) { %>
+								<option value="-1" selected="selected" disabled="disabled"><bean:message key="provider.appointmentProviderAdminDay.SelfBookedMarker"/> Click to set a reason</option>
+								<% } else if (apptReasonCode == null) { %>
+								<option value ="-1" selected="selected" disabled="disabled">Click to set a reason</option>
+								<% }
+								if (reasonCodes != null) {
+									for (LookupListItem reasonCode : reasonCodes.getItems()) {
+									    boolean isApptReason = reasonCode.getId().equals(apptReasonCode);
+									    if (reasonCode.isActive() || isApptReason) { %>
 								<option value="<%=reasonCode.getId()%>" <%=isApptReason ? "selected=\"selected\"" : "" %>><%=StringEscapeUtils.escapeHtml(reasonCode.getValue())%></option>
-								<%			}
-									    }
-									} else { %>
+								<%		}
+									}
+								} else { %>
 								<option value="-1">Other</option>
-								<%	} %>
+								<% } %>
 							</select>
 							</br>
 							<textarea id="reason" name="reason" tabindex="2" maxlength="80" rows="2" wrap="virtual"

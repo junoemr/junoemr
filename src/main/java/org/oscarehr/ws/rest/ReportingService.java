@@ -23,17 +23,7 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.List;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-
 import net.sf.json.JSONObject;
-
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.dao.EFormReportToolDao;
 import org.oscarehr.common.model.DemographicSets;
@@ -44,11 +34,20 @@ import org.oscarehr.managers.EFormReportToolManager;
 import org.oscarehr.web.PatientListApptBean;
 import org.oscarehr.web.PatientListApptItemBean;
 import org.oscarehr.ws.rest.conversion.EFormReportToolConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.model.EFormReportToolTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import java.util.List;
 
 @Path("/reporting/")
 @Component
@@ -68,13 +67,13 @@ public class ReportingService extends AbstractServiceImpl {
 	@GET
 	@Path("/demographicSets/list")
 	@Produces("application/json")
-	public AbstractSearchResponse<String> listDemographicSets(){
+	public RestResponse<AbstractSearchResponse<String>> listDemographicSets(){
 		AbstractSearchResponse<String> response = new AbstractSearchResponse<String>();
 		
 		response.setContent(demographicSetsManager.getNames(getLoggedInInfo()));
 		response.setTotal(response.getContent().size());
 		
-		return (response);
+		return (RestResponse.successResponse(response));
 	}
 	
 	@GET

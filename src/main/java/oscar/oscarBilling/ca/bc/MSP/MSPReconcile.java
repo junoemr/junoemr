@@ -353,7 +353,7 @@ public class MSPReconcile {
 					officeNumbers.add(forwardZero(justBillingMaster.get(i), 7));
 				}
 
-				for (TeleplanS00 ts : dao.findByOfficeNumbers(justBillingMaster)) {
+				for (TeleplanS00 ts : dao.findByOfficeNumbers(officeNumbers)) {
 					try {
 						int i = Integer.parseInt(ts.getOfficeNo()); // this kludge rids leading zeros
 						String exp[] = ts.getExps();
@@ -1870,7 +1870,7 @@ public class MSPReconcile {
 			String strOwing = String.valueOf(dblAmtOwing);
 			double amountOwing = Double.parseDouble(strOwing);
 			if (amountOwing <= 0) {
-				if (MSPReconcile.BILLTYPE_PRI.equals(b.getBillAmount())) { // Warning: This was probably a bug, as row[0] referred to bill amount...
+				if (MSPReconcile.BILLTYPE_PRI.equals(b1.getBillingtype())) {
 					this.updateBillingMasterStatus(billingmasterNo, MSPReconcile.PAIDPRIVATE);
 				} else {
 					this.updateBillingMasterStatus(billingmasterNo, MSPReconcile.SETTLED);

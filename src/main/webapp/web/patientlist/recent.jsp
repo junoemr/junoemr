@@ -24,7 +24,7 @@
 
 --%>
 <div id="patient-list">
-	<a ng-repeat="patient in patientListCtrl.recentPatientList | offset: patientListCtrl.currentPage * patientListCtrl.pageSize"
+	<a ng-repeat="patient in patientListCtrl.recentPatientList | offset: patientListCtrl.currentPage * patientListCtrl.pageSize | filter:query"
 	   class="list-group-item hand-hover"
 	   ng-click="patientListCtrl.goToRecord(patient)"
 	   class="default">
