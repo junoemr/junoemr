@@ -2704,24 +2704,28 @@
 				asynchronous: false,
 				postBody: params,
 				evalScripts: true,
-				onSuccess: function(request)
+				onSuccess: function (request)
 				{
 					$("notCPP").update(request.responseText);
 					$("notCPP").style.height = "50%";
 					if (fullChart == "true")
 					{
 						$("quickChart").innerHTML = quickChartMsg;
-						$("quickChart").onclick = function() {return viewFullChart(false);}
+						$("quickChart").onclick = function ()
+						{
+							return viewFullChart(false);
 						}
-					else {
+					}
+					else
+					{
 						$("quickChart").innerHTML = fullChartMsg;
-						$("quickChart").onclick = function()
+						$("quickChart").onclick = function ()
 						{
 							return viewFullChart(true);
 						}
 					}
 				},
-				onFailure: function(request)
+				onFailure: function (request)
 				{
 					$("notCPP").update("Error: " + request.status + request.responseText);
 				}
