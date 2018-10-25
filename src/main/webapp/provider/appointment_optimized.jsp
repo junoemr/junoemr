@@ -99,6 +99,7 @@
 
 private boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
 private HashMap<String,String> siteBgColor = new HashMap<String,String>();
+private boolean isClinicaid = OscarProperties.getInstance().isClinicaidBillingType();
 
 public boolean isWeekView(ServletRequest request)
 {
@@ -212,6 +213,9 @@ private long getAppointmentRowSpan(
 
 	// Additional things required for schedule
 	String roleName$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
+
+	//Required so it can be used in JSTL
+	request.setAttribute("isClinicaid", isClinicaid);
 
 	MyGroupDao myGroupDao = SpringUtils.getBean(MyGroupDao.class);
 	MyGroupAccessRestrictionDao myGroupAccessRestrictionDao = SpringUtils.getBean(MyGroupAccessRestrictionDao.class);
@@ -1835,7 +1839,7 @@ private long getAppointmentRowSpan(
 															<c:if test="${!appointmentInfo.weekView}">
 																<c:if test="${appointmentInfo.showBilling}">
 																	<c:choose>
-																		<c:when test="${appointmentInfo.billed}">
+																		<c:when test="${appointmentInfo.billed && !isClinicaid}">
 																			&#124; <a
 																				href=#
 																				onClick='onUnbilled("${appointmentInfo.unbillURL}");return false;'
