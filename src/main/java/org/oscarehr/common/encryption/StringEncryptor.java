@@ -25,6 +25,7 @@ package org.oscarehr.common.encryption;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.exception.EncryptionException;
+import oscar.OscarProperties;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -44,8 +45,8 @@ import java.util.Optional;
 public class StringEncryptor
 {
 	private static final Logger logger = Logger.getLogger(StringEncryptor.class);
+	private static final OscarProperties props = OscarProperties.getInstance();
 
-	private static final String SECRET_KEY_ENV_NAME = "TOMCAT_ENCRYPTION_KEY";
 	private static final String TRANSFORM = "AES/CBC/PKCS5Padding";
 	private static final String AES = "AES";
 
@@ -75,7 +76,7 @@ public class StringEncryptor
 			Cipher cipher = Cipher.getInstance(TRANSFORM);
 			final SecureRandom rng = new SecureRandom();
 
-			SecretKeySpec skeySpec = getSecretKeySpec(loadSecretKey());
+			SecretKeySpec skeySpec = getSecretKeySpec(props.getProperty("AES_SYMMETRIC_KEY"));
 			IvParameterSpec iv = createIV(cipher.getBlockSize(), Optional.of(rng));
 
 			cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
@@ -96,7 +97,7 @@ public class StringEncryptor
 		{
 			Cipher cipher = Cipher.getInstance(TRANSFORM);
 
-			SecretKeySpec skeySpec = getSecretKeySpec(loadSecretKey());
+			SecretKeySpec skeySpec = getSecretKeySpec(props.getProperty("AES_SYMMETRIC_KEY"));
 			IvParameterSpec iv = readIV(cipher.getBlockSize(), new ByteArrayInputStream(encryptedWithIV));
 
 			cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
@@ -113,16 +114,11 @@ public class StringEncryptor
 
 	private static SecretKeySpec getSecretKeySpec(String secretKey) throws UnsupportedEncodingException
 	{
-		return new SecretKeySpec(secretKey.getBytes("UTF-8"), AES);
-	}
-	private static String loadSecretKey()
-	{
-		String secretKey = System.getenv(SECRET_KEY_ENV_NAME);
 		if(secretKey == null)
 		{
-			throw new IllegalStateException("Missing environment variable: " + SECRET_KEY_ENV_NAME);
+			throw new EncryptionException("Invalid encryption key");
 		}
-		return secretKey;
+		return new SecretKeySpec(secretKey.getBytes("UTF-8"), AES);
 	}
 
 	private static IvParameterSpec createIV(final int ivSizeBytes, final Optional<SecureRandom> rng)
