@@ -677,17 +677,6 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
         <style type="text/css">
             <!-- .selected { font: Arial, Verdana; color:#000000; text-decoration: none; } -->
 
-            .ControlPushButton {
-                font-size: 0.8em;
-                display: inline-block;
-                width: 120px;
-                height: 25px;
-                margin: auto;
-                padding: 0;
-                line-height: 1.1em;
-                text-align: center;
-            }
-
 
             #verificationLink{
                 color:white;
@@ -698,7 +687,6 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
                 padding-left:20px;
 
             }
-
 
             table.legend_items td{
                 font-size:12px;
@@ -725,6 +713,7 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
             .matchInactive{
                 background-color: #C0C0C0;
             }
+
             #myAutoComplete {
                 width:25em; /* set width here or else widget will expand to fit its container */
                 padding-bottom:2em;
@@ -772,11 +761,59 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
 
             }
 
+            .FlexRow {
+                display: flex;
+                flex-direction:row;
+                flex-wrap: wrap;
+            }
+
+            .FlexRow_Column {
+                display: flex;
+                flex-direction:column;
+                flex-wrap: wrap;
+            }
+
+            .ControlPushButton {
+                font-size: 0.8em;
+                margin: 2px 0 0 2px;
+                padding: 2px 0 2px 0;
+                text-align: center;
+            }
+
+            #searchStringLabel, #searchString
+            {
+                float: left;
+                display: block;
+            }
+
+            #searchStringLabel
+            {
+                font-weight:800;
+                font-size:1em;
+            }
+
             #searchString {
-                width: 340px;
+                box-sizing: border-box;
+                /* override positioning.  Binding the input to autocomplete assigns the element the yui-ac-input class,
+                which then has relative positioning via an imported css file*/
+                position: static; !important
                 height: 30px;
                 padding: 0 6px;
                 line-height:30px;
+            }
+
+            #buttonControls_left
+            {
+                float:left;
+                width: 40%;
+                padding: 5px 10px 0 5px;
+            }
+
+            #buttonControls_right
+            {
+                width: 400px;
+                padding: 5px 10px 10px 5px;
+                float:right;
             }
 
         </style>
@@ -822,60 +859,46 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
                                     <input type="hidden" id="deleteOnCloseRxBox" value="false">
 
                                     <html:hidden property="demographicNo" value="<%=Integer.toString(patient.getDemographicNo())%>" />
-                                    <table border="0" style="padding-top:10px">
-                                        <tr valign="top" style="height:35px">
-                                            <td style="vertical-align: middle"> <bean:message key="SearchDrug.drugSearchTextBox"/>
-                                            </td>
-                                            <td style="width:auto">
-                                                <html:text styleId="searchString" property="searchString" onfocus="changeContainerHeight();" onblur="changeContainerHeight();" onclick="changeContainerHeight();" onkeydown="changeContainerHeight();" style="\" autocomplete=\"off"  />
-                                                <div id="autocomplete_choices" style="overflow:auto;width:600px"></div>
-                                                <span id="indicator1" style="display: none"> <!--img src="/images/spinner.gif" alt="Working..." --></span>
-                                            </td>
-                                            <td style="padding-left:10px; vertical-align: middle">
-                                                <!-- search controls -->
+                                    <div class="FlexRow">
+                                        <div id=buttonControls_left>
+                                            <div id="searchStringLabel">
+                                                <bean:message key="SearchDrug.drugSearchTextBox"/>
+                                            </div>
+                                            <html:text styleId="searchString" property="searchString" onfocus="changeContainerHeight();" onblur="changeContainerHeight();" onclick="changeContainerHeight();" onkeydown="changeContainerHeight();" style="\" autocomplete=\"off"  />
+                                            <div id="autocomplete_choices" style="overflow:auto; width:600px"></div>
+                                            <span id="indicator1" style="display: none"> <!--img src="/images/spinner.gif" alt="Working..." --></span>
+                                        </div>
+                                        <div id="buttonControls_right" class="FlexRow_Column">
+                                            <div>
                                                 <input type="button" name="search" class="ControlPushButton" value="<bean:message key="SearchDrug.msgSearch"/>" onclick="popupRxSearchWindow();" title="<bean:message key="SearchDrug.help.Search"/>">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><!-- empty cell --></td>
-                                            <td style="padding-top:5px">
-                                                <!-- main controls -->
-                                                <input id="customDrug" type="button" class="ControlPushButton" onclick="customWarning2();" value="<bean:message key="SearchDrug.msgCustomDrugRx3"/>" title="<bean:message key="SearchDrug.help.CustomDrug"/>" />
-                                                <input id="customNote" type="button" class="ControlPushButton" onclick="customNoteWarning();" value="<bean:message key="SearchDrug.msgNoteRx3"/>" title="<bean:message key="SearchDrug.help.CustomNote"/>"/>
                                                 <input id="reset" type="button" class="ControlPushButton" title="Clear pending prescriptions" onclick="resetStash();" value="<bean:message key="SearchDrug.msgResetPrescriptionRx3"/>"/>
-                                            </td>
-                                            <td style="padding-left:10px; padding-top:5px">
+                                                <input id="customDrug" type="button" class="ControlPushButton" onclick="customWarning2();" value="<bean:message key="SearchDrug.msgCustomDrugRx3"/>" title="<bean:message key="SearchDrug.help.CustomDrug"/>" />
+                                                <% if (!OscarProperties.getInstance().getProperty("rx.drugofchoice.hide","false").equals("true")) { %>
+                                                <input type="button" class="ControlPushButton" style="display: inline-block" onclick="callTreatments('searchString','treatmentsMyD')" value="<bean:message key="SearchDrug.msgDrugOfChoiceRx3"/>" title="<bean:message key="SearchDrug.help.DrugOfChoice"/>"/>
+                                                <% } %>
+                                                <% if (OscarProperties.getInstance().getProperty("oscarrx.medrec","false").equals("true")) { %>
+                                                <input id="completeMedRecButton" type="button" class="ControlPushButton" style="display: inline-block" onclick="completeMedRec();" value="Complete Med Rec" />
+                                                <% } %>
+                                                <input id="customNote" type="button" class="ControlPushButton" onclick="customNoteWarning();" value="<bean:message key="SearchDrug.msgNoteRx3"/>" title="<bean:message key="SearchDrug.help.CustomNote"/>"/>
+                                            </div>
+                                            <div>
                                                 <!-- Rx save controls -->
                                                 <security:oscarSec roleName="<%=roleName2$%>" objectName="_rx" rights="x">
-                                                <input id="saveButton" type="button" class="ControlPushButton" onclick="updateSaveAllDrugsPrintContinue();" value="<bean:message key="SearchDrug.msgSaveAndPrint"/>" title="<bean:message key="SearchDrug.help.SaveAndPrint"/>" />
+                                                    <input id="saveButton" type="button" class="ControlPushButton" onclick="updateSaveAllDrugsPrintContinue();" value="<bean:message key="SearchDrug.msgSaveAndPrint"/>" title="<bean:message key="SearchDrug.help.SaveAndPrint"/>" />
                                                 </security:oscarSec>
                                                 <input id="saveOnlyButton" type="button" class="ControlPushButton" onclick="updateSaveAllDrugsContinue();" value="<bean:message key="SearchDrug.msgSaveOnly"/>" title="<bean:message key="SearchDrug.help.Save"/>"/>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><!-- empty cell --></td>
-                                            <td>
-                                            <!-- optional controls -->
-                                            <% if (!OscarProperties.getInstance().getProperty("rx.drugofchoice.hide","false").equals("true")) { %>
-                                            <input type="button" class="ControlPushButton" style="display: inline-block" onclick="callTreatments('searchString','treatmentsMyD')" value="<bean:message key="SearchDrug.msgDrugOfChoiceRx3"/>" title="<bean:message key="SearchDrug.help.DrugOfChoice"/>"/>
-                                            <% } %>
-                                            <% if (OscarProperties.getInstance().getProperty("oscarrx.medrec","false").equals("true")) { %>
-                                            <input id="completeMedRecButton" type="button" class="ControlPushButton" style="display: inline-block" onclick="completeMedRec();" value="Complete Med Rec" />
-                                            <% } %>
-                                            </td>
-                                            <td style="text-align:center">
+                                            </div>
+                                            <div>
                                                 <!-- optional links -->
                                                 <% if (OscarProperties.getInstance().hasProperty("ONTARIO_MD_INCOMINGREQUESTOR")) { %>
-                                                <a href="javascript:goOMD();" title="<bean:message key="SearchDrug.help.OMD"/>"
-                                                   style="display: inline-block"><bean:message key="SearchDrug.msgOMDLookup"/></a>
+                                                <a href="javascript:goOMD();" title="<bean:message key="SearchDrug.help.OMD"/>" style="display: inline-block"><bean:message key="SearchDrug.msgOMDLookup"/></a>
                                                 <% } %>
                                                 <% if (eRxEnabled) { %>
-                                                <a href="<%=eRx_SSO_URL%>User=<%=eRxUsername%>&Password=<%=eRxPassword%>&Clinic=<%=eRxFacility%>&PatientIdPMIS=<%=patient.getDemographicNo()%>&IsTraining=<%=eRxTrainingMode%>"
-                                                   style="display: inline-block; padding-left:10px"><bean:message key="SearchDrug.eRx.msgExternalPrescriber"/></a>
+                                                <a href="<%=eRx_SSO_URL%>User=<%=eRxUsername%>&Password=<%=eRxPassword%>&Clinic=<%=eRxFacility%>&PatientIdPMIS=<%=patient.getDemographicNo()%>&IsTraining=<%=eRxTrainingMode%>" style="display: inline-block; padding-left:10px"><bean:message key="SearchDrug.eRx.msgExternalPrescriber"/></a>
                                                 <% } %>
-                                            </td>
-                                        </tr>
-                                    </table>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </html:form>
                                 <div id="previewForm" style="display:none;"></div>
                                 <%} %>
@@ -1280,7 +1303,7 @@ function changeLt(drugId){
     function changeContainerHeight(ele){
         var ss=$('searchString').value;
         ss=trim(ss);
-        if(ss.length==0)
+        if(ss.length === 0)
             $('autocomplete_choices').setStyle({height:'0%'});
         else
             $('autocomplete_choices').setStyle({height:'100%'});
