@@ -25,7 +25,6 @@ package org.oscarehr.demographic.search;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
@@ -51,11 +50,6 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		all, active, inactive, deceased
 	}
 
-	public enum SORTDIR
-	{
-		asc, desc
-	}
-
 	private MatchMode matchMode = MatchMode.START;
 
 	private Integer DemographicNo;
@@ -70,7 +64,6 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	private String providerNo;
 
 	private SORTMODE sortMode = SORTMODE.DemographicNo;
-	private SORTDIR sortDir = SORTDIR.asc;
 	private STATUSMODE statusMode = STATUSMODE.all;
 	private boolean customWildcardsEnabled = false;
 
@@ -188,10 +181,6 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 			default: criteria.addOrder(getOrder("demographicId")); break;
 		}
 	}
-	private Order getOrder(String propertyName)
-	{
-		return (SORTDIR.asc.equals(sortDir))? Order.asc(propertyName) : Order.desc(propertyName);
-	}
 
 	public Integer getDemographicNo()
 	{
@@ -301,16 +290,6 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	public void setSortMode(SORTMODE sortMode)
 	{
 		this.sortMode = sortMode;
-	}
-
-	public SORTDIR getSortDir()
-	{
-		return sortDir;
-	}
-
-	public void setSortDir(SORTDIR sortDir)
-	{
-		this.sortDir = sortDir;
 	}
 
 	public STATUSMODE getStatusMode()

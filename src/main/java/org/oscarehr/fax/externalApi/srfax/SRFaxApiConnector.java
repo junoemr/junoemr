@@ -209,10 +209,10 @@ public class SRFaxApiConnector
 		String result = processRequest(ACTION_GET_MULTI_FAX_STATUS, requiredFields, optionalFields, parameters);
 		return processListResponse(result, new TypeReference<ListWrapper<GetFaxStatusResult>>(){});
 	}
-	public ListWrapper<GetFaxStatusResult> Get_MultiFaxStatus(String sFaxDetailsID, String sResponseFormat)
+	public ListWrapper<GetFaxStatusResult> Get_MultiFaxStatus(List<String> sFaxDetailsIDList, String sResponseFormat)
 	{
 		Map<String, String> parameters = new HashMap<>();
-		parameters.put(S_FAX_DETAILS_ID, sFaxDetailsID);
+		parameters.put(S_FAX_DETAILS_ID, String.join("|", sFaxDetailsIDList));
 		parameters.put(S_RESPONSE_FORMAT, sResponseFormat);
 		return Get_MultiFaxStatus(parameters);
 	}

@@ -29,13 +29,13 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.dao.FaxAccountDao;
-import org.oscarehr.fax.dao.FaxJobDao;
+import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.exception.FaxApiException;
 import org.oscarehr.fax.exception.FaxNumberException;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
 import org.oscarehr.fax.model.FaxAccount;
-import org.oscarehr.fax.model.FaxJob;
+import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,7 +62,7 @@ public class OutgoingFaxService
 	private static final OscarProperties props = OscarProperties.getInstance();
 
 	@Autowired
-	FaxJobDao faxJobDao;
+	FaxOutboundDao faxOutboundDao;
 
 	@Autowired
 	FaxAccountDao faxAccountDao;
@@ -73,7 +73,7 @@ public class OutgoingFaxService
 		return (!faxAccountList.isEmpty() || props.isFaxEnabled());
 	}
 
-	public void sendFax(String providerId, Integer demographicId, String faxNumber, GenericFile...filesToFax) throws IOException
+	public void sendFax(String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile...filesToFax) throws IOException
 	{
 		//TODO determine which fax route to use
 		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveOutbound(true, true, 0, 1);
@@ -81,7 +81,7 @@ public class OutgoingFaxService
 		if(!faxAccountList.isEmpty())
 		{
 			FaxAccount faxSettings = faxAccountList.get(0);
-			sendBySRFax(providerId, demographicId, faxSettings, faxNumber, filesToFax);
+			sendBySRFax(providerId, demographicId, faxSettings, faxNumber, fileType, filesToFax);
 		}
 		// if legacy faxing is enabled, write to the outgoing folder.
 		else if(props.isFaxEnabled())
@@ -110,11 +110,12 @@ public class OutgoingFaxService
 		}
 	}
 
-	private void sendBySRFax(String providerId, Integer demographicId, FaxAccount faxSettings, String faxNumber, GenericFile...filesToFax) throws IOException
+	private void sendBySRFax(String providerId, Integer demographicId, FaxAccount faxAccount, String faxNumber,
+	                         FaxOutbound.FileType fileType, GenericFile...filesToFax) throws IOException
 	{
-		SRFaxApiConnector apiConnector = new SRFaxApiConnector(faxSettings.getLoginId(), faxSettings.getLoginPassword());
+		SRFaxApiConnector apiConnector = new SRFaxApiConnector(faxAccount.getLoginId(), faxAccount.getLoginPassword());
 
-		String coverLetterOption = faxSettings.getCoverLetterOption();
+		String coverLetterOption = faxAccount.getCoverLetterOption();
 		if(coverLetterOption == null || !SRFaxApiConnector.validCoverLetterNames.contains(coverLetterOption))
 		{
 			coverLetterOption = null;
@@ -128,8 +129,8 @@ public class OutgoingFaxService
 
 		// external api call
 		SingleWrapper<Integer> resultWrapper = apiConnector.Queue_Fax(
-				faxSettings.getReplyFaxNumber(),
-				faxSettings.getEmail(),
+				faxAccount.getReplyFaxNumber(),
+				faxAccount.getEmail(),
 				SRFaxApiConnector.FAX_TYPE_SINGLE,
 				faxNumber,
 				fileMap,
@@ -151,29 +152,30 @@ public class OutgoingFaxService
 
 		for(GenericFile fileToFax : filesToFax)
 		{
-			FaxJob faxJob = new FaxJob();
+			FaxOutbound faxOutbound = new FaxOutbound();
 
 			if(sendSuccess)
 			{
 				logger.info("Fax send success " + String.valueOf(resultWrapper.getResult()));
-				faxJob.setStatus(FaxJob.STATUS.SENT);
-				faxJob.setJobId(resultWrapper.getResult().longValue());
+				faxOutbound.setStatus(FaxOutbound.Status.SENT);
+				faxOutbound.setExternalReferenceId(resultWrapper.getResult().longValue());
 			}
 			else
 			{
 				logger.warn("Fax send failure " + resultWrapper.getError());
-				faxJob.setStatus(FaxJob.STATUS.ERROR);
+				faxOutbound.setStatus(FaxOutbound.Status.ERROR);
 			}
 
-			faxJob.setDestination(faxNumber);
-			faxJob.setFax_line(FaxAccount.INTEGRATION_TYPE_SRFAX);
-			faxJob.setFile_name(fileToFax.getName());
-			faxJob.setUser(faxSettings.getLoginId());
-			faxJob.setNumPages(fileToFax.getPageCount());
-			faxJob.setStamp(new Date());
-			faxJob.setProviderNo(providerId);
-			faxJob.setDemographicNo(demographicId);
-			faxJobDao.persist(faxJob);
+			faxOutbound.setFaxAccount(faxAccount);
+			faxOutbound.setSentTo(faxNumber);
+			faxOutbound.setExternalAccountType(FaxAccount.INTEGRATION_TYPE_SRFAX);
+			faxOutbound.setExternalAccountId(faxAccount.getLoginId());
+			faxOutbound.setFileType(fileType);
+			faxOutbound.setFileName(fileToFax.getName());
+			faxOutbound.setCreatedAt(new Date());
+			faxOutbound.setProviderNo(providerId);
+			faxOutbound.setDemographicNo(demographicId);
+			faxOutboundDao.persist(faxOutbound);
 
 			try
 			{

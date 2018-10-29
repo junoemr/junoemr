@@ -40,13 +40,13 @@ if(!authed) {
 	    
 	    type = "";
 	    
-	    if( faxJob.getFile_name().indexOf("Consult") > -1 ) {
+	    if( faxJob.getFileName().indexOf("Consult") > -1 ) {
 			type = "CONSULT";
 	    }
-	    else if( faxJob.getFile_name().indexOf("prescription") > -1 ) {
+	    else if( faxJob.getFileName().indexOf("prescription") > -1 ) {
 			type = "PRESCRIPTION";
 	    }
-	    else if( faxJob.getFile_name().indexOf("fax") > -1 ) {
+	    else if( faxJob.getFileName().indexOf("fax") > -1 ) {
 			type = "RECEIVED FAX";
 	    }
     

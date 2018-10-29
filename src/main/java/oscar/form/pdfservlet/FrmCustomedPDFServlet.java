@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.exception.FaxNumberException;
+import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -95,7 +96,7 @@ public class FrmCustomedPDFServlet extends HttpServlet
 					String pdfFile = "prescription_" + pdfId + ".pdf";
 					GenericFile fileToFax = FileFactory.createTempFile(baosPDF, ".pdf");
 					fileToFax.rename(pdfFile);
-					outgoingFaxService.sendFax(providerNo, demographicNo, recipient, fileToFax);
+					outgoingFaxService.sendFax(providerNo, demographicNo, recipient, FaxOutbound.FileType.FORM, fileToFax);
 				}
 				LogAction.addLogEntry(providerNo, demographicNo, LogConst.SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
 						pdfId, req.getRemoteAddr(), "Prescription " + pdfId);

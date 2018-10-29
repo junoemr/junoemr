@@ -24,7 +24,9 @@ package org.oscarehr.ws.rest;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.fax.dao.FaxAccountDao;
+import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 import org.oscarehr.fax.service.FaxAccountService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.conversion.FaxSettingsConverter;
@@ -61,6 +63,9 @@ public class FaxAccountWebService extends AbstractServiceImpl
 
 	@Autowired
 	FaxAccountDao faxAccountDao;
+
+	@Autowired
+	FaxOutboundDao faxOutboundDao;
 
 	@Autowired
 	FaxAccountService faxAccountService;
@@ -208,8 +213,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	public RestSearchResponse<FaxOutboxTransferOutbound> getOutbox(@PathParam("id") Long id,
 	                                                               @QueryParam("page") @DefaultValue("1") Integer page,
 	                                                               @QueryParam("perPage") @DefaultValue("10") Integer perPage,
-	                                                               @QueryParam("startDate") String startDateStr,
-	                                                               @QueryParam("endDate") String endDateStr)
+	                                                               @QueryParam("startDate") String startDateStr)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin", "_admin.fax");
@@ -219,23 +223,18 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		int offset = calculatedOffset(page, perPage);
 
 		LocalDate startDate = (startDateStr != null)? ConversionUtils.toLocalDate(startDateStr) : LocalDate.now();
-		LocalDate endDate = (endDateStr != null)? ConversionUtils.toLocalDate(endDateStr) : startDate;
 
+		FaxOutboundCriteriaSearch criteriaSearch = new FaxOutboundCriteriaSearch();
+		criteriaSearch.setOffset(offset);
+		criteriaSearch.setLimit(perPage);
+		criteriaSearch.setFaxAccountId(id);
+//		criteriaSearch.setBeforeDate(startDate);
+		criteriaSearch.setSortDirDescending();
+		int total = faxOutboundDao.criteriaSearchCount(criteriaSearch);
 
 		FaxAccount faxAccount = faxAccountDao.find(id);
-		List<FaxOutboxTransferOutbound> resultList = faxAccountService.getOutboxResults(faxAccount, startDate, endDate);
+		List<FaxOutboxTransferOutbound> resultList = faxAccountService.getOutboxResults(faxAccount, criteriaSearch);
 
-		/* SRFAX doesn't page their results, instead they return all results in the date range.
-		* Truncate the results to enforce pagination for our services */
-		List<FaxOutboxTransferOutbound> resultSubList;
-		if(resultList.size() > (offset + perPage))
-		{
-			resultSubList = resultList.subList(offset, offset + perPage);
-		}
-		else
-		{
-			resultSubList = resultList.subList(offset, resultList.size());
-		}
-		return RestSearchResponse.successResponse(resultSubList, page, perPage, resultList.size());
+		return RestSearchResponse.successResponse(resultList, page, perPage, total);
 	}
 }

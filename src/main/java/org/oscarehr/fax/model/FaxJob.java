@@ -40,6 +40,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
+@Deprecated
 @XmlRootElement(name="FaxJob")
 @Entity
 @Table(name="faxes")
@@ -55,8 +56,8 @@ public class FaxJob extends AbstractModel<Integer> implements Comparable<FaxJob>
 		this.id = null;
 		this.user = null;
 		this.password = null;
-		this.file_name = null;
-		this.fax_line = null;
+		this.fileName = null;
+		this.faxLine = null;
 		this.destination = null;
 		this.status = null;
 		this.numPages = null;
@@ -70,8 +71,8 @@ public class FaxJob extends AbstractModel<Integer> implements Comparable<FaxJob>
 		this.id = null;
 		this.user = faxJob.getUser();
 		this.password = faxJob.getPassword();
-		this.file_name = faxJob.getFile_name();
-		this.fax_line = faxJob.getFax_line();
+		this.fileName = faxJob.getFileName();
+		this.faxLine = faxJob.getFaxLine();
 		this.destination = faxJob.getDestination();
 		this.status = faxJob.getStatus();
 		this.numPages = faxJob.getNumPages();
@@ -93,10 +94,10 @@ public class FaxJob extends AbstractModel<Integer> implements Comparable<FaxJob>
     private String password;
         
     @Column(name="filename")
-    private String file_name;
+    private String fileName;
     
     @Column(name="faxline")
-    private String fax_line;
+    private String faxLine;
     
     private String destination;
     
@@ -135,26 +136,26 @@ public class FaxJob extends AbstractModel<Integer> implements Comparable<FaxJob>
     /**
      * @return the file_namne
      */
-    public String getFile_name() {
-        return file_name;
+    public String getFileName() {
+        return fileName;
     }
     /**
      * @param file_namne the file_namne to set
      */
-    public void setFile_name(String file_namne) {
-        this.file_name = file_namne;
+    public void setFileName(String file_namne) {
+        this.fileName = file_namne;
     }
     /**
      * @return the fax_line
      */
-    public String getFax_line() {
-        return fax_line;
+    public String getFaxLine() {
+        return faxLine;
     }
     /**
      * @param fax_line the fax_line to set
      */
-    public void setFax_line(String fax_line) {
-        this.fax_line = fax_line;
+    public void setFaxLine(String fax_line) {
+        this.faxLine = fax_line;
     }
     /**
      * @return the destination

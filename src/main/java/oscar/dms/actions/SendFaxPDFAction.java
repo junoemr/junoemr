@@ -32,6 +32,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -105,7 +106,7 @@ public class SendFaxPDFAction extends DispatchAction {
 						String faxFileName = "DOC-"+ docNo + "-" + filename + "-" + faxNo + "." + System.currentTimeMillis();
 						fileToFax.rename(faxFileName + ".pdf");
 
-						outgoingFaxService.sendFax(providerNo, demographicId, faxNo, fileToFax);
+						outgoingFaxService.sendFax(providerNo, demographicId, faxNo, FaxOutbound.FileType.DOCUMENT, fileToFax);
 					}
 					catch(Exception e)
 					{
@@ -160,7 +161,7 @@ public class SendFaxPDFAction extends DispatchAction {
 			{
 				GenericFile fileToFax = FileFactory.getExistingFile(pdfPath);
 				fileToFax.rename("Form-" + formName);
-				outgoingFaxService.sendFax(providerNo, null, recipients[i], fileToFax);
+				outgoingFaxService.sendFax(providerNo, null, recipients[i], FaxOutbound.FileType.DOCUMENT, fileToFax);
 			}
 			catch (Exception e)
 			{

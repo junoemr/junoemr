@@ -23,6 +23,7 @@ import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.exception.FaxApiException;
+import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.fax.util.PdfCoverPageCreator;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -221,7 +222,7 @@ public class EctConsultationFormFaxAction extends Action
 
 					GenericFile fileToFax = FileFactory.copy(fileToCopy);
 					fileToFax.rename(tempName);
-					outgoingFaxService.sendFax(providerNo, Integer.parseInt(demoNo), faxNo, fileToFax);
+					outgoingFaxService.sendFax(providerNo, Integer.parseInt(demoNo), faxNo, FaxOutbound.FileType.CONSULTATION, fileToFax);
 				}
 				LogAction.addLogEntry(providerNo, Integer.parseInt(demoNo), LogConst.SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
 						reqId, loggedInInfo.getIp(), "CONSULT " + reqId);
