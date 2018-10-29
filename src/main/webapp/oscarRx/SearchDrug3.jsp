@@ -860,7 +860,7 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
 
                                     <html:hidden property="demographicNo" value="<%=Integer.toString(patient.getDemographicNo())%>" />
                                     <div class="FlexRow">
-                                        <div id=buttonControls_left>
+                                        <div id="buttonControls_left">
                                             <div id="searchStringLabel">
                                                 <bean:message key="SearchDrug.drugSearchTextBox"/>
                                             </div>
@@ -1304,9 +1304,9 @@ function changeLt(drugId){
         var ss=$('searchString').value;
         ss=trim(ss);
         if(ss.length === 0)
-            $('autocomplete_choices').setStyle({height:'0%'});
+            $('autocomplete_choices').setStyle({height:'0vh'});
         else
-            $('autocomplete_choices').setStyle({height:'100%'});
+            $('autocomplete_choices').setStyle({height:'75vh'});
     }
     function addInstruction(content,randomId){
         $('instructions_'+randomId).value=content;
