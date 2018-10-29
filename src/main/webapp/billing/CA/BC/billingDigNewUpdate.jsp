@@ -23,7 +23,12 @@
     Ontario, Canada
 
 --%>
-
+<%
+	if(session.getAttribute("user") == null)
+	{
+		response.sendRedirect("../../../logout.htm");
+	}
+%>
 <%@ page import="java.math.*, java.util.*, java.sql.*, oscar.*, java.net.*"%>
 
 <%@ page import="org.oscarehr.util.SpringUtils" %>
