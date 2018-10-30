@@ -29,7 +29,7 @@
 	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 	boolean authorized = true;
 %>
-<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.fax" rights="r" reverse="<%=true%>">
+<security:oscarSec roleName="<%=roleName$%>" objectName="_admin.fax" rights="r" reverse="<%=true%>">
 	<%authorized = false; %>
 	<%response.sendRedirect("../securityError.jsp?type=_admin");%>
 </security:oscarSec>
@@ -64,11 +64,14 @@
 		<table ng-table="faxOutboxController.tableParams" show-filter="false" class="table table-striped table-bordered">
 			<tbody>
 				<tr ng-repeat="item in faxOutboxController.outboxItemList">
-					<td data-title="'Date Sent'"    sortable="'DateSent'">{{item.dateSent}}</td>
-					<td data-title="'Subject'"      sortable="'Subject'">{{item.subject}}</td>
-					<td data-title="'File Name'"    sortable="'FileName'">{{item.fileName}}</td>
-					<td data-title="'Sent Status'"  sortable="'SentStatus'">{{item.sentStatus}}</td>
+					<td data-title="'Date Sent'"    sortable="'DateSent'">{{item.systemDateSent}}</td>
+					<td data-title="'Sent By'"      sortable="'SentBy'">{{item.providerNo}}</td>
+					<td data-title="'Fax Type'"     sortable="'FaxType'">{{item.fileType}}</td>
+					<td data-title="'Sent Status'"  sortable="'SentStatus'">{{item.systemStatus}}</td>
 					<td data-title="'Sent To'"      sortable="'SentTo'">{{item.toFaxNumber}}</td>
+					<td data-title="'Remote Date Queued'">{{item.integrationDateQueued}}</td>
+					<td data-title="'Remote Date Sent'">{{item.integrationDateSent}}</td>
+					<td data-title="'Remote Status'">{{item.integrationStatus}}</td>
 				</tr>
 			</tbody>
 		</table>

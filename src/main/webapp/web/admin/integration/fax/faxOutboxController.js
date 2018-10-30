@@ -46,7 +46,6 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxOut
 				{
 					getData: function(params)
 					{
-						console.info(params.url());
 						controller.search = params.url();
 						return faxAccountService.getOutbox(controller.selectedFaxAccount.id, controller.search.page, controller.search.count).then(
 							function success(response)

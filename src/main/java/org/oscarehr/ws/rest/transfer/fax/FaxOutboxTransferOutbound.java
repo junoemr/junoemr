@@ -32,13 +32,24 @@ import java.io.Serializable;
 public class FaxOutboxTransferOutbound implements Serializable
 {
 	private Long faxAccountId;
-	private String fileName;
-	private String subject;
 
-	private String sentStatus;
-	private String dateQueued;
-	private String dateSent;
+	private String providerNo;
+	private Integer demographicNo;
 	private String toFaxNumber;
+	/* file type: document, form, consult, etc. */
+	private String fileType;
+	/* the sent status of the document as recorded in the system */
+	private String systemStatus;
+	/* the sent date of the document as recorded in the system */
+	private String systemDateSent;
+
+	/* the sent status of the document as retrieved from the api */
+	private String integrationStatus;
+	/* the received/queued date of the document as retrieved from the api.
+	 * when the integration first learns of the document */
+	private String integrationDateQueued;
+	/* the sent date of the document as retrieved from the api */
+	private String integrationDateSent;
 
 	public Long getFaxAccountId()
 	{
@@ -50,54 +61,24 @@ public class FaxOutboxTransferOutbound implements Serializable
 		this.faxAccountId = faxAccountId;
 	}
 
-	public String getFileName()
+	public String getProviderNo()
 	{
-		return fileName;
+		return providerNo;
 	}
 
-	public void setFileName(String fileName)
+	public void setProviderNo(String providerNo)
 	{
-		this.fileName = fileName;
+		this.providerNo = providerNo;
 	}
 
-	public String getSubject()
+	public Integer getDemographicNo()
 	{
-		return subject;
+		return demographicNo;
 	}
 
-	public void setSubject(String subject)
+	public void setDemographicNo(Integer demographicNo)
 	{
-		this.subject = subject;
-	}
-
-	public String getSentStatus()
-	{
-		return sentStatus;
-	}
-
-	public void setSentStatus(String sentStatus)
-	{
-		this.sentStatus = sentStatus;
-	}
-
-	public String getDateQueued()
-	{
-		return dateQueued;
-	}
-
-	public void setDateQueued(String dateQueued)
-	{
-		this.dateQueued = dateQueued;
-	}
-
-	public String getDateSent()
-	{
-		return dateSent;
-	}
-
-	public void setDateSent(String dateSent)
-	{
-		this.dateSent = dateSent;
+		this.demographicNo = demographicNo;
 	}
 
 	public String getToFaxNumber()
@@ -108,5 +89,65 @@ public class FaxOutboxTransferOutbound implements Serializable
 	public void setToFaxNumber(String toFaxNumber)
 	{
 		this.toFaxNumber = toFaxNumber;
+	}
+
+	public String getFileType()
+	{
+		return fileType;
+	}
+
+	public void setFileType(String fileType)
+	{
+		this.fileType = fileType;
+	}
+
+	public String getSystemStatus()
+	{
+		return systemStatus;
+	}
+
+	public void setSystemStatus(String systemStatus)
+	{
+		this.systemStatus = systemStatus;
+	}
+
+	public String getSystemDateSent()
+	{
+		return systemDateSent;
+	}
+
+	public void setSystemDateSent(String systemDateSent)
+	{
+		this.systemDateSent = systemDateSent;
+	}
+
+	public String getIntegrationStatus()
+	{
+		return integrationStatus;
+	}
+
+	public void setIntegrationStatus(String integrationStatus)
+	{
+		this.integrationStatus = integrationStatus;
+	}
+
+	public String getIntegrationDateQueued()
+	{
+		return integrationDateQueued;
+	}
+
+	public void setIntegrationDateQueued(String integrationDateQueued)
+	{
+		this.integrationDateQueued = integrationDateQueued;
+	}
+
+	public String getIntegrationDateSent()
+	{
+		return integrationDateSent;
+	}
+
+	public void setIntegrationDateSent(String integrationDateSent)
+	{
+		this.integrationDateSent = integrationDateSent;
 	}
 }

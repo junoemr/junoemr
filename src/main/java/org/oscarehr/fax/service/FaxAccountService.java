@@ -37,6 +37,7 @@ import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -124,18 +125,25 @@ public class FaxAccountService
 			// set the locally available field info
 			FaxOutboxTransferOutbound transfer = new FaxOutboxTransferOutbound();
 			transfer.setFaxAccountId(faxAccount.getId());
-			transfer.setFileName(faxOutbound.getFileName());
+			transfer.setProviderNo(faxOutbound.getProviderNo());
+			transfer.setDemographicNo(faxOutbound.getDemographicNo());
+			transfer.setSystemStatus(String.valueOf(faxOutbound.getStatus()));
+			transfer.setSystemDateSent(ConversionUtils.toDateString(faxOutbound.getCreatedAt()));
+			transfer.setToFaxNumber(faxOutbound.getSentTo());
+			transfer.setFileType(faxOutbound.getFileType().name());
 
 			// if there is a api result, add the additional info to the transfer object
-			if(faxOutbound.getStatus() == FaxOutbound.Status.SENT)
+			// only do this if the account info has not changed, or the api will reject it
+			if(FaxOutbound.Status.SENT.equals(faxOutbound.getStatus())
+					&& faxAccount.getLoginId().equals(faxOutbound.getExternalAccountId())
+					&& faxAccount.getIntegrationType().equals(faxOutbound.getExternalAccountType()))
 			{
 				int index = referenceIdList.indexOf(String.valueOf(faxOutbound.getExternalReferenceId()));
 				GetFaxStatusResult apiResult = statusResultList.get(index);
 
-				transfer.setDateQueued(apiResult.getDateQueued());
-				transfer.setDateSent(apiResult.getDateSent());
-				transfer.setSentStatus(apiResult.getSentStatus());
-				transfer.setToFaxNumber(apiResult.getToFaxNumber());
+				transfer.setIntegrationDateQueued(apiResult.getDateQueued());
+				transfer.setIntegrationDateSent(apiResult.getDateSent());
+				transfer.setIntegrationStatus(apiResult.getSentStatus());
 			}
 			transferList.add(transfer);
 		}
