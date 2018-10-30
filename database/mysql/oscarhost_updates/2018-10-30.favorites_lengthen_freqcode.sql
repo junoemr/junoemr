@@ -1,1 +1,0 @@
-ALTER TABLE `favorites` MODIFY `freqcode` VARCHAR(8);
