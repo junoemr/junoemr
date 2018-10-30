@@ -1294,7 +1294,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 
 			thisForm.setStatus("1");
 
-			thisForm.setSendTo(team);
+			thisForm.setSendTo(team.toLowerCase());
 
        		if (bMultisites) {
         		thisForm.setSiteName(defaultSiteName);
@@ -1759,7 +1759,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 												{
 													String te = (String)consultUtil.teamVec.elementAt(i);
 								%>
-								<html:option value="<%=te%>"><%=te%></html:option>
+								<html:option value="<%=te.toLowerCase()%>"><%=te%></html:option>
 								<%
 									}
 								%>

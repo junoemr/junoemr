@@ -291,7 +291,7 @@
 						key="tickler.ticklerAdd.formDemoName"/>: </b></font></font></td>
 				<td colspan="2" width="65%">
 					<div align="left"><INPUT TYPE="TEXT" NAME="keyword" size="25"
-											 VALUE="<%=bFirstDisp?"":demoName.equals("")?session.getAttribute("appointmentname"):demoName%>">
+											 VALUE="<%=bFirstDisp ? "" : demoName.equals("") ? session.getAttribute("appointmentname") == null ? "" : session.getAttribute("appointmentname") : demoName%>">
 						<input type="submit" name="Submit"
 							   value="<bean:message key="tickler.ticklerAdd.btnSearch"/>">
 					</div>
@@ -299,11 +299,9 @@
 			</tr>
 			<INPUT TYPE="hidden" NAME="orderby" VALUE="last_name">
 			<%
-				String searchMode = request.getParameter("search_mode");
-				if (searchMode == null || searchMode.isEmpty())
-				{
-					searchMode = props.getProperty("default_search_mode", "search_name");
-				}
+				// This is linked to a form label which specifies a name search,
+				// so we will use that here, rather than whatever the default is specified as
+				String searchMode = "search_name";
 			%>
 			<INPUT TYPE="hidden" NAME="search_mode" VALUE="<%=searchMode%>">
 			<INPUT TYPE="hidden" NAME="originalpage" VALUE="../tickler/ticklerAdd.jsp">

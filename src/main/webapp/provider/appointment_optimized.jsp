@@ -99,6 +99,7 @@
 
 private boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
 private HashMap<String,String> siteBgColor = new HashMap<String,String>();
+private boolean isClinicaid = OscarProperties.getInstance().isClinicaidBillingType();
 
 public boolean isWeekView(ServletRequest request)
 {
@@ -212,6 +213,9 @@ private long getAppointmentRowSpan(
 
 	// Additional things required for schedule
 	String roleName$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
+
+	//Required so it can be used in JSTL
+	request.setAttribute("isClinicaid", isClinicaid);
 
 	MyGroupDao myGroupDao = SpringUtils.getBean(MyGroupDao.class);
 	MyGroupAccessRestrictionDao myGroupAccessRestrictionDao = SpringUtils.getBean(MyGroupAccessRestrictionDao.class);
@@ -673,7 +677,7 @@ private long getAppointmentRowSpan(
 			self.location.href = "providercontrol.jsp?year=<%=year%>&month=<%=month%>&day=<%=day%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1&provider_no="+s;
 		}
 		function goZoomView(s, n) {
-			self.location.href = "providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=1&curProvider="+s+"&curProviderName="+encodeURIComponent(n)+"&displaymode=day&dboperation=searchappointmentday" ;
+			self.location.href = "providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=1&curProvider="+s+"&curProviderName="+encodeURIComponent(n)+"&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>" ;
 		}
 		function findProvider(p,m,d) {
 			popupPage(300,400, "receptionistfindprovider.jsp?pyear=" +p+ "&pmonth=" +m+ "&pday=" +d+ "&providername="+ document.findprovider.providername.value );
@@ -1070,7 +1074,7 @@ private long getAppointmentRowSpan(
 			<%
 				} } } else { if (view==1) {
 			%>
-			<a href='providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=0&displaymode=day&dboperation=searchappointmentday'><bean:message key="provider.appointmentProviderAdminDay.grpView"/></a>
+			<a href='providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>'><bean:message key="provider.appointmentProviderAdminDay.grpView"/></a>
 			<% } else { %>
 			<bean:message key="global.hello"/>
 			<% out.println( userFirstName+" "+userLastName); %>
@@ -1428,10 +1432,11 @@ private long getAppointmentRowSpan(
 								<%
 
 								int slotLengthInMinutes = everyMin;
+								int numScheduleSlots = schedule.getScheduleSlots().asMapOfRanges().size();
 
-								if(bDispTemplatePeriod)
+								if(bDispTemplatePeriod && numScheduleSlots > 0)
 								{
-									slotLengthInMinutes = (MINUTES_IN_DAY/schedule.getScheduleSlots().asMapOfRanges().size());
+									slotLengthInMinutes = (MINUTES_IN_DAY/numScheduleSlots);
 								}
 
 								LocalTime startTime = cleanLocalTime(startHour);
@@ -1698,9 +1703,34 @@ private long getAppointmentRowSpan(
 														</c:if>
 
 
-														<a href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;" title="${appointmentInfo.appointmentLinkTitle}" >
+														<a href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;" ${appointmentInfo.appointmentLinkTitle} >
 															.${appointmentInfo.truncatedUpperName}
-														</a><!--Inline display of reason -->
+														</a>
+
+														<% if (OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true") || OscarProperties.getInstance().getProperty("APPT_THREE_LINE", "true").equals("true"))
+														{ %>
+														<%
+															if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
+															{
+														%>
+																<%=StringEscapeUtils.escapeHtml(appointment.getType())%>&nbsp;|&nbsp;<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
+														<% 	} %>
+														<%
+															if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() == null || appointmentInfo.getReason().length() == 0))
+															{
+														%>
+																<%=StringEscapeUtils.escapeHtml(appointment.getType())%>
+														<% 	} %>
+														<%
+															if ((appointment.getType() == null || appointment.getType().length() == 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
+															{
+														%>
+																<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
+														<% 	} %>
+
+														<% } %>
+
+														<!--Inline display of reason -->
 														<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
 															<span class="${appointmentInfo.reasonToggleableClass} reason reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
 																<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:${appointmentInfo.reason}
@@ -1810,7 +1840,7 @@ private long getAppointmentRowSpan(
 															<c:if test="${!appointmentInfo.weekView}">
 																<c:if test="${appointmentInfo.showBilling}">
 																	<c:choose>
-																		<c:when test="${appointmentInfo.billed}">
+																		<c:when test="${appointmentInfo.billed && !isClinicaid}">
 																			&#124; <a
 																				href=#
 																				onClick='onUnbilled("${appointmentInfo.unbillURL}");return false;'
@@ -1864,6 +1894,29 @@ private long getAppointmentRowSpan(
 																	</oscar:oscarPropertiesCheck>
 
 																</c:if>
+
+																<oscar:oscarPropertiesCheck property="SHOW_PATIENT_APPOINTMENT_PHN_CHART" value="true" defaultVal="false">
+																	<c:if test="${appointmentInfo.demographicNo != null }">
+																		&#124;
+																		<c:choose>
+																			<c:when test="${not empty appointmentInfo.demographicHin}">
+																				${appointmentInfo.demographicHin}
+																			</c:when>
+																			<c:otherwise>
+																				-
+																			</c:otherwise>
+																		</c:choose>
+																		&#124;
+																		<c:choose>
+																			<c:when test="${not empty appointmentInfo.demographicChartNo}">
+																				${appointmentInfo.demographicChartNo}
+																			</c:when>
+																			<c:otherwise>
+																				-
+																			</c:otherwise>
+																		</c:choose>
+																	</c:if>
+																</oscar:oscarPropertiesCheck>
 
 																<!-- add one link to caisi Program Management Module -->
 																<c:if test="${appointmentInfo.birthday}">

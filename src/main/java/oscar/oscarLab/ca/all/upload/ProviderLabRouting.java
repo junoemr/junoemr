@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.util.SpringUtils;
@@ -56,6 +57,7 @@ public class ProviderLabRouting {
 
 	private static final Logger logger = Logger.getLogger(ProviderLabRouting.class);
 	private ProviderLabRoutingDao providerLabRoutingDao = SpringUtils.getBean(ProviderLabRoutingDao.class);
+	private ProviderInboxRoutingDao providerInboxRoutingDao = (ProviderInboxRoutingDao) SpringUtils.getBean("providerInboxRoutingDAO");
 
 	public ProviderLabRouting() {
 	}
@@ -140,8 +142,10 @@ public class ProviderLabRouting {
 			newRouted.setLabNo(Integer.parseInt(labId));
 			newRouted.setLabType(labType);
 			newRouted.setStatus(status);
-
-			providerLabRoutingDao.persist(newRouted);
+			if(!providerInboxRoutingDao.hasProviderBeenLinkedWithDocument(labType, Integer.parseInt(labId), provider_no))
+			{
+				providerLabRoutingDao.persist(newRouted);
+			}
 
 			//forward lab to specified providers
 			for (int j = 0; j < forwardProviders.size(); j++) {

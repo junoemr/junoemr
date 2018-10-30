@@ -184,6 +184,11 @@ public final class BillingAction extends Action {
 		bean.setOtherCode1(request.getParameter("other_code_1"));
 		bean.setOtherCode2(request.getParameter("other_code_2"));
 		bean.setOtherCode3(request.getParameter("other_code_3"));
+
+		bean.setStartTimeHr(request.getParameter("xml_starttime_hr"));
+		bean.setStartTimeMin(request.getParameter("xml_starttime_min"));
+		bean.setEndTimeHr(request.getParameter("xml_endtime_hr"));
+		bean.setEndTimeMin(request.getParameter("xml_endtime_min"));
 	}
 
   /**

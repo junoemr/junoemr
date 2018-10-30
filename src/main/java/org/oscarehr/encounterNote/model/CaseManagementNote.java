@@ -54,11 +54,11 @@ public class CaseManagementNote extends AbstractModel<Long>
 	private Long noteId;
 
 	@Column(name = "update_date")
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date updateDate;
 
 	@Column(name = "observation_date")
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date observationDate;
 
 	@Column(name = "note")
@@ -136,6 +136,62 @@ public class CaseManagementNote extends AbstractModel<Long>
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "note", cascade = CascadeType.ALL)
 	private List<CaseManagementNoteExt> noteExtensionList;
 
+	// with cascade, these entities will be persisted/merged/deleted when this class is.
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "note", cascade = CascadeType.ALL)
+	private List<CaseManagementNoteLink> noteLinkList;
+
+	// with cascade, these entities will be persisted when this class is.
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "id.caseManagementNote", cascade = CascadeType.PERSIST)
+	private List<CaseManagementIssueNote> issueNoteList;
+
+	public CaseManagementNote() {}
+
+	/** construct a copy of the given note */
+	public CaseManagementNote(CaseManagementNote noteToCopy)
+	{
+		this.noteId = null;
+		this.appointment = noteToCopy.appointment;
+		this.archived = noteToCopy.archived;
+		this.billingCode = noteToCopy.billingCode;
+		this.demographic = noteToCopy.demographic;
+		this.encounterType = noteToCopy.encounterType;
+		this.history = noteToCopy.history;
+		this.hourOfEncounterTime = noteToCopy.hourOfEncounterTime;
+		this.hourOfEncTransportationTime = noteToCopy.hourOfEncTransportationTime;
+		this.includeIssueInNote = noteToCopy.includeIssueInNote;
+		this.locked = noteToCopy.locked;
+		this.minuteOfEncounterTime = noteToCopy.minuteOfEncounterTime;
+		this.minuteOfEncTransportationTime = noteToCopy.minuteOfEncTransportationTime;
+		this.note = noteToCopy.note;
+		this.observationDate = noteToCopy.observationDate;
+		this.password = noteToCopy.password;
+		this.position = noteToCopy.position;
+		this.programNo = noteToCopy.programNo;
+		this.provider = noteToCopy.provider;
+		this.reporterCaisiRole = noteToCopy.reporterCaisiRole;
+		this.reporterProgramTeam = noteToCopy.reporterProgramTeam;
+		this.signed = noteToCopy.signed;
+		this.signingProvider = noteToCopy.signingProvider;
+		this.updateDate = noteToCopy.updateDate;
+		this.uuid = noteToCopy.uuid;
+
+		/* also make copies of the note extensions, links, and issues */
+		this.noteExtensionList = new ArrayList<>(noteToCopy.noteExtensionList.size());
+		for(CaseManagementNoteExt extToCopy : noteToCopy.noteExtensionList)
+		{
+			noteExtensionList.add(new CaseManagementNoteExt(extToCopy, this));
+		}
+		this.noteLinkList = new ArrayList<>(noteToCopy.noteLinkList.size());
+		for(CaseManagementNoteLink linkToCopy : noteToCopy.noteLinkList)
+		{
+			noteLinkList.add(new CaseManagementNoteLink(linkToCopy, this));
+		}
+		this.issueNoteList = new ArrayList<>(noteToCopy.issueNoteList.size());
+		for(CaseManagementIssueNote issueNoteToCopy : noteToCopy.issueNoteList)
+		{
+			issueNoteList.add(new CaseManagementIssueNote(issueNoteToCopy, this));
+		}
+	}
 
 	public Long getId()
 	{
@@ -409,5 +465,43 @@ public class CaseManagementNote extends AbstractModel<Long>
 			noteExtensionList = new ArrayList<>(1);
 		}
 		noteExtensionList.add(ext);
+	}
+
+	public List<CaseManagementNoteLink> getNoteLinkList()
+	{
+		return noteLinkList;
+	}
+
+	public void setNoteLinkList(List<CaseManagementNoteLink> noteLinkList)
+	{
+		this.noteLinkList = noteLinkList;
+	}
+
+	public void addNoteLink(CaseManagementNoteLink link)
+	{
+		if(noteLinkList == null)
+		{
+			noteLinkList = new ArrayList<>(1);
+		}
+		noteLinkList.add(link);
+	}
+
+	public List<CaseManagementIssueNote> getIssueNoteList()
+	{
+		return issueNoteList;
+	}
+
+	public void setIssueNoteList(List<CaseManagementIssueNote> issueNoteList)
+	{
+		this.issueNoteList = issueNoteList;
+	}
+
+	public void addIssueNote(CaseManagementIssueNote issueNote)
+	{
+		if(issueNoteList == null)
+		{
+			issueNoteList = new ArrayList<>(1);
+		}
+		issueNoteList.add(issueNote);
 	}
 }

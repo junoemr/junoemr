@@ -363,10 +363,8 @@ public class CommonLabResultData {
 		return labs;
 	}
 
-	public static void updateReportStatus(int labNo, String providerNo, char charStatus, String comment, String labType) throws SQLException
+	public static void updateReportStatus(int labNo, String providerNo, String status, String comment, String labType) throws SQLException
 	{
-		String status = String.valueOf(charStatus);
-
 		try {
 			DBPreparedHandler db = new DBPreparedHandler();
 			// handles the case where this provider/lab combination is not already in providerLabRouting table
@@ -568,14 +566,14 @@ public class CommonLabResultData {
 					String[] labArray = labs.split(",");
 					for (int j = 0; j < labArray.length; j++)
 					{
-						updateReportStatus(Integer.parseInt(labArray[j]), provider, 'F', "", labType);
+						updateReportStatus(Integer.parseInt(labArray[j]), provider, ProviderInboxItem.FILE, "", labType);
 						removeFromQueue(Integer.parseInt(labArray[j]));
 					}
 
 				}
 				else
 				{
-					updateReportStatus(Integer.parseInt(lab), provider, 'F', "", labType);
+					updateReportStatus(Integer.parseInt(lab), provider, ProviderInboxItem.FILE, "", labType);
 					removeFromQueue(Integer.parseInt(lab));
 				}
 			}

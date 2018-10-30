@@ -24,13 +24,6 @@
 
 package oscar.oscarMessenger.config.pageUtil;
 
-import java.io.IOException;
-import java.util.ResourceBundle;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -42,9 +35,13 @@ import org.oscarehr.common.model.Groups;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.oscarMessenger.data.MsgAddressBookMaker;
-import oscar.util.ConversionUtils;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ResourceBundle;
 
 public class MsgMessengerAdminAction extends Action {
 
@@ -52,66 +49,74 @@ public class MsgMessengerAdminAction extends Action {
 	private GroupMembersDao groupMembersDao = (GroupMembersDao) SpringUtils.getBean(GroupMembersDao.class);
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	
-	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+	{
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin");
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_admin", "w", null)) {
-			throw new SecurityException("missing required security object (_admin)");
-		}
-		
 		String[] providers = ((MsgMessengerAdminForm) form).getProviders();
-		String grpNo = ((MsgMessengerAdminForm) form).getGrpNo();
+		String groupNoStr = ((MsgMessengerAdminForm) form).getGrpNo();
+		Integer groupNo = Integer.parseInt(groupNoStr);
 		String update = ((MsgMessengerAdminForm) form).getUpdate();
 		String delete = ((MsgMessengerAdminForm) form).getDelete();
 
-		String parent = new String();
-
 		ResourceBundle oscarR = ResourceBundle.getBundle("oscarResources", request.getLocale());
 
-		if (update.equals(oscarR.getString("oscarMessenger.config.MessengerAdmin.btnUpdateGroupMembers"))) {
+		if(update.equals(oscarR.getString("oscarMessenger.config.MessengerAdmin.btnUpdateGroupMembers")))
+		{
 
-			for (GroupMembers g : groupMembersDao.findByGroupId(Integer.parseInt(grpNo))) {
+			for(GroupMembers g : groupMembersDao.findByGroupId(groupNo))
+			{
 				groupMembersDao.remove(g.getId());
 			}
 
-			for (int i = 0; i < providers.length; i++) {
+			for(int i = 0; i < providers.length; i++)
+			{
 				GroupMembers gm = new GroupMembers();
-				gm.setGroupId(Integer.parseInt(grpNo));
+				gm.setGroupId(groupNo);
 				gm.setProviderNo(providers[i]);
 				groupMembersDao.persist(gm);
-
 			}
 
 			MsgAddressBookMaker addMake = new MsgAddressBookMaker();
 			addMake.updateAddressBook();
-			request.setAttribute("groupNo", grpNo);
-		} else if (delete.equals(oscarR.getString("oscarMessenger.config.MessengerAdmin.btnDeleteThisGroup"))) {
-			GroupsDao dao = SpringUtils.getBean(GroupsDao.class);
-			Groups gg = dao.find(ConversionUtils.fromIntString(grpNo));
-			if (gg != null) {
-				parent = "" + gg.getParentId();
-			}
+			request.setAttribute("groupNo", groupNoStr);
+		}
+		else if(delete.equals(oscarR.getString("oscarMessenger.config.MessengerAdmin.btnDeleteThisGroup")))
+		{
+			Groups group = groupsDao.find(groupNo);
+			Integer parentId;
 
-			if (dao.findByParentId(ConversionUtils.fromIntString(parent)).size() > 1) {
-				request.setAttribute("groupNo", grpNo);
-				request.setAttribute("fail", "This Group has Children, you must delete the children groups first");
+			if(group != null)
+			{
+				parentId = group.getParentId();
+				Long childCount = groupsDao.countChildGroups(groupNo);
+
+				// can't delete if this group has associated child groups
+				if(childCount > 0)
+				{
+					request.setAttribute("groupNo", groupNoStr);
+					request.setAttribute("fail", "This Group has Children, you must delete the children groups first");
+					return (mapping.findForward("failure"));
+				}
+
+				for(GroupMembers member : groupMembersDao.findByGroupId(groupNo))
+				{
+					groupMembersDao.remove(member.getId());
+				}
+				groupsDao.remove(group.getId());
+			}
+			else
+			{
+				request.setAttribute("groupNo", groupNoStr);
+				request.setAttribute("fail", "This Group does not exist");
 				return (mapping.findForward("failure"));
 			}
 
-			for (GroupMembers g : groupMembersDao.findByGroupId(Integer.parseInt(grpNo))) {
-				groupMembersDao.remove(g.getId());
-			}
-
-			Groups g = groupsDao.find(Integer.parseInt(grpNo));
-			if (g != null) {
-				groupsDao.remove(g.getId());
-			}
-
 			MsgAddressBookMaker addMake = new MsgAddressBookMaker();
 			addMake.updateAddressBook();
-			request.setAttribute("groupNo", parent);
+			request.setAttribute("groupNo", String.valueOf(parentId));
 		}
-
 		return (mapping.findForward("success"));
 	}
-
 }

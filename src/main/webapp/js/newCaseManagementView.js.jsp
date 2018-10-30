@@ -133,32 +133,11 @@
 
 	}
 
-	function urlencode(str)
-	{
-		var ns = (navigator.appName == "Netscape") ? 1 : 0;
-		if (ns)
-		{
-			return escape(str);
-		}
-		var ms = "%25#23 20+2B?3F<3C>3E{7B}7D[5B]5D|7C^5E~7E`60";
-		var msi = 0;
-		var i, c, rs, ts;
-		while (msi < ms.length)
-		{
-			c = ms.charAt(msi);
-			rs = ms.substring(++msi, msi + 2);
-			msi += 2;
-			i = 0;
-			while (true)
-			{
-				i = str.indexOf(c, i);
-				if (i == -1) break;
-				ts = str.substring(0, i);
-				str = ts + "%" + rs + str.substring(++i, str.length);
-			}
-		}
-		return str;
-	}
+    function urlencode(str)
+    {
+        console.log("method newCaseManagementView urlencode is deprecated");
+        return encodeURIComponent(str);
+    }
 
 	function measurementLoaded(name)
 	{
@@ -344,8 +323,7 @@
 
 	function popperup(vheight, vwidth, varpage, pageName)
 	{ //open a new popup window
-		var page = varpage;
-		windowprops = "height=" + vheight + ",width=" + vwidth + ",status=yes,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=100,left=100";
+		var windowprops = "height=" + vheight + ",width=" + vwidth + ",status=yes,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=0,screenY=0,top=100,left=100";
 		var popup = window.open(varpage, pageName, windowprops);
 		popup.pastewin = opener;
 		popup.focus();
@@ -451,8 +429,31 @@
 		}
 	}
 
-	/**
+    /**
+     * Allows calculators to be opened by clicking on them in a select menu.  This is needed for cross-platform
+	 * functionality to achieve an effect similar to onClick for a select option element.
+	 * (onClick on the option element doesn't work in Chrome (or IE), and onClick on the select doesn't work in FireFox)
+	 *
+     * @param calculatorMenu jQuery element referencing a select with urls as option values
+     */
+	function bindCalculatorListener(calculatorMenu)
+	{
+	    calculatorMenu.change(
+			function() {
+                var x_size = calculatorMenu.attr('x_size'),
+                    y_size = calculatorMenu.attr('y_size');
 
+                popperup(x_size, y_size, calculatorMenu.val(), calculatorMenu.text());
+				// Since we are listening for the change event, we need to account for the same calculator
+				// selected twice in a row.  A side effect is that the UI will be updated when we reset the
+				// value of the select menu to the default.  Here we're using the value "none" over a -1 index
+				// because this is the key to a disabled "title" element, whereas -1 will display an empty
+				// select menu.
+                calculatorMenu.val("none");
+			});
+	}
+
+	/**
 	 Responsible for loading notes on the eChart
 	 @param {offset}
 		 Offset from the beginning of the notes
@@ -2575,7 +2576,7 @@
 		var encType = "encTypeSelect" + noteId;
 		var caseMgtEntryfrm = document.forms["caseManagementEntryForm"];
 		var url = ctx + "/CaseManagementEntry.do";
-		var params = "nId=" + noteId + issueParams + "&demographicNo=" + demographicNo + "&providerNo=" + providerNo + "&numIssues=" + idx + "&obsDate=" + $F("observationDate") + "&encType=" + encodeURI($F(encType)) + "&noteTxt=" + encodeURI(noteTxt);
+		var params = "nId=" + noteId + issueParams + "&demographicNo=" + demographicNo + "&providerNo=" + providerNo + "&numIssues=" + idx + "&obsDate=" + $F("observationDate") + "&encType=" + encodeURIComponent($F(encType)) + "&noteTxt=" + encodeURIComponent(noteTxt);
 		params += "&" + Form.serialize(caseMgtEntryfrm);
 
 		var objAjax = new Ajax.Updater(
@@ -2703,24 +2704,28 @@
 				asynchronous: false,
 				postBody: params,
 				evalScripts: true,
-				onSuccess: function(request)
+				onSuccess: function (request)
 				{
 					$("notCPP").update(request.responseText);
 					$("notCPP").style.height = "50%";
 					if (fullChart == "true")
 					{
 						$("quickChart").innerHTML = quickChartMsg;
-						$("quickChart").onclick = function() {return viewFullChart(false);}
+						$("quickChart").onclick = function ()
+						{
+							return viewFullChart(false);
 						}
-					else {
+					}
+					else
+					{
 						$("quickChart").innerHTML = fullChartMsg;
-						$("quickChart").onclick = function()
+						$("quickChart").onclick = function ()
 						{
 							return viewFullChart(true);
 						}
 					}
 				},
-				onFailure: function(request)
+				onFailure: function (request)
 				{
 					$("notCPP").update("Error: " + request.status + request.responseText);
 				}
@@ -3332,7 +3337,7 @@
 		var demoNo = demographicNo;
 		var cmeFrm = document.forms["caseManagementEntryForm"];
 		var nId = cmeFrm.noteId.value < 0 ? 0 : cmeFrm.noteId.value;
-		var params = "method=autosave&demographicNo=" + demoNo + "&programId=" + programId + "&note_id=" + nId + "&note=" + escape($F(caseNote));
+		var params = "method=autosave&demographicNo=" + demoNo + "&programId=" + programId + "&note_id=" + nId + "&note=" + encodeURIComponent($F(caseNote));
 
 		new Ajax.Request(url, {
 				method: 'post',

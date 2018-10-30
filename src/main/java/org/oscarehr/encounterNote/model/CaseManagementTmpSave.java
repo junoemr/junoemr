@@ -21,7 +21,9 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.model;
+package org.oscarehr.encounterNote.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import java.util.Date;
 
@@ -36,7 +38,8 @@ import javax.persistence.TemporalType;
 
 @Entity
 @Table(name="casemgmt_tmpsave")
-public class CaseManagementTmpSave extends AbstractModel<Integer> {
+public class CaseManagementTmpSave extends AbstractModel<Integer>
+{
 
 	@Id
    	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,7 +57,7 @@ public class CaseManagementTmpSave extends AbstractModel<Integer> {
 	private String note;
 	
 	@Column(name="update_date")
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date updateDate;
 	
 	@Column(name="note_id")

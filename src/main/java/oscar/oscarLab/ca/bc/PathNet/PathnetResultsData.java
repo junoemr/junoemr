@@ -43,7 +43,7 @@ import org.oscarehr.billing.CA.BC.model.Hl7Obr;
 import org.oscarehr.billing.CA.BC.model.Hl7Orc;
 import org.oscarehr.billing.CA.BC.model.Hl7Pid;
 import org.oscarehr.common.dao.ConsultDocsDao;
-import org.oscarehr.common.dao.ConsultResponseDocDao;
+import org.oscarehr.consultations.dao.ConsultResponseDocDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.model.ConsultDocs;
 import org.oscarehr.common.model.PatientLabRouting;

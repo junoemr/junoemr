@@ -55,15 +55,15 @@ public class ReceivePaymentAction
 
     frm.setAmountReceived(String.valueOf(dblAmount*-1.0));
     }
-    this.receivePayment(frm.getBillingmasterNo(),dblAmount,frm.getPaymentMethod());
+    this.receivePayment(frm.getBillingmasterNo(),dblAmount,frm.getPaymentMethod(),frm.getPaymentDate());
     frm.setPaymentReceived(true);
     return actionMapping.findForward("success");
   }
 
-public void receivePayment(String billingMasterNo, double amount,String paymentType) {
+public void receivePayment(String billingMasterNo, double amount,String paymentType, String paymentDate) {
    BillingHistoryDAO dao = new BillingHistoryDAO();
    MSPReconcile msp = new MSPReconcile();
-   dao.createBillingHistoryArchive(billingMasterNo,amount,paymentType);
+   dao.createBillingHistoryArchiveWithDate(billingMasterNo,amount,paymentType, paymentDate);
    msp.settleIfBalanced(billingMasterNo);
  }
 }
