@@ -1,7 +1,4 @@
-<%@ page import="oscar.oscarRx.data.RxPrescriptionData" %>
-<%@ page import="oscar.oscarRx.data.RxCodesData" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="oscar.oscarRx.pageUtil.RxSessionBean" %><%--
+<%--
 
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
@@ -30,6 +27,12 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<%@ page import="oscar.oscarRx.pageUtil.RxSessionBean" %>
+<%@ page import="oscar.oscarRx.data.RxPrescriptionData" %>
+<%@ page import="oscar.oscarRx.data.RxCodesData" %>
+<%@ page import="org.apache.commons.lang3.StringUtils" %>
+
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <html:html locale="true">
 <head>
@@ -59,6 +62,7 @@
 		}
 	</style>
 </head>
+
 
 
 <%
@@ -183,17 +187,22 @@
         return isValid;
 	}
 
+    document.onload = function() {document.forms['DispForm'].reset()}
 </script>
+
+
+
 
 <body topmargin="0" leftmargin="0" vlink="#0000FF">
 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; position: absolute; left: 0; top:0;" bordercolor="#111111" width="100%" id="AutoNumber1" height="100%">
 	<%@ include file="TopLinks.jsp"%><!-- Row One included here-->
 	<tr>
 		<td></td>
+
+
 		<td width="100%" style="border-left: 2px solid #A9A9A9;" height="100%"
 			valign="top">
-		<table style="border-collapse: collapse" bordercolor="#111111"
-			width="100%" height="100%">
+		<table style="border-collapse: collapse" bordercolor="#111111" width="100%" height="100%">
 			<tr>
 				<td width="0%" valign="top">
 				<div class="DivCCBreadCrumbs"><a href="SearchDrug3.jsp"> <bean:message
@@ -201,19 +210,22 @@
 					key="StaticScript.title.EditFavorites" /></b></div>
 				</td>
 			</tr>
+
+
 			<!----Start new rows here-->
+
 			<tr>
 				<td>
-				<div class="DivContentPadding">
-				<div class="DivContentSectionHead">Favorites</div>
-				</div>
+					<div class=DivContentPadding>
+						<input type=button value="Back to Search For Drug" class="ControlPushButton" onClick="javascript:window.location.href='SearchDrug3.jsp';" />
+					</div>
 				</td>
 			</tr>
 			<tr>
 				<td>
-				<div class=DivContentPadding><input type=button
-					value="Back to Search For Drug" class="ControlPushButton"
-					onClick="javascript:window.location.href='SearchDrug3.jsp';" /></div>
+					<div class="DivContentPadding">
+						<div class="DivContentSectionHead">Favorites</div>
+					</div>
 				</td>
 			</tr>
 
@@ -256,30 +268,41 @@
 						</td>
 					</tr>
 					<% } %>
-					<!-- Record line 3 -->
+					<!-- Record line 3
+
+					We do not use the XHTML compliant selected="selected" and disabled="disabled" in the
+					frequency and durationUnit dropdowns because they seem to be ignored in Firefox.
+					-->
 					<tr class='tblRow drugForm'>
 						<td nowrap><b>Take:</b>
 							<input type=text name="takeMin" class=tblRow size=3 value="<%=fav.getTakeMin()%>" /> <span>to</span>
 							<input type=text name="takeMax" class=tblRow size=3 value="<%=fav.getTakeMax()%>"/>
+							<%
+								String favFreqCode = fav.getFrequencyCode() != null ? fav.getFrequencyCode() : "";
+							%>
 							<select name="frequencyCode" class=tblRow>
-							<%
-								for (RxCodesData.FrequencyCode freq : frequencies)
-								{
-								    String freqCode = freq.getFreqCode();
-							%>
-								<option value="<%=freqCode%>" selected=<%=freqCode.equals(fav.getFrequencyCode()) ? "selected" : ""%>>
-									<%=freqCode%>
-								</option>
-							<%
-								}
-								String duration = fav.getDuration() == null ? "" : fav.getDuration();
-							%>
+								<% if (favFreqCode.isEmpty()) { %>
+								<option selected disabled value="">Frequency</option>
+								<% }
+								   for (RxCodesData.FrequencyCode freq : frequencies) {
+								   String freqCode = freq.getFreqCode();
+								%>
+								<option value="<%=freqCode%>" <%=favFreqCode.equals(freqCode) ? "selected" : ""%>><%=freqCode%></option>
+								<%
+								   }
+
+								String duration = fav.getDuration() != null ? fav.getDuration() : "";
+								String durationUnit = fav.getDurationUnit() != null ? fav.getDurationUnit() : "";
+								%>
 							</select> <b>For:</b>
 								<input type=text name="duration" class=tblRow size=3 value="<%=duration%>"/>
 								<select name="durationUnit" class=tblRow>
-								<option value="D" selected="<%=duration.equals("D") ? "selected" : ""%>">Day(s)</option>
-								<option value="N" selected="<%=duration.equals("N") ? "selected" : ""%>">Week(s)</option>
-								<option value="M" selected="<%=duration.equals("M") ? "selected" : ""%>">Month(s)</option>
+								<% if (durationUnit.isEmpty()) { %>
+								<option value="" selected disabled>Duration</option>
+								<% } %>
+								<option value="D" <%=durationUnit.equals("D") ? "selected" : ""%>>Day(s)</option>
+								<option value="W" <%=durationUnit.equals("W") ? "selected" : ""%>>Week(s)</option>
+								<option value="M" <%=durationUnit.equals("M") ? "selected" : ""%>>Month(s)</option>
 							</select>
 						</td>
 						<td></td>
