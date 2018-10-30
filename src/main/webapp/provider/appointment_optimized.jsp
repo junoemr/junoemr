@@ -1432,10 +1432,11 @@ private long getAppointmentRowSpan(
 								<%
 
 								int slotLengthInMinutes = everyMin;
+								int numScheduleSlots = schedule.getScheduleSlots().asMapOfRanges().size();
 
-								if(bDispTemplatePeriod)
+								if(bDispTemplatePeriod && numScheduleSlots > 0)
 								{
-									slotLengthInMinutes = (MINUTES_IN_DAY/schedule.getScheduleSlots().asMapOfRanges().size());
+									slotLengthInMinutes = (MINUTES_IN_DAY/numScheduleSlots);
 								}
 
 								LocalTime startTime = cleanLocalTime(startHour);
