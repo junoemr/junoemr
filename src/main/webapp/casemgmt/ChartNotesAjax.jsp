@@ -119,9 +119,9 @@ int maxId = 0;
 		}
 
 		//Check user property for stale date and show appropriately
-		UserProperty uProp = (UserProperty)request.getAttribute(UserProperty.STALE_NOTEDATE);
+		UserProperty uProp = (UserProperty) session.getAttribute(UserProperty.STALE_NOTEDATE);
 
-		Date dStaleDate = null;
+		Date dStaleDate;
 		int numToDisplay = 5;
 		int numDisplayed = 0;
 		Calendar cal = Calendar.getInstance();

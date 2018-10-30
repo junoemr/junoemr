@@ -258,6 +258,55 @@ public class EctFormData {
 		return (forms);
 	}
 
+	public static PatientForm getRecentPatientForm(String demoNo, String formName, String table)
+	{
+		PatientForm patientForm = null;
+
+		table = StringUtils.trimToNull(table);
+		if (table == null)
+		{
+			return (patientForm);
+		}
+
+		Connection connection = null;
+		try
+		{
+			connection = DbConnectionFilter.getThreadLocalDbConnection();
+
+			if (!table.equals("form"))
+			{
+				String sql = "SELECT MAX(ID) ID, demographic_no, formCreated, formEdited FROM " + table + " WHERE demographic_no=" + demoNo + " GROUP BY formEdited ORDER BY ID DESC";
+				Statement statement = connection.createStatement();
+				ResultSet results = statement.executeQuery(sql);
+
+				if (results.next())
+				{
+					patientForm = new PatientForm(formName, results.getInt("ID"), results.getInt("demographic_no"), results.getDate("formCreated"), results.getTimestamp("formEdited"));
+				}
+			} else
+			{
+				String sql = "SELECT form_no, demographic_no, form_date FROM " + table + " WHERE demographic_no=" + demoNo + " ORDER BY form_no DESC";
+
+				Statement statement = connection.createStatement();
+				ResultSet results = statement.executeQuery(sql);
+
+				if (results.next())
+				{
+					patientForm = new PatientForm(formName, results.getInt("form_no"), results.getInt("demographic_no"), results.getDate("form_date"), results.getDate("form_date"));
+				}
+			}
+		} catch (SQLException e)
+		{
+			logger.error("Unexpected error.", e);
+			throw (new PersistenceException(e));
+		} finally
+		{
+			SqlUtils.closeResources(connection, null, null);
+		}
+
+		return patientForm;
+	}
+
 	public static PatientForm[] getPatientForms(String demoNo, String table) {
 		return (getPatientFormsAsArrayList(demoNo, null, table).toArray(new PatientForm[0]));
 	}

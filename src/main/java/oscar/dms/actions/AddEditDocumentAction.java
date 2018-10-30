@@ -155,6 +155,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		String fileName = docFile.getFileName();
 		HashMap<String, String> errors = new HashMap<>();
 		String user = (String) request.getSession().getAttribute("user");
+
 		Integer programId = null;
 		
         // if the document was added in the context of a program

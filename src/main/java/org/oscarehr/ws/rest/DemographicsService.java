@@ -45,6 +45,7 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.DemographicSearchHelper;
 import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
 import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SEARCHMODE;
@@ -86,31 +87,27 @@ public class DemographicsService extends AbstractServiceImpl {
 	@GET
 	@Path("/quickSearch")
 	@Produces("application/json")
-	public RestResponse<AbstractSearchResponse<DemographicSearchResult>> search(@QueryParam("query") String query) {
+	public RestSearchResponse<DemographicSearchResult> search(@QueryParam("query") String query) {
 
 		try
 		{
-			if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_demographic", "r", null))
-			{
-				throw new RuntimeException("Access Denied");
-			}
-
-			AbstractSearchResponse<DemographicSearchResult> response = new AbstractSearchResponse<DemographicSearchResult>();
-
-			List<DemographicSearchResult> results = new ArrayList<DemographicSearchResult>();
+			securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, "_demographic");
 
 			if (query == null)
 			{
-				return RestResponse.errorResponse("No Query Parameter Sent");
+				return RestSearchResponse.errorResponse("No Query Parameter Sent");
 			}
 
+			List<DemographicSearchResult> results = new ArrayList<>(0);
 			DemographicSearchRequest req = new DemographicSearchRequest();
 			req.setStatusMode(STATUSMODE.active);
+			req.setSortMode(SORTMODE.Name);
+			req.setSortDir(SORTDIR.asc);
 			req.setIntegrator(false); //this should be configurable by persona
 
 			//caisi
 			boolean outOfDomain = true;
-			if (OscarProperties.getInstance().getProperty("ModuleNames", "").indexOf("Caisi") != -1)
+			if (OscarProperties.getInstance().getProperty("ModuleNames", "").contains("Caisi"))
 			{
 				outOfDomain = false;
 			}
@@ -138,18 +135,14 @@ public class DemographicsService extends AbstractServiceImpl {
 			if (count > 0)
 			{
 				results = demographicManager.searchPatients(getLoggedInInfo(), req, 0, 10);
-				response.setContent(results);
-				response.setTotal(count);
-				response.setQuery(query);
-
 			}
-			return RestResponse.successResponse(response);
+			return RestSearchResponse.successResponse(results, 1, 10, count);
 		}
 		catch (Exception e)
 		{
 			logger.error("Error", e);
 		}
-		return RestResponse.errorResponse("Error");
+		return RestSearchResponse.errorResponse("Error");
 	}
 
 	@GET

@@ -118,13 +118,13 @@ public class DocumentService
 	 * @return - the persisted document model
 	 * @throws IOException
 	 */
-	public Document uploadNewDemographicDocument(Document document, InputStream fileInputStream, Integer demographicNo) throws IOException
+	public Document uploadNewDemographicDocument(Document document, InputStream fileInputStream, Integer demographicNo) throws IOException, InterruptedException
 	{
 		GenericFile file = FileFactory.createDocumentFile(fileInputStream, document.getDocfilename());
 		return uploadNewDemographicDocument(document, file, demographicNo);
 	}
 
-	public Document uploadNewDemographicDocument(Document document, InputStream fileInputStream) throws IOException
+	public Document uploadNewDemographicDocument(Document document, InputStream fileInputStream) throws IOException, InterruptedException
 	{
 		return uploadNewDemographicDocument(document, fileInputStream, null);
 	}
@@ -158,7 +158,7 @@ public class DocumentService
 		logger.info("Uploaded Provider Document " + document.getDocumentNo());
 		return document;
 	}
-	public Document uploadNewProviderDocument(Document document, InputStream fileInputStream, Integer providerNo) throws IOException
+	public Document uploadNewProviderDocument(Document document, InputStream fileInputStream, Integer providerNo) throws IOException, InterruptedException
 	{
 		GenericFile file = FileFactory.createDocumentFile(fileInputStream, document.getDocfilename());
 		return uploadNewProviderDocument(document, file, providerNo);
@@ -256,22 +256,12 @@ public class DocumentService
 				formattedFileName = GenericFile.getFormattedFileName(documentFileName);
 				// get a tempfile. it will replace the existing doc at last step of the transaction
 				tempFile = FileFactory.createTempFile(documentInputStream);
-				// validate the file & content
-				if(!tempFile.validate())
-				{
-					tempFile.reEncode();
-				}
 			}
 			// save the content as new and update the references, but keep the previous document in the folder.
 			else
 			{
 				tempFile = FileFactory.createDocumentFile(documentInputStream, documentFileName);
 				formattedFileName = tempFile.getName();
-				// validate the file & content
-				if(!tempFile.validate())
-				{
-					tempFile.reEncode();
-				}
 				tempFile.moveToDocuments();
 			}
 			documentModel.setDocfilename(formattedFileName);

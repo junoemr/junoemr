@@ -24,8 +24,11 @@
 package org.oscarehr.common.io;
 
 import org.apache.log4j.Logger;
+import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.oscarehr.util.MiscUtils;
+import oscar.OscarProperties;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,7 +45,10 @@ public class PDFFile extends GenericFile
 	private static final Set<String> allowedErrors = new HashSet<>();
 	private static Pattern[] allowedWarningsGS = null;
 
-	public PDFFile(File file)
+	private OscarProperties oscarProperties = OscarProperties.getInstance();
+	private long maxMemoryUsage = oscarProperties.getPDFMaxMemUsage();
+
+	public PDFFile(File file) throws IOException
 	{
 		super(file);
 	}
@@ -79,7 +85,7 @@ public class PDFFile extends GenericFile
 		return this.isValid;
 	}
 	@Override
-	public void reEncode() throws IOException, InterruptedException
+	public void process() throws IOException, InterruptedException
 	{
 		javaFile = ghostscriptReEncode();
 	}
@@ -89,19 +95,21 @@ public class PDFFile extends GenericFile
 	 * @return the number of pages in the file
 	 */
 	@Override
-	public int getPageCount()
+	public int getPageCount() throws IOException
 	{
 		int numOfPage = 0;
+
 		try
 		{
-			PDDocument doc = PDDocument.load(javaFile);
-			numOfPage = doc.getNumberOfPages();
-			doc.close();
+			PDDocument document = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+			numOfPage = document.getNumberOfPages();
+			document.close();
 		}
-		catch(IOException e)
+		catch(InvalidPasswordException e)
 		{
-			logger.error("Error", e);
+			logger.warn("Encrypted PDF. Can't get page count");
 		}
+
 		return numOfPage;
 	}
 
@@ -153,7 +161,7 @@ public class PDFFile extends GenericFile
 		String gs = props.getProperty("document.ghostscript_path", "/usr/bin/gs");
 
 		File currentDir = javaFile.getParentFile();
-		this.moveToCorrupt();
+		this.moveToOriginal();
 
 		File newPdf = new File(currentDir, javaFile.getName());
 
@@ -182,6 +190,7 @@ public class PDFFile extends GenericFile
 		while((line = in.readLine()) != null)
 		{
 			logger.warn("gs error line: " + line);
+
 			if (isAllowedWarning(line))
 				continue;
 
@@ -193,7 +202,29 @@ public class PDFFile extends GenericFile
 		int exitValue = process.exitValue();
 		if(exitValue != 0 || reasonInvalid != null)
 		{
+			try
+			{
+				PDDocument document = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+				document.close();
+			} catch(InvalidPasswordException e)
+			{
+				logger.warn("Encrypted PDF. Cannot re-encode");
+				this.moveFile(currentDir);
+				newPdf = javaFile;
+				return newPdf;
+			}
+
+			this.moveToCorrupt();
 			throw new RuntimeException("Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue);
+		}
+
+		try
+		{
+			PDDocument document = PDDocument.load(newPdf, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+			document.close();
+		} catch(Exception e)
+		{
+			throw new RuntimeException("Failed to load re-encoded PDF: ", e);
 		}
 
 		logger.info("END PDF RE-ENCODING");

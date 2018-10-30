@@ -27,6 +27,8 @@ import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Query;
+
 @SuppressWarnings("unchecked")
 @Transactional
 @Repository("encounterNote.dao.CaseManagementNoteDao")
@@ -35,5 +37,18 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 	public CaseManagementNoteDao()
 	{
 		super(CaseManagementNote.class);
+	}
+
+	public CaseManagementNote findLatestByUUID(String uuid)
+	{
+		// select model name must match specified @Entity name in model object
+		String queryString = "SELECT x FROM model.CaseManagementNote x " +
+				"WHERE x.uuid=:uuid " +
+				"ORDER BY x.noteId DESC";
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("uuid", uuid);
+		query.setMaxResults(1);
+
+		return this.getSingleResultOrNull(query);
 	}
 }

@@ -21,16 +21,18 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.encounterNote.dao;
 
 import java.util.Date;
 import javax.persistence.Query;
 
-import org.oscarehr.common.model.CaseManagementTmpSave;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CaseManagementTmpSaveDao extends AbstractDao<CaseManagementTmpSave>{
+public class CaseManagementTmpSaveDao extends AbstractDao<CaseManagementTmpSave>
+{
 
 	public CaseManagementTmpSaveDao() {
 		super(CaseManagementTmpSave.class);
