@@ -86,7 +86,7 @@ public class DocumentWs extends AbstractWs {
 		return (DocumentTransfer.getTransfers(loggedInInfo, documents));
 	}
 
-	public String addDocument(String docFilename, String docContentsBase64, String providerId, String responsibleId) throws IOException
+	public String addDocument(String docFilename, String docContentsBase64, String providerId, String responsibleId) throws IOException, InterruptedException
 	{
 		// Decode document
 		Base64 base64 = new Base64();

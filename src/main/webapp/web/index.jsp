@@ -23,7 +23,6 @@
     Ontario, Canada
 
 --%>
-<%@page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 
@@ -472,6 +471,7 @@
 <script type="text/javascript" src="common/services/uxService.js"></script>
 <script type="text/javascript" src="common/services/specialistsService.js"></script>
 <script type="text/javascript" src="common/services/referralDoctorsService.js"></script>
+<script type="text/javascript" src="common/services/reportingService.js"></script>
 
 <script type="text/javascript" src="common/filters/module.js"></script>
 <script type="text/javascript" src="common/filters/age.js"></script>

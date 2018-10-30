@@ -68,6 +68,22 @@ public class CaseManagementNoteLink extends AbstractModel<Long>
 	@JoinColumn(name = "note_id")
 	private CaseManagementNote note;
 
+	public CaseManagementNoteLink() {}
+
+	/** construct a copy of the given note */
+	public CaseManagementNoteLink(CaseManagementNoteLink linkToCopy)
+	{
+		this(linkToCopy, null);
+	}
+
+	public CaseManagementNoteLink(CaseManagementNoteLink linkToCopy, CaseManagementNote referenceNote)
+	{
+		this.id = null;
+		this.note = referenceNote;
+		this.otherId = linkToCopy.otherId;
+		this.tableId = linkToCopy.tableId;
+		this.tableName = linkToCopy.tableName;
+	}
 
 	public void setCaseManagementNote(int noteId)
 	{

@@ -27,8 +27,6 @@
 <%@page import="org.oscarehr.common.model.ProviderPreference"%>
 <%@page import="org.oscarehr.myoscar.utils.MyOscarLoggedInInfo"%>
 <%@page import="org.oscarehr.phr.util.MyOscarUtils"%>
-<%@page import="org.oscarehr.study.Study"%>
-<%@page import="org.oscarehr.study.StudyFactory"%>
 <%@ page import="org.oscarehr.util.LocaleUtils"%>
 <%@page import="org.oscarehr.util.WebUtilsOld"%>
 <%@page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%>
@@ -195,8 +193,6 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
    "http://www.w3.org/TR/html4/loose.dtd">
 <html:html locale="true">
     <head>
-
-
         <title><bean:message key="SearchDrug.title" /></title>
         <link rel="stylesheet" type="text/css" href="styles.css">
 
@@ -205,8 +201,8 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
         <script type="text/javascript" >
         	var ctx = '${ ctx }';
         </script>
-<script type="text/javascript" src="${ ctx }/js/jquery-1.7.1.min.js" ></script>                
-<script type="text/javascript" src="${ ctx }/js/jquery-ui-1.8.18.custom.min.js" ></script>
+        <script type="text/javascript" src="${ ctx }/js/jquery-1.7.1.min.js" ></script>
+        <script type="text/javascript" src="${ ctx }/js/jquery-ui-1.8.18.custom.min.js" ></script>
         <script>
           jQuery.noConflict();
         </script>
@@ -239,54 +235,59 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
         <script type="text/javascript" src="<c:out value="${ctx}/js/checkDate.js"/>"></script>
 
         <script type="text/javascript">
-	        function saveLinks(randNumber) {
-	            $('method_'+randNumber).onblur();
-	            $('route_'+randNumber).onblur();
-	            $('frequency_'+randNumber).onblur();
-	            $('minimum_'+randNumber).onblur();
-	            $('maximum_'+randNumber).onblur();
-	            $('duration_'+randNumber).onblur();
-	            $('durationUnit_'+randNumber).onblur();
-	        }
-
-
-	        function handleEnter(inField, ev){
-	            var charCode;
-	            if(ev && ev.which)
-	                charCode=ev.which;
-	            else if(window.event){
-	                ev=window.event;
-	                charCode=ev.keyCode;
-	            }
-	            var id=inField.id.split("_")[1];
-	            if(charCode==13)
-	                showHideSpecInst('siAutoComplete_'+id);
-	        }
-
-        //has to be in here, not prescribe.jsp for it to work in IE 6/7 and probably 8.
-        function showHideSpecInst(elementId){
-            if($(elementId).getStyle('display')=='none'){
-                Effect.BlindDown(elementId);
-            }else{
-                Effect.BlindUp(elementId);
+            function saveLinks(randNumber) {
+                $('method_'+randNumber).onblur();
+                $('route_'+randNumber).onblur();
+                $('frequency_'+randNumber).onblur();
+                $('minimum_'+randNumber).onblur();
+                $('maximum_'+randNumber).onblur();
+                $('duration_'+randNumber).onblur();
+                $('durationUnit_'+randNumber).onblur();
             }
-          }
 
-            function resetReRxDrugList(){
-            	var rand = Math.floor(Math.random()*10001);
+            function handleEnter(inField, ev){
+                var charCode;
+                if(ev && ev.which)
+                    charCode=ev.which;
+                else if(window.event){
+                    ev=window.event;
+                    charCode=ev.keyCode;
+                }
+                var id=inField.id.split("_")[1];
+                if(charCode==13)
+                    showHideSpecInst('siAutoComplete_'+id);
+            }
+
+            //has to be in here, not prescribe.jsp for it to work in IE 6/7 and probably 8.
+            function showHideSpecInst(elementId){
+                if($(elementId).getStyle('display')=='none'){
+                    Effect.BlindDown(elementId);
+                }else{
+                    Effect.BlindUp(elementId);
+                }
+            }
+
+            function resetReRxDrugList() {
+                var rand = Math.floor(Math.random()*10001);
                 var url="<c:out value="${ctx}"/>" + "/oscarRx/deleteRx.do?parameterValue=clearReRxDrugList";
-                       var data = "rand="+rand;
-                       new Ajax.Request(url, {method: 'post',parameters:data,onSuccess:function(transport){
-                    	   updateCurrentInteractions();
-                        }});
+                var data = "rand="+rand;
+                new Ajax.Request(url,
+                    {
+                        method: 'post',
+                        parameters:data,
+                        onSuccess:function(transport) {
+                            updateCurrentInteractions();
+                        }
+                    });
             }
+
             function onPrint(cfgPage) {
                 var docF = $('printFormDD');
 
                 docF.action = "../form/createpdf?__title=Rx&__cfgfile=" + cfgPage + "&__template=a6blank";
                 docF.target="_blank";
                 docF.submit();
-               return true;
+                return true;
             }
 
             function buildRoute() {
@@ -294,431 +295,406 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
                 pickRoute = "";
             }
 
+            function popupRxSearchWindow(){
+                var winX = (document.all)?window.screenLeft:window.screenX;
+                var winY = (document.all)?window.screenTop:window.screenY;
 
+                var top = winY+70;
+                var left = winX+110;
+                var url = "searchDrug.do?rx2=true&searchString="+$('searchString').value;
+                popup2(600, 800, top, left, url, 'windowNameRxSearch<%=demoNo%>');
 
-           function popupRxSearchWindow(){
-               var winX = (document.all)?window.screenLeft:window.screenX;
-               var winY = (document.all)?window.screenTop:window.screenY;
+            }
 
-               var top = winY+70;
-               var left = winX+110;
-               var url = "searchDrug.do?rx2=true&searchString="+$('searchString').value;
-               popup2(600, 800, top, left, url, 'windowNameRxSearch<%=demoNo%>');
+            function popupRxReasonWindow(demographic,id){
+                var winX = (document.all)?window.screenLeft:window.screenX;
+                var winY = (document.all)?window.screenTop:window.screenY;
 
-           }
+                var top = winY+70;
+                var left = winX+110;
+                var url = "SelectReason.jsp?demographicNo="+demographic+"&drugId="+id;
+                popup2(575, 650, top, left, url, 'windowNameRxReason<%=demoNo%>');
 
+            }
 
-           function popupRxReasonWindow(demographic,id){
-               var winX = (document.all)?window.screenLeft:window.screenX;
-               var winY = (document.all)?window.screenTop:window.screenY;
-
-               var top = winY+70;
-               var left = winX+110;
-               var url = "SelectReason.jsp?demographicNo="+demographic+"&drugId="+id;
-               popup2(575, 650, top, left, url, 'windowNameRxReason<%=demoNo%>');
-
-           }
-
-
-           var highlightMatch = function(full, snippet, matchindex) {
+            var highlightMatch = function(full, snippet, matchindex) {
                 return "<a title='"+full+"'>"+full.substring(0, matchindex) +
-                "<span class=match>" +full.substr(matchindex, snippet.length) + "</span>" + full.substring(matchindex + snippet.length)+"</a>";
-           };
+                    "<span class=match>" +full.substr(matchindex, snippet.length) + "</span>" + full.substring(matchindex + snippet.length)+"</a>";
+            };
 
-           var highlightMatchInactiveMatchWord = function(full, snippet, matchindex) {
-               //oscarLog(full+"--"+snippet+"--"+matchindex);
+            var highlightMatchInactiveMatchWord = function(full, snippet, matchindex) {
+                //oscarLog(full+"--"+snippet+"--"+matchindex);
                 return "<a title='"+full+"'>"+"<span class=matchInactive>"+full.substring(0, matchindex) +
-                "<span class=match>" +full.substr(matchindex, snippet.length) +"</span>" + full.substring(matchindex + snippet.length)+"</span>"+"</a>";
-           };
-           var highlightMatchInactive = function(full, snippet, matchindex) {
-               /* oscarLog(full+"--"+snippet+"--"+matchindex);
-                oscarLog(" aa "+full.substring(0, matchindex) );
-                oscarLog(" bb "+full.substr(matchindex, snippet.length) );
-                oscarLog(" cc "+ full.substring(matchindex + snippet.length));*/
-               /*return "<a title='"+full+"'>"+"<span class=matchInactive>"+full.substring(0, matchindex) +
-                full.substr(matchindex, snippet.length) +full.substring(matchindex + snippet.length)+"</span>"+"</a>";*/
+                    "<span class=match>" +full.substr(matchindex, snippet.length) +"</span>" + full.substring(matchindex + snippet.length)+"</span>"+"</a>";
+            };
+            var highlightMatchInactive = function(full, snippet, matchindex) {
                 return "<a title='"+full+"'>"+"<span class=matchInactive>"+full+"</span>"+"</a>";
-           };
-           var resultFormatter = function(oResultData, sQuery, sResultMatch) {
-               //oscarLog("oResultData, sQuery, sResultMatch="+oResultData+"--"+sQuery+"--"+sResultMatch);
-               //oscarLog("oResultData[0]="+oResultData[0]);
-               //oscarLog("oResultData.name="+oResultData.name);
-               //oscarLog("oResultData.name="+oResultData.id);
-               var query = sQuery.toUpperCase();
-               var drugName = oResultData[0];
+            };
+            var resultFormatter = function(oResultData, sQuery, sResultMatch) {
+                var query = sQuery.toUpperCase();
+                var drugName = oResultData[0];
 
-               var mIndex = drugName.toUpperCase().indexOf(query);
-               var display = '';
+                var mIndex = drugName.toUpperCase().indexOf(query);
+                var display = '';
 
-               if(mIndex > -1){
-                   display = highlightMatch(drugName,query,mIndex);
-               }else{
-                   display = drugName;
-               }
-               return  display;
-           };
+                if(mIndex > -1){
+                    display = highlightMatch(drugName,query,mIndex);
+                }else{
+                    display = drugName;
+                }
+                return  display;
+            };
             var resultFormatter2 = function(oResultData, sQuery, sResultMatch) {
-               /*oscarLog("oResultData, sQuery, sResultMatch="+oResultData+"--"+sQuery+"--"+sResultMatch);
-               oscarLog("oResultData[0]="+oResultData[0]);
-               oscarLog("oResultData.name="+oResultData.name);
-               oscarLog("oResultData.name="+oResultData.id);*/
-               var query = sQuery.toUpperCase();
-               var drugName = oResultData.name;
-               var isInactive=oResultData.isInactive;
-               //oscarLog("isInactive="+isInactive);
 
-               var mIndex = drugName.toUpperCase().indexOf(query);
-               var display = '';
-               if(mIndex>-1 && (isInactive=='true'||isInactive==true)){ //match and inactive
-                   display=highlightMatchInactiveMatchWord(drugName,query,mIndex);
-               }
-               else if(mIndex > -1 && (isInactive=='false'||isInactive==false || isInactive==undefined || isInactive==null)){ //match and active
-                   display = highlightMatch(drugName,query,mIndex);
-               }else if(mIndex<=-1 && (isInactive=='true'||isInactive==true)){//no match and inactive
-                   display=highlightMatchInactive(drugName,query,mIndex);
-               }
-               else{//active and no match
-                   display = drugName;
-               }
-               
-               
-               return  display;
-           };
+                var query = sQuery.toUpperCase();
+                var drugName = oResultData.name;
+                var isInactive=oResultData.isInactive;
+
+                var mIndex = drugName.toUpperCase().indexOf(query);
+                var display = '';
+                if(mIndex>-1 && (isInactive=='true'||isInactive==true)){ //match and inactive
+                    display=highlightMatchInactiveMatchWord(drugName,query,mIndex);
+                }
+                else if(mIndex > -1 && (isInactive=='false'||isInactive==false || isInactive==undefined || isInactive==null)){ //match and active
+                    display = highlightMatch(drugName,query,mIndex);
+                }else if(mIndex<=-1 && (isInactive=='true'||isInactive==true)){//no match and inactive
+                    display=highlightMatchInactive(drugName,query,mIndex);
+                }
+                else{//active and no match
+                    display = drugName;
+                }
+
+
+                return  display;
+            };
         </script>
 
         <script type="text/javascript">
-addEvent(window, "load", sortables_init);
+            addEvent(window, "load", sortables_init);
 
-var SORT_COLUMN_INDEX;
+            var SORT_COLUMN_INDEX;
 
-function sortables_init() {
-    // Find all tables with class sortable and make them sortable
+            function sortables_init() {
+                // Find all tables with class sortable and make them sortable
 
-    if (!document.getElementsByTagName) return;
+                if (!document.getElementsByTagName) return;
 
-    tbls = document.getElementsByTagName("table");
+                tbls = document.getElementsByTagName("table");
 
-    for (ti=0;ti<tbls.length;ti++) {
-        thisTbl = tbls[ti];
+                for (ti=0;ti<tbls.length;ti++) {
+                    thisTbl = tbls[ti];
 
-        if (((' '+thisTbl.className+' ').indexOf("sortable") != -1) && (thisTbl.id)) {
-            //initTable(thisTbl.id);
-            ts_makeSortable(thisTbl);
-        }
-    }
-}
-
-function ts_makeSortable(table) {
-    oscarLog('making '+table+' sortable');
-    if (table.rows && table.rows.length > 0) {
-        var firstRow = table.rows[0];
-    }
-    if (!firstRow) return;
-    oscarLog('Gets past here');
-
-    // We have a first row: assume it's the header, and make its contents clickable links
-    for (var i=0;i<firstRow.cells.length;i++) {
-        var cell = firstRow.cells[i];
-        var txt = ts_getInnerText(cell);
-        cell.innerHTML = '<a href="#"  class="sortheader" '+
-        'onclick="ts_resortTable(this, '+i+');return false;">' +
-        txt+'<span class="sortarrow"></span></a>';
-    }
-}
-
-function ts_getInnerText(el) {
-	if (typeof el == "string") return el;
-	if (typeof el == "undefined") { return el };
-	if (el.innerText) return el.innerText;	//Not needed but it is faster
-	var str = "";
-
-	var cs = el.childNodes;
-	var l = cs.length;
-	for (var i = 0; i < l; i++) {
-		switch (cs[i].nodeType) {
-			case 1: //ELEMENT_NODE
-				str += ts_getInnerText(cs[i]);
-				break;
-			case 3:	//TEXT_NODE
-				str += cs[i].nodeValue;
-				break;
-		}
-	}
-	return str;
-}
-
-function ts_resortTable(lnk,clid) {
-    // get the span
-    var span;
-    for (var ci=0;ci<lnk.childNodes.length;ci++) {
-        if (lnk.childNodes[ci].tagName && lnk.childNodes[ci].tagName.toLowerCase() == 'span') span = lnk.childNodes[ci];
-    }
-    var spantext = ts_getInnerText(span);
-    var td = lnk.parentNode;
-    var column = clid;
-    var table = getParent(td,'TABLE');
-
-    // Work out a type for the column
-    if (table.rows.length <= 1) return;
-
-
-    var itm = ts_getInnerText(table.rows[1].cells[column]).trim();
-    sortfn = ts_sort_caseinsensitive;
-    if (itm.match(/^\d\d[\/-]\d\d[\/-]\d\d\d\d$/)) sortfn = ts_sort_date;
-    if (itm.match(/^\d\d[\/-]\d\d[\/-]\d\d$/)) sortfn = ts_sort_date;
-    if (itm.match(/^[£$]/)) sortfn = ts_sort_currency;
-    if (itm.match(/^[\d\.]+$/)) sortfn = ts_sort_numeric;
-    SORT_COLUMN_INDEX = column;
-    var firstRow = new Array();
-    var newRows = new Array();
-    for (i=0;i<table.rows[0].length;i++) { firstRow[i] = table.rows[0][i]; }
-    for (j=1;j<table.rows.length;j++) { newRows[j-1] = table.rows[j]; }
-
-    newRows.sort(sortfn);
-
-    if (span.getAttribute("sortdir") == 'down') {
-        ARROW = '&nbsp;&nbsp;&uarr;';
-        newRows.reverse();
-        span.setAttribute('sortdir','up');
-    } else {
-        ARROW = '&nbsp;&nbsp;&darr;';
-        span.setAttribute('sortdir','down');
-    }
-
-    // We appendChild rows that already exist to the tbody, so it moves them rather than creating new ones
-    // don't do sortbottom rows
-    for (i=0;i<newRows.length;i++) { if (!newRows[i].className || (newRows[i].className && (newRows[i].className.indexOf('sortbottom') == -1))) table.tBodies[0].appendChild(newRows[i]);}
-    // do sortbottom rows only
-    for (i=0;i<newRows.length;i++) { if (newRows[i].className && (newRows[i].className.indexOf('sortbottom') != -1)) table.tBodies[0].appendChild(newRows[i]);}
-
-    // Delete any other arrows there may be showing
-    var allspans = document.getElementsByTagName("span");
-    for (var ci=0;ci<allspans.length;ci++) {
-        if (allspans[ci].className == 'sortarrow') {
-            if (getParent(allspans[ci],"table") == getParent(lnk,"table")) { // in the same table as us?
-                allspans[ci].innerHTML = '';
+                    if (((' '+thisTbl.className+' ').indexOf("sortable") != -1) && (thisTbl.id)) {
+                        //initTable(thisTbl.id);
+                        ts_makeSortable(thisTbl);
+                    }
+                }
             }
-        }
-    }
 
-    span.innerHTML = ARROW;
-}
+            function ts_makeSortable(table) {
+                oscarLog('making '+table+' sortable');
+                if (table.rows && table.rows.length > 0) {
+                    var firstRow = table.rows[0];
+                }
+                if (!firstRow) return;
 
-function getParent(el, pTagName) {
-	if (el == null) return null;
-	else if (el.nodeType == 1 && el.tagName.toLowerCase() == pTagName.toLowerCase())	// Gecko bug, supposed to be uppercase
-		return el;
-	else
-		return getParent(el.parentNode, pTagName);
-}
-function ts_sort_date(a,b) {
-    // y2k notes: two digit years less than 50 are treated as 20XX, greater than 50 are treated as 19XX
-    aa = ts_getInnerText(a.cells[SORT_COLUMN_INDEX]);
-    bb = ts_getInnerText(b.cells[SORT_COLUMN_INDEX]);
-    if (aa.length == 10) {
-        dt1 = aa.substr(6,4)+aa.substr(3,2)+aa.substr(0,2);
-    } else {
-        yr = aa.substr(6,2);
-        if (parseInt(yr) < 50) { yr = '20'+yr; } else { yr = '19'+yr; }
-        dt1 = yr+aa.substr(3,2)+aa.substr(0,2);
-    }
-    if (bb.length == 10) {
-        dt2 = bb.substr(6,4)+bb.substr(3,2)+bb.substr(0,2);
-    } else {
-        yr = bb.substr(6,2);
-        if (parseInt(yr) < 50) { yr = '20'+yr; } else { yr = '19'+yr; }
-        dt2 = yr+bb.substr(3,2)+bb.substr(0,2);
-    }
-    if (dt1==dt2) return 0;
-    if (dt1<dt2) return -1;
-    return 1;
-}
+                // We have a first row: assume it's the header, and make its contents clickable links
+                for (var i=0;i<firstRow.cells.length;i++) {
+                    var cell = firstRow.cells[i];
+                    var txt = ts_getInnerText(cell);
+                    cell.innerHTML = '<a href="#"  class="sortheader" '+
+                        'onclick="ts_resortTable(this, '+i+');return false;">' +
+                        txt+'<span class="sortarrow"></span></a>';
+                }
+            }
 
-function ts_sort_currency(a,b) {
-    aa = ts_getInnerText(a.cells[SORT_COLUMN_INDEX]).replace(/[^0-9.]/g,'');
-    bb = ts_getInnerText(b.cells[SORT_COLUMN_INDEX]).replace(/[^0-9.]/g,'');
-    return parseFloat(aa) - parseFloat(bb);
-}
+            function ts_getInnerText(el) {
+                if (typeof el === "string" || typeof el === "undefined") {
+                    return el;
+                }
+                if (el.innerText) return el.innerText;	//Not needed but it is faster
+                var str = "";
 
-function ts_sort_numeric(a,b) {
-    aa = parseFloat(ts_getInnerText(a.cells[SORT_COLUMN_INDEX]));
-    if (isNaN(aa)) aa = 0;
-    bb = parseFloat(ts_getInnerText(b.cells[SORT_COLUMN_INDEX]));
-    if (isNaN(bb)) bb = 0;
-    return aa-bb;
-}
+                var cs = el.childNodes;
+                var l = cs.length;
+                for (var i = 0; i < l; i++) {
+                    switch (cs[i].nodeType) {
+                        case 1: //ELEMENT_NODE
+                            str += ts_getInnerText(cs[i]);
+                            break;
+                        case 3:	//TEXT_NODE
+                            str += cs[i].nodeValue;
+                            break;
+                    }
+                }
+                return str;
+            }
 
-function ts_sort_caseinsensitive(a,b) {
-    aa = ts_getInnerText(a.cells[SORT_COLUMN_INDEX]).toLowerCase();
-    bb = ts_getInnerText(b.cells[SORT_COLUMN_INDEX]).toLowerCase();
-    if (aa==bb) return 0;
-    if (aa<bb) return -1;
-    return 1;
-}
+            function ts_resortTable(lnk,clid) {
+                // get the span
+                var span;
+                for (var ci=0;ci<lnk.childNodes.length;ci++) {
+                    if (lnk.childNodes[ci].tagName && lnk.childNodes[ci].tagName.toLowerCase() == 'span') span = lnk.childNodes[ci];
+                }
+                var spantext = ts_getInnerText(span);
+                var td = lnk.parentNode;
+                var column = clid;
+                var table = getParent(td,'TABLE');
 
-function ts_sort_default(a,b) {
-    aa = ts_getInnerText(a.cells[SORT_COLUMN_INDEX]);
-    bb = ts_getInnerText(b.cells[SORT_COLUMN_INDEX]);
-    if (aa==bb) return 0;
-    if (aa<bb) return -1;
-    return 1;
-}
+                // Work out a type for the column
+                if (table.rows.length <= 1) return;
 
+                var itm = ts_getInnerText(table.rows[1].cells[column]).trim();
+                sortfn = ts_sort_caseinsensitive;
+                if (itm.match(/^\d\d[\/-]\d\d[\/-]\d\d\d\d$/)) sortfn = ts_sort_date;
+                if (itm.match(/^\d\d[\/-]\d\d[\/-]\d\d$/)) sortfn = ts_sort_date;
+                if (itm.match(/^[£$]/)) sortfn = ts_sort_currency;
+                if (itm.match(/^[\d\.]+$/)) sortfn = ts_sort_numeric;
+                SORT_COLUMN_INDEX = column;
+                var firstRow = new Array();
+                var newRows = new Array();
+                for (i=0;i<table.rows[0].length;i++) { firstRow[i] = table.rows[0][i]; }
+                for (j=1;j<table.rows.length;j++) { newRows[j-1] = table.rows[j]; }
 
-function addEvent(elm, evType, fn, useCapture)
-// addEvent and removeEvent
-// cross-browser event handling for IE5+,  NS6 and Mozilla
-// By Scott Andrew
-{
-  if (elm.addEventListener){
-    elm.addEventListener(evType, fn, useCapture);
-    return true;
-  } else if (elm.attachEvent){
-    var r = elm.attachEvent("on"+evType, fn);
-    return r;
-  } else {
-    alert("Handler could not be removed");
-  }
-}
-function checkFav(){
-    //oscarLog("****** in checkFav");
-    var usefav='<%=usefav%>';
-    var favid='<%=favid%>';
-    if(usefav=="true" && favid!=null && favid!='null'){
-        //oscarLog("****** favid "+favid);
-        useFav2(favid);
-    }else{}
-}
+                newRows.sort(sortfn);
 
-     //not used , represcribe a drug
-    function represcribeOnLoad(drugId){
-        var data="drugId="+drugId + "&rand=" + Math.floor(Math.random()*10001);
-        var url= "<c:out value="${ctx}"/>" + "/oscarRx/rePrescribe2.do?method=saveReRxDrugIdToStash";
-        new Ajax.Updater('rxText',url, {method:'get',parameters:data,evalScripts:true,insertion: Insertion.Bottom,
-            onSuccess:function(transport){
-            }});
+                if (span.getAttribute("sortdir") == 'down') {
+                    ARROW = '&nbsp;&nbsp;&uarr;';
+                    newRows.reverse();
+                    span.setAttribute('sortdir','up');
+                } else {
+                    ARROW = '&nbsp;&nbsp;&darr;';
+                    span.setAttribute('sortdir','down');
+                }
 
-    }
+                // We appendChild rows that already exist to the tbody, so it moves them rather than creating new ones
+                // don't do sortbottom rows
+                for (i=0;i<newRows.length;i++) { if (!newRows[i].className || (newRows[i].className && (newRows[i].className.indexOf('sortbottom') == -1))) table.tBodies[0].appendChild(newRows[i]);}
+                // do sortbottom rows only
+                for (i=0;i<newRows.length;i++) { if (newRows[i].className && (newRows[i].className.indexOf('sortbottom') != -1)) table.tBodies[0].appendChild(newRows[i]);}
 
+                // Delete any other arrows there may be showing
+                var allspans = document.getElementsByTagName("span");
+                for (var ci=0;ci<allspans.length;ci++) {
+                    if (allspans[ci].className == 'sortarrow') {
+                        if (getParent(allspans[ci],"table") == getParent(lnk,"table")) { // in the same table as us?
+                            allspans[ci].innerHTML = '';
+                        }
+                    }
+                }
 
-    function moveDrugDown(drugId,swapDrugId,demographicNo) {
-    	new Ajax.Request('<c:out value="${ctx}"/>/oscarRx/reorderDrug.do?method=update&direction=down&drugId='+drugId + '&swapDrugId='+swapDrugId+'&demographicNo=' + demographicNo + "&rand="+ Math.floor(Math.random()*10001) , {
-  		  method: 'get',
-  		  onSuccess: function(transport) {
-  			callReplacementWebService("ListDrugs.jsp",'drugProfile');
-            resetReRxDrugList();
-            resetStash();
-  		  }
-  		});
-    }
+                span.innerHTML = ARROW;
+            }
 
-    function moveDrugUp(drugId,swapDrugId,demographicNo) {
-    	new Ajax.Request('<c:out value="${ctx}"/>/oscarRx/reorderDrug.do?method=update&direction=up&drugId='+drugId  + '&swapDrugId='+swapDrugId+'&demographicNo=' + demographicNo +"&rand=" + Math.floor(Math.random()*10001), {
-    		  method: 'get',
-    		  onSuccess: function(transport) {
-    			  callReplacementWebService("ListDrugs.jsp",'drugProfile');
-                  resetReRxDrugList();
-                  resetStash();
-    		  }
-    		});
-    }
+            function getParent(el, pTagName) {
+                if (el == null) return null;
+                else if (el.nodeType == 1 && el.tagName.toLowerCase() == pTagName.toLowerCase())	// Gecko bug, supposed to be uppercase
+                    return el;
+                else
+                    return getParent(el.parentNode, pTagName);
+            }
+            function ts_sort_date(a,b) {
+                // y2k notes: two digit years less than 50 are treated as 20XX, greater than 50 are treated as 19XX
+                aa = ts_getInnerText(a.cells[SORT_COLUMN_INDEX]);
+                bb = ts_getInnerText(b.cells[SORT_COLUMN_INDEX]);
+                if (aa.length == 10) {
+                    dt1 = aa.substr(6,4)+aa.substr(3,2)+aa.substr(0,2);
+                } else {
+                    yr = aa.substr(6,2);
+                    if (parseInt(yr) < 50) { yr = '20'+yr; } else { yr = '19'+yr; }
+                    dt1 = yr+aa.substr(3,2)+aa.substr(0,2);
+                }
+                if (bb.length == 10) {
+                    dt2 = bb.substr(6,4)+bb.substr(3,2)+bb.substr(0,2);
+                } else {
+                    yr = bb.substr(6,2);
+                    if (parseInt(yr) < 50) { yr = '20'+yr; } else { yr = '19'+yr; }
+                    dt2 = yr+bb.substr(3,2)+bb.substr(0,2);
+                }
+                if (dt1==dt2) return 0;
+                if (dt1<dt2) return -1;
+                return 1;
+            }
 
-	function showPreviousPrints(scriptNo) {
-		popupWindow(720,700,'ShowPreviousPrints.jsp?scriptNo='+scriptNo,'ShowPreviousPrints')
-	}
+            function ts_sort_currency(a,b) {
+                aa = ts_getInnerText(a.cells[SORT_COLUMN_INDEX]).replace(/[^0-9.]/g,'');
+                bb = ts_getInnerText(b.cells[SORT_COLUMN_INDEX]).replace(/[^0-9.]/g,'');
+                return parseFloat(aa) - parseFloat(bb);
+            }
 
+            function ts_sort_numeric(a,b) {
+                aa = parseFloat(ts_getInnerText(a.cells[SORT_COLUMN_INDEX]));
+                if (isNaN(aa)) aa = 0;
+                bb = parseFloat(ts_getInnerText(b.cells[SORT_COLUMN_INDEX]));
+                if (isNaN(bb)) bb = 0;
+                return aa-bb;
+            }
 
-    /*<![CDATA[*/
-    var Lst;
+            function ts_sort_caseinsensitive(a,b) {
+                aa = ts_getInnerText(a.cells[SORT_COLUMN_INDEX]).toLowerCase();
+                bb = ts_getInnerText(b.cells[SORT_COLUMN_INDEX]).toLowerCase();
+                if (aa==bb) return 0;
+                if (aa<bb) return -1;
+                return 1;
+            }
 
-    function CngClass(obj){
-    	document.getElementById("selected_default").removeAttribute("style");
-     if (Lst) Lst.className='';
-     obj.className='selected';
-     Lst=obj;
-    }
+            function ts_sort_default(a,b) {
+                aa = ts_getInnerText(a.cells[SORT_COLUMN_INDEX]);
+                bb = ts_getInnerText(b.cells[SORT_COLUMN_INDEX]);
+                if (aa==bb) return 0;
+                if (aa<bb) return -1;
+                return 1;
+            }
 
-    /*]]>*/
+            function addEvent(elm, evType, fn, useCapture)
+            // addEvent and removeEvent
+            // cross-browser event handling for IE5+,  NS6 and Mozilla
+            // By Scott Andrew
+            {
+                if (elm.addEventListener){
+                    elm.addEventListener(evType, fn, useCapture);
+                    return true;
+                } else if (elm.attachEvent){
+                    var r = elm.attachEvent("on"+evType, fn);
+                    return r;
+                } else {
+                    alert("Handler could not be removed");
+                }
+            }
+            function checkFav(){
+                //oscarLog("****** in checkFav");
+                var usefav='<%=usefav%>';
+                var favid='<%=favid%>';
+                if(usefav=="true" && favid!=null && favid!='null'){
+                    //oscarLog("****** favid "+favid);
+                    useFav2(favid);
+                }else{}
+            }
 
-    function toggleStartDateUnknown(rand) {
-    	var cb = document.getElementById('startDateUnknown_'+rand);
-    	var txt = document.getElementById('rxDate_'+rand);
-    	if(cb.checked) {
-    		<%
-    			java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("yyyy-MM-dd");
-    			String today = formatter.format(new java.util.Date());
-    		%>
-    		txt.disabled=true;
-    		txt.value='<%=today%>';
-    	} else {
-    		txt.disabled=false;
-    	}
-    }
+            //not used , represcribe a drug
+            function represcribeOnLoad(drugId){
+                var data="drugId="+drugId + "&rand=" + Math.floor(Math.random()*10001);
+                var url= "<c:out value="${ctx}"/>" + "/oscarRx/rePrescribe2.do?method=saveReRxDrugIdToStash";
+                new Ajax.Updater('rxText',url, {method:'get',parameters:data,evalScripts:true,insertion: Insertion.Bottom,
+                    onSuccess:function(transport){
+                    }});
 
-    function emptyWrittenDate(rand){
-    	var cb = document.getElementById('pastMed_'+rand);
-    	var txt = document.getElementById('writtenDate_'+rand);
-
-    	if(cb.checked){
-    		txt.value='0001-01-01';
-    		txt.disabled=true;
-    	}else{
-    		txt.disabled=false;
-
-    	}
-
-    }
-
-    //this is a SJHH specific feature
-    function completeMedRec() {
-   	 var ok = confirm("Are you sure you would like to mark the Med Rec as complete?");
-   	 if(ok) {
-   		 var url = "<c:out value="${ctx}"/>" + "/oscarRx/completeMedRec.jsp?demographicNo=<%=bean.getDemographicNo()%>";
-   		 var data;
-   		 new Ajax.Request(url,{method: 'get',parameters:data,onSuccess:function(transport){
-                alert('Completed.')
-            }});
-   	 }
-    }
-       
-</script>
-               
-               <style type="text/css" media="print">
-
-
-
-                   noprint{
-                       display:none;
-                   }
-                   justforprint{
-                       float:left;
-                   }
-               </style>
-
-<style type="text/css">
-<!-- .selected { font: Arial, Verdana; color:#000000; text-decoration: none; } -->
-
-    .ControlPushButton{
-        font-size:10.5px;
-    }
-
-    #verificationLink{
-    	color:white;
-    }
-
-	table.legend{
-        font-size:12px;
-        padding-left:20px;
-
-    }
+            }
 
 
-	table.legend_items td{
-		font-size:12px;
-		text-align:left;
-		height:30px;
-		padding-right:10px;
-	}
+            function moveDrugDown(drugId,swapDrugId,demographicNo) {
+                new Ajax.Request('<c:out value="${ctx}"/>/oscarRx/reorderDrug.do?method=update&direction=down&drugId='+drugId + '&swapDrugId='+swapDrugId+'&demographicNo=' + demographicNo + "&rand="+ Math.floor(Math.random()*10001) , {
+                    method: 'get',
+                    onSuccess: function(transport) {
+                        callReplacementWebService("ListDrugs.jsp",'drugProfile');
+                        resetReRxDrugList();
+                        resetStash();
+                    }
+                });
+            }
+
+            function moveDrugUp(drugId,swapDrugId,demographicNo) {
+                new Ajax.Request('<c:out value="${ctx}"/>/oscarRx/reorderDrug.do?method=update&direction=up&drugId='+drugId  + '&swapDrugId='+swapDrugId+'&demographicNo=' + demographicNo +"&rand=" + Math.floor(Math.random()*10001), {
+                    method: 'get',
+                    onSuccess: function(transport) {
+                        callReplacementWebService("ListDrugs.jsp",'drugProfile');
+                        resetReRxDrugList();
+                        resetStash();
+                    }
+                });
+            }
+
+            function showPreviousPrints(scriptNo) {
+                popupWindow(720,700,'ShowPreviousPrints.jsp?scriptNo='+scriptNo,'ShowPreviousPrints')
+            }
+
+
+            /*<![CDATA[*/
+            var Lst;
+
+            function CngClass(obj){
+                document.getElementById("selected_default").removeAttribute("style");
+                if (Lst) Lst.className='';
+                obj.className='selected';
+                Lst=obj;
+            }
+
+            /*]]>*/
+
+            function toggleStartDateUnknown(rand) {
+                var cb = document.getElementById('startDateUnknown_'+rand);
+                var txt = document.getElementById('rxDate_'+rand);
+                if(cb.checked) {
+                    <%
+                        java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                        String today = formatter.format(new java.util.Date());
+                    %>
+                    txt.disabled=true;
+                    txt.value='<%=today%>';
+                } else {
+                    txt.disabled=false;
+                }
+            }
+
+            function emptyWrittenDate(rand){
+                var cb = document.getElementById('pastMed_'+rand);
+                var txt = document.getElementById('writtenDate_'+rand);
+
+                if(cb.checked){
+                    txt.value='0001-01-01';
+                    txt.disabled=true;
+                }else{
+                    txt.disabled=false;
+
+                }
+
+            }
+
+            //this is a SJHH specific feature
+            function completeMedRec() {
+                var ok = confirm("Are you sure you would like to mark the Med Rec as complete?");
+                if(ok) {
+                    var url = "<c:out value="${ctx}"/>" + "/oscarRx/completeMedRec.jsp?demographicNo=<%=bean.getDemographicNo()%>";
+                    var data;
+                    new Ajax.Request(url,{method: 'get',parameters:data,onSuccess:function(transport){
+                            alert('Completed.')
+                        }});
+                }
+            }
+
+
+        </script>
+
+        <style type="text/css" media="print">
+            noprint {
+                display:none;
+            }
+            justforprint {
+                float: left;
+            }
+        </style>
+
+        <style type="text/css">
+            <!-- .selected { font: Arial, Verdana; color:#000000; text-decoration: none; } -->
+
+
+            #verificationLink{
+                color:white;
+            }
+
+            table.legend{
+                font-size:12px;
+                padding-left:20px;
+
+            }
+
+            table.legend_items td{
+                font-size:12px;
+                text-align:left;
+                height:30px;
+                padding-right:10px;
+            }
+
             .highlight {
                 background-color : #99FFCC;
                 border: 1px solid #008000;
@@ -737,80 +713,110 @@ function checkFav(){
             .matchInactive{
                 background-color: #C0C0C0;
             }
-#myAutoComplete {
-    width:25em; /* set width here or else widget will expand to fit its container */
-    padding-bottom:2em;
-}
 
-body {
-	margin:0;
-	padding:0;
-}
+            #myAutoComplete {
+                width:25em; /* set width here or else widget will expand to fit its container */
+                padding-bottom:2em;
+            }
 
+            body {
+                margin:0;
+                padding:0;
+            }
 
-/*THEMES
+            .currentDrug{
+                font-weight:bold;
+            }
+            .archivedDrug{
+                text-decoration: line-through;
+            }
+            .expireInReference{
+                color:orange;
+                font-weight:bold;
+            }
+            .expiredDrug{
+                color:gray;
+            }
 
-     .currentDrug{
-        color:red;
-     }
-     .archivedDrug{
-        text-decoration: line-through;
-     }
-     .expireInReference{
-         color:orange;
-         font-weight:bold;
-     }
-     .expiredDrug{
+            .longTermMed{
+                font-style:italic;
+            }
 
-     }
+            .discontinued{
+                text-decoration: line-through;
 
-     .longTermMed{
+            }
 
-     }
+            .deleted{
+                text-decoration: line-through;
 
-     .discontinued{
+            }
+            .external {
+                color:purple;
+            }
 
-     }
+            .sortheader{
+                text-decoration: none;
+                color:black;
 
-THEME 2*/
+            }
 
-     .currentDrug{
-        font-weight:bold;
-     }
-     .archivedDrug{
-        text-decoration: line-through;
-     }
-     .expireInReference{
-         color:orange;
-         font-weight:bold;
-     }
-     .expiredDrug{
-         color:gray;
-     }
+            .FlexRow {
+                display: flex;
+                flex-direction:row;
+                flex-wrap: wrap;
+            }
 
-     .longTermMed{
-        font-style:italic;
-     }
+            .FlexRow_Column {
+                display: flex;
+                flex-direction:column;
+                flex-wrap: wrap;
+            }
 
-     .discontinued{
-         text-decoration: line-through;
+            .ControlPushButton {
+                font-size: 0.8em;
+                margin: 2px 0 0 2px;
+                padding: 2px 0 2px 0;
+                text-align: center;
+            }
 
-     }
+            #searchStringLabel, #searchString
+            {
+                float: left;
+                display: block;
+            }
 
-     .deleted{
-         text-decoration: line-through;
+            #searchStringLabel
+            {
+                font-weight:800;
+                font-size:1em;
+            }
 
-     }
-		.external {
-			color:purple;
-		}
+            #searchString {
+                box-sizing: border-box;
+                /* override positioning.  Binding the input to autocomplete assigns the element the yui-ac-input class,
+                which then has relative positioning via an imported css file*/
+                position: static; !important
+                height: 30px;
+                padding: 0 6px;
+                line-height:30px;
+            }
 
-     .sortheader{
-         text-decoration: none;
-         color:black;
+            #buttonControls_left
+            {
+                float:left;
+                width: 40%;
+                padding: 5px 10px 0 5px;
+            }
 
-     }
-</style>
+            #buttonControls_right
+            {
+                width: 400px;
+                padding: 5px 10px 10px 5px;
+                float:right;
+            }
+
+        </style>
 
 <!--[if IE]>
 <style type="text/css">
@@ -852,48 +858,47 @@ THEME 2*/
                                     <div id="rxText" style="float:left;"></div><br style="clear:left;">
                                     <input type="hidden" id="deleteOnCloseRxBox" value="false">
 
-                                    <html:hidden property="demographicNo" value="<%=new Integer(patient.getDemographicNo()).toString()%>" />
-                                    <table border="0">
-                                        <tr valign="top">
-                                            <td style="width:320px;"><bean:message key="SearchDrug.drugSearchTextBox"  />
-                                                <html:text styleId="searchString" property="searchString" onfocus="changeContainerHeight();" onblur="changeContainerHeight();" onclick="changeContainerHeight();" onkeydown="changeContainerHeight();" style="width:248px;\" autocomplete=\"off"  />
-                                                <div id="autocomplete_choices" style="overflow:auto;width:600px"></div>
-                                                <span id="indicator1" style="display: none"> <!--img src="/images/spinner.gif" alt="Working..." --></span>
-                                            </td>
-                                            <td>
-                                                <input type="button" name="search" class="ControlPushButton" style="width:48px" value="<bean:message key="SearchDrug.msgSearch"/>" onclick="popupRxSearchWindow();" title="<bean:message key="SearchDrug.help.Search"/>">
-                                                <input id="customDrug" type="button" class="ControlPushButton" style="width:86px" onclick="customWarning2();" value="<bean:message key="SearchDrug.msgCustomDrugRx3"/>" title="<bean:message key="SearchDrug.help.CustomDrug"/>" />
-                                                <input id="customNote" type="button" class="ControlPushButton" style="width:40px"   onclick="customNoteWarning();" value="<bean:message key="SearchDrug.msgNoteRx3"/>" title="<bean:message key="SearchDrug.help.CustomNote"/>"/>
-                                                <input id="reset" type="button" class="ControlPushButton" style="width:42px" title="Clear pending prescriptions"   onclick="resetStash();" value="<bean:message key="SearchDrug.msgResetPrescriptionRx3"/>"/>
-                                                <% if(!OscarProperties.getInstance().getProperty("rx.drugofchoice.hide","false").equals("true")) { %>
-                                                <input type="button" class="ControlPushButton" style="width:92px" onclick="callTreatments('searchString','treatmentsMyD')" value="<bean:message key="SearchDrug.msgDrugOfChoiceRx3"/>" title="<bean:message key="SearchDrug.help.DrugOfChoice"/>"/>
-                                                <%} %>
-                                                <%if (OscarProperties.getInstance().hasProperty("ONTARIO_MD_INCOMINGREQUESTOR")) {%>
-                                                <a href="javascript:goOMD();" title="<bean:message key="SearchDrug.help.OMD"/>"><bean:message key="SearchDrug.msgOMDLookup"/></a>
-                                                <%}%>
-                                                <br>
+                                    <html:hidden property="demographicNo" value="<%=Integer.toString(patient.getDemographicNo())%>" />
+                                    <div class="FlexRow">
+                                        <div id="buttonControls_left">
+                                            <div id="searchStringLabel">
+                                                <bean:message key="SearchDrug.drugSearchTextBox"/>
+                                            </div>
+                                            <html:text styleId="searchString" property="searchString" onfocus="changeContainerHeight();" onblur="changeContainerHeight();" onclick="changeContainerHeight();" onkeydown="changeContainerHeight();" style="\" autocomplete=\"off"  />
+                                            <div id="autocomplete_choices" style="overflow:auto; width:600px"></div>
+                                            <span id="indicator1" style="display: none"> <!--img src="/images/spinner.gif" alt="Working..." --></span>
+                                        </div>
+                                        <div id="buttonControls_right" class="FlexRow_Column">
+                                            <div>
+                                                <input type="button" name="search" class="ControlPushButton" value="<bean:message key="SearchDrug.msgSearch"/>" onclick="popupRxSearchWindow();" title="<bean:message key="SearchDrug.help.Search"/>">
+                                                <input id="reset" type="button" class="ControlPushButton" title="Clear pending prescriptions" onclick="resetStash();" value="<bean:message key="SearchDrug.msgResetPrescriptionRx3"/>"/>
+                                                <input id="customDrug" type="button" class="ControlPushButton" onclick="customWarning2();" value="<bean:message key="SearchDrug.msgCustomDrugRx3"/>" title="<bean:message key="SearchDrug.help.CustomDrug"/>" />
+                                                <% if (!OscarProperties.getInstance().getProperty("rx.drugofchoice.hide","false").equals("true")) { %>
+                                                <input type="button" class="ControlPushButton" style="display: inline-block" onclick="callTreatments('searchString','treatmentsMyD')" value="<bean:message key="SearchDrug.msgDrugOfChoiceRx3"/>" title="<bean:message key="SearchDrug.help.DrugOfChoice"/>"/>
+                                                <% } %>
+                                                <% if (OscarProperties.getInstance().getProperty("oscarrx.medrec","false").equals("true")) { %>
+                                                <input id="completeMedRecButton" type="button" class="ControlPushButton" style="display: inline-block" onclick="completeMedRec();" value="Complete Med Rec" />
+                                                <% } %>
+                                                <input id="customNote" type="button" class="ControlPushButton" onclick="customNoteWarning();" value="<bean:message key="SearchDrug.msgNoteRx3"/>" title="<bean:message key="SearchDrug.help.CustomNote"/>"/>
+                                            </div>
+                                            <div>
+                                                <!-- Rx save controls -->
                                                 <security:oscarSec roleName="<%=roleName2$%>" objectName="_rx" rights="x">
-                                                <input id="saveButton" type="button"  class="ControlPushButton" onclick="updateSaveAllDrugsPrint();" value="<bean:message key="SearchDrug.msgSaveAndPrint"/>" title="<bean:message key="SearchDrug.help.SaveAndPrint"/>" />
+                                                    <input id="saveButton" type="button" class="ControlPushButton" onclick="updateSaveAllDrugsPrintContinue();" value="<bean:message key="SearchDrug.msgSaveAndPrint"/>" title="<bean:message key="SearchDrug.help.SaveAndPrint"/>" />
                                                 </security:oscarSec>
-
-                                                <input id="saveOnlyButton" type="button"  class="ControlPushButton" onclick="updateSaveAllDrugs();" value="<bean:message key="SearchDrug.msgSaveOnly"/>" title="<bean:message key="SearchDrug.help.Save"/>"/>
-												<%
-                                                    	if(OscarProperties.getInstance().getProperty("oscarrx.medrec","false").equals("true")) {
-                                                %>
-                                                    <input id="completeMedRecButton" type="button"  onclick="completeMedRec();" value="Complete Med Rec" />
+                                                <input id="saveOnlyButton" type="button" class="ControlPushButton" onclick="updateSaveAllDrugsContinue();" value="<bean:message key="SearchDrug.msgSaveOnly"/>" title="<bean:message key="SearchDrug.help.Save"/>"/>
+                                            </div>
+                                            <div>
+                                                <!-- optional links -->
+                                                <% if (OscarProperties.getInstance().hasProperty("ONTARIO_MD_INCOMINGREQUESTOR")) { %>
+                                                <a href="javascript:goOMD();" title="<bean:message key="SearchDrug.help.OMD"/>" style="display: inline-block"><bean:message key="SearchDrug.msgOMDLookup"/></a>
                                                 <% } %>
-                                                
-                                                <% if(eRxEnabled) { %>
-													<a href="<%=eRx_SSO_URL%>User=<%=eRxUsername%>&Password=<%=eRxPassword%>&Clinic=<%=eRxFacility%>&PatientIdPMIS=<%=patient.getDemographicNo()%>&IsTraining=<%=eRxTrainingMode%>"><bean:message key="SearchDrug.eRx.msgExternalPrescriber"/></a>
+                                                <% if (eRxEnabled) { %>
+                                                <a href="<%=eRx_SSO_URL%>User=<%=eRxUsername%>&Password=<%=eRxPassword%>&Clinic=<%=eRxFacility%>&PatientIdPMIS=<%=patient.getDemographicNo()%>&IsTraining=<%=eRxTrainingMode%>" style="display: inline-block; padding-left:10px"><bean:message key="SearchDrug.eRx.msgExternalPrescriber"/></a>
                                                 <% } %>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="3">
-                                                <%-- input type="button" class="ControlPushButton" onclick="customWarning();" value="<bean:message key="SearchDrug.msgCustomDrug"/>" / --%>
-                                            </td>
-                                        </tr>
-                                    </table>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </html:form>
                                 <div id="previewForm" style="display:none;"></div>
                                 <%} %>
@@ -913,7 +918,7 @@ THEME 2*/
 													<%if(securityManager.hasWriteAccess("_rx",roleName2$,true)) {%>
                                                     <a href="#" onclick="$('reprint').toggle();return false;"><bean:message key="SearchDrug.Reprint"/></a>
                                                     &nbsp;
-                                                    <a href="javascript:void(0);"name="cmdRePrescribe"  onclick="javascript:RePrescribeLongTerm();" style="width: 200px" ><bean:message key="SearchDrug.msgReprescribeLongTermMed"/></a>
+                                                    <a href="javascript:void(0);"name="cmdRePrescribe"  onclick="javascript:RePrescribeLongTerm(false);" style="width: 200px" ><bean:message key="SearchDrug.msgReprescribeLongTermMed"/></a>
                                                     &nbsp;
 													<% } %>
                                                     <a href="javascript:popupWindow(720,920,'chartDrugProfile.jsp?demographic_no=<%=demoNo%>','PrintDrugProfile2')">Timeline Drug Profile</a>
@@ -1292,16 +1297,16 @@ function changeLt(drugId){
         var url=window.location.href;
         var match=url.indexOf('ltm=true');
         if(match>-1){
-            RePrescribeLongTerm();
+            RePrescribeLongTerm(true);
         }
     }
     function changeContainerHeight(ele){
         var ss=$('searchString').value;
         ss=trim(ss);
-        if(ss.length==0)
-            $('autocomplete_choices').setStyle({height:'0%'});
+        if(ss.length === 0)
+            $('autocomplete_choices').setStyle({height:'0vh'});
         else
-            $('autocomplete_choices').setStyle({height:'100%'});
+            $('autocomplete_choices').setStyle({height:'75vh'});
     }
     function addInstruction(content,randomId){
         $('instructions_'+randomId).value=content;
@@ -1438,7 +1443,7 @@ function changeLt(drugId){
             + '\n  *  Drug Allergy Information'
             + '\n  *  Drug-Drug Interaction Information'
             + '\n  *  Drug Information'
-            + '\n\nAre you sure you wish to use this feature?')==true) {
+            + '\n\nAre you sure you wish to use this feature?')) {
 
             //call another function to bring up prescribe.jsp
             var url="<c:out value="${ctx}"/>"+ "/oscarRx/WriteScript.do?parameterValue=normalDrugSetCustom";
@@ -1672,15 +1677,28 @@ function changeLt(drugId){
                                         }});
                             }});
     }
-//represcribe long term meds
-    function RePrescribeLongTerm(){
-       var demoNo='<%=patient.getDemographicNo()%>';
-        var data="demoNo="+demoNo+"&showall=<%=showall%>&rand=" +  Math.floor(Math.random()*10001);
-        var url= "<c:out value="${ctx}"/>" + "/oscarRx/rePrescribe2.do?method=repcbAllLongTerm";
-        new Ajax.Updater('rxText',url, {method:'get',parameters:data,asynchronous:true,insertion: Insertion.Bottom,onSuccess:function(transport){
-                            updateCurrentInteractions();
-            }});
-        return false;
+
+    function RePrescribeLongTerm (shouldReRxExpiredMeds) {
+
+        var rand = Math.floor(Math.random()*10001),
+
+            updateReRxURL = '<c:out value="${ctx}"/>' + '/oscarRx/rePrescribe2.do?method=repcbAllLongTerm',
+            updateReRxData = 'demoNo=<%=patient.getDemographicNo()%>&showall=<%=showall%>&rand=' + rand;
+
+        if (shouldReRxExpiredMeds)
+        {
+            updateReRxData += "&reRxExpiredLTM=<%=request.getParameter("reRxExpiredLTM") != null ? request.getParameter("reRxExpiredLTM") : "false"%>";
+        }
+
+        new Ajax.Updater('rxText', updateReRxURL,
+            {
+                method:'get',
+                parameters: updateReRxData,
+                insertion: Insertion.Bottom,
+                onSuccess: function() {
+                    updateCurrentInteractions();
+                }
+            });
     }
 
 function customNoteWarning(){
@@ -1691,7 +1709,7 @@ function customNoteWarning(){
 	+ '\n  *  Drug Allergy Information'
 	+ '\n  *  Drug-Drug Interaction Information'
 	+ '\n  *  Drug Information'
-	+ '\n\nAre you sure you wish to use this feature?')==true) {
+	+ '\n\nAre you sure you wish to use this feature?')) {
         var randomId=Math.round(Math.random()*1000000);
         var url="<c:out value="${ctx}"/>"+ "/oscarRx/WriteScript.do?parameterValue=newCustomNote";
         var data="randomId="+randomId;
@@ -1706,7 +1724,7 @@ function customWarning2(){
 	+ '\n  *  Drug Allergy Information'
 	+ '\n  *  Drug-Drug Interaction Information'
 	+ '\n  *  Drug Information'
-	+ '\n\nAre you sure you wish to use this feature?')==true) {
+	+ '\n\nAre you sure you wish to use this feature?')) {
 	//call another function to bring up prescribe.jsp
         var randomId=Math.round(Math.random()*1000000);
 		var searchString = $("searchString").value;
@@ -2264,16 +2282,6 @@ function updateQty(element){
         return x;
     }
 
-    
-    
-	<%
-		ArrayList<Object> args = new ArrayList<Object>();
-		args.add(String.valueOf(bean.getDemographicNo()));
-		args.add(bean.getProviderNo());
-				
-		Study myMeds = StudyFactory.getFactoryInstance().makeStudy(Study.MYMEDS, args);
-		out.write(myMeds.printInitcode());			
-	%>
     /*
      * validate instruction text value for non-empty values
      */
@@ -2305,7 +2313,6 @@ function updateQty(element){
         new Ajax.Request(url,
         {method: 'post',postBody:data,asynchronous:false,
             onSuccess:function(transport){
-            	
                 callReplacementWebService("ListDrugs.jsp",'drugProfile');
                 popForm2(null);
                 resetReRxDrugList();
@@ -2331,16 +2338,12 @@ function updateQty(element){
         return false;
     }
 
-function checkEnterSendRx(){
+    function checkEnterSendRx() {
         popupRxSearchWindow();
         return false;
-}
-
-
+    }
 
 $("searchString").focus();
-
-
 
 </script>
 

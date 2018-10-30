@@ -51,7 +51,8 @@ public class FrmBCAR2007Record extends FrmRecord {
             if (demo != null) {
                 java.util.Date date = UtilDateUtilities.calcDate(demo.getYearOfBirth(), demo.getMonthOfBirth(), demo.getDateOfBirth());
                 setDemoProperties(loggedInInfo, demographicNo, props);
-               
+
+                props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(), dateFormat));
                 props.setProperty("pg1_formDate", UtilDateUtilities.DateToString(new Date(), _dateFormat));
                 props.setProperty("pg2_formDate", UtilDateUtilities.DateToString(new Date(), _dateFormat));
                 props.setProperty("pg3_formDate", UtilDateUtilities.DateToString(new Date(), _dateFormat));

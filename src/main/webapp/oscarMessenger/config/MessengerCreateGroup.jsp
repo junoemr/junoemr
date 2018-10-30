@@ -79,7 +79,7 @@ function BackToOscar()
 	<tr>
 		<td width="10%" height="37" bgcolor="#000000">&nbsp;</td>
 		<td width="100%" bgcolor="#000000"
-			style="border-left: 2px solid #A9A9A9; padding-left: 5" height="0%">
+			style="border-left: 2px solid #A9A9A9; padding-left: 5px;" height="0%">
 		<p class="ScreenTitle"><bean:message key="application.title.admin" /></p>
 		</td>
 	</tr>
@@ -167,7 +167,7 @@ function BackToOscar()
 		<td width="100%" height="0%" colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
-		<td width="100%" height="0%" style="padding: 5" bgcolor="#DCDCDC"
+		<td width="100%" height="0%" style="padding: 5px;" bgcolor="#DCDCDC"
 			colspan="2"></td>
 	</tr>
 </table>
