@@ -31,7 +31,6 @@ import javax.persistence.Query;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.Billing;
 import org.oscarehr.util.DateRange;
-import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
 import oscar.entities.Billingmaster;
