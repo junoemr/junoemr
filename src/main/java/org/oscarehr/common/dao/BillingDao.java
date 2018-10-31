@@ -31,6 +31,7 @@ import javax.persistence.Query;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.Billing;
 import org.oscarehr.util.DateRange;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
 import oscar.entities.Billingmaster;
@@ -441,10 +442,12 @@ public class BillingDao extends AbstractDao<Billing> {
 		return results;
 	}
 
-	public List<Billing> findByProviderStatusForTeleplanFileWriter(String hin) {
-		Query query = createQuery("bs", "bs.providerOhipNo = :hin and (bs.status = 'O' or bs.status = 'W') and bs.billingtype != 'Pri'");
-		query.setParameter("hin", hin);
-		return query.getResultList();
+	public List<Billing> findByProviderStatusForTeleplanFileWriter(String providerInsNo) {
+		Query query = entityManager.createQuery("SELECT b FROM Billing b, Billingmaster bm WHERE b.id = bm.billingNo AND b.providerOhipNo = :providerInsNo AND (b.status = 'O' OR b.status = 'W') AND b.billingtype <> 'Pri' AND bm.billingstatus NOT IN ('S', 'D')");
+		query.setParameter("providerInsNo", providerInsNo);
+		List<Billing> results = query.getResultList();
+
+		return results;
     }
 	
 	
