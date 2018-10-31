@@ -147,6 +147,7 @@ public class DocumentUploadAction extends DispatchAction
 		responseMap.put("size", docFile.getFileSize());
 
 		Integer programId = null;
+
 		// if the document was added in the context of a program
 		ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);

@@ -60,7 +60,7 @@ public class GenericFile
 	public static final String BASE_DIRECTORY = props.getProperty("BASE_DOCUMENT_DIR");
 
 	public static final String DOCUMENT_BASE_DIR = props.getProperty("DOCUMENT_DIR");
-	public static final String DOCUMENT_NEW_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("DOCUMENT_NEW_DIR")).getPath();
+	public static final String DOCUMENT_ORIGINAL_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("DOCUMENT_ORIGINAL_DIR")).getPath();
 	public static final String DOCUMENT_CORRUPT_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("DOCUMENT_CORRUPT_DIR")).getPath();
 	public static final String OUTBOUND_FAX_DIR_PENDING = props.getProperty("fax_file_location");
 	public static final String OUTBOUND_FAX_DIR_SENT = new File(OUTBOUND_FAX_DIR_PENDING, "sent").getPath();
@@ -92,7 +92,6 @@ public class GenericFile
 	{
 		return moveFile(DOCUMENT_CORRUPT_DIR);
 	}
-
 	public boolean moveToOutgoingFaxPending() throws IOException
 	{
 		return moveFile(OUTBOUND_FAX_DIR_PENDING);
@@ -104,6 +103,10 @@ public class GenericFile
 	public boolean moveToOutgoingFaxUnsent() throws IOException
 	{
 		return moveFile(OUTBOUND_FAX_DIR_UNSENT);
+	}
+	public boolean moveToOriginal() throws IOException
+	{
+		return moveFile(DOCUMENT_ORIGINAL_DIR);
 	}
 
 	public boolean moveFile(String directory) throws IOException
@@ -180,9 +183,8 @@ public class GenericFile
 		this.isValid = true;
 		return true;
 	}
-	public void reEncode() throws IOException, InterruptedException
+	public void process() throws IOException, InterruptedException
 	{
-		throw new RuntimeException("Not Implemented");
 	}
 
 	public boolean isValid()
@@ -210,7 +212,7 @@ public class GenericFile
 	{
 		return GenericFile.getContentType(javaFile);
 	}
-	public int getPageCount()
+	public int getPageCount() throws IOException
 	{
 		return 0;
 	}
