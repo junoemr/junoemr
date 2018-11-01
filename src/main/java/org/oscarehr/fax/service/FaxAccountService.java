@@ -25,7 +25,6 @@ package org.oscarehr.fax.service;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.fax.dao.FaxOutboundDao;
-import org.oscarehr.fax.exception.FaxApiException;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.result.GetFaxStatusResult;
 import org.oscarehr.fax.externalApi.srfax.result.GetUsageResult;
@@ -42,7 +41,9 @@ import oscar.util.ConversionUtils;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This service should be responsible for handling all logic around fax setup and configuration
@@ -97,25 +98,38 @@ public class FaxAccountService
 		List<String> referenceIdList = new ArrayList<>(outboundList.size());
 		for(FaxOutbound faxOutbound : outboundList)
 		{
-			if(faxOutbound.getStatus() == FaxOutbound.Status.SENT)
+			// if there is an expected api result, add the additional info to the transfer object
+			// only do this if the account info has not changed, or the api call will fail
+			if(FaxOutbound.Status.SENT.equals(faxOutbound.getStatus())
+					&& faxAccount.getLoginId().equals(faxOutbound.getExternalAccountId())
+					&& faxAccount.getIntegrationType().equals(faxOutbound.getExternalAccountType()))
 			{
 				referenceIdList.add(String.valueOf(faxOutbound.getExternalReferenceId()));
 			}
 		}
 
-		// ask srfax for information on the outbound faxes that were successfully sent to srfax
-		List<GetFaxStatusResult> statusResultList = new ArrayList<>(0);
+		Map<String, GetFaxStatusResult> statusResultMap = new HashMap<>(referenceIdList.size());
 		if(!referenceIdList.isEmpty())
 		{
+			// ask srfax for information on the outbound faxes that were successfully sent to srfax
 			ListWrapper<GetFaxStatusResult> resultList = apiConnector.Get_MultiFaxStatus(referenceIdList, SRFaxApiConnector.RESPONSE_FORMAT_JSON);
-			logger.info(resultList);
-			logger.info(resultList.getResult());
+			logger.debug(resultList);
 
-			if(!resultList.isSuccess())
+			// if the api response is a success, map the results
+			if(resultList.isSuccess())
 			{
-				throw new FaxApiException("Fax API Error:" + resultList.getError());
+				for(GetFaxStatusResult result : resultList.getResult())
+				{
+					// need to parse the filename property for the referenceId in the returned data
+					String filename = result.getFileName();
+					String referenceId = filename.split("\\|")[1];
+					statusResultMap.put(referenceId, result);
+				}
 			}
-			statusResultList = resultList.getResult();
+			else
+			{
+				logger.warn("SRFAX API Connection Failure: " + resultList.getError());
+			}
 		}
 
 		// merge the local outbound fax results with the results from srfax into transfer objects
@@ -128,22 +142,20 @@ public class FaxAccountService
 			transfer.setProviderNo(faxOutbound.getProviderNo());
 			transfer.setDemographicNo(faxOutbound.getDemographicNo());
 			transfer.setSystemStatus(String.valueOf(faxOutbound.getStatus()));
-			transfer.setSystemDateSent(ConversionUtils.toDateString(faxOutbound.getCreatedAt()));
+			transfer.setSystemDateSent(ConversionUtils.toTimestampString(faxOutbound.getCreatedAt()));
 			transfer.setToFaxNumber(faxOutbound.getSentTo());
 			transfer.setFileType(faxOutbound.getFileType().name());
 
-			// if there is a api result, add the additional info to the transfer object
-			// only do this if the account info has not changed, or the api will reject it
-			if(FaxOutbound.Status.SENT.equals(faxOutbound.getStatus())
-					&& faxAccount.getLoginId().equals(faxOutbound.getExternalAccountId())
-					&& faxAccount.getIntegrationType().equals(faxOutbound.getExternalAccountType()))
+			// add the data from srfax on relevant objects
+			if(FaxOutbound.Status.SENT.equals(faxOutbound.getStatus()))
 			{
-				int index = referenceIdList.indexOf(String.valueOf(faxOutbound.getExternalReferenceId()));
-				GetFaxStatusResult apiResult = statusResultList.get(index);
-
-				transfer.setIntegrationDateQueued(apiResult.getDateQueued());
-				transfer.setIntegrationDateSent(apiResult.getDateSent());
-				transfer.setIntegrationStatus(apiResult.getSentStatus());
+				GetFaxStatusResult apiResult = statusResultMap.get(String.valueOf(faxOutbound.getExternalReferenceId()));
+				if(apiResult != null)
+				{
+					transfer.setIntegrationDateQueued(apiResult.getDateQueued());
+					transfer.setIntegrationDateSent(apiResult.getDateSent());
+					transfer.setIntegrationStatus(apiResult.getSentStatus());
+				}
 			}
 			transferList.add(transfer);
 		}

@@ -59,6 +59,8 @@
 			        ng-model="faxOutboxController.selectedFaxAccount"
 			        ng-options="faxAccount.displayName for faxAccount in faxOutboxController.faxAccountList">
 			</select>
+			<button type="button" class="btn btn-primary"
+			        ng-click="faxOutboxController.loadOutboxItems();">Search</button>
 		</div>
 
 		<table ng-table="faxOutboxController.tableParams" show-filter="false" class="table table-striped table-bordered">

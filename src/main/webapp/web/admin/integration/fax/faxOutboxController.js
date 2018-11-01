@@ -29,7 +29,6 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxOut
 					if(controller.faxAccountList.length > 0)
 					{
 						controller.selectedFaxAccount = controller.faxAccountList[0];
-						controller.loadOutboxItems();
 					}
 				},
 				function error(error)

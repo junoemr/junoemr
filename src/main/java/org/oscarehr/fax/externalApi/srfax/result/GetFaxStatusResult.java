@@ -24,6 +24,7 @@ package org.oscarehr.fax.externalApi.srfax.result;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GetFaxStatusResult
@@ -160,5 +161,11 @@ public class GetFaxStatusResult
 	public void setAccountCode(String accountCode)
 	{
 		this.accountCode = accountCode;
+	}
+
+	@Override
+	public String toString()
+	{
+		return new ReflectionToStringBuilder(this).toString();
 	}
 }
