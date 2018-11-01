@@ -1,4 +1,4 @@
-angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxOutboxController', [
+angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSendReceiveController', [
 	'NgTableParams',
 	"faxAccountService",
 	function (NgTableParams,

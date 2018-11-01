@@ -56,16 +56,16 @@
 		<div class="flex-row">
 			<label class="flex-row-label" for="input-fax-outbox-select-account">Account</label>
 			<select class="flex-row-content" id="input-fax-outbox-select-account"
-			        ng-model="faxOutboxController.selectedFaxAccount"
-			        ng-options="faxAccount.displayName for faxAccount in faxOutboxController.faxAccountList">
+			        ng-model="faxSendReceiveController.selectedFaxAccount"
+			        ng-options="faxAccount.displayName for faxAccount in faxSendReceiveController.faxAccountList">
 			</select>
 			<button type="button" class="btn btn-primary"
-			        ng-click="faxOutboxController.loadOutboxItems();">Search</button>
+			        ng-click="faxSendReceiveController.loadOutboxItems();">Search</button>
 		</div>
 
-		<table ng-table="faxOutboxController.tableParams" show-filter="false" class="table table-striped table-bordered">
+		<table ng-table="faxSendReceiveController.tableParams" show-filter="false" class="table table-striped table-bordered">
 			<tbody>
-				<tr ng-repeat="item in faxOutboxController.outboxItemList">
+				<tr ng-repeat="item in faxSendReceiveController.outboxItemList">
 					<td data-title="'Date Sent'"    sortable="'DateSent'">{{item.systemDateSent}}</td>
 					<td data-title="'Sent By'"      sortable="'SentBy'">{{item.providerNo}}</td>
 					<td data-title="'Fax Type'"     sortable="'FaxType'">{{item.fileType}}</td>
