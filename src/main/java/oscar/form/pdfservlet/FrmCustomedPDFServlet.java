@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.exception.FaxNumberException;
+import org.oscarehr.fax.exception.NoRollbackException;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.LoggedInInfo;
@@ -51,6 +52,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.HashSet;
@@ -98,7 +100,7 @@ public class FrmCustomedPDFServlet extends HttpServlet
 					fileToFax.rename(pdfFile);
 					outgoingFaxService.sendFax(providerNo, demographicNo, recipient, FaxOutbound.FileType.FORM, fileToFax);
 				}
-				LogAction.addLogEntry(providerNo, demographicNo, LogConst.SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
+				LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
 						pdfId, req.getRemoteAddr(), "Prescription " + pdfId);
 
 				writer.println("<script>alert('Fax sent to: " + pharmacyName + " (" + pharmacyFaxNo + ")');window.close();</script>");
@@ -153,7 +155,7 @@ public class FrmCustomedPDFServlet extends HttpServlet
 			PrintWriter writer = res.getWriter();
 			writer.println("<script>alert('Signature not found. Please sign the prescription.');</script>");
 		}
-		catch(FaxNumberException e)
+		catch(IOException | NoRollbackException | FaxNumberException e)
 	    {
 		    res.setContentType("text/html");
 		    PrintWriter writer = res.getWriter();

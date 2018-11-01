@@ -35,6 +35,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.oscarehr.fax.exception.FaxApiException;
 import org.oscarehr.fax.externalApi.srfax.result.GetFaxInboxResult;
 import org.oscarehr.fax.externalApi.srfax.result.GetFaxOutboxResult;
 import org.oscarehr.fax.externalApi.srfax.result.GetFaxStatusResult;
@@ -655,7 +656,7 @@ public class SRFaxApiConnector
 			}
 			if(error.length() > 0)
 			{
-				throw new RuntimeException(error);
+				throw new FaxApiException(error);
 			}
 		}
 	}

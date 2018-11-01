@@ -103,6 +103,26 @@ public class FileFactory
 	}
 
 	/**
+	 * load an existing pending fax file with the given name
+	 * @param fileName - name of the file to load
+	 * @return - the file, or null if no file exists with the given filename
+	 */
+	public static GenericFile getOutboundPendingFaxFile(String fileName) throws IOException
+	{
+		return getExistingFile(GenericFile.OUTBOUND_FAX_DIR_PENDING, fileName);
+	}
+
+	/**
+	 * load an existing unsent fax file with the given name
+	 * @param fileName - name of the file to load
+	 * @return - the file, or null if no file exists with the given filename
+	 */
+	public static GenericFile getOutboundUnsentFaxFile(String fileName) throws IOException
+	{
+		return getExistingFile(GenericFile.OUTBOUND_FAX_DIR_UNSENT, fileName);
+	}
+
+	/**
 	 * Copy the given file to a new file.
 	 * This will be placed in the tempfile location, and should be moved afterwards
 	 * @param fileToCopy - the file to be copied

@@ -54,6 +54,7 @@ public class FaxOutbound extends AbstractModel<Long>
 	public enum Status
 	{
 		ERROR,
+		QUEUED,
 		SENT
 	}
 

@@ -128,7 +128,7 @@ public class SendFaxPDFAction extends DispatchAction {
 							programNo, faxNo, Long.valueOf(docNo));
 					}
 				}
-				LogAction.addLogEntry(providerNo, demographicId, LogConst.SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
+				LogAction.addLogEntry(providerNo, demographicId, LogConst.ACTION_SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
 						docNo, request.getRemoteAddr(), "Document " + docNo);
 			}
 			if (errorList.size() != 0)

@@ -224,7 +224,7 @@ public class EctConsultationFormFaxAction extends Action
 					fileToFax.rename(tempName);
 					outgoingFaxService.sendFax(providerNo, Integer.parseInt(demoNo), faxNo, FaxOutbound.FileType.CONSULTATION, fileToFax);
 				}
-				LogAction.addLogEntry(providerNo, Integer.parseInt(demoNo), LogConst.SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
+				LogAction.addLogEntry(providerNo, Integer.parseInt(demoNo), LogConst.ACTION_SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
 						reqId, loggedInInfo.getIp(), "CONSULT " + reqId);
 				request.setAttribute("faxSuccessful", true);
 			}
@@ -252,6 +252,11 @@ public class EctConsultationFormFaxAction extends Action
 		{
 			error = "IOException";
 			exception = ioe;
+		}
+		catch(Exception e)
+		{
+			error = "Exception";
+			exception = e;
 		}
 		finally
 		{
