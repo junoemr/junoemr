@@ -83,7 +83,7 @@ public class Utilities {
 				if(!line.substring(0, 3).equals("MSH") && skipMessage)
 					continue;
 				if (line.substring(0, 3).equals("MSH")){
-					if(line.contains("ORU"))
+					if(line.contains("ORU") || line.contains("ORM^002"))
 					{
 						skipMessage = false;
 					}

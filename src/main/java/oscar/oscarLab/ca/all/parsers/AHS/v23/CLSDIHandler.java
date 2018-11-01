@@ -41,8 +41,10 @@ import org.oscarehr.util.SpringUtils;
 public class CLSDIHandler extends CLSHandler {
 
 	private static Logger logger = Logger.getLogger(CLSDIHandler.class);
-
 	private static Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
+
+	protected static final String CLSDI_SENDING_APPLICATION = "OPEN ENGINE";
+	protected static final String CLSDI_SENDING_FACILITY = "DI";
 
 	public static boolean handlerTypeMatch(Message message)
 	{
@@ -55,8 +57,8 @@ public class CLSDIHandler extends CLSHandler {
 			String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
 
-			return "OPEN ENGINE".equalsIgnoreCase(sendingApplication) &&
-					"DI".equalsIgnoreCase(sendingFacility);
+			return CLSDI_SENDING_APPLICATION.equalsIgnoreCase(sendingApplication) &&
+					CLSDI_SENDING_FACILITY.equalsIgnoreCase(sendingFacility);
 		}
 		return false;
 	}
@@ -96,8 +98,7 @@ public class CLSDIHandler extends CLSHandler {
 	@Override
 	public String getServiceDate() {
 		try {
-			//String serviceDate = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getORC().getOrderEffectiveDateTime().getTimeOfAnEvent().getValue());
-			String serviceDate = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getObservationEndDateTime().getTimeOfAnEvent().getValue());
+			String serviceDate = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getObr8_ObservationEndDateTime().getTimeOfAnEvent().getValue());
 			return (formatDateTime(serviceDate));
 		}
 		catch (Exception e) {
@@ -109,7 +110,6 @@ public class CLSDIHandler extends CLSHandler {
 	public String getOBXResultStatus(int i, int j) {
 		String status = "";
 		try {
-			//status = getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservResultStatus().getValue());
 			status = getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getResultStatus().getValue());
 			if (status.equalsIgnoreCase("C")) {
 				status = "Corrected";
