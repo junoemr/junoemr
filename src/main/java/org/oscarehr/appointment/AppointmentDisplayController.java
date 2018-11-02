@@ -419,17 +419,43 @@ public class AppointmentDisplayController
 			referralNoParameter = "&referral_no_1=" + rdohip;
 		}
 
-		ProviderPreference preference = providerPreferenceDao.find(demographic.getProviderNo());
-		if (preference == null)
+		ProviderPreference mrpPreference = providerPreferenceDao.find(demographic.getProviderNo());
+		ProviderPreference currentUserPreference = providerPreferenceDao.find(sessionProviderNo);
+		String mrpPreferredView = null;
+		String currentUserPreferredView = null;
+
+		if (mrpPreference != null)
 		{
-			preference = providerPreferenceDao.find(sessionProviderNo);
+			mrpPreferredView = mrpPreference.getDefaultServiceType();
 		}
-		if(preference != null)
+
+		if (currentUserPreference != null){
+			currentUserPreferredView = currentUserPreference.getDefaultServiceType();
+		}
+
+		if (mrpPreferredView != null)
 		{
-			String preferredView = preference.getDefaultServiceType();
-			if(preferredView != null && !preferredView.equals("no"))
+			if (!mrpPreferredView.equals("no"))
 			{
-				defaultView = preferredView;
+				defaultView = mrpPreferredView;
+			} else
+			{
+				if (currentUserPreferredView != null)
+				{
+					if (!currentUserPreferredView.equals("no"))
+					{
+						defaultView = currentUserPreferredView;
+					}
+				}
+			}
+		} else
+		{
+			if (currentUserPreferredView != null)
+			{
+				if (!currentUserPreferredView.equals("no"))
+				{
+					defaultView = currentUserPreferredView;
+				}
 			}
 		}
 
