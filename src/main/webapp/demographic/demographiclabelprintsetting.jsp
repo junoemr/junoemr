@@ -40,21 +40,22 @@
 %>
 
 
-<%@ page import="java.util.*, java.sql.*, java.net.*, oscar.*" errorPage="../appointment/errorpage.jsp"%>
-
-<%@page import="org.oscarehr.util.SpringUtils" %>
-
-<%@page import="org.oscarehr.common.model.Demographic" %>
-<%@page import="org.oscarehr.common.dao.DemographicDao" %>
-<%@ page import="org.oscarehr.provider.model.ProviderData"%>
+<%@ page import="org.oscarehr.common.dao.DemographicDao"%>
+<%@ page import="org.oscarehr.common.model.Demographic"%>
 <%@ page import="org.oscarehr.provider.dao.ProviderDataDao"%>
-
+<%@ page import="org.oscarehr.provider.model.ProviderData"%>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.Misc" %>
+<%@ page import="oscar.MyDateFormat" %>
+<%@ page import="oscar.SxmlMisc"%>
+<%@ page import="java.util.Calendar"%>
+<%@ page import="java.util.GregorianCalendar" %>
+<%@ page errorPage="../appointment/errorpage.jsp"%>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-
 
 <%
 	if(session.getValue("user") == null)  response.sendRedirect("../logout.jsp");
@@ -65,8 +66,6 @@
 	DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
  	ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
 %>
-
-
 
 <html:html locale="true">
 <head>
@@ -90,91 +89,20 @@ function checkTotal() {
   return true;
 }
 
-<%-- RJ added code to copy text to clipboard in firefox 07/06/2006 --%>
-function ClipBoard1(spanId) {
 
-	var browser = navigator.userAgent.toLowerCase();
-
-	if( browser.indexOf('msie') > -1 )
-	{			
-		document.getElementById("text1").innerText = document.getElementById(spanId).innerText;
-		//alert("clip");
-		Copied = document.getElementById("text1").createTextRange();
-		//alert("clip");
-		Copied.execCommand("RemoveFormat");
-		Copied.execCommand("Copy");
-	}
-	else if( browser.indexOf('safari') > -1 )
-	{
-		alert("Copy to clipboard is not supported in Safari");
-	}
-	else if( browser.indexOf('firefox') > -1 )
-	{
-
-		//need privelege to access clipboard
-		//We'll catch exception if security prevents access and tell user how to correct the problem
-		try
-		{
-			netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');
-		}
-		catch(ex)
-		{
-			alert("Your browser has restricted access to clipboard\n" + 
-			       "Please type \"about:config\" in location bar\n" + 
-			       "and search for \"signed.applets.codebase_principal_support\"\n" +
-			       "then set value to true.  You will then be able to copy to clipboard");
-			return;
-		}
-
-		var strText = document.getElementById(spanId).innerHTML;
-		
-		//we want to keep line format so replace <br> with \r\n
-		strText = strText.replace(/\t/g, "");
-		strText = strText.replace(/<br>/g,"\r\n");
-		
-		//get rid of html tags and &nbsp;
-		strText = strText.stripTags();
-		strText = strText.replace(/&nbsp;/g," ");
-
-		//object to hold copy of string 
-		var str = Components.classes["@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString);
-		str.data = strText;
-
-		//transfer object holds string. xfer obj is placed on clipboard
-		var trans = Components.classes["@mozilla.org/widget/transferable;1"].createInstance(Components.interfaces.nsITransferable);
-		trans.addDataFlavor("text/unicode");
-		trans.setTransferData("text/unicode",str,strText.length * 2); 
-
-		//xfer object to clipboard
-		var clipid = Components.interfaces.nsIClipboard;
-		var clip = Components.classes["@mozilla.org/widget/clipboard;1"].getService(clipid);
-		clip.setData(trans,null,clipid.kGlobalClipboard);
-
-	}
+function copyToClipboard(spanId)
+{
+	var textToCopy = document.getElementById(spanId).innerText;
+	copyTextToClipboard(textToCopy);
 }
-function ClipBoard2() {
-	document.getElementById("text1").innerText = document.getElementById("copytext").innerText;
-	//alert("cl ip");
-	Copied = document.getElementById("text1").createTextRange();
-	//alert("clip");
-	Copied.execCommand("RemoveFormat");
-	Copied.execCommand("Copy");
-}
-function ClipBoard3() {
-	document.getElementById("text1").innerText = document.getElementById("copytext").innerText;
-	//alert("cl ip");
-	Copied = document.getElementById("text1").createTextRange();
-	//alert("clip");
-	Copied.execCommand("RemoveFormat");
-	Copied.execCommand("Copy");
-}
-function ClipBoard4() {
-	document.getElementById("text1").innerText = document.getElementById("copytext").innerText;
-	//alert("cl ip");
-	Copied = document.getElementById("text1").createTextRange();
-	//alert("clip");
-	Copied.execCommand("RemoveFormat");
-	Copied.execCommand("Copy");
+
+function copyTextToClipboard(text){
+	var dummy = document.createElement("input");
+	document.body.appendChild(dummy);
+	dummy.setAttribute('value', text);
+	dummy.select();
+	document.execCommand("copy");
+	document.body.removeChild(dummy);
 }
 
 </script>
@@ -268,7 +196,7 @@ function ClipBoard4() {
 		</td>
 		<td align="center" bgcolor="#CCCCCC"><a href="#" onClick="onNewPatient()">
 			<bean:message key="demographic.demographiclabelprintsetting.btnNewPatientLabel" /></a><br>
-			<input type="button" onClick="ClipBoard1('copytext1');" value="Copy to Clipboard" /> 
+			<input type="button" onClick="copyToClipboard('copytext1');" value="Copy to Clipboard" />
 			<input type="checkbox" name="label1checkbox" value="checked"> 
 			<input type="text" name="label1no" size="2" maxlength="2" value="<%= oscarVariables.getProperty("label.1no","1") %>" />
 		</td>
@@ -301,7 +229,7 @@ function ClipBoard4() {
 		</table>
 		</td>
 		<td align="center" bgcolor="#CCCCCC">
-		<input type="button" onClick="ClipBoard1('copytext2');" value="Copy to Clipboard" /> 
+		<input type="button" onClick="copyToClipboard('copytext2');" value="Copy to Clipboard" />
 		<input type="checkbox" name="label2checkbox" value="checked" checked>
 		<input type="text" name="label2no" size="2" maxlength="2" value="<%= oscarVariables.getProperty("label.2no","1") %>"></td>
 	</tr>
@@ -316,7 +244,7 @@ function ClipBoard4() {
 		</table>
 		</td>
 		<td align="center" bgcolor="#CCCCCC">
-		<input type="button" onClick="ClipBoard1('copytext3');" value="Copy to Clipboard" /> 
+		<input type="button" onClick="copyToClipboard('copytext3');" value="Copy to Clipboard" />
 		<input type="checkbox" name="label3checkbox" value="checked"> 
 		<input type="text" name="label3no" size="2" maxlength="2" value="<%= oscarVariables.getProperty("label.3no","1") %>"></td>
 	</tr>
@@ -331,8 +259,7 @@ function ClipBoard4() {
 		</table>
 		</td>
 		<td align="center" bgcolor="#CCCCCC">
-		<textarea id="text1" STYLE="display: none;"> </textarea> 
-		<input type="button" onClick="ClipBoard1('copytext4');" value="Copy to Clipboard" /> 
+		<input type="button" onClick="copyToClipboard('copytext4');" value="Copy to Clipboard" />
 		<input type="checkbox" name="label4checkbox" value="checked"> 
 		<input type="text" name="label4no" size="2" maxlength="2" value="<%= oscarVariables.getProperty("label.4no","1") %>"></td>
 	</tr>
@@ -347,8 +274,8 @@ function ClipBoard4() {
 			</tr>
 		</table>
 		</td>
-		<td align="center" bgcolor="#CCCCCC"><textarea id="text1" style="display: none;"></textarea> 
-		<input type="button" onClick="ClipBoard1('copytext5');" value="Copy to Clipboard" /> 
+		<td align="center" bgcolor="#CCCCCC">
+		<input type="button" onClick="copyToClipboard('copytext5');" value="Copy to Clipboard" />
 		<input type="checkbox" name="label5checkbox" value="checked"> 
 		<input type="text" name="label5no" size="2" maxlength="2" value="<%= oscarVariables.getProperty("label.5no","1") %>"></td>
 	</tr>
