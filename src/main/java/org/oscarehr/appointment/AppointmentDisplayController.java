@@ -429,7 +429,8 @@ public class AppointmentDisplayController
 			mrpPreferredView = mrpPreference.getDefaultServiceType();
 		}
 
-		if (currentUserPreference != null){
+		if (currentUserPreference != null)
+		{
 			currentUserPreferredView = currentUserPreference.getDefaultServiceType();
 		}
 
