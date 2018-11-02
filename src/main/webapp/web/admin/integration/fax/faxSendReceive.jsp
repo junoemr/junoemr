@@ -53,12 +53,14 @@
 		<h1>Fax Outbox</h1>
 	</div>
 	<div class="fax-outbox-body">
-		<div class="flex-row">
+		<div class="flex-row search-filters">
 			<label class="flex-row-label" for="input-fax-outbox-select-account">Account</label>
-			<select class="flex-row-content" id="input-fax-outbox-select-account"
+			<select class="flex-row-content form-control" id="input-fax-outbox-select-account"
 			        ng-model="faxSendReceiveController.selectedFaxAccount"
 			        ng-options="faxAccount.displayName for faxAccount in faxSendReceiveController.faxAccountList">
 			</select>
+		</div>
+		<div class="flex-row search-buttons">
 			<button type="button" class="btn btn-primary"
 			        ng-click="faxSendReceiveController.loadOutboxItems();">Search</button>
 		</div>
@@ -66,11 +68,20 @@
 		<table ng-table="faxSendReceiveController.tableParams" show-filter="false" class="table table-striped table-bordered">
 			<tbody>
 				<tr ng-repeat="item in faxSendReceiveController.outboxItemList">
-					<td data-title="'Date Sent'"    sortable="'DateSent'">{{item.systemDateSent}}</td>
-					<td data-title="'Sent By'"      sortable="'SentBy'">{{item.providerNo}}</td>
-					<td data-title="'Fax Type'"     sortable="'FaxType'">{{item.fileType}}</td>
-					<td data-title="'Sent Status'"  sortable="'SentStatus'">{{item.systemStatus}}</td>
-					<td data-title="'Sent To'"      sortable="'SentTo'">{{item.toFaxNumber}}</td>
+					<td>
+						<button class="btn"
+						        title="resend"
+						        ng-disabled="item.systemStatus !== 'ERROR'"
+						        ng-class="{'btn-success': item.systemStatus === 'ERROR'}"
+								ng-click="faxSendReceiveController.resendFax(item);">
+							<span class="glyphicon glyphicon-repeat"></span>
+						</button>
+					</td>
+					<td data-title="'Date Sent'">{{item.systemDateSent}}</td>
+					<td data-title="'Sent By'">{{item.providerNo}}</td>
+					<td data-title="'Fax Type'">{{item.fileType}}</td>
+					<td data-title="'Sent Status'">{{item.systemStatus}}</td>
+					<td data-title="'Sent To'">{{item.toFaxNumber}}</td>
 					<td data-title="'Remote Date Queued'">{{item.integrationDateQueued}}</td>
 					<td data-title="'Remote Date Sent'">{{item.integrationDateSent}}</td>
 					<td data-title="'Remote Status'">{{item.integrationStatus}}</td>

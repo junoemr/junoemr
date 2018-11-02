@@ -467,7 +467,7 @@ public class SRFaxApiConnector
 		catch(IOException e)
 		{
 			logger.error("Error", e);
-			throw new RuntimeException(e);
+			throw new FaxApiException(e);
 		}
 		return result;
 	}

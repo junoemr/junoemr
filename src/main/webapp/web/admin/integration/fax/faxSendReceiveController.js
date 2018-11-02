@@ -1,8 +1,10 @@
 angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSendReceiveController', [
 	'NgTableParams',
 	"faxAccountService",
+	"faxOutboundService",
 	function (NgTableParams,
-	          faxAccountService)
+	          faxAccountService,
+	          faxOutboundService)
 	{
 		var controller = this;
 
@@ -17,8 +19,7 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 			sorting: {
 				DateSent: "desc"
 			}
-		}
-		;
+		};
 
 		controller.initialize = function()
 		{
@@ -59,6 +60,23 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 							}
 						);
 					}
+				}
+			);
+		};
+
+		controller.resendFax = function(outboxItem)
+		{
+			outboxItem.systemStatus = 'RESEND';
+			faxOutboundService.resendOutboundFax(outboxItem.id).then(
+				function success(response)
+				{
+					angular.copy(response, outboxItem);
+				},
+				function error(error)
+				{
+					outboxItem.systemStatus = 'ERROR';
+					console.error(error);
+					alert(error);
 				}
 			);
 		};

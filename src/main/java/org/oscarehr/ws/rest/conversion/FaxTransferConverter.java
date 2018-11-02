@@ -23,13 +23,16 @@
 package org.oscarehr.ws.rest.conversion;
 
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferInbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferOutbound;
+import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FaxSettingsConverter
+public class FaxTransferConverter
 {
 	public static FaxAccount getAsDomainObject(FaxSettingsTransferInbound transfer)
 	{
@@ -69,5 +72,20 @@ public class FaxSettingsConverter
 			transferList.add(getAsOutboundTransferObject(config));
 		}
 		return transferList;
+	}
+
+	public static FaxOutboxTransferOutbound getAsOutboxTransferObject(FaxAccount faxAccount, FaxOutbound faxOutbound)
+	{
+		FaxOutboxTransferOutbound transfer = new FaxOutboxTransferOutbound();
+		transfer.setId(faxOutbound.getId());
+		transfer.setFaxAccountId(faxAccount.getId());
+		transfer.setProviderNo(faxOutbound.getProviderNo());
+		transfer.setDemographicNo(faxOutbound.getDemographicNo());
+		transfer.setSystemStatus(String.valueOf(faxOutbound.getStatus()));
+		transfer.setSystemDateSent(ConversionUtils.toTimestampString(faxOutbound.getCreatedAt()));
+		transfer.setToFaxNumber(faxOutbound.getSentTo());
+		transfer.setFileType(faxOutbound.getFileType().name());
+
+		return transfer;
 	}
 }

@@ -22,14 +22,14 @@
  */
 package org.oscarehr.fax.exception;
 
-public class NoRollbackException extends Exception
+public class FaxSendException extends Exception
 {
-	public NoRollbackException(String message)
+	public FaxSendException(String message)
 	{
 		super(message);
 	}
 
-	public NoRollbackException(Exception e)
+	public FaxSendException(Exception e)
 	{
 		super(e);
 	}

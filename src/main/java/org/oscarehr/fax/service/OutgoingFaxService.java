@@ -32,12 +32,14 @@ import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.exception.FaxApiException;
 import org.oscarehr.fax.exception.FaxNumberException;
-import org.oscarehr.fax.exception.NoRollbackException;
+import org.oscarehr.fax.exception.FaxSendException;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
+import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -58,7 +60,7 @@ import java.util.List;
  * This service should be responsible for handling all logic around sending outgoing faxes
  */
 @Service
-@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class, noRollbackFor = NoRollbackException.class)
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class, noRollbackFor = FaxSendException.class)
 public class OutgoingFaxService
 {
 	private static final Logger logger = MiscUtils.getLogger();
@@ -76,7 +78,7 @@ public class OutgoingFaxService
 		return (!faxAccountList.isEmpty() || props.isFaxEnabled());
 	}
 
-	public void sendFax(String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile...filesToFax) throws IOException, NoRollbackException
+	public void sendFax(String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile...filesToFax) throws IOException, FaxSendException
 	{
 		//TODO determine which fax route to use
 		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveOutbound(true, true, 0, 1);
@@ -101,7 +103,7 @@ public class OutgoingFaxService
 		}
 	}
 
-	public void resendFax(Long faxOutId) throws IOException, NoRollbackException
+	public FaxOutboxTransferOutbound resendFax(Long faxOutId) throws IOException
 	{
 		FaxOutbound faxOutbound = faxOutboundDao.find(faxOutId);
 		GenericFile fileToResend = FileFactory.getOutboundUnsentFaxFile(faxOutbound.getFileName());
@@ -110,7 +112,16 @@ public class OutgoingFaxService
 		faxOutbound.setStatus(FaxOutbound.Status.QUEUED);
 		faxOutboundDao.merge(faxOutbound);
 
-		sendQueuedFax(faxOutbound);
+		try
+		{
+			sendQueuedFax(faxOutbound);
+		}
+		// queueing but not completing a send is ok, we still want to return th transfer with the queued status in this case
+		catch(FaxSendException e)
+		{
+			logger.warn("Failed to send queued fax (id:"+faxOutbound.getId()+"):"+ e.getMessage());
+		}
+		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
 	}
 
 	public void sendQueuedFaxes()
@@ -122,7 +133,7 @@ public class OutgoingFaxService
 			{
 				sendQueuedFax(queuedFax);
 			}
-			catch(NoRollbackException e)
+			catch(FaxSendException e)
 			{
 				logger.warn("Failed to send queued fax (id:"+queuedFax.getId()+"):"+ e.getMessage());
 			}
@@ -171,7 +182,7 @@ public class OutgoingFaxService
 		return faxOutbound;
 	}
 
-	private void sendQueuedFax(FaxOutbound faxOutbound) throws NoRollbackException
+	private void sendQueuedFax(FaxOutbound faxOutbound) throws FaxSendException
 	{
 		String logStatus = LogConst.STATUS_FAILURE;
 		String logData = null;
@@ -225,6 +236,7 @@ public class OutgoingFaxService
 					faxOutbound.setStatus(FaxOutbound.Status.SENT);
 					faxOutbound.setExternalReferenceId(resultWrapper.getResult().longValue());
 					logStatus = LogConst.STATUS_SUCCESS;
+					logData = "Faxed To: " + faxOutbound.getSentTo();
 					fileToFax.moveToOutgoingFaxSent();
 				}
 				else
@@ -246,17 +258,18 @@ public class OutgoingFaxService
 		catch(FaxApiException e)
 		{
 			logData = e.getMessage();
-			throw new NoRollbackException(e);
+			throw new FaxSendException(e);
 		}
 		catch(Exception e)
 		{
 			logger.error("Unknown error sending queued fax", e);
 			logData = "System Error";
-			throw new NoRollbackException(e);
+			throw new FaxSendException(e);
 		}
 		finally
 		{
-			LogAction.addLogEntry(faxOutbound.getProviderNo(), faxOutbound.getDemographicNo(), LogConst.ACTION_SENT, LogConst.CON_FAX, logStatus, String.valueOf(faxOutbound.getId()), null, logData);
+			LogAction.addLogEntry(faxOutbound.getProviderNo(), faxOutbound.getDemographicNo(), LogConst.ACTION_SENT, LogConst.CON_FAX,
+					logStatus, String.valueOf(faxOutbound.getId()), null, logData);
 		}
 	}
 

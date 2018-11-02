@@ -456,6 +456,7 @@
 <script type="text/javascript" src="common/services/inboxService.js"></script>
 <script type="text/javascript" src="common/services/k2aService.js"></script>
 <script type="text/javascript" src="common/services/faxAccountService.js"></script>
+<script type="text/javascript" src="common/services/faxOutboundService.js"></script>
 <script type="text/javascript" src="common/services/messageService.js"></script>
 <script type="text/javascript" src="common/services/noteService.js"></script>
 <script type="text/javascript" src="common/services/patientDetailStatusService.js"></script>

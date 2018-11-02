@@ -28,4 +28,9 @@ public class FaxApiException extends RuntimeException
 	{
 		super(message);
 	}
+
+	public FaxApiException(Exception e)
+	{
+		super(e);
+	}
 }

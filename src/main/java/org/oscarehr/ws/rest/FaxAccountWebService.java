@@ -29,7 +29,7 @@ import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 import org.oscarehr.fax.service.FaxAccountService;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.ws.rest.conversion.FaxSettingsConverter;
+import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
@@ -37,7 +37,6 @@ import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferInbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import oscar.util.ConversionUtils;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -49,7 +48,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.time.LocalDate;
 import java.util.List;
 
 @Path("/faxAccount")
@@ -90,7 +88,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		List<FaxAccount> accountList = faxAccountDao.findAll(offset, perPage);
 
 		//TODO get total result count correctly
-		return RestSearchResponse.successResponse(FaxSettingsConverter.getAllAsOutboundTransferObject(accountList), page, perPage, -1);
+		return RestSearchResponse.successResponse(FaxTransferConverter.getAllAsOutboundTransferObject(accountList), page, perPage, -1);
 	}
 
 	@GET
@@ -113,7 +111,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
 
-		FaxSettingsTransferOutbound accountSettingsTo1 = FaxSettingsConverter.getAsOutboundTransferObject(faxAccountDao.find(id));
+		FaxSettingsTransferOutbound accountSettingsTo1 = FaxTransferConverter.getAsOutboundTransferObject(faxAccountDao.find(id));
 		return RestResponse.successResponse(accountSettingsTo1);
 	}
 
@@ -126,11 +124,11 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin");
 
-		FaxAccount faxAccount = FaxSettingsConverter.getAsDomainObject(accountSettingsTo1);
+		FaxAccount faxAccount = FaxTransferConverter.getAsDomainObject(accountSettingsTo1);
 		faxAccount.setIntegrationType(FaxAccount.INTEGRATION_TYPE_SRFAX);// hardcoded until more than one type exists
 		faxAccountDao.persist(faxAccount);
 
-		return RestResponse.successResponse(FaxSettingsConverter.getAsOutboundTransferObject(faxAccount));
+		return RestResponse.successResponse(FaxTransferConverter.getAsOutboundTransferObject(faxAccount));
 	}
 
 	@PUT
@@ -154,11 +152,11 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		{
 			accountSettingsTo1.setPassword(faxAccount.getLoginPassword());
 		}
-		faxAccount = FaxSettingsConverter.getAsDomainObject(accountSettingsTo1);
+		faxAccount = FaxTransferConverter.getAsDomainObject(accountSettingsTo1);
 		faxAccount.setId(id);
 		faxAccountDao.merge(faxAccount);
 
-		return RestResponse.successResponse(FaxSettingsConverter.getAsOutboundTransferObject(faxAccount));
+		return RestResponse.successResponse(FaxTransferConverter.getAsOutboundTransferObject(faxAccount));
 	}
 
 	@POST
@@ -222,13 +220,10 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		perPage = limitedResultCount(perPage);
 		int offset = calculatedOffset(page, perPage);
 
-		LocalDate startDate = (startDateStr != null)? ConversionUtils.toLocalDate(startDateStr) : LocalDate.now();
-
 		FaxOutboundCriteriaSearch criteriaSearch = new FaxOutboundCriteriaSearch();
 		criteriaSearch.setOffset(offset);
 		criteriaSearch.setLimit(perPage);
 		criteriaSearch.setFaxAccountId(id);
-//		criteriaSearch.setBeforeDate(startDate);
 		criteriaSearch.setSortDirDescending();
 		int total = faxOutboundDao.criteriaSearchCount(criteriaSearch);
 

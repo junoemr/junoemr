@@ -31,6 +31,7 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
 public class FaxOutboxTransferOutbound implements Serializable
 {
+	private Long id;
 	private Long faxAccountId;
 
 	private String providerNo;
@@ -50,6 +51,16 @@ public class FaxOutboxTransferOutbound implements Serializable
 	private String integrationDateQueued;
 	/* the sent date of the document as retrieved from the api */
 	private String integrationDateSent;
+
+	public Long getId()
+	{
+		return id;
+	}
+
+	public void setId(Long id)
+	{
+		this.id = id;
+	}
 
 	public Long getFaxAccountId()
 	{

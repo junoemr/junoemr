@@ -32,11 +32,11 @@ import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
+import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -137,14 +137,7 @@ public class FaxAccountService
 		for(FaxOutbound faxOutbound : outboundList)
 		{
 			// set the locally available field info
-			FaxOutboxTransferOutbound transfer = new FaxOutboxTransferOutbound();
-			transfer.setFaxAccountId(faxAccount.getId());
-			transfer.setProviderNo(faxOutbound.getProviderNo());
-			transfer.setDemographicNo(faxOutbound.getDemographicNo());
-			transfer.setSystemStatus(String.valueOf(faxOutbound.getStatus()));
-			transfer.setSystemDateSent(ConversionUtils.toTimestampString(faxOutbound.getCreatedAt()));
-			transfer.setToFaxNumber(faxOutbound.getSentTo());
-			transfer.setFileType(faxOutbound.getFileType().name());
+			FaxOutboxTransferOutbound transfer = FaxTransferConverter.getAsOutboxTransferObject(faxAccount, faxOutbound);
 
 			// add the data from srfax on relevant objects
 			if(FaxOutbound.Status.SENT.equals(faxOutbound.getStatus()))
