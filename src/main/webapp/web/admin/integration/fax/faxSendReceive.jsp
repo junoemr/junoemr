@@ -48,47 +48,91 @@
 
 <title>FAX Title</title>
 
-<div class="fax-outbox">
-	<div class="fax-outbox-header">
-		<h1>Fax Outbox</h1>
+<div class="fax-send_receive">
+	<div class="flex-row search-filters">
+		<label class="flex-row-label" for="input-fax-inbox-select-account">Account</label>
+		<select class="flex-row-content form-control" id="input-fax-inbox-select-account"
+		        ng-model="faxSendReceiveController.selectedFaxAccount"
+		        ng-options="faxAccount.displayName for faxAccount in faxSendReceiveController.faxAccountList">
+		</select>
 	</div>
-	<div class="fax-outbox-body">
-		<div class="flex-row search-filters">
-			<label class="flex-row-label" for="input-fax-outbox-select-account">Account</label>
-			<select class="flex-row-content form-control" id="input-fax-outbox-select-account"
-			        ng-model="faxSendReceiveController.selectedFaxAccount"
-			        ng-options="faxAccount.displayName for faxAccount in faxSendReceiveController.faxAccountList">
-			</select>
-		</div>
-		<div class="flex-row search-buttons">
-			<button type="button" class="btn btn-primary"
-			        ng-click="faxSendReceiveController.loadOutboxItems();">Search</button>
-		</div>
+	<ul class="nav nav-tabs">
+		<li>
+			<a data-toggle="tab" ng-click="faxSendReceiveController.changeTab(faxSendReceiveController.tabEnum.inbox);">Inbox</a>
+		</li>
+		<li class="active">
+			<a data-toggle="tab" ng-click="faxSendReceiveController.changeTab(faxSendReceiveController.tabEnum.outbox);">Outbox</a>
+		</li>
+	</ul>
+	<div>
+		<div id="fax_inbox" class="tab-pane"
+		ng-show="faxSendReceiveController.activeTab == faxSendReceiveController.tabEnum.inbox">
+			<div class="fax-inbox-header">
+				<h1>Fax Inbox</h1>
+			</div>
+			<div class="fax-inbox-body">
+				<div class="flex-row search-filters">
+				</div>
+				<div class="flex-row search-buttons">
+					<button type="button" class="btn btn-primary"
+					        ng-click="faxSendReceiveController.loadInboxItems();">Search
+					</button>
+				</div>
 
-		<table ng-table="faxSendReceiveController.tableParams" show-filter="false" class="table table-striped table-bordered">
-			<tbody>
-				<tr ng-repeat="item in faxSendReceiveController.outboxItemList">
-					<td>
-						<button class="btn"
-						        title="resend"
-						        ng-disabled="item.systemStatus !== 'QUEUED' && item.systemStatus !== 'ERROR'"
-						        ng-class="{'btn-success': item.systemStatus === 'QUEUED', 'btn-warning': item.systemStatus === 'ERROR'}"
-								ng-click="faxSendReceiveController.resendFax(item);">
-							<span class="glyphicon glyphicon-repeat"></span>
-						</button>
-					</td>
-					<td data-title="'Date Sent'">{{item.systemDateSent}}</td>
-					<td data-title="'Sent By'">{{item.providerNo}}</td>
-					<td data-title="'Fax Type'">{{item.fileType}}</td>
-					<td data-title="'Sent Status'">{{item.systemStatus}}</td>
-					<td data-title="'Sent To'">{{item.toFaxNumber}}</td>
-					<td data-title="'Remote Date Queued'">{{item.integrationDateQueued}}</td>
-					<td data-title="'Remote Date Sent'">{{item.integrationDateSent}}</td>
-					<td data-title="'Remote Status'">{{item.integrationStatus}}</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<div class="fax-outbox-footer">
+				<table ng-table="faxSendReceiveController.tableParamsInbox" show-filter="false" class="table table-striped table-bordered">
+					<tbody>
+					<tr ng-repeat="item in faxSendReceiveController.inboxItemList">
+
+						<td data-title="'Received Date'">{{item.dateReceived}}</td>
+						<td data-title="'Document Link'">{{item.documentNo}}</td>
+					</tr>
+					</tbody>
+				</table>
+
+			</div>
+		</div>
+		<div id="fax_outbox" class="tab-pane"
+		     ng-show="faxSendReceiveController.activeTab == faxSendReceiveController.tabEnum.outbox">
+			<div class="fax-outbox-header">
+				<h1>Fax Outbox</h1>
+			</div>
+			<div class="fax-outbox-body">
+				<div class="flex-row search-filters">
+				</div>
+				<div class="flex-row search-buttons">
+					<button type="button" class="btn btn-primary"
+					        ng-click="faxSendReceiveController.loadOutboxItems();">Search
+					</button>
+				</div>
+
+				<table ng-table="faxSendReceiveController.tableParamsOutbox" show-filter="false" class="table table-striped table-bordered">
+					<tbody>
+					<tr ng-repeat="item in faxSendReceiveController.outboxItemList">
+						<td>
+							<button class="btn"
+							        title="resend"
+							        ng-disabled="item.systemStatus != faxSendReceiveController.systemStatusEnum.queued
+					                    && item.systemStatus != faxSendReceiveController.systemStatusEnum.error"
+							        ng-class="{'btn-success': item.systemStatus == faxSendReceiveController.systemStatusEnum.queued,
+					                    'btn-warning': item.systemStatus == faxSendReceiveController.systemStatusEnum.error}"
+							        ng-click="faxSendReceiveController.resendFax(item);">
+								<span class="glyphicon glyphicon-repeat"></span>
+							</button>
+						</td>
+						<td data-title="'Date Sent'">{{item.systemDateSent}}</td>
+						<td data-title="'Sent By'">{{item.providerNo}}</td>
+						<td data-title="'Fax Type'">{{item.fileType}}</td>
+						<td data-title="'Sent Status'">{{item.systemStatus}}</td>
+						<td data-title="'Sent To'">{{item.toFaxNumber}}</td>
+						<td data-title="'Remote Date Queued'">{{item.integrationDateQueued}}</td>
+						<td data-title="'Remote Date Sent'">{{item.integrationDateSent}}</td>
+						<td data-title="'Remote Status'">{{item.integrationStatus}}</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="fax-outbox-footer">
+			</div>
+		</div>
 	</div>
 </div>

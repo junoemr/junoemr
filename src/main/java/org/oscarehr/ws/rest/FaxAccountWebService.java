@@ -32,6 +32,7 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
+import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferInbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferOutbound;
@@ -48,6 +49,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.LinkedList;
 import java.util.List;
 
 @Path("/faxAccount")
@@ -198,11 +200,17 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Path("/{id}/inbox")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> getInbox(@PathParam("id") Long id)
+	public RestSearchResponse<FaxInboxTransferOutbound> getInbox(@PathParam("id") Long id,
+	                                                             @QueryParam("page") @DefaultValue("1") Integer page,
+	                                                             @QueryParam("perPage") @DefaultValue("10") Integer perPage)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin", "_admin.fax");
-		return RestResponse.successResponse(false);
+
+		//TODO load inbox results
+		List<FaxInboxTransferOutbound> resultList = new LinkedList<>();
+
+		return RestSearchResponse.successResponse(resultList, page, perPage, 0);
 	}
 
 	@GET

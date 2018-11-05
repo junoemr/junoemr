@@ -7,10 +7,14 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 	          faxOutboundService)
 	{
 		var controller = this;
+		controller.systemStatusEnum = Object.freeze({"sent":"SENT", "queued":"QUEUED", "error":"ERROR"});
+		controller.tabEnum = Object.freeze({"inbox":0, "outbox":1});
+		controller.activeTab = controller.tabEnum.outbox;
 
 		controller.selectedFaxAccount = null;
 		controller.faxAccountList = [];
 		controller.outboxItemList = [];
+		controller.inboxItemList = [];
 
 		// ngTable object for storing search parameters
 		controller.search = {
@@ -41,7 +45,7 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 
 		controller.loadOutboxItems = function()
 		{
-			controller.tableParams = new NgTableParams(
+			controller.tableParamsOutbox = new NgTableParams(
 				controller.search,
 				{
 					getData: function(params)
@@ -64,6 +68,31 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 			);
 		};
 
+		controller.loadInboxItems = function ()
+		{
+			controller.tableParamsInbox = new NgTableParams(
+				controller.search,
+				{
+					getData: function (params)
+					{
+						controller.search = params.url();
+						return faxAccountService.getInbox(controller.selectedFaxAccount.id, controller.search.page, controller.search.count).then(
+							function success(response)
+							{
+								controller.inboxItemList = response;
+								return controller.inboxItemList;
+							},
+							function error(error)
+							{
+								console.error(error);
+								alert("Failed to load inbox");
+							}
+						);
+					}
+				}
+			);
+		};
+
 		controller.resendFax = function(outboxItem)
 		{
 			outboxItem.systemStatus = 'RESEND';
@@ -74,11 +103,16 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 				},
 				function error(error)
 				{
-					outboxItem.systemStatus = 'ERROR';
+					outboxItem.systemStatus = controller.systemStatusEnum.error;
 					console.error(error);
 					alert(error);
 				}
 			);
+		};
+
+		controller.changeTab = function(tabId)
+		{
+			controller.activeTab = tabId;
 		};
 
 		controller.initialize();
