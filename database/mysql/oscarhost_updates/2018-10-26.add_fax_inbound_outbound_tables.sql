@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS `fax_outbound` (
   demographic_no          int(10),
   created_at              datetime NOT NULL,
   status                  VARCHAR(16),
+  status_message          text,
   sent_to                 VARCHAR(32),
   file_type               VARCHAR(16),
   file_name               VARCHAR(255),

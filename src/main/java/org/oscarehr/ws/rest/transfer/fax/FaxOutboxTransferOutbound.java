@@ -41,6 +41,8 @@ public class FaxOutboxTransferOutbound implements Serializable
 	private String fileType;
 	/* the sent status of the document as recorded in the system */
 	private String systemStatus;
+	/* a message sent along with the status, usually for error explanations */
+	private String systemStatusMessage;
 	/* the sent date of the document as recorded in the system */
 	private String systemDateSent;
 
@@ -120,6 +122,16 @@ public class FaxOutboxTransferOutbound implements Serializable
 	public void setSystemStatus(String systemStatus)
 	{
 		this.systemStatus = systemStatus;
+	}
+
+	public String getSystemStatusMessage()
+	{
+		return systemStatusMessage;
+	}
+
+	public void setSystemStatusMessage(String systemStatusMessage)
+	{
+		this.systemStatusMessage = systemStatusMessage;
 	}
 
 	public String getSystemDateSent()

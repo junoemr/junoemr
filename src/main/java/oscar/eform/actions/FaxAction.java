@@ -14,7 +14,6 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
-import org.oscarehr.fax.exception.FaxSendException;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.MiscUtils;
@@ -54,7 +53,7 @@ public final class FaxAction
 	 * @throws IOException
 	 * @throws HtmlToPdfConversionException
 	 */
-	public void faxForms(String[] numbers, String formId, String providerId) throws IOException, HtmlToPdfConversionException, FaxSendException
+	public void faxForms(String[] numbers, String formId, String providerId) throws IOException, HtmlToPdfConversionException
 	{
 		HashSet<String> recipients = OutgoingFaxService.preProcessFaxNumbers(numbers);
 		for (String recipient : recipients)

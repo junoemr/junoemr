@@ -71,6 +71,9 @@ public class FaxOutbound extends AbstractModel<Long>
 	@Column(name= "status")
 	private Status status;
 
+	@Column(name= "status_message")
+	private String statusMessage;
+
 	@Column(name= "sent_to")
 	private String sentTo;
 
@@ -129,6 +132,16 @@ public class FaxOutbound extends AbstractModel<Long>
 	public void setStatus(Status status)
 	{
 		this.status = status;
+	}
+
+	public String getStatusMessage()
+	{
+		return statusMessage;
+	}
+
+	public void setStatusMessage(String statusMessage)
+	{
+		this.statusMessage = statusMessage;
 	}
 
 	public String getSentTo()

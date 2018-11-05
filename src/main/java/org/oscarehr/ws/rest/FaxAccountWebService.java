@@ -153,6 +153,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 			accountSettingsTo1.setPassword(faxAccount.getLoginPassword());
 		}
 		faxAccount = FaxTransferConverter.getAsDomainObject(accountSettingsTo1);
+		faxAccount.setIntegrationType(FaxAccount.INTEGRATION_TYPE_SRFAX);// hardcoded until more than one type exists
 		faxAccount.setId(id);
 		faxAccountDao.merge(faxAccount);
 

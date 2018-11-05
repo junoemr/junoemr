@@ -71,8 +71,8 @@
 					<td>
 						<button class="btn"
 						        title="resend"
-						        ng-disabled="item.systemStatus !== 'ERROR'"
-						        ng-class="{'btn-success': item.systemStatus === 'ERROR'}"
+						        ng-disabled="item.systemStatus !== 'QUEUED' && item.systemStatus !== 'ERROR'"
+						        ng-class="{'btn-success': item.systemStatus === 'QUEUED', 'btn-warning': item.systemStatus === 'ERROR'}"
 								ng-click="faxSendReceiveController.resendFax(item);">
 							<span class="glyphicon glyphicon-repeat"></span>
 						</button>

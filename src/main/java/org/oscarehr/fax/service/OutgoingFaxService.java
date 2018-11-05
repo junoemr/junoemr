@@ -30,9 +30,9 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
-import org.oscarehr.fax.exception.FaxApiException;
+import org.oscarehr.fax.exception.FaxApiConnectionException;
+import org.oscarehr.fax.exception.FaxApiValidationException;
 import org.oscarehr.fax.exception.FaxNumberException;
-import org.oscarehr.fax.exception.FaxSendException;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
 import org.oscarehr.fax.model.FaxAccount;
@@ -60,11 +60,14 @@ import java.util.List;
  * This service should be responsible for handling all logic around sending outgoing faxes
  */
 @Service
-@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class, noRollbackFor = FaxSendException.class)
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class OutgoingFaxService
 {
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarProperties props = OscarProperties.getInstance();
+
+	private static HashMap<Long, Integer> faxAttemptCounterMap = new HashMap<>();
+	private static int MAX_SEND_COUNT = Integer.parseInt(props.getProperty("fax.max_send_attempts"));
 
 	@Autowired
 	FaxOutboundDao faxOutboundDao;
@@ -78,65 +81,103 @@ public class OutgoingFaxService
 		return (!faxAccountList.isEmpty() || props.isFaxEnabled());
 	}
 
-	public void sendFax(String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile...filesToFax) throws IOException, FaxSendException
+	/** Remove duplicate phone numbers and all non digit characters from fax numbers. */
+	public static HashSet<String> preProcessFaxNumbers(String...faxNumberList)
+	{
+		HashSet<String> recipients = new HashSet<>(faxNumberList.length);
+		for(String faxNumber : faxNumberList)
+		{
+			String formattedFaxNo = faxNumber.trim().replaceAll("\\D", "");
+			if(formattedFaxNo.length() < 7)
+			{
+				throw new FaxNumberException("Invalid Fax Number: " + faxNumber);
+			}
+			recipients.add(formattedFaxNo);
+		}
+		return recipients;
+	}
+
+	public FaxOutboxTransferOutbound sendFax(String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException
 	{
 		//TODO determine which fax route to use
 		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveOutbound(true, true, 0, 1);
+		FaxOutboxTransferOutbound transfer;
 		// check for enabled fax routes
 		if(!faxAccountList.isEmpty())
 		{
 			FaxAccount faxAccount = faxAccountList.get(0);
-			for(GenericFile fileToFax : filesToFax)
-			{
-				FaxOutbound queuedFax = queueFax(providerId, demographicId, faxAccount, faxNumber, fileType, fileToFax);
-				sendQueuedFax(queuedFax);
-			}
+			FaxOutbound faxOutbound = queueNewFax(providerId, demographicId, faxAccount, faxNumber, fileType, fileToFax);
+			sendQueuedFax(faxOutbound, fileToFax);
+			transfer = FaxTransferConverter.getAsOutboxTransferObject(faxAccount, faxOutbound);
 		}
 		// if legacy faxing is enabled, write to the outgoing folder.
 		else if(props.isFaxEnabled())
 		{
-			writeToFaxOutgoing(faxNumber, filesToFax);
+			writeToFaxOutgoing(faxNumber, fileToFax);
+			// fake a transfer object to return
+			transfer = new FaxOutboxTransferOutbound();
+			transfer.setSystemStatus(FaxOutbound.Status.QUEUED.name());
+			transfer.setToFaxNumber(faxNumber);
+			transfer.setFileType(fileType.name());
+			transfer.setDemographicNo(demographicId);
+			transfer.setProviderNo(providerId);
 		}
 		else
 		{
 			throw new RuntimeException("No outbound fax routes enabled!");
 		}
+		return transfer;
 	}
 
+	/**
+	 * re-queue an existing outbound fax and attempt to resend it.
+	 * @return - the updated transfer object
+	 * @throws IOException - if the file to be re-sent encounters a file system error
+	 */
 	public FaxOutboxTransferOutbound resendFax(Long faxOutId) throws IOException
 	{
 		FaxOutbound faxOutbound = faxOutboundDao.find(faxOutId);
-		GenericFile fileToResend = FileFactory.getOutboundUnsentFaxFile(faxOutbound.getFileName());
+		GenericFile fileToResend;
+
+		if(FaxOutbound.Status.QUEUED.equals(faxOutbound.getStatus()))
+		{
+			fileToResend = FileFactory.getOutboundPendingFaxFile(faxOutbound.getFileName());
+		}
+		else if(FaxOutbound.Status.ERROR.equals(faxOutbound.getStatus()))
+		{
+			fileToResend = FileFactory.getOutboundUnsentFaxFile(faxOutbound.getFileName());
+		}
+		else
+		{
+			throw new RuntimeException("Attempt to resend fax with invalid status: " + faxOutbound.getStatus().name());
+		}
 		fileToResend.moveToOutgoingFaxPending();
-
 		faxOutbound.setStatus(FaxOutbound.Status.QUEUED);
-		faxOutboundDao.merge(faxOutbound);
 
-		try
-		{
-			sendQueuedFax(faxOutbound);
-		}
-		// queueing but not completing a send is ok, we still want to return th transfer with the queued status in this case
-		catch(FaxSendException e)
-		{
-			logger.warn("Failed to send queued fax (id:"+faxOutbound.getId()+"):"+ e.getMessage());
-		}
+		sendQueuedFax(faxOutbound, fileToResend);
 		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
 	}
 
+	/**
+	 * find a list of all queued faxes and attempt to send them.
+	 */
 	public void sendQueuedFaxes()
 	{
 		List<FaxOutbound> queuedFaxList = faxOutboundDao.findByStatus(FaxOutbound.Status.QUEUED);
 		for(FaxOutbound queuedFax : queuedFaxList)
 		{
+			GenericFile fileToResend;
 			try
 			{
-				sendQueuedFax(queuedFax);
+				fileToResend = FileFactory.getOutboundUnsentFaxFile(queuedFax.getFileName());
 			}
-			catch(FaxSendException e)
+			catch(IOException e)
 			{
-				logger.warn("Failed to send queued fax (id:"+queuedFax.getId()+"):"+ e.getMessage());
+				// ignore this error and continue, can't rollback previous object fax status updates
+				logger.error("IOError", e);
+				continue;
 			}
+			sendQueuedFax(queuedFax, fileToResend);
 		}
 	}
 
@@ -161,8 +202,8 @@ public class OutgoingFaxService
 	 * @return - the fax objects that were added
 	 * @throws IOException - if a fax file cannot be moved to the pending folder
 	 */
-	private FaxOutbound queueFax(String providerId, Integer demographicId, FaxAccount faxAccount, String faxNumber,
-	                      FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException
+	private FaxOutbound queueNewFax(String providerId, Integer demographicId, FaxAccount faxAccount, String faxNumber,
+	                                FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException
 	{
 		FaxOutbound faxOutbound = new FaxOutbound();
 		faxOutbound.setStatus(FaxOutbound.Status.QUEUED);
@@ -182,7 +223,7 @@ public class OutgoingFaxService
 		return faxOutbound;
 	}
 
-	private void sendQueuedFax(FaxOutbound faxOutbound) throws FaxSendException
+	private void sendQueuedFax(FaxOutbound faxOutbound, GenericFile fileToFax)
 	{
 		String logStatus = LogConst.STATUS_FAILURE;
 		String logData = null;
@@ -198,7 +239,6 @@ public class OutgoingFaxService
 			}
 
 			HashMap<String, String> fileMap = new HashMap<>(1);
-			GenericFile fileToFax = FileFactory.getOutboundPendingFaxFile(faxOutbound.getFileName());
 			fileMap.put(fileToFax.getName(), toBase64String(fileToFax));
 
 			// external api call
@@ -234,6 +274,7 @@ public class OutgoingFaxService
 				{
 					logger.info("Fax send success " + String.valueOf(resultWrapper.getResult()));
 					faxOutbound.setStatus(FaxOutbound.Status.SENT);
+					faxOutbound.setStatusMessage(null);
 					faxOutbound.setExternalReferenceId(resultWrapper.getResult().longValue());
 					logStatus = LogConst.STATUS_SUCCESS;
 					logData = "Faxed To: " + faxOutbound.getSentTo();
@@ -243,6 +284,7 @@ public class OutgoingFaxService
 				{
 					logger.warn("Fax send failure " + resultWrapper.getError());
 					faxOutbound.setStatus(FaxOutbound.Status.ERROR);
+					faxOutbound.setStatusMessage(resultWrapper.getError());
 					logData = resultWrapper.getError();
 					fileToFax.moveToOutgoingFaxUnsent();
 				}
@@ -253,40 +295,72 @@ public class OutgoingFaxService
 				// fax may have been sent in which case we want to report a success
 				logger.error("IOError", e);
 			}
-			faxOutboundDao.merge(faxOutbound);
 		}
-		catch(FaxApiException e)
+		catch(FaxApiConnectionException e)
 		{
+			// if the api connection fails, leave the fax as queued
+			logger.warn("Fax API failure: " + e.getMessage());
 			logData = e.getMessage();
-			throw new FaxSendException(e);
+			faxOutbound.setStatusMessage(e.getMessage());
+
+			// if the maximum sent attempts has been hit, set the error status.
+			if(faxAttemptCounterMap.get(faxOutbound.getId()) >= MAX_SEND_COUNT)
+			{
+				faxOutbound.setStatus(FaxOutbound.Status.ERROR);
+				faxOutbound.setStatusMessage(e.getMessage());
+			}
+		}
+		catch(FaxApiValidationException e)
+		{
+			logger.warn("Fax API failure: " + e.getMessage());
+			logData = e.getMessage();
+			faxOutbound.setStatus(FaxOutbound.Status.ERROR);
+			faxOutbound.setStatusMessage(e.getMessage());
 		}
 		catch(Exception e)
 		{
 			logger.error("Unknown error sending queued fax", e);
 			logData = "System Error";
-			throw new FaxSendException(e);
+			faxOutbound.setStatus(FaxOutbound.Status.ERROR);
+			faxOutbound.setStatusMessage(e.getMessage());
 		}
 		finally
 		{
+			faxOutboundDao.merge(faxOutbound);
 			LogAction.addLogEntry(faxOutbound.getProviderNo(), faxOutbound.getDemographicNo(), LogConst.ACTION_SENT, LogConst.CON_FAX,
 					logStatus, String.valueOf(faxOutbound.getId()), null, logData);
+			updateSendAttempts(faxOutbound);
+
+			// make sure errors move the file to the error folder
+			if(FaxOutbound.Status.ERROR.equals(faxOutbound.getStatus()))
+			{
+				try
+				{
+					fileToFax.moveToOutgoingFaxUnsent();
+				}
+				catch(IOException e)
+				{
+					logger.error("IOError", e);
+				}
+			}
 		}
 	}
 
-	/** Remove duplicate phone numbers and all non digit characters from fax numbers. */
-	public static HashSet<String> preProcessFaxNumbers(String...faxNumberList)
+	private void updateSendAttempts(FaxOutbound faxOutbound)
 	{
-		HashSet<String> recipients = new HashSet<>(faxNumberList.length);
-		for(String faxNumber : faxNumberList)
+		FaxOutbound.Status status = faxOutbound.getStatus();
+		Long faxId = faxOutbound.getId();
+		if(FaxOutbound.Status.QUEUED.equals(status))
 		{
-			String formattedFaxNo = faxNumber.trim().replaceAll("\\D", "");
-			if(formattedFaxNo.length() < 7)
-			{
-				throw new FaxNumberException("Invalid Fax Number: " + faxNumber);
-			}
-			recipients.add(formattedFaxNo);
+			Integer count = faxAttemptCounterMap.get(faxId);
+			count = (count == null)? 0 : count;
+			faxAttemptCounterMap.put(faxId, count+1);
 		}
-		return recipients;
+		else
+		{
+			// clear out the map value if the fax is no longer queued
+			faxAttemptCounterMap.remove(faxId);
+		}
 	}
 
 	private String toBase64String(GenericFile file) throws IOException
