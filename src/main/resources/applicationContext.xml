@@ -286,6 +286,8 @@
 	<task:executor id="taskExecutor" />
 	-->
 	<task:scheduler id="taskScheduler" />
-		
+
+	<!-- Enables scheduled tasks annotated with @Scheduled etc. -->
+	<task:annotation-driven/>
 		
 </beans>
