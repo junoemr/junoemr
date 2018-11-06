@@ -25,47 +25,29 @@
 
  */
 
-angular.module("Common.Services").service("faxOutboundService", [
+angular.module("Common.Services").service("faxInboundService", [
 	'$q',
 	'junoHttp',
 	function($q, junoHttp)
 	{
 		var service = {};
 
-		service.apiPath = '../ws/rs/faxOutbound';
+		service.apiPath = '../ws/rs/faxInbound';
 
-		service.resendOutboundFax = function resendFax(id)
-		{
-			var deferred = $q.defer();
-
-			junoHttp.post(service.apiPath + '/' + id + '/resend').then(
-				function success(response)
-				{
-					deferred.resolve(response.data);
-				},
-				function error(error)
-				{
-					console.log("faxService::resendFax error", error);
-					deferred.reject("An error occurred while resending a fax");
-				});
-			return deferred.promise;
-		};
-
-
-		service.getNextPushTime = function getNextPushTime()
+		service.getNextPullTime = function getNextPullTime()
 		{
 			var deferred = $q.defer();
 			var config = Juno.Common.ServiceHelper.configHeaders();
 
-			junoHttp.get(service.apiPath + '/getNextPushTime', config).then(
+			junoHttp.get(service.apiPath + '/getNextPullTime', config).then(
 				function success(response)
 				{
 					deferred.resolve(response.data);
 				},
 				function error(error)
 				{
-					console.log("faxService::getNextPushTime error", error);
-					deferred.reject("An error occurred while getting scheduled push time");
+					console.log("faxService::getNextPullTime error", error);
+					deferred.reject("An error occurred while getting scheduled pull time");
 				});
 			return deferred.promise;
 		};

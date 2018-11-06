@@ -1,15 +1,20 @@
 angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSendReceiveController', [
 	'NgTableParams',
 	"faxAccountService",
+	"faxInboundService",
 	"faxOutboundService",
 	function (NgTableParams,
 	          faxAccountService,
+	          faxInboundService,
 	          faxOutboundService)
 	{
 		var controller = this;
 		controller.systemStatusEnum = Object.freeze({"sent":"SENT", "queued":"QUEUED", "error":"ERROR"});
 		controller.tabEnum = Object.freeze({"inbox":0, "outbox":1});
 		controller.activeTab = controller.tabEnum.outbox;
+
+		controller.nextPullTime = null;
+		controller.nextPushTime = null;
 
 		controller.selectedFaxAccount = null;
 		controller.faxAccountList = [];
@@ -41,6 +46,8 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 					console.error(error);
 				}
 			);
+			controller.loadNextPushTime();
+			controller.loadNextPullTime();
 		};
 
 		controller.loadOutboxItems = function()
@@ -106,6 +113,37 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 					outboxItem.systemStatus = controller.systemStatusEnum.error;
 					console.error(error);
 					alert(error);
+				}
+			);
+		};
+
+		controller.loadNextPullTime = function()
+		{
+			faxInboundService.getNextPullTime().then(
+				function success(response)
+				{
+					controller.nextPullTime = response;
+				},
+				function error(error)
+				{
+					console.error(error);
+					alert(error);
+					controller.nextPullTime = null;
+				}
+			);
+		};
+		controller.loadNextPushTime = function()
+		{
+			faxOutboundService.getNextPushTime().then(
+				function success(response)
+				{
+					controller.nextPushTime = response;
+				},
+				function error(error)
+				{
+					console.error(error);
+					alert(error);
+					controller.nextPushTime = null;
 				}
 			);
 		};

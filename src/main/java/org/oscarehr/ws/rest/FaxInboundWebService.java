@@ -23,55 +23,40 @@
 package org.oscarehr.ws.rest;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.fax.schedulingTasks.OutboundFaxSchedulingTask;
-import org.oscarehr.fax.service.OutgoingFaxService;
+import org.oscarehr.fax.schedulingTasks.InboundFaxSchedulingTask;
+import org.oscarehr.fax.service.IncomingFaxService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 import java.time.LocalDateTime;
 
-@Path("/faxOutbound")
-@Component("FaxOutboundWebService")
-public class FaxOutboundWebService extends AbstractServiceImpl
+@Path("/faxInbound")
+@Component("FaxInboundWebService")
+public class FaxInboundWebService extends AbstractServiceImpl
 {
-	private static Logger logger = Logger.getLogger(FaxOutboundWebService.class);
+	private static Logger logger = Logger.getLogger(FaxInboundWebService.class);
 
 	@Autowired
 	SecurityInfoManager securityInfoManager;
 
 	@Autowired
-	OutgoingFaxService outgoingFaxService;
-
-	@POST
-	@Path("/{id}/resend")
-	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<FaxOutboxTransferOutbound> resend(@PathParam("id") Long id) throws IOException
-	{
-		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin.fax");
-
-		return RestResponse.successResponse(outgoingFaxService.resendFax(id));
-	}
+	IncomingFaxService incomingFaxService;
 
 	@GET
-	@Path("/getNextPushTime")
+	@Path("/getNextPullTime")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<LocalDateTime> getNextPushTime()
+	public RestResponse<LocalDateTime> getNextPullTime()
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin", "_admin.fax");
 
-		return RestResponse.successResponse(OutboundFaxSchedulingTask.getNextRunTime());
+		return RestResponse.successResponse(InboundFaxSchedulingTask.getNextRunTime());
 	}
 
 }
