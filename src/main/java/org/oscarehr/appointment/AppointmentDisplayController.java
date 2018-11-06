@@ -419,7 +419,7 @@ public class AppointmentDisplayController
 			referralNoParameter = "&referral_no_1=" + rdohip;
 		}
 
-		ProviderPreference mrpPreference = providerPreferenceDao.find(demographic.getProviderNo());
+		ProviderPreference mrpPreference = providerPreferenceDao.find(StringUtils.trimToEmpty(demographic.getProviderNo()));
 		String mrpPreferredView = null;
 
 		if (mrpPreference != null)
