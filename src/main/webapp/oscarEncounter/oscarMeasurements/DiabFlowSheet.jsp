@@ -132,6 +132,10 @@ ArrayList<String> recomendations = mi.getRecommendations();
 	function getContextPath() {
 		return '<%=request.getContextPath()%>';
 	}
+	function refreshEncounter()
+	{
+		return '';
+	}
 </script>
 
 	<oscar:customInterface name="renal" section="indicators"/>

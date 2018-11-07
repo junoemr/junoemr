@@ -33,6 +33,7 @@
 <title>close</title>
 <script LANGUAGE="JavaScript">
 function closeWin() {
+	  opener.refreshEncounter();
       self.opener.location.reload(); 
       self.close();     
 }
