@@ -96,10 +96,11 @@ function copyToClipboard(spanId)
 	copyTextToClipboard(textToCopy);
 }
 
-function copyTextToClipboard(text){
-	var dummy = document.createElement("input");
+function copyTextToClipboard(text)
+{
+	var dummy = document.createElement("textarea");
 	document.body.appendChild(dummy);
-	dummy.setAttribute('value', text);
+	dummy.value = text;
 	dummy.select();
 	document.execCommand("copy");
 	document.body.removeChild(dummy);
