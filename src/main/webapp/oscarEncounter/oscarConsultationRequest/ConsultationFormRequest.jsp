@@ -105,7 +105,7 @@ if(!authed) {
 	String multisiteLetterheadSelectionName = "Referring Site Name";
 	String defaultSiteName = "";
 	Integer defaultSiteId = 0;
-	List<Site> sites = new ArrayList<>();
+	List<Site> sites = new ArrayList<Site>();
 	if(bMultisites)
 	{
 		SiteDao siteDao = (SiteDao) WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");

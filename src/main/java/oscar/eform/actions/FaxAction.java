@@ -19,6 +19,7 @@ import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
+import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 
@@ -69,7 +70,7 @@ public final class FaxAction
 			WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
 
 			GenericFile fileToFax = FileFactory.getExistingFile(tempFile);
-			outgoingFaxService.sendFax(providerId, null, recipient, FaxOutbound.FileType.FORM, fileToFax);
+			FaxOutboxTransferOutbound transfer = outgoingFaxService.sendFax(providerId, null, recipient, FaxOutbound.FileType.FORM, fileToFax);
 		}
 		LogAction.addLogEntry(providerId, null, LogConst.ACTION_SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
 				formId, requestIp, "EForm " + formId);

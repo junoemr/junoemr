@@ -56,15 +56,17 @@
 		        ng-options="faxAccount.displayName for faxAccount in faxSendReceiveController.faxAccountList">
 		</select>
 	</div>
-	<ul class="nav nav-tabs">
-		<li>
-			<a data-toggle="tab" ng-click="faxSendReceiveController.changeTab(faxSendReceiveController.tabEnum.inbox);">Inbox</a>
-		</li>
-		<li class="active">
-			<a data-toggle="tab" ng-click="faxSendReceiveController.changeTab(faxSendReceiveController.tabEnum.outbox);">Outbox</a>
-		</li>
-	</ul>
-	<div>
+	<div class="tabs-heading">
+		<ul class="nav nav-tabs">
+			<li>
+				<a data-toggle="tab" ng-click="faxSendReceiveController.changeTab(faxSendReceiveController.tabEnum.inbox);">Inbox</a>
+			</li>
+			<li class="active">
+				<a data-toggle="tab" ng-click="faxSendReceiveController.changeTab(faxSendReceiveController.tabEnum.outbox);">Outbox</a>
+			</li>
+		</ul>
+	</div>
+	<div class="tabs-body">
 		<div id="fax_inbox" class="tab-pane"
 		ng-show="faxSendReceiveController.activeTab == faxSendReceiveController.tabEnum.inbox">
 			<div class="fax-inbox-header">

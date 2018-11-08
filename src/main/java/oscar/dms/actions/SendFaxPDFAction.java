@@ -37,6 +37,7 @@ import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import oscar.OscarProperties;
 import oscar.dms.EDocUtil;
 import oscar.log.LogAction;
@@ -98,6 +99,7 @@ public class SendFaxPDFAction extends DispatchAction {
 				Set<String> faxNoList = OutgoingFaxService.preProcessFaxNumbers(recipients);
 				for(String faxNo : faxNoList)
 				{
+					FaxOutboxTransferOutbound transfer;
 					try
 					{
 						GenericFile fileToCopy = FileFactory.getDocumentFile(docData.getDocumentName(docNo));
@@ -106,7 +108,17 @@ public class SendFaxPDFAction extends DispatchAction {
 						String faxFileName = "DOC-"+ docNo + "-" + filename + "-" + faxNo + "." + System.currentTimeMillis();
 						fileToFax.rename(faxFileName + ".pdf");
 
-						outgoingFaxService.sendFax(providerNo, demographicId, faxNo, FaxOutbound.FileType.DOCUMENT, fileToFax);
+						transfer = outgoingFaxService.sendFax(providerNo, demographicId, faxNo, FaxOutbound.FileType.DOCUMENT, fileToFax);
+						if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
+						{
+							errorList.add("Failed to send fax. Check account settings. " +
+									"Reason: " + transfer.getSystemStatusMessage());
+						}
+						else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED.name()))
+						{
+							errorList.add("Failed to send fax, it has been queued for automatic resend. " +
+									"Reason: " + transfer.getSystemStatusMessage());
+						}
 					}
 					catch(Exception e)
 					{
@@ -157,11 +169,22 @@ public class SendFaxPDFAction extends DispatchAction {
 		ArrayList<Object> errorList = new ArrayList<>();
 		for (int i = 0; i < recipients.length; i++)
 		{
+			FaxOutboxTransferOutbound transfer;
 			try
 			{
 				GenericFile fileToFax = FileFactory.getExistingFile(pdfPath);
 				fileToFax.rename("Form-" + formName);
-				outgoingFaxService.sendFax(providerNo, null, recipients[i], FaxOutbound.FileType.DOCUMENT, fileToFax);
+				transfer = outgoingFaxService.sendFax(providerNo, null, recipients[i], FaxOutbound.FileType.DOCUMENT, fileToFax);
+				if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
+				{
+					errorList.add("Failed to send fax. Check account settings. " +
+							"Reason: " + transfer.getSystemStatusMessage());
+				}
+				else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED.name()))
+				{
+					errorList.add("Failed to send fax, it has been queued for automatic resend. " +
+							"Reason: " + transfer.getSystemStatusMessage());
+				}
 			}
 			catch (Exception e)
 			{

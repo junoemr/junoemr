@@ -38,6 +38,7 @@ import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import oscar.OscarProperties;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
@@ -97,7 +98,7 @@ public class FrmCustomedPDFServlet extends HttpServlet
 					String pdfFile = "prescription_" + pdfId + ".pdf";
 					GenericFile fileToFax = FileFactory.createTempFile(baosPDF, ".pdf");
 					fileToFax.rename(pdfFile);
-					outgoingFaxService.sendFax(providerNo, demographicNo, recipient, FaxOutbound.FileType.FORM, fileToFax);
+					FaxOutboxTransferOutbound transfer = outgoingFaxService.sendFax(providerNo, demographicNo, recipient, FaxOutbound.FileType.FORM, fileToFax);
 				}
 				LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
 						pdfId, req.getRemoteAddr(), "Prescription " + pdfId);

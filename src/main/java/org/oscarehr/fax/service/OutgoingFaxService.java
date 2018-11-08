@@ -209,7 +209,7 @@ public class OutgoingFaxService
 		faxOutbound.setStatus(FaxOutbound.Status.QUEUED);
 		faxOutbound.setFaxAccount(faxAccount);
 		faxOutbound.setSentTo(faxNumber);
-		faxOutbound.setExternalAccountType(FaxAccount.INTEGRATION_TYPE_SRFAX);
+		faxOutbound.setExternalAccountType(faxAccount.getIntegrationType());
 		faxOutbound.setExternalAccountId(faxAccount.getLoginId());
 		faxOutbound.setFileType(fileType);
 		faxOutbound.setFileName(fileToFax.getName());

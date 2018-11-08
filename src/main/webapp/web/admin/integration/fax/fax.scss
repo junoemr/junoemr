@@ -85,3 +85,33 @@
 	padding-bottom: 20px;
   }
 }
+
+
+.fax-send_receive {
+  .tabs-heading {
+	padding: 5px 5px 0 5px;
+  }
+  .nav-justified {
+	margin-bottom: -1px;
+  }
+  .nav-tabs {
+	li {
+	  a {
+		color: black;
+		background-color: $light-grey;
+		&:hover, &:focus {
+		  background-color: $medium-grey;
+		  border-color: transparent;
+		}
+	  }
+	  .active {
+		a {
+		  color: black;
+		  background-color: $primary-white;
+		  border-color: black;
+		  border-bottom-color:transparent;
+		}
+	  }
+	}
+  }
+}

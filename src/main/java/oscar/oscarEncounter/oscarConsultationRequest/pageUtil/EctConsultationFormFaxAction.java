@@ -19,7 +19,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.tika.io.IOUtils;
-import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.model.FaxOutbound;
@@ -29,6 +28,7 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
@@ -43,10 +43,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 public class EctConsultationFormFaxAction extends Action
 {
@@ -103,8 +103,7 @@ public class EctConsultationFormFaxAction extends Action
 			labs = consultLabs.populateLabResultsDataConsultResponse(loggedInInfo, demoNo, reqId, CommonLabResultData.ATTACHED);
 		}
 
-		String error = "";
-		Exception exception = null;
+		List<String> errorList = new ArrayList<>();
 		File tempfile = null;
 		try
 		{
@@ -215,13 +214,24 @@ public class EctConsultationFormFaxAction extends Action
 				pdfReader.close();
 				GenericFile fileToCopy = FileFactory.getExistingFile(faxPdf);
 
-				for (String faxNo : recipients)
+				for(String faxNo : recipients)
 				{
 					String tempName = String.format("CRF-%s%s.%s.%d.pdf", faxClinicId, reqId, faxNo, System.currentTimeMillis());
 
 					GenericFile fileToFax = FileFactory.copy(fileToCopy);
 					fileToFax.rename(tempName);
-					outgoingFaxService.sendFax(providerNo, Integer.parseInt(demoNo), faxNo, FaxOutbound.FileType.CONSULTATION, fileToFax);
+					FaxOutboxTransferOutbound transfer = outgoingFaxService.sendFax(providerNo, Integer.parseInt(demoNo), faxNo, FaxOutbound.FileType.CONSULTATION, fileToFax);
+					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
+					{
+						errorList.add("Failed to send fax. Check account settings. " +
+									"Reason: " + transfer.getSystemStatusMessage());
+					}
+					else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED.name()))
+					{
+						errorList.add("Failed to send fax, it has been queued for automatic resend. " +
+									"Reason: " + transfer.getSystemStatusMessage());
+					}
+
 				}
 				LogAction.addLogEntry(providerNo, Integer.parseInt(demoNo), LogConst.ACTION_SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
 						reqId, loggedInInfo.getIp(), "CONSULT " + reqId);
@@ -232,39 +242,17 @@ public class EctConsultationFormFaxAction extends Action
 				throw new DocumentException("No faxable objects");
 			}
 		}
-		catch (HtmlToPdfConversionException e)
-		{
-			error = "HtmlToPdfConversionException";
-			exception = e;
-		}
-		catch (DocumentException de)
-		{
-			error = "DocumentException";
-			exception = de;
-		}
-		catch (IOException ioe)
-		{
-			error = "IOException";
-			exception = ioe;
-		}
 		catch(Exception e)
 		{
-			error = "Exception";
-			exception = e;
+			logger.error("Error occurred inside ConsultationPrintAction", e);
+			errorList.add("System Error");
 		}
 		finally
 		{
 			// Cleaning up InputStreams created for concatenation.
 			for (InputStream is : streams)
 			{
-				try
-				{
-					is.close();
-				}
-				catch (IOException e)
-				{
-					error = "IOException";
-				}
+				IOUtils.closeQuietly(is);
 			}
 			if(tempfile != null)
 			{
@@ -272,12 +260,13 @@ public class EctConsultationFormFaxAction extends Action
 				tempfile.delete();
 			}
 		}
-		if (!error.equals(""))
+		if(!errorList.isEmpty())
 		{
-			logger.error(error + " occurred inside ConsultationPrintAction", exception);
-			request.setAttribute("printError", new Boolean(true));
+			request.setAttribute("errorList", errorList);
+			request.setAttribute("autoClose", false);
 			return mapping.findForward("error");
 		}
+		request.setAttribute("autoClose", true);
 		return mapping.findForward("success");
 	}
 }
