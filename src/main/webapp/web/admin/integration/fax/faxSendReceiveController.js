@@ -22,13 +22,27 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 		controller.inboxItemList = [];
 
 		// ngTable object for storing search parameters
-		controller.search = {
-			page: 1,
-			count: 10,
-			sorting: {
-				DateSent: "desc"
+		controller.inbox =
+		{
+			search: {
+				page: 1,
+				count: 10,
+				sorting: {
+					DateSent: "desc"
+				}
 			}
 		};
+		// ngTable object for storing search parameters
+		controller.outbox =
+			{
+				search: {
+					page: 1,
+					count: 10,
+					sorting: {
+						DateSent: "desc"
+					}
+				}
+			};
 
 		controller.initialize = function()
 		{
@@ -53,15 +67,16 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 		controller.loadOutboxItems = function()
 		{
 			controller.tableParamsOutbox = new NgTableParams(
-				controller.search,
+				controller.outbox.search,
 				{
 					getData: function(params)
 					{
-						controller.search = params.url();
-						return faxAccountService.getOutbox(controller.selectedFaxAccount.id, controller.search.page, controller.search.count).then(
+						controller.outbox.search = params.url();
+						return faxAccountService.getOutbox(controller.selectedFaxAccount.id, controller.outbox.search.page, controller.outbox.search.count).then(
 							function success(response)
 							{
-								controller.outboxItemList = response;
+								controller.outboxItemList = response.data;
+								controller.tableParamsOutbox.total(response.meta.total);
 								return controller.outboxItemList;
 							},
 							function error(error)
@@ -78,15 +93,16 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 		controller.loadInboxItems = function ()
 		{
 			controller.tableParamsInbox = new NgTableParams(
-				controller.search,
+				controller.inbox.search,
 				{
 					getData: function (params)
 					{
-						controller.search = params.url();
-						return faxAccountService.getInbox(controller.selectedFaxAccount.id, controller.search.page, controller.search.count).then(
+						controller.inbox.search = params.url();
+						return faxAccountService.getInbox(controller.selectedFaxAccount.id, controller.inbox.search.page, controller.inbox.search.count).then(
 							function success(response)
 							{
-								controller.inboxItemList = response;
+								controller.inboxItemList = response.data;
+								controller.tableParamsInbox.total(response.meta.total);
 								return controller.inboxItemList;
 							},
 							function error(error)

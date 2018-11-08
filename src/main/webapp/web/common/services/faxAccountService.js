@@ -157,7 +157,7 @@ angular.module("Common.Services").service("faxAccountService", [
 			junoHttp.get(service.apiPath + '/' + accountId + '/inbox', config).then(
 				function success(response)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(response);
 				},
 				function error(error)
 				{
@@ -180,7 +180,7 @@ angular.module("Common.Services").service("faxAccountService", [
 			junoHttp.get(service.apiPath + '/' + accountId + '/outbox', config).then(
 				function success(response)
 				{
-					deferred.resolve(response.data);
+					deferred.resolve(response);
 				},
 				function error(error)
 				{

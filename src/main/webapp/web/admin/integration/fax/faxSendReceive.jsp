@@ -85,7 +85,7 @@
 					<span>Next check for new faxes at {{faxSendReceiveController.nextPullTime}}</span>
 				</div>
 
-				<table ng-table="faxSendReceiveController.tableParamsInbox" show-filter="false" class="table table-striped table-bordered">
+				<table ng-table="faxSendReceiveController.tableParamsInbox" show-filter="true" class="table table-striped table-bordered">
 					<tbody>
 					<tr ng-repeat="item in faxSendReceiveController.inboxItemList">
 
@@ -115,7 +115,7 @@
 					<span>The system will automatically attempt to resend queued faxes again at {{faxSendReceiveController.nextPushTime}}</span>
 				</div>
 
-				<table ng-table="faxSendReceiveController.tableParamsOutbox" show-filter="false" class="table table-striped table-bordered">
+				<table ng-table="faxSendReceiveController.tableParamsOutbox" show-filter="true" class="table table-striped table-bordered">
 					<tbody>
 					<tr ng-repeat="item in faxSendReceiveController.outboxItemList">
 						<td>
