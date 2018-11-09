@@ -29,6 +29,7 @@ import com.lowagie.text.DocumentException;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperRunManager;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
@@ -92,18 +93,29 @@ public class FrmCustomedPDFServlet extends HttpServlet
 				PrintWriter writer = res.getWriter();
 
 				HashSet<String> recipients = OutgoingFaxService.preProcessFaxNumbers(pharmacyFaxNo);
+				String faxMessage = "Fax sent to: " + pharmacyName + " (" + pharmacyFaxNo + ")";
 				for(String recipient : recipients)
 				{
 					// write to file
 					String pdfFile = "prescription_" + pdfId + ".pdf";
 					GenericFile fileToFax = FileFactory.createTempFile(baosPDF, ".pdf");
 					fileToFax.rename(pdfFile);
-					FaxOutboxTransferOutbound transfer = outgoingFaxService.sendFax(providerNo, demographicNo, recipient, FaxOutbound.FileType.FORM, fileToFax);
+					FaxOutboxTransferOutbound transfer = outgoingFaxService.sendFax(providerNo, demographicNo, recipient, FaxOutbound.FileType.PRESCRIPTION, fileToFax);
+					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
+					{
+						faxMessage = StringEscapeUtils.escapeHtml4("Failed to send fax. Check account settings. " +
+								"Reason: " + transfer.getSystemStatusMessage());
+					}
+					else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED.name()))
+					{
+						faxMessage = StringEscapeUtils.escapeHtml4("Failed to send fax, it has been queued for automatic resend. " +
+								"Reason: " + transfer.getSystemStatusMessage());
+					}
 				}
 				LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
 						pdfId, req.getRemoteAddr(), "Prescription " + pdfId);
 
-				writer.println("<script>alert('Fax sent to: " + pharmacyName + " (" + pharmacyFaxNo + ")');window.close();</script>");
+				writer.println("<script>alert('" + faxMessage + ")');window.close();</script>");
 			}
 			else
 			{
