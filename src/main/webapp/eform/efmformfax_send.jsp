@@ -8,13 +8,17 @@
     and "gnu.org/licenses/gpl-2.0.html".
 
 --%>
-<%@page import="oscar.eform.actions.FaxAction"%>
+<%@page import="org.oscarehr.fax.model.FaxOutbound"%>
 <%@ page language="java"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 
 <%@page import="org.oscarehr.util.MiscUtils"%>
+<%@ page import="org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound" %>
+<%@ page import="oscar.eform.actions.FaxAction" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
 <html:html locale="true">
 	<%
 
@@ -23,18 +27,30 @@
 		String providerId = request.getParameter("efmprovider_no");
 		FaxAction bean = new FaxAction(request);
 		boolean failed = false;
-		String responseMsg;
+		List<String> errorMessages = new ArrayList<String>(faxRecipients.length);
 
 		try
 		{
-			bean.faxForms(faxRecipients, formId, providerId);
-			responseMsg = "Fax has been sent successfully.";
-
+			List<FaxOutboxTransferOutbound> faxTransferList = bean.faxForms(faxRecipients, formId, providerId);
+			for(FaxOutboxTransferOutbound transfer : faxTransferList)
+			{
+				if(FaxOutbound.Status.QUEUED.name().equals(transfer.getSystemStatus()))
+				{
+					errorMessages.add("Failed to send fax, it has been queued for automatic resend. " +
+							"Reason: " + transfer.getSystemStatusMessage());
+				}
+				else if(FaxOutbound.Status.ERROR.name().equals(transfer.getSystemStatus()))
+				{
+					errorMessages.add("Failed to send fax. Check account settings. " +
+							"Reason: " + transfer.getSystemStatusMessage());
+					failed=true;
+				}
+			}
 		}
 		catch (Exception e)
 		{
 			MiscUtils.getLogger().error("An error occurred while faxing eForm.", e);
-			responseMsg = "An error occurred sending the fax, please contact an administrator.";
+			errorMessages.add("An error occurred sending the fax, please contact an administrator.");
 			failed = true;
 		}
 
@@ -47,7 +63,7 @@
 		table {
 			font-size: initial;
 		}
-		#faxError {
+		.faxError {
 			font-size: 1.25em;
 			color: red;
 		}
@@ -85,27 +101,50 @@ window.onload = function()
 		<td class="MainTableLeftColumn" width="10%">&nbsp;</td>
 		<td class="MainTableRightColumn">
 		<table width="100%" height="100%">
-			<tr>
-				<td id=<%=failed ? "faxError" : "faxSuccess"%>>
-					<%=responseMsg%>
-				</td>
-			</tr>
+
 			<%
-				if (!failed)
+				if(!errorMessages.isEmpty())
 				{
 			%>
-			<tr>
-				<td><bean:message
-					key="oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.msgClose5Sec" />
-				</td>
-			</tr>
-			<tr>
-				<td><a href="javascript: BackToOscar();"> <bean:message
-					key="global.btnClose" /> </a></td>
-			</tr>
-			<%
+				<h1><bean:message
+					key="oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.msgEncounteredErrors"/></h1><%
+					for(String errorMessage : errorMessages)
+					{
+					%>
+					<tr>
+						<td>
+							<span class="faxError"><%=errorMessage%></span>
+						</td>
+					</tr>
+					<%
+					}
+				}
+				else
+				{
+				%>
+					<tr>
+						<td id='faxSuccess'>
+							Fax has been sent successfully.
+						</td>
+					</tr>
+				<%
+				}
+
+				if (!failed)
+				{
+				%>
+				<tr>
+					<td><bean:message
+						key="oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.msgClose5Sec" />
+					</td>
+				</tr>
+				<%
 				}
 			%>
+			<tr>
+				<td><a href="javascript: BackToOscar();"> <bean:message
+						key="global.btnClose" /> </a></td>
+			</tr>
 		</table>
 		</td>
 	</tr>

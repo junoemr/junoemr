@@ -26,7 +26,9 @@ import oscar.log.LogConst;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 public final class FaxAction
 {
@@ -54,9 +56,10 @@ public final class FaxAction
 	 * @throws IOException
 	 * @throws HtmlToPdfConversionException
 	 */
-	public void faxForms(String[] numbers, String formId, String providerId) throws IOException, HtmlToPdfConversionException
+	public List<FaxOutboxTransferOutbound> faxForms(String[] numbers, String formId, String providerId) throws IOException, HtmlToPdfConversionException
 	{
 		HashSet<String> recipients = OutgoingFaxService.preProcessFaxNumbers(numbers);
+		List<FaxOutboxTransferOutbound> transferList = new ArrayList<>(recipients.size());
 		for (String recipient : recipients)
 		{
 			logger.info("Generating PDF for eForm with fdid = " + formId);
@@ -71,6 +74,7 @@ public final class FaxAction
 
 			GenericFile fileToFax = FileFactory.getExistingFile(tempFile);
 			FaxOutboxTransferOutbound transfer = outgoingFaxService.sendFax(providerId, null, recipient, FaxOutbound.FileType.FORM, fileToFax);
+			transferList.add(transfer);
 		}
 		LogAction.addLogEntry(providerId, null, LogConst.ACTION_SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
 				formId, requestIp, "EForm " + formId);
@@ -82,5 +86,6 @@ public final class FaxAction
 			eFormData.setCurrent(false);
 			eFormDataDao.merge(eFormData);
 		}
+		return transferList;
 	}
 }
