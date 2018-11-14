@@ -23,7 +23,7 @@
 package org.oscarehr.fax.schedulingTasks;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.fax.service.IncomingFaxService;
+import org.oscarehr.fax.service.IncomingFaxDownloadService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -48,7 +48,7 @@ public class InboundFaxSchedulingTask
 	private static CronSequenceGenerator cronTrigger;
 
 	@Autowired
-	private IncomingFaxService incomingFaxService;
+	private IncomingFaxDownloadService incomingFaxDownloadService;
 
 	@PostConstruct
 	public void init()
@@ -62,7 +62,7 @@ public class InboundFaxSchedulingTask
 		if(enabled)
 		{
 			logger.info("Execute Inbound scheduling task! " + ConversionUtils.toDateTimeString(LocalDateTime.now()));
-			incomingFaxService.pullNewFaxes();
+			incomingFaxDownloadService.pullNewFaxes();
 			logger.info("Completed at " + ConversionUtils.toDateTimeString(LocalDateTime.now()) + ". Next Execution Time: " + getNextRunTime());
 		}
 	}

@@ -24,7 +24,7 @@ package org.oscarehr.ws.rest;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.fax.schedulingTasks.InboundFaxSchedulingTask;
-import org.oscarehr.fax.service.IncomingFaxService;
+import org.oscarehr.fax.service.IncomingFaxDownloadService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class FaxInboundWebService extends AbstractServiceImpl
 	SecurityInfoManager securityInfoManager;
 
 	@Autowired
-	IncomingFaxService incomingFaxService;
+	IncomingFaxDownloadService incomingFaxDownloadService;
 
 	@GET
 	@Path("/getNextPullTime")

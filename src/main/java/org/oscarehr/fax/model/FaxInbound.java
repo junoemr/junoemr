@@ -33,7 +33,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -64,7 +63,7 @@ public class FaxInbound extends AbstractModel<Long>
 	@Column(name= "external_reference_id")
 	private Long externalReferenceId;
 
-	@OneToOne(fetch=FetchType.LAZY)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name = "document_no")
 	private Document document;
 
@@ -72,7 +71,7 @@ public class FaxInbound extends AbstractModel<Long>
 	@JoinColumn(name = "fax_account_id")
 	private FaxAccount faxAccount;
 
-	@Id
+	@Override
 	public Long getId()
 	{
 		return id;

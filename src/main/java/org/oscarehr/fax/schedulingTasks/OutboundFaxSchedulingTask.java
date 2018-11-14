@@ -56,7 +56,7 @@ public class OutboundFaxSchedulingTask
 		cronTrigger = new CronSequenceGenerator(cronSchedule, TimeZone.getDefault());
 	}
 
-	@Scheduled(cron=cronSchedule)
+	@Scheduled(cron = cronSchedule)
 	public void sendOutboundFaxes()
 	{
 		if(enabled)
