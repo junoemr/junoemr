@@ -23,7 +23,9 @@
 package org.oscarehr.fax.schedulingTasks;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.fax.service.IncomingFaxService;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Component;
@@ -42,8 +44,11 @@ public class InboundFaxSchedulingTask
 	private static final OscarProperties props = OscarProperties.getInstance();
 
 	private static final boolean enabled = props.isPropertyActive("fax.schedule_inbound.enabled");
-	private static final String cronSchedule = "0 0/15 * * * ?";
+	private static final String cronSchedule = "0 0/5 * * * ?";
 	private static CronSequenceGenerator cronTrigger;
+
+	@Autowired
+	private IncomingFaxService incomingFaxService;
 
 	@PostConstruct
 	public void init()
@@ -57,7 +62,8 @@ public class InboundFaxSchedulingTask
 		if(enabled)
 		{
 			logger.info("Execute Inbound scheduling task! " + ConversionUtils.toDateTimeString(LocalDateTime.now()));
-			logger.info("Next Execution Time: " + getNextRunTime());
+			incomingFaxService.pullNewFaxes();
+			logger.info("Completed at " + ConversionUtils.toDateTimeString(LocalDateTime.now()) + ". Next Execution Time: " + getNextRunTime());
 		}
 	}
 

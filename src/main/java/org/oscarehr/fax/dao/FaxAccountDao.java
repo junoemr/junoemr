@@ -48,7 +48,7 @@ public class FaxAccountDao extends AbstractDao<FaxAccount>
 		return query.getResultList();
 	}
 
-	public List<FaxAccount> findByActiveInbound(boolean enabled, boolean activeInbound, int offset, int limit)
+	public List<FaxAccount> findByActiveInbound(boolean enabled, boolean activeInbound)
 	{
 		Query query = entityManager.createQuery(
 				"SELECT config FROM FaxAccount config " +
@@ -57,13 +57,11 @@ public class FaxAccountDao extends AbstractDao<FaxAccount>
 		);
 		query.setParameter("enabled", enabled);
 		query.setParameter("activeInbound", activeInbound);
-		query.setMaxResults(limit);
-		query.setFirstResult(offset);
 
 		return query.getResultList();
 	}
 
-	public List<FaxAccount> findByActiveOutbound(boolean enabled, boolean activeOutbound, int offset, int limit)
+	public List<FaxAccount> findByActiveOutbound(boolean enabled, boolean activeOutbound)
 	{
 		Query query = entityManager.createQuery(
 				"SELECT config FROM FaxAccount config " +
@@ -72,8 +70,6 @@ public class FaxAccountDao extends AbstractDao<FaxAccount>
 		);
 		query.setParameter("enabled", enabled);
 		query.setParameter("activeOutbound", activeOutbound);
-		query.setMaxResults(limit);
-		query.setFirstResult(offset);
 
 		return query.getResultList();
 	}

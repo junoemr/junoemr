@@ -48,7 +48,7 @@ public class OutboundFaxSchedulingTask
 	private static CronSequenceGenerator cronTrigger;
 
 	@Autowired
-	OutgoingFaxService outgoingFaxService;
+	private OutgoingFaxService outgoingFaxService;
 
 	@PostConstruct
 	public void init()
@@ -63,7 +63,7 @@ public class OutboundFaxSchedulingTask
 		{
 			logger.info("Execute Outbound scheduling task! " + ConversionUtils.toDateTimeString(LocalDateTime.now()));
 			outgoingFaxService.sendQueuedFaxes();
-			logger.info("Next Execution Time: " + getNextRunTime());
+			logger.info("Completed at " + ConversionUtils.toDateTimeString(LocalDateTime.now()) + ". Next Execution Time: " + getNextRunTime());
 		}
 	}
 

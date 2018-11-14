@@ -114,6 +114,15 @@ public class SRFaxApiConnector
 	public static final String PERIOD_RANGE = "RANGE";
 	public static final String FAX_TYPE_SINGLE = "SINGLE";
 	public static final String FAX_TYPE_BROADCAST = "BROADCAST";
+	public static final String RETRIEVE_DIRECTION_IN = "IN";
+	public static final String RETRIEVE_DIRECTION_OUT = "IN";
+	public static final String RETRIEVE_DOC_FORMAT = "PDF";
+	public static final String RETRIEVE_DONT_CHANGE_STATUS = "N";
+	public static final String MARK_AS_READ = "Y";
+	public static final String MARK_AS_UNREAD = "N";
+	public static final String VIEWED_STATUS_ALL = "ALL";
+	public static final String VIEWED_STATUS_READ = "READ";
+	public static final String VIEWED_STATUS_UNREAD = "UNREAD";
 	public static final List<String> validCoverLetterNames = new ArrayList<String>(4) {{
 		add("Basic");
 		add("Standard");
@@ -222,13 +231,13 @@ public class SRFaxApiConnector
 	private ListWrapper<GetFaxInboxResult> Get_Fax_Inbox(Map<String, String> parameters)
 	{
 		String[] requiredFields = {};
-		String[] optionalFields = {S_RESPONSE_FORMAT, S_PERIOD, S_START_DATE, S_END_DATE, S_VIEWED_STATUS, S_INCLUDE_SUB_USERS, S_FAX_DETAILS_ID};
+		String[] optionalFields = {S_RESPONSE_FORMAT, S_PERIOD, S_START_DATE, S_END_DATE, S_VIEWED_STATUS, S_INCLUDE_SUB_USERS};
 		String result = processRequest(ACTION_GET_FAX_INBOX, requiredFields, optionalFields, parameters);
 		return processListResponse(result, new TypeReference<ListWrapper<GetFaxInboxResult>>(){});
 	}
 	public ListWrapper<GetFaxInboxResult> Get_Fax_Inbox(String sResponseFormat, String sPeriod,
 	                                                     String sStartDate, String sEndDate, String sViewedStatus,
-	                                                     String sIncludeSubUsers, String sFaxDetailsID)
+	                                                     String sIncludeSubUsers)
 	{
 		Map<String, String> parameters = new HashMap<>();
 		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
@@ -237,7 +246,6 @@ public class SRFaxApiConnector
 		putIfPresent(parameters, S_END_DATE, sEndDate);
 		putIfPresent(parameters, S_VIEWED_STATUS, sViewedStatus);
 		putIfPresent(parameters, S_INCLUDE_SUB_USERS, sIncludeSubUsers);
-		putIfPresent(parameters, S_FAX_DETAILS_ID, sFaxDetailsID);
 		return Get_Fax_Inbox(parameters);
 	}
 

@@ -37,13 +37,17 @@ public class FaxOutboundDao extends AbstractDao<FaxOutbound>
 		super(FaxOutbound.class);
 	}
 
-	public List<FaxOutbound> findByStatus(FaxOutbound.Status status)
+	public List<FaxOutbound> findActiveQueued()
 	{
 		Query query = entityManager.createQuery(
 				"SELECT record " +
 						"FROM FaxOutbound record " +
-						"WHERE record.status = :status");
-		query.setParameter("status", status);
+						"INNER JOIN record.faxAccount acct " +
+						"WHERE record.status = :status " +
+						"AND acct.outboundEnabled = :enabled " +
+						"ORDER BY record.createdAt ASC");
+		query.setParameter("status", FaxOutbound.Status.QUEUED);
+		query.setParameter("enabled", true);
 		return query.getResultList();
 	}
 }

@@ -77,7 +77,7 @@ public class OutgoingFaxService
 
 	public boolean isOutboundFaxEnabled()
 	{
-		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveOutbound(true, true, 0, 1);
+		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveOutbound(true, true);
 		return (!faxAccountList.isEmpty() || props.isFaxEnabled());
 	}
 
@@ -100,7 +100,7 @@ public class OutgoingFaxService
 	public FaxOutboxTransferOutbound sendFax(String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException
 	{
 		//TODO determine which fax route to use
-		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveOutbound(true, true, 0, 1);
+		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveOutbound(true, true);
 		FaxOutboxTransferOutbound transfer;
 		// check for enabled fax routes
 		if(!faxAccountList.isEmpty())
@@ -163,7 +163,8 @@ public class OutgoingFaxService
 	 */
 	public void sendQueuedFaxes()
 	{
-		List<FaxOutbound> queuedFaxList = faxOutboundDao.findByStatus(FaxOutbound.Status.QUEUED);
+		// get a list of queued faxes filtered by accounts with active outbound faxing
+		List<FaxOutbound> queuedFaxList = faxOutboundDao.findActiveQueued();
 		for(FaxOutbound queuedFax : queuedFaxList)
 		{
 			GenericFile fileToResend;
