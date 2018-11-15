@@ -30,7 +30,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 public class GetFaxInboxResult
 {
 	@JsonProperty("FileName")
-	private String fileName;
+	private String rawFileName;
 	@JsonProperty("ReceiveStatus")
 	private String recieveStatus;
 	@JsonProperty("Date")
@@ -53,14 +53,33 @@ public class GetFaxInboxResult
 	@JsonProperty("User_FaxNumber")
 	private String userFaxNumber;
 
-	public String getFileName()
+	/**
+	 * @return the fileName string as sent by SRFAX
+	 */
+	public String getRawFileName()
 	{
-		return fileName;
+		return rawFileName;
 	}
 
-	public void setFileName(String fileName)
+	public void setRawFileName(String rawFileName)
 	{
-		this.fileName = fileName;
+		this.rawFileName = rawFileName;
+	}
+
+	/**
+	 * @return the parsed fileName section of the fileName sent by SRFAX
+	 */
+	public String getFileName()
+	{
+		return getRawFileName().split("\\|")[0];
+	}
+
+	/**
+	 * @return the parsed detailsID section of the fileName sent by SRFAX
+	 */
+	public String getDetailsId()
+	{
+		return getRawFileName().split("\\|")[1];
 	}
 
 	public String getRecieveStatus()

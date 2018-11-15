@@ -33,6 +33,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -51,8 +52,8 @@ public class FaxInbound extends AbstractModel<Long>
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createdAt;
 
-	@Column(name= "file_name")
-	private String fileName;
+	@Column(name= "sent_from")
+	private String sentFrom;
 
 	@Column(name= "external_account_id")
 	private String externalAccountId;
@@ -63,7 +64,7 @@ public class FaxInbound extends AbstractModel<Long>
 	@Column(name= "external_reference_id")
 	private Long externalReferenceId;
 
-	@ManyToOne(fetch=FetchType.LAZY)
+	@OneToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name = "document_no")
 	private Document document;
 
@@ -92,14 +93,14 @@ public class FaxInbound extends AbstractModel<Long>
 		this.createdAt = createdAt;
 	}
 
-	public String getFileName()
+	public String getSentFrom()
 	{
-		return fileName;
+		return sentFrom;
 	}
 
-	public void setFileName(String fileName)
+	public void setSentFrom(String sentFrom)
 	{
-		this.fileName = fileName;
+		this.sentFrom = sentFrom;
 	}
 
 	public String getExternalAccountId()

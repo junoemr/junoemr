@@ -36,7 +36,11 @@ public class FaxInboxTransferOutbound implements Serializable
 	/* the received date of the document as recorded in the system */
 	private String systemDateReceived;
 	/* the id of the document in the system */
-	private Long documentId;
+	private Integer documentId;
+
+	private String sentFrom;
+
+	private Long externalReferenceId;
 
 	public Long getId()
 	{
@@ -68,13 +72,33 @@ public class FaxInboxTransferOutbound implements Serializable
 		this.systemDateReceived = systemDateReceived;
 	}
 
-	public Long getDocumentId()
+	public Integer getDocumentId()
 	{
 		return documentId;
 	}
 
-	public void setDocumentId(Long documentId)
+	public void setDocumentId(Integer documentId)
 	{
 		this.documentId = documentId;
+	}
+
+	public String getSentFrom()
+	{
+		return sentFrom;
+	}
+
+	public void setSentFrom(String sentFrom)
+	{
+		this.sentFrom = sentFrom;
+	}
+
+	public Long getExternalReferenceId()
+	{
+		return externalReferenceId;
+	}
+
+	public void setExternalReferenceId(Long externalReferenceId)
+	{
+		this.externalReferenceId = externalReferenceId;
 	}
 }

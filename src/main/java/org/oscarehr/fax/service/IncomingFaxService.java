@@ -27,8 +27,10 @@ import org.apache.log4j.Logger;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.fax.dao.FaxInboundDao;
+import org.oscarehr.fax.externalApi.srfax.result.GetFaxInboxResult;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxInbound;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,15 +57,16 @@ public class IncomingFaxService
 	@Autowired
 	private DocumentService documentService;
 
-	public FaxInbound saveFaxDocument(FaxAccount faxAccount, Long referenceId, String result) throws IOException, InterruptedException
+	public FaxInbound saveFaxDocument(final FaxAccount faxAccount, final GetFaxInboxResult inboxMeta, String result) throws IOException, InterruptedException
 	{
 		InputStream documentStream = base64ToStream(result);
+		Long referenceId = Long.parseLong(inboxMeta.getDetailsId());
 
 		// upload a new document through document service
 		Document document = new Document();
 		document.setSource(faxAccount.getIntegrationType());
-		document.setDoccreator("-1");
-		document.setResponsible("-1");
+		document.setDoccreator(ProviderData.SYSTEM_PROVIDER_NO);
+		document.setResponsible(ProviderData.SYSTEM_PROVIDER_NO);
 		document.setDocdesc("Incoming Fax");
 
 		document = documentService.uploadNewDemographicDocument(document, documentStream, null);
@@ -72,6 +75,7 @@ public class IncomingFaxService
 		// create a record in the fax_inbound table
 		FaxInbound faxInbound = new FaxInbound();
 		faxInbound.setCreatedAt(new Date());
+		faxInbound.setSentFrom(inboxMeta.getCallerId());
 		faxInbound.setDocument(document);
 		faxInbound.setFaxAccount(faxAccount);
 		faxInbound.setExternalAccountId(faxAccount.getLoginId());

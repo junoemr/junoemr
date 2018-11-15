@@ -24,8 +24,10 @@ package org.oscarehr.ws.rest;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.fax.dao.FaxAccountDao;
+import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 import org.oscarehr.fax.service.FaxAccountService;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -49,7 +51,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.LinkedList;
 import java.util.List;
 
 @Path("/faxAccount")
@@ -66,6 +67,9 @@ public class FaxAccountWebService extends AbstractServiceImpl
 
 	@Autowired
 	FaxOutboundDao faxOutboundDao;
+
+	@Autowired
+	FaxInboundDao faxInboundDao;
 
 	@Autowired
 	FaxAccountService faxAccountService;
@@ -207,10 +211,20 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin", "_admin.fax");
 
-		//TODO load inbox results
-		List<FaxInboxTransferOutbound> resultList = new LinkedList<>();
+		page = validPageNo(page);
+		perPage = limitedResultCount(perPage);
+		int offset = calculatedOffset(page, perPage);
 
-		return RestSearchResponse.successResponse(resultList, page, perPage, 0);
+		FaxInboundCriteriaSearch criteriaSearch = new FaxInboundCriteriaSearch();
+		criteriaSearch.setOffset(offset);
+		criteriaSearch.setLimit(perPage);
+		criteriaSearch.setFaxAccountId(id);
+		criteriaSearch.setSortDirDescending();
+
+		int total = faxInboundDao.criteriaSearchCount(criteriaSearch);
+		List<FaxInboxTransferOutbound> resultList = faxAccountService.getInboxResults(criteriaSearch);
+
+		return RestSearchResponse.successResponse(resultList, page, perPage, total);
 	}
 
 	@GET

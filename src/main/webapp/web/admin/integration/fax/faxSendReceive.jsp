@@ -83,14 +83,24 @@
 
 				<div ng-show="faxSendReceiveController.selectedFaxAccount.enableInbound == true">
 					<span>Next check for new faxes at {{faxSendReceiveController.nextPullTime}}</span>
+					<span>Faxes marked as 'Unread' will be downloaded, and marked as 'Read'</span>
+				</div>
+				<div ng-show="faxSendReceiveController.selectedFaxAccount.enableInbound == false">
+					<span>Inbound Faxing integration is disabled for this account</span>
 				</div>
 
 				<table ng-table="faxSendReceiveController.tableParamsInbox" show-filter="false" class="table table-striped table-bordered">
 					<tbody>
 					<tr ng-repeat="item in faxSendReceiveController.inboxItemList">
 
-						<td data-title="'Received Date'">{{item.dateReceived}}</td>
-						<td data-title="'Document Link'">{{item.documentNo}}</td>
+						<td data-title="'Received Date'">{{item.systemDateReceived}}</td>
+						<td data-title="'Sender'">{{item.sentFrom}}</td>
+						<td>
+							<button class="btn btn-primary btn-xs"
+							ng-click="faxSendReceiveController.openDocument(item.documentId)">
+								View
+							</button>
+						</td>
 					</tr>
 					</tbody>
 				</table>

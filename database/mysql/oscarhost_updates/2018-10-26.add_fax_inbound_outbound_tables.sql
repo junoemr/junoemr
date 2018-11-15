@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS `fax_inbound` (
   fax_account_id          BIGINT UNSIGNED,
   document_no             int(20),
   created_at              datetime NOT NULL,
-  file_name               VARCHAR(255),
+  sent_from               VARCHAR(32),
   external_account_id     VARCHAR(255),
   external_account_type   VARCHAR(32),
   external_reference_id   BIGINT UNSIGNED,

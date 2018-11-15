@@ -24,22 +24,26 @@ package org.oscarehr.fax.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.result.GetFaxStatusResult;
 import org.oscarehr.fax.externalApi.srfax.result.GetUsageResult;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.model.FaxInbound;
 import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
+import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +61,9 @@ public class FaxAccountService
 	@Autowired
 	private FaxOutboundDao faxOutboundDao;
 
+	@Autowired
+	private FaxInboundDao faxInboundDao;
+
 	/**
 	 * Test the connection to the fax service based on the configuration settings
 	 * @return true if the connection succeeded, false otherwise
@@ -70,10 +77,7 @@ public class FaxAccountService
 		}
 
 		SRFaxApiConnector apiConnector = new SRFaxApiConnector(accountId, password);
-
-		LocalDate localDate = LocalDate.now();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-		String currentDateStr = localDate.format(formatter);
+		String currentDateStr = ConversionUtils.toDateString(LocalDate.now(), SRFaxApiConnector.DATE_FORMAT);
 
 		ListWrapper<GetUsageResult> result = apiConnector.Get_Fax_Usage(
 				SRFaxApiConnector.RESPONSE_FORMAT_JSON,
@@ -152,6 +156,20 @@ public class FaxAccountService
 			}
 			transferList.add(transfer);
 		}
+		return transferList;
+	}
+
+	public List<FaxInboxTransferOutbound> getInboxResults(FaxInboundCriteriaSearch criteriaSearch)
+	{
+		// find the list of all inbound results based on the search criteria
+		List<FaxInbound> inboundList = faxInboundDao.criteriaSearch(criteriaSearch);
+
+		ArrayList<FaxInboxTransferOutbound> transferList = new ArrayList<>(inboundList.size());
+		for(FaxInbound faxInbound : inboundList)
+		{
+			transferList.add(FaxTransferConverter.getAsInboxTransferObject(faxInbound));
+		}
+
 		return transferList;
 	}
 }

@@ -1,9 +1,11 @@
 angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSendReceiveController', [
 	'NgTableParams',
+	'providerService',
 	"faxAccountService",
 	"faxInboundService",
 	"faxOutboundService",
 	function (NgTableParams,
+	          providerService,
 	          faxAccountService,
 	          faxInboundService,
 	          faxOutboundService)
@@ -12,6 +14,7 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 		controller.systemStatusEnum = Object.freeze({"sent":"SENT", "queued":"QUEUED", "error":"ERROR"});
 		controller.tabEnum = Object.freeze({"inbox":0, "outbox":1});
 		controller.activeTab = controller.tabEnum.outbox;
+		controller.loggedInProviderNo = null;
 
 		controller.nextPullTime = null;
 		controller.nextPushTime = null;
@@ -88,6 +91,7 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 					}
 				}
 			);
+			controller.loadNextPushTime();
 		};
 
 		controller.loadInboxItems = function ()
@@ -114,6 +118,7 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 					}
 				}
 			);
+			controller.loadNextPullTime();
 		};
 
 		controller.resendFax = function(outboxItem)
@@ -167,6 +172,34 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 		controller.changeTab = function(tabId)
 		{
 			controller.activeTab = tabId;
+		};
+
+		controller.openDocument = function(documentId)
+		{
+			let openDocumentWindow = function()
+			{
+				window.open("../dms/showDocument.jsp?segmentID="+documentId+"&providerNo="+ controller.loggedInProviderNo + "&status=A&inWindow=true&chartView&demoName=");
+			};
+
+			// if the current provider number is unknown, retrieve it before opening the new window.
+			if(controller.loggedInProviderNo == null)
+			{
+				providerService.getMe().then(
+					function success(response)
+					{
+						controller.loggedInProviderNo = response.providerNo;
+						openDocumentWindow();
+					},
+					function error(error)
+					{
+						console.error(error);
+					}
+				)
+			}
+			else
+			{
+				openDocumentWindow();
+			}
 		};
 
 		controller.initialize();

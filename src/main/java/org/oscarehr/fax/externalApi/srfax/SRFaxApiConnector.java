@@ -55,6 +55,8 @@ import java.util.Map;
 
 public class SRFaxApiConnector
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
 	private static final String SERVER_URL = "https://www.srfax.com/SRF_SecWebSvc.php";
 
 	private static final String ACCESS_ID = "access_id";
@@ -104,9 +106,7 @@ public class SRFaxApiConnector
 	private static final String S_FAX_FORMAT = "sFaxFormat";
 	private static final String S_SUB_USER_ID = "sSubUserID";
 
-	private static final Logger logger = MiscUtils.getLogger();
-	private final String access_id;
-	private final String access_pwd;
+	public static final String DATE_FORMAT = "yyyyMMdd";
 
 	public static final String RESPONSE_FORMAT_JSON = "JSON";
 	public static final String RESPONSE_FORMAT_XML = "XML";
@@ -129,6 +129,9 @@ public class SRFaxApiConnector
 		add("Company");
 		add("Personal");
 	}};
+
+	private final String access_id;
+	private final String access_pwd;
 
 	public SRFaxApiConnector(String username, String password)
 	{

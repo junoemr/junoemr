@@ -23,7 +23,9 @@
 package org.oscarehr.ws.rest.conversion;
 
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.model.FaxInbound;
 import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferInbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferOutbound;
@@ -86,6 +88,19 @@ public class FaxTransferConverter
 		transfer.setSystemDateSent(ConversionUtils.toTimestampString(faxOutbound.getCreatedAt()));
 		transfer.setToFaxNumber(faxOutbound.getSentTo());
 		transfer.setFileType(faxOutbound.getFileType().name());
+
+		return transfer;
+	}
+
+	public static FaxInboxTransferOutbound getAsInboxTransferObject(FaxInbound faxInbound)
+	{
+		FaxInboxTransferOutbound transfer = new FaxInboxTransferOutbound();
+		transfer.setId(faxInbound.getId());
+		transfer.setDocumentId(faxInbound.getDocument().getDocumentNo());
+		transfer.setFaxAccountId(faxInbound.getFaxAccount().getId());
+		transfer.setSystemDateReceived(ConversionUtils.toTimestampString(faxInbound.getCreatedAt()));
+		transfer.setExternalReferenceId(faxInbound.getExternalReferenceId());
+		transfer.setSentFrom(faxInbound.getSentFrom());
 
 		return transfer;
 	}

@@ -32,6 +32,7 @@ import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxInbound;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,15 +63,13 @@ public class IncomingFaxDownloadService
 	private FaxAccountDao faxAccountDao;
 
 	@Autowired
-	private IncomingFaxService faxServiceTransactional;
+	private IncomingFaxService incomingFaxService;
 
 	public void pullNewFaxes()
 	{
 		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveInbound(true, true);
-		String dateFormat = "yyyyMMdd";
-		String startDate = ConversionUtils.toDateString(LocalDate.now().minusDays(faxDaysPast), dateFormat);
-		String endDate = ConversionUtils.toDateString(LocalDate.now(), dateFormat);
-		logger.info("Date range: '" + startDate + "' -> '" + endDate + "'");
+		String startDate = ConversionUtils.toDateString(LocalDate.now().minusDays(faxDaysPast), SRFaxApiConnector.DATE_FORMAT);
+		String endDate = ConversionUtils.toDateString(LocalDate.now(), SRFaxApiConnector.DATE_FORMAT);
 
 		for(FaxAccount faxAccount : faxAccountList)
 		{
@@ -121,9 +120,7 @@ public class IncomingFaxDownloadService
 			String inboundId = null;
 			try
 			{
-				String filename = result.getFileName();
-				String referenceIdStr = filename.split("\\|")[1];
-				Long referenceId = Long.parseLong(referenceIdStr);
+				String referenceIdStr = result.getDetailsId();
 
 				// for each new fax to get, call api and request document.
 				SingleWrapper<String> getDocResultWrapper = srFaxApiConnector.Retrieve_Fax(null,
@@ -137,7 +134,7 @@ public class IncomingFaxDownloadService
 				if(getDocResultWrapper.isSuccess())
 				{
 					// save document to input stream
-					FaxInbound faxInbound = faxServiceTransactional.saveFaxDocument(faxAccount, referenceId, getDocResultWrapper.getResult());
+					FaxInbound faxInbound = incomingFaxService.saveFaxDocument(faxAccount, result, getDocResultWrapper.getResult());
 					inboundId = String.valueOf(faxInbound.getId());
 					logStatus = LogConst.STATUS_SUCCESS;
 
@@ -178,7 +175,7 @@ public class IncomingFaxDownloadService
 			finally
 			{
 				// log download attempt to security log
-				LogAction.addLogEntry("-1", null, LogConst.ACTION_DOWNLOAD, LogConst.CON_FAX,
+				LogAction.addLogEntry(ProviderData.SYSTEM_PROVIDER_NO, null, LogConst.ACTION_DOWNLOAD, LogConst.CON_FAX,
 						logStatus, inboundId, null, logData);
 			}
 		}
