@@ -410,11 +410,11 @@ public final class MessageUploader {
 		if (providerNums.size() > 0) {
 			for (int i = 0; i < providerNums.size(); i++) {
 				String provider_no = providerNums.get(i);
-				routing.route(labId, provider_no, conn, "HL7");
+				routing.route(labId, provider_no, "HL7");
 			}
 		} else {
-			routing.route(labId, "0", conn, "HL7");
-			routing.route(labId, altProviderNo, conn, "HL7");
+			routing.route(labId, "0", "HL7");
+			routing.route(labId, altProviderNo, "HL7");
 		}
 	}
 

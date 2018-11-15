@@ -45,7 +45,6 @@ import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
-import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.XmlUtils;
@@ -485,11 +484,7 @@ public class CommonLabResultData {
 				for (int k = 0; k < labIds.length; k++) {
 
 					for (int j = 0; j < providersArray.length; j++) {
-						/*
-						 * if (!insertString.equals("")) { insertString = insertString + ", "; } insertString = insertString + "('" + providersArray[j] + "','" + labIds[k]+ "','N','"+labType+"')";
-						 */
-						plr.route(labIds[k], providersArray[j], DbConnectionFilter.getThreadLocalDbConnection(), labType);
-						//updateReportStatus(Integer.parseInt(labIds[k]),((providersArray[j]==null)?"":providersArray[j]),'N',"",labType);
+						plr.addToLabRouting(labIds[k], providersArray[j], labType);
 					}
 
 					// delete old entries

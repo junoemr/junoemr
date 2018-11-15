@@ -24,11 +24,9 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.dao.ProviderInboxRoutingDao;
-import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.common.model.ProviderInboxItem;
-import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.document.dao.DocumentDAO;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.CtlDocumentPK;
@@ -40,7 +38,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
-import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
 
 
 
@@ -105,7 +102,6 @@ public class SplitDocumentAction extends DispatchAction {
 
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
 			ProviderInboxRoutingDao providerInboxRoutingDao = (ProviderInboxRoutingDao) ctx.getBean("providerInboxRoutingDAO");
-			//providerInboxRoutingDao.addToProviderInbox("0", newDocNo, "DOC");
 
 			List<ProviderInboxItem> routeList = providerInboxRoutingDao.getProvidersWithRoutingForDocument("DOC", docNum);
 			for (ProviderInboxItem i : routeList) {
@@ -118,14 +114,6 @@ public class SplitDocumentAction extends DispatchAction {
 			Integer qid = 1;
 			Integer did= Integer.parseInt(newDocNo.trim());
 			queueDocumentLinkDAO.addToQueueDocumentLink(qid,did);
-
-			ProviderLabRoutingDao providerLabRoutingDao = (ProviderLabRoutingDao) SpringUtils.getBean("providerLabRoutingDao");
-
-			List<ProviderLabRoutingModel> result = providerLabRoutingDao.getProviderLabRoutingDocuments(docNum);
-			if (!result.isEmpty()) {
-				new ProviderLabRouting().route(newDocNo,
-						   result.get(0).getProviderNo(),"DOC");
-			}
 
 			PatientLabRoutingDao patientLabRoutingDao = (PatientLabRoutingDao) SpringUtils.getBean("patientLabRoutingDao");
 			List<PatientLabRouting> result2 = patientLabRoutingDao.findDocByDemographic(docNum);

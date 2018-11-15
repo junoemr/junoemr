@@ -103,7 +103,7 @@ public class ABCDParser {
 
 
       ProviderLabRouting router = new ProviderLabRouting();
-      router.route(labId, providerNo, conn, "CML");
+      router.route(labId, providerNo, "CML");
    }
 
    /////
