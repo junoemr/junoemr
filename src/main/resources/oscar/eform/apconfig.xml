@@ -545,6 +545,13 @@
 		<ap-output>${address_name}</ap-output>
 	</databaseap>
 	<databaseap>
+		<ap-name>licensed_producer_address_province</ap-name>
+		<ap-sql>SELECT pa.province as province
+			FROM demographic_licensed_producer d JOIN licensed_producer_address pa ON (d.address_id=pa.address_id) where d.demographic_no=${demographic}
+		</ap-sql>
+		<ap-output>${province}</ap-output>
+	</databaseap>
+	<databaseap>
 		<ap-name>licensed_producer_address_name_list</ap-name>
 		<ap-sql>SELECT GROUP_CONCAT(pa.display_name SEPARATOR ';') as list
 			FROM licensed_producer_address pa

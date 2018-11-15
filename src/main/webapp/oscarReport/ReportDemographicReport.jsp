@@ -467,8 +467,9 @@ if ( thisForm != null || thisForm.getAgeStyle() == null || thisForm.getAgeStyle(
                         <html:option value="0">---NO AGE SPECIFIED---</html:option>
                         <html:option value="1">younger than</html:option>
                         <html:option value="2">older than</html:option>
-                        <html:option value="3">equal too</html:option>
+                        <html:option value="3">equal to</html:option>
                         <html:option value="4">ages between</html:option>
+                        <html:option value="5">ages between and including</html:option>
                     </html:select>
                 </td>
                 <td>

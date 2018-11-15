@@ -44,6 +44,12 @@ public class RptDemographicQueryBuilder {
 	int theFirstFlag;
 	StringBuilder stringBuffer = null;
 
+	private static final int YOUNGER_THAN = 1;
+	private static final int OLDER_THAN = 2;
+	private static final int EQUAL_TO = 3;
+	private static final int AGES_BETWEEN = 4;
+	private static final int BETWEEN_AND_INCLUDING = 5;
+
 	public void whereClause() {
 		if (stringBuffer != null) {
 			if (theWhereFlag == 0) {
@@ -192,7 +198,7 @@ public class RptDemographicQueryBuilder {
 
 		MiscUtils.getLogger().debug("date style" + yStyle);
 		switch (yStyle) {
-		case 1:
+		case YOUNGER_THAN:
 			whereClause();
 			if (ageStyle.equals("1")) {
 				stringBuffer.append(" ( ( YEAR(" + asofDate + ") -YEAR (DATE_FORMAT(CONCAT((d.year_of_birth), '-', (d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d'))) - (RIGHT(" + asofDate + ",5)<RIGHT(DATE_FORMAT(CONCAT((d.year_of_birth),'-',(d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d'),5)) <  " + startYear + " ) ");
@@ -201,7 +207,7 @@ public class RptDemographicQueryBuilder {
 			}
 			theFirstFlag = 1;
 			break;
-		case 2:
+		case OLDER_THAN:
 			whereClause();
 			//if (ageStyle.equals("1")){
 			stringBuffer.append(" ( ( YEAR(" + asofDate + ") -YEAR (DATE_FORMAT(CONCAT((d.year_of_birth), '-', (d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d'))) - (RIGHT(" + asofDate + ",5)<RIGHT(DATE_FORMAT(CONCAT((d.year_of_birth),'-',(d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d'),5)) >  " + startYear + " ) ");
@@ -210,7 +216,7 @@ public class RptDemographicQueryBuilder {
 			//}
 			theFirstFlag = 1;
 			break;
-		case 3:
+		case EQUAL_TO:
 			whereClause();
 			if (ageStyle.equals("1")) {
 				stringBuffer.append(" ( ( YEAR(" + asofDate + ") -YEAR (DATE_FORMAT(CONCAT((d.year_of_birth), '-', (d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d'))) - (RIGHT(" + asofDate + ",5)<RIGHT(DATE_FORMAT(CONCAT((d.year_of_birth),'-',(d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d'),5)) =  " + startYear + " ) ");
@@ -219,7 +225,7 @@ public class RptDemographicQueryBuilder {
 			}
 			theFirstFlag = 1;
 			break;
-		case 4:
+		case AGES_BETWEEN:
 			whereClause();
 			MiscUtils.getLogger().debug("age style " + ageStyle);
 			if (!ageStyle.equals("2")) {
@@ -242,6 +248,36 @@ public class RptDemographicQueryBuilder {
 				}
 			} else {
 				stringBuffer.append(" ( YEAR(" + asofDate + ") - d.year_of_birth > " + startYear + "  and YEAR(" + asofDate + ") - d.year_of_birth < " + endYear + "  ) ");
+			}
+			theFirstFlag = 1;
+			break;
+		case BETWEEN_AND_INCLUDING:
+			whereClause();
+
+			if (!ageStyle.equals("2"))
+			{
+				MiscUtils.getLogger().debug("VERIFYING INT" + startYear);
+				//check to see if its a number
+				if (verifyInt(startYear))
+				{
+					stringBuffer.append(" ( ( YEAR(" + asofDate + ") -YEAR (DATE_FORMAT(CONCAT((d.year_of_birth), '-', (d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d'))) - (RIGHT(" + asofDate + ",5)<=RIGHT(DATE_FORMAT(CONCAT((d.year_of_birth),'-',(d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d'),5)) >=  " + startYear + " ) ");
+				} else
+				{
+					String interval = getInterval(startYear);
+					stringBuffer.append(" ( date_sub(" + asofDate + ",interval " + interval + ") >= DATE_FORMAT(CONCAT((d.year_of_birth),'-',(d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d')   ) ");
+				}
+				stringBuffer.append(" and ");
+				if (verifyInt(endYear))
+				{
+					stringBuffer.append(" ( ( YEAR(" + asofDate + ") -YEAR (DATE_FORMAT(CONCAT((d.year_of_birth), '-', (d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d'))) - (RIGHT(" + asofDate + ",5)<=RIGHT(DATE_FORMAT(CONCAT((d.year_of_birth),'-',(d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d'),5)) <=  " + endYear + "  ) ");
+				} else
+				{
+					String interval = getInterval(endYear);
+					stringBuffer.append(" ( date_sub(" + asofDate + ",interval " + interval + ") <= DATE_FORMAT(CONCAT((d.year_of_birth),'-',(d.month_of_birth),'-',(d.date_of_birth)),'%Y-%m-%d')   ) ");
+				}
+			} else
+			{
+				stringBuffer.append(" ( YEAR(" + asofDate + ") - d.year_of_birth >= " + startYear + "  and YEAR(" + asofDate + ") - d.year_of_birth <= " + endYear + "  ) ");
 			}
 			theFirstFlag = 1;
 			break;
