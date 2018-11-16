@@ -365,10 +365,8 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 			infoTable.addCell(setDataCell(cell, reqFrm.patientCPhone));
 		}
 
-		if(props.isPropertyActive("consultation.include_patient_email")) {
-			infoTable.addCell(setInfoCell(cell, getResource("msgEmail")));
-			infoTable.addCell(setDataCell(cell, reqFrm.patientEmail));
-		}
+		infoTable.addCell(setInfoCell(cell, getResource("msgEmail")));
+		infoTable.addCell(setDataCell(cell, reqFrm.patientEmail));
 
 		infoTable.addCell(setInfoCell(cell, getResource("msgBirth")));
 		infoTable.addCell(setDataCell(cell, reqFrm.patientDOB + " (y/m/d)"));
