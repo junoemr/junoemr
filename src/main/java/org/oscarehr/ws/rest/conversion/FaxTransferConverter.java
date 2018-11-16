@@ -27,8 +27,8 @@ import org.oscarehr.fax.model.FaxInbound;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferInbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferOutbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferInbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ import java.util.List;
 
 public class FaxTransferConverter
 {
-	public static FaxAccount getAsDomainObject(FaxSettingsTransferInbound transfer)
+	public static FaxAccount getAsDomainObject(FaxAccountTransferInbound transfer)
 	{
 		FaxAccount config = new FaxAccount();
 		config.setIntegrationEnabled(transfer.isEnabled());
@@ -51,9 +51,9 @@ public class FaxTransferConverter
 		return config;
 	}
 
-	public static FaxSettingsTransferOutbound getAsOutboundTransferObject(FaxAccount config)
+	public static FaxAccountTransferOutbound getAsOutboundTransferObject(FaxAccount config)
 	{
-		FaxSettingsTransferOutbound transfer = new FaxSettingsTransferOutbound();
+		FaxAccountTransferOutbound transfer = new FaxAccountTransferOutbound();
 		transfer.setId(config.getId());
 		transfer.setAccountLogin(config.getLoginId());
 		transfer.setEnabled(config.isIntegrationEnabled());
@@ -66,9 +66,9 @@ public class FaxTransferConverter
 		return transfer;
 	}
 
-	public static List<FaxSettingsTransferOutbound> getAllAsOutboundTransferObject(List<FaxAccount> configList)
+	public static List<FaxAccountTransferOutbound> getAllAsOutboundTransferObject(List<FaxAccount> configList)
 	{
-		List<FaxSettingsTransferOutbound> transferList = new ArrayList<>(configList.size());
+		List<FaxAccountTransferOutbound> transferList = new ArrayList<>(configList.size());
 		for(FaxAccount config : configList)
 		{
 			transferList.add(getAsOutboundTransferObject(config));

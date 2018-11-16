@@ -29,7 +29,7 @@ import java.io.Serializable;
 
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class FaxSettingsTransferBasic implements Serializable
+public class FaxAccountTransferBasic implements Serializable
 {
 	private Boolean enabled;
 	private Boolean enableInbound;

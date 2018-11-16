@@ -36,8 +36,8 @@ import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferInbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxSettingsTransferOutbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferInbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -77,12 +77,12 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@GET
 	@Path("/search")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestSearchResponse<FaxSettingsTransferOutbound> listAccounts(@QueryParam("page")
-	                                                                    @DefaultValue("1")
-			                                                                    Integer page,
-	                                                                    @QueryParam("perPage")
-	                                                                    @DefaultValue("10")
-			                                                                    Integer perPage)
+	public RestSearchResponse<FaxAccountTransferOutbound> listAccounts(@QueryParam("page")
+	                                                                   @DefaultValue("1")
+			                                                                   Integer page,
+	                                                                   @QueryParam("perPage")
+	                                                                   @DefaultValue("10")
+			                                                                   Integer perPage)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
@@ -112,12 +112,12 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<FaxSettingsTransferOutbound> getAccountSettings(@PathParam("id") Long id)
+	public RestResponse<FaxAccountTransferOutbound> getAccountSettings(@PathParam("id") Long id)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
 
-		FaxSettingsTransferOutbound accountSettingsTo1 = FaxTransferConverter.getAsOutboundTransferObject(faxAccountDao.find(id));
+		FaxAccountTransferOutbound accountSettingsTo1 = FaxTransferConverter.getAsOutboundTransferObject(faxAccountDao.find(id));
 		return RestResponse.successResponse(accountSettingsTo1);
 	}
 
@@ -125,7 +125,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<FaxSettingsTransferOutbound> addAccountSettings(FaxSettingsTransferInbound accountSettingsTo1)
+	public RestResponse<FaxAccountTransferOutbound> addAccountSettings(FaxAccountTransferInbound accountSettingsTo1)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin");
@@ -141,8 +141,8 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<FaxSettingsTransferOutbound> updateAccountSettings(@PathParam("id") Long id,
-	                                                                       FaxSettingsTransferInbound accountSettingsTo1)
+	public RestResponse<FaxAccountTransferOutbound> updateAccountSettings(@PathParam("id") Long id,
+	                                                                      FaxAccountTransferInbound accountSettingsTo1)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin");
@@ -170,7 +170,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Path("/testConnection")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> testConnection(FaxSettingsTransferInbound accountSettingsTo1)
+	public RestResponse<Boolean> testConnection(FaxAccountTransferInbound accountSettingsTo1)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");
@@ -183,7 +183,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> testConnection(@PathParam("id") Long id,
-	                                            FaxSettingsTransferInbound accountSettingsTo1)
+	                                            FaxAccountTransferInbound accountSettingsTo1)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin");

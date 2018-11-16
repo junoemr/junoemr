@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class FaxSettingsTransferInbound extends FaxSettingsTransferBasic
+public class FaxAccountTransferInbound extends FaxAccountTransferBasic
 {
 	private String password;
 
