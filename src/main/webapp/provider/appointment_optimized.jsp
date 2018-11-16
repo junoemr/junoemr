@@ -1542,419 +1542,436 @@ private long getAppointmentRowSpan(
 										// ----------------------------------------------------------------------------------
 										// Build appointments
 										// ----------------------------------------------------------------------------------
-
 										SortedMap<LocalTime, List<AppointmentDetails>> appointmentLists =
-											schedule.getAppointments();
+											schedule.getAppointments().subMap(slotTime, slotEndTime);
+
+										List<List<AppointmentDetails>> allAppointments = new ArrayList(appointmentLists.values());
+										List<AppointmentDetails> appointmentsBeforeList = new ArrayList();
+
+										//If we're looking at the first slot of the day, get all appointments that occur before this time
+										if (slotTime.equals(startTime))
+										{
+											SortedMap<LocalTime, List<AppointmentDetails>> appointmentsBeforeStartTime = schedule.getAppointments().headMap(slotTime);
+
+											//Only show the appointments that occur before the first slot of the day and the end time is after the first slot of the day
+											for(List<AppointmentDetails> appointments: appointmentsBeforeStartTime.values())
+											{
+												for (AppointmentDetails appointment : appointments)
+												{
+													if (appointment.getEndTime().isAfter(slotTime))
+													{
+														appointmentsBeforeList.add(appointment);
+													}
+												}
+											}
+
+											//Add all these appointments to the list with all the other appointments
+											allAppointments.add(appointmentsBeforeList);
+										}
 
 										boolean isFirstAppointmentInSlot = true;
-										for(List<AppointmentDetails> appointments: appointmentLists.values())
+										for(List<AppointmentDetails> appointments: allAppointments)
 										{
 											Collections.reverse(appointments);
 											for(AppointmentDetails appointment: appointments)
 											{
-												boolean isApptInTimeSlot = (appointment.getStartTime().equals(slotTime) || appointment.getStartTime().isAfter(slotTime)) && appointment.getStartTime().isBefore(slotEndTime);
-												boolean isApptBeforeStartSlot = slotTime.equals(startTime) && appointment.getStartTime().isBefore(startTime);
-												// Get appointment if it is within the time slot we're looking at or if it occurs before the earliest slot in the schedule
-												if (isApptInTimeSlot || isApptBeforeStartSlot)
+												long appointmentRowSpan = getAppointmentRowSpan(
+													appointment.getEndTime().plus(1, ChronoUnit.MINUTES),
+													slotEndTime,
+													slotLengthInMinutes,
+													endTime
+												);
+												/*
+												long appointmentLengthInMinutes = Duration
+														.between(appointment.getStartTime(),
+																appointment.getEndTime().minus(1,
+																		ChronoUnit.MINUTES))
+														.toMinutes();
+												long appointmentRowSpan = (long) Math
+														.ceil((double) appointmentLengthInMinutes / slotLengthInMinutes);
+														*/
+
+												// Preventions are very complicated.  To keep from running a query per appointment it
+												// would require a complicated query.
+												// XXX: if fixing, probably run one query for all appointments and create one prevention
+												//      object per demographic.
+												String preventionWarnings = "";
+												if(enablePreventionAppointmentWarnings)
 												{
-													long appointmentRowSpan = getAppointmentRowSpan(
-														appointment.getEndTime().plus(1, ChronoUnit.MINUTES),
-														slotEndTime,
-														slotLengthInMinutes,
-														endTime
-													);
-													/*
-													long appointmentLengthInMinutes = Duration
-															.between(appointment.getStartTime(),
-																	appointment.getEndTime().minus(1,
-																			ChronoUnit.MINUTES))
-															.toMinutes();
-													long appointmentRowSpan = (long) Math
-															.ceil((double) appointmentLengthInMinutes / slotLengthInMinutes);
-															*/
+													preventionWarnings = prevMgr.getWarnings(loggedInInfo1, appointment.getDemographicNo().toString());
+													preventionWarnings = ProviderPreventionManager.checkNames(preventionWarnings);
+												}
 
-													// Preventions are very complicated.  To keep from running a query per appointment it
-													// would require a complicated query.
-													// XXX: if fixing, probably run one query for all appointments and create one prevention
-													//      object per demographic.
-													String preventionWarnings = "";
-													if(enablePreventionAppointmentWarnings)
-													{
-														preventionWarnings = prevMgr.getWarnings(loggedInInfo1, appointment.getDemographicNo().toString());
-														preventionWarnings = ProviderPreventionManager.checkNames(preventionWarnings);
-													}
+												String record = "";
+												String module = "";
 
-													String record = "";
-													String module = "";
+												if(request.getParameter("record") != null)
+												{
+													record = request.getParameter("record");
+												}
 
-													if(request.getParameter("record") != null)
-													{
-														record = request.getParameter("record");
-													}
+												if(request.getParameter("module") != null)
+												{
+													module = request.getParameter("module");
+												}
 
-													if(request.getParameter("module") != null)
-													{
-														module = request.getParameter("module");
-													}
-
-													// Shorten names for second+ appointments in a slot
-													int nameLength = len;
-													if(!isFirstAppointmentInSlot)
-													{
-														nameLength = lenLimitedS;
-													}
+												// Shorten names for second+ appointments in a slot
+												int nameLength = len;
+												if(!isFirstAppointmentInSlot)
+												{
+													nameLength = lenLimitedS;
+												}
 
 
-													// Load appointmentInfo bean for this appointment
-													appointmentInfo.init(
-														appointment,
-														curUser_no,
-														scheduleProviderNo,
-														request.getParameter("curProvider"),
-														request.getParameter("curProviderName"),
-														bMultisites,
-														siteBgColor,
-														appointmentStatusList,
-														request.getLocale(),
-														isWeekView(request),
-														view,
-														numAvailProvider,
-														nameLength,
-														lenLimitedL,
-														request.getParameter("viewall"),
-														reasonCodesMap,
-														showDocumentLink,
-														showEncounterLink,
-														showOldEchartLink,
-														enablePreventionAppointmentWarnings,
-														preventionWarnings,
-														record,
-														module,
-														userFirstName,
-														userLastName,
-														curUser_no,
-														showTicklers,
-														showDoctorLink,
-														showMasterLink,
-														showBilling,
-														showEChart
-													);
+												// Load appointmentInfo bean for this appointment
+												appointmentInfo.init(
+													appointment,
+													curUser_no,
+													scheduleProviderNo,
+													request.getParameter("curProvider"),
+													request.getParameter("curProviderName"),
+													bMultisites,
+													siteBgColor,
+													appointmentStatusList,
+													request.getLocale(),
+													isWeekView(request),
+													view,
+													numAvailProvider,
+													nameLength,
+													lenLimitedL,
+													request.getParameter("viewall"),
+													reasonCodesMap,
+													showDocumentLink,
+													showEncounterLink,
+													showOldEchartLink,
+													enablePreventionAppointmentWarnings,
+													preventionWarnings,
+													record,
+													module,
+													userFirstName,
+													userLastName,
+													curUser_no,
+													showTicklers,
+													showDoctorLink,
+													showMasterLink,
+													showBilling,
+													showEChart
+												);
 
-													// These are for the appointmentFormLinks.jspf
-													String demographic_no = appointment.getDemographicNo().toString();
-													String appointment_no = appointment.getAppointmentNo().toString();
-
-
-												%>
-
-												<td class="appt <%=appointment.getColor()==null?"noStatus":""%>" bgcolor='<%= appointment.getColor() %>' rowspan="<%= appointmentRowSpan %>" nowrap>
-
-													<!-- Self booking notice -->
-													<c:if test="${appointmentInfo.selfBooked}">
-														<bean:message key="provider.appointmentProviderAdminDay.SelfBookedMarker"/>
-													</c:if>
+												// These are for the appointmentFormLinks.jspf
+												String demographic_no = appointment.getDemographicNo().toString();
+												String appointment_no = appointment.getAppointmentNo().toString();
 
 
-													<!-- multisites : add colour-coded to the "location" value of that appointment. -->
-													<c:if test="${appointmentInfo.multisitesEnabled}">
-														<span title="${appointmentInfo.siteName}" style="background-color:${appointmentInfo.siteColour};">&nbsp;</span>|
-													</c:if>
+											%>
+
+											<td class="appt <%=appointment.getColor()==null?"noStatus":""%>" bgcolor='<%= appointment.getColor() %>' rowspan="<%= appointmentRowSpan %>" nowrap>
+
+												<!-- Self booking notice -->
+												<c:if test="${appointmentInfo.selfBooked}">
+													<bean:message key="provider.appointmentProviderAdminDay.SelfBookedMarker"/>
+												</c:if>
 
 
-													<!-- Short letters -->
-													<a
-														class="apptStatus"
-														href=#
-														onclick="refreshSameLoc('${appointmentInfo.refreshURL}');"
-														title="${appointmentInfo.appointmentTitle} " >
-
-														<c:choose>
-															<c:when test="${appointmentInfo.showShortLetters}">
-																<!-- Appointment status image -->
-																<span
-																	class='short_letters'
-																	style='color:${appointmentInfo.shortLetterColour};border:0;height:10'>
-																	[${appointmentInfo.shortLetters}]
-																</span>
-															</c:when>
-															<c:otherwise>
-																<img src="../images/${appointmentInfo.iconImage}" border="0" height="10" title="${appointmentInfo.statusTitle}" />
-															</c:otherwise>
-														</c:choose>
-
-													</a>
+												<!-- multisites : add colour-coded to the "location" value of that appointment. -->
+												<c:if test="${appointmentInfo.multisitesEnabled}">
+													<span title="${appointmentInfo.siteName}" style="background-color:${appointmentInfo.siteColour};">&nbsp;</span>|
+												</c:if>
 
 
-													<c:if test="${appointmentInfo.criticalUrgency}">
-														<img src="../images/warning-icon.png" border="0" width="14" height="14" title="Critical Appointment"/>
-													</c:if>
+												<!-- Short letters -->
+												<a
+													class="apptStatus"
+													href=#
+													onclick="refreshSameLoc('${appointmentInfo.refreshURL}');"
+													title="${appointmentInfo.appointmentTitle} " >
 
-													<%--|--%>
 													<c:choose>
-														<c:when test="${appointmentInfo.emptyDemographic}">
-
-															<!--  caisi  -->
-															<c:if test="${appointmentInfo.showTickler}">
-																<a href="#" onClick="popupPage(700,1024, '../tickler/ticklerMain.jsp?demoview=0');return false;" title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: ${appointmentInfo.ticklerNote}"><font color="red">!</font></a>
-															</c:if>
-
-															<!--  alerts -->
-															<c:if test="${appointmentInfo.displayAlerts}">
-																<a href="#" onClick="return false;" title="${appointmentInfo.alert}">A</a>
-															</c:if>
-
-															<!--  notes -->
-															<c:if test="${appointmentInfo.displayNotes}">
-																<a href="#" onClick="return false;" title="${appointmentInfo.notes}">N</a>
-															</c:if>
-
-
-															<a href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;" ${appointmentInfo.appointmentLinkTitle} >
-																.${appointmentInfo.truncatedUpperName}
-															</a>
-
-															<% if (OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true") || OscarProperties.getInstance().getProperty("APPT_THREE_LINE", "true").equals("true"))
-															{ %>
-															<%
-																if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
-																{
-															%>
-																	<%=StringEscapeUtils.escapeHtml(appointment.getType())%>&nbsp;|&nbsp;<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
-															<% 	} %>
-															<%
-																if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() == null || appointmentInfo.getReason().length() == 0))
-																{
-															%>
-																	<%=StringEscapeUtils.escapeHtml(appointment.getType())%>
-															<% 	} %>
-															<%
-																if ((appointment.getType() == null || appointment.getType().length() == 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
-																{
-															%>
-																	<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
-															<% 	} %>
-
-															<% } %>
-
-															<!--Inline display of reason -->
-															<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
-																<span class="${appointmentInfo.reasonToggleableClass} reason reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
-																	<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:${appointmentInfo.reason}
-																</span>
-															</oscar:oscarPropertiesCheck></td>
-
+														<c:when test="${appointmentInfo.showShortLetters}">
+															<!-- Appointment status image -->
+															<span
+																class='short_letters'
+																style='color:${appointmentInfo.shortLetterColour};border:0;height:10'>
+																[${appointmentInfo.shortLetters}]
+															</span>
 														</c:when>
 														<c:otherwise>
-
-															<c:if test="${appointmentInfo.showTickler}">
-																<a href="#" onClick="popupPage(700,1024, '../tickler/ticklerMain.jsp?demoview=${appointmentInfo.demographicNo}');return false;" title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: ${appointmentInfo.ticklerNote}"><font color="red">!</font></a>
-															</c:if>
-
-															<!--  alerts -->
-															<c:if test="${appointmentInfo.displayAlerts}">
-																<a href="#" onClick="return false;" title="${appointmentInfo.alert}">A</a>
-															</c:if>
-
-															<!--  notes -->
-															<c:if test="${appointmentInfo.displayNotes}">
-																<a href="#" onClick="return false;" title="${appointmentInfo.notes}">N</a>
-															</c:if>
-
-															<!-- doctor code block 1 -->
-															<c:if test="${appointmentInfo.showDocumentLink}">
-
-																<c:if test="${appointmentInfo.showVerLink}">
-																	<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.versionMsg"/> ${appointmentInfo.ver}">
-																		<font color="red">*</font>
-																	</a>
-																</c:if>
-
-																<c:if test="${appointmentInfo.showFSRosterLink}">
-																	<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> ${appointmentInfo.rosterStatus}">
-																		<font color="red">$</font>
-																	</a>
-																</c:if>
-
-																<c:if test="${appointmentInfo.showRORosterLink}">
-																	<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> ${appointmentInfo.rosterStatus}">
-																		<font color="red">^</font>
-																	</a>
-																</c:if>
-
-																<c:if test="${appointmentInfo.showNRorPLRosterLink}">
-																	<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> ${appointmentInfo.rosterStatus}">
-																		<font color="red">#</font>
-																	</a>
-																</c:if>
-
-															</c:if>
-
-															<!-- doctor code block 2 -->
-
-															<c:if test="${appointmentInfo.showPreventionWarnings}">
-																<img src="../images/stop_sign.png" height="14" width="14" title="${appointmentInfo.preventionWarnings}" />&nbsp;
-
-															</c:if>
-
-															<a class="apptLink" href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;"
-
-																<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON_TOOLTIP" value="yes" defaultVal="true">
-																	${appointmentInfo.appointmentLinkTitle}
-																</oscar:oscarPropertiesCheck>
-															>
-
-																<oscar:oscarPropertiesCheck property="show_hc_eligibility" value="true" defaultVal="false">
-																	<c:if test="${appointmentInfo.activeMedicalCoverage}">+&nbsp</c:if>
-																</oscar:oscarPropertiesCheck>
-
-																${appointmentInfo.truncatedName}
-															</a>
-
-
-															<c:if test="${appointmentInfo.showAppointmentLinks}">
-
-																<c:if test="${appointmentInfo.showEChart}">
-																	<oscar:oscarPropertiesCheck property="eform_in_appointment" value="yes">
-																		&#124;<b><a href="#" onclick="popupPage(500,1024,'${appointmentInfo.eformURL}'); return false;" title="eForms">e</a></b>
-																	</oscar:oscarPropertiesCheck>
-																</c:if>
-
-																<!-- doctor code block 3 -->
-																<c:if test="${appointmentInfo.showEncounterLink}">
-
-																	<c:if test="${appointmentInfo.singlePageChart}">
-																		&#124; <a href="${appointmentInfo.singlePageChartURL}" ${appointmentInfo.singlePageChartStyle}>
-																			<bean:message key="provider.appointmentProviderAdminDay.btnE"/>2</a>
-																	</c:if>
-
-																	<c:if test="${appointmentInfo.showOldEchartLink}">
-																		&#124; <a href=# class="encounterBtn" onClick="popupWithApptNo(710, 1024,'${appointmentInfo.incomingEncounterURL}','encounter',${appointmentInfo.appointmentNo});return false;" title="<bean:message key="global.encounter"/>">
-																			<bean:message key="provider.appointmentProviderAdminDay.btnE"/></a>
-																	</c:if>
-																</c:if>
-
-																<c:if test="${appointmentInfo.showIntakeFormLink}">
-																	&#124; <a href='#' onClick='popupPage(700, 1024, "formIntake.jsp?demographic_no=${appointmentInfo.demographicNo}")' title='Intake Form'>In</a>
-																</c:if>
-
-																<!--  eyeform open link -->
-																<c:if test="${appointmentInfo.showEyeformLink}">
-																	&#124; <a href="#" onClick='popupPage(800, 1280, "../eyeform/eyeform.jsp?demographic_no=${appointmentInfo.demographicNo}&appointment_no=${appointmentInfo.appointmentNo}");return false;' title="EyeForm">EF</a>
-																</c:if>
-
-																<!-- billing code block -->
-																<c:if test="${!appointmentInfo.weekView}">
-																	<c:if test="${appointmentInfo.showBilling}">
-																		<c:choose>
-																			<c:when test="${appointmentInfo.billed && !isClinicaid}">
-																				&#124; <a
-																					href=#
-																					onClick='onUnbilled("${appointmentInfo.unbillURL}");return false;'
-																					title="<bean:message key="global.billingtag"/>"
-																				>
-																					-<bean:message key="provider.appointmentProviderAdminDay.btnB"/>
-																				</a>
-																			</c:when>
-																			<c:otherwise>
-																				&#124; <a
-																					href="${appointmentInfo.billLink}"
-																					target="_blank"
-																					title="<bean:message key="global.billingtag"/>"
-																				>
-																					<bean:message key="provider.appointmentProviderAdminDay.btnB"/>
-																				</a>
-																			</c:otherwise>
-																		</c:choose>
-																	</c:if>
-																</c:if>
-																<!-- billing code block -->
-
-																<c:if test="${appointmentInfo.showMasterLink}">
-																	&#124; <a class="masterBtn" href="javascript: function myFunction() {return false; }" onClick="popupWithApptNo(700,1024,'../demographic/demographiccontrol.jsp?demographic_no=${appointmentInfo.demographicNo}&apptProvider=${appointmentInfo.scheduleProviderNo}&appointment=${appointmentInfo.appointmentNo}&displaymode=edit&dboperation=search_detail','master',${appointmentInfo.appointmentNo})"
-																			  title="<bean:message key="provider.appointmentProviderAdminDay.msgMasterFile"/>"><bean:message key="provider.appointmentProviderAdminDay.btnM"/></a>
-																</c:if>
-
-																<c:if test="${!appointmentInfo.weekView}">
-
-																	<!-- doctor code block 4 -->
-																	<c:if test="${appointmentInfo.showDoctorLink}">
-																		&#124; <a href=# onClick="popupWithApptNo(700,1027,'../oscarRx/choosePatient.do?providerNo=${appointmentInfo.sessionProviderNo}&demographicNo=${appointmentInfo.demographicNo}','rx',${appointmentInfo.appointmentNo})" title="<bean:message key="global.prescriptions"/>">
-																			<bean:message key="global.rx"/>
-																		</a>
-
-
-																		<!-- doctor color -->
-																		<oscar:oscarPropertiesCheck property="ENABLE_APPT_DOC_COLOR" value="yes">
-																			<c:if test="${appointmentInfo.hasProviderColor}">
-																				<span style="background-color:${appointmentInfo.providerColor};width:5px">&nbsp;</span>
-																			</c:if>
-																		</oscar:oscarPropertiesCheck>
-
-																		<c:if test="${appointmentInfo.showDollarSign}">
-																			&#124;<b style="color:#FF0000">$</b>
-																		</c:if>
-																		<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
-																			<span class="toggleable reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
-																				<strong>&#124;${appointmentInfo.formattedReason}</strong>
-																			</span>
-																		</oscar:oscarPropertiesCheck>
-
-																	</c:if>
-
-																	<oscar:oscarPropertiesCheck property="SHOW_PATIENT_APPOINTMENT_PHN_CHART" value="true" defaultVal="false">
-																		<c:if test="${appointmentInfo.demographicNo != null }">
-																			&#124;
-																			<c:choose>
-																				<c:when test="${not empty appointmentInfo.demographicHin}">
-																					${appointmentInfo.demographicHin}
-																				</c:when>
-																				<c:otherwise>
-																					-
-																				</c:otherwise>
-																			</c:choose>
-																			&#124;
-																			<c:choose>
-																				<c:when test="${not empty appointmentInfo.demographicChartNo}">
-																					${appointmentInfo.demographicChartNo}
-																				</c:when>
-																				<c:otherwise>
-																					-
-																				</c:otherwise>
-																			</c:choose>
-																		</c:if>
-																	</oscar:oscarPropertiesCheck>
-
-																	<!-- add one link to caisi Program Management Module -->
-																	<c:if test="${appointmentInfo.birthday}">
-																		&#124; <img src="../images/cake.gif" height="20" alt="Happy Birthday"/>
-																	</c:if>
-
-																	<%@include file="appointmentFormsLinks.jspf" %>
-
-																	<oscar:oscarPropertiesCheck property="appt_pregnancy" value="true" defaultVal="false">
-
-																		<c:set var="demographicNo" value="${appointmentInfo.demographicNo}" />
-																		<jsp:include page="appointmentPregnancy.jspf" >
-																			<jsp:param value="${appointmentInfo.demographicNo}" name="demographicNo"/>
-																		</jsp:include>
-
-																	</oscar:oscarPropertiesCheck>
-
-
-																</c:if>
-															</c:if>
-															</font></td>
+															<img src="../images/${appointmentInfo.iconImage}" border="0" height="10" title="${appointmentInfo.statusTitle}" />
 														</c:otherwise>
 													</c:choose>
 
-
-												</td>
-
+												</a>
 
 
-												<%
-													isFirstAppointmentInSlot = false;
-												}
+												<c:if test="${appointmentInfo.criticalUrgency}">
+													<img src="../images/warning-icon.png" border="0" width="14" height="14" title="Critical Appointment"/>
+												</c:if>
+
+												<%--|--%>
+												<c:choose>
+													<c:when test="${appointmentInfo.emptyDemographic}">
+
+														<!--  caisi  -->
+														<c:if test="${appointmentInfo.showTickler}">
+															<a href="#" onClick="popupPage(700,1024, '../tickler/ticklerMain.jsp?demoview=0');return false;" title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: ${appointmentInfo.ticklerNote}"><font color="red">!</font></a>
+														</c:if>
+
+														<!--  alerts -->
+														<c:if test="${appointmentInfo.displayAlerts}">
+															<a href="#" onClick="return false;" title="${appointmentInfo.alert}">A</a>
+														</c:if>
+
+														<!--  notes -->
+														<c:if test="${appointmentInfo.displayNotes}">
+															<a href="#" onClick="return false;" title="${appointmentInfo.notes}">N</a>
+														</c:if>
+
+
+														<a href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;" ${appointmentInfo.appointmentLinkTitle} >
+															.${appointmentInfo.truncatedUpperName}
+														</a>
+
+														<% if (OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true") || OscarProperties.getInstance().getProperty("APPT_THREE_LINE", "true").equals("true"))
+														{ %>
+														<%
+															if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
+															{
+														%>
+																<%=StringEscapeUtils.escapeHtml(appointment.getType())%>&nbsp;|&nbsp;<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
+														<% 	} %>
+														<%
+															if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() == null || appointmentInfo.getReason().length() == 0))
+															{
+														%>
+																<%=StringEscapeUtils.escapeHtml(appointment.getType())%>
+														<% 	} %>
+														<%
+															if ((appointment.getType() == null || appointment.getType().length() == 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
+															{
+														%>
+																<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
+														<% 	} %>
+
+														<% } %>
+
+														<!--Inline display of reason -->
+														<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
+															<span class="${appointmentInfo.reasonToggleableClass} reason reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
+																<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:${appointmentInfo.reason}
+															</span>
+														</oscar:oscarPropertiesCheck></td>
+
+													</c:when>
+													<c:otherwise>
+
+														<c:if test="${appointmentInfo.showTickler}">
+															<a href="#" onClick="popupPage(700,1024, '../tickler/ticklerMain.jsp?demoview=${appointmentInfo.demographicNo}');return false;" title="<bean:message key="provider.appointmentProviderAdminDay.ticklerMsg"/>: ${appointmentInfo.ticklerNote}"><font color="red">!</font></a>
+														</c:if>
+
+														<!--  alerts -->
+														<c:if test="${appointmentInfo.displayAlerts}">
+															<a href="#" onClick="return false;" title="${appointmentInfo.alert}">A</a>
+														</c:if>
+
+														<!--  notes -->
+														<c:if test="${appointmentInfo.displayNotes}">
+															<a href="#" onClick="return false;" title="${appointmentInfo.notes}">N</a>
+														</c:if>
+
+														<!-- doctor code block 1 -->
+														<c:if test="${appointmentInfo.showDocumentLink}">
+
+															<c:if test="${appointmentInfo.showVerLink}">
+																<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.versionMsg"/> ${appointmentInfo.ver}">
+																	<font color="red">*</font>
+																</a>
+															</c:if>
+
+															<c:if test="${appointmentInfo.showFSRosterLink}">
+																<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> ${appointmentInfo.rosterStatus}">
+																	<font color="red">$</font>
+																</a>
+															</c:if>
+
+															<c:if test="${appointmentInfo.showRORosterLink}">
+																<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> ${appointmentInfo.rosterStatus}">
+																	<font color="red">^</font>
+																</a>
+															</c:if>
+
+															<c:if test="${appointmentInfo.showNRorPLRosterLink}">
+																<a href="#" title="<bean:message key="provider.appointmentProviderAdminDay.rosterMsg"/> ${appointmentInfo.rosterStatus}">
+																	<font color="red">#</font>
+																</a>
+															</c:if>
+
+														</c:if>
+
+														<!-- doctor code block 2 -->
+
+														<c:if test="${appointmentInfo.showPreventionWarnings}">
+															<img src="../images/stop_sign.png" height="14" width="14" title="${appointmentInfo.preventionWarnings}" />&nbsp;
+
+														</c:if>
+
+														<a class="apptLink" href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;"
+
+															<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON_TOOLTIP" value="yes" defaultVal="true">
+																${appointmentInfo.appointmentLinkTitle}
+															</oscar:oscarPropertiesCheck>
+														>
+
+															<oscar:oscarPropertiesCheck property="show_hc_eligibility" value="true" defaultVal="false">
+																<c:if test="${appointmentInfo.activeMedicalCoverage}">+&nbsp</c:if>
+															</oscar:oscarPropertiesCheck>
+
+															${appointmentInfo.truncatedName}
+														</a>
+
+
+														<c:if test="${appointmentInfo.showAppointmentLinks}">
+
+															<c:if test="${appointmentInfo.showEChart}">
+																<oscar:oscarPropertiesCheck property="eform_in_appointment" value="yes">
+																	&#124;<b><a href="#" onclick="popupPage(500,1024,'${appointmentInfo.eformURL}'); return false;" title="eForms">e</a></b>
+																</oscar:oscarPropertiesCheck>
+															</c:if>
+
+															<!-- doctor code block 3 -->
+															<c:if test="${appointmentInfo.showEncounterLink}">
+
+																<c:if test="${appointmentInfo.singlePageChart}">
+																	&#124; <a href="${appointmentInfo.singlePageChartURL}" ${appointmentInfo.singlePageChartStyle}>
+																		<bean:message key="provider.appointmentProviderAdminDay.btnE"/>2</a>
+																</c:if>
+
+																<c:if test="${appointmentInfo.showOldEchartLink}">
+																	&#124; <a href=# class="encounterBtn" onClick="popupWithApptNo(710, 1024,'${appointmentInfo.incomingEncounterURL}','encounter',${appointmentInfo.appointmentNo});return false;" title="<bean:message key="global.encounter"/>">
+																		<bean:message key="provider.appointmentProviderAdminDay.btnE"/></a>
+																</c:if>
+															</c:if>
+
+															<c:if test="${appointmentInfo.showIntakeFormLink}">
+																&#124; <a href='#' onClick='popupPage(700, 1024, "formIntake.jsp?demographic_no=${appointmentInfo.demographicNo}")' title='Intake Form'>In</a>
+															</c:if>
+
+															<!--  eyeform open link -->
+															<c:if test="${appointmentInfo.showEyeformLink}">
+																&#124; <a href="#" onClick='popupPage(800, 1280, "../eyeform/eyeform.jsp?demographic_no=${appointmentInfo.demographicNo}&appointment_no=${appointmentInfo.appointmentNo}");return false;' title="EyeForm">EF</a>
+															</c:if>
+
+															<!-- billing code block -->
+															<c:if test="${!appointmentInfo.weekView}">
+																<c:if test="${appointmentInfo.showBilling}">
+																	<c:choose>
+																		<c:when test="${appointmentInfo.billed && !isClinicaid}">
+																			&#124; <a
+																				href=#
+																				onClick='onUnbilled("${appointmentInfo.unbillURL}");return false;'
+																				title="<bean:message key="global.billingtag"/>"
+																			>
+																				-<bean:message key="provider.appointmentProviderAdminDay.btnB"/>
+																			</a>
+																		</c:when>
+																		<c:otherwise>
+																			&#124; <a
+																				href="${appointmentInfo.billLink}"
+																				target="_blank"
+																				title="<bean:message key="global.billingtag"/>"
+																			>
+																				<bean:message key="provider.appointmentProviderAdminDay.btnB"/>
+																			</a>
+																		</c:otherwise>
+																	</c:choose>
+																</c:if>
+															</c:if>
+															<!-- billing code block -->
+
+															<c:if test="${appointmentInfo.showMasterLink}">
+																&#124; <a class="masterBtn" href="javascript: function myFunction() {return false; }" onClick="popupWithApptNo(700,1024,'../demographic/demographiccontrol.jsp?demographic_no=${appointmentInfo.demographicNo}&apptProvider=${appointmentInfo.scheduleProviderNo}&appointment=${appointmentInfo.appointmentNo}&displaymode=edit&dboperation=search_detail','master',${appointmentInfo.appointmentNo})"
+																		  title="<bean:message key="provider.appointmentProviderAdminDay.msgMasterFile"/>"><bean:message key="provider.appointmentProviderAdminDay.btnM"/></a>
+															</c:if>
+
+															<c:if test="${!appointmentInfo.weekView}">
+
+																<!-- doctor code block 4 -->
+																<c:if test="${appointmentInfo.showDoctorLink}">
+																	&#124; <a href=# onClick="popupWithApptNo(700,1027,'../oscarRx/choosePatient.do?providerNo=${appointmentInfo.sessionProviderNo}&demographicNo=${appointmentInfo.demographicNo}','rx',${appointmentInfo.appointmentNo})" title="<bean:message key="global.prescriptions"/>">
+																		<bean:message key="global.rx"/>
+																	</a>
+
+
+																	<!-- doctor color -->
+																	<oscar:oscarPropertiesCheck property="ENABLE_APPT_DOC_COLOR" value="yes">
+																		<c:if test="${appointmentInfo.hasProviderColor}">
+																			<span style="background-color:${appointmentInfo.providerColor};width:5px">&nbsp;</span>
+																		</c:if>
+																	</oscar:oscarPropertiesCheck>
+
+																	<c:if test="${appointmentInfo.showDollarSign}">
+																		&#124;<b style="color:#FF0000">$</b>
+																	</c:if>
+																	<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
+																		<span class="toggleable reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
+																			<strong>&#124;${appointmentInfo.formattedReason}</strong>
+																		</span>
+																	</oscar:oscarPropertiesCheck>
+
+																</c:if>
+
+																<oscar:oscarPropertiesCheck property="SHOW_PATIENT_APPOINTMENT_PHN_CHART" value="true" defaultVal="false">
+																	<c:if test="${appointmentInfo.demographicNo != null }">
+																		&#124;
+																		<c:choose>
+																			<c:when test="${not empty appointmentInfo.demographicHin}">
+																				${appointmentInfo.demographicHin}
+																			</c:when>
+																			<c:otherwise>
+																				-
+																			</c:otherwise>
+																		</c:choose>
+																		&#124;
+																		<c:choose>
+																			<c:when test="${not empty appointmentInfo.demographicChartNo}">
+																				${appointmentInfo.demographicChartNo}
+																			</c:when>
+																			<c:otherwise>
+																				-
+																			</c:otherwise>
+																		</c:choose>
+																	</c:if>
+																</oscar:oscarPropertiesCheck>
+
+																<!-- add one link to caisi Program Management Module -->
+																<c:if test="${appointmentInfo.birthday}">
+																	&#124; <img src="../images/cake.gif" height="20" alt="Happy Birthday"/>
+																</c:if>
+
+																<%@include file="appointmentFormsLinks.jspf" %>
+
+																<oscar:oscarPropertiesCheck property="appt_pregnancy" value="true" defaultVal="false">
+
+																	<c:set var="demographicNo" value="${appointmentInfo.demographicNo}" />
+																	<jsp:include page="appointmentPregnancy.jspf" >
+																		<jsp:param value="${appointmentInfo.demographicNo}" name="demographicNo"/>
+																	</jsp:include>
+
+																</oscar:oscarPropertiesCheck>
+
+
+															</c:if>
+														</c:if>
+														</font></td>
+													</c:otherwise>
+												</c:choose>
+
+
+											</td>
+
+
+
+											<%
+												isFirstAppointmentInSlot = false;
 											}
 										}
 
