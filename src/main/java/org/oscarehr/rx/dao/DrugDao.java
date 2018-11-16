@@ -24,6 +24,7 @@ package org.oscarehr.rx.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -394,10 +395,19 @@ public class DrugDao extends AbstractDao<Drug>
 	@NativeSql("drugs")
 	@SuppressWarnings("unchecked")
 	public List<Object[]> findByParameter(String parameter, String value) {
-		String sql = "select special, special_instruction from drugs where " + parameter + " = :value order by drugid desc";
-		Query query = entityManager.createNativeQuery(sql);
-		query.setParameter("value", value);
-		return query.getResultList();
+		List<String> queryableDrugColumns = Arrays.asList("customName","regional_identifier","BN");
+
+		if (queryableDrugColumns.contains(parameter))
+		{
+			String sql = "select special, special_instruction from drugs where " + parameter + " = :value order by drugid desc";
+			Query query = entityManager.createNativeQuery(sql);
+			query.setParameter("value", value);
+			return query.getResultList();
+		} else
+		{
+			MiscUtils.getLogger().error("Invalid query parameter");
+			return null;
+		}
 	}
 
 	@SuppressWarnings("unchecked")
