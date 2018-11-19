@@ -5,12 +5,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.MiscUtilsOld;
 
 import oscar.oscarTickler.TicklerCreator;
