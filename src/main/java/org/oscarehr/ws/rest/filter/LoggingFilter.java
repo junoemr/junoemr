@@ -28,6 +28,7 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.RestServiceLog;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.filter.annotation.LoggingFilterHidePassword;
 import oscar.log.LogAction;
 
 import javax.annotation.Priority;
@@ -37,6 +38,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
@@ -46,6 +48,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Priority(Priorities.USER)
 public abstract class LoggingFilter implements ContainerRequestFilter, ContainerResponseFilter
@@ -64,6 +68,9 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 
 	@Context
 	MessageContext messageContext;
+
+	@Context
+	ResourceInfo resourceInfo;
 
     /**
      * Retrieve the providerNo (ie: the User).  Filters for different REST services should override this method
@@ -89,6 +96,13 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 		if(request.hasEntity())
 		{
 			body = readEntityStream(request);
+
+			// if the custom annotation exists on the target method, filter the fields from the request body before logging
+			LoggingFilterHidePassword filterAnnotation = resourceInfo.getResourceMethod().getAnnotation(LoggingFilterHidePassword.class);
+			if(filterAnnotation != null)
+			{
+				body = removePasswordData(body, filterAnnotation.fields());
+			}
 		}
 
 		request.setProperty(PROP_REQUEST_BODY, body);
@@ -204,5 +218,17 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 		}
 
 		return builder.toString();
+	}
+
+	private String removePasswordData(String rawString, String...fields)
+	{
+		for(String fieldName : fields)
+		{
+			Pattern p = Pattern.compile("(\\\""+ fieldName +"\\\"\\s*\\:\\s*\\\")(.*)(\\\")");
+			Matcher m = p.matcher(rawString);
+
+			rawString = m.replaceAll("$1******$3");
+		}
+		return rawString;
 	}
 }

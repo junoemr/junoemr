@@ -32,12 +32,13 @@ import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 import org.oscarehr.fax.service.FaxAccountService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
+import org.oscarehr.ws.rest.filter.annotation.LoggingFilterHidePassword;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
-import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferInbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -123,6 +124,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 
 	@POST
 	@Path("/")
+	@LoggingFilterHidePassword
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxAccountTransferOutbound> addAccountSettings(FaxAccountTransferInbound accountSettingsTo1)
@@ -139,6 +141,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 
 	@PUT
 	@Path("/{id}")
+	@LoggingFilterHidePassword
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxAccountTransferOutbound> updateAccountSettings(@PathParam("id") Long id,
@@ -168,6 +171,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 
 	@POST
 	@Path("/testConnection")
+	@LoggingFilterHidePassword
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> testConnection(FaxAccountTransferInbound accountSettingsTo1)
@@ -180,6 +184,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	}
 	@POST
 	@Path("/{id}/testConnection")
+	@LoggingFilterHidePassword
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> testConnection(@PathParam("id") Long id,
