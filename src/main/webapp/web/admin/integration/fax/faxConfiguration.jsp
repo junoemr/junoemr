@@ -46,15 +46,15 @@
 <!-- Hide the main program nav as a fix for having angular in an iframe -->
 <link rel="stylesheet" href="<%=request.getContextPath() %>/web/admin/integration/know2act/Know2actHideNavBars.css">
 
-<title>FAX Title</title>
+<title><bean:message bundle="ui" key="admin.fax.acct.window-title"/></title>
 
 <div class="fax-config">
 	<div class="fax-config-header">
-		<h1>Fax Accounts</h1>
+		<h1><bean:message bundle="ui" key="admin.fax.acct.header"/></h1>
 		<button type="button" class="btn btn-primary"
 		<%--ng-show="faxController.faxAccountList.length == 0"--%>
 		        ng-click="faxController.editNewFaxAccount()">
-			Add New Account
+			<bean:message bundle="ui" key="admin.fax.acct.btn-addNew"/>
 		</button>
 	</div>
 	<div class="fax-config-body">
@@ -62,22 +62,22 @@
 			<div class="account-item">
 				<div>
 					<span class="glyphicon enabled glyphicon-ok glyphicon-lrg" ng-show="faxAccount.enabled"
-					      title="Account Active"></span>
+					      title="<bean:message bundle="ui" key="admin.fax.acct.acctEnabled"/>"></span>
 					<span class="glyphicon disabled glyphicon-remove glyphicon-lrg" ng-hide="faxAccount.enabled"
-					      title="Account Disabled"></span>
+					      title="<bean:message bundle="ui" key="admin.fax.acct.acctDisabled"/>"></span>
 				</div>
 				<div>
 					<h5>Inbound:
 						<span class="glyphicon enabled glyphicon-ok glyphicon-sml" ng-show="faxAccount.enableInbound"
-						      title="Inbound Faxing Enabled"></span>
+						      title="<bean:message bundle="ui" key="admin.fax.acct.inboundEnabled"/>"></span>
 						<span class="glyphicon disabled glyphicon-remove glyphicon-sml" ng-hide="faxAccount.enableInbound"
-						      title="Inbound Faxing Disabled"></span>
+						      title="<bean:message bundle="ui" key="admin.fax.acct.inboundDisabled"/>"></span>
 					</h5>
 					<h5>Outbound:
 						<span class="glyphicon enabled glyphicon-ok glyphicon-sml" ng-show="faxAccount.enableOutbound"
-						      title="Outbound Faxing Enabled"></span>
+						      title="<bean:message bundle="ui" key="admin.fax.acct.outboundEnabled"/>"></span>
 						<span class="glyphicon disabled glyphicon-remove glyphicon-sml" ng-hide="faxAccount.enableOutbound"
-						      title="Outbound Faxing Disabled"></span>
+						      title="<bean:message bundle="ui" key="admin.fax.acct.outboundDisabled"/>"></span>
 					</h5>
 				</div>
 				<div>
@@ -89,7 +89,7 @@
 				<button type="button" class="btn btn-default"
 				        <%-- TODO disable button for non-admin users? --%>
 				        ng-click="faxController.editFaxAccount(faxAccount)">
-					Edit Account
+					<bean:message bundle="ui" key="admin.fax.acct.btn-EditAccount"/>
 				</button>
 			</div>
 		</div>
