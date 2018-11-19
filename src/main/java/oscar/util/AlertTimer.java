@@ -74,19 +74,25 @@ public class AlertTimer {
      * The helper class which is responsible for triggering the alerts
      */
     class ReminderClass extends TimerTask {
+
+        static final String SYSTEM_USER_PROVIDER_NO = "-1";
+
         public void run() {
-    		// LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoAsCurrentClassAndMethod();
-        	// work around for the security object.
-        	String providerNo = "-1";
-        	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+            Logger logger = MiscUtils.getLogger();
+
+        	/* This class runs in the background during the lifetime of the server, therefore, it cannot
+        	   be tied to any provider.  We give it loggedInInfo of the system user so that it has the
+        	   permissions to create the reminder ticklers. */
+
+            ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
         	LoggedInInfo loggedInInfo = new LoggedInInfo();
         	Security security = new Security();
             security.setSecurityNo(0);
-            Provider provider = providerDao.getProvider( providerNo) ;
+            Provider provider = providerDao.getProvider(SYSTEM_USER_PROVIDER_NO) ;
             loggedInInfo.setLoggedInSecurity(security);
             loggedInInfo.setLoggedInProvider(provider);
             try {
-                hlp.manageCDMTicklers(loggedInInfo, providerNo, alertCodes);
+                hlp.manageCDMTicklers(loggedInInfo, SYSTEM_USER_PROVIDER_NO, alertCodes);
             }
             catch (ShutdownException e) {
             	logger.debug("AlertTimer noticed shutdown signaled.");
