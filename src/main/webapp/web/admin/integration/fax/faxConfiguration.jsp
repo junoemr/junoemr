@@ -52,7 +52,7 @@
 	<div class="fax-config-header">
 		<h1><bean:message bundle="ui" key="admin.fax.acct.header"/></h1>
 		<button type="button" class="btn btn-primary"
-		<%--ng-show="faxController.faxAccountList.length == 0"--%>
+		        ng-show="faxController.faxAccountList.length == 0"
 		        ng-click="faxController.editNewFaxAccount()">
 			<bean:message bundle="ui" key="admin.fax.acct.btn-addNew"/>
 		</button>

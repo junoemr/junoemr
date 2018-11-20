@@ -147,9 +147,9 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 				},
 				function error(error)
 				{
+					controller.nextPullTime = null;
 					console.error(error);
 					alert(error);
-					controller.nextPullTime = null;
 				}
 			);
 		};
@@ -162,9 +162,9 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 				},
 				function error(error)
 				{
+					controller.nextPushTime = null;
 					console.error(error);
 					alert(error);
-					controller.nextPushTime = null;
 				}
 			);
 		};
