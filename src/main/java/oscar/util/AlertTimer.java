@@ -48,7 +48,7 @@ import org.oscarehr.util.SpringUtils;
  * @version 1.0
  */
 public class AlertTimer {
-	private static Logger logger=MiscUtils.getLogger();
+	private static Logger logger = MiscUtils.getLogger();
 	
 	private static AlertTimer alerts = null;
     private static Timer timer;
@@ -75,10 +75,7 @@ public class AlertTimer {
      */
     class ReminderClass extends TimerTask {
 
-        static final String SYSTEM_USER_PROVIDER_NO = "-1";
-
         public void run() {
-            Logger logger = MiscUtils.getLogger();
 
         	/* This class runs in the background during the lifetime of the server, therefore, it cannot
         	   be tied to any provider.  We give it loggedInInfo of the system user so that it has the
@@ -88,11 +85,11 @@ public class AlertTimer {
         	LoggedInInfo loggedInInfo = new LoggedInInfo();
         	Security security = new Security();
             security.setSecurityNo(0);
-            Provider provider = providerDao.getProvider(SYSTEM_USER_PROVIDER_NO) ;
+            Provider provider = providerDao.getProvider(Provider.SYSTEM_PROVIDER_NO) ;
             loggedInInfo.setLoggedInSecurity(security);
             loggedInInfo.setLoggedInProvider(provider);
             try {
-                hlp.manageCDMTicklers(loggedInInfo, SYSTEM_USER_PROVIDER_NO, alertCodes);
+                hlp.manageCDMTicklers(loggedInInfo, Provider.SYSTEM_PROVIDER_NO, alertCodes);
             }
             catch (ShutdownException e) {
             	logger.debug("AlertTimer noticed shutdown signaled.");
