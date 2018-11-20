@@ -1546,7 +1546,7 @@ private long getAppointmentRowSpan(
 											schedule.getAppointments().subMap(slotTime, slotEndTime);
 
 										List<List<AppointmentDetails>> allAppointments = new ArrayList(appointmentLists.values());
-										List<AppointmentDetails> appointmentsBeforeList = new ArrayList();
+										List<AppointmentDetails> appointmentsBeforeList = new ArrayList<AppointmentDetails>();
 
 										//If we're looking at the first slot of the day, get all appointments that occur before this time
 										if (slotTime.equals(startTime))
