@@ -23,6 +23,7 @@
 package org.oscarehr.fax.schedulingTasks;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.server.ServerStateHandler;
 import org.oscarehr.fax.service.IncomingFaxDownloadService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,7 @@ public class InboundFaxSchedulingTask
 	@Scheduled(cron = cronSchedule)
 	public void retrieveInboundFaxes()
 	{
-		if(enabled)
+		if(canRun())
 		{
 			logger.info("Execute Inbound scheduling task! " + ConversionUtils.toDateTimeString(LocalDateTime.now()));
 			incomingFaxDownloadService.pullNewFaxes();
@@ -69,10 +70,16 @@ public class InboundFaxSchedulingTask
 
 	public static LocalDateTime getNextRunTime()
 	{
-		if(enabled)
+		if(canRun())
 		{
 			return ConversionUtils.toLocalDateTime(cronTrigger.next(new Date()));
 		}
 		return null;
+	}
+
+	private static boolean canRun()
+	{
+		Boolean isMaster = ServerStateHandler.isThisServerMaster();
+		return enabled && (isMaster != null) && isMaster;
 	}
 }
