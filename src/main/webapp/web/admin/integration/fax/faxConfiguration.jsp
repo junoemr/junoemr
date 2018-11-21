@@ -67,13 +67,13 @@
 					      title="<bean:message bundle="ui" key="admin.fax.acct.acctDisabled"/>"></span>
 				</div>
 				<div>
-					<h5>Inbound:
+					<h5><bean:message bundle="ui" key="admin.fax.acct.inbound"/>:
 						<span class="glyphicon enabled glyphicon-ok glyphicon-sml" ng-show="faxAccount.enableInbound"
 						      title="<bean:message bundle="ui" key="admin.fax.acct.inboundEnabled"/>"></span>
 						<span class="glyphicon disabled glyphicon-remove glyphicon-sml" ng-hide="faxAccount.enableInbound"
 						      title="<bean:message bundle="ui" key="admin.fax.acct.inboundDisabled"/>"></span>
 					</h5>
-					<h5>Outbound:
+					<h5><bean:message bundle="ui" key="admin.fax.acct.outbound"/>:
 						<span class="glyphicon enabled glyphicon-ok glyphicon-sml" ng-show="faxAccount.enableOutbound"
 						      title="<bean:message bundle="ui" key="admin.fax.acct.outboundEnabled"/>"></span>
 						<span class="glyphicon disabled glyphicon-remove glyphicon-sml" ng-hide="faxAccount.enableOutbound"

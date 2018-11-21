@@ -48,12 +48,36 @@
   .modal-body {
 	padding:30px;
 	background-color: $primary-white;
+	input {
+	  &.ng-invalid {
+		background-color: $input-color-invalid-background;
+		border-color: $input-color-invalid-border;
+	  }
+	}
+	.input-validation {
+	  font-size: 10px;
+	  color: $input-color-invalid-text;
+	}
 
 	.flex-row {
 	  display: flex;
 	  flex-direction: row;
 	  align-items: center;
 	  justify-content: flex-start;
+	  &.content-center {
+		justify-content: center;
+	  }
+	  &.content-end {
+		justify-content: flex-end;
+	  }
+	  &.info-section {
+		position: relative;
+		.info-icon {
+		  position: absolute;
+		  font-size: 14px;
+		  color: $info-icon-color;
+		}
+	  }
 	  .flex-row-label {
 		width: 40%;
 		padding: 0 5px;

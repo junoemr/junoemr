@@ -45,8 +45,15 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxCon
 			}
 		};
 
-		controller.saveSettings = function ()
+		controller.saveSettings = function (form)
 		{
+			console.info('valid', form.$valid);
+			if(!form.$valid)
+			{
+				alert("The form contains errors");
+				return;
+			}
+
 			let closeSuccess = function(updatedAccount)
 			{
 				// keep these settings
