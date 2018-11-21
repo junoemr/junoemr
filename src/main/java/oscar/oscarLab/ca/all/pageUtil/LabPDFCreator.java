@@ -459,10 +459,13 @@ public class LabPDFCreator extends PdfPageEventHelper{
 								cell.setPhrase(new Phrase("", lineFont));
 								table.addCell(cell);
 							}
-							else{
-							cell.setPhrase(new Phrase((obrFlag ? "   " : "")
-									+ obxName, lineFont));
-							table.addCell(cell);}
+							else
+							{
+								cell.setBorder(Rectangle.LEFT);
+								cell.setColspan(1);
+								cell.setPhrase(new Phrase((obrFlag ? "   " : "") + obxName, lineFont));
+								table.addCell(cell);
+							}
 							boolean isLongText =false;
 							if(handler.getMsgType().equals("PATHL7")){
 								cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t","\u00a0\u00a0\u00a0\u00a0"), lineFont));
@@ -487,6 +490,19 @@ public class LabPDFCreator extends PdfPageEventHelper{
 								}else{
 									cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 									table.addCell(cell);}
+							} else if (handler.getMsgType().equals("ALPHA"))
+							{
+								cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0"), lineFont));
+								if (handler.getOBXValueType(j, k).equals("FT"))
+								{
+									cell.setPhrase(new Phrase("", lineFont));
+									cell.setColspan(1);
+									table.addCell(cell);
+								} else
+								{
+									cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+									table.addCell(cell);
+								}
 							}else{
 							cell.setPhrase(new Phrase(handler
 									.getOBXResult(j, k).replaceAll(
@@ -530,29 +546,46 @@ public class LabPDFCreator extends PdfPageEventHelper{
 							table.addCell(cell);
 							cell.setPhrase(new Phrase(handler
 									.getOBXResultStatus(j, k), lineFont));
+							cell.setBorder(Rectangle.RIGHT | Rectangle.LEFT);
 							table.addCell(cell);}
 							
-						if(!handler.getMsgType().equals("PFHT")) {
-							// add obx comments
-							if (handler.getOBXCommentCount(j, k) > 0) {
-								// cell.setBackgroundColor(getHighlightColor(linenum));
-								linenum++;
-								cell.setPaddingLeft(100);
-								cell.setColspan(7);
-								cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-								for (int l = 0; l < handler.getOBXCommentCount(
-										j, k); l++) {
+							if(!handler.getMsgType().equals("PFHT")) {
+								// add obx comments
+								if (handler.getOBXCommentCount(j, k) > 0) {
+									// cell.setBackgroundColor(getHighlightColor(linenum));
+									linenum++;
+									cell.setPaddingLeft(100);
+									cell.setColspan(7);
+									cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+									for (int l = 0; l < handler.getOBXCommentCount(
+											j, k); l++) {
 
-									cell.setPhrase(new Phrase(handler
-											.getOBXComment(j, k, l).replaceAll(
-													"<br\\s*/*>", "\n"), font));
-									table.addCell(cell);
+										cell.setPhrase(new Phrase(handler
+												.getOBXComment(j, k, l).replaceAll(
+														"<br\\s*/*>", "\n"), font));
+										table.addCell(cell);
 
+									}
+									cell.setPadding(3);
+									cell.setColspan(1);
 								}
-								cell.setPadding(3);
-								cell.setColspan(1);
 							}
-						}
+
+							if (handler.getMsgType().equals("ALPHA"))
+							{
+								if (handler.getOBXValueType(j, k).equals("FT"))
+								{
+									cell.setPhrase(new Phrase("", lineFont));
+									cell.setColspan(1);
+									cell.setBorder(Rectangle.BOTTOM | Rectangle.TOP | Rectangle.LEFT);
+									table.addCell(cell);
+									cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0"), lineFont));
+									cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+									cell.setColspan(6);
+									cell.setBorder(Rectangle.BOTTOM | Rectangle.TOP | Rectangle.RIGHT);
+									table.addCell(cell);
+								}
+							}
 						// if (DNS)
 						} else if ((handler.getMsgType().equals("EPSILON") && header.equals(handler.getOBXIdentifier(j,k)) && obxName.equals("")) || (handler.getMsgType().equals("PFHT") && obxName.equals("")&& header.equals(handler.getObservationHeader(j,k)))){
 							// cell.setBackgroundColor(getHighlightColor(linenum));
