@@ -95,7 +95,7 @@ public class FileFactory
 	/**
 	 * load an existing document with the given name
 	 * @param fileName - name of the file to load
-	 * @return - the file, or null if no file exists with the given filename
+	 * @return - the file
 	 */
 	public static GenericFile getDocumentFile(String fileName) throws IOException
 	{
@@ -105,7 +105,7 @@ public class FileFactory
 	/**
 	 * load an existing pending fax file with the given name
 	 * @param fileName - name of the file to load
-	 * @return - the file, or null if no file exists with the given filename
+	 * @return - the file
 	 */
 	public static GenericFile getOutboundPendingFaxFile(String fileName) throws IOException
 	{
@@ -115,11 +115,21 @@ public class FileFactory
 	/**
 	 * load an existing unsent fax file with the given name
 	 * @param fileName - name of the file to load
-	 * @return - the file, or null if no file exists with the given filename
+	 * @return - the file
 	 */
 	public static GenericFile getOutboundUnsentFaxFile(String fileName) throws IOException
 	{
 		return getExistingFile(GenericFile.OUTBOUND_FAX_DIR_UNSENT, fileName);
+	}
+
+	/**
+	 * load an existing sent fax file with the given name
+	 * @param fileName - name of the file to load
+	 * @return - the file
+	 */
+	public static GenericFile getOutboundSentFaxFile(String fileName) throws IOException
+	{
+		return getExistingFile(GenericFile.OUTBOUND_FAX_DIR_SENT, fileName);
 	}
 
 	/**

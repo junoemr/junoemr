@@ -153,6 +153,12 @@
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationDateQueued"/>'">{{item.integrationDateQueued}}</td>
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationDateSent"/>'">{{item.integrationDateSent}}</td>
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationStatus"/>'">{{item.integrationStatus}}</td>
+						<td>
+							<button class="btn btn-primary btn-xs"
+							ng-click="faxSendReceiveController.viewDownloadFile(item.id);">
+							<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.download"/>
+							</button>
+						</td>
 					</tr>
 					</tbody>
 				</table>

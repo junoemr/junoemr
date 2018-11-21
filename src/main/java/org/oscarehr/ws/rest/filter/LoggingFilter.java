@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.model.RestServiceLog;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.filter.annotation.LoggingFilterHidePassword;
+import org.oscarehr.ws.rest.filter.annotation.LoggingFilterSkipContentLogging;
 import oscar.log.LogAction;
 
 import javax.annotation.Priority;
@@ -58,6 +59,7 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 	private static final String PROP_REQUEST_BODY = "LoggingFilter.requestBody";
 	private static final String PROP_REQUEST_DATETIME = "LoggingFilter.requestDateTime";
     private static final String PROP_REQUEST_PROVIDER = "LoggingFilter.requestProviderNo";
+	private static final String PROP_SKIP_LOGGING_CONTENT = "LoggingFilter.doNotLogContent";
 	static final String PROP_SKIP_LOGGING = "LoggingFilter.doNotLog";
 
 	@Context
@@ -104,6 +106,13 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 				body = removePasswordData(body, filterAnnotation.fields());
 			}
 		}
+		/* allow methods annotated with this custom annotation to skip the content logging step.
+		 * This is useful for large responses such as encoded documents & non-json responses */
+		LoggingFilterSkipContentLogging skipContentLogging = resourceInfo.getResourceMethod().getAnnotation(LoggingFilterSkipContentLogging.class);
+		if(skipContentLogging != null)
+		{
+			request.setProperty(PROP_SKIP_LOGGING_CONTENT, true);
+		}
 
 		request.setProperty(PROP_REQUEST_BODY, body);
 		request.setProperty(PROP_REQUEST_DATETIME, new Date());
@@ -117,6 +126,7 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 	{
 		// some things should not be logged, if they set this property, we deliberately skip the logging process
 		Boolean skipLogging = (Boolean) request.getProperty(PROP_SKIP_LOGGING);
+		Boolean skipContentLogging = (Boolean) request.getProperty(PROP_SKIP_LOGGING_CONTENT);
 		if(skipLogging != null && skipLogging)
 		{
 			return;
@@ -154,13 +164,13 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 			}
 		}
 
-		if(response.getEntity() != null)
+		if(response.getEntity() != null && (skipContentLogging == null || !skipContentLogging))
 		{
-			Object entity = response.getEntity();
-			final ObjectMapper objectMapper = mapperResolver.getContext(Object.class);
-
 			try
 			{
+				Object entity = response.getEntity();
+				final ObjectMapper objectMapper = mapperResolver.getContext(Object.class);
+
 				rawResponseData = objectMapper.writeValueAsString(entity);
 			}
 			catch(Exception e)

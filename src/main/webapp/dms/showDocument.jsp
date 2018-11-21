@@ -166,6 +166,7 @@
 %>
 <% if (request.getParameter("inWindow") != null && request.getParameter("inWindow").equalsIgnoreCase("true")) {  %>
 <html>
+<title>Show Document <%=documentNo%></title>
 <head>
 	<script type="text/javascript" src="<%= contextPath %>/share/calendar/calendar.js"></script>
 	<!-- language for the calendar -->

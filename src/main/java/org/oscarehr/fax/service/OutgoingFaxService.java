@@ -182,6 +182,25 @@ public class OutgoingFaxService
 		}
 	}
 
+	public GenericFile getFile(long faxOutId) throws IOException
+	{
+		FaxOutbound faxOutbound = faxOutboundDao.find(faxOutId);
+		GenericFile file;
+		if(FaxOutbound.Status.QUEUED.equals(faxOutbound.getStatus()))
+		{
+			file = FileFactory.getOutboundPendingFaxFile(faxOutbound.getFileName());
+		}
+		else if(FaxOutbound.Status.ERROR.equals(faxOutbound.getStatus()))
+		{
+			file = FileFactory.getOutboundUnsentFaxFile(faxOutbound.getFileName());
+		}
+		else
+		{
+			file = FileFactory.getOutboundSentFaxFile(faxOutbound.getFileName());
+		}
+		return file;
+	}
+
 	/**
 	 * When there are no direct integration fax routes, write file to outbound location (old fax system)
 	 */

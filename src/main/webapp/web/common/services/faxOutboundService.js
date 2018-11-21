@@ -70,6 +70,12 @@ angular.module("Common.Services").service("faxOutboundService", [
 			return deferred.promise;
 		};
 
+		/* provide the endpoint url for downloading the faxed pdf document */
+		service.getDownloadUrl = function(id)
+		{
+			return service.apiPath + '/' + id + '/download';
+		};
+
 		return service;
 	}
 ]);

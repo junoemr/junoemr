@@ -178,7 +178,10 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 		{
 			let openDocumentWindow = function()
 			{
-				window.open("../dms/showDocument.jsp?segmentID="+documentId+"&providerNo="+ controller.loggedInProviderNo + "&status=A&inWindow=true&chartView&demoName=");
+				let url = "../dms/showDocument.jsp";
+				let params = "segmentID="+documentId+"&providerNo="+ controller.loggedInProviderNo + "&status=A&inWindow=true&chartView&demoName=";
+				let windowName = "ShowDocument" + documentId;
+				window.open(url + "?" + params, windowName, "scrollbars=1,width=1024,height=768");
 			};
 
 			// if the current provider number is unknown, retrieve it before opening the new window.
@@ -200,6 +203,13 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 			{
 				openDocumentWindow();
 			}
+		};
+
+		controller.viewDownloadFile = function(outboundId)
+		{
+			let url = faxOutboundService.getDownloadUrl(outboundId);
+			let windowName = "ViewFaxFile" + outboundId;
+			window.open(url, windowName, "scrollbars=1,width=1024,height=768");
 		};
 
 		controller.initialize();

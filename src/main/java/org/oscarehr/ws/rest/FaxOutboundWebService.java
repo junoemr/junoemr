@@ -23,9 +23,11 @@
 package org.oscarehr.ws.rest;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.schedulingTasks.OutboundFaxSchedulingTask;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.ws.rest.filter.annotation.LoggingFilterSkipContentLogging;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
@@ -72,6 +76,35 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin", "_admin.fax");
 
 		return RestResponse.successResponse(OutboundFaxSchedulingTask.getNextRunTime());
+	}
+
+	/** retrieve the associated pdf based on outgoing fax record id */
+	@GET
+	@Path("/{id}/download")
+	@Produces("application/pdf")
+	@LoggingFilterSkipContentLogging
+	public Response download(@PathParam("id") Long id)
+	{
+		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin.fax");
+
+		FileInputStream stream = null;
+		String filename = "faxed-document-" + id + ".pdf";
+		try
+		{
+			GenericFile file = outgoingFaxService.getFile(id);
+			stream = new FileInputStream(file.getFileObject());
+		}
+		catch(Exception e)
+		{
+			/* handle all exception because the return type of this is not json, and will break the normal exception mappers */
+			logger.error("Error retrieving fax file", e);
+		}
+		Response.ResponseBuilder response = Response.ok(stream);
+
+		response.header("Content-Disposition", "filename="+filename);
+		response.type("application/pdf");
+		return response.build();
 	}
 
 }
