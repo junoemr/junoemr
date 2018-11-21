@@ -1136,9 +1136,9 @@ private long getAppointmentRowSpan(
 							function changeSite(sel) {
 								sel.style.backgroundColor=sel.options[sel.selectedIndex].style.backgroundColor;
 								var siteName = sel.options[sel.selectedIndex].value;
-								var newGroupNo = "<%=(mygroupno == null ? ".default" : mygroupno)%>";
+
 								jQuery.ajax({
-									url: 'providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&mygroup_no=' + newGroupNo + '&site=' + siteName,
+									url: 'updateSite.jsp?site=' + siteName,
 									success: function(result)
 									{
 										location.reload();
