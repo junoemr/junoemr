@@ -26,8 +26,11 @@
 package oscar;
 
 
-public class HScheduleDate {
-	
+import java.io.Serializable;
+
+public class HScheduleDate implements Serializable
+{
+
   public String available = "";
   public String priority = "";
   public String reason = "";
@@ -35,19 +38,25 @@ public class HScheduleDate {
   public String creator = "";
 
   // default constructor
-  public HScheduleDate() {}
-  public HScheduleDate( String available1, String priority1, String reason1, String hour1, String creator1) {
+  public HScheduleDate()
+  {
+  }
+
+  public HScheduleDate(String available1, String priority1, String reason1, String hour1, String creator1)
+  {
     available = available1;
     priority = priority1;
-    reason= reason1;
+    reason = reason1;
     hour = hour1;
     creator = creator1;
-	}
-  public void setHScheduleDate(String available1, String priority1, String reason1, String hour1, String creator1) { 
+  }
+
+  public void setHScheduleDate(String available1, String priority1, String reason1, String hour1, String creator1)
+  {
     available = available1;
     priority = priority1;
-    reason= reason1;
+    reason = reason1;
     hour = hour1;
     creator = creator1;
-  }  
+  }
 }
