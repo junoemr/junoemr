@@ -1709,7 +1709,7 @@ private long getAppointmentRowSpan(
 														<%
 														Boolean doNotBook = ("DO_NOT_BOOK").equalsIgnoreCase(appointment.getName());
 
-														if ((OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true") || OscarProperties.getInstance().getProperty("APPT_THREE_LINE", "true").equals("true")) && !doNotBook)
+														if ((oscarProperties.isPropertyActive("APPT_MULTILINE") || oscarProperties.getProperty("APPT_THREE_LINE", "true").equals("true")) && !doNotBook)
 														{
 															if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
 															{
