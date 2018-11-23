@@ -27,6 +27,11 @@
 
 	<!-- interceptors -->
 	<bean id="abstractLoggingInterceptor" abstract="true">
+		<!--
+			We remove the default limit of 65K characters otherwise an com.ctc.wstx.exc.WstxEOFException will be
+			thrown when logging some of the longer labs.  This exception causes the soap request to fail
+		-->
+		<property name="limit" value="-1" />
 		<property name="prettyLogging" value="true" />
 	</bean>
 	<bean id="loggingInInterceptor" class="org.apache.cxf.interceptor.LoggingInInterceptor" parent="abstractLoggingInterceptor" />
