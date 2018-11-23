@@ -93,7 +93,7 @@ public class QuickBillingBCHandler {
 	public static final String BILLING_UNIT = "1";
 	public static final String HALF_BILLING = "0.5";
 	
-	public final SimpleDateFormat dateformat = new SimpleDateFormat("ddmmyyyy");
+	public final SimpleDateFormat dateformat = new SimpleDateFormat("yyyyMMdd");
 	
 	private Date today;
 	private QuickBillingBCFormBean quickBillingBCFormBean;
@@ -450,7 +450,6 @@ public class QuickBillingBCHandler {
         bill.setTotal(bean.getGrandtotal());
         bill.setStatus(""+billingAccountStatus);
         bill.setDob(bean.getPatientDoB());
-        bill.setVisitDate(dateformat.parse(bean.getAdmissionDate()));
         bill.setVisitType(bean.getVisitType());
         bill.setProviderOhipNo(bean.getBillingPracNo());
         bill.setApptProviderNo(bean.getApptProviderNo());
