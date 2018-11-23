@@ -32,9 +32,10 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.oscarehr.encounterNote.dao.CaseManagementTmpSaveDao;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.CaseManagementTmpSave;
+import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.util.SpringUtils;
 
 public class CaseManagementTmpSaveDaoTest extends DaoTestFixtures {

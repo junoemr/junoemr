@@ -133,6 +133,11 @@ public class PatientEligibilityDataTo1 implements Serializable
 		return CHECKED_STATUS_CHECKED.equals(checkStatus);
 	}
 
+	public boolean isPending()
+	{
+		return CHECKED_STATUS_PENDING.equals(checkStatus);
+	}
+
 	public String getFirstName()
 	{
 		return firstName;

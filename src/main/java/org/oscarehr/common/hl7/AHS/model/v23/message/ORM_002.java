@@ -20,35 +20,27 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.encounterNote.dao;
+package org.oscarehr.common.hl7.AHS.model.v23.message;
 
-import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.encounterNote.model.CaseManagementNote;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
+import ca.uhn.hl7v2.model.v23.message.ORU_R01;
+import ca.uhn.hl7v2.parser.DefaultModelClassFactory;
+import ca.uhn.hl7v2.parser.ModelClassFactory;
 
-import javax.persistence.Query;
-
-@SuppressWarnings("unchecked")
-@Transactional
-@Repository("encounterNote.dao.CaseManagementNoteDao")
-public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
+/**
+ * A Custom HL7 segment sent by AHS labs for lab cancellation messages.
+ * Is basically the same as ORU_R01 except for ORC segment use.
+ */
+public class ORM_002 extends ORU_R01
 {
-	public CaseManagementNoteDao()
+	// the CustomModelClassFactory requires the root package for the message as a string. exclude the version and sub-folders
+	public static final String ROOT_PACKAGE = "org.oscarehr.common.hl7.AHS.model";
+
+	public ORM_002()
 	{
-		super(CaseManagementNote.class);
+		this(new DefaultModelClassFactory());
 	}
-
-	public CaseManagementNote findLatestByUUID(String uuid)
+	public ORM_002(ModelClassFactory theFactory)
 	{
-		// select model name must match specified @Entity name in model object
-		String queryString = "SELECT x FROM model.CaseManagementNote x " +
-				"WHERE x.uuid=:uuid " +
-				"ORDER BY x.noteId DESC";
-		Query query = entityManager.createQuery(queryString);
-		query.setParameter("uuid", uuid);
-		query.setMaxResults(1);
-
-		return this.getSingleResultOrNull(query);
+		super(theFactory);
 	}
 }

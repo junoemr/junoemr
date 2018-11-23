@@ -35,6 +35,10 @@ public class SunquestHandler extends AHSHandler
 {
 	private static Logger logger = Logger.getLogger(SunquestHandler.class);
 
+	protected static final String SUNQUEST_SENDING_APPLICATION = "OADD";
+	protected static final String SUNQUEST_SENDING_FACILITY = "SUNQUEST";
+	protected static final String COPATH_SENDING_FACILITY = "COPATH";
+
 	protected ORU_R01 msg;
 
 	public static boolean handlerTypeMatch(Message message)
@@ -48,8 +52,9 @@ public class SunquestHandler extends AHSHandler
 			String sendingApplication = messageHeaderSegment.getSendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getSendingFacility().getNamespaceID().getValue();
 
-			return "OADD".equalsIgnoreCase(sendingApplication) &&
-					("SUNQUEST".equalsIgnoreCase(sendingFacility) || "COPATH".equalsIgnoreCase(sendingFacility));
+			return SUNQUEST_SENDING_APPLICATION.equalsIgnoreCase(sendingApplication) &&
+					(SUNQUEST_SENDING_FACILITY.equalsIgnoreCase(sendingFacility) ||
+							COPATH_SENDING_FACILITY.equalsIgnoreCase(sendingFacility));
 		}
 		return false;
 	}
@@ -84,7 +89,13 @@ public class SunquestHandler extends AHSHandler
 
     /* ===================================== PID ====================================== */
 
-    /* ===================================== OBR ====================================== */
+    @Override
+	public String getPatientName()
+	{
+		return(getFirstName()+" "+getMiddleName()+" "+getLastName());
+	}
+
+	/* ===================================== OBR ====================================== */
 
 	@Override
 	protected String getOrderingProvider(int i, int k) throws HL7Exception

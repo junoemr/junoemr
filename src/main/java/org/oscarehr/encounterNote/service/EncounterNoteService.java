@@ -26,10 +26,13 @@ import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.SecRole;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueNoteDao;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteLinkDao;
+import org.oscarehr.encounterNote.dao.CaseManagementTmpSaveDao;
 import org.oscarehr.encounterNote.dao.IssueDao;
 import org.oscarehr.encounterNote.model.CaseManagementIssue;
 import org.oscarehr.encounterNote.model.CaseManagementIssueNote;
@@ -37,17 +40,21 @@ import org.oscarehr.encounterNote.model.CaseManagementIssueNotePK;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
 import org.oscarehr.encounterNote.model.Issue;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.rx.model.Drug;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class EncounterNoteService
 {
 	@Autowired
@@ -63,6 +70,9 @@ public class EncounterNoteService
 	CaseManagementIssueDao caseManagementIssueDao;
 
 	@Autowired
+	CaseManagementTmpSaveDao caseManagementTmpSaveDao;
+
+	@Autowired
 	IssueDao issueDao;
 
 	@Autowired
@@ -71,9 +81,25 @@ public class EncounterNoteService
 	@Autowired
 	SecRoleDao secRoleDao;
 
+	@Autowired
+	ProviderDataDao providerDataDao;
+
+	@Autowired
+	DemographicDao demographicDao;
+
 	public CaseManagementNote saveChartNote(CaseManagementNote note)
 	{
 		return saveChartNote(note, null);
+	}
+	public CaseManagementNote saveChartNote(CaseManagementNote note, String providerNo, Integer demographicNo)
+	{
+		return saveChartNote(note, null, providerNo, demographicNo);
+	}
+	public CaseManagementNote saveChartNote(CaseManagementNote note, List<Issue> issueList, String providerNo, Integer demographicNo)
+	{
+		note.setDemographic(demographicDao.find(demographicNo));
+		note.setProvider(providerDataDao.find(providerNo));
+		return saveChartNote(note, issueList);
 	}
 	public CaseManagementNote saveChartNote(CaseManagementNote note, List<Issue> issueList)
 	{
@@ -82,9 +108,32 @@ public class EncounterNoteService
 
 		if(issueList != null && !issueList.isEmpty())
 		{
-			//TODO merge/save issues as CaseManagementIssue models
-		}
+			for(Issue issue : issueList)
+			{
+				// if there exists a casemgmt_issue for the demographic, use that
+				// otherwise, create a new casemgmt_issue
+				CaseManagementIssue caseManagementIssue = caseManagementIssueDao.findByIssueId(issue.getId());
+				if(caseManagementIssue == null)
+				{
+					caseManagementIssue = new CaseManagementIssue();
+					caseManagementIssue.setAcute(false);
+					caseManagementIssue.setCertain(false);
+					caseManagementIssue.setMajor(false);
+					caseManagementIssue.setProgramId(programManager.getDefaultProgramId());
+					caseManagementIssue.setResolved(false);
+					caseManagementIssue.setIssue(issue);
+					caseManagementIssue.setType(issue.getRole());
+					caseManagementIssue.setDemographic(note.getDemographic());
+					caseManagementIssue.setUpdateDate(note.getUpdateDate());
 
+					caseManagementIssueDao.persist(caseManagementIssue);
+				}
+				// link the note and the issue
+				CaseManagementIssueNotePK caseManagementIssueNotePK = new CaseManagementIssueNotePK(caseManagementIssue, note);
+				CaseManagementIssueNote caseManagementIssueNote = new CaseManagementIssueNote(caseManagementIssueNotePK);
+				caseManagementIssueNoteDao.persist(caseManagementIssueNote);
+			}
+		}
 		return note;
 	}
 
@@ -103,6 +152,7 @@ public class EncounterNoteService
 
 		return note;
 	}
+
 	public CaseManagementNote saveDrugNote(CaseManagementNote note, Drug drug)
 	{
 		note.setIncludeIssueInNote(true);
@@ -118,7 +168,6 @@ public class EncounterNoteService
 
 		return note;
 	}
-
 
 	public CaseManagementNote saveMedicalHistoryNote(CaseManagementNote note)
 	{
@@ -167,13 +216,8 @@ public class EncounterNoteService
 		}
 
 		// link the note and the issue
-		CaseManagementIssueNotePK caseManagementIssueNotePK = new CaseManagementIssueNotePK();
-		caseManagementIssueNotePK.setCaseManagementIssue(caseManagementIssue);
-		caseManagementIssueNotePK.setCaseManagementNote(note);
-
-		CaseManagementIssueNote caseManagementIssueNote = new CaseManagementIssueNote();
-		caseManagementIssueNote.setId(caseManagementIssueNotePK);
-
+		CaseManagementIssueNotePK caseManagementIssueNotePK = new CaseManagementIssueNotePK(caseManagementIssue, note);
+		CaseManagementIssueNote caseManagementIssueNote = new CaseManagementIssueNote(caseManagementIssueNotePK);
 		caseManagementIssueNoteDao.persist(caseManagementIssueNote);
 		return note;
 	}
@@ -238,5 +282,60 @@ public class EncounterNoteService
 			return String.valueOf(secRole.getId());
 		}
 		return "0";
+	}
+
+	/**
+	 * create a new copy of the existing note, without an ID
+	 * @param noteId - id of the note to copy
+	 * @return a copy of the note
+	 */
+	public CaseManagementNote getNoteRevisionCopy(Long noteId)
+	{
+		CaseManagementNote noteToCopy = caseManagementNoteDao.find(noteId);
+		return new CaseManagementNote(noteToCopy);
+	}
+
+	/**
+	 * This method is intended for use in the case that multiple saves are required for constructing a single note revision,
+	 * specifically multiple flowsheet measurements.
+	 * This should be avoided in any other use case if at all possible.
+	 * @deprecated to discourage future use
+	 * @return the persisted note model
+	 */
+	@Deprecated
+	public CaseManagementNote addNewNoteWithUUID(String uuid, String textToAppend, String providerNo, Integer demographicNo)
+	{
+		ProviderData provider = providerDataDao.find(providerNo);
+		Demographic demographic = demographicDao.find(demographicNo);
+
+		SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+		Date date = new Date();
+		String formattedDate = "[" + df.format(date) + " .: ]";
+
+		CaseManagementNote newNote = new CaseManagementNote();
+		newNote.setNote(formattedDate + "\n" + textToAppend);
+		newNote.setProvider(provider);
+		newNote.setDemographic(demographic);
+		newNote.setSigned(true);
+		newNote.setSigningProvider(provider);
+		newNote.setUuid(uuid);
+		return saveChartNote(newNote);
+	}
+	/**
+	 * This method is intended for use in the case that multiple saves are required for constructing a single note revision,
+	 * specifically multiple flowsheet measurements.
+	 * This should be avoided in any other use case if at all possible.
+	 * @deprecated to discourage future use
+	 * @return the persisted note model
+	 */
+	@Deprecated
+	public CaseManagementNote appendTextToNote(CaseManagementNote note, String textToAppend, String providerNo, Integer demographicNo)
+	{
+		note.setProvider(providerDataDao.find(providerNo));
+		note.setDemographic(demographicDao.find(demographicNo));
+		note.setNote(note.getNote() + "\n" + textToAppend);
+		note.setHistory(note.getNote());
+		caseManagementNoteDao.merge(note);
+		return note;
 	}
 }

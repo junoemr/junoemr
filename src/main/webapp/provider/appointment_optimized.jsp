@@ -99,6 +99,7 @@
 
 private boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
 private HashMap<String,String> siteBgColor = new HashMap<String,String>();
+private boolean isClinicaid = OscarProperties.getInstance().isClinicaidBillingType();
 
 public boolean isWeekView(ServletRequest request)
 {
@@ -212,6 +213,9 @@ private long getAppointmentRowSpan(
 
 	// Additional things required for schedule
 	String roleName$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
+
+	//Required so it can be used in JSTL
+	request.setAttribute("isClinicaid", isClinicaid);
 
 	MyGroupDao myGroupDao = SpringUtils.getBean(MyGroupDao.class);
 	MyGroupAccessRestrictionDao myGroupAccessRestrictionDao = SpringUtils.getBean(MyGroupAccessRestrictionDao.class);
@@ -1132,9 +1136,9 @@ private long getAppointmentRowSpan(
 							function changeSite(sel) {
 								sel.style.backgroundColor=sel.options[sel.selectedIndex].style.backgroundColor;
 								var siteName = sel.options[sel.selectedIndex].value;
-								var newGroupNo = "<%=(mygroupno == null ? ".default" : mygroupno)%>";
+
 								jQuery.ajax({
-									url: 'providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&mygroup_no=' + newGroupNo + '&site=' + siteName,
+									url: 'updateSite.jsp?site=' + siteName,
 									success: function(result)
 									{
 										location.reload();
@@ -1428,10 +1432,11 @@ private long getAppointmentRowSpan(
 								<%
 
 								int slotLengthInMinutes = everyMin;
+								int numScheduleSlots = schedule.getScheduleSlots().asMapOfRanges().size();
 
-								if(bDispTemplatePeriod)
+								if(bDispTemplatePeriod && numScheduleSlots > 0)
 								{
-									slotLengthInMinutes = (MINUTES_IN_DAY/schedule.getScheduleSlots().asMapOfRanges().size());
+									slotLengthInMinutes = (MINUTES_IN_DAY/numScheduleSlots);
 								}
 
 								LocalTime startTime = cleanLocalTime(startHour);
@@ -1835,7 +1840,7 @@ private long getAppointmentRowSpan(
 															<c:if test="${!appointmentInfo.weekView}">
 																<c:if test="${appointmentInfo.showBilling}">
 																	<c:choose>
-																		<c:when test="${appointmentInfo.billed}">
+																		<c:when test="${appointmentInfo.billed && !isClinicaid}">
 																			&#124; <a
 																				href=#
 																				onClick='onUnbilled("${appointmentInfo.unbillURL}");return false;'
