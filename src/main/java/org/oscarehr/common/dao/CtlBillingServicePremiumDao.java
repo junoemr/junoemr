@@ -61,7 +61,7 @@ public class CtlBillingServicePremiumDao extends AbstractDao<CtlBillingServicePr
 	}
 	
 	public List<Object[]> search_ctlpremium(String status) {
-		Query q = entityManager.createQuery("select b.serviceCode, c.description from CtlBillingServicePremium b, BillingService c where b.serviceCode=c.serviceCode and b.status=?");
+		Query q = entityManager.createQuery("select b.serviceCode, c.description from CtlBillingServicePremium b, BillingService c where b.serviceCode=c.serviceCode and b.status=? GROUP BY b.serviceCode");
 		q.setParameter(1, status);
 		
 		List<Object[]> results = q.getResultList();
