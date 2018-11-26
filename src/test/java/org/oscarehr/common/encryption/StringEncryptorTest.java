@@ -98,14 +98,14 @@ public class StringEncryptorTest
 
 	private void setValidKey()
 	{
-		OscarProperties.getInstance().setProperty("AES_SYMMETRIC_KEY", "1234567890123456");
+		OscarProperties.getInstance().setProperty(StringEncryptor.KEY_PROPERTY_NAME, "eb693ec8252cd630");
 	}
 	private void setNullKey()
 	{
-		OscarProperties.getInstance().remove("AES_SYMMETRIC_KEY");
+		OscarProperties.getInstance().remove(StringEncryptor.KEY_PROPERTY_NAME);
 	}
 	private void setInvalidKey()
 	{
-		OscarProperties.getInstance().setProperty("AES_SYMMETRIC_KEY", "1234567890");
+		OscarProperties.getInstance().setProperty(StringEncryptor.KEY_PROPERTY_NAME, "1234567890");
 	}
 }

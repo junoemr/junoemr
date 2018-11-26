@@ -46,6 +46,7 @@ public class StringEncryptor
 {
 	private static final Logger logger = Logger.getLogger(StringEncryptor.class);
 	private static final OscarProperties props = OscarProperties.getInstance();
+	public static final String KEY_PROPERTY_NAME = "STRING_ENCRYPTION_KEY";
 
 	private static final String TRANSFORM = "AES/CBC/PKCS5Padding";
 	private static final String AES = "AES";
@@ -76,7 +77,7 @@ public class StringEncryptor
 			Cipher cipher = Cipher.getInstance(TRANSFORM);
 			final SecureRandom rng = new SecureRandom();
 
-			SecretKeySpec skeySpec = getSecretKeySpec(props.getProperty("AES_SYMMETRIC_KEY"));
+			SecretKeySpec skeySpec = getSecretKeySpec(getAESKey());
 			IvParameterSpec iv = createIV(cipher.getBlockSize(), Optional.of(rng));
 
 			cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
@@ -97,7 +98,7 @@ public class StringEncryptor
 		{
 			Cipher cipher = Cipher.getInstance(TRANSFORM);
 
-			SecretKeySpec skeySpec = getSecretKeySpec(props.getProperty("AES_SYMMETRIC_KEY"));
+			SecretKeySpec skeySpec = getSecretKeySpec(getAESKey());
 			IvParameterSpec iv = readIV(cipher.getBlockSize(), new ByteArrayInputStream(encryptedWithIV));
 
 			cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
@@ -110,6 +111,11 @@ public class StringEncryptor
 			logger.error("Decryption Error", e);
 			throw new EncryptionException(e);
 		}
+	}
+
+	private static String getAESKey()
+	{
+		return props.getProperty(KEY_PROPERTY_NAME);
 	}
 
 	private static SecretKeySpec getSecretKeySpec(String secretKey) throws UnsupportedEncodingException
