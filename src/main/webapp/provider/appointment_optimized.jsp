@@ -1542,12 +1542,35 @@ private long getAppointmentRowSpan(
 										// ----------------------------------------------------------------------------------
 										// Build appointments
 										// ----------------------------------------------------------------------------------
-
 										SortedMap<LocalTime, List<AppointmentDetails>> appointmentLists =
 											schedule.getAppointments().subMap(slotTime, slotEndTime);
 
+										List<List<AppointmentDetails>> allAppointments = new ArrayList(appointmentLists.values());
+										List<AppointmentDetails> appointmentsBeforeList = new ArrayList<AppointmentDetails>();
+
+										//If we're looking at the first slot of the day, get all appointments that occur before this time
+										if (slotTime.equals(startTime))
+										{
+											SortedMap<LocalTime, List<AppointmentDetails>> appointmentsBeforeStartTime = schedule.getAppointments().headMap(slotTime);
+
+											//Only show the appointments that occur before the first slot of the day and the end time is after the first slot of the day
+											for(List<AppointmentDetails> appointments: appointmentsBeforeStartTime.values())
+											{
+												for (AppointmentDetails appointment : appointments)
+												{
+													if (appointment.getEndTime().isAfter(slotTime))
+													{
+														appointmentsBeforeList.add(appointment);
+													}
+												}
+											}
+
+											//Add all these appointments to the list with all the other appointments
+											allAppointments.add(appointmentsBeforeList);
+										}
+
 										boolean isFirstAppointmentInSlot = true;
-										for(List<AppointmentDetails> appointments: appointmentLists.values())
+										for(List<AppointmentDetails> appointments: allAppointments)
 										{
 											Collections.reverse(appointments);
 											for(AppointmentDetails appointment: appointments)
@@ -1638,6 +1661,7 @@ private long getAppointmentRowSpan(
 												// These are for the appointmentFormLinks.jspf
 												String demographic_no = appointment.getDemographicNo().toString();
 												String appointment_no = appointment.getAppointmentNo().toString();
+
 
 											%>
 
