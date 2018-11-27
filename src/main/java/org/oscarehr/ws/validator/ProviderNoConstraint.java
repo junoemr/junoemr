@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
 
 @Documented
 @Constraint(validatedBy = ProviderNoValidator.class)
-@Target({ElementType.METHOD, ElementType.FIELD})
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ProviderNoConstraint
 {

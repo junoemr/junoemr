@@ -113,7 +113,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		Document document = new Document();
 		document.setPublic1(false);
 		document.setResponsible(user);
-		document.setDoccreator(user);
+		document.setDocCreator(user);
 		document.setDocdesc("");
 		document.setDoctype("");
 		document.setDocfilename(fileName);
@@ -129,7 +129,7 @@ public class AddEditDocumentAction extends DispatchAction {
 
 		if (providerId != null) // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
 		{
-			documentService.routeToProviderInbox(document.getDocumentNo(), Integer.parseInt(providerId));
+			documentService.routeToProviderInbox(document.getDocumentNo(), providerId);
 		}
 		// add to queuelinkdocument
 		String queueId = request.getParameter("queue");
@@ -175,7 +175,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		Document document = new Document();
 		document.setPublic1(false);
 		document.setResponsible(user);
-		document.setDoccreator(user);
+		document.setDocCreator(user);
 		document.setDocdesc("");
 		document.setDoctype("");
 		document.setDocfilename(fileName);
@@ -292,7 +292,7 @@ public class AddEditDocumentAction extends DispatchAction {
 				boolean isPublicDoc = ("1".equals(fm.getDocPublic()) || "checked".equalsIgnoreCase(fm.getDocPublic()));
 				document.setPublic1(isPublicDoc);
 				document.setResponsible(fm.getResponsibleId());
-				document.setDoccreator(fm.getDocCreator());
+				document.setDocCreator(fm.getDocCreator());
 				document.setDocdesc(fm.getDocDesc());
 				document.setDoctype(fm.getDocType());
 				document.setDocfilename(fileName1);

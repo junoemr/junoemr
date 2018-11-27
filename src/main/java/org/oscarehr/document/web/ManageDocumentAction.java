@@ -163,7 +163,7 @@ public class ManageDocumentAction extends DispatchAction {
 
 				for(String proNo : flagProviders)
 				{
-					documentService.routeToProviderInbox(documentId, Integer.parseInt(proNo));
+					documentService.routeToProviderInbox(documentId, proNo);
 				}
 
 				// Removes the link to the "0" provider so that the document no longer shows up as "unclaimed"
@@ -970,7 +970,7 @@ public class ManageDocumentAction extends DispatchAction {
 	            document.setDocClass(docClass);
 	            document.setDocSubClass(docSubClass);
 	            document.setResponsible(user);
-	            document.setDoccreator(user);
+	            document.setDocCreator(user);
 	            document.setDocdesc(documentDescription);
 	            document.setDoctype(docType);
 	            document.setDocfilename(fileName);
