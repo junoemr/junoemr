@@ -311,6 +311,11 @@ public final class MessageUploader {
 						if (lab_user.equals(account))
 						{
 							providerRouteReport(String.valueOf(insertID), to_provider, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, "provider_no", limit, orderByLength);
+						} else
+						{
+							/* allow property override setting to route all labs to a specific inbox or list of inboxes. */
+							ArrayList<String> providers = OscarProperties.getInstance().getRouteLabsToProviders(docNums);
+							providerRouteReport(String.valueOf(insertID), providers, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
 						}
 
 						k++;
