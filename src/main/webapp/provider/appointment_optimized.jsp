@@ -1376,7 +1376,7 @@ private long getAppointmentRowSpan(
 											"&dboperation=searchappointmentday";
 									%>
 									<b><a href="<%= dayUrl %>">
-										<%=schedule.getScheduleDate().format(DateTimeFormatter.ISO_LOCAL_DATE)%>
+										<%=schedule.getScheduleDate().format(DateTimeFormatter.ofPattern("EEE, yyyy-MM-dd"))%>
 									</a></b>
 									<%
 								}
