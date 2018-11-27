@@ -1726,14 +1726,15 @@ private long getAppointmentRowSpan(
 														%>
 																<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
 														<% 	} 
-														} %>
-
-														<!--Inline display of reason -->
-														<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
-															<span class="${appointmentInfo.reasonToggleableClass} reason reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
-																<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:${appointmentInfo.reason}
-															</span>
-														</oscar:oscarPropertiesCheck></td>
+														} else
+														{%>
+															<!--Inline display of reason -->
+															<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
+																<span class="${appointmentInfo.reasonToggleableClass} reason reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
+																	<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:${appointmentInfo.reason}
+																</span>
+															</oscar:oscarPropertiesCheck></td>
+														<%}%>
 
 													</c:when>
 													<c:otherwise>
