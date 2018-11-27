@@ -196,12 +196,12 @@ public class AppointmentDisplayController
 
 	public boolean isBilled()
 	{
-		if (appointment.getStatus() == null)
+		if (appointment.getStatus() == null || appointment.getStatus().indexOf(BILLED_STATUS) == -1)
 		{
 			return false;
 		} else
 		{
-			return (appointment.getStatus().equals(BILLED_STATUS));
+			return true;
 		}
 	}
 
