@@ -292,37 +292,41 @@ public final class MessageUploader {
 					//Property format: custom_lab_routeX=<excelleris_lab_account>,<provider_no>
 					custom_lab_route = OscarProperties.getInstance().getProperty("custom_lab_route1");
 
-					String account;
-					String lab_user;
-
-					PATHL7Handler handler = new PATHL7Handler();
-					handler.init(hl7Body);
-
-					int k = 1;
-					while (custom_lab_route != null && !custom_lab_route.equals(""))
+					if (custom_lab_route != null && !custom_lab_route.equals(""))
 					{
-						custom_route_enabled = true;
+						String account;
+						String lab_user;
 
-						ArrayList<String> cust_route = new ArrayList<String>(Arrays.asList(custom_lab_route.split(",")));
-						account = cust_route.get(0);
-						ArrayList<String> to_provider = new ArrayList<String>(Arrays.asList(cust_route.get(1)));
+						PATHL7Handler handler = new PATHL7Handler();
+						handler.init(hl7Body);
 
-						lab_user = handler.getLabUser();
-						if (lab_user.equals(account))
+						int k = 1;
+						// Loop through each custom_lab_routeX in the properties file
+						while (custom_lab_route != null && !custom_lab_route.equals(""))
 						{
-							providerRouteReport(String.valueOf(insertID), to_provider, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, "provider_no", limit, orderByLength);
-						} else
-						{
-							/* allow property override setting to route all labs to a specific inbox or list of inboxes. */
-							ArrayList<String> providers = OscarProperties.getInstance().getRouteLabsToProviders(docNums);
-							providerRouteReport(String.valueOf(insertID), providers, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
+							ArrayList<String> cust_route = new ArrayList<String>(Arrays.asList(custom_lab_route.split(",")));
+							account = cust_route.get(0);
+							ArrayList<String> to_provider = new ArrayList<String>(Arrays.asList(cust_route.get(1)));
+
+							// Get the receiving facility from the MSH segment
+							lab_user = handler.getLabUser();
+
+							// If the receiving facility is equal to the excelleris_lab_account in the property then route to the provider number that pairs with that lab account
+							// A single lab result shouldn't have more than one route here as there shouldn't be more than one receiving facility
+							if (lab_user.equals(account))
+							{
+								// We have a match, so we have a custom route. Route to the custom provider not the ordering provider
+								custom_route_enabled = true;
+								providerRouteReport(String.valueOf(insertID), to_provider, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, "provider_no", limit, orderByLength);
+							}
+
+							k++;
+							custom_lab_route = OscarProperties.getInstance().getProperty("custom_lab_route" + k);
 						}
-
-						k++;
-						custom_lab_route = OscarProperties.getInstance().getProperty("custom_lab_route" + k);
 					}
 				}
 
+				// If we don't have a custom route then route as normal. Route to the the ordering provider
 				if(!custom_route_enabled)
 				{
 					/* allow property override setting to route all labs to a specific inbox or list of inboxes. */
