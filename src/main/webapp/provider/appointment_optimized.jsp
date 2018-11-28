@@ -1730,36 +1730,35 @@ private long getAppointmentRowSpan(
 														<a href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;" ${appointmentInfo.appointmentLinkTitle} >
 															.${appointmentInfo.truncatedUpperName}
 														</a>
-
-														<% if (OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true") || OscarProperties.getInstance().getProperty("APPT_THREE_LINE", "true").equals("true"))
-														{ %>
 														<%
+														Boolean doNotBook = ("DO_NOT_BOOK").equalsIgnoreCase(appointment.getName());
+
+														if ((oscarProperties.isPropertyActive("APPT_MULTILINE") || oscarProperties.getProperty("APPT_THREE_LINE", "true").equals("true")) && !doNotBook)
+														{
 															if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
 															{
 														%>
 																<%=StringEscapeUtils.escapeHtml(appointment.getType())%>&nbsp;|&nbsp;<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
-														<% 	} %>
-														<%
+														<% 	}
 															if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() == null || appointmentInfo.getReason().length() == 0))
 															{
 														%>
 																<%=StringEscapeUtils.escapeHtml(appointment.getType())%>
-														<% 	} %>
-														<%
+														<% 	}
 															if ((appointment.getType() == null || appointment.getType().length() == 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
 															{
 														%>
 																<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
-														<% 	} %>
-
-														<% } %>
-
-														<!--Inline display of reason -->
-														<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
-															<span class="${appointmentInfo.reasonToggleableClass} reason reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
-																<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:${appointmentInfo.reason}
-															</span>
-														</oscar:oscarPropertiesCheck></td>
+														<% 	} 
+														} else
+														{%>
+															<!--Inline display of reason -->
+															<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
+																<span class="${appointmentInfo.reasonToggleableClass} reason reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
+																	<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:${appointmentInfo.reason}
+																</span>
+															</oscar:oscarPropertiesCheck></td>
+														<%}%>
 
 													</c:when>
 													<c:otherwise>
