@@ -1444,9 +1444,17 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										   {%>
 										   		<td align="<%=align%>"></td>
 										   <%}
+
+										   if (handler.getOBXAbnormalFlag(j, k) == null || handler.getOBXAbnormalFlag(j, k).isEmpty())
+										   {%>
+										   		<td align="center">N</td>
+										   <%} else
+										   {%>
+										   		<td align="center"><%= handler.getOBXAbnormalFlag(j, k)%></td>
+										   <%}
 										   %>
 
-										   <td align="center"><%= handler.getOBXAbnormalFlag(j, k)%></td>
+
 										   <td align="left"><%=handler.getOBXReferenceRange(j, k)%></td>
 										   <td align="left"><%=handler.getOBXUnits(j, k) %></td>
 										   <td align="center"><%= handler.getTimeStamp(j, k) %></td>
