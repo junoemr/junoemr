@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS indicatorTemplate (
 INSERT IGNORE INTO dashboard VALUES
 (1,'BC Billing Dashboard','Optimize Billing','999998','2018-01-30 09:37:54',0,0),
 (2,'DoBC PSP Panel - Demographic','Patient Contact, MRP, Active etc','999998','2018-06-13 15:10:04',0,0),
-(3,'DoBC CPQI PSP Panel','Polypharmacy, Prevalence of Conditions etc.','999998','2018-06-13 15:10:16',0,0pwd),
+(3,'DoBC CPQI PSP Panel','Polypharmacy, Prevalence of Conditions etc.','999998','2018-06-13 15:10:16',0,0),
 (4,'Doctors of BC PSP - Panel 1','','999998','2018-06-13 15:10:51',0,0),
 (5,'Doctors of BC PSP - Panel 2','','999998','2018-06-13 15:11:07',0,0),
 (6,'Doctors of BC PSP - Panel 3','','999998','2018-06-13 15:11:21',0,0),
