@@ -34,6 +34,7 @@
 	</bean>
 
 	<bean id="validationExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.ValidationExceptionMapper"/>
+	<bean id="constraintViolationExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.ConstraintViolationExceptionExceptionMapper"/>
 	<bean id="generalExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.GeneralExceptionMapper"/>
 	<bean id="invalidFormatExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.InvalidFormatExceptionMapper"/>
 	<bean id="jsonParseExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.JsonParseExceptionMapper"/>
@@ -102,6 +103,7 @@
 			<ref bean="oAuthFilter"/>
 			<ref bean="jaxb"/>
 			<ref bean="validationExceptionMapper"/>
+			<ref bean="constraintViolationExceptionMapper"/>
 			<ref bean="invalidFormatExceptionMapper"/>
 			<ref bean="jsonParseExceptionMapper"/>
 			<ref bean="rateLimitExceptionMapper"/>

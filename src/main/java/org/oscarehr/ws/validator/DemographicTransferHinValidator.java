@@ -20,32 +20,38 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.exceptionMapping;
+package org.oscarehr.ws.validator;
 
-import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.response.RestResponseValidationError;
+import org.oscarehr.demographic.util.HinValidator;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferBasic;
 
-import javax.validation.ValidationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
-
-@Provider
-public class ValidationExceptionMapper implements ExceptionMapper<ValidationException>
+/**
+ * Custom validator to ensure health insurance numbers are valid
+ */
+public class DemographicTransferHinValidator implements ConstraintValidator<DemographicTransferHinConstraint, DemographicTransferBasic>
 {
-	public ValidationExceptionMapper()
+	private boolean allowNull;
+
+	@Override
+	public void initialize(DemographicTransferHinConstraint constraint)
 	{
+		allowNull = constraint.allowNull();
 	}
 
 	@Override
-	public Response toResponse(ValidationException exception)
+	public boolean isValid(DemographicTransferBasic demographicTransfer, ConstraintValidatorContext constraintValidatorContext)
 	{
-		RestResponseValidationError responseError = new RestResponseValidationError(exception.getMessage());
-		RestResponse<String> response = RestResponse.errorResponse(responseError);
-
-		return Response.status(Response.Status.BAD_REQUEST).entity(response)
-				.type(MediaType.APPLICATION_JSON).build();
+		if(demographicTransfer == null)
+		{
+			return false;
+		}
+		if(demographicTransfer.getHin() == null)
+		{
+			return allowNull;
+		}
+		return HinValidator.isValid(demographicTransfer.getHin(), demographicTransfer.getHcType());
 	}
 }

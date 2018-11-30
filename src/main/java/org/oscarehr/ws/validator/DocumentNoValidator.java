@@ -20,32 +20,39 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.exceptionMapping;
+package org.oscarehr.ws.validator;
 
-import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.response.RestResponseValidationError;
+import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.util.SpringUtils;
 
-import javax.validation.ValidationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
-
-@Provider
-public class ValidationExceptionMapper implements ExceptionMapper<ValidationException>
+/**
+ * Custom validator to ensure document numbers match existing documents
+ */
+public class DocumentNoValidator implements ConstraintValidator<DocumentNoConstraint, Integer>
 {
-	public ValidationExceptionMapper()
+	private DocumentDao documentDao = SpringUtils.getBean(DocumentDao.class);
+	private boolean allowNull;
+
+	@Override
+	public void initialize(DocumentNoConstraint documentNoConstraint)
 	{
+		allowNull = documentNoConstraint.allowNull();
 	}
 
 	@Override
-	public Response toResponse(ValidationException exception)
+	public boolean isValid(Integer documentNo, ConstraintValidatorContext constraintValidatorContext)
 	{
-		RestResponseValidationError responseError = new RestResponseValidationError(exception.getMessage());
-		RestResponse<String> response = RestResponse.errorResponse(responseError);
-
-		return Response.status(Response.Status.BAD_REQUEST).entity(response)
-				.type(MediaType.APPLICATION_JSON).build();
+		if(documentNo == null)
+		{
+			return allowNull;
+		}
+		if(documentNo < 1)
+		{
+			return false;
+		}
+		return documentDao.documentExists(documentNo);
 	}
 }

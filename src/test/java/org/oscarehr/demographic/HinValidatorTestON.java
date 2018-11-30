@@ -20,32 +20,48 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.exceptionMapping;
+package org.oscarehr.demographic;
 
-import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.response.RestResponseValidationError;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.oscarehr.demographic.util.HinValidator;
 
-import javax.validation.ValidationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import java.util.Arrays;
+import java.util.Collection;
 
+import static junit.framework.Assert.assertEquals;
 
-@Provider
-public class ValidationExceptionMapper implements ExceptionMapper<ValidationException>
+@RunWith(Parameterized.class)
+public class HinValidatorTestON
 {
-	public ValidationExceptionMapper()
+	private String hin;
+	private boolean expectedResult;
+
+	public HinValidatorTestON(String hin, boolean result)
 	{
+		this.hin = hin;
+		this.expectedResult = result;
 	}
 
-	@Override
-	public Response toResponse(ValidationException exception)
+	@Parameterized.Parameters
+	public static Collection testData()
 	{
-		RestResponseValidationError responseError = new RestResponseValidationError(exception.getMessage());
-		RestResponse<String> response = RestResponse.errorResponse(responseError);
+		return Arrays.asList(new Object[][]
+				{
+						{null, false},
+						{"", false},
+						{"bubbles", false},
+						{"9663096511", false},
+						{"9663096512", false},
+						{"9663096510", true},
+				});
+	}
 
-		return Response.status(Response.Status.BAD_REQUEST).entity(response)
-				.type(MediaType.APPLICATION_JSON).build();
+	@Test
+	public void testHinOntario()
+	{
+		boolean actualResult = HinValidator.isValid(hin,"ON");
+		assertEquals(expectedResult, actualResult);
 	}
 }

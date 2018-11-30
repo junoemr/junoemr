@@ -70,6 +70,11 @@ public class DocumentDao extends AbstractDao<Document>
 		super(Document.class);
 	}
 
+	public boolean documentExists(Integer documentNo)
+	{
+		return (this.find(documentNo) != null);
+	}
+
     public List<Object[]> getCtlDocsAndDocsByDemoId(Integer demoId, Module moduleName, DocumentType docType) {
 		String sql = "FROM CtlDocument c, Document d " +
 				"WHERE c.id.module = :moduleName " +

@@ -83,7 +83,7 @@ public class FrmCustomedPDFServlet extends HttpServlet
 				String providerNo = LoggedInInfo.getLoggedInInfoFromSession(req).getLoggedInProviderNo();
 				String clinicFax = req.getParameter("clinicFax");
 				String pharmacyFaxNo = req.getParameter("pharmaFax");
-				String pharmacyName = req.getParameter("pharmaName");
+				String pharmacyName = req.getParameter("pharmaName").replaceAll("'", "\\\\'");
 				String pdfId = req.getParameter("pdfId");
 
 				String demographicNoStr = req.getParameter("demographic_no");
