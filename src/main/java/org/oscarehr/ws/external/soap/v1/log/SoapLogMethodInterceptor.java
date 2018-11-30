@@ -23,10 +23,8 @@
 
 package org.oscarehr.ws.external.soap.v1.log;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.cxf.interceptor.AbstractLoggingInterceptor;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -34,30 +32,36 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.log4j.Logger;
-import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.ws.common.MaskParameter;
 import org.oscarehr.ws.common.SkipContentLogging;
 import org.oscarehr.ws.external.soap.v1.log.model.SoapServiceLog;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import oscar.log.LogAction;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.util.Date;
 
+
+// TODO:  This should just extract the method and pass it to the outbound interceptor
 /**
- * This class is responsible for intercepting and logging webservice calls to SOAP webservices.
- * Messages are logged prior to being passed to the webservice method.
- * This class pairs with the SoapLogOutboundInterceptor to log the full webservice post and response.
+ * This class is responsible for logging at the service/method level of a SOAP request.
+ *
+ * Together with SoapLogMessageBodyInterceptor and SoapLogOutboundInterceptor, these three interceptors form a suite which is
+ * able to log the full webservice request and response.
  */
-public class SoapLogInboundInterceptor extends AbstractLoggingInterceptor {
-	
-	private static Logger logger = Logger.getLogger(SoapLogInboundInterceptor.class);
-	
-	public SoapLogInboundInterceptor() {
+public class SoapLogMethodInterceptor extends AbstractLoggingInterceptor {
+
+	private static Logger logger = Logger.getLogger(SoapLogMethodInterceptor.class);
+
+	public SoapLogMethodInterceptor() {
 		super(Phase.PRE_LOGICAL);
 	}
 
@@ -68,25 +72,8 @@ public class SoapLogInboundInterceptor extends AbstractLoggingInterceptor {
 	 * @param message Soap message to be logged
 	 */
 	@Override
-	public void handleMessage(Message message) throws Fault {	
-		// now get the request body
-		InputStream is = message.getContent(InputStream.class);
-		CachedOutputStream os = new CachedOutputStream();
-		try {
-			IOUtils.copy(is, os);
-			os.flush();
-			
-			message.setContent(InputStream.class, os.getInputStream());
-			is.close();
-
-			String postData = IOUtils.toString(os.getInputStream());
-			os.close();
-
-			attachInboundLogEntry(message, postData);
-		}
-		catch (IOException e) {
-			logger.error("IO Error in incoming SOAP logging interceptor", e);
-		}
+	public void handleMessage(Message message) throws Fault {
+		buildInboundEntry(message);
 	}
 
 	/**
@@ -102,7 +89,8 @@ public class SoapLogInboundInterceptor extends AbstractLoggingInterceptor {
 		logger.error("Incoming SOAP logging interceptor Fault", e);
 		
 		// ensure we log something if the fault occurs after the interceptor stores the incoming data
-		SoapServiceLog soapLog = (SoapServiceLog) message.getExchange().get(SoapLogInboundInterceptor.class.getName());
+		SoapServiceLog soapLog = (SoapServiceLog) message.getExchange().get(SoapServiceLog.class.getName());
+
 		if(soapLog != null) {
 			Date createdAt = soapLog.getCreatedAt();
 			long duration  = new Date().getTime() - createdAt.getTime();
@@ -115,52 +103,26 @@ public class SoapLogInboundInterceptor extends AbstractLoggingInterceptor {
 		}
 	}
 
-	/**
-	 *  Store the inbound part of the exchange in the message itself.  When it comes time to log the outbound response,
-	 *  we will combine it with the outbound log component to form a single log entry.
-	 */
-	private void attachInboundLogEntry(Message message, String postData)
-	{
-		SoapServiceLog soapLog = buildInboundEntry(message, postData);
-		message.getExchange().put(SoapLogInboundInterceptor.class.getName(), soapLog);
-	}
 
 	/**
 	 * Populates the inbound component of the logging entry
 	 *
 	 * @param message  The soap message to log
-	 * @param postData The raw soap body, including the envelope
-	 * @return A soap service log with the inbound portion filled out.  The outbound fields will still be null.
 	 */
-	private SoapServiceLog buildInboundEntry(Message message, String postData)
+	private void buildInboundEntry(Message message)
 	{
-		HttpServletRequest request = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
-
-		String url = request.getRequestURL().toString();
-
-		SoapServiceLog soapLog = new SoapServiceLog();
-
-		LoggedInInfo info = LoggedInInfo.getLoggedInInfoFromRequest(request);
-
-		if (info != null)
-		{
-			String providerNo = info.getLoggedInProviderNo();
-			soapLog.setProviderNo(providerNo);
-		}
-
-		soapLog.setDuration(0L);
-		soapLog.setIp(request.getRemoteAddr());
-		soapLog.setUrl(url);
-		soapLog.setRawOutput(null);
+		SoapServiceLog soapLog = (SoapServiceLog) message.getExchange().get(SoapServiceLog.class.getName());
 
 		Method soapMethod = getMessageTargetMethod(message);
+		soapLog.setSoapMethod(soapMethod.getName());
 
-		if (shouldLogContent(soapMethod))
+		String postData = (String) message.getExchange().remove(SoapLogMessageBodyInterceptor.class.getName());
+
+		if (!skipLoggingContent(soapMethod))
 		{
+			applyParameterMasking(soapMethod, postData);
 			soapLog.setRawPost(postData);
 		}
-
-		return soapLog;
 	}
 
 	/**
@@ -184,11 +146,53 @@ public class SoapLogInboundInterceptor extends AbstractLoggingInterceptor {
 	 * @param method the method to examine
 	 * @return true if the method is annotated with SkipContentLogging
 	 */
-	private boolean shouldLogContent(Method method)
+	private boolean skipLoggingContent(Method method)
 	{
-		Annotation skipLogging = AnnotationUtils.getMethodAnnotation(method, SkipContentLogging.class);
+		SkipContentLogging skipLogging = AnnotationUtils.getMethodAnnotation(method, SkipContentLogging.class);
 
 		return skipLogging != null;
+	}
+
+	/**
+	 * Apply parameter masking (if any) to the raw message to sanitize sensitive fields prior to logging.
+	 *
+	 * @param method Webservice method which may be annotated
+	 * @param postData The raw SOAP message which was marshalled into the webservice.
+	 */
+	private void applyParameterMasking(Method method, String postData)
+	{
+		MaskParameter maskParameters = AnnotationUtils.getMethodAnnotation(method, MaskParameter.class);
+
+		if (maskParameters != null)
+		{
+			try
+			{
+				String[] fieldNames = maskParameters.name();
+
+				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+				DocumentBuilder builder = dbFactory.newDocumentBuilder();
+
+				InputSource is = new InputSource(new StringReader(postData));
+				Document doc = builder.parse(is);
+				doc.normalizeDocument();
+
+				for (int i = 0; i < fieldNames.length; i++)
+				{
+					String toFilter = fieldNames[i];
+					NodeList nodes = doc.getElementsByTagName(toFilter);
+						for (int j=0; i < nodes.getLength(); i++)
+						{
+							Node node = nodes.item(j);
+							Element elem = (Element) node;
+							elem.getElementsByTagName(toFilter).item(0).setTextContent(MaskParameter.MASK);
+						}
+				}
+			}
+			catch (Exception e)
+			{
+				// TODO: Hmmm...
+			}
+		}
 	}
 
 	/**

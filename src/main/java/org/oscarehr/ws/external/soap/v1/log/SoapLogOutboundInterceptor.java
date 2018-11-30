@@ -42,7 +42,7 @@ import oscar.log.LogAction;
  * This class is responsible for intercepting and logging webservice responses from SOAP services.
  * Messages passed will be logged to the matching soap log entry created by the InInterceptor before being passed to the client
  *
- * This class pairs with the SoapLogInboundInterceptor to log the full webservice post and response.
+ * This class pairs with the SoapLogMethodInterceptor to log the full webservice post and response.
  */
 public class SoapLogOutboundInterceptor extends AbstractLoggingInterceptor {
 	
@@ -141,7 +141,7 @@ class SoapLogOutboundCallback implements CachedOutputStreamCallback {
 	
 	private SoapServiceLog buildOutboundMessage(Message message, String messageBody) {
 
-		SoapServiceLog soapLog = (SoapServiceLog) message.getExchange().get(SoapLogInboundInterceptor.class.getName());
+		SoapServiceLog soapLog = (SoapServiceLog) message.getExchange().get(SoapServiceLog.class.getName());
 
 		if(soapLog != null) {
 			Date createdAt = soapLog.getCreatedAt();

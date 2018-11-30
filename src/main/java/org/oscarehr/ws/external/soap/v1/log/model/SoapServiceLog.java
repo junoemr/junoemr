@@ -55,6 +55,12 @@ public class SoapServiceLog extends AbstractModel<Long>
     @Column(name = "url")
     private String url;
 
+    @Column(name = "http_method")
+    private String httpMethod;
+
+    @Column(name = "soap_method")
+    private String soapMethod;
+
     @Column(name= "provider_no")
     private String providerNo;
 
@@ -63,6 +69,9 @@ public class SoapServiceLog extends AbstractModel<Long>
 
     @Column(name = "soap_output")
     private String rawOutput;
+
+    @Column(name = "error_message")
+    private String errorMessage;
 
     public Long getId()
     {
@@ -142,5 +151,36 @@ public class SoapServiceLog extends AbstractModel<Long>
     public void setRawOutput(String rawOutput)
     {
         this.rawOutput = rawOutput;
+    }
+
+    public String getErrorMessage()
+    {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage)
+    {
+        this.errorMessage = errorMessage;
+    }
+
+
+    public String getHttpMethod()
+    {
+        return httpMethod;
+    }
+
+    public void setHttpMethod(String httpMethod)
+    {
+        this.httpMethod = httpMethod;
+    }
+
+    public String getSoapMethod()
+    {
+        return soapMethod;
+    }
+
+    public void setSoapMethod(String soapMethod)
+    {
+        this.soapMethod = soapMethod;
     }
 }
