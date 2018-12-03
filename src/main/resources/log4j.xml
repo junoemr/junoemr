@@ -85,12 +85,11 @@
 		<priority value="DEBUG" />
 	</category>
 	-->
+
+	<!-- separate log file for vm-stat logging -->
 	<category name="org.oscarehr.util.VmStat" additivity="false">
 		<level value="INFO" />
-		<!-- uncomment for deployments -->
-		<!-- 
 		<appender-ref ref="VMSTAT_FILE" />
-		-->
 	</category>
 
 	<!-- append warning level info to a separate document conversion alert file -->
