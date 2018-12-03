@@ -61,8 +61,9 @@ public class CtlBillingServicePremiumDao extends AbstractDao<CtlBillingServicePr
 	}
 	
 	public List<Object[]> search_ctlpremium(String status) {
-		Query q = entityManager.createQuery("select b.serviceCode, c.description, MAX(c.billingserviceDate) from CtlBillingServicePremium b, BillingService c " +
-									"where b.serviceCode=c.serviceCode and b.status=? and c.billingserviceDate <= now() group by b.serviceCode");
+		Query q = entityManager.createNativeQuery("SELECT b.service_code, c.description FROM ctl_billingservice_premium b INNER JOIN billingservice c ON b.service_code=c.service_code " +
+									"WHERE b.status=? AND c.billingservice_date = (SELECT MAX(c2.billingservice_date) FROM billingservice c2 " +
+									"WHERE c2.service_code = c.service_code AND c2.billingservice_date <= now())");
 		q.setParameter(1, status);
 		
 		List<Object[]> results = q.getResultList();
