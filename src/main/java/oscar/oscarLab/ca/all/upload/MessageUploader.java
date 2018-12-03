@@ -51,6 +51,7 @@ import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
+import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
@@ -435,6 +436,27 @@ public final class MessageUploader {
 							providerNums.add(otherId.getTableId());
 						}
 					}
+				}
+			}
+		}
+
+		//If the lab is a new version for an already existing lab, route to providers already assigned to previous versions of this lab
+		ProviderLabRoutingDao providerLabRoutingDao = (ProviderLabRoutingDao) SpringUtils.getBean(ProviderLabRoutingDao.class);
+		String labs = Hl7textResultsData.getMatchingLabs(labId);
+
+		//Loop through each lab version and find all providers assigned to each lab version. Add that provider to the newest version of the lab
+		if (labs != null && !labs.equals(""))
+		{
+			String[] labsArray = labs.split(",");
+
+			for (int i = 0; i < labsArray.length; i++)
+			{
+				List<Object[]> providerLabRoutings = providerLabRoutingDao.getProviderLabRoutings(Integer.parseInt(labsArray[i]), "HL7");
+
+				for (int j = 0; j < providerLabRoutings.size(); j++)
+				{
+					Provider provider = (Provider) providerLabRoutings.get(j)[0];
+					providerNums.add(provider.getProviderNo());
 				}
 			}
 		}
