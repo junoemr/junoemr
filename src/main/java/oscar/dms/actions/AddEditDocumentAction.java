@@ -328,8 +328,7 @@ public class AddEditDocumentAction extends DispatchAction {
 				if (module.equals(CtlDocument.MODULE_DEMOGRAPHIC)) {// doc is uploaded under a patient,moduleId become demo no.
 	
 					Date now = EDocUtil.getDmsDateTimeAsDate();
-	
-					String docDesc = EDocUtil.getLastDocumentDesc();
+					String docDesc = document.getDocdesc();
 	
 					CaseManagementNote cmn = new CaseManagementNote();
 					cmn.setUpdate_date(now);
@@ -376,7 +375,7 @@ public class AddEditDocumentAction extends DispatchAction {
 					// Add a noteLink to casemgmt_note_link
 					CaseManagementNoteLink cmnl = new CaseManagementNoteLink();
 					cmnl.setTableName(CaseManagementNoteLink.DOCUMENT);
-					cmnl.setTableId(Long.parseLong(EDocUtil.getLastDocumentNo()));
+					cmnl.setTableId(documentNo.longValue());
 					cmnl.setNoteId(note_id);
 	
 					request.setAttribute("document_no", documentNo);
