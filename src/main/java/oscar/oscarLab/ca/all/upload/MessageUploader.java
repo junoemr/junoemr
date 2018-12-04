@@ -449,9 +449,13 @@ public final class MessageUploader {
 		{
 			String[] labsArray = labs.split(",");
 
-			for (int i = 0; i < labsArray.length; i++)
+			//Get the lab version before the latest version. The latest version has already been inserted into the hl7TextInfo table at this point
+			//so we need to get the second most recent version
+			if (labsArray.length > 1)
 			{
-				List<Object[]> providerLabRoutings = providerLabRoutingDao.getProviderLabRoutings(Integer.parseInt(labsArray[i]), "HL7");
+				String previousLabVersion = labsArray[labsArray.length - 2];
+
+				List<Object[]> providerLabRoutings = providerLabRoutingDao.getProviderLabRoutings(Integer.parseInt(previousLabVersion), "HL7");
 
 				for (int j = 0; j < providerLabRoutings.size(); j++)
 				{
