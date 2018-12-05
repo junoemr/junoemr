@@ -30,6 +30,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.validator.ProviderNoConstraint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -53,7 +54,7 @@ public class ProviderWs extends AbstractExternalRestWs
 	@GET
 	@Path("/{id}")
 	@Operation(summary = "Retrieve an existing provider record by provider id.")
-	public RestResponse<ProviderTransfer> getProvider(@PathParam("id") String id)
+	public RestResponse<ProviderTransfer> getProvider(@ProviderNoConstraint @PathParam("id") String id)
 	{
 		ProviderTransfer providerTransfer = ProviderTransfer.toTransfer(providerDao.getProvider(id));
 		return RestResponse.successResponse(providerTransfer);

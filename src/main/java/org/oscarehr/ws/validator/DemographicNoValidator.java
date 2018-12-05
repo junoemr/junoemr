@@ -20,32 +20,39 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.exceptionMapping;
+package org.oscarehr.ws.validator;
 
-import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.response.RestResponseValidationError;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.util.SpringUtils;
 
-import javax.validation.ValidationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
-
-@Provider
-public class ValidationExceptionMapper implements ExceptionMapper<ValidationException>
+/**
+ * Custom validator to ensure demographic numbers match existing demographics
+ */
+public class DemographicNoValidator implements ConstraintValidator<DemographicNoConstraint, Integer>
 {
-	public ValidationExceptionMapper()
+	private DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+	private boolean allowNull;
+
+	@Override
+	public void initialize(DemographicNoConstraint demographicNoConstraint)
 	{
+		allowNull = demographicNoConstraint.allowNull();
 	}
 
 	@Override
-	public Response toResponse(ValidationException exception)
+	public boolean isValid(Integer demographicNo, ConstraintValidatorContext constraintValidatorContext)
 	{
-		RestResponseValidationError responseError = new RestResponseValidationError(exception.getMessage());
-		RestResponse<String> response = RestResponse.errorResponse(responseError);
-
-		return Response.status(Response.Status.BAD_REQUEST).entity(response)
-				.type(MediaType.APPLICATION_JSON).build();
+		if(demographicNo == null)
+		{
+			return allowNull;
+		}
+		if(demographicNo < 1)
+		{
+			return false;
+		}
+		return demographicDao.demographicExists(demographicNo);
 	}
 }

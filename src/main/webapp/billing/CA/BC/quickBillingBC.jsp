@@ -97,7 +97,7 @@ $(document).ready(function() {
 	// date picker function. Don't want it to run 
 	// until other elements are chosen.
 	$('#visitDate').datepicker({
-			dateFormat: "dd-mm-yy",
+			dateFormat: "yy-mm-dd",
 			beforeShow: function(input, inst) {	
 				if($("#provider :selected").val() == "empty") {	
 					

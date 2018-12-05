@@ -65,7 +65,7 @@ public class UploadEFormAttachmentAction extends Action {
 			document.setDocdesc("EForm attachment document");
 			document.setContenttype("image/jpeg");
 			document.setDocfilename(docFileName);
-			document.setDoccreator(user);
+			document.setDocCreator(user);
 			document.setPublic1(false);
 			document.setStatus('A');
 			document.setObservationdate(eformUploadDate);

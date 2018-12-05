@@ -153,7 +153,7 @@ public class FrmCustomedPDFServlet extends HttpServlet {
 			        	LogAction.addLog(provider_no, LogConst.SENT, LogConst.CON_FAX, "PRESCRIPTION " + pdfFile );
 			        }
 
-					writer.println("<script>alert('Fax sent to: " + req.getParameter("pharmaName") + " (" + req.getParameter("pharmaFax") + ")');window.close();</script>");
+					writer.println("<script>alert('Fax sent to: " + req.getParameter("pharmaName").replaceAll("'", "\\\\'") + " (" + req.getParameter("pharmaFax") + ")');window.close();</script>");
 				}
 			} else {
 				StringBuilder sbFilename = new StringBuilder();
