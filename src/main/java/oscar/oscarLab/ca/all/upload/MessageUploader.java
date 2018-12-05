@@ -58,6 +58,7 @@ import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.OtherId;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.model.OLISSystemPreferences;
@@ -442,25 +443,24 @@ public final class MessageUploader {
 
 		//If the lab is a new version for an already existing lab, route to providers already assigned to previous versions of this lab
 		ProviderLabRoutingDao providerLabRoutingDao = (ProviderLabRoutingDao) SpringUtils.getBean(ProviderLabRoutingDao.class);
-		String labs = Hl7textResultsData.getMatchingLabs(labId);
+		String labNumberCSV = Hl7textResultsData.getMatchingLabs(labId);
 
 		//Loop through each lab version and find all providers assigned to each lab version. Add that provider to the newest version of the lab
-		if (labs != null && !labs.equals(""))
+		if (labNumberCSV != null && !labNumberCSV.equals(""))
 		{
-			String[] labsArray = labs.split(",");
+			String[] labsNumbers = labNumberCSV.split(",");
 
 			//Get the lab version before the latest version. The latest version has already been inserted into the hl7TextInfo table at this point
 			//so we need to get the second most recent version
-			if (labsArray.length > 1)
+			if (labsNumbers.length > 1)
 			{
-				String previousLabVersion = labsArray[labsArray.length - 2];
+				String previousLabVersion = labsNumbers[labsNumbers.length - 2];
 
-				List<Object[]> providerLabRoutings = providerLabRoutingDao.getProviderLabRoutings(Integer.parseInt(previousLabVersion), "HL7");
+				List<ProviderLabRoutingModel> providerLabRoutings = providerLabRoutingDao.getProviderLabRoutings(Integer.parseInt(previousLabVersion), "HL7");
 
 				for (int j = 0; j < providerLabRoutings.size(); j++)
 				{
-					Provider provider = (Provider) providerLabRoutings.get(j)[0];
-					providerNums.add(provider.getProviderNo());
+					providerNums.add(providerLabRoutings.get(j).getProviderNo());
 				}
 			}
 		}

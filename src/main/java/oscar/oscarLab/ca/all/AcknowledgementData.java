@@ -33,7 +33,9 @@
 package oscar.oscarLab.ca.all;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
@@ -53,15 +55,20 @@ public class AcknowledgementData {
 		return getAcknowledgements("HL7", segmentID);
 	}
 
-	public static ArrayList<ReportStatus> getAcknowledgements(String docType, String segmentID) {
+	public static ArrayList<ReportStatus> getAcknowledgements(String docType, String segmentID)
+	{
 		ProviderLabRoutingDao dao = (ProviderLabRoutingDao) SpringUtils.getBean(ProviderLabRoutingDao.class);
+		ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 
 		ArrayList<ReportStatus> acknowledgements = new ArrayList<ReportStatus>();
-		for (Object[] i : dao.getProviderLabRoutings(ConversionUtils.fromIntString(segmentID), docType)) {
-			Provider provider = (Provider) i[0];
-			ProviderLabRoutingModel routing = (ProviderLabRoutingModel) i[1];
 
-			acknowledgements.add(new ReportStatus(provider.getFullName(), provider.getPractitionerNo(), provider.getProviderNo(),routing.getStatus(), routing.getComment(), ConversionUtils.toDateString(routing.getTimestamp(),ConversionUtils.DEFAULT_TS_PATTERN), segmentID));
+		List<ProviderLabRoutingModel> providerLabRoutings = dao.getProviderLabRoutings(ConversionUtils.fromIntString(segmentID), docType);
+
+		for (ProviderLabRoutingModel routing : providerLabRoutings)
+		{
+			Provider provider = providerDao.getProvider(routing.getProviderNo());
+
+			acknowledgements.add(new ReportStatus(provider.getFullName(), provider.getPractitionerNo(), provider.getProviderNo(), routing.getStatus(), routing.getComment(), ConversionUtils.toDateString(routing.getTimestamp(), ConversionUtils.DEFAULT_TS_PATTERN), segmentID));
 		}
 		return acknowledgements;
 	}
