@@ -21,6 +21,7 @@
 <%@page import="org.oscarehr.allergy.dao.AllergyDao"%>
 <%@page import="org.oscarehr.allergy.model.Allergy"%>
 <%@page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -38,6 +39,8 @@
     String demographic_no = request.getParameter("demographic_no");
     String providerNo = (String) session.getAttribute("user");
     String temp = "diab3";
+	String uuid = request.getParameter("uuid");
+	String UUIDParamStr = "&uuid="+ StringUtils.trimToEmpty(uuid);
 
     AllergyDao allergyDao = (AllergyDao)SpringUtils.getBean("allergyDao");
 %>
@@ -128,6 +131,10 @@ ArrayList<String> recomendations = mi.getRecommendations();
 	}
 	function getContextPath() {
 		return '<%=request.getContextPath()%>';
+	}
+	function refreshEncounter()
+	{
+		return '';
 	}
 </script>
 
@@ -833,6 +840,7 @@ String date = year+"-"+month+"-"+day;
 
 	<input type="hidden" name="demographic_no" value="<%=demographic_no%>" />
 	<input type="hidden" name="template" value="<%=temp%>" />
+	<input type="hidden" name="uuid" value="<%=uuid%>"/>
 
 	<table class="formTable" id="mainTable">
 	<%
@@ -886,7 +894,7 @@ String date = year+"-"+month+"-"+day;
 	    			<%//This part here grabs the field name %>
 	    			<tr class="dataRow <%=currentSection%>" >
 					<td class="field">
-					<a style="color: black; text-decoration : underline;" href="javascript: function myFunction() {return false; }"  onclick="javascript:popup(465,635,'<%=project%>/oscarEncounter/oscarMeasurements/AddMeasurementData.jsp?measurement=<%= response.encodeURL( measure) %>&amp;demographic_no=<%=demographic_no%>&amp;template=<%= URLEncoder.encode(temp,"UTF-8") %>','addMeasurementData<%=measurementData %>')">
+					<a style="color: black; text-decoration : underline;" href="javascript: function myFunction() {return false; }"  onclick="javascript:popup(465,635,'<%=project%>/oscarEncounter/oscarMeasurements/AddMeasurementData.jsp?measurement=<%= response.encodeURL( measure) %>&amp;demographic_no=<%=demographic_no%>&amp;template=<%= URLEncoder.encode(temp,"UTF-8") + UUIDParamStr %>','addMeasurementData<%=measurementData %>')">
 					<b><%=child.flowSheetItem.getDisplayName()%></b>
 					</a>
 					</td>

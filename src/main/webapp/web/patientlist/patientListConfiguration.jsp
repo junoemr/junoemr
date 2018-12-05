@@ -39,6 +39,13 @@
                 <b><bean:message key="patientList.config.showReason" bundle="ui"/></b>
 		    </label>
 	  	</div>
+
+		<div class="checkbox">
+			<label>
+				<input type="checkbox" ng-model="patientListConfigCtrl.patientListConfig.showStatus">
+				<b><bean:message key="patientList.config.showStatus" bundle="ui"/></b>
+			</label>
+		</div>
 		  
 	</form>  
 </div>

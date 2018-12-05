@@ -461,9 +461,27 @@ function checkFormTypeIn() {
 	return true;
 }
 
-function checkTitleSex(ttl) {
-   // if (ttl=="MS" || ttl=="MISS" || ttl=="MRS" || ttl=="SR") document.adddemographic.sex.selectedIndex=1;
-	//else if (ttl=="MR" || ttl=="MSSR") document.adddemographic.sex.selectedIndex=0;
+function checkTitleSex(title) {
+    var genderSelect = document.getElementById("sex");
+
+    switch (title)
+	{
+		case "MS":
+		case "MISS":
+		case "MRS":
+		case "SR":
+		{
+		    genderSelect.value = "F";
+		    break;
+		}
+		case "MR":
+		case "MSSR":
+		{
+		    genderSelect.value = "M";
+		    break;
+		}
+		default:
+	}
 }
 
 function removeAccents(s){

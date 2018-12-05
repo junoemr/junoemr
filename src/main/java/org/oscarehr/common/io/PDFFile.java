@@ -24,8 +24,11 @@
 package org.oscarehr.common.io;
 
 import org.apache.log4j.Logger;
+import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.oscarehr.util.MiscUtils;
+import oscar.OscarProperties;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,33 +41,31 @@ import java.util.regex.Pattern;
 
 public class PDFFile extends GenericFile
 {
-	private static Logger logger = MiscUtils.getLogger();
+	private static final Logger logger = MiscUtils.getLogger();
 	private static final Set<String> allowedErrors = new HashSet<>();
-	private static Pattern[] allowedWarningsGS = null;
+	private static final Pattern[] allowedWarningsGS = new Pattern[1];
 
-	public PDFFile(File file)
+	static
+	{
+		allowedWarningsGS[0] = Pattern.compile(".*Missing glyph .* in the font HiddenHorzOCR.*", Pattern.CASE_INSENSITIVE);
+	}
+
+	private OscarProperties oscarProperties = OscarProperties.getInstance();
+	private long maxMemoryUsage = oscarProperties.getPDFMaxMemUsage();
+
+	public PDFFile(File file) throws IOException
 	{
 		super(file);
 	}
 
 	private boolean isAllowedWarning(String line)
 	{
-		for (Pattern pattern : getAllowedWarningsGS())
+		for (Pattern pattern : allowedWarningsGS)
 		{
 			if (pattern.matcher(line).matches())
 				return true;
 		}
 		return false;
-	}
-
-	private static Pattern[] getAllowedWarningsGS()
-	{
-		if(allowedWarningsGS == null)
-		{
-			allowedWarningsGS = new Pattern[1];
-			allowedWarningsGS[0] = Pattern.compile(".*Missing glyph .* in the font HiddenHorzOCR.*", Pattern.CASE_INSENSITIVE);
-		}
-		return allowedWarningsGS;
 	}
 
 	@Override
@@ -79,7 +80,7 @@ public class PDFFile extends GenericFile
 		return this.isValid;
 	}
 	@Override
-	public void reEncode() throws IOException, InterruptedException
+	public void process() throws IOException, InterruptedException
 	{
 		javaFile = ghostscriptReEncode();
 	}
@@ -89,19 +90,21 @@ public class PDFFile extends GenericFile
 	 * @return the number of pages in the file
 	 */
 	@Override
-	public int getPageCount()
+	public int getPageCount() throws IOException
 	{
 		int numOfPage = 0;
+
 		try
 		{
-			PDDocument doc = PDDocument.load(javaFile);
-			numOfPage = doc.getNumberOfPages();
-			doc.close();
+			PDDocument document = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+			numOfPage = document.getNumberOfPages();
+			document.close();
 		}
-		catch(IOException e)
+		catch(InvalidPasswordException e)
 		{
-			logger.error("Error", e);
+			logger.warn("Encrypted PDF. Can't get page count");
 		}
+
 		return numOfPage;
 	}
 
@@ -153,7 +156,7 @@ public class PDFFile extends GenericFile
 		String gs = props.getProperty("document.ghostscript_path", "/usr/bin/gs");
 
 		File currentDir = javaFile.getParentFile();
-		this.moveToCorrupt();
+		this.moveToOriginal();
 
 		File newPdf = new File(currentDir, javaFile.getName());
 
@@ -167,7 +170,9 @@ public class PDFFile extends GenericFile
 				"-dCompatibilityLevel=1.4",
 				"-dPDFSETTINGS=/printer",
 				"-dNOPAUSE",
-				"-dQUIET",
+				"-dQUIET",      // Suppresses routine information comments on standard output
+				"-q",           // Quiet startup: suppress normal startup messages, and also do the equivalent of dQUIET
+//				"-sstdout=%stderr", // Redirect PostScript %stdout to a file or stderr, to avoid it being mixed with device stdout.
 				"-dBATCH",
 				"-sOutputFile="+ newPdf.getPath(),
 				javaFile.getPath()};
@@ -175,25 +180,66 @@ public class PDFFile extends GenericFile
 		logger.info(Arrays.toString(command));
 		Process process = Runtime.getRuntime().exec(command);
 
-		BufferedReader in = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-		String line;
+		BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		BufferedReader stderr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
+		String line;
 		String reasonInvalid = null;
-		while((line = in.readLine()) != null)
+		String warnings = null;
+		while((line = stdout.readLine()) != null)
 		{
-			logger.warn("gs error line: " + line);
+			logger.warn("gs stdout: " + line);
+			warnings = (warnings == null)? line : warnings + ", " + line;
+		}
+
+		while((line = stderr.readLine()) != null)
+		{
+			logger.warn("gs stderr: " + line);
+
 			if (isAllowedWarning(line))
 				continue;
 
 			reasonInvalid = (reasonInvalid == null)? line : reasonInvalid + ", " + line;
 		}
 		process.waitFor();
-		in.close();
+		stdout.close();
+		stderr.close();
 
 		int exitValue = process.exitValue();
+		if(exitValue == 0 && reasonInvalid == null && warnings != null)
+		{
+			// append the original file location to the log if there is unexpected output
+			logger.warn("File conversion allowed with unexpected output!");
+			logger.warn("Original file:  " + javaFile.getPath());
+			logger.warn("Converted file: " + newPdf.getPath());
+			logger.warn("---------------------------------------------");
+		}
+
 		if(exitValue != 0 || reasonInvalid != null)
 		{
+			try
+			{
+				PDDocument document = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+				document.close();
+			} catch(InvalidPasswordException e)
+			{
+				logger.warn("Encrypted PDF. Cannot re-encode");
+				this.moveFile(currentDir);
+				newPdf = javaFile;
+				return newPdf;
+			}
+
+			this.moveToCorrupt();
 			throw new RuntimeException("Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue);
+		}
+
+		try
+		{
+			PDDocument document = PDDocument.load(newPdf, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+			document.close();
+		} catch(Exception e)
+		{
+			throw new RuntimeException("Failed to load re-encoded PDF: ", e);
 		}
 
 		logger.info("END PDF RE-ENCODING");

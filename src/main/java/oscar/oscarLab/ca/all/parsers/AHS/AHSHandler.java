@@ -143,11 +143,12 @@ public abstract class AHSHandler extends MessageHandler
 	{
 		// of ORC is present - return it
 		String orderStatus = getString(get("/.ORC-5"));
-		if (orderStatus != null && !orderStatus.isEmpty()) {
+		if (orderStatus != null && !orderStatus.isEmpty())
+		{
 			return orderStatus;
 		}
 		// otherwise get first OBR status
-		return get("/.OBR-25-1");
+		return getString(get("/.OBR-25-1"));
 	}
 
 	/**

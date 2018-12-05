@@ -33,6 +33,8 @@ import org.oscarehr.ws.external.rest.v1.conversion.DocumentConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.document.DocumentTransferInbound;
 import org.oscarehr.ws.rest.exception.MissingArgumentException;
 import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.validator.DocumentNoConstraint;
+import org.oscarehr.ws.validator.ProviderNoConstraint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.log.LogAction;
@@ -66,7 +68,7 @@ public class DocumentWs extends AbstractExternalRestWs
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Add a new document to the system")
-	public RestResponse<Integer> postDocument(@Valid DocumentTransferInbound transfer) throws IOException
+	public RestResponse<Integer> postDocument(@Valid DocumentTransferInbound transfer) throws IOException, InterruptedException
 	{
 		String providerNoStr = getOAuthProviderNo();
 		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_edoc");
@@ -102,7 +104,7 @@ public class DocumentWs extends AbstractExternalRestWs
 	@Path("/{documentId}/inbox/general")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Route the document to the unclaimed inbox")
-	public RestResponse<Integer> postDocument(@PathParam("documentId") Integer documentId)
+	public RestResponse<Integer> postDocument(@DocumentNoConstraint @PathParam("documentId") Integer documentId)
 	{
 		String providerNoStr = getOAuthProviderNo();
 		String ip = getHttpServletRequest().getRemoteAddr();
@@ -118,8 +120,8 @@ public class DocumentWs extends AbstractExternalRestWs
 	@Path("/{documentId}/inbox/provider/{providerId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Route the document to the given provider inbox")
-	public RestResponse<Integer> postDocument(@PathParam("documentId") Integer documentId,
-	                                          @PathParam("providerId") Integer providerId)
+	public RestResponse<Integer> postDocument(@DocumentNoConstraint @PathParam("documentId") Integer documentId,
+	                                          @ProviderNoConstraint @PathParam("providerId") String providerId)
 	{
 		String providerNoStr = getOAuthProviderNo();
 		String ip = getHttpServletRequest().getRemoteAddr();

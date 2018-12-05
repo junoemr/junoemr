@@ -20,7 +20,7 @@ jQuery(document).ready(function(){
 	
 	jQuery("#add_overdue").after(
 			"<p id=\"add_renal\">" +
-			"<a class=\"DoNotPrint\" href=\"javascript: function myFunction() {return false; }\"  onclick=\"javascript:fsPopup(760,670,'AddMeasurementData.jsp?demographic_no="+getDemographicNo()+"&measurement=EGFR&measurement=ACR&measurement=AORA&template=diab2','addMeasurementDataRenal')\" TITLE=\"Add renal measurements.\">" +
+			"<a class=\"DoNotPrint\" href=\"javascript: function myFunction() {return false; }\"  onclick=\"javascript:fsPopup(760,670,'AddMeasurementData.jsp?uuid="+getUuid()+"&demographic_no="+getDemographicNo()+"&measurement=EGFR&measurement=ACR&measurement=AORA&template=diab2','addMeasurementDataRenal')\" TITLE=\"Add renal measurements.\">" +
 			"Add Renal" +
 			"</a></p>"
 	);

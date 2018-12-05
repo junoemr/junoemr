@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.List;
 
 import org.oscarehr.util.LoggedInInfo;
@@ -15,6 +14,7 @@ import oscar.oscarTickler.TicklerCreator;
 import oscar.util.SqlUtils;
 
 public class CDMReminderHlp {
+
   public CDMReminderHlp() {
   }
 
@@ -32,28 +32,29 @@ public class CDMReminderHlp {
     //get all demographics with a problem that falls within CDM category
     TicklerCreator crt = new TicklerCreator();
     ServiceCodeValidationLogic lgc = new ServiceCodeValidationLogic();
-    List cdmServiceCodes = lgc.getCDMCodes();
+    List<String[]> cdmServiceCodes = lgc.getCDMCodes();
     alertCodes = createCDMCodeArray(cdmServiceCodes);
 
     final String remString = "SERVICE CODE";
-    List cdmPatients = this.getCDMPatients(alertCodes);
-    List cdmPatientNos = extractPatientNos(cdmPatients);
+    List<String[]> cdmPatients = this.getCDMPatients(alertCodes);
+    List<String> cdmPatientNos = extractPatientNos(cdmPatients);
     crt.resolveTicklers(loggedInInfo, providerNo, cdmPatientNos, remString);
 
-    for (Iterator iter = cdmPatients.iterator(); iter.hasNext(); ) {
-    	MiscUtilsOld.checkShutdownSignaled();
+    for (String[] cdmPatientInfo : cdmPatients) {
 
-      String[] dxRecord = (String[]) iter.next();
-      String demoNo = dxRecord[0];
-      String provNo = dxRecord[1];
-      String dxcode = dxRecord[2];
-      for (Iterator iterb = cdmServiceCodes.iterator(); iterb.hasNext(); ) {
-        String[] cdmRecord = (String[]) iterb.next();
+      MiscUtilsOld.checkShutdownSignaled();
+
+      String demoNo = cdmPatientInfo[0];
+      String provNo = cdmPatientInfo[1];
+      String dxcode = cdmPatientInfo[2];
+
+      for (String[] cdmRecord : cdmServiceCodes) {
+
         String cdmCode = cdmRecord[0]; //A declared cdm code
         String cdmServiceCode = cdmRecord[1]; //The associated service code for the specified cdm
         //if the specified patient has one one the specified chronic diseases
         if (cdmCode.equals(dxcode)) {
-          /**
+          /*
            * Check If the associated service code was billed in the past calendar year
            */
           int daysPast = lgc.daysSinceCodeLastBilled(demoNo, cdmServiceCode);
@@ -77,18 +78,19 @@ public class CDMReminderHlp {
   }
 
   private List<String> extractPatientNos(List<String[]> cdmPatients) {
-    ArrayList<String> cdmPatientNos = new ArrayList<String>();
-    for (Iterator<String[]> iter = cdmPatients.iterator(); iter.hasNext(); ) {
-      String[] item = iter.next();
-      cdmPatientNos.add(item[0]);
+    ArrayList<String> cdmPatientNos = new ArrayList<>();
+
+    for (String[] patientInfo : cdmPatients) {
+      cdmPatientNos.add(patientInfo[0]);
     }
+
     return cdmPatientNos;
   }
 
   /**
    * Returns a String list of demographic numbers for patients that are associated with the
    * specified provider number and who have been diagnosed with a chronic disease
-   * @param provNo String
+   *
    * @return ArrayList
    */
   private List<String[]> getCDMPatients(String[] codes) {

@@ -199,7 +199,7 @@ public class Document extends AbstractModel<Integer> implements Serializable {
         return doccreator;
     }
 
-    public void setDoccreator(String doccreator) {
+    public void setDocCreator(String doccreator) {
         this.doccreator = doccreator;
     }
     

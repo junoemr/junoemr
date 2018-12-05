@@ -86,7 +86,7 @@ public class DocumentWs extends AbstractWs {
 		return (DocumentTransfer.getTransfers(loggedInInfo, documents));
 	}
 
-	public String addDocument(String docFilename, String docContentsBase64, String providerId, String responsibleId) throws IOException
+	public String addDocument(String docFilename, String docContentsBase64, String providerId, String responsibleId) throws IOException, InterruptedException
 	{
 		// Decode document
 		Base64 base64 = new Base64();
@@ -102,7 +102,7 @@ public class DocumentWs extends AbstractWs {
 		Document document = new Document();
 		document.setPublic1(false);
 		document.setResponsible(responsibleId);
-		document.setDoccreator(providerId);
+		document.setDocCreator(providerId);
 		document.setDocdesc("");
 		document.setDoctype("");
 		document.setDocfilename(docFilename);
@@ -110,7 +110,7 @@ public class DocumentWs extends AbstractWs {
 		document.setObservationdate(new Date());
 
 		documentService.uploadNewDemographicDocument(document, fileInputStream);
-		documentService.routeToProviderInbox(document.getDocumentNo(), Integer.parseInt(providerId));
+		documentService.routeToProviderInbox(document.getDocumentNo(), providerId);
 
 		return "{\"success\":1,\"message\":\"\"}";
 	}

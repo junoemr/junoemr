@@ -70,6 +70,11 @@ public class DocumentDao extends AbstractDao<Document>
 		super(Document.class);
 	}
 
+	public boolean documentExists(Integer documentNo)
+	{
+		return (this.find(documentNo) != null);
+	}
+
     public List<Object[]> getCtlDocsAndDocsByDemoId(Integer demoId, Module moduleName, DocumentType docType) {
 		String sql = "FROM CtlDocument c, Document d " +
 				"WHERE c.id.module = :moduleName " +
@@ -144,7 +149,7 @@ public class DocumentDao extends AbstractDao<Document>
 		return query.getResultList();
     }
 
-	public List<Object[]> findCtlDocsAndDocsByDocNo(Integer documentNo) {
+	public List<Object[]> findCtlDocsAndDocsByDocNo(Integer documentNo, String module) {
 		String sql = "FROM Document d, CtlDocument c " + 
 				"WHERE c.id.documentNo = d.documentNo " +
                 "AND c.id.documentNo = :documentNo " +
@@ -152,9 +157,12 @@ public class DocumentDao extends AbstractDao<Document>
                 "ORDER BY d.observationdate DESC, d.updatedatetime DESC";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("documentNo", documentNo);
-		query.setParameter("module", CtlDocument.MODULE_DEMOGRAPHIC);
+		query.setParameter("module", module);
 		return query.getResultList();
     }
+	public List<Object[]> findCtlDocsAndDocsByDocNo(Integer documentNo) {
+		return findCtlDocsAndDocsByDocNo(documentNo, CtlDocument.MODULE_DEMOGRAPHIC);
+	}
 
 	public List<Object[]> findCtlDocsAndDocsByModuleCreatorResponsibleAndDates(Module module, String providerNo, String responsible, Date from, Date to, boolean unmatchedDemographics) {
 		String sql = "FROM Document d, CtlDocument c " +

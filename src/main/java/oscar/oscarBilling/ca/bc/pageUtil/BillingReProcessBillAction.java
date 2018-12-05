@@ -100,7 +100,7 @@ public class BillingReProcessBillAction extends Action {
     String billingGroupNo = billform.getGroupNo(providerNo);
     String practitionerNo = billform.getPracNo(providerNo); //p
 
-    String hcNo = demo.getHin().trim()+demo.getVer().trim(); //d
+    String hcNo = org.apache.commons.lang.StringUtils.trimToEmpty(demo.getHin())+org.apache.commons.lang.StringUtils.trimToEmpty(demo.getVer()); //d
     String dependentNo = frm.getDependentNo(); //f
 
     String visitLocation = frm.getLocationVisit(); //f

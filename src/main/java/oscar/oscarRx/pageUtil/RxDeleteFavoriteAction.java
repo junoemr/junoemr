@@ -56,8 +56,7 @@ public final class RxDeleteFavoriteAction extends Action {
 			throw new RuntimeException("missing required security object (_rx)");
 		}
 
-
-            int favoriteId = Integer.parseInt(((RxDeleteFavoriteForm)form).getFavoriteId());
+            int favoriteId = Integer.parseInt(request.getParameter("favoriteId"));
             new RxPrescriptionData().deleteFavorite(favoriteId);
 
             // Setup variables

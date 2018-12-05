@@ -68,6 +68,8 @@ public class SecRoleDao extends AbstractDao<SecRole> {
  		return(results);
  	}
 
+ 	/** BAD! Stop using this. we want to be able to rename roles */
+ 	@Deprecated
     public SecRole findByName(String name) {
     	Query q = entityManager.createQuery("select x from SecRole x where x.name=:name");
 

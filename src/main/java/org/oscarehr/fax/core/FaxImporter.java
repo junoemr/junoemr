@@ -107,20 +107,24 @@ public class FaxImporter {
 	                }
 	                
 	                mGet.releaseConnection();
-	            } catch (ClientProtocolException e) {
-	            	logger.error("HTTP WS CLIENT ERROR", e);
-	            
-	            } catch (IOException e) {
-	            	logger.error("IO ERROR", e);
-	            	
-	            } catch( Exception e ) {
-	            	logger.error("UNKNOWN ERROR ",e);
-	            }				
-				finally {
+				} catch (ClientProtocolException e)
+				{
+					logger.error("HTTP WS CLIENT ERROR", e);
+
+				} catch (IOException e)
+				{
+					logger.error("IO ERROR", e);
+
+				} catch (InterruptedException e)
+				{
+					logger.error("THREAD INTERRUPTED ERROR ", e);
+				} catch (Exception e)
+				{
+					logger.error("UNKNOWN ERROR ", e);
+				} finally
+				{
 					mGet.releaseConnection();
 				}
-				
-			
 			}
 		}
 		
@@ -179,7 +183,7 @@ public class FaxImporter {
 		
 	}
 
-	private boolean saveAndInsertIntoQueue(FaxConfig faxConfig, FaxJob receivedFax, FaxJob faxFile)
+	private boolean saveAndInsertIntoQueue(FaxConfig faxConfig, FaxJob receivedFax, FaxJob faxFile) throws InterruptedException
 	{
 		boolean retval = false;
 
@@ -189,7 +193,7 @@ public class FaxImporter {
 		Document document = new Document();
 		document.setPublic1(false);
 		document.setResponsible(user);
-		document.setDoccreator(user);
+		document.setDocCreator(user);
 		document.setDocdesc("");
 		document.setDoctype("");
 		document.setDocfilename(fileName);

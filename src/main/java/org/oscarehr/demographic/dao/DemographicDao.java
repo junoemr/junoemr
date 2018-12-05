@@ -34,4 +34,9 @@ public class DemographicDao extends AbstractDao<Demographic>
 	{
 		super(Demographic.class);
 	}
+
+	public boolean demographicExists(Integer demographicNo)
+	{
+		return (this.find(demographicNo) != null);
+	}
 }

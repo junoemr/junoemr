@@ -145,6 +145,7 @@ public class EctDisplayDocsAction extends EctDisplayAction {
     
     			String user = (String) request.getSession().getAttribute("user");
     			item.setDate(date);
+    			winName = curDoc.getFileName() + bean.demographicNo;
     			hash = Math.abs(winName.hashCode());
     			
     			if (inboxflag) {
@@ -157,7 +158,7 @@ public class EctDisplayDocsAction extends EctDisplayAction {
 					isURLjavaScript = true;
     			}
     			else {
-    				url = "popupPage(700,800,'" + hash + "', '" +  request.getContextPath() + "/dms/ManageDocument.do?method=display&doc_no=" + dispDocNo + "&providerNo=" + user + (curDoc.getRemoteFacilityId()!=null?"&remoteFacilityId="+curDoc.getRemoteFacilityId():"") + "'); return false;";
+					url = "popupPage(700,800,'" + hash + "', '" +  request.getContextPath() + "/dms/ManageDocument.do?method=display&doc_no=" + dispDocNo + "&providerNo=" + user + (curDoc.getRemoteFacilityId()!=null?"&remoteFacilityId="+curDoc.getRemoteFacilityId():"") + "'); return false;";
     			}
     			
     			item.setLinkTitle(title + serviceDateStr);

@@ -24,6 +24,7 @@ package org.oscarehr.ws.external.rest.v1.transfer.demographic;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.oscarehr.ws.validator.DemographicNoConstraint;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDate;
@@ -33,12 +34,25 @@ import java.time.LocalDate;
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
 public class DemographicTransferOutbound extends DemographicTransferBasic
 {
+	@Schema(description = "patient demographic record identifier")
+	@DemographicNoConstraint
+	private Integer demographicNo;
 	@Schema(description = "record last update date")
 	private LocalDate lastUpdateDate;
 
 	public DemographicTransferOutbound()
 	{
 		super();
+	}
+
+	public Integer getDemographicNo()
+	{
+		return demographicNo;
+	}
+
+	public void setDemographicNo(Integer demographicNo)
+	{
+		this.demographicNo = demographicNo;
 	}
 
 	public LocalDate getLastUpdateDate()
