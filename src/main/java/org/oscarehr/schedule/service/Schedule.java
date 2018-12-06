@@ -414,6 +414,8 @@ public class Schedule
 		String site
 	)
 	{
+		char isAvailable = '0';
+
 		// Get schedule slots
 		RangeMap<LocalTime, ScheduleSlot> scheduleSlots = scheduleTemplateDao.findScheduleSlots(
 			date, providerNo);
@@ -422,13 +424,21 @@ public class Schedule
 		SortedMap<LocalTime, List<AppointmentDetails>> appointments =
 			appointmentDao.findAppointmentDetailsByDateAndProvider(date, providerNo, site);
 
+		ScheduleDate scheduleDate = scheduleDateDao.findByProviderNoAndDate(Integer.toString(providerNo), java.sql.Date.valueOf(date));
+
+		if (scheduleDate != null)
+		{
+			isAvailable = scheduleDate.getAvailable();
+		}
+
 		return new UserDateSchedule(
 			providerNo,
 			date,
 			firstName,
 			lastName,
 			scheduleSlots,
-			appointments
+			appointments,
+			isAvailable
 		);
 	}
 }

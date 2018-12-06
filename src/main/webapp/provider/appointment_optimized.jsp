@@ -1341,6 +1341,9 @@ private long getAppointmentRowSpan(
 							if(!viewall.equals("1") && scheduleProviderNo == Integer.parseInt(curUser_no) && !schedule.hasSchedule())
 							{
 								notOnSchedule = true;
+							} else if ("0".equals(viewall) && '0' == schedule.getIsAvailable() && scheduleProviderNo != Integer.parseInt(curUser_no))
+							{
+								continue;
 							}
 
 
