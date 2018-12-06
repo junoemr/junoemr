@@ -437,14 +437,18 @@ public class CommonLabResultData {
 		List<ProviderLabRoutingModel> providerLabRoutings = dao.getProviderLabRoutings(ConversionUtils.fromIntString(labId), labType);
 		for (ProviderLabRoutingModel routings : providerLabRoutings)
 		{
-			Provider p = providerDao.getProvider(routings.getProviderNo());
+			Provider provider = providerDao.getProvider(routings.getProviderNo());
 
-			statusArray.add(new ReportStatus(p.getFullName(),
-					p.getProviderNo(),
-					descriptiveStatus(routings.getStatus()),
-					routings.getComment(),
-					ConversionUtils.toTimestampString(routings.getTimestamp()),
-					labId));
+			// Provider can be null. For example, the unclaimed inbox has a route for provider 0 which will never match to an actual provider record
+			if (provider != null)
+			{
+				statusArray.add(new ReportStatus(provider.getFullName(),
+						provider.getProviderNo(),
+						descriptiveStatus(routings.getStatus()),
+						routings.getComment(),
+						ConversionUtils.toTimestampString(routings.getTimestamp()),
+						labId));
+			}
 		}
 		return statusArray;
 	}

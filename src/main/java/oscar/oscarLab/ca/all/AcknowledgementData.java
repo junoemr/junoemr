@@ -68,7 +68,11 @@ public class AcknowledgementData {
 		{
 			Provider provider = providerDao.getProvider(routing.getProviderNo());
 
-			acknowledgements.add(new ReportStatus(provider.getFullName(), provider.getPractitionerNo(), provider.getProviderNo(), routing.getStatus(), routing.getComment(), ConversionUtils.toDateString(routing.getTimestamp(), ConversionUtils.DEFAULT_TS_PATTERN), segmentID));
+			// Provider can be null. For example, the unclaimed inbox has a route for provider 0 which will never match to an actual provider record
+			if (provider != null)
+			{
+				acknowledgements.add(new ReportStatus(provider.getFullName(), provider.getPractitionerNo(), provider.getProviderNo(), routing.getStatus(), routing.getComment(), ConversionUtils.toDateString(routing.getTimestamp(), ConversionUtils.DEFAULT_TS_PATTERN), segmentID));
+			}
 		}
 		return acknowledgements;
 	}
