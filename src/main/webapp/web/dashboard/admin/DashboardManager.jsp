@@ -32,7 +32,7 @@
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<%-- COMMENTING OUT NON-TEMPLATE CODE, SHOULD BE REMOVED WHEN REFACTORED --%>
+<%-- COMMENTING OUT NON-TEMPLATE CODE, SHOULD BE REMOVED WHEN REFACTORED
 
 <security:oscarSec roleName='${ sessionScope[userrole] }, ${ sessionScope[user] }' rights="w" objectName="_dashboardManager">
 	<c:redirect url="securityError.jsp?type=_admin.dashboardManager" />
@@ -59,7 +59,7 @@
 
 </head>
 <body>
-<%-- --%>
+--%>
 
 <div>
 <div class="col-sm-12">
@@ -285,7 +285,7 @@
 </div>
 </div> <!-- end container -->
 
-<%-- COMMENTING OUT NON-TEMPLATE CODE, SHOULD BE REMOVED WHEN REFACTORED --%>
+<%-- COMMENTING OUT NON-TEMPLATE CODE, SHOULD BE REMOVED WHEN REFACTORED
 </body>
 </html:html>
-<%-- --%>
+--%>
