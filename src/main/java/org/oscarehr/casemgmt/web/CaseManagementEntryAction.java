@@ -137,6 +137,7 @@ import java.util.Set;
 public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 
 	private static Logger logger = MiscUtils.getLogger();
+	private static final String OBS_DATETIME_PATTERN = "dd-MMM-yyyy HH:mm";
 
 	private CaseManagementNoteDAO caseManagementNoteDao = (CaseManagementNoteDAO) SpringUtils.getBean("caseManagementNoteDAO");
 	private CaseManagementIssueDAO caseManagementIssueDao = (CaseManagementIssueDAO) SpringUtils.getBean("caseManagementIssueDAO");
@@ -298,7 +299,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			String obsDateStr = cform.getObservation_date();
 			if(obsDateStr != null && !obsDateStr.trim().isEmpty())
 			{
-				Date obsDate = ConversionUtils.fromDateString(obsDateStr, "dd-MMM-yyyy HH:mm");
+				Date obsDate = ConversionUtils.fromDateString(obsDateStr, OBS_DATETIME_PATTERN);
 				note.setObservation_date(obsDate);
 			}
 
@@ -377,7 +378,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 				if(appointmentDate != null)
 				{
 					note.setObservation_date(appointmentDate);
-					cform.setObservation_date(ConversionUtils.toDateString(appointmentDate, "dd-MMM-yyyy HH:mm"));
+					cform.setObservation_date(ConversionUtils.toDateString(appointmentDate, OBS_DATETIME_PATTERN));
 				}
 			}
 			else
@@ -512,11 +513,11 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			if(startTime != null)
 			{
 				String apptDateTime = appointmentDate + " " + startTime;
-				apptDate = ConversionUtils.fromDateString(apptDateTime, "yyyy-MM-dd HH:mm:ss");
+				apptDate = ConversionUtils.fromDateString(apptDateTime, ConversionUtils.DEFAULT_TS_PATTERN);
 			}
 			else
 			{
-				apptDate = ConversionUtils.fromDateString(appointmentDate, "yyyy-MM-dd");
+				apptDate = ConversionUtils.fromDateString(appointmentDate, ConversionUtils.DEFAULT_DATE_PATTERN);
 			}
 		}
 		return apptDate;
