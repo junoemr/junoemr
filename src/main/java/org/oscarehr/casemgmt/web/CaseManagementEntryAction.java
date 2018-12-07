@@ -294,6 +294,14 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			note.setProvider(prov);
 			note.setDemographic_no(demono);
 
+			// preserve the observation date if set
+			String obsDateStr = cform.getObservation_date();
+			if(obsDateStr != null && !obsDateStr.trim().isEmpty())
+			{
+				Date obsDate = ConversionUtils.fromDateString(obsDateStr, "dd-MMM-yyyy HH:mm");
+				note.setObservation_date(obsDate);
+			}
+
 			if (!OscarProperties.getInstance().isPropertyActive("encounter.empty_new_note")) {
 				this.insertReason(request, note);
 			} else {
@@ -365,12 +373,11 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 				note = this.makeNewNote(providerNo, demono, request);
 
 				// if there is an appointment date parameter, default the observation date to it
-				String appointmentDate = request.getParameter("appointmentDate");
+				Date appointmentDate = parseParamDateTime(request);
 				if(appointmentDate != null)
 				{
-					Date apptDate = ConversionUtils.fromDateString(appointmentDate, "yyyy-MM-dd");
-					note.setObservation_date(apptDate);
-					cform.setObservation_date(ConversionUtils.toDateString(apptDate, "dd-MMM-yyyy HH:mm"));
+					note.setObservation_date(appointmentDate);
+					cform.setObservation_date(ConversionUtils.toDateString(appointmentDate, "dd-MMM-yyyy HH:mm"));
 				}
 			}
 			else
@@ -492,6 +499,27 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			finalFwd = new ActionForward(path.toString());
 		}
 		return finalFwd;
+	}
+
+	private Date parseParamDateTime(HttpServletRequest request)
+	{
+		String appointmentDate = request.getParameter("appointmentDate");
+		String startTime = request.getParameter("start_time");
+		Date apptDate = null;
+
+		if(appointmentDate != null)
+		{
+			if(startTime != null)
+			{
+				String apptDateTime = appointmentDate + " " + startTime;
+				apptDate = ConversionUtils.fromDateString(apptDateTime, "yyyy-MM-dd HH:mm:ss");
+			}
+			else
+			{
+				apptDate = ConversionUtils.fromDateString(appointmentDate, "yyyy-MM-dd");
+			}
+		}
+		return apptDate;
 	}
 
 	private CaseManagementNote makeNewNote(String providerNo, String demographicNo, HttpServletRequest request) {
