@@ -416,6 +416,7 @@ public final class MessageUploader {
 	private static void providerRouteReport(String labId, ArrayList<String> docNums, Connection conn, String altProviderNo, String labType, String search_on, Integer limit, boolean orderByLength) throws Exception {
 		ArrayList<String> providerNums = new ArrayList<String>();
 		String sqlSearchOn = "ohip_no";
+		String routeToProvider = OscarProperties.getInstance().getProperty("route_labs_to_provider", "");
 		
 		if (search_on != null && search_on.length() > 0) {
 			sqlSearchOn = search_on;
@@ -441,26 +442,30 @@ public final class MessageUploader {
 			}
 		}
 
-		//If the lab is a new version for an already existing lab, route to providers already assigned to previous versions of this lab
-		ProviderLabRoutingDao providerLabRoutingDao = (ProviderLabRoutingDao) SpringUtils.getBean(ProviderLabRoutingDao.class);
-		String labNumberCSV = Hl7textResultsData.getMatchingLabs(labId);
-
-		//Loop through each lab version and find all providers assigned to each lab version. Add that provider to the newest version of the lab
-		if (labNumberCSV != null && !labNumberCSV.equals(""))
+		// If we're not routing all labs to the unclaimed inbox, then route to all providers assigned to the most recent version of the lab
+		if (!"0".equals(routeToProvider))
 		{
-			String[] labsNumbers = labNumberCSV.split(",");
+			//If the lab is a new version for an already existing lab, route to providers already assigned to previous versions of this lab
+			ProviderLabRoutingDao providerLabRoutingDao = (ProviderLabRoutingDao) SpringUtils.getBean(ProviderLabRoutingDao.class);
+			String labNumberCSV = Hl7textResultsData.getMatchingLabs(labId);
 
-			//Get the lab version before the latest version. The latest version has already been inserted into the hl7TextInfo table at this point
-			//so we need to get the second most recent version
-			if (labsNumbers.length > 1)
+			//Loop through each lab version and find all providers assigned to each lab version. Add that provider to the newest version of the lab
+			if (labNumberCSV != null && !labNumberCSV.equals(""))
 			{
-				String previousLabVersion = labsNumbers[labsNumbers.length - 2];
+				String[] labsNumbers = labNumberCSV.split(",");
 
-				List<ProviderLabRoutingModel> providerLabRoutings = providerLabRoutingDao.getProviderLabRoutings(Integer.parseInt(previousLabVersion), "HL7");
-
-				for (int j = 0; j < providerLabRoutings.size(); j++)
+				//Get the lab version before the latest version. The latest version has already been inserted into the hl7TextInfo table at this point
+				//so we need to get the second most recent version
+				if (labsNumbers.length > 1)
 				{
-					providerNums.add(providerLabRoutings.get(j).getProviderNo());
+					String previousLabVersion = labsNumbers[labsNumbers.length - 2];
+
+					List<ProviderLabRoutingModel> providerLabRoutings = providerLabRoutingDao.getProviderLabRoutings(Integer.parseInt(previousLabVersion), "HL7");
+
+					for (int j = 0; j < providerLabRoutings.size(); j++)
+					{
+						providerNums.add(providerLabRoutings.get(j).getProviderNo());
+					}
 				}
 			}
 		}
