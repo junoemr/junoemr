@@ -819,7 +819,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  ON d.provider_no = p.provider_no AND p.name = :property_name\n" +
 				"LEFT JOIN tickler t \n" +
 				"  ON d.demographic_no = t.demographic_no \n" +
-				"  AND t.service_date <= a.appointment_date \n" +
+				"  AND DATE(t.service_date) <= a.appointment_date \n" +
 				"  AND t.status = 'A'\n" +
 				"WHERE a.appointment_date = :date\n" +
 				"AND a.provider_no = :providerNo\n";
