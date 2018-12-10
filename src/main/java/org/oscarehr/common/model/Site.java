@@ -30,6 +30,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -114,6 +115,7 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	@JoinColumn(name="provider_no")
 	}
 	)
+	@OrderBy(value="LastName, FirstName ASC")
 	private Set<Provider> providers;
 
 	public Site() {

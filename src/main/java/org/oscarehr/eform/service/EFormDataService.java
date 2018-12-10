@@ -72,7 +72,8 @@ public class EFormDataService
 	@Autowired
 	private EFormDatabaseTagService databaseTagService;
 
-	public EFormData saveExistingEForm(Integer oldFormDataId, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
+	public EFormData saveExistingEForm(Integer oldFormDataId, Integer demographicNo, Integer providerNo, String subject,
+	                                   Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink, Date formDate)
 	{
 		logger.info("Save Existing EForm (Previous eform_data fdid " + oldFormDataId + ")");
 		EFormData oldVersion = eFormDataDao.find(oldFormDataId);
@@ -82,12 +83,20 @@ public class EFormDataService
 		}
 		EFormData newVersion = copyFromEFormData(oldVersion);
 
-		return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
+		return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink, formDate);
 	}
+
+	public EFormData saveExistingEForm(Integer oldFormDataId, Integer demographicNo, Integer providerNo, String subject,
+	                                   Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
+	{
+		return saveExistingEForm(oldFormDataId, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink, null);
+	}
+
 	/**
-	 * Save a new EForm record to the database
+	 * Save a new EForm record to the database, with a custom creation date
 	 */
-	public EFormData saveNewEForm(Integer templateId, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
+	public EFormData saveNewEForm(Integer templateId, Integer demographicNo, Integer providerNo, String subject,
+	                              Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink, Date formDate)
 	{
 		logger.info("Save New EForm (template id " + templateId + ")");
 		EForm template = getEFormTemplate(templateId);
@@ -95,14 +104,24 @@ public class EFormDataService
 		// must have a persisted instance in order to save the id
 		newVersion.setEFormInstance(getNewPersistedEFormInstance(template));
 
-		return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink);
+		return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, eFormValueMap, eformLink, formDate);
+	}
+
+	/**
+	 * Save a new EForm record to the database
+	 */
+	public EFormData saveNewEForm(Integer templateId, Integer demographicNo, Integer providerNo, String subject,
+	                              Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
+	{
+		return saveNewEForm(templateId, demographicNo, providerNo, subject,formOpenerMap, eFormValueMap, eformLink, null);
 	}
 
 	/**
 	 * Same as saveNewEForm but it also loads all databaseAP tags before saving.
 	 * This should only be used in cases where a new eform is loaded without having the usual ui initialization steps (such as the API)
 	 */
-	public EFormData saveNewEFormWithDatabaseTags(Integer templateId, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
+	public EFormData saveNewEFormWithDatabaseTags(Integer templateId, Integer demographicNo, Integer providerNo, String subject,
+	                                              Map<String,String> formOpenerMap, Map<String,String> eFormValueMap, String eformLink)
 	{
 		logger.info("Save New EForm (template id " + templateId + ") - Include AP values");
 
@@ -117,7 +136,7 @@ public class EFormDataService
 		Map<String, String> combinedValueMap = databaseTagService.getDatabaseTagNameValueMap(template.getFormHtml(), demographicNo, providerNo);
 		combinedValueMap.putAll(eFormValueMap);
 
-		return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, combinedValueMap, eformLink);
+		return saveEForm(newVersion, demographicNo, providerNo, subject, formOpenerMap, combinedValueMap, eformLink, null);
 	}
 
 	/**
@@ -203,11 +222,14 @@ public class EFormDataService
 	 * Handle all of the major eForm creation logic. save an eForm data model for a demographic.
 	 */
 	private EFormData saveEForm(EFormData eForm, Integer demographicNo, Integer providerNo, String subject, Map<String,String> formOpenerMap,
-	                            Map<String,String> eFormValueMap, String eformLink)
+	                            Map<String,String> eFormValueMap, String eformLink, Date formDate)
 	{
-		Date currentDate = new Date();
-		eForm.setFormDate(currentDate);
-		eForm.setFormTime(currentDate);
+		if(formDate == null)
+		{
+			formDate = new Date();
+		}
+		eForm.setFormDate(formDate);
+		eForm.setFormTime(formDate);
 		eForm.setProviderNo(String.valueOf(providerNo));
 		eForm.setDemographicId(demographicNo);
 		eForm.setSubject(subject);
