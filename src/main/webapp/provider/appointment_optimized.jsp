@@ -1136,9 +1136,9 @@ private long getAppointmentRowSpan(
 							function changeSite(sel) {
 								sel.style.backgroundColor=sel.options[sel.selectedIndex].style.backgroundColor;
 								var siteName = sel.options[sel.selectedIndex].value;
-								var newGroupNo = "<%=(mygroupno == null ? ".default" : mygroupno)%>";
+
 								jQuery.ajax({
-									url: 'providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&mygroup_no=' + newGroupNo + '&site=' + siteName,
+									url: 'updateSite.jsp?site=' + siteName,
 									success: function(result)
 									{
 										location.reload();
@@ -1376,7 +1376,7 @@ private long getAppointmentRowSpan(
 											"&dboperation=searchappointmentday";
 									%>
 									<b><a href="<%= dayUrl %>">
-										<%=schedule.getScheduleDate().format(DateTimeFormatter.ISO_LOCAL_DATE)%>
+										<%=schedule.getScheduleDate().format(DateTimeFormatter.ofPattern("EEE, yyyy-MM-dd"))%>
 									</a></b>
 									<%
 								}
@@ -1542,12 +1542,35 @@ private long getAppointmentRowSpan(
 										// ----------------------------------------------------------------------------------
 										// Build appointments
 										// ----------------------------------------------------------------------------------
-
 										SortedMap<LocalTime, List<AppointmentDetails>> appointmentLists =
 											schedule.getAppointments().subMap(slotTime, slotEndTime);
 
+										List<List<AppointmentDetails>> allAppointments = new ArrayList(appointmentLists.values());
+										List<AppointmentDetails> appointmentsBeforeList = new ArrayList<AppointmentDetails>();
+
+										//If we're looking at the first slot of the day, get all appointments that occur before this time
+										if (slotTime.equals(startTime))
+										{
+											SortedMap<LocalTime, List<AppointmentDetails>> appointmentsBeforeStartTime = schedule.getAppointments().headMap(slotTime);
+
+											//Only show the appointments that occur before the first slot of the day and the end time is after the first slot of the day
+											for(List<AppointmentDetails> appointments: appointmentsBeforeStartTime.values())
+											{
+												for (AppointmentDetails appointment : appointments)
+												{
+													if (appointment.getEndTime().isAfter(slotTime))
+													{
+														appointmentsBeforeList.add(appointment);
+													}
+												}
+											}
+
+											//Add all these appointments to the list with all the other appointments
+											allAppointments.add(appointmentsBeforeList);
+										}
+
 										boolean isFirstAppointmentInSlot = true;
-										for(List<AppointmentDetails> appointments: appointmentLists.values())
+										for(List<AppointmentDetails> appointments: allAppointments)
 										{
 											Collections.reverse(appointments);
 											for(AppointmentDetails appointment: appointments)
@@ -1639,6 +1662,7 @@ private long getAppointmentRowSpan(
 												String demographic_no = appointment.getDemographicNo().toString();
 												String appointment_no = appointment.getAppointmentNo().toString();
 
+
 											%>
 
 											<td class="appt <%=appointment.getColor()==null?"noStatus":""%>" bgcolor='<%= appointment.getColor() %>' rowspan="<%= appointmentRowSpan %>" nowrap>
@@ -1706,36 +1730,35 @@ private long getAppointmentRowSpan(
 														<a href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;" ${appointmentInfo.appointmentLinkTitle} >
 															.${appointmentInfo.truncatedUpperName}
 														</a>
-
-														<% if (OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true") || OscarProperties.getInstance().getProperty("APPT_THREE_LINE", "true").equals("true"))
-														{ %>
 														<%
+														Boolean doNotBook = ("DO_NOT_BOOK").equalsIgnoreCase(appointment.getName());
+
+														if ((oscarProperties.isPropertyActive("APPT_MULTILINE") || oscarProperties.getProperty("APPT_THREE_LINE", "true").equals("true")) && !doNotBook)
+														{
 															if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
 															{
 														%>
 																<%=StringEscapeUtils.escapeHtml(appointment.getType())%>&nbsp;|&nbsp;<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
-														<% 	} %>
-														<%
+														<% 	}
 															if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() == null || appointmentInfo.getReason().length() == 0))
 															{
 														%>
 																<%=StringEscapeUtils.escapeHtml(appointment.getType())%>
-														<% 	} %>
-														<%
+														<% 	}
 															if ((appointment.getType() == null || appointment.getType().length() == 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
 															{
 														%>
 																<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
-														<% 	} %>
-
-														<% } %>
-
-														<!--Inline display of reason -->
-														<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
-															<span class="${appointmentInfo.reasonToggleableClass} reason reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
-																<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:${appointmentInfo.reason}
-															</span>
-														</oscar:oscarPropertiesCheck></td>
+														<% 	} 
+														} else
+														{%>
+															<!--Inline display of reason -->
+															<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
+																<span class="${appointmentInfo.reasonToggleableClass} reason reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
+																	<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:${appointmentInfo.reason}
+																</span>
+															</oscar:oscarPropertiesCheck></td>
+														<%}%>
 
 													</c:when>
 													<c:otherwise>

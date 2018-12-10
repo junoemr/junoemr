@@ -149,7 +149,7 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures {
 		document.setDocdesc(docdesc);
 		document.setDocxml(docxml);
 		document.setDocfilename(docfilename);
-		document.setDoccreator(doccreator);
+		document.setDocCreator(doccreator);
 		document.setObservationdate(observationdate);
 		document.setUpdatedatetime(updatedatetime);
 		document.setStatus(status.charAt(0));

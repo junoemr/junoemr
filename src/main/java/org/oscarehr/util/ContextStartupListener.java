@@ -59,8 +59,11 @@ public class ContextStartupListener implements javax.servlet.ServletContextListe
 			LocaleUtils.BASE_NAME="oscarResources";
 			
 			OscarProperties properties = OscarProperties.getInstance();
-			String vmstatLoggingPeriod = properties.getProperty("VMSTAT_LOGGING_PERIOD");
-			VmStat.startContinuousLogging(Long.parseLong(vmstatLoggingPeriod));
+			if(properties.isPropertyActive("VMSTAT_LOGGING_ENABLED"))
+			{
+				String vmStatLoggingPeriod = properties.getProperty("VMSTAT_LOGGING_PERIOD");
+				VmStat.startContinuousLogging(Long.parseLong(vmStatLoggingPeriod));
+			}
 
 			MiscUtilsOld.setShutdownSignaled(false);
 			MiscUtilsOld.registerShutdownHook();

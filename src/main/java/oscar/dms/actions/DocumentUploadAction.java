@@ -160,7 +160,7 @@ public class DocumentUploadAction extends DispatchAction
 		Document document = new Document();
 		document.setPublic1(false);
 		document.setResponsible(user);
-		document.setDoccreator(user);
+		document.setDocCreator(user);
 		document.setDocdesc("");
 		document.setDoctype("");
 		document.setDocfilename(docFile.getFileName());
@@ -177,7 +177,7 @@ public class DocumentUploadAction extends DispatchAction
 		String providerId = request.getParameter("provider");
 		if(providerId != null)
 		{
-			documentService.routeToProviderInbox(document.getDocumentNo(), Integer.parseInt(providerId));
+			documentService.routeToProviderInbox(document.getDocumentNo(), providerId);
 		}
 
 		String queueId = request.getParameter("queue");

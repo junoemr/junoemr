@@ -368,7 +368,7 @@ public class AddDemographicAction extends Action
 				document.setDoctype(request.getParameter("docType"));
 				document.setDocdesc(request.getParameter("docDesc"));
 				document.setDocfilename(docFile.getFileName());
-				document.setDoccreator(loggedInInfo.getLoggedInProviderNo());
+				document.setDocCreator(loggedInInfo.getLoggedInProviderNo());
 				document.setResponsible(loggedInInfo.getLoggedInProviderNo());
 				DocumentService documentService = SpringUtils.getBean(org.oscarehr.document.service.DocumentService.class);
 				try

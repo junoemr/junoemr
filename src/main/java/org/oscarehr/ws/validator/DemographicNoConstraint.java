@@ -20,32 +20,25 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.exceptionMapping;
+package org.oscarehr.ws.validator;
 
-import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.response.RestResponseValidationError;
+import javax.validation.Constraint;
+import javax.validation.Payload;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.validation.ValidationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
-
-
-@Provider
-public class ValidationExceptionMapper implements ExceptionMapper<ValidationException>
+@Documented
+@Constraint(validatedBy = DemographicNoValidator.class)
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface DemographicNoConstraint
 {
-	public ValidationExceptionMapper()
-	{
-	}
+	String message() default "Invalid Demographic Number";
+	Class<?>[] groups() default{};
+	Class<? extends Payload>[] payload() default{};
 
-	@Override
-	public Response toResponse(ValidationException exception)
-	{
-		RestResponseValidationError responseError = new RestResponseValidationError(exception.getMessage());
-		RestResponse<String> response = RestResponse.errorResponse(responseError);
-
-		return Response.status(Response.Status.BAD_REQUEST).entity(response)
-				.type(MediaType.APPLICATION_JSON).build();
-	}
+	boolean allowNull() default false;
 }
