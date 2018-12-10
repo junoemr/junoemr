@@ -443,7 +443,7 @@ public final class MessageUploader {
 		}
 
 		// If we're not routing all labs to the unclaimed inbox, then route to all providers assigned to the most recent version of the lab
-		if (!"0".equals(routeToProvider))
+		if (!Provider.UNCLAIMED_PROVIDER_NO.equals(routeToProvider))
 		{
 			//If the lab is a new version for an already existing lab, route to providers already assigned to previous versions of this lab
 			ProviderLabRoutingDao providerLabRoutingDao = (ProviderLabRoutingDao) SpringUtils.getBean(ProviderLabRoutingDao.class);
