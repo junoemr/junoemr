@@ -23,8 +23,8 @@
     Ontario, Canada
 
 --%>
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="org.oscarehr.util.SessionConstants"%>
+<%@page import="org.oscarehr.PMmodule.dao.ProviderDao"%>
+<%@page import="org.oscarehr.common.dao.MyGroupAccessRestrictionDao"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -39,15 +39,22 @@
   String month = request.getParameter("pmonth")!=null?request.getParameter("pmonth"):"5";
   String day = request.getParameter("pday")!=null?request.getParameter("pday"):"8";
 %>
-<%@ page import="java.util.*, java.sql.*, oscar.*, java.text.*, java.lang.*,java.net.*" errorPage="../appointment/errorpage.jsp"%>
 
+<%@ page import="org.oscarehr.common.dao.MyGroupDao" %>
+<%@ page import="org.oscarehr.common.model.MyGroup" %>
+<%@ page import="org.oscarehr.common.model.MyGroupAccessRestriction" %>
+<%@ page import="org.oscarehr.common.model.Provider" %>
+<%@ page import="org.oscarehr.common.model.ProviderPreference" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page errorPage="../appointment/errorpage.jsp" %>
+
+<%@page import="org.oscarehr.util.SessionConstants" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.common.dao.MyGroupDao" %>
-<%@page import="org.oscarehr.common.model.MyGroup" %>
-<%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
-<%@page import="org.oscarehr.common.model.Provider" %>
-<%@page import="org.oscarehr.common.dao.MyGroupAccessRestrictionDao" %>
-<%@page import="org.oscarehr.common.model.MyGroupAccessRestriction" %>
+<%@page import="org.oscarehr.web.admin.ProviderPreferencesUIBean" %>
+<%@page import="java.net.URLEncoder" %>
+<%@page import="java.util.Collection" %>
+<%@page import="java.util.Iterator" %>
+<%@page import="java.util.List" %>
 <%
 	MyGroupDao myGroupDao = SpringUtils.getBean(MyGroupDao.class);
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
@@ -92,13 +99,24 @@
   }
   
   List<MyGroupAccessRestriction> restrictions = myGroupAccessRestrictionDao.findByProviderNo(curUser_no);
+
+	Collection<Integer> eforms = providerPreference.getAppointmentScreenEForms();
+	StringBuilder eformIds = new StringBuilder();
+	for( Integer eform : eforms ) {
+		eformIds = eformIds.append("&eformId=" + eform);
+	}
+
+	Collection<String> forms = providerPreference.getAppointmentScreenForms();
+	StringBuilder ectFormNames = new StringBuilder();
+	for( String formName : forms ) {
+		ectFormNames = ectFormNames.append("&encounterFormName=" + formName);
+	}
  
 %>
 
-<%@page import="org.oscarehr.common.model.ProviderPreference"%>
-<%@page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%><html>
+<html>
 <head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <title><bean:message key="receptionist.receptionistfindprovider.title" /></title>
 <link rel="stylesheet" href="../web.css">
 <script language="JavaScript">
@@ -107,9 +125,9 @@
 function selectProvider(p,pn) {
 	  newGroupNo = p;
 <%if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.IsPropertiesOn.isTicklerPlusEnable()){%>
-	  this.location.href = "providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&new_tickler_warning_window=<%=n_t_w_w%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&default_servicetype=<%=defaultServiceType%>&mygroup_no="+newGroupNo;
+	  this.location.href = "providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&new_tickler_warning_window=<%=n_t_w_w%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&default_servicetype=<%=defaultServiceType%>&mygroup_no="+newGroupNo+"<%=eformIds.toString()%><%=ectFormNames.toString()%>";
 <%}else{%>
-	  this.location.href = "providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&default_servicetype=<%=defaultServiceType%>&mygroup_no="+newGroupNo;
+	  this.location.href = "providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&default_servicetype=<%=defaultServiceType%>&mygroup_no="+newGroupNo+"<%=eformIds.toString()%><%=ectFormNames.toString()%>";
 <%}%>
 }
 
