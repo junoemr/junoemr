@@ -327,7 +327,7 @@ public class ClinicaidAPIService
 
 			if (oscarProperties.isBritishColumbiaInstanceType())
 			{
-				if (demo.getVer().equals("66"))
+				if (demo.getVer() != null && demo.getVer().equals("66"))
 				{
 					data.remove("service_recipient_ver");
 					data.put("guardian_health_number", data.remove("service_recipient_uli"));
