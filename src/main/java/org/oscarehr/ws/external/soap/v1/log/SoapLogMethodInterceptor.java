@@ -100,7 +100,7 @@ public class SoapLogMethodInterceptor extends AbstractSoapInterceptor
 
 		if (!skipLoggingContent(soapMethod))
 		{
-			applyParameterMasking(soapMethod, postData);
+			postData = applyParameterMasking(soapMethod, postData);
 			soapLog.setRawPost(postData);
 		}
 	}
