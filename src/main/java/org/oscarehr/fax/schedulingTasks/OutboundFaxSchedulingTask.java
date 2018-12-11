@@ -79,7 +79,15 @@ public class OutboundFaxSchedulingTask
 
 	private static boolean canRun()
 	{
-		Boolean isMaster = ServerStateHandler.isThisServerMaster();
-		return enabled && (isMaster != null) && isMaster;
+		boolean isMaster = false;
+		try
+		{
+			isMaster = ServerStateHandler.isThisServerMaster();
+		}
+		catch(IllegalStateException e)
+		{
+			logger.error("Server State Error", e);
+		}
+		return enabled && isMaster;
 	}
 }

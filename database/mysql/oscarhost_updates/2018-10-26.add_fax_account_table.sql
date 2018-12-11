@@ -1,6 +1,6 @@
 -- add a table for fax accounts
 CREATE TABLE IF NOT EXISTS `fax_account` (
-  id                      BIGINT UNSIGNED AUTO_INCREMENT,
+  id                      BIGINT AUTO_INCREMENT,
   login_id                VARCHAR(128),
   login_password          VARCHAR(128),
   integration_type        VARCHAR(32),

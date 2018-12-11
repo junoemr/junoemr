@@ -22,8 +22,6 @@
  */
 package org.oscarehr.common.server;
 
-import org.apache.log4j.Logger;
-import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 
 import java.io.File;
@@ -34,18 +32,18 @@ import java.io.File;
  */
 public class ServerStateHandler
 {
-	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarProperties props = OscarProperties.getInstance();
 	private static final String masterCheckLocation = props.getProperty("common.server.master_check_file.location");
 	private static final String masterCheckFilename = props.getProperty("common.server.master_check_file.filename");
 
 	/**
 	 * checks if the server is running in a 'master' state
-	 * @return true if the server is a master server, false if it is not a master, and null if the state cannot be determined
+	 * @return true if the server is a master server, false if it is not a master
+	 * @throws IllegalStateException if the master/slave status cannot be determined
 	 */
-	public static Boolean isThisServerMaster()
+	public static boolean isThisServerMaster() throws IllegalStateException
 	{
-		Boolean isMaster = null;
+		boolean isMaster;
 		try
 		{
 			File file = new File(masterCheckLocation, masterCheckFilename);
@@ -53,7 +51,7 @@ public class ServerStateHandler
 		}
 		catch(Exception e)
 		{
-			logger.error("Server State Check Error", e);
+			throw new IllegalStateException("Invalid master/slave state");
 		}
 		return isMaster;
 	}
