@@ -24,6 +24,7 @@ package org.oscarehr.fax.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
@@ -64,6 +65,9 @@ public class FaxAccountService
 	@Autowired
 	private FaxInboundDao faxInboundDao;
 
+	@Autowired
+	private FaxAccountDao faxAccountDao;
+
 	/**
 	 * Test the connection to the fax service based on the configuration settings
 	 * @return true if the connection succeeded, false otherwise
@@ -91,6 +95,14 @@ public class FaxAccountService
 		return (result != null && result.isSuccess());
 	}
 
+	/** get the default fax account to be used. return null if none exists */
+	public FaxAccount getDefaultFaxAccount()
+	{
+		//TODO provider specific logic etc?
+		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveOutbound(true, true);
+		return faxAccountList.isEmpty() ? null : faxAccountList.get(0);
+	}
+
 	public List<FaxOutboxTransferOutbound> getOutboxResults(FaxAccount faxAccount, FaxOutboundCriteriaSearch criteriaSearch)
 	{
 		SRFaxApiConnector apiConnector = new SRFaxApiConnector(faxAccount.getLoginId(), faxAccount.getLoginPassword());
@@ -102,11 +114,8 @@ public class FaxAccountService
 		List<String> referenceIdList = new ArrayList<>(outboundList.size());
 		for(FaxOutbound faxOutbound : outboundList)
 		{
-			// if there is an expected api result, add the additional info to the transfer object
-			// only do this if the account info has not changed, or the api call will fail
-			if(FaxOutbound.Status.SENT.equals(faxOutbound.getStatus())
-					&& faxAccount.getLoginId().equals(faxOutbound.getExternalAccountId())
-					&& faxAccount.getIntegrationType().equals(faxOutbound.getExternalAccountType()))
+			// only include records with info that the remote fax account is expected to have a record of
+			if(faxOutbound.isLinkedWithRemoteAccount(faxAccount))
 			{
 				referenceIdList.add(String.valueOf(faxOutbound.getExternalReferenceId()));
 			}

@@ -134,6 +134,21 @@ public class FaxOutbound extends AbstractModel<Long>
 		this.status = status;
 	}
 
+	public boolean isStatusSent()
+	{
+		return Status.SENT.equals(getStatus());
+	}
+
+	public boolean isStatusQueued()
+	{
+		return Status.QUEUED.equals(getStatus());
+	}
+
+	public boolean isStatusError()
+	{
+		return Status.ERROR.equals(getStatus());
+	}
+
 	public String getStatusMessage()
 	{
 		return statusMessage;
@@ -232,5 +247,20 @@ public class FaxOutbound extends AbstractModel<Long>
 	public void setFaxAccount(FaxAccount faxAccount)
 	{
 		this.faxAccount = faxAccount;
+	}
+
+	/**
+	 * determine the given account will have a record of this outbound fax.
+	 * This requires this fax to have been sent (failed faxes will have no remote record),
+	 * and for the account id/type to match the account that was originally used for this record.
+	 * @param accountToCheck the account to verify
+	 * @return true if the the account is expected to have information on this fax record, false otherwise
+	 */
+	public boolean isLinkedWithRemoteAccount(FaxAccount accountToCheck)
+	{
+		return  this.isStatusSent() &&
+				this.getExternalAccountId().equals(accountToCheck.getLoginId()) &&
+				this.getExternalAccountType().equals(accountToCheck.getIntegrationType());
+
 	}
 }
