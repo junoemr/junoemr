@@ -44,11 +44,11 @@ import oscar.log.LogAction;
  *
  * This class pairs with the SoapLogMethodInterceptor to log the full webservice post and response.
  */
-public class SoapLogOutboundInterceptor extends AbstractLoggingInterceptor {
+public class SoapLogResponseInterceptor extends AbstractLoggingInterceptor {
 	
-	private static Logger logger = Logger.getLogger(SoapLogOutboundInterceptor.class);
+	private static Logger logger = Logger.getLogger(SoapLogResponseInterceptor.class);
 
-	public SoapLogOutboundInterceptor() {
+	public SoapLogResponseInterceptor() {
 		super(Phase.PRE_STREAM);
 	}
 	
@@ -127,7 +127,7 @@ class SoapLogOutboundCallback implements CachedOutputStreamCallback {
 		}
 		catch (Exception e)
 		{
-			logger.error("Error in outgoing SOAP log interceptor", e);
+			logger.error("SOAP response interceptor fault", e);
 		}
 	}
 

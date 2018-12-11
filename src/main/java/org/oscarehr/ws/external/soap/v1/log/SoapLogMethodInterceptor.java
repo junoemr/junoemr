@@ -23,7 +23,8 @@
 
 package org.oscarehr.ws.external.soap.v1.log;
 
-import org.apache.cxf.interceptor.AbstractLoggingInterceptor;
+import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.message.Exchange;
@@ -32,33 +33,39 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.log4j.Logger;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.common.MaskParameter;
 import org.oscarehr.ws.common.SkipContentLogging;
 import org.oscarehr.ws.external.soap.v1.log.model.SoapServiceLog;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
-import oscar.log.LogAction;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLFilterImpl;
+import org.xml.sax.helpers.XMLReaderFactory;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
-import java.util.Date;
+import java.util.Arrays;
+import java.util.HashSet;
 
-
-// TODO:  This should just extract the method and pass it to the outbound interceptor
 /**
  * This class is responsible for logging at the service/method level of a SOAP request.
  *
- * Together with SoapLogMessageBodyInterceptor and SoapLogOutboundInterceptor, these three interceptors form a suite which is
+ * Together with SoapLogHTTPInterceptor and SoapLogResponseInterceptor, these three interceptors form a suite which is
  * able to log the full webservice request and response.
  */
-public class SoapLogMethodInterceptor extends AbstractLoggingInterceptor {
-
+public class SoapLogMethodInterceptor extends AbstractSoapInterceptor
+{
 	private static Logger logger = Logger.getLogger(SoapLogMethodInterceptor.class);
 
 	public SoapLogMethodInterceptor() {
@@ -66,57 +73,30 @@ public class SoapLogMethodInterceptor extends AbstractLoggingInterceptor {
 	}
 
 	/**
-	 * This method accepts the incoming webservice call as a Message object
-	 * The message object contents depend on the Phase and the actions of any preceding interceptors
+	 *  Add authentication and SOAP service information to the SOAP request/response log
 	 *
 	 * @param message Soap message to be logged
 	 */
 	@Override
-	public void handleMessage(Message message) throws Fault {
-		buildInboundEntry(message);
-	}
-
-	/**
-	 * Log an error message if something goes wrong.  The error message is a Java exception and not a Soap fault
-	 *
-	 * @param message Soap message encountering an Exception.
-	 */
-	@Override
-	public void handleFault(Message message)
+	public void handleMessage(SoapMessage message) throws Fault
 	{
-		Exception e = message.getContent(Exception.class);
-
-		logger.error("Incoming SOAP logging interceptor Fault", e);
-		
-		// ensure we log something if the fault occurs after the interceptor stores the incoming data
 		SoapServiceLog soapLog = (SoapServiceLog) message.getExchange().get(SoapServiceLog.class.getName());
+		HttpServletRequest request = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
 
-		if(soapLog != null) {
-			Date createdAt = soapLog.getCreatedAt();
-			long duration  = new Date().getTime() - createdAt.getTime();
-			
-			soapLog.setDuration(duration);
-			String errorMessage = e.getClass().getSimpleName() + ": " + String.valueOf(e.getMessage());
-			soapLog.setErrorMessage(errorMessage);
-			
-			LogAction.saveSoapLogEntry(soapLog);
+		LoggedInInfo info = LoggedInInfo.getLoggedInInfoFromRequest(request);
+
+		// Log the provider no here, because the transport level interceptor is processed before authentication
+		// This could also go in the authentication interceptor
+		if (info != null)
+		{
+			String providerNo = info.getLoggedInProviderNo();
+			soapLog.setProviderNo(providerNo);
 		}
-	}
-
-
-	/**
-	 * Populates the inbound component of the logging entry
-	 *
-	 * @param message  The soap message to log
-	 */
-	private void buildInboundEntry(Message message)
-	{
-		SoapServiceLog soapLog = (SoapServiceLog) message.getExchange().get(SoapServiceLog.class.getName());
 
 		Method soapMethod = getMessageTargetMethod(message);
 		soapLog.setSoapMethod(soapMethod.getName());
 
-		String postData = (String) message.getExchange().remove(SoapLogMessageBodyInterceptor.class.getName());
+		String postData = (String) message.getExchange().remove(SoapLogHTTPInterceptor.class.getName());
 
 		if (!skipLoggingContent(soapMethod))
 		{
@@ -154,12 +134,15 @@ public class SoapLogMethodInterceptor extends AbstractLoggingInterceptor {
 	}
 
 	/**
-	 * Apply parameter masking (if any) to the raw message to sanitize sensitive fields prior to logging.
+	 * Apply parameter masking (if any) to the raw message to sanitize any specified XML element values in the SOAP message,
+	 * replacing the contents with asterisks.  Uses a SAX parser to handle the XML message.
 	 *
 	 * @param method Webservice method which may be annotated
-	 * @param postData The raw SOAP message which was marshalled into the webservice.
+	 * @param postData The raw SOAP message.
+	 *
+	 * @return postData with any specified parameter masking applied
 	 */
-	private void applyParameterMasking(Method method, String postData)
+	private String applyParameterMasking(Method method, String postData)
 	{
 		MaskParameter maskParameters = AnnotationUtils.getMethodAnnotation(method, MaskParameter.class);
 
@@ -168,50 +151,58 @@ public class SoapLogMethodInterceptor extends AbstractLoggingInterceptor {
 			try
 			{
 				String[] fieldNames = maskParameters.name();
+				HashSet<String> fieldSet = new HashSet<>(Arrays.asList(fieldNames));
 
-				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder builder = dbFactory.newDocumentBuilder();
+				XMLReader xr = new XMLFilterImpl(XMLReaderFactory.createXMLReader()) {
+					boolean shouldMask = false;
 
-				InputSource is = new InputSource(new StringReader(postData));
-				Document doc = builder.parse(is);
-				doc.normalizeDocument();
-
-				for (int i = 0; i < fieldNames.length; i++)
-				{
-					String toFilter = fieldNames[i];
-					NodeList nodes = doc.getElementsByTagName(toFilter);
-						for (int j=0; i < nodes.getLength(); i++)
+					@Override
+					public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException
+					{
+						if (fieldSet.contains(qName))
 						{
-							Node node = nodes.item(j);
-							Element elem = (Element) node;
-							elem.getElementsByTagName(toFilter).item(0).setTextContent(MaskParameter.MASK);
+							shouldMask = true;
 						}
-				}
+
+						super.startElement(uri, localName, qName, atts);
+					}
+
+					@Override
+					public void endElement(String uri, String localName, String qName) throws SAXException {
+						if (fieldSet.contains(qName) && shouldMask)
+						{
+							shouldMask = false;
+						}
+						super.endElement(uri, localName, qName);
+					}
+
+					@Override
+					public void characters(char[] ch, int start, int length) throws SAXException {
+						if (shouldMask)
+						{
+							ch = MaskParameter.MASK.toCharArray();
+							start = 0;
+							length = ch.length;
+						}
+
+						super.characters(ch, start, length);
+					}
+				};
+
+				Source src = new SAXSource(xr, new InputSource(new StringReader(postData)));
+				StringWriter writer = new StringWriter();
+				Result res = new StreamResult(writer);
+				TransformerFactory.newInstance().newTransformer().transform(src, res);
+
+				postData = writer.toString();
 			}
 			catch (Exception e)
 			{
-				// TODO: Hmmm...
+				throw new Fault(e);
 			}
 		}
-	}
 
-	/**
-	 * We don't use this, but it is a required method for any logging interceptor
-	 */
-	@Override
-	protected java.util.logging.Logger getLogger() {
-		return new SoapLogOutboundLogger("SoapLogInboundLogger", null);
-	}
-
-}
-
-/**
- * Dummy Logger, Needed for the getLogger method we aren't using
- */
-class SoapLogInboundLogger extends java.util.logging.Logger {
-
-	protected SoapLogInboundLogger(String name, String resourceBundleName) {
-		super(name, resourceBundleName);
+		return postData;
 	}
 }
 

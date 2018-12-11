@@ -26,20 +26,6 @@
 	<!-- ========================================================================================-->
 
 	<!-- interceptors -->
-	<!--
-	<bean id="abstractLoggingInterceptor" abstract="true">
-	-->
-		<!--
-			We remove the default limit of 65K characters otherwise an com.ctc.wstx.exc.WstxEOFException will be
-			thrown when log some of the longer labs.  This exception causes the soap request to fail
-		--><!--
-		<property name="limit" value="-1" />
-		<property name="prettyLogging" value="true" />
-	</bean>
-	-->
-	<bean id="soapLogMessageBodyInteceptor" class="org.oscarehr.ws.external.soap.v1.log.SoapLogMessageBodyInterceptor"/>
-	<bean id="soapLogInboundInterceptor" class="org.oscarehr.ws.external.soap.v1.log.SoapLogMethodInterceptor"/>
-	<bean id="soapLogOutboundInterceptor" class="org.oscarehr.ws.external.soap.v1.log.SoapLogOutboundInterceptor"/>
 
 	<cxf:bus>
 		<cxf:properties>
@@ -56,13 +42,16 @@
 	<!-- The WS classes are turned into spring beans to allow autowiring etc, then the endpoints reference them -->
 	<context:component-scan base-package="org.oscarehr.ws.external.soap"/>
 
+	<!-- Interceptors are listed in lifecycle order -->
+	<!-- Request interceptors -->
+	<bean id="soapHttpRequestInterceptor" class="org.oscarehr.ws.external.soap.v1.log.SoapLogHTTPInterceptor"/>
 	<bean id="authenticationInWSS4JInterceptor" class="org.oscarehr.ws.AuthenticationInWSS4JInterceptor"/>
 	<bean id="IPInWSS4JInterceptor" class="org.oscarehr.ws.IPInWSS4JInterceptor"/>
-	<bean id="bornSOAPHeaderInterceptor" class="org.oscarehr.integration.born.BornSOAPHeaderInterceptor"/>
-
-	<bean id="soapHttpRequestInterceptor" class="org.oscarehr.ws.external.soap.v1.log.SoapLogMessageBodyInterceptor"/>
 	<bean id="soapServiceInterceptor" class="org.oscarehr.ws.external.soap.v1.log.SoapLogMethodInterceptor"/>
-	<bean id="soapOutboundInterceptor" class="org.oscarehr.ws.external.soap.v1.log.SoapLogOutboundInterceptor"/>
+
+	<!-- Response interceptors -->
+	<bean id="bornSOAPHeaderInterceptor" class="org.oscarehr.integration.born.BornSOAPHeaderInterceptor"/>
+	<bean id="soapResponseInterceptor" class="org.oscarehr.ws.external.soap.v1.log.SoapLogResponseInterceptor"/>
 
 	<!-- web service endpoints -->
 	<jaxws:endpoint implementor="#systemInfoWs" address="/SystemInfoService">
@@ -72,13 +61,13 @@
 		</jaxws:inInterceptors>
 		<jaxws:inFaultInterceptors>
 			<ref bean="soapHttpRequestInterceptor"/>
-			<ref bean="soapServiceInterceptor"/>
 		</jaxws:inFaultInterceptors>
 		<jaxws:outInterceptors>
-			<ref bean="soapLogOutboundInterceptor"/>
+			<ref bean="soapResponseInterceptor"/>
+			<ref bean="bornSOAPHeaderInterceptor"/>
 		</jaxws:outInterceptors>
 		<jaxws:outFaultInterceptors>
-			<ref bean="soapLogOutboundInterceptor"/>
+			<ref bean="soapResponseInterceptor"/>
 		</jaxws:outFaultInterceptors>
 	</jaxws:endpoint>
 
@@ -88,46 +77,224 @@
 			<ref bean="soapServiceInterceptor"/>
 		</jaxws:inInterceptors>
 		<jaxws:inFaultInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
 		</jaxws:inFaultInterceptors>
 		<jaxws:outInterceptors>
-			<ref bean="soapLogOutboundInterceptor"/>
+			<ref bean="soapResponseInterceptor"/>
+			<ref bean="bornSOAPHeaderInterceptor"/>
 		</jaxws:outInterceptors>
 		<jaxws:outFaultInterceptors>
-			<ref bean="soapLogOutboundInterceptor"/>
+			<ref bean="soapResponseInterceptor"/>
 		</jaxws:outFaultInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#scheduleWs" address="/ScheduleService">
+		<jaxws:inInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+			<ref bean="IPInWSS4JInterceptor"/>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+			<ref bean="soapServiceInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:inFaultInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+		</jaxws:inFaultInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:outFaultInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+		</jaxws:outFaultInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#providerWs" address="/ProviderService" >
+		<jaxws:inInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+			<ref bean="IPInWSS4JInterceptor"/>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+			<ref bean="soapServiceInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:inFaultInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+		</jaxws:inFaultInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:outFaultInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+		</jaxws:outFaultInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#demographicWs" address="/DemographicService" >
+		<jaxws:inInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+			<ref bean="IPInWSS4JInterceptor"/>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+			<ref bean="soapServiceInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:inFaultInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+		</jaxws:inFaultInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:outFaultInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+		</jaxws:outFaultInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#userMetricsWs" address="/UserMetricsService" >
+		<jaxws:inInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+			<ref bean="IPInWSS4JInterceptor"/>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+			<ref bean="soapServiceInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:inFaultInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+		</jaxws:inFaultInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:outFaultInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+		</jaxws:outFaultInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#facilityWs" address="/FacilityService" >
+		<jaxws:inInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+			<ref bean="IPInWSS4JInterceptor"/>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+			<ref bean="soapServiceInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:inFaultInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+		</jaxws:inFaultInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:outFaultInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+		</jaxws:outFaultInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#programWs" address="/ProgramService" >
+		<jaxws:inInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+			<ref bean="IPInWSS4JInterceptor"/>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+			<ref bean="soapServiceInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:inFaultInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+		</jaxws:inFaultInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:outFaultInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outFaultInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#allergyWs" address="/AllergyService" >
+		<jaxws:inInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+			<ref bean="IPInWSS4JInterceptor"/>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+			<ref bean="soapServiceInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:inFaultInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+		</jaxws:inFaultInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:outFaultInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outFaultInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#preventionWs" address="/PreventionService" >
+		<jaxws:inInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+			<ref bean="IPInWSS4JInterceptor"/>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+			<ref bean="soapServiceInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:inFaultInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+		</jaxws:inFaultInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:outFaultInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outFaultInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#measurementWs" address="/MeasurementService" >
+		<jaxws:inInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+			<ref bean="IPInWSS4JInterceptor"/>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+			<ref bean="soapServiceInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:inFaultInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+		</jaxws:inFaultInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:outFaultInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outFaultInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#documentWs" address="/DocumentService" >
+		<jaxws:inInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+			<ref bean="IPInWSS4JInterceptor"/>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+			<ref bean="soapServiceInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:inFaultInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+		</jaxws:inFaultInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:outFaultInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outFaultInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#prescriptionWs" address="/PrescriptionService" >
+		<jaxws:inInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+			<ref bean="IPInWSS4JInterceptor"/>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+			<ref bean="soapServiceInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:inFaultInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
+		</jaxws:inFaultInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:outFaultInterceptors>
+			<ref bean="soapResponseInterceptor"/>
+		</jaxws:outFaultInterceptors>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#labUploadWs" address="/LabUploadService" >
@@ -137,13 +304,14 @@
 			<ref bean="soapServiceInterceptor"/>
 		</jaxws:inInterceptors>
 		<jaxws:inFaultInterceptors>
+			<ref bean="soapHttpRequestInterceptor"/>
 		</jaxws:inFaultInterceptors>
 		<jaxws:outInterceptors>
-			<!-- <ref bean="bornSOAPHeaderInterceptor"/> -->
-			<ref bean="soapLogOutboundInterceptor"/>
+			<ref bean="soapResponseInterceptor"/>
+			<ref bean="bornSOAPHeaderInterceptor"/>
 		</jaxws:outInterceptors>
 		<jaxws:outFaultInterceptors>
-			<ref bean="soapLogOutboundInterceptor"/>
+			<ref bean="soapResponseInterceptor"/>
 		</jaxws:outFaultInterceptors>
 	</jaxws:endpoint>
 
