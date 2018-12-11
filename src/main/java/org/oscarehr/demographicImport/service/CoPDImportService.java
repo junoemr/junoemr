@@ -33,6 +33,7 @@ import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.allergy.service.AllergyService;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.hl7.copd.mapper.AlertMapper;
 import org.oscarehr.common.hl7.copd.mapper.AllergyMapper;
 import org.oscarehr.common.hl7.copd.mapper.AppointmentMapper;
 import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
@@ -226,6 +227,8 @@ public class CoPDImportService
 
 			logger.info("Import Notes & History ...");
 			importProviderNotes(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			logger.info("Import Alerts ...");
+			importAlerts(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 			logger.info("Import diagnosed health problems ...");
 			importDxData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Medications ...");
@@ -487,6 +490,18 @@ public class CoPDImportService
 			InputStream stream = new FileInputStream(documentFile.getFileObject());
 			documentService.uploadNewDemographicDocument(document, stream, demographic.getDemographicId());
 			documentService.routeToProviderInbox(document.getDocumentNo(), true, provider.getId());
+		}
+	}
+
+	private void importAlerts(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
+	{
+		AlertMapper alertMapper = new AlertMapper(zpdZtrMessage, providerRep, importSource);
+		for(CaseManagementNote reminderNote : alertMapper.getReminderNoteList())
+		{
+			reminderNote.setProvider(provider);
+			reminderNote.setSigningProvider(provider);
+			reminderNote.setDemographic(demographic);
+			encounterNoteService.saveReminderNote(reminderNote);
 		}
 	}
 
