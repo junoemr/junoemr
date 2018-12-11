@@ -94,14 +94,14 @@ public class BillingSaveBillingAction extends Action {
         ////////////
         if (bean.getApptNo() != null && !bean.getApptNo().trim().equals("0") && !bean.getApptNo().trim().equals(""))
         {
-            String apptStatus = "";
             Appointment result = appointmentDao.find(Integer.parseInt(bean.getApptNo()));
             if (result == null)
             {
-                log.error("APPOINTMENT STATUS CHANGE ERROR - APPT (" + bean.getApptNo() + ") NOT FOUND - FOR demo:" + bean.getPatientName() + " date " + curDate);
-            } else
+                log.warn("COULD NOT CHANGE APPOINTMENT STATUS - APPT (" + bean.getApptNo() + ") NOT FOUND - FOR demo:" + bean.getPatientName() + " date " + curDate);
+            }
+            else
             {
-                apptStatus = result.getStatus();
+                String apptStatus = result.getStatus();
 
                 String billStatus = as.billStatus(apptStatus);
 
