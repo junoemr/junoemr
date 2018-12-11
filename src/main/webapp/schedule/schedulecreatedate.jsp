@@ -307,7 +307,7 @@
 							if(aHScheduleDate != null)
 							{
 								bgcolor = new StringBuffer("gold");
-								if(aHScheduleDate.available.equals("0")) bgcolor = new StringBuffer("navy");
+								if(!aHScheduleDate.available) bgcolor = new StringBuffer("navy");
 								strHour = new StringBuffer(aHScheduleDate.hour != null ? aHScheduleDate.hour : "");
 								strReason = new StringBuffer(aHScheduleDate.reason != null ? aHScheduleDate.reason : "");
 							}

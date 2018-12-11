@@ -52,7 +52,7 @@
 
 		String providerNo = request.getParameter("provider_no");
 		String providerName = request.getParameter("provider_name");
-		String available = request.getParameter("available");
+		boolean available = request.getParameter("available").equals(ScheduleDate.AVAILABLE);
 		String priority = "c";
 		String reason = request.getParameter("reason");
 		String hour = request.getParameter("hour");
@@ -73,7 +73,7 @@
 			if(scheduleRscheduleBean.getDateAvail(dateStr))
 			{
 				String availHour = scheduleRscheduleBean.getDateAvailHour(dateStr);
-				scheduleService.saveScheduleByDate(providerNo, date, "1", "b", "", availHour, userName, scheduleRscheduleBean.active);
+				scheduleService.saveScheduleByDate(providerNo, date, true, "b", "", availHour, userName, scheduleRscheduleBean.active);
 			}
 			scheduleDateBean.remove(dateStr);
 		}

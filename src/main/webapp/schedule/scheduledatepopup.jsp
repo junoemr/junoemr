@@ -51,7 +51,7 @@
   String available = "checked", strHour = "", strReason = "value=''", strCreator="Me";
   HScheduleDate aHScheduleDate= (HScheduleDate) scheduleDateBean.get(year+"-"+month+"-"+day);
   if (aHScheduleDate!=null) {
-    available = aHScheduleDate.available.compareTo("1")==0?"checked":""  ;
+    available = aHScheduleDate.available?"checked":""  ;
     strHour = aHScheduleDate.hour;
     strReason = aHScheduleDate.reason ;
     strCreator= aHScheduleDate.creator;

@@ -1527,7 +1527,7 @@ public boolean isBirthday(String schedDate,String demBday){
 
 											//viewall function
 											if(request.getParameter("viewall")==null || request.getParameter("viewall").equals("0") ) {
-												if(sd == null|| "0".equals(String.valueOf(sd.getAvailable())) ) {
+												if(sd == null|| !sd.isAvailable() ) {
 													if(nProvider!=me ) continue;
 													else userAvail = false;
 												}

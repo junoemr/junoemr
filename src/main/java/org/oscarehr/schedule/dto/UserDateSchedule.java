@@ -40,12 +40,12 @@ public class UserDateSchedule
 	private RangeMap<LocalTime, ScheduleSlot> scheduleSlots;
 	private SortedMap<LocalTime, List<AppointmentDetails>> appointments;
 
-	private char isAvailable;
+	private boolean isAvailable;
 
 	public UserDateSchedule(
 		Integer providerNo, LocalDate scheduleDate, String firstName, String lastName,
 		RangeMap<LocalTime, ScheduleSlot> scheduleSlots,
-		SortedMap<LocalTime, List<AppointmentDetails>> appointments, char isAvailable)
+		SortedMap<LocalTime, List<AppointmentDetails>> appointments, boolean isAvailable)
 	{
 		this.providerNo = providerNo;
 		this.scheduleDate = scheduleDate;
@@ -96,7 +96,7 @@ public class UserDateSchedule
 		return scheduleSlots.asMapOfRanges().size() > 0;
 	}
 
-	public char getIsAvailable()
+	public boolean isAvailable()
 	{
 		return isAvailable;
 	}

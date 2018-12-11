@@ -174,7 +174,7 @@ public class Schedule
 		scheduleDateBean.clear();
 		for(ScheduleDate sd : scheduleDateDao.search_scheduledate_c(providerNo))
 		{
-			scheduleDateBean.put(ConversionUtils.toDateString(sd.getDate()), new HScheduleDate(String.valueOf(sd.getAvailable()), String.valueOf(sd.getPriority()), sd.getReason(), sd.getHour(), sd.getCreator()));
+			scheduleDateBean.put(ConversionUtils.toDateString(sd.getDate()), new HScheduleDate(sd.isAvailable(), String.valueOf(sd.getPriority()), sd.getReason(), sd.getHour(), sd.getCreator()));
 		}
 
 		//initial scheduleHolidayBean record
@@ -204,7 +204,7 @@ public class Schedule
 				ScheduleDate sd = new ScheduleDate();
 				sd.setDate(MyDateFormat.getSysDate(year + "-" + month + "-" + day));
 				sd.setProviderNo(providerNo);
-				sd.setAvailable('1');
+				sd.setAvailable(true);
 				sd.setPriority('b');
 				sd.setReason(scheduleRscheduleBean.getSiteAvail(cal));
 				sd.setHour(scheduleRscheduleBean.getDateAvailHour(cal));
@@ -276,7 +276,7 @@ public class Schedule
 	 * @param hour hour
 	 * @param userName username
 	 */
-	public void saveScheduleByDate(String providerNoStr, Date date, String available, String priority, String reason, String hour, String userName, String status)
+	public void saveScheduleByDate(String providerNoStr, Date date, boolean available, String priority, String reason, String hour, String userName, String status)
 	{
 		// flag existing schedule(s) as deleted.
 		ScheduleDate sd = scheduleDateDao.findByProviderNoAndDate(providerNoStr, date);
@@ -288,7 +288,7 @@ public class Schedule
 		sd = new ScheduleDate();
 		sd.setDate(date);
 		sd.setProviderNo(providerNoStr);
-		sd.setAvailable(available.toCharArray()[0]);
+		sd.setAvailable(available);
 		sd.setPriority(priority.toCharArray()[0]);
 		sd.setReason(reason);
 		sd.setHour(hour);
@@ -414,7 +414,7 @@ public class Schedule
 		String site
 	)
 	{
-		char isAvailable = '0';
+		boolean isAvailable = false;
 
 		// Get schedule slots
 		RangeMap<LocalTime, ScheduleSlot> scheduleSlots = scheduleTemplateDao.findScheduleSlots(
@@ -428,7 +428,7 @@ public class Schedule
 
 		if (scheduleDate != null)
 		{
-			isAvailable = scheduleDate.getAvailable();
+			isAvailable = scheduleDate.isAvailable();
 		}
 
 		return new UserDateSchedule(

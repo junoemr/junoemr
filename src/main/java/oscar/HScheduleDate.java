@@ -31,7 +31,7 @@ import java.io.Serializable;
 public class HScheduleDate implements Serializable
 {
 
-  public String available = "";
+  public boolean available;
   public String priority = "";
   public String reason = "";
   public String hour = "";
@@ -42,7 +42,7 @@ public class HScheduleDate implements Serializable
   {
   }
 
-  public HScheduleDate(String available1, String priority1, String reason1, String hour1, String creator1)
+  public HScheduleDate(boolean available1, String priority1, String reason1, String hour1, String creator1)
   {
     available = available1;
     priority = priority1;
@@ -51,7 +51,7 @@ public class HScheduleDate implements Serializable
     creator = creator1;
   }
 
-  public void setHScheduleDate(String available1, String priority1, String reason1, String hour1, String creator1)
+  public void setHScheduleDate(boolean available1, String priority1, String reason1, String hour1, String creator1)
   {
     available = available1;
     priority = priority1;
