@@ -52,7 +52,7 @@
 
 		String providerNo = request.getParameter("provider_no");
 		String providerName = request.getParameter("provider_name");
-		boolean available = request.getParameter("available").equals(ScheduleDate.AVAILABLE);
+		boolean available = ScheduleDate.AVAILABLE.equals(request.getParameter("available"));
 		String priority = "c";
 		String reason = request.getParameter("reason");
 		String hour = request.getParameter("hour");

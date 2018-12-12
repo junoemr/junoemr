@@ -31,11 +31,11 @@ import java.io.Serializable;
 public class HScheduleDate implements Serializable
 {
 
-  public boolean available;
-  public String priority = "";
-  public String reason = "";
-  public String hour = "";
-  public String creator = "";
+  private boolean available;
+  private String priority = "";
+  private String reason = "";
+  private String hour = "";
+  private String creator = "";
 
   // default constructor
   public HScheduleDate()
@@ -58,5 +58,55 @@ public class HScheduleDate implements Serializable
     reason = reason1;
     hour = hour1;
     creator = creator1;
+  }
+
+  public boolean isAvailable()
+  {
+    return available;
+  }
+
+  public void setAvailable(boolean available)
+  {
+    this.available = available;
+  }
+
+  public String getPriority()
+  {
+    return priority;
+  }
+
+  public void setPriority(String priority)
+  {
+    this.priority = priority;
+  }
+
+  public String getReason()
+  {
+    return reason;
+  }
+
+  public void setReason(String reason)
+  {
+    this.reason = reason;
+  }
+
+  public String getHour()
+  {
+    return hour;
+  }
+
+  public void setHour(String hour)
+  {
+    this.hour = hour;
+  }
+
+  public String getCreator()
+  {
+    return creator;
+  }
+
+  public void setCreator(String creator)
+  {
+    this.creator = creator;
   }
 }
