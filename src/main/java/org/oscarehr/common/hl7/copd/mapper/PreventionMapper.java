@@ -157,11 +157,13 @@ public class PreventionMapper
 		preventionTypeMap.put("Fluad", "Flu");
 		preventionTypeMap.put("flu shot", "Flu");
 		preventionTypeMap.put("Hepatitis A", "HepA");
+		preventionTypeMap.put("Hepatitis A Vaccine Inactivated", "HepA");
 		preventionTypeMap.put("Hepatitis B", "HepB");
 		preventionTypeMap.put("Hepatitis B Recombinant", "HepB");
 		preventionTypeMap.put("Hep A and Hep B Combined", "HepAB");
 		preventionTypeMap.put("Infanrix", "DTaP");
 		preventionTypeMap.put("Influenza", "Flu");
+		preventionTypeMap.put("influenza", "Flu");
 		preventionTypeMap.put("Meningococcal C-TT Conjugate", "MenconC");
 		preventionTypeMap.put("MMR/Varicella", "MMRV");
 		preventionTypeMap.put("penta", "DPTP-IPV-Hib");

@@ -68,6 +68,7 @@ import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.service.PreventionManager;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.provider.search.ProviderCriteriaSearch;
 import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.rx.dao.PrescriptionDao;
@@ -268,8 +269,12 @@ public class CoPDImportService
 			newProvider = getDefaultProvider();
 		}
 
+		ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
+		criteriaSearch.setFirstName(newProvider.getFirstName());
+		criteriaSearch.setLastName(newProvider.getLastName());
+
 		ProviderData provider;
-		List<ProviderData> matchedProviders = providerDataDao.findByName(newProvider.getFirstName(), newProvider.getLastName(), false);
+		List<ProviderData> matchedProviders = providerDataDao.criteriaSearch(criteriaSearch);
 		if(matchedProviders.isEmpty())
 		{
 			provider = newProvider;

@@ -125,7 +125,12 @@ public class AllergyMapper
 
 	public Date getStartDate(int rep)
 	{
-		return ConversionUtils.fromDateString(provider.getALLERGY(rep).getIAM().getIam13_ReportedDateTime().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
+		String dateStr = provider.getALLERGY(rep).getIAM().getIam13_ReportedDateTime().getTs1_TimeOfAnEvent().getValue();
+		if(dateStr==null || dateStr.trim().isEmpty() || dateStr.equals("00000000"))
+		{
+			return null;
+		}
+		return ConversionUtils.fromDateString(dateStr, "yyyyMMdd");
 	}
 
 	public String getDescription(int rep)
@@ -155,8 +160,7 @@ public class AllergyMapper
 		String dobDateStr = message.getPATIENT().getPID().getDateTimeOfBirth().getTimeOfAnEvent().getValue();
 		LocalDate dob = ConversionUtils.toLocalDate(dobDateStr, DateTimeFormatter.ofPattern("yyyyMMdd"));
 
-		String startDateStr = provider.getALLERGY(rep).getIAM().getIam13_ReportedDateTime().getTs1_TimeOfAnEvent().getValue();
-		LocalDate startDate = ConversionUtils.toLocalDate(startDateStr, DateTimeFormatter.ofPattern("yyyyMMdd"));
+		LocalDate startDate = ConversionUtils.toNullableLocalDate(getStartDate(rep));
 
 		if(dob != null && startDate != null)
 		{
