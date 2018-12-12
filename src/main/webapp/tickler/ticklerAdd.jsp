@@ -401,42 +401,49 @@
 				<td valign="top"><font face="Verdana, Arial, Helvetica, sans-serif" size="2"
 									   color="#333333">
 							<% if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
-{ // multisite start ==========================================
+	{ // multisite start ==========================================
         	SiteDao siteDao = (SiteDao)WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
           	List<Site> sites = siteDao.getActiveSitesByProviderNo(user_no);
           	String appNo = (String) session.getAttribute("cur_appointment_no");
           	String location = null;
-          	if (appNo != null) {
+          	if (appNo != null)
+          	{
           		Appointment a  = appointmentDao.find(Integer.parseInt(appNo));
-          		if(a != null) {
+          		if(a != null)
+          		{
           			location = a.getLocation();
           		}
-          		
           	}
-      %>
-					<script>
-						var _providers = [];
-						<%
-						Site site = null;
-						for (int i=0; i<sites.size(); i++) { %>
-						_providers["<%= sites.get(i).getSiteId() %>"] = "<% Iterator<Provider> iter = sites.get(i).getProviders().iterator();
-	while (iter.hasNext()) {
-		Provider p=iter.next();
-		if ("1".equals(p.getStatus())) {
-	%><option value='<%= p.getProviderNo() %>'><%= p.getLastName() %>, <%= p.getFirstName() %></option><% }} %>";
-						<%	if (sites.get(i).getName().equals(location))
-								site = sites.get(i);
-							} %>
+        %>
+		<script>
+		var _providers = [];
+		<%
+		Site site = null;
+		for (int i=0; i<sites.size(); i++)
+		{ %>
+			_providers["<%= sites.get(i).getSiteId() %>"] = "<% Iterator<Provider> iter = sites.get(i).getProviders().iterator();
+			while (iter.hasNext())
+			 {
+				Provider p=iter.next();
+				if ("1".equals(p.getStatus()))
+				{
+					%><option value='<%= p.getProviderNo() %>'><%= p.getLastName() %>, <%= p.getFirstName() %></option><%
+				}
+			} %>";
+			<%
+			if (sites.get(i).getName().equals(location))
+					site = sites.get(i);
+		} %>
 
-						function changeSite(sel)
-						{
-							sel.form.task_assigned_to.innerHTML = sel.value == "none" ? "" : _providers[sel.value];
-						}
-					</script>
+	function changeSite(sel)
+	{
+		sel.form.task_assigned_to.innerHTML = sel.value == "none" ? "" : _providers[sel.value];
+	}
+	</script>
 					<select id="site" name="site" onchange="changeSite(this)">
 						<option value="none">---select clinic---</option>
 						<%
-							for (int i = 0; i < sites.size(); i++)
+							for(int i = 0; i < sites.size(); i++)
 							{
 						%>
 						<option value="<%= sites.get(i).getSiteId() %>"><%= sites.get(i).getName() %>
@@ -449,7 +456,9 @@
 						changeSite(document.getElementById("site"));
 					</script>
 							<% // multisite end ==========================================
-} else {
+	}
+else
+	{
 %>
 					<select name="task_assigned_to">
 						<% String proFirst = "";
