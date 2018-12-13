@@ -38,6 +38,7 @@ import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -50,12 +51,14 @@ import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
+import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.OtherId;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.model.OLISSystemPreferences;
@@ -70,6 +73,7 @@ import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.HHSEmrDownloadHandler;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
 import oscar.oscarLab.ca.all.parsers.SpireHandler;
 import oscar.util.UtilDateUtilities;
 
@@ -239,6 +243,8 @@ public final class MessageUploader {
 			}
 
 			String demProviderNo = "0";
+			boolean custom_route_enabled=false;
+
 			try
 			{
 				demProviderNo = patientRouteReport(loggedInProviderNo, insertID, lastName,
@@ -265,6 +271,7 @@ public final class MessageUploader {
 			else
 			{
 				Integer limit = null;
+				String custom_lab_route="";
 				boolean orderByLength = false;
 				String search = null;
 				if(type.equals("Spire"))
@@ -280,11 +287,54 @@ public final class MessageUploader {
 				else if(type.equals("IHA"))
 				{
 					search = "alberta_e_delivery_ids";
+				} else if (type.equals("PATHL7"))
+				{
+					//custom lab routing for excelleris labs
+					//Parses custom_lab_routeX properties (starting at 1)
+					//Property format: custom_lab_routeX=<excelleris_lab_account>,<provider_no>
+					custom_lab_route = OscarProperties.getInstance().getProperty("custom_lab_route1");
+
+					if (custom_lab_route != null && !custom_lab_route.equals(""))
+					{
+						String account;
+						String lab_user;
+
+						PATHL7Handler handler = new PATHL7Handler();
+						handler.init(hl7Body);
+
+						int k = 1;
+						// Loop through each custom_lab_routeX in the properties file
+						while (custom_lab_route != null && !custom_lab_route.equals(""))
+						{
+							ArrayList<String> cust_route = new ArrayList<String>(Arrays.asList(custom_lab_route.split(",")));
+							account = cust_route.get(0);
+							ArrayList<String> to_provider = new ArrayList<String>(Arrays.asList(cust_route.get(1)));
+
+							// Get the receiving facility from the MSH segment
+							lab_user = handler.getLabUser();
+
+							// If the receiving facility is equal to the excelleris_lab_account in the property then route to the provider number that pairs with that lab account
+							// A single lab result shouldn't have more than one route here as there shouldn't be more than one receiving facility
+							if (lab_user.equals(account))
+							{
+								// We have a match, so we have a custom route. Route to the custom provider not the ordering provider
+								custom_route_enabled = true;
+								providerRouteReport(String.valueOf(insertID), to_provider, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, "provider_no", limit, orderByLength);
+							}
+
+							k++;
+							custom_lab_route = OscarProperties.getInstance().getProperty("custom_lab_route" + k);
+						}
+					}
 				}
 
-				/* allow property override setting to route all labs to a specific inbox or list of inboxes. */
-				ArrayList<String> providers = OscarProperties.getInstance().getRouteLabsToProviders(docNums);
-				providerRouteReport(String.valueOf(insertID), providers, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
+				// If we don't have a custom route then route as normal. Route to the the ordering provider
+				if(!custom_route_enabled)
+				{
+					/* allow property override setting to route all labs to a specific inbox or list of inboxes. */
+					ArrayList<String> providers = OscarProperties.getInstance().getRouteLabsToProviders(docNums);
+					providerRouteReport(String.valueOf(insertID), providers, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
+				}
 			}
 			retVal = messageHandler.audit();
 			if(results != null)
@@ -366,6 +416,7 @@ public final class MessageUploader {
 	private static void providerRouteReport(String labId, ArrayList<String> docNums, Connection conn, String altProviderNo, String labType, String search_on, Integer limit, boolean orderByLength) throws Exception {
 		ArrayList<String> providerNums = new ArrayList<String>();
 		String sqlSearchOn = "ohip_no";
+		String routeToProvider = OscarProperties.getInstance().getProperty("route_labs_to_provider", "");
 		
 		if (search_on != null && search_on.length() > 0) {
 			sqlSearchOn = search_on;
@@ -386,6 +437,34 @@ public final class MessageUploader {
 						if(otherId != null) {
 							providerNums.add(otherId.getTableId());
 						}
+					}
+				}
+			}
+		}
+
+		// If we're not routing all labs to the unclaimed inbox, then route to all providers assigned to the most recent version of the lab
+		if (!Provider.UNCLAIMED_PROVIDER_NO.equals(routeToProvider))
+		{
+			//If the lab is a new version for an already existing lab, route to providers already assigned to previous versions of this lab
+			ProviderLabRoutingDao providerLabRoutingDao = (ProviderLabRoutingDao) SpringUtils.getBean(ProviderLabRoutingDao.class);
+			String labNumberCSV = Hl7textResultsData.getMatchingLabs(labId);
+
+			//Loop through each lab version and find all providers assigned to each lab version. Add that provider to the newest version of the lab
+			if (labNumberCSV != null && !labNumberCSV.equals(""))
+			{
+				String[] labsNumbers = labNumberCSV.split(",");
+
+				//Get the lab version before the latest version. The latest version has already been inserted into the hl7TextInfo table at this point
+				//so we need to get the second most recent version
+				if (labsNumbers.length > 1)
+				{
+					String previousLabVersion = labsNumbers[labsNumbers.length - 2];
+
+					List<ProviderLabRoutingModel> providerLabRoutings = providerLabRoutingDao.getProviderLabRoutings(Integer.parseInt(previousLabVersion), "HL7");
+
+					for (int j = 0; j < providerLabRoutings.size(); j++)
+					{
+						providerNums.add(providerLabRoutings.get(j).getProviderNo());
 					}
 				}
 			}

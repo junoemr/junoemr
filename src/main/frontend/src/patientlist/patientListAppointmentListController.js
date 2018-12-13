@@ -24,6 +24,10 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 
 		var controller = this;
 
+		controller.statusCodeMap = new Map();
+		controller.statuses = null;
+
+
 		controller.dateOptions = {
 			showWeeks: false
 		};
@@ -32,48 +36,33 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 			function success(results)
 			{
 				controller.statuses = results.content;
+				controller.statusCodeMap = new Map(controller.statuses.map(i => [i.status, i]));
 			},
 			function error(errors)
 			{
 				console.log(errors);
 			});
 
-		controller.getAppointmentTextStyle = function getAppointmentTextStyle(patient)
+		controller.getAppointmentStatusDescriptionByStatusCode = function (statusCode)
 		{
-			if (patient.demographicNo == 0)
+			let status = controller.statusCodeMap.get(statusCode);
+			let description = "";
+			if(status)
 			{
-				return {
-					'color': 'white'
-				};
+				description = status.description;
 			}
+			return description;
 		};
-
-		//TODO:this gets called alot..should switch to a dictionary.
-		controller.getAppointmentStyle = function getAppointmentStyle(patient)
+		controller.getAppointmentStatusColourByStatusCode = function (statusCode)
 		{
-			if (patient.demographicNo == 0)
+			let status = controller.statusCodeMap.get(statusCode);
+			let colour = "#000000";
+			if(status)
 			{
-				return {
-					'background-color': 'black'
-				};
+				colour = status.color;
 			}
-
-			if (controller.statuses != null)
-			{
-				for (var i = 0; i < controller.statuses.length; i++)
-				{
-					if (controller.statuses[i].status == patient.status)
-					{
-						return {
-							'background-color': controller.statuses[i].color
-						};
-					}
-				}
-			}
-
-			return {};
+			return colour;
 		};
-
 
 		controller.today = function today()
 		{
@@ -126,12 +115,16 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 
 		controller.changeApptList = function changeApptList(day)
 		{
-
-			temp = 0;
-
-			controller.currenttab = patientListState.tabItems[temp];
-			var lastIndx = controller.currenttab.url.lastIndexOf("/");
-			controller.currenttab.url = controller.currenttab.url.slice(0, lastIndx + 1) + day;
+			controller.currenttab = patientListState.tabItems[0];
+			controller.currenttab.serviceMethod = function ()
+			{
+				return scheduleService.getAppointments(day).then(
+					function success(results)
+					{
+						return results.patients;
+					}
+				);
+			};
 			controller.showFilter = true;
 			$scope.$emit('juno:patientListRefresh');
 		};
@@ -197,7 +190,6 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 				function success(results)
 				{
 					controller.switchDay(0);
-
 				},
 				function error(errors)
 				{

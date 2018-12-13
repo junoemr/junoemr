@@ -45,14 +45,16 @@ angular.module('Common.Directives').directive('junoPatientSearchTypeahead', [
 			{
 				var deferred = $q.defer();
 				demographicsService.quickSearch(search).then(
-					function success(data)
+					function success(results)
 					{
-						var matches = data.content;
-						if(data.total > 10)
+						var matches = results.data;
+						var meta = results.meta;
+
+						if(meta.total > 10)
 						{
 							matches.push({
 								moreResults: true,
-								total: data.total,
+								total: meta.total,
 								searchQuery: search
 							});
 						}

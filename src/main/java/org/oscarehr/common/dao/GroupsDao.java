@@ -40,13 +40,18 @@ public class GroupsDao extends AbstractDao<Groups>{
 	}
 
 	@SuppressWarnings("unchecked")
-    public List<Groups> findByParentId(int groupId) {
+	public List<Groups> findByParentId(int groupId)
+	{
 		Query query = createQuery("g", "g.parentId = :id");
 		query.setParameter("id", groupId);
 		return query.getResultList();
-    }
-	
-	
-	
-	
+	}
+
+	public long countChildGroups(int parentGroupId)
+	{
+		Query query = entityManager.createQuery("SELECT count(g) FROM Groups g WHERE g.parentId = :groupId");
+		query.setParameter("groupId", parentGroupId);
+
+		return (Long) query.getSingleResult();
+	}
 }

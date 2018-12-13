@@ -24,6 +24,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.model.PatientLabRouting;
+import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -77,7 +78,7 @@ public class OLISAddToInboxAction extends DispatchAction {
 					if (doAck) {
 						String demographicID = getDemographicIdFromLab("HL7", msgHandler.getLastSegmentId());
 						LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACK, LogConst.CON_HL7_LAB, "" + msgHandler.getLastSegmentId(), request.getRemoteAddr(), demographicID);
-						CommonLabResultData.updateReportStatus(msgHandler.getLastSegmentId(), providerNo, 'A', "comment", "HL7");
+						CommonLabResultData.updateReportStatus(msgHandler.getLastSegmentId(), providerNo, ProviderInboxItem.ACK, "comment", "HL7");
 
 					}
 				} else {

@@ -49,6 +49,7 @@ if(!authed) {
 <%@taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@page import="java.util.*, oscar.oscarDemographic.data.*"%>
 <%@page import="oscar.oscarBilling.ca.bc.data.*,oscar.oscarBilling.ca.bc.pageUtil.*,oscar.*,oscar.oscarClinic.*"%>
+<%@ page import="java.text.SimpleDateFormat" %>
 <%
             double totalPayments = 0;
             double totalRefunds = 0;
@@ -449,7 +450,11 @@ if(!authed) {
                                                     <tr align="center">
                                                         <td colspan="3">&nbsp;</td>
                                                         <td><%=label%>(<%=item.getPaymentTypeDesc()%>)</td>
-                                                        <td colspan="2"><%=item.getArchiveDate()%></td>
+                                                        <%
+                                                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                                                            String archiveDateString = dateFormat.format(item.getArchiveDate());
+                                                        %>
+                                                        <td colspan="2"><%=archiveDateString%></td>
 
                                                         <td align="right"><%=java.text.NumberFormat.getCurrencyInstance().format(amtReceived * -1.0).replace('$', ' ')%></td>
                                                     </tr>

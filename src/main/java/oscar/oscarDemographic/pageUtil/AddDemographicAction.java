@@ -368,12 +368,12 @@ public class AddDemographicAction extends Action
 				document.setDoctype(request.getParameter("docType"));
 				document.setDocdesc(request.getParameter("docDesc"));
 				document.setDocfilename(docFile.getFileName());
-				document.setDoccreator(loggedInInfo.getLoggedInProviderNo());
+				document.setDocCreator(loggedInInfo.getLoggedInProviderNo());
 				document.setResponsible(loggedInInfo.getLoggedInProviderNo());
 				DocumentService documentService = SpringUtils.getBean(org.oscarehr.document.service.DocumentService.class);
 				try
 				{
-					documentService.uploadNewDocument(document, docFile.getInputStream(), Integer.parseInt(demoNo));
+					documentService.uploadNewDemographicDocument(document, docFile.getInputStream(), Integer.parseInt(demoNo));
 				} catch (Exception e)
 				{
 					docError = true;

@@ -93,7 +93,7 @@ import org.oscarehr.common.dao.GroupNoteDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.BillingONCHeader1;
-import org.oscarehr.common.model.CaseManagementTmpSave;
+import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.common.model.CustomFilter;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.rx.model.Drug;
@@ -889,13 +889,15 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		long startTime;
 		startTime = System.currentTimeMillis();
 
-		logger.debug("Get stale note date");
-		// filter the notes by the checked issues and date if set
+		// This attribute is called from the other side of an ajax request, so it has to be set with
+		// session (or longer) scope.
+
 		UserProperty userProp = caseManagementMgr.getUserProperty(providerNo, UserProperty.STALE_NOTEDATE);
-		request.setAttribute(UserProperty.STALE_NOTEDATE, userProp);
+		HttpSession session = request.getSession();
+		session.setAttribute(UserProperty.STALE_NOTEDATE, userProp);
+
 		UserProperty userProp2 = caseManagementMgr.getUserProperty(providerNo, UserProperty.STALE_FORMAT);
 		request.setAttribute(UserProperty.STALE_FORMAT, userProp2);
-		logger.debug("Get stale note date " + (System.currentTimeMillis() - startTime));
 
 		//List<CaseManagementIssue> issues = cmeIssueDao.getIssuesByDemographic(demoNo);
 		ArrayList<CheckBoxBean> checkBoxBeanList = new ArrayList<CheckBoxBean>();

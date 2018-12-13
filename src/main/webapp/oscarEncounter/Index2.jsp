@@ -24,8 +24,8 @@
 
 --%>
 
-<%@page import="org.oscarehr.util.LoggedInInfo" %>
-<%@page import="oscar.oscarRx.data.RxPatientData" %>
+<%@page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@page import="org.oscarehr.allergy.model.Allergy" %>
 <%@ taglib uri="/WEB-INF/caisi-tag.tld" prefix="caisi" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -94,13 +94,13 @@
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 
 <%@page
-		import="oscar.log.*,oscar.util.UtilMisc,oscar.oscarEncounter.data.*, java.net.*,java.util.*,oscar.util.UtilDateUtilities" %>
+		import="org.oscarehr.util.LoggedInInfo,org.oscarehr.util.MiscUtils,oscar.log.LogAction, oscar.log.LogConst,oscar.oscarEncounter.data.EctFormData,oscar.oscarEncounter.data.EctPatientData" %>
 <%@page
-		import="oscar.oscarMDS.data.MDSResultsData,oscar.oscarLab.ca.on.*, oscar.oscarMessenger.util.MsgDemoMap, oscar.oscarMessenger.data.MsgMessageData" %>
+		import="oscar.oscarEncounter.data.EctProgram,oscar.oscarEncounter.data.EctProviderData, oscar.oscarEncounter.data.EctSplitChart, oscar.oscarMessenger.data.MsgMessageData" %>
 <%@page
-		import="oscar.oscarEncounter.oscarMeasurements.*,oscar.oscarResearch.oscarDxResearch.bean.*,oscar.util.*" %>
+		import="oscar.oscarMessenger.util.MsgDemoMap,oscar.oscarRx.data.RxPatientData,oscar.util.StringUtils" %>
 <%@page
-		import="oscar.eform.*, oscar.dms.*, org.apache.commons.lang.StringEscapeUtils" %>
+		import="oscar.util.UtilDateUtilities, oscar.util.UtilMisc, java.net.URLEncoder" %>
 
 <% oscar.OscarProperties oscarVariables = oscar.OscarProperties.getInstance(); %>
 
@@ -246,8 +246,9 @@ else
 %>
 
 
-<%@page import="org.oscarehr.util.MiscUtils" %>
-<%@ page import="org.oscarehr.allergy.model.Allergy" %>
+<%@page import="java.util.ArrayList" %>
+<%@ page import="java.util.Properties" %>
+<%@ page import="java.util.Vector" %>
 <html:html locale="true">
 	<head>
 		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>

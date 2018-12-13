@@ -25,8 +25,7 @@ package org.oscarehr.ws.rest.exceptionMapping;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestResponseValidationError;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -34,14 +33,14 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class ValidationExceptionMapper implements ExceptionMapper<ConstraintViolationException>
+public class ValidationExceptionMapper implements ExceptionMapper<ValidationException>
 {
 	public ValidationExceptionMapper()
 	{
 	}
 
 	@Override
-	public Response toResponse(ConstraintViolationException exception)
+	public Response toResponse(ValidationException exception)
 	{
 		RestResponseValidationError responseError = new RestResponseValidationError("Validation Error");
 		for(ConstraintViolation constraintViolation : exception.getConstraintViolations())

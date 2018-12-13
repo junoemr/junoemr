@@ -32,14 +32,14 @@
 
 <%@ include file="/casemgmt/taglibs.jsp"%>
 
-<%@ page import="org.oscarehr.casemgmt.model.*"%>
-<%@ page import="org.oscarehr.casemgmt.web.formbeans.*"%>
-<%@page import="org.springframework.web.context.WebApplicationContext"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@ page import="oscar.OscarProperties"%>
 <%@ page import="org.apache.log4j.Logger"%>
-<%@page import="org.oscarehr.casemgmt.web.CaseManagementViewAction"%>
-<%@page import="org.oscarehr.casemgmt.web.NoteDisplay"%>
+<%@ page import="org.oscarehr.casemgmt.model.CaseManagementCPP"%>
+<%@ page import="org.oscarehr.casemgmt.model.ClientImage"%>
+<%@ page import="org.oscarehr.casemgmt.web.NoteDisplay"%>
+<%@ page import="org.oscarehr.casemgmt.web.formbeans.CaseManagementViewFormBean"%>
+<%@ page import="org.springframework.web.context.WebApplicationContext"%>
+<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@ page import="oscar.OscarProperties"%>
 <%
 	Logger logger=Logger.getLogger("CaseManagementView.jsp");
 	
@@ -181,7 +181,7 @@
 	<table>
 		<tr>
 			<th width="8%"></th>
-			<th style="font-size: 20" colspan="2" width="80%"><b>Case
+			<th style="font-size: 20px" colspan="2" width="80%"><b>Case
 			Management Encounter</b></th>
 			<%
 				WebApplicationContext ctx=WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());

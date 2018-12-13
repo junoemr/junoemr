@@ -53,6 +53,7 @@
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Locale" %>
+<%@ page import="java.net.URLEncoder" %>
 
 <%
 	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -1149,7 +1150,7 @@
 					&nbsp;
 					<input type="button" name="button"
 						   value="<bean:message key="tickler.ticklerMain.btnAddTickler"/>"
-						   onClick="popupPage('400','600', 'ticklerAdd.jsp?updateParent=true&parentAjaxId=<%=parentAjaxId%>&demographic_no=<%=tmpDemoNo%>&chart_no=<%=demographic_chartno%>&name=<%=demographic_name%>')"
+						   onClick="popupPage('400','600', 'ticklerAdd.jsp?updateParent=true&parentAjaxId=<%=parentAjaxId%>&demographic_no=<%=tmpDemoNo%>&chart_no=<%=URLEncoder.encode(demographic_chartno, "UTF-8")%>&name=<%=URLEncoder.encode(demographic_name, "UTF-8")%>&bFirstDisp=false')"
 						   class="sbttn">
 					<input type="hidden" name="submit_form" value="">
 					<%

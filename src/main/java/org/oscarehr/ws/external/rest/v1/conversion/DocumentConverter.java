@@ -59,7 +59,7 @@ public class DocumentConverter
 		document.setSource(transfer.getSource());
 		document.setSourceFacility(transfer.getSourceFacility());
 
-		document.setDoccreator(transfer.getDocumentCreator());
+		document.setDocCreator(transfer.getDocumentCreator());
 		document.setReviewer(transfer.getReviewer());
 		document.setResponsible(transfer.getResponsible());
 		document.setReviewdatetime(ConversionUtils.toNullableLegacyDateTime(transfer.getReviewDateTime()));

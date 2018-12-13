@@ -79,6 +79,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
 @Path("/schedule")
 @Component("scheduleService")
 @Tag(name = "schedule")
@@ -106,59 +119,67 @@ public class ScheduleService extends AbstractServiceImpl {
 	@GET
 	@Path("/day/{date}")
 	@Produces("application/json")
-	public PatientListApptBean getAppointmentsForDay(@PathParam("date") String date) {
+	public RestResponse<PatientListApptBean> getAppointmentsForDay(@PathParam("date") String date) throws ParseException
+	{
 		String providerNo = this.getCurrentProvider().getProviderNo();
 		return getAppointmentsForDay(providerNo, date);
 	}
 
+	/**
+	 * Will substitute "me" to your logged in provider no, and "today" to today's date.
+	 * eg /schedule/me/day/today
+	 *
+	 * @param providerNo
+	 * @param dateStr
+	 * @return list of appointments by provider and date
+	 */
 	@GET
 	@Path("/{providerNo}/day/{date}")
 	@Produces("application/json")
-	/**
-	 * Will substitute "me" to your logged in provider no, and "today" to doday's date.
-	 * eg /schedule/me/day/today
-	 * 
-	 * @param providerNo
-	 * @param date
-	 * @return
-	 */
-	public PatientListApptBean getAppointmentsForDay(@PathParam("providerNo") String providerNo, @PathParam("date") String date) {
-		SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm aa");
+	public RestResponse<PatientListApptBean> getAppointmentsForDay(@PathParam("providerNo") String providerNo,
+	                                                               @PathParam("date") String dateStr) throws ParseException
+	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		if("".equals(providerNo))
+		{
+			providerNo = loggedInInfo.getLoggedInProviderNo();
+		}
+		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.READ, null, "_appointment");
+
+		SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm aa");
 		PatientListApptBean response = new PatientListApptBean();
 
-		try {
-			Date dateObj = null;
-			if ("today".equals(date)) {
-				dateObj = new Date();
-			} else {
-				dateObj = DateUtils.parseIso8601Date(date);
-			}
-
-			if ("".equals(providerNo)) {
-				providerNo = loggedInInfo.getLoggedInProviderNo();
-			}
-
-			List<Appointment> appts = scheduleManager.getDayAppointments(loggedInInfo, providerNo, dateObj);
-			for (Appointment appt : appts) {
-				PatientListApptItemBean item = new PatientListApptItemBean();
-				item.setDemographicNo(appt.getDemographicNo());
-				if(appt.getDemographicNo() == 0){
-					item.setName(appt.getName());
-				}else{
-					item.setName(demographicManager.getDemographicFormattedName(loggedInInfo, appt.getDemographicNo()));
-				}
-				item.setStartTime(timeFormatter.format(appt.getStartTime()));
-				item.setReason(appt.getReason());
-				item.setStatus(appt.getStatus());
-				item.setAppointmentNo(appt.getId());
-				item.setDate(appt.getStartTimeAsFullDate());
-				response.getPatients().add(item);
-			}
-		} catch (ParseException e) {
-			throw new RuntimeException("Invalid Date sent, use yyyy-MM-dd format");
+		Date dateObj;
+		if("today".equals(dateStr))
+		{
+			dateObj = new Date();
 		}
-		return response;
+		else
+		{
+			dateObj = DateUtils.parseIso8601Date(dateStr);
+		}
+
+		List<Appointment> appts = scheduleManager.getDayAppointments(loggedInInfo, providerNo, dateObj);
+		for(Appointment appt : appts)
+		{
+			PatientListApptItemBean item = new PatientListApptItemBean();
+			item.setDemographicNo(appt.getDemographicNo());
+			if(appt.getDemographicNo() == 0)
+			{
+				item.setName(appt.getName());
+			}
+			else
+			{
+				item.setName(demographicManager.getDemographicFormattedName(loggedInInfo, appt.getDemographicNo()));
+			}
+			item.setStartTime(timeFormatter.format(appt.getStartTime()));
+			item.setReason(appt.getReason());
+			item.setStatus(appt.getStatus());
+			item.setAppointmentNo(appt.getId());
+			item.setDate(appt.getStartTimeAsFullDate());
+			response.getPatients().add(item);
+		}
+		return RestResponse.successResponse(response);
 	}
 
 	@GET

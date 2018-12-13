@@ -129,7 +129,7 @@ li.cpp-note-list:last-child {
 		margin-top: $margin-sm;
 	}
 	.toggle-patient-list-button {
-		height: 90px;
+		height: $dashboard-header-height;
 		width: $toggle-patient-list-btn-width;
 		background-color: $secondary-blue;
 		border-style: solid;

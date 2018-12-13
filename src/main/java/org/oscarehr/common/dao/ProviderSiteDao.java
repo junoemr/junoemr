@@ -42,9 +42,9 @@ public class ProviderSiteDao extends AbstractDao<ProviderSite>{
 	}
 
 	public List<ProviderSite> findByProviderNo(String providerNo) {
-    	String sql = "select x from ProviderSite x where x.id.providerNo=?";
+    	String sql = "select x from ProviderSite x where x.id.providerNo = :providerNo";
     	Query query = entityManager.createQuery(sql);
-    	query.setParameter(1,providerNo);
+    	query.setParameter("providerNo",providerNo);
 
         List<ProviderSite> results = query.getResultList();
         return results;

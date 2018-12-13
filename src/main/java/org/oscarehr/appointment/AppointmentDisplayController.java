@@ -23,11 +23,17 @@
 package org.oscarehr.appointment;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.appointment.model.AppointmentStatusList;
+import org.oscarehr.common.dao.DemographicDao;
+import org.oscarehr.common.dao.ProviderPreferenceDao;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.LookupListItem;
+import org.oscarehr.common.model.ProviderPreference;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.SxmlMisc;
 import oscar.util.UtilMisc;
@@ -87,6 +93,9 @@ public class AppointmentDisplayController
 	private boolean showMasterLink;
 	private boolean showBilling;
 	private boolean showEChart;
+
+	private DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
+	private ProviderPreferenceDao providerPreferenceDao = SpringUtils.getBean(ProviderPreferenceDao.class);
 
 	public void init(
 		AppointmentDetails appointment,
@@ -187,12 +196,12 @@ public class AppointmentDisplayController
 
 	public boolean isBilled()
 	{
-		if (appointment.getStatus() == null)
+		if (appointment.getStatus() == null || !appointment.getStatus().contains(BILLED_STATUS))
 		{
 			return false;
 		} else
 		{
-			return (appointment.getStatus().equals(BILLED_STATUS));
+			return true;
 		}
 	}
 
@@ -280,7 +289,8 @@ public class AppointmentDisplayController
 		if (status == null)
 		{
 			return null;
-		} else
+		}
+		else
 		{
 			if (status.length() >= 2)
 			{
@@ -398,13 +408,52 @@ public class AppointmentDisplayController
 	public String getBillLink()
 	{
 		String province = OscarProperties.getInstance().getBillingTypeUpperCase();
-		String default_view = OscarProperties.getInstance().getProperty("default_view");
+		String defaultView = OscarProperties.getInstance().getProperty("default_view");
+		Demographic demographic = demographicDao.getDemographicById(appointment.getDemographicNo());
+		String referralNoParameter = "";
+
+		if(oscar.OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc"))
+		{
+			String rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
+			rdohip = rdohip !=null ? rdohip : "" ;
+			referralNoParameter = "&referral_no_1=" + rdohip;
+		}
+
+		String mrpPreferredView = null;
+
+		if (demographic.getProviderNo() != null && !demographic.getProviderNo().isEmpty())
+		{
+			ProviderPreference mrpPreference = providerPreferenceDao.find(demographic.getProviderNo());
+			if (mrpPreference != null)
+			{
+				mrpPreferredView = mrpPreference.getDefaultServiceType();
+			}
+		}
+
+		if (mrpPreferredView != null && !mrpPreferredView.equals("no"))
+		{
+			defaultView = mrpPreferredView;
+		} else
+		{
+			ProviderPreference currentUserPreference = providerPreferenceDao.find(sessionProviderNo);
+			String currentUserPreferredView = null;
+
+			if (currentUserPreference != null)
+			{
+				currentUserPreferredView = currentUserPreference.getDefaultServiceType();
+			}
+
+			if (currentUserPreferredView != null && !currentUserPreferredView.equals("no"))
+			{
+				defaultView = currentUserPreferredView;
+			}
+		}
 
 		try
 		{
 			return "../billing.do" +
 				"?billRegion=" + URLEncoder.encode(province, "UTF-8") +
-				"&billForm=" + URLEncoder.encode(default_view, "UTF-8") +
+				"&billForm=" + URLEncoder.encode(defaultView, "UTF-8") +
 				"&hotclick=" +
 				"&appointment_no=" + appointment.getAppointmentNo().toString() +
 				"&demographic_name=" + URLEncoder.encode(getName(), "UTF-8") +
@@ -414,8 +463,8 @@ public class AppointmentDisplayController
 				"&user_no=" + currentUserNo +
 				"&apptProvider_no=" + scheduleProviderNo +
 				"&appointment_date=" + appointment.getDate().format(dateFormatter) +
-				"&start_time=" + appointment.getStartTime().format(timeFormatter) +
-				"&bNewForm=1";
+				"&start_time=" + appointment.getStartTime().format(timeFormatterWithSeconds) +
+				"&bNewForm=1" + referralNoParameter;
 		}
 		catch(UnsupportedEncodingException e)
 		{
@@ -520,10 +569,10 @@ public class AppointmentDisplayController
 
 		if (appointment.getReason() != null && !appointment.getReason().isEmpty())
 		{
-			title += "- " + StringEscapeUtils.escapeHtml(appointment.getReason() + "\n");
+			title += " - " + StringEscapeUtils.escapeHtml(appointment.getReason());
 		}
 
-		title += "notes: " + StringEscapeUtils.escapeHtml(appointment.getNotes());
+		title += "\nnotes: " + StringEscapeUtils.escapeHtml(appointment.getNotes());
 
 		return " title=\"" + title + "\"";
 	}
@@ -659,6 +708,16 @@ public class AppointmentDisplayController
 		return appointment.getDemographicNo().toString();
 	}
 
+	public String getDemographicHin() 
+	{ 
+		return appointment.getHin(); 
+	}
+
+	public String getDemographicChartNo() 
+	{ 
+		return appointment.getChart_no(); 
+	}
+
 	public boolean isShowVerLink()
 	{
 		return "##".equals(appointment.getVer());
@@ -678,6 +737,7 @@ public class AppointmentDisplayController
 	{
 		return ROSTER_STATUS_RO.equalsIgnoreCase(appointment.getRosterStatus());
 	}
+
 	public boolean isShowNRorPLRosterLink()
 	{
 		return (

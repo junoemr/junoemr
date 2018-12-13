@@ -29,7 +29,7 @@
 <%@page import="org.oscarehr.common.model.Provider"%>
 <%@page import="org.oscarehr.common.model.Demographic"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
-<%@page import="org.oscarehr.util.HinValidator"%>
+<%@page import="org.oscarehr.demographic.util.HinValidator"%>
 
 <%@include file="/layouts/caisi_html_top2.jspf"%>
 

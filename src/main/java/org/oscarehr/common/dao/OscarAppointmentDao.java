@@ -810,6 +810,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  d.year_of_birth,\n" +
 				"  d.month_of_birth,\n" +
 				"  d.date_of_birth,\n" +
+				"  d.hin,\n" +
+				"  d.chart_no,\n" +
 				"  dc.content AS cust_notes,\n" +
 				"  dc.cust3 AS cust_alert,\n" +
 				"  p.value AS color_property,\n" +
@@ -823,7 +825,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  ON d.provider_no = p.provider_no AND p.name = :property_name\n" +
 				"LEFT JOIN tickler t \n" +
 				"  ON d.demographic_no = t.demographic_no \n" +
-				"  AND t.service_date <= a.appointment_date \n" +
+				"  AND DATE(t.service_date) <= a.appointment_date \n" +
 				"  AND t.status = 'A'\n" +
 				"WHERE a.appointment_date >= :startDate\n" +
 				"AND a.appointment_date <= :endDate\n" +
@@ -864,6 +866,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  d.year_of_birth,\n" +
 				"  d.month_of_birth,\n" +
 				"  d.date_of_birth,\n" +
+				"  d.hin,\n" +
+				"  d.chart_no,\n" +
 				"  dc.content,\n" +
 				"  dc.cust3,\n" +
 				"  p.value\n" +
@@ -916,6 +920,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 			String yearOfBirth = (String) result[index++];
 			String monthOfBirth = (String) result[index++];
 			String dayOfBirth = (String) result[index++];
+			String hin = (String) result[index++];
+			String chartNo = (String) result[index++];
 			String custNotes = (String) result[index++];
 			String custAlert = (String) result[index++];
 			String colorProperty = (String) result[index++];
@@ -983,6 +989,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				firstName,
 				lastName,
 				ver,
+				hin,
+				chartNo,
 				rosterStatus,
 				hcRenewDate,
 				custNotes,

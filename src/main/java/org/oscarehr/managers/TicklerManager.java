@@ -91,6 +91,7 @@ public class TicklerManager {
 	private static final String PRIVILEGE_READ = "r";
 	private static final String PRIVILEGE_WRITE = "w";
 	private static final String PRIVILEGE_UPDATE = "u";
+	private static final String SYSTEM_USER_PROVIDER_NO = "-1";
 	
 	@Autowired
 	private ProgramAccessDAO programAccessDAO;
@@ -735,8 +736,12 @@ public class TicklerManager {
 
 
           private void checkPrivilege(LoggedInInfo loggedInInfo, String privilege) {
-      		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_tickler", privilege, null)) {
-    			throw new RuntimeException("missing required security object (_tickler)");
-    		}
+      		if (!SYSTEM_USER_PROVIDER_NO.equals(loggedInInfo.getLoggedInProviderNo()))
+			{
+				if (!securityInfoManager.hasPrivilege(loggedInInfo, "_tickler", privilege, null))
+				{
+					throw new RuntimeException("missing required security object (_tickler)");
+				}
+			}
           }
 }
