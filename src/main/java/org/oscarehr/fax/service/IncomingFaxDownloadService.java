@@ -78,8 +78,7 @@ public class IncomingFaxDownloadService
 				SRFaxApiConnector srFaxApiConnector = new SRFaxApiConnector(faxAccount.getLoginId(), faxAccount.getLoginPassword());
 
 				// get list of un-downloaded faxes from external api
-				ListWrapper<GetFaxInboxResult> listResultWrapper = srFaxApiConnector.Get_Fax_Inbox(
-						SRFaxApiConnector.RESPONSE_FORMAT_JSON,
+				ListWrapper<GetFaxInboxResult> listResultWrapper = srFaxApiConnector.getFaxInbox(
 						SRFaxApiConnector.PERIOD_RANGE,
 						startDate,
 						endDate,
@@ -123,13 +122,8 @@ public class IncomingFaxDownloadService
 				String referenceIdStr = result.getDetailsId();
 
 				// for each new fax to get, call api and request document.
-				SingleWrapper<String> getDocResultWrapper = srFaxApiConnector.Retrieve_Fax(null,
-						referenceIdStr,
-						SRFaxApiConnector.RETRIEVE_DIRECTION_IN,
-						SRFaxApiConnector.RETRIEVE_DOC_FORMAT,
-						SRFaxApiConnector.RETRIEVE_DONT_CHANGE_STATUS,
-						SRFaxApiConnector.RESPONSE_FORMAT_JSON,
-						null);
+				SingleWrapper<String> getDocResultWrapper = srFaxApiConnector.retrieveFax(null,
+						referenceIdStr, SRFaxApiConnector.RETRIEVE_DIRECTION_IN);
 
 				if(getDocResultWrapper.isSuccess())
 				{
@@ -139,11 +133,10 @@ public class IncomingFaxDownloadService
 					logStatus = LogConst.STATUS_SUCCESS;
 
 					// mark the fax as downloaded if the download/save is successful
-					SingleWrapper<String> markReadResultWrapper = srFaxApiConnector.Update_Viewed_Status(null,
+					SingleWrapper<String> markReadResultWrapper = srFaxApiConnector.updateViewedStatus(null,
 							referenceIdStr,
 							SRFaxApiConnector.RETRIEVE_DIRECTION_IN,
-							SRFaxApiConnector.MARK_AS_READ,
-							SRFaxApiConnector.RESPONSE_FORMAT_JSON);
+							SRFaxApiConnector.MARK_AS_READ);
 					if(!markReadResultWrapper.isSuccess())
 					{
 						logger.error("Failed to mark fax("+referenceIdStr+") as read. " + markReadResultWrapper.getError());

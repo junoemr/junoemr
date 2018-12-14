@@ -83,12 +83,7 @@ public class FaxAccountService
 		SRFaxApiConnector apiConnector = new SRFaxApiConnector(accountId, password);
 		String currentDateStr = ConversionUtils.toDateString(LocalDate.now(), SRFaxApiConnector.DATE_FORMAT);
 
-		ListWrapper<GetUsageResult> result = apiConnector.Get_Fax_Usage(
-				SRFaxApiConnector.RESPONSE_FORMAT_JSON,
-				SRFaxApiConnector.PERIOD_RANGE,
-				currentDateStr,
-				currentDateStr,
-				null);
+		ListWrapper<GetUsageResult> result = apiConnector.getFaxUsageByRange(currentDateStr, currentDateStr, null);
 
 		logger.info(String.valueOf(result));
 
@@ -125,7 +120,7 @@ public class FaxAccountService
 		if(!referenceIdList.isEmpty())
 		{
 			// ask srfax for information on the outbound faxes that were successfully sent to srfax
-			ListWrapper<GetFaxStatusResult> resultList = apiConnector.Get_MultiFaxStatus(referenceIdList, SRFaxApiConnector.RESPONSE_FORMAT_JSON);
+			ListWrapper<GetFaxStatusResult> resultList = apiConnector.getMultiFaxStatus(referenceIdList);
 			logger.debug(resultList);
 
 			// if the api response is a success, map the results
@@ -153,7 +148,7 @@ public class FaxAccountService
 			FaxOutboxTransferOutbound transfer = FaxTransferConverter.getAsOutboxTransferObject(faxAccount, faxOutbound);
 
 			// add the data from srfax on relevant objects
-			if(FaxOutbound.Status.SENT.equals(faxOutbound.getStatus()))
+			if(faxOutbound.isStatusSent())
 			{
 				GetFaxStatusResult apiResult = statusResultMap.get(String.valueOf(faxOutbound.getExternalReferenceId()));
 				if(apiResult != null)

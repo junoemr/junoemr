@@ -66,8 +66,9 @@ public class OutgoingFaxService
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarProperties props = OscarProperties.getInstance();
 
+	private static final String DEFAULT_MAX_SEND_COUNT = "5";
 	private static HashMap<Long, Integer> faxAttemptCounterMap = new HashMap<>();
-	private static int MAX_SEND_COUNT = Integer.parseInt(props.getProperty("fax.max_send_attempts", "5"));
+	private static int MAX_SEND_COUNT = Integer.parseInt(props.getProperty("fax.max_send_attempts", DEFAULT_MAX_SEND_COUNT));
 
 	@Autowired
 	FaxOutboundDao faxOutboundDao;
@@ -178,7 +179,7 @@ public class OutgoingFaxService
 			throw new RuntimeException("Attempt to resend fax with invalid status: " + faxOutbound.getStatus().name());
 		}
 		fileToResend.moveToOutgoingFaxPending();
-		faxOutbound.setStatus(FaxOutbound.Status.QUEUED);
+		faxOutbound.setStatusQueued();
 
 		sendQueuedFax(faxOutbound, fileToResend);
 		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
@@ -252,7 +253,7 @@ public class OutgoingFaxService
 	                                FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException
 	{
 		FaxOutbound faxOutbound = new FaxOutbound();
-		faxOutbound.setStatus(FaxOutbound.Status.QUEUED);
+		faxOutbound.setStatusQueued();
 		faxOutbound.setFaxAccount(faxAccount);
 		faxOutbound.setSentTo(faxNumber);
 		faxOutbound.setExternalAccountType(faxAccount.getIntegrationType());
@@ -288,25 +289,12 @@ public class OutgoingFaxService
 			fileMap.put(fileToFax.getName(), toBase64String(fileToFax));
 
 			// external api call
-			SingleWrapper<Integer> resultWrapper = apiConnector.Queue_Fax(
+			SingleWrapper<Integer> resultWrapper = apiConnector.queueFax(
 					faxAccount.getReplyFaxNumber(),
 					faxAccount.getEmail(),
-					SRFaxApiConnector.FAX_TYPE_SINGLE,
 					faxOutbound.getSentTo(),
 					fileMap,
-					SRFaxApiConnector.RESPONSE_FORMAT_JSON,
-					null,
-					null,
-					coverLetterOption,
-					null,
-					null,
-					null,
-					null,
-					null,
-					null,
-					null,
-					null,
-					null
+					coverLetterOption
 			);
 			boolean sendSuccess = resultWrapper.isSuccess();
 
@@ -319,7 +307,7 @@ public class OutgoingFaxService
 				if(sendSuccess)
 				{
 					logger.info("Fax send success " + String.valueOf(resultWrapper.getResult()));
-					faxOutbound.setStatus(FaxOutbound.Status.SENT);
+					faxOutbound.setStatusSent();
 					faxOutbound.setStatusMessage(null);
 					faxOutbound.setExternalReferenceId(resultWrapper.getResult().longValue());
 					logStatus = LogConst.STATUS_SUCCESS;
@@ -329,7 +317,7 @@ public class OutgoingFaxService
 				else
 				{
 					logger.warn("Fax send failure " + resultWrapper.getError());
-					faxOutbound.setStatus(FaxOutbound.Status.ERROR);
+					faxOutbound.setStatusError();
 					faxOutbound.setStatusMessage(resultWrapper.getError());
 					logData = resultWrapper.getError();
 					fileToFax.moveToOutgoingFaxUnsent();
@@ -352,7 +340,7 @@ public class OutgoingFaxService
 			// if the maximum sent attempts has been hit, set the error status.
 			if(faxAttemptCounterMap.get(faxOutbound.getId()) >= MAX_SEND_COUNT)
 			{
-				faxOutbound.setStatus(FaxOutbound.Status.ERROR);
+				faxOutbound.setStatusError();
 				faxOutbound.setStatusMessage(e.getMessage());
 			}
 		}
@@ -360,14 +348,14 @@ public class OutgoingFaxService
 		{
 			logger.warn("Fax API failure: " + e.getMessage());
 			logData = e.getMessage();
-			faxOutbound.setStatus(FaxOutbound.Status.ERROR);
+			faxOutbound.setStatusError();
 			faxOutbound.setStatusMessage(e.getMessage());
 		}
 		catch(Exception e)
 		{
 			logger.error("Unknown error sending queued fax", e);
 			logData = "System Error";
-			faxOutbound.setStatus(FaxOutbound.Status.ERROR);
+			faxOutbound.setStatusError();
 			faxOutbound.setStatusMessage(e.getMessage());
 		}
 		finally

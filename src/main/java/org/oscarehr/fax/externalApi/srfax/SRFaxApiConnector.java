@@ -139,7 +139,7 @@ public class SRFaxApiConnector
 		this.access_pwd = password;
 	}
 
-	private SingleWrapper<Integer> Queue_Fax(Map<String, String> parameters)
+	private SingleWrapper<Integer> queueFax(Map<String, String> parameters)
 	{
 		String[] requiredFields = {S_CALLER_ID, S_SENDER_EMAIL, S_FAX_TYPE, S_TO_FAX_NUMBER};
 		String[] optionalFields = {
@@ -152,21 +152,22 @@ public class SRFaxApiConnector
 		return processSingleResponse(result);
 	}
 
-	public SingleWrapper<Integer> Queue_Fax(String sCallerID, String sSenderEmail, String sFaxType, String sToFaxNumber,
-	                                        Map<String,String> sFileMap,
-	                                        String sResponseFormat,
-	                                        String sAccountCode,
-	                                        String sRetries,
-	                                        String sCoverPage,
-	                                        String sCPFromName,
-	                                        String sCPToName,
-	                                        String sCPOrganization,
-	                                        String sCPSubject,
-	                                        String sCPComments,
-	                                        String sNotifyURL,
-	                                        String sFaxFromHeader,
-	                                        String sQueueFaxDate,
-	                                        String sQueueFaxTime)
+	/** Queue a fax (all available api options)*/
+	public SingleWrapper<Integer> queueFax(String sCallerID, String sSenderEmail, String sFaxType, String sToFaxNumber,
+	                                       Map<String,String> sFileMap,
+	                                       String sResponseFormat,
+	                                       String sAccountCode,
+	                                       String sRetries,
+	                                       String sCoverPage,
+	                                       String sCPFromName,
+	                                       String sCPToName,
+	                                       String sCPOrganization,
+	                                       String sCPSubject,
+	                                       String sCPComments,
+	                                       String sNotifyURL,
+	                                       String sFaxFromHeader,
+	                                       String sQueueFaxDate,
+	                                       String sQueueFaxTime)
 	{
 		Map<String, String> parameters = new HashMap<>();
 		parameters.put(S_CALLER_ID, sCallerID);
@@ -198,49 +199,81 @@ public class SRFaxApiConnector
 		putIfPresent(parameters, S_QUEUE_FAX_DATE, sQueueFaxDate);
 		putIfPresent(parameters, S_QUEUE_FAX_TIME, sQueueFaxTime);
 
-		return Queue_Fax(parameters);
+		return queueFax(parameters);
+	}
+	/** Queue a standard fax with all cover letter options*/
+	public SingleWrapper<Integer> queueFax(String sCallerID, String sSenderEmail, String sToFaxNumber,
+	                                       Map<String,String> sFileMap,
+	                                       String sCoverPage,
+	                                       String sCPFromName,
+	                                       String sCPToName,
+	                                       String sCPOrganization,
+	                                       String sCPSubject,
+	                                       String sCPComments,
+	                                       String sFaxFromHeader)
+	{
+		return queueFax(sCallerID, sSenderEmail, FAX_TYPE_SINGLE, sToFaxNumber, sFileMap, RESPONSE_FORMAT_JSON, null, null,
+				sCoverPage, sCPFromName, sCPToName, sCPOrganization, sCPSubject, sCPComments, null, sFaxFromHeader, null, null);
 	}
 
-	private SingleWrapper<GetFaxStatusResult> Get_FaxStatus(Map<String, String> parameters)
+	/** Queue a standard fax with basic cover letter */
+	public SingleWrapper<Integer> queueFax(String sCallerID, String sSenderEmail, String sToFaxNumber, Map<String,String> sFileMap, String sCoverPage)
+	{
+		return queueFax(sCallerID, sSenderEmail, FAX_TYPE_SINGLE, sToFaxNumber, sFileMap, RESPONSE_FORMAT_JSON, null, null,
+				sCoverPage, null, null, null, null, null, null, null, null, null);
+	}
+
+	/** Queue a standard fax with no cover letter */
+	public SingleWrapper<Integer> queueFax(String sCallerID, String sSenderEmail, String sToFaxNumber, Map<String,String> sFileMap)
+	{
+		return queueFax(sCallerID, sSenderEmail, FAX_TYPE_SINGLE, sToFaxNumber, sFileMap, RESPONSE_FORMAT_JSON, null, null,
+				null, null, null, null, null, null, null, null, null, null);
+	}
+
+	private SingleWrapper<GetFaxStatusResult> getFaxStatus(Map<String, String> parameters)
 	{
 		String[] requiredFields = {S_FAX_DETAILS_ID};
 		String[] optionalFields = {S_RESPONSE_FORMAT};
 		String result = processRequest(ACTION_GET_FAX_STATUS, requiredFields, optionalFields, parameters);
 		return processSingleResponse(result);
 	}
-	public SingleWrapper<GetFaxStatusResult> Get_FaxStatus(String sFaxDetailsID, String sResponseFormat)
+	public SingleWrapper<GetFaxStatusResult> getFaxStatus(String sFaxDetailsID, String sResponseFormat)
 	{
 		Map<String, String> parameters = new HashMap<>();
 		parameters.put(S_FAX_DETAILS_ID, sFaxDetailsID);
 		parameters.put(S_RESPONSE_FORMAT, sResponseFormat);
-		return Get_FaxStatus(parameters);
+		return getFaxStatus(parameters);
 	}
 
-	private ListWrapper<GetFaxStatusResult> Get_MultiFaxStatus(Map<String, String> parameters)
+	private ListWrapper<GetFaxStatusResult> getMultiFaxStatus(Map<String, String> parameters)
 	{
 		String[] requiredFields = {S_FAX_DETAILS_ID};
 		String[] optionalFields = {S_RESPONSE_FORMAT};
 		String result = processRequest(ACTION_GET_MULTI_FAX_STATUS, requiredFields, optionalFields, parameters);
 		return processListResponse(result, new TypeReference<ListWrapper<GetFaxStatusResult>>(){});
 	}
-	public ListWrapper<GetFaxStatusResult> Get_MultiFaxStatus(List<String> sFaxDetailsIDList, String sResponseFormat)
+	public ListWrapper<GetFaxStatusResult> getMultiFaxStatus(List<String> sFaxDetailsIDList, String sResponseFormat)
 	{
 		Map<String, String> parameters = new HashMap<>();
 		parameters.put(S_FAX_DETAILS_ID, String.join("|", sFaxDetailsIDList));
 		parameters.put(S_RESPONSE_FORMAT, sResponseFormat);
-		return Get_MultiFaxStatus(parameters);
+		return getMultiFaxStatus(parameters);
+	}
+	public ListWrapper<GetFaxStatusResult> getMultiFaxStatus(List<String> sFaxDetailsIDList)
+	{
+		return getMultiFaxStatus(sFaxDetailsIDList, RESPONSE_FORMAT_JSON);
 	}
 
-	private ListWrapper<GetFaxInboxResult> Get_Fax_Inbox(Map<String, String> parameters)
+	private ListWrapper<GetFaxInboxResult> getFaxInbox(Map<String, String> parameters)
 	{
 		String[] requiredFields = {};
 		String[] optionalFields = {S_RESPONSE_FORMAT, S_PERIOD, S_START_DATE, S_END_DATE, S_VIEWED_STATUS, S_INCLUDE_SUB_USERS};
 		String result = processRequest(ACTION_GET_FAX_INBOX, requiredFields, optionalFields, parameters);
 		return processListResponse(result, new TypeReference<ListWrapper<GetFaxInboxResult>>(){});
 	}
-	public ListWrapper<GetFaxInboxResult> Get_Fax_Inbox(String sResponseFormat, String sPeriod,
-	                                                     String sStartDate, String sEndDate, String sViewedStatus,
-	                                                     String sIncludeSubUsers)
+	public ListWrapper<GetFaxInboxResult> getFaxInbox(String sResponseFormat, String sPeriod,
+	                                                  String sStartDate, String sEndDate, String sViewedStatus,
+	                                                  String sIncludeSubUsers)
 	{
 		Map<String, String> parameters = new HashMap<>();
 		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
@@ -249,19 +282,25 @@ public class SRFaxApiConnector
 		putIfPresent(parameters, S_END_DATE, sEndDate);
 		putIfPresent(parameters, S_VIEWED_STATUS, sViewedStatus);
 		putIfPresent(parameters, S_INCLUDE_SUB_USERS, sIncludeSubUsers);
-		return Get_Fax_Inbox(parameters);
+		return getFaxInbox(parameters);
 	}
 
-	private ListWrapper<GetFaxOutboxResult> Get_Fax_Outbox(Map<String, String> parameters)
+	public ListWrapper<GetFaxInboxResult> getFaxInbox(String sPeriod, String sStartDate, String sEndDate, String sViewedStatus,
+	                                                  String sIncludeSubUsers)
+	{
+		return getFaxInbox(RESPONSE_FORMAT_JSON, sPeriod, sStartDate, sEndDate, sViewedStatus, sIncludeSubUsers);
+	}
+
+	private ListWrapper<GetFaxOutboxResult> getFaxOutbox(Map<String, String> parameters)
 	{
 		String[] requiredFields = {};
 		String[] optionalFields = {S_RESPONSE_FORMAT, S_PERIOD, S_START_DATE, S_END_DATE, S_INCLUDE_SUB_USERS};
 		String result = processRequest(ACTION_GET_FAX_OUTBOX, requiredFields, optionalFields, parameters);
 		return processListResponse(result, new TypeReference<ListWrapper<GetFaxOutboxResult>>(){});
 	}
-	public ListWrapper<GetFaxOutboxResult> Get_Fax_Outbox(String sResponseFormat, String sPeriod,
-	                                                     String sStartDate, String sEndDate,
-	                                                     String sIncludeSubUsers)
+	public ListWrapper<GetFaxOutboxResult> getFaxOutbox(String sResponseFormat, String sPeriod,
+	                                                    String sStartDate, String sEndDate,
+	                                                    String sIncludeSubUsers)
 	{
 		Map<String, String> parameters = new HashMap<>();
 		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
@@ -269,18 +308,18 @@ public class SRFaxApiConnector
 		putIfPresent(parameters, S_START_DATE, sStartDate);
 		putIfPresent(parameters, S_END_DATE, sEndDate);
 		putIfPresent(parameters, S_INCLUDE_SUB_USERS, sIncludeSubUsers);
-		return Get_Fax_Outbox(parameters);
+		return getFaxOutbox(parameters);
 	}
 
-	private SingleWrapper<String> Retrieve_Fax(Map<String, String> parameters)
+	private SingleWrapper<String> retrieveFax(Map<String, String> parameters)
 	{
 		String[] requiredFields = {S_FAX_FILE_NAME + "|" + S_FAX_DETAILS_ID, S_DIRECTION};
 		String[] optionalFields = {S_FAX_FORMAT, S_MARKAS_VIEWED, S_RESPONSE_FORMAT, S_SUB_USER_ID};
 		String result = processRequest(ACTION_RETRIEVE_FAX, requiredFields, optionalFields, parameters);
 		return processSingleResponse(result);
 	}
-	public SingleWrapper<String> Retrieve_Fax(String sFaxFileName, String sFaxDetailsID, String sDirection,
-	                                           String sFaxFormat, String sMarkasViewed, String sResponseFormat, String sSubUserID)
+	public SingleWrapper<String> retrieveFax(String sFaxFileName, String sFaxDetailsID, String sDirection,
+	                                         String sFaxFormat, String sMarkasViewed, String sResponseFormat, String sSubUserID)
 	{
 		Map<String, String> parameters = new HashMap<>();
 		putIfPresent(parameters, S_FAX_FILE_NAME, sFaxFileName);
@@ -290,18 +329,23 @@ public class SRFaxApiConnector
 		putIfPresent(parameters, S_MARKAS_VIEWED, sMarkasViewed);
 		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
 		putIfPresent(parameters, S_SUB_USER_ID, sSubUserID);
-		return Retrieve_Fax(parameters);
+		return retrieveFax(parameters);
 	}
 
-	private SingleWrapper<String> Update_Viewed_Status(Map<String, String> parameters)
+	public SingleWrapper<String> retrieveFax(String sFaxFileName, String sFaxDetailsID, String sDirection)
+	{
+		return retrieveFax(sFaxFileName, sFaxDetailsID, sDirection, RETRIEVE_DOC_FORMAT, RETRIEVE_DONT_CHANGE_STATUS, RESPONSE_FORMAT_JSON, null);
+	}
+
+	private SingleWrapper<String> updateViewedStatus(Map<String, String> parameters)
 	{
 		String[] requiredFields = {S_FAX_FILE_NAME + "|" + S_FAX_DETAILS_ID, S_DIRECTION, S_MARKAS_VIEWED};
 		String[] optionalFields = {S_RESPONSE_FORMAT};
 		String result = processRequest(ACTION_UPDATE_VIEWED_STATUS, requiredFields, optionalFields, parameters);
 		return processSingleResponse(result);
 	}
-	public SingleWrapper<String> Update_Viewed_Status(String sFaxFileName, String sFaxDetailsID, String sDirection,
-	                                                  String sMarkasViewed, String sResponseFormat)
+	public SingleWrapper<String> updateViewedStatus(String sFaxFileName, String sFaxDetailsID, String sDirection,
+	                                                String sMarkasViewed, String sResponseFormat)
 	{
 		Map<String, String> parameters = new HashMap<>();
 		putIfPresent(parameters, S_FAX_FILE_NAME, sFaxFileName);
@@ -309,42 +353,47 @@ public class SRFaxApiConnector
 		putIfPresent(parameters, S_DIRECTION, sDirection);
 		putIfPresent(parameters, S_MARKAS_VIEWED, sMarkasViewed);
 		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
-		return Update_Viewed_Status(parameters);
+		return updateViewedStatus(parameters);
 	}
 
-	private SingleWrapper<String> Delete_Fax(Map<String, String> parameters)
+	public SingleWrapper<String> updateViewedStatus(String sFaxFileName, String sFaxDetailsID, String sDirection, String sMarkasViewed)
+	{
+		return updateViewedStatus(sFaxFileName, sFaxDetailsID, sDirection, sMarkasViewed, RESPONSE_FORMAT_JSON);
+	}
+
+	private SingleWrapper<String> deleteFax(Map<String, String> parameters)
 	{
 		String[] requiredFields = {S_DIRECTION, S_FAX_FILE_NAME + "_*|" + S_FAX_DETAILS_ID + "_*"};
 		String[] optionalFields = {S_RESPONSE_FORMAT};
 		String result = processRequest(ACTION_DELETE_FAX, requiredFields, optionalFields, parameters);
 		return processSingleResponse(result);
 	}
-	public SingleWrapper<String> Delete_Fax(String sDirection, String sFaxFileName, String sFaxDetailsID, String sResponseFormat)
+	public SingleWrapper<String> deleteFax(String sDirection, String sFaxFileName, String sFaxDetailsID, String sResponseFormat)
 	{
 		Map<String, String> parameters = new HashMap<>();
 		putIfPresent(parameters, S_FAX_FILE_NAME, sFaxFileName);
 		putIfPresent(parameters, S_FAX_DETAILS_ID, sFaxDetailsID);
 		putIfPresent(parameters, S_DIRECTION, sDirection);
 		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
-		return Delete_Fax(parameters);
+		return deleteFax(parameters);
 	}
 
-	private SingleWrapper<String> Stop_Fax(Map<String, String> parameters)
+	private SingleWrapper<String> stopFax(Map<String, String> parameters)
 	{
 		String[] requiredFields = {S_FAX_DETAILS_ID};
 		String[] optionalFields = {S_RESPONSE_FORMAT};
 		String result = processRequest(ACTION_STOP_FAX, requiredFields, optionalFields, parameters);
 		return processSingleResponse(result);
 	}
-	public SingleWrapper<String> Stop_Fax(String sFaxDetailsID, String sResponseFormat)
+	public SingleWrapper<String> stopFax(String sFaxDetailsID, String sResponseFormat)
 	{
 		Map<String, String> parameters = new HashMap<>();
 		putIfPresent(parameters, S_FAX_DETAILS_ID, sFaxDetailsID);
 		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
-		return Stop_Fax(parameters);
+		return stopFax(parameters);
 	}
 
-	private ListWrapper<GetUsageResult> Get_Fax_Usage(Map<String, String> parameters)
+	private ListWrapper<GetUsageResult> getFaxUsage(Map<String, String> parameters)
 	{
 		String[] requiredFields = {};
 		String[] optionalFields = {S_RESPONSE_FORMAT, S_PERIOD, S_START_DATE, S_END_DATE, S_INCLUDE_SUB_USERS};
@@ -352,7 +401,7 @@ public class SRFaxApiConnector
 		return processListResponse(result, new TypeReference<ListWrapper<GetUsageResult>>(){});
 	}
 
-	public ListWrapper<GetUsageResult> Get_Fax_Usage(String sResponseFormat, String sPeriod, String sStartDate, String sEndDate, String sIncludeSubUsers)
+	public ListWrapper<GetUsageResult> getFaxUsage(String sResponseFormat, String sPeriod, String sStartDate, String sEndDate, String sIncludeSubUsers)
 	{
 		Map<String, String> parameters = new HashMap<>();
 		putIfPresent(parameters, S_RESPONSE_FORMAT, sResponseFormat);
@@ -360,7 +409,12 @@ public class SRFaxApiConnector
 		putIfPresent(parameters, S_START_DATE, sStartDate);
 		putIfPresent(parameters, S_END_DATE, sEndDate);
 		putIfPresent(parameters, S_INCLUDE_SUB_USERS, sIncludeSubUsers);
-		return Get_Fax_Usage(parameters);
+		return getFaxUsage(parameters);
+	}
+
+	public ListWrapper<GetUsageResult> getFaxUsageByRange(String sStartDate, String sEndDate, String sIncludeSubUsers)
+	{
+		return getFaxUsage(RESPONSE_FORMAT_JSON, PERIOD_RANGE, sStartDate, sEndDate, sIncludeSubUsers);
 	}
 
 	/*******************INTERNAL FUNCTIONS*********************************/

@@ -134,6 +134,21 @@ public class FaxOutbound extends AbstractModel<Long>
 		this.status = status;
 	}
 
+	public void setStatusSent()
+	{
+		setStatus(Status.SENT);
+	}
+
+	public void setStatusQueued()
+	{
+		setStatus(Status.QUEUED);
+	}
+
+	public void setStatusError()
+	{
+		setStatus(Status.ERROR);
+	}
+
 	public boolean isStatusSent()
 	{
 		return Status.SENT.equals(getStatus());
