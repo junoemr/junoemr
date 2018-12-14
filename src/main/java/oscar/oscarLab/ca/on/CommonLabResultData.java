@@ -38,6 +38,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
+import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.billing.CA.BC.dao.Hl7MshDao;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicLabResult;
 import org.oscarehr.caisi_integrator.ws.DemographicWs;
@@ -428,18 +429,26 @@ public class CommonLabResultData {
 		}
 	}
 
-	public ArrayList<ReportStatus> getStatusArray(String labId, String labType) {
+	public ArrayList<ReportStatus> getStatusArray(String labId, String labType)
+	{
 		ArrayList<ReportStatus> statusArray = new ArrayList<ReportStatus>();
 		ProviderLabRoutingDao dao = SpringUtils.getBean(ProviderLabRoutingDao.class);
-		for(Object[] i : dao.getProviderLabRoutings(ConversionUtils.fromIntString(labId), labType)) {
-			Provider p = (Provider) i[0];
-			ProviderLabRoutingModel m = (ProviderLabRoutingModel) i[1]; 
-			statusArray.add(new ReportStatus(p.getFullName(), 
-					p.getProviderNo(), 
-					descriptiveStatus(m.getStatus()), 
-					m.getComment(), 
-					ConversionUtils.toTimestampString(m.getTimestamp()), 
-					labId));
+		ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+		List<ProviderLabRoutingModel> providerLabRoutings = dao.getProviderLabRoutings(ConversionUtils.fromIntString(labId), labType);
+		for (ProviderLabRoutingModel routings : providerLabRoutings)
+		{
+			Provider provider = providerDao.getProvider(routings.getProviderNo());
+
+			// Provider can be null. For example, the unclaimed inbox has a route for provider 0 which will never match to an actual provider record
+			if (provider != null)
+			{
+				statusArray.add(new ReportStatus(provider.getFullName(),
+						provider.getProviderNo(),
+						descriptiveStatus(routings.getStatus()),
+						routings.getComment(),
+						ConversionUtils.toTimestampString(routings.getTimestamp()),
+						labId));
+			}
 		}
 		return statusArray;
 	}

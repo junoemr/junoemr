@@ -51,12 +51,14 @@ import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
+import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.OtherId;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.model.OLISSystemPreferences;
@@ -414,6 +416,7 @@ public final class MessageUploader {
 	private static void providerRouteReport(String labId, ArrayList<String> docNums, Connection conn, String altProviderNo, String labType, String search_on, Integer limit, boolean orderByLength) throws Exception {
 		ArrayList<String> providerNums = new ArrayList<String>();
 		String sqlSearchOn = "ohip_no";
+		String routeToProvider = OscarProperties.getInstance().getProperty("route_labs_to_provider", "");
 		
 		if (search_on != null && search_on.length() > 0) {
 			sqlSearchOn = search_on;
@@ -434,6 +437,34 @@ public final class MessageUploader {
 						if(otherId != null) {
 							providerNums.add(otherId.getTableId());
 						}
+					}
+				}
+			}
+		}
+
+		// If we're not routing all labs to the unclaimed inbox, then route to all providers assigned to the most recent version of the lab
+		if (!Provider.UNCLAIMED_PROVIDER_NO.equals(routeToProvider))
+		{
+			//If the lab is a new version for an already existing lab, route to providers already assigned to previous versions of this lab
+			ProviderLabRoutingDao providerLabRoutingDao = (ProviderLabRoutingDao) SpringUtils.getBean(ProviderLabRoutingDao.class);
+			String labNumberCSV = Hl7textResultsData.getMatchingLabs(labId);
+
+			//Loop through each lab version and find all providers assigned to each lab version. Add that provider to the newest version of the lab
+			if (labNumberCSV != null && !labNumberCSV.equals(""))
+			{
+				String[] labsNumbers = labNumberCSV.split(",");
+
+				//Get the lab version before the latest version. The latest version has already been inserted into the hl7TextInfo table at this point
+				//so we need to get the second most recent version
+				if (labsNumbers.length > 1)
+				{
+					String previousLabVersion = labsNumbers[labsNumbers.length - 2];
+
+					List<ProviderLabRoutingModel> providerLabRoutings = providerLabRoutingDao.getProviderLabRoutings(Integer.parseInt(previousLabVersion), "HL7");
+
+					for (int j = 0; j < providerLabRoutings.size(); j++)
+					{
+						providerNums.add(providerLabRoutings.get(j).getProviderNo());
 					}
 				}
 			}
