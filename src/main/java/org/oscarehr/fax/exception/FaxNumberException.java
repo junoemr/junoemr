@@ -22,10 +22,14 @@
  */
 package org.oscarehr.fax.exception;
 
-public class FaxNumberException extends RuntimeException
+public class FaxNumberException extends FaxException
 {
 	public FaxNumberException(String message)
 	{
 		super(message);
+	}
+	public FaxNumberException(String message, String userFriendlyMessage)
+	{
+		super(message, userFriendlyMessage);
 	}
 }

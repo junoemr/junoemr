@@ -23,6 +23,7 @@
 package org.oscarehr.ws.rest;
 
 import org.apache.log4j.Logger;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
@@ -153,7 +154,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		FaxAccount faxAccount = faxAccountDao.find(id);
 		if(faxAccount == null)
 		{
-			throw new RuntimeException("Invalid Fax Config Id: " + id);
+			throw new ResourceNotFoundException("Invalid Fax Config Id: " + id);
 		}
 
 		// keep current password if a new one is not set

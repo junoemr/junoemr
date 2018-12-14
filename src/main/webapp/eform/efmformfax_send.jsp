@@ -8,13 +8,14 @@
     and "gnu.org/licenses/gpl-2.0.html".
 
 --%>
-<%@page import="org.oscarehr.fax.model.FaxOutbound"%>
+<%@page import="org.oscarehr.fax.exception.FaxException"%>
 <%@ page language="java"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 
-<%@page import="org.oscarehr.util.MiscUtils"%>
+<%@page import="org.oscarehr.fax.model.FaxOutbound"%>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound" %>
 <%@ page import="oscar.eform.actions.FaxAction" %>
 <%@ page import="java.util.ArrayList" %>
@@ -46,6 +47,12 @@
 					failed=true;
 				}
 			}
+		}
+		catch(FaxException e)
+		{
+			MiscUtils.getLogger().error("An error occurred while faxing eForm.", e);
+			errorMessages.add(e.getUserFriendlyErrorMessage());
+			failed = true;
 		}
 		catch (Exception e)
 		{

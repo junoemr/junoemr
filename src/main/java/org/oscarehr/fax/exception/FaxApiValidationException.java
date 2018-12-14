@@ -22,11 +22,16 @@
  */
 package org.oscarehr.fax.exception;
 
-public class FaxApiValidationException extends RuntimeException
+public class FaxApiValidationException extends FaxException
 {
 	public FaxApiValidationException(String message)
 	{
 		super(message);
+	}
+
+	public FaxApiValidationException(String message, String userFriendlyMessage)
+	{
+		super(message, userFriendlyMessage);
 	}
 
 	public FaxApiValidationException(Exception e)

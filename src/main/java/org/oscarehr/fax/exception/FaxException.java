@@ -22,20 +22,39 @@
  */
 package org.oscarehr.fax.exception;
 
-public class FaxApiConnectionException extends FaxException
+public class FaxException extends RuntimeException
 {
-	public FaxApiConnectionException(String message)
+	private String userFriendlyErrorMessage = "Unexpected fax error";
+
+	public FaxException(String message)
 	{
 		super(message);
 	}
 
-	public FaxApiConnectionException(Exception e)
+	public FaxException(String message, String userFriendlyMessage)
+	{
+		super(message);
+		setUserFriendlyErrorMessage(userFriendlyMessage);
+	}
+
+	public FaxException(Exception e)
 	{
 		super(e);
 	}
 
-	public FaxApiConnectionException(Exception e, String userFriendlyMessage)
+	public FaxException(Exception e, String userFriendlyMessage)
 	{
-		super(e, userFriendlyMessage);
+		super(e);
+		setUserFriendlyErrorMessage(userFriendlyMessage);
+	}
+
+	public String getUserFriendlyErrorMessage()
+	{
+		return userFriendlyErrorMessage;
+	}
+
+	public void setUserFriendlyErrorMessage(String message)
+	{
+		userFriendlyErrorMessage = message;
 	}
 }

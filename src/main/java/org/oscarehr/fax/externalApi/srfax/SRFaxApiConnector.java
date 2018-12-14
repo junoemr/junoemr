@@ -533,7 +533,7 @@ public class SRFaxApiConnector
 		catch(IOException e)
 		{
 			logger.error("Error", e);
-			throw new FaxApiConnectionException(e);
+			throw new FaxApiConnectionException(e, "Failed to connect to SRFax");
 		}
 		return result;
 	}
@@ -722,7 +722,8 @@ public class SRFaxApiConnector
 			}
 			if(error.length() > 0)
 			{
-				throw new FaxApiValidationException(error);
+				// if this happens, a developer has missed some form of validation or is passing parameters incorrectly
+				throw new FaxApiValidationException(error, "Unexpected fax validation error");
 			}
 		}
 	}

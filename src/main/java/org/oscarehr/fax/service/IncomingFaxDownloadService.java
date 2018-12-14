@@ -84,7 +84,6 @@ public class IncomingFaxDownloadService
 						endDate,
 						SRFaxApiConnector.VIEWED_STATUS_UNREAD,
 						null);
-				logger.info(listResultWrapper.toString()); //TODO - remove when done
 
 				if(listResultWrapper.isSuccess())
 				{
@@ -142,7 +141,6 @@ public class IncomingFaxDownloadService
 						logger.error("Failed to mark fax("+referenceIdStr+") as read. " + markReadResultWrapper.getError());
 						logData = "Failed to mark fax as read: " + markReadResultWrapper.getError();
 					}
-					logger.info(markReadResultWrapper.toString()); //TODO - remove when done
 				}
 				else
 				{

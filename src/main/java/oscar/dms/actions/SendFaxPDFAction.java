@@ -84,19 +84,17 @@ public class SendFaxPDFAction extends DispatchAction {
 	
 		request.setAttribute("docNo", docNoArray);
 		request.setAttribute("faxRecipients", recipients);
+		Set<String> faxNoList = OutgoingFaxService.preProcessFaxNumbers(recipients);
 
-        String ContentDisposition=request.getParameter("ContentDisposition");
+		String ContentDisposition=request.getParameter("ContentDisposition");
         ArrayList<Object> errorList = new ArrayList<Object>();
         if (docNoArray != null)
 		{
 			MiscUtils.getLogger().debug("size = " + docNoArray.length);
 			EDocUtil docData = new EDocUtil();
-            for (int i =0 ; i < docNoArray.length ; i++)
+			for(String docNo : docNoArray)
 			{
-				String docNo = docNoArray[i];
 				String filename =  docData.getDocumentName(docNo);
-
-				Set<String> faxNoList = OutgoingFaxService.preProcessFaxNumbers(recipients);
 				for(String faxNo : faxNoList)
 				{
 					FaxOutboxTransferOutbound transfer;

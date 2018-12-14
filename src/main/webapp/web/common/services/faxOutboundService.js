@@ -38,7 +38,7 @@ angular.module("Common.Services").service("faxOutboundService", [
 		{
 			var deferred = $q.defer();
 
-			junoHttp.post(service.apiPath + '/' + id + '/resend').then(
+			junoHttp.put(service.apiPath + '/' + id + '/resend').then(
 				function success(response)
 				{
 					deferred.resolve(response.data);

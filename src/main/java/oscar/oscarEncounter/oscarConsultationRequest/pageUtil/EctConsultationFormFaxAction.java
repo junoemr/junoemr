@@ -21,6 +21,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tika.io.IOUtils;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.fax.exception.FaxException;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.fax.util.PdfCoverPageCreator;
@@ -241,6 +242,11 @@ public class EctConsultationFormFaxAction extends Action
 			{
 				throw new DocumentException("No faxable objects");
 			}
+		}
+		catch(FaxException e)
+		{
+			logger.error("Error occurred inside ConsultationPrintAction", e);
+			errorList.add(e.getUserFriendlyErrorMessage());
 		}
 		catch(Exception e)
 		{

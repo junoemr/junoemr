@@ -84,8 +84,7 @@ public class FaxAccountService
 		String currentDateStr = ConversionUtils.toDateString(LocalDate.now(), SRFaxApiConnector.DATE_FORMAT);
 
 		ListWrapper<GetUsageResult> result = apiConnector.getFaxUsageByRange(currentDateStr, currentDateStr, null);
-
-		logger.info(String.valueOf(result));
+		logger.debug(String.valueOf(result));
 
 		return (result != null && result.isSuccess());
 	}

@@ -33,7 +33,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.fax.exception.FaxNumberException;
+import org.oscarehr.fax.exception.FaxException;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.LoggedInInfo;
@@ -167,12 +167,18 @@ public class FrmCustomedPDFServlet extends HttpServlet
 			PrintWriter writer = res.getWriter();
 			writer.println("<script>alert('Signature not found. Please sign the prescription.');</script>");
 		}
-		catch(IOException | FaxNumberException e)
+		catch(IOException e)
 	    {
 		    res.setContentType("text/html");
 		    PrintWriter writer = res.getWriter();
 		    writer.println("<script>alert('Error: " + e.getMessage() + "');window.close();</script>");
 	    }
+		catch(FaxException e)
+		{
+			res.setContentType("text/html");
+			PrintWriter writer = res.getWriter();
+			writer.println("<script>alert('Error: " + e.getUserFriendlyErrorMessage() + "');window.close();</script>");
+		}
 		finally
 		{
 			if(baosPDF != null)

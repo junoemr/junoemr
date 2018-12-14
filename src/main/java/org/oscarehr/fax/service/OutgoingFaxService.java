@@ -32,6 +32,7 @@ import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxApiValidationException;
+import org.oscarehr.fax.exception.FaxException;
 import org.oscarehr.fax.exception.FaxNumberException;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
@@ -102,7 +103,7 @@ public class OutgoingFaxService
 			String formattedFaxNo = faxNumber.trim().replaceAll("\\D", "");
 			if(formattedFaxNo.length() < 10)
 			{
-				throw new FaxNumberException("Invalid Fax Number: " + faxNumber);
+				throw new FaxNumberException("Invalid Fax Number: " + faxNumber, "Fax number is too short: " + faxNumber);
 			}
 			if(formattedFaxNo.length() == 10)
 			{
@@ -176,7 +177,7 @@ public class OutgoingFaxService
 		}
 		else
 		{
-			throw new RuntimeException("Attempt to resend fax with invalid status: " + faxOutbound.getStatus().name());
+			throw new FaxException("Attempt to resend fax with invalid status: " + faxOutbound.getStatus().name());
 		}
 		fileToResend.moveToOutgoingFaxPending();
 		faxOutbound.setStatusQueued();
@@ -308,7 +309,7 @@ public class OutgoingFaxService
 				{
 					logger.info("Fax send success " + String.valueOf(resultWrapper.getResult()));
 					faxOutbound.setStatusSent();
-					faxOutbound.setStatusMessage(null);
+					faxOutbound.setStatusMessage("Success");
 					faxOutbound.setExternalReferenceId(resultWrapper.getResult().longValue());
 					logStatus = LogConst.STATUS_SUCCESS;
 					logData = "Faxed To: " + faxOutbound.getSentTo();
@@ -335,13 +336,12 @@ public class OutgoingFaxService
 			// if the api connection fails, leave the fax as queued
 			logger.warn("Fax API failure: " + e.getMessage());
 			logData = e.getMessage();
-			faxOutbound.setStatusMessage(e.getMessage());
+			faxOutbound.setStatusMessage(e.getUserFriendlyErrorMessage());
 
 			// if the maximum sent attempts has been hit, set the error status.
 			if(faxAttemptCounterMap.get(faxOutbound.getId()) >= MAX_SEND_COUNT)
 			{
 				faxOutbound.setStatusError();
-				faxOutbound.setStatusMessage(e.getMessage());
 			}
 		}
 		catch(FaxApiValidationException e)
@@ -349,14 +349,14 @@ public class OutgoingFaxService
 			logger.warn("Fax API failure: " + e.getMessage());
 			logData = e.getMessage();
 			faxOutbound.setStatusError();
-			faxOutbound.setStatusMessage(e.getMessage());
+			faxOutbound.setStatusMessage(e.getUserFriendlyErrorMessage());
 		}
 		catch(Exception e)
 		{
 			logger.error("Unknown error sending queued fax", e);
 			logData = "System Error";
 			faxOutbound.setStatusError();
-			faxOutbound.setStatusMessage(e.getMessage());
+			faxOutbound.setStatusMessage("Unknown error, please contact support");
 		}
 		finally
 		{

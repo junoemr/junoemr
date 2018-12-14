@@ -32,14 +32,14 @@
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-      boolean authed=true;
+      boolean authorized = true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_con" rights="r" reverse="<%=true%>">
-	<%authed=false; %>
+	<%authorized = false; %>
 	<%response.sendRedirect("../../securityError.jsp?type=_con");%>
 </security:oscarSec>
 <%
-	if(!authed)
+	if(!authorized)
 	{
 		return;
 	}
