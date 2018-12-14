@@ -105,6 +105,11 @@ public class PATHL7Handler extends MessageHandler
         return(formatDateTime(getString(msg.getMSH().getDateTimeOfMessage().getTimeOfAnEvent().getValue())));
     }
 
+    public String getLabUser()
+    {
+        return (msg.getMSH().getReceivingFacility().getNamespaceID().toString());
+    }
+
     /*
      *  PID METHODS
      */

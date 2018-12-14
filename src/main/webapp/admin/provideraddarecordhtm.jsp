@@ -28,19 +28,20 @@
 <%@ taglib uri="/WEB-INF/caisi-tag.tld" prefix="caisi"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 
-<%@ page import="org.oscarehr.common.model.ClinicNbr"%>
+<%@ page import="org.oscarehr.common.Gender"%>
 <%@ page import="org.oscarehr.common.dao.ClinicNbrDao"%>
-<%@ page import="org.oscarehr.util.SpringUtils"%>
-<%@ page import="java.util.*,oscar.oscarProvider.data.*"%>
-<%@ page import="oscar.OscarProperties"%>
-<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@ page import="org.oscarehr.common.dao.SiteDao"%>
-<%@ page import="org.oscarehr.common.model.Site"%>
+<%@ page import="org.oscarehr.common.model.ClinicNbr,org.oscarehr.common.model.Site"%>
 <%@ page import="org.oscarehr.provider.dao.ProviderDataDao"%>
-<%@page  import="org.oscarehr.provider.model.ProviderData"%>
-
-
-<%@page import="org.oscarehr.common.Gender" %>
+<%@ page import="org.oscarehr.provider.model.ProviderData"%>
+<%@ page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@ page import="oscar.OscarProperties"%>
+<%@ page  import="oscar.oscarProvider.data.ProviderBillCenter"%>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Enumeration" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.List" %>
 <%
 
   String curProvider_no,userfirstname,userlastname;
@@ -460,7 +461,11 @@ for (int i=0; i<sites.size(); i++) {
 		<tr>
 			<td align="right"><bean:message key="admin.provider.formStatus" />:
 			</td>
-			<td><input type="text" name="status" value='1' maxlength="1">
+			<td>
+				<select name="status">
+					<option value="1" selected><bean:message key="admin.provider.formStatusActiveTrue" /></option>
+					<option value="0"><bean:message key="admin.provider.formStatusActiveFalse" /></option>
+				</select>
 			</td>
 		</tr>
 			

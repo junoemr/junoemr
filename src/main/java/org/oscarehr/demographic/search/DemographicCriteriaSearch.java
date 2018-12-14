@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographic.search;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
@@ -104,9 +105,9 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		// birthdate searches are always exact due to how the values are stored
 		if(getDateOfBirth() != null)
 		{
-			criteria.add(Restrictions.eq("dayOfBirth", String.valueOf(getDateOfBirth().getDayOfMonth())));
-			criteria.add(Restrictions.eq("monthOfBirth", String.valueOf(getDateOfBirth().getMonthValue())));
 			criteria.add(Restrictions.eq("yearOfBirth", String.valueOf(getDateOfBirth().getYear())));
+			criteria.add(Restrictions.eq("monthOfBirth", StringUtils.leftPad(String.valueOf(getDateOfBirth().getMonthValue()), 2, "0")));
+			criteria.add(Restrictions.eq("dayOfBirth", StringUtils.leftPad(String.valueOf(getDateOfBirth().getDayOfMonth()), 2, "0")));
 		}
 
 		if(getAddress() != null)

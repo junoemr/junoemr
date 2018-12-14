@@ -40,16 +40,19 @@ import oscar.OscarProperties;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.X509ExtendedTrustManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.Socket;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 
@@ -209,22 +212,49 @@ public class ClinicaidSessionManager
 		return outValue.trim();
 	}
 
-	TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager()
-	{
-		public java.security.cert.X509Certificate[] getAcceptedIssuers()
+	TrustManager[] trustAllCerts = new TrustManager[]{new X509ExtendedTrustManager() {
+		@Override
+		public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException
+		{
+
+		}
+
+		@Override
+		public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException
+		{
+
+		}
+
+		@Override
+		public X509Certificate[] getAcceptedIssuers()
 		{
 			return null;
 		}
 
-		public void checkClientTrusted(X509Certificate[] certs, String authType)
+		@Override
+		public void checkClientTrusted(X509Certificate[] x509Certificates, String s, Socket socket) throws CertificateException
 		{
+
 		}
 
-		public void checkServerTrusted(X509Certificate[] certs, String authType)
+		@Override
+		public void checkServerTrusted(X509Certificate[] x509Certificates, String s, Socket socket) throws CertificateException
 		{
+
 		}
-	}
-	};
+
+		@Override
+		public void checkClientTrusted(X509Certificate[] x509Certificates, String s, SSLEngine sslEngine) throws CertificateException
+		{
+
+		}
+
+		@Override
+		public void checkServerTrusted(X509Certificate[] x509Certificates, String s, SSLEngine sslEngine) throws CertificateException
+		{
+
+		}
+	}};
 
 	private void IgnoreSSLVerify()
 	{

@@ -42,7 +42,7 @@ import oscar.entities.WCB;
 import oscar.oscarBilling.ca.bc.data.BillingmasterDAO;
 import oscar.util.ConversionUtils;
 
-public class BillingBillingManager {
+public class BillingBillingManager implements Serializable {
 	private String billTtype;
 
 	public BillingItem[] getBillingItem(String[] service, String service1, String service2, String service3, String service1unit, String service2unit, String service3unit) {

@@ -455,7 +455,7 @@ public class PHRUserManagementAction extends DispatchAction {
 			document.setContenttype("application/pdf");
 			document.setDocdesc("PHR Registration");
 			document.setDocfilename(filename);
-			document.setDoccreator(user);
+			document.setDocCreator(user);
 			document.setPublic1(false);
 			document.setStatus('A');
 			document.setNumberofpages(1);

@@ -43,7 +43,6 @@ public class DemographicConverter
 		Demographic demographic = new Demographic();
 
 		// base info
-		demographic.setDemographicId(transfer.getDemographicNo());
 		demographic.setFirstName(transfer.getFirstName());
 		demographic.setLastName(transfer.getLastName());
 		demographic.setDateOfBirth(transfer.getDateOfBirth());
@@ -107,7 +106,6 @@ public class DemographicConverter
 		if(transfer.getCellPhone() != null)
 		{
 			DemographicExt extension = new DemographicExt();
-			extension.setDemographicNo(transfer.getDemographicNo());
 			extension.setDateCreated(new Date());
 			extension.setKey("demo_cell");
 			extension.setValue(transfer.getCellPhone());
@@ -121,7 +119,6 @@ public class DemographicConverter
 		if (transfer.getNurse() != null || transfer.getResident() != null || transfer.getAlert() != null || transfer.getMidwife() != null || transfer.getNotes() != null)
 		{
 			demographicCustom = new DemographicCust();
-			demographicCustom.setId(transfer.getDemographicNo());
 			demographicCustom.setNurse(transfer.getNurse());
 			demographicCustom.setResident(transfer.getResident());
 			demographicCustom.setAlert(transfer.getAlert());

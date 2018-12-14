@@ -2020,7 +2020,7 @@ import java.util.zip.ZipInputStream;
 	                            Document document = new Document();
 	                            document.setPublic1(false);
 	                            document.setResponsible(admProviderNo);
-	                            document.setDoccreator(docCreator);
+	                            document.setDocCreator(docCreator);
 	                            document.setDocdesc(docDesc);
 	                            document.setDoctype("");
 	                            document.setDocfilename(docFileName);

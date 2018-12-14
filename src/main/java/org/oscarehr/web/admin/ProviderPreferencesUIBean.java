@@ -130,12 +130,15 @@ public final class ProviderPreferencesUIBean {
 		if (temp != null) providerPreference.setAppointmentScreenLinkNameDisplayLength(Integer.parseInt(temp));
 
 		String[] formNames = request.getParameterValues("encounterFormName");
-		Collection<String> formNamesList = providerPreference.getAppointmentScreenForms();		
+		Collection<String> formNamesList = providerPreference.getAppointmentScreenForms();
 
 
-		if( formNames != null ) {
-			formNamesList.clear();
-			for (String formName : formNames) {
+		formNamesList.clear();
+
+		if (formNames != null)
+		{
+			for (String formName : formNames)
+			{
 				formNamesList.add(formName);
 			}
 		}

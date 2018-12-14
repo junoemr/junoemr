@@ -25,6 +25,7 @@ package org.oscarehr.ws.external.rest.v1.transfer.demographic;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.oscarehr.ws.validator.DemographicNoConstraint;
 import org.oscarehr.ws.validator.ProviderNoConstraint;
 import org.oscarehr.ws.validator.StringValueConstraint;
 
@@ -42,6 +43,7 @@ public class DemographicListTransfer implements Serializable
 {
 	// demographic base info
 	@Schema(description = "patient demographic record identifier")
+	@DemographicNoConstraint
 	private Integer demographicNo;
 	@NotNull
 	@Size(min=1, max=30)
