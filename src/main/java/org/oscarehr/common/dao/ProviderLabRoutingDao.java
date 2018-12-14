@@ -15,7 +15,6 @@ import javax.persistence.Query;
 
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.ProviderInboxItem;
-import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -123,14 +122,10 @@ public class ProviderLabRoutingDao extends AbstractDao<ProviderLabRoutingModel> 
 	 * @param labType
 	 * 		Lab type to find data for
 	 * @return
-	 * 		Returns an array of objects containing {@link Provider}, {@link ProviderLabRoutingModel} pairs.
+	 * 		Returns a list containing {@link ProviderLabRoutingModel} objects.
 	 */
-	
-	public List<Object[]> getProviderLabRoutings(Integer labNo, String labType) {
-		Query query = entityManager.createQuery("FROM " + Provider.class.getSimpleName() + " p, ProviderLabRoutingModel r WHERE p.id = r.providerNo AND r.labNo = :labNo AND r.labType = :labType");
-		query.setParameter("labNo", labNo);
-		query.setParameter("labType", labType);
-		return query.getResultList();
+	public List<ProviderLabRoutingModel> getProviderLabRoutings(Integer labNo, String labType) {
+		return getProviderLabRoutings(labNo, labType, null, null);
 	}
 
 	

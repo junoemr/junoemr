@@ -410,8 +410,12 @@ for (int i=0; i<sites.size(); i++) {
 		<tr>
 			<td align="right"><bean:message key="admin.provider.formStatus" />:
 			</td>
-			<td><input type="text" name="status"
-				value="<%= provider.getStatus()==null? "" : provider.getStatus() %>" maxlength="1"></td>
+			<td>
+				<select name="status">
+					<option value="1" <%=provider.getStatus().equals("1")? "selected":""%>><bean:message key="admin.provider.formStatusActiveTrue" /></option>
+					<option value="0" <%=provider.getStatus().equals("1")? "":"selected"%>><bean:message key="admin.provider.formStatusActiveFalse" /></option>
+				</select>
+			</td>
 		</tr>
 		<tr>
 			<td align="right"><bean:message

@@ -56,11 +56,16 @@ import oscar.util.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -102,6 +107,9 @@ public class AddEFormAction extends Action {
 		Map<String, String> paramValueMap = new HashMap<>();
 		Map<String,String> formOpenerMap = new HashMap<>();
 		ActionMessages updateErrors = new ActionMessages();
+
+		// special oscar override input names
+		String dateOverrideValue = request.getParameter("_oscarOverrideFormDate");
 
 		// The fields in the _oscarupdatefields parameter are separated by %s.
 		if (!print && !fax && doDatabaseUpdate && request.getParameter("_oscarupdatefields") != null) {
@@ -195,11 +203,13 @@ public class AddEFormAction extends Action {
 			if(StringUtils.filled(oldFormDataId))
 			{
 				Integer oldFdid = Integer.parseInt(oldFormDataId);
-				eForm = eFormService.saveExistingEForm(oldFdid, demographicNo, providerNo, subject, formOpenerMap, paramValueMap, eFormLink);
+				eForm = eFormService.saveExistingEForm(oldFdid, demographicNo, providerNo, subject,
+						formOpenerMap, paramValueMap, eFormLink, getOverrideDate(dateOverrideValue));
 			}
 			else
 			{
-				eForm = eFormService.saveNewEForm(eformTemplateId, demographicNo, providerNo, subject, formOpenerMap, paramValueMap, eFormLink);
+				eForm = eFormService.saveNewEForm(eformTemplateId, demographicNo, providerNo, subject,
+						formOpenerMap, paramValueMap, eFormLink, getOverrideDate(dateOverrideValue));
 			}
 
 
@@ -265,5 +275,22 @@ public class AddEFormAction extends Action {
 			return mapping.getInputForward();
 		}
 		return(mapping.findForward("close"));
+	}
+
+	private Date getOverrideDate(String dateOverrideValue)
+	{
+		Date eformDate = new Date();
+		if(dateOverrideValue != null && !dateOverrideValue.trim().isEmpty())
+		{
+			try {
+				DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+				eformDate = format.parse(dateOverrideValue);
+			}
+			catch(ParseException e) {
+				logger.error("Failed to parse eform date override string. current date (default) used.", e);
+			}
+		}
+
+		return eformDate;
 	}
 }
