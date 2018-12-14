@@ -1,4 +1,4 @@
-<%--  
+<%@ page import="org.oscarehr.util.MiscUtils" %><%--
 /*
  * 
  * Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved. *
@@ -125,6 +125,19 @@
 					value="<bean:message key="billing.manageBillingform_premium.btnDelete"/>"></td>
 				<td>&nbsp;</td>
 				<td>&nbsp;</td>
+			</tr>
+
+			<tr>
+				<%
+					if (request.getParameter("invalidcodes") != null)
+					{
+				%>
+						<td width="74%" class="white">
+							<span style="color:red"><bean:message key="billing.manageBillingform_premium.invalidCodes"/> <%=request.getParameter("invalidcodes")%></span>
+						</td>
+				<%
+					}
+				%>
 			</tr>
 			</form>
 		</table>
