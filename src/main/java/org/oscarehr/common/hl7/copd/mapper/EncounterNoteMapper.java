@@ -118,18 +118,17 @@ public class EncounterNoteMapper
 	{
 		ProviderData signingProvider = null;
 
-		/* Wolf puts provider names for a note in the form of 'first last' in the comment signature.
+		/* Wolf puts provider names for a note in the form of 'first|last' in the comment signature.
 		 * Here we attempt to parse the names out and match them to a provider record */
 		if(importSource.equals(CoPDImportService.IMPORT_SOURCE.WOLF))
 		{
 			String noteProviderStr = getEncounterNoteSignature(rep);
 			if(noteProviderStr != null && noteProviderStr.contains(" "))
 			{
-				// no idea how to handle a name with a space in it here.
-				String[] providerNames = noteProviderStr.split(" ");
+				String[] providerNames = noteProviderStr.split("\\|");
 				if(providerNames.length > 2)
 				{
-					logger.error("Malformed provider name contains too many spaces: '" + noteProviderStr + "'");
+					logger.error("Malformed provider name contains too many delimiters: '" + noteProviderStr + "'");
 				}
 				signingProvider = new ProviderData();
 				signingProvider.setFirstName(providerNames[0]);
