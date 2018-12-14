@@ -23,7 +23,6 @@
 
 
 package org.oscarehr.common.model;
-
 import com.sun.istack.NotNull;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
