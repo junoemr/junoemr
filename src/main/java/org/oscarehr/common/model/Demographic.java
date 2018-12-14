@@ -23,7 +23,6 @@
 
 
 package org.oscarehr.common.model;
-
 import com.sun.istack.NotNull;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -1532,6 +1531,31 @@ public class Demographic implements Serializable
 			sb.append("</b>");
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * Determines if a demographic is a newborn.  The criteria for a newborn is a HIN version code of 66 if in BC,
+	 * or less than a year old in all other cases.
+	 *
+	 * @return true if demographic meets newborn criteria
+	 */
+	public boolean isNewBorn()
+	{
+		final String BC_NEWBORN_BILLING_CODE = "66";
+
+		OscarProperties oscarProperties = OscarProperties.getInstance();
+
+
+		if (oscarProperties.isBritishColumbiaInstanceType())
+		{
+			return (getVer() != null && getVer().equals(BC_NEWBORN_BILLING_CODE));
+		}
+
+		Date birthDate = getBirthDate();
+		Date now = new Date();
+		long days = java.util.concurrent.TimeUnit.DAYS.toDays(now.getTime() - birthDate.getTime());
+
+		return days < 365;
 	}
 
 }
