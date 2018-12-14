@@ -42,6 +42,7 @@ public class Provider implements Serializable, Comparable<Provider>{
 	private static final long serialVersionUID = 1L;
 
 	public static final String SYSTEM_PROVIDER_NO = "-1";
+	public static final String UNCLAIMED_PROVIDER_NO = "0";
 
 	private String providerNo;
 	private String comments;
