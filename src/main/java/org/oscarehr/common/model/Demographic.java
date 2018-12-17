@@ -31,12 +31,12 @@ import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
+import oscar.util.ConversionUtils;
 
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
@@ -1542,12 +1542,8 @@ public class Demographic implements Serializable
 	 */
 	public boolean isNewBorn()
 	{
-		// Timezones don't apply to birthdays.  We avoid having anything to do with them by parsing a timezone-less
-		// string rather than applying the system default timezone to the fixed point in time specified by Java.Date.
-
-		String bithdayStr = getBirthDayAsString();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		LocalDate birthday = LocalDate.parse(bithdayStr, formatter);
+		String birthdayStr = getBirthDayAsString();
+		LocalDate birthday = ConversionUtils.toLocalDate(birthdayStr);
 
 		return org.oscarehr.demographic.model.Demographic.isNewBorn(birthday, getVer());
 	}
