@@ -82,7 +82,8 @@
 						<bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail"/>
 					</label>
 					<input class="flex-row-content" id="input-fax-account-email" name="input-fax-account-email" type="email"
-					       ng-model="faxConfigEditController.faxAccount.accountEmail">
+					       ng-model="faxConfigEditController.faxAccount.accountEmail"
+					       ng-required="faxConfigEditController.faxAccount.enableOutbound">
 				</div>
 				<div class="flex-row input-validation" ng-show="!form['input-fax-account-email'].$valid">
 					<label class="flex-row-label">*</label>
@@ -97,7 +98,7 @@
 					</label>
 					<input class="flex-row-content" id="input-fax-account-fax-no" name="input-fax-account-fax-no" type="text"
 					       ng-model="faxConfigEditController.faxAccount.faxNumber"
-					       ng-minlength="11" ng-maxlength="11" ng-pattern="/\d{11}/" >
+					       ng-minlength="11" ng-maxlength="11" ng-pattern="/\d{11}/" ng-required="faxConfigEditController.faxAccount.enableOutbound">
 				</div>
 				<div class="flex-row input-validation" ng-show="!form['input-fax-account-fax-no'].$valid">
 					<label class="flex-row-label">*</label>

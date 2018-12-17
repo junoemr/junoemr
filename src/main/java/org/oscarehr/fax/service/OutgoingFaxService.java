@@ -103,7 +103,7 @@ public class OutgoingFaxService
 			String formattedFaxNo = faxNumber.trim().replaceAll("\\D", "");
 			if(formattedFaxNo.length() < 10)
 			{
-				throw new FaxNumberException("Invalid Fax Number: " + faxNumber, "Fax number is too short: " + faxNumber);
+				throw new FaxNumberException("Invalid Fax Number: " + faxNumber, "fax.exception.invalidFaxNumber");
 			}
 			if(formattedFaxNo.length() == 10)
 			{
@@ -336,7 +336,7 @@ public class OutgoingFaxService
 			// if the api connection fails, leave the fax as queued
 			logger.warn("Fax API failure: " + e.getMessage());
 			logData = e.getMessage();
-			faxOutbound.setStatusMessage(e.getUserFriendlyErrorMessage());
+			faxOutbound.setStatusMessage(e.getUserFriendlyMessage());
 
 			// if the maximum sent attempts has been hit, set the error status.
 			if(faxAttemptCounterMap.get(faxOutbound.getId()) >= MAX_SEND_COUNT)
@@ -349,7 +349,7 @@ public class OutgoingFaxService
 			logger.warn("Fax API failure: " + e.getMessage());
 			logData = e.getMessage();
 			faxOutbound.setStatusError();
-			faxOutbound.setStatusMessage(e.getUserFriendlyErrorMessage());
+			faxOutbound.setStatusMessage(e.getUserFriendlyMessage());
 		}
 		catch(Exception e)
 		{

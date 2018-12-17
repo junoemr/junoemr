@@ -29,9 +29,9 @@ public class FaxApiValidationException extends FaxException
 		super(message);
 	}
 
-	public FaxApiValidationException(String message, String userFriendlyMessage)
+	public FaxApiValidationException(String message, String userMessageResourceKey)
 	{
-		super(message, userFriendlyMessage);
+		super(message, userMessageResourceKey);
 	}
 
 	public FaxApiValidationException(Exception e)

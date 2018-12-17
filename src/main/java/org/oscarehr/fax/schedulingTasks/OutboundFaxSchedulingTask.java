@@ -45,7 +45,7 @@ public class OutboundFaxSchedulingTask
 	private static final OscarProperties props = OscarProperties.getInstance();
 
 	private static final boolean enabled = props.isPropertyActive("fax.schedule_outbound.enabled");
-	private static final String cronSchedule = "0 0/5 * * * ?";
+	private static final String cronSchedule = "0 */5 * * * *";
 	private static CronSequenceGenerator cronTrigger;
 
 	@Autowired

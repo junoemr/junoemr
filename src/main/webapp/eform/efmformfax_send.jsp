@@ -51,7 +51,7 @@
 		catch(FaxException e)
 		{
 			MiscUtils.getLogger().error("An error occurred while faxing eForm.", e);
-			errorMessages.add(e.getUserFriendlyErrorMessage());
+			errorMessages.add(e.getUserFriendlyMessage(request.getLocale()));
 			failed = true;
 		}
 		catch (Exception e)

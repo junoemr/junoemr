@@ -128,6 +128,11 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 				function success(response)
 				{
 					angular.copy(response, outboxItem);
+					console.info(outboxItem);
+					if(outboxItem.systemStatus === controller.systemStatusEnum.error)
+					{
+						alert(outboxItem.systemStatusMessage);
+					}
 				},
 				function error(error)
 				{

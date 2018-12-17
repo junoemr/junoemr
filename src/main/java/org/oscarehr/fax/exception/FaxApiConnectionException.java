@@ -34,8 +34,8 @@ public class FaxApiConnectionException extends FaxException
 		super(e);
 	}
 
-	public FaxApiConnectionException(Exception e, String userFriendlyMessage)
+	public FaxApiConnectionException(Exception e, String userMessageResourceKey)
 	{
-		super(e, userFriendlyMessage);
+		super(e, userMessageResourceKey);
 	}
 }

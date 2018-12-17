@@ -177,7 +177,7 @@ public class FrmCustomedPDFServlet extends HttpServlet
 		{
 			res.setContentType("text/html");
 			PrintWriter writer = res.getWriter();
-			writer.println("<script>alert('Error: " + e.getUserFriendlyErrorMessage() + "');window.close();</script>");
+			writer.println("<script>alert('Error: " + e.getUserFriendlyMessage(req.getLocale()) + "');window.close();</script>");
 		}
 		finally
 		{

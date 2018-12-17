@@ -28,8 +28,8 @@ public class FaxNumberException extends FaxException
 	{
 		super(message);
 	}
-	public FaxNumberException(String message, String userFriendlyMessage)
+	public FaxNumberException(String message, String userMessageResourceKey)
 	{
-		super(message, userFriendlyMessage);
+		super(message, userMessageResourceKey);
 	}
 }

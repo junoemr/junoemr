@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `fax_account` (
   integration_enabled     TINYINT(1) NOT NULL DEFAULT 0,
   inbound_enabled         TINYINT(1) NOT NULL DEFAULT 0,
   outbound_enabled        TINYINT(1) NOT NULL DEFAULT 0,
-  reply_fax_number        VARCHAR(10),
+  reply_fax_number        VARCHAR(12),
   email                   VARCHAR(128),
   cover_letter_option     VARCHAR(255),
   display_name            VARCHAR(255),

@@ -22,9 +22,12 @@
  */
 package org.oscarehr.fax.exception;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 public class FaxException extends RuntimeException
 {
-	private String userFriendlyErrorMessage = "Unexpected fax error";
+	private String userMessageResourceKey = "fax.exception.defaultError";
 
 	public FaxException(String message)
 	{
@@ -34,7 +37,7 @@ public class FaxException extends RuntimeException
 	public FaxException(String message, String userFriendlyMessage)
 	{
 		super(message);
-		setUserFriendlyErrorMessage(userFriendlyMessage);
+		setUserMessageResourceKey(userFriendlyMessage);
 	}
 
 	public FaxException(Exception e)
@@ -45,16 +48,26 @@ public class FaxException extends RuntimeException
 	public FaxException(Exception e, String userFriendlyMessage)
 	{
 		super(e);
-		setUserFriendlyErrorMessage(userFriendlyMessage);
+		setUserMessageResourceKey(userFriendlyMessage);
 	}
 
-	public String getUserFriendlyErrorMessage()
+	public String getUserMessageResourceKey()
 	{
-		return userFriendlyErrorMessage;
+		return userMessageResourceKey;
 	}
 
-	public void setUserFriendlyErrorMessage(String message)
+	public void setUserMessageResourceKey(String message)
 	{
-		userFriendlyErrorMessage = message;
+		userMessageResourceKey = message;
+	}
+
+	public String getUserFriendlyMessage(Locale locale)
+	{
+		ResourceBundle resourceBundle = ResourceBundle.getBundle("oscarResources", locale);
+		return resourceBundle.getString(userMessageResourceKey);
+	}
+	public String getUserFriendlyMessage()
+	{
+		return getUserFriendlyMessage(Locale.getDefault());
 	}
 }

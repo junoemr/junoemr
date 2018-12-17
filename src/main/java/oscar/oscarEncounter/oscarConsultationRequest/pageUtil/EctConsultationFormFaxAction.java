@@ -246,7 +246,7 @@ public class EctConsultationFormFaxAction extends Action
 		catch(FaxException e)
 		{
 			logger.error("Error occurred inside ConsultationPrintAction", e);
-			errorList.add(e.getUserFriendlyErrorMessage());
+			errorList.add(e.getUserFriendlyMessage(request.getLocale()));
 		}
 		catch(Exception e)
 		{
