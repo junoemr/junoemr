@@ -92,28 +92,28 @@ public class BillingSaveBillingAction extends Action {
         }
 
         ////////////
-        if (bean.getApptNo() != null && !bean.getApptNo().trim().equals("0") &&  !bean.getApptNo().trim().equals("")){
-            String apptStatus = "";
+        if (bean.getApptNo() != null && !bean.getApptNo().trim().equals("0") && !bean.getApptNo().trim().equals(""))
+        {
             Appointment result = appointmentDao.find(Integer.parseInt(bean.getApptNo()));
-           if (result == null) {
-                log.error("LLLOOK: APPT ERROR - APPT ("+bean.getApptNo()+") NOT FOUND - FOR demo:" + bean.getPatientName() +" date " + curDate);
-            } else {
-                apptStatus = result.getStatus();
+            if (result == null)
+            {
+                log.warn("COULD NOT CHANGE APPOINTMENT STATUS - APPT (" + bean.getApptNo() + ") NOT FOUND - FOR demo:" + bean.getPatientName() + " date " + curDate);
             }
-            String billStatus = as.billStatus(apptStatus);
-            ///Update Appointment information
-            log.debug("appointment_no: " + bean.getApptNo());
-            log.debug("BillStatus:" + billStatus);
-            Appointment appt = appointmentDao.find(Integer.parseInt(bean.getApptNo()));
-            appointmentArchiveDao.archiveAppointment(appt);
-            int rowsAffected = 0;
-            if(appt != null) {
-            	appt.setStatus(billStatus);
-            	appt.setLastUpdateUser(bean.getCreator());
-            	appointmentDao.merge(appt);
+            else
+            {
+                String apptStatus = result.getStatus();
+
+                String billStatus = as.billStatus(apptStatus);
+
+                log.debug("appointment_no: " + bean.getApptNo());
+                log.debug("BillStatus:" + billStatus);
+
+                ///Update Appointment information
+                appointmentArchiveDao.archiveAppointment(result);
+                result.setStatus(billStatus);
+                result.setLastUpdateUser(bean.getCreator());
+                appointmentDao.merge(result);
             }
-            
-            if (rowsAffected<1) log.error("LLLOOK: APPT ERROR - CANNOT UPDATE APPT ("+bean.getApptNo()+") FOR demo:" + bean.getPatientName() +" date " + curDate);
         }
 
 
