@@ -879,7 +879,7 @@ private long getAppointmentRowSpan(
 					</li>
 
 					<security:oscarSec roleName="<%=roleName$%>" objectName="_dashboardDisplay" rights="r">
-						<c:if test="${menuBarController.hasDashboards}">
+						<oscar:oscarPropertiesCheck property="enable_dashboards" value="true">
 							<li id="dashboardList">
 								<div class="dropdown">
 									<a href="#" class="dashboardBtn">Dashboard</a>
@@ -892,8 +892,7 @@ private long getAppointmentRowSpan(
 									</div>
 								</div>
 							</li>
-						</c:if>
-
+						</oscar:oscarPropertiesCheck>
 					</security:oscarSec>
 
 					<!-- Added logout link for mobile version -->
