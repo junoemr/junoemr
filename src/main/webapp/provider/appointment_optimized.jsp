@@ -1340,11 +1340,7 @@ private long getAppointmentRowSpan(
 							headerColor = !headerColor;
 
 							boolean notOnSchedule = false;
-							if (!ALL_VIEW.equals(viewall) && scheduleProviderNo == Integer.parseInt(curUser_no) && !schedule.hasSchedule())
-							{
-								notOnSchedule = true;
-							}
-							else if (SCHEDULE_VIEW.equals(viewall) && !schedule.isAvailable())
+							if (SCHEDULE_VIEW.equals(viewall) && !schedule.isAvailable())
 							{
 								continue;
 							}
