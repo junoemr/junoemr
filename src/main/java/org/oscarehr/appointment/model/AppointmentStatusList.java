@@ -89,7 +89,7 @@ public class AppointmentStatusList
 
 	public String getStatusAfter(String status)
 	{
-		if (status == null)
+		if (status == null || status.isEmpty())
 		{
 			return orderedStatusList.get(0);
 		} else
@@ -111,7 +111,7 @@ public class AppointmentStatusList
 
 	public String getTitle(String status, Locale locale)
 	{
-		if (status == null)
+		if (status == null || status.isEmpty())
 		{
 			return null;
 		} else
