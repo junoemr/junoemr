@@ -31,5 +31,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LoggingFilterHidePassword
 {
+	String FILTER_TEXT = "******";
 	String[] fields() default "password";
 }

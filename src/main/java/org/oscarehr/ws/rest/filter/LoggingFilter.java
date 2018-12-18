@@ -230,14 +230,18 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 		return builder.toString();
 	}
 
-	private String removePasswordData(String rawString, String...fields)
+	static String removePasswordData(String rawString, String...fields)
 	{
+		if(rawString == null)
+		{
+			return null;
+		}
 		for(String fieldName : fields)
 		{
-			Pattern p = Pattern.compile("(\\\""+ fieldName +"\\\"\\s*\\:\\s*\\\")(.*)(\\\")");
+			Pattern p = Pattern.compile("(\\\""+ fieldName +"\\\"\\s*\\:\\s*\\\")((?:\\\\.|[^\\\"])*?)(\\\")");
 			Matcher m = p.matcher(rawString);
 
-			rawString = m.replaceAll("$1******$3");
+			rawString = m.replaceAll("$1"+LoggingFilterHidePassword.FILTER_TEXT+"$3");
 		}
 		return rawString;
 	}
