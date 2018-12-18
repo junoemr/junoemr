@@ -127,10 +127,7 @@ public class FaxAccountService
 			{
 				for(GetFaxStatusResult result : resultList.getResult())
 				{
-					// need to parse the filename property for the referenceId in the returned data
-					String filename = result.getFileName();
-					String referenceId = filename.split("\\|")[1];
-					statusResultMap.put(referenceId, result);
+					statusResultMap.put(result.getDetailsId(), result);
 				}
 			}
 			else

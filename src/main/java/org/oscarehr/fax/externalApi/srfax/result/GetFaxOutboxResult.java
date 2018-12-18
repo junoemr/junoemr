@@ -22,6 +22,7 @@
  */
 package org.oscarehr.fax.externalApi.srfax.result;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -30,7 +31,11 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 public class GetFaxOutboxResult
 {
 	@JsonProperty("FileName")
+	private String rawFileName;
+	@JsonIgnore
 	private String fileName;
+	@JsonIgnore
+	private String detailsId;
 	@JsonProperty("SentStatus")
 	private String sentStatus;
 	@JsonProperty("DateQueued")
@@ -63,14 +68,26 @@ public class GetFaxOutboxResult
 	@JsonProperty("User_FaxNumber")
 	private String userFaxNumber;
 
+	public String getRawFileName()
+	{
+		return rawFileName;
+	}
+
+	public void setRawFileName(String rawFileName)
+	{
+		this.rawFileName = rawFileName;
+		this.fileName = rawFileName.split("\\|")[0];
+		this.detailsId = rawFileName.split("\\|")[1];
+	}
+
 	public String getFileName()
 	{
 		return fileName;
 	}
 
-	public void setFileName(String fileName)
+	public String getDetailsId()
 	{
-		this.fileName = fileName;
+		return detailsId;
 	}
 
 	public String getSentStatus()
