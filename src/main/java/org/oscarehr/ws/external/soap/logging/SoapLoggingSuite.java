@@ -21,16 +21,23 @@
  * Canada
  */
 
-package org.oscarehr.ws.external.soap.v1.log;
+package org.oscarehr.ws.external.soap.logging;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Message;
+import org.oscarehr.ws.external.soap.logging.interceptor.SoapLogHTTPInterceptor;
+import org.oscarehr.ws.external.soap.logging.interceptor.SoapLogMethodInterceptor;
+import org.oscarehr.ws.external.soap.logging.interceptor.SoapLogResponseInterceptor;
 
 import java.util.List;
 
+/**
+ * This class bundles together the different SOAP interceptors responsble for creatng a single SOAP log entry for a
+ * full cycle request to response exchange.
+ */
 public class SoapLoggingSuite extends AbstractFeature
 {
     private static final SoapLogHTTPInterceptor SOAP_HTTP_INTERCEPTOR = new SoapLogHTTPInterceptor();

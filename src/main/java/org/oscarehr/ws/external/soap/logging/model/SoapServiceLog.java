@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.external.soap.v1.log.model;
+package org.oscarehr.ws.external.soap.logging.model;
 
 import org.oscarehr.common.model.AbstractModel;
 

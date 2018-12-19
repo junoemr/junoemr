@@ -21,7 +21,7 @@
  * Canada
  */
 
-package org.oscarehr.ws.external.soap.v1.log;
+package org.oscarehr.ws.external.soap.logging.interceptor;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.common.MaskParameter;
 import org.oscarehr.ws.common.SkipContentLogging;
-import org.oscarehr.ws.external.soap.v1.log.model.SoapServiceLog;
+import org.oscarehr.ws.external.soap.logging.model.SoapServiceLog;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

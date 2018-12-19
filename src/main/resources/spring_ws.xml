@@ -39,11 +39,14 @@
 	<!-- The WS classes are turned into spring beans to allow autowiring etc, then the endpoints reference them -->
 	<context:component-scan base-package="org.oscarehr.ws.external.soap"/>
 
+	<!-- Features -->
+	<bean id="soapLoggingPackage" class="org.oscarehr.ws.external.soap.logging.SoapLoggingSuite"/>
+
 	<!-- Interceptors are listed in lifecycle order -->
 	<!-- Request interceptors -->
 	<bean id="authenticationInWSS4JInterceptor" class="org.oscarehr.ws.AuthenticationInWSS4JInterceptor"/>
 	<bean id="IPInWSS4JInterceptor" class="org.oscarehr.ws.IPInWSS4JInterceptor"/>
-	<bean id="soapLoggingPackage" class="org.oscarehr.ws.external.soap.v1.log.SoapLoggingSuite"/>
+
 	<!-- Response interceptors -->
 	<bean id="bornSOAPHeaderInterceptor" class="org.oscarehr.integration.born.BornSOAPHeaderInterceptor"/>
 

@@ -21,17 +21,17 @@
  * Canada
  */
 
-package org.oscarehr.ws.external.soap.v1.log.dao;
+package org.oscarehr.ws.external.soap.logging.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.ws.external.soap.v1.log.model.SoapServiceLog;
+import org.oscarehr.ws.external.soap.logging.model.SoapServiceLog;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class SoapLogDao extends AbstractDao<SoapServiceLog>
+public class SoapServiceLogDao extends AbstractDao<SoapServiceLog>
 {
 
-    public SoapLogDao()
+    public SoapServiceLogDao()
     {
         super(SoapServiceLog.class);
     }

@@ -42,7 +42,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MaskParameter
 {
-    String MASK = "*******";
+    static String MASK = "*******";
 
     String[] name() default "password";
 }

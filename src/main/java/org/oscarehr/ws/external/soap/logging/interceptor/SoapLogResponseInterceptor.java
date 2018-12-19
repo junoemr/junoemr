@@ -21,7 +21,7 @@
  * Canada
  */
 
-package org.oscarehr.ws.external.soap.v1.log;
+package org.oscarehr.ws.external.soap.logging.interceptor;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,7 +35,7 @@ import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.log4j.Logger;
-import org.oscarehr.ws.external.soap.v1.log.model.SoapServiceLog;
+import org.oscarehr.ws.external.soap.logging.model.SoapServiceLog;
 import oscar.log.LogAction;
 
 /**

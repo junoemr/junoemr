@@ -41,14 +41,14 @@ import org.oscarehr.util.DeamonThreadFactory;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.external.soap.v1.log.dao.SoapLogDao;
-import org.oscarehr.ws.external.soap.v1.log.model.SoapServiceLog;
+import org.oscarehr.ws.external.soap.logging.dao.SoapServiceLogDao;
+import org.oscarehr.ws.external.soap.logging.model.SoapServiceLog;
 
 public class LogAction {
 	private static Logger logger = MiscUtils.getLogger();
 	private static OscarLogDao oscarLogDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
 	private static RestServiceLogDao restLogDao = (RestServiceLogDao) SpringUtils.getBean(org.oscarehr.common.dao.RestServiceLogDao.class);
-	private static SoapLogDao soapLogDao = (SoapLogDao) SpringUtils.getBean(org.oscarehr.ws.external.soap.v1.log.dao.SoapLogDao.class);
+	private static SoapServiceLogDao soapLogDao = (SoapServiceLogDao) SpringUtils.getBean(SoapServiceLogDao.class);
 	private static ExecutorService executorService = Executors.newCachedThreadPool(new DeamonThreadFactory(LogAction.class.getSimpleName()+".executorService", Thread.MAX_PRIORITY));
 	
 	/**
