@@ -1808,7 +1808,7 @@ private long getAppointmentRowSpan(
 
 														<!-- doctor code block 2 -->
 
-														<c:if test="${appointmentInfo.showPreventionWarnings}">
+														<c:if test="${not empty appointmentInfo.preventionWarnings}">
 															<img src="../images/stop_sign.png" height="14" width="14" title="${appointmentInfo.preventionWarnings}" />&nbsp;
 
 														</c:if>
