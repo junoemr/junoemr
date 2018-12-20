@@ -45,6 +45,7 @@ import org.oscarehr.common.hl7.copd.mapper.LabMapper;
 import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
 import org.oscarehr.common.hl7.copd.mapper.PreventionMapper;
 import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
+import org.oscarehr.common.hl7.copd.mapper.TicklerMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.parser.CoPDParser;
 import org.oscarehr.common.io.FileFactory;
@@ -53,6 +54,7 @@ import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.ProviderInboxItem;
+import org.oscarehr.common.model.Tickler;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
@@ -246,6 +248,8 @@ public class CoPDImportService
 			importLabData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Documents ...");
 			importDocumentData(zpdZtrMessage, i, assignedProvider, demographic, documentLocation, importSource);
+			logger.info("Import Ticklers ...");
+			importTicklers(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 		}
 
 		return mrpProvider;
@@ -507,6 +511,17 @@ public class CoPDImportService
 			reminderNote.setSigningProvider(provider);
 			reminderNote.setDemographic(demographic);
 			encounterNoteService.saveReminderNote(reminderNote);
+		}
+	}
+
+	private void importTicklers(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
+	{
+		TicklerMapper ticklerMapper = new TicklerMapper(zpdZtrMessage, providerRep, importSource);
+		for(Tickler tickler : ticklerMapper.getTicklerList())
+		{
+//			tickler.setProvider(provider);
+//			tickler.setDemographic(demographic);
+			logger.info("TODO: tickler " + tickler.getMessage());
 		}
 	}
 

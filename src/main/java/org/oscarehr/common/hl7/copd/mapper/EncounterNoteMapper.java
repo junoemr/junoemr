@@ -123,7 +123,7 @@ public class EncounterNoteMapper
 		if(importSource.equals(CoPDImportService.IMPORT_SOURCE.WOLF))
 		{
 			String noteProviderStr = getEncounterNoteSignature(rep);
-			if(noteProviderStr != null && noteProviderStr.contains(" "))
+			if(noteProviderStr != null && noteProviderStr.contains("|"))
 			{
 				String[] providerNames = noteProviderStr.split("\\|");
 				if(providerNames.length > 2)
@@ -134,10 +134,14 @@ public class EncounterNoteMapper
 				signingProvider.setFirstName(providerNames[0]);
 				signingProvider.setLastName(providerNames[1]);
 			}
+			else if(noteProviderStr != null)
+			{
+				logger.error("WOLF signing provider data is malformed: '"+noteProviderStr+"'");
+			}
 			else
 			{
 				/* Wolf exports their internal communication notes sometimes as notes without associated provider information. */
-				logger.debug("WOLF signing provider data is empty or malformed.");
+				logger.debug("WOLF signing provider data is empty.");
 			}
 		}
 		return signingProvider;

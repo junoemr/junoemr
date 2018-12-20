@@ -184,7 +184,7 @@ public class CopdCommandLineImporter
 		List<String> messageList = coPDPreProcessorService.separateMessages(fileString);
 		for(String message : messageList)
 		{
-			message = coPDPreProcessorService.preProcessMessage(message);
+			message = coPDPreProcessorService.preProcessMessage(message, importSource);
 			coPDImportService.importFromHl7Message(message, documentDirectory, importSource);
 		}
 	}
