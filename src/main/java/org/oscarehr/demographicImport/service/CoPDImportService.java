@@ -526,13 +526,16 @@ public class CoPDImportService
 		for(int i=0; i< numTicklers; i++)
 		{
 			Tickler tickler = ticklerMapper.getTickler(i);
-			ProviderData assignedProvider = ticklerMapper.getAttendingProvider(i);
-			assignedProvider = findOrCreateProviderRecord(assignedProvider);
+			if(tickler != null)
+			{
+				ProviderData assignedProvider = ticklerMapper.getAttendingProvider(i);
+				assignedProvider = findOrCreateProviderRecord(assignedProvider);
 
-			tickler.setDemographicNo(demographic.getDemographicId());
-			tickler.setCreator(provider.getId());
-			tickler.setTaskAssignedTo(assignedProvider.getId());
-			ticklerDao.persist(tickler);
+				tickler.setDemographicNo(demographic.getDemographicId());
+				tickler.setCreator(provider.getId());
+				tickler.setTaskAssignedTo(assignedProvider.getId());
+				ticklerDao.persist(tickler);
+			}
 		}
 	}
 

@@ -77,7 +77,7 @@ public abstract class AbstractMapper
 	}
 
 	/** Wolf puts provider names for a note in the form of 'first|last' in the comment signature.
-	 *  Here we attempt to parse the names out and match them to a provider record */
+	 *  Here we attempt to parse the names out and put them in a provider record */
 	protected ProviderData getWOLFParsedProviderInfo(String segmentToParse, String debugLocation)
 	{
 		ProviderData parsedProvider = null;
