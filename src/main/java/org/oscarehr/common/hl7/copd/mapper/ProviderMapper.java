@@ -24,23 +24,14 @@ package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.provider.model.ProviderData;
-import org.oscarehr.util.MiscUtils;
 
-public class ProviderMapper
+public class ProviderMapper extends AbstractMapper
 {
-	private static final Logger logger = MiscUtils.getLogger();
-	private final ZPD_ZTR message;
-
-	public ProviderMapper()
-	{
-		message = null;
-	}
 	public ProviderMapper(ZPD_ZTR message)
 	{
-		this.message = message;
+		super(message);
 	}
 
 	/* Methods for converting to oscar model */

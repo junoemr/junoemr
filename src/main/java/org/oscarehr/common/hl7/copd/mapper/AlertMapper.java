@@ -24,38 +24,19 @@ package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
-import org.oscarehr.util.MiscUtils;
-import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class AlertMapper
+public class AlertMapper extends AbstractMapper
 {
-
-	private static final Logger logger = MiscUtils.getLogger();
-	private final ZPD_ZTR message;
-	private final ZPD_ZTR_PROVIDER provider;
-
-	private final CoPDImportService.IMPORT_SOURCE importSource;
-
-	public AlertMapper()
-	{
-		message = null;
-		provider = null;
-		importSource = CoPDImportService.IMPORT_SOURCE.UNKNOWN;
-	}
 	public AlertMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		this.message = message;
-		this.provider = message.getPATIENT().getPROVIDER(providerRep);
-		this.importSource = importSource;
+		super(message, providerRep, importSource);
 	}
 
 	public int getNumAlerts()
@@ -97,12 +78,8 @@ public class AlertMapper
 
 	public Date getAlertDate(int rep) throws HL7Exception
 	{
-		String dateStr = provider.getZAL(rep).getZal2_dateOfAlert().getTs1_TimeOfAnEvent().getValue();
-		if(dateStr==null || dateStr.trim().isEmpty() || dateStr.equals("00000000"))
-		{
-			return null;
-		}
-		return ConversionUtils.fromDateString(dateStr, "yyyyMMdd");
+		return getNullableDate(provider.getZAL(rep)
+				.getZal2_dateOfAlert().getTs1_TimeOfAnEvent().getValue());
 	}
 
 	public String getAlertText(int rep) throws HL7Exception

@@ -26,7 +26,6 @@ import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.allergy.model.Allergy;
-import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.util.MiscUtils;
@@ -39,21 +38,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class AllergyMapper
+public class AllergyMapper extends AbstractMapper
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private final ZPD_ZTR message;
-	private final ZPD_ZTR_PROVIDER provider;
 
-	public AllergyMapper()
-	{
-		message = null;
-		provider = null;
-	}
 	public AllergyMapper(ZPD_ZTR message, int providerRep)
 	{
-		this.message = message;
-		this.provider = message.getPATIENT().getPROVIDER(providerRep);
+		super(message, providerRep);
 	}
 
 	public int getNumAllergies()
@@ -125,12 +116,8 @@ public class AllergyMapper
 
 	public Date getStartDate(int rep)
 	{
-		String dateStr = provider.getALLERGY(rep).getIAM().getIam13_ReportedDateTime().getTs1_TimeOfAnEvent().getValue();
-		if(dateStr==null || dateStr.trim().isEmpty() || dateStr.equals("00000000"))
-		{
-			return null;
-		}
-		return ConversionUtils.fromDateString(dateStr, "yyyyMMdd");
+		return getNullableDate(provider.getALLERGY(rep).getIAM()
+				.getIam13_ReportedDateTime().getTs1_TimeOfAnEvent().getValue());
 	}
 
 	public String getDescription(int rep)

@@ -33,6 +33,7 @@ import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.allergy.service.AllergyService;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.dao.TicklerDao;
 import org.oscarehr.common.hl7.copd.mapper.AlertMapper;
 import org.oscarehr.common.hl7.copd.mapper.AllergyMapper;
 import org.oscarehr.common.hl7.copd.mapper.AppointmentMapper;
@@ -150,6 +151,9 @@ public class CoPDImportService
 
 	@Autowired
 	LabService labService;
+
+	@Autowired
+	TicklerDao ticklerDao;
 
 	public void importFromHl7Message(String message, String documentLocation, IMPORT_SOURCE importSource) throws HL7Exception, IOException, InterruptedException
 	{
@@ -517,11 +521,18 @@ public class CoPDImportService
 	private void importTicklers(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		TicklerMapper ticklerMapper = new TicklerMapper(zpdZtrMessage, providerRep, importSource);
-		for(Tickler tickler : ticklerMapper.getTicklerList())
+
+		int numTicklers = ticklerMapper.getNumTicklers();
+		for(int i=0; i< numTicklers; i++)
 		{
-//			tickler.setProvider(provider);
-//			tickler.setDemographic(demographic);
-			logger.info("TODO: tickler " + tickler.getMessage());
+			Tickler tickler = ticklerMapper.getTickler(i);
+			ProviderData assignedProvider = ticklerMapper.getAttendingProvider(i);
+			assignedProvider = findOrCreateProviderRecord(assignedProvider);
+
+			tickler.setDemographicNo(demographic.getDemographicId());
+			tickler.setCreator(provider.getId());
+			tickler.setTaskAssignedTo(assignedProvider.getId());
+			ticklerDao.persist(tickler);
 		}
 	}
 

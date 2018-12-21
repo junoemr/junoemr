@@ -24,34 +24,20 @@ package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.rx.model.Drug;
 import org.oscarehr.rx.model.Prescription;
-import org.oscarehr.util.MiscUtils;
-import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MedicationMapper
+public class MedicationMapper extends AbstractMapper
 {
-	private static final Logger logger = MiscUtils.getLogger();
-	private final ZPD_ZTR message;
-	private final ZPD_ZTR_PROVIDER provider;
-
-	public MedicationMapper()
-	{
-		message = null;
-		provider = null;
-	}
 	public MedicationMapper(ZPD_ZTR message, int providerRep)
 	{
-		this.message = message;
-		this.provider = message.getPATIENT().getPROVIDER(providerRep);
+		super(message, providerRep);
 	}
 
 	public int getNumMedications()
@@ -160,14 +146,14 @@ public class MedicationMapper
 
 	public Date getTransactionDate(int rep)
 	{
-		return ConversionUtils.fromDateString(provider.getMEDS(rep).getORC()
-				.getOrc9_DateTimeOfTransaction().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
+		return getNullableDate(provider.getMEDS(rep).getORC()
+				.getOrc9_DateTimeOfTransaction().getTs1_TimeOfAnEvent().getValue());
 	}
 
 	public Date getOrderEffectiveDate(int rep)
 	{
-		return ConversionUtils.fromDateString(provider.getMEDS(rep).getORC()
-				.getOrc15_OrderEffectiveDateTime().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
+		return getNullableDate(provider.getMEDS(rep).getORC()
+				.getOrc15_OrderEffectiveDateTime().getTs1_TimeOfAnEvent().getValue());
 	}
 
 	// ---- RXO ----
@@ -300,19 +286,13 @@ public class MedicationMapper
 
 	public Date getAdministrationStartDate(int rep) throws HL7Exception
 	{
-		return ConversionUtils.fromDateString(provider.getMEDS(rep).getZRX()
-				.getZrx2_administrationStartDate().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
+		return getNullableDate(provider.getMEDS(rep).getZRX()
+				.getZrx2_administrationStartDate().getTs1_TimeOfAnEvent().getValue());
 	}
 	public Date getAdministrationStopDate(int rep) throws HL7Exception
 	{
-		String adminStopDateStr = provider.getMEDS(rep).getZRX()
-				.getZrx3_administrationStopDate().getTs1_TimeOfAnEvent().getValue();
-
-		if("00000000".equalsIgnoreCase(adminStopDateStr))
-		{
-			return null;
-		}
-		return ConversionUtils.fromDateString(adminStopDateStr, "yyyyMMdd");
+		return getNullableDate(provider.getMEDS(rep).getZRX()
+				.getZrx3_administrationStopDate().getTs1_TimeOfAnEvent().getValue());
 	}
 
 	public boolean isLongTerm(int rep) throws HL7Exception

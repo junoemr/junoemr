@@ -24,38 +24,21 @@ package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.provider.model.ProviderData;
-import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class EncounterNoteMapper
+public class EncounterNoteMapper extends AbstractMapper
 {
-	private static final Logger logger = MiscUtils.getLogger();
-	private final ZPD_ZTR message;
-	private final ZPD_ZTR_PROVIDER provider;
-
-	private final CoPDImportService.IMPORT_SOURCE importSource;
-
-	public EncounterNoteMapper()
-	{
-		message = null;
-		provider = null;
-		importSource = CoPDImportService.IMPORT_SOURCE.UNKNOWN;
-	}
 	public EncounterNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		this.message = message;
-		this.provider = message.getPATIENT().getPROVIDER(providerRep);
-		this.importSource = importSource;
+		super(message, providerRep, importSource);
 	}
 
 	public int getNumEncounterNotes()
@@ -118,38 +101,19 @@ public class EncounterNoteMapper
 	{
 		ProviderData signingProvider = null;
 
-		/* Wolf puts provider names for a note in the form of 'first|last' in the comment signature.
-		 * Here we attempt to parse the names out and match them to a provider record */
+
 		if(importSource.equals(CoPDImportService.IMPORT_SOURCE.WOLF))
 		{
 			String noteProviderStr = getEncounterNoteSignature(rep);
-			if(noteProviderStr != null && noteProviderStr.contains("|"))
-			{
-				String[] providerNames = noteProviderStr.split("\\|");
-				if(providerNames.length > 2)
-				{
-					logger.error("Malformed provider name contains too many delimiters: '" + noteProviderStr + "'");
-				}
-				signingProvider = new ProviderData();
-				signingProvider.setFirstName(providerNames[0]);
-				signingProvider.setLastName(providerNames[1]);
-			}
-			else if(noteProviderStr != null)
-			{
-				logger.error("WOLF signing provider data is malformed: '"+noteProviderStr+"'");
-			}
-			else
-			{
-				/* Wolf exports their internal communication notes sometimes as notes without associated provider information. */
-				logger.debug("WOLF signing provider data is empty.");
-			}
+			signingProvider = getWOLFParsedProviderInfo(noteProviderStr, "ZPV.5");
 		}
 		return signingProvider;
 	}
 
 	public Date getEncounterNoteContactDate(int rep) throws HL7Exception
 	{
-		return ConversionUtils.fromDateString(provider.getZPV(rep).getZpv2_contactDate().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
+		return getNullableDate(provider.getZPV(rep)
+				.getZpv2_contactDate().getTs1_TimeOfAnEvent().getValue());
 	}
 
 	public String getEncounterNoteReason(int rep) throws HL7Exception

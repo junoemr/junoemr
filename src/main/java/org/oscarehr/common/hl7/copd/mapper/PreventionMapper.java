@@ -25,12 +25,10 @@ package org.oscarehr.common.hl7.copd.mapper;
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.model.PreventionExt;
 import org.oscarehr.util.MiscUtils;
-import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,25 +36,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PreventionMapper
+public class PreventionMapper extends AbstractMapper
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private final ZPD_ZTR message;
-	private final ZPD_ZTR_PROVIDER provider;
-
 	private List<String> validPreventionTypes;
 	private static Map<String, String> preventionTypeMap = new HashMap<>();
 
-	public PreventionMapper()
-	{
-		message = null;
-		provider = null;
-		validPreventionTypes = null;
-	}
 	public PreventionMapper(ZPD_ZTR message, int providerRep)
 	{
-		this.message = message;
-		this.provider = message.getPATIENT().getPROVIDER(providerRep);
+		super(message, providerRep);
 		this.validPreventionTypes = null;
 	}
 
@@ -107,12 +95,8 @@ public class PreventionMapper
 
 	public Date getImmunizationDate(int rep) throws HL7Exception
 	{
-		String dateStr = provider.getIMMUNIZATION(rep).getZIM().getZim2_immunizationDate().getTs1_TimeOfAnEvent().getValue();
-		if(dateStr==null || dateStr.trim().isEmpty() || dateStr.equals("00000000"))
-		{
-			return null;
-		}
-		return ConversionUtils.fromDateString(dateStr, "yyyyMMdd");
+		return getNullableDate(provider.getIMMUNIZATION(rep).getZIM()
+				.getZim2_immunizationDate().getTs1_TimeOfAnEvent().getValue());
 	}
 
 	public String getVaccineCode(int rep) throws HL7Exception
