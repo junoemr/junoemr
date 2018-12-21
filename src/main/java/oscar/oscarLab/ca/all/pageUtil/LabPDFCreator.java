@@ -89,8 +89,10 @@ public class LabPDFCreator extends PdfPageEventHelper{
 
     private Document document;
     private BaseFont bf;
+	private BaseFont monospace;
     private Font font;
     private Font boldFont;
+	private Font monospaceFont;
    // private Font redFont;
     private String dateLabReceived;
 
@@ -205,6 +207,8 @@ public class LabPDFCreator extends PdfPageEventHelper{
         bf = BaseFont.createFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
         font = new Font(bf, 9, Font.NORMAL);
         boldFont = new Font(bf, 10, Font.BOLD);
+		monospace = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+		monospaceFont = new Font(monospace, 8, Font.NORMAL);
       //  redFont = new Font(bf, 9, Font.NORMAL, Color.RED);
 		if(handler.getHeaders().get(0).equals("CELLPATHR")){
 			PdfPTable table = new PdfPTable(1);
@@ -557,14 +561,18 @@ public class LabPDFCreator extends PdfPageEventHelper{
 									cell.setPaddingLeft(100);
 									cell.setColspan(7);
 									cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-									for (int l = 0; l < handler.getOBXCommentCount(
-											j, k); l++) {
-
-										cell.setPhrase(new Phrase(handler
-												.getOBXComment(j, k, l).replaceAll(
-														"<br\\s*/*>", "\n"), font));
-										table.addCell(cell);
-
+									for (int l = 0; l < handler.getOBXCommentCount(j, k); l++)
+									{
+										if (handler.getMsgType().equals("ALPHA"))
+										{
+											cell.setPhrase(new Phrase(handler.getOBXComment(j, k, l).replaceAll("<br\\s*/*>", "\n"), monospaceFont));
+											table.addCell(cell);
+										}
+										else
+										{
+											cell.setPhrase(new Phrase(handler.getOBXComment(j, k, l).replaceAll("<br\\s*/*>", "\n"), font));
+											table.addCell(cell);
+										}
 									}
 									cell.setPadding(3);
 									cell.setColspan(1);
@@ -579,7 +587,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 									cell.setColspan(1);
 									cell.setBorder(Rectangle.BOTTOM | Rectangle.TOP | Rectangle.LEFT);
 									table.addCell(cell);
-									cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0"), lineFont));
+									cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0"), monospaceFont));
 									cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 									cell.setColspan(6);
 									cell.setBorder(Rectangle.BOTTOM | Rectangle.TOP | Rectangle.RIGHT);

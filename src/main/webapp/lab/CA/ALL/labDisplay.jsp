@@ -1479,9 +1479,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										   {%>
 											   <tr>
 												   <td colspan="8" style="text-align:center">
-													  <div style="display:inline-block; text-align:left; width:450px">
-														  <%= handler.getOBXResult(j, k) %>
-													  </div>
+													   <div style="display:inline-block; text-align:left; width:450px"><pre><%= handler.getOBXResult(j, k) %></pre></div>
 												   </td>
 											   </tr>
 										   <%}
