@@ -33,14 +33,13 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.external.soap.logging.model.SoapServiceLog;
+import org.oscarehr.ws.external.soap.logging.SoapLogBuilder;
 import oscar.log.LogAction;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.HttpMethod;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 
 /**
  * This class is an upstream inbound logger responsible for logging information about SOAP requests at
@@ -68,18 +67,20 @@ public class SoapLogHTTPInterceptor extends AbstractLoggingInterceptor
     public void handleMessage(Message message) throws Fault
     {
         HttpServletRequest request = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
-        SoapServiceLog log = buildServiceLog(message);
+
+        SoapLogBuilder logData = new SoapLogBuilder();
+        cacheTransportData(logData, message);
 
         if (request.getMethod().equals(HttpMethod.GET))
         {
             // These are requests for the WSDL.  Log them at this level because they don't propagate down
             // far enough to hit (in) PRE_LOGICAL or (out) PRE_STREAM level interceptors
 
-            LogAction.saveSoapLogEntry(log);
+            LogAction.saveSoapLogEntry(logData.buildSoapLog());
         }
         else
         {
-            message.getExchange().put(SoapServiceLog.class.getName(), log);
+            message.getExchange().put(SoapLogBuilder.class.getName(), logData);
         }
     }
 
@@ -89,44 +90,33 @@ public class SoapLogHTTPInterceptor extends AbstractLoggingInterceptor
      * @param message Inbound SOAP request
      * @return A log object with the transport level fields initialized.
      */
-    private SoapServiceLog buildServiceLog(Message message)
+    private void cacheTransportData(SoapLogBuilder logData, Message message)
     {
         HttpServletRequest request = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
-
-        SoapServiceLog log = new SoapServiceLog();
-        log.setIp(request.getRemoteAddr());
-        log.setUrl(request.getRequestURL().toString());
-        log.setDuration(0L);
-        log.setHttpMethod(request.getMethod());
-
-        InputStream inStream = message.getContent(InputStream.class);
-        if (inStream != null) {
+        StringBuilder rawPostData = new StringBuilder();
+        try
+        {
+            InputStream inStream = message.getContent(InputStream.class);
             CachedOutputStream outStream = new CachedOutputStream();
-            try
-            {
-                IOUtils.copy(inStream, outStream);
 
-                outStream.flush();
-                inStream.close();
+            IOUtils.copy(inStream, outStream);
 
-                message.setContent(InputStream.class, outStream.getInputStream());
-                String soapMessage = IOUtils.toString(outStream.getInputStream());
-                outStream.close();
+            outStream.flush();
+            inStream.close();
 
-                // Store raw xml body in the message instead of the log at this point.  We'll deal with it at the PRE_STREAM
-                // level to determine if it's needed or not.  This avoids ever having the soap log entry in an invalid
-                // state (eg:  adding it now, then to removing it later if a method-level annotation determines that
-                // content logging should be skipped).
-                message.getExchange().put(SoapLogHTTPInterceptor.class.getName(), soapMessage);
-            }
-            catch (IOException e)
-            {
-                logger.error("Error retrieving message body data for SOAP ws og");
-                log.setErrorMessage(e.getMessage());
-            }
+            message.setContent(InputStream.class, outStream.getInputStream());
+            rawPostData.append(IOUtils.toString(outStream.getInputStream()));
+            outStream.close();
         }
-
-        return log;
+        catch (IOException | NullPointerException ex) // NullPointerException can be thrown if the inStream can't be found
+        {
+            logger.error("Unable to retrieve raw soap message");
+            logData.addErrorData(ex);
+        }
+        finally
+        {
+            logData.addTransportData(request, rawPostData.toString());
+        }
     }
 
     /**
@@ -139,22 +129,15 @@ public class SoapLogHTTPInterceptor extends AbstractLoggingInterceptor
     @Override
     public void handleFault(Message message)
     {
-        Exception e = message.getContent(Exception.class);
+        Exception ex = message.getContent(Exception.class);
 
-        logger.error("SOAP request fault", e);
+        logger.error("SOAP request fault", ex);
+        SoapLogBuilder logData = (SoapLogBuilder) message.getExchange().remove(SoapLogBuilder.class.getName());
 
-        // ensure we log something if the fault occurs after the interceptor stores the incoming data
-        SoapServiceLog soapLog = (SoapServiceLog) message.getExchange().get(SoapServiceLog.class.getName());
-
-        if(soapLog != null) {
-            Date createdAt = soapLog.getCreatedAt();
-            long duration  = new Date().getTime() - createdAt.getTime();
-
-            soapLog.setDuration(duration);
-            String errorMessage = e.getClass().getSimpleName() + ": " + String.valueOf(e.getMessage());
-            soapLog.setErrorMessage(errorMessage);
-
-            LogAction.saveSoapLogEntry(soapLog);
+        if (logData != null)
+        {
+            logData.addErrorData(ex);
+            LogAction.saveSoapLogEntry(logData.buildSoapLog());
         }
     }
 
@@ -162,7 +145,8 @@ public class SoapLogHTTPInterceptor extends AbstractLoggingInterceptor
      * We don't use this, but it is a required method for any logging interceptor
      */
     @Override
-    protected java.util.logging.Logger getLogger() {
+    protected java.util.logging.Logger getLogger()
+    {
         return new SoapLogOutboundLogger("SoapLogInboundLogger", null);
     }
 
@@ -170,8 +154,8 @@ public class SoapLogHTTPInterceptor extends AbstractLoggingInterceptor
     /**
      * Dummy Logger, Needed for the getLogger method we aren't using
      */
-    class SoapLogInboundLogger extends java.util.logging.Logger {
-
+    class SoapLogInboundLogger extends java.util.logging.Logger
+    {
         protected SoapLogInboundLogger(String name, String resourceBundleName) {
             super(name, resourceBundleName);
         }

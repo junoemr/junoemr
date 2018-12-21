@@ -34,4 +34,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SkipContentLogging
 {
+    String marker = "logging.SkipContentLogging";
 }

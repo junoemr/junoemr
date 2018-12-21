@@ -65,7 +65,7 @@ public class SoapServiceLog extends AbstractModel<Long>
     private String providerNo;
 
     @Column(name = "soap_input")
-    private String rawPost;
+    private String postData;
 
     @Column(name = "soap_output")
     private String rawOutput;
@@ -133,14 +133,14 @@ public class SoapServiceLog extends AbstractModel<Long>
         this.providerNo = providerNo;
     }
 
-    public String getRawPost()
+    public String getPostData()
     {
-        return rawPost;
+        return postData;
     }
 
-    public void setRawPost(String rawPost)
+    public void setPostData(String rawPost)
     {
-        this.rawPost = rawPost;
+        this.postData = rawPost;
     }
 
     public String getRawOutput()
@@ -162,7 +162,6 @@ public class SoapServiceLog extends AbstractModel<Long>
     {
         this.errorMessage = errorMessage;
     }
-
 
     public String getHttpMethod()
     {
