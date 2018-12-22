@@ -39,15 +39,13 @@ import org.oscarehr.ws.external.soap.logging.SoapLogBuilder;
 import oscar.log.LogAction;
 
 /**
- * This class is responsible for intercepting and logging webservice responses from SOAP services.
- * Messages passed will be logged to the matching soap log entry created by the InInterceptor before being passed to the client.
+ * Responsible for submitting response level data to the SOAPLogBuilder so that a single log entry can be created
+ * for each request/response chain
  *
- * We extend AbstractLoggingInterceptor to get access to the handleFault methods // TODO: Now that it's a feature can probably just extend FaultHandler?
- *
- * This class pairs with the SoapLogMethodInterceptor to log the full webservice post and response.
+ * We extend AbstractLoggingInterceptor to get access to the handleFault methods
  */
 public class SoapLogResponseInterceptor extends AbstractLoggingInterceptor {
-	
+
 	private static final Logger logger = Logger.getLogger(SoapLogResponseInterceptor.class);
 
 	public SoapLogResponseInterceptor() {
@@ -55,29 +53,37 @@ public class SoapLogResponseInterceptor extends AbstractLoggingInterceptor {
 	}
 	
 	/**
-	 * This method accepts the outgoing webservice response as a Message object
-	 * The message object contents depend on the Phase and the actions of any preceding interceptors
+	 * Intercept the SOAP response and extract data for logging.  Since the output steam can only be
+	 * read once, replace the old stream with a new copy created from the original
 	 */
 	@Override
 	public void handleMessage(Message message) throws Fault {
 		
         final OutputStream outputStream = message.getContent(OutputStream.class);
-        // Write the output while caching it for the log message
+
+		// message content has to be set to a new stream, as streams can only be read once
         if (outputStream != null) {
             final CacheAndWriteOutputStream outputCopy = new CacheAndWriteOutputStream(outputStream);
             if (threshold > 0) {
                 outputCopy.setThreshold(threshold);
             }
-            // message content has to be set to a new stream, as streams can only be read once
+
             message.setContent(OutputStream.class, outputCopy);
-            // use the callback to perform log once the stream closes
+
+            // Log only at the end of the response cycle (ie: after the output stream has been closed).  Since
+			// will occur in the future, register a callback to trigger then.
             outputCopy.registerCallback(new SoapLogOutboundCallback(logger, message));
         }
 	}
 
+	/**
+	 * Log SOAP Faults if they occur on the response side of the request/response exchange
+	 *
+	 * @param message SOAP request/response
+	 */
 	@Override
 	public void handleFault(Message message) {
-		SoapLogBuilder logData = (SoapLogBuilder) message.getExchange().get(SoapLogBuilder.class.getName());
+		SoapLogBuilder logData = (SoapLogBuilder) message.getExchange().remove(SoapLogBuilder.class.getName());
 
 		if (logData != null)
 		{
@@ -90,23 +96,17 @@ public class SoapLogResponseInterceptor extends AbstractLoggingInterceptor {
 	}
 
 	/**
-	 * We don't use this, but it is a required method for any log log
+	 * Stub method required due to extending AbstractLoggingInterceptor.
 	 */
 	@Override
 	protected java.util.logging.Logger getLogger() {
-		return new SoapLogOutboundLogger("SoapLogOutboundLogger", null);
+		return new java.util.logging.Logger("SoapLogOutboundLogger", null)
+		{
+			// Stubbed anonymous class extending java.util.logging.Logger
+		};
 	}
 }
 
-/**
- * Dummy Logger, Needed for the getLogger method we aren't using
- */
-class SoapLogOutboundLogger extends java.util.logging.Logger {
-
-	protected SoapLogOutboundLogger(String name, String resourceBundleName) {
-		super(name, resourceBundleName);
-	}
-}
 
 /**
  * Customized implementation of the CachedOutputStreamCallback
@@ -122,14 +122,23 @@ class SoapLogOutboundCallback implements CachedOutputStreamCallback {
         this.logger = logger;
         this.message = message;
     }
-	
-	public void onFlush(CachedOutputStream outputStream) {
 
-	}
+	/**
+	 * Required to implement the CachedOutputStreamCallback interface.  We don't use it.
+	 *
+	 * @param outputStream
+	 */
+	public void onFlush(CachedOutputStream outputStream) { }
 
+	/**
+	 * Add response data to the SoapLogBuilder and log the complete request/response cycle after the response stream
+	 * has closed.
+	 *
+	 * @param outputStream OutputStream containing the SOAP response
+	 */
 	public void onClose(CachedOutputStream outputStream) {
 
-		SoapLogBuilder logData = (SoapLogBuilder) message.getExchange().get(SoapLogBuilder.class.getName());
+		SoapLogBuilder logData = (SoapLogBuilder) message.getExchange().remove(SoapLogBuilder.class.getName());
 
 		if (logData != null)
 		{
@@ -140,6 +149,8 @@ class SoapLogOutboundCallback implements CachedOutputStreamCallback {
 			}
 			catch (IOException ex)
 			{
+				// We do not throw a fault here, as this is a logger problem retrieving response text,
+				// and not necessarily a fault within the SOAP service.
 				logger.error("SOAP response interceptor fault", ex);
 				logData.addErrorData(ex);
 			}
@@ -154,11 +165,24 @@ class SoapLogOutboundCallback implements CachedOutputStreamCallback {
 		}
 	}
 
+	/**
+	 * Add the response data to the SoapLogBuilder
+	 *
+	 * @param logData LogBuilder
+	 * @param rawOutput raw response data text
+	 */
 	private void cacheResponseData(SoapLogBuilder logData, String rawOutput)
 	{
 		logData.addResponseData(rawOutput);
 	}
 
+	/**
+	 * Retrieve the payload of the response output stream
+	 *
+	 * @param outputStream SOAP output stream
+	 * @return raw text contents of the stream
+	 * @throws IOException if the output stream cannot be opened
+	 */
 	private String getResponsePayload(CachedOutputStream outputStream) throws IOException
 	{
 		StringBuilder rawMessage = new StringBuilder();

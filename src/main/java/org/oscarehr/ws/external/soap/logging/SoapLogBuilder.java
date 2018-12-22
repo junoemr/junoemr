@@ -78,6 +78,9 @@ public class SoapLogBuilder
         this.createdAt = new Date();
     }
 
+    /**
+     * Cache relevant transport data
+     */
     public SoapLogBuilder addTransportData(HttpServletRequest request, String rawPostData)
     {
         this.ip = request.getRemoteAddr();
@@ -89,6 +92,9 @@ public class SoapLogBuilder
         return this;
     }
 
+    /**
+     * Cache relevant method data
+     */
     public SoapLogBuilder addMethodData(HttpServletRequest request, Method soapMethod)
     {
         this.soapMethod = soapMethod;
@@ -106,6 +112,9 @@ public class SoapLogBuilder
         return this;
     }
 
+    /**
+     * Cache relevant SOAP response data
+     */
     public SoapLogBuilder addResponseData(String rawOutput)
     {
         this.rawOutput = rawOutput;
@@ -113,6 +122,9 @@ public class SoapLogBuilder
         return this;
     }
 
+    /**
+     * Cache exception data
+     */
     public SoapLogBuilder addErrorData(Exception exception)
     {
         if (errorMessage.length() != 0)
@@ -126,6 +138,11 @@ public class SoapLogBuilder
     }
 
 
+    /**
+     * Generates a new SOAP service log from the data cached
+     *
+     * @return SOAP service log
+     */
     public SoapServiceLog buildSoapLog()
     {
         SoapServiceLog logEntry = new SoapServiceLog();
@@ -175,7 +192,7 @@ public class SoapLogBuilder
         }
         else
         {
-            postData = SkipContentLogging.marker;
+            postData = SkipContentLogging.SKIP_CONTENT_LOGGING;
         }
 
         return postData;
@@ -183,6 +200,7 @@ public class SoapLogBuilder
 
     /**
      * Determine the time needed to process the request in milliseconds
+     *
      * @return elapsed time in ms
      */
     private long calculateElapsedTimeMilliSeconds()
@@ -192,6 +210,7 @@ public class SoapLogBuilder
 
     /**
      * Determine if the specified annotation is present on the SoapMethod
+     *
      * @param annotation The annotation to look for
      * @return true if the specified annotation is present
      */
@@ -203,6 +222,7 @@ public class SoapLogBuilder
 
     /**
      * Retrieve the list of parameters to mask from the raw input
+     *
      * @return array of parameters which should be masked
      */
     private String[] getMaskParameters()

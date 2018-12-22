@@ -20,6 +20,10 @@
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
+	<!-- ========================================================================================-->
+	<!-- Shared SOAP/REST bus-->
+	<!-- ========================================================================================-->
+
 	<cxf:bus>
 		<cxf:properties>
 			<entry key="ws-security.ut.validator" value="org.oscarehr.ws.OscarUsernameTokenValidator" />
@@ -52,6 +56,9 @@
 
 	<!-- web service endpoints -->
 	<jaxws:endpoint implementor="#systemInfoWs" address="/SystemInfoService">
+		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
+		</jaxws:inInterceptors>
 		<jaxws:outInterceptors>
 			<ref bean="bornSOAPHeaderInterceptor"/>
 		</jaxws:outInterceptors>
@@ -61,6 +68,9 @@
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#loginWs" address="/LoginService">
+		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
+		</jaxws:inInterceptors>
 		<jaxws:outInterceptors>
 			<ref bean="bornSOAPHeaderInterceptor"/>
 		</jaxws:outInterceptors>
@@ -214,6 +224,7 @@
 
 	<jaxws:endpoint implementor="#labUploadWs" address="/LabUploadService" >
 		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
 		<jaxws:outInterceptors>

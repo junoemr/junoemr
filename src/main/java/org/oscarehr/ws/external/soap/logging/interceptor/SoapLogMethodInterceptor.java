@@ -43,10 +43,7 @@ import java.lang.reflect.Method;
 
 
 /**
- * This class is responsible for logging at the service/method level of a SOAP request.
- *
- * Together with SoapLogHTTPInterceptor and SoapLogResponseInterceptor, these three interceptors form a suite which is
- * able to log the full webservice request and response.
+ * This class is responsible for logging at the service/method level of the SOAP request.
  */
 public class SoapLogMethodInterceptor extends AbstractSoapInterceptor
 {
@@ -57,9 +54,8 @@ public class SoapLogMethodInterceptor extends AbstractSoapInterceptor
 	}
 
 	/**
-	 * Add authentication and SOAP service information to the SOAP request/response log
-	 *
-	 * @param message Soap message to be logged
+	 * Retrieve the SOAP Log builder on attached to the message and attach method and authentication data to it.
+	 * @param message SOAP request/response
 	 */
 	@Override
 	public void handleMessage(SoapMessage message) throws Fault
@@ -77,7 +73,13 @@ public class SoapLogMethodInterceptor extends AbstractSoapInterceptor
         }
     }
 
-    private void cacheMethodData(SoapLogBuilder logData, Message message)
+	/**
+	 * Add method level data to the log builder
+	 *
+	 * @param logData logBuilder used to construct a log entry for this request/response exchange
+	 * @param message SOAP request/response
+	 */
+	private void cacheMethodData(SoapLogBuilder logData, Message message)
     {
         HttpServletRequest request = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
         Method soapMethod = getMessageTargetMethod(message);
@@ -87,8 +89,8 @@ public class SoapLogMethodInterceptor extends AbstractSoapInterceptor
 	/**
 	 *	Get the java method which is invoked by the soap message
 	 *
-	 * @param message:  The soap message
-	 * @return the Method
+	 * @param message:  SOAP request/response
+	 * @return the java method at the SOAP endpoint.
 	 */
 	private Method getMessageTargetMethod(Message message)
 	{

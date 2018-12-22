@@ -43,7 +43,7 @@ import java.io.InputStream;
 
 /**
  * This class is an upstream inbound logger responsible for logging information about SOAP requests at
- * the transport (HTTP) level.
+ * the transport (HTTP) level.  This class extends AbstractLoggingInterceptor for access to the handleFault method.
  */
 public class SoapLogHTTPInterceptor extends AbstractLoggingInterceptor
 {
@@ -55,13 +55,11 @@ public class SoapLogHTTPInterceptor extends AbstractLoggingInterceptor
     }
 
     /**
-     * Create a log entry for the SOAP request/response exchange.  If the request is an HTTP GET, then
-     * only the request portion will be logged.  The log entry is attached to the message and allowed to propgate
-     * out to the response level interceptors where it will be combined with response information and
-     * persisted as a single entry for the complete exchange.
+     * If the request is a GET for the WSDL, then build the log and persist it, as the message will not propagate down
+     * far enough to register with the response interceptor.  Otherwise, register transport data with the logBuilder.
      *
-     * @param message Abstract message representing the request
-     * @throws Fault If something goes wrong with the SOAP request
+     * @param message SOAP request/response
+     * @throws Fault If there is a problem reading the payload of the message
      */
     @Override
     public void handleMessage(Message message) throws Fault
@@ -85,12 +83,15 @@ public class SoapLogHTTPInterceptor extends AbstractLoggingInterceptor
     }
 
     /**
-     * Build the HTTP transport level component of the SOAP log
+     * Extract transport level data from the Message and add it to a LogBuilder.  Since the input stream can only
+     * be read once, this method reads the stream, then attaches a new stream containing the contents of the old stream
+     * to the Message.
      *
-     * @param message Inbound SOAP request
-     * @return A log object with the transport level fields initialized.
+     * @param logData logBuilder to attach the transport level data to
+     * @param message SOAP request/response
+     * @throws Fault if the input stream cannot be read, or the output stream cannot be instantitated properly
      */
-    private void cacheTransportData(SoapLogBuilder logData, Message message)
+    private void cacheTransportData(SoapLogBuilder logData, Message message) throws Fault
     {
         HttpServletRequest request = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
         StringBuilder rawPostData = new StringBuilder();
@@ -107,20 +108,22 @@ public class SoapLogHTTPInterceptor extends AbstractLoggingInterceptor
             message.setContent(InputStream.class, outStream.getInputStream());
             rawPostData.append(IOUtils.toString(outStream.getInputStream()));
             outStream.close();
+            logData.addTransportData(request, rawPostData.toString());
         }
         catch (IOException | NullPointerException ex) // NullPointerException can be thrown if the inStream can't be found
         {
+            final String emptyPostBody = "";
+            // Try and salvage some of the transport data
+            logData.addTransportData(request, emptyPostBody);
+
             logger.error("Unable to retrieve raw soap message");
-            logData.addErrorData(ex);
-        }
-        finally
-        {
-            logData.addTransportData(request, rawPostData.toString());
+            throw new Fault(ex);
         }
     }
 
     /**
      * Log all SOAP faults arising from the inbound request if something goes wrong.
+     *
      * Since interceptors are unwound backwards when a Fault is thrown, the handle fault method of this
      * class will be called last.
      *
@@ -142,22 +145,14 @@ public class SoapLogHTTPInterceptor extends AbstractLoggingInterceptor
     }
 
     /**
-     * We don't use this, but it is a required method for any logging interceptor
+     * This is a stub method needed because we extend AbstractLogginginterceptor.
      */
     @Override
     protected java.util.logging.Logger getLogger()
     {
-        return new SoapLogOutboundLogger("SoapLogInboundLogger", null);
-    }
-
-
-    /**
-     * Dummy Logger, Needed for the getLogger method we aren't using
-     */
-    class SoapLogInboundLogger extends java.util.logging.Logger
-    {
-        protected SoapLogInboundLogger(String name, String resourceBundleName) {
-            super(name, resourceBundleName);
-        }
+        return new java.util.logging.Logger("SoapLogInboundLogger", null)
+        {
+            // Anonymous inner class??
+        };
     }
 }
