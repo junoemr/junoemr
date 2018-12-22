@@ -152,7 +152,7 @@ public class SoapLogHTTPInterceptor extends AbstractLoggingInterceptor
     {
         return new java.util.logging.Logger("SoapLogInboundLogger", null)
         {
-            // Anonymous inner class??
+            // Anonymous inner class extending java.util.logging.Logger
         };
     }
 }
