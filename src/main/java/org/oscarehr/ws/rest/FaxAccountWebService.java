@@ -42,6 +42,7 @@ import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -212,7 +213,9 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<FaxInboxTransferOutbound> getInbox(@PathParam("id") Long id,
 	                                                             @QueryParam("page") @DefaultValue("1") Integer page,
-	                                                             @QueryParam("perPage") @DefaultValue("10") Integer perPage)
+	                                                             @QueryParam("perPage") @DefaultValue("10") Integer perPage,
+	                                                             @QueryParam("endDate") String endDateStr,
+	                                                             @QueryParam("startDate") String startDateStr)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin", "_admin.fax");
@@ -227,6 +230,15 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		criteriaSearch.setFaxAccountId(id);
 		criteriaSearch.setSortDirDescending();
 
+		if(endDateStr != null)
+		{
+			criteriaSearch.setEndDate(ConversionUtils.toLocalDate(endDateStr));
+		}
+		if(startDateStr != null)
+		{
+			criteriaSearch.setStartDate(ConversionUtils.toLocalDate(startDateStr));
+		}
+
 		int total = faxInboundDao.criteriaSearchCount(criteriaSearch);
 		List<FaxInboxTransferOutbound> resultList = faxAccountService.getInboxResults(criteriaSearch);
 
@@ -240,6 +252,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	public RestSearchResponse<FaxOutboxTransferOutbound> getOutbox(@PathParam("id") Long id,
 	                                                               @QueryParam("page") @DefaultValue("1") Integer page,
 	                                                               @QueryParam("perPage") @DefaultValue("10") Integer perPage,
+	                                                               @QueryParam("endDate") String endDateStr,
 	                                                               @QueryParam("startDate") String startDateStr)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
@@ -254,6 +267,15 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		criteriaSearch.setLimit(perPage);
 		criteriaSearch.setFaxAccountId(id);
 		criteriaSearch.setSortDirDescending();
+		if(endDateStr != null)
+		{
+			criteriaSearch.setEndDate(ConversionUtils.toLocalDate(endDateStr));
+		}
+		if(startDateStr != null)
+		{
+			criteriaSearch.setStartDate(ConversionUtils.toLocalDate(startDateStr));
+		}
+
 		int total = faxOutboundDao.criteriaSearchCount(criteriaSearch);
 
 		FaxAccount faxAccount = faxAccountDao.find(id);

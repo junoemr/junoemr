@@ -432,6 +432,7 @@
 <%--Non-angular scripts--%>
 <script type="text/javascript" src="common/util/util.js"></script>
 <script type="text/javascript" src="common/util/serviceHelper.js"></script>
+<script type="text/javascript" src="common/util/searchListHelper.js"></script>
 <script type="text/javascript" src="consults/common.js"></script>
 
 <%--Angular scripts--%>

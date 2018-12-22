@@ -28,6 +28,7 @@ import org.oscarehr.common.search.AbstractCriteriaSearch;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
 
 public class FaxInboundCriteriaSearch extends AbstractCriteriaSearch
@@ -39,7 +40,8 @@ public class FaxInboundCriteriaSearch extends AbstractCriteriaSearch
 
 	private Long faxAccountId;
 	private Integer documentNo;
-	private LocalDate beforeDate;
+	private LocalDate startDate;
+	private LocalDate endDate;
 
 	private SORTMODE sortMode = SORTMODE.CreationDate;
 
@@ -61,9 +63,13 @@ public class FaxInboundCriteriaSearch extends AbstractCriteriaSearch
 		{
 			criteria.add(Restrictions.eq("doc.documentNo", getDocumentNo()));
 		}
-		if(getBeforeDate() != null)
+		if(getEndDate() != null)
 		{
-			criteria.add(Restrictions.le("createdAt", Timestamp.from(getBeforeDate().atStartOfDay().toInstant(ZoneOffset.UTC))));
+			criteria.add(Restrictions.le("createdAt", Timestamp.from(getEndDate().atTime(LocalTime.MAX).toInstant(ZoneOffset.UTC))));
+		}
+		if(getStartDate() != null)
+		{
+			criteria.add(Restrictions.ge("createdAt", Timestamp.from(getStartDate().atStartOfDay().toInstant(ZoneOffset.UTC))));
 		}
 		setOrderByCriteria(criteria);
 		return criteria;
@@ -98,14 +104,24 @@ public class FaxInboundCriteriaSearch extends AbstractCriteriaSearch
 		this.documentNo = documentNo;
 	}
 
-	public LocalDate getBeforeDate()
+	public LocalDate getEndDate()
 	{
-		return beforeDate;
+		return endDate;
 	}
 
-	public void setBeforeDate(LocalDate beforeDate)
+	public void setEndDate(LocalDate endDate)
 	{
-		this.beforeDate = beforeDate;
+		this.endDate = endDate;
+	}
+
+	public LocalDate getStartDate()
+	{
+		return startDate;
+	}
+
+	public void setStartDate(LocalDate startDate)
+	{
+		this.startDate = startDate;
 	}
 
 	public SORTMODE getSortMode()

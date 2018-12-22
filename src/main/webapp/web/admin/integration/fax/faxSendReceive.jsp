@@ -78,13 +78,6 @@
 				<h1><bean:message bundle="ui" key="admin.fax.sr.inbox.header-title"/></h1>
 			</div>
 			<div class="fax-inbox-body">
-				<div class="flex-row search-filters">
-				</div>
-				<div class="flex-row search-buttons">
-					<button type="button" class="btn btn-primary"
-					        ng-click="faxSendReceiveController.loadInboxItems();">Search
-					</button>
-				</div>
 
 				<div ng-show="faxSendReceiveController.selectedFaxAccount.enableInbound == true">
 					<span><bean:message bundle="ui" key="admin.fax.sr.inbox.checkNewFaxesAt"/> {{faxSendReceiveController.nextPullTime}}</span>
@@ -93,6 +86,32 @@
 				</div>
 				<div ng-show="faxSendReceiveController.selectedFaxAccount.enableInbound == false">
 					<span><bean:message bundle="ui" key="admin.fax.sr.inbox.disabledMessage"/></span>
+				</div>
+
+				<div class="flex-row search-frame">
+					<div class="row search-filters">
+						<div class="col-lg-3 col-xs-6">
+							<label for="inbox-datepicker-startdate-id"><bean:message bundle="ui" key="admin.fax.sr.search.startDate"/></label>
+							<juno-datepicker-popup id="inbox-datepicker-startdate-id"
+							                       juno-model="faxSendReceiveController.inbox.startDate"
+							                       show-icon="true"
+							                       type="Input">
+							</juno-datepicker-popup>
+						</div>
+						<div class="col-lg-3 col-xs-6">
+							<label for="inbox-datepicker-enddate-id"><bean:message bundle="ui" key="admin.fax.sr.search.endDate"/></label>
+							<juno-datepicker-popup id="inbox-datepicker-enddate-id"
+							                       juno-model="faxSendReceiveController.inbox.endDate"
+							                       show-icon="true"
+							                       type="Input">
+							</juno-datepicker-popup>
+						</div>
+					</div>
+					<div class="row search-buttons">
+						<button type="button" class="btn btn-primary"
+						        ng-click="faxSendReceiveController.loadInboxItems();">Search
+						</button>
+					</div>
 				</div>
 
 				<table ng-table="faxSendReceiveController.tableParamsInbox" show-filter="false" class="table table-striped table-bordered">
@@ -119,16 +138,35 @@
 				<h1><bean:message bundle="ui" key="admin.fax.sr.outbox.header-title"/></h1>
 			</div>
 			<div class="fax-outbox-body">
-				<div class="flex-row search-filters">
-				</div>
-				<div class="flex-row search-buttons">
-					<button type="button" class="btn btn-primary"
-					        ng-click="faxSendReceiveController.loadOutboxItems();"><bean:message bundle="ui" key="global.search"/>
-					</button>
-				</div>
 
 				<div>
 					<span><bean:message bundle="ui" key="admin.fax.sr.outbox.resendAtMessage"/> {{faxSendReceiveController.nextPushTime}}</span>
+				</div>
+
+				<div class="flex-row search-frame">
+					<div class="row search-filters">
+						<div class="col-lg-3 col-xs-6">
+							<label for="outbox-datepicker-startdate-id"><bean:message bundle="ui" key="admin.fax.sr.search.startDate"/></label>
+							<juno-datepicker-popup id="outbox-datepicker-startdate-id"
+							                       juno-model="faxSendReceiveController.outbox.startDate"
+							                       show-icon="true"
+							                       type="Input">
+							</juno-datepicker-popup>
+						</div>
+						<div class="col-lg-3 col-xs-6">
+							<label for="outbox-datepicker-enddate-id"><bean:message bundle="ui" key="admin.fax.sr.search.endDate"/></label>
+							<juno-datepicker-popup id="outbox-datepicker-enddate-id"
+							                       juno-model="faxSendReceiveController.outbox.endDate"
+							                       show-icon="true"
+							                       type="Input">
+							</juno-datepicker-popup>
+						</div>
+					</div>
+					<div class="row search-buttons">
+						<button type="button" class="btn btn-primary"
+						        ng-click="faxSendReceiveController.loadOutboxItems();"><bean:message bundle="ui" key="global.search"/>
+						</button>
+					</div>
 				</div>
 
 				<table ng-table="faxSendReceiveController.tableParamsOutbox" show-filter="false" class="table table-striped table-bordered">

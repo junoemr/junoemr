@@ -33,7 +33,9 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 				sorting: {
 					DateSent: "desc"
 				}
-			}
+			},
+			startDate: null,
+			endDate: null
 		};
 		// ngTable object for storing search parameters
 		controller.outbox =
@@ -44,7 +46,9 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 					sorting: {
 						DateSent: "desc"
 					}
-				}
+				},
+				startDate: null,
+				endDate: null
 			};
 
 		controller.initialize = function()
@@ -75,7 +79,17 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 					getData: function(params)
 					{
 						controller.outbox.search = params.url();
-						return faxAccountService.getOutbox(controller.selectedFaxAccount.id, controller.outbox.search.page, controller.outbox.search.count).then(
+
+						let defaults = {
+							page: controller.outbox.search.page,
+							perPage: controller.outbox.search.count
+						};
+						let searchParams = {
+							startDate:  controller.formatOptionalDateParam(controller.outbox.startDate),
+							endDate: controller.formatOptionalDateParam(controller.outbox.endDate),
+						};
+						var searchListHelper = new Juno.Common.SearchListHelper(defaults, searchParams);
+						return faxAccountService.getOutbox(controller.selectedFaxAccount.id, searchListHelper).then(
 							function success(response)
 							{
 								controller.outboxItemList = response.data;
@@ -102,7 +116,18 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 					getData: function (params)
 					{
 						controller.inbox.search = params.url();
-						return faxAccountService.getInbox(controller.selectedFaxAccount.id, controller.inbox.search.page, controller.inbox.search.count).then(
+						console.info(controller.inbox);
+
+						let defaults = {
+							page: controller.inbox.search.page,
+							perPage: controller.inbox.search.count
+						};
+						let searchParams = {
+							startDate:  controller.formatOptionalDateParam(controller.inbox.startDate),
+							endDate: controller.formatOptionalDateParam(controller.inbox.endDate),
+						};
+						var searchListHelper = new Juno.Common.SearchListHelper(defaults, searchParams);
+						return faxAccountService.getInbox(controller.selectedFaxAccount.id, searchListHelper).then(
 							function success(response)
 							{
 								controller.inboxItemList = response.data;
@@ -215,6 +240,11 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 			let url = faxOutboundService.getDownloadUrl(outboundId);
 			let windowName = "ViewFaxFile" + outboundId;
 			window.open(url, windowName, "scrollbars=1,width=1024,height=768");
+		};
+
+		controller.formatOptionalDateParam = function(dateObj)
+		{
+			return Juno.Common.Util.isUndefinedOrNull(dateObj)? null : moment(dateObj).format('YYYY-MM-DD')
 		};
 
 		controller.initialize();
