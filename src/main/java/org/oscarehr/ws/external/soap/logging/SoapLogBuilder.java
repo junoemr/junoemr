@@ -178,7 +178,7 @@ public class SoapLogBuilder
 
         if (!isSoapMethodAnnotatedWith(SkipContentLogging.class))
         {
-            if (isSoapMethodAnnotatedWith(MaskParameter.class))
+            if (isSoapMethodAnnotatedWith(MaskParameter.class) && isPostBodyParseable())
             {
                 String[] parametersToMask = getMaskParameters();
                 String sanitizedPostData = applyParameterMasking(parametersToMask);
@@ -217,6 +217,16 @@ public class SoapLogBuilder
     private boolean isSoapMethodAnnotatedWith(Class<? extends Annotation> annotation)
     {
         return (this.soapMethod != null) && (AnnotationUtils.getMethodAnnotation(this.soapMethod, annotation) != null);
+    }
+
+    /**
+     * Determine if a post body is parseable.  It is if it's not null and not empty.
+     *
+     * @return true if the post body can be parsed
+     */
+    private boolean isPostBodyParseable()
+    {
+        return this.rawPostData != null && !this.rawPostData.isEmpty();
     }
 
 
