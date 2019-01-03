@@ -23,7 +23,6 @@
 
 package org.oscarehr.ws.soap.logging;
 
-import org.apache.cxf.interceptor.Fault;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
