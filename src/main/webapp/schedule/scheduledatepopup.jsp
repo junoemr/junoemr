@@ -51,10 +51,10 @@
   String available = "checked", strHour = "", strReason = "value=''", strCreator="Me";
   HScheduleDate aHScheduleDate= (HScheduleDate) scheduleDateBean.get(year+"-"+month+"-"+day);
   if (aHScheduleDate!=null) {
-    available = aHScheduleDate.available.compareTo("1")==0?"checked":""  ;
-    strHour = aHScheduleDate.hour;
-    strReason = aHScheduleDate.reason ;
-    strCreator= aHScheduleDate.creator;
+    available = aHScheduleDate.isAvailable()?"checked":""  ;
+    strHour = aHScheduleDate.getHour();
+    strReason = aHScheduleDate.getReason();
+    strCreator= aHScheduleDate.getCreator();
   }
 
   String providerNoStr = request.getParameter("provider_no");
