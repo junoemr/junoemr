@@ -56,7 +56,7 @@ public final class FaxAction
 	 * @throws IOException
 	 * @throws HtmlToPdfConversionException
 	 */
-	public List<FaxOutboxTransferOutbound> faxForms(String[] numbers, String formId, String providerId) throws IOException, HtmlToPdfConversionException
+	public List<FaxOutboxTransferOutbound> faxForms(String[] numbers, String formId, String providerId) throws IOException, HtmlToPdfConversionException, InterruptedException
 	{
 		HashSet<String> recipients = OutgoingFaxService.preProcessFaxNumbers(numbers);
 		List<FaxOutboxTransferOutbound> transferList = new ArrayList<>(recipients.size());

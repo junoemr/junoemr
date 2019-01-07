@@ -167,7 +167,7 @@ public class FrmCustomedPDFServlet extends HttpServlet
 			PrintWriter writer = res.getWriter();
 			writer.println("<script>alert('Signature not found. Please sign the prescription.');</script>");
 		}
-		catch(IOException e)
+		catch(InterruptedException | IOException e)
 	    {
 		    res.setContentType("text/html");
 		    PrintWriter writer = res.getWriter();

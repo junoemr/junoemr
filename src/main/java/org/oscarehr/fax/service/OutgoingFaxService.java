@@ -118,7 +118,7 @@ public class OutgoingFaxService
 	 * Send a fax with the default fax account
 	 * @throws IOException
 	 */
-	public FaxOutboxTransferOutbound sendFax(String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException
+	public FaxOutboxTransferOutbound sendFax(String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
 	{
 		FaxAccount faxAccount = faxAccountService.getDefaultFaxAccount();
 		return sendFax(faxAccount, providerId, demographicId, faxNumber, fileType, fileToFax);
@@ -128,7 +128,7 @@ public class OutgoingFaxService
 	 * Send a fax with the given fax account
 	 * @throws IOException
 	 */
-	public FaxOutboxTransferOutbound sendFax(FaxAccount faxAccount, String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException
+	public FaxOutboxTransferOutbound sendFax(FaxAccount faxAccount, String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
 	{
 		FaxOutboxTransferOutbound transfer;
 		// check for enabled fax routes
@@ -232,7 +232,7 @@ public class OutgoingFaxService
 	/**
 	 * When there are no direct integration fax routes, write file to outbound location (old fax system)
 	 */
-	private void writeToFaxOutgoing(String faxNumber, GenericFile...filesToFax) throws IOException
+	private void writeToFaxOutgoing(String faxNumber, GenericFile...filesToFax) throws IOException, InterruptedException
 	{
 		for(GenericFile fileToFax : filesToFax)
 		{
