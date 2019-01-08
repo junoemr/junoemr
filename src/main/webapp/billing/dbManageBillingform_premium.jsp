@@ -24,42 +24,49 @@
 
 --%>
 
-<%@ page
-	import="java.math.*, java.util.*, java.io.*, java.sql.*, oscar.*, java.net.*,oscar.MyDateFormat"%>
-
-
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.common.model.CtlBillingServicePremium" %>
 <%@ page import="org.oscarehr.common.dao.CtlBillingServicePremiumDao" %>
+<%@ page import="org.oscarehr.common.dao.BillingServiceDao" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 <%
 	CtlBillingServicePremiumDao ctlBillingServicePremiumDao = SpringUtils.getBean(CtlBillingServicePremiumDao.class);
+	BillingServiceDao billingServiceDao = SpringUtils.getBean(BillingServiceDao.class);
+	String billingServiceCode;
+	List<String> invalidCodes = new ArrayList<String>();
+
+	for (int i = 1; i < 11; i++)
+	{
+		billingServiceCode = request.getParameter("service" + i);
+
+		if (billingServiceCode != null && !billingServiceCode.isEmpty())
+		{
+			//Check if billing code exists before inserting
+			if(!billingServiceDao.findByServiceCode(billingServiceCode).isEmpty())
+			{
+				CtlBillingServicePremium billingServicePremium = new CtlBillingServicePremium();
+				billingServicePremium.setServiceTypeName("Office");
+				billingServicePremium.setServiceCode(billingServiceCode);
+				billingServicePremium.setStatus("A");
+				billingServicePremium.setUpdateDate(new java.util.Date());
+				ctlBillingServicePremiumDao.persist(billingServicePremium);
+			}
+			else
+			{
+				invalidCodes.add(billingServiceCode);
+			}
+		}
+	}
+
+
+	if (invalidCodes.isEmpty())
+	{
+		response.sendRedirect("manageBillingform.jsp?billingform=***");
+	}
+	else
+	{
+		response.sendRedirect("manageBillingform.jsp?billingform=***&invalidcodes=" + invalidCodes.toString());
+	}
 %>
-<%
 
-
-String[] group = new String[4];
-String typeid = "", type="";
-GregorianCalendar now=new GregorianCalendar();
-  int curYear = now.get(Calendar.YEAR);
-  int curMonth = (now.get(Calendar.MONTH)+1);
-  int curDay = now.get(Calendar.DAY_OF_MONTH);
-
-%>
-
-<%
-for (int i=1; i<11; i++){
-
-if(request.getParameter("service"+i).length() !=0){
-
- String[] param =new String[4];
- 	CtlBillingServicePremium cbspd = new CtlBillingServicePremium();
- 	cbspd.setServiceTypeName("Office");
- 	cbspd.setServiceCode(request.getParameter("service"+i));
- 	cbspd.setStatus("A");
- 	cbspd.setUpdateDate(new java.util.Date());
- 	ctlBillingServicePremiumDao.persist(cbspd);
-
-}}
-%>
-
-<% response.sendRedirect("manageBillingform.jsp"); %>

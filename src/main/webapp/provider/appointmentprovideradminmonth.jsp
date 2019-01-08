@@ -845,7 +845,7 @@ function refreshTabAlerts(id) {
       break;
     } else {
       bFistEntry = true;
-      if(String.valueOf(date.getAvailable()).equals("0")) continue;
+      if(!date.isAvailable()) continue;
     }
     if(isTeamOnly || !providerview.startsWith("_grp_",0) || myGrpBean.containsKey(date.getProviderNo()) ) {
     	%>
