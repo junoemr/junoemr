@@ -33,7 +33,7 @@ import oscar.util.ConversionUtils;
 
 import java.util.Date;
 
-public abstract class AbstractMapper
+public class AbstractMapper
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
@@ -41,29 +41,29 @@ public abstract class AbstractMapper
 	protected final ZPD_ZTR_PROVIDER provider;
 	protected final CoPDImportService.IMPORT_SOURCE importSource;
 
-	public AbstractMapper()
+	protected AbstractMapper()
 	{
 		this.message = null;
 		this.provider = null;
 		this.importSource = CoPDImportService.IMPORT_SOURCE.UNKNOWN;
 	}
-	public AbstractMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	protected AbstractMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
 		this.message = message;
 		this.provider = message.getPATIENT().getPROVIDER(providerRep);
 		this.importSource = importSource;
 	}
-	public AbstractMapper(ZPD_ZTR message, int providerRep)
+	protected AbstractMapper(ZPD_ZTR message, int providerRep)
 	{
 		this(message, providerRep, CoPDImportService.IMPORT_SOURCE.UNKNOWN);
 	}
-	public AbstractMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
+	protected AbstractMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
 	{
 		this.message = message;
 		this.provider = null;
 		this.importSource = importSource;
 	}
-	public AbstractMapper(ZPD_ZTR message)
+	protected AbstractMapper(ZPD_ZTR message)
 	{
 		this(message, CoPDImportService.IMPORT_SOURCE.UNKNOWN);
 	}
