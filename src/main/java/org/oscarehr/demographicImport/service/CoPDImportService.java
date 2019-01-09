@@ -159,8 +159,10 @@ public class CoPDImportService
 	{
 		logger.info("Initialize HL7 parser");
 		HapiContext context = new DefaultHapiContext();
+		// default Obx2 types to string
 		context.getParserConfiguration().setDefaultObx2Type("ST");
-//		context.setValidationContext(new NoValidation());
+		// otherwise multiple spaces are trimmed to single spaces and document file names won't match
+		context.getParserConfiguration().setXmlDisableWhitespaceTrimmingOnAllNodes(true);
 
 		// this package string needs to match the custom model location in the oscar source code.
 		ModelClassFactory modelClassFactory = new CustomModelClassFactory(ZPD_ZTR.ROOT_PACKAGE);

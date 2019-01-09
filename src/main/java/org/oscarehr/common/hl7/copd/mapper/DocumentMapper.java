@@ -87,7 +87,7 @@ public class DocumentMapper extends AbstractMapper
 
 	public String getContentType(int rep)
 	{
-		//TODO map to apllication/contenttype correctly
+		//TODO map to application/contenttype correctly
 		return "application/" + StringUtils.lowerCase(provider.getZAT(rep).getZat4_Attachment().getSubtype().getValue());
 	}
 }

@@ -22,6 +22,7 @@
  */
 package org.oscarehr.common.hl7.copd.mapper;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
@@ -83,14 +84,14 @@ public abstract class AbstractMapper
 		ProviderData parsedProvider = null;
 		if(segmentToParse != null && segmentToParse.contains("|"))
 		{
-			String[] providerNames = segmentToParse.split("\\|");
+			String[] providerNames = segmentToParse.split("\\|", -1); // -1 forces all trailing empties to be included
 			if(providerNames.length > 2)
 			{
 				logger.error("["+debugLocation+"] Malformed provider name contains too many delimiters: '" + segmentToParse + "'");
 			}
 			parsedProvider = new ProviderData();
-			parsedProvider.setFirstName(providerNames[0]);
-			parsedProvider.setLastName(providerNames[1]);
+			parsedProvider.setFirstName(StringUtils.trimToNull(providerNames[0]));
+			parsedProvider.setLastName(StringUtils.trimToNull(providerNames[1]));
 		}
 		else if(segmentToParse != null)
 		{

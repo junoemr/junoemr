@@ -86,11 +86,11 @@ public class EncounterNoteMapper extends AbstractMapper
 			text += "\n" + commentText + "\n";
 		}
 
-		if(!signatureText.isEmpty())
+		if(!signatureText.isEmpty() && !signatureText.equals("|"))
 		{
 			Date noteDate = getEncounterNoteContactDate(rep);
 			String dateStr = ConversionUtils.toDateString(noteDate, "dd-MMM-yyyy HH:mm");
-			signatureText = "[Signed on " + dateStr + " by " + signatureText + "]";
+			signatureText = "[Signed on " + dateStr + " by " + signatureText.replaceAll("\\|", " ") + "]";
 			text += signatureText;
 		}
 
