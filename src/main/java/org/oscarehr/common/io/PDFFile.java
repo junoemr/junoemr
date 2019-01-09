@@ -47,7 +47,7 @@ public class PDFFile extends GenericFile
 
 	static
 	{
-		allowedWarningsGS[0] = Pattern.compile(".*Missing glyph .* in the font HiddenHorzOCR.*", Pattern.CASE_INSENSITIVE);
+		allowedWarningsGS[0] = Pattern.compile(".*Missing glyph .* in the font .*", Pattern.CASE_INSENSITIVE);
 	}
 
 	private OscarProperties oscarProperties = OscarProperties.getInstance();
