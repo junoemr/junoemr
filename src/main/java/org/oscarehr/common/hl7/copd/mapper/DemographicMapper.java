@@ -176,7 +176,7 @@ public class DemographicMapper extends AbstractMapper
 		String areaCode = messagePID.getPid13_PhoneNumberHome(rep).getAreaCityCode().getValue();
 		String phoneNumber = messagePID.getPid13_PhoneNumberHome(rep).getPhoneNumber().getValue();
 
-		return StringUtils.trimToNull(StringUtils.trimToEmpty(areaCode) + " " + StringUtils.trimToEmpty(phoneNumber));
+		return StringUtils.trimToNull(StringUtils.trimToEmpty(areaCode) + StringUtils.trimToEmpty(phoneNumber));
 	}
 
 	public String getPHN() throws HL7Exception
