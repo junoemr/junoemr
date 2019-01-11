@@ -56,7 +56,7 @@ public class CopdCommandLineImporter
 	public static void main (String [] args)
 	{
 
-		if(args == null || args.length != 5)
+		if(args == null || args.length != 6)
 		{
 			BasicConfigurator.configure();
 			logger.error("Invalid argument count");
@@ -100,6 +100,8 @@ public class CopdCommandLineImporter
 			importSource = CoPDImportService.IMPORT_SOURCE.WOLF;
 		}
 
+		// flag to allow importing demographics with missing document files by skipping those records.
+		boolean skipMissingDocs= Boolean.parseBoolean(args[5]);
 
 		ClassPathXmlApplicationContext ctx = null;
 		long importCount = 0;
@@ -147,7 +149,7 @@ public class CopdCommandLineImporter
 
 						try
 						{
-							importFileString(fileString, copdDocumentLocation, importSource);
+							importFileString(fileString, copdDocumentLocation, importSource, skipMissingDocs);
 							importCount++;
 							moveToCompleted(copdFile, copdDirectory);
 						}
@@ -176,16 +178,23 @@ public class CopdCommandLineImporter
 				ctx.close();
 			}
 		}
+
+		if(skipMissingDocs)
+		{
+			long totalSkippedDocuments = coPDImportService.getMissingDocumentCount();
+			logger.info(totalSkippedDocuments + " documents failed to upload and were skipped.");
+		}
 		logger.info("IMPORT PROCESS COMPLETE (" + importCount + " files imported. " + failureCount + " failures)");
 	}
 
-	private static void importFileString(String fileString, String documentDirectory, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception, IOException, InterruptedException
+	private static void importFileString(String fileString, String documentDirectory, CoPDImportService.IMPORT_SOURCE importSource, boolean skipMissingDocs)
+			throws HL7Exception, IOException, InterruptedException
 	{
 		List<String> messageList = coPDPreProcessorService.separateMessages(fileString);
 		for(String message : messageList)
 		{
 			message = coPDPreProcessorService.preProcessMessage(message, importSource);
-			coPDImportService.importFromHl7Message(message, documentDirectory, importSource);
+			coPDImportService.importFromHl7Message(message, documentDirectory, importSource, skipMissingDocs);
 		}
 	}
 

@@ -155,7 +155,9 @@ public class CoPDImportService
 	@Autowired
 	TicklerDao ticklerDao;
 
-	public void importFromHl7Message(String message, String documentLocation, IMPORT_SOURCE importSource) throws HL7Exception, IOException, InterruptedException
+	private static long missingDocumentCount = 0;
+
+	public void importFromHl7Message(String message, String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs) throws HL7Exception, IOException, InterruptedException
 	{
 		logger.info("Initialize HL7 parser");
 		HapiContext context = new DefaultHapiContext();
@@ -172,17 +174,24 @@ public class CoPDImportService
 		logger.info("Parse Message");
 
 		ZPD_ZTR zpdZtrMessage = (ZPD_ZTR) p.parse(message);
-		importRecordData(zpdZtrMessage, documentLocation, importSource);
+
+		missingDocumentCount = 0;
+		importRecordData(zpdZtrMessage, documentLocation, importSource, skipMissingDocs);
+	}
+	public long getMissingDocumentCount()
+	{
+		return missingDocumentCount;
 	}
 
-	private void importRecordData(ZPD_ZTR zpdZtrMessage, String documentLocation, IMPORT_SOURCE importSource) throws HL7Exception, IOException, InterruptedException
+	private void importRecordData(ZPD_ZTR zpdZtrMessage, String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs)
+			throws HL7Exception, IOException, InterruptedException
 	{
 		logger.info("Creating Demographic Record ...");
 		Demographic demographic = importDemographicData(zpdZtrMessage, importSource);
 		logger.info("Created record " + demographic.getDemographicId() + " for patient: " + demographic.getLastName() + ", " + demographic.getFirstName());
 
 		logger.info("Find/Create Provider Record(s) ...");
-		ProviderData mrpProvider = importProviderData(zpdZtrMessage, demographic, documentLocation, importSource);
+		ProviderData mrpProvider = importProviderData(zpdZtrMessage, demographic, documentLocation, importSource, skipMissingDocs);
 
 		// set the mrp doctor after all the provider records are created
 		demographic.setProviderNo(mrpProvider.getId());
@@ -199,7 +208,9 @@ public class CoPDImportService
 	 * @return the MRP doctor record. This should never be null, as all messages are required to have at least one provider record
 	 * @throws HL7Exception
 	 */
-	private ProviderData importProviderData(ZPD_ZTR zpdZtrMessage, Demographic demographic, String documentLocation, IMPORT_SOURCE importSource) throws HL7Exception, IOException, InterruptedException
+	private ProviderData importProviderData(ZPD_ZTR zpdZtrMessage, Demographic demographic,
+	                                        String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs)
+			throws HL7Exception, IOException, InterruptedException
 	{
 		ProviderData mrpProvider = null;
 		ProviderMapper providerMapper = new ProviderMapper(zpdZtrMessage);
@@ -253,7 +264,7 @@ public class CoPDImportService
 			logger.info("Import Labs ...");
 			importLabData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Documents ...");
-			importDocumentData(zpdZtrMessage, i, assignedProvider, demographic, documentLocation, importSource);
+			importDocumentData(zpdZtrMessage, i, assignedProvider, demographic, documentLocation, importSource, skipMissingDocs);
 			logger.info("Import Ticklers ...");
 			importTicklers(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 		}
@@ -484,7 +495,9 @@ public class CoPDImportService
 		}
 	}
 
-	private void importDocumentData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, String documentLocation, IMPORT_SOURCE importSource) throws IOException, InterruptedException
+	private void importDocumentData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic,
+	                                String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs)
+			throws IOException, InterruptedException
 	{
 		DocumentMapper documentMapper = new DocumentMapper(zpdZtrMessage, providerRep);
 
@@ -493,7 +506,25 @@ public class CoPDImportService
 			document.setDocCreator(provider.getId());
 			document.setResponsible(provider.getId());
 
-			GenericFile documentFile = FileFactory.getExistingFile(documentLocation, document.getDocfilename());
+			GenericFile documentFile = null;
+			try
+			{
+				documentFile = FileFactory.getExistingFile(documentLocation, document.getDocfilename());
+
+			}
+			catch(IOException e)
+			{
+				missingDocumentCount++;
+				if(skipMissingDocs)
+				{
+					logger.error("Skipped missing document: " + document.getDocfilename());
+					continue;
+				}
+				else
+				{
+					throw e;
+				}
+			}
 
 			if(importSource.equals(IMPORT_SOURCE.WOLF) && documentFile instanceof XMLFile)
 			{
