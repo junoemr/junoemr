@@ -87,7 +87,10 @@ public class PreventionDisplayConfig {
 			loadPreventions();
 		}
 
-		Collections.sort(prevList, PreventionNameComparator);
+		if (OscarProperties.getInstance().getBooleanProperty("alphabetize_preventions", "true"))
+		{
+			Collections.sort(prevList, PreventionNameComparator);
+		}
 
 		return prevList;
 	}
