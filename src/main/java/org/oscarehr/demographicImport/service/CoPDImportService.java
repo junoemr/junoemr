@@ -252,7 +252,7 @@ public class CoPDImportService
 			logger.info("Import diagnosed health problems ...");
 			importDxData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Medications ...");
-			importMedicationData(zpdZtrMessage, i, assignedProvider, demographic);
+			importMedicationData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 			logger.info("Import Pediatrics ...");
 			importPediatricsData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Pregnancy ...");
@@ -362,9 +362,10 @@ public class CoPDImportService
 		}
 	}
 
-	private void importMedicationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception
+	private void importMedicationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource)
+			throws HL7Exception
 	{
-		MedicationMapper medicationMapper = new MedicationMapper(zpdZtrMessage, providerRep);
+		MedicationMapper medicationMapper = new MedicationMapper(zpdZtrMessage, providerRep, importSource);
 
 		int numMedications = medicationMapper.getNumMedications();
 
