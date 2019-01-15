@@ -39,10 +39,10 @@ public class BillingONDiskNameDao extends AbstractDao<BillingONDiskName>{
 		super(BillingONDiskName.class);
 	}
 	
-	public BillingONDiskName getLatestSoloMonthCodeBatchNum(String providerNo) {
+	public BillingONDiskName getLatestSoloMonthCodeBatchNum(String providerOhipNo) {
 		String q = "select d from BillingONDiskName d, BillingONFilename f where f.providerOhipNo=? and d.groupNo='' and d.id=f.diskId order by d.id desc";
 		Query query = entityManager.createQuery(q);
-		query.setParameter(1, providerNo);
+		query.setParameter(1, providerOhipNo);
 		query.setMaxResults(1);
 		
 		BillingONDiskName result = this.getSingleResultOrNull(query);
