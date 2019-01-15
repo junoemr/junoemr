@@ -38,6 +38,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionRedirect;
 import org.oscarehr.common.dao.ProviderLabRoutingFavoritesDao;
 import org.oscarehr.common.model.ProviderLabRoutingFavorite;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -180,14 +181,14 @@ public class ReportReassignAction extends Action {
             logger.error("exception in ReportReassignAction", e);
             newURL = mapping.findForward("failure").getPath();
         }
-        //MiscUtils.getLogger().info(ajax);
-        if(ajax!=null && ajax.equals("yes")){
-            //MiscUtils.getLogger().info("if");
-            return null;
-        }
-        else{
-            //MiscUtils.getLogger().info("else");
-            return (new ActionForward(newURL));
-        }
-    }
+
+		if (ajax != null && ajax.equals("yes"))
+		{
+			return null;
+		}
+		else
+		{
+			return (new ActionRedirect(newURL));
+		}
+	}
 }
