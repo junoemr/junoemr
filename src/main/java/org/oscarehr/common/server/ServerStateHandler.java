@@ -22,9 +22,27 @@
  */
 package org.oscarehr.common.server;
 
+import org.apache.log4j.Logger;
+import org.xbill.DNS.ARecord;
+import org.xbill.DNS.Lookup;
+import org.xbill.DNS.Record;
+import org.xbill.DNS.SimpleResolver;
+import org.xbill.DNS.TextParseException;
+import org.xbill.DNS.Type;
 import oscar.OscarProperties;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Responsible for handling server state information.
@@ -33,8 +51,23 @@ import java.io.File;
 public class ServerStateHandler
 {
 	private static final OscarProperties props = OscarProperties.getInstance();
-	private static final String masterCheckLocation = props.getProperty("common.server.master_check_file.location");
-	private static final String masterCheckFilename = props.getProperty("common.server.master_check_file.filename");
+	private static final Logger logger = Logger.getLogger(ServerStateHandler.class);
+
+	private static final boolean isMasterCheckEnabled = props.isPropertyActive("common.server.master_check.enabled");
+
+	private static final String domain = props.getProperty("common.server.master_check.domain");
+	private static final String secureDomain = props.getProperty("common.server.master_check.secure_subdomain");
+	private static final String masterCheckRedirectRegex = props.getProperty("common.server.master_check.master_redirect_pattern");
+	private static final String primaryServerRegexPattern = props.getProperty("common.server.master_check.primary_server_regex_pattern");
+	private static final String secondaryServerRegexPattern = props.getProperty("common.server.master_check.secondary_server_regex_pattern");
+
+	private static final String masterCheckFile = props.getProperty("common.server.master_check.file");
+	private static final String dnsServers = props.getProperty("common.server.master_check.dns_ip_list");
+	private static final Set<String> dnsServerList;
+	static
+	{
+		dnsServerList = new HashSet<>((dnsServers != null) ? Arrays.asList(dnsServers.split("\\s*,\\s*")) : new ArrayList<>());
+	}
 
 	/**
 	 * checks if the server is running in a 'master' state
@@ -46,13 +79,154 @@ public class ServerStateHandler
 		boolean isMaster;
 		try
 		{
-			File file = new File(masterCheckLocation, masterCheckFilename);
-			isMaster = (file.exists() && file.isFile());
+			if(isMasterCheckEnabled)
+			{
+				logger.info("Checking master status...");
+				isMaster = actingAsMaster() && resolvesAsMaster();
+				logger.info("This is a " + (isMaster? "master" : "slave") + " server");
+			}
+			else
+			{
+				isMaster = true;
+			}
 		}
 		catch(Exception e)
 		{
-			throw new IllegalStateException("Invalid master/slave state");
+			throw new IllegalStateException(e);
 		}
 		return isMaster;
+	}
+
+	private static boolean actingAsMaster() throws IOException
+	{
+		File file = new File(masterCheckFile);
+		boolean isMaster = false;
+		if(file.exists() && file.isFile() && file.canRead())
+		{
+			Pattern pattern = Pattern.compile(masterCheckRedirectRegex);
+
+			String line;
+			Scanner scanner = new Scanner(file);
+			while(scanner.hasNextLine())
+			{
+				line = scanner.nextLine();
+				Matcher messagePatternMatcher = pattern.matcher(line);
+				if(messagePatternMatcher.find())
+				{
+					isMaster = true;
+					break;
+				}
+			}
+		}
+		else
+		{
+			throw new IOException("Cannot read file: " + masterCheckFile);
+		}
+		return isMaster;
+	}
+
+	private static boolean resolvesAsMaster() throws UnknownHostException
+	{
+		boolean isMaster = false;
+		boolean resolved = false;
+		String serverNumber = "";
+
+		InetAddress inetAddress = InetAddress.getLocalHost();
+		String localHostname = inetAddress.getHostName();
+		logger.info("local hostname: " + localHostname);
+
+		Pattern primPattern = Pattern.compile(primaryServerRegexPattern);
+		Matcher primPatternMatcher = primPattern.matcher(localHostname);
+		if(primPatternMatcher.find())
+		{
+			serverNumber = primPatternMatcher.group(1);
+		}
+		else
+		{
+			Pattern secPattern = Pattern.compile(secondaryServerRegexPattern);
+			Matcher secPatternMatcher = secPattern.matcher(localHostname);
+			if(secPatternMatcher.find())
+			{
+				serverNumber = secPatternMatcher.group(1);
+			}
+		}
+		String secureHostname = secureDomain + serverNumber + "." + domain;
+		logger.info("secure hostname: " + secureHostname);
+
+		// for each server in the dns servers list, check that the name resolves.
+		// if the server fails, try the next one as a backup, etc.
+		for(String server : dnsServerList)
+		{
+			try
+			{
+				isMaster = resolvesAsMaster(server, localHostname, secureHostname);
+				resolved = true;
+				break;
+			}
+			catch(UnknownHostException | TextParseException | IllegalStateException e)
+			{
+				logger.warn("["+server+"]: " + e.getMessage());
+			}
+		}
+		if(!resolved)
+		{
+			throw new IllegalStateException("All DNS servers failed to resolve master");
+		}
+		return isMaster;
+	}
+
+	private static boolean resolvesAsMaster(String dnsServer, String localHostname, String secureDomain) throws TextParseException, UnknownHostException
+	{
+		List<String> localIpList = resolveHostByName(dnsServer, null, localHostname);
+		List<String> remoteIpList = resolveHostByName(dnsServer, null, secureDomain);
+
+		if(localIpList.size() != 1)
+		{
+			throw new IllegalStateException("Unable to resolve " + localHostname + " IP");
+		}
+		if(remoteIpList.size() != 1)
+		{
+			throw new IllegalStateException("Unable to resolve " + secureDomain + " IP");
+		}
+
+		// this is the master if the two IP addresses match
+		return (localIpList.get(0).equals(remoteIpList.get(0)));
+	}
+
+	/**
+	 * resolves an A record by its name using a specified DNS host and port
+	 *
+	 * @param resolverHost name server hostname or IP address
+	 * @param resolverPort name server port
+	 * @param name         the DNS name of the A record - the name to resolve
+	 * @return a list of IP addresses or an empty list when unable to resolve
+	 */
+	private static List<String> resolveHostByName(String resolverHost, Integer resolverPort, String name) throws UnknownHostException, TextParseException
+	{
+		List<String> addressList;
+		SimpleResolver resolver = new SimpleResolver(resolverHost);
+		if(resolverPort != null)
+		{
+			resolver.setPort(resolverPort);
+		}
+
+		Lookup lookup = new Lookup(name, Type.A);
+		Record[] records = lookup.run();
+		if(records != null)
+		{
+			addressList = new ArrayList<>(records.length);
+			for(Record record : records)
+			{
+				if(record instanceof ARecord)
+				{
+					addressList.add(((ARecord) record).getAddress().getHostAddress());
+				}
+			}
+		}
+		else
+		{
+			addressList = new ArrayList<>(0);
+		}
+		return addressList;
 	}
 }

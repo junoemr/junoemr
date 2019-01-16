@@ -86,7 +86,7 @@ public class OutboundFaxSchedulingTask
 		}
 		catch(IllegalStateException e)
 		{
-			logger.error("Server State Error", e);
+			logger.error("Invalid server state", e);
 		}
 		return enabled && isMaster;
 	}
