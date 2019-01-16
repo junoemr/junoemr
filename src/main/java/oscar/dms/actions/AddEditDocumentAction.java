@@ -113,7 +113,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		Document document = new Document();
 		document.setPublic1(false);
 		document.setResponsible(user);
-		document.setDoccreator(user);
+		document.setDocCreator(user);
 		document.setDocdesc("");
 		document.setDoctype("");
 		document.setDocfilename(fileName);
@@ -129,7 +129,7 @@ public class AddEditDocumentAction extends DispatchAction {
 
 		if (providerId != null) // TODO: THIS NEEDS TO RUN THRU THE lab forwarding rules!
 		{
-			documentService.routeToProviderInbox(document.getDocumentNo(), Integer.parseInt(providerId));
+			documentService.routeToProviderInbox(document.getDocumentNo(), providerId);
 		}
 		// add to queuelinkdocument
 		String queueId = request.getParameter("queue");
@@ -155,6 +155,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		String fileName = docFile.getFileName();
 		HashMap<String, String> errors = new HashMap<>();
 		String user = (String) request.getSession().getAttribute("user");
+
 		Integer programId = null;
 		
         // if the document was added in the context of a program
@@ -174,7 +175,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		Document document = new Document();
 		document.setPublic1(false);
 		document.setResponsible(user);
-		document.setDoccreator(user);
+		document.setDocCreator(user);
 		document.setDocdesc("");
 		document.setDoctype("");
 		document.setDocfilename(fileName);
@@ -288,16 +289,17 @@ public class AddEditDocumentAction extends DispatchAction {
 			 		EDocUtil.addDocTypeSQL(fm.getDocType(),fm.getFunction());
 			 	}
 
-				document.setPublic1(fm.getDocPublic().equals("1"));
+				boolean isPublicDoc = ("1".equals(fm.getDocPublic()) || "checked".equalsIgnoreCase(fm.getDocPublic()));
+				document.setPublic1(isPublicDoc);
 				document.setResponsible(fm.getResponsibleId());
-				document.setDoccreator(fm.getDocCreator());
+				document.setDocCreator(fm.getDocCreator());
 				document.setDocdesc(fm.getDocDesc());
 				document.setDoctype(fm.getDocType());
 				document.setDocfilename(fileName1);
 				document.setSource(fm.getSource());
 				document.setDocClass(fm.getDocClass());
 				document.setDocSubClass(fm.getDocSubClass());
-				document.setObservationdate(ConversionUtils.fromDateString(fm.getObservationDate()));
+				document.setObservationdate(ConversionUtils.fromDateString(fm.getObservationDate(), "yyyy/MM/dd"));
 
 				String module = fm.getFunction().trim();
 				Integer moduleId = Integer.parseInt(fm.getFunctionId().trim());
@@ -326,8 +328,7 @@ public class AddEditDocumentAction extends DispatchAction {
 				if (module.equals(CtlDocument.MODULE_DEMOGRAPHIC)) {// doc is uploaded under a patient,moduleId become demo no.
 	
 					Date now = EDocUtil.getDmsDateTimeAsDate();
-	
-					String docDesc = EDocUtil.getLastDocumentDesc();
+					String docDesc = document.getDocdesc();
 	
 					CaseManagementNote cmn = new CaseManagementNote();
 					cmn.setUpdate_date(now);
@@ -374,7 +375,7 @@ public class AddEditDocumentAction extends DispatchAction {
 					// Add a noteLink to casemgmt_note_link
 					CaseManagementNoteLink cmnl = new CaseManagementNoteLink();
 					cmnl.setTableName(CaseManagementNoteLink.DOCUMENT);
-					cmnl.setTableId(Long.parseLong(EDocUtil.getLastDocumentNo()));
+					cmnl.setTableId(documentNo.longValue());
 					cmnl.setNoteId(note_id);
 	
 					request.setAttribute("document_no", documentNo);

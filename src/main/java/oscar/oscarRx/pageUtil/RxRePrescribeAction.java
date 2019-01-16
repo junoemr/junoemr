@@ -334,28 +334,37 @@ public final class RxRePrescribeAction extends DispatchAction {
 
 		String demoNo = request.getParameter("demoNo");
 		String strShow = request.getParameter("showall");
-		// p("demoNo",demoNo);
-		// p("showall",strShow);
 
 		boolean showall = false;
 		if (strShow.equalsIgnoreCase("true")) {
 			showall = true;
 		}
-		// p("here");
+
 		// get a list of long term meds
 		DrugDao drugDao = (DrugDao) SpringUtils.getBean("drugDao");
 		List<Drug> prescriptDrugs = drugDao.getPrescriptions(demoNo, showall);
-		List<Integer> listLongTermMed = new ArrayList<Integer>();
-		// p("size of prescriptDrugs",""+prescriptDrugs.size());
+		List<Integer> listLongTermMed = new ArrayList<>();
+
+		boolean showExpiredLongTermMedsOnly = false;
+
+		if (request.getParameter("reRxExpiredLTM") != null &&
+				request.getParameter("reRxExpiredLTM").equals("true"))
+		{
+			showExpiredLongTermMedsOnly = true;
+		}
+
 		for (Drug prescriptDrug : prescriptDrugs) {
-			// p("id of drug returned",""+prescriptDrug.getId());
-			// add all expired long term med drugIds to an array.
-			if (prescriptDrug.isLongTerm() && prescriptDrug.isExpired()) {
+
+			if (prescriptDrug.isLongTerm())
+			{
+				if (showExpiredLongTermMedsOnly && !prescriptDrug.isExpired())
+				{
+					continue;
+				}
 
 				listLongTermMed.add(prescriptDrug.getId());
 			}
 		}
-
 
         oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBean) request.getSession().getAttribute("RxSessionBean");
         
@@ -396,6 +405,7 @@ public final class RxRePrescribeAction extends DispatchAction {
 			if (RxUtil.isRxUniqueInStash(beanRX, rx)) {
 				listLongTerm.add(rx);
 			}
+
 			int rxStashIndex = beanRX.addStashItem(loggedInInfo, rx);
 			beanRX.setStashIndex(rxStashIndex);
 			auditStr.append(rx.getAuditString() + "\n");

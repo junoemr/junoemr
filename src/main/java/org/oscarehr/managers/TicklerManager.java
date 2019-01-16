@@ -54,6 +54,7 @@ import org.oscarehr.common.dao.TicklerTextSuggestDao;
 import org.oscarehr.common.dao.TicklerUpdateDao;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.CustomFilter;
+import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.common.model.TicklerCategory;
 import org.oscarehr.common.model.TicklerComment;
@@ -735,8 +736,12 @@ public class TicklerManager {
 
 
           private void checkPrivilege(LoggedInInfo loggedInInfo, String privilege) {
-      		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_tickler", privilege, null)) {
-    			throw new RuntimeException("missing required security object (_tickler)");
-    		}
+      		if (!Provider.SYSTEM_PROVIDER_NO.equals(loggedInInfo.getLoggedInProviderNo()))
+			{
+				if (!securityInfoManager.hasPrivilege(loggedInInfo, "_tickler", privilege, null))
+				{
+					throw new RuntimeException("missing required security object (_tickler)");
+				}
+			}
           }
 }

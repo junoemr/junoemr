@@ -26,28 +26,87 @@
 package oscar;
 
 
-public class HScheduleDate {
-	
-  public String available = "";
-  public String priority = "";
-  public String reason = "";
-  public String hour = "";
-  public String creator = "";
+import java.io.Serializable;
+
+public class HScheduleDate implements Serializable
+{
+
+  private boolean available;
+  private String priority = "";
+  private String reason = "";
+  private String hour = "";
+  private String creator = "";
 
   // default constructor
-  public HScheduleDate() {}
-  public HScheduleDate( String available1, String priority1, String reason1, String hour1, String creator1) {
+  public HScheduleDate()
+  {
+  }
+
+  public HScheduleDate(boolean available1, String priority1, String reason1, String hour1, String creator1)
+  {
     available = available1;
     priority = priority1;
-    reason= reason1;
+    reason = reason1;
     hour = hour1;
     creator = creator1;
-	}
-  public void setHScheduleDate(String available1, String priority1, String reason1, String hour1, String creator1) { 
+  }
+
+  public void setHScheduleDate(boolean available1, String priority1, String reason1, String hour1, String creator1)
+  {
     available = available1;
     priority = priority1;
-    reason= reason1;
+    reason = reason1;
     hour = hour1;
     creator = creator1;
-  }  
+  }
+
+  public boolean isAvailable()
+  {
+    return available;
+  }
+
+  public void setAvailable(boolean available)
+  {
+    this.available = available;
+  }
+
+  public String getPriority()
+  {
+    return priority;
+  }
+
+  public void setPriority(String priority)
+  {
+    this.priority = priority;
+  }
+
+  public String getReason()
+  {
+    return reason;
+  }
+
+  public void setReason(String reason)
+  {
+    this.reason = reason;
+  }
+
+  public String getHour()
+  {
+    return hour;
+  }
+
+  public void setHour(String hour)
+  {
+    this.hour = hour;
+  }
+
+  public String getCreator()
+  {
+    return creator;
+  }
+
+  public void setCreator(String creator)
+  {
+    this.creator = creator;
+  }
 }

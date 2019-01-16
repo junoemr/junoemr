@@ -23,31 +23,10 @@
 
 package org.oscarehr.casemgmt.web;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.quatro.model.security.Secrole;
+import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+import net.sf.json.processors.JsDateJsonBeanProcessor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -83,14 +62,16 @@ import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.ProviderDefaultProgramDao;
 import org.oscarehr.common.dao.ProviderPreferenceDao;
+import org.oscarehr.common.dao.ResidentOscarMsgDao;
 import org.oscarehr.common.model.Appointment;
-import org.oscarehr.common.model.CaseManagementTmpSave;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderDefaultProgram;
 import org.oscarehr.common.model.ProviderPreference;
+import org.oscarehr.common.model.ResidentOscarMsg;
 import org.oscarehr.common.model.Tickler;
+import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.eyeform.dao.EyeFormDao;
 import org.oscarehr.eyeform.dao.EyeformFollowUpDao;
 import org.oscarehr.eyeform.dao.EyeformTestBookDao;
@@ -103,6 +84,8 @@ import org.oscarehr.eyeform.web.FollowUpAction;
 import org.oscarehr.eyeform.web.ProcedureBookAction;
 import org.oscarehr.eyeform.web.TestBookAction;
 import org.oscarehr.managers.TicklerManager;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.EncounterUtil;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -111,17 +94,6 @@ import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WebUtils;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.WebApplicationContext;
-
-import com.quatro.model.security.Secrole;
-import java.util.GregorianCalendar;
-
-import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
-import net.sf.json.processors.JsDateJsonBeanProcessor;
-import org.oscarehr.provider.dao.ProviderDataDao;
-import org.oscarehr.common.dao.ResidentOscarMsgDao;
-import org.oscarehr.provider.model.ProviderData;
-import org.oscarehr.common.model.ResidentOscarMsg;
 import oscar.OscarProperties;
 import oscar.appt.ApptStatusData;
 import oscar.log.LogAction;
@@ -130,7 +102,33 @@ import oscar.oscarBilling.ca.on.pageUtil.BillingSavePrep;
 import oscar.oscarEncounter.data.EctProgram;
 import oscar.oscarEncounter.pageUtil.EctSessionBean;
 import oscar.oscarSurveillance.SurveillanceMaster;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /*
  * Updated by Eugene Petruhin on 12 and 13 jan 2009 while fixing #2482832 & #2494061
@@ -139,6 +137,7 @@ import oscar.util.UtilDateUtilities;
 public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 
 	private static Logger logger = MiscUtils.getLogger();
+	private static final String OBS_DATETIME_PATTERN = "dd-MMM-yyyy HH:mm";
 
 	private CaseManagementNoteDAO caseManagementNoteDao = (CaseManagementNoteDAO) SpringUtils.getBean("caseManagementNoteDAO");
 	private CaseManagementIssueDAO caseManagementIssueDao = (CaseManagementIssueDAO) SpringUtils.getBean("caseManagementIssueDAO");
@@ -296,6 +295,14 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			note.setProvider(prov);
 			note.setDemographic_no(demono);
 
+			// preserve the observation date if set
+			String obsDateStr = cform.getObservation_date();
+			if(obsDateStr != null && !obsDateStr.trim().isEmpty())
+			{
+				Date obsDate = ConversionUtils.fromDateString(obsDateStr, OBS_DATETIME_PATTERN);
+				note.setObservation_date(obsDate);
+			}
+
 			if (!OscarProperties.getInstance().isPropertyActive("encounter.empty_new_note")) {
 				this.insertReason(request, note);
 			} else {
@@ -365,7 +372,9 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 				session.setAttribute("newNote", "true");
 				session.setAttribute("issueStatusChanged", "false");
 				note = this.makeNewNote(providerNo, demono, request);
-			} else {
+			}
+			else
+			{
 				session.setAttribute("newNote", "false"); // should be able to get getLatSaved from the manager now
 			}
 		}
@@ -483,6 +492,27 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			finalFwd = new ActionForward(path.toString());
 		}
 		return finalFwd;
+	}
+
+	private Date parseParamDateTime(HttpServletRequest request)
+	{
+		String appointmentDate = request.getParameter("appointmentDate");
+		String startTime = request.getParameter("start_time");
+		Date apptDate = null;
+
+		if(appointmentDate != null)
+		{
+			if(startTime != null)
+			{
+				String apptDateTime = appointmentDate + " " + startTime;
+				apptDate = ConversionUtils.fromDateString(apptDateTime, ConversionUtils.DEFAULT_TS_PATTERN);
+			}
+			else
+			{
+				apptDate = ConversionUtils.fromDateString(appointmentDate, ConversionUtils.DEFAULT_DATE_PATTERN);
+			}
+		}
+		return apptDate;
 	}
 
 	private CaseManagementNote makeNewNote(String providerNo, String demographicNo, HttpServletRequest request) {

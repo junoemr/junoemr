@@ -55,7 +55,7 @@ import static java.lang.Thread.sleep;
 @Service
 public class ClinicaidAPIService
 {
-	static private final int ELIG_CHECK_TIMEOUT_MS = 6000;
+	static private final int ELIG_CHECK_TIMEOUT_MS = 12000;
 	static private final int ELIG_CHECK_POLL_FREQUENCY_MS = 1200;
 	static private String apiPath = "/api/v2/";
 
@@ -113,7 +113,7 @@ public class ClinicaidAPIService
 			lastUsableResult = result;
 			sleepDuration = ELIG_CHECK_POLL_FREQUENCY_MS;
 
-			if (result.hasError() || result.getData().getEligibilityData().isChecked())
+			if (result.hasError() || !result.getData().getEligibilityData().isPending())
 				break;
 
 		} while (System.currentTimeMillis() - start < ELIG_CHECK_TIMEOUT_MS);
@@ -246,7 +246,7 @@ public class ClinicaidAPIService
 
 			// If no appointment provider exists, try to get the patients 
 			// provider to use for billing
-			if (provider_no == null || provider_no == "")
+			if (provider_no == null || provider_no.equals(""))
 			{
 				try
 				{
@@ -320,6 +320,19 @@ public class ClinicaidAPIService
 			data.put("referral_last_name", StringUtils.trimToEmpty(referral_last_name));
 			data.put("diagnostic_code", StringUtils.trimToEmpty(dx_codes));
 			data.put("address", StringUtils.trimToEmpty(demo.getAddress()));
+
+			// In Oscar, Newborns are denoted with the Mother's PHN and version Code 66
+			// Before sending to Clinicaid, we will remove the version code
+			// and move the PHN into the guardian_health_number field instead
+
+			if (oscarProperties.isBritishColumbiaInstanceType())
+			{
+				if (demo.isNewBorn())
+				{
+					data.remove("service_recipient_ver");
+					data.put("guardian_health_number", data.remove("service_recipient_uli"));
+				}
+			}
 
 			clinicaidLink = clinicaidLink + "/?nonce=" + nonce +
 					"#/invoice/add" + sessionManager.buildQueryString(data);

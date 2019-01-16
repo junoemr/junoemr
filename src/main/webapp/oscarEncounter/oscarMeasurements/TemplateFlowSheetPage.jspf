@@ -23,20 +23,21 @@
     Ontario, Canada
 
 --%>
-<%@page import="org.oscarehr.common.dao.FlowSheetCustomizationDao"%>
-<%@page  import="org.oscarehr.common.dao.FlowSheetDrugDao,org.oscarehr.common.dao.FlowSheetDxDao,org.oscarehr.common.model.FlowSheetCustomization,org.oscarehr.common.model.FlowSheetDrug,org.oscarehr.util.LoggedInInfo,org.oscarehr.util.MiscUtils"%>
+<%@page import="org.apache.commons.lang.StringUtils"%>
+<%@page  import="org.oscarehr.allergy.model.Allergy,org.oscarehr.common.dao.FlowSheetCustomizationDao,org.oscarehr.common.dao.FlowSheetDrugDao,org.oscarehr.common.dao.FlowSheetDxDao,org.oscarehr.common.model.FlowSheetCustomization,org.oscarehr.common.model.FlowSheetDrug"%>
+<%@page import="org.oscarehr.util.LoggedInInfo,org.oscarehr.util.MiscUtils"%>
 <%@page import="org.springframework.web.context.WebApplicationContext,org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="oscar.OscarProperties,oscar.log.LogAction"%>
-<%@page import="oscar.log.LogConst,oscar.oscarEncounter.oscarMeasurements.FlowSheetItem"%>
-<%@page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet,oscar.oscarEncounter.oscarMeasurements.MeasurementInfo,oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig,oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler"%>
-<%@page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean,oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean,oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler" %>
-<%@page import="oscar.oscarPrevention.PreventionData" %>
+<%@page import="oscar.log.LogConst,oscar.oscarEncounter.oscarMeasurements.FlowSheetItem,oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet,oscar.oscarEncounter.oscarMeasurements.MeasurementInfo"%>
+<%@page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig,oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler,oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean" %>
+<%@page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@ taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
-<%@page import="oscar.oscarResearch.oscarDxResearch.bean.dxResearchBean"%>
+<%@page import="oscar.oscarPrevention.PreventionData"%>
+<%@ page import="oscar.oscarResearch.oscarDxResearch.bean.dxResearchBean" %>
 <%@ page import="oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler" %>
 <%@ page import="oscar.oscarRx.data.RxPatientData" %>
 <%@ page import="oscar.util.UtilDateUtilities" %>
@@ -48,7 +49,6 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Vector" %>
-<%@ page import="org.oscarehr.allergy.model.Allergy" %>
 
 <%
 	if(session.getValue("user") == null) response.sendRedirect("../../logout.jsp");
@@ -58,7 +58,9 @@
     String demographic_no = request.getParameter("demographic_no");
     String providerNo = (String) session.getAttribute("user");
     String template = request.getParameter("template");
-    
+	String uuid = request.getParameter("uuid");
+	String UUIDParamStr = "&uuid="+StringUtils.trimToEmpty(uuid);
+
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 %>
 <oscar:oscarPropertiesCheck property="SPEC3" value="yes">
@@ -92,8 +94,7 @@
 <%
 	LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_FLOWSHEET, template, request.getRemoteAddr(),demographic_no);
 
-
-    int numElementsToShow = 4;
+	int numElementsToShow = 4;
     Date sdate = null;
     Date edate = null;
     if ( request.getParameter("numEle") != null ){
@@ -183,9 +184,13 @@
 	function getContextPath() {
 		return '<%=request.getContextPath()%>';
 	}
+	function getUuid() {
+		return '<%=StringUtils.trimToEmpty(uuid)%>'
+    }
 
-	function refreshEncounter() {
-	      self.opener.location.reload(); 
+	function refreshEncounter()
+	{
+		self.opener.location.reload();
 	}
 </script>
 <oscar:customInterface name="renal" section="diab"/>
@@ -262,21 +267,20 @@ div.headPrevention p {
 <link rel="stylesheet" type="text/css" href="../../share/css/niftyPrint.css" media="print" />
 <script type="text/javascript" src="../../share/javascript/nifty.js"></script>
 
-<script type="text/javascript">
-    window.onload=function(){
-        if(!NiftyCheck())
-            return;
+	<script type="text/javascript">
+		window.onload = function ()
+		{
+			if (!NiftyCheck())
+				return;
 
-//Rounded("div.news","all","transparent","#FFF","small border #999");
-        Rounded("div.headPrevention","all","#CCF","#efeadc","small border blue");
-        Rounded("div.preventionProcedure","all","transparent","#F0F0E7","small border #999");
+			//Rounded("div.news","all","transparent","#FFF","small border #999");
+			Rounded("div.headPrevention", "all", "#CCF", "#efeadc", "small border blue");
+			Rounded("div.preventionProcedure", "all", "transparent", "#F0F0E7", "small border #999");
 
-//Rounded("span.footnote","all","transparent","#F0F0E7","small border #999");
-
-        Rounded("div.leftBox","top","transparent","#CCCCFF","small border #ccccff");
-        Rounded("div.leftBox","bottom","transparent","#EEEEFF","small border #ccccff");
-
-    };
+			//Rounded("span.footnote","all","transparent","#F0F0E7","small border #999");
+			Rounded("div.leftBox", "top", "transparent", "#CCCCFF", "small border #ccccff");
+			Rounded("div.leftBox", "bottom", "transparent", "#EEEEFF", "small border #ccccff");
+		};
 
 
    function loadDifferentElements(){
@@ -499,7 +503,7 @@ div.recommendations li{
     <p><a class="DoNotPrint" href="javascript: function myFunction() {return false; }" onclick="javascript:createAddAll(<%=demographic_no%>, '<%= URLEncoder.encode(template,"UTF-8") %>', <%=Math.abs( "ADDTHEMALL".hashCode() ) %>)" TITLE="Add all measurements.">
 	    <bean:message key="oscarencounter.templateflowsheet.addall" />
 	</a> </p>
-    <p id="add_overdue"><a class="DoNotPrint" href="javascript: function myFunction() {return false; }" onclick="javascript:fsPopup(760,670,'AddMeasurementData.jsp?demographic_no=<%=demographic_no%><%=recListBuffer.toString()%>&amp;template=<%=template%>','addMeasurementData<%=Math.abs( "ADDTHEMALL".hashCode() ) %>')" TITLE="Add all overdue measurements.">
+    <p id="add_overdue"><a class="DoNotPrint" href="javascript: function myFunction() {return false; }" onclick="javascript:fsPopup(760,670,'AddMeasurementData.jsp?demographic_no=<%=demographic_no%><%=recListBuffer.toString()%>&amp;template=<%=template + UUIDParamStr%>','addMeasurementData<%=Math.abs( "ADDTHEMALL".hashCode() ) %>')" TITLE="Add all overdue measurements.">
         <bean:message key="oscarencounter.templateflowsheet.addoverdue" />
     </a></p>
     <%}%>
@@ -695,7 +699,7 @@ div.recommendations li{
            <%}%>
 
 		   <security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="w">
-            <a class="noborder" href="javascript: function myFunction() {return false; }"  onclick="javascript:fsPopup(760,670,'AddMeasurementData.jsp?measurement=<%= response.encodeURL( measure) %>&amp;demographic_no=<%=demographic_no%>&amp;template=<%= URLEncoder.encode(template,"UTF-8") %>','addMeasurementData<%=Math.abs( ((String) h2.get("display_name")).hashCode() ) %>')">
+            <a class="noborder" href="javascript: function myFunction() {return false; }"  onclick="javascript:fsPopup(760,670,'AddMeasurementData.jsp?measurement=<%= response.encodeURL( measure) %>&amp;demographic_no=<%=demographic_no%>&amp;template=<%= URLEncoder.encode(template,"UTF-8") + UUIDParamStr %>','addMeasurementData<%=Math.abs( ((String) h2.get("display_name")).hashCode() ) %>')">
            </security:oscarSec>
                 <span  class="noborder" style="font-weight:bold;"><%=h2.get("display_name")%></span>
 
@@ -748,7 +752,7 @@ div.recommendations li{
     %>
     <div class="preventionProcedure" <%=hider%>  
     <%if(mdb.getRemoteFacility() == null){ %>
-    onclick="javascript:fsPopup(760,670,'AddMeasurementData.jsp?measurement=<%= response.encodeURL( measure) %>&amp;id=<%=hdata.get("id")%>&amp;demographic_no=<%=demographic_no%>&amp;template=<%= URLEncoder.encode(template,"UTF-8") %>','addMeasurementData')"
+    onclick="javascript:fsPopup(760,670,'AddMeasurementData.jsp?measurement=<%= response.encodeURL( measure) %>&amp;id=<%=hdata.get("id")%>&amp;demographic_no=<%=demographic_no%>&amp;template=<%= URLEncoder.encode(template,"UTF-8") + UUIDParamStr %>','addMeasurementData')"
     <%}%>
     >
         <p <%=indColour%> title="fade=[on] header=[<%=hdata.get("age")%> -- Date:<%=hdata.get("prevention_date")%>] body=[<%=com%>&lt;br/&gt;Entered By:<%=mdb.getProviderFirstName()%> <%=mdb.getProviderLastName()%>]"><%=h2.get("value_name")%>: <%=hdata.get("age")%> <br/>
@@ -823,7 +827,7 @@ function createAddAll(d,t,h){
    				out.print("&measurement="+ addAllLink[i]);
    				}%>';
 
-	return fsPopup(760,670,'AddMeasurementData.jsp?demographic_no='+d+'&template='+t+newMtype,'addMeasurementData'+h);
+	return fsPopup(760,670,'AddMeasurementData.jsp?demographic_no='+d+'&template='+t+newMtype + '<%=UUIDParamStr%>','addMeasurementData'+h);
 }
 </script>
 

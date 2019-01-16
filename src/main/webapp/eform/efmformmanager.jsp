@@ -25,6 +25,8 @@
 --%>
 <!DOCTYPE html>
 <%@ page import="oscar.eform.EFormUtil, java.util.ArrayList, java.util.HashMap"%>
+<%@ page import="org.apache.commons.text.StringEscapeUtils" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%
@@ -172,6 +174,10 @@ $(function ()  {
 
 	  String roleType = (String)curForm.get("roleType");
 
+	  String escapedFileName = StringEscapeUtils.escapeHtml4(StringUtils.trimToEmpty((String) curForm.get("formFileName")));
+	  String escapedFormName = StringEscapeUtils.escapeHtml4((String) curForm.get("formName"));
+	  String escapedFormSubject = StringEscapeUtils.escapeHtml4((String) curForm.get("formSubject"));
+
 	  // Don't show roletype if it's null
 	  if(roleType == null)
 	  {
@@ -179,27 +185,27 @@ $(function ()  {
 	  }
 %>
     <tr>
-        <td><%if(curForm.get("formFileName") != null && curForm.get("formFileName").toString().length()!=0){%><i class="icon-file" title="<%=curForm.get("formFileName").toString()%>"></i><%}%></td>
-        <td title="<%=curForm.get("formName")%>">
-        <a href="#" onclick="newWindow('<%= request.getContextPath() %>/eform/efmshowform_data.jsp?fid=<%=curForm.get("fid")%>', '<%="Form"+i%>'); return false;"><%=curForm.get("formName")%></a>
+        <td><i class="icon-file" title="<%=escapedFileName%>"></i></td>
+        <td title="<%=escapedFormName%>">
+        <a href="#" onclick="newWindow('<%= request.getContextPath() %>/eform/efmshowform_data.jsp?fid=<%=curForm.get("fid")%>', '<%="Form"+i%>'); return false;"><%=escapedFormName%></a>
         </td>
-        <td><%=curForm.get("formSubject")%> </td>
+        <td><%=escapedFormSubject%> </td>
         <td align='center' ><%=curForm.get("formDate")%></td>
         <td align='center' ><%=curForm.get("formTime")%></td>
         <td align='center' ><%=roleType%></td>
         <td align='center'>
                     
                 
-<a href="<%= request.getContextPath() %>/eform/efmformmanageredit.jsp?fid=<%= curForm.get("fid")%>" class="contentLink" style="padding-right:6px" title='<bean:message key="eform.uploadhtml.editform" /><%=curForm.get("formName")%>'><i class="icon-pencil" title="<bean:message key="eform.uploadhtml.editform" />"></i></a>
+<a href="<%= request.getContextPath() %>/eform/efmformmanageredit.jsp?fid=<%= curForm.get("fid")%>" class="contentLink" style="padding-right:6px" title='<bean:message key="eform.uploadhtml.editform" /><%=escapedFormName%>'><i class="icon-pencil" title="<bean:message key="eform.uploadhtml.editform" />"></i></a>
 
                  
-<a href='<%= request.getContextPath() %>/eform/manageEForm.do?method=exportEForm&fid=<%=curForm.get("fid")%>' style="padding-right:6px" title='<bean:message key="eform.uploadhtml.btnExport" /> <%=curForm.get("formName")%>' ><i class="icon-download-alt" title="<bean:message key="eform.uploadhtml.btnExport" />"></i></a>
+<a href='<%= request.getContextPath() %>/eform/manageEForm.do?method=exportEForm&fid=<%=curForm.get("fid")%>' style="padding-right:6px" title='<bean:message key="eform.uploadhtml.btnExport" /> <%=escapedFormName%>' ><i class="icon-download-alt" title="<bean:message key="eform.uploadhtml.btnExport" />"></i></a>
                     
 
-<a href='<%= request.getContextPath() %>/eform/delEForm.do?fid=<%=curForm.get("fid")%>' style="padding-right:6px" title='<bean:message key="eform.uploadhtml.btnDelete" /> <%=curForm.get("formName")%>' class="contentLink"><i class="icon-trash" title="<bean:message key="eform.uploadhtml.btnDelete" />"></i></a>
+<a href='<%= request.getContextPath() %>/eform/delEForm.do?fid=<%=curForm.get("fid")%>' style="padding-right:6px" title='<bean:message key="eform.uploadhtml.btnDelete" /> <%=escapedFormName%>' class="contentLink"><i class="icon-trash" title="<bean:message key="eform.uploadhtml.btnDelete" />"></i></a>
 		</td>			
 		
-		<td align='center'><a href="<%= request.getContextPath() %>/eform/efmSendform.jsp?fid=<%=curForm.get("fid")%>" title='Send <%=curForm.get("formName")%> to Emporium' class="contentLink"><i class="icon-share" title="send"></i></a>
+		<td align='center'><a href="<%= request.getContextPath() %>/eform/efmSendform.jsp?fid=<%=curForm.get("fid")%>" title='Send <%=escapedFormName%> to Emporium' class="contentLink"><i class="icon-share" title="send"></i></a>
 					
     </tr>
     <% } %>

@@ -27,9 +27,7 @@ import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.DemographicArchive;
-import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
@@ -49,19 +47,13 @@ import java.util.List;
 public class DemographicService
 {
 	@Autowired
-	DemographicManager demographicManager;
+	private DemographicManager demographicManager;
 
 	@Autowired
-	DemographicDao demographicDao;
+	private DemographicDao demographicDao;
 
 	@Autowired
-	DemographicCustDao demographicCustDao;
-
-	@Autowired
-	DemographicExtDao demographicExtDao;
-
-	@Autowired
-	DemographicArchiveDao demographicArchiveDao;
+	private DemographicArchiveDao demographicArchiveDao;
 
 	@Autowired
 	private ProgramManager programManager;
@@ -69,7 +61,7 @@ public class DemographicService
 	@Autowired
 	private AdmissionDao admissionDao;
 
-	public DemographicTransferOutbound getDemographicTransferOutbound(String providerNoStr, Integer demographicNo)
+	public DemographicTransferOutbound getDemographicTransferOutbound(Integer demographicNo)
 	{
 		Demographic demographic = demographicDao.find(demographicNo);
 		List<DemographicExt> demoExtras = demographic.getDemographicExtList();
@@ -108,11 +100,11 @@ public class DemographicService
 		}
 		return demographic;
 	}
-	public void addNewDemographicRecord(String providerNoStr, Demographic demographic)
+	private void addNewDemographicRecord(String providerNoStr, Demographic demographic)
 	{
 		addNewDemographicRecord(providerNoStr, demographic, programManager.getDefaultProgramId());
 	}
-	public void addNewDemographicRecord(String providerNoStr, Demographic demographic, Integer programId)
+	private void addNewDemographicRecord(String providerNoStr, Demographic demographic, Integer programId)
 	{
 		/* set some default values */
 		demographic.setLastUpdateDate(new Date());

@@ -38,6 +38,14 @@ public class CaseManagementIssueNotePK implements Serializable
 	@JoinColumn(name = "note_id")
 	private CaseManagementNote caseManagementNote;
 
+	public CaseManagementIssueNotePK() {}
+
+	public CaseManagementIssueNotePK(CaseManagementIssue issue, CaseManagementNote note)
+	{
+		this.caseManagementIssue = issue;
+		this.caseManagementNote = note;
+	}
+
 	public CaseManagementIssue getCaseManagementIssue()
 	{
 		return caseManagementIssue;

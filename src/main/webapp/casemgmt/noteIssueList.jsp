@@ -24,12 +24,12 @@
 
 --%>
 
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@ page
-	import="org.oscarehr.casemgmt.web.formbeans.CaseManagementEntryFormBean, org.oscarehr.common.model.Facility"%>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
-<%@page import="org.oscarehr.PMmodule.model.Program"%>
 <%@page import="org.oscarehr.PMmodule.dao.ProgramDao"%>
+<%@page import="org.oscarehr.PMmodule.model.Program"%>
+<%@page import="org.oscarehr.casemgmt.web.formbeans.CaseManagementEntryFormBean"%>
+<%@page import="org.oscarehr.common.model.Facility"%>
+<%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
 <%@ include file="/casemgmt/taglibs.jsp"%>
 
@@ -57,11 +57,12 @@
 	String demoNo = request.getParameter("demographicNo");
 	String caseMgmtEntryFrm = "caseManagementEntryForm" + demoNo;
 	CaseManagementEntryFormBean frm = (CaseManagementEntryFormBean)request.getAttribute("caseManagementEntryForm");
+
 	if (frm == null)
 	{
 		frm = (CaseManagementEntryFormBean)session.getAttribute(caseMgmtEntryFrm);
 		request.setAttribute("caseManagementEntryForm", frm);
-	} 
+	}
 %>
 <nested:empty name="caseManagementEntryForm" property="caseNote.id">
 	<nested:notEmpty name="newNoteIdx">
@@ -104,14 +105,17 @@
 </nested:notEmpty>
 <nested:empty name="ajaxsave">
 	<bean:message key="oscarEncounter.encounterDate.title"/>:&nbsp;<img src="<c:out value="${ctx}/images/cal.gif" />"
-		id="observationDate_cal" alt="calendar">&nbsp;<input type="text"
+		id="observationDate_cal" alt="calendar">&nbsp;
+	<input type="text"
 		id="observationDate" name="observation_date"
 		ondblclick="this.value='';"
 		style="border: none; width: 140px;" readonly
 		value="<nested:write name="caseManagementEntryForm" property="caseNote.observation_date" format="dd-MMM-yyyy H:mm" />">
-                rev<a href="#"
-		onclick="return showHistory('<nested:write name="caseManagementEntryForm" property="caseNote.id" />', event);"><nested:write
-		name="caseManagementEntryForm" property="caseNote.revision" /></a>
+		<bean:message key="oscarEncounter.noteRev.title"/>
+		<a href="#"
+			onclick="return showHistory('<nested:write name="caseManagementEntryForm" property="caseNote.id" />', event);">
+			<nested:write name="caseManagementEntryForm" property="caseNote.revision" />
+		</a>
 </nested:empty>
 </div>
 

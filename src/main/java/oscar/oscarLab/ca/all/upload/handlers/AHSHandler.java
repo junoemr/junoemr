@@ -33,14 +33,15 @@ import oscar.oscarLab.ca.all.util.Utilities;
 
 import java.util.ArrayList;
 
-public class AHSHandler implements MessageHandler {
-
+public class AHSHandler implements MessageHandler
+{
 	private static final Logger logger = Logger.getLogger(AHSHandler.class);
-	public String parse(LoggedInInfo loggedInInfo, String serviceName,
-	                    String fileName, int fileId, String ipAddr) throws Exception {
 
+	public String parse(LoggedInInfo loggedInInfo, String serviceName,
+	                    String fileName, int fileId, String ipAddr) throws Exception
+	{
 		ArrayList<String> messages = Utilities.separateMessages(fileName);
-		for (String msg : messages)
+		for(String msg : messages)
 		{
 			logger.debug("Handle message:\n" + msg);
 			oscar.oscarLab.ca.all.parsers.MessageHandler parser = Factory.getHandler("AHS", msg);
@@ -55,7 +56,7 @@ public class AHSHandler implements MessageHandler {
 			// check if the lab has passed validation and can be saved
 			if(parser.canUpload())
 			{
-				MessageUploader.routeReport(loggedInInfo, serviceName, parser.getMsgType(), msg, fileId);
+				MessageUploader.routeReport(loggedInInfo.getLoggedInProviderNo(), serviceName, parser.getMsgType(), msg, fileId);
 				parser.postUpload();
 			}
 			else

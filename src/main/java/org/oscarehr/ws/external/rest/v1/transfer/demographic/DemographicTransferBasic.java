@@ -25,6 +25,7 @@ package org.oscarehr.ws.external.rest.v1.transfer.demographic;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.oscarehr.ws.validator.DemographicTransferHinConstraint;
 import org.oscarehr.ws.validator.ProviderNoConstraint;
 import org.oscarehr.ws.validator.StringValueConstraint;
 
@@ -37,11 +38,10 @@ import java.time.LocalDate;
 @XmlRootElement
 @Schema(description = "Demographic record data transfer object")
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
+@DemographicTransferHinConstraint(allowNull = true)
 public class DemographicTransferBasic implements Serializable
 {
 	// demographic base info
-	@Schema(description = "patient demographic record identifier")
-	private Integer demographicNo;
 	@NotNull
 	@Size(min=1, max=30)
 	@Schema(description = "patient first name")
@@ -58,7 +58,7 @@ public class DemographicTransferBasic implements Serializable
 	@Schema(description = "patient gender", allowableValues = {"M", "F", "T", "O", "U"})
 	@StringValueConstraint(allows = {"M","F","T","O","U"})
 	private String sex;
-	@Size(max=10)
+	@Size(max=12)
 	@Schema(description = "patient health insurance number")
 	private String hin;
 	@Size(max=15)
@@ -196,16 +196,6 @@ public class DemographicTransferBasic implements Serializable
 	@Schema(description = "The alert on the patient master file")
 	private String alert;
 
-
-	public Integer getDemographicNo()
-	{
-		return demographicNo;
-	}
-
-	public void setDemographicNo(Integer demographicNo)
-	{
-		this.demographicNo = demographicNo;
-	}
 
 	public String getFirstName()
 	{

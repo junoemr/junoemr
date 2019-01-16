@@ -285,7 +285,7 @@ public class SharingCenterUtil {
         return doc;
     }
 
-    public static PatientDocument downloadSharedDocument(int patientDocumentId, String demographicId, String providerId) throws CommunicationsException, IOException
+    public static PatientDocument downloadSharedDocument(int patientDocumentId, String demographicId, String providerId) throws CommunicationsException, IOException, InterruptedException
     {
         PatientDocument doc = patientDocumentDao.find(patientDocumentId);
 
@@ -325,7 +325,7 @@ public class SharingCenterUtil {
             Document document = new Document();
             document.setPublic1(false);
             document.setResponsible("");
-            document.setDoccreator(providerId);
+            document.setDocCreator(providerId);
             document.setDocdesc(doc.getTitle());
             document.setDoctype("others");
             document.setDocfilename(fileName);

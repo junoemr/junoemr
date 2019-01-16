@@ -10,6 +10,7 @@ package org.oscarehr.document.web;
 
 import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
+import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.struts.action.ActionForm;
@@ -30,6 +31,9 @@ import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
+
+
+import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
 import oscar.oscarLab.ca.on.LabResultData;
 
@@ -52,6 +56,8 @@ public class SplitDocumentAction extends DispatchAction {
 	private QueueDocumentLinkDao queueDocumentLinkDAO = (QueueDocumentLinkDao) SpringUtils.getBean("queueDocumentLinkDAO");
 	private DocumentService documentService = SpringUtils.getBean(DocumentService.class);
 
+	private long maxMemoryUsage = OscarProperties.getInstance().getPDFMaxMemUsage();
+
 	public ActionForward split(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String docNum = request.getParameter("document");
 		String[] commands = request.getParameterValues("page[]");
@@ -70,7 +76,7 @@ public class SplitDocumentAction extends DispatchAction {
 		{
 			GenericFile existingPdf = FileFactory.getDocumentFile(existingDocument.getDocfilename());
 
-			pdf = PDDocument.load(existingPdf.getFileObject());
+			pdf = PDDocument.load(existingPdf.getFileObject(), MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
 			PDDocument newPdf = new PDDocument();
 			
 			if (commands != null) {
@@ -100,7 +106,7 @@ public class SplitDocumentAction extends DispatchAction {
 				document.setDoctype(existingDocument.getDoctype());
 				document.setDocSubClass(existingDocument.getDocSubClass());
 				document.setDocfilename(tempFile.getName());
-				document.setDoccreator(providerNo);
+				document.setDocCreator(providerNo);
 				document.setResponsible(existingDocument.getDoccreator());
 				document.setSource(existingDocument.getSource());
 				document.setObservationdate(new Date());
@@ -112,9 +118,9 @@ public class SplitDocumentAction extends DispatchAction {
 				/* add link in providerInbox */
 				List<ProviderInboxItem> routeList = providerInboxRoutingDao.getProvidersWithRoutingForDocument(LabResultData.DOCUMENT, Integer.parseInt(docNum));
 				for (ProviderInboxItem i : routeList) {
-					documentService.routeToProviderInbox(newDocumentNo, Integer.parseInt(i.getProviderNo()));
+					documentService.routeToProviderInbox(newDocumentNo, i.getProviderNo());
 				}
-				documentService.routeToProviderInbox(newDocumentNo, Integer.parseInt(providerNo));
+				documentService.routeToProviderInbox(newDocumentNo, providerNo);
 
 				/* add link in document queue */
 				Integer qid = (queueId == null || queueId.equalsIgnoreCase("null")) ? 1 : Integer.parseInt(queueId);
@@ -164,7 +170,7 @@ public class SplitDocumentAction extends DispatchAction {
 		Document doc = documentDao.getDocument(request.getParameter("document"));
 
 		File pdfFile = FileFactory.getDocumentFile(doc.getDocfilename()).getFileObject();
-		PDDocument pdf = PDDocument.load(pdfFile);
+		PDDocument pdf = PDDocument.load(pdfFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
 		
 		for(int i=0; i<pdf.getNumberOfPages(); i++) {
 			PDPage pg = pdf.getPage(i);
@@ -192,7 +198,7 @@ public class SplitDocumentAction extends DispatchAction {
 		Document doc = documentDao.getDocument(request.getParameter("document"));
 
 		File pdfFile = FileFactory.getDocumentFile(doc.getDocfilename()).getFileObject();
-		PDDocument pdf = PDDocument.load(pdfFile);
+		PDDocument pdf = PDDocument.load(pdfFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
 
 		// Documents must have at least 2 pages, for the first page to be removed.
 		if(pdf.getNumberOfPages() > 1)

@@ -24,13 +24,6 @@
 
 package oscar.oscarEncounter.pageUtil;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Vector;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.util.MessageResources;
 import org.oscarehr.common.dao.AdmissionDao;
@@ -42,13 +35,19 @@ import org.oscarehr.common.model.MeasurementGroupStyle;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.OscarProperties;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
 import oscar.oscarResearch.oscarDxResearch.bean.dxResearchBeanHandler;
 import oscar.util.DateUtils;
 import oscar.util.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+import java.util.Vector;
 
 
 
@@ -67,6 +66,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 
 			String menuId = "3"; //div id for popup menu
 			String roleName$ = request.getSession().getAttribute("userrole") + "," + request.getSession().getAttribute("user");
+			String uuid="";
 
 			//set text for lefthand module title
 			Dao.setLeftHeading(messages.getMessage(request.getLocale(), "oscarEncounter.Index.measurements"));
@@ -103,8 +103,9 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 					String dispname = MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName);
 
 					winName = flowsheetName + bean.demographicNo;
+					uuid = UUID.randomUUID().toString();
 					hash = Math.abs(winName.hashCode());
-					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "');return false;";
+					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?uuid=" + uuid + "&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "');return false;";
 					item.setLinkTitle(dispname);
 					dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 					item.setTitle(dispname);
@@ -145,8 +146,9 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 					String dispname = MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName);
 
 					winName = flowsheetName + bean.demographicNo;
+					uuid = UUID.randomUUID().toString();
 					hash = Math.abs(winName.hashCode());
-					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "');return false;";
+					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?uuid=" + uuid + "&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "');return false;";
 					item.setLinkTitle(dispname);
 					dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 					item.setTitle(dispname);
@@ -176,8 +178,9 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 					String dispname = MeasurementTemplateFlowSheetConfig.getInstance().getDisplayName(flowsheetName);
 
 					winName = flowsheetName + bean.demographicNo;
+					uuid = UUID.randomUUID().toString();
 					hash = Math.abs(winName.hashCode());
-					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "');return false;";
+					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?uuid=" + uuid + "&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "');return false;";
 					item.setLinkTitle(dispname);
 					dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 					item.setTitle(dispname);
