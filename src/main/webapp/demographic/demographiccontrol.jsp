@@ -63,7 +63,7 @@
 	}
 
 	String fieldname = "";
-	String regularexp = "regexp";
+	String comparisonOperator = "regexp";
 
 	String searchMode = request.getParameter("search_mode");
 	String keyword = request.getParameter("keyword");
@@ -71,7 +71,7 @@
 
 	if (searchMode != null)
 	{
-		if (keyword.indexOf("*") != -1 || keyword.indexOf("%") != -1) regularexp = "like";
+		if (keyword.indexOf("*") != -1 || keyword.indexOf("%") != -1) comparisonOperator = "like";
 
 		if (searchMode.equals("search_address")) fieldname = "address";
 		if (searchMode.equals("search_phone")) fieldname = "phone";
@@ -83,7 +83,7 @@
 		}
 		if (searchMode.equals("search_dob"))
 		{
-			fieldname = "year_of_birth " + regularexp + " ?" + " and month_of_birth " + regularexp + " ?" + " and date_of_birth ";
+			fieldname = "year_of_birth " + comparisonOperator + " ?" + " and month_of_birth " + comparisonOperator + " ?" + " and date_of_birth ";
 
 			try
 			{
@@ -115,13 +115,22 @@
 			{
 				matchingDemographicParameters.setLastName(lastfirst[0].trim() + "%");
 				matchingDemographicParameters.setFirstName(lastfirst[1].trim() + "%");
-				fieldname = "lower(last_name) " + regularexp + " ?" + " and lower(first_name) ";
+				fieldname = "lower(last_name) " + comparisonOperator + " ?" + " and lower(first_name) ";
 			}
 			else
 			{
 				matchingDemographicParameters.setLastName(lastfirst[0].trim() + "%");
 				fieldname = "lower(last_name)";
 			}
+		}
+		if (searchMode.equals("search_demographic_no"))
+		{
+			if (!keyword.contains("*") && !keyword.contains("%"))
+			{
+				comparisonOperator = "=";
+			}
+
+			fieldname = "demographic_no";
 		}
 	}
 
@@ -149,10 +158,10 @@
 
 
 	String[][] dbQueries = new String[][]{
-			{"search_titlename", "select *  from demographic where " + fieldname + " " + regularexp + " ? " + ptstatusexp + domainRestriction + orderby},
-			{"search_titlename_mysql", "select *  from demographic where " + fieldname + " " + regularexp + " ? " + ptstatusexp + domainRestriction + orderby + " " + limit},
-			{"add_apptrecord", "select demographic_no,first_name,last_name,roster_status,sex,chart_no,year_of_birth,month_of_birth,date_of_birth,provider_no from demographic where " + fieldname + " " + regularexp + " ? " + ptstatusexp + domainRestriction + orderby},
-			{"update_apptrecord", "select demographic_no,first_name,last_name,roster_status,sex,chart_no,year_of_birth,month_of_birth,date_of_birth,provider_no  from demographic where " + fieldname + " " + regularexp + " ? " + ptstatusexp + domainRestriction + orderby + " " + limit},
+			{"search_titlename", "select *  from demographic where " + fieldname + " " + comparisonOperator + " ? " + ptstatusexp + domainRestriction + orderby},
+			{"search_titlename_mysql", "select *  from demographic where " + fieldname + " " + comparisonOperator + " ? " + ptstatusexp + domainRestriction + orderby + " " + limit},
+			{"add_apptrecord", "select demographic_no,first_name,last_name,roster_status,sex,chart_no,year_of_birth,month_of_birth,date_of_birth,provider_no from demographic where " + fieldname + " " + comparisonOperator + " ? " + ptstatusexp + domainRestriction + orderby},
+			{"update_apptrecord", "select demographic_no,first_name,last_name,roster_status,sex,chart_no,year_of_birth,month_of_birth,date_of_birth,provider_no  from demographic where " + fieldname + " " + comparisonOperator + " ? " + ptstatusexp + domainRestriction + orderby + " " + limit},
 			{"search_detail", "select * from demographic where demographic_no=?"},
 			{"search_detail_ptbr", "select * from demographic d left outer join demographic_ptbr dptbr on dptbr.demographic_no = d.demographic_no where d.demographic_no=?"},
 

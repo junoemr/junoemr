@@ -310,7 +310,12 @@ function popupEChart(vheight,vwidth,varpage) { //open a new popup window
          keyword = keyword.replaceAll("-", "-?");
          if (keyword.length() < 1) keyword="^";
          rs = apptMainBean.queryResults(keyword, dboperation);
-	  } else {
+	  }
+	  else if(request.getParameter("search_mode").equals("search_demographic_no"))
+		{
+			rs = apptMainBean.queryResults(keyword, dboperation);
+		}
+	  else {
 		 keyword="^"+request.getParameter("keyword");
 		 rs = apptMainBean.queryResults(keyword, dboperation);
 	  }
