@@ -1,12 +1,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:cxf="http://cxf.apache.org/core"
-	xmlns:jaxws="http://cxf.apache.org/jaxws"
-	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:cxf="http://cxf.apache.org/core"
+	   xmlns:jaxws="http://cxf.apache.org/jaxws"
+	   xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="
 		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
@@ -20,19 +20,11 @@
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
-
 	<!-- ========================================================================================-->
-	<!-- Settings for the external SOAP web services -->
+	<!-- Shared SOAP/REST bus-->
 	<!-- ========================================================================================-->
 
-	<!-- interceptors -->
-	<bean id="abstractLoggingInterceptor" abstract="true">
-		<property name="prettyLogging" value="true" />
-	</bean>
-	<bean id="loggingInInterceptor" class="org.apache.cxf.interceptor.LoggingInInterceptor" parent="abstractLoggingInterceptor" />
-	<bean id="loggingOutInterceptor" class="org.apache.cxf.interceptor.LoggingOutInterceptor" parent="abstractLoggingInterceptor" />
-
-    <cxf:bus>
+	<cxf:bus>
 		<cxf:properties>
 			<entry key="ws-security.ut.validator" value="org.oscarehr.ws.OscarUsernameTokenValidator" />
 			<!--
@@ -41,42 +33,63 @@
 			-->
 			<entry key="skip.default.json.provider.registration" value="true" />
 		</cxf:properties>
+	</cxf:bus>
 
-		<!-- logging interceptors -->
-		<cxf:inInterceptors>
-			<ref bean="loggingInInterceptor" />
-		</cxf:inInterceptors>
-		<cxf:outInterceptors>
-			<!-- BORN XDS Soap Header Interceptor (Adds endpointID node to header) -->
-			<bean id="bornSOAPHeaderInterceptor" class="org.oscarehr.integration.born.BornSOAPHeaderInterceptor" />
-			<ref bean="loggingOutInterceptor" />
-		</cxf:outInterceptors>
-		
-		<cxf:outFaultInterceptors>
-			<ref bean="loggingOutInterceptor" />
-		</cxf:outFaultInterceptors>
-		<cxf:inFaultInterceptors>
-			<ref bean="loggingInInterceptor" />
-		</cxf:inFaultInterceptors>
-
-    </cxf:bus>
+	<!-- ========================================================================================-->
+	<!-- Settings for the external SOAP web services -->
+	<!-- ========================================================================================-->
 
 	<!-- Managed WS Beans -->
 	<!-- The WS classes are turned into spring beans to allow autowiring etc, then the endpoints reference them -->
- 	<context:component-scan base-package="org.oscarehr.ws.external.soap"/>
+	<context:component-scan base-package="org.oscarehr.ws.external.soap"/>
 
-	<bean id="authenticationInWSS4JInterceptor" class="org.oscarehr.ws.AuthenticationInWSS4JInterceptor" />
+	<!-- Features -->
+	<bean id="soapLoggingPackage" class="org.oscarehr.ws.external.soap.logging.SoapLoggingSuite"/>
+
+	<!-- Interceptors are listed in lifecycle order -->
+	<!-- Request interceptors -->
+	<bean id="authenticationInWSS4JInterceptor" class="org.oscarehr.ws.AuthenticationInWSS4JInterceptor"/>
 	<bean id="IPInWSS4JInterceptor" class="org.oscarehr.ws.IPInWSS4JInterceptor"/>
 
+	<!-- Response interceptors -->
+	<bean id="bornSOAPHeaderInterceptor" class="org.oscarehr.integration.born.BornSOAPHeaderInterceptor"/>
+
 	<!-- web service endpoints -->
-	<jaxws:endpoint implementor="#systemInfoWs" address="/SystemInfoService"/>
-	<jaxws:endpoint implementor="#loginWs" address="/LoginService" />
+	<jaxws:endpoint implementor="#systemInfoWs" address="/SystemInfoService">
+		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
+	</jaxws:endpoint>
+
+	<jaxws:endpoint implementor="#loginWs" address="/LoginService">
+		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
+	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#scheduleWs" address="/ScheduleService">
 		<jaxws:inInterceptors>
 			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#providerWs" address="/ProviderService" >
@@ -84,6 +97,12 @@
 			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#demographicWs" address="/DemographicService" >
@@ -91,20 +110,38 @@
 			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
 	</jaxws:endpoint>
 
-    <jaxws:endpoint implementor="#userMetricsWs" address="/UserMetricsService" >
-        <jaxws:inInterceptors>
+	<jaxws:endpoint implementor="#userMetricsWs" address="/UserMetricsService" >
+		<jaxws:inInterceptors>
 			<ref bean="IPInWSS4JInterceptor"/>
-            <ref bean="authenticationInWSS4JInterceptor"/>
-        </jaxws:inInterceptors>
-    </jaxws:endpoint>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
+	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#facilityWs" address="/FacilityService" >
 		<jaxws:inInterceptors>
 			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#programWs" address="/ProgramService" >
@@ -112,6 +149,12 @@
 			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#allergyWs" address="/AllergyService" >
@@ -119,6 +162,12 @@
 			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#preventionWs" address="/PreventionService" >
@@ -126,6 +175,12 @@
 			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#measurementWs" address="/MeasurementService" >
@@ -133,6 +188,12 @@
 			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#documentWs" address="/DocumentService" >
@@ -140,6 +201,12 @@
 			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#prescriptionWs" address="/PrescriptionService" >
@@ -147,12 +214,25 @@
 			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
 	</jaxws:endpoint>
 
 	<jaxws:endpoint implementor="#labUploadWs" address="/LabUploadService" >
 		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
 			<ref bean="authenticationInWSS4JInterceptor"/>
 		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
 	</jaxws:endpoint>
 
 	<!-- ========================================================================================-->
@@ -233,7 +313,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ConsultationWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicMergeService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicService"/>
-            <bean autowire="byName" class="org.oscarehr.ws.rest.DemographicsService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DiseaseRegistryService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormsService"/>
