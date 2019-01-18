@@ -62,9 +62,20 @@ public class InboundFaxSchedulingTask
 	{
 		if(canRun())
 		{
-			logger.info("Execute Inbound scheduling task! " + ConversionUtils.toDateTimeString(LocalDateTime.now()));
-			incomingFaxDownloadService.pullNewFaxes();
-			logger.info("Completed at " + ConversionUtils.toDateTimeString(LocalDateTime.now()) + ". Next Execution Time: " + getNextRunTime());
+			try
+			{
+				logger.info("Execute Inbound scheduling task! " + ConversionUtils.toDateTimeString(LocalDateTime.now()));
+				incomingFaxDownloadService.pullNewFaxes();
+				logger.info("Completed at " + ConversionUtils.toDateTimeString(LocalDateTime.now()) + ". Next Execution Time: " + getNextRunTime());
+			}
+			catch(IllegalStateException e)
+			{
+				logger.warn(e.getMessage());
+			}
+			catch(Exception e)
+			{
+				logger.error("Unexpected scheduling task error", e);
+			}
 		}
 	}
 
@@ -79,15 +90,6 @@ public class InboundFaxSchedulingTask
 
 	private static boolean canRun()
 	{
-		boolean isMaster = false;
-		try
-		{
-			isMaster = ServerStateHandler.isThisServerMaster();
-		}
-		catch(IllegalStateException e)
-		{
-			logger.error("Invalid server state", e);
-		}
-		return enabled && isMaster;
+		return enabled && ServerStateHandler.isProductionServer();
 	}
 }

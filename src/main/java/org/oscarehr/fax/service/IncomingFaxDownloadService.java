@@ -23,6 +23,7 @@
 package org.oscarehr.fax.service;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.server.ServerStateHandler;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxApiValidationException;
@@ -67,44 +68,47 @@ public class IncomingFaxDownloadService
 
 	public void pullNewFaxes()
 	{
-		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveInbound(true, true);
-		String startDate = ConversionUtils.toDateString(LocalDate.now().minusDays(faxDaysPast), SRFaxApiConnector.DATE_FORMAT);
-		String endDate = ConversionUtils.toDateString(LocalDate.now(), SRFaxApiConnector.DATE_FORMAT);
-
-		for(FaxAccount faxAccount : faxAccountList)
+		if(ServerStateHandler.isThisServerMaster())
 		{
-			try
-			{
-				SRFaxApiConnector srFaxApiConnector = new SRFaxApiConnector(faxAccount.getLoginId(), faxAccount.getLoginPassword());
+			List<FaxAccount> faxAccountList = faxAccountDao.findByActiveInbound(true, true);
+			String startDate = ConversionUtils.toDateString(LocalDate.now().minusDays(faxDaysPast), SRFaxApiConnector.DATE_FORMAT);
+			String endDate = ConversionUtils.toDateString(LocalDate.now(), SRFaxApiConnector.DATE_FORMAT);
 
-				// get list of un-downloaded faxes from external api
-				ListWrapper<GetFaxInboxResult> listResultWrapper = srFaxApiConnector.getFaxInbox(
-						SRFaxApiConnector.PERIOD_RANGE,
-						startDate,
-						endDate,
-						SRFaxApiConnector.VIEWED_STATUS_UNREAD,
-						null);
+			for(FaxAccount faxAccount : faxAccountList)
+			{
+				try
+				{
+					SRFaxApiConnector srFaxApiConnector = new SRFaxApiConnector(faxAccount.getLoginId(), faxAccount.getLoginPassword());
 
-				if(listResultWrapper.isSuccess())
-				{
-					handleResults(faxAccount, srFaxApiConnector, listResultWrapper);
+					// get list of un-downloaded faxes from external api
+					ListWrapper<GetFaxInboxResult> listResultWrapper = srFaxApiConnector.getFaxInbox(
+							SRFaxApiConnector.PERIOD_RANGE,
+							startDate,
+							endDate,
+							SRFaxApiConnector.VIEWED_STATUS_UNREAD,
+							null);
+
+					if(listResultWrapper.isSuccess())
+					{
+						handleResults(faxAccount, srFaxApiConnector, listResultWrapper);
+					}
+					else
+					{
+						logger.warn("API Failure: " + listResultWrapper.getError());
+					}
 				}
-				else
+				catch(FaxApiConnectionException e)
 				{
-					logger.warn("API Failure: " + listResultWrapper.getError());
+					logger.warn("Fax API connection error: " + e.getMessage());
 				}
-			}
-			catch(FaxApiConnectionException e)
-			{
-				logger.warn("Fax API connection error: " + e.getMessage());
-			}
-			catch(FaxApiValidationException e)
-			{
-				logger.warn("Fax API validation error: " + e.getMessage());
-			}
-			catch(Exception e)
-			{
-				logger.error("Unexpected Inbound Fax Error", e);
+				catch(FaxApiValidationException e)
+				{
+					logger.warn("Fax API validation error: " + e.getMessage());
+				}
+				catch(Exception e)
+				{
+					logger.error("Unexpected Inbound Fax Error", e);
+				}
 			}
 		}
 	}

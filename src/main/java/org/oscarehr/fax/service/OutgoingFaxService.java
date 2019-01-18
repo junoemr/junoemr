@@ -28,6 +28,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.server.ServerStateHandler;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
@@ -84,7 +85,7 @@ public class OutgoingFaxService
 	{
 		return (isIntegratedFaxEnabled() || isLegacyFaxEnabled());
 	}
-	protected boolean isIntegratedFaxEnabled()
+	public boolean isIntegratedFaxEnabled()
 	{
 		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveOutbound(true, true);
 		return !faxAccountList.isEmpty();
@@ -130,6 +131,10 @@ public class OutgoingFaxService
 	 */
 	public FaxOutboxTransferOutbound sendFax(FaxAccount faxAccount, String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
 	{
+		if(!ServerStateHandler.isThisServerMaster())
+		{
+			throw new IllegalStateException("Faxes must be sent from a master server");
+		}
 		FaxOutboxTransferOutbound transfer;
 		// check for enabled fax routes
 		if(isIntegratedFaxEnabled())
@@ -152,7 +157,7 @@ public class OutgoingFaxService
 		}
 		else
 		{
-			throw new RuntimeException("No outbound fax routes enabled!");
+			throw new IllegalStateException("No outbound fax routes enabled!");
 		}
 		return transfer;
 	}
@@ -164,6 +169,11 @@ public class OutgoingFaxService
 	 */
 	public FaxOutboxTransferOutbound resendFax(Long faxOutId) throws IOException
 	{
+		if(!ServerStateHandler.isThisServerMaster())
+		{
+			throw new IllegalStateException("Faxes must be sent from a master server");
+		}
+
 		FaxOutbound faxOutbound = faxOutboundDao.find(faxOutId);
 		GenericFile fileToResend;
 
@@ -193,20 +203,25 @@ public class OutgoingFaxService
 	{
 		// get a list of queued faxes filtered by accounts with active outbound faxing
 		List<FaxOutbound> queuedFaxList = faxOutboundDao.findActiveQueued();
-		for(FaxOutbound queuedFax : queuedFaxList)
+
+		// only send faxes from a master server
+		if(!queuedFaxList.isEmpty() && ServerStateHandler.isThisServerMaster())
 		{
-			GenericFile fileToSend;
-			try
+			for(FaxOutbound queuedFax : queuedFaxList)
 			{
-				fileToSend = FileFactory.getOutboundUnsentFaxFile(queuedFax.getFileName());
+				GenericFile fileToSend;
+				try
+				{
+					fileToSend = FileFactory.getOutboundUnsentFaxFile(queuedFax.getFileName());
+				}
+				catch(IOException e)
+				{
+					// ignore this error and continue, can't rollback previous object fax status updates
+					logger.error("IOError", e);
+					continue;
+				}
+				sendQueuedFax(queuedFax, fileToSend);
 			}
-			catch(IOException e)
-			{
-				// ignore this error and continue, can't rollback previous object fax status updates
-				logger.error("IOError", e);
-				continue;
-			}
-			sendQueuedFax(queuedFax, fileToSend);
 		}
 	}
 

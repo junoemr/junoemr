@@ -26,6 +26,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
+import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.externalApi.srfax.result.GetFaxInboxResult;
 import org.oscarehr.fax.model.FaxAccount;
@@ -41,6 +42,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
 
 /**
  * This service should be responsible for handling all transactional logic around receiving faxes
@@ -55,7 +57,16 @@ public class IncomingFaxService
 	private FaxInboundDao faxInboundDao;
 
 	@Autowired
+	private FaxAccountDao faxAccountDao;
+
+	@Autowired
 	private DocumentService documentService;
+
+	public boolean isIntegratedFaxEnabled()
+	{
+		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveInbound(true, true);
+		return !faxAccountList.isEmpty();
+	}
 
 	public FaxInbound saveFaxDocument(final FaxAccount faxAccount, final GetFaxInboxResult inboxMeta, String result) throws IOException, InterruptedException
 	{

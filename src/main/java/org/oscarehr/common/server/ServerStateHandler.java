@@ -23,6 +23,9 @@
 package org.oscarehr.common.server;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.server.dao.SlaveStatusDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.xbill.DNS.ARecord;
 import org.xbill.DNS.Lookup;
 import org.xbill.DNS.Record;
@@ -31,15 +34,13 @@ import org.xbill.DNS.TextParseException;
 import org.xbill.DNS.Type;
 import oscar.OscarProperties;
 
-import java.io.File;
-import java.io.IOException;
+import javax.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,25 +49,43 @@ import java.util.regex.Pattern;
  * Responsible for handling server state information.
  * This is where other classes should be able to determine if the server is a master/slave server, in readonly mode, etc.
  */
+@Component
 public class ServerStateHandler
 {
 	private static final OscarProperties props = OscarProperties.getInstance();
 	private static final Logger logger = Logger.getLogger(ServerStateHandler.class);
 
-	private static final boolean isMasterCheckEnabled = props.isPropertyActive("common.server.master_check.enabled");
+	private static final String PRODUCTION_SERVER_ENV = "JUNO_PRODUCTION_SERVER";
 
+	private static final String forceMasterDomainOverride = props.getProperty("common.server.master_check.force_master_domain");
 	private static final String domain = props.getProperty("common.server.master_check.domain");
 	private static final String secureDomain = props.getProperty("common.server.master_check.secure_subdomain");
-	private static final String masterCheckRedirectRegex = props.getProperty("common.server.master_check.master_redirect_pattern");
 	private static final String primaryServerRegexPattern = props.getProperty("common.server.master_check.primary_server_regex_pattern");
 	private static final String secondaryServerRegexPattern = props.getProperty("common.server.master_check.secondary_server_regex_pattern");
 
-	private static final String masterCheckFile = props.getProperty("common.server.master_check.file");
-	private static final String dnsServers = props.getProperty("common.server.master_check.dns_ip_list");
+	private static final String dnsServers = props.getProperty("common.server.master_check.dns_server_list");
 	private static final Set<String> dnsServerList;
 	static
 	{
 		dnsServerList = new HashSet<>((dnsServers != null) ? Arrays.asList(dnsServers.split("\\s*,\\s*")) : new ArrayList<>());
+	}
+
+	private static SlaveStatusDao slaveStatusDao;
+
+	@Autowired
+	private SlaveStatusDao _slaveStatusDao;
+
+	/** clever solution to allow autowired dao in static class */
+	@PostConstruct
+	private void initServerStateHandler()
+	{
+		slaveStatusDao = _slaveStatusDao;
+	}
+
+	public static boolean isProductionServer()
+	{
+		String productionEnv = System.getenv(PRODUCTION_SERVER_ENV);
+		return (productionEnv != null && productionEnv.equalsIgnoreCase("true"));
 	}
 
 	/**
@@ -79,61 +98,47 @@ public class ServerStateHandler
 		boolean isMaster;
 		try
 		{
-			if(isMasterCheckEnabled)
+			logger.info("Checking master status...");
+
+			InetAddress inetAddress = InetAddress.getLocalHost();
+			String localHostname = inetAddress.getHostName();
+			logger.info("local hostname: " + localHostname);
+
+			// this property should not be included on production servers, so log an error if it exists
+			if(forceMasterDomainOverride != null)
 			{
-				logger.info("Checking master status...");
-				isMaster = actingAsMaster() && resolvesAsMaster();
-				logger.info("This is a " + (isMaster? "master" : "slave") + " server");
+				logger.error("Master check has properties file override: " + forceMasterDomainOverride);
+			}
+
+			// force this server to master if the override domain matches the localhost
+			if(localHostname.equals(forceMasterDomainOverride))
+			{
+				isMaster = true;
 			}
 			else
 			{
-				isMaster = true;
+				isMaster = actingAsMaster() && resolvesAsMaster(localHostname);
 			}
 		}
 		catch(Exception e)
 		{
 			throw new IllegalStateException(e);
 		}
+		logger.info("This is a " + (isMaster? "master" : "slave") + " server");
 		return isMaster;
 	}
 
-	private static boolean actingAsMaster() throws IOException
+	private static boolean actingAsMaster()
 	{
-		File file = new File(masterCheckFile);
-		boolean isMaster = false;
-		if(file.exists() && file.isFile() && file.canRead())
-		{
-			Pattern pattern = Pattern.compile(masterCheckRedirectRegex);
-
-			String line;
-			Scanner scanner = new Scanner(file);
-			while(scanner.hasNextLine())
-			{
-				line = scanner.nextLine();
-				Matcher messagePatternMatcher = pattern.matcher(line);
-				if(messagePatternMatcher.find())
-				{
-					isMaster = true;
-					break;
-				}
-			}
-		}
-		else
-		{
-			throw new IOException("Cannot read file: " + masterCheckFile);
-		}
-		return isMaster;
+		List<Object[]> list = slaveStatusDao.getSlaveStatus();
+		return list.isEmpty();
 	}
 
-	private static boolean resolvesAsMaster() throws UnknownHostException
+	private static boolean resolvesAsMaster(String localHostname)
 	{
 		boolean isMaster = false;
 		boolean resolved = false;
-		String serverNumber = "";
-
-		InetAddress inetAddress = InetAddress.getLocalHost();
-		String localHostname = inetAddress.getHostName();
-		logger.info("local hostname: " + localHostname);
+		String serverNumber = null;
 
 		Pattern primPattern = Pattern.compile(primaryServerRegexPattern);
 		Matcher primPatternMatcher = primPattern.matcher(localHostname);
@@ -150,27 +155,30 @@ public class ServerStateHandler
 				serverNumber = secPatternMatcher.group(1);
 			}
 		}
-		String secureHostname = secureDomain + serverNumber + "." + domain;
-		logger.info("secure hostname: " + secureHostname);
+		if(serverNumber != null)
+		{
+			String secureHostname = secureDomain + serverNumber + "." + domain;
+			logger.info("secure hostname: " + secureHostname);
 
-		// for each server in the dns servers list, check that the name resolves.
-		// if the server fails, try the next one as a backup, etc.
-		for(String server : dnsServerList)
-		{
-			try
+			// for each server in the dns servers list, check that the name resolves.
+			// if the server fails, try the next one as a backup, etc.
+			for(String server : dnsServerList)
 			{
-				isMaster = resolvesAsMaster(server, localHostname, secureHostname);
-				resolved = true;
-				break;
+				try
+				{
+					isMaster = resolvesAsMaster(server, localHostname, secureHostname);
+					resolved = true;
+					break;
+				}
+				catch(UnknownHostException | TextParseException | IllegalStateException e)
+				{
+					logger.warn("[" + server + "]: " + e.getMessage());
+				}
 			}
-			catch(UnknownHostException | TextParseException | IllegalStateException e)
+			if(!resolved)
 			{
-				logger.warn("["+server+"]: " + e.getMessage());
+				throw new IllegalStateException("All DNS servers failed to resolve master");
 			}
-		}
-		if(!resolved)
-		{
-			throw new IllegalStateException("All DNS servers failed to resolve master");
 		}
 		return isMaster;
 	}
