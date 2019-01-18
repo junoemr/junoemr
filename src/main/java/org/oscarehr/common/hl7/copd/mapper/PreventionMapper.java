@@ -150,6 +150,7 @@ public class PreventionMapper extends AbstractMapper
 		preventionTypeMap.put("Fluviral 2015-2016", "Flu");
 		preventionTypeMap.put("Fluviral (2017-2018)", "Flu");
 		preventionTypeMap.put("FluZone 2015-2016", "Flu");
+		preventionTypeMap.put("flu", "Flu");
 		preventionTypeMap.put("flu shot", "Flu");
 		preventionTypeMap.put("Haemophilus b Conjugate", "Hib");
 		preventionTypeMap.put("Hepatitis A", "HepA");
@@ -171,6 +172,7 @@ public class PreventionMapper extends AbstractMapper
 		preventionTypeMap.put("Meningococcal C-TT Conjugate", "MenconC");
 		preventionTypeMap.put("Meningococcal Group B", "rMenB");
 		preventionTypeMap.put("MMR/Varicella", "MMRV");
+		preventionTypeMap.put("MMR II", "MMR");
 		preventionTypeMap.put("OPV", "OtherA");
 		preventionTypeMap.put("Osler", "OtherA");
 		preventionTypeMap.put("penta", "DPTP-IPV-Hib");
@@ -183,6 +185,7 @@ public class PreventionMapper extends AbstractMapper
 		preventionTypeMap.put("Pneumovax 23", "Pneumovax");
 		preventionTypeMap.put("Polio Injectable", "IPV");
 		preventionTypeMap.put("Poliomyelitis Inactivated", "IPV");
+		preventionTypeMap.put("PPD", "Tuberculosis");
 		preventionTypeMap.put("PPD = TB Skin Test", "Tuberculosis");
 		preventionTypeMap.put("Prevnar", "Pneu-C");
 		preventionTypeMap.put("quad", "DPTP-IPV");
@@ -199,6 +202,7 @@ public class PreventionMapper extends AbstractMapper
 		preventionTypeMap.put("Tetanus-diptheria", "Td");
 		preventionTypeMap.put("Twinrix", "HepAB");
 		preventionTypeMap.put("Typhoid Vaccine", "Typhoid");
+		preventionTypeMap.put("typhoid VI polysaccharide", "Typhoid");
 		preventionTypeMap.put("Varicella", "VZ");
 		preventionTypeMap.put("varivax", "VZ");
 		preventionTypeMap.put("Vaxigrip 2012-2013", "Flu");
