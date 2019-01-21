@@ -1007,12 +1007,16 @@ if(wLReadonly.equals("")){
 							<bean:message key="demographic.demographiceditdemographic.msgInvoiceList"/>
 							</a>
 							<br/>
-                            <a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
-                            <div id='menu2' class='menu' onclick='event.cancelBubble = true;' style="width:350px;">
-                                <span id="search_spinner" ><bean:message key="demographic.demographiceditdemographic.msgLoading"/></span>
-                                <span id="eligibilityMsg"></span>
-                            </div>
-					<%
+							<%
+							if (!oscarProps.isAlbertaInstanceType())
+							{
+							%>
+									<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
+									<div id='menu2' class='menu' onclick='event.cancelBubble = true;' style="width:350px;">
+										<span id="search_spinner" ><bean:message key="demographic.demographiceditdemographic.msgLoading"/></span>
+										<span id="eligibilityMsg"></span>
+									</div>
+					<%		}
 					}
 					else if("ON".equals(billRegion)) 
 					{
