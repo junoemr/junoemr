@@ -980,48 +980,54 @@ public class RxPrescriptionData {
 			return b;
 		}
 
-		public void calcEndDate() {
-			try {
+		public static Date calcEndDate(Date rxDate, String duration, String durationUnit, int repeat)
+		{
+			Date endDate = null;
+			try
+			{
 				GregorianCalendar cal = new GregorianCalendar(Locale.CANADA);
 				int days = 0;
 
-				//          p("this.getRxDate()",this.getRxDate().toString());
-				cal.setTime(this.getRxDate());
-
-				if (this.getDuration() != null && this.getDuration().length() > 0) {
-					if (Integer.parseInt(this.getDuration()) > 0) {
-						int i = Integer.parseInt(this.getDuration());
-						//      p("i",Integer.toString(i));
-						//      p("this.getDurationUnit()",this.getDurationUnit());
-						if (this.getDurationUnit() != null && this.getDurationUnit().equalsIgnoreCase("D")) {
+				cal.setTime(rxDate);
+				if(duration != null && duration.length() > 0)
+				{
+					if(Integer.parseInt(duration) > 0)
+					{
+						int i = Integer.parseInt(duration);
+						if(durationUnit != null && durationUnit.equalsIgnoreCase("D"))
+						{
 							days = i;
 						}
-						if (this.getDurationUnit() != null && this.getDurationUnit().equalsIgnoreCase("W")) {
+						if(durationUnit != null && durationUnit.equalsIgnoreCase("W"))
+						{
 							days = i * 7;
 						}
-						if (this.getDurationUnit() != null && this.getDurationUnit().equalsIgnoreCase("M")) {
+						if(durationUnit != null && durationUnit.equalsIgnoreCase("M"))
+						{
 							days = i * 30;
 						}
 
-						if (this.getRepeat() > 0) {
-							int r = this.getRepeat();
-
+						if(repeat > 0)
+						{
+							int r = repeat;
 							r++; // if we have a repeat of 1, multiply days by 2
 
 							days = days * r;
 						}
-						//    p("days",Integer.toString(days));
-						if (days > 0) {
+						if(days > 0)
+						{
 							cal.add(GregorianCalendar.DATE, days);
 						}
 					}
 				}
 
-				this.endDate = cal.getTime();
-			} catch (Exception e) {
+				endDate = cal.getTime();
+			}
+			catch(Exception e)
+			{
 				MiscUtils.getLogger().error("Error", e);
 			}
-			//     p("endDate",RxUtil.DateToString(this.endDate));
+			return endDate;
 		}
 
 		public String getBrandName() {
@@ -1528,7 +1534,11 @@ public class RxPrescriptionData {
 
 		public boolean Save(String scriptId) {
 
-			this.calcEndDate();
+			Date endDate = calcEndDate(this.getRxDate(), this.getDuration(), this.getDurationUnit(), this.getRepeat());
+			if(endDate != null)
+			{
+				this.setEndDate(endDate);
+			}
 
 			// clean up fields
 			if (this.takeMin > this.takeMax) this.takeMax = this.takeMin;

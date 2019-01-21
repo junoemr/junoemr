@@ -24,32 +24,18 @@ package org.oscarehr.common.hl7.copd.mapper;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.document.model.Document;
-import org.oscarehr.util.MiscUtils;
-import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class DocumentMapper
+public class DocumentMapper extends AbstractMapper
 {
-	private static final Logger logger = MiscUtils.getLogger();
-	private final ZPD_ZTR message;
-	private final ZPD_ZTR_PROVIDER provider;
-
-	public DocumentMapper()
-	{
-		message = null;
-		provider = null;
-	}
 	public DocumentMapper(ZPD_ZTR message, int providerRep)
 	{
-		this.message = message;
-		this.provider = message.getPATIENT().getPROVIDER(providerRep);
+		super(message, providerRep);
 	}
 
 	public int getNumDocuments()
@@ -83,7 +69,7 @@ public class DocumentMapper
 
 	public Date getObservationDate(int rep)
 	{
-		return ConversionUtils.fromDateString(provider.getZAT(rep).getZat2_Date().getValue(), "yyyyMMdd");
+		return getNullableDate(provider.getZAT(rep).getZat2_Date().getValue());
 	}
 
 	public String getFileName(int rep)
@@ -101,7 +87,7 @@ public class DocumentMapper
 
 	public String getContentType(int rep)
 	{
-		//TODO map to apllication/contenttype correctly
+		//TODO map to application/contenttype correctly
 		return "application/" + StringUtils.lowerCase(provider.getZAT(rep).getZat4_Attachment().getSubtype().getValue());
 	}
 }

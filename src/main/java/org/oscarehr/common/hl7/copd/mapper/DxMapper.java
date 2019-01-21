@@ -23,32 +23,18 @@
 package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
-import org.apache.log4j.Logger;
-import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.model.Dxresearch;
-import org.oscarehr.util.MiscUtils;
-import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class DxMapper
+public class DxMapper extends AbstractMapper
 {
-	private static final Logger logger = MiscUtils.getLogger();
-	private final ZPD_ZTR message;
-	private final ZPD_ZTR_PROVIDER provider;
-
-	public DxMapper()
-	{
-		message = null;
-		provider = null;
-	}
 	public DxMapper(ZPD_ZTR message, int providerRep)
 	{
-		this.message = message;
-		this.provider = message.getPATIENT().getPROVIDER(providerRep);
+		super(message, providerRep);
 	}
 
 	public int getNumDx()
@@ -121,16 +107,19 @@ public class DxMapper
 
 	public Date getDiagnosisDate(int rep) throws HL7Exception
 	{
-		return ConversionUtils.fromDateString(provider.getZPB(rep).getZpb2_diagnosisDate().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
+		return getNullableDate(provider.getZPB(rep)
+				.getZpb2_diagnosisDate().getTs1_TimeOfAnEvent().getValue());
 	}
 
 	public Date getOnsetDate(int rep) throws HL7Exception
 	{
-		return ConversionUtils.fromDateString(provider.getZPB(rep).getZpb6_onsetDate().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
+		return getNullableDate(provider.getZPB(rep)
+				.getZpb6_onsetDate().getTs1_TimeOfAnEvent().getValue());
 	}
 
 	public Date getResolvedDate(int rep) throws HL7Exception
 	{
-		return ConversionUtils.fromDateString(provider.getZPB(rep).getZpb7_dateResolved().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
+		return getNullableDate(provider.getZPB(rep)
+				.getZpb7_dateResolved().getTs1_TimeOfAnEvent().getValue());
 	}
 }

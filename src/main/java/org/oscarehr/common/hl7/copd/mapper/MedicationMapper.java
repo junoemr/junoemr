@@ -24,34 +24,23 @@ package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
+import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.rx.model.Drug;
 import org.oscarehr.rx.model.Prescription;
-import org.oscarehr.util.MiscUtils;
-import oscar.util.ConversionUtils;
+import oscar.oscarRx.data.RxPrescriptionData;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class MedicationMapper
+public class MedicationMapper extends AbstractMapper
 {
-	private static final Logger logger = MiscUtils.getLogger();
-	private final ZPD_ZTR message;
-	private final ZPD_ZTR_PROVIDER provider;
-
-	public MedicationMapper()
+	public MedicationMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		message = null;
-		provider = null;
-	}
-	public MedicationMapper(ZPD_ZTR message, int providerRep)
-	{
-		this.message = message;
-		this.provider = message.getPATIENT().getPROVIDER(providerRep);
+		super(message, providerRep, importSource);
 	}
 
 	public int getNumMedications()
@@ -63,18 +52,38 @@ public class MedicationMapper
 	{
 		Drug drug = new Drug();
 
-		Date writtenDate = getTransactionDate(rep);
+		Date writtenDate;
+		Date startDate;
+		Date endDate;
+		switch(importSource)
+		{
+			case WOLF:
+			{
+				// prescribed date: ORC-9 else ORC-15, else ZRX-3
+				writtenDate = getWOLFCreatedDate(rep);
+				// start date: ORC-15, else ZRX-3
+				startDate = getWOLFStartDate(rep);
+				// end date: ZRX-3, else calculate? else ORC-15(start date)
+				endDate = getWOLFEndDate(rep);
+				break;
+			}
+			default:
+			case UNKNOWN:
+			{
+				writtenDate = getTransactionDate(rep);
+				startDate = getAdministrationStartDate(rep);
+				endDate = getAdministrationStopDate(rep);
+				if(endDate == null)
+				{
+					endDate = startDate; //end date can't be null
+				}
+				break;
+			}
+		}
+
 		drug.setCreateDate(writtenDate);
 		drug.setWrittenDate(writtenDate);
-
-		Date startDate = getAdministrationStartDate(rep);
 		drug.setRxDate(startDate);
-
-		Date endDate = getAdministrationStopDate(rep);
-		if(endDate == null)
-		{
-			endDate = startDate; //end date can't be null
-		}
 		drug.setEndDate(endDate);
 		drug.setLongTerm(isLongTerm(rep));
 
@@ -156,18 +165,74 @@ public class MedicationMapper
 		return note;
 	}
 
+	/** ORC-9 else ORC-15, else ZRX-3 */
+	private Date getWOLFCreatedDate(int rep) throws HL7Exception
+	{
+		Date createdDate = getTransactionDate(rep);
+		if(createdDate == null)
+		{
+			createdDate = getOrderEffectiveDate(rep);
+		}
+		if(createdDate == null)
+		{
+			createdDate = getAdministrationStopDate(rep);
+		}
+		return createdDate;
+	}
+
+	/** start date: ORC-15, else ZRX-3 */
+	private Date getWOLFStartDate(int rep) throws HL7Exception
+	{
+		Date startDate = getOrderEffectiveDate(rep);
+		if(startDate == null)
+		{
+			startDate = getAdministrationStopDate(rep);
+		}
+		return startDate;
+	}
+
+	/** ZRX-3, else calculate? else start date */
+	private Date getWOLFEndDate(int rep) throws HL7Exception
+	{
+		Date endDate = getAdministrationStopDate(rep);
+		if(endDate == null)
+		{
+			endDate = getCalculatedEndDate(rep, getWOLFStartDate(rep));
+		}
+		if(endDate == null)
+		{
+			endDate = getOrderEffectiveDate(rep);
+		}
+		return endDate;
+	}
+
+	private Date getCalculatedEndDate(int rep, Date rxDate)
+	{
+		List<String> durationUnits = Arrays.asList("W","M","D");
+		Integer duration = getServiceDurationQuantity(rep, 0);
+		String durationUnit = getServiceDurationUnit(rep, 0);
+		int repeats = getNumberOfRefills(rep);
+
+		if(rxDate != null && duration > 0 && durationUnit != null && durationUnits.contains(durationUnit.substring(0, 1).toUpperCase()))
+		{
+			durationUnit = durationUnit.substring(0, 1).toUpperCase();
+			return RxPrescriptionData.Prescription.calcEndDate(rxDate, duration.toString(), durationUnit, repeats);
+		}
+		return null;
+	}
+
 	// ---- ORC ----
 
 	public Date getTransactionDate(int rep)
 	{
-		return ConversionUtils.fromDateString(provider.getMEDS(rep).getORC()
-				.getOrc9_DateTimeOfTransaction().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
+		return getNullableDate(provider.getMEDS(rep).getORC()
+				.getOrc9_DateTimeOfTransaction().getTs1_TimeOfAnEvent().getValue());
 	}
 
 	public Date getOrderEffectiveDate(int rep)
 	{
-		return ConversionUtils.fromDateString(provider.getMEDS(rep).getORC()
-				.getOrc15_OrderEffectiveDateTime().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
+		return getNullableDate(provider.getMEDS(rep).getORC()
+				.getOrc15_OrderEffectiveDateTime().getTs1_TimeOfAnEvent().getValue());
 	}
 
 	// ---- RXO ----
@@ -270,6 +335,22 @@ public class MedicationMapper
 				.getTq13_RepeatPattern(0).getRpt1_RepeatPatternCode().getCwe1_Identifier().getValue());
 	}
 
+	public int getServiceDurationQuantity(int rep, int tq1Rep)
+	{
+		String durationUnitStr = StringUtils.trimToNull(provider.getMEDS(rep).getTIMING_QUANTITY().getTQ1(tq1Rep)
+				.getTq16_ServiceDuration().getCq1_Quantity().getValue());
+		if(durationUnitStr != null)
+		{
+			return Integer.parseInt(durationUnitStr);
+		}
+		return 0;
+	}
+	public String getServiceDurationUnit(int rep, int tq1Rep)
+	{
+		return StringUtils.trimToNull(provider.getMEDS(rep).getTIMING_QUANTITY().getTQ1(tq1Rep)
+				.getTq16_ServiceDuration().getCq2_Units().getCe1_Identifier().getValue());
+	}
+
 	// ---- RXE ----
 
 	public String getDispenseUnitsId(int rep)
@@ -300,19 +381,13 @@ public class MedicationMapper
 
 	public Date getAdministrationStartDate(int rep) throws HL7Exception
 	{
-		return ConversionUtils.fromDateString(provider.getMEDS(rep).getZRX()
-				.getZrx2_administrationStartDate().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
+		return getNullableDate(provider.getMEDS(rep).getZRX()
+				.getZrx2_administrationStartDate().getTs1_TimeOfAnEvent().getValue());
 	}
 	public Date getAdministrationStopDate(int rep) throws HL7Exception
 	{
-		String adminStopDateStr = provider.getMEDS(rep).getZRX()
-				.getZrx3_administrationStopDate().getTs1_TimeOfAnEvent().getValue();
-
-		if("00000000".equalsIgnoreCase(adminStopDateStr))
-		{
-			return null;
-		}
-		return ConversionUtils.fromDateString(adminStopDateStr, "yyyyMMdd");
+		return getNullableDate(provider.getMEDS(rep).getZRX()
+				.getZrx3_administrationStopDate().getTs1_TimeOfAnEvent().getValue());
 	}
 
 	public boolean isLongTerm(int rep) throws HL7Exception

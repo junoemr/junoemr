@@ -91,12 +91,18 @@ public class CoPDPreProcessorService
 	 * @param message the original message string
 	 * @return the formatted and fixed message string
 	 */
-	public String preProcessMessage(String message)
+	public String preProcessMessage(String message, CoPDImportService.IMPORT_SOURCE importSource)
 	{
 		message = setHl7Version(message);
 		message = fixPRDSegment(message);
 		message = fixPhoneNumbers(message);
 		message = fixDateTimeNumbers(message);
+
+		if(CoPDImportService.IMPORT_SOURCE.WOLF.equals(importSource))
+		{
+//			message = formatWolfZPV5SegmentNames(message);
+			message = formatWolfFollowupSegments(message);
+		}
 
 		return message;
 	}
@@ -221,4 +227,63 @@ public class CoPDPreProcessorService
 		return xmlPRD;
 	}
 
+//	private String formatWolfZPV5SegmentNames(String message)
+//	{
+//		Pattern patt = Pattern.compile("<ZPV\\.5>\\s*<firstname>(.*?)<\\/firstname>\\s*<lastname>(.*?)<\\/lastname>\\s*<ZPV\\.5>", Pattern.DOTALL);
+//		Matcher m = patt.matcher(message);
+//		StringBuffer sb = new StringBuffer(message.length());
+//		while(m.find())
+//		{
+//			String firstName = m.group(1);
+//			String lastName = m.group(2);
+//			String replacement = "<ZPV\\.5>" + firstName + "|" + lastName + "<ZPV\\.5>";
+//			m.appendReplacement(sb, replacement);
+//		}
+//		m.appendTail(sb);
+//		return sb.toString();
+//	}
+
+	private String formatWolfFollowupSegments(String message)
+	{
+		message = message.replaceAll("<followup>", "<ZFU>");
+		message = message.replaceAll("</followup>", "</ZFU>");
+
+		message = message.replaceAll("<followupnumber>", "<ZFU.1>");
+		message = message.replaceAll("</followupnumber>", "</ZFU.1>");
+
+		message = message.replaceAll("<mdattending>", "<ZFU.2>");
+		message = message.replaceAll("</mdattending>", "</ZFU.2>");
+
+		message = message.replaceAll("<date>", "<ZFU.3>");
+		message = message.replaceAll("</date>", "</ZFU.3>");
+
+		message = message.replaceAll("<dateoffollowup>", "<ZFU.4>");
+		message = message.replaceAll("</dateoffollowup>", "</ZFU.4>");
+
+		message = message.replaceAll("<followupproblem>", "<ZFU.5>");
+		message = message.replaceAll("</followupproblem>", "</ZFU.5>");
+
+		message = message.replaceAll("<Done>", "<ZFU.6>");
+		message = message.replaceAll("</Done>", "</ZFU.6>");
+
+		message = message.replaceAll("<notes>", "<ZFU.7>");
+		message = message.replaceAll("</notes>", "</ZFU.7>");
+
+		message = message.replaceAll("<actiondesc>", "<ZFU.8>");
+		message = message.replaceAll("</actiondesc>", "</ZFU.8>");
+
+		message = message.replaceAll("<urgency>", "<ZFU.9>");
+		message = message.replaceAll("</urgency>", "</ZFU.9>");
+
+		Pattern patt = Pattern.compile("<ZFU>(.*?)</ZFU>", Pattern.DOTALL);
+		Matcher m = patt.matcher(message);
+
+		logger.info("followup segment:");
+		while(m.find())
+		{
+			logger.info(m.group(0));
+		}
+
+		return message;
+	}
 }
