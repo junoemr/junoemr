@@ -28,6 +28,7 @@ package oscar.log;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
@@ -41,11 +42,14 @@ import org.oscarehr.util.DeamonThreadFactory;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.oscarehr.ws.external.soap.logging.dao.SoapServiceLogDao;
+import org.oscarehr.ws.external.soap.logging.model.SoapServiceLog;
 
 public class LogAction {
 	private static Logger logger = MiscUtils.getLogger();
 	private static OscarLogDao oscarLogDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
-	private static RestServiceLogDao restServiceLogDao = (RestServiceLogDao) SpringUtils.getBean("restServiceLogDao");
+	private static RestServiceLogDao restLogDao = (RestServiceLogDao) SpringUtils.getBean(org.oscarehr.common.dao.RestServiceLogDao.class);
+	private static SoapServiceLogDao soapLogDao = (SoapServiceLogDao) SpringUtils.getBean(SoapServiceLogDao.class);
 	private static ExecutorService executorService = Executors.newCachedThreadPool(new DeamonThreadFactory(LogAction.class.getSimpleName()+".executorService", Thread.MAX_PRIORITY));
 	
 	/**
@@ -215,7 +219,7 @@ public class LogAction {
 			oscarLogDao.persist(oscarLog);
 		} catch (Exception e) {
 			logger.error("Error in logger.", e);
-			logger.error("Error logging entry : " + oscarLog);
+			logger.error("Error log entry : " + oscarLog);
 		}
 	}
 	
@@ -241,6 +245,19 @@ public class LogAction {
 	 * @param restLog
 	 */
 	public static void saveRestLogEntry(RestServiceLog restLog) {
-		restServiceLogDao.persist(restLog);
+		restLogDao.persist(restLog);
+	}
+
+	public static void saveSoapLogEntry(SoapServiceLog soapLog)
+	{
+		try
+		{
+			soapLogDao.persist(soapLog);
+		}
+		catch (PersistenceException e)
+		{
+			logger.error("Could not save SOAP service log");
+		}
+
 	}
 }

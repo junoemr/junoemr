@@ -372,14 +372,6 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 				session.setAttribute("newNote", "true");
 				session.setAttribute("issueStatusChanged", "false");
 				note = this.makeNewNote(providerNo, demono, request);
-
-				// if there is an appointment date parameter, default the observation date to it
-				Date appointmentDate = parseParamDateTime(request);
-				if(appointmentDate != null)
-				{
-					note.setObservation_date(appointmentDate);
-					cform.setObservation_date(ConversionUtils.toDateString(appointmentDate, OBS_DATETIME_PATTERN));
-				}
 			}
 			else
 			{

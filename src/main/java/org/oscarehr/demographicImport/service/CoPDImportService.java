@@ -33,6 +33,8 @@ import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.allergy.service.AllergyService;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.dao.TicklerDao;
+import org.oscarehr.common.hl7.copd.mapper.AlertMapper;
 import org.oscarehr.common.hl7.copd.mapper.AllergyMapper;
 import org.oscarehr.common.hl7.copd.mapper.AppointmentMapper;
 import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
@@ -44,6 +46,7 @@ import org.oscarehr.common.hl7.copd.mapper.LabMapper;
 import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
 import org.oscarehr.common.hl7.copd.mapper.PreventionMapper;
 import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
+import org.oscarehr.common.hl7.copd.mapper.TicklerMapper;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.parser.CoPDParser;
 import org.oscarehr.common.io.FileFactory;
@@ -52,6 +55,7 @@ import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.ProviderInboxItem;
+import org.oscarehr.common.model.Tickler;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
@@ -67,6 +71,7 @@ import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.service.PreventionManager;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.provider.search.ProviderCriteriaSearch;
 import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.rx.dao.PrescriptionDao;
@@ -147,12 +152,19 @@ public class CoPDImportService
 	@Autowired
 	LabService labService;
 
-	public void importFromHl7Message(String message, String documentLocation, IMPORT_SOURCE importSource) throws HL7Exception, IOException, InterruptedException
+	@Autowired
+	TicklerDao ticklerDao;
+
+	private static long missingDocumentCount = 0;
+
+	public void importFromHl7Message(String message, String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs) throws HL7Exception, IOException, InterruptedException
 	{
 		logger.info("Initialize HL7 parser");
 		HapiContext context = new DefaultHapiContext();
+		// default Obx2 types to string
 		context.getParserConfiguration().setDefaultObx2Type("ST");
-//		context.setValidationContext(new NoValidation());
+		// otherwise multiple spaces are trimmed to single spaces and document file names won't match
+		context.getParserConfiguration().setXmlDisableWhitespaceTrimmingOnAllNodes(true);
 
 		// this package string needs to match the custom model location in the oscar source code.
 		ModelClassFactory modelClassFactory = new CustomModelClassFactory(ZPD_ZTR.ROOT_PACKAGE);
@@ -162,17 +174,24 @@ public class CoPDImportService
 		logger.info("Parse Message");
 
 		ZPD_ZTR zpdZtrMessage = (ZPD_ZTR) p.parse(message);
-		importRecordData(zpdZtrMessage, documentLocation, importSource);
+
+		missingDocumentCount = 0;
+		importRecordData(zpdZtrMessage, documentLocation, importSource, skipMissingDocs);
+	}
+	public long getMissingDocumentCount()
+	{
+		return missingDocumentCount;
 	}
 
-	private void importRecordData(ZPD_ZTR zpdZtrMessage, String documentLocation, IMPORT_SOURCE importSource) throws HL7Exception, IOException, InterruptedException
+	private void importRecordData(ZPD_ZTR zpdZtrMessage, String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs)
+			throws HL7Exception, IOException, InterruptedException
 	{
 		logger.info("Creating Demographic Record ...");
 		Demographic demographic = importDemographicData(zpdZtrMessage, importSource);
 		logger.info("Created record " + demographic.getDemographicId() + " for patient: " + demographic.getLastName() + ", " + demographic.getFirstName());
 
 		logger.info("Find/Create Provider Record(s) ...");
-		ProviderData mrpProvider = importProviderData(zpdZtrMessage, demographic, documentLocation, importSource);
+		ProviderData mrpProvider = importProviderData(zpdZtrMessage, demographic, documentLocation, importSource, skipMissingDocs);
 
 		// set the mrp doctor after all the provider records are created
 		demographic.setProviderNo(mrpProvider.getId());
@@ -189,7 +208,9 @@ public class CoPDImportService
 	 * @return the MRP doctor record. This should never be null, as all messages are required to have at least one provider record
 	 * @throws HL7Exception
 	 */
-	private ProviderData importProviderData(ZPD_ZTR zpdZtrMessage, Demographic demographic, String documentLocation, IMPORT_SOURCE importSource) throws HL7Exception, IOException, InterruptedException
+	private ProviderData importProviderData(ZPD_ZTR zpdZtrMessage, Demographic demographic,
+	                                        String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs)
+			throws HL7Exception, IOException, InterruptedException
 	{
 		ProviderData mrpProvider = null;
 		ProviderMapper providerMapper = new ProviderMapper(zpdZtrMessage);
@@ -226,10 +247,12 @@ public class CoPDImportService
 
 			logger.info("Import Notes & History ...");
 			importProviderNotes(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			logger.info("Import Alerts ...");
+			importAlerts(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 			logger.info("Import diagnosed health problems ...");
 			importDxData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Medications ...");
-			importMedicationData(zpdZtrMessage, i, assignedProvider, demographic);
+			importMedicationData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 			logger.info("Import Pediatrics ...");
 			importPediatricsData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Pregnancy ...");
@@ -241,7 +264,9 @@ public class CoPDImportService
 			logger.info("Import Labs ...");
 			importLabData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Documents ...");
-			importDocumentData(zpdZtrMessage, i, assignedProvider, demographic, documentLocation, importSource);
+			importDocumentData(zpdZtrMessage, i, assignedProvider, demographic, documentLocation, importSource, skipMissingDocs);
+			logger.info("Import Ticklers ...");
+			importTicklers(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 		}
 
 		return mrpProvider;
@@ -265,8 +290,12 @@ public class CoPDImportService
 			newProvider = getDefaultProvider();
 		}
 
+		ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
+		criteriaSearch.setFirstName(newProvider.getFirstName());
+		criteriaSearch.setLastName(newProvider.getLastName());
+
 		ProviderData provider;
-		List<ProviderData> matchedProviders = providerDataDao.findByName(newProvider.getFirstName(), newProvider.getLastName(), false);
+		List<ProviderData> matchedProviders = providerDataDao.criteriaSearch(criteriaSearch);
 		if(matchedProviders.isEmpty())
 		{
 			provider = newProvider;
@@ -333,9 +362,10 @@ public class CoPDImportService
 		}
 	}
 
-	private void importMedicationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception
+	private void importMedicationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource)
+			throws HL7Exception
 	{
-		MedicationMapper medicationMapper = new MedicationMapper(zpdZtrMessage, providerRep);
+		MedicationMapper medicationMapper = new MedicationMapper(zpdZtrMessage, providerRep, importSource);
 
 		int numMedications = medicationMapper.getNumMedications();
 
@@ -466,7 +496,9 @@ public class CoPDImportService
 		}
 	}
 
-	private void importDocumentData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, String documentLocation, IMPORT_SOURCE importSource) throws IOException, InterruptedException
+	private void importDocumentData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic,
+	                                String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs)
+			throws IOException, InterruptedException
 	{
 		DocumentMapper documentMapper = new DocumentMapper(zpdZtrMessage, providerRep);
 
@@ -475,7 +507,25 @@ public class CoPDImportService
 			document.setDocCreator(provider.getId());
 			document.setResponsible(provider.getId());
 
-			GenericFile documentFile = FileFactory.getExistingFile(documentLocation, document.getDocfilename());
+			GenericFile documentFile = null;
+			try
+			{
+				documentFile = FileFactory.getExistingFile(documentLocation, document.getDocfilename());
+
+			}
+			catch(IOException e)
+			{
+				missingDocumentCount++;
+				if(skipMissingDocs)
+				{
+					logger.error("Skipped missing document: " + document.getDocfilename());
+					continue;
+				}
+				else
+				{
+					throw e;
+				}
+			}
 
 			if(importSource.equals(IMPORT_SOURCE.WOLF) && documentFile instanceof XMLFile)
 			{
@@ -487,6 +537,39 @@ public class CoPDImportService
 			InputStream stream = new FileInputStream(documentFile.getFileObject());
 			documentService.uploadNewDemographicDocument(document, stream, demographic.getDemographicId());
 			documentService.routeToProviderInbox(document.getDocumentNo(), true, provider.getId());
+		}
+	}
+
+	private void importAlerts(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
+	{
+		AlertMapper alertMapper = new AlertMapper(zpdZtrMessage, providerRep, importSource);
+		for(CaseManagementNote reminderNote : alertMapper.getReminderNoteList())
+		{
+			reminderNote.setProvider(provider);
+			reminderNote.setSigningProvider(provider);
+			reminderNote.setDemographic(demographic);
+			encounterNoteService.saveReminderNote(reminderNote);
+		}
+	}
+
+	private void importTicklers(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
+	{
+		TicklerMapper ticklerMapper = new TicklerMapper(zpdZtrMessage, providerRep, importSource);
+
+		int numTicklers = ticklerMapper.getNumTicklers();
+		for(int i=0; i< numTicklers; i++)
+		{
+			Tickler tickler = ticklerMapper.getTickler(i);
+			if(tickler != null)
+			{
+				ProviderData assignedProvider = ticklerMapper.getAttendingProvider(i);
+				assignedProvider = findOrCreateProviderRecord(assignedProvider);
+
+				tickler.setDemographicNo(demographic.getDemographicId());
+				tickler.setCreator(provider.getId());
+				tickler.setTaskAssignedTo(assignedProvider.getId());
+				ticklerDao.persist(tickler);
+			}
 		}
 	}
 

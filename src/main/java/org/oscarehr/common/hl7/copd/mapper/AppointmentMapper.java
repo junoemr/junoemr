@@ -24,12 +24,10 @@ package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.model.v24.segment.SCH;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.provider.model.ProviderData;
-import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
@@ -37,18 +35,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class AppointmentMapper
+public class AppointmentMapper extends AbstractMapper
 {
-	private static final Logger logger = MiscUtils.getLogger();
-	private final ZPD_ZTR message;
-
-	public AppointmentMapper()
-	{
-		message = null;
-	}
 	public AppointmentMapper(ZPD_ZTR message)
 	{
-		this.message = message;
+		super(message);
 	}
 
 	public int getNumAppointments()
@@ -118,7 +109,7 @@ public class AppointmentMapper
 	public Date getCreationDate(int rep) throws HL7Exception
 	{
 		String dateStr = message.getPATIENT().getSCH(rep).getSch28_zCreationDate().getTs1_TimeOfAnEvent().getValue();
-		return ConversionUtils.fromDateString(dateStr, "yyyyMMdd");
+		return getNullableDate(dateStr);
 	}
 
 	public Date getAppointmentDate(int rep) throws HL7Exception

@@ -43,11 +43,12 @@ public class PDFFile extends GenericFile
 {
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final Set<String> allowedErrors = new HashSet<>();
-	private static final Pattern[] allowedWarningsGS = new Pattern[1];
+	private static final Pattern[] allowedWarningsGS = new Pattern[2];
 
 	static
 	{
-		allowedWarningsGS[0] = Pattern.compile(".*Missing glyph .* in the font HiddenHorzOCR.*", Pattern.CASE_INSENSITIVE);
+		allowedWarningsGS[0] = Pattern.compile(".*Missing glyph .* in the font .*", Pattern.CASE_INSENSITIVE);
+		allowedWarningsGS[1] = Pattern.compile(".*Failed to interpret TT instructions in font.*", Pattern.CASE_INSENSITIVE);
 	}
 
 	private OscarProperties oscarProperties = OscarProperties.getInstance();

@@ -100,6 +100,8 @@
 private boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
 private HashMap<String,String> siteBgColor = new HashMap<String,String>();
 private boolean isClinicaid = OscarProperties.getInstance().isClinicaidBillingType();
+private static final String SCHEDULE_VIEW = "0";
+private static final String ALL_VIEW = "1";
 
 public boolean isWeekView(ServletRequest request)
 {
@@ -365,7 +367,7 @@ private long getAppointmentRowSpan(
 	String viewall = request.getParameter("viewall");
 	if( viewall == null )
 	{
-		viewall = "0";
+		viewall = SCHEDULE_VIEW;
 	}
 
 	int numProvider=0, numAvailProvider=0;
@@ -458,7 +460,7 @@ private long getAppointmentRowSpan(
 				curProvider_no = new String []{curUser_no};  //[numProvider];
 				curProviderName = new String []{(userLastName+", "+userFirstName)}; //[numProvider];
 			} else {
-				if(request.getParameter("viewall")!=null && request.getParameter("viewall").equals("1") ) {
+				if(request.getParameter("viewall")!=null && request.getParameter("viewall").equals(ALL_VIEW) ) {
 					if(numProvider >= 5) {lenLimitedL = 2; lenLimitedS = 3; len = 2; }
 				} else {
 					if(numAvailProvider >= 5) {lenLimitedL = 2; lenLimitedS = 3; len = 2; }
@@ -674,7 +676,7 @@ private long getAppointmentRowSpan(
 			self.location.href = "../schedule/scheduleflipview.jsp?originalpage=../provider/providercontrol.jsp&startDate=<%=year+"-"+month+"-"+day%>" + "&provider_no="+s ;
 		}
 		function goWeekView(s) {
-			self.location.href = "providercontrol.jsp?year=<%=year%>&month=<%=month%>&day=<%=day%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1&provider_no="+s;
+			self.location.href = "providercontrol.jsp?year=<%=year%>&month=<%=month%>&day=<%=day%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>&provider_no="+s;
 		}
 		function goZoomView(s, n) {
 			self.location.href = "providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=1&curProvider="+s+"&curProviderName="+encodeURIComponent(n)+"&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>" ;
@@ -686,14 +688,24 @@ private long getAppointmentRowSpan(
 			popupPage(600,650,"../appointment/appointmentsearch.jsp?provider_no="+s);
 		}
 
-		function review(key) {
-			if(self.location.href.lastIndexOf("?") > 0) {
-				if(self.location.href.lastIndexOf("&viewall=") > 0 ) a = self.location.href.substring(0,self.location.href.lastIndexOf("&viewall="));
-				else a = self.location.href;
-			} else {
-				a="providercontrol.jsp?year="+document.jumptodate.year.value+"&month="+document.jumptodate.month.value+"&day="+document.jumptodate.day.value+"&view=0&displaymode=day&dboperation=searchappointmentday&site=" + "<%=(selectedSite==null? "none" : selectedSite)%>";
+		function review(key)
+		{
+			if (self.location.href.lastIndexOf("?") > 0)
+			{
+				if (self.location.href.lastIndexOf("&viewall=") > 0)
+				{
+					a = self.location.href.substring(0, self.location.href.lastIndexOf("&viewall="));
+				}
+				else
+				{
+					a = self.location.href;
+				}
 			}
-			self.location.href = a + "&viewall="+key ;
+			else
+			{
+				a = "providercontrol.jsp?year=" + document.jumptodate.year.value + "&month=" + document.jumptodate.month.value + "&day=" + document.jumptodate.day.value + "&view=0&displaymode=day&dboperation=searchappointmentday&site=" + "<%=(selectedSite==null? "none" : selectedSite)%>";
+			}
+			self.location.href = a + "&viewall=" + key + "<%=isWeekView(request)?"&provider_no="+provNum:""%>";
 		}
 
 
@@ -1019,7 +1031,7 @@ private long getAppointmentRowSpan(
 			<a id="calendarLink" href=# onClick ="popupPage(425,430,'../share/CalendarPopup.jsp?urlfrom=../provider/providercontrol.jsp&year=<%=strYear%>&month=<%=strMonth%>&param=<%=URLEncoder.encode("&view=0&displaymode=day&dboperation=searchappointmentday&viewall="+viewall,"UTF-8")%><%=isWeekView(request)?URLEncoder.encode("&provider_no="+provNum, "UTF-8"):""%>')"><bean:message key="global.calendar"/></a>
 
 			<logic:notEqual name="infirmaryView_isOscar" value="false">
-				| <% if(request.getParameter("viewall")!=null && request.getParameter("viewall").equals("1") ) { %>
+				| <% if(request.getParameter("viewall")!=null && request.getParameter("viewall").equals(ALL_VIEW) ) { %>
 				<!-- <span style="color:#333"><bean:message key="provider.appointmentProviderAdminDay.viewAll"/></span> -->
 				<u><a href=# onClick = "review('0')" title="<bean:message key="provider.appointmentProviderAdminDay.viewAllProv"/>"><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a></u>
 
@@ -1280,7 +1292,7 @@ private long getAppointmentRowSpan(
 						//     scheduledate entry for that provider.
 						//   - Don't show a schedule for anyone else
 
-						boolean viewAllBoolean = ("1".equals(viewall));
+						boolean viewAllBoolean = (ALL_VIEW.equals(viewall));
 						String curProviderNo = request.getParameter("curProvider");
 
 						if(isWeekView(request))
@@ -1337,9 +1349,9 @@ private long getAppointmentRowSpan(
 							headerColor = !headerColor;
 
 							boolean notOnSchedule = false;
-							if(!viewall.equals("1") && scheduleProviderNo == Integer.parseInt(curUser_no) && !schedule.hasSchedule())
+							if (SCHEDULE_VIEW.equals(viewall) && !schedule.isAvailable())
 							{
-								notOnSchedule = true;
+								continue;
 							}
 
 
@@ -1807,7 +1819,7 @@ private long getAppointmentRowSpan(
 
 														<!-- doctor code block 2 -->
 
-														<c:if test="${appointmentInfo.showPreventionWarnings}">
+														<c:if test="${not empty appointmentInfo.preventionWarnings}">
 															<img src="../images/stop_sign.png" height="14" width="14" title="${appointmentInfo.preventionWarnings}" />&nbsp;
 
 														</c:if>
@@ -2148,7 +2160,7 @@ private long getAppointmentRowSpan(
 				case <bean:message key="global.searchShortcut"/> : popupOscarRx(550,687,'../demographic/search.jsp');  return false;  //run code for 'S'earch
 				case <bean:message key="global.dayShortcut"/> : window.open("providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+URLEncoder.encode(request.getParameter("curProviderName"),"UTF-8") )%>&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>","_self") ;  return false;  //run code for 'T'oday
 				case <bean:message key="global.viewShortcut"/> : {
-					<% if(request.getParameter("viewall")!=null && request.getParameter("viewall").equals("1") ) { %>
+					<% if(request.getParameter("viewall")!=null && request.getParameter("viewall").equals(ALL_VIEW) ) { %>
 					review('0');  return false; //scheduled providers 'V'iew
 					<% } else {  %>
 					review('1');  return false; //all providers 'V'iew

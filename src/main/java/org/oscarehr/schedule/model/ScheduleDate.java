@@ -43,6 +43,8 @@ import javax.persistence.TemporalType;
 public class ScheduleDate extends AbstractModel<Integer>
 {
 	public static final char STATUS_DELETED = 'D';
+	public static final String AVAILABLE = "1";
+	public static final String UNAVAILABLE = "0";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,7 +55,7 @@ public class ScheduleDate extends AbstractModel<Integer>
 	private Date date;
 	@Column(name="provider_no")
 	private String providerNo;
-	private char available;
+	private String available;
 	private char priority;
 	private String reason;
 	private String hour;
@@ -80,12 +82,25 @@ public class ScheduleDate extends AbstractModel<Integer>
     	this.providerNo = providerNo;
     }
 
-	public char getAvailable() {
-    	return available;
+	public boolean isAvailable() {
+    	if (AVAILABLE.equals(available))
+		{
+			return true;
+		} else
+		{
+			return false;
+		}
     }
 
-	public void setAvailable(char available) {
-    	this.available = available;
+	public void setAvailable(boolean available) {
+    	if (available)
+		{
+			this.available = AVAILABLE;
+		} else
+		{
+			this.available = UNAVAILABLE;
+		}
+
     }
 
 	public char getPriority() {

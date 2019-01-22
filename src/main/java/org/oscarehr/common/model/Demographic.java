@@ -31,6 +31,7 @@ import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
+import oscar.util.ConversionUtils;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -1541,21 +1542,10 @@ public class Demographic implements Serializable
 	 */
 	public boolean isNewBorn()
 	{
-		final String BC_NEWBORN_BILLING_CODE = "66";
+		String birthdayStr = getBirthDayAsString();
+		LocalDate birthday = ConversionUtils.toLocalDate(birthdayStr);
 
-		OscarProperties oscarProperties = OscarProperties.getInstance();
-
-
-		if (oscarProperties.isBritishColumbiaInstanceType())
-		{
-			return (getVer() != null && getVer().equals(BC_NEWBORN_BILLING_CODE));
-		}
-
-		Date birthDate = getBirthDate();
-		Date now = new Date();
-		long days = java.util.concurrent.TimeUnit.DAYS.toDays(now.getTime() - birthDate.getTime());
-
-		return days < 365;
+		return org.oscarehr.demographic.model.Demographic.isNewBorn(birthday, getVer());
 	}
 
 }
