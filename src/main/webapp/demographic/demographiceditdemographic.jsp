@@ -1008,7 +1008,7 @@ if(wLReadonly.equals("")){
 							</a>
 							<br/>
 							<%
-							if (!oscarProps.isAlbertaInstanceType())
+							if (oscarProps.isBritishColumbiaInstanceType() || oscarProps.isOntarioInstanceType())
 							{
 							%>
 									<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
@@ -1026,7 +1026,7 @@ if(wLReadonly.equals("")){
 						<bean:message key="demographic.demographiceditdemographic.msgBillHistory"/></a>
 					<%
 					}
-					else
+					else if("BC".equals(billRegion))
 					{
 					%>
 						<a href="#"
