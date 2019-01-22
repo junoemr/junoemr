@@ -28,6 +28,7 @@ package oscar.log;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
@@ -249,6 +250,14 @@ public class LogAction {
 
 	public static void saveSoapLogEntry(SoapServiceLog soapLog)
 	{
-		soapLogDao.persist(soapLog);
+		try
+		{
+			soapLogDao.persist(soapLog);
+		}
+		catch (PersistenceException e)
+		{
+			logger.error("Could not save SOAP service log");
+		}
+
 	}
 }

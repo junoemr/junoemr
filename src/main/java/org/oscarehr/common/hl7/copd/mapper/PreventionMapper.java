@@ -25,12 +25,10 @@ package org.oscarehr.common.hl7.copd.mapper;
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.model.PreventionExt;
 import org.oscarehr.util.MiscUtils;
-import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,25 +36,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PreventionMapper
+public class PreventionMapper extends AbstractMapper
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private final ZPD_ZTR message;
-	private final ZPD_ZTR_PROVIDER provider;
-
 	private List<String> validPreventionTypes;
 	private static Map<String, String> preventionTypeMap = new HashMap<>();
 
-	public PreventionMapper()
-	{
-		message = null;
-		provider = null;
-		validPreventionTypes = null;
-	}
 	public PreventionMapper(ZPD_ZTR message, int providerRep)
 	{
-		this.message = message;
-		this.provider = message.getPATIENT().getPROVIDER(providerRep);
+		super(message, providerRep);
 		this.validPreventionTypes = null;
 	}
 
@@ -107,12 +95,8 @@ public class PreventionMapper
 
 	public Date getImmunizationDate(int rep) throws HL7Exception
 	{
-		String dateStr = provider.getIMMUNIZATION(rep).getZIM().getZim2_immunizationDate().getTs1_TimeOfAnEvent().getValue();
-		if(dateStr==null || dateStr.trim().isEmpty() || dateStr.equals("00000000"))
-		{
-			return null;
-		}
-		return ConversionUtils.fromDateString(dateStr, "yyyyMMdd");
+		return getNullableDate(provider.getIMMUNIZATION(rep).getZIM()
+				.getZim2_immunizationDate().getTs1_TimeOfAnEvent().getValue());
 	}
 
 	public String getVaccineCode(int rep) throws HL7Exception
@@ -151,31 +135,80 @@ public class PreventionMapper
 		preventionTypeMap.put("Adacel", "dTap");
 		preventionTypeMap.put("Adacel/Polio", "Tdap-IPV");
 		preventionTypeMap.put("Adacel/Polio (Quad)", "Tdap-IPV");
+		preventionTypeMap.put("Agriflu 2017/2018", "");
+		preventionTypeMap.put("Cholera", "CHOLERA");
+		preventionTypeMap.put("dPT (Tdap)", "dTap");
+		preventionTypeMap.put("DPT", "dTap");
 		preventionTypeMap.put("dPT/Polio/HIB", "TdP-IPV-Hib");
 		preventionTypeMap.put("dPT/Polio", "DT-IPV");
 		preventionTypeMap.put("Engerix B", "HepB");
 		preventionTypeMap.put("Fluad", "Flu");
+		preventionTypeMap.put("FluLaval", "Flu");
+		preventionTypeMap.put("FluLaval TETRA (2017-2018)", "Flu");
+		preventionTypeMap.put("FluMist 2015-2016", "Flu");
+		preventionTypeMap.put("FluMist Quadrivalent (2017-2018)", "Flu");
+		preventionTypeMap.put("Fluviral 2015-2016", "Flu");
+		preventionTypeMap.put("Fluviral (2017-2018)", "Flu");
+		preventionTypeMap.put("FluZone 2015-2016", "Flu");
+		preventionTypeMap.put("flu", "Flu");
 		preventionTypeMap.put("flu shot", "Flu");
+		preventionTypeMap.put("Haemophilus b Conjugate", "Hib");
 		preventionTypeMap.put("Hepatitis A", "HepA");
+		preventionTypeMap.put("Hepatitis A Vaccine Inactivated", "HepA");
 		preventionTypeMap.put("Hepatitis B", "HepB");
 		preventionTypeMap.put("Hepatitis B Recombinant", "HepB");
 		preventionTypeMap.put("Hep A and Hep B Combined", "HepAB");
+		preventionTypeMap.put("Hep A vaccine", "HepA");
+		preventionTypeMap.put("HPV", "HPV Vaccine");
+		preventionTypeMap.put("HPV vaccine for types 16 & 18", "HPV Vaccine");
+		preventionTypeMap.put("H1N1 adjuvanted", "H1N1");
+		preventionTypeMap.put("Immune Globulin", "OtherA");
 		preventionTypeMap.put("Infanrix", "DTaP");
 		preventionTypeMap.put("Influenza", "Flu");
+		preventionTypeMap.put("influenza", "Flu");
+		preventionTypeMap.put("Japanese encephalitis", "JE");
+		preventionTypeMap.put("Meningococcal C Conjugate", "MenC-C");
+		preventionTypeMap.put("meningococcal C conjugate", "MenC-C");
 		preventionTypeMap.put("Meningococcal C-TT Conjugate", "MenconC");
+		preventionTypeMap.put("Meningococcal Group B", "rMenB");
 		preventionTypeMap.put("MMR/Varicella", "MMRV");
+		preventionTypeMap.put("MMR II", "MMR");
+		preventionTypeMap.put("OPV", "OtherA");
+		preventionTypeMap.put("Osler", "OtherA");
 		preventionTypeMap.put("penta", "DPTP-IPV-Hib");
 		preventionTypeMap.put("Pentacel", "DTaP-IPV-Hib");
+		preventionTypeMap.put("Pneumococcal", "Pneumovax");
 		preventionTypeMap.put("Pneumococcal 7-Conjugate", "PNEU-C7");
 		preventionTypeMap.put("Pneumococcal 13-Conjugate", "PNEU-C");
+		preventionTypeMap.put("Pneumococcal 13-valent Conjugate Vaccine", "Pneu-C");
 		preventionTypeMap.put("Pneumococcal 23-Polyvalent", "Pneumovax");
 		preventionTypeMap.put("Pneumovax 23", "Pneumovax");
+		preventionTypeMap.put("Polio Injectable", "IPV");
+		preventionTypeMap.put("Poliomyelitis Inactivated", "IPV");
+		preventionTypeMap.put("PPD", "Tuberculosis");
+		preventionTypeMap.put("PPD = TB Skin Test", "Tuberculosis");
 		preventionTypeMap.put("Prevnar", "Pneu-C");
 		preventionTypeMap.put("quad", "DPTP-IPV");
 		preventionTypeMap.put("Quadracel", "Tdap-IPV");
+		preventionTypeMap.put("quadrivalent HPV recombinant vaccine", "HPV Vaccine");
 		preventionTypeMap.put("rotovirus", "Rot");
+		preventionTypeMap.put("Rotavirus Vaccine", "Rot");
+		preventionTypeMap.put("Shingrix", "HZV");
+		preventionTypeMap.put("TB skin test", "Tuberculosis");
 		preventionTypeMap.put("Td Adsorbed", "Td");
+		preventionTypeMap.put("Td adsorbed", "Td");
+		preventionTypeMap.put("Tdap", "dTap");
+		preventionTypeMap.put("Tetanus & Diphtheria toxoids", "Td");
+		preventionTypeMap.put("Tetanus-diptheria", "Td");
+		preventionTypeMap.put("Twinrix", "HepAB");
+		preventionTypeMap.put("Typhoid Vaccine", "Typhoid");
+		preventionTypeMap.put("typhoid VI polysaccharide", "Typhoid");
 		preventionTypeMap.put("Varicella", "VZ");
 		preventionTypeMap.put("varivax", "VZ");
+		preventionTypeMap.put("Vaxigrip 2012-2013", "Flu");
+		preventionTypeMap.put("Yellow Fever Vaccine", "YF");
+		preventionTypeMap.put("zostavax", "Zostavax");
+		preventionTypeMap.put("zoster", "HZV");
+		preventionTypeMap.put("zoster vaccine", "HZV");
 	}
 }

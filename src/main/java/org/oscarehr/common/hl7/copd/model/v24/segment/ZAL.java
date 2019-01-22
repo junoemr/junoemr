@@ -52,6 +52,7 @@ public class ZAL extends AbstractSegment
 		{
 			this.add(SI.class, true, 1, 4, new Object[]{message}, "Set ID - ZAL");
 			this.add(TS.class, true, 1, 8, new Object[]{message}, "Date of Alert");
+			this.add(ST.class, false, 1, 1, new Object[]{message}, "Unused Segment");
 			this.add(IS.class, true, 1, 1, new Object[]{message}, "Confidential flag");
 			this.add(ST.class, false, 1, 2000, new Object[]{message}, "Alert text sent");
 			this.add(ST.class, false, 1, 2000, new Object[]{message}, "Comments to alert");
@@ -61,6 +62,84 @@ public class ZAL extends AbstractSegment
 		{
 			logger.error("Can't instantiate " + this.getClass().getName());
 			throw new RuntimeException(e);
+		}
+	}
+
+	public SI getZal1_setId() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(1, 0);
+			return (SI) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public TS getZal2_dateOfAlert() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(2, 0);
+			return (TS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public IS getZal4_confidentialFlag() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(4, 0);
+			return (IS) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZal5_alertTextSent() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(5, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZal6_commentsToAlert() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(6, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
+		}
+	}
+
+	public ST getZal7_advanceDirFlag() throws HL7Exception
+	{
+		try
+		{
+			Type t = this.getField(7, 0);
+			return (ST) t;
+		}
+		catch(ClassCastException var4)
+		{
+			throw new RuntimeException(var4);
 		}
 	}
 
