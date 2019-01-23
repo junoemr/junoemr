@@ -125,11 +125,14 @@ public class ScheduleWs extends AbstractWs {
 
 		try
 		{
-			DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
-			Demographic demographic = demographicDao.getDemographic(String.valueOf(appointment.getDemographicNo()));
-			if (demographic != null)
+			if (appointment.getDemographicNo() != 0)
 			{
-				appointment.setName(demographic.getDisplayName());
+				DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
+				Demographic demographic = demographicDao.getDemographic(String.valueOf(appointment.getDemographicNo()));
+				if (demographic != null)
+				{
+					appointment.setName(demographic.getDisplayName());
+				}
 			}
 		} catch (Exception e)
 		{
