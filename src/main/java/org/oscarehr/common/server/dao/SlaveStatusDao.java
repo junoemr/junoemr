@@ -38,16 +38,47 @@ public class SlaveStatusDao extends AbstractDao<SlaveStatus>
 	}
 
 	/**
-	 * runs get slave status on the database. this list should always contain 0 results if the server is not running in slave mode,
-	 * and 1 result if the server is running in slave mode.
+	 * Tries to determine if the current server is running in slave mode.
+	 * If show slave status returns results that look like a slave server,
+	 * this method returns true, false if the state is not definitively a slave state
 	 *
 	 * The mysql database user requires replication client privileges to run this.
-	 * @return list of the status objects returned,
+	 * @return true if the server is running as a slave, false otherwise
 	 */
-	public List<Object[]> getSlaveStatus()
+	public boolean inSlaveMode()
 	{
-		Query query = entityManager.createNativeQuery("SHOW SLAVE STATUS");
-		List<Object[]> list = query.getResultList();
-		return list;
+		SlaveStatus slaveStatus = getSlaveStatus();
+		return  slaveStatus != null
+				&& slaveStatus.getSlaveIORunning().equalsIgnoreCase("Yes")
+				&& slaveStatus.getSlaveSQLRunning().equalsIgnoreCase("Yes");
+	}
+
+	/**
+	 * runs get slave status on the database.
+	 *
+	 * The mysql database user requires replication client privileges to run this.
+	 * @return the status objects returned, or null if no result is returned
+	 */
+	private SlaveStatus getSlaveStatus()
+	{
+		Query query = entityManager.createNativeQuery("SHOW SLAVE STATUS", SlaveStatus.class);
+
+		List<Object[]> resultList = query.getResultList();
+		if(resultList.isEmpty())
+		{
+			return null;
+		}
+		return toMappedEntity(resultList.get(0));
+	}
+
+	private static SlaveStatus toMappedEntity(Object[] result)
+	{
+		SlaveStatus slaveStatus = new SlaveStatus();
+
+		slaveStatus.setId(null);
+		slaveStatus.setSlaveIORunning((String) result[10]);
+		slaveStatus.setSlaveSQLRunning((String) result[11]);
+
+		return slaveStatus;
 	}
 }

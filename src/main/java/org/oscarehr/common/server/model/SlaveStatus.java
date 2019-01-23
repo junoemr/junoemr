@@ -33,14 +33,37 @@ public class SlaveStatus extends AbstractModel<String>
 	@Id
 	private String id;
 
-	public void setId(String id)
-	{
-		this.id = id;
-	}
+	private String slaveIORunning;
+
+	private String slaveSQLRunning;
 
 	@Override
 	public String getId()
 	{
 		return id;
+	}
+	public void setId(String id)
+	{
+		this.id = id;
+	}
+
+	public String getSlaveIORunning()
+	{
+		return slaveIORunning;
+	}
+
+	public void setSlaveIORunning(String slaveIORunning)
+	{
+		this.slaveIORunning = slaveIORunning;
+	}
+
+	public String getSlaveSQLRunning()
+	{
+		return slaveSQLRunning;
+	}
+
+	public void setSlaveSQLRunning(String slaveSQLRunning)
+	{
+		this.slaveSQLRunning = slaveSQLRunning;
 	}
 }

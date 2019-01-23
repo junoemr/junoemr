@@ -130,8 +130,7 @@ public class ServerStateHandler
 
 	private static boolean actingAsMaster()
 	{
-		List<Object[]> list = slaveStatusDao.getSlaveStatus();
-		return list.isEmpty();
+		return slaveStatusDao.inSlaveMode();
 	}
 
 	private static boolean resolvesAsMaster(String localHostname)
