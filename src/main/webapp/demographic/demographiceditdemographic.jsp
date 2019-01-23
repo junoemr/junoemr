@@ -1008,7 +1008,7 @@ if(wLReadonly.equals("")){
 							</a>
 							<br/>
 							<%
-							if (oscarProps.isBritishColumbiaInstanceType() || oscarProps.isOntarioInstanceType())
+							if (oscarProps.isEligibilityCheckEnabled())
 							{
 							%>
 									<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
