@@ -1,8 +1,8 @@
 
-import {ScheduleApi} from "../../generated/JunoInternalApi/ScheduleApi";
+import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {
 	AppointmentTo1,
-	CalendarAppointmentStatus, NewAppointmentTo1, SchedulingResponse
+	CalendarAppointmentStatus, NewAppointmentTo1, RestResponseAppointmentTo1
 } from "../../generated";
 import {modal} from 'angular-ui-bootstrap/src/modal';
 import * as moment from 'moment';
@@ -650,7 +650,7 @@ export class CalendarApiAdapter
 
 			console.log(edit_mode);
 			this.scheduleApi.addAppointment(newAppointment).then(
-				function(result: IHttpResponse<SchedulingResponse>)
+				function(result: IHttpResponse<RestResponseAppointmentTo1>)
 				{
 					deferred.resolve(result.data);
 				},
@@ -794,7 +794,8 @@ export class CalendarApiAdapter
 			});
 
 		return deferred.promise;
-	}*/
+	}
+	*/
 
 	//-------------------------------------------------------------------------
 	// Global State Manipulation

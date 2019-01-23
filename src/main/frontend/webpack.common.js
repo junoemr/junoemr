@@ -101,11 +101,13 @@ module.exports = {
 			'./node_modules/cp-calendar/event_controller.js',
 			'./node_modules/cp-calendar/util.js',*/
 			// TODO: move this back to node_modules after development
+			/*
 			'./cp-calendar/module.js',
 			'./cp-calendar/directive.js',
 			'./cp-calendar/controller.js',
 			'./cp-calendar/event_controller.js',
 			'./cp-calendar/util.js',
+			*/
 			'./src/common/module.js',
 
 			'./src/common/util/module.js',
@@ -134,6 +136,7 @@ module.exports = {
 			'./src/common/services/programService.js',
 			'./src/common/services/providerService.js',
 			'./src/common/services/providersService.js',
+			'./src/common/services/reportingService.js',
 			'./src/common/services/resultsService.js',
 			'./src/common/services/scheduleService.js',
 			'./src/common/services/securityService.js',
@@ -236,6 +239,7 @@ module.exports = {
 
 			'./src/schedule/module.js',
 			'./src/schedule/scheduleController.js',
+			'./src/schedule/eventController.js',
 			'./src/schedule/appointmentAddController.js',
 			'./src/schedule/appointmentViewController.js',
 

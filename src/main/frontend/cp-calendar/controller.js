@@ -775,14 +775,14 @@ function(
 		$scope.opening_dialog = false;
 	};
 
-	$scope.rotate_event_status = function rotate_event_status(calEvent)
+	$scope.rotateEventStatus = function rotateEventStatus(calEvent)
 	{
 		if(!$scope.access_control.has_permission('scheduling_create') )
 		{
 			return;
 		}
 
-		$scope.set_calendar_loading(true);
+		$scope.setCalendarLoading(true);
 
 		$scope.calendar_api_adapter.rotate_event_status(calEvent.data.uuid, $scope.rotate_statuses).then(
 				function success(event_data)
@@ -804,6 +804,62 @@ function(
 
 					$scope.set_calendar_loading(false);
 				});
+
+
+		eventModel.load(uuid).then(
+			function success()
+			{
+				var next_index = null;
+				for(var i = 0; i < rotate_statuses.length; i++)
+				{
+					if(rotate_statuses[i].uuid ===
+						event_model.data.event_status_uuid)
+					{
+						next_index = (i + 1) % rotate_statuses.length;
+						break;
+					}
+				}
+
+				event_model.data.event_status_uuid =
+					rotate_statuses[next_index].uuid;
+
+				event_model.save().then(
+					function success()
+					{
+						deferred.resolve(angular.copy(event_model.data));
+					});
+			});
+	};
+
+	$scope.rotateEventStatus = function rotateEventStatus(uuid, rotate_statuses)
+	{
+		var deferred = this.$q.defer();
+
+		eventModel.load(uuid).then(
+			function success()
+			{
+				var next_index = null;
+				for(var i = 0; i < rotate_statuses.length; i++)
+				{
+					if(rotate_statuses[i].uuid ===
+						event_model.data.event_status_uuid)
+					{
+						next_index = (i + 1) % rotate_statuses.length;
+						break;
+					}
+				}
+
+				event_model.data.event_status_uuid =
+					rotate_statuses[next_index].uuid;
+
+				event_model.save().then(
+					function success()
+					{
+						deferred.resolve(angular.copy(event_model.data));
+					});
+			});
+
+		return deferred.promise;
 	};
 
 	$scope.open_create_invoice = function open_create_invoice(

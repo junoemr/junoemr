@@ -121,15 +121,15 @@ angular.module("Common.Services").service("securityService", [
 			return deferred.promise;
 		};
 
-		service.has_one_of_permissions = function has_one_of_permissions(permission_array)
+		service.hasOneOfPermissions = function hasOneOfPermissions(permission_array)
 		{
 			return true;
 		};
 
-		service.has_permission = function has_permission(permission)
+		service.hasPermission = function hasPermission(permission)
 		{
 			return true;
-		}
+		};
 
 		return service;
 	}

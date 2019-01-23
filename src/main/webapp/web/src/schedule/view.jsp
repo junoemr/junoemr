@@ -142,7 +142,28 @@
 		</div>
 
 
+		<div
+			id="ca-calendar"
+			class="calendar"
+			ui-calendar="uiConfigApplied.calendar"
+			calendar="cpCalendar"
+			ng-model="eventSources"
+			ng-enabled="initialized"
+		></div>
+		<!--
+		<div>
+			<div
+				id="cp-calendar"
+				class="calendar"
+				ng-model="event_sources"
+				calendar="cpCalendar"
+				ui-calendar="ui_config_applied.calendar"
+				ng-enabled="initialized"
+			></div>
+		</div>
+		-->
 
+		<!--
 		<div
 			id="ca-calendar"
 			class="calendar"
@@ -156,6 +177,7 @@
 			cp-calendar-global-state = "globalStateService"
 			cp-calendar-patient-model="demographicService"
 		></div>
+		-->
 
 	</div>
 </div>

@@ -42,12 +42,7 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
 	@Override
 	public Response toResponse(ValidationException exception)
 	{
-		RestResponseValidationError responseError = new RestResponseValidationError("Validation Error");
-		for(ConstraintViolation constraintViolation : exception.getConstraintViolations())
-		{
-			responseError.addError(constraintViolation.getPropertyPath().toString(), constraintViolation.getMessage());
-		}
-
+		RestResponseValidationError responseError = new RestResponseValidationError(exception.getMessage());
 		RestResponse<String> response = RestResponse.errorResponse(responseError);
 
 		return Response.status(Response.Status.BAD_REQUEST).entity(response)

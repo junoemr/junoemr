@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "watch": "webpack --config webpack.dev.js --watch",
-    "build_dev": "webpack --config webpack.dev.js",
+    "build_dev": "webpack --watch --config webpack.dev.js",
     "build_prod": "webpack --config webpack.prod.js"
   },
   "devDependencies": {

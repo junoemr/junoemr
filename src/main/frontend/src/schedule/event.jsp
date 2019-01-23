@@ -27,8 +27,8 @@
 		<span aria-hidden="true">&times;</span>
 	</button>
 	<h3 class="modal-title">
-		<span ng-hide="edit_mode">Add {{label}}</span>
-		<span ng-show="edit_mode">Modify {{label}}</span>
+		<span ng-hide="editMode">Add {{label}}</span>
+		<span ng-show="editMode">Modify {{label}}</span>
 	</h3>
 </div>
 
@@ -36,32 +36,32 @@
 <form ng-submit="save()" class="schedule-modal event" ng-init="init()">
 
 	<div class="modal-body">
-		<div ng-show="!is_initialized() || is_working()" ng-include="'src/common/spinner.jsp'"></div>
-		<div ng-show="is_initialized() && !is_working()">
+		<div ng-show="!isInitialized() || isWorking()" ng-include="'src/common/spinner.jsp'"></div>
+		<div ng-show="isInitialized() && !isWorking()">
 
 			<div class="schedule-header">
 				<h4 class="pull-left schedule-title">{{schedule.display_name}}</h4>
 
-				<div class="pull-right" ng-show="edit_mode">
-					<span ng-repeat="tag in tag_names"
+				<div class="pull-right" ng-show="editMode">
+					<span ng-repeat="tag in tagNames"
 						  class="label label-default">
 						<i class="fa fa-tag"></i>
 						{{ tag }}
 					</span>
 				</div>
 
-				<div class="pull-right" ng-show="edit_mode && num_invoices > 0">
+				<div class="pull-right" ng-show="editMode && numInvoices > 0">
 					<button type="button"
 							class="btn btn-sm btn-success"
-							ng-click="view_invoices()">
-						View Invoice<span ng-show="num_invoices > 1">s</span>
+							ng-click="viewInvoices()">
+						View Invoice<span ng-show="numInvoices > 1">s</span>
 					</button>
 				</div>
 			</div>
 
 			<ca-info-messages
-					ca-errors-object="display_messages"
-					ca-field-value-map="field_value_mapping"
+					ca-errors-object="displayMessages"
+					ca-field-value-map="fieldValueMapping"
 					ca-prepend-name-to-field-errors="false"
 			></ca-info-messages>
 
@@ -69,7 +69,7 @@
 				<div class="col-sm-6">
 
 					<div class="form-group"
-						 ng-class="{ 'has-error': display_messages.field_errors()['start_date'] }">
+						 ng-class="{ 'has-error': displayMessages.fieldErrors()['start_date'] }">
 
 						<label class="control-label col-sm-12">
 							Start Time:
@@ -80,7 +80,7 @@
 									ca-template="bare"
 									ca-date-picker-id="start-date-picker"
 									ca-name="start_date"
-									ca-model="start_date"
+									ca-model="startDate"
 									ca-orientation="auto"
 							></ca-field-date>
 						</div>
@@ -89,15 +89,15 @@
 							<ca-field-time
 									ca-template="bare"
 									ca-name="start_time"
-									ca-model="start_time"
-									ca-minute-step="parent_scope.time_interval_minutes()">
+									ca-model="startTime"
+									ca-minute-step="parentScope.timeIntervalMinutes()">
 							</ca-field-time>
 						</div>
 
 					</div>
 
 					<div class="form-group"
-						 ng-class="{ 'has-error': display_messages.field_errors()['end_date'] }">
+						 ng-class="{ 'has-error': displayMessages.fieldErrors()['end_date'] }">
 
 						<label class="control-label col-sm-12">
 							End Time:
@@ -108,7 +108,7 @@
 									ca-template="bare"
 									ca-date-picker-id="end-date-picker"
 									ca-name="end_date"
-									ca-model="end_date"
+									ca-model="endDate"
 									ca-orientation="auto"
 							></ca-field-date>
 						</div>
@@ -117,8 +117,8 @@
 							<ca-field-time
 									ca-template="bare"
 									ca-name="end_time"
-									ca-model="end_time"
-									ca-minute-step="parent_scope.time_interval_minutes()">
+									ca-model="endTime"
+									ca-minute-step="parentScope.timeIntervalMinutes()">
 							</ca-field-time>
 						</div>
 					</div>
@@ -130,24 +130,24 @@
 						<div class="col-sm-10">
 							<select id="input-event-status"
 									class="form-control"
-									ng-model="selected_event_status"
-									ng-options="option as option.name for option in event_status_options">
+									ng-model="selectedEventStatus"
+									ng-options="option as option.name for option in eventStatusOptions">
 							</select>
 						</div>
 						<span class="event-color"
-							  style="background-color: {{selected_event_status.color}};"></span>
+							  style="background-color: {{selectedEventStatus.color}};"></span>
 					</div>
 
-					<div class="form-group" ng-class="{'has-error': display_messages.field_errors()['location']}">
+					<div class="form-group" ng-class="{'has-error': displayMessages.fieldErrors()['location']}">
 						<label for="input-site" class="control-label col-sm-12">
 							Site:
 						</label>
 						<div class="col-sm-10">
 							<select id="input-site"
 									class="form-control"
-									ng-model="selected_site_name">
+									ng-model="selectedSiteName">
 								<option
-										ng-repeat="option in parent_scope.site_options"
+										ng-repeat="option in parentScope.siteOptions"
 										value="{{option.name}}"
 										style="background-color: {{option.color}}">
 									{{option.display_name}}
@@ -159,37 +159,37 @@
 				</div>
 
 				<div class="col-sm-6"
-					 ng-show="active_template_events.length > 0">
+					 ng-show="activeTemplateEvents.length > 0">
 
 					<label class="control-label">Availability during appointment:</label>
 
 					<div class="availability"
-						 ng-repeat="template_event in active_template_events | limitTo: 4">
+						 ng-repeat="templateEvent in activeTemplateEvents | limitTo: 4">
 
 						<div class="pull-left color">
 							<div class="event-color"
-								 style="background-color: {{template_event.color}};">
+								 style="background-color: {{templateEvent.color}};">
 							</div>
 						</div>
 						<div class="pull-left info">
-							<div>{{ template_event.availability_type.name }}</div>
+							<div>{{ templateEvent.availability_type.name }}</div>
 
 							<div class="availability-detail">
-								{{ template_event.start.format('h:mma') }} -
-								{{ template_event.end.format('h:mma') }}
+								{{ templateEvent.start.format('h:mma') }} -
+								{{ templateEvent.end.format('h:mma') }}
 							</div>
 							<a class="availability-detail"
-							   ng-show="template_event.availability_type.preferred_event_length_minutes != null"
+							   ng-show="templateEvent.availability_type.preferred_event_length_minutes != null"
 							   href=""
-							   ng-click="set_event_length(template_event.availability_type.preferred_event_length_minutes)">
-								({{ template_event.availability_type.preferred_event_length_minutes }} minutes)
+							   ng-click="setEventLength(templateEvent.availability_type.preferred_event_length_minutes)">
+								({{ templateEvent.availability_type.preferred_event_length_minutes }} minutes)
 							</a>
 						</div>
 					</div>
 
-					<div class="availability" ng-show="active_template_events.length > 4">
+					<div class="availability" ng-show="activeTemplateEvents.length > 4">
 						<div class="availability-detail more-availability">
-							and {{ active_template_events.length - 4 }} more...
+							and {{ activeTemplateEvents.length - 4 }} more...
 						</div>
 					</div>
 
@@ -203,7 +203,7 @@
 							ca-input-size="col-sm-12"
 							ca-title="Reason"
 							ca-name="event_reason"
-							ca-model="event_data.reason"
+							ca-model="eventData.reason"
 							ca-max-characters="300"
 							ca-rows="1">
 					</ca-field-text>
@@ -217,7 +217,7 @@
 							ca-input-size="col-sm-12"
 							ca-title="Notes"
 							ca-name="event_description"
-							ca-model="event_data.description"
+							ca-model="eventData.description"
 							ca-max-characters="600"
 							ca-rows="2">
 					</ca-field-text>
@@ -237,10 +237,10 @@
 						<div class="col-sm-12">
 							<input type="text"
 								   id="input-patient"
-								   ng-model="autocomplete_values.patient"
+								   ng-model="autocompleteValues.patient"
 								   placeholder="Patient"
-								   uib-typeahead="pt.data.full_name for pt in parent_scope.calendar_api_adapter.searchPatients($viewValue)"
-								   typeahead-on-select="on_select_patient($item, $model, $label)"
+								   uib-typeahead="pt.data.full_name for pt in parentScope.searchPatients($viewValue)"
+								   typeahead-on-select="onSelectPatient($item, $model, $label)"
 								   class="form-control"
 								   autocomplete="off"/>
 						</div>
@@ -251,7 +251,7 @@
 
 			<div class="row">
 
-				<div class="col-sm-3 patient-image" ng-show="is_patient_selected()">
+				<div class="col-sm-3 patient-image" ng-show="isPatientSelected()">
 					<div class="file-upload-drop-box">
 						<span class="upload-text" ng-if="!patient.has_photo">Upload Photo</span>
 						<img class="patient-photo" title="Click to change image"
@@ -260,7 +260,7 @@
 					</div>
 				</div>
 
-				<div class="col-sm-9 form-horizontal form-compact" ng-show="is_patient_selected()">
+				<div class="col-sm-9 form-horizontal form-compact" ng-show="isPatientSelected()">
 
 					<div class="form-group">
 						<label class="control-label col-sm-4">
@@ -336,9 +336,9 @@
 		<div class="pull-left">
 			<button type="button"
 					class="btn btn-danger"
-					ng-show="edit_mode"
+					ng-show="editMode"
 					ng-click="delete()"
-					ng-disabled="is_working()">
+					ng-disabled="isWorking()">
 				Delete
 			</button>
 		</div>
@@ -349,34 +349,34 @@
 					class="btn btn-primary"
 					tooltip-placement="top"
 					tooltip-append-to-body="true"
-					uib-tooltip="{{key_binding.get_tooltip(key_bind_settings, 'ctrl+enter')}}"
-					ng-show="!edit_mode"
-					ng-disabled="is_working()">Create</button>
+					uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
+					ng-show="!editMode"
+					ng-disabled="isWorking()">Create</button>
 
 			<button
 					type="submit"
 					class="btn btn-primary"
 					tooltip-placement="top"
 					tooltip-append-to-body="true"
-					uib-tooltip="{{key_binding.get_tooltip(key_bind_settings, 'ctrl+enter')}}"
-					ng-show="edit_mode"
-					ng-disabled="is_working()">Modify</button>
+					uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
+					ng-show="editMode"
+					ng-disabled="isWorking()">Modify</button>
 
 			<button
 					type="button"
 					class="btn btn-success"
 					tooltip-placement="top"
 					tooltip-append-to-body="true"
-					uib-tooltip="{{key_binding.get_tooltip(key_bind_settings, 'ctrl+shift+enter')}}"
-					ng-click="save_and_bill()"
-					ng-show="num_invoices == 0"
-					ng-disabled="is_working()">Modify &amp; Bill</button>
+					uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+shift+enter')}}"
+					ng-click="saveAndBill()"
+					ng-show="numInvoices == 0"
+					ng-disabled="isWorking()">Modify &amp; Bill</button>
 
 			<button
 					type="button"
 					class="btn btn-default"
 					ng-click="cancel()"
-					ng-disabled="is_working()">Cancel</button>
+					ng-disabled="isWorking()">Cancel</button>
 
 		</div>
 	</div>

@@ -294,7 +294,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			{
 				id: 0,
 				label: "Appts.",
-				template: "patientlist/patientList1.jsp",
+				template: "src/patientlist/patientList1.jsp",
 				serviceMethod: function ()
 				{
 					// this gets overwritten by the appointmentListController, when it sets specific dates
@@ -309,7 +309,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			{
 				id: 1,
 				label: "Recent",
-				template: "patientlist/recent.jsp",
+				template: "src/patientlist/recent.jsp",
 				serviceMethod: function ()
 				{
 					return providerService.getRecentPatientList().then(
@@ -326,7 +326,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			{
 				id: 0,
 				label: "Patient Sets",
-				template: "patientlist/demographicSets.jsp",
+				template: "src/patientlist/demographicSets.jsp",
 				serviceMethod: function ()
 				{
 					return reportingService.getDemographicSetList().then(
@@ -340,7 +340,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			{
 				id: 1,
 				label: "Caseload",
-				template: "patientlist/program.jsp",
+				template: "src/patientlist/program.jsp",
 				serviceMethod: function ()
 				{
 					return Promise.resolve([]);

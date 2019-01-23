@@ -65,6 +65,70 @@ Juno.Common.Util.formatMomentDate = function formatMomentDate(d) {
 	return d.format(Juno.Common.Util.settings.date_format);
 };
 
+Juno.Common.Util.formatMomentTime = function formatMomentTime(d, format) {
+	if(!format) {
+		format = Juno.Common.Util.settings.time_format;
+	}
+	return d.format(format);
+};
+
+Juno.Common.Util.getDateMoment = function getDateMoment(date_string)
+{
+	return moment.utc(date_string, Juno.Common.Util.settings.date_format, true);
+};
+
+Juno.Common.Util.getTimeMoment = function getTimeMoment(time_string)
+{
+	return moment.utc(time_string, Juno.Common.Util.settings.time_format, true);
+};
+
+Juno.Common.Util.getDateAndTimeMoment = function getCombinedMoment(dateString, timeString)
+{
+	return moment.utc(dateString + " " + timeString,
+		Juno.Common.Util.settings.date_format + " " +
+		Juno.Common.Util.settings.time_format, true);
+};
+
+Juno.Common.Util.getDatetimeNoTimezoneMoment = function getDatetimeNoTimezoneMoment(datetime_string)
+{
+	return moment.utc(datetime_string,
+		Juno.Common.Util.settings.datetime_no_timezone_format, true);
+};
+
+Juno.Common.Util.validateDateString = function validateDateString(
+	dateString, displayErrors, field, fieldDisplayName, required)
+{
+	if(Juno.Common.Util.exists(dateString))
+	{
+		var moment = Juno.Common.Util.getDateMoment(dateString);
+		if(!moment.isValid())
+		{
+			displayErrors.addFieldError(field, fieldDisplayName + ' is invalid');
+		}
+	}
+	else if(required)
+	{
+		displayErrors.addFieldError(field, fieldDisplayName + 'is required');
+	}
+};
+
+Juno.Common.Util.validateTimeString = function validateTimeString(
+	timeString, displayErrors, field, fieldDisplayName, required)
+{
+	if (Juno.Common.Util.exists(timeString))
+	{
+		var moment = Juno.Common.Util.getTimeMoment(timeString);
+		if (!moment.isValid())
+		{
+			displayErrors.addFieldError(field, fieldDisplayName + 'is invalid');
+		}
+	}
+	else if (required)
+	{
+		displayErrors.addFieldError(field, fieldDisplayName + 'is required');
+	}
+};
+
 Juno.Common.Util.addNewLine = function addNewLine(line, mssg) {
 	if (line == null || line.trim() == "") return mssg;
 
@@ -151,4 +215,21 @@ Juno.Common.Util.isIntegerString = function isIntegerString(string)
 	}
 
 	return false;
+};
+
+Juno.Common.Util.escapeHtml = function escapeHtml(str)
+{
+	var entityMap = {
+		"&": "&amp;",
+		"<": "&lt;",
+		">": "&gt;",
+		'"': '&quot;',
+		"'": '&#39;',
+		"/": '&#x2F;'
+	};
+
+	return String(str).replace(/[&<>"'\/]/g, function (s)
+	{
+		return entityMap[s];
+	});
 };

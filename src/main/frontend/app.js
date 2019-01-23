@@ -7,6 +7,7 @@ require('jquery-ui/themes/base/resizable.css');
 require('moment');
 require('angular');
 require('angular-ui-bootstrap');
+//require('angular-ui-calendar');
 require('angular-ui-router');
 require('angular-ui-router/release/stateEvents');
 require('fullcalendar-scheduler');
@@ -34,7 +35,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'ngResource',
 	'ui.bootstrap',
 	'ui.calendar',
-	'cpCalendar',
+//	'cpCalendar',
 	'angular-loading-bar',
 	'ngTable',
 	'ngStorage',
