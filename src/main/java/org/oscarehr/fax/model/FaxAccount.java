@@ -44,6 +44,9 @@ public class FaxAccount extends AbstractModel<Long>
 	private static final long serialVersionUID = 1L;
 
 	public static final String INTEGRATION_TYPE_SRFAX = "SRFAX";
+
+	public static final String PROP_MASTER_FAX_ENABLED_INBOUND = "masterFaxEnabledInbound";
+	public static final String PROP_MASTER_FAX_ENABLED_OUTBOUND = "masterFaxEnabledOutbound";
 	
 	@Id
 	@Column(name="id")

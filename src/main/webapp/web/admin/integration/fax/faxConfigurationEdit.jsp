@@ -62,73 +62,79 @@
 				       ng-model="faxConfigEditController.faxAccount.displayName">
 			</div>
 			<hr>
-			<div class="flex-row content-end info-section">
-				<span class="glyphicon info-icon glyphicon-info-sign"
-				      title="<bean:message bundle="ui" key="admin.fax.acct.edit.outboundInfoMessage"/>">
-				</span>
-			</div>
-			<div class="flex-row">
-				<label class="flex-row-label" for="input-fax-enabled-outbound"><bean:message bundle="ui" key="admin.fax.acct.edit.enableOutbound"/></label>
-				<label class="flex-row-content switch">
-					<input id="input-fax-enabled-outbound" type="checkbox"
-					       ng-model="faxConfigEditController.faxAccount.enableOutbound"/>
-					<span class="slider"></span>
-				</label>
-			</div>
-			<div>
+			<fieldset ng-disabled="!faxConfigEditController.masterFaxEnabledOutbound">
+				<span ng-show="!faxConfigEditController.masterFaxEnabledOutbound"><bean:message bundle="ui" key="admin.fax.acct.edit.outboundDisabledMessage"/></span>
+				<div class="flex-row content-end info-section">
+					<span class="glyphicon info-icon glyphicon-info-sign"
+					      title="<bean:message bundle="ui" key="admin.fax.acct.edit.outboundInfoMessage"/>">
+					</span>
+				</div>
 				<div class="flex-row">
-					<label class="flex-row-label" for="input-fax-account-email"
-					       title="<bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail-tooltip"/>">
-						<bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail"/>
+					<label class="flex-row-label" for="input-fax-enabled-outbound"><bean:message bundle="ui" key="admin.fax.acct.edit.enableOutbound"/></label>
+					<label class="flex-row-content switch">
+						<input id="input-fax-enabled-outbound" type="checkbox"
+						       ng-model="faxConfigEditController.faxAccount.enableOutbound"/>
+						<span class="slider"></span>
 					</label>
-					<input class="flex-row-content" id="input-fax-account-email" name="input-fax-account-email" type="email"
-					       ng-model="faxConfigEditController.faxAccount.accountEmail"
-					       ng-required="faxConfigEditController.faxAccount.enableOutbound">
 				</div>
-				<div class="flex-row input-validation" ng-show="!form['input-fax-account-email'].$valid">
-					<label class="flex-row-label">*</label>
-					<span><bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail-invalid"/></span>
+				<div>
+					<div class="flex-row">
+						<label class="flex-row-label" for="input-fax-account-email"
+						       title="<bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail-tooltip"/>">
+							<bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail"/>
+						</label>
+						<input class="flex-row-content" id="input-fax-account-email" name="input-fax-account-email" type="email"
+						       ng-model="faxConfigEditController.faxAccount.accountEmail"
+						       ng-required="faxConfigEditController.faxAccount.enableOutbound">
+					</div>
+					<div class="flex-row input-validation" ng-show="!form['input-fax-account-email'].$valid">
+						<label class="flex-row-label">*</label>
+						<span><bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail-invalid"/></span>
+					</div>
 				</div>
-			</div>
-			<div>
+				<div>
+					<div class="flex-row">
+						<label class="flex-row-label" for="input-fax-account-fax-no"
+						       title="<bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber-tooltip"/>">
+							<bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber"/>
+						</label>
+						<input class="flex-row-content" id="input-fax-account-fax-no" name="input-fax-account-fax-no" type="text"
+						       ng-model="faxConfigEditController.faxAccount.faxNumber"
+						       ng-minlength="11" ng-maxlength="11" ng-pattern="/\d{11}/" ng-required="faxConfigEditController.faxAccount.enableOutbound">
+					</div>
+					<div class="flex-row input-validation" ng-show="!form['input-fax-account-fax-no'].$valid">
+						<label class="flex-row-label">*</label>
+						<span><bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber-invalid"/></span>
+					</div>
+				</div>
 				<div class="flex-row">
-					<label class="flex-row-label" for="input-fax-account-fax-no"
-					       title="<bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber-tooltip"/>">
-						<bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber"/>
+					<label class="flex-row-label" for="input-fax-account-cover-letter-type"
+					       title="<bean:message bundle="ui" key="admin.fax.acct.edit.coverLetterOption-tooltip"/>">
+						<bean:message bundle="ui" key="admin.fax.acct.edit.coverLetterOption"/>
 					</label>
-					<input class="flex-row-content" id="input-fax-account-fax-no" name="input-fax-account-fax-no" type="text"
-					       ng-model="faxConfigEditController.faxAccount.faxNumber"
-					       ng-minlength="11" ng-maxlength="11" ng-pattern="/\d{11}/" ng-required="faxConfigEditController.faxAccount.enableOutbound">
+					<select class="flex-row-content" id="input-fax-account-cover-letter-type"
+					        ng-model="faxConfigEditController.faxAccount.coverLetterOption"
+					        ng-options="coverLetter for coverLetter in faxConfigEditController.coverLetterOptions">
+					</select>
 				</div>
-				<div class="flex-row input-validation" ng-show="!form['input-fax-account-fax-no'].$valid">
-					<label class="flex-row-label">*</label>
-					<span><bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber-invalid"/></span>
-				</div>
-			</div>
-			<div class="flex-row">
-				<label class="flex-row-label" for="input-fax-account-cover-letter-type"
-				       title="<bean:message bundle="ui" key="admin.fax.acct.edit.coverLetterOption-tooltip"/>">
-					<bean:message bundle="ui" key="admin.fax.acct.edit.coverLetterOption"/>
-				</label>
-				<select class="flex-row-content" id="input-fax-account-cover-letter-type"
-				        ng-model="faxConfigEditController.faxAccount.coverLetterOption"
-				        ng-options="coverLetter for coverLetter in faxConfigEditController.coverLetterOptions">
-				</select>
-			</div>
+			</fieldset>
 			<hr>
-			<div class="flex-row content-end info-section">
-				<span class="glyphicon info-icon glyphicon-info-sign"
-				      title="<bean:message bundle="ui" key="admin.fax.acct.edit.inboundInfoMessage"/>">
-				</span>
-			</div>
-			<div class="flex-row">
-				<label class="flex-row-label" for="input-fax-enabled-inbound"><bean:message bundle="ui" key="admin.fax.acct.edit.enableInbound"/></label>
-				<label class="flex-row-content switch">
-					<input id="input-fax-enabled-inbound" type="checkbox"
-					       ng-model="faxConfigEditController.faxAccount.enableInbound"/>
-					<span class="slider"></span>
-				</label>
-			</div>
+			<fieldset ng-disabled="!faxConfigEditController.masterFaxEnabledInbound">
+				<span ng-show="!faxConfigEditController.masterFaxEnabledInbound"><bean:message bundle="ui" key="admin.fax.acct.edit.inboundDisabledMessage"/></span>
+				<div class="flex-row content-end info-section">
+					<span class="glyphicon info-icon glyphicon-info-sign"
+					      title="<bean:message bundle="ui" key="admin.fax.acct.edit.inboundInfoMessage"/>">
+					</span>
+				</div>
+				<div class="flex-row">
+					<label class="flex-row-label" for="input-fax-enabled-inbound"><bean:message bundle="ui" key="admin.fax.acct.edit.enableInbound"/></label>
+					<label class="flex-row-content switch">
+						<input id="input-fax-enabled-inbound" type="checkbox"
+						       ng-model="faxConfigEditController.faxAccount.enableInbound"/>
+						<span class="slider"></span>
+					</label>
+				</div>
+			</fieldset>
 			<hr>
 			<div class="flex-row">
 				<label class="flex-row-label"><bean:message bundle="ui" key="admin.fax.acct.edit.connectionStatus"/></label>

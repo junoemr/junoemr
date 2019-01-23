@@ -468,6 +468,7 @@
 <script type="text/javascript" src="common/services/providersService.js"></script>
 <script type="text/javascript" src="common/services/scheduleService.js"></script>
 <script type="text/javascript" src="common/services/securityService.js"></script>
+<script type="text/javascript" src="common/services/systemPreferenceService.js"></script>
 <script type="text/javascript" src="common/services/staticDataService.js"></script>
 <script type="text/javascript" src="common/services/summaryService.js"></script>
 <script type="text/javascript" src="common/services/ticklerService.js"></script>

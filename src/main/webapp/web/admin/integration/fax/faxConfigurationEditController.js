@@ -3,10 +3,14 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxCon
 	"$uibModalInstance",
 	"faxAccountService",
 	"faxAccount",
+	"masterFaxEnabledInbound",
+	"masterFaxEnabledOutbound",
 	function ($uibModal,
 	          $uibModalInstance,
 	          faxAccountService,
-	          faxAccount)
+	          faxAccount,
+	          masterFaxEnabledInbound,
+	          masterFaxEnabledOutbound)
 	{
 		var controller = this;
 		controller.connectionStatusEnum = Object.freeze({"unknown":1, "success":2, "failure":3});
@@ -43,11 +47,24 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxCon
 					connectionStatus: controller.connectionStatusEnum.unknown
 				};
 			}
+			// get the master flag status for inbound/outbound settings
+			controller.masterFaxEnabledInbound = masterFaxEnabledInbound;
+			controller.masterFaxEnabledOutbound = masterFaxEnabledOutbound;
+
+			// switch off settings that are disabled and un-editable.
+			// if this is not done, form errors may prevent saving changes to other section
+			if(!controller.masterFaxEnabledInbound)
+			{
+				controller.faxAccount.enableInbound = false;
+			}
+			if(!controller.masterFaxEnabledOutbound)
+			{
+				controller.faxAccount.enableOutbound = false;
+			}
 		};
 
 		controller.saveSettings = function (form)
 		{
-			console.info('valid', form.$valid);
 			if(!form.$valid)
 			{
 				alert("The form contains errors");

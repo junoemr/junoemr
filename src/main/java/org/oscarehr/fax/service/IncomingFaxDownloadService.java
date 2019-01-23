@@ -68,7 +68,7 @@ public class IncomingFaxDownloadService
 
 	public void pullNewFaxes()
 	{
-		if(ServerStateHandler.isThisServerMaster())
+		if(incomingFaxService.isIntegratedFaxEnabled() && ServerStateHandler.isThisServerMaster())
 		{
 			List<FaxAccount> faxAccountList = faxAccountDao.findByActiveInbound(true, true);
 			String startDate = ConversionUtils.toDateString(LocalDate.now().minusDays(faxDaysPast), SRFaxApiConnector.DATE_FORMAT);

@@ -39,6 +39,7 @@ import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
@@ -73,13 +74,16 @@ public class OutgoingFaxService
 	private static int MAX_SEND_COUNT = Integer.parseInt(props.getProperty("fax.max_send_attempts", DEFAULT_MAX_SEND_COUNT));
 
 	@Autowired
-	FaxOutboundDao faxOutboundDao;
+	private FaxOutboundDao faxOutboundDao;
 
 	@Autowired
-	FaxAccountDao faxAccountDao;
+	private FaxAccountDao faxAccountDao;
 
 	@Autowired
-	FaxAccountService faxAccountService;
+	private FaxAccountService faxAccountService;
+
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
 
 	public boolean isOutboundFaxEnabled()
 	{
@@ -87,8 +91,9 @@ public class OutgoingFaxService
 	}
 	public boolean isIntegratedFaxEnabled()
 	{
+		Boolean masterSettingEnabled = systemPreferenceService.isPreferenceEnabled(FaxAccount.PROP_MASTER_FAX_ENABLED_OUTBOUND, false);
 		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveOutbound(true, true);
-		return !faxAccountList.isEmpty();
+		return masterSettingEnabled && !faxAccountList.isEmpty();
 	}
 	protected boolean isLegacyFaxEnabled()
 	{

@@ -342,6 +342,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ScheduleService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.SpecialistsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.StatusService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.SystemPreferenceWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.TicklerWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.UserMetricsService"/>
 

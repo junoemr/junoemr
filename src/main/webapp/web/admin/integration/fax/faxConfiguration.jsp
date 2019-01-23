@@ -51,8 +51,35 @@
 <div class="fax-config">
 	<div class="fax-config-header">
 		<h1><bean:message bundle="ui" key="admin.fax.acct.header"/></h1>
+
+		<span ng-show="!faxController.loggedInProvider.superAdmin && faxController.masterFaxDisabled">
+			<bean:message bundle="ui" key="admin.fax.acct.accessDisabledMessage"/>
+		</span>
+		<div ng-show="faxController.loggedInProvider.superAdmin">
+			<!-- let super admin enable/disable faxing -->
+			<div>
+				<div>
+					<label class="switch">
+						<input id="input-master-fax-integration-enabled-inbound" type="checkbox"
+						       ng-model="faxController.masterFaxEnabledInbound"
+						       ng-change="faxController.saveMasterFaxEnabledStateInbound();"/>
+						<span class="slider"></span>
+					</label>
+					<label for="input-master-fax-integration-enabled-inbound"><bean:message bundle="ui" key="admin.fax.acct.masterFaxEnabledInbound"/></label>
+				</div>
+				<div>
+					<label class="switch">
+						<input id="input-master-fax-integration-enabled-outbound" type="checkbox"
+						       ng-model="faxController.masterFaxEnabledOutbound"
+						       ng-change="faxController.saveMasterFaxEnabledStateOutbound();"/>
+						<span class="slider"></span>
+					</label>
+					<label for="input-master-fax-integration-enabled-outbound"><bean:message bundle="ui" key="admin.fax.acct.masterFaxEnabledOutbound"/></label>
+				</div>
+			</div>
+		</div>
 		<button type="button" class="btn btn-primary"
-		        ng-show="faxController.faxAccountList.length == 0"
+		        ng-show="faxController.faxAccountList.length == 0 && !faxController.masterFaxDisabled"
 		        ng-click="faxController.editNewFaxAccount()">
 			<bean:message bundle="ui" key="admin.fax.acct.btn-addNew"/>
 		</button>
@@ -88,7 +115,8 @@
 				</div>
 				<button type="button" class="btn btn-default"
 				        <%-- TODO disable button for non-admin users? --%>
-				        ng-click="faxController.editFaxAccount(faxAccount)">
+				        ng-click="faxController.editFaxAccount(faxAccount)"
+						ng-disabled="faxController.masterFaxDisabled">
 					<bean:message bundle="ui" key="admin.fax.acct.btn-EditAccount"/>
 				</button>
 			</div>

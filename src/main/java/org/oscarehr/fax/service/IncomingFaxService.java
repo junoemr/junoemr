@@ -31,6 +31,7 @@ import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.externalApi.srfax.result.GetFaxInboxResult;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxInbound;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,10 +63,14 @@ public class IncomingFaxService
 	@Autowired
 	private DocumentService documentService;
 
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
+
 	public boolean isIntegratedFaxEnabled()
 	{
+		Boolean masterSettingEnabled = systemPreferenceService.isPreferenceEnabled(FaxAccount.PROP_MASTER_FAX_ENABLED_INBOUND, false);
 		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveInbound(true, true);
-		return !faxAccountList.isEmpty();
+		return masterSettingEnabled && !faxAccountList.isEmpty();
 	}
 
 	public FaxInbound saveFaxDocument(final FaxAccount faxAccount, final GetFaxInboxResult inboxMeta, String result) throws IOException, InterruptedException
