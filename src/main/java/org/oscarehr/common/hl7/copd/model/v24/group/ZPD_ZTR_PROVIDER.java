@@ -39,6 +39,7 @@ import org.oscarehr.common.hl7.copd.model.v24.segment.ZPR;
 import org.oscarehr.common.hl7.copd.model.v24.segment.ZPV;
 import org.oscarehr.common.hl7.copd.model.v24.segment.ZQO;
 import org.oscarehr.common.hl7.copd.model.v24.segment.ZSH;
+import org.oscarehr.common.hl7.copd.model.v24.segment.ZFU;
 
 public class ZPD_ZTR_PROVIDER extends AbstractGroup
 {
@@ -50,6 +51,7 @@ public class ZPD_ZTR_PROVIDER extends AbstractGroup
 			this.add(PRD.class, true, false);
 			this.add(NK1.class, false, true);
 			this.add(ZAL.class, false, true);
+			this.add(ZFU.class, false, true); // custom wolf-only segment
 			this.add(ZSH.class, false, true);
 			this.add(ZQO.class, false, true);
 			this.add(ZPV.class, false, true);
@@ -108,6 +110,24 @@ public class ZPD_ZTR_PROVIDER extends AbstractGroup
 			return this.getAll("ZAL").length;
 		}
 		catch(HL7Exception var4)
+		{
+			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
+			throw new RuntimeException(message);
+		}
+	}
+
+	public ZFU getZFU(int rep)
+	{
+		return this.getTyped("ZFU", rep, ZFU.class);
+	}
+
+	public int getZFUReps()
+	{
+		try
+		{
+			return this.getAll("ZFU").length;
+		}
+		catch(HL7Exception var)
 		{
 			String message = "Unexpected error accessing data - this is probably a bug in the source code generator.";
 			throw new RuntimeException(message);

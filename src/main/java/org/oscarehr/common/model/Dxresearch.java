@@ -204,11 +204,20 @@ public class Dxresearch  extends AbstractModel<Integer> implements java.io.Seria
         return hash;
     }
 
-
+	/** allow new objects to set the update date. This is important for imported data */
     @PrePersist
-	@PreUpdate
-	protected void jpaUpdateDate() {
-		this.updateDate = new Date();
-	}
+    protected void jpaNewObjUpdateDate()
+    {
+        if(this.updateDate == null)
+        {
+            this.updateDate = new Date();
+        }
+    }
 
+    /** always change the last updated date when an existing object is modified */
+    @PreUpdate
+    protected void jpaChangeUpdateDate()
+    {
+        this.updateDate = new Date();
+    }
 }

@@ -271,7 +271,7 @@ public final class ApptStatusData {
 
 	private String preStatus(String status, String s) {
 		String temp = "";
-		if (status != null) {
+		if (status != null && !status.isEmpty()) {
 			if (status.length() == 1) {
 				temp = s;
 			} else {

@@ -24,6 +24,7 @@ package org.oscarehr.demographic.model;
 
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.AbstractModel;
+import oscar.OscarProperties;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -39,6 +40,8 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 @Entity(name = "model.Demographic") // use a name to prevent autowire conflict with old model
 @Table(name = "demographic")
@@ -172,6 +175,29 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "mergedTo")
 	private List<DemographicMerged> mergedToDemographicsList;
 
+	/**
+	 * Determine if demographic is a newborn.  A demographic is a newborn if the HIN version code is 66 in BC, or
+	 * under a year old in all other cases.
+	 *
+	 * @return true if the demographic meets newborn criteria listed above.
+	 */
+	public static boolean isNewBorn(LocalDate birthDate, String HINVersion)
+	{
+		final String BC_NEWBORN_BILLING_CODE = "66";
+
+		OscarProperties oscarProperties = OscarProperties.getInstance();
+
+		if (oscarProperties.isBritishColumbiaInstanceType())
+		{
+			return (HINVersion != null && HINVersion.equals(BC_NEWBORN_BILLING_CODE));
+		}
+
+		LocalDate now = LocalDate.now();
+
+		long dayDifference = DAYS.between(birthDate, now);
+
+		return dayDifference < 365;
+	}
 
 	@Override
 	public Integer getId()
@@ -719,5 +745,10 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public void setMergedToDemographicsList(List<DemographicMerged> mergedToDemographicsList)
 	{
 		this.mergedToDemographicsList = mergedToDemographicsList;
+	}
+
+	public boolean isNewBorn()
+	{
+		return Demographic.isNewBorn(getDateOfBirth(), getVer());
 	}
 }

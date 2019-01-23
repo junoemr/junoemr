@@ -29,6 +29,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,20 +62,38 @@ public class PreventionDisplayConfig {
     private PreventionDisplayConfig() {
     	// use getInstance()
     }
-    
-    static public PreventionDisplayConfig getInstance(){
+
+	public static final Comparator<HashMap<String, String>> PreventionNameComparator = new Comparator<HashMap<String, String>>()
+	{
+		public int compare(HashMap<String, String> preventionList1, HashMap<String, String> preventionList2)
+		{
+			String prevention1 = preventionList1.get("name").toLowerCase();
+			String prevention2 = preventionList2.get("name").toLowerCase();
+			return prevention1.compareTo(prevention2);
+		}
+	};
+
+	static public PreventionDisplayConfig getInstance(){
        if (preventionDisplayConfig.prevList == null) {
          preventionDisplayConfig.loadPreventions();
        }
        return preventionDisplayConfig;
     }
 
-    public ArrayList<HashMap<String,String>> getPreventions() {
-        if (prevList == null) {
-            loadPreventions();
-        }
-        return prevList;
-    }
+	public ArrayList<HashMap<String, String>> getPreventions()
+	{
+		if (prevList == null)
+		{
+			loadPreventions();
+		}
+
+		if (OscarProperties.getInstance().isPropertyActive("alphabetize_preventions"))
+		{
+			Collections.sort(prevList, PreventionNameComparator);
+		}
+
+		return prevList;
+	}
 
     public HashMap<String,String> getPrevention(String s) {
         if (prevHash == null) {
