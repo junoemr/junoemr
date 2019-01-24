@@ -222,6 +222,8 @@ public class DmsInboxManageAction extends DispatchAction {
 		String patientHealthNumber = request.getParameter("hnum");
 		String startDateStr = request.getParameter("startDate");
 		String endDateStr = request.getParameter("endDate");
+		String ajax = request.getParameter("ajax");
+		Boolean isAjax = (ajax != null && ajax.equals("true"));
 
 		Date startDate = null;
 		Date endDate = null;
@@ -246,25 +248,29 @@ public class DmsInboxManageAction extends DispatchAction {
 		boolean patientSearch = !"".equals(patientFirstName) || !"".equals(patientLastName)
 				|| !"".equals(patientHealthNumber);
 		try {
-			CategoryData cData = new CategoryData(patientLastName, patientFirstName, patientHealthNumber,
-					patientSearch, providerSearch, searchProviderNo, status, startDate, endDate);
-			cData.populateCountsAndPatients();
-			MiscUtils.getLogger().debug("LABS " + cData.getTotalLabs());
+
+			if(isAjax)
+			{
+				CategoryData cData = new CategoryData(patientLastName, patientFirstName, patientHealthNumber,
+						patientSearch, providerSearch, searchProviderNo, status, startDate, endDate);
+				cData.populateCountsAndPatients();
+				MiscUtils.getLogger().debug("LABS " + cData.getTotalLabs());
+				request.setAttribute("patients", new ArrayList<PatientInfo>(cData.getPatients().values()));
+				request.setAttribute("unmatchedDocs", cData.getUnmatchedDocs());
+				request.setAttribute("unmatchedLabs", cData.getUnmatchedLabs());
+				request.setAttribute("totalDocs", cData.getTotalDocs());
+				request.setAttribute("totalLabs", cData.getTotalLabs());
+				request.setAttribute("abnormalCount", cData.getAbnormalCount());
+				request.setAttribute("normalCount", cData.getNormalCount());
+				request.setAttribute("totalNumDocs", cData.getTotalNumDocs());
+				request.setAttribute("categoryHash", cData.getCategoryHash());
+			}
 			request.setAttribute("patientFirstName", patientFirstName);
 			request.setAttribute("patientLastName", patientLastName);
 			request.setAttribute("patientHealthNumber", patientHealthNumber);
-			request.setAttribute("patients", new ArrayList<PatientInfo>(cData.getPatients().values()));
-			request.setAttribute("unmatchedDocs", cData.getUnmatchedDocs());
-			request.setAttribute("unmatchedLabs", cData.getUnmatchedLabs());
-			request.setAttribute("totalDocs", cData.getTotalDocs());
-			request.setAttribute("totalLabs", cData.getTotalLabs());
-			request.setAttribute("abnormalCount", cData.getAbnormalCount());
-			request.setAttribute("normalCount", cData.getNormalCount());
-			request.setAttribute("totalNumDocs", cData.getTotalNumDocs());
 			request.setAttribute("providerNo", providerNo);
 			request.setAttribute("searchProviderNo", searchProviderNo);
 			request.setAttribute("ackStatus", status);
-			request.setAttribute("categoryHash", cData.getCategoryHash());
 			request.setAttribute("startDate", startDateStr);
 			request.setAttribute("endDate", endDateStr);
 			return mapping.findForward("dms_index");
@@ -274,7 +280,8 @@ public class DmsInboxManageAction extends DispatchAction {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-    public ActionForward prepareForContentPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+    public ActionForward prepareForContentPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
 
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 
@@ -679,6 +686,7 @@ public class DmsInboxManageAction extends DispatchAction {
 
 		// set attributes
 		request.setAttribute("pageNum", page);
+		request.setAttribute("pageSize", pageSize);
 		request.setAttribute("docType", docType);
 		request.setAttribute("patientDocs", patientDocs);
 		request.setAttribute("providerNo", providerNo);

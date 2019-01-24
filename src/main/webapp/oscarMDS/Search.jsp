@@ -27,6 +27,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ page import="oscar.oscarMDS.data.ProviderData, java.util.ArrayList" %>
+<%@ page import="java.time.LocalDate" %>
 <html>
 <head>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
@@ -38,6 +39,10 @@
 			src="<%= request.getContextPath() %>/js/jquery-ui-1.10.2.custom.min.js"></script>
 
 	<script type="text/javascript">
+		function clearDate(id)
+		{
+			document.getElementById(id).value = '';
+		}
 		function handleDateChange(elem)
 		{
 			if (!Oscar.Util.Date.validateDateInputTolerant(elem))
@@ -209,19 +214,23 @@
 						</tr>
 
 						<tr>
-							<td>Start Date:(yyyy-mm-dd)
+							<td>
+								<label for="startDate">Start Date:(yyyy-mm-dd)</label>
 							</td>
 							<td><input type="text" id="startDate" name="startDate" size="15"
-									   id="startDate"
+									   value="<%= LocalDate.now().minusMonths(3) %>"
 									   onchange="handleDateChange(this)">
+								&nbsp;&nbsp;&nbsp;<button onclick="clearDate('startDate'); return false;">clear</button>
 							</td>
 						</tr>
 						<tr>
-							<td>End Date:(yyyy-mm-dd)
+							<td>
+								<label for="endDate">End Date:(yyyy-mm-dd)</label>
 							</td>
 							<td><input type="text" id="endDate" name="endDate" size="15"
-									   id="endDate"
+									   value="<%= LocalDate.now() %>"
 									   onchange="handleDateChange(this)">
+								&nbsp;&nbsp;&nbsp;<button onclick="clearDate('endDate'); return false;">clear</button>
 							</td>
 						</tr>
 
