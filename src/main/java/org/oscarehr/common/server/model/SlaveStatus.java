@@ -24,6 +24,7 @@ package org.oscarehr.common.server.model;
 
 import org.oscarehr.common.model.AbstractModel;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -31,10 +32,13 @@ import javax.persistence.Id;
 public class SlaveStatus extends AbstractModel<String>
 {
 	@Id
+	@Column(name="Master_Host")
 	private String id;
 
+	@Column(name="Slave_IO_Running")
 	private String slaveIORunning;
 
+	@Column(name="Slave_SQL_Running")
 	private String slaveSQLRunning;
 
 	@Override

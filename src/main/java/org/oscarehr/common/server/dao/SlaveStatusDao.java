@@ -61,7 +61,7 @@ public class SlaveStatusDao extends AbstractDao<SlaveStatus>
 	 */
 	private SlaveStatus getSlaveStatus()
 	{
-		Query query = entityManager.createNativeQuery("SHOW SLAVE STATUS", SlaveStatus.class);
+		Query query = entityManager.createNativeQuery("SHOW SLAVE STATUS");
 
 		List<Object[]> resultList = query.getResultList();
 		if(resultList.isEmpty())

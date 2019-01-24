@@ -130,7 +130,9 @@ public class ServerStateHandler
 
 	private static boolean actingAsMaster()
 	{
-		return slaveStatusDao.inSlaveMode();
+		boolean isSlave = slaveStatusDao.inSlaveMode();
+		logger.debug("Slave check: " + isSlave);
+		return !isSlave;
 	}
 
 	private static boolean resolvesAsMaster(String localHostname)
@@ -154,6 +156,7 @@ public class ServerStateHandler
 				serverNumber = secPatternMatcher.group(1);
 			}
 		}
+		logger.debug("Found server number: " + serverNumber);
 		if(serverNumber != null)
 		{
 			String secureHostname = secureDomain + serverNumber + "." + domain;
