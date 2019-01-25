@@ -1860,7 +1860,9 @@ YAHOO.example.FnMultipleFields = function(){
                     var arr = args[2];
                     var url = "<c:out value="${ctx}"/>" + "/oscarRx/WriteScript.do?parameterValue=createNewRx"; //"prescribe.jsp";
                     var ran_number=Math.round(Math.random()*1000000);
+					console.log("NAME3: " + arr.name);
                     var name=encodeURIComponent(arr.name);
+					console.log("ENCODED NAME3: " + name);
                     var params = "demographicNo=<%=demoNo%>&drugId="+arr.id+"&text="+name+"&randomId="+ran_number;  //hack to get around ie caching the page
                    new Ajax.Updater('rxText',url, {method:'get',parameters:params,evalScripts:true,
                         insertion: Insertion.Bottom,onSuccess:function(transport){
@@ -2022,6 +2024,7 @@ function setSearchedDrug(drugId,name){
 
     var url = "<c:out value="${ctx}"/>" + "/oscarRx/WriteScript.do?parameterValue=createNewRx";
     var ran_number=Math.round(Math.random()*1000000);
+	console.log("NAME2: " + name);
     name=encodeURIComponent(name);
     var params = "demographicNo=<%=demoNo%>&drugId="+drugId+"&text="+name+"&randomId="+ran_number;
     new Ajax.Updater('rxText',url, {method:'get',parameters:params,asynchronous:true,evalScripts:true,insertion: Insertion.Bottom,onSuccess:function(transport){

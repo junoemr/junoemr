@@ -26,6 +26,8 @@
 package oscar.oscarRx.pageUtil;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -539,6 +541,8 @@ public final class RxWriteScriptAction extends DispatchAction {
 			int randomId = Integer.parseInt(ra);
 			rx.setRandomId(randomId);
 			String drugId = request.getParameter("drugId");
+			//String reEncodedText = URLEncoder.encode(request.getParameter("text"), "ISO-8859-1");
+			//String text = URLDecoder.decode(reEncodedText, "UTF-8");
 			String text = request.getParameter("text");
 
 			// TODO: Is this to slow to do here? It's possible to do this in ajax, as in when this comes back launch an ajax request to fill in.
