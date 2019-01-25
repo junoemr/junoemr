@@ -42,10 +42,10 @@
 	}
 %>
 
-<%@page import="org.oscarehr.provider.dao.ProviderDataDao" %>
-<%@page import="org.oscarehr.managers.DemographicManager" %>
+<%@page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@page import="org.apache.commons.lang.StringUtils" %>
 
-<%@page import="oscar.appt.status.service.impl.AppointmentStatusMgrImpl" %>
+<%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%
 	if (session.getAttribute("user") == null) response.sendRedirect("../logout.jsp");
 	String curProvider_no = request.getParameter("provider_no");
@@ -61,43 +61,42 @@
 		bFirstDisp = (request.getParameter("bFirstDisp")).equals("true");
 %>
 
-<%@page import="oscar.oscarDemographic.data.*, java.util.*, java.sql.*, oscar.appt.*, oscar.*, oscar.util.*, java.text.*, java.net.*, org.oscarehr.common.OtherIdManager" %>
-<%@ page import="oscar.appt.status.service.AppointmentStatusMgr" %>
+<%@page import="org.oscarehr.PMmodule.model.Program, org.oscarehr.PMmodule.service.ProgramManager, org.oscarehr.PMmodule.service.ProviderManager, org.oscarehr.common.OtherIdManager, org.oscarehr.common.dao.BillingONCHeader1Dao, org.oscarehr.common.dao.BillingONExtDao, org.oscarehr.common.dao.EncounterFormDao, org.oscarehr.common.dao.OscarAppointmentDao, org.oscarehr.common.dao.SiteDao" %>
+<%@ page import="org.oscarehr.common.model.Appointment" %>
 <%@ page import="org.oscarehr.common.model.AppointmentStatus" %>
-<%@page import="org.oscarehr.common.dao.BillingONCHeader1Dao" %>
 <%@page import="org.oscarehr.common.model.BillingONCHeader1" %>
+<%@page import="org.oscarehr.common.model.Demographic" %>
 <%@ page
-		import="org.oscarehr.common.dao.DemographicDao, org.oscarehr.PMmodule.dao.ProviderDao, org.oscarehr.common.model.*, org.oscarehr.util.SpringUtils" %>
-<%@ page import="oscar.oscarEncounter.data.EctFormData" %>
+		import="org.oscarehr.common.model.EncounterForm, org.oscarehr.common.model.Facility, org.oscarehr.common.model.LookupList, org.oscarehr.common.model.LookupListItem" %>
+<%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session"/>
-<%@page import="org.oscarehr.demographic.model.DemographicCust" %>
-<%@page import="org.oscarehr.demographic.dao.DemographicCustDao" %>
-<%@ page import="org.oscarehr.common.model.EncounterForm" %>
-<%@ page import="org.oscarehr.common.dao.EncounterFormDao" %>
 <%@page import="org.oscarehr.common.model.ProviderPreference" %>
+<%@page import="org.oscarehr.common.model.Site" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicCustDao" %>
+<%@ page import="org.oscarehr.demographic.model.DemographicCust" %>
+<%@page import="org.oscarehr.managers.DemographicManager" %>
+<%@page import="org.oscarehr.managers.LookupListManager" %>
+<%@page import="org.oscarehr.provider.dao.ProviderDataDao" %>
 <%@page import="org.oscarehr.provider.model.ProviderData" %>
-<%@page import="org.oscarehr.util.SessionConstants" %>
-<%@page import="org.oscarehr.common.model.Appointment" %>
-<%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="org.oscarehr.PMmodule.model.Program" %>
-<%@ page import="org.oscarehr.PMmodule.model.ProgramProvider" %>
-<%@ page import="org.oscarehr.common.model.Facility" %>
-<%@ page import="org.oscarehr.PMmodule.service.ProviderManager" %>
-<%@ page import="org.oscarehr.PMmodule.service.ProgramManager" %>
+<%@ page import="org.oscarehr.util.EmailUtilsOld" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
-<%@ page import="org.oscarehr.managers.LookupListManager" %>
-<%@ page import="org.oscarehr.common.model.LookupList" %>
-<%@ page import="org.oscarehr.common.model.LookupListItem" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
-<%@page import="oscar.oscarBilling.ca.on.data.BillingDataHlp" %>
-<%@page import="org.oscarehr.common.dao.BillingONExtDao" %>
-<%@page import="org.oscarehr.billing.CA.ON.dao.*" %>
-<%@page import="java.math.*" %>
+<%@ page import="org.oscarehr.util.SessionConstants" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.OscarProperties" %>
+<%@ page import="oscar.appt.ApptData" %>
+<%@ page import="oscar.appt.ApptUtil" %>
+<%@ page import="oscar.appt.status.service.AppointmentStatusMgr" %>
+<%@ page import="oscar.appt.status.service.impl.AppointmentStatusMgrImpl" %>
+<%@ page import="oscar.oscarBilling.ca.on.data.BillingDataHlp" %>
+<%@ page import="oscar.oscarDemographic.data.DemographicData" %>
+<%@page import="oscar.oscarEncounter.data.EctFormData" %>
+<%@page import="oscar.util.ConversionUtils" %>
+<%@page import="java.math.BigDecimal" %>
+<%@page import="java.util.Calendar" %>
 <%
 	String mrpName = "";
 	DemographicCustDao demographicCustDao = (DemographicCustDao) SpringUtils.getBean("demographicCustDao");
@@ -147,6 +146,8 @@
 	String strEditable = pros.getProperty("ENABLE_EDIT_APPT_STATUS");
 	String apptStatusHere = pros.getProperty("appt_status_here");
 
+	boolean appointmentReminderEnabled = pros.isPropertyActive("appointment_reminder_enabled");
+
 	AppointmentStatusMgr apptStatusMgr = new AppointmentStatusMgrImpl();
 	List allStatus = apptStatusMgr.getAllActiveStatus();
 
@@ -157,8 +158,9 @@
 	boolean caisiEnabled = moduleNames != null && org.apache.commons.lang.StringUtils.containsIgnoreCase(moduleNames, "Caisi");
 	boolean locationEnabled = caisiEnabled && (useProgramLocation != null && useProgramLocation.equals("true"));
 %>
-<%@page import="org.oscarehr.common.dao.SiteDao" %>
-<%@page import="org.oscarehr.common.model.Site" %>
+<%@page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ResourceBundle" %>
 <html:html locale="true">
 	<head>
 		<% if (isMobileOptimized)
@@ -693,6 +695,7 @@
 							<%
 								int everyMin = 1;
 								StringBuilder nameSb = new StringBuilder();
+								boolean validEmailAddress = false;
 								if (bFirstDisp)
 								{
 									Calendar startCal = Calendar.getInstance();
@@ -710,6 +713,7 @@
 										nameSb.append(demo.getLastName())
 												.append(",")
 												.append(demo.getFirstName());
+										validEmailAddress = EmailUtilsOld.isValidEmailAddress(demo.getEmail());
 									} else
 									{
 										nameSb.append(appt.getName());
@@ -1055,6 +1059,12 @@
 								   name="buttonprintcard" id="printCardButton"
 								   value="Print Card"
 								   onClick="window.location='appointmentcontrol.jsp?displaymode=PrintCard&appointment_no=<%=appointment_no%>'">
+
+							<% if(appointmentReminderEnabled && validEmailAddress) { %>
+							<input type="submit" id="reminderButton"
+							       onclick="document.forms['EDITAPPT'].displaymode.value='Email Reminder'; onButUpdate();"
+							       value="<bean:message key="appointment.editappointment.btnEmailReminder"/>">
+							<% } %>
 
 						</td>
 						<td align="right" nowrap><input type="button" name="labelprint"
