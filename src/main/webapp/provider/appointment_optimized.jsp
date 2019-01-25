@@ -1674,6 +1674,9 @@ private long getAppointmentRowSpan(
 												String demographic_no = appointment.getDemographicNo().toString();
 												String appointment_no = appointment.getAppointmentNo().toString();
 
+												String demo_alert = "";
+
+
 
 											%>
 
@@ -1831,6 +1834,18 @@ private long getAppointmentRowSpan(
 																${appointmentInfo.appointmentLinkTitle}
 															</oscar:oscarPropertiesCheck>
 														>
+
+															<oscar:oscarPropertiesCheck property="show_demographic_alert_flag" value="true" defaultVal="false">
+																<%
+																	if (!appointmentInfo.getAlert().equals(""))
+																	{
+																%>
+																		<img height="14px" src="../images/icons/071.png" alt="${appointmentInfo.alert}" title="${appointmentInfo.alert}" />
+																<%
+																	}
+																%>
+
+															</oscar:oscarPropertiesCheck>
 
 															<oscar:oscarPropertiesCheck property="show_hc_eligibility" value="true" defaultVal="false">
 																<c:if test="${appointmentInfo.activeMedicalCoverage}">+&nbsp</c:if>
