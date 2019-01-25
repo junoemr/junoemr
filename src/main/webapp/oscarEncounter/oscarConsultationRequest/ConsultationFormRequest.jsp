@@ -82,6 +82,9 @@ if(!authed) {
 <%@page import="oscar.util.StringUtils, java.util.ArrayList"%>
 <%@page import="java.util.Collections" %>
 <%@page import="java.util.List" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.Calendar" %>
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 
 <html:html locale="true">
@@ -664,6 +667,15 @@ function onSelectSpecialist(SelectedSpec)	{
 		form.address.value = ("");
 
 		enableDisableRemoteReferralButton(form, true);
+
+		<%
+		if(props.isPropertyActive("enable_consultation_invoice_link"))
+		{ %>
+			var newLink = jQuery("#invoice_link").attr("data-href");
+			jQuery("#invoice_link").attr("href", newLink);
+		<%
+		} %>
+
 		return;
 	}
 	var selectedService = document.EctConsultationFormRequestForm.service.value;  				// get the service that is selected now
@@ -695,7 +707,14 @@ function onSelectSpecialist(SelectedSpec)	{
 				if (props.isConsultationFaxEnabled())
 				{ %>
 					Oscar.Util.Fax.AddFax(aSpeci.specName, aSpeci.specFax.trim())
-        		<% } %>
+        		<% }
+
+				if(props.isPropertyActive("enable_consultation_invoice_link"))
+				{ %>
+					var newLink = jQuery("#invoice_link").attr("data-href") + "&referral_no_1=" + encodeURIComponent(aSpeci.specRefNo);
+					jQuery("#invoice_link").attr("href", newLink);
+				<%
+				} %>
             	
             	jQuery.getJSON("getProfessionalSpecialist.json", {id: aSpeci.specNbr},
                     function(xml)
@@ -1337,7 +1356,87 @@ var requestIdKey = "<%=signatureRequestId %>";
 				<tr>
 					<td class="Header"
 						style="padding-left: 2px; padding-right: 2px; border-right: 2px solid #003399; text-align: left; font-size: 80%; font-weight: bold; width: 100%;"
-						NOWRAP><%=thisForm.getPatientName()%> <%=thisForm.getPatientSex()%>	<%=thisForm.getPatientAge()%></td>
+						NOWRAP><%=thisForm.getPatientName()%> <%=thisForm.getPatientSex()%>	<%=thisForm.getPatientAge()%>
+					</td> <%
+					if (props.isPropertyActive("enable_consultation_invoice_link"))
+					{
+						String billingType = props.getBillingType();
+						String billingServiceType = URLEncoder.encode(props.getProperty("default_view"));
+
+						String linkProvider = providerNo;
+						String service_date_parameter = "";
+						// set the invoice date to match the consultation referral date (if all date fields exists)
+						if (consultUtil.referalDate != null)
+						{
+							service_date_parameter = consultUtil.referalDate.replace('/', '-');
+						}
+						else
+						{
+							// default todays date
+							GregorianCalendar now = new GregorianCalendar();
+							int apptYear = now.get(Calendar.YEAR);
+							int apptMonth = (now.get(Calendar.MONTH) + 1);
+							int apptDay = now.get(Calendar.DAY_OF_MONTH);
+
+							// format date to yyyy-mm-dd
+							String strYear = "" + apptYear;
+							String strMonth = apptMonth > 9 ? ("" + apptMonth) : ("0" + apptMonth);
+							String strDay = apptDay > 9 ? ("" + apptDay) : ("0" + apptDay);
+
+							service_date_parameter = strYear + "-" + strMonth + "-" + strDay;
+						}
+
+						if (props.isClinicaidBillingType())
+						{
+							String clinicaid_link = "../../billing/billingClinicAid.jsp?demographic_no=" + demographic.getDemographicNo() +
+									"&service_start_date=" + URLEncoder.encode(service_date_parameter, "UTF-8") +
+									"&chart_no=" + demographic.getChartNo() +
+									"&appointment_start_time=0" +
+									"&appointment_provider_no=" + linkProvider +
+									"&billing_action=create_invoice&appointment_no=0";
+						%>
+							<td NOWRAP>
+								<a href="<%=clinicaid_link%>" target="_blank"
+						   			title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>">
+										<bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/>
+								</a>
+							</td>
+					<%
+						}
+						else
+						{
+							String diagnosticCode1 = props.getProperty("auto_populate_billing_bc_diagnostic_codesVal1_consult", "");
+							if (!diagnosticCode1.equals(""))
+							{
+								diagnosticCode1 = "&diag_code_1=" + diagnosticCode1;
+							}
+							String otherCode1 = props.getProperty("auto_populate_billing_bc_other_codesVal1_consult", "");
+							if (!otherCode1.equals(""))
+							{
+								otherCode1 = "&other_code_1=" + otherCode1;
+							}
+							String referralType1 = props.getProperty("auto_populate_billing_bc_billingreferral_type1_consult", "");
+							if (!referralType1.equals(""))
+							{
+								referralType1 = "&referral_type_1=" + referralType1;
+							}
+
+							// should not include referral_no_1 parameter ()
+							String invoice_link = "../../billing.do?billRegion=" + URLEncoder.encode(billingType) + "&billForm=" + billingServiceType
+									+ "&hotclick=&appointment_no=0&demographic_name=" + URLEncoder.encode(demographic.getLastName()) + "%2C"
+									+ URLEncoder.encode(demographic.getFirstName()) + "&demographic_no=" + demographic.getDemographicNo() + "&providerview=1&user_no="
+									+ providerNo + "&apptProvider_no=none&appointment_date=" + service_date_parameter + "&start_time=0:00&bNewForm=1&status=t"
+									+ diagnosticCode1 + otherCode1 + referralType1;
+					%>
+							<td NOWRAP align='right'><a id="invoice_link"
+													href="<%=invoice_link%>"
+													data-href="<%=invoice_link%>" target="_blank"
+													title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message
+								key="demographic.demographiceditdemographic.msgCreateInvoice"/>
+							</a></td>
+						<%
+						}
+					}%>
 				</tr>
 			</table>
 			</td>
