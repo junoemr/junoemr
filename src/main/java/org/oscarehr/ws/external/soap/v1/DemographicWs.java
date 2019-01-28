@@ -86,11 +86,25 @@ public class DemographicWs extends AbstractWs {
 		Demographic demographic=demographicManager.getDemographicByMyOscarUserName(getLoggedInInfo(),myOscarUserName);
 		return(DemographicTransfer.toTransfer(demographic));
 	}
-	
-	public DemographicTransfer[] searchDemographicByName(String searchString, int startIndex, int itemsToReturn)
+
+	public List<DemographicTransfer> searchDemographicByName(String searchString, int startIndex, int itemsToReturn)
 	{
-		List<Demographic> demographics=demographicManager.searchDemographicByName(getLoggedInInfo(),searchString, startIndex, itemsToReturn);
-		return(DemographicTransfer.toTransfers(demographics));
+		List<Demographic> demographics = demographicManager.searchDemographicByName(getLoggedInInfo(), searchString, startIndex, itemsToReturn);
+		List<DemographicTransfer> transferList = new ArrayList<DemographicTransfer>();
+
+		for (Demographic demographic : demographics)
+		{
+			DemographicCust custResult = demographicCustManager.getDemographicCust(demographic.getDemographicNo());
+
+			DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
+			if (custResult != null)
+			{
+				transfer.setNotes(custResult.getParsedNotes());
+			}
+			transferList.add(transfer);
+		}
+
+		return (transferList);
 	}
 	
 	public PhrVerificationTransfer getLatestPhrVerificationByDemographic(Integer demographicId)
