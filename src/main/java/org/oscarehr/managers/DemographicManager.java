@@ -170,6 +170,19 @@ public class DemographicManager {
 		return (result);
 	}
 
+	public List getDemographicsByHealthNum(String hin)
+	{
+		List result = demographicDao.getDemographicsByHealthNum(hin);
+
+		//--- log action ---
+		if (result!=null)
+		{
+			LogAction.addLogEntrySynchronous("DemographicManager.getDemographicsByHealthNum", "List");
+		}
+
+		return(result);
+	}
+
 	public List<Demographic> searchDemographicByName(LoggedInInfo loggedInInfo, String searchString, int startIndex, int itemsToReturn) {
 		checkPrivilege(loggedInInfo, SecurityInfoManager.READ);
 		
@@ -679,24 +692,36 @@ public class DemographicManager {
 		}
 	}
 
-	public void updateDemographicExtras(LoggedInInfo loggedInInfo, Demographic demographic)
+	public void updateDemographicExtras(LoggedInInfo loggedInInfo, Demographic demographic, DemographicTransfer demographicTransfer)
 	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
 
 		DemographicCust demoCust = getDemographicCust(loggedInInfo, demographic.getDemographicNo());
+		demoCust.setParsedNotes(demographicTransfer.getNotes());
 		createUpdateDemographicCust(loggedInInfo, demoCust);
 	}
 
 	// When adding a demographic, entries are required in other tables.  This
 	// method adds those entries.
-	public void addDemographicExtras(LoggedInInfo loggedInInfo, Demographic demographic)
+	public void addDemographicExtras(LoggedInInfo loggedInInfo, Demographic demographic, DemographicTransfer demographicTransfer)
 	{
 		checkPrivilege(loggedInInfo, SecurityInfoManager.WRITE);
 
 		// demographiccust
 		DemographicCust demoCust = new DemographicCust();
 		demoCust.setId(demographic.getDemographicNo());
-		demoCust.setNotes("<unotes></unotes>");
+		demoCust.setAlert("");
+		demoCust.setResident("");
+		demoCust.setMidwife("");
+		demoCust.setNurse("");
+		if (demographicTransfer.getNotes() != null)
+		{
+			demoCust.setParsedNotes(demographicTransfer.getNotes());
+		}
+		else
+		{
+			demoCust.setNotes("<unotes></unotes>");
+		}
 
 		demographicCustDao.persist(demoCust);
 
