@@ -106,7 +106,7 @@ public class SendFaxPDFAction extends DispatchAction {
 						String faxFileName = "DOC-"+ docNo + "-" + filename + "-" + faxNo + "." + System.currentTimeMillis();
 						fileToFax.rename(faxFileName + ".pdf");
 
-						transfer = outgoingFaxService.sendFax(providerNo, demographicId, faxNo, FaxOutbound.FileType.DOCUMENT, fileToFax);
+						transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicId, faxNo, FaxOutbound.FileType.DOCUMENT, fileToFax);
 						if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
 						{
 							errorList.add("Failed to send fax. Check account settings. " +
@@ -172,7 +172,7 @@ public class SendFaxPDFAction extends DispatchAction {
 			{
 				GenericFile fileToFax = FileFactory.getExistingFile(pdfPath);
 				fileToFax.rename("Form-" + formName);
-				transfer = outgoingFaxService.sendFax(providerNo, null, recipients[i], FaxOutbound.FileType.FORM, fileToFax);
+				transfer = outgoingFaxService.queueAndSendFax(providerNo, null, recipients[i], FaxOutbound.FileType.FORM, fileToFax);
 				if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
 				{
 					errorList.add("Failed to send fax. Check account settings. " +

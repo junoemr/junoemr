@@ -73,7 +73,7 @@ public final class FaxAction
 			WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
 
 			GenericFile fileToFax = FileFactory.getExistingFile(tempFile);
-			FaxOutboxTransferOutbound transfer = outgoingFaxService.sendFax(providerId, null, recipient, FaxOutbound.FileType.FORM, fileToFax);
+			FaxOutboxTransferOutbound transfer = outgoingFaxService.queueAndSendFax(providerId, null, recipient, FaxOutbound.FileType.FORM, fileToFax);
 			transferList.add(transfer);
 		}
 		LogAction.addLogEntry(providerId, null, LogConst.ACTION_SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,

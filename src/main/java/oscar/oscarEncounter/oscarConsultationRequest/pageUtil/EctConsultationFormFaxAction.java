@@ -221,7 +221,7 @@ public class EctConsultationFormFaxAction extends Action
 
 					GenericFile fileToFax = FileFactory.copy(fileToCopy);
 					fileToFax.rename(tempName);
-					FaxOutboxTransferOutbound transfer = outgoingFaxService.sendFax(providerNo, Integer.parseInt(demoNo), faxNo, FaxOutbound.FileType.CONSULTATION, fileToFax);
+					FaxOutboxTransferOutbound transfer = outgoingFaxService.queueAndSendFax(providerNo, Integer.parseInt(demoNo), faxNo, FaxOutbound.FileType.CONSULTATION, fileToFax);
 					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
 					{
 						errorList.add("Failed to send fax. Check account settings. " +

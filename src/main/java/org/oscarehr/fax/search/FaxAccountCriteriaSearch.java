@@ -37,6 +37,10 @@ public class FaxAccountCriteriaSearch extends AbstractCriteriaSearch
 
 	private SORTMODE sortMode = SORTMODE.ID;
 
+	private Boolean integrationEnabledStatus = null;
+	private Boolean inboundEnabledStatus = null;
+	private Boolean outboundEnabledStatus = null;
+
 
 	@Override
 	public Criteria setCriteriaProperties(Criteria criteria)
@@ -46,6 +50,22 @@ public class FaxAccountCriteriaSearch extends AbstractCriteriaSearch
 		{
 			criteria.add(Restrictions.eq("id", getId()));
 		}
+
+		if(getIntegrationEnabledStatus() != null)
+		{
+			criteria.add(Restrictions.eq("integrationEnabled", getIntegrationEnabledStatus()));
+		}
+
+		if(getInboundEnabledStatus() != null)
+		{
+			criteria.add(Restrictions.eq("inboundEnabled", getInboundEnabledStatus()));
+		}
+
+		if(getOutboundEnabledStatus() != null)
+		{
+			criteria.add(Restrictions.eq("outboundEnabled", getOutboundEnabledStatus()));
+		}
+
 		setOrderByCriteria(criteria);
 		return criteria;
 	}
@@ -67,6 +87,36 @@ public class FaxAccountCriteriaSearch extends AbstractCriteriaSearch
 	public void setId(Long id)
 	{
 		this.id = id;
+	}
+
+	public Boolean getIntegrationEnabledStatus()
+	{
+		return integrationEnabledStatus;
+	}
+
+	public void setIntegrationEnabledStatus(Boolean integrationEnabledStatus)
+	{
+		this.integrationEnabledStatus = integrationEnabledStatus;
+	}
+
+	public Boolean getInboundEnabledStatus()
+	{
+		return inboundEnabledStatus;
+	}
+
+	public void setInboundEnabledStatus(Boolean inboundEnabledStatus)
+	{
+		this.inboundEnabledStatus = inboundEnabledStatus;
+	}
+
+	public Boolean getOutboundEnabledStatus()
+	{
+		return outboundEnabledStatus;
+	}
+
+	public void setOutboundEnabledStatus(Boolean outboundEnabledStatus)
+	{
+		this.outboundEnabledStatus = outboundEnabledStatus;
 	}
 
 	public SORTMODE getSortMode()

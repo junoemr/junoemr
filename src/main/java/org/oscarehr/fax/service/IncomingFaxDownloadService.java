@@ -23,7 +23,7 @@
 package org.oscarehr.fax.service;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.server.ServerStateHandler;
+import org.oscarehr.fax.FaxStatus;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxApiValidationException;
@@ -33,6 +33,7 @@ import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxInbound;
+import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,11 +67,18 @@ public class IncomingFaxDownloadService
 	@Autowired
 	private IncomingFaxService incomingFaxService;
 
+	@Autowired
+	private FaxStatus faxStatus;
+
 	public void pullNewFaxes()
 	{
-		if(incomingFaxService.isIntegratedFaxEnabled() && ServerStateHandler.isThisServerMaster())
+		if(faxStatus.canPullFaxesAndIsMaster())
 		{
-			List<FaxAccount> faxAccountList = faxAccountDao.findByActiveInbound(true, true);
+			FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();
+			criteriaSearch.setIntegrationEnabledStatus(true);
+			criteriaSearch.setInboundEnabledStatus(true);
+			List<FaxAccount> faxAccountList = faxAccountDao.criteriaSearch(criteriaSearch);
+
 			String startDate = ConversionUtils.toDateString(LocalDate.now().minusDays(faxDaysPast), SRFaxApiConnector.DATE_FORMAT);
 			String endDate = ConversionUtils.toDateString(LocalDate.now(), SRFaxApiConnector.DATE_FORMAT);
 

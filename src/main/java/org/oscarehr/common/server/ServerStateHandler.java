@@ -34,7 +34,6 @@ import org.xbill.DNS.TextParseException;
 import org.xbill.DNS.Type;
 import oscar.OscarProperties;
 
-import javax.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -55,8 +54,6 @@ public class ServerStateHandler
 	private static final OscarProperties props = OscarProperties.getInstance();
 	private static final Logger logger = Logger.getLogger(ServerStateHandler.class);
 
-	private static final String PRODUCTION_SERVER_ENV = "JUNO_PRODUCTION_SERVER";
-
 	private static final String forceMasterDomainOverride = props.getProperty("common.server.master_check.force_master_domain");
 	private static final String domain = props.getProperty("common.server.master_check.domain");
 	private static final String secureDomain = props.getProperty("common.server.master_check.secure_subdomain");
@@ -70,30 +67,15 @@ public class ServerStateHandler
 		dnsServerList = new HashSet<>((dnsServers != null) ? Arrays.asList(dnsServers.split("\\s*,\\s*")) : new ArrayList<>());
 	}
 
-	private static SlaveStatusDao slaveStatusDao;
-
 	@Autowired
-	private SlaveStatusDao _slaveStatusDao;
-
-	/** clever solution to allow autowired dao in static class */
-	@PostConstruct
-	private void initServerStateHandler()
-	{
-		slaveStatusDao = _slaveStatusDao;
-	}
-
-	public static boolean isProductionServer()
-	{
-		String productionEnv = System.getenv(PRODUCTION_SERVER_ENV);
-		return (productionEnv != null && productionEnv.equalsIgnoreCase("true"));
-	}
+	private SlaveStatusDao slaveStatusDao;
 
 	/**
 	 * checks if the server is running in a 'master' state
 	 * @return true if the server is a master server, false if it is not a master
 	 * @throws IllegalStateException if the master/slave status cannot be determined
 	 */
-	public static boolean isThisServerMaster() throws IllegalStateException
+	public boolean isThisServerMaster() throws IllegalStateException
 	{
 		boolean isMaster;
 		try
@@ -128,7 +110,7 @@ public class ServerStateHandler
 		return isMaster;
 	}
 
-	private static boolean actingAsMaster()
+	private boolean actingAsMaster()
 	{
 		boolean isSlave = slaveStatusDao.inSlaveMode();
 		logger.debug("Slave check: " + isSlave);

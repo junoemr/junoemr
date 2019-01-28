@@ -51,10 +51,13 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 	private static Logger logger = Logger.getLogger(FaxOutboundWebService.class);
 
 	@Autowired
-	SecurityInfoManager securityInfoManager;
+	private SecurityInfoManager securityInfoManager;
 
 	@Autowired
-	OutgoingFaxService outgoingFaxService;
+	private OutgoingFaxService outgoingFaxService;
+
+	@Autowired
+	private OutboundFaxSchedulingTask outboundFaxSchedulingTask;
 
 	@PUT
 	@Path("/{id}/resend")
@@ -75,7 +78,7 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin", "_admin.fax");
 
-		return RestResponse.successResponse(OutboundFaxSchedulingTask.getNextRunTime());
+		return RestResponse.successResponse(outboundFaxSchedulingTask.getNextRunTime());
 	}
 
 	/** retrieve the associated pdf based on outgoing fax record id */

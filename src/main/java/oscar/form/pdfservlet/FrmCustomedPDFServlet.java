@@ -100,7 +100,7 @@ public class FrmCustomedPDFServlet extends HttpServlet
 					String pdfFile = "prescription_" + pdfId + ".pdf";
 					GenericFile fileToFax = FileFactory.createTempFile(baosPDF, ".pdf");
 					fileToFax.rename(pdfFile);
-					FaxOutboxTransferOutbound transfer = outgoingFaxService.sendFax(providerNo, demographicNo, recipient, FaxOutbound.FileType.PRESCRIPTION, fileToFax);
+					FaxOutboxTransferOutbound transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicNo, recipient, FaxOutbound.FileType.PRESCRIPTION, fileToFax);
 					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
 					{
 						faxMessage = StringEscapeUtils.escapeHtml4("Failed to send fax. Check account settings. " +

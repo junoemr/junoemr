@@ -34,6 +34,7 @@ import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxInbound;
 import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
@@ -93,7 +94,13 @@ public class FaxAccountService
 	public FaxAccount getDefaultFaxAccount()
 	{
 		//TODO provider specific logic etc?
-		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveOutbound(true, true);
+		FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();
+		criteriaSearch.setIntegrationEnabledStatus(true);
+		criteriaSearch.setOutboundEnabledStatus(true);
+		criteriaSearch.setLimit(1);
+		criteriaSearch.setSortDirAscending();
+		List<FaxAccount> faxAccountList = faxAccountDao.criteriaSearch(criteriaSearch);
+
 		return faxAccountList.isEmpty() ? null : faxAccountList.get(0);
 	}
 

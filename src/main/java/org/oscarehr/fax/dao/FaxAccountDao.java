@@ -27,50 +27,11 @@ import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.fax.model.FaxAccount;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.Query;
-import java.util.List;
-
 @Repository
 public class FaxAccountDao extends AbstractDao<FaxAccount>
 {
 	public FaxAccountDao()
 	{
 		super(FaxAccount.class);
-	}
-
-	public List<FaxAccount> findByActiveStatus(boolean enabled, int offset, int limit)
-	{
-		Query query = entityManager.createQuery("SELECT config FROM FaxAccount config WHERE config.integrationEnabled = :enabled");
-		query.setParameter("enabled", enabled);
-		query.setMaxResults(limit);
-		query.setFirstResult(offset);
-
-		return query.getResultList();
-	}
-
-	public List<FaxAccount> findByActiveInbound(boolean enabled, boolean activeInbound)
-	{
-		Query query = entityManager.createQuery(
-				"SELECT config FROM FaxAccount config " +
-				"WHERE config.integrationEnabled = :enabled " +
-				"AND config.inboundEnabled = :activeInbound"
-		);
-		query.setParameter("enabled", enabled);
-		query.setParameter("activeInbound", activeInbound);
-
-		return query.getResultList();
-	}
-
-	public List<FaxAccount> findByActiveOutbound(boolean enabled, boolean activeOutbound)
-	{
-		Query query = entityManager.createQuery(
-				"SELECT config FROM FaxAccount config " +
-						"WHERE config.integrationEnabled = :enabled " +
-						"AND config.outboundEnabled = :activeOutbound"
-		);
-		query.setParameter("enabled", enabled);
-		query.setParameter("activeOutbound", activeOutbound);
-
-		return query.getResultList();
 	}
 }

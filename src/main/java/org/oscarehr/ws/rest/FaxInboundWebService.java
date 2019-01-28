@@ -22,9 +22,7 @@
  */
 package org.oscarehr.ws.rest;
 
-import org.apache.log4j.Logger;
 import org.oscarehr.fax.schedulingTasks.InboundFaxSchedulingTask;
-import org.oscarehr.fax.service.IncomingFaxDownloadService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,13 +38,11 @@ import java.time.LocalDateTime;
 @Component("FaxInboundWebService")
 public class FaxInboundWebService extends AbstractServiceImpl
 {
-	private static Logger logger = Logger.getLogger(FaxInboundWebService.class);
+	@Autowired
+	private SecurityInfoManager securityInfoManager;
 
 	@Autowired
-	SecurityInfoManager securityInfoManager;
-
-	@Autowired
-	IncomingFaxDownloadService incomingFaxDownloadService;
+	private InboundFaxSchedulingTask inboundFaxSchedulingTask;
 
 	@GET
 	@Path("/getNextPullTime")
@@ -56,7 +52,7 @@ public class FaxInboundWebService extends AbstractServiceImpl
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin", "_admin.fax");
 
-		return RestResponse.successResponse(InboundFaxSchedulingTask.getNextRunTime());
+		return RestResponse.successResponse(inboundFaxSchedulingTask.getNextRunTime());
 	}
 
 }

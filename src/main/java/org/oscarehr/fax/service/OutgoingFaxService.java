@@ -28,8 +28,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.common.server.ServerStateHandler;
-import org.oscarehr.fax.dao.FaxAccountDao;
+import org.oscarehr.fax.FaxStatus;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxApiValidationException;
@@ -39,7 +38,6 @@ import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxOutbound;
-import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
@@ -77,23 +75,14 @@ public class OutgoingFaxService
 	private FaxOutboundDao faxOutboundDao;
 
 	@Autowired
-	private FaxAccountDao faxAccountDao;
-
-	@Autowired
 	private FaxAccountService faxAccountService;
 
 	@Autowired
-	private SystemPreferenceService systemPreferenceService;
+	private FaxStatus faxStatus;
 
 	public boolean isOutboundFaxEnabled()
 	{
-		return (isIntegratedFaxEnabled() || isLegacyFaxEnabled());
-	}
-	public boolean isIntegratedFaxEnabled()
-	{
-		Boolean masterSettingEnabled = systemPreferenceService.isPreferenceEnabled(FaxAccount.PROP_MASTER_FAX_ENABLED_OUTBOUND, false);
-		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveOutbound(true, true);
-		return masterSettingEnabled && !faxAccountList.isEmpty();
+		return (faxStatus.canSendFaxes() || isLegacyFaxEnabled());
 	}
 	protected boolean isLegacyFaxEnabled()
 	{
@@ -124,25 +113,21 @@ public class OutgoingFaxService
 	 * Send a fax with the default fax account
 	 * @throws IOException
 	 */
-	public FaxOutboxTransferOutbound sendFax(String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
+	public FaxOutboxTransferOutbound queueAndSendFax(String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
 	{
 		FaxAccount faxAccount = faxAccountService.getDefaultFaxAccount();
-		return sendFax(faxAccount, providerId, demographicId, faxNumber, fileType, fileToFax);
+		return queueAndSendFax(faxAccount, providerId, demographicId, faxNumber, fileType, fileToFax);
 	}
 
 	/**
 	 * Send a fax with the given fax account
 	 * @throws IOException
 	 */
-	public FaxOutboxTransferOutbound sendFax(FaxAccount faxAccount, String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
+	public FaxOutboxTransferOutbound queueAndSendFax(FaxAccount faxAccount, String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
 	{
-		if(!ServerStateHandler.isThisServerMaster())
-		{
-			throw new IllegalStateException("Faxes must be sent from a master server");
-		}
 		FaxOutboxTransferOutbound transfer;
 		// check for enabled fax routes
-		if(isIntegratedFaxEnabled())
+		if(faxStatus.canSendFaxesAndIsMaster())
 		{
 			FaxOutbound faxOutbound = queueNewFax(providerId, demographicId, faxAccount, faxNumber, fileType, fileToFax);
 			sendQueuedFax(faxOutbound, fileToFax);
@@ -174,9 +159,9 @@ public class OutgoingFaxService
 	 */
 	public FaxOutboxTransferOutbound resendFax(Long faxOutId) throws IOException
 	{
-		if(!ServerStateHandler.isThisServerMaster())
+		if(!faxStatus.canSendFaxesAndIsMaster())
 		{
-			throw new IllegalStateException("Faxes must be sent from a master server");
+			throw new IllegalStateException("Invalid state for sending faxes.");
 		}
 
 		FaxOutbound faxOutbound = faxOutboundDao.find(faxOutId);
@@ -210,7 +195,7 @@ public class OutgoingFaxService
 		List<FaxOutbound> queuedFaxList = faxOutboundDao.findActiveQueued();
 
 		// only send faxes from a master server
-		if(!queuedFaxList.isEmpty() && ServerStateHandler.isThisServerMaster())
+		if(!queuedFaxList.isEmpty() && faxStatus.canSendFaxesAndIsMaster())
 		{
 			for(FaxOutbound queuedFax : queuedFaxList)
 			{
@@ -380,6 +365,7 @@ public class OutgoingFaxService
 		}
 		finally
 		{
+			// status changes must be saved
 			faxOutboundDao.merge(faxOutbound);
 			LogAction.addLogEntry(faxOutbound.getProviderNo(), faxOutbound.getDemographicNo(), LogConst.ACTION_SENT, LogConst.CON_FAX,
 					logStatus, String.valueOf(faxOutbound.getId()), null, logData);

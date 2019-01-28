@@ -23,17 +23,13 @@
 package org.oscarehr.fax.service;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
-import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.externalApi.srfax.result.GetFaxInboxResult;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxInbound;
-import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.provider.model.ProviderData;
-import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -43,7 +39,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import java.util.List;
 
 /**
  * This service should be responsible for handling all transactional logic around receiving faxes
@@ -52,26 +47,11 @@ import java.util.List;
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class IncomingFaxService
 {
-	private static final Logger logger = MiscUtils.getLogger();
-
 	@Autowired
 	private FaxInboundDao faxInboundDao;
 
 	@Autowired
-	private FaxAccountDao faxAccountDao;
-
-	@Autowired
 	private DocumentService documentService;
-
-	@Autowired
-	private SystemPreferenceService systemPreferenceService;
-
-	public boolean isIntegratedFaxEnabled()
-	{
-		Boolean masterSettingEnabled = systemPreferenceService.isPreferenceEnabled(FaxAccount.PROP_MASTER_FAX_ENABLED_INBOUND, false);
-		List<FaxAccount> faxAccountList = faxAccountDao.findByActiveInbound(true, true);
-		return masterSettingEnabled && !faxAccountList.isEmpty();
-	}
 
 	public FaxInbound saveFaxDocument(final FaxAccount faxAccount, final GetFaxInboxResult inboxMeta, String result) throws IOException, InterruptedException
 	{

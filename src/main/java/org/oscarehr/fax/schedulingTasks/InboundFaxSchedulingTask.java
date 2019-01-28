@@ -23,7 +23,7 @@
 package org.oscarehr.fax.schedulingTasks;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.server.ServerStateHandler;
+import org.oscarehr.fax.FaxStatus;
 import org.oscarehr.fax.service.IncomingFaxDownloadService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +51,9 @@ public class InboundFaxSchedulingTask
 	@Autowired
 	private IncomingFaxDownloadService incomingFaxDownloadService;
 
+	@Autowired
+	private FaxStatus faxStatus;
+
 	@PostConstruct
 	public void init()
 	{
@@ -60,36 +63,31 @@ public class InboundFaxSchedulingTask
 	@Scheduled(cron = cronSchedule)
 	public void retrieveInboundFaxes()
 	{
-		if(canRun())
+		try
 		{
-			try
+			if(enabled)
 			{
 				logger.info("Execute Inbound scheduling task! " + ConversionUtils.toDateTimeString(LocalDateTime.now()));
 				incomingFaxDownloadService.pullNewFaxes();
 				logger.info("Completed at " + ConversionUtils.toDateTimeString(LocalDateTime.now()) + ". Next Execution Time: " + getNextRunTime());
 			}
-			catch(IllegalStateException e)
-			{
-				logger.warn(e.getMessage());
-			}
-			catch(Exception e)
-			{
-				logger.error("Unexpected scheduling task error", e);
-			}
+		}
+		catch(IllegalStateException e)
+		{
+			logger.warn(e.getMessage());
+		}
+		catch(Exception e)
+		{
+			logger.error("Unexpected scheduling task error", e);
 		}
 	}
 
-	public static LocalDateTime getNextRunTime()
+	public LocalDateTime getNextRunTime()
 	{
-		if(canRun())
+		if(enabled && faxStatus.canPullFaxes())
 		{
 			return ConversionUtils.toLocalDateTime(cronTrigger.next(new Date()));
 		}
 		return null;
-	}
-
-	private static boolean canRun()
-	{
-		return enabled && ServerStateHandler.isProductionServer();
 	}
 }
