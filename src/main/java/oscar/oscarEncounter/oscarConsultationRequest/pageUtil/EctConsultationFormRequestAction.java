@@ -387,7 +387,7 @@ public class EctConsultationFormRequestAction extends Action {
 	    Clinic clinic=clinicDAO.getClinic();
 	    
 	    // set status now so the remote version shows this status
-	    consultationRequest.setStatus("2");
+	    consultationRequest.setStatus(ConsultationRequest.STATUS_PEND_SPECIAL);
 
 	    REF_I12 refI12=RefI12.makeRefI12(clinic, consultationRequest);
 	    SendingUtils.send(loggedInInfo, refI12, professionalSpecialist);

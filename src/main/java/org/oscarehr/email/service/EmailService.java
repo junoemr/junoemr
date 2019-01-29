@@ -22,7 +22,6 @@
  */
 package org.oscarehr.email.service;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.mail.EmailException;
 import org.apache.log4j.Logger;
 import org.apache.velocity.VelocityContext;
@@ -35,6 +34,7 @@ import org.oscarehr.common.model.ConsultationServices;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.email.EmailTemplateConfig;
 import org.oscarehr.email.dao.EmailLogDao;
 import org.oscarehr.email.model.EmailLog;
 import org.oscarehr.provider.dao.ProviderDataDao;
@@ -48,12 +48,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Calendar;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -80,244 +74,256 @@ public class EmailService
 	@Autowired
 	private EmailLogDao emailLogDao;
 
-	public void sendConsultationTemplateEmail(String consultRequestId, String template, String loggedInProviderNo) throws IOException, EmailException
+	public boolean sendConsultationTemplateEmail(String consultRequestId, boolean useDetailsTemplate, String loggedInProviderNo)
 	{
+		boolean emailSuccess = false;
 		EmailLog logEntry = new EmailLog();
-		if (consultRequestId == null)
+
+		try
 		{
-			throw new IllegalArgumentException("Unable to find consultation request ID");
-		}
-		boolean useDetailsTemplate = ("details").equals(template);
+			EmailTemplateConfig templateConfig = new EmailTemplateConfig();
 
-		ConsultationRequest consultRequest = consultationRequestDao.find(Integer.parseInt(consultRequestId));
-		Demographic demo = demographicDao.find(consultRequest.getDemographicId());
-		ProfessionalSpecialist specialist = consultRequest.getProfessionalSpecialist();
-		ConsultationServices service = consultationServiceDao.find(consultRequest.getServiceId());
+			ConsultationRequest consultRequest = consultationRequestDao.find(Integer.parseInt(consultRequestId));
+			ProfessionalSpecialist specialist = consultRequest.getProfessionalSpecialist();
+			ConsultationServices service = consultationServiceDao.find(consultRequest.getServiceId());
 
-		String emailAddress = demo.getEmail();
-		String fullName = demo.getFormattedName();
+			// load required demographic info
+			Demographic demo = demographicDao.find(consultRequest.getDemographicId());
+			templateConfig.setToEmail(demo.getEmail());
+			templateConfig.setToName(demo.getFormattedName());
 
-		if (emailAddress == null || emailAddress.trim().equals(""))
-		{
-			throw new IllegalArgumentException("No email address found.");
-		}
+			// prepare log entry values
+			logEntry.setLoggedInProviderNo(loggedInProviderNo);
+			logEntry.setReferralDoctorId(specialist != null ? specialist.getId() : null);
+			logEntry.setReferringProviderNo(consultRequest.getProviderNo());
+			logEntry.setDemographicNo(demo.getDemographicId());
+			logEntry.setEmailAddress(templateConfig.getToEmail());
 
-		if (!EmailUtilsOld.isValidEmailAddress(emailAddress))
-		{
-			throw new IllegalArgumentException("Email Address '" + emailAddress + "' is invalid");
-		}
+			// determine which template to use
+			String templateFileNameProp = useDetailsTemplate ?
+					"email.consult_request_details_template" : "email.consult_request_notification_template";
 
-		OscarProperties props = OscarProperties.getInstance();
+			// configure velocity context for template value replacements
+			VelocityContext velocityContext = VelocityUtils.createVelocityContextWithTools();
+			velocityContext.put("demographic", demo);
+			velocityContext.put("specialist", specialist);
+			velocityContext.put("service", service);
 
-		String fromEmail = props.getProperty("appointment_reminder_from_email_address");
-		String fromName = props.getProperty("appointment_reminder_from_name");
-		String subject = props.getProperty("appointment_reminder_subject");
-		String dateFormat = props.getProperty("appointment_reminder_appt_date_format_java");
-
-		if (fromEmail == null || fromName == null || subject == null || dateFormat == null)
-		{
-			throw new IllegalArgumentException("Application is misconfigured to send email.");
-		}
-
-		String templateFolder = props.getProperty("template_file_location");
-
-		if (!(("notification").equals(template) || ("details").equals(template)))
-		{
-			throw new IllegalArgumentException("Unable to find requested email template.");
-		}
-
-		String templateFileName = useDetailsTemplate ?
-				"email.consult_request_details_template" : "email.consult_request_notification_template";
-
-		String templateTxt = props.getProperty(String.format("%s.txt", templateFileName));
-		String templateHtml = props.getProperty(String.format("%s.html", templateFileName));
-		if (templateFolder == null || (templateTxt == null && templateHtml == null))
-		{
-			throw new IllegalArgumentException("Application email templates misconfigured.");
-		}
-
-		VelocityContext velocityContext = VelocityUtils.createVelocityContextWithTools();
-		velocityContext.put("demographic", demo);
-		velocityContext.put("specialist", specialist);
-		velocityContext.put("service", service);
-
-		if (useDetailsTemplate)
-		{
-			Calendar apptTime = Calendar.getInstance();
-			apptTime.setTime(consultRequest.getAppointmentTime());
-
-			Calendar apptDate = Calendar.getInstance();
-			apptDate.setTime(consultRequest.getAppointmentDate());
-			apptDate.set(Calendar.HOUR_OF_DAY, apptTime.get(Calendar.HOUR_OF_DAY));
-			apptDate.set(Calendar.MINUTE, apptTime.get(Calendar.MINUTE));
-
-			String formattedApptDate = ConversionUtils.toDateString(apptDate.getTime(), dateFormat);
-
-			String specialistFullName = "Dr. " + specialist.getFirstName() + " " + specialist.getLastName();
-			if (specialist.getProfessionalLetters() != null && specialist.getProfessionalLetters().length() > 0)
+			if (useDetailsTemplate)
 			{
-				specialistFullName += " " + specialist.getProfessionalLetters();
-			}
+				String formattedApptDate = ConversionUtils.toDateString(consultRequest.getAppointmentDateTime(), templateConfig.getDateFormat());
 
-			velocityContext.put("appointmentDateTime", formattedApptDate);
-			velocityContext.put("consultRequest", consultRequest);
-			velocityContext.put("specialistFullName", specialistFullName);
-		}
-		else
-		{
-			ProviderData providerData = providerDao.find(consultRequest.getProviderNo());
-			velocityContext.put("referringDoctorName", providerData.getLastName());
-		}
+				String specialistFullName = "Dr. " + specialist.getFirstName() + " " + specialist.getLastName();
+				if (specialist.getProfessionalLetters() != null && specialist.getProfessionalLetters().length() > 0)
+				{
+					specialistFullName += " " + specialist.getProfessionalLetters();
+				}
 
-		String emailBodyTxt = null;
-		String emailBodyHtml = null;
-		if (templateTxt != null)
-		{
-			File templateFile = new File(templateFolder, templateTxt);
-			if (templateFile.exists() && templateFile.isFile())
-			{
-				InputStream templateInputStream = new FileInputStream(templateFile);
-				String emailTemplate = IOUtils.toString(templateInputStream);
-				emailBodyTxt = VelocityUtils.velocityEvaluate(velocityContext, emailTemplate);
-				templateInputStream.close();
+				velocityContext.put("appointmentDateTime", formattedApptDate);
+				velocityContext.put("consultRequest", consultRequest);
+				velocityContext.put("specialistFullName", specialistFullName);
 			}
 			else
 			{
-				logger.warn("Missing template file: " + templateFile.getPath());
+				ProviderData providerData = providerDao.find(consultRequest.getProviderNo());
+				velocityContext.put("referringDoctorName", providerData.getLastName());
 			}
-		}
-		if (templateHtml != null)
-		{
-			File templateFile = new File(templateFolder, templateHtml);
-			if (templateFile.exists() && templateFile.isFile())
+
+			templateConfig.setVelocityContext(velocityContext);
+			templateConfig.setTemplateNameTxt(props.getProperty(String.format("%s.txt", templateFileNameProp)));
+			templateConfig.setTemplateNameHtml(props.getProperty(String.format("%s.html", templateFileNameProp)));
+
+			logEntry.setEmailContent((templateConfig.getEmailBodyHtml() != null)? templateConfig.getEmailBodyHtml() : templateConfig.getEmailBodyTxt());
+
+			// send the email
+			sendTemplateEmail(templateConfig);
+			emailSuccess = true;
+
+			// update the consultation request info
+			if (useDetailsTemplate)
 			{
-				InputStream templateInputStream = new FileInputStream(templateFile);
-				String emailTemplate = IOUtils.toString(templateInputStream);
-				emailBodyHtml = VelocityUtils.velocityEvaluate(velocityContext, emailTemplate);
-				templateInputStream.close();
+				consultRequest.setStatus(ConsultationRequest.STATUS_COMPLETE);
 			}
-			else
-			{
-				logger.warn("Missing template file: " + templateFile.getPath());
-			}
+			consultRequest.setNotificationSent(true);
+			consultationRequestDao.merge(consultRequest);
 		}
-
-		logEntry.setLoggedInProviderNo(loggedInProviderNo);
-		logEntry.setReferralDoctorId(specialist != null ? specialist.getId() : null);
-		logEntry.setReferringProviderNo(consultRequest.getProviderNo());
-		logEntry.setDemographicNo(demo.getDemographicId());
-		logEntry.setEmailAddress(emailAddress);
-		logEntry.setEmailContent(emailBodyHtml != null ? emailBodyHtml : emailBodyTxt);
-
-		// don't send blank emails
-		if (!(emailBodyTxt == null && emailBodyHtml == null))
+		catch(Exception e)
 		{
-			EmailUtilsOld.sendEmail(emailAddress, fullName, fromEmail, fromName, subject, emailBodyTxt, emailBodyHtml);
-			boolean sentEmail = true;
+			logger.error("Email Consultation template error", e);
 		}
-		else
-		{
-			logger.error("Email failed to send: no available templates");
-		}
-
-		logEntry.setEmailSuccess(true);
+		logEntry.setEmailSuccess(emailSuccess);
 		emailLogDao.persist(logEntry);
+		return emailSuccess;
 	}
 
-	public void sendAppointmentTemplateEmail(String appointmentNo) throws IOException, EmailException
+	public boolean sendAppointmentTemplateEmail(String appointmentNo, String loggedInProviderNo)
 	{
-		Appointment appt = appointmentDao.find(Integer.parseInt(appointmentNo));
-		Demographic demo = demographicDao.find(appt.getDemographicNo());
-		ProviderData provider = providerDao.find(appt.getProviderNo());
+		boolean emailSuccess = false;
+		EmailLog logEntry = new EmailLog();
 
-		String emailAddress = demo.getEmail();
-		String fullName = demo.getFormattedName();
-
-		if (emailAddress == null || emailAddress.trim().equals(""))
+		try
 		{
-			throw new IllegalArgumentException("No email address found.");
-		}
+			EmailTemplateConfig templateConfig = new EmailTemplateConfig();
 
-		if (!EmailUtilsOld.isValidEmailAddress(emailAddress))
+			Appointment appt = appointmentDao.find(Integer.parseInt(appointmentNo));
+			ProviderData provider = providerDao.find(appt.getProviderNo());
+
+			// load required demographic info
+			Demographic demo = demographicDao.find(appt.getDemographicNo());
+			templateConfig.setToEmail(demo.getEmail());
+			templateConfig.setToName(demo.getFormattedName());
+
+			// prepare log entry values
+			logEntry.setLoggedInProviderNo(loggedInProviderNo);
+			logEntry.setDemographicNo(demo.getDemographicId());
+			logEntry.setEmailAddress(templateConfig.getToEmail());
+
+			// configure velocity context
+			String formattedApptDate = ConversionUtils.toDateString(appt.getStartTimeAsFullDate(), templateConfig.getDateFormat());
+
+			VelocityContext velocityContext = VelocityUtils.createVelocityContextWithTools();
+			velocityContext.put("appointmentDateTime", formattedApptDate);
+			velocityContext.put("demographic", demo);
+			velocityContext.put("provider", provider);
+			templateConfig.setVelocityContext(velocityContext);
+
+			templateConfig.setTemplateNameTxt(props.getProperty("email.appointment_details_template.txt"));
+			templateConfig.setTemplateNameHtml(props.getProperty("email.appointment_details_template.html"));
+
+			logEntry.setEmailContent((templateConfig.getEmailBodyHtml() != null)? templateConfig.getEmailBodyHtml() : templateConfig.getEmailBodyTxt());
+
+			// send the email
+			sendTemplateEmail(templateConfig);
+			emailSuccess = true;
+		}
+		catch(Exception e)
 		{
-			throw new IllegalArgumentException("Email Address '" + emailAddress + "' is invalid");
+			logger.error("Email Appointment template error", e);
 		}
+		logEntry.setEmailSuccess(emailSuccess);
+		emailLogDao.persist(logEntry);
+		return emailSuccess;
+	}
 
-		String fromEmail = props.getProperty("appointment_reminder_from_email_address");
-		String fromName = props.getProperty("appointment_reminder_from_name");
-		String subject = props.getProperty("appointment_reminder_subject");
-		String dateFormat = props.getProperty("appointment_reminder_appt_date_format_java");
+//	public void sendAppointmentTemplateEmail(String appointmentNo) throws IOException, EmailException
+//	{
+//		Appointment appt = appointmentDao.find(Integer.parseInt(appointmentNo));
+//		Demographic demo = demographicDao.find(appt.getDemographicNo());
+//		ProviderData provider = providerDao.find(appt.getProviderNo());
+//
+//		String emailAddress = demo.getEmail();
+//		String fullName = demo.getFormattedName();
+//
+//		if (emailAddress == null || emailAddress.trim().equals(""))
+//		{
+//			throw new IllegalArgumentException("No email address found.");
+//		}
+//
+//		if (!EmailUtilsOld.isValidEmailAddress(emailAddress))
+//		{
+//			throw new IllegalArgumentException("Email Address '" + emailAddress + "' is invalid");
+//		}
+//
+//		String fromEmail = props.getProperty("appointment_reminder_from_email_address");
+//		String fromName = props.getProperty("appointment_reminder_from_name");
+//		String subject = props.getProperty("appointment_reminder_subject");
+//		String dateFormat = props.getProperty("appointment_reminder_appt_date_format_java");
+//
+//		if (fromEmail == null || fromName == null || subject == null || dateFormat == null)
+//		{
+//			throw new IllegalArgumentException("Application is misconfigured to send email.");
+//		}
+//
+//		String templateFolder = props.getProperty("template_file_location");
+//		String detailsTemplateTxt = props.getProperty("email.appointment_details_template.txt");
+//		String detailsTemplateHtml = props.getProperty("email.appointment_details_template.html");
+//		if (templateFolder == null || (detailsTemplateTxt == null && detailsTemplateHtml == null))
+//		{
+//			throw new IllegalArgumentException("Application email templates misconfigured.");
+//		}
+//
+//		Calendar apptTime = Calendar.getInstance();
+//		apptTime.setTime(appt.getStartTime());
+//
+//		Calendar apptDate = Calendar.getInstance();
+//		apptDate.setTime(appt.getAppointmentDate());
+//		apptDate.set(Calendar.HOUR_OF_DAY, apptTime.get(Calendar.HOUR_OF_DAY));
+//		apptDate.set(Calendar.MINUTE, apptTime.get(Calendar.MINUTE));
+//
+//		String formattedApptDate = ConversionUtils.toDateString(apptDate.getTime(), dateFormat);
+//
+//		VelocityContext velocityContext = VelocityUtils.createVelocityContextWithTools();
+//		velocityContext.put("appointmentDateTime", formattedApptDate);
+//		velocityContext.put("demographic", demo);
+//		velocityContext.put("provider", provider);
+//
+//		String emailBodyTxt = null;
+//		String emailBodyHtml = null;
+//		if (detailsTemplateTxt != null)
+//		{
+//			File templateFile = new File(templateFolder, detailsTemplateTxt);
+//			if (templateFile.exists() && templateFile.isFile())
+//			{
+//				InputStream templateInputStream = new FileInputStream(templateFile);
+//				String emailTemplate = IOUtils.toString(templateInputStream);
+//				emailBodyTxt = VelocityUtils.velocityEvaluate(velocityContext, emailTemplate);
+//				templateInputStream.close();
+//			}
+//			else
+//			{
+//				logger.warn("Missing template file: " + templateFile.getPath());
+//			}
+//		}
+//		if (detailsTemplateHtml != null)
+//		{
+//			File templateFile = new File(templateFolder, detailsTemplateHtml);
+//			if (templateFile.exists() && templateFile.isFile())
+//			{
+//				InputStream templateInputStream = new FileInputStream(templateFile);
+//				String emailTemplate = IOUtils.toString(templateInputStream);
+//				emailBodyHtml = VelocityUtils.velocityEvaluate(velocityContext, emailTemplate);
+//				templateInputStream.close();
+//			}
+//			else
+//			{
+//				logger.warn("Missing template file: " + templateFile.getPath());
+//			}
+//		}
+//		// don't send blank emails
+//		if (!(emailBodyTxt == null && emailBodyHtml == null))
+//		{
+//			EmailUtilsOld.sendEmail(emailAddress, fullName, fromEmail, fromName, subject, emailBodyTxt, emailBodyHtml);
+//			logger.info("APPOINTMENT REMINDER EMAIL SUCCESSFULLY SENT TO " + emailAddress + " FOR APPOINTMENT #: " + appointmentNo);
+//		}
+//		else {
+//			logger.error("Email failed to send: no available templates");
+//			throw new RuntimeException("Email failed to send: no available templates");
+//		}
+//	}
 
-		if (fromEmail == null || fromName == null || subject == null || dateFormat == null)
+	private void sendTemplateEmail(EmailTemplateConfig templateConfig) throws EmailException
+	{
+		if(templateConfig.isEmailConfigured())
+		{
+			if(templateConfig.isEmailBodyConfigured())
+			{
+				EmailUtilsOld.sendEmail(
+						templateConfig.getToEmail(),
+						templateConfig.getToName(),
+						templateConfig.getFromEmail(),
+						templateConfig.getFromName(),
+						templateConfig.getSubject(),
+						templateConfig.getEmailBodyTxt(),
+						templateConfig.getEmailBodyHtml());
+			}
+			else
+			{
+				throw new IllegalStateException("Missing or invalid email body");
+			}
+		}
+		else
 		{
 			throw new IllegalArgumentException("Application is misconfigured to send email.");
-		}
-
-		String templateFolder = props.getProperty("template_file_location");
-		String detailsTemplateTxt = props.getProperty("email.appointment_details_template.txt");
-		String detailsTemplateHtml = props.getProperty("email.appointment_details_template.html");
-		if (templateFolder == null || (detailsTemplateTxt == null && detailsTemplateHtml == null))
-		{
-			throw new IllegalArgumentException("Application email templates misconfigured.");
-		}
-
-		Calendar apptTime = Calendar.getInstance();
-		apptTime.setTime(appt.getStartTime());
-
-		Calendar apptDate = Calendar.getInstance();
-		apptDate.setTime(appt.getAppointmentDate());
-		apptDate.set(Calendar.HOUR_OF_DAY, apptTime.get(Calendar.HOUR_OF_DAY));
-		apptDate.set(Calendar.MINUTE, apptTime.get(Calendar.MINUTE));
-
-		String formattedApptDate = ConversionUtils.toDateString(apptDate.getTime(), dateFormat);
-
-		VelocityContext velocityContext = VelocityUtils.createVelocityContextWithTools();
-		velocityContext.put("appointmentDateTime", formattedApptDate);
-		velocityContext.put("demographic", demo);
-		velocityContext.put("provider", provider);
-
-		String emailBodyTxt = null;
-		String emailBodyHtml = null;
-		if (detailsTemplateTxt != null)
-		{
-			File templateFile = new File(templateFolder, detailsTemplateTxt);
-			if (templateFile.exists() && templateFile.isFile())
-			{
-				InputStream templateInputStream = new FileInputStream(templateFile);
-				String emailTemplate = IOUtils.toString(templateInputStream);
-				emailBodyTxt = VelocityUtils.velocityEvaluate(velocityContext, emailTemplate);
-				templateInputStream.close();
-			}
-			else
-			{
-				logger.warn("Missing template file: " + templateFile.getPath());
-			}
-		}
-		if (detailsTemplateHtml != null)
-		{
-			File templateFile = new File(templateFolder, detailsTemplateHtml);
-			if (templateFile.exists() && templateFile.isFile())
-			{
-				InputStream templateInputStream = new FileInputStream(templateFile);
-				String emailTemplate = IOUtils.toString(templateInputStream);
-				emailBodyHtml = VelocityUtils.velocityEvaluate(velocityContext, emailTemplate);
-				templateInputStream.close();
-			}
-			else
-			{
-				logger.warn("Missing template file: " + templateFile.getPath());
-			}
-		}
-		// don't send blank emails
-		if (!(emailBodyTxt == null && emailBodyHtml == null))
-		{
-			EmailUtilsOld.sendEmail(emailAddress, fullName, fromEmail, fromName, subject, emailBodyTxt, emailBodyHtml);
-			boolean sentEmail = true;
-			logger.info("APPOINTMENT REMINDER EMAIL SUCCESSFULLY SENT TO " + emailAddress + " FOR APPOINTMENT #: " + appointmentNo);
-		}
-		else {
-			logger.error("Email failed to send: no available templates");
-			throw new RuntimeException("Email failed to send: no available templates");
 		}
 	}
 }

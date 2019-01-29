@@ -27,15 +27,11 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ include file="/common/webAppContextAndSuperMgr.jsp" %>
-<%@page import="org.oscarehr.common.dao.ConsultationRequestDao" %>
-<%@page import="org.oscarehr.common.model.ConsultationRequest" %>
 <%@page import="org.oscarehr.email.service.EmailService" %>
 <%@page import="org.oscarehr.util.LoggedInInfo" %>
-<%@page import="org.oscarehr.util.MiscUtils" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 
 <%
-	ConsultationRequestDao consultationRequestDao = (ConsultationRequestDao) SpringUtils.getBean("consultationRequestDao");
 	EmailService emailService = SpringUtils.getBean(EmailService.class);
 %>
 <html:html locale="true">
@@ -49,33 +45,17 @@
 			String consult_request_id = (String) request.getAttribute("consult_request_id");
 			String template = (String) request.getAttribute("template");
 
-			boolean sentEmail = false;
 			boolean useDetailsTemplate = ("details").equals(template);
-			String emailAddress = "";
-			String errorMsg = "";
-			String statusMsg = "";
-			ConsultationRequest consultRequest = null;
-
-			try
-			{
-				String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(session).getLoggedInProviderNo();
-				emailService.sendConsultationTemplateEmail(consult_request_id, template, loggedInProviderNo);
-
-			}
-			catch (Exception e)
-			{
-				MiscUtils.getLogger().error("Unable to email consultation request reminder", e);
-				errorMsg = e.getMessage();
-			}
-
+			String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(session).getLoggedInProviderNo();
+			boolean sentEmail = emailService.sendConsultationTemplateEmail(consult_request_id, useDetailsTemplate, loggedInProviderNo);
 		%>
 		<table border="0" cellspacing="0" cellpadding="0" width="90%">
 			<tr bgcolor="#486ebd">
 				<th align="CENTER">
 					<font face="Helvetica" color="#FFFFFF">
 						<%
-							if (useDetailsTemplate)
-							{
+						if (useDetailsTemplate)
+						{
 						%>
 						<bean:message
 								key="oscarEncounter.oscarConsultationRequest.msgEmailDetailsLabel"/>
@@ -93,47 +73,18 @@
 		</table>
 
 		<%
-			if (sentEmail)
-			{
-				consultRequest.setNotificationSent(true);
-				consultationRequestDao.merge(consultRequest);
+		if (sentEmail)
+		{
 		%>
 		<p>
 		<h1><bean:message key="oscarEncounter.oscarConsultationRequest.msgEmailSuccess"/></h1>
-		<h3><%= emailAddress %>
-		</h3>
 		<%
-			if (useDetailsTemplate)
-			{
-				try
-				{
-					// update the status of the consultation request to 4 (Completed)
-					consultRequest.setStatus("4");
-					consultationRequestDao.merge(consultRequest);
-
-					statusMsg = "Status updated to 'Completed'";
-
-				}
-				catch (Exception e)
-				{
-					MiscUtils.getLogger().error("Unable to update consultation request status", e);
-					statusMsg = "Error updating status to 'Completed': " + e.getMessage();
-				}
-		%>
-		<h3><%= statusMsg %>
-		</h3>
-		<%
-			}
 		}
 		else
 		{
 		%>
-
 		<p>
 		<h1><bean:message key="oscarEncounter.oscarConsultationRequest.msgEmailFailure"/></h1>
-		<h3><%= errorMsg %>
-		</h3>
-
 		<%
 			}
 		%>

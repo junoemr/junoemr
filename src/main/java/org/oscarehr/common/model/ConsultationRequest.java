@@ -26,6 +26,7 @@
 package org.oscarehr.common.model;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.persistence.CascadeType;
@@ -49,7 +50,11 @@ import org.apache.commons.lang.StringUtils;
 @Table(name = "consultationRequests")
 public class ConsultationRequest extends AbstractModel<Integer> implements Serializable {
 
-	private static final String ACTIVE_MARKER = "1";
+	public static final String STATUS_ACTIVE = "1";
+	public static final String STATUS_PEND_SPECIAL = "2";
+	public static final String STATUS_PEND_PATIENT = "3";
+	public static final String STATUS_COMPLETE = "4";
+
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -82,7 +87,7 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
 	@Column(name = "demographicNo")
 	private Integer demographicId;
 
-	private String status = ACTIVE_MARKER;
+	private String status = STATUS_ACTIVE;
 	private String statusText;
 	private String sendTo;
 	private String concurrentProblems;
@@ -359,5 +364,30 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
 	@PreUpdate
 	protected void jpa_updateLastDateUpdated() {
 		lastUpdateDate = new Date();
+	}
+
+	public Date getAppointmentDateTime()
+	{
+		try
+		{
+			Date appointmentDate = getAppointmentDate();
+			if(appointmentDate != null)
+			{
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(appointmentDate);
+				Calendar acal = Calendar.getInstance();
+				acal.setTime(getAppointmentTime());
+				cal.set(Calendar.HOUR_OF_DAY, acal.get(Calendar.HOUR_OF_DAY));
+				cal.set(Calendar.MINUTE, acal.get(Calendar.MINUTE));
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 0);
+				return cal.getTime();
+			}
+		}
+		catch(Exception e)
+		{
+			// do nothing
+		}
+		return null;
 	}
 }

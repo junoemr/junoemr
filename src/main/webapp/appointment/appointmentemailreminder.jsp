@@ -27,9 +27,8 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ include file="/common/webAppContextAndSuperMgr.jsp" %>
-<%@page import="org.apache.log4j.Logger" %>
 <%@page import="org.oscarehr.email.service.EmailService" %>
-<%@page import="org.oscarehr.util.MiscUtils" %>
+<%@page import="org.oscarehr.util.LoggedInInfo" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 
 <%
@@ -49,31 +48,18 @@
 			</tr>
 		</table>
 		<%
-			Logger logger = MiscUtils.getLogger();
-
 			boolean sentEmail = false;
-			String emailAddress = "";
-			String errorMsg = "";
 
-			try
+			String appointment_no = request.getParameter("appointment_no");
+			if (appointment_no == null)
 			{
-				String appointment_no = request.getParameter("appointment_no");
-				if (appointment_no == null)
-				{
-					// when coming from a newly added appointment, the ID is added as an attribute instead of coming in as a parameter
-					appointment_no = (String) request.getAttribute("appointment_no");
-				}
-				if (appointment_no == null)
-				{
-					throw new IllegalArgumentException("Unable to find appointment ID");
-				}
-				emailService.sendAppointmentTemplateEmail(appointment_no);
-				sentEmail = true;
+				// when coming from a newly added appointment, the ID is added as an attribute instead of coming in as a parameter
+				appointment_no = (String) request.getAttribute("appointment_no");
 			}
-			catch (Exception e)
+			if (appointment_no != null)
 			{
-				logger.error("Unable to email appointment reminder", e);
-				errorMsg = e.getMessage();
+				String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(session).getLoggedInProviderNo();
+				sentEmail = emailService.sendAppointmentTemplateEmail(appointment_no, loggedInProviderNo);
 			}
 
 			if (sentEmail)
@@ -81,8 +67,6 @@
 		%>
 		<p>
 		<h1><bean:message key="appointment.appointmentemailreminder.msgEmailSuccess"/></h1>
-		<h3><%= emailAddress %>
-		</h3>
 
 		<%
 		}
@@ -92,8 +76,6 @@
 
 		<p>
 		<h1><bean:message key="appointment.appointmentemailreminder.msgEmailFailure"/></h1>
-		<h3><%= errorMsg %>
-		</h3>
 
 		<%
 			}
