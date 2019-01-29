@@ -25,7 +25,9 @@ package org.oscarehr.email.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.email.model.EmailLog;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class EmailLogDao extends AbstractDao<EmailLog>
 {
 	public EmailLogDao()

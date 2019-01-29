@@ -82,6 +82,9 @@ if(!authed) {
 <%@page import="oscar.util.StringUtils, java.util.ArrayList"%>
 <%@page import="java.util.Collections" %>
 <%@page import="java.util.List" %>
+<%@ page import="org.oscarehr.util.EmailUtilsOld" %>
+<%@ page import="org.oscarehr.common.dao.ConsultationRequestDao" %>
+<%@ page import="org.oscarehr.common.model.ConsultationRequest" %>
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 
 <html:html locale="true">
@@ -162,6 +165,12 @@ if(!authed) {
 		if (demo != null) consultUtil.estPatient(loggedInInfo, demo);
 		consultUtil.estActiveTeams();
 
+		boolean enableEmail = false;
+		if(demographic != null)
+		{
+			enableEmail = EmailUtilsOld.isValidEmailAddress(demographic.getEmail());
+		}
+
 		if (request.getParameter("error") != null)
 		{
 %>
@@ -217,10 +226,10 @@ if(!authed) {
 	<%
 	} %>
 </script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/js/global.js"></script>
+	<script src="<c:out value="${ctx}/share/javascript/jquery/jquery-2.2.4.min.js"/>"></script>
+
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/util/date.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/util/fax.js"></script>
-<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery_oscar_defaults.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/moment.min.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/share/javascript/prototype.js"></script>
@@ -236,7 +245,11 @@ if(!authed) {
 <script type="text/javascript"
 	src="<%=request.getContextPath()%>/share/calendar/calendar-setup.js"></script>
 
-   <script src="<c:out value="${ctx}/js/jquery.js"/>"></script>
+<!-- featherlight is used for emailing code -->
+<script src="//cdn.rawgit.com/noelboss/featherlight/1.2.3/release/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="//cdn.rawgit.com/noelboss/featherlight/1.2.3/release/featherlight.min.css" type="text/css" rel="stylesheet" title="Featherlight Styles" />
+
+
    <script>
      jQuery.noConflict();
    </script>
@@ -331,6 +344,7 @@ text-align: right;
 
 <script language="JavaScript" type="text/javascript">
 
+var featherlight = null;
 var servicesName = new Object();   		// used as a cross reference table for name and number
 var services = new Array();				// the following are used as a 2D table for makes and models
 var specialists = new Array();
@@ -431,6 +445,7 @@ function disableEditing()
 		disableIfExists(form.update, disableFields);
 		disableIfExists(form.updateAndPrint, disableFields);
 		disableIfExists(form.updateAndSendElectronically, disableFields);
+    disableIfExists(form.updateAndEmailDetails, disableFields);
 		disableIfExists(form.updateAndFax, disableFields);
 
 		disableIfExists(form.submitSaveOnly, disableFields);
@@ -808,10 +823,44 @@ function popupOscarCal(vheight,vwidth,varpage) { //open a new popup window
     }
   }
 }
-
-
-function checkForm(submissionVal, formName)
+function sendEmail(type)
 {
+	var box_id = null
+		if(type == 'patient')
+		{
+			box_id = "#emailFormBoxPatient";
+		}
+		else if(type == 'provider')
+		{
+			box_id = "#emailFormBoxProvider";
+
+			chooseEmail();
+			jQuery("#emailToProvider").val(jQuery("#emailSelect").find(":selected").val());
+			jQuery(".featherlight-content #emailToProvider").val(jQuery("#emailSelect").find(":selected").val());
+		}
+
+	jQuery(box_id).show();
+
+	if(featherlight == null)
+{
+		jQuery.isFunction("featherlight");
+		featherlight = jQuery.featherlight(box_id,{closeOnClick:false, closeOnEsc:false});
+	}
+	else
+	{
+		featherlight.open();
+	}
+}
+
+
+function checkForm(submissionVal,formName){
+
+    jQuery("#emailSubject").val(jQuery(".featherlight-content #emailSubjectForm").val());
+    jQuery("#patientEmailBody").val(jQuery(".featherlight-content #patientEmailBodyForm").val());
+    jQuery("#providerEmailBody").val(jQuery(".featherlight-content #providerEmailBodyForm").val());
+    jQuery("#emailToProvider").val(jQuery(".featherlight-content #emailToProvider").val());
+    jQuery("#emailToPatient").val(jQuery(".featherlight-content #emailToPatient").val());
+
 	//if document attach to consultation is still active user needs to close before submitting
 	if (DocPopup != null && !DocPopup.closed)
 	{
@@ -1212,6 +1261,19 @@ if (userAgent != null) {
 function requestSignature()
 {
 
+function AddOtherFaxProvider() {
+	var selected = jQuery("#otherFaxSelect option:selected");
+	_AddOtherFax(selected.text(),selected.val());
+}
+function AddOtherFax() {
+	var number = jQuery("#otherFaxInput").val();
+	if (checkPhone(number)) {
+		_AddOtherFax(number,number);
+	}
+	else {
+		alert("The fax number you entered is invalid.");
+	}
+}
 
 	<% if (OscarProperties.getInstance().getBooleanProperty("topaz_enabled", "true")) { %>
 	document.getElementById('newSignature').value = "true";
@@ -1475,15 +1537,120 @@ var requestIdKey = "<%=signatureRequestId %>";
 						<input name="printPreview" type="button" value="Print Preview" onclick="return checkForm('And Print Preview','EctConsultationFormRequestForm');" />
 						<input name="updateAndSendElectronicallyTop" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndSendElectronicReferral"/>" onclick="return checkForm('Update_esend','EctConsultationFormRequestForm');" />
 						<% if (faxEnabled) { %>
-						<input id="fax_button" class="faxButton" name="updateAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndFax"/>" onclick="return checkForm('Update And Fax','EctConsultationFormRequestForm');" />
+						<input id="fax_button" name="updateAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndFax"/>" onclick="return checkForm('Update And Fax','EctConsultationFormRequestForm');" />
 						<% } %>
-					<% } else { %>
+
+            <% if (OscarProperties.getInstance().isPropertyActive("appointment_reminder_enabled")) { %>
+              <input type="button"
+                <% if(!enableEmail) { %> disabled="disabled" <% } %>
+                name="updateAndEmailDetails"
+                value='<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailAppointmentTime"/>'
+                onclick="return checkForm('Update And Email Details','EctConsultationFormRequestForm');" />
+						<% } %>
+						<%
+							if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled"))
+							{
+								boolean disableNotification = !enableEmail;
+								if (requestId != null)
+								{
+									ConsultationRequestDao consultationRequestDao = (ConsultationRequestDao) SpringUtils.getBean("consultationRequestDao");
+									ConsultationRequest consult = consultationRequestDao.find(Integer.parseInt(requestId));
+									disableNotification = disableNotification || consult.isNotificationSent();
+						%>
+								<input type="button"
+								<% if(disableNotification) { %> disabled="disabled" <% } %>
+							   id="updateAndEmailNotification" name="updateAndEmailNotification"
+							   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailNotification"/>"
+							   onclick="return checkForm('Update And Email Notification','EctConsultationFormRequestForm');"/>
+						<%
+								}
+							}
+						}
+						else
+						{ %>
 						<input name="submitSaveOnly" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmit"/>" onclick="return checkForm('Submit Consultation Request','EctConsultationFormRequestForm'); " />
 						<input name="submitAndPrint" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndPrint"/>" onclick="return checkForm('Submit Consultation Request And Print Preview','EctConsultationFormRequestForm'); " />
 						<input name="submitAndSendElectronicallyTop" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndSendElectronicReferral"/>" onclick="return checkForm('Submit_esend','EctConsultationFormRequestForm');" />
 						<% if (faxEnabled) { %>
-						<input id="fax_button" class="faxButton" name="submitAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndFax"/>" onclick="return checkForm('Submit And Fax','EctConsultationFormRequestForm');" />
+						<input id="fax_button" name="submitAndFax" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndFax"/>" onclick="return checkForm('Submit And Fax','EctConsultationFormRequestForm');" />
+					<%  }
+						if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) {
+					%>
+						<input type="button"
+								<% if(!enableEmail) { %> disabled="disabled" <% } %>
+							   id="submitAndEmailNotification" name="submitAndEmailNotification"
+							   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailNotification"/>"
+							   onclick="return checkForm('Submit And Email Notification','EctConsultationFormRequestForm');" />
 					<% 	   }
+
+				    }
+						if(props.isConsultationEmailEnabled())
+						{
+							%>
+							<div>
+								<%
+								if(request.getAttribute("id")!=null){
+								%>
+								<input id="updateAndEmailPatient" name="updateAndEmailPatient" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailPatient"/>" onclick="return sendEmail('patient');" />
+								<input id="updateAndEmailProvider" name="updateAndEmailProvider" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailProvider"/>" onclick="return sendEmail('provider');" />
+								<%
+								}else{
+								%>
+								<input id="submitAndEmailPatient" name="submitAndEmailPatient" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailPatient"/>" onclick="return sendEmail('patient');" />
+								<input id="submitAndEmailProvider" name="submitAndEmailProvider" type="button" value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailProvider"/>" onclick="return sendEmail('provider');" />
+							    <%}
+
+								// Get email addresses
+								displayServiceUtil.estSpecialist();
+								String rdohip = "";
+								if (!"".equals(demo))
+								{
+								 rdohip = SxmlMisc.getXmlContent(org.apache.commons.lang.StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
+								 rdohip = SxmlMisc.getXmlContent(demographic.getFamilyDoctor(),"rdohip").trim();
+								}
+
+								%>
+								<div style="display: inline-block;">
+									Provider:
+									<select id="emailSelect" name="emailSelect" onchange="chooseEmail()">
+										<option value=""></option>
+									<%
+									String rdName = "";
+									for (int i=0;i < displayServiceUtil.specIdVec.size(); i++) {
+							                             String  specId     = (String) displayServiceUtil.specIdVec.elementAt(i);
+							                             String  fName      = (String) displayServiceUtil.fNameVec.elementAt(i);
+							                             String  lName      = (String) displayServiceUtil.lNameVec.elementAt(i);
+							                             String  proLetters = (String) displayServiceUtil.proLettersVec.elementAt(i);
+							                             String  address    = (String) displayServiceUtil.addressVec.elementAt(i);
+							                             String  phone      = (String) displayServiceUtil.phoneVec.elementAt(i);
+							                             String  fax        = (String) displayServiceUtil.faxVec.elementAt(i);
+							                             String  email      = (String) displayServiceUtil.emailVec.elementAt(i);
+							                             String  referralNo = (displayServiceUtil.referralNoVec.size() > 0 ? displayServiceUtil.referralNoVec.get(i).trim() : "");
+							                             if (rdohip != null && !"".equals(rdohip) && rdohip.equals(referralNo)) {
+							                            	 rdName = String.format("%s, %s", lName, fName);
+							                             }
+										if (!"".equals(email)) {
+										%>
+										<option value="<%=email%>"><%= String.format("%s, %s &lt;%s&gt;", lName, fName, email) %> </option>
+										<%
+										}
+									} %>
+									</select>
+
+									<input value="" name="toProviderName" id="toProviderName" type="hidden" />
+									<input value="" name="toProviderEmail" id="toProviderEmail" type="hidden" />
+									<input name="providerEmailBody" id="providerEmailBody" type="hidden" value="<%= props.getProperty("eform_email_text_providers") %>" />
+
+									<input value="<%=demographic.getDisplayName()%>" name="toPatientName" id="toPatientName" type="hidden" />
+									<input value="<%=demographic.getEmail()%>" name="toPatientEmail" id="toPatientEmail" type="hidden" />
+									<input name="patientEmailBody" id="patientEmailBody" type="hidden" value="<%= props.getProperty("eform_email_text_patients") %>" />
+
+									<input name="emailSubject" id="emailSubject" type="hidden" value="<%= props.getProperty("eform_email_subject") %>" />
+
+
+								</div>
+							</div>
+							<%
 					   }
 					   if (thisForm.iseReferral()) { %>
 						<input type="button" value="Send eResponse" onclick="$('saved').value='true';document.location='<%=thisForm.getOruR01UrlString(request)%>'" />
@@ -2201,7 +2368,22 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 						<%
 							}
 						%>
-					<%
+
+            <% if (OscarProperties.getInstance().isPropertyActive("appointment_reminder_enabled")) { %>
+              <input type="button"
+                <% if(!enableEmail) { %> disabled="disabled" <% } %>
+                name="updateAndEmailDetails"
+                value='<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailAppointmentTime"/>'
+                onclick="return checkForm('Update And Email Details','EctConsultationFormRequestForm');" />
+            <% } %>
+
+			<% if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) { %>
+			<input type="button"
+					<% if(!enableEmail) { %> disabled="disabled" <% } %>
+				   id="updateAndEmailNotification" name="updateAndEmailNotification"
+				   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailNotification"/>"
+				   onclick="return checkForm('Update And Email Notification','EctConsultationFormRequestForm');" />
+			<% }
 						}
 								else
 								{
@@ -2217,7 +2399,13 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 						<%
 							}
 						%>
-					<%
+						<% if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) { %>
+						<input type="button"
+								<% if(!enableEmail) { %> disabled="disabled" <% } %>
+							   id="submitAndEmailNotification" name="submitAndEmailNotification"
+							   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailNotification"/>"
+							   onclick="return checkForm('Submit And Email Notification','EctConsultationFormRequestForm');" />
+						<% }
 						}
 
 						if (thisForm.iseReferral())
@@ -2301,6 +2489,77 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 			<td class="MainTableBottomRowRightColumn"></td>
 		</tr>
 	</table>
+	<input value="" name="toProviderName" id="toProviderName" type="hidden" />
+    <input value="" name="toProviderEmail" id="toProviderEmail" type="hidden" />
+
+    <input value="<%=demographic.getDisplayName()%>" name="toPatientName" id="toPatientName" type="hidden" />
+    <input value="<%=demographic.getEmail()%>" name="toPatientEmail" id="toPatientEmail" type="hidden" />
+    <input name="providerEmailBody" id="providerEmailBody" type="hidden" value="" />
+
+    <input name="patientEmailBody" id="patientEmailBody" type="hidden" value="" />
+
+    <input name="emailSubject" id="emailSubject" type="hidden" value="" />
+
+	<div id="emailFormBoxProvider" style="display: none">
+        <div id="additionalInfoForm">
+            <div>
+                <label>To:</label>
+                <input type=text id="emailToProvider" name="emailToProvider" value="">
+            </div>
+            <div>
+                <label>Subject:</label>
+                <input type="text" name="emailSubjectForm" id="emailSubjectForm" value="<%= props.getProperty("eform_email_subject") %>">
+            </div>
+            <div>
+                <label>Body text:</label>
+                <textarea name="providerEmailBodyForm" id="providerEmailBodyForm"><%= props.getProperty("eform_email_text_providers") %></textarea>
+            </div>
+            <div>
+				<%
+				if(request.getAttribute("id")!=null){
+				%>
+                <input type="button" onClick="checkForm('Update And Email Provider','EctConsultationFormRequestForm')" value="Email eForm">
+				<% } else { %>
+                <input type="button" onClick="checkForm('Submit And Email Provider','EctConsultationFormRequestForm')" value="Email eForm">
+				<% } %>
+            </div>
+        </div>
+
+        <span class="progress"></span>
+
+    </div>
+    <div id="emailFormBoxPatient" style="display: none">
+        <div id="additionalInfoForm">
+            <div>
+                <label>To:</label>
+                <input type=text id="emailToPatient" name="emailToPatient" value="<%=demographic.getEmail()%>">
+            </div>
+            <div>
+                <label>Subject:</label>
+                <input type="text" name="emailSubjectForm" id="emailSubjectForm" value="<%= props.getProperty("eform_email_subject") %>">
+            </div>
+            <div>
+                <label>Body text:</label>
+                <textarea name="patientEmailBodyForm" id="patientEmailBodyForm"><%= props.getProperty("eform_email_text_patients") %></textarea>
+            </div>
+            <div>
+				<%
+				if(request.getAttribute("id")!=null){
+				%>
+                <input type="button" onClick="checkForm('Update And Email Patient','EctConsultationFormRequestForm')" value="Email eForm">
+				<% } else { %>
+                <input type="button" onClick="checkForm('Submit And Email Patient','EctConsultationFormRequestForm')" value="Email eForm">
+				<% } %>
+            </div>
+        </div>
+
+        <span class="progress"></span>
+
+    </div>
+
+
+
+
 </html:form>
 </body>
 

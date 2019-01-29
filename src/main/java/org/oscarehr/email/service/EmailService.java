@@ -35,6 +35,7 @@ import org.oscarehr.common.model.ConsultationServices;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.email.dao.EmailLogDao;
 import org.oscarehr.email.model.EmailLog;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
@@ -75,6 +76,9 @@ public class EmailService
 
 	@Autowired
 	private ProviderDataDao providerDao;
+
+	@Autowired
+	private EmailLogDao emailLogDao;
 
 	public void sendConsultationTemplateEmail(String consultRequestId, String template, String loggedInProviderNo) throws IOException, EmailException
 	{
@@ -215,6 +219,9 @@ public class EmailService
 		{
 			logger.error("Email failed to send: no available templates");
 		}
+
+		logEntry.setEmailSuccess(true);
+		emailLogDao.persist(logEntry);
 	}
 
 	public void sendAppointmentTemplateEmail(String appointmentNo) throws IOException, EmailException

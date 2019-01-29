@@ -230,6 +230,7 @@ public class EctConsultationFormRequestAction extends Action {
 
 		request.setAttribute("teamVar", sendTo);
 
+		ConsultationRequest consult = consultationRequestDao.find(Integer.parseInt(requestId));
 		if (submission.endsWith("And Print Preview")) {
 
 			request.setAttribute("reqId", requestId);
@@ -258,6 +259,20 @@ public class EctConsultationFormRequestAction extends Action {
 				return mapping.findForward("fax");
 			}
 
+		}
+		else if (submission.endsWith("And Email Details"))
+		{
+			// email consultation details to patient
+			request.setAttribute("consult_request_id", requestId);
+			request.setAttribute("template", "details");
+			return mapping.findForward("emailalt");
+		}
+		else if (submission.endsWith("And Email Notification") && !consult.isNotificationSent())
+		{
+			// email consultation notification to patient
+			request.setAttribute("consult_request_id", requestId);
+			request.setAttribute("template", "notification");
+			return mapping.findForward("emailalt");
 		}
 		else if (submission.endsWith("esend")) {
 			// upon success continue as normal with success message

@@ -100,6 +100,8 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
     private String letterheadAddress;
     private String letterheadPhone;
     private String letterheadFax;
+	@Column(name = "notification_sent", columnDefinition = "TINYINT(1)", nullable = false)
+	private boolean notificationSent = false;
     
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateDate;
@@ -341,6 +343,16 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
 
 	public void setSource(String source) {
 		this.source = source;
+	}
+
+	public boolean isNotificationSent()
+	{
+		return notificationSent;
+	}
+
+	public void setNotificationSent(boolean notificationSent)
+	{
+		this.notificationSent = notificationSent;
 	}
 
 	@PrePersist

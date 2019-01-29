@@ -390,6 +390,11 @@ public class OscarProperties extends Properties {
 		return isPropertyActive("faxEnable") && isPropertyActive("consultation_fax_enabled");
 	}
 
+	public boolean isConsultationEmailEnabled()
+	{
+		return isPropertyActive("consultation_email_enabled");
+	}
+
 	public boolean isEFormFaxEnabled() {
 		return isPropertyActive("faxEnable") && isPropertyActive("eform_fax_enabled");
 	}
