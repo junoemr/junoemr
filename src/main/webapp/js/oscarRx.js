@@ -1177,10 +1177,9 @@ function setSearchedDrug(drugId,name){
 
     var url = ctx +  "/oscarRx/WriteScript.do?parameterValue=createNewRx";
     var ran_number=Math.round(Math.random()*1000000);
-    console.log("NAME: " + name);
     name=encodeURIComponent(name);
     var params = "demographicNo=<%=demoNo%>&drugId="+drugId+"&text="+name+"&randomId="+ran_number;
-    new Ajax.Updater('rxText',url, {method:'get',parameters:params,asynchronous:true,evalScripts:true,insertion: Insertion.Bottom,onSuccess:function(transport){
+    new Ajax.Updater('rxText',url, {method:'post',parameters:params,asynchronous:true,evalScripts:true,insertion: Insertion.Bottom,onSuccess:function(transport){
                             updateCurrentInteractions();
             }});
     $('searchString').value = "";
