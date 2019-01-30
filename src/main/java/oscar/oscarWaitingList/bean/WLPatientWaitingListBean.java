@@ -26,7 +26,10 @@
 package oscar.oscarWaitingList.bean;
 
 
-public class WLPatientWaitingListBean{
+import java.io.Serializable;
+
+public class WLPatientWaitingListBean implements Serializable
+{
 
        String demographicNo;
        String waitingList;

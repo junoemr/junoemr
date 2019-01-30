@@ -52,4 +52,4 @@ String typeid = "", type="";
 }
 
 %>
-<% response.sendRedirect("manageBillingform.jsp"); %>
+<% response.sendRedirect("manageBillingform.jsp?billingform=***"); %>

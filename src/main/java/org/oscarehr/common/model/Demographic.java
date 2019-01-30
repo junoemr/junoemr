@@ -23,7 +23,6 @@
 
 
 package org.oscarehr.common.model;
-
 import com.sun.istack.NotNull;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -32,6 +31,7 @@ import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
+import oscar.util.ConversionUtils;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -1532,6 +1532,20 @@ public class Demographic implements Serializable
 			sb.append("</b>");
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * Determines if a demographic is a newborn.  The criteria for a newborn is a HIN version code of 66 if in BC,
+	 * or less than a year old in all other cases.
+	 *
+	 * @return true if demographic meets newborn criteria
+	 */
+	public boolean isNewBorn()
+	{
+		String birthdayStr = getBirthDayAsString();
+		LocalDate birthday = ConversionUtils.toLocalDate(birthdayStr);
+
+		return org.oscarehr.demographic.model.Demographic.isNewBorn(birthday, getVer());
 	}
 
 }

@@ -391,7 +391,7 @@ public class PHRMessageAction extends DispatchAction {
 		org.oscarehr.document.model.Document document = new org.oscarehr.document.model.Document();
 		document.setPublic1(false);
 		document.setResponsible("");
-		document.setDoccreator(providerNo);
+		document.setDocCreator(providerNo);
 		document.setDocdesc(description);
 		document.setDoctype("others");
 		document.setDocfilename(filename);

@@ -22,10 +22,10 @@
  */
 package org.oscarehr.demographic.search;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
@@ -51,11 +51,6 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		all, active, inactive, deceased
 	}
 
-	public enum SORTDIR
-	{
-		asc, desc
-	}
-
 	private MatchMode matchMode = MatchMode.START;
 
 	private Integer DemographicNo;
@@ -70,7 +65,6 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	private String providerNo;
 
 	private SORTMODE sortMode = SORTMODE.DemographicNo;
-	private SORTDIR sortDir = SORTDIR.asc;
 	private STATUSMODE statusMode = STATUSMODE.all;
 	private boolean customWildcardsEnabled = false;
 
@@ -104,9 +98,9 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		// birthdate searches are always exact due to how the values are stored
 		if(getDateOfBirth() != null)
 		{
-			criteria.add(Restrictions.eq("dayOfBirth", String.valueOf(getDateOfBirth().getDayOfMonth())));
-			criteria.add(Restrictions.eq("monthOfBirth", String.valueOf(getDateOfBirth().getMonthValue())));
 			criteria.add(Restrictions.eq("yearOfBirth", String.valueOf(getDateOfBirth().getYear())));
+			criteria.add(Restrictions.eq("monthOfBirth", StringUtils.leftPad(String.valueOf(getDateOfBirth().getMonthValue()), 2, "0")));
+			criteria.add(Restrictions.eq("dayOfBirth", StringUtils.leftPad(String.valueOf(getDateOfBirth().getDayOfMonth()), 2, "0")));
 		}
 
 		if(getAddress() != null)
@@ -188,11 +182,6 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 			default: criteria.addOrder(getOrder("demographicId")); break;
 		}
 	}
-	private Order getOrder(String propertyName)
-	{
-		return (SORTDIR.asc.equals(sortDir))? Order.asc(propertyName) : Order.desc(propertyName);
-	}
-
 	public Integer getDemographicNo()
 	{
 		return DemographicNo;
@@ -303,15 +292,7 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		this.sortMode = sortMode;
 	}
 
-	public SORTDIR getSortDir()
-	{
-		return sortDir;
-	}
 
-	public void setSortDir(SORTDIR sortDir)
-	{
-		this.sortDir = sortDir;
-	}
 
 	public STATUSMODE getStatusMode()
 	{

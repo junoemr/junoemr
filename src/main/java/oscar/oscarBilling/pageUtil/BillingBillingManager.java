@@ -24,6 +24,7 @@
 
 package oscar.oscarBilling.pageUtil;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
@@ -36,7 +37,8 @@ import oscar.entities.Billingmaster;
 import oscar.oscarBilling.ca.bc.data.BillingmasterDAO;
 import oscar.util.ConversionUtils;
 
-public class BillingBillingManager {
+public class BillingBillingManager implements Serializable
+{
 
 	public BillingItem[] getBillingItem(String[] service, String service1, String service2, String service3, String service1unit, String service2unit, String service3unit) {
 		BillingItem[] arr = {};
@@ -199,7 +201,8 @@ public class BillingBillingManager {
 
 	}
 
-	public class BillingItem {
+	public class BillingItem implements Serializable
+	{
 
 		String service_code;
 		String description;

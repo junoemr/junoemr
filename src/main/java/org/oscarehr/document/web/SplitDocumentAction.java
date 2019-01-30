@@ -106,7 +106,7 @@ public class SplitDocumentAction extends DispatchAction {
 				document.setDoctype(existingDocument.getDoctype());
 				document.setDocSubClass(existingDocument.getDocSubClass());
 				document.setDocfilename(tempFile.getName());
-				document.setDoccreator(providerNo);
+				document.setDocCreator(providerNo);
 				document.setResponsible(existingDocument.getDoccreator());
 				document.setSource(existingDocument.getSource());
 				document.setObservationdate(new Date());
@@ -118,9 +118,9 @@ public class SplitDocumentAction extends DispatchAction {
 				/* add link in providerInbox */
 				List<ProviderInboxItem> routeList = providerInboxRoutingDao.getProvidersWithRoutingForDocument(LabResultData.DOCUMENT, Integer.parseInt(docNum));
 				for (ProviderInboxItem i : routeList) {
-					documentService.routeToProviderInbox(newDocumentNo, Integer.parseInt(i.getProviderNo()));
+					documentService.routeToProviderInbox(newDocumentNo, i.getProviderNo());
 				}
-				documentService.routeToProviderInbox(newDocumentNo, Integer.parseInt(providerNo));
+				documentService.routeToProviderInbox(newDocumentNo, providerNo);
 
 				/* add link in document queue */
 				Integer qid = (queueId == null || queueId.equalsIgnoreCase("null")) ? 1 : Integer.parseInt(queueId);

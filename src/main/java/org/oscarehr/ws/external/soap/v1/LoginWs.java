@@ -33,6 +33,7 @@ import org.oscarehr.common.model.Security;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.NotAuthorisedException;
 import org.oscarehr.ws.WsUtils;
+import org.oscarehr.ws.common.MaskParameter;
 import org.oscarehr.ws.external.soap.v1.transfer.LoginResultTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.LoginResultTransfer2;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
@@ -60,9 +61,9 @@ public class LoginWs extends AbstractWs {
 	 * Returns LoginResultTransfer on valid login, will be provided with a security token too.
 	 * @throws NotAuthorisedException if password is incorrect
 	 */
+	@MaskParameter(name="arg1")
 	public LoginResultTransfer login(String userName, String password) throws NotAuthorisedException {
 		logger.info("Login attempt : user=" + userName);
-		logger.debug("Login attempt : p =" + password);
 
 		List<Security> securities = securityDao.findByUserName(userName);
 		Security security = null;
@@ -87,9 +88,9 @@ public class LoginWs extends AbstractWs {
 	 * @return LoginResultTransfer2 on valid login, will be provided with a security token too.
 	 * @throws NotAuthorisedException if password is incorrect
 	 */
+	@MaskParameter(name="arg1")
 	public LoginResultTransfer2 login2(String userName, String password) throws NotAuthorisedException {
 		logger.info("Login attempt : user=" + userName);
-		logger.debug("Login attempt : p =" + password);
 
 		List<Security> securities = securityDao.findByUserName(userName);
 		Security security = null;

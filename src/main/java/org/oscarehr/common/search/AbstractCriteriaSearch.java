@@ -23,11 +23,18 @@
 package org.oscarehr.common.search;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 
 public abstract class AbstractCriteriaSearch
 {
+	public enum SORTDIR
+	{
+		asc, desc
+	}
+
 	private int limit = 100;
 	private int offset = 0;
+	private SORTDIR sortDir = SORTDIR.asc;
 
 	public abstract Criteria setCriteriaProperties(Criteria criteria);
 
@@ -49,5 +56,30 @@ public abstract class AbstractCriteriaSearch
 	public void setOffset(int offset)
 	{
 		this.offset = offset;
+	}
+
+	public SORTDIR getSortDir()
+	{
+		return sortDir;
+	}
+
+	public void setSortDir(SORTDIR sortDir)
+	{
+		this.sortDir = sortDir;
+	}
+
+	public void setSortDirDesc()
+	{
+		setSortDir(SORTDIR.desc);
+	}
+
+	public void setSortDirAsc()
+	{
+		setSortDir(SORTDIR.asc);
+	}
+
+	protected Order getOrder(String propertyName)
+	{
+		return (SORTDIR.asc.equals(sortDir))? Order.asc(propertyName) : Order.desc(propertyName);
 	}
 }
