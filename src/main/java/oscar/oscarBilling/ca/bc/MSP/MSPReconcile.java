@@ -1024,7 +1024,8 @@ public class MSPReconcile {
 		BillingmasterDAO bmDao = SpringUtils.getBean(BillingmasterDAO.class);
 		Billingmaster bm = bmDao.getBillingmaster(ConversionUtils.fromIntString(billingNo));
 
-		if (bm != null) {
+		if (bm != null)
+		{
 			currStat = bm.getBillingstatus();
 		}
 		
@@ -1048,21 +1049,25 @@ public class MSPReconcile {
 			}
 		}
 
-		else {
+		else
+		{
 			updated = false;
 			MiscUtils.getLogger().debug("billing No " + billingNo + " is settled, will not be updated");
 		}
-		if (updated) {
-			try {
+		if (updated)
+		{
+			try
+			{
 
 				Billingmaster b = billingmasterDao.getBillingmaster(Integer.parseInt(billingNo));
-				if (b != null) {
+				if (b != null)
+				{
 					b.setBillingstatus(newStat);
 					billingmasterDao.update(b);
+					dao.createBillingHistoryArchive(billingNo);
 				}
-
-				dao.createBillingHistoryArchive(billingNo);
-			} catch (Exception e) {
+			} catch (Exception e)
+			{
 				MiscUtils.getLogger().error("Error", e);
 			}
 		}
