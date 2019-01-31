@@ -325,6 +325,10 @@ public class OscarProperties extends Properties {
 	public boolean isAlbertaInstanceType() {
 		return ( INSTANCE_TYPE_ALBERTA.equalsIgnoreCase( getProperty(KEY_INSTANCE_TYPE) ) );
 	}
+
+	public boolean isEligibilityCheckEnabled() {
+		return (isBritishColumbiaInstanceType() || isOntarioInstanceType());
+	}
 	
 	public String getBillingType() {
 		return getProperty(KEY_BILLING_TYPE);
