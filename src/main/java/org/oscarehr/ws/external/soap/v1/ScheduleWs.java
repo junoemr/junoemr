@@ -27,13 +27,16 @@ package org.oscarehr.ws.external.soap.v1;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentArchive;
 import org.oscarehr.common.model.AppointmentType;
+import org.oscarehr.common.model.Demographic;
 import org.oscarehr.managers.DayWorkSchedule;
 import org.oscarehr.managers.ScheduleManager;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.AppointmentArchiveTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.AppointmentTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.AppointmentTypeTransfer;
@@ -115,10 +118,38 @@ public class ScheduleWs extends AbstractWs {
 	/**
 	 * @return the ID of the appointment just added
 	 */
-	public Integer addAppointment(AppointmentTransfer appointmentTransfer) {
+	public Integer addAppointment(AppointmentTransfer appointmentTransfer)
+	{
 		Appointment appointment = new Appointment();
 		appointmentTransfer.copyTo(appointment);
-		scheduleManager.addAppointment(getLoggedInInfo(),getLoggedInSecurity(), appointment);
+
+		try
+		{
+			if (appointment.getDemographicNo() != 0)
+			{
+				DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
+				Demographic demographic = demographicDao.getDemographic(String.valueOf(appointment.getDemographicNo()));
+				if (demographic != null)
+				{
+					appointment.setName(demographic.getDisplayName());
+				}
+			}
+		} catch (Exception e)
+		{
+			logger.error("Error setting patient name while adding appointment via the Web Service", e);
+		}
+
+		if (appointment.getName() == null)
+		{
+			appointment.setName("");
+		}
+
+		if (appointment.getReason() == null)
+		{
+			appointment.setReason("");
+		}
+
+		scheduleManager.addAppointment(getLoggedInInfo(), getLoggedInSecurity(), appointment);
 		return (appointment.getId());
 	}
 
