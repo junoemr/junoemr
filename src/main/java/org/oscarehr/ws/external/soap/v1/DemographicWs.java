@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.Gender;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.PHRVerification;
-import org.oscarehr.managers.DemographicCustManager;
+import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -65,12 +65,12 @@ public class DemographicWs extends AbstractWs {
 	private DemographicManager demographicManager;
 
 	@Autowired
-	private DemographicCustManager demographicCustManager;
+	private DemographicCustDao demographicCustDao;
 
 	public DemographicTransfer getDemographic(Integer demographicId)
 	{
 		Demographic demographic = demographicManager.getDemographic(getLoggedInInfo(), demographicId);
-		DemographicCust custResult = demographicCustManager.getDemographicCust(demographic.getDemographicNo());
+		DemographicCust custResult = demographicCustDao.find(demographic.getDemographicNo());
 
 		DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
 		if (custResult != null)
@@ -94,7 +94,7 @@ public class DemographicWs extends AbstractWs {
 
 		for (Demographic demographic : demographics)
 		{
-			DemographicCust custResult = demographicCustManager.getDemographicCust(demographic.getDemographicNo());
+			DemographicCust custResult = demographicCustDao.find(demographic.getDemographicNo());
 
 			DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
 			if (custResult != null)
@@ -177,7 +177,7 @@ public class DemographicWs extends AbstractWs {
 		{
 			Demographic demographic = demographicListIterator.next();
 
-			DemographicCust custResult = demographicCustManager.getDemographicCust(demographic.getDemographicNo());
+			DemographicCust custResult = demographicCustDao.find(demographic.getDemographicNo());
 
 			DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
 			if (custResult != null)

@@ -174,12 +174,6 @@ public class DemographicManager {
 	{
 		List result = demographicDao.getDemographicsByHealthNum(hin);
 
-		//--- log action ---
-		if (result!=null)
-		{
-			LogAction.addLogEntrySynchronous("DemographicManager.getDemographicsByHealthNum", "List");
-		}
-
 		return(result);
 	}
 
