@@ -35,6 +35,7 @@ import org.oscarehr.common.dao.ReportByExamplesDao;
 import org.oscarehr.common.model.Explain;
 import org.oscarehr.common.model.ReportByExamples;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.report.SQLReportHelper;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
@@ -43,7 +44,6 @@ import oscar.oscarReport.data.RptByExampleData;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
@@ -82,12 +82,16 @@ public class RptByExampleAction extends Action
 			{
 				logger.info("User Query: " + userSql);
 
-				List<Explain> explainResultList = rptByExampleDao.getExplainResultList(preparedUserSql);
+				List<Explain> explainResultList = null;
+				boolean allowRun = SQLReportHelper.canSkipExplainCheck(preparedUserSql);
+				if(!allowRun)
+				{
+					explainResultList = rptByExampleDao.getExplainResultList(preparedUserSql);
+					allowRun = SQLReportHelper.allowQueryRun(explainResultList, maxRows);
+				}
 
-				// save the query record
 				write2Database(userSql, providerNo);
-
-				if(allowQueryRun(explainResultList))
+				if(allowRun)
 				{
 					RptByExampleData exampleData = new RptByExampleData();
 
@@ -113,7 +117,7 @@ public class RptByExampleAction extends Action
 		}
 		catch(SQLException | SQLGrammarException e)
 		{
-			logger.warn("Report By Example user SQL Error");
+			logger.warn("Report By Example user SQL Error: " + e.getMessage());
 			logger.warn("Query Attempt: " + userSql);
 			request.setAttribute("errorMessage", "Invalid SQL");
 		}
@@ -136,21 +140,5 @@ public class RptByExampleAction extends Action
 			r.setDate(new Date());
 			dao.persist(r);
 		}
-	}
-
-	private boolean allowQueryRun(List<Explain> explainResults)
-	{
-		for(Explain result : explainResults)
-		{
-			logger.info("Explain Result:\n" + result.toString());
-
-			BigInteger rows = result.getRows();
-			// if rows > maxRows
-			if(rows != null && BigInteger.valueOf(maxRows).compareTo(rows) < 0)
-			{
-				return false;
-			}
-		}
-		return true;
 	}
 }

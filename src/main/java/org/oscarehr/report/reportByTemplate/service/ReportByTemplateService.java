@@ -29,7 +29,6 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
-import org.oscarehr.common.model.Explain;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.report.reportByTemplate.dao.ReportTemplatesDao;
@@ -47,7 +46,6 @@ import oscar.oscarReport.reportByTemplate.ReportObjectGeneric;
 import oscar.util.UtilXML;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -308,28 +306,6 @@ public class ReportByTemplateService
 		preparedSQLTemplate.setParameterMap(indexedParams);
 
 		return preparedSQLTemplate;
-	}
-
-	/**
-	 * compare sql explain results with a maximum row cound and determine if the query is allowable
-	 * @param explainResults - list of explain results
-	 * @param maxRows - maximum rows to allow
-	 * @return true if row counts examined by the query are within the maximum value limit, false otherwise
-	 */
-	public boolean allowQueryRun(List<Explain> explainResults, long maxRows)
-	{
-		for(Explain result : explainResults)
-		{
-			logger.info("Explain Result:\n" + result.toString());
-
-			BigInteger rows = result.getRows();
-			// if rows > maxRows
-			if(rows != null && BigInteger.valueOf(maxRows).compareTo(rows) < 0)
-			{
-				return false;
-			}
-		}
-		return true;
 	}
 
 	// ---- logic taken from old ReportManager

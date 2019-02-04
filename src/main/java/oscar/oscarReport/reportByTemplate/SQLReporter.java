@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Explain;
 import org.oscarehr.log.dao.LogReportByTemplateDao;
 import org.oscarehr.log.model.LogReportByTemplate;
+import org.oscarehr.report.SQLReportHelper;
 import org.oscarehr.report.reportByTemplate.dao.ReportTemplatesDao;
 import org.oscarehr.report.reportByTemplate.exception.ReportByTemplateException;
 import org.oscarehr.report.reportByTemplate.model.PreparedSQLTemplate;
@@ -108,8 +109,14 @@ public class SQLReporter implements Reporter
 			// admin verified reports bypass the maximum row limitations
 			if(!curReport.isSuperAdminVerified())
 			{
-				List<Explain> explainResultList = rptTemplatesDao.getIndexPreparedExplainResultList(preparedSql, indexedParamMap);
-				if(!reportByTemplateService.allowQueryRun(explainResultList, maxRows))
+				List<Explain> explainResultList = null;
+				boolean allowRun = SQLReportHelper.canSkipExplainCheck(preparedSql);
+				if(!allowRun)
+				{
+					explainResultList = rptTemplatesDao.getIndexPreparedExplainResultList(preparedSql, indexedParamMap);
+					allowRun = SQLReportHelper.allowQueryRun(explainResultList, maxRows);
+				}
+				if(!allowRun)
 				{
 					logger.info("User Template Query: " + preparedSql);
 					request.setAttribute("errormsg", "Error: The report examines more than the maximum " + maxRows + " rows");
