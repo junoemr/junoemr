@@ -32,8 +32,6 @@
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<%-- COMMENTING OUT NON-TEMPLATE CODE, SHOULD BE REMOVED WHEN REFACTORED
-
 <security:oscarSec roleName='${ sessionScope[userrole] }, ${ sessionScope[user] }' rights="w" objectName="_dashboardDisplay">
 	<c:redirect url="securityError.jsp?type=_dashboardDisplay" />
 </security:oscarSec>
@@ -60,7 +58,6 @@
 </head>
 
 <body>
---%>
 
 <div class="container">
 <div class="row" id="dashboardPanel" >
@@ -143,8 +140,5 @@
 </div>
 <!-- end container -->
 
-
-<%-- COMMENTING OUT NON-TEMPLATE CODE, SHOULD BE REMOVED
 </body>
 </html>
---%>

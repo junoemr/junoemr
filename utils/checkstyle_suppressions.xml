@@ -15,4 +15,5 @@
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="2018-02-08.change_log_tables_to_MyISAM.sql" />
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="SQLReporter.java" />
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="RptByExampleData.java" />
+	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="2018-11-29.add_dashboard_tables.sql" />
 </suppressions>
