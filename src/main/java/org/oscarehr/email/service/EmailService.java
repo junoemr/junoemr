@@ -76,7 +76,7 @@ public class EmailService
 
 	public boolean sendConsultationTemplateEmail(String consultRequestId, boolean useDetailsTemplate, String loggedInProviderNo)
 	{
-		boolean emailSuccess = false;
+		boolean emailSent = false;
 		EmailLog logEntry = new EmailLog();
 
 		try
@@ -137,7 +137,7 @@ public class EmailService
 
 			// send the email
 			sendTemplateEmail(templateConfig);
-			emailSuccess = true;
+			emailSent = true;
 
 			// update the consultation request info
 			if (useDetailsTemplate)
@@ -151,14 +151,14 @@ public class EmailService
 		{
 			logger.error("Email Consultation template error", e);
 		}
-		logEntry.setEmailSuccess(emailSuccess);
+		logEntry.setEmailSent(emailSent);
 		emailLogDao.persist(logEntry);
-		return emailSuccess;
+		return emailSent;
 	}
 
 	public boolean sendAppointmentTemplateEmail(String appointmentNo, String loggedInProviderNo)
 	{
-		boolean emailSuccess = false;
+		boolean emailSent = false;
 		EmailLog logEntry = new EmailLog();
 
 		try
@@ -194,15 +194,15 @@ public class EmailService
 
 			// send the email
 			sendTemplateEmail(templateConfig);
-			emailSuccess = true;
+			emailSent = true;
 		}
 		catch(Exception e)
 		{
 			logger.error("Email Appointment template error", e);
 		}
-		logEntry.setEmailSuccess(emailSuccess);
+		logEntry.setEmailSent(emailSent);
 		emailLogDao.persist(logEntry);
-		return emailSuccess;
+		return emailSent;
 	}
 
 	private void sendTemplateEmail(EmailTemplateConfig templateConfig) throws EmailException

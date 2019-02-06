@@ -45,10 +45,14 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
 @Entity
 @Table(name = "consultationRequests")
 public class ConsultationRequest extends AbstractModel<Integer> implements Serializable {
+
+	private static final Logger logger = MiscUtils.getLogger();
 
 	public static final String STATUS_ACTIVE = "1";
 	public static final String STATUS_PEND_SPECIAL = "2";
@@ -368,26 +372,33 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
 
 	public Date getAppointmentDateTime()
 	{
+		Date appointmentDateTime = null;
 		try
 		{
 			Date appointmentDate = getAppointmentDate();
+			Date appointmentTime = getAppointmentTime();
 			if(appointmentDate != null)
 			{
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(appointmentDate);
-				Calendar acal = Calendar.getInstance();
-				acal.setTime(getAppointmentTime());
-				cal.set(Calendar.HOUR_OF_DAY, acal.get(Calendar.HOUR_OF_DAY));
-				cal.set(Calendar.MINUTE, acal.get(Calendar.MINUTE));
-				cal.set(Calendar.SECOND, 0);
-				cal.set(Calendar.MILLISECOND, 0);
-				return cal.getTime();
+
+				// if there is no appointment time, still want to return the date
+				if(appointmentTime != null)
+				{
+					Calendar acal = Calendar.getInstance();
+					acal.setTime(appointmentTime);
+					cal.set(Calendar.HOUR_OF_DAY, acal.get(Calendar.HOUR_OF_DAY));
+					cal.set(Calendar.MINUTE, acal.get(Calendar.MINUTE));
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+				}
+				appointmentDateTime = cal.getTime();
 			}
 		}
 		catch(Exception e)
 		{
-			// do nothing
+			logger.error("Invalid appointment datetime", e);
 		}
-		return null;
+		return appointmentDateTime;
 	}
 }

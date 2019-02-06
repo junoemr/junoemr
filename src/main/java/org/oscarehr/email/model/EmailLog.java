@@ -67,7 +67,7 @@ public class EmailLog extends AbstractModel<Long> implements Serializable
 	private String emailAddress;
 
 	@Column(name = "email_success", columnDefinition = "TINYINT(1)", nullable = false)
-	private boolean emailSuccess = false;
+	private boolean emailSent = false;
 
 	@Column(name = "email_content")
 	private String emailContent;
@@ -150,14 +150,14 @@ public class EmailLog extends AbstractModel<Long> implements Serializable
 		this.emailAddress = emailAddress;
 	}
 
-	public boolean isEmailSuccess()
+	public boolean isEmailSent()
 	{
-		return emailSuccess;
+		return emailSent;
 	}
 
-	public void setEmailSuccess(boolean emailSuccess)
+	public void setEmailSent(boolean emailSent)
 	{
-		this.emailSuccess = emailSuccess;
+		this.emailSent = emailSent;
 	}
 
 	public String getEmailContent()

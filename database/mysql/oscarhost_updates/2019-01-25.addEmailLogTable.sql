@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS log_emails(
-  id bigint(20) unsigned AUTO_INCREMENT PRIMARY KEY,
+  id bigint(20) AUTO_INCREMENT PRIMARY KEY,
   timestamp datetime NOT NULL,
   referring_provider_no varchar(6),
   loggedIn_provider_no varchar(6),
