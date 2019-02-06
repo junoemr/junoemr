@@ -89,6 +89,7 @@ public final class RxWriteScriptAction extends DispatchAction {
 	private static UserPropertyDAO userPropertyDAO;
 	private static final String DEFAULT_QUANTITY = "30";
 	private static final PartialDateDao partialDateDao = (PartialDateDao)SpringUtils.getBean("partialDateDao");
+	private static final DrugDao drugDao = (DrugDao)SpringUtils.getBean(DrugDao.class);
 
 	DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class) ;
     
@@ -1162,31 +1163,39 @@ public final class RxWriteScriptAction extends DispatchAction {
 		checkPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), PRIVILEGE_WRITE);
 		
 		String strId = request.getParameter("ltDrugId");
-		if (strId != null) {
+
+		HashMap<String, Boolean> responseMap = new HashMap<>();
+		if (strId != null)
+		{
 			int drugId = Integer.parseInt(strId);
 			RxSessionBean bean = (RxSessionBean) request.getSession().getAttribute("RxSessionBean");
-			if (bean == null) {
+			if (bean == null)
+			{
 				response.sendRedirect("error.html");
 				return null;
 			}
 
-			RxPrescriptionData rxData = new RxPrescriptionData();
-			RxPrescriptionData.Prescription oldRx = rxData.getPrescription(drugId);
-			oldRx.setLongTerm(true);
-			boolean b = oldRx.Save(oldRx.getScript_no());
-			HashMap hm = new HashMap();
-			if (b) hm.put("success", true);
-			else hm.put("success", false);
-			JSONObject jsonObject = JSONObject.fromObject(hm);
-			response.getOutputStream().write(jsonObject.toString().getBytes());
-			return null;
-		} else {
-			HashMap hm = new HashMap();
-			hm.put("success", false);
-			JSONObject jsonObject = JSONObject.fromObject(hm);
-			response.getOutputStream().write(jsonObject.toString().getBytes());
-			return null;
+			Drug drug = drugDao.find(drugId);
+
+			if (drug != null)
+			{
+				drug.setLongTerm(true);
+				drugDao.merge(drug);
+				responseMap.put("success", true);
+			}
+			else
+			{
+				responseMap.put("success", false);
+			}
 		}
+		else
+		{
+			responseMap.put("success", false);
+		}
+
+		JSONObject jsonObject = JSONObject.fromObject(responseMap);
+		response.getOutputStream().write(jsonObject.toString().getBytes());
+		return null;
 	}
 
 	public void saveDrug(final HttpServletRequest request) throws Exception {
