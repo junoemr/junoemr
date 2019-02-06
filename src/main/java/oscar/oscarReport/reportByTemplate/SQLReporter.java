@@ -148,9 +148,13 @@ public class SQLReporter implements Reporter
 		{
 			logger.warn("An Exception occurred while generating a report by template (from user defined query): " + e.getMessage());
 		}
-		catch(SQLException | PersistenceException e)
+		catch(SQLException e)
 		{
 			logger.warn("An SQL Exception occurred while generating a report by template (from user defined query): " + e.getMessage());
+		}
+		catch(PersistenceException e)
+		{
+			logger.warn("An SQL Exception occurred while generating a report by template (from user defined query)", e);
 		}
 		catch(Exception sqe)
 		{

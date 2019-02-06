@@ -343,11 +343,12 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 	 * @return
 	 * 		Returns list containing query results.
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<Object[]> runNativeQuery(String sql) {
-		Query query = entityManager.createNativeQuery(sql);
-		List resultList = query.getResultList();
-		return resultList;
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	@Transactional(readOnly = true)
+	public List<Object[]> runNativeQuery(String sql)
+	{
+		Query query = readOnlyEntityManager.createNativeQuery(sql);
+		return query.getResultList();
 	}
 
 	/**
