@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
@@ -1543,28 +1542,9 @@ public class RxPrescriptionData {
 			// clean up fields
 			if (this.takeMin > this.takeMax) this.takeMax = this.takeMin;
 
-			String escapedSpecial = StringEscapeUtils.escapeSql(this.getSpecial());
-
-			// check to see if there is an identitical prescription in
-			// the database. If there is we'll return that drugid instead
-			// of adding a new prescription.
-			/*
-						String endDate;
-						if (this.getEndDate() == null) {
-							endDate = "0001-01-01";
-						} else {
-							endDate = RxUtil.DateToString(this.getEndDate());
-						}
-			*/
 			DrugDao dao = SpringUtils.getBean(DrugDao.class);
-			// double check if we don't h
-			Drug drug = dao.findByEverything(this.getProviderNo(), this.getDemographicNo(), this.getRxDate(), this.getEndDate(), this.getWrittenDate(), this.getBrandName(), this.getGCN_SEQNO(), this.getCustomName(), this.getTakeMin(), this.getTakeMax(), this.getFrequencyCode(), this.getDuration(), this.getDurationUnit(), this.getQuantity(), this.getUnitName(), this.getRepeat(), this.getLastRefillDate(), this.getNosubs(), this.getPrn(), escapedSpecial, this.getOutsideProviderName(),
-			        this.getOutsideProviderOhip(), this.getCustomInstr(), this.getLongTerm(), this.isCustomNote(), this.getPastMed(), this.getPatientCompliance(), this.getSpecialInstruction(), this.getComment(), this.getStartDateUnknown());
-
-			drug = new Drug();
-
-			int position = this.getNextPosition();
-			this.position = position;
+			Drug drug = new Drug();
+			this.position = this.getNextPosition();
 			syncDrug(drug, ConversionUtils.fromIntString(scriptId));
 			dao.persist(drug);
 			drugId = drug.getId();
