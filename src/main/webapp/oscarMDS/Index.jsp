@@ -10,15 +10,12 @@
 --%>
 <%@ page language="java" %>
 <%@ page import="java.util.*" %>
-<%@ page import="oscar.oscarMDS.data.*,oscar.oscarLab.ca.on.*,oscar.util.StringUtils,oscar.util.UtilDateUtilities, oscar.OscarProperties" %>
-<%@ page import="org.apache.commons.collections.MultiHashMap" %>
+<%@ page import="oscar.oscarMDS.data.*, oscar.OscarProperties" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
-<%@page import="org.oscarehr.common.hl7.v2.oscar_to_oscar.OscarToOscarUtils"%>
-<%@page import="org.oscarehr.util.MiscUtils,org.apache.commons.lang.StringEscapeUtils"%>
 
 <%
 	String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -489,10 +486,6 @@
 					}
 					break;
 			}
-
-			if (oldestLab != null)
-				query += "&newestDate=" + encodeURIComponent(oldestLab);
-
 			return query;
 		}
 

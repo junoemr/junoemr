@@ -20,7 +20,6 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%@page import="java.util.List"%>
-<%@page import="java.util.Map"%>
 
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -39,31 +38,14 @@ if(!authed) {
 <%
 Logger logger=MiscUtils.getLogger();
 
-String view = (String)request.getAttribute("view");
 Integer pageSize=(Integer)request.getAttribute("pageSize");
 Integer pageNum=(Integer)request.getAttribute("pageNum");
 Integer pageCount=(Integer)request.getAttribute("pageCount");
-Map<String,String> docType=(Map<String,String>)request.getAttribute("docType");
-Map<String,List<String>> patientDocs=(Map<String,List<String>>)request.getAttribute("patientDocs");
 String providerNo=(String)request.getAttribute("providerNo");
 String searchProviderNo=(String)request.getAttribute("searchProviderNo");
-Map<String,String> patientIdNames=(Map<String,String>)request.getAttribute("patientIdNames");
-String patientIdNamesStr=(String)request.getAttribute("patientIdNamesStr");
-Map<String,String> docStatus=(Map<String,String>)request.getAttribute("docStatus");
-String patientIdStr =(String)request.getAttribute("patientIdStr");
-Map<String,List<String>> typeDocLab =(Map<String,List<String>>)request.getAttribute("typeDocLab");
-String demographicNo=(String)request.getAttribute("demographicNo");
 String ackStatus = (String)request.getAttribute("ackStatus");
 List labdocs=(List)request.getAttribute("labdocs");
-Map<String,Integer> patientNumDoc=(Map<String,Integer>)request.getAttribute("patientNumDoc");
-Integer totalDocs=(Integer) request.getAttribute("totalDocs");
-Integer totalHL7=(Integer)request.getAttribute("totalHL7");
-List<String> normals=(List<String>)request.getAttribute("normals");
-List<String> abnormals=(List<String>)request.getAttribute("abnormals");
 Integer totalNumDocs=(Integer)request.getAttribute("totalNumDocs");
-String selectedCategory = request.getParameter("selectedCategory");
-String selectedCategoryPatient = request.getParameter("selectedCategoryPatient");
-String selectedCategoryType = request.getParameter("selectedCategoryType");
 boolean isListView = Boolean.valueOf(request.getParameter("isListView"));
 
 boolean hasNoMoreResults = false;
@@ -104,43 +86,6 @@ String curUser_no = (String) session.getAttribute("user");
             </tr>
             <tr>
                 <td style="margin:0px;padding:0px;">
-                    <%--
-                    <table width="100%" style="margin:0px;padding:0px;" cellpadding="0" cellspacing="0">
-                        <tr>
-                            <th align="left" valign="bottom" class="cell" nowrap>
-                                <input type="checkbox" onclick="checkAll('lab_form');" name="checkA"/>
-                                <bean:message key="oscarMDS.index.msgHealthNumber"/>
-                            </th>
-                            <th align="left" valign="bottom" class="cell">
-                                <bean:message key="oscarMDS.index.msgPatientName"/>
-                            </th>
-                            <th align="left" valign="bottom" class="cell">
-                                <bean:message key="oscarMDS.index.msgSex"/>
-                            </th>
-                            <th align="left" valign="bottom" class="cell">
-                                <bean:message key="oscarMDS.index.msgResultStatus"/>
-                            </th>
-                            <th align="left" valign="bottom" class="cell">
-                                <bean:message key="oscarMDS.index.msgDateTest"/>
-                            </th>
-                            <th align="left" valign="bottom" class="cell">
-                                <bean:message key="oscarMDS.index.msgOrderPriority"/>
-                            </th>
-                            <th align="left" valign="bottom" class="cell">
-                                <bean:message key="oscarMDS.index.msgRequestingClient"/>
-                            </th>
-                            <th align="left" valign="bottom" class="cell">
-                                <bean:message key="oscarMDS.index.msgDiscipline"/>
-                            </th>
-                            <th align="left" valign="bottom" class="cell">
-                                <bean:message key="oscarMDS.index.msgReportStatus"/>
-                            </th>
-                            <th align="left" valign="bottom" class="cell">
-                                Ack #
-                            </th>
-                        </tr>
-					</table>
-					 --%>
 					<div id="listViewDocs" style="height:536px; overflow:auto;" onscroll="handleScroll(this)">
 					<style type="text/css">
 						#summaryView td, #summaryView th {
@@ -500,9 +445,6 @@ String curUser_no = (String) session.getAttribute("user");
                                                     arr2.push(ele);
                                                 }
                                                 doclabid_seq=arr2;
-
-                                                oldestLab = '<%=request.getAttribute("oldestLab") %>';
-
                                         </script>
                                         </tr>
                                     </table>

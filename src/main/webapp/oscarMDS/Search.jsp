@@ -26,7 +26,6 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
-<%@ page import="oscar.oscarMDS.data.ProviderData, java.util.ArrayList" %>
 <%@ page import="java.time.LocalDate" %>
 <html>
 <head>
@@ -45,7 +44,7 @@
 		}
 		function handleDateChange(elem)
 		{
-			if (!Oscar.Util.Date.validateDateInputTolerant(elem))
+			if (!Oscar.Util.Date.cleanDateInput(elem))
 			{
 				elem.focus();
 				alert("<bean:message key="oscarMDS.search.msgInvalidDate"/>");
