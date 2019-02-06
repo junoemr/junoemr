@@ -127,6 +127,10 @@
 			$("#autocompleteprov").autocomplete({
 				source: "<%= request.getContextPath() %>/provider/SearchProvider.do?method=labSearch",
 				minLength: 2,
+				messages: {
+					noResults: '',
+					results: ''
+				},
 				focus: function(event, ui)
 				{
 					$("#autocompleteprov").val(ui.item.label);
@@ -134,13 +138,12 @@
 				},
 				select: function(event, ui)
 				{
-					$("#autocompleteprov").val(ui.item.label);
-					$("#provfind").val(ui.item.value);
-
 					// Uncheck the radios when a doctor is selected
 					setTimeout(function()
 					{
-						radios = $("input[name=searchProviderAll]")
+						$("#autocompleteprov").val(ui.item.label);
+						$("#provfind").val(ui.item.value);
+						radios = $("input[name=searchProviderAll]");
 						for (var i = 0; i < radios.length; i++)
 						{
 							radios[i].checked = false;
@@ -148,6 +151,11 @@
 					});
 
 					return false;
+				},
+				close: function(event, uid)
+				{
+					$("#autocompleteprov").val(null);
+					$("#provfind").val(null);
 				}
 			})
 		});
@@ -220,7 +228,7 @@
 							<td><input type="text" id="startDate" name="startDate" size="15"
 									   value="<%= LocalDate.now().minusMonths(3) %>"
 									   onchange="handleDateChange(this)">
-								&nbsp;&nbsp;&nbsp;<button onclick="clearDate('startDate'); return false;">clear</button>
+								&nbsp;&nbsp;&nbsp;<button type="button" onclick="clearDate('startDate'); return false;">clear</button>
 							</td>
 						</tr>
 						<tr>
@@ -230,7 +238,7 @@
 							<td><input type="text" id="endDate" name="endDate" size="15"
 									   value="<%= LocalDate.now() %>"
 									   onchange="handleDateChange(this)">
-								&nbsp;&nbsp;&nbsp;<button onclick="clearDate('endDate'); return false;">clear</button>
+								&nbsp;&nbsp;&nbsp;<button type="button" onclick="clearDate('endDate'); return false;">clear</button>
 							</td>
 						</tr>
 

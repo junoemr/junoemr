@@ -27,7 +27,6 @@ import org.apache.http.impl.cookie.DateUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.utility.UtilDateUtilities;
-import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
 import org.oscarehr.util.LoggedInInfo;
@@ -237,128 +236,96 @@ public class InboxResultsDao {
 
 
 			// Filters to add to the where clause
-			String labFilterSql = "";
-			String docFilterSql = "";
+			String filterSql = "";
 			String proLrSql = "";
 			String labSql = "";
-			String docSql = "";
-
-			Boolean doLabs = true;
-			Boolean doDocuments = true;
 
 			if(labType != null && !"".equals(labType)) {
-				labFilterSql += "AND proLR.lab_type = :lab_type ";
-				docFilterSql += "AND proLR.lab_type = :lab_type ";
+				filterSql += "AND proLR.lab_type = :lab_type ";
 				proLrSql += "AND proLR_filter.lab_type = :lab_type ";
 				qp_lab_type = true;
-
-				if(labType.equals(ProviderLabRoutingModel.LAB_TYPE_DOCUMENTS))
-				{
-					doLabs = false;
-				}
-				else if(labType.equals(ProviderLabRoutingModel.LAB_TYPE_LABS))
-				{
-					doDocuments = false;
-				}
 			}
 
 			if(isAbnormal != null) {
 				if(isAbnormal) {
-					labFilterSql += "AND lab.result_status = 'A' ";
+					filterSql += "AND lab.result_status = 'A' ";
 					labSql += "AND lab_filter.result_status = 'A' ";
 				}
 				else {
-					labFilterSql += "AND (lab.result_status IS NULL OR lab.result_status != 'A') ";
+					filterSql += "AND (lab.result_status IS NULL OR lab.result_status != 'A') ";
 					labSql += "AND (lab_filter.result_status IS NULL OR lab_filter.result_status != 'A') ";
 				}
-				labFilterSql += "AND lab.id IS NOT NULL ";
+				filterSql += "AND lab.id IS NOT NULL ";
 				labSql += "AND lab_filter.id IS NOT NULL ";
-				doDocuments = false;
 			}
 
 			if ("-1".equals(providerNo) || "".equals(providerNo)) {
 				// any provider
 			} else if ("0".equals(providerNo)) {
 				// unclaimed
-				labFilterSql += "AND (proLR.provider_no = '0') ";
-				docFilterSql += "AND (proLR.provider_no = '0') ";
+				filterSql += "AND (proLR.provider_no = '0') ";
 				proLrSql += "AND (proLR_filter.provider_no = '0') ";
 			} else {
-				labFilterSql += "AND (proLR.provider_no = :provider_no) ";
-				docFilterSql += "AND (proLR.provider_no = :provider_no) ";
+				filterSql += "AND (proLR.provider_no = :provider_no) ";
 				proLrSql += "AND (proLR_filter.provider_no = :provider_no) ";
 				qp_provider_no = true;
 			}
 
 			if(providerNoList != null && !providerNoList.equals("")){
-				labFilterSql += "AND (proLR.provider_no IN ("+providerNoList+") ) ";
-				docFilterSql += "AND (proLR.provider_no IN ("+providerNoList+") ) ";
+				filterSql += "AND (proLR.provider_no IN ("+providerNoList+") ) ";
 				proLrSql += "AND (proLR_filter.provider_no IN ("+providerNoList+") ) ";
 			}
 
 			if ("N".equals(status) || "A".equals(status) || "F".equals(status)) {
-				labFilterSql += "AND (proLR.status = :status) ";
-				docFilterSql += "AND (proLR.status = :status) ";
+				filterSql += "AND (proLR.status = :status) ";
 				proLrSql += "AND (proLR_filter.status = :status) ";
 				qp_status = true;
 			}
 
 			if (!"".equals(patientFirstName)) {
-				labFilterSql += "AND (CASE "
-						+ "WHEN demo.demographic_no IS NOT NULL THEN demo.first_name "
+				filterSql += "AND (CASE "
+						+ "WHEN d1.demographic_no IS NOT NULL THEN d1.first_name "
+						+ "WHEN d2.demographic_no IS NOT NULL THEN d2.first_name "
 						+ "ELSE lab.first_name END LIKE :first_name) ";
-				docFilterSql += "AND demo.first_name LIKE :first_name ";
 				labSql += "AND (CASE "
-						+ "WHEN demo.demographic_no IS NOT NULL THEN demo.first_name "
+						+ "WHEN d1.demographic_no IS NOT NULL THEN d1.first_name "
+						+ "WHEN d2.demographic_no IS NOT NULL THEN d2.first_name "
 						+ "ELSE lab_filter.first_name END LIKE :first_name) ";
-				docSql += "AND demo.first_name LIKE :first_name ";
 				qp_first_name = true;
 			}
 
 			if (!"".equals(patientLastName)) {
-				labFilterSql += "AND (CASE     WHEN demo.demographic_no IS NOT NULL THEN demo.last_name     ELSE lab.last_name END LIKE :last_name) ";
-				docFilterSql += "AND demo.last_name LIKE :last_name ";
-				labSql += "AND (CASE     WHEN demo.demographic_no IS NOT NULL THEN demo.last_name     ELSE lab_filter.last_name END LIKE :last_name) ";
-				docSql += "AND demo.last_name LIKE :last_name ";
+				filterSql += "AND (CASE     WHEN d1.demographic_no IS NOT NULL THEN d1.last_name     WHEN d2.demographic_no IS NOT NULL THEN d2.last_name      ELSE lab.last_name END LIKE :last_name) ";
+				labSql += "AND (CASE     WHEN d1.demographic_no IS NOT NULL THEN d1.last_name     WHEN d2.demographic_no IS NOT NULL THEN d2.last_name      ELSE lab_filter.last_name END LIKE :last_name) ";
 				qp_last_name = true;
 			}
 
 			if (!"".equals(patientHealthNumber)) {
-				labFilterSql += "AND (CASE     WHEN demo.demographic_no IS NOT NULL THEN demo.hin     ELSE lab.health_no END LIKE :hin) ";
-				docFilterSql += "AND demo.hin LIKE :hin ";
-				labSql += "AND (CASE     WHEN demo.demographic_no IS NOT NULL THEN demo.hin     ELSE lab_filter.health_no END LIKE :hin) ";
-				docSql += "AND demo.hin LIKE :hin ";
+				filterSql += "AND (CASE     WHEN d1.demographic_no IS NOT NULL THEN d1.hin     WHEN d2.demographic_no IS NOT NULL THEN d2.hin     ELSE lab.health_no END LIKE :hin) ";
+				labSql += "AND (CASE     WHEN d1.demographic_no IS NOT NULL THEN d1.hin     WHEN d2.demographic_no IS NOT NULL THEN d2.hin     ELSE lab_filter.health_no END LIKE :hin) ";
 				qp_hin = true;
 			}
 
 			if (startDate != null) {
-				labFilterSql += "AND lab.obr_date >= :start_date ";
-				docFilterSql += "AND doc.observationdate >= :start_date ";
-				labSql += "AND lab_filter.obr_date >= :start_date ";
-				docSql += "AND doc.observationdate >= :start_date ";
+				filterSql += "AND COALESCE(doc.observationdate, lab.obr_date) >= :start_date ";
+				labSql += "AND COALESCE(doc.observationdate, lab_filter.obr_date) >= :start_date ";
 				qp_start_date = true;
 			}
 
 			if (endDate != null) {
-				labFilterSql += "AND lab.obr_date <= :end_date ";
-				docFilterSql += "AND doc.observationdate <= :end_date ";
-				labSql += "AND lab_filter.obr_date <= :end_date ";
-				docSql += "AND doc.observationdate <= :end_date ";
+				filterSql += "AND COALESCE(doc.observationdate, lab.obr_date) <= :end_date ";
+				labSql += "AND COALESCE(doc.observationdate, lab_filter.obr_date) <= :end_date ";
 				qp_end_date = true;
 			}
 
 			if ("0".equals(demographicNo)) {
-				labFilterSql += "AND NOT CAST(CASE     WHEN demo.demographic_no IS NULL THEN false     ELSE true END AS int) ";
-				docFilterSql += "AND NOT CAST(CASE     WHEN demo.demographic_no IS NULL THEN false     ELSE true END AS int) ";
+				filterSql += "AND NOT CAST(CASE     WHEN d1.demographic_no IS NULL AND d2.demographic_no IS NULL THEN false     ELSE true END AS int) ";
 			} else if (demographicNo != null && !"".equals(demographicNo)) {
-				labFilterSql += "AND CAST(CASE     WHEN demo.demographic_no IS NULL THEN false     ELSE true END AS int) ";
-				labFilterSql += "AND CASE ";
-				labFilterSql += "  WHEN demo.demographic_no IS NOT NULL THEN demo.demographic_no ";
-				labFilterSql += "  ELSE 0 END = :demographic_no ";
-				docFilterSql += "AND CAST(CASE     WHEN demo.demographic_no IS NULL THEN false     ELSE true END AS int) ";
-				docFilterSql += "AND CASE ";
-				docFilterSql += "  WHEN demo.demographic_no IS NOT NULL THEN demo.demographic_no ";
-				docFilterSql += "  ELSE 0 END = :demographic_no ";
+				filterSql += "AND CAST(CASE     WHEN d1.demographic_no IS NULL AND d2.demographic_no IS NULL THEN false     ELSE true END AS int) ";
+				filterSql += "AND CASE ";
+				filterSql += "  WHEN d1.demographic_no IS NOT NULL THEN d1.demographic_no ";
+				filterSql += "  WHEN d2.demographic_no IS NOT NULL THEN d2.demographic_no ";
+				filterSql += "  ELSE 0 END = :demographic_no ";
 				qp_demographic_no = true;
 			}
 
@@ -407,15 +374,18 @@ public class InboxResultsDao {
  				+ "  accessionNum, "
  				+ "  final_result_count, "
  				+ "  report_file "
- 				+ "FROM ( ";
+ 				+ "FROM ( "
  				
  				// This side of the union is for labs and documents.  It is grouped by accession number
  				// because labs can have multiple entries for a single lab.  If any of the records for a lab
  				// are unmatched, the entire lab is marked as unmatched because that is how it is treated 
  				// when viewing the lab.
-				String inner_query = "SELECT "
-				+ "#LABS#  '" + LabResultData.HL7TEXT + "' AS result_type, #ENDLABS#"
-				+ "#DOCS#  '" + LabResultData.DOCUMENT + "' AS result_type, #ENDDOCS#"
+				+ "SELECT "
+				+ "  CASE "
+				+ "    WHEN lab.id IS NOT NULL THEN '" + LabResultData.HL7TEXT + "'"
+				+ "    WHEN doc.document_no IS NOT NULL THEN '" + LabResultData.DOCUMENT + "' "
+				+ "    ELSE 'UNKNOWN' "
+				+ "  END AS result_type, "
 				+ "  proLR.id AS id, "
 				+ "  proLR.lab_no AS document_no, "
 				+ "  proLR.status, "
@@ -426,62 +396,48 @@ public class InboxResultsDao {
 				// (when module='demographic') indicates that the document is unassigned.  This CASE
 				// deals with that by checking if a demographic record is successfully joined.
 				+ "  CAST(CASE "
-				+ "    WHEN demo.demographic_no IS NULL THEN false "
+				+ "    WHEN d1.demographic_no IS NULL AND d2.demographic_no IS NULL THEN false "
 				+ "    ELSE true END AS int) as has_demographic, "
-				+ "#DOCS#  demo.last_name  AS last_name, #ENDDOCS#"
-				+ "#LABS#  CASE "
-				+ "    WHEN demo.demographic_no IS NOT NULL THEN demo.last_name "
+				+ "  CASE "
+				+ "    WHEN d1.demographic_no IS NOT NULL THEN d1.last_name "
+				+ "    WHEN d2.demographic_no IS NOT NULL THEN d2.last_name  "
 				+ "    ELSE lab.last_name END AS last_name, "
-				+ "#ENDLABS#"
-				+ "#DOCS#  demo.first_name  AS first_name, #ENDDOCS#"
-				+ "#LABS#  CASE "
-				+ "    WHEN demo.demographic_no IS NOT NULL THEN demo.first_name "
+				+ "  CASE "
+				+ "    WHEN d1.demographic_no IS NOT NULL THEN d1.first_name "
+				+ "    WHEN d2.demographic_no IS NOT NULL THEN d2.first_name  "
 				+ "    ELSE lab.first_name END AS first_name, "
-				+ "#ENDLABS#"
-				+ "#DOCS#  demo.hin AS hin, #ENDDOCS#"
-				+ "#LABS#  CASE "
-				+ "    WHEN demo.demographic_no IS NOT NULL THEN demo.hin "
+				+ "  CASE "
+				+ "    WHEN d1.demographic_no IS NOT NULL THEN d1.hin "
+				+ "    WHEN d2.demographic_no IS NOT NULL THEN d2.hin "
 				+ "    ELSE lab.health_no END AS hin, "
-				+ "#ENDLABS#"
-				+ "#DOCS# CASE WHEN demo.sex IN ('F', 'M') THEN demo.sex ELSE '?' END AS sex, #ENDDOCS#"
-				+ "#LABS#  CASE "
-				+ "    WHEN demo.demographic_no IS NOT NULL "
-				+ "      THEN CASE WHEN demo.sex IN ('F', 'M') THEN demo.sex ELSE '?' END "
+				+ "  CASE "
+				+ "    WHEN d1.demographic_no IS NOT NULL "
+				+ "      THEN CASE WHEN d1.sex IN ('F', 'M') THEN d1.sex ELSE '?' END "
+				+ "    WHEN d2.demographic_no IS NOT NULL "
+				+ "      THEN CASE WHEN d2.sex IN ('F', 'M') THEN d2.sex ELSE '?' END "
 				+ "    ELSE CASE WHEN lab.sex IN ('F', 'M') THEN lab.sex ELSE '?' END "
 				+ "    END AS sex, "
-				+ "#ENDLABS#"
 				+ "  CASE "
-				+ "    WHEN demo.demographic_no IS NOT NULL THEN demo.demographic_no "
+				+ "    WHEN d1.demographic_no IS NOT NULL THEN d1.demographic_no "
+				+ "    WHEN d2.demographic_no IS NOT NULL THEN d2.demographic_no"
 				+ "    ELSE 0 END AS demographic_no, "
-				+ "#DOCS#  doc.observationdate AS observationdate, #ENDDOCS#"
-				+ "#LABS#  lab.obr_date AS observationdate, #ENDLABS#"
-				+ "#DOCS#  doc.doctype AS description, #ENDDOCS#"
-				+ "#LABS#  null AS description, #ENDLABS#"
-				+ "#DOCS#  date(doc.updatedatetime) AS update_date_time, #ENDDOCS#"
-				+ "#LABS#  null AS update_date_time, #ENDLABS#"
-				+ "#DOCS#  CONCAT(creator.last_name, ', ', creator.first_name) AS uploadedBy, #ENDDOCS#"
-				+ "#LABS# null AS uploadedBy, #ENDLABS#"
-				+ "#DOCS#  null AS label, #ENDDOCS#"
-				+ "#LABS#  lab.label, #ENDLABS#"
-				+ "#DOCS#  null AS result_status, #ENDDOCS#"
-				+ "#LABS#  lab.result_status, #ENDLABS#"
-				+ "#DOCS#  null AS priority, #ENDDOCS#"
-				+ "#LABS#  lab.priority, #ENDLABS#"
-				+ "#DOCS#  null AS requesting_client, #ENDDOCS#"
-				+ "#LABS#  lab.requesting_client, #ENDLABS#"
-				+ "#DOCS#  null AS discipline, #ENDDOCS#"
-				+ "#LABS#  lab.discipline, #ENDLABS#"
-				+ "#DOCS#  null AS report_status, #ENDDOCS#"
-				+ "#LABS#  lab.report_status, #ENDLABS#"
-				+ "#DOCS#  null AS accessionNum, #ENDDOCS#"
-				+ "#LABS#  lab.accessionNum,  #ENDLABS#"
-				+ "#DOCS#  null AS final_result_count, #ENDDOCS#"
-				+ "#LABS#  lab.final_result_count, #ENDLABS#"
+				+ "  COALESCE(doc.observationdate, lab.obr_date) AS observationdate, "
+				+ "  doc.doctype AS description, "
+				+ "  date(doc.updatedatetime) as update_date_time, "
+				+ "  CONCAT(creator.last_name, ', ', creator.first_name) AS uploadedBy, "
+				+ "  lab.label, "
+				+ "  lab.result_status, "
+				+ "  lab.priority, "
+				+ "  lab.requesting_client, "
+				+ "  lab.discipline, "
+				+ "  lab.report_status, "
+				+ "  lab.accessionNum, "
+				+ "  lab.final_result_count,"
 				+ "  null AS report_file ";
 
 			if(neverAcknowledgedItems && "N".equals(status)) {
 
-				inner_query = inner_query + "FROM (" +
+				sql = sql + "FROM (" +
 						    "    SELECT * FROM (" +
 						    "        SELECT plr.*" +
 						    "        FROM providerLabRouting plr" +
@@ -491,10 +447,10 @@ public class InboxResultsDao {
 			} 
 			else {
 
-				inner_query = inner_query + "FROM providerLabRouting proLR ";
+				sql = sql + "FROM providerLabRouting proLR ";
 			}
 
-			inner_query += "LEFT JOIN providerLabRouting proLR_filter ON "
+			sql += "LEFT JOIN providerLabRouting proLR_filter ON "
 				+ "  proLR.lab_no = proLR_filter.lab_no "
 				+ "  AND proLR.lab_type = proLR_filter.lab_type "
 				+ "  AND ( "
@@ -507,46 +463,34 @@ public class InboxResultsDao {
 				+ "  proLR.lab_type = patLR_filter.lab_type "
 				+ "  AND patLR.lab_no = patLR_filter.lab_no "
 				+ "  AND (patLR.dateModified < patLR_filter.dateModified OR (patLR.dateModified = patLR_filter.dateModified AND patLR.id < patLR_filter.id))) "
-				+ "#DOCS# JOIN document doc ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no AND doc.status <> 'D' ) #ENDDOCS#"
-				+ "#DOCS# LEFT JOIN provider creator ON ( doc.doccreator = creator.provider_no ) #ENDDOCS#"
-				+ "#DOCS# LEFT JOIN ctl_document cdoc ON ( doc.document_no = cdoc.document_no AND cdoc.module='demographic' AND cdoc.module_id > 0) #ENDDOCS#"
-				+ "#DOCS# LEFT JOIN demographic demo ON ( cdoc.module_id IS NOT NULL AND cdoc.module_id = demo.demographic_no ) #ENDDOCS#"
+				+ "LEFT JOIN document doc ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no AND doc.status <> 'D' ) "
+				+ "LEFT JOIN provider creator ON ( doc.doccreator = creator.provider_no ) "
+				+ "LEFT JOIN ctl_document cdoc ON ( doc.document_no = cdoc.document_no AND cdoc.module='demographic' AND cdoc.module_id > 0) "
+				+ "LEFT JOIN demographic d2 ON ( cdoc.module_id IS NOT NULL AND cdoc.module_id = d2.demographic_no ) "
+				
+				+ "LEFT JOIN demographic d1 ON ( patLR.demographic_no = d1.demographic_no) "
+				+ "LEFT JOIN hl7TextInfo lab ON ( proLR.lab_type = 'HL7' AND lab.lab_no = proLR.lab_no ) "
+				+ "LEFT JOIN hl7TextInfo lab_filter ON  "
+				+ "  lab.accessionNum = lab_filter.accessionNum "
+				+ "  AND (lab.obr_date < lab_filter.obr_date OR ("
+				+ "    lab.obr_date = lab_filter.obr_date AND lab.id < lab_filter.id)) "
+				+ labSql
 
-				+ "#LABS# LEFT JOIN demographic demo ON ( patLR.demographic_no = demo.demographic_no) #ENDLABS#"
-				+ "#LABS# JOIN hl7TextInfo lab ON ( proLR.lab_type = 'HL7' AND lab.lab_no = proLR.lab_no ) #ENDLABS#"
-				+ "#LABS# LEFT JOIN hl7TextInfo lab_filter ON  #ENDLABS#"
-				+ "#LABS#   lab.accessionNum = lab_filter.accessionNum #ENDLABS#"
-				+ "#LABS#   AND (lab.obr_date < lab_filter.obr_date OR (#ENDLABS#"
-				+ "#LABS#     lab.obr_date = lab_filter.obr_date AND lab.id < lab_filter.id)) #ENDLABS#";
-
-			String where_clause = "#DOCS# WHERE proLR.lab_type = 'DOC' #ENDDOCS#"
-				+ "#LABS# WHERE proLR.lab_type = 'HL7' #ENDLABS#"
+				+ "WHERE proLR.lab_type IN ('DOC', 'HL7') "
 				+ "AND proLR_filter.id IS NULL "
 				+ "AND patLR_filter.id IS NULL "
-				+ "#LABS# AND lab_filter.id IS NULL #ENDLABS#"
-				+ "AND proLR.status != 'X' ";
+				+ "AND lab_filter.id IS NULL "
+				+ "AND (doc.document_no IS NOT NULL OR lab.id IS NOT NULL) "
+				+ "AND proLR.status != 'X' "
+				+ filterSql;
+				
 
-			String lab_query = inner_query + labSql + where_clause + labFilterSql;
-			lab_query = lab_query.replaceAll("#DOCS#((?:(?!#DOCS).)*)#ENDDOCS#", "");
-			lab_query = lab_query.replaceAll("#LABS#", "");
-			lab_query = lab_query.replaceAll("#ENDLABS#", "");
-			String doc_query = inner_query + docSql + where_clause + docFilterSql;
-			doc_query = doc_query.replaceAll("#LABS#((?:(?!#LABS).)*)#ENDLABS#", "");
-			doc_query = doc_query.replaceAll("#DOCS#", "");
-			doc_query = doc_query.replaceAll("#ENDDOCS#", "");
-
-			if(doLabs)
-			{
-				sql += lab_query + " UNION ALL ";
-			}
-			if(doDocuments)
-			{
-				sql += doc_query + " UNION ALL ";
-			}
-
+			sql += " UNION ALL "
+					
+					
 			// This side of the union is for HRM documents.  This is entirely untested because we don't
 			// have any example records.  It is included in the query because it is expected to be used soon.
-			sql += "SELECT "
+				+ "SELECT "
  				+ "  'HRM' AS result_type, "
  				+ "  hrm.id, "
  				+ "  hrm.id AS document_no, "
@@ -614,63 +558,25 @@ public class InboxResultsDao {
 
 			q = entityManager.createNativeQuery(sql);
 
-			if (qp_provider_no)
-			{
-				q.setParameter("provider_no", providerNo);
-			}
-			if (qp_status)
-			{
-				q.setParameter("status", status);
-			}
-			if (qp_first_name)
-			{
-				q.setParameter("first_name", "%" + patientFirstName + "%");
-			}
-			if (qp_last_name)
-			{
-				q.setParameter("last_name", "%" + patientLastName + "%");
-			}
-			if (qp_hin)
-			{
-				q.setParameter("hin", "%" + patientHealthNumber + "%");
-			}
-			if (qp_lab_type)
-			{
-				q.setParameter("lab_type", labType);
-			}
-			if (qp_start_date)
-			{
-				q.setParameter("start_date", startDate, TemporalType.DATE);
-			}
-			if (qp_end_date)
-			{
-				q.setParameter("end_date", endDate, TemporalType.DATE);
-			}
-			if (qp_demographic_no)
-			{
-				q.setParameter("demographic_no", demographicNo);
-			}
-			if (qp_hrm_first_name)
-			{
-				q.setParameter("first_name", "%" + patientFirstName + "%");
-			}
-			if (qp_hrm_last_name)
-			{
-				q.setParameter("last_name", "%" + patientLastName + "%");
-			}
-			if (qp_hrm_hin)
-			{
-				q.setParameter("hin", "%" + patientHealthNumber + "%");
-			}
-			if (qp_hrm_demographic_no)
-			{
-				q.setParameter("demographic_no", demographicNo);
-			}
-			if (qp_page)
-			{
+			if (qp_provider_no) { q.setParameter("provider_no", providerNo); }
+			if (qp_status) { q.setParameter("status", status); }
+			if (qp_first_name) { q.setParameter("first_name", "%" + patientFirstName + "%"); }
+			if (qp_last_name) { q.setParameter("last_name", "%" + patientLastName + "%"); }
+			if (qp_hin) { q.setParameter("hin", "%" + patientHealthNumber + "%"); }
+			if (qp_lab_type) { q.setParameter("lab_type", labType); }
+			if (qp_start_date) { q.setParameter("start_date", startDate, TemporalType.DATE); }
+			if (qp_end_date) { q.setParameter("end_date", endDate, TemporalType.DATE); }
+			if (qp_demographic_no) { q.setParameter("demographic_no", demographicNo); }
+			if (qp_hrm_first_name) { q.setParameter("first_name", "%" + patientFirstName + "%"); }
+			if (qp_hrm_last_name) { q.setParameter("last_name", "%" + patientLastName + "%"); }
+			if (qp_hrm_hin) { q.setParameter("hin", "%" + patientHealthNumber + "%"); }
+			if (qp_hrm_demographic_no) { q.setParameter("demographic_no", demographicNo); }
+			if (qp_page) {
 				q.setParameter("page_start", page * pageSize);
 				q.setParameter("page_size", pageSize);
 			}
+
+			logger.debug("QUERY: " + sql);
 
 			result = q.getResultList();
 
