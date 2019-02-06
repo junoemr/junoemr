@@ -42,6 +42,7 @@ import oscar.oscarDB.DBHandler;
 import oscar.oscarReport.data.RptResultStruct;
 import oscar.util.UtilMisc;
 
+import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.StringWriter;
 import java.sql.ResultSet;
@@ -111,7 +112,11 @@ public class SQLReporter implements Reporter
 			{
 				List<Explain> explainResultList = null;
 				boolean allowRun = SQLReportHelper.canSkipExplainCheck(preparedSql);
-				if(!allowRun)
+				if(allowRun)
+				{
+					preparedSql = SQLReportHelper.getExplainSkippableQuery(preparedSql);
+				}
+				else
 				{
 					explainResultList = rptTemplatesDao.getIndexPreparedExplainResultList(preparedSql, indexedParamMap);
 					allowRun = SQLReportHelper.allowQueryRun(explainResultList, maxRows);
@@ -141,11 +146,11 @@ public class SQLReporter implements Reporter
 		// since users can write custom queries this error is expected and should not generate an error in the log
 		catch(ReportByTemplateException e)
 		{
-			logger.warn("An Exception occurred while generating a report by template (from user defined query).");
+			logger.warn("An Exception occurred while generating a report by template (from user defined query): " + e.getMessage());
 		}
-		catch(SQLException e)
+		catch(SQLException | PersistenceException e)
 		{
-			logger.warn("An SQL Exception occurred while generating a report by template (from user defined query).");
+			logger.warn("An SQL Exception occurred while generating a report by template (from user defined query): " + e.getMessage());
 		}
 		catch(Exception sqe)
 		{

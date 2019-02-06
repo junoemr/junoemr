@@ -64,26 +64,37 @@ public class SQLReportHelper
 	 */
 	public static boolean canSkipExplainCheck(String sql)
 	{
+		return getExplainSkippableQuery(sql) != null;
+	}
+	public static String getExplainSkippableQuery(String sql)
+	{
 		String sqlTrimmed = sql.trim().replaceAll(";", "");
 		String sqlTrimmedUpper = sqlTrimmed.toUpperCase();
+
+		String queryString = null;
 
 		// show tables can't be explained
 		if("SHOW TABLES".equals(sqlTrimmedUpper))
 		{
-			return true;
+			queryString = "SHOW TABLES";
 		}
-
-		if(sqlTrimmedUpper.startsWith("DESCRIBE"))
+		else if(sqlTrimmedUpper.startsWith("DESCRIBE"))
 		{
 			String[] queryWords = sqlTrimmed.split(" ");
-			return queryWords.length == 2 && isValidTable(queryWords[1]);
+			if(queryWords.length == 2 && isValidTable(queryWords[1]))
+			{
+				queryString = "DESCRIBE " + queryWords[1];
+			}
 		}
 		else if(sqlTrimmedUpper.startsWith("SHOW COLUMNS FROM"))
 		{
 			String[] queryWords = sqlTrimmed.split(" ");
-			return queryWords.length == 4 && isValidTable(queryWords[3]);
+			if(queryWords.length == 4 && isValidTable(queryWords[3]))
+			{
+				queryString = "SHOW COLUMNS FROM " + queryWords[3];
+			}
 		}
-		return false;
+		return queryString;
 	}
 
 	private static boolean isValidTable(String tableName)

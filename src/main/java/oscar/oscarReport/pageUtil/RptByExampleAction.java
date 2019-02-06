@@ -42,6 +42,7 @@ import oscar.OscarProperties;
 import oscar.oscarReport.bean.RptByExampleQueryBeanHandler;
 import oscar.oscarReport.data.RptByExampleData;
 
+import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
@@ -84,7 +85,11 @@ public class RptByExampleAction extends Action
 
 				List<Explain> explainResultList = null;
 				boolean allowRun = SQLReportHelper.canSkipExplainCheck(preparedUserSql);
-				if(!allowRun)
+				if(allowRun)
+				{
+					preparedUserSql = SQLReportHelper.getExplainSkippableQuery(preparedUserSql);
+				}
+				else
 				{
 					explainResultList = rptByExampleDao.getExplainResultList(preparedUserSql);
 					allowRun = SQLReportHelper.allowQueryRun(explainResultList, maxRows);
@@ -94,7 +99,6 @@ public class RptByExampleAction extends Action
 				if(allowRun)
 				{
 					RptByExampleData exampleData = new RptByExampleData();
-
 					String results = exampleData.exampleReportGenerate(preparedUserSql, properties);
 
 					request.setAttribute("results", results);
@@ -120,6 +124,12 @@ public class RptByExampleAction extends Action
 			logger.warn("Report By Example user SQL Error: " + e.getMessage());
 			logger.warn("Query Attempt: " + userSql);
 			request.setAttribute("errorMessage", "Invalid SQL");
+		}
+		catch(PersistenceException e)
+		{
+			logger.warn("Report By Example Error: " + e.getMessage());
+			logger.warn("Query Attempt: " + userSql);
+			request.setAttribute("errorMessage", "Failed to run query");
 		}
 		catch(Exception e)
 		{
