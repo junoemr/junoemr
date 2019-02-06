@@ -8,6 +8,9 @@ DECLARE dashboard_present TINYINT(1);
 DECLARE template_present TINYINT(1);
 DECLARE dashboard_entries INT DEFAULT 0;
 DECLARE template_entries INT DEFAULT 0;
+DECLARE shared TEXT DEFAULT NULL;
+DECLARE metricSetName TEXT DEFAULT NULL;
+DECLARE metricLabel TEXT DEFAULT NULL;
 
 SELECT EXISTS(SELECT * FROM information_schema.tables where table_schema = DATABASE() AND table_name='dashboard') INTO dashboard_present;
 SELECT EXISTS(SELECT * FROM information_schema.tables where table_schema = DATABASE() AND table_name='indicatorTemplate') INTO template_present;
@@ -15,6 +18,29 @@ SELECT EXISTS(SELECT * FROM information_schema.tables where table_schema = DATAB
 IF dashboard_present AND template_present THEN
 SELECT COUNT(*) from dashboard INTO dashboard_entries;
 SELECT COUNT(*) from indicatorTemplate INTO template_entries;
+
+-- We want to keep their existing data if they have any, therefore we can't just delete the table and redeclare it.
+-- So we update it on the fly.
+
+SELECT column_name INTO shared FROM information_schema.columns where table_schema = DATABASE() and table_name='indicatorTemplate' and column_name='shared';
+SELECT column_name INTO metricSetName FROM information_schema.columns where table_schema = DATABASE() and table_name='indicatorTemplate' and column_name='metricSetName';
+SELECT column_name INTO metricLabel FROM information_schema.columns where table_schema = DATABASE() and table_name='indicatorTemplate' and column_name='metricLabel';
+
+IF shared is null THEN
+ALTER IGNORE TABLE indicatorTemplate
+ADD COLUMN shared tinyint(1) DEFAULT NULL;
+END IF;
+
+IF metricSetName is null THEN
+ALTER IGNORE TABLE indicatorTemplate
+ADD COLUMN metricSetName varchar(255) DEFAULT NULL;
+END IF;
+
+IF metricLabel is null THEN
+ALTER IGNORE TABLE indicatorTemplate
+ADD COLUMN metricLabel varchar(255) DEFAULT NULL;
+END IF;
+
 END IF;
 
 IF NOT dashboard_present AND NOT template_present THEN
