@@ -47,7 +47,7 @@ enum CodingSystem {
 	ICHPPCCODE("ichppccode");
 
 	private String text;
-	private static final Map<String, CodingSystem> MAP;
+	private static final Map<String, CodingSystem> VALID_SYSTEMS;
 	private static Logger logger = MiscUtils.getLogger();
 
 	static
@@ -57,7 +57,7 @@ enum CodingSystem {
 		{
 			initMap.put(system.toString(), system);
 		}
-		MAP = Collections.unmodifiableMap(initMap);
+		VALID_SYSTEMS = Collections.unmodifiableMap(initMap);
 	}
 
 	CodingSystem(String name)
@@ -70,30 +70,24 @@ enum CodingSystem {
 		return this.text;
 	}
 
-	public static CodingSystem fromString(String text)
+	public static String selectSystem(String name)
 	{
-		CodingSystem toReturn = MAP.get(text);
+		CodingSystem toReturn = VALID_SYSTEMS.get(name);
 
 		if (toReturn == null)
 		{
-			String errorMessage = "Invalid coding system specified: " + text;
+			String errorMessage = "Invalid coding system specified: " + name;
 			logger.error(errorMessage);
 			throw new IllegalArgumentException(errorMessage);
 		}
 
-		return toReturn;
-	}
-
-	public static String clean(String name)
-	{
-		return CodingSystem.fromString(name).toString();
+		return toReturn.toString();
 	}
 
 }
 
 @Repository
 public class DxDao extends AbstractDao<DxAssociation> {
-	private static Logger logger = MiscUtils.getLogger();
 
 	public DxDao() {
 		super(DxAssociation.class);
@@ -131,7 +125,7 @@ public class DxDao extends AbstractDao<DxAssociation> {
     @SuppressWarnings("unchecked")
 	public List<Object[]> findCodingSystemDescription(String codingSystem, String code) {
 		try {
-			codingSystem = CodingSystem.clean(codingSystem);
+			codingSystem = CodingSystem.selectSystem(codingSystem);
 
 			String sql = "SELECT " + codingSystem +", description FROM " + codingSystem + " WHERE " + codingSystem + " = :code";
 			Query query = entityManager.createNativeQuery(sql);
@@ -145,9 +139,11 @@ public class DxDao extends AbstractDao<DxAssociation> {
 	
 	@NativeSql
     @SuppressWarnings("unchecked")
-	public List<Object[]> findCodingSystemDescription(String codingSystem, String[] keywords) {
-		try {
-			codingSystem = CodingSystem.clean(codingSystem);
+	public List<Object[]> findCodingSystemDescription(String codingSystem, String[] keywords)
+	{
+		try
+		{
+			codingSystem = CodingSystem.selectSystem(codingSystem);
 			StringBuilder buf = new StringBuilder("select " + codingSystem + ", description from " + codingSystem);
 
 			List<String> keywordsArray = new ArrayList<>();
@@ -160,7 +156,7 @@ public class DxDao extends AbstractDao<DxAssociation> {
 				}
 			}
 
-			for (int i=0; i<keywordsArray.size(); i++)
+			for (int i = 0; i < keywordsArray.size(); i++)
 			{
 				if (i == 0)
 				{
@@ -180,7 +176,7 @@ public class DxDao extends AbstractDao<DxAssociation> {
 
 			Query query = entityManager.createNativeQuery(buf.toString());
 
-			for (int i=0; i<keywordsArray.size(); i++)
+			for (int i = 0; i < keywordsArray.size(); i++)
 			{
 				String paramName = "Param" + i;
 				query.setParameter(paramName, keywordsArray.get(i));
@@ -198,7 +194,7 @@ public class DxDao extends AbstractDao<DxAssociation> {
 	@NativeSql
 	public String getCodeDescription(String codingSystem, String code) {
 		String desc="";
-		codingSystem = CodingSystem.clean(codingSystem);
+		codingSystem = CodingSystem.selectSystem(codingSystem);
 		StringBuilder buf = new StringBuilder("select description from " + codingSystem + " where "+ codingSystem + "= :code");
 		try {
 			Query query = entityManager.createNativeQuery(buf.toString());
