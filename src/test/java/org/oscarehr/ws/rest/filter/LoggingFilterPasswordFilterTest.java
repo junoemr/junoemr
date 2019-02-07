@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.oscarehr.ws.rest.filter.annotation.LoggingFilterHidePassword;
+import org.oscarehr.ws.common.annotation.MaskParameter;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,7 +37,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(Parameterized.class)
 public class LoggingFilterPasswordFilterTest
 {
-	private static final String filterText = LoggingFilterHidePassword.FILTER_TEXT;
+	private static final String filterText = MaskParameter.MASK;
 	private static final Logger logger = Logger.getLogger(LoggingFilterPasswordFilterTest.class);
 
 	private String inputStr;

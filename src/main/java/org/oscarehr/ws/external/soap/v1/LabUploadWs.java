@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.common.SkipContentLogging;
+import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
 import org.springframework.stereotype.Component;
 import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
@@ -60,7 +60,7 @@ public class LabUploadWs extends AbstractWs {
 
     private static final Logger logger=MiscUtils.getLogger();
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
     public String uploadAHS(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
@@ -88,7 +88,7 @@ public class LabUploadWs extends AbstractWs {
 	 * use uploadAHS instead. This method redirects to uploadAHS
 	 */
     @Deprecated
-    @SkipContentLogging
+    @SkipContentLoggingInbound
 	public String uploadCLS(
 			@WebParam(name="file_name") String fileName,
 			@WebParam(name="contents") String contents,
@@ -101,7 +101,7 @@ public class LabUploadWs extends AbstractWs {
 	 * use uploadAHS instead. This method redirects to uploadAHS
 	 */
 	@Deprecated
-    @SkipContentLogging
+    @SkipContentLoggingInbound
 	public String uploadCLSDI(
 			@WebParam(name="file_name") String fileName,
 			@WebParam(name="contents") String contents,
@@ -111,7 +111,7 @@ public class LabUploadWs extends AbstractWs {
 		return uploadAHS(fileName, contents, oscarProviderNo);
 	}
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
     public String uploadCML(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
@@ -135,7 +135,7 @@ public class LabUploadWs extends AbstractWs {
         return returnMessage;
     }
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
     public String uploadLifelabs(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
@@ -158,7 +158,7 @@ public class LabUploadWs extends AbstractWs {
         return returnMessage;
     }
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
     public String uploadExcelleris(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
@@ -180,7 +180,7 @@ public class LabUploadWs extends AbstractWs {
         return returnMessage;
     }
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
     public String uploadIHA(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
@@ -203,7 +203,7 @@ public class LabUploadWs extends AbstractWs {
         return returnMessage;
     }
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
     public String uploadGammaDynacare(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
@@ -226,7 +226,7 @@ public class LabUploadWs extends AbstractWs {
         return returnMessage;
     }
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
     public String uploadCDL(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
@@ -249,7 +249,7 @@ public class LabUploadWs extends AbstractWs {
         return returnMessage;
     }
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
 	public String uploadMHL(
 			@WebParam(name = "file_name") String fileName, 
 			@WebParam(name = "contents") String contents,

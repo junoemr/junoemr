@@ -28,8 +28,9 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.RestServiceLog;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.filter.annotation.LoggingFilterHidePassword;
-import org.oscarehr.ws.rest.filter.annotation.LoggingFilterSkipContentLogging;
+import org.oscarehr.ws.common.annotation.MaskParameter;
+import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
+import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
 import oscar.log.LogAction;
 
 import javax.annotation.Priority;
@@ -59,7 +60,7 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 	private static final String PROP_REQUEST_BODY = "LoggingFilter.requestBody";
 	private static final String PROP_REQUEST_DATETIME = "LoggingFilter.requestDateTime";
     private static final String PROP_REQUEST_PROVIDER = "LoggingFilter.requestProviderNo";
-	private static final String PROP_SKIP_LOGGING_CONTENT = "LoggingFilter.doNotLogContent";
+	private static final String PROP_SKIP_LOGGING_CONTENT_OUTBOUND = "LoggingFilter.doNotLogContentOutbound";
 	public static final String PROP_SKIP_LOGGING = "LoggingFilter.doNotLog";
 
 	@Context
@@ -99,19 +100,26 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 		{
 			body = readEntityStream(request);
 
-			// if the custom annotation exists on the target method, filter the fields from the request body before logging
-			LoggingFilterHidePassword filterAnnotation = resourceInfo.getResourceMethod().getAnnotation(LoggingFilterHidePassword.class);
-			if(filterAnnotation != null)
+			SkipContentLoggingInbound skipContentLoggingInbound = resourceInfo.getResourceMethod().getAnnotation(SkipContentLoggingInbound.class);
+			MaskParameter filterAnnotation = resourceInfo.getResourceMethod().getAnnotation(MaskParameter.class);
+
+			// if the skip logging inbound annotation exists on the target method, set the body to the dummy value
+			if(skipContentLoggingInbound != null)
+			{
+				body = SkipContentLoggingInbound.SKIP_CONTENT_LOGGING_INBOUND;
+			}
+			// if the filter annotation exists on the target method, filter the fields from the request body before logging
+			else if(filterAnnotation != null)
 			{
 				body = removePasswordData(body, filterAnnotation.fields());
 			}
 		}
-		/* allow methods annotated with this custom annotation to skip the content logging step.
+		/* allow methods annotated with this custom annotation to skip the outbound content logging step.
 		 * This is useful for large responses such as encoded documents & non-json responses */
-		LoggingFilterSkipContentLogging skipContentLogging = resourceInfo.getResourceMethod().getAnnotation(LoggingFilterSkipContentLogging.class);
-		if(skipContentLogging != null)
+		SkipContentLoggingOutbound skipContentLoggingOutbound = resourceInfo.getResourceMethod().getAnnotation(SkipContentLoggingOutbound.class);
+		if(skipContentLoggingOutbound != null)
 		{
-			request.setProperty(PROP_SKIP_LOGGING_CONTENT, true);
+			request.setProperty(PROP_SKIP_LOGGING_CONTENT_OUTBOUND, true);
 		}
 
 		request.setProperty(PROP_REQUEST_BODY, body);
@@ -126,7 +134,7 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 	{
 		// some things should not be logged, if they set this property, we deliberately skip the logging process
 		Boolean skipLogging = (Boolean) request.getProperty(PROP_SKIP_LOGGING);
-		Boolean skipContentLogging = (Boolean) request.getProperty(PROP_SKIP_LOGGING_CONTENT);
+		Boolean skipContentLoggingOutbound = (Boolean) request.getProperty(PROP_SKIP_LOGGING_CONTENT_OUTBOUND);
 		if(skipLogging != null && skipLogging)
 		{
 			return;
@@ -164,18 +172,26 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 			}
 		}
 
-		if(response.getEntity() != null && (skipContentLogging == null || !skipContentLogging))
+		if(response.getEntity() != null)
 		{
-			try
+			if(skipContentLoggingOutbound == null || !skipContentLoggingOutbound)
 			{
-				Object entity = response.getEntity();
-				final ObjectMapper objectMapper = mapperResolver.getContext(Object.class);
+				try
+				{
+					Object entity = response.getEntity();
+					final ObjectMapper objectMapper = mapperResolver.getContext(Object.class);
 
-				rawResponseData = objectMapper.writeValueAsString(entity);
+					rawResponseData = objectMapper.writeValueAsString(entity);
+				}
+				catch(Exception e)
+				{
+					logger.error("Error writing API response as JSON", e);
+				}
 			}
-			catch(Exception e)
+			else
 			{
-				logger.error("Error writing API response as JSON", e);
+				// use dummy data in place of the actual body to signify that the data exists but was not logged
+				rawResponseData = SkipContentLoggingOutbound.SKIP_CONTENT_LOGGING_OUTBOUND;
 			}
 		}
 
@@ -204,7 +220,6 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 			logger.error("Failed to save REST Log Entry", e);
 		}
 	}
-
 
 	private String readEntityStream(ContainerRequestContext requestContext)
 	{
@@ -241,7 +256,7 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 			Pattern p = Pattern.compile("(\\\""+ fieldName +"\\\"\\s*\\:\\s*\\\")((?:\\\\.|[^\\\"])*?)(\\\")");
 			Matcher m = p.matcher(rawString);
 
-			rawString = m.replaceAll("$1"+LoggingFilterHidePassword.FILTER_TEXT+"$3");
+			rawString = m.replaceAll("$1"+ MaskParameter.MASK+"$3");
 		}
 		return rawString;
 	}

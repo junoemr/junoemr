@@ -20,15 +20,19 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.filter.annotation;
+package org.oscarehr.ws.common.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * This annotation should be called for messages where the message body should not be logged.
+ */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface LoggingFilterSkipContentLogging
+public @interface SkipContentLoggingOutbound
 {
+	String SKIP_CONTENT_LOGGING_OUTBOUND = "logging.SkipContentLoggingOutbound";
 }

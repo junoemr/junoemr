@@ -20,29 +20,19 @@
  * Victoria, British Columbia
  * Canada
  */
-
-package org.oscarehr.ws.common;
+package org.oscarehr.ws.common.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
-/** Use this annotation to mask parameter values from being logged.
- *
- * SOAP
- * @value name: The <xs:element/> to mask
- *
- *
- * REST
- * @value name: JSON key of the value to mask
-*/
+/**
+ * This annotation should be called for messages where the message body should not be logged.
+ */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MaskParameter
+public @interface SkipContentLoggingInbound
 {
-    String MASK = "*******";
-
-    String[] name() default "password";
+    String SKIP_CONTENT_LOGGING_INBOUND = "logging.SkipContentLoggingInbound";
 }

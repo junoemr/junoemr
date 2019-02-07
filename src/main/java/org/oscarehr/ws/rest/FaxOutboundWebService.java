@@ -27,7 +27,7 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.schedulingTasks.OutboundFaxSchedulingTask;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.ws.rest.filter.annotation.LoggingFilterSkipContentLogging;
+import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +85,7 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 	@GET
 	@Path("/{id}/download")
 	@Produces("application/pdf")
-	@LoggingFilterSkipContentLogging
+	@SkipContentLoggingOutbound
 	public Response download(@PathParam("id") Long id)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
