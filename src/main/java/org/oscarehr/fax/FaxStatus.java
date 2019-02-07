@@ -29,10 +29,15 @@ import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.OscarProperties;
 
 @Component
 public class FaxStatus
 {
+	private static final OscarProperties props = OscarProperties.getInstance();
+	private static final boolean outboundPropEnabled = props.isPropertyActive("fax.outbound.enabled");
+	private static final boolean inboundPropEnabled = props.isPropertyActive("fax.inbound.enabled");
+
 	@Autowired
 	private ServerStateHandler serverStateHandler;
 
@@ -46,7 +51,7 @@ public class FaxStatus
 	{
 		// the master setting must be enabled.
 		Boolean masterSettingEnabled = systemPreferenceService.isPreferenceEnabled(FaxAccount.PROP_MASTER_FAX_ENABLED_OUTBOUND, false);
-		if(masterSettingEnabled)
+		if(outboundPropEnabled && masterSettingEnabled)
 		{
 			// at least one fax account must have the outgoing route turned on
 			FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();
@@ -69,7 +74,7 @@ public class FaxStatus
 	{
 		// the master setting must be enabled.
 		Boolean masterSettingEnabled = systemPreferenceService.isPreferenceEnabled(FaxAccount.PROP_MASTER_FAX_ENABLED_INBOUND, false);
-		if(masterSettingEnabled)
+		if(inboundPropEnabled && masterSettingEnabled)
 		{
 			// at least one fax account must have the incoming route turned on
 			FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();

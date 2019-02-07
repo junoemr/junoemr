@@ -632,18 +632,13 @@ public class SRFaxApiConnector
 			}
 
 		}
-
 		return wildCards;
-
 	}
 
 	private void validateRequiredVariables(String[] requiredVariables, Map<String, String> parameters)
 	{
-
 		for(String field : requiredVariables)
 		{
-			String error = "";
-
 			if(field.endsWith("*") && !field.contains("|")) // non piped wildcard variable.  check for first instance
 			{
 				String fieldPrefix = field.replace("*", "");
@@ -651,14 +646,14 @@ public class SRFaxApiConnector
 
 				if(!parameters.containsKey(wildCard))
 				{
-					error = "Required Field missing.  No values for " + fieldPrefix;
+					throw new FaxApiValidationException("Required Field missing.  No values for " + fieldPrefix, "fax.exception.validationError");
 				}
 				else
 				{
 					String value = parameters.get(wildCard);
 					if(value.length() <= 0)
 					{
-						error = "Required Field missing.  No values for " + fieldPrefix;
+						throw new FaxApiValidationException("Required Field missing.  No values for " + fieldPrefix, "fax.exception.validationError");
 					}
 				}
 			}
@@ -701,28 +696,26 @@ public class SRFaxApiConnector
 					}
 					if(!checkSuccessful)
 					{
-						error = "Required field missing.  You must provide at lease 1 of the following: " + String.join(",", pipedFields);
+						throw new FaxApiValidationException(
+								"Required field missing.  You must provide at lease 1 of the following: " + String.join(",", pipedFields),
+								"fax.exception.validationError");
 					}
 				}
 				else // standard field, check if it exists
 				{
 					if(!parameters.containsKey(field))
 					{
-						error = "Required field " + field + " is missing!";
+						throw new FaxApiValidationException("Required field " + field + " is missing!", "fax.exception.validationError");
 					}
 					else // ensure field value is not empty
 					{
 						String value = parameters.get(field);
 						if(value.length() <= 0)
 						{
-							error = "Required field " + field + " is missing!";
+							throw new FaxApiValidationException("Required field " + field + " is missing!", "fax.exception.validationError");
 						}
 					}
 				}
-			}
-			if(error.length() > 0)
-			{
-				throw new FaxApiValidationException(error, "fax.exception.validationError");
 			}
 		}
 	}

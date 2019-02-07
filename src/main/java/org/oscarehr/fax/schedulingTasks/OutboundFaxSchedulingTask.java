@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Component;
-import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
 
 import javax.annotation.PostConstruct;
@@ -42,9 +41,6 @@ import java.util.TimeZone;
 public class OutboundFaxSchedulingTask
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final OscarProperties props = OscarProperties.getInstance();
-
-	private static final boolean enabled = props.isPropertyActive("fax.schedule_outbound.enabled");
 	private static final String cronSchedule = "0 */5 * * * *";
 	private static CronSequenceGenerator cronTrigger;
 
@@ -65,12 +61,9 @@ public class OutboundFaxSchedulingTask
 	{
 		try
 		{
-			if(enabled)
-			{
-				logger.info("Execute Outbound scheduling task! " + ConversionUtils.toDateTimeString(LocalDateTime.now()));
-				outgoingFaxService.sendQueuedFaxes();
-				logger.info("Completed at " + ConversionUtils.toDateTimeString(LocalDateTime.now()) + ". Next Execution Time: " + getNextRunTime());
-			}
+			logger.info("Execute Outbound scheduling task! " + ConversionUtils.toDateTimeString(LocalDateTime.now()));
+			outgoingFaxService.sendQueuedFaxes();
+			logger.info("Completed at " + ConversionUtils.toDateTimeString(LocalDateTime.now()) + ". Next Execution Time: " + getNextRunTime());
 		}
 		catch(IllegalStateException e)
 		{
@@ -84,7 +77,7 @@ public class OutboundFaxSchedulingTask
 
 	public LocalDateTime getNextRunTime()
 	{
-		if(enabled && faxStatus.canSendFaxes())
+		if(faxStatus.canSendFaxes())
 		{
 			return ConversionUtils.toLocalDateTime(cronTrigger.next(new Date()));
 		}
