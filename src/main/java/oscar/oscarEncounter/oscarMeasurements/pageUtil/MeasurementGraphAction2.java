@@ -537,6 +537,12 @@ public class MeasurementGraphAction2 extends Action {
 
                 if (mdb.get("range") != null){
                     String range = (String) mdb.get("range");
+                    String units = (String) mdb.get("units");
+                    if (units != null)
+                    {
+                        range = range.replace(units, "");
+                    }
+
                     if (range.indexOf("-") != -1){
                         String[] sp = range.split("-");
                         double open = Double.parseDouble(sp[0]);
