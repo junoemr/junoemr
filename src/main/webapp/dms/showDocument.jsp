@@ -364,6 +364,10 @@
 											<input id="rotate180btn_<%=docId %>" onclick="rotate180('<%=docId %>')" type="button" value="<bean:message key="inboxmanager.document.rotate180" />" />
 											<input id="rotate90btn_<%=docId %>" onclick="rotate90('<%=docId %>')" type="button" value="<bean:message key="inboxmanager.document.rotate90" />" />
 											<% if (numOfPage > 1) { %><input id="removeFirstPagebtn_<%=docId %>" onclick="removeFirstPage('<%=docId %>')" type="button" value="<bean:message key="inboxmanager.document.removeFirstPage" />" /><% } %>
+											<% if (numOfPage > 1 && displayDocumentAs.equals(UserProperty.IMAGE))
+											{ %>
+												<input id="removePagebtn_<%=docId %>" onclick="removePage('<%=docId %>')" type="button" value="<bean:message key="inboxmanager.document.removeCurrentPage" />"/>
+											<% } %>
 										</div>
 									</td>
 								</tr>
