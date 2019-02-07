@@ -193,30 +193,6 @@ public class SplitDocumentAction extends DispatchAction {
 		return rotate(mapping, form, request, response, 90);
 	}
 
-	public ActionForward removeFirstPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
-	{
-		Document doc = documentDao.getDocument(request.getParameter("document"));
-
-		File pdfFile = FileFactory.getDocumentFile(doc.getDocfilename()).getFileObject();
-		PDDocument pdf = PDDocument.load(pdfFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
-
-		// Documents must have at least 2 pages, for the first page to be removed.
-		if(pdf.getNumberOfPages() > 1)
-		{
-			for(int i = 0; i < pdf.getNumberOfPages(); i++)
-			{
-				ManageDocumentAction.deleteCacheVersion(doc, (i + 1));
-			}
-			pdf.removePage(0);
-			pdf.save(pdfFile);
-			doc.setNumberofpages(doc.getNumberofpages() - 1);
-			documentDao.merge(doc);
-		}
-		pdf.close();
-
-		return null;
-	}
-
 	public ActionForward removePage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
 	{
 		int pageNumber = Integer.parseInt(request.getParameter("page"));

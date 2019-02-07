@@ -363,10 +363,10 @@
 											<input onclick="split('<%=docId%>','<%=StringEscapeUtils.escapeJavaScript(demoName) %>')" type="button" value="<bean:message key="inboxmanager.document.split" />" />
 											<input id="rotate180btn_<%=docId %>" onclick="rotate180('<%=docId %>')" type="button" value="<bean:message key="inboxmanager.document.rotate180" />" />
 											<input id="rotate90btn_<%=docId %>" onclick="rotate90('<%=docId %>')" type="button" value="<bean:message key="inboxmanager.document.rotate90" />" />
-											<% if (numOfPage > 1) { %><input id="removeFirstPagebtn_<%=docId %>" onclick="removeFirstPage('<%=docId %>')" type="button" value="<bean:message key="inboxmanager.document.removeFirstPage" />" /><% } %>
+											<% if (numOfPage > 1) { %><input id="removeFirstPagebtn_<%=docId %>" onclick="removePage('<%=docId %>', 1)" type="button" value="<bean:message key="inboxmanager.document.removeFirstPage" />" /><% } %>
 											<% if (numOfPage > 1 && displayDocumentAs.equals(UserProperty.IMAGE))
 											{ %>
-												<input id="removePagebtn_<%=docId %>" onclick="removePage('<%=docId %>')" type="button" value="<bean:message key="inboxmanager.document.removeCurrentPage" />"/>
+												<input id="removePagebtn_<%=docId %>" onclick="removePage('<%=docId %>', $('curPage_' + <%=docId %>).value)" type="button" value="<bean:message key="inboxmanager.document.removeCurrentPage" />"/>
 											<% } %>
 										</div>
 									</td>
