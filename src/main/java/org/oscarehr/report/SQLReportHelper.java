@@ -43,10 +43,10 @@ public class SQLReportHelper
 	 */
 	public static boolean allowQueryRun(List<Explain> explainResults, long maxRows)
 	{
+		logger.info("Explain Results:\n" + explainResults.toString());
+
 		for(Explain result : explainResults)
 		{
-			logger.info("Explain Result:\n" + result.toString());
-
 			BigInteger rows = result.getRows();
 			// if rows > maxRows
 			if(rows != null && BigInteger.valueOf(maxRows).compareTo(rows) < 0)

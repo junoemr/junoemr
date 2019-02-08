@@ -38,8 +38,10 @@ public class Parameter {
     public static final String CHECK = "check";
     public static final String TEXT = "text";
     public static final String DATE = "date";
-    public static final String TEXTLIST = "textlist"; 
-    
+    public static final String TEXTLIST = "textlist";
+    public static final String LIMIT = "limit";
+    public static final String OFFSET = "offset";
+
     //public static final int TYPE_INTEGER = 1;
     //public static final int TYPE_STRING = 2;
     //public static final int TYPE_DATE = 3;

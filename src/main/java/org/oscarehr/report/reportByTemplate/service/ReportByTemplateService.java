@@ -23,6 +23,7 @@
 
 package org.oscarehr.report.reportByTemplate.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -269,6 +270,8 @@ public class ReportByTemplateService
 		StringBuffer sb = new StringBuffer();
 
 		int counter = 1;
+		PreparedSQLTemplate preparedSQLTemplate = new PreparedSQLTemplate();
+
 		while(matcher.find())
 		{
 			String paramName = matcher.group(1);
@@ -288,6 +291,26 @@ public class ReportByTemplateService
 			{
 				paramValues = new String[0];
 			}
+			else if(parameters.containsKey(paramName+":limit"))
+			{
+				String limitParam = parameters.get(paramName+":limit")[0];
+				if(!StringUtils.isNumeric(limitParam))
+				{
+					throw new ReportByTemplateException("Non numeric limit value: " + limitParam);
+				}
+				matcher.appendReplacement(sb, limitParam);
+				continue;
+			}
+			else if(parameters.containsKey(paramName+":offset"))
+			{
+				String offsetParam = parameters.get(paramName+":offset")[0];
+				if(!StringUtils.isNumeric(offsetParam))
+				{
+					throw new ReportByTemplateException("Non numeric offset value: " + offsetParam);
+				}
+				matcher.appendReplacement(sb, offsetParam);
+				continue;
+			}
 			else
 			{
 				throw new ReportByTemplateException("Missing Parameter definition: " + paramName);
@@ -301,7 +324,6 @@ public class ReportByTemplateService
 
 		jpaSQL = sb.toString();
 
-		PreparedSQLTemplate preparedSQLTemplate = new PreparedSQLTemplate();
 		preparedSQLTemplate.setPreparedSQL(jpaSQL);
 		preparedSQLTemplate.setParameterMap(indexedParams);
 
