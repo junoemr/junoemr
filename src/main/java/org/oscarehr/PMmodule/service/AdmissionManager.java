@@ -166,11 +166,6 @@ public class AdmissionManager {
 
 
 	public void processAdmission(Integer demographicNo, String providerNo, Program program, String dischargeNotes, String admissionNotes, boolean tempAdmission, Date admissionDate, boolean overrideRestriction, List<Integer> dependents) throws ProgramFullException, AdmissionException, ServiceRestrictionException {
-		// see if there's room first
-		if (program.getNumOfMembers().intValue() >= program.getMaxAllowed().intValue()) {
-			throw new ProgramFullException();
-		}
-
         // check if there's a service restriction in place on this individual for this program
         if (!overrideRestriction) {
             ProgramClientRestriction restrInPlace = clientRestrictionManager.checkClientRestriction(program.getId(), demographicNo, new Date());
