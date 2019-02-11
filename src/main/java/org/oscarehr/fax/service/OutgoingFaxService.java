@@ -96,7 +96,11 @@ public class OutgoingFaxService
 		for(String faxNumber : faxNumberList)
 		{
 			String formattedFaxNo = faxNumber.trim().replaceAll("\\D", "");
-			if(formattedFaxNo.length() != 10)
+			if(formattedFaxNo.length() == 10)
+			{
+				formattedFaxNo = "1" + formattedFaxNo;
+			}
+			if(formattedFaxNo.length() != 11)
 			{
 				throw new FaxNumberException("Invalid Fax Number: " + faxNumber, "fax.exception.invalidFaxNumber");
 			}
