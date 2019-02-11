@@ -100,7 +100,7 @@
 						</label>
 						<input class="flex-row-content" id="input-fax-account-fax-no" name="input-fax-account-fax-no" type="text"
 						       ng-model="faxConfigEditController.faxAccount.faxNumber"
-						       ng-minlength="11" ng-maxlength="11" ng-pattern="/\d{11}/" ng-required="faxConfigEditController.faxAccount.enableOutbound">
+						       ng-minlength="10" ng-maxlength="10" ng-pattern="/\d{10}/" ng-required="faxConfigEditController.faxAccount.enableOutbound">
 					</div>
 					<div class="flex-row input-validation" ng-show="!form['input-fax-account-fax-no'].$valid">
 						<label class="flex-row-label">*</label>

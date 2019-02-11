@@ -893,7 +893,7 @@ web_service_client.received_timeout_ms=3000
 oscarhost_login=https://www.junoemr.com/{oscar_practice_id}
 
 # Set the location to write fax files to
-#fax_file_location=/var/lib/OscarDocument/{oscar_practice_id}/fax/
+fax_file_location=/var/lib/OscarDocument/{oscar_practice_id}/fax/outgoing/
 
 # Enable full demographics merge
 #enable_full_merge = true
