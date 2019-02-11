@@ -963,17 +963,21 @@ public class RxPrescriptionData {
 			if(isLongTerm() && !isDiscontinued() && !isArchived()) {
 				return true;
 			}
-			boolean b = false;
+			return !isExpired();
+		}
+
+		public boolean isExpired() {
+			boolean b = true;
 
 			try {
 				GregorianCalendar cal = new GregorianCalendar(Locale.CANADA);
 				cal.add(GregorianCalendar.DATE, -1);
 
 				if (this.getEndDate().after(cal.getTime())) {
-					b = true;
+					b = false;
 				}
 			} catch (Exception e) {
-				b = false;
+				b = true;
 			}
 
 			return b;
