@@ -959,24 +959,34 @@ public class RxPrescriptionData {
 		/*
 		 * Current should contain non-expired drugs, as well as long terms drugs that are not deleted/discontinued
 		 */
-		public boolean isCurrent() {
-			if(isLongTerm() && !isDiscontinued() && !isArchived()) {
+		public boolean isCurrent()
+		{
+			if(isLongTerm() && !isDiscontinued() && !isArchived())
+			{
 				return true;
 			}
-			boolean b = false;
+			return !isExpired();
+		}
 
-			try {
+		public boolean isExpired()
+		{
+			boolean bExpired = true;
+			try
+			{
 				GregorianCalendar cal = new GregorianCalendar(Locale.CANADA);
 				cal.add(GregorianCalendar.DATE, -1);
 
-				if (this.getEndDate().after(cal.getTime())) {
-					b = true;
+				if (this.getEndDate().after(cal.getTime()))
+				{
+					bExpired = false;
 				}
-			} catch (Exception e) {
-				b = false;
+			}
+			catch (Exception e)
+			{
+				bExpired = true;
 			}
 
-			return b;
+			return bExpired;
 		}
 
 		public static Date calcEndDate(Date rxDate, String duration, String durationUnit, int repeat)
