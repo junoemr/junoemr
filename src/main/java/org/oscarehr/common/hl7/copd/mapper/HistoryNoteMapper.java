@@ -25,13 +25,11 @@ package org.oscarehr.common.hl7.copd.mapper;
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
 import org.oscarehr.util.MiscUtils;
-import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,29 +38,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HistoryNoteMapper
+public class HistoryNoteMapper extends AbstractMapper
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private final ZPD_ZTR message;
-	private final ZPD_ZTR_PROVIDER provider;
 	private final Date oldestEncounterNoteDate; // used as a default for notes with no date info
-	private final CoPDImportService.IMPORT_SOURCE importSource;
 
 	private static Map<String, String> relationshipTypeMap = new HashMap<>();
 
-	public HistoryNoteMapper()
-	{
-		message = null;
-		provider = null;
-		oldestEncounterNoteDate = null;
-		importSource = null;
-	}
 	public HistoryNoteMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		this.message = message;
-		this.provider = message.getPATIENT().getPROVIDER(providerRep);
+		super(message, providerRep, importSource);
 		this.oldestEncounterNoteDate = getOldestEncounterNoteContactDate();
-		this.importSource = importSource;
 	}
 
 	private Date getOldestEncounterNoteContactDate() throws HL7Exception
@@ -72,7 +58,7 @@ public class HistoryNoteMapper
 
 		for(int rep = 0; rep < reps; rep++)
 		{
-			Date noteDate = ConversionUtils.fromDateString(provider.getZPV(rep).getZpv2_contactDate().getTs1_TimeOfAnEvent().getValue(), "yyyyMMdd");
+			Date noteDate = getNullableDate(provider.getZPV(rep).getZpv2_contactDate().getTs1_TimeOfAnEvent().getValue());
 			if(noteDate != null)
 			{
 				noteDateList.add(noteDate);
@@ -277,12 +263,8 @@ public class HistoryNoteMapper
 
 	public Date getMedHistProcedureDate(int rep) throws HL7Exception
 	{
-		String dateStr = provider.getZPR(rep).getZpr3_procedureDateTime().getTs1_TimeOfAnEvent().getValue();
-		if(dateStr==null || dateStr.trim().isEmpty() || dateStr.equals("00000000"))
-		{
-			return null;
-		}
-		return ConversionUtils.fromDateString(dateStr, "yyyyMMdd");
+		return getNullableDate(provider.getZPR(rep)
+				.getZpr3_procedureDateTime().getTs1_TimeOfAnEvent().getValue());
 	}
 
 	public String getMedHistProcedureName(int rep) throws HL7Exception
@@ -327,12 +309,8 @@ public class HistoryNoteMapper
 
 	public Date getFamHistDiagnosisDate(int rep) throws HL7Exception
 	{
-		String dateStr = provider.getZHF(rep).getZhf2_diagnosisDate().getTs1_TimeOfAnEvent().getValue();
-		if(dateStr==null || dateStr.trim().isEmpty() || dateStr.equals("00000000"))
-		{
-			return null;
-		}
-		return ConversionUtils.fromDateString(dateStr, "yyyyMMdd");
+		return getNullableDate(provider.getZHF(rep)
+				.getZhf2_diagnosisDate().getTs1_TimeOfAnEvent().getValue());
 	}
 
 	public String getFamHistDiagnosisDescription(int rep) throws HL7Exception

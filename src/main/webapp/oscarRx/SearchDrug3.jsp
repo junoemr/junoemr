@@ -1862,7 +1862,7 @@ YAHOO.example.FnMultipleFields = function(){
                     var ran_number=Math.round(Math.random()*1000000);
                     var name=encodeURIComponent(arr.name);
                     var params = "demographicNo=<%=demoNo%>&drugId="+arr.id+"&text="+name+"&randomId="+ran_number;  //hack to get around ie caching the page
-                   new Ajax.Updater('rxText',url, {method:'get',parameters:params,evalScripts:true,
+                   new Ajax.Updater('rxText',url, {method:'post',parameters:params,evalScripts:true,
                         insertion: Insertion.Bottom,onSuccess:function(transport){
                             updateCurrentInteractions();
                         }});
@@ -1908,7 +1908,7 @@ function addFav(randomId,brandName){
    if (favoriteName.length > 0){
         var url= "<c:out value="${ctx}"/>" + "/oscarRx/addFavorite2.do?parameterValue=addFav2";
         var data="randomId="+randomId+"&favoriteName="+favoriteName;
-        new Ajax.Request(url, {method: 'get',parameters:data, onSuccess:function(transport){
+        new Ajax.Request(url, {method: 'post',parameters:data, onSuccess:function(transport){
               window.location.href="SearchDrug3.jsp";
         }})
    }

@@ -24,12 +24,9 @@ package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_LAB;
-import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.writer.JunoCoPDLabWriter;
-import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
 import java.io.IOException;
@@ -40,21 +37,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class LabMapper
+public class LabMapper extends AbstractMapper
 {
-	private static final Logger logger = MiscUtils.getLogger();
-	private final ZPD_ZTR message;
-	private final ZPD_ZTR_PROVIDER provider;
-
-	public LabMapper()
-	{
-		message = null;
-		provider = null;
-	}
 	public LabMapper(ZPD_ZTR message, int providerRep)
 	{
-		this.message = message;
-		this.provider = message.getPATIENT().getPROVIDER(providerRep);
+		super(message, providerRep);
 	}
 
 	public int getNumLabs()

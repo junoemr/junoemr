@@ -272,8 +272,18 @@ public class CaseManagementPrint {
 				//Date d = result.getDateObj();
 				// TODO:filter out the ones which aren't in our date range if there's a date range????
 
-				Hl7TextInfo textInfo = hl7TextInfoDao.findLatestVersionByAccessionNo(result.accessionNumber);
-				String segmentId = String.valueOf(textInfo.getLabNumber());
+				String segmentId;
+
+				if (result.accessionNumber == null || result.accessionNumber.equals(""))
+				{
+					segmentId = result.segmentID;
+				}
+				else
+				{
+					Hl7TextInfo textInfo = hl7TextInfoDao.findLatestVersionByAccessionNo(result.accessionNumber);
+					segmentId = String.valueOf(textInfo.getLabNumber());
+				}
+
 				MessageHandler handler = Factory.getHandler(segmentId);
 				String fileName2 = OscarProperties.getInstance().getProperty("DOCUMENT_DIR") + "//" + handler.getPatientName().replaceAll("\\s", "_") + "_" + handler.getMsgDate() + "_LabReport.pdf";
                                 file2= new File(fileName2);

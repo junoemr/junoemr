@@ -25,15 +25,18 @@
 package org.oscarehr.ws.rest;
 
 import io.prometheus.client.Histogram;
+import org.oscarehr.ws.rest.filter.LoggingFilter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.model.UserMetricsTo1;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 
@@ -50,8 +53,9 @@ public class UserMetricsService extends AbstractServiceImpl
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces({MediaType.APPLICATION_JSON , MediaType.APPLICATION_XML})
-	public RestResponse<String> postMetrics(ArrayList<UserMetricsTo1> data)
+	public RestResponse<String> postMetrics(@Context HttpServletRequest request, ArrayList<UserMetricsTo1> data)
 	{
+		request.setAttribute(LoggingFilter.PROP_SKIP_LOGGING, true);
 		String page = "appointment";
 		for(UserMetricsTo1 metric : data)
 		{
