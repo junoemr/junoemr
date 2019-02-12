@@ -175,6 +175,11 @@ Oscar.ShowDocument.updateDocument = function updateDocument(elementId)
 			}
 		}
 	});
+
+	// Reload the window the document was opened from only if it's the inbox
+	if (window.opener.location.href.includes('inboxManage.do'))
+		window.opener.location.reload();
+
 	return false;
 };
 
