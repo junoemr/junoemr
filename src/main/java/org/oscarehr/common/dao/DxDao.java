@@ -89,6 +89,8 @@ enum CodingSystem {
 @Repository
 public class DxDao extends AbstractDao<DxAssociation> {
 
+	private static final Logger logger = MiscUtils.getLogger();
+
 	public DxDao() {
 		super(DxAssociation.class);
 	}
@@ -169,8 +171,7 @@ public class DxDao extends AbstractDao<DxAssociation> {
 
 				// We will rely on the persistence library to escape potentially dangerous strings for us by
 				// parameterizing all search strings ('%:Param1%', '%:Param2%', etc)
-				String queryParam = "'%:Param" + i + "%'";
-
+				String queryParam = ":Param" + i;
 				buf.append(" " + codingSystem + " like " + queryParam + " or description like " + queryParam);
 			}
 
@@ -179,29 +180,32 @@ public class DxDao extends AbstractDao<DxAssociation> {
 			for (int i = 0; i < keywordsArray.size(); i++)
 			{
 				String paramName = "Param" + i;
-				query.setParameter(paramName, keywordsArray.get(i));
+				query.setParameter(paramName, "%" + keywordsArray.get(i) + "%");
 			}
 			return query.getResultList();
 		}
 		catch (Exception e)
 		{
-			MiscUtils.getLogger().error("error",e);
+			logger.error("error",e);
 			return new ArrayList<Object[]>();
 		}
-
 	}
-	
+
 	@NativeSql
-	public String getCodeDescription(String codingSystem, String code) {
-		String desc="";
+	public String getCodeDescription(String codingSystem, String code)
+	{
+		String desc = "";
 		codingSystem = CodingSystem.selectSystem(codingSystem);
-		StringBuilder buf = new StringBuilder("select description from " + codingSystem + " where "+ codingSystem + "= :code");
-		try {
+		StringBuilder buf = new StringBuilder("select description from " + codingSystem + " where " + codingSystem + "= :code");
+		try
+		{
 			Query query = entityManager.createNativeQuery(buf.toString());
 			query.setParameter("code", code);
-			desc =  (String) query.getSingleResult();
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("error "+buf,e);
+			desc = (String) query.getSingleResult();
+		}
+		catch(Exception e)
+		{
+			logger.error("error " + buf, e);
 		}
 		return desc;
 	}
