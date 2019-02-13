@@ -57,10 +57,10 @@ public class EmailTemplateConfig
 
 	public EmailTemplateConfig()
 	{
-		fromEmail = props.getProperty("appointment_reminder_from_email_address");
-		fromName = props.getProperty("appointment_reminder_from_name");
-		subject = props.getProperty("appointment_reminder_subject");
-		dateFormat = props.getProperty("appointment_reminder_appt_date_format_java");
+		setFromEmail(props.getProperty("appointment_reminder_from_email_address"));
+		setFromName(props.getProperty("appointment_reminder_from_name"));
+		setSubject(props.getProperty("appointment_reminder_subject"));
+		setDateFormat(props.getProperty("appointment_reminder_appt_date_format_java"));
 
 		templateNameTxt = null;
 		templateNameHtml = null;

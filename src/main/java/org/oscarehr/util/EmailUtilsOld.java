@@ -70,22 +70,22 @@ import java.util.Properties;
  */
 public final class EmailUtilsOld
 {
-	private static final Logger logger=MiscUtils.getLogger();
-	
+	private static final Logger logger = MiscUtils.getLogger();
+
 	private static final String CATEGORY = "email.";
 	private static final String SMTP_HOST_KEY = "host";
 	private static final String SMTP_SSL_PORT_KEY = "port";
 	private static final String SMTP_USER_KEY = "username";
 	private static final String SMTP_PASSWORD_KEY = "password";
-        private static final String SMTP_CONNECTION_SECURITY = "connection_security";
+	private static final String SMTP_CONNECTION_SECURITY = "connection_security";
 	private static final String RECIPIENT_OVERRIDE_KEY = "recipient_override";
 	private static final String PRINT_INSTEAD_OF_SEND_KEY = "print_instead_of_send";
-        
-        private static final String CONNECTION_SECURITY_SSL = "ssl";
-        private static final String CONNECTION_SECURITY_STARTTLS = "starttls";
 
-	private static String recipientOverride = OscarProperties.getInstance().getProperty(CATEGORY+RECIPIENT_OVERRIDE_KEY);
-	private static boolean printInsteadOfSend = Boolean.parseBoolean(OscarProperties.getInstance().getProperty(CATEGORY+PRINT_INSTEAD_OF_SEND_KEY));
+	private static final String CONNECTION_SECURITY_SSL = "ssl";
+	private static final String CONNECTION_SECURITY_STARTTLS = "starttls";
+
+	private static String recipientOverride = OscarProperties.getInstance().getProperty(CATEGORY + RECIPIENT_OVERRIDE_KEY);
+	private static boolean printInsteadOfSend = Boolean.parseBoolean(OscarProperties.getInstance().getProperty(CATEGORY + PRINT_INSTEAD_OF_SEND_KEY));
 
 	private static class HtmlEmailWrapper extends HtmlEmail
 	{
@@ -201,18 +201,18 @@ public final class EmailUtilsOld
 	 */
 	public static HtmlEmail getHtmlEmail(String smtpServer, String smtpPort, String smtpUser, String smtpPassword, String connectionSecurity) throws EmailException
 	{
-		logger.debug("smtpServer="+smtpServer+", smtpSslPort="+smtpPort+", smtpUser="+smtpUser+", smtpPassword="+smtpPassword + ",connectionSecurity="+connectionSecurity);
+		logger.debug("smtpServer=" + smtpServer + ", smtpSslPort=" + smtpPort + ", smtpUser=" + smtpUser + ", smtpPassword=" + smtpPassword + ",connectionSecurity=" + connectionSecurity);
 
 		HtmlEmail email = null;
 
-		if (RECIPIENT_OVERRIDE_KEY!=null || printInsteadOfSend) email=new HtmlEmailWrapper();
-		else email=new HtmlEmail();
+		if(RECIPIENT_OVERRIDE_KEY != null || printInsteadOfSend) email = new HtmlEmailWrapper();
+		else email = new HtmlEmail();
 
 		email.setHostName(smtpServer);
 
-		if (smtpPort != null)
+		if(smtpPort != null)
 		{
-			if (connectionSecurity != null && connectionSecurity.equals(CONNECTION_SECURITY_SSL))
+			if(connectionSecurity != null && connectionSecurity.equals(CONNECTION_SECURITY_SSL))
 			{
 				email.setSslSmtpPort(smtpPort);
 			}
@@ -222,15 +222,19 @@ public final class EmailUtilsOld
 			}
 		}
 
-		if (smtpUser != null && smtpPassword != null) email.setAuthentication(smtpUser, smtpPassword);
+		if(smtpUser != null && smtpPassword != null) email.setAuthentication(smtpUser, smtpPassword);
 
 		Session session = email.getMailSession();
 
-		if (connectionSecurity != null) {
-			if (connectionSecurity.equals(CONNECTION_SECURITY_STARTTLS)){
+		if(connectionSecurity != null)
+		{
+			if(connectionSecurity.equals(CONNECTION_SECURITY_STARTTLS))
+			{
 				session.getProperties().setProperty(Email.MAIL_TRANSPORT_TLS, "true");
 				email.setTLS(true);
-			} else if (connectionSecurity.equals(CONNECTION_SECURITY_SSL)) {
+			}
+			else if(connectionSecurity.equals(CONNECTION_SECURITY_SSL))
+			{
 				email.setSSL(true);
 			}
 		}
@@ -240,7 +244,7 @@ public final class EmailUtilsOld
 		properties.setProperty("mail.smtp.timeout", "20000");
 		properties.setProperty("mail.smtp.auth", "true");
 
-		return(email);
+		return (email);
 	}
 
 	/**
@@ -272,8 +276,8 @@ public final class EmailUtilsOld
 		htmlEmail.addReplyTo(fromEmailAddress);
 
 		htmlEmail.setSubject(subject);
-		if (textContents != null) htmlEmail.setTextMsg(textContents);
-		if (htmlContents != null) htmlEmail.setHtmlMsg(htmlContents);
+		if(textContents != null) htmlEmail.setTextMsg(textContents);
+		if(htmlContents != null) htmlEmail.setHtmlMsg(htmlContents);
 
 		htmlEmail.send();
 	}
