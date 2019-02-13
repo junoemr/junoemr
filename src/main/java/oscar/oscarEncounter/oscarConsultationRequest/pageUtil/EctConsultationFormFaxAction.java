@@ -33,8 +33,6 @@ import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
-import oscar.log.LogAction;
-import oscar.log.LogConst;
 import oscar.oscarLab.ca.all.pageUtil.LabPDFCreator;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
@@ -232,10 +230,7 @@ public class EctConsultationFormFaxAction extends Action
 						errorList.add("Failed to send fax, it has been queued for automatic resend. " +
 									"Reason: " + transfer.getSystemStatusMessage());
 					}
-
 				}
-				LogAction.addLogEntry(providerNo, Integer.parseInt(demoNo), LogConst.ACTION_SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
-						reqId, loggedInInfo.getIp(), "CONSULT " + reqId);
 				request.setAttribute("faxSuccessful", true);
 			}
 			else

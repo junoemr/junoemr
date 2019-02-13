@@ -29,7 +29,7 @@ import com.lowagie.text.DocumentException;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperRunManager;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import org.apache.commons.text.StringEscapeUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
@@ -41,8 +41,6 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import oscar.OscarProperties;
-import oscar.log.LogAction;
-import oscar.log.LogConst;
 import oscar.oscarRx.templates.RxPdfTemplate;
 import oscar.oscarRx.templates.RxPdfTemplateCustom1;
 import oscar.oscarRx.templates.RxPdfTemplatePrescriptionPad;
@@ -85,7 +83,6 @@ public class FrmCustomedPDFServlet extends HttpServlet
 				String pharmacyFaxNo = req.getParameter("pharmaFax");
 				String pharmacyName = req.getParameter("pharmaName").replaceAll("'", "\\\\'");
 				String pdfId = req.getParameter("pdfId");
-
 				String demographicNoStr = req.getParameter("demographic_no");
 				Integer demographicNo = Integer.parseInt(demographicNoStr);
 
@@ -94,7 +91,8 @@ public class FrmCustomedPDFServlet extends HttpServlet
 
 				HashSet<String> recipients = OutgoingFaxService.preProcessFaxNumbers(pharmacyFaxNo);
 				String faxMessage = "Fax sent to: " + pharmacyName + " (" + pharmacyFaxNo + ")";
-				for(String recipient : recipients)
+
+				for(String recipient : recipients) // only ever has one element
 				{
 					// write to file
 					String pdfFile = "prescription_" + pdfId + ".pdf";
@@ -103,19 +101,16 @@ public class FrmCustomedPDFServlet extends HttpServlet
 					FaxOutboxTransferOutbound transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicNo, recipient, FaxOutbound.FileType.PRESCRIPTION, fileToFax);
 					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
 					{
-						faxMessage = StringEscapeUtils.escapeHtml4("Failed to send fax. Check account settings. " +
-								"Reason: " + transfer.getSystemStatusMessage());
+						faxMessage = "Failed to send fax. Check account settings. " +
+								"Reason: " + transfer.getSystemStatusMessage();
 					}
 					else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED.name()))
 					{
-						faxMessage = StringEscapeUtils.escapeHtml4("Failed to send fax, it has been queued for automatic resend. " +
-								"Reason: " + transfer.getSystemStatusMessage());
+						faxMessage = "Failed to send fax, it has been queued for automatic resend. " +
+								"Reason: " + transfer.getSystemStatusMessage();
 					}
 				}
-				LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_SENT, LogConst.CON_FAX, LogConst.STATUS_SUCCESS,
-						pdfId, req.getRemoteAddr(), "Prescription " + pdfId);
-
-				writer.println("<script>alert('" + faxMessage + ")');window.close();</script>");
+				writer.println("<script>alert('" + StringEscapeUtils.escapeJavaScript(faxMessage) + ")');window.close();</script>");
 			}
 			else
 			{

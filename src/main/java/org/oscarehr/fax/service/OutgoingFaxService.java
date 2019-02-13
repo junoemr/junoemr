@@ -137,13 +137,17 @@ public class OutgoingFaxService
 		else if(isLegacyFaxEnabled())
 		{
 			writeToFaxOutgoing(faxNumber, fileToFax);
+			LogAction.addLogEntry(providerId, demographicId, LogConst.ACTION_SENT, LogConst.CON_FAX,
+					LogConst.STATUS_SUCCESS, null, null, "Faxed To: " + faxNumber);
+
 			// fake a transfer object to return
 			transfer = new FaxOutboxTransferOutbound();
-			transfer.setSystemStatus(FaxOutbound.Status.QUEUED.name());
+			transfer.setSystemStatus(FaxOutbound.Status.SENT.name());
 			transfer.setToFaxNumber(faxNumber);
 			transfer.setFileType(fileType.name());
 			transfer.setDemographicNo(demographicId);
 			transfer.setProviderNo(providerId);
+			transfer.setSystemStatusMessage("Using legacy fax system");
 		}
 		else
 		{
@@ -367,6 +371,7 @@ public class OutgoingFaxService
 		{
 			// status changes must be saved
 			faxOutboundDao.merge(faxOutbound);
+			// log the fax send attempt in the security log
 			LogAction.addLogEntry(faxOutbound.getProviderNo(), faxOutbound.getDemographicNo(), LogConst.ACTION_SENT, LogConst.CON_FAX,
 					logStatus, String.valueOf(faxOutbound.getId()), null, logData);
 			updateSendAttempts(faxOutbound);
