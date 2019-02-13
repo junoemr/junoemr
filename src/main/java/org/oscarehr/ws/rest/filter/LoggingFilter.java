@@ -54,7 +54,7 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 	private static final String PROP_REQUEST_BODY = "LoggingFilter.requestBody";
 	private static final String PROP_REQUEST_DATETIME = "LoggingFilter.requestDateTime";
     private static final String PROP_REQUEST_PROVIDER = "LoggingFilter.requestProviderNo";
-	static final String PROP_SKIP_LOGGING = "LoggingFilter.doNotLog";
+	public static final String PROP_SKIP_LOGGING = "LoggingFilter.doNotLog";
 
 	@Context
 	ContextResolver<ObjectMapper> mapperResolver;

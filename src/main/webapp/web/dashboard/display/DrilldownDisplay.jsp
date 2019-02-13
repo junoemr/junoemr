@@ -33,8 +33,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
-<%-- COMMENTING OUT NON-TEMPLATE CODE, SHOULD BE REMOVED WHEN REFACTORED
-
 <security:oscarSec roleName='${ sessionScope[userrole] }, ${ sessionScope[user] }' rights="w" objectName="_dashboardDrilldown">
 	<c:redirect url="securityError.jsp?type=_dashboardDrilldown" />
 </security:oscarSec>
@@ -62,7 +60,6 @@
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/web/dashboard/display/drilldownDisplayController.js" ></script>
 </head>
 <body>
---%>
 
 <div class="container">
 
@@ -345,7 +342,5 @@
 
 </div>	<!-- end container -->
 
-<%-- COMMENTING OUT NON-TEMPLATE CODE, SHOULD BE REMOVED WHEN REFACTORED
 </body>
 </html>
---%>
