@@ -55,6 +55,7 @@ import org.oscarehr.billing.CA.BC.model.TeleplanC12;
 import org.oscarehr.billing.CA.BC.model.TeleplanRefusalCode;
 import org.oscarehr.billing.CA.BC.model.TeleplanS00;
 import org.oscarehr.billing.CA.BC.model.TeleplanS21;
+import org.oscarehr.common.dao.BillingBCDao;
 import org.oscarehr.common.dao.BillingDao;
 import org.oscarehr.common.dao.BillingPaymentTypeDao;
 import org.oscarehr.common.model.Billing;
@@ -1202,6 +1203,17 @@ public class MSPReconcile {
 					if (rsDemo.next()) {
 						b.demoPhone = rsDemo.getString("phone");
 						b.demoPhone2 = rsDemo.getString("phone2");
+					}
+
+					//Lookup Service_location long name, and append to serviceLocation.
+					BillingBCDao srvTypeDoa = (BillingBCDao) SpringUtils.getBean(BillingBCDao.class);
+					List<Object[]> srvLocationMapping = srvTypeDoa.findBillingVisits("BC");
+					for (Object[] mapping : srvLocationMapping)
+					{
+						if (((String)mapping[0]).equals(b.serviceLocation)) {
+							b.serviceLocation = b.serviceLocation + " - " + (String)mapping[1];
+							break;
+						}
 					}
 				}
 
