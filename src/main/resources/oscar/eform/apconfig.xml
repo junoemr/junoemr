@@ -466,23 +466,16 @@
 	</databaseap>
 	<databaseap>
 		<ap-name>ageComplex</ap-name>
-		<ap-sql>SELECT (IF ( (YEAR(CURRENT_DATE) - YEAR(@bdate))&lt; 3,
-			(IF ( (((YEAR(CURRENT_DATE) - 1) * 12 + MONTH(CURRENT_DATE)) -
-			((YEAR(@bdate) - 1) * 12 + MONTH(@bdate))) - (MID(@bdate, 9, 2) &lt;
-			MID(@bdate, 9, 2))&lt; 3,
-			(IF ( FLOOR((TO_DAYS(CURRENT_DATE) - TO_DAYS(@bdate))/7)&lt; 5,
-			(IF ( (TO_DAYS(CURRENT_DATE) - TO_DAYS(@bdate))&lt; 2,
-			'newborn', CONCAT((TO_DAYS(CURRENT_DATE) - TO_DAYS(@bdate)),' day old'))),
-			CONCAT(FLOOR((TO_DAYS(CURRENT_DATE) - TO_DAYS(@bdate))/7),' week
-			old'))), CONCAT((((YEAR(CURRENT_DATE) - 1) * 12 +
-			MONTH(CURRENT_DATE)) - ((YEAR(@bdate) - 1) * 12 + MONTH(@bdate))) -
-			(MID(@bdate, 9, 2) &lt; MID(@bdate, 9, 2)),' month old'))),
-			CONCAT((YEAR(CURRENT_DATE) - YEAR(@bdate)) - (MID(CURRENT_DATE, 6, 5)
-			&lt; MID(CURRENT_DATE, 6, 5)),' year old'))) as ageComplex from
-			(SELECT @bdate:=
-			DATE_FORMAT(CONCAT((demographic.year_of_birth), '-', (demographic.month_of_birth), '-',
-			(demographic.date_of_birth)),'%Y-%m-%d') AS birthdate FROM
-			demographic WHERE demographic_no=${demographic}) as t</ap-sql>
+		<ap-sql>SELECT
+			CASE
+			  WHEN (@bdate >= DATE(NOW() - INTERVAL 2 DAY)) THEN 'newborn'
+			  WHEN (@bdate >= DATE(NOW() - INTERVAL 7 DAY)) THEN CONCAT(TIMESTAMPDIFF(DAY, @bdate, CURRENT_DATE),' day old')
+			  WHEN (@bdate >= DATE(NOW() - INTERVAL 4 WEEK)) THEN CONCAT(TIMESTAMPDIFF(WEEK, @bdate, CURRENT_DATE),' week old')
+			  WHEN (@bdate >= DATE(NOW() - INTERVAL 11 MONTH)) THEN CONCAT(TIMESTAMPDIFF(MONTH, @bdate, CURRENT_DATE),' month old')
+			  ELSE CONCAT(TIMESTAMPDIFF(YEAR, @bdate, CURRENT_DATE), ' year old')
+			END AS ageComplex
+			  FROM (SELECT @bdate:= DATE_FORMAT(CONCAT((demographic.year_of_birth), '-', (demographic.month_of_birth), '-', (demographic.date_of_birth)),'%Y-%m-%d')
+			  AS birthdate FROM demographic WHERE demographic_no=${demographic}) as t</ap-sql>
 		<ap-output>${ageComplex}</ap-output>
 	</databaseap>
 	<databaseap>

@@ -29,6 +29,9 @@ import org.apache.commons.lang.StringUtils;
 @Table(name = "providerLabRouting")
 public class ProviderLabRoutingModel extends AbstractModel<Integer> implements Serializable {
 
+	public static final String LAB_TYPE_LABS  = "HL7";
+	public static final String LAB_TYPE_DOCUMENTS  = "DOC";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
