@@ -1207,10 +1207,11 @@ public class MSPReconcile {
 
 					//Lookup Service_location long name, and append to serviceLocation.
 					BillingBCDao srvTypeDoa = (BillingBCDao) SpringUtils.getBean(BillingBCDao.class);
-					List<Object[]> srvLocationMapping = srvTypeDoa.findBillingVisits("BC");
+					List<Object[]> srvLocationMapping = srvTypeDoa.findBillingVisits(org.oscarehr.common.dao.BillingServiceDao.BC);
 					for (Object[] mapping : srvLocationMapping)
 					{
-						if (((String)mapping[0]).equals(b.serviceLocation)) {
+						if (((String)mapping[0]).equals(b.serviceLocation))
+						{
 							b.serviceLocation = b.serviceLocation + " - " + (String)mapping[1];
 							break;
 						}
