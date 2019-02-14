@@ -1,6 +1,5 @@
 /**
- *
- * Copyright (c) 2005-2012. Centre for Research on Inner City Health, St. Michael's Hospital, Toronto. All Rights Reserved.
+ * Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,13 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * This software was written for
- * Centre for Research on Inner City Health, St. Michael's Hospital,
- * Toronto, Ontario, Canada
+ * This software was written for the
+ * Department of Family Medicine
+ * McMaster University
+ * Hamilton
+ * Ontario, Canada
  */
 
-
 package org.oscarehr.common.model;
+
+import org.oscarehr.clinic.model.ClinicBillingAddress;
 
 import java.io.Serializable;
 
@@ -42,160 +44,191 @@ import javax.persistence.Table;
  * @author Jay Gallagher
  */
 @Entity
-@Table(name="clinic")
-public class Clinic extends AbstractModel<Integer> implements Serializable {
+@Table(name = "clinic")
+public class Clinic extends AbstractModel<Integer> implements Serializable
+{
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="clinic_no")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "clinic_no")
     private Integer id;
-	@Column(name="clinic_name")
+    @Column(name = "clinic_name")
     private String clinicName;
-	@Column(name="clinic_address")
+    @Column(name = "clinic_address")
     private String clinicAddress;
-	@Column(name="clinic_city")
+    @Column(name = "clinic_city")
     private String clinicCity;
-	@Column(name="clinic_postal")
+    @Column(name = "clinic_postal")
     private String clinicPostal;
-	@Column(name="clinic_phone")
+    @Column(name = "clinic_phone")
     private String clinicPhone;
-	@Column(name="clinic_fax")
+    @Column(name = "clinic_fax")
     private String clinicFax;
-	@Column(name="clinic_location_code")
+    @Column(name = "clinic_location_code")
     private String clinicLocationCode;
     private String status;
-    @Column(name="clinic_province")
+    @Column(name = "clinic_province")
     private String clinicProvince;
-    @Column(name="clinic_delim_phone")
+    @Column(name = "clinic_delim_phone")
     private String clinicDelimPhone;
-    @Column(name="clinic_delim_fax")
+    @Column(name = "clinic_delim_fax")
     private String clinicDelimFax;
     // foreign key
-    @OneToOne(fetch=FetchType.EAGER, cascade=CascadeType.MERGE)
-    @JoinColumn(name="clinic_billing_address_id", referencedColumnName="id")
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "clinic_billing_address_id", referencedColumnName = "id")
     private ClinicBillingAddress clinicBillingAddress;
 
-    public Integer getId() {
+    public Integer getId()
+    {
         return this.id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Integer id)
+    {
         this.id = id;
     }
 
-    /** Creates a new instance of UserProperty */
-    public Clinic() {
+    /**
+     * Creates a new instance of UserProperty
+     */
+    public Clinic()
+    {
     }
 
-    public String getClinicName() {
+    public String getClinicName()
+    {
         return clinicName;
     }
 
-    public void setClinicName(String clinicName) {
+    public void setClinicName(String clinicName)
+    {
         this.clinicName = clinicName;
     }
 
-    public String getClinicAddress() {
+    public String getClinicAddress()
+    {
         return clinicAddress;
     }
 
-    public void setClinicAddress(String clinicAddress) {
+    public void setClinicAddress(String clinicAddress)
+    {
         this.clinicAddress = clinicAddress;
     }
 
-    public String getClinicCity() {
+    public String getClinicCity()
+    {
         return clinicCity;
     }
 
-    public void setClinicCity(String clinicCity) {
+    public void setClinicCity(String clinicCity)
+    {
         this.clinicCity = clinicCity;
     }
 
-    public String getClinicPostal() {
+    public String getClinicPostal()
+    {
         return clinicPostal;
     }
 
-    public void setClinicPostal(String clinicPostal) {
+    public void setClinicPostal(String clinicPostal)
+    {
         this.clinicPostal = clinicPostal;
     }
 
-    public String getClinicPhone() {
+    public String getClinicPhone()
+    {
         return clinicPhone;
     }
 
-    public void setClinicPhone(String clinicPhone) {
+    public void setClinicPhone(String clinicPhone)
+    {
         this.clinicPhone = clinicPhone;
     }
 
-    public String getClinicFax() {
+    public String getClinicFax()
+    {
         return clinicFax;
     }
 
-    public void setClinicFax(String clinicFax) {
+    public void setClinicFax(String clinicFax)
+    {
         this.clinicFax = clinicFax;
     }
 
-    public String getClinicLocationCode() {
+    public String getClinicLocationCode()
+    {
         return clinicLocationCode;
     }
 
-    public void setClinicLocationCode(String clinicLocationCode) {
+    public void setClinicLocationCode(String clinicLocationCode)
+    {
         this.clinicLocationCode = clinicLocationCode;
     }
 
-    public String getStatus() {
+    public String getStatus()
+    {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(String status)
+    {
         this.status = status;
     }
 
-    public String getClinicProvince() {
+    public String getClinicProvince()
+    {
         return clinicProvince;
     }
 
-    public void setClinicProvince(String clinicProvince) {
+    public void setClinicProvince(String clinicProvince)
+    {
         this.clinicProvince = clinicProvince;
     }
 
-    public String getClinicDelimPhone() {
+    public String getClinicDelimPhone()
+    {
         return clinicDelimPhone;
     }
 
-    public void setClinicDelimPhone(String clinicDelimPhone) {
+    public void setClinicDelimPhone(String clinicDelimPhone)
+    {
         this.clinicDelimPhone = clinicDelimPhone;
     }
 
-    public String getClinicDelimFax() {
+    public String getClinicDelimFax()
+    {
         return clinicDelimFax;
     }
 
-    public void setClinicDelimFax(String clinicDelimFax) {
+    public void setClinicDelimFax(String clinicDelimFax)
+    {
         this.clinicDelimFax = clinicDelimFax;
     }
 
-    public ClinicBillingAddress getClinicBillingAddress() {
+    public ClinicBillingAddress getClinicBillingAddress()
+    {
         return clinicBillingAddress;
     }
 
-    public void setClinicBillingAddress(ClinicBillingAddress clinicBillingAddress) {
+    public void setClinicBillingAddress(ClinicBillingAddress clinicBillingAddress)
+    {
         this.clinicBillingAddress = clinicBillingAddress;
     }
 
-    public String toString(){
-       return "clinicName " +clinicName +
-    " clinicAddress  " +clinicAddress+
-    " clinicCity " +clinicCity+
-    " clinicPostal " +clinicPostal+
-    " clinicPhone " +clinicPhone+
-    "  clinicFax " +clinicFax+
-    " clinicLocationCode " +clinicLocationCode+
-    " status " +status+
-    " clinicProvince " +clinicProvince+
-    " clinicDelimPhone " +clinicDelimPhone+
-    " clinicDelimFax " +clinicDelimFax +
-    " clinicBillingAddress " + clinicBillingAddress;
+    public String toString()
+    {
+        return "clinicName " + clinicName +
+                " clinicAddress  " + clinicAddress +
+                " clinicCity " + clinicCity +
+                " clinicPostal " + clinicPostal +
+                " clinicPhone " + clinicPhone +
+                "  clinicFax " + clinicFax +
+                " clinicLocationCode " + clinicLocationCode +
+                " status " + status +
+                " clinicProvince " + clinicProvince +
+                " clinicDelimPhone " + clinicDelimPhone +
+                " clinicDelimFax " + clinicDelimFax +
+                " clinicBillingAddress " + clinicBillingAddress;
 
     }
 

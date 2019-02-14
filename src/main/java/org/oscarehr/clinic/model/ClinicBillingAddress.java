@@ -1,6 +1,5 @@
 /**
- *
- * Copyright (c) 2005-2012. Centre for Research on Inner City Health, St. Michael's Hospital, Toronto. All Rights Reserved.
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,12 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * This software was written for
- * Centre for Research on Inner City Health, St. Michael's Hospital,
- * Toronto, Ontario, Canada
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.clinic.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import java.io.Serializable;
 
@@ -34,42 +36,47 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- *
- * @author Jay Gallagher
+ * @author Levi Murray
  */
 @Entity
-@Table(name="clinic_billing_address")
-public class ClinicBillingAddress extends AbstractModel<Integer> implements Serializable {
+@Table(name = "clinic_billing_address")
+public class ClinicBillingAddress extends AbstractModel<Integer> implements Serializable
+{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name = "id")
     private Integer id;
-    @Column(name="name")
+    @Column(name = "name")
     private String billingName;
-    @Column(name="address")
+    @Column(name = "address")
     private String billingAddress;
-    @Column(name="city")
+    @Column(name = "city")
     private String billingCity;
-    @Column(name="province")
+    @Column(name = "province")
     private String billingProvince;
-    @Column(name="postal")
+    @Column(name = "postal")
     private String billingPostal;
-    @Column(name="phone")
+    @Column(name = "phone")
     private String billingPhone;
-    @Column(name="fax")
+    @Column(name = "fax")
     private String billingFax;
 
-    public Integer getId() {
+    public Integer getId()
+    {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Integer id)
+    {
         this.id = id;
     }
 
-    /** Creates a new instance of UserProperty */
-    public ClinicBillingAddress() {
+    /**
+     * Creates a new instance of UserProperty
+     */
+    public ClinicBillingAddress()
+    {
     }
 
     public String getBillingName()
@@ -142,8 +149,9 @@ public class ClinicBillingAddress extends AbstractModel<Integer> implements Seri
         this.billingFax = billingFax;
     }
 
-    public String toString(){
-        return  "\nid" + id +
+    public String toString()
+    {
+        return "\nid" + id +
                 "\nname " + billingName +
                 "\nAddress " + billingAddress +
                 "\nCity " + billingCity +

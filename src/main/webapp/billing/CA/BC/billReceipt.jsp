@@ -53,7 +53,7 @@
 <%@page import="java.util.*, oscar.oscarDemographic.data.*" %>
 <%@page import="oscar.oscarBilling.ca.bc.data.*,oscar.oscarBilling.ca.bc.pageUtil.*,oscar.*,oscar.oscarClinic.*" %>
 <%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="org.oscarehr.common.model.ClinicBillingAddress" %>
+<%@ page import="org.oscarehr.clinic.model.ClinicBillingAddress" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
 <%
     double totalPayments = 0;
