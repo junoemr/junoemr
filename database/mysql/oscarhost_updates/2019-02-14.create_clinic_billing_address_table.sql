@@ -1,6 +1,5 @@
-DROP TABLE IF EXISTS `clinic_billing_address`;
 
-CREATE TABLE `clinic_billing_address` (
+CREATE TABLE IF NOT EXISTS `clinic_billing_address` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) DEFAULT NULL,
   `address` varchar(60) DEFAULT NULL,

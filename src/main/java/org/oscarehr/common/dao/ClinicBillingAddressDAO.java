@@ -25,10 +25,6 @@
 
 package org.oscarehr.common.dao;
 
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.oscarehr.common.model.ClinicBillingAddress;
 import org.springframework.stereotype.Repository;
 
@@ -42,27 +38,6 @@ public class ClinicBillingAddressDAO extends AbstractDao<ClinicBillingAddress> {
     public ClinicBillingAddressDAO() {
         super(ClinicBillingAddress.class);
     }
-
-    @SuppressWarnings("unchecked")
-    public List<ClinicBillingAddress> findAll() {
-        Query query = entityManager.createQuery("SELECT x FROM " + modelClass.getSimpleName() + " x");
-        List<ClinicBillingAddress> results = query.getResultList();
-        return results;
-    }
-
-    public ClinicBillingAddress getBillingInfo(Integer clinicBillingAddressId){
-        Query query = entityManager.createQuery(
-                "SELECT c FROM ClinicBillingAddress c WHERE c.id = :clinicBillingAddressId"
-                                                ).setParameter("clinicBillingAddressId", clinicBillingAddressId);
-
-        @SuppressWarnings("unchecked")
-        List<ClinicBillingAddress> codeList = query.getResultList();
-        if(codeList.size()>0) {
-            return codeList.get(0);
-        }
-        return null;
-    }
-
 
     public void save(ClinicBillingAddress clinicBillingAddress) {
         if(clinicBillingAddress.getId() != null && clinicBillingAddress.getId() > 0) {
