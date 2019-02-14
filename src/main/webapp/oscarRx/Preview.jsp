@@ -208,13 +208,13 @@ ProviderData user = new ProviderData(strUser);
 					<%= patient.getCity() %>, <%= patient.getProvince() %> <%= patient.getPostal() %><br>
 					<%= patient.getPhone() %><br>
 					<b> <% if(!props.getProperty("showRxHin", "").equals("false")) { %>
-						<% if(patient.getProvince().equals(org.oscarehr.common.dao.BillingServiceDao.BC))
+						<% if(props.isOntarioInstanceType())
 						{ %>
-							<bean:message key="oscar.oscarRx.hin" /><%= patient.getHin() %>
+							<bean:message key="oscar.oscarRx.hin" /><%= patient.getHin() %> <%= patient.getVer() %>
 						<% }
 						else
 						{%>
-							<bean:message key="oscar.oscarRx.hin" /><%= patient.getHin() %> <%= patient.getVer() %>
+							<bean:message key="oscar.oscarRx.hin" /><%= patient.getHin() %>
 						<%}%>
 					<% } %>
 					</b><br>

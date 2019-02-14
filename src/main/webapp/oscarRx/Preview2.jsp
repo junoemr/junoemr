@@ -418,15 +418,15 @@ if(custom_logo_name != null ){
                                                             <%= patientCityPostal %><br>
                                                             <%= patientPhone %><br>
                                                             <b> <% if(!props.getProperty("showRxHin", "").equals("false")) { %>
-																<% if(patientProvince.equals(org.oscarehr.common.dao.BillingServiceDao.BC))
+																<% if(props.isOntarioInstanceType())
 																{ %>
-																	<bean:message key="oscar.oscarRx.hin" /><%= patientHin %>
+																	<bean:message key="oscar.oscarRx.hin" /><%= patientHin %> <%= patientVer %>
 																<%
                                                             	}
                                                             	else
 																{
 																%>
-																	<bean:message key="oscar.oscarRx.hin" /><%= patientHin %> <%= patientVer %>
+																	<bean:message key="oscar.oscarRx.hin" /><%= patientHin %>
 																<%}%>
 															<% } %>
                                                             </b><br>
