@@ -573,8 +573,8 @@
 		<ap-output>${list}</ap-output>
 	</databaseap>
 	<databaseap>
-		<ap-name>licensed_producers_list</ap-name>
-		<ap-sql>SELECT GROUP_CONCAT(producer_name ORDER BY producer_name SEPARATOR ',' ) as list FROM licensed_producer</ap-sql>
+		<ap-name>licensed_producer_name_list</ap-name>
+		<ap-sql>SELECT GROUP_CONCAT(producer_name ORDER BY producer_name SEPARATOR ';' ) as list FROM licensed_producer</ap-sql>
 		<ap-output>${list}</ap-output>
 	</databaseap>
 
