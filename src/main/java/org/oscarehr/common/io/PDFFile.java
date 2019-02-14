@@ -41,9 +41,15 @@ import java.util.regex.Pattern;
 
 public class PDFFile extends GenericFile
 {
-	private static Logger logger = MiscUtils.getLogger();
+	private static final Logger logger = MiscUtils.getLogger();
 	private static final Set<String> allowedErrors = new HashSet<>();
-	private static Pattern[] allowedWarningsGS = null;
+	private static final Pattern[] allowedWarningsGS = new Pattern[2];
+
+	static
+	{
+		allowedWarningsGS[0] = Pattern.compile(".*Missing glyph .* in the font .*", Pattern.CASE_INSENSITIVE);
+		allowedWarningsGS[1] = Pattern.compile(".*Failed to interpret TT instructions in font.*", Pattern.CASE_INSENSITIVE);
+	}
 
 	private OscarProperties oscarProperties = OscarProperties.getInstance();
 	private long maxMemoryUsage = oscarProperties.getPDFMaxMemUsage();
@@ -55,22 +61,12 @@ public class PDFFile extends GenericFile
 
 	private boolean isAllowedWarning(String line)
 	{
-		for (Pattern pattern : getAllowedWarningsGS())
+		for (Pattern pattern : allowedWarningsGS)
 		{
 			if (pattern.matcher(line).matches())
 				return true;
 		}
 		return false;
-	}
-
-	private static Pattern[] getAllowedWarningsGS()
-	{
-		if(allowedWarningsGS == null)
-		{
-			allowedWarningsGS = new Pattern[1];
-			allowedWarningsGS[0] = Pattern.compile(".*Missing glyph .* in the font HiddenHorzOCR.*", Pattern.CASE_INSENSITIVE);
-		}
-		return allowedWarningsGS;
 	}
 
 	@Override
@@ -175,7 +171,9 @@ public class PDFFile extends GenericFile
 				"-dCompatibilityLevel=1.4",
 				"-dPDFSETTINGS=/printer",
 				"-dNOPAUSE",
-				"-dQUIET",
+				"-dQUIET",      // Suppresses routine information comments on standard output
+				"-q",           // Quiet startup: suppress normal startup messages, and also do the equivalent of dQUIET
+//				"-sstdout=%stderr", // Redirect PostScript %stdout to a file or stderr, to avoid it being mixed with device stdout.
 				"-dBATCH",
 				"-sOutputFile="+ newPdf.getPath(),
 				javaFile.getPath()};
@@ -183,13 +181,21 @@ public class PDFFile extends GenericFile
 		logger.info(Arrays.toString(command));
 		Process process = Runtime.getRuntime().exec(command);
 
-		BufferedReader in = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-		String line;
+		BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		BufferedReader stderr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
+		String line;
 		String reasonInvalid = null;
-		while((line = in.readLine()) != null)
+		String warnings = null;
+		while((line = stdout.readLine()) != null)
 		{
-			logger.warn("gs error line: " + line);
+			logger.warn("gs stdout: " + line);
+			warnings = (warnings == null)? line : warnings + ", " + line;
+		}
+
+		while((line = stderr.readLine()) != null)
+		{
+			logger.warn("gs stderr: " + line);
 
 			if (isAllowedWarning(line))
 				continue;
@@ -197,9 +203,19 @@ public class PDFFile extends GenericFile
 			reasonInvalid = (reasonInvalid == null)? line : reasonInvalid + ", " + line;
 		}
 		process.waitFor();
-		in.close();
+		stdout.close();
+		stderr.close();
 
 		int exitValue = process.exitValue();
+		if(exitValue == 0 && reasonInvalid == null && warnings != null)
+		{
+			// append the original file location to the log if there is unexpected output
+			logger.warn("File conversion allowed with unexpected output!");
+			logger.warn("Original file:  " + javaFile.getPath());
+			logger.warn("Converted file: " + newPdf.getPath());
+			logger.warn("---------------------------------------------");
+		}
+
 		if(exitValue != 0 || reasonInvalid != null)
 		{
 			try

@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.apache.log4j.Logger;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.eform.service.EFormDataService;
@@ -38,6 +39,8 @@ import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransfer
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferOutbound;
 import org.oscarehr.ws.external.rest.v1.transfer.eform.EFormTransferInbound;
 import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.validator.DemographicNoConstraint;
+import org.oscarehr.ws.validator.DocumentNoConstraint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.log.LogAction;
@@ -62,16 +65,19 @@ public class DemographicWs extends AbstractExternalRestWs
 	private static Logger logger = MiscUtils.getLogger();
 
 	@Autowired
-	RecentDemographicAccessService recentDemographicAccessService;
+	private RecentDemographicAccessService recentDemographicAccessService;
 
 	@Autowired
-	DemographicService demographicService;
+	private DemographicService demographicService;
 
 	@Autowired
-	DocumentService documentService;
+	private HinValidationService hinValidationService;
 
 	@Autowired
-	EFormDataService eFormService;
+	private DocumentService documentService;
+
+	@Autowired
+	private EFormDataService eFormService;
 
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
@@ -79,13 +85,13 @@ public class DemographicWs extends AbstractExternalRestWs
 	@GET
 	@Path("/{demographicId}")
 	@Operation(summary = "Retrieve an existing patient demographic record by demographic id.")
-	public RestResponse<DemographicTransferOutbound> getDemographic(@PathParam("demographicId") Integer demographicNo)
+	public RestResponse<DemographicTransferOutbound> getDemographic(@DemographicNoConstraint @PathParam("demographicId") Integer demographicNo)
 	{
 		String providerNoStr = getOAuthProviderNo();
 		int providerNo = Integer.parseInt(providerNoStr);
 
 		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.READ, demographicNo, "_demographic");
-		DemographicTransferOutbound demographicTransfer = demographicService.getDemographicTransferOutbound(providerNoStr, demographicNo);
+		DemographicTransferOutbound demographicTransfer = demographicService.getDemographicTransferOutbound(demographicNo);
 
 		LogAction.addLogEntry(providerNoStr, demographicTransfer.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
 		recentDemographicAccessService.updateAccessRecord(providerNo, demographicTransfer.getDemographicNo());
@@ -97,7 +103,7 @@ public class DemographicWs extends AbstractExternalRestWs
 	@Path("/{demographicId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Update an existing patient demographic record by demographic id.")
-	public RestResponse<DemographicTransferOutbound> putDemographic(@PathParam("demographicId") Integer demographicNo,
+	public RestResponse<DemographicTransferOutbound> putDemographic(@DemographicNoConstraint @PathParam("demographicId") Integer demographicNo,
 	                                                                @Valid DemographicTransferInbound demographicTo)
 	{
 		String providerNoStr = getOAuthProviderNo();
@@ -111,15 +117,12 @@ public class DemographicWs extends AbstractExternalRestWs
 	@Operation(summary = "Add a new patient demographic record to the system.")
 	public RestResponse<Integer> postDemographic(@Valid DemographicTransferInbound demographicTo)
 	{
-		if(demographicTo.getDemographicNo() != null)
-		{
-			return RestResponse.errorResponse("Demographic number for a new record must be null");
-		}
 		String providerNoStr = getOAuthProviderNo();
 		int providerNo = Integer.parseInt(providerNoStr);
 		String ip = getHttpServletRequest().getRemoteAddr();
 
 		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_demographic");
+		hinValidationService.validateNoDuplication(demographicTo.getHin(), demographicTo.getHcVersion(), demographicTo.getHcType());
 		Demographic demographic = demographicService.addNewDemographicRecord(providerNoStr, demographicTo);
 
 		// log the action and update the access record
@@ -132,8 +135,8 @@ public class DemographicWs extends AbstractExternalRestWs
 	@Path("/{demographicId}/chart/document/{documentId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Assign a document in the system to the demographic chart")
-	public RestResponse<Integer> assignDocument(@PathParam("demographicId") Integer demographicId,
-	                                            @PathParam("documentId") Integer documentId)
+	public RestResponse<Integer> assignDocument(@DemographicNoConstraint @PathParam("demographicId") Integer demographicId,
+	                                            @DocumentNoConstraint @PathParam("documentId") Integer documentId)
 	{
 		String providerNoStr = getOAuthProviderNo();
 		String ip = getHttpServletRequest().getRemoteAddr();
@@ -150,7 +153,7 @@ public class DemographicWs extends AbstractExternalRestWs
 	@Path("/{demographicId}/chart/eform")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Create an eForm on the patient chart with the passed in values")
-	public RestResponse<Integer> postEForm(@PathParam("demographicId") Integer demographicId,
+	public RestResponse<Integer> postEForm(@DemographicNoConstraint @PathParam("demographicId") Integer demographicId,
 	                                       @Valid EFormTransferInbound transfer)
 	{
 		String providerNoStr = getOAuthProviderNo();

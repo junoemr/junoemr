@@ -7,7 +7,7 @@ var sass = require('gulp-sass'),
 
 var paths = {
     scss: 'scss/juno.scss',
-    jsp: ['./**/*.jsp', '!./index.jsp', '!./dist/**'],
+    jsp: ['./**/*.jsp', '!./index.jsp', '!./dist/**', '!./dashboard/**'],
     dest: './dist/'
 };
 

@@ -193,7 +193,7 @@ public class FaxImporter {
 		Document document = new Document();
 		document.setPublic1(false);
 		document.setResponsible(user);
-		document.setDoccreator(user);
+		document.setDocCreator(user);
 		document.setDocdesc("");
 		document.setDoctype("");
 		document.setDocfilename(fileName);

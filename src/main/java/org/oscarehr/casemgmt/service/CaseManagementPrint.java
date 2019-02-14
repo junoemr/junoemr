@@ -54,6 +54,8 @@ import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.casemgmt.util.ExtPrint;
 import org.oscarehr.casemgmt.web.NoteDisplay;
 import org.oscarehr.casemgmt.web.NoteDisplayLocal;
+import org.oscarehr.common.dao.Hl7TextInfoDao;
+import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -75,12 +77,10 @@ public class CaseManagementPrint {
 	
 	private static Logger logger = MiscUtils.getLogger();
 	
-	
-	
-	CaseManagementManager caseManagementMgr = SpringUtils.getBean(CaseManagementManager.class);
+	private CaseManagementManager caseManagementMgr = SpringUtils.getBean(CaseManagementManager.class);
+	private Hl7TextInfoDao hl7TextInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
 
 	private NoteService noteService = SpringUtils.getBean(NoteService.class);
-	
 	
 	private ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);
 	
@@ -271,7 +271,19 @@ public class CaseManagementPrint {
 			for (LabResultData result : accessionMap.values()) {
 				//Date d = result.getDateObj();
 				// TODO:filter out the ones which aren't in our date range if there's a date range????
-				String segmentId = result.segmentID;
+
+				String segmentId;
+
+				if (result.accessionNumber == null || result.accessionNumber.equals(""))
+				{
+					segmentId = result.segmentID;
+				}
+				else
+				{
+					Hl7TextInfo textInfo = hl7TextInfoDao.findLatestVersionByAccessionNo(result.accessionNumber);
+					segmentId = String.valueOf(textInfo.getLabNumber());
+				}
+
 				MessageHandler handler = Factory.getHandler(segmentId);
 				String fileName2 = OscarProperties.getInstance().getProperty("DOCUMENT_DIR") + "//" + handler.getPatientName().replaceAll("\\s", "_") + "_" + handler.getMsgDate() + "_LabReport.pdf";
                                 file2= new File(fileName2);

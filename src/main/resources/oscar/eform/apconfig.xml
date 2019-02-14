@@ -12,6 +12,7 @@
 		<ap-output>${curtime()}</ap-output>
 	</databaseap>
 
+	<!-- Current appointment information  -->
 	<databaseap>
 		<ap-name>appt_date</ap-name>
 		<ap-sql>SELECT appointment_date from appointment WHERE
@@ -20,44 +21,88 @@
 	</databaseap>
 	<databaseap>
 		<ap-name>appt_start_time</ap-name>
-		<ap-sql>SELECT start_time from appointment WHERE
-			appointment_no=${appt_no}</ap-sql>
+		<ap-sql>
+			SELECT DATE_FORMAT(start_time, '%H:%i') AS start_time
+			FROM appointment
+			WHERE appointment_no=${appt_no}
+		</ap-sql>
 		<ap-output>${start_time}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>appt_end_time</ap-name>
-		<ap-sql>SELECT end_time from appointment WHERE
-			appointment_no=${appt_no}</ap-sql>
-		<ap-output>${end_time}</ap-output>
+		<ap-sql>
+			<!-- Here we add a minute to the appointment end time because oscar stores appointments with the end time
+			one minute lower to avoid formatting issues in the main chart.  For example, a 15 minute appointment at
+			15:00 will be stored from 15:00 - 15:14.  We round the seconds down to zero first, in case the data came from
+			an import which does something differently like storing the example appointment until 15:14:59 instead-->
+			SELECT DATE_FORMAT(ADDTIME(DATE_FORMAT(end_time, '%H:%i:00'), '00:01:00'), '%H:%i') AS rounded_endtime_plus_1_minute
+			FROM appointment
+			WHERE appointment_no=${appt_no}
+		</ap-sql>
+		<ap-output>${rounded_endtime_plus_1_minute}</ap-output>
 	</databaseap>
-	<!-- Next booked appointment date -->
+	<databaseap>
+		<ap-name>appt_location</ap-name>
+		<ap-sql>
+			SELECT location
+			FROM appointment
+			WHERE appointment_no=${appt_no}
+		</ap-sql>
+		<ap-output>${location}</ap-output>
+	</databaseap>
+
+	<!-- Next booked appointment information, relative to the current datetime -->
 	<databaseap>
 		<ap-name>next_appt_date</ap-name>
-		<ap-sql>SELECT appointment_date, start_time from appointment WHERE
-			demographic_no = ${demographic} AND `status` NOT IN('C', 'N', 'NS')
-			AND appointment_date >= CURDATE( )
-			ORDER BY appointment_date LIMIT 1
+		<ap-sql>
+			SELECT appointment_date, DATE_FORMAT(start_time, '%H:%i') AS start_time
+			FROM appointment
+			WHERE demographic_no = ${demographic}
+				AND ADDTIME(appointment_date, start_time) >= NOW()
+				AND `status` NOT IN('C', 'N', 'NS')
+			ORDER BY appointment_date asc, start_time asc
+			LIMIT 1
 		</ap-sql>
 		<ap-output>${appointment_date}, ${start_time}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>next_appt_time</ap-name>
-		<ap-sql>SELECT LEFT(start_time,5) AS start_time from appointment WHERE
-			demographic_no = ${demographic} AND `status` NOT IN('C', 'N', 'NS')
-			AND appointment_date >= CURDATE( )
-			ORDER BY appointment_date LIMIT 1
+		<ap-sql>
+			SELECT DATE_FORMAT(start_time, '%H:%i') AS start_time
+			FROM appointment
+			WHERE demographic_no = ${demographic}
+				AND ADDTIME(appointment_date, start_time) >= NOW()
+				AND `status` NOT IN('C', 'N', 'NS')
+			ORDER BY appointment_date asc, start_time asc
+			LIMIT 1
 		</ap-sql>
 		<ap-output>${start_time}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>nextf_appt_date</ap-name>
-		<ap-sql>SELECT DATE_FORMAT(appointment_date, '%Y-%b-%d' ) as
-			nextf_appt_date from appointment WHERE demographic_no =
-			${demographic} AND `status` NOT IN('C', 'N', 'NS') AND
-			appointment_date >= CURDATE( )
-			ORDER BY appointment_date LIMIT 1
+		<ap-sql>
+			SELECT DATE_FORMAT(appointment_date, '%Y-%b-%d' ) AS nextf_appt_date
+			FROM appointment
+			WHERE demographic_no = ${demographic}
+				AND ADDTIME(appointment_date, start_time) >= NOW()
+				AND status NOT IN ('C', 'N', 'NS')
+			ORDER BY appointment_date asc, start_time asc
+			LIMIT 1
 		</ap-sql>
 		<ap-output>${nextf_appt_date}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>next_appt_location</ap-name>
+		<ap-sql>
+			SELECT location
+			FROM appointment
+			WHERE demographic_no = ${demographic}
+				AND ADDTIME(appointment_date, start_time) >= NOW()
+				AND status NOT IN ('C', 'N', 'NS')
+			ORDER BY appointment_date asc, start_time asc
+			LIMIT 1;
+		</ap-sql>
+		<ap-output>${location}</ap-output>
 	</databaseap>
 
 	<!-- Current eform information -->
@@ -421,23 +466,16 @@
 	</databaseap>
 	<databaseap>
 		<ap-name>ageComplex</ap-name>
-		<ap-sql>SELECT (IF ( (YEAR(CURRENT_DATE) - YEAR(@bdate))&lt; 3,
-			(IF ( (((YEAR(CURRENT_DATE) - 1) * 12 + MONTH(CURRENT_DATE)) -
-			((YEAR(@bdate) - 1) * 12 + MONTH(@bdate))) - (MID(@bdate, 9, 2) &lt;
-			MID(@bdate, 9, 2))&lt; 3,
-			(IF ( FLOOR((TO_DAYS(CURRENT_DATE) - TO_DAYS(@bdate))/7)&lt; 5,
-			(IF ( (TO_DAYS(CURRENT_DATE) - TO_DAYS(@bdate))&lt; 2,
-			'newborn', CONCAT((TO_DAYS(CURRENT_DATE) - TO_DAYS(@bdate)),' day old'))),
-			CONCAT(FLOOR((TO_DAYS(CURRENT_DATE) - TO_DAYS(@bdate))/7),' week
-			old'))), CONCAT((((YEAR(CURRENT_DATE) - 1) * 12 +
-			MONTH(CURRENT_DATE)) - ((YEAR(@bdate) - 1) * 12 + MONTH(@bdate))) -
-			(MID(@bdate, 9, 2) &lt; MID(@bdate, 9, 2)),' month old'))),
-			CONCAT((YEAR(CURRENT_DATE) - YEAR(@bdate)) - (MID(CURRENT_DATE, 6, 5)
-			&lt; MID(CURRENT_DATE, 6, 5)),' year old'))) as ageComplex from
-			(SELECT @bdate:=
-			DATE_FORMAT(CONCAT((demographic.year_of_birth), '-', (demographic.month_of_birth), '-',
-			(demographic.date_of_birth)),'%Y-%m-%d') AS birthdate FROM
-			demographic WHERE demographic_no=${demographic}) as t</ap-sql>
+		<ap-sql>SELECT
+			CASE
+			  WHEN (@bdate >= DATE(NOW() - INTERVAL 2 DAY)) THEN 'newborn'
+			  WHEN (@bdate >= DATE(NOW() - INTERVAL 7 DAY)) THEN CONCAT(TIMESTAMPDIFF(DAY, @bdate, CURRENT_DATE),' day old')
+			  WHEN (@bdate >= DATE(NOW() - INTERVAL 4 WEEK)) THEN CONCAT(TIMESTAMPDIFF(WEEK, @bdate, CURRENT_DATE),' week old')
+			  WHEN (@bdate >= DATE(NOW() - INTERVAL 11 MONTH)) THEN CONCAT(TIMESTAMPDIFF(MONTH, @bdate, CURRENT_DATE),' month old')
+			  ELSE CONCAT(TIMESTAMPDIFF(YEAR, @bdate, CURRENT_DATE), ' year old')
+			END AS ageComplex
+			  FROM (SELECT @bdate:= DATE_FORMAT(CONCAT((demographic.year_of_birth), '-', (demographic.month_of_birth), '-', (demographic.date_of_birth)),'%Y-%m-%d')
+			  AS birthdate FROM demographic WHERE demographic_no=${demographic}) as t</ap-sql>
 		<ap-output>${ageComplex}</ap-output>
 	</databaseap>
 	<databaseap>

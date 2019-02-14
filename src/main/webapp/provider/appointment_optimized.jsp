@@ -100,6 +100,8 @@
 private boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable();
 private HashMap<String,String> siteBgColor = new HashMap<String,String>();
 private boolean isClinicaid = OscarProperties.getInstance().isClinicaidBillingType();
+private static final String SCHEDULE_VIEW = "0";
+private static final String ALL_VIEW = "1";
 
 public boolean isWeekView(ServletRequest request)
 {
@@ -365,7 +367,7 @@ private long getAppointmentRowSpan(
 	String viewall = request.getParameter("viewall");
 	if( viewall == null )
 	{
-		viewall = "0";
+		viewall = SCHEDULE_VIEW;
 	}
 
 	int numProvider=0, numAvailProvider=0;
@@ -458,7 +460,7 @@ private long getAppointmentRowSpan(
 				curProvider_no = new String []{curUser_no};  //[numProvider];
 				curProviderName = new String []{(userLastName+", "+userFirstName)}; //[numProvider];
 			} else {
-				if(request.getParameter("viewall")!=null && request.getParameter("viewall").equals("1") ) {
+				if(request.getParameter("viewall")!=null && request.getParameter("viewall").equals(ALL_VIEW) ) {
 					if(numProvider >= 5) {lenLimitedL = 2; lenLimitedS = 3; len = 2; }
 				} else {
 					if(numAvailProvider >= 5) {lenLimitedL = 2; lenLimitedS = 3; len = 2; }
@@ -674,7 +676,7 @@ private long getAppointmentRowSpan(
 			self.location.href = "../schedule/scheduleflipview.jsp?originalpage=../provider/providercontrol.jsp&startDate=<%=year+"-"+month+"-"+day%>" + "&provider_no="+s ;
 		}
 		function goWeekView(s) {
-			self.location.href = "providercontrol.jsp?year=<%=year%>&month=<%=month%>&day=<%=day%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1&provider_no="+s;
+			self.location.href = "providercontrol.jsp?year=<%=year%>&month=<%=month%>&day=<%=day%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>&provider_no="+s;
 		}
 		function goZoomView(s, n) {
 			self.location.href = "providercontrol.jsp?year=<%=strYear%>&month=<%=strMonth%>&day=<%=strDay%>&view=1&curProvider="+s+"&curProviderName="+encodeURIComponent(n)+"&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>" ;
@@ -686,14 +688,24 @@ private long getAppointmentRowSpan(
 			popupPage(600,650,"../appointment/appointmentsearch.jsp?provider_no="+s);
 		}
 
-		function review(key) {
-			if(self.location.href.lastIndexOf("?") > 0) {
-				if(self.location.href.lastIndexOf("&viewall=") > 0 ) a = self.location.href.substring(0,self.location.href.lastIndexOf("&viewall="));
-				else a = self.location.href;
-			} else {
-				a="providercontrol.jsp?year="+document.jumptodate.year.value+"&month="+document.jumptodate.month.value+"&day="+document.jumptodate.day.value+"&view=0&displaymode=day&dboperation=searchappointmentday&site=" + "<%=(selectedSite==null? "none" : selectedSite)%>";
+		function review(key)
+		{
+			if (self.location.href.lastIndexOf("?") > 0)
+			{
+				if (self.location.href.lastIndexOf("&viewall=") > 0)
+				{
+					a = self.location.href.substring(0, self.location.href.lastIndexOf("&viewall="));
+				}
+				else
+				{
+					a = self.location.href;
+				}
 			}
-			self.location.href = a + "&viewall="+key ;
+			else
+			{
+				a = "providercontrol.jsp?year=" + document.jumptodate.year.value + "&month=" + document.jumptodate.month.value + "&day=" + document.jumptodate.day.value + "&view=0&displaymode=day&dboperation=searchappointmentday&site=" + "<%=(selectedSite==null? "none" : selectedSite)%>";
+			}
+			self.location.href = a + "&viewall=" + key + "<%=isWeekView(request)?"&provider_no="+provNum:""%>";
 		}
 
 
@@ -879,7 +891,7 @@ private long getAppointmentRowSpan(
 					</li>
 
 					<security:oscarSec roleName="<%=roleName$%>" objectName="_dashboardDisplay" rights="r">
-						<c:if test="${menuBarController.hasDashboards}">
+						<oscar:oscarPropertiesCheck property="enable_dashboards" value="true">
 							<li id="dashboardList">
 								<div class="dropdown">
 									<a href="#" class="dashboardBtn">Dashboard</a>
@@ -892,8 +904,7 @@ private long getAppointmentRowSpan(
 									</div>
 								</div>
 							</li>
-						</c:if>
-
+						</oscar:oscarPropertiesCheck>
 					</security:oscarSec>
 
 					<!-- Added logout link for mobile version -->
@@ -1020,7 +1031,7 @@ private long getAppointmentRowSpan(
 			<a id="calendarLink" href=# onClick ="popupPage(425,430,'../share/CalendarPopup.jsp?urlfrom=../provider/providercontrol.jsp&year=<%=strYear%>&month=<%=strMonth%>&param=<%=URLEncoder.encode("&view=0&displaymode=day&dboperation=searchappointmentday&viewall="+viewall,"UTF-8")%><%=isWeekView(request)?URLEncoder.encode("&provider_no="+provNum, "UTF-8"):""%>')"><bean:message key="global.calendar"/></a>
 
 			<logic:notEqual name="infirmaryView_isOscar" value="false">
-				| <% if(request.getParameter("viewall")!=null && request.getParameter("viewall").equals("1") ) { %>
+				| <% if(request.getParameter("viewall")!=null && request.getParameter("viewall").equals(ALL_VIEW) ) { %>
 				<!-- <span style="color:#333"><bean:message key="provider.appointmentProviderAdminDay.viewAll"/></span> -->
 				<u><a href=# onClick = "review('0')" title="<bean:message key="provider.appointmentProviderAdminDay.viewAllProv"/>"><bean:message key="provider.appointmentProviderAdminDay.schedView"/></a></u>
 
@@ -1136,9 +1147,9 @@ private long getAppointmentRowSpan(
 							function changeSite(sel) {
 								sel.style.backgroundColor=sel.options[sel.selectedIndex].style.backgroundColor;
 								var siteName = sel.options[sel.selectedIndex].value;
-								var newGroupNo = "<%=(mygroupno == null ? ".default" : mygroupno)%>";
+
 								jQuery.ajax({
-									url: 'providercontrol.jsp?provider_no=<%=curUser_no%>&start_hour=<%=startHour%>&end_hour=<%=endHour%>&every_min=<%=everyMin%>&color_template=deepblue&dboperation=updatepreference&displaymode=updatepreference&mygroup_no=' + newGroupNo + '&site=' + siteName,
+									url: 'updateSite.jsp?site=' + siteName,
 									success: function(result)
 									{
 										location.reload();
@@ -1281,7 +1292,7 @@ private long getAppointmentRowSpan(
 						//     scheduledate entry for that provider.
 						//   - Don't show a schedule for anyone else
 
-						boolean viewAllBoolean = ("1".equals(viewall));
+						boolean viewAllBoolean = (ALL_VIEW.equals(viewall));
 						String curProviderNo = request.getParameter("curProvider");
 
 						if(isWeekView(request))
@@ -1338,9 +1349,9 @@ private long getAppointmentRowSpan(
 							headerColor = !headerColor;
 
 							boolean notOnSchedule = false;
-							if(!viewall.equals("1") && scheduleProviderNo == Integer.parseInt(curUser_no) && !schedule.hasSchedule())
+							if (SCHEDULE_VIEW.equals(viewall) && !schedule.isAvailable())
 							{
-								notOnSchedule = true;
+								continue;
 							}
 
 
@@ -1376,7 +1387,7 @@ private long getAppointmentRowSpan(
 											"&dboperation=searchappointmentday";
 									%>
 									<b><a href="<%= dayUrl %>">
-										<%=schedule.getScheduleDate().format(DateTimeFormatter.ISO_LOCAL_DATE)%>
+										<%=schedule.getScheduleDate().format(DateTimeFormatter.ofPattern("EEE, yyyy-MM-dd"))%>
 									</a></b>
 									<%
 								}
@@ -1542,12 +1553,35 @@ private long getAppointmentRowSpan(
 										// ----------------------------------------------------------------------------------
 										// Build appointments
 										// ----------------------------------------------------------------------------------
-
 										SortedMap<LocalTime, List<AppointmentDetails>> appointmentLists =
 											schedule.getAppointments().subMap(slotTime, slotEndTime);
 
+										List<List<AppointmentDetails>> allAppointments = new ArrayList(appointmentLists.values());
+										List<AppointmentDetails> appointmentsBeforeList = new ArrayList<AppointmentDetails>();
+
+										//If we're looking at the first slot of the day, get all appointments that occur before this time
+										if (slotTime.equals(startTime))
+										{
+											SortedMap<LocalTime, List<AppointmentDetails>> appointmentsBeforeStartTime = schedule.getAppointments().headMap(slotTime);
+
+											//Only show the appointments that occur before the first slot of the day and the end time is after the first slot of the day
+											for(List<AppointmentDetails> appointments: appointmentsBeforeStartTime.values())
+											{
+												for (AppointmentDetails appointment : appointments)
+												{
+													if (appointment.getEndTime().isAfter(slotTime))
+													{
+														appointmentsBeforeList.add(appointment);
+													}
+												}
+											}
+
+											//Add all these appointments to the list with all the other appointments
+											allAppointments.add(appointmentsBeforeList);
+										}
+
 										boolean isFirstAppointmentInSlot = true;
-										for(List<AppointmentDetails> appointments: appointmentLists.values())
+										for(List<AppointmentDetails> appointments: allAppointments)
 										{
 											Collections.reverse(appointments);
 											for(AppointmentDetails appointment: appointments)
@@ -1639,6 +1673,7 @@ private long getAppointmentRowSpan(
 												String demographic_no = appointment.getDemographicNo().toString();
 												String appointment_no = appointment.getAppointmentNo().toString();
 
+
 											%>
 
 											<td class="appt <%=appointment.getColor()==null?"noStatus":""%>" bgcolor='<%= appointment.getColor() %>' rowspan="<%= appointmentRowSpan %>" nowrap>
@@ -1706,36 +1741,35 @@ private long getAppointmentRowSpan(
 														<a href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;" ${appointmentInfo.appointmentLinkTitle} >
 															.${appointmentInfo.truncatedUpperName}
 														</a>
-
-														<% if (OscarProperties.getInstance().getProperty("APPT_MULTILINE", "false").equals("true") || OscarProperties.getInstance().getProperty("APPT_THREE_LINE", "true").equals("true"))
-														{ %>
 														<%
+														Boolean doNotBook = ("DO_NOT_BOOK").equalsIgnoreCase(appointment.getName());
+
+														if ((oscarProperties.isPropertyActive("APPT_MULTILINE") || oscarProperties.getProperty("APPT_THREE_LINE", "true").equals("true")) && !doNotBook)
+														{
 															if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
 															{
 														%>
 																<%=StringEscapeUtils.escapeHtml(appointment.getType())%>&nbsp;|&nbsp;<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
-														<% 	} %>
-														<%
+														<% 	}
 															if ((appointment.getType() != null && appointment.getType().length() > 0) && (appointmentInfo.getReason() == null || appointmentInfo.getReason().length() == 0))
 															{
 														%>
 																<%=StringEscapeUtils.escapeHtml(appointment.getType())%>
-														<% 	} %>
-														<%
+														<% 	}
 															if ((appointment.getType() == null || appointment.getType().length() == 0) && (appointmentInfo.getReason() != null && appointmentInfo.getReason().length() > 0))
 															{
 														%>
 																<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
-														<% 	} %>
-
-														<% } %>
-
-														<!--Inline display of reason -->
-														<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
-															<span class="${appointmentInfo.reasonToggleableClass} reason reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
-																<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:${appointmentInfo.reason}
-															</span>
-														</oscar:oscarPropertiesCheck></td>
+														<% 	} 
+														} else
+														{%>
+															<!--Inline display of reason -->
+															<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
+																<span class="${appointmentInfo.reasonToggleableClass} reason reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
+																	<bean:message key="provider.appointmentProviderAdminDay.Reason"/>:${appointmentInfo.reason}
+																</span>
+															</oscar:oscarPropertiesCheck></td>
+														<%}%>
 
 													</c:when>
 													<c:otherwise>
@@ -1785,7 +1819,7 @@ private long getAppointmentRowSpan(
 
 														<!-- doctor code block 2 -->
 
-														<c:if test="${appointmentInfo.showPreventionWarnings}">
+														<c:if test="${not empty appointmentInfo.preventionWarnings}">
 															<img src="../images/stop_sign.png" height="14" width="14" title="${appointmentInfo.preventionWarnings}" />&nbsp;
 
 														</c:if>
@@ -2126,7 +2160,7 @@ private long getAppointmentRowSpan(
 				case <bean:message key="global.searchShortcut"/> : popupOscarRx(550,687,'../demographic/search.jsp');  return false;  //run code for 'S'earch
 				case <bean:message key="global.dayShortcut"/> : window.open("providercontrol.jsp?year=<%=curYear%>&month=<%=curMonth%>&day=<%=curDay%>&view=<%=view==0?"0":("1&curProvider="+request.getParameter("curProvider")+"&curProviderName="+URLEncoder.encode(request.getParameter("curProviderName"),"UTF-8") )%>&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>","_self") ;  return false;  //run code for 'T'oday
 				case <bean:message key="global.viewShortcut"/> : {
-					<% if(request.getParameter("viewall")!=null && request.getParameter("viewall").equals("1") ) { %>
+					<% if(request.getParameter("viewall")!=null && request.getParameter("viewall").equals(ALL_VIEW) ) { %>
 					review('0');  return false; //scheduled providers 'V'iew
 					<% } else {  %>
 					review('1');  return false; //all providers 'V'iew

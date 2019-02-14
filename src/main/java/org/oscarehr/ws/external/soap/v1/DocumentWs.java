@@ -34,6 +34,7 @@ import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.DocumentManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.common.SkipContentLogging;
 import org.oscarehr.ws.external.soap.v1.transfer.DocumentTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -86,6 +87,7 @@ public class DocumentWs extends AbstractWs {
 		return (DocumentTransfer.getTransfers(loggedInInfo, documents));
 	}
 
+	@SkipContentLogging
 	public String addDocument(String docFilename, String docContentsBase64, String providerId, String responsibleId) throws IOException, InterruptedException
 	{
 		// Decode document
@@ -102,7 +104,7 @@ public class DocumentWs extends AbstractWs {
 		Document document = new Document();
 		document.setPublic1(false);
 		document.setResponsible(responsibleId);
-		document.setDoccreator(providerId);
+		document.setDocCreator(providerId);
 		document.setDocdesc("");
 		document.setDoctype("");
 		document.setDocfilename(docFilename);
@@ -110,7 +112,7 @@ public class DocumentWs extends AbstractWs {
 		document.setObservationdate(new Date());
 
 		documentService.uploadNewDemographicDocument(document, fileInputStream);
-		documentService.routeToProviderInbox(document.getDocumentNo(), Integer.parseInt(providerId));
+		documentService.routeToProviderInbox(document.getDocumentNo(), providerId);
 
 		return "{\"success\":1,\"message\":\"\"}";
 	}

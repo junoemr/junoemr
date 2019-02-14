@@ -37,19 +37,13 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DemographicMapper
+public class DemographicMapper extends AbstractMapper
 {
-	private final ZPD_ZTR message;
 	private final PID messagePID;
 
-	public DemographicMapper()
-	{
-		message = null;
-		messagePID = null;
-	}
 	public DemographicMapper(ZPD_ZTR message)
 	{
-		this.message = message;
+		super(message);
 		this.messagePID = message.getPATIENT().getPID();
 	}
 
@@ -182,7 +176,7 @@ public class DemographicMapper
 		String areaCode = messagePID.getPid13_PhoneNumberHome(rep).getAreaCityCode().getValue();
 		String phoneNumber = messagePID.getPid13_PhoneNumberHome(rep).getPhoneNumber().getValue();
 
-		return StringUtils.trimToNull(StringUtils.trimToEmpty(areaCode) + " " + StringUtils.trimToEmpty(phoneNumber));
+		return StringUtils.trimToNull(StringUtils.trimToEmpty(areaCode) + StringUtils.trimToEmpty(phoneNumber));
 	}
 
 	public String getPHN() throws HL7Exception

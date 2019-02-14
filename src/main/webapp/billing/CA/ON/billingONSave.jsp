@@ -132,12 +132,11 @@
             self.opener.refresh(); 
             self.location.href="<%=urlBack%>";
         
-       	 <%}else{%>       	 
-					    self.close(); 
-					    
-					    <% if(!"Save".equals(request.getParameter("submit"))) { %>
+       	 <%}
+       	 	else
+       	 	{%>
+					    self.close();
  					    self.opener.refresh();
- 					    <% } %>
          <% }%>
 </script>
 	<% } else { %>

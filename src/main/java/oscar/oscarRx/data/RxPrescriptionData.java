@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
@@ -960,68 +959,84 @@ public class RxPrescriptionData {
 		/*
 		 * Current should contain non-expired drugs, as well as long terms drugs that are not deleted/discontinued
 		 */
-		public boolean isCurrent() {
-			if(isLongTerm() && !isDiscontinued() && !isArchived()) {
+		public boolean isCurrent()
+		{
+			if(isLongTerm() && !isDiscontinued() && !isArchived())
+			{
 				return true;
 			}
-			boolean b = false;
+			return !isExpired();
+		}
 
-			try {
+		public boolean isExpired()
+		{
+			boolean bExpired = true;
+			try
+			{
 				GregorianCalendar cal = new GregorianCalendar(Locale.CANADA);
 				cal.add(GregorianCalendar.DATE, -1);
 
-				if (this.getEndDate().after(cal.getTime())) {
-					b = true;
+				if (this.getEndDate().after(cal.getTime()))
+				{
+					bExpired = false;
 				}
-			} catch (Exception e) {
-				b = false;
+			}
+			catch (Exception e)
+			{
+				bExpired = true;
 			}
 
-			return b;
+			return bExpired;
 		}
 
-		public void calcEndDate() {
-			try {
+		public static Date calcEndDate(Date rxDate, String duration, String durationUnit, int repeat)
+		{
+			Date endDate = null;
+			try
+			{
 				GregorianCalendar cal = new GregorianCalendar(Locale.CANADA);
 				int days = 0;
 
-				//          p("this.getRxDate()",this.getRxDate().toString());
-				cal.setTime(this.getRxDate());
-
-				if (this.getDuration() != null && this.getDuration().length() > 0) {
-					if (Integer.parseInt(this.getDuration()) > 0) {
-						int i = Integer.parseInt(this.getDuration());
-						//      p("i",Integer.toString(i));
-						//      p("this.getDurationUnit()",this.getDurationUnit());
-						if (this.getDurationUnit() != null && this.getDurationUnit().equalsIgnoreCase("D")) {
+				cal.setTime(rxDate);
+				if(duration != null && duration.length() > 0)
+				{
+					if(Integer.parseInt(duration) > 0)
+					{
+						int i = Integer.parseInt(duration);
+						if(durationUnit != null && durationUnit.equalsIgnoreCase("D"))
+						{
 							days = i;
 						}
-						if (this.getDurationUnit() != null && this.getDurationUnit().equalsIgnoreCase("W")) {
+						if(durationUnit != null && durationUnit.equalsIgnoreCase("W"))
+						{
 							days = i * 7;
 						}
-						if (this.getDurationUnit() != null && this.getDurationUnit().equalsIgnoreCase("M")) {
+						if(durationUnit != null && durationUnit.equalsIgnoreCase("M"))
+						{
 							days = i * 30;
 						}
 
-						if (this.getRepeat() > 0) {
-							int r = this.getRepeat();
-
+						if(repeat > 0)
+						{
+							int r = repeat;
 							r++; // if we have a repeat of 1, multiply days by 2
 
 							days = days * r;
 						}
-						//    p("days",Integer.toString(days));
-						if (days > 0) {
+						if(days > 0)
+						{
 							cal.add(GregorianCalendar.DATE, days);
 						}
 					}
 				}
 
-				this.endDate = cal.getTime();
-			} catch (Exception e) {
+				endDate = cal.getTime();
+			}
+			catch(Exception e)
+			{
 				MiscUtils.getLogger().error("Error", e);
 			}
-			//     p("endDate",RxUtil.DateToString(this.endDate));
+			return endDate;
 		}
 
 		public String getBrandName() {
@@ -1528,33 +1543,18 @@ public class RxPrescriptionData {
 
 		public boolean Save(String scriptId) {
 
-			this.calcEndDate();
+			Date endDate = calcEndDate(this.getRxDate(), this.getDuration(), this.getDurationUnit(), this.getRepeat());
+			if(endDate != null)
+			{
+				this.setEndDate(endDate);
+			}
 
 			// clean up fields
 			if (this.takeMin > this.takeMax) this.takeMax = this.takeMin;
 
-			String escapedSpecial = StringEscapeUtils.escapeSql(this.getSpecial());
-
-			// check to see if there is an identitical prescription in
-			// the database. If there is we'll return that drugid instead
-			// of adding a new prescription.
-			/*
-						String endDate;
-						if (this.getEndDate() == null) {
-							endDate = "0001-01-01";
-						} else {
-							endDate = RxUtil.DateToString(this.getEndDate());
-						}
-			*/
 			DrugDao dao = SpringUtils.getBean(DrugDao.class);
-			// double check if we don't h
-			Drug drug = dao.findByEverything(this.getProviderNo(), this.getDemographicNo(), this.getRxDate(), this.getEndDate(), this.getWrittenDate(), this.getBrandName(), this.getGCN_SEQNO(), this.getCustomName(), this.getTakeMin(), this.getTakeMax(), this.getFrequencyCode(), this.getDuration(), this.getDurationUnit(), this.getQuantity(), this.getUnitName(), this.getRepeat(), this.getLastRefillDate(), this.getNosubs(), this.getPrn(), escapedSpecial, this.getOutsideProviderName(),
-			        this.getOutsideProviderOhip(), this.getCustomInstr(), this.getLongTerm(), this.isCustomNote(), this.getPastMed(), this.getPatientCompliance(), this.getSpecialInstruction(), this.getComment(), this.getStartDateUnknown());
-
-			drug = new Drug();
-
-			int position = this.getNextPosition();
-			this.position = position;
+			Drug drug = new Drug();
+			this.position = this.getNextPosition();
 			syncDrug(drug, ConversionUtils.fromIntString(scriptId));
 			dao.persist(drug);
 			drugId = drug.getId();

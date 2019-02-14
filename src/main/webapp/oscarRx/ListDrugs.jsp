@@ -435,7 +435,7 @@ Event.observe('hidecpp_<%=prescriptIdInt%>', 'change', function(event) {
 	{
 		StringBuilder sb = new StringBuilder("class=\"");
 
-		if (!drug.isLongTerm() && (drug.isCurrent() && drug.getEndDate() != null && (drug.getEndDate().getTime() - referenceTime <= durationToSoon)))
+		if (drug.isCurrent() && drug.getEndDate() != null && (drug.getEndDate().getTime() - referenceTime <= durationToSoon))
 		{
 			sb.append("expireInReference ");
 		}
