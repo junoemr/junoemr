@@ -1154,15 +1154,7 @@
 						   class="sbttn">
 					<input type="hidden" name="submit_form" value="">
 					<%
-						if (ticklerview.compareTo("D") == 0)
-						{
-					%>
-					<input type="button"
-						   value="<bean:message key="tickler.ticklerMain.btnEraseCompletely"/>"
-						   class="sbttn"
-						   onclick="document.forms['ticklerform'].submit_form.value='Erase Completely'; document.forms['ticklerform'].submit();">
-					<%
-					} else
+					if (ticklerview.compareTo("A") == 0)
 					{
 					%>
 					<input type="button"
@@ -1173,7 +1165,7 @@
 						   class="sbttn"
 						   onclick="document.forms['ticklerform'].submit_form.value='Delete'; document.forms['ticklerform'].submit();">
 					<%
-						}
+					}
 					%>
 					<input type="button" name="button"
 						   value="<bean:message key="global.btnCancel"/>" onClick="window.close()"
