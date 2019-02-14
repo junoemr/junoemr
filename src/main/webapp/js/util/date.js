@@ -6,8 +6,10 @@ if (!Oscar.Util) Oscar.Util = {};
 Oscar.Util.Date = {};
 
 // single digit formatters will work with either one or two digits
-Oscar.Util.Date.DateFormat = "YYYY-M-D";
-Oscar.Util.Date.DateFormatAlt = "YYYY/M/D";
+Oscar.Util.Date.DepricatedDateFormat = "YYYY-M-D";
+Oscar.Util.Date.DepricatedDateFormatAlt = "YYYY/M/D";
+Oscar.Util.Date.DateFormat = "YYYY-MM-DD";
+Oscar.Util.Date.DateFormatAlt = "YYYY/MM/DD";
 
 /**
  * Normalizes a date input value to use the default format delimiters.
@@ -15,6 +17,15 @@ Oscar.Util.Date.DateFormatAlt = "YYYY/M/D";
  *
  * @param {object} elem   The DOM element to normalize.
  */
+Oscar.Util.Date.depricatedNormalizeDateInput = function depricatedNormalizeDateInput(elem)
+{
+	// If the value is not a recognized RFC2822 or ISO format, date construction
+	// falls back to js Date(). To avoid this, we provide format to parse from.
+	// Since we are not enforcing strict parsing, delimiters don't need to match.
+	var date = moment(elem.value.trim(), this.DepricatedDateFormat);
+	elem.value = date.format(this.DepricatedDateFormat);
+};
+
 Oscar.Util.Date.normalizeDateInput = function normalizeDateInput(elem)
 {
 	// If the value is not a recognized RFC2822 or ISO format, date construction
@@ -37,10 +48,19 @@ Oscar.Util.Date.normalizeDateInput = function normalizeDateInput(elem)
 Oscar.Util.Date.validateDateInput = function validateDateInput(elem, strict)
 {
 	strict = strict !== false;
-	var validFormats = strict ? [this.DateFormat] : [this.DateFormat, this.DateFormatAlt];
+	var validFormats = strict ? [this.DepricatedDateFormat] :
+		[this.DepricatedDateFormat, this.DepricatedDateFormatAlt];
+
 	var dateStr = elem.value.trim();
 
 	// enforce strict parsing to match against the given formats exactly
+	return moment(dateStr, validFormats, true).isValid();
+};
+
+Oscar.Util.Date.newValidateDateInput = function newValidateDateInput(elem)
+{
+	var validFormats = [this.DateFormat];
+	var dateStr = elem.value.trim();
 	return moment(dateStr, validFormats, true).isValid();
 };
 
@@ -63,6 +83,23 @@ Oscar.Util.Date.validateDateInputTolerant = function validateDateInputTolerant(e
 	}
 
 	var isValid = this.validateDateInput(elem, false);
+
+	if (isValid)
+	{
+		this.depricatedNormalizeDateInput(elem);
+	}
+
+	return isValid;
+};
+
+Oscar.Util.Date.cleanDateInput = function cleanDateInput(elem)
+{
+	if (elem.value.trim() === '')
+	{
+		return true;
+	}
+
+	var isValid = this.newValidateDateInput(elem);
 
 	if (isValid)
 	{
