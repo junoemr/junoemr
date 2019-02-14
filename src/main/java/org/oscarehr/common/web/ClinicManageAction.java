@@ -33,12 +33,15 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.common.dao.ClinicBillingAddressDAO;
+import org.oscarehr.common.model.ClinicBillingAddress;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.model.Clinic;
 
 public class ClinicManageAction extends DispatchAction {
 
     private ClinicDAO clinicDAO;
+    private ClinicBillingAddressDAO clinicBillingAddressDAO;
 
     @Override
     protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -46,26 +49,63 @@ public class ClinicManageAction extends DispatchAction {
     }
 
     public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        String updateStatus = "";
+
+        if (request.getAttribute("updateSuccess") != null) {
+            updateStatus = (String)request.getAttribute("updateSuccess");
+        }
+
+        request.setAttribute("updateStatus", updateStatus);
+
         Clinic clinic = clinicDAO.getClinic();
+        ClinicBillingAddress clinicBillingAddress = new ClinicBillingAddress();
+        boolean hasCustomBillingAddress = false;
+
+        if (clinic.getClinicBillingAddress() != null) {
+            clinicBillingAddress = clinic.getClinicBillingAddress();
+            hasCustomBillingAddress = true;
+        }
+
         DynaActionForm frm = (DynaActionForm)form;
-        frm.set("clinic",clinic);
-        request.setAttribute("clinicForm",form);
+
+        frm.set("clinic", clinic);
+        frm.set("clinicBillingAddress", clinicBillingAddress);
+
+        request.setAttribute("clinicForm", form);
+        request.setAttribute("hasCustomBillingAddress", hasCustomBillingAddress);
+
         return mapping.findForward("success");
     }
 
     public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         DynaActionForm frm = (DynaActionForm)form;
         Clinic clinic = (Clinic) frm.get("clinic");
+
         //weird hack, but not sure why struts isn't filling in the id.
         if(request.getParameter("clinic.id") != null && request.getParameter("clinic.id").length()>0 && clinic.getId()==null) {
         	clinic.setId(Integer.parseInt(request.getParameter("clinic.id")));
         }
+
+        if (request.getParameter("billingCheck") != null && request.getParameter("billingCheck").equals("on"))
+        {
+            ClinicBillingAddress clinicBillingAddress = (ClinicBillingAddress) frm.get("clinicBillingAddress");
+            clinicBillingAddressDAO.save(clinicBillingAddress);
+            clinic.setClinicBillingAddress(clinicBillingAddress);
+        }
+
         clinicDAO.save(clinic);
 
-        return mapping.findForward("success");
+        request.setAttribute("updateSuccess", "Updated Successfully");
+
+        return view(mapping, form, request, response);
     }
 
     public void setClinicDAO(ClinicDAO clinicDAO) {
         this.clinicDAO = clinicDAO;
+    }
+
+    public void setClinicBillingAddressDAO(ClinicBillingAddressDAO clinicBillingAddressDAO)
+    {
+        this.clinicBillingAddressDAO = clinicBillingAddressDAO;
     }
 }

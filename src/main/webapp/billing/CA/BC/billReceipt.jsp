@@ -53,9 +53,12 @@
 <%@page import="java.util.*, oscar.oscarDemographic.data.*" %>
 <%@page import="oscar.oscarBilling.ca.bc.data.*,oscar.oscarBilling.ca.bc.pageUtil.*,oscar.*,oscar.oscarClinic.*" %>
 <%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="org.oscarehr.common.model.ClinicBillingAddress" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 <%
     double totalPayments = 0;
     double totalRefunds = 0;
+
     String color = "", colorflag = "";
     BillingHistoryDAO dao = new BillingHistoryDAO();
     BillingViewBean bean = (BillingViewBean) pageContext.findAttribute("billingViewBean");
@@ -65,8 +68,13 @@
     ArrayList billItem = bean.getBillItem();
     BillingFormData billform = new BillingFormData();
     OscarProperties props = OscarProperties.getInstance();
+
     ClinicData clinic = new ClinicData();
+
+    HashMap<String, String> billing = clinic.getBillingInfo();
+
     String strPhones = clinic.getClinicDelimPhone();
+
     if (strPhones == null)
     {
         strPhones = "";
@@ -297,17 +305,14 @@
                                                         <table width="100%" border="0">
                                                             <tr>
                                                                 <td class="secHead" align="left">
-                                                                    <h2> INVOICE -
-                                                                        <%=bean.getBillingNo()%>
-                                                                    </h2>
+
+                                                                    <h2>INVOICE - <%=bean.getBillingNo()%></h2>
                                                                 </td>
                                                                 <%
                                                                     java.text.SimpleDateFormat fmt = new java.text.SimpleDateFormat("MMM d, yyyy 'at' h:mm aaa");
                                                                     String fmtDate = fmt.format(new java.util.Date());
                                                                 %>
-                                                                <td class="secHead" align="right"> Date:
-                                                                    <%=fmtDate%>
-                                                                </td>
+                                                                <td class="secHead" align="right">Date: <%=fmtDate%></td>
                                                             </tr>
                                                         </table>
                                                     </td>
@@ -319,13 +324,15 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="2" class="address"><%=clinic.getClinicAddress()%>,
-                                                        <%=clinic.getClinicCity()%>                            ,
-                                                        <%=clinic.getClinicProvince()%><%=clinic.getClinicPostal()%>
+                                                    <td colspan="2" class="address">
+                                                        <%=clinic.getClinicAddress()%>,
+                                                        <%=clinic.getClinicCity()%>,
+                                                        <%=clinic.getClinicProvince()%>,
+                                                        <%=clinic.getClinicPostal()%>
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="address" id="clinicPhone"> Telephone:
+                                                    <td class="address" id="clinicPhone">Telephone:
                                                         <%=vecPhones.size() >= 1 ? vecPhones.elementAt(0) : clinic.getClinicPhone()%>
                                                     </td>
                                                     <td class="address" id="clinicFax">&nbsp;</td>
@@ -401,8 +408,8 @@
                                         <td width="50%" valign="top">
                                             <table width="100%" border="0" cellspacing="2" cellpadding="2">
                                                 <tr>
-                                                    <td colspan="2" valign="top" class="secHead"> Patient (
-                                                        <%=bean.getPatientPHN()%>                            )
+                                                    <td colspan="2" valign="top" class="secHead">
+                                                        Patient (<%=bean.getPatientPHN()%>)
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -414,12 +421,12 @@
                                                             <br>
                                                             <strong>Address:</strong>
                                                             <br>
-                                                            <%=demo.getAddress()%>                              <br>
-                                                            <%=demo.getCity()%>                              ,
-                                                            <%=demo.getProvince()%>                              <br>
-                                                            <%=demo.getPostal()%>                              <br>
+                                                            <%=demo.getAddress()%><br>
+                                                            <%=demo.getCity()%>,
+                                                            <%=demo.getProvince()%><br>
+                                                            <%=demo.getPostal()%><br>
                                                             <strong>Gender:</strong>
-                                                            <%=demo.getSex()%>                              <br>
+                                                            <%=demo.getSex()%><br>
                                                             <strong>Birth Date :</strong>
                                                             <%=DemographicData.getDob(demo, "-")%>
                                                         </p>
@@ -576,23 +583,24 @@
                                                             </tr>
                                                             <tr>
                                                                 <td class="title4">
-                                                                    <%=clinic.getClinicName()%>
+                                                                    <%=billing.get("name")%>
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td class="address"><%=clinic.getClinicAddress()%>
-                                                                    , <%=clinic.getClinicCity()%>
-                                                                    , <%=clinic.getClinicProvince()%><%=clinic.getClinicPostal()%>
+                                                                <td class="address">
+                                                                    <%=billing.get("address")%>,
+                                                                    <%=billing.get("city")%>,
+                                                                    <%=billing.get("province")%> <%=billing.get("postal")%>
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <td class="address" id="clinicPhone">
-                                                                    Telephone: <%=vecPhones.size() >= 1 ? vecPhones.elementAt(0) : clinic.getClinicPhone()%>
+                                                                    Telephone: <%=billing.get("phone")%>
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <td class="address" id="clinicFax">
-                                                                    Fax: <%=vecFaxes.size() >= 1 ? vecFaxes.elementAt(0) : clinic.getClinicFax()%>
+                                                                    Fax: <%=billing.get("fax")%>
                                                                 </td>
                                                             </tr>
                                                         </table>

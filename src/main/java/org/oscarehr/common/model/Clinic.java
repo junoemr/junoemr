@@ -26,11 +26,15 @@ package org.oscarehr.common.model;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -66,6 +70,10 @@ public class Clinic extends AbstractModel<Integer> implements Serializable {
     private String clinicDelimPhone;
     @Column(name="clinic_delim_fax")
     private String clinicDelimFax;
+    // foreign key
+    @OneToOne(fetch=FetchType.EAGER, cascade=CascadeType.MERGE)
+    @JoinColumn(name="clinic_billing_address_id", referencedColumnName="id")
+    private ClinicBillingAddress clinicBillingAddress;
 
     public Integer getId() {
         return this.id;
@@ -167,6 +175,14 @@ public class Clinic extends AbstractModel<Integer> implements Serializable {
         this.clinicDelimFax = clinicDelimFax;
     }
 
+    public ClinicBillingAddress getClinicBillingAddress() {
+        return clinicBillingAddress;
+    }
+
+    public void setClinicBillingAddress(ClinicBillingAddress clinicBillingAddress) {
+        this.clinicBillingAddress = clinicBillingAddress;
+    }
+
     public String toString(){
        return "clinicName " +clinicName +
     " clinicAddress  " +clinicAddress+
@@ -178,7 +194,8 @@ public class Clinic extends AbstractModel<Integer> implements Serializable {
     " status " +status+
     " clinicProvince " +clinicProvince+
     " clinicDelimPhone " +clinicDelimPhone+
-    " clinicDelimFax " +clinicDelimFax;
+    " clinicDelimFax " +clinicDelimFax +
+    " clinicBillingAddress " + clinicBillingAddress;
 
     }
 

@@ -32,7 +32,10 @@ package oscar.oscarClinic;
 
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.model.Clinic;
+import org.oscarehr.common.model.ClinicBillingAddress;
 import org.oscarehr.util.SpringUtils;
+
+import java.util.HashMap;
 
 /**
  *
@@ -71,6 +74,7 @@ public class ClinicData {
 	String clinic_province = null;
 	String clinic_delim_phone = null;
 	String clinic_delim_fax = null;
+	private HashMap<String, String> billing_info = new HashMap<>();
 
 	boolean filled = false;
 
@@ -94,6 +98,27 @@ public class ClinicData {
 				clinic_province = clinic.getClinicProvince();
 				clinic_delim_phone = clinic.getClinicDelimPhone();
 				clinic_delim_fax = clinic.getClinicDelimFax();
+
+				if (clinic.getClinicBillingAddress() != null) {
+					ClinicBillingAddress billing = clinic.getClinicBillingAddress();
+
+					billing_info.put("name", billing.getBillingName());
+					billing_info.put("address", billing.getBillingAddress());
+					billing_info.put("city", billing.getBillingCity());
+					billing_info.put("postal", billing.getBillingPostal());
+					billing_info.put("province", billing.getBillingProvince());
+					billing_info.put("phone", billing.getBillingPhone());
+					billing_info.put("fax", billing.getBillingFax());
+				} else {
+					billing_info.put("name", clinic_name);
+					billing_info.put("address", clinic_address);
+					billing_info.put("city", clinic_city);
+					billing_info.put("postal", clinic_postal);
+					billing_info.put("province", clinic_province);
+					billing_info.put("phone", clinic_phone);
+					billing_info.put("fax", clinic_fax);
+				}
+
 			}
 
 			filled = true;
@@ -153,6 +178,11 @@ public class ClinicData {
 	public String getClinicDelimFax() {
 		fillClinicData();
 		return clinic_delim_fax;
+	}
+
+	public HashMap<String, String> getBillingInfo() {
+		fillClinicData();
+		return billing_info;
 	}
 
 	public void refreshClinicData() {

@@ -41,6 +41,8 @@
     {
         return;
     }
+
+    Boolean hasCustomBillingAddress = (Boolean) request.getAttribute("hasCustomBillingAddress");
 %>
 
 <%@ page import="java.util.*,oscar.oscarReport.reportByTemplate.*" %>
@@ -49,159 +51,166 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <html:html locale="true">
     <head>
-        <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-        <title>Clinic</title>
-        <link rel="stylesheet" type="text/css"
-              href="../share/css/OscarStandardLayout.css">
+    <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+    <title>Clinic</title>
+    <link rel="stylesheet" type="text/css"
+          href="../share/css/OscarStandardLayout.css">
+    <link rel="stylesheet" type="text/css" href="../share/css/OscarStandardLayout.css"/>
+    <link rel="stylesheet" href="../css/clinicAdmin.css">
 
-        <script type="text/javascript" language="JavaScript"
-                src="../share/javascript/prototype.js"></script>
-        <script type="text/javascript" language="JavaScript"
-                src="../share/javascript/Oscar.js"></script>
+    <script type="text/javascript" language="JavaScript"
+            src="../share/javascript/prototype.js"></script>
+    <script type="text/javascript" language="JavaScript"
+            src="../share/javascript/Oscar.js"></script>
 
-        <style type="text/css">
-            table.outline {
-                margin-top: 50px;
-                border-bottom: 1pt solid #888888;
-                border-left: 1pt solid #888888;
-                border-top: 1pt solid #888888;
-                border-right: 1pt solid #888888;
-            }
 
-            table.grid {
-                border-bottom: 1pt solid #888888;
-                border-left: 1pt solid #888888;
-                border-top: 1pt solid #888888;
-                border-right: 1pt solid #888888;
-            }
-
-            td.gridTitles {
-                border-bottom: 2pt solid #888888;
-                font-weight: bold;
-                text-align: center;
-            }
-
-            td.gridTitlesWOBottom {
-                font-weight: bold;
-                text-align: center;
-            }
-
-            td.middleGrid {
-                border-left: 1pt solid #888888;
-                border-right: 1pt solid #888888;
-                text-align: center;
-            }
-
-            label {
-                float: left;
-                width: 120px;
-                font-weight: bold;
-            }
-
-            label.checkbox {
-                float: left;
-                width: 116px;
-                font-weight: bold;
-            }
-
-            label.fields {
-                float: left;
-                width: 80px;
-                font-weight: bold;
-            }
-
-            span.labelLook {
-                font-weight: bold;
-            }
-
-            input, textarea, select {
-            / / margin-bottom: 5 px;
-            }
-
-            textarea {
-                width: 450px;
-                height: 100px;
-            }
-
-            .boxes {
-                width: 1em;
-            }
-
-            #submitbutton {
-                margin-left: 120px;
-                margin-top: 5px;
-                width: 90px;
-            }
-
-            br {
-                clear: left;
-            }
-        </style>
-    </head>
-
-    <body vlink="#0000FF" class="BodyStyle">
-
-    <table class="MainTable">
-        <tr class="MainTableTopRow">
-            <td class="MainTableTopRowLeftColumn">admin</td>
-            <td class="MainTableTopRowRightColumn">
-                <table class="TopStatusBar" style="width: 100%;">
-                    <tr>
-                        <td>Manage Clinic Details</td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <td class="MainTableLeftColumn" valign="top" width="160px;">
-                &nbsp;
-            </td>
-            <td class="MainTableRightColumn" valign="top">
+    <div class="header">
+        <h2>Manage Clinic Details</h2>
+    </div>
+    <div id="clinic">
+        <div class="clinic-details">
+            <div class="clinic-info">
                 <fieldset>
-                    <legend>Clinic Details</legend>
-                    <html:form
-                            action="/admin/ManageClinic">
+                    <legend>Clinic Address</legend>
+                    <html:form action="/admin/ManageClinic">
                         <html:hidden property="clinic.id"/>
-                        <input type="hidden" name="method" value="update"/>
-
-                        <label for="clinic.clinicName">Clinic Name</label>
-                        <html:text property="clinic.clinicName"/>
-                        <br/>
-                        <label for="clinic.clinicAddress">Clinic Address</label>
-                        <html:text property="clinic.clinicAddress"/>
-                        <br/>
-                        <label for="clinic.clinicCity">Clinic City</label>
-                        <html:text property="clinic.clinicCity"/>
-                        <br/>
-                        <label for="clinic.clinicPostal">Clinic Postal</label>
-                        <html:text property="clinic.clinicPostal"/>
-                        <br/>
-                        <label for="clinic.clinicPhone">Clinic Phone</label>
-                        <html:text property="clinic.clinicPhone"/>
-                        <br/>
-                        <label for="clinic.clinicFax">Clinic Fax</label>
-                        <html:text property="clinic.clinicFax"/>
-                        <br/>
-                        <label for="clinic.clinicLocationCode">Clinic Location Code</label>
-                        <html:text property="clinic.clinicLocationCode"/>
-                        <br/>
+                            <% if (hasCustomBillingAddress != null && hasCustomBillingAddress) { %>
+                        <html:hidden property="clinicBillingAddress.id"/>
+                            <% } %>
                         <html:hidden property="clinic.status" value="A"/>
-                        <br/>
-                        <label for="clinic.clinicProvince">Clinic Province</label>
-                        <html:text property="clinic.clinicProvince"/>
-                        <br/>
-                        <label for="clinic.clinicDelimPhone">multi phone</label>
-                        <html:text property="clinic.clinicDelimPhone"/> (Delimited by |) <br/>
-                        <label for="clinic.clinicDelimFax">multi fax</label>
-                        <html:text property="clinic.clinicDelimFax"/> (Delimited by |)<br />
-                        <input type="submit" value="submit"/>
-                    </html:form></fieldset>
-            </td>
-        </tr>
-        <tr>
-            <td class="MainTableBottomRowLeftColumn">&nbsp;</td>
+                    <input type="hidden" name="method" value="update"/>
+                    <div class="billing-check">
+                        <input id="billingCheckbox" type="checkbox" name="billingCheck">
+                        <span style="font-size: 0.8em;">Custom billing address</span>
+                    </div>
+                    <div class="address-fields hide-billing" id="address-fields">
+                        <div class="address">
+                            <div class="input-field">
+                                <label for="clinic.clinicName">Clinic Name</label>
+                                <html:text property="clinic.clinicName"/>
+                            </div>
+                            <div class="input-field">
+                                <label for="clinic.clinicAddress">Clinic Address</label>
+                                <html:text property="clinic.clinicAddress"/>
+                            </div>
+                            <div class="input-field">
+                                <label for="clinic.clinicCity">Clinic City</label>
+                                <html:text property="clinic.clinicCity"/>
+                            </div>
+                            <div class="input-field">
+                                <label for="clinic.clinicProvince">Clinic Province</label>
+                                <html:text property="clinic.clinicProvince"/>
+                            </div>
+                            <div class="input-field">
+                                <label for="clinic.clinicPostal">Clinic Postal</label>
+                                <html:text property="clinic.clinicPostal"/>
+                            </div>
+                            <div class="input-field">
+                                <label for="clinic.clinicPhone">Clinic Phone</label>
+                                <html:text property="clinic.clinicPhone"/>
+                            </div>
+                            <div class="input-field">
+                                <label for="clinic.clinicFax">Clinic Fax</label>
+                                <html:text property="clinic.clinicFax"/>
+                            </div>
+                            <div class="input-field">
+                                <label for="clinic.clinicLocationCode">Clinic Location Code</label>
+                                <html:text property="clinic.clinicLocationCode"/>
+                            </div>
+                            <div class="input-field">
+                                <label for="clinic.clinicDelimPhone">
+                                    Multi Phone -
+                                    <span style="color: grey;">Delimited by |</span>
+                                </label>
+                                <html:text property="clinic.clinicDelimPhone"/>
+                            </div>
+                            <div class="input-field">
+                                <label for="clinic.clinicDelimFax">
+                                    Multi Fax -
+                                    <span style="color: grey;">Delimited by |</span>
+                                </label>
+                                <html:text property="clinic.clinicDelimFax"/>
+                            </div>
+                        </div>
+                        <div class="address" id="billing-fields">
+                            <div class="title">
+                                <h3>Billing Address</h3>
+                            </div>
+                            <div class="input-field">
+                                <label for="clinicBillingAddress.billingName">Billing Name</label>
+                                <html:text property="clinicBillingAddress.billingName"/>
+                            </div>
+                            <div class="input-field">
+                                <label for="clinicBillingAddress.billingAddress">Billing Address</label>
+                                <html:text property="clinicBillingAddress.billingAddress"/>
+                            </div>
+                            <div class="input-field">
+                                <label for="clinicBillingAddress.billingCity">Billing City</label>
+                                <html:text property="clinicBillingAddress.billingCity"/>
+                            </div>
+                            <div class="input-field">
+                                <label for="clinicBillingAddress.billingProvince">Billing Province</label>
+                                <html:text property="clinicBillingAddress.billingProvince"/>
+                            </div>
+                            <div class="input-field">
+                                <label for="clinicBillingAddress.billingPostal">Billing Postal</label>
+                                <html:text property="clinicBillingAddress.billingPostal"/>
+                            </div>
+                            <div class="input-field">
+                                <label for="clinicBillingAddress.billingPhone">Billing Phone</label>
+                                <html:text property="clinicBillingAddress.billingPhone"/>
+                            </div>
+                            <div class="input-field">
+                                <label for="clinicBillingAddress.billingFax">Billing Fax</label>
+                                <html:text property="clinicBillingAddress.billingFax"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="submit">
+                        <input class="submit-button" type="submit" value="Update">
+                    </div>
+                    <div class="update-success">
+                        <p><%=(String) request.getAttribute("updateStatus")%>
+                        </p>
+                    </div>
+            </div>
+            </html:form>
+            </fieldset>
+        </div>
+    </div>
+    </div>
+    <script>
+        const billingCheckbox = document.querySelector('#billingCheckbox');
+        const billingFields = document.querySelector('#billing-fields');
+        const addressFields = document.querySelector('#address-fields');
 
-            <td class="MainTableBottomRowRightColumn">&nbsp;</td>
-        </tr>
-    </table>
+        function showBilling(showBilling) {
+            if (showBilling) {
+                billingFields.style.display = 'block';
+                addressFields.classList.remove('hide-billing');
+                addressFields.classList.add('show-billing');
+            } else {
+                billingFields.style.display = 'none';
+                addressFields.classList.remove('show-billing');
+                addressFields.classList.add('hide-billing');
+            }
+        }
+
+        if (<%=hasCustomBillingAddress%>) {
+            billingCheckbox.checked = "checked";
+            showBilling(true);
+        } else {
+            billingCheckbox.checked = "";
+            showBilling(false);
+        }
+
+        billingCheckbox.addEventListener('change', function (event) {
+            if (event.target.checked) {
+                showBilling(true);
+            } else {
+                showBilling(false);
+            }
+        });
+    </script>
+    </body>
 </html:html>

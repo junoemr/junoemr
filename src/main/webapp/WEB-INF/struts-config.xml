@@ -32,6 +32,7 @@
 		</form-bean>
 		<form-bean name="clinicForm" type="org.apache.struts.validator.DynaValidatorForm">
 			<form-property name="clinic" type="org.oscarehr.common.model.Clinic" />
+			<form-property name="clinicBillingAddress" type="org.oscarehr.common.model.ClinicBillingAddress" />
 		</form-bean>
 		<form-bean name="olisPreferences" type="org.oscarehr.olis.model.OLISSystemPreferences"/>
 
