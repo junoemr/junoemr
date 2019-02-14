@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS `clinic_billing_address` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) DEFAULT NULL,
@@ -9,4 +8,4 @@ CREATE TABLE IF NOT EXISTS `clinic_billing_address` (
   `phone` varchar(50) DEFAULT NULL,
   `fax` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
