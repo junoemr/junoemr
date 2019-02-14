@@ -452,14 +452,14 @@ function disableIfExists(item, disabled)
 /////////////////////////////////////////////////////////////////////
 // create car model objects and fill arrays
 //=======
-function D( servNumber, specNum, phoneNum ,SpecName,SpecFax,SpecAddress){
-    var specialistObj = new Specialist(servNumber,specNum,phoneNum, SpecName, SpecFax, SpecAddress);
+function D( servNumber, specNum, phoneNum ,SpecName,SpecFax,SpecAddress, specRefNo){
+    var specialistObj = new Specialist(servNumber,specNum,phoneNum, SpecName, SpecFax, SpecAddress, specRefNo);
     services[servNumber].specialists.push(specialistObj);
 }
 //-------------------------------------------------------------------
 
 /////////////////////////////////////////////////////////////////////
-function Specialist(makeNumber,specNum,phoneNum,SpecName, SpecFax, SpecAddress){
+function Specialist(makeNumber,specNum,phoneNum,SpecName, SpecFax, SpecAddress, specRefNo){
 
 	this.specId = makeNumber;
 	this.specNbr = specNum;
@@ -467,6 +467,7 @@ function Specialist(makeNumber,specNum,phoneNum,SpecName, SpecFax, SpecAddress){
 	this.specName = SpecName;
 	this.specFax = SpecFax;
 	this.specAddress = SpecAddress;
+	this.specRefNo = specRefNo;
 }
 //-------------------------------------------------------------------
 
@@ -598,7 +599,7 @@ function initSpec() {
 }
 
 /////////////////////////////////////////////////////////////////////
-function initService(ser,name,spec,specname,phone,fax,address){
+function initService(ser,name,spec,specname,phone,fax,address,specReferralNum){
 	var i = 0;
 	var isSel = 0;
 	var strSer = new String(ser);
@@ -608,6 +609,7 @@ function initService(ser,name,spec,specname,phone,fax,address){
 	var strPhone = new String(phone);
 	var strFax = new String(fax);
 	var strAddress = new String(address);
+	var strReferralNum = new String(specReferralNum);
 
 	var isSerDel=1;//flagging service if deleted: 1=deleted 0=active
 
@@ -619,7 +621,7 @@ function initService(ser,name,spec,specname,phone,fax,address){
 
 	if (isSerDel==1 && strSer != "null") {
 	K(strSer,strNa);
-	D(strSer,strSpec,strPhone,strSpecNa,strFax,strAddress);
+	D(strSer,strSpec,strPhone,strSpecNa,strFax,strAddress,strReferralNum);
     }
 
         $H(servicesName).each(function(pair){
@@ -2338,7 +2340,8 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 		        '<%=((consultUtil.specialist==null)?"":StringEscapeUtils.escapeJavaScript(consultUtil.getSpecailistsName(consultUtil.specialist.toString())))%>',
 		        '<%=StringEscapeUtils.escapeJavaScript(consultUtil.specPhone)%>',
 		        '<%=StringEscapeUtils.escapeJavaScript(consultUtil.specFax)%>',
-		        '<%=StringEscapeUtils.escapeJavaScript(consultUtil.specAddr)%>');
+		        '<%=StringEscapeUtils.escapeJavaScript(consultUtil.specAddr)%>',
+				'<%=StringEscapeUtils.escapeJavaScript(consultUtil.specReferralNo)%>');
             initSpec();
             document.EctConsultationFormRequestForm.phone.value = ("");
         	document.EctConsultationFormRequestForm.fax.value = ("");
