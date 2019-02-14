@@ -55,6 +55,7 @@ import org.oscarehr.billing.CA.BC.model.TeleplanC12;
 import org.oscarehr.billing.CA.BC.model.TeleplanRefusalCode;
 import org.oscarehr.billing.CA.BC.model.TeleplanS00;
 import org.oscarehr.billing.CA.BC.model.TeleplanS21;
+import org.oscarehr.common.dao.BillingBCDao;
 import org.oscarehr.common.dao.BillingDao;
 import org.oscarehr.common.dao.BillingPaymentTypeDao;
 import org.oscarehr.common.model.Billing;
@@ -271,11 +272,11 @@ public class MSPReconcile {
 			Vector<String> exp = new Vector<String>();
 			
 			if( rejectedArray.length > 0 ) {
-				tc = (TeleplanC12) rejectedArray[1];
+				tc = (TeleplanC12) rejectedArray[0];
 			}
 			
 			if( rejectedArray.length > 1 ) {
-				ts = (TeleplanS21) rejectedArray[2];
+				ts = (TeleplanS21) rejectedArray[1];
 			}
 
 			if( tc != null ) {				
@@ -1113,7 +1114,7 @@ public class MSPReconcile {
 			orderByClause = "order by b.provider_no,bt.sortOrder,bm.service_date,b.demographic_name";
 			c12 = currentC12Records();
 		}
-		String p = "select provider.first_name,provider.last_name,b.billingtype, b.update_date, bm.billingmaster_no,b.billing_no, " + " b.demographic_name,b.demographic_no,bm.billing_unit,bm.billing_code,bm.bill_amount,bm.billingstatus,bm.mva_claim_code,bm.service_location," + " bm.phn,bm.service_end_time,service_start_time,bm.service_to_day,bm.service_date,bm.oin_sex_code,b.dob,dx_code1,b.provider_no,apptProvider_no,bt.sortOrder "
+		String p = "select provider.first_name,provider.last_name,b.billingtype, b.update_date, bm.billingmaster_no,b.billing_no, " + " b.demographic_name,b.demographic_no,bm.billing_unit,bm.billing_code,bm.bill_amount,bm.billingstatus,bm.mva_claim_code,bm.service_location," + " bm.phn,bm.service_end_time,service_start_time,bm.service_to_day,bm.service_date,demographic.sex,b.dob,dx_code1,b.provider_no,apptProvider_no,bt.sortOrder "
 		        + " from demographic,provider,billing as b left join billingtypes bt on b.billingtype = bt.billingtype ,billingmaster as bm left join billingstatus_types bs on bm.billingstatus = bs.billingstatus" + " where bm.billing_no=b.billing_no " + " and b.provider_no = provider.provider_no " + " and demographic.demographic_no = b.demographic_no " + criteriaQry + " " + orderByClause;
 
 		if (type.equals(REP_REJ)) {
@@ -1155,7 +1156,7 @@ public class MSPReconcile {
 				b.hin = rs.getString("phn");
 				b.serviceLocation = rs.getString("service_location");
 				b.demoDOB = rs.getString("dob");
-				b.demoSex = rs.getString("oin_sex_code");
+				b.demoSex = rs.getString("demographic.sex");
 				b.apptDoctorNo = rs.getString("apptProvider_no");
 				b.accountNo = rs.getString("b.provider_no");
 				b.updateDate = rs.getString("update_date");
@@ -1202,6 +1203,18 @@ public class MSPReconcile {
 					if (rsDemo.next()) {
 						b.demoPhone = rsDemo.getString("phone");
 						b.demoPhone2 = rsDemo.getString("phone2");
+					}
+
+					//Lookup Service_location long name, and append to serviceLocation.
+					BillingBCDao srvTypeDoa = (BillingBCDao) SpringUtils.getBean(BillingBCDao.class);
+					List<Object[]> srvLocationMapping = srvTypeDoa.findBillingVisits(org.oscarehr.common.dao.BillingServiceDao.BC);
+					for (Object[] mapping : srvLocationMapping)
+					{
+						if (((String)mapping[0]).equals(b.serviceLocation))
+						{
+							b.serviceLocation = b.serviceLocation + " - " + (String)mapping[1];
+							break;
+						}
 					}
 				}
 
