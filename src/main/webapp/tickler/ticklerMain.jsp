@@ -1154,7 +1154,7 @@
 						   class="sbttn">
 					<input type="hidden" name="submit_form" value="">
 					<%
-					if (ticklerview.compareTo("A") == 0)
+					if (ticklerview.compareTo("D") != 0)
 					{
 					%>
 					<input type="button"
