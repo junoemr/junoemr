@@ -1384,7 +1384,8 @@ private long getAppointmentRowSpan(
 											"&day=" + schedule.getScheduleDate().getDayOfMonth() +
 											"&view=0" +
 											"&displaymode=day" +
-											"&dboperation=searchappointmentday";
+											"&dboperation=searchappointmentday" +
+											"&viewall=" + viewall;
 									%>
 									<b><a href="<%= dayUrl %>">
 										<%=schedule.getScheduleDate().format(DateTimeFormatter.ofPattern("EEE, yyyy-MM-dd"))%>
