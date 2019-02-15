@@ -13,6 +13,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.jasperreports.engine.DefaultJasperReportsContext;
+import net.sf.jasperreports.engine.util.LocalJasperReportsContext;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -123,7 +125,15 @@ public class PrintDemoLabelAction extends OscarAction {
         response.setHeader("Content-disposition", getHeader(response).toString());
         OscarDocumentCreator osc = new OscarDocumentCreator();
         try {
-            osc.fillDocumentStream(parameters, sos, "pdf", ins, DbConnectionFilter.getThreadLocalDbConnection(),exportPdfJavascript);
+            OscarProperties props = OscarProperties.getInstance();
+            String fontSize = props.getProperty("label.fontSize");
+            if (fontSize == null)
+            {
+                fontSize = DefaultJasperReportsContext.getInstance().getProperty("net.sf.jasperreports.default.font.size");
+            }
+            LocalJasperReportsContext rContext = new LocalJasperReportsContext(DefaultJasperReportsContext.getInstance());
+            rContext.setProperty("net.sf.jasperreports.default.font.size", fontSize);
+            osc.fillDocumentStream(parameters, sos, "pdf", ins, DbConnectionFilter.getThreadLocalDbConnection(),exportPdfJavascript, rContext);
         }
         catch (SQLException e) {
             MiscUtils.getLogger().error("Error", e);
