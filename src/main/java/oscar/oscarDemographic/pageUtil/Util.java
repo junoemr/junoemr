@@ -769,10 +769,6 @@ public class Util {
 	{
 		OscarProperties props = OscarProperties.getInstance();
 		String fontSize = props.getProperty("label.fontSize");
-		if (fontSize == null)
-		{
-			fontSize = DefaultJasperReportsContext.getInstance().getProperty("net.sf.jasperreports.default.font.size");
-		}
 		LocalJasperReportsContext rContext = new LocalJasperReportsContext(DefaultJasperReportsContext.getInstance());
 		rContext.setProperty("net.sf.jasperreports.default.font.size", fontSize);
 		return rContext;
