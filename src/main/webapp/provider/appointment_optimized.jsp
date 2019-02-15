@@ -1394,7 +1394,8 @@ private long getAppointmentRowSpan(
 								else
 								{
 									%>
-									<b><input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.weekLetter"/>" name='weekview' onClick=goWeekView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.weekView"/>" style="color:black" class="noprint">
+									<b style="padding: 0 5px 0 5px;">
+										<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.weekLetter"/>" name='weekview' onClick=goWeekView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.weekView"/>" style="color:black" class="noprint">
 										<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.searchLetter"/>" name='searchview' onClick=goSearchView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.searchView"/>" style="color:black" class="noprint">
 										<b><input type='radio' name='flipview' class="noprint" onClick="goFilpView('<%= scheduleProviderNo %>')" title="Flip view"  >
 											<a href=# onClick="goZoomView('<%= scheduleProviderNo %>','<%=StringEscapeUtils.escapeJavaScript(schedule.getFullName())%>')" onDblClick="goFilpView('<%= scheduleProviderNo %>')" title="<bean:message key="provider.appointmentProviderAdminDay.zoomView"/>" >
@@ -2042,7 +2043,8 @@ private long getAppointmentRowSpan(
 									else
 									{
 										%>
-										<b><input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.weekLetter"/>" name='weekview' onClick=goWeekView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.weekView"/>" style="color:black" class="noprint">
+										<b style="padding: 0 5px 0 5px;">
+											<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.weekLetter"/>" name='weekview' onClick=goWeekView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.weekView"/>" style="color:black" class="noprint">
 											<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.searchLetter"/>" name='searchview' onClick=goSearchView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.searchView"/>" style="color:black" class="noprint">
 											<b><input type='radio' name='flipview' class="noprint" onClick="goFilpView('<%= scheduleProviderNo %>')" title="Flip view"  >
 												<a href=# onClick="goZoomView('<%= scheduleProviderNo %>','<%=StringEscapeUtils.escapeJavaScript(schedule.getFullName())%>')" onDblClick="goFilpView('<%= scheduleProviderNo %>')" title="<bean:message key="provider.appointmentProviderAdminDay.zoomView"/>" >
