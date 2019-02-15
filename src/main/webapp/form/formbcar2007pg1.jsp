@@ -102,6 +102,12 @@ if (request.getParameter("view") != null && request.getParameter("view").equals(
 <!-- the following script defines the Calendar.setup helper function, which makes
        adding a calendar a matter of 1 or 2 lines of code. -->
 <script type="text/javascript" src="../share/calendar/calendar-setup.js"></script>
+
+<!-- Form submission helper scripts -->
+<script type="text/javascript" src="<%=request.getContextPath() %>/js/jquery-3.1.0.min.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath() %>/js/juno-jquery-plugin.js"></script>
+<script type="text/javascript" src="./OscarFormHelpers.js"></script>
+
 <html:base />
 <style type="text/css">
         <!--
@@ -533,7 +539,35 @@ function calcAgeAtEDD(){
     }
 
 }
-                                                   </script>
+
+$(document).ready(function()
+{
+    var $form = $('#bcar2007pg1');
+    $form.juno_trackIsChanged();
+
+    var $links = $('a:not([href^="javascript:"])');
+    $.each($links, function()
+	{
+	    var $link = $(this);
+        Oscar.FormHelpers.safeLink($link, $form);
+	});
+
+    var $saveButtons = $('input[name="saveButton"]');
+    $.each($saveButtons, function()
+	{
+	    var $saveButton = $(this);
+        Oscar.FormHelpers.safeSave($saveButton, $links);
+	});
+
+	var $exitButtons = $('input[name="exitButton"]')
+    $.each($exitButtons, function()
+    {
+        var $exitButton = $(this);
+        Oscar.FormHelpers.safeClose($exitButton, $form);
+    });
+});
+
+</script>
 
 <body bgproperties="fixed" topmargin="0" leftmargin="1" rightmargin="1">
 <div ID="Langdiv" class="demo">
@@ -870,7 +904,7 @@ function calcAgeAtEDD(){
 @oscar.formDB Field="formEdited" Type="timestamp"  
 @oscar.formDB Field="c_lastVisited" Type="char(3)" 
 -->
-<html:form action="/form/formname">
+<html:form action="/form/formname" styleId="bcar2007pg1">
 	<input type="hidden" name="commonField" value="ar2_" />
 	<input type="hidden" name="c_lastVisited" value="pg1" />
 	<input type="hidden" name="demographic_no"
@@ -891,13 +925,12 @@ function calcAgeAtEDD(){
 			<td align="left">
 			<%
             if (!bView) {
-            %> <input type="submit" style="width: 40px;" value="Save"
+            %> <input type="submit" name="saveButton" style="width: 40px;" value="Save"
 				onclick="javascript:return onSave();" /> <input type="submit"
 				value="Save and Exit" onclick="javascript:return onSaveExit();" /> <%
             }
-            %> <input type="submit" style="width: 40px;" value="Exit"
-				onclick="javascript:return onExit();" /> <input type="submit"
-				style="width: 50px;" value="Print"
+            %> <input type="submit" name="exitButton" style="width: 40px;" value="Exit"/>
+				<input type="submit" style="width: 50px;" value="Print"
 				onclick="javascript:return onPrint();" /> <input type="submit"
 				style="width: 75px;" value="Print Risk"
 				onclick="javascript:return onPrintRisk();" /> <input type="submit"
@@ -2253,12 +2286,12 @@ function calcAgeAtEDD(){
             <%
             if (!bView) {
             %>
-            <input type="submit" style="width:40px;" value="Save" onclick="javascript:return onSave();" />
+            <input type="submit" name="saveButton" style="width:40px;" value="Save" onclick="javascript:return onSave();" />
             <input type="submit" value="Save and Exit" onclick="javascript:return onSaveExit();"/>
             <%
             }
             %>
-            <input type="submit" style="width:40px;" value="Exit" onclick="javascript:return onExit();"/>
+            <input type="submit" style="width:40px;" name="exitButton" value="Exit"/>
             <input type="submit" style="width:50px;" value="Print" onclick="javascript:return onPrint();"/>
             <input type="submit" style="width:75px;" value="Print Risk" onclick="javascript:return onPrintRisk();"/>
             <input type="submit" value="Print AR1 & AR2" onclick="javascript:return onPrint12();"/>
