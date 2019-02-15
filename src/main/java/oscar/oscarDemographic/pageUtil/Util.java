@@ -48,6 +48,8 @@ import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.jasperreports.engine.DefaultJasperReportsContext;
+import net.sf.jasperreports.engine.util.LocalJasperReportsContext;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlCalendar;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
@@ -57,6 +59,7 @@ import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
+import oscar.OscarProperties;
 import oscar.oscarPrevention.PreventionDisplayConfig;
 import oscar.oscarProvider.data.ProviderData;
 import oscar.util.StringUtils;
@@ -757,4 +760,21 @@ public class Util {
     	
     	return s;
     }
+
+	/**
+	 * getJasperLabelContext returns a local jasper report context for PDF label creation.
+	 * @return
+	 */
+	static public LocalJasperReportsContext getJasperLabelContext()
+	{
+		OscarProperties props = OscarProperties.getInstance();
+		String fontSize = props.getProperty("label.fontSize");
+		if (fontSize == null)
+		{
+			fontSize = DefaultJasperReportsContext.getInstance().getProperty("net.sf.jasperreports.default.font.size");
+		}
+		LocalJasperReportsContext rContext = new LocalJasperReportsContext(DefaultJasperReportsContext.getInstance());
+		rContext.setProperty("net.sf.jasperreports.default.font.size", fontSize);
+		return rContext;
+	}
 }
