@@ -24,25 +24,24 @@
 
 package org.oscarehr.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Properties;
+import org.apache.commons.mail.Email;
+import org.apache.commons.mail.EmailAttachment;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.HtmlEmail;
+import org.apache.commons.mail.MultiPartEmail;
+import org.apache.commons.validator.EmailValidator;
+import org.apache.log4j.Logger;
+import oscar.OscarProperties;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
-import org.apache.commons.mail.Email;
-import org.apache.commons.mail.EmailAttachment;
-import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.HtmlEmail;
-import org.apache.commons.mail.MultiPartEmail;
-import org.apache.log4j.Logger;
-import org.apache.commons.validator.EmailValidator;
-import oscar.OscarProperties;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Properties;
 
 /**
  * Example of how to use this is as follows
@@ -71,22 +70,22 @@ import oscar.OscarProperties;
  */
 public final class EmailUtilsOld
 {
-	private static final Logger logger=MiscUtils.getLogger();
-	
+	private static final Logger logger = MiscUtils.getLogger();
+
 	private static final String CATEGORY = "email.";
 	private static final String SMTP_HOST_KEY = "host";
 	private static final String SMTP_SSL_PORT_KEY = "port";
 	private static final String SMTP_USER_KEY = "username";
 	private static final String SMTP_PASSWORD_KEY = "password";
-        private static final String SMTP_CONNECTION_SECURITY = "connection_security";
+	private static final String SMTP_CONNECTION_SECURITY = "connection_security";
 	private static final String RECIPIENT_OVERRIDE_KEY = "recipient_override";
 	private static final String PRINT_INSTEAD_OF_SEND_KEY = "print_instead_of_send";
-        
-        private static final String CONNECTION_SECURITY_SSL = "ssl";
-        private static final String CONNECTION_SECURITY_STARTTLS = "starttls";
 
-	private static String recipientOverride = OscarProperties.getInstance().getProperty(CATEGORY+RECIPIENT_OVERRIDE_KEY);
-	private static boolean printInsteadOfSend = Boolean.parseBoolean(OscarProperties.getInstance().getProperty(CATEGORY+PRINT_INSTEAD_OF_SEND_KEY));
+	private static final String CONNECTION_SECURITY_SSL = "ssl";
+	private static final String CONNECTION_SECURITY_STARTTLS = "starttls";
+
+	private static String recipientOverride = OscarProperties.getInstance().getProperty(CATEGORY + RECIPIENT_OVERRIDE_KEY);
+	private static boolean printInsteadOfSend = Boolean.parseBoolean(OscarProperties.getInstance().getProperty(CATEGORY + PRINT_INSTEAD_OF_SEND_KEY));
 
 	private static class HtmlEmailWrapper extends HtmlEmail
 	{
@@ -95,29 +94,33 @@ public final class EmailUtilsOld
 		{
 			try
 			{
-				if (recipientOverride != null)
+				if(recipientOverride != null)
 				{
 					message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipientOverride));
 					message.setRecipients(Message.RecipientType.CC, new InternetAddress[0]);
 					message.setRecipients(Message.RecipientType.BCC, new InternetAddress[0]);
 				}
-				
-				if (printInsteadOfSend)
+
+				if(printInsteadOfSend)
 				{
 					logger.info(getAsString(message));
 				}
 				else
-				{					
-					logger.debug("Sending Email to "+Arrays.toString(message.getAllRecipients()));
-					return(super.sendMimeMessage());
+				{
+					logger.debug("Sending Email to " + Arrays.toString(message.getAllRecipients()));
+					return (super.sendMimeMessage());
 				}
 			}
-			catch (Exception e)
+			catch(Exception e)
 			{
 				logger.error("Error", e);
+				if(e instanceof EmailException)
+				{
+					throw (EmailException) e;
+				}
 			}
 
-			return(null);
+			return (null);
 		}
 	}
 
@@ -158,6 +161,18 @@ public final class EmailUtilsOld
 
 		email.setHostName(smtpServer);
 
+		if (smtpPort != null)
+		{
+			if (connectionSecurity != null && connectionSecurity.equals(CONNECTION_SECURITY_SSL))
+			{
+				email.setSslSmtpPort(smtpPort);
+			}
+			else
+			{
+				email.setSmtpPort(Integer.parseInt(smtpPort));
+			}
+		}
+
 		if (smtpUser != null && smtpPassword != null) email.setAuthentication(smtpUser, smtpPassword);
 
 		Session session = email.getMailSession();
@@ -170,12 +185,6 @@ public final class EmailUtilsOld
 				email.setSSL(true);
 			}
 		}
-
-		if (smtpPort != null)
-		{
-			email.setSslSmtpPort(smtpPort);
-		}
-
 
 		Properties properties = session.getProperties();
 		properties.setProperty("mail.smtp.connectiontimeout", "20000");
@@ -192,39 +201,50 @@ public final class EmailUtilsOld
 	 */
 	public static HtmlEmail getHtmlEmail(String smtpServer, String smtpPort, String smtpUser, String smtpPassword, String connectionSecurity) throws EmailException
 	{
-		logger.debug("smtpServer="+smtpServer+", smtpSslPort="+smtpPort+", smtpUser="+smtpUser+", smtpPassword="+smtpPassword + ",connectionSecurity="+connectionSecurity);
-		
+		logger.debug("smtpServer=" + smtpServer + ", smtpSslPort=" + smtpPort + ", smtpUser=" + smtpUser + ", smtpPassword=" + smtpPassword + ",connectionSecurity=" + connectionSecurity);
+
 		HtmlEmail email = null;
-		
-		if (RECIPIENT_OVERRIDE_KEY!=null || printInsteadOfSend) email=new HtmlEmailWrapper();
-		else email=new HtmlEmail();
-		
+
+		if(RECIPIENT_OVERRIDE_KEY != null || printInsteadOfSend) email = new HtmlEmailWrapper();
+		else email = new HtmlEmail();
+
 		email.setHostName(smtpServer);
 
-		if (smtpUser != null && smtpPassword != null) email.setAuthentication(smtpUser, smtpPassword);
-
-                Session session = email.getMailSession();
-                
-                if (connectionSecurity != null) {
-                    if (connectionSecurity.equals(CONNECTION_SECURITY_STARTTLS)){
-                        session.getProperties().setProperty(Email.MAIL_TRANSPORT_TLS, "true");
-                        email.setTLS(true);                        
-                    } else if (connectionSecurity.equals(CONNECTION_SECURITY_SSL)) {
-                        email.setSSL(true);
-                    }
-                }
-                
-		if (smtpPort != null)
+		if(smtpPort != null)
 		{
-			email.setSslSmtpPort(smtpPort);
+			if(connectionSecurity != null && connectionSecurity.equals(CONNECTION_SECURITY_SSL))
+			{
+				email.setSslSmtpPort(smtpPort);
+			}
+			else
+			{
+				email.setSmtpPort(Integer.parseInt(smtpPort));
+			}
 		}
 
-		
+		if(smtpUser != null && smtpPassword != null) email.setAuthentication(smtpUser, smtpPassword);
+
+		Session session = email.getMailSession();
+
+		if(connectionSecurity != null)
+		{
+			if(connectionSecurity.equals(CONNECTION_SECURITY_STARTTLS))
+			{
+				session.getProperties().setProperty(Email.MAIL_TRANSPORT_TLS, "true");
+				email.setTLS(true);
+			}
+			else if(connectionSecurity.equals(CONNECTION_SECURITY_SSL))
+			{
+				email.setSSL(true);
+			}
+		}
+
 		Properties properties = session.getProperties();
 		properties.setProperty("mail.smtp.connectiontimeout", "20000");
 		properties.setProperty("mail.smtp.timeout", "20000");
+		properties.setProperty("mail.smtp.auth", "true");
 
-		return(email);
+		return (email);
 	}
 
 	/**
@@ -253,10 +273,11 @@ public final class EmailUtilsOld
 
 		htmlEmail.addTo(toEmailAddress, toName);
 		htmlEmail.setFrom(fromEmailAddress, fromName);
+		htmlEmail.addReplyTo(fromEmailAddress);
 
 		htmlEmail.setSubject(subject);
-		if (textContents != null) htmlEmail.setTextMsg(textContents);
-		if (htmlContents != null) htmlEmail.setHtmlMsg(htmlContents);
+		if(textContents != null) htmlEmail.setTextMsg(textContents);
+		if(htmlContents != null) htmlEmail.setHtmlMsg(htmlContents);
 
 		htmlEmail.send();
 	}
@@ -341,9 +362,10 @@ public final class EmailUtilsOld
 
 			htmlEmail.send();
 	}
-        
-        public static boolean isValidEmailAddress(String emailAddr){           
-            EmailValidator eValidator = EmailValidator.getInstance();
-            return eValidator.isValid(emailAddr);           
-        }
+
+	public static boolean isValidEmailAddress(String emailAddr)
+	{
+		EmailValidator eValidator = EmailValidator.getInstance();
+		return eValidator.isValid(emailAddr);
+	}
 }

@@ -1203,6 +1203,15 @@
 						}
 
 					%>
+
+					<% if(props.isPropertyActive("appointment_reminder_enabled")) { %>
+
+					<INPUT TYPE="submit" id="addEmailButton"
+					       onclick="document.forms['ADDAPPT'].displaymode.value='Add Appt & Email'"
+					       VALUE="<bean:message key='appointment.addappointment.btnAddApptEmail'/>"
+							<%=disabled%>>
+
+					<% } %>
 					<INPUT TYPE="submit" id="addButton" class="rightButton blueButton top"
 						   onclick="document.forms['ADDAPPT'].displaymode.value='Add Appointment'"
 						   tabindex="6"

@@ -40,7 +40,7 @@ import org.oscarehr.util.MiscUtils;
 public class OscarProperties extends Properties {
 	private static final long serialVersionUID = -5965807410049845132L;
 	private static OscarProperties oscarProperties = new OscarProperties();
-	private static final Set<String> activeMarkers = new HashSet<String>(Arrays.asList(new String[] { "true", "yes", "on" }));
+	private static final Set<String> activeMarkers = new HashSet<>(Arrays.asList("true", "yes", "on"));
 	
 	// Put property names here
 	private static final String KEY_INSTANCE_TYPE = "instance_type";
@@ -392,6 +392,11 @@ public class OscarProperties extends Properties {
 		
 	public boolean isConsultationFaxEnabled() {
 		return isPropertyActive("faxEnable") && isPropertyActive("consultation_fax_enabled");
+	}
+
+	public boolean isConsultationEmailEnabled()
+	{
+		return isPropertyActive("consultation_email_enabled");
 	}
 
 	public boolean isEFormFaxEnabled() {

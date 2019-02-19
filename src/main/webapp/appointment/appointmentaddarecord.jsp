@@ -39,22 +39,22 @@
 	}
 %>
 
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
+<%@page import="org.oscarehr.common.OtherIdManager"%>
 <%@ page
-	import="java.sql.*, java.util.*, oscar.MyDateFormat, oscar.oscarDemographic.data.*, org.oscarehr.common.OtherIdManager, java.text.SimpleDateFormat"
+	import="org.oscarehr.common.dao.OscarAppointmentDao, org.oscarehr.common.dao.WaitingListDao, org.oscarehr.common.model.Appointment,
+	org.oscarehr.common.model.Demographic, org.oscarehr.common.model.WaitingList, org.oscarehr.common.model.WaitingListName"
 	errorPage="errorpage.jsp"%>
-<%@ page import="org.oscarehr.common.model.Demographic,oscar.appt.AppointmentMailer, org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
-<%@page import="org.oscarehr.common.model.Appointment" %>
-<%@page import="org.oscarehr.common.dao.WaitingListDao" %>
-<%@page import="org.oscarehr.common.model.WaitingList" %>
-<%@page import="org.oscarehr.common.model.WaitingListName" %>
-<%@page import="oscar.util.ConversionUtils" %>
-<%@page import="oscar.util.UtilDateUtilities"%>
-<%@ page import="org.oscarehr.event.EventService"%>
-<%@page import="org.oscarehr.managers.DemographicManager" %>
-<%@ page import="javax.validation.ConstraintViolationException" %>
-<%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page import="org.oscarehr.event.EventService,org.oscarehr.managers.DemographicManager, org.oscarehr.util.LoggedInInfo" %>
+<%@page import="org.oscarehr.util.MiscUtils" %>
+<%@page import="org.oscarehr.util.SpringUtils" %>
+<%@page import="oscar.MyDateFormat" %>
+<%@page import="oscar.appt.AppointmentMailer" %>
+<%@page import="oscar.oscarDemographic.data.DemographicData" %>
+<%@page import="oscar.oscarDemographic.data.DemographicMerged" %>
+<%@page import="oscar.util.ConversionUtils"%>
+<%@ page import="oscar.util.UtilDateUtilities"%>
+<%@page import="javax.validation.ConstraintViolationException" %>
+<%@ page import="java.util.List" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <html:html locale="true">
@@ -75,6 +75,7 @@ LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
 OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
 WaitingListDao waitingListDao = SpringUtils.getBean(WaitingListDao.class);
+Integer appointmentNo = null;
 
 String createDateTime = UtilDateUtilities.DateToString(new java.util.Date(),"yyyy-MM-dd HH:mm:ss");
 
@@ -150,14 +151,13 @@ if (request.getParameter("demographic_no") != null && !(request.getParameter("de
 	
 	try{
 		appointmentDao.persist(a);
+		appointmentNo = a.getId();
 	} catch (ConstraintViolationException e)
 	{
 		MiscUtils.getLogger().error("ConstraintViolation", e);
 	}
 
-	int rowsAffected=1;
-	
-	if (rowsAffected == 1) {
+	if (appointmentNo != null) {
 
              //email patient appointment record
             if (request.getParameter("emailPt")!= null) {
@@ -222,6 +222,16 @@ if (request.getParameter("demographic_no") != null && !(request.getParameter("de
 %>
 <p>
 <h1><bean:message key="appointment.addappointment.msgAddSuccess" /></h1>
+	<%
+		String postAction = (String) request.getAttribute("postAction");
+		if("Email".equals(postAction))
+		{
+			pageContext.getRequest().setAttribute("appointment_no", String.valueOf(appointmentNo));
+			pageContext.forward("appointmentemailreminder.jsp");
+		}
+		else
+		{
+	%>
 
 <script LANGUAGE="JavaScript">
     <% 
@@ -239,6 +249,7 @@ if (request.getParameter("demographic_no") != null && !(request.getParameter("de
 </script>
 
 <%
+		}
 		 Appointment aa =  appointmentDao.search_appt_no(request.getParameter("provider_no"), ConversionUtils.fromDateString(request.getParameter("appointment_date")), ConversionUtils.fromTimeStringNoSeconds(request.getParameter("start_time")),
      			ConversionUtils.fromTimeStringNoSeconds(request.getParameter("end_time")), ConversionUtils.fromTimestampString(createDateTime), request.getParameter("creator"), Integer.parseInt(param[16]));
 
