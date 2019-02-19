@@ -15,8 +15,10 @@ if (!Oscar.FormHelpers) {
  */
 Oscar.FormHelpers.safeLink = function promptSaveBeforeLink($link, $form)
 {
+    var message = 'Are you sure you want to navigate away from this page without saving your changes?';
+
     $link.on("click", function(event) {
-        if ($form.juno_isChanged() && !confirm('Are you sure you want to navigate away from this page without saving your changes?'))
+        if ($form.juno_isChanged() && !confirm(message))
         {
             event.preventDefault();
         }
@@ -32,8 +34,11 @@ Oscar.FormHelpers.safeLink = function promptSaveBeforeLink($link, $form)
  */
 Oscar.FormHelpers.safeClose = function promptSaveBeforeClose($closeInput, $form)
 {
+    var message = 'Are you sure you want to navigate away from this page without saving your changes?';
+
     $closeInput.on("click", function() {
-        if ($form.juno_isChanged() && confirm('Are you sure you want to navigate away from this page without saving your changes?'))
+
+        if (!$form.juno_isChanged() || $form.juno_isChanged() && confirm(message))
         {
             window.close();
         }
@@ -60,3 +65,4 @@ Oscar.FormHelpers.safeSave = function DisableLinksOnSave($saveInput, $linkArray)
         })
     })
 };
+
