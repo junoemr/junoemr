@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -253,25 +254,56 @@ public class CaseManagementPrint {
 		List<Object> pdfDocs = new ArrayList<Object>();
 		pdfDocs.add(fileName);
 
-		if (printLabs) {
+		if (printLabs)
+		{
 			// get the labs which fall into the date range which are attached to this patient
 			CommonLabResultData comLab = new CommonLabResultData();
 			ArrayList<LabResultData> labs = comLab.populateLabResultsData(loggedInInfo, "", demono, "", "", "", "U");
 			LinkedHashMap<String, LabResultData> accessionMap = new LinkedHashMap<String, LabResultData>();
-			for (int i = 0; i < labs.size(); i++) {
+			for (int i = 0; i < labs.size(); i++)
+			{
 				LabResultData result = labs.get(i);
-				if (result.isHL7TEXT()) {
-					if (result.accessionNumber == null || result.accessionNumber.equals("")) {
+				if (result.isHL7TEXT())
+				{
+					if (result.accessionNumber == null || result.accessionNumber.equals(""))
+					{
 						accessionMap.put("noAccessionNum" + i + result.labType, result);
-					} else {
-						if (!accessionMap.containsKey(result.accessionNumber + result.labType)) accessionMap.put(result.accessionNumber + result.labType, result);
+					} else
+					{
+						if (!accessionMap.containsKey(result.accessionNumber + result.labType))
+							accessionMap.put(result.accessionNumber + result.labType, result);
 					}
 				}
 			}
-			for (LabResultData result : accessionMap.values()) {
-				//Date d = result.getDateObj();
-				// TODO:filter out the ones which aren't in our date range if there's a date range????
 
+			ArrayList<LabResultData> labResults = new ArrayList<>(accessionMap.values());
+			//remove out of date range results
+			Iterator<LabResultData> labResultIterator = labResults.iterator();
+			while (labResultIterator.hasNext())
+			{
+				LabResultData lab = labResultIterator.next();
+				if (startDate != null && lab.getDateObj().getTime() - startDate.getTimeInMillis() < 0)
+				{// filter out lab results not in range.
+					labResultIterator.remove();
+				}
+				if (endDate != null && lab.getDateObj().getTime() - endDate.getTimeInMillis() > 0)
+				{// filter out lab results not in range
+					labResultIterator.remove();
+				}
+			}
+
+			//sort lab results.
+			Collections.sort(labResults,  new java.util.Comparator<LabResultData> ()
+			{
+				@Override
+				public int compare(LabResultData l1, LabResultData l2)
+				{
+					return -l1.getDateObj().compareTo(l2.getDateObj());
+				}
+			});
+
+
+			for (LabResultData result : labResults) {
 				String segmentId;
 
 				if (result.accessionNumber == null || result.accessionNumber.equals(""))
