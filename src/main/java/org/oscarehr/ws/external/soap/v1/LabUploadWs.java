@@ -57,6 +57,7 @@ public class LabUploadWs extends AbstractWs {
 	private static final String LAB_TYPE_GAMMADYNACARE = "GDML";
 	private static final String LAB_TYPE_CDL = "CDL";
     private static final String LAB_TYPE_EPSILON_MHL = "EPSILON";
+	private static final String LAB_TYPE_ALPHA = "ALPHA";
 
     private static final Logger logger=MiscUtils.getLogger();
 
@@ -269,6 +270,27 @@ public class LabUploadWs extends AbstractWs {
         returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
         return returnMessage;
     }
+
+	@SkipContentLogging
+	public String uploadALPHA(
+			@WebParam(name = "file_name") String fileName,
+			@WebParam(name = "contents") String contents,
+			@WebParam(name = "oscar_provider_no") String oscarProviderNo) {
+
+		String returnMessage, audit;
+
+		try {
+			audit = importLab(fileName, contents, LAB_TYPE_ALPHA, oscarProviderNo);
+		}
+		catch (Exception e) {
+			logger.error(e.getMessage());
+			returnMessage = "{\"success\":0,\"message\":\"" +
+					e.getMessage() + "\", \"audit\":\"\"}";
+			return returnMessage;
+		}
+		returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
+		return returnMessage;
+	}
 
     private String importLab(String fileName, String labContent, String labType, String oscarProviderNo)
 		throws ParseException, Exception
