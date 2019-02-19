@@ -114,25 +114,25 @@ function openNewPage(vheight,vwidth,varpage) {
 		</td>
 	</tr>
 	<tr>
-		<td><html:form
-			action="/oscarResearch/oscarDxResearch/dxResearchUpdateQuickList.do">
+		<td><html:form action="/oscarResearch/oscarDxResearch/dxResearchUpdateQuickList.do">
 			<table width="100%" border="0" cellpadding="0" cellspacing="0"
-				bgcolor="#EEEEFF" height="200">
+			       bgcolor="#EEEEFF" height="200">
 				<tr>
-					<td class="heading"><bean:message
-						key="oscarResearch.oscarDxResearch.codingSystem" />: <%-- <bean:write name="codingSystem"/> --%>
-					<html:select property="selectedCodingSystem">
-						<logic:iterate id="codingSys" name="codingSystem"
-							property="codingSystems">
-							<option value="<bean:write name="codingSys"/>"><bean:write
-								name="codingSys" /></option>
-						</logic:iterate>
-					</html:select></td>
+					<td class="heading"><bean:message key="oscarResearch.oscarDxResearch.codingSystem"/>: <%-- <bean:write name="codingSystem"/> --%>
+						<html:select property="selectedCodingSystem">
+							<logic:iterate id="codingSys" name="codingSystem" property="codingSystems">
+								<option value="<bean:write name="codingSys"/>">
+									<bean:write name="codingSys"/>
+								</option>
+							</logic:iterate>
+						</html:select></td>
 					<td class="heading"></td>
-					<td class="heading"><bean:message
-						key="oscarResearch.oscarDxResearch.quickListItemsOf" /> <bean:write
-						name="quickListName" /> <input type="hidden" name="quickListName"
-						value="<bean:write name="quickListName"/>" /></td>
+					<td class="heading">
+						<bean:message key="oscarResearch.oscarDxResearch.quickListItemsOf"/>
+						<bean:write name="quickListName"/>
+						<input type="hidden" name="quickListName"
+						       value="<bean:write name="quickListName"/>"/>
+					</td>
 				</tr>
 				<tr>
 					<td colspan="3"><html:errors /></td>
@@ -159,7 +159,7 @@ function openNewPage(vheight,vwidth,varpage) {
 						<tr>
 							<td><input type="button" name="button" class=mbttn
 								value="<bean:message key="oscarResearch.oscarDxResearch.btnCodeSearch"/>"
-								onClick="javascript: ResearchScriptAttach();")></td>
+								onClick="javascript: ResearchScriptAttach();"></td>
 						</tr>
 					</table>
 					</td>
@@ -167,13 +167,13 @@ function openNewPage(vheight,vwidth,varpage) {
 					<table>
 						<tr>
 							<td><input type="hidden" name="forward" value="none" /> <input
-								type="button" name="button" class=mbttn style="width: 80"
+								type="button" name="button" class=mbttn style="width: 80px"
 								value="<bean:message key="ADD"/> >>"
 								onClick="javascript: submitform('add');"></td>
 						</tr>
 						<tr>
 							<td><input type="button" name="button" class=mbttn
-								style="width: 80"
+								style="width: 80px"
 								value="<< <bean:message key="REMOVE"/>"
 								onClick="javascript: submitform('remove');"></td>
 						</tr>
