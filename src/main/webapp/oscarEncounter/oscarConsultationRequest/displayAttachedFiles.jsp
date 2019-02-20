@@ -56,7 +56,7 @@ if(!authed) {
 
 %>
 <ul id="attachedList"
-    style="background-color: white; padding-left: 20px; list-style-position: outside; list-style-type: lower-roman; overflow: hidden; max-width: 100px">
+    style="background-color: white; padding-left: 20px; list-style-position: outside; list-style-type: lower-roman;">
     <%
         for(int idx = 0; idx < docs.size(); ++idx) {
             EDoc curDoc = (EDoc) docs.get(idx);

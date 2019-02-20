@@ -270,6 +270,7 @@ input.btn{
 
 .lab {
     color: #CC0099;
+	word-break: break-word;
 }
 td.tite {
 
