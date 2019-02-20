@@ -1428,7 +1428,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 									+ "&hotclick=&appointment_no=0&demographic_name=" + URLEncoder.encode(demographic.getLastName()) + "%2C"
 									+ URLEncoder.encode(demographic.getFirstName()) + "&demographic_no=" + demographic.getDemographicNo() + "&providerview=1&user_no="
 									+ providerNo + "&apptProvider_no=none&appointment_date=" + service_date_parameter + "&start_time=0:00&bNewForm=1&status=t"
-									+ diagnosticCode1 + otherCode1 + referralType1;
+									+ diagnosticCode1 + otherCode1 + referralType1 + "&from_consult=true";
 					%>
 							<td NOWRAP align='right'><a id="invoice_link"
 													href="<%=invoice_link%>"
