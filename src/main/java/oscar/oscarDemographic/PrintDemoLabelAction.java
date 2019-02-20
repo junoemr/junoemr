@@ -28,7 +28,7 @@ import org.oscarehr.util.SpringUtils;
 import oscar.OscarAction;
 import oscar.OscarDocumentCreator;
 import oscar.OscarProperties;
-import oscar.oscarDemographic.pageUtil.JasperReportContextCreator;
+import oscar.oscarDemographic.pageUtil.JasperLabel;
 
 public class PrintDemoLabelAction extends OscarAction {
     
@@ -126,7 +126,7 @@ public class PrintDemoLabelAction extends OscarAction {
         try
         {
             osc.fillDocumentStream(parameters, sos, "pdf", ins, DbConnectionFilter.getThreadLocalDbConnection(),
-                    exportPdfJavascript, JasperReportContextCreator.getDefaultJasperLabelContext());
+                    exportPdfJavascript, JasperLabel.getDefaultJasperLabelContext());
         }
         catch (SQLException e) {
             MiscUtils.getLogger().error("Error", e);

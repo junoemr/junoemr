@@ -51,7 +51,7 @@ import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarAction;
 import oscar.OscarDocumentCreator;
-import oscar.oscarDemographic.pageUtil.JasperReportContextCreator;
+import oscar.oscarDemographic.pageUtil.JasperLabel;
 
 
 public class PrintClientLabLabelAction extends OscarAction {
@@ -115,7 +115,7 @@ public class PrintClientLabLabelAction extends OscarAction {
         	response.setHeader("Content-disposition", getHeader(response).toString());
             OscarDocumentCreator osc = new OscarDocumentCreator();
             osc.fillDocumentStream(parameters, sos, "pdf", ins, DbConnectionFilter.getThreadLocalDbConnection(),
-					exportPdfJavascript, JasperReportContextCreator.getDefaultJasperLabelContext());
+					exportPdfJavascript, JasperLabel.getDefaultJasperLabelContext());
         } catch (FileNotFoundException ex1) {
         	logger.debug("Addresslabel.xml not found in user's home directory. Using default instead");
         } catch (IOException ex) {

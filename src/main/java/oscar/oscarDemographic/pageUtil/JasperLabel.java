@@ -27,10 +27,10 @@ import net.sf.jasperreports.engine.DefaultJasperReportsContext;
 import net.sf.jasperreports.engine.util.LocalJasperReportsContext;
 import oscar.OscarProperties;
 
-public class JasperReportContextCreator
+public class JasperLabel
 {
-	private static final String DEFAULT_JASPER_FONT_SIZE_PROP = "net.sf.jasperreports.default.font.size";
-	private static final String DEFAULT_LABEL_FONT_SIZE_PROP = "label.fontSize";
+	private static final String JASPER_DEFAULT_FONT_SIZE_PROP = "net.sf.jasperreports.default.font.size";
+	private static final String OSCAR_DEFAULT_LABEL_FONT_SIZE_PROP = "label.fontSize";
 
 	/**
 	 * getDefaultJasperLabelContext returns a default local jasper report context for PDF label creation.
@@ -39,9 +39,9 @@ public class JasperReportContextCreator
 	static public LocalJasperReportsContext getDefaultJasperLabelContext()
 	{
 		OscarProperties props = OscarProperties.getInstance();
-		String fontSize = props.getProperty(DEFAULT_LABEL_FONT_SIZE_PROP);
+		String fontSize = props.getProperty(OSCAR_DEFAULT_LABEL_FONT_SIZE_PROP);
 		LocalJasperReportsContext rContext = new LocalJasperReportsContext(DefaultJasperReportsContext.getInstance());
-		rContext.setProperty(DEFAULT_JASPER_FONT_SIZE_PROP, fontSize);
+		rContext.setProperty(JASPER_DEFAULT_FONT_SIZE_PROP, fontSize);
 		return rContext;
 	}
 }
