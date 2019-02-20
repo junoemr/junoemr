@@ -837,12 +837,10 @@ function sendEmail(type)
 		else if(type == 'provider')
 		{
 			box_id = "#emailFormBoxProvider";
-
 			chooseEmail();
 			jQuery("#emailToProvider").val(jQuery("#emailSelect").find(":selected").val());
 			jQuery(".featherlight-content #emailToProvider").val(jQuery("#emailSelect").find(":selected").val());
 		}
-
 	jQuery(box_id).show();
 
 	if(featherlight == null)
