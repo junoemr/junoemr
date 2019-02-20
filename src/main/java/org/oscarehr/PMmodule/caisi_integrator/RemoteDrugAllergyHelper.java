@@ -88,7 +88,7 @@ public class RemoteDrugAllergyHelper {
 			}
 			
 			for (CachedDemographicDrug remoteDrug : remoteDrugs) {
-				if (remoteDrug.getAtc() != null && remoteDrug.getRegionalIdentifier() != null)
+				if (remoteDrug.getAtc() != null)
 				{
 					regionalIdentifierCodes.add(remoteDrug.getRegionalIdentifier());
 				}
