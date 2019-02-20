@@ -229,6 +229,7 @@ public class EctConsultationFormRequestAction extends Action {
 
 		request.setAttribute("teamVar", sendTo);
 
+		ConsultationRequest consult = consultationRequestDao.find(Integer.parseInt(requestId));
 		if (submission.endsWith("And Print Preview")) {
 
 			request.setAttribute("reqId", requestId);
@@ -257,6 +258,20 @@ public class EctConsultationFormRequestAction extends Action {
 				return mapping.findForward("fax");
 			}
 
+		}
+		else if (submission.endsWith("And Email Details"))
+		{
+			// email consultation details to patient
+			request.setAttribute("consult_request_id", requestId);
+			request.setAttribute("template", "details");
+			return mapping.findForward("emailalt");
+		}
+		else if (submission.endsWith("And Email Notification") && !consult.isNotificationSent())
+		{
+			// email consultation notification to patient
+			request.setAttribute("consult_request_id", requestId);
+			request.setAttribute("template", "notification");
+			return mapping.findForward("emailalt");
 		}
 		else if (submission.endsWith("esend")) {
 			// upon success continue as normal with success message
@@ -371,7 +386,7 @@ public class EctConsultationFormRequestAction extends Action {
 	    Clinic clinic=clinicDAO.getClinic();
 	    
 	    // set status now so the remote version shows this status
-	    consultationRequest.setStatus("2");
+	    consultationRequest.setStatus(ConsultationRequest.STATUS_PEND_SPECIAL);
 
 	    REF_I12 refI12=RefI12.makeRefI12(clinic, consultationRequest);
 	    SendingUtils.send(loggedInInfo, refI12, professionalSpecialist);

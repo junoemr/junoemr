@@ -66,6 +66,8 @@ public class GenericFile
 	public static final String OUTBOUND_FAX_DIR_SENT = new File(OUTBOUND_FAX_DIR_PENDING, "sent").getPath();
 	public static final String OUTBOUND_FAX_DIR_UNSENT = new File(OUTBOUND_FAX_DIR_PENDING, "unsent").getPath();
 
+	public static final String EMAIL_TEMPLATE_DIRECTORY = props.getProperty("template_file_location");
+
 	// file info
 	protected File javaFile;
 
@@ -207,6 +209,10 @@ public class GenericFile
 	public File getFileObject()
 	{
 		return this.javaFile;
+	}
+	public FileInputStream asFileInputStream() throws FileNotFoundException
+	{
+		return new FileInputStream(this.javaFile);
 	}
 	public String getContentType() throws IOException
 	{

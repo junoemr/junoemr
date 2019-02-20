@@ -1419,7 +1419,80 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 			                                     </tr>
 			                                <%}
 
-                                   } else if ((!handler.getOBXResultStatus(j, k).equals("TDIS") && handler.getMsgType().equals("Spire")) )  { %>
+									} else if (handler.getMsgType().equals("ALPHA"))
+									{%>
+						   				<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
+											<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %>
+											   <a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName %>
+											   </a>&nbsp;
+											   <%
+											   if (loincCode != null)
+											   {%>
+													<a href="javascript:popupStart('660','1000','http://apps.nlm.nih.gov/medlineplus/services/mpconnect.cfm?mainSearchCriteria.v.cs=2.16.840.1.113883.6.1&mainSearchCriteria.v.c=<%=loincCode%>&informationRecipient.languageCode.c=en')">
+														info
+													</a>
+											   <%}
+											   %>
+										   </td>
+										   <%
+										   String align = "right";
+
+										   if (!handler.getOBXValueType(j, k).equals("FT"))
+										   {%>
+										   		<td align="<%=align%>"><%= handler.getOBXResult(j, k) %></td>
+										   <%} else
+										   {%>
+										   		<td align="<%=align%>"></td>
+										   <%}
+
+										   if (handler.getOBXAbnormalFlag(j, k) == null || handler.getOBXAbnormalFlag(j, k).isEmpty())
+										   {%>
+										   		<td align="center">N</td>
+										   <%} else
+										   {%>
+										   		<td align="center"><%= handler.getOBXAbnormalFlag(j, k)%></td>
+										   <%}
+										   %>
+
+
+										   <td align="left"><%=handler.getOBXReferenceRange(j, k)%></td>
+										   <td align="left"><%=handler.getOBXUnits(j, k) %></td>
+										   <td align="center"><%= handler.getTimeStamp(j, k) %></td>
+										   <td align="center"><%= handler.getOBXResultStatus(j, k) %></td>
+										   <td align="center" valign="top">
+											   <a href="javascript:void(0);" title="Annotation" onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(j) + "-" + String.valueOf(k) %>','anwin','width=400,height=500');">
+												   <%
+												   if (!isPrevAnnotation)
+												   {%>
+													   <img src="../../../images/notes.gif" alt="rxAnnotation" height="16" width="13" border="0"/>
+												   <%} else
+												   {%>
+													   <img src="../../../images/filledNotes.gif" alt="rxAnnotation" height="16" width="13" border="0"/>
+												   <%}
+												   %>
+											   </a>
+										   </td>
+										</tr>
+
+										   <%
+										   if (handler.getOBXValueType(j, k).equals("FT"))
+										   {%>
+											   <tr>
+												   <td colspan="8" style="text-align:center">
+													   <div style="display:inline-block; text-align:left; width:450px"><pre><%= handler.getOBXResult(j, k) %></pre></div>
+												   </td>
+											   </tr>
+										   <%}
+
+										   for (l = 0; l < handler.getOBXCommentCount(j, k); l++)
+										   {%>
+											   <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
+												   <td valign="top" align="left" colspan="8">
+													   <pre style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=handler.getOBXComment(j, k, l)%></pre>
+												   </td>
+											   </tr>
+									   		<%}
+                                       } else if ((!handler.getOBXResultStatus(j, k).equals("TDIS") && handler.getMsgType().equals("Spire")) )  { %>
 											<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
                                            <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName %></a>
                                            &nbsp;<%if(loincCode != null){ %>
