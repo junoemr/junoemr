@@ -106,9 +106,11 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
     <script type="text/javascript" src="../share/calendar/calendar-setup.js"></script>
 
     <!-- Form submission helper scripts -->
-    <script type="text/javascript" src="<%=request.getContextPath() %>/js/jquery-3.1.0.min.js"></script>
+    <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+    <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0.min.js"></script>
     <script type="text/javascript" src="<%=request.getContextPath() %>/js/juno-jquery-plugin.js"></script>
     <script type="text/javascript" src="./OscarFormHelpers.js"></script>
+    <link href= "<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0/themes/vader/jquery-ui.min.css" rel="stylesheet">
 
     <style type="text/css">
         <!--
@@ -723,7 +725,7 @@ if (!fedb.equals("") && fedb.length()==10 ) {
 
     $(document).ready(function()
     {
-        var $form = $('#bcar2007pg1');
+        var $form = $('#bcar2007pg3');
         $form.juno_trackIsChanged();
 
         var $links = $('a:not([href^="javascript:"])');
@@ -750,8 +752,8 @@ if (!fedb.equals("") && fedb.length()==10 ) {
 
 </script>
 
-
 <body bgproperties="fixed" topmargin="0" leftmargin="0" rightmargin="0">
+<div id="oscarFormHelpersDialog"/>
 <div ID="Langdiv" class="demo">
     <table bgcolor='silver' width='100%'>
         <tr><td align='right'><a href="javascript: function myFunction() {return false; }" onclick="showHideBox('Langdiv',0); return false;">X</a></td></tr>

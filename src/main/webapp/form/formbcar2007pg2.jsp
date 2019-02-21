@@ -106,9 +106,11 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
     <script type="text/javascript" src="../share/calendar/calendar-setup.js"></script>
 
     <!-- Form submission helper scripts -->
-    <script type="text/javascript" src="<%=request.getContextPath() %>/js/jquery-3.1.0.min.js"></script>
+    <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+    <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0.min.js"></script>
     <script type="text/javascript" src="<%=request.getContextPath() %>/js/juno-jquery-plugin.js"></script>
     <script type="text/javascript" src="./OscarFormHelpers.js"></script>
+    <link href= "<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0/themes/vader/jquery-ui.min.css" rel="stylesheet">
 
     <style type="text/css">
         <!--
@@ -854,7 +856,7 @@ function setEPDSscores(){
 
 $(document).ready(function()
 {
-    var $form = $('#bcar2007pg1');
+    var $form = $('#bcar2007pg2');
     $form.juno_trackIsChanged();
 
     var $links = $('a:not([href^="javascript:"])');
