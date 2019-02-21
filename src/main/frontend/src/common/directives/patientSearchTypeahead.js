@@ -74,7 +74,7 @@ angular.module('Common.Directives').directive('junoPatientSearchTypeahead', [
 					return null;
 				}
 
-				return demographic.lastName + ', ' + demographic.firstName;
+				return Juno.Common.Util.formatName(demographic.firstName, demographic.lastName);
 			};
 		};
 

@@ -1,4 +1,5 @@
 
+import {AppointmentApi} from '../../generated/api/AppointmentApi';
 import {ScheduleApi} from '../../generated/api/ScheduleApi';
 
 angular.module('Schedule').controller('Schedule.ScheduleController', [
@@ -30,6 +31,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		//var controller = this;
 
 		// XXX: put this address somewhere else
+		$scope.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
+			'http://localhost:9090/ws/rs');
+
 		$scope.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
 			'http://localhost:9090/ws/rs');
 
@@ -56,7 +60,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		// Parameters from directive controller
 
-		$scope.globalState = [];
+
 		$scope.schedules = [];
 		$scope.scheduleOptions = [];
 		$scope.resourceOptions = [];
@@ -79,44 +83,20 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.openingDialog = false;
 		$scope.dialog = null;
 
-		$scope.patientModel = {
-			uuid: null,
-			full_name: null,
-			has_photo: true,
-			patient_photo_url: '/imageRenderingServlet?source=local_client&clientId=0',
-			clear: function clear(){
-				this.uuid = null;
-				this.full_name = null;
-				this.patient_photo_url = '/imageRenderingServlet?source=local_client&clientId=0';
-				this.data.birth_date = null;
-				this.data.health_number = null;
-				this.data.ontario_version_code = null;
-				this.data.phone_number_primary = null;
-			},
-			fillData: function fillData(data){
-				this.uuid = data.uuid;
-				this.full_name = data.full_name;
-				this.patient_photo_url = '/imageRenderingServlet?source=local_client&clientId=' + (data.uuid ? data.uuid : 0);
-				this.data.birth_date = data.birth_date;
-				this.data.health_number = data.health_number;
-				this.data.ontario_version_code = data.ontario_version_code;
-				this.data.phone_number_primary = data.phone_number_primary;
-			},
-			uploadPhoto: function uploadPhoto(file){},
-			data: {
-				birth_date: null,
-				health_number: null,
-				ontario_version_code: null,
-				phone_number_primary: null
-			}
-		};
+
+		// Global State parameters
+		$scope.defaultDate = null;
+		$scope.selectedDate = null;
+		$scope.scheduleViewName = null;
+		$scope.scheduleDefault = null;
+		$scope.scheduleTimeInterval = null;
+		$scope.scheduleAutoRefresh = null;
+		$scope.scheduleAutoRefreshMinutes = null;
+
+
 
 		$scope.init = function init()
 		{
-
-			$scope.defaultDate = $scope.globalState.selectedDate;
-			//$scope.uiConfig.calendar.schedulerlicensekey = "0752822575-fcs-1459294728";
-			//$scope.global_state.global_settings.interface_preferences.scheduler_license_key,
 			$scope.uiConfig.calendar.defaultView = $scope.calendarViewName();
 
 			// XXX: loadScheduleTemplates seems to not be used
@@ -164,7 +144,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.isSchedulingEnabled = function isSchedulingEnabled()
 		{
 			return true;
-			//return global_state.global_settings.addons.scheduling_enabled;
 		};
 
 		$scope.isInitialized = function isInitialized()
@@ -204,65 +183,32 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.viewName = function viewName()
 		{
-			// XXX: global_state/preferences
-			var viewName = $scope.getGlobalState('schedule_view_name');
-
-			if(!Juno.Common.Util.exists(viewName))
-			{
-				viewName = $scope.getGlobalPreferenceSetting(
-					'schedule_view_name');
-			}
+			var viewName = $scope.scheduleViewName;
 
 			if(!Juno.Common.Util.exists(viewName))
 			{
 				viewName = $scope.defaultCalendarView;
 			}
 
-			$scope.saveGlobalState('schedule_view_name', viewName);
-
 			return viewName;
 		};
 
 		$scope.calendarEvents = function calendarEvents(start, end, timezone, callback)
 		{
-			console.log("-- Load Calendar Events ------------------------------------------");
-			console.log(start.toString());
-			console.log(end.toString());
-			console.log("------------------------------------------------------------------");
-
 			// load the events for each of the loaded schedules
 			var promise_array = [];
 			for(var i = 0; i < $scope.schedules.length; i++)
 			{
 				promise_array.push(
 					$scope.loadScheduleEvents(
-						$scope.schedules[i], $scope.selected_site_name, start, end, $scope.viewName(), $scope.scheduleTemplates,
-						$scope.eventStatuses, $scope.defaultEventColor, $scope.availabilityTypes));
+						$scope.schedules[i].uuid, $scope.selected_site_name, start, end));
 			}
 
 			// once all the events are loaded, concat them together and callback
 			$q.all(promise_array).then(
 				function success(results_array)
 				{
-					var schedule_events = [];
-					for(var i = 0; i < results_array.length; i++)
-					{
-						// Pull the relations out of the result
-						var schedule = $scope.schedules[i];
-						var events = results_array[i];
-
-						if(events && angular.isArray(events.data))
-						{
-							console.log('-- schedule templates ---------------------');
-							schedule.events = events.data;
-							//$scope.extract_data_from_events(events.data, schedule, $scope.schedule_templates);
-						}
-
-						// Display the result
-						schedule_events.push(results_array[i].data);
-					}
-
-					$scope.events = Array.prototype.concat.apply([], schedule_events);
+					$scope.events = Array.prototype.concat.apply([], results_array);
 
 					try
 					{
@@ -272,7 +218,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					{
 						// the callback throws an error on first load, ignore
 					}
-				});
+				}
+			);
 		};
 
 		$scope.showTimeIntervals = function showTimeIntervals()
@@ -280,64 +227,17 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			return $scope.viewName() !== 'month';
 		};
 
-		$scope.onSiteChanged = function onSiteChanged()
-		{
-			return $scope.onScheduleChanged();
-		};
-
-		$scope.onScheduleChanged = function onScheduleChanged()
-		{
-			var selectedSchedule = $scope.selectedSchedule;
-			var selectedSiteName = $scope.selectedSiteName;
-
-			if(!Juno.Common.Util.exists(selectedSchedule))
-			{
-				return;
-			}
-
-			var scheduleUuid = selectedSchedule.uuid;
-
-			$scope.saveGlobalState('schedule_default', scheduleUuid);
-			$scope.selectedSchedule = $scope.calendar_api_adapter.getSelectedSchedule(
-				$scope.scheduleOptions);
-
-			if(Juno.Common.Util.exists(selectedSiteName))
-			{
-				$scope.selectedSiteName = selectedSiteName;
-			}
-			else
-			{
-				$scope.selectedSiteName = null;
-			}
-
-			// reload the schedule and then events data, triggering a rerender
-			$scope.loadSelectedSchedules().then($scope.refetchEvents);
-		};
-
-		$scope.onTimeIntervalChanged = function onTimeIntervalChanged()
-		{
-			$scope.saveGlobalState(
-				'schedule_time_interval', $scope.selectedTimeInterval);
-
-			// updating the config will automatically trigger an events refresh
-			$scope.uiConfig.calendar.slotDuration = $scope.selectedTimeInterval;
-			$scope.uiConfig.calendar.slotLabelInterval = $scope.selectedTimeInterval;
-
-			$scope.applyUiConfig($scope.uiConfig);
-		};
-
 		$scope.changeView = function changeView(view)
 		{
 			// if switching to or from resourceDay view, need to update schedules
 			var reload_schedules = false;
-			if(view === 'resourceDay' ||
-				$scope.getGlobalState('schedule_view_name') === 'resourceDay')
+			if(view === 'resourceDay' || $scope.scheduleViewName === 'resourceDay')
 			{
 				reload_schedules = true;
 			}
 
 			// save the new view to global state so it gets picked up in rendering
-			$scope.saveGlobalState('schedule_view_name', view);
+			$scope.scheduleViewName = view;
 
 			if(reload_schedules)
 			{
@@ -396,221 +296,19 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			return ($scope.viewName() != 'resourceDay')
 		};
 
-		$scope.saveEvent = function saveEvent(
-			editMode,
-			eventUuid,
-			startDatetime,
-			endDatetime,
-			eventData,
-			scheduleUuid,
-			selectedEventStatusUuid,
-			patientUuid,
-			siteUuid
-		)
-		{
-			var deferred = $q.defer();
-
-			var dateString = util.get_date_string(startDatetime);
-			var startTimeString = util.get_time_string(startDatetime, "HH:mm");
-			var endTimeString = util.get_time_string(endDatetime, "HH:mm");
-			var duration = moment.duration(endDatetime.diff(startDatetime)).asMinutes();
-
-
-			if(editMode)
-			{
-				var appointment =  {
-					"id": 0,
-					"providerNo": scheduleUuid,
-					"appointmentDate": startDatetime.toDate(),
-					"startTime": startDatetime.toDate(),
-					"endTime": endDatetime.toDate(),
-					//"name": string,
-					"demographicNo": patientUuid,
-					//"programId": number,
-					"notes": eventData.description,
-					"reason": eventData.reason,
-					"location": siteUuid,
-					//"resources": string,
-					//"type": string,
-					//"style": string,
-					//"billing": string,
-					"status": selectedEventStatusUuid,
-					//"importedStatus": string,
-					//"createDateTime": Date,
-					//"updateDateTime": Date,
-					//"creator": string,
-					//"lastUpdateUser": string,
-					//"remarks": string,
-					//"urgency": string,
-					//"creatorSecurityId": number,
-					//"bookingSource": AppointmentTo1.BookingSourceEnum,
-					//"reasonCode": number,
-					//"demographic": models.Demographic,
-					//"provider": models.Provider,
-				};
-				console.log(appointment);
-				deferred.reject();
-
-				/*			this.scheduleApi.updateAppointment(appointment).then(
-							function(result: IHttpResponse<SchedulingResponse>)
-							{
-								deferred.resolve(result.data);
-							},
-							function (result)
-							{
-								deferred.reject(result.data);
-							});*/
-			}
-			else
-			{
-				var newAppointment =  {
-					"appointmentDate": dateString,
-					"startTime": startTimeString,
-					"duration": duration,
-					"status": selected_event_status_uuid,
-					"demographicNo": patientUuid,
-					"notes": event_data.description,
-					"reason": event_data.reason,
-					"location": siteUuid,
-					"providerNo": scheduleUuid,
-					//"name": string,
-					/*			"resources": string,
-								"type": string,
-								"urgency": string,*/
-				};
-
-
-				console.log(editMode);
-				$scope.scheduleApi.addAppointment(newAppointment).then(
-					function(result)
-					{
-						deferred.resolve(result.data);
-					},
-					function (result)
-					{
-						deferred.reject(result.data);
-					});
-			}
-
-
-			return deferred.promise;
-		};
-
-		// Read the implementation-specific results and return a calendar-compatible object.
-		$scope.processSaveResults = function processSaveResults(results, displayErrors)
-		{
-			var status = (results || {}).status;
-
-			if(status == 'SUCCESS')
-			{
-				return true;
-			}
-
-			var errorMessage = ((results || {}).error || {}).message;
-			var validationErrorArray = ((results || {}).error || {}).validationErrors;
-
-			if(Array.isArray(validationErrorArray))
-			{
-				displayErrors.add_standard_error(errorMessage);
-				//for(var error in validationErrorArray)
-				for(var i = 0; i < validationErrorArray.length; i++)
-				{
-					var error = validationErrorArray[i];
-					displayErrors.add_field_error(error.path, error.message);
-				}
-			}
-		};
-
-		/*
-		public deleteEvent(event_uuid)
-		{
-			var deferred = this.$q.defer();
-
-			this.event_model.del(event_uuid).then(function()
-			{
-				deferred.resolve();
-
-			}, function()
-			{
-				deferred.reject();
-			});
-
-			return deferred.promise;
-		}*/
-
-		$scope.openCreateInvoice = function openCreateInvoice(
-			event_uuid, schedule_uuid, demographics_patient_uuid)
-		{
-			var schedule =
-				$scope.get_loaded_schedule(schedule_uuid);
-
-			var url = $scope.calendar_api_adapter.get_create_invoice_url(event_uuid,
-				schedule.demographics_practitioner_uuid, demographics_patient_uuid);
-
-			window.window_scope = $scope;
-			$window.open(url, '_blank');
-		};
-
 
 		//=========================================================================
 		// Private methods
 		//=========================================================================/
-
-		// Calls the named function on the calendar control object.  This is here to fail without
-		// an error if the calendar isn't initialized yet.
-		$scope.callCalendarMethod = function callCalendarMethod(name, args)
-		{
-			if($scope.cpCalendarControl && angular.isFunction($scope.cpCalendarControl[name]))
-			{
-				return $scope.cpCalendarControl[name].apply(this, args);
-			}
-
-			return null;
-		};
-
-		$scope.getGlobalPreferenceSetting = function getGlobalPreferenceSetting(key)
-		{
-			if(Juno.Common.Util.exists($scope.globalState.preferences) &&
-				Juno.Common.Util.exists($scope.globalState.preferences.settings))
-			{
-				return $scope.globalState.preferences.settings[key];
-			}
-
-			return null;
-		};
-
-		$scope.getGlobalState = function getGlobalState(key)
-		{
-			var setting = $scope.globalState[key];
-			if(!Juno.Common.Util.exists(setting))
-			{
-				setting = null;
-			}
-			return setting;
-		};
-
-		$scope.saveGlobalState = function saveGlobalState(key, value)
-		{
-			$scope.globalState[key] = value;
-		};
 
 		$scope.getSelectedSchedule = function getSelectedSchedule(scheduleOptions)
 		{
 			// priority: last used from global state, then preference setting,
 			// then default (first in the list)
 			var selectedUuid = null;
-			if($stateParams.default_schedule)
+			if($scope.scheduleDefault)
 			{
-				// Passed in url string
-				selectedUuid = $stateParams.default_schedule;
-			}
-			else
-			{
-				selectedUuid = $scope.getGlobalState('schedule_default');
-			}
-			if(selectedUuid === null)
-			{
-				selectedUuid = $scope.getGlobalPreferenceSetting('schedule_default');
+				selectedUuid = $scope.scheduleDefault;
 			}
 
 			if(Juno.Common.Util.exists(selectedUuid))
@@ -660,14 +358,14 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					$scope.uiConfig.calendar.defaultView = "resourceDay";
 
 					// save the new view to global state so it gets picked up in rendering
-					$scope.saveGlobalState("schedule_view_name", "resourceDay");
+					$scope.scheduleViewName = 'resourceDay';
 					$scope.updateCalendarView();
 				}
 				else
 				{
 					// Reset everything to single-provider view mode
 					$scope.uiConfig.calendar.defaultView = "agendaWeek";
-					$scope.saveGlobalState("schedule_view_name", "agendaWeek");
+					$scope.scheduleViewName = 'agendaWeek';
 					$scope.uiConfig.calendar.resources = false;
 				}
 
@@ -763,26 +461,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			return schedule;
 		};
 
-		$scope.viewName = function viewName()
-		{
-			var viewName = $scope.getGlobalState('schedule_view_name');
-
-			if(!Juno.Common.Util.exists(viewName))
-			{
-				viewName = $scope.getGlobalPreferenceSetting(
-					'schedule_view_name');
-			}
-
-			if(!Juno.Common.Util.exists(viewName))
-			{
-				viewName = $scope.defaultCalendarView;
-			}
-
-			$scope.saveGlobalState('schedule_view_name', viewName);
-
-			return viewName;
-		};
-
 		// TODO: change this, perhaps?  It is getting the resource details from the groups
 		$scope.buildSelectedResources = function buildSelectedResources(providerNos)
 		{
@@ -862,7 +540,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			$scope.selectedSchedule = $scope.getSelectedSchedule($scope.scheduleOptions);
 
-			$scope.selectedResources = $scope.getSelectedResources($scope.resourceOptions);
+			//$scope.selectedResources = $scope.getSelectedResources($scope.resourceOptions);
 
 			$scope.selectedTimeInterval = $scope.getSelectedTimeInterval(
 				$scope.timeIntervalOptions, $scope.defaultTimeInterval);
@@ -876,68 +554,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.uiConfig.calendar.scrollTime = moment().subtract(1, 'hours').format('HH:mm:ss');
 		};
 
-		$scope.getSelectedSchedule = function getSelectedSchedule(scheduleOptions)
-		{
-			// priority: last used from global state, then preference setting,
-			// then default (first in the list)
-			var selectedUuid = null;
-			if($stateParams.default_schedule)
-			{
-				// Passed in url string
-				selectedUuid = $stateParams.default_schedule;
-			}
-			else
-			{
-				selectedUuid = $scope.getGlobalState('schedule_default');
-			}
-			if(selectedUuid === null)
-			{
-				selectedUuid = $scope.getGlobalPreferenceSetting('schedule_default');
-			}
-
-			if(Juno.Common.Util.exists(selectedUuid))
-			{
-				// only choose it if it can be found in the options list
-				for(var i = 0; i < scheduleOptions.length; i++)
-				{
-					if(selectedUuid === scheduleOptions[i].uuid)
-					{
-						return scheduleOptions[i];
-					}
-				}
-			}
-
-			if(scheduleOptions.length > 0)
-			{
-				// select the first schedule in the list by default
-				return scheduleOptions[0];
-			}
-
-			return null;
-		};
-
-		$scope.getSelectedResources = function getSelectedResources(resourceOptions)
-		{
-			return [];
-
-			/*	XXX: probably not using this because we don't select resources in juno
-
-			// priority: last used from global state, then preference setting,
-			// then default (all the non-doctor schedules)
-
-			var custom_resource_list =
-				this.get_global_state('schedule_resources');
-
-			if(custom_resource_list === null)
-			{
-				custom_resource_list = this.get_global_preference_setting(
-					'schedule_resources');
-			}
-
-			return this.get_group_resources(
-				custom_resource_list, resource_options);*/
-		};
-
 		$scope.getSelectedTimeInterval = function getSelectedTimeInterval(
 			timeIntervalOptions, defaultTimeInterval)
 		{
@@ -946,11 +562,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 			var selectedTimeInterval = null;
 
-			var timeInterval = $scope.getGlobalState('schedule_time_interval');
+			var timeInterval = $scope.scheduleTimeInterval;
 			if(timeInterval === null)
 			{
-				timeInterval = $scope.getGlobalPreferenceSetting(
-					'schedule_time_interval');
+				timeInterval = $scope.scheduleTimeInterval;
 			}
 
 			if(Juno.Common.Util.exists(timeInterval))
@@ -1011,22 +626,21 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 			$scope.eventStatuses = {};
 			$scope.rotateStatuses = [];
-			//$scope.calendar_api_adapter.load_event_statuses().then(
-			$scope.scheduleApi.getCalendarAppointmentStatuses().then(//function(results)
+
+			$scope.scheduleApi.getCalendarAppointmentStatuses().then(
 				function success(rawResults)
 				{
-					var results = snakeAppointmentStatuses(rawResults.data.body);
+					var results = rawResults.data.body;
 
 					for(var i = 0; i < results.length; i++)
 					{
 						var result = results[i];
-						$scope.eventStatuses[result.uuid] = result;
+						$scope.eventStatuses[result.displayLetter] = result;
 						if(result.rotates)
 						{
 							$scope.rotateStatuses.push(result);
 						}
 					}
-					console.log($scope.eventStatuses);
 
 					deferred.resolve(results);
 				});
@@ -1034,145 +648,208 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			return deferred.promise;
 		};
 
-		// XXX: unused variables
-		$scope.loadScheduleEvents = function loadScheduleEvents(schedule, siteName, start, end,
-			viewName, scheduleTemplates, eventStatuses, defaultEventColor, availabilityTypes)
+		$scope.loadScheduleEvents = function loadScheduleEvents(providerId, siteName, start, end)
 		{
-			//console.log("FETCHING: " + providerId + " " + start.format("YYYY-MM-DD") + " " + end.subtract(1, "seconds").format("YYYY-MM-DD"));
-
 			var deferred = $q.defer();
-
-			var providerId = schedule.uuid;
 
 			// Get date strings to pass to the backend.  The calendar provides datetime that describe
 			// and inclusive start time and exclusive end time, so one second is removed from
 			// the end time to convert to the correct date.
-			var startDateString = start.format("YYYY-MM-DD");
-			var endDateString = end.subtract(1, 'seconds').format("YYYY-MM-DD");
+			var startDateString = start.format(Juno.Common.Util.settings.date_format);
+			var endDateString = end.subtract(1, 'seconds').format(Juno.Common.Util.settings.date_format);
 
-			scheduleService.getSchedulesForCalendar(
+			$scope.scheduleApi.getCalendarEvents(
 				providerId,
 				startDateString,
 				endDateString,
 				siteName
-			).then(function(results)
-			{
-				// Transform from camel to snake.  Normally this wouldn't need to happen, but
-				// this is an external library that requires a certain format.
-				deferred.resolve({data: snakeScheduleResults(results, providerId)});
-			});
+			).then(
+				function(results)
+				{
+					deferred.resolve(results.data.body);
+				},
+				function(results)
+				{
+					deferred.reject(results.data.body);
+				}
+			);
 
 			return deferred.promise;
 		};
 
-
-		//=========================================================================
-		// Local methods
-		//=========================================================================
-
-		function snakeAppointmentStatuses(data)
+		$scope.saveEvent = function saveEvent(
+			editMode,
+			eventUuid,
+			startDatetime,
+			endDatetime,
+			eventData,
+			scheduleUuid,
+			selectedEventStatusCode,
+			demographicNo,
+			siteUuid
+		)
 		{
-			if (!angular.isArray(data))
+			var deferred = $q.defer();
+
+			var dateString = Juno.Common.Util.formatMomentDate(startDatetime);
+
+			if(editMode)
 			{
-				return data;
+				var startDatetimeString = Juno.Common.Util.formatMomentTime(
+					startDatetime, Juno.Common.Util.settings.datetime_no_timezone_format);
+				var endDatetimeString = Juno.Common.Util.formatMomentTime(
+					endDatetime, Juno.Common.Util.settings.datetime_no_timezone_format);
+
+				var appointment =  {
+					"id": eventUuid,
+					"providerNo": scheduleUuid,
+					"appointmentDate": dateString,
+					"startTime": startDatetimeString,
+					"endTime": endDatetimeString,
+					"demographicNo": demographicNo,
+					"status": selectedEventStatusCode,
+					"notes": eventData.notes,
+					"reason": eventData.reason,
+					"location": siteUuid,
+				};
+
+				this.appointmentApi.updateAppointment(appointment).then(
+					function(result)
+					{
+						deferred.resolve(result.data);
+					},
+					function(result)
+					{
+						deferred.reject(result.data);
+					}
+				);
+			}
+			else
+			{
+				var startTimeString = Juno.Common.Util.formatMomentTime(startDatetime, "HH:mm");
+				var duration = moment.duration(endDatetime.diff(startDatetime)).asMinutes();
+
+				var newAppointment =  {
+					"providerNo": scheduleUuid,
+					"appointmentDate": dateString,
+					"startTime": startTimeString,
+					"duration": duration,
+					"demographicNo": demographicNo,
+					"status": selectedEventStatusCode,
+					"notes": eventData.notes,
+					"reason": eventData.reason,
+					"location": siteUuid,
+				};
+
+
+				$scope.appointmentApi.addAppointment(newAppointment).then(
+					function(result)
+					{
+						deferred.resolve(result.data);
+					},
+					function (result)
+					{
+						deferred.reject(result.data);
+					});
 			}
 
-			var snake_data = [];
 
-			for (var i = 0; i < data.length; i++)
-			{
-				snake_data.push({
-					uuid: data[i].displayLetter,
-					name: data[i].name,
-					display_letter: data[i].displayLetter,
-					color: data[i].color,
-					icon: data[i].icon,
-					rotates: data[i].rotates,
-					system_code: data[i].systemCode,
-					sort_order: data[i].sortOrder,
-				});
-			}
-			console.log(snake_data);
+			return deferred.promise;
+		};
 
-			return snake_data;
-		}
-
-		function snakeAppointmentData(data, providerId)
+		$scope.moveEvent = function moveEvent(appointment, delta)
 		{
-			if(data == null)
-			{
-				return data;
-			}
+			var deferred = $q.defer();
 
-			return {
-				appointment_uuid: data.scheduleUuid,
-				schedule_uuid: providerId,
-				event_status_uuid: data.eventStatusUuid,
-				event_status_modifier: data.eventStatusModifier,
-				start_time: data.startTime,
-				end_time: data.endTime,
-				site: data.site,
-				reason: data.reason,
-				num_invoices: data.numInvoices,
-				demographics_patient_dob: data.demographicPatientDob,
-				demographics_patient_name: data.demographicPatientName,
-				demographics_patient_phone: data.demographicPatientPhone,
-				demographics_patient_uuid: data.demographicPatientUuid,
-				demographics_practitioner_uuid: data.demographicPractitionerUuid,
-				tag_names: data.tagNames,
-				tag_self_booked: data.tagSelfBooked,
-				tag_self_cancelled: data.tagSelfCancelled,
-				tag_system_codes: data.tagSystemCodes
+			var eventData = {
+				reason: appointment.reason,
+				notes: appointment.notes
 			};
-		}
 
-		function snakeAvailabilityType(data)
+			var start_moment = Juno.Common.Util.getDatetimeNoTimezoneMoment(appointment.start_time);
+			var end_moment = Juno.Common.Util.getDatetimeNoTimezoneMoment(appointment.end_time);
+
+			$scope.saveEvent(
+				true,
+				appointment.appointment_uuid,
+				start_moment.add(delta.asMinutes(), 'minutes'),
+				end_moment.add(delta.asMinutes(), 'minutes'),
+				eventData,
+				appointment.schedule_uuid,
+				appointment.event_status_uuid,
+				appointment.demographics_patient_uuid,
+				appointment.site
+			).then(
+				function success(data)
+				{
+					deferred.resolve(data.body);
+				},
+				function success(data)
+				{
+					deferred.reject(data.body);
+				}
+			);
+
+
+			return deferred.promise;
+		};
+
+		// Read the implementation-specific results and return a calendar-compatible object.
+		$scope.processSaveResults = function processSaveResults(results, displayErrors)
 		{
-			if(data == null)
+			var status = (results || {}).status;
+
+			if(status == 'SUCCESS')
 			{
-				return data;
+				return true;
 			}
 
-			return {
-				name: data.name,
-				color: data.color,
-				preferred_event_length_minutes: data.preferredEventLengthMinutes,
-				system_code: data.systemCode,
-			};
-		}
+			var errorMessage = ((results || {}).error || {}).message;
+			var validationErrorArray = ((results || {}).error || {}).validationErrors;
 
-		function snakeScheduleResults(results, providerId)
+			if(Array.isArray(validationErrorArray))
+			{
+				displayErrors.add_standard_error(errorMessage);
+				//for(var error in validationErrorArray)
+				for(var i = 0; i < validationErrorArray.length; i++)
+				{
+					var error = validationErrorArray[i];
+					displayErrors.add_field_error(error.path, error.message);
+				}
+			}
+		};
+
+		$scope.deleteEvent = function deleteEvent(appointmentNo)
 		{
-			if(!angular.isArray(results))
-			{
-				return results;
-			}
+			var deferred = $q.defer();
 
-			var snake_results = [];
+			$scope.appointmentApi.deleteAppointment(appointmentNo).then(
+				function(result)
+				{
+					deferred.resolve(result.data);
 
-			for(var i = 0; i < results.length; i++)
-			{
-				var result = results[i];
-				snake_results.push({
-					resourceId: result.resourceId,
-					start: result.start,
-					end: result.end,
-					color: result.color,
-					rendering: result.rendering,
-					schedule_template_code: result.scheduleTemplateCode,
-					className: result.className,
-					availability_type: snakeAvailabilityType(result.availabilityType),
-					data: snakeAppointmentData(result.data, providerId),
-				});
-			}
+				},
+				function(result)
+				{
+					deferred.reject(result.data);
+				}
+			);
 
-			return snake_results;
-		}
+			return deferred.promise;
+		};
 
+		$scope.openCreateInvoice = function openCreateInvoice(
+			event_uuid, schedule_uuid, demographics_patient_uuid)
+		{
+			var schedule =
+				$scope.get_loaded_schedule(schedule_uuid);
 
-		//=========================================================================
-		// Event Handlers
-		//=========================================================================/
+			var url = $scope.calendar_api_adapter.get_create_invoice_url(event_uuid,
+				schedule.demographics_practitioner_uuid, demographics_patient_uuid);
+
+			window.window_scope = $scope;
+			$window.open(url, '_blank');
+		};
 
 		$scope.getIconPath = function getIconPath(icon, statusModifier)
 		{
@@ -1189,129 +866,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 
 			return "../images/" + modifierString + icon;
-		};
-
-		$scope.onEventRender = function onEventRender(event, element, view)
-		{
-			if(event.rendering !== 'background')
-			{
-				var eventSiteHtml = '';
-				var eventSite = $scope.sites[event.data.site];
-
-				if(Juno.Common.Util.exists(eventSite))
-				{
-					eventSiteHtml += "<span style='background-color: " + eventSite.color + "'>&nbsp;</span>"
-				}
-
-
-				var eventStatusHtml = '';
-				var eventStatus =
-					$scope.eventStatuses[event.data.event_status_uuid];
-
-				if(Juno.Common.Util.exists(eventStatus) && Juno.Common.Util.exists(eventStatus.icon) &&
-					Juno.Common.Util.exists(event) && Juno.Common.Util.exists(event.data))
-				{
-					eventStatusHtml += "<img src='" + $scope.getIconPath(eventStatus.icon, event.data.event_status_modifier) + "' />";
-				}
-				else
-				{
-					eventStatusHtml = '<span class="event-status';
-					if(Juno.Common.Util.exists(eventStatus))
-					{
-						var eventStatusRotate = Juno.Common.Util.exists(eventStatus.sort_order);
-						if(eventStatusRotate)
-						{
-							eventStatusHtml += ' rotate ';
-						}
-						eventStatusHtml += '"' + ' title="' + Juno.Common.Util.escapeHtml(eventStatus.name) + '">' +
-							Juno.Common.Util.escapeHtml(eventStatus.display_letter) + '</span>';
-					}
-					else
-					{
-						eventStatusHtml += '" title="Unknown">?</span>';
-					}
-				}
-
-				var eventInvoiceHtml = '<span class="event-invoice';
-				if(event.data.num_invoices > 0)
-				{
-					eventInvoiceHtml += ' edit" title="View Invoice' +
-						(event.data.num_invoices > 1 ? "s" : "") + '">B</span>';
-				}
-				else
-				{
-					eventInvoiceHtml += '" title="Create Invoice">$</span>';
-				}
-
-				var eventDetails = "";
-				if(Juno.Common.Util.exists(event.data.demographics_patient_name))
-				{
-					eventDetails = Juno.Common.Util.escapeHtml(event.data.demographics_patient_name);
-					if(Juno.Common.Util.exists(event.data.reason))
-					{
-						eventDetails += " (" + Juno.Common.Util.escapeHtml(event.data.reason) + ")"
-					}
-				}
-				else if(Juno.Common.Util.exists(event.data.reason))
-				{
-					eventDetails = Juno.Common.Util.escapeHtml(event.data.reason);
-				}
-
-				var eventDetailsHtml = "<span class='event-details' title='" + eventDetails + "'>" +
-					eventDetails + "</span>";
-
-				var eventDemographicHtml = "";
-				if(securityService.hasOneOfPermissions(['patient_view', 'patient_manage']) &&
-					Juno.Common.Util.exists(event.data.demographics_patient_uuid))
-				{
-					eventDemographicHtml =
-						'<span class="event-demographic" title="View Patient">' +
-						'<i class="fa fa-user"></i></span>';
-				}
-
-				var eventNoteHtml = "";
-				if(securityService.hasOneOfPermissions(['chart_note_view', 'chart_note_manage']) &&
-					Juno.Common.Util.exists(event.data.demographics_patient_uuid))
-				{
-					eventNoteHtml =
-						'<span class="event-note" title="Add Patient Note">' +
-						'<i class="fa fa-file-text-o"></i></span>';
-				}
-
-				var eventTagsHtml = '';
-				var tagClass = element.hasClass('text-light') ? 'icon-white' : '';
-
-				if(Juno.Common.Util.exists(event.data.tag_names))
-				{
-					eventTagsHtml = '<span class="event-tags" title="' +
-						event.data.tag_names.join(", ") +
-						'"><i class="icon ' + tagClass + ' icon-tags"/></span>';
-				}
-
-				$(element).find('.fc-content').html(eventSiteHtml + eventStatusHtml + eventInvoiceHtml +
-					eventDemographicHtml + eventNoteHtml + eventTagsHtml + eventDetailsHtml);
-			}
-		};
-
-		$scope.onViewRender = function onViewRender()
-		{
-			if($scope.isInitialized() && $scope.calendar())
-			{
-				$scope.globalState.selected_date = moment(Juno.Common.Util.formatMomentDate(
-					moment($scope.calendar().fullCalendar('getDate'))));
-			}
-
-			// Voodoo to set the resource view column width from https://stackoverflow.com/a/39297864
-			$("#ca-calendar").css('min-width',$('.fc-resource-cell').length*125);
-		};
-
-		$scope.afterRender = function afterRender()
-		{
-			// Voodoo to set the resource view column width from https://stackoverflow.com/a/39297864
-			$('.fc-agendaDay-button').click(function()
-			{
-				$("#schedule_container").css('min-width',$('.fc-resource-cell').length*125);
-			});
 		};
 
 		$scope.rotateEventStatus = function rotateEventStatus(calEvent)
@@ -1369,6 +923,135 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						});
 				});
 				*/
+		};
+
+
+		//=========================================================================
+		// Event Handlers
+		//=========================================================================/
+
+		$scope.onEventRender = function onEventRender(event, element, view)
+		{
+			if(event.rendering !== 'background')
+			{
+				var eventSiteHtml = '';
+				var eventSite = $scope.sites[event.data.site];
+
+				if(Juno.Common.Util.exists(eventSite))
+				{
+					eventSiteHtml += "<span style='background-color: " + eventSite.color + "'>&nbsp;</span>"
+				}
+
+
+				var eventStatusHtml = '';
+				var eventStatus =
+					$scope.eventStatuses[event.data.eventStatusCode];
+
+				if(Juno.Common.Util.exists(eventStatus) && Juno.Common.Util.exists(eventStatus.icon) &&
+					Juno.Common.Util.exists(event) && Juno.Common.Util.exists(event.data))
+				{
+					eventStatusHtml += "<img src='" + $scope.getIconPath(eventStatus.icon, event.data.eventStatusModifier) + "' />";
+				}
+				else
+				{
+					eventStatusHtml = '<span class="event-status';
+					if(Juno.Common.Util.exists(eventStatus))
+					{
+						var eventStatusRotate = Juno.Common.Util.exists(eventStatus.sortOrder);
+						if(eventStatusRotate)
+						{
+							eventStatusHtml += ' rotate ';
+						}
+						eventStatusHtml += '"' + ' title="' + Juno.Common.Util.escapeHtml(eventStatus.name) + '">' +
+							Juno.Common.Util.escapeHtml(eventStatus.displayLetter) + '</span>';
+					}
+					else
+					{
+						eventStatusHtml += '" title="Unknown">?</span>';
+					}
+				}
+
+				var eventInvoiceHtml = '<span class="event-invoice';
+				if(event.data.numInvoices > 0)
+				{
+					eventInvoiceHtml += ' edit" title="View Invoice' +
+						(event.data.numInvoices > 1 ? "s" : "") + '">B</span>';
+				}
+				else
+				{
+					eventInvoiceHtml += '" title="Create Invoice">$</span>';
+				}
+
+				console.log(event);
+				var eventDetails = "";
+				if(!Juno.Common.Util.isBlank(event.data.demographicName))
+				{
+					eventDetails = Juno.Common.Util.escapeHtml(event.data.demographicName);
+					if(!Juno.Common.Util.isBlank(event.data.reason))
+					{
+						eventDetails += " (" + Juno.Common.Util.escapeHtml(event.data.reason) + ")"
+					}
+				}
+				else if(!Juno.Common.Util.isBlank(event.data.reason))
+				{
+					eventDetails = Juno.Common.Util.escapeHtml(event.data.reason);
+				}
+
+				var eventDetailsHtml = "<span class='event-details' title='" + eventDetails + "'>" +
+					eventDetails + "</span>";
+
+				var eventDemographicHtml = "";
+				if(securityService.hasOneOfPermissions(['patient_view', 'patient_manage']) &&
+					Juno.Common.Util.exists(event.data.demographicNo))
+				{
+					eventDemographicHtml =
+						'<span class="event-demographic" title="View Patient">' +
+						'<i class="fa fa-user"></i></span>';
+				}
+
+				var eventNoteHtml = "";
+				if(securityService.hasOneOfPermissions(['chart_note_view', 'chart_note_manage']) &&
+					Juno.Common.Util.exists(event.data.demographicNo))
+				{
+					eventNoteHtml =
+						'<span class="event-note" title="Add Patient Note">' +
+						'<i class="fa fa-file-text-o"></i></span>';
+				}
+
+				var eventTagsHtml = '';
+				var tagClass = element.hasClass('text-light') ? 'icon-white' : '';
+
+				if(Juno.Common.Util.exists(event.data.tagNames))
+				{
+					eventTagsHtml = '<span class="event-tags" title="' +
+						event.data.tagNames.join(", ") +
+						'"><i class="icon ' + tagClass + ' icon-tags"/></span>';
+				}
+
+				$(element).find('.fc-content').html(eventSiteHtml + eventStatusHtml + eventInvoiceHtml +
+					eventDemographicHtml + eventNoteHtml + eventTagsHtml + eventDetailsHtml);
+			}
+		};
+
+		$scope.onViewRender = function onViewRender()
+		{
+			if($scope.isInitialized() && $scope.calendar())
+			{
+				$scope.selectedDate = moment(Juno.Common.Util.formatMomentDate(
+					moment($scope.calendar().fullCalendar('getDate'))));
+			}
+
+			// Voodoo to set the resource view column width from https://stackoverflow.com/a/39297864
+			$("#ca-calendar").css('min-width',$('.fc-resource-cell').length*125);
+		};
+
+		$scope.afterRender = function afterRender()
+		{
+			// Voodoo to set the resource view column width from https://stackoverflow.com/a/39297864
+			$('.fc-agendaDay-button').click(function()
+			{
+				$("#schedule_container").css('min-width',$('.fc-resource-cell').length*125);
+			});
 		};
 
 		$scope.openCreateEventDialog = function openCreateEventDialog(
@@ -1470,6 +1153,98 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			});
 		};
 
+		$scope.openPatientDemographic = function openPatientDemographic(calEvent)
+		{
+			console.log("Not implemented at this time.");
+		};
+
+		$scope.openCreateChartNote = function openCreateChartNote(calEvent)
+		{
+			// XXX: are we going to do this?
+
+			console.log("Not implemented at this time.");
+		};
+
+		$scope.openEditEventDialog = function openEditEventDialog(calEvent)
+		{
+			if(!securityService.hasPermission('scheduling_edit') )
+			{
+				return;
+			}
+
+			// if already opening a dialog or have one open, ignore and return
+			if($scope.openingDialog || $scope.dialog)
+			{
+				return;
+			}
+
+			$scope.openingDialog = true;
+
+			var scheduleUuid = calEvent.data.schedule_uuid;
+			var displayName = calEvent.data.demographics_patient_name;
+
+			if(displayName == null)
+			{
+				displayName = '';
+			}
+
+			var schedule = $scope.getLoadedSchedule(scheduleUuid);
+
+			if(schedule !== null)
+			{
+				//var defaultEventStatus = schedule.new_event_status_uuid;
+
+				var modalSchedule = angular.copy(schedule);
+				modalSchedule.display_name = displayName;
+
+				console.log(calEvent);
+
+				var data = {
+
+					schedule: modalSchedule,
+					default_event_status: null, //defaultEventStatus,
+					start_time: calEvent.start,
+					end_time: calEvent.end,
+					time_interval: $scope.timeIntervalMinutes(),
+					schedule_templates: $scope.scheduleTemplates,
+					availability_types: $scope.availabilityTypes,
+					sites: $scope.sites,
+					event_data: calEvent.data
+				};
+
+				$scope.dialog = $uibModal.open({
+					animation: false,
+					backdrop: 'static',
+					controller: 'Schedule.EventController',
+					templateUrl: 'src/schedule/event.jsp',
+					resolve: {
+						type: [function() { return 'create_edit_event' }],
+						label: [function() { return 'Appointment' }],
+						parentScope: [function() { return $scope }],
+						data: [function() { return data }],
+						editMode: [function() { return true }],
+						//access_control: [function() {return securityService}],
+						keyBinding: [function() {return {bindKeyGlobal: function(){}}}],
+						focus: [function() {return focusService}],
+					}
+				});
+
+				$scope.dialog.result.catch(function(res) {
+					if(!(res === 'cancel' || res === 'escape key press'))
+					{
+						throw res;
+					}
+				});
+
+				// when the dialog closes clear the variable
+				$scope.dialog.closed.then(function() {
+					$scope.dialog = null;
+				});
+			}
+
+			$scope.openingDialog = false;
+		};
+
 		$scope.onEventClicked = function onEventClicked(calEvent, jsEvent, view)
 		{
 			if($(jsEvent.target).is(".event-status.rotate"))
@@ -1516,14 +1291,27 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			// load then update the start and end time based on the delta
 			$scope.setCalendarLoading(true);
 
-			$scope.dropEvent(calEvent.data.uuid, calEvent.resourceId, delta).then(
+			$scope.moveEvent(calEvent.data, delta).then(
 				function success(eventData)
 				{
-					calEvent.data.start_time = eventData.start_time;
-					calEvent.data.end_time = eventData.end_time;
-					calEvent.data.schedule_uuid = eventData.schedule_uuid;
+					console.log(eventData);
+					console.log(calEvent);
 
-					$scope.updateEvent(calEvent);
+					/*
+					var startMoment = Juno.Common.Util.getDatetimeNoTimezoneMoment(eventData.startTime)
+					var endMoment = Juno.Common.Util.getDatetimeNoTimezoneMoment(eventData.endTime)
+					*/
+
+					var startMoment = moment(eventData.startTime, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
+					var endMoment = moment(eventData.endTime, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
+
+					calEvent.data.start_time = Juno.Common.Util.formatMomentTime(
+						startMoment, Juno.Common.Util.settings.datetime_no_timezone_format);
+					calEvent.data.end_time = Juno.Common.Util.formatMomentTime(
+						endMoment, Juno.Common.Util.settings.datetime_no_timezone_format);
+
+					calEvent.data.schedule_uuid = eventData.providerNo;
+					console.log(calEvent);
 
 					$scope.setCalendarLoading(false);
 
@@ -1549,7 +1337,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			// load then update the end time based on the delta
 			$scope.set_calendar_loading(true);
 
-			$scope.calendar_api_adapter.resize_event(calEvent.data.uuid, delta).then(
+			$scope.resizeEvent(calEvent.data.uuid, delta).then(
 				function success(event_data)
 				{
 					calEvent.data.end_time = event_data.end_time;
@@ -1568,62 +1356,44 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				});
 		};
 
-		//=========================================================================
-		// API Methods from directive
-		//=========================================================================/
-
-		/*
-		this.has_sites = function has_sites() {
-			return $scope.site_options.length > 0;
-		};
-
-		this.get_schedule_options = function get_schedule_options()
+		$scope.onSiteChanged = function onSiteChanged()
 		{
-			return $scope.schedule_options;
+			return $scope.onScheduleChanged();
 		};
 
-		this.get_site_options = function get_site_options()
+		$scope.onScheduleChanged = function onScheduleChanged()
 		{
-			return $scope.site_options;
+			var selectedSchedule = $scope.selectedSchedule;
+			var selectedSiteName = $scope.selectedSiteName;
+
+			if(!Juno.Common.Util.exists(selectedSchedule))
+			{
+				return;
+			}
+
+			if(Juno.Common.Util.exists(selectedSiteName))
+			{
+				$scope.selectedSiteName = selectedSiteName;
+			}
+			else
+			{
+				$scope.selectedSiteName = null;
+			}
+
+			// reload the schedule and then events data, triggering a rerender
+			$scope.loadSelectedSchedules().then($scope.refetchEvents);
 		};
 
-		this.on_schedule_changed = function on_schedule_changed(schedule_uuid, site)
+		$scope.onTimeIntervalChanged = function onTimeIntervalChanged()
 		{
-			return $scope.on_schedule_changed(schedule_uuid, site);
+			$scope.scheduleTimeInterval = $scope.selectedTimeInterval;
+
+			// updating the config will automatically trigger an events refresh
+			$scope.uiConfig.calendar.slotDuration = $scope.selectedTimeInterval;
+			$scope.uiConfig.calendar.slotLabelInterval = $scope.selectedTimeInterval;
+
+			$scope.applyUiConfig($scope.uiConfig);
 		};
-
-		this.on_time_interval_changed = function on_time_interval_changed(selected_time_interval)
-		{
-			return $scope.on_time_interval_changed(selected_time_interval);
-		};
-
-		this.change_view = function change_view(view)
-		{
-			return $scope.change_view(view);
-		};
-
-		this.view_name = function view_name()
-		{
-			return $scope.view_name();
-		};
-
-		this.get_time_interval_options = function get_time_interval_options()
-		{
-			return $scope.timeIntervalOptions;
-		};
-
-		this.show_legend = function show_legend()
-		{
-			return $scope.show_legend();
-		};
-		*/
-
-
-		//=========================================================================
-		// Methods pulled from the directive controller
-		//=========================================================================/
-
-		$scope.initialized = false;
 
 
 		//=========================================================================
@@ -1686,24 +1456,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					}
 					deferred.resolve(results);
 				});
-
-			return deferred.promise;
-		};
-
-		$scope.load_schedule_options = function load_schedule_options()
-		{
-			var deferred = $q.defer();
-
-			scheduleService.getScheduleGroups().then(
-				function success(results)
-				{
-					for(var i = 0; i < results.length; i++)
-					{
-						results[i].uuid = results[i].identifier;
-					}
-					deferred.resolve(results);
-				}
-			);
 
 			return deferred.promise;
 		};
@@ -1788,15 +1540,14 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			var deferred = $q.defer();
 
 			// if there is already a refresh set up, stop it
-			var refresh = $scope.getGlobalState('schedule_auto_refresh');
+			var refresh = $scope.scheduleAutoRefresh;
 			if(refresh !== null)
 			{
 				clearInterval(refresh);
 			}
 
 			// get the refresh interval from preferences, or use default
-			var minutes = $scope.getGlobalPreferenceSetting(
-				'schedule_auto_refresh_minutes');
+			var minutes = $scope.scheduleAutoRefreshMinutes;
 			if(!Juno.Common.Util.exists(minutes) || !Juno.Common.Util.isIntegerString(minutes))
 			{
 				minutes = $scope.defaultAutoRefreshMinutes;
@@ -1809,8 +1560,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			if(minutes > 0)
 			{
 				// start the auto refresh and save its ID to global state
-				$scope.saveGlobalState('schedule_auto_refresh',
-					setInterval($scope.refetchEvents, minutes * 60 * 1000));
+				$scope.scheduleAutoRefresh = setInterval($scope.refetchEvents, minutes * 60 * 1000);
 			}
 
 			deferred.resolve();
@@ -1848,7 +1598,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 				editable: true,
 				eventDrop: $scope.onEventDrop,
-				eventResize: $scope.onEventResize
+				eventResize: $scope.onEventResize,
+				schedulerLicenseKey: "GPL-My-Project-Is-Open-Source"
 			}
 		};
 

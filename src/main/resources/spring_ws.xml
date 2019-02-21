@@ -307,6 +307,7 @@
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.MissingArgumentExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.RateLimitExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.SecurityExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.ConstraintViolationExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.ValidationExceptionMapper"/>
 
 			<!-- Juno filters. -->
@@ -323,6 +324,7 @@
 		<jaxrs:serviceBeans>
 			<!-- Alphabetically Please! -->
 			<bean autowire="byName" class="org.oscarehr.ws.rest.AllergyService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.AppointmentService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.AppService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.BillingService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ConsultationWebService"/>
@@ -352,6 +354,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ResourceService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.RSSFeedService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ScheduleService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.SitesService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.SpecialistsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.StatusService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.TicklerWebService"/>
@@ -359,7 +362,6 @@
 
 			<!--  Not yet implemented
 
-			<bean class="org.oscarehr.ws.rest.SitesService"  autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.WaitListWebService" autowire="byName"/>
 			
 			-->

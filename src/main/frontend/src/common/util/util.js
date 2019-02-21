@@ -82,6 +82,11 @@ Juno.Common.Util.getTimeMoment = function getTimeMoment(time_string)
 	return moment.utc(time_string, Juno.Common.Util.settings.time_format, true);
 };
 
+Juno.Common.Util.getDateMomentFromComponents = function getDateMomentFromComponents(year_string, month_string, day_string)
+{
+	return moment.utc({year: year_string, month: month_string, day: day_string});
+};
+
 Juno.Common.Util.getDateAndTimeMoment = function getCombinedMoment(dateString, timeString)
 {
 	return moment.utc(dateString + " " + timeString,
@@ -232,4 +237,22 @@ Juno.Common.Util.escapeHtml = function escapeHtml(str)
 	{
 		return entityMap[s];
 	});
+};
+
+Juno.Common.Util.formatName = function formatName(firstName, lastName)
+{
+	if(!lastName && !firstName)
+	{
+		return null;
+	}
+	else if(!firstName)
+	{
+		return lastName;
+	}
+	else if(!lastName)
+	{
+		return firstName;
+	}
+
+	return lastName + ', ' + firstName;
 };

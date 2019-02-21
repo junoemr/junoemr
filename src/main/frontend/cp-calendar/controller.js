@@ -693,7 +693,7 @@ function(
 					data: [function() { return data }],
 					edit_mode: [function() { return false }],
 					access_control: [function() {return $scope.access_control}],
-					key_binding: [function() {return {bind_key_global: function(){}}}],
+					key_binding: [function() {return {bindKeyGlobal: function(){}}}],
 					focus: [function() {return $scope.calendar_api_adapter.focus}],
 				}
 			});

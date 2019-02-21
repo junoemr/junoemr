@@ -80,7 +80,7 @@
 									ca-template="bare"
 									ca-date-picker-id="start-date-picker"
 									ca-name="start_date"
-									ca-model="startDate"
+									ca-model="eventData.startDate"
 									ca-orientation="auto"
 							></ca-field-date>
 						</div>
@@ -89,7 +89,7 @@
 							<ca-field-time
 									ca-template="bare"
 									ca-name="start_time"
-									ca-model="startTime"
+									ca-model="eventData.startTime"
 									ca-minute-step="parentScope.timeIntervalMinutes()">
 							</ca-field-time>
 						</div>
@@ -108,7 +108,7 @@
 									ca-template="bare"
 									ca-date-picker-id="end-date-picker"
 									ca-name="end_date"
-									ca-model="endDate"
+									ca-model="eventData.endDate"
 									ca-orientation="auto"
 							></ca-field-date>
 						</div>
@@ -117,7 +117,7 @@
 							<ca-field-time
 									ca-template="bare"
 									ca-name="end_time"
-									ca-model="endTime"
+									ca-model="eventData.endTime"
 									ca-minute-step="parentScope.timeIntervalMinutes()">
 							</ca-field-time>
 						</div>
@@ -132,6 +132,9 @@
 									class="form-control"
 									ng-model="selectedEventStatus"
 									ng-options="option as option.name for option in eventStatusOptions">
+								<!-- XXX: don't put in a blank options
+								<option value=""></option>
+								-->
 							</select>
 						</div>
 						<span class="event-color"
@@ -216,8 +219,8 @@
 							ca-label-size="col-sm-12"
 							ca-input-size="col-sm-12"
 							ca-title="Notes"
-							ca-name="event_description"
-							ca-model="eventData.description"
+							ca-name="event_notes"
+							ca-model="eventData.notes"
 							ca-max-characters="600"
 							ca-rows="2">
 					</ca-field-text>
@@ -235,6 +238,7 @@
 						</label>
 
 						<div class="col-sm-12">
+							<!--
 							<input type="text"
 								   id="input-patient"
 								   ng-model="autocompleteValues.patient"
@@ -243,6 +247,19 @@
 								   typeahead-on-select="onSelectPatient($item, $model, $label)"
 								   class="form-control"
 								   autocomplete="off"/>
+
+							<input type="text"
+								   ng-model="appointmentAddCtrl.appointment.demographicName" placeholder="Patient"
+								   uib-typeahead="pt.demographicNo as pt.name for pt in appointmentAddCtrl.searchPatients($viewValue)"
+								   typeahead-on-select="appointmentAddCtrl.updateDemographicNo($item, $model, $label)"
+								   class="form-control form-control-details">
+							-->
+
+							<juno-patient-search-typeahead
+									id="input-patient"
+									juno-model="patientTypeahead"
+									juno-placeholder="Patient">
+							</juno-patient-search-typeahead>
 						</div>
 
 					</div>
@@ -253,9 +270,9 @@
 
 				<div class="col-sm-3 patient-image" ng-show="isPatientSelected()">
 					<div class="file-upload-drop-box">
-						<span class="upload-text" ng-if="!patient.has_photo">Upload Photo</span>
+						<span class="upload-text" ng-if="!demographicModel.hasPhoto">Upload Photo</span>
 						<img class="patient-photo" title="Click to change image"
-							 ng-src="{{patient.patient_photo_url}}"
+							 ng-src="{{demographicModel.patientPhotoUrl}}"
 							 align="middle" />
 					</div>
 				</div>
@@ -268,7 +285,7 @@
 						</label>
 						<div class="col-sm-8">
 							<div class="form-control-static">
-								<a ng-href="#!/record/{{ patient.uuid }}/summary" target="_blank">{{ patient.full_name }}</a>
+								<a ng-href="#!/record/{{ demographicModel.demographicNo }}/summary" target="_blank">{{ demographicModel.fullName }}</a>
 							</div>
 						</div>
 					</div>
@@ -279,25 +296,25 @@
 						</label>
 						<div class="col-sm-8">
 
-							<span ng-if="patient.data.health_number">
+							<span ng-if="demographicModel.data.healthNumber">
 								<span class="patient-health-number">
-									{{patient.data.health_number}}
-									{{patient.data.ontario_version_code}}
+									{{demographicModel.data.healthNumber}}
+									{{demographicModel.data.ontarioVersionCode}}
 								</span>
 								<button type="button"
 										aria-label="Check Eligibility"
-										title="{{patient.eligibility_text}}"
+										title="{{demographicModel.eligibilityText}}"
 										class="btn"
 										ng-class="{
-														'btn-addon': (patient.checking_eligibility || patient.eligibility == null) && !patient.polling_eligibility,
-														'btn-warning': patient.polling_eligibility,
-														'btn-success': patient.eligibility == 'eligible',
-														'btn-danger': patient.eligibility == 'ineligible' }"
-										ng-click="patient.get_eligibility(true, true)">
+														'btn-addon': (demographicModel.checkingEligibility || demographicModel.eligibility == null) && !demographicModel.pollingEligibility,
+														'btn-warning': demographicModel.pollingEligibility,
+														'btn-success': demographicModel.eligibility == 'eligible',
+														'btn-danger': demographicModel.eligibility == 'ineligible' }"
+										ng-click="demographicModel.getEligibility(true, true)">
 									<i class="fa fa-user" aria-hidden="true"></i>
 								</button>
 							</span>
-							<p ng-if="!patient.data.health_number"
+							<p ng-if="!demographicModel.data.healthNumber"
 							   class="form-control-static"></p>
 						</div>
 					</div>
@@ -308,7 +325,7 @@
 						</label>
 						<div class="col-sm-8">
 							<div class="form-control-static">
-								{{ patient.data.birth_date }}
+								{{ demographicModel.data.birthDate }}
 							</div>
 						</div>
 					</div>
@@ -319,7 +336,7 @@
 						</label>
 						<div class="col-sm-8">
 							<div class="form-control-static">
-								{{ patient.data.phone_number_primary }}
+								{{ demographicModel.data.phoneNumberPrimary }}
 							</div>
 						</div>
 					</div>
@@ -337,7 +354,7 @@
 			<button type="button"
 					class="btn btn-danger"
 					ng-show="editMode"
-					ng-click="delete()"
+					ng-click="del()"
 					ng-disabled="isWorking()">
 				Delete
 			</button>

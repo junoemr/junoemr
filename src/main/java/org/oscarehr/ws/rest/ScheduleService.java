@@ -36,8 +36,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
@@ -67,14 +65,12 @@ import org.oscarehr.ws.rest.conversion.AppointmentConverter;
 import org.oscarehr.ws.rest.conversion.AppointmentStatusConverter;
 import org.oscarehr.ws.rest.conversion.AppointmentTypeConverter;
 import org.oscarehr.ws.rest.conversion.LookupListItemConverter;
-import org.oscarehr.ws.rest.conversion.NewAppointmentConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.SchedulingResponse;
 import org.oscarehr.ws.rest.to.model.AppointmentStatusTo1;
 import org.oscarehr.ws.rest.to.model.AppointmentTo1;
-import org.oscarehr.ws.rest.to.model.NewAppointmentTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -184,12 +180,15 @@ public class ScheduleService extends AbstractServiceImpl {
 		return response;
 	}
 
+	/*
 	@POST
 	@Path("/add")
 	@Produces("application/json")
 	@Consumes("application/json")
 	public RestResponse<AppointmentTo1> addAppointment(NewAppointmentTo1 appointmentTo) {
 		//SchedulingResponse response = new SchedulingResponse();
+
+		logger.info(appointmentTo.toString());
 
 		NewAppointmentConverter converter = new NewAppointmentConverter();
 
@@ -204,6 +203,7 @@ public class ScheduleService extends AbstractServiceImpl {
 
 		return RestResponse.successResponse(appointment);
 	}
+	*/
 
 	@POST
 	@Path("/getAppointment")
@@ -221,17 +221,7 @@ public class ScheduleService extends AbstractServiceImpl {
 		return response;
 	}
 
-	@POST
-	@Path("/deleteAppointment")
-	@Consumes("application/json")
-	@Produces("application/json")
-	public Response deleteAppointment(AppointmentTo1 appointmentTo) {
-
-		appointmentManager.deleteAppointment(getLoggedInInfo(), appointmentTo.getId());
-
-		return Response.status(Status.OK).build();
-	}
-
+	/*
 	@POST
 	@Path("/updateAppointment")
 	@Consumes("application/json")
@@ -242,11 +232,12 @@ public class ScheduleService extends AbstractServiceImpl {
 		AppointmentConverter converter = new AppointmentConverter();
 		Appointment appt = converter.getAsDomainObject(getLoggedInInfo(), appointmentTo);
 
-		scheduleManager.updateAppointment(getLoggedInInfo(), appt);
+		appointmentManager.updateAppointment(getLoggedInInfo(), appt);
 
 		response.setAppointment(converter.getAsTransferObject(getLoggedInInfo(), appt));
 		return response;
 	}
+	*/
 
 	@POST
 	@Path("/{demographicNo}/appointmentHistory")

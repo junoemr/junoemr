@@ -81,8 +81,13 @@ public class Appointment
 		{
 			for(AppointmentDetails details: dateList)
 			{
-				LocalDateTime startDateTime = LocalDateTime.of(details.getDate(), details.getStartTime());
-				LocalDateTime endDateTime = LocalDateTime.of(details.getDate(), details.getEndTime());
+				LocalDateTime startDateTime =
+						LocalDateTime.of(details.getDate(), details.getStartTime());
+
+				// Add an extra minute because oscar stores the endtime minus a minute
+				LocalDateTime endDateTime =
+						LocalDateTime.of(details.getDate(), details.getEndTime()).plusMinutes(1);
+
 
 				String rawStatus = details.getStatus();
 				String status = null;
@@ -110,6 +115,7 @@ public class Appointment
 					statusModifier,
 					null,
 					details.getReason(),
+					details.getNotes(),
 					null,
 					details.getLocation(),
 					false,

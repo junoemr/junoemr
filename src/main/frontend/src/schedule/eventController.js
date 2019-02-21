@@ -17,6 +17,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		//'cpCalendar.Juno.Common.Util',
 
 
+		'demographicService',
 		'securityService',
 		'keyBinding',
 		'focus',
@@ -27,6 +28,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 		messagesFactory, //util,
 
+		demographicService,
 		securityService,
 		keyBinding, focus,
 		type, parentScope, label, editMode, data
@@ -48,36 +50,37 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	$scope.editMode = editMode;
 
 	$scope.keyBinding = keyBinding;
-	$scope.eventUuid = data.uuid;
-	$scope.numInvoices = data.numInvoices;
-	$scope.tagNames = data.tagNames;
+	$scope.eventUuid = null;
 
 	$scope.schedule = data.schedule;
 
+	/*
+	$scope.numInvoices = data.event_data.num_invoices;
+	$scope.tagNames = data.event_data.tag_names;
+
+
 	$scope.availabilityTypes = data.availabilityTypes;
 	$scope.scheduleTemplates = data.scheduleTemplates;
+	*/
 
 	$scope.eventData = {
-		start_time: null,
-		end_time: null,
+		startDate: null,
+		startTime: null,
+		endDate: null,
+		endTime: null,
 		reason: null,
-		description: null
+		notes: null
 	};
 
-	$scope.timeInterval = data.timeInterval;
-	$scope.startDate = null;
-	$scope.startTime = null;
-	$scope.endDate = null;
-	$scope.endTime = null;
+	$scope.timeInterval = data.time_interval;
 
 	$scope.lastEventLength = null;
 
-	$scope.patient = parentScope.patientModel;
+	$scope.patientTypeahead = {};
 	$scope.autocompleteValues = {};
 
 	$scope.activeTemplateEvents = [];
 
-	console.log($scope.parentScope);
 	$scope.eventStatuses = $scope.parentScope.eventStatuses;
 	$scope.eventStatusOptions = [];
 	$scope.selectedEventStatus = null;
@@ -98,37 +101,104 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	$scope.initialized = false;
 	$scope.working = false;
 
+	$scope.demographicModel = {
+		demographicNo: null,
+		fullName: null,
+		hasPhoto: true,
+		patientPhotoUrl: '/imageRenderingServlet?source=local_client&clientId=0',
+		data: {
+			birthDate: null,
+			healthNumber: null,
+			ontarioVersionCode: null,
+			phoneNumberPrimary: null
+		},
+		clear: function clear()
+		{
+			this.demographicNo = null;
+			this.fullName = null;
+			this.patientPhotoUrl = '/imageRenderingServlet?source=local_client&clientId=0';
+			this.data.birthDate = null;
+			this.data.healthNumber = null;
+			this.data.ontarioVersionCode = null;
+			this.data.phoneNumberPrimary = null;
+		},
+		fillData: function fillData(data)
+		{
+			this.demographicNo = data.demographicNo;
+			this.fullName = Juno.Common.Util.formatName(data.firstName, data.lastName);
+			this.patientPhotoUrl = '/imageRenderingServlet?source=local_client&clientId=' + (data.demographicNo? data.demographicNo: 0);
+
+			var dateOfBirth = null;
+			if(Juno.Common.Util.exists(data.dob))
+			{
+				// XXX: Perhaps put this in util?  Is this date format common for juno?
+				dateOfBirth = moment(data.dob, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
+				console.log(dateOfBirth);
+			}
+			else
+			{
+				dateOfBirth = Juno.Common.Util.getDateMomentFromComponents(
+					data.dobYear, data.dobMonth, data.dobDay);
+			}
+			this.data.birthDate = Juno.Common.Util.formatMomentDate(dateOfBirth);
+
+
+			this.data.healthNumber = data.hin;
+			// XXX: no version code when loaded from autocomplete?  Does that matter?
+			this.data.ontarioVersionCode = data.ver;
+			this.data.phoneNumberPrimary = data.phone;
+		},
+		uploadPhoto: function uploadPhoto(file){}
+	};
+
 	//=========================================================================
 	// Init
 	//=========================================================================/
 
 	$scope.init = function init()
 	{
-		if(!securityService.hasPermission('scheduling_create'))
+		if (!securityService.hasPermission('scheduling_create'))
 		{
-			$timeout(function()
+			$timeout(function ()
 			{
 				$scope.cancel();
 			});
 		}
 
+		$scope.demographicModel.clear();
+
+		console.log(data);
+		//var momentStart = Juno.Common.Util.getDateAndTimeMoment(data.start_time);
+		//var momentEnd = Juno.Common.Util.getDateAndTimeMoment(data.end_time);
 		var momentStart = data.start_time;
 		var momentEnd = data.end_time;
 
-		$scope.startTime = Juno.Common.Util.formatMomentTime(momentStart, $scope.timepickerFormat);
-		$scope.endTime = Juno.Common.Util.formatMomentTime(momentEnd, $scope.timepickerFormat);
-		$scope.startDate = Juno.Common.Util.formatMomentDate(momentStart);
-		$scope.endDate = Juno.Common.Util.formatMomentDate(momentEnd);
-
-		console.log('start_time');
-		console.log($scope.startDate);
-		console.log($scope.startTime);
+		$scope.eventData.startTime = Juno.Common.Util.formatMomentTime(momentStart, $scope.timepickerFormat);
+		$scope.eventData.endTime = Juno.Common.Util.formatMomentTime(momentEnd, $scope.timepickerFormat);
+		$scope.eventData.startDate = Juno.Common.Util.formatMomentDate(momentStart);
+		$scope.eventData.endDate = Juno.Common.Util.formatMomentDate(momentEnd);
 
 		$scope.lastEventLength = momentEnd.diff(momentStart, 'minutes');
 
 		// maintain a list of the 'active' templates based on start time
 		$scope.setActiveTemplateEvents();
 
+		/*
+		$scope.eventStatusOptions = [];
+		$scope.eventStatusOptions.push({
+			color: "#FFFFFF",
+			display_letter: "",
+			icon: "",
+			name: "",
+			rotates: true,
+			sort_order: 1,
+			system_code: null,
+			uuid: null
+		});
+		console.log($scope.eventStatusOptions);
+		*/
+
+		//$scope.eventStatusOptions.push("");
 		for(var key in $scope.eventStatuses)
 		{
 			if($scope.eventStatuses.hasOwnProperty(key))
@@ -142,23 +212,23 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 		if(editMode)
 		{
-			$scope.eventData.reason = data.reason;
-			$scope.eventData.description = data.description;
+			$scope.eventUuid = data.event_data.appointment_uuid;
+			$scope.eventData.reason = data.event_data.reason;
+			$scope.eventData.notes = data.event_data.notes;
 
 			// either load the patient data and init the autocomplete
 			// or ensure the patient model is clear
-			$scope.patient.uuid = data.demographics_patient_uuid;
-			$scope.initPatientAutocomplete().then(function() {
+			$scope.initPatientAutocomplete(data.event_data.demographics_patient_uuid).then(function() {
 				$scope.initialized = true;
 			});
-			$scope.selectedSiteName = data.selected_site_name;
+			$scope.selectedSiteName = data.event_data.site;
 		}
 		else
 		{
 			// create mode: adjust the end date (if needed)
 			// and clear the patient model
 			$scope.adjustEndDatetime();
-			$scope.patient.clear();
+			$scope.demographicModel.clear();
 
 			// autofocus the patient field
 			focus.element("#input-patient");
@@ -167,31 +237,27 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		}
 	};
 
-	$scope.initPatientAutocomplete = function initPatientAutocomplete()
+	$scope.initPatientAutocomplete = function initPatientAutocomplete(demographicNo)
 	{
 		var deferred = $q.defer();
 
-		if(Juno.Common.Util.exists($scope.patient.uuid) && $scope.patient.uuid != 0)
+		if(Juno.Common.Util.exists(demographicNo) && demographicNo != 0)
 		{
-			parentScope.autocomplete.init_autocomplete_values(
-				{ patient: $scope.patient.uuid },
-				$scope.autocompleteValues).then(
-				function(results)
-				{
-					$scope.autocompleteValues = results.data;
-					$scope.patient.fillData($scope.autocompleteValues.patient.data);
-					deferred.resolve();
-				},
-				function(errors)
-				{
-					console.log('error initializing patient autocomplete', errors);
-					$scope.patient.clear();
-					deferred.resolve();
-				});
+			demographicService.getDemographic(demographicNo).then(function(data)
+			{
+				$scope.patientTypeahead = data;
+				deferred.resolve();
+			},
+			function(errors)
+			{
+				console.log('error initializing patient autocomplete', errors);
+				$scope.demographicModel.clear();
+				deferred.resolve();
+			});
 		}
 		else
 		{
-			$scope.patient.clear();
+			$scope.demographicModel.clear();
 			deferred.resolve();
 		}
 
@@ -201,6 +267,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	//=========================================================================
 	// Private methods
 	//=========================================================================/
+
 
 	$scope.get_inclusive_days = function get_inclusive_days(
 		momentStart, momentEnd)
@@ -215,22 +282,23 @@ angular.module('Schedule').controller('Schedule.EventController', [
   		return days;
 	};
 
-	$scope.setSelectedEventStatus = function setSelectedEventStatus(uuid)
+	$scope.setSelectedEventStatus = function setSelectedEventStatus(selectedCode)
 	{
-		var eventStatusUuid = $scope.defaultEventStatus;
-		if(Juno.Common.Util.exists(uuid))
+		var eventStatusCode = $scope.defaultEventStatus;
+
+		if(Juno.Common.Util.exists(selectedCode))
 		{
-			eventStatusUuid = uuid;
+			eventStatusCode = selectedCode;
 		}
 
-		if(!Juno.Common.Util.exists(eventStatusUuid) ||
-			!Juno.Common.Util.exists($scope.eventStatuses[eventStatusUuid]))
+		if(!Juno.Common.Util.exists(eventStatusCode) ||
+			!Juno.Common.Util.exists($scope.eventStatuses[eventStatusCode]))
 		{
 			// if not set or found just pick the first one
-			eventStatusUuid = $scope.eventStatusOptions[0].uuid;
+			eventStatusCode = $scope.eventStatusOptions[0].displayLetter;
 		}
 
-		$scope.selectedEventStatus = $scope.eventStatuses[eventStatusUuid];
+		$scope.selectedEventStatus = $scope.eventStatuses[eventStatusCode];
 	};
 
 	$scope.setActiveTemplateEvents = function setActiveTemplateEvents()
@@ -243,9 +311,9 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		// Get templates that happen during the time period
 
 		var momentStart = Juno.Common.Util.getDateAndTimeMoment(
-			$scope.startDate, $scope.formattedTime($scope.startTime));
+			$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
 		var momentEnd = Juno.Common.Util.getDateAndTimeMoment(
-			$scope.endDate, $scope.formattedTime($scope.endTime));
+			$scope.eventData.endDate, $scope.formattedTime($scope.eventData.endTime));
 
 		var active_events = [];
 
@@ -279,7 +347,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		// adjusts to keep the event length the same as it last was
 
 		var momentStart = Juno.Common.Util.getDateAndTimeMoment(
-			$scope.startDate, $scope.formattedTime($scope.startTime));
+			$scope.startDate, $scope.formattedTime($scope.eventData.startTime));
 		if(momentStart.isValid())
 		{
 			var new_event_length = Juno.Common.Util.exists(length_minutes) ?
@@ -297,9 +365,9 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		// saves the current event length, if the date/times are valid
 
 		var momentStart = Juno.Common.Util.getDateAndTimeMoment(
-			$scope.startDate, $scope.formattedTime($scope.startTime));
+			$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
 		var momentEnd = Juno.Common.Util.getDateAndTimeMoment(
-			$scope.endDate, $scope.formattedTime($scope.endTime));
+			$scope.eventData.endDate, $scope.formattedTime($scope.eventData.endTime));
 
 		if(momentStart.isValid() && momentEnd.isValid())
 		{
@@ -315,25 +383,25 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	{
 		$scope.displayMessages.clear();
 
-		Juno.Common.Util.validateDateString($scope.startDate,
+		Juno.Common.Util.validateDateString($scope.eventData.startDate,
 			$scope.displayMessages, 'start_date', 'Start Time', true);
 
-		Juno.Common.Util.validateTimeString($scope.formattedTime($scope.startTime),
+		Juno.Common.Util.validateTimeString($scope.formattedTime($scope.eventData.startTime),
 			$scope.displayMessages, 'start_time', 'Start Time', true);
 
-		Juno.Common.Util.validateDateString($scope.endDate,
+		Juno.Common.Util.validateDateString($scope.eventData.endDate,
 			$scope.displayMessages, 'end_date', 'End Time', true);
 
-		Juno.Common.Util.validateTimeString($scope.formattedTime($scope.endTime),
+		Juno.Common.Util.validateTimeString($scope.formattedTime($scope.eventData.endTime),
 			$scope.displayMessages, 'end_time', 'End Time', true);
 
 		// if all the date/time fields look good, validate range
 		if(!$scope.displayMessages.has_errors())
 		{
 			var startDatetime = Juno.Common.Util.getDateAndTimeMoment(
-				$scope.startDate, $scope.formattedTime($scope.startTime));
+				$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
 			var endDatetime = Juno.Common.Util.getDateAndTimeMoment(
-				$scope.endDate, $scope.formattedTime($scope.endTime));
+				$scope.eventData.endDate, $scope.formattedTime($scope.eventData.endTime));
 
 			if(endDatetime.isSame(startDatetime) ||
 				endDatetime.isBefore(startDatetime))
@@ -342,7 +410,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			}
 		}
 
-		return !$scope.displayMessages.hasErrors();
+		return !$scope.displayMessages.has_errors();
 	};
 
 	$scope.saveEvent = function saveEvent()
@@ -350,11 +418,13 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		var deferred = $q.defer();
 
 		var startDatetime = Juno.Common.Util.getDateAndTimeMoment(
-				$scope.startDate, $scope.formattedTime($scope.startTime));
+				$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
 
 		var endDatetime = Juno.Common.Util.getDateAndTimeMoment(
-				$scope.endDate, $scope.formattedTime($scope.endTime));
+				$scope.eventData.endDate, $scope.formattedTime($scope.eventData.endTime));
 
+		console.log($scope.schedule);
+		console.log($scope.demographicModel);
 		parentScope.saveEvent(
 			editMode,
 			$scope.eventUuid,
@@ -362,8 +432,8 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			endDatetime,
 			$scope.eventData,
 			$scope.schedule.uuid,
-			$scope.selectedEventStatus.uuid,
-			$scope.patient.uuid,
+			$scope.selectedEventStatus.displayLetter,
+			$scope.demographicModel.demographicNo,
 			$scope.selectedSiteName
 		).then(
 			function(results)
@@ -406,6 +476,11 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	{
 		// the time picker format is HH:MM AM - need to strip spaces
 		return time_str.replace(/ /g,'');
+	};
+
+	$scope.loadPatientFromTypeahead = function loadPatientFromTypeahead(patientTypeahead)
+	{
+		$scope.demographicModel.fillData(patientTypeahead);
 	};
 
 	//=========================================================================
@@ -458,6 +533,11 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		}
 	});
 
+	$scope.$watch('patientTypeahead', function()
+	{
+		$scope.loadPatientFromTypeahead($scope.patientTypeahead);
+	});
+
 	//=========================================================================
 	// Public methods
 	//=========================================================================/
@@ -470,8 +550,8 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		}
 		$scope.preview_patient_image = file;
 		$scope.new_photo = true;
-		$scope.patient.has_photo = true;
-		$scope.patient.uploadPhoto(file);
+		$scope.demographicModel.hasPhoto = true;
+		$scope.demographicModel.uploadPhoto(file);
 	};
 
 	$scope.isWorking = function isWorking()
@@ -486,20 +566,13 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	$scope.isPatientSelected = function isPatientSelected()
 	{
-		return Juno.Common.Util.exists($scope.patient.uuid);
+		return Juno.Common.Util.exists($scope.demographicModel.demographicNo);
 	};
 
 	$scope.clearPatient = function clearPatient()
 	{
 		$scope.autocompleteValues.patient = null;
-		$scope.patient.clear();
-	};
-
-	$scope.onSelectPatient = function onSelectPatient($item, $model, $label, $event)
-	{
-		// $item is a Patient pojo
-		$scope.patient.uuid = $item.data[$item.value_field];
-		$scope.patient.fillData($item.data);
+		$scope.demographicModel.clear();
 	};
 
 	$scope.setEventLength = function setEventLength(minutes)
@@ -522,15 +595,15 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			$scope.working = false;
 		}, function()
 		{
-			if(!$scope.displayMessages.hasStandardErrors())
+			if(!$scope.displayMessages.has_standard_errors())
 			{
-				$scope.displayMessages.addGenericFatalError();
+				$scope.displayMessages.add_generic_fatal_error();
 			}
 			$scope.working = false;
 		});
 	};
 
-	$scope.delete = function()
+	$scope.del = function del()
 	{
 		$scope.working = true;
 		$scope.deleteEvent().then(function()
@@ -540,7 +613,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			$scope.working = false;
 		}, function()
 		{
-			$scope.displayMessages.addGenericFatalError();
+			$scope.displayMessages.add_generic_fatal_error();
 			$scope.working = false;
 		});
 	};
@@ -566,10 +639,10 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			$scope.parentScope.openCreateInvoice(
 				$scope.eventUuid,
 				$scope.schedule.uuid,
-				$scope.patient.uuid);
+				$scope.demographicModel.demographicNo);
 		}, function()
 		{
-			$scope.displayMessages.addGenericFatalError();
+			$scope.displayMessages.add_generic_fatal_error();
 			$scope.working = false;
 		});
 	};
@@ -591,7 +664,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	$scope.modify_patient = function modify_patient()
 	{
-		if(!$scope.patient.uuid)
+		if(!$scope.demographicModel.demographicNo)
 		{
 			return;
 		}
@@ -605,11 +678,48 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	};
 
 	// for callback on create/edit patient modal
-	$scope.onPatientModalSave = function onPatientModalSave(uuid)
+	$scope.onPatientModalSave = function onPatientModalSave(demographicNo)
 	{
 		// load the newly created/updated patient
-		$scope.patient.uuid = uuid;
+		$scope.demographicModel.demographicNo = demographicNo;
 		$scope.initPatientAutocomplete();
+	};
+
+	$scope.searchPatients = function searchPatients(term)
+	{
+		var search = {
+			type: 'Name',
+			'term': term,
+			status: 'active',
+			integrator: false,
+			outofdomain: true
+		};
+		return demographicsService.search(search, 0, 25).then(
+			function(results)
+			{
+				var resp = [];
+				for (var x = 0; x < results.content.length; x++)
+				{
+					resp.push(
+						{
+							demographicNo: results.content[x].demographicNo,
+							name: Juno.Common.Util.formatName(
+								results.content[x].firstName, results.content[x].lastName)
+						});
+				}
+				return resp;
+			},
+			function error(errors)
+			{
+				console.log(errors);
+			});
+	};
+
+	$scope.selectPatient = function selectPatient(item, model, label)
+	{
+		console.log(item);
+		console.log(model);
+		console.log(label);
 	};
 
 	//=========================================================================
@@ -645,6 +755,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			target: null
 		}
 	};
-	$scope.keyBinding.bind_key_global("ctrl+enter", $scope.keyBindSettings["ctrl+enter"]);
-	$scope.keyBinding.bind_key_global("ctrl+shift+enter", $scope.keyBindSettings["ctrl+shift+enter"]);
+	$scope.keyBinding.bindKeyGlobal("ctrl+enter", $scope.keyBindSettings["ctrl+enter"]);
+	$scope.keyBinding.bindKeyGlobal("ctrl+shift+enter", $scope.keyBindSettings["ctrl+shift+enter"]);
 }]);

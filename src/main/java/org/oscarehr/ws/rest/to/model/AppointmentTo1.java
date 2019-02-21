@@ -305,7 +305,7 @@ public class AppointmentTo1 implements Serializable {
 	public void setProvider(Provider provider) {
 		this.provider = provider;
 	}
-	
-	
+
+
 
 }

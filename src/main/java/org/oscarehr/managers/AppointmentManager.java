@@ -43,6 +43,7 @@ import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.TransactionSystemException;
 import oscar.log.LogAction;
 
 @Service
@@ -137,7 +138,7 @@ public class AppointmentManager {
 
 	/**
 	 * Returns appointment for display.
-	 * 
+	 *
 	 * @param loggedInInfo
 	 * @param appointment - appointment data
 	 */
@@ -151,17 +152,34 @@ public class AppointmentManager {
 		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.saveAppointment", "id=" + appointment.getId());
 	}
 
-	public void updateAppointment(LoggedInInfo loggedInInfo, Appointment appointment) {
+	public void updateAppointment(LoggedInInfo loggedInInfo, Appointment appointment) throws Throwable {
 		
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null)) {
 			throw new RuntimeException("Access Denied");
 		}
 
 		Appointment existing = appointmentDao.find(appointment.getId());
-		if(existing != null) {
-			appointmentArchiveDao.archiveAppointment(existing);	
+		if(existing == null) {
+			throw new RuntimeException("Attempt to update an appointment that doesn't exist");
 		}
-		appointmentDao.merge(appointment);
+
+		appointmentArchiveDao.archiveAppointment(existing);
+
+		appointment.setCreator(existing.getCreator());
+		appointment.setReasonCode(existing.getReasonCode());
+
+		try
+		{
+			logger.info(appointment.toString());
+			appointmentDao.merge(appointment);
+		}
+		catch(TransactionSystemException exception)
+		{
+			// If a transaction exception is thrown, it might have been caused by a validation error,
+			// but won't be caught by the exception mapper.
+			// XXX: maybe just throw the root cause if it's a ConstraintViolationException?
+			throw exception.getRootCause();
+		}
 
 		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.updateAppointment", "id=" + appointment.getId());
 

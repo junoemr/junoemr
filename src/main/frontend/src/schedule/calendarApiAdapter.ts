@@ -1,5 +1,6 @@
 
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
+import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import {
 	AppointmentTo1,
 	CalendarAppointmentStatus, NewAppointmentTo1, RestResponseAppointmentTo1
@@ -90,6 +91,7 @@ export class CalendarApiAdapter
 	};
 
 	scheduleApi = new ScheduleApi(this.$http, this.$httpParamSerializer, 'http://localhost:9090/ws/rs');
+    appointmentApi = new AppointmentApi(this.$http, this.$httpParamSerializer, 'http://localhost:9090/ws/rs');
 
 
 	public searchPatients(term)
@@ -649,7 +651,7 @@ export class CalendarApiAdapter
 
 
 			console.log(edit_mode);
-			this.scheduleApi.addAppointment(newAppointment).then(
+			this.appointmentApi.addAppointment(newAppointment).then(
 				function(result: IHttpResponse<RestResponseAppointmentTo1>)
 				{
 					deferred.resolve(result.data);

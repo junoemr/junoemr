@@ -107,7 +107,7 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			$scope.hasSearchButton = function hasSearchButton()
 			{
-				return angular.isFunction($scope.onAddFn());
+				return angular.isFunction($scope.onSearchFn());
 			};
 
 			$scope.hasAddButton = function hasAddButton()
@@ -127,6 +127,9 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			$scope.formatMatch = function formatMatch($model)
 			{
+				console.log("- Formatting Match -------------");
+				console.log($model);
+				console.log("--------------------------------");
 				if (!Juno.Common.Util.exists($model))
 				{
 					return null;

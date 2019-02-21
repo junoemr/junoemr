@@ -23,13 +23,23 @@
  */
 package org.oscarehr.ws.rest.conversion;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.Demographic;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.to.model.AppointmentTo1;
 import org.springframework.beans.BeanUtils;
+import oscar.util.StringUtils;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class AppointmentConverter extends AbstractConverter<Appointment, AppointmentTo1> {
 
@@ -38,7 +48,9 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 	
 	private DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 	private ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
-	
+
+	protected Logger logger = MiscUtils.getLogger();
+
 	public AppointmentConverter() {
 		
 	}
@@ -50,7 +62,85 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 	
 	@Override
     public Appointment getAsDomainObject(LoggedInInfo loggedInInfo, AppointmentTo1 t) throws ConversionException {
-	    return null;
+		logger.info(t);
+
+
+		// XXX: incoming date is parsed as UTC, but then converted to PST (probably default time
+		//      zone for this part of the app.  This is a hack that converts it to a string in the
+		//      UTC time zone, so it is the same as what was sent, then it is parsed without time
+		//      zone information in the default time zone.
+		TimeZone timeZoneUTC = TimeZone.getTimeZone("UTC");
+
+		String format = "yyyy-MM-dd HH:mm";
+		SimpleDateFormat dateFormatterUTC = new SimpleDateFormat(format);
+		dateFormatterUTC.setTimeZone(timeZoneUTC);
+
+		SimpleDateFormat dateFormatterDefault = new SimpleDateFormat(format);
+
+		Date adjustedAppointmentDate = null;
+		Date adjustedStartDate = null;
+		Date adjustedEndDate = null;
+		try {
+			adjustedAppointmentDate = dateFormatterDefault.parse(dateFormatterUTC.format(t.getAppointmentDate()));
+			adjustedStartDate = dateFormatterDefault.parse(dateFormatterUTC.format(t.getStartTime()));
+			Date intermediateEndDate = dateFormatterDefault.parse(dateFormatterUTC.format(t.getEndTime()));
+
+			// Remove a minute from the enddate because that's how Oscar does it.
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(intermediateEndDate);
+			cal.add(Calendar.MINUTE, -1);
+			adjustedEndDate = cal.getTime();
+
+		} catch (ParseException e) {
+			logger.warn("Cannot parse new appointment dates");
+			throw new ConversionException("Could not parse date/times of appointment. please check format");
+		}
+
+		Demographic demographic = demographicDao.getDemographicById(t.getDemographicNo());
+
+		// Copy the defaults from the old frontend
+		int demographicNo = 0;
+		String demographicName = "";
+		if (demographic != null)
+		{
+			demographicNo = demographic.getDemographicNo();
+			demographicName = demographic.getFormattedName();
+		}
+
+		String resources = StringUtils.transformNullInEmptyString(t.getResources());
+		String type = StringUtils.transformNullInEmptyString(t.getType());
+		String urgency = StringUtils.transformNullInEmptyString(t.getUrgency());
+
+		Appointment appointment = new Appointment();
+
+		appointment.setId(t.getId());
+
+		appointment.setProviderNo(t.getProviderNo());
+		appointment.setAppointmentDate(adjustedAppointmentDate);
+		appointment.setStartTime(adjustedStartDate);
+		appointment.setEndTime(adjustedEndDate);
+		appointment.setName(demographicName);
+		appointment.setDemographicNo(demographicNo);
+		appointment.setProgramId(t.getProgramId());
+		appointment.setNotes(t.getNotes());
+		appointment.setReason(t.getReason());
+		appointment.setLocation(t.getLocation());
+		appointment.setResources(resources);
+		appointment.setType(type);
+		appointment.setStyle(t.getStyle());
+		appointment.setBilling(t.getBilling());
+		appointment.setStatus(t.getStatus());
+		appointment.setImportedStatus(t.getImportedStatus());
+		appointment.setCreateDateTime(t.getCreateDateTime());
+		appointment.setUpdateDateTime(t.getUpdateDateTime());
+		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
+		appointment.setRemarks(t.getRemarks());
+		appointment.setUrgency(urgency);
+		appointment.setCreatorSecurityId(t.getCreatorSecurityId());
+		appointment.setBookingSource(t.getBookingSource());
+		appointment.setReasonCode(t.getReasonCode());
+
+		return appointment;
     }
 
 	@Override
