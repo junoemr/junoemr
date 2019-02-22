@@ -110,7 +110,7 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
     <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0.min.js"></script>
     <script type="text/javascript" src="<%=request.getContextPath() %>/js/juno-jquery-plugin.js"></script>
     <script type="text/javascript" src="./OscarFormHelpers.js"></script>
-    <link href= "<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0/themes/vader/jquery-ui.min.css" rel="stylesheet">
+    <link href= "<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0/themes/smoothness/jquery-ui.min.css" rel="stylesheet">
 
     <style type="text/css">
         <!--
@@ -308,16 +308,21 @@ function calcBMIMetric() {
         document.forms[0].target = "";
         document.forms[0].action = "/<%=project_home%>/form/formname.do" ;
 	}
+
     function onPrint() {
         document.forms[0].submit.value="print"; 
-        var ret = checkAllDates();
-        if(ret==true)
+
+        if(checkAllDates())
         {            
             document.forms[0].action = "../form/createpdf?__title=British+Columbia+Antenatal+Record+Part+2&__cfgfile=bcar2PrintCfgPg2_2007&__cfgGraphicFile=bcar2PrintGraphCfgPg1_2007&__template=bcar2_2007";
-            document.forms[0].target="_blank";            
+            document.forms[0].target="_blank";
+
+            return true;
         }
-       return ret;
+
+       return false;
     }
+
     function onPrint12() {
         document.forms[0].submit.value="printAll"; 
                 
@@ -326,6 +331,7 @@ function calcBMIMetric() {
         
         return true;
     }
+
     function onPrintAll() {
         document.forms[0].submit.value="printAll"; 
                 
@@ -350,26 +356,21 @@ function calcBMIMetric() {
     }
 
     function onSave() {
-
         document.forms[0].submit.value="save";
-        var ret = checkAllDates();
-        ret = checkAllNumber();
-        if(ret==true) {
+        if(checkAllDates() && checkAllNumber()) {
             reset();
-            ret = confirm("Are you sure you want to save this form?");
+            return confirm("Are you sure you want to save this form?");
         }
-        return ret;
+        return false;
     }
 
     function onSaveExit() {
         document.forms[0].submit.value="exit";
-        var ret = checkAllDates();
-        ret = checkAllNumber();
-        if(ret == true) {
+        if(checkAllDates() && checkAllNumber()) {
             reset();
-            ret = confirm("Are you sure you wish to save and close this window?");
+            return confirm("Are you sure you wish to save and close this window?");
         }
-        return ret;
+        return false;
     }
     function popupPage(varpage) {
         windowprops = "height=700,width=960"+

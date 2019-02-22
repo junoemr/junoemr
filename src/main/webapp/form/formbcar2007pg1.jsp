@@ -273,14 +273,14 @@ function calcBMIMetric() {
 	}
     function onPrint() {
         document.forms[0].submit.value="print"; 
-        var ret = checkAllDates();
 
-        if(ret==true)
+        if(checkAllDates())
         {
             document.forms[0].action = "../form/createpdf?__title=British+Columbia+Antenatal+Record+Part+1&__cfgfile=bcar1PrintCfgPg1_2007&__template=bcar1_2007";
-            document.forms[0].target="_blank";            
+            document.forms[0].target="_blank";
+            return true;
         }
-        return ret;
+        return false;
     }
     function onPrint12() {
         document.forms[0].submit.value="printAll"; 
@@ -299,35 +299,35 @@ function calcBMIMetric() {
         return true;
     }
     function onPrintRisk() {
-        document.forms[0].submit.value="print"; 
-        var ret = checkAllDates();
-        if(ret==true)
+        document.forms[0].submit.value="print";
+        if(checkAllDates())
         {
             document.forms[0].action = "../form/createpdf?__title=British+Columbia+Antenatal+Record+Part+2&__cfgfile=bcar1PrintCfgPg2_2007&__template=bcarRisk_2007";
-            document.forms[0].target="_blank";            
+            document.forms[0].target="_blank";
+            return true;
         }
-        return ret;
+        return false;
     }
     function onSave() {
         document.forms[0].submit.value="save";
-        var ret = checkAllDates();
-        if(ret==true)
+
+        if(checkAllDates())
         {
             reset();
-            ret = confirm("Are you sure you want to save this form?");
+            return confirm("Are you sure you want to save this form?");
         }
-        return ret;
+        return false;
     }
     
     function onSaveExit() {
         document.forms[0].submit.value="exit";
-        var ret = checkAllDates();
-        if(ret == true)
+
+        if(checkAllDates())
         {
             reset();
-            ret = confirm("Are you sure you wish to save and close this window?");
+            return confirm("Are you sure you wish to save and close this window?");
         }
-        return ret;
+        return false
     }
     function popupPage(varpage) {
         windowprops = "height=700,width=960"+
