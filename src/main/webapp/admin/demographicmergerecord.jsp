@@ -241,7 +241,7 @@ Search:
 
 if(!mergedSearch) {
 	if(searchMode.equals("search_name")) {
-		demoList = demographicDao.searchDemographicByName(keyword, limit, offset, providerNo, outOfDomain);
+		demoList = demographicDao.searchDemographicByName(keyword, limit, offset, providerNo, outOfDomain, false);
 	}
 	else if(searchMode.equals("search_dob")) {
 		demoList = demographicDao.searchDemographicByDOB(keyword, limit, offset, providerNo, outOfDomain);

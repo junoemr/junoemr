@@ -103,13 +103,13 @@ public class SearchDemographicAutoCompleteAction extends Action {
             pstatus = pstatus.replaceAll("'","").replaceAll("\\s", "");
             List<String>stati = Arrays.asList(pstatus.split(","));
 
-        	list = demographicDao.searchDemographicByNameAndNotStatus(searchStr, stati, 100, 0, providerNo, outOfDomain);
+        	list = demographicDao.searchDemographicByNameAndNotStatus(searchStr, stati, 100, 0, providerNo, outOfDomain, false);
         	if(list.size() == 100) {
         		MiscUtils.getLogger().warn("More results exists than returned");
         	}
         }
         else {
-        	list = demographicDao.searchDemographicByName(searchStr, 100, 0, providerNo, outOfDomain);
+        	list = demographicDao.searchDemographicByName(searchStr, 100, 0, providerNo, outOfDomain, false);
         	if(list.size() == 100) {
         		MiscUtils.getLogger().warn("More results exists than returned");
         	}

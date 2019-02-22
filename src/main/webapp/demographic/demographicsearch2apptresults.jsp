@@ -109,7 +109,7 @@
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <title><bean:message key="demographic.demographicsearch2apptresults.title" />(demographicsearch2apptresults)</title>
 
-<% 
+<%
 	if (isMobileOptimized) { 
 %>
    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, width=device-width" />
@@ -383,7 +383,7 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
 
 	if( "".equals(ptstatus) ) {
 		if(searchMode.equals("search_name")) {
-			demoList = demographicDao.searchDemographicByName(keyword, limit, offset,providerNo,outOfDomain);
+			demoList = demographicDao.searchDemographicByName(keyword, limit, offset,providerNo,outOfDomain, true);
 		}
 		else if(searchMode.equals("search_phone")) {
 			demoList = demographicDao.searchDemographicByPhone(keyword, limit, offset,providerNo,outOfDomain);
@@ -403,7 +403,7 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
 	}
 	else if( "active".equals(ptstatus) ) {
 	    if(searchMode.equals("search_name")) {
-			demoList = demographicDao.searchDemographicByNameAndNotStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
+			demoList = demographicDao.searchDemographicByNameAndNotStatus(keyword, stati, limit, offset,providerNo,outOfDomain, true);
 		}
 	    else if(searchMode.equals("search_phone")) {
 			demoList = demographicDao.searchDemographicByPhoneAndNotStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
@@ -423,7 +423,7 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
 	}
 	else if( "inactive".equals(ptstatus) ) {
 	    if(searchMode.equals("search_name")) {
-			demoList = demographicDao.searchDemographicByNameAndStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
+			demoList = demographicDao.searchDemographicByNameAndStatus(keyword, stati, limit, offset,providerNo,outOfDomain, true);
 		}
 	    else if(searchMode.equals("search_phone")) {
 			demoList = demographicDao.searchDemographicByPhoneAndStatus(keyword, stati, limit, offset,providerNo,outOfDomain);
@@ -446,8 +446,6 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
 	    //out.println("failed!!!");
 	} 
 	else {
-		Collections.sort(demoList, Demographic.LastNameComparator);
-		
 		DemographicMerged dmDAO = new DemographicMerged();
 	
 		for(Demographic demo : demoList) {
