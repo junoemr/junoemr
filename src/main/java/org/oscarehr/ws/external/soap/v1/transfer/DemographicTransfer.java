@@ -94,6 +94,7 @@ public final class DemographicTransfer {
 	private String countryOfOrigin;
 	private String newsletter;
 	private String veteranNo;
+	private String notes;
 
 	
 	public Integer getDemographicNo() {
@@ -542,6 +543,16 @@ public final class DemographicTransfer {
 	public void setVeteranNo(String veteranNo)
 	{
 		this.veteranNo = veteranNo;
+	}
+
+	public void setNotes(String notes)
+	{
+		this.notes = notes;
+	}
+
+	public String getNotes()
+	{
+		return notes;
 	}
 
 	public static DemographicTransfer toTransfer(Demographic demographic) {
