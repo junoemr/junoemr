@@ -406,7 +406,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 
 		if(orderByLastFirstName)
 		{
-			queryString += "ORDER BY d.LastName, d.FirstName";
+			queryString += " ORDER BY d.LastName, d.FirstName ";
 		}
 
 		Session session = this.getSession();
