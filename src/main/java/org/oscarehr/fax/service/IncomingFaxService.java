@@ -64,6 +64,7 @@ public class IncomingFaxService
 		document.setDocCreator(ProviderData.SYSTEM_PROVIDER_NO);
 		document.setResponsible(ProviderData.SYSTEM_PROVIDER_NO);
 		document.setDocdesc("");
+		document.setDocfilename("-" + faxAccount.getIntegrationType() + "-" + referenceId + ".pdf");
 
 		document = documentService.uploadNewDemographicDocument(document, documentStream, null);
 		documentService.routeToGeneralInbox(document.getDocumentNo());
