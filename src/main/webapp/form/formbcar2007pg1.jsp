@@ -271,6 +271,7 @@ function calcBMIMetric() {
         document.forms[0].target = "";
         document.forms[0].action = "/<%=project_home%>/form/formname.do" ;
 	}
+
     function onPrint() {
         document.forms[0].submit.value="print"; 
 
@@ -308,25 +309,29 @@ function calcBMIMetric() {
         }
         return false;
     }
-    function onSave() {
-        document.forms[0].submit.value="save";
 
-        if(checkAllDates())
+    function onSave() {
+        if(checkAllDates() && confirm("Are you sure you wish to save this form?"))
         {
+            var $links = $('a:not([href^="javascript:"])');
+            Oscar.FormHelpers.disableLinks($links);
+            document.forms[0].submit.value="save";
             reset();
-            return confirm("Are you sure you want to save this form?");
+            return true;
         }
+
         return false;
     }
     
     function onSaveExit() {
         document.forms[0].submit.value="exit";
 
-        if(checkAllDates())
+        if(checkAllDates() && confirm("Are you sure you wish to save and close this window?"))
         {
             reset();
-            return confirm("Are you sure you wish to save and close this window?");
+            return true;
         }
+
         return false
     }
     function popupPage(varpage) {
@@ -552,13 +557,6 @@ $(document).ready(function()
 	{
 	    var $link = $(this);
         Oscar.FormHelpers.safeLink($link, $form);
-	});
-
-    var $saveButtons = $('input[name="saveButton"]');
-    $.each($saveButtons, function()
-	{
-	    var $saveButton = $(this);
-        Oscar.FormHelpers.safeSave($saveButton, $links);
 	});
 
 	var $exitButtons = $('input[name="exitButton"]')
@@ -927,9 +925,8 @@ $(document).ready(function()
 			<td align="left">
 			<%
             if (!bView) {
-            %> <input type="submit" name="saveButton" style="width: 40px;" value="Save"
-				onclick="javascript:return onSave();" /> <input type="submit"
-				value="Save and Exit" onclick="javascript:return onSaveExit();" /> <%
+            %> <input type="submit" name="saveButton" style="width: 40px;" value="Save" onclick="javascript:return onSave()"/>
+				<input type="submit" value="Save and Exit" onclick="javascript:return onSaveExit();" /> <%
             }
             %> <input type="submit" name="exitButton" style="width: 40px;" value="Exit"/>
 				<input type="submit" style="width: 50px;" value="Print"
@@ -2288,7 +2285,7 @@ $(document).ready(function()
             <%
             if (!bView) {
             %>
-            <input type="submit" name="saveButton" style="width:40px;" value="Save" onclick="javascript:return onSave();" />
+            <input type="submit" name="saveButton" style="width:40px;" value="Save" onclick="javascript:return onSave()"/>
             <input type="submit" value="Save and Exit" onclick="javascript:return onSaveExit();"/>
             <%
             }

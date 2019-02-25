@@ -356,10 +356,15 @@ function calcBMIMetric() {
     }
 
     function onSave() {
-        document.forms[0].submit.value="save";
-        if(checkAllDates() && checkAllNumber()) {
+
+        if(checkAllDates() && checkAllNumber() && confirm("Are you sure you want to save this form?")) {
+
+            var $links = $('a:not([href^="javascript:"])');
+            Oscar.FormHelpers.disableLinks($links);
+
+            document.forms[0].submit.value="save";
             reset();
-            return confirm("Are you sure you want to save this form?");
+            return true;
         }
         return false;
     }
@@ -734,13 +739,6 @@ if (!fedb.equals("") && fedb.length()==10 ) {
         {
             var $link = $(this);
             Oscar.FormHelpers.safeLink($link, $form);
-        });
-
-        var $saveButtons = $('input[name="saveButton"]');
-        $.each($saveButtons, function()
-        {
-            var $saveButton = $(this);
-            Oscar.FormHelpers.safeSave($saveButton, $links);
         });
 
         var $exitButtons = $('input[name="exitButton"]');

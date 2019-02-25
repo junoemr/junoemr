@@ -60,46 +60,16 @@ Oscar.FormHelpers.safeClose = function alertDirtyBeforeClose($closeInput, $form)
 };
 
 /**
- * Adds a click event handler to all specified link elements when the save button is clicked. The handler disables the
- * link from firing.  The links will fire again normally when the page is refreshed automatically after the data is saved/
- * @param $saveInput jQuery save input
+ * Disable all link elements when called
  * @param $linkArray jQuery links to disable
  */
-Oscar.FormHelpers.safeSave = function disableLinksOnSave($saveInput, $linkArray)
+Oscar.FormHelpers.disableLinks = function disableLinks($linkArray)
 {
-    $saveInput.on("click",function() {
-        $.each($linkArray, function() {
-            var $link = $(this);
-            $link.on("click", function (event)
-            {
-                event.preventDefault();
-            })
-        })
-    })
-};
-
-/**
- * Prompt a confirmation dialog if the page is dirty and the window is closed.
- *
- * NOTE:  Most modern browsers will recognize the confirm prompt, but will override it with their own built-in prompt
- * due to safety/user experience issues.  Therefore, the message displayed will probably not be the one coded below.
- * Regardless, the functionality is equivalent.
- *
- * Overrides tested:
- * Firefox 61.0, Chrome 69.0 - Prompt on dirty state only
- * Safari 9.1.3 - Prompt on both clean and dirty states
- */
-Oscar.FormHelpers.safeWindow = function alertDirtyBeforeWindowClose()
-{
-    console.log("blah blah");
-    window.onbeforeunload = function() {
-        // .juno_isChanged will not necessarily work here.  We can edit a form field, then click the window close
-        // without clicking on another element.  Without the blur event, the jQuery change handler will not fire.
-        // The browser itself is capable of detecting the dirty state properly in 2/3 of cases (see method doc),
-        // so we will just let it do the work for us.
-
-        return confirm('Are you sure you want to navigate away from this page without saving your changes?');
-    }
+    $.each($linkArray, function() {
+        var $link = $(this);
+        $link.off("click");
+        $link.on("click", function() { return false; })
+    });
 };
 
 /**
