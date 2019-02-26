@@ -34,7 +34,9 @@
 <%@ page import="org.oscarehr.common.model.ReportProvider" %>
 <%@ page import="org.oscarehr.common.dao.ReportProviderDao" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
-
+<%@ page import="org.oscarehr.billing.CA.search.BillingCriteriaSearch" %>
+<%@ page import="org.oscarehr.common.dao.BillingDao" %>
+<%@ page import="org.oscarehr.common.model.Billing" %>
 
 <%
 	ReportProviderDao reportProviderDao = SpringUtils.getBean(ReportProviderDao.class);
@@ -91,9 +93,11 @@
 		header_values.add("TIME");
 		header_values.add("PATIENT");
 		header_values.add("DESCRIPTION");
+		header_values.add("ACCOUNT");
 		header_values.add("COMMENTS");
 
 		DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+		BillingDao billingDao = SpringUtils.getBean(BillingDao.class);
 		OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 		List<Appointment> unBilledAppointments = 
 			appointmentDao.findPatientUnbilledAppointmentsByProviderAndAppointmentDate(
@@ -124,6 +128,8 @@
 			prop.setProperty("DESCRIPTION", reason);
 
 			prop.setProperty("COMMENTS", note);
+
+			setAccountField(action, unBilledAppointment, billingDao, demographicDao, session, prop);
 			column_values.add(prop);
 		}
 	}
@@ -137,6 +143,7 @@
 
 
 		DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+		BillingDao billingDao = SpringUtils.getBean(BillingDao.class);
 		OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 		List<Appointment> billedAppointments = 
 			appointmentDao.findPatientBilledAppointmentsByProviderAndAppointmentDate(
@@ -166,20 +173,124 @@
 
 			prop.setProperty("DESCRIPTION", reason);
 
-			String clinicaid_link = "../../billing/billingClinicAid.jsp?" + 
-				"billing_action=create_invoice&" +
-				"demographic_no=" + demographic_no + "&service_start_date=" + 
-				URLEncoder.encode(service_start_date, "UTF-8") +
-				"&appointment_no=" + appointment_no +
-				"&appointment_provider_no=" + provider_no +
-				"&chart_no=" +
-				"&appointment_start_time=" + appointment_start_time;
-
-			String billing_url = "<a href=# onClick='popupPage(700,720, \"" +
-				clinicaid_link + "\"); return false;'>Bill</a>";
-
-			prop.setProperty("ACCOUNT", billing_url);
+			setAccountField(action, billedAppointment, billingDao, demographicDao, session, prop);
 			column_values.add(prop);
+		}
+	}
+%>
+
+<%!
+	public void setAccountField (String apptType, Appointment appt, BillingDao billingDao, DemographicDao demoDao, HttpSession session, Properties prop)
+	{
+		try
+		{
+			String demographic_name = "";
+			String referralNo = "";
+
+			OscarProperties oscarProps = OscarProperties.getInstance();
+			Demographic demographic = demoDao.getDemographic(Integer.toString(appt.getDemographicNo()));
+			if (demographic == null )
+			{
+				demographic_name = "unkown";
+			}
+			else
+			{
+				demographic_name = demographic.getFullName();
+			}
+
+			if(oscar.OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc"))
+			{
+				String rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
+				rdohip = rdohip !=null ? rdohip : "" ;
+				referralNo = "&referral_no_1=" + rdohip;
+			}
+
+			// configure billing link depending on instance billing mode
+			if (oscarProps.isClinicaidBillingType())
+			{// clinicaid billing link always the same
+				String billing_url = "../../../billing.do?" +
+						"billRegion=" + oscarProps.getProperty("billing_type") +
+						"&billForm=NEU" +
+						"&hotclick=" +
+						"&appointment_no=" + appt.getId() +
+						"&demographic_name=" + URLEncoder.encode(demographic_name, "UTF-8") +
+						"&demographic_no=" + appt.getDemographicNo() +
+						"&providerview=11" +
+						"&user_no=" + session.getAttribute("user")+
+						"&apptProvider_no=" + appt.getProviderNo() +
+						"&appointment_date=" + appt.getAppointmentDate() +
+						"&start_time=" + appt.getStartTime() +
+						"&bNewForm=1" +
+						"&referral_no_1=" + referralNo;
+
+				String billing_el = "<a href=# onClick='popupPage(700,1000, \"" +
+						billing_url + "\"); return false;'>Bill</a>";
+				prop.setProperty("ACCOUNT", billing_el);
+			}
+			else if ("billed".equals(apptType) && (oscarProps.isBritishColumbiaBillingType() || oscarProps.isOntarioBillingType()))
+			{// both ON and BC use the same link if report is a "billed" report
+				BillingCriteriaSearch bcs = new BillingCriteriaSearch();
+				bcs.setAppointmentNo(appt.getId());
+				bcs.setOrderBy(BillingCriteriaSearch.ORDER_BY.UPDATE_DATE);
+				List<Billing> bills = billingDao.criteriaSearch(bcs);
+
+				if (bills.size() > 0)
+				{
+					prop.setProperty("ACCOUNT", "<a href='#' " +
+							"onclick='popupPage(700,720, \"../../../billing/CA/BC/billingView.do?billing_no=" + bills.get(bills.size() - 1).getId() +
+							"&dboperation=search_bill&hotclick=0\")'> Bill </a>");
+				} else
+				{
+					MiscUtils.getLogger().warn("appointment [" + appt.getId() + "] does not map to a bill.");
+				}
+			}
+			else if ("unbilled".equals(apptType))
+			{
+				if (oscarProps.isBritishColumbiaBillingType())
+				{// link to BC billing page
+					String billing_url = "../../../billing.do?" +
+							"billRegion=" + oscarProps.getProperty("billing_type") +
+							"&billForm=" + oscarProps.getProperty("default_view") +
+							"&hotclick=" +
+							"&appointment_no=" + appt.getId() +
+							"&demographic_name=" + URLEncoder.encode(demographic_name, "UTF-8") +
+							"&demographic_no=" + appt.getDemographicNo() +
+							"&status=" + appt.getStatus() +
+							"&user_no=" + session.getAttribute("user") +
+							"&apptProvider_no=" + appt.getProviderNo() +
+							"&appointment_date=" + appt.getAppointmentDate() +
+							"&start_time=" + appt.getStartTime() +
+							"&bNewForm=1";
+
+					String billing_el = "<a href=# onClick='popupPage(700,1000, \"" +
+							billing_url + "\"); return false;'>Bill</a>";
+					prop.setProperty("ACCOUNT", billing_el);
+				}
+				else if (oscarProps.isOntarioBillingType())
+				{// link to ON billing page
+					String billing_url = "../ON/billingOB.jsp?" +
+							"billForm=" + oscarProps.getProperty("default_view")  +
+							"&hotclick=" +
+							"&appointment_no=" + appt.getId() +
+							"&demographic_name=" + URLEncoder.encode(demographic_name, "UTF-8") +
+							"&demographic_no=" + appt.getDemographicNo() +
+							"&user_no=" + session.getAttribute("user") +
+							"&apptProvider_no=" + appt.getProviderNo() +
+							"&appointment_date=" + appt.getAppointmentDate() +
+							"&start_time=" + appt.getStartTime() +
+							"&bNewForm=1" +
+							"&referral_no_1=" + referralNo;
+
+					String billing_el = "<a href=# onClick='popupPage(700,1000, \"" +
+							billing_url + "\"); return false;'>Bill</a>";
+					prop.setProperty("ACCOUNT", billing_el);
+				}
+			}
+
+		}
+		catch (java.io.UnsupportedEncodingException e)
+		{
+			MiscUtils.getLogger().error(e.getMessage());
 		}
 	}
 %>
@@ -188,10 +299,12 @@
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="org.oscarehr.common.model.Site"%>
 <%@page import="org.oscarehr.common.model.Provider"%>
-<%@page import="org.apache.commons.lang.StringUtils"%><html>
+<%@page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
+<html>
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<title>Clinicaid Billed Appointment Report</title>
+<title>Billed Appointment Report</title>
 <link rel="stylesheet" href="../../../web.css">
 <link rel="stylesheet" type="text/css" media="all" href="../../../share/css/extractedFromPages.css"  />
 <!-- calendar stylesheet -->
