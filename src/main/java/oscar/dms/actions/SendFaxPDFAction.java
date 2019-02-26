@@ -32,6 +32,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.fax.exception.FaxException;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.LoggedInInfo;
@@ -82,66 +83,74 @@ public class SendFaxPDFAction extends DispatchAction {
 	
 		request.setAttribute("docNo", docNoArray);
 		request.setAttribute("faxRecipients", recipients);
-		Set<String> faxNoList = OutgoingFaxService.preProcessFaxNumbers(recipients);
 
 		String ContentDisposition=request.getParameter("ContentDisposition");
         ArrayList<Object> errorList = new ArrayList<Object>();
-        if (docNoArray != null)
-		{
-			MiscUtils.getLogger().debug("size = " + docNoArray.length);
-			EDocUtil docData = new EDocUtil();
-			for(String docNo : docNoArray)
-			{
-				String filename =  docData.getDocumentName(docNo);
-				for(String faxNo : faxNoList)
-				{
-					FaxOutboxTransferOutbound transfer;
-					try
-					{
-						GenericFile fileToCopy = FileFactory.getDocumentFile(docData.getDocumentName(docNo));
-						GenericFile fileToFax = FileFactory.copy(fileToCopy);
+        try
+        {
+	        Set<String> faxNoList = OutgoingFaxService.preProcessFaxNumbers(recipients);
+	        if(docNoArray != null)
+	        {
+		        MiscUtils.getLogger().debug("size = " + docNoArray.length);
+		        EDocUtil docData = new EDocUtil();
+		        for(String docNo : docNoArray)
+		        {
+			        String filename = docData.getDocumentName(docNo);
+			        for(String faxNo : faxNoList)
+			        {
+				        FaxOutboxTransferOutbound transfer;
+				        try
+				        {
+					        GenericFile fileToCopy = FileFactory.getDocumentFile(docData.getDocumentName(docNo));
+					        GenericFile fileToFax = FileFactory.copy(fileToCopy);
 
-						String faxFileName = "DOC-"+ docNo + "-" + filename + "-" + faxNo + "." + System.currentTimeMillis();
-						fileToFax.rename(faxFileName + ".pdf");
+					        String faxFileName = "DOC-" + docNo + "-" + filename + "-" + faxNo + "." + System.currentTimeMillis();
+					        fileToFax.rename(faxFileName + ".pdf");
 
-						transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicId, faxNo, FaxOutbound.FileType.DOCUMENT, fileToFax);
-						if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
-						{
-							errorList.add("Failed to send fax. Check account settings. " +
-									"Reason: " + transfer.getSystemStatusMessage());
-						}
-						else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED.name()))
-						{
-							errorList.add("Failed to send fax, it has been queued for automatic resend. " +
-									"Reason: " + transfer.getSystemStatusMessage());
-						}
-					}
-					catch(Exception e)
-					{
-						MiscUtils.getLogger().error(e.getClass().getCanonicalName() +
-								" occurred while preparing document fax files.", e);
-						String errorAt = " (Document: " + filename + " Recipient: " + faxNo + ")";
-						errorList.add(getUserFriendlyError(e) + errorAt);
-						continue;
-					}
+					        transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicId, faxNo, FaxOutbound.FileType.DOCUMENT, fileToFax);
+					        if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
+					        {
+						        errorList.add("Failed to send fax. Check account settings. " +
+								        "Reason: " + transfer.getSystemStatusMessage());
+					        }
+					        else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED.name()))
+					        {
+						        errorList.add("Failed to send fax, it has been queued for automatic resend. " +
+								        "Reason: " + transfer.getSystemStatusMessage());
+					        }
+				        }
+				        catch(Exception e)
+				        {
+					        MiscUtils.getLogger().error(e.getClass().getCanonicalName() +
+							        " occurred while preparing document fax files.", e);
+					        String errorAt = " (Document: " + filename + " Recipient: " + faxNo + ")";
+					        errorList.add(getUserFriendlyError(e) + errorAt);
+					        continue;
+				        }
 
-					/* -- OHSUPPORT-2932 -- */
-					if(OscarProperties.getInstance().isPropertyActive(
-						"encounter_notes_add_fax_notes_consult") && !demoNo.equals("-1"))
-					{
-						MiscUtils.getLogger().info("SAVING NOTE FOR " + demoNo);
-						String programNo = 
-							new EctProgram(request.getSession()).getProgram(providerNo);
-						FaxUtils.addFaxDocumentEncounterNote(demoNo, providerNo, 
-							programNo, faxNo, Long.valueOf(docNo));
-					}
-				}
-			}
-			if (errorList.size() != 0)
-			{
-				request.setAttribute("printError", true);
-			}
+				        /* -- OHSUPPORT-2932 -- */
+				        if(OscarProperties.getInstance().isPropertyActive(
+						        "encounter_notes_add_fax_notes_consult") && !demoNo.equals("-1"))
+				        {
+					        MiscUtils.getLogger().info("SAVING NOTE FOR " + demoNo);
+					        String programNo =
+							        new EctProgram(request.getSession()).getProgram(providerNo);
+					        FaxUtils.addFaxDocumentEncounterNote(demoNo, providerNo,
+							        programNo, faxNo, Long.valueOf(docNo));
+				        }
+			        }
+		        }
+	        }
         }
+        catch(FaxException e)
+        {
+	        errorList.add(e.getUserFriendlyMessage());
+        }
+
+		if (errorList.size() != 0)
+		{
+			request.setAttribute("printError", true);
+		}
 		
 		request.setAttribute("errors", errorList);
         return mapping.findForward("success");
@@ -154,39 +163,49 @@ public class SendFaxPDFAction extends DispatchAction {
 		{
 			return mapping.findForward("failed");
 		}
-		String providerNo = LoggedInInfo.getLoggedInInfoFromRequest(request).getLoggedInProviderNo();
+		String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 
 		String[] recipients = request.getParameterValues("faxRecipients");
 		String pdfPath = (String) request.getAttribute("pdfPath");
 		String formName = (String) request.getAttribute("formName");
+		String demographicNoStr = (String) request.getAttribute("demographicNo");
+		Integer demographicNo = Integer.parseInt(demographicNoStr);
 
 		ArrayList<Object> errorList = new ArrayList<>();
-		for (int i = 0; i < recipients.length; i++)
+		try
 		{
-			FaxOutboxTransferOutbound transfer;
-			try
+			Set<String> faxNoList = OutgoingFaxService.preProcessFaxNumbers(recipients);
+			for(String faxNo : faxNoList)
 			{
-				GenericFile fileToFax = FileFactory.getExistingFile(pdfPath);
-				fileToFax.rename("Form-" + formName);
-				transfer = outgoingFaxService.queueAndSendFax(providerNo, null, recipients[i], FaxOutbound.FileType.FORM, fileToFax);
-				if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
+				FaxOutboxTransferOutbound transfer;
+				try
 				{
-					errorList.add("Failed to send fax. Check account settings. " +
-							"Reason: " + transfer.getSystemStatusMessage());
+					GenericFile fileToFax = FileFactory.getExistingFile(pdfPath);
+					fileToFax.rename(GenericFile.getFormattedFileName("-Form-" + formName + ".pdf"));
+					transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicNo, faxNo, FaxOutbound.FileType.FORM, fileToFax);
+					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
+					{
+						errorList.add("Failed to send fax. Check account settings. " +
+								"Reason: " + transfer.getSystemStatusMessage());
+					}
+					else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED.name()))
+					{
+						errorList.add("Failed to send fax, it has been queued for automatic resend. " +
+								"Reason: " + transfer.getSystemStatusMessage());
+					}
 				}
-				else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED.name()))
+				catch(Exception e)
 				{
-					errorList.add("Failed to send fax, it has been queued for automatic resend. " +
-							"Reason: " + transfer.getSystemStatusMessage());
+					MiscUtils.getLogger().error(e.getClass().getCanonicalName() +
+							" occurred while preparing form fax files. ", e);
+					String errorAt = " (Form: " + formName + " Recipient: " + faxNo + ")";
+					errorList.add(getUserFriendlyError(e) + errorAt);
 				}
 			}
-			catch (Exception e)
-			{
-				MiscUtils.getLogger().error(e.getClass().getCanonicalName() +
-						" occurred while preparing form fax files. ", e);
-				String errorAt = " (Form: " + formName + " Recipient: " + recipients[i] + ")";
-				errorList.add(getUserFriendlyError(e) + errorAt);
-			}
+		}
+		catch(FaxException e)
+		{
+			errorList.add(e.getUserFriendlyMessage());
 		}
 
 		request.setAttribute("errors", errorList);
@@ -199,7 +218,7 @@ public class SendFaxPDFAction extends DispatchAction {
 		{
 			return e.getMessage();
 		}
-		if (e instanceof  FileNotFoundException)
+		if (e instanceof FileNotFoundException)
 		{
 			return "Cannot find file to fax.";
 		}
