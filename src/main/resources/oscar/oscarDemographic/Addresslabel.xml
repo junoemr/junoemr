@@ -5,7 +5,7 @@
 	columnWidth="200" leftMargin="15" rightMargin="0" topMargin="0"
 	bottomMargin="4">
 	<reportFont name="sansserif" isDefault="false" fontName="sansserif"
-		size="10" isBold="false" isItalic="false" isUnderline="false"
+		isBold="false" isItalic="false" isUnderline="false"
 		isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252"
 		isPdfEmbedded="false" />
 	<parameter name="demo" class="java.lang.String">
@@ -29,24 +29,20 @@
 				<reportElement positionType="Float" mode="Opaque" x="0"
 					y="10" width="330" height="14" />
 				<textElement>
-					<font size="10" isBold="true" />
+					<font isBold="true" />
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{first_name} + " " + $F{last_name}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement positionType="Float" mode="Opaque" x="0"
 					y="25" width="330" height="14" />
-				<textElement>
-					<font size="10" />
-				</textElement>
+				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{address}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement positionType="Float" mode="Opaque" x="0"
 					y="38" width="330" height="14" />
-				<textElement>
-					<font size="10" />
-				</textElement>
+				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{city} + "," + $F{province} + " " + $F{postal}]]></textFieldExpression>
 			</textField>
 
