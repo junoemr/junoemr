@@ -276,4 +276,11 @@ public class SiteDao extends AbstractDao<Site> {
 		} catch (Exception e) {}
 		return null;
 	}
+
+	public Site findByShortName(String sname)
+	{
+		Query query = entityManager.createQuery("select site from Site site where site.shortName = ?1");
+		query.setParameter(1, sname);
+		return getSingleResultOrNull(query);
+	}
 }
