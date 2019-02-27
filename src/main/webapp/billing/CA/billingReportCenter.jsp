@@ -22,6 +22,6 @@ if(
 	((String)session.getAttribute("userrole")).indexOf("admin") >=0 ||
 	((String)session.getAttribute("userrole")).indexOf("doctor") >=0) 
 {
-	response.sendRedirect("billingClinicaidReport.jsp");
+	response.sendRedirect("billingReport.jsp");
 }
 %>

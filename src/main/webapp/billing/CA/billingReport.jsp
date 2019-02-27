@@ -87,14 +87,22 @@
 		end_date = new Date(xml_appointment_date);
 	}
 
+	// page headers
+	final String HEADER_SERVICE_DATE   	= "SERVICE_DATE";
+	final String HEADER_TIME			= "TIME";
+	final String HEADER_PATIENT			= "PATIENT";
+	final String HEADER_DESCRIPTION		= "DESCRIPTION";
+	final String HEADER_ACCOUNT			= "ACCOUNT";
+	final String HEADER_COMMENTS		= "COMMENTS";
+
 	if("unbilled".equals(action)) 
 	{
-		header_values.add("SERVICE DATE");
-		header_values.add("TIME");
-		header_values.add("PATIENT");
-		header_values.add("DESCRIPTION");
-		header_values.add("ACCOUNT");
-		header_values.add("COMMENTS");
+		header_values.add(HEADER_SERVICE_DATE);
+		header_values.add(HEADER_TIME);
+		header_values.add(HEADER_PATIENT);
+		header_values.add(HEADER_DESCRIPTION);
+		header_values.add(HEADER_ACCOUNT);
+		header_values.add(HEADER_COMMENTS);
 
 		DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 		BillingDao billingDao = SpringUtils.getBean(BillingDao.class);
@@ -117,17 +125,17 @@
 			String demographic_name = demographic.getFullName();
 
 			prop = new Properties();
-			prop.setProperty("SERVICE DATE", service_start_date);
-			prop.setProperty("TIME", appointment_start_time);
-			prop.setProperty("PATIENT", demographic_name);
+			prop.setProperty(HEADER_SERVICE_DATE, service_start_date);
+			prop.setProperty(HEADER_TIME, appointment_start_time);
+			prop.setProperty(HEADER_PATIENT, demographic_name);
 			
 			String status = unBilledAppointment.getStatus();
 			String reason = unBilledAppointment.getReason();
 			String note = unBilledAppointment.getNotes();
 
-			prop.setProperty("DESCRIPTION", reason);
+			prop.setProperty(HEADER_DESCRIPTION, reason);
 
-			prop.setProperty("COMMENTS", note);
+			prop.setProperty(HEADER_COMMENTS, note);
 
 			setAccountField(action, unBilledAppointment, billingDao, demographicDao, session, prop);
 			column_values.add(prop);
@@ -135,11 +143,11 @@
 	}
 	else if("billed".equals(action)) 
 	{
-		header_values.add("SERVICE DATE");
-		header_values.add("TIME");
-		header_values.add("PATIENT");
-		header_values.add("DESCRIPTION");
-		header_values.add("ACCOUNT");
+		header_values.add(HEADER_SERVICE_DATE);
+		header_values.add(HEADER_TIME);
+		header_values.add(HEADER_PATIENT);
+		header_values.add(HEADER_DESCRIPTION);
+		header_values.add(HEADER_ACCOUNT);
 
 
 		DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
@@ -163,15 +171,15 @@
 			String demographic_name = demographic.getFullName();
 
 			prop = new Properties();
-			prop.setProperty("SERVICE DATE", service_start_date);
-			prop.setProperty("TIME", appointment_start_time);
-			prop.setProperty("PATIENT", demographic_name);
+			prop.setProperty(HEADER_SERVICE_DATE, service_start_date);
+			prop.setProperty(HEADER_TIME, appointment_start_time);
+			prop.setProperty(HEADER_PATIENT, demographic_name);
 			
 			String status = billedAppointment.getStatus();
 			String reason = billedAppointment.getReason();
 			String note = billedAppointment.getNotes();
 
-			prop.setProperty("DESCRIPTION", reason);
+			prop.setProperty(HEADER_DESCRIPTION, reason);
 
 			setAccountField(action, billedAppointment, billingDao, demographicDao, session, prop);
 			column_values.add(prop);
@@ -198,7 +206,7 @@
 				demographic_name = demographic.getFullName();
 			}
 
-			if(oscar.OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc"))
+			if(oscarProps.isPropertyActive("auto_populate_billingreferral_bc"))
 			{
 				String rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(demographic.getFamilyDoctor()),"rdohip");
 				rdohip = rdohip !=null ? rdohip : "" ;
@@ -208,7 +216,7 @@
 			// configure billing link depending on instance billing mode
 			if (oscarProps.isClinicaidBillingType())
 			{// clinicaid billing link always the same
-				String billing_url = "../../../billing.do?" +
+				String billing_url = "../../billing.do?" +
 						"billRegion=" + oscarProps.getProperty("billing_type") +
 						"&billForm=NEU" +
 						"&hotclick=" +
@@ -237,7 +245,7 @@
 				if (bills.size() > 0)
 				{
 					prop.setProperty("ACCOUNT", "<a href='#' " +
-							"onclick='popupPage(700,720, \"../../../billing/CA/BC/billingView.do?billing_no=" + bills.get(bills.size() - 1).getId() +
+							"onclick='popupPage(700,720, \"../../billing/CA/BC/billingView.do?billing_no=" + bills.get(bills.size() - 1).getId() +
 							"&dboperation=search_bill&hotclick=0\")'> Bill </a>");
 				} else
 				{
@@ -248,7 +256,7 @@
 			{
 				if (oscarProps.isBritishColumbiaBillingType())
 				{// link to BC billing page
-					String billing_url = "../../../billing.do?" +
+					String billing_url = "../../billing.do?" +
 							"billRegion=" + oscarProps.getProperty("billing_type") +
 							"&billForm=" + oscarProps.getProperty("default_view") +
 							"&hotclick=" +
@@ -268,7 +276,7 @@
 				}
 				else if (oscarProps.isOntarioBillingType())
 				{// link to ON billing page
-					String billing_url = "../ON/billingOB.jsp?" +
+					String billing_url = "ON/billingOB.jsp?" +
 							"billForm=" + oscarProps.getProperty("default_view")  +
 							"&hotclick=" +
 							"&appointment_no=" + appt.getId() +
@@ -298,27 +306,26 @@
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="org.oscarehr.common.model.Site"%>
-<%@page import="org.oscarehr.common.model.Provider"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
 <html>
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <title>Billed Appointment Report</title>
-<link rel="stylesheet" href="../../../web.css">
-<link rel="stylesheet" type="text/css" media="all" href="../../../share/css/extractedFromPages.css"  />
+<link rel="stylesheet" href="../../web.css">
+<link rel="stylesheet" type="text/css" media="all" href="../../share/css/extractedFromPages.css"  />
 <!-- calendar stylesheet -->
 <link rel="stylesheet" type="text/css" media="all"
-	href="../../../share/calendar/calendar.css" title="win2k-cold-1" />
+	  href="../../share/calendar/calendar.css" title="win2k-cold-1" />
 <!-- main calendar program -->
-<script type="text/javascript" src="../../../share/calendar/calendar.js"></script>
+<script type="text/javascript" src="../../share/calendar/calendar.js"></script>
 <!-- language for the calendar -->
 <script type="text/javascript"
-	src="../../../share/calendar/lang/calendar-en.js"></script>
+	src="../../share/calendar/lang/calendar-en.js"></script>
 <!-- the following script defines the Calendar.setup helper function, which makes
 	   adding a calendar a matter of 1 or 2 lines of code. -->
 <script type="text/javascript"
-	src="../../../share/calendar/calendar-setup.js"></script>
+	src="../../share/calendar/calendar-setup.js"></script>
 <script type="text/javascript">
 <!--
 
@@ -360,13 +367,13 @@ function calToday(field) {
 			href="billingReportCenter.jsp">OSCARbilling</a></font></b></p>
 		</td>
 		<td align="right"><a href=#
-			onClick="popupPage(700,720,'../../../oscarReport/manageProvider.jsp?action=billingreport')">
+			onClick="popupPage(700,720,'../../oscarReport/manageProvider.jsp?action=billingreport')">
 		<font size="1">Manage Provider List </font></a></td>
 	</tr>
 </table>
 
 <table width="100%" border="0" bgcolor="#EEEEFF">
-	<form name="serviceform" method="post" action="billingClinicaidReport.jsp">
+	<form name="serviceform" method="post" action="billingReport.jsp">
 	<tr>
 		<td width="30%" align="center"><font size="2"> <input
 			type="radio" name="reportAction" value="unbilled"
@@ -410,11 +417,11 @@ function calToday(field) {
 			<td align="center" nowrap><font size="1"> From:</font> <input
 				type="text" name="xml_vdate" id="xml_vdate" size="10"
 				value="<%=xml_vdate%>"> <font size="1"> <img
-				src="../../../images/cal.gif" id="xml_vdate_cal"> To:</font> <input
+					src="../../images/cal.gif" id="xml_vdate_cal"> To:</font> <input
 				type="text" name="xml_appointment_date" id="xml_appointment_date"
 				onDblClick="calToday(this)" size="10"
 				value="<%=xml_appointment_date%>"> <img
-				src="../../../images/cal.gif" id="xml_appointment_date_cal"></td>
+					src="../../images/cal.gif" id="xml_appointment_date_cal"></td>
 			<td align="right"><input type="submit" name="Submit"
 				value="Create Report"> </font></td>
 		</tr>
@@ -455,11 +462,11 @@ function calToday(field) {
 	<table border="0" cellspacing="0" cellpadding="0" width="100%">
 		<tr>
 			<td><a href=# onClick="javascript:history.go(-1);return false;">
-			<img src="../../../images/leftarrow.gif" border="0" width="25" height="20"
-				align="absmiddle"> Back </a></td>
+			<img src="../../images/leftarrow.gif" border="0" width="25" height="20"
+				 align="absmiddle"> Back </a></td>
 			<td align="right"><a href="" onClick="self.close();">Close
-			the Window<img src="../../../images/rightarrow.gif" border="0" width="25"
-				height="20" align="absmiddle"></a></td>
+			the Window<img src="../../images/rightarrow.gif" border="0" width="25"
+						   height="20" align="absmiddle"></a></td>
 		</tr>
 	</table>
 

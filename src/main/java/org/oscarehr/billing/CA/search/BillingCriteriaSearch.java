@@ -31,7 +31,7 @@ import java.util.Date;
 public class BillingCriteriaSearch extends AbstractCriteriaSearch
 {
 	public enum ORDER_BY {
-		NONE,
+		ID,
 		UPDATE_DATE
 	}
 
@@ -42,7 +42,7 @@ public class BillingCriteriaSearch extends AbstractCriteriaSearch
 	private Integer appointmentNo;
 	private String  status;
 	private Date updateDate;
-	private ORDER_BY orderBy = ORDER_BY.NONE;
+	private ORDER_BY orderBy = ORDER_BY.ID;
 
 	@Override
 	public Criteria setCriteriaProperties(Criteria criteria)
@@ -85,8 +85,9 @@ public class BillingCriteriaSearch extends AbstractCriteriaSearch
 	private void setOrderByCriteria(Criteria criteria) {
 		switch (this.orderBy)
 		{
-			case NONE:
+			case ID:
 			{
+				criteria.addOrder(getOrder("id"));
 				break;
 			}
 			case UPDATE_DATE:
