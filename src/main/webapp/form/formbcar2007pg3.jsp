@@ -738,14 +738,14 @@ if (!fedb.equals("") && fedb.length()==10 ) {
         $.each($links, function()
         {
             var $link = $(this);
-            Oscar.FormHelpers.safeLink($link, $form);
+            Oscar.FormHelpers.alertDirtyBeforeLink($link, $form);
         });
 
         var $exitButtons = $('input[name="exitButton"]');
         $.each($exitButtons, function()
         {
             var $exitButton = $(this);
-            Oscar.FormHelpers.safeClose($exitButton, $form);
+            Oscar.FormHelpers.alertDirtyBeforeClose($exitButton, $form);
         });
     });
 

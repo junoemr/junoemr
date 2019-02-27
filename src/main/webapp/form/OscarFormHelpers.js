@@ -13,13 +13,13 @@ if (!Oscar.FormHelpers) {
  * @param $form jQuery form element
  * @return false if form is dirty and the confirmation returns false
  */
-Oscar.FormHelpers.safeLink = function alertDirtyBeforeLink($link, $form)
+Oscar.FormHelpers.alertDirtyBeforeLink = function alertDirtyBeforeLink($link, $form)
 {
     $link.on('click', function(event) {
         if ($form.juno_isChanged())
         {
             event.preventDefault();
-            $.when(Oscar.FormHelpers.createConfirm()).done(function(confirmed)
+            $.when(Oscar.FormHelpers.createConfirmDirtyState()).done(function(confirmed)
             {
                 if (confirmed)
                 {
@@ -37,12 +37,12 @@ Oscar.FormHelpers.safeLink = function alertDirtyBeforeLink($link, $form)
  * @param $form jQuery form element
  * @return false
  */
-Oscar.FormHelpers.safeClose = function alertDirtyBeforeClose($closeInput, $form)
+Oscar.FormHelpers.alertDirtyBeforeClose = function alertDirtyBeforeClose($closeInput, $form)
 {
     $closeInput.on('click', function(event) {
         if ($form.juno_isChanged())
         {
-            $.when(Oscar.FormHelpers.createConfirm()).done(function(confirmed)
+            $.when(Oscar.FormHelpers.createConfirmDirtyState()).done(function(confirmed)
             {
                 if (confirmed)
                 {
@@ -55,6 +55,7 @@ Oscar.FormHelpers.safeClose = function alertDirtyBeforeClose($closeInput, $form)
             window.close();
         }
 
+        // Return false just in case the close button is a submit input.  We want to block it in all cases.
         return false;
     });
 };
@@ -78,38 +79,38 @@ Oscar.FormHelpers.disableLinks = function disableLinks($linkArray)
  *
  * @returns Promise, resolves when dialog option is selected.
  */
-Oscar.FormHelpers.createConfirm = function dirtyStateConfirm()
+Oscar.FormHelpers.createConfirmDirtyState = function createConfirmDirtyState()
 {
     var defer = $.Deferred();
     var confirmed = false;
 
-    $('<div>Are you sure you want to navigate away from this page without saving your changes?</div>').dialog(
-        {
-            resizeable: false,
-            draggable: false,
-            modal: true,
-            closeOnEscape: true,
-            create: function (event) {
-                $(event.target).parent().css({ 'position': 'fixed'});
-            },
-            width: '30%',
-            title: 'Unsaved Changes',
-            buttons: {
-                'Yes': function() {
-                    confirmed = true;
-                    $(this).dialog('close');
+    $('<div>')
+        .html(Oscar.FormHelpers.DirtyStateConfirmMessage)
+        .dialog({
+                resizeable: false,
+                draggable: false,
+                modal: true,
+                closeOnEscape: true,
+                create: function (event) {
+                    $(event.target).parent().css({ 'position': 'fixed'});
                 },
-                'No': function() {
-                    $(this).dialog('close');
-                }
-            },
-            close: function() {
-                defer.resolve(confirmed);
-                $(this).dialog('destroy').remove();
-            }
-
-        }).parent().position(
-        {
+                width: '30%',
+                title: Oscar.FormHelpers.DirtyStateConfirmTitle,
+                buttons: {
+                    'Yes': function() {
+                        confirmed = true;
+                        $(this).dialog('close');
+                    },
+                    'No': function() {
+                        $(this).dialog('close');
+                    }
+                },
+                close: function() {
+                    defer.resolve(confirmed);
+                    $(this).dialog('destroy').remove();
+                    }
+        })
+        .parent().position({
             my: 'center',
             at: 'center top+10%',
             of: 'body'
@@ -117,4 +118,7 @@ Oscar.FormHelpers.createConfirm = function dirtyStateConfirm()
 
     return defer.promise();
 };
+
+Oscar.FormHelpers.DirtyStateConfirmMessage = 'Are you sure you want to navigate away from this page without saving your changes?';
+Oscar.FormHelpers.DirtyStateConfirmTitle = 'Unsaved Changes';
 
