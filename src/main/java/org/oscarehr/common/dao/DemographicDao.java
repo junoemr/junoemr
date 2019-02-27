@@ -372,21 +372,21 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	
 	private static final String PROGRAM_DOMAIN_RESTRICTION = "select distinct a.clientId from ProgramProvider pp,Admission a WHERE pp.ProgramId=a.programId AND pp.ProviderNo=:providerNo";
 
-	public List<Demographic> searchDemographicByName(String searchStr, int limit, int offset, String providerNo, boolean outOfDomain, boolean orderByLastFirstName) {
-		return searchDemographicByNameAndStatus(searchStr,null,limit,offset,providerNo,outOfDomain,false, orderByLastFirstName);
+	public List<Demographic> searchDemographicByName(String searchStr, int limit, int offset, String providerNo, boolean outOfDomain) {
+		return searchDemographicByNameAndStatus(searchStr,null,limit,offset,providerNo,outOfDomain,false);
 	}
 
-	public List<Demographic> searchDemographicByNameAndNotStatus(String searchStr, List<String> statuses, int limit, int offset, String providerNo, boolean outOfDomain, boolean orderByLastFirstName) {
-		return searchDemographicByNameAndStatus(searchStr,statuses,limit,offset,providerNo,outOfDomain,true, orderByLastFirstName);
+	public List<Demographic> searchDemographicByNameAndNotStatus(String searchStr, List<String> statuses, int limit, int offset, String providerNo, boolean outOfDomain) {
+		return searchDemographicByNameAndStatus(searchStr,statuses,limit,offset,providerNo,outOfDomain,true);
 	}
 
-	public List<Demographic> searchDemographicByNameAndStatus(String searchStr, List<String> statuses, int limit, int offset, String providerNo, boolean outOfDomain, boolean orderByLastFirstName) {
-		return searchDemographicByNameAndStatus(searchStr,statuses,limit,offset,providerNo,outOfDomain,false, orderByLastFirstName);
+	public List<Demographic> searchDemographicByNameAndStatus(String searchStr, List<String> statuses, int limit, int offset, String providerNo, boolean outOfDomain) {
+		return searchDemographicByNameAndStatus(searchStr,statuses,limit,offset,providerNo,outOfDomain,false);
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<Demographic> searchDemographicByNameAndStatus(String searchStr, List<String> statuses, int limit, int offset,
-															  String providerNo, boolean outOfDomain,boolean ignoreStatuses, boolean orderByLastFirstName) {
+															  String providerNo, boolean outOfDomain,boolean ignoreStatuses) {
 		List<Demographic> list = new ArrayList<Demographic>();
 		String queryString = "From Demographic d where d.LastName like :lastName ";
 
@@ -402,11 +402,6 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		
 		if(providerNo != null && !outOfDomain) {
 			queryString += " AND d.id IN ("+ PROGRAM_DOMAIN_RESTRICTION+") ";
-		}
-
-		if(orderByLastFirstName)
-		{
-			queryString += " ORDER BY d.LastName, d.FirstName ";
 		}
 
 		Session session = this.getSession();
