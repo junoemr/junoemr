@@ -445,10 +445,7 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
 	}
 
 	List<Demographic> demoList = demographicDao.criteriaSearch(demoCS);
-	if(demoList == null) {
-	    //out.println("failed!!!");
-	}
-	else {
+	if(demoList != null) {
 		DemographicMerged dmDAO = new DemographicMerged();
 
 		for(Demographic demo : demoList) {
