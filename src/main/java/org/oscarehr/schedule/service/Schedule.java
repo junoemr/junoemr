@@ -356,14 +356,18 @@ public class Schedule
 
 		for(MyGroup result: results)
 		{
-			// get a UserDateSchedule for each
-			userDateSchedules.add(getUserDateSchedule(
-				date,
-				new Integer(result.getId().getProviderNo()),
-				result.getFirstName(),
-				result.getLastName(),
-				site
-			));
+			Provider provider = providerDao.getProvider(result.getId().getProviderNo());
+			if (provider != null)
+			{
+				// get a UserDateSchedule for each
+				userDateSchedules.add(getUserDateSchedule(
+						date,
+						new Integer(result.getId().getProviderNo()),
+						provider.getFirstName(),
+						provider.getLastName(),
+						site
+				));
+			}
 		}
 
 		// Create transfer object
