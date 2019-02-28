@@ -1,7 +1,20 @@
 /*
     editControl - a WYSIWYG edit control using iFrames and designMode
+    
+    Modified by Selwyn Wan (March 25, 2015)
+    Version 1.3a
+    	- Altered the browser detect code to set a single global variable for the detection of IE to be called once at load time.
+   			This allows for much more complicated detection code to be executed one time during load away from the places where the
+   			IEness of the browser is used.
+    	- Fixed the browser detect code that misidentified FireFox as IE post FF 17.0.11 ESR
+    	- Fixed OnLoad handler for loading of templates as the handler was being set after the load happened
+    	- Fixed various errors in code syntax that was causing compilation errors
+    	- Altered the bracketing style to improve readability of the code
+    	- Altered the usercss function to now operate with any browser that supports the feature
+    	- Altered the viewsource function to now operate with any browser that supports the feature
+    
     Copyright (C) 2009-2010 Peter Hutten-Czapski
-     Version 1.3 now about 500 lines of code
+    Version 1.3 now about 500 lines of code
         NEW in 0.2 button styles, links, select box
         NEW in 0.3 help, date, rule, select all, and clean functions
         NEW in 0.4 code completely rewritten, more functions including images and
@@ -41,7 +54,7 @@
 						// | a cosmetic seperator bar
 						// [bold] a button that toggles bold of the selected text
 						// [italic] a button that toggles emphasis text
-						// [underlined] a button that toggles underlined text
+					// [underlined] a button that toggles underlined text
 						// [strike] a button that toggles strike trough text
 						// [subscript] a button that toggles subscript text
 						// [superscript] a button that toggles superscript text
@@ -91,16 +104,27 @@ var cfg_formatfontsize = '<option value="">&mdash; font size &mdash;</option>  <
 var cfg_formattemplate = '<option value="">&mdash; template &mdash;</option>  <option value="blank">blank</option>  </select>';
 var cfg_isrc = '';  				// path to icons degrades to text buttons if icons not found
 var cfg_filesrc = '';				// path to blank.html and editor_help.html
-var cfg_template = 'blank.html';		// style and content template of the editor's iframe itself.
+var cfg_template = 'blank.html';	// style and content template of the editor's iframe itself.
 var cfg_width = '700';				// editor control width in pixels
 var cfg_height = '400';				// editor control height in pixels
 var cfg_editorname ="anEditControl";		// handle for the editor control itself
 var cfg_bstyle = 'width:24px;height:24px;border: solid 2px #ccccff; background-color: #ccccff;'; 	//the CSS of the button elements
 var cfg_boutstyle = 'solid 2px #ccccff'; 	//the CSS of the button elements om mouse out
-var cfg_sstyle = 'vertical-align: top; height:24px;';//the CSS of the option select box.  Selects will take font and background but not border.
+var cfg_sstyle = 'vertical-align: top; height:24px;'; //the CSS of the option select box.  Selects will take font and background but not border.
 var cfg_sepstyle = 'width:6px;height:24px;border: solid 2px #ccccff; background-color: #ccccff;';	//the CSS of the seperator icon
+	
+var isIE = false;
 
-function insertEditControl() {
+function browserDetect()
+{
+	if (navigator.userAgent.indexOf('MSIE') != -1 || (navigator.userAgent.indexOf('Trident') != -1 && navigator.userAgent.indexOf('rv') != 01))
+		isIE = true;
+}
+
+function insertEditControl() 
+{
+	browserDetect();
+	
 	// The main initialising function which writes the edit control as per passed variables
 	// ...OR... if it fails, degrades nicely by supplying a text area with the same ID (cfg_editorname)
 
@@ -149,13 +173,17 @@ function insertEditControl() {
 	var pasteButton = '<input type="image" src="' + cfg_isrc + 'edit-paste.png" value="Paste" alt="Paste" title="Paste" name="' + cfg_editorname + '" class="editControlButton" id="paste" style="'+ cfg_bstyle+ '">';
 
 	var separator = '<input type="image" src="' + cfg_isrc + 'separator.png" value="|" name="' + cfg_editorname + '" style="'+ cfg_sepstyle+ '">';
-	var editControl =  '<iframe src="'+cfg_filesrc+cfg_template+'" id="' + cfg_editorname + '" \n style="width:' + cfg_width + 'px; height:' + cfg_height + 'px; border-style:inset; border-width:thin;" frameborder="0px"></iframe>';
-
+	var editControl = '<iframe src="'+cfg_filesrc+cfg_template+'" id="' + cfg_editorname + '" \n style="width:' + cfg_width + 'px; height:' + cfg_height + 'px; border-style:inset; border-width:thin;" frameborder="0px"></iframe>';
 
 	// SECOND GET THE LAYOUT STRING PASSED AND REPLACE IT WITH THE BUTTONS AS REQUESTED
 	var editControlHTML = cfg_layout;
-	if (editControlHTML=="[all]"){editControlHTML = "<div id=control>[select-block][select-face][select-size][select-template]|[bold][italic][underlined][unordered][ordered][rule]|[undo][redo]|[cut][copy][paste]|[left][center][full][right]|[indent][outdent][select-all][clean]|[image][link]|[clock][date][spell][help]</div>[edit-area]"};
-	if ((editControlHTML.indexOf("select-block")>-1)&&(editControlHTML.indexOf("heading1")>-1)){ editControlHTML = editControlHTML.replace("[heading1]", "");} //only one id=formatblock tolerated
+	
+	if (editControlHTML == "[all]")
+		editControlHTML = "<div id=control>[select-block][select-face][select-size][select-template]|[bold][italic][underlined][unordered][ordered][rule]|[undo][redo]|[cut][copy][paste]|[left][center][full][right]|[indent][outdent][select-all][clean]|[image][link]|[clock][date][spell][help]</div>[edit-area]";
+	
+	if ((editControlHTML.indexOf("select-block") > -1) && (editControlHTML.indexOf("heading1") > -1))
+		editControlHTML = editControlHTML.replace("[heading1]", ""); //only one id=formatblock tolerated
+		
 	editControlHTML = editControlHTML.replace("[bold]", boldButton);
 	editControlHTML = editControlHTML.replace("[italic]", italicButton);
 	editControlHTML = editControlHTML.replace("[underlined]", underlinedButton);
@@ -187,18 +215,21 @@ function insertEditControl() {
 	editControlHTML = editControlHTML.replace("[help]", helpButton);
    	editControlHTML = editControlHTML.replace("[clock]", clockButton);
    	editControlHTML = editControlHTML.replace("[date]", dateButton);
-	editControlHTML = editControlHTML.replace(/\|/g, separator);
+	editControlHTML = editControlHTML.replace("[|]", separator);
 	editControlHTML = editControlHTML.replace("[edit-area]", editControl);
 	editControlHTML = editControlHTML.replace("[select-template]", selectTemplate);
 
 	var agent=navigator.userAgent.toLowerCase();
-	if ((agent.indexOf("msie") != -1) && (agent.indexOf("opera") == -1)) {
+	if (isIE && (agent.indexOf("opera") == -1)) 
+	{
 		//Browser is Microsoft Internet Explorer : Can load browser specific code
 		editControlHTML = editControlHTML.replace("[spell]", ieSpellButton);
 		editControlHTML = editControlHTML.replace("[cut]", cutButton);
 		editControlHTML = editControlHTML.replace("[copy]", copyButton);
 		editControlHTML = editControlHTML.replace("[paste]", pasteButton);
-	} else {
+	} 
+	else 
+	{
 		//spell is superfluous for FF and cut/copy/paste are protected
 		editControlHTML = editControlHTML.replace("[spell]", "");
 		editControlHTML = editControlHTML.replace("[cut]", "");
@@ -206,44 +237,49 @@ function insertEditControl() {
 		editControlHTML = editControlHTML.replace("[paste]", "");
 	}
 	// THIRD WRITE THE EDIT CONTROL TO THE WEB PAGE
-	if (document.designMode) {
+	if (document.designMode) 
+	{
 		document.write(editControlHTML);
 		InitToolbarButtons(cfg_editorname);
-	} else {
+	} 
+	else 
+	{
 		// create a normal <textarea> if document.designMode does not exist
 		//alert("Design mode is not supported by your browser \n- reverting to classic mode");
 		document.write('<textarea id="' + cfg_editorname + '" style="width:' + cfg_width + '; height:' + editControlHeight + 'px; ' + editControlStyle + '"></textarea>');
 	}
 }
 
-function editControlContents(editorname) {
+function editControlContents(editorname) 
+{
+	var retStr = "";
 	// this function retrieves the HTML contents of the edit control "editorname"
-	if (document.designMode) {
+	if (document.designMode) 
+	{
 		// Explorer reformats HTML during document.write() removing quotes on element ID names
 		// so we need to address Explorer elements as window[elementID]
-		if (window[editorname].document) return window[editorname].document.body.innerHTML;
-		return document.getElementById(editorname).contentWindow.document.body.innerHTML;
-	} else {
-		// play nice and at least return the value from the <textarea> if document.designMode does not exist
-		return document.getElementById(editorname).value;
-	}
+		if (isIE) //(window[editorname]) 
+		    retStr = window[editorname].document.body.innerHTML;
+		else		
+			retStr = document.getElementById(editorname).contentWindow.document.body.innerHTML;
+	} 
+	else 
+		retStr = document.getElementById(editorname).value; // play nice and at least return the value from the <textarea> if document.designMode does not exist
+		
+	return retStr;
 }
 
 function seteditControlContents(editorname, value){
 	// this function sets the HTML contents of the edit control "editorname" to "value"
-    if (document.designMode) {
-		if (window[editorname].document){
+    if (document.designMode) 
+    {
+		if (isIE) //(window[editorname]) 
 		    window[editorname].document.body.innerHTML = value; //if browser supports M$ conventions
-		    return
-		} else {
+		else 
 		    document.getElementById(editorname).contentWindow.document.body.innerHTML = value;
-		    return
-		}
-	} else {
-		// play nice and at least set the value to the <textarea> if document.designMode does not exist
-		document.getElementById(cfg_editorname).value = value;
-		return
-	}
+	} 
+	else 
+		document.getElementById(cfg_editorname).value = value; // play nice and at least set the value to the <textarea> if document.designMode does not exist
 }
 
 
@@ -252,8 +288,10 @@ function InitToolbarButtons(cfg_editorname) {
 	// code modeled after the Mozilla Rich Text Editor Demo http://www.mozilla.org/editor/midasdemo/
 	var kids = document.getElementsByTagName('input');
 
-	for (var i=0; i < kids.length; i++) {
-		if (kids[i].className == "editControlButton" && kids[i].name == cfg_editorname) {
+	for (var i=0; i < kids.length; i++) 
+	{
+		if (kids[i].className == "editControlButton" && kids[i].name == cfg_editorname) 
+		{
 			kids[i].onmouseover = tbuttonMouseOver;
 			kids[i].onmouseout = tbuttonMouseOut;
 			kids[i].onmouseup = tbuttonMouseUp;
@@ -263,84 +301,109 @@ function InitToolbarButtons(cfg_editorname) {
 	}
 }
 
-function tbuttonMouseDown(e) {
+function tbuttonMouseDown(e) 
+{
 	// when the mouse button is held down use CSS to
 	// inset the border by 2 pixels (darken over and the left border)
   	this.style.border="inset 2px";
 	// prevent default event (i.e. don't remove focus from text area)
 	var evt = e ? e : window.evcfg_editornameent;
-	if (evt.returnValue) {
+	
+	if (evt.returnValue) 
 		evt.returnValue = false;
-	} else if (evt.preventDefault) {
-		evt.preventDefault( );
-	} else {
+	else if (evt.preventDefault) 
+		evt.preventDefault();
+	else 
 		return false;
-	}
 }
 
-function tbuttonMouseOver() {
+function tbuttonMouseOver() 
+{
 	// when the mouse pointer is over the button
 	// outset the border by 2 pixels (darken under and the right border)
 	this.style.border="outset 2px";
 }
 
-function tbuttonMouseOut() {
+function tbuttonMouseOut() 
+{
 	// events for mouseOut on buttons #FFFFFF = white
   	this.style.border=cfg_boutstyle;
 }
 
-function tbuttonMouseUp() {
+function tbuttonMouseUp() 
+{
 	// events for mouseUp on buttons
   	this.style.border="outset 2px";
 }
 
-function Select(selectname){
+function Select(selectname)
+{
   	var cursel = document.getElementById(selectname).selectedIndex;
-  	if (cursel != 0) { // First one is a label
+  	if (cursel != 0) 
+  	{ // First one is a label
     	var selected = document.getElementById(selectname).options[cursel].value;
-    	if (window[cfg_editorname].document) { window[cfg_editorname].document.execCommand(selectname, false, selected); } //if browser supports M$ conventions
-	else { document.getElementById(cfg_editorname).contentWindow.document.execCommand(selectname, false, selected); }
+		if (isIE) // if (window[cfg_editorname]) 
+    		window[cfg_editorname].document.execCommand(selectname, false, selected); //if browser supports M$ conventions
+		else 
+			document.getElementById(cfg_editorname).contentWindow.document.execCommand(selectname, false, selected); 
+		
     	document.getElementById(selectname).selectedIndex = 0;
-  	document.getElementById(cfg_editorname).contentWindow.focus();
+  		document.getElementById(cfg_editorname).contentWindow.focus();
   	}
 }
 
-function loadTemplate(selectname){
+function loadTemplate(selectname)
+{
 	//change the iframe src to that selected in the template select box
 	//TODO fix the eventlistener! in the meantime just set the dirty flag
-	 setDirtyFlag();
+	setDirtyFlag();
   	var cursel = document.getElementById(selectname).selectedIndex;
-  	if (cursel != 0) { // First one is a label
-    		var selected = document.getElementById(selectname).options[cursel].value;
+  	
+  	if (cursel != 0) 
+  	{ // First one is a label
+		var obj = document.getElementById(cfg_editorname);
+		
+		obj.onload = function() 
+		{ 
+			parseTemplate(); 
+		}
+  	
+    	var selected = document.getElementById(selectname).options[cursel].value;
 		//document.getElementById(cfg_editorname).src = cfg_filesrc + selected + '.html' ; //FF != IE
 		window.frames[0].location = cfg_filesrc + selected + '.html' ; //FF & IE ***ASSUMES 1 iframe!
+			
 		if (selected !='blank'){document.getElementById('subject').value = selected;}
     		document.getElementById('template').selectedIndex = 0;
+    		
 		//need to ensure that the new src is loaded before we parse it FF only IE doesn't do nada
-		var obj = document.getElementById(cfg_editorname);
-		obj.onload = function() { parseTemplate(); }
+		
 		//for IE put some delay to ensure that the new src is loaded before we parse it
-    		if (window[cfg_editorname].document) { setTimeout('parseTemplate()',1000); } //if M$ like browser
-    	}
+    	if (isIE) // if (window[cfg_editorname]) 
+    		setTimeout('parseTemplate()',1000); //if M$ like browser
+    }
 }
 
-function parseTemplate(){
+function parseTemplate()
+{
 	//replace template placeholders with database pulls
 	var temp = new Array();
 	contents=editControlContents(cfg_editorname);
 	temp = contents.split('##'); //parse for template place holders identified by ##value##
 	contents='';
 	var x;
-	for (x in temp) {
-		if ((x % 2)){ //odd numbered values contain placeholders
-			if((document.getElementById(temp[x]))&&(document.getElementById(temp[x]).value.length>0)){
-				//known field placeholder with a value so use it
-				temp[x]=document.getElementById(temp[x]).value;
-			} else {
-			//get the placeholder value from the user
-			var prompttext=new Array();
-			prompttext=temp[x].split('=');
-			temp[x]= prompt(prompttext[0], prompttext[1]);
+	
+	for (x in temp) 
+	{
+		if ((x % 2))
+		{ //odd numbered values contain placeholders
+			if((document.getElementById(temp[x])) && (document.getElementById(temp[x]).value.length>0))
+				temp[x]=document.getElementById(temp[x]).value; //known field placeholder with a value so use it
+			else 
+			{
+				//get the placeholder value from the user
+				var prompttext=new Array();
+				prompttext=temp[x].split('=');
+				temp[x]= prompt(prompttext[0], prompttext[1]);
 			}
 		}
 		contents += temp[x];
@@ -348,128 +411,151 @@ function parseTemplate(){
 	seteditControlContents(cfg_editorname,contents);
 }
 
-
-
-function spellCheck() {
+function spellCheck() 
+{
 	//check spelling with ieSpell if available
- 	try {
+ 	try 
+ 	{
   		var axo=new ActiveXObject("ieSpell.ieSpellExtension");
   		axo.CheckAllLinkedDocuments(document);
- 	} catch(e) {
-  		if(e.number==-2146827859) {
+ 	} 
+ 	catch(e) 
+ 	{
+  		if(e.number==-2146827859) 
+  		{
   			if (confirm("ieSpell is not installed on your computer. \n Click [OK] to go to download page."))
-    		window.open("http://www.iespell.com/download.php","DownLoad");
-  		} else {
-   		alert("Error Loading ieSpell: Exception " + e.number);
-  		}
+    			window.open("http://www.iespell.com/download.php","DownLoad");
+  		} 
+  		else 
+   			alert("Error Loading ieSpell: Exception " + e.number);
  	}
 }
 
 
-function parseText(obs) {
+function parseText(obs) 
+{
 	//clean up OSCAR formated case management notes leaving the last entry
 	var myRe= /^(.|\n|\r)*-{5}/g;
-	if (obs.match(myRe)) {
+	if (obs.match(myRe)) 
 		var obs=obs.replace(myRe,"");
-	}
+	
 	return obs;
 }
 
-function doHtml(value) {
+function doHtml(value)  
+{
 	//insert HTML of value
-	if (window[cfg_editorname].document){  //if you can't support insertHtml do something else
-		var tmp=window[cfg_editorname].document.body.innerHTML;
-		tmp=tmp+value;  // for IE this means append the text
-		window[cfg_editorname].document.body.innerHTML=tmp;
-	} else {
-		var tmp=window[cfg_editorname].contentWindow.document.body.innerHTML;
-		tmp=tmp+value;  // for IE this means append the text
-		window[cfg_editorname].contentWindow.document.body.innerHTML=tmp;
-		//document.getElementById(cfg_editorname).contentWindow.document.execCommand("insertHtml", false, value);
-	}
+	if (isIE) // if (window[cfg_editorname])
+	{  //if you can't support insertHtml do something else
+		var tmp = window[cfg_editorname].document.body.innerHTML;
+		tmp = tmp+value;  // for IE this means append the text
+		window[cfg_editorname].document.body.innerHTML = tmp;
+	} 
+	else 
+		document.getElementById(cfg_editorname).contentWindow.document.execCommand("insertHtml", false, value);
+	
 	return;
 }
 
-function block(blockElements) {
-	for(i=0; i<blockElements.length; i++) {
-		htm='<div>'+blockElements[i]+'<\div>';
+function block(blockElements) 
+{
+	for(i=0; i<blockElements.length; i++) 
+	{
+		htm = '<div>'+blockElements[i]+'<\div>';
 		doHtml(htm);
 	}
 }
 
-function doTime() {
+function doTime() 
+{
 	// need to supply the time!
 	var digital = new Date();
 	var hours = digital.getHours();
 	var minutes = digital.getMinutes();
 	var seconds = digital.getSeconds();
 	var amOrPm = "AM";
-	if (hours > 11) amOrPm = "PM";
-	if (hours > 12) hours = hours - 12;
-	if (hours == 0) hours = 12;						//0 hour
-	if (minutes <= 9) minutes = "0" + minutes;		//pad with 0
-	if (seconds <= 9) seconds = "0" + seconds;		//pad with 0
-	var time =" " + hours + ":" + minutes + ":" + seconds + " " + amOrPm +" ";
+	if (hours > 11) 
+		amOrPm = "PM";
+	if (hours > 12) 
+	 	hours = hours - 12;
+	if (hours == 0) 
+		hours = 12;						//0 hour
+	if (minutes <= 9) 
+		minutes = "0" + minutes;		//pad with 0
+	if (seconds <= 9) 
+		seconds = "0" + seconds;		//pad with 0
+		
+	var time = " " + hours + ":" + minutes + ":" + seconds + " " + amOrPm +" ";
+	
 	return time;
 }
 
-function doDate() {
+function doDate() 
+{
 	// need to supply the date!
 	var digital = new Date();
 	var days = digital.getDate();
 	var months = digital.getMonth()*1 +1;
 	var years = digital.getFullYear();
-	var date =" " + days + "/" + months + "/" + years + " " ;
+	var date =" " + days + "/" + months + "/" + years + " ";
 	return date;
 }
 
-function doTable() {
+function doTable() 
+{
 	var rowstext = prompt("enter rows");
 	var colstext = prompt("enter cols");
 	var rows = parseInt(rowstext);
 	var cols = parseInt(colstext);
 	var table;
-	if ((rows > 0) && (cols > 0)) {
+	if ((rows > 0) && (cols > 0)) 
+	{
 		table = '<table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2"><tbody>'
-		for (var i=0; i < rows; i++) {
+		for (var i=0; i < rows; i++) 
+		{
 			table +='<tr>';
-			for (var j=0; j < cols; j++) {
+			for (var j=0; j < cols; j++) 
 				table +='<td>&nbsp;</td>';
-			}
 			table +='</tr>';
 		}
 		table += '</tbody></table>';
-    	}
+    }
 	return table;
 }
 
-function tbuttonOnClick() {
+function tbuttonOnClick() 
+{
 	// do the deed unless you need to prompt the user for information
 	var value = this.getAttribute('cmdValue') || null;
-	switch (value) {
+	
+	switch (value) 
+	{
   		case "spell" : spellCheck(); break;
   		case "clock" : doHtml(doTime()); break;
   		case "date" : doHtml(doDate()); break;
   		case "table" : doHtml(doTable()); break;
-  		case "help" : window.open (cfg_filesrc+"editor_help.html","mywindow","resizable=1,width=300,height=500"); break;
+  		case "help" : window.open(cfg_filesrc+"editor_help.html","mywindow","resizable=1,width=300,height=500"); break;
   		case "promptUser" : value = prompt(this.getAttribute('promptText'));
-  		default: if (window[this.name]) { window[this.name].document.execCommand(this.id, false, value); } else { document.getElementById(this.name).contentWindow.document.execCommand(this.id, false, value); }
-return;
+  		default: 
+  			if (isIE) // if (window[this.name]) 
+  				window[this.name].document.execCommand(this.id, false, value); 
+  			else 
+  				document.getElementById(this.name).contentWindow.document.execCommand(this.id, false, value); 
+			break;
 	}
 }
-function viewsource(source) {
+function viewsource(inViewSource) 
+{
 	// load the html into a variable, blank the body, import as text, disable gui
 	var html;
-	if (window[cfg_editorname].document){
-		html=window[cfg_editorname].document.body.innerHTML ; //if browser supports M$ conventions
-		alert(html) ; //load into an alert as importnode not supported by IE
-		return;
-	}else{
-		html=window[cfg_editorname].contentWindow.document.body.innerHTML ;
-		alert(html);
-		return;
-	}
-	if (source) {
+//	if (isIE) // if (window[cfg_editorname])
+//	{
+//		html = window[cfg_editorname].document.body.innerHTML ; //if browser supports M$ conventions
+//		alert(html) ; //load into an alert as importnode not supported by IE
+//		return;
+//	}
+	if (inViewSource) 
+	{
 		html = document.createTextNode(document.getElementById('edit').contentWindow.document.body.innerHTML);
 		document.getElementById(cfg_editorname).contentWindow.document.body.innerHTML = "";
 		html = document.getElementById(cfg_editorname).contentWindow.document.importNode(html,false);
@@ -477,7 +563,9 @@ function viewsource(source) {
 		document.getElementById("control1").style.visibility="hidden";
 		document.getElementById("control2").style.visibility="hidden";
 		document.getElementById("control3").style.visibility="hidden";
-	} else {
+	} 
+	else 
+	{
 		html = document.getElementById(cfg_editorname).contentWindow.document.body.ownerDocument.createRange();
 		html.selectNodeContents(document.getElementById(cfg_editorname).contentWindow.document.body);
 		document.getElementById(cfg_editorname).contentWindow.document.body.innerHTML = html.toString();
@@ -485,14 +573,34 @@ function viewsource(source) {
 		document.getElementById("control2").style.visibility="visible";
 		document.getElementById("control3").style.visibility="visible";
 	}
+	
 	return;
 }
 
-function usecss(source) {
-	if (window[cfg_editorname].document){
-		//if browser supports M$ conventions it may error on this execCommand
-		return;
-	}
-	// a Mozilla only feature
-	document.getElementById('edit').contentWindow.document.execCommand("styleWithCSS", false, (source));
+function usecss(inUseCSS) 
+{
+	var theEditor = document.getElementById('edit').contentWindow.document;
+	
+    try 
+    {
+        theEditor.execCommand("styleWithCSS", 0, inUseCSS);
+    } 
+    catch (e) 
+    {
+        try 
+        {
+           theEditor.execCommand("useCSS", 0, inUseCSS);
+        } 
+        catch (e) 
+        {
+            try 
+            {
+            	// Mozilla
+                theEditor.execCommand('styleWithCSS', false, inUseCSS);
+            }
+            catch (e) 
+            {
+            }
+        }
+    }
 }
