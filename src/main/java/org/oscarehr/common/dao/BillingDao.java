@@ -283,18 +283,7 @@ public class BillingDao extends AbstractDao<Billing> {
 	    	String[] statusTypes = statusType.split(",");
 	    	if (statusTypes.length > 1)
 			{
-				statusTypeClause += " in (";
-				for (int i=0; i < statusTypes.length; i ++)
-				{
-					if (i < (statusTypes.length - 1))
-					{
-						statusTypeClause += "'" + statusTypes[i] + "',";
-					}
-					else
-					{
-						statusTypeClause += "'" + statusTypes[i] +"')";
-					}
-				}
+				statusTypeClause += " in ('" + String.join("','", statusTypes) + "')";
 			}
 	    	else
 			{
