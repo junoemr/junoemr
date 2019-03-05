@@ -6,6 +6,19 @@
 		<ap-sql>SELECT curdate()</ap-sql>
 		<ap-output>${curdate()}</ap-output>
 	</databaseap>
+
+	<databaseap>
+		<ap-name>today2</ap-name>
+		<ap-sql>SELECT DATE_FORMAT(curdate(), "%d-%m-%Y") as date</ap-sql>
+		<ap-output>${date}</ap-output>
+	</databaseap>
+
+	<databaseap>
+		<ap-name>today3</ap-name>
+		<ap-sql>SELECT DATE_FORMAT(curdate(), "%m-%d-%Y") as date</ap-sql>
+		<ap-output>${date}</ap-output>
+	</databaseap>
+
 	<databaseap>
 		<ap-name>time</ap-name>
 		<ap-sql>SELECT curtime()</ap-sql>
@@ -123,6 +136,18 @@
 		<ap-sql>SELECT provider.first_name, provider.last_name FROM provider
 			WHERE provider.provider_no='${provider}' </ap-sql>
 		<ap-output>${last_name}, ${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>current_userF</ap-name>
+		<ap-sql>SELECT provider.first_name FROM provider
+			WHERE provider.provider_no='${provider}' </ap-sql>
+		<ap-output>${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>current_userL</ap-name>
+		<ap-sql>SELECT provider.last_name FROM provider
+			WHERE provider.provider_no='${provider}' </ap-sql>
+		<ap-output>${last_name}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>current_user_fname_lname</ap-name>
@@ -1099,6 +1124,20 @@
 		<ap-output>${last_name}, ${first_name}</ap-output>
 	</databaseap>
 	<databaseap>
+		<ap-name>doctorF</ap-name>
+		<ap-sql>SELECT provider.first_name FROM provider,
+			demographic WHERE demographic.demographic_no=${demographic} AND
+			demographic.provider_no=provider.provider_no</ap-sql>
+		<ap-output>${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>doctorL</ap-name>
+		<ap-sql>SELECT provider.last_name FROM provider,
+			demographic WHERE demographic.demographic_no=${demographic} AND
+			demographic.provider_no=provider.provider_no</ap-sql>
+		<ap-output>${last_name}</ap-output>
+	</databaseap>
+	<databaseap>
 		<ap-name>doctor_provider_no</ap-name>
 		<ap-sql>SELECT provider_no FROM demographic WHERE
 			demographic_no=${demographic}</ap-sql>
@@ -1250,6 +1289,32 @@
 		<ap-output>${referral_doc_name}</ap-output>
 	</databaseap>
 	<databaseap>
+		<ap-name>referral_nameF</ap-name>
+		<ap-sql>SELECT
+			CASE WHEN (ps.lName IS NULL AND ps.fName IS NULL) OR LENGTH(ps.referralNo) = 0
+			THEN SUBSTRING_INDEX(EXTRACTVALUE(d.family_doctor, '/rd'), ',', -1)
+			ELSE ps.fName
+			END as referral_doc_first_name
+			FROM demographic d
+			LEFT JOIN professionalSpecialists ps ON (EXTRACTVALUE(d.family_doctor, '/rdohip') = ps.referralNo)
+			WHERE d.demographic_no=${demographic}
+		</ap-sql>
+		<ap-output>${referral_doc_first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>referral_nameL</ap-name>
+		<ap-sql>SELECT
+			CASE WHEN (ps.lName IS NULL AND ps.fName IS NULL) OR LENGTH(ps.referralNo) = 0
+			THEN SUBSTRING_INDEX(EXTRACTVALUE(d.family_doctor, '/rd'), ',', 1)
+			ELSE ps.lName
+			END as referral_doc_last_name
+			FROM demographic d
+			LEFT JOIN professionalSpecialists ps ON (EXTRACTVALUE(d.family_doctor, '/rdohip') = ps.referralNo)
+			WHERE d.demographic_no=${demographic}
+		</ap-sql>
+		<ap-output>${referral_doc_last_name}</ap-output>
+	</databaseap>
+	<databaseap>
 		<ap-name>referral_address</ap-name>
 		<ap-sql>SELECT professionalSpecialists.address AS raddress
 			FROM professionalSpecialists, demographic
@@ -1304,6 +1369,28 @@
 			EXTRACTVALUE(demographic.family_doctor, '/rdohip') = billingreferral.referral_no
 		</ap-sql>
 		<ap-output>${last_name}, ${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>bc_referral_nameF</ap-name>
+		<ap-sql>SELECT billingreferral.first_name
+			FROM billingreferral, demographic
+			WHERE demographic.demographic_no=${demographic}
+			AND LENGTH(billingreferral.referral_no) > 0
+			AND
+			EXTRACTVALUE(demographic.family_doctor, '/rdohip') = billingreferral.referral_no
+		</ap-sql>
+		<ap-output>${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>bc_referral_nameL</ap-name>
+		<ap-sql>SELECT billingreferral.last_name
+			FROM billingreferral, demographic
+			WHERE demographic.demographic_no=${demographic}
+			AND LENGTH(billingreferral.referral_no) > 0
+			AND
+			EXTRACTVALUE(demographic.family_doctor, '/rdohip') = billingreferral.referral_no
+		</ap-sql>
+		<ap-output>${last_name}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>bc_referral_address</ap-name>
