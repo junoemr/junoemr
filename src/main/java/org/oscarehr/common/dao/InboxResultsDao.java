@@ -10,10 +10,9 @@
 package org.oscarehr.common.dao;
 
 import java.math.BigInteger;
-import java.text.DateFormat;                                                    
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +22,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 
-import org.apache.http.impl.cookie.DateUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.utility.UtilDateUtilities;
@@ -34,11 +32,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import oscar.oscarLab.ca.on.LabResultData;
 import oscar.oscarLab.ca.on.LabSummaryData;
-import oscar.oscarMDS.data.PatientInfo;	
+import oscar.oscarMDS.data.PatientInfo;
 import oscar.util.ConversionUtils;
 
 @Transactional
-public class InboxResultsDao {
+public class InboxResultsDao
+{
 
 	Logger logger = Logger.getLogger(InboxResultsDao.class);
 
@@ -46,150 +45,68 @@ public class InboxResultsDao {
 	protected EntityManager entityManager = null;
 
 	/** Creates a new instance of Hl7textResultsData */
-	public InboxResultsDao() {
+	public InboxResultsDao()
+	{
 	}
 
-	/**
-	 * Populates ArrayList with labs attached to a consultation request
-	 */
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	public ArrayList populateHL7ResultsData(String demographicNo, String consultationId, boolean attached) {
-		String sql = "SELECT hl7.label, hl7.lab_no, hl7.obr_date, hl7.discipline, hl7.accessionNum, hl7.final_result_count, patientLabRouting.id "
-				+ "FROM hl7TextInfo hl7, patientLabRouting "
-				+ "WHERE patientLabRouting.lab_no = hl7.lab_no "
-				+ "AND patientLabRouting.lab_type = 'HL7' AND patientLabRouting.demographic_no="
-				+ demographicNo
-				+ " GROUP BY hl7.lab_no";
+	@SuppressWarnings({ "unchecked" })
+	private List<Object[]> getRawInboxResults(
+			boolean do_counts,
+			String providerNo,
+			String demographicNo,
+			String patientFirstName,
+			String patientLastName,
+			String patientHealthNumber,
+			String status,
+			boolean isPaged,
+			Integer page,
+			Integer pageSize,
+			Boolean isAbnormal,
+			List<String> providerNoArr,
+			boolean neverAcknowledgedItems,
+			String labType,
+			Date startDate,
+			Date endDate)
+	{
 
-		String attachQuery = "SELECT consultdocs.document_no FROM consultdocs, patientLabRouting "
-				+ "WHERE patientLabRouting.id = consultdocs.document_no AND " + "consultdocs.requestId = "
-				+ consultationId
-				+ " AND consultdocs.doctype = 'L' AND consultdocs.deleted IS NULL ORDER BY consultdocs.document_no";
-
-		ArrayList labResults = new ArrayList<LabResultData>();
-		ArrayList attachedLabs = new ArrayList<LabResultData>();
-
-
-		try {
-			Query q = entityManager.createNativeQuery(attachQuery);
-
-			List<Object[]> result = q.getResultList();
-			for (Object[] r : result) {
-				LabResultData lbData = new LabResultData(LabResultData.HL7TEXT);
-				lbData.labPatientId = (String) r[0];
-				attachedLabs.add(lbData);
-			}
-
-			LabResultData lbData = new LabResultData(LabResultData.HL7TEXT);
-			LabResultData.CompareId c = lbData.getComparatorId();
-
-			q = entityManager.createNativeQuery(sql);
-			result = q.getResultList();
-			for (Object[] r : result) {
-				lbData.segmentID = (String) r[1];
-				lbData.labPatientId = (String) r[6];
-				lbData.dateTime = (String) r[2];
-				lbData.discipline = (String) r[3];
-				lbData.accessionNumber = (String) r[4];
-				lbData.finalResultsCount = (Integer) r[5];
-				lbData.label = (String) r[0];
-
-				if (attached && Collections.binarySearch(attachedLabs, lbData, c) >= 0)
-					labResults.add(lbData);
-				else if (!attached && Collections.binarySearch(attachedLabs, lbData, c) < 0)
-					labResults.add(lbData);
-
-				lbData = new LabResultData(LabResultData.HL7TEXT);
-			}
-		} catch (Exception e) {
-			logger.error("exception in HL7Populate", e);
-		}
-
-
-		return labResults;
-	}
-
-	@SuppressWarnings("unchecked")
-	public boolean isSentToProvider(String docNo, String providerNo) {
-		if (docNo != null && providerNo != null) {
-			int dn = Integer.parseInt(docNo.trim());
-			providerNo = providerNo.trim();
-			String sql = "select * from providerLabRouting plr where plr.lab_type='DOC' and plr.lab_no=" + dn
-					+ " and plr.provider_no='" + providerNo + "'";
-			try {
-
-				Query q = entityManager.createNativeQuery(sql);
-				List<Object[]> rs = q.getResultList();
-
-				logger.debug(sql);
-				if (!rs.isEmpty()) {
-					return true;
-				} else
-					return false;
-			} catch (Exception e) {
-				logger.error(e.toString());
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}
-
-	//retrieve all documents from database
-	/**
-	 * Wrapper function for non paged document queries.
-	 */
-	@SuppressWarnings("rawtypes")
-    public ArrayList populateDocumentResultsData(String providerNo, String demographicNo, String patientFirstName,
-			String patientLastName, String patientHealthNumber, String status) {
-		return populateDocumentResultsData(providerNo, demographicNo, patientFirstName, patientLastName,
-				patientHealthNumber, status, false, null, null, false, null);
-	}
-	
-	@SuppressWarnings({ "unchecked", "deprecation" })
-	private List<Object[]> getRawInboxResults(boolean do_counts, String providerNo, String demographicNo, String patientFirstName,
-			String patientLastName, String patientHealthNumber, String status, boolean isPaged, Integer page,
-			Integer pageSize, Boolean isAbnormal, List<String> providerNoArr, boolean neverAcknowledgedItems, 
-			String labType, Date startDate, Date endDate) {
-		
 		logger.info("POPULATING DOCUMENT RESULTS: provider:"+providerNo+", demographic:"+demographicNo);
 
-        boolean qp_provider_no = false;
-        boolean qp_status = false;
-        boolean qp_first_name = false;
-        boolean qp_last_name = false;
-        boolean qp_hin = false;
-        boolean qp_start_date = false;
-        boolean qp_end_date = false;
+		boolean qp_provider_no = false;
+		boolean qp_status = false;
+		boolean qp_first_name = false;
+		boolean qp_last_name = false;
+		boolean qp_hin = false;
+		boolean qp_start_date = false;
+		boolean qp_end_date = false;
 		boolean qp_lab_type = false;
-        boolean qp_demographic_no = false;
-        boolean qp_page = false;
-        boolean qp_hrm_first_name = false;
-        boolean qp_hrm_last_name = false;
-        boolean qp_hrm_hin = false;
-        boolean qp_hrm_demographic_no = false;
+		boolean qp_demographic_no = false;
+		boolean qp_page = false;
+		boolean qp_hrm_first_name = false;
+		boolean qp_hrm_last_name = false;
+		boolean qp_hrm_hin = false;
+		boolean qp_hrm_demographic_no = false;
 
-        String providerNoList = "";
-        if(providerNoArr != null && providerNoArr.size() > 0){
-        	providerNoList = StringUtils.join(providerNoArr, ",");
-        }
+		String providerNoList = "";
+		if(providerNoArr != null && providerNoArr.size() > 0){
+			providerNoList = StringUtils.join(providerNoArr, ",");
+		}
 
-        logger.debug("populateDocumentResultsData("
-			+ "providerNo = " + ((providerNo == null) ? "NULL" : providerNo) + ", "
-			+ "demographicNo = " + ((demographicNo == null) ? "NULL" : demographicNo) + ", "
-			+ "patientFirstName = " + ((patientFirstName == null) ? "NULL" : patientFirstName) + ", "
-			+ "patientLastName = " + ((patientLastName == null) ? "NULL" : patientLastName) + ", "
-			+ "patientHealthNumber = " + ((patientHealthNumber == null) ? "NULL" : patientHealthNumber) + ", "
-			+ "startDate = " + ((startDate == null) ? "NULL" : startDate.toString()) + ", "
-			+ "endDate = " + ((endDate == null) ? "NULL" : endDate.toString()) + ", "
-			+ "status = " + ((status == null) ? "NULL" : status) + ", "
-			+ "isPaged = " + ((isPaged) ? "true" : "false") + ", "
-			+ "page = "+ ((page == null) ? "NULL" : page.toString()) + ", "
-			+ "pageSize = "+ ((pageSize == null) ? "NULL" : pageSize.toString()) + ", "
-			+ "isAbnormal = " + ((isAbnormal == null) ? "NULL" : ((isAbnormal) ? "true" : "false"))  +", "
-			+ "providerNoList = "+ ((providerNoList == null) ? "NULL" : (providerNoList.equals("") ? "empty" : providerNoList)) + ", "
-			+ "neverAcknowledgedItems = " + ((neverAcknowledgedItems) ? "true" : "false") + ", "
-			+ ")");
+		logger.debug("populateDocumentResultsData("
+				+ "providerNo = " + ((providerNo == null) ? "NULL" : providerNo) + ", "
+				+ "demographicNo = " + ((demographicNo == null) ? "NULL" : demographicNo) + ", "
+				+ "patientFirstName = " + ((patientFirstName == null) ? "NULL" : patientFirstName) + ", "
+				+ "patientLastName = " + ((patientLastName == null) ? "NULL" : patientLastName) + ", "
+				+ "patientHealthNumber = " + ((patientHealthNumber == null) ? "NULL" : patientHealthNumber) + ", "
+				+ "startDate = " + ((startDate == null) ? "NULL" : startDate.toString()) + ", "
+				+ "endDate = " + ((endDate == null) ? "NULL" : endDate.toString()) + ", "
+				+ "status = " + ((status == null) ? "NULL" : status) + ", "
+				+ "isPaged = " + ((isPaged) ? "true" : "false") + ", "
+				+ "page = "+ ((page == null) ? "NULL" : page.toString()) + ", "
+				+ "pageSize = "+ ((pageSize == null) ? "NULL" : pageSize.toString()) + ", "
+				+ "isAbnormal = " + ((isAbnormal == null) ? "NULL" : ((isAbnormal) ? "true" : "false"))  +", "
+				+ "providerNoList = "+ ((providerNoList == null) ? "NULL" : (providerNoList.equals("") ? "empty" : providerNoList)) + ", "
+				+ "neverAcknowledgedItems = " + ((neverAcknowledgedItems) ? "true" : "false") + ", "
+				+ ")");
 
 
 
@@ -213,7 +130,6 @@ public class InboxResultsDao {
 			status = "";
 		}
 
-		
 		Query q;
 		String sql = "";
 
@@ -221,8 +137,8 @@ public class InboxResultsDao {
 
 		try {
 
-            // Notes on query:
-            //
+			// Notes on query:
+			//
 			// If do_counts is set, the whole query is wrapped in a select and summed up for
 			// each demographic.  A null demographic id means the counts are for unassigned labs/documents.
 			//
@@ -313,8 +229,8 @@ public class InboxResultsDao {
 			}
 
 			if (endDate != null) {
-				filterSql += "AND COALESCE(doc.observationdate, lab.obr_date) <= :end_date ";
-				labSql += "AND COALESCE(doc.observationdate, lab_filter.obr_date) <= :end_date ";
+				filterSql += "AND COALESCE(doc.observationdate, lab.obr_date) <= :end_date + INTERVAL 1 DAY ";
+				labSql += "AND COALESCE(doc.observationdate, lab_filter.obr_date) <= :end_date + INTERVAL 1 DAY  ";
 				qp_end_date = true;
 			}
 
@@ -329,198 +245,194 @@ public class InboxResultsDao {
 				qp_demographic_no = true;
 			}
 
-
-
-			sql = "";
-			
 			if(do_counts) {
 				sql = "SELECT "
-					+ "  CAST(demographic_no AS int) AS demographic_no, "
-					+ "  first_name, "
-					+ "  last_name, "
-					+ "  CAST(SUM(IF(result_status = 'A', 1, 0)) AS int) AS abnormal, "
-					+ "  CAST(SUM(IF(has_demographic AND demographic_no NOT IN ('0', '-1') AND doctype = 'DOC', 1, 0)) AS int) AS doc_count, "
-					+ "  CAST(SUM(IF(has_demographic AND demographic_no NOT IN ('0', '-1') AND doctype = 'HL7', 1, 0)) AS int) AS lab_count, "
-					+ "  CAST(SUM(IF((NOT has_demographic OR demographic_no IN ('0', '-1')) AND doctype = 'DOC', 1, 0)) AS int) AS unmatched_doc_count, "
-					+ "  CAST(SUM(IF((NOT has_demographic OR demographic_no IN ('0', '-1')) AND doctype = 'HL7', 1, 0)) AS int) AS unmatched_lab_count, "
-					+ "  CAST(count(*) AS int) AS total_count "
-					+ "FROM ( ";
+						+ "  CAST(demographic_no AS int) AS demographic_no, "
+						+ "  first_name, "
+						+ "  last_name, "
+						+ "  CAST(SUM(IF(result_status = 'A', 1, 0)) AS int) AS abnormal, "
+						+ "  CAST(SUM(IF(has_demographic AND demographic_no NOT IN ('0', '-1') AND doctype = 'DOC', 1, 0)) AS int) AS doc_count, "
+						+ "  CAST(SUM(IF(has_demographic AND demographic_no NOT IN ('0', '-1') AND doctype = 'HL7', 1, 0)) AS int) AS lab_count, "
+						+ "  CAST(SUM(IF((NOT has_demographic OR demographic_no IN ('0', '-1')) AND doctype = 'DOC', 1, 0)) AS int) AS unmatched_doc_count, "
+						+ "  CAST(SUM(IF((NOT has_demographic OR demographic_no IN ('0', '-1')) AND doctype = 'HL7', 1, 0)) AS int) AS unmatched_lab_count, "
+						+ "  CAST(count(*) AS int) AS total_count "
+						+ "FROM ( ";
 			}
-			
-			
-			sql += "SELECT "
- 				+ "  result_type, "
- 				+ "  id, "
- 				+ "  document_no, "
- 				+ "  status, "
- 				+ "  provider_no, "
- 				+ "  doctype, "
- 				+ "  CAST(has_demographic AS integer) AS has_demographic, "
- 				+ "  last_name, "
- 				+ "  first_name, "
- 				+ "  hin, "
- 				+ "  sex, "
- 				+ "  demographic_no, "
- 				+ "  observationdate, "
- 				+ "  description, "
- 				+ "  update_date_time, "
- 				+ "  uploadedBy, "
- 				+ "  label, "
- 				+ "  result_status, "
- 				+ "  priority, "
- 				+ "  requesting_client, "
- 				+ "  discipline, "
- 				+ "  report_status, "
- 				+ "  accessionNum, "
- 				+ "  final_result_count, "
- 				+ "  report_file "
- 				+ "FROM ( "
- 				
- 				// This side of the union is for labs and documents.  It is grouped by accession number
- 				// because labs can have multiple entries for a single lab.  If any of the records for a lab
- 				// are unmatched, the entire lab is marked as unmatched because that is how it is treated 
- 				// when viewing the lab.
-				+ "SELECT "
-				+ "  CASE "
-				+ "    WHEN lab.id IS NOT NULL THEN '" + LabResultData.HL7TEXT + "'"
-				+ "    WHEN doc.document_no IS NOT NULL THEN '" + LabResultData.DOCUMENT + "' "
-				+ "    ELSE 'UNKNOWN' "
-				+ "  END AS result_type, "
-				+ "  proLR.id AS id, "
-				+ "  proLR.lab_no AS document_no, "
-				+ "  proLR.status, "
-				+ "  proLR.provider_no, "
-				+ "  proLR.lab_type AS doctype, "
 
-				// There seems to be an inconsistency where a ctl_document.module_id of either 0 or -1
-				// (when module='demographic') indicates that the document is unassigned.  This CASE
-				// deals with that by checking if a demographic record is successfully joined.
-				+ "  CAST(CASE "
-				+ "    WHEN d1.demographic_no IS NULL AND d2.demographic_no IS NULL THEN false "
-				+ "    ELSE true END AS int) as has_demographic, "
-				+ "  CASE "
-				+ "    WHEN d1.demographic_no IS NOT NULL THEN d1.last_name "
-				+ "    WHEN d2.demographic_no IS NOT NULL THEN d2.last_name  "
-				+ "    ELSE lab.last_name END AS last_name, "
-				+ "  CASE "
-				+ "    WHEN d1.demographic_no IS NOT NULL THEN d1.first_name "
-				+ "    WHEN d2.demographic_no IS NOT NULL THEN d2.first_name  "
-				+ "    ELSE lab.first_name END AS first_name, "
-				+ "  CASE "
-				+ "    WHEN d1.demographic_no IS NOT NULL THEN d1.hin "
-				+ "    WHEN d2.demographic_no IS NOT NULL THEN d2.hin "
-				+ "    ELSE lab.health_no END AS hin, "
-				+ "  CASE "
-				+ "    WHEN d1.demographic_no IS NOT NULL "
-				+ "      THEN CASE WHEN d1.sex IN ('F', 'M') THEN d1.sex ELSE '?' END "
-				+ "    WHEN d2.demographic_no IS NOT NULL "
-				+ "      THEN CASE WHEN d2.sex IN ('F', 'M') THEN d2.sex ELSE '?' END "
-				+ "    ELSE CASE WHEN lab.sex IN ('F', 'M') THEN lab.sex ELSE '?' END "
-				+ "    END AS sex, "
-				+ "  CASE "
-				+ "    WHEN d1.demographic_no IS NOT NULL THEN d1.demographic_no "
-				+ "    WHEN d2.demographic_no IS NOT NULL THEN d2.demographic_no"
-				+ "    ELSE 0 END AS demographic_no, "
-				+ "  COALESCE(doc.observationdate, lab.obr_date) AS observationdate, "
-				+ "  doc.doctype AS description, "
-				+ "  date(doc.updatedatetime) as update_date_time, "
-				+ "  CONCAT(creator.last_name, ', ', creator.first_name) AS uploadedBy, "
-				+ "  lab.label, "
-				+ "  lab.result_status, "
-				+ "  lab.priority, "
-				+ "  lab.requesting_client, "
-				+ "  lab.discipline, "
-				+ "  lab.report_status, "
-				+ "  lab.accessionNum, "
-				+ "  lab.final_result_count,"
-				+ "  null AS report_file ";
+
+			sql += "SELECT "
+					+ "  result_type, "
+					+ "  id, "
+					+ "  document_no, "
+					+ "  status, "
+					+ "  provider_no, "
+					+ "  doctype, "
+					+ "  CAST(has_demographic AS integer) AS has_demographic, "
+					+ "  last_name, "
+					+ "  first_name, "
+					+ "  hin, "
+					+ "  sex, "
+					+ "  demographic_no, "
+					+ "  observationdate, "
+					+ "  description, "
+					+ "  update_date_time, "
+					+ "  uploadedBy, "
+					+ "  label, "
+					+ "  result_status, "
+					+ "  priority, "
+					+ "  requesting_client, "
+					+ "  discipline, "
+					+ "  report_status, "
+					+ "  accessionNum, "
+					+ "  final_result_count, "
+					+ "  report_file "
+					+ "FROM ( "
+
+					// This side of the union is for labs and documents.  It is grouped by accession number
+					// because labs can have multiple entries for a single lab.  If any of the records for a lab
+					// are unmatched, the entire lab is marked as unmatched because that is how it is treated
+					// when viewing the lab.
+					+ "SELECT "
+					+ "  CASE "
+					+ "    WHEN lab.id IS NOT NULL THEN '" + LabResultData.HL7TEXT + "'"
+					+ "    WHEN doc.document_no IS NOT NULL THEN '" + LabResultData.DOCUMENT + "' "
+					+ "    ELSE 'UNKNOWN' "
+					+ "  END AS result_type, "
+					+ "  proLR.id AS id, "
+					+ "  proLR.lab_no AS document_no, "
+					+ "  proLR.status, "
+					+ "  proLR.provider_no, "
+					+ "  proLR.lab_type AS doctype, "
+
+					// There seems to be an inconsistency where a ctl_document.module_id of either 0 or -1
+					// (when module='demographic') indicates that the document is unassigned.  This CASE
+					// deals with that by checking if a demographic record is successfully joined.
+					+ "  CAST(CASE "
+					+ "    WHEN d1.demographic_no IS NULL AND d2.demographic_no IS NULL THEN false "
+					+ "    ELSE true END AS int) as has_demographic, "
+					+ "  CASE "
+					+ "    WHEN d1.demographic_no IS NOT NULL THEN d1.last_name "
+					+ "    WHEN d2.demographic_no IS NOT NULL THEN d2.last_name  "
+					+ "    ELSE lab.last_name END AS last_name, "
+					+ "  CASE "
+					+ "    WHEN d1.demographic_no IS NOT NULL THEN d1.first_name "
+					+ "    WHEN d2.demographic_no IS NOT NULL THEN d2.first_name  "
+					+ "    ELSE lab.first_name END AS first_name, "
+					+ "  CASE "
+					+ "    WHEN d1.demographic_no IS NOT NULL THEN d1.hin "
+					+ "    WHEN d2.demographic_no IS NOT NULL THEN d2.hin "
+					+ "    ELSE lab.health_no END AS hin, "
+					+ "  CASE "
+					+ "    WHEN d1.demographic_no IS NOT NULL "
+					+ "      THEN CASE WHEN d1.sex IN ('F', 'M') THEN d1.sex ELSE '?' END "
+					+ "    WHEN d2.demographic_no IS NOT NULL "
+					+ "      THEN CASE WHEN d2.sex IN ('F', 'M') THEN d2.sex ELSE '?' END "
+					+ "    ELSE CASE WHEN lab.sex IN ('F', 'M') THEN lab.sex ELSE '?' END "
+					+ "    END AS sex, "
+					+ "  CASE "
+					+ "    WHEN d1.demographic_no IS NOT NULL THEN d1.demographic_no "
+					+ "    WHEN d2.demographic_no IS NOT NULL THEN d2.demographic_no"
+					+ "    ELSE 0 END AS demographic_no, "
+					+ "  COALESCE(doc.observationdate, lab.obr_date) AS observationdate, "
+					+ "  doc.doctype AS description, "
+					+ "  date(doc.updatedatetime) as update_date_time, "
+					+ "  CONCAT(creator.last_name, ', ', creator.first_name) AS uploadedBy, "
+					+ "  lab.label, "
+					+ "  lab.result_status, "
+					+ "  lab.priority, "
+					+ "  lab.requesting_client, "
+					+ "  lab.discipline, "
+					+ "  lab.report_status, "
+					+ "  lab.accessionNum, "
+					+ "  lab.final_result_count,"
+					+ "  null AS report_file ";
 
 			if(neverAcknowledgedItems && "N".equals(status)) {
 
 				sql = sql + "FROM (" +
-						    "    SELECT * FROM (" +
-						    "        SELECT plr.*" +
-						    "        FROM providerLabRouting plr" +
-						    "        GROUP BY lab_no, status" +
-						    "    ) lab_status_grouped GROUP BY lab_no HAVING count(lab_no) = 1" +
-						    ") proLR ";
-			} 
+						"    SELECT * FROM (" +
+						"        SELECT plr.*" +
+						"        FROM providerLabRouting plr" +
+						"        GROUP BY lab_no, status" +
+						"    ) lab_status_grouped GROUP BY lab_no HAVING count(lab_no) = 1" +
+						") proLR ";
+			}
 			else {
 
 				sql = sql + "FROM providerLabRouting proLR ";
 			}
 
 			sql += "LEFT JOIN providerLabRouting proLR_filter ON "
-				+ "  proLR.lab_no = proLR_filter.lab_no "
-				+ "  AND proLR.lab_type = proLR_filter.lab_type "
-				+ "  AND ( "
-				+ "    proLR.timestamp < proLR_filter.timestamp OR ( "
-				+ "      proLR.timestamp = proLR_filter.timestamp AND proLR.id < proLR_filter.id)) "
-				+ "  AND proLR_filter.status != 'X' "
-				+ proLrSql
-				+ "LEFT JOIN patientLabRouting patLR ON ( proLR.lab_type = patLR.lab_type AND proLR.lab_no = patLR.lab_no ) "
-				+ "LEFT JOIN patientLabRouting patLR_filter ON ( "
-				+ "  proLR.lab_type = patLR_filter.lab_type "
-				+ "  AND patLR.lab_no = patLR_filter.lab_no "
-				+ "  AND (patLR.dateModified < patLR_filter.dateModified OR (patLR.dateModified = patLR_filter.dateModified AND patLR.id < patLR_filter.id))) "
-				+ "LEFT JOIN document doc ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no AND doc.status <> 'D' ) "
-				+ "LEFT JOIN provider creator ON ( doc.doccreator = creator.provider_no ) "
-				+ "LEFT JOIN ctl_document cdoc ON ( doc.document_no = cdoc.document_no AND cdoc.module='demographic' AND cdoc.module_id > 0) "
-				+ "LEFT JOIN demographic d2 ON ( cdoc.module_id IS NOT NULL AND cdoc.module_id = d2.demographic_no ) "
-				
-				+ "LEFT JOIN demographic d1 ON ( patLR.demographic_no = d1.demographic_no) "
-				+ "LEFT JOIN hl7TextInfo lab ON ( proLR.lab_type = 'HL7' AND lab.lab_no = proLR.lab_no ) "
-				+ "LEFT JOIN hl7TextInfo lab_filter ON  "
-				+ "  lab.accessionNum = lab_filter.accessionNum "
-				+ "  AND (lab.obr_date < lab_filter.obr_date OR ("
-				+ "    lab.obr_date = lab_filter.obr_date AND lab.id < lab_filter.id)) "
-				+ labSql
+					+ "  proLR.lab_no = proLR_filter.lab_no "
+					+ "  AND proLR.lab_type = proLR_filter.lab_type "
+					+ "  AND ( "
+					+ "    proLR.timestamp < proLR_filter.timestamp OR ( "
+					+ "      proLR.timestamp = proLR_filter.timestamp AND proLR.id < proLR_filter.id)) "
+					+ "  AND proLR_filter.status != 'X' "
+					+ proLrSql
+					+ "LEFT JOIN patientLabRouting patLR ON ( proLR.lab_type = patLR.lab_type AND proLR.lab_no = patLR.lab_no ) "
+					+ "LEFT JOIN patientLabRouting patLR_filter ON ( "
+					+ "  proLR.lab_type = patLR_filter.lab_type "
+					+ "  AND patLR.lab_no = patLR_filter.lab_no "
+					+ "  AND (patLR.dateModified < patLR_filter.dateModified OR (patLR.dateModified = patLR_filter.dateModified AND patLR.id < patLR_filter.id))) "
+					+ "LEFT JOIN document doc ON ( proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no AND doc.status <> 'D' ) "
+					+ "LEFT JOIN provider creator ON ( doc.doccreator = creator.provider_no ) "
+					+ "LEFT JOIN ctl_document cdoc ON ( doc.document_no = cdoc.document_no AND cdoc.module='demographic' AND cdoc.module_id > 0) "
+					+ "LEFT JOIN demographic d2 ON ( cdoc.module_id IS NOT NULL AND cdoc.module_id = d2.demographic_no ) "
 
-				+ "WHERE proLR.lab_type IN ('DOC', 'HL7') "
-				+ "AND proLR_filter.id IS NULL "
-				+ "AND patLR_filter.id IS NULL "
-				+ "AND lab_filter.id IS NULL "
-				+ "AND (doc.document_no IS NOT NULL OR lab.id IS NOT NULL) "
-				+ "AND proLR.status != 'X' "
-				+ filterSql;
-				
+					+ "LEFT JOIN demographic d1 ON ( patLR.demographic_no = d1.demographic_no) "
+					+ "LEFT JOIN hl7TextInfo lab ON ( proLR.lab_type = 'HL7' AND lab.lab_no = proLR.lab_no ) "
+					+ "LEFT JOIN hl7TextInfo lab_filter ON  "
+					+ "  lab.accessionNum = lab_filter.accessionNum "
+					+ "  AND (lab.obr_date < lab_filter.obr_date OR ("
+					+ "    lab.obr_date = lab_filter.obr_date AND lab.id < lab_filter.id)) "
+					+ labSql
+
+					+ "WHERE proLR.lab_type IN ('DOC', 'HL7') "
+					+ "AND proLR_filter.id IS NULL "
+					+ "AND patLR_filter.id IS NULL "
+					+ "AND lab_filter.id IS NULL "
+					+ "AND (doc.document_no IS NOT NULL OR lab.id IS NOT NULL) "
+					+ "AND proLR.status != 'X' "
+					+ filterSql;
+
 
 			sql += " UNION ALL "
-					
-					
-			// This side of the union is for HRM documents.  This is entirely untested because we don't
-			// have any example records.  It is included in the query because it is expected to be used soon.
-				+ "SELECT "
- 				+ "  'HRM' AS result_type, "
- 				+ "  hrm.id, "
- 				+ "  hrm.id AS document_no, "
- 				+ "  null AS status, "
- 				+ "  null AS provider_no, "
- 				+ "  null AS doctype, "
- 				+ "  CAST(CASE WHEN d.demographic_no IS NULL THEN 0 ELSE 1 END as int) as has_demographic, "
- 				+ "  d.last_name AS last_name, "
- 				+ "  d.first_name AS first_name, "
- 				+ "  d.hin AS hin, "
- 				+ "  d.sex AS sex, "
- 				+ "  d.demographic_no AS demographic_no, "
- 				+ "  hrm.timeReceived AS observationdate, "
- 				+ "  null AS description, "
- 				+ "  null as update_date_time, "
- 				+ "  null AS uploadedBy, "
- 				+ "  null AS label, "
- 				+ "  null AS result_status, "
- 				+ "  null AS priority, "
- 				+ "  null AS requesting_client, "
- 				+ "  null AS discipline, "
- 				+ "  null AS report_status, "
- 				+ "  null AS accessionNum, "
- 				+ "  null AS final_result_count, "
- 				+ "  reportFile AS report_file "
- 				+ "FROM HRMDocument hrm "
- 				+ "LEFT JOIN HRMDocumentToProvider hrmtp ON hrm.id = hrmtp.hrmDocumentId "
- 				+ "LEFT JOIN HRMDocumentToDemographic hrmtd ON hrm.id = hrmtd.hrmDocumentId "
- 				+ "LEFT JOIN demographic d ON d.demographic_no = hrmtd.demographicNo "
- 				+ "WHERE TRUE ";
+
+
+					// This side of the union is for HRM documents.  This is entirely untested because we don't
+					// have any example records.  It is included in the query because it is expected to be used soon.
+					+ "SELECT "
+					+ "  'HRM' AS result_type, "
+					+ "  hrm.id, "
+					+ "  hrm.id AS document_no, "
+					+ "  null AS status, "
+					+ "  null AS provider_no, "
+					+ "  null AS doctype, "
+					+ "  CAST(CASE WHEN d.demographic_no IS NULL THEN 0 ELSE 1 END as int) as has_demographic, "
+					+ "  d.last_name AS last_name, "
+					+ "  d.first_name AS first_name, "
+					+ "  d.hin AS hin, "
+					+ "  d.sex AS sex, "
+					+ "  d.demographic_no AS demographic_no, "
+					+ "  hrm.timeReceived AS observationdate, "
+					+ "  null AS description, "
+					+ "  null as update_date_time, "
+					+ "  null AS uploadedBy, "
+					+ "  null AS label, "
+					+ "  null AS result_status, "
+					+ "  null AS priority, "
+					+ "  null AS requesting_client, "
+					+ "  null AS discipline, "
+					+ "  null AS report_status, "
+					+ "  null AS accessionNum, "
+					+ "  null AS final_result_count, "
+					+ "  reportFile AS report_file "
+					+ "FROM HRMDocument hrm "
+					+ "LEFT JOIN HRMDocumentToProvider hrmtp ON hrm.id = hrmtp.hrmDocumentId "
+					+ "LEFT JOIN HRMDocumentToDemographic hrmtd ON hrm.id = hrmtd.hrmDocumentId "
+					+ "LEFT JOIN demographic d ON d.demographic_no = hrmtd.demographicNo "
+					+ "WHERE TRUE ";
 
 			if (!"".equals(patientFirstName)) {
 				sql = sql + "AND d.first_name LIKE :first_name ";
@@ -541,19 +453,19 @@ public class InboxResultsDao {
 				sql = sql + "AND (d.demographic_no = :demographic_no) ";
 				qp_hrm_demographic_no = true;
 			}
-					
+
 			sql = sql + "  "
-			+ "ORDER BY observationdate desc, document_no desc ";
+					+ "ORDER BY observationdate desc, document_no desc ";
 
 			if (isPaged) {
 				sql = sql + "LIMIT :page_start, :page_size";
 				qp_page = true;
 			}
 			sql = sql + ") AS the_result ";
-			
+
 			if(do_counts) {
 				sql += ") AS count_query "
-					+ "GROUP BY demographic_no, first_name, last_name ";
+						+ "GROUP BY demographic_no, first_name, last_name ";
 			}
 
 			q = entityManager.createNativeQuery(sql);
@@ -586,13 +498,26 @@ public class InboxResultsDao {
 
 		return result;
 	}
-			
-	@SuppressWarnings({ "unchecked", "deprecation" })
-	public LabSummaryData getInboxSummary(String providerNo, String demographicNo, String patientFirstName,
-			String patientLastName, String patientHealthNumber, String status, boolean isPaged, Integer page,
-			Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal,
-			List<String> providerNoArr, boolean neverAcknowledgedItems, String labType, Date startDate, Date endDate) {
-		
+
+	public LabSummaryData getInboxSummary(
+			String providerNo,
+			String demographicNo,
+			String patientFirstName,
+			String patientLastName,
+			String patientHealthNumber,
+			String status,
+			boolean isPaged,
+			Integer page,
+			Integer pageSize,
+			boolean mixLabsAndDocs,
+			Boolean isAbnormal,
+			List<String> providerNoArr,
+			boolean neverAcknowledgedItems,
+			String labType,
+			Date startDate,
+			Date endDate)
+	{
+
 		int pos = 0;
 		int demographicLoc = pos++;
 		int firstNameLoc = pos++;
@@ -604,7 +529,7 @@ public class InboxResultsDao {
 		int unmatchedLabCountLoc = pos++;
 		int totalCountLoc = pos++;
 
-        HashMap<Integer,PatientInfo> patients = new HashMap<Integer,PatientInfo>();
+		HashMap<Integer,PatientInfo> patients = new HashMap<Integer,PatientInfo>();
 
 		int docCount = 0;
 		int labCount = 0;
@@ -612,27 +537,27 @@ public class InboxResultsDao {
 		int unmatchedDocCount = 0;
 		int unmatchedLabCount = 0;
 		int totalCount = 0;
-		
+
 		try {
 
 			List<Object[]> result = getRawInboxResults(true, providerNo, demographicNo, patientFirstName,
-			patientLastName, patientHealthNumber, status, isPaged, page,
-			pageSize, isAbnormal, providerNoArr, neverAcknowledgedItems, 
-			labType, startDate, endDate);
+					patientLastName, patientHealthNumber, status, isPaged, page,
+					pageSize, isAbnormal, providerNoArr, neverAcknowledgedItems,
+					labType, startDate, endDate);
 
 			for (Object[] r : result) {
-			
+
 				docCount += getIntValue(r[docCountLoc]);
 				labCount += getIntValue(r[labCountLoc]);
 				abnormalCount += getIntValue(r[abnormalCountLoc]);
 				unmatchedDocCount += getIntValue(r[unmatchedDocCountLoc]);
 				unmatchedLabCount += getIntValue(r[unmatchedLabCountLoc]);
 				totalCount += getIntValue(r[totalCountLoc]);
-				
+
 				if(r[demographicLoc] != null && getIntValue(r[demographicLoc]) != 0) {
-					PatientInfo info = new PatientInfo(getIntValue(r[demographicLoc]), 
-						getStringValue(r[firstNameLoc]), getStringValue(r[lastNameLoc]));
-					
+					PatientInfo info = new PatientInfo(getIntValue(r[demographicLoc]),
+							getStringValue(r[firstNameLoc]), getStringValue(r[lastNameLoc]));
+
 					info.setDocCount(getIntValue(r[docCountLoc]));
 					info.setLabCount(getIntValue(r[labCountLoc]));
 
@@ -645,7 +570,7 @@ public class InboxResultsDao {
 		}
 
 		LabSummaryData summary = new LabSummaryData();
-		
+
 		summary.setPatients(patients);
 		summary.setDocumentCount(docCount);
 		summary.setLabCount(labCount);
@@ -653,16 +578,30 @@ public class InboxResultsDao {
 		summary.setUnmatchedDocumentCount(unmatchedDocCount);
 		summary.setUnmatchedLabCount(unmatchedLabCount);
 		summary.setTotalCount(totalCount);
-		
+
 		return summary;
 	}
-			
-	@SuppressWarnings({ "unchecked", "deprecation" })
-	public ArrayList<LabResultData> getInboxResults(LoggedInInfo loggedInInfo, String providerNo, String demographicNo, String patientFirstName,
-			String patientLastName, String patientHealthNumber, String status, boolean isPaged, Integer page,
-			Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal,
-			List<String> providerNoArr, boolean neverAcknowledgedItems, String labType, Date startDate, Date endDate) {
-		
+
+	@SuppressWarnings({ "deprecation" })
+	public ArrayList<LabResultData> getInboxResults(
+			LoggedInInfo loggedInInfo,
+			String providerNo,
+			String demographicNo,
+			String patientFirstName,
+			String patientLastName,
+			String patientHealthNumber,
+			String status,
+			boolean isPaged,
+			Integer page,
+			Integer pageSize,
+			boolean mixLabsAndDocs,
+			Boolean isAbnormal,
+			List<String> providerNoArr,
+			boolean neverAcknowledgedItems,
+			String labType,
+			Date startDate,
+			Date endDate)
+	{
 		int pos = 0;
 		int resultTypeLoc = pos++;
 		int idLoc = pos++;
@@ -695,9 +634,9 @@ public class InboxResultsDao {
 
 		try {
 			List<Object[]> result = getRawInboxResults(false, providerNo, demographicNo, patientFirstName,
-			patientLastName, patientHealthNumber, status, isPaged, page,
-			pageSize, isAbnormal, providerNoArr, neverAcknowledgedItems, 
-			labType, startDate, endDate);
+					patientLastName, patientHealthNumber, status, isPaged, page,
+					pageSize, isAbnormal, providerNoArr, neverAcknowledgedItems,
+					labType, startDate, endDate);
 
 			for (Object[] r : result) {
 
@@ -715,8 +654,8 @@ public class InboxResultsDao {
 
 					lbData.discipline = StringUtils.trimToNull(getStringValue(r[docTypeLoc]));
 					lbData.description = StringUtils.trimToNull(getStringValue(r[descriptionLoc]));
-					lbData.lastUpdateDate = getStringValue(r[updateDateLoc]);				
-				
+					lbData.lastUpdateDate = getStringValue(r[updateDateLoc]);
+
 					lbData.finalResultsCount = 0;
 				}
 				else if(LabResultData.HL7TEXT.equals(resultType)) {
@@ -727,7 +666,7 @@ public class InboxResultsDao {
 					String report_status = getStringValue(r[reportStatusLoc]);
 					String accessionNum = getStringValue(r[accessionNumLoc]);
 					String final_result_count = getStringValue(r[finalResultCountLoc]);
-					
+
 					lbData = new LabResultData(LabResultData.HL7TEXT);
 					lbData.labType = LabResultData.HL7TEXT;
 
@@ -757,11 +696,11 @@ public class InboxResultsDao {
 					lbData.priority = "----";
 					lbData.requestingClient = "";
 					lbData.discipline = "HRM";
-					
+
 					hrmReport = HRMReportParser.parseReport(loggedInInfo, getStringValue(r[hrmReportFileLoc]));
 					lbData.reportStatus = hrmReport.getResultStatus();
 				}
-				
+
 				// The query is built to ignore entries that are not a lab, hrm or document.
 				if(lbData == null) {
 					continue;
@@ -843,7 +782,7 @@ public class InboxResultsDao {
 
 					lbData.finalRes = false;
 				}
-				
+
 				labResults.add(lbData);
 			}
 
@@ -854,400 +793,41 @@ public class InboxResultsDao {
 		return labResults;
 	}
 
-	@SuppressWarnings({ "unchecked", "deprecation" })
-	public ArrayList<LabResultData> populateDocumentResultsData(String providerNo, String demographicNo, String patientFirstName,
-			String patientLastName, String patientHealthNumber, String status, boolean isPaged, Integer page,
-			Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal) {
-		if (providerNo == null) {
-			providerNo = "";
-		}
-		boolean searchProvider = !"-1".equals(providerNo);
-		if (patientFirstName == null) {
-			patientFirstName = "";
-		}
-		if (patientLastName == null) {
-			patientLastName = "";
-		}
-		if (patientHealthNumber == null) {
-			patientHealthNumber = "";
-		}
-		boolean patientSearch = !"".equals(patientFirstName) || !"".equals(patientLastName)
-				|| !"".equals(patientHealthNumber);
-		if (status == null) {
-			status = "";
-		}
-
-		ArrayList<LabResultData> labResults = new ArrayList<LabResultData>();
-		String sql = "";
-		
-		int docNoLoc = -1;
-		int statusLoc = -1;
-		int docTypeLoc = -1;
-		int lastNameLoc = -1;
-		int firstNameLoc = -1;
-		int hinLoc = -1;
-		int sexLoc = -1;
-		int moduleLoc = -1;
-		int obsDateLoc = -1;
-		int descriptionLoc = -1;
-		int updateDateLoc = -1;
-		try {
-
-			// Get documents by demographic
-			//if (demographicNo != null && !"".equals(demographicNo)) {
-			// Get mix from labs
-			if (mixLabsAndDocs) {
-				if ("0".equals(demographicNo) || "0".equals(providerNo)) {
-					docNoLoc = 1; statusLoc = 2; docTypeLoc = 3; lastNameLoc = 4; firstNameLoc = 5; hinLoc = 6; sexLoc = 7; moduleLoc = 8; obsDateLoc = 9; descriptionLoc = 10; updateDateLoc = 11;
-					sql = " SELECT X.id, X.lab_no as document_no, X.status, X.lab_type as doctype, d.last_name, d.first_name, hin, sex, d.demographic_no as module_id, doc.observationdate, doc.doctype as description, date(doc.updatedatetime) "
-							+ " FROM document doc, "
-							+ " (SELECT plr.id, plr.lab_type, plr.lab_no, plr.status "
-							+ "  FROM patientLabRouting plr2, providerLabRouting plr, hl7TextInfo info "
-							+ "  WHERE plr.lab_no = plr2.lab_no "
-							+ (searchProvider ? " AND plr.provider_no = '" + providerNo + "' " : " ")
-							+ "    AND plr.status like '%"
-							+ status
-							+ "%' "
-							+ "    AND plr.lab_type = 'HL7'   "
-							+ "    AND plr2.lab_type = 'HL7' "
-							+ "    AND plr2.demographic_no = '0' "
-							+ "    AND info.lab_no = plr.lab_no "
-							+ (isAbnormal != null && isAbnormal ? "AND info.result_status = 'A'" : isAbnormal != null
-									&& !isAbnormal ? "AND (info.result_status IS NULL OR info.result_status != 'A')" : "")
-							+ " UNION "
-							+ " SELECT plr.id, plr.lab_type, plr.lab_no, plr.status "
-							+ " FROM providerLabRouting plr  "
-							+ " WHERE plr.lab_type = 'DOC' AND plr.status like '%"
-							+ status
-							+ "%' "
-							+ (searchProvider ? " AND plr.provider_no = '" + providerNo + "' " : " ")
-							+ " ) AS X "
-							+ " LEFT JOIN demographic d "
-							+ " ON d.demographic_no = -1 "
-							+ " WHERE X.lab_type = 'DOC' AND doc.document_no = X.lab_no "
-							+ "ORDER BY doc.observationdate DESC, doc.document_no DESC "
-							+ (isPaged ? "	LIMIT " + (page * pageSize) + "," + pageSize : "");
-
-				} else if (demographicNo != null && !"".equals(demographicNo)) {
-					docNoLoc = 1; statusLoc = 2; docTypeLoc = 9; lastNameLoc = 3; firstNameLoc = 4; hinLoc = 5; sexLoc = 6; moduleLoc = 7; obsDateLoc = 8; descriptionLoc = 10; updateDateLoc = 11;
-					sql = " SELECT plr.id, doc.document_no, plr.status, d.last_name, d.first_name, hin, sex, d.demographic_no as module_id, doc.observationdate, plr.lab_type as doctype, doc.doctype as description, date(doc.updatedatetime) "
-							+ " FROM demographic d, providerLabRouting plr, document doc, "
-							+ " (SELECT * FROM "
-							+ " (SELECT DISTINCT plr.id, plr.lab_type  FROM providerLabRouting plr, ctl_document cd "
-							+ " WHERE 	" + " (cd.module_id = '"
-							+ demographicNo
-							+ "' "
-							+ "	AND cd.document_no = plr.lab_no"
-							+ "	AND plr.lab_type = 'DOC'  	"
-							+ "	AND plr.status like '%"
-							+ status
-							+ "%' "
-							+ (searchProvider ? " AND plr.provider_no = '" + providerNo + "' )" : " )")
-							+ " ORDER BY id DESC) AS Y"
-							+ " UNION"
-							+ " SELECT * FROM"
-							+ " (SELECT DISTINCT plr.id, plr.lab_type  FROM providerLabRouting plr, patientLabRouting plr2"
-							+ " WHERE"
-							+ "	plr.lab_type = 'HL7' AND plr2.lab_type = 'HL7'"
-							+ "	AND plr.status like '%"
-							+ status
-							+ "%' "
-							+ (searchProvider ? " AND plr.provider_no = '" + providerNo + "' " : " ")
-							+ " 	AND plr.lab_no = plr2.lab_no AND plr2.demographic_no = '"
-							+ demographicNo
-							+ "'"
-							+ " ORDER BY id DESC) AS Z"
-							+ " ) AS X "
-							+ " WHERE X.lab_type = 'DOC' and X.id = plr.id and doc.document_no = plr.lab_no and d.demographic_no = '"
-							+ demographicNo + "' "
-							+ "ORDER BY doc.observationdate DESC, doc.document_no DESC "
-							+ (isPaged ? "	LIMIT " + (page * pageSize) + "," + pageSize : "");
-				} else if (patientSearch) { // N arg
-					docNoLoc = 1; statusLoc = 2; docTypeLoc = 9; lastNameLoc = 3; firstNameLoc = 4; hinLoc = 5; sexLoc = 6; moduleLoc = 7; obsDateLoc = 8; descriptionLoc = 10; updateDateLoc = 11;
-					sql = " SELECT plr.id, doc.document_no, plr.status, d.last_name, d.first_name, hin, sex, d.demographic_no as module_id, doc.observationdate, plr.lab_type as doctype, doc.doctype as description, date(doc.updatedatetime) "
-							+ " FROM demographic d, providerLabRouting plr, document doc,  "
-							+ " (SELECT * FROM "
-							+ "	 (SELECT * FROM  "
-							+ "		(SELECT DISTINCT plr.id, plr.lab_type, d.demographic_no "
-							+ "			FROM providerLabRouting plr, ctl_document cd, demographic d "
-							+ "			WHERE 	 "
-							+ "			(d.first_name like '%"
-							+ patientFirstName
-							+ "%' AND d.last_name like '%"
-							+ patientLastName
-							+ "%' AND d.hin like '%"
-							+ patientHealthNumber
-							+ "%' "
-							+ "		AND cd.module_id = d.demographic_no 	AND cd.document_no = plr.lab_no	AND plr.lab_type = 'DOC' "
-							+ "				AND plr.status like '%"
-							+ status
-							+ "%' "
-							+ (searchProvider ? " AND plr.provider_no = '" + providerNo + "' " : " ")
-							+ "		) ORDER BY id DESC) AS Y "
-							+ " 	UNION "
-							+ "	SELECT * FROM "
-							+ "		(SELECT DISTINCT plr.id, plr.lab_type, d.demographic_no "
-							+ "		FROM providerLabRouting plr, patientLabRouting plr2, demographic d"
-							+ (isAbnormal != null ? ", hl7TextInfo info " : " ")
-							+ "		WHERE d.first_name like '%"
-							+ patientFirstName
-							+ "%' AND d.last_name like '%"
-							+ patientLastName
-							+ "%' AND d.hin like '%"
-							+ patientHealthNumber
-							+ "%' "
-							+ "		AND	plr.lab_type = 'HL7' AND plr2.lab_type = 'HL7' "
-							+ (isAbnormal != null ? " AND plr.lab_no = info.lab_no AND (info.result_status IS NULL OR info.result_status != 'A') "
-									: " ")
-							+ "				AND plr.status like '%"
-							+ status
-							+ "%' "
-							+ (searchProvider ? " AND plr.provider_no = '" + providerNo + "' " : " ")
-							+ " 	AND plr.lab_no = plr2.lab_no AND plr2.demographic_no = d.demographic_no ORDER BY id DESC) AS Z "
-							+ " 			ORDER BY id DESC) AS X "
-							+ " 	  ) AS Z  "
-							+ " WHERE Z.lab_type = 'DOC' and Z.id = plr.id and doc.document_no = plr.lab_no and d.demographic_no = Z.demographic_no "
-							+ "ORDER BY doc.observationdate DESC, doc.document_no DESC "
-							+ (isPaged ? "	LIMIT " + (page * pageSize) + "," + pageSize : "");
-
-				} else {
-					docNoLoc = 0; statusLoc = 1; docTypeLoc = 8; lastNameLoc = 2; firstNameLoc = 3; hinLoc = 4; sexLoc = 5; moduleLoc = 6; obsDateLoc = 7; descriptionLoc = 9; updateDateLoc = 10;
-					// N
-					// document_no, status, last_name, first_name, hin, sex, module_id, observationdate
-					sql = " SELECT doc.document_no, plr.status, last_name, first_name, hin, sex, module_id, observationdate, plr.lab_type, doc.doctype , date(doc.updatedatetime)"
-							+ " FROM document doc, "
-							+ " 	(SELECT DISTINCT pl.status, pl.lab_type, pl.lab_no FROM providerLabRouting pl "
-							+ (isAbnormal != null ? ", hl7TextInfo info " : "")
-							+ " 	WHERE pl.status like '%"
-							+ status
-							+ "%' "
-							+ (searchProvider ? " AND pl.provider_no = '" + providerNo + "' " : "")
-							// The only time abnormal matters for documents is when we are looking for normal documents since there are no abnormal documents.
-							+ (isAbnormal != null ? "     AND (pl.lab_type = 'DOC' OR (pl.lab_no = info.lab_no AND (info.result_status IS NULL OR info.result_status != 'A'))) "
-									: " AND pl.lab_type = 'DOC' ")
-							+ "     ) AS plr"
-							+ " LEFT JOIN "
-							+ "(SELECT module_id, document_no FROM ctl_document cd "
-							+ "WHERE cd.module = 'demographic' AND cd.module_id != '-1') AS Y "
-							+ "ON plr.lab_type = 'DOC' AND plr.lab_no = Y.document_no"
-							+ " LEFT JOIN "
-							+ "(SELECT demographic_no, first_name, last_name, hin, sex "
-							+ "FROM demographic d) AS Z "
-							+ "ON Y.module_id = Z.demographic_no "
-							+ "WHERE doc.document_no = plr.lab_no "
-							+ "ORDER BY doc.observationdate DESC, doc.document_no DESC "
-							+ (isPaged ? "	LIMIT " + (page * pageSize) + "," + pageSize : "");
-				}
-			} else { // Don't mix labs and docs.
-				if ("0".equals(demographicNo) || "0".equals(providerNo)) {
-					docNoLoc = 1; statusLoc = 2; docTypeLoc = 5; lastNameLoc = 6; firstNameLoc = 7; hinLoc = 8; sexLoc = 9; moduleLoc = 3; obsDateLoc = 4; descriptionLoc = 10; updateDateLoc = 11;
-					sql = " SELECT id, document_no, status, demographic_no as module_id, observationdate, doctype, last_name, first_name, hin, sex, docdesc, updateDateLoc"
-							+ " FROM "
-							+ " (SELECT plr.id, doc.document_no, plr.status, observationdate, plr.lab_type as doctype, doc.doctype as description, date(doc.updatedatetime) as updateDateLoc, docdesc"
-							+ " FROM providerLabRouting plr, document doc"
-							+ " WHERE plr.lab_type = 'DOC' "
-							+ " AND plr.status like '%"
-							+ status
-							+ "%'  "
-							+ " AND plr.provider_no = '0' "
-							+ " AND doc.document_no = plr.lab_no"
-							+ " ORDER BY id DESC 	"
-							+ (isPaged ? "	LIMIT " + (page * pageSize) + "," + pageSize : "")
-							+ ") as X"
-							+ " LEFT JOIN demographic d" + " ON d.demographic_no = -1";
-				} else if (demographicNo != null && !"".equals(demographicNo)) {
-					docNoLoc = 1; statusLoc = 2; docTypeLoc = 9; lastNameLoc = 3; firstNameLoc = 4; hinLoc = 5; sexLoc = 6; moduleLoc = 7; obsDateLoc = 8; descriptionLoc = 10; updateDateLoc = 11;
-					sql = "SELECT plr.id, doc.document_no, plr.status, last_name, first_name, hin, sex, module_id, observationdate, plr.lab_type as doctype, doc.doctype as description, date(doc.updatedatetime) "
-							+ "FROM ctl_document cd, demographic d, providerLabRouting plr, document doc "
-							+ "WHERE d.demographic_no = '"
-							+ demographicNo
-							+ "' "
-							+ "	AND cd.module_id = d.demographic_no "
-							+ "	AND cd.document_no = plr.lab_no "
-							+ "	AND plr.lab_type = 'DOC' "
-							+ "	AND plr.status like '%"
-							+ status
-							+ "%' "
-							+ (searchProvider ? " AND plr.provider_no = '" + providerNo + "' " : "")
-							+ "	AND doc.document_no = cd.document_no "
-							+ " ORDER BY id DESC "
-							+ (isPaged ? "	LIMIT " + (page * pageSize) + "," + pageSize : "");
-				} else if (patientSearch) {
-					docNoLoc = 1; statusLoc = 2; docTypeLoc = 9; lastNameLoc = 3; firstNameLoc = 4; hinLoc = 5; sexLoc = 6; moduleLoc = 7; obsDateLoc = 8; descriptionLoc = 10; updateDateLoc = 11;
-					sql = "SELECT plr.id, doc.document_no, plr.status, last_name, first_name, hin, sex, module_id, observationdate, plr.lab_type as doctype, doc.doctype as description, date(doc.updatedatetime) "
-							+ "FROM ctl_document cd, demographic d, providerLabRouting plr, document doc "
-							+ "WHERE d.first_name like '%"
-							+ patientFirstName
-							+ "%' AND d.last_name like '%"
-							+ patientLastName
-							+ "%' AND d.hin like '%"
-							+ patientHealthNumber
-							+ "%' "
-							+ "	AND cd.module_id = d.demographic_no "
-							+ "	AND cd.document_no = plr.lab_no "
-							+ "	AND plr.lab_type = 'DOC' "
-							+ "	AND plr.status like '%"
-							+ status
-							+ "%' "
-							+ (searchProvider ? " AND plr.provider_no = '" + providerNo + "' " : "")
-							+ "	AND doc.document_no = cd.document_no "
-							+ " ORDER BY id DESC "
-							+ (isPaged ? "	LIMIT " + (page * pageSize) + "," + pageSize : "");
-				} else {
-					docNoLoc = 1; statusLoc = 2; docTypeLoc = 9; lastNameLoc = 3; firstNameLoc = 4; hinLoc = 5; sexLoc = 6; moduleLoc = 7; obsDateLoc = 8; descriptionLoc = 10; updateDateLoc = 11;
-					sql = " SELECT * "
-							+ " FROM (SELECT plr.id, doc.document_no, plr.status, last_name, first_name, hin, sex, module_id, observationdate, plr.lab_type as doctype, docdesc, updatedatetime "
-							+ " FROM ctl_document cd, demographic d, providerLabRouting plr, document doc "
-							+ " WHERE (cd.module_id = d.demographic_no) "
-							+ " 	AND cd.document_no = plr.lab_no "
-							+ " 	AND plr.lab_type = 'DOC' "
-							+ "	AND plr.status like '%"
-							+ status
-							+ "%'  "
-							+ (searchProvider ? " AND plr.provider_no = '" + providerNo + "' " : "")
-							+ " 	AND doc.document_no = cd.document_no  "
-							+ " UNION "
-							+ " SELECT X.id, X.lab_no as document_no, X.status, last_name, first_name, hin, sex, X.module_id, X.observationdate, X.lab_type as doctype, docdesc, updatedatetime "
-							+ " FROM (SELECT plr.id, plr.lab_no, plr.status, plr.lab_type, cd.module_id, observationdate, docdesc, updatedatetime "
-							+ " FROM ctl_document cd, providerLabRouting plr, document d "
-							+ " WHERE plr.lab_type = 'DOC' " + "	AND plr.status like '%" + status + "%'  "
-							+ (searchProvider ? " AND plr.provider_no = '" + providerNo + "' " : "")
-							+ " AND plr.lab_no = cd.document_no " + " AND cd.module_id = -1 "
-							+ " AND d.document_no = cd.document_no " + " ) AS X " + " LEFT JOIN demographic d "
-							+ " ON d.demographic_no = -1) AS X " + " ORDER BY id DESC "
-							+ (isPaged ? "	LIMIT " + (page * pageSize) + "," + pageSize : "");
-				}
-			}
-
-			logger.debug(sql);
-
-			Query q = entityManager.createNativeQuery(sql);
-
-			List<Object[]> result = q.getResultList();
-			for (Object[] r : result) {
-				LabResultData lbData = new LabResultData(LabResultData.DOCUMENT);
-				lbData.labType = LabResultData.DOCUMENT;
-
-				
-				lbData.segmentID = getStringValue(r[docNoLoc]);
-
-				if (demographicNo == null && !providerNo.equals("0")) {
-					lbData.acknowledgedStatus = getStringValue(r[statusLoc]);
-				} else {
-					lbData.acknowledgedStatus = "U";
-				}
-
-				lbData.healthNumber = "";
-				lbData.patientName = "Not, Assigned";
-				lbData.sex = "";
-
-				lbData.isMatchedToPatient = r[lastNameLoc] != null;
-
-				if (lbData.isMatchedToPatient) {
-					lbData.patientName = getStringValue(r[lastNameLoc]) + ", " + getStringValue(r[firstNameLoc]);
-					lbData.healthNumber = getStringValue(r[hinLoc]);
-					lbData.sex = getStringValue(r[sexLoc]);
-					lbData.setLabPatientId(getStringValue(r[moduleLoc]));
-
-				}else {
-					lbData.patientName = "Not, Assigned";
-				}
-
-				logger.debug("DOCUMENT " + lbData.isMatchedToPatient());
-				lbData.accessionNumber = "";
-				lbData.resultStatus = "N";
-
-				lbData.dateTime = getStringValue(r[obsDateLoc]);
-				lbData.setDateObj(DateUtils.parseDate(getStringValue(r[obsDateLoc]), new String[] {
-						"yyyy-MM-dd"
-				}));
-
-				String priority = "";
-				if (priority != null && !priority.equals("")) {
-					switch (priority.charAt(0)) {
-						case 'C':
-							lbData.priority = "Critical";
-							break;
-						case 'S':
-							lbData.priority = "Stat/Urgent";
-							break;
-						case 'U':
-							lbData.priority = "Unclaimed";
-							break;
-						case 'A':
-							lbData.priority = "ASAP";
-							break;
-						case 'L':
-							lbData.priority = "Alert";
-							break;
-						default:
-							lbData.priority = "Routine";
-							break;
-					}
-				} else {
-					lbData.priority = "----";
-				}
-
-				lbData.requestingClient = "";
-
-				lbData.reportStatus = "F";
-
-
-				// the "C" is for corrected excelleris labs
-				if (lbData.reportStatus != null && (lbData.reportStatus.equals("F") || lbData.reportStatus.equals("C"))) {
-					lbData.finalRes = true;
-				} else if (lbData.reportStatus != null && lbData.reportStatus.equals("X")){
-					lbData.cancelledReport = true;
-				} else{
-
-					lbData.finalRes = false;
-				}
-
-				lbData.discipline = StringUtils.trimToNull(getStringValue(r[docTypeLoc]));
-				lbData.description = StringUtils.trimToNull(getStringValue(r[descriptionLoc]));
-				lbData.lastUpdateDate = getStringValue(r[updateDateLoc]);				
-				
-				lbData.finalResultsCount = 0;//rs.getInt("final_result_count");
-				labResults.add(lbData);
-			}
-
-		} catch (Exception e) {
-			logger.error("exception in DOCPopulate:", e);
-		}
-		return labResults;
-	}
-
-	private String getStringValue(Object value) {
+	private String getStringValue(Object value)
+	{
 		return value != null ? value.toString() : null;
 	}
-	
-	private int getIntValue(Object value) {
-		if(value == null) {
+
+	private int getIntValue(Object value)
+	{
+		if(value == null)
+		{
 			return 0;
 		}
-		
-		if(value instanceof Integer) {
+
+		if(value instanceof Integer)
+		{
 			return ((Integer) value).intValue();
 		}
-		else if(value instanceof BigInteger) {
+		else if(value instanceof BigInteger)
+		{
 			return ((BigInteger) value).intValue();
 		}
-		
 		return 0;
 	}
 
-	private boolean getBooleanValue(Object value) {
-		if(value == null){
+	private boolean getBooleanValue(Object value)
+	{
+		if(value == null)
+		{
 			return false;
 		}
-		
-		//BigInteger big_flag = new BigInteger((BigInteger)value);
-		int flag = ((BigInteger) value).intValue();
 
-		if(flag <= 0) {
-			return false; 
+		int flag = ((BigInteger) value).intValue();
+		if(flag <= 0)
+		{
+			return false;
 		}
-		
 		return true;
 	}
 }

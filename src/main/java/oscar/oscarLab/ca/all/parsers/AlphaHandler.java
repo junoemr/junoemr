@@ -25,6 +25,8 @@ package oscar.oscarLab.ca.all.parsers;
 
 import java.util.ArrayList;
 
+import ca.uhn.hl7v2.DefaultHapiContext;
+import ca.uhn.hl7v2.HapiContext;
 import org.apache.log4j.Logger;
 
 import ca.uhn.hl7v2.HL7Exception;
@@ -33,9 +35,7 @@ import ca.uhn.hl7v2.model.Structure;
 import ca.uhn.hl7v2.model.Type;
 import ca.uhn.hl7v2.model.v22.segment.OBX;
 import ca.uhn.hl7v2.parser.Parser;
-import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
-import ca.uhn.hl7v2.validation.impl.NoValidation;
 
 public class AlphaHandler extends DefaultGenericHandler {
 
@@ -59,8 +59,10 @@ public class AlphaHandler extends DefaultGenericHandler {
     
     public void init(String hl7Body) throws HL7Exception {
     	//super.init(hl7Body);
-    	Parser p = new PipeParser();
-        p.setValidationContext(new NoValidation());
+		HapiContext context = new DefaultHapiContext();
+		context.getParserConfiguration().setValidating(false);
+		Parser p = context.getPipeParser();
+
 
         // force parsing as a generic message by changing the message structure
        // hl7Body = hl7Body.replaceAll("R01", "");
@@ -331,20 +333,26 @@ public class AlphaHandler extends DefaultGenericHandler {
         }
     }
 
-    public String getOBXResult(int i, int j){
-        try{
-        	if (version.equals("2.2")) {
-                return(getString(Terser.get(msg22.getPATIENT_RESULT().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX(),5,0,1,1)));
+	public String getOBXResult(int i, int j)
+	{
+		try
+		{
+			if (version.equals("2.2"))
+			{
+				return (getStringWithWhiteSpace(Terser.get(msg22.getPATIENT_RESULT().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX(), 5, 0, 1, 1)));
 
-        	} else {
-                return(getString(Terser.get(msg23.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX(),5,0,1,1)));
+			}
+			else
+			{
+				return (getStringWithWhiteSpace(Terser.get(msg23.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX(), 5, 0, 1, 1)));
 
-        	}
-        }catch(Exception e){
-            logger.error("Error retrieving obx result", e);
-            return("");
-        }
-    }
+			}
+		} catch (Exception e)
+		{
+			logger.error("Error retrieving obx result", e);
+			return ("");
+		}
+	}
 
     public String getOBXReferenceRange(int i, int j){
         try{
@@ -471,30 +479,38 @@ public class AlphaHandler extends DefaultGenericHandler {
 
     }
 
-    public String getOBXComment(int i, int j, int k){
-        try {
-        	if (version.equals("2.2")) {
-                Type[] field= msg22.getPATIENT_RESULT().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getField(7);
-        		if (field.length>1) {
-        			String range = field[k+1].toString();
-        			return(getString(range));
-        		} else {
-        			return "";
-        		}
-    	} else {
-            // ICL likes to thrown reserved characters in their comments -- this is to compensate
-            String obxComment = getString(Terser.get(msg23.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE(k),3,0,1,1))+" "+
-                    getString(Terser.get(msg23.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE(k),3,0,2,1)).trim();
+	public String getOBXComment(int i, int j, int k)
+	{
+		try
+		{
+			if (version.equals("2.2"))
+			{
+				Type[] field = msg22.getPATIENT_RESULT().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getField(7);
+				if (field.length > 1)
+				{
+					String range = field[k + 1].toString();
+					return (getString(range));
+				}
+				else
+				{
+					return "";
+				}
+			}
+			else
+			{
+				// ICL likes to thrown reserved characters in their comments -- this is to compensate
+				String obxComment = getStringWithWhiteSpace(Terser.get(msg23.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE(k), 3, 0, 1, 1)) + " " +
+						getString(Terser.get(msg23.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE(k), 3, 0, 2, 1)).trim();
 
-            return(obxComment);
-    	}
+				return (obxComment);
+			}
 
 
-
-        } catch (Exception e) {
-            return("");
-        }
-    }
+		} catch (Exception e)
+		{
+			return ("");
+		}
+	}
 
     public String getAccessionNum(){
         try{
@@ -646,4 +662,15 @@ public class AlphaHandler extends DefaultGenericHandler {
 		sb.append("obxCount="+getOBXCount(0));
     	logger.info(sb.toString());
     }
+
+	protected String getStringWithWhiteSpace(String message) {
+		if (message == null)
+		{
+			return "";
+		}
+		else
+		{
+			return message.replaceAll("\\\\\\.br\\\\", "<br />");
+		}
+	}
 }

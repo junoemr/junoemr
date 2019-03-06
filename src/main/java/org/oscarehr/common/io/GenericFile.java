@@ -30,6 +30,8 @@ import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -60,6 +62,11 @@ public class GenericFile
 	public static final String DOCUMENT_BASE_DIR = props.getProperty("DOCUMENT_DIR");
 	public static final String DOCUMENT_ORIGINAL_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("DOCUMENT_ORIGINAL_DIR")).getPath();
 	public static final String DOCUMENT_CORRUPT_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("DOCUMENT_CORRUPT_DIR")).getPath();
+	public static final String OUTBOUND_FAX_DIR_PENDING = props.getProperty("fax_file_location");
+	public static final String OUTBOUND_FAX_DIR_SENT = new File(OUTBOUND_FAX_DIR_PENDING, "sent").getPath();
+	public static final String OUTBOUND_FAX_DIR_UNSENT = new File(OUTBOUND_FAX_DIR_PENDING, "unsent").getPath();
+
+	public static final String EMAIL_TEMPLATE_DIRECTORY = props.getProperty("template_file_location");
 
 	// file info
 	protected File javaFile;
@@ -87,7 +94,18 @@ public class GenericFile
 	{
 		return moveFile(DOCUMENT_CORRUPT_DIR);
 	}
-
+	public boolean moveToOutgoingFaxPending() throws IOException
+	{
+		return moveFile(OUTBOUND_FAX_DIR_PENDING);
+	}
+	public boolean moveToOutgoingFaxSent() throws IOException
+	{
+		return moveFile(OUTBOUND_FAX_DIR_SENT);
+	}
+	public boolean moveToOutgoingFaxUnsent() throws IOException
+	{
+		return moveFile(OUTBOUND_FAX_DIR_UNSENT);
+	}
 	public boolean moveToOriginal() throws IOException
 	{
 		return moveFile(DOCUMENT_ORIGINAL_DIR);
@@ -192,6 +210,10 @@ public class GenericFile
 	{
 		return this.javaFile;
 	}
+	public FileInputStream asFileInputStream() throws FileNotFoundException
+	{
+		return new FileInputStream(this.javaFile);
+	}
 	public String getContentType() throws IOException
 	{
 		return GenericFile.getContentType(javaFile);
@@ -203,6 +225,11 @@ public class GenericFile
 	public String getName()
 	{
 		return javaFile.getName();
+	}
+
+	public FileInputStream toFileInputStream() throws FileNotFoundException
+	{
+		return new FileInputStream(javaFile);
 	}
 	/**
 	 * returns the file content type, or null if it cannot be determined

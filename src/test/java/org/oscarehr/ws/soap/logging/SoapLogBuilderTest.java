@@ -27,8 +27,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.oscarehr.ws.common.MaskParameter;
-import org.oscarehr.ws.common.SkipContentLogging;
+import org.oscarehr.ws.common.annotation.MaskParameter;
+import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
 import org.oscarehr.ws.external.soap.logging.SoapLogBuilder;
 import org.oscarehr.ws.external.soap.logging.model.SoapServiceLog;
 
@@ -44,16 +44,16 @@ public class SoapLogBuilderTest
 {
     public void noAnnotationsStub() {}
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
     public void skipContentLoggingStub() {}
 
     @MaskParameter
     public void maskParameterStubDefault(){}
 
-    @MaskParameter(name="mask_me")
+    @MaskParameter(fields ="mask_me")
     public void maskParameterStubSpecifiedField() {}
 
-    @MaskParameter(name={"secret0", "secret1"})
+    @MaskParameter(fields ={"secret0", "secret1"})
     public void maskParameterStubArray(){}
 
     private static HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
@@ -86,7 +86,7 @@ public class SoapLogBuilderTest
     public void testDefaultSkipContentLogging()
     {
         String testData = makeSoapMessage("lab provider", "medical labs ltd.", "labData", "really_long_string");
-        String expected = SkipContentLogging.SKIP_CONTENT_LOGGING;
+        String expected = SkipContentLoggingInbound.SKIP_CONTENT_LOGGING_INBOUND;
 
         configureBuilder(testData, "skipContentLoggingStub");
         SoapServiceLog logEntry = logBuilder.buildSoapLog();

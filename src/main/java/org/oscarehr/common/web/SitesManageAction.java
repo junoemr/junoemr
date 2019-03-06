@@ -59,28 +59,49 @@ public class SitesManageAction extends DispatchAction {
         return mapping.findForward("details");
     }
 
-    public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-    	DynaBean lazyForm = (DynaBean) form;
+    public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+		DynaBean lazyForm = (DynaBean) form;
 
-    	Site s = (Site) lazyForm.get("site");
+		Site newSite = (Site) lazyForm.get("site");
 
-    	// verify mandatories
-    	if (StringUtils.isBlank(s.getName())||StringUtils.isBlank(s.getShortName())) {
-   			ActionMessages errors = this.getErrors(request);
- 			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required", "Site name or short name"));
-    		this.saveErrors(request, errors);
-    	}
-    	if (StringUtils.isBlank(s.getBgColor())) {
-   			ActionMessages errors = this.getErrors(request);
- 			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required", "Theme color"));
-    		this.saveErrors(request, errors);
-    	}
+		// verify mandatories
+		if (StringUtils.isBlank(newSite.getName()) || StringUtils.isBlank(newSite.getShortName()))
+		{
+			ActionMessages errors = this.getErrors(request);
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required", "Site name or short name"));
+			this.saveErrors(request, errors);
+		}
+		if (StringUtils.isBlank(newSite.getBgColor()))
+		{
+			ActionMessages errors = this.getErrors(request);
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required", "Theme color"));
+			this.saveErrors(request, errors);
+		}
+
+		// check that site with this name does not already exist
+		Site siteByName = siteDao.findByName(newSite.getName());
+		if (siteByName != null && !siteByName.getId().equals(newSite.getId()))
+		{
+			ActionMessages errors = this.getErrors(request);
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.exists", "A site with the name: " + newSite.getName()));
+			this.saveErrors(request, errors);
+		}
+
+		// check that site with this short name does not already exist
+		Site siteByShortName = siteDao.findByShortName(newSite.getShortName());
+		if (siteByShortName != null && !siteByShortName.getId().equals(newSite.getId()))
+		{
+			ActionMessages errors = this.getErrors(request);
+			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.exists", "A site with the short name: " + newSite.getShortName()));
+			this.saveErrors(request, errors);
+		}
 
     	if (this.getErrors(request).size()>0)
     		return mapping.findForward("details");
 
 
-    	siteDao.save(s);
+    	siteDao.save(newSite);
 
         return view(mapping, form, request, response);
     }

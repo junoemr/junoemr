@@ -182,6 +182,7 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 			default: criteria.addOrder(getOrder("demographicId")); break;
 		}
 	}
+
 	public Integer getDemographicNo()
 	{
 		return DemographicNo;
@@ -291,8 +292,6 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	{
 		this.sortMode = sortMode;
 	}
-
-
 
 	public STATUSMODE getStatusMode()
 	{

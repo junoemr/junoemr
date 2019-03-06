@@ -340,7 +340,10 @@ public class RxSessionBean implements Serializable
         RxPrescriptionData.Prescription rx;
         for(int i=0;i<this.getStashSize(); i++) {
            rx = this.getStashItem(i);
-           regionalIdentifierCodes.add(rx.getRegionalIdentifier());
+           if (rx.getRegionalIdentifier() != null)
+		   {
+			   regionalIdentifierCodes.add(rx.getRegionalIdentifier());
+		   }
         }
         return regionalIdentifierCodes;
     }

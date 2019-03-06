@@ -24,7 +24,7 @@
 
 --%>
 
-<%@ page import="java.util.*, oscar.*, oscar.util.*" errorPage="errorpage.jsp"%>
+<%@ page import="oscar.util.UtilDict" errorPage="errorpage.jsp"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
     if(session.getAttribute("userrole") == null )  response.sendRedirect("../logout.jsp");
@@ -38,6 +38,7 @@
   // associate each operation with an output JSP file -- displaymode
   String[][] opToFile = new String[][] {
      {"Add Appointment" , "appointmentaddarecord.jsp"},
+     {"Add Appt & Email" , "appointmentaddarecord.jsp"},
      {"Group Appt" , "appointmentgrouprecords.jsp"},
      {"Group Action" ,  "appointmentgrouprecords.jsp"},
      {"Add Appt & PrintPreview" , "appointmentaddrecordprint.jsp"},
@@ -49,8 +50,14 @@
      {"edit" , "editappointment.jsp"},
      {"Update Appt" , "appointmentupdatearecord.jsp"},
      {"Delete Appt" , "appointmentdeletearecord.jsp"},
+     {"Email Reminder" , "appointmentemailreminder.jsp"},
      {"Cut" , "appointmentcutrecord.jsp"},
      {"Copy" , "appointmentcopyrecord.jsp"}
+  };
+
+  // map operation to value of "postAction" request attribute to set
+  String[][] opToPostAction = new String[][] {
+          {"Add Appt & Email" , "Email"},
   };
 
   // create an operation-to-file dictionary
@@ -63,6 +70,15 @@
 
   // get operation name from request
   String operation = requestParamDict.getDef("displaymode","");
+
+  // create an operation-to-post-action dictionary and add a request attribute if applicable
+  UtilDict opToPostActionDict = new UtilDict();
+  opToPostActionDict.setDef(opToPostAction);
+  String postAction = opToPostActionDict.getDef(operation, null);
+  if(postAction != null)
+  {
+    pageContext.getRequest().setAttribute("postAction", postAction);
+  }
 
   // redirect to a file associated with operation
   pageContext.forward(opToFileDict.getDef(operation,""));

@@ -44,6 +44,8 @@ import java.util.List;
 @Table(name = "provider")
 public class ProviderData extends AbstractModel<String> implements Serializable {
 
+	public static final String SYSTEM_PROVIDER_NO = "-1";
+
 	/**
 	 * default serial version id for serializable
 	 */

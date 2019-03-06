@@ -42,6 +42,15 @@
     function set(target) {
      document.forms[0].forward.value=target;
 };
+    <%
+    	String error = (String)request.getAttribute("error");
+    	if (error != null)
+    	{
+    %>
+			alert("<%=error%>");
+	<%
+    	}
+    %>
 </script>
 </head>
 

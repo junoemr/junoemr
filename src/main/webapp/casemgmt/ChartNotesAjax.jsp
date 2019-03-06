@@ -281,7 +281,7 @@ int maxId = 0;
 			fulltxt = fullTxtFormat.get(pos) || note.getRemoteFacilityId()!=null;
 			--pos;
 			bgColour = CaseManagementViewAction.getNoteColour(note);
-			if (fulltxt)
+			if (fulltxt || note.isDocument())
 			{
 				noteStr = noteStr.replaceAll("\n", "<br>");
 			}

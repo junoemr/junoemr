@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Chartlabel2" pageWidth="350" pageHeight="75" columnWidth="330" leftMargin="0" rightMargin="0" topMargin="10" bottomMargin="0">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"  isIgnorePagination="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Chartlabel2" pageWidth="350" pageHeight="75" columnWidth="330" leftMargin="0" rightMargin="0" topMargin="6" bottomMargin="0">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -32,32 +32,32 @@
 	<field name="sex" class="java.lang.String"/>
 	<field name="doc_name" class="java.lang.String"/>
 	<title>
-		<band height="60" splitType="Stretch">
+		<band height="65" splitType="Stretch">
 			<textField>
 				<reportElement x="17" y="0" width="330" height="17"/>
 				<textElement>
-					<font size="10" isBold="true" isUnderline="true"/>
+					<font isBold="true" isUnderline="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{last_name} + "," + $F{first_name} + "   " + "CHART#:" + $F{chart_no}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement positionType="Float" mode="Opaque" x="17" y="15" width="330" height="17"/>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" mode="Opaque" x="17" y="14" width="330" height="17"/>
 				<textElement/>
-				<textFieldExpression><![CDATA["HIN:" + $F{hin} + " " + $F{ver} + "   " + "SEX:" + $F{sex} + "	   " + "DOB:" +$F{date_of_birth} + "/" + $F{month_of_birth} + "/" + $F{year_of_birth}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["HIN:" + $F{hin} + " " + $F{ver} + "   " + "SEX:" + $F{sex} + "   " + "DOB:" +$F{date_of_birth} + "/" + $F{month_of_birth} + "/" + $F{year_of_birth}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isStretchWithOverflow="true">
 				<reportElement positionType="Float" mode="Opaque" x="17" y="28" width="330" height="17"/>
 				<textElement/>
 				<textFieldExpression><![CDATA[$F{address} + " " + $F{city} + "," + $F{province} + " " + $F{postal}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isStretchWithOverflow="true">
 				<reportElement positionType="Float" mode="Opaque" x="17" y="43" width="330" height="17">
 					<printWhenExpression><![CDATA[Boolean.valueOf($F{doc_name} != null)]]></printWhenExpression>
 				</reportElement>
 				<textElement/>
 				<textFieldExpression><![CDATA["HOME: " + $F{phone} + "   " + "Dr. " + $F{doc_name}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isStretchWithOverflow="true">
 				<reportElement positionType="Float" mode="Opaque" x="17" y="43" width="330" height="17">
 					<printWhenExpression><![CDATA[Boolean.valueOf($F{doc_name} == null)]]></printWhenExpression>
 				</reportElement>

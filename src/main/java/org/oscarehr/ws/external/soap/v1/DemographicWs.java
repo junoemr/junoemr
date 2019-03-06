@@ -30,6 +30,8 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.Gender;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.PHRVerification;
+import org.oscarehr.demographic.dao.DemographicCustDao;
+import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -47,6 +49,7 @@ import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 
 @WebService
@@ -60,11 +63,22 @@ public class DemographicWs extends AbstractWs {
 
 	@Autowired
 	private DemographicManager demographicManager;
-	
+
+	@Autowired
+	private DemographicCustDao demographicCustDao;
+
 	public DemographicTransfer getDemographic(Integer demographicId)
 	{
-		Demographic demographic=demographicManager.getDemographic(getLoggedInInfo(),demographicId);
-		return(DemographicTransfer.toTransfer(demographic));
+		Demographic demographic = demographicManager.getDemographic(getLoggedInInfo(), demographicId);
+		DemographicCust custResult = demographicCustDao.find(demographic.getDemographicNo());
+
+		DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
+		if (custResult != null)
+		{
+			transfer.setNotes(custResult.getParsedNotes());
+		}
+
+		return (transfer);
 	}
 
 	public DemographicTransfer getDemographicByMyOscarUserName(String myOscarUserName)
@@ -72,11 +86,25 @@ public class DemographicWs extends AbstractWs {
 		Demographic demographic=demographicManager.getDemographicByMyOscarUserName(getLoggedInInfo(),myOscarUserName);
 		return(DemographicTransfer.toTransfer(demographic));
 	}
-	
-	public DemographicTransfer[] searchDemographicByName(String searchString, int startIndex, int itemsToReturn)
+
+	public List<DemographicTransfer> searchDemographicByName(String searchString, int startIndex, int itemsToReturn)
 	{
-		List<Demographic> demographics=demographicManager.searchDemographicByName(getLoggedInInfo(),searchString, startIndex, itemsToReturn);
-		return(DemographicTransfer.toTransfers(demographics));
+		List<Demographic> demographics = demographicManager.searchDemographicByName(getLoggedInInfo(), searchString, startIndex, itemsToReturn);
+		List<DemographicTransfer> transferList = new ArrayList<DemographicTransfer>();
+
+		for (Demographic demographic : demographics)
+		{
+			DemographicCust custResult = demographicCustDao.find(demographic.getDemographicNo());
+
+			DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
+			if (custResult != null)
+			{
+				transfer.setNotes(custResult.getParsedNotes());
+			}
+			transferList.add(transfer);
+		}
+
+		return (transferList);
 	}
 	
 	public PhrVerificationTransfer getLatestPhrVerificationByDemographic(Integer demographicId)
@@ -139,6 +167,29 @@ public class DemographicWs extends AbstractWs {
 		return(DemographicTransfer.toTransfers(demographics));	
 	}
 
+	public List getDemographicsByHealthNum(String hin)
+	{
+		List<Demographic> demographicList = demographicManager.getDemographicsByHealthNum(hin);
+
+		Iterator<Demographic> demographicListIterator = demographicList.iterator();
+		List<DemographicTransfer> out = new ArrayList<DemographicTransfer>();
+		while (demographicListIterator.hasNext())
+		{
+			Demographic demographic = demographicListIterator.next();
+
+			DemographicCust custResult = demographicCustDao.find(demographic.getDemographicNo());
+
+			DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
+			if (custResult != null)
+			{
+				transfer.setNotes(custResult.getParsedNotes());
+			}
+			out.add(transfer);
+		}
+
+		return (out);
+	}
+
 	/**
 	 * @return the ID of the demographic just added
 	 */
@@ -159,7 +210,7 @@ public class DemographicWs extends AbstractWs {
 		}
 
 		demographicManager.addDemographicWithValidation(loggedInInfo, demographic);
-		demographicManager.addDemographicExtras(loggedInInfo, demographic);
+		demographicManager.addDemographicExtras(loggedInInfo, demographic, demographicTransfer);
 		demographicManager.addDemographicExts(loggedInInfo, demographic, demographicTransfer);
 
 		return demographic.getDemographicNo();
@@ -185,7 +236,7 @@ public class DemographicWs extends AbstractWs {
 		}
 
 		demographicManager.addDemographicWithValidation(loggedInInfo, demographic);
-		demographicManager.updateDemographicExtras(loggedInInfo, demographic);
+		demographicManager.updateDemographicExtras(loggedInInfo, demographic, demographicTransfer);
 		demographicManager.addDemographicExts(loggedInInfo, demographic, demographicTransfer);
 
 	}
