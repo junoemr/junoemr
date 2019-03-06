@@ -21,7 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ticklers.service;
+package org.oscarehr.ticklers.dao;
 
 import java.util.List;
 
