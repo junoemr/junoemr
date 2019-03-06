@@ -172,10 +172,10 @@ if(!authed) {
 	}
 	consultUtil.estActiveTeams();
 
-	boolean enableEmail = false;
+	boolean validPatientEmail = false;
 	if(demographic != null)
 	{
-		enableEmail = EmailUtilsOld.isValidEmailAddress(demographic.getEmail());
+		validPatientEmail = EmailUtilsOld.isValidEmailAddress(demographic.getEmail());
 	}
 
 	if (request.getParameter("error") != null)
@@ -1645,7 +1645,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 
             <% if (OscarProperties.getInstance().isPropertyActive("appointment_reminder_enabled")) { %>
               <input type="button"
-                <% if(!enableEmail) { %> disabled="disabled" <% } %>
+                <% if(!validPatientEmail) { %> disabled="disabled" <% } %>
                 name="updateAndEmailDetails"
                 value='<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailAppointmentTime"/>'
                 onclick="return checkForm('Update And Email Details','EctConsultationFormRequestForm');" />
@@ -1653,7 +1653,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 						<%
 							if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled"))
 							{
-								boolean disableNotification = !enableEmail;
+								boolean disableNotification = !validPatientEmail;
 								if (requestId != null)
 								{
 									ConsultationRequestDao consultationRequestDao = (ConsultationRequestDao) SpringUtils.getBean("consultationRequestDao");
@@ -1680,14 +1680,14 @@ var requestIdKey = "<%=signatureRequestId %>";
 						if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) {
 					%>
 						<input type="button"
-								<% if(!enableEmail) { %> disabled="disabled" <% } %>
+								<% if(!validPatientEmail) { %> disabled="disabled" <% } %>
 							   id="submitAndEmailNotification" name="submitAndEmailNotification"
 							   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailNotification"/>"
 							   onclick="return checkForm('Submit And Email Notification','EctConsultationFormRequestForm');" />
 					<% 	   }
 
 				    }
-						if(faxEnabled)
+						if(OscarProperties.getInstance().isPropertyActive("consultation_email_enabled"))
 						{
 							%>
 							<div>
@@ -2474,7 +2474,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 
             <% if (OscarProperties.getInstance().isPropertyActive("appointment_reminder_enabled")) { %>
               <input type="button"
-                <% if(!enableEmail) { %> disabled="disabled" <% } %>
+                <% if(!validPatientEmail) { %> disabled="disabled" <% } %>
                 name="updateAndEmailDetails"
                 value='<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailAppointmentTime"/>'
                 onclick="return checkForm('Update And Email Details','EctConsultationFormRequestForm');" />
@@ -2482,7 +2482,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 
 			<% if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) { %>
 			<input type="button"
-					<% if(!enableEmail) { %> disabled="disabled" <% } %>
+					<% if(!validPatientEmail) { %> disabled="disabled" <% } %>
 				   id="updateAndEmailNotification" name="updateAndEmailNotification"
 				   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailNotification"/>"
 				   onclick="return checkForm('Update And Email Notification','EctConsultationFormRequestForm');" />
@@ -2504,7 +2504,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 						%>
 						<% if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) { %>
 						<input type="button"
-								<% if(!enableEmail) { %> disabled="disabled" <% } %>
+								<% if(!validPatientEmail) { %> disabled="disabled" <% } %>
 							   id="submitAndEmailNotification" name="submitAndEmailNotification"
 							   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailNotification"/>"
 							   onclick="return checkForm('Submit And Email Notification','EctConsultationFormRequestForm');" />
