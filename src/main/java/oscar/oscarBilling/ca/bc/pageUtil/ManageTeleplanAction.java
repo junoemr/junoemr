@@ -30,6 +30,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.billing.CA.BC.dao.TeleplanS21Dao;
+import org.oscarehr.billing.CA.BC.model.TeleplanS21;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.DiagnosticCodeDao;
 import org.oscarehr.common.model.Demographic;
@@ -413,7 +415,18 @@ public class ManageTeleplanAction extends DispatchAction {
 		if(loadFromFile)
 		{
 			remittanceFilename = props.getProperty("billing.remit_load_from_file.file");
-			log.warn("Loading remittance from file: " + remittanceFilename);
+			TeleplanS21Dao s21Dao = SpringUtils.getBean(TeleplanS21Dao.class);
+
+			List<TeleplanS21> matches = s21Dao.findByFilename(remittanceFilename);
+			if(!matches.isEmpty())
+			{
+				log.error("Aborted. Remittance file has already been loaded: " + remittanceFilename);
+				return mapping.findForward("error");
+			}
+			else
+			{
+				log.warn("Loading remittance from file: " + remittanceFilename);
+			}
 		}
 		else
 		{
