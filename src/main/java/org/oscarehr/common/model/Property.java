@@ -81,6 +81,11 @@ public class Property extends AbstractModel<Integer> implements Serializable {
 		this.value = StringUtils.trimToNull(value);
 	}
 
+	public void setValueNoNull(String value)
+	{
+		this.value = StringUtils.trimToEmpty(value);
+	}
+
 	public String getProviderNo() {
 		return (providerNo);
 	}
