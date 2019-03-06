@@ -1,4 +1,4 @@
-<%--
+<%@ page import="org.oscarehr.util.MiscUtils" %><%--
 
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
@@ -25,6 +25,7 @@
 --%>
 
 <% String cardData = request.getParameter("card_no");
+	MiscUtils.getLogger().info("New Card Data: [" + cardData + "]");
 	cardData = cardData.replaceAll("\"","'");
 %>
 <html>
