@@ -486,7 +486,7 @@ billTypes = "%";
 %>
 	  <input type="radio" name="billTypes" value="<%=MSPReconcile.REJECTED%>"     <%=billTypes.equals(MSPReconcile.REJECTED)?"checked":""%>/>
       Rejected
-      <input type="radio" name="billTypes" value="<%=MSPReconcile.NOTSUBMITTED%>" <%=billTypes.equals(MSPReconcile.NOTSUBMITTED)?"checked":""%>/>
+      <input type="radio" name="billTypes" value="<%=MSPReconcile.NOTSUBMITTED + "," + MSPReconcile.WCB%>" <%=billTypes.equals(MSPReconcile.NOTSUBMITTED)?"checked":""%>/>
       Not Submitted
       <input type="radio" name="billTypes" value="<%=MSPReconcile.SUBMITTED%>"    <%=billTypes.equals(MSPReconcile.SUBMITTED)?"checked":""%>/>
       Submitted
