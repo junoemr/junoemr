@@ -274,14 +274,7 @@ public class ManageTeleplanAction extends DispatchAction {
 				String fee = code.substring(5, 13).trim();
 				String desc = code.substring(13).trim();
 				BillingCodeData bcd = new BillingCodeData();
-				if(bcd.getBillingCodeByCode(nCode) == null)
-				{ //NEW CODE
-					bcd.addBillingCode(nCode, desc, fee);
-				}
-				else
-				{ //UPDATE PRICE
-					bcd.updateBillingCodePrice(nCode, fee);
-				}
+				bcd.addBillingCode(nCode, desc, fee);
 			}
 		}
 		return mapping.findForward("success");
