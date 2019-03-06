@@ -44,6 +44,8 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
+<%@ page import="org.oscarehr.fax.service.OutgoingFaxService" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
 
 <% oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance(); %>
 
@@ -58,6 +60,8 @@ int provNo = Integer.parseInt((String) session.getAttribute("user"));
 
 FrmRecord rec = (new FrmRecordFactory()).factory(formClass);
 Properties props = rec.getFormRecord(LoggedInInfo.getLoggedInInfoFromSession(request),demoNo, formId);
+	OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
+	boolean faxEnabled = outgoingFaxService.isOutboundFaxEnabled();
 
 FrmData fd = new FrmData();
 String resource = fd.getResource();
@@ -922,7 +926,7 @@ function calcAgeAtEDD(){
 				<input type="submit" style="width: 75px;" value="Print All"
 				onclick="javascript:return onPrintAll();" />
 				<%
-					if (oscarProperties.isFormFaxEnabled())
+					if (faxEnabled)
 					{
 				%>
 				<input type="button" style="width: 65px;" value="Fax All"
@@ -2520,7 +2524,7 @@ function calcAgeAtEDD(){
             <input type="submit" value="Print AR1 & AR2" onclick="javascript:return onPrint12();"/>
             <input type="submit" style="width:75px;" value="Print All" onclick="javascript:return onPrintAll();"/>
 			<%
-				if (oscarProperties.isFormFaxEnabled())
+				if (faxEnabled)
 				{
 			%>
 			<input type="button" style="width: 65px;" value="Fax All"

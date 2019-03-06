@@ -28,6 +28,7 @@ package oscar.oscarEncounter.oscarMeasurements.pageUtil;
 import java.io.IOException;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -37,9 +38,11 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.MeasurementGroupDao;
 import org.oscarehr.common.dao.MeasurementTypeDao;
 import org.oscarehr.common.dao.MeasurementTypeDeletedDao;
+import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.MeasurementType;
 import org.oscarehr.common.model.MeasurementTypeDeleted;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -52,6 +55,7 @@ import oscar.oscarEncounter.oscarMeasurements.data.MeasurementTypes;
 
 public class EctDeleteMeasurementTypesAction extends Action {
 
+	private MeasurementDao measurementDao = SpringUtils.getBean(MeasurementDao.class);
 	private MeasurementTypeDao measurementTypeDao = SpringUtils.getBean(MeasurementTypeDao.class);
 	private MeasurementGroupDao measurementGroupDao = SpringUtils.getBean(MeasurementGroupDao.class);
 	private MeasurementTypeDeletedDao measurementTypeDeletedDao = SpringUtils.getBean(MeasurementTypeDeletedDao.class);
@@ -77,19 +81,27 @@ public class EctDeleteMeasurementTypesAction extends Action {
 					MeasurementType mt = measurementTypeDao.find(Integer.parseInt(deleteCheckbox[i]));
 					if (mt != null)
 					{
-						String typeDisplayName = mt.getTypeDisplayName();
+						List<Measurement> measurementTypeInUse = measurementDao.findByType(mt.getType());
+						if (measurementTypeInUse.isEmpty())
+						{
+							String typeDisplayName = mt.getTypeDisplayName();
 
-						MeasurementTypeDeleted mtd = new MeasurementTypeDeleted();
-						mtd.setType(mt.getType());
-						mtd.setTypeDisplayName(typeDisplayName);
-						mtd.setTypeDescription(mt.getTypeDescription());
-						mtd.setMeasuringInstruction(mt.getMeasuringInstruction());
-						mtd.setValidation(mt.getValidation());
-						mtd.setDateDeleted(new Date());
-						measurementTypeDeletedDao.persist(mtd);
+							MeasurementTypeDeleted mtd = new MeasurementTypeDeleted();
+							mtd.setType(mt.getType());
+							mtd.setTypeDisplayName(typeDisplayName);
+							mtd.setTypeDescription(mt.getTypeDescription());
+							mtd.setMeasuringInstruction(mt.getMeasuringInstruction());
+							mtd.setValidation(mt.getValidation());
+							mtd.setDateDeleted(new Date());
+							measurementTypeDeletedDao.persist(mtd);
 
-						measurementTypeDao.remove(mt.getId());
-						measurementGroupDao.removeAll(typeDisplayName);
+							measurementTypeDao.remove(mt.getId());
+							measurementGroupDao.removeAll(typeDisplayName);
+						}
+						else
+						{
+							request.setAttribute("error", "Measurement is in use. Cannot delete.");
+						}
 					}
 
 

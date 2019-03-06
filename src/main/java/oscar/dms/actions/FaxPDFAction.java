@@ -25,15 +25,15 @@
 
 package oscar.dms.actions;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.fax.service.OutgoingFaxService;
+import org.oscarehr.util.SpringUtils;
 
-import oscar.OscarProperties;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  *
@@ -41,10 +41,12 @@ import oscar.OscarProperties;
  */
 public class FaxPDFAction extends Action {
 
-    public ActionForward execute(ActionMapping mapping, ActionForm form, 
+	private static OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
+
+    public ActionForward execute(ActionMapping mapping, ActionForm form,
 		HttpServletRequest request, HttpServletResponse response) 
 	{
-		if(!OscarProperties.getInstance().isPropertyActive("document_fax_enabled")) 
+		if(!outgoingFaxService.isOutboundFaxEnabled())
 		{
 			return mapping.findForward("failed");
 		}

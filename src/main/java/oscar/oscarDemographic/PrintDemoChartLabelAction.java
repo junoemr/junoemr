@@ -32,6 +32,7 @@ import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarAction;
 import oscar.OscarDocumentCreator;
+import oscar.oscarDemographic.pageUtil.JasperLabel;
 
 public class PrintDemoChartLabelAction extends OscarAction {
 
@@ -143,8 +144,9 @@ public class PrintDemoChartLabelAction extends OscarAction {
 	
 	        response.setHeader("Content-disposition", getHeader(response).toString());
 	        OscarDocumentCreator osc = new OscarDocumentCreator();
-        
-            osc.fillDocumentStream(parameters, sos, "pdf", ins, DbConnectionFilter.getThreadLocalDbConnection(),exportPdfJavascript);
+
+            osc.fillDocumentStream(parameters, sos, "pdf", ins, DbConnectionFilter.getThreadLocalDbConnection(),
+					exportPdfJavascript, JasperLabel.getDefaultJasperLabelContext());
         }
         catch (SQLException e) {
             MiscUtils.getLogger().error("Error", e);

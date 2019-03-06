@@ -166,6 +166,7 @@
 %>
 <% if (request.getParameter("inWindow") != null && request.getParameter("inWindow").equalsIgnoreCase("true")) {  %>
 <html>
+<title>Show Document <%=documentNo%></title>
 <head>
 	<script type="text/javascript" src="<%= contextPath %>/share/calendar/calendar.js"></script>
 	<!-- language for the calendar -->
@@ -363,7 +364,11 @@
 											<input onclick="split('<%=docId%>','<%=StringEscapeUtils.escapeJavaScript(demoName) %>')" type="button" value="<bean:message key="inboxmanager.document.split" />" />
 											<input id="rotate180btn_<%=docId %>" onclick="rotate180('<%=docId %>')" type="button" value="<bean:message key="inboxmanager.document.rotate180" />" />
 											<input id="rotate90btn_<%=docId %>" onclick="rotate90('<%=docId %>')" type="button" value="<bean:message key="inboxmanager.document.rotate90" />" />
-											<% if (numOfPage > 1) { %><input id="removeFirstPagebtn_<%=docId %>" onclick="removeFirstPage('<%=docId %>')" type="button" value="<bean:message key="inboxmanager.document.removeFirstPage" />" /><% } %>
+											<% if (numOfPage > 1) { %><input id="removeFirstPagebtn_<%=docId %>" onclick="removePage('<%=docId %>', 1)" type="button" value="<bean:message key="inboxmanager.document.removeFirstPage" />" /><% } %>
+											<% if (numOfPage > 1 && displayDocumentAs.equals(UserProperty.IMAGE))
+											{ %>
+												<input id="removePagebtn_<%=docId %>" onclick="removePage('<%=docId %>', $('curPage_' + <%=docId %>).value)" type="button" value="<bean:message key="inboxmanager.document.removeCurrentPage" />"/>
+											<% } %>
 										</div>
 									</td>
 								</tr>

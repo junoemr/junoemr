@@ -60,16 +60,14 @@ public class dxResearchUpdateQuickListAction extends Action {
 		String curUser = (String) request.getSession().getAttribute("user");
 		dxResearchLoadQuickListItemsForm qLItemsFrm = (dxResearchLoadQuickListItemsForm) request.getSession().getAttribute("dxResearchLoadQuickListItemsFrm");
 		qLItemsFrm.setQuickListName(quickListName);
-		boolean valid = true;
 
-		if (forward.equals("add")) {
-			valid = doAdd(request, frm, quickListName, codingSystem, curUser);
-		} else if (forward.equals("remove")) {
-			doRemove(frm, quickListName);
+		if(forward.equals("add"))
+		{
+			doAdd(request, frm, quickListName, codingSystem, curUser);
 		}
-
-		if (!valid) {
-			return (new ActionForward(mapping.getInput()));
+		else if(forward.equals("remove"))
+		{
+			doRemove(frm, quickListName);
 		}
 
 		return mapping.findForward("success");

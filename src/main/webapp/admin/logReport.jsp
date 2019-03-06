@@ -166,6 +166,7 @@ label{margin-top:6px;margin-bottom:0px;}
 				<option value="document">Document</option>
 				<option value="eform_data">EForm</option>
 				<option value="eform_template">EForm Template</option>
+				<option value="fax">Fax</option>
 				<option value="cme_notes">Encounter Note</option>
 				<option value="login">Log in</option>
 			</select>
@@ -212,6 +213,7 @@ label{margin-top:6px;margin-bottom:0px;}
 		if(content.equals("cme_notes")) content = LogConst.CON_CME_NOTE;
 		if(content.equals("eform_data")) content = LogConst.CON_EFORM_DATA;
 		if(content.equals("eform_template")) content = LogConst.CON_EFORM_TEMPLATE;
+		if(content.equals("fax")) content = LogConst.CON_FAX;
 		if(content.equals("all")) content = "%";
 	  
 	  String sDate = request.getParameter("startDate");

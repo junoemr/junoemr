@@ -171,8 +171,6 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			},
 			function(new_value)
 			{
-				console.log('NavBarController::watch demographicSearch', controller.demographicSearch);
-
 				if (new_value != null && !new_value.isTypeaheadSearchQuery)
 				{
 					// selection from the patient search typeahead changed

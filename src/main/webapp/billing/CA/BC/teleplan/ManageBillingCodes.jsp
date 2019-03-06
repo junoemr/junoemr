@@ -49,7 +49,8 @@ if(!authed) {
 <%@ page import="org.oscarehr.common.dao.BillingServiceDao,org.oscarehr.util.SpringUtils,org.oscarehr.common.model.*" %>
 <%BillingServiceDao billingServiceDao = (BillingServiceDao) SpringUtils.getBean("billingServiceDao"); %>
 
-<%@page import="org.oscarehr.util.MiscUtils"%><html:html locale="true">
+<%@page import="org.oscarehr.util.MiscUtils"%>
+<html:html locale="true">
 
 <head>
 <title>
@@ -277,10 +278,13 @@ tr.newCode{
 tr.nochange{
    display: none;
 }
-tr.down{
+tr.description_change {
+    background-color:lightblue;
+}
+tr.price_down{
    background-color: red;
 }
-tr.up{
+tr.price_up{
    background-color: #33FF33;
 }
        
@@ -351,12 +355,23 @@ tr.up{
                                 BigDecimal newPriceDec = (BigDecimal) h.get("fee");
 
                                 if(oldPriceDec.compareTo(newPriceDec) == 0){
-                                    classStyle = "nochange";
-                                    selected = "";
-                                }else if(oldPriceDec.compareTo(newPriceDec) > 0){
-                                    classStyle = "down";
-                                }else if(oldPriceDec.compareTo(newPriceDec) < 0){
-                                    classStyle = "up";
+                                	if (!h.get("desc").toString().trim().equals(thisCode.getDescription().trim()))
+                                	{
+                                		classStyle = "description_change";
+                                	}
+                                	else
+                                    {
+                                        classStyle = "nochange";
+                                        selected = "";
+                                    }
+                                }
+                                else if(oldPriceDec.compareTo(newPriceDec) > 0)
+                                {
+                                    classStyle = "price_down";
+                                }
+                                else if(oldPriceDec.compareTo(newPriceDec) < 0)
+                                {
+                                    classStyle = "price_up";
                                 }
                             }catch(Exception e){
                                 MiscUtils.getLogger().error("ERROR: oldfee "+oldFee);
@@ -368,7 +383,7 @@ tr.up{
                     %>
                    
                     <tr class="<%=classStyle%>">
-                        <td><input type="checkbox" name="codes" value="<%=lin%>" <%=selected%>/></td>
+                        <td><input type="checkbox" name="codes" value="<%=Misc.htmlEscape(lin)%>" <%=selected%>/></td>
                         <td><%=h.get("code")%></td>
                         <td><%=oldFee%></td>
                         <td><%=h.get("fee")%></td>

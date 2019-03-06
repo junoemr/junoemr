@@ -248,8 +248,8 @@ public class CreateBillingReportAction extends OscarAction
 				{
 					billSearch = msp.getBillsByType(account, payee, provider, startDate, endDate, !showWCB, !showMSP, !showPriv, !showICBC, reportType);
 
-					oscar.entities.Provider payProv = msp.getProvider(payee, 1);
-					reportParams.put("account", account.equals("ALL") ? "ALL" : payProv.getFullName());
+					oscar.entities.Provider acctProv = msp.getProvider(account, 0);
+					reportParams.put("account", account.equals("ALL") ? "ALL" : acctProv.getFullName());
 					//Fill document with report parameter data
 					documentCreator.fillDocumentStream(reportParams, outputStream, documentFormat, reportInstream, billSearch.list);
 					break;
