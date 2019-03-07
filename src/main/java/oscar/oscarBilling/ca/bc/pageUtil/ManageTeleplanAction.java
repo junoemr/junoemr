@@ -30,6 +30,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.billing.CA.BC.dao.TeleplanS21Dao;
+import org.oscarehr.billing.CA.BC.model.TeleplanS21;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.DiagnosticCodeDao;
 import org.oscarehr.common.model.Demographic;
@@ -68,6 +70,7 @@ public class ManageTeleplanAction extends DispatchAction {
 
     private static Logger log = MiscUtils.getLogger();
 	private static final String teleplan_login_failure_msgHdr = "An error occured connecting to teleplan: <br/>";
+	private static final OscarProperties props = OscarProperties.getInstance();
 
     /** Creates a new instance of ManageTeleplanAction */
     public ManageTeleplanAction() {
@@ -406,27 +409,50 @@ public class ManageTeleplanAction extends DispatchAction {
 	public ActionForward remit(ActionMapping mapping, ActionForm form,
 	                           HttpServletRequest request, HttpServletResponse response)
 	{
-
-		TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
-		String[] userpass = dao.getUsernamePassword();
-		TeleplanService tService = new TeleplanService();
-
-		TeleplanAPI tAPI = null;
-		try
+		String remittanceFilename;
+		// should be enabled for dev use/ bug fixing only
+		boolean loadFromFile = props.isPropertyActive("billing.remit_load_from_file.enabled");
+		if(loadFromFile)
 		{
-			tAPI = tService.getTeleplanAPI(userpass[0], userpass[1]);
+			remittanceFilename = props.getProperty("billing.remit_load_from_file.file");
+			TeleplanS21Dao s21Dao = SpringUtils.getBean(TeleplanS21Dao.class);
+
+			List<TeleplanS21> matches = s21Dao.findByFilename(remittanceFilename);
+			if(!matches.isEmpty())
+			{
+				log.error("Aborted. Remittance file has already been loaded: " + remittanceFilename);
+				return mapping.findForward("error");
+			}
+			else
+			{
+				log.warn("Loading remittance from file: " + remittanceFilename);
+			}
 		}
-		catch(Exception e)
+		else
 		{
-			log.warn(e.getMessage());
-			request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
-			return mapping.findForward("error");
+			TeleplanUserPassDAO dao = new TeleplanUserPassDAO();
+			String[] userpass = dao.getUsernamePassword();
+			TeleplanService tService = new TeleplanService();
+
+			TeleplanAPI tAPI;
+			try
+			{
+				tAPI = tService.getTeleplanAPI(userpass[0], userpass[1]);
+			}
+			catch(Exception e)
+			{
+				log.warn(e.getMessage());
+				request.setAttribute("error", teleplan_login_failure_msgHdr + e.getMessage());
+				return mapping.findForward("error");
+			}
+
+			TeleplanResponse tr = tAPI.getRemittance(true);
+			log.debug(tr.toString());
+			log.debug("real filename " + tr.getRealFilename());
+			remittanceFilename = tr.getRealFilename();
 		}
 
-		TeleplanResponse tr = tAPI.getRemittance(true);
-		log.debug(tr.toString());
-		log.debug("real filename " + tr.getRealFilename());
-		request.setAttribute("filename", tr.getRealFilename());
+		request.setAttribute("filename", remittanceFilename);
 		return mapping.findForward("remit");
 	}
 
