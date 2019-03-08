@@ -40,14 +40,18 @@ if(!authed) {
 %>
 
 
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
+<%@page import="org.oscarehr.consultations.model.ConsultDocs"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@ page import="java.math.*, java.util.*, java.io.*, java.sql.*, oscar.*, oscar.util.*, java.net.*,oscar.MyDateFormat, oscar.dms.*, oscar.dms.data.*, oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationAttachDocs"%>
-<%@ page import="oscar.oscarLab.ca.on.*"%>
-<%@ page import="oscar.oscarLab.ca.all.Hl7textResultsData"%>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils"%>
-<%@ page import="org.oscarehr.util.SessionConstants"%>
+<%@ page import="org.oscarehr.consultations.service.ConsultationAttachmentService, org.oscarehr.eform.model.EFormData,
+org.oscarehr.util.LoggedInInfo,
+org.oscarehr.util.SpringUtils, oscar.dms.EDoc,
+oscar.dms.EDocUtil, oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationAttachDocs"%>
+<%@ page import="oscar.oscarLab.ca.all.Hl7textResultsData" %>
+<%@ page import="oscar.oscarLab.ca.on.CommonLabResultData" %>
+<%@ page import="oscar.oscarLab.ca.on.LabResultData" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
 <%
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
    		 
@@ -71,7 +75,9 @@ if(!authed) {
 	}
 
 	String patientName = EDocUtil.getDemographicName(loggedInInfo, demoNo);
-	String[] docType = {"D", "L"};
+	String[] docType = {ConsultDocs.DOCTYPE_DOC, ConsultDocs.DOCTYPE_LAB, ConsultDocs.DOCTYPE_EFORM};
+
+	ConsultationAttachmentService consultationAttachmentService = SpringUtils.getBean(ConsultationAttachmentService.class);
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html:html locale="true">
@@ -278,6 +284,15 @@ if(!authed) {
 						<%
 								}
 							}
+
+							List<EFormData> unattachedEformList = consultationAttachmentService.getUnattachedEForms(Integer.parseInt(demoNo), Integer.parseInt(requestId));
+							for(EFormData eform : unattachedEformList)
+							{
+							%>
+						<html:option styleClass="eform"
+						             value="<%=docType[2] + eform.getId()%>"><%=eform.getFormName() + " " + eform.getFormDate() %></html:option>
+						<%
+							}
 						%>
 					</html:select></td>
 				<td style="width: 10%; text-align: center"><input type="button"
@@ -310,6 +325,16 @@ if(!authed) {
 										+ resData.getDateTime()%></html:option>
 						<%
 							}
+
+							List<EFormData> attachedEformList = consultationAttachmentService.getAttachedEForms(Integer.parseInt(demoNo), Integer.parseInt(requestId));
+							for(EFormData eform : attachedEformList)
+							{
+							%>
+						<html:option styleClass="eform"
+						             value="<%=docType[2] + eform.getId()%>"><%=eform.getFormName() + " " + eform.getFormDate() %></html:option>
+						<%
+						}
+					%>
 						%>
 					</html:select></td>
 			</tr>

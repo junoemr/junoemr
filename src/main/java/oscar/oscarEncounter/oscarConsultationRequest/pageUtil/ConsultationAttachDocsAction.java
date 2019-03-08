@@ -24,12 +24,6 @@
 
 package oscar.oscarEncounter.oscarConsultationRequest.pageUtil;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -37,17 +31,26 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
+import org.oscarehr.consultations.model.ConsultDocs;
+import org.oscarehr.consultations.service.ConsultationAttachmentService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.OscarProperties;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConsultationAttachDocsAction extends Action {
 
 	private static Logger logger = Logger.getLogger(ConsultationAttachDocsAction.class);
 
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private ConsultationAttachmentService consultationAttachmentService = SpringUtils.getBean(ConsultationAttachmentService.class);
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 
@@ -72,26 +75,54 @@ public class ConsultationAttachDocsAction extends Action {
 
 			String[] labs;
 			String[] docs;
+			String[] eforms;
 
-			if (!OscarProperties.getInstance().isPropertyActive("consultation_indivica_attachment_enabled")) {
-				labs = frm.getStrings("attachedDocs");
-				docs = frm.getStrings("attachedDocs");
-			}
-			else {
+			if(OscarProperties.getInstance().isPropertyActive("consultation_indivica_attachment_enabled"))
+			{
 				labs = request.getParameterValues("labNo");
 				docs = request.getParameterValues("docNo");
+				eforms = request.getParameterValues("eFormNo");
+			}
+			else
+			{
+				labs = frm.getStrings("attachedDocs");
+				docs = frm.getStrings("attachedDocs");
+				eforms = frm.getStrings("attachedDocs");
 			}
 			if (labs == null) { labs = new String[]{};}
 			if (docs == null) { docs = new String[]{};}
+			if (eforms == null) { eforms = new String[]{};}
 
 			ConsultationAttachDocs Doc = new ConsultationAttachDocs(provNo, demoNo, requestId, docs);
 			Doc.attach(loggedInInfo);
 
 			ConsultationAttachLabs Lab = new ConsultationAttachLabs(provNo, demoNo, requestId, labs);
 			Lab.attach(loggedInInfo);
+
+			consultationAttachmentService.setAttachedEforms(Integer.parseInt(requestId), provNo, filterIdList(eforms, ConsultDocs.DOCTYPE_EFORM));
 			return mapping.findForward("success");
 		}
-		logger.error("Invalid consultation document parameters (provider:" + provNo + ",demoNo:" + demoNo + ",requestId:" + requestId + "). Save attempt aborted.");
+		logger.error("Invalid consultation document parameters " +
+				"(provider:" + provNo + ",demoNo:" + demoNo + ",requestId:" + requestId + "). Save attempt aborted.");
 		return mapping.findForward("failure");
+	}
+
+	/**
+	 * filter the attachedDocs id list on prefix. ids start with a doctype letter, followed by the integerID value for that attachment
+	 * @param idList
+	 * @param filterPrefix
+	 * @return filtered list converted to integers
+	 */
+	private List<Integer> filterIdList(String[] idList, String filterPrefix)
+	{
+		List<Integer> filterdList = new ArrayList<>();
+		for(String id : idList)
+		{
+			if(id.startsWith(filterPrefix))
+			{
+				filterdList.add(Integer.parseInt(id.substring(filterPrefix.length())));
+			}
+		}
+		return filterdList;
 	}
 }

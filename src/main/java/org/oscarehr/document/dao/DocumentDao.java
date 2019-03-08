@@ -36,7 +36,7 @@ import java.util.Map;
 import javax.persistence.Query;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.common.model.ConsultDocs;
+import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;

@@ -24,29 +24,30 @@
 
 package oscar.oscarEncounter.oscarConsultationRequest.pageUtil;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.consultations.service.ConsultationAttachmentService;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import oscar.dms.EDocUtil;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 
-public class ConsultationGetAttachedAction extends Action {
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-	private static final Logger logger= MiscUtils.getLogger();
+public class ConsultationGetAttachedAction extends Action
+{
+	private static ConsultationAttachmentService consultationAttachmentService = SpringUtils.getBean(ConsultationAttachmentService.class);
 
-	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws ServletException, IOException {
-
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	{
 		CommonLabResultData labData = new CommonLabResultData();
 		String displayValue = "display: none;";
 
@@ -57,14 +58,29 @@ public class ConsultationGetAttachedAction extends Action {
 		ArrayList labs = labData.populateLabResultsData(loggedInInfo, demoNo, requestId, CommonLabResultData.ATTACHED);
 		ArrayList privateDocs = EDocUtil.listDocs(loggedInInfo, demoNo, requestId, EDocUtil.ATTACHED);
 
-		if ( privateDocs.size() == 0 && labs.size() == 0 ) {
+		List<EFormData> eFormList = consultationAttachmentService.getAttachedEForms(Integer.parseInt(demoNo), Integer.parseInt(requestId));
+		List<String> eFormLabels = getEFormLabels(eFormList);
+
+		if(privateDocs.isEmpty() && labs.isEmpty() && eFormLabels.isEmpty())
+		{
 			displayValue = "";
 		}
 
 		request.setAttribute("displayValue", displayValue);
 		request.setAttribute("docArray", privateDocs);
 		request.setAttribute("labArray", labs);
+		request.setAttribute("eFormArray", eFormLabels);
 
 		return mapping.findForward("success");
+	}
+
+	private List<String> getEFormLabels(List<EFormData> eFormList)
+	{
+		List<String> labels = new ArrayList<>(eFormList.size());
+		for(EFormData eform : eFormList)
+		{
+			labels.add(eform.getFormName());
+		}
+		return labels;
 	}
 }

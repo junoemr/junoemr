@@ -24,7 +24,7 @@ if(!authed) {
 }
 %>
 
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
+<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%
 String user_no = (String) session.getAttribute("user");
 String userfirstname = (String) session.getAttribute("userfirstname");
@@ -36,11 +36,10 @@ String userlastname = (String) session.getAttribute("userlastname");
 <jsp:useBean id="oscarVariables" class="java.util.Properties"
 	scope="page" />
 <%@ page
-	import="java.math.*, java.util.*, java.io.*, java.sql.*, oscar.*, oscar.util.*, java.net.*,oscar.MyDateFormat, oscar.dms.*, oscar.dms.data.*, oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationAttachDocs"%>
-<%@ page import="oscar.oscarLab.ca.on.*"%>
-<%@ page import="oscar.oscarLab.ca.all.Hl7textResultsData"%>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils"%>
-<%@page import="org.oscarehr.util.SessionConstants"%>
+	import="org.oscarehr.util.LoggedInInfo, oscar.MyDateFormat, oscar.dms.EDoc, oscar.dms.EDocUtil,
+	oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationAttachDocs,
+	oscar.oscarLab.ca.on.CommonLabResultData, oscar.oscarLab.ca.on.LabResultData,
+	oscar.util.DateUtils, oscar.util.StringUtils, java.util.ArrayList, java.util.Collections"%>
 
 <%
 

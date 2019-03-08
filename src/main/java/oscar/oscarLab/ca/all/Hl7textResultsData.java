@@ -33,7 +33,7 @@ import org.oscarehr.consultations.dao.ConsultResponseDocDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
-import org.oscarehr.common.model.ConsultDocs;
+import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.common.model.ConsultResponseDoc;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.PatientLabRouting;

@@ -23,7 +23,9 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.consultations.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import java.util.Date;
 
@@ -37,8 +39,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name="consultdocs")
-public class ConsultDocs extends AbstractModel<Integer>{
+@Table(name = "consultdocs")
+public class ConsultDocs extends AbstractModel<Integer>
+{
 	public static final String DOCTYPE_DOC = "D";
 	public static final String DOCTYPE_EFORM = "E";
 	public static final String DOCTYPE_LAB = "L";
@@ -50,24 +53,27 @@ public class ConsultDocs extends AbstractModel<Integer>{
 
 	private int requestId;
 
-	@Column(name="document_no")
+	@Column(name = "document_no")
 	private int documentNo;
 
-	@Column(name="doctype")
+	@Column(name = "doctype")
 	private String docType;
 
 	private String deleted;
 
-	@Column(name="attach_date")
+	@Column(name = "attach_date")
 	@Temporal(TemporalType.DATE)
 	private Date attachDate;
 
-	@Column(name="provider_no")
+	@Column(name = "provider_no")
 	private String providerNo;
-	
-	public ConsultDocs() {}
-	
-	public ConsultDocs(int requestId, int documentNo, String docType, String providerNo) {
+
+	public ConsultDocs()
+	{
+	}
+
+	public ConsultDocs(int requestId, int documentNo, String docType, String providerNo)
+	{
 		setRequestId(requestId);
 		setDocumentNo(documentNo);
 		setDocType(docType);
@@ -75,61 +81,73 @@ public class ConsultDocs extends AbstractModel<Integer>{
 		setAttachDate(new Date());
 	}
 
-	public Integer getId() {
-    	return id;
-    }
+	public Integer getId()
+	{
+		return id;
+	}
 
-	public void setId(Integer id) {
-    	this.id = id;
-    }
+	public void setId(Integer id)
+	{
+		this.id = id;
+	}
 
-	public int getRequestId() {
-    	return requestId;
-    }
+	public int getRequestId()
+	{
+		return requestId;
+	}
 
-	public void setRequestId(int requestId) {
-    	this.requestId = requestId;
-    }
+	public void setRequestId(int requestId)
+	{
+		this.requestId = requestId;
+	}
 
-	public int getDocumentNo() {
-    	return documentNo;
-    }
+	public int getDocumentNo()
+	{
+		return documentNo;
+	}
 
-	public void setDocumentNo(int documentNo) {
-    	this.documentNo = documentNo;
-    }
+	public void setDocumentNo(int documentNo)
+	{
+		this.documentNo = documentNo;
+	}
 
-	public String getDocType() {
-    	return docType;
-    }
+	public String getDocType()
+	{
+		return docType;
+	}
 
-	public void setDocType(String docType) {
-    	this.docType = docType;
-    }
+	public void setDocType(String docType)
+	{
+		this.docType = docType;
+	}
 
-	public String getDeleted() {
-    	return deleted;
-    }
+	public String getDeleted()
+	{
+		return deleted;
+	}
 
-	public void setDeleted(String deleted) {
-    	this.deleted = deleted;
-    }
+	public void setDeleted(String deleted)
+	{
+		this.deleted = deleted;
+	}
 
-	public Date getAttachDate() {
-    	return attachDate;
-    }
+	public Date getAttachDate()
+	{
+		return attachDate;
+	}
 
-	public void setAttachDate(Date attachDate) {
-    	this.attachDate = attachDate;
-    }
+	public void setAttachDate(Date attachDate)
+	{
+		this.attachDate = attachDate;
+	}
 
-	public String getProviderNo() {
-    	return providerNo;
-    }
+	public String getProviderNo()
+	{
+		return providerNo;
+	}
 
-	public void setProviderNo(String providerNo) {
-    	this.providerNo = providerNo;
-    }
-
-
+	public void setProviderNo(String providerNo)
+	{
+		this.providerNo = providerNo;
+	}
 }

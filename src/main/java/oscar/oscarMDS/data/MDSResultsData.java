@@ -38,7 +38,7 @@ import org.oscarehr.common.dao.LabTestResultsDao;
 import org.oscarehr.common.dao.MdsMSHDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
-import org.oscarehr.common.model.ConsultDocs;
+import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.common.model.ConsultResponseDoc;
 import org.oscarehr.common.model.LabPatientPhysicianInfo;
 import org.oscarehr.common.model.MdsMSH;

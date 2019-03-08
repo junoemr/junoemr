@@ -41,8 +41,7 @@ if(!authed) {
 
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@page
-    import="java.util.ArrayList, oscar.dms.*, oscar.oscarLab.ca.on.*, oscar.util.StringUtils"%>
-<%@page import="org.oscarehr.util.SessionConstants"%>
+    import="oscar.dms.EDoc, oscar.oscarLab.ca.on.LabResultData, oscar.util.StringUtils, java.util.ArrayList"%>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 
@@ -53,6 +52,7 @@ if(!authed) {
     String displayValue = (String) request.getAttribute("displayValue");
     ArrayList labs = (ArrayList) request.getAttribute("labArray");
     ArrayList docs = (ArrayList) request.getAttribute("docArray");
+    ArrayList<String> eFormLabels = (ArrayList<String>) request.getAttribute("eFormArray");
 
 %>
 <ul id="attachedList"
@@ -72,6 +72,12 @@ if(!authed) {
     %>
     <li class="lab"><%=resData.getDiscipline()+" "+resData.getDateTime()%></li>
     <%
+        }
+        for(String eFormLabel : eFormLabels)
+        {
+    %>
+	<li class="eform"><%=StringUtils.maxLenString(eFormLabel, 19, 16, "...")%></li>
+	<%
         }
     %>
 </ul>

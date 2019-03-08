@@ -26,7 +26,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.common.dao.ConsultDocsDao;
 import org.oscarehr.common.exception.HtmlToPdfConversionException;
-import org.oscarehr.common.model.ConsultDocs;
+import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.managers.SecurityInfoManager;

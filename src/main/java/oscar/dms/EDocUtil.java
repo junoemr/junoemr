@@ -41,7 +41,7 @@ import org.oscarehr.common.dao.ConsultDocsDao;
 import org.oscarehr.common.dao.CtlDocTypeDao;
 import org.oscarehr.common.dao.IndivoDocsDao;
 import org.oscarehr.common.dao.TicklerLinkDao;
-import org.oscarehr.common.model.ConsultDocs;
+import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.common.model.CtlDocType;
 import org.oscarehr.common.model.CtlDocumentPK;
 import org.oscarehr.common.model.Demographic;

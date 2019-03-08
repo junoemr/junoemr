@@ -292,6 +292,11 @@ input.btn{
     color: #CC0099;
 	word-break: break-word;
 }
+
+.eform {
+	color: #045700;
+	word-break: break-word;
+}
 td.tite {
 
 background-color: #bbbbFF;

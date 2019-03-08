@@ -30,7 +30,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.oscarehr.common.dao.ConsultDocsDao;
-import org.oscarehr.common.model.ConsultDocs;
+import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 

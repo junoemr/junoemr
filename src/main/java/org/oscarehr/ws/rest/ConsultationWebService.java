@@ -29,7 +29,7 @@ import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.BORNPathwayMappingDao;
 import org.oscarehr.common.dao.ConsultationServiceDao;
 import org.oscarehr.common.model.BORNPathwayMapping;
-import org.oscarehr.common.model.ConsultDocs;
+import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.common.model.ConsultResponseDoc;
 import org.oscarehr.common.model.ConsultationRequest;
 import org.oscarehr.common.model.ConsultationResponse;
