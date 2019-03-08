@@ -35,8 +35,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.jpedal.PdfDecoder;
-import org.jpedal.fonts.FontMappings;
+import org.ghost4j.document.PDFDocument;
+import org.ghost4j.renderer.SimpleRenderer;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
 import org.oscarehr.PMmodule.model.ProgramProvider;
@@ -98,6 +98,8 @@ import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
@@ -105,6 +107,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.concurrent.Semaphore;
 
 /**
  * @author jaygallagher
@@ -113,11 +116,21 @@ public class ManageDocumentAction extends DispatchAction {
 
 	private static Logger logger = MiscUtils.getLogger();
 
+	private static Integer MAX_GHOST4J_THREADS = 10;
+	private static SimpleRenderer ghost4jPdfRenderer = new SimpleRenderer();
+	private static Semaphore ghost4jSema = new Semaphore(MAX_GHOST4J_THREADS);
+
 	private DocumentDao documentDao = SpringUtils.getBean(DocumentDao.class);
 	private CtlDocumentDao ctlDocumentDao = SpringUtils.getBean(CtlDocumentDao.class);
 	private ProviderInboxRoutingDao providerInboxRoutingDAO = SpringUtils.getBean(ProviderInboxRoutingDao.class);
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	private DocumentService documentService = SpringUtils.getBean(DocumentService.class);
+
+	static {
+		// initialize ghost4j rendering instance
+		ghost4jPdfRenderer.setMaxProcessCount(MAX_GHOST4J_THREADS);
+		ghost4jPdfRenderer.setResolution(96);
+	}
 
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
@@ -365,12 +378,76 @@ public class ManageDocumentAction extends DispatchAction {
 		return outfile;
 	}
 
-	public File createCacheVersion2(Document d, Integer pageNum) {
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		File documentDir = new File(docdownload);
-		File documentCacheDir = getDocumentCacheDir(docdownload);
-		logger.debug("Document Dir is a dir" + documentDir.isDirectory());
-		File file = new File(documentDir, d.getDocfilename());
+	public File createCacheVersion2(Document d, Integer pageNum)
+	{
+		try
+		{
+			String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
+			File documentCacheDir = getDocumentCacheDir(docdownload);
+
+			Path filePath = Paths.get(docdownload).resolve(d.getDocfilename());
+
+			return generatePdfPageImage(filePath.toString(), Paths.get(documentCacheDir.getCanonicalPath()).resolve(d.getDocfilename() + "_" + pageNum + ".png").toString(), pageNum);
+		}
+		catch (IOException ioE)
+		{
+			MiscUtils.getLogger().error("IO Exception when resolving cache dir path: " + ioE.getMessage());
+		}
+		return null;
+	}
+
+	public File generatePdfPageImage(String inputPdfPath, String outputFilePath, Integer pageNum)
+	{
+		Long startTime = System.currentTimeMillis();
+		try
+		{
+			if (!ghost4jSema.tryAcquire())
+			{
+				MiscUtils.getLogger().warn("high pdf to image generation load! BLOCKING...");
+				ghost4jSema.acquire();
+			}
+			try
+			{
+				Long pdfLoadStartTime = System.currentTimeMillis();
+
+				PDFDocument pdfDocument = new PDFDocument();
+				pdfDocument.load(new File(inputPdfPath));
+
+				Long renderStartTime = System.currentTimeMillis();
+
+				// render image
+				List<Image> images = ghost4jPdfRenderer.render(pdfDocument, pageNum - 1, pageNum - 1);
+
+				Long imageOutStartTime = System.currentTimeMillis();
+				// save image to cache
+				if (images.size() > 0)
+				{
+					ImageIO.write((RenderedImage) images.get(0), "png", new File(outputFilePath));
+				} else
+				{
+					throw new IOException("don't have any images to write to file! " + images);
+				}
+
+				Long endTime = System.currentTimeMillis();
+				MiscUtils.getLogger().info("TOTAL TIME: " + (endTime - startTime) + " PDF LOAD START: " + (pdfLoadStartTime - startTime) +
+						"RENDER START :" + (renderStartTime - startTime) + " IMAGE START: " + (imageOutStartTime - startTime));
+				return new File(outputFilePath);
+			} catch (Exception e)
+			{
+				MiscUtils.getLogger().error("failed to generate pdf page image with error: " + e.getMessage());
+			} finally
+			{
+				ghost4jSema.release();
+			}
+		}
+		catch(InterruptedException interE)
+		{
+			MiscUtils.getLogger().error("failed to acquire ghost4j semaphore with error: " + interE.getMessage());
+		}
+
+		return null;
+
+		/* keeping the tradition
 		PdfDecoder decode_pdf  = new PdfDecoder(true);
 		File ofile = null;
 		try {
@@ -385,9 +462,12 @@ public class ManageDocumentAction extends DispatchAction {
 
 			decode_pdf.openPdfFileFromInputStream(is, false);
 
+			MiscUtils.getLogger().info("PDF version: " + decode_pdf.getPDFVersion());
+
 			BufferedImage image_to_save = decode_pdf.getPageAsImage(pageNum);
 
-
+			MiscUtils.getLogger().info("Color model: " + image_to_save.getColorModel().toString());
+			ImageIO.write(image_to_save, "bmp", new File("/tmp/awtImage.bmp"));
 
 			decode_pdf.getObjectStore().saveStoredImage( documentCacheDir.getCanonicalPath() + "/" + d.getDocfilename() + "_" + pageNum + ".png", image_to_save, true, false, "png");
 
@@ -407,6 +487,7 @@ public class ManageDocumentAction extends DispatchAction {
 		}
 
 		return ofile;
+	 */
 
 		/*
 
@@ -1177,52 +1258,22 @@ public class ManageDocumentAction extends DispatchAction {
         return null;
     }
 
-    public File createIncomingCacheVersion(String queueId, String pdfDir, String pdfName, Integer pageNum) throws Exception {
-
-
+    public File createIncomingCacheVersion(String queueId, String pdfDir, String pdfName, Integer pageNum)
+	{
         String incomingDocPath = IncomingDocUtil.getIncomingDocumentFilePath(queueId, pdfDir);
         File documentDir = new File(incomingDocPath);
         File documentCacheDir = getDocumentCacheDir(incomingDocPath);
         File file = new File(documentDir, pdfName);
 
-        PdfDecoder decode_pdf = new PdfDecoder(true);
-        File ofile = null;
-        FileInputStream is = null;
-        
-        try {
-
-            FontMappings.setFontReplacements();
-
-            decode_pdf.useHiResScreenDisplay(true);
-
-            decode_pdf.setExtractionMode(0, 96, 96 / 72f);
-
-            is = new FileInputStream(file);
-
-            decode_pdf.openPdfFileFromInputStream(is, false);
-
-            BufferedImage image_to_save = decode_pdf.getPageAsImage(pageNum);
-
-            decode_pdf.getObjectStore().saveStoredImage(documentCacheDir.getCanonicalPath() + "/" + pdfName + "_" + pageNum + ".png", image_to_save, true, false, "png");
-
-            decode_pdf.flushObjectValues(true);
-
-        } catch (Exception e) {
-            logger.error("Error decoding pdf file " + pdfDir + pdfName);
-        } finally {
-            if (decode_pdf != null) {
-                decode_pdf.closePdfFile();
-            }
-            if (is!=null) {
-                is.close();
-            }
-                
-        }
-        
-        ofile = new File(documentCacheDir, pdfName + "_" + pageNum + ".png");
-        
-        return ofile;
-
+        try
+		{
+			return generatePdfPageImage(file.getCanonicalPath(), Paths.get(documentCacheDir.getCanonicalPath()).resolve(pdfName + "_" + pageNum + ".png").toString(), pageNum);
+		}
+        catch (IOException ioE)
+		{
+			MiscUtils.getLogger().error("failed to resolve path name when creating pdf image with error: " + ioE.getMessage());
+		}
+        return null;
     }
 
 	/**
