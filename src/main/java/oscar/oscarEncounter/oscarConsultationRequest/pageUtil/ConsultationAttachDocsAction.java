@@ -99,7 +99,7 @@ public class ConsultationAttachDocsAction extends Action {
 			ConsultationAttachLabs Lab = new ConsultationAttachLabs(provNo, demoNo, requestId, labs);
 			Lab.attach(loggedInInfo);
 
-			consultationAttachmentService.setAttachedEforms(Integer.parseInt(requestId), provNo, filterIdList(eforms, ConsultDocs.DOCTYPE_EFORM));
+			consultationAttachmentService.setAttachedEForms(Integer.parseInt(requestId), provNo, filterIdList(eforms, ConsultDocs.DOCTYPE_EFORM));
 			return mapping.findForward("success");
 		}
 		logger.error("Invalid consultation document parameters " +

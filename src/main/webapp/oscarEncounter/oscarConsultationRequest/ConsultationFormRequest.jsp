@@ -294,7 +294,7 @@ input.btn{
 }
 
 .eform {
-	color: #045700;
+	color: #008000;
 	word-break: break-word;
 }
 td.tite {
@@ -1623,7 +1623,9 @@ var requestIdKey = "<%=signatureRequestId %>";
 							<span class="doc"><bean:message
 								key="oscarEncounter.oscarConsultationRequest.AttachDoc.LegendDocs" /></span><br />
 							<span class="lab"><bean:message
-								key="oscarEncounter.oscarConsultationRequest.AttachDoc.LegendLabs" /></span>
+								key="oscarEncounter.oscarConsultationRequest.AttachDoc.LegendLabs" /></span><br />
+							<span class="eform"><bean:message
+								key="oscarEncounter.oscarConsultationRequest.AttachDoc.LegendEForms" /></span>
 							</td>
 						</tr>
 					</table>

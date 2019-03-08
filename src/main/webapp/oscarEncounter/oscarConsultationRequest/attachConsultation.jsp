@@ -87,13 +87,15 @@ oscar.dms.EDocUtil, oscar.oscarEncounter.oscarConsultationRequest.pageUtil.Consu
 <title><bean:message key="oscarEncounter.oscarConsultationRequest.AttachDocPopup.title" /></title>
 <link rel="stylesheet" type="text/css" media="all" href="<%=request.getContextPath()%>/share/css/extractedFromPages.css" />
 <style type="text/css">
-.doc {
-    color:blue;
-}
-
-.lab {
-    color: #CC0099;
-}
+	.doc {
+		color: blue;
+	}
+	.lab {
+		color: #CC0099;
+	}
+	.eform {
+		color: #008000;
+	}
 </style>
 <script type="text/javascript">
 	//<!--

@@ -25,11 +25,16 @@ package org.oscarehr.consultations.service;
 import org.oscarehr.common.dao.ConsultDocsDao;
 import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.dms.EDoc;
+import oscar.dms.EDocUtil;
 import oscar.eform.EFormUtil;
+import oscar.oscarLab.ca.on.CommonLabResultData;
+import oscar.oscarLab.ca.on.LabResultData;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,35 +57,61 @@ public class ConsultationAttachmentService
 		return getEFormList(demographicNo, consultId, false);
 	}
 
-	private List<EFormData> getEFormList(Integer demographicNo, Integer consultId, boolean isAttached)
+	private List<EFormData> getEFormList(Integer demographicNo, Integer consultId, boolean findAttached)
 	{
 		// TODO this could be refined to a single query
-		List<EFormData> eforms = EFormUtil.listPatientEFormsShowLatestOnly(demographicNo.toString());
+		List<EFormData> eForms = EFormUtil.listPatientEFormsShowLatestOnly(demographicNo.toString());
 		List<ConsultDocs> docs = consultDocsDao.findByRequestIdAndType(consultId, ConsultDocs.DOCTYPE_EFORM);
 
-		int listSize = isAttached ? docs.size() : eforms.size() - docs.size();
+		int listSize = findAttached? docs.size() : (eForms.size() - docs.size());
 		List<EFormData> returnList = new ArrayList<>(listSize);
 
-		for (EFormData eform : eforms)
+		for (EFormData eForm : eForms)
 		{
-			boolean found = false;
+			boolean isAttached = false;
 			for (ConsultDocs doc : docs)
 			{
-				if (eform.getId().equals(doc.getId()))
+				if (eForm.getId().equals(doc.getDocumentNo()))
 				{
-					found = true; break;
+					isAttached = true; break;
 				}
 			}
-			if (isAttached == found)
+			if (findAttached == isAttached)
 			{
-				returnList.add(eform);
+				returnList.add(eForm);
 			}
 		}
 		return returnList;
 	}
 
+	public List<EDoc> getAttachedDocuments(LoggedInInfo loggedInInfo, Integer demographicNo, Integer consultId)
+	{
+		return getAttachedDocuments(loggedInInfo, String.valueOf(demographicNo), String.valueOf(consultId));
+	}
+	public List<EDoc> getAttachedDocuments(LoggedInInfo loggedInInfo, String demographicNo, String consultId)
+	{
+		return EDocUtil.listDocs(loggedInInfo, demographicNo, consultId, EDocUtil.ATTACHED);
+	}
 
-	public void setAttachedEforms(Integer consultId, String providerNo, List<Integer> idList)
+	public List<EDoc> getUnattachedDocuments(LoggedInInfo loggedInInfo, String demographicNo, String consultId)
+	{
+		return EDocUtil.listDocs(loggedInInfo, demographicNo, consultId, EDocUtil.UNATTACHED);
+	}
+
+	public List<LabResultData> getAttachedLabs(LoggedInInfo loggedInInfo, String demographicNo, String consultId)
+	{
+		CommonLabResultData labData = new CommonLabResultData();
+		return labData.populateLabResultsData(loggedInInfo, demographicNo, consultId, CommonLabResultData.ATTACHED);
+	}
+
+	public List<LabResultData> getUnattachedLabs(LoggedInInfo loggedInInfo, String demographicNo, String consultId)
+	{
+		CommonLabResultData labData = new CommonLabResultData();
+		return labData.populateLabResultsData(loggedInInfo, demographicNo, consultId, CommonLabResultData.UNATTACHED);
+	}
+
+
+	public void setAttachedEForms(Integer consultId, String providerNo, List<Integer> idList)
 	{
 		setAttached(consultId, providerNo, ConsultDocs.DOCTYPE_EFORM, idList);
 	}
