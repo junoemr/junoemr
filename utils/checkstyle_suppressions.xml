@@ -14,4 +14,5 @@
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="2017-06-14.addSnomedCoreTable.sql" />
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="2018-02-08.change_log_tables_to_MyISAM.sql" />
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="2018-11-29.add_dashboard_tables.sql" />
+	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="2019-03-06.gad7_phq9_measurements.sql" />
 </suppressions>
