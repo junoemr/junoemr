@@ -1184,10 +1184,13 @@
 				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:ss:mm.SSS", locale);
 
 				if (dateEnd.compareTo("") == 0)
+				{
 					dateEnd = MyDateFormat.getMysqlStandardDate(curYear, curMonth, curDay);
+				}
 				if (dateBegin.compareTo("") == 0)
+				{
 					dateBegin = "1950-01-01"; // any early start date should suffice for selecting since the beginning
-
+				}
 				CustomFilter filter = new CustomFilter();
 				filter.setPriority(null);
 
@@ -1230,21 +1233,16 @@
 					Demographic demo = t.getDemographic();
 
 					vGrantdate = t.getServiceDate() + " 00:00:00.0";
-					java.util.Date grantdate = dateFormat.parse(vGrantdate);
+					java.util.Date grantDate = dateFormat.parse(vGrantdate);
 					java.util.Date toDate = new java.util.Date();
-					long millisDifference = toDate.getTime() - grantdate.getTime();
-
-					long ONE_DAY_IN_MS = (1000 * 60 * 60 * 24);
-					long daysDifference = millisDifference / (ONE_DAY_IN_MS);
 
 					String numDaysUntilWarn = OscarProperties.getInstance().getProperty("tickler_warn_period");
 					long ticklerWarnDays = Long.parseLong(numDaysUntilWarn);
 					boolean ignoreWarning = (ticklerWarnDays < 0);
 
-
-					//Set the colour of the table cell
+					// Set the colour of the table cell
 					String warnColour = "";
-					if (!ignoreWarning && (daysDifference >= ticklerWarnDays))
+					if (!ignoreWarning && !(grantDate.after(toDate)))
 					{
 						warnColour = "Red";
 					}
@@ -1252,7 +1250,8 @@
 					if (rowColour.equals("lilac"))
 					{
 						rowColour = "white";
-					} else
+					}
+					else
 					{
 						rowColour = "lilac";
 					}
