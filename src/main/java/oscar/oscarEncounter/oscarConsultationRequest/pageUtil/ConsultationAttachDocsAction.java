@@ -63,13 +63,14 @@ public class ConsultationAttachDocsAction extends Action {
 		DynaActionForm frm = (DynaActionForm) form;
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
-		String requestId = frm.getString("requestId");
+		String requestIdStr = frm.getString("requestId");
 		String demoNo = frm.getString("demoNo");
 		String provNo = frm.getString("providerNo");
+		Integer requestId = Integer.parseInt(requestIdStr);
 		
 		boolean demoNoValid = StringUtils.isNumeric(demoNo) && !demoNo.trim().isEmpty() && !demoNo.equalsIgnoreCase("0");
 		boolean provNoValid = provNo != null && !provNo.equalsIgnoreCase("null");
-		boolean requestIdValid = StringUtils.isNumeric(requestId) && !requestId.trim().isEmpty() && !requestId.equalsIgnoreCase("0");
+		boolean requestIdValid = StringUtils.isNumeric(requestIdStr) && !requestIdStr.trim().isEmpty() && !requestIdStr.equalsIgnoreCase("0");
 
 		if (demoNoValid && provNoValid && requestIdValid) {
 
@@ -93,17 +94,13 @@ public class ConsultationAttachDocsAction extends Action {
 			if (docs == null) { docs = new String[]{};}
 			if (eforms == null) { eforms = new String[]{};}
 
-			ConsultationAttachDocs Doc = new ConsultationAttachDocs(provNo, demoNo, requestId, docs);
-			Doc.attach(loggedInInfo);
-
-			ConsultationAttachLabs Lab = new ConsultationAttachLabs(provNo, demoNo, requestId, labs);
-			Lab.attach(loggedInInfo);
-
-			consultationAttachmentService.setAttachedEForms(Integer.parseInt(requestId), provNo, filterIdList(eforms, ConsultDocs.DOCTYPE_EFORM));
+			consultationAttachmentService.setAttachedDocuments(requestId, provNo, filterIdList(docs, ConsultDocs.DOCTYPE_DOC));
+			consultationAttachmentService.setAttachedLabs(requestId, provNo, filterIdList(labs, ConsultDocs.DOCTYPE_LAB));
+			consultationAttachmentService.setAttachedEForms(requestId, provNo, filterIdList(eforms, ConsultDocs.DOCTYPE_EFORM));
 			return mapping.findForward("success");
 		}
 		logger.error("Invalid consultation document parameters " +
-				"(provider:" + provNo + ",demoNo:" + demoNo + ",requestId:" + requestId + "). Save attempt aborted.");
+				"(provider:" + provNo + ",demoNo:" + demoNo + ",requestId:" + requestIdStr + "). Save attempt aborted.");
 		return mapping.findForward("failure");
 	}
 
@@ -115,14 +112,14 @@ public class ConsultationAttachDocsAction extends Action {
 	 */
 	private List<Integer> filterIdList(String[] idList, String filterPrefix)
 	{
-		List<Integer> filterdList = new ArrayList<>();
+		List<Integer> filteredList = new ArrayList<>();
 		for(String id : idList)
 		{
 			if(id.startsWith(filterPrefix))
 			{
-				filterdList.add(Integer.parseInt(id.substring(filterPrefix.length())));
+				filteredList.add(Integer.parseInt(id.substring(filterPrefix.length())));
 			}
 		}
-		return filterdList;
+		return filteredList;
 	}
 }

@@ -48,9 +48,7 @@ org.oscarehr.util.LoggedInInfo,
 org.oscarehr.util.SpringUtils, oscar.dms.EDoc,
 oscar.dms.EDocUtil, oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationAttachDocs"%>
 <%@ page import="oscar.oscarLab.ca.all.Hl7textResultsData" %>
-<%@ page import="oscar.oscarLab.ca.on.CommonLabResultData" %>
 <%@ page import="oscar.oscarLab.ca.on.LabResultData" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -256,33 +254,31 @@ oscar.dms.EDocUtil, oscar.oscarEncounter.oscarConsultationRequest.pageUtil.Consu
 						property="providerNo" value="<%=providerNo%>" /> <html:select
 						style="width: 100%;" property="documents" multiple="1" size="10">
 						<%
-							ArrayList privatedocs = new ArrayList();
-							privatedocs = EDocUtil.listDocs(loggedInInfo, demoNo, requestId, EDocUtil.UNATTACHED);
-							EDoc curDoc;
-							for (int idx = 0; idx < privatedocs.size(); ++idx) {
-								curDoc = (EDoc) privatedocs.get(idx);
+							List<EDoc> unattachedDocList = consultationAttachmentService.getUnattachedDocuments(loggedInInfo, demoNo, requestId);
+							for(EDoc doc : unattachedDocList)
+							{
 						%>
 						<html:option styleClass="doc"
-							value="<%=docType[0] + curDoc.getDocId()%>"><%=curDoc.getDescription()%></html:option>
+							value="<%=docType[0] + doc.getDocId()%>"><%=doc.getDescription()%></html:option>
 						<%
 							}
-							CommonLabResultData labData = new CommonLabResultData();
 
-							ArrayList labs = labData.populateLabResultsData(loggedInInfo, demoNo, requestId, CommonLabResultData.UNATTACHED);
-							LabResultData resData;
-							
-							for (int idx = 0; idx < labs.size(); ++idx) {
-								resData = (LabResultData) labs.get(idx);
+							List<LabResultData> unattachedLabList = consultationAttachmentService.getUnattachedLabs(loggedInInfo, demoNo, requestId);
+							for(LabResultData lab : unattachedLabList)
+							{
 								boolean displayFlag = true;
-								if (resData.labType.equals(LabResultData.HL7TEXT)) {
-									if (!Hl7textResultsData.getMatchingLabs(resData.segmentID).endsWith(resData.segmentID))
+								if(lab.labType.equals(LabResultData.HL7TEXT))
+								{
+									if(!Hl7textResultsData.getMatchingLabs(lab.segmentID).endsWith(lab.segmentID))
+									{
 										displayFlag = false;
+									}
 								}
-								if (displayFlag) {
+								if(displayFlag)
+								{
 						%>
 						<html:option styleClass="lab"
-							value="<%=docType[1] + resData.labPatientId%>"><%=resData.getDiscipline() + " "
-											+ resData.getDateTime()%></html:option>
+							value="<%=docType[1] + lab.labPatientId%>"><%=lab.getDiscipline() + " " + lab.getDateTime()%></html:option>
 						<%
 								}
 							}
@@ -290,7 +286,7 @@ oscar.dms.EDocUtil, oscar.oscarEncounter.oscarConsultationRequest.pageUtil.Consu
 							List<EFormData> unattachedEformList = consultationAttachmentService.getUnattachedEForms(Integer.parseInt(demoNo), Integer.parseInt(requestId));
 							for(EFormData eform : unattachedEformList)
 							{
-							%>
+						%>
 						<html:option styleClass="eform"
 						             value="<%=docType[2] + eform.getId()%>"><%=eform.getFormName() + " " + eform.getFormDate() %></html:option>
 						<%
@@ -305,26 +301,21 @@ oscar.dms.EDocUtil, oscar.oscarEncounter.oscarConsultationRequest.pageUtil.Consu
 						style="width: 100%;" property="attachedDocs" multiple="1"
 						size="10">
 						<%
-							ArrayList privatedocs = new ArrayList();
-							privatedocs = EDocUtil.listDocs(loggedInInfo, demoNo, requestId, EDocUtil.ATTACHED);
-							EDoc curDoc;
-							for (int idx = 0; idx < privatedocs.size(); ++idx) {
-								curDoc = (EDoc) privatedocs.get(idx);
+							List<EDoc> attachedDocList = consultationAttachmentService.getAttachedDocuments(loggedInInfo, demoNo, requestId);
+							for(EDoc doc : attachedDocList)
+							{
 						%>
 						<html:option styleClass="doc"
-							value="<%=docType[0] + curDoc.getDocId()%>"><%=curDoc.getDescription()%></html:option>
+							value="<%=docType[0] + doc.getDocId()%>"><%=doc.getDescription()%></html:option>
 						<%
 							}
 
-							CommonLabResultData labData = new CommonLabResultData();
-							ArrayList labs = labData.populateLabResultsData(loggedInInfo, demoNo, requestId, CommonLabResultData.ATTACHED);
-							LabResultData resData;
-							for (int idx = 0; idx < labs.size(); ++idx) {
-								resData = (LabResultData) labs.get(idx);
+							List<LabResultData> attachedLabList = consultationAttachmentService.getAttachedLabs(loggedInInfo, demoNo, requestId);
+							for(LabResultData lab : attachedLabList)
+							{
 						%>
 						<html:option styleClass="lab"
-							value="<%=docType[1] + resData.labPatientId%>"><%=resData.getDiscipline() + " "
-										+ resData.getDateTime()%></html:option>
+							value="<%=docType[1] + lab.labPatientId%>"><%=lab.getDiscipline() + " " + lab.getDateTime()%></html:option>
 						<%
 							}
 
@@ -354,7 +345,9 @@ oscar.dms.EDocUtil, oscar.oscarEncounter.oscarConsultationRequest.pageUtil.Consu
 				<span class="doc legend"><bean:message
 							key="oscarEncounter.oscarConsultationRequest.AttachDoc.LegendDocs" /></span><br />
 				<span class="lab legend"><bean:message
-							key="oscarEncounter.oscarConsultationRequest.AttachDoc.LegendLabs" /></span></td>
+							key="oscarEncounter.oscarConsultationRequest.AttachDoc.LegendLabs" /></span><br />
+				<span class="eform legend"><bean:message
+						key="oscarEncounter.oscarConsultationRequest.AttachDoc.LegendEForms" /></span></td>
 			</tr>
 		</table>
 	</html:form>

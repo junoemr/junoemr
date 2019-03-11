@@ -93,17 +93,29 @@ public class ConsultationAttachmentService
 		return EDocUtil.listDocs(loggedInInfo, demographicNo, consultId, EDocUtil.ATTACHED);
 	}
 
+	public List<EDoc> getUnattachedDocuments(LoggedInInfo loggedInInfo, Integer demographicNo, Integer consultId)
+	{
+		return getUnattachedDocuments(loggedInInfo, String.valueOf(demographicNo), String.valueOf(consultId));
+	}
 	public List<EDoc> getUnattachedDocuments(LoggedInInfo loggedInInfo, String demographicNo, String consultId)
 	{
 		return EDocUtil.listDocs(loggedInInfo, demographicNo, consultId, EDocUtil.UNATTACHED);
 	}
 
+	public List<LabResultData> getAttachedLabs(LoggedInInfo loggedInInfo, Integer demographicNo, Integer consultId)
+	{
+		return getAttachedLabs(loggedInInfo, String.valueOf(demographicNo), String.valueOf(consultId));
+	}
 	public List<LabResultData> getAttachedLabs(LoggedInInfo loggedInInfo, String demographicNo, String consultId)
 	{
 		CommonLabResultData labData = new CommonLabResultData();
 		return labData.populateLabResultsData(loggedInInfo, demographicNo, consultId, CommonLabResultData.ATTACHED);
 	}
 
+	public List<LabResultData> getUnattachedLabs(LoggedInInfo loggedInInfo, Integer demographicNo, Integer consultId)
+	{
+		return getUnattachedLabs(loggedInInfo, String.valueOf(demographicNo), String.valueOf(consultId));
+	}
 	public List<LabResultData> getUnattachedLabs(LoggedInInfo loggedInInfo, String demographicNo, String consultId)
 	{
 		CommonLabResultData labData = new CommonLabResultData();
