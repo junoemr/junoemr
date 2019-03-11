@@ -40,25 +40,29 @@ if(!authed) {
 %>
 
 
-<%@page import="org.oscarehr.consultations.model.ConsultDocs"%>
+<%@page import="org.oscarehr.consultations.dao.ConsultRequestDao"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@ page import="org.oscarehr.consultations.service.ConsultationAttachmentService, org.oscarehr.eform.model.EFormData,
+<%@ page import="org.oscarehr.consultations.model.ConsultDocs,
+org.oscarehr.consultations.service.ConsultationAttachmentService,
+org.oscarehr.eform.model.EFormData,
 org.oscarehr.util.LoggedInInfo,
-org.oscarehr.util.SpringUtils, oscar.dms.EDoc,
-oscar.dms.EDocUtil, oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationAttachDocs"%>
+org.oscarehr.util.SpringUtils,
+oscar.dms.EDoc,
+oscar.dms.EDocUtil"%>
 <%@ page import="oscar.oscarLab.ca.all.Hl7textResultsData" %>
 <%@ page import="oscar.oscarLab.ca.on.LabResultData" %>
 <%@ page import="java.util.List" %>
 <%
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+	ConsultationAttachmentService consultationAttachmentService = SpringUtils.getBean(ConsultationAttachmentService.class);
+	ConsultRequestDao consultRequestDao = SpringUtils.getBean(ConsultRequestDao.class);
    		 
 	String user_no = (String) session.getAttribute("user");
 	String userfirstname = (String) session.getAttribute("userfirstname");
 	String userlastname = (String) session.getAttribute("userlastname");
 
 	// "Module" and "function" is the same thing (old dms module)
-	String module = "demographic";
 	String demoNo = request.getParameter("demo");
 	String requestId = request.getParameter("requestId");
 	String providerNo = request.getParameter("provNo");
@@ -66,16 +70,15 @@ oscar.dms.EDocUtil, oscar.oscarEncounter.oscarConsultationRequest.pageUtil.Consu
 	if (demoNo == null && requestId == null)
 		response.sendRedirect("../error.jsp");
 
-	if (demoNo == null || demoNo.equals("null")) {
-		ConsultationAttachDocs docsUtil = new ConsultationAttachDocs(requestId);
-		demoNo = docsUtil.getDemoNo();
-
+	if (demoNo == null || demoNo.equals("null"))
+	{
+		demoNo = consultRequestDao.find(Integer.parseInt(requestId)).getDemographicId().toString();
 	}
 
 	String patientName = EDocUtil.getDemographicName(loggedInInfo, demoNo);
 	String[] docType = {ConsultDocs.DOCTYPE_DOC, ConsultDocs.DOCTYPE_LAB, ConsultDocs.DOCTYPE_EFORM};
 
-	ConsultationAttachmentService consultationAttachmentService = SpringUtils.getBean(ConsultationAttachmentService.class);
+
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html:html locale="true">

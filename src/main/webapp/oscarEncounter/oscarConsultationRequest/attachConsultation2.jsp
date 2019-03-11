@@ -36,36 +36,40 @@ String userlastname = (String) session.getAttribute("userlastname");
 <jsp:useBean id="oscarVariables" class="java.util.Properties"
 	scope="page" />
 <%@ page
-	import="org.oscarehr.util.LoggedInInfo, oscar.MyDateFormat, oscar.dms.EDoc, oscar.dms.EDocUtil,
-	oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationAttachDocs,
-	oscar.oscarLab.ca.on.CommonLabResultData, oscar.oscarLab.ca.on.LabResultData,
-	oscar.util.DateUtils, oscar.util.StringUtils, java.util.ArrayList, java.util.Collections"%>
+	import="org.oscarehr.consultations.dao.ConsultRequestDao,
+	org.oscarehr.consultations.service.ConsultationAttachmentService,
+	org.oscarehr.util.LoggedInInfo,
+	org.oscarehr.util.SpringUtils,
+	oscar.MyDateFormat,
+	oscar.dms.EDoc, oscar.dms.EDocUtil,
+	oscar.oscarLab.ca.on.CommonLabResultData,
+	oscar.oscarLab.ca.on.LabResultData,
+	oscar.util.DateUtils,
+	oscar.util.StringUtils"%>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Collections" %>
 
 <%
+	//preliminary JSP code
+	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+	ConsultationAttachmentService consultationAttachmentService = SpringUtils.getBean(ConsultationAttachmentService.class);
+	ConsultRequestDao consultRequestDao = SpringUtils.getBean(ConsultRequestDao.class);
 
-//preliminary JSP code
+	String demoNo = request.getParameter("demo");
+	String requestId = request.getParameter("requestId");
+	String providerNo = request.getParameter("provNo");
 
-LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+	if(demoNo == null && requestId == null) response.sendRedirect("../error.jsp");
 
-// "Module" and "function" is the same thing (old dms module)
-String module = "demographic";
-String demoNo = request.getParameter("demo");
-String requestId = request.getParameter("requestId");
-String providerNo = request.getParameter("provNo");
+	if(demoNo == null || demoNo.equals("null"))
+	{
+		demoNo = consultRequestDao.find(Integer.parseInt(requestId)).getDemographicId().toString();
+	}
 
-if(demoNo == null && requestId == null ) response.sendRedirect("../error.jsp");
-
-if( demoNo == null || demoNo.equals("null")  ) {
-
-	ConsultationAttachDocs docsUtil = new ConsultationAttachDocs(requestId);
-    demoNo = docsUtil.getDemoNo();
-    
-}
-
-String patientName = EDocUtil.getDemographicName(loggedInInfo, demoNo);
-String[] docType = {"D","L"};
-String http_user_agent = request.getHeader("User-Agent");
-boolean onIPad = http_user_agent.indexOf("iPad") >= 0;
+	String patientName = EDocUtil.getDemographicName(loggedInInfo, demoNo);
+	String[] docType = {"D", "L"};
+	String http_user_agent = request.getHeader("User-Agent");
+	boolean onIPad = http_user_agent.indexOf("iPad") >= 0;
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
    "http://www.w3.org/TR/html4/strict.dtd">
@@ -86,8 +90,7 @@ boolean onIPad = http_user_agent.indexOf("iPad") >= 0;
 <% 
 CommonLabResultData labData = new CommonLabResultData();
 ArrayList<LabResultData> labs = labData.populateLabResultsData(loggedInInfo, demoNo, requestId, CommonLabResultData.ATTACHED);
-ArrayList<EDoc> privatedocs = new ArrayList<EDoc>();
-privatedocs = EDocUtil.listDocs(loggedInInfo, demoNo, requestId, EDocUtil.ATTACHED);
+ArrayList<EDoc> privatedocs = EDocUtil.listDocs(loggedInInfo, demoNo, requestId, EDocUtil.ATTACHED);
 String attachedDocs = "";
 if (requestId == null || requestId.equals("") || requestId.equals("null")) {
 	attachedDocs = "window.opener.document.EctConsultationFormRequestForm.documents.value";
@@ -255,7 +258,7 @@ function toggleSelectAll() {
 	            String truncatedDisplayName;
 	            for(int idx = 0; idx < privatedocs.size(); ++idx)
 	            {                    
-	                curDoc = privatedocs.get(idx); 
+	                curDoc = privatedocs.get(idx);
 	                int slash = 0;
 	                String contentType = "";
 	                if ((slash = curDoc.getContentType().indexOf('/')) != -1) {
