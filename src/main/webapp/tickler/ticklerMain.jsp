@@ -41,6 +41,7 @@
 <%@ page import="org.oscarehr.common.model.TicklerLink" %>
 <%@ page import="org.oscarehr.common.dao.TicklerLinkDao" %>
 <%@ page import="java.util.Calendar" %>
+<%@ page import="java.time.LocalDate" %>
 <%@ page import="oscar.MyDateFormat" %>
 <%@ page import="oscar.OscarProperties" %>
 <%@ page import="org.oscarehr.common.model.Site" %>
@@ -54,6 +55,8 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.net.URLEncoder" %>
+<%@ page import="java.time.ZoneId" %>
+<%@ page import="oscar.util.ConversionUtils" %>
 
 <%
 	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -1180,9 +1183,6 @@
 				String dateBegin = xml_vdate;
 				String dateEnd = xml_appointment_date;
 
-				String vGrantdate = "1980-01-07 00:00:00.0";
-				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:ss:mm.SSS", locale);
-
 				if (dateEnd.compareTo("") == 0)
 				{
 					dateEnd = MyDateFormat.getMysqlStandardDate(curYear, curMonth, curDay);
@@ -1230,11 +1230,11 @@
 
 				for (Tickler t : ticklers)
 				{
+					// NOTE: Using deprecated Demographic model, need to update to new demographic model
 					Demographic demo = t.getDemographic();
 
-					vGrantdate = t.getServiceDate() + " 00:00:00.0";
-					java.util.Date grantDate = dateFormat.parse(vGrantdate);
-					java.util.Date toDate = new java.util.Date();
+					LocalDate grantDate = ConversionUtils.toZonedLocalDate(t.getServiceDate());
+					LocalDate today = LocalDate.now();
 
 					String numDaysUntilWarn = OscarProperties.getInstance().getProperty("tickler_warn_period");
 					long ticklerWarnDays = Long.parseLong(numDaysUntilWarn);
@@ -1242,7 +1242,7 @@
 
 					// Set the colour of the table cell
 					String warnColour = "";
-					if (!ignoreWarning && !(grantDate.after(toDate)))
+					if (!ignoreWarning && grantDate.isBefore(today))
 					{
 						warnColour = "Red";
 					}
