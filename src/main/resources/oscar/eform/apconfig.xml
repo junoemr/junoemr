@@ -63,6 +63,24 @@
 		</ap-sql>
 		<ap-output>${location}</ap-output>
 	</databaseap>
+	<databaseap>
+		<ap-name>appt_providerF</ap-name>
+		<ap-sql>
+			SELECT p.first_name
+			FROM provider p, appointment a
+			WHERE p.provider_no=a.provider_no AND a.appointment_no=${appt_no}
+		</ap-sql>
+		<ap-output>${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>appt_providerL</ap-name>
+		<ap-sql>
+			SELECT p.last_name
+			FROM provider p, appointment a
+			WHERE p.provider_no=a.provider_no AND a.appointment_no=${appt_no}
+		</ap-sql>
+		<ap-output>${last_name}</ap-output>
+	</databaseap>
 
 	<!-- Next booked appointment information, relative to the current datetime -->
 	<databaseap>
