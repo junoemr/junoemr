@@ -74,7 +74,6 @@ import oscar.OscarProperties;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarSecurity.CRHelper;
-import oscar.util.AlertTimer;
 import oscar.util.CBIUtil;
 
 public final class LoginAction extends DispatchAction {
@@ -343,19 +342,7 @@ public final class LoginAction extends DispatchAction {
             if(quatroShelter!= null && quatroShelter.equals("on")) {
             	where = "shelterSelection";
             }
-        
-            /*
-             * if (OscarProperties.getInstance().isTorontoRFQ()) { where = "caisiPMM"; }
-             */
-            // Lazy Loads AlertTimer instance only once, will run as daemon for duration of server runtime
-            if (pvar.isBritishColumbiaInstanceType()) {
-                String alertFreq = pvar.getProperty("ALERT_POLL_FREQUENCY");
-                if (alertFreq != null) {
-                    Long longFreq = new Long(alertFreq);
-                    String[] alertCodes = OscarProperties.getInstance().getProperty("CDM_ALERTS").split(",");
-                    AlertTimer.getInstance(alertCodes, longFreq.longValue());
-                }
-            }
+
             CRHelper.recordLoginSuccess(userName, strAuth[0], request);
 
             String username = (String) session.getAttribute("user");
@@ -372,6 +359,9 @@ public final class LoginAction extends DispatchAction {
                     service.fetchGuidelinesFromServiceInBackground(loggedInInfo);
                 }
             }
+
+            //CDMTicklerReminderService thing = SpringUtils.getBean(CDMTicklerReminderService.class);
+            //thing.contextInitialized(null);
             
 		    MyOscarUtils.attemptMyOscarAutoLoginIfNotAlreadyLoggedIn(loggedInInfo, true);
             
@@ -475,7 +465,7 @@ public final class LoginAction extends DispatchAction {
         	json.write(response.getWriter());
         	return null;
         }
-        
+
     	logger.debug("rendering standard response : "+where);
         return mapping.findForward(where);
     }

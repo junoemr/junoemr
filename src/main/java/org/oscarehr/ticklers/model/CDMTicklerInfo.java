@@ -23,41 +23,60 @@
 
 package org.oscarehr.ticklers.model;
 
-import org.oscarehr.common.model.AbstractModel;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
-import javax.persistence.EmbeddedId;
-
-public class CDMTicklerInfo extends AbstractModel<CDMTicklerInfoCompositeKey>
+public class CDMTicklerInfo
 {
-    @EmbeddedId
-    private CDMTicklerInfoCompositeKey id;
-    // demographic_no, dxResearchCode, billingStatus is a candidate key
-    // demographic_no, billingServiceCode, billingStatus is another
-
-    private String billingServiceCode;
+    private int demographicNo;
     private String providerNo;
-    private String date;
-    private String ticklerNo;
+    private String dxCode;
+    private String billingCode;
+    private LocalDate billingDate;
+    private Integer ticklerNo;
 
-    @Override
-    public CDMTicklerInfoCompositeKey getId()
+    public CDMTicklerInfo(){}
+
+    public CDMTicklerInfo(Object[] dbResult)
     {
-        return id;
+        this.demographicNo = (Integer)dbResult[0];
+
+        if (dbResult[1] != null) // check to avoid an unboxing NullPointerException if the demographic doesn't have a provider set.
+        {
+
+            this.providerNo = (String)dbResult[1];
+        }
+
+        this.dxCode = (String)dbResult[2];
+
+
+        // Depending on if the CDM was billed or not, the following values may be null
+
+        if (dbResult[3] != null)
+        {
+            this.billingCode = (String)dbResult[3];
+        }
+
+        if (dbResult[4] != null)
+        {
+            DateTimeFormatter dateFormat = DateTimeFormatter.BASIC_ISO_DATE;
+            this.billingDate = LocalDate.parse((String)dbResult[4], dateFormat);
+        }
+
+        if (dbResult[5] != null)
+        {
+            this.ticklerNo = (Integer) dbResult[5];
+        }
     }
 
-    public void setId(CDMTicklerInfoCompositeKey id)
+    public int getDemographicNo()
     {
-        this.id = id;
+        return demographicNo;
     }
 
-    public String getBillingServiceCode()
+    public void setDemographicNo(int demographicNo)
     {
-        return billingServiceCode;
-    }
-
-    public void setBillingServiceCode(String billingServiceCode)
-    {
-        this.billingServiceCode = billingServiceCode;
+        this.demographicNo = demographicNo;
     }
 
     public String getProviderNo()
@@ -70,53 +89,44 @@ public class CDMTicklerInfo extends AbstractModel<CDMTicklerInfoCompositeKey>
         this.providerNo = providerNo;
     }
 
-    public String getDate()
+    public String getDxCode()
     {
-        return date;
+        return dxCode;
     }
 
-    public void setDate(String date)
+    public void setDxCode(String dxCode)
     {
-        this.date = date;
+        this.dxCode = dxCode;
     }
 
-    public String getTicklerNo()
+    public String getBillingCode()
+    {
+        return billingCode;
+    }
+
+    public void setBillingCode(String billingCode)
+    {
+        this.billingCode = billingCode;
+    }
+
+
+    public LocalDate getBillingDate()
+    {
+        return billingDate;
+    }
+
+    public void setBillingDate(LocalDate billingDate)
+    {
+        this.billingDate = billingDate;
+    }
+
+    public Integer getTicklerNo()
     {
         return ticklerNo;
     }
 
-    public void setTicklerNo(String ticklerNo)
+    public void setTicklerNo(Integer ticklerNo)
     {
         this.ticklerNo = ticklerNo;
-    }
-
-    public String getDemographicNo()
-    {
-        return this.id.getDemographicNo();
-    }
-
-    public void setDemographicNo(String demographicNo)
-    {
-        this.id.setDemographicNo(demographicNo);
-    }
-
-    public String getdxResearchCode()
-    {
-        return this.id.getDxResearchCode();
-    }
-
-    public void setDxResearchCode(String dxResearchCode)
-    {
-        this.id.setDxResearchCode(dxResearchCode);
-    }
-
-    public String getBillingStatus()
-    {
-        return this.id.getBillingStatus();
-    }
-
-    public void setBillingStatus(String billingStatus)
-    {
-        this.id.setBillingStatus(billingStatus);
     }
 }

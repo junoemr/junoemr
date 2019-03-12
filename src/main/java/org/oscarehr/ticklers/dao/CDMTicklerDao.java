@@ -24,7 +24,7 @@
 package org.oscarehr.ticklers.dao;
 
 import org.oscarehr.ticklers.model.CDMTicklerInfo;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +38,7 @@ import java.util.List;
  * This is an entity-less DAO used to determine which demographics need CDM billing reminder ticklers to be created or deleted.
  * It does not use JPA or Hibernate mapping.
  */
-@Service
+@Component
 @Transactional(propagation = Propagation.REQUIRED)
 public class CDMTicklerDao
 {
@@ -59,8 +59,9 @@ public class CDMTicklerDao
     public List<CDMTicklerInfo> getCDMTicklerCreationInfo(List<Integer> cdmDxCodes)
     {
         Query query = entityManager.createNativeQuery(
-         "SELECT d.demographic_no, d.provider_no, dxr.dxresearch_code, bm.billing_code, bm.date, t.tickler_no " +
+         "SELECT d.demographic_no, d.provider_no, dxr.dxresearch_code, sc.serviceCode, bm.date, t.tickler_no " +
             "FROM demographic d " +
+            "JOIN dxresearch dxr " +
                 "ON d.demographic_no = dxr.demographic_no " +
                 "AND dxr.dxresearch_code IN (:cdmCodes) " +
                 "AND dxr.status = 'A' " +
@@ -74,12 +75,11 @@ public class CDMTicklerDao
             ") bm " +
                 "ON d.demographic_no = bm.demographic_no " +
                 "AND bm.billing_code = sc.serviceCode " +
-            "LEFT JOIN tickler t " +
-                "ON t.demographic_no = d.demographic_no " +
+            "LEFT JOIN tickler t ON t.demographic_no = d.demographic_no " +
                 "AND t.message LIKE CONCAT('%', 'SERVICE CODE ', sc.serviceCode, '%') " +
                 "AND t.status = 'A' " +
             "WHERE (billingstatus NOT IN ('D', 'R', 'F') " +
-                "AND DATEDIFF(NOW(), bm.date) >= 365) OR bm.date IS NULL " +
+                "AND (DATEDIFF(NOW(), bm.date) >= 365) OR bm.date IS NULL) " +
                 "AND t.tickler_no IS NULL");
 
         query.setParameter("cdmCodes", cdmDxCodes);
@@ -100,7 +100,7 @@ public class CDMTicklerDao
     public List<CDMTicklerInfo> getCDMTicklersToDelete(List<Integer> cdmTicklerDxCodes)
     {
         Query query = entityManager.createNativeQuery(
-            "SELECT d.demographic_no, d.provider_no, dxr.dxresearch_code, bm.billing_code, bm.date, t.tickler_no " +
+           "SELECT d.demographic_no, d.provider_no, dxr.dxresearch_code, bm.billing_code, bm.date, t.tickler_no " +
             "FROM demographic d " +
             "JOIN dxresearch dxr " +
                 "ON d.demographic_no = dxr.demographic_no " +
@@ -121,8 +121,8 @@ public class CDMTicklerDao
                 "AND t.message LIKE CONCAT('%', 'SERVICE CODE ', sc.serviceCode, '%') " +
                 "AND t.status = 'A' " +
             "WHERE billingstatus NOT IN ('D', 'R', 'F') " +
-            "AND DATEDIFF(NOW(), bm.date) < 365");
-        
+            "AND DATEDIFF(NOW(), bm.date) <= 365");
+
         query.setParameter("cdmTicklerDxCodes", cdmTicklerDxCodes);
         List<Object[]> rawResult = query.getResultList();
 
@@ -143,7 +143,6 @@ public class CDMTicklerDao
 
     private CDMTicklerInfo toEntity(Object[] rawResult)
     {
-        // STUB
-        return new CDMTicklerInfo();
+        return new CDMTicklerInfo(rawResult);
     }
 }
