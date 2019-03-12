@@ -24,6 +24,7 @@ package org.oscarehr.demographic.model;
 
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.provider.model.ProviderData;
 import oscar.OscarProperties;
 
 import javax.persistence.Column;
@@ -32,7 +33,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -174,6 +177,10 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "mergedTo")
 	private List<DemographicMerged> mergedToDemographicsList;
+
+	@OneToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="provider_no", insertable=false, updatable=false)
+	private ProviderData provider;
 
 	/**
 	 * Determine if demographic is a newborn.  A demographic is a newborn if the HIN version code is 66 in BC, or
@@ -756,6 +763,16 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public void setMergedToDemographicsList(List<DemographicMerged> mergedToDemographicsList)
 	{
 		this.mergedToDemographicsList = mergedToDemographicsList;
+	}
+
+	public ProviderData getProvider()
+	{
+		return provider;
+	}
+
+	public void setProvider(ProviderData provider)
+	{
+		this.provider = provider;
 	}
 
 	public boolean isNewBorn()

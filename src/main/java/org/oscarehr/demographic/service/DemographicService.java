@@ -31,14 +31,21 @@ import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.OscarProperties;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -61,6 +68,16 @@ public class DemographicService
 	@Autowired
 	private AdmissionDao admissionDao;
 
+	public enum SEARCH_MODE
+	{
+		demographicNo,name, phone, dob, address, hin, chart_no
+	}
+
+	public enum STATIS_MODE
+	{
+		all, active, inactive,
+	}
+
 	public DemographicTransferOutbound getDemographicTransferOutbound(Integer demographicNo)
 	{
 		Demographic demographic = demographicDao.find(demographicNo);
@@ -68,6 +85,155 @@ public class DemographicService
 		DemographicCust demoCustom = demographic.getDemographicCust().get(0);
 
 		return DemographicConverter.getAsTransferObject(demographic, demoExtras, demoCustom);
+	}
+
+	public SEARCH_MODE searchModeStringToEnum(String searchMode)
+	{
+		switch(searchMode)
+		{
+			case "search_demographic_no":
+				return SEARCH_MODE.demographicNo;
+			case "search_name":
+				return SEARCH_MODE.name;
+			case "search_phone":
+				return SEARCH_MODE.phone;
+			case "search_dob":
+				return SEARCH_MODE.dob;
+			case "search_address":
+				return SEARCH_MODE.address;
+			case "search_hin":
+				return SEARCH_MODE.hin;
+			case "search_chart_no":
+				return SEARCH_MODE.chart_no;
+		}
+		return null;
+	}
+
+	/**
+	 * builds a demographic criteria search
+	 * @param keyword keyword to look for. has different meaning depending on search mode.
+	 * @param searchMode the search mode to use @see SEARCH_MODE.
+	 * @param status the type of status to search for one of (all, active, inactive)
+	 * @param orderBy by which column to sort results
+	 * @return a criteria search object configured to search with the above
+	 */
+	public DemographicCriteriaSearch buildDemographicSearch(String keyword, SEARCH_MODE searchMode, STATIS_MODE status, DemographicCriteriaSearch.SORTMODE orderBy)
+	{
+		//build criteria search
+		DemographicCriteriaSearch demoCS = new DemographicCriteriaSearch();
+		demoCS.setCustomWildcardsEnabled(true);
+		demoCS.setSortMode(orderBy);
+
+		if (searchMode == SEARCH_MODE.demographicNo)
+		{
+			try
+			{
+				Integer demoNo = Integer.parseInt(keyword);
+				demoCS.setDemographicNo(demoNo);
+			}
+			catch (NumberFormatException nfe)
+			{
+				MiscUtils.getLogger().warn("could not convert demographic no to int with error: " + nfe.getMessage());
+			}
+		}
+		else if(searchMode == SEARCH_MODE.name)
+		{
+			String [] names = keyword.split(",");
+			if (names.length == 2)
+			{
+				demoCS.setFirstName(names[1].trim() + "*");
+				demoCS.setLastName(names[0].trim() + "*");
+			}
+			else
+			{
+				demoCS.setLastName(keyword.replace(",", "").trim() + "*");
+			}
+		}
+		else if(searchMode == SEARCH_MODE.phone)
+		{
+			demoCS.setPhone("*" + keyword.trim() + "*");
+		}
+		else if(searchMode == SEARCH_MODE.dob)
+		{
+			try
+			{
+				SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd");
+				LocalDate dob = LocalDate.parse(keyword);
+				demoCS.setDateOfBirth(dob);
+			}
+			catch (DateTimeParseException ex)
+			{
+				MiscUtils.getLogger().error(ex.getMessage());
+			}
+		}
+		else if(searchMode == SEARCH_MODE.address)
+		{
+			demoCS.setAddress("*"+keyword.trim()+"*");
+		}
+		else if(searchMode == SEARCH_MODE.hin)
+		{
+			demoCS.setHin(keyword.trim()+"*");
+		}
+		else if(searchMode == SEARCH_MODE.chart_no)
+		{
+			demoCS.setChartNo(keyword.trim()+"*");
+		}
+
+		if (status != STATIS_MODE.all)
+		{
+			//set status mode
+			List<DemographicCriteriaSearch.STATUSMODE> demoStatuses = getInactiveStatusModeListFromOscarProps();
+			demoCS.setStatusModeList(demoStatuses);
+
+			if (status == STATIS_MODE.active)
+			{
+				demoCS.setNegateStatus(true);
+			}
+			else if (status == STATIS_MODE.inactive)
+			{
+				demoCS.setNegateStatus(false);
+			}
+		}
+
+		return demoCS;
+	}
+
+	// build list of inactive statuses from the properties file.
+	private List<DemographicCriteriaSearch.STATUSMODE> getInactiveStatusModeListFromOscarProps()
+	{
+		List<DemographicCriteriaSearch.STATUSMODE> outStatusList = new ArrayList<>();
+
+		String inactiveStati= OscarProperties.getInstance().getProperty("inactive_statuses", "IN, DE, IC, ID, MO, FI");
+		String[] stati = inactiveStati.split(",");
+		for (String status : stati)
+		{
+			status = status.trim().substring(1, status.length() -1);
+			switch (status)
+			{
+				case "IN":
+					outStatusList.add(DemographicCriteriaSearch.STATUSMODE.inactive);
+					break;
+				case "DE":
+					outStatusList.add(DemographicCriteriaSearch.STATUSMODE.deceased);
+					break;
+				case "IC":
+					outStatusList.add(DemographicCriteriaSearch.STATUSMODE.ic);
+					break;
+				case "ID":
+					outStatusList.add(DemographicCriteriaSearch.STATUSMODE.id);
+					break;
+				case "MO":
+					outStatusList.add(DemographicCriteriaSearch.STATUSMODE.moved);
+					break;
+				case "FI":
+					outStatusList.add(DemographicCriteriaSearch.STATUSMODE.fired);
+					break;
+				default:
+					MiscUtils.getLogger().warn("Un-mappable status code [" + status +"] in property file!");
+			}
+		}
+
+		return outStatusList;
 	}
 
 	public Demographic addNewDemographicRecord(String providerNoStr, DemographicTransferInbound demographicTransferInbound)

@@ -47,10 +47,6 @@
 <%@page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager"%>
 <%@page import="org.apache.commons.lang.time.DateFormatUtils"%>
 <%@page import="org.oscarehr.caisi_integrator.ws.DemographicTransfer"%>
-<%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchRequest"%>
-<%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SEARCHMODE"%>
-<%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SORTMODE"%>
-<%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchRequest.STATUSMODE"%>
 <%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchResult"%>
 <%@page import="org.oscarehr.caisi_integrator.ws.MatchingDemographicTransferScore"%>
 <%@page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
@@ -78,9 +74,12 @@
 
 <%@ page import="java.util.*, java.net.URLEncoder, oscar.*" errorPage="errorpage.jsp" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.common.dao.DemographicDao" %>
+<%@page import="org.oscarehr.demographic.dao.DemographicDao" %>
 <%@ page import="oscar.oscarDemographic.data.DemographicMerged" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.oscarehr.demographic.service.DemographicService" %>
+<%@ page import="org.oscarehr.demographic.search.DemographicCriteriaSearch" %>
+<%@ page import="org.oscarehr.demographic.model.Demographic" %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties"	scope="session" />
 
@@ -254,7 +253,7 @@
 		</td>
 		<% } %>
 		<td class="name">
-			<a href="demographiccontrol.jsp<%=basicQueryString%>&orderby=last_name">
+			<a href="demographiccontrol.jsp<%=basicQueryString%>&orderby=last_name, first_name">
 				<bean:message key="demographic.demographicsearchresults.btnDemoName"/></a>
         </td>
 		<td class="chartNo">
@@ -300,7 +299,7 @@
         </td>
 	</tr>
 	<%
-	DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
+	DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographic.dao.DemographicDao");
 	CaseManagementManager caseManagementManager=(CaseManagementManager)SpringUtils.getBean("caseManagementManager");
 	String providerNo = loggedInInfo.getLoggedInProviderNo();
 	boolean outOfDomain = true;
@@ -312,18 +311,13 @@
 			outOfDomain=true;
 		}
 	}
-	
-	
 
 	if (searchMode == null)
 		searchMode = "search_name";
 	if (orderBy == null)
 		orderBy = "last_name";
-	
-	
-	List<DemographicSearchResult> demoList = null;
-	
-	demoList = doSearch(demographicDao,loggedInInfo, searchMode, ptstatus, keyword, limit, offset, orderBy, outOfDomain);
+
+	List<Demographic> demoList = doSearch(demographicDao,loggedInInfo, searchMode, ptstatus, keyword, limit, offset, orderBy, outOfDomain);
 	
 	
 	boolean toggleLine = false;
@@ -388,9 +382,9 @@
 
 		DemographicMerged dmDAO = new DemographicMerged();
 
-		for(DemographicSearchResult demo : demoList) {
+		for(Demographic demo : demoList) {
 
-			String dem_no = demo.getDemographicNo().toString();
+			String dem_no = demo.getId().toString();
 			String head = dmDAO.getHead(dem_no);
 
 %>
@@ -401,7 +395,7 @@
 
 		if (fromMessenger) {
 	%>
-		<a href="demographiccontrol.jsp?keyword=<%=StringEscapeUtils.escapeJavaScript(Misc.toUpperLowerCase(demo.getLastName()+", "+demo.getFirstName()))%>&demographic_no=<%= dem_no %>&displaymode=linkMsg2Demo&dboperation=search_detail" ><%=demo.getDemographicNo()%></a></td>
+		<a href="demographiccontrol.jsp?keyword=<%=StringEscapeUtils.escapeJavaScript(Misc.toUpperLowerCase(demo.getLastName()+", "+demo.getFirstName()))%>&demographic_no=<%= dem_no %>&displaymode=linkMsg2Demo&dboperation=search_detail" ><%=demo.getId()%></a></td>
 	<%	
 		} else { 
 	%>
@@ -435,7 +429,7 @@
 		</caisi:isModuleLoad>
 		<td class="chartNo"><%=demo.getChartNo()==null||demo.getChartNo().equals("")?"&nbsp;":demo.getChartNo()%></td>
 		<td class="sex"><%=demo.getSex()%></td>
-		<td class="dob"><%=demo.getFormattedDOB()%></td>
+		<td class="dob"><%=demo.getDateOfBirth()%></td>
 		<td class="hin"><%=StringUtils.trimToEmpty(demo.getHin())%></td>
 		<td class="doctor"><%=Misc.getShortStr(providerBean.getProperty(demo.getProviderNo() == null ? "" : demo.getProviderNo()),"_",12 )%></td>
 		<td class="rosterStatus"><%=demo.getRosterStatus()==null||demo.getRosterStatus().equals("")?"&nbsp;":demo.getRosterStatus()%></td>
@@ -494,9 +488,9 @@
 </html:html>
 <%!
 
-Boolean isLocal(MatchingDemographicTransferScore matchingDemographicTransferScore, List<DemographicSearchResult> demoList) {
+Boolean isLocal(MatchingDemographicTransferScore matchingDemographicTransferScore, List<Demographic> demoList) {
     String hin = matchingDemographicTransferScore.getDemographicTransfer().getHin(); 
-    for( DemographicSearchResult demo : demoList ) {
+    for( Demographic demo : demoList ) {
 		
 		if( hin != null && hin.equals(demo.getHin()) ) {
 		    return true;
@@ -507,110 +501,70 @@ Boolean isLocal(MatchingDemographicTransferScore matchingDemographicTransferScor
     
 }
 
-List<DemographicSearchResult> doSearch(DemographicDao demographicDao,LoggedInInfo loggedInInfo, String searchMode, String searchStatus, String searchKeyword, int limit, int offset, String orderBy, boolean outOfDomain) {
-	List<DemographicSearchResult> demoList = null;
+List<Demographic> doSearch(DemographicDao demographicDao, LoggedInInfo loggedInInfo, String searchMode, String searchStatus, String searchKeyword, int limit, int offset, String orderBy, boolean outOfDomain) {
+	DemographicService demoSrvc = (DemographicService) SpringUtils.getBean("demographic.service.DemographicService");
 
-	DemographicSearchRequest searchRequest = new DemographicSearchRequest();
-
-	searchRequest.setOutOfDomain(outOfDomain);
-	searchRequest.setKeyword(searchKeyword);
-
-	// Set Status Mode
-	if (("active").equals(searchStatus))
+	DemographicService.STATIS_MODE statisMode = DemographicService.STATIS_MODE.all;
+	if( "inactive".equals(searchStatus) )
 	{
-		searchRequest.setStatusMode(STATUSMODE.active);
+		statisMode = DemographicService.STATIS_MODE.inactive;
 	}
-	else if (("inactive").equals(searchStatus))
+	else if ( "active".equals(searchStatus))
 	{
-		searchRequest.setStatusMode(STATUSMODE.inactive);
-	}
-	else
-	{
-	    searchRequest.setStatusMode(STATUSMODE.all);
+		statisMode = DemographicService.STATIS_MODE.active;
 	}
 
-	// Set Search Mode
-	if ("search_name".equals(searchMode))
+	// set sort mode
+	DemographicCriteriaSearch.SORTMODE sortMode = DemographicCriteriaSearch.SORTMODE.DemographicName;
+	if (orderBy.equals("demographic_no"))
 	{
-		searchRequest.setMode(SEARCHMODE.Name);
+		sortMode = DemographicCriteriaSearch.SORTMODE.DemographicNo;
 	}
-	else if ("search_phone".equals(searchMode))
+	else if (orderBy.equals("last_name"))
 	{
-		searchRequest.setMode(SEARCHMODE.Phone);
+		sortMode = DemographicCriteriaSearch.SORTMODE.DemographicLastName;
 	}
-	else if ("search_dob".equals(searchMode))
+	else if(orderBy.equals("first_name"))
 	{
-		searchRequest.setMode(SEARCHMODE.DOB);
+		sortMode = DemographicCriteriaSearch.SORTMODE.DemographicFirstName;
 	}
-	else if ("search_address".equals(searchMode))
+	else if (orderBy.equals("chart_no"))
 	{
-		searchRequest.setMode(SEARCHMODE.Address);
+		sortMode = DemographicCriteriaSearch.SORTMODE.ChartNo;
 	}
-	else if ("search_hin".equals(searchMode))
+	else if (orderBy.equals("dob"))
 	{
-		searchRequest.setMode(SEARCHMODE.HIN);
+		sortMode = DemographicCriteriaSearch.SORTMODE.DOB;
 	}
-	else if ("search_chart_no".equals(searchMode))
+	else if (orderBy.equals("sex"))
 	{
-		searchRequest.setMode(SEARCHMODE.ChartNo);
+		sortMode = DemographicCriteriaSearch.SORTMODE.Sex;
 	}
-	else if ("search_demographic_no".equals(searchMode))
+	else if (orderBy.equals("patient_status"))
 	{
-		searchRequest.setMode(SEARCHMODE.DemographicNo);
+		sortMode = DemographicCriteriaSearch.SORTMODE.Status;
 	}
-	else
+	else if (orderBy.equals("roster_status"))
 	{
-	    MiscUtils.getLogger().error("Invalid search mode set [" + searchMode + "], defaulting to name");
-	    searchRequest.setMode(SEARCHMODE.Name);
+		sortMode = DemographicCriteriaSearch.SORTMODE.RosterStatus;
 	}
-
-	// Set Order By
-	if ("demographic_no".equals(orderBy))
+	else if (orderBy.equals("phone"))
 	{
-		searchRequest.setSortMode(SORTMODE.DemographicNo);
+		sortMode = DemographicCriteriaSearch.SORTMODE.Phone;
 	}
-	else if ("last_name".equals(orderBy))
+	else if (orderBy.equals("provider_name"))
 	{
-		searchRequest.setSortMode(SORTMODE.Name);
+		sortMode = DemographicCriteriaSearch.SORTMODE.ProviderName;
 	}
-	else if ("chart_no".equals(orderBy))
+	else if (orderBy.equals("hin"))
 	{
-		searchRequest.setSortMode(SORTMODE.ChartNo);
-	}
-	else if ("dob".equals(orderBy))
-	{
-		searchRequest.setSortMode(SORTMODE.DOB);
-	}
-	else if ("sex".equals(orderBy))
-	{
-		searchRequest.setSortMode(SORTMODE.Sex);
-	}
-	else if ("patient_status".equals(orderBy))
-	{
-		searchRequest.setSortMode(SORTMODE.PatientStatus);
-	}
-	else if ("roster_status".equals(orderBy))
-	{
-		searchRequest.setSortMode(SORTMODE.RosterStatus);
-	}
-	else if ("phone".equals(orderBy))
-	{
-		searchRequest.setSortMode(SORTMODE.Phone);
-	}
-	else if ("provider_name".equals(orderBy))
-	{
-		searchRequest.setSortMode(SORTMODE.ProviderName);
-	}
-	else if ("hin".equals(orderBy))
-	{
-	    searchRequest.setSortMode(SORTMODE.HIN);
-	}
-	else
-	{
-	    searchRequest.setSortMode(SORTMODE.Name);
+			sortMode = DemographicCriteriaSearch.SORTMODE.Hin;
 	}
 
-	demoList = demographicDao.searchPatients(loggedInInfo, searchRequest, offset, limit);
-	return demoList;
+	DemographicService.SEARCH_MODE demoSearchMode = demoSrvc.searchModeStringToEnum(searchMode);
+	DemographicCriteriaSearch demoCS = demoSrvc.buildDemographicSearch(searchKeyword, demoSearchMode, statisMode, sortMode);
+	demoCS.setLimit(limit);
+	demoCS.setOffset(offset);
+	return demographicDao.criteriaSearch(demoCS);
 }
 %>
