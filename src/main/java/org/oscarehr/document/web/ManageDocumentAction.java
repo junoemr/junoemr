@@ -81,6 +81,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -384,11 +385,78 @@ public class ManageDocumentAction extends DispatchAction {
 			Process gsProc = Runtime.getRuntime().exec(gsCmd);
 			gsProc.waitFor();
 
+			if (gsProc.exitValue() != 0)
+			{
+				throw new RuntimeException("GhostScript exited with value [" + gsProc.exitValue() +"] expecting 0.");
+			}
+
 			return new File(outputFilePath);
 		}
 		catch (Exception e)
 		{
-			MiscUtils.getLogger().error("failed to convert pdf to png! with error: " + e.getMessage());
+			MiscUtils.getLogger().error("failed to convert page [" + pageNum + "] of pdf ["+ inputPdfPath +"] to png! with error: " + e.getMessage());
+			return generatePdfPreviewErrorImage();
+		}
+	}
+
+	private File generatePdfPreviewErrorImage()
+	{
+		final Integer errorImgWidth = 600;
+		final Integer errorImgHieght= 800;
+		final String  junoLogoPath = "/opt/oscarhost/oscarhost_maintenance/img/logo_juno_green.png";
+
+		final String errorHeaderText = "Error generating PDF Preview";
+		final String subHeader = "Please contact Juno support.";
+
+		try
+		{
+			File outFile = File.createTempFile("oscarError", ".png");
+			BufferedImage buffImg = new BufferedImage(errorImgWidth, errorImgHieght, BufferedImage.TYPE_INT_RGB);
+			Graphics2D g2d = buffImg.createGraphics();
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+			Font headerFont = new Font("Arial", Font.BOLD, 20);
+			FontMetrics headerFontMetric = g2d.getFontMetrics(headerFont);
+
+			Font bodyFont = new Font("Arial", Font.PLAIN, 12);
+			FontMetrics bodyFontMetric = g2d.getFontMetrics(bodyFont);
+
+			//draw image
+
+			//fill bg
+			g2d.setColor(Color.white);
+			g2d.fillRect(0, 0, errorImgWidth, errorImgHieght);
+
+			//error header
+			g2d.setFont(headerFont);
+			g2d.setColor(Color.darkGray);
+			int headerXInset = errorImgWidth/2 - headerFontMetric.stringWidth(errorHeaderText)/2;
+			g2d.drawString(errorHeaderText, headerXInset, 150);
+
+			//logo
+			try
+			{
+				Image junoLogo = ImageIO.read(new File(junoLogoPath));
+				g2d.drawImage(junoLogo,errorImgWidth/2 - ((BufferedImage) junoLogo).getWidth()/2 - 10, 10, Color.white, null);
+			}
+			catch (IOException ioE)
+			{
+				MiscUtils.getLogger().warn("could not open logo file with error: " + ioE.getMessage());
+			}
+
+			// main error msg
+			g2d.setFont(bodyFont);
+			g2d.setColor(Color.gray);
+			g2d.drawString(subHeader, headerXInset, 170);
+
+			g2d.dispose();
+			ImageIO.write(buffImg, "png", outFile);
+			return outFile;
+		}
+		catch (Exception e)
+		{
+			MiscUtils.getLogger().error("failed to generate error image! with error: " + e.getMessage());
 		}
 		return null;
 	}
