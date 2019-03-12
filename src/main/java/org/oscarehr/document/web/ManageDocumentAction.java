@@ -35,8 +35,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.ghost4j.document.PDFDocument;
-import org.ghost4j.renderer.SimpleRenderer;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
 import org.oscarehr.PMmodule.model.ProgramProvider;
@@ -67,7 +65,6 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.dms.IncomingDocUtil;
@@ -79,21 +76,16 @@ import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.UtilDateUtilities;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -103,11 +95,9 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.concurrent.Semaphore;
 
 /**
  * @author jaygallagher
@@ -116,21 +106,11 @@ public class ManageDocumentAction extends DispatchAction {
 
 	private static Logger logger = MiscUtils.getLogger();
 
-	private static Integer MAX_GHOST4J_THREADS = 10;
-	private static SimpleRenderer ghost4jPdfRenderer = new SimpleRenderer();
-	private static Semaphore ghost4jSema = new Semaphore(MAX_GHOST4J_THREADS);
-
 	private DocumentDao documentDao = SpringUtils.getBean(DocumentDao.class);
 	private CtlDocumentDao ctlDocumentDao = SpringUtils.getBean(CtlDocumentDao.class);
 	private ProviderInboxRoutingDao providerInboxRoutingDAO = SpringUtils.getBean(ProviderInboxRoutingDao.class);
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	private DocumentService documentService = SpringUtils.getBean(DocumentService.class);
-
-	static {
-		// initialize ghost4j rendering instance
-		ghost4jPdfRenderer.setMaxProcessCount(MAX_GHOST4J_THREADS);
-		ghost4jPdfRenderer.setResolution(96);
-	}
 
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
@@ -398,194 +378,19 @@ public class ManageDocumentAction extends DispatchAction {
 
 	public File generatePdfPageImage(String inputPdfPath, String outputFilePath, Integer pageNum)
 	{
-		Long startTime = System.currentTimeMillis();
 		try
 		{
-			if (!ghost4jSema.tryAcquire())
-			{
-				MiscUtils.getLogger().warn("high pdf to image generation load! BLOCKING...");
-				ghost4jSema.acquire();
-			}
-			try
-			{
-				Long pdfLoadStartTime = System.currentTimeMillis();
+			String[] gsCmd = {"gs", "-sDEVICE=png16m", "-dDownScaleFactor=4","-dFirstPage=" + pageNum, "-dLastPage=" + pageNum, "-o", outputFilePath, "-r384", inputPdfPath};
+			Process gsProc = Runtime.getRuntime().exec(gsCmd);
+			gsProc.waitFor();
 
-				PDFDocument pdfDocument = new PDFDocument();
-				pdfDocument.load(new File(inputPdfPath));
-
-				Long renderStartTime = System.currentTimeMillis();
-
-				// render image
-				List<Image> images = ghost4jPdfRenderer.render(pdfDocument, pageNum - 1, pageNum - 1);
-
-				Long imageOutStartTime = System.currentTimeMillis();
-				// save image to cache
-				if (images.size() > 0)
-				{
-					ImageIO.write((RenderedImage) images.get(0), "png", new File(outputFilePath));
-				} else
-				{
-					throw new IOException("don't have any images to write to file! " + images);
-				}
-
-				Long endTime = System.currentTimeMillis();
-				MiscUtils.getLogger().info("TOTAL TIME: " + (endTime - startTime) + " PDF LOAD START: " + (pdfLoadStartTime - startTime) +
-						"RENDER START :" + (renderStartTime - startTime) + " IMAGE START: " + (imageOutStartTime - startTime));
-				return new File(outputFilePath);
-			} catch (Exception e)
-			{
-				MiscUtils.getLogger().error("failed to generate pdf page image with error: " + e.getMessage());
-			} finally
-			{
-				ghost4jSema.release();
-			}
+			return new File(outputFilePath);
 		}
-		catch(InterruptedException interE)
+		catch (Exception e)
 		{
-			MiscUtils.getLogger().error("failed to acquire ghost4j semaphore with error: " + interE.getMessage());
+			MiscUtils.getLogger().error("failed to convert pdf to png! with error: " + e.getMessage());
 		}
-
 		return null;
-
-		/* keeping the tradition
-		PdfDecoder decode_pdf  = new PdfDecoder(true);
-		File ofile = null;
-		try {
-
-			FontMappings.setFontReplacements();
-
-			decode_pdf.useHiResScreenDisplay(true);
-
-			decode_pdf.setExtractionMode(0, 96, 96/72f);
-
-			FileInputStream is = new FileInputStream(file);
-
-			decode_pdf.openPdfFileFromInputStream(is, false);
-
-			MiscUtils.getLogger().info("PDF version: " + decode_pdf.getPDFVersion());
-
-			BufferedImage image_to_save = decode_pdf.getPageAsImage(pageNum);
-
-			MiscUtils.getLogger().info("Color model: " + image_to_save.getColorModel().toString());
-			ImageIO.write(image_to_save, "bmp", new File("/tmp/awtImage.bmp"));
-
-			decode_pdf.getObjectStore().saveStoredImage( documentCacheDir.getCanonicalPath() + "/" + d.getDocfilename() + "_" + pageNum + ".png", image_to_save, true, false, "png");
-
-			decode_pdf.flushObjectValues(true);
-
-			decode_pdf.closePdfFile();
-
-			ofile = new File(documentCacheDir, d.getDocfilename() + "_" + pageNum + ".png");
-
-			if(OscarProperties.getInstance().isPropertyActive("INVERT_DARK_DOCUMENT_PREVIEWS")) {
-				correctImageFileColors(ofile);
-			}
-
-		}catch(Exception e) {
-			logger.error("Error decoding pdf file " + d.getDocfilename(), e);
-			decode_pdf.closePdfFile();
-		}
-
-		return ofile;
-	 */
-
-		/*
-
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		File documentDir = new File(docdownload);
-		File documentCacheDir = getDocumentCacheDir(docdownload);
-		log.debug("Document Dir is a dir" + documentDir.isDirectory());
-
-		File file = new File(documentDir, d.getDocfilename());
-
-		RandomAccessFile raf = new RandomAccessFile(file, "r");
-		FileChannel channel = raf.getChannel();
-		ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-		PDFFile pdffile = new PDFFile(buf);
-		if(raf != null) raf.close();
-		if(channel != null) channel.close();
-		// long readfile = System.currentTimeMillis() - start;
-		// draw the first page to an image
-		PDFPage ppage = pdffile.getPage(pageNum);
-
-		log.debug("WIDTH " + (int) ppage.getBBox().getWidth() + " height " + (int) ppage.getBBox().getHeight());
-
-		// get the width and height for the doc at the default zoom
-		Rectangle rect = new Rectangle(0, 0, (int) ppage.getBBox().getWidth(), (int) ppage.getBBox().getHeight());
-
-		log.debug("generate the image");
-		Image img = ppage.getImage(rect.width, rect.height, // width & height
-		        rect, // clip rect
-		        null, // null for the ImageObserver
-		        true, // fill background with white
-		        true // block until drawing is done
-		        );
-
-		log.debug("about to Print to stream");
-		File outfile = new File(documentCacheDir, d.getDocfilename() + "_" + pageNum + ".png");
-
-		OutputStream outs = null;
-		try {
-			outs = new FileOutputStream(outfile);
-
-			RenderedImage rendImage = (RenderedImage) img;
-			ImageIO.write(rendImage, "png", outs);
-			outs.flush();
-		} finally {
-			if (outs != null) outs.close();
-		}
-		return outfile;
-*/
-	}
-
-	public File createCacheVersion(Document d) throws Exception {
-
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		File documentDir = new File(docdownload);
-		File documentCacheDir = getDocumentCacheDir(docdownload);
-		logger.debug("Document Dir is a dir" + documentDir.isDirectory());
-
-		File file = new File(documentDir, d.getDocfilename());
-
-		RandomAccessFile raf = new RandomAccessFile(file, "r");
-		FileChannel channel = raf.getChannel();
-		ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-		PDFFile pdffile = new PDFFile(buf);
-		if(raf != null) raf.close();
-		if(channel != null) channel.close();
-		// long readfile = System.currentTimeMillis() - start;
-		// draw the first page to an image
-		PDFPage ppage = pdffile.getPage(0);
-
-		logger.debug("WIDTH " + (int) ppage.getBBox().getWidth() + " height " + (int) ppage.getBBox().getHeight());
-
-		// get the width and height for the doc at the default zoom
-		Rectangle rect = new Rectangle(0, 0, (int) ppage.getBBox().getWidth(), (int) ppage.getBBox().getHeight());
-
-		logger.debug("generate the image");
-		Image img = ppage.getImage(rect.width, rect.height, // width & height
-		        rect, // clip rect
-		        null, // null for the ImageObserver
-		        true, // fill background with white
-		        true // block until drawing is done
-		        );
-
-		logger.debug("about to Print to stream");
-		File outfile = new File(documentCacheDir, d.getDocfilename() + ".png");
-
-		OutputStream outs = null;
-		try {
-			outs = new FileOutputStream(outfile);
-
-			RenderedImage rendImage = (RenderedImage) img;
-			ImageIO.write(rendImage, "png", outs);
-			outs.flush();
-		} finally {
-			if (outs != null) outs.close();
-		}
-
-		return outfile;
-
 	}
 
 	public ActionForward showPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -1275,110 +1080,4 @@ public class ManageDocumentAction extends DispatchAction {
 		}
         return null;
     }
-
-	/**
-	 * Oscarhost implemented fix to cases where image previews do not generate correctly, resulting in dark images with light writing.
-	 * This method attempts to correct for the error (with external library) by inverting the document colouring.
-	 * @param file - to be inverted
-	 */
-	private void correctImageFileColors(File file)
-	{
-		ImageInputStream inputStream = null;
-		try
-		{
-			inputStream = ImageIO.createImageInputStream(file);
-			Iterator iter = ImageIO.getImageReaders(inputStream);
-			int inversionRatio = Integer.parseInt(OscarProperties.getInstance().getProperty("INVERT_DOCUMENT_BW_RATIO", "10"));
-			int lightnessThreshold = 240; //rgb range 0-255
-			int darknessThreshold = 10; //rgb range 0-255
-
-			if (!iter.hasNext())
-			{
-				logger.warn("unable to load image file for color correction");
-				return;
-			}
-
-			ImageReader imageReader = (ImageReader) iter.next();
-			imageReader.setInput(inputStream);
-
-			BufferedImage image = imageReader.read(0);
-
-			int height = image.getHeight();
-			int width = image.getWidth();
-
-			int countWhitish = 0;
-			int countBlackish = 0;
-			for (int i = 0; i < width; i++)
-			{
-				for (int j = 0; j < height; j++)
-				{
-					int rgb = image.getRGB(i, j);
-					int brightness = getBrightness(rgb);
-
-					if (brightness > lightnessThreshold)
-					{
-						countWhitish++;
-					}
-					else if (brightness < darknessThreshold)
-					{
-						countBlackish++;
-					}
-				}
-			}
-
-			logger.info(String.format("White vs Black image ratio: %s/%s",
-					countWhitish, countBlackish));
-
-			if (countBlackish > (countWhitish * inversionRatio))
-			{
-				logger.info("inverting image");
-
-				for (int x = 0; x < width; x++)
-				{
-					for (int y = 0; y < height; y++)
-					{
-						int rgb = image.getRGB(x, y);
-						Color col = new Color(rgb, true);
-						col = new Color(
-								255 - col.getRed(),
-								255 - col.getGreen(),
-								255 - col.getBlue());
-						image.setRGB(x, y, col.getRGB());
-					}
-				}
-				ImageIO.write(image, "png", file);
-			}
-		}
-		catch (IOException e)
-		{
-			logger.error("error inverting image: " + e.getMessage(), e);
-		}
-		finally
-		{
-			if (inputStream != null)
-			{
-				try
-				{
-					inputStream.close();
-				}
-				catch (IOException e)
-				{
-					// do nothing.
-				}
-			}
-		}
-	}
-
-	private int getBrightness(int pixel)
-	{
-		int alpha = (pixel >> 24) & 0xff;
-		int red = (pixel >> 16) & 0xff;
-		int green = (pixel >> 8) & 0xff;
-		int blue = (pixel) & 0xff;
-
-		return (int) Math.sqrt(
-				red * red * .241 +
-				green * green * .691 +
-				blue * blue * .068);
-	}
 }

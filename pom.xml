@@ -312,19 +312,6 @@
 			<version>2.2</version>
 		</dependency>
 
-		<!-- pdf / ghost4j -->
-		<dependency>
-			<groupId>org.ghost4j</groupId>
-			<artifactId>ghost4j</artifactId>
-			<version>1.0.1</version>
-		</dependency>
-
-		<!-- pdf / jpedal -->
-		<dependency>
-			<groupId>org</groupId>
-			<artifactId>jpedal</artifactId>
-			<version>lgpl</version>
-		</dependency>
 		<!--  pdfbox -->
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>
