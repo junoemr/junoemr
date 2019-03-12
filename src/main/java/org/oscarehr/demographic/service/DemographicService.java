@@ -122,6 +122,7 @@ public class DemographicService
 		//build criteria search
 		DemographicCriteriaSearch demoCS = new DemographicCriteriaSearch();
 		demoCS.setCustomWildcardsEnabled(true);
+		demoCS.setMatchModeAnywhere();
 		demoCS.setSortMode(orderBy);
 
 		if (searchMode == SEARCH_MODE.demographicNo)
@@ -138,20 +139,21 @@ public class DemographicService
 		}
 		else if(searchMode == SEARCH_MODE.name)
 		{
+			demoCS.setMatchModeStart();
 			String [] names = keyword.split(",");
 			if (names.length == 2)
 			{
-				demoCS.setFirstName(names[1].trim() + "*");
-				demoCS.setLastName(names[0].trim() + "*");
+				demoCS.setFirstName(names[1].trim());
+				demoCS.setLastName(names[0].trim());
 			}
 			else
 			{
-				demoCS.setLastName(keyword.replace(",", "").trim() + "*");
+				demoCS.setLastName(keyword.replace(",", "").trim());
 			}
 		}
 		else if(searchMode == SEARCH_MODE.phone)
 		{
-			demoCS.setPhone("*" + keyword.trim() + "*");
+			demoCS.setPhone(keyword.trim());
 		}
 		else if(searchMode == SEARCH_MODE.dob)
 		{
@@ -168,15 +170,17 @@ public class DemographicService
 		}
 		else if(searchMode == SEARCH_MODE.address)
 		{
-			demoCS.setAddress("*"+keyword.trim()+"*");
+			demoCS.setAddress(keyword.trim());
 		}
 		else if(searchMode == SEARCH_MODE.hin)
 		{
-			demoCS.setHin(keyword.trim()+"*");
+			demoCS.setMatchModeStart();
+			demoCS.setHin(keyword.trim());
 		}
 		else if(searchMode == SEARCH_MODE.chart_no)
 		{
-			demoCS.setChartNo(keyword.trim()+"*");
+			demoCS.setMatchModeStart();
+			demoCS.setChartNo(keyword.trim());
 		}
 
 		if (status != STATIS_MODE.all)
