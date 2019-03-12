@@ -52,6 +52,8 @@ oscar.dms.EDoc,
 oscar.dms.EDocUtil"%>
 <%@ page import="oscar.oscarLab.ca.all.Hl7textResultsData" %>
 <%@ page import="oscar.oscarLab.ca.on.LabResultData" %>
+<%@ page import="oscar.util.StringUtils" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -63,20 +65,58 @@ oscar.dms.EDocUtil"%>
 	String userlastname = (String) session.getAttribute("userlastname");
 
 	// "Module" and "function" is the same thing (old dms module)
-	String demoNo = request.getParameter("demo");
-	String requestId = request.getParameter("requestId");
+	String demoNoStr = request.getParameter("demo");
+	String requestIdStr = request.getParameter("requestId");
 	String providerNo = request.getParameter("provNo");
 
-	if (demoNo == null && requestId == null)
+	Integer demoNo;
+
+	if (demoNoStr == null && requestIdStr == null)
 		response.sendRedirect("../error.jsp");
 
-	if (demoNo == null || demoNo.equals("null"))
-	{
-		demoNo = consultRequestDao.find(Integer.parseInt(requestId)).getDemographicId().toString();
-	}
-
-	String patientName = EDocUtil.getDemographicName(loggedInInfo, demoNo);
+	String patientName = EDocUtil.getDemographicName(loggedInInfo, demoNoStr);
 	String[] docType = {ConsultDocs.DOCTYPE_DOC, ConsultDocs.DOCTYPE_LAB, ConsultDocs.DOCTYPE_EFORM};
+
+	List<EDoc> attachedDocList;
+	List<EDoc> unattachedDocList;
+	List<LabResultData> attachedLabList;
+	List<LabResultData> unattachedLabList;
+	List<EFormData> attachedEFormList;
+	List<EFormData> unattachedEFormList;
+
+	// for existing requests (with an ID)
+	if(requestIdStr != null && StringUtils.isNumeric(requestIdStr))
+	{
+		Integer requestId = Integer.parseInt(requestIdStr);
+
+		if (demoNoStr == null || demoNoStr.equals("null"))
+		{
+			demoNo = consultRequestDao.find(requestId).getDemographicId();
+		}
+		else
+		{
+			 demoNo = Integer.parseInt(demoNoStr);
+		}
+
+		attachedDocList = consultationAttachmentService.getAttachedDocuments(loggedInInfo, demoNo, requestId);
+		attachedLabList = consultationAttachmentService.getAttachedLabs(loggedInInfo, demoNo, requestId);
+		attachedEFormList = consultationAttachmentService.getAttachedEForms(demoNo, requestId);
+
+		unattachedDocList = consultationAttachmentService.getUnattachedDocuments(loggedInInfo, demoNo, requestId);
+		unattachedLabList = consultationAttachmentService.getUnattachedLabs(loggedInInfo, demoNo, requestId);
+		unattachedEFormList = consultationAttachmentService.getUnattachedEForms(demoNo, requestId);
+	}
+	else // new requests don't have a request ID yet, and can't have attachments
+	{
+		demoNo = Integer.parseInt(demoNoStr);
+
+		attachedDocList = new ArrayList<EDoc>(0);
+		attachedLabList = new ArrayList<LabResultData>(0);
+		attachedEFormList = new ArrayList<EFormData>(0);
+		unattachedDocList = consultationAttachmentService.getUnattachedDocuments(loggedInInfo, demoNo);
+		unattachedLabList = consultationAttachmentService.getUnattachedLabs(loggedInInfo, demoNo);
+		unattachedEFormList = consultationAttachmentService.getUnattachedEForms(demoNo);
+	}
 
 
 %>
@@ -252,12 +292,11 @@ oscar.dms.EDocUtil"%>
 			</tr>
 			<tr>
 				<td style="width: 45%; text-align: left" valign="top"><html:hidden
-						property="requestId" value="<%=requestId%>" /> <html:hidden
-						property="demoNo" value="<%=demoNo%>" /> <html:hidden
+						property="requestId" value="<%=requestIdStr%>" /> <html:hidden
+						property="demoNo" value="<%=demoNoStr%>" /> <html:hidden
 						property="providerNo" value="<%=providerNo%>" /> <html:select
 						style="width: 100%;" property="documents" multiple="1" size="10">
 						<%
-							List<EDoc> unattachedDocList = consultationAttachmentService.getUnattachedDocuments(loggedInInfo, demoNo, requestId);
 							for(EDoc doc : unattachedDocList)
 							{
 						%>
@@ -265,8 +304,6 @@ oscar.dms.EDocUtil"%>
 							value="<%=docType[0] + doc.getDocId()%>"><%=doc.getDescription()%></html:option>
 						<%
 							}
-
-							List<LabResultData> unattachedLabList = consultationAttachmentService.getUnattachedLabs(loggedInInfo, demoNo, requestId);
 							for(LabResultData lab : unattachedLabList)
 							{
 								boolean displayFlag = true;
@@ -285,13 +322,11 @@ oscar.dms.EDocUtil"%>
 						<%
 								}
 							}
-
-							List<EFormData> unattachedEformList = consultationAttachmentService.getUnattachedEForms(Integer.parseInt(demoNo), Integer.parseInt(requestId));
-							for(EFormData eform : unattachedEformList)
+							for(EFormData eform : unattachedEFormList)
 							{
 						%>
 						<html:option styleClass="eform"
-						             value="<%=docType[2] + eform.getId()%>"><%=eform.getFormName() + " " + eform.getFormDate() %></html:option>
+				             value="<%=docType[2] + eform.getId()%>"><%=eform.getFormName() + " " + eform.getFormDate() %></html:option>
 						<%
 							}
 						%>
@@ -304,7 +339,6 @@ oscar.dms.EDocUtil"%>
 						style="width: 100%;" property="attachedDocs" multiple="1"
 						size="10">
 						<%
-							List<EDoc> attachedDocList = consultationAttachmentService.getAttachedDocuments(loggedInInfo, demoNo, requestId);
 							for(EDoc doc : attachedDocList)
 							{
 						%>
@@ -312,8 +346,6 @@ oscar.dms.EDocUtil"%>
 							value="<%=docType[0] + doc.getDocId()%>"><%=doc.getDescription()%></html:option>
 						<%
 							}
-
-							List<LabResultData> attachedLabList = consultationAttachmentService.getAttachedLabs(loggedInInfo, demoNo, requestId);
 							for(LabResultData lab : attachedLabList)
 							{
 						%>
@@ -321,13 +353,11 @@ oscar.dms.EDocUtil"%>
 							value="<%=docType[1] + lab.labPatientId%>"><%=lab.getDiscipline() + " " + lab.getDateTime()%></html:option>
 						<%
 							}
-
-							List<EFormData> attachedEformList = consultationAttachmentService.getAttachedEForms(Integer.parseInt(demoNo), Integer.parseInt(requestId));
-							for(EFormData eform : attachedEformList)
+							for(EFormData eform : attachedEFormList)
 							{
 							%>
 						<html:option styleClass="eform"
-						             value="<%=docType[2] + eform.getId()%>"><%=eform.getFormName() + " " + eform.getFormDate() %></html:option>
+				             value="<%=docType[2] + eform.getId()%>"><%=eform.getFormName() + " " + eform.getFormDate() %></html:option>
 						<%
 						}
 					%>

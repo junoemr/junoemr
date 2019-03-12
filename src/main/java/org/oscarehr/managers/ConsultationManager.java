@@ -40,7 +40,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.oscarehr.common.dao.ClinicDAO;
-import org.oscarehr.common.dao.ConsultDocsDao;
+import org.oscarehr.consultations.dao.ConsultDocsDao;
 import org.oscarehr.consultations.dao.ConsultRequestDao;
 import org.oscarehr.consultations.dao.ConsultResponseDao;
 import org.oscarehr.consultations.dao.ConsultResponseDocDao;

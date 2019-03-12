@@ -28,7 +28,7 @@ import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.ConsultDocsDao;
+import org.oscarehr.consultations.dao.ConsultDocsDao;
 import org.oscarehr.consultations.dao.ConsultResponseDocDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.MeasurementDao;

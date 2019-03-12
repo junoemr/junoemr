@@ -56,14 +56,27 @@ public class ConsultationGetAttachedAction extends Action
 		String demoNo = request.getParameter("demo");
 		String requestId = request.getParameter("requestId");
 
-		List<LabResultData> labs = consultationAttachmentService.getAttachedLabs(loggedInInfo, demoNo, requestId);
-		List<String> labLabels = getLabLabels(labs);
+		List<String> labLabels;
+		List<String> docLabels;
+		List<String> eFormLabels;
 
-		List<EDoc> privateDocs = consultationAttachmentService.getAttachedDocuments(loggedInInfo, demoNo, requestId);
-		List<String> docLabels = getDocumentLabels(privateDocs);
+		if(StringUtils.isNumeric(demoNo) && StringUtils.isNumeric(requestId))
+		{
+			List<LabResultData> labs = consultationAttachmentService.getAttachedLabs(loggedInInfo, demoNo, requestId);
+			labLabels = getLabLabels(labs);
 
-		List<EFormData> eFormList = consultationAttachmentService.getAttachedEForms(Integer.parseInt(demoNo), Integer.parseInt(requestId));
-		List<String> eFormLabels = getEFormLabels(eFormList);
+			List<EDoc> privateDocs = consultationAttachmentService.getAttachedDocuments(loggedInInfo, demoNo, requestId);
+			docLabels = getDocumentLabels(privateDocs);
+
+			List<EFormData> eFormList = consultationAttachmentService.getAttachedEForms(Integer.parseInt(demoNo), Integer.parseInt(requestId));
+			eFormLabels = getEFormLabels(eFormList);
+		}
+		else
+		{
+			labLabels = new ArrayList<>(0);
+			docLabels = new ArrayList<>(0);
+			eFormLabels = new ArrayList<>(0);
+		}
 
 		request.setAttribute("docArray", docLabels);
 		request.setAttribute("labArray", labLabels);

@@ -22,7 +22,7 @@
  */
 package org.oscarehr.consultations.service;
 
-import org.oscarehr.common.dao.ConsultDocsDao;
+import org.oscarehr.consultations.dao.ConsultDocsDao;
 import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.util.LoggedInInfo;
@@ -57,10 +57,20 @@ public class ConsultationAttachmentService
 		return getEFormList(demographicNo, consultId, false);
 	}
 
+	public List<EFormData> getUnattachedEForms(Integer demographicNo)
+	{
+		return getEFormList(demographicNo, null, false);
+	}
+
 	private List<EFormData> getEFormList(Integer demographicNo, Integer consultId, boolean findAttached)
 	{
 		// TODO this could be refined to a single query
 		List<EFormData> eForms = EFormUtil.listPatientEFormsShowLatestOnly(demographicNo.toString());
+		if(consultId == null && !findAttached)
+		{
+			// without a consult ID, all eForms are unattached
+			return eForms;
+		}
 		List<ConsultDocs> docs = consultDocsDao.findByRequestIdAndType(consultId, ConsultDocs.DOCTYPE_EFORM);
 
 		int listSize = findAttached? docs.size() : (eForms.size() - docs.size());
@@ -97,6 +107,10 @@ public class ConsultationAttachmentService
 	{
 		return getUnattachedDocuments(loggedInInfo, String.valueOf(demographicNo), String.valueOf(consultId));
 	}
+	public List<EDoc> getUnattachedDocuments(LoggedInInfo loggedInInfo, Integer demographicNo)
+	{
+		return getUnattachedDocuments(loggedInInfo, String.valueOf(demographicNo), "null");
+	}
 	public List<EDoc> getUnattachedDocuments(LoggedInInfo loggedInInfo, String demographicNo, String consultId)
 	{
 		return EDocUtil.listDocs(loggedInInfo, demographicNo, consultId, EDocUtil.UNATTACHED);
@@ -115,6 +129,10 @@ public class ConsultationAttachmentService
 	public List<LabResultData> getUnattachedLabs(LoggedInInfo loggedInInfo, Integer demographicNo, Integer consultId)
 	{
 		return getUnattachedLabs(loggedInInfo, String.valueOf(demographicNo), String.valueOf(consultId));
+	}
+	public List<LabResultData> getUnattachedLabs(LoggedInInfo loggedInInfo, Integer demographicNo)
+	{
+		return getUnattachedLabs(loggedInInfo, String.valueOf(demographicNo), "null");
 	}
 	public List<LabResultData> getUnattachedLabs(LoggedInInfo loggedInInfo, String demographicNo, String consultId)
 	{

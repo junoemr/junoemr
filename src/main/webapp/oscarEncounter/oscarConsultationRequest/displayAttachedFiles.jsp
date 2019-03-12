@@ -38,14 +38,9 @@ if(!authed) {
     return;
 }
 %>
-
 <%@ page import="java.util.List"%>
-
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
-
 <%
-    String demo = request.getParameter("demo") ;
-    String requestId = request.getParameter("requestId");
     List<String> labLabels = (List<String>) request.getAttribute("labArray");
     List<String> docLabels = (List<String>) request.getAttribute("docArray");
     List<String> eFormLabels = (List<String>) request.getAttribute("eFormArray");
