@@ -821,7 +821,7 @@ function rs(n,u,w,h,x){
 
 var DocPopup = null;
 function popup(location) {
-    DocPopup = window.open(location,"_blank","height=380,width=580");
+    DocPopup = window.open(location,"_blank","height=800,width=1280");
 
     if (DocPopup != null) {
         if (DocPopup.opener == null) {
@@ -1598,15 +1598,10 @@ var requestIdKey = "<%=signatureRequestId %>";
 								else
 								{
 									%>
-									<% if (OscarProperties.getInstance().isPropertyActive("consultation_indivica_attachment_enabled")) { %>
 									<a href="#" onclick="popup('<rewrite:reWrite jspPage="attachConsultation2.jsp"/>?provNo=<%=consultUtil.providerNo%>&demo=<%=demo%>&requestId=<%=requestId%>');return false;">
 										<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.attachDoc" />
 									</a>
-									<% } else { %>
-									<a href="#" onclick="popup('<rewrite:reWrite jspPage="attachConsultation.jsp"/>?provNo=<%=consultUtil.providerNo%>&demo=<%=demo%>&requestId=<%=requestId%>');return false;">
-										<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.attachDoc" />
-									</a>
-									<% }
+									<%
 								}
 							%>
 							</td>

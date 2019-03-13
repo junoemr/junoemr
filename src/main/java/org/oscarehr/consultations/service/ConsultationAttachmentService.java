@@ -57,7 +57,7 @@ public class ConsultationAttachmentService
 		return getEFormList(demographicNo, consultId, false);
 	}
 
-	public List<EFormData> getUnattachedEForms(Integer demographicNo)
+	public List<EFormData> getAllEForms(Integer demographicNo)
 	{
 		return getEFormList(demographicNo, null, false);
 	}

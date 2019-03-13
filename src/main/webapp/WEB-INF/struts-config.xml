@@ -1172,7 +1172,7 @@
 		<action input=" " name="EctIncomingConsultationForm" path="/oscarEncounter/IncomingConsultation" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctIncomingConsultationAction">
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/ViewConsultationRequests.jsp" />
 		</action>
-		<action input="/oscarConsultationRequest/attachConsultation.jsp" name="attachConsultation" path="/oscarConsultationRequest/attachDoc" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationAttachDocsAction">
+		<action input="/oscarConsultationRequest/attachConsultation2.jsp" name="attachConsultation" path="/oscarConsultationRequest/attachDoc" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationAttachDocsAction">
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/attachSuccessfull.jsp" />
 			<forward name="failure" path="/oscarEncounter/oscarConsultationRequest/attachSuccessfull.jsp" />
 		</action>
@@ -1198,16 +1198,10 @@
 		>
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/ConfirmConsultationRequest.jsp" />
 			<forward name="failESend" path="/oscarEncounter/ViewRequest.do" />
-			<forward name="print" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormPrint.jsp" />
-			<forward name="printalt" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormPrint2.jsp" />
-			<forward name="printpdf" path="/oscarEncounter/oscarConsultationRequest/printPdf.do" />
-			<forward name="printIndivica" path="/oscarEncounter/oscarConsultationRequest/printPdf2.do" />
+			<forward name="print" path="/oscarEncounter/oscarConsultationRequest/printPdf2.do" />
 			<forward name="fax" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormFax.jsp" />
 			<forward name="faxIndivica" path="/fax/CoverPage.jsp" />
 			<forward name="emailalt" path="/oscarEncounter/oscarConsultationRequest/emailPatient.jsp" />
-		</action>
-		<action input="/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/printPdf" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestPrintAction">
-			<forward name="error" path="/oscarEncounter/ViewRequest.do?error=error" />
 		</action>
 		<action input="/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/printPdf2" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestPrintAction2">
 			<forward name="error" path="/oscarEncounter/ViewRequest.do?error=error" />
@@ -1510,7 +1504,7 @@
 			<forward name="success" path="/oscarEncounter/ViewAttachment.jsp" />
 		</action>
 		<action input="/ConsultationReport.jsp" name="RptShowConsultForm" path="/oscarReport/ShowConsult" scope="request" type="oscar.oscarReport.pageUtil.RptShowConsultAction">
-			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormPrint.jsp" />
+			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/printPdf2.do" />
 		</action>
 		<action input="/oscarReport/oscarReportFluBilling.jsp" name="RptFluBillingForm" path="/oscarReport/FluBilling" scope="request" type="oscar.oscarReport.pageUtil.RptFluBillingAction">
 			<forward name="success" path="/oscarReport/oscarReportFluBilling.jsp" />

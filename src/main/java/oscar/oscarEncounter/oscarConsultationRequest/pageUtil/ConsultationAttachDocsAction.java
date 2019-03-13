@@ -31,12 +31,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
-import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.consultations.service.ConsultationAttachmentService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
-import oscar.OscarProperties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -69,24 +67,11 @@ public class ConsultationAttachDocsAction extends Action
 		boolean provNoValid = provNo != null && !provNo.equalsIgnoreCase("null");
 		boolean requestIdValid = StringUtils.isNumeric(requestIdStr) && !requestIdStr.trim().isEmpty() && !requestIdStr.equalsIgnoreCase("0");
 
-		if (demoNoValid && provNoValid && requestIdValid) {
-
-			List<Integer> labIds;
-			List<Integer> docIds;
-			List<Integer> eformIds;
-
-			if(OscarProperties.getInstance().isPropertyActive("consultation_indivica_attachment_enabled"))
-			{
-				labIds = toIntList(request.getParameterValues("labNo"));
-				docIds = toIntList(request.getParameterValues("docNo"));
-				eformIds = toIntList(request.getParameterValues("eFormNo"));
-			}
-			else
-			{
-				labIds = filterIdList(frm.getStrings("attachedDocs"), ConsultDocs.DOCTYPE_LAB);
-				docIds = filterIdList(frm.getStrings("attachedDocs"), ConsultDocs.DOCTYPE_DOC);
-				eformIds = filterIdList(frm.getStrings("attachedDocs"), ConsultDocs.DOCTYPE_EFORM);
-			}
+		if (demoNoValid && provNoValid && requestIdValid)
+		{
+			List<Integer> labIds = toIntList(request.getParameterValues("labNo"));
+			List<Integer> docIds = toIntList(request.getParameterValues("docNo"));
+			List<Integer> eformIds = toIntList(request.getParameterValues("eFormNo"));
 
 			consultationAttachmentService.setAttachedDocuments(requestId, provNo, docIds);
 			consultationAttachmentService.setAttachedLabs(requestId, provNo, labIds);
@@ -98,24 +83,6 @@ public class ConsultationAttachDocsAction extends Action
 		return mapping.findForward("failure");
 	}
 
-	/**
-	 * filter the attachedDocs id list on prefix. ids start with a doctype letter, followed by the integerID value for that attachment
-	 * @param idList
-	 * @param filterPrefix
-	 * @return filtered list converted to integers
-	 */
-	private List<Integer> filterIdList(String[] idList, String filterPrefix)
-	{
-		List<Integer> filteredList = new ArrayList<>();
-		for(String id : idList)
-		{
-			if(id.startsWith(filterPrefix))
-			{
-				filteredList.add(Integer.parseInt(id.substring(filterPrefix.length())));
-			}
-		}
-		return filteredList;
-	}
 	private List<Integer> toIntList(String[] strList)
 	{
 		List<Integer> intList = new ArrayList<>();
