@@ -121,7 +121,10 @@ public class DemographicService
 	{
 		//build criteria search
 		DemographicCriteriaSearch demoCS = new DemographicCriteriaSearch();
-		demoCS.setCustomWildcardsEnabled(true);
+		if (keyword.contains("*"))
+		{
+			demoCS.setCustomWildcardsEnabled(true);
+		}
 		demoCS.setMatchModeAnywhere();
 		demoCS.setSortMode(orderBy);
 

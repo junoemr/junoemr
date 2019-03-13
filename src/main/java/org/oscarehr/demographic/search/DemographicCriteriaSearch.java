@@ -142,7 +142,7 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	private Criterion getRestrictionCriterion(String propertyName, String value)
 	{
 		MatchMode matchMode = this.matchMode;
-		if(customWildcardsEnabled && value.contains("*"))
+		if(customWildcardsEnabled)
 		{
 			// convert the * character to a wildcard for mysql
 			value = value.replaceAll("\\*", "%");
