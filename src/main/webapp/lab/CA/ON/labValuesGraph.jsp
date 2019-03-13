@@ -66,15 +66,12 @@ if(!authed) {
             if (request.getParameterValues("drug") != null)
             {
                 String[] drugs = request.getParameterValues("drug");
-                if (drugs.length > 0)
+                for (String drug : drugs)
                 {
-                    for (String drug : drugs)
-                    {
-                        buffer.append("&drug=" + drug);
-                        drugTable.put(drug, "drug");
-                    }
-                    drugForGraph = buffer.toString();
+                    buffer.append("&drug=" + drug);
+                    drugTable.put(drug, "drug");
                 }
+                drugForGraph = buffer.toString();
             }
 
 

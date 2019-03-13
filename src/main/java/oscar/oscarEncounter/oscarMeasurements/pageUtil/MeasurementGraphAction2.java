@@ -97,11 +97,13 @@ public class MeasurementGraphAction2 extends Action {
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         String userrole = (String) request.getSession().getAttribute("userrole");
-        if (userrole == null) {
+        if (userrole == null)
+        {
             response.sendRedirect("../logout.jsp");
         }
 
-        if (!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_measurement", "r", null)) {
+        if (!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_measurement", "r", null))
+        {
             throw new SecurityException("missing required security object (_measurement)");
         }
 
@@ -175,7 +177,6 @@ public class MeasurementGraphAction2 extends Action {
     }
 
     private static XYTaskDataset getDrugDataSet(Integer demographicId, String[] dins) {
-
         TaskSeriesCollection datasetDrug = new TaskSeriesCollection();
         oscar.oscarRx.data.RxPrescriptionData prescriptData = new oscar.oscarRx.data.RxPrescriptionData();
 
@@ -201,9 +202,9 @@ public class MeasurementGraphAction2 extends Action {
     }
 
     private static String[] getDrugSymbol(Integer demographic,String[] dins){
-        String[] ret = new String[dins.length];
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         oscar.oscarRx.data.RxPrescriptionData prescriptData = new oscar.oscarRx.data.RxPrescriptionData();
+
         for (String din : dins)
         {
              oscar.oscarRx.data.RxPrescriptionData.Prescription [] prescriptions =  prescriptData.getPrescriptionScriptsByPatientRegionalIdentifier(demographic,din);
@@ -213,7 +214,9 @@ public class MeasurementGraphAction2 extends Action {
              }
 
         }
-        ret = list.toArray(new String[list.size()]);
+
+        String[] ret = list.toArray(new String[list.size()]);
+
         return ret;
     }
 
