@@ -155,11 +155,7 @@ public final class BillingViewAction
   {
     BillingPreferencesDAO dao = SpringUtils.getBean(BillingPreferencesDAO.class);
     BillingPreference pref = dao.getUserBillingPreference(userProviderNo);
-    if ( pref == null || pref.getDefaultPayeeNo() == 0)
-    {
-      return true;
-    }
-    return false;
+    return ( pref == null || pref.getDefaultPayeeNo() == 0);
   }
 
   /**
