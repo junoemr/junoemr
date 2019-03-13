@@ -1,9 +1,11 @@
 <%@taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@page import="java.util.*,oscar.util.*"%>
+<%@ page import="oscar.oscarBilling.ca.bc.pageUtil.BillingViewBean" %>
 <%
 oscar.entities.Provider prov = new oscar.entities.Provider();
 prov.setProviderNo("0");
+prov.setFirstName(BillingViewBean.DEFAULT_PAYEE_NAME);
 List lst = (List)request.getAttribute("providerList");
 
 lst.add(prov);
