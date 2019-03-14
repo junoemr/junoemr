@@ -1468,13 +1468,19 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
 										<span class="_hc_status_icon _hc_status_success"></span>Ready for Card Swipe
 									</span>
 								<% } %>	
-                                <% if (!OscarProperties.getInstance().getBooleanProperty("workflow_enhance", "true")) { %>
+                                <% if (!OscarProperties.getInstance().getBooleanProperty("workflow_enhance", "true"))
+                                {
+                                	if(oscarProps.isOntarioInstanceType())
+									{
+								%>
 								<span id="swipeButton" style="display: inline;"> 
                                     <input type="button" name="Button"
                                     value="<bean:message key="demographic.demographiceditdemographic.btnSwipeCard"/>"
                                     onclick="window.open('zdemographicswipe.jsp','', 'scrollbars=yes,resizable=yes,width=600,height=300, top=360, left=0')">
                                 </span> <!--input type="button" name="Button" value="<bean:message key="demographic.demographiceditdemographic.btnSwipeCard"/>" onclick="javascript:window.alert('Health Card Number Already Inuse');"-->
-                                <% } %>
+                                <% 	}
+								}
+								%>
                                 </td>
                                 <td width="40%" align='right' valign="top">
 								<input type="button" size="110" name="Button"
@@ -3788,12 +3794,20 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) { out.println(os
 									<input type="submit" <%=(showCbiReminder?"onclick='showCbiReminder()'":"")%>
 										value="<bean:message key="demographic.demographiceditdemographic.btnUpdate"/>">
 								</security:oscarSec> </span> <!-- security code block --></td>
-								<td width="40%" align='right' valign="top"><span
+								<td width="40%" align='right' valign="top">
+									<%
+										if(oscarProps.isOntarioInstanceType())
+										{
+									%>
+									<span
 									id="swipeButton" style="display: none;"> <input
 									type="button" name="Button"
 									value="<bean:message key="demographic.demographiceditdemographic.btnSwipeCard"/>"
 									onclick="window.open('zdemographicswipe.jsp','', 'scrollbars=yes,resizable=yes,width=600,height=300, top=360, left=0')">
 								</span> <!--input type="button" name="Button" value="<bean:message key="demographic.demographiceditdemographic.btnSwipeCard"/>" onclick="javascript:window.alert('Health Card Number Already Inuse');"-->
+									<%
+										}
+									%>
 									<input type="button" size="110" name="Button"
 									    value="<bean:message key="demographic.demographiceditdemographic.btnCreatePDFEnvelope"/>"
 									    onclick="popupPage(400,700,'<%=printEnvelope%><%=demographic.getDemographicNo()%>');return false;">

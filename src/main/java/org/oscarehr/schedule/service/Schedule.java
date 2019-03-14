@@ -39,6 +39,7 @@ import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.model.RSchedule;
 import org.oscarehr.schedule.model.ScheduleDate;
 import org.oscarehr.schedule.model.ScheduleHoliday;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -341,29 +342,42 @@ public class Schedule
 	public ResourceSchedule getResourceScheduleByGroup(String group, LocalDate date, String site,
 		boolean viewAll, Integer limitProviderNo)
 	{
-		List<MyGroup> results;
+		List<MyGroup> userGroupMappings;
 
 		if(viewAll)
 		{
-			results = myGroupDao.getGroupByGroupNo(group);
+			userGroupMappings = myGroupDao.getGroupByGroupNo(group);
 		}
 		else
 		{
-			results = myGroupDao.getGroupWithScheduleByGroupNo(group, date, limitProviderNo);
+			userGroupMappings = myGroupDao.getGroupWithScheduleByGroupNo(group, date, limitProviderNo);
 		}
 
 		List<UserDateSchedule> userDateSchedules = new ArrayList<>();
 
-		for(MyGroup result: results)
+		for(MyGroup result: userGroupMappings)
 		{
-			// get a UserDateSchedule for each
-			userDateSchedules.add(getUserDateSchedule(
-				date,
-				new Integer(result.getId().getProviderNo()),
-				result.getFirstName(),
-				result.getLastName(),
-				site
-			));
+			UserDateSchedule userScheduel = getUserDateSchedule(
+					date,
+					new Integer(result.getId().getProviderNo()),
+					result.getFirstName(),
+					result.getLastName(),
+					site
+			);
+
+			Provider provider = providerDao.getProvider(result.getId().getProviderNo());
+			if (provider != null)
+			{
+				userScheduel.setFirstName(provider.getFirstName());
+				userScheduel.setLastName(provider.getLastName());
+			}
+			else
+			{
+				MiscUtils.getLogger().error("failed to lookup provider with no [" +
+						result.getId().getProviderNo() + "] for group [" + result.getId().getMyGroupNo() +"]");
+			}
+
+			userDateSchedules.add(userScheduel);
 		}
 
 		// Create transfer object

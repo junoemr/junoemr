@@ -41,6 +41,7 @@
 <%@ page import="org.oscarehr.common.model.TicklerLink" %>
 <%@ page import="org.oscarehr.common.dao.TicklerLinkDao" %>
 <%@ page import="java.util.Calendar" %>
+<%@ page import="java.time.LocalDate" %>
 <%@ page import="oscar.MyDateFormat" %>
 <%@ page import="oscar.OscarProperties" %>
 <%@ page import="org.oscarehr.common.model.Site" %>
@@ -54,6 +55,8 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.net.URLEncoder" %>
+<%@ page import="java.time.ZoneId" %>
+<%@ page import="oscar.util.ConversionUtils" %>
 
 <%
 	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -1180,14 +1183,14 @@
 				String dateBegin = xml_vdate;
 				String dateEnd = xml_appointment_date;
 
-				String vGrantdate = "1980-01-07 00:00:00.0";
-				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:ss:mm.SSS", locale);
-
 				if (dateEnd.compareTo("") == 0)
+				{
 					dateEnd = MyDateFormat.getMysqlStandardDate(curYear, curMonth, curDay);
+				}
 				if (dateBegin.compareTo("") == 0)
+				{
 					dateBegin = "1950-01-01"; // any early start date should suffice for selecting since the beginning
-
+				}
 				CustomFilter filter = new CustomFilter();
 				filter.setPriority(null);
 
@@ -1225,26 +1228,21 @@
 				}
 				String rowColour = "lilac";
 
-				for (Tickler t : ticklers)
+				for (Tickler tickler : ticklers)
 				{
-					Demographic demo = t.getDemographic();
+					// NOTE: Using deprecated Demographic model, need to update to new demographic model
+					Demographic demo = tickler.getDemographic();
 
-					vGrantdate = t.getServiceDate() + " 00:00:00.0";
-					java.util.Date grantdate = dateFormat.parse(vGrantdate);
-					java.util.Date toDate = new java.util.Date();
-					long millisDifference = toDate.getTime() - grantdate.getTime();
-
-					long ONE_DAY_IN_MS = (1000 * 60 * 60 * 24);
-					long daysDifference = millisDifference / (ONE_DAY_IN_MS);
+					LocalDate grantDate = ConversionUtils.toZonedLocalDate(tickler.getServiceDate());
+					LocalDate today = LocalDate.now();
 
 					String numDaysUntilWarn = OscarProperties.getInstance().getProperty("tickler_warn_period");
 					long ticklerWarnDays = Long.parseLong(numDaysUntilWarn);
 					boolean ignoreWarning = (ticklerWarnDays < 0);
 
-
-					//Set the colour of the table cell
+					// Set the colour of the table cell
 					String warnColour = "";
-					if (!ignoreWarning && (daysDifference >= ticklerWarnDays))
+					if (!ignoreWarning && grantDate.isBefore(today))
 					{
 						warnColour = "Red";
 					}
@@ -1252,7 +1250,8 @@
 					if (rowColour.equals("lilac"))
 					{
 						rowColour = "white";
-					} else
+					}
+					else
 					{
 						rowColour = "lilac";
 					}
@@ -1263,14 +1262,14 @@
 			<tr>
 				<TD width="3%" ROWSPAN="1" class="<%=cellColour%>"><input type="checkbox"
 																		  name="checkbox"
-																		  value="<%=t.getId()%>"
+																		  value="<%=tickler.getId()%>"
 																		  class="noprint"></TD>
 				<%
 					if (ticklerEditEnabled)
 					{
 				%>
 				<td width="3%" ROWSPAN="1" class="<%=cellColour%>"><a href=#
-																	  onClick="popupPage(600,800, '../tickler/ticklerEdit.jsp?tickler_no=<%=t.getId()%>')"><bean:message
+																	  onClick="popupPage(600,800, '../tickler/ticklerEdit.jsp?tickler_no=<%=tickler.getId()%>')"><bean:message
 						key="tickler.ticklerMain.editTickler"/></a></td>
 				<%
 					}
@@ -1279,55 +1278,55 @@
 																	   onClick="popupPage(600,800,'../demographic/demographiccontrol.jsp?demographic_no=<%=demo.getDemographicNo()%>&displaymode=edit&dboperation=search_detail')"><%=demo.getDisplayName()%>
 				</a></TD>
 				<TD ROWSPAN="1"
-					class="<%=cellColour%>"><%=t.getProvider() == null ? "N/A" : t.getProvider().getFormattedName()%>
+					class="<%=cellColour%>"><%=tickler.getProvider() == null ? "N/A" : tickler.getProvider().getFormattedName()%>
 				</TD>
-				<TD ROWSPAN="1" class="<%=cellColour%>"><%=t.getServiceDate()%>
+				<TD ROWSPAN="1" class="<%=cellColour%>"><%=tickler.getServiceDate()%>
 				</TD>
-				<TD ROWSPAN="1" class="<%=cellColour%>"><%=t.getUpdateDate()%>
+				<TD ROWSPAN="1" class="<%=cellColour%>"><%=tickler.getUpdateDate()%>
 				</TD>
-				<TD ROWSPAN="1" class="<%=cellColour%>"><%=t.getPriority()%>
+				<TD ROWSPAN="1" class="<%=cellColour%>"><%=tickler.getPriority()%>
 				</TD>
 				<TD ROWSPAN="1"
-					class="<%=cellColour%>"><%=t.getAssignee() != null ? t.getAssignee().getLastName() + ", " + t.getAssignee().getFirstName() : "N/A"%>
+					class="<%=cellColour%>"><%=tickler.getAssignee() != null ? tickler.getAssignee().getLastName() + ", " + tickler.getAssignee().getFirstName() : "N/A"%>
 				</TD>
-				<TD ROWSPAN="1" class="<%=cellColour%>"><%=t.getStatusDesc(locale)%>
+				<TD ROWSPAN="1" class="<%=cellColour%>"><%=tickler.getStatusDesc(locale)%>
 				</TD>
-				<TD ROWSPAN="1" class="<%=cellColour%>"><%=t.getMessage()%>
+				<TD ROWSPAN="1" class="<%=cellColour%>"><%=tickler.getMessage()%>
 
 					<%
-						List<TicklerLink> linkList = ticklerLinkDao.getLinkByTickler(t.getId().intValue());
+						List<TicklerLink> linkList = ticklerLinkDao.getLinkByTickler(tickler.getId().intValue());
 						if (linkList != null)
 						{
-							for (TicklerLink tl : linkList)
+							for (TicklerLink ticklerLink : linkList)
 							{
-								String type = tl.getTableName();
+								String type = ticklerLink.getTableName();
 					%>
 
 					<%
 						if (LabResultData.isMDS(type))
 						{
 					%>
-					<a href="javascript:reportWindow('SegmentDisplay.jsp?segmentID=<%=tl.getTableId()%>&providerNo=<%=user_no%>&searchProviderNo=<%=user_no%>&status=')">ATT</a>
+					<a href="javascript:reportWindow('SegmentDisplay.jsp?segmentID=<%=ticklerLink.getTableId()%>&providerNo=<%=user_no%>&searchProviderNo=<%=user_no%>&status=')">ATT</a>
 					<%
 					} else if (LabResultData.isCML(type))
 					{
 					%>
-					<a href="javascript:reportWindow('../lab/CA/ON/CMLDisplay.jsp?segmentID=<%=tl.getTableId()%>&providerNo=<%=user_no%>&searchProviderNo=<%=user_no%>&status=')">ATT</a>
+					<a href="javascript:reportWindow('../lab/CA/ON/CMLDisplay.jsp?segmentID=<%=ticklerLink.getTableId()%>&providerNo=<%=user_no%>&searchProviderNo=<%=user_no%>&status=')">ATT</a>
 					<%
 					} else if (LabResultData.isHL7TEXT(type))
 					{
 					%>
-					<a href="javascript:reportWindow('../lab/CA/ALL/labDisplay.jsp?segmentID=<%=tl.getTableId()%>&providerNo=<%=user_no%>&searchProviderNo=<%=user_no%>&status=')">ATT</a>
+					<a href="javascript:reportWindow('../lab/CA/ALL/labDisplay.jsp?segmentID=<%=ticklerLink.getTableId()%>&providerNo=<%=user_no%>&searchProviderNo=<%=user_no%>&status=')">ATT</a>
 					<%
 					} else if (LabResultData.isDocument(type))
 					{
 					%>
-					<a href="javascript:reportWindow('../dms/ManageDocument.do?method=display&doc_no=<%=tl.getTableId()%>&providerNo=<%=user_no%>&searchProviderNo=<%=user_no%>&status=')">ATT</a>
+					<a href="javascript:reportWindow('../dms/ManageDocument.do?method=display&doc_no=<%=ticklerLink.getTableId()%>&providerNo=<%=user_no%>&searchProviderNo=<%=user_no%>&status=')">ATT</a>
 					<%
 					} else
 					{
 					%>
-					<a href="javascript:reportWindow('../lab/CA/BC/labDisplay.jsp?segmentID=<%=tl.getTableId()%>&providerNo=<%=user_no%>&searchProviderNo=<%=user_no%>&status=')">ATT</a>
+					<a href="javascript:reportWindow('../lab/CA/BC/labDisplay.jsp?segmentID=<%=ticklerLink.getTableId()%>&providerNo=<%=user_no%>&searchProviderNo=<%=user_no%>&status=')">ATT</a>
 					<%
 						}
 					%>
@@ -1339,39 +1338,39 @@
 				</TD>
 				<td ROWSPAN="1" class="<%=cellColour%> noprint">
 					<a href="#"
-					   onClick="return openNoteDialog('<%=demo.getDemographicNo() %>','<%=t.getId() %>');return false;">
+					   onClick="return openNoteDialog('<%=demo.getDemographicNo() %>','<%=tickler.getId() %>');return false;">
 						<img border="0" src="<%=request.getContextPath()%>/images/notepad.gif"/>
 					</a>
 				</td>
 			</tr>
 			<%
-				Set<TicklerComment> tcomments = t.getComments();
+				Set<TicklerComment> tcomments = tickler.getComments();
 				if (ticklerEditEnabled && !tcomments.isEmpty())
 				{
-					for (TicklerComment tc : tcomments)
+					for (TicklerComment ticklerComment : tcomments)
 					{
 			%>
 			<tr>
 				<td width="3%" ROWSPAN="1" class="<%=cellColour%>"></td>
 				<td width="3%" ROWSPAN="1" class="<%=cellColour%>"></td>
 				<td width="12%" ROWSPAN="1" class="<%=cellColour%>"></td>
-				<td ROWSPAN="1" class="<%=cellColour%>"><%=tc.getProvider().getLastName()%>
-					,<%=tc.getProvider().getFirstName()%>
+				<td ROWSPAN="1" class="<%=cellColour%>"><%=ticklerComment.getProvider().getLastName()%>
+					,<%=ticklerComment.getProvider().getFirstName()%>
 				</td>
 				<td ROWSPAN="1" class="<%=cellColour%>"></td>
-				<% if (tc.isUpdateDateToday())
+				<% if (ticklerComment.isUpdateDateToday())
 				{ %>
-				<td ROWSPAN="1" class="<%=cellColour%>"><%=tc.getUpdateTime(locale)%>
+				<td ROWSPAN="1" class="<%=cellColour%>"><%=ticklerComment.getUpdateTime(locale)%>
 				</td>
 				<% } else
 				{ %>
-				<td ROWSPAN="1" class="<%=cellColour%>"><%=tc.getUpdateDate(locale)%>
+				<td ROWSPAN="1" class="<%=cellColour%>"><%=ticklerComment.getUpdateDate(locale)%>
 				</td>
 				<% } %>
 				<td ROWSPAN="1" class="<%=cellColour%>"></td>
 				<td ROWSPAN="1" class="<%=cellColour%>"></td>
 				<td ROWSPAN="1" class="<%=cellColour%>"></td>
-				<td ROWSPAN="1" class="<%=cellColour%>"><%=tc.getMessage()%>
+				<td ROWSPAN="1" class="<%=cellColour%>"><%=ticklerComment.getMessage()%>
 				</td>
 				<td ROWSPAN="1" class="<%=cellColour%>">&nbsp;</td>
 			</tr>

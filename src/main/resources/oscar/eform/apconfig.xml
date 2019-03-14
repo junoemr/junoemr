@@ -1255,6 +1255,24 @@
 		<ap-output>${last_name}, ${first_name}</ap-output>
 	</databaseap>
 	<databaseap>
+		<ap-name>appt_provider_nameF</ap-name>
+		<ap-sql>
+			SELECT p.first_name
+			FROM provider p, appointment a
+			WHERE p.provider_no=a.provider_no AND a.appointment_no=${appt_no}
+		</ap-sql>
+		<ap-output>${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>appt_provider_nameL</ap-name>
+		<ap-sql>
+			SELECT p.last_name
+			FROM provider p, appointment a
+			WHERE p.provider_no=a.provider_no AND a.appointment_no=${appt_no}
+		</ap-sql>
+		<ap-output>${last_name}</ap-output>
+	</databaseap>
+	<databaseap>
 		<ap-name>appt_provider_ohip_no</ap-name>
 		<ap-sql>SELECT p.ohip_no
 			FROM provider p INNER JOIN appointment a ON (p.provider_no=a.provider_no)
