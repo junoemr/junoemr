@@ -25,6 +25,7 @@ package org.oscarehr.demographic.model;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 
 import javax.persistence.Column;
@@ -40,6 +41,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.io.Serializable;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -290,7 +292,15 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 
 	public LocalDate getDateOfBirth()
 	{
-		return LocalDate.of(Integer.parseInt(yearOfBirth), Integer.parseInt(monthOfBirth), Integer.parseInt(dayOfBirth));
+		try
+		{
+			return LocalDate.of(Integer.parseInt(yearOfBirth), Integer.parseInt(monthOfBirth), Integer.parseInt(dayOfBirth));
+		}
+		catch (DateTimeException dte)
+		{
+			MiscUtils.getLogger().error("Demographic [" + getId() + "] has invalid dob with error: " + dte.getMessage());
+		}
+		return LocalDate.now();
 	}
 
 	public void setDateOfBirth(LocalDate dateOfBirth)
