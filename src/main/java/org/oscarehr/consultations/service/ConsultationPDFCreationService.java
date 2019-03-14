@@ -27,12 +27,12 @@ import com.sun.xml.messaging.saaj.util.ByteInputStream;
 import com.sun.xml.messaging.saaj.util.ByteOutputStream;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.exception.HtmlToPdfConversionException;
+import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +46,7 @@ import oscar.util.ConcatPDF;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,115 +56,92 @@ public class ConsultationPDFCreationService
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
-	@Autowired
-	private ConsultationAttachmentService consultationAttachmentService;
-
-	public ByteOutputStream getRequestOutputStream(HttpServletRequest request, LoggedInInfo loggedInInfo, Integer demographicNo, Integer requestId) throws IOException, DocumentException, HtmlToPdfConversionException
+	public List<InputStream> toEDocInputStreams(HttpServletRequest request, List<EDoc> attachedDocuments) throws IOException, DocumentException
 	{
-		ByteOutputStream bos;
-		List<InputStream> streams = new ArrayList<>();
-
-		try
+		List<InputStream> streamList = new ArrayList<>(attachedDocuments.size());
+		for(EDoc doc : attachedDocuments)
 		{
-			List<EDoc> attachedDocuments = consultationAttachmentService.getAttachedDocuments(loggedInInfo, demographicNo, requestId);
-			List<LabResultData> attachedLabs = consultationAttachmentService.getAttachedLabs(loggedInInfo, demographicNo, requestId);
-			List<EFormData> attachedEForms = consultationAttachmentService.getAttachedEForms(demographicNo, requestId);
+			if(doc.isPrintable())
+			{
+				GenericFile docFile = FileFactory.getDocumentFile(doc.getFileName());
+				if(doc.isImage())
+				{
+					ByteOutputStream bos = new ByteOutputStream();
+					request.setAttribute("imagePath", docFile.getFileObject().getPath());
+					request.setAttribute("imageTitle", doc.getDescription());
+					ImagePDFCreator ipdfc = new ImagePDFCreator(request, bos);
+					ipdfc.printPdf();
 
-			String path = GenericFile.DOCUMENT_BASE_DIR;
-			List<Object> inputList = new ArrayList<>();
+					byte[] buffer = bos.getBytes();
+					streamList.add(new ByteInputStream(buffer, bos.getCount()));
+					bos.close();
+				}
+				else if(doc.isPDF())
+				{
+					streamList.add(docFile.toFileInputStream());
+				}
+				else
+				{
+					logger.error("EctConsultationFormRequestPrintAction: " +
+							doc.getType() + " is marked as printable but no means have been established to print it.");
+				}
+			}
+		}
+		return streamList;
+	}
 
-			byte[] buffer;
-			ByteInputStream bis;
+	public List<InputStream> toLabInputStreams(HttpServletRequest request, List<LabResultData> attachedLabs) throws IOException, DocumentException
+	{
+		List<InputStream> streamList = new ArrayList<>(attachedLabs.size());
+		// Iterating over requested labs.
+		for(LabResultData lab : attachedLabs)
+		{
+			// Storing the lab in PDF format inside a byte stream.
+			ByteOutputStream bos = new ByteOutputStream();
+			LabPDFCreator labPDFCreator = new LabPDFCreator(bos, lab.segmentID, null);
+			labPDFCreator.printPdf();
 
-			bos = new ByteOutputStream();
-			ConsultationPDFCreator cpdfc = new ConsultationPDFCreator(request, bos);
-			cpdfc.printPdf(loggedInInfo);
-
-			buffer = bos.getBytes();
-			bis = new ByteInputStream(buffer, bos.getCount());
+			// Transferring PDF to an input stream to be concatenated with
+			// the rest of the documents.
+			byte[] buffer = bos.getBytes();
+			streamList.add(new ByteInputStream(buffer, bos.getCount()));
 			bos.close();
-			streams.add(bis);
-			inputList.add(bis);
-
-			for(EDoc doc : attachedDocuments)
-			{
-				if(doc.isPrintable())
-				{
-					if(doc.isImage())
-					{
-						bos = new ByteOutputStream();
-						request.setAttribute("imagePath", path + doc.getFileName());
-						request.setAttribute("imageTitle", doc.getDescription());
-						ImagePDFCreator ipdfc = new ImagePDFCreator(request, bos);
-						ipdfc.printPdf();
-
-						buffer = bos.getBytes();
-						bis = new ByteInputStream(buffer, bos.getCount());
-						bos.close();
-						streams.add(bis);
-						inputList.add(bis);
-					}
-					else if(doc.isPDF())
-					{
-						inputList.add(path + doc.getFileName());
-					}
-					else
-					{
-						logger.error("EctConsultationFormRequestPrintAction: " +
-								doc.getType() + " is marked as printable but no means have been established to print it.");
-					}
-				}
-			}
-
-			// Iterating over requested labs.
-			for(LabResultData lab : attachedLabs)
-			{
-				// Storing the lab in PDF format inside a byte stream.
-				bos = new ByteOutputStream();
-				LabPDFCreator labPDFCreator = new LabPDFCreator(bos, lab.segmentID, null);
-				labPDFCreator.printPdf();
-
-				// Transferring PDF to an input stream to be concatenated with
-				// the rest of the documents.
-				buffer = bos.getBytes();
-				bis = new ByteInputStream(buffer, bos.getCount());
-				bos.close();
-				streams.add(bis);
-				inputList.add(bis);
-			}
-
-			// Iterating over requested eforms.
-			for(EFormData eForm : attachedEForms)
-			{
-				String eFormRequestUrl = WKHtmlToPdfUtils.getEformRequestUrl(request.getParameter("providerId"),
-						String.valueOf(eForm.getId()), request.getScheme(), request.getContextPath());
-				buffer = WKHtmlToPdfUtils.convertToPdf(eFormRequestUrl);
-				bis = new ByteInputStream(buffer, buffer.length);
-				streams.add(bis);
-				inputList.add(bis);
-			}
-
-			if(!inputList.isEmpty())
-			{
-				bos = new ByteOutputStream();
-				ConcatPDF.concat(inputList, bos);
-			}
 		}
-		finally
+		return streamList;
+	}
+
+	public List<InputStream> toEFormInputStreams(HttpServletRequest request, List<EFormData> attachedEForms) throws IOException, HtmlToPdfConversionException
+	{
+		List<InputStream> streamList = new ArrayList<>(attachedEForms.size());
+		for(EFormData eForm : attachedEForms)
 		{
-			// Cleaning up InputStreams created for concatenation.
-			for(InputStream is : streams)
-			{
-				try
-				{
-					is.close();
-				}
-				catch(IOException e)
-				{
-					logger.error("Error closing streams", e);
-				}
-			}
+			String eFormRequestUrl = WKHtmlToPdfUtils.getEformRequestUrl(request.getParameter("providerId"),
+					String.valueOf(eForm.getId()), request.getScheme(), request.getContextPath());
+			byte[]  buffer = WKHtmlToPdfUtils.convertToPdf(eFormRequestUrl);
+			streamList.add(new ByteInputStream(buffer, buffer.length));
 		}
-		return bos;
+
+		return streamList;
+	}
+
+	public OutputStream combineStreams(List<InputStream> streams, OutputStream outputStream)
+	{
+		//TODO this is dumb. make it not dumb
+		ConcatPDF.concat(new ArrayList<>(streams), outputStream);
+		return outputStream;
+	}
+
+	public InputStream getConsultationRequestAsStream(HttpServletRequest request, LoggedInInfo loggedInInfo) throws IOException, DocumentException
+	{
+		byte[] buffer;
+		ByteOutputStream bos = new ByteOutputStream();
+		ConsultationPDFCreator cpdfc = new ConsultationPDFCreator(request, bos);
+		cpdfc.printPdf(loggedInInfo);
+
+		buffer = bos.getBytes();
+		ByteInputStream bis = new ByteInputStream(buffer, bos.getCount());
+		bos.close();
+
+		return bis;
 	}
 }

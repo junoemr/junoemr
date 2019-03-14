@@ -23,17 +23,25 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tika.io.IOUtils;
 import org.oscarehr.common.exception.HtmlToPdfConversionException;
+import org.oscarehr.consultations.service.ConsultationAttachmentService;
 import org.oscarehr.consultations.service.ConsultationPDFCreationService;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import oscar.dms.EDoc;
+import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.UtilDateUtilities;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -41,10 +49,10 @@ import java.io.IOException;
  */
 public class EctConsultationFormRequestPrintAction2 extends Action
 {
-
 	private static final Logger logger = MiscUtils.getLogger();
-	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	private ConsultationPDFCreationService consultationPDFCreationService = SpringUtils.getBean(ConsultationPDFCreationService.class);
+	private static final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private static final ConsultationPDFCreationService consultationPDFCreationService = SpringUtils.getBean(ConsultationPDFCreationService.class);
+	private static final ConsultationAttachmentService consultationAttachmentService = SpringUtils.getBean(ConsultationAttachmentService.class);
     
     public EctConsultationFormRequestPrintAction2()
     {
@@ -68,9 +76,21 @@ public class EctConsultationFormRequestPrintAction2 extends Action
 
 		String error = "";
 		Exception exception = null;
-		try
+	    List<InputStream> streamList = new ArrayList<>();
+
+	    try
 		{
-			ByteOutputStream bos = consultationPDFCreationService.getRequestOutputStream(request, loggedInInfo, demographicNo, requestId);
+			List<EDoc> attachedDocuments = consultationAttachmentService.getAttachedDocuments(loggedInInfo, demographicNo, requestId);
+			List<LabResultData> attachedLabs = consultationAttachmentService.getAttachedLabs(loggedInInfo, demographicNo, requestId);
+			List<EFormData> attachedEForms = consultationAttachmentService.getAttachedEForms(demographicNo, requestId);
+
+			streamList.add(consultationPDFCreationService.getConsultationRequestAsStream(request, loggedInInfo));
+			streamList.addAll(consultationPDFCreationService.toEDocInputStreams(request, attachedDocuments));
+			streamList.addAll(consultationPDFCreationService.toLabInputStreams(request, attachedLabs));
+			streamList.addAll(consultationPDFCreationService.toEFormInputStreams(request, attachedEForms));
+
+			ByteOutputStream bos = new ByteOutputStream();
+			consultationPDFCreationService.combineStreams(streamList, bos);
 
 			response.setContentType("application/pdf"); // octet-stream
 			response.setHeader(
@@ -94,6 +114,14 @@ public class EctConsultationFormRequestPrintAction2 extends Action
 		{
 			error = "IOException";
 			exception = ioe;
+		}
+		finally
+		{
+			// Cleaning up InputStreams created for concatenation.
+			for (InputStream is : streamList)
+			{
+				IOUtils.closeQuietly(is);
+			}
 		}
 	    if(!error.isEmpty())
 	    {
