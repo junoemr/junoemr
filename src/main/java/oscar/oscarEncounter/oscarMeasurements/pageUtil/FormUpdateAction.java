@@ -120,7 +120,7 @@ public class FormUpdateAction extends Action {
 	        FlowSheetItem item =  mFlowsheet.getFlowSheetItem(measure);
 					
 	               mFlowsheet.getMeasurementFlowSheetInfo(measure);
-					EctMeasurementTypesBean mtypeBean = mFlowsheet.getFlowsheetMeasurement(measure);
+	               EctMeasurementTypesBean mtypeBean = mFlowsheet.getFlowsheetMeasurement(measure);
 
 					String name = h2.get("display_name").toString().replaceAll("\\W","");
 					String displayName=h2.get("display_name").toString();
@@ -336,13 +336,13 @@ public class FormUpdateAction extends Action {
 				Measurement measurement = new Measurement();
 				measurement.setDemographicId(Integer.parseInt(demographicNo));
 				measurement.setDataField(inputValue);
-				measurement.setMeasuringInstruction(mInstructions);
+				measurement.setMeasuringInstruction(mInstructions != null? mInstructions : "");
 				if (comments.equals("")) {
 					comments = " ";
 				}
 				measurement.setComments(comments);
 				measurement.setDateObserved(ConversionUtils.fromDateString(dateObserved));
-				measurement.setType(inputType);
+				measurement.setType(inputType != null? inputType : "");
 				if (apptNo != null) {
 					measurement.setAppointmentNo(Integer.parseInt(apptNo));
 				} else {
