@@ -220,7 +220,7 @@ if(!authed) {
                         for (int idx = 0; idx < arr.length; ++idx)
                         {
                             oscar.oscarRx.data.RxPrescriptionData.Prescription drug = arr[idx];
-                            if (drug.isArchived())
+                            if (drug.isArchived() || drug.isCustom())
                             {
                                 continue;
                             }
