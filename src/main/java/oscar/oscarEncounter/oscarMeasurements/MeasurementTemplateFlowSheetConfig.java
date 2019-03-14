@@ -258,7 +258,12 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 	            MeasurementFlowSheet d = createflowsheet(mType, is);
 	            flowsheets.put(d.getName(), d);
 	            if (d.isUniversal())
-	                universalFlowSheets.add(d.getName());
+                {
+                    if (!universalFlowSheets.contains(d.getName()))
+                    {
+                        universalFlowSheets.add(d.getName());
+                    }
+                }
 	            else if(d.getDxTriggers()!=null && d.getDxTriggers().length>0){
 	                String[] dxTrig = d.getDxTriggers();
 	                addTriggers(dxTrig, d.getName());
@@ -318,7 +323,12 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
         	MeasurementFlowSheet d = createflowsheet(mType, is);
         	flowsheets.put(d.getName(), d);
             if (d.isUniversal())
-                universalFlowSheets.add(d.getName());
+            {
+                if (!universalFlowSheets.contains(d.getName()))
+                {
+                    universalFlowSheets.add(d.getName());
+                }
+            }
             else if(d.getDxTriggers()!=null && d.getDxTriggers().length>0){
                 String[] dxTrig = d.getDxTriggers();
                 addTriggers(dxTrig, d.getName());
@@ -329,7 +339,6 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
             flowsheetDisplayNames.put(d.getName(), d.getDisplayName());
             flowsheetSettings.put(d.getName(),fs);
         }
-
     }
 
     public HashMap<String,Flowsheet> getFlowsheetSettings() {
