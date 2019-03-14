@@ -59,6 +59,7 @@ import org.springframework.beans.factory.InitializingBean;
 
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctValidationsBean;
 import oscar.oscarEncounter.oscarMeasurements.data.ExportMeasurementType;
 import oscar.oscarEncounter.oscarMeasurements.data.ImportMeasurementTypes;
 import oscar.oscarEncounter.oscarMeasurements.util.DSCondition;
@@ -245,52 +246,61 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
     	FlowsheetDao flowsheetDao = (FlowsheetDao)SpringUtils.getBean("flowsheetDao");
     	FlowSheetUserCreatedDao flowSheetUserCreatedDao = (FlowSheetUserCreatedDao) SpringUtils.getBean("flowSheetUserCreatedDao");
 
+        List<Flowsheet> dbFlowsheets = flowsheetDao.findAll();
+        List<FlowSheetUserCreated> userCreatedFlowsheets = flowSheetUserCreatedDao.getAllUserCreatedFlowSheets();
+
         flowsheets = new Hashtable<String, MeasurementFlowSheet>();
         flowsheetSettings = new HashMap<String,Flowsheet>();
 
         EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
         //TODO: Will change this when there are more flowsheets
         log.debug("LOADING FLOWSSHEETS");
-        for (File flowSheet : flowSheets) {
-        	InputStream is = null;
-        	try {
-	            is = new FileInputStream(flowSheet);
-	            MeasurementFlowSheet d = createflowsheet(mType, is);
-	            flowsheets.put(d.getName(), d);
-	            if (d.isUniversal())
+        for (File flowSheet : flowSheets)
+        {
+            InputStream is = null;
+            try
+            {
+                is = new FileInputStream(flowSheet);
+                MeasurementFlowSheet measurementFlowsheet = createflowsheet(mType, is);
+
+                //If the system flowsheet is not in the database, then load it normally. Otherwise, it has been overwritten, so only load it once from the database
+                if (flowsheetDao.findByName(measurementFlowsheet.getName()) == null && flowSheetUserCreatedDao.findByName(measurementFlowsheet.getName()) == null)
                 {
-                    if (!universalFlowSheets.contains(d.getName()))
+                    flowsheets.put(measurementFlowsheet.getName(), measurementFlowsheet);
+                    if (measurementFlowsheet.isUniversal())
                     {
-                        universalFlowSheets.add(d.getName());
+                        universalFlowSheets.add(measurementFlowsheet.getName());
+                    } else if (measurementFlowsheet.getDxTriggers() != null && measurementFlowsheet.getDxTriggers().length > 0)
+                    {
+                        String[] dxTrig = measurementFlowsheet.getDxTriggers();
+                        addTriggers(dxTrig, measurementFlowsheet.getName());
+                    } else if (measurementFlowsheet.getProgramTriggers() != null && measurementFlowsheet.getProgramTriggers().length > 0)
+                    {
+                        String[] programTrig = measurementFlowsheet.getProgramTriggers();
+                        addProgramTriggers(programTrig, measurementFlowsheet.getName());
+                    }
+
+                    flowsheetDisplayNames.put(measurementFlowsheet.getName(), measurementFlowsheet.getDisplayName());
+                }
+            } catch (Exception e)
+            {
+                MiscUtils.getLogger().error("Flowsheet error: ", e);
+            } finally
+            {
+                if (is != null)
+                {
+                    try
+                    {
+                        is.close();
+                    } catch (IOException e)
+                    {
+                        MiscUtils.getLogger().error("Error Closing the Input Stream: ", e);
                     }
                 }
-	            else if(d.getDxTriggers()!=null && d.getDxTriggers().length>0){
-	                String[] dxTrig = d.getDxTriggers();
-	                addTriggers(dxTrig, d.getName());
-	            } else if(d.getProgramTriggers()!=null && d.getProgramTriggers().length>0) {
-	            	String[] programTrig = d.getProgramTriggers();
-	            	addProgramTriggers(programTrig,d.getName());
-	            }
-
-	            flowsheetDisplayNames.put(d.getName(), d.getDisplayName());
-	            Flowsheet tmp = flowsheetDao.findByName(d.getName());
-	            if(tmp!=null) {
-	            	flowsheetSettings.put(d.getName(), tmp);
-	            }
-        	}catch(Exception e) {
-        		MiscUtils.getLogger().error("error",e);
-        	} finally {
-        		if(is != null) {
-        			try {
-        				is.close();
-        			}catch(IOException e) {
-        				MiscUtils.getLogger().error("error",e);
-        			}
-        		}
-        	}
+            }
         }
-        List<FlowSheetUserCreated> flowSheetUserCreateds = flowSheetUserCreatedDao.getAllUserCreatedFlowSheets();
-        for(FlowSheetUserCreated flowSheetUserCreated: flowSheetUserCreateds){
+
+        for(FlowSheetUserCreated flowSheetUserCreated: userCreatedFlowsheets){
 
         	MeasurementFlowSheet m = new MeasurementFlowSheet();
         	m.setName(flowSheetUserCreated.getName());
@@ -308,7 +318,7 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
             }
         }
 
-        for(Flowsheet fs:flowsheetDao.findAll()) {
+        for(Flowsheet fs:dbFlowsheets) {
         	if(fs.isExternal()){
         		continue;
         	}
@@ -489,10 +499,46 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
 
     }
 
+    private void processMeasurementTypes(List<Element> elements, Node parent, MeasurementFlowSheet mFlowSheet)
+    {
+        Hashtable<String, String> flowsheetMeasurements = new Hashtable<String, String>();
+        for( Element e: elements)
+        {
+            List<Attribute> attributes = e.getAttributes();
+            for (Attribute att : attributes) {
+                flowsheetMeasurements.put(att.getName(), att.getValue());
+            }
+
+            EctMeasurementTypesBean measurements = new EctMeasurementTypesBean(flowsheetMeasurements);
+
+            Node node = new Node();
+            node.parent = parent;
+
+            Element validations  = e.getChild("validationRule");
+            if (validations !=null)
+            {
+                EctValidationsBean vb = new EctValidationsBean();
+                vb.setName(validations.getAttributeValue("name"));
+                vb.setMaxValue(validations.getAttributeValue("maxValue"));
+                vb.setMinValue(validations.getAttributeValue("minValue"));
+                vb.setIsDate(validations.getAttributeValue("isDate"));
+                vb.setIsNumeric(validations.getAttributeValue("isNumeric"));
+                vb.setRegularExp(validations.getAttributeValue("regularExp"));
+                vb.setMaxLength(validations.getAttributeValue("maxLength"));
+                vb.setMinLength(validations.getAttributeValue("minLength"));
+
+                measurements.addValidationRule(vb);
+            }
+            measurements = mFlowSheet.addMeasurements(measurements);
+            node.flowSheetMeasurement = measurements;
+        }
+    }
+
     public class Node {
         public Node parent;
         public List<Node> children;
         public FlowSheetItem flowSheetItem;
+        public EctMeasurementTypesBean flowSheetMeasurement;
         public int numSibling = -1;
 
         public Node getFirstChild() {
@@ -541,6 +587,10 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
             //MAKE SURE ALL MEASUREMENTS HAVE BEEN INITIALIZED
             ImportMeasurementTypes importMeasurementTypes = new ImportMeasurementTypes();
             importMeasurementTypes.importMeasurements(root);
+
+            List<Element> measurements = root.getChildren("measurement");
+
+            processMeasurementTypes(measurements, null, d);
 
             List indi = root.getChildren("indicator"); // key="LOW" colour="blue">
             for (int i = 0; i < indi.size(); i++) {
@@ -618,6 +668,10 @@ public class MeasurementTemplateFlowSheetConfig implements InitializingBean {
             //MAKE SURE ALL MEASUREMENTS HAVE BEEN INITIALIZED
             ImportMeasurementTypes importMeasurementTypes = new ImportMeasurementTypes();
             importMeasurementTypes.importMeasurements(root);
+
+            List<Element> measurements = root.getChildren("measurement");
+
+            processMeasurementTypes(measurements, null, d);
 
             List indi = root.getChildren("indicator"); // key="LOW" colour="blue">
             for (int i = 0; i < indi.size(); i++) {

@@ -348,7 +348,7 @@
                     measurement = measurements[i];
                     Map h2 = mFlowsheet.getMeasurementFlowSheetInfo(measurement);
 
-                EctMeasurementTypesBean mtypeBean = mType.getMeasurementType(measurement);
+                EctMeasurementTypesBean mtypeBean = mFlowsheet.getFlowsheetMeasurement(measurement);
                 if(ectMeasurementsForm != null && !ectMeasurementsForm.isEmpty()){
 
                    h = new Hashtable(ectMeasurementsForm.values);
