@@ -370,12 +370,7 @@ function toggleSelectAll()
 				                        type="checkbox" name="docNo" id="docNo<%=curDoc.getDocId()%>"
 				                        value="<%=curDoc.getDocId()%>"
 				                        style="margin: 0px; padding: 0px;" />
-				                <span class="url" style="display:none">
-		                        	<a  title="<%=curDoc.getDescription()%>" href="<%=url%>" style="color: blue; text-decoration: none;" target="_blank">
-										<img style="width:15px;height:15px" title="<%= printTitle %>" src="<%= printImage %>" alt="<%= printAlt %>" />
-										<%=truncatedDisplayName%>
-									</a>										
-			                    </span>  
+			                    <div style="display:none" class="doc"><%=truncatedDisplayName%></div>
 			                    <img title="<%= printTitle %>" src="<%= printImage %>" alt="<%= printAlt %>">		                    
 			                    <a class="docPreview" href="#" onclick="<%=onClick%>" >
 			                        <span class="text"><%=truncatedDisplayName%></span>                
@@ -439,11 +434,7 @@ function toggleSelectAll()
 									       name="labNo" id="labNo<%=result.segmentID%>"
 									       value="<%=result.segmentID%>"
 									       style="margin: 0px; padding: 0px;"/>
-									<span class="url" style="display:none">
-							               <a href="<%=url%>" title="<%=labDisplayName%>" style="color: #CC0099; text-decoration: none;" target="_blank">
-										   <img style="width:15px;height:15px" title="<%= printTitle %>" src="<%= printImage %>" alt="<%= printAlt %>"/>
-										<%=truncatedDisplayName%></a>
-							        </span>
+									<div style="display:none" class="lab"><%=labDisplayName%></div>
 									<img title="<%= printTitle %>" src="<%= printImage %>" alt="<%= printAlt %>">
 									<a class="labPreview" href="#" onclick="javascript:previewHTML('<%=url%>');">
 										<span class="text"><%=truncatedDisplayName%></span>
@@ -478,11 +469,7 @@ function toggleSelectAll()
 									       name="eFormNo" id="eFormNo<%=eForm.getId()%>"
 									       value="<%=eForm.getId()%>"
 									       style="margin: 0px; padding: 0px;"/>
-									<span class="url" style="display:none">
-							               <a href="<%=url%>" title="<%=eFormDisplayName%>" style="color: #CC0099; text-decoration: none;" target="_blank">
-										   <img style="width:15px;height:15px" title="<%= printTitle %>" src="<%= printImage %>" alt="<%= printAlt %>"/>
-										<%=eFormDisplayName%></a>
-							        </span>
+									<div style="display:none" class="eform"><%=eFormDisplayName%></div>
 									<img title="<%= printTitle %>" src="<%= printImage %>" alt="<%= printAlt %>">
 									<a class="labPreview" href="#" onclick="javascript:previewHTML('<%=url%>');">
 										<span class="text"><%=eFormDisplayName%></span>

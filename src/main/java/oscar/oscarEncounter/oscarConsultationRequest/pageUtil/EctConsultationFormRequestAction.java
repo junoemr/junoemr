@@ -235,6 +235,7 @@ public class EctConsultationFormRequestAction extends Action {
 		ConsultationRequest consult = consultationRequestDao.find(Integer.parseInt(requestId));
 		if (submission.endsWith("And Print Preview"))
 		{
+			request.setAttribute("reqId", requestId);
 			return mapping.findForward("print");
 		}
 		else if (submission.endsWith("And Fax")) {

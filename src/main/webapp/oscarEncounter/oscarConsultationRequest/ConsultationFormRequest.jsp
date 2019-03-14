@@ -83,12 +83,12 @@ if(!authed) {
 <%@page import="oscar.oscarRx.data.RxProviderData" %>
 <%@page import="oscar.oscarRx.data.RxProviderData.Provider" %>
 <%@ page import="oscar.util.StringUtils" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.Collections" %>
-<%@ page import="java.util.List" %>
 <%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.List" %>
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 
 <html:html locale="true">
@@ -1103,7 +1103,6 @@ function fetchAttached() {
                 }
 
             );
-
 }
 
 function addCCName(){
@@ -1274,18 +1273,6 @@ function showSignatureImage()
 
 	return true;
 }
-
-<%
-String userAgent = request.getHeader("User-Agent");
-String browserType = "";
-if (userAgent != null) {
-	if (userAgent.toLowerCase().contains("ipad")) {
-		browserType = "IPAD";
-	} else {
-		browserType = "ALL";
-	}
-}
-%>
 
 function requestSignature()
 {

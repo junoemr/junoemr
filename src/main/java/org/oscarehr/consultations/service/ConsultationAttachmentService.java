@@ -170,7 +170,7 @@ public class ConsultationAttachmentService
 			alreadyAttached = false;
 			for(ConsultDocs consultDoc : oldList)
 			{
-				if(consultDoc.getId().equals(docId))
+				if(consultDoc.getDocumentNo() == docId)
 				{
 					alreadyAttached = true;
 					keepList.add(consultDoc);
