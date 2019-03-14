@@ -102,10 +102,8 @@ public class MeasurementGraphAction2 extends Action {
             response.sendRedirect("../logout.jsp");
         }
 
-        if (!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_measurement", "r", null))
-        {
-            throw new SecurityException("missing required security object (_measurement)");
-        }
+        String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+        securityInfoManager.requireOnePrivilege(providerNo, "r", null, "_measurement");
 
         Integer demographicNo = Integer.valueOf(request.getParameter("demographic_no"));
         String typeIdName = request.getParameter("type");
