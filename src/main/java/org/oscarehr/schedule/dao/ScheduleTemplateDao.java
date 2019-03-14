@@ -31,8 +31,13 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
@@ -41,9 +46,15 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
 import org.oscarehr.common.NativeSql;
+import org.oscarehr.common.model.Appointment;
+import org.oscarehr.managers.ScheduleManager;
 import org.oscarehr.schedule.model.ScheduleTemplate;
 import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.MhaBookingRules;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
 import org.springframework.stereotype.Repository;
 
 import static org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey.DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES;
@@ -222,5 +233,208 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		}
 
 		return slots;
+	}
+
+	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
+	public ProviderScheduleTransfer getValidProviderScheduleSlots(
+			String providerNo, Calendar calendarDate, String[] appointmentTypesArr, String demographicNo, Map<String, Object> bookingRulesObj)
+	{
+
+		int year = calendarDate.get(Calendar.YEAR);
+		int month = calendarDate.get(Calendar.MONTH) + 1; // Calendar month is 0 based indexing...
+
+		int minMonthDay = 1;
+		int maxMonthDay = calendarDate.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+		LocalDate minDate = LocalDate.of(year, month, minMonthDay);
+		LocalDate maxDate = LocalDate.of(year, month, maxMonthDay);
+
+		List<String> appointmentTypesList = Arrays.asList(appointmentTypesArr);
+
+		if (minDate.isBefore(LocalDate.now()))
+			minDate = LocalDate.now();
+
+		MhaBookingRules bookingRules = new MhaBookingRules(bookingRulesObj);
+
+		String sql = "SELECT STRAIGHT_JOIN\n" +
+				"  SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1) AS code_char,\n" +
+				"  sd.sdate AS appt_date,\n" +
+				"  SEC_TO_TIME(ROUND((24*60*60)*(n3.i + (10 * n2.i) + (100 * n1.i))/LENGTH(st.timecode))) AS appt_time,\n" +
+				"  stc.code,\n" +
+				"  CAST(COALESCE(stc.duration, ((24*60)/LENGTH(st.timecode))) AS integer) AS duration\n" +
+				"FROM \n" +
+				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2) as n1    \n" +
+				"    CROSS JOIN \n" +
+				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n2     \n" +
+				"    CROSS JOIN \n" +
+				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n3 \n" +
+				"CROSS JOIN scheduledate sd\n" +
+				"JOIN scheduletemplate st ON (sd.hour = st.name AND (sd.provider_no = st.provider_no OR st.provider_no = :publicCode ))\n" +
+				"LEFT JOIN scheduletemplatecode stc " +
+				"  ON BINARY stc.code = SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1)\n" +
+				"WHERE sd.status = 'A'\n" +
+				"AND stc.code IN (:appointmentTypes) \n" +
+				"AND sd.sdate BETWEEN :minDate AND :maxDate\n" +
+				"AND sd.provider_no = :providerNo\n" +
+				"AND (n3.i + (10 * n2.i) + (100 * n1.i)) < LENGTH(st.timecode)\n" +
+				"ORDER BY sd.sdate, (n3.i + (10 * n2.i) + (100 * n1.i));";
+
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("minDate", java.sql.Date.valueOf(minDate), TemporalType.DATE);
+		query.setParameter("maxDate", java.sql.Date.valueOf(maxDate), TemporalType.DATE);
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("appointmentTypes", appointmentTypesList);
+		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
+
+		List<Object[]> results = query.getResultList();
+
+		HashMap<String, List<DayTimeSlots>> providerSchedule = new HashMap<>();
+		HashMap<String, Boolean> scheduleArrMap = new HashMap<>();
+		ProviderScheduleTransfer scheduleResponse = new ProviderScheduleTransfer();
+
+		if (results.size() > 0)
+		{
+			java.sql.Date firstSqlDate = (java.sql.Date) results.get(0)[1];
+			java.sql.Date lastSqlDate = (java.sql.Date) results.get(results.size()-1)[1];
+
+			bookingRules.setMultiBookingRuleDays(firstSqlDate.toLocalDate());
+			List<Integer> multiBookingRuleDays = bookingRules.getMultiBookingRuleDays();
+			Map<LocalDate, List<Appointment>> monthlyAppointments = new ScheduleManager().getProviderAppointmentsForMonth(providerNo, minDate, maxDate);
+
+			if (multiBookingRuleDays.size() > 0)
+			{
+				LocalDate lowDateCheck = firstSqlDate.toLocalDate().minusDays(multiBookingRuleDays.get(0));
+				LocalDate highDateCheck = lastSqlDate.toLocalDate().plusDays(multiBookingRuleDays.get(0));
+
+				List<Appointment> patientAppointments = new ScheduleManager().getPatientAppointmentsWithProvider(demographicNo, providerNo, lowDateCheck, highDateCheck);
+				bookingRules.setPatientAppointments(patientAppointments);
+			}
+
+			for (Object[] result : results)
+			{
+				List<DayTimeSlots> dayTimeSlots;
+				Map<LocalDate, Boolean> invalidDates = bookingRules.getInvalidDates();
+
+				java.sql.Date slotDate = (java.sql.Date) result[1];
+				Time slotStartTime = (Time) result[2];
+				BigInteger iDuration = (BigInteger) result[4];
+
+				LocalDateTime slotDateTime = LocalDateTime.of(slotDate.toLocalDate(), slotStartTime.toLocalTime());
+
+				// All of the provider's scheduled appointments for the same day as this schedule slot. Used to
+				// check if there are any appointments scheduled within this slot's time range.
+				List<Appointment> dayAppointments = monthlyAppointments.get(slotDate.toLocalDate());
+
+				List<Map<String, LocalTime>> startEndTimeMap = new ArrayList<>();
+
+				if (dayAppointments != null)
+				{
+					// Kind of unnecessary. Quick conversion of each Appointment class to a List<Map>, as well as
+					// java Date to LocalDate
+					for (Appointment appointment : dayAppointments)
+					{
+						LocalTime startTime = LocalTime.parse(appointment.getStartTime().toString());
+						LocalTime endTime = LocalTime.parse(appointment.getEndTime().toString());
+						Map<String, LocalTime> appointmentTime = new HashMap<>();
+
+						appointmentTime.put("startTime", startTime);
+						appointmentTime.put("endTime", endTime);
+
+						startEndTimeMap.add(appointmentTime);
+					}
+				}
+
+				String scheduleDate = slotDate.toString(); // scheduleDate
+				String timeSlotCodeStr = (String) result[0]; // timeCode
+
+				LocalTime tmpStartTime = slotStartTime.toLocalTime();
+				LocalTime tmpEndTime = tmpStartTime.plusMinutes(iDuration.longValue());
+
+				// Loop through all the 5 minute iterations of this schedule slot, and check whether or not
+				// there is an appointment booked within that 5 minute window in this specific slot
+				while (tmpStartTime.isBefore(tmpEndTime))
+				{
+					Boolean bookable = true;
+					String maxBookingDuration = "0";
+
+					LocalTime nextBookedWindowSlot = null;
+
+					if (dayAppointments != null && dayAppointments.size() > 0)
+					{
+						// Loop through each scheduled appointment for this day, and check if it falls within this
+						// 5 minute window of this specific schedule slot
+						for (Map<String, LocalTime> appointmentTime : startEndTimeMap)
+						{
+							LocalTime startTime = appointmentTime.get("startTime");
+							LocalTime endTime = appointmentTime.get("endTime");
+
+							if (startTime.isAfter(tmpStartTime) && startTime.isBefore(tmpEndTime))
+							{
+								if (nextBookedWindowSlot == null || (nextBookedWindowSlot != null && nextBookedWindowSlot.isAfter(startTime)))
+								{
+									MiscUtils.getLogger().error(scheduleDate + ": Found booked window slot: " + startTime);
+									MiscUtils.getLogger().error("Setting nextBookedWindowSlot == " + startTime);
+									nextBookedWindowSlot = startTime;
+								}
+							}
+
+							// If the 5 minute window is before the booked appointment, AND the 5 minute window is either
+							// equal to, or after the booked appointment's start time, then the 5 minute window is not bookable.
+							if (tmpStartTime.isBefore(endTime) && (tmpStartTime.equals(startTime) || tmpStartTime.isAfter(startTime)))
+								bookable = false;
+						}
+					}
+
+					if (nextBookedWindowSlot != null)
+					{
+						MiscUtils.getLogger().error(scheduleDate + " " + tmpStartTime + " " + nextBookedWindowSlot + " nextBookedWindowSlot IS NOT null");
+						long maxBookingL = Duration.between(tmpStartTime, nextBookedWindowSlot).toMinutes();
+						maxBookingDuration = Long.toString(maxBookingL);
+					}
+					else
+					{
+						MiscUtils.getLogger().error(scheduleDate + " " + tmpStartTime + " " + tmpEndTime + " nextBookedWindowSlot IS null");
+						long maxBookingL = Duration.between(tmpStartTime, tmpEndTime).toMinutes();
+						maxBookingDuration = Long.toString(maxBookingL);
+					}
+
+					// Test whether or not the slot breaks MyHealthAccess booking rules
+					if (bookable)
+					{
+						if (invalidDates.get(slotDateTime.toLocalDate()) == null)
+							bookable = bookingRules.scheduleSlotIsValid(slotDateTime);
+						else
+							bookable = false;
+					}
+
+					maxBookingDuration = bookable ? maxBookingDuration : "0";
+
+					LocalDateTime windowDateTime = LocalDateTime.of(slotDate.toLocalDate(), tmpStartTime);
+
+					DayTimeSlots timeSlotEntry = new DayTimeSlots(windowDateTime.toString(), bookable.toString(), timeSlotCodeStr, "5", slotStartTime.toLocalTime().toString(), maxBookingDuration);
+
+					// scheduleArrMap tracks if schedule slots have already been added to this slot's date.
+					// Update the schedule slots for this day if it's in scheduleArrMap. Otherwise, create a
+					// new list of schedule slots.
+					if (!scheduleArrMap.containsKey(scheduleDate))
+					{
+						scheduleArrMap.put(scheduleDate, true);
+						dayTimeSlots = new ArrayList<>();
+					}
+					else
+					{
+						dayTimeSlots = providerSchedule.get(scheduleDate);
+					}
+
+					dayTimeSlots.add(timeSlotEntry);
+					providerSchedule.put(scheduleDate, dayTimeSlots);
+
+					tmpStartTime = tmpStartTime.plusMinutes(5);
+				}
+			}
+		}
+
+		scheduleResponse.setProviderScheduleResponse(providerSchedule);
+		return scheduleResponse;
 	}
 }

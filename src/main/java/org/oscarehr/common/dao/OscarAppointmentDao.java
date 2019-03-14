@@ -996,4 +996,62 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 
 		return appointmentDetails;
 	}
+
+	public List<Appointment> findPatientAppointmentsWithProvider(String demographicNo, String providerNo, LocalDate lowDateCheck, LocalDate highDateCheck)
+	{
+		String sql = "SELECT a FROM Appointment a\n" +
+					 "WHERE a.demographicNo = :demographicNo\n" +
+					 "AND a.providerNo = :providerNo\n" +
+	 				 "AND a.status != 'C'\n" +
+					 "AND a.appointmentDate BETWEEN :lowDateCheck AND :highDateCheck\n" +
+					 "ORDER BY a.appointmentDate, a.startTime";
+
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("demographicNo", Integer.parseInt(demographicNo));
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("lowDateCheck", java.sql.Date.valueOf(lowDateCheck));
+		query.setParameter("highDateCheck", java.sql.Date.valueOf(highDateCheck));
+
+		@SuppressWarnings("unchecked")
+		List<Appointment> results =  query.getResultList();
+
+		return results;
+	}
+
+	public Map<LocalDate, List<Appointment>> findProviderAppointmentsForMonth(String providerNo, LocalDate minDate, LocalDate maxDate)
+	{
+	    Map<LocalDate, List<Appointment>> monthlyAppointments = new HashMap<>();
+
+		String sql = "SELECT a FROM Appointment a\n" +
+				"WHERE a.providerNo = :providerNo\n" +
+				"AND a.status != 'C'\n" +
+				"AND a.appointmentDate BETWEEN :minDate AND :maxDate\n" +
+				"ORDER BY a.appointmentDate, a.startTime";
+
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("minDate", java.sql.Date.valueOf(minDate));
+		query.setParameter("maxDate", java.sql.Date.valueOf(maxDate));
+
+		@SuppressWarnings("unchecked")
+		List<Appointment> results =  query.getResultList();
+
+
+        for (Appointment appointment : results)
+        {
+            LocalDate appointmentDate = LocalDate.parse(appointment.getAppointmentDate().toString());
+
+            List<Appointment> dayAppointments = monthlyAppointments.get(appointmentDate);
+
+            if (dayAppointments == null)
+                dayAppointments = new ArrayList<>();
+
+            dayAppointments.add(appointment);
+
+            monthlyAppointments.put(appointmentDate, dayAppointments);
+        }
+
+
+		return monthlyAppointments;
+	}
 }

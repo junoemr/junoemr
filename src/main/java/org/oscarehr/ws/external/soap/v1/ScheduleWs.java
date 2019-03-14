@@ -24,6 +24,8 @@
 
 package org.oscarehr.ws.external.soap.v1;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.log4j.Logger;
@@ -34,6 +36,7 @@ import org.oscarehr.common.model.AppointmentType;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.managers.DayWorkSchedule;
 import org.oscarehr.managers.ScheduleManager;
+import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -42,6 +45,8 @@ import org.oscarehr.ws.external.soap.v1.transfer.AppointmentTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.AppointmentTypeTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.DayWorkScheduleTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ScheduleTemplateCodeTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -49,7 +54,9 @@ import javax.jws.WebService;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebService
 @Component
@@ -59,6 +66,9 @@ public class ScheduleWs extends AbstractWs {
 	
 	@Autowired
 	private ScheduleManager scheduleManager;
+
+	@Autowired
+	private ScheduleTemplateDao scheduleTemplateDao;
 
 	public ScheduleTemplateCodeTransfer[] getScheduleTemplateCodes() {
 		List<ScheduleTemplateCode> scheduleTemplateCodes = scheduleManager.getScheduleTemplateCodes();
@@ -108,6 +118,24 @@ public class ScheduleWs extends AbstractWs {
 		DayWorkSchedule dayWorkSchedule = scheduleManager.getDayWorkSchedule(providerNo, date);
 		if (dayWorkSchedule == null) return (null);
 		else return (DayWorkScheduleTransfer.toTransfer(dayWorkSchedule));
+	}
+
+	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots(
+			String providerNo, Calendar date, String[] appointmentTypes, String demographicNo, String bookingRulesStr)
+	{
+		Map<String, Object> bookingRules = null;
+
+		try
+		{
+			bookingRules = new ObjectMapper().readValue(bookingRulesStr, new TypeReference<Map<String, Object>>(){});
+		}
+		catch(Exception e)
+		{
+			MiscUtils.getLogger().error("Exception: " + e);
+		}
+
+		ProviderScheduleTransfer scheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(providerNo, date, appointmentTypes, demographicNo, bookingRules);
+		return scheduleTransfer.toTransfer();
 	}
 
 	public AppointmentTypeTransfer[] getAppointmentTypes() {

@@ -24,10 +24,12 @@
 
 package org.oscarehr.managers;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang.time.DateUtils;
@@ -52,6 +54,7 @@ import org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -203,6 +206,20 @@ public class ScheduleManager {
 		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.getAppointmentsForPatient", "appointments for demographicId=" + demographicId + ", startIndex=" + startIndex + ", itemsToReturn=" + itemsToReturn);
 
 		return (results);
+	}
+
+	public List<Appointment> getPatientAppointmentsWithProvider(String demographicNo, String providerNo, LocalDate lowDateCheck, LocalDate highDateCheck)
+	{
+		oscarAppointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
+
+		return oscarAppointmentDao.findPatientAppointmentsWithProvider(demographicNo, providerNo, lowDateCheck, highDateCheck);
+	}
+
+	public Map<LocalDate, List<Appointment>> getProviderAppointmentsForMonth(String providerNo, LocalDate minDate, LocalDate maxDate)
+	{
+		oscarAppointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
+
+		return oscarAppointmentDao.findProviderAppointmentsForMonth(providerNo, minDate, maxDate);
 	}
 
 	public List<Appointment> getAppointmentsByProgramProviderDemographicDate(LoggedInInfo loggedInInfo, Integer programId, String providerNo, Integer demographicId, Calendar updatedAfterThisDateExclusive, int itemsToReturn) {
