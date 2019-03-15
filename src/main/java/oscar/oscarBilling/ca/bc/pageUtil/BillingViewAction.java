@@ -133,9 +133,7 @@ public final class BillingViewAction
       if (receipt != null && receipt.equals("yes")) {
         if (isClinicPayee(bean.getBillingProvider()))
         {
-          bean.setDefaultPayeeFirstName(BillingViewBean.DEFAULT_PAYEE_NAME);
-          bean.setDefaultPayeeLastName("");
-          bean.setAddDrToName(false);
+          bean.setOmitPayee(true);
         }
         else
         {

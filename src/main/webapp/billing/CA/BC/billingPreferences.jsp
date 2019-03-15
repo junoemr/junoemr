@@ -5,10 +5,10 @@
 <%
 oscar.entities.Provider prov = new oscar.entities.Provider();
 prov.setProviderNo("0");
-prov.setFirstName(BillingViewBean.DEFAULT_PAYEE_NAME);
+prov.setFirstName("Clinic");
 List lst = (List)request.getAttribute("providerList");
 
-lst.add(prov);
+lst.add(0, prov);
 %>
 <html:html>
 <head>

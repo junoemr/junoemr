@@ -577,16 +577,10 @@
                                                             <tr>
                                                                 <td class="title4">
                                                                     <%
-                                                                        if (bean.isAddDrToName())
+                                                                        if (!bean.isOmitPayee())
                                                                         {
                                                                     %>
                                                                         Dr. <%=bean.getDefaultPayeeFirstName() + " " + bean.getDefaultPayeeLastName()%>
-                                                                    <%
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                    %>
-                                                                        <%=bean.getDefaultPayeeFirstName() + " " + bean.getDefaultPayeeLastName()%>
                                                                     <%
                                                                         }
                                                                     %>

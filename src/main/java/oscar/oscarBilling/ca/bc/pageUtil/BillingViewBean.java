@@ -48,8 +48,6 @@ import oscar.util.ConversionUtils;
 
 public class BillingViewBean implements Serializable
 {
-	public static final String DEFAULT_PAYEE_NAME = "Clinic";
-
 	private String apptProviderNo = null;
 	private String patientName = null;
 	private String providerView = null;
@@ -99,7 +97,7 @@ public class BillingViewBean implements Serializable
 	private String paymentMethod;
 	private String defaultPayeeFirstName;
 	private String defaultPayeeLastName;
-	private boolean addDrToName = true;
+	private boolean omitPayee = false;
 
 	public void loadBilling(String billing_no) {
 		BillingDao dao = SpringUtils.getBean(BillingDao.class);
@@ -583,14 +581,14 @@ public class BillingViewBean implements Serializable
 		this.defaultPayeeFirstName = defaultPayeeFirstName;
 	}
 
-	public boolean isAddDrToName()
+	public boolean isOmitPayee()
 	{
-		return addDrToName;
+		return omitPayee;
 	}
 
-	public void setAddDrToName(boolean addDrToName)
+	public void setOmitPayee(boolean omitPayee)
 	{
-		this.addDrToName = addDrToName;
+		this.omitPayee = omitPayee;
 	}
 
 	public void setDefaultPayeeLastName(String defaultPayeeLastName) {
