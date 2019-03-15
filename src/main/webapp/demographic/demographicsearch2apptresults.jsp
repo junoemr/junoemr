@@ -427,10 +427,10 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
         </td>
 		<td class="lastName"><%=Misc.toUpperLowerCase(demo.getLastName())%></td>
 		<td class="firstName"><%=Misc.toUpperLowerCase(demo.getFirstName())%></td>
-		<td class="age"><%=ChronoUnit.YEARS.between(demo.getDateOfBirth(), LocalDate.now())%></td>
+		<td class="age"><%=demo.getDateOfBirth() != null ? ChronoUnit.YEARS.between(demo.getDateOfBirth(), LocalDate.now()) : "null"%></td>
 		<td class="rosterStatus"><%=demo.getRosterStatus()==null||demo.getRosterStatus().equals("")?"&nbsp;":demo.getRosterStatus()%></td>
 		<td class="sex"><%=demo.getSex()%></td>
-		<td class="dob"><%=demo.getDateOfBirth()%></td>
+		<td class="dob"><%=demo.getDateOfBirth() != null ? demo.getDateOfBirth() : "null"%></td>
 		<td class="hin"><%=demo.getHin()%></td>
         <td class="doctor"><%=providerBean.getProperty(demo.getProviderNo()==null?"":demo.getProviderNo())==null?"":providerBean.getProperty(demo.getProviderNo())%></td>
         </tr>

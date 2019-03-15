@@ -300,7 +300,7 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		{
 			MiscUtils.getLogger().error("Demographic [" + getId() + "] has invalid dob with error: " + dte.getMessage());
 		}
-		return LocalDate.now();
+		return null;
 	}
 
 	public void setDateOfBirth(LocalDate dateOfBirth)
