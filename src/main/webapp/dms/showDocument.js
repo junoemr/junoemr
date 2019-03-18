@@ -173,12 +173,15 @@ Oscar.ShowDocument.updateDocument = function updateDocument(elementId)
 
 				// TODO: update side navigation to reflect the new document counts for the patient
 			}
+		},
+		onComplete: function ()
+		{
+			// Reload the window the document was opened from only if it's the inbox
+			if (window.opener.location.href.includes('inboxManage.do'))
+			//window.opener.location.reload();
+				window.opener.reloadListView();
 		}
 	});
-
-	// Reload the window the document was opened from only if it's the inbox
-	if (window.opener.location.href.includes('inboxManage.do'))
-		window.opener.location.reload();
 
 	return false;
 };
