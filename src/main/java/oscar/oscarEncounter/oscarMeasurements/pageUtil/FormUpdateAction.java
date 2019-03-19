@@ -336,13 +336,13 @@ public class FormUpdateAction extends Action {
 				Measurement measurement = new Measurement();
 				measurement.setDemographicId(Integer.parseInt(demographicNo));
 				measurement.setDataField(inputValue);
-				measurement.setMeasuringInstruction(mInstructions != null? mInstructions : "");
+				measurement.setMeasuringInstruction(mInstructions);
 				if (comments.equals("")) {
 					comments = " ";
 				}
 				measurement.setComments(comments);
 				measurement.setDateObserved(ConversionUtils.fromDateString(dateObserved));
-				measurement.setType(inputType != null? inputType : "");
+				measurement.setType(inputType);
 				if (apptNo != null) {
 					measurement.setAppointmentNo(Integer.parseInt(apptNo));
 				} else {

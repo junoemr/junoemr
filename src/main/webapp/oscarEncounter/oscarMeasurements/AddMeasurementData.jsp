@@ -38,6 +38,8 @@
 <%@page import="java.util.Hashtable"%>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="java.time.LocalDateTime" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
@@ -65,7 +67,7 @@
 	EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
 
 	String provider = (String) session.getValue("user");
-	String prevDate = UtilDateUtilities.getToday("yyyy-MM-dd H:mm");
+	String prevDate = ConversionUtils.toDateTimeNoSecString(LocalDateTime.now());
 %>
 
 
