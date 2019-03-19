@@ -49,7 +49,7 @@ public class Measurement extends AbstractModel<Integer> implements Serializable 
 	private Integer id;
 
 	@Column(name = "type")
-	private String type = "";
+	private String type;
 
 	@Column(name = "demographicNo")
 	private Integer demographicId;
@@ -92,10 +92,7 @@ public class Measurement extends AbstractModel<Integer> implements Serializable 
 	}
 
 	public void setType(String type) {
-		if (type != null)
-		{
-			this.type = StringUtils.trimToEmpty(type);
-		}
+		this.type = StringUtils.trimToEmpty(type);
 	}
 
 	public Integer getDemographicId() {
@@ -127,10 +124,7 @@ public class Measurement extends AbstractModel<Integer> implements Serializable 
 	}
 
 	public void setMeasuringInstruction(String measuringInstruction) {
-		if (measuringInstruction != null)
-		{
-			this.measuringInstruction = measuringInstruction;
-		}
+		this.measuringInstruction = StringUtils.trimToEmpty(measuringInstruction);
 	}
 
 	public String getComments() {
