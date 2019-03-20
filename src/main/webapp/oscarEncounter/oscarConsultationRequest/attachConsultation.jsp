@@ -85,6 +85,7 @@ String userlastname = (String) session.getAttribute("userlastname");
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery_oscar_defaults.js"></script>
+<link rel="stylesheet" type="text/css" href="attachConsultation.css" />
 
 <title><bean:message
 	key="oscarEncounter.oscarConsultationRequest.AttachDocPopup.title" /></title>
@@ -266,83 +267,16 @@ String userlastname = (String) session.getAttribute("userlastname");
 	}
 
 	</script>
-
-	<style type="text/css">
-		.flexV {
-			display: flex;
-			flex-direction: column;
-		}
-		.flexH {
-			display: flex;
-			flex-direction: row;
-		}
-		.flexGrow {
-			flex-grow: 1;
-		}
-		.itemGroup {
-			align-items: baseline;
-			justify-content: space-between;
-		}
-		.hiddenLabel {
-			display: none;
-		}
-		.submitButton {
-			padding: 5px;
-			margin: 10px;
-			color: #ffffff;
-			background-color: #5cb85c;
-			border-color: #4cae4c;
-		}
-		body {
-			font-family: Verdana, Tahoma, Arial, sans-serif;
-			background-color: #ddddff;
-		}
-		body h3 {
-			text-align: left;
-			margin-left: 5px;
-		}
-		#contentFrame {
-			flex-wrap: nowrap;
-			width: auto;
-			border: solid 1px blue;
-			font-size: x-small;
-			background-color:white;
-			margin: 5px;
-		}
-		#tableFrame {
-			position:relative;
-			border-right: solid 1px blue;
-			padding:5px;
-		}
-		.table-scroll-wrapper {
-			height:600px;
-			overflow:auto;
-		}
-		#contentTable {
-			width: 250px;
-			overflow:auto;
-			font-size: x-small;
-		}
-		#previewPane {
-			width:100%;
-			min-height: 600px;
-			overflow: auto;
-			border:0;
-		}
-		/*.content-wrapper {*/
-			/**/
-		/*}*/
-
-
-	</style>
 </head>
 <body onload="init()">
-	<h3><bean:message key="oscarEncounter.oscarConsultationRequest.AttachDocPopup.header"/>&nbsp<%=patientName%></h3>
-<html:form action="/oscarConsultationRequest/attachDoc">
+	<div class="header">
+		<h3><bean:message key="oscarEncounter.oscarConsultationRequest.AttachDocPopup.header"/>&nbsp<%=patientName%></h3>
+	</div>
+	<html:form action="/oscarConsultationRequest/attachDoc">
 	<html:hidden property="requestId" value="<%=requestId%>" />
 	<html:hidden property="demoNo" value="<%=demoNo%>" />
 	<html:hidden property="providerNo" value="<%=providerNo%>" />
-	<div id="contentFrame" class="flexH">
+	<div id="contentFrame" class="flexH flexGrow">
 		<div id="tableFrame" class="flexV">
 			<%
 			if (allLabs.isEmpty() && allDocuments.isEmpty() && allEForms.isEmpty())
@@ -428,13 +362,13 @@ String userlastname = (String) session.getAttribute("userlastname");
 						                        value="<%=curDoc.getDocId()%>"/>
 					                    <div class="hiddenLabel doc"><%=truncatedDisplayName%></div>
 					                    <img title="<%= printTitle %>" src="<%= printImage %>" alt="<%= printAlt %>">
-					                    <a class="docPreview" href="#" onclick="<%=onClick%>" >
+					                    <a class="preview-link-name" href="#" onclick="<%=onClick%>" >
 					                        <span class="text"><%=truncatedDisplayName%></span>
 					                    </a>
 
 					               </div>
 					               <div>
-					                    <a class="docPreview" href="#" onclick="<%=onClick%>" >
+					                    <a class="preview-link-date" href="#" onclick="<%=onClick%>" >
 					                        <span>... <%=date%></span>
 					                    </a>
 				                   </div>
@@ -492,12 +426,12 @@ String userlastname = (String) session.getAttribute("userlastname");
 										       value="<%=result.segmentID%>"/>
 										<div class="hiddenLabel lab"><%=labDisplayName%></div>
 										<img title="<%= printTitle %>" src="<%= printImage %>" alt="<%= printAlt %>">
-										<a class="labPreview" href="#" onclick="javascript:previewHTML('<%=url%>');">
+										<a class="preview-link-name" href="#" onclick="javascript:previewHTML('<%=url%>');">
 											<span class="text"><%=truncatedDisplayName%></span>
 										</a>
 									</div>
 									<div>
-										<a class="labPreview" href="#" onclick="javascript:previewHTML('<%=url%>');">
+										<a class="preview-link-date" href="#" onclick="javascript:previewHTML('<%=url%>');">
 											<span>... <%=date%></span>
 										</a>
 									</div>
@@ -521,18 +455,18 @@ String userlastname = (String) session.getAttribute("userlastname");
 								%>
 							<td class="flexV">
 								<div class="eform itemGroup flexH" title="<%=eFormDisplayName%>" id="<%=docType[2]+eForm.getId()%>">
-									<div>
+									<div  class="flexH">
 										<input class="tightCheckbox1" type="checkbox"
 										       name="eFormNo" id="eFormNo<%=eForm.getId()%>"
 										       value="<%=eForm.getId()%>"/>
 										<div class="hiddenLabel eform"><%=eFormDisplayName%></div>
 										<img title="<%= printTitle %>" src="<%= printImage %>" alt="<%= printAlt %>">
-										<a class="labPreview" href="#" onclick="javascript:previewHTML('<%=url%>');">
+										<a class="preview-link-name" href="#" onclick="javascript:previewHTML('<%=url%>');">
 											<span class="text"><%=eFormDisplayName%></span>
 										</a>
 									</div>
-									<div>
-										<a class="labPreview" href="#" onclick="javascript:previewHTML('<%=url%>');">
+									<div class="flexH">
+										<a class="preview-link-date" href="#" onclick="javascript:previewHTML('<%=url%>');">
 											<span>... <%=date%></span>
 										</a>
 									</div>
