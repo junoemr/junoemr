@@ -1,2 +1,2 @@
-ALTER TABLE demographic ADD COLUMN IF NOT EXISTS nameOfMother varchar(32) AFTER `family_doctor_2`;
-ALTER TABLE demographic ADD COLUMN IF NOT EXISTS nameOfFather varchar(32) AFTER `nameOfMother`;
+ALTER TABLE demographic ADD COLUMN IF NOT EXISTS name_of_mother varchar(32) AFTER `family_doctor_2`;
+ALTER TABLE demographic ADD COLUMN IF NOT EXISTS name_of_father varchar(32) AFTER `nameOfMother`;

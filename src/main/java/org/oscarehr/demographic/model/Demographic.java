@@ -722,13 +722,25 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		this.veteranNo = veteranNo;
 	}
 
-	public String getNameOfMother() { return nameOfMother; }
+	public String getNameOfMother()
+	{
+		return nameOfMother;
+	}
 
-	public void setNameOfMother(String mother) { this.nameOfMother = mother; }
+	public void setNameOfMother(String mother)
+	{
+		this.nameOfMother = mother;
+	}
 
-	public String getNameOfFather() { return nameOfFather; }
+	public String getNameOfFather()
+	{
+		return nameOfFather;
+	}
 
-	public void setNameOfFather(String father) { this.nameOfFather = father; }
+	public void setNameOfFather(String father)
+	{
+		this.nameOfFather = father;
+	}
 
 	public List<DemographicCust> getDemographicCust()
 	{

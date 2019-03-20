@@ -96,8 +96,6 @@ public class DemographicConverter
 		demographic.setCountryOfOrigin(transfer.getCountryOfOrigin());
 		demographic.setNewsletter(transfer.getNewsletter());
 		demographic.setAnonymous(transfer.getAnonymous());
-		demographic.setNameOfMother(transfer.getNameOfMother());
-		demographic.setNameOfFather(transfer.getNameOfFather());
 
 		return demographic;
 	}
@@ -188,8 +186,6 @@ public class DemographicConverter
 		transfer.setNewsletter(demographic.getNewsletter());
 		transfer.setAnonymous(demographic.getAnonymous());
 		transfer.setLastUpdateDate(ConversionUtils.toNullableLocalDate(demographic.getLastUpdateDate()));
-		transfer.setNameOfMother(demographic.getNameOfMother());
-		transfer.setNameOfFather(demographic.getNameOfFather());
 
 		if(demographicExtensions != null)
 		{
