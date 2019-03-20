@@ -189,6 +189,12 @@ public class DemographicTransferBasic implements Serializable
 	private String newsletter;
 	@Size(max=32)
 	private String anonymous;
+	@Size(max=32)
+	@Schema(description = "name of mother")
+	private String nameOfMother;
+	@Size(max=32)
+	@Schema(description = "name of father")
+	private String nameOfFather;
 
 	// notes
 	@Schema(description = "The note on the patient master file")
@@ -676,6 +682,14 @@ public class DemographicTransferBasic implements Serializable
 	{
 		this.anonymous = anonymous;
 	}
+
+	public String getNameOfMother() { return nameOfMother; }
+
+	public void setNameOfMother(String mother) { this.nameOfMother = mother; }
+
+	public String getNameOfFather() { return nameOfFather; }
+
+	public void setNameOfFather(String father) { this.nameOfFather = father; }
 
 	public String getNotes()
 	{
