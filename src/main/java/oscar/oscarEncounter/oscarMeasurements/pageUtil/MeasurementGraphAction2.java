@@ -103,7 +103,7 @@ public class MeasurementGraphAction2 extends Action {
         }
 
         String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-        securityInfoManager.requireOnePrivilege(providerNo, "r", null, "_measurement");
+        securityInfoManager.requireOnePrivilege(providerNo, SecurityInfoManager.READ, null, "_measurement");
 
         Integer demographicNo = Integer.valueOf(request.getParameter("demographic_no"));
         String typeIdName = request.getParameter("type");
