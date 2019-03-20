@@ -47,14 +47,14 @@ import java.util.List;
  *
  * Convert submitted preventions into pdf and return file
  */
-public class EctConsultationFormRequestPrintAction2 extends Action
+public class EctConsultationFormRequestPrintAction extends Action
 {
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	private static final ConsultationPDFCreationService consultationPDFCreationService = SpringUtils.getBean(ConsultationPDFCreationService.class);
 	private static final ConsultationAttachmentService consultationAttachmentService = SpringUtils.getBean(ConsultationAttachmentService.class);
     
-    public EctConsultationFormRequestPrintAction2()
+    public EctConsultationFormRequestPrintAction()
     {
     }
     
