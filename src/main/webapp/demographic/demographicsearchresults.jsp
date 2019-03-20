@@ -429,7 +429,7 @@
 		</caisi:isModuleLoad>
 		<td class="chartNo"><%=demo.getChartNo()==null||demo.getChartNo().equals("")?"&nbsp;":demo.getChartNo()%></td>
 		<td class="sex"><%=demo.getSex()%></td>
-		<td class="dob"><%=demo.getDateOfBirth() != null ? demo.getDateOfBirth() : "null"%></td>
+		<td class="dob"><%=demo.getDateOfBirth() != null ? demo.getDateOfBirth() : ""%></td>
 		<td class="hin"><%=StringUtils.trimToEmpty(demo.getHin())%></td>
 		<td class="doctor"><%=Misc.getShortStr(providerBean.getProperty(demo.getProviderNo() == null ? "" : demo.getProviderNo()),"_",12 )%></td>
 		<td class="rosterStatus"><%=demo.getRosterStatus()==null||demo.getRosterStatus().equals("")?"&nbsp;":demo.getRosterStatus()%></td>
