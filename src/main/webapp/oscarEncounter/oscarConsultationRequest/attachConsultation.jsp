@@ -85,15 +85,10 @@ String userlastname = (String) session.getAttribute("userlastname");
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery_oscar_defaults.js"></script>
+<script type="text/javascript" src="attachConsultation.js"></script>
 <link rel="stylesheet" type="text/css" href="attachConsultation.css" />
 
-<title><bean:message
-	key="oscarEncounter.oscarConsultationRequest.AttachDocPopup.title" /></title>
-
-<link rel="stylesheet" type="text/css" media="all" href="../../share/css/extractedFromPages.css" />
-
-<script type="text/javascript">
-//<!--   
+<title><bean:message key="oscarEncounter.oscarConsultationRequest.AttachDocPopup.title" /></title>
 <%
     final String PRINTABLE_IMAGE = request.getContextPath() + "/images/printable.png";
     final String PRINTABLE_TITLE = "This file can be automatically printed to PDF with the consultation request.";
@@ -145,130 +140,11 @@ String userlastname = (String) session.getAttribute("userlastname");
 		{
 		    attachedDocs += (attachedDocs.equals("") ? "" : "|") + ConsultDocs.DOCTYPE_EFORM + eForm.getId();
 		}
-		attachedDocs = "\"" + attachedDocs + "\"";
+		attachedDocs = "\'" + attachedDocs + "\'";
 	}
-%>  
-
-	//if consultation has not been saved, load existing docs into proper select boxes
-	function init()
-	{
-		var docs = <%= attachedDocs %>;
-		docs = docs.split("|");
-		checkDocuments(docs);
-	}
-
-	// set the checked state of attachments
-	function checkDocuments(docs)
-	{
-		if (docs == null)
-		{
-			return;
-		}
-		for(var idx = 0; idx < docs.length; ++idx)
-		{
-	        if (docs[idx].length < 2)
-	        {
-	            continue;
-	        }
-
-	        let inputName = "";
-	        switch (docs[idx].charAt(0))
-	        {
-		        case "<%=ConsultDocs.DOCTYPE_DOC%>": inputName = "docNo"; break;
-		        case "<%=ConsultDocs.DOCTYPE_LAB%>": inputName = "labNo"; break;
-		        case "<%=ConsultDocs.DOCTYPE_EFORM%>": inputName = "eFormNo"; break;
-		        default: console.error("Invalid doctype: " + docs[idx].charAt(0)); continue;
-	        }
-	        $("input[name='" + inputName + "'][value='" + docs[idx].substring(1) + "']").attr("checked", "checked");
-	    }
-	}
-
-	function save()
-	{
-		var ret;
-		console.info(document.forms[0].requestId.value);
-		if (document.forms[0].requestId.value == null || document.forms[0].requestId.value === "null")
-		{
-			var saved = "";
-			var list = window.opener.document.getElementById("attachedList");
-			var paragraph = window.opener.document.getElementById("attachDefault");
-
-			paragraph.innerHTML = "";
-
-			//delete what we have before adding new docs to list
-			while (list.firstChild)
-			{
-				list.removeChild(list.firstChild);
-			}
-
-		    $("input[name='docNo']:checked").each(function ()
-		    {
-			    saved += (saved === "" ? "" : "|") + "<%=ConsultDocs.DOCTYPE_DOC%>" + $(this).attr("value");
-			    listElem = window.opener.document.createElement("li");
-			    listElem.innerHTML = $(this).next().get(0).innerHTML;
-			    listElem.className = "doc";
-			    list.appendChild(listElem);
-		    });
-		    $("input[name='labNo']:checked").each(function ()
-		    {
-			    saved += (saved === "" ? "" : "|") + "<%=ConsultDocs.DOCTYPE_LAB%>" + $(this).attr("value");
-			    listElem = window.opener.document.createElement("li");
-			    listElem.innerHTML = $(this).next().get(0).innerHTML;
-			    listElem.className = "lab";
-			    list.appendChild(listElem);
-		    });
-		    $("input[name='eFormNo']:checked").each(function ()
-		    {
-			    saved += (saved === "" ? "" : "|") + "<%=ConsultDocs.DOCTYPE_EFORM%>" + $(this).attr("value");
-			    listElem = window.opener.document.createElement("li");
-			    listElem.innerHTML = $(this).next().get(0).innerHTML;
-			    listElem.className = "eform";
-			    list.appendChild(listElem);
-		    });
-
-			window.opener.document.EctConsultationFormRequestForm.documents.value = saved;
-
-			if (list.childNodes.length === 0)
-			{
-				paragraph.innerHTML = "<bean:message key="oscarEncounter.oscarConsultationRequest.AttachDoc.Empty"/>";
-			}
-			ret = false;
-		}
-		else
-		{
-			window.opener.updateAttached();
-			ret = true;
-		}
-		if (!ret) window.close();
-			return ret;
-	}
-
-	function previewPDF(docId, url)
-	{
-		$("#previewPane").attr("src",
-			"<%= request.getContextPath() %>/oscarEncounter/oscarConsultationRequest/displayImage.jsp?url="
-			+ encodeURIComponent("<%= request.getContextPath() %>" + "/dms/ManageDocument.do?method=view&doc_no=" + docId)
-			+ "&link=" + encodeURIComponent(url));
-	}
-
-	function previewHTML(url)
-	{
-		$("#previewPane").attr("src", url);
-	}
-
-	function previewImage(url)
-	{
-		$("#previewPane").attr("src", "<%= request.getContextPath() %>/oscarEncounter/oscarConsultationRequest/displayImage.jsp?url=" + encodeURIComponent(url));
-	}
-
-	function toggleSelectAll()
-	{
-		$("input[type='checkbox']").attr("checked", $("#selectAll").attr("checked"));
-	}
-
-	</script>
+%>
 </head>
-<body onload="init()">
+<body onload="Oscar.AttachConsultation.init(<%=attachedDocs%>)">
 	<div class="header">
 		<h3><bean:message key="oscarEncounter.oscarConsultationRequest.AttachDocPopup.header"/>&nbsp<%=patientName%></h3>
 	</div>
@@ -297,7 +173,7 @@ String userlastname = (String) session.getAttribute("userlastname");
 							<div class="itemGroup flexH">
 								<div>
 									<input class="tightCheckbox1" id="selectAll"
-									       type="checkbox" onclick="toggleSelectAll()"
+									       type="checkbox" onclick="Oscar.AttachConsultation.toggleSelectAll()"
 									       value="" title="Select/un-select all documents."
 									/> Select all
 								</div>
@@ -327,13 +203,14 @@ String userlastname = (String) session.getAttribute("userlastname");
 			                String onClick = "";
 
 			                if (curDoc.isPDF()) {
-			                    onClick = "javascript:previewPDF('" + curDoc.getDocId() + "','" + StringEscapeUtils.escapeJavaScript(url) + "');";
+			                    onClick = "Oscar.AttachConsultation.previewPDF('" + curDoc.getDocId() + "','" +
+					                    StringEscapeUtils.escapeJavaScript(url) + "','" + request.getContextPath() + "');";
 			                }
 			                else if (curDoc.isImage()) {
-			                    onClick = "javascript:previewImage('" + url + "');";
+			                    onClick = "Oscar.AttachConsultation.previewImage('" + url + "','" + request.getContextPath() + "');";
 			                }
 			                else {
-			                    onClick = "javascript:previewHTML('" + url + "');";
+			                    onClick = "Oscar.AttachConsultation.previewHTML('" + url + "');";
 			                }
 
 			                if (curDoc.isPrintable()) {
@@ -426,12 +303,12 @@ String userlastname = (String) session.getAttribute("userlastname");
 										       value="<%=result.segmentID%>"/>
 										<div class="hiddenLabel lab"><%=labDisplayName%></div>
 										<img title="<%= printTitle %>" src="<%= printImage %>" alt="<%= printAlt %>">
-										<a class="preview-link-name" href="#" onclick="javascript:previewHTML('<%=url%>');">
+										<a class="preview-link-name" href="#" onclick="Oscar.AttachConsultation.previewHTML('<%=url%>');">
 											<span class="text"><%=truncatedDisplayName%></span>
 										</a>
 									</div>
 									<div>
-										<a class="preview-link-date" href="#" onclick="javascript:previewHTML('<%=url%>');">
+										<a class="preview-link-date" href="#" onclick="Oscar.AttachConsultation.previewHTML('<%=url%>');">
 											<span>... <%=date%></span>
 										</a>
 									</div>
@@ -461,12 +338,12 @@ String userlastname = (String) session.getAttribute("userlastname");
 										       value="<%=eForm.getId()%>"/>
 										<div class="hiddenLabel eform"><%=eFormDisplayName%></div>
 										<img title="<%= printTitle %>" src="<%= printImage %>" alt="<%= printAlt %>">
-										<a class="preview-link-name" href="#" onclick="javascript:previewHTML('<%=url%>');">
+										<a class="preview-link-name" href="#" onclick="Oscar.AttachConsultation.previewHTML('<%=url%>');">
 											<span class="text"><%=eFormDisplayName%></span>
 										</a>
 									</div>
 									<div class="flexH">
-										<a class="preview-link-date" href="#" onclick="javascript:previewHTML('<%=url%>');">
+										<a class="preview-link-date" href="#" onclick="Oscar.AttachConsultation.previewHTML('<%=url%>');">
 											<span>... <%=date%></span>
 										</a>
 									</div>
@@ -481,12 +358,12 @@ String userlastname = (String) session.getAttribute("userlastname");
 			</div>
 			<input type="submit" class="btn submitButton" name="submit"
 			       value="<bean:message key="oscarEncounter.oscarConsultationRequest.AttachDocPopup.submit"/>"
-			       onclick="return save();" />
+			       onclick="return Oscar.AttachConsultation.save('<bean:message key="oscarEncounter.oscarConsultationRequest.AttachDoc.Empty"/>');" />
 		</div>
 		<div class="flexV flexGrow">
 			<h2 style="text-align: center"><bean:message
 					key="oscarEncounter.oscarConsultationRequest.AttachDocPopup.preview" /></h2>
-			<iframe id="previewPane" class="flexGrow"></iframe>
+			<iframe id="previewPane" class="flexGrow" sandbox="allow-scripts"></iframe>
 		</div>
 	</div>
 </html:form>
