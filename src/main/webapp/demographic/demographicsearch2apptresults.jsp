@@ -387,18 +387,18 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
 
     DemographicService demoSrvc = (DemographicService) SpringUtils.getBean("demographic.service.DemographicService");
 
-	DemographicService.STATIS_MODE statisMode = DemographicService.STATIS_MODE.all;
+	DemographicService.STATUS_MODE statisMode = DemographicService.STATUS_MODE.all;
 	if( "inactive".equals(ptstatus) )
 	{
-		statisMode = DemographicService.STATIS_MODE.inactive;
+		statisMode = DemographicService.STATUS_MODE.inactive;
 	}
 	else if ("active".equals(ptstatus))
 	{
-		statisMode = DemographicService.STATIS_MODE.active;
+		statisMode = DemographicService.STATUS_MODE.active;
 	}
 
 	DemographicService.SEARCH_MODE demoSearchMode = demoSrvc.searchModeStringToEnum(searchMode);
-	DemographicCriteriaSearch demoCS = demoSrvc.buildDemographicSearch(keyword, demoSearchMode, statisMode, DemographicCriteriaSearch.SORTMODE.DemographicName);
+	DemographicCriteriaSearch demoCS = demoSrvc.buildDemographicSearch(keyword, demoSearchMode, statisMode, DemographicCriteriaSearch.SORT_MODE.DemographicName);
     demoCS.setLimit(limit);
     demoCS.setOffset(offset);
 	List<Demographic> demoList = demographicDao.criteriaSearch(demoCS);

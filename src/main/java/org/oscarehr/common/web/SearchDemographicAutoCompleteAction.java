@@ -86,28 +86,28 @@ public class SearchDemographicAutoCompleteAction extends Action {
         RxProviderData rx = new RxProviderData();
 
         DemographicService demoService = (DemographicService) SpringUtils.getBean("demographic.service.DemographicService");
-        DemographicCriteriaSearch.SORTMODE sortMode = DemographicCriteriaSearch.SORTMODE.DemographicName;
+        DemographicCriteriaSearch.SORT_MODE sortMode = DemographicCriteriaSearch.SORT_MODE.DemographicName;
 
         List<Demographic> list;
         DemographicService.SEARCH_MODE searchMode;
-        DemographicService.STATIS_MODE statusMode;
+        DemographicService.STATUS_MODE statusMode;
 
         // search by birth date (format has to be yyyyMMdd)
         if (searchStr.length() == 8 && searchStr.matches("([0-9]*)"))
         {
             searchStr = searchStr.substring(0,4) + "-" + searchStr.substring(4,6) + "-" + searchStr.substring(6, 8);
             searchMode = DemographicService.SEARCH_MODE.dob;
-            statusMode = DemographicService.STATIS_MODE.all;
+            statusMode = DemographicService.STATUS_MODE.all;
         } 
         else if (activeOnly)
         {
             searchMode = DemographicService.SEARCH_MODE.name;
-            statusMode = DemographicService.STATIS_MODE.active;
+            statusMode = DemographicService.STATUS_MODE.active;
         }
         else
         {
             searchMode = DemographicService.SEARCH_MODE.name;
-            statusMode = DemographicService.STATIS_MODE.all;
+            statusMode = DemographicService.STATUS_MODE.all;
         }
 
         DemographicCriteriaSearch demoCriteriaSearch = demoService.buildDemographicSearch(searchStr, searchMode, statusMode, sortMode);

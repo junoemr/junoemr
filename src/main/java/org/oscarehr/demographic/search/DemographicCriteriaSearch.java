@@ -36,7 +36,7 @@ import java.util.List;
 
 public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 {
-	public enum SORTMODE
+	public enum SORT_MODE
 	{
 		DemographicNo,
 		DemographicName,
@@ -53,10 +53,16 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		ProviderName
 	}
 
-	public enum STATUSMODE
+	public enum STATUS_MODE
 	{
-		all, active, inactive, deceased, fired,
-		ic, id, moved
+		all,
+		active,
+		inactive,
+		deceased,
+		fired,
+		ic,
+		id,
+		moved
 	}
 
 	private MatchMode matchMode = MatchMode.START;
@@ -72,8 +78,8 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	private String sex;
 	private String providerNo;
 
-	private SORTMODE sortMode = SORTMODE.DemographicNo;
-	private List<STATUSMODE> statusModes = new ArrayList<>();
+	private SORT_MODE sortMode = SORT_MODE.DemographicNo;
+	private List<STATUS_MODE> statusModes = new ArrayList<>();
 	private boolean negateStatus = false;
 	private boolean customWildcardsEnabled = false;
 
@@ -160,10 +166,10 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	private void setStatusCriteria(Criteria criteria)
 	{
 		//build list of status names
-		ArrayList<String> stati = new ArrayList<>();
-		for (STATUSMODE status : statusModes)
+		ArrayList<String> statuses = new ArrayList<>();
+		for (STATUS_MODE status : statusModes)
 		{
-			if (status == STATUSMODE.all)
+			if (status == STATUS_MODE.all)
 			{
 				// if we see status "all" at any point just bail.
 				return;
@@ -172,40 +178,40 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 				switch (status)
 				{
 					case active:
-						stati.add(Demographic.PatientStatus.AC.name());
+						statuses.add(Demographic.PatientStatus.AC.name());
 						break;
 					case inactive:
-						stati.add(Demographic.PatientStatus.IN.name());
+						statuses.add(Demographic.PatientStatus.IN.name());
 						break;
 					case deceased:
-						stati.add(Demographic.PatientStatus.DE.name());
+						statuses.add(Demographic.PatientStatus.DE.name());
 						break;
 					case fired:
-						stati.add(Demographic.PatientStatus.FI.name());
+						statuses.add(Demographic.PatientStatus.FI.name());
 						break;
 					case ic:
-						stati.add(Demographic.PatientStatus.IC.name());
+						statuses.add(Demographic.PatientStatus.IC.name());
 						break;
 					case id:
-						stati.add(Demographic.PatientStatus.ID.name());
+						statuses.add(Demographic.PatientStatus.ID.name());
 						break;
 					case moved:
-						stati.add(Demographic.PatientStatus.MO.name());
+						statuses.add(Demographic.PatientStatus.MO.name());
 						break;
 				}
 			}
 		}
 
 		//set hibernate restrictions
-		if (stati.size() > 0)
+		if (statuses.size() > 0)
 		{
 			if (negateStatus)
 			{
-				criteria.add(Restrictions.not(Restrictions.in("patientStatus", stati)));
+				criteria.add(Restrictions.not(Restrictions.in("patientStatus", statuses)));
 			}
 			else
 			{
-				criteria.add(Restrictions.in("patientStatus", stati));
+				criteria.add(Restrictions.in("patientStatus", statuses));
 			}
 		}
 	}
@@ -364,17 +370,17 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		this.providerNo = providerNo;
 	}
 
-	public SORTMODE getSortMode()
+	public SORT_MODE getSortMode()
 	{
 		return sortMode;
 	}
 
-	public void setSortMode(SORTMODE sortMode)
+	public void setSortMode(SORT_MODE sortMode)
 	{
 		this.sortMode = sortMode;
 	}
 
-	public STATUSMODE getStatusMode()
+	public STATUS_MODE getStatusMode()
 	{
 		if (statusModes.size() > 0)
 		{
@@ -382,27 +388,27 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		}
 		else
 		{
-			return STATUSMODE.all;
+			return STATUS_MODE.all;
 		}
 	}
 
-	public List<STATUSMODE> getStatusModeList()
+	public List<STATUS_MODE> getStatusModeList()
 	{
 		return this.statusModes;
 	}
 
-	public void setStatusMode(STATUSMODE statusMode)
+	public void setStatusMode(STATUS_MODE statusMode)
 	{
 		this.statusModes = new ArrayList<>();
 		this.statusModes.add(statusMode);
 	}
 
-	public void setStatusModeList(List<STATUSMODE> statusModes)
+	public void setStatusModeList(List<STATUS_MODE> statusModes)
 	{
 		this.statusModes = new ArrayList<>(statusModes);
 	}
 
-	public void addStatusMode(STATUSMODE statusMode)
+	public void addStatusMode(STATUS_MODE statusMode)
 	{
 		this.statusModes.add(statusMode);
 	}

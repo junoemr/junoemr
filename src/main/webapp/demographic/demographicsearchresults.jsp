@@ -504,65 +504,65 @@ Boolean isLocal(MatchingDemographicTransferScore matchingDemographicTransferScor
 List<Demographic> doSearch(DemographicDao demographicDao, LoggedInInfo loggedInInfo, String searchMode, String searchStatus, String searchKeyword, int limit, int offset, String orderBy, boolean outOfDomain) {
 	DemographicService demoSrvc = (DemographicService) SpringUtils.getBean("demographic.service.DemographicService");
 
-	DemographicService.STATIS_MODE statisMode = DemographicService.STATIS_MODE.all;
+	DemographicService.STATUS_MODE statusMode = DemographicService.STATUS_MODE.all;
 	if( "inactive".equals(searchStatus) )
 	{
-		statisMode = DemographicService.STATIS_MODE.inactive;
+		statusMode = DemographicService.STATUS_MODE.inactive;
 	}
 	else if ( "active".equals(searchStatus))
 	{
-		statisMode = DemographicService.STATIS_MODE.active;
+		statusMode = DemographicService.STATUS_MODE.active;
 	}
 
 	// set sort mode
-	DemographicCriteriaSearch.SORTMODE sortMode = DemographicCriteriaSearch.SORTMODE.DemographicName;
+	DemographicCriteriaSearch.SORT_MODE sortMode = DemographicCriteriaSearch.SORT_MODE.DemographicName;
 	if (orderBy.equals("demographic_no"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.DemographicNo;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.DemographicNo;
 	}
 	else if (orderBy.equals("last_name"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.DemographicLastName;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.DemographicLastName;
 	}
 	else if(orderBy.equals("first_name"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.DemographicFirstName;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.DemographicFirstName;
 	}
 	else if (orderBy.equals("chart_no"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.ChartNo;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.ChartNo;
 	}
 	else if (orderBy.equals("dob"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.DOB;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.DOB;
 	}
 	else if (orderBy.equals("sex"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.Sex;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.Sex;
 	}
 	else if (orderBy.equals("patient_status"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.Status;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.Status;
 	}
 	else if (orderBy.equals("roster_status"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.RosterStatus;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.RosterStatus;
 	}
 	else if (orderBy.equals("phone"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.Phone;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.Phone;
 	}
 	else if (orderBy.equals("provider_name"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.ProviderName;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.ProviderName;
 	}
 	else if (orderBy.equals("hin"))
 	{
-			sortMode = DemographicCriteriaSearch.SORTMODE.Hin;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.Hin;
 	}
 
 	DemographicService.SEARCH_MODE demoSearchMode = demoSrvc.searchModeStringToEnum(searchMode);
-	DemographicCriteriaSearch demoCS = demoSrvc.buildDemographicSearch(searchKeyword, demoSearchMode, statisMode, sortMode);
+	DemographicCriteriaSearch demoCS = demoSrvc.buildDemographicSearch(searchKeyword, demoSearchMode, statusMode, sortMode);
 	demoCS.setLimit(limit);
 	demoCS.setOffset(offset);
 	return demographicDao.criteriaSearch(demoCS);
