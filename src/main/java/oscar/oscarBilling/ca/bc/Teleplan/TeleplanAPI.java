@@ -41,6 +41,7 @@ import oscar.OscarProperties;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -108,47 +109,50 @@ public class TeleplanAPI {
         httpclient.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
         httpclient.getParams().setParameter("User-Agent","TeleplanPerl 1.0");  
 	
-    }	
-    
-    private TeleplanResponse processRequest(String url,NameValuePair[] data){
-        TeleplanResponse tr = null;
-        try{
-            PostMethod post = new PostMethod(url);
-            post.setRequestBody(data);
-            httpclient.executeMethod(post);
-
-            InputStream in = post.getResponseBodyAsStream();
-            log.debug("INPUT STREAM "+in+"\n");
-
-            tr = new TeleplanResponse();
-            tr.processResponseStream(in);
-            TeleplanResponseDAO trDAO = new TeleplanResponseDAO();
-            trDAO.save(tr);
-        }catch(Exception e){
-            MiscUtils.getLogger().error("Error", e);
-        }
-        return tr; 
-            //display(in);
     }
-    
-    private TeleplanResponse processRequest(String url,Part[] parts){
-        TeleplanResponse tr = null;
-        try{ 
-            PostMethod filePost = new PostMethod(url); 
-            filePost.setRequestEntity( new MultipartRequestEntity(parts, filePost.getParams()) );  
-            httpclient.executeMethod(filePost);
-            
-            InputStream in = filePost.getResponseBodyAsStream();
-            tr = new TeleplanResponse();
-            tr.processResponseStream(in); 
-            TeleplanResponseDAO trDAO = new TeleplanResponseDAO();
-            trDAO.save(tr);
 
-            }catch(Exception e){
-                MiscUtils.getLogger().error("Error", e);
-            }
-            return tr; 
-    }
+	private TeleplanResponse processRequest(InputStream inputStream) throws IOException, InterruptedException
+	{
+		TeleplanResponse response = new TeleplanResponse();
+		response.processResponseStream(inputStream);
+		TeleplanResponseDAO trDAO = new TeleplanResponseDAO();
+		trDAO.save(response);
+		return response;
+	}
+
+	private TeleplanResponse processRequest(String url, NameValuePair[] data)
+	{
+		TeleplanResponse tr = null;
+		try
+		{
+			PostMethod post = new PostMethod(url);
+			post.setRequestBody(data);
+			httpclient.executeMethod(post);
+			tr = processRequest(post.getResponseBodyAsStream());
+		}
+		catch(Exception e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+		}
+		return tr;
+	}
+
+	private TeleplanResponse processRequest(String url, Part[] parts)
+	{
+		TeleplanResponse tr = null;
+		try
+		{
+			PostMethod filePost = new PostMethod(url);
+			filePost.setRequestEntity(new MultipartRequestEntity(parts, filePost.getParams()));
+			httpclient.executeMethod(filePost);
+			tr = processRequest(filePost.getResponseBodyAsStream());
+		}
+		catch(Exception e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+		}
+		return tr;
+	}
    
     
     
@@ -274,13 +278,14 @@ public class TeleplanAPI {
 	*                                "SUCCESS" 
 	*                                "FAILURE"
 	*/
-	public TeleplanResponse getRemittance(boolean includeRemittance){
-            NameValuePair[] data = {
-                new NameValuePair("remittance", Boolean.toString(includeRemittance)),
-                new NameValuePair("ExternalAction", ExternalActionGetRemit)
-            };
-            return processRequest(CONTACT_URL,data);
-        }
+	public TeleplanResponse getRemittance(boolean includeRemittance)
+	{
+		NameValuePair[] data = {
+				new NameValuePair("remittance", Boolean.toString(includeRemittance)),
+				new NameValuePair("ExternalAction", ExternalActionGetRemit)
+		};
+		return processRequest(CONTACT_URL, data);
+	}
 	//-------------------------------------------------------------------------
 	/**
 	*Procedure parameters: File Type, which is outlined below

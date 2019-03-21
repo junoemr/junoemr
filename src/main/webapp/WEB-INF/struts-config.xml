@@ -2081,9 +2081,10 @@
 			<forward name="success" path="/billing/CA/BC/TeleplanSubmission.jsp" />
 		</action>
 
-		<action path="/billing/CA/BC/ProcessRemittance" scope="request" name="FrmForm" type="org.oscarehr.billing.CA.BC.service.GenTaAction">
+		<action path="/billing/CA/BC/ProcessRemittance" scope="request" name="FrmForm" type="oscar.oscarBilling.ca.bc.Teleplan.GenTaAction">
 			<forward name="C12" path="/billing/CA/BC/billStatus.jsp" />
 			<forward name="S21" path="/billing/CA/BC/viewReconcileReports.jsp" />
+			<forward name="error" path="/billing/CA/BC/teleplan/ManageTeleplan.jsp" />
 		</action>
 
 		<action path="/billing/CA/BC/SimulateTeleplanFile" scope="request" name="FrmForm" type="oscar.oscarBilling.ca.bc.pageUtil.SimulateTeleplanFileAction">

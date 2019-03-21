@@ -59,10 +59,11 @@ public class TeleplanResponse
 	{
 		double randNum = Math.random();
 		GenericFile file = FileFactory.createTempFile(in, "teleplan.msp-" + randNum);
-		BufferedReader fileReader = new BufferedReader(new FileReader(file.getName()));
+		BufferedReader fileReader = new BufferedReader(new FileReader(file.getFileObject()));
 
 		String line;
 		String lastLine = null;
+		lineCount = 0;
 		while ((line = fileReader.readLine()) != null)
 		{
 			lineCount++;
@@ -74,7 +75,7 @@ public class TeleplanResponse
 		if(!StringUtils.isNullOrEmpty(this.getFilename()))
 		{
 			file.rename("teleplan" + this.getFilename() + randNum);
-			file.moveToBillingRemitance();
+			file.moveToBillingRemittance();
 			realFilename = file.getName();
 		}
 	}

@@ -92,7 +92,7 @@ public class GenericFile
 	{
 		return moveFile(DOCUMENT_BASE_DIR);
 	}
-	public boolean moveToBillingRemitance() throws IOException
+	public boolean moveToBillingRemittance() throws IOException
 	{
 		return moveFile(BILLING_REMITTANCE_DIR);
 	}
