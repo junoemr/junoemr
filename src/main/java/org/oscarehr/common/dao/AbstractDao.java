@@ -114,6 +114,8 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 		Criteria criteria = session.createCriteria(modelClass);
 		criteria = criteriaSearch.setCriteriaProperties(criteria);
 
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
 		criteria.setMaxResults(criteriaSearch.getLimit());
 		criteria.setFirstResult(criteriaSearch.getOffset());
 
