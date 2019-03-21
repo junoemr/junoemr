@@ -24,6 +24,8 @@ package org.oscarehr.demographic.model;
 
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 
 import javax.persistence.Column;
@@ -32,11 +34,14 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.io.Serializable;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -175,6 +180,10 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "mergedTo")
 	private List<DemographicMerged> mergedToDemographicsList;
 
+	@OneToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="provider_no", insertable=false, updatable=false)
+	private ProviderData provider;
+
 	/**
 	 * Determine if demographic is a newborn.  A demographic is a newborn if the HIN version code is 66 in BC, or
 	 * under a year old in all other cases.
@@ -283,7 +292,15 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 
 	public LocalDate getDateOfBirth()
 	{
-		return LocalDate.of(Integer.parseInt(yearOfBirth), Integer.parseInt(monthOfBirth), Integer.parseInt(dayOfBirth));
+		try
+		{
+			return LocalDate.of(Integer.parseInt(yearOfBirth), Integer.parseInt(monthOfBirth), Integer.parseInt(dayOfBirth));
+		}
+		catch (DateTimeException dte)
+		{
+			MiscUtils.getLogger().error("Demographic [" + getId() + "] has invalid dob with error: " + dte.getMessage());
+		}
+		return null;
 	}
 
 	public void setDateOfBirth(LocalDate dateOfBirth)
@@ -756,6 +773,16 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public void setMergedToDemographicsList(List<DemographicMerged> mergedToDemographicsList)
 	{
 		this.mergedToDemographicsList = mergedToDemographicsList;
+	}
+
+	public ProviderData getProvider()
+	{
+		return provider;
+	}
+
+	public void setProvider(ProviderData provider)
+	{
+		this.provider = provider;
 	}
 
 	public boolean isNewBorn()
