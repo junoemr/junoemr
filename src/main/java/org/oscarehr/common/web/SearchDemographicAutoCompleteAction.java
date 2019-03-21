@@ -213,7 +213,6 @@ public class SearchDemographicAutoCompleteAction extends Action {
         }
         json.append("]");
 
-        MiscUtils.getLogger().info(json.toString());
         return json.toString();
     }
 
