@@ -170,7 +170,17 @@ public class RxPatientData {
 
 		public java.util.Date getDOB() {
 			Date dob = null;
-			if (demographic != null) dob = demographic.getBirthDay().getTime();
+			if (demographic != null)
+			{
+				try
+				{
+					dob = demographic.getBirthDay().getTime();
+				}
+				catch (NullPointerException ex)
+				{
+					MiscUtils.getLogger().error("Demographic " + getDemographicNo() + " has error with date of birth: " + ex.getMessage());
+				}
+			}
 
 			return dob;
 		}
