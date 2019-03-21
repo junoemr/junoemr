@@ -42,7 +42,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -162,7 +161,6 @@ public class DemographicService
 		{
 			try
 			{
-				SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd");
 				LocalDate dob = LocalDate.parse(keyword);
 				demoCS.setDateOfBirth(dob);
 			}
