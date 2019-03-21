@@ -23,7 +23,7 @@
  */
 
 
-package oscar.oscarBilling.ca.bc.Teleplan;
+package oscar.oscarBilling.ca.bc.MSP;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
