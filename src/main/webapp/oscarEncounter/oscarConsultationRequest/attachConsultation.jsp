@@ -44,13 +44,12 @@ String userlastname = (String) session.getAttribute("userlastname");
 	oscar.OscarProperties,
 	oscar.dms.EDoc,
 	oscar.dms.EDocUtil,
-	oscar.oscarLab.ca.on.CommonLabResultData"%>
-<%@ page import="oscar.oscarLab.ca.on.LabResultData" %>
+	oscar.oscarLab.ca.on.LabResultData"%>
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@ page import="oscar.util.StringUtils" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.Collections" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.ResourceBundle" %>
 
 <%
 	//preliminary JSP code
@@ -91,18 +90,18 @@ String userlastname = (String) session.getAttribute("userlastname");
 <title><bean:message key="oscarEncounter.oscarConsultationRequest.AttachDocPopup.title" /></title>
 <%
     final String PRINTABLE_IMAGE = request.getContextPath() + "/images/printable.png";
-    final String PRINTABLE_TITLE = "This file can be automatically printed to PDF with the consultation request.";
-    final String PRINTABLE_ALT = "Printable";
-    final String UNPRINTABLE_IMAGE = request.getContextPath() + "/images/notprintable.png";
-    final String UNPRINTABLE_TITLE = "This file must be manually printed.";
-    final String UNPRINTABLE_ALT = "Unprintable";
+	final String UNPRINTABLE_IMAGE = request.getContextPath() + "/images/notprintable.png";
+
+	ResourceBundle oscarResources = ResourceBundle.getBundle("oscarResources", request.getLocale());
+	final String PRINTABLE_TITLE = oscarResources.getString("oscarEncounter.oscarConsultationRequest.AttachConsultation.PrintableTitle");
+	final String PRINTABLE_ALT = oscarResources.getString("oscarEncounter.oscarConsultationRequest.AttachConsultation.PrintableTitleAlt");
+	final String UNPRINTABLE_TITLE = oscarResources.getString("oscarEncounter.oscarConsultationRequest.AttachConsultation.UnprintableTitle");
+	final String UNPRINTABLE_ALT = oscarResources.getString("oscarEncounter.oscarConsultationRequest.AttachConsultation.UnprintableTitleAlt");
 
     String dateFormat = OscarProperties.getInstance().getDisplayDateFormat();
 
-	List<EDoc> allDocuments = EDocUtil.listDocs(loggedInInfo, "demographic", demoNo, null, EDocUtil.PRIVATE, EDocUtil.EDocSort.OBSERVATIONDATE);
-	CommonLabResultData labData = new CommonLabResultData();
-    List<LabResultData> allLabs = labData.populateLabResultsData(loggedInInfo, "",demoNo, "", "","","U");
-    Collections.sort(allLabs);
+	List<EDoc> allDocuments = consultationAttachmentService.getAllDocuments(loggedInInfo, demoNo);
+    List<LabResultData> allLabs = consultationAttachmentService.getAllLabs(loggedInInfo, demoNo, requestId);
     List<EFormData> allEForms = consultationAttachmentService.getAllEForms(demographicNo);
 
 	List<EDoc> attachedDocuments;

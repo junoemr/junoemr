@@ -24,6 +24,7 @@ package org.oscarehr.consultations.service;
 
 import org.oscarehr.consultations.dao.ConsultDocsDao;
 import org.oscarehr.consultations.model.ConsultDocs;
+import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -115,6 +117,10 @@ public class ConsultationAttachmentService
 	{
 		return EDocUtil.listDocs(loggedInInfo, demographicNo, consultId, EDocUtil.UNATTACHED);
 	}
+	public List<EDoc> getAllDocuments(LoggedInInfo loggedInInfo, String demographicNo)
+	{
+		return EDocUtil.listDocs(loggedInInfo, CtlDocument.MODULE_DEMOGRAPHIC, demographicNo, null, EDocUtil.PRIVATE, EDocUtil.EDocSort.OBSERVATIONDATE);
+	}
 
 	public List<LabResultData> getAttachedLabs(LoggedInInfo loggedInInfo, Integer demographicNo, Integer consultId)
 	{
@@ -138,6 +144,14 @@ public class ConsultationAttachmentService
 	{
 		CommonLabResultData labData = new CommonLabResultData();
 		return labData.populateLabResultsData(loggedInInfo, demographicNo, consultId, CommonLabResultData.UNATTACHED);
+	}
+	public List<LabResultData> getAllLabs(LoggedInInfo loggedInInfo, String demographicNo, String consultId)
+	{
+		//TODO refactor to single get when lab logic is re-worked
+		List<LabResultData> allLabs = getAttachedLabs(loggedInInfo, demographicNo, consultId);
+		allLabs.addAll(getUnattachedLabs(loggedInInfo, demographicNo, consultId));
+		Collections.sort(allLabs);
+		return allLabs;
 	}
 
 
