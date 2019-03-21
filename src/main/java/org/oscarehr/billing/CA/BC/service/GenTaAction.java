@@ -23,17 +23,7 @@
  */
 
 
-package oscar.oscarBilling.ca.bc.MSP;
-
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+package org.oscarehr.billing.CA.BC.service;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -52,15 +42,29 @@ import org.oscarehr.billing.CA.BC.model.TeleplanS21;
 import org.oscarehr.billing.CA.BC.model.TeleplanS22;
 import org.oscarehr.billing.CA.BC.model.TeleplanS23;
 import org.oscarehr.billing.CA.BC.model.TeleplanS25;
+import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import oscar.oscarBilling.ca.bc.MSP.MSPReconcile;
 
-import oscar.OscarProperties;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.List;
 
 /**
  *
  * @author jay
  */
+@Service
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class GenTaAction extends Action
 {
 	private static final Logger logger = MiscUtils.getLogger();
@@ -72,31 +76,26 @@ public class GenTaAction extends Action
 	private TeleplanS22Dao s22Dao = SpringUtils.getBean(TeleplanS22Dao.class);
 	private TeleplanC12Dao c12Dao = SpringUtils.getBean(TeleplanC12Dao.class);
 
-	
-    /** Creates a new instance of GenTaAction */
-    public GenTaAction() {
-    }
-    
-    
+	/**
+	 * Creates a new instance of GenTaAction
+	 */
+	public GenTaAction()
+	{
+	}
     
     public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response)
     throws IOException, ServletException
     {
-        
-        
         MSPReconcile mspReconcile = new MSPReconcile();
-        
-        
+
         int recFlag = 0;
         String raNo = "";
-        String filename = (String) request.getAttribute("filename");// documentBean.getFilename();
+        String filename = (String) request.getAttribute("filename");
         
         String forwardPage = "S21";
-        
-        String filepath = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-        
-        FileInputStream file = new FileInputStream(filepath + filename);
-        BufferedReader input = new BufferedReader(new InputStreamReader(file));
+
+        FileInputStream file = FileFactory.getRemittanceFile(filename).toFileInputStream();
+	    BufferedReader input = new BufferedReader(new InputStreamReader(file));
         String nextline;
 	    logger.info("Begin Remittance file parse: " + filename);
         
@@ -1410,9 +1409,4 @@ class C12{
     public String getT_filler() {
         return t_filler;
     }
-    
-    
 }
-
-
-/////

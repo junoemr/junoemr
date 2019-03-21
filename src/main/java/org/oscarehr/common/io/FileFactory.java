@@ -103,6 +103,24 @@ public class FileFactory
 	}
 
 	/**
+	 * load an existing remittance file with the given name
+	 * @param fileName - name of the file to load
+	 * @return - the file
+	 */
+	public static GenericFile getRemittanceFile(String fileName) throws IOException
+	{
+		// remittance files previously were saved to documents, if it is not in the new location, check the old
+		if(fileExists(GenericFile.BILLING_REMITTANCE_DIR, fileName))
+		{
+			return getExistingFile(GenericFile.BILLING_REMITTANCE_DIR, fileName);
+		}
+		else
+		{
+			return getDocumentFile(fileName);
+		}
+	}
+
+	/**
 	 * load an existing pending fax file with the given name
 	 * @param fileName - name of the file to load
 	 * @return - the file
@@ -160,7 +178,7 @@ public class FileFactory
 	{
 		File file = oldFile.getFileObject();
 
-		if(!file.exists() || !file.isFile())
+		if(!fileExists(file))
 		{
 			throw new IOException("Attempt to overwrite an invalid File: " + file.getPath());
 		}
@@ -261,7 +279,7 @@ public class FileFactory
 		logger.info("Load File: " + file.getPath());
 
 		GenericFile genFile;
-		if(file.exists() && file.isFile())
+		if(fileExists(file))
 		{
 			String fileContent = GenericFile.getContentType(file);
 			logger.info("FileContent: " + fileContent);
@@ -283,5 +301,15 @@ public class FileFactory
 			throw new FileNotFoundException("No Valid File Exists: " + file.getPath());
 		}
 		return genFile;
+	}
+
+	private static boolean fileExists(String folder, String fileName)
+	{
+		return fileExists(new File(folder, fileName));
+	}
+
+	private static boolean fileExists(File file)
+	{
+		return file.exists() && file.isFile();
 	}
 }

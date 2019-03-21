@@ -25,83 +25,63 @@
 
 package oscar.oscarBilling.ca.bc.Teleplan;
 
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
+import oscar.util.StringUtils;
+
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import org.apache.log4j.Logger;
-import org.oscarehr.util.MiscUtils;
-
-import oscar.OscarProperties;
 
 /**
  *
  * @author jay
  */
-public class TeleplanResponse {
-    static Logger log=MiscUtils.getLogger();
-    private String transactionNo = null;
-    private String result = null;
-    private String filename = null;
-    private String realFilename = null;
-    private String msgs = null;
-    private int lineCount = 0;
+public class TeleplanResponse
+{
+	private String transactionNo = null;
+	private String result = null;
+	private String filename = null;
+	private String realFilename = null;
+	private String msgs = null;
+	private int lineCount = 0;
 
-    /** Creates a new instance of TeleplanResponse */
-    public TeleplanResponse() {
-    }
-  
+	/**
+	 * Creates a new instance of TeleplanResponse
+	 */
+	public TeleplanResponse()
+	{
+	}
 
-	
-	
-    void processResponseStream(InputStream in){
-        try {
-            String directory = OscarProperties.getInstance().getProperty("DOCUMENT_DIR","./");
-            double randNum= Math.random();
-            String tempFile = directory+"teleplan.msp"+randNum;
-            BufferedReader bin = new BufferedReader(new InputStreamReader(in));
-            BufferedWriter out = new BufferedWriter(new FileWriter(tempFile));
+	void processResponseStream(InputStream in) throws IOException, InterruptedException
+	{
+		double randNum = Math.random();
+		GenericFile file = FileFactory.createTempFile(in, "teleplan.msp-" + randNum);
+		BufferedReader fileReader = new BufferedReader(new FileReader(file.getName()));
 
-            String str = "";
-            String lastLine = null;
-            while ((str = bin.readLine()) != null) {
-           //write str to temp file
-                lineCount++;
-                out.write(str+"\n");
-                log.debug(str);
-                lastLine = new String(str);
-            }
-            out.close();
-            bin.close();
-            lineCount--;
-            processLastLine(lastLine);
-            //If it has a filename same to
-            
-            if (this.getFilename() != null && !this.getFilename().trim().equals("")){
-               File file = new File(tempFile); 
-               realFilename = "teleplan"+this.getFilename()+randNum;
-               File file2 = new File(directory+realFilename);
-               boolean success = file.renameTo(file2);
-                if (!success) {
-                   log.error("File was not successfully renamed");
-                    // 
-                }
-            }
-            
-           
-        } catch (IOException e) {
-            MiscUtils.getLogger().error("Error", e);
-        }
-    }
-	
+		String line;
+		String lastLine = null;
+		while ((line = fileReader.readLine()) != null)
+		{
+			lineCount++;
+			lastLine = line;
+		}
+		fileReader.close();
+		processLastLine(lastLine);
+
+		if(!StringUtils.isNullOrEmpty(this.getFilename()))
+		{
+			file.rename("teleplan" + this.getFilename() + randNum);
+			file.moveToBillingRemitance();
+			realFilename = file.getName();
+		}
+	}
 	
     //#TID=001;Result=SUCCESS;Filename=TPBULET-I.txt;Msgs=;
     //	String str = "#TID=001;Result=SUCCESS;Filename=TPBULET-I.txt;Msgs
-    void processLastLine(String str){
+    private void processLastLine(String str){
         int idx = str.indexOf("Msgs=");
     	msgs = str.substring(idx+5,str.lastIndexOf(';'));
     	str = str.substring(0,idx);
@@ -114,10 +94,12 @@ public class TeleplanResponse {
         idx = str.indexOf("#TID=");
         transactionNo = str.substring(idx+5,str.lastIndexOf(';'));
     }
-		
-    public String toString(){
-        return "#TID="+getTransactionNo()+";Result="+getResult()+";Filename="+getFilename()+";Msgs="+getMsgs()+"; NUM LINES "+lineCount+" REALFILNAME ="+realFilename;
-    }
+
+	public String toString()
+	{
+		return "#TID=" + getTransactionNo() + ";Result=" + getResult() + ";Filename=" + getFilename() +
+				";Msgs=" + getMsgs() + "; NUM LINES " + lineCount + " REALFILNAME =" + realFilename;
+	}
 
     public String getTransactionNo() {
         return transactionNo;
@@ -146,10 +128,10 @@ public class TeleplanResponse {
     public String getMsgs() {
         return msgs;
     }
-    
-    public File getFile(){
-        String directory = OscarProperties.getInstance().getProperty("DOCUMENT_DIR","./");
-        return new File (directory+realFilename);    
-    }
+
+	public File getFile() throws IOException
+	{
+		return FileFactory.getRemittanceFile(realFilename).getFileObject();
+	}
 		
 }
