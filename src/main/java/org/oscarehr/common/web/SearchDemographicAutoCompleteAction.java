@@ -113,7 +113,7 @@ public class SearchDemographicAutoCompleteAction extends Action {
         DemographicCriteriaSearch demoCriteriaSearch = demoService.buildDemographicSearch(searchStr, searchMode, statusMode, sortMode);
         list = demographicDao.criteriaSearch(demoCriteriaSearch);
 
-        if (list.size() == 100)
+        if (list.size() == demoCriteriaSearch.getLimit())
         {
             MiscUtils.getLogger().warn("More results exists than returned");
         }
