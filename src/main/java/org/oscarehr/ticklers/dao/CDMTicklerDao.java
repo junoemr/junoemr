@@ -23,6 +23,8 @@
 
 package org.oscarehr.ticklers.dao;
 
+import org.oscarehr.common.model.Tickler;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.ticklers.model.CDMTicklerInfo;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -39,7 +41,7 @@ import java.util.List;
  * It does not use JPA or Hibernate mapping.
  */
 @Component
-@Transactional(propagation = Propagation.REQUIRED)
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class CDMTicklerDao
 {
 
@@ -65,7 +67,7 @@ public class CDMTicklerDao
                 "ON d.demographic_no = dxr.demographic_no " +
                 "AND dxr.dxresearch_code IN (:cdmCodes) " +
                 "AND dxr.status = 'A' " +
-                "AND d.patient_status = 'AC' " +
+                "AND d.patient_status = :patientStatus " +
             "JOIN billing_cdm_service_codes sc " +
                 "ON dxr.dxresearch_code = sc.cdmCode " +
             "LEFT JOIN (" +
@@ -77,12 +79,14 @@ public class CDMTicklerDao
                 "AND bm.billing_code = sc.serviceCode " +
             "LEFT JOIN tickler t ON t.demographic_no = d.demographic_no " +
                 "AND t.message LIKE CONCAT('%', 'SERVICE CODE ', sc.serviceCode, '%') " +
-                "AND t.status = 'A' " +
+                "AND t.status = :ticklerStatus " +
             "WHERE (billingstatus NOT IN ('D', 'R', 'F') " +
                 "AND (DATEDIFF(NOW(), bm.date) >= 365) OR bm.date IS NULL) " +
                 "AND t.tickler_no IS NULL");
 
+        query.setParameter("patientStatus", Demographic.PatientStatus.ACTIVE.toString());
         query.setParameter("cdmCodes", cdmDxCodes);
+        query.setParameter("ticklerStatus", Tickler.ACTIVE);
         List<Object[]> rawResult = query.getResultList();
 
         return toEntityList(rawResult);
@@ -119,11 +123,12 @@ public class CDMTicklerDao
             "JOIN tickler t " +
                 "ON t.demographic_no = d.demographic_no " +
                 "AND t.message LIKE CONCAT('%', 'SERVICE CODE ', sc.serviceCode, '%') " +
-                "AND t.status = 'A' " +
+                "AND t.status = :ticklerStatus " +
             "WHERE billingstatus NOT IN ('D', 'R', 'F') " +
             "AND DATEDIFF(NOW(), bm.date) <= 365");
 
         query.setParameter("cdmTicklerDxCodes", cdmTicklerDxCodes);
+        query.setParameter("ticklerStatus", Tickler.ACTIVE);
         List<Object[]> rawResult = query.getResultList();
 
         return toEntityList(rawResult);

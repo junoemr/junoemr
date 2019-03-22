@@ -34,7 +34,6 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import oscar.OscarProperties;
@@ -64,6 +63,7 @@ public class CDMTicklerReminderService implements ServletContextListener
 {
 
     private static final Logger logger = MiscUtils.getLogger();
+    private static final OscarProperties properties = OscarProperties.getInstance();
     private static ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private LoggedInInfo systemProviderSecurity;
 
@@ -94,8 +94,6 @@ public class CDMTicklerReminderService implements ServletContextListener
 
         initializeSecurity();
 
-        OscarProperties properties = OscarProperties.getInstance();
-
         if (properties.isBritishColumbiaInstanceType())
         {
             Long pollingFrequencyMs = Long.parseLong(properties.getProperty("ALERT_POLL_FREQUENCY"));
@@ -108,9 +106,13 @@ public class CDMTicklerReminderService implements ServletContextListener
         }
     }
 
+
+    /**
+     * Create a mock LoggedInInfo object for the System User (provider_no -1)
+     */
     private void initializeSecurity()
     {
-        LoggedInInfo systemUser= new LoggedInInfo();
+        LoggedInInfo systemUser = new LoggedInInfo();
         Security security = new Security();
         security.setSecurityNo(0);
         Provider provider = providerDao.getProvider(Provider.SYSTEM_PROVIDER_NO);
@@ -119,8 +121,13 @@ public class CDMTicklerReminderService implements ServletContextListener
         systemProviderSecurity = systemUser;
     }
 
-    @Transactional
-    protected void deleteBilledTicklers(List<Integer> cdmDxCodes)       // protected access modifier because @Transactional requires method to be overridable
+
+    /**
+     * Archive CDM ticklers if they have been billed
+     *
+     * @param cdmDxCodes list of CDM diagnosis codes to search for billed ticklers.
+     */
+    private void deleteBilledTicklers(List<Integer> cdmDxCodes)
     {
         try
         {
@@ -140,20 +147,34 @@ public class CDMTicklerReminderService implements ServletContextListener
         }
         catch (Exception e)
         {
+            // Explicitly catch any exceptions and log them here because the thread will die silently and swallow any
+            // error messages if allowed to propagate up.
             logger.error(e.getMessage());
         }
     }
 
-    @Transactional
-    protected void createUnbilledTicklers(List<Integer> cdmDxCodes)     // protected access modifier because @Transactional requires method to be overridable
+
+    /**
+     * Create CDM ticklers if they have never been billed, of it they can be billed again because the last billing
+     * was outside the current billing period
+     *
+     * @param cdmDxCodes list of CDM codes to create ticklers for
+     */
+    private void createUnbilledTicklers(List<Integer> cdmDxCodes)
     {
         try
         {
             List<CDMTicklerInfo> cdmPatientsToUpdate = cdmTicklerDao.getCDMTicklerCreationInfo(cdmDxCodes);
-            createReminderTicklers(cdmPatientsToUpdate);
+
+            for (CDMTicklerInfo cdmPatient : cdmPatientsToUpdate)
+            {
+                GenerateReminderTickler(cdmPatient);
+            }
         }
         catch (Exception e)
         {
+            // Explicitly catch any exceptions and log them here because the thread will die silently and swallow any
+            // error messages if allowed to propagate up.
             logger.error(e.getMessage());
         }
     }
@@ -169,6 +190,7 @@ public class CDMTicklerReminderService implements ServletContextListener
     {
         scheduler.shutdownNow();
     }
+
 
     /**
      * Return a List of CDM dx codes from the database
@@ -190,14 +212,12 @@ public class CDMTicklerReminderService implements ServletContextListener
     }
 
 
-    private void createReminderTicklers(List<CDMTicklerInfo> ticklerInfoList)
-    {
-        for (CDMTicklerInfo ticklerInfo : ticklerInfoList)
-        {
-            GenerateReminderTickler(ticklerInfo);
-        }
-    }
-
+    /**
+     * Create reminder ticklers for CDM billings if the billing has never been done, or if no billing has occured
+     * for the billing period.  The ticklers created have the same creator and recipient.
+     *
+     * @param ticklerInfo Tickler data
+     */
     private void GenerateReminderTickler(CDMTicklerInfo ticklerInfo)
     {
         String createMessage = "SERVICE CODE %s - Never billed for this patient";
@@ -221,9 +241,10 @@ public class CDMTicklerReminderService implements ServletContextListener
         }
     }
 
+
     /**
-     * Run the CDM reminder task asynchronously.  Every cycle the delete task will be called.  Call the update task
-     * if it's been at least six hours since it was last run.
+     * Run the CDM reminder task asynchronously.  Every cycle the delete task will be called to remove billed
+     * CDM ticklers for quick feedback.  The update task is less important and is only called every 6 hours.
      */
     private class ProcessTicklersAsyncJob implements Runnable
     {

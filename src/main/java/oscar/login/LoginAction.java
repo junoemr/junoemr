@@ -360,9 +360,6 @@ public final class LoginAction extends DispatchAction {
                 }
             }
 
-            //CDMTicklerReminderService thing = SpringUtils.getBean(CDMTicklerReminderService.class);
-            //thing.contextInitialized(null);
-            
 		    MyOscarUtils.attemptMyOscarAutoLoginIfNotAlreadyLoggedIn(loggedInInfo, true);
             
             List<Integer> facilityIds = providerDao.getFacilityIds(provider.getProviderNo());
