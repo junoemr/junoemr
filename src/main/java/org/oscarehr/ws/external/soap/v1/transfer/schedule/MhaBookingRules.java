@@ -28,6 +28,7 @@ import org.oscarehr.common.model.Appointment;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
@@ -39,6 +40,22 @@ import java.util.Map;
 
 public class MhaBookingRules
 {
+    private static final String BOOKING_RULES_BLACKOUT = "blackout";
+    private static final String BOOKING_RULES_CUTOFF = "cutoff";
+    private static final String BOOKING_RULES_MULTI = "multi";
+
+    private static final String BLACKOUT_RULE_DAYS = "blackout_now_until_day";
+    private static final String CUTOFF_RULE_DAYS = "days";
+
+    private static final String RULE_PERIOD_TYPE = "period_type";
+    private static final String RULE_PERIOD_TIME = "period_time";
+    private static final String RULE_PERIOD_OF_TIME = "period_of_time";
+    private static final String RULE_BOOKINGS = "bookings";
+
+    private static final String DAY_RULES = "day_rules";
+    private static final String WEEK_RULES = "week_rules";
+    private static final String MONTH_RULES = "month_rules";
+
     private Map<String, Object> bookingRules;
 
     private LocalDateTime blackOutEndDateTime;
@@ -64,22 +81,22 @@ public class MhaBookingRules
         Integer blackOutHours;
         LocalDateTime blackOutEndDateTime = LocalDateTime.now();
 
-        Map<String, Object> blackOutMap = (Map<String, Object>) this.bookingRules.get("blackout");
+        Map<String, Object> blackOutMap = (Map<String, Object>) this.bookingRules.get(BOOKING_RULES_BLACKOUT);
 
-        String blackOutPeriodType = (String) blackOutMap.get("period_type");
+        String blackOutPeriodType = (String) blackOutMap.get(RULE_PERIOD_TYPE);
 
-        blackOutHours = (Integer) blackOutMap.get("period_time");
-        blackOutHours = blackOutPeriodType.equals("blackout_now_until_day") ? blackOutHours * 24 : blackOutHours;
+        blackOutHours = (Integer) blackOutMap.get(RULE_PERIOD_TIME);
+        blackOutHours = blackOutPeriodType.equals(BLACKOUT_RULE_DAYS) ? blackOutHours * 24 : blackOutHours;
 
         this.blackOutEndDateTime = blackOutEndDateTime.plusHours(blackOutHours.longValue());
     }
 
     private void setCutOffEndDateTime()
     {
-        Map<String, Object> cutOffMap = (Map<String, Object>) this.bookingRules.get("cutoff");
+        Map<String, Object> cutOffMap = (Map<String, Object>) this.bookingRules.get(BOOKING_RULES_CUTOFF);
         LocalDateTime currentDateTime = LocalDateTime.now();
 
-        Integer cutOffDays = (Integer) cutOffMap.get("days");
+        Integer cutOffDays = (Integer) cutOffMap.get(CUTOFF_RULE_DAYS);
 
         this.cutOffEndDateTime = currentDateTime.plusDays(cutOffDays);
     }
@@ -91,7 +108,7 @@ public class MhaBookingRules
 
     private void setMultiBookingRules()
     {
-        this.multiBookingRules = (Map<String, List<Map<String, Integer>>>) this.bookingRules.get("multi");
+        this.multiBookingRules = (Map<String, List<Map<String, Integer>>>) this.bookingRules.get(BOOKING_RULES_MULTI);
     }
 
     public List<Integer> getMultiBookingRuleDays()
@@ -109,49 +126,55 @@ public class MhaBookingRules
      */
     public boolean scheduleSlotIsValid(LocalDateTime slot)
     {
-        if (blackOutRuleIsBroken(slot)) return false;
-        if (cutOffRuleIsBroken(slot)) return false;
+        if (blackOutRuleIsBroken(slot))
+        {
+            return false;
+        }
+        if (cutOffRuleIsBroken(slot))
+        {
+            return false;
+        }
 
         if (patientAppointments.size() > 0)
+        {
             return !multiBookRuleIsBroken(slot);
+        }
 
         return true;
     }
 
     // Patients can only book x number of appointments in x period of time
-    private boolean multiBookRuleIsBroken(LocalDateTime slot)
+    public boolean multiBookRuleIsBroken(LocalDateTime slot)
     {
-        List<Map<String, Integer>> dayRules = multiBookingRules.get("day_rules");
-        List<Map<String, Integer>> weekRules = multiBookingRules.get("week_rules");
-        List<Map<String, Integer>> monthRules = multiBookingRules.get("month_rules");
+        List<Map<String, Integer>> dayRules = multiBookingRules.get(DAY_RULES);
+        List<Map<String, Integer>> weekRules = multiBookingRules.get(WEEK_RULES);
+        List<Map<String, Integer>> monthRules = multiBookingRules.get(MONTH_RULES);
 
-        for (Map<String, Integer> dayRule : dayRules)
+        if (applyBookingRules(dayRules, DAY_RULES, slot))
         {
-            Integer appointmentCount = appointmentCountInTimePeriod("day_rules", dayRule, slot);
-
-            if (appointmentCount >= dayRule.get("bookings"))
-            {
-                this.invalidDates.put(slot.toLocalDate(), true);
-                return true;
-            }
+            return true;
         }
 
-        for (Map<String, Integer> weekRule : weekRules)
+        if (applyBookingRules(weekRules, WEEK_RULES, slot))
         {
-            Integer appointmentCount = appointmentCountInTimePeriod("week_rules", weekRule, slot);
-
-            if (appointmentCount >= weekRule.get("bookings"))
-            {
-                this.invalidDates.put(slot.toLocalDate(), true);
-                return true;
-            }
+            return true;
         }
 
-        for (Map<String, Integer> monthRule : monthRules)
+        if (applyBookingRules(monthRules, MONTH_RULES, slot))
         {
-            Integer appointmentCount = appointmentCountInTimePeriod("month_rules", monthRule, slot);
+            return true;
+        }
 
-            if (appointmentCount >= monthRule.get("bookings"))
+        return false;
+    }
+
+    private boolean applyBookingRules(List<Map<String, Integer>> multiBookingRules, String multiRuleType, LocalDateTime slot)
+    {
+        for (Map<String, Integer> rule : multiBookingRules)
+        {
+            Integer appointmentCount = appointmentCountInTimePeriod(multiRuleType, rule, slot);
+
+            if (appointmentCount >= rule.get(RULE_BOOKINGS))
             {
                 this.invalidDates.put(slot.toLocalDate(), true);
                 return true;
@@ -162,13 +185,13 @@ public class MhaBookingRules
     }
 
     // Patients can only book within x number of hours/days from the current time
-    private boolean blackOutRuleIsBroken(LocalDateTime slot)
+    public boolean blackOutRuleIsBroken(LocalDateTime slot)
     {
         return slot.isBefore(this.blackOutEndDateTime);
     }
 
     // Patients can only book up until x days in the future
-    private boolean cutOffRuleIsBroken(LocalDateTime slot)
+    public boolean cutOffRuleIsBroken(LocalDateTime slot)
     {
         if (slot.isAfter(this.cutOffEndDateTime))
         {
@@ -186,21 +209,33 @@ public class MhaBookingRules
 
         for (Appointment appointment : this.patientAppointments)
         {
-            LocalDate appointmentDate = LocalDate.parse(appointment.getAppointmentDate().toString());
-            LocalTime appointmentTime = LocalTime.parse(appointment.getStartTime().toString());
+            LocalDateTime appointmentDateTime;
 
-            LocalDateTime appointmentDateTime = LocalDateTime.of(appointmentDate, appointmentTime);
+            try
+            {
+                LocalDate appointmentDate = LocalDate.parse(appointment.getAppointmentDate().toString());
+                LocalTime appointmentTime = LocalTime.parse(appointment.getStartTime().toString());
 
-            int ruleTimePeriod = multiBookRule.get("period_of_time") - 1;
+                appointmentDateTime = LocalDateTime.of(appointmentDate, appointmentTime);
+            }
+            catch (Exception e)
+            {
+                DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                String appointmentDateStr = appointment.getAppointmentDate().toInstant().toString();
+
+                appointmentDateTime = LocalDateTime.parse(appointmentDateStr, dateFormat);
+            }
+
+            int ruleTimePeriod = multiBookRule.get(RULE_PERIOD_OF_TIME) - 1;
             LocalDateTime rulePeriodStart = LocalDateTime.of(slotDate.minusDays(ruleTimePeriod), LocalTime.MIN);
             LocalDateTime rulePeriodEnd = LocalDateTime.of(slotDate.plusDays(ruleTimePeriod), LocalTime.MAX);
 
-            if (ruleType.equals("week_rules"))
+            if (ruleType.equals(WEEK_RULES))
             {
                 rulePeriodStart = LocalDateTime.of(slotDate.minusWeeks(ruleTimePeriod).with(WeekFields.of(Locale.US).dayOfWeek(), 1L), LocalTime.MIN);
                 rulePeriodEnd = LocalDateTime.of(slotDate.plusWeeks(ruleTimePeriod).with(WeekFields.of(Locale.US).dayOfWeek(), 7L), LocalTime.MAX);
             }
-            else if (ruleType.equals("month_rules"))
+            else if (ruleType.equals(MONTH_RULES))
             {
                 rulePeriodStart = LocalDateTime.of(slotDate.minusMonths(ruleTimePeriod).withDayOfMonth(1), LocalTime.MIN);
                 rulePeriodEnd = LocalDateTime.of(slotDate.plusMonths(ruleTimePeriod).withDayOfMonth(slotDate.lengthOfMonth()), LocalTime.MAX);
@@ -230,18 +265,21 @@ public class MhaBookingRules
 
             for (Map<String, Integer> rule : period_rules)
             {
-                if (period_type.equals("day_rules"))
+                if (period_type.equals(DAY_RULES))
                 {
-                    multiBookingRuleDays.add(rule.get("period_of_time"));
+                    multiBookingRuleDays.add(rule.get(RULE_PERIOD_OF_TIME));
                 }
                 else
                 {
                     LocalDate slotDateMinusRule = firstSlotDate;
 
-                    if (period_type.equals("week_rules"))
-                        slotDateMinusRule = firstSlotDate.minusWeeks(rule.get("period_of_time"));
-                    if (period_type.equals("month_rules"))
-                        slotDateMinusRule = firstSlotDate.minusMonths(rule.get("period_of_time"));
+                    if (period_type.equals(WEEK_RULES))
+                    {
+                        slotDateMinusRule = firstSlotDate.minusWeeks(rule.get(RULE_PERIOD_OF_TIME));
+                    }
+                    if (period_type.equals(MONTH_RULES)) {
+                        slotDateMinusRule = firstSlotDate.minusMonths(rule.get(RULE_PERIOD_OF_TIME));
+                    }
 
                     Long daysBetween = ChronoUnit.DAYS.between(slotDateMinusRule, firstSlotDate);
                     multiBookingRuleDays.add(daysBetween.intValue());

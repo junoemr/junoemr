@@ -210,15 +210,13 @@ public class ScheduleManager {
 
 	public List<Appointment> getPatientAppointmentsWithProvider(String demographicNo, String providerNo, LocalDate lowDateCheck, LocalDate highDateCheck)
 	{
-		oscarAppointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
-
+		OscarAppointmentDao oscarAppointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 		return oscarAppointmentDao.findPatientAppointmentsWithProvider(demographicNo, providerNo, lowDateCheck, highDateCheck);
 	}
 
 	public Map<LocalDate, List<Appointment>> getProviderAppointmentsForMonth(String providerNo, LocalDate minDate, LocalDate maxDate)
 	{
-		oscarAppointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
-
+		OscarAppointmentDao oscarAppointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 		return oscarAppointmentDao.findProviderAppointmentsForMonth(providerNo, minDate, maxDate);
 	}
 

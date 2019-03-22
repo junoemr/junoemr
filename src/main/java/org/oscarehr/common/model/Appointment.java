@@ -50,6 +50,10 @@ import javax.persistence.TemporalType;
 @Table(name = "appointment")
 public class Appointment extends AbstractModel<Integer> implements Serializable {
 
+	public static final String CANCELLED = "C";
+	public static final String BILLED = "B";
+	public static final String NO_SHOW = "N";
+
 	public enum BookingSource
 	{
 		OSCAR,

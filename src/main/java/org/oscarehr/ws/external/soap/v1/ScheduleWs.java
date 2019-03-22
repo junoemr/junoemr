@@ -123,19 +123,20 @@ public class ScheduleWs extends AbstractWs {
 	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots(
 			String providerNo, Calendar date, String[] appointmentTypes, String demographicNo, String bookingRulesStr)
 	{
-		Map<String, Object> bookingRules = null;
+		HashMap<String, DayTimeSlots[]> scheduleTransfer = new HashMap<>();
 
 		try
 		{
-			bookingRules = new ObjectMapper().readValue(bookingRulesStr, new TypeReference<Map<String, Object>>(){});
+			Map<String, Object> bookingRules = new ObjectMapper().readValue(bookingRulesStr, new TypeReference<Map<String, Object>>(){});
+			ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(providerNo, date, appointmentTypes, demographicNo, bookingRules);
+			scheduleTransfer = providerScheduleTransfer.toTransfer();
 		}
 		catch(Exception e)
 		{
 			MiscUtils.getLogger().error("Exception: " + e);
 		}
 
-		ProviderScheduleTransfer scheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(providerNo, date, appointmentTypes, demographicNo, bookingRules);
-		return scheduleTransfer.toTransfer();
+		return scheduleTransfer;
 	}
 
 	public AppointmentTypeTransfer[] getAppointmentTypes() {

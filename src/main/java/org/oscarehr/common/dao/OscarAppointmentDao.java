@@ -997,20 +997,21 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 		return appointmentDetails;
 	}
 
-	public List<Appointment> findPatientAppointmentsWithProvider(String demographicNo, String providerNo, LocalDate lowDateCheck, LocalDate highDateCheck)
+	public List<Appointment> findPatientAppointmentsWithProvider(String demographicNo, String providerNo, LocalDate minDate, LocalDate maxDate)
 	{
 		String sql = "SELECT a FROM Appointment a\n" +
 					 "WHERE a.demographicNo = :demographicNo\n" +
 					 "AND a.providerNo = :providerNo\n" +
-	 				 "AND a.status != 'C'\n" +
-					 "AND a.appointmentDate BETWEEN :lowDateCheck AND :highDateCheck\n" +
+	 				 "AND a.status != :cancelledStatus\n" +
+					 "AND a.appointmentDate BETWEEN :minDate AND :maxDate\n" +
 					 "ORDER BY a.appointmentDate, a.startTime";
 
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("demographicNo", Integer.parseInt(demographicNo));
 		query.setParameter("providerNo", providerNo);
-		query.setParameter("lowDateCheck", java.sql.Date.valueOf(lowDateCheck));
-		query.setParameter("highDateCheck", java.sql.Date.valueOf(highDateCheck));
+		query.setParameter("minDate", java.sql.Date.valueOf(minDate));
+		query.setParameter("maxDate", java.sql.Date.valueOf(maxDate));
+		query.setParameter("cancelledStatus", Appointment.CANCELLED);
 
 		@SuppressWarnings("unchecked")
 		List<Appointment> results =  query.getResultList();
@@ -1024,7 +1025,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 
 		String sql = "SELECT a FROM Appointment a\n" +
 				"WHERE a.providerNo = :providerNo\n" +
-				"AND a.status != 'C'\n" +
+				"AND a.status != :cancelledStatus\n" +
 				"AND a.appointmentDate BETWEEN :minDate AND :maxDate\n" +
 				"ORDER BY a.appointmentDate, a.startTime";
 
@@ -1032,10 +1033,10 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 		query.setParameter("providerNo", providerNo);
 		query.setParameter("minDate", java.sql.Date.valueOf(minDate));
 		query.setParameter("maxDate", java.sql.Date.valueOf(maxDate));
+		query.setParameter("cancelledStatus", Appointment.CANCELLED);
 
 		@SuppressWarnings("unchecked")
 		List<Appointment> results =  query.getResultList();
-
 
         for (Appointment appointment : results)
         {
@@ -1043,14 +1044,14 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 
             List<Appointment> dayAppointments = monthlyAppointments.get(appointmentDate);
 
-            if (dayAppointments == null)
-                dayAppointments = new ArrayList<>();
+            if (dayAppointments == null) {
+				dayAppointments = new ArrayList<>();
+			}
 
             dayAppointments.add(appointment);
 
             monthlyAppointments.put(appointmentDate, dayAppointments);
         }
-
 
 		return monthlyAppointments;
 	}
