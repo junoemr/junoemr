@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.eform.EFormUtil;
+import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
 
@@ -143,17 +144,34 @@ public class ConsultationAttachmentService
 	public List<LabResultData> getUnattachedLabs(LoggedInInfo loggedInInfo, String demographicNo, String consultId)
 	{
 		CommonLabResultData labData = new CommonLabResultData();
-		return labData.populateLabResultsData(loggedInInfo, demographicNo, consultId, CommonLabResultData.UNATTACHED);
+		List<LabResultData> unfilteredLabs = labData.populateLabResultsData(loggedInInfo, demographicNo, consultId, CommonLabResultData.UNATTACHED);
+		return filterLabVersions(unfilteredLabs);
 	}
 	public List<LabResultData> getAllLabs(LoggedInInfo loggedInInfo, String demographicNo, String consultId)
 	{
 		//TODO refactor to single get when lab logic is re-worked
+		/* This relies on the unattached lab version being filtered (only latest is shown) but attached labs being unfiltered,
+		there is a case where old lab versions are attached and if those are filtered out,
+		they will not appear. It may look like a duplicate in this case. */
 		List<LabResultData> allLabs = getAttachedLabs(loggedInInfo, demographicNo, consultId);
 		allLabs.addAll(getUnattachedLabs(loggedInInfo, demographicNo, consultId));
 		Collections.sort(allLabs);
 		return allLabs;
 	}
-
+	/* This filters lab versions using the old logic from the jsp, so that only the latest version appears
+	 * TODO - refactor all this to the DAO */
+	private List<LabResultData> filterLabVersions(List<LabResultData> unfilteredLabs)
+	{
+		List<LabResultData> filteredLabs = new ArrayList<>(unfilteredLabs.size());
+		for(LabResultData lab : unfilteredLabs)
+		{
+			if(lab.labType.equals(LabResultData.HL7TEXT) && Hl7textResultsData.getMatchingLabs(lab.segmentID).endsWith(lab.segmentID))
+			{
+				filteredLabs.add(lab);
+			}
+		}
+		return filteredLabs;
+	}
 
 	public void setAttachedEForms(Integer consultId, String providerNo, List<Integer> idList)
 	{
