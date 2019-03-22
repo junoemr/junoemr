@@ -72,6 +72,10 @@ Juno.Common.Util.formatMomentTime = function formatMomentTime(d, format) {
 	return d.format(format);
 };
 
+Juno.Common.Util.formatMomentDateTimeNoTimezone = function formatMomentDateTimeNoTimezone(d) {
+	return d.format(Juno.Common.Util.settings.datetime_no_timezone_format);
+};
+
 Juno.Common.Util.getDateMoment = function getDateMoment(date_string)
 {
 	return moment.utc(date_string, Juno.Common.Util.settings.date_format, true);
@@ -108,12 +112,12 @@ Juno.Common.Util.validateDateString = function validateDateString(
 		var moment = Juno.Common.Util.getDateMoment(dateString);
 		if(!moment.isValid())
 		{
-			displayErrors.addFieldError(field, fieldDisplayName + ' is invalid');
+			displayErrors.add_field_error(field, fieldDisplayName + ' is invalid');
 		}
 	}
 	else if(required)
 	{
-		displayErrors.addFieldError(field, fieldDisplayName + 'is required');
+		displayErrors.add_field_error(field, fieldDisplayName + 'is required');
 	}
 };
 
@@ -125,12 +129,12 @@ Juno.Common.Util.validateTimeString = function validateTimeString(
 		var moment = Juno.Common.Util.getTimeMoment(timeString);
 		if (!moment.isValid())
 		{
-			displayErrors.addFieldError(field, fieldDisplayName + 'is invalid');
+			displayErrors.add_field_error(field, fieldDisplayName + 'is invalid');
 		}
 	}
 	else if (required)
 	{
-		displayErrors.addFieldError(field, fieldDisplayName + 'is required');
+		displayErrors.add_field_error(field, fieldDisplayName + 'is required');
 	}
 };
 

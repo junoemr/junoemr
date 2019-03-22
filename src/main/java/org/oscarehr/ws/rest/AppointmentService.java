@@ -27,12 +27,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.managers.AppointmentManager;
+import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.AppointmentConverter;
-import org.oscarehr.ws.rest.conversion.NewAppointmentConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.to.model.AppointmentTo1;
-import org.oscarehr.ws.rest.to.model.NewAppointmentTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -58,37 +56,54 @@ public class AppointmentService extends AbstractServiceImpl
 	@Path("/")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public RestResponse<AppointmentTo1> addAppointment(NewAppointmentTo1 appointmentTo)
+	public RestResponse<CalendarAppointment> addAppointment(CalendarAppointment calendarAppointment)
 	{
+		AppointmentConverter converter = new AppointmentConverter();
+		Appointment appointment = converter.getAsDomainObject(calendarAppointment);
 
-		NewAppointmentConverter converter = new NewAppointmentConverter();
-		Appointment appointment = converter.getAsDomainObject(getLoggedInInfo(), appointmentTo);
+		logger.info(calendarAppointment.toString());
+		logger.info(appointment.toString());
 
-		appointmentManager.addAppointment(getLoggedInInfo(), appointment);
+		Appointment savedAppointment =
+				appointmentManager.addAppointment(getLoggedInInfo(), appointment);
 
-		AppointmentTo1 responseAppointmentTo =
-				new AppointmentConverter().getAsTransferObject(getLoggedInInfo(), appointment);
+		CalendarAppointment responseAppointment = converter.getAsCalendarAppointment(savedAppointment);
 
-		return RestResponse.successResponse(responseAppointmentTo);
+		responseAppointment.setBillingRegion(calendarAppointment.getBillingRegion());
+		responseAppointment.setBillingForm(calendarAppointment.getBillingForm());
+		responseAppointment.setBillingRdohip(calendarAppointment.getBillingRdohip());
+		responseAppointment.setUserProviderNo(calendarAppointment.getUserProviderNo());
+		responseAppointment.setUserFirstName(calendarAppointment.getUserFirstName());
+		responseAppointment.setUserLastName(calendarAppointment.getUserLastName());
+
+		return RestResponse.successResponse(responseAppointment);
 	}
 
 	@PUT
 	@Path("/")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestResponse<AppointmentTo1> updateAppointment(AppointmentTo1 appointmentTo) throws Throwable
+	public RestResponse<CalendarAppointment> updateAppointment(CalendarAppointment calendarAppointment) throws Throwable
 	{
-
-		logger.info(appointmentTo.toString());
 		AppointmentConverter converter = new AppointmentConverter();
-		Appointment appointment = converter.getAsDomainObject(getLoggedInInfo(), appointmentTo);
+		Appointment appointment = converter.getAsDomainObject(calendarAppointment);
 
-		appointmentManager.updateAppointment(getLoggedInInfo(), appointment);
+		logger.info(calendarAppointment.toString());
+		logger.info(appointment.toString());
 
-		AppointmentTo1 responseAppointmentTo =
-				new AppointmentConverter().getAsTransferObject(getLoggedInInfo(), appointment);
+		Appointment savedAppointment =
+				appointmentManager.updateAppointment(getLoggedInInfo(), appointment);
 
-		return RestResponse.successResponse(responseAppointmentTo);
+		CalendarAppointment responseAppointment = converter.getAsCalendarAppointment(savedAppointment);
+
+		responseAppointment.setBillingRegion(calendarAppointment.getBillingRegion());
+		responseAppointment.setBillingForm(calendarAppointment.getBillingForm());
+		responseAppointment.setBillingRdohip(calendarAppointment.getBillingRdohip());
+		responseAppointment.setUserProviderNo(calendarAppointment.getUserProviderNo());
+		responseAppointment.setUserFirstName(calendarAppointment.getUserFirstName());
+		responseAppointment.setUserLastName(calendarAppointment.getUserLastName());
+
+		return RestResponse.successResponse(responseAppointment);
 	}
 
 	@DELETE
@@ -100,5 +115,17 @@ public class AppointmentService extends AbstractServiceImpl
 		appointmentManager.deleteAppointment(getLoggedInInfo(), appointmentNo);
 
 		return RestResponse.successResponse(appointmentNo);
+	}
+
+
+	@POST
+	@Path("/{appointmentNo}/rotate_status")
+	@Consumes("application/json")
+	@Produces("application/json")
+	public RestResponse<String> setNextStatus(@PathParam("appointmentNo") Integer appointmentNo)
+	{
+		String newStatus = appointmentManager.rotateStatus(getLoggedInInfo(), appointmentNo);
+
+		return RestResponse.successResponse(newStatus);
 	}
 }

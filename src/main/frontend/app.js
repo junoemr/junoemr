@@ -7,7 +7,6 @@ require('jquery-ui/themes/base/resizable.css');
 require('moment');
 require('angular');
 require('angular-ui-bootstrap');
-//require('angular-ui-calendar');
 require('angular-ui-router');
 require('angular-ui-router/release/stateEvents');
 require('fullcalendar-scheduler');
@@ -23,10 +22,8 @@ require('bootstrap-datepicker');
 require('bootstrap-datepicker/dist/css/bootstrap-datepicker.css');
 require('bootstrap-timepicker');
 require('ngstorage');
-require('./scss/juno.scss')
+require('./scss/juno.scss');
 require('font-awesome/css/font-awesome.min.css');
-// TODO: make sure this works, fix if it doesn't
-//require('components-font-awesome');
 
 
 var oscarApp = angular.module('oscarProviderViewModule', [
@@ -35,7 +32,6 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'ngResource',
 	'ui.bootstrap',
 	'ui.calendar',
-//	'cpCalendar',
 	'angular-loading-bar',
 	'ngTable',
 	'ngStorage',

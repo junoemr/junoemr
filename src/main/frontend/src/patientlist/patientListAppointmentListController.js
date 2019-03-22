@@ -5,6 +5,7 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 	'$q',
 	'$filter',
 	'$uibModal',
+	'$state',
 	'Navigation',
 	'scheduleService',
 	'providerService',
@@ -16,6 +17,7 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 		$q,
 		$filter,
 		$uibModal,
+		$state,
 		Navigation,
 		scheduleService,
 		providerService,
@@ -27,10 +29,29 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 		controller.statusCodeMap = new Map();
 		controller.statuses = null;
 
-
 		controller.dateOptions = {
 			showWeeks: false
 		};
+
+
+		//=========================================================================
+		// Watches
+		//=========================================================================/
+
+		$scope.selectedDate = null;
+
+		$scope.$watch('selectedDate', function(newValue, oldValue)
+		{
+			if(newValue !== oldValue)
+			{
+				scheduleService.selectedDate = newValue;
+			}
+		});
+
+
+		//=========================================================================
+		// Load Remote Data
+		//=========================================================================/
 
 		scheduleService.getStatuses().then(
 			function success(results)
@@ -43,6 +64,11 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 				console.log(errors);
 			});
 
+
+		//=========================================================================
+		// Public Methods
+		//=========================================================================/
+
 		controller.getAppointmentStatusDescriptionByStatusCode = function (statusCode)
 		{
 			let status = controller.statusCodeMap.get(statusCode);
@@ -53,6 +79,7 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 			}
 			return description;
 		};
+
 		controller.getAppointmentStatusColourByStatusCode = function (statusCode)
 		{
 			let status = controller.statusCodeMap.get(statusCode);
@@ -195,6 +222,11 @@ angular.module('PatientList').controller('PatientList.PatientListAppointmentList
 				{
 					console.log(errors);
 				});
+		};
+
+		controller.isScheduleActive = function isScheduleActive()
+		{
+			return $state.current.name == 'schedule';
 		};
 	}
 ]);

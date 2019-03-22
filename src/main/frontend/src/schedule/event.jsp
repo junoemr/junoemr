@@ -69,7 +69,7 @@
 				<div class="col-sm-6">
 
 					<div class="form-group"
-						 ng-class="{ 'has-error': displayMessages.fieldErrors()['start_date'] }">
+						 ng-class="{ 'has-error': displayMessages.field_errors()['startDate'] }">
 
 						<label class="control-label col-sm-12">
 							Start Time:
@@ -79,7 +79,7 @@
 							<ca-field-date
 									ca-template="bare"
 									ca-date-picker-id="start-date-picker"
-									ca-name="start_date"
+									ca-name="startDate"
 									ca-model="eventData.startDate"
 									ca-orientation="auto"
 							></ca-field-date>
@@ -88,7 +88,7 @@
 						<div class="col-sm-6 time-wrapper">
 							<ca-field-time
 									ca-template="bare"
-									ca-name="start_time"
+									ca-name="startTime"
 									ca-model="eventData.startTime"
 									ca-minute-step="parentScope.timeIntervalMinutes()">
 							</ca-field-time>
@@ -97,7 +97,7 @@
 					</div>
 
 					<div class="form-group"
-						 ng-class="{ 'has-error': displayMessages.fieldErrors()['end_date'] }">
+						 ng-class="{ 'has-error': displayMessages.field_errors()['endDate'] }">
 
 						<label class="control-label col-sm-12">
 							End Time:
@@ -107,7 +107,7 @@
 							<ca-field-date
 									ca-template="bare"
 									ca-date-picker-id="end-date-picker"
-									ca-name="end_date"
+									ca-name="endDate"
 									ca-model="eventData.endDate"
 									ca-orientation="auto"
 							></ca-field-date>
@@ -116,7 +116,7 @@
 						<div class="col-sm-6 time-wrapper">
 							<ca-field-time
 									ca-template="bare"
-									ca-name="end_time"
+									ca-name="endTime"
 									ca-model="eventData.endTime"
 									ca-minute-step="parentScope.timeIntervalMinutes()">
 							</ca-field-time>
@@ -141,7 +141,7 @@
 							  style="background-color: {{selectedEventStatus.color}};"></span>
 					</div>
 
-					<div class="form-group" ng-class="{'has-error': displayMessages.fieldErrors()['location']}">
+					<div class="form-group" ng-class="{'has-error': displayMessages.field_errors()['location']}">
 						<label for="input-site" class="control-label col-sm-12">
 							Site:
 						</label>
@@ -175,17 +175,17 @@
 							</div>
 						</div>
 						<div class="pull-left info">
-							<div>{{ templateEvent.availability_type.name }}</div>
+							<div>{{ templateEvent.availabilityType.description}}</div>
 
 							<div class="availability-detail">
 								{{ templateEvent.start.format('h:mma') }} -
 								{{ templateEvent.end.format('h:mma') }}
 							</div>
 							<a class="availability-detail"
-							   ng-show="templateEvent.availability_type.preferred_event_length_minutes != null"
+							   ng-show="templateEvent.availabilityType.duration != null"
 							   href=""
-							   ng-click="setEventLength(templateEvent.availability_type.preferred_event_length_minutes)">
-								({{ templateEvent.availability_type.preferred_event_length_minutes }} minutes)
+							   ng-click="setEventLength(templateEvent.availabilityType.duration)">
+								({{ templateEvent.availabilityType.duration }} minutes)
 							</a>
 						</div>
 					</div>
@@ -238,27 +238,12 @@
 						</label>
 
 						<div class="col-sm-12">
-							<!--
-							<input type="text"
-								   id="input-patient"
-								   ng-model="autocompleteValues.patient"
-								   placeholder="Patient"
-								   uib-typeahead="pt.data.full_name for pt in parentScope.searchPatients($viewValue)"
-								   typeahead-on-select="onSelectPatient($item, $model, $label)"
-								   class="form-control"
-								   autocomplete="off"/>
-
-							<input type="text"
-								   ng-model="appointmentAddCtrl.appointment.demographicName" placeholder="Patient"
-								   uib-typeahead="pt.demographicNo as pt.name for pt in appointmentAddCtrl.searchPatients($viewValue)"
-								   typeahead-on-select="appointmentAddCtrl.updateDemographicNo($item, $model, $label)"
-								   class="form-control form-control-details">
-							-->
-
 							<juno-patient-search-typeahead
 									id="input-patient"
 									juno-model="patientTypeahead"
-									juno-placeholder="Patient">
+									juno-placeholder="Patient"
+									juno-on-add-fn="newDemographic"
+							>
 							</juno-patient-search-typeahead>
 						</div>
 

@@ -16,27 +16,35 @@
 	top: 65px;
 }
 
+#calendar-container
+{
+  //border: 2px solid blue;
+  //height: 1000px;
+	/*
+        position: fixed;
+        top: 100px;
+        left: 100px;
+        right: 200px;
+        bottom: 200px;
+    */
+}
+
+.fc-view-container {
+	background: #f6f6f6;
+	overflow-x: scroll;
+}
+
+.fc-view.fc-agendaDay-view.fc-agendaDay-view
+{
+    width: 100%;
+}
+
+.fc-view.fc-agendaTwoDay-view.fc-agenda-view{
+    width: 100%;
+}
+
 .calendar
 {
-/*	overflow-x: auto;
-	table
-	{
-		table-layout: fixed;
-	}
-
-	.fc-widget-header
-	{
-		width:100px;
-	}
-	.fc-widget-content
-	{
-		width:100px;
-	}
-	.fc-resourceName
-	{
-		background-color:aliceblue;
-		width:150px;
-	}*/
 
 	.fc-toolbar
 	{
@@ -70,14 +78,14 @@
 				display: none;
 			}
 
-			.event-status
+			span.event-status, span.event-encounter, span.event-invoice, span.event-demographic, span.event-rx
 			{
 				display: inline-block;
 				width: 18px;
 				text-align: center;
 			}
 
-			.event-status.rotate
+			span.event-status.rotate, span.event-encounter, span.event-invoice, span.event-demographic, span.event-rx
 			{
 				background-color: #EEE;
 				color: #000;
@@ -86,35 +94,22 @@
 
 			.event-invoice
 			{
-				display: inline-block;
-				width: 18px;
-				text-align: center;
 				margin: 0 2px 0 2px;
-				background-color: #EEE;
-				color: #000;
-				text-shadow: none;
 			}
 
 			.event-demographic
 			{
-				display: inline-block;
-				width: 18px;
-				text-align: center;
 				margin: 0 2px 0 0;
-				background-color: #EEE;
-				color: #000;
-				text-shadow: none;
+			}
+
+			.event-rx
+			{
+				margin: 0 2px 0 0;
 			}
 
 			.event-note
 			{
-				display: inline-block;
-				width: 18px;
-				text-align: center;
 				margin: 0 4px 0 0;
-				background-color: #EEE;
-				color: #000;
-				text-shadow: none;
 			}
 
 			.event-tags

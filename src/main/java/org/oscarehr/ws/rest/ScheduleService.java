@@ -29,6 +29,8 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -38,6 +40,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.util.DateUtils;
 import org.oscarehr.appointment.dto.CalendarAppointmentStatus;
@@ -429,6 +434,10 @@ public class ScheduleService extends AbstractServiceImpl {
 		@QueryParam("site") String siteName
 	)
 	{
+		Message message = PhaseInterceptorChain.getCurrentMessage();
+		HttpServletRequest request = (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
+		HttpSession session = request.getSession(true);
+
 		LocalDate startDate = ConversionUtils.dateStringToNullableLocalDate(startDateString);
 		LocalDate endDate = ConversionUtils.dateStringToNullableLocalDate(endDateString);
 
@@ -441,7 +450,7 @@ public class ScheduleService extends AbstractServiceImpl {
 		}
 
 		List<CalendarEvent> calendarEvents =
-			scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
+			scheduleService.getCalendarEvents(session, providerId, startDate, endDate, siteName);
 
 		return RestSearchResponse.successResponseOnePage(calendarEvents);
 	}

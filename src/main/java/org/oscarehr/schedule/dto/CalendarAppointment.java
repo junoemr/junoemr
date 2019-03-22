@@ -22,12 +22,19 @@
  */
 package org.oscarehr.schedule.dto;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class CalendarAppointment
+public class CalendarAppointment implements Serializable
 {
 	private Integer appointmentNo;
+	private String billingRegion;
+	private String billingForm;
+	private String billingRdohip;
+	private String userProviderNo;
+	private String userFirstName;
+	private String userLastName;
 	private LocalDate demographicDob;
 	private String demographicName;
 	private String demographicPhone;
@@ -46,7 +53,11 @@ public class CalendarAppointment
 	private boolean tagSelfCancelled;
 	private String tagSystemCodes;
 
-	public CalendarAppointment(Integer appointmentNo, LocalDate demographicDob,
+	public CalendarAppointment()
+	{}
+
+	public CalendarAppointment(Integer appointmentNo, String billingRegion, String billingForm,
+		String billingRdohip, String userProviderNo, String userFirstName, String userLastName, LocalDate demographicDob,
 		String demographicName, String demographicPhone,
 		Integer demographicNo, Integer providerNo,
 		LocalDateTime startTime, LocalDateTime endTime, String eventStatusCode,
@@ -54,6 +65,12 @@ public class CalendarAppointment
 		String site, boolean tagSelfBooked, boolean tagSelfCancelled, String tagSystemCodes)
 	{
 		this.appointmentNo = appointmentNo;
+		this.billingRegion = billingRegion;
+		this.billingForm = billingForm;
+		this.billingRdohip = billingRdohip;
+		this.userProviderNo = userProviderNo;
+		this.userFirstName = userFirstName;
+		this.userLastName = userLastName;
 		this.demographicDob = demographicDob;
 		this.demographicName = demographicName;
 		this.demographicPhone = demographicPhone;
@@ -81,6 +98,66 @@ public class CalendarAppointment
 	public void setAppointmentNo(Integer appointmentNo)
 	{
 		this.appointmentNo = appointmentNo;
+	}
+
+	public String getBillingRegion()
+	{
+		return billingRegion;
+	}
+
+	public void setBillingRegion(String billingRegion)
+	{
+		this.billingRegion = billingRegion;
+	}
+
+	public String getBillingForm()
+	{
+		return billingForm;
+	}
+
+	public void setBillingForm(String billingForm)
+	{
+		this.billingForm = billingForm;
+	}
+
+	public String getBillingRdohip()
+	{
+		return billingRdohip;
+	}
+
+	public String getUserProviderNo()
+	{
+		return userProviderNo;
+	}
+
+	public void setUserProviderNo(String userProviderNo)
+	{
+		this.userProviderNo = userProviderNo;
+	}
+
+	public String getUserFirstName()
+	{
+		return userFirstName;
+	}
+
+	public void setUserFirstName(String userFirstName)
+	{
+		this.userFirstName = userFirstName;
+	}
+
+	public String getUserLastName()
+	{
+		return userLastName;
+	}
+
+	public void setUserLastName(String userLastName)
+	{
+		this.userLastName = userLastName;
+	}
+
+	public void setBillingRdohip(String billingRdohip)
+	{
+		this.billingRdohip = billingRdohip;
 	}
 
 	public LocalDate getDemographicDob()

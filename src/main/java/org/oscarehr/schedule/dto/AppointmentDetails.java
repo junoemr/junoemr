@@ -54,6 +54,7 @@ public class AppointmentDetails
 	private String ver;
 	private String hin;
 	private String chart_no;
+	private String familyDoctor;
 	private String rosterStatus;
 	private LocalDate hcRenewDate;
 	private String custNotes;
@@ -90,6 +91,7 @@ public class AppointmentDetails
 		String ver,
 		String hin,
 		String chart_no,
+		String familyDoctor,
 		String rosterStatus,
 		LocalDate hcRenewDate,
 		String custNotes,
@@ -126,6 +128,7 @@ public class AppointmentDetails
 		this.ver = ver;
 		this.hin = hin;
 		this.chart_no = chart_no;
+		this.familyDoctor = familyDoctor;
 		this.rosterStatus = rosterStatus;
 		this.hcRenewDate = hcRenewDate;
 		this.custNotes = custNotes;
@@ -304,5 +307,10 @@ public class AppointmentDetails
 	public String getChart_no()
 	{
 		return chart_no;
+	}
+
+	public String getFamilyDoctor()
+	{
+		return familyDoctor;
 	}
 }

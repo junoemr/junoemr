@@ -55,7 +55,9 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 		OSCAR,
 		MYOSCAR_SELF_BOOKING
 	}
-	
+
+	public static final int DEFAULT_REASON_CODE = 17;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "appointment_no")
@@ -243,6 +245,26 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 
 	public String getStatus() {
 		return status;
+	}
+
+	public String getAppointmentStatus()
+	{
+		if(status != null && status.length() > 0)
+		{
+			return status.substring(0, 1);
+		}
+
+		return null;
+	}
+
+	public String getAppointmentStatusModifier()
+	{
+		if(status != null && status.length() > 1)
+		{
+			return status.substring(1,2);
+		}
+
+		return null;
 	}
 
 	public void setStatus(String status) {

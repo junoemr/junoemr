@@ -40,6 +40,8 @@ angular.module("Common.Services").service("scheduleService", [
 
 		service.apiPath = '../ws/rs/';
 
+		service.selectedDate = null;
+
 		service.getStatuses = function getStatuses()
 		{
 			var deferred = $q.defer();

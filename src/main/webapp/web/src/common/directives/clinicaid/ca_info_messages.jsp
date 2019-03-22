@@ -6,7 +6,7 @@
 	</div>
 
 	<div class="alert alert-info" ng-show="saving">
-		{{errors.saving_message}}
+		{{errors.savingMessage}}
 	</div>
 
 	<div ng-if="errors.has_standard_success()"

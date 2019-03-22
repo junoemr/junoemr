@@ -28,6 +28,7 @@ import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -37,6 +38,8 @@ import oscar.util.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -45,8 +48,9 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 
 	private boolean includeDemographic;
 	private boolean includeProvider;
-	
+
 	private DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+
 	private ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 
 	protected Logger logger = MiscUtils.getLogger();
@@ -59,9 +63,74 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		this.includeDemographic = includeDemographic;
 		this.includeProvider = includeProvider;
 	}
-	
+
+	public Appointment getAsDomainObject(CalendarAppointment t) throws ConversionException
+	{
+		logger.info(t);
+
+		Demographic demographic = demographicDao.getDemographicById(t.getDemographicNo());
+
+		// Copy the defaults from the old frontend
+		int demographicNo = 0;
+		String demographicName = "";
+		if (demographic != null)
+		{
+			demographicNo = demographic.getDemographicNo();
+			demographicName = demographic.getDisplayName();
+		}
+
+		Date adjustedAppointmentDate =
+				Date.from(t.getStartTime().toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+		Date adjustedStartDate = Date.from(t.getStartTime().atZone(ZoneId.systemDefault()).toInstant());
+
+		// Remove a minute off of the end date because that's how oscar does things.
+		Date adjustedEndDate = Date.from(t.getEndTime().minusMinutes(1).atZone(ZoneId.systemDefault()).toInstant());
+
+		Appointment appointment = new Appointment();
+
+		appointment.setId(t.getAppointmentNo());
+
+		appointment.setProviderNo(String.valueOf(t.getProviderNo()));
+		appointment.setAppointmentDate(adjustedAppointmentDate);
+		appointment.setStartTime(adjustedStartDate);
+		appointment.setEndTime(adjustedEndDate);
+		appointment.setName(demographicName);
+		appointment.setDemographicNo(demographicNo);
+		appointment.setNotes(t.getNotes());
+		appointment.setReason(t.getReason());
+		appointment.setLocation(t.getSite());
+		appointment.setStatus(t.getEventStatusCode());
+
+
+		//String resources = StringUtils.transformNullInEmptyString(t.getResources());
+		//String type = StringUtils.transformNullInEmptyString(t.getType());
+		//String urgency = StringUtils.transformNullInEmptyString(t.getUrgency());
+
+		/*
+		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
+		appointment.setCreateDateTime(t.getCreateDateTime());
+		appointment.setUpdateDateTime(t.getUpdateDateTime());
+		appointment.setCreatorSecurityId(t.getCreatorSecurityId());
+		appointment.setReasonCode(t.getReasonCode());
+		*/
+
+		//appointment.setType(type);
+		//appointment.setUrgency(urgency);
+		//appointment.setResources(resources);
+		//appointment.setProgramId(t.getProgramId());
+		//appointment.setStyle(t.getStyle());
+		//appointment.setBilling(t.getBilling());
+		//appointment.setImportedStatus(t.getImportedStatus());
+		//appointment.setRemarks(t.getRemarks());
+		//appointment.setBookingSource(t.getBookingSource());
+
+		return appointment;
+	}
+
 	@Override
-    public Appointment getAsDomainObject(LoggedInInfo loggedInInfo, AppointmentTo1 t) throws ConversionException {
+    public Appointment getAsDomainObject(LoggedInInfo loggedInInfo, AppointmentTo1 t) throws ConversionException
+	{
 		logger.info(t);
 
 
@@ -104,7 +173,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		if (demographic != null)
 		{
 			demographicNo = demographic.getDemographicNo();
-			demographicName = demographic.getFormattedName();
+			demographicName = demographic.getDisplayName();
 		}
 
 		String resources = StringUtils.transformNullInEmptyString(t.getResources());
@@ -143,8 +212,58 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		return appointment;
     }
 
+	public CalendarAppointment getAsCalendarAppointment(Appointment appointment)
+	{
+		Demographic demographic = demographicDao.getDemographicById(appointment.getDemographicNo());
+
+		LocalDate birthDate = null;
+		String displayName = null;
+		String phone = null;
+		Integer demographicNo = null;
+
+		if(demographic != null)
+		{
+
+			birthDate = demographic.getBirthDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			displayName = demographic.getDisplayName();
+			phone = demographic.getPhone();
+			demographicNo = demographic.getDemographicNo();
+		}
+
+		return new CalendarAppointment(
+				appointment.getId(),
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				birthDate,
+				displayName,
+				phone,
+				demographicNo,
+				Integer.parseInt(appointment.getProviderNo()),
+				appointment.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(),
+
+				// Add a minute to the end time because Oscar stores the minute before the end time
+				appointment.getEndTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(1),
+
+				appointment.getAppointmentStatus(),
+				appointment.getAppointmentStatusModifier(),
+				null,
+				appointment.getReason(),
+				appointment.getNotes(),
+				null,
+				appointment.getLocation(),
+				false,
+				false,
+				null
+		);
+	}
+
 	@Override
-    public AppointmentTo1 getAsTransferObject(LoggedInInfo loggedInInfo, Appointment d) throws ConversionException {
+    public AppointmentTo1 getAsTransferObject(LoggedInInfo loggedInInfo, Appointment d) throws ConversionException
+	{
 	   AppointmentTo1 t = new AppointmentTo1();
 	   
 	   BeanUtils.copyProperties(d, t);

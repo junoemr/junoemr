@@ -64,7 +64,7 @@
 	<%-- TODO move to a SCSS file and include in Juno SCSS/CSS --%>
 	<link href="../library/bootstrap/3.0.0/assets/css/bootstrap3_badge_colours.css" rel="stylesheet">
 
-</head>
+<link href="vendors~bundle.f95ee960d99227737a35.css" rel="stylesheet"><link href="bundle.dc5de70341b301f20a76.css" rel="stylesheet"></head>
 
 <body ng-controller="Layout.BodyController as bodyCtrl"
 	  ng-init="bodyCtrl.init()"
@@ -335,6 +335,16 @@
 				</div>
 			</div>
 
+			<div id="left-pane-calendar" ng-show="patientListAppointmentListCtrl.isScheduleActive();">
+				<div class="calendar-daypicker-container">
+					<div uib-datepicker
+						 ng-model="selectedDate"
+						 datepicker-options="{showWeeks: false}"
+						 class="well well-sm"
+					></div>
+				</div>
+			</div>
+
 			<div class="col-sm-12">
 				<div class="row" ng-cloak>
 					<%--<button type="button" class="btn btn-default" ng-click="refresh()" title="<bean:message key="patientList.refresh" bundle="ui"/>">
@@ -419,5 +429,5 @@
 <!-- Template code generated from the template jsps -->
 <jsp:include page="templates.jsp"/>
 
-<script type="text/javascript" src="runtime~bundle.2d868530a43b1e0176c1.js"></script><script type="text/javascript" src="vendors~bundle.288c4bee1d1abea71762.js"></script><script type="text/javascript" src="bundle.6caf26183ca06cd89437.js"></script></body>
+<script type="text/javascript" src="runtime~bundle.b9768e88f357c12a8f2d.js"></script><script type="text/javascript" src="vendors~bundle.f95ee960d99227737a35.js"></script><script type="text/javascript" src="bundle.dc5de70341b301f20a76.js"></script></body>
 </html>

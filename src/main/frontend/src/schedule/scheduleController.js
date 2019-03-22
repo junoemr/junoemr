@@ -10,6 +10,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 	'$http',
 	'$httpParamSerializer',
 	'$uibModal',
+	'$state',
 	'focusService',
 	'scheduleService',
 	'securityService',
@@ -22,6 +23,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$http,
 		$httpParamSerializer,
 		$uibModal,
+		$state,
 		focusService,
 		scheduleService,
 		securityService,
@@ -93,6 +95,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.scheduleAutoRefresh = null;
 		$scope.scheduleAutoRefreshMinutes = null;
 
+		$scope.scheduleService = scheduleService;
 
 
 		$scope.init = function init()
@@ -100,7 +103,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.uiConfig.calendar.defaultView = $scope.calendarViewName();
 
 			// XXX: loadScheduleTemplates seems to not be used
-			//$scope.loadScheduleTemplates().then(function()
+
 			//{
 				$scope.loadAvailabilityTypes().then(function()
 				{
@@ -201,7 +204,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			{
 				promise_array.push(
 					$scope.loadScheduleEvents(
-						$scope.schedules[i].uuid, $scope.selected_site_name, start, end));
+						$scope.schedules[i].uuid, $scope.selectedSiteName, start, end));
 			}
 
 			// once all the events are loaded, concat them together and callback
@@ -289,6 +292,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.refetchEvents = function refetchEvents()
 		{
 			$scope.calendar().fullCalendar('refetchEvents');
+		};
+
+		$scope.changeDate = function changeDate(date)
+		{
+			$scope.calendar().fullCalendar('gotoDate', date);
 		};
 
 		$scope.isAgendaView = function isAgendaView()
@@ -493,6 +501,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.eventSources.push($scope.calendarEvents);
 		};
 
+		$scope.updateEvent = function updateEvent(calEvent)
+		{
+			$scope.calendar().fullCalendar('updateEvent', calEvent);
+		};
+
 		$scope.timeIntervalMinutes = function timeIntervalMinutes()
 		{
 			return parseInt($scope.selectedTimeInterval.split(":")[1]);
@@ -506,27 +519,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			scheduleService.getScheduleTemplateCodes().then(
 				function success(results)
 				{
-					/*	Example JSON result (P is the oscar scheduletemplatecode.code)
-					var example_result = {
-						P: {
-							color: "#000000",
-							name: "Do Not Book",
-							preferred_event_length_minutes: null,
-							system_code: "unavailable",
-						},
-					};
-					*/
-
 					for(var i = 0; i < results.length; i++)
 					{
 						var result = results[i];
 
-						availabilityTypes[result.code] = {
-							color: result.color,
-							name: result.description,
-							preferred_event_length_minutes: result.duration,
-							system_code: null,
-						};
+						availabilityTypes[result.code] = angular.copy(result);
 					}
 
 					$scope.availabilityTypes = availabilityTypes;
@@ -677,43 +674,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			return deferred.promise;
 		};
 
-		$scope.saveEvent = function saveEvent(
-			editMode,
-			eventUuid,
-			startDatetime,
-			endDatetime,
-			eventData,
-			scheduleUuid,
-			selectedEventStatusCode,
-			demographicNo,
-			siteUuid
-		)
+		$scope.saveEvent = function saveEvent(editMode, calendarAppointment)
 		{
 			var deferred = $q.defer();
 
-			var dateString = Juno.Common.Util.formatMomentDate(startDatetime);
-
 			if(editMode)
 			{
-				var startDatetimeString = Juno.Common.Util.formatMomentTime(
-					startDatetime, Juno.Common.Util.settings.datetime_no_timezone_format);
-				var endDatetimeString = Juno.Common.Util.formatMomentTime(
-					endDatetime, Juno.Common.Util.settings.datetime_no_timezone_format);
-
-				var appointment =  {
-					"id": eventUuid,
-					"providerNo": scheduleUuid,
-					"appointmentDate": dateString,
-					"startTime": startDatetimeString,
-					"endTime": endDatetimeString,
-					"demographicNo": demographicNo,
-					"status": selectedEventStatusCode,
-					"notes": eventData.notes,
-					"reason": eventData.reason,
-					"location": siteUuid,
-				};
-
-				this.appointmentApi.updateAppointment(appointment).then(
+				this.appointmentApi.updateAppointment(calendarAppointment).then(
 					function(result)
 					{
 						deferred.resolve(result.data);
@@ -726,23 +693,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 			else
 			{
-				var startTimeString = Juno.Common.Util.formatMomentTime(startDatetime, "HH:mm");
-				var duration = moment.duration(endDatetime.diff(startDatetime)).asMinutes();
-
-				var newAppointment =  {
-					"providerNo": scheduleUuid,
-					"appointmentDate": dateString,
-					"startTime": startTimeString,
-					"duration": duration,
-					"demographicNo": demographicNo,
-					"status": selectedEventStatusCode,
-					"notes": eventData.notes,
-					"reason": eventData.reason,
-					"location": siteUuid,
-				};
-
-
-				$scope.appointmentApi.addAppointment(newAppointment).then(
+				$scope.appointmentApi.addAppointment(calendarAppointment).then(
 					function(result)
 					{
 						deferred.resolve(result.data);
@@ -750,36 +701,30 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					function (result)
 					{
 						deferred.reject(result.data);
-					});
+					}
+				);
 			}
 
 
 			return deferred.promise;
 		};
 
-		$scope.moveEvent = function moveEvent(appointment, delta)
+		$scope.moveEvent = function moveEvent(appointment, delta, adjustStartTime)
 		{
 			var deferred = $q.defer();
 
-			var eventData = {
-				reason: appointment.reason,
-				notes: appointment.notes
-			};
+			var startMoment = Juno.Common.Util.getDatetimeNoTimezoneMoment(appointment.startTime);
+			var endMoment = Juno.Common.Util.getDatetimeNoTimezoneMoment(appointment.endTime);
 
-			var start_moment = Juno.Common.Util.getDatetimeNoTimezoneMoment(appointment.start_time);
-			var end_moment = Juno.Common.Util.getDatetimeNoTimezoneMoment(appointment.end_time);
+			var movedAppointment = angular.copy(appointment);
 
-			$scope.saveEvent(
-				true,
-				appointment.appointment_uuid,
-				start_moment.add(delta.asMinutes(), 'minutes'),
-				end_moment.add(delta.asMinutes(), 'minutes'),
-				eventData,
-				appointment.schedule_uuid,
-				appointment.event_status_uuid,
-				appointment.demographics_patient_uuid,
-				appointment.site
-			).then(
+			if(adjustStartTime)
+			{
+				movedAppointment.startTime = Juno.Common.Util.formatMomentDateTimeNoTimezone(startMoment.add(delta.asMinutes(), 'minutes'));
+			}
+			movedAppointment.endTime = Juno.Common.Util.formatMomentDateTimeNoTimezone(endMoment.add(delta.asMinutes(), 'minutes'));
+
+			$scope.saveEvent(true, movedAppointment).then(
 				function success(data)
 				{
 					deferred.resolve(data.body);
@@ -870,59 +815,98 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.rotateEventStatus = function rotateEventStatus(calEvent)
 		{
-			if(!securityService.hasPermission('scheduling_create') )
-			{
-				return;
-			}
-
 			$scope.setCalendarLoading(true);
 
-			$scope.calendar_api_adapter.rotate_event_status(calEvent.data.uuid, $scope.rotate_statuses).then(
-				function success(event_data)
+			var appointmentNo = calEvent.data.appointmentNo;
+
+			$scope.appointmentApi.setNextStatus(appointmentNo).then(
+				function success(response)
 				{
+					var newStatus = response.data.body;
 
-					var event_status_uuid = event_data.event_status_uuid;
-					var event_status_color =
-						$scope.eventStatuses[event_status_uuid] ?
-							$scope.eventStatuses[event_status_uuid].color :
-							$scope.default_event_color;
-
-					calEvent.data.event_status_uuid = event_status_uuid;
-					calEvent.color = event_status_color;
-					// This is being set to an array because of a bug:
-					// https://github.com/fullcalendar/fullcalendar/issues/4011
-					calEvent.className = [$scope.calendar_api_adapter.event_class(event_status_color)];
+					calEvent.color = $scope.eventStatuses[newStatus].color;
+					calEvent.data.eventStatusCode = newStatus;
 
 					$scope.updateEvent(calEvent);
 
 					$scope.setCalendarLoading(false);
-				});
-
-			/*
-			event_model.load(uuid).then(
-				function success()
+				},
+				function failure(response)
 				{
-					var next_index = null;
-					for(var i = 0; i < rotate_statuses.length; i++)
-					{
-						if(rotate_statuses[i].uuid ===
-							event_model.data.event_status_uuid)
-						{
-							next_index = (i + 1) % rotate_statuses.length;
-							break;
-						}
-					}
 
-					event_model.data.event_status_uuid =
-						rotate_statuses[next_index].uuid;
+				}
+			);
+		};
 
-					event_model.save().then(
-						function success()
-						{
-							deferred.resolve(angular.copy(event_model.data));
-						});
-				});
-				*/
+		$scope.getBillingLink = function getBillingLink(calEvent)
+		{
+			var startMoment = Juno.Common.Util.getDatetimeNoTimezoneMoment(calEvent.data.startTime);
+
+			var appointmentDate = Juno.Common.Util.formatMomentDate(startMoment);
+			var startTime = Juno.Common.Util.formatMomentTime(startMoment);
+
+			var providerNo = calEvent.resourceId;
+
+			var referralNoParameter = "";
+			if(calEvent.data.billingRdohip)
+			{
+				referralNoParameter = "&referral_no_1=" + encodeURIComponent(calEvent.data.billingRdohip);
+			}
+
+			return "../billing.do" +
+				"?billRegion=" + encodeURIComponent(calEvent.data.billingRegion) +
+				"&billForm=" + encodeURIComponent(calEvent.data.billingForm) +
+				"&hotclick=" +
+				"&appointment_no=" + encodeURIComponent(calEvent.data.appointmentNo) +
+				"&demographic_name=" + encodeURIComponent(calEvent.data.demographicName) +
+				"&status=" + encodeURIComponent(calEvent.data.eventStatusCode) +
+				"&demographic_no=" + encodeURIComponent(calEvent.data.demographicNo) +
+				"&providerview=" + encodeURIComponent(providerNo) +
+				"&user_no=" + encodeURIComponent(calEvent.data.userProviderNo) +
+				"&apptProvider_no=" + encodeURIComponent(providerNo) +
+				"&appointment_date=" + encodeURIComponent(appointmentDate) +
+				"&start_time=" + encodeURIComponent(startTime) +
+				"&bNewForm=1" + referralNoParameter;
+		};
+
+		$scope.getEncounterLink = function getEncounterLink(calEvent)
+		{
+			// XXX: Perhaps link to the new encounter page?  Put in an option to choose new or old.
+			var providerNo = calEvent.resourceId;
+
+			var startMoment = Juno.Common.Util.getDatetimeNoTimezoneMoment(calEvent.data.startTime);
+
+			var appointmentDate = Juno.Common.Util.formatMomentDate(startMoment);
+			var startTime = Juno.Common.Util.formatMomentTime(startMoment);
+
+			return "../oscarEncounter/IncomingEncounter.do" +
+				"?providerNo=" + encodeURIComponent(providerNo) +
+				"&appointmentNo=" + encodeURIComponent(calEvent.data.appointmentNo) +
+				"&demographicNo=" + encodeURIComponent(calEvent.data.demographicNo) +
+				"&curProviderNo=" + encodeURIComponent(calEvent.data.userProviderNo) +
+				"&reason=" + encodeURIComponent(calEvent.data.reason) +
+				"&encType=" + encodeURIComponent("face to face encounter with client") +
+
+				"&userName=" + encodeURIComponent(calEvent.data.userFirstName + " " + calEvent.data.userLastName) +
+				"&curDate=" + encodeURIComponent(Juno.Common.Util.formatMomentDate(moment())) +
+
+				"&appointmentDate=" + encodeURIComponent(appointmentDate) +
+				"&startTime=" + encodeURIComponent(startTime) +
+				"&status=" + encodeURIComponent(calEvent.data.eventStatusCode) +
+				"&apptProvider_no=" + encodeURIComponent(providerNo) +
+				"&providerview=" + encodeURIComponent(providerNo);
+		};
+
+		$scope.getRxLink = function getRxLink(calEvent)
+		{
+			if (calEvent.data.demographicNo != 0)
+			{
+				var providerNo = calEvent.resourceId;
+
+				return "../oscarRx/choosePatient.do" +
+					"?providerNo=" + encodeURIComponent(providerNo) +
+					"&demographicNo=" + encodeURIComponent(calEvent.data.demographicNo);
+			}
 		};
 
 
@@ -946,18 +930,23 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				var eventStatusHtml = '';
 				var eventStatus =
 					$scope.eventStatuses[event.data.eventStatusCode];
+				var eventStatusRotate = Juno.Common.Util.exists(eventStatus.sortOrder);
 
 				if(Juno.Common.Util.exists(eventStatus) && Juno.Common.Util.exists(eventStatus.icon) &&
 					Juno.Common.Util.exists(event) && Juno.Common.Util.exists(event.data))
 				{
-					eventStatusHtml += "<img src='" + $scope.getIconPath(eventStatus.icon, event.data.eventStatusModifier) + "' />";
+					eventStatusHtml += "<img class='event-status";
+					if(eventStatusRotate)
+					{
+						eventStatusHtml += ' rotate';
+					}
+					eventStatusHtml += "' src='" + $scope.getIconPath(eventStatus.icon, event.data.eventStatusModifier) + "' />";
 				}
 				else
 				{
 					eventStatusHtml = '<span class="event-status';
 					if(Juno.Common.Util.exists(eventStatus))
 					{
-						var eventStatusRotate = Juno.Common.Util.exists(eventStatus.sortOrder);
 						if(eventStatusRotate)
 						{
 							eventStatusHtml += ' rotate ';
@@ -971,18 +960,14 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					}
 				}
 
-				var eventInvoiceHtml = '<span class="event-invoice';
-				if(event.data.numInvoices > 0)
-				{
-					eventInvoiceHtml += ' edit" title="View Invoice' +
-						(event.data.numInvoices > 1 ? "s" : "") + '">B</span>';
-				}
-				else
-				{
-					eventInvoiceHtml += '" title="Create Invoice">$</span>';
-				}
+				var eventEncounterHtml = '<span class="event-encounter" title="Open Encounter">E</span>';
 
-				console.log(event);
+				var eventInvoiceHtml = '<span class="event-invoice" title="Create Invoice">B</span>';
+
+				var eventDemographicHtml = '<span class="event-demographic" title="View Patient">M</span>';
+
+				var eventRxHtml = '<span class="event-rx" title="View Prescription">Rx</span>';
+
 				var eventDetails = "";
 				if(!Juno.Common.Util.isBlank(event.data.demographicName))
 				{
@@ -997,39 +982,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					eventDetails = Juno.Common.Util.escapeHtml(event.data.reason);
 				}
 
-				var eventDetailsHtml = "<span class='event-details' title='" + eventDetails + "'>" +
-					eventDetails + "</span>";
-
-				var eventDemographicHtml = "";
-				if(securityService.hasOneOfPermissions(['patient_view', 'patient_manage']) &&
-					Juno.Common.Util.exists(event.data.demographicNo))
-				{
-					eventDemographicHtml =
-						'<span class="event-demographic" title="View Patient">' +
-						'<i class="fa fa-user"></i></span>';
-				}
-
-				var eventNoteHtml = "";
-				if(securityService.hasOneOfPermissions(['chart_note_view', 'chart_note_manage']) &&
-					Juno.Common.Util.exists(event.data.demographicNo))
-				{
-					eventNoteHtml =
-						'<span class="event-note" title="Add Patient Note">' +
-						'<i class="fa fa-file-text-o"></i></span>';
-				}
-
-				var eventTagsHtml = '';
-				var tagClass = element.hasClass('text-light') ? 'icon-white' : '';
-
-				if(Juno.Common.Util.exists(event.data.tagNames))
-				{
-					eventTagsHtml = '<span class="event-tags" title="' +
-						event.data.tagNames.join(", ") +
-						'"><i class="icon ' + tagClass + ' icon-tags"/></span>';
-				}
-
-				$(element).find('.fc-content').html(eventSiteHtml + eventStatusHtml + eventInvoiceHtml +
-					eventDemographicHtml + eventNoteHtml + eventTagsHtml + eventDetailsHtml);
+				$(element).find('.fc-content').html(eventSiteHtml + eventStatusHtml + eventEncounterHtml +
+					eventInvoiceHtml + eventDemographicHtml + eventRxHtml + eventDetails);
 			}
 		};
 
@@ -1042,7 +996,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 
 			// Voodoo to set the resource view column width from https://stackoverflow.com/a/39297864
-			$("#ca-calendar").css('min-width',$('.fc-resource-cell').length*125);
+			$("#ca-calendar").css('min-width',$('.fc-resource-cell').length*200);
 		};
 
 		$scope.afterRender = function afterRender()
@@ -1050,13 +1004,14 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			// Voodoo to set the resource view column width from https://stackoverflow.com/a/39297864
 			$('.fc-agendaDay-button').click(function()
 			{
-				$("#schedule_container").css('min-width',$('.fc-resource-cell').length*125);
+				$("#schedule_container").css('min-width',$('.fc-resource-cell').length*200);
 			});
 		};
 
 		$scope.openCreateEventDialog = function openCreateEventDialog(
 			start, end, jsEvent, view, resource)
 		{
+			// XXX: share as much code as possible with edit event
 			if(!securityService.hasPermission('scheduling_create') )
 			{
 				return;
@@ -1091,13 +1046,15 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 				var data = {
 					schedule: modalSchedule,
-					default_event_status: null, //defaultEventStatus,
-					start_time: start,
-					end_time: end,
-					time_interval: $scope.timeIntervalMinutes(),
-					schedule_templates: $scope.scheduleTemplates,
-					availability_types: $scope.availabilityTypes,
-					sites: $scope.sites
+					defaultEventStatus: null, //defaultEventStatus,
+					startTime: start,
+					endTime: end,
+					timeInterval: $scope.timeIntervalMinutes(),
+					scheduleTemplates: $scope.scheduleTemplates,
+					availabilityTypes: $scope.availabilityTypes,
+					sites: $scope.sites,
+					events: $scope.events,
+					eventData: {}
 				};
 
 				$scope.dialog = $uibModal.open({
@@ -1111,7 +1068,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						parentScope: [function() { return $scope }],
 						data: [function() { return data }],
 						editMode: [function() { return false }],
-						//access_control: [function() {return securityService}],
 						keyBinding: [function() {return {bindKeyGlobal: function(){}}}],
 						focus: [function() {return focusService}],
 					}
@@ -1155,14 +1111,20 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.openPatientDemographic = function openPatientDemographic(calEvent)
 		{
-			console.log("Not implemented at this time.");
-		};
+			if (calEvent.data.demographicNo != 0)
+			{
+				var params = {
+					demographicNo: calEvent.data.demographicNo
+				};
 
-		$scope.openCreateChartNote = function openCreateChartNote(calEvent)
-		{
-			// XXX: are we going to do this?
+				if (angular.isDefined(calEvent.data.appointmentNo))
+				{
+					params.appointmentNo = calEvent.data.appointmentNo;
+					params.encType = "face to face encounter with client";
+				}
 
-			console.log("Not implemented at this time.");
+				$state.go('record.summary', params);
+			}
 		};
 
 		$scope.openEditEventDialog = function openEditEventDialog(calEvent)
@@ -1180,8 +1142,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 			$scope.openingDialog = true;
 
-			var scheduleUuid = calEvent.data.schedule_uuid;
-			var displayName = calEvent.data.demographics_patient_name;
+			var scheduleUuid = calEvent.resourceId;
+			var displayName = calEvent.data.demographicName;
 
 			if(displayName == null)
 			{
@@ -1197,19 +1159,16 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				var modalSchedule = angular.copy(schedule);
 				modalSchedule.display_name = displayName;
 
-				console.log(calEvent);
-
 				var data = {
-
 					schedule: modalSchedule,
-					default_event_status: null, //defaultEventStatus,
-					start_time: calEvent.start,
-					end_time: calEvent.end,
-					time_interval: $scope.timeIntervalMinutes(),
-					schedule_templates: $scope.scheduleTemplates,
-					availability_types: $scope.availabilityTypes,
+					defaultEventStatus: null, //defaultEventStatus,
+					startTime: calEvent.start,
+					endTime: calEvent.end,
+					timeInterval: $scope.timeIntervalMinutes(),
+					availabilityTypes: $scope.availabilityTypes,
 					sites: $scope.sites,
-					event_data: calEvent.data
+					events: $scope.events,
+					eventData: calEvent.data
 				};
 
 				$scope.dialog = $uibModal.open({
@@ -1223,7 +1182,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						parentScope: [function() { return $scope }],
 						data: [function() { return data }],
 						editMode: [function() { return true }],
-						//access_control: [function() {return securityService}],
 						keyBinding: [function() {return {bindKeyGlobal: function(){}}}],
 						focus: [function() {return focusService}],
 					}
@@ -1251,26 +1209,21 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			{
 				$scope.rotateEventStatus(calEvent);
 			}
-			else if($(jsEvent.target).is(".event-invoice.edit"))
+			else if($(jsEvent.target).is(".event-encounter"))
 			{
-				$scope.openViewInvoices(calEvent.data.uuid);
+				window.open($scope.getEncounterLink(calEvent));
 			}
 			else if($(jsEvent.target).is(".event-invoice"))
 			{
-				$scope.openCreateInvoice(
-					calEvent.data.uuid,
-					calEvent.data.schedule_uuid,
-					calEvent.data.demographics_patient_uuid);
+				window.open($scope.getBillingLink(calEvent));
 			}
-			else if($(jsEvent.target).is(".event-demographic") ||
-				$(jsEvent.target).parent().is(".event-demographic"))
+			else if($(jsEvent.target).is(".event-demographic"))
 			{
 				$scope.openPatientDemographic(calEvent);
 			}
-			else if($(jsEvent.target).is(".event-note") ||
-				$(jsEvent.target).parent().is(".event-note"))
+			else if($(jsEvent.target).is(".event-rx"))
 			{
-				$scope.openCreateChartNote(calEvent);
+				window.open($scope.getRxLink(calEvent));
 			}
 			else
 			{
@@ -1291,27 +1244,21 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			// load then update the start and end time based on the delta
 			$scope.setCalendarLoading(true);
 
-			$scope.moveEvent(calEvent.data, delta).then(
+			var appointment = angular.copy(calEvent.data);
+			appointment.providerNo = calEvent.resourceId
+
+			$scope.moveEvent(appointment, delta, true).then(
 				function success(eventData)
 				{
-					console.log(eventData);
-					console.log(calEvent);
-
-					/*
-					var startMoment = Juno.Common.Util.getDatetimeNoTimezoneMoment(eventData.startTime)
-					var endMoment = Juno.Common.Util.getDatetimeNoTimezoneMoment(eventData.endTime)
-					*/
-
 					var startMoment = moment(eventData.startTime, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
 					var endMoment = moment(eventData.endTime, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
 
-					calEvent.data.start_time = Juno.Common.Util.formatMomentTime(
+					calEvent.data.startTime = Juno.Common.Util.formatMomentTime(
 						startMoment, Juno.Common.Util.settings.datetime_no_timezone_format);
-					calEvent.data.end_time = Juno.Common.Util.formatMomentTime(
+					calEvent.data.endTime = Juno.Common.Util.formatMomentTime(
 						endMoment, Juno.Common.Util.settings.datetime_no_timezone_format);
 
-					calEvent.data.schedule_uuid = eventData.providerNo;
-					console.log(calEvent);
+					calEvent.data.providerNo = eventData.providerNo;
 
 					$scope.setCalendarLoading(false);
 
@@ -1335,16 +1282,27 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 			// event was extended by dragging the end of the event on the calendar:
 			// load then update the end time based on the delta
-			$scope.set_calendar_loading(true);
+			$scope.setCalendarLoading(true);
 
-			$scope.resizeEvent(calEvent.data.uuid, delta).then(
-				function success(event_data)
+			var appointment = angular.copy(calEvent.data);
+			appointment.providerNo = calEvent.resourceId
+
+			$scope.moveEvent(appointment, delta, false).then(
+				function success(eventData)
 				{
-					calEvent.data.end_time = event_data.end_time;
+					var startMoment = moment(eventData.startTime, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
+					var endMoment = moment(eventData.endTime, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
 
-					$scope.update_event(calEvent);
+					calEvent.data.startTime = Juno.Common.Util.formatMomentTime(
+						startMoment, Juno.Common.Util.settings.datetime_no_timezone_format);
+					calEvent.data.endTime = Juno.Common.Util.formatMomentTime(
+						endMoment, Juno.Common.Util.settings.datetime_no_timezone_format);
 
-					$scope.set_calendar_loading(false);
+					calEvent.data.providerNo = eventData.providerNo;
+
+					//$scope.update_event(calEvent);
+
+					$scope.setCalendarLoading(false);
 
 				}, function error(errors)
 				{
@@ -1352,8 +1310,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 					// revert on fail
 					revertFunc();
-					$scope.set_calendar_loading(false);
-				});
+					$scope.setCalendarLoading(false);
+				}
+			);
 		};
 
 		$scope.onSiteChanged = function onSiteChanged()
@@ -1407,20 +1366,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.loadScheduleOptions = function loadScheduleOptions()
 		{
 			var deferred = $q.defer();
-
-			/*
-				function success(results)
-				{
-					for(var i = 0; i < results.length; i++)
-					{
-						results[i].uuid = results[i].identifier;
-					}
-					deferred.resolve(results);
-				}
-			//);
-			*/
-
-			//$scope.loadScheduleOptions().then(
 
 			scheduleService.getScheduleGroups().then(
 				function success(results)
@@ -1527,6 +1472,20 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 
 		//=========================================================================
+		// Watches
+		//=========================================================================/
+
+		$scope.$watch('scheduleService.selectedDate', function(newValue, oldValue)
+		{
+			// avoid running first time this fires during initialization
+			if(newValue !== oldValue)
+			{
+				$scope.changeDate(newValue);
+			}
+		});
+
+
+		//=========================================================================
 		// Config Array
 		//=========================================================================/
 
@@ -1571,12 +1530,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		// Any changes to this array need to be applied by calling applyUiConfig()
 		$scope.uiConfig = {
 			calendar: {
-				height: 800,//$scope.get_schedule_height(),
+				height: 'auto', //$scope.get_schedule_height(),
 				nowIndicator: true,
 				header: {
-					left: 'title',
+					left: 'prev,next today title',
 					center: '',
-					right: 'today prev,next'
+					right: ''
 				},
 
 				allDaySlot: false,

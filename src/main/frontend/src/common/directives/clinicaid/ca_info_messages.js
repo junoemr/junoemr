@@ -10,17 +10,17 @@ angular.module('Common').directive(
 		field_value_map: '=?caFieldValueMap',
 		success_message: '@caSuccessMessage',
 		field_value_map_label_key: '@caFieldValueMapLabelKey',
-		display_field_errors: '=?caDisplayFieldErrors',
+		displayFieldErrors: '=?caDisplayFieldErrors',
 		prepend_name_to_field_errors: '=?caPrependNameToFieldErrors',
 		error_link_functions: '=?caErrorLinkFunctions'
 	};
 
 	var link_function = function link_function($scope, element, attribute, controller)
 	{
-		if(!Juno.Common.Util.exists($scope.display_field_errors) ||
-			$scope.display_field_errors !== false)
+		if(!Juno.Common.Util.exists($scope.displayFieldErrors) ||
+			$scope.displayFieldErrors !== false)
 		{
-			$scope.display_field_errors = true;
+			$scope.displayFieldErrors = true;
 		}
 
 		if(!Juno.Common.Util.exists($scope.prepend_name_to_field_errors) ||
@@ -94,8 +94,8 @@ angular.module('Common').directive(
 		{
 			return Juno.Common.Util.exists($scope.errors) &&
 				$scope.errors.has_field_errors() &&
-				$scope.display_field_errors &&
-				$scope.errors.display_field_errors;
+				$scope.displayFieldErrors &&
+				$scope.errors.displayFieldErrors;
 		};
 	};
 

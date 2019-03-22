@@ -50,6 +50,7 @@ import oscar.MyDateFormat;
 import oscar.RscheduleBean;
 import oscar.util.ConversionUtils;
 
+import javax.servlet.http.HttpSession;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -451,6 +452,7 @@ public class Schedule
 	}
 
 	public List<CalendarEvent> getCalendarEvents(
+		HttpSession session,
 		Integer providerId,
 		LocalDate startDate,
 		LocalDate endDate,
@@ -469,7 +471,7 @@ public class Schedule
 
 		// Get appointments for this provider/date range
 		calendarEvents.addAll(appointmentService.getCalendarEvents(
-			providerId, startDate, endDate, siteName));
+			session, providerId, startDate, endDate, siteName));
 
 		return calendarEvents;
 	}

@@ -335,6 +335,16 @@
 				</div>
 			</div>
 
+			<div id="left-pane-calendar" ng-show="patientListAppointmentListCtrl.isScheduleActive();">
+				<div class="calendar-daypicker-container">
+					<div uib-datepicker
+						 ng-model="selectedDate"
+						 datepicker-options="{showWeeks: false}"
+						 class="well well-sm"
+					></div>
+				</div>
+			</div>
+
 			<div class="col-sm-12">
 				<div class="row" ng-cloak>
 					<%--<button type="button" class="btn btn-default" ng-click="refresh()" title="<bean:message key="patientList.refresh" bundle="ui"/>">

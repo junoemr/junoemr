@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.appointment.model.AppointmentStatusList;
 import org.oscarehr.common.dao.AppointmentArchiveDao;
 import org.oscarehr.appointment.dao.AppointmentStatusDao;
 import org.oscarehr.common.dao.LookupListDao;
@@ -40,6 +41,7 @@ import org.oscarehr.common.model.LookupList;
 import org.oscarehr.common.model.LookupListItem;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -142,17 +144,28 @@ public class AppointmentManager {
 	 * @param loggedInInfo
 	 * @param appointment - appointment data
 	 */
-	public void addAppointment(LoggedInInfo loggedInInfo, Appointment appointment) {
+	public Appointment addAppointment(LoggedInInfo loggedInInfo, Appointment appointment) {
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null)) {
 			throw new RuntimeException("Access Denied");
 		}
-		
+
+		// Set automatic information
+		appointment.setCreator(loggedInInfo.getLoggedInProviderNo());
+		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
+		appointment.setCreateDateTime(new Date());
+		appointment.setUpdateDateTime(new Date());
+		appointment.setReasonCode(Appointment.DEFAULT_REASON_CODE);
+
+		// Subtract a minute
+
 		appointmentDao.persist(appointment);
 
 		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.saveAppointment", "id=" + appointment.getId());
+
+		return appointment;
 	}
 
-	public void updateAppointment(LoggedInInfo loggedInInfo, Appointment appointment) throws Throwable {
+	public Appointment updateAppointment(LoggedInInfo loggedInInfo, Appointment appointment) throws Throwable {
 		
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null)) {
 			throw new RuntimeException("Access Denied");
@@ -165,7 +178,13 @@ public class AppointmentManager {
 
 		appointmentArchiveDao.archiveAppointment(existing);
 
+		// Update automatic information
+		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
+		appointment.setUpdateDateTime(new Date());
+
+		// Copy automatic information
 		appointment.setCreator(existing.getCreator());
+		appointment.setCreateDateTime(existing.getCreateDateTime());
 		appointment.setReasonCode(existing.getReasonCode());
 
 		try
@@ -183,6 +202,7 @@ public class AppointmentManager {
 
 		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.updateAppointment", "id=" + appointment.getId());
 
+		return appointment;
 	}
 
 	public void deleteAppointment(LoggedInInfo loggedInInfo, int apptNo) {
@@ -198,6 +218,27 @@ public class AppointmentManager {
 
 		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.deleteAppointment", "id=" + apptNo);
 
+	}
+
+	public String rotateStatus(LoggedInInfo loggedInInfo, int apptNo)
+	{
+		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null)) {
+			throw new RuntimeException("Access Denied");
+		}
+
+		Appointment appointment = appointmentDao.find(apptNo);
+
+		AppointmentManager appointmentManager = SpringUtils.getBean(AppointmentManager.class);
+		AppointmentStatusList appointmentStatusList =
+				AppointmentStatusList.factory(appointmentManager);
+
+		String nextStatus = appointmentStatusList.getStatusAfter(appointment.getStatus());
+
+		appointment.setStatus(nextStatus);
+
+		appointmentDao.merge(appointment);
+
+		return appointment.getStatus();
 	}
 
 	public Appointment getAppointment(LoggedInInfo loggedInInfo, int apptNo) {

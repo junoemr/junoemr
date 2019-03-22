@@ -22,6 +22,7 @@
  */
 package org.oscarehr.appointment.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.schedule.dto.AppointmentDetails;
@@ -30,7 +31,10 @@ import org.oscarehr.schedule.dto.CalendarEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.OscarProperties;
+import oscar.SxmlMisc;
 
+import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -67,7 +71,27 @@ public class Appointment
 		return String.join(", ", outputList);
 	}
 
-	public List<CalendarEvent> getCalendarEvents(
+	private String getStatus(String statusString)
+	{
+		if(statusString != null && statusString.length() > 0)
+		{
+			return statusString.substring(0, 1);
+		}
+
+		return null;
+	}
+
+	private String getStatusModifier(String statusString)
+	{
+		if(statusString != null && statusString.length() > 1)
+		{
+			return statusString.substring(1,2);
+		}
+
+		return null;
+	}
+
+	public List<CalendarEvent> getCalendarEvents(HttpSession session,
 		Integer providerId, LocalDate startDate, LocalDate endDate, String siteName)
 	{
 		List<CalendarEvent> calendarEvents = new ArrayList<>();
@@ -102,8 +126,27 @@ public class Appointment
 					}
 				}
 
+				String province = OscarProperties.getInstance().getBillingTypeUpperCase();
+				String defaultView = OscarProperties.getInstance().getProperty("default_view");
+				String userProviderNo = (String) session.getAttribute("user");
+				String userFirstName = (String) session.getAttribute("userfirstname");
+				String userLastName = (String) session.getAttribute("userlastname");
+
+				String rdohip = null;
+				if(oscar.OscarProperties.getInstance().isPropertyActive("auto_populate_billingreferral_bc"))
+				{
+					rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(details.getFamilyDoctor()),"rdohip");
+					rdohip = rdohip !=null ? rdohip : null;
+				}
+
 				CalendarAppointment appointment = new CalendarAppointment(
 					details.getAppointmentNo(),
+					province,
+					defaultView,
+					userProviderNo,
+					userFirstName,
+					userLastName,
+					rdohip,
 					details.getBirthday(),
 					formatName(details.getFirstName(), details.getLastName()),
 					null, // TODO get phone number
@@ -111,8 +154,8 @@ public class Appointment
 					null, // TODO get patient's doctor
 					startDateTime,
 					endDateTime,
-					status,
-					statusModifier,
+					getStatus(rawStatus),
+					getStatusModifier(rawStatus),
 					null,
 					details.getReason(),
 					details.getNotes(),

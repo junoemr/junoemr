@@ -78,6 +78,7 @@ function(
 	$scope.opening_dialog = false;
 	$scope.dialog = null;
 
+
 	$scope.calendar = function calendar()
 	{
 		return uiCalendarConfig.calendars[$scope.calendar_name];

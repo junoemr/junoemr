@@ -1,6 +1,7 @@
 
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
+/*
 import {
 	AppointmentTo1,
 	CalendarAppointmentStatus, NewAppointmentTo1, RestResponseAppointmentTo1
@@ -15,10 +16,12 @@ import {
 } from "../../node_modules/@types/angular";
 import {IStateParamsService} from "../../node_modules/@types/angular-ui-router";
 import {IModalService} from "../../node_modules/@types/angular-ui-bootstrap";
+*/
 
 export class CalendarApiAdapter
 {
 	static $inject = [
+		/*
         '$q',
         '$stateParams',
         '$uibModal',
@@ -34,9 +37,11 @@ export class CalendarApiAdapter
         'scheduleService',
         'globalStateService',
 		'focusService',
+		*/
 	];
 
 	constructor(
+		/*
         private $q: IQService,
         private $stateParams: IStateParamsService,
         private $uibModal: IModalService,
@@ -52,10 +57,11 @@ export class CalendarApiAdapter
         private scheduleService,
         private globalStateService,
 		public focus
+		*/
 	){}
 
 
-	event_statuses: null;
+/*	event_statuses: null;
 	default_event_color: null;
 
 	patient_model = {
@@ -237,7 +243,7 @@ export class CalendarApiAdapter
 		var promise_array = [];
 
 		deferred.resolve([]);
-		/*				schedule_template_model.list().then(
+		/!*				schedule_template_model.list().then(
 							function success(results)
 							{
 								for(var i = 0; i < results.data.length; i++)
@@ -258,7 +264,7 @@ export class CalendarApiAdapter
 										}
 										deferred.resolve(schedule_templates);
 									});
-							});*/
+							});*!/
 
 		return deferred.promise;
 	}
@@ -271,7 +277,7 @@ export class CalendarApiAdapter
 		this.scheduleService.getScheduleTemplateCodes().then(
 			function success(results)
 			{
-				/*	Example JSON result (P is the oscar scheduletemplatecode.code)
+				/!*	Example JSON result (P is the oscar scheduletemplatecode.code)
 				var example_result = {
 					P: {
 						color: "#000000",
@@ -280,7 +286,7 @@ export class CalendarApiAdapter
 						system_code: "unavailable",
 					},
 				};
-				*/
+				*!/
 
 				for(var i = 0; i < results.length; i++)
 				{
@@ -430,7 +436,7 @@ export class CalendarApiAdapter
 	{
 		return [];
 
-		/*	XXX: probably not using this because we don't select resources in juno
+		/!*	XXX: probably not using this because we don't select resources in juno
 
 		// priority: last used from global state, then preference setting,
 		// then default (all the non-doctor schedules)
@@ -445,10 +451,10 @@ export class CalendarApiAdapter
 		}
 
 		return this.get_group_resources(
-			custom_resource_list, resource_options);*/
+			custom_resource_list, resource_options);*!/
 	}
 
-/*	public get_group_resources(default_selections, schedules)
+/!*	public get_group_resources(default_selections, schedules)
 	{
 		var has_defaults = this.util.exists(default_selections) && default_selections.length > 0;
 
@@ -481,7 +487,7 @@ export class CalendarApiAdapter
 		}
 
 		return selected_resources;
-	}*/
+	}*!/
 
 	public get_selected_time_interval(
 		time_interval_options, default_time_interval)
@@ -522,27 +528,27 @@ export class CalendarApiAdapter
 	public get_schedule_min_time() {
 		// restrict day view if user preferences are set
 
-		/*				var min_time = service.get_global_preference_setting('schedule_min_time');
+		/!*				var min_time = service.get_global_preference_setting('schedule_min_time');
 						if (util.exists(min_time)) {
 							// format: HH24:MM:SS - expect HH24:MM in preference
 							return min_time + ":00";
 						}
 
-						return null;*/
+						return null;*!/
 
 		return "08:00";
 	}
 
 	public get_schedule_max_time()
 	{
-		/*				var max_time = service.get_global_preference_setting('schedule_max_time');
+		/!*				var max_time = service.get_global_preference_setting('schedule_max_time');
 						if(util.exists(max_time))
 						{
 							// format: HH24:MM:SS - expect HH24:MM in preference
 							return max_time + ":00";
 						}
 
-						return null;*/
+						return null;*!/
 		return "20:00";
 	}
 
@@ -621,7 +627,7 @@ export class CalendarApiAdapter
 			console.log(appointment);
 			deferred.reject();
 
-/*			this.scheduleApi.updateAppointment(appointment).then(
+/!*			this.scheduleApi.updateAppointment(appointment).then(
 			function(result: IHttpResponse<SchedulingResponse>)
 			{
 				deferred.resolve(result.data);
@@ -629,7 +635,7 @@ export class CalendarApiAdapter
 			function (result)
 			{
 				deferred.reject(result.data);
-			});*/
+			});*!/
 		}
 		else
 		{
@@ -644,9 +650,9 @@ export class CalendarApiAdapter
 				"location": site_uuid,
 				"providerNo": schedule_uuid,
 				//"name": string,
-				/*			"resources": string,
+				/!*			"resources": string,
 							"type": string,
-							"urgency": string,*/
+							"urgency": string,*!/
 			};
 
 
@@ -689,7 +695,7 @@ export class CalendarApiAdapter
 		}
 	}
 
-	/*
+	/!*
 	public delete_event(event_uuid)
 	{
 		var deferred = this.$q.defer();
@@ -704,14 +710,14 @@ export class CalendarApiAdapter
 		});
 
 		return deferred.promise;
-	}*/
+	}*!/
 
 
 	//-------------------------------------------------------------------------
 	// Event Handlers
 	//-------------------------------------------------------------------------/
 
-/*	public drop_event(uuid, schedule_uuid, delta)
+/!*	public drop_event(uuid, schedule_uuid, delta)
 	{
 		var deferred = this.$q.defer();
 
@@ -797,7 +803,7 @@ export class CalendarApiAdapter
 
 		return deferred.promise;
 	}
-	*/
+	*!/
 
 	//-------------------------------------------------------------------------
 	// Global State Manipulation
@@ -886,12 +892,12 @@ export class CalendarApiAdapter
 
 	public get_schedule_height()
 	{
-/*		// get the full window height, minus the header height, minus a buffer for schedule options
+/!*		// get the full window height, minus the header height, minus a buffer for schedule options
 		var schedule_height = $(window).height() - $('#right-pane').offset().top - 80;
 		if(schedule_height < $scope.min_height) {
 			schedule_height = $scope.min_height;
 		}
-		return schedule_height;*/
+		return schedule_height;*!/
 		return 814;
 	}
 
@@ -899,7 +905,7 @@ export class CalendarApiAdapter
 	// ===============================================================================================
 	// Private Methods
 	// ===============================================================================================
-/*
+/!*
 	private create_schedule_event(event)
 	{
 		var event_status_color =
@@ -926,9 +932,9 @@ export class CalendarApiAdapter
 
 		return (yiq >= 128) ? 'text-dark' : 'text-light';
 	}
-	*/
+	*!/
 
-/*
+/!*
 	private load_schedule_availabilities(schedule)
 	{
 		var deferred = this.$q.defer();
@@ -958,5 +964,5 @@ export class CalendarApiAdapter
 			});
 
 		return deferred.promise;
-	}*/
+	}*!/*/
 }
