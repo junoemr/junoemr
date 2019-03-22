@@ -78,6 +78,7 @@ public class GenericFile
 	protected boolean hasBeenValidated;
 	protected boolean isValid;
 	protected String reasonInvalid;
+	protected String invalidContentType;
 
 	public GenericFile(File file)
 	{
@@ -86,6 +87,7 @@ public class GenericFile
 		this.hasBeenValidated = false;
 		this.isValid = false;
 		this.reasonInvalid = null;
+		this.invalidContentType = "application/octet-stream";
 	}
 
 	public boolean moveToDocuments() throws IOException
@@ -183,14 +185,9 @@ public class GenericFile
 		this.hasBeenValidated = replacementFile.hasBeenValidated();
 		this.isValid = replacementFile.isValid();
 		this.reasonInvalid = replacementFile.getReasonInvalid();
+		this.invalidContentType = replacementFile.getInvalidContentType();
 	}
 
-	public boolean validate() throws IOException, InterruptedException
-	{
-		this.hasBeenValidated = true;
-		this.isValid = true;
-		return true;
-	}
 	public void process() throws IOException, InterruptedException
 	{
 	}
@@ -207,6 +204,10 @@ public class GenericFile
 	{
 		return this.reasonInvalid;
 	}
+	public String getInvalidContentType()
+	{
+		return this.invalidContentType;
+	}
 
 	/**
 	 * get the base file object for backwards compatibility
@@ -222,7 +223,16 @@ public class GenericFile
 	}
 	public String getContentType() throws IOException
 	{
-		return GenericFile.getContentType(javaFile);
+		String contentType;
+		if(isValid)
+		{
+			contentType = GenericFile.getContentType(javaFile);
+		}
+		else
+		{
+			contentType = getInvalidContentType();
+		}
+		return contentType;
 	}
 	public int getPageCount() throws IOException
 	{

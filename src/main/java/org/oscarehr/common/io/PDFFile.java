@@ -54,7 +54,7 @@ public class PDFFile extends GenericFile
 	private OscarProperties oscarProperties = OscarProperties.getInstance();
 	private long maxMemoryUsage = oscarProperties.getPDFMaxMemUsage();
 
-	public PDFFile(File file) throws IOException
+	public PDFFile(File file)
 	{
 		super(file);
 	}
@@ -69,7 +69,6 @@ public class PDFFile extends GenericFile
 		return false;
 	}
 
-	@Override
 	public boolean validate() throws IOException, InterruptedException
 	{
 		this.isValid = pdfinfoValidation(javaFile);
@@ -97,9 +96,12 @@ public class PDFFile extends GenericFile
 
 		try
 		{
-			PDDocument document = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
-			numOfPage = document.getNumberOfPages();
-			document.close();
+			if(isValid)
+			{
+				PDDocument document = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+				numOfPage = document.getNumberOfPages();
+				document.close();
+			}
 		}
 		catch(InvalidPasswordException e)
 		{
@@ -222,26 +224,34 @@ public class PDFFile extends GenericFile
 			{
 				PDDocument document = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
 				document.close();
-			} catch(InvalidPasswordException e)
+
+				this.isValid = false;
+				this.reasonInvalid = "Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue;
+				logger.warn("PDF failed to re-encode. Original used and flagged as invalid: " + javaFile.getName());
+			}
+			catch(InvalidPasswordException e)
 			{
 				logger.warn("Encrypted PDF. Cannot re-encode");
-				this.moveFile(currentDir);
-				newPdf = javaFile;
-				return newPdf;
+				this.isValid = true;
 			}
-
-			this.moveToCorrupt();
-			throw new RuntimeException("Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue);
+			this.moveFile(currentDir);
+			newPdf = javaFile;
 		}
-
-		try
+		else
 		{
-			PDDocument document = PDDocument.load(newPdf, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
-			document.close();
-		} catch(Exception e)
-		{
-			throw new RuntimeException("Failed to load re-encoded PDF: ", e);
+			// attempt to load the new pdf to ensure it is readable
+			try
+			{
+				PDDocument document = PDDocument.load(newPdf, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+				document.close();
+				this.isValid = true;
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException("Failed to load re-encoded PDF: ", e);
+			}
 		}
+		this.hasBeenValidated = true;
 
 		logger.info("END PDF RE-ENCODING");
 		return newPdf;

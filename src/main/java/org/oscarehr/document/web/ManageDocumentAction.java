@@ -25,7 +25,6 @@
 
 package org.oscarehr.document.web;
 
-import com.lowagie.text.pdf.PdfReader;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 import net.sf.json.JSONObject;
@@ -331,50 +330,59 @@ public class ManageDocumentAction extends DispatchAction {
 		return cacheDir;
 	}
 
-	private File hasCacheVersion2(Document d, Integer pageNum) {
-		File documentCacheDir = getDocumentCacheDir(oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR"));
-		File outfile = new File(documentCacheDir, d.getDocfilename() + "_" + pageNum + ".png");
-		if (!outfile.exists()) {
+	private File hasCacheVersion2(Document d, Integer pageNum)
+	{
+		File outfile = new File(GenericFile.DOCUMENT_BASE_DIR, d.getDocfilename() + "_" + pageNum + ".png");
+		if(!outfile.exists())
+		{
 			outfile = null;
 		}
 		return outfile;
 	}
 
-	public static void deleteCacheVersion(Document d, int pageNum) {
-		File documentCacheDir = getDocumentCacheDir(oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR"));
-		//pageNum=pageNum-1;
-		File outfile = new File(documentCacheDir,d.getDocfilename()+"_"+pageNum+".png");
-		if (outfile.exists()){
+	public static void deleteCacheVersion(Document d, int pageNum)
+	{
+		File outfile = new File(GenericFile.DOCUMENT_BASE_DIR, d.getDocfilename() + "_" + pageNum + ".png");
+		if(outfile.exists())
+		{
 			outfile.delete();
 		}
 	}
 
-	private File hasCacheVersion(Document d, int pageNum){
-		File documentCacheDir = getDocumentCacheDir(oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR"));
-		//pageNum= pageNum-1;
-		File outfile = new File(documentCacheDir,d.getDocfilename()+"_"+pageNum+".png");
-		if (!outfile.exists()){
+	private File hasCacheVersion(Document d, int pageNum)
+	{
+		File outfile = new File(GenericFile.DOCUMENT_BASE_DIR, d.getDocfilename() + "_" + pageNum + ".png");
+		if(!outfile.exists())
+		{
 			outfile = null;
 		}
 		return outfile;
 	}
 
-	public File createCacheVersion2(Document d, Integer pageNum)
+	public File createCacheVersion2(Document document, Integer pageNum)
 	{
+		File returnFile = null;
 		try
 		{
-			String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-			File documentCacheDir = getDocumentCacheDir(docdownload);
+			if(document.hasEncodingError())
+			{
+				returnFile = generatePdfPreviewErrorImage();
+			}
+			else
+			{
+				String docdownload = GenericFile.DOCUMENT_BASE_DIR;
+				File documentCacheDir = getDocumentCacheDir(docdownload);
 
-			Path filePath = Paths.get(docdownload).resolve(d.getDocfilename());
+				Path filePath = Paths.get(docdownload).resolve(document.getDocfilename());
 
-			return generatePdfPageImage(filePath.toString(), Paths.get(documentCacheDir.getCanonicalPath()).resolve(d.getDocfilename() + "_" + pageNum + ".png").toString(), pageNum);
+				returnFile = generatePdfPageImage(filePath.toString(), Paths.get(documentCacheDir.getCanonicalPath()).resolve(document.getDocfilename() + "_" + pageNum + ".png").toString(), pageNum);
+			}
 		}
 		catch (IOException ioE)
 		{
 			MiscUtils.getLogger().error("IO Exception when resolving cache dir path: " + ioE.getMessage());
 		}
-		return null;
+		return returnFile;
 	}
 
 	public File generatePdfPageImage(String inputPdfPath, String outputFilePath, Integer pageNum)
@@ -519,61 +527,77 @@ public class ManageDocumentAction extends DispatchAction {
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "r", null)) {
         	throw new SecurityException("missing required security object (_edoc)");
         }
-		
+
 		logger.debug("in viewDocPage");
-		try {
+		try
+		{
 			String doc_no = request.getParameter("doc_no");
 			String pageNum = request.getParameter("curPage");
-			if (pageNum == null) {
+			if(pageNum == null)
+			{
 				pageNum = "0";
 			}
-			Integer pn = Integer.parseInt(pageNum);
+			Integer pageNumber = Integer.parseInt(pageNum);
 			logger.debug("Document No :" + doc_no);
 			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
 
-			Document d = documentDao.getDocument(doc_no);
-			logger.debug("Document Name :" + d.getDocfilename());
-			String name = d.getDocfilename() + "_" + pn + ".png";
+			Document document = documentDao.getDocument(doc_no);
+			logger.debug("Document Name :" + document.getDocfilename());
+			String name = document.getDocfilename() + "_" + pageNumber + ".png";
 			logger.debug("name " + name);
 
-			File outfile = null;
-
-			outfile = hasCacheVersion2(d, pn);
-			if (outfile != null) {
+			File outfile = hasCacheVersion2(document, pageNumber);
+			if(outfile != null)
+			{
 				logger.debug("got doc from local cache   ");
-			} else {
-				outfile = createCacheVersion2(d, pn);
-				if (outfile != null) {
+			}
+			else
+			{
+				outfile = createCacheVersion2(document, pageNumber);
+				if(outfile != null)
+				{
 					logger.debug("create new doc  ");
 				}
 			}
 			response.setContentType("image/png");
 			ServletOutputStream outs = response.getOutputStream();
-			response.setHeader("Content-Disposition", "attachment;filename=\"" + d.getDocfilename() + "\"");
+			response.setHeader("Content-Disposition", "attachment;filename=\"" + document.getDocfilename() + "\"");
 
 			BufferedInputStream bfis = null;
-			try {
-				if (outfile != null) {
+			try
+			{
+				if(outfile != null)
+				{
 					bfis = new BufferedInputStream(new FileInputStream(outfile));
 					int data;
-					while ((data = bfis.read()) != -1) {
+					while((data = bfis.read()) != -1)
+					{
 						outs.write(data);
 						// outs.flush();
 					}
-				} else {
-					logger.info("Unable to retrieve content for " + d + ". This may indicate previous upload or save errors...");
 				}
-			} finally {
-				if (bfis!=null) {
+				else
+				{
+					logger.info("Unable to retrieve content for " + document + ". This may indicate previous upload or save errors...");
+				}
+			}
+			finally
+			{
+				if(bfis != null)
+				{
 					bfis.close();
 				}
 			}
 
 			outs.flush();
 			outs.close();
-		} catch (java.net.SocketException se) {
+		}
+		catch(java.net.SocketException se)
+		{
 			MiscUtils.getLogger().error("Error", se);
-		} catch (Exception e) {
+		}
+		catch(Exception e)
+		{
 			MiscUtils.getLogger().error("Error", e);
 		}
 		return null;
@@ -590,8 +614,7 @@ public class ManageDocumentAction extends DispatchAction {
 
 		LogAction.addLogEntry((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
 
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		File documentDir = new File(docdownload);
+		File documentDir = new File(GenericFile.DOCUMENT_BASE_DIR);
 		logger.debug("Document Dir is a dir" + documentDir.isDirectory());
 
 		Document d = documentDao.getDocument(doc_no);
@@ -633,34 +656,6 @@ public class ManageDocumentAction extends DispatchAction {
 		outs.flush();
 		outs.close();
 		return null;
-	}
-
-	public ActionForward getDocPageNumber(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "r", null)) {
-        	throw new SecurityException("missing required security object (_edoc)");
-        }
-		
-		String doc_no = request.getParameter("doc_no");
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		// File documentDir = new File(docdownload);
-		Document d = documentDao.getDocument(doc_no);
-		String filePath = docdownload + d.getDocfilename();
-
-		int numOfPage = 0;
-		try {
-			PdfReader reader = new PdfReader(filePath);
-			numOfPage = reader.getNumberOfPages();
-
-			HashMap hm = new HashMap();
-			hm.put("numOfPage", numOfPage);
-			JSONObject jsonObject = JSONObject.fromObject(hm);
-			response.getOutputStream().write(jsonObject.toString().getBytes());
-		} catch (IOException e) {
-			MiscUtils.getLogger().error("Error", e);
-		}
-
-		return null;// execute2(mapping, form, request, response);
 	}
 	
 	public ActionForward downloadCDS(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -714,28 +709,31 @@ public class ManageDocumentAction extends DispatchAction {
 			Integer demographicNo = ctld.isDemographicDocument() ? ctld.getId().getModuleId() : null;
 			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), demographicNo, LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
 
-			String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-
-			File documentDir = new File(docdownload);
+			File documentDir = new File(GenericFile.DOCUMENT_BASE_DIR);
 			logger.debug("Document Dir is a dir" + documentDir.isDirectory());
 
-			Document d = documentDao.getDocument(doc_no);
-			logger.debug("Document Name :" + d.getDocfilename());
+			Document document = documentDao.getDocument(doc_no);
+			logger.debug("Document Name :" + document.getDocfilename());
 
-			docxml = d.getDocxml();
-			contentType = d.getContenttype();
+			docxml = document.getDocxml();
+			contentType = document.getContenttype();
 
-			File file = new File(documentDir, d.getDocfilename());
-			filename = d.getDocfilename();
-                        
-                        if (contentType != null && !contentType.trim().equals("text/html")) {
-                            if (file.exists()) {
-                            	contentBytes = FileUtils.readFileToByteArray(file);
-                            } else {
-                            	throw new IllegalStateException("Local document doesn't exist for eDoc (ID " + d.getId() + "): " + file.getAbsolutePath());
-                            }
-                        }
-		} else // remote document
+			File file = new File(documentDir, document.getDocfilename());
+			filename = document.getDocfilename();
+
+			if(contentType != null && !contentType.trim().equals("text/html"))
+			{
+				if(file.exists())
+				{
+					contentBytes = FileUtils.readFileToByteArray(file);
+				}
+				else
+				{
+					throw new IllegalStateException("Local document doesn't exist for eDoc (ID " + document.getId() + "): " + file.getAbsolutePath());
+				}
+			}
+		}
+		else // remote document
 		{
 			FacilityIdIntegerCompositePk remotePk = new FacilityIdIntegerCompositePk();
 			remotePk.setIntegratorFacilityId(remoteFacilityId);
@@ -1018,31 +1016,6 @@ public class ManageDocumentAction extends DispatchAction {
         }
 
         return null;
-    }
-
-    public int countNumOfPages(String fileName) { // count number of pages in a pdf file
-        int numOfPage = 0;
-        String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-
-        if (!docdownload.endsWith(File.separator)) {
-            docdownload += File.separator;
-        }
-
-        String filePath = docdownload + fileName;
-        PdfReader reader = null;
-
-        try {
-            reader = new PdfReader(filePath);
-            numOfPage = reader.getNumberOfPages();
-
-        } catch (IOException e) {
-            MiscUtils.getLogger().error("Error", e);
-        } finally {
-            if (reader != null) {
-                reader.close();
-            }
-        }
-        return numOfPage;
     }
 
     public ActionForward displayIncomingDocs(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {

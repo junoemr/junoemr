@@ -31,8 +31,6 @@ import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
-
-
 import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
 import oscar.oscarLab.ca.on.LabResultData;
@@ -45,8 +43,8 @@ import java.io.PrintWriter;
 import java.util.Date;
 import java.util.List;
 
-public class SplitDocumentAction extends DispatchAction {
-	
+public class SplitDocumentAction extends DispatchAction
+{
 	private static Logger logger = Logger.getLogger(SplitDocumentAction.class);
 
 	private DocumentDao documentDao = SpringUtils.getBean(DocumentDao.class);
@@ -67,11 +65,13 @@ public class SplitDocumentAction extends DispatchAction {
 		String providerNo = loggedInInfo.getLoggedInProviderNo();
 
 		Document existingDocument = documentDao.getDocument(docNum);
-
-		String newFilename = existingDocument.getDocfilename();
+		if(existingDocument.hasEncodingError())
+		{
+			logger.warn("Invalid PDF file found. Edit operation aborted");
+			return null;
+		}
 
 		PDDocument pdf = null;
-
 		try
 		{
 			GenericFile existingPdf = FileFactory.getDocumentFile(existingDocument.getDocfilename());
@@ -168,6 +168,11 @@ public class SplitDocumentAction extends DispatchAction {
 
 	private ActionForward rotate(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response, int degrees) throws Exception {
 		Document doc = documentDao.getDocument(request.getParameter("document"));
+		if(doc.hasEncodingError())
+		{
+			logger.warn("Invalid PDF file found. Edit operation aborted");
+			return null;
+		}
 
 		File pdfFile = FileFactory.getDocumentFile(doc.getDocfilename()).getFileObject();
 		PDDocument pdf = PDDocument.load(pdfFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
@@ -197,6 +202,11 @@ public class SplitDocumentAction extends DispatchAction {
 	{
 		int pageNumber = Integer.parseInt(request.getParameter("page"));
 		Document doc = documentDao.getDocument(request.getParameter("document"));
+		if(doc.hasEncodingError())
+		{
+			logger.warn("Invalid PDF file found. Edit operation aborted");
+			return null;
+		}
 
 		File pdfFile = FileFactory.getDocumentFile(doc.getDocfilename()).getFileObject();
 		PDDocument pdf = PDDocument.load(pdfFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
