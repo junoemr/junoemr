@@ -54,7 +54,6 @@ import org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -210,13 +209,11 @@ public class ScheduleManager {
 
 	public List<Appointment> getPatientAppointmentsWithProvider(String demographicNo, String providerNo, LocalDate lowDateCheck, LocalDate highDateCheck)
 	{
-		OscarAppointmentDao oscarAppointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 		return oscarAppointmentDao.findPatientAppointmentsWithProvider(demographicNo, providerNo, lowDateCheck, highDateCheck);
 	}
 
 	public Map<LocalDate, List<Appointment>> getProviderAppointmentsForMonth(String providerNo, LocalDate minDate, LocalDate maxDate)
 	{
-		OscarAppointmentDao oscarAppointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 		return oscarAppointmentDao.findProviderAppointmentsForMonth(providerNo, minDate, maxDate);
 	}
 

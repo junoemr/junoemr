@@ -28,7 +28,6 @@ import org.oscarehr.common.model.Appointment;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
@@ -66,6 +65,11 @@ public class MhaBookingRules
     private List<Appointment> patientAppointments = new ArrayList<>();
 
     private Map<LocalDate, Boolean> invalidDates = new HashMap<>();
+
+    public MhaBookingRules()
+    {
+
+    }
 
     public MhaBookingRules(Map<String, Object> bookingRules)
     {
@@ -111,6 +115,11 @@ public class MhaBookingRules
         this.multiBookingRules = (Map<String, List<Map<String, Integer>>>) this.bookingRules.get(BOOKING_RULES_MULTI);
     }
 
+    public Map<String, List<Map<String, Integer>>> getMultiBookingRules()
+    {
+        return multiBookingRules;
+    }
+
     public List<Integer> getMultiBookingRuleDays()
     {
         return multiBookingRuleDays;
@@ -150,17 +159,17 @@ public class MhaBookingRules
         List<Map<String, Integer>> weekRules = multiBookingRules.get(WEEK_RULES);
         List<Map<String, Integer>> monthRules = multiBookingRules.get(MONTH_RULES);
 
-        if (applyBookingRules(dayRules, DAY_RULES, slot))
+        if (applyMultiBookRules(dayRules, DAY_RULES, slot))
         {
             return true;
         }
 
-        if (applyBookingRules(weekRules, WEEK_RULES, slot))
+        if (applyMultiBookRules(weekRules, WEEK_RULES, slot))
         {
             return true;
         }
 
-        if (applyBookingRules(monthRules, MONTH_RULES, slot))
+        if (applyMultiBookRules(monthRules, MONTH_RULES, slot))
         {
             return true;
         }
@@ -168,11 +177,11 @@ public class MhaBookingRules
         return false;
     }
 
-    private boolean applyBookingRules(List<Map<String, Integer>> multiBookingRules, String multiRuleType, LocalDateTime slot)
+    public boolean applyMultiBookRules(List<Map<String, Integer>> multiBookingRules, String multiRuleType, LocalDateTime slot)
     {
         for (Map<String, Integer> rule : multiBookingRules)
         {
-            Integer appointmentCount = appointmentCountInTimePeriod(multiRuleType, rule, slot);
+            int appointmentCount = appointmentCountInTimePeriod(multiRuleType, rule, slot);
 
             if (appointmentCount >= rule.get(RULE_BOOKINGS))
             {
@@ -202,7 +211,7 @@ public class MhaBookingRules
         return false;
     }
 
-    private Integer appointmentCountInTimePeriod(String ruleType, Map<String, Integer> multiBookRule, LocalDateTime slot)
+    public int appointmentCountInTimePeriod(String ruleType, Map<String, Integer> multiBookRule, LocalDateTime slot)
     {
         List<Appointment> periodAppointments = new ArrayList<>();
         LocalDate slotDate = slot.toLocalDate();
@@ -211,20 +220,10 @@ public class MhaBookingRules
         {
             LocalDateTime appointmentDateTime;
 
-            try
-            {
-                LocalDate appointmentDate = LocalDate.parse(appointment.getAppointmentDate().toString());
-                LocalTime appointmentTime = LocalTime.parse(appointment.getStartTime().toString());
+            LocalDate appointmentDate = LocalDate.parse(appointment.getAppointmentDate().toString());
+            LocalTime appointmentTime = LocalTime.parse(appointment.getStartTime().toString());
 
-                appointmentDateTime = LocalDateTime.of(appointmentDate, appointmentTime);
-            }
-            catch (Exception e)
-            {
-                DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                String appointmentDateStr = appointment.getAppointmentDate().toInstant().toString();
-
-                appointmentDateTime = LocalDateTime.parse(appointmentDateStr, dateFormat);
-            }
+            appointmentDateTime = LocalDateTime.of(appointmentDate, appointmentTime);
 
             int ruleTimePeriod = multiBookRule.get(RULE_PERIOD_OF_TIME) - 1;
             LocalDateTime rulePeriodStart = LocalDateTime.of(slotDate.minusDays(ruleTimePeriod), LocalTime.MIN);

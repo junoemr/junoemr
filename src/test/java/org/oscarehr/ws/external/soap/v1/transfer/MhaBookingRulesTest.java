@@ -23,119 +23,98 @@
 
 package org.oscarehr.ws.external.soap.v1.transfer;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.time.DateUtils;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+
 import org.oscarehr.common.model.Appointment;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.MhaBookingRules;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.sql.Date;
+import java.sql.Time;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class MhaBookingRulesTest
 {
-    private String bookingRulesJsonString =
-            "{" +
-                "\"blackout\": {" +
-                    "\"period_type\": \"blackout_now_until_day\", " +
-                    "\"period_time\": 1" +
-                "}," +
-                "\"cutoff\": {" +
-                    "\"days\": 90" +
-                "}," +
-                "\"multi\": {" +
-                    "\"day_rules\": [{\"bookings\": 1, \"period_of_time\": 1}, {\"bookings\": 2, \"period_of_time\": 3}]," +
-                    "\"week_rules\": [{\"bookings\": 3, \"period_of_time\": 1}]," +
-                    "\"month_rules\": [{\"bookings\": 5, \"period_of_time\": 1}]" +
-                "}" +
-            "}";
+    private MhaBookingRules bookingRules;
+
+    private static final String DAY_RULES = "day_rules";
+    private static final String WEEK_RULES = "week_rules";
+    private static final String MONTH_RULES = "month_rules";
+
+    @Before
+    public void setUp()
+    {
+        bookingRules = Mockito.spy(new MhaBookingRules());
+    }
 
     @Test
-    public void mhaBookingRulesTest()
+    public void applyMultiBookRulesTest()
     {
-        Map<String, Object> bookingRulesObj = getBookingRules();
-        MhaBookingRules bookingRules = new MhaBookingRules(bookingRulesObj);
+        Map<String, Integer> dayRule = new HashMap<>();
+        dayRule.put("bookings", 2);
 
-        String startDateStr = "2019-03-25 06:10";
-        List<Appointment> patientAppointments = createTestAppointments(startDateStr, "days", 1, 4);
+        List<Map<String, Integer>> dayRules = new ArrayList<>();
+        dayRules.add(dayRule);
 
-        bookingRules.setPatientAppointments(patientAppointments);
+        LocalDateTime bookingSlot = LocalDateTime.of(2019, 3, 25, 7, 15);
+        String multiRuleType = "days";
 
-        LocalDateTime slot = LocalDateTime.of(2019, Month.MARCH, 29, 6, 0);
+        Mockito.when(bookingRules.appointmentCountInTimePeriod(multiRuleType, dayRule, bookingSlot)).thenReturn(4);
+        boolean dayRuleIsBroken = bookingRules.applyMultiBookRules(dayRules, multiRuleType, bookingSlot);
+        // If appointmentCountInTimePeriod returns a higher number than specified in the dayRule bookings
+        assertTrue(dayRuleIsBroken);
 
-        boolean cutOffRuleIsBroken = bookingRules.cutOffRuleIsBroken(slot);
-        boolean blackOutRuleIsBroken = bookingRules.blackOutRuleIsBroken(slot);
-        boolean multiRuleIsBroken = bookingRules.multiBookRuleIsBroken(slot);
-
-        assertFalse(cutOffRuleIsBroken);
-        assertFalse(blackOutRuleIsBroken);
-        assertTrue(multiRuleIsBroken);
+        Mockito.when(bookingRules.appointmentCountInTimePeriod(multiRuleType, dayRule, bookingSlot)).thenReturn(1);
+        dayRuleIsBroken = bookingRules.applyMultiBookRules(dayRules, multiRuleType, bookingSlot);
+        // If appointmentCountInTimePeriod returns a lower number than specified in the dayRule bookings
+        assertFalse(dayRuleIsBroken);
     }
 
-    private List<Appointment> createTestAppointments(String startDateTimeStr, String intervalType, int appointmentInterval, int numOfAppointments)
+    @Test
+    public void applyAppointmentCountInTimePeriodTest()
     {
-        List<Appointment> patientAppointments = new ArrayList<>();
+        List<Appointment> appointments = new ArrayList<>();
 
-        try
-        {
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            Date startDate = dateFormat.parse(startDateTimeStr);
+        appointments.add(createMockAppointment("2019-03-25", "06:10:00"));
+        appointments.add(createMockAppointment("2019-03-26", "07:00:00"));
+        appointments.add(createMockAppointment("2019-03-27", "07:30:00"));
+        appointments.add(createMockAppointment("2019-03-29", "06:30:00"));
+        bookingRules.setPatientAppointments(appointments);
 
-            for (int i = 0; i < numOfAppointments; i++)
-            {
-                Appointment appointment = new Appointment();
-                appointment.setStartTime(startDate);
-                appointment.setAppointmentDate(startDate);
+        LocalDateTime bookingSlot = LocalDateTime.of(2019, 3, 26, 9, 10);
 
-                patientAppointments.add(appointment);
+        Map<String, Integer> weekRule = new HashMap<>();
+        weekRule.put("period_of_time", 2);
+        int appointmentCountInPeriod = bookingRules.appointmentCountInTimePeriod(WEEK_RULES, weekRule, bookingSlot);
 
-                switch (intervalType)
-                {
-                    case "minutes":
-                        startDate = DateUtils.addMinutes(startDate, appointmentInterval);
-                        break;
+        assertEquals(4, appointmentCountInPeriod);
 
-                    case "hours":
-                        startDate = DateUtils.addHours(startDate, appointmentInterval);
-                        break;
+        Map<String, Integer> dayRule = new HashMap<>();
+        dayRule.put("period_of_time", 1);
+        appointmentCountInPeriod = bookingRules.appointmentCountInTimePeriod(DAY_RULES, dayRule, bookingSlot);
 
-                    case "days":
-                        startDate = DateUtils.addDays(startDate, appointmentInterval);
-                        break;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            MiscUtils.getLogger().error("Exception " + e);
-        }
-
-        return patientAppointments;
+        assertEquals(1, appointmentCountInPeriod);
     }
 
-    private Map<String, Object> getBookingRules()
+    private Appointment createMockAppointment(String dateString, String timeString)
     {
-        try
-        {
-            return new ObjectMapper().readValue(bookingRulesJsonString, new TypeReference<Map<String, Object>>(){});
-        }
-        catch(Exception e)
-        {
-            MiscUtils.getLogger().error("Exception: " + e);
-        }
+        Appointment appointment = Mockito.mock(Appointment.class);
 
-        return new HashMap<>();
+        Date appointmentDate = Date.valueOf(dateString);
+        Time startTime = Time.valueOf(timeString);
+
+        Mockito.when(appointment.getAppointmentDate()).thenReturn(appointmentDate);
+        Mockito.when(appointment.getStartTime()).thenReturn(startTime);
+
+        return appointment;
     }
 }
