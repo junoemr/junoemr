@@ -902,15 +902,19 @@ if(wcbneeds != null){%>
 		if(refType1.isEmpty()) { refType1 = propReferralPref; }
 		if(refType2.isEmpty()) { refType2 = propReferralPref; }
 
-		// preferences overrides the properties file settings
-		if(pref != null)
+		String propConsultationReferralType = oscarProperties.getProperty("the auto_populate_billing_bc_billingreferral_type1_consult", "");
+		String fromConsult = request.getParameter("from_consult");
+
+		// Preferences overrides the properties file settings. Don't override if coming from a consultation and have
+		// the auto_populate_billing_bc_billingreferral_type1_consult property set
+		if (pref != null && (fromConsult == null || propConsultationReferralType.isEmpty()))
 		{
-			if(pref.getReferral() == BillingPreference.REFER_TO_CODE)
+			if (pref.getReferral() == BillingPreference.REFER_TO_CODE)
 			{
 				refType1 = "T";
 				refType2 = "T";
 			}
-			else if(pref.getReferral() == BillingPreference.REFER_FROM_CODE)
+			else if (pref.getReferral() == BillingPreference.REFER_FROM_CODE)
 			{
 				refType1 = "B";
 				refType2 = "B";

@@ -1,6 +1,15 @@
 <script type="text/ng-template" id="src/admin/admin_popup.jsp">
 	<jsp:include page="src/admin/admin_popup.jsp"/>
 </script>
+<script type="text/ng-template" id="src/admin/integration/fax/faxConfiguration.jsp">
+	<jsp:include page="src/admin/integration/fax/faxConfiguration.jsp"/>
+</script>
+<script type="text/ng-template" id="src/admin/integration/fax/faxConfigurationEdit.jsp">
+	<jsp:include page="src/admin/integration/fax/faxConfigurationEdit.jsp"/>
+</script>
+<script type="text/ng-template" id="src/admin/integration/fax/faxSendReceive.jsp">
+	<jsp:include page="src/admin/integration/fax/faxSendReceive.jsp"/>
+</script>
 <script type="text/ng-template" id="src/admin/integration/know2act/Know2actConfiguration.jsp">
 	<jsp:include page="src/admin/integration/know2act/Know2actConfiguration.jsp"/>
 </script>

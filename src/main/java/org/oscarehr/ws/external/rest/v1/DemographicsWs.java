@@ -136,7 +136,7 @@ public class DemographicsWs extends AbstractExternalRestWs
 
 		searchQuery.setOffset(offset);
 		searchQuery.setLimit(perPage);
-		searchQuery.setSortDirAsc();
+		searchQuery.setSortDirAscending();
 
 		searchQuery.setSortMode(DemographicCriteriaSearch.SORTMODE.DemographicNo);
 		searchQuery.setStatusMode(DemographicCriteriaSearch.STATUSMODE.all);

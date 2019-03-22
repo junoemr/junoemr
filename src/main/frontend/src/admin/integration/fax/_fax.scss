@@ -1,0 +1,144 @@
+.fax-config {
+  .fax-config-header {
+	padding: 15px;
+  }
+  .fax-config-body {
+	.account-list {
+	  padding: 5px;
+	  background-color: $primary-white;
+	  .account-item {
+		background-color: $light-grey;
+		border: 2px $medium-grey;
+		padding: 10px;
+
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+	  }
+	  .glyphicon {
+		&.glyphicon-lrg {
+		  font-size: 30px;
+		}
+		&.glyphicon-sml {
+		  font-size: 15px;
+		}
+		&.enabled {
+		  color: $success-green;
+		}
+		&.disabled {
+		  color: $failure-red;
+		}
+	  }
+	}
+  }
+  .fax-config-footer {
+
+  }
+}
+
+//hack to re-center modal for now
+.modal-dialog {
+  left: auto !important;
+}
+.faxEditModal {
+  .modal-content {
+	background-color: $primary-blue;
+  }
+  .modal-body {
+	padding:30px;
+	background-color: $primary-white;
+	input {
+	  &.ng-invalid {
+		background-color: $input-color-invalid-background;
+		border-color: $input-color-invalid-border;
+	  }
+	}
+	.input-validation {
+	  font-size: 10px;
+	  color: $input-color-invalid-text;
+	}
+
+	.flex-row {
+	  display: flex;
+	  flex-direction: row;
+	  align-items: center;
+	  justify-content: flex-start;
+	  &.content-center {
+		justify-content: center;
+	  }
+	  &.content-end {
+		justify-content: flex-end;
+	  }
+	  &.info-section {
+		position: relative;
+		.info-icon {
+		  position: absolute;
+		  font-size: 14px;
+		  color: $info-icon-color;
+		}
+	  }
+	  .flex-row-label {
+		width: 40%;
+		padding: 0 5px;
+		text-align: right;
+	  }
+	  .flex-row-content {
+		text-align: left;
+	  }
+	}
+	.glyphicon {
+	  font-size: 25px;
+	  &.unknown {
+		color: $dark-grey;
+	  }
+	  &.success {
+		color: $success-green;
+	  }
+	  &.failure {
+		color: $failure-red;
+	  }
+	}
+  }
+  .modal-header {
+	color: $primary-white;
+  }
+  .modal-footer {
+	background-color: $light-grey;
+	padding-top: 20px;
+	padding-bottom: 20px;
+  }
+}
+
+
+.fax-send_receive {
+  .tabs-heading {
+	padding: 5px 5px 0 5px;
+  }
+  .nav-justified {
+	margin-bottom: -1px;
+  }
+  .nav-tabs {
+	li {
+	  a {
+		color: black;
+		background-color: $light-grey;
+		&:hover, &:focus {
+		  background-color: $medium-grey;
+		  border-color: transparent;
+		}
+	  }
+	  .active {
+		a {
+		  color: black;
+		  background-color: $primary-white;
+		  border-color: black;
+		  border-bottom-color:transparent;
+		}
+	  }
+	}
+  }
+  .search-frame {
+	padding: 20px;
+  }
+}

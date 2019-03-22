@@ -24,31 +24,13 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<%@ page import="org.oscarehr.provider.controller.MenuBar" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 
-<%@ page import="java.io.UnsupportedEncodingException" %>
-<%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="java.time.format.DateTimeFormatter" %>
-<%@ page import="java.time.LocalDate" %>
-<%@ page import="java.time.LocalTime" %>
-<%@ page import="java.time.Duration" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.Calendar" %>
-<%@ page import="java.util.Collections" %>
-<%@ page import="java.util.GregorianCalendar" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="java.util.ResourceBundle" %>
-<%@ page import="java.util.SortedMap" %>
-
-<%@ page import="oscar.OscarProperties" %>
-<%@ page import="oscar.util.UtilDateUtilities" %>
-<%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="org.apache.commons.lang.WordUtils" %>
+<%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%@ page import="org.oscarehr.appointment.model.AppointmentStatusList" %>
-<%@ page import="org.oscarehr.common.dao.MyGroupDao" %>
 <%@ page import="org.oscarehr.common.dao.MyGroupAccessRestrictionDao" %>
+<%@ page import="org.oscarehr.common.dao.MyGroupDao" %>
 <%@ page import="org.oscarehr.common.dao.ProviderSiteDao" %>
 <%@ page import="org.oscarehr.common.dao.SiteDao" %>
 <%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
@@ -58,13 +40,13 @@
 <%@ page import="org.oscarehr.common.model.MyGroupAccessRestriction" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ page import="org.oscarehr.common.model.ProviderSite" %>
-<%@ page import="org.oscarehr.common.model.ProviderPreference"%>
 <%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
+
 <%@ page import="org.oscarehr.managers.AppointmentManager" %>
-<%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
 <%@ page import="org.oscarehr.managers.LookupListManager" %>
-<%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
+<%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
+<%@ page import="org.oscarehr.provider.controller.MenuBar" %>
 <%@ page import="org.oscarehr.provider.model.ProviderPreventionManager" %>
 <%@ page import="org.oscarehr.schedule.dao.ScheduleDateDao" %>
 <%@ page import="org.oscarehr.schedule.dto.AppointmentDetails" %>
@@ -76,13 +58,25 @@
 <%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="org.oscarehr.util.SessionConstants" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.web.admin.ProviderPreferencesUIBean" %>
-<%@ page import="org.springframework.transaction.support.DefaultTransactionDefinition" %>
+<%@ page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%>
 <%@ page import="org.springframework.transaction.TransactionDefinition" %>
+<%@ page import="org.springframework.transaction.support.DefaultTransactionDefinition" %>
+<%@ page import="oscar.OscarProperties" %>
+<%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="oscar.util.UtilDateUtilities" %>
+<%@ page import="java.io.UnsupportedEncodingException" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="java.time.LocalTime" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page import="java.time.temporal.ChronoUnit" %>
-<%@ page import="java.time.Period" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="org.apache.commons.lang.WordUtils" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.ResourceBundle" %>
+<%@ page import="java.util.SortedMap" %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
 <jsp:useBean id="appointmentInfo" class="org.oscarehr.appointment.AppointmentDisplayController" scope="page" />
@@ -684,8 +678,13 @@ private long getAppointmentRowSpan(
 		function findProvider(p,m,d) {
 			popupPage(300,400, "receptionistfindprovider.jsp?pyear=" +p+ "&pmonth=" +m+ "&pday=" +d+ "&providername="+ document.findprovider.providername.value );
 		}
-		function goSearchView(s) {
+		function goSearchView(s)
+		{
 			popupPage(600,650,"../appointment/appointmentsearch.jsp?provider_no="+s);
+		}
+		function goDaysheetView(providerNo, date)
+		{
+			popupPage(600,650,"../report/reportdaysheet.jsp?dsmode=all&provider_no=" + providerNo +"&sdate="+ date + "&edate=" + date);
 		}
 
 		function review(key)
@@ -798,7 +797,7 @@ private long getAppointmentRowSpan(
 
 					<security:oscarSec roleName="<%=roleName$%>" objectName="_billing" rights="r">
 						<li>
-							<a HREF="#" ONCLICK ="popupPage2('../billing/CA/<%=prov%>/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;" TITLE='<bean:message key="global.genBillReport"/>' onMouseOver="window.status='<bean:message key="global.genBillReport"/>';return true"><bean:message key="global.billing"/></a>
+							<a HREF="#" ONCLICK ="popupPage2('../billing/CA/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;" TITLE='<bean:message key="global.genBillReport"/>' onMouseOver="window.status='<bean:message key="global.genBillReport"/>';return true"><bean:message key="global.billing"/></a>
 						</li>
 					</security:oscarSec>
 
@@ -891,7 +890,7 @@ private long getAppointmentRowSpan(
 					</li>
 
 					<security:oscarSec roleName="<%=roleName$%>" objectName="_dashboardDisplay" rights="r">
-						<c:if test="${menuBarController.hasDashboards}">
+						<oscar:oscarPropertiesCheck property="enable_dashboards" value="true">
 							<li id="dashboardList">
 								<div class="dropdown">
 									<a href="#" class="dashboardBtn">Dashboard</a>
@@ -904,8 +903,7 @@ private long getAppointmentRowSpan(
 									</div>
 								</div>
 							</li>
-						</c:if>
-
+						</oscar:oscarPropertiesCheck>
 					</security:oscarSec>
 
 					<!-- Added logout link for mobile version -->
@@ -1346,6 +1344,7 @@ private long getAppointmentRowSpan(
 						for(UserDateSchedule schedule: schedules)
 						{
 							Integer scheduleProviderNo = schedule.getProviderNo();
+							String formattedScheduleDate = ConversionUtils.toDateString(schedule.getScheduleDate());
 
 							headerColor = !headerColor;
 
@@ -1385,7 +1384,8 @@ private long getAppointmentRowSpan(
 											"&day=" + schedule.getScheduleDate().getDayOfMonth() +
 											"&view=0" +
 											"&displaymode=day" +
-											"&dboperation=searchappointmentday";
+											"&dboperation=searchappointmentday" +
+											"&viewall=" + viewall;
 									%>
 									<b><a href="<%= dayUrl %>">
 										<%=schedule.getScheduleDate().format(DateTimeFormatter.ofPattern("EEE, yyyy-MM-dd"))%>
@@ -1395,7 +1395,8 @@ private long getAppointmentRowSpan(
 								else
 								{
 									%>
-									<b><input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.weekLetter"/>" name='weekview' onClick=goWeekView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.weekView"/>" style="color:black" class="noprint">
+									<b style="padding: 0 5px 0 5px;">
+										<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.weekLetter"/>" name='weekview' onClick=goWeekView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.weekView"/>" style="color:black" class="noprint">
 										<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.searchLetter"/>" name='searchview' onClick=goSearchView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.searchView"/>" style="color:black" class="noprint">
 										<b><input type='radio' name='flipview' class="noprint" onClick="goFilpView('<%= scheduleProviderNo %>')" title="Flip view"  >
 											<a href=# onClick="goZoomView('<%= scheduleProviderNo %>','<%=StringEscapeUtils.escapeJavaScript(schedule.getFullName())%>')" onDblClick="goFilpView('<%= scheduleProviderNo %>')" title="<bean:message key="provider.appointmentProviderAdminDay.zoomView"/>" >
@@ -1406,6 +1407,7 @@ private long getAppointmentRowSpan(
 												<%-- Default is to hide inline reasons. --%>
 											</oscar:oscarPropertiesCheck>
 										</b>
+										<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.daysheetLetter"/>" name='daysheetview' onClick=goDaysheetView('<%= scheduleProviderNo %>','<%= formattedScheduleDate %>') title="<bean:message key="provider.appointmentProviderAdminDay.daysheetView"/>" style="color:black" class="noprint">
 									<%
 								}
 								%>
@@ -1674,6 +1676,9 @@ private long getAppointmentRowSpan(
 												String demographic_no = appointment.getDemographicNo().toString();
 												String appointment_no = appointment.getAppointmentNo().toString();
 
+												String demo_alert = "";
+
+
 
 											%>
 
@@ -1831,6 +1836,18 @@ private long getAppointmentRowSpan(
 																${appointmentInfo.appointmentLinkTitle}
 															</oscar:oscarPropertiesCheck>
 														>
+
+															<oscar:oscarPropertiesCheck property="show_demographic_alert_flag" value="true" defaultVal="false">
+																<%
+																	if (!appointmentInfo.getAlert().equals(""))
+																	{
+																%>
+																		<img height="14px" src="../images/icons/071.png" alt="${appointmentInfo.alert}" title="${appointmentInfo.alert}" />
+																<%
+																	}
+																%>
+
+															</oscar:oscarPropertiesCheck>
 
 															<oscar:oscarPropertiesCheck property="show_hc_eligibility" value="true" defaultVal="false">
 																<c:if test="${appointmentInfo.activeMedicalCoverage}">+&nbsp</c:if>
@@ -2042,12 +2059,14 @@ private long getAppointmentRowSpan(
 									else
 									{
 										%>
-										<b><input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.weekLetter"/>" name='weekview' onClick=goWeekView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.weekView"/>" style="color:black" class="noprint">
+										<b style="padding: 0 5px 0 5px;">
+											<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.weekLetter"/>" name='weekview' onClick=goWeekView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.weekView"/>" style="color:black" class="noprint">
 											<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.searchLetter"/>" name='searchview' onClick=goSearchView('<%= scheduleProviderNo %>') title="<bean:message key="provider.appointmentProviderAdminDay.searchView"/>" style="color:black" class="noprint">
 											<b><input type='radio' name='flipview' class="noprint" onClick="goFilpView('<%= scheduleProviderNo %>')" title="Flip view"  >
 												<a href=# onClick="goZoomView('<%= scheduleProviderNo %>','<%=StringEscapeUtils.escapeJavaScript(schedule.getFullName())%>')" onDblClick="goFilpView('<%= scheduleProviderNo %>')" title="<bean:message key="provider.appointmentProviderAdminDay.zoomView"/>" >
 													<%=schedule.getFullName()%></a>
 											</b>
+											<input type='button' value="<bean:message key="provider.appointmentProviderAdminDay.daysheetLetter"/>" name='daysheetview' onClick=goDaysheetView('<%= scheduleProviderNo %>','<%= formattedScheduleDate %>') title="<bean:message key="provider.appointmentProviderAdminDay.daysheetView"/>" style="color:black" class="noprint">
 										<%
 									}
 									%>
@@ -2140,7 +2159,7 @@ private long getAppointmentRowSpan(
 			//use (evt.altKey || evt.metaKey) for Mac if you want Apple+A, you will probably want a seperate onkeypress handler in that case to return false to prevent propagation
 			switch(evt.keyCode) {
 				case <bean:message key="global.adminShortcut"/> : newWindow("../administration/","admin");  return false;  //run code for 'A'dmin
-				case <bean:message key="global.billingShortcut"/> : popupOscarRx(600,1024,'../billing/CA/<%=prov%>/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;  //code for 'B'illing
+				case <bean:message key="global.billingShortcut"/> : popupOscarRx(600,1024,'../billing/CA/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;  //code for 'B'illing
 				case <bean:message key="global.calendarShortcut"/> : popupOscarRx(425,430,'../share/CalendarPopup.jsp?urlfrom=../provider/providercontrol.jsp&year=<%=strYear%>&month=<%=strMonth%>&param=<%=URLEncoder.encode("&view=0&displaymode=day&dboperation=searchappointmentday&viewall="+viewall,"UTF-8")%>');  return false;  //run code for 'C'alendar
 				case <bean:message key="global.edocShortcut"/> : popupOscarRx('700', '1024', '../dms/documentReport.jsp?function=provider&functionid=<%=curUser_no%>&curUser=<%=curUser_no%>', 'edocView');  return false;  //run code for e'D'oc
 				case <bean:message key="global.resourcesShortcut"/> : popupOscarRx(550,687,'<%=resourceBaseUrl%>'); return false; // code for R'e'sources

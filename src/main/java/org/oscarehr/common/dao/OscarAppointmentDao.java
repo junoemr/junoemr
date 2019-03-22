@@ -656,7 +656,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 			"providerNo = ? AND " +
 			"appointmentDate >= ? AND " +
 			"appointmentDate <= ? AND " +
-			"status = 'B' AND " + 
+			"status LIKE 'B%' AND " +
 			"demographicNo <> 0 " + 
 			"ORDER BY appointmentDate DESC, startTime DESC ";
 

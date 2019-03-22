@@ -334,6 +334,9 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DiseaseRegistryService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormsService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxAccountWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxInboundWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxOutboundWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FormsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.InboxService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.MessagingService"/>
@@ -357,6 +360,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.SitesService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.SpecialistsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.StatusService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.SystemPreferenceWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.TicklerWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.UserMetricsService"/>
 

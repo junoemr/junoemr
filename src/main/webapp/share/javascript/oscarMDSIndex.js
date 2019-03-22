@@ -348,28 +348,43 @@ function rotate90(id) {
 	}});
 }
 
-function removeFirstPage(id) {
-	jQuery("#removeFirstPagebtn_" + id).attr('disabled', 'disabled');
-        var displayDocumentAs=$('displayDocumentAs_'+id).value;
+function removePage(id, pageNumber)
+{
+	jQuery("#removePagebtn_" + id).attr('disabled', 'disabled');
+	var displayDocumentAs = $('displayDocumentAs_' + id).value;
 
-	new Ajax.Request(contextPath + "/dms/SplitDocument.do", {method: 'post', parameters: "method=removeFirstPage&document=" + id, onSuccess: function(data) {
-		jQuery("#removeFirstPagebtn_" + id).removeAttr('disabled');
-                if(displayDocumentAs=="PDF") {
-                    showPDF(id,contextPath);
-                } else {
-                    jQuery("#docImg_" + id).attr('src', contextPath + "/dms/ManageDocument.do?method=viewDocPage&doc_no=" + id + "&curPage=1&rand=" + (new Date().getTime()));
-                }
-		var numPages = parseInt(jQuery("#numPages_" + id).text())-1;
-		jQuery("#numPages_" + id).text("" + numPages);
+	new Ajax.Request(contextPath + "/dms/SplitDocument.do", {
+		method: 'post',
+		parameters: "method=removePage&document=" + id + "&page=" + pageNumber,
+		onSuccess: function(data)
+		{
+			jQuery("#removePagebtn_" + id).removeAttr('disabled');
+			if (displayDocumentAs == "PDF")
+			{
+				showPDF(id, contextPath);
+			}
+			else
+			{
+				jQuery("#docImg_" + id).attr('src', contextPath + "/dms/ManageDocument.do?method=viewDocPage&doc_no=" + id + "&curPage=1&rand=" + (new Date().getTime()));
+			}
+
+			var numPages = parseInt(jQuery("#numPages_" + id).text()) - 1;
+			jQuery("#numPages_" + id).text("" + numPages);
+			jQuery("#totalPage_" + id).text("" + numPages);
+			jQuery('#totalPage_'+ id).attr("value", numPages)
 
 
+			if (numPages <= 1)
+			{
+				jQuery("#numPages_" + id).removeClass("multiPage");
+				jQuery("#removeFirstPagebtn_" + id).remove();
+				jQuery("#removePagebtn_" + id).remove();
+			}
 
-		if (numPages <= 1) {
-			jQuery("#numPages_" + id).removeClass("multiPage");
-			jQuery("#removeFirstPagebtn_" + id).remove();
+			//reset to first page
+			firstPage(id, contextPath);
 		}
-
-	}});
+	});
 }
 
 function split(id) {
@@ -1846,7 +1861,6 @@ function showPDF(docid,cp) {
     }
 
     var url=cp+'/dms/ManageDocument.do?method=display&doc_no='+docid+'&rand='+Math.random()+'#view=fitV&page=1';
-
     document.getElementById('docDispPDF_'+docid).innerHTML='<object width="'+(width)+'" height="'+(height)+'" type="application/pdf" data="'+url+'" id="docPDF_'+docid+'"></object>';
 }
 
@@ -1859,7 +1873,7 @@ function showPageImg(docid,pn,cp){
     {
         if(docid&&pn&&cp){
             var e=$('docImg_'+docid);
-            var url=cp+'/dms/ManageDocument.do?method=viewDocPage&doc_no='+docid+'&curPage='+pn;
+            var url=cp+'/dms/ManageDocument.do?method=viewDocPage&doc_no='+docid+'&curPage='+pn + "&rand=" + (new Date().getTime());
             e.setAttribute('src',url);
         }
     }

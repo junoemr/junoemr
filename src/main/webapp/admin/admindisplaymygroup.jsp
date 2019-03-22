@@ -36,6 +36,7 @@
 
 <%
 	MyGroupDao myGroupDao = SpringUtils.getBean(MyGroupDao.class);
+	ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
 
     String curProvider_no = (String) session.getAttribute("user");
     String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -48,6 +49,8 @@
 </security:oscarSec>
 
 <%@ page import="java.util.*,java.sql.*" errorPage="../provider/errorpage.jsp"%>
+<%@ page import="org.oscarehr.provider.dao.ProviderDataDao" %>
+<%@ page import="org.oscarehr.provider.model.ProviderData" %>
 
 <!DOCTYPE html>
 <html:html locale="true">
@@ -103,24 +106,28 @@ if(isSiteAccessPrivacy) {
 
 
 for(MyGroup myGroup : groupList) {
+	ProviderData provider = providerDataDao.find(myGroup.getId().getProviderNo());
 
-	if(!myGroup.getId().getMyGroupNo().equals(oldNumber)) {
-		toggleLine = !toggleLine;
-		oldNumber = myGroup.getId().getMyGroupNo();
+	if (provider != null)
+	{
+		if(!myGroup.getId().getMyGroupNo().equals(oldNumber)) {
+			toggleLine = !toggleLine;
+			oldNumber = myGroup.getId().getMyGroupNo();
+		}
+	%>
+				<tr class="<%=toggleLine?"":"info"%>">
+					<td width="20px">
+						<input type="checkbox"
+						name="<%=myGroup.getId().getMyGroupNo() + myGroup.getId().getProviderNo()%>"
+						value="<%=myGroup.getId().getMyGroupNo()%>">
+					</td>
+					<td><%=myGroup.getId().getMyGroupNo()%></td>
+					<td> <%=provider.getLastName()+","+ provider.getFirstName()%>
+					</td>
+				</tr>
+	<%
 	}
-%>
-			<tr class="<%=toggleLine?"":"info"%>">
-				<td width="20px">
-					<input type="checkbox"
-					name="<%=myGroup.getId().getMyGroupNo() + myGroup.getId().getProviderNo()%>"
-					value="<%=myGroup.getId().getMyGroupNo()%>">
-				</td>
-				<td><%=myGroup.getId().getMyGroupNo()%></td>
-				<td> <%=myGroup.getLastName()+","+ myGroup.getFirstName()%>
-				</td>
-			</tr>
-<%
-   }
+}
 %>
 		</tbody>
 		</table>

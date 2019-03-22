@@ -528,7 +528,10 @@ public class MSPBill {
         while (e.hasMoreElements()) {
           String code = (String) e.nextElement();
           String desc = (String)this.explanations.get(code);
-          summary += code + ":" + desc + "\n";
+          if (!code.equals(""))
+          {
+            summary += code + ":" + desc + "\n";
+          }
         }
       }
       else{

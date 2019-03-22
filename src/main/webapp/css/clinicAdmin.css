@@ -1,0 +1,139 @@
+body {
+    font-family: 'Helvetica', sans-serif;
+}
+
+h2 {
+    margin: 0;
+}
+
+fieldset legend {
+    font-size: 1.5em;
+    color: #1d4c88;
+}
+
+.header {
+    background-color: #1d4c88;
+    color: white;
+    padding: 10px 0;
+    padding-left: 20px;
+    -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    -ms-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    -o-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.billing-check {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.billing-check span {
+    margin-left: 3px;
+}
+
+form {
+    padding-left: 7px;
+    padding-right: 15px;
+    padding-bottom: 20px;
+    width: 90%;
+    margin: 0 auto;
+    margin-top: 8px;
+}
+
+.clinic-info {
+    width: 95%;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+
+.address-fields {
+    display: flex;
+}
+
+.hide-billing {
+    justify-content: center;
+}
+
+.show-billing {
+    justify-content: space-between;
+}
+
+.address {
+    width: 43%;
+}
+
+.title h3 {
+    color: #1d4c88;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.4em;
+    font-weight: 100;
+}
+
+.input-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-field input {
+    margin-top: 4px;
+    margin-bottom: 10px;
+    padding: 3px 0;
+    padding-left: 4px;
+    font-size: 1.1em;
+}
+
+.input-field label {
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.submit {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.submit-button {
+    background-color: #1d4c88;
+    color: white;
+    border: none;
+    font-size: 1.1em;
+    padding: 5px 10px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+.submit-button:hover {
+    background-color: #1d3a88;
+}
+
+#billing-fields {
+    display: none;
+}
+
+.update-success {
+    text-align: center;
+    color: darkgreen;
+}
+
+@media only screen and (max-width: 1000px) {
+    .address-fields {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .clinic-info {
+        width: 90%;
+    }
+
+    .address {
+        width: 70%;
+    }
+
+    #billing-fields {
+        margin-top: 20px;
+    }
+}

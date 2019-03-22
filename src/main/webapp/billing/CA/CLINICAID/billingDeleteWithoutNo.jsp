@@ -20,7 +20,7 @@
 <%
   String curUser_no = (String) session.getAttribute("user");
 %>
-<%@ page errorPage="errorpage.jsp"%>
+<%@ page errorPage="../errorpage.jsp"%>
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@page import="org.oscarehr.common.model.Appointment" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>

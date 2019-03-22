@@ -33,7 +33,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
-import org.oscarehr.inbox.InboxManagerQuery;
 import org.oscarehr.inbox.InboxManagerResponse;
 import org.oscarehr.managers.InboxManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -57,32 +56,31 @@ public class InboxService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public InboxResponse getMyUnacknowlegedReports(@QueryParam("limit") int limit) {
 	
-		LoggedInInfo loggedInInfo=getLoggedInInfo();
-		String providerNo=loggedInInfo.getLoggedInProviderNo();
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
 	
-		InboxManagerQuery query = new InboxManagerQuery();
-		query.setProviderNo(providerNo);
-		query.setSearchProviderNo(providerNo);
-		query.setStatus("N");
-		query.setScannedDocStatus("I");
-		query.setPage(0);
-		query.setPageSize(40);
-		query.setView("all");
-		query.setPatientFirstName("");
-		query.setPatientLastName("");
-		query.setPatientHIN("");
-		
-		
-		InboxManagerResponse response = inboxManager.getInboxResults(loggedInInfo, query);
-		
+		InboxManagerResponse response = inboxManager.getInboxResults(
+				loggedInInfo,
+				InboxManager.ALL,
+				providerNo,
+				providerNo,
+				null,
+				"",
+				"",
+				"",
+				InboxManager.STATUS_NEW,
+				0,
+				40,
+				null,
+				null);
+
 		List<LabResultData> labDocs = response.getLabdocs();
 		List<InboxTo1> responseItems = new ArrayList<InboxTo1>();
 	
-		for(LabResultData result:labDocs) {
+		for(LabResultData result:labDocs)
+		{
 			InboxTo1 inboxItem = new InboxTo1();
-			String segmentID        =  result.getSegmentID();
-          
-            
+			String segmentID =  result.getSegmentID();
             String discipline = result.isDocument() ? result.description == null ? "" : result.description : result.getDisciplineDisplayString();
             String status = ((result.isReportCancelled())? "Cancelled" : result.isFinal() ? "Final" : "Partial");
             
@@ -94,13 +92,8 @@ public class InboxService extends AbstractServiceImpl {
             inboxItem.setPriority(result.getPriority());
             inboxItem.setStatus(status);
             inboxItem.setHin(result.getHealthNumber());
-            
+
             responseItems.add(inboxItem);
-            
-            if(responseItems.size() > limit) {
-            	continue;
-            }
-            
 		}
 		
 		InboxResponse resp = new InboxResponse();

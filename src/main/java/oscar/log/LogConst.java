@@ -55,7 +55,8 @@ public class LogConst {
 	public static final String VERIFY = "verify";
 	public static final String REFUSED = "refused";
 	public static final String UNLINK = "unlink";
-	public static final String SENT = "sent";
+	public static final String ACTION_SENT = "sent";
+	public static final String ACTION_DOWNLOAD = "download";
 
 	/* Content/Module constants
 	 * These should describe what module the action applies to.

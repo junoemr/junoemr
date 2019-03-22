@@ -26,7 +26,7 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
-<%@ page import="oscar.oscarMDS.data.ProviderData, java.util.ArrayList" %>
+<%@ page import="java.time.LocalDate" %>
 <html>
 <head>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
@@ -38,9 +38,13 @@
 			src="<%= request.getContextPath() %>/js/jquery-ui-1.10.2.custom.min.js"></script>
 
 	<script type="text/javascript">
+		function clearDate(id)
+		{
+			document.getElementById(id).value = '';
+		}
 		function handleDateChange(elem)
 		{
-			if (!Oscar.Util.Date.validateDateInputTolerant(elem))
+			if (!Oscar.Util.Date.cleanDateInput(elem))
 			{
 				elem.focus();
 				alert("<bean:message key="oscarMDS.search.msgInvalidDate"/>");
@@ -122,6 +126,10 @@
 			$("#autocompleteprov").autocomplete({
 				source: "<%= request.getContextPath() %>/provider/SearchProvider.do?method=labSearch",
 				minLength: 2,
+				messages: {
+					noResults: '',
+					results: ''
+				},
 				focus: function(event, ui)
 				{
 					$("#autocompleteprov").val(ui.item.label);
@@ -129,13 +137,12 @@
 				},
 				select: function(event, ui)
 				{
-					$("#autocompleteprov").val(ui.item.label);
-					$("#provfind").val(ui.item.value);
-
 					// Uncheck the radios when a doctor is selected
 					setTimeout(function()
 					{
-						radios = $("input[name=searchProviderAll]")
+						$("#autocompleteprov").val(ui.item.label);
+						$("#provfind").val(ui.item.value);
+						radios = $("input[name=searchProviderAll]");
 						for (var i = 0; i < radios.length; i++)
 						{
 							radios[i].checked = false;
@@ -143,6 +150,11 @@
 					});
 
 					return false;
+				},
+				close: function(event, uid)
+				{
+					$("#autocompleteprov").val(null);
+					$("#provfind").val(null);
 				}
 			})
 		});
@@ -209,19 +221,23 @@
 						</tr>
 
 						<tr>
-							<td>Start Date:(yyyy-mm-dd)
+							<td>
+								<label for="startDate">Start Date:(yyyy-mm-dd)</label>
 							</td>
 							<td><input type="text" id="startDate" name="startDate" size="15"
-									   id="startDate"
+									   value="<%= LocalDate.now().minusMonths(3) %>"
 									   onchange="handleDateChange(this)">
+								&nbsp;&nbsp;&nbsp;<button type="button" onclick="clearDate('startDate'); return false;">clear</button>
 							</td>
 						</tr>
 						<tr>
-							<td>End Date:(yyyy-mm-dd)
+							<td>
+								<label for="endDate">End Date:(yyyy-mm-dd)</label>
 							</td>
 							<td><input type="text" id="endDate" name="endDate" size="15"
-									   id="endDate"
+									   value="<%= LocalDate.now() %>"
 									   onchange="handleDateChange(this)">
+								&nbsp;&nbsp;&nbsp;<button type="button" onclick="clearDate('endDate'); return false;">clear</button>
 							</td>
 						</tr>
 

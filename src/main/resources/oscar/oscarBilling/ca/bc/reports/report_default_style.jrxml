@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Default style for all jasperreport (.jrxml) files -->
+<jasperTemplate>
+    <style name="Default"  isDefault="true" fontSize="8" fontName="DejaVu Sans"/>
+</jasperTemplate>

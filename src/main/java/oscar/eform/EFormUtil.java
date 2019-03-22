@@ -1076,7 +1076,7 @@ public class EFormUtil {
 			consult.setConcurrentProblems(concurrentProblems);
 			
 			consult.setUrgency(urgency!=null?urgency:"2");
-			consult.setStatus(status != null?status:"1");
+			consult.setStatus(status != null?status:ConsultationRequest.STATUS_ACTIVE);
 			consult.setSendTo("-1");
 			consult.setPatientWillBook(patientWillBook!=null?Boolean.valueOf(patientWillBook):false);
 	

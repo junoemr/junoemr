@@ -32,6 +32,7 @@
 		</form-bean>
 		<form-bean name="clinicForm" type="org.apache.struts.validator.DynaValidatorForm">
 			<form-property name="clinic" type="org.oscarehr.common.model.Clinic" />
+			<form-property name="clinicBillingAddress" type="org.oscarehr.clinic.model.ClinicBillingAddress" />
 		</form-bean>
 		<form-bean name="olisPreferences" type="org.oscarehr.olis.model.OLISSystemPreferences"/>
 
@@ -1203,6 +1204,7 @@
 			<forward name="printIndivica" path="/oscarEncounter/oscarConsultationRequest/printPdf2.do" />
 			<forward name="fax" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormFax.jsp" />
 			<forward name="faxIndivica" path="/fax/CoverPage.jsp" />
+			<forward name="emailalt" path="/oscarEncounter/oscarConsultationRequest/emailPatient.jsp" />
 		</action>
 		<action input="/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/printPdf" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestPrintAction">
 			<forward name="error" path="/oscarEncounter/ViewRequest.do?error=error" />
@@ -1212,7 +1214,7 @@
 		</action>
 		<action input="/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormFax" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormFaxAction">
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/ConfirmConsultationRequest.jsp" />
-			<forward name="error" path="/oscarEncounter/ViewRequest.do?error=error" />
+			<forward name="error" path="/oscarEncounter/oscarConsultationRequest/ConfirmConsultationRequest.jsp" />
 		</action>
 		<action input="/oscarEncounter/oscarConsultationRequest/attachmentReport.jsp" name="FrmForm" path="/oscarEncounter/oscarConsultation/printAttached" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationPrintDocsAction">
 			<forward name="noprint" path="/oscarEncounter/oscarConsultationRequest/nothingtoPrint.jsp" />
@@ -1604,12 +1606,6 @@
 			<forward name="success" path="/provider/providerFax.jsp" />
 			<forward name="error" path="/provider/providerFaxErr.jsp" />
 			<forward name="eject" path="/index.jsp" />
-		</action>
-		<action input="/admin/configureFax.jsp" path="/admin/ManageFax" scope="request" parameter="method" type="org.oscarehr.fax.admin.ConfigureFaxAction">
-			<forward name="completed" path="/admin/manageFax.jsp"/>			
-		</action>
-		<action input="/admin/manageFaxes.jsp" path="/admin/ManageFaxes" scope="request" parameter="method" validate="false" type="org.oscarehr.fax.admin.ManageFaxes">
-			<forward name="faxstatus" path="/admin/faxStatusResults.jspf" />			
 		</action>
 		
 		<action input="/provider/providerColourPicker.jsp" name="setProviderColour" path="/setProviderColour" scope="request" type="oscar.oscarProvider.pageUtil.ProEditColourAction">

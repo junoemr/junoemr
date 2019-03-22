@@ -78,6 +78,7 @@
 	<bean id="programClientRestrictionDAO" class="org.oscarehr.PMmodule.dao.ProgramClientRestrictionDAO" autowire="byName" />
 	<bean id="UserPropertyDAO" class="org.oscarehr.common.dao.UserPropertyDAO" autowire="byName" />
 	<bean id="clinicDAO" class="org.oscarehr.common.dao.ClinicDAO" autowire="byName" />
+	<bean id="clinicBillingAddressDAO" class="org.oscarehr.clinic.dao.ClinicBillingAddressDAO" autowire="byName" />
 	<bean id="dataExportDAO" class="org.oscarehr.common.dao.DataExportDao" autowire="byName" />
 	<bean id="siteDao" class="org.oscarehr.common.dao.SiteDao" autowire="byName" />
 	<bean id="BillingmasterDAO" class="oscar.oscarBilling.ca.bc.data.BillingmasterDAO" autowire="byName" />
@@ -289,6 +290,8 @@
 	<task:executor id="taskExecutor" />
 	-->
 	<task:scheduler id="taskScheduler" />
-		
+
+	<!-- Enables scheduled tasks annotated with @Scheduled etc. -->
+	<task:annotation-driven/>
 		
 </beans>

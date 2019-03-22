@@ -278,8 +278,17 @@ public class BillingDao extends AbstractDao<Billing> {
 	            "','" + MSPReconcile.SETTLED + "')";
 	      }
 	    }
-	    else {
-	      statusTypeClause += " like '" + statusType + "'";
+	    else
+		{
+	    	String[] statusTypes = statusType.split(",");
+	    	if (statusTypes.length > 1)
+			{
+				statusTypeClause += " in ('" + String.join("','", statusTypes) + "')";
+			}
+	    	else
+			{
+				statusTypeClause += " like '" + statusType + "'";
+			}
 	    }
 	    //
 	    String p = " select b.billing_no, b.demographic_no, b.demographic_name, b.update_date, b.billingtype,"
@@ -297,7 +306,7 @@ public class BillingDao extends AbstractDao<Billing> {
 	        + demoQuery
 	        + billingType
 	        + " order by b.billing_date desc";
-	    
+
 	    Query query = entityManager.createNativeQuery(p);
 		return query.getResultList();
 	}

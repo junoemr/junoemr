@@ -28,9 +28,11 @@ import org.oscarehr.managers.AppManager;
 import org.oscarehr.managers.DashboardManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
+import oscar.OscarProperties;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -118,7 +120,14 @@ public class MenuBar
 
 	private List<Dashboard> loadDashboards()
 	{
-		DashboardManager dashboardManager = SpringUtils.getBean(DashboardManager.class);
-		return dashboardManager.getActiveDashboards(this.loggedInInfo);
+		if (OscarProperties.getInstance().isPropertyActive("enable_dashboards"))
+		{
+			DashboardManager dashboardManager = SpringUtils.getBean(DashboardManager.class);
+			return dashboardManager.getActiveDashboards(this.loggedInInfo);
+		}
+		else
+		{
+			return new ArrayList<>();
+		}
 	}
 }

@@ -163,7 +163,7 @@ public class EctDisplayRxAction extends EctDisplayAction {
     String getClassColour(Prescription drug, long referenceTime, long durationToSoon){
         StringBuilder sb = new StringBuilder("class=\"");
 
-        if (!drug.isLongTerm() && (drug.isCurrent() && drug.getEndDate() != null && (drug.getEndDate().getTime() - referenceTime <= durationToSoon))) {
+        if (drug.isCurrent() && drug.getEndDate() != null && (drug.getEndDate().getTime() - referenceTime <= durationToSoon)) {
             sb.append("expireInReference ");
         }
 
@@ -175,7 +175,7 @@ public class EctDisplayRxAction extends EctDisplayAction {
             sb.append("archivedDrug ");
         }
 
-        if(!drug.isLongTerm() && !drug.isCurrent()) {
+        if(drug.isExpired()) {
             sb.append("expiredDrug ");
         }
 

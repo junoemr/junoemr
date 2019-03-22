@@ -104,13 +104,17 @@ clH = ["<bean:message key="caseload.msgDemographic" />", "", "<bean:message key=
 		<%
 		List<Provider> providerList = providerDao.getProviders();
 		for (Provider provider : providerList) {
-			if (caseloadProv.equals(provider.getProviderNo()) && !bDefaultAllProviders) {
-		%>
- 				<option value='<%=provider.getProviderNo()%>' selected><%=provider.getLastName()+", "+provider.getFirstName()%></option>
- 			<%} else {%>
-				<option value='<%=provider.getProviderNo()%>'><%=provider.getLastName()+", "+provider.getFirstName()%></option>
-			<%}%>
-		<% } %>
+			if (!provider.isProviderTypeReceptionist() && !provider.isProviderTypeAdmin() && provider.isActive())
+			{
+				if (caseloadProv.equals(provider.getProviderNo()) && !bDefaultAllProviders) {
+			%>
+					<option value='<%=provider.getProviderNo()%>' selected><%=provider.getLastName()+", "+provider.getFirstName()%></option>
+				<%} else {%>
+					<option value='<%=provider.getProviderNo()%>'><%=provider.getLastName()+", "+provider.getFirstName()%></option>
+				<%}%>
+			<% 
+			}
+			} %>
 					</select>
 					<b>Rostered: </b>
 					<select id='caseloadRoster' onChange='search("search");' style='width: 120'>

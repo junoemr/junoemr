@@ -61,7 +61,8 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Consults',
 	'Admin',
 	'Admin.Integration',
-	'Admin.Integration.Know2act'
+	'Admin.Integration.Know2act',
+	'Admin.Integration.Fax'
 ]);
 
 oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider)
@@ -484,11 +485,24 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 				controller: 'Admin.Integration.Know2act.k2aTemplateController as k2aTemplateCtrl'
 			})
 		.state('k2aNotification',
-		{
-			url:'/k2aNotification',
-			templateUrl: 'src/admin/integration/know2act/Know2actNotifications.jsp',
-			controller: 'Admin.Integration.Know2act.k2aNotificationController as k2aNoteCtrl'
-		});
+			{
+				url: '/k2aNotification',
+				templateUrl: 'src/admin/integration/know2act/Know2actNotifications.jsp',
+				controller: 'Admin.Integration.Know2act.k2aNotificationController as k2aNoteCtrl'
+			})
+		.state('faxConfig',
+			{
+				url: '/faxConfig',
+				templateUrl: 'src/admin/integration/fax/faxConfiguration.jsp',
+				controller: 'Admin.Integration.Fax.FaxConfigurationController as faxController'
+			})
+		.state('faxSendReceive',
+			{
+				url: '/faxSendReceive',
+				templateUrl: 'src/admin/integration/fax/faxSendReceive.jsp',
+				controller: 'Admin.Integration.Fax.FaxSendReceiveController as faxSendReceiveController'
+			})
+	;
 
 }]);
 

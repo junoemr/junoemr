@@ -23,7 +23,7 @@
     Ontario, Canada
 
 --%>
-<%@ page import="org.oscarehr.common.dao.FaxConfigDao, org.oscarehr.common.dao.OscarAppointmentDao,org.oscarehr.common.dao.SiteDao, org.oscarehr.common.model.Appointment, org.oscarehr.common.model.FaxConfig"%>
+<%@ page import="org.oscarehr.fax.dao.FaxAccountDao, org.oscarehr.common.dao.OscarAppointmentDao,org.oscarehr.common.dao.SiteDao, org.oscarehr.common.model.Appointment, org.oscarehr.fax.model.FaxAccount"%>
 <%@ page import="org.oscarehr.common.model.PharmacyInfo" %>
 <%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet" %>
@@ -48,9 +48,13 @@
 <%@page import="java.io.File"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.Vector"%>
+<%@ page import="org.oscarehr.fax.service.OutgoingFaxService" %>
 <%
 	OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+
+	OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
+	boolean faxEnabled = outgoingFaxService.isOutboundFaxEnabled();
 %>
 
 <%
@@ -447,18 +451,18 @@ function unloadMess(){
 var isSignatureDirty = false;
 var isSignatureSaved = false;
 function signatureHandler(e) {
-	<% if (OscarProperties.getInstance().isRxFaxEnabled()) { %>
+	<% if (faxEnabled) { %>
 	var hasFaxNumber = <%= pharmacy != null && pharmacy.getFax().trim().length() > 0 ? "true" : "false" %>;
 	<% } %>
 	isSignatureDirty = e.isDirty;
 	isSignatureSaved = e.isSave;
 	e.target.onbeforeunload = null;
-	<% if (OscarProperties.getInstance().isRxFaxEnabled()) { //%>
+	<% if (faxEnabled) { //%>
 	e.target.document.getElementById("faxButton").disabled = !hasFaxNumber || !e.isSave;
 	e.target.document.getElementById("faxAndPasteButton").disabled = !hasFaxNumber || !e.isSave;
 	<% } %>
 	if (e.isSave) {
-		<% if (OscarProperties.getInstance().isRxFaxEnabled()) { //%>
+		<% if (faxEnabled) { //%>
 		if (hasFaxNumber) {
 			e.target.onbeforeunload = unloadMess;
 		}
@@ -665,10 +669,10 @@ function toggleView(form) {
 							class="ControlPushButton" style="width: 150px"
 							onClick="javascript:printPaste2Parent(true);" /></span></td>
 					</tr>
-					<% if (OscarProperties.getInstance().isRxFaxEnabled()) {
+					<% if (faxEnabled) {
 							boolean hasFaxNumber = (pharmacy != null) && (pharmacy.getFax().trim().length() > 0);
-					    	FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
-					    	List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
+					    	FaxAccountDao faxAccountDao = SpringUtils.getBean(FaxAccountDao.class);
+					    	List<FaxAccount> faxAccounts = faxAccountDao.findAll(null, null);
 
                         // enable the fax button if there is a pre-set signature for the creator of the prescription or the logged in user
 					    String disabled = "disabled";

@@ -26,6 +26,7 @@
 package org.oscarehr.common.model;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.persistence.CascadeType;
@@ -44,12 +45,20 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
 @Entity
 @Table(name = "consultationRequests")
 public class ConsultationRequest extends AbstractModel<Integer> implements Serializable {
 
-	private static final String ACTIVE_MARKER = "1";
+	private static final Logger logger = MiscUtils.getLogger();
+
+	public static final String STATUS_ACTIVE = "1";
+	public static final String STATUS_PEND_SPECIAL = "2";
+	public static final String STATUS_PEND_PATIENT = "3";
+	public static final String STATUS_COMPLETE = "4";
+
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,9 +71,9 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
 	
 	private Integer serviceId;
 
-        @ManyToOne(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
-        @JoinColumn(name="specId")
-        private ProfessionalSpecialist professionalSpecialist;
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "specId")
+	private ProfessionalSpecialist professionalSpecialist;
 
 	@Temporal(TemporalType.DATE)
 	private Date appointmentDate;	
@@ -82,7 +91,7 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
 	@Column(name = "demographicNo")
 	private Integer demographicId;
 
-	private String status = ACTIVE_MARKER;
+	private String status = STATUS_ACTIVE;
 	private String statusText;
 	private String sendTo;
 	private String concurrentProblems;
@@ -100,6 +109,8 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
     private String letterheadAddress;
     private String letterheadPhone;
     private String letterheadFax;
+	@Column(name = "notification_sent", columnDefinition = "TINYINT(1)", nullable = false)
+	private boolean notificationSent = false;
     
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdateDate;
@@ -343,9 +354,51 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
 		this.source = source;
 	}
 
+	public boolean isNotificationSent()
+	{
+		return notificationSent;
+	}
+
+	public void setNotificationSent(boolean notificationSent)
+	{
+		this.notificationSent = notificationSent;
+	}
+
 	@PrePersist
 	@PreUpdate
 	protected void jpa_updateLastDateUpdated() {
 		lastUpdateDate = new Date();
+	}
+
+	public Date getAppointmentDateTime()
+	{
+		Date appointmentDateTime = null;
+		try
+		{
+			Date appointmentDate = getAppointmentDate();
+			Date appointmentTime = getAppointmentTime();
+			if(appointmentDate != null)
+			{
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(appointmentDate);
+
+				// if there is no appointment time, still want to return the date
+				if(appointmentTime != null)
+				{
+					Calendar acal = Calendar.getInstance();
+					acal.setTime(appointmentTime);
+					cal.set(Calendar.HOUR_OF_DAY, acal.get(Calendar.HOUR_OF_DAY));
+					cal.set(Calendar.MINUTE, acal.get(Calendar.MINUTE));
+					cal.set(Calendar.SECOND, 0);
+					cal.set(Calendar.MILLISECOND, 0);
+				}
+				appointmentDateTime = cal.getTime();
+			}
+		}
+		catch(Exception e)
+		{
+			logger.error("Invalid appointment datetime", e);
+		}
+		return appointmentDateTime;
 	}
 }

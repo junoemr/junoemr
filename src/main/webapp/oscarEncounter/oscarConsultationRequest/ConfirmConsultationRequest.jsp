@@ -24,93 +24,135 @@
 
 --%>
 
-<%@page import="org.oscarehr.util.WebUtilsOld"%>
+<%@ page import="org.oscarehr.util.WebUtilsOld"%>
+<%@ page import="java.util.List" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-      boolean authed=true;
+      boolean authorized = true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_con" rights="r" reverse="<%=true%>">
-	<%authed=false; %>
+	<%authorized = false; %>
 	<%response.sendRedirect("../../securityError.jsp?type=_con");%>
 </security:oscarSec>
 <%
-if(!authed) {
-	return;
-}
+	if(!authorized)
+	{
+		return;
+	}
+
+	List<String> errorList = (List<String>) request.getAttribute("errorList");
+	boolean hasErrors = (errorList != null && !errorList.isEmpty());
+
+	Boolean autoClose = (Boolean) request.getAttribute("autoClose");
+	if(autoClose == null)
+	{
+		autoClose = !hasErrors;
+	}
+
+	String type = (request.getParameter("transType") == null) ? (String) request.getAttribute("transType") : request.getParameter("transType");
 %>
 
+<html:html locale="true">
+	<head>
+		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+		<title><bean:message
+				key="oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.title"/>
+		</title>
+		<html:base/>
+		<script language="javascript">
+			function BackToOscar()
+			{
+				window.close();
+			}
 
+			function finishPage(secs)
+			{
+				if(<%=autoClose%>)
+				{
+					setTimeout("window.close()", secs * 500);
+				}
+			}
+		</script>
+	</head>
 
-<%@page import="org.oscarehr.util.WebUtils"%><html:html locale="true">
+	<link rel="stylesheet" type="text/css" href="../encounterStyles.css">
+	<body topmargin="0" leftmargin="0" vlink="#0000FF" onload="finishPage(5);">
 
-<head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<title><bean:message
-	key="oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.title" />
-</title>
-<html:base />
-
-</head>
-<script language="javascript">
-function BackToOscar() {
-       window.close();
-}
-
-function finishPage(secs){
-    setTimeout("window.close()",secs*500);    
-    //window.opener.location.reload();    
-}
-
-</script>
-
-
-<link rel="stylesheet" type="text/css" href="../encounterStyles.css">
-<body topmargin="0" leftmargin="0" vlink="#0000FF"
-	onload="finishPage(5);">
-<!--  -->
-<table class="MainTable" id="scrollNumber1" name="encounterTable">
-	<tr class="MainTableTopRow">
-		<td class="MainTableTopRowLeftColumn">Consultation</td>
-		<td class="MainTableTopRowRightColumn"></td>
-	</tr>
-	<tr style="vertical-align: top">
-		<td class="MainTableLeftColumn" width="10%">&nbsp;</td>
-		<td class="MainTableRightColumn">
-		<table width="100%" height="100%">
-			<tr>
-				<td><bean:message
-					key="oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.msgConsReq" />
-				<%
-                            String type = request.getParameter("transType") == null ? (String) request.getAttribute("transType") : request.getParameter("transType");
-                            if (type.equals("1")){ %> <bean:message
-					key="oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.msgUpdated" />
-				<% }else if (type.equals("2")){ %> <bean:message
-					key="oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.msgCreated" />
-				<% } %>
-				
-				<%=WebUtilsOld.popInfoMessagesAsHtml(session)%>
-				</td>
-			</tr>
-			<tr>
-				<td><bean:message
-					key="oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.msgClose5Sec" />
-				</td>
-			</tr>
-			<tr>
-				<td><a href="javascript: BackToOscar();"> <bean:message
-					key="global.btnClose" /> </a></td>
-			</tr>
-		</table>
-		</td>
-	</tr>
-	<tr>
-		<td class="MainTableBottomRowLeftColumn"></td>
-		<td class="MainTableBottomRowRightColumn"></td>
-	</tr>
-</table>
-</body>
+	<table class="MainTable" id="scrollNumber1" name="encounterTable">
+		<tr class="MainTableTopRow">
+			<td class="MainTableTopRowLeftColumn">Consultation</td>
+			<td class="MainTableTopRowRightColumn"></td>
+		</tr>
+		<tr style="vertical-align: top">
+			<td class="MainTableLeftColumn" width="10%">&nbsp;</td>
+			<td class="MainTableRightColumn">
+				<table width="100%" height="100%">
+					<%
+					if(hasErrors)
+					{
+					%><h1><bean:message
+						key="oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.msgEncounteredErrors"/></h1><%
+						for(String errorMessage : errorList)
+						{
+						%>
+							<tr>
+								<td>
+									<span><%=errorMessage%></span>
+								</td>
+							</tr>
+						<%
+						}
+					}
+					else
+					{ %>
+						<tr>
+							<td><bean:message
+									key="oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.msgConsReq"/>
+								<%
+								if(type.equals("1"))
+								{ %>
+									<bean:message
+									key="oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.msgUpdated"/>
+								<%
+								}
+								else if(type.equals("2"))
+								{ %>
+									<bean:message
+									key="oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.msgCreated"/>
+								<%
+								} %>
+								<%=WebUtilsOld.popInfoMessagesAsHtml(session)%>
+							</td>
+						</tr>
+						<%
+					}
+					if(autoClose)
+					{
+					%>
+						<tr>
+							<td><bean:message
+									key="oscarEncounter.oscarConsultationRequest.ConfirmConsultationRequest.msgClose5Sec"/>
+							</td>
+						</tr>
+					<%
+					}%>
+					<tr>
+						<td><a href="javascript: BackToOscar();">
+							<bean:message
+								key="global.btnClose"/>
+						</a></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td class="MainTableBottomRowLeftColumn"></td>
+			<td class="MainTableBottomRowRightColumn"></td>
+		</tr>
+	</table>
+	</body>
 </html:html>

@@ -60,6 +60,9 @@ boolean isSharingCenterEnabled = SharingCenterUtil.isEnabled();
 AffinityDomainDao affDao = SpringUtils.getBean(AffinityDomainDao.class);
 List<AffinityDomainDataObject> affinityDomains = affDao.getAllAffinityDomains();
 
+    OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
+    boolean faxEnabled = outgoingFaxService.isOutboundFaxEnabled();
+
 %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
@@ -72,6 +75,7 @@ List<AffinityDomainDataObject> affinityDomains = affDao.getAllAffinityDomains();
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils, oscar.OscarProperties, oscar.dms.EDoc, oscar.dms.EDocUtil, java.util.ArrayList, java.util.List"%>
+<%@ page import="org.oscarehr.fax.service.OutgoingFaxService" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" scope="request" />
 
 
@@ -619,7 +623,7 @@ function popup1(height, width, url, windowName){
         onClick="window.print()"> <input type="button"
         value="<bean:message key="dms.documentReport.btnCombinePDF"/>"
         onclick="return submitForm('<rewrite:reWrite jspPage="combinePDFs.do"/>');" />
-				<% if (props.isDocumentFaxEnabled()) { %>
+				<% if (faxEnabled) { %>
 				<input type="button"
 					value="<bean:message key="dms.documentReport.btnFaxPDF"/>"
 					onclick="return newWindowForm('<rewrite:reWrite jspPage="faxPDFs.do"/>');" />

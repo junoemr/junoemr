@@ -427,7 +427,6 @@
 <%--<script type="text/javascript" src="dist_webpack/tsbundle.js"></script>--%>
 
 <!-- Template code generated from the template jsps -->
-<jsp:include page="templates.jsp"/>
 
 </body>
 </html>

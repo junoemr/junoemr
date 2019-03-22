@@ -6,6 +6,19 @@
 		<ap-sql>SELECT curdate()</ap-sql>
 		<ap-output>${curdate()}</ap-output>
 	</databaseap>
+
+	<databaseap>
+		<ap-name>today2</ap-name>
+		<ap-sql>SELECT DATE_FORMAT(curdate(), "%d-%m-%Y") as date</ap-sql>
+		<ap-output>${date}</ap-output>
+	</databaseap>
+
+	<databaseap>
+		<ap-name>today3</ap-name>
+		<ap-sql>SELECT DATE_FORMAT(curdate(), "%m-%d-%Y") as date</ap-sql>
+		<ap-output>${date}</ap-output>
+	</databaseap>
+
 	<databaseap>
 		<ap-name>time</ap-name>
 		<ap-sql>SELECT curtime()</ap-sql>
@@ -123,6 +136,18 @@
 		<ap-sql>SELECT provider.first_name, provider.last_name FROM provider
 			WHERE provider.provider_no='${provider}' </ap-sql>
 		<ap-output>${last_name}, ${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>current_userF</ap-name>
+		<ap-sql>SELECT provider.first_name FROM provider
+			WHERE provider.provider_no='${provider}' </ap-sql>
+		<ap-output>${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>current_userL</ap-name>
+		<ap-sql>SELECT provider.last_name FROM provider
+			WHERE provider.provider_no='${provider}' </ap-sql>
+		<ap-output>${last_name}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>current_user_fname_lname</ap-name>
@@ -466,23 +491,16 @@
 	</databaseap>
 	<databaseap>
 		<ap-name>ageComplex</ap-name>
-		<ap-sql>SELECT (IF ( (YEAR(CURRENT_DATE) - YEAR(@bdate))&lt; 3,
-			(IF ( (((YEAR(CURRENT_DATE) - 1) * 12 + MONTH(CURRENT_DATE)) -
-			((YEAR(@bdate) - 1) * 12 + MONTH(@bdate))) - (MID(@bdate, 9, 2) &lt;
-			MID(@bdate, 9, 2))&lt; 3,
-			(IF ( FLOOR((TO_DAYS(CURRENT_DATE) - TO_DAYS(@bdate))/7)&lt; 5,
-			(IF ( (TO_DAYS(CURRENT_DATE) - TO_DAYS(@bdate))&lt; 2,
-			'newborn', CONCAT((TO_DAYS(CURRENT_DATE) - TO_DAYS(@bdate)),' day old'))),
-			CONCAT(FLOOR((TO_DAYS(CURRENT_DATE) - TO_DAYS(@bdate))/7),' week
-			old'))), CONCAT((((YEAR(CURRENT_DATE) - 1) * 12 +
-			MONTH(CURRENT_DATE)) - ((YEAR(@bdate) - 1) * 12 + MONTH(@bdate))) -
-			(MID(@bdate, 9, 2) &lt; MID(@bdate, 9, 2)),' month old'))),
-			CONCAT((YEAR(CURRENT_DATE) - YEAR(@bdate)) - (MID(CURRENT_DATE, 6, 5)
-			&lt; MID(CURRENT_DATE, 6, 5)),' year old'))) as ageComplex from
-			(SELECT @bdate:=
-			DATE_FORMAT(CONCAT((demographic.year_of_birth), '-', (demographic.month_of_birth), '-',
-			(demographic.date_of_birth)),'%Y-%m-%d') AS birthdate FROM
-			demographic WHERE demographic_no=${demographic}) as t</ap-sql>
+		<ap-sql>SELECT
+			CASE
+			  WHEN (@bdate >= DATE(NOW() - INTERVAL 2 DAY)) THEN 'newborn'
+			  WHEN (@bdate >= DATE(NOW() - INTERVAL 7 DAY)) THEN CONCAT(TIMESTAMPDIFF(DAY, @bdate, CURRENT_DATE),' day old')
+			  WHEN (@bdate >= DATE(NOW() - INTERVAL 4 WEEK)) THEN CONCAT(TIMESTAMPDIFF(WEEK, @bdate, CURRENT_DATE),' week old')
+			  WHEN (@bdate >= DATE(NOW() - INTERVAL 11 MONTH)) THEN CONCAT(TIMESTAMPDIFF(MONTH, @bdate, CURRENT_DATE),' month old')
+			  ELSE CONCAT(TIMESTAMPDIFF(YEAR, @bdate, CURRENT_DATE), ' year old')
+			END AS ageComplex
+			  FROM (SELECT @bdate:= DATE_FORMAT(CONCAT((demographic.year_of_birth), '-', (demographic.month_of_birth), '-', (demographic.date_of_birth)),'%Y-%m-%d')
+			  AS birthdate FROM demographic WHERE demographic_no=${demographic}) as t</ap-sql>
 		<ap-output>${ageComplex}</ap-output>
 	</databaseap>
 	<databaseap>
@@ -570,6 +588,11 @@
 		<ap-sql>SELECT GROUP_CONCAT(pa.address, '\n', pa.city, ', ', pa.province, ', ', pa.postal SEPARATOR ';') AS list
 			FROM licensed_producer_address pa
 		</ap-sql>
+		<ap-output>${list}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>licensed_producer_name_list</ap-name>
+		<ap-sql>SELECT GROUP_CONCAT(producer_name ORDER BY producer_name SEPARATOR ';' ) as list FROM licensed_producer</ap-sql>
 		<ap-output>${list}</ap-output>
 	</databaseap>
 
@@ -1101,6 +1124,20 @@
 		<ap-output>${last_name}, ${first_name}</ap-output>
 	</databaseap>
 	<databaseap>
+		<ap-name>doctorF</ap-name>
+		<ap-sql>SELECT provider.first_name FROM provider,
+			demographic WHERE demographic.demographic_no=${demographic} AND
+			demographic.provider_no=provider.provider_no</ap-sql>
+		<ap-output>${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>doctorL</ap-name>
+		<ap-sql>SELECT provider.last_name FROM provider,
+			demographic WHERE demographic.demographic_no=${demographic} AND
+			demographic.provider_no=provider.provider_no</ap-sql>
+		<ap-output>${last_name}</ap-output>
+	</databaseap>
+	<databaseap>
 		<ap-name>doctor_provider_no</ap-name>
 		<ap-sql>SELECT provider_no FROM demographic WHERE
 			demographic_no=${demographic}</ap-sql>
@@ -1218,6 +1255,24 @@
 		<ap-output>${last_name}, ${first_name}</ap-output>
 	</databaseap>
 	<databaseap>
+		<ap-name>appt_provider_nameF</ap-name>
+		<ap-sql>
+			SELECT p.first_name
+			FROM provider p, appointment a
+			WHERE p.provider_no=a.provider_no AND a.appointment_no=${appt_no}
+		</ap-sql>
+		<ap-output>${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>appt_provider_nameL</ap-name>
+		<ap-sql>
+			SELECT p.last_name
+			FROM provider p, appointment a
+			WHERE p.provider_no=a.provider_no AND a.appointment_no=${appt_no}
+		</ap-sql>
+		<ap-output>${last_name}</ap-output>
+	</databaseap>
+	<databaseap>
 		<ap-name>appt_provider_ohip_no</ap-name>
 		<ap-sql>SELECT p.ohip_no
 			FROM provider p INNER JOIN appointment a ON (p.provider_no=a.provider_no)
@@ -1250,6 +1305,32 @@
 			WHERE d.demographic_no=${demographic}
 		</ap-sql>
 		<ap-output>${referral_doc_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>referral_nameF</ap-name>
+		<ap-sql>SELECT
+			CASE WHEN (ps.lName IS NULL AND ps.fName IS NULL) OR LENGTH(ps.referralNo) = 0
+			THEN SUBSTRING_INDEX(EXTRACTVALUE(d.family_doctor, '/rd'), ',', -1)
+			ELSE ps.fName
+			END as referral_doc_first_name
+			FROM demographic d
+			LEFT JOIN professionalSpecialists ps ON (EXTRACTVALUE(d.family_doctor, '/rdohip') = ps.referralNo)
+			WHERE d.demographic_no=${demographic}
+		</ap-sql>
+		<ap-output>${referral_doc_first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>referral_nameL</ap-name>
+		<ap-sql>SELECT
+			CASE WHEN (ps.lName IS NULL AND ps.fName IS NULL) OR LENGTH(ps.referralNo) = 0
+			THEN SUBSTRING_INDEX(EXTRACTVALUE(d.family_doctor, '/rd'), ',', 1)
+			ELSE ps.lName
+			END as referral_doc_last_name
+			FROM demographic d
+			LEFT JOIN professionalSpecialists ps ON (EXTRACTVALUE(d.family_doctor, '/rdohip') = ps.referralNo)
+			WHERE d.demographic_no=${demographic}
+		</ap-sql>
+		<ap-output>${referral_doc_last_name}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>referral_address</ap-name>
@@ -1306,6 +1387,28 @@
 			EXTRACTVALUE(demographic.family_doctor, '/rdohip') = billingreferral.referral_no
 		</ap-sql>
 		<ap-output>${last_name}, ${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>bc_referral_nameF</ap-name>
+		<ap-sql>SELECT billingreferral.first_name
+			FROM billingreferral, demographic
+			WHERE demographic.demographic_no=${demographic}
+			AND LENGTH(billingreferral.referral_no) > 0
+			AND
+			EXTRACTVALUE(demographic.family_doctor, '/rdohip') = billingreferral.referral_no
+		</ap-sql>
+		<ap-output>${first_name}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>bc_referral_nameL</ap-name>
+		<ap-sql>SELECT billingreferral.last_name
+			FROM billingreferral, demographic
+			WHERE demographic.demographic_no=${demographic}
+			AND LENGTH(billingreferral.referral_no) > 0
+			AND
+			EXTRACTVALUE(demographic.family_doctor, '/rdohip') = billingreferral.referral_no
+		</ap-sql>
+		<ap-output>${last_name}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>bc_referral_address</ap-name>
