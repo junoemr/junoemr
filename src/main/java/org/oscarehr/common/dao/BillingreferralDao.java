@@ -42,7 +42,7 @@ public class BillingreferralDao extends AbstractDao<Billingreferral> {
 	}
 
 	public Billingreferral getByReferralNo(String referral_no) {
-		if (referral_no == null || referral_no == "")
+		if (referral_no == null || referral_no.isEmpty())
 		{
 			return null;
 		}
