@@ -37,11 +37,9 @@ import org.oscarehr.casemgmt.dao.CaseManagementNoteDAO;
 import org.oscarehr.casemgmt.dao.CaseManagementNoteLinkDAO;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
-import org.oscarehr.common.dao.ConsultDocsDao;
 import org.oscarehr.common.dao.CtlDocTypeDao;
 import org.oscarehr.common.dao.IndivoDocsDao;
 import org.oscarehr.common.dao.TicklerLinkDao;
-import org.oscarehr.common.model.ConsultDocs;
 import org.oscarehr.common.model.CtlDocType;
 import org.oscarehr.common.model.CtlDocumentPK;
 import org.oscarehr.common.model.Demographic;
@@ -86,7 +84,6 @@ import java.util.ResourceBundle;
 // all SQL statements here
 public final class EDocUtil {
 
-	private static ConsultDocsDao consultDocsDao = (ConsultDocsDao) SpringUtils.getBean("consultDocsDao");
 	private static DocumentDao documentDao = (DocumentDao) SpringUtils.getBean(DocumentDao.class);
 	private static IndivoDocsDao indivoDocsDao = (IndivoDocsDao) SpringUtils.getBean(IndivoDocsDao.class);
 	private static Logger logger = MiscUtils.getLogger();
@@ -264,24 +261,6 @@ public final class EDocUtil {
 	/** new method to let the user add a new DocumentType into the database */
 	public static void addDocTypeSQL(String docType, String module) {
 		ctldoctypedao.addDocType(docType, module);
-	}
-
-	public static void detachDocConsult(String docNo, String consultId) {
-		List<ConsultDocs> consultDocs = consultDocsDao.findByRequestIdDocNoDocType(ConversionUtils.fromIntString(consultId), ConversionUtils.fromIntString(docNo), ConsultDocs.DOCTYPE_DOC);
-		for (ConsultDocs consultDoc : consultDocs) {
-			consultDoc.setDeleted("Y");
-			consultDocsDao.merge(consultDoc);
-		}
-	}
-
-	public static void attachDocConsult(String providerNo, String docNo, String consultId) {
-		ConsultDocs consultDoc = new ConsultDocs();
-		consultDoc.setRequestId(ConversionUtils.fromIntString(consultId));
-		consultDoc.setDocumentNo(ConversionUtils.fromIntString(docNo));
-		consultDoc.setDocType(ConsultDocs.DOCTYPE_DOC);
-		consultDoc.setAttachDate(new Date());
-		consultDoc.setProviderNo(providerNo);
-		consultDocsDao.persist(consultDoc);
 	}
 
 	public static void editDocumentSQL(EDoc newDocument, boolean doReview) {

@@ -23,18 +23,20 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.consultations.dao;
 
 import java.util.List;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.model.ConsultDocs;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.consultations.model.ConsultDocs;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class ConsultDocsDao extends AbstractDao<ConsultDocs>{
+public class ConsultDocsDao extends AbstractDao<ConsultDocs>
+{
 
 	public ConsultDocsDao() {
 		super(ConsultDocs.class);
@@ -57,6 +59,16 @@ public class ConsultDocsDao extends AbstractDao<ConsultDocs>{
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, requestId);
 		query.setParameter(2, docType);
+
+		return query.getResultList();
+	}
+
+	public List<ConsultDocs> findByRequestIdAndType(Integer requestId, String docType)
+	{
+		String sql = "SELECT x FROM ConsultDocs x WHERE x.requestId=:requestId AND x.docType=:docType AND x.deleted IS NULL";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("requestId", requestId);
+		query.setParameter("docType", docType);
 
 		return query.getResultList();
 	}
