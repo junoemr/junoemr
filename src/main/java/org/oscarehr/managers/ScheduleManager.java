@@ -207,9 +207,9 @@ public class ScheduleManager {
 		return (results);
 	}
 
-	public List<Appointment> getPatientAppointmentsWithProvider(String demographicNo, String providerNo, LocalDate lowDateCheck, LocalDate highDateCheck)
+	public List<Appointment> getPatientAppointmentsWithProvider(String demographicNo, String providerNo, LocalDate minDate, LocalDate maxDate)
 	{
-		return oscarAppointmentDao.findPatientAppointmentsWithProvider(demographicNo, providerNo, lowDateCheck, highDateCheck);
+		return oscarAppointmentDao.findPatientAppointmentsWithProvider(demographicNo, providerNo, minDate, maxDate);
 	}
 
 	public Map<LocalDate, List<Appointment>> getProviderAppointmentsForMonth(String providerNo, LocalDate minDate, LocalDate maxDate)

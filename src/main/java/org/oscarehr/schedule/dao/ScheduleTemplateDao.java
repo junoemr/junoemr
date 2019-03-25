@@ -65,7 +65,9 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 {
 	@Autowired
 	private ScheduleManager scheduleManager;
-	
+
+	static final int SCHEDULE_SLOT_DURATION = 5;
+
 	public ScheduleTemplateDao() {
 		super(ScheduleTemplate.class);
 	}
@@ -377,7 +379,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 							windowDateTime.toString(),
 							bookable.toString(),
 							timeSlotCodeStr,
-							"5",
+							String.valueOf(SCHEDULE_SLOT_DURATION),
 							slotStartTime.toLocalTime().toString(),
 							maxBookingDuration.toString()
 					);
@@ -397,7 +399,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 					dayTimeSlots.add(timeSlotEntry);
 					providerSchedule.put(scheduleDate, dayTimeSlots);
 
-					windowSlotStartTime = windowSlotStartTime.plusMinutes(5);
+					windowSlotStartTime = windowSlotStartTime.plusMinutes(SCHEDULE_SLOT_DURATION);
 				}
 			}
 		}
