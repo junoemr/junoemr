@@ -61,6 +61,8 @@ import oscar.oscarRx.data.RxProviderData.Provider;
  */
 public class SearchDemographicAutoCompleteAction extends Action {
 
+    private final int MAX_SEARCH_RESULTS = 100;
+
     public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response) throws Exception{
         String searchStr = request.getParameter("demographicKeyword");
 
@@ -112,7 +114,6 @@ public class SearchDemographicAutoCompleteAction extends Action {
 
         DemographicCriteriaSearch demoCriteriaSearch = demoService.buildDemographicSearch(searchStr, searchMode, statusMode, sortMode);
 
-        int MAX_SEARCH_RESULTS = 100;
         demoCriteriaSearch.setLimit(MAX_SEARCH_RESULTS);
         list = demographicDao.criteriaSearch(demoCriteriaSearch);
 
