@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,22 +22,9 @@
  * Ontario, Canada
  */
 
-
-package oscar.oscarBilling.ca.bc.MSP;
-
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+package org.oscarehr.billing.CA.BC.service;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.billing.CA.BC.dao.TeleplanC12Dao;
@@ -52,51 +39,51 @@ import org.oscarehr.billing.CA.BC.model.TeleplanS21;
 import org.oscarehr.billing.CA.BC.model.TeleplanS22;
 import org.oscarehr.billing.CA.BC.model.TeleplanS23;
 import org.oscarehr.billing.CA.BC.model.TeleplanS25;
+import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import oscar.oscarBilling.ca.bc.MSP.MSPReconcile;
 
-import oscar.OscarProperties;
+import javax.servlet.ServletException;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.List;
 
-/**
- *
- * @author jay
- */
-public class GenTaAction extends Action
+@Service
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+public class TeleplanRemittanceService
 {
 	private static final Logger logger = MiscUtils.getLogger();
-    
-	private TeleplanS21Dao s21Dao = SpringUtils.getBean(TeleplanS21Dao.class);
-	private TeleplanS00Dao s00Dao = SpringUtils.getBean(TeleplanS00Dao.class);
-	private TeleplanS23Dao s23Dao = SpringUtils.getBean(TeleplanS23Dao.class);
-	private TeleplanS25Dao s25Dao = SpringUtils.getBean(TeleplanS25Dao.class);
-	private TeleplanS22Dao s22Dao = SpringUtils.getBean(TeleplanS22Dao.class);
-	private TeleplanC12Dao c12Dao = SpringUtils.getBean(TeleplanC12Dao.class);
 
-	
-    /** Creates a new instance of GenTaAction */
-    public GenTaAction() {
-    }
-    
-    
-    
-    public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response)
+	@Autowired
+	private TeleplanS21Dao s21Dao;
+	@Autowired
+	private TeleplanS00Dao s00Dao;
+	@Autowired
+	private TeleplanS23Dao s23Dao;
+	@Autowired
+	private TeleplanS25Dao s25Dao;
+	@Autowired
+	private TeleplanS22Dao s22Dao;
+	@Autowired
+	private TeleplanC12Dao c12Dao;
+
+	public ActionForward execute(ActionMapping mapping, String filename)
     throws IOException, ServletException
     {
-        
-        
         MSPReconcile mspReconcile = new MSPReconcile();
-        
-        
+
         int recFlag = 0;
         String raNo = "";
-        String filename = (String) request.getAttribute("filename");// documentBean.getFilename();
-        
         String forwardPage = "S21";
-        
-        String filepath = OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-        
-        FileInputStream file = new FileInputStream(filepath + filename);
-        BufferedReader input = new BufferedReader(new InputStreamReader(file));
+
+        FileInputStream file = FileFactory.getRemittanceFile(filename).toFileInputStream();
+	    BufferedReader input = new BufferedReader(new InputStreamReader(file));
         String nextline;
 	    logger.info("Begin Remittance file parse: " + filename);
         
@@ -486,7 +473,7 @@ public class GenTaAction extends Action
         return mapping.findForward(forwardPage);
     }
 }
-    
+
 class M01{
    String message;
     void parse(String nextline){
@@ -499,118 +486,118 @@ class M01{
     
     
     
-} 
-        
-    class S21{
-        private String t_datacenter;
-        private String t_dataseq ;
-        private String t_payment;
-        private String t_linecode;
-        private String t_payeeno;
-        private String t_mspctlno;
-        private String t_payeename;
-        private String t_amtbilled;
-        private String t_amtpaid;
-        private String t_balancefwd ;
-        private String t_cheque ;
-        private String t_newbalance;
-        private String t_filler;
-        
-        public void parse(String nextline){
-            
-            t_datacenter = nextline.substring(3,8);
-            t_dataseq = nextline.substring(8,15);
-            t_payment = nextline.substring(15,23);
-            t_linecode = nextline.substring(23,24);
-            t_payeeno = nextline.substring(24,29);
-            t_mspctlno = nextline.substring(29,35);
-            t_payeename = nextline.substring(35,60);
-            t_amtbilled = nextline.substring(60,69);
-            t_amtpaid = nextline.substring(69,78);
-            t_balancefwd = nextline.substring(78,87);
-            t_cheque = nextline.substring(87,96);
-            t_newbalance = nextline.substring(96,105);
-            t_filler = nextline.substring(105,165);
-            
-        }
-        
-        public String[] getParam(String filename){
-            String[] param =new String[15];
-            param[0]=filename;
-            param[1]=getT_datacenter();
-            param[2]=getT_dataseq();
-            param[3]=getT_payment();
-            param[4]=getT_linecode();
-            param[5]=getT_payeeno();
-            param[6]=getT_mspctlno();
-            param[7]=getT_payeename();
-            param[8]=getT_amtbilled();
-            param[9]=getT_amtpaid();
-            param[10]=getT_balancefwd();
-            param[11]= getT_cheque();
-            param[12]=getT_newbalance();
-            param[13]=getT_filler();
-            param[14]="N";
-            return param;
-            
-        }
-        
-     
-        
-        public String getT_datacenter() {
-            return t_datacenter;
-        }
-        
-        public String getT_dataseq() {
-            return t_dataseq;
-        }
-        
-        public String getT_payment() {
-            return t_payment;
-        }
-        
-        public String getT_linecode() {
-            return t_linecode;
-        }
-        
-        public String getT_payeeno() {
-            return t_payeeno;
-        }
-        
-        public String getT_mspctlno() {
-            return t_mspctlno;
-        }
-        
-        public String getT_payeename() {
-            return t_payeename;
-        }
-        
-        public String getT_amtbilled() {
-            return t_amtbilled;
-        }
-        
-        public String getT_amtpaid() {
-            return t_amtpaid;
-        }
-        
-        public String getT_balancefwd() {
-            return t_balancefwd;
-        }
-        
-        public String getT_cheque() {
-            return t_cheque;
-        }
-        
-        public String getT_newbalance() {
-            return t_newbalance;
-        }
-        
-        public String getT_filler() {
-            return t_filler;
-        }
-        
-        
+}
+
+class S21{
+    private String t_datacenter;
+    private String t_dataseq ;
+    private String t_payment;
+    private String t_linecode;
+    private String t_payeeno;
+    private String t_mspctlno;
+    private String t_payeename;
+    private String t_amtbilled;
+    private String t_amtpaid;
+    private String t_balancefwd ;
+    private String t_cheque ;
+    private String t_newbalance;
+    private String t_filler;
+
+    public void parse(String nextline){
+
+        t_datacenter = nextline.substring(3,8);
+        t_dataseq = nextline.substring(8,15);
+        t_payment = nextline.substring(15,23);
+        t_linecode = nextline.substring(23,24);
+        t_payeeno = nextline.substring(24,29);
+        t_mspctlno = nextline.substring(29,35);
+        t_payeename = nextline.substring(35,60);
+        t_amtbilled = nextline.substring(60,69);
+        t_amtpaid = nextline.substring(69,78);
+        t_balancefwd = nextline.substring(78,87);
+        t_cheque = nextline.substring(87,96);
+        t_newbalance = nextline.substring(96,105);
+        t_filler = nextline.substring(105,165);
+
     }
+
+    public String[] getParam(String filename){
+        String[] param =new String[15];
+        param[0]=filename;
+        param[1]=getT_datacenter();
+        param[2]=getT_dataseq();
+        param[3]=getT_payment();
+        param[4]=getT_linecode();
+        param[5]=getT_payeeno();
+        param[6]=getT_mspctlno();
+        param[7]=getT_payeename();
+        param[8]=getT_amtbilled();
+        param[9]=getT_amtpaid();
+        param[10]=getT_balancefwd();
+        param[11]= getT_cheque();
+        param[12]=getT_newbalance();
+        param[13]=getT_filler();
+        param[14]="N";
+        return param;
+
+    }
+
+
+
+    public String getT_datacenter() {
+        return t_datacenter;
+    }
+
+    public String getT_dataseq() {
+        return t_dataseq;
+    }
+
+    public String getT_payment() {
+        return t_payment;
+    }
+
+    public String getT_linecode() {
+        return t_linecode;
+    }
+
+    public String getT_payeeno() {
+        return t_payeeno;
+    }
+
+    public String getT_mspctlno() {
+        return t_mspctlno;
+    }
+
+    public String getT_payeename() {
+        return t_payeename;
+    }
+
+    public String getT_amtbilled() {
+        return t_amtbilled;
+    }
+
+    public String getT_amtpaid() {
+        return t_amtpaid;
+    }
+
+    public String getT_balancefwd() {
+        return t_balancefwd;
+    }
+
+    public String getT_cheque() {
+        return t_cheque;
+    }
+
+    public String getT_newbalance() {
+        return t_newbalance;
+    }
+
+    public String getT_filler() {
+        return t_filler;
+    }
+
+
+}
     
   
     class S01{
@@ -1410,9 +1397,4 @@ class C12{
     public String getT_filler() {
         return t_filler;
     }
-    
-    
 }
-
-
-/////
