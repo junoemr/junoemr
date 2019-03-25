@@ -158,10 +158,9 @@ span.extrasmall {
 }
 
 body {
-	font-size: 100%
+	font-size: 100%;
 }
 
-//
 div.news {
 	width: 100px;
 	background: #FFF;
@@ -182,7 +181,7 @@ div.leftBox h3 {
 	/*font-size: 1.25em;*/
 	font-size: 8pt;
 	font-variant: small-caps;
-	font: bold;
+	font-weight: bold;
 	margin-top: 0px;
 	padding-top: 0px;
 	margin-bottom: 0px;
@@ -221,7 +220,8 @@ div.headPrevention p {
 	margin: 0;
 	padding: 4px 5px;
 	line-height: 1.3;
-	text-align: justify height : 2em;
+	text-align: justify;
+	height : 2em;
 	font-family: sans-serif;
 	border-left: 0px;
 }

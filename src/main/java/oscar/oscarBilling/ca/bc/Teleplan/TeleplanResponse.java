@@ -41,18 +41,24 @@ import java.io.InputStream;
  */
 public class TeleplanResponse
 {
-	private String transactionNo = null;
-	private String result = null;
-	private String filename = null;
-	private String realFilename = null;
-	private String msgs = null;
-	private int lineCount = 0;
+	private String transactionNo;
+	private String result;
+	private String filename;
+	private String realFilename;
+	private String msgs;
+	private int lineCount;
 
 	/**
 	 * Creates a new instance of TeleplanResponse
 	 */
 	public TeleplanResponse()
 	{
+		transactionNo = null;
+		result = null;
+		filename = null;
+		realFilename = null;
+		msgs = null;
+		lineCount = 0;
 	}
 
 	void processResponseStream(InputStream in) throws IOException, InterruptedException

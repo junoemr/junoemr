@@ -24,12 +24,6 @@
 
 package oscar.oscarEncounter.oscarConsultationRequest.pageUtil;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -37,61 +31,68 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
+import org.oscarehr.consultations.service.ConsultationAttachmentService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
-import oscar.OscarProperties;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class ConsultationAttachDocsAction extends Action {
-
-	private static Logger logger = Logger.getLogger(ConsultationAttachDocsAction.class);
+public class ConsultationAttachDocsAction extends Action
+{
+	private static final Logger logger = Logger.getLogger(ConsultationAttachDocsAction.class);
 
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private ConsultationAttachmentService consultationAttachmentService = SpringUtils.getBean(ConsultationAttachmentService.class);
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-
-	throws ServletException, IOException {
-
-		if (!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_con", "u", null)) {
-			throw new SecurityException("missing required security object (_con)");
-		}
+			throws ServletException, IOException
+	{
+		securityInfoManager.requireOnePrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
+				SecurityInfoManager.WRITE, null, "_con");
 
 		DynaActionForm frm = (DynaActionForm) form;
-		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
-		String requestId = frm.getString("requestId");
+		String requestIdStr = frm.getString("requestId");
 		String demoNo = frm.getString("demoNo");
 		String provNo = frm.getString("providerNo");
+		Integer requestId = Integer.parseInt(requestIdStr);
 		
 		boolean demoNoValid = StringUtils.isNumeric(demoNo) && !demoNo.trim().isEmpty() && !demoNo.equalsIgnoreCase("0");
 		boolean provNoValid = provNo != null && !provNo.equalsIgnoreCase("null");
-		boolean requestIdValid = StringUtils.isNumeric(requestId) && !requestId.trim().isEmpty() && !requestId.equalsIgnoreCase("0");
+		boolean requestIdValid = StringUtils.isNumeric(requestIdStr) && !requestIdStr.trim().isEmpty() && !requestIdStr.equalsIgnoreCase("0");
 
-		if (demoNoValid && provNoValid && requestIdValid) {
+		if (demoNoValid && provNoValid && requestIdValid)
+		{
+			List<Integer> labIds = toIntList(request.getParameterValues("labNo"));
+			List<Integer> docIds = toIntList(request.getParameterValues("docNo"));
+			List<Integer> eformIds = toIntList(request.getParameterValues("eFormNo"));
 
-			String[] labs;
-			String[] docs;
-
-			if (!OscarProperties.getInstance().isPropertyActive("consultation_indivica_attachment_enabled")) {
-				labs = frm.getStrings("attachedDocs");
-				docs = frm.getStrings("attachedDocs");
-			}
-			else {
-				labs = request.getParameterValues("labNo");
-				docs = request.getParameterValues("docNo");
-			}
-			if (labs == null) { labs = new String[]{};}
-			if (docs == null) { docs = new String[]{};}
-
-			ConsultationAttachDocs Doc = new ConsultationAttachDocs(provNo, demoNo, requestId, docs);
-			Doc.attach(loggedInInfo);
-
-			ConsultationAttachLabs Lab = new ConsultationAttachLabs(provNo, demoNo, requestId, labs);
-			Lab.attach(loggedInInfo);
+			consultationAttachmentService.setAttachedDocuments(requestId, provNo, docIds);
+			consultationAttachmentService.setAttachedLabs(requestId, provNo, labIds);
+			consultationAttachmentService.setAttachedEForms(requestId, provNo, eformIds);
 			return mapping.findForward("success");
 		}
-		logger.error("Invalid consultation document parameters (provider:" + provNo + ",demoNo:" + demoNo + ",requestId:" + requestId + "). Save attempt aborted.");
+		logger.error("Invalid consultation document parameters " +
+				"(provider:" + provNo + ",demoNo:" + demoNo + ",requestId:" + requestIdStr + "). Save attempt aborted.");
 		return mapping.findForward("failure");
+	}
+
+	private List<Integer> toIntList(String[] strList)
+	{
+		List<Integer> intList = new ArrayList<>();
+		if(strList != null)
+		{
+			for(String str : strList)
+			{
+				intList.add(Integer.parseInt(str));
+			}
+		}
+		return intList;
 	}
 }

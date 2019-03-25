@@ -31,7 +31,6 @@
 <%
 	EFormDataService eFormDataService = SpringUtils.getBean(EFormDataService.class);
 
-	String messageOnFailure = "No eform or appointment is available";
 	String providerNo = (String) session.getValue("user");
 	boolean showInstancedWarning = false;
 
@@ -40,9 +39,13 @@
 		String id = request.getParameter("fdid");
 		String appointmentNo = request.getParameter("appointment");
 		String eformLink = request.getParameter("eform_link");
+		String parentAjaxId = StringUtils.trimToNull(request.getParameter("parentAjaxId"));
 
 		EForm eForm = new EForm(id);
-		showInstancedWarning = !eFormDataService.isLatestInstancedVersion(Integer.parseInt(id));
+		if(!parentAjaxId.equalsIgnoreCase("consult"))
+		{
+			showInstancedWarning = !eFormDataService.isLatestInstancedVersion(Integer.parseInt(id));
+		}
 
 		eForm.setLoggedInProvider(providerNo);
 		eForm.setContextPath(request.getContextPath());
@@ -50,7 +53,6 @@
 		if(appointmentNo != null) eForm.setAppointmentNo(appointmentNo);
 		if(eformLink != null) eForm.setEformLink(eformLink);
 
-		String parentAjaxId = StringUtils.trimToNull(request.getParameter("parentAjaxId"));
 		eForm.setParentAjaxId(parentAjaxId);
 		eForm.setAction();
 		eForm.setDatabaseUpdateAPs();
@@ -92,7 +94,7 @@
 	if(showInstancedWarning) {
 %>
 	<script>
-		alert("You are editing an outdated version of an instanced eForm. Saving this version will overwrite the existing version and could result in a data loss.";);
+		alert("You are editing an outdated version of an instanced eForm. Saving this version will overwrite the existing version and could result in a data loss.");
 	</script>
 <%
 	}
