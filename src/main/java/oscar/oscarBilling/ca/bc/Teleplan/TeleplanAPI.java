@@ -35,7 +35,6 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
-import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 
@@ -48,9 +47,8 @@ import java.io.InputStream;
  *
  * @author jay
  */
-public class TeleplanAPI {
-    private static Logger log=MiscUtils.getLogger();
-    	
+public class TeleplanAPI
+{
     public static String ExternalActionLogon      = "AsignOn";
     public static String ExternalActionLogoff     = "AsignOff";
     public static String ExternalActionChangePW   = "AchangePW";
@@ -68,19 +66,16 @@ public class TeleplanAPI {
 	// Set TELEPLAN_URL=https://tlpt2.moh.hnet.bc.ca/TeleplanBroker
     public String CONTACT_URL = "https://teleplan.hnet.bc.ca/TeleplanBroker";
     
-    HttpClient httpclient = null;
+    private HttpClient httpclient = null;
 	
     /** Creates a new instance of TeleplanAPI */
-    public TeleplanAPI() {
+    public TeleplanAPI()
+    {
         getClient();
-    }
-    
-    public TeleplanAPI(String username,String password){
-        getClient();
-        
     }
 
-    private void getClient(){
+    private void getClient()
+    {
        CONTACT_URL = OscarProperties.getInstance().getProperty("TELEPLAN_URL",CONTACT_URL);
 
 	    String proxy_host = OscarProperties.getInstance().getProperty("teleplan_proxy_host");
@@ -115,43 +110,43 @@ public class TeleplanAPI {
 	{
 		TeleplanResponse response = new TeleplanResponse();
 		response.processResponseStream(inputStream);
-		TeleplanResponseDAO trDAO = new TeleplanResponseDAO();
-		trDAO.save(response);
+		TeleplanResponseDAO teleplanResponseDAO = new TeleplanResponseDAO();
+		teleplanResponseDAO.save(response);
 		return response;
 	}
 
 	private TeleplanResponse processRequest(String url, NameValuePair[] data)
 	{
-		TeleplanResponse tr = null;
+		TeleplanResponse response = null;
 		try
 		{
 			PostMethod post = new PostMethod(url);
 			post.setRequestBody(data);
 			httpclient.executeMethod(post);
-			tr = processRequest(post.getResponseBodyAsStream());
+			response = processRequest(post.getResponseBodyAsStream());
 		}
 		catch(Exception e)
 		{
 			MiscUtils.getLogger().error("Error", e);
 		}
-		return tr;
+		return response;
 	}
 
 	private TeleplanResponse processRequest(String url, Part[] parts)
 	{
-		TeleplanResponse tr = null;
+		TeleplanResponse response = null;
 		try
 		{
 			PostMethod filePost = new PostMethod(url);
 			filePost.setRequestEntity(new MultipartRequestEntity(parts, filePost.getParams()));
 			httpclient.executeMethod(filePost);
-			tr = processRequest(filePost.getResponseBodyAsStream());
+			response = processRequest(filePost.getResponseBodyAsStream());
 		}
 		catch(Exception e)
 		{
 			MiscUtils.getLogger().error("Error", e);
 		}
-		return tr;
+		return response;
 	}
    
     

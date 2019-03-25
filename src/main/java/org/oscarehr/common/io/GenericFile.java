@@ -66,7 +66,7 @@ public class GenericFile
 	public static final String OUTBOUND_FAX_DIR_SENT = new File(OUTBOUND_FAX_DIR_PENDING, "sent").getPath();
 	public static final String OUTBOUND_FAX_DIR_UNSENT = new File(OUTBOUND_FAX_DIR_PENDING, "unsent").getPath();
 
-	public static final String BILLING_BASE_DIR = new File(BASE_DIRECTORY, "billing/").getPath();
+	public static final String BILLING_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("BILLING_BASE_DIR")).getPath();
 	public static final String BILLING_REMITTANCE_DIR = new File(BILLING_BASE_DIR, props.getProperty("BILLING_REMITTANCE_DIR")).getPath();
 
 	public static final String EMAIL_TEMPLATE_DIRECTORY = props.getProperty("template_file_location");

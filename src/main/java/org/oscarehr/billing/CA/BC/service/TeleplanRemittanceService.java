@@ -56,7 +56,7 @@ import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-public class GenTaActionService
+public class TeleplanRemittanceService
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
