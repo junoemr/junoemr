@@ -35,20 +35,20 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 public class PDFFile extends GenericFile
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final Set<String> allowedErrors = new HashSet<>();
 	private static final Pattern[] allowedWarningsGS = new Pattern[2];
+	private static final Pattern[] disallowedOutputGS = new Pattern[1];
 
 	static
 	{
 		allowedWarningsGS[0] = Pattern.compile(".*Missing glyph .* in the font .*", Pattern.CASE_INSENSITIVE);
 		allowedWarningsGS[1] = Pattern.compile(".*Failed to interpret TT instructions in font.*", Pattern.CASE_INSENSITIVE);
+
+		disallowedOutputGS[0] = Pattern.compile(".*Error reading a content stream\\. The page may be incomplete.*", Pattern.CASE_INSENSITIVE);
 	}
 
 	private OscarProperties oscarProperties = OscarProperties.getInstance();
@@ -65,6 +65,17 @@ public class PDFFile extends GenericFile
 		{
 			if (pattern.matcher(line).matches())
 				return true;
+		}
+		return false;
+	}
+	private boolean isDisallowedOutput(String line)
+	{
+		for (Pattern pattern : disallowedOutputGS)
+		{
+			if (pattern.matcher(line).matches())
+			{
+				return true;
+			}
 		}
 		return false;
 	}
@@ -142,6 +153,11 @@ public class PDFFile extends GenericFile
 		{
 			logger.warn("gs stdout: " + line);
 			warnings = (warnings == null)? line : warnings + ", " + line;
+
+			if(isDisallowedOutput(line))
+			{
+				reasonInvalid = (reasonInvalid == null)? line : reasonInvalid + ", " + line;
+			}
 		}
 
 		while((line = stderr.readLine()) != null)
@@ -170,6 +186,7 @@ public class PDFFile extends GenericFile
 		if(exitValue != 0 || reasonInvalid != null)
 		{
 			logger.warn("PDF failed to re-encode. Original used and flagged as invalid: " + javaFile.getName());
+			logger.warn("---------------------------------------------");
 
 			this.isValid = false;
 			this.reasonInvalid = "Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue;
