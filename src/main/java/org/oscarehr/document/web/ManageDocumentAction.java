@@ -366,7 +366,7 @@ public class ManageDocumentAction extends DispatchAction {
 		{
 			if(document.hasEncodingError())
 			{
-				returnFile = generatePdfPreviewErrorImage();
+				returnFile = generatePdfPreviewUnavailableImage();
 			}
 			else
 			{
@@ -402,24 +402,35 @@ public class ManageDocumentAction extends DispatchAction {
 		}
 		catch (Exception e)
 		{
-			MiscUtils.getLogger().error("failed to convert page [" + pageNum + "] of pdf ["+ inputPdfPath +"] to png! with error: " + e.getMessage());
+			MiscUtils.getLogger().warn("failed to convert page [" + pageNum + "] of pdf ["+ inputPdfPath +"] to png! with error: " + e.getMessage());
 			return generatePdfPreviewErrorImage();
 		}
 	}
 
+	private File generatePdfPreviewUnavailableImage()
+	{
+		final String errorHeader = "Preview Unavailable";
+		final String subHeader = "Preview generation for this document type is not supported";
+		return generatePdfDefaultPreviewImage(errorHeader, subHeader);
+	}
+
 	private File generatePdfPreviewErrorImage()
 	{
-		final Integer errorImgWidth = 600;
-		final Integer errorImgHieght= 800;
-		final String  junoLogoPath = "/opt/oscarhost/oscarhost_maintenance/img/logo_juno_green.png";
-
-		final String errorHeaderText = "Error generating PDF Preview";
+		final String errorHeader = "Error generating PDF Preview";
 		final String subHeader = "Please contact Juno support.";
+		return generatePdfDefaultPreviewImage(errorHeader, subHeader);
+	}
+
+	private File generatePdfDefaultPreviewImage(final String headerText, final String subHeader)
+	{
+		final Integer errorImgWidth = 600;
+		final Integer errorImgHeight= 800;
+		final String  junoLogoPath = "/opt/oscarhost/oscarhost_maintenance/img/logo_juno_green.png";
 
 		try
 		{
 			File outFile = File.createTempFile("oscarError", ".png");
-			BufferedImage buffImg = new BufferedImage(errorImgWidth, errorImgHieght, BufferedImage.TYPE_INT_RGB);
+			BufferedImage buffImg = new BufferedImage(errorImgWidth, errorImgHeight, BufferedImage.TYPE_INT_RGB);
 			Graphics2D g2d = buffImg.createGraphics();
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -434,13 +445,13 @@ public class ManageDocumentAction extends DispatchAction {
 
 			//fill bg
 			g2d.setColor(Color.white);
-			g2d.fillRect(0, 0, errorImgWidth, errorImgHieght);
+			g2d.fillRect(0, 0, errorImgWidth, errorImgHeight);
 
 			//error header
 			g2d.setFont(headerFont);
 			g2d.setColor(Color.darkGray);
-			int headerXInset = errorImgWidth/2 - headerFontMetric.stringWidth(errorHeaderText)/2;
-			g2d.drawString(errorHeaderText, headerXInset, 150);
+			int headerXInset = errorImgWidth/2 - headerFontMetric.stringWidth(headerText)/2;
+			g2d.drawString(headerText, headerXInset, 150);
 
 			//logo
 			try

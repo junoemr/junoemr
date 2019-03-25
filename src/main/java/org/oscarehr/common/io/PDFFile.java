@@ -69,16 +69,6 @@ public class PDFFile extends GenericFile
 		return false;
 	}
 
-	public boolean validate() throws IOException, InterruptedException
-	{
-		this.isValid = pdfinfoValidation(javaFile);
-		if(!this.isValid)
-		{
-			logger.error("Pdf Encoding Error: " + getReasonInvalid());
-		}
-		this.hasBeenValidated = true;
-		return this.isValid;
-	}
 	@Override
 	public void process() throws IOException, InterruptedException
 	{
@@ -109,47 +99,6 @@ public class PDFFile extends GenericFile
 		}
 
 		return numOfPage;
-	}
-
-	private boolean pdfinfoValidation(File file) throws IOException,InterruptedException
-	{
-		logger.info("BEGIN PDF VALIDATION");
-		boolean isValid = true;
-		boolean isEncrypted = false;
-
-		String pdfInfo = props.getProperty("document.pdfinfo_path", "/usr/bin/pdfinfo");
-
-		String[] command = {pdfInfo, file.getPath()};
-		Process process = Runtime.getRuntime().exec(command);
-
-		BufferedReader in = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-		String line;
-
-		while((line = in.readLine()) != null)
-		{
-			logger.warn("validator error line: " + line);
-			// if error is allowed and flag not already set to fail
-			isValid = (isValid && allowedErrors.contains(line.toLowerCase()));
-			isEncrypted = (line.toLowerCase().equals("command line error: incorrect password"));
-			this.reasonInvalid = (this.reasonInvalid == null)? line : this.reasonInvalid + ", " + line;
-		}
-		process.waitFor();
-		in.close();
-
-		int exitValue = process.exitValue();
-		if (exitValue != 0)
-		{
-			if (isEncrypted)
-			{
-				isValid = true;
-			} else
-			{
-				isValid = false;
-			}
-		}
-
-		logger.info("Passed PDF Validation: " + isValid);
-		return isValid;
 	}
 
 	private File ghostscriptReEncode() throws IOException,InterruptedException
@@ -220,20 +169,10 @@ public class PDFFile extends GenericFile
 
 		if(exitValue != 0 || reasonInvalid != null)
 		{
-			try
-			{
-				PDDocument document = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
-				document.close();
+			logger.warn("PDF failed to re-encode. Original used and flagged as invalid: " + javaFile.getName());
 
-				this.isValid = false;
-				this.reasonInvalid = "Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue;
-				logger.warn("PDF failed to re-encode. Original used and flagged as invalid: " + javaFile.getName());
-			}
-			catch(InvalidPasswordException e)
-			{
-				logger.warn("Encrypted PDF. Cannot re-encode");
-				this.isValid = true;
-			}
+			this.isValid = false;
+			this.reasonInvalid = "Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue;
 			this.moveFile(currentDir);
 			newPdf = javaFile;
 		}
