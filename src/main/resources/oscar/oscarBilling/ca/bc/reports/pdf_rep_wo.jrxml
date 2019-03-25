@@ -7,6 +7,7 @@
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
+	<template>"oscar/oscarBilling/ca/bc/reports/report_default_style.jrxml"</template>
 	<parameter name="startDate" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
 	</parameter>

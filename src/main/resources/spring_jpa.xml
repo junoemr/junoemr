@@ -123,8 +123,10 @@
 	<!-- Managed Beans -->
 	<context:component-scan base-package="org.oscarehr.appointment.dao" />
 	<context:component-scan base-package="org.oscarehr.common.dao" />
+	<context:component-scan base-package="org.oscarehr.common.server" />
 	<context:component-scan base-package="org.oscarehr.consultations" />
 	<context:component-scan base-package="org.oscarehr.eyeform.dao" />
+	<context:component-scan base-package="org.oscarehr.email" />
 	<context:component-scan base-package="org.oscarehr.hospitalReportManager.dao" />
 	<context:component-scan base-package="org.oscarehr.olis.dao" />
 	<context:component-scan base-package="org.oscarehr.billing.CA.ON.dao" />
@@ -138,10 +140,12 @@
 	<context:component-scan base-package="org.oscarehr.allergy" />
 	<context:component-scan base-package="org.oscarehr.rx" />
 	<context:component-scan base-package="org.oscarehr.encounterNote" />
+	<context:component-scan base-package="org.oscarehr.preferences" />
 	<context:component-scan base-package="org.oscarehr.prevention" />
 	<context:component-scan base-package="org.oscarehr.labs" />
 	<context:component-scan base-package="org.oscarehr.log" />
 	<context:component-scan base-package="org.oscarehr.report" />
+	<context:component-scan base-package="org.oscarehr.fax" />
 	<!-- Sharing Center -->
 	<context:component-scan base-package="org.oscarehr.sharingcenter.dao" />
 	<context:component-scan base-package="oscar.oscarLab.ca.all.upload.handlers"/>

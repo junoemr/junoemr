@@ -32,24 +32,50 @@
     <head>
         <script type="text/javascript" src="<%= request.getContextPath()%>/js/global.js"></script>
         <script type="text/javascript" src="<%= request.getContextPath()%>/js/jquery.js"></script>
+        <script type="text/javascript" src="<%= request.getContextPath() %>/web/common/util/HealthCardParser.js"></script>
         <link href="<%=request.getContextPath()%>/css/bootstrap.min.css" rel="stylesheet">
         <title>PATIENT DETAIL INFO</title>
         <link rel="stylesheet" href="../web.css" />
         <script language="JavaScript">
             <!--
             
-            function verifyInput() {
-            	var input = document.forms[0].magneticStripe.value;
-            	var tracks = input.split(";");
-            	track1 = tracks[0];
-            	
-            	if( track1.length == 78 || track1.length == 79 ) {
-            		return true;
-            	}
+            function handleSubmit(event) {
+            	var cardData = document.forms[0].magneticStripe.value;
+                if (cardData.length !== 0)
+                {
+                    let healthCardData = Oscar.HealthCardParser.parse(cardData);
+                    if (healthCardData.data.lastName.length !== 0 || healthCardData.data.firstName.length !== 0)
+                    {
+                        addCardDataToForm(event.target, healthCardData)
+                        return true
+                    }
+                }
             	
             	alert("I didn't get that.  Try scanning again");
             	document.forms[0].magneticStripe.value = "";
             	return false;
+            }
+
+            function addCardDataToForm (form, hcData)
+            {
+                $(form).append("<input type='hidden' name='firstName' value='" + (hcData.data.firstName !== undefined ? hcData.data.firstName : "") + "'/>")
+                $(form).append("<input type='hidden' name='lastName' value='" + (hcData.data.lastName !== undefined ? hcData.data.lastName : "") + "'/>")
+                $(form).append("<input type='hidden' name='hin' value='" + (hcData.data.hin !== undefined ? hcData.data.hin : "") + "'/>")
+                $(form).append("<input type='hidden' name='hinVer' value='" + (hcData.data.versionCode !== undefined ? hcData.data.versionCode : "") + "'/>")
+
+                $(form).append("<input type='hidden' name='endYear' value='" + (hcData.data.endYear !== undefined ? hcData.data.endYear : "") + "'/>")
+                $(form).append("<input type='hidden' name='endMonth' value='" + (hcData.data.endMonth !== undefined ? hcData.data.endMonth : "") + "'/>")
+                $(form).append("<input type='hidden' name='endDay' value='" + (hcData.data.endDay !== undefined ? hcData.data.endDay : "") + "'/>")
+
+                $(form).append("<input type='hidden' name='dobYear' value='" + (hcData.data.dobYear !== undefined ? hcData.data.dobYear : "") + "'/>")
+                $(form).append("<input type='hidden' name='dobMonth' value='" + (hcData.data.dobMonth !== undefined ? hcData.data.dobMonth : "") + "'/>")
+                $(form).append("<input type='hidden' name='dobDay' value='" + (hcData.data.dobDay !== undefined ? hcData.data.dobDay : "") + "'/>")
+
+                $(form).append("<input type='hidden' name='effYear' value='" + (hcData.data.effYear !== undefined ? hcData.data.effYear : "") + "'/>")
+                $(form).append("<input type='hidden' name='effMonth' value='" + (hcData.data.effMonth !== undefined ? hcData.data.effMonth: "") + "'/>")
+                $(form).append("<input type='hidden' name='effDay' value='" + (hcData.data.effDay !== undefined ? hcData.data.effDay : "") + "'/>")
+
+                $(form).append("<input type='hidden' name='sex' value='" + (hcData.data.sex !== undefined ? hcData.data.sex : "") + "'/>")
             }
             
             function setfocus() {
@@ -68,7 +94,7 @@
             </tr>
         </table>
 
-        <html:form action="/demographic/ValidateSwipeCard" onsubmit="return verifyInput();">
+        <html:form action="/demographic/ValidateSwipeCard" onsubmit="return handleSubmit(event);">
 
             <div class="container">
 

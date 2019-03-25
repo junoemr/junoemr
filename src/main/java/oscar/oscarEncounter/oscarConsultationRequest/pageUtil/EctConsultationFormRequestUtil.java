@@ -95,6 +95,7 @@ public class EctConsultationFormRequestUtil {
 	public String mrp = "";
 	public String siteName;
 	public String signatureImg;
+	public String specReferralNo;
 
 	public String letterheadName;
 	public String letterheadTitle;
@@ -300,6 +301,7 @@ public class EctConsultationFormRequestUtil {
 			specFax = ps.getFaxNumber();
 			specAddr = ps.getStreetAddress();
 			specEmail = ps.getEmailAddress();
+			specReferralNo = ps.getReferralNo();
 			MiscUtils.getLogger().debug("getting Null" + specEmail + "<");
 			if (specPhone == null || specPhone.equals("null")) {
 				specPhone = "";
@@ -312,6 +314,9 @@ public class EctConsultationFormRequestUtil {
 			}
 			if (specEmail == null || specEmail.equalsIgnoreCase("null")) {
 				specEmail = "";
+			}
+			if (specReferralNo == null || specReferralNo.equalsIgnoreCase("null")) {
+				specReferralNo = "";
 			}
 		}
 			

@@ -35,6 +35,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -60,7 +61,9 @@ import oscar.OscarProperties;
  *
  * @author jay
  */
-public class GenTaAction  extends Action {
+public class GenTaAction extends Action
+{
+	private static final Logger logger = MiscUtils.getLogger();
     
 	private TeleplanS21Dao s21Dao = SpringUtils.getBean(TeleplanS21Dao.class);
 	private TeleplanS00Dao s00Dao = SpringUtils.getBean(TeleplanS00Dao.class);
@@ -77,7 +80,8 @@ public class GenTaAction  extends Action {
     
     
     public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response)
-    throws IOException, ServletException, Exception{
+    throws IOException, ServletException
+    {
         
         
         MSPReconcile mspReconcile = new MSPReconcile();
@@ -94,6 +98,7 @@ public class GenTaAction  extends Action {
         FileInputStream file = new FileInputStream(filepath + filename);
         BufferedReader input = new BufferedReader(new InputStreamReader(file));
         String nextline;
+	    logger.info("Begin Remittance file parse: " + filename);
         
         while ((nextline=input.readLine())!=null){
             String header = nextline.substring(0,3);
@@ -476,10 +481,8 @@ public class GenTaAction  extends Action {
            }
             
         }
-        
-        
-        
-        
+	    logger.info("Completed Remittance file parse");
+
         return mapping.findForward(forwardPage);
     }
 }

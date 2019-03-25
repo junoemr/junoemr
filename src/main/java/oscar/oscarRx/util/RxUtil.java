@@ -1556,17 +1556,23 @@ public class RxUtil {
 		return retStr;
 	}
 
-	private static RxPrescriptionData.Prescription findRxFromDrugNameOrGN(final RxPrescriptionData.Prescription[] rxs, String interactingDrugName) {
+	private static RxPrescriptionData.Prescription findRxFromDrugNameOrGN(final RxPrescriptionData.Prescription[] rxs, String interactingDrugName)
+	{
 		RxPrescriptionData.Prescription returnRx = null;
-		for (RxPrescriptionData.Prescription rxItem : rxs) {
-			if (rxItem.getDrugName().contains(interactingDrugName)) {
+		for(RxPrescriptionData.Prescription rxItem : rxs)
+		{
+			String drugName = rxItem.getDrugName();
+			String genericName = rxItem.getGenericName();
+			if(drugName != null && drugName.contains(interactingDrugName))
+			{
 				returnRx = rxItem;
-			} else if (rxItem.getGenericName().contains(interactingDrugName)) {
+			}
+			else if(genericName != null && genericName.contains(interactingDrugName))
+			{
 				returnRx = rxItem;
 			}
 		}
 		return returnRx;
-
 	}
 
 	private static Vector getMyDrugrefInfo(String command, Vector drugs, String myDrugrefId) {

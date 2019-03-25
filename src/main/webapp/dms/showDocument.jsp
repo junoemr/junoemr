@@ -160,12 +160,13 @@
 			else
 				numOfPageStr=(new Integer(numOfPage)).toString();
 			String contextPath = request.getContextPath();
-			String url = contextPath +"/dms/ManageDocument.do?method=viewDocPage&doc_no=" + docId+"&curPage=1";
+			String url = contextPath +"/dms/ManageDocument.do?method=viewDocPage&doc_no=" + docId+"&curPage=1&rand=" + Math.random();
 			String url2 = contextPath +"/dms/ManageDocument.do?method=display&doc_no=" + docId;
 			String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 %>
 <% if (request.getParameter("inWindow") != null && request.getParameter("inWindow").equalsIgnoreCase("true")) {  %>
 <html>
+<title>Show Document <%=documentNo%></title>
 <head>
 	<script type="text/javascript" src="<%= contextPath %>/share/calendar/calendar.js"></script>
 	<!-- language for the calendar -->

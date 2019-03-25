@@ -129,16 +129,31 @@ public final class BillingViewAction
       request.getSession().setAttribute("billingViewBean", bean);
       ActionForward actionForward = mapping.findForward("success");
       String receipt = request.getParameter("receipt");
+
       if (receipt != null && receipt.equals("yes")) {
-        Provider p = getPreferredPayeeProvider(bean.getBillingProvider());
-        bean.setDefaultPayeeFirstName(p.getFirstName());
-        bean.setDefaultPayeeLastName(p.getLastName());
+        if (isClinicPayee(bean.getBillingProvider()))
+        {
+          bean.setOmitPayee(true);
+        }
+        else
+        {
+          Provider p = getPreferredPayeeProvider(bean.getBillingProvider());
+          bean.setDefaultPayeeFirstName(p.getFirstName());
+          bean.setDefaultPayeeLastName(p.getLastName());
+        }
         actionForward = mapping.findForward("private");
       }
 
 
       return actionForward;
     }
+  }
+
+  public boolean isClinicPayee (String userProviderNo)
+  {
+    BillingPreferencesDAO dao = SpringUtils.getBean(BillingPreferencesDAO.class);
+    BillingPreference pref = dao.getUserBillingPreference(userProviderNo);
+    return ( pref == null || pref.getDefaultPayeeNo() == 0);
   }
 
   /**

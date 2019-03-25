@@ -25,137 +25,95 @@
 
 package oscar.form.pdfservlet;
 
-import java.io.ByteArrayOutputStream;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.Date;
-import java.util.List;
-
+import com.lowagie.text.DocumentException;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperRunManager;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.fax.exception.FaxException;
+import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.service.OutgoingFaxService;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
+import oscar.OscarProperties;
+import oscar.oscarRx.templates.RxPdfTemplate;
+import oscar.oscarRx.templates.RxPdfTemplateCustom1;
+import oscar.oscarRx.templates.RxPdfTemplatePrescriptionPad;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.HashSet;
 
-import org.apache.commons.io.FileUtils;
-
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperRunManager;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-
-import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.FaxConfigDao;
-import org.oscarehr.common.dao.FaxJobDao;
-import org.oscarehr.common.model.FaxConfig;
-import org.oscarehr.common.model.FaxJob;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.OscarProperties;
-import oscar.log.LogAction;
-import oscar.log.LogConst;
-
-import com.itextpdf.text.pdf.PdfReader;
-import com.lowagie.text.DocumentException;
-import oscar.oscarRx.templates.RxPdfTemplate;
-import oscar.oscarRx.templates.RxPdfTemplateCustom1;
-import oscar.oscarRx.templates.RxPdfTemplatePrescriptionPad;
-
-public class FrmCustomedPDFServlet extends HttpServlet {
-
+public class FrmCustomedPDFServlet extends HttpServlet
+{
 	public static final String HSFO_RX_DATA_KEY = "hsfo.rx.data";
-	private static Logger logger = MiscUtils.getLogger();
-	private OscarProperties props = OscarProperties.getInstance();
+	private static final Logger logger = MiscUtils.getLogger();
+	private final OscarProperties props = OscarProperties.getInstance();
+
+	private static final OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
 
 	@Override
-    public void service(HttpServletRequest req, HttpServletResponse res) throws javax.servlet.ServletException, java.io.IOException {
-
+    public void service(HttpServletRequest req, HttpServletResponse res) throws java.io.IOException
+	{
 		logger.info("CREATE CUSTOM RX PDF SERVICE");
 
 		ByteArrayOutputStream baosPDF = null;
 
-		try {
+		try
+		{
 			String method = req.getParameter("__method");
 			boolean isFax = method.equals("oscarRxFax");
 			baosPDF = generatePDFDocumentBytes(req, this.getServletContext());
-			if (isFax) {
+			if(isFax)
+			{
+				String providerNo = LoggedInInfo.getLoggedInInfoFromSession(req).getLoggedInProviderNo();
+				String clinicFax = req.getParameter("clinicFax");
+				String pharmacyFaxNo = req.getParameter("pharmaFax");
+				String pharmacyName = req.getParameter("pharmaName").replaceAll("'", "\\\\'");
+				String pdfId = req.getParameter("pdfId");
+				String demographicNoStr = req.getParameter("demographic_no");
+				Integer demographicNo = Integer.parseInt(demographicNoStr);
 
 				res.setContentType("text/html");
 				PrintWriter writer = res.getWriter();
-				String faxNo = req.getParameter("pharmaFax").trim().replaceAll("\\D", "");
-			    if (faxNo.length() < 7) {
-					writer.println("<script>alert('Error: No fax number found!');window.close();</script>");
-				} else {
+
+				HashSet<String> recipients = OutgoingFaxService.preProcessFaxNumbers(pharmacyFaxNo);
+				String faxMessage = "Fax sent to: " + pharmacyName + " (" + pharmacyFaxNo + ")";
+
+				for(String recipient : recipients) // only ever has one element
+				{
 					// write to file
-					String pdfFile = "prescription_"+req.getParameter("pdfId")+".pdf";
-					String path = OscarProperties.getInstance().getProperty("DOCUMENT_DIR") + "/";
-					FileOutputStream fos = new FileOutputStream(path+pdfFile);
-					baosPDF.writeTo(fos);
-					fos.close();
-
-					String tempPath = OscarProperties.getInstance().getProperty(
-						"fax_file_location", System.getProperty("java.io.tmpdir"));
-
-					// write to file
-					String tempPdf = tempPath + "/prescription_" + req.getParameter("pdfId") + ".pdf";
-					// Copying the fax pdf.
-					FileUtils.copyFile(new File(path+pdfFile), new File(tempPdf));
-
-					String txtFile = tempPath + "/prescription_" + req.getParameter("pdfId") + ".txt";
-					FileWriter fstream = new FileWriter(txtFile);
-					BufferedWriter out = new BufferedWriter(fstream);
-					try {
-						out.write(faxNo);
-					} finally {
-						if (out != null) out.close();
+					String pdfFile = "prescription_" + pdfId + ".pdf";
+					GenericFile fileToFax = FileFactory.createTempFile(baosPDF, ".pdf");
+					fileToFax.rename(pdfFile);
+					FaxOutboxTransferOutbound transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicNo, recipient, FaxOutbound.FileType.PRESCRIPTION, fileToFax);
+					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
+					{
+						faxMessage = "Failed to send fax. Check account settings. " +
+								"Reason: " + transfer.getSystemStatusMessage();
 					}
-
-					String faxNumber = req.getParameter("clinicFax");
-					String demo = req.getParameter("demographic_no");
-					FaxJobDao faxJobDao = SpringUtils.getBean(FaxJobDao.class);
-					FaxConfigDao faxConfigDao = SpringUtils.getBean(FaxConfigDao.class);
-					List<FaxConfig> faxConfigs = faxConfigDao.findAll(null, null);
-					String provider_no = LoggedInInfo.getLoggedInInfoFromSession(req).getLoggedInProviderNo();
-					FaxJob faxJob;
-					boolean validFaxNumber = false;
-
-					for( FaxConfig faxConfig : faxConfigs ) {
-
-						if( faxConfig.getFaxNumber().equals(faxNumber) ) {
-
-							PdfReader pdfReader = new PdfReader(path+pdfFile);
-
-							faxJob = new FaxJob();
-							faxJob.setDestination(faxNo);
-							faxJob.setFax_line(faxNumber);
-							faxJob.setFile_name(pdfFile);
-							faxJob.setUser(faxConfig.getFaxUser());
-							faxJob.setNumPages(pdfReader.getNumberOfPages());
-							faxJob.setStamp(new Date());
-							faxJob.setStatus(FaxJob.STATUS.SENT);
-							faxJob.setOscarUser(provider_no);
-							faxJob.setDemographicNo(Integer.parseInt(demo));
-
-							faxJobDao.persist(faxJob);
-							validFaxNumber = true;
-							break;
-
-						}
+					else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED.name()))
+					{
+						faxMessage = "Failed to send fax, it has been queued for automatic resend. " +
+								"Reason: " + transfer.getSystemStatusMessage();
 					}
-			                
-			        if( validFaxNumber ) {
-			        	LogAction.addLog(provider_no, LogConst.SENT, LogConst.CON_FAX, "PRESCRIPTION " + pdfFile );
-			        }
-
-					writer.println("<script>alert('Fax sent to: " + req.getParameter("pharmaName").replaceAll("'", "\\\\'") + " (" + req.getParameter("pharmaFax") + ")');window.close();</script>");
 				}
-			} else {
+				writer.println("<script>alert('" + StringEscapeUtils.escapeJavaScript(faxMessage) + ")');window.close();</script>");
+			}
+			else
+			{
 				StringBuilder sbFilename = new StringBuilder();
 				sbFilename.append("filename_");
 				sbFilename.append(".pdf");
@@ -188,23 +146,41 @@ public class FrmCustomedPDFServlet extends HttpServlet {
 
 				sos.flush();
 			}
-		} catch (DocumentException dex) {
+		}
+		catch(DocumentException dex)
+		{
 			res.setContentType("text/html");
 			PrintWriter writer = res.getWriter();
 			writer.println("Exception from: " + this.getClass().getName() + " " + dex.getClass().getName() + "<br>");
 			writer.println("<pre>");
 			writer.println(dex.getMessage());
 			writer.println("</pre>");
-		} catch (java.io.FileNotFoundException dex) {
+		}
+		catch(java.io.FileNotFoundException dex)
+		{
+			res.setContentType("text/html");
+			PrintWriter writer = res.getWriter();
+			writer.println("<script>alert('Signature not found. Please sign the prescription.');</script>");
+		}
+		catch(InterruptedException | IOException e)
+	    {
 		    res.setContentType("text/html");
 		    PrintWriter writer = res.getWriter();
-		    writer.println("<script>alert('Signature not found. Please sign the prescription.');</script>");
-	    } finally {
-			if (baosPDF != null) {
+		    writer.println("<script>alert('Error: " + e.getMessage() + "');window.close();</script>");
+	    }
+		catch(FaxException e)
+		{
+			res.setContentType("text/html");
+			PrintWriter writer = res.getWriter();
+			writer.println("<script>alert('Error: " + e.getUserFriendlyMessage(req.getLocale()) + "');window.close();</script>");
+		}
+		finally
+		{
+			if(baosPDF != null)
+			{
 				baosPDF.reset();
 			}
 		}
-
 	}
 
 	// added by vic, hsfo

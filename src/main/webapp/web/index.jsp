@@ -432,6 +432,7 @@
 <%--Non-angular scripts--%>
 <script type="text/javascript" src="common/util/util.js"></script>
 <script type="text/javascript" src="common/util/serviceHelper.js"></script>
+<script type="text/javascript" src="common/util/searchListHelper.js"></script>
 <script type="text/javascript" src="consults/common.js"></script>
 
 <%--Angular scripts--%>
@@ -455,6 +456,9 @@
 <script type="text/javascript" src="common/services/formService.js"></script>
 <script type="text/javascript" src="common/services/inboxService.js"></script>
 <script type="text/javascript" src="common/services/k2aService.js"></script>
+<script type="text/javascript" src="common/services/faxAccountService.js"></script>
+<script type="text/javascript" src="common/services/faxInboundService.js"></script>
+<script type="text/javascript" src="common/services/faxOutboundService.js"></script>
 <script type="text/javascript" src="common/services/messageService.js"></script>
 <script type="text/javascript" src="common/services/noteService.js"></script>
 <script type="text/javascript" src="common/services/patientDetailStatusService.js"></script>
@@ -464,6 +468,7 @@
 <script type="text/javascript" src="common/services/providersService.js"></script>
 <script type="text/javascript" src="common/services/scheduleService.js"></script>
 <script type="text/javascript" src="common/services/securityService.js"></script>
+<script type="text/javascript" src="common/services/systemPreferenceService.js"></script>
 <script type="text/javascript" src="common/services/staticDataService.js"></script>
 <script type="text/javascript" src="common/services/summaryService.js"></script>
 <script type="text/javascript" src="common/services/ticklerService.js"></script>
@@ -543,6 +548,14 @@
 <script type="text/javascript" src="admin/integration/know2act/Know2actConfigController.js"></script>
 <script type="text/javascript" src="admin/integration/know2act/Know2actNotificationController.js"></script>
 <script type="text/javascript" src="admin/integration/know2act/Know2actTemplateController.js"></script>
+
+<script type="text/javascript" src="admin/integration/fax/module.js"></script>
+<script type="text/javascript" src="admin/integration/fax/faxConfiguration.jsp"></script>
+<script type="text/javascript" src="admin/integration/fax/faxConfigurationController.js"></script>
+<script type="text/javascript" src="admin/integration/fax/faxConfigurationEdit.jsp"></script>
+<script type="text/javascript" src="admin/integration/fax/faxConfigurationEditController.js"></script>
+<script type="text/javascript" src="admin/integration/fax/faxSendReceive.jsp"></script>
+<script type="text/javascript" src="admin/integration/fax/faxSendReceiveController.js"></script>
 
 <script type="text/javascript" src="billing/billingController.js"></script>
 

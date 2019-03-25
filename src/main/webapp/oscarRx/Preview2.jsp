@@ -146,6 +146,7 @@ String patientProvince = patient.getProvince()==null ? "" : patient.getProvince(
 String patientPostal = patient.getPostal()==null ? "" : patient.getPostal();
 String patientPhone = patient.getPhone()==null ? "" : patient.getPhone();
 String patientHin = patient.getHin()==null ? "" : patient.getHin();
+String patientVer = patient.getVer();
 
 
 oscar.oscarRx.data.RxPrescriptionData.Prescription rx = null;
@@ -417,7 +418,17 @@ if(custom_logo_name != null ){
                                                             <%= patientCityPostal %><br>
                                                             <%= patientPhone %><br>
                                                             <b> <% if(!props.getProperty("showRxHin", "").equals("false")) { %>
-                                                            <bean:message key="oscar.oscarRx.hin" /><%= patientHin %> <% } %>                                                            
+																<% if(props.isOntarioInstanceType())
+																{ %>
+																	<bean:message key="oscar.oscarRx.hin" /><%= patientHin %> <%= patientVer %>
+																<%
+                                                            	}
+                                                            	else
+																{
+																%>
+																	<bean:message key="oscar.oscarRx.hin" /><%= patientHin %>
+																<%}%>
+															<% } %>
                                                             </b><br>
                                                                 <% if(props.getProperty("showRxChartNo", "").equalsIgnoreCase("true")) { %>
                                                             <bean:message key="oscar.oscarRx.chartNo" /><%=ptChartNo%><% } %></td>

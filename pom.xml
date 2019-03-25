@@ -211,6 +211,12 @@
 			<artifactId>hapi-structures-v231</artifactId>
 			<version>2.3</version>
 		</dependency>
+		<!-- DNS lookup -->
+		<dependency>
+			<groupId>dnsjava</groupId>
+			<artifactId>dnsjava</artifactId>
+			<version>2.1.8</version>
+		</dependency>
 		<!-- spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -306,12 +312,6 @@
 			<version>2.2</version>
 		</dependency>
 
-		<!-- pdf / jpedal -->
-		<dependency>
-			<groupId>org</groupId>
-			<artifactId>jpedal</artifactId>
-			<version>lgpl</version>
-		</dependency>
 		<!--  pdfbox -->
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>

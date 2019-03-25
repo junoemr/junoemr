@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.common.SkipContentLogging;
+import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
 import org.springframework.stereotype.Component;
 import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
@@ -57,10 +57,11 @@ public class LabUploadWs extends AbstractWs {
 	private static final String LAB_TYPE_GAMMADYNACARE = "GDML";
 	private static final String LAB_TYPE_CDL = "CDL";
     private static final String LAB_TYPE_EPSILON_MHL = "EPSILON";
+	private static final String LAB_TYPE_ALPHA = "ALPHA";
 
     private static final Logger logger=MiscUtils.getLogger();
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
     public String uploadAHS(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
@@ -88,7 +89,7 @@ public class LabUploadWs extends AbstractWs {
 	 * use uploadAHS instead. This method redirects to uploadAHS
 	 */
     @Deprecated
-    @SkipContentLogging
+    @SkipContentLoggingInbound
 	public String uploadCLS(
 			@WebParam(name="file_name") String fileName,
 			@WebParam(name="contents") String contents,
@@ -101,7 +102,7 @@ public class LabUploadWs extends AbstractWs {
 	 * use uploadAHS instead. This method redirects to uploadAHS
 	 */
 	@Deprecated
-    @SkipContentLogging
+    @SkipContentLoggingInbound
 	public String uploadCLSDI(
 			@WebParam(name="file_name") String fileName,
 			@WebParam(name="contents") String contents,
@@ -111,7 +112,7 @@ public class LabUploadWs extends AbstractWs {
 		return uploadAHS(fileName, contents, oscarProviderNo);
 	}
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
     public String uploadCML(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
@@ -135,7 +136,7 @@ public class LabUploadWs extends AbstractWs {
         return returnMessage;
     }
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
     public String uploadLifelabs(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
@@ -158,7 +159,7 @@ public class LabUploadWs extends AbstractWs {
         return returnMessage;
     }
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
     public String uploadExcelleris(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
@@ -180,7 +181,7 @@ public class LabUploadWs extends AbstractWs {
         return returnMessage;
     }
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
     public String uploadIHA(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
@@ -203,7 +204,7 @@ public class LabUploadWs extends AbstractWs {
         return returnMessage;
     }
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
     public String uploadGammaDynacare(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
@@ -226,7 +227,7 @@ public class LabUploadWs extends AbstractWs {
         return returnMessage;
     }
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
     public String uploadCDL(
             @WebParam(name="file_name") String fileName,
             @WebParam(name="contents") String contents,
@@ -249,7 +250,7 @@ public class LabUploadWs extends AbstractWs {
         return returnMessage;
     }
 
-    @SkipContentLogging
+    @SkipContentLoggingInbound
 	public String uploadMHL(
 			@WebParam(name = "file_name") String fileName, 
 			@WebParam(name = "contents") String contents,
@@ -269,6 +270,27 @@ public class LabUploadWs extends AbstractWs {
         returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
         return returnMessage;
     }
+
+	@SkipContentLoggingInbound
+	public String uploadALPHA(
+			@WebParam(name = "file_name") String fileName,
+			@WebParam(name = "contents") String contents,
+			@WebParam(name = "oscar_provider_no") String oscarProviderNo) {
+
+		String returnMessage, audit;
+
+		try {
+			audit = importLab(fileName, contents, LAB_TYPE_ALPHA, oscarProviderNo);
+		}
+		catch (Exception e) {
+			logger.error(e.getMessage());
+			returnMessage = "{\"success\":0,\"message\":\"" +
+					e.getMessage() + "\", \"audit\":\"\"}";
+			return returnMessage;
+		}
+		returnMessage = "{\"success\":1,\"message\":\"\", \"audit\":\""+audit+"\"}";
+		return returnMessage;
+	}
 
     private String importLab(String fileName, String labContent, String labType, String oscarProviderNo)
 		throws ParseException, Exception

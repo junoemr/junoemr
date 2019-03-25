@@ -7,6 +7,7 @@
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
+	<template>"oscar/oscarBilling/ca/bc/reports/report_default_style.jrxml"</template>
 	<parameter name="startDate" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
 	</parameter>
@@ -281,8 +282,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None">
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<text><![CDATA[ServDate
-]]></text>
+				<text><![CDATA[ServDate]]></text>
 			</staticText>
 			<staticText>
 				<reportElement key="element-90" mode="Transparent" x="129" y="0" width="61" height="20" forecolor="#FFFFFF" backcolor="#FFFFFF"/>

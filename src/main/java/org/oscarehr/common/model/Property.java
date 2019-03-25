@@ -26,6 +26,9 @@
 package org.oscarehr.common.model;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -39,6 +42,8 @@ import org.apache.commons.lang.StringUtils;
 @Entity
 @Table(name = "property")
 public class Property extends AbstractModel<Integer> implements Serializable {
+
+	private static final Set<String> activeMarkers = new HashSet<>(Arrays.asList("true", "yes", "on"));
 
 	public Property() {}
 	
@@ -76,12 +81,22 @@ public class Property extends AbstractModel<Integer> implements Serializable {
 		this.value = StringUtils.trimToNull(value);
 	}
 
+	public void setValueNoNull(String value)
+	{
+		this.value = StringUtils.trimToEmpty(value);
+	}
+
 	public String getProviderNo() {
 		return (providerNo);
 	}
 
 	public void setProviderNo(String providerNo) {
 		this.providerNo = StringUtils.trimToNull(providerNo);
+	}
+
+	public boolean isPropertyEnabled()
+	{
+		return value != null && activeMarkers.contains(value.toLowerCase());
 	}
 
 }

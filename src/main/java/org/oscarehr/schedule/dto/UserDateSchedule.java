@@ -91,6 +91,16 @@ public class UserDateSchedule
 		return appointments;
 	}
 
+	public void setFirstName(String firstName)
+	{
+		this.firstName = firstName;
+	}
+
+	public void setLastName(String lastName)
+	{
+		this.lastName = lastName;
+	}
+
 	public boolean hasSchedule()
 	{
 		return scheduleSlots.asMapOfRanges().size() > 0;

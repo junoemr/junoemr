@@ -30,8 +30,8 @@ import java.lang.annotation.Annotation;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.ws.common.MaskParameter;
-import org.oscarehr.ws.common.SkipContentLogging;
+import org.oscarehr.ws.common.annotation.MaskParameter;
+import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
 import org.oscarehr.ws.external.soap.logging.model.SoapServiceLog;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -176,7 +176,7 @@ public class SoapLogBuilder
     {
         String postData;
 
-        if (!isSoapMethodAnnotatedWith(SkipContentLogging.class))
+        if (!isSoapMethodAnnotatedWith(SkipContentLoggingInbound.class))
         {
             if (isSoapMethodAnnotatedWith(MaskParameter.class) && isPostBodyParseable())
             {
@@ -192,7 +192,7 @@ public class SoapLogBuilder
         }
         else
         {
-            postData = SkipContentLogging.SKIP_CONTENT_LOGGING;
+            postData = SkipContentLoggingInbound.SKIP_CONTENT_LOGGING_INBOUND;
         }
 
         return postData;
@@ -238,7 +238,7 @@ public class SoapLogBuilder
     private String[] getMaskParameters()
     {
         MaskParameter maskParameters = AnnotationUtils.getMethodAnnotation(this.soapMethod, MaskParameter.class);
-        String[] fieldNames = maskParameters.name();
+        String[] fieldNames = maskParameters.fields();
 
         return fieldNames;
     }

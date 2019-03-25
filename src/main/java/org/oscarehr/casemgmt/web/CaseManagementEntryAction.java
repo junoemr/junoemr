@@ -1898,7 +1898,10 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			//Should we get the billform based on the appointment provider or the demographic's provider?
 			ProviderPreference providerPreference = providerPreferenceDao.find(demographic.getProviderNo());
 
-			if (providerPreference != null && !providerPreference.getDefaultServiceType().equals("no")) {
+			if (providerPreference != null &&
+					providerPreference.getDefaultServiceType() != null &&
+					!providerPreference.getDefaultServiceType().equals("no"))
+			{
 				defaultView = providerPreference.getDefaultServiceType();
 			}
 
@@ -2760,15 +2763,29 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
 
 		if(pStartDate!=null && !pStartDate.isEmpty()){
-			Date startDate = formatter.parse(pStartDate);
-			cStartDate = Calendar.getInstance();
-			cStartDate.setTime(startDate);
+			try
+			{
+				Date startDate = formatter.parse(pStartDate);
+				cStartDate = Calendar.getInstance();
+				cStartDate.setTime(startDate);
+			}
+			catch (ParseException ex)
+			{
+				MiscUtils.getLogger().error(ex.getMessage());
+			}
 		}
 
 		if(pEndDate!=null && !pEndDate.isEmpty()){
-			Date endDate = formatter.parse(pEndDate);
-			cEndDate = Calendar.getInstance();
-			cEndDate.setTime(endDate);
+			try
+			{
+				Date endDate = formatter.parse(pEndDate);
+				cEndDate = Calendar.getInstance();
+				cEndDate.setTime(endDate);
+			}
+			catch (ParseException ex)
+			{
+				MiscUtils.getLogger().error(ex.getMessage());
+			}
 		}
 
 		boolean printAllNotes = "ALL_NOTES".equals(ids);

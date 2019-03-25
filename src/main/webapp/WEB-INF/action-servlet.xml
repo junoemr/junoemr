@@ -202,6 +202,10 @@
 
 	<bean name="/admin/ManageClinic" class="org.oscarehr.common.web.ClinicManageAction" singleton="false">
 		<property name="clinicDAO" ref="clinicDAO" />
+		<property name="clinicBillingAddressDAO" ref="clinicBillingAddressDAO" />
+	</bean>
+	<bean name="/admin/ClinicBillingAddress" class="org.oscarehr.common.web.ClinicBillingAddressAction" singleton="false">
+		<property name="clinicBillingDao" ref="clinicBillingAddressDAO" />
 	</bean>
 	<bean name="/admin/ManageSites" class="org.oscarehr.common.web.SitesManageAction" singleton="false">
 		<property name="siteDao" ref="siteDao" />
