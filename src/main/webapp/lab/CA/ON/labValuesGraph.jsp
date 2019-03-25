@@ -51,7 +51,8 @@ if(!authed) {
             String demographicNo = request.getParameter("demographic_no");
             String testName = request.getParameter("testName");
             String identifier = request.getParameter("identifier");
-            if (identifier == null) {
+            if (identifier == null)
+            {
                 identifier = "NULL";
             }
 
@@ -59,24 +60,24 @@ if(!authed) {
 
             org.oscarehr.common.model.Demographic demographic = dData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demographicNo);
 
-            StringBuffer sb = new StringBuffer();
-            Hashtable h = new Hashtable();
+            StringBuffer buffer = new StringBuffer();
+            Hashtable<String, String> drugTable = new Hashtable<String, String>();
             String drugForGraph = "";
-            if(request.getParameterValues("drug")!=null){
+            if (request.getParameterValues("drug") != null)
+            {
                 String[] drugs = request.getParameterValues("drug");
-
-                for(String d:drugs){
-                    sb.append("&drug="+d);
-                    h.put(d,"drug");
+                for (String drug : drugs)
+                {
+                    buffer.append("&drug=" + drug);
+                    drugTable.put(drug, "drug");
                 }
-               drugForGraph = sb.toString();
+                drugForGraph = buffer.toString();
             }
 
 
 
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<%@page import="org.oscarehr.util.MiscUtils"%><html>
     <head>
         <script type="text/javascript" src="<%= request.getContextPath()%>/js/global.js"></script>
         <html:base />
@@ -189,17 +190,6 @@ if(!authed) {
                             <tr>
                                 <td colspan="4" height="7">&nbsp;</td>
                             </tr>
-                            <!--tr>
-                                <td bgcolor="#FFCC00" width="200" height="22" valign="bottom">
-                                    <div class="Title2">
-                                        <%=""/*gResults.groupName*/%>
-
-                                    </div>
-                                </td>
-                                <td align="right" bgcolor="#FFCC00" width="100">&nbsp;</td>
-                                <td width="9">&nbsp;</td>
-                                <td width="*">&nbsp;</td>
-                            </tr-->
                         </table>
 
                         <img src="../../../oscarEncounter/GraphMeasurements.do?method=actualLab&demographic_no=<%=demographicNo%>&labType=<%=labType%>&identifier=<%=identifier%>&testName=<%=testName%><%=drugForGraph%>"/>
@@ -225,29 +215,18 @@ if(!authed) {
                         <ul>
                         <%
                         oscar.oscarRx.data.RxPrescriptionData prescriptData = new oscar.oscarRx.data.RxPrescriptionData();
-                        oscar.oscarRx.data.RxPrescriptionData.Prescription [] arr = {};
-                        arr = prescriptData.getUniquePrescriptionsByPatient(Integer.parseInt(demographicNo));
+                        oscar.oscarRx.data.RxPrescriptionData.Prescription[] arr = prescriptData.getUniquePrescriptionsByPatient(Integer.parseInt(demographicNo));
 
-                        if (arr != null){
-                        	MiscUtils.getLogger().error("ARR "+arr.length);
-                        }
-
-                        long now = System.currentTimeMillis();
-                        long month = 1000L * 60L * 60L * 24L * 30L;
-                        for(int idx = 0; idx < arr.length; ++idx ) {
+                        for (int idx = 0; idx < arr.length; ++idx)
+                        {
                             oscar.oscarRx.data.RxPrescriptionData.Prescription drug = arr[idx];
-                            if( drug.isArchived() ){
+                            if (drug.isArchived() || drug.isCustom())
+                            {
                                 continue;
                             }
 
-                            String styleColor = "";
-                            if (drug.isCurrent() && (drug.getEndDate().getTime() - now <= month)) {
-                                styleColor="style=\"color:orange;font-weight:bold;\"";
-                            }else if (drug.isCurrent() )  {
-                                styleColor="style=\"color:red;\"";
-                            }
                             %>
-                            <li><input type="checkbox"  <%=getChecked( h,drug.getRegionalIdentifier())%> name="drug" value="<%=drug.getRegionalIdentifier()%>" /> <%=drug.getFullOutLine().replaceAll(";", " ")%> </li>
+                            <li><input type="checkbox"  <%=getChecked(drugTable, drug.getRegionalIdentifier())%> name="drug" value="<%=drug.getRegionalIdentifier()%>" /> <%=drug.getFullOutLine().replaceAll(";", " ")%> </li>
                             <%
                          }
                         %>
@@ -263,8 +242,9 @@ if(!authed) {
 </html>
 
 <%!
-String getChecked(Hashtable h,String reg){
-    if (h != null && reg != null && h.containsKey(reg)){
+String getChecked(Hashtable table, String reg) {
+    if (table != null && reg != null && table.containsKey(reg))
+    {
         return "checked";
     }
     return "";
