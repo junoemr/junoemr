@@ -34,7 +34,6 @@ import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.report.reportByTemplate.dao.ReportTemplatesDao;
 import org.oscarehr.report.reportByTemplate.exception.ReportByTemplateException;
-import org.oscarehr.report.reportByTemplate.model.PreparedSQLTemplate;
 import org.oscarehr.report.reportByTemplate.model.ReportTemplates;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +49,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -198,98 +196,37 @@ public class ReportByTemplateService
 		return report;
 	}
 
-	/**
-	 * TODO - code left here for future use if spring upgraded to version 2.0 or higher.
-	 * Reason: the Tuple object can be used to retrieve column names as alias.
-	 * This code runs fine, but there was no way to display the column names for user queries.
-	 */
-	public Map<String, String[]> getJpaPreparedParams(String rawSQL, Map<String,String[]> parameters) throws ReportByTemplateException
+	public String getTemplateSQL(Integer templateId, Map<String,String[]> parameters) throws ReportByTemplateException
 	{
-		// match optionally quoted '{parameter}'
-		Pattern pattern = Pattern.compile("[\\'|\\\"]?\\{(.*?)\\}[\\'|\\\"]?");
-		Matcher matcher = pattern.matcher(rawSQL);
+		ReportTemplates template = reportByTemplateDao.find(templateId);
+		String templateSql = template.getTemplateSql();
 
-		Map<String, String[]> preparedParams = new HashMap<String, String[]>();
-
-		while(matcher.find())
-		{
-			String paramName = matcher.group(1);
-			String[] paramValues;
-
-			// get the value array. it can be in several forms
-			if(parameters.containsKey(paramName))
-			{
-				paramValues = parameters.get(paramName);
-			}
-			else if(parameters.containsKey(paramName+":list"))
-			{
-				paramValues = parameters.get(paramName+":list");
-			}
-			else if(parameters.containsKey(paramName+":check"))
-			{
-				paramValues = new String[0];
-			}
-			else
-			{
-				throw new ReportByTemplateException("Missing Parameter definition: " + paramName);
-			}
-
-			preparedParams.put(paramName, paramValues);
-		}
-		return preparedParams;
-	}
-
-	/**
-	 * TODO - code left here for future use if spring upgraded to version 2.0 or higher.
-	 * Reason: the Tuple object can be used to retrieve column names as alias.
-	 * This code runs fine, but there was no way to display the column names for user queries.
-	 */
-	public String getJpaPreparedSQL(String rawSQL, Map<String,String[]> preparedParams)
-	{
-		String jpaSQL = rawSQL;
-
-		for(String parameter : preparedParams.keySet())
-		{
-			String paramTag = "[\\'|\\\"]?\\{" + parameter + "\\}[\\'|\\\"]?";
-			jpaSQL = jpaSQL.replaceAll(paramTag, ":" + parameter);
-		}
-
-		return jpaSQL;
-	}
-
-	public PreparedSQLTemplate getPreparedSQLTemplate(String rawSQL, Map<String,String[]> parameters) throws ReportByTemplateException
-	{
-		// match optionally quoted '{parameter}'
-		Pattern pattern = Pattern.compile("[\\'|\\\"]?\\{(.*?)\\}[\\'|\\\"]?");
-		Matcher matcher = pattern.matcher(rawSQL);
-		String jpaSQL;
-
-		Map<Integer,String[]> indexedParams = new HashMap<>();
-
+		// match {parameter}
+		Pattern pattern = Pattern.compile("\\{(.*?)\\}");
+		Matcher matcher = pattern.matcher(templateSql);
+		String nativeSql;
 
 		StringBuffer sb = new StringBuffer();
 
-		int counter = 1;
-		PreparedSQLTemplate preparedSQLTemplate = new PreparedSQLTemplate();
-
 		while(matcher.find())
 		{
 			String paramName = matcher.group(1);
-			String[] paramValues;
+			String paramValue;
 			logger.info("Pattern Match: " + paramName);
 
 			// get the value array. it can be in several forms
 			if(parameters.containsKey(paramName))
 			{
-				paramValues = parameters.get(paramName);
+				paramValue = parameters.get(paramName)[0];
 			}
 			else if(parameters.containsKey(paramName+":list"))
 			{
-				paramValues = parameters.get(paramName+":list");
+				String[] paramValues = parameters.get(paramName+":list");
+				paramValue = String.join(",", paramValues);
 			}
 			else if(parameters.containsKey(paramName+":check"))
 			{
-				paramValues = new String[0];
+				paramValue = "";
 			}
 			else if(parameters.containsKey(paramName+":limit"))
 			{
@@ -298,8 +235,7 @@ public class ReportByTemplateService
 				{
 					throw new ReportByTemplateException("Non numeric limit value: " + limitParam);
 				}
-				matcher.appendReplacement(sb, limitParam);
-				continue;
+				paramValue = limitParam;
 			}
 			else if(parameters.containsKey(paramName+":offset"))
 			{
@@ -308,26 +244,19 @@ public class ReportByTemplateService
 				{
 					throw new ReportByTemplateException("Non numeric offset value: " + offsetParam);
 				}
-				matcher.appendReplacement(sb, offsetParam);
-				continue;
+				paramValue = offsetParam;
 			}
 			else
 			{
 				throw new ReportByTemplateException("Missing Parameter definition: " + paramName);
 			}
 
-			matcher.appendReplacement(sb, "?");
-			indexedParams.put(counter, paramValues);
-			counter++;
+			matcher.appendReplacement(sb, paramValue);
 		}
 		matcher.appendTail(sb);
 
-		jpaSQL = sb.toString();
-
-		preparedSQLTemplate.setPreparedSQL(jpaSQL);
-		preparedSQLTemplate.setParameterMap(indexedParams);
-
-		return preparedSQLTemplate;
+		nativeSql = sb.toString();
+		return nativeSql;
 	}
 
 	// ---- logic taken from old ReportManager

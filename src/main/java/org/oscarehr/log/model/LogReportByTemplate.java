@@ -48,7 +48,7 @@ public class LogReportByTemplate extends AbstractModel<Integer>
 	private Integer templateId;
 
 	@Column(name = "provider_no")
-	private Integer providerNo;
+	private String providerNo;
 
 	@Column(name = "datetime_start")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -81,12 +81,12 @@ public class LogReportByTemplate extends AbstractModel<Integer>
 		this.templateId = templateId;
 	}
 
-	public Integer getProviderNo()
+	public String getProviderNo()
 	{
 		return providerNo;
 	}
 
-	public void setProviderNo(Integer providerNo)
+	public void setProviderNo(String providerNo)
 	{
 		this.providerNo = providerNo;
 	}

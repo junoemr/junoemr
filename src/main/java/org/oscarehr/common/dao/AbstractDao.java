@@ -40,7 +40,6 @@ import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Transactional(propagation = Propagation.REQUIRED)
 public abstract class AbstractDao<T extends AbstractModel<?>> {
@@ -347,7 +346,7 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 	@Transactional(readOnly = true)
 	public List<Object[]> runNativeQuery(String sql)
 	{
-		Query query = readOnlyEntityManager.createNativeQuery(sql);
+		Query query = readOnlyEntityManager.createNativeQuery(escapeJpaParamCharacters(sql));
 		return query.getResultList();
 	}
 
@@ -395,7 +394,6 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 		setLimit(query, itemsToReturn);
 	}
 
-
 	/**
 	 * Run explain on a raw sql statement
 	 * This will run the query string as unescaped natural sql. when using this method, ensure that all sql is safe before hand
@@ -406,32 +404,9 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 	public List<Explain> getExplainResultList(String userQueryString)
 	{
 		// use string concat with explain over setParameter, as the parameter gives invalid sql syntax
-		Query query = readOnlyEntityManager.createNativeQuery("EXPLAIN " + userQueryString);
+		Query query = readOnlyEntityManager.createNativeQuery("EXPLAIN " + escapeJpaParamCharacters(userQueryString));
 		@SuppressWarnings("unchecked")
 		List<Object[]> list = query.getResultList();
-		return toExplainList(list);
-	}
-	/**
-	 * Run explain on a raw sql statement
-	 * This will run the query string as unescaped natural sql. when using this method, ensure that all sql is safe before hand
-	 * @param jpaPreparedSQL jpa native sql string
-	 * @param jpaParams jpa prepared parameter map
-	 * @return list of Explain results
-	 */
-	@Transactional(readOnly = true)
-	public List<Explain> getPreparedExplainResultList(String jpaPreparedSQL, Map<String, String[]> jpaParams)
-	{
-		// use string concat with explain over setParameter, as the parameter gives invalid sql syntax
-		@SuppressWarnings("unchecked")
-		List<Object[]> list = runPreparedNativeQuery("EXPLAIN " + jpaPreparedSQL, jpaParams);
-		return toExplainList(list);
-	}
-	@Transactional(readOnly = true)
-	public List<Explain> getIndexPreparedExplainResultList(String jpaPreparedSQL, Map<Integer, String[]> jpaParams)
-	{
-		// use string concat with explain over setParameter, as the parameter gives invalid sql syntax
-		@SuppressWarnings("unchecked")
-		List<Object[]> list = runIndexPreparedNativeQuery("EXPLAIN " + jpaPreparedSQL, jpaParams);
 		return toExplainList(list);
 	}
 
@@ -463,55 +438,18 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 		return results;
 	}
 
-	/**
-	 * TODO - code left here for future use if spring upgraded to version 2.0 or higher.
-	 * Reason: the Tuple object can be used to retrieve column names as alias.
-	 * This code runs fine, but there was no way to display the column names for user queries.
+	/** escapes some special characters that the entity manager will not allow in native queries correctly.
+	 * Proper escaping (\\: etc.) is not available until hibernate version 4.1.3
+	 * So this uses a quick and dirty hack to allow the characters through:
+	 *    Hibernate code treats everything between ' as a string (ignores it).
+	 *    MySQL on the other hand will ignore everything inside a blockquote and will evaluate the whole expression to an assignment operator.
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Transactional(readOnly = true)
-	public List<Object[]> runPreparedNativeQuery(String jpaPreparedSQL, Map<String, String[]> jpaParams)
+	private String escapeJpaParamCharacters(String unescapedSql)
 	{
-		Query query = readOnlyEntityManager.createNativeQuery(jpaPreparedSQL);
-
-		for(String parameter : jpaParams.keySet())
-		{
-			String[] paramValue = jpaParams.get(parameter);
-			if(paramValue.length == 1)
-			{
-				// for single parameters, use the value
-				query.setParameter(parameter, paramValue[0]);
-			}
-			else
-			{
-				// otherwise use the list
-				query.setParameter(parameter, paramValue);
-			}
-		}
-		List<Object[]> results = query.getResultList();
-		return results;
-	}
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Transactional(readOnly = true)
-	public List<Object[]> runIndexPreparedNativeQuery(String jpaPreparedSQL, Map<Integer, String[]> indexedParams)
-	{
-		Query query = readOnlyEntityManager.createNativeQuery(jpaPreparedSQL);
-
-		for(Integer parameter : indexedParams.keySet())
-		{
-			String[] paramValue = indexedParams.get(parameter);
-			if(paramValue.length == 1)
-			{
-				// for single parameters, use the value
-				query.setParameter(parameter, paramValue[0]);
-			}
-			else
-			{
-				// otherwise use the list
-				query.setParameter(parameter, paramValue);
-			}
-		}
-		List<Object[]> results = query.getResultList();
-		return results;
+		String escapedSql = unescapedSql
+				.replaceAll(":=", "/*'*/:=/*'*/")
+				.replaceAll("\\?", "/*'*/?/*'*/");
+		MiscUtils.getLogger().info("ESCAPED:\n" + escapedSql);
+		return escapedSql;
 	}
 }

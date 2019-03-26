@@ -32,8 +32,6 @@ import org.oscarehr.log.model.LogReportByTemplate;
 import org.oscarehr.report.SQLReportHelper;
 import org.oscarehr.report.reportByTemplate.dao.ReportTemplatesDao;
 import org.oscarehr.report.reportByTemplate.exception.ReportByTemplateException;
-import org.oscarehr.report.reportByTemplate.model.PreparedSQLTemplate;
-import org.oscarehr.report.reportByTemplate.model.ReportTemplates;
 import org.oscarehr.report.reportByTemplate.service.ReportByTemplateService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -49,7 +47,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -76,65 +73,60 @@ public class SQLReporter implements Reporter
 
 	public boolean generateReport( HttpServletRequest request)
 	{
-		String templateId = request.getParameter("templateId");
+		String templateIdStr = request.getParameter("templateId");
 		String providerNo = (String) request.getSession().getAttribute("user");
 
 		String rsHtml = "An SQL query error has occurred";
 		String csv = "";
-		String preparedSql = "";
-		String rawSql;
+		String nativeSQL = "";
 		ReportObject curReport = null;
 
 		try
 		{
-			ReportTemplates template = rptTemplatesDao.find(Integer.parseInt(templateId));
-			curReport = reportByTemplateService.getAsLegacyReport(Integer.parseInt(templateId), true);
+			Integer templateId = Integer.parseInt(templateIdStr);
+			curReport = reportByTemplateService.getAsLegacyReport(templateId, true);
+			nativeSQL = reportByTemplateService.getTemplateSQL(templateId, request.getParameterMap());
+			logger.info("SQL: " + nativeSQL);
 
 			//TODO re-design or fully remove this new functionality??
 //			if(curReport.isSequence()) {
 //				return generateSequencedReport(request);
 //			}
 
-			rawSql = template.getTemplateSql();
-			PreparedSQLTemplate preparedSQLTemplate = reportByTemplateService.getPreparedSQLTemplate(rawSql, request.getParameterMap());
-			preparedSql = preparedSQLTemplate.getPreparedSQL();
-			Map<Integer, String[]> indexedParamMap = preparedSQLTemplate.getParameterMap();
-			logger.info(preparedSQLTemplate.toString());
-
-			if(preparedSql == null || preparedSql.trim().isEmpty())
+			if(nativeSQL == null || nativeSQL.trim().isEmpty())
 			{
 				request.setAttribute("errormsg", "Error: Cannot find all parameters for the query. Check the template.");
-				request.setAttribute("templateid", templateId);
+				request.setAttribute("templateid", templateIdStr);
 				return false;
 			}
 			// admin verified reports bypass the maximum row limitations
 			if(!curReport.isSuperAdminVerified())
 			{
 				List<Explain> explainResultList = null;
-				boolean allowRun = SQLReportHelper.canSkipExplainCheck(preparedSql);
+				boolean allowRun = SQLReportHelper.canSkipExplainCheck(nativeSQL);
 				if(allowRun)
 				{
-					preparedSql = SQLReportHelper.getExplainSkippableQuery(preparedSql);
+					nativeSQL = SQLReportHelper.getExplainSkippableQuery(nativeSQL);
 				}
 				else
 				{
-					explainResultList = rptTemplatesDao.getIndexPreparedExplainResultList(preparedSql, indexedParamMap);
+					explainResultList = rptTemplatesDao.getExplainResultList(nativeSQL);
 					allowRun = SQLReportHelper.allowQueryRun(explainResultList, maxRows);
 				}
 				if(!allowRun)
 				{
-					logger.info("User Template Query: " + preparedSql);
+					logger.info("User Template Query: " + nativeSQL);
 					request.setAttribute("errormsg", "Error: The report examines more than the maximum " + maxRows + " rows");
 					request.setAttribute("explainResults", explainResultList);
-					request.setAttribute("templateid", templateId);
+					request.setAttribute("templateid", templateIdStr);
 					return false;
 				}
 			}
 
-			LogReportByTemplate logEntry = saveInitialLog(Integer.parseInt(templateId), Integer.parseInt(providerNo), rawSql);
+			LogReportByTemplate logEntry = saveInitialLog(templateId, providerNo, nativeSQL);
 
 			//TODO use the entityManager sql equivalent. can't get the column headers until spring upgrade to 2.0 or higher
-			ResultSet rs = DBHandler.GetSQL(preparedSql, indexedParamMap);
+			ResultSet rs = DBHandler.GetSQL(nativeSQL);
 			rsHtml = RptResultStruct.getStructure2(rs);  //makes html from the result set
 			StringWriter swr = new StringWriter();
 			CSVPrinter csvp = new CSVPrinter(swr);
@@ -163,14 +155,14 @@ public class SQLReporter implements Reporter
 
 		request.getSession().setAttribute("csv", csv);
 		request.setAttribute("csv", csv);
-		request.setAttribute("sql", preparedSql);
+		request.setAttribute("sql", nativeSQL);
 		request.setAttribute("reportobject", curReport);
 		request.setAttribute("resultsethtml", rsHtml);
 
 		return true;
 	}
 
-	private LogReportByTemplate saveInitialLog(Integer templateId, Integer providerNo, String querySql)
+	private LogReportByTemplate saveInitialLog(Integer templateId, String providerNo, String querySql)
 	{
 		LogReportByTemplate logReportByTemplate = new LogReportByTemplate();
 		try
