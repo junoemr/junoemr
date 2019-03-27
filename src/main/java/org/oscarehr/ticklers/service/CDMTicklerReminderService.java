@@ -47,8 +47,11 @@ import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -100,8 +103,9 @@ public class CDMTicklerReminderService implements ServletContextListener
 
             if (pollingFrequencyMs > 0)
             {
-                List<Integer> cdmDxCodes = getCDMDxCodes();
-                scheduler.scheduleAtFixedRate(new ProcessTicklersAsyncJob(cdmDxCodes), 1000L, pollingFrequencyMs, TimeUnit.MILLISECONDS);
+                Set<Integer> cdmDxCodes = getCDMDxCodes();
+                Set<String> inactiveStatuses = getInactivePatientStatuses();
+                scheduler.scheduleAtFixedRate(new ProcessTicklersAsyncJob(cdmDxCodes, inactiveStatuses), 1000L, pollingFrequencyMs, TimeUnit.MILLISECONDS);
             }
         }
     }
@@ -127,7 +131,7 @@ public class CDMTicklerReminderService implements ServletContextListener
      *
      * @param cdmDxCodes list of CDM diagnosis codes to search for billed ticklers.
      */
-    private void deleteBilledTicklers(List<Integer> cdmDxCodes)
+    private void deleteBilledTicklers(Set<Integer> cdmDxCodes)
     {
         try
         {
@@ -160,11 +164,11 @@ public class CDMTicklerReminderService implements ServletContextListener
      *
      * @param cdmDxCodes list of CDM codes to create ticklers for
      */
-    private void createUnbilledTicklers(List<Integer> cdmDxCodes)
+    private void createUnbilledTicklers(Set<Integer> cdmDxCodes, Set<String> inactivePatientStatuses)
     {
         try
         {
-            List<CDMTicklerInfo> cdmPatientsToUpdate = cdmTicklerDao.getCDMTicklerCreationInfo(cdmDxCodes);
+            List<CDMTicklerInfo> cdmPatientsToUpdate = cdmTicklerDao.getCDMTicklerCreationInfo(cdmDxCodes, inactivePatientStatuses);
 
             for (CDMTicklerInfo cdmPatient : cdmPatientsToUpdate)
             {
@@ -196,12 +200,12 @@ public class CDMTicklerReminderService implements ServletContextListener
      * Return a List of CDM dx codes from the database
      * @return list of cdmCodes.
      */
-    private List<Integer> getCDMDxCodes()
+    private Set<Integer> getCDMDxCodes()
     {
         ServiceCodeValidationLogic lgc = new ServiceCodeValidationLogic();
         List<String[]> cdmServiceCodes = lgc.getCDMCodes();
 
-        List<Integer> toReturn = new ArrayList<>();
+        Set<Integer> toReturn = new HashSet<>();
 
         for (String[] code : cdmServiceCodes)
         {
@@ -209,6 +213,17 @@ public class CDMTicklerReminderService implements ServletContextListener
         }
 
         return toReturn;
+    }
+
+    /**
+     *  Return inactive patient statuses.  These may be the traditional "IN", "DE", "MV", "FI" and
+     *  any custom ones.  If a demographic's code does not match one of these, then they are considered active.
+     *  @return list of inactive patient status codes for demographics
+     */
+    private Set<String> getInactivePatientStatuses()
+    {
+        String statuses = (String) properties.get("inactive_statuses");
+        return new HashSet<>(Arrays.asList(statuses.split(",")));
     }
 
 
@@ -250,11 +265,13 @@ public class CDMTicklerReminderService implements ServletContextListener
     {
         private final long SIX_HOURS = Duration.of(6, ChronoUnit.HOURS).toMillis();
         private long lastUpdate = 0L;
-        private List<Integer> cdmDxCodes;
+        private Set<Integer> cdmDxCodes;
+        private Set<String> inactiveStatuses;
 
-        ProcessTicklersAsyncJob(List<Integer> cdmDxCodes)
+        ProcessTicklersAsyncJob(Set<Integer> cdmDxCodes, Set<String> inactivePatientStatuses)
         {
             this.cdmDxCodes = cdmDxCodes;
+            this.inactiveStatuses = inactivePatientStatuses;
         }
 
         @Override
@@ -267,7 +284,7 @@ public class CDMTicklerReminderService implements ServletContextListener
 
             if (now - lastUpdate >= SIX_HOURS)
             {
-                createUnbilledTicklers(cdmDxCodes);
+                createUnbilledTicklers(cdmDxCodes, this.inactiveStatuses);
                 lastUpdate = calendar.getTimeInMillis();
             }
         }

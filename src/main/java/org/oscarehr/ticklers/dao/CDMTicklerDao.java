@@ -24,7 +24,6 @@
 package org.oscarehr.ticklers.dao;
 
 import org.oscarehr.common.model.Tickler;
-import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.ticklers.model.CDMTicklerInfo;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -35,6 +34,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This is an entity-less DAO used to determine which demographics need CDM billing reminder ticklers to be created or deleted.
@@ -58,7 +58,7 @@ public class CDMTicklerDao
      * @param cdmDxCodes CDM dx codes
      * @return CDM tickler info for patients which need a CDM reminder tickler generated.
      */
-    public List<CDMTicklerInfo> getCDMTicklerCreationInfo(List<Integer> cdmDxCodes)
+    public List<CDMTicklerInfo> getCDMTicklerCreationInfo(Set<Integer> cdmDxCodes, Set<String> inactivePatientStatuses)
     {
         Query query = entityManager.createNativeQuery(
          "SELECT d.demographic_no, d.provider_no, dxr.dxresearch_code, sc.serviceCode, bm.date, t.tickler_no " +
@@ -67,7 +67,7 @@ public class CDMTicklerDao
                 "ON d.demographic_no = dxr.demographic_no " +
                 "AND dxr.dxresearch_code IN (:cdmCodes) " +
                 "AND dxr.status = 'A' " +
-                "AND d.patient_status = :patientStatus " +
+                "AND d.patient_status = NOT IN (:inactivePatientStatuses) " +
             "JOIN billing_cdm_service_codes sc " +
                 "ON dxr.dxresearch_code = sc.cdmCode " +
             "LEFT JOIN (" +
@@ -84,7 +84,7 @@ public class CDMTicklerDao
                 "AND (DATEDIFF(NOW(), bm.date) >= 365) OR bm.date IS NULL) " +
                 "AND t.tickler_no IS NULL");
 
-        query.setParameter("patientStatus", Demographic.PatientStatus.ACTIVE.toString());
+        query.setParameter("inactivePatientStatuses", inactivePatientStatuses);
         query.setParameter("cdmCodes", cdmDxCodes);
         query.setParameter("ticklerStatus", Tickler.ACTIVE);
         List<Object[]> rawResult = query.getResultList();
@@ -101,7 +101,7 @@ public class CDMTicklerDao
      * @param cdmTicklerDxCodes CDM dx codes
      * @return Information on which ticklers can be archived
      */
-    public List<CDMTicklerInfo> getCDMTicklersToDelete(List<Integer> cdmTicklerDxCodes)
+    public List<CDMTicklerInfo> getCDMTicklersToDelete(Set<Integer> cdmTicklerDxCodes)
     {
         Query query = entityManager.createNativeQuery(
            "SELECT d.demographic_no, d.provider_no, dxr.dxresearch_code, bm.billing_code, bm.date, t.tickler_no " +
