@@ -25,6 +25,7 @@
 
 package org.oscarehr.common.web;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -127,7 +128,11 @@ public class SearchDemographicAutoCompleteAction extends Action {
         {
             int demoId = demo.getDemographicId();
             HashMap<String,String> hashMap = new HashMap<>();
-            hashMap.put("formattedDob", demo.getDateOfBirth().toString());
+            LocalDate dob = demo.getDateOfBirth();
+            if (dob != null)
+            {
+                hashMap.put("formattedDob", dob.toString());
+            }
             hashMap.put("formattedName",StringEscapeUtils.escapeJava(demo.getFormattedName().replaceAll("\"", "\\\"")));
             hashMap.put("demographicNo",String.valueOf(demoId));
             hashMap.put("status",demo.getPatientStatus());
