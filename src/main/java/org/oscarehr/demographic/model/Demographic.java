@@ -23,6 +23,7 @@
 package org.oscarehr.demographic.model;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
@@ -175,6 +176,7 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private List<DemographicExt> demographicExtList;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo")
+	@Where(clause="deleted=0")
 	private List<DemographicMerged> mergedDemographicsList;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "mergedTo")
