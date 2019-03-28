@@ -27,6 +27,7 @@ package oscar.oscarEncounter.oscarMeasurements.pageUtil;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -45,6 +46,8 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.util.ConversionUtils;
+
+import static oscar.util.ConversionUtils.coalesceTimeStampString;
 
 public class EctValidation{
 
@@ -152,7 +155,7 @@ public class EctValidation{
        
         return validation;
     }
-    
+
     public boolean isDate(String inputValue){
 
         boolean validation = true;
@@ -160,15 +163,22 @@ public class EctValidation{
         sdf.setLenient(false);
         
         try {
-			Date d = sdf.parse(inputValue);
-			Calendar c = Calendar.getInstance();
-			c.setTime(d);
-			if(c.get(Calendar.YEAR) > 9999) { // to prevent date parsing of more than 4-digit year
-				validation = false;
-			}
-		} catch (ParseException e) {
-			validation = false;
-		}
+            Date inputDate = sdf.parse(inputValue);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(inputDate);
+            if(calendar.get(Calendar.YEAR) > 9999) { // to prevent date parsing of more than 4-digit year
+                validation = false;
+            }
+            // Measurements uses following function to record date, which is different from the above check
+            // Sanity check by calling it and ensuring we won't get a null value back
+            if (coalesceTimeStampString(inputValue) == null) {
+                validation = false;
+            }
+
+        } catch (ParseException e) {
+            MiscUtils.getLogger().error("Received bad input date when attempting to validate: " + e);
+            validation = false;
+        }
                
         return validation;
     }
