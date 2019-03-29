@@ -125,7 +125,7 @@ public class CDMTicklerDao
                 "AND t.message LIKE CONCAT('%', 'SERVICE CODE ', sc.serviceCode, '%') " +
                 "AND t.status = :ticklerStatus " +
             "WHERE billingstatus NOT IN ('D', 'R', 'F') " +
-            "AND DATEDIFF(NOW(), bm.date) <= 365");
+            "AND DATEDIFF(NOW(), bm.date) < 365");
 
         query.setParameter("cdmTicklerDxCodes", cdmTicklerDxCodes);
         query.setParameter("ticklerStatus", Tickler.ACTIVE);
