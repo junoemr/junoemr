@@ -53,7 +53,8 @@
     {"search_provider", "select * from provider where provider_type='doctor' and status='1' order by last_name"},
     {"search_rsstatus", "select distinct roster_status from demographic where roster_status != '' and roster_status != 'RO' and roster_status != 'NR' and roster_status != 'TE' and roster_status != 'FS' "},
     {"search_ptstatus", "select distinct patient_status from demographic where patient_status != '' and patient_status != 'AC' and patient_status != 'IN' and patient_status != 'DE' and patient_status != 'MO' and patient_status != 'FI'"},
-    {"search_waiting_list", "select * from waitingListName where group_no='" + ((ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo() +"' and is_history='N'  order by name"}
+    {"search_waiting_list", "select * from waitingListName where group_no='" + ((ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo() +"' and is_history='N'  order by name"},
+	{"search_referral_source", "select 'implement me' as referralSource"}		// !!! Robert fix me
   };
   String[][] responseTargets=new String[][] {  };
   addDemoBean.doConfigure(dbQueries,responseTargets);
@@ -281,6 +282,22 @@ function newStatus1() {
     } else {
         alert("Invalid entry");
     }
+}
+
+
+<%-- Robert:  Parameterizing this funciton, newStatus and newStatus1 can be refactored to use this instead --%>
+function addOption (selectElement, optionType) {
+    var optionToAdd = prompt("Please enter a new " + optionType);
+
+    if (optionToAdd)
+	{
+	    selectElement.options[selectElement.length] = new Option(optionToAdd, optionToAdd);
+	    selectElement.options[selectElement.length - 1].selected = true;
+	}
+	else
+	{
+    	alert("Invalid value for " + optionType);
+	}
 }
 
 function formatPhoneNum() {
@@ -1319,9 +1336,35 @@ for(int i=0; i<custom_demographic_fields.size(); i++){
 			<%
 		}
 	}//end of Brazil form fields
-	
-	
-	
+	else if (custom_demographic_fields.get(i).equals("referral_source"))
+	{
+	 %>
+		<div>
+			<%-- Robert connect me and disable the sample.  In juno localize all AddNewPatient and AddNewRosterStatus to just use AddNew since both translate to "Add New" in all languages--%>
+			<label><b><bean:message key="demographic.demographicaddrecordhtml.referralSource"></bean:message></b></label>
+			<select type="select" name="referral_source">
+				<option value="foo">Foo</option>
+				<option value="bar">Bar</option>
+
+				<%--
+				This should be a fairly close implementation, depending on how you structure the result of the query.
+				Here I have it as a single field "referralSource"
+				<%
+					ResultSet referralSources = addDemoBean.queryResults("referral_source");
+					while (referralSources.next()) {
+					    String source = referralSources.getString("referralSource");
+				%>
+				<option value="<%=source%>"><%=source%></option>
+				<%
+					}
+					referralSources.close();
+				%>
+				--%>
+			</select>
+			<input type="button" onClick="addOption(document.adddemographic.referral_source, 'referral source');" value="<bean:message key="demographic.demographicaddrecordhtm.AddNew"/> ">
+		</div>
+	 <%
+	}
 }
 
 for(int i=0; i<hidden_demographic_fields.size(); i++){

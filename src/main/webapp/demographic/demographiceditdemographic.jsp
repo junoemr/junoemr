@@ -2215,6 +2215,21 @@ while(field_itr.hasNext()){
 																		</span>
 																	</li>
 																<% } %>
+																<%
+																	if (true)
+																	{
+																%>
+																<%-- Robert add stuff here --%>
+																	<li>
+																		<span class="label">
+																			Referral Source
+																		</span>
+																		<span class="info">
+																			Test Value
+																		</span>
+																	</li>
+
+																<% } %>
 																<li><span
 																		class="label"><bean:message
 																		key="demographic.demographiceditdemographic.formChartNo"/>:</span>
