@@ -4440,6 +4440,24 @@ while(field_itr.hasNext()){
 
 													</tr>
 												<% } %>
+												<% if (true)  //!!! CS
+												{
+												%>
+												<tr>
+													<td align="right">
+														<b>
+															Referral Source
+														</b>
+													</td>
+													<td>
+														<select name="referralSource" style="width: 281px">
+															<option value="foo">foo</option>
+															<option value="bar">bar</option>
+														</select>
+													</td>
+												</tr>
+												<% } %>
+
 												<%
 													// Patient parental name OHSUPPORT-3228
 													if (oscarProps.isPropertyActive("demographic_parent_names"))
