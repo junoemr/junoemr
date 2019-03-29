@@ -734,7 +734,6 @@ public class InboxResultsDao
 
 				lbData.dateTime = getStringValue(r[obsDateLoc]);
 
-				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 				lbData.setDateObj(UtilDateUtilities.StringToDate(getStringValue(r[obsDateLoc])));
 
 				String priority = getStringValue(r[priorityLoc]);
