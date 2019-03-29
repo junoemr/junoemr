@@ -23,7 +23,7 @@
 
 --%>
 <html>
-<!-- Eform Generator 0.1.01 -->
+<!-- Eform Generator 0.1.02 -->
 <!-- Author: Robert Martin -->
 <head>
 	<META http-equiv='Content-Type' content='text/html; charset=UTF-8'>
@@ -342,8 +342,21 @@
 			border: 1px solid black;
 			cursor: pointer;
 		}
-
 		.gen-xBox input:focus {
+			outline: none;
+			color: transparent;
+			text-shadow: 0 0 0 #000;
+		}
+		/* define custom checkbox styling */
+		.gen-checkbox input {
+			background: #f3f3f3;
+			text-align: center;
+			font-weight: bold;
+			font-size: 14px;
+			border: 1px solid black;
+			cursor: pointer;
+		}
+		.gen-checkbox input:focus {
 			outline: none;
 			color: transparent;
 			text-shadow: 0 0 0 #000;
@@ -496,8 +509,8 @@
 		var baseSignatureDataName = "gen_signatureData";
 		var basePageName = "page_";
 
-		var XBOX_INPUT_SELECTOR = ".xBox";
-		var TEXT_INPUT_SELECTOR = ":input[type=text]:not(.xBox), textarea";
+		var XBOX_INPUT_SELECTOR = ".xBox,.utf8Check";
+		var TEXT_INPUT_SELECTOR = ":input[type=text]:not("+XBOX_INPUT_SELECTOR+"), textarea";
 		var CHEK_INPUT_SELECTOR = ":input[type=checkbox]";
 		var GENDER_PRECHECK_CLASS_SELECTOR = "[class*=gender_precheck_]";
 		var OSCAR_DISPLAY_IMG_SRC = "<%= request.getContextPath() %>/eform/displayImage.do?imagefile=";
@@ -981,8 +994,7 @@
 			var $widget = $("<label>", {
 				id: widgetId,
 				class: "gen-widget gen-layer3 ui-widget-content " + customClasses,
-				text: text,
-				value: text
+				text: text
 			});
 			$parent.append($widget);
 			makeDraggable($widget, true, ".gen-layer1, .gen-layer2, .gen-layer3");
@@ -1487,7 +1499,7 @@
 				event.preventDefault();
 			});
 
-			$root.append($removePageButton).append($clearButton)
+			$root.append($removePageButton).append($clearButton);
 			if(!runStandaloneVersion) {
 
                 var options = [""];
@@ -1539,7 +1551,7 @@
 		}
 		function setEformId(id) {
 			var asInt = parseInt(id);
-			var $saveBtn = $("#saveToOscarButton")
+			var $saveBtn = $("#saveToOscarButton");
 			if(Number.isInteger(asInt) && asInt > 0) {
 				eFormFid = asInt;
 				$saveBtn.button('option', 'label', OSCAR_SAVE_MESSAGE_UPDATE);
@@ -1665,18 +1677,24 @@
 			var $options_menu0 = $("<div>", {
 				class: "gen-control-menu"
 			});
-			var $dragFrame0 = createStitchFrame();
-			var $checkBoxTemplate = addDraggableInputType($dragFrame0, "checkBoxTemplate", "checkbox", checkboxSize, checkboxSize, "");
-			var $xBoxTemplate = addDraggableInputType($dragFrame0, "xBoxTemplate", "text", checkboxSize, checkboxSize, "gen-xBox");
+			var $dragFrame00 = createStitchFrame();
+			var $dragFrame01 = createStitchFrame();
+			var $checkBoxTemplate = addDraggableInputType($dragFrame00, "checkBoxTemplate", "checkbox", checkboxSize, checkboxSize, "");
+			var $xBoxTemplate = addDraggableInputType($dragFrame01, "xBoxTemplate", "text", checkboxSize, checkboxSize, "gen-xBox");
+			var $utf8CheckBoxTemplate = addDraggableInputType($dragFrame00, "utf8CheckBoxTemplate", "text", checkboxSize, checkboxSize, "gen-checkbox");
 			var $checkBoxTemplateInput = $checkBoxTemplate.find(":input");
 			var $xBoxTemplateInput = $xBoxTemplate.find(":input");
 			$xBoxTemplateInput.addClass("xBox").attr('autocomplete', 'off');
+			var $utf8CheckboxTemplateInput = $utf8CheckBoxTemplate.find(":input");
+			$utf8CheckboxTemplateInput.addClass("utf8Check").attr('autocomplete', 'off');
 			var $checkboxSizeSpinner = createSpinnerElem("checkboxSizeSpinner", "Template Size:", checkboxSize);
 			var changeTemplateSize = function (event, ui) {
 				checkboxSize = this.value;
 				$checkBoxTemplate.css({width: checkboxSize, height: checkboxSize});
 				$xBoxTemplate.css({width: checkboxSize, height: checkboxSize});
 				$xBoxTemplate.find(XBOX_INPUT_SELECTOR).css({'font-size': (checkboxSize - 1) + 'px'});
+				$utf8CheckBoxTemplate.css({width: checkboxSize, height: checkboxSize});
+				$utf8CheckBoxTemplate.find(XBOX_INPUT_SELECTOR).css({'font-size': (checkboxSize - 1) + 'px'});
 			};
 			$checkboxSizeSpinner.find(":input").spinner({
 				min: checkboxSizeRange[0],
@@ -1696,7 +1714,9 @@
 				change: function (event, ui) {
 					var $xbox = $xBoxTemplate.find(":input");
 					var $chkbox = $checkBoxTemplate.find(":input");
+					var $utf8box = $utf8CheckBoxTemplate.find(":input");
 					$xbox.val($xbox.val() === 'X' ? '' : 'X');
+					$utf8box.val($utf8box.val() === '\u2713' ? '' : '\u2713');
 					$chkbox.prop('checked', !($chkbox.is(':checked')));
 					if ($(this).is(':checked') && $checkByGenderChkbox.is(':checked')) {
 						$checkByGenderChkbox.prop('checked', false);
@@ -1705,7 +1725,8 @@
 				}
 			});
 			$tab.append($options_menu0);
-			$tab.append($dragFrame0);
+			$tab.append($("<label>", {for: $dragFrame00.attr('id'), text: "\u2713 Box"})).append($dragFrame00);
+			$tab.append($("<label>", {for: $dragFrame01.attr('id'), text: "X Box"})).append($dragFrame01);
 			$options_menu0.append($checkboxSizeSpinner);
 			$options_menu0.append($("<div>").append($("<label>", {
 				text: "Pre-Check:",
@@ -1725,12 +1746,14 @@
 			$gender_select.on("selectmenuchange", ( function (event, data) {
 				$checkBoxTemplateInput.removeClass(removeGenderPrecheckClasses).addClass("gender_precheck_" + $gender_select.val());
 				$xBoxTemplateInput.removeClass(removeGenderPrecheckClasses).addClass("gender_precheck_" + $gender_select.val());
+				$utf8CheckboxTemplateInput.removeClass(removeGenderPrecheckClasses).addClass("gender_precheck_" + $gender_select.val());
 			}));
 			$checkByGenderChkbox.on('change', function () {
 				if ($(this).is(':checked')) {
 					$gender_select.selectmenu("enable");
 					$checkBoxTemplateInput.removeClass(removeGenderPrecheckClasses).addClass("gender_precheck_" + $gender_select.val());
 					$xBoxTemplateInput.removeClass(removeGenderPrecheckClasses).addClass("gender_precheck_" + $gender_select.val());
+					$utf8CheckboxTemplateInput.removeClass(removeGenderPrecheckClasses).addClass("gender_precheck_" + $gender_select.val());
 					if ($preCheckCheckbox.is(':checked')) {
 						$preCheckCheckbox.prop('checked', false);
 						$preCheckCheckbox.change();
@@ -1740,6 +1763,7 @@
 					$gender_select.selectmenu("disable");
 					$checkBoxTemplateInput.removeClass(removeGenderPrecheckClasses);
 					$xBoxTemplateInput.removeClass(removeGenderPrecheckClasses);
+					$utf8CheckboxTemplateInput.removeClass(removeGenderPrecheckClasses);
 				}
 			});
 		}
@@ -1749,9 +1773,9 @@
 				class: "gen-control-menu"
 			});
 
-			var $dragFrame1 = createStitchFrame().attr('id', 'dragframe1');
+			var $dragFrame10 = createStitchFrame().attr('id', 'dragframe1');
 			var $dragFrame11 = createStitchFrame().attr('id', 'dragframe11');
-			var $textBoxTemplate = addDraggableInputType($dragFrame1, "textBoxTemplate", "text", textBoxWidth, textBoxHeight, "");
+			var $textBoxTemplate = addDraggableInputType($dragFrame10, "textBoxTemplate", "text", textBoxWidth, textBoxHeight, "");
 			var $textAreaTemplate = addDraggableInputType($dragFrame11, "textAreaTemplate", "textarea", textBoxWidth, textBoxHeight, "");
 			var $textSizeSpinnerW = createSpinnerElem("textSizeSpinnerW", "Template Width:", textBoxWidth);
 			var onTextSizeSpinnerW = function (event, ui) {
@@ -1779,7 +1803,7 @@
 			});
 
 			$tab.append($options_menu1);
-			$tab.append($("<label>", {for: $dragFrame1.attr('id'), text: "Single Line Input"})).append($dragFrame1);
+			$tab.append($("<label>", {for: $dragFrame10.attr('id'), text: "Single Line Input"})).append($dragFrame10);
 			$tab.append($("<label>", {for: $dragFrame11.attr('id'), text: "Multi Line Input"})).append($dragFrame11);
 
 			$options_menu1.append($textSizeSpinnerW)
@@ -2187,8 +2211,9 @@
 				$('.inputOverride').attr("disabled", true);
 				//make xBoxes work in generator (have to unbind and rebind click events)
 				var $input_elements = $(".input_elements");
-				$input_elements.find(".xBox").unbind("click");
+				$input_elements.find(XBOX_INPUT_SELECTOR).unbind("click");
 				initXBoxes($input_elements);
+				initUTF8Checkboxes($input_elements);
 			}
 			dragAndDropEnabled = enable;
 		}
@@ -2477,6 +2502,19 @@
 				}
 			});
 		}
+		/** initializes custom checkboxes input functionality using utf-8 character.
+		 *  should be called once on eform load */
+		function initUTF8Checkboxes($selector) {
+			$selector.find(".utf8Check").click(function () {
+				$(this).val($(this).val() === '\u2713' ? '' : '\u2713');
+			}).keypress(function (event) {
+				// any key press except tab will constitute a value change to the checkbox
+				if (event.which != 0) {
+					$(this).click();
+					return false;
+				}
+			});
+		}
 		/** pre-check checkboxes and xboxes based on patient gender */
 		function initPrecheckedCheckboxes($selector) {
 			var $patientGender = $("#PatientGender");
@@ -2484,6 +2522,7 @@
 				var filter = ".gender_precheck_" + $patientGender.val();
 				$selector.find("input[type=checkbox]").filter(filter).prop('checked', true);
 				$selector.find(".xBox").filter(filter).val('X');
+				$selector.find(".utf8Check").filter(filter).val('\u2713');
 			}
 		}
 		/** This function is called when the eform has been loaded */
@@ -2491,6 +2530,7 @@
 			var $input_elements = $(".input_elements");
 			replaceOscarImagePathsWhenLocal($("#eform_container"));
 			initXBoxes($input_elements);
+			initUTF8Checkboxes($input_elements);
 			initPrecheckedCheckboxes($input_elements);
 			initConfirmClose();
 		}
