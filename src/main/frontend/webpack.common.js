@@ -56,6 +56,26 @@ module.exports = {
 			template: 'raw-loader!./index.jsp',
 			filename: 'index.jsp'
 		}),
+		new HtmlWebpackPlugin({
+			template: 'raw-loader!./faxConfiguration.jsp',
+			filename: 'faxConfiguration.jsp'
+		}),
+		new HtmlWebpackPlugin({
+			template: 'raw-loader!./faxSendReceive.jsp',
+			filename: 'faxSendReceive.jsp'
+		}),
+		new HtmlWebpackPlugin({
+			template: 'raw-loader!./Know2actConfiguration.jsp',
+			filename: 'Know2actConfiguration.jsp'
+		}),
+		new HtmlWebpackPlugin({
+			template: 'raw-loader!./Know2actTemplate.jsp',
+			filename: 'Know2actTemplate.jsp'
+		}),
+		new HtmlWebpackPlugin({
+			template: 'raw-loader!./Know2actNotifications.jsp',
+			filename: 'Know2actNotifications.jsp'
+		}),
 
 		// Copy files that aren't modified by webpack
 		new CopyWebpackPlugin([

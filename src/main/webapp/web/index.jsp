@@ -64,7 +64,7 @@
 	<%-- TODO move to a SCSS file and include in Juno SCSS/CSS --%>
 	<link href="../library/bootstrap/3.0.0/assets/css/bootstrap3_badge_colours.css" rel="stylesheet">
 
-</head>
+<link href="vendors~bundle.d14204db8f30be71cb3a.css" rel="stylesheet"><link href="bundle.ac5907003e3b3af6ec62.css" rel="stylesheet"></head>
 
 <body ng-controller="Layout.BodyController as bodyCtrl"
 	  ng-init="bodyCtrl.init()"
@@ -428,5 +428,5 @@
 
 <!-- Template code generated from the template jsps -->
 
-<script type="text/javascript" src="runtime~bundle.2d868530a43b1e0176c1.js"></script><script type="text/javascript" src="vendors~bundle.288c4bee1d1abea71762.js"></script><script type="text/javascript" src="bundle.84560a1dcf319cc02b76.js"></script></body>
+<script type="text/javascript" src="runtime~bundle.b9768e88f357c12a8f2d.js"></script><script type="text/javascript" src="vendors~bundle.d14204db8f30be71cb3a.js"></script><script type="text/javascript" src="bundle.ac5907003e3b3af6ec62.js"></script></body>
 </html>

@@ -41,10 +41,18 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<html lang="en" ng-app="oscarProviderViewModule">
+<head></head>
+<body ng-controller="Admin.Integration.Fax.FaxSendReceiveController as faxSendReceiveController">
+
+<!--
 <link href="<%=request.getContextPath() %>/library/bootstrap/3.0.0/css/bootstrap.css" rel="stylesheet">
 <link rel="stylesheet" href="<%=request.getContextPath() %>/css/font-awesome.min.css">
+-->
 <!-- Hide the main program nav as a fix for having angular in an iframe -->
+<!--
 <link rel="stylesheet" href="<%=request.getContextPath() %>/web/admin/integration/know2act/Know2actHideNavBars.css">
+-->
 
 <title><bean:message bundle="ui" key="admin.fax.sr.window-title"/></title>
 
@@ -206,3 +214,6 @@
 		</div>
 	</div>
 </div>
+
+</body>
+</html>

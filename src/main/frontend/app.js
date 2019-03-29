@@ -21,6 +21,7 @@ require('angular-loading-bar/build/loading-bar.min.css');
 require('bootstrap-datepicker');
 require('bootstrap-datepicker/dist/css/bootstrap-datepicker.css');
 require('bootstrap-timepicker');
+require('bootstrap-sass');
 require('ngstorage');
 require('./scss/juno.scss');
 require('font-awesome/css/font-awesome.min.css');

@@ -80,7 +80,7 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxCon
 
 			var modalInstance = $uibModal.open(
 				{
-					templateUrl: 'admin/integration/fax/faxConfigurationEdit.jsp',
+					templateUrl: 'src/admin/integration/fax/faxConfigurationEdit.jsp',
 					controller: 'Admin.Integration.Fax.FaxConfigurationEditController as faxConfigEditController',
 					backdrop: 'static',
 					windowClass: 'faxEditModal',
