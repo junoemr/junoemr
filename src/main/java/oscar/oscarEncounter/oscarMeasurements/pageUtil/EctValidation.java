@@ -27,7 +27,6 @@ package oscar.oscarEncounter.oscarMeasurements.pageUtil;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -64,18 +63,19 @@ public class EctValidation{
     public List<Validations> getValidationType(String inputType, String mInstrc){
         List<Validations> result = new ArrayList<Validations>();
         
-    	MeasurementTypeDao dao = SpringUtils.getBean(MeasurementTypeDao.class);
+        MeasurementTypeDao dao = SpringUtils.getBean(MeasurementTypeDao.class);
         List<MeasurementType> types = dao.findByTypeAndMeasuringInstruction(inputType, mInstrc);
         if (types.isEmpty()) {
-        	return result;
+            return result;
         }
-        
-        ValidationsDao vDao = SpringUtils.getBean(ValidationsDao.class); 
+
+        ValidationsDao vDao = SpringUtils.getBean(ValidationsDao.class);
         for(MeasurementType type : types) {
-        	Validations vs = vDao.find(ConversionUtils.fromIntString(type.getValidation()));
-		if(vs != null) {
-	        	result.add(vs);
-		}
+            Validations vs = vDao.find(ConversionUtils.fromIntString(type.getValidation()));
+            if(vs != null)
+            {
+                result.add(vs);
+            }
         }
         return result;
     }
@@ -102,16 +102,15 @@ public class EctValidation{
     public boolean isInRange(Double dMax, Double dMin, String inputValue){
 
         boolean validation = true;
-        
         if ((dMax != null && dMax!=0) || (dMin != null && dMin!=0)){
             if(GenericValidator.isDouble(inputValue)){
                 double dValue = Double.parseDouble(inputValue);
-                
-                if (!GenericValidator.isInRange(dValue, dMin, dMax)){                                       
+
+                if (!GenericValidator.isInRange(dValue, dMin, dMax)){
                     validation=false;
                 }
             }
-            else if(!GenericValidator.isBlankOrNull(inputValue)){                                
+            else if(!GenericValidator.isBlankOrNull(inputValue)){
                 validation=false;
             }
         }
@@ -123,10 +122,10 @@ public class EctValidation{
 
         boolean validation = true;
        
-        if (iMax != null && iMax!=0){            
-            if(!GenericValidator.maxLength(inputValue, iMax)){                
+        if (iMax != null && iMax!=0){
+            if(!GenericValidator.maxLength(inputValue, iMax)){
                     validation=false;
-                }                       
+            }
         }
         return validation;
     }
@@ -135,10 +134,10 @@ public class EctValidation{
 
         boolean validation = true;
        
-        if (iMin != null && iMin!=0){            
-            if(!GenericValidator.minLength(inputValue, iMin)){                
+        if (iMin != null && iMin!=0){
+            if(!GenericValidator.minLength(inputValue, iMin)){
                     validation=false;
-                }                       
+            }
         }
         return validation;
     }    
@@ -146,12 +145,12 @@ public class EctValidation{
     public boolean isInteger(String inputValue){
 
         boolean validation = true;
+
         
-        
-        if(!GenericValidator.isInt(inputValue)){                                                 
+        if(!GenericValidator.isInt(inputValue)){
             validation=false;
         }
-        
+
        
         return validation;
     }
@@ -166,15 +165,17 @@ public class EctValidation{
             Date inputDate = sdf.parse(inputValue);
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(inputDate);
-            if(calendar.get(Calendar.YEAR) > 9999) { // to prevent date parsing of more than 4-digit year
+            // to prevent date parsing of more than 4-digit year
+            if (calendar.get(Calendar.YEAR) > 9999)
+            {
                 validation = false;
             }
             // Measurements uses following function to record date, which is different from the above check
             // Sanity check by calling it and ensuring we won't get a null value back
-            if (coalesceTimeStampString(inputValue) == null) {
+            if (coalesceTimeStampString(inputValue) == null)
+            {
                 validation = false;
             }
-
         } catch (ParseException e) {
             MiscUtils.getLogger().error("Received bad input date when attempting to validate: " + e);
             validation = false;
@@ -235,9 +236,9 @@ public class EctValidation{
         MeasurementCSSLocationDao cssDao = SpringUtils.getBean(MeasurementCSSLocationDao.class);
         List<MeasurementGroupStyle> styles = dao.findByGroupName(inputGroupName);
         for(MeasurementGroupStyle style : styles) {
-        	MeasurementCSSLocation location = cssDao.find(style.getCssId());
-        	String place = "StreamStyleSheet.do?cssfilename="; // Streams by default
-        	
+            MeasurementCSSLocation location = cssDao.find(style.getCssId());
+            String place = "StreamStyleSheet.do?cssfilename="; // Streams by default
+
             // Use the following commented code in place of the above line to allow the
             // option of using the oscarMeasurement_css property to form the css path.
             // If using this code, also uncomment the line in oscar.login.Startup.java
@@ -253,9 +254,9 @@ public class EctValidation{
              *    place = "StreamStyleSheet.do?cssfilename=";
              * }
              */
-        	if (location != null) {
-        		cssLocation = place + location.getLocation();
-        	}
+            if (location != null) {
+                cssLocation = place + location.getLocation();
+            }
         }
         return cssLocation;
     }
@@ -272,9 +273,9 @@ public class EctValidation{
         MeasurementCSSLocationDao cssDao = SpringUtils.getBean(MeasurementCSSLocationDao.class);
         List<MeasurementGroupStyle> styles = dao.findByGroupName(inputGroupName);
         for(MeasurementGroupStyle style : styles) {
-        	MeasurementCSSLocation location = cssDao.find(style.getCssId());
-        	
-            if(location != null){                    
+            MeasurementCSSLocation location = cssDao.find(style.getCssId());
+
+            if(location != null){
                 cssName = location.getLocation();
             }
         }
