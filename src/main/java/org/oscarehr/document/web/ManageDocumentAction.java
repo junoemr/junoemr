@@ -64,6 +64,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.dms.IncomingDocUtil;
@@ -375,7 +376,8 @@ public class ManageDocumentAction extends DispatchAction {
 
 				Path filePath = Paths.get(docdownload).resolve(document.getDocfilename());
 
-				returnFile = generatePdfPageImage(filePath.toString(), Paths.get(documentCacheDir.getCanonicalPath()).resolve(document.getDocfilename() + "_" + pageNum + ".png").toString(), pageNum);
+				returnFile = generatePdfPageImage(filePath.toString(),
+						Paths.get(documentCacheDir.getCanonicalPath()).resolve(document.getDocfilename() + "_" + pageNum + ".png").toString(), pageNum);
 			}
 		}
 		catch (IOException ioE)
@@ -389,7 +391,8 @@ public class ManageDocumentAction extends DispatchAction {
 	{
 		try
 		{
-			String[] gsCmd = {"gs", "-sDEVICE=png16m", "-dDownScaleFactor=4","-dFirstPage=" + pageNum, "-dLastPage=" + pageNum, "-o", outputFilePath, "-r384", inputPdfPath};
+			String gs = OscarProperties.getInstance().getProperty("document.ghostscript_path", "/usr/bin/gs");
+			String[] gsCmd = {gs, "-sDEVICE=png16m", "-dDownScaleFactor=4","-dFirstPage=" + pageNum, "-dLastPage=" + pageNum, "-o", outputFilePath, "-r384", inputPdfPath};
 			Process gsProc = Runtime.getRuntime().exec(gsCmd);
 			gsProc.waitFor();
 
@@ -495,7 +498,8 @@ public class ManageDocumentAction extends DispatchAction {
 			String doc_no = request.getParameter("doc_no");
 			logger.debug("Document No :" + doc_no);
 
-			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
+			LogAction.addLogEntry((String) request.getSession().getAttribute("user"),
+					LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
 
 			Document d = documentDao.getDocument(doc_no);
 			logger.debug("Document Name :" + d.getDocfilename());
@@ -550,7 +554,8 @@ public class ManageDocumentAction extends DispatchAction {
 			}
 			Integer pageNumber = Integer.parseInt(pageNum);
 			logger.debug("Document No :" + doc_no);
-			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
+			LogAction.addLogEntry((String) request.getSession().getAttribute("user"),
+					LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
 
 			Document document = documentDao.getDocument(doc_no);
 			logger.debug("Document Name :" + document.getDocfilename());
@@ -623,7 +628,8 @@ public class ManageDocumentAction extends DispatchAction {
 		String doc_no = request.getParameter("doc_no");
 		logger.debug("Document No :" + doc_no);
 
-		LogAction.addLogEntry((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
+		LogAction.addLogEntry((String) request.getSession().getAttribute("user"),
+				LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
 
 		File documentDir = new File(GenericFile.DOCUMENT_BASE_DIR);
 		logger.debug("Document Dir is a dir" + documentDir.isDirectory());
@@ -691,13 +697,11 @@ public class ManageDocumentAction extends DispatchAction {
 		return null;
 	}
 
-	public ActionForward display(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-
+	public ActionForward display(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "r", null)) {
-        	throw new SecurityException("missing required security object (_edoc)");
-        }
+
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.READ, null, "_edoc");
 		
 		String temp = request.getParameter("remoteFacilityId");
 		Integer remoteFacilityId = null;
@@ -718,7 +722,8 @@ public class ManageDocumentAction extends DispatchAction {
 		if (remoteFacilityId == null) {
 			CtlDocument ctld = ctlDocumentDao.getCtrlDocument(Integer.parseInt(doc_no));
 			Integer demographicNo = ctld.isDemographicDocument() ? ctld.getId().getModuleId() : null;
-			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), demographicNo, LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
+			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), demographicNo,
+					LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
 
 			File documentDir = new File(GenericFile.DOCUMENT_BASE_DIR);
 			logger.debug("Document Dir is a dir" + documentDir.isDirectory());
@@ -770,7 +775,8 @@ public class ManageDocumentAction extends DispatchAction {
 				MiscUtils.getLogger().debug("got demographic no from remote document "+demographicId);
 				List<CachedDemographicDocument> remoteDocuments = IntegratorFallBackManager.getRemoteDocuments(loggedInInfo,demographicId);
 				for(CachedDemographicDocument demographicDocument: remoteDocuments){
-					if(demographicDocument.getFacilityIntegerPk().getIntegratorFacilityId() == remotePk.getIntegratorFacilityId() && demographicDocument.getFacilityIntegerPk().getCaisiItemId() == remotePk.getCaisiItemId() ){
+					if(demographicDocument.getFacilityIntegerPk().getIntegratorFacilityId() == remotePk.getIntegratorFacilityId()
+							&& demographicDocument.getFacilityIntegerPk().getCaisiItemId() == remotePk.getCaisiItemId() ){
 						remoteDocument = demographicDocument;
 						remoteDocumentContents = IntegratorFallBackManager.getRemoteDocument(loggedInInfo,demographicId, remotePk);
 						break;
