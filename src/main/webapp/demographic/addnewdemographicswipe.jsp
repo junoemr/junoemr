@@ -1,4 +1,4 @@
-<%@ page import="org.oscarehr.util.MiscUtils" %><%--
+<%--
 
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
@@ -24,9 +24,9 @@
 
 --%>
 
-<% String cardData = request.getParameter("card_no");
-	MiscUtils.getLogger().info("New Card Data: [" + cardData + "]");
-	cardData = cardData.replaceAll("\"","'");
+<%
+	String cardData = request.getParameter("card_no");
+	cardData = cardData.replaceAll("\"", "'");
 %>
 <html>
 <head>
@@ -49,13 +49,43 @@
 
 		function setValueIfExists(element, value)
 		{
-			if(value) {
+			if (value)
+			{
 				element.value = value.trim();
 			}
 		}
 
+
+
+		// If we somehow read from a card that has bad values, don't allow weird date values through
+		// This will force the user inputting to the demographic form to correct errors before adding
+		function setDateIfValid(element, value, type)
+		{
+			switch(type)
+			{
+				case "year":
+					if (value > 1800 && value < 9999)
+					{
+						element.value = value.trim()
+					}
+					break;
+				case "month":
+					if (value >= 1 && value <= 12)
+					{
+						element.value = value.trim()
+					}
+					break;
+				case "day":
+					if (value >= 1 && value <= 31)
+					{
+						element.value = value.trim()
+					}
+					break;
+				default:
+					break;
+			}
+		}
 		var healthCardData = Oscar.HealthCardParser.parse("<%=cardData%>");
-		console.log("Parsed Card Data",healthCardData);
 
 		var form = self.opener.document.adddemographic;
 
@@ -63,16 +93,16 @@
 		setValueIfExists(form.first_name,           healthCardData.data.firstName);
 		setValueIfExists(form.hin,                  healthCardData.data.hin);
 		setValueIfExists(form.ver,                  healthCardData.data.versionCode);
-		setValueIfExists(form.year_of_birth,        healthCardData.data.dobYear);
-		setValueIfExists(form.month_of_birth,       healthCardData.data.dobMonth);
-		setValueIfExists(form.date_of_birth,        healthCardData.data.dobDay);
+		setDateIfValid(form.year_of_birth,          healthCardData.data.dobYear, "year");
+		setDateIfValid(form.month_of_birth,         healthCardData.data.dobMonth, "month");
+		setDateIfValid(form.date_of_birth,          healthCardData.data.dobDay, "day");
 		setValueIfExists(form.sex,                  healthCardData.data.sex);
-		setValueIfExists(form.eff_date_year,        healthCardData.data.effYear);
-		setValueIfExists(form.eff_date_month,       healthCardData.data.effMonth);
-		setValueIfExists(form.eff_date_date,        healthCardData.data.effDay);
-		setValueIfExists(form.hc_renew_date_year,   healthCardData.data.endYear);
-		setValueIfExists(form.hc_renew_date_month,  healthCardData.data.endMonth);
-		setValueIfExists(form.hc_renew_date_date,   healthCardData.data.endDay);
+		setDateIfValid(form.eff_date_year,          healthCardData.data.effYear, "year");
+		setDateIfValid(form.eff_date_month,         healthCardData.data.effMonth, "month");
+		setDateIfValid(form.eff_date_date,          healthCardData.data.effDay, "day");
+		setDateIfValid(form.hc_renew_date_year,     healthCardData.data.endYear, "year");
+		setDateIfValid(form.hc_renew_date_month,    healthCardData.data.endMonth, "month");
+		setDateIfValid(form.hc_renew_date_date,     healthCardData.data.endDay, "day");
 		setValueIfExists(form.address,              healthCardData.data.address);
 		setValueIfExists(form.postal,               healthCardData.data.postal);
 		setValueIfExists(form.city,                 healthCardData.data.city);

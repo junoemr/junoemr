@@ -25,8 +25,14 @@
 */
 'use strict';
 
-if (!window.Oscar) { window.Oscar = {} }
-if (!Oscar.HealthCardParser) { Oscar.HealthCardParser = {} }
+if (!window.Oscar)
+{
+	window.Oscar = {}
+}
+if (!Oscar.HealthCardParser)
+{
+	Oscar.HealthCardParser = {}
+}
 
 
 Oscar.HealthCardParser.getFieldValue = function getFieldValue(track, trackIndex, length)
@@ -167,7 +173,8 @@ Oscar.HealthCardParser.parseBCStandalone = function parseBCStandalone(cardData,c
 	var metaHash = cardHash.meta;
 
 	// BC standalone photo card, non-photo card, or care card
-	// specs defined in http://www.health.gov.bc.ca/msp/infoprac/teleplanspecs/ch4.pdf
+	// https://www2.gov.bc.ca/assets/gov/health/practitioner-pro/medical-services-plan/teleplan-v4-4.pdf
+	// begins p. 106
 	dataHash.hin = cardData.substring(8, cardData.indexOf("0^"));
 	dataHash.lastName = cardData.substring(cardData.indexOf("^")+1, cardData.indexOf("/")).toUpperCase();
 
@@ -266,9 +273,13 @@ Oscar.HealthCardParser.parse = function parse(cardData)
 		{
 			cardHashOut = Oscar.HealthCardParser.parseBCCombined(cardData, cardHashOut);
 		}
-		else
+		else if (cardData.startsWith("%B610054"))
 		{
 			cardHashOut = Oscar.HealthCardParser.parseOntario(cardData, cardHashOut);
+		}
+		else
+		{
+			// Invalid or unsupported card format
 		}
 	}
 	catch (e)

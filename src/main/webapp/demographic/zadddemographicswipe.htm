@@ -36,6 +36,30 @@
 			document.swipecard.card_no.select();
 		}
 
+		// Card validation has to occur before we pass a card to addnewdemographicswipe
+		// To ensure we're reading the card(s) correctly, we're whitelisting cards based off the prefix we read
+		function isWhitelisted(card)
+		{
+			card = card.toUpperCase();
+			// BC standalone
+			if (card.startsWith("%B610043"))
+			{
+				return true;
+			}
+			// BC Combined
+			else if (card.startsWith("%BC") && card.substring(card.indexOf("?")).startsWith("?;636028"))
+			{
+				return true;
+			}
+			// Ontario
+			else if (card.startsWith("%B610054"))
+			{
+				return true;
+			}
+			// Currently unsupported
+			return false;
+		}
+
 		function validate()
 		{
 			var cardNo = document.swipecard.card_no.value;
@@ -46,8 +70,17 @@
 			}
 			else
 			{
-				return true;
-
+				if (isWhitelisted(cardNo))
+				{
+					return true;
+				}
+				// Card is unsupported - clear data from card off screen before telling user error
+				document.getElementById("card_no").value = "";
+				alert("Card type not supported." +
+						"\nCurrently support is enabled for health cards from the following provinces:" +
+						"\n- BC" +
+						"\n- Ontario");
+				return false;
 			}
 		}
 	</script>
@@ -69,7 +102,7 @@
 			</td>
 
 			<td valign="middle" rowspan="2" ALIGN="left">
-				<input type="text" NAME="card_no" SIZE="60" MAXLENGTH="200">
+				<input type="text" NAME="card_no" id="card_no" SIZE="60" MAXLENGTH="200">
 				<INPUT TYPE="SUBMIT" NAME="displaymode" VALUE="Validate" SIZE="17"></td>
 		</tr>
 	</form>
