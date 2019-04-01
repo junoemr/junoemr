@@ -26,8 +26,10 @@ import com.google.common.collect.RangeMap;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.MyGroupDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.MyGroup;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.Site;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.ResourceSchedule;
 import org.oscarehr.schedule.dto.ScheduleSlot;
@@ -89,6 +91,9 @@ public class Schedule
 
 	@Autowired
 	ScheduleTemplateDao scheduleTemplateDao;
+
+	@Autowired
+	SiteDao siteDao;
 
 
 	public long updateSchedule(RscheduleBean scheduleRscheduleBean,
@@ -357,27 +362,42 @@ public class Schedule
 
 		for(MyGroup result: userGroupMappings)
 		{
-			UserDateSchedule userScheduel = getUserDateSchedule(
-					date,
-					new Integer(result.getId().getProviderNo()),
-					result.getFirstName(),
-					result.getLastName(),
-					site
-			);
-
-			Provider provider = providerDao.getProvider(result.getId().getProviderNo());
-			if (provider != null)
+			// check that the provider is assigned to the requested site.
+			List<Site> providerSites = siteDao.getActiveSitesByProviderNo(result.getId().getProviderNo());
+			boolean siteMatch = false;
+			for (Site providerSite : providerSites)
 			{
-				userScheduel.setFirstName(provider.getFirstName());
-				userScheduel.setLastName(provider.getLastName());
-			}
-			else
-			{
-				MiscUtils.getLogger().error("failed to lookup provider with no [" +
-						result.getId().getProviderNo() + "] for group [" + result.getId().getMyGroupNo() +"]");
+				if (providerSite.getName().equals(site))
+				{
+					siteMatch = true;
+				}
 			}
 
-			userDateSchedules.add(userScheduel);
+			if (siteMatch)
+			{
+
+				UserDateSchedule userScheduel = getUserDateSchedule(
+						date,
+						new Integer(result.getId().getProviderNo()),
+						result.getFirstName(),
+						result.getLastName(),
+						site
+				);
+
+				Provider provider = providerDao.getProvider(result.getId().getProviderNo());
+				if (provider != null)
+				{
+					userScheduel.setFirstName(provider.getFirstName());
+					userScheduel.setLastName(provider.getLastName());
+				}
+				else
+				{
+					MiscUtils.getLogger().error("failed to lookup provider with no [" +
+							result.getId().getProviderNo() + "] for group [" + result.getId().getMyGroupNo() + "]");
+				}
+
+				userDateSchedules.add(userScheduel);
+			}
 		}
 
 		// Create transfer object
