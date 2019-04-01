@@ -261,8 +261,6 @@ public class LabPDFCreator extends PdfPageEventHelper{
 		MessageHandler handler = (extraHandler != null) ? extraHandler : this.handler;
 		if (handler.getMsgType().equals("PATHL7")) {
 			this.isUnstructuredDoc = ((PATHL7Handler) handler).unstructuredDocCheck(header);
-			// VPP-BCCA labs are structured, but we want to treat them like other unstructured PATHL7 labs
-			this.isUnstructuredDoc |= header.equals("CYTO");
 		}
 		else
 		{
@@ -327,14 +325,16 @@ public class LabPDFCreator extends PdfPageEventHelper{
 			table.addCell(cell);
 			cell.setPhrase(new Phrase("Result", boldFont));
 			table.addCell(cell);
-			if (isTypeCLS) {
+			if (isTypeCLS)
+			{
 				String phrase = (handler.getMsgType().equals("CLSDI")) ? "Exam Date" : "Date/Time Collected";
 				cell.setPhrase(new Phrase(phrase, boldFont));
 				table.addCell(cell);
 				cell.setPhrase(new Phrase("Status", boldFont));
 				table.addCell(cell);
 			}
-			else {
+			else
+			{
 				cell.setPhrase(new Phrase("Date/Time Completed", boldFont));
 				table.addCell(cell);
 			}

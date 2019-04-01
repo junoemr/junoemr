@@ -1174,8 +1174,6 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						//labs that fall into any of these categories have certain requirements per Excelleris
 						if(handler.getMsgType().equals("PATHL7")){
 							isUnstructuredDoc = ((PATHL7Handler) handler).unstructuredDocCheck(headers.get(i));
-							// VCC-BCCA docs have a header but Excelleris wants them treated as unstructured
-							isUnstructuredDoc |= headers.get(i).equals("CYTO");
 							isVIHARtf = ((PATHL7Handler) handler).vihaRtfCheck(headers.get(i));
 							if(handler.getPatientLocation().equals("SG") || handler.getPatientLocation().equals("CDC")){
 								isSGorCDC = true;
