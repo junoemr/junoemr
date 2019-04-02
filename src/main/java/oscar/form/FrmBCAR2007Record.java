@@ -34,7 +34,7 @@ import org.oscarehr.common.model.Demographic;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
-import oscar.util.UtilDateUtilities;
+import oscar.util.ConversionUtils;
 
 public class FrmBCAR2007Record extends FrmRecord {
     private String _dateFormat = "dd/MM/yyyy";
@@ -45,28 +45,29 @@ public class FrmBCAR2007Record extends FrmRecord {
     	Demographic demo = demographicManager.getDemographic(loggedInInfo, demographicNo);
     	Properties props = new Properties();
 
-
-        if (existingID <= 0) {
-            if (demo != null) {
-                java.util.Date date = UtilDateUtilities.calcDate(demo.getYearOfBirth(), demo.getMonthOfBirth(), demo.getDateOfBirth());
+        if (existingID <= 0)
+        {
+            if (demo != null)
+            {
                 setDemoProperties(loggedInInfo, demographicNo, props);
 
-                props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(), _dateFormat));
-                props.setProperty("pg1_formDate", UtilDateUtilities.DateToString(new Date(), _dateFormat));
-                props.setProperty("pg2_formDate", UtilDateUtilities.DateToString(new Date(), _dateFormat));
-                props.setProperty("pg3_formDate", UtilDateUtilities.DateToString(new Date(), _dateFormat));
-                
-               
+                Date today = new Date();
+                props.setProperty("formCreated", ConversionUtils.toDateString(today, _dateFormat));
+                props.setProperty("pg1_formDate", ConversionUtils.toDateString(today, _dateFormat));
+                props.setProperty("pg2_formDate", ConversionUtils.toDateString(today, _dateFormat));
+                props.setProperty("pg3_formDate", ConversionUtils.toDateString(today, _dateFormat));
             }
-        } else {
+        }
+        else
+        {
             String sql = "SELECT * FROM formBCAR2007 WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
             FrmRecordHelp frh = new FrmRecordHelp();
             frh.setDateFormat(_dateFormat);
             props = (frh).getFormRecord(sql);
             
-            if (demo != null) {
+            if (demo != null)
+            {
                setDemoCurProperties(loggedInInfo, demographicNo, props);
-               
             }
         }
         return props;
