@@ -28,36 +28,13 @@
 <head>
 	<title>PATIENT DETAIL INFO</title>
 	<link rel="stylesheet" href="../web.css"/>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/web/common/util/HealthCardParser.js"></script>
 	<script language="JavaScript">
 		function setfocus()
 		{
 			this.focus();
 			document.swipecard.card_no.focus();
 			document.swipecard.card_no.select();
-		}
-
-		// Card validation has to occur before we pass a card to addnewdemographicswipe
-		// To ensure we're reading the card(s) correctly, we're whitelisting cards based off the prefix we read
-		function isWhitelisted(card)
-		{
-			card = card.toUpperCase();
-			// BC standalone
-			if (card.startsWith("%B610043"))
-			{
-				return true;
-			}
-			// BC Combined
-			else if (card.startsWith("%BC") && card.substring(card.indexOf("?")).startsWith("?;636028"))
-			{
-				return true;
-			}
-			// Ontario
-			else if (card.startsWith("%B610054"))
-			{
-				return true;
-			}
-			// Currently unsupported
-			return false;
 		}
 
 		function validate()
@@ -70,7 +47,7 @@
 			}
 			else
 			{
-				if (isWhitelisted(cardNo))
+				if (Oscar.HealthCardParser.isWhitelisted(cardNo))
 				{
 					return true;
 				}

@@ -34,6 +34,19 @@ if (!Oscar.HealthCardParser)
 	Oscar.HealthCardParser = {}
 }
 
+var BC_STANDALONE = "%B610043";
+var BC_PREFIX = "%BC";
+var BC_COMBINED = "?;636028";
+var ON_STANDALONE = "%B610054";
+
+Oscar.HealthCardParser.isWhitelisted = function isWhitelisted(cardNo)
+{
+	cardNo = cardNo.toUpperCase();
+	return (cardNo.startsWith(BC_STANDALONE) ||
+			cardNo.startsWith(ON_STANDALONE) ||
+			(cardNo.startsWith(BC_PREFIX) && cardNo.substring(cardNo.indexOf("?")).startsWith(BC_COMBINED)));
+};
+
 
 Oscar.HealthCardParser.getFieldValue = function getFieldValue(track, trackIndex, length)
 {
@@ -265,15 +278,15 @@ Oscar.HealthCardParser.parse = function parse(cardData)
 		cardData = cardData.toUpperCase();
 		console.info(cardData);
 
-		if (cardData.startsWith("%B610043"))
+		if (cardData.startsWith(BC_STANDALONE))
 		{
 			cardHashOut = Oscar.HealthCardParser.parseBCStandalone(cardData, cardHashOut);
 		}
-		else if (cardData.startsWith("%BC") && cardData.substring(cardData.indexOf("?")).startsWith("?;636028"))
+		else if (cardData.startsWith(BC_PREFIX) && cardData.substring(cardData.indexOf("?")).startsWith(BC_COMBINED))
 		{
 			cardHashOut = Oscar.HealthCardParser.parseBCCombined(cardData, cardHashOut);
 		}
-		else if (cardData.startsWith("%B610054"))
+		else if (cardData.startsWith(ON_STANDALONE))
 		{
 			cardHashOut = Oscar.HealthCardParser.parseOntario(cardData, cardHashOut);
 		}

@@ -32,6 +32,7 @@
 <head>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/web/common/util/HealthCardParser.js"></script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/web/common/util/util.js"></script>
 	<title>PATIENT DETAIL INFO</title>
 	<link rel="stylesheet" href="../web.css"/>
 </head>
@@ -49,43 +50,10 @@
 
 		function setValueIfExists(element, value)
 		{
+			value = value.trim();
 			if (value)
 			{
-				element.value = value.trim();
-			}
-		}
-
-		function setYearIfValid(element, year)
-		{
-			if (year > 1800 && year < 9999)
-			{
-				element.value = year.trim();
-			}
-		}
-
-		function setMonthIfValid(element, month)
-		{
-			if (month >= 1 && month <= 12)
-			{
-				element.value = month.trim();
-			}
-		}
-
-		function setDateIfValid(element, year, month, day)
-		{
-
-			// Valid month in [1, 12] range so pad arr[0] to allow us to plug in a valid month as-is
-			var month_to_date_mapping = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-			// Take into account leap years
-			if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))
-			{
-				month_to_date_mapping[2] = 29;
-			}
-			// Need to also check month since we're using it as a possible index
-			if (month >= 1 && month <= 12 &&
-					value >= 1 && value <= month_to_date_mapping[month])
-			{
-				element.value = day.trim();
+				element.value = value;
 			}
 		}
 
@@ -93,30 +61,41 @@
 
 		var form = self.opener.document.adddemographic;
 
-		setValueIfExists(form.last_name,            healthCardData.data.lastName);
-		setValueIfExists(form.first_name,           healthCardData.data.firstName);
-		setValueIfExists(form.hin,                  healthCardData.data.hin);
-		setValueIfExists(form.ver,                  healthCardData.data.versionCode);
-		setValueIfExists(form.sex,                  healthCardData.data.sex);
-		setValueIfExists(form.address,              healthCardData.data.address);
-		setValueIfExists(form.postal,               healthCardData.data.postal);
-		setValueIfExists(form.city,                 healthCardData.data.city);
-		setValueIfExists(form.province,             healthCardData.data.province);
-		setValueIfExists(form.hc_type,              healthCardData.data.province);
+		setValueIfExists(form.last_name,               healthCardData.data.lastName);
+		setValueIfExists(form.first_name,              healthCardData.data.firstName);
+		setValueIfExists(form.hin,                     healthCardData.data.hin);
+		setValueIfExists(form.ver,                     healthCardData.data.versionCode);
+		setValueIfExists(form.sex,                     healthCardData.data.sex);
+		setValueIfExists(form.address,                 healthCardData.data.address);
+		setValueIfExists(form.postal,                  healthCardData.data.postal);
+		setValueIfExists(form.city,                    healthCardData.data.city);
+		setValueIfExists(form.province,                healthCardData.data.province);
+		setValueIfExists(form.hc_type,                 healthCardData.data.province);
 		// If we somehow read from a card that has bad values, don't allow weird date values through
 		// This will force the user inputting to the demographic form to correct errors before adding
-		setYearIfValid(form.year_of_birth,          healthCardData.data.dobYear);
-		setMonthIfValid(form.month_of_birth,        healthCardData.data.dobMonth);
-		setDateIfValid(form.date_of_birth, healthCardData.data.dobYear,
-				healthCardData.data.dobMonth, healthCardData.data.dobDay);
-		setYearIfValid(form.eff_date_year,          healthCardData.data.effYear);
-		setMonthIfValid(form.eff_date_month,        healthCardData.data.effMonth);
-		setDateIfValid(form.eff_date_date, healthCardData.data.effYear,
-				healthCardData.data.effMonth, healthCardData.data.effDay);
-		setYearIfValid(form.hc_renew_date_year,     healthCardData.data.endYear);
-		setMonthIfValid(form.hc_renew_date_month,   healthCardData.data.endMonth);
-		setDateIfValid(form.hc_renew_date_date, healthCardData.data.endYear,
-				healthCardData.data.endMonth, healthCardData.data.endDay);
+        if (Juno.Common.Util.validateDate(healthCardData.data.dobYear,
+            healthCardData.data.dobMonth, healthCardData.data.dobDay))
+        {
+        	setValueIfExists(form.year_of_birth,       healthCardData.data.dobYear);
+        	setValueIfExists(form.month_of_birth,      healthCardData.data.dobMonth);
+        	setValueIfExists(form.date_of_birth,       healthCardData.data.dobYear);
+        }
+
+        if (Juno.Common.Util.validateDate(healthCardData.data.effYear,
+			healthCardData.data.effMonth, healthCardData.data.effDay))
+        {
+        	setValueIfExists(form.eff_date_year,       healthCardData.data.effYear);
+			setValueIfExists(form.eff_date_month,      healthCardData.data.effMonth);
+			setValueIfExists(form.eff_date_date,       healthCardData.data.effDay);
+        }
+
+        if (Juno.Common.Util.validateDate(healthCardData.data.endYear,
+            healthCardData.data.endMonth, healthCardData.data.endDay))
+        {
+			setValueIfExists(form.hc_renew_date_year,  healthCardData.data.endYear);
+			setValueIfExists(form.hc_renew_date_month, healthCardData.data.endMonth);
+			setValueIfExists(form.hc_renew_date_date,  healthCardData.data.endDay);
+        }
 
 		self.close();
 

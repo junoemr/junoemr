@@ -18,48 +18,80 @@ Juno.Common.Util.isBlank = function isBlank(object) {
 };
 
 Juno.Common.Util.toArray = function toArray(obj) { //convert single object to array
-	if (obj instanceof Array) return obj;
-	else if (obj == null) return [];
-	else return [obj];
+	if (obj instanceof Array)
+	{
+		return obj;
+	}
+	else if (obj == null)
+	{
+		return [];
+	}
+	else
+	{
+		return [obj];
+	}
 };
 
 Juno.Common.Util.pad0 = function pad0(n) {
 	var s = n.toString();
-	if (s.length == 1) s = "0" + s;
+	if (s.length === 1)
+	{
+		s = "0" + s;
+	}
 	return s;
 };
 
 Juno.Common.Util.toTrimmedString = function toTrimmedString(s) {
-	if (s == null) s = "";
-	if (s instanceof String) s = s.trim();
+	if (s == null)
+	{
+		s = "";
+	}
+	if (s instanceof String)
+	{
+		s = s.trim();
+	}
 	return s;
 };
 
-Juno.Common.Util.formatDate = function formatDate(d) {
-	d = Juno.Common.Util.toTrimmedString(d);
-	if (d) {
-		if (!(d instanceof Date)) d = new Date(d);
-		d = d.getFullYear() + "-" + Juno.Common.Util.pad0(d.getMonth() + 1) + "-" + Juno.Common.Util.pad0(d.getDate());
+Juno.Common.Util.formatDate = function formatDate(date) {
+	date = Juno.Common.Util.toTrimmedString(date);
+	if (date)
+	{
+		if (!(date instanceof Date))
+		{
+			date = new Date(date);
+		}
+		date = date.getFullYear() + "-" + Juno.Common.Util.pad0(date.getMonth() + 1) + "-" + Juno.Common.Util.pad0(date.getDate());
 	}
-	return d;
+	return date;
 };
 
-Juno.Common.Util.formatTime = function formatTime(d) {
-	d = Juno.Common.Util.toTrimmedString(d);
-	if (d) {
-		if (!(d instanceof Date)) d = new Date(d);
-		d = Juno.Common.Util.pad0(d.getHours()) + ":" + Juno.Common.Util.pad0(d.getMinutes());
+Juno.Common.Util.formatTime = function formatTime(time) {
+	time = Juno.Common.Util.toTrimmedString(time);
+	if (time)
+	{
+		if (!(time instanceof Date))
+		{
+			time = new Date(time);
+		}
+		time = Juno.Common.Util.pad0(time.getHours()) + ":" + Juno.Common.Util.pad0(time.getMinutes());
 	}
-	return d;
+	return time;
 };
 
-Juno.Common.Util.addNewLine = function addNewLine(line, mssg) {
-	if (line == null || line.trim() == "") return mssg;
+Juno.Common.Util.addNewLine = function addNewLine(line, msg) {
+	if (line == null || line.trim() === "")
+	{
+		return msg;
+	}
 
-	if (mssg == null || mssg.trim() == "") mssg = line.trim();
-	else mssg += "\n" + line.trim();
+	if (msg == null || msg.trim() === "")
+	{
+		msg = line.trim();
+	}
+	else msg += "\n" + line.trim();
 
-	return mssg;
+	return msg;
 };
 
 Juno.Common.Util.calcAge = function calcAge(dobYear, dobMonth, dobDay)
@@ -71,7 +103,8 @@ Juno.Common.Util.calcAge = function calcAge(dobYear, dobMonth, dobDay)
 	var years = (currDate.getFullYear() - dateOfBirth.getFullYear());
 
 	if (currDate.getMonth() < dateOfBirth.getMonth() ||
-		currDate.getMonth() == dateOfBirth.getMonth() && currDate.getDate() < dateOfBirth.getDate())
+		currDate.getMonth() === dateOfBirth.getMonth() &&
+		currDate.getDate() < dateOfBirth.getDate())
 	{
 		years--;
 	}
@@ -90,11 +123,38 @@ Juno.Common.Util.isInArray = function isInArray(value, array)
  */
 Juno.Common.Util.mergeHash = function mergeHash(baseHash, toMerge)
 {
-	if (toMerge === 'undefined') {
+	if (toMerge === 'undefined')
+	{
 		return false;
 	}
 	$.extend(true, baseHash, toMerge);
 	return true;
+};
+
+/**
+ * take in string of format yyyy-MM-dd and checks if string is a valid date
+ * @param dateString
+ */
+Juno.Common.Util.validateDateString = function validateDateString(dateString)
+{
+	return Date.parse(dateString);
+};
+
+/**
+ * take in separated year, month, day values and ensure that their combination
+ * produces a valid date
+ * @param year
+ * @param month
+ * @param day
+ */
+Juno.Common.Util.validateDate = function validateDate(year, month, day)
+{
+	if (month === 12)
+	{
+		month -= 1;
+	}
+	var dateString = year + "-" + month + "-" + day;
+	return Juno.Common.Util.validateDateString(dateString);
 };
 
 Juno.Common.Util.noNull = function noNull(val)
@@ -103,7 +163,7 @@ Juno.Common.Util.noNull = function noNull(val)
     {
         val =  val.trim();
     }
-    else if ( val === null)
+    else if (val === null)
     {
 		val = "";
     }
@@ -123,8 +183,12 @@ Juno.Common.Util.isDefinedAndNotNull = function isDefinedAndNotNull(val)
 
 Juno.Common.Util.objectArrayIndexOf = function objectArrayIndexOf(array, searchTerm, property)
 {
-	for(var i = 0, len = array.length; i < len; i++) {
-		if (array[i][property] === searchTerm) return i;
+	for(var i = 0, len = array.length; i < len; i++)
+	{
+		if (array[i][property] === searchTerm)
+		{
+			return i;
+		}
 	}
 	return -1;
 };
