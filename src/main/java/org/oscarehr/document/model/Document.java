@@ -148,6 +148,9 @@ public class Document extends AbstractModel<Integer> implements Serializable {
     private Integer appointmentNo;
 
     private Boolean restrictToProgram=false;
+
+    @Column(name = "encoding_error")
+    private Boolean encodingError = false;
     
     public Document() {
     }
@@ -357,9 +360,18 @@ public class Document extends AbstractModel<Integer> implements Serializable {
 		return restrictToProgram;
 	}
 
-	public void setRestrictToProgram(Boolean restrictToProgram) {
+	public void setRestrictToProgram(Boolean restrictToProgram)
+	{
 		this.restrictToProgram = restrictToProgram;
 	}
-	
-	
+
+	public Boolean hasEncodingError()
+	{
+		return encodingError;
+	}
+
+	public void setEncodingError(Boolean encodingError)
+	{
+		this.encodingError = encodingError;
+	}
 }
