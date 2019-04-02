@@ -42,7 +42,6 @@ public class FrmBCAR2007Record extends FrmRecord {
     private DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
 
     public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID) throws SQLException {
-        
     	Demographic demo = demographicManager.getDemographic(loggedInInfo, demographicNo);
     	Properties props = new Properties();
 
@@ -52,7 +51,7 @@ public class FrmBCAR2007Record extends FrmRecord {
                 java.util.Date date = UtilDateUtilities.calcDate(demo.getYearOfBirth(), demo.getMonthOfBirth(), demo.getDateOfBirth());
                 setDemoProperties(loggedInInfo, demographicNo, props);
 
-                props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(), dateFormat));
+                props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(), _dateFormat));
                 props.setProperty("pg1_formDate", UtilDateUtilities.DateToString(new Date(), _dateFormat));
                 props.setProperty("pg2_formDate", UtilDateUtilities.DateToString(new Date(), _dateFormat));
                 props.setProperty("pg3_formDate", UtilDateUtilities.DateToString(new Date(), _dateFormat));
