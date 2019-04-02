@@ -26,6 +26,7 @@
 package oscar.oscarEncounter.oscarMeasurements.bean;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Vector;
 
 public class EctMeasurementTypesBean implements Serializable {
@@ -50,7 +51,15 @@ public class EctMeasurementTypesBean implements Serializable {
     boolean canPrefill = false;
     
     public EctMeasurementTypesBean(){}
-    
+
+    public EctMeasurementTypesBean(Map<String,String> hashtable)
+    {
+        this.type = hashtable.get("type");
+        this.typeDesc = hashtable.get("typeDesc");
+        this.typeDisplayName = hashtable.get("typeDisplayName");
+        this.measuringInstrc = hashtable.get("measuringInstrc");
+    }
+
     public EctMeasurementTypesBean(int id, String type, String typeDisplayName, String typeDesc, String measuringInstrc, String validation){
         this.id = id;
         this.type = type;
