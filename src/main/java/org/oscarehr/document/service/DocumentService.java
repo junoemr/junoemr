@@ -194,6 +194,8 @@ public class DocumentService
 		document.setDocfilename(file.getName());
 		document.setContenttype(file.getContentType());
 		document.setNumberofpages(file.getPageCount());
+		document.setEncodingError(!file.isValid());
+
 		return document;
 	}
 
