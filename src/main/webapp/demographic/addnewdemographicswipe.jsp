@@ -55,36 +55,40 @@
 			}
 		}
 
-
-
-		// If we somehow read from a card that has bad values, don't allow weird date values through
-		// This will force the user inputting to the demographic form to correct errors before adding
-		function setDateIfValid(element, value, type)
+		function setYearIfValid(element, year)
 		{
-			switch(type)
+			if (year > 1800 && year < 9999)
 			{
-				case "year":
-					if (value > 1800 && value < 9999)
-					{
-						element.value = value.trim()
-					}
-					break;
-				case "month":
-					if (value >= 1 && value <= 12)
-					{
-						element.value = value.trim()
-					}
-					break;
-				case "day":
-					if (value >= 1 && value <= 31)
-					{
-						element.value = value.trim()
-					}
-					break;
-				default:
-					break;
+				element.value = year.trim();
 			}
 		}
+
+		function setMonthIfValid(element, month)
+		{
+			if (month >= 1 && month <= 12)
+			{
+				element.value = month.trim();
+			}
+		}
+
+		function setDateIfValid(element, year, month, day)
+		{
+
+			// Valid month in [1, 12] range so pad arr[0] to allow us to plug in a valid month as-is
+			var month_to_date_mapping = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+			// Take into account leap years
+			if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))
+			{
+				month_to_date_mapping[2] = 29;
+			}
+			// Need to also check month since we're using it as a possible index
+			if (month >= 1 && month <= 12 &&
+					value >= 1 && value <= month_to_date_mapping[month])
+			{
+				element.value = day.trim();
+			}
+		}
+
 		var healthCardData = Oscar.HealthCardParser.parse("<%=cardData%>");
 
 		var form = self.opener.document.adddemographic;
@@ -93,21 +97,26 @@
 		setValueIfExists(form.first_name,           healthCardData.data.firstName);
 		setValueIfExists(form.hin,                  healthCardData.data.hin);
 		setValueIfExists(form.ver,                  healthCardData.data.versionCode);
-		setDateIfValid(form.year_of_birth,          healthCardData.data.dobYear, "year");
-		setDateIfValid(form.month_of_birth,         healthCardData.data.dobMonth, "month");
-		setDateIfValid(form.date_of_birth,          healthCardData.data.dobDay, "day");
 		setValueIfExists(form.sex,                  healthCardData.data.sex);
-		setDateIfValid(form.eff_date_year,          healthCardData.data.effYear, "year");
-		setDateIfValid(form.eff_date_month,         healthCardData.data.effMonth, "month");
-		setDateIfValid(form.eff_date_date,          healthCardData.data.effDay, "day");
-		setDateIfValid(form.hc_renew_date_year,     healthCardData.data.endYear, "year");
-		setDateIfValid(form.hc_renew_date_month,    healthCardData.data.endMonth, "month");
-		setDateIfValid(form.hc_renew_date_date,     healthCardData.data.endDay, "day");
 		setValueIfExists(form.address,              healthCardData.data.address);
 		setValueIfExists(form.postal,               healthCardData.data.postal);
 		setValueIfExists(form.city,                 healthCardData.data.city);
 		setValueIfExists(form.province,             healthCardData.data.province);
 		setValueIfExists(form.hc_type,              healthCardData.data.province);
+		// If we somehow read from a card that has bad values, don't allow weird date values through
+		// This will force the user inputting to the demographic form to correct errors before adding
+		setYearIfValid(form.year_of_birth,          healthCardData.data.dobYear);
+		setMonthIfValid(form.month_of_birth,        healthCardData.data.dobMonth);
+		setDateIfValid(form.date_of_birth, healthCardData.data.dobYear,
+				healthCardData.data.dobMonth, healthCardData.data.dobDay);
+		setYearIfValid(form.eff_date_year,          healthCardData.data.effYear);
+		setMonthIfValid(form.eff_date_month,        healthCardData.data.effMonth);
+		setDateIfValid(form.eff_date_date, healthCardData.data.effYear,
+				healthCardData.data.effMonth, healthCardData.data.effDay);
+		setYearIfValid(form.hc_renew_date_year,     healthCardData.data.endYear);
+		setMonthIfValid(form.hc_renew_date_month,   healthCardData.data.endMonth);
+		setDateIfValid(form.hc_renew_date_date, healthCardData.data.endYear,
+				healthCardData.data.endMonth, healthCardData.data.endDay);
 
 		self.close();
 
