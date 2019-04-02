@@ -528,6 +528,11 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		return Juno.Common.Util.exists($scope.demographicModel.demographicNo);
 	};
 
+	$scope.hasSites = function hasSites()
+	{
+		return (parentScope.siteOptions.length > 0)
+	}
+
 	$scope.clearPatient = function clearPatient()
 	{
 		$scope.autocompleteValues.patient = null;

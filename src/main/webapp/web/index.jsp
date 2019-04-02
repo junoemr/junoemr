@@ -29,8 +29,8 @@
 
 <%
 	// Force the page to un-cache itself so user cannot go back after logout
-// The 3 lines ensure that all browsers are covered
-// They are necessary for URL not showing this file name (index.jsp)
+	// The 3 lines ensure that all browsers are covered
+	// They are necessary for URL not showing this file name (index.jsp)
 	response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
 	response.setHeader("Pragma", "no-cache");
 	response.setDateHeader("Expires", 0);
@@ -50,21 +50,16 @@
 
 	<title><bean:message key="global.title" bundle="ui"/></title>
 
-	<%-- 3rd party CSS --%>
-<%--	<link href="bower_components/components-font-awesome/css/font-awesome.min.css" rel="stylesheet">--%>
-<%--	<link href="bower_components/ng-table-bundle/ng-table.min.css" rel="stylesheet">
-	<link href="bower_components/angular-loading-bar/build/loading-bar.min.css" rel="stylesheet">
-	<link href="bower_components/jquery-ui/themes/base/jquery-ui.min.css" rel="stylesheet">
-	<link href="bower_components/fullcalendar/dist/fullcalendar.min.css" rel="stylesheet">
-	<link href="bower_components/fullcalendar-scheduler/dist/scheduler.min.css" rel="stylesheet">--%>
-
-	<%-- combined CSS from compiled SCSS --%>
-<%--	<link href="dist/juno.css" rel="stylesheet">--%>
-
 	<%-- TODO move to a SCSS file and include in Juno SCSS/CSS --%>
 	<link href="../library/bootstrap/3.0.0/assets/css/bootstrap3_badge_colours.css" rel="stylesheet">
 
-<link href="vendors~bundle.d14204db8f30be71cb3a.css" rel="stylesheet"><link href="bundle.ac5907003e3b3af6ec62.css" rel="stylesheet"></head>
+	<%-- This is in the HTML to make sure it is loaded with the page --%>
+	<style>
+		[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+			display: none !important;
+		}
+	</style>
+<link href="vendors~bundle.d14204db8f30be71cb3a.css" rel="stylesheet"><link href="bundle.e6fc9c575dc828cd5801.css" rel="stylesheet"></head>
 
 <body ng-controller="Layout.BodyController as bodyCtrl"
 	  ng-init="bodyCtrl.init()"
@@ -75,8 +70,7 @@
 	 ng-init="navBarCtrl.init()"
 	 ng-show="navBarCtrl.me != null"
 	 class="navbar navbar-default navbar-fixed-top"
-	 id="main-nav"
-	 ng-cloak>
+	 id="main-nav">
 	<div class="container-fluid">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-nav-collapse">
@@ -97,7 +91,7 @@
 		<div class="navbar-collapse collapse" id="main-nav-collapse">
 
 			<form class="navbar-form navbar-left" role="search">
-				<div class="form-group">
+				<div class="form-group" ng-cloak>
 					<juno-patient-search-typeahead
 							juno-model="navBarCtrl.demographicSearch"
 							juno-placeholder="<bean:message key="navbar.searchPatients" bundle="ui"/>"
@@ -110,7 +104,7 @@
 			</form>
 
 			<!-- Large view -->
-			<ul class="nav navbar-nav visible-nav-lg">
+			<ul class="nav navbar-nav visible-nav-lg" ng-cloak>
 				<li ng-repeat="item in navBarCtrl.menuItems"
 					ng-class="{'active': navBarCtrl.isActive(item) }">
 
@@ -140,7 +134,7 @@
 			</ul>
 
 			<!-- Medium view -->
-			<ul class="nav navbar-nav visible-nav-md">
+			<ul class="nav navbar-nav visible-nav-md" ng-cloak>
 				<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.mediumNavItemFilter(false)"
 					ng-class="{'active': navBarCtrl.isActive(item) }">
 
@@ -191,7 +185,7 @@
 			</ul>
 
 			<%--Small View--%>
-			<ul class="nav navbar-nav visible-nav-sm">
+			<ul class="nav navbar-nav visible-nav-sm" ng-cloak>
 				<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.smallNavItemFilter(false)"
 					ng-class="{'active': navBarCtrl.isActive(item) }">
 					<a ng-click="navBarCtrl.transition(item)" data-toggle="tab">{{item.label}}
@@ -231,7 +225,7 @@
 				</li>
 			</ul>
 
-			<div class="navbar-text pull-right navbar-right-menu">
+			<div class="navbar-text pull-right navbar-right-menu" ng-cloak>
 				<a onClick="popup(700,1024,'../scratch/index.jsp','scratch')"
 				   title="<bean:message key="navbar.scratchpad" bundle="ui"/>"
 				   class="hand-hover">
@@ -418,15 +412,5 @@
 
 </script>
 
-<!-- Legacy code written in javascript -->
-<%--<script type="text/javascript" src="dist_webpack/vendors~bundle.js"></script>
-<script type="text/javascript" src="dist_webpack/bundle.js"></script>--%>
-<%--<jsp:include page="webpack_includes.html" />--%>
-
-<!-- Code written in typescript -->
-<%--<script type="text/javascript" src="dist_webpack/tsbundle.js"></script>--%>
-
-<!-- Template code generated from the template jsps -->
-
-<script type="text/javascript" src="runtime~bundle.b9768e88f357c12a8f2d.js"></script><script type="text/javascript" src="vendors~bundle.d14204db8f30be71cb3a.js"></script><script type="text/javascript" src="bundle.ac5907003e3b3af6ec62.js"></script></body>
+<script type="text/javascript" src="runtime~bundle.b9768e88f357c12a8f2d.js"></script><script type="text/javascript" src="vendors~bundle.d14204db8f30be71cb3a.js"></script><script type="text/javascript" src="bundle.e6fc9c575dc828cd5801.js"></script></body>
 </html>

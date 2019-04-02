@@ -141,7 +141,10 @@
 							  style="background-color: {{selectedEventStatus.color}};"></span>
 					</div>
 
-					<div class="form-group" ng-class="{'has-error': displayMessages.field_errors()['location']}">
+					<div
+							class="form-group"
+							ng-class="{'has-error': displayMessages.field_errors()['location']}"
+							ng-show="hasSites()">
 						<label for="input-site" class="control-label col-sm-12">
 							Site:
 						</label>

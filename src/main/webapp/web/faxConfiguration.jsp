@@ -42,7 +42,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <html lang="en" ng-app="oscarProviderViewModule">
-<head><link href="vendors~bundle.d14204db8f30be71cb3a.css" rel="stylesheet"><link href="bundle.ac5907003e3b3af6ec62.css" rel="stylesheet"></head>
+<head><link href="vendors~bundle.d14204db8f30be71cb3a.css" rel="stylesheet"><link href="bundle.e6fc9c575dc828cd5801.css" rel="stylesheet"></head>
 <body ng-controller="Admin.Integration.Fax.FaxConfigurationController as faxController">
 
 <!--
@@ -136,6 +136,6 @@
 </div>
 
 
-<script type="text/javascript" src="runtime~bundle.b9768e88f357c12a8f2d.js"></script><script type="text/javascript" src="vendors~bundle.d14204db8f30be71cb3a.js"></script><script type="text/javascript" src="bundle.ac5907003e3b3af6ec62.js"></script></body>
+<script type="text/javascript" src="runtime~bundle.b9768e88f357c12a8f2d.js"></script><script type="text/javascript" src="vendors~bundle.d14204db8f30be71cb3a.js"></script><script type="text/javascript" src="bundle.e6fc9c575dc828cd5801.js"></script></body>
 </html>
 

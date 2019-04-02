@@ -58,6 +58,7 @@ import org.oscarehr.ws.rest.to.model.NavBarMenuTo1;
 import org.oscarehr.ws.rest.to.model.PatientListConfigTo1;
 import org.oscarehr.ws.rest.to.model.ProgramProviderTo1;
 import org.springframework.beans.factory.annotation.Autowired;
+import oscar.OscarProperties;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -226,7 +227,7 @@ public class PersonaService extends AbstractServiceImpl {
 		 */
 		NavBarMenuTo1 navBarMenu = new NavBarMenuTo1();
 		navBarMenu.setMessengerMenu(messengerMenu);
-		
+
 		MenuTo1 patientSearchMenu = new MenuTo1().add(0,bundle.getString("navbar.menu.newPatient"),null,"#/newpatient")
 				.add(1,bundle.getString("navbar.menu.advancedSearch"),null,"#/search");
 		navBarMenu.setPatientSearchMenu(patientSearchMenu);
@@ -234,9 +235,14 @@ public class PersonaService extends AbstractServiceImpl {
 		int idCounter = 0;
 		
 		MenuTo1 menu = new MenuTo1()
-				.addWithState(idCounter++,bundle.getString("navbar.menu.dashboard"), null, "dashboard")
-		        .addWithState(idCounter++,bundle.getString("navbar.menu.schedule"),null,"schedule")
-				.addWithState(idCounter++,bundle.getString("navbar.menu.inbox"),null,"inbox");
+				.addWithState(idCounter++,bundle.getString("navbar.menu.dashboard"), null, "dashboard");
+
+		if(OscarProperties.getInstance().isScheduleEnabled())
+		{
+			menu.addWithState(idCounter++, bundle.getString("navbar.menu.schedule"), null, "schedule");
+		}
+
+		menu.addWithState(idCounter++,bundle.getString("navbar.menu.inbox"),null,"inbox");
 
 		if (!consultationManager.isConsultResponseEnabled()) {
 			menu.addWithState(idCounter++,bundle.getString("navbar.menu.consults"),null,"consultRequests");

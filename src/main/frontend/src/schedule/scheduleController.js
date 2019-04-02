@@ -34,10 +34,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		// XXX: put this address somewhere else
 		$scope.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
-			'http://localhost:9090/ws/rs');
+			'../ws/rs');
 
 		$scope.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
-			'http://localhost:9090/ws/rs');
+			'../ws/rs');
 
 
 		//=========================================================================
