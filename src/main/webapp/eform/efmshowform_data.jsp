@@ -42,7 +42,7 @@
 		String parentAjaxId = StringUtils.trimToNull(request.getParameter("parentAjaxId"));
 
 		EForm eForm = new EForm(id);
-		if(!parentAjaxId.equalsIgnoreCase("consult"))
+		if(!"consult".equalsIgnoreCase(parentAjaxId))
 		{
 			showInstancedWarning = !eFormDataService.isLatestInstancedVersion(Integer.parseInt(id));
 		}
