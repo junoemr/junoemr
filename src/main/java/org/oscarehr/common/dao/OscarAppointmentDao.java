@@ -23,6 +23,7 @@
 
 package org.oscarehr.common.dao;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -950,7 +951,14 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				int month = Integer.parseInt(monthOfBirth);
 				int day = Integer.parseInt(dayOfBirth);
 
-				birthday = LocalDate.of(year, month, day);
+				try
+				{
+					birthday = LocalDate.of(year, month, day);
+				}
+				catch (DateTimeException ex)
+				{
+					MiscUtils.getLogger().error("Demographic [" + demographicNo + "] has invalid dob with error: " + ex.getMessage());
+				}
 
 			}
 

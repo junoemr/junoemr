@@ -298,9 +298,9 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		{
 			return LocalDate.of(Integer.parseInt(yearOfBirth), Integer.parseInt(monthOfBirth), Integer.parseInt(dayOfBirth));
 		}
-		catch (DateTimeException dte)
+		catch (NumberFormatException | DateTimeException ex)
 		{
-			MiscUtils.getLogger().error("Demographic [" + getId() + "] has invalid dob with error: " + dte.getMessage());
+			MiscUtils.getLogger().error("Demographic [" + getId() + "] has invalid dob with error: " + ex.getMessage());
 		}
 		return null;
 	}
