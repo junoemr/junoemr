@@ -55,7 +55,6 @@ import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.printing.FontSettings;
 import org.oscarehr.common.printing.PdfWriterFactory;
 import org.oscarehr.util.SpringUtils;
-import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
@@ -974,6 +973,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
         
         document.add(patientInfo);
     }
+
     /*
      *  addTableToTable(PdfPTable main, PdfPTable add) adds the table 'add' as
      *  a cell spanning 'colspan' columns to the table main.
@@ -986,48 +986,33 @@ public class LabPDFCreator extends PdfPageEventHelper{
         return main;
     }
 
+	/*
+	 *  onEndPage is a page event that occurs when a page has finished being created.
+	 *  It is used to add header and footer information to each page.
+	 */
+	public void onEndPage(PdfWriter writer, Document document){
+		try
+		{
+			Rectangle page = document.getPageSize();
+			PdfContentByte cb = writer.getDirectContent();
+			BaseFont bf = BaseFont.createFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+			int pageNum = document.getPageNumber();
+			float height = page.getHeight();
 
-    /*
-     *  onEndPage is a page event that occurs when a page has finished being created.
-     *  It is used to add header and footer information to each page.
-     */
-    public void onEndPage(PdfWriter writer, Document document){
-        try {
+			//add patient name header for every page but the first.
+			if (pageNum > 1)
+			{
+				cb.beginText();
+				cb.setFontAndSize(bf, 8);
+				cb.showTextAligned(PdfContentByte.ALIGN_RIGHT, handler.getPatientName(), 575, height - 30, 0);
+				cb.endText();
+			}
 
-            Rectangle page = document.getPageSize();
-            PdfContentByte cb = writer.getDirectContent();
-            BaseFont bf = BaseFont.createFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-            int pageNum = document.getPageNumber();
-            float width = page.getWidth();
-            float height = page.getHeight();
-
-            //add patient name header for every page but the first.
-            if (pageNum > 1){
-                cb.beginText();
-                cb.setFontAndSize(bf, 8);
-                cb.showTextAligned(PdfContentByte.ALIGN_RIGHT, handler.getPatientName(), 575, height - 30, 0);
-                cb.endText();
-
-            }
-
-            //add footer for every page
-            cb.beginText();
-            cb.setFontAndSize(bf, 8);
-            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "-"+pageNum+"-", width/2, 30, 0);
-            cb.endText();
-
-
-            // add promotext as footer if it is enabled
-            if ( OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT") != null){
-                cb.beginText();
-                cb.setFontAndSize(BaseFont.createFont(BaseFont.HELVETICA,BaseFont.CP1252,BaseFont.NOT_EMBEDDED), 6);
-                cb.showTextAligned(PdfContentByte.ALIGN_CENTER, OscarProperties.getInstance().getProperty("FORMS_PROMOTEXT"), width/2, 19, 0);
-                cb.endText();
-            }
-
-        // throw any exceptions
-        } catch (Exception e) {
-            throw new ExceptionConverter(e);
-        }
-    }
+		// throw any exceptions
+		}
+		catch (Exception e)
+		{
+			throw new ExceptionConverter(e);
+		}
+	}
 }
