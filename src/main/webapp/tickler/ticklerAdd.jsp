@@ -43,42 +43,51 @@
 <%
 	String user_no = (String) session.getAttribute("user");
 	oscar.OscarProperties props = oscar.OscarProperties.getInstance();
-	int nItems = 0;
-	String strLimit1 = "0";
-	String strLimit2 = "5";
-	if (request.getParameter("limit1") != null) strLimit1 = request.getParameter("limit1");
-	if (request.getParameter("limit2") != null) strLimit2 = request.getParameter("limit2");
-	String providerview = request.getParameter("providerview") == null ? "all" : request.getParameter("providerview");
 	boolean bFirstDisp = true; //this is the first time to display the window
-	if (request.getParameter("bFirstDisp") != null)
+	if(request.getParameter("bFirstDisp") != null)
 		bFirstDisp = (request.getParameter("bFirstDisp")).equals("true");
 	String ChartNo;
-	String demoNo = "";
+	String demoNo = request.getParameter("demographic_no");
 	String demoName = request.getParameter("name");
-	if (request.getAttribute("demographic_no") != null)
+	if(request.getAttribute("demographic_no") != null)
 	{
 		demoNo = (String) request.getAttribute("demographic_no");
 		demoName = (String) request.getAttribute("demoName");
 		bFirstDisp = false;
 	}
-	if (demoName == null)
+	if(demoName == null)
 	{
 		demoName = "";
 	}
+	if(demoNo == null)
+	{
+		demoNo = "";
+	}
 
-//Retrieve encounter id for updating encounter navbar if info this page changes anything
+	//Retrieve encounter id for updating encounter navbar if info this page changes anything
 	String parentAjaxId;
-	if (request.getParameter("parentAjaxId") != null)
+	if(request.getParameter("parentAjaxId") != null)
 		parentAjaxId = request.getParameter("parentAjaxId");
 	else
 		parentAjaxId = "";
 
 	String updateParent;
-	if (request.getParameter("updateParent") != null)
+	if(request.getParameter("updateParent") != null)
 		updateParent = request.getParameter("updateParent");
 	else
 		updateParent = "true";
 
+	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+	OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
+
+	GregorianCalendar now = new GregorianCalendar();
+	int curYear = now.get(Calendar.YEAR);
+	int curMonth = (now.get(Calendar.MONTH) + 1);
+	int curDay = now.get(Calendar.DAY_OF_MONTH);
+
+	String xml_vdate = request.getParameter("xml_vdate") == null ? "" : request.getParameter("xml_vdate");
+	String xml_appointment_date = request.getParameter("xml_appointment_date") == null ?
+			MyDateFormat.getMysqlStandardDate(curYear, curMonth, curDay) : request.getParameter("xml_appointment_date");
 %>
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
@@ -90,48 +99,17 @@
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
 <%@page import="oscar.MyDateFormat" %>
 <%@page import="java.util.Calendar" %>
-
-<%
-	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
-	OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
-%>
-
-<%
-	GregorianCalendar now = new GregorianCalendar();
-	int curYear = now.get(Calendar.YEAR);
-	int curMonth = (now.get(Calendar.MONTH) + 1);
-	int curDay = now.get(Calendar.DAY_OF_MONTH);
-
-%><% //String providerview=request.getParameter("provider")==null?"":request.getParameter("provider");
-	String xml_vdate = request.getParameter("xml_vdate") == null ? "" : request.getParameter("xml_vdate");
-	String xml_appointment_date = request.getParameter("xml_appointment_date") == null ? MyDateFormat.getMysqlStandardDate(curYear, curMonth, curDay) : request.getParameter("xml_appointment_date");
-%>
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
-
 <%@page import="java.util.GregorianCalendar" %>
 <%@page import="java.util.Iterator" %>
 <%@page import="java.util.List" %>
+
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
+
 <html:html locale="true">
 	<head>
 		<title><bean:message key="tickler.ticklerAdd.title"/></title>
 		<link rel="stylesheet" href="../billing/billing.css">
-		<style type="text/css">
-			<!--
-			.bodytext {
-				font-family: Arial, Helvetica, sans-serif;
-				font-size: 14px;
-				font-style: bold;
-				line-height: normal;
-				font-weight: normal;
-				font-variant: normal;
-				text-transform: none;
-				color: #FFFFFF;
-				text-decoration: none;
-			}
-
-			-->
-		</style>
 		<script type="text/javascript"
 				src="<%= request.getContextPath() %>/js/moment.min.js"></script>
 		<script type="text/javascript"
@@ -235,41 +213,27 @@
 				returnDate.setTime(returnDate.getTime() + 60000 * 60 * 24 * numDays);
 
 				return returnDate;
-
 			}
-
-			function YearAdd(startDate, numYears)
-			{
-				return DateAdd(startDate, 0, 0, numYears);
-			}
-
-			function MonthAdd(startDate, numMonths)
-			{
-				return DateAdd(startDate, 0, numMonths, 0);
-			}
-
-			function DayAdd(startDate, numDays)
-			{
-				return DateAdd(startDate, numDays, 0, 0);
-			}
-
-
-			function addMonth(no)
+			function addDateToForm(numDays, numMonths, numYears)
 			{
 				var gCurrentDate = new Date();
-				var newDate = DateAdd(gCurrentDate, 0, no, 0);
+				var newDate = DateAdd(gCurrentDate, numDays, numMonths, numYears);
 				var newYear = newDate.getFullYear();
-				var newMonth = newDate.getMonth() + 1;
-				var newDay = newDate.getDate();
-				var newD = newYear + "-" + newMonth + "-" + newDay;
-				document.serviceform.xml_appointment_date.value = newD;
+				var newMonth = (newDate.getMonth() + 1).toString().padStart(2, '0');
+				var newDay = newDate.getDate().toString().padStart(2, '0');
+				document.serviceform.xml_appointment_date.value = newYear + "-" + newMonth + "-" + newDay;
 			}
 
-
+			function addDay(days)
+			{
+				return addDateToForm(days, 0, 0);
+			}
+			function addMonth(months)
+			{
+				return addDateToForm(0, months, 0);
+			}
 			//-->
 		</script>
-
-
 	</head>
 
 	<body bgcolor="#FFFFFF" text="#000000" leftmargin="0" rightmargin="0" topmargin="10"
@@ -293,7 +257,7 @@
 						key="tickler.ticklerAdd.formDemoName"/>: </b></font></font></td>
 				<td colspan="2" width="65%">
 					<div align="left"><INPUT TYPE="TEXT" NAME="keyword" size="25"
-											 VALUE="<%=bFirstDisp ? "" : demoName.equals("") ? session.getAttribute("appointmentname") == null ? "" : session.getAttribute("appointmentname") : demoName%>">
+											 VALUE="<%=bFirstDisp ? "" : demoName.equals("") ? session.getAttribute("appointmentname") == null ? "" : (String) session.getAttribute("appointmentname") : demoName%>">
 						<input type="submit" name="Submit"
 							   value="<bean:message key="tickler.ticklerAdd.btnSearch"/>">
 					</div>
@@ -358,26 +322,50 @@
 				</td>
 				<td colspan="2">
 					<div align="left"><INPUT TYPE="hidden" NAME="demographic_no"
-											 VALUE="<%=bFirstDisp?"":(demoNo.isEmpty()?"":demoNo)%>"><%=ChartNo%>
+											 VALUE="<%=bFirstDisp?"":demoNo%>"><%=ChartNo%>
 					</div>
 				</td>
 			</tr>
 
 			<tr>
 				<td><font color="#003366" size="2"
-						  face="Verdana, Arial, Helvetica, sans-serif"><strong><bean:message
-						key="tickler.ticklerAdd.formServiceDate"/>:</strong></font></td>
-				<td><input type="text" name="xml_appointment_date"
-						   value="<%=xml_appointment_date%>">
+				          face="Verdana, Arial, Helvetica, sans-serif"><strong>
+					<bean:message key="tickler.ticklerAdd.formServiceDate"/>:</strong></font></td>
+				<td>
+					<input type="text" name="xml_appointment_date"
+				           value="<%=xml_appointment_date%>">
 					<font color="#003366" size="1" face="Verdana, Arial, Helvetica, sans-serif">
 						<a href="#"
-						   onClick="openBrWindow('../billing/billingCalendarPopup.jsp?type=end&amp;year=<%=curYear%>&amp;month=<%=curMonth%>','','width=300,height=300')"><bean:message
+						   onClick="openBrWindow('../billing/billingCalendarPopup.jsp?type=end&amp;year=<%=curYear%>&amp;month=<%=curMonth%>','','width=300,height=300')">
+							<bean:message
 								key="tickler.ticklerAdd.btnCalendarLookup"/></a> &nbsp; &nbsp;
-						<a href="#" onClick="addMonth(6)"><bean:message
-								key="tickler.ticklerAdd.btn6Month"/></a>&nbsp; &nbsp;
-						<a href="#" onClick="addMonth(12)"><bean:message
-								key="tickler.ticklerAdd.btn1Year"/></a></font></td>
+					</font></td>
 				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+					<a href="#" onClick="addDay(7)">
+						<bean:message
+								key="tickler.ticklerAdd.btn7Day"/></a>&nbsp; &nbsp;
+					<a href="#" onClick="addDay(14)">
+						<bean:message
+								key="tickler.ticklerAdd.btn14Day"/></a>&nbsp; &nbsp;
+					<a href="#" onClick="addMonth(1)">
+						<bean:message
+								key="tickler.ticklerAdd.btn1Month"/></a>&nbsp; &nbsp;
+					<a href="#" onClick="addMonth(2)">
+						<bean:message
+								key="tickler.ticklerAdd.btn2Month"/></a>&nbsp; &nbsp;
+					<a href="#" onClick="addMonth(4)">
+						<bean:message
+								key="tickler.ticklerAdd.btn4Month"/></a>&nbsp; &nbsp;
+					<a href="#" onClick="addMonth(6)">
+						<bean:message
+								key="tickler.ticklerAdd.btn6Month"/></a>&nbsp; &nbsp;
+					<a href="#" onClick="addMonth(12)"><bean:message
+							key="tickler.ticklerAdd.btn1Year"/></a>
+				</td>
 			</tr>
 			<tr>
 				<td height="21" valign="top"><font color="#003366" size="2"
@@ -395,7 +383,6 @@
 				</td>
 				<td>&nbsp;</td>
 			</tr>
-
 			<tr>
 				<td height="21" valign="top"><font color="#003366" size="2"
 												   face="Verdana, Arial, Helvetica, sans-serif"><strong><bean:message
