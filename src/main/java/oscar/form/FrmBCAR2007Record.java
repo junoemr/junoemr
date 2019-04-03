@@ -37,7 +37,6 @@ import org.oscarehr.util.SpringUtils;
 import oscar.util.ConversionUtils;
 
 public class FrmBCAR2007Record extends FrmRecord {
-    private String _dateFormat = "dd/MM/yyyy";
 
     private DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
 
@@ -52,17 +51,17 @@ public class FrmBCAR2007Record extends FrmRecord {
                 setDemoProperties(loggedInInfo, demographicNo, props);
 
                 Date today = new Date();
-                props.setProperty("formCreated", ConversionUtils.toDateString(today, _dateFormat));
-                props.setProperty("pg1_formDate", ConversionUtils.toDateString(today, _dateFormat));
-                props.setProperty("pg2_formDate", ConversionUtils.toDateString(today, _dateFormat));
-                props.setProperty("pg3_formDate", ConversionUtils.toDateString(today, _dateFormat));
+                props.setProperty("formCreated", ConversionUtils.toDateString(today, dateFormat));
+                props.setProperty("pg1_formDate", ConversionUtils.toDateString(today, dateFormat));
+                props.setProperty("pg2_formDate", ConversionUtils.toDateString(today, dateFormat));
+                props.setProperty("pg3_formDate", ConversionUtils.toDateString(today, dateFormat));
             }
         }
         else
         {
             String sql = "SELECT * FROM formBCAR2007 WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
             FrmRecordHelp frh = new FrmRecordHelp();
-            frh.setDateFormat(_dateFormat);
+            frh.setDateFormat(dateFormat);
             props = (frh).getFormRecord(sql);
             
             if (demo != null)
@@ -78,26 +77,26 @@ public class FrmBCAR2007Record extends FrmRecord {
         String sql = "SELECT * FROM formBCAR2007 WHERE demographic_no=" + demographic_no + " AND ID=0";
 
         FrmRecordHelp frh = new FrmRecordHelp();
-        frh.setDateFormat(_dateFormat);
+        frh.setDateFormat(dateFormat);
         return ((frh).saveFormRecord(props, sql));
     }
 
     public Properties getPrintRecord(int demographicNo, int existingID) throws SQLException {
         String sql = "SELECT * FROM formBCAR2007 WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
         FrmRecordHelp frh = new FrmRecordHelp();
-        frh.setDateFormat(_dateFormat);
+        frh.setDateFormat(dateFormat);
         return ((frh).getPrintRecord(sql));
     }
 
     public String findActionValue(String submit) throws SQLException {
         FrmRecordHelp frh = new FrmRecordHelp();
-        frh.setDateFormat(_dateFormat);
+        frh.setDateFormat(dateFormat);
         return ((frh).findActionValue(submit));
     }
 
     public String createActionURL(String where, String action, String demoId, String formId) throws SQLException {
         FrmRecordHelp frh = new FrmRecordHelp();
-        frh.setDateFormat(_dateFormat);
+        frh.setDateFormat(dateFormat);
         return ((frh).createActionURL(where, action, demoId, formId));
     }
 

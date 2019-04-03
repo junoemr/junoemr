@@ -33,6 +33,7 @@ import java.util.Properties;
 import org.oscarehr.util.LoggedInInfo;
 
 import oscar.oscarDB.DBHandler;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 public class FrmMMSERecord  extends FrmRecord {
@@ -40,27 +41,30 @@ public class FrmMMSERecord  extends FrmRecord {
             throws SQLException {
         Properties props = new Properties();
 
-        if(existingID <= 0) {
-			
+        if (existingID <= 0)
+        {
             String sql = "SELECT demographic_no, CONCAT(last_name, ', ', first_name) AS pName, "
                 + "sex, year_of_birth, month_of_birth, date_of_birth "
                 + "FROM demographic WHERE demographic_no = " + demographicNo;
             ResultSet rs = DBHandler.GetSQL(sql);
 
-            if(rs.next()) {
-                java.util.Date dob = UtilDateUtilities.calcDate(oscar.Misc.getString(rs, "year_of_birth"), oscar.Misc.getString(rs, "month_of_birth"), oscar.Misc.getString(rs, "date_of_birth"));
-
+            if (rs.next())
+            {
+                java.util.Date dob = UtilDateUtilities.calcDate(oscar.Misc.getString(rs, "year_of_birth"),
+                        oscar.Misc.getString(rs, "month_of_birth"),
+                        oscar.Misc.getString(rs, "date_of_birth"));
                 props.setProperty("demographic_no", oscar.Misc.getString(rs, "demographic_no"));
                 props.setProperty("pName", oscar.Misc.getString(rs, "pName"));
-                props.setProperty("formDate", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
-                props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
-                //props.setProperty("formEdited", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
+                props.setProperty("formDate", ConversionUtils.toDateString(new Date(), "yyyy/MM/dd"));
+                props.setProperty("formCreated", ConversionUtils.toDateString(new Date(), "yyyy/MM/dd"));
                 props.setProperty("sex", oscar.Misc.getString(rs, "sex"));
                 props.setProperty("age", String.valueOf(UtilDateUtilities.calcAge(dob)));
             }
             rs.close();
 
-        } else {
+        }
+        else
+        {
             String sql = "SELECT * FROM formMMSE WHERE demographic_no = " +demographicNo +" AND ID = " +existingID;
 			props = (new FrmRecordHelp()).getFormRecord(sql);
         }

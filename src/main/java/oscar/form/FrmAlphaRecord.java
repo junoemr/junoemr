@@ -33,10 +33,9 @@ import java.util.Properties;
 import org.oscarehr.util.LoggedInInfo;
 
 import oscar.oscarDB.DBHandler;
-import oscar.util.UtilDateUtilities;
+import oscar.util.ConversionUtils;
 
 public class FrmAlphaRecord extends FrmRecord {
-	//FrmRecordHelp recordHlp = null;
 
     public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID)
         throws SQLException  {
@@ -49,9 +48,8 @@ public class FrmAlphaRecord extends FrmRecord {
             if(rs.next()) {
                 props.setProperty("demographic_no", oscar.Misc.getString(rs, "demographic_no"));
                 props.setProperty("pName", oscar.Misc.getString(rs, "pName"));
-                props.setProperty("formDate", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
-                props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
-                //props.setProperty("formEdited", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
+                props.setProperty("formDate", ConversionUtils.toDateString(new Date(), "yyyy/MM/dd"));
+                props.setProperty("formCreated", ConversionUtils.toDateString(new Date(), "yyyy/MM/dd"));
             }
             rs.close();
         } else {
