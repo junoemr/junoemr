@@ -181,8 +181,8 @@ public class FrmRourkeRecord extends FrmRecord {
 	public static double age(String dob, String today) {
 		double age = -1;
 
-		try {
-			// Todo: find corollary for ConversionUtils.toDateString
+		try
+		{
 			Date tToday = (oscar.util.UtilDateUtilities.StringToDate(today, "yyyy/MM/dd"));
 			Date tDob = (oscar.util.UtilDateUtilities.StringToDate(dob, "yyyy/MM/dd"));
 
