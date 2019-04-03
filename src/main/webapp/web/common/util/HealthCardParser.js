@@ -47,7 +47,6 @@ Oscar.HealthCardParser.isWhitelisted = function isWhitelisted(cardNo)
 			(cardNo.startsWith(BC_PREFIX) && cardNo.substring(cardNo.indexOf("?")).startsWith(BC_COMBINED)));
 };
 
-
 Oscar.HealthCardParser.getFieldValue = function getFieldValue(track, trackIndex, length)
 {
 	var fieldValue = "";

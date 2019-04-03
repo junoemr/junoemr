@@ -149,10 +149,6 @@ Juno.Common.Util.validateDateString = function validateDateString(dateString)
  */
 Juno.Common.Util.validateDate = function validateDate(year, month, day)
 {
-	if (month === 12)
-	{
-		month -= 1;
-	}
 	var dateString = year + "-" + month + "-" + day;
 	return Juno.Common.Util.validateDateString(dateString);
 };

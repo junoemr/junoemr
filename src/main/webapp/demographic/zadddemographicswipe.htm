@@ -28,7 +28,7 @@
 <head>
 	<title>PATIENT DETAIL INFO</title>
 	<link rel="stylesheet" href="../web.css"/>
-	<script type="text/javascript" src="<%= request.getContextPath() %>/web/common/util/HealthCardParser.js"></script>
+	<script type="text/javascript" src="../web/common/util/HealthCardParser.js"></script>
 	<script language="JavaScript">
 		function setfocus()
 		{
@@ -55,8 +55,7 @@
 				document.getElementById("card_no").value = "";
 				alert("Card type not supported." +
 						"\nCurrently support is enabled for health cards from the following provinces:" +
-						"\n- BC" +
-						"\n- Ontario");
+						"\n- BC, Ontario");
 				return false;
 			}
 		}

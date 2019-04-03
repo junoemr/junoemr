@@ -50,9 +50,9 @@
 
 		function setValueIfExists(element, value)
 		{
-			value = value.trim();
 			if (value)
 			{
+				value = value.trim();
 				element.value = value;
 			}
 		}
