@@ -51,19 +51,19 @@ public class Frm2MinWalkRecord extends FrmRecord {
 		if (existingID <= 0)
 		{
 			sql = "SELECT demographic_no, sex, year_of_birth, month_of_birth, date_of_birth, phone" +
-					"FROM demographic WHERE demographic_no = " + demographicNo;
+					" FROM demographic WHERE demographic_no=" + demographicNo;
 			rs = DBHandler.GetSQL(sql);
 			if (rs.next())
 			{
 				java.util.Date dob = UtilDateUtilities.calcDate(oscar.Misc.getString(rs, "year_of_birth"), oscar.Misc.getString(rs, "month_of_birth"), oscar.Misc.getString(rs, "date_of_birth"));
 				props.setProperty("demographic_no", oscar.Misc.getString(rs, "demographic_no"));
-				props.setProperty("formCreated", ConversionUtils.toDateString(new Date(), dateFormat));
+				props.setProperty("formCreated", ConversionUtils.toDateString(new Date(), "yyyy/MM/dd"));
 				props.setProperty("dob", ConversionUtils.toDateString(dob, "yyyy/MM/dd"));
 				props.setProperty("sex", oscar.Misc.getString(rs, "sex"));
 				props.setProperty("phone", oscar.Misc.getString(rs, "phone"));
 			}
 			rs.close();
-			sql = "SELECT studyID FROM rehabStudy2004 WHERE demographic_no='"+demographicNo + "'";
+			sql = "SELECT studyID FROM rehabStudy2004 WHERE demographic_no='" + demographicNo + "'";
 			rs = DBHandler.GetSQL(sql);
 			if (rs.next())
 			{
