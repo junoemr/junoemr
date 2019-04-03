@@ -316,15 +316,44 @@ public class Schedule
 		Provider provider = providerDao.getProvider(providerNo);
 
 		List<UserDateSchedule> userDateSchedules = new ArrayList<>();
+		UserDateSchedule userDateSchedule;
 
-		// get a UserDateSchedule for each
-		UserDateSchedule userDateSchedule = getUserDateSchedule(
-			date,
-			new Integer(provider.getProviderNo()),
-			provider.getFirstName(),
-			provider.getLastName(),
-			site
-		);
+		if (viewAll && site != null)
+		{
+			List<Site> providerSites = siteDao.getActiveSitesByProviderNo(providerNo);
+			boolean siteMatch = false;
+			for (Site providerSite : providerSites)
+			{
+				if (providerSite.getName().equals(site))
+				{
+					siteMatch = true;
+				}
+			}
+			if (!siteMatch)
+			{// no schedule results for this provider
+				return new ResourceSchedule(userDateSchedules);
+			}
+
+			// get a UserDateSchedule for each
+			userDateSchedule = getUserDateSchedule(
+					date,
+					new Integer(provider.getProviderNo()),
+					provider.getFirstName(),
+					provider.getLastName(),
+					null
+			);
+		}
+		else
+		{
+			// get a UserDateSchedule for each
+			userDateSchedule = getUserDateSchedule(
+					date,
+					new Integer(provider.getProviderNo()),
+					provider.getFirstName(),
+					provider.getLastName(),
+					site
+			);
+		}
 
 		// When not viewing all schedules, only add if there is a schedule set
 		if(viewAll || userDateSchedule.getScheduleSlots().asMapOfRanges().size() > 0)
