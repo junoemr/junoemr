@@ -81,12 +81,16 @@
 
 %>
 <%@ page
-		import="java.util.*, java.sql.*, oscar.*, java.net.*, oscar.oscarEncounter.pageUtil.EctSessionBean" %>
+		import="org.oscarehr.PMmodule.dao.ProviderDao,
+		        org.oscarehr.common.dao.OscarAppointmentDao,
+		        org.oscarehr.common.dao.SiteDao,
+		        org.oscarehr.common.model.Appointment,
+		        org.oscarehr.common.model.Provider" %>
+<%@page import="org.oscarehr.common.model.Site" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.common.model.Appointment" %>
-<%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
-<%@page import="org.oscarehr.common.model.Provider" %>
-<%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
+<%@page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
+<%@page import="oscar.MyDateFormat" %>
+<%@page import="java.util.Calendar" %>
 
 <%
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
@@ -106,10 +110,9 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 
-<%@page import="org.oscarehr.common.dao.SiteDao" %>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
-<%@page import="org.oscarehr.common.model.Site" %>
-<%@page import="org.oscarehr.common.model.Provider" %>
+<%@page import="java.util.GregorianCalendar" %>
+<%@page import="java.util.Iterator" %>
+<%@page import="java.util.List" %>
 <html:html locale="true">
 	<head>
 		<title><bean:message key="tickler.ticklerAdd.title"/></title>
