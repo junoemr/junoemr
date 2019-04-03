@@ -125,6 +125,7 @@ public class Demographic implements Serializable {
     private String nameOfFather;
     private String nameOfMother;
     private String veteranNo;
+    private Integer referralSourceID;
 
 
         public String getTitle() {
@@ -1202,5 +1203,15 @@ public class Demographic implements Serializable {
 	public Integer getCustomStatusId()
 	{
 		return customStatusId;
+	}
+
+	public Integer getReferralSourceID()
+	{
+		return referralSourceID;
+	}
+
+	public void setReferralSourceID(Integer referralSourceID)
+	{
+		this.referralSourceID = referralSourceID;
 	}
 }

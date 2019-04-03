@@ -90,6 +90,7 @@ public class AppointmentMainBean implements Serializable {
 	  String sqlExec = dbSQL.getDef(dboperation,"");
   	return (dbPH.queryExecuteUpdate(sqlExec, param));
   }
+
   public int queryExecuteUpdate(String aKeyword, String dboperation) throws Exception{
 	  String sqlExec = dbSQL.getDef(dboperation,"");
 	  String[] param =new String[] {aKeyword};

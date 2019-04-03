@@ -14,6 +14,8 @@
 	<suppress checks="org.oscarehr.utils.checkstyle.TrackingRegexpCheck" files="demographiceditdemographic.jsp" />
 	<suppress checks="org.oscarehr.utils.checkstyle.TrackingRegexpCheck" files="EctViewConsultationRequestsUtil.java" />
 
+	<suppress checks="org.oscarehr.utils.checkstyle.TrackingRegexpCheck" files="demographicaddarecord.jsp"/>
+	<suppress checks="org.oscarehr.utils.checkstyle.TrackingRegexpCheck" files="demographicupdatearecord.jsp" />
 	<!-- 
 	<suppress checks="RegexpMultiline" files="ResponseDefaultsFilter.java" lines="54" />
 	<suppress checks="RegexpMultiline" files="ResponseDefaultsChangeDetectingWrapper.java" lines="44" />

@@ -176,7 +176,6 @@
 			licensedProducerAddress = demoProducerAddrRs.getString("display_name");
 		}
 	}
-
 %>
 
 
@@ -733,6 +732,32 @@ while(field_itr.hasNext()){
 					alert("<bean:message key="demographic.demographiceditdemographic.msgInvalidEntry"/>");
 				}
 			}
+
+            function addOption (selectElement, optionType, valueOfNew, hiddenNameField) {
+                var optionToAdd = prompt("Please enter a new " + optionType);
+
+                if (optionToAdd)
+                {
+                    if (valueOfNew && hiddenNameField)
+                    {
+                        <%-- If the valueOfNew parameter is specified, we will use that value as the value for the new option,
+                        otherwise, use the text of the element as the option value.  Additionally, the text of the  new value will be
+                        loaded into a hidden field --%>
+                        selectElement.options[selectElement.length] = new Option(optionToAdd, valueOfNew);
+                        hiddenNameField.value = optionToAdd;
+                    }
+                    else
+                    {
+                        selectElement.options[selectElement.length] = new Option(optionToAdd, optionToAdd);
+                    }
+
+                    selectElement.options[selectElement.length - 1].selected = true;
+                }
+                else
+                {
+                    alert("Invalid value for " + optionType);
+                }
+            }
 
 			function removeAccents(s)
 			{
@@ -2216,17 +2241,29 @@ while(field_itr.hasNext()){
 																	</li>
 																<% } %>
 																<%
-																	if (true)
+																	if (oscarProps.isPropertyActive("demographic.showReferralSource"))
 																	{
 																%>
-																<%-- Robert add stuff here --%>
 																	<li>
+
 																		<span class="label">
-																			Referral Source
+																			<bean:message key="demographic.demographicaddrecordhtml.referralSource"/>
 																		</span>
-																		<span class="info">
-																			Test Value
-																		</span>
+																		<%
+                                                                            if (demographic.getReferralSourceID() != null)
+                                                                            {
+                                                                                String[] params = {demographic.getReferralSourceID().toString()};
+                                                                                ResultSet resultSet = apptMainBean.queryResults(params, "referral_source");
+																			    String referralSource = resultSet.next() ? resultSet.getString("source") : "";
+																			    resultSet.close();
+																		%>
+                                                                            <span class="info"><%=referralSource%></span>
+                                                                        <%  }
+                                                                            else
+                                                                            {
+                                                                        %>
+                                                                            <span class="info"></span>
+                                                                        <%  }%>
 																	</li>
 
 																<% } %>
@@ -4440,20 +4477,31 @@ while(field_itr.hasNext()){
 
 													</tr>
 												<% } %>
-												<% if (true)  //!!! CS
+												<% if (oscarProps.isPropertyActive("demographic.showReferralSource"))
 												{
 												%>
 												<tr>
 													<td align="right">
 														<b>
-															Referral Source
+															<bean:message key="demographic.demographicaddrecordhtml.referralSource"/>
 														</b>
 													</td>
 													<td>
-														<select name="referralSource" style="width: 281px">
-															<option value="foo">foo</option>
-															<option value="bar">bar</option>
+														<select name="referral_source" style="width: 281px">
+															<option value="" <%=demographic.getReferralSourceID() == null ? "selected" : ""%>>""</option>
+														<%
+															ResultSet sources = apptMainBean.queryResults("search_referral_source");
+															while (sources.next())
+															{
+																Integer sourceID = sources.getInt("id");
+																String sourceName = sources.getString("source");
+															%>
+															<option value="<%=sourceID%>" <%=sourceID.equals(demographic.getReferralSourceID()) ? "selected" : ""%>><%=sourceName%></option>
+															<%}%>
 														</select>
+														<input type="button" onClick="addOption(document.updatedelete.referral_source, 'Referral Source', -1, document.updatedelete.referral_source_new);"
+															   value="<bean:message key="demographic.demographicaddrecordhtm.AddNew"/>">
+														<input type="hidden" name="referral_source_new">
 													</td>
 												</tr>
 												<% } %>

@@ -131,7 +131,6 @@ public final class DBPreparedHandler {
         preparedStmt = DbConnectionFilter.getThreadLocalDbConnection().prepareStatement(preparedSQL);
         for (int i = 0; i < param.length; i++) {
             preparedStmt.setString((i + 1), param[i]);
-
         }
         return(preparedStmt.executeUpdate());
     }

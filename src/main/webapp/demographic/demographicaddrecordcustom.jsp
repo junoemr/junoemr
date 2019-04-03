@@ -54,7 +54,7 @@
     {"search_rsstatus", "select distinct roster_status from demographic where roster_status != '' and roster_status != 'RO' and roster_status != 'NR' and roster_status != 'TE' and roster_status != 'FS' "},
     {"search_ptstatus", "select distinct patient_status from demographic where patient_status != '' and patient_status != 'AC' and patient_status != 'IN' and patient_status != 'DE' and patient_status != 'MO' and patient_status != 'FI'"},
     {"search_waiting_list", "select * from waitingListName where group_no='" + ((ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo() +"' and is_history='N'  order by name"},
-	{"search_referral_source", "select 'implement me' as referralSource"}		// !!! Robert fix me
+	{"search_referral_source", "select id, source from referral_source where deleted_at is null"}
   };
   String[][] responseTargets=new String[][] {  };
   addDemoBean.doConfigure(dbQueries,responseTargets);
@@ -284,14 +284,24 @@ function newStatus1() {
     }
 }
 
-
-<%-- Robert:  Parameterizing this funciton, newStatus and newStatus1 can be refactored to use this instead --%>
-function addOption (selectElement, optionType) {
+function addOption (selectElement, optionType, valueOfNew, hiddenNameField) {
     var optionToAdd = prompt("Please enter a new " + optionType);
 
     if (optionToAdd)
 	{
-	    selectElement.options[selectElement.length] = new Option(optionToAdd, optionToAdd);
+	    if (valueOfNew && hiddenNameField)
+		{
+		    <%-- If the valueOfNew parameter is specified, we will use that value as the value for the new option,
+		    otherwise, use the text of the element as the option value.  Additionally, the text of the  new value will be
+		    loaded into a hidden field --%>
+            selectElement.options[selectElement.length] = new Option(optionToAdd, valueOfNew);
+            hiddenNameField.value = optionToAdd;
+		}
+		else
+		{
+            selectElement.options[selectElement.length] = new Option(optionToAdd, optionToAdd);
+		}
+
 	    selectElement.options[selectElement.length - 1].selected = true;
 	}
 	else
@@ -1336,32 +1346,28 @@ for(int i=0; i<custom_demographic_fields.size(); i++){
 			<%
 		}
 	}//end of Brazil form fields
-	else if (custom_demographic_fields.get(i).equals("referral_source"))
+	else if (props.isPropertyActive("demographic.showReferralSource") && custom_demographic_fields.get(i).equals("referral_source"))
 	{
 	 %>
 		<div>
-			<%-- Robert connect me and disable the sample.  In juno localize all AddNewPatient and AddNewRosterStatus to just use AddNew since both translate to "Add New" in all languages--%>
-			<label><b><bean:message key="demographic.demographicaddrecordhtml.referralSource"></bean:message></b></label>
+			<label><b><bean:message key="demographic.demographicaddrecordhtml.referralSource"/></b></label>
 			<select type="select" name="referral_source">
-				<option value="foo">Foo</option>
-				<option value="bar">Bar</option>
-
-				<%--
-				This should be a fairly close implementation, depending on how you structure the result of the query.
-				Here I have it as a single field "referralSource"
+                <option value=""></option>
 				<%
-					ResultSet referralSources = addDemoBean.queryResults("referral_source");
+					ResultSet referralSources = addDemoBean.queryResults("search_referral_source");
 					while (referralSources.next()) {
-					    String source = referralSources.getString("referralSource");
+					    String source = referralSources.getString("source");
+					    Integer id = referralSources.getInt("id");
 				%>
-				<option value="<%=source%>"><%=source%></option>
+			<option value="<%=id%>"><%=source%></option>
 				<%
 					}
 					referralSources.close();
 				%>
-				--%>
 			</select>
-			<input type="button" onClick="addOption(document.adddemographic.referral_source, 'referral source');" value="<bean:message key="demographic.demographicaddrecordhtm.AddNew"/> ">
+			<input type="hidden" name="referral_source_new">
+			<input type="button" onClick="addOption(document.adddemographic.referral_source, 'referral source', -1, document.adddemographic.referral_source_new);"
+				   value="<bean:message key="demographic.demographicaddrecordhtm.AddNew"/>">
 		</div>
 	 <%
 	}

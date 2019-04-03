@@ -191,6 +191,9 @@
 			{"search_demo_licensed_producer_address_name", "SELECT pa.address_id, pa.display_name FROM demographic_licensed_producer d JOIN licensed_producer_address pa ON (d.address_id=pa.address_id) where d.demographic_no=?"},
 			// Custom demographic status
 			{"search_demo_cust_status", "SELECT * FROM demographic_custom_status WHERE deleted = 0"},
+			// Referral Source Info
+			{"search_referral_source", "SELECT id, source FROM referral_source WHERE deleted_at IS null ORDER BY source"},
+			{"referral_source", "SELECT source FROM referral_source WHERE id = ?"},
 	};
 
 	//associate each operation with an output JSP file -- displaymode
@@ -239,7 +242,7 @@
 			request.setAttribute("integratorSearchResults", integratorSearchResults);
 		} catch (Exception e)
 		{
-			log("error searching integrator", e);
+			MiscUtils.getLogger().error("error searching integrator", e);
 		}
 	}
 
