@@ -151,6 +151,13 @@ public class LabResultData implements Comparable<LabResultData> {
 
 	}
 
+	// Relevant for Alberta Health Services as they are not currently
+	// sending any abnormal indications in their pathologies. We want
+	// to flag them all as "Unknown" so user notices and hopefully reads
+	public boolean isPathology()
+	{
+		return this.discipline.equals("CYTOPATHOLOGY");
+	}
 
 	public boolean isFinal(){ return finalRes ;}
 
