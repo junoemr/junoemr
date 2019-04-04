@@ -74,7 +74,7 @@ import java.util.List;
  *
  * @author wrighd
  */
-public class LabPDFCreator extends PdfPageEventHelper{
+public class LabPDFCreator extends PdfPageEventHelper {
     private OutputStream os;
 
     private boolean isUnstructuredDoc = false;
@@ -990,25 +990,28 @@ public class LabPDFCreator extends PdfPageEventHelper{
 	 *  onEndPage is a page event that occurs when a page has finished being created.
 	 *  It is used to add header and footer information to each page.
 	 */
-	public void onEndPage(PdfWriter writer, Document document){
+	public void onEndPage(PdfWriter writer, Document document)
+	{
 		try
 		{
 			Rectangle page = document.getPageSize();
 			PdfContentByte cb = writer.getDirectContent();
 			BaseFont bf = BaseFont.createFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
 			int pageNum = document.getPageNumber();
+			float width = page.getWidth();
 			float height = page.getHeight();
-
-			//add patient name header for every page but the first.
+			final float MARGIN_TOP = 30.0f;
+			final float MARGIN_RIGHT = 38.0f;
+			final int ROTATION = 0;
+			// Add patient name header for every page but the first.
 			if (pageNum > 1)
 			{
 				cb.beginText();
 				cb.setFontAndSize(bf, 8);
-				cb.showTextAligned(PdfContentByte.ALIGN_RIGHT, handler.getPatientName(), 575, height - 30, 0);
+				cb.showTextAligned(PdfContentByte.ALIGN_RIGHT, handler.getPatientName(),
+						width - MARGIN_RIGHT, height - MARGIN_TOP, ROTATION);
 				cb.endText();
 			}
-
-		// throw any exceptions
 		}
 		catch (Exception e)
 		{
