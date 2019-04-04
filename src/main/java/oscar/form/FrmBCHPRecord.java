@@ -35,87 +35,87 @@ import org.oscarehr.util.LoggedInInfo;
 import oscar.login.DBHelp;
 import oscar.oscarDB.DBHandler;
 import oscar.oscarProvider.data.ProviderData;
-import oscar.util.UtilDateUtilities;
+import oscar.util.ConversionUtils;
 
 public class FrmBCHPRecord extends FrmRecord {
-    private String _dateFormat = "dd/MM/yyyy";
 
-    public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID) throws SQLException {
-        Properties props = new Properties();
+	public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID) throws SQLException {
+		Properties props = new Properties();
 
-        if (existingID <= 0) {
-            
-            String sql = "SELECT demographic_no, last_name, first_name, phone, phone2, hin,provider_no FROM demographic WHERE demographic_no = "
-                    + demographicNo;
-            String providerNo = null;
-            ResultSet rs = DBHandler.GetSQL(sql);
-            if (rs.next()) {
-                props.setProperty("demographic_no", rs.getString("demographic_no"));
-                props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(),
-                                _dateFormat));
-                // props.setProperty("formEdited",
-                // UtilDateUtilities.DateToString(new Date(),_dateFormat));
-                props.setProperty("pg1_patientName", rs.getString("last_name")+", "+rs.getString("first_name"));
-                props.setProperty("pg1_phn", rs.getString("hin"));
-                props.setProperty("pg1_phone", rs.getString("phone") + "  " + rs.getString("phone2"));
-                props.setProperty("pg1_formDate", UtilDateUtilities
-                        .DateToString(new Date(), _dateFormat));
-                providerNo = rs.getString("provider_no");
-            }
-            rs.close();
-            
-            if(providerNo != null && !providerNo.trim().equals("")){
-                ProviderData proData = new ProviderData();
-                proData.getProvider(providerNo);
-                
-                props.setProperty("pg1_msp",proData.getOhip_no());
-                props.setProperty("pg1_md", "Dr. "+proData.getLast_name());
-                
-            }
-        } else {
-            String sql = "SELECT * FROM formBCHP WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
-            FrmRecordHelp frh = new FrmRecordHelp();
-            frh.setDateFormat(_dateFormat);
-            props = (frh).getFormRecord(sql);
+		if (existingID <= 0)
+		{
 
-            sql = "SELECT last_name, first_name, address, city, province, postal, phone,phone2, hin FROM demographic WHERE demographic_no = "
-                    + demographicNo;
-            ResultSet rs = DBHelp.searchDBRecord(sql);
-            if (rs.next()) {
-                props.setProperty("pg1_patientName_cur", rs.getString("last_name")+", "+rs.getString("first_name"));
-                props.setProperty("pg1_phn_cur", rs.getString("hin"));
-                props.setProperty("pg1_phone_cur", rs.getString("phone") + "  " + rs.getString("phone2"));
-            }
-        }
-        return props;
-    }
+			String sql = "SELECT demographic_no, last_name, first_name, phone, phone2, hin,provider_no FROM demographic WHERE demographic_no = "
+					+ demographicNo;
+			String providerNo = null;
+			ResultSet rs = DBHandler.GetSQL(sql);
+			if (rs.next())
+			{
+				props.setProperty("demographic_no", rs.getString("demographic_no"));
+				props.setProperty("formCreated", ConversionUtils.toDateString(new Date(), dateFormat));
+				props.setProperty("pg1_patientName", rs.getString("last_name")+", "+rs.getString("first_name"));
+				props.setProperty("pg1_phn", rs.getString("hin"));
+				props.setProperty("pg1_phone", rs.getString("phone") + "  " + rs.getString("phone2"));
+				props.setProperty("pg1_formDate", ConversionUtils.toDateString(new Date(), dateFormat));
+				providerNo = rs.getString("provider_no");
+			}
+			rs.close();
 
-    public int saveFormRecord(Properties props) throws SQLException {
-        String demographic_no = props.getProperty("demographic_no");
-        String sql = "SELECT * FROM formBCHP WHERE demographic_no=" + demographic_no + " AND ID=0";
+			if (providerNo != null && !providerNo.trim().equals(""))
+			{
+				ProviderData proData = new ProviderData();
+				proData.getProvider(providerNo);
 
-        FrmRecordHelp frh = new FrmRecordHelp();
-        frh.setDateFormat(_dateFormat);
-        return ((frh).saveFormRecord(props, sql));
-    }
+				props.setProperty("pg1_msp",proData.getOhip_no());
+				props.setProperty("pg1_md", "Dr. "+proData.getLast_name());
+			}
+		}
+		else
+		{
+			String sql = "SELECT * FROM formBCHP WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
+			FrmRecordHelp frh = new FrmRecordHelp();
+			frh.setDateFormat(dateFormat);
+			props = (frh).getFormRecord(sql);
 
-    public Properties getPrintRecord(int demographicNo, int existingID) throws SQLException {
-        String sql = "SELECT * FROM formBCHP WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
-        FrmRecordHelp frh = new FrmRecordHelp();
-        frh.setDateFormat(_dateFormat);
-        return ((frh).getPrintRecord(sql));
-    }
+			sql = "SELECT last_name, first_name, address, city, province, postal, phone,phone2, hin FROM demographic WHERE demographic_no = "
+					+ demographicNo;
+			ResultSet rs = DBHelp.searchDBRecord(sql);
+			if (rs.next())
+			{
+				props.setProperty("pg1_patientName_cur", rs.getString("last_name")+", "+rs.getString("first_name"));
+				props.setProperty("pg1_phn_cur", rs.getString("hin"));
+				props.setProperty("pg1_phone_cur", rs.getString("phone") + "  " + rs.getString("phone2"));
+			}
+		}
+		return props;
+	}
 
-    public String findActionValue(String submit) throws SQLException {
-        FrmRecordHelp frh = new FrmRecordHelp();
-        frh.setDateFormat(_dateFormat);
-        return ((frh).findActionValue(submit));
-    }
+	public int saveFormRecord(Properties props) throws SQLException {
+		String demographic_no = props.getProperty("demographic_no");
+		String sql = "SELECT * FROM formBCHP WHERE demographic_no=" + demographic_no + " AND ID=0";
 
-    public String createActionURL(String where, String action, String demoId, String formId) throws SQLException {
-        FrmRecordHelp frh = new FrmRecordHelp();
-        frh.setDateFormat(_dateFormat);
-        return ((frh).createActionURL(where, action, demoId, formId));
-    }
+		FrmRecordHelp frh = new FrmRecordHelp();
+		frh.setDateFormat(dateFormat);
+		return ((frh).saveFormRecord(props, sql));
+	}
+
+	public Properties getPrintRecord(int demographicNo, int existingID) throws SQLException {
+		String sql = "SELECT * FROM formBCHP WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
+		FrmRecordHelp frh = new FrmRecordHelp();
+		frh.setDateFormat(dateFormat);
+		return ((frh).getPrintRecord(sql));
+	}
+
+	public String findActionValue(String submit) throws SQLException {
+		FrmRecordHelp frh = new FrmRecordHelp();
+		frh.setDateFormat(dateFormat);
+		return ((frh).findActionValue(submit));
+	}
+
+	public String createActionURL(String where, String action, String demoId, String formId) throws SQLException {
+		FrmRecordHelp frh = new FrmRecordHelp();
+		frh.setDateFormat(dateFormat);
+		return ((frh).createActionURL(where, action, demoId, formId));
+	}
 
 }

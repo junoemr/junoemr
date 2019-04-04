@@ -365,6 +365,7 @@ public final class EDocUtil {
 			currentdoc.setReviewDateTime(ConversionUtils.toTimestampString(d.getReviewdatetime()));
 			currentdoc.setReviewDateTimeDate(d.getReviewdatetime());
             currentdoc.setContentDateTime(d.getContentdatetime());
+			currentdoc.setHasEncodingError(d.hasEncodingError());
             
             if(d.isRestrictToProgram() != null){            
             	currentdoc.setRestrictToProgram(d.isRestrictToProgram());
@@ -402,6 +403,7 @@ public final class EDocUtil {
 				currentdoc.setReviewDateTime(ConversionUtils.toTimestampString(d.getReviewdatetime()));
 				currentdoc.setReviewDateTimeDate(d.getReviewdatetime());
 				currentdoc.setContentDateTime(d.getContentdatetime());
+				currentdoc.setHasEncodingError(d.hasEncodingError());
 				if(d.isRestrictToProgram() != null)
 				{
 					currentdoc.setRestrictToProgram(d.isRestrictToProgram());
@@ -460,7 +462,8 @@ public final class EDocUtil {
 			currentdoc.setReviewerId(d.getReviewer());
 			currentdoc.setReviewDateTime(ConversionUtils.toTimestampString(d.getReviewdatetime()));
 			currentdoc.setReviewDateTimeDate(d.getReviewdatetime());
-                        currentdoc.setContentDateTime(d.getContentdatetime());
+			currentdoc.setContentDateTime(d.getContentdatetime());
+			currentdoc.setHasEncodingError(d.hasEncodingError());
 		}
 
 		return currentdoc;
@@ -553,6 +556,7 @@ public final class EDocUtil {
         currentdoc.setDocClass(d.getDocClass());
         currentdoc.setDocSubClass(d.getDocSubClass());
         currentdoc.setContentDateTime(d.getContentdatetime());
+		currentdoc.setHasEncodingError(d.hasEncodingError());
         if(d.isRestrictToProgram() != null && d.isRestrictToProgram()) {
         	currentdoc.setRestrictToProgram(true);
         }
@@ -589,7 +593,8 @@ public final class EDocUtil {
 			currentdoc.setStatus(d.getStatus());
 			currentdoc.setContentType(d.getContenttype());
 			currentdoc.setObservationDate(d.getObservationdate());
-                        currentdoc.setContentDateTime(d.getContentdatetime());
+			currentdoc.setContentDateTime(d.getContentdatetime());
+			currentdoc.setHasEncodingError(d.hasEncodingError());
 
 			list.add(currentdoc);
 		}
@@ -662,7 +667,8 @@ public final class EDocUtil {
 			currentdoc.setReviewerId(d.getReviewer());
 			currentdoc.setReviewDateTime(ConversionUtils.toTimestampString(d.getReviewdatetime()));
 			currentdoc.setReviewDateTimeDate(d.getReviewdatetime());
-                        currentdoc.setContentDateTime(d.getContentdatetime());
+			currentdoc.setContentDateTime(d.getContentdatetime());
+			currentdoc.setHasEncodingError(d.hasEncodingError());
 			resultDocs.add(currentdoc);
 		}
 
@@ -714,6 +720,7 @@ public final class EDocUtil {
 			currentdoc.setContentType(d.getContenttype());
 			currentdoc.setNumberOfPages(d.getNumberofpages());
             currentdoc.setContentDateTime(d.getContentdatetime());
+            currentdoc.setHasEncodingError(d.hasEncodingError());
             
             if(d.isRestrictToProgram() != null){
             	currentdoc.setRestrictToProgram(d.isRestrictToProgram());

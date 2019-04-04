@@ -35,6 +35,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 
 import oscar.oscarDB.DBHandler;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 public class FrmGripStrengthRecord extends FrmRecord {
@@ -43,91 +44,97 @@ public class FrmGripStrengthRecord extends FrmRecord {
 	public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID)
 		throws SQLException {
 		Properties props = new Properties();
-                
-                
-                ResultSet rs;
-                String sql;
 
-		if (existingID <= 0) {			
+		ResultSet rs;
+		String sql;
+
+		if (existingID <= 0)
+		{
 			sql = "SELECT demographic_no FROM demographic WHERE demographic_no = "
                               + demographicNo;
 			rs = DBHandler.GetSQL(sql);
-			if (rs.next()) {                                
+			if (rs.next())
+			{
 				props.setProperty("demographic_no",oscar.Misc.getString(rs, "demographic_no"));
 				props.setProperty("formCreated",UtilDateUtilities.DateToString(new Date(),_dateFormat));
 			}
 			rs.close();
-                        sql = "SELECT studyID FROM rehabStudy2004 WHERE demographic_no='"+demographicNo + "'";
-                        rs = DBHandler.GetSQL(sql);
-                        if (rs.next()){
-                            props.setProperty("studyID", oscar.Misc.getString(rs, "studyID"));
-                        }
-                        else{
-                            props.setProperty("studyID", "N/A");
-                        }
-                        rs.close();
-                        sql = "SELECT studyID FROM rehabStudy2004 WHERE demographic_no='"+demographicNo + "'";
-                        rs = DBHandler.GetSQL(sql);
-                        if (rs.next()){
-                            props.setProperty("studyID", oscar.Misc.getString(rs, "studyID"));
-                        }
-                        else{
-                            props.setProperty("studyID", "N/A");
-                        }
-                        rs.close();
-		} else {
+			sql = "SELECT studyID FROM rehabStudy2004 WHERE demographic_no='"+demographicNo + "'";
+			rs = DBHandler.GetSQL(sql);
+			if (rs.next())
+			{
+				props.setProperty("studyID", oscar.Misc.getString(rs, "studyID"));
+			}
+			else
+			{
+				props.setProperty("studyID", "N/A");
+			}
+			rs.close();
+			sql = "SELECT studyID FROM rehabStudy2004 WHERE demographic_no='"+demographicNo + "'";
+			rs = DBHandler.GetSQL(sql);
+			if (rs.next())
+			{
+				props.setProperty("studyID", oscar.Misc.getString(rs, "studyID"));
+			}
+			else
+			{
+				props.setProperty("studyID", "N/A");
+			}
+			rs.close();
+		}
+		else
+		{
 			sql =   "SELECT * FROM formGripStrength WHERE demographic_no = "
                                 + demographicNo
                                 + " AND ID = "
                                 + existingID;
 			rs = DBHandler.GetSQL(sql);
 
-                        if(rs.next())
-                        {
-                            MiscUtils.getLogger().debug("getting metaData");
-                            ResultSetMetaData md = rs.getMetaData();
+			if (rs.next())
+			{
+				MiscUtils.getLogger().debug("getting metaData");
+				ResultSetMetaData md = rs.getMetaData();
 
-                            for(int i=1; i<=md.getColumnCount(); i++)
-                            {
-                                String name = md.getColumnName(i);
+				for (int i = 1; i <= md.getColumnCount(); i++)
+				{
+					String name = md.getColumnName(i);
 
-                                String value;
-                                    MiscUtils.getLogger().debug(" name = "+name+" type = "+md.getColumnTypeName(i)+" scale = "+md.getScale(i));
-                                if(md.getColumnTypeName(i).equalsIgnoreCase("TINY"))           
-                                {
+					String value;
+						MiscUtils.getLogger().debug(" name = "+name+" type = "+md.getColumnTypeName(i)+" scale = "+md.getScale(i));
+					if (md.getColumnTypeName(i).equalsIgnoreCase("TINY"))
+					{
+						if (rs.getInt(i) == 1)
+						{
+							value = "checked='checked'";
+							MiscUtils.getLogger().debug("checking "+name);
+						}
+						else
+						{
+							value = "";
+							MiscUtils.getLogger().debug("not checking "+name);
+						}
+					}
+					else
+					{
+						if (md.getColumnTypeName(i).equalsIgnoreCase("date"))
+						{
+							value = ConversionUtils.toDateString(rs.getDate(i),"yyyy/MM/dd");
+						}
+						else
+						{
+							value = oscar.Misc.getString(rs, i);
+						}
+					}
 
-                                    if(rs.getInt(i)==1)
-                                    {
-                                        value = "checked='checked'";
-                                        MiscUtils.getLogger().debug("checking "+name);
-                                    }
-                                    else
-                                    {
-                                        value = "";
-                                        MiscUtils.getLogger().debug("not checking "+name);
-                                    }
-                                }
-                                else
-                                {
-                                    if(md.getColumnTypeName(i).equalsIgnoreCase("date"))
-                                    {
-                                        value = UtilDateUtilities.DateToString(rs.getDate(i),"yyyy/MM/dd");
-                                    }
-                                    else
-                                    {
-                                        value = oscar.Misc.getString(rs, i);
-                                    }
-                                }
-
-                                if(value!=null)
-                                {
-                                    props.setProperty(name, value);
-                                }
-                            }
-                        }
-                        rs.close();
-                    }
-                    return props;
+					if (value!=null)
+					{
+						props.setProperty(name, value);
+					}
+				}
+			}
+			rs.close();
+		}
+		return props;
 	}
 
 	public int saveFormRecord(Properties props) throws SQLException {

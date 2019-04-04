@@ -235,7 +235,8 @@ String userlastname = (String) session.getAttribute("userlastname");
 				                    <div>
 				                        <input class="tightCheckbox1"
 						                        type="checkbox" name="docNo" id="docNo<%=curDoc.getDocId()%>"
-						                        value="<%=curDoc.getDocId()%>"/>
+						                        value="<%=curDoc.getDocId()%>"
+				                                <%=curDoc.isPrintable() ? "":"disabled=\"disabled\""%>/>
 					                    <div class="hiddenLabel doc"><%=truncatedDisplayName%></div>
 					                    <img title="<%= printTitle %>" src="<%= printImage %>" alt="<%= printAlt %>">
 					                    <a class="preview-link-name" href="#" onclick="<%=onClick%>" >

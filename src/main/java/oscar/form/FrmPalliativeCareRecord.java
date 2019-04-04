@@ -33,33 +33,34 @@ import java.util.Properties;
 import org.oscarehr.util.LoggedInInfo;
 
 import oscar.oscarDB.DBHandler;
-import oscar.util.UtilDateUtilities;
+import oscar.util.ConversionUtils;
 
 public class FrmPalliativeCareRecord  extends FrmRecord {
     public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID)
             throws SQLException {
         Properties props = new Properties();
 
-        if(existingID <= 0) {
-			
+        if (existingID <= 0)
+        {
             String sql = "SELECT demographic_no, CONCAT(last_name, ', ', first_name) AS pName "
                 + "FROM demographic WHERE demographic_no = " + demographicNo;
             ResultSet rs = DBHandler.GetSQL(sql);
 
-            if(rs.next()) {
+            if (rs.next())
+            {
                 props.setProperty("demographic_no", oscar.Misc.getString(rs, "demographic_no"));
-                props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
-                //props.setProperty("formEdited", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
-                props.setProperty("formDate", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
+                props.setProperty("formCreated", ConversionUtils.toDateString(new Date(), "yyyy/MM/dd"));
+                props.setProperty("formDate", ConversionUtils.toDateString(new Date(), "yyyy/MM/dd"));
                 props.setProperty("pName", oscar.Misc.getString(rs, "pName"));
             }
             rs.close();
 
-        } else {
+        }
+        else
+        {
             String sql = "SELECT * FROM formPalliativeCare WHERE demographic_no = " +demographicNo +" AND ID = " +existingID;
 			props = (new FrmRecordHelp()).getFormRecord(sql);
         }
-
         return props;
     }
 
