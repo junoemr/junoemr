@@ -314,16 +314,18 @@ public class LabPDFCreator extends PdfPageEventHelper {
 			table.addCell(cell);
 		}
 
+		// Set these for every lab
+		cell.setColspan(1);
+		cell.setBorder(15);
+		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+		cell.setBackgroundColor(new Color(210, 212, 255));
+		cell.setPhrase(new Phrase("Test Name(s)", boldFont));
+		table.addCell(cell);
+		cell.setPhrase(new Phrase("Result", boldFont));
+		table.addCell(cell);
 		// table headers
-		if (isUnstructuredDoc) {
-			cell.setColspan(1);
-			cell.setBorder(15);
-			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-			cell.setBackgroundColor(new Color(210, 212, 255));
-			cell.setPhrase(new Phrase("Test Name(s)", boldFont));
-			table.addCell(cell);
-			cell.setPhrase(new Phrase("Result", boldFont));
-			table.addCell(cell);
+		if (isUnstructuredDoc)
+		{
 			if (isTypeCLS)
 			{
 				String phrase = (handler.getMsgType().equals("CLSDI")) ? "Exam Date" : "Date/Time Collected";
@@ -340,25 +342,19 @@ public class LabPDFCreator extends PdfPageEventHelper {
 		}
 		else
 		{
-			cell.setColspan(1);
-			cell.setBorder(15);
-			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-			cell.setBackgroundColor(new Color(210, 212, 255));
-			cell.setPhrase(new Phrase("Test Name(s)", boldFont));
-			table.addCell(cell);
-			cell.setPhrase(new Phrase("Result", boldFont));
-			table.addCell(cell);
 			cell.setPhrase(new Phrase("Abn", boldFont));
 			table.addCell(cell);
 			cell.setPhrase(new Phrase("Reference Range", boldFont));
 			table.addCell(cell);
 			cell.setPhrase(new Phrase("Units", boldFont));
 			table.addCell(cell);
-			if (isTypeCLS) {
+			if (isTypeCLS)
+			{
 				String phrase = (handler.getMsgType().equals("CLSDI")) ? "Exam Date" : "Date/Time Collected";
 				cell.setPhrase(new Phrase(phrase, boldFont));
 			}
-			else {
+			else
+			{
 				cell.setPhrase(new Phrase("Date/Time Completed", boldFont));
 			}
 			table.addCell(cell);
@@ -370,7 +366,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 		// add test results
 		int obrCount = handler.getOBRCount();
 		cell.setBorder(12);
-		cell.setBorderColor(Color.BLACK); // cell.setBorderColor(Color.WHITE);
+		cell.setBorderColor(Color.BLACK);
 		cell.setBackgroundColor(new Color(255, 255, 255));
 
 		if (handler.getMsgType().equals("MEDVUE"))
@@ -432,14 +428,12 @@ public class LabPDFCreator extends PdfPageEventHelper {
 							}
 
 							// add the obx results and info
-							Font lineFont = new Font(bf, 8, Font.NORMAL,
-									getTextColor(handler,handler.getOBXAbnormalFlag(j,
-											k)));
-							if(isUnstructuredDoc)
+							Font lineFont = new Font(bf, 8, Font.NORMAL, getTextColor(handler.getOBXAbnormalFlag(j, k)));
+							if (isUnstructuredDoc)
 							{
 								cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 								//if there are duplicate obxNames, display only the first 
-								if((k > 0 && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (obxCount>1)))
+								if ((k > 0 && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (obxCount>1)))
 								{
 									cell.setPhrase(new Phrase("", lineFont));
 									table.addCell(cell);
@@ -465,129 +459,127 @@ public class LabPDFCreator extends PdfPageEventHelper {
 								}
 								if(isTypeCLS)
 								{
-									cell.setPhrase(new Phrase(handler
-											.getOBXResultStatus(j, k), lineFont));
+									cell.setPhrase(new Phrase(handler.getOBXResultStatus(j, k), lineFont));
 									table.addCell(cell);
 								}
 							}
 							else
 							{
-							cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-							if(!isAllowedDuplicate
-									&& (obxCount>1)
-									&& k > 0
-									&& handler.getOBXIdentifier(j, k).equals(handler.getOBXIdentifier(j, k-1))
-									&& (handler.getOBXValueType(j, k).equals("TX") || handler.getOBXValueType(j, k).equals("FT")))
-							{
-								cell.setPhrase(new Phrase("", lineFont));
-								table.addCell(cell);
-							}
-							else
-							{
-								cell.setBorder(Rectangle.LEFT);
-								cell.setColspan(1);
-								cell.setPhrase(new Phrase((obrFlag ? "   " : "") + obxName, lineFont));
-								table.addCell(cell);
-							}
-							boolean isLongText =false;
-							if(handler.getMsgType().equals("PATHL7"))
-							{
-								cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t","\u00a0\u00a0\u00a0\u00a0"), lineFont));
-								//if this PATHL7 result is from CDC/SG and is greater than 100 characters
-								if((handler.getOBXResult(j, k).length() > 100) && (handler.getPatientLocation().equals("SG") || handler.getPatientLocation().equals("CDC")))
+								cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+								if (!isAllowedDuplicate
+										&& (obxCount>1)
+										&& k > 0
+										&& handler.getOBXIdentifier(j, k).equals(handler.getOBXIdentifier(j, k-1))
+										&& (handler.getOBXValueType(j, k).equals("TX") || handler.getOBXValueType(j, k).equals("FT")))
 								{
-									cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-									//if the Abn, Reference Range and Units are empty or equal to null, give the long result the use of those columns
-									if ((handler.getOBXAbnormalFlag(j, k) == null || handler.getOBXAbnormalFlag(j, k).isEmpty()) &&
-										(handler.getOBXReferenceRange(j, k) == null || handler.getOBXReferenceRange(j, k).isEmpty()) &&
-										(handler.getOBXUnits(j, k) == null || handler.getOBXUnits(j, k).isEmpty()))
+									cell.setPhrase(new Phrase("", lineFont));
+									table.addCell(cell);
+								}
+								else
+								{
+									cell.setBorder(Rectangle.LEFT);
+									cell.setColspan(1);
+									cell.setPhrase(new Phrase((obrFlag ? "   " : "") + obxName, lineFont));
+									table.addCell(cell);
+								}
+								boolean isLongText = false;
+								if (handler.getMsgType().equals("PATHL7"))
+								{
+									cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t","\u00a0\u00a0\u00a0\u00a0"), lineFont));
+									//if this PATHL7 result is from CDC/SG and is greater than 100 characters
+									if ((handler.getOBXResult(j, k).length() > 100) &&
+											(handler.getPatientLocation().equals("SG") || handler.getPatientLocation().equals("CDC")))
 									{
-										isLongText = true;
-										cell.setColspan(4);
+										cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+										//if the Abn, Reference Range and Units are empty or equal to null, give the long result the use of those columns
+										if ((handler.getOBXAbnormalFlag(j, k) == null || handler.getOBXAbnormalFlag(j, k).isEmpty()) &&
+											(handler.getOBXReferenceRange(j, k) == null || handler.getOBXReferenceRange(j, k).isEmpty()) &&
+											(handler.getOBXUnits(j, k) == null || handler.getOBXUnits(j, k).isEmpty()))
+										{
+											isLongText = true;
+											cell.setColspan(4);
+											table.addCell(cell);
+										}
+										else
+										{//else use the 6 remaining columns, and add a new empty cell that takes the first two columns(Test & Results).
+										//This will allow the corresponding Abn, RR and Units to be printed beneath the long result in the appropriate columns
+											cell.setColspan(6);
+											table.addCell(cell);
+											cell.setPhrase(new Phrase("", lineFont));
+											cell.setColspan(2);
+											table.addCell(cell);
+										}
+									}
+									else
+									{
+										cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+										table.addCell(cell);
+									}
+								}
+								else if (handler.getMsgType().equals("ALPHA"))
+								{
+									cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0"), lineFont));
+									if (handler.getOBXValueType(j, k).equals("FT"))
+									{
+										cell.setPhrase(new Phrase("", lineFont));
+										cell.setColspan(1);
 										table.addCell(cell);
 									}
 									else
-									{//else use the 6 remaining columns, and add a new empty cell that takes the first two columns(Test & Results).
-									//This will allow the corresponding Abn, RR and Units to be printed beneath the long result in the appropriate columns
-										cell.setColspan(6);
-										table.addCell(cell);
-										cell.setPhrase(new Phrase("", lineFont));
-										cell.setColspan(2);
-										table.addCell(cell);
-									}
-								}
-								else
-								{
-									cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-									table.addCell(cell);
-								}
-							}
-							else if (handler.getMsgType().equals("ALPHA"))
-							{
-								cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0"), lineFont));
-								if (handler.getOBXValueType(j, k).equals("FT"))
-								{
-									cell.setPhrase(new Phrase("", lineFont));
-									cell.setColspan(1);
-									table.addCell(cell);
-								}
-								else
-								{
-									cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-									table.addCell(cell);
-								}
-							}
-							else
-							{
-								cell.setPhrase(new Phrase(handler
-										.getOBXResult(j, k).replaceAll(
-												"<br\\s*/*>", "\n"), lineFont));
-								cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-								table.addCell(cell);
-							}
-							cell.setColspan(1);
-							cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-							
-							String abnFlag = handler.getOBXAbnormalFlag(j, k);
-							if(!isLongText) //if the Abn, RR and Unit columns have not been occupied above
-							{
-								if(handler.getMsgType().equals("PATHL7"))
-								{
-									cell.setPhrase(new Phrase(abnFlag, lineFont));
-								} 
-								else if(isTypeCLS)
-								{
-									cell.setPhrase(new Phrase(
-										(handler.isOBXAbnormal(j, k) ?
-											handler.getOBXAbnormalFlag(j, k) :
-											""),
-										lineFont));
-								}
-								else
-								{
-									if (abnFlag == null || abnFlag.trim().equals(""))
 									{
-										abnFlag = "N";
+										cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+										table.addCell(cell);
 									}
-									cell.setPhrase(new Phrase(abnFlag, lineFont));
 								}
+								else
+								{
+									cell.setPhrase(new Phrase(handler
+											.getOBXResult(j, k).replaceAll(
+													"<br\\s*/*>", "\n"), lineFont));
+									cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+									table.addCell(cell);
+								}
+								cell.setColspan(1);
+								cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+								String abnFlag = handler.getOBXAbnormalFlag(j, k);
+								if (!isLongText) //if the Abn, RR and Unit columns have not been occupied above
+								{
+									if(handler.getMsgType().equals("PATHL7"))
+									{
+										cell.setPhrase(new Phrase(abnFlag, lineFont));
+									}
+									else if(isTypeCLS)
+									{
+										cell.setPhrase(new Phrase(
+											(handler.isOBXAbnormal(j, k) ?
+												handler.getOBXAbnormalFlag(j, k) :
+												""),
+											lineFont));
+									}
+									else
+									{
+										if (abnFlag == null || abnFlag.trim().equals(""))
+										{
+											abnFlag = "N";
+										}
+										cell.setPhrase(new Phrase(abnFlag, lineFont));
+									}
+									table.addCell(cell);
+									cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+									cell.setPhrase(new Phrase(handler.getOBXReferenceRange(j, k), lineFont));
+									table.addCell(cell);
+									cell.setPhrase(new Phrase(handler.getOBXUnits(j, k), lineFont));
+									table.addCell(cell);
+								}
+
+								cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+								cell.setPhrase(new Phrase(handler.getTimeStamp(j, k), lineFont));
 								table.addCell(cell);
-								cell.setHorizontalAlignment(Element.ALIGN_LEFT);
-								cell.setPhrase(new Phrase(handler
-										.getOBXReferenceRange(j, k), lineFont));
+								cell.setPhrase(new Phrase(handler.getOBXResultStatus(j, k), lineFont));
+								cell.setBorder(Rectangle.RIGHT | Rectangle.LEFT);
 								table.addCell(cell);
-								cell.setPhrase(new Phrase(
-										handler.getOBXUnits(j, k), lineFont));
-								table.addCell(cell);
-							}// end of isLongText
-							cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-							cell.setPhrase(new Phrase(handler
-									.getTimeStamp(j, k), lineFont));
-							table.addCell(cell);
-							cell.setPhrase(new Phrase(handler
-									.getOBXResultStatus(j, k), lineFont));
-							cell.setBorder(Rectangle.RIGHT | Rectangle.LEFT);
-							table.addCell(cell);}
+							}
 							
 							if(!handler.getMsgType().equals("PFHT"))
 							{
@@ -623,7 +615,10 @@ public class LabPDFCreator extends PdfPageEventHelper {
 									cell.setColspan(1);
 									cell.setBorder(Rectangle.BOTTOM | Rectangle.TOP | Rectangle.LEFT);
 									table.addCell(cell);
-									cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0"), monospaceFont));
+									cell.setPhrase(new Phrase(handler.
+											getOBXResult(j, k).replaceAll(
+													"<br\\s*/*>", "\n").replace(
+															"\t", "\u00a0\u00a0\u00a0\u00a0"), monospaceFont));
 									cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 									cell.setColspan(6);
 									cell.setBorder(Rectangle.BOTTOM | Rectangle.TOP | Rectangle.RIGHT);
@@ -632,8 +627,8 @@ public class LabPDFCreator extends PdfPageEventHelper {
 							}
 						// if (DNS)
 						}
-						else if ((handler.getMsgType().equals("EPSILON") && header.equals(handler.getOBXIdentifier(j,k)) && obxName.equals(""))
-								|| (handler.getMsgType().equals("PFHT") && obxName.equals("")&& header.equals(handler.getObservationHeader(j,k))))
+						else if ((handler.getMsgType().equals("EPSILON") && header.equals(handler.getOBXIdentifier(j,k)) && obxName.equals("")) ||
+								(handler.getMsgType().equals("PFHT") && obxName.equals("")&& header.equals(handler.getObservationHeader(j,k))))
 						{
 							cell.setPaddingLeft(100);
 							cell.setColspan(7);
@@ -707,13 +702,12 @@ public class LabPDFCreator extends PdfPageEventHelper {
 						for (int k = 0; k < handler.getOBRCommentCount(j); k++)
 						{
 							// the obrName should only be set if it has not been
-							// set already which will only have occured if the
+							// set already which will only have occurred if the
 							// obx name is "" or if it is the same as the obr name
 							if (!obrFlag && handler.getOBXName(j, 0).equals(""))
 							{
 
-								cell.setPhrase(new Phrase(handler.getOBRName(j),
-										boldFont));
+								cell.setPhrase(new Phrase(handler.getOBRName(j), boldFont));
 								table.addCell(cell);
 								obrFlag = true;
 							}
@@ -725,11 +719,11 @@ public class LabPDFCreator extends PdfPageEventHelper {
 									Phrase phrase= new Phrase();
 									StringReader strReader = new StringReader(handler.getOBRComment(j, k));
 									@SuppressWarnings("rawtypes")
-									ArrayList p = HTMLWorker.parseToList(strReader, null);
+									ArrayList parsedList = HTMLWorker.parseToList(strReader, null);
 									strReader.close();
-									for (int h=0; h<p.size();h++)
+									for (int h = 0; h < parsedList.size(); h++)
 									{
-										phrase.add(p.get(h));
+										phrase.add(parsedList.get(h));
 										phrase.add("\n");
 									}
 									cell.setPhrase(phrase);
@@ -759,11 +753,13 @@ public class LabPDFCreator extends PdfPageEventHelper {
 	}
 
 
-    /*
+    /**
      *  getTextColor will return the the color corresponding to the abnormal
      *  status of the result.
+	 * @param abn single character flag that indicates [A]bnormal, [H]igh, or [L]ow
+	 * @return Color object that highlights red for abnormal/high results, blue for low, black otherwise
      */
-    private Color getTextColor(MessageHandler handler, String abn) {
+    private Color getTextColor(String abn) {
         Color ret = Color.BLACK;
         if (abn != null && (abn.equals("A") || abn.startsWith("H")))
         {
@@ -773,7 +769,6 @@ public class LabPDFCreator extends PdfPageEventHelper {
         {
             ret = Color.BLUE;
         }
-
         return ret;
     }
 
@@ -833,12 +828,16 @@ public class LabPDFCreator extends PdfPageEventHelper {
         rInfoTable.addCell(cell);
         cell.setPhrase(new Phrase("Report Status: ", boldFont));
         rInfoTable.addCell(cell);
-        if(handler.getMsgType().equals("PATHL7")){
+        if (handler.getMsgType().equals("PATHL7"))
+        {
         	cell.setPhrase(new Phrase((handler.getOrderStatus().equals("F") ? "Final" : (handler.getOrderStatus().equals("C") ? "Corrected" : "Preliminary")), font));
         	rInfoTable.addCell(cell);
-        }else{
-        cell.setPhrase(new Phrase((handler.getOrderStatus().equals("F") ? "Final" : (handler.getOrderStatus().equals("C") ? "Corrected" : "Partial")), font));
-        rInfoTable.addCell(cell);}
+        }
+        else
+        {
+			cell.setPhrase(new Phrase((handler.getOrderStatus().equals("F") ? "Final" : (handler.getOrderStatus().equals("C") ? "Corrected" : "Partial")), font));
+			rInfoTable.addCell(cell);
+        }
         cell.setPhrase(new Phrase("Client Ref. #: ", boldFont));
         rInfoTable.addCell(cell);
         cell.setPhrase(new Phrase(handler.getClientRef(), font));
@@ -848,7 +847,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
         cell.setPhrase(new Phrase(handler.getAccessionNum(), font));
         rInfoTable.addCell(cell);
 
-        //Create client table
+        // Create client table
         float[] clientWidths = {2f, 3f};
         Phrase clientPhrase = new Phrase();
         PdfPTable clientTable = new PdfPTable(clientWidths);
@@ -863,10 +862,11 @@ public class LabPDFCreator extends PdfPageEventHelper {
         cell.setPhrase(clientPhrase);
         clientTable.addCell(cell);
 
-        //Create header info table
+        // Create header info table
         float[] tableWidths = {2f, 1f};
         PdfPTable table = new PdfPTable(tableWidths);
-        if (multiID.length > 1){
+        if (multiID.length > 1)
+        {
             cell = new PdfPCell(new Phrase("Version: "+versionNum+" of "+multiID.length, boldFont));
             cell.setBackgroundColor(new Color(210, 212, 255));
             cell.setPadding(3);
