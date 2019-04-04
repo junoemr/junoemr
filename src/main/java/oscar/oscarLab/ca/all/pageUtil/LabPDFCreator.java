@@ -77,7 +77,6 @@ import java.util.List;
 public class LabPDFCreator extends PdfPageEventHelper {
     private OutputStream os;
 
-    private boolean isUnstructuredDoc = false;
     private MessageHandler handler;
     List<MessageHandler>handlers = new ArrayList<MessageHandler>();
     
@@ -258,16 +257,18 @@ public class LabPDFCreator extends PdfPageEventHelper {
 	 */
 	private void addLabCategory(String header, MessageHandler extraHandler) throws DocumentException {
 		MessageHandler handler = (extraHandler != null) ? extraHandler : this.handler;
+		boolean isUnstructuredDoc;
+
 		if (handler.getMsgType().equals("PATHL7")) {
-			this.isUnstructuredDoc = ((PATHL7Handler) handler).unstructuredDocCheck(header);
+			isUnstructuredDoc = ((PATHL7Handler) handler).unstructuredDocCheck(header);
 		}
 		else
 		{
-			this.isUnstructuredDoc = handler.isUnstructured();
+			isUnstructuredDoc = handler.isUnstructured();
 		}
 		
 		float[] mainTableWidths;
-		if(isUnstructuredDoc)
+		if (isUnstructuredDoc)
 		{
 			if(isTypeCLS)
 			{
@@ -283,7 +284,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 		}
 		
 		PdfPTable table = new PdfPTable(mainTableWidths);
-		if(isUnstructuredDoc)
+		if (isUnstructuredDoc)
 		{
 			table.setHeaderRows(1);
 		}
@@ -295,7 +296,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 
 		PdfPCell cell = new PdfPCell();
 		// category name
-		if(!isUnstructuredDoc)
+		if (!isUnstructuredDoc)
 		{
 			cell.setPadding(3);
 			cell.setPhrase(new Phrase("  "));
