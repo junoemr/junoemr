@@ -42,9 +42,9 @@
 
 <%
 String rx_enhance = OscarProperties.getInstance().getProperty("rx_enhance");
-%>	
+%>
 
-<% 
+<%
 if (rx_enhance!=null && rx_enhance.equals("true")) {
 	if (request.getParameter("ID") != null) { %>
 		<script>
@@ -52,7 +52,7 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
 			window.close();
 		</script>
 <%
-	} 
+	}
 }
         com.quatro.service.security.SecurityManager securityManager = new com.quatro.service.security.SecurityManager();
 %>
@@ -98,7 +98,7 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
 <% response.sendRedirect("../acctLocked.html"); %>
 </security:oscarSec>
 
-<%         
+<%
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
             String providerNo=bean.getProviderNo();
             //String reRxDrugId=request.getParameter("reRxDrugId");
@@ -143,7 +143,7 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
 
             RxPharmacyData pharmacyData = new RxPharmacyData();
             List<PharmacyInfo> pharmacyList;
-            pharmacyList = pharmacyData.getPharmacyFromDemographic(Integer.toString(demoNo));                        
+            pharmacyList = pharmacyData.getPharmacyFromDemographic(Integer.toString(demoNo));
 
             String drugref_route = OscarProperties.getInstance().getProperty("drugref_route");
             if (drugref_route == null) {
@@ -156,24 +156,24 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
             oscar.oscarRx.data.RxPrescriptionData.Prescription[] prescribedDrugs;
                         prescribedDrugs = patient.getPrescribedDrugScripts(); //this function only returns drugs which have an entry in prescription and drugs table
                         String script_no = "";
-                        
+
             //This checks if the provider has the ExternalPresriber feature enabled, if so then a link appear for the provider to access the ExternalPrescriber
             ProviderPreference providerPreference=ProviderPreferencesUIBean.getProviderPreference(loggedInInfo.getLoggedInProviderNo());
-            
+
             boolean eRxEnabled= false;
             String eRx_SSO_URL = null;
             String eRxUsername = null;
             String eRxPassword = null;
             String eRxFacility = null;
             String eRxTrainingMode="0"; //not in training mode
-            
+
             if(providerPreference!=null){
             	eRxEnabled = providerPreference.isERxEnabled();
                 eRx_SSO_URL = providerPreference.getERx_SSO_URL();
                 eRxUsername = providerPreference.getERxUsername();
                 eRxPassword = providerPreference.getERxPassword();
                 eRxFacility = providerPreference.getERxFacility();
-                	                
+
                 boolean eRxTrainingModeTemp = providerPreference.isERxTrainingMode();
                 if(eRxTrainingModeTemp) eRxTrainingMode="1";
              }
@@ -186,8 +186,8 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
 		issueIds[idx] = String.valueOf(issue.getId());
 	    }
 	   List<CaseManagementNote> notes = cmgmtMgr.getNotes(bean.getDemographicNo()+"", issueIds);
-             
-             
+
+
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
@@ -197,7 +197,7 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
         <link rel="stylesheet" type="text/css" href="styles.css">
 
         <html:base />
-        
+
         <script type="text/javascript" >
         	var ctx = '${ ctx }';
         </script>
@@ -449,6 +449,7 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
                 if (itm.match(/^\d\d[\/-]\d\d[\/-]\d\d\d\d$/)) sortfn = ts_sort_date;
                 if (itm.match(/^\d\d[\/-]\d\d[\/-]\d\d$/)) sortfn = ts_sort_date;
                 if (itm.match(/^[£$]/)) sortfn = ts_sort_currency;
+				if (itm.match(/^[\Uffffffff$]/)) sortfn = ts_sort_currency;
                 if (itm.match(/^[\d\.]+$/)) sortfn = ts_sort_numeric;
                 SORT_COLUMN_INDEX = column;
                 var firstRow = new Array();
@@ -843,7 +844,8 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
         <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1" height="100%">
             <%@ include file="TopLinks2.jspf" %><!-- Row One included here-->
             <tr>
-                <%@ include file="SideLinksEditFavorites2.jsp"%><%-- <td></td>Side Bar File --%>
+                <%-- <td></td>Side Bar File --%>
+				<td width="10%" height="100%" valign="top"><%@ include file="SideLinksEditFavorites2.jsp"%></td>
                 <td style="border-left: 2px solid #A9A9A9;" height="100%" valign="top"><!--Column Two Row Two-->
 
 
@@ -954,7 +956,7 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
                                         </tr>
                                         <tr>
                                             <td>
-                                            
+
 <%-- Start List Drugs Prescribed --%>
                                                 <div style="height: 100px; overflow: auto; background-color: #DCDCDC; border: thin solid green; display: none;" id="reprint">
                                                     <%
@@ -982,7 +984,7 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
                         }
                                                     %>
                                                 </div>
-                                                
+
                                             </td>
                                         </tr>
                                         <tr><!--move this left-->
@@ -996,7 +998,7 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
                                                                             <a href="javascript:void(0);" title="View drug profile legend" onclick="ThemeViewer();" style="font-style:normal;color:#000000" >
                                                                             	<bean:message key="SearchDrug.msgProfileLegend"/>:
                                                                             </a>
-                                                                            <a href="#"  title="<bean:message key="provider.rxChangeProfileViewMessage"/>" 
+                                                                            <a href="#"  title="<bean:message key="provider.rxChangeProfileViewMessage"/>"
                                                                             	onclick="popupPage(230,860,'../setProviderStaleDate.do?method=viewRxProfileView');" style="color:red;text-decoration:none" >
                                                                             	<bean:message key="provider.rxChangeProfileView"/>
                                                                             </a>
@@ -1008,29 +1010,29 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
 																			<tr>
 																				<%if(show_current){%>
 																				<td >
-		                                                                            <a href="javascript:void(0);" onclick="callReplacementWebService('ListDrugs.jsp','drugProfile');CngClass(this);" 
-		                                                                            	id="selected_default" style="font: Arial; color:#000000; text-decoration: none;" 
+		                                                                            <a href="javascript:void(0);" onclick="callReplacementWebService('ListDrugs.jsp','drugProfile');CngClass(this);"
+		                                                                            	id="selected_default" style="font: Arial; color:#000000; text-decoration: none;"
 		                                                                            	TITLE="<bean:message key='SearchDrug.msgShowCurrentDesc'/>">
 		                                                                            	<bean:message key="SearchDrug.msgShowCurrent"/>
 		                                                                            </a>
 	                                                                            </td>
 																				<%}if(show_all){%>
 	                                                                            <td >
-																					<a href="javascript:void(0);" onclick="callReplacementWebService('ListDrugs.jsp?show=all','drugProfile');CngClass(this);" 
+																					<a href="javascript:void(0);" onclick="callReplacementWebService('ListDrugs.jsp?show=all','drugProfile');CngClass(this);"
 																						Title="<bean:message key='SearchDrug.msgShowAllDesc'/>">
 																						<bean:message key="SearchDrug.msgShowAll"/>
 																					</a>
 	                                                                            </td>
 																				<%}if(active){%>
 																				<td >
-																					<a href="javascript:void(0);" onclick="callReplacementWebService('ListDrugs.jsp?status=active','drugProfile');CngClass(this);" 
+																					<a href="javascript:void(0);" onclick="callReplacementWebService('ListDrugs.jsp?status=active','drugProfile');CngClass(this);"
 																						TITLE="<bean:message key='SearchDrug.msgActiveDesc'/>">
 																						<bean:message key="SearchDrug.msgActive"/>
 																					</a>
 	                                                                            </td>
 																				<%}if(inactive){%>
 																				<td >
-																					<a href="javascript:void(0);" onclick="callReplacementWebService('ListDrugs.jsp?status=inactive','drugProfile');CngClass(this);" 
+																					<a href="javascript:void(0);" onclick="callReplacementWebService('ListDrugs.jsp?status=inactive','drugProfile');CngClass(this);"
 																						TITLE="<bean:message key='SearchDrug.msgInactiveDesc'/>">
 																						<bean:message key="SearchDrug.msgInactive"/>
 																					</a>
@@ -1039,14 +1041,14 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
 
 																				if(longterm_acute){%>
 																				<td >
-																					<a href="javascript:void(0);" onclick="callReplacementWebService('ListDrugs.jsp?longTermOnly=true&heading=Long Term Meds','drugProfile'); callAdditionWebService('ListDrugs.jsp?longTermOnly=acute&heading=Acute','drugProfile');CngClass(this);" 
+																					<a href="javascript:void(0);" onclick="callReplacementWebService('ListDrugs.jsp?longTermOnly=true&heading=Long Term Meds','drugProfile'); callAdditionWebService('ListDrugs.jsp?longTermOnly=acute&heading=Acute','drugProfile');CngClass(this);"
 																						TITLE="<bean:message key='SearchDrug.msgLongTermAcuteDesc'/>">
 																						<bean:message key="SearchDrug.msgLongTermAcute"/>
 																					</a>
 	                                                                            </td>
 																				<%}if(longterm_acute_inactive_external){%>
 																				<td >
-																					<a href="javascript:void(0);" onclick="callReplacementWebService('ListDrugs.jsp?longTermOnly=true&heading=Long Term Meds','drugProfile'); callAdditionWebService('ListDrugs.jsp?longTermOnly=acute&heading=Acute&status=active','drugProfile');callAdditionWebService('ListDrugs.jsp?longTermOnly=acute&heading=Inactive&status=inactive','drugProfile');callAdditionWebService('ListDrugs.jsp?heading=External&drugLocation=external','drugProfile');CngClass(this);" 
+																					<a href="javascript:void(0);" onclick="callReplacementWebService('ListDrugs.jsp?longTermOnly=true&heading=Long Term Meds','drugProfile'); callAdditionWebService('ListDrugs.jsp?longTermOnly=acute&heading=Acute&status=active','drugProfile');callAdditionWebService('ListDrugs.jsp?longTermOnly=acute&heading=Inactive&status=inactive','drugProfile');callAdditionWebService('ListDrugs.jsp?heading=External&drugLocation=external','drugProfile');CngClass(this);"
 																						TITLE="<bean:message key='SearchDrug.msgLongTermAcuteInactiveExternalDesc'/>">
 																						<bean:message key="SearchDrug.msgLongTermAcuteInactiveExternal"/>
 																					</a>
@@ -1094,7 +1096,7 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
                                         		</tr>
                                         		 <%
                                         		// java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("yyyy-MM-dd");
-                                     			
+
                                 			for(CaseManagementNote note:notes) {
                             				if (!note.isLocked() && !note.isArchived()) {
                             					String str = note.getNote();
@@ -1103,16 +1105,16 @@ if (rx_enhance!=null && rx_enhance.equals("true")) {
                             							<td><%=formatter.format(note.getCreate_date()) %></td>
                             							<td><%=StringEscapeUtils.escapeHtml(str)%></td>
                             						</tr>
-                            					<% 
+                            					<%
                             				}
                             			}
                             			 %>
-                            			 
+
                                         	</table>
                                         	</td>
                                         </tr>
                                     </table>
-				                                    
+
 					</div>
                             </td>
                         </tr>
@@ -1772,20 +1774,20 @@ function popForm2(scriptId){
                 var json = jQuery("#Calcs").val();
                 //oscarLog(json);
                 if( json != null && json != "" ) {
-                	
+
                 	var pharmacy = JSON.parse(json);
-                    
+
                     if( pharmacy != null ) {
                     	url= "<c:out value="${ctx}"/>" + "/oscarRx/ViewScript2.jsp?scriptId="+scriptId+"&pharmacyId="+pharmacy.id;
                     }
                     else {
                     	url= "<c:out value="${ctx}"/>" + "/oscarRx/ViewScript2.jsp?scriptId="+scriptId;
-                    }	
+                    }
                 }
                 else {
                 	url= "<c:out value="${ctx}"/>" + "/oscarRx/ViewScript2.jsp?scriptId="+scriptId;
                 }
-                
+
                 //oscarLog( "preview2 done");
                 myLightWindow.activateWindow({
                     href: url,
@@ -1850,8 +1852,8 @@ YAHOO.example.FnMultipleFields = function(){
     oAC.minQueryLength = 3;
     oAC.maxResultsDisplayed = 40;
     oAC.formatResult = resultFormatter2;
-    
-    
+
+
 
     // Define an event handler to populate a hidden form field
     // when an item gets selected and populate the input field
@@ -1870,7 +1872,7 @@ YAHOO.example.FnMultipleFields = function(){
                     $('searchString').value = "";
 
    };
-   
+
    oAC.doBeforeExpandContainer = function(sQuery, oResponse) {
 	   if (oAC._nDisplayedItems < oAC.maxResultsDisplayed) {
 	      oAC.setFooter("");
@@ -1880,8 +1882,8 @@ YAHOO.example.FnMultipleFields = function(){
 
 	   return true;
 	}
-   
-   
+
+
     oAC.itemSelectEvent.subscribe(myHandler);
     var collapseFn=function(){
         $('autocomplete_choices').hide();
@@ -1895,8 +1897,8 @@ YAHOO.example.FnMultipleFields = function(){
         oDS: oDS,
         oAC: oAC
     };
-    
-    
+
+
 }();
 
 function addFav(randomId,brandName){
@@ -2055,12 +2057,12 @@ function removeReRxDrugId(drugId){
 
 //represcribe a drug
 function represcribe(element, toArchive){
-  
+
     var elemId=element.id;
     var ar=elemId.split("_");
     var drugId=ar[1];
     if(drugId!=null && $("reRxCheckBox_"+drugId).checked==true){
-    	        	
+
         var url= "<c:out value="${ctx}"/>" + "/oscarRx/rePrescribe2.do?method=represcribeMultiple&rand="+Math.floor(Math.random()*10001);
         new Ajax.Updater('rxText',url, {method:'get',parameters:data,asynchronous:false,evalScripts:true,
             insertion: Insertion.Bottom,onSuccess:function(transport){
@@ -2070,7 +2072,7 @@ function represcribe(element, toArchive){
         var dataUpdateId="reRxDrugId="+toArchive+"&action=addToReRxDrugIdList&rand="+Math.floor(Math.random()*10001);
         var urlUpdateId= "<c:out value="${ctx}"/>" + "/oscarRx/WriteScript.do?parameterValue=updateReRxDrug";
         new Ajax.Request(urlUpdateId, {method: 'get',parameters:dataUpdateId});
-                	
+
         var data="drugId="+drugId;
         var url= "<c:out value="${ctx}"/>" + "/oscarRx/rePrescribe2.do?method=represcribe2&rand="+Math.floor(Math.random()*10001);
         new Ajax.Updater('rxText',url, {method:'get',parameters:data,evalScripts:true,
@@ -2287,7 +2289,7 @@ function updateQty(element){
      */
     function validateInstructionString(message) {
     	 var valid = true;
-    	 
+
     	 jQuery('input[name^="instructions_"]').each(function(){
     		 var value = jQuery(this).val();
     		 if(value == null || value.trim().length == 0) {
@@ -2303,11 +2305,11 @@ function updateQty(element){
     }
 
     function updateSaveAllDrugsPrintContinue(){
-    	
+
     	if(!validateInstructionString() || !validateWrittenDate() || !validateRxDate()) {
     		return false;
     	}
-		
+
         var data=Form.serialize($('drugForm'));
         var url= "<c:out value="${ctx}"/>" + "/oscarRx/WriteScript.do?parameterValue=updateSaveAllDrugs&rand="+ Math.floor(Math.random()*10001);
         new Ajax.Request(url,
@@ -2319,13 +2321,13 @@ function updateQty(element){
             }});
         return false;
     }
-    
+
     function updateSaveAllDrugsContinue(){
     	if(!validateInstructionString() || !validateWrittenDate() || !validateRxDate()) {
     		return false;
     	}
-		
-		
+
+
         var data=Form.serialize($('drugForm'));
         var url= "<c:out value="${ctx}"/>" + "/oscarRx/WriteScript.do?parameterValue=updateSaveAllDrugs&rand="+ Math.floor(Math.random()*10001);
         new Ajax.Request(url,

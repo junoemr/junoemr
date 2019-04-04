@@ -40,7 +40,6 @@
         String alle = "";
         if (allergies.length > 0 ){ alle = "Red"; }
         %>
-<td width="10%" height="100%" valign="top">
 <div class="PropSheetMenu">
 <p class="PropSheetLevel1CurrentItem"><bean:message key="oscarRx.sideLinks.msgSpecial"/></p>
 <p class="PropSheetMenuItemLevel1"><a href="SelectPharmacy.jsp"><bean:message key="oscarRx.sideLinks.msgEditPharmacy"/></a></p>

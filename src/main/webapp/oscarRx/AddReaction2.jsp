@@ -1,5 +1,5 @@
-<%--
 
+<%@ page import="oscar.util.ConversionUtils" %><%--
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
     This program is free software; you can redistribute it and/or
@@ -26,11 +26,10 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
-<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
 	String roleName2$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-   boolean authed=true;
+	boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName2$%>" objectName="_allergy" rights="r" reverse="<%=true%>">
 	<%authed=false; %>
@@ -43,167 +42,305 @@
 %>
 
 <html:html locale="true">
-<head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<title><bean:message key="AddReaction.title" /></title>
-<html:base />
+	<head>
+		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+		<title><bean:message key="AddReaction.title" /></title>
+		<html:base />
 
-<logic:notPresent name="RxSessionBean" scope="session">
-	<logic:redirect href="error.html" />
-</logic:notPresent>
-<logic:present name="RxSessionBean" scope="session">
-	<bean:define id="bean" type="oscar.oscarRx.pageUtil.RxSessionBean"
-		name="RxSessionBean" scope="session" />
-	<logic:equal name="bean" property="valid" value="false">
-		<logic:redirect href="error.html" />
-	</logic:equal>
-</logic:present>
+		<logic:notPresent name="RxSessionBean" scope="session">
+			<logic:redirect href="error.html" />
+		</logic:notPresent>
+		<logic:present name="RxSessionBean" scope="session">
+			<bean:define id="bean" type="oscar.oscarRx.pageUtil.RxSessionBean"
+						 name="RxSessionBean" scope="session" />
+			<logic:equal name="bean" property="valid" value="false">
+				<logic:redirect href="error.html" />
+			</logic:equal>
+		</logic:present>
 
-<%
-oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
-String name = (String) request.getAttribute("name");
-String type = (String) request.getAttribute("type");
-String allergyId = (String) request.getAttribute("allergyId");
-%>
+		<%
+			oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
+			RxPatientData.Patient patient = (RxPatientData.Patient)request.getSession().getAttribute("Patient");
 
-<link rel="stylesheet" type="text/css" href="styles.css">
-</head>
-<body topmargin="0" leftmargin="0" vlink="#0000FF">
+			String name = (String) request.getAttribute("name");
+			String type = (String) request.getAttribute("type");
+			String drugrefId = (String)request.getAttribute("drugrefId");
+			String allergyToArchive = (String)request.getAttribute("allergyToArchive");
+			String nkdaId = (String)request.getAttribute("nkdaId");
 
-<table border="0" cellpadding="0" cellspacing="0"
-	style="border-collapse: collapse" bordercolor="#111111" width="100%"
-	id="AutoNumber1" height="100%">
-	<%@ include file="TopLinks.jsp"%><!-- Row One included here-->
-	<tr>
-		<%@ include file="SideLinksNoEditFavorites2.jsp"%><!-- <td></td>Side Bar File --->
-		<td width="100%" style="border-left: 2px solid #A9A9A9;" height="100%"
-			valign="top">
-		<table cellpadding="0" cellspacing="2"
-			style="border-collapse: collapse" bordercolor="#111111" width="100%"
-			height="100%">
-			<tr>
-				<td width="0%" valign="top">
-				<div class="DivCCBreadCrumbs"><a href="SearchDrug3.jsp"> <bean:message
-					key="SearchDrug.title" /></a>&nbsp;&gt;&nbsp; <a
-					href="ShowAllergies2.jsp"> <bean:message
-					key="EditAllergies.title" /></a>&nbsp;&gt;&nbsp; <b><bean:message
-					key="AddReaction.title" /></b></div>
-				</td>
-			</tr>
-			<!----Start new rows here-->
+			String reaction = "";
+			String startDate = "";
+			String ageOfOnset = "";
+			String lifeStage = "";
+			String severity = "";
+			String onsetOfReaction = "";
+			// Their changes include this, but IIRC we can't really do anything with it rn
+			// Boolean nonDrug = null;
 
-			<tr>
-				<td>
-				<div class="DivContentSectionHead"><%=name%></div>
-				</td>
-			</tr>
-			<tr>
-				<td><html:form action="/oscarRx/addAllergy2"
-					focus="reactionDescription">
-					<table>
-						<tr valign="center">
+			if (allergyToArchive != null && !allergyToArchive.isEmpty())
+			{
+				Allergy allergy = patient.getAllergy(Integer.parseInt(allergyToArchive));
+				if (allergy != null)
+				{
+					reaction = allergy.getReaction();
+					startDate = ConversionUtils.toDateString(allergy.getStartDate(), allergy.getStartDateFormat());
+					ageOfOnset = allergy.getAgeOfOnset();
+					lifeStage = allergy.getLifeStage();
+					severity = allergy.getSeverityOfReaction();
+					onsetOfReaction = allergy.getOnsetOfReaction();
+				}
 
-							<td colspan="2"><html:textarea
-								property="reactionDescription" cols="40" rows="3" /> <html:hidden
-								property="ID" value="<%=allergyId%>" /> <html:hidden
-								property="name" value="<%=name%>" /> <html:hidden
-								property="type" value="<%=type%>" /></td>
-						</tr>
+				if (allergy.getArchived() && nkdaId != null)
+				{
+					allergyToArchive = nkdaId;
+				}
+			}
+			else
+			{
+				if (nkdaId != null)
+				{
+					allergyToArchive = nkdaId;
+				}
+			}
+			//String allergyId = (String) request.getAttribute("allergyId");
+			boolean isNKDA = "No Known Drug Allergies".equals(name);
+		%>
 
-						<tr valign="center">
-							<td colspan="2">Start Date: <html:text
-								property="startDate" size="10" maxlength="10"/>
-							    (yyyy-mm-dd OR yyyy-mm OR yyyy)</td>
+		<link rel="stylesheet" type="text/css" href="styles.css">
+	</head>
+	<body topmargin="0" leftmargin="0" vlink="#0000FF">
 
-						</tr>
+	<table border="0" cellpadding="0" cellspacing="0"
+		   style="border-collapse: collapse" bordercolor="#111111" width="100%"
+		   id="AutoNumber1" height="100%">
+		<%@ include file="TopLinks.jsp"%><!-- Row One included here-->
+		<tr>
+			<%@ include file="SideLinksNoEditFavorites2.jsp"%><!-- <td></td>Side Bar File --->
+			<td width="100%" style="border-left: 2px solid #A9A9A9;" height="100%" valign="top">
+				<!-- height, bordercolor invalid attrs for table -->
+				<table cellpadding="0" cellspacing="2" style="border-collapse: collapse" bordercolor="#111111" width="100%" height="100%">
+					<tr>
+						<td width="0%" valign="top">
+							<div class="DivCCBreadCrumbs"><a href="SearchDrug3.jsp"> <bean:message
+									key="SearchDrug.title" /></a>&nbsp;&gt;&nbsp; <a
+									href="ShowAllergies2.jsp"> <bean:message
+									key="EditAllergies.title" /></a>&nbsp;&gt;&nbsp; <b><bean:message
+									key="AddReaction.title" /></b></div>
+						</td>
+					</tr>
+					<!----Start new rows here-->
 
-						<tr valign="center">
-							<td colspan="2">Age Of Onset: <html:text
-								property="ageOfOnset" size="4" maxlength="4" /></td>
+					<tr>
+						<td>
+							<div class="DivContentSectionHead"><%=name%></div>
+						</td>
+					</tr>
+					<tr>
+						<td id="addAllergyDialogue"><html:form action="/oscarRx/addAllergy2"
+															   focus="reactionDescription">
+							<script type="text/javascript">
+								function checkStartDate() {
+									var field = document.forms.RxAddAllergyForm.startDate;
+									if (field.value.trim()!="") {
+										var t = /^\d{4}(-[0-1]*\d{1}(-[0-3]*\d{1})*)*$/;
+										var startDate = new Date(field.value);
 
-						</tr>
-						
-						
-						<tr valign="center">
-							<td><bean:message key="oscarEncounter.lifestage.title"/>: 
-	                                <html:select property="lifeStage">
-	                                        <html:option value=""><bean:message key="oscarEncounter.lifestage.opt.notset"/></html:option>
-	                                        <html:option value="N"><bean:message key="oscarEncounter.lifestage.opt.newborn"/></html:option>
-	                                        <html:option value="I"><bean:message key="oscarEncounter.lifestage.opt.infant"/></html:option>
-	                                        <html:option value="C"><bean:message key="oscarEncounter.lifestage.opt.child"/></html:option>
-	                                        <html:option value="T"><bean:message key="oscarEncounter.lifestage.opt.adolescent"/></html:option> 
-	                                        <html:option value="A"><bean:message key="oscarEncounter.lifestage.opt.adult"/></html:option>
-	                                </html:select>
-	                        </td>
-						</tr>
-						<tr valign="center">
+										if (!t.test(field.value) || startDate=="Invalid Date") {
+											alert("Invalid Start Date");
+											setTimeout(function(){ field.focus(); }, 100);
+										}
+									}
+								}
 
-							<td colspan="2">Severity Of Reaction : <html:select
-								property="severityOfReaction">
-								<html:option value="1">Mild</html:option>
-								<html:option value="2">Moderate</html:option>
-								<html:option value="3">Severe</html:option>
-								<html:option value="4">Unknown</html:option>
-							</html:select></td>
+								function checkAgeOfOnset() {
+									var field = document.forms.RxAddAllergyForm.ageOfOnset;
+									if (field.value.trim()!="") {
+										var t = /^\d{1,3}$/;
+										if (!t.test(field.value)) {
+											alert("Invalid Age of Onset (3-digit integer only)");
+											setTimeout(function(){ field.focus(); }, 100);
+										}
+									}
+								}
 
-						</tr>
+								function doSubmit() {
 
-						<tr valign="center">
+									if(document.forms.RxAddAllergyForm.nonDrug.value == '') {
+										alert("Please choose value for non-drug");
+										return false;
+									}
 
-							<td colspan="2">Onset Of Reaction: <html:select
-								property="onSetOfReaction">
-								<html:option value="1">Immediate</html:option>
-								<html:option value="2">Gradual</html:option>
-								<html:option value="3">Slow</html:option>
-								<html:option value="4">Unknown</html:option>
-							</html:select></td>
+									confirmRemoveNKDA();
 
-						</tr>
+									return true;
+								}
+								function confirmRemoveNKDA() {
+									<% if (nkdaId!=null && !nkdaId.isEmpty()) { %>
+									if (<%=nkdaId%>>0) {
+										var yes = confirm("Remove \"No Known Drug Allergies\" from list?");
+										if (!yes) document.forms.RxAddAllergyForm.allergyToArchive.value = "";
+									}
+									<% } %>
+								}
+							</script>
+							<table>
+								<tr id="addReactionSubheading">
+									<td>
+										Adding Allergy: <%=name%>
+									</td>
+								</tr>
+								<tr valign="center">
+
+									<td>
+										<span class="label">Comment: </span>
+										<html:textarea property="reactionDescription" cols="40" rows="3" />
+										<html:hidden property="ID" value="<%=drugrefId%>" />
+										<html:hidden property="name" value="<%=name%>" />
+										<html:hidden property="type" value="<%=type%>" />
+									</td>
+								</tr>
+
+								<html:hidden property="type" value="<%=type%>" />
+
+								<tr valign="center">
+									<td>
+										<link rel="stylesheet" type="text/css" media="all" href="<%= request.getContextPath() %>/share/calendar/calendar.css" title="win2k-cold-1" />
+										<script type="text/javascript" src="<%= request.getContextPath() %>/share/calendar/calendar.js"></script>
+										<script type="text/javascript" src="<%= request.getContextPath() %>/share/calendar/lang/<bean:message key="global.javascript.calendar"/>"></script>
+										<script type="text/javascript" src="<%= request.getContextPath() %>/share/calendar/calendar-setup.js"></script>
+										<script type="text/javascript">
+											Calendar.setup({ inputField : "startDate", ifFormat : "%Y-%m-%d", showsTime :false, button : "startDateCal", singleClick : true, step : 1 });
+										</script>
+
+										<span class="label">Start Date:</span>
+										<input type="text" name="startDate" id="startDate" size="10" maxlength="10" value="<%=startDate%>" onblur="checkStartDate();"/>
+										<img src="../images/cal.gif" id="startDateCal">(yyyy-mm-dd OR yyyy-mm OR yyyy)
+									</td>
+								</tr>
+
+								<tr valign="center">
+									<td><span class="label">Age Of Onset:</span> <html:text
+											property="ageOfOnset" size="4" maxlength="4" value="<%=ageOfOnset%>" onblur="checkAgeOfOnset();"/></td>
+								</tr>
 
 
-						<tr>
-							<td colspan="2"><html:submit property="submit"
-								value="Add Allergy" styleClass="ControlPushButton" /> <input
-								type=button class="ControlPushButton"
-								onclick="javascript:document.forms.RxAddAllergyForm.reactionDescription.value='';document.forms.RxAddAllergyForm.startDate.value='';document.forms.RxAddAllergyForm.ageOfOnset.value='';document.forms.RxAddAllergyForm.reactionDescription.focus();"
-								value="Reset" /></td>
-						</tr>
-					</table>
-                      &nbsp;
+								<tr valign="center">
+									<td> <span class="label"><bean:message key="oscarEncounter.lifestage.title"/>:</span>
+										<html:select property="lifeStage">
+											<html:option value=""><bean:message key="oscarEncounter.lifestage.opt.notset"/></html:option>
+											<html:option value="N"><bean:message key="oscarEncounter.lifestage.opt.newborn"/></html:option>
+											<html:option value="I"><bean:message key="oscarEncounter.lifestage.opt.infant"/></html:option>
+											<html:option value="C"><bean:message key="oscarEncounter.lifestage.opt.child"/></html:option>
+											<html:option value="T"><bean:message key="oscarEncounter.lifestage.opt.adolescent"/></html:option>
+											<html:option value="A"><bean:message key="oscarEncounter.lifestage.opt.adult"/></html:option>
+										</html:select>
+									</td>
+								</tr>
 
-                      </html:form></td>
-			</tr>
+								<%
+								if (isNKDA)
+								{
+								%>
+									<html:hidden property="severityOfReaction" value="4" />
+									<html:hidden property="onSetOfReaction" value="4" />
+								<%
+								}
+								else
+								{
+								%>
+								<tr valign="center">
+									<td>
+										<span class="label">Severity Of Reaction:</span>
+										<html:select property="severityOfReaction">
+											<html:option value="4">Unknown</html:option>
+											<html:option value="1">Mild</html:option>
+											<html:option value="2">Moderate</html:option>
+											<html:option value="3">Severe</html:option>
+											<html:option value="5">No Reaction</html:option>
+										</html:select>
+									</td>
+								</tr>
 
-			<tr>
-				<td>
-				<%
-                        String sBack="ShowAllergies2.jsp";
-                      %> <input type=button class="ControlPushButton"
-					onclick="javascript:window.location.href='<%=sBack%>';"
-					value="Back to View Allergies" /></td>
-			</tr>
-			<!----End new rows here-->
-			<tr height="100%">
-				<td></td>
-			</tr>
-		</table>
-		</td>
-	</tr>
-	<tr>
-		<td height="0%"
-			style="border-bottom: 2px solid #A9A9A9; border-top: 2px solid #A9A9A9;"></td>
-		<td height="0%"
-			style="border-bottom: 2px solid #A9A9A9; border-top: 2px solid #A9A9A9;"></td>
-	</tr>
-	<tr>
-		<td width="100%" height="0%" colspan="2">&nbsp;</td>
-	</tr>
-	<tr>
-		<td width="100%" height="0%" style="padding: 5" bgcolor="#DCDCDC"
-			colspan="2"></td>
-	</tr>
-</table>
+								<tr valign="center">
+									<td>
+										<span class="label">Onset Of Reaction:</span>
+										<html:select property="onSetOfReaction">
+											<html:option value="4">Unknown</html:option>
+											<html:option value="1">Immediate</html:option>
+											<html:option value="2">Gradual</html:option>
+											<html:option value="3">Slow</html:option>
+										</html:select>
+									</td>
+								</tr>
 
-</body>
+								<%
+								if (drugrefId == null || "0".equals(drugrefId) || "null".equals(drugrefId))
+								{
+								%>
+								<!-- <tr valign="center"> -->
+									<!-- <td><span class="label">Non Drug:</span> -->
+										<!-- <select name="nonDrug" id="nonDrug"> -->
+											<!-- <option value="">Select Below</option> -->
+											<!-- <option value="on" < % = //nonDrug != null && nonDrug.booleanValue() == true?" selected=\"selected\" ":""% >>Allergy to non-drug substance</option> -->
+											<!-- <option value="off" < % =nonDrug != null && nonDrug.booleanValue() == false?" selected=\"selected\" ":""% >>Adverse reaction to drug</option> -->
+
+										<!-- </select> -->
+									<!-- </td> -->
+								<!-- </tr> -->
+								<%
+								}
+								%>
+
+								<%
+								}
+								%>
+								<tr>
+									<td>
+										<html:submit property="submit" value="Add Allergy" styleClass="ControlPushButton"
+													 onclick="return doSubmit()" />
+										<input type=button class="ControlPushButton" id="cancelAddReactionButton"
+											onclick="window.location='ShowAllergies2.jsp?demographicNo=<%=bean.getDemographicNo() %>'"
+											value="Cancel" />
+									</td>
+								</tr>
+							</table>
+
+						</html:form>
+						</td>
+					</tr>
+
+					<tr>
+						<td>
+							<%
+								String sBack="ShowAllergies2.jsp";
+							%>
+							<input type=button class="ControlPushButton"
+								   onclick="javascript:window.location.href='<%=sBack%>';"
+								   value="Back to View Allergies" />
+						</td>
+					</tr>
+					<!----End new rows here-->
+					<tr height="100%">
+						<td></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td height="0%"
+				style="border-bottom: 2px solid #A9A9A9; border-top: 2px solid #A9A9A9;"></td>
+			<td height="0%"
+				style="border-bottom: 2px solid #A9A9A9; border-top: 2px solid #A9A9A9;"></td>
+		</tr>
+		<tr>
+			<td width="100%" height="0%" colspan="2">&nbsp;</td>
+		</tr>
+		<tr>
+			<td width="100%" height="0%" style="padding: 5px" bgcolor="#DCDCDC"
+				colspan="2"></td>
+		</tr>
+	</table>
+
+	</body>
 
 </html:html>

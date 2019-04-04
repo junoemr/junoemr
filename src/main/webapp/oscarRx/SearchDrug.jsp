@@ -80,28 +80,28 @@
 	String[] d_route = ("Oral," + drugref_route).split(",");
 
 	String annotation_display = org.oscarehr.casemgmt.model.CaseManagementNoteLink.DISP_PRESCRIP;
-	
+
 	//This checks if the provider has the ExternalPresriber feature enabled, if so then a link appear for the provider to access the ExternalPrescriber
 	ProviderPreference providerPreference=ProviderPreferencesUIBean.getProviderPreference(loggedInInfo.getLoggedInProviderNo());
-	
+
 	boolean eRxEnabled= false;
 	String eRx_SSO_URL = null;
 	String eRxUsername = null;
 	String eRxPassword = null;
 	String eRxFacility = null;
 	String eRxTrainingMode="0"; //not in training mode
-	
+
 	if(providerPreference!=null){
 		eRxEnabled = providerPreference.isERxEnabled();
 	    eRx_SSO_URL = providerPreference.getERx_SSO_URL();
 	    eRxUsername = providerPreference.getERxUsername();
 	    eRxPassword = providerPreference.getERxPassword();
 	    eRxFacility = providerPreference.getERxFacility();
-	
+
 	    boolean eRxTrainingModeTemp = providerPreference.isERxTrainingMode();
 	    if(eRxTrainingModeTemp) eRxTrainingMode="1";
 	}
-	
+
 %>
 <%@page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
@@ -259,7 +259,7 @@ function load() {
 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber1" height="100%">
 	<%@ include file="TopLinks.jsp"%><!-- Row One included here-->
 	<tr>
-		<%@ include file="SideLinksEditFavorites.jsp"%><!-- <td></td>Side Bar File --->
+		<td width="10%" height="100%" valign="top"><%@ include file="SideLinksEditFavorites.jsp"%></td>
 		<td width="100%" style="border-left: 2px solid #A9A9A9;" height="100%" valign="top"><!--Column Two Row Two-->
 		<table cellpadding="0" cellspacing="2" style="border-collapse: collapse" bordercolor="#111111" width="100%" height="100%">
 			<tr>
@@ -295,7 +295,7 @@ function load() {
 								</td>
 							</tr>
 						</indivo:indivoRegistered>
-					
+
 				</table>
 				</td>
 			</tr>
@@ -578,7 +578,7 @@ function load() {
  <%if (eRxEnabled) {%>
 	<a href="<%=eRx_SSO_URL%>User=<%=eRxUsername%>&Password=<%=eRxPassword%>&Clinic=<%=eRxFacility%>&PatientIdPMIS=<%=patient.getDemographicNo()%>&IsTraining=<%=eRxTrainingMode%>"><bean:message key="SearchDrug.eRx.msgExternalPrescriber"/></a>
  <%}%>
- 
+
 							</td>
 							<td><oscar:oscarPropertiesCheck property="drugref_route_search" value="on">
 								<bean:message key="SearchDrug.drugSearchRouteLabel" />
