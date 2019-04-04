@@ -56,7 +56,7 @@ import static java.lang.Thread.sleep;
 public class ClinicaidAPIService
 {
 	static private final int ELIG_CHECK_TIMEOUT_MS = 12000;
-	static private final int ELIG_CHECK_POLL_FREQUENCY_MS = 1200;
+	static private final int ELIG_CHECK_POLL_FREQUENCY_MS = 2000;
 	static private String apiPath = "/api/v2/";
 
 	private ClinicaidSessionManager sessionManager;
@@ -97,6 +97,7 @@ public class ClinicaidAPIService
 		long start = System.currentTimeMillis();
 		int sleepDuration = 0;
 
+		long startTime = System.currentTimeMillis();
 		do
 		{
 			sleep(sleepDuration);
@@ -117,6 +118,7 @@ public class ClinicaidAPIService
 				break;
 
 		} while (System.currentTimeMillis() - start < ELIG_CHECK_TIMEOUT_MS);
+		MiscUtils.getLogger().info("Clinicaid API: eligibility check took: " + (System.currentTimeMillis() - startTime) + " ms");
 
 		return lastUsableResult;
 	}
@@ -143,7 +145,11 @@ public class ClinicaidAPIService
 		}
 
 		HashMap<String, String> response = new HashMap<>();
-		if (result.hasError())
+		if (result == null)
+		{
+			response.put("error", "Request timeout");
+		}
+		else if (result.hasError())
 		{
 			response.put("error", result.getErrors().getErrorString());
 		}
