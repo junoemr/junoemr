@@ -59,7 +59,7 @@ import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
-import oscar.util.UtilDateUtilities;
+import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
@@ -118,7 +118,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
         Hl7TextMessage hl7TextMessage = hl7TxtMsgDao.find(Integer.parseInt(segmentId));
         java.util.Date date = hl7TextMessage.getCreated();
         String stringFormat = "yyyy-MM-dd HH:mm";
-        dateLabReceived = UtilDateUtilities.DateToString(date, stringFormat);
+        dateLabReceived = ConversionUtils.toDateString(date, stringFormat);
 
         // create handler
         this.handler = Factory.getHandler(id);
