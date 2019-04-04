@@ -32,6 +32,7 @@ import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarProperties;
 import oscar.oscarDB.DBHandler;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 
@@ -43,125 +44,138 @@ public class FrmConsultantRecord extends FrmRecord {
 
 
 	public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID) throws SQLException {
-        	Properties props = new Properties();
+		Properties props = new Properties();
 
-        	if (existingID <= 0) {
+		if (existingID <= 0)
+		{
 
+			String sql = "SELECT demographic_no, CONCAT(last_name, ', ', first_name) AS pName, address, CONCAT(city, ', ', province, ' ', postal) AS address2, phone, year_of_birth, month_of_birth, date_of_birth, CONCAT(hin, ' ', ver) AS hic FROM demographic WHERE demographic_no = " + demographicNo;
 
-		String sql = "SELECT demographic_no, CONCAT(last_name, ', ', first_name) AS pName, address, CONCAT(city, ', ', province, ' ', postal) AS address2, phone, year_of_birth, month_of_birth, date_of_birth, CONCAT(hin, ' ', ver) AS hic FROM demographic WHERE demographic_no = " + demographicNo;
+			ResultSet rs = DBHandler.GetSQL(sql);
+			if (rs.next())
+			{
+				java.util.Date date = UtilDateUtilities.calcDate(oscar.Misc.getString(rs, "year_of_birth"),
+						oscar.Misc.getString(rs, "month_of_birth"),
+						oscar.Misc.getString(rs, "date_of_birth"));
+				props.setProperty("demographic_no", oscar.Misc.getString(rs, "demographic_no"));
+				props.setProperty("formCreated", ConversionUtils.toDateString(new Date(), "yyyy/MM/dd"));
+				props.setProperty("consultTime", ConversionUtils.toDateString(new Date(), "yyyy/MM/dd"));
+				props.setProperty("formEdited", ConversionUtils.toDateString(new Date(),"yyyy/MM/dd"));
+				props.setProperty("p_name", oscar.Misc.getString(rs, "pName"));
+				props.setProperty("p_address1", oscar.Misc.getString(rs, "address"));
+				props.setProperty("p_address2", oscar.Misc.getString(rs, "address2"));
+				props.setProperty("p_birthdate", ConversionUtils.toDateString(date, "yyyy/MM/dd"));
+				props.setProperty("p_phone", oscar.Misc.getString(rs, "phone"));
+				props.setProperty("p_healthcard", oscar.Misc.getString(rs, "hic"));
+			}
+			rs.close();
 
-		ResultSet rs = DBHandler.GetSQL(sql);
-		if (rs.next()) {
-			java.util.Date date = UtilDateUtilities.calcDate(oscar.Misc.getString(rs, "year_of_birth"), oscar.Misc.getString(rs, "month_of_birth"), oscar.Misc.getString(rs, "date_of_birth"));
-                	props.setProperty("demographic_no", oscar.Misc.getString(rs, "demographic_no"));
-	                props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
-                        props.setProperty("consultTime", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
-	                props.setProperty("formEdited", UtilDateUtilities.DateToString(new Date(),"yyyy/MM/dd"));
-	                props.setProperty("p_name", oscar.Misc.getString(rs, "pName"));
-        	        props.setProperty("p_address1", oscar.Misc.getString(rs, "address"));
-			props.setProperty("p_address2", oscar.Misc.getString(rs, "address2"));
-               		props.setProperty("p_birthdate", UtilDateUtilities.DateToString(date, "yyyy/MM/dd"));
-	                props.setProperty("p_phone", oscar.Misc.getString(rs, "phone"));
-			props.setProperty("p_healthcard", oscar.Misc.getString(rs, "hic"));
-        	}
-            	rs.close();
+			Clinic clinic = clinicDao.getClinic();
+			if (clinic != null)
+			{
+				props.setProperty("cl_name",clinic.getClinicName());
+				props.setProperty("cl_address1",clinic.getClinicAddress());
+				props.setProperty("cl_address2",clinic.getClinicCity() + ", " + clinic.getClinicProvince() + ", " + clinic.getClinicPostal());
+				props.setProperty("cl_phone",clinic.getClinicPhone());
+				props.setProperty("cl_fax",clinic.getClinicFax());
+			}
 
-        	Clinic clinic = clinicDao.getClinic();
-        	if(clinic != null) {
-        		props.setProperty("cl_name",clinic.getClinicName());
-        		props.setProperty("cl_address1",clinic.getClinicAddress());
-        		props.setProperty("cl_address2",clinic.getClinicCity() + ", " + clinic.getClinicProvince() + ", " + clinic.getClinicPostal());
-        		props.setProperty("cl_phone",clinic.getClinicPhone());
-        		props.setProperty("cl_fax",clinic.getClinicFax());
-        	}
-
-        	} else {
-            		String sql = "SELECT * FROM formConsult WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
-            		props = (new FrmRecordHelp()).getFormRecord(sql);
-
-        	}
+		}
+		else
+		{
+			String sql = "SELECT * FROM formConsult WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
+			props = (new FrmRecordHelp()).getFormRecord(sql);
+		}
 
 		return props;
 	}
 
 
-        public Properties getDocInfo(Properties props, String billingreferral_no) {
-            ProfessionalSpecialist professionalSpecialist = professionalSpecialistDao.getByReferralNo(billingreferral_no);
-            if(professionalSpecialist != null) {
-            	props.setProperty("t_name", "Dr. " + professionalSpecialist.getFirstName() + " " + professionalSpecialist.getLastName());
-            	props.setProperty("t_address", professionalSpecialist.getStreetAddress());
-            	props.setProperty("t_phone", professionalSpecialist.getPhoneNumber());
-            	props.setProperty("t_fax", professionalSpecialist.getFaxNumber());
-            }
+		public Properties getDocInfo(Properties props, String billingreferral_no)
+		{
+			ProfessionalSpecialist professionalSpecialist = professionalSpecialistDao.getByReferralNo(billingreferral_no);
+			if (professionalSpecialist != null)
+			{
+				props.setProperty("t_name", "Dr. " + professionalSpecialist.getFirstName() + " " + professionalSpecialist.getLastName());
+				props.setProperty("t_address", professionalSpecialist.getStreetAddress());
+				props.setProperty("t_phone", professionalSpecialist.getPhoneNumber());
+				props.setProperty("t_fax", professionalSpecialist.getFaxNumber());
+			}
 
-            return props;
-        }
+			return props;
+		}
 
-	public String getProvName(int provider_no) throws SQLException {
-
+	public String getProvName(int provider_no) throws SQLException
+	{
 		Properties props = new Properties();
 		String sql = "SELECT CONCAT('Dr. ', first_name, ' ', last_name) AS doc_Name FROM provider WHERE provider_no = " + provider_no;
 		ResultSet rs = DBHandler.GetSQL(sql);
-		if (rs.next()) {
+		if (rs.next())
+		{
 			props.setProperty("doc_name", oscar.Misc.getString(rs, "doc_Name"));
 		}
 		rs.close();
-                return props.getProperty("doc_name", "");
+
+		return props.getProperty("doc_name", "");
 	}
 
-        public Properties getInitRefDoc(Properties props, int demo_no) throws SQLException {
+	public Properties getInitRefDoc(Properties props, int demo_no) throws SQLException {
 
-                String sql = "SELECT family_doctor FROM demographic WHERE demographic_no = '" + demo_no + "';";
-                ResultSet rs = DBHandler.GetSQL(sql);
-                String refdocno, docno;
-                if (rs.next()){
-                    docno = oscar.Misc.getString(rs, "family_doctor");
-                    refdocno = docno.substring( 8, docno.indexOf("</rdohip>"));
-                    if ( refdocno != ""){
-                        props.setProperty("refdocno", refdocno);
-                    }
-                }
+			String sql = "SELECT family_doctor FROM demographic WHERE demographic_no = '" + demo_no + "';";
+			ResultSet rs = DBHandler.GetSQL(sql);
+			String refdocno, docno;
+			if (rs.next())
+			{
+				docno = oscar.Misc.getString(rs, "family_doctor");
+				refdocno = docno.substring( 8, docno.indexOf("</rdohip>"));
+				if (refdocno != "")
+				{
+					props.setProperty("refdocno", refdocno);
+				}
+			}
 
-                return props;
-        }
+			return props;
+	}
 
 	public int saveFormRecord(Properties props) throws SQLException {
-        	String demographic_no = props.getProperty("demographic_no");
-        	String sql = "SELECT * FROM formConsult WHERE demographic_no=" + demographic_no + " AND ID=0";
-        	return ((new FrmRecordHelp()).saveFormRecord(props, sql));
+		String demographic_no = props.getProperty("demographic_no");
+		String sql = "SELECT * FROM formConsult WHERE demographic_no=" + demographic_no + " AND ID=0";
+		return ((new FrmRecordHelp()).saveFormRecord(props, sql));
 	}
 
 	public Properties getPrintRecord(int demographicNo, int existingID) throws SQLException {
-        	String sql = "SELECT * FROM formConsult WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
-	        return ((new FrmRecordHelp()).getPrintRecord(sql));
-    	}
+		String sql = "SELECT * FROM formConsult WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
+		return ((new FrmRecordHelp()).getPrintRecord(sql));
+	}
 
-    	public String findActionValue(String submit) throws SQLException {
-        	return ((new FrmRecordHelp()).findActionValue(submit));
-    	}
+	public String findActionValue(String submit) throws SQLException {
+		return ((new FrmRecordHelp()).findActionValue(submit));
+	}
 
-    	public String createActionURL(String where, String action, String demoId, String formId) throws SQLException {
-	        return ((new FrmRecordHelp()).createActionURL(where, action, demoId, formId));
-    	}
-
+	public String createActionURL(String where, String action, String demoId, String formId) throws SQLException {
+		return ((new FrmRecordHelp()).createActionURL(where, action, demoId, formId));
+	}
 
 	public boolean isSendToPing(String demoNo) throws SQLException {
-        	boolean ret = false;
-	        if ("yes".equalsIgnoreCase(OscarProperties.getInstance().getProperty("PHR", ""))) {
+		boolean ret = false;
+		if ("yes".equalsIgnoreCase(OscarProperties.getInstance().getProperty("PHR", "")))
+		{
+			String demographic_no = demoNo;
+			String sql = "select email from demographic where demographic_no=" + demographic_no;
+			ResultSet rs = DBHandler.GetSQL(sql);
+			if (rs.next())
+			{
+				if (oscar.Misc.getString(rs, "email") != null
+						&& oscar.Misc.getString(rs, "email").length() > 5
+						&& oscar.Misc.getString(rs, "email").matches(".*@.*"))
+				{
+					ret = true;
+				}
+			}
 
-        	    String demographic_no = demoNo;
-
-	            String sql = "select email from demographic where demographic_no=" + demographic_no;
-          	  ResultSet rs = DBHandler.GetSQL(sql);
-                if (rs.next()) {
-                if (oscar.Misc.getString(rs, "email") != null && oscar.Misc.getString(rs, "email").length() > 5
-                        && oscar.Misc.getString(rs, "email").matches(".*@.*"))
-                    ret = true;
-            }
-
-            rs.close();
-        }
-        return ret;
-    }
+			rs.close();
+		}
+		return ret;
+	}
 
 }

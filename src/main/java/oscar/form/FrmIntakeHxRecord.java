@@ -40,15 +40,18 @@ public class FrmIntakeHxRecord extends FrmRecord{
         Properties props = new Properties();
         Demographic demographic = demographicManager.getDemographic(loggedInInfo, demographicNo);
         
-        if(existingID <= 0 && demographic != null) {
+        if (existingID <= 0 && demographic != null)
+        {
             props.setProperty("demographic_no", String.valueOf(demographicNo));
             props.setProperty("formCreated",oscar.util.DateUtils.getDateTime());
             props.setProperty("formCreated",oscar.util.DateUtils.getDateTime());           
             
-        } else {
+        }
+        else
+        {
             String sql = "SELECT * FROM formIntakeHx WHERE demographic_no = " +demographicNo +" AND ID = " +existingID;
             FrmRecordHelp frmRec = new FrmRecordHelp();
-            frmRec.setDateFormat("dd/MM/yyyy");
+            frmRec.setDateFormat(dateFormat);
             props = frmRec.getFormRecord(sql); 
         }
         
