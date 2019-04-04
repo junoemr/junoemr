@@ -57,6 +57,7 @@ public class ScheduleDate extends AbstractModel<Integer>
 	private String providerNo;
 	private String available;
 	private char priority;
+	@Column(name="reason")
 	private String reason;
 	private String hour;
 	private String creator;
