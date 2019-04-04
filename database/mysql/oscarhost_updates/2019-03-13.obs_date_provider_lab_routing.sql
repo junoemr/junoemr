@@ -14,9 +14,7 @@ SET plr.obr_date = doc.observationdate
 -- of the original (uncached) inbox search.
 
 UPDATE providerLabRouting plr
-JOIN (SELECT lab_no, MIN(obr_date) AS obr_date
-      FROM hl7TextInfo
-      GROUP BY lab_no) AS hl7
+JOIN hl7TextInfo hl7
   ON hl7.lab_no = plr.lab_no
   AND plr.lab_type='HL7'
 SET plr.obr_date = hl7.obr_date
@@ -87,7 +85,7 @@ END //
 CREATE PROCEDURE cacheObrDate_hl7(IN in_hl7_no INT(20), IN in_obr_date DATE)
 BEGIN
 UPDATE providerLabRouting plr
-SET plr.obr_date = (SELECT min(hl7.obr_date) from hl7TextInfo hl7 where hl7.lab_no = in_hl7_no)
+SET plr.obr_date = in_obr_date
 WHERE plr.lab_no = in_hl7_no
 AND plr.lab_type = 'HL7';
 END //
@@ -103,7 +101,7 @@ END //
 CREATE PROCEDURE getObrDate_plr(IN in_lab_no INT(10), IN in_lab_type VARCHAR(3), OUT out_obr_date DATETIME)
 BEGIN
 IF in_lab_type = 'HL7' THEN
-  SET out_obr_date = (SELECT MIN(hl7.obr_date) FROM hl7TextInfo hl7 WHERE hl7.lab_no = in_lab_no GROUP BY hl7.lab_no);
+  SET out_obr_date = (SELECT hl7.obr_date FROM hl7TextInfo hl7 WHERE hl7.lab_no = in_lab_no);
 ELSEIF in_lab_type = 'DOC' THEN
   SET out_obr_date = (SELECT doc.observationdate FROM document doc WHERE doc.document_no = in_lab_no);
 ELSE
