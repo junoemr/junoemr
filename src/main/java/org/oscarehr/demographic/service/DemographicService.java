@@ -69,7 +69,7 @@ public class DemographicService
 
 	public enum SEARCH_MODE
 	{
-		demographicNo, name, phone, dob, address, hin, chart_no
+		demographicNo, name, phone, dob, address, hin, chart_no, email
 	}
 
 	public enum STATUS_MODE
@@ -104,6 +104,8 @@ public class DemographicService
 				return SEARCH_MODE.hin;
 			case "search_chart_no":
 				return SEARCH_MODE.chart_no;
+			case "search_email":
+				return SEARCH_MODE.email;
 		}
 		return null;
 	}
@@ -182,6 +184,11 @@ public class DemographicService
 		{
 			demoCS.setMatchModeStart();
 			demoCS.setChartNo(keyword.trim());
+		}
+		else if(searchMode == SEARCH_MODE.email)
+		{
+			demoCS.setMatchModeStart();
+			demoCS.setEmail(keyword.trim());
 		}
 
 		if (status != STATUS_MODE.all)
