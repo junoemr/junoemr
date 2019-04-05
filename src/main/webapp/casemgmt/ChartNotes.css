@@ -10,8 +10,6 @@
     border-width: 1px;
     border-color: black;
     padding: 3px;
-    max-height: 17px;
-
 }
 
 .encounter_timer_container div {
@@ -29,12 +27,19 @@
 #encounter_timer {
     display: inline-block;
     position: relative;
-    background-color: white;
+    background-color: transparent;
 
-    padding: 4px;
-    top: -4px;
-    left: -4px;
+    padding-right: 5px;
     min-width: 20px;
+}
+
+.encounter_timer_background {
+    position:absolute;
+    background-color: white;
+    left: -20px;
+    right: 0px;
+    top:-20px;
+    bottom:-20px;
 }
 
 #encounter_timer:active {
@@ -45,8 +50,7 @@
 #encounter_timer_pause {
     display: inline-block;
     position:relative;
-    top: -4px;
-    left: -2px;
+
     width: 15px;
     background-color: transparent;
 }
@@ -54,8 +58,7 @@
 #encounter_timer_play {
     display: none;
     position:relative;
-    top: -4px;
-    left: -2px;
+
     width: 15px;
     background-color: transparent;
 }

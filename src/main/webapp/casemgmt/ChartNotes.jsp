@@ -129,6 +129,7 @@ try
     demographicNo = "<%=demographicNo%>";
     case_program_id = "<%=pId%>";
 	encounter_timer_interval_id = undefined;
+	encounter_timer_start_time = new Date();
 
     <caisi:isModuleLoad moduleName="caisi">
         caisiEnabled = true;
@@ -175,18 +176,39 @@ try
 		if (timer !== undefined)
 		{
 			let timeArray = timer.html().split(":");
-			let timeMintuesString = timeArray[0];
-			let timeSecondsString = timeArray[1];
 
+			let timeMintuesString = timeArray[timeArray.length -2];
+			let timeSecondsString = timeArray[timeArray.length -1];
 			let timeSeconds = parseInt(timeSecondsString) + 1;
 			let timeMintues = parseInt(timeMintuesString);
+			let timeHours = 0;
+
+			if (timeArray.length > 2)
+			{
+				timeHours = parseInt(timeArray[0]);
+			}
+
 			if (timeSeconds > 59)
 			{
 				timeSeconds = 0;
 				timeMintues += 1;
 			}
 
-			timer.html((timeMintues < 10 ? ("0" + timeMintues).slice(-2) : timeMintues) + ":" + ("0" + timeSeconds).slice(-2));
+			if (timeMintues > 59)
+			{
+				timeMintues = 0;
+				timeHours += 1;
+			}
+
+			if (timeHours > 0)
+			{
+				timer.html((timeHours < 10 ? ("0" + timeHours).slice(-2) : timeHours) + ":" +
+						(timeMintues < 10 ? ("0" + timeMintues).slice(-2) : timeMintues) + ":" + ("0" + timeSeconds).slice(-2));
+			}
+			else
+			{
+				timer.html((timeMintues < 10 ? ("0" + timeMintues).slice(-2) : timeMintues) + ":" + ("0" + timeSeconds).slice(-2));
+			}
 		}
 	}
 
@@ -213,6 +235,32 @@ try
 				window.clearInterval(encounter_timer_interval_id);
 			}
 		}
+	}
+
+
+	window.putEncounterTimeInNote = function putEncounterTimeInNote()
+	{
+		let timer = jQuery("#encounter_timer");
+		let activeNote = jQuery($(caseNote));
+		if (activeNote !== undefined && timer !== undefined)
+		{
+			let endTime = new Date();
+			let timeStr = timer.html();
+
+			if (timeStr.split(":").length < 3)
+			{
+				timeStr = "00:" + timeStr;
+			}
+
+			noteTxt = activeNote.val();
+			noteTxt = noteTxt +
+					"Start time: " + encounter_timer_start_time.getHours() + ":" + encounter_timer_start_time.getMinutes() + "\n" +
+					"End time: " + endTime.getHours() + ":" + endTime.getMinutes() + "\n" +
+					"Duration: " + timeStr + "\n";
+			activeNote.val(noteTxt);
+			adjustCaseNote();
+		}
+
 	}
 
 </script>
@@ -627,7 +675,10 @@ try
     	</div>
     	<div style="padding-top: 3px;">
 			<div class="encounter_timer_container">
-				<div id="encounter_timer" title="Paste timer data" >00:00</div>
+				<div style="display: inline-block; position:relative;">
+					<div class="encounter_timer_background"></div>
+					<div id="encounter_timer" title="Paste timer data" onclick="putEncounterTimeInNote()">59:40</div>
+				</div>
 				<div id="encounter_timer_pause" onclick="toggleTimer()"><i class="fa fa-pause"></i></div>
 				<div id="encounter_timer_play" onclick="toggleTimer()"><i class="fa fa-play"></i></div>
 			</div>
