@@ -52,11 +52,11 @@ public final class EctSetupMeasurementsAction extends Action {
                                  HttpServletRequest request,
                                  HttpServletResponse response)
         throws Exception {
-        
-    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_measurement", "r", null)) {
-			throw new SecurityException("missing required security object (_measurement)");
-		}
-    	
+
+        LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+        String providerNo = loggedInInfo.getLoggedInProviderNo();
+        securityInfoManager.requireOnePrivilege(providerNo, securityInfoManager.READ, null, "_measurement");
+
         HttpSession session = request.getSession();
         EctMeasurementsForm frm = (EctMeasurementsForm) form;
         
@@ -64,39 +64,36 @@ public final class EctSetupMeasurementsAction extends Action {
         EctValidation ectValidation = new EctValidation();             
         String css = ectValidation.getCssPath(groupName);
         String today = LocalDate.now().toString();
-        /*
-        java.util.Calendar calender = java.util.Calendar.getInstance();
-        String day =  Integer.toString(calender.get(java.util.Calendar.DAY_OF_MONTH));
-        String month =  Integer.toString(calender.get(java.util.Calendar.MONTH)+1);
-        String year = Integer.toString(calender.get(java.util.Calendar.YEAR));
-        String today = year+"-"+month+"-"+day;
-          */
         request.setAttribute("groupName", groupName);
         request.setAttribute("css", css);
         EctSessionBean bean = (EctSessionBean)request.getSession().getAttribute("EctSessionBean");
         
-        String demo = null;
-        if (bean!=null){
+        String demo;
+        if (bean != null)
+        {
             request.getSession().setAttribute("EctSessionBean", bean);
             demo = bean.getDemographicNo();
-        }else{
+        }
+        else
+        {
             demo = request.getParameter("demographic_no");
         }   
         request.setAttribute("demographicNo",demo);
         oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBeanHandler hd = new oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBeanHandler(groupName, demo);
-        for(int i=0; i<hd.getMeasurementTypeVector().size(); i++){
+        for (int i = 0; i < hd.getMeasurementTypeVector().size(); i++)
+        {
             frm.setValue("date-" + i, today);
         }
         session.setAttribute("EctMeasurementsForm", frm);            
         session.setAttribute("measurementTypes", hd);
         Vector mInstrcVector = hd.getMeasuringInstrcHdVector();
-        for(int i=0; i<mInstrcVector.size(); i++){
+        for (int i = 0; i < mInstrcVector.size(); i++)
+        {
             EctMeasuringInstructionBeanHandler mInstrcs = (EctMeasuringInstructionBeanHandler) mInstrcVector.elementAt(i);
             String mInstrcName = "mInstrcs" + i;
             session.setAttribute(mInstrcName, mInstrcs);
         }
 
-        
         return (mapping.findForward("continue"));
     }
     
