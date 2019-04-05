@@ -51,7 +51,7 @@
 		<script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/scriptaculous.js"></script>
 		<script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/effects.js"></script>
 
-		
+
 		<title><bean:message key="ChooseAllergy.title" /></title>
 		<html:base />
 

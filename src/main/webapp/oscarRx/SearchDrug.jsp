@@ -107,8 +107,6 @@
 <%@page import="org.oscarehr.util.SpringUtils"%>
 <%@page import="org.oscarehr.util.SessionConstants"%>
 <%@page import="java.util.List"%>
-<%@page import="org.oscarehr.casemgmt.web.PrescriptDrug"%>
-<%@page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@ page import="org.oscarehr.rx.model.Drug" %>
 <html:html locale="true">
@@ -171,7 +169,7 @@ function customWarning(){
 	+ '\n  *  Drug Allergy Information'
 	+ '\n  *  Drug-Drug Interaction Information'
 	+ '\n  *  Drug Information'
-	+ '\n\nAre you sure you wish to use this feature?')==true) {
+	+ '\n\nAre you sure you wish to use this feature?') === true) {
 	window.location.href = 'chooseDrug.do?demographicNo=<%=response.encodeURL(Integer.toString(bean.getDemographicNo()))%>';
     }
 }

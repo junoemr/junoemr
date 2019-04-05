@@ -1,5 +1,5 @@
+<%--
 
-<%@ page import="oscar.util.ConversionUtils" %><%--
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
     This program is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@
     Ontario, Canada
 
 --%>
+<%@ page import="oscar.util.ConversionUtils" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -190,11 +191,10 @@
 									</td>
 								</tr>
 								<tr valign="center">
-
 									<td>
 										<span class="label">Comment: </span>
 										<html:textarea property="reactionDescription" cols="40" rows="3" />
-										<html:hidden property="ID" value="<%=drugrefId%>" />
+										<!-- < html:hidden property="" value="< %=drugrefId% >" /> -->
 										<html:hidden property="name" value="<%=name%>" />
 										<html:hidden property="type" value="<%=type%>" />
 									</td>
@@ -277,16 +277,15 @@
 								if (drugrefId == null || "0".equals(drugrefId) || "null".equals(drugrefId))
 								{
 								%>
-								<!-- <tr valign="center"> -->
-									<!-- <td><span class="label">Non Drug:</span> -->
-										<!-- <select name="nonDrug" id="nonDrug"> -->
-											<!-- <option value="">Select Below</option> -->
-											<!-- <option value="on" < % = //nonDrug != null && nonDrug.booleanValue() == true?" selected=\"selected\" ":""% >>Allergy to non-drug substance</option> -->
-											<!-- <option value="off" < % =nonDrug != null && nonDrug.booleanValue() == false?" selected=\"selected\" ":""% >>Adverse reaction to drug</option> -->
-
-										<!-- </select> -->
-									<!-- </td> -->
-								<!-- </tr> -->
+								<tr valign="center">
+									<td><span class="label">Non Drug:</span>
+										<select name="nonDrug" id="nonDrug">
+											<option value="">Select Below</option>
+											<option value="on">Allergy to non-drug substance</option>
+											<option value="off">Adverse reaction to drug</option>
+										</select>
+									</td>
+								</tr>
 								<%
 								}
 								%>

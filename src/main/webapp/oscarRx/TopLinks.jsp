@@ -32,64 +32,64 @@
 <c:set var="url" value="${ ctx }/demographic/demographiccontrol.jsp?demographic_no=${ param.demographicNo }&displaymode=edit&dboperation=search_detail&appointment=" />
 
 <table id="${ not empty param.tableId ? param.tableId : 'topLink' }" >
-    <tr>
-        <td id="topLinkLeftColumn">
-            <h1><c:out value="${ param.title }" /></h1>
-        </td>
+	<tr>
+		<td id="topLinkLeftColumn">
+			<h1><c:out value="${ param.title }" /></h1>
+		</td>
 
-        <td id="topLinkCenterColumn" >
+		<td id="topLinkCenterColumn" >
 
-            <c:if test="${ not empty param.patientName }" >
-                <a href="#" onClick="popupPage(700,1000,'${ param.title }','${ url }'); return false;"
-                   title="<bean:message key="provider.appointmentProviderAdminDay.msgMasterFile"/>" >
-                    <c:out value="${ param.patientName }" />
-                </a>
-            </c:if>
+			<c:if test="${ not empty param.patientName }" >
+				<a href="#" onClick="popupPage(700,1000,'${ param.title }','${ url }'); return false;"
+				   title="<bean:message key="provider.appointmentProviderAdminDay.msgMasterFile"/>" >
+					<c:out value="${ param.patientName }" />
+				</a>
+			</c:if>
 
-            <c:if test="${ not empty param.sex }" >
+			<c:if test="${ not empty param.sex }" >
 	        <span class="label">
 	        	sex
 	        </span>
-                <span>
-                        ${ param.sex }
-                </span>
-            </c:if>
+				<span>
+						${ param.sex }
+				</span>
+			</c:if>
 
-            <c:if test="${ not empty param.age }" >
+			<c:if test="${ not empty param.age }" >
 	        <span class="label">
 	        	age
 	        </span>
-                <span>
-                        ${ param.age }
-                </span>
-            </c:if>
+				<span>
+						${ param.age }
+				</span>
+			</c:if>
 
-            <c:if test="${ not empty param.phone }" >
+			<c:if test="${ not empty param.phone }" >
 	        <span class="label">
 	        	home
 	        </span>
-                <span>
-                        ${ param.phone }
-                </span>
-            </c:if>
+				<span>
+						${ param.phone }
+				</span>
+			</c:if>
 
-            <c:if test="${ not empty param.mrp }" >
-                <security:oscarSec roleName="${ security }" objectName="_newCasemgmt.doctorName" rights="r">
+			<c:if test="${ not empty param.mrp }" >
+				<security:oscarSec roleName="${ security }" objectName="_newCasemgmt.doctorName" rights="r">
 	    	<span class="label">
 	    		  <bean:message key="oscarEncounter.Index.msgMRP"/>
 		    </span>
-                    <span>
+					<span>
 		     	<c:out value="${ param.mrp }" />
 		    </span>
-                </security:oscarSec>
-            </c:if>
-        </td>
+				</security:oscarSec>
+			</c:if>
+		</td>
 
-        <td id="topLinkRightColumn">
+		<td id="topLinkRightColumn">
 	 		<span class="HelpAboutLogout" style="color:white;">
                  <oscar:help keywords="2.2.4" key="app.top1" style="color:white;" />
                  <a style="color:white;" href="${ ctx }/oscarEncounter/About.jsp" target="_new">About</a>
              </span>
-        </td>
-    </tr>
+		</td>
+	</tr>
 </table>

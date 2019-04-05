@@ -100,6 +100,7 @@
 
 					//--> unbind first to avoid multiple binds.
 					$(".deleteAllergyLink").unbind("click");
+					$(".modifyAllergyLink").unbind("click");
 					$("#searchResultsContainer a").unbind("click");
 					$(".DivContentSectionHead a img").unbind("click");
 
@@ -109,23 +110,33 @@
 						// override the old addReaction.do with the new addReaction2.do
 						var path = "${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do"
 						var param = this.href.split("?")[1];
+
 						sendSearchRequest(path, param, "#addAllergyDialogue");
 						$("#searchResultsContainer").html("");
 					});
 
 					//--> delete allergy.
 					$(".deleteAllergyLink").bind("click", function(event){
-						var id = this.id;
-						var param = id.split("_")[1].trim();
+						var ids = this.id.split("_");
+						var action = ids[0].split(":")[1];
+						var param = ids[1].trim();
 						var allergyId = param.split("&")[0];
 						allergyId = allergyId.split("=")[1].trim()
 						$("#allergy_" + allergyId).addClass("highLightRow");
 
 						var path = "${ pageContext.servletContext.contextPath }/oscarRx/deleteAllergy2.do";
 
-						if( confirm(" Inactivate this Allergy? ") ) {
+						if( confirm(action+" this Allergy?") ) {
 							sendSearchRequest(path, param, ".Step1Text");
 						}
+					});
+
+					//--> modify allergy.
+					$(".modifyAllergyLink").bind("click", function(event){
+						var ids = this.id.split("_");
+						var param = ids[1].trim();
+						sendSearchRequest("${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do",
+							param, "#addAllergyDialogue");
 					});
 
 					//--> Toggle search results listing.
@@ -138,7 +149,6 @@
 							document.getElementById(typecode+"_img").src='../images/expander.png';
 							Effect.BlindUp(document.getElementById(typecode+"_content"), {duration: 0.1 });
 						}
-
 					}
 
 					//--> Toggle search results listing.
@@ -212,21 +222,6 @@
 					$(".ControlPushButton").removeClass("highLightButton");
 				})
 
-				//--> delete allergy.
-				$(".deleteAllergyLink").click(function(){
-					var id = this.id;
-					var param = id.split("_")[1].trim();
-					var allergyId = param.split("&")[0];
-					allergyId = allergyId.split("=")[1].trim()
-					$("#allergy_" + allergyId).addClass("highLightRow");
-
-					var path = "${ pageContext.servletContext.contextPath }/oscarRx/deleteAllergy.do";
-
-					if( confirm(" Inactivate this Allergy? ") ) {
-						sendSearchRequest(path, param, "")
-					}
-				})
-
 				$().bindActionEvents();
 				$().setDefaults();
 
@@ -234,6 +229,24 @@
 
 			//--> AJAX the data to the server.
 			function sendSearchRequest(path, param, target) {
+				var iNKDA = document.forms.searchAllergy2.iNKDA.value;
+				if (param.indexOf(paramNKDA)>=0) {
+					var hasDrugAllergy = document.forms.searchAllergy2.hasDrugAllergy.value;
+					if (hasDrugAllergy=="true") {
+						alert("Active drug allergy exists!");
+						return;
+					}
+					if (iNKDA>0) {
+						var iAtoA = param.indexOf("allergyToArchive=");
+						if (iAtoA>0) iAtoA = param.substring(iAtoA+"allergyToArchive=".length);
+						if (iAtoA<0 || iNKDA>iAtoA) {
+							alert("\"No Known Drug Allergies\" already exists!");
+							return;
+						}
+					}
+				} else if (param.indexOf("ID=0")<0 && iNKDA>0) {
+					param += "&nkdaId="+iNKDA;
+				}
 				$.ajax({
 					url: path,
 					type: 'POST',
@@ -241,6 +254,7 @@
 					dataType: 'html',
 					success: function(data) {
 						renderSearchResults(data, target);
+						if (path.indexOf("deleteAllergy")>=0) location.reload();
 					}
 				});
 			}
@@ -281,26 +295,22 @@
 			}
 
 			//--> Checkboxes for search allergy criteria
-			function typeSelect()
-			{
+			function typeSelect(){
 				var frm = document.forms.searchAllergy2;
 
 				frm.type1.checked = true;
 				frm.type2.checked = true;
 				frm.type3.checked = true;
 				frm.type4.checked = true;
-
 			}
 
-			function typeClear()
-			{
+			function typeClear(){
 				var frm = document.forms.searchAllergy2;
 
 				frm.type1.checked = false;
 				frm.type2.checked = false;
 				frm.type3.checked = false;
 				frm.type4.checked = false;
-
 			}
 
 
@@ -310,36 +320,37 @@
 				if(isEmpty() == true){
 					name = name.toUpperCase();
 					confirm("Adding custom allergy: " + name);
-					/*          window.location="addReaction2.do?ID=0&type=0&name="+name; */
 					sendSearchRequest("${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do",
 						"ID=0&type=0&name="+name,"#addAllergyDialogue");
 					$("input[value='Custom Allergy']").addClass("highLightButton");
 				}
-
 			}
 
 			function addPenicillinAllergy(){
 				$(".highLightButton").removeClass("highLightButton");
+				var param = "ID=44452&name=PENICILLINS&type=10";
+
 				sendSearchRequest("${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do",
-					"ID=44452&name=PENICILLINS&type=10", "#addAllergyDialogue");
+					param, "#addAllergyDialogue");
 				$("input[value='Penicillin']").addClass("highLightButton");
-				/* window.location="addReaction2.do?ID=44452&name=PENICILLINS&type=10"; */
 			}
 
 			function addSulfonamideAllergy(){
 				$(".highLightButton").removeClass("highLightButton");
+				var param = "ID=44159&name=SULFONAMIDES&type=10";
+
 				sendSearchRequest("${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do",
-					"ID=44159&name=SULFONAMIDES&type=10","#addAllergyDialogue");
+					param, "#addAllergyDialogue");
 				$("input[value='Sulfa']").addClass("highLightButton");
-				/*             window.location="addReaction2.do?ID=44159&name=SULFONAMIDES&type=10"; */
 			}
+
+			var paramNKDA = "name=No Known Drug Allergies";
 
 			function addCustomNKDA(){
 				$(".highLightButton").removeClass("highLightButton");
 				sendSearchRequest("${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do",
-					"ID=0&type=0&name=No Known Drug Allergies","#addAllergyDialogue");
+					"ID=0&type=0&"+paramNKDA, "#addAllergyDialogue");
 				$("input[value='NKDA']").addClass("highLightButton");
-				/*             window.location="addReaction2.do?ID=0&type=0&name=NKDA"; */
 			}
 
 
@@ -400,58 +411,53 @@
 							</table>
 						</td>
 					</tr>
-
 					<tr>
 						<td class="DivContentSectionHead" >
-
 							<bean:message key="EditAllergies.section2Title" />
-
 							<span class="view_menu">View:
 
-				<%
+						<%
 
-					String demoNo=request.getParameter("demographicNo");
+							String demoNo=request.getParameter("demographicNo");
 
-					if(demoNo==null) {
-						demoNo = (String)session.getAttribute("demographicNo");
-					}else{
-						session.setAttribute("demographicNo", demoNo);
-					}
+							if(demoNo==null) {
+								demoNo = (String)session.getAttribute("demographicNo");
+							}else{
+								session.setAttribute("demographicNo", demoNo);
+							}
 
-					if(demoNo == null || demoNo.equals("null")) {
-						demoNo = String.valueOf(bean.getDemographicNo());
-					}
+							if(demoNo == null || demoNo.equals("null")) {
+								demoNo = String.valueOf(bean.getDemographicNo());
+							}
 
-					String strView=request.getParameter("view");
+							String strView=request.getParameter("view");
+							if (strView==null) strView = "Active";
 
-					String[] navArray={"Active","All","Inactive"};
+							String[] navArray={"Active","All","Inactive"};
 
-					int i=0;
-					for(i=0;i<navArray.length;i++)
-					{
+							int i=0;
+							for(i=0;i<navArray.length;i++)
+							{
+								if( strView.equals(navArray[i]) ){
+									out.print(" <span class='view_selected'>"+navArray[i]+"</span>");
+								}else{
+									out.print("<span class='view_menu'><a href='ShowAllergies2.jsp?demographicNo="+demoNo+"&view="+navArray[i]+"'>");
+									out.print(navArray[i]);
+									out.print("</a></span>");
+								}
+							}
+						//1 mild 2 moderate 3 severe 4 unknown
 
-						if( (strView!=null && strView.equals(navArray[i]) || ( strView==null && i==0 ) )){
+							String[] ColourCodesArray=new String[6];
+							ColourCodesArray[1]="#F5F5F5"; // Mild Was set to yellow (#FFFF33) SJHH requested not to flag mild
+							ColourCodesArray[2]="#FF6600"; // Moderate
+							ColourCodesArray[3]="#CC0000"; // Severe
+							ColourCodesArray[4]="#E0E0E0"; // unknown
+							ColourCodesArray[5]="#FFFFFF"; // no reaction
 
-							out.print(" <span class='view_selected'>"+navArray[i]+"</span>");
-
-
-						}else{
-							out.print("<span class='view_menu'><a href='ShowAllergies2.do?demographicNo="+demoNo+"&view="+navArray[i]+"'>");
-							out.print(navArray[i]);
-							out.print("</a></span>");
-						}
-					}
-					//1 mild 2 moderate 3 severe 4 unknown
-
-					String[] ColourCodesArray=new String[5];
-					ColourCodesArray[1]="#F5F5F5"; // Mild Was set to yellow (#FFFF33) SJHH requested not to flag mild
-					ColourCodesArray[2]="#FF6600"; // Moderate
-					ColourCodesArray[3]="#CC0000"; // Severe
-					ColourCodesArray[4]="#E0E0E0"; // unknown
-
-					String allergy_colour_codes = "<table class='allergy_legend' cellspacing='0'><tr><td><b>Legend:</b></td> <td > <table class='colour_codes' bgcolor='"+ColourCodesArray[1]+"'><td> </td></table></td> <td >Mild</td> <td > <table class='colour_codes' bgcolor='"+ColourCodesArray[2]+"'><td> </td></table></td> <td >Moderate</td><td > <table class='colour_codes' bgcolor='"+ColourCodesArray[3]+"'><td> </td></table></td> <td >Severe</td> </tr></table>";
-				%>
-				</span>
+							String allergy_colour_codes = "<table class='allergy_legend' cellspacing='0'><tr><td><b>Legend:</b></td> <td > <table class='colour_codes' bgcolor='"+ColourCodesArray[1]+"'><td> </td></table></td> <td >Mild</td> <td > <table class='colour_codes' bgcolor='"+ColourCodesArray[2]+"'><td> </td></table></td> <td >Moderate</td><td > <table class='colour_codes' bgcolor='"+ColourCodesArray[3]+"'><td> </td></table></td> <td >Severe</td> </tr></table>";
+						%>
+							</span>
 							<%
 								if (MyOscarUtils.isMyOscarEnabled((String) session.getAttribute("user")))
 								{
@@ -505,16 +511,23 @@
 												String labelAction;
 												String actionPath;
 												String trColour;
-												String labelConfirmAction;
 												String strSOR;
 												int intSOR;
+												boolean hasDrugAllergy=false;
+												int iNKDA = 0;
 
-												for(Allergy allergy : patient.getAllergies(LoggedInInfo.getLoggedInInfoFromSession(request))) {
-
+												for(Allergy allergy : patient.getAllergies(LoggedInInfo.getLoggedInInfoFromSession(request)))
+												{
+													if (!allergy.getArchived())
+													{
+														if (allergy.getTypeCode()>0) hasDrugAllergy = true;
+														if (allergy.getDescription().equals("No Known Drug Allergies")) iNKDA = allergy.getId();
+													}
 
 													String title = "";
-													if(allergy.getRegionalIdentifier() != null && !allergy.getRegionalIdentifier().trim().equalsIgnoreCase("null") && !allergy.getRegionalIdentifier().trim().equals("")){
-														title=  " title=\"Din: "+allergy.getRegionalIdentifier()+"\" ";
+													if(allergy.getRegionalIdentifier() != null && !allergy.getRegionalIdentifier().trim().equalsIgnoreCase("null") && !allergy.getRegionalIdentifier().trim().equals(""))
+													{
+														title= " title=\"Din: "+allergy.getRegionalIdentifier()+"\" ";
 													}
 
 													boolean filterOut=false;
@@ -524,11 +537,13 @@
 													{
 														intArchived = Integer.parseInt(strArchived);
 
-														if(bean.getView().equals("Active") && intArchived == 1) {
+														if(strView.equals("Active") && intArchived == 1)
+														{
 															filterOut=true;
 														}
 
-														if(bean.getView().equals("Inactive") && intArchived == 0) {
+														if(strView.equals("Inactive") && intArchived == 0)
+														{
 															filterOut=true;
 														}
 													}
@@ -541,19 +556,20 @@
 													intSOR = Integer.parseInt(strSOR);
 													String sevColour;
 
-													if(intArchived==1){
+													if(intArchived==1)
+													{
 														//if allergy is set as archived
 														labelStatus="Inactive";
-														labelAction="Activate";
-														labelConfirmAction="Active";
+														labelAction="Reactivate";
 														actionPath="activate";
 														trColour="#C0C0C0";
 
 														sevColour="#C0C0C0"; //clearing severity bgcolor
-													}else{
+													}
+													else
+													{
 														labelStatus="Active";
 														labelAction="Inactivate";
-														labelConfirmAction="Inactive";
 														actionPath="delete";
 
 														trColour="#E0E0E0";
@@ -561,21 +577,24 @@
 													}
 
 
-													if(!filterOut) {
+													if(!filterOut)
+													{
 														String entryDate = partialDateDao.getDatePartial(allergy.getEntryDate(), PartialDate.ALLERGIES, allergy.getAllergyId(), PartialDate.ALLERGIES_ENTRYDATE);
 														String startDate = partialDateDao.getDatePartial(allergy.getStartDate(), PartialDate.ALLERGIES, allergy.getAllergyId(), PartialDate.ALLERGIES_STARTDATE);
 											%>
-
 											<tr bgcolor="<%=trColour%>" id="allergy_<%= allergy.getAllergyId() %>" >
 												<td><%=labelStatus%></td>
 												<td><%=entryDate==null ? "" : entryDate %></td>
 												<td <%=title%> ><%=allergy.getDescription() %></td>
 												<td><%=allergy.getTypeDesc() %></td>
+												<!-- We do not have allergy.isNonDrug -->
+												<td><%=allergy.getTypeCode() == 0 ? "<i>&lt;Not Set&gt;</i>" :""%><%=allergy.getTypeCode() == 0 ? "*" : "" %></td>
 												<td bgcolor="<%=sevColour%>"><%=allergy.getSeverityOfReactionDesc() %></td>
 												<td><%=allergy.getOnSetOfReactionDesc() %></td>
 												<td><%=allergy.getReaction()!=null?allergy.getReaction():"" %></td>
 												<td><%=startDate==null ? "" : startDate %></td>
 												<td><%=allergy.getLifeStageDesc() %></td>
+												<td><%=allergy.getAgeOfOnset()==null ? "" : allergy.getAgeOfOnset()%></td>
 												<%
 													CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 													@SuppressWarnings("unchecked")
@@ -587,30 +606,38 @@
 														{
 													%>
 													<a href="#" title="Annotation" onclick="window.open('../annotation/annotation.jsp?display=<%=annotation_display%>&table_id=<%=String.valueOf(allergy.getAllergyId())%>&demo=<jsp:getProperty name="patient" property="demographicNo"/>','anwin','width=400,height=500');">
-														<%if(existingAnnots.size()>0) {%>
+														<%			if(existingAnnots.size()>0) {%>
 														<img src="../images/filledNotes.gif" border="0"/>
-														<% } else { %>
+														<%			} else { %>
 														<img src="../images/notes.gif" border="0">
-														<% } %>
+														<%			} %>
 													</a>
-													<%
-														}
-													%>
+													<%	} %>
 												</td>
 												<td>
 													<%
-														if(!allergy.isIntegratorResult() && securityManager.hasDeleteAccess("_allergies",roleName$)) {
+														if(!allergy.isIntegratorResult() && securityManager.hasDeleteAccess("_allergies",roleName$))
+														{
+															if(intArchived==0)
+															{
 													%>
 													<a href="#" class="deleteAllergyLink"
-													   id="deleteAllergy_ID=<%= allergy.getAllergyId() %>&demographicNo=<%=demoNo %>&action=<%=actionPath %>" >
+													   id="deleteAllergy:<%= labelAction %>_ID=<%=allergy.getAllergyId() %>&demographicNo=<%=demoNo %>&action=<%=actionPath %>" >
 														<%=labelAction%>
+													</a> |
+													<%		} %>
+													<a href="#" class="modifyAllergyLink"
+													   id="modifyAllergy:<%= labelAction %>_ID=<%=allergy.getDrugrefId() %>&name=<%=allergy.getDescription() %>&type=<%=allergy.getTypeCode() %>&allergyToArchive=<%=allergy.getId() %>" >
+														<%=intArchived==0?"Modify":labelAction%>
 													</a>
-
-													<% } %>
+													<%	} %>
 												</td>
 											</tr>
-											<% } %>
-											<% } //end of iterate %>
+											<%
+													}
+												} //end of iterate
+											if (hasDrugAllergy) iNKDA = 0;
+											%>
 
 										</table>
 
@@ -622,11 +649,16 @@
 					</tr>
 
 					<tr id="addAllergyInterface" >
-
 						<td>
-							<form action="/oscarRx/searchAllergy2.do" focus="searchString" id="searchAllergy2"  >
+							<form action="/oscarRx/searchAllergy2.do" focus="searchString" id="searchAllergy2" onSubmit="return submitSearchForm()">
+
+								<input type="hidden" name="iNKDA" value="<%=iNKDA%>"/>
+								<input type="hidden" name="hasDrugAllergy" value="<%=hasDrugAllergy%>"/>
+
 								<table>
-									<tr><th>Add an Allergy</th></tr>
+									<tr>
+										<th>Add an Allergy</th>
+									</tr>
 									<tr id="allergyQuickButtonRow" >
 										<td>
 											<input type=button class="ControlPushButton" onclick="javascript:addCustomNKDA();" value="NKDA" />
@@ -634,30 +666,27 @@
 											<input type=button class="ControlPushButton" onclick="javascript:addSulfonamideAllergy();" value="Sulfa" />
 										</td>
 									</tr>
-
 									<tr>
 										<td id="addAllergyDialogue"></td>
 									</tr>
-
 									<tr id="allergySearchCriteraRow">
 										<td>
 											<div id="allergySearchSelectors">
-												<input type="checkbox" name="type4"  id="type4" ${ type4 ? 'checked' : '' } />
+												<input type="checkbox" name="type4" id="type4" ${ type4 ? 'checked' : '' } />
 												<label for="type4" >Drug Classes</label>
-												<input type="checkbox" name="type3" id="type3"  ${ type3 ? 'checked' : '' }  />
+												<input type="checkbox" name="type3" id="type3" ${ type3 ? 'checked' : '' } />
 												<label for="type3" >Ingredients</label>
-												<input type="checkbox" name="type2" id="type2"  ${ type2 ? 'checked' : '' }  />
+												<input type="checkbox" name="type2" id="type2" ${ type2 ? 'checked' : '' } />
 												<label for="type2" >Generic Names</label>
-												<input type="checkbox"  name="type1" id="type1"  ${ type1 ? 'checked' : '' }  />
+												<input type="checkbox" name="type1" id="type1" ${ type1 ? 'checked' : '' } />
 												<label for="type1" >Brand Names</label>
-												<input type="checkbox" name="typeSelectAll" id="typeSelectAll"  />
+												<input type="checkbox" name="typeSelectAll" id="typeSelectAll" />
 												<label for="typeSelectAll" >All</label>
 											</div>
 											<input type="text" name="searchString" value="${ searchString }" size="16" id="searchString" maxlength="16" />
 											<input type="button" value="Search" id="searchStringButton" class="ControlPushButton" />
 											OR
 											<input type=button class="ControlPushButton" onclick="javascript:addCustomAllergy();" value="Custom Allergy" />
-
 										</td>
 									</tr>
 								</table>
