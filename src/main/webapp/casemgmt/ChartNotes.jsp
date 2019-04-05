@@ -119,7 +119,8 @@ try
 	}
 %>
 
-
+<link href="ChartNotes.css" rel="stylesheet" type="text/css">
+<link href="../web/bower_components/components-font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
 
 <script type="text/javascript">
     ctx = "<c:out value="${ctx}"/>";
@@ -127,6 +128,7 @@ try
     providerNo = "<%=provNo%>";
     demographicNo = "<%=demographicNo%>";
     case_program_id = "<%=pId%>";
+	encounter_timer_interval_id = undefined;
 
     <caisi:isModuleLoad moduleName="caisi">
         caisiEnabled = true;
@@ -159,12 +161,60 @@ try
     	notesScrollCheckInterval = setInterval('notesIncrementAndLoadMore()', 2000);
 
         bindCalculatorListener(calculatorMenu);
+
+		encounter_timer_interval_id = window.setInterval(updateTimer, 1000, "#encounter_timer");
     });
 
     <% if( request.getAttribute("NoteLockError") != null ) { %>
 		alert("<%=request.getAttribute("NoteLockError")%>");
 	<%}%>
-	
+
+	function updateTimer(timerId)
+	{
+		let timer = jQuery("#encounter_timer");
+		if (timer !== undefined)
+		{
+			let timeArray = timer.html().split(":");
+			let timeMintuesString = timeArray[0];
+			let timeSecondsString = timeArray[1];
+
+			let timeSeconds = parseInt(timeSecondsString) + 1;
+			let timeMintues = parseInt(timeMintuesString);
+			if (timeSeconds > 59)
+			{
+				timeSeconds = 0;
+				timeMintues += 1;
+			}
+
+			timer.html((timeMintues < 10 ? ("0" + timeMintues).slice(-2) : timeMintues) + ":" + ("0" + timeSeconds).slice(-2));
+		}
+	}
+
+	// toggle the timer state depending on current state (start / stop)
+	window.toggleTimer = function toggleTimer()
+	{
+		let pause = jQuery("#encounter_timer_pause");
+		let play = jQuery("#encounter_timer_play");
+
+		if (play !== undefined && pause !== undefined)
+		{
+			if (pause.css("display") == "none")
+			{// play
+				play.css("display", "none");
+				pause.css("display", "inline-block");
+
+				encounter_timer_interval_id = window.setInterval(updateTimer, 1000, "#encounter_timer");
+			}
+			else
+			{// stop
+				play.css("display", "inline-block");
+				pause.css("display", "none");
+
+				window.clearInterval(encounter_timer_interval_id);
+			}
+		}
+	}
+
 </script>
 
  <html:form action="/CaseManagementView" method="post">
@@ -576,6 +626,11 @@ try
 	    	</span>
     	</div>
     	<div style="padding-top: 3px;">
+			<div class="encounter_timer_container">
+				<div id="encounter_timer" title="Paste timer data" >00:00</div>
+				<div id="encounter_timer_pause" onclick="toggleTimer()"><i class="fa fa-pause"></i></div>
+				<div id="encounter_timer_play" onclick="toggleTimer()"><i class="fa fa-play"></i></div>
+			</div>
     		<button type="button" onclick="return showHideIssues(event, 'noteIssues-resolved');"><bean:message key="oscarEncounter.Index.btnDisplayResolvedIssues"/></button> &nbsp;
     		<button type="button" onclick="return showHideIssues(event, 'noteIssues-unresolved');"><bean:message key="oscarEncounter.Index.btnDisplayUnresolvedIssues"/></button> &nbsp;
     		<button type="button" onclick="javascript:spellCheck();">Spell Check</button> &nbsp;

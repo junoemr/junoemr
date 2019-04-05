@@ -1,0 +1,61 @@
+
+.encounter_timer_container {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    background-color: #dddddd;
+    top: 6px;
+
+    border-radius: 2px;
+    border-width: 1px;
+    border-color: black;
+    padding: 3px;
+    max-height: 17px;
+
+}
+
+.encounter_timer_container div {
+    cursor: pointer;
+    border-style: none;
+}
+
+.encounter_timer_container .fa {
+    position: relative;
+    color: #222222;
+    left: 0px;
+    top: 0px;
+}
+
+#encounter_timer {
+    display: inline-block;
+    position: relative;
+    background-color: white;
+
+    padding: 4px;
+    top: -4px;
+    left: -4px;
+    min-width: 20px;
+}
+
+#encounter_timer:active {
+    background-color: #bbbbff;
+}
+
+
+#encounter_timer_pause {
+    display: inline-block;
+    position:relative;
+    top: -4px;
+    left: -2px;
+    width: 15px;
+    background-color: transparent;
+}
+
+#encounter_timer_play {
+    display: none;
+    position:relative;
+    top: -4px;
+    left: -2px;
+    width: 15px;
+    background-color: transparent;
+}
