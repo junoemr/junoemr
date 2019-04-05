@@ -9,20 +9,34 @@
 
 --%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<% long startTime = System.currentTimeMillis(); %>
 <%@page contentType="text/html"%>
-<%@page import="oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*,oscar.oscarEncounter.oscarMeasurements.*,oscar.oscarEncounter.oscarMeasurements.bean.*,java.net.*, oscar.oscarRx.util.*"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils,oscar.log.*"%>
-<%@page import="org.springframework.web.context.WebApplicationContext,oscar.oscarResearch.oscarDxResearch.bean.*"%>
-<%@page import="org.oscarehr.common.dao.FlowSheetCustomizationDao,org.oscarehr.common.model.FlowSheetCustomization"%>
-<%@page import="org.oscarehr.common.dao.FlowSheetDrugDao,org.oscarehr.common.model.FlowSheetDrug"%>
-<%@page import="org.oscarehr.common.dao.UserPropertyDAO,org.oscarehr.common.model.UserProperty"%>
+<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@page import="org.springframework.web.context.WebApplicationContext"%>
+<%@page import="org.oscarehr.common.dao.FlowSheetCustomizationDao"%>
+<%@page import="org.oscarehr.common.model.FlowSheetCustomization"%>
 
 <%@page import="org.oscarehr.allergy.dao.AllergyDao"%>
 <%@page import="org.oscarehr.allergy.model.Allergy"%>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="java.time.LocalDate" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="static org.caisi.comp.web.WebComponentUtil.getServletContext" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementInfo" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.FlowSheetItem" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean" %>
+<%@ page import="oscar.log.LogAction" %>
+<%@ page import="oscar.log.LogConst" %>
+<%@ page import="oscar.oscarRx.util.RxUtil" %>
+<%@ page import="java.net.URLEncoder" %>
 
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -33,12 +47,10 @@
 
 <%
     if(session.getValue("user") == null) response.sendRedirect("../../logout.jsp");
-    //int demographic_no = Integer.parseInt(request.getParameter("demographic_no"));
     if(session.getAttribute("userrole") == null )  response.sendRedirect("../logout.jsp");
     String project = request.getContextPath();
     String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
     String demographic_no = request.getParameter("demographic_no");
-    String providerNo = (String) session.getAttribute("user");
     String temp = "diab3";
 	String uuid = request.getParameter("uuid");
 	String UUIDParamStr = "&uuid="+ StringUtils.trimToEmpty(uuid);
@@ -56,13 +68,9 @@
 
 
 <%
-boolean dsProblems = false;
-
-
 WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 
 FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
-FlowSheetDrugDao flowSheetDrugDao = (FlowSheetDrugDao) ctx.getBean("flowSheetDrugDao");
 
 List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( temp,(String) session.getAttribute("user"),Integer.parseInt(demographic_no));
 
@@ -75,7 +83,6 @@ MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(temp,custList);
 MeasurementInfo mi = new MeasurementInfo(demographic_no);
 List<String> measurementLs = mFlowsheet.getMeasurementList();
 ArrayList<String> measurements = new ArrayList(measurementLs);
-long startTimeToGetM = System.currentTimeMillis();
 
 mi.getMeasurements(measurements);
 
@@ -90,8 +97,6 @@ for(int i = 0; i < recList.size(); i++){
 }
 
 String flowSheet = mFlowsheet.getDisplayName();
-ArrayList<String> warnings = mi.getWarnings();
-ArrayList<String> recomendations = mi.getRecommendations();
 %>
 
 <html>
@@ -125,19 +130,6 @@ ArrayList<String> recomendations = mi.getRecommendations();
     		$('.xsparkline').sparkline(vals2,{type:"line", lineColor:"#f00", fillColor:"", spotRadius:"0", spotColor:"", composite:"true"});
     	});
     </script>
-    
-<script>
-	function getDemographicNo() {
-		return '<%=demographic_no%>';
-	}
-	function getContextPath() {
-		return '<%=request.getContextPath()%>';
-	}
-	function refreshEncounter()
-	{
-		return '';
-	}
-</script>
 
 	<oscar:customInterface name="renal" section="indicators"/>
 
@@ -199,8 +191,6 @@ ArrayList<String> recomendations = mi.getRecommendations();
 	}
 
 	$(document).ready(function() {
-
-		var sliderTimeout;
 
 		$("#highlightSlider").slider({
 			value: 0,
@@ -927,7 +917,6 @@ String date = LocalDate.now().toString();
 
 					<%
 					Iterator<EctMeasurementsDataBean> alistIterator = alist.iterator();
-					Iterator<EctMeasurementsDataBean> graphIterator = alist.iterator();
     				HashMap<String,String> hdata;
     				EctMeasurementsDataBean mdb;
     				%>
@@ -1127,7 +1116,6 @@ String date = LocalDate.now().toString();
     	<td id="<%=header.getDisplayName()%>_update_comments" align="right" style="border-top: 1px solid #9d9d9d;">
     	</td></tr>
     <%
-    	node = node.getNextSibling();
     }%>
 
 	<tr>
