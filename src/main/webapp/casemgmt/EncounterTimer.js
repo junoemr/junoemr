@@ -2,19 +2,23 @@
 
 var encounterTimerStartTime = new Date();
 var encounterTimerIntervalId = null;
-var encounterCurrentTime = {seconds: 4850};
+var encounterCurrentTime = {seconds: 0};
+var encounterTimerPaused = {paused: false};
 
 jQuery(document).ready( function () {
     encounterTimerStartTime = new Date();
-    encounterTimerIntervalId = window.setInterval(updateTimer, 1000, "#encounter_timer", encounterCurrentTime);
+    encounterTimerIntervalId = window.setInterval(updateTimer, 1000, "#encounter_timer", "#encounter_timer_background", encounterCurrentTime, encounterTimerPaused);
 });
 
-function updateTimer(timerId, currTime)
+function updateTimer(timerId, timerBgId, currTime, timerPaused)
 {
     let timer = jQuery(timerId);
     if (timer.length && currTime)
     {
-        currTime.seconds ++;
+        if (!timerPaused.paused)
+        {
+            currTime.seconds++;
+        }
 
         let timeSeconds = currTime.seconds % 60;
         let timeMinutes = parseInt(currTime.seconds / 60) % 60;
@@ -29,34 +33,61 @@ function updateTimer(timerId, currTime)
         {
             timer.html((timeMinutes < 10 ? ("0" + timeMinutes).slice(-2) : timeMinutes) + ":" + ("0" + timeSeconds).slice(-2));
         }
+
+        //modify color if over certain time
+        if (currTime.seconds > 3600)
+        {
+            jQuery(timerBgId).css("background-color", "#FDFEC7");
+        }
+        else if (currTime.seconds > 1200)
+        {
+            jQuery(timerBgId).css("background-color", "#DFF0D8");
+        }
+
+        //ensure correct button is being displayed
+        showEncounterTimerControl(timerPaused.paused, '#encounter_timer_pause', '#encounter_timer_play');
     }
 }
 
 // toggle the timer state depending on current state (start / stop)
 window.toggleEncounterTimer = function toggleEncounterTimer(pauseId, playId)
 {
+    if (encounterTimerPaused.paused)
+    {// play
+        showEncounterTimerControl(false, pauseId, playId);
+
+        encounterTimerPaused.paused = false;
+        //encounterTimerIntervalId = window.setInterval(updateTimer, 1000, "#encounter_timer", "#encounter_timer_background", encounterCurrentTime);
+    }
+    else
+    {// stop
+        showEncounterTimerControl(true, pauseId, playId);
+
+        encounterTimerPaused.paused = true;
+        //window.clearInterval(encounterTimerIntervalId);
+    }
+}
+
+
+function showEncounterTimerControl(bPaused, pauseId, playId)
+{
     let pause = jQuery(pauseId);
     let play = jQuery(playId);
 
     if (play.length && pause.length)
     {
-        if (pause.css("display") == "none")
-        {// play
-            play.css("display", "none");
-            pause.css("display", "inline-block");
-
-            encounterTimerIntervalId = window.setInterval(updateTimer, 1000, "#encounter_timer", encounterCurrentTime);
-        }
-        else
-        {// stop
+        if (bPaused)
+        {
             play.css("display", "inline-block");
             pause.css("display", "none");
-
-            window.clearInterval(encounterTimerIntervalId);
+        }
+        else
+        {
+            play.css("display", "none");
+            pause.css("display", "inline-block");
         }
     }
 }
-
 
 window.putEncounterTimeInNote = function putEncounterTimeInNote()
 {

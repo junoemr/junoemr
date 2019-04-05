@@ -33,7 +33,7 @@
     min-width: 20px;
 }
 
-.encounter_timer_background {
+#encounter_timer_background {
     position:absolute;
     background-color: white;
     left: -20px;

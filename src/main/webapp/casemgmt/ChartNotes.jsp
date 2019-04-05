@@ -580,7 +580,7 @@ try
     	<div style="padding-top: 3px;">
 			<div class="encounter_timer_container">
 				<div style="display: inline-block; position:relative;">
-					<div class="encounter_timer_background"></div>
+					<div id="encounter_timer_background"></div>
 					<div id="encounter_timer" title="Paste timer data" onclick="putEncounterTimeInNote()">00:00</div>
 				</div>
 				<div id="encounter_timer_pause" onclick="toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"><i class="fa fa-pause"></i></div>
