@@ -23,23 +23,16 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-
+import io.swagger.v3.oas.annotations.Parameter;
 import net.sf.json.JSONObject;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.caisi_integrator.ws.DemographicTransfer;
 import org.oscarehr.caisi_integrator.ws.MatchingDemographicParameters;
 import org.oscarehr.caisi_integrator.ws.MatchingDemographicTransferScore;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.search.DemographicCriteriaSearch;
+import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
@@ -47,17 +40,21 @@ import org.oscarehr.web.DemographicSearchHelper;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
-import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
-import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SEARCHMODE;
-import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SORTDIR;
-import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SORTMODE;
-import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.STATUSMODE;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.oscarehr.ws.rest.to.model.StatusValueTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import oscar.OscarProperties;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -65,12 +62,19 @@ import oscar.OscarProperties;
  */
 @Path("/demographics")
 @Component("demographicsService")
-public class DemographicsService extends AbstractServiceImpl {
-
+@Produces(MediaType.APPLICATION_JSON)
+public class DemographicsService extends AbstractServiceImpl
+{
 	private static Logger logger = MiscUtils.getLogger();
 
 	@Autowired
 	private DemographicManager demographicManager;
+
+	@Autowired
+	private DemographicDao demographicDao;
+
+	@Autowired
+	private DemographicService demographicService;
 
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
@@ -86,133 +90,115 @@ public class DemographicsService extends AbstractServiceImpl {
 	 */
 	@GET
 	@Path("/quickSearch")
-	@Produces("application/json")
-	public RestSearchResponse<DemographicSearchResult> search(@QueryParam("query") String query) {
-
-		try
+	public RestSearchResponse<DemographicSearchResult> quickSearch(@QueryParam("page")
+	                                                               @DefaultValue("1")
+	                                                               @Parameter(description = "Requested result page")
+			                                                               Integer page,
+	                                                               @QueryParam("perPage")
+	                                                               @DefaultValue("10")
+	                                                               @Parameter(description = "Number of results per page")
+			                                                               Integer perPage,
+	                                                               @QueryParam("query") String query)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
+				SecurityInfoManager.READ, null, "_demographic");
+		if (query == null)
 		{
-			securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, "_demographic");
-
-			if (query == null)
-			{
-				return RestSearchResponse.errorResponse("No Query Parameter Sent");
-			}
-
-			List<DemographicSearchResult> results = new ArrayList<>(0);
-			DemographicSearchRequest req = new DemographicSearchRequest();
-			req.setStatusMode(STATUSMODE.active);
-			req.setSortMode(SORTMODE.Name);
-			req.setSortDir(SORTDIR.asc);
-			req.setIntegrator(false); //this should be configurable by persona
-
-			//caisi
-			boolean outOfDomain = true;
-			if (OscarProperties.getInstance().getProperty("ModuleNames", "").contains("Caisi"))
-			{
-				outOfDomain = false;
-			}
-			req.setOutOfDomain(outOfDomain);
-
-
-			if (query.startsWith("addr:"))
-			{
-				req.setMode(SEARCHMODE.Address);
-				req.setKeyword(query.substring("addr:".length()));
-			}
-			else if (query.startsWith("chartNo:"))
-			{
-				req.setMode(SEARCHMODE.ChartNo);
-				req.setKeyword(query.substring("chartNo:".length()));
-			}
-			else
-			{
-				req.setMode(SEARCHMODE.Name);
-				req.setKeyword(query);
-			}
-
-			int count = demographicManager.searchPatientsCount(getLoggedInInfo(), req);
-
-			if (count > 0)
-			{
-				results = demographicManager.searchPatients(getLoggedInInfo(), req, 0, 10);
-			}
-			return RestSearchResponse.successResponse(results, 1, 10, count);
+			return RestSearchResponse.errorResponse("No Query Parameter Sent");
 		}
-		catch (Exception e)
+
+		page = validPageNo(page);
+		perPage = limitedResultCount(perPage);
+		int offset = calculatedOffset(page, perPage);
+
+		DemographicService.SEARCH_MODE searchMode = DemographicService.SEARCH_MODE.name;
+		if (query.startsWith("addr:"))
 		{
-			logger.error("Error", e);
+			searchMode = DemographicService.SEARCH_MODE.address;
+			query = query.substring("addr:".length());
 		}
-		return RestSearchResponse.errorResponse("Error");
+		else if (query.startsWith("chartNo:"))
+		{
+			searchMode = DemographicService.SEARCH_MODE.chart_no;
+			query = query.substring("chartNo:".length());
+		}
+
+		// set up the search criteria
+		DemographicCriteriaSearch searchQuery = demographicService.buildDemographicSearch(query, searchMode,
+				DemographicService.STATUS_MODE.active,
+				DemographicCriteriaSearch.SORT_MODE.DemographicName);
+		searchQuery.setOffset(offset);
+		searchQuery.setLimit(perPage);
+		searchQuery.setSortDirAscending();
+
+		List<DemographicSearchResult> results = new ArrayList<>(0);
+		int count = demographicDao.criteriaSearchCount(searchQuery);
+		if(count > 0)
+		{
+			results = demographicService.toSearchResultTransferList(searchQuery);
+		}
+		return RestSearchResponse.successResponse(results, page, perPage, count);
 	}
 
 	@GET
 	@Path("/search")
-	@Produces("application/json")
-	public RestResponse<AbstractSearchResponse<DemographicSearchResult>> search(@QueryParam("jsonData") String jsonStr,
-	                                                                                   @QueryParam("startIndex") Integer startIndex,
-	                                                                                   @QueryParam("itemsToReturn") Integer itemsToReturn )
+	public RestResponse<AbstractSearchResponse<DemographicSearchResult>> search(@QueryParam("page")
+	                                                                            @DefaultValue("1")
+	                                                                            @Parameter(description = "Requested result page")
+			                                                                            Integer page,
+	                                                                            @QueryParam("perPage")
+	                                                                            @DefaultValue("10")
+	                                                                            @Parameter(description = "Number of results per page")
+			                                                                            Integer perPage,
+	                                                                            @QueryParam("jsonData") String jsonStr)
 	{
-		try
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
+				SecurityInfoManager.READ, null, "_demographic");
+
+		page = validPageNo(page);
+		perPage = limitedResultCount(perPage);
+		int offset = calculatedOffset(page, perPage);
+
+		JSONObject json = JSONObject.fromObject(jsonStr);
+
+		// set up the search criteria
+		DemographicCriteriaSearch searchQuery = convertFromJSON(json);
+		searchQuery.setOffset(offset);
+		searchQuery.setLimit(perPage);
+		int total = demographicDao.criteriaSearchCount(searchQuery);
+
+		AbstractSearchResponse<DemographicSearchResult> response = new AbstractSearchResponse<>();
+		response.setTotal(total);
+		response.setLimit(perPage);
+		response.setOffset(offset);
+
+		if(total > 0)
 		{
-			AbstractSearchResponse<DemographicSearchResult> response = new AbstractSearchResponse<DemographicSearchResult>();
-			JSONObject json = JSONObject.fromObject(jsonStr);
-
-			if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_demographic", "r", null))
-			{
-				throw new RuntimeException("Access Denied");
-			}
-
-			DemographicSearchRequest req = convertFromJSON(json);
-			//caisi
-			boolean outOfDomain = true;
-			if (OscarProperties.getInstance().getProperty("ModuleNames", "").indexOf("Caisi") != -1)
-			{
-				outOfDomain = false;
-			}
-			req.setOutOfDomain(outOfDomain);
-
-
-			List<DemographicSearchResult> results = new ArrayList<DemographicSearchResult>();
-
-			int count = demographicManager.searchPatientsCount(getLoggedInInfo(), req);
-
-			if (count > 0)
-			{
-				results = demographicManager.searchPatients(getLoggedInInfo(), req, startIndex, itemsToReturn);
-				response.setContent(results);
-				response.setTotal(count);
-			}
-
-			return RestResponse.successResponse(response);
+			List<DemographicSearchResult> results = demographicService.toSearchResultTransferList(searchQuery);
+			response.setContent(results);
 		}
-		catch (Exception e)
-		{
-			logger.error("Error", e);
-		}
-		return RestResponse.errorResponse("Error");
+		return RestResponse.successResponse(response);
 	}
 
 	@GET
 	@Path("/searchIntegrator")
-	@Produces("application/json")
 	public RestResponse<AbstractSearchResponse<DemographicSearchResult>> searchIntegrator(@QueryParam("jsonData") String jsonStr,
-	                                                                                             @QueryParam("itemsToReturn") Integer itemsToReturn ) {
-		AbstractSearchResponse<DemographicSearchResult> response = new AbstractSearchResponse<DemographicSearchResult>();
+	                                                                                      @QueryParam("itemsToReturn") Integer itemsToReturn)
+	{
+		AbstractSearchResponse<DemographicSearchResult> response = new AbstractSearchResponse<>();
 		try
 		{
 			JSONObject json = JSONObject.fromObject(jsonStr);
 
-			if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_demographic", "r", null))
-			{
-				throw new RuntimeException("Access Denied");
-			}
+			securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
+					SecurityInfoManager.READ, null, "_demographic");
 
-			List<DemographicSearchResult> results = new ArrayList<DemographicSearchResult>();
+			List<DemographicSearchResult> results = new ArrayList<>();
 
 			if (json.getString("term").length() >= 1)
 			{
-
-				MatchingDemographicParameters matches = CaisiIntegratorManager.getMatchingDemographicParameters(getLoggedInInfo(), convertFromJSON(json));
+				String searchType = json.getString("type");
+				MatchingDemographicParameters matches = CaisiIntegratorManager.getMatchingDemographicParameters(getSearchMode(searchType), convertFromJSON(json));
 				List<MatchingDemographicTransferScore> integratorSearchResults = null;
 				try
 				{
@@ -265,7 +251,6 @@ public class DemographicsService extends AbstractServiceImpl {
 
 	@GET
 	@Path("/statusList")
-	@Produces("application/json")
 	public RestResponse<List<StatusValueTo1>> getStatusList(@QueryParam("type") String listType)
 	{
 		try
@@ -293,54 +278,76 @@ public class DemographicsService extends AbstractServiceImpl {
 		return RestResponse.errorResponse("Error");
 	}
 
-	private DemographicSearchRequest convertFromJSON(JSONObject json) {
+
+	private DemographicService.SEARCH_MODE getSearchMode(String searchType)
+	{
+		DemographicService.SEARCH_MODE searchMode = demographicService.searchModeStringToEnum(searchType);
+		if(searchMode == null)
+		{
+			searchMode = DemographicService.SEARCH_MODE.name;
+		}
+		return searchMode;
+	}
+	private DemographicCriteriaSearch convertFromJSON(JSONObject json) {
 		if(json ==null)return null;
 
+
 		String searchType = json.getString("type");
+		DemographicService.SEARCH_MODE searchMode = getSearchMode(searchType);
 
-		DemographicSearchRequest req = new DemographicSearchRequest();
+		String keyword = json.getString("term");
 
-		req.setMode(SEARCHMODE.valueOf(searchType));
-		if(req.getMode() == null) {
-			req.setMode(SEARCHMODE.Name);
+		DemographicService.STATUS_MODE statusMode;
+		switch(json.getString("status"))
+		{
+			default:
+			case "active": statusMode = DemographicService.STATUS_MODE.active; break;
+			case "inactive": statusMode = DemographicService.STATUS_MODE.inactive; break;
+			case "all": statusMode = DemographicService.STATUS_MODE.all; break;
 		}
-
-		req.setKeyword(json.getString("term"));
-		req.setIntegrator(Boolean.valueOf(json.getString("integrator")));
-		req.setOutOfDomain(Boolean.valueOf(json.getString("outofdomain")));
-		req.setStatusMode(STATUSMODE.valueOf(json.getString("status")));
+		DemographicCriteriaSearch.SORT_MODE sortMode = DemographicCriteriaSearch.SORT_MODE.DemographicName;
+		DemographicCriteriaSearch.SORTDIR sortDir = DemographicCriteriaSearch.SORTDIR.asc;
+//		req.setIntegrator(Boolean.valueOf(json.getString("integrator")));
 
 		Pattern namePtrn = Pattern.compile("sorting\\[(\\w+)\\]");
 
 		JSONObject params = json.getJSONObject("params");
-		if(params != null) {
-			for(Object key:params.keySet()) {
-				Matcher nameMtchr = namePtrn.matcher((String)key);
-				if (nameMtchr.find()) {
+		if(params != null)
+		{
+			for(Object key : params.keySet())
+			{
+				Matcher nameMtchr = namePtrn.matcher((String) key);
+				if(nameMtchr.find())
+				{
 					String var = nameMtchr.group(1);
-					req.setSortMode(SORTMODE.valueOf(var));
-					req.setSortDir(SORTDIR.valueOf(params.getString((String)key)));
+					sortMode = DemographicCriteriaSearch.SORT_MODE.valueOf(var);
+					sortDir = DemographicCriteriaSearch.SORTDIR.valueOf(params.getString((String) key));
 				}
 			}
 		}
-		return req;
+
+		// set up the search criteria
+		DemographicCriteriaSearch searchQuery = demographicService.buildDemographicSearch(keyword,
+				searchMode,
+				statusMode,
+				sortMode);
+		searchQuery.setSortDir(sortDir);
+		return searchQuery;
 	}
 
-	private boolean isLocal(MatchingDemographicTransferScore matchingDemographicTransferScore) {
+	private boolean isLocal(MatchingDemographicTransferScore matchingDemographicTransferScore)
+	{
 		String hin = matchingDemographicTransferScore.getDemographicTransfer().getHin();
 
-		if(hin != null && !hin.isEmpty()) {
-			DemographicSearchRequest dsr = new DemographicSearchRequest();
-			dsr.setStatusMode(STATUSMODE.active);
-			dsr.setKeyword(hin);
-			dsr.setMode(SEARCHMODE.HIN);
-			dsr.setOutOfDomain(true);
-			dsr.setSortMode(SORTMODE.Name);
-			dsr.setSortDir(SORTDIR.asc);
+		if(hin != null && !hin.isEmpty())
+		{
+			DemographicCriteriaSearch searchQuery = demographicService.buildDemographicSearch(hin,
+					DemographicService.SEARCH_MODE.hin,
+					DemographicService.STATUS_MODE.active,
+					DemographicCriteriaSearch.SORT_MODE.DemographicName);
 
-			if(demographicManager.searchPatientsCount(getLoggedInInfo(), dsr) > 0) {
-				return true;
-			}
+			int count = demographicDao.criteriaSearchCount(searchQuery);
+			return count > 0;
 		}
 		return false;
 	}

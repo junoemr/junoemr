@@ -51,7 +51,8 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 		//=========================================================================
 
 		controller.demographicReadAccess = null;
-		controller.search = null;
+		controller.search = {};
+		controller.defaultStatus = "active";
 
 		controller.init = function init()
 		{
@@ -60,6 +61,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 			{
 				controller.search.term = $stateParams.term;
 			}
+			controller.search.status = controller.defaultStatus;
 
 			securityService.hasRights(
 			{
@@ -104,7 +106,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 				count: 10,
 				sorting:
 				{
-					Name: 'asc'
+					DemographicName: 'asc'
 				}
 			},
 			{
@@ -119,7 +121,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 
 					var promiseArray = [];
 					promiseArray.push(demographicsService.search(
-						controller.search, ((page - 1) * count), count));
+						controller.search, page, count));
 
 					controller.integratorResults = null;
 					if (controller.search.integrator)
@@ -154,7 +156,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 
 		controller.searchPatients = function searchPatients()
 		{
-			if (controller.search.type === "DOB")
+			if (controller.search.type === "search_dob")
 			{
 				var dobMoment = moment(controller.search.term, ["YYYY-MM-DD", "YYYY/MM/DD"], true);
 				if (dobMoment.isValid())
@@ -178,20 +180,20 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 			// default search type
 			if (!Juno.Common.Util.exists(searchType))
 			{
-				searchType = 'Name';
+				searchType = 'search_name';
 			}
 
 			// reset the parameters
 			controller.search = {
 				type: searchType,
 				term: '',
-				status: "all",
+				status: controller.defaultStatus,
 				integrator: false,
 				outofdomain: true
 			};
 
 			// update the placeholder
-			controller.searchTermPlaceHolder = (controller.search.type === "DOB") ?
+			controller.searchTermPlaceHolder = (controller.search.type === "search_dob") ?
 				"YYYY-MM-DD" : "Search Term";
 
 			// do the search (if initialized)

@@ -45,25 +45,28 @@
 						<select ng-model="patientSearchCtrl.search.type"
 								ng-change="patientSearchCtrl.clearParams(patientSearchCtrl.search.type)"
 								class="form-control">
-							<option value="Name">
+							<option value="search_name">
 								<bean:message key="patientsearch.type.name" bundle="ui"/>
 							</option>
-							<option value="Phone">
+							<option value="search_phone">
 								<bean:message key="patientsearch.type.phone" bundle="ui"/>
 							</option>
-							<option value="DOB">
+							<option value="search_dob">
 								<bean:message key="patientsearch.type.dob" bundle="ui"/>
 							</option>
-							<option value="Address">
+							<option value="search_address">
 								<bean:message key="patientsearch.type.address" bundle="ui"/>
 							</option>
-							<option value="HIN">
+							<option value="search_hin">
 								<bean:message key="patientsearch.type.hin" bundle="ui"/>
 							</option>
-							<option value="ChartNo">
+							<option value="search_email">
+								<bean:message key="patientsearch.type.email" bundle="ui"/>
+							</option>
+							<option value="search_chart_no">
 								<bean:message key="patientsearch.type.chartNo" bundle="ui"/>
 							</option>
-							<option value="DemographicNo">
+							<option value="search_demographic_no">
 								<bean:message key="patientsearch.type.demographicNo" bundle="ui"/>
 							</option>
 						</select>
@@ -79,8 +82,7 @@
 
 					<div class="col-sm-3 col-xs-12">
 						<label>What to Show</label>
-						<select ng-model="patientSearchCtrl.search.status"
-								class="form-control">
+						<select ng-model="patientSearchCtrl.search.status" class="form-control">
 							<option value="all">
 								<bean:message key="patientsearch.showAll" bundle="ui"/>
 							</option>
@@ -161,7 +163,7 @@
 					{{patient.demographicNo}}
 				</td>
 				<td data-title="'<bean:message key="patientsearch.header.name" bundle="ui"/>'"
-					sortable="'Name'">
+					sortable="'DemographicName'">
 					{{patient.lastName}}, {{patient.firstName}}
 				</td>
 				<td data-title="'<bean:message key="patientsearch.header.chartNo" bundle="ui"/>'"
@@ -184,12 +186,12 @@
 				</td>
 				<td data-title="'<bean:message key="patientsearch.header.rosterStatus" bundle="ui"/>'"
 					class="text-center"
-					sortable="'RS'">
+					sortable="'RosterStatus'">
 					{{patient.rosterStatus}}
 				</td>
 				<td data-title="'<bean:message key="patientsearch.header.patientStatus" bundle="ui"/>'"
 					class="text-center"
-					sortable="'PS'">
+					sortable="'Status'">
 					{{patient.patientStatus}}
 				</td>
 				<td data-title="'<bean:message key="patientsearch.header.phone" bundle="ui"/>'"

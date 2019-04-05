@@ -57,15 +57,15 @@ angular.module("Common.Services").service("demographicsService", [
 			return deferred.promise;
 		};
 
-		service.search = function search(search, startIndex, itemsToReturn)
+		service.search = function search(search, page, perPage)
 		{
 			var deferred = $q.defer();
 
 			var config = Juno.Common.ServiceHelper.configHeaders();
 			config.params = {
 				jsonData: search,
-				startIndex: startIndex,
-				itemsToReturn: itemsToReturn
+				page: page,
+				perPage: perPage
 			};
 
 			junoHttp.get(service.apiPath + '/search', config).then(

@@ -33,14 +33,17 @@ import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferOutbound;
+import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
+import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -246,6 +249,44 @@ public class DemographicService
 		}
 
 		return outStatusList;
+	}
+
+	// this needs to be wrapped in a transaction
+	public List<DemographicSearchResult> toSearchResultTransferList(DemographicCriteriaSearch criteriaSearch)
+	{
+		List<Demographic> demographicList = demographicDao.criteriaSearch(criteriaSearch);
+		List<DemographicSearchResult> transferList = new ArrayList<>(demographicList.size());
+		for(Demographic demographic : demographicList)
+		{
+			transferList.add(toSearchResultTransfer(demographic));
+		}
+		return transferList;
+	}
+
+	private DemographicSearchResult toSearchResultTransfer(Demographic demographic)
+	{
+		DemographicSearchResult result = new DemographicSearchResult();
+
+		result.setDemographicNo(demographic.getDemographicId());
+		result.setDob(ConversionUtils.toLegacyDate(demographic.getDateOfBirth()));
+		result.setEmail(demographic.getEmail());
+		result.setChartNo(demographic.getChartNo());
+		result.setFirstName(demographic.getFirstName());
+		result.setLastName(demographic.getLastName());
+		result.setHin(demographic.getHin());
+		result.setPatientStatus(demographic.getPatientStatus());
+		result.setSex(demographic.getSex());
+		result.setPhone(demographic.getPhone());
+		result.setProviderNo(demographic.getProviderNo());
+		result.setRosterStatus(demographic.getRosterStatus());
+
+		ProviderData provider = demographic.getProvider();
+		if(provider != null)
+		{
+			result.setProviderName(demographic.getProvider().getDisplayName());
+		}
+
+		return result;
 	}
 
 	public Demographic addNewDemographicRecord(String providerNoStr, DemographicTransferInbound demographicTransferInbound)

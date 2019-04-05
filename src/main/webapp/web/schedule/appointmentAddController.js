@@ -203,9 +203,9 @@ angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 		controller.searchPatients = function searchPatients(term)
 		{
 			var search = {
-				type: 'Name',
+				type: 'search_name',
 				'term': term,
-				active: true,
+				status: 'active',
 				integrator: false,
 				outofdomain: true
 			};
