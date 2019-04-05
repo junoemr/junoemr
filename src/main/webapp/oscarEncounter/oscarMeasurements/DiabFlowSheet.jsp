@@ -22,6 +22,7 @@
 <%@page import="org.oscarehr.allergy.model.Allergy"%>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="java.time.LocalDate" %>
 
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -765,11 +766,7 @@ if (!medicationsResult.isEmpty()) {
 	}
 }
 
-java.util.Calendar calender = java.util.Calendar.getInstance();
-String day =  Integer.toString(calender.get(java.util.Calendar.DAY_OF_MONTH));
-String month =  Integer.toString(calender.get(java.util.Calendar.MONTH)+1);
-String year = Integer.toString(calender.get(java.util.Calendar.YEAR));
-String date = year+"-"+month+"-"+day;
+String date = LocalDate.now().toString();
 %>
 
 <body>

@@ -25,6 +25,7 @@
 
 package oscar.oscarEncounter.oscarMeasurements.pageUtil;
 
+import java.time.LocalDate;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
@@ -62,12 +63,14 @@ public final class EctSetupMeasurementsAction extends Action {
         String groupName = request.getParameter("groupName");
         EctValidation ectValidation = new EctValidation();             
         String css = ectValidation.getCssPath(groupName);
+        String today = LocalDate.now().toString();
+        /*
         java.util.Calendar calender = java.util.Calendar.getInstance();
         String day =  Integer.toString(calender.get(java.util.Calendar.DAY_OF_MONTH));
         String month =  Integer.toString(calender.get(java.util.Calendar.MONTH)+1);
         String year = Integer.toString(calender.get(java.util.Calendar.YEAR));
         String today = year+"-"+month+"-"+day;
-                
+          */
         request.setAttribute("groupName", groupName);
         request.setAttribute("css", css);
         EctSessionBean bean = (EctSessionBean)request.getSession().getAttribute("EctSessionBean");
