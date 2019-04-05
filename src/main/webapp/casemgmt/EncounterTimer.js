@@ -2,7 +2,7 @@
 
 var encounterTimerStartTime = new Date();
 var encounterTimerIntervalId = null;
-var encounterCurrentTime = {str: "00:00"};
+var encounterCurrentTime = {seconds: 4850};
 
 jQuery(document).ready( function () {
     encounterTimerStartTime = new Date();
@@ -12,53 +12,23 @@ jQuery(document).ready( function () {
 function updateTimer(timerId, currTime)
 {
     let timer = jQuery(timerId);
-    if (timer.length)
+    if (timer.length && currTime)
     {
-        let timeArray = "";
-        if (currTime)
-        {
-            timeArray = currTime.str.split(":");
-        }
-        else
-        {
-            timeArray = timer.html().split(":");
-        }
+        currTime.seconds ++;
 
-        let timeMintuesString = timeArray[timeArray.length -2];
-        let timeSecondsString = timeArray[timeArray.length -1];
-        let timeSeconds = parseInt(timeSecondsString) + 1;
-        let timeMintues = parseInt(timeMintuesString);
-        let timeHours = 0;
-
-        if (timeArray.length > 2)
-        {
-            timeHours = parseInt(timeArray[0]);
-        }
-
-        if (timeSeconds > 59)
-        {
-            timeSeconds = 0;
-            timeMintues += 1;
-        }
-
-        if (timeMintues > 59)
-        {
-            timeMintues = 0;
-            timeHours += 1;
-        }
+        let timeSeconds = currTime.seconds % 60;
+        let timeMinutes = parseInt(currTime.seconds / 60) % 60;
+        let timeHours = parseInt(parseInt(currTime.seconds / 60) / 60);
 
         if (timeHours > 0)
         {
             timer.html((timeHours < 10 ? ("0" + timeHours).slice(-2) : timeHours) + ":" +
-                (timeMintues < 10 ? ("0" + timeMintues).slice(-2) : timeMintues) + ":" + ("0" + timeSeconds).slice(-2));
+                (timeMinutes < 10 ? ("0" + timeMinutes).slice(-2) : timeMinutes) + ":" + ("0" + timeSeconds).slice(-2));
         }
         else
         {
-            timer.html((timeMintues < 10 ? ("0" + timeMintues).slice(-2) : timeMintues) + ":" + ("0" + timeSeconds).slice(-2));
+            timer.html((timeMinutes < 10 ? ("0" + timeMinutes).slice(-2) : timeMinutes) + ":" + ("0" + timeSeconds).slice(-2));
         }
-
-        //save current time
-        currTime.str = timer.html();
     }
 }
 
