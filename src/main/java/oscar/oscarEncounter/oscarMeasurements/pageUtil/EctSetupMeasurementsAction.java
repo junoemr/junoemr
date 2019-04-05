@@ -52,7 +52,6 @@ public final class EctSetupMeasurementsAction extends Action {
                                  HttpServletRequest request,
                                  HttpServletResponse response)
         throws Exception {
-
         LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
         String providerNo = loggedInInfo.getLoggedInProviderNo();
         securityInfoManager.requireOnePrivilege(providerNo, securityInfoManager.READ, null, "_measurement");
@@ -80,15 +79,13 @@ public final class EctSetupMeasurementsAction extends Action {
         }   
         request.setAttribute("demographicNo",demo);
         oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBeanHandler hd = new oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBeanHandler(groupName, demo);
-        for (int i = 0; i < hd.getMeasurementTypeVector().size(); i++)
-        {
+        for(int i=0; i<hd.getMeasurementTypeVector().size(); i++){
             frm.setValue("date-" + i, today);
         }
         session.setAttribute("EctMeasurementsForm", frm);            
         session.setAttribute("measurementTypes", hd);
         Vector mInstrcVector = hd.getMeasuringInstrcHdVector();
-        for (int i = 0; i < mInstrcVector.size(); i++)
-        {
+        for(int i=0; i<mInstrcVector.size(); i++){
             EctMeasuringInstructionBeanHandler mInstrcs = (EctMeasuringInstructionBeanHandler) mInstrcVector.elementAt(i);
             String mInstrcName = "mInstrcs" + i;
             session.setAttribute(mInstrcName, mInstrcs);
