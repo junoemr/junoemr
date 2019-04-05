@@ -92,9 +92,9 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 		controller.searchPatients = function searchPatients(term)
 		{
 			var search = {
-				type: 'search_name',
-				'term': term,
-				status: 'active',
+				type: demographicsService.SEARCH_MODE.Name,
+				term: term,
+				status: demographicsService.STATUS_MODE.ACTIVE,
 				integrator: false,
 				outofdomain: true
 			};

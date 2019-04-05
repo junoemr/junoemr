@@ -52,7 +52,9 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 
 		controller.demographicReadAccess = null;
 		controller.search = {};
-		controller.defaultStatus = "active";
+		controller.STATUS_MODE = demographicsService.STATUS_MODE;
+		controller.SEARCH_MODE = demographicsService.SEARCH_MODE;
+		controller.defaultStatus = demographicsService.STATUS_MODE.ACTIVE;
 
 		controller.init = function init()
 		{
@@ -156,7 +158,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 
 		controller.searchPatients = function searchPatients()
 		{
-			if (controller.search.type === "search_dob")
+			if (controller.search.type === demographicsService.SEARCH_MODE.DOB)
 			{
 				var dobMoment = moment(controller.search.term, ["YYYY-MM-DD", "YYYY/MM/DD"], true);
 				if (dobMoment.isValid())
@@ -180,7 +182,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 			// default search type
 			if (!Juno.Common.Util.exists(searchType))
 			{
-				searchType = 'search_name';
+				searchType = demographicsService.SEARCH_MODE.Name;
 			}
 
 			// reset the parameters
@@ -193,7 +195,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 			};
 
 			// update the placeholder
-			controller.searchTermPlaceHolder = (controller.search.type === "search_dob") ?
+			controller.searchTermPlaceHolder = (controller.search.type === demographicsService.SEARCH_MODE.DOB) ?
 				"YYYY-MM-DD" : "Search Term";
 
 			// do the search (if initialized)

@@ -45,28 +45,28 @@
 						<select ng-model="patientSearchCtrl.search.type"
 								ng-change="patientSearchCtrl.clearParams(patientSearchCtrl.search.type)"
 								class="form-control">
-							<option value="search_name">
+							<option value="{{patientSearchCtrl.SEARCH_MODE.Name}}">
 								<bean:message key="patientsearch.type.name" bundle="ui"/>
 							</option>
-							<option value="search_phone">
+							<option value="{{patientSearchCtrl.SEARCH_MODE.Phone}}">
 								<bean:message key="patientsearch.type.phone" bundle="ui"/>
 							</option>
-							<option value="search_dob">
+							<option value="{{patientSearchCtrl.SEARCH_MODE.DOB}}">
 								<bean:message key="patientsearch.type.dob" bundle="ui"/>
 							</option>
-							<option value="search_address">
+							<option value="{{patientSearchCtrl.SEARCH_MODE.Address}}">
 								<bean:message key="patientsearch.type.address" bundle="ui"/>
 							</option>
-							<option value="search_hin">
+							<option value="{{patientSearchCtrl.SEARCH_MODE.Hin}}">
 								<bean:message key="patientsearch.type.hin" bundle="ui"/>
 							</option>
-							<option value="search_email">
+							<option value="{{patientSearchCtrl.SEARCH_MODE.Email}}">
 								<bean:message key="patientsearch.type.email" bundle="ui"/>
 							</option>
-							<option value="search_chart_no">
+							<option value="{{patientSearchCtrl.SEARCH_MODE.ChartNo}}">
 								<bean:message key="patientsearch.type.chartNo" bundle="ui"/>
 							</option>
-							<option value="search_demographic_no">
+							<option value="{{patientSearchCtrl.SEARCH_MODE.DemographicNo}}">
 								<bean:message key="patientsearch.type.demographicNo" bundle="ui"/>
 							</option>
 						</select>
@@ -83,13 +83,13 @@
 					<div class="col-sm-3 col-xs-12">
 						<label>What to Show</label>
 						<select ng-model="patientSearchCtrl.search.status" class="form-control">
-							<option value="all">
+							<option value="{{patientSearchCtrl.STATUS_MODE.ALL}}">
 								<bean:message key="patientsearch.showAll" bundle="ui"/>
 							</option>
-							<option value="active">
+							<option value="{{patientSearchCtrl.STATUS_MODE.ACTIVE}}">
 								<bean:message key="patientsearch.showActiveOnly" bundle="ui"/>
 							</option>
-							<option value="inactive">
+							<option value="{{patientSearchCtrl.STATUS_MODE.INACTIVE}}">
 								<bean:message key="patientsearch.showInactiveOnly" bundle="ui"/>
 							</option>
 						</select>

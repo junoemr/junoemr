@@ -34,6 +34,25 @@ angular.module("Common.Services").service("demographicsService", [
 
 		service.apiPath = '../ws/rs/demographics';
 
+		service.SEARCH_MODE = Object.freeze(
+			{
+				Name: "search_name",
+				DOB: "search_dob",
+				Phone: "search_phone",
+				Hin: "search_hin",
+				Address: "search_address",
+				Email: "search_email",
+				ChartNo: "search_chart_no",
+				DemographicNo: "search_demographic_no"
+			});
+
+		service.STATUS_MODE = Object.freeze(
+			{
+				ALL: "all",
+				ACTIVE: "active",
+				INACTIVE: "inactive"
+			});
+
 		service.quickSearch = function quickSearch(search)
 		{
 			var deferred = $q.defer();
