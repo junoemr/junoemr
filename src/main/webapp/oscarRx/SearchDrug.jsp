@@ -30,15 +30,21 @@
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 <%@ taglib uri="/WEB-INF/indivo-tag.tld" prefix="indivo" %>
-<%@ page import="oscar.oscarRx.data.*,oscar.oscarProvider.data.ProviderMyOscarIdData,oscar.oscarDemographic.data.DemographicData,oscar.OscarProperties,oscar.log.*"%>
-<%@ page import="org.oscarehr.common.model.*" %>
-<%@page import="java.util.Enumeration"%>
-<%@page import="org.oscarehr.common.model.ProviderPreference"%>
-<%@page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%>
-
+<%@ page import="oscar.OscarProperties" %>
+<%@ page import="org.oscarehr.common.model.ProviderPreference"%>
+<%@ page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%>
+<%@page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
+<%@page import="org.oscarehr.util.SpringUtils"%>
+<%@page import="java.util.List"%>
+<%@page import="org.oscarehr.util.LoggedInInfo"%>
+<%@ page import="org.oscarehr.rx.model.Drug" %>
+<%@ page import="org.oscarehr.common.model.PharmacyInfo" %>
+<%@ page import="oscar.oscarRx.data.RxPharmacyData" %>
+<%@ page import="oscar.oscarRx.data.RxPrescriptionData" %>
+<%@ page import="oscar.oscarRx.pageUtil.RxSessionBean" %>
 
 <%
-    String roleName2$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+    String roleName2$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
     boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName2$%>" objectName="_rx" rights="r" reverse="<%=true%>">
@@ -46,7 +52,8 @@
 	<%response.sendRedirect("../securityError.jsp?type=_rx");%>
 </security:oscarSec>
 <%
-	if(!authed) {
+	if (!authed)
+	{
 		return;
 	}
 %>
@@ -63,35 +70,42 @@
 </logic:present>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <%
-	oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
+	RxSessionBean rxBean = (RxSessionBean)pageContext.findAttribute("rxBean");
 
-	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 	RxPharmacyData pharmacyData = new RxPharmacyData();
-	List<PharmacyInfo>pharmacyList = pharmacyData.getPharmacyFromDemographic(Integer.toString(bean.getDemographicNo()));
+	List<PharmacyInfo> pharmacyList = pharmacyData.getPharmacyFromDemographic(Integer.toString(rxBean.getDemographicNo()));
 	String prefPharmacy = "";
 	PharmacyInfo pharmacy = null;
-	if (pharmacyList != null && !pharmacyList.isEmpty()) {
+	if (pharmacyList != null && !pharmacyList.isEmpty())
+	{
 	    prefPharmacy = pharmacyList.get(0).getName();
 	    pharmacy = pharmacyList.get(0);
 	}
 
-	String drugref_route = OscarProperties.getInstance().getProperty("drugref_route");
-	if (drugref_route == null) drugref_route = "";
-	String[] d_route = ("Oral," + drugref_route).split(",");
+	String drugrefRoute = OscarProperties.getInstance().getProperty("drugref_route");
+	if (drugrefRoute == null)
+	{
+		drugrefRoute = "";
+	}
+	String[] drugRoute = ("Oral," + drugrefRoute).split(",");
 
 	String annotation_display = org.oscarehr.casemgmt.model.CaseManagementNoteLink.DISP_PRESCRIP;
 
-	//This checks if the provider has the ExternalPresriber feature enabled, if so then a link appear for the provider to access the ExternalPrescriber
-	ProviderPreference providerPreference=ProviderPreferencesUIBean.getProviderPreference(loggedInInfo.getLoggedInProviderNo());
+	// This checks if the provider has the ExternalPrescriber feature enabled
+	// If so then a link appears for the provider to access the ExternalPrescriber
+	ProviderPreference providerPreference = ProviderPreferencesUIBean.getProviderPreference(loggedInInfo.getLoggedInProviderNo());
 
-	boolean eRxEnabled= false;
+	boolean eRxEnabled = false;
 	String eRx_SSO_URL = null;
 	String eRxUsername = null;
 	String eRxPassword = null;
 	String eRxFacility = null;
-	String eRxTrainingMode="0"; //not in training mode
+	//not in training mode
+	String eRxTrainingMode = "0";
 
-	if(providerPreference!=null){
+	if (providerPreference!=null)
+	{
 		eRxEnabled = providerPreference.isERxEnabled();
 	    eRx_SSO_URL = providerPreference.getERx_SSO_URL();
 	    eRxUsername = providerPreference.getERxUsername();
@@ -99,16 +113,13 @@
 	    eRxFacility = providerPreference.getERxFacility();
 
 	    boolean eRxTrainingModeTemp = providerPreference.isERxTrainingMode();
-	    if(eRxTrainingModeTemp) eRxTrainingMode="1";
+	    if (eRxTrainingModeTemp)
+		{
+			eRxTrainingMode="1";
+		}
 	}
 
 %>
-<%@page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
-<%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.util.SessionConstants"%>
-<%@page import="java.util.List"%>
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@ page import="org.oscarehr.rx.model.Drug" %>
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/global.js"></script>
@@ -123,132 +134,87 @@
 
 <script type="text/javascript">
 
-function popupDrugOfChoice(vheight,vwidth,varpage) { //open a new popup window
-    var page = varpage;
-    windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=40,screenY=10,top=10,left=60";
-    var popup=window.open(varpage, "oscarDoc", windowprops);
-    if (popup != null) {
-	if (popup.opener == null) {
-	    popup.opener = self;
+	//open a new popup window
+	function popupDrugOfChoice(vheight,vwidth,varpage)
+	{
+		var windowProps = "height=" + vheight + ",width=" + vwidth + ",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=40,screenY=10,top=10,left=60";
+		var popup = window.open(varpage, "oscarDoc", windowProps);
+		if (popup != null)
+		{
+			if (popup.opener == null)
+			{
+				popup.opener = self;
+			}
+		}
 	}
-    }
-}
 
-function goDOC(){
-    if (document.RxSearchDrugForm.searchString.value.length == 0){
-	popupDrugOfChoice(720,700,'http://doc.oscartools.org/')
-    }else{
-	//var docURL = "http://resource.oscarmcmaster.org/oscarResource/DoC/OSCAR_search/OSCAR_search_results?title="+document.RxSearchDrugForm.searchString.value+"&SUBMIT=GO";
-	var docURL = "http://doc.oscartools.org/search?SearchableText="+document.RxSearchDrugForm.searchString.value;
-	popupDrugOfChoice(720,700,docURL);
-    }
-}
-
-
-function goOMD(){
-  	var docURL = "../common/OntarioMDRedirect.jsp?keyword=eCPS&params="+document.RxSearchDrugForm.searchString.value;
-	popupDrugOfChoice(743,817,docURL);
-}
-
-
-function popupWindow(vheight,vwidth,varpage,varPageName) { //open a new popup window
-    var page = varpage;
-    windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,screenX=40,screenY=10,top=10,left=60";
-    var popup=window.open(varpage,varPageName, windowprops);
-    if (popup != null) {
-	if (popup.opener == null) {
-	    popup.opener = self;
+	function customWarning()
+	{
+		if (confirm('This feature will allow you to manually enter a drug.'
+		+ '\nWarning: Only use this feature if absolutely necessary, as you will lose the following functionality:'
+		+ '\n  *  Known Dosage Forms / Routes'
+		+ '\n  *  Drug Allergy Information'
+		+ '\n  *  Drug-Drug Interaction Information'
+		+ '\n  *  Drug Information'
+		+ '\n\nAre you sure you wish to use this feature?') === true) {
+		window.location.href = 'chooseDrug.do?demographicNo=<%=response.encodeURL(Integer.toString(rxBean.getDemographicNo()))%>';
+		}
 	}
-    }
-}
 
-function customWarning(){
-    if (confirm('This feature will allow you to manually enter a drug.'
-	+ '\nWarning: Only use this feature if absolutely necessary, as you will lose the following functionality:'
-	+ '\n  *  Known Dosage Forms / Routes'
-	+ '\n  *  Drug Allergy Information'
-	+ '\n  *  Drug-Drug Interaction Information'
-	+ '\n  *  Drug Information'
-	+ '\n\nAre you sure you wish to use this feature?') === true) {
-	window.location.href = 'chooseDrug.do?demographicNo=<%=response.encodeURL(Integer.toString(bean.getDemographicNo()))%>';
-    }
-}
+	function showpic(picture)
+	{
+		// Netscape 6 and IE 5+
+		if (document.getElementById)
+		{
+			var targetElement = document.getElementById(picture);
+			var bal = document.getElementById("Calcs");
 
-function showpic(picture){
-    if (document.getElementById){ // Netscape 6 and IE 5+
-	var targetElement = document.getElementById(picture);
-	var bal = document.getElementById("Calcs");
-
-	var offsetTrail = document.getElementById("Calcs");
-	var offsetLeft = 0;
-	var offsetTop = 0;
-	while (offsetTrail) {
-	    offsetLeft += offsetTrail.offsetLeft;
-	    offsetTop += offsetTrail.offsetTop;
-	    offsetTrail = offsetTrail.offsetParent;
+			var offsetTrail = document.getElementById("Calcs");
+			var offsetLeft = 0;
+			var offsetTop = 0;
+			while (offsetTrail)
+			{
+				offsetLeft += offsetTrail.offsetLeft;
+				offsetTop += offsetTrail.offsetTop;
+				offsetTrail = offsetTrail.offsetParent;
+			}
+			if (navigator.userAgent.indexOf("Mac") != -1 &&
+				typeof document.body.leftMargin != "undefined")
+			{
+				offsetLeft += document.body.leftMargin;
+				offsetTop += document.body.topMargin;
+			}
+			targetElement.style.left = offsetLeft +bal.offsetWidth;
+			targetElement.style.top = offsetTop;
+			targetElement.style.visibility = 'visible';
+		}
 	}
-	if (navigator.userAgent.indexOf("Mac") != -1 &&
-	    typeof document.body.leftMargin != "undefined") {
-	    offsetLeft += document.body.leftMargin;
-	    offsetTop += document.body.topMargin;
+
+	function hidepic(picture)
+	{
+		if (document.getElementById)
+		{ // Netscape 6 and IE 5+
+			var targetElement = document.getElementById(picture);
+			targetElement.style.visibility = 'hidden';
+		}
 	}
-	targetElement.style.left = offsetLeft +bal.offsetWidth;
-	targetElement.style.top = offsetTop;
-	targetElement.style.visibility = 'visible';
-    }
-}
 
-function hidepic(picture){
-    if (document.getElementById){ // Netscape 6 and IE 5+
-	var targetElement = document.getElementById(picture);
-	targetElement.style.visibility = 'hidden';
-    }
-}
-
-function isEmpty(){
-    if (document.RxSearchDrugForm.searchString.value.length == 0){
-
-	document.RxSearchDrugForm.searchString.focus();
-	return false;
-    }
-    return true;
-}
-
-function buildRoute() {
-
-        pickRoute = "";
-<oscar:oscarPropertiesCheck property="drugref_route_search" value="on">
-<%for (int i = 0; i < d_route.length; i++)
-					{%>
-	if (document.forms[2].route<%=i%>.checked) pickRoute += " "+document.forms[2].route<%=i%>.value;
-<%}%>
-	document.forms[2].searchRoute.value = pickRoute;
-</oscar:oscarPropertiesCheck>
-}
-
-function processData() {
-
-    if (isEmpty())
-        buildRoute();
-    else
-        return false;
-
-    return true;
-}
-
-//make sure form is in viewport
-function load() {
-    window.scrollTo(0,0);
-}
+	//make sure form is in viewport
+	function load()
+	{
+		window.scrollTo(0,0);
+	}
 
 
 </script>
 </head>
 
 <%
-	boolean showall = false;
-
-		if (request.getParameter("show") != null) if (request.getParameter("show").equals("all")) showall = true;
+	boolean showAll = false;
+	if (request.getParameter("show") != null && request.getParameter("show").equals("all"))
+	{
+		showAll = true;
+	}
 %>
 
 <bean:define id="patient" type="oscar.oscarRx.data.RxPatientData.Patient" name="Patient" />
@@ -286,10 +252,10 @@ function load() {
 						<td></td>
 						<td><b><bean:message key="SearchDrug.PreferedPharmacy"/> :</b> <a href="javascript: function myFunction() {return false; }" onClick="showpic('Layer1');" id="Calcs"><%=prefPharmacy%></a></td>
 					</tr>
-						<indivo:indivoRegistered demographic="<%=String.valueOf(bean.getDemographicNo())%>" provider="<%=bean.getProviderNo()%>">
+						<indivo:indivoRegistered demographic="<%=String.valueOf(rxBean.getDemographicNo())%>" provider="<%=rxBean.getProviderNo()%>">
 							<tr>
 								<td colspan="3">
-									<a href="javascript: phrActionPopup('../oscarRx/SendToPhr.do?demoId=<%=Integer.toString(bean.getDemographicNo())%>', 'sendRxToPhr');">Send To PHR</a>
+									<a href="javascript: phrActionPopup('../oscarRx/SendToPhr.do?demoId=<%=Integer.toString(rxBean.getDemographicNo())%>', 'sendRxToPhr');">Send To PHR</a>
 								</td>
 							</tr>
 						</indivo:indivoRegistered>
@@ -309,31 +275,32 @@ function load() {
 					<div style="height: 100px; overflow: auto; background-color: #DCDCDC; border: thin solid green; display: none;" id="reprint">
 					<%
 						oscar.oscarRx.data.RxPrescriptionData.Prescription[] prescribedDrugs;
-							prescribedDrugs = patient.getPrescribedDrugScripts(); //this function only returns drugs which have an entry in prescription and drugs table
-							String script_no = "";
+						// Only grab drugs that have an entry in both the prescription and drug tables
+						prescribedDrugs = patient.getPrescribedDrugScripts();
+						String script_no = "";
 
-							for (int i = 0; i < prescribedDrugs.length; i++)
+						for (int i = 0; i < prescribedDrugs.length; i++)
+						{
+							oscar.oscarRx.data.RxPrescriptionData.Prescription drug = prescribedDrugs[i];
+							if (drug.getScript_no() != null && script_no.equals(drug.getScript_no()))
 							{
-								oscar.oscarRx.data.RxPrescriptionData.Prescription drug = prescribedDrugs[i];
-								if (drug.getScript_no() != null && script_no.equals(drug.getScript_no()))
-								{
 					%>
-										<br>
-										<div style="float: left; width: 24%; padding-left: 40px;">&nbsp;</div>
-										<a style="float: left;" href="javascript:reprint('<%=drug.getScript_no()%>')"><%=drug.getRxDisplay()%></a>
-									<%
- 										}
- 												else
- 												{
- 									%>
-										<%=i > 0?"<br style='clear:both;'><br style='clear:both;'>":""%><div style="float: left; width: 12%; padding-left: 20px;"><%=drug.getRxDate()%></div>
-										<div style="float: left; width: 12%; padding-left: 20px;"><%=drug.getNumPrints()%>&nbsp;Prints</div>
-										<a style="float: left;" href="javascript:reprint('<%=drug.getScript_no()%>')"><%=drug.getRxDisplay()%></a>
-									<%
- 										}
- 												script_no = drug.getScript_no() == null?"":drug.getScript_no();
- 											}
- 									%>
+								<br>
+								<div style="float: left; width: 24%; padding-left: 40px;">&nbsp;</div>
+								<a style="float: left;" href="javascript:reprint('<%=drug.getScript_no()%>')"><%=drug.getRxDisplay()%></a>
+						<%
+							}
+							else
+							{
+						%>
+								<%=i > 0?"<br style='clear:both;'><br style='clear:both;'>":""%><div style="float: left; width: 12%; padding-left: 20px;"><%=drug.getRxDate()%></div>
+								<div style="float: left; width: 12%; padding-left: 20px;"><%=drug.getNumPrints()%>&nbsp;Prints</div>
+								<a style="float: left;" href="javascript:reprint('<%=drug.getScript_no()%>')"><%=drug.getRxDisplay()%></a>
+						<%
+							}
+							script_no = drug.getScript_no() == null ? "" : drug.getScript_no();
+						}
+						%>
 					</div>
 				</td>
 			</tr>
@@ -363,8 +330,8 @@ function load() {
 							</tr>
 
 							<%
-								CaseManagementManager caseManagementManager=(CaseManagementManager)SpringUtils.getBean("caseManagementManager");
-								List<Drug> prescriptDrugs=caseManagementManager.getPrescriptions(loggedInInfo, patient.getDemographicNo(), showall);
+								CaseManagementManager caseManagementManager = (CaseManagementManager)SpringUtils.getBean("caseManagementManager");
+								List<Drug> prescriptDrugs=caseManagementManager.getPrescriptions(loggedInInfo, patient.getDemographicNo(), showAll);
 
 								long now = System.currentTimeMillis();
 								long month = 1000L * 60L * 60L * 24L * 30L;
@@ -376,7 +343,7 @@ function load() {
 									if (request.getParameter("status") != null)
 									{ //TODO: Redo this in a better way
 										String stat = request.getParameter("status");
-										if (stat != null && stat.equals("active") && prescriptDrug.isExpired())
+										if (stat != null && (stat.equals("active") && prescriptDrug.isExpired()))
 										{
 											continue;
 										}
@@ -444,7 +411,7 @@ function load() {
 								%>
 								</td>
 								<td width="20px" align="center"><a href="#" title="Annotation"
-									onclick="window.open('../annotation/annotation.jsp?display=<%=annotation_display%>&table_id=<%=prescriptDrug.getId()%>&demo=<%=bean.getDemographicNo()%>','anwin','width=400,height=500');"> <img src="../images/notes.gif" border="0"></a>
+									onclick="window.open('../annotation/annotation.jsp?display=<%=annotation_display%>&table_id=<%=prescriptDrug.getId()%>&demo=<%=rxBean.getDemographicNo()%>','anwin','width=400,height=500');"> <img src="../images/notes.gif" border="0"></a>
 									</td>
 								<%
 									if (integratorEnabled)
@@ -467,7 +434,7 @@ function load() {
 								<td align="left">
 								<%
 									String show = "&show=all";
-										if (showall)
+										if (showAll)
 										{
 								%> <a href="SearchDrug.jsp"><bean:message key="SearchDrug.msgShowCurrent"/></a> <%
  	}
@@ -582,10 +549,10 @@ function load() {
 								<bean:message key="SearchDrug.drugSearchRouteLabel" />
 								<br>
 								<%
-									for (int i = 0; i < d_route.length; i++)
+									for (int i = 0; i < drugRoute.length; i++)
 												{
 								%>
-								<input type="checkbox" name="route" <%=i%> value="<%=d_route[i].trim()%>"><%=d_route[i].trim()%> &nbsp;</input>
+								<input type="checkbox" name="route" <%=i%> value="<%=drugRoute[i].trim()%>"><%=drugRoute[i].trim()%> &nbsp;</input>
 								<%
 									}
 								%>
@@ -634,9 +601,9 @@ function load() {
 						%>
 						<logic:iterate id="rx" name="bean" property="stash" length="stashSize">
 							<tr>
-								<td><a href="javascript:submitPending(<%=i%>, 'edit');"><bean:message key="SearchDrug.msgEdit"/></a></td>
-								<td><a href="javascript:submitPending(<%=i%>, 'delete');"><bean:message key="SearchDrug.msgDelete"/></a></td>
-								<td><a href="javascript:submitPending(<%=i%>, 'edit');"> <bean:write name="rx" property="rxDisplay" /> </a></td>
+								<td><a href="javascript:submitPending(<%=i%> 'edit');"><bean:message key="SearchDrug.msgEdit"/></a></td>
+								<td><a href="javascript:submitPending(<%=i%> 'delete');"><bean:message key="SearchDrug.msgDelete"/></a></td>
+								<td><a href="javascript:submitPending(<%=i%> 'edit');"> <bean:write name="rx" property="rxDisplay" /> </a></td>
 								<td><a href="javascript:ShowDrugInfo('<%=((oscar.oscarRx.data.RxPrescriptionData.Prescription)rx).getGenericName()%>');"><bean:message key="SearchDrug.msgInfo"/></a></td>
 							</tr>
 							<%
@@ -668,7 +635,7 @@ function load() {
 	</tr>
 
 	<tr>
-		<td width="100%" height="0%" style="padding: 5" bgcolor="#DCDCDC" colspan="2"></td>
+		<td width="100%" height="0%" style="padding: 5px" bgcolor="#DCDCDC" colspan="2"></td>
 	</tr>
 
 </table>
