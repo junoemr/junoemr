@@ -46,16 +46,22 @@
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 
 <%
-    if(session.getValue("user") == null) response.sendRedirect("../../logout.jsp");
-    if(session.getAttribute("userrole") == null )  response.sendRedirect("../logout.jsp");
-    String project = request.getContextPath();
-    String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-    String demographic_no = request.getParameter("demographic_no");
-    String temp = "diab3";
+	if (session.getAttribute("user") == null)
+	{
+		response.sendRedirect("../../logout.jsp");
+	}
+	if (session.getAttribute("userrole") == null)
+	{
+		response.sendRedirect("../logout.jsp");
+	}
+	String project = request.getContextPath();
+	String roleName$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
+	String demographic_no = request.getParameter("demographic_no");
+	String temp = "diab3";
 	String uuid = request.getParameter("uuid");
 	String UUIDParamStr = "&uuid="+ StringUtils.trimToEmpty(uuid);
 
-    AllergyDao allergyDao = (AllergyDao)SpringUtils.getBean("allergyDao");
+	AllergyDao allergyDao = (AllergyDao)SpringUtils.getBean("allergyDao");
 %>
 <oscar:oscarPropertiesCheck property="SPEC3" value="yes">
     <security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="r" reverse="<%=true%>">
@@ -68,35 +74,32 @@
 
 
 <%
-WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 
-FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
+	FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
+	List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( temp,(String) session.getAttribute("user"),Integer.parseInt(demographic_no));
 
-List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( temp,(String) session.getAttribute("user"),Integer.parseInt(demographic_no));
+	MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
+	MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(temp,custList);
 
-////Start
-MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
+	MeasurementInfo mi = new MeasurementInfo(demographic_no);
+	List<String> measurementLs = mFlowsheet.getMeasurementList();
+	ArrayList<String> measurements = new ArrayList(measurementLs);
 
+	mi.getMeasurements(measurements);
 
-MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(temp,custList);
+	mFlowsheet.getMessages(mi);
 
-MeasurementInfo mi = new MeasurementInfo(demographic_no);
-List<String> measurementLs = mFlowsheet.getMeasurementList();
-ArrayList<String> measurements = new ArrayList(measurementLs);
+	ArrayList recList = mi.getList();
 
-mi.getMeasurements(measurements);
+	mFlowsheet.sortToCurrentOrder(recList);
+	StringBuilder recListBuffer = new StringBuilder();
+	for (int i = 0; i < recList.size(); i++)
+	{
+		recListBuffer.append("&amp;measurement="+response.encodeURL( (String) recList.get(i)));
+	}
 
-mFlowsheet.getMessages(mi);
-
-ArrayList recList = mi.getList();
-
-mFlowsheet.sortToCurrentOrder(recList);
-StringBuilder recListBuffer = new StringBuilder();
-for(int i = 0; i < recList.size(); i++){
-    recListBuffer.append("&amp;measurement="+response.encodeURL( (String) recList.get(i)));
-}
-
-String flowSheet = mFlowsheet.getDisplayName();
+	String flowSheet = mFlowsheet.getDisplayName();
 %>
 
 <html>
@@ -675,88 +678,122 @@ fieldset[disabled] .btn-primary.active {
 </head>
 
 <%
-String[] demographicParam = new String[1];
-demographicParam[0] = demographic_no;
+	String[] demographicParam = new String[1];
+	demographicParam[0] = demographic_no;
 
-String remindersQuery = "intake_reminders";
-List<Map<String,Object>> remindersResult = oscarSuperManager.find("providerDao", remindersQuery, demographicParam);
-String remindersList = (!remindersResult.isEmpty() && remindersResult.get(0).get("note")!=null) ? remindersResult.get(0).get("note").toString() : "";
-if (remindersResult.size() > 1) {
-	for (int i=1; i<remindersResult.size(); i++) {
-		remindersList += ",<br/>" + remindersResult.get(i).get("note").toString();
+	String remindersQuery = "intake_reminders";
+	List<Map<String,Object>> remindersResult = oscarSuperManager.find("providerDao", remindersQuery, demographicParam);
+	String remindersList = "";
+	if (!remindersResult.isEmpty() && remindersResult.get(0).get("note")!=null)
+	{
+		remindersList = remindersResult.get(0).get("note").toString();
 	}
-}
 
-List<Allergy> allergies = allergyDao.findActiveAllergiesOrderByDescription(Integer.parseInt(demographic_no));
-String allergiesList="";
-for(int x=0;x<allergies.size();x++) {
-	if(x!=0) {
-		allergiesList += ",<br/>";
+	if (remindersResult.size() > 1)
+	{
+		for (int i = 1; i < remindersResult.size(); i++)
+		{
+			remindersList += ",<br/>" + remindersResult.get(i).get("note").toString();
+		}
 	}
-	Allergy allergy = allergies.get(x);
-	allergiesList += allergy.getDescription();
-}
 
-String curUser_no = (String) session.getAttribute("user");
-
-String medicationsQuery = "intake_medications";
-List<Map<String,Object>> medicationsResult = oscarSuperManager.find("providerDao", medicationsQuery, demographicParam);
-String medicationsList = "";
-if (!medicationsResult.isEmpty()) {
-	for (int i=0; i<medicationsResult.size(); i++) {
-		if (i != 0) {
-			medicationsList += ",<br/>";
+	List<Allergy> allergies = allergyDao.findActiveAllergiesOrderByDescription(Integer.parseInt(demographic_no));
+	String allergiesList = "";
+	for (int x = 0;x < allergies.size(); x++)
+	{
+		if (x != 0)
+		{
+			allergiesList += ",<br/>";
 		}
+		Allergy allergy = allergies.get(x);
+		allergiesList += allergy.getDescription();
+	}
 
-		if (medicationsResult.get(i).get("customName")!=null && !medicationsResult.get(i).get("customName").toString().equals("null")) {
-			medicationsList += medicationsResult.get(i).get("customName").toString();
-		} else if (Integer.parseInt(medicationsResult.get(i).get("GCN_SEQNO").toString())==0) {
-			medicationsList += "Unknown";
-		} else {
-			medicationsList += medicationsResult.get(i).get("BN").toString();
-		}
+	String curUser_no = (String) session.getAttribute("user");
 
-		medicationsList += " " + RxUtil.FloatToString(Float.parseFloat(medicationsResult.get(i).get("takemin").toString()));
-		if (!medicationsResult.get(i).get("takemin").toString().equals(medicationsResult.get(i).get("takemax").toString())) {
-			medicationsList += "-" + RxUtil.FloatToString(Float.parseFloat(medicationsResult.get(i).get("takemax").toString()));
-		}
+	String medicationsQuery = "intake_medications";
+	List<Map<String,Object>> medicationsResult = oscarSuperManager.find("providerDao", medicationsQuery, demographicParam);
+	String medicationsList = "";
+	if (!medicationsResult.isEmpty())
+	{
+		for (int i=0; i<medicationsResult.size(); i++)
+		{
+			if (i != 0)
+			{
+				medicationsList += ",<br/>";
+			}
 
-		if (medicationsResult.get(i).get("freqcode")!=null) {
-			medicationsList += " " + medicationsResult.get(i).get("freqcode").toString();
-		}
+			if (medicationsResult.get(i).get("customName")!=null &&
+					!medicationsResult.get(i).get("customName").toString().equals("null"))
+			{
+				medicationsList += medicationsResult.get(i).get("customName").toString();
+			}
+			else if (Integer.parseInt(medicationsResult.get(i).get("GCN_SEQNO").toString()) == 0)
+			{
+				medicationsList += "Unknown";
+			}
+			else
+			{
+				medicationsList += medicationsResult.get(i).get("BN").toString();
+			}
 
-		if (medicationsResult.get(i).get("prn").toString().equals("1")) {
-			medicationsList += " PRN";
-		}
+			medicationsList += " " + RxUtil.FloatToString(Float.parseFloat(medicationsResult.get(i).get("takemin").toString()));
+			if (!medicationsResult.get(i).get("takemin").toString().equals(medicationsResult.get(i).get("takemax").toString()))
+			{
+				medicationsList += "-" + RxUtil.FloatToString(Float.parseFloat(medicationsResult.get(i).get("takemax").toString()));
+			}
 
-		if (medicationsResult.get(i).get("duration") != null && !medicationsResult.get(i).get("duration").toString().equals("null")) {
-			medicationsList += " " + medicationsResult.get(i).get("duration").toString();
-			if (medicationsResult.get(i).get("durunit")!=null) {
-				if (medicationsResult.get(i).get("durunit").toString().equals("D")) {
-					medicationsList += " Day";
-				} else if (medicationsResult.get(i).get("durunit").toString().equals("W")) {
-					medicationsList += " Week";
-				} else if (medicationsResult.get(i).get("durunit").toString().equals("M")) {
-					medicationsList += " Month";
+			if (medicationsResult.get(i).get("freqcode") != null)
+			{
+				medicationsList += " " + medicationsResult.get(i).get("freqcode").toString();
+			}
+
+			if (medicationsResult.get(i).get("prn").toString().equals("1"))
+			{
+				medicationsList += " PRN";
+			}
+
+			if (medicationsResult.get(i).get("duration") != null &&
+					!medicationsResult.get(i).get("duration").toString().equals("null"))
+			{
+				medicationsList += " " + medicationsResult.get(i).get("duration").toString();
+				if (medicationsResult.get(i).get("durunit") != null)
+				{
+					if (medicationsResult.get(i).get("durunit").toString().equals("D"))
+					{
+						medicationsList += " Day";
+					}
+					else if (medicationsResult.get(i).get("durunit").toString().equals("W"))
+					{
+						medicationsList += " Week";
+					}
+					else if (medicationsResult.get(i).get("durunit").toString().equals("M"))
+					{
+						medicationsList += " Month";
+					}
 				}
 			}
-		}
 
-		if (medicationsResult.get(i).get("duration")!=null && !medicationsResult.get(i).get("duration").toString().equals("null") && !medicationsResult.get(i).get("duration").toString().equals("") && Integer.parseInt(medicationsResult.get(i).get("duration").toString())>1) {
-			medicationsList += "s";
-		}
+			if (medicationsResult.get(i).get("duration")!=null &&
+					!medicationsResult.get(i).get("duration").toString().equals("null") &&
+					!medicationsResult.get(i).get("duration").toString().equals("") &&
+					Integer.parseInt(medicationsResult.get(i).get("duration").toString()) > 1)
+			{
+				medicationsList += "s";
+			}
 
-		medicationsList += "  " + medicationsResult.get(i).get("quantity").toString() + " Qty  Repeats: ";
+			medicationsList += "  " + medicationsResult.get(i).get("quantity").toString() + " Qty  Repeats: ";
 
-		medicationsList += medicationsResult.get(i).get("repeat").toString();
+			medicationsList += medicationsResult.get(i).get("repeat").toString();
 
-		if (medicationsResult.get(i).get("repeat").toString().equals("1")) {
-			medicationsList += " No subs";
+			if (medicationsResult.get(i).get("repeat").toString().equals("1"))
+			{
+				medicationsList += " No subs";
+			}
 		}
 	}
-}
 
-String date = LocalDate.now().toString();
+	String date = LocalDate.now().toString();
 %>
 
 <body>
@@ -773,12 +810,13 @@ String date = LocalDate.now().toString();
 	<%
 	int numPrev;
 
-	if (request.getParameter("numPrev") == null) {
+	if (request.getParameter("numPrev") == null)
+	{
 		numPrev = 9;
-		%> <%
-	} else {
+	}
+	else
+	{
 		numPrev = Integer.parseInt(request.getParameter("numPrev"));
-		%> <%
 	}
 	%>
 
@@ -835,7 +873,8 @@ String date = LocalDate.now().toString();
     List<MeasurementTemplateFlowSheetConfig.Node>nodes = mFlowsheet.getItemHeirarchy();
     String measure;
 
-    for (int i = 0; i < nodes.size(); i++) {
+    for (int i = 0; i < nodes.size(); i++)
+    {
     	MeasurementTemplateFlowSheetConfig.Node node = nodes.get(i);
     	FlowSheetItem item = node.flowSheetItem;
     	FlowSheetItem header = item;
@@ -852,29 +891,32 @@ String date = LocalDate.now().toString();
     	</tr>
     	<%
     	String currentSection = item.getDisplayName();
-    	for (int j = 0; j < node.children.size(); j++) {
-    		MeasurementTemplateFlowSheetConfig.Node child = node.children.get(j);
-    		if (child.children == null && child.flowSheetItem != null) {
-    			item = child.flowSheetItem;
+		for (int j = 0; j < node.children.size(); j++)
+		{
+			MeasurementTemplateFlowSheetConfig.Node child = node.children.get(j);
+			if (child.children == null && child.flowSheetItem != null)
+			{
+				item = child.flowSheetItem;
 
-    			measure = item.getItemName();
-				Map h2 = mFlowsheet.getMeasurementFlowSheetInfo(measure);
+				measure = item.getItemName();
+				Map flowSheetInfo = mFlowsheet.getMeasurementFlowSheetInfo(measure);
 
+				if (flowSheetInfo.get("measurement_type") != null)
+				{
+					ArrayList<EctMeasurementsDataBean> alist = mi.getMeasurementData(measure);
+					HashMap<String,String> measureMap = new HashMap<String,String>();
+					EctMeasurementTypesBean mtypeBean = mType.getMeasurementType(measure);
 
-	            if (h2.get("measurement_type") != null ){
-	            	ArrayList<EctMeasurementsDataBean> alist = mi.getMeasurementData(measure);
-		            HashMap<String,String> h = new HashMap<String,String>();
-		            EctMeasurementTypesBean mtypeBean = mType.getMeasurementType(measure);
-
-		            if(mtypeBean!=null) {
-		                h.put("name",mtypeBean.getTypeDisplayName());
-		                h.put("desc",mtypeBean.getTypeDesc());
-		            }
+					if (mtypeBean!=null)
+					{
+						measureMap.put("name",mtypeBean.getTypeDisplayName());
+						measureMap.put("desc",mtypeBean.getTypeDesc());
+					}
 
 					int measurementData = 0;
-					if(h.get("name") != null)
+					if (measureMap.get("name") != null)
 					{
-						measurementData = Math.abs(h.get("name").hashCode());
+						measurementData = Math.abs(measureMap.get("name").hashCode());
 					}
 
 	    		%>
@@ -893,14 +935,14 @@ String date = LocalDate.now().toString();
 
 					<td class="inputData">
 					<%//This part here grabs the type of input %>
-					<% if ( mtypeBean != null && mtypeBean.getValidationName() != null && mtypeBean.getValidationName().equals("Yes/No")){ %>
-	                           <input type="radio" name="<%=name%>" value="Yes">Yes
-	                           <input type="radio" name="<%=name%>" value="No">No
-	                           <input type="radio" name="<%=name%>" style="display:none;" value="">
+					<%if (mtypeBean != null && mtypeBean.getValidationName() != null && mtypeBean.getValidationName().equals("Yes/No")){ %>
+	                           <input type="radio" name=<%=name%> value="Yes"">Yes
+	                           <input type="radio" name=<%=name%> value="No"">No
+	                           <input type="radio" name=<%=name%> style="display:none;"" value="">
 	                           <input type="button" onclick="document.mainForm.<%=name%>[2].checked = true;" value="Clear">
 	                 <%}else{%>
-	                       <input type="text" id="<%=name%>" name="<%=name%>" size="14"
-	                       	<% if (name.equals("Weight") || name.equals("Height") ){ %> onchange="calcBMI();" onkeyup="calcBMI();"<%}%>
+	                       <input type="text" id="<%=name%>" name=<%=name%> size=14
+	                        <% if (name.equals("Weight") || name.equals("Height")) { %> onchange="calcBMI();" onkeyup="calcBMI();"<%}%>
 	                       	<% if (name.equals("Weight")){ %> title="Double click to automatically convert from lbs to kg" onDblClick="wtEnglish2Metric(this); calcBMI();"<%}%>
 	                       	<% if (name.equals("Height")){ %> title="Double click to automatically convert from feet and inches to cm" onDblClick="htEnglish2Metric(this); calcBMI();"<%}%>
 	                       	<% if (name.equals("BMI")){ %> title="Double click to automatically calculate BMI from height and weight" onDblClick="calcBMI();"<%}%>
@@ -911,8 +953,8 @@ String date = LocalDate.now().toString();
 					</td>
 
 					<td class="comments">
-						<input type="text" size="15" name="<%=name + "_comments"%>" />
-						<input type="hidden" name="<%=name%>_note" id="<%=name%>_note" value="addtonote">
+						<input type="text" size="15" name=<%=name + "_comments"%> />
+						<input type="hidden" name=<%=name + "_note"%> id="<%=name%>_note"" value="addtonote">
 					</td>
 
 					<%
@@ -922,25 +964,38 @@ String date = LocalDate.now().toString();
     				%>
 
 					<td class="graph">
-					<%if(h2.get("graphable") != null && ((String) h2.get("graphable")).equals("yes")){%>
-			            <%if (alist != null && alist.size() > 1) {
-			            boolean sep = false;
-			            	String mInstr = null;
-			            	boolean differentInstr=false;
-			            	for(int x=0;x<alist.size();x++) {
-			            		String tmp = alist.get(x).getMeasuringInstrc();
-			            		if(mInstr==null)
-			            			mInstr = tmp;
-			            		if(mInstr != null && !mInstr.equals(tmp)) {
-			            			differentInstr=true;
-			            			break;
-			            		}
-			            	}
-			            	
-			            	String onclick="";
-			            	if(!differentInstr) {
-			            		onclick="onclick=\"popup(465,635,'../../servlet/oscar.oscarEncounter.oscarMeasurements.pageUtil.ScatterPlotChartServlet?type="+h2.get("measurement_type")+"&mInstrc="+mInstr+"&demographicNo="+demographic_no+"');\"";
-			            	}
+					<%
+						if (flowSheetInfo.get("graphable") != null && ((String) flowSheetInfo.get("graphable")).equals("yes"))
+						{
+							if (alist != null && alist.size() > 1)
+							{
+								String mInstr = null;
+								boolean differentInstr=false;
+								for (int x = 0;x < alist.size(); x++)
+								{
+									String tmp = alist.get(x).getMeasuringInstrc();
+									if (mInstr==null)
+									{
+										mInstr = tmp;
+									}
+									if (mInstr != null && !mInstr.equals(tmp))
+									{
+										differentInstr=true;
+										break;
+									}
+								}
+
+							String onclick="";
+							if (!differentInstr)
+							{
+								onclick="onclick=\"popup(465,635,'../../servlet/oscar.oscarEncounter.oscarMeasurements.pageUtil.ScatterPlotChartServlet?type="
+										+ flowSheetInfo.get("measurement_type")
+										+ "&mInstrc="
+										+ mInstr
+										+ "&demographicNo="
+										+ demographic_no
+										+"');\"";
+							}
 			            %>
 			               	<span  <%=onclick %> class="inlinesparkline" values="
 			               	 <%=alist.get(alist.size()-1).getDataField()%>
@@ -955,62 +1010,85 @@ String date = LocalDate.now().toString();
 			               	 <%}%>
 			               	 "></span>
 			            <%}%>
-		           <%} else if ( mtypeBean != null && mtypeBean.getValidationName() != null && mtypeBean.getValidationName().equals("Yes/No")){
-		           		if (alist !=null && alist.size() > 0) {
-		           			if (alist.get(0).getDataField().equalsIgnoreCase("Yes")) { %>
-		           				<span class="checkmarksparkline" values="2,1,2,3"></span>
-		           			<%} else if (alist.get(0).getDataField().equalsIgnoreCase("No")) { %>
-		           				<span class="xsparkline"></span>
-		           			<%
-		           			}
-		           		}
-		           	} else if (name.equals("BP")) {
-		           		if (alist != null && alist.size() > 1) {
-		           			
-		           			String mInstr = null;
-			            	boolean differentInstr=false;
-			            	for(int x=0;x<alist.size();x++) {
-			            		String tmp = alist.get(x).getMeasuringInstrc();
-			            		if(mInstr==null)
-			            			mInstr = tmp;
-			            		if(mInstr != null && !mInstr.equals(tmp)) {
-			            			differentInstr=true;
-			            			break;
-			            		}
-			            	}
-			            	
-			            	String onclick="";
-			            	if(!differentInstr) {
-			            		onclick="onclick=\"popup(465,635,'../../servlet/oscar.oscarEncounter.oscarMeasurements.pageUtil.ScatterPlotChartServlet?type="+h2.get("measurement_type")+"&mInstrc="+mInstr+"&demographicNo="+demographic_no+"');\"";
-			            	}
-		           			
-		           			List<String> first = new ArrayList<String>();
-		           			List<String> second = new ArrayList<String>();
-		           			for (int x=alist.size()-1; x>=0; x--){
-		           				if (alist.get(x) != null && alist.get(x).getDataField() != null && !alist.get(x).getDataField().equals("")) {
-			           				String[] parsed = alist.get(x).getDataField().split("/");
-			           				first.add(parsed[0]);
-			           				second.add(parsed[1]);
-		           				} else {
-		           					first.add("null");
-		           					second.add("null");
-		           				}
-		           			} %>
-		           			<span <%=onclick %> class="bpline"></span>
-		           			<script type="text/javascript">
-		           				var first = new Array();
-		           				var second = new Array();
+		           <%
+						}
+						else if ( mtypeBean != null && mtypeBean.getValidationName() != null && mtypeBean.getValidationName().equals("Yes/No"))
+						{
+							if (alist !=null && alist.size() > 0)
+							{
+								if (alist.get(0).getDataField().equalsIgnoreCase("Yes")) { %>
+									<span class="checkmarksparkline" values="2,1,2,3"></span>
+								<%} else if (alist.get(0).getDataField().equalsIgnoreCase("No")) { %>
+									<span class="xsparkline"></span>
+								<%
+								}
+							}
+						}
+						else if (name.equals("BP"))
+						{
+							if (alist != null && alist.size() > 1)
+							{
 
-		           				<%for (int x = 0; x < first.size(); x++) {%>
-		           					first[<%=x%>] = "<%=first.get(x)%>";
-		           					second[<%=x%>] = "<%=second.get(x)%>";
-		           				<%}%>
+								String mInstr = null;
+								boolean differentInstr=false;
+								for(int x=0;x<alist.size();x++)
+								{
+									String tmp = alist.get(x).getMeasuringInstrc();
+									if(mInstr==null)
+									{
+										mInstr = tmp;
+									}
+									if(mInstr != null && !mInstr.equals(tmp))
+									{
+										differentInstr=true;
+										break;
+									}
+								}
 
-		           				$('.bpline').sparkline(first,{width:"42px", type:"line", lineColor:"#00f", fillColor:"#cdf", spotRadius:"0", spotColor:"", chartRangeMin:"0", chartRangeMax:"200"});
-		           				$('.bpline').sparkline(second,{composite:"true", type:"line", lineColor:"#040", fillColor:"#7d7", spotRadius:"0", spotColor:"", chartRangeMin:"0", chartRangeMax:"200"});
-		           			</script>
-		           		<%}
-		           	} %>
+								String onclick="";
+								if (!differentInstr)
+								{
+									onclick="onclick=\"popup(465,635,'../../servlet/oscar.oscarEncounter.oscarMeasurements.pageUtil.ScatterPlotChartServlet?type="
+											+ flowSheetInfo.get("measurement_type")
+											+ "&mInstrc="
+											+ mInstr
+											+ "&demographicNo="
+											+ demographic_no
+											+ "');\"";
+								}
+
+								List<String> first = new ArrayList<String>();
+								List<String> second = new ArrayList<String>();
+								for (int x=alist.size()-1; x>=0; x--)
+								{
+									if (alist.get(x) != null && alist.get(x).getDataField() != null &&
+											!alist.get(x).getDataField().equals(""))
+									{
+										String[] parsed = alist.get(x).getDataField().split("/");
+										first.add(parsed[0]);
+										second.add(parsed[1]);
+									}
+									else
+									{
+										first.add("null");
+										second.add("null");
+									}
+								} %>
+								<span <%=onclick %> class="bpline"></span>
+								<script type="text/javascript">
+									var first = new Array();
+									var second = new Array();
+
+									<%for (int x = 0; x < first.size(); x++) {%>
+										first[<%=x%>] = "<%=first.get(x)%>";
+										second[<%=x%>] = "<%=second.get(x)%>";
+									<%}%>
+
+									$('.bpline').sparkline(first,{width:"42px", type:"line", lineColor:"#00f", fillColor:"#cdf", spotRadius:"0", spotColor:"", chartRangeMin:"0", chartRangeMax:"200"});
+									$('.bpline').sparkline(second,{composite:"true", type:"line", lineColor:"#040", fillColor:"#7d7", spotRadius:"0", spotColor:"", chartRangeMin:"0", chartRangeMax:"200"});
+								</script>
+							<%}
+						} %>
 					</td>
 
     					<td class="last">
@@ -1108,31 +1186,33 @@ String date = LocalDate.now().toString();
     	}%>
     	
     	<tr id="<%=header.getDisplayName()%>_update">
-    	<td><input style="font-size:12;" type="submit" name="submit" value="Add" /></td>
-    	<td></td>
-    	<td></td>
-    	<td></td>
-    	<td></td>
-    	<td id="<%=header.getDisplayName()%>_update_comments" align="right" style="border-top: 1px solid #9d9d9d;">
-    	</td></tr>
+			<td><input style="font-size:12px;" type="submit" name="submit" value="Add" /></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td id="<%=header.getDisplayName()%>_update_comments" align="right" style="border-top: 1px solid #9d9d9d;"></td>
+		</tr>
     <%
     }%>
 
-	<tr>
-	<th colspan="8" align="left">
-	<input style="margin-top: 0.2em; font-size:12;" type="submit" name="submit" value="Submit & Close" />
-	</th>
-	</tr>
+		<tr>
+			<th colspan="8" align="left">
+				<input style="margin-top: 0.2em; font-size:12px;" type="submit" name="submit" value="Submit & Close" />
+			</th>
+		</tr>
 
 	</table>
 	</form>
 
-
-<div id="measurement-view">
-<div id="measurement-view-message"> </div>
-<input type="hidden" name="deleteId" id="deleteId" value="">
-<p align='right'><button type='button' id="deleteButton" name='deleteButton' class='btn btn-danger'>Delete</button> <button type='button' id='close-message' name='close' class='btn btn-primary'>Close</button></p>
-</div>
+	<div id="measurement-view">
+		<div id="measurement-view-message"> </div>
+		<input type="hidden" name="deleteId" id="deleteId" value="">
+		<p align='right'>
+			<button type='button' id="deleteButton" name='deleteButton' class='btn btn-danger'>Delete</button>
+			<button type='button' id='close-message' name='close' class='btn btn-primary'>Close</button>
+		</p>
+	</div>
 
 
 
