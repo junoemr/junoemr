@@ -35,6 +35,8 @@ import org.oscarehr.common.model.LabReportInformation;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
+import oscar.oscarLab.ca.all.parsers.Factory;
+import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.bc.PathNet.PathnetResultsData;
 import oscar.oscarLab.ca.on.CML.CMLLabTest;
 import oscar.oscarLab.ca.on.Spire.SpireLabTest;
@@ -128,7 +130,6 @@ public class LabResultData implements Comparable<LabResultData> {
 		{
 			labType = Spire;
 		}
-
 	}
 
 	public String getLabPatientId(){
@@ -170,7 +171,9 @@ public class LabResultData implements Comparable<LabResultData> {
 	// to flag them all as "Unknown" so user notices and hopefully reads
 	public boolean isUnknown()
 	{
-		return this.discipline.equals("CYTOPATHOLOGY");
+		MessageHandler handler = Factory.getHandler(segmentID);
+		boolean isLabCLS = ("CLS".equals(handler.getMsgType()) || "CLSDI".equals(handler.getMsgType()));
+		return this.discipline.equals("CYTOPATHOLOGY") && isLabCLS;
 	}
 
 	public boolean isFinal(){ return finalRes ;}
