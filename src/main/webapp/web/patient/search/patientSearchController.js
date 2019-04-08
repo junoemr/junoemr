@@ -136,14 +136,14 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 						function success(results)
 						{
 							var demographicSearchResults = results[0];
-							params.total(demographicSearchResults.total);
+							params.total(demographicSearchResults.meta.total);
 
 							if (controller.search.integrator)
 							{
 								controller.integratorResults = results[1];
 							}
 
-							deferred.resolve(demographicSearchResults.content);
+							deferred.resolve(demographicSearchResults.data);
 						},
 						function error(promiseErrors)
 						{

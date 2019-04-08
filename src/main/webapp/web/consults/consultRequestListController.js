@@ -102,12 +102,12 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				function success(response)
 				{
 					var resp = [];
-					for (var x = 0; x < response.content.length; x++)
+					for (var x = 0; x < response.data.length; x++)
 					{
 						resp.push(
 						{
-							demographicNo: response.content[x].demographicNo,
-							name: response.content[x].lastName + ', ' + response.content[x].firstName
+							demographicNo: response.data[x].demographicNo,
+							name: response.data[x].lastName + ', ' + response.data[x].firstName
 						});
 					}
 					return resp;

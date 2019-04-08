@@ -107,10 +107,6 @@ public class DemographicsService extends AbstractServiceImpl
 			return RestSearchResponse.errorResponse("No Query Parameter Sent");
 		}
 
-		page = validPageNo(page);
-		perPage = limitedResultCount(perPage);
-		int offset = calculatedOffset(page, perPage);
-
 		DemographicService.SEARCH_MODE searchMode = DemographicService.SEARCH_MODE.name;
 		if (query.startsWith("addr:"))
 		{
@@ -127,57 +123,48 @@ public class DemographicsService extends AbstractServiceImpl
 		DemographicCriteriaSearch searchQuery = demographicService.buildDemographicSearch(query, searchMode,
 				DemographicService.STATUS_MODE.active,
 				DemographicCriteriaSearch.SORT_MODE.DemographicName);
-		searchQuery.setOffset(offset);
-		searchQuery.setLimit(perPage);
 		searchQuery.setSortDirAscending();
 
-		List<DemographicSearchResult> results = new ArrayList<>(0);
-		int count = demographicDao.criteriaSearchCount(searchQuery);
-		if(count > 0)
-		{
-			results = demographicService.toSearchResultTransferList(searchQuery);
-		}
-		return RestSearchResponse.successResponse(results, page, perPage, count);
+		return getSearchResponse(searchQuery, page, perPage);
 	}
 
 	@GET
 	@Path("/search")
-	public RestResponse<AbstractSearchResponse<DemographicSearchResult>> search(@QueryParam("page")
-	                                                                            @DefaultValue("1")
-	                                                                            @Parameter(description = "Requested result page")
-			                                                                            Integer page,
-	                                                                            @QueryParam("perPage")
-	                                                                            @DefaultValue("10")
-	                                                                            @Parameter(description = "Number of results per page")
-			                                                                            Integer perPage,
-	                                                                            @QueryParam("jsonData") String jsonStr)
+	public RestSearchResponse<DemographicSearchResult> search(@QueryParam("page")
+	                                                          @DefaultValue("1")
+	                                                          @Parameter(description = "Requested result page")
+			                                                          Integer page,
+	                                                          @QueryParam("perPage")
+	                                                          @DefaultValue("10")
+	                                                          @Parameter(description = "Number of results per page")
+			                                                          Integer perPage,
+	                                                          @QueryParam("jsonData") String jsonStr)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
 				SecurityInfoManager.READ, null, "_demographic");
-
-		page = validPageNo(page);
-		perPage = limitedResultCount(perPage);
-		int offset = calculatedOffset(page, perPage);
 
 		JSONObject json = JSONObject.fromObject(jsonStr);
 
 		// set up the search criteria
 		DemographicCriteriaSearch searchQuery = convertFromJSON(json);
+		return getSearchResponse(searchQuery, page, perPage);
+	}
+	private RestSearchResponse<DemographicSearchResult> getSearchResponse(DemographicCriteriaSearch searchQuery, Integer page, Integer perPage)
+	{
+		page = validPageNo(page);
+		perPage = limitedResultCount(perPage);
+		int offset = calculatedOffset(page, perPage);
+
 		searchQuery.setOffset(offset);
 		searchQuery.setLimit(perPage);
 		int total = demographicDao.criteriaSearchCount(searchQuery);
 
-		AbstractSearchResponse<DemographicSearchResult> response = new AbstractSearchResponse<>();
-		response.setTotal(total);
-		response.setLimit(perPage);
-		response.setOffset(offset);
-
+		List<DemographicSearchResult> results = new ArrayList<>(0);
 		if(total > 0)
 		{
-			List<DemographicSearchResult> results = demographicService.toSearchResultTransferList(searchQuery);
-			response.setContent(results);
+			results = demographicService.toSearchResultTransferList(searchQuery);
 		}
-		return RestResponse.successResponse(response);
+		return RestSearchResponse.successResponse(results, page, perPage, total);
 	}
 
 	@GET

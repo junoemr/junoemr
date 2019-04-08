@@ -52,10 +52,10 @@ angular.module('Common.Directives').directive('junoPatientTypeahead', [
 					integrator: false,
 					outofdomain: true
 				};
-				demographicsService.search(params, 0, 25).then(function success(data)
+				demographicsService.search(params, 0, 25).then(
+					function success(response)
 					{
-						deferred.resolve(data.content);
-						console.log('data', data);
+						deferred.resolve(response.data);
 					},
 					function error()
 					{

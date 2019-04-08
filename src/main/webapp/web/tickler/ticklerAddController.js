@@ -184,12 +184,12 @@ angular.module('Tickler').controller('Tickler.TicklerAddController', [
 				function(results)
 				{
 					var resp = [];
-					for (var x = 0; x < results.content.length; x++)
+					for (var x = 0; x < results.data.length; x++)
 					{
 						resp.push(
 						{
-							demographicNo: results.content[x].demographicNo,
-							name: results.content[x].lastName + ',' + results.content[x].firstName
+							demographicNo: results.data[x].demographicNo,
+							name: results.data[x].lastName + ',' + results.data[x].firstName
 						});
 					}
 					return resp;
