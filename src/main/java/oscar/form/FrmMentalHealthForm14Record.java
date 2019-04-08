@@ -31,34 +31,34 @@ import java.util.Properties;
 import org.oscarehr.util.LoggedInInfo;
 
 import oscar.oscarDB.DBHandler;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 public class FrmMentalHealthForm14Record extends FrmRecord {
 		
 	public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID) throws SQLException {
         Properties props = new Properties();
-        if (existingID <= 0) {
-            
-            String demoProvider = "000000";
+        if (existingID <= 0)
+        {
             String sql = "SELECT demographic_no, CONCAT(CONCAT(last_name, ', '), first_name) AS clientName, year_of_birth, month_of_birth, date_of_birth, provider_no FROM demographic WHERE demographic_no = "
                     + demographicNo;
             ResultSet rs = DBHandler.GetSQL(sql);
-            if (rs.next()) {
-                Date dob = UtilDateUtilities.calcDate(oscar.Misc.getString(rs, "year_of_birth"), oscar.Misc.getString(rs, "month_of_birth"),
+            if (rs.next())
+            {
+                Date dob = UtilDateUtilities.calcDate(oscar.Misc.getString(rs, "year_of_birth"),
+                        oscar.Misc.getString(rs, "month_of_birth"),
                         oscar.Misc.getString(rs, "date_of_birth"));
                 props.setProperty("demographic_no", oscar.Misc.getString(rs, "demographic_no"));
-               props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(),
-                        "yyyy/MM/dd"));
-                props.setProperty("formEdited",UtilDateUtilities.DateToString(new Date(), "yyyy-MM-dd HH:mm:ss"));
-                props.setProperty("clientDOB", UtilDateUtilities.DateToString(dob, "yyyy/MM/dd"));
+                props.setProperty("formCreated", ConversionUtils.toDateString(new Date(), "yyyy/MM/dd"));
+                props.setProperty("formEdited",ConversionUtils.toDateString(new Date(), "yyyy-MM-dd HH:mm:ss"));
+                props.setProperty("clientDOB", ConversionUtils.toDateString(dob, "yyyy/MM/dd"));
                 props.setProperty("clientName", oscar.Misc.getString(rs, "clientName"));
                 props.setProperty("demoProvider", oscar.Misc.getString(rs, "provider_no"));
-                
-                demoProvider = oscar.Misc.getString(rs, "provider_no");
-                
             }
             rs.close();
-        } else {
+        }
+        else
+        {
             String sql = "SELECT * FROM formMentalHealthForm14 WHERE demographic_no = " + demographicNo + " AND ID = "
                     + existingID;
             props = (new FrmRecordHelp()).getFormRecord(sql);
@@ -74,29 +74,34 @@ public class FrmMentalHealthForm14Record extends FrmRecord {
         ResultSet rs = null;
         String sql = null;
 
-        if (!demoProvider.equals("")) {
-
-            if (demoProvider.equals(provNo) ) {
+        if (!demoProvider.equals(""))
+        {
+            if (demoProvider.equals(provNo))
+            {
                 // from provider table
                 sql = "SELECT CONCAT(last_name, ', ', first_name) AS provName, ohip_no "
                         + "FROM provider WHERE provider_no = '" + provNo + "'";
                 rs = DBHandler.GetSQL(sql);
 
-                if (rs.next()) {
+                if (rs.next())
+                {
                     String num = oscar.Misc.getString(rs, "ohip_no");
                     props.setProperty("reqProvName", oscar.Misc.getString(rs, "provName"));
                     props.setProperty("provName", oscar.Misc.getString(rs, "provName"));
                     props.setProperty("practitionerNo", "0000-" + num + "-00");
                 }
                 rs.close();
-            } else {
+            }
+            else
+            {
                 // from provider table
                 sql = "SELECT CONCAT(last_name, ', ', first_name) AS provName, ohip_no FROM provider WHERE provider_no = '"
                         + provNo + "'";
                 rs = DBHandler.GetSQL(sql);
                 
                 String num = "";
-                if (rs.next()) {
+                if (rs.next())
+                {
                     num = oscar.Misc.getString(rs, "ohip_no");
                     props.setProperty("reqProvName", oscar.Misc.getString(rs, "provName"));                    
                     props.setProperty("practitionerNo", "0000-" + num + "-00");
@@ -108,18 +113,18 @@ public class FrmMentalHealthForm14Record extends FrmRecord {
                         + demoProvider;
                 rs = DBHandler.GetSQL(sql);
 
-                if (rs.next()) {
-                    if( num.equals("") ) {
+                if (rs.next())
+                {
+                    if (num.equals(""))
+                    {
                         num = oscar.Misc.getString(rs, "ohip_no");
                         props.setProperty("practitionerNo", "0000-"+num+"-00");
                     }
                     props.setProperty("provName", oscar.Misc.getString(rs, "provName"));
-                    
                 }
                 rs.close();
             }
-        }     
-        
+        }
 
         return props;
     }

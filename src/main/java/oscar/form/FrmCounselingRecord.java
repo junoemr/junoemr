@@ -33,61 +33,63 @@ import org.oscarehr.common.model.Demographic;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
-import oscar.util.UtilDateUtilities;
+import oscar.util.ConversionUtils;
 /**
  *
  * @author kimleanhoffman
  */
 
 public class FrmCounselingRecord extends FrmRecord{
-    
-    @Override
-    public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID) throws SQLException{
-        Properties props = new Properties();
-        Demographic demographic = demographicManager.getDemographic(loggedInInfo, demographicNo);
 
-        if(existingID <= 0 && demographic != null) {
-            props.setProperty("demographic_no", String.valueOf(demographicNo));
-            props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(),"dd/MM/yyyy"));
-        } else {
-            String sql = "SELECT * FROM formCounseling WHERE demographic_no = " +demographicNo +" AND ID = " +existingID;
-            FrmRecordHelp frmRec = new FrmRecordHelp();
-            frmRec.setDateFormat("dd/MM/yyyy");
-            props = frmRec.getFormRecord(sql);
-        }
+	@Override
+	public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID) throws SQLException{
+		Properties props = new Properties();
+		Demographic demographic = demographicManager.getDemographic(loggedInInfo, demographicNo);
 
-        //get local clinic information
-        ClinicDAO clinicDao = (ClinicDAO)SpringUtils.getBean("clinicDAO");
-        Clinic clinic = clinicDao.getClinic();
+		if (existingID <= 0 && demographic != null)
+		{
+			props.setProperty("demographic_no", String.valueOf(demographicNo));
+			props.setProperty("formCreated", ConversionUtils.toDateString(new Date(),"dd/MM/yyyy"));
+		}
+		else
+		{
+			String sql = "SELECT * FROM formCounseling WHERE demographic_no = " +demographicNo +" AND ID = " +existingID;
+			FrmRecordHelp frmRec = new FrmRecordHelp();
+			frmRec.setDateFormat(dateFormat);
+			props = frmRec.getFormRecord(sql);
+		}
 
-            props.setProperty("clinicName",clinic.getClinicName()==null?"":clinic.getClinicName());
-            props.setProperty("clinicProvince",clinic.getClinicProvince()==null?"":clinic.getClinicProvince());
-            props.setProperty("clinicAddress", clinic.getClinicAddress()==null?"":clinic.getClinicAddress());
-            props.setProperty("clinicCity", clinic.getClinicCity()==null?"":clinic.getClinicCity());
-            props.setProperty("clinicPhone", clinic.getClinicPhone()==null?"":clinic.getClinicPhone());
-            props.setProperty("clinicFax", clinic.getClinicFax()==null?"":clinic.getClinicFax());  
-                
-        return props;
-    }
+		// Get local clinic information
+		ClinicDAO clinicDao = (ClinicDAO)SpringUtils.getBean("clinicDAO");
+		Clinic clinic = clinicDao.getClinic();
 
-    @Override
-    public int saveFormRecord(Properties props) throws SQLException {
-        String demographicNo = props.getProperty("demographic_no");
-        String sql = "SELECT * FROM formCounseling WHERE demographic_no=" +demographicNo +" AND ID=0";
-        FrmRecordHelp frmRec = new FrmRecordHelp();
-        frmRec.setDateFormat("dd/MM/yyyy");
+		props.setProperty("clinicName", clinic.getClinicName()==null ? "" : clinic.getClinicName());
+		props.setProperty("clinicProvince", clinic.getClinicProvince()==null ? "" : clinic.getClinicProvince());
+		props.setProperty("clinicAddress", clinic.getClinicAddress()==null ? "" : clinic.getClinicAddress());
+		props.setProperty("clinicCity", clinic.getClinicCity()==null ? "" : clinic.getClinicCity());
+		props.setProperty("clinicPhone", clinic.getClinicPhone()==null ? "" : clinic.getClinicPhone());
+		props.setProperty("clinicFax", clinic.getClinicFax()==null ? "" : clinic.getClinicFax());
 
-        return frmRec.saveFormRecord(props, sql);
-    }
+		return props;
+	}
 
-    @Override
-    public String findActionValue(String submit) throws SQLException {
- 		return ((new FrmRecordHelp()).findActionValue(submit));
-    }
+	@Override
+	public int saveFormRecord(Properties props) throws SQLException {
+		String demographicNo = props.getProperty("demographic_no");
+		String sql = "SELECT * FROM formCounseling WHERE demographic_no=" +demographicNo +" AND ID=0";
+		FrmRecordHelp frmRec = new FrmRecordHelp();
+		frmRec.setDateFormat(dateFormat);
+		return frmRec.saveFormRecord(props, sql);
+	}
 
-    @Override
-    public String createActionURL(String where, String action, String demoId, String formId) throws SQLException {
- 		return ((new FrmRecordHelp()).createActionURL(where, action, demoId, formId));
-    }
+	@Override
+	public String findActionValue(String submit) throws SQLException {
+		return ((new FrmRecordHelp()).findActionValue(submit));
+	}
+
+	@Override
+	public String createActionURL(String where, String action, String demoId, String formId) throws SQLException {
+		return ((new FrmRecordHelp()).createActionURL(where, action, demoId, formId));
+	}
 
 }

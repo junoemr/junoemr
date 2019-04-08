@@ -35,6 +35,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 
 import oscar.oscarDB.DBHandler;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 public class FrmLateLifeFDIDisabilityRecord extends FrmRecord {
@@ -44,39 +45,40 @@ public class FrmLateLifeFDIDisabilityRecord extends FrmRecord {
 		throws SQLException {
 		Properties props = new Properties();
                 
-                
-                ResultSet rs;
-                String sql;
+		ResultSet rs;
+		String sql;
 
-		if (existingID <= 0) {			
-			sql = "SELECT demographic_no, sex, year_of_birth, month_of_birth, date_of_birth, phone FROM demographic WHERE demographic_no = "
-                              + demographicNo;
+		if (existingID <= 0)
+		{
+			sql = "SELECT demographic_no, sex, year_of_birth, month_of_birth, date_of_birth, phone " +
+					"FROM demographic WHERE demographic_no = " + demographicNo;
 			rs = DBHandler.GetSQL(sql);
-			if (rs.next()) {
-                                java.util.Date dob = UtilDateUtilities.calcDate(oscar.Misc.getString(rs, "year_of_birth"), oscar.Misc.getString(rs, "month_of_birth"), oscar.Misc.getString(rs, "date_of_birth"));
-				props.setProperty(
-					"demographic_no",
-					oscar.Misc.getString(rs, "demographic_no"));
-				props.setProperty(
-					"formCreated",
-					UtilDateUtilities.DateToString(
-						new Date(),
-						_dateFormat));	
-                                props.setProperty("dob", UtilDateUtilities.DateToString(dob,"yyyy/MM/dd"));
-                                props.setProperty("sex", oscar.Misc.getString(rs, "sex"));
-                                props.setProperty("phone", oscar.Misc.getString(rs, "phone"));
+			if (rs.next())
+			{
+				java.util.Date dob = UtilDateUtilities.calcDate(oscar.Misc.getString(rs, "year_of_birth"),
+						oscar.Misc.getString(rs, "month_of_birth"),
+						oscar.Misc.getString(rs, "date_of_birth"));
+				props.setProperty("demographic_no", oscar.Misc.getString(rs, "demographic_no"));
+				props.setProperty("formCreated", ConversionUtils.toDateString(new Date(), _dateFormat));
+				props.setProperty("dob", ConversionUtils.toDateString(dob, _dateFormat));
+				props.setProperty("sex", oscar.Misc.getString(rs, "sex"));
+				props.setProperty("phone", oscar.Misc.getString(rs, "phone"));
 			}
 			rs.close();
-                        sql = "SELECT studyID FROM rehabStudy2004 WHERE demographic_no='"+demographicNo + "'";
-                        rs = DBHandler.GetSQL(sql);
-                        if (rs.next()){
-                            props.setProperty("studyID", oscar.Misc.getString(rs, "studyID"));
-                        }
-                        else{
-                            props.setProperty("studyID", "N/A");
-                        }
-                        rs.close();
-		} else {
+			sql = "SELECT studyID FROM rehabStudy2004 WHERE demographic_no='"+demographicNo + "'";
+			rs = DBHandler.GetSQL(sql);
+			if (rs.next())
+			{
+				props.setProperty("studyID", oscar.Misc.getString(rs, "studyID"));
+			}
+			else
+			{
+				props.setProperty("studyID", "N/A");
+			}
+			rs.close();
+		}
+		else
+		{
 			sql =
 				"SELECT * FROM formLateLifeFDIDisability WHERE demographic_no = "
 					+ demographicNo
@@ -84,52 +86,51 @@ public class FrmLateLifeFDIDisabilityRecord extends FrmRecord {
 					+ existingID;
 			rs = DBHandler.GetSQL(sql);
 
-                        if(rs.next())
-                        {
-                            MiscUtils.getLogger().debug("getting metaData");
-                            ResultSetMetaData md = rs.getMetaData();
+			if (rs.next())
+			{
+				MiscUtils.getLogger().debug("getting metaData");
+				ResultSetMetaData md = rs.getMetaData();
 
-                            for(int i=1; i<=md.getColumnCount(); i++)
-                            {
-                                String name = md.getColumnName(i);
+				for (int i = 1; i <= md.getColumnCount(); i++)
+				{
+					String name = md.getColumnName(i);
 
-                                String value;
-                                    MiscUtils.getLogger().debug(" name = "+name+" type = "+md.getColumnTypeName(i)+" scale = "+md.getScale(i));
-                                if(md.getColumnTypeName(i).equalsIgnoreCase("TINY"))           
-                                {
+					String value;
+					MiscUtils.getLogger().debug(" name = "+name+" type = "+md.getColumnTypeName(i)+" scale = "+md.getScale(i));
+					if (md.getColumnTypeName(i).equalsIgnoreCase("TINY"))
+					{
+						if (rs.getInt(i) == 1)
+						{
+							value = "checked='checked'";
+							MiscUtils.getLogger().debug("checking "+name);
+						}
+						else
+						{
+							value = "";
+							MiscUtils.getLogger().debug("not checking "+name);
+						}
+					}
+					else
+					{
+						if(md.getColumnTypeName(i).equalsIgnoreCase("date"))
+						{
+							value = ConversionUtils.toDateString(rs.getDate(i),_dateFormat);
+						}
+						else
+						{
+							value = oscar.Misc.getString(rs, i);
+						}
+					}
 
-                                    if(rs.getInt(i)==1)
-                                    {
-                                        value = "checked='checked'";
-                                        MiscUtils.getLogger().debug("checking "+name);
-                                    }
-                                    else
-                                    {
-                                        value = "";
-                                        MiscUtils.getLogger().debug("not checking "+name);
-                                    }
-                                }
-                                else
-                                {
-                                    if(md.getColumnTypeName(i).equalsIgnoreCase("date"))
-                                    {
-                                        value = UtilDateUtilities.DateToString(rs.getDate(i),"yyyy/MM/dd");
-                                    }
-                                    else
-                                    {
-                                        value = oscar.Misc.getString(rs, i);
-                                    }
-                                }
-
-                                if(value!=null)
-                                {
-                                    props.setProperty(name, value);
-                                }
-                            }
-                        }
-                        rs.close();
-                    }
-                    return props;
+					if (value != null)
+					{
+						props.setProperty(name, value);
+					}
+				}
+			}
+			rs.close();
+		}
+		return props;
 	}
 
 	public int saveFormRecord(Properties props) throws SQLException {
@@ -162,11 +163,7 @@ public class FrmLateLifeFDIDisabilityRecord extends FrmRecord {
 		return ((frh).findActionValue(submit));
 	}
 
-	public String createActionURL(
-		String where,
-		String action,
-		String demoId,
-		String formId)
+	public String createActionURL(String where, String action, String demoId, String formId)
 		throws SQLException {
 		FrmRecordHelp frh = new FrmRecordHelp();
 		frh.setDateFormat(_dateFormat);
