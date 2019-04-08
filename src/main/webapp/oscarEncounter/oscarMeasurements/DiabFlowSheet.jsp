@@ -37,6 +37,7 @@
 <%@ page import="oscar.log.LogConst" %>
 <%@ page import="oscar.oscarRx.util.RxUtil" %>
 <%@ page import="java.net.URLEncoder" %>
+<%@ page import="oscar.util.ConversionUtils" %>
 
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -714,7 +715,7 @@ fieldset[disabled] .btn-primary:active
 		}
 	}
 
-	String date = LocalDate.now().toString();
+	String date = ConversionUtils.toDateString(LocalDate.now(), ConversionUtils.DEFAULT_DATE_PATTERN);
 %>
 
 <body>

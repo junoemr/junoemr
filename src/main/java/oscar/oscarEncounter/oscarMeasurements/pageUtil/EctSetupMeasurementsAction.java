@@ -42,6 +42,7 @@ import org.oscarehr.util.SpringUtils;
 
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasuringInstructionBeanHandler;
 import oscar.oscarEncounter.pageUtil.EctSessionBean;
+import oscar.util.ConversionUtils;
 
 public final class EctSetupMeasurementsAction extends Action {
 
@@ -62,7 +63,7 @@ public final class EctSetupMeasurementsAction extends Action {
         String groupName = request.getParameter("groupName");
         EctValidation ectValidation = new EctValidation();             
         String css = ectValidation.getCssPath(groupName);
-        String today = LocalDate.now().toString();
+        String today = ConversionUtils.toDateString(LocalDate.now(), ConversionUtils.DEFAULT_DATE_PATTERN);
         request.setAttribute("groupName", groupName);
         request.setAttribute("css", css);
         EctSessionBean bean = (EctSessionBean)request.getSession().getAttribute("EctSessionBean");
