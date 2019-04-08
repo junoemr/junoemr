@@ -1350,7 +1350,7 @@ for(int i=0; i<custom_demographic_fields.size(); i++){
 	{
 	 %>
 		<div>
-			<label><b><bean:message key="demographic.demographicaddrecordhtml.referralSource"/></b></label>
+			<label><b><bean:message key="demographic.demographicaddrecordhtml.referralSource"/>:</b></label>
 			<select type="select" name="referral_source">
                 <option value=""></option>
 				<%

@@ -195,7 +195,7 @@
 		{
 		    String referralSourceParam = request.getParameter("referral_source");
 
-		    if (referralSourceParam.equals(""))
+		    if (referralSourceParam == null || referralSourceParam.equals(""))
 			{
 			    demographic.setReferralSourceID(null);
 			}

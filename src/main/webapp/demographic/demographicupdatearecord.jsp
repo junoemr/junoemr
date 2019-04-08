@@ -147,7 +147,7 @@
 			final Integer NEW_SOURCE_ID = -1;
 			Integer referralSourceID = Integer.parseInt(request.getParameter("referral_source"));
 
-			if (referralSourceID.equals(NEW_SOURCE_ID))
+			if (referralSourceID != null && referralSourceID.equals(NEW_SOURCE_ID))
 			{
 				String newReferralSource = request.getParameter("referral_source_new");
 

@@ -2247,7 +2247,7 @@ while(field_itr.hasNext()){
 																	<li>
 
 																		<span class="label">
-																			<bean:message key="demographic.demographicaddrecordhtml.referralSource"/>
+																			<bean:message key="demographic.demographicaddrecordhtml.referralSource"/>:
 																		</span>
 																		<%
                                                                             if (demographic.getReferralSourceID() != null)
@@ -4483,12 +4483,12 @@ while(field_itr.hasNext()){
 												<tr>
 													<td align="right">
 														<b>
-															<bean:message key="demographic.demographicaddrecordhtml.referralSource"/>
+															<bean:message key="demographic.demographicaddrecordhtml.referralSource"/>:
 														</b>
 													</td>
 													<td>
 														<select name="referral_source" style="width: 281px">
-															<option value="" <%=demographic.getReferralSourceID() == null ? "selected" : ""%>>""</option>
+															<option value="" <%=demographic.getReferralSourceID() == null ? "selected" : ""%>></option>
 														<%
 															ResultSet sources = apptMainBean.queryResults("search_referral_source");
 															while (sources.next())
