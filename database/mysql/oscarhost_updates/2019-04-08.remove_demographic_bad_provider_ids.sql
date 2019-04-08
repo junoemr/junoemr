@@ -1,0 +1,1 @@
+UPDATE demographic SET provider_no = NULL WHERE provider_no NOT IN (SELECT provider_no FROM provider);

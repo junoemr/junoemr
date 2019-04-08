@@ -145,7 +145,7 @@
 				demographic.setPatientStatus(request.getParameter("patient_status"));
 				demographic.setDateJoined(MyDateFormat.getSysDate(request.getParameter("date_joined_year")+"-"+request.getParameter("date_joined_month")+"-"+request.getParameter("date_joined_date")));
 				demographic.setChartNo(request.getParameter("chart_no"));
-				demographic.setProviderNo(request.getParameter("staff"));
+				demographic.setProviderNo(StringUtils.trimToNull(request.getParameter("staff")));
 				demographic.setSex(request.getParameter("sex"));
 
 				year = StringUtils.trimToNull(request.getParameter("end_date_year"));
