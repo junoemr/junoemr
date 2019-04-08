@@ -66,9 +66,15 @@
 <oscar:oscarPropertiesCheck property="SPEC3" value="yes">
     <security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="r" reverse="<%=true%>">
         "You have no right to access this page!"
-        <%
-         LogAction.addLog((String) session.getAttribute("user"), LogConst.NORIGHT+LogConst.ACTION_READ, LogConst.CON_FLOWSHEET,  temp , request.getRemoteAddr(),demographic_no);
-        response.sendRedirect("../../noRights.html"); %>
+		<%
+			LogAction.addLogEntry((String) session.getAttribute("user"),
+					LogConst.NORIGHT+LogConst.ACTION_READ,
+					LogConst.CON_FLOWSHEET,
+					temp,
+					request.getRemoteAddr(),
+					demographic_no);
+			response.sendRedirect("../../noRights.html");
+		%>
     </security:oscarSec>
 </oscar:oscarPropertiesCheck>
 
@@ -359,31 +365,6 @@
 	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath() %>/share/css/jquery-ui-1.8.15.custom.draggable.slider.css" />
 	<style type="text/css" media="all">
 
-
-		.highlight .title .uiBarBtn {
-			background: #A5A5A5;
-		}
-
-		.highlight .title .uiBarBtn:hover {
-			color: #656565;
-			background: white;
-		}
-
-		.uiBarBtn {
-			position: relative;
-			float: right;
-			line-height: 8px;
-			border-radius: 2px;
-			background: #656565;
-			color: white;
-			font-weight: bold;
-			font-size: 12px;
-			cursor: pointer;
-			padding: 2px;
-			top: -1px;
-			margin-left: 4px;
-		}
-
 		.highlightTime {
 			background-color: yellow;
 		}
@@ -400,15 +381,6 @@
 			padding: 4px;
 			margin-bottom: 4px;
 			cursor: default;
-		}
-
-		.ui-slider-horizontal {
-			height: 0.5em;
-		}
-
-		.ui-slider .ui-slider-handle {
-			height: 0.95em;
-			width: 0.95em;
 		}
 
 		a {
@@ -503,10 +475,6 @@
 			vertical-align: text-top;
 		}
 
-		.rowheader2 {
-			text-align: right;
-		}
-
 		.header {
 			font-weight: bold;
 		}
@@ -519,32 +487,32 @@
 
 
 
-#measurement-view{
-display:none;
-position:fixed;
-top:80px;
-width:600px;
+#measurement-view {
+	display:none;
+	position:fixed;
+	top:80px;
+	width:600px;
 
-text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-padding:10px;
-left: 50%;
-margin-left: -300px;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+	padding:10px;
+	left: 50%;
+	margin-left: -300px;
 
-color: #333;
-background-color: #f5f5f5;
-border-color: #eed3d7;
-font-family:"Arial";
+	color: #333;
+	background-color: #f5f5f5;
+	border-color: #eed3d7;
+	font-family:"Arial";
 
-border: 1px solid #fbeed5;
--webkit-border-radius: 4px;
--moz-border-radius: 4px;
-border-radius: 4px;
+	border: 1px solid #fbeed5;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
 
--moz-box-shadow: 3px 3px 4px #444;
--webkit-box-shadow: 3px 3px 4px #444;
-box-shadow: 3px 3px 4px #444;
--ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#444444')";
-filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#444444');
+	-moz-box-shadow: 3px 3px 4px #444;
+	-webkit-box-shadow: 3px 3px 4px #444;
+	box-shadow: 3px 3px 4px #444;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#444444')";
+	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#444444');
 }
 
 #measurement-view{
@@ -584,12 +552,6 @@ filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Colo
 }
 
 .btn:active,
-.btn.active {
-  background-image: none;
-  outline: 0;
-  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-          box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-}
 
 .btn-danger {
   color: #ffffff;
@@ -600,37 +562,17 @@ filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Colo
 .btn-danger:hover,
 .btn-danger:focus,
 .btn-danger:active,
-.btn-danger.active,
-.open .dropdown-toggle.btn-danger {
-  color: #ffffff;
-  background-color: #d2322d;
-  border-color: #ac2925;
-}
 
 .btn-danger:active,
-.btn-danger.active,
-.open .dropdown-toggle.btn-danger {
-  background-image: none;
-}
 
-.btn-danger.disabled,
 .btn-danger[disabled],
 fieldset[disabled] .btn-danger,
-.btn-danger.disabled:hover,
 .btn-danger[disabled]:hover,
 fieldset[disabled] .btn-danger:hover,
-.btn-danger.disabled:focus,
 .btn-danger[disabled]:focus,
 fieldset[disabled] .btn-danger:focus,
-.btn-danger.disabled:active,
 .btn-danger[disabled]:active,
 fieldset[disabled] .btn-danger:active,
-.btn-danger.disabled.active,
-.btn-danger[disabled].active,
-fieldset[disabled] .btn-danger.active {
-  background-color: #d9534f;
-  border-color: #d43f3a;
-}
 
 .btn-primary {
   color: #ffffff;
@@ -641,38 +583,17 @@ fieldset[disabled] .btn-danger.active {
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:active,
-.btn-primary.active,
-.open .dropdown-toggle.btn-primary {
-  color: #ffffff;
-  background-color: #3276b1;
-  border-color: #285e8e;
-}
 
 .btn-primary:active,
-.btn-primary.active,
-.open .dropdown-toggle.btn-primary {
-  background-image: none;
-}
 
-.btn-primary.disabled,
 .btn-primary[disabled],
 fieldset[disabled] .btn-primary,
-.btn-primary.disabled:hover,
 .btn-primary[disabled]:hover,
 fieldset[disabled] .btn-primary:hover,
-.btn-primary.disabled:focus,
 .btn-primary[disabled]:focus,
 fieldset[disabled] .btn-primary:focus,
-.btn-primary.disabled:active,
 .btn-primary[disabled]:active,
-fieldset[disabled] .btn-primary:active,
-.btn-primary.disabled.active,
-.btn-primary[disabled].active,
-fieldset[disabled] .btn-primary.active {
-  background-color: #428bca;
-  border-color: #357ebd;
-}
-
+fieldset[disabled] .btn-primary:active
 	</style>
 
 </head>
