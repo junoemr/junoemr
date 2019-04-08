@@ -581,10 +581,10 @@ try
 			<div class="encounter_timer_container">
 				<div style="display: inline-block; position:relative;">
 					<div id="encounter_timer_background"></div>
-					<div id="encounter_timer" title="Paste timer data" onclick="putEncounterTimeInNote()">00:00</div>
+					<div id="encounter_timer" title="Paste timer data" onclick="encounterTimer.putEncounterTimeInNote()">00:00</div>
 				</div>
-				<div id="encounter_timer_pause" onclick="toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"><i class="fa fa-pause"></i></div>
-				<div id="encounter_timer_play" onclick="toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"><i class="fa fa-play"></i></div>
+				<div id="encounter_timer_pause" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"><i class="fa fa-pause"></i></div>
+				<div id="encounter_timer_play" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"><i class="fa fa-play"></i></div>
 			</div>
     		<button type="button" onclick="return showHideIssues(event, 'noteIssues-resolved');"><bean:message key="oscarEncounter.Index.btnDisplayResolvedIssues"/></button> &nbsp;
     		<button type="button" onclick="return showHideIssues(event, 'noteIssues-unresolved');"><bean:message key="oscarEncounter.Index.btnDisplayUnresolvedIssues"/></button> &nbsp;
