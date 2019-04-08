@@ -57,14 +57,14 @@ import oscar.oscarLab.ca.all.util.Utilities;
 
 public class InsideLabUploadAction extends Action {
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	Logger logger = Logger.getLogger(InsideLabUploadAction.class);
+	private Logger logger = Logger.getLogger(InsideLabUploadAction.class);
 
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)  {
 		logger.debug("Uploading lab file");
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 		String providerNo = loggedInInfo.getLoggedInProviderNo();
-		securityInfoManager.requireOnePrivilege(providerNo, "w", null, "_lab");
+		securityInfoManager.requireOnePrivilege(providerNo, securityInfoManager.WRITE, null, "_lab");
 
 		LabUploadForm frm = (LabUploadForm) form;
 		FormFile importFile = frm.getImportFile();
