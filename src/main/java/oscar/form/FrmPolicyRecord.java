@@ -39,14 +39,17 @@ public class FrmPolicyRecord extends FrmRecord{
         Properties props = new Properties();
         Demographic demographic = demographicManager.getDemographic(loggedInInfo, demographicNo);
 
-        if(existingID <= 0 && demographic != null) {
+        if (existingID <= 0 && demographic != null)
+        {
             props.setProperty("demographic_no", String.valueOf(demographicNo));
             props.setProperty("formCreated",oscar.util.DateUtils.getDateTime());
 
-        } else {
+        }
+        else
+        {
             String sql = "SELECT * FROM formNoShowPolicy WHERE demographic_no = " +demographicNo +" AND ID = " +existingID;
             FrmRecordHelp frmRec = new FrmRecordHelp();
-            frmRec.setDateFormat("dd/MM/yyyy");
+            frmRec.setDateFormat(dateFormat);
             props = frmRec.getFormRecord(sql);
         }
 
@@ -58,7 +61,7 @@ public class FrmPolicyRecord extends FrmRecord{
         String demographicNo = props.getProperty("demographic_no");
         String sql = "SELECT * FROM formNoShowPolicy WHERE demographic_no=" +demographicNo +" AND ID=0";
         FrmRecordHelp frmRec = new FrmRecordHelp();
-        frmRec.setDateFormat("dd/MM/yyyy");
+        frmRec.setDateFormat(dateFormat);
 
         return frmRec.saveFormRecord(props, sql);
     }

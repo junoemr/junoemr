@@ -26,8 +26,10 @@ import com.google.common.collect.RangeMap;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.MyGroupDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.MyGroup;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.Site;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.ResourceSchedule;
 import org.oscarehr.schedule.dto.ScheduleSlot;
@@ -39,6 +41,7 @@ import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.model.RSchedule;
 import org.oscarehr.schedule.model.ScheduleDate;
 import org.oscarehr.schedule.model.ScheduleHoliday;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,6 +91,9 @@ public class Schedule
 
 	@Autowired
 	ScheduleTemplateDao scheduleTemplateDao;
+
+	@Autowired
+	SiteDao siteDao;
 
 
 	public long updateSchedule(RscheduleBean scheduleRscheduleBean,
@@ -210,6 +216,14 @@ public class Schedule
 				sd.setHour(scheduleRscheduleBean.getDateAvailHour(cal));
 				sd.setCreator(providerName);
 				sd.setStatus(scheduleRscheduleBean.active.toCharArray()[0]);
+
+				//attempt to map to a schedule
+				Site site = siteDao.findByName(scheduleRscheduleBean.getSiteAvail(cal));
+				if (site != null)
+				{
+					sd.setSiteId(site.getId());
+				}
+
 				scheduleDateDao.persist(sd);
 			}
 			if((year + "-" + MyDateFormat.getDigitalXX(month) + "-" + MyDateFormat.getDigitalXX(day)).equals(endDateString)) break;
@@ -294,6 +308,14 @@ public class Schedule
 		sd.setHour(hour);
 		sd.setCreator(userName);
 		sd.setStatus(status.toCharArray()[0]);
+
+		//attempt to map to a schedule
+		Site site = siteDao.findByName(reason);
+		if (site != null)
+		{
+			sd.setSiteId(site.getId());
+		}
+
 		scheduleDateDao.persist(sd);
 	}
 
@@ -310,15 +332,44 @@ public class Schedule
 		Provider provider = providerDao.getProvider(providerNo);
 
 		List<UserDateSchedule> userDateSchedules = new ArrayList<>();
+		UserDateSchedule userDateSchedule;
 
-		// get a UserDateSchedule for each
-		UserDateSchedule userDateSchedule = getUserDateSchedule(
-			date,
-			new Integer(provider.getProviderNo()),
-			provider.getFirstName(),
-			provider.getLastName(),
-			site
-		);
+		if (viewAll && site != null)
+		{
+			List<Site> providerSites = siteDao.getActiveSitesByProviderNo(providerNo);
+			boolean siteMatch = false;
+			for (Site providerSite : providerSites)
+			{
+				if (providerSite.getName().equals(site))
+				{
+					siteMatch = true;
+				}
+			}
+			if (!siteMatch)
+			{// no schedule results for this provider
+				return new ResourceSchedule(userDateSchedules);
+			}
+
+			// get a UserDateSchedule for each
+			userDateSchedule = getUserDateSchedule(
+					date,
+					new Integer(provider.getProviderNo()),
+					provider.getFirstName(),
+					provider.getLastName(),
+					null
+			);
+		}
+		else
+		{
+			// get a UserDateSchedule for each
+			userDateSchedule = getUserDateSchedule(
+					date,
+					new Integer(provider.getProviderNo()),
+					provider.getFirstName(),
+					provider.getLastName(),
+					site
+			);
+		}
 
 		// When not viewing all schedules, only add if there is a schedule set
 		if(viewAll || userDateSchedule.getScheduleSlots().asMapOfRanges().size() > 0)
@@ -341,29 +392,74 @@ public class Schedule
 	public ResourceSchedule getResourceScheduleByGroup(String group, LocalDate date, String site,
 		boolean viewAll, Integer limitProviderNo)
 	{
-		List<MyGroup> results;
+		List<MyGroup> userGroupMappings;
 
 		if(viewAll)
 		{
-			results = myGroupDao.getGroupByGroupNo(group);
+			userGroupMappings = myGroupDao.getGroupByGroupNo(group);
 		}
 		else
 		{
-			results = myGroupDao.getGroupWithScheduleByGroupNo(group, date, limitProviderNo);
+			userGroupMappings = myGroupDao.getGroupWithScheduleByGroupNo(group, date, limitProviderNo);
 		}
 
 		List<UserDateSchedule> userDateSchedules = new ArrayList<>();
 
-		for(MyGroup result: results)
+		for(MyGroup result: userGroupMappings)
 		{
-			// get a UserDateSchedule for each
-			userDateSchedules.add(getUserDateSchedule(
-				date,
-				new Integer(result.getId().getProviderNo()),
-				result.getFirstName(),
-				result.getLastName(),
-				site
-			));
+			UserDateSchedule userSchedule;
+			if (viewAll)
+			{
+				//in view all we filter by site assigned to provider
+				if (site != null)
+				{
+					List<Site> providerSites = siteDao.getActiveSitesByProviderNo(result.getId().getProviderNo());
+					boolean siteMatch = false;
+					for (Site providerSite : providerSites)
+					{
+						if (providerSite.getName().equals(site))
+						{
+							siteMatch = true;
+						}
+					}
+					if (!siteMatch)
+					{// skip this provider
+						continue;
+					}
+				}
+
+				userSchedule = getUserDateSchedule(
+						date,
+						new Integer(result.getId().getProviderNo()),
+						result.getFirstName(),
+						result.getLastName(),
+						null
+				);
+			}
+			else
+			{
+				userSchedule = getUserDateSchedule(
+						date,
+						new Integer(result.getId().getProviderNo()),
+						result.getFirstName(),
+						result.getLastName(),
+						site
+				);
+			}
+
+			Provider provider = providerDao.getProvider(result.getId().getProviderNo());
+			if (provider != null)
+			{
+				userSchedule.setFirstName(provider.getFirstName());
+				userSchedule.setLastName(provider.getLastName());
+			}
+			else
+			{
+				MiscUtils.getLogger().error("failed to lookup provider with no [" +
+						result.getId().getProviderNo() + "] for group [" + result.getId().getMyGroupNo() + "]");
+			}
+
+			userDateSchedules.add(userSchedule);
 		}
 
 		// Create transfer object
@@ -424,7 +520,15 @@ public class Schedule
 		SortedMap<LocalTime, List<AppointmentDetails>> appointments =
 			appointmentDao.findAppointmentDetailsByDateAndProvider(date, providerNo, site);
 
-		ScheduleDate scheduleDate = scheduleDateDao.findByProviderNoAndDate(Integer.toString(providerNo), java.sql.Date.valueOf(date));
+		ScheduleDate scheduleDate;
+		if (site != null)
+		{
+			scheduleDate = scheduleDateDao.findByProviderNoSiteAndDate(Integer.toString(providerNo), site, java.sql.Date.valueOf(date));
+		}
+		else
+		{
+			scheduleDate = scheduleDateDao.findByProviderNoAndDate(Integer.toString(providerNo), java.sql.Date.valueOf(date));
+		}
 
 		if (scheduleDate != null)
 		{

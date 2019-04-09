@@ -312,12 +312,6 @@
 			<version>2.2</version>
 		</dependency>
 
-		<!-- pdf / jpedal -->
-		<dependency>
-			<groupId>org</groupId>
-			<artifactId>jpedal</artifactId>
-			<version>lgpl</version>
-		</dependency>
 		<!--  pdfbox -->
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>

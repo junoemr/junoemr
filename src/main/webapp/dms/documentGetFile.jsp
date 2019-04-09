@@ -24,14 +24,18 @@
 
 --%>
 
-<%@page import="oscar.util.ConversionUtils"%>
+<%@page import="org.oscarehr.document.dao.DocumentDao"%>
 <%@taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@page import="java.math.*, java.util.*, java.io.*, java.sql.*, oscar.*, java.net.*,oscar.MyDateFormat"%>
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.document.dao.DocumentDao" %>
-<%@page import="org.oscarehr.document.model.Document" %>
-
+<%@page import="org.oscarehr.document.model.Document,
+                org.oscarehr.util.SpringUtils,
+                oscar.util.ConversionUtils,
+                java.io.File,
+                java.io.FileInputStream,
+                java.io.InputStream,
+                java.util.List" %>
+<%@ page import="org.oscarehr.common.io.GenericFile" %>
+<%@ page trimDirectiveWhitespaces="true" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
     String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -45,23 +49,24 @@
 	if(!authed) {
 		return;
 	}
-%>
 
-<%
 	DocumentDao documentDao = SpringUtils.getBean(DocumentDao.class);
-  String filename = "", filetype = "", doc_no = "";
-  String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-  String downloadMethod = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DOWNLOAD_METHOD");
-  session.setAttribute("docdownload", docdownload);
-  if (request.getParameter("document") != null) {
-    filename = request.getParameter("document");
-    filetype = request.getParameter("type");
-    doc_no = request.getParameter("doc_no");
-    String filePath = docdownload +'/'+ filename;
-    if (filetype.compareTo("active") == 0) {              
-      if ( downloadMethod == null ) {
-      filePath = "../../OscarDocument"+request.getContextPath()+"/document/"+filename;
-      %>
+	String filename = "", filetype = "", doc_no = "";
+	String docdownload = GenericFile.DOCUMENT_BASE_DIR;
+	String downloadMethod = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DOWNLOAD_METHOD");
+	session.setAttribute("docdownload", docdownload);
+	if(request.getParameter("document") != null)
+	{
+		filename = request.getParameter("document");
+		filetype = request.getParameter("type");
+		doc_no = request.getParameter("doc_no");
+		String filePath = docdownload + '/' + filename;
+		if(filetype.compareTo("active") == 0)
+		{
+			if(downloadMethod == null)
+			{
+				filePath = "../../OscarDocument" + request.getContextPath() + "/document/" + filename;
+%>
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
@@ -78,38 +83,48 @@
 </noframes>
 </html:html>
 
-<%}else{         
-         response.setContentType("application/octet-stream");      
-         response.setHeader("Content-Disposition", "inline;filename=\"" + filename+ "\"");
-         //read the file name.
-         File f = new File(filePath);
-         InputStream is = new FileInputStream(f);                  
-      
-         long length = f.length();
-         byte[] bytes = new byte[(int) length];
-         int offset = 0;
-         int numRead = 0;
-         while (offset < bytes.length 
-             && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
-           offset += numRead;
-         }
-         is.close();
-         ServletOutputStream outs = response.getOutputStream();
-         outs.write(bytes);
-         outs.flush();
-         outs.close();
-        }
-  } else {
-      Integer doc_no_as_int = ConversionUtils.fromIntString(doc_no);
-      if (doc_no_as_int != null) {
-	      List<Document> documents = documentDao.findActiveByDocumentNo(doc_no_as_int);
-	      
-		  for(Document d: documents) {
-			out.print(d.getDocxml());
-		  }
-	  }
-     }
-  } else {
+<%
+		}
+		else
+		{
+			response.setContentType("application/octet-stream");
+			response.setHeader("Content-Disposition", "inline;filename=\"" + filename + "\"");
+			//read the file name.
+			File f = new File(filePath);
+			InputStream is = new FileInputStream(f);
+
+			long length = f.length();
+			byte[] bytes = new byte[(int) length];
+			int offset = 0;
+			int numRead = 0;
+			while(offset < bytes.length
+					&& (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0)
+			{
+				offset += numRead;
+			}
+			is.close();
+			ServletOutputStream outs = response.getOutputStream();
+			outs.write(bytes);
+			outs.flush();
+			outs.close();
+		}
+	}
+	else
+	{
+		Integer doc_no_as_int = ConversionUtils.fromIntString(doc_no);
+		if(doc_no_as_int != null)
+		{
+			List<Document> documents = documentDao.findActiveByDocumentNo(doc_no_as_int);
+
+			for(Document d : documents)
+			{
+				out.print(d.getDocxml());
+			}
+		}
+	}
+}
+else
+{
 %>
 <jsp:forward page='../dms/errorpage.jsp'>
 	<jsp:param name="msg"

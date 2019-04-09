@@ -52,7 +52,11 @@ public class UtilDateUtilities {
         return StringToDate(s, spattern, defaultLocale);
     }
     public static Date StringToDate(String s, String spattern, Locale locale)    {
-    	if(s == null) return null;
+        if (s == null)
+        {
+            return null;
+        }
+
         try {
             SimpleDateFormat simpledateformat = new SimpleDateFormat(spattern, locale);
             return simpledateformat.parse(s);
@@ -72,12 +76,12 @@ public class UtilDateUtilities {
     	return DateToString(date, spattern, defaultLocale);
     }
     public static String DateToString(Date date, String spattern, Locale locale)    {
-        if(date != null) {
-            SimpleDateFormat simpledateformat = new SimpleDateFormat(spattern, locale);
-            return simpledateformat.format(date);
-        } else {
+        if(date == null || spattern == null || locale == null)
+        {
             return "";
         }
+        SimpleDateFormat simpledateformat = new SimpleDateFormat(spattern, locale);
+        return simpledateformat.format(date);
     }
     //"yyyy-MM-dd";
     public static String justYear(Date date){

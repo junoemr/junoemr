@@ -83,12 +83,12 @@ if(!authed) {
 <%@page import="oscar.oscarRx.data.RxProviderData" %>
 <%@page import="oscar.oscarRx.data.RxProviderData.Provider" %>
 <%@ page import="oscar.util.StringUtils" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.Collections" %>
-<%@ page import="java.util.List" %>
 <%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.List" %>
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 
 <html:html locale="true">
@@ -290,6 +290,11 @@ input.btn{
 
 .lab {
     color: #CC0099;
+	word-break: break-word;
+}
+
+.eform {
+	color: #008000;
 	word-break: break-word;
 }
 td.tite {
@@ -816,7 +821,7 @@ function rs(n,u,w,h,x){
 
 var DocPopup = null;
 function popup(location) {
-    DocPopup = window.open(location,"_blank","height=380,width=580");
+    DocPopup = window.open(location,"_blank","height=800,width=1280");
 
     if (DocPopup != null) {
         if (DocPopup.opener == null) {
@@ -1074,7 +1079,7 @@ function importFromEnct(reqInfo,txtArea)
 }
 
 
-
+// used by consultation attachments
 function updateAttached() {
     var t = setTimeout('fetchAttached()', 2000);
 }
@@ -1098,7 +1103,6 @@ function fetchAttached() {
                 }
 
             );
-
 }
 
 function addCCName(){
@@ -1269,18 +1273,6 @@ function showSignatureImage()
 
 	return true;
 }
-
-<%
-String userAgent = request.getHeader("User-Agent");
-String browserType = "";
-if (userAgent != null) {
-	if (userAgent.toLowerCase().contains("ipad")) {
-		browserType = "IPAD";
-	} else {
-		browserType = "ALL";
-	}
-}
-%>
 
 function requestSignature()
 {
@@ -1593,15 +1585,10 @@ var requestIdKey = "<%=signatureRequestId %>";
 								else
 								{
 									%>
-									<% if (OscarProperties.getInstance().isPropertyActive("consultation_indivica_attachment_enabled")) { %>
-									<a href="#" onclick="popup('<rewrite:reWrite jspPage="attachConsultation2.jsp"/>?provNo=<%=consultUtil.providerNo%>&demo=<%=demo%>&requestId=<%=requestId%>');return false;">
-										<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.attachDoc" />
-									</a>
-									<% } else { %>
 									<a href="#" onclick="popup('<rewrite:reWrite jspPage="attachConsultation.jsp"/>?provNo=<%=consultUtil.providerNo%>&demo=<%=demo%>&requestId=<%=requestId%>');return false;">
 										<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.attachDoc" />
 									</a>
-									<% }
+									<%
 								}
 							%>
 							</td>
@@ -1618,7 +1605,9 @@ var requestIdKey = "<%=signatureRequestId %>";
 							<span class="doc"><bean:message
 								key="oscarEncounter.oscarConsultationRequest.AttachDoc.LegendDocs" /></span><br />
 							<span class="lab"><bean:message
-								key="oscarEncounter.oscarConsultationRequest.AttachDoc.LegendLabs" /></span>
+								key="oscarEncounter.oscarConsultationRequest.AttachDoc.LegendLabs" /></span><br />
+							<span class="eform"><bean:message
+								key="oscarEncounter.oscarConsultationRequest.AttachDoc.LegendEForms" /></span>
 							</td>
 						</tr>
 					</table>

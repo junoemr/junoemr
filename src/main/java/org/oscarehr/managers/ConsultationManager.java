@@ -40,7 +40,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.oscarehr.common.dao.ClinicDAO;
-import org.oscarehr.common.dao.ConsultDocsDao;
+import org.oscarehr.consultations.dao.ConsultDocsDao;
 import org.oscarehr.consultations.dao.ConsultRequestDao;
 import org.oscarehr.consultations.dao.ConsultResponseDao;
 import org.oscarehr.consultations.dao.ConsultResponseDocDao;
@@ -53,7 +53,7 @@ import org.oscarehr.common.hl7.v2.oscar_to_oscar.OruR01.ObservationData;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.RefI12;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.SendingUtils;
 import org.oscarehr.common.model.Clinic;
-import org.oscarehr.common.model.ConsultDocs;
+import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.common.model.ConsultResponseDoc;
 import org.oscarehr.common.model.ConsultationRequest;
 import org.oscarehr.common.model.ConsultationResponse;

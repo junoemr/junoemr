@@ -24,47 +24,97 @@
 
 package oscar.oscarEncounter.oscarConsultationRequest.pageUtil;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.oscarehr.consultations.service.ConsultationAttachmentService;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import oscar.dms.EDocUtil;
-import oscar.oscarLab.ca.on.CommonLabResultData;
+import org.oscarehr.util.SpringUtils;
+import oscar.dms.EDoc;
+import oscar.oscarLab.ca.on.LabResultData;
+import oscar.util.StringUtils;
 
-public class ConsultationGetAttachedAction extends Action {
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-	private static final Logger logger= MiscUtils.getLogger();
+public class ConsultationGetAttachedAction extends Action
+{
+	private static ConsultationAttachmentService consultationAttachmentService = SpringUtils.getBean(ConsultationAttachmentService.class);
 
-	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws ServletException, IOException {
+	private static final String LABEL_ADDED = "...";
+	private static final int LABEL_MAX_LEN = 19;
 
-		CommonLabResultData labData = new CommonLabResultData();
-		String displayValue = "display: none;";
-
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		String demoNo = request.getParameter("demo");
 		String requestId = request.getParameter("requestId");
 
-		ArrayList labs = labData.populateLabResultsData(loggedInInfo, demoNo, requestId, CommonLabResultData.ATTACHED);
-		ArrayList privateDocs = EDocUtil.listDocs(loggedInInfo, demoNo, requestId, EDocUtil.ATTACHED);
+		List<String> labLabels;
+		List<String> docLabels;
+		List<String> eFormLabels;
 
-		if ( privateDocs.size() == 0 && labs.size() == 0 ) {
-			displayValue = "";
+		if(StringUtils.isNumeric(demoNo) && StringUtils.isNumeric(requestId))
+		{
+			List<LabResultData> labs = consultationAttachmentService.getAttachedLabs(loggedInInfo, demoNo, requestId);
+			labLabels = getLabLabels(labs);
+
+			List<EDoc> privateDocs = consultationAttachmentService.getAttachedDocuments(loggedInInfo, demoNo, requestId);
+			docLabels = getDocumentLabels(privateDocs);
+
+			List<EFormData> eFormList = consultationAttachmentService.getAttachedEForms(Integer.parseInt(demoNo), Integer.parseInt(requestId));
+			eFormLabels = getEFormLabels(eFormList);
+		}
+		else
+		{
+			labLabels = new ArrayList<>(0);
+			docLabels = new ArrayList<>(0);
+			eFormLabels = new ArrayList<>(0);
 		}
 
-		request.setAttribute("displayValue", displayValue);
-		request.setAttribute("docArray", privateDocs);
-		request.setAttribute("labArray", labs);
+		request.setAttribute("docArray", docLabels);
+		request.setAttribute("labArray", labLabels);
+		request.setAttribute("eFormArray", eFormLabels);
 
 		return mapping.findForward("success");
+	}
+
+	private List<String> getEFormLabels(List<EFormData> eFormList)
+	{
+		List<String> labels = new ArrayList<>(eFormList.size());
+		for(EFormData eForm : eFormList)
+		{
+			String label = eForm.getFormName();
+			labels.add(StringUtils.maxLenString(label, LABEL_MAX_LEN, LABEL_MAX_LEN-LABEL_ADDED.length(), LABEL_ADDED));
+		}
+		return labels;
+	}
+
+	private List<String> getDocumentLabels(List<EDoc> docList)
+	{
+		List<String> labels = new ArrayList<>(docList.size());
+		for(EDoc doc : docList)
+		{
+			String label = doc.getDescription();
+			labels.add(StringUtils.maxLenString(label, LABEL_MAX_LEN, LABEL_MAX_LEN-LABEL_ADDED.length(), LABEL_ADDED));
+		}
+		return labels;
+	}
+
+	private List<String> getLabLabels(List<LabResultData> labResultList)
+	{
+		List<String> labels = new ArrayList<>(labResultList.size());
+		for(LabResultData lab : labResultList)
+		{
+			String label = lab.getDiscipline()+" "+lab.getDateTime();
+			labels.add(StringUtils.maxLenString(label, LABEL_MAX_LEN, LABEL_MAX_LEN-LABEL_ADDED.length(), LABEL_ADDED));
+		}
+		return labels;
 	}
 }

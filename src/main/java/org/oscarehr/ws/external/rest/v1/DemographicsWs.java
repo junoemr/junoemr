@@ -138,8 +138,8 @@ public class DemographicsWs extends AbstractExternalRestWs
 		searchQuery.setLimit(perPage);
 		searchQuery.setSortDirAscending();
 
-		searchQuery.setSortMode(DemographicCriteriaSearch.SORTMODE.DemographicNo);
-		searchQuery.setStatusMode(DemographicCriteriaSearch.STATUSMODE.all);
+		searchQuery.setSortMode(DemographicCriteriaSearch.SORT_MODE.DemographicNo);
+		searchQuery.setStatusMode(DemographicCriteriaSearch.STATUS_MODE.all);
 		searchQuery.setCustomWildcardsEnabled(false);
 
 		if(exactMatch)

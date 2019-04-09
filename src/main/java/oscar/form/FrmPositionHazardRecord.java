@@ -33,71 +33,76 @@ import org.oscarehr.common.model.Demographic;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 public class FrmPositionHazardRecord extends FrmRecord {
-    
-    private ClinicDAO clinicDao = (ClinicDAO) SpringUtils.getBean("clinicDAO");
-                
-    public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID) throws SQLException {
-        Properties props = new Properties();
 
-        if (existingID <= 0) {
-        	Demographic demographic=demographicManager.getDemographic(loggedInInfo, demographicNo);
+	private ClinicDAO clinicDao = (ClinicDAO) SpringUtils.getBean("clinicDAO");
 
-            if (demographic!=null) {
-                props.setProperty("demographic_no", String.valueOf(demographic.getDemographicNo()));
-                props.setProperty("patientName", demographic.getLastName()+", "+ demographic.getFirstName());
-                props.setProperty("healthNumber", demographic.getHin());
-                props.setProperty("version", demographic.getVer());
-                props.setProperty("hcType", demographic.getHcType());
-                props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
+	public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID) throws SQLException {
+		Properties props = new Properties();
 
-                java.util.Date dob = UtilDateUtilities.calcDate(demographic.getYearOfBirth(), demographic.getMonthOfBirth(), demographic.getDateOfBirth());
-                props.setProperty("birthDate", UtilDateUtilities.DateToString(dob, "yyyy/MM/dd"));
+		if (existingID <= 0)
+		{
+			Demographic demographic = demographicManager.getDemographic(loggedInInfo, demographicNo);
 
-                props.setProperty("phoneNumber", demographic.getPhone());
-                props.setProperty("patientAddress", demographic.getAddress());
-                props.setProperty("patientCity", demographic.getCity());
-                props.setProperty("patientPC", demographic.getPostal());
-                props.setProperty("province", demographic.getProvince());
-                props.setProperty("sex", demographic.getSex());
-                props.setProperty("demoProvider", demographic.getProviderNo());
-            }
+			if (demographic != null)
+			{
+				props.setProperty("demographic_no", String.valueOf(demographic.getDemographicNo()));
+				props.setProperty("patientName", demographic.getLastName()+", "+ demographic.getFirstName());
+				props.setProperty("healthNumber", demographic.getHin());
+				props.setProperty("version", demographic.getVer());
+				props.setProperty("hcType", demographic.getHcType());
+				props.setProperty("formCreated", ConversionUtils.toDateString(new Date(), "yyyy/MM/dd"));
 
-            //get local clinic information            
-            Clinic clinic = clinicDao.getClinic();
-            props.setProperty("clinicName",clinic.getClinicName());
-            props.setProperty("clinicProvince",clinic.getClinicProvince());
-            props.setProperty("clinicAddress", clinic.getClinicAddress());
-            props.setProperty("clinicCity", clinic.getClinicCity());
-            props.setProperty("clinicPC", clinic.getClinicPostal());
+				java.util.Date dob = UtilDateUtilities.calcDate(demographic.getYearOfBirth(), demographic.getMonthOfBirth(), demographic.getDateOfBirth());
+				props.setProperty("birthDate", ConversionUtils.toDateString(dob, "yyyy/MM/dd"));
 
-        } else {
-            String sql = "SELECT * FROM formPositionHazard WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
-            props = (new FrmRecordHelp()).getFormRecord(sql);
-        }
+				props.setProperty("phoneNumber", demographic.getPhone());
+				props.setProperty("patientAddress", demographic.getAddress());
+				props.setProperty("patientCity", demographic.getCity());
+				props.setProperty("patientPC", demographic.getPostal());
+				props.setProperty("province", demographic.getProvince());
+				props.setProperty("sex", demographic.getSex());
+				props.setProperty("demoProvider", demographic.getProviderNo());
+			}
 
-        return props;
-    }
-        
-    public int saveFormRecord(Properties props) throws SQLException {
-        String demographic_no = props.getProperty("demographic_no");
-        String sql = "SELECT * FROM formPositionHazard WHERE demographic_no=" + demographic_no + " AND ID=0";
+			//get local clinic information
+			Clinic clinic = clinicDao.getClinic();
+			props.setProperty("clinicName",clinic.getClinicName());
+			props.setProperty("clinicProvince",clinic.getClinicProvince());
+			props.setProperty("clinicAddress", clinic.getClinicAddress());
+			props.setProperty("clinicCity", clinic.getClinicCity());
+			props.setProperty("clinicPC", clinic.getClinicPostal());
 
-        return ((new FrmRecordHelp()).saveFormRecord(props, sql));
-    }
+		}
+		else
+		{
+			String sql = "SELECT * FROM formPositionHazard WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
+			props = (new FrmRecordHelp()).getFormRecord(sql);
+		}
 
-    public Properties getPrintRecord(int demographicNo, int existingID) throws SQLException {
-        String sql = "SELECT * FROM formPositionHazard WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
-        return ((new FrmRecordHelp()).getPrintRecord(sql));
-    }
+		return props;
+	}
 
-    public String findActionValue(String submit) throws SQLException {
-        return ((new FrmRecordHelp()).findActionValue(submit));
-    }
+	public int saveFormRecord(Properties props) throws SQLException {
+		String demographic_no = props.getProperty("demographic_no");
+		String sql = "SELECT * FROM formPositionHazard WHERE demographic_no=" + demographic_no + " AND ID=0";
 
-    public String createActionURL(String where, String action, String demoId, String formId) throws SQLException {
-        return ((new FrmRecordHelp()).createActionURL(where, action, demoId, formId));
-    }
+		return ((new FrmRecordHelp()).saveFormRecord(props, sql));
+	}
+
+	public Properties getPrintRecord(int demographicNo, int existingID) throws SQLException {
+		String sql = "SELECT * FROM formPositionHazard WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
+		return ((new FrmRecordHelp()).getPrintRecord(sql));
+	}
+
+	public String findActionValue(String submit) throws SQLException {
+		return ((new FrmRecordHelp()).findActionValue(submit));
+	}
+
+	public String createActionURL(String where, String action, String demoId, String formId) throws SQLException {
+		return ((new FrmRecordHelp()).createActionURL(where, action, demoId, formId));
+	}
 }

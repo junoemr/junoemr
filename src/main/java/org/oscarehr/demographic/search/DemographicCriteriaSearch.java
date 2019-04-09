@@ -31,24 +31,38 @@ import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 {
-	public enum SORTMODE
+	public enum SORT_MODE
 	{
 		DemographicNo,
 		DemographicName,
+		DemographicLastName,
+		DemographicFirstName,
+		Status,
+		RosterStatus,
 		Phone,
 		Address,
 		DOB,
 		ChartNo,
 		Sex,
+		Hin,
 		ProviderName
 	}
 
-	public enum STATUSMODE
+	public enum STATUS_MODE
 	{
-		all, active, inactive, deceased
+		all,
+		active,
+		inactive,
+		deceased,
+		fired,
+		ic,
+		id,
+		moved
 	}
 
 	private MatchMode matchMode = MatchMode.START;
@@ -64,8 +78,9 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	private String sex;
 	private String providerNo;
 
-	private SORTMODE sortMode = SORTMODE.DemographicNo;
-	private STATUSMODE statusMode = STATUSMODE.all;
+	private SORT_MODE sortMode = SORT_MODE.DemographicNo;
+	private List<STATUS_MODE> statusModes = new ArrayList<>();
+	private boolean negateStatus = false;
 	private boolean customWildcardsEnabled = false;
 
 	@Override
@@ -80,7 +95,7 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		// set the search filters
 		if(getDemographicNo() != null)
 		{
-			criteria.add(getRestrictionCriterion("demographicId", String.valueOf(getDemographicNo())));
+			criteria.add(Restrictions.eq("demographicId", getDemographicNo()));
 		}
 		if(getFirstName() != null)
 		{
@@ -109,8 +124,7 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		}
 		if(getPhone() != null)
 		{
-			criteria.add(getRestrictionCriterion("phone", getPhone()));
-			criteria.add(getRestrictionCriterion("phone2", getPhone()));
+			criteria.add(Restrictions.or(getRestrictionCriterion("phone", getPhone()), getRestrictionCriterion("phone2", getPhone())));
 		}
 		if(getChartNo() != null)
 		{
@@ -151,11 +165,54 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 
 	private void setStatusCriteria(Criteria criteria)
 	{
-		switch(statusMode)
+		//build list of status names
+		ArrayList<String> statuses = new ArrayList<>();
+		for (STATUS_MODE status : statusModes)
 		{
-			case active: criteria.add(Restrictions.eq("patientStatus", Demographic.PatientStatus.AC.name())); break;
-			case inactive: criteria.add(Restrictions.eq("patientStatus", Demographic.PatientStatus.IN.name())); break;
-			case deceased: criteria.add(Restrictions.eq("patientStatus", Demographic.PatientStatus.DE.name())); break;
+			if (status == STATUS_MODE.all)
+			{
+				// if we see status "all" at any point just bail.
+				return;
+			} else
+			{
+				switch (status)
+				{
+					case active:
+						statuses.add(Demographic.PatientStatus.AC.name());
+						break;
+					case inactive:
+						statuses.add(Demographic.PatientStatus.IN.name());
+						break;
+					case deceased:
+						statuses.add(Demographic.PatientStatus.DE.name());
+						break;
+					case fired:
+						statuses.add(Demographic.PatientStatus.FI.name());
+						break;
+					case ic:
+						statuses.add(Demographic.PatientStatus.IC.name());
+						break;
+					case id:
+						statuses.add(Demographic.PatientStatus.ID.name());
+						break;
+					case moved:
+						statuses.add(Demographic.PatientStatus.MO.name());
+						break;
+				}
+			}
+		}
+
+		//set hibernate restrictions
+		if (statuses.size() > 0)
+		{
+			if (negateStatus)
+			{
+				criteria.add(Restrictions.not(Restrictions.in("patientStatus", statuses)));
+			}
+			else
+			{
+				criteria.add(Restrictions.in("patientStatus", statuses));
+			}
 		}
 	}
 
@@ -174,8 +231,38 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 				criteria.addOrder(getOrder("firstName"));
 				break;
 			}
+			case DemographicFirstName:
+			{
+				criteria.addOrder(getOrder("firstName"));
+				break;
+			}
+			case DemographicLastName:
+			{
+				criteria.addOrder(getOrder("lastName"));
+				break;
+			}
+			case Status:
+			{
+				criteria.addOrder(getOrder("patientStatus"));
+				break;
+			}
+			case RosterStatus:
+			{
+				criteria.addOrder(getOrder("rosterStatus"));
+				break;
+			}
+			case Hin:
+			{
+				criteria.addOrder(getOrder("hin"));
+				break;
+			}
+			case ProviderName:
+			{
+				criteria.addOrder(getOrder("provider.id"));
+				break;
+			}
 			case Sex: criteria.addOrder(getOrder("sex")); break;
-			case Phone: criteria.addOrder(getOrder("phone")); break;
+			case Phone: criteria.addOrder(getOrder("phone"));break;
 			case Address: criteria.addOrder(getOrder("address")); break;
 			case ChartNo: criteria.addOrder(getOrder("chartNo")); break;
 			case DemographicNo:
@@ -283,24 +370,47 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		this.providerNo = providerNo;
 	}
 
-	public SORTMODE getSortMode()
+	public SORT_MODE getSortMode()
 	{
 		return sortMode;
 	}
 
-	public void setSortMode(SORTMODE sortMode)
+	public void setSortMode(SORT_MODE sortMode)
 	{
 		this.sortMode = sortMode;
 	}
 
-	public STATUSMODE getStatusMode()
+	public STATUS_MODE getStatusMode()
 	{
-		return statusMode;
+		if (statusModes.size() > 0)
+		{
+			return statusModes.get(0);
+		}
+		else
+		{
+			return STATUS_MODE.all;
+		}
 	}
 
-	public void setStatusMode(STATUSMODE statusMode)
+	public List<STATUS_MODE> getStatusModeList()
 	{
-		this.statusMode = statusMode;
+		return this.statusModes;
+	}
+
+	public void setStatusMode(STATUS_MODE statusMode)
+	{
+		this.statusModes = new ArrayList<>();
+		this.statusModes.add(statusMode);
+	}
+
+	public void setStatusModeList(List<STATUS_MODE> statusModes)
+	{
+		this.statusModes = new ArrayList<>(statusModes);
+	}
+
+	public void addStatusMode(STATUS_MODE statusMode)
+	{
+		this.statusModes.add(statusMode);
 	}
 
 	public MatchMode getMatchMode()
@@ -312,6 +422,17 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	{
 		return customWildcardsEnabled;
 	}
+
+	public boolean isNegateStatus()
+	{
+		return negateStatus;
+	}
+
+	public void setNegateStatus(boolean negateStatus)
+	{
+		this.negateStatus = negateStatus;
+	}
+
 
 	/**
 	 * Enable custom wildcard use in search strings. Enabling this forces the search matching to EXACT mode.

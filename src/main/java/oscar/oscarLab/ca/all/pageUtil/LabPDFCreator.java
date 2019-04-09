@@ -433,7 +433,7 @@ public class LabPDFCreator extends PdfPageEventHelper{
 							if(isUnstructuredDoc){
 								cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 								//if there are duplicate obxNames, display only the first 
-								if((handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (obxCount>1))){
+								if((k > 0 && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (obxCount>1))){
 									cell.setPhrase(new Phrase("", lineFont));
 									table.addCell(cell);
 								}else {

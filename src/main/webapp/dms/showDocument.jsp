@@ -122,6 +122,7 @@
 			String creator = (String) session.getAttribute("user");
 			ArrayList doctypes = EDocUtil.getActiveDocTypes("demographic");
 			EDoc curdoc = EDocUtil.getDoc(documentNo);
+			boolean isValidPdf = !curdoc.hasEncodingError() && curdoc.getContentType().toLowerCase().contains("pdf");
 
 			String demographicID = curdoc.getModuleId();
 			if ((demographicID != null) && !demographicID.isEmpty() && !demographicID.equals("-1")){
@@ -141,17 +142,10 @@
 				ackFunc = "getDocComment('" + docId + "','" + providerNo + "'," + inQueueB + ");";
 			}
 
-
 			int slash = 0;
 			String contentType = "";
 			if ((slash = curdoc.getContentType().indexOf('/')) != -1) {
 				contentType = curdoc.getContentType().substring(slash + 1);
-			}
-			String dStatus = "";
-			if ((curdoc.getStatus() + "").compareTo("A") == 0) {
-				dStatus = "active";
-			} else if ((curdoc.getStatus() + "").compareTo("H") == 0) {
-				dStatus = "html";
 			}
 			int numOfPage=curdoc.getNumberOfPages();
 			String numOfPageStr="";
@@ -353,14 +347,14 @@
 
 								<tr><td></td>
 									<td>
-										<% boolean updatableContent = !inChart; %>
+										<% boolean updatableContent = isValidPdf && !inChart; %>
 										<oscar:oscarPropertiesCheck property="ALLOW_UPDATE_DOCUMENT_CONTENT" value="false" defaultVal="false">
 											<%
 												if(!demographicID.equals("-1")) { updatableContent=false; }
 											%>
 										</oscar:oscarPropertiesCheck>
 
-										<div style="<%=updatableContent==true?"":"visibility: hidden"%>">
+										<div style="<%=(updatableContent)?"":"visibility: hidden"%>">
 											<input onclick="split('<%=docId%>','<%=StringEscapeUtils.escapeJavaScript(demoName) %>')" type="button" value="<bean:message key="inboxmanager.document.split" />" />
 											<input id="rotate180btn_<%=docId %>" onclick="rotate180('<%=docId %>')" type="button" value="<bean:message key="inboxmanager.document.rotate180" />" />
 											<input id="rotate90btn_<%=docId %>" onclick="rotate90('<%=docId %>')" type="button" value="<bean:message key="inboxmanager.document.rotate90" />" />

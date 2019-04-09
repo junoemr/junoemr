@@ -361,37 +361,37 @@ public class EctSessionBean implements java.io.Serializable {
         // Therefore, we assume that the demographic number is already set prior to calling this method.
 
         DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-        Demographic d = demographicManager.getDemographic(loggedInInfo, demoNo);
+        Demographic demographic = demographicManager.getDemographic(loggedInInfo, demoNo);
 
-        patientLastName = d.getLastName();
-        patientFirstName = d.getFirstName();
-        address = d.getAddress();
-        city = d.getCity();
-        postal = d.getPostal();
-        phone = d.getPhone();
-        familyDoctorNo = d.getProviderNo();
-        chartNo = d.getChartNo();
-        yearOfBirth = d.getYearOfBirth();
-        monthOfBirth = d.getMonthOfBirth();
-        dateOfBirth = d.getDateOfBirth();
-        roster = d.getRosterStatus();
-        patientSex = d.getSex();
-        rosterDate = d.getRosterDate();
+        patientLastName = demographic.getLastName();
+        patientFirstName = demographic.getFirstName();
+        address = demographic.getAddress();
+        city = demographic.getCity();
+        postal = demographic.getPostal();
+        phone = demographic.getPhone();
+        familyDoctorNo = demographic.getProviderNo();
+        chartNo = demographic.getChartNo();
+        yearOfBirth = demographic.getYearOfBirth();
+        monthOfBirth = demographic.getMonthOfBirth();
+        dateOfBirth = demographic.getDateOfBirth();
+        roster = demographic.getRosterStatus();
+        patientSex = demographic.getSex();
+        rosterDate = demographic.getRosterDate();
 
-        if (yearOfBirth.equals("null") || yearOfBirth.equals(""))
+        if (yearOfBirth == null || yearOfBirth.equals("null") || yearOfBirth.equals(""))
         {
             yearOfBirth = "0";
         }
-        if (monthOfBirth.equals("null") || monthOfBirth.equals(""))
+        if (monthOfBirth == null || monthOfBirth.equals("null") || monthOfBirth.equals(""))
         {
             monthOfBirth = "0";
         }
-        if (dateOfBirth.equals("null") || dateOfBirth.equals(""))
+        if (dateOfBirth == null || dateOfBirth.equals("null") || dateOfBirth.equals(""))
         {
             dateOfBirth = "0";
         }
 
-        if (yearOfBirth.equals("0") || yearOfBirth == null)
+        if (yearOfBirth == null || yearOfBirth.equals("0"))
         {
             MiscUtils.getLogger().warn("Demographic no " + demographicNo + " does not have birth year. Unable to calculate age");
         }
@@ -401,7 +401,7 @@ public class EctSessionBean implements java.io.Serializable {
             patientBirthdate = yearOfBirth + "-" + monthOfBirth + "-" + dateOfBirth;
         }
 
-        String referringDoctor = d.getFamilyDoctor();
+        String referringDoctor = demographic.getFamilyDoctor();
         if (referringDoctor != null)
         {
             referringDoctorName = SxmlMisc.getXmlContent(referringDoctor, "rd") != null ? SxmlMisc.getXmlContent(referringDoctor, "rd") : "";
