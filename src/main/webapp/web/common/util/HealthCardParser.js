@@ -285,13 +285,10 @@ Oscar.HealthCardParser.parse = function parse(cardData)
 		{
 			cardHashOut = Oscar.HealthCardParser.parseBCCombined(cardData, cardHashOut);
 		}
-		else if (cardData.startsWith(ON_STANDALONE))
-		{
-			cardHashOut = Oscar.HealthCardParser.parseOntario(cardData, cardHashOut);
-		}
 		else
 		{
-			// Invalid or unsupported card format
+			// Card may be unsupported, but as a temporary measure we're letting it through
+			cardHashOut = Oscar.HealthCardParser.parseOntario(cardData, cardHashOut);
 		}
 	}
 	catch (e)

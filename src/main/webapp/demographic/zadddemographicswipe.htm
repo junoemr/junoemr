@@ -45,6 +45,11 @@
 				alert("Incorrect value provided for card number");
 				return false;
 			}
+			return true;
+			/*
+			 * We eventually want to insert the following code, but for now we need to
+			 * understand what types of cards are breaking our system.
+			 * Once we feel comfortable with the supported card types, re-add the following whitelist check.
 			else
 			{
 				if (Oscar.HealthCardParser.isWhitelisted(cardNo))
@@ -58,6 +63,7 @@
 						"\n- BC, Ontario");
 				return false;
 			}
+			*/
 		}
 	</script>
 </head>

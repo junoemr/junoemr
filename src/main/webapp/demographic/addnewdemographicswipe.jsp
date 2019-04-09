@@ -24,9 +24,14 @@
 
 --%>
 
+<%@ page import="org.oscarehr.util.MiscUtils" %>
+
 <%
 	String cardData = request.getParameter("card_no");
-	cardData = cardData.replaceAll("\"", "'");
+	String trimmedCardData = cardData.replaceAll("\"", "'");
+	// TEMPORARY LOGGING
+	// We want to determine what cards are being swiped that we don't know about
+	MiscUtils.getLogger().info(cardData);
 %>
 <html>
 <head>
@@ -57,7 +62,7 @@
 			}
 		}
 
-		var healthCardData = Oscar.HealthCardParser.parse("<%=cardData%>");
+		var healthCardData = Oscar.HealthCardParser.parse('<%=trimmedCardData %>');
 
 		var form = self.opener.document.adddemographic;
 
