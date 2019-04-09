@@ -389,7 +389,8 @@ public class ConversionUtils {
 	 *
 	 * @param dateString Date string of form like (yyyy-MM-dd).
 	 *                   This input string is allowed to be missing leading zero on MM or dd.
-	 *                   Input string can also be missing leading zeroes on year!
+	 *                   Note that LocalDate *could* fix a bad year (a year like 019 or 219)
+	 *                   but allowing a year entry like these to be entered could cause more problems.
 	 * @return dateString original dateString if we can't fix, fixed dateString otherwise
 	 */
 	public static String padDateString(String dateString)
@@ -398,7 +399,7 @@ public class ConversionUtils {
 		{
 			String[] splitDate = dateString.split("-");
 			// If we didn't get [year, month, day] then there's no point
-			if (splitDate.length != 3)
+			if (splitDate.length != 3 || splitDate[0].length() != 4)
 			{
 				return dateString;
 			}
