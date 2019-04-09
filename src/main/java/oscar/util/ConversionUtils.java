@@ -379,6 +379,40 @@ public class ConversionUtils {
 		return (int) (timestamp / MS_IN_DAY);
 	}
 
+	/**
+	 * Some date strings that we receive are sometimes missing leading zeroes, i.e:
+	 * - 2019-4-8
+	 * - 019-04-8
+	 * - 2019-4-08
+	 *
+	 * LocalDate can interpret these properly if we individually feed in the year, month, and day.
+	 *
+	 * @param dateString Date string of form like (yyyy-MM-dd).
+	 *                   This input string is allowed to be missing leading zero on MM or dd.
+	 *                   Input string can also be missing leading zeroes on year!
+	 * @return dateString original dateString if we can't fix, fixed dateString otherwise
+	 */
+	public static String padDateString(String dateString)
+	{
+		try
+		{
+			String[] splitDate = dateString.split("-");
+			// If we didn't get [year, month, day] then there's no point
+			if (splitDate.length != 3)
+			{
+				return dateString;
+			}
+			int year = Integer.parseInt(splitDate[0]);
+			int month = Integer.parseInt(splitDate[1]);
+			int date = Integer.parseInt(splitDate[2]);
+			LocalDate desiredDate = LocalDate.of(year, month, date);
+			return desiredDate.toString();
+		}
+		catch (Exception e)
+		{
+			return dateString;
+		}
+	}
 
 	public static Date coalesceTimeStampString(String dateString)
 	{
@@ -393,6 +427,8 @@ public class ConversionUtils {
 			logger.warn("Cannot Coalesce a null/empty date string");
 			return returnDate;
 		}
+
+		plain = padDateString(plain);
 
 		if(inFormat.length() > plain.length())
 			inFormat = inFormat.substring(0, plain.length());
