@@ -216,6 +216,14 @@ public class Schedule
 				sd.setHour(scheduleRscheduleBean.getDateAvailHour(cal));
 				sd.setCreator(providerName);
 				sd.setStatus(scheduleRscheduleBean.active.toCharArray()[0]);
+
+				//attempt to map to a schedule
+				Site site = siteDao.findByName(scheduleRscheduleBean.getSiteAvail(cal));
+				if (site != null)
+				{
+					sd.setSiteId(site.getId());
+				}
+
 				scheduleDateDao.persist(sd);
 			}
 			if((year + "-" + MyDateFormat.getDigitalXX(month) + "-" + MyDateFormat.getDigitalXX(day)).equals(endDateString)) break;
@@ -300,6 +308,14 @@ public class Schedule
 		sd.setHour(hour);
 		sd.setCreator(userName);
 		sd.setStatus(status.toCharArray()[0]);
+
+		//attempt to map to a schedule
+		Site site = siteDao.findByName(reason);
+		if (site != null)
+		{
+			sd.setSiteId(site.getId());
+		}
+
 		scheduleDateDao.persist(sd);
 	}
 
@@ -507,7 +523,7 @@ public class Schedule
 		ScheduleDate scheduleDate;
 		if (site != null)
 		{
-			scheduleDate = scheduleDateDao.findByProviderNoReasonAndDate(Integer.toString(providerNo), site, java.sql.Date.valueOf(date));
+			scheduleDate = scheduleDateDao.findByProviderNoSiteAndDate(Integer.toString(providerNo), site, java.sql.Date.valueOf(date));
 		}
 		else
 		{
