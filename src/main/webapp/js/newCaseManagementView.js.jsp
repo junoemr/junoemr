@@ -1,4 +1,4 @@
-<%--
+<%@ page import="java.util.UUID"%><%--
 
 
     Copyright (c) 2005-2012. Centre for Research on Inner City Health, St. Michael's Hospital, Toronto. All Rights Reserved.
@@ -57,6 +57,7 @@
 	var updateDivTimer = null;
 	var reloadDivUrl;
 	var reloadDiv;
+	var eChartUUID = "<%=UUID.randomUUID().toString()%>";
 
 	function checkLengthofObject(o)
 	{
@@ -70,7 +71,11 @@
 		}
 
 		return c;
+	}
 
+	function getEChartUUID()
+	{
+		return eChartUUID;
 	}
 
 	function popupPage(vheight, vwidth, name, varpage)
@@ -523,7 +528,7 @@
 				ctx + "/oscarEncounter/displayDocuments.do?hC=" + Colour.documents,
 				ctx + "/oscarEncounter/displayLabs.do?hC=" + Colour.labs,
 				ctx + "/oscarEncounter/displayMessages.do?hC=" + Colour.messages,
-				ctx + "/oscarEncounter/displayMeasurements.do?hC=" + Colour.measurements,
+				ctx + "/oscarEncounter/displayMeasurements.do?hC=" + Colour.measurements + "&eChartUUID=" + eChartUUID,
 				ctx + "/oscarEncounter/displayConsultation.do?hC=" + Colour.consultation,
 				//ctx + "/oscarEncounter/displayHRM.do?hC="
 				//ctx + "/oscarEncounter/displayMyOscar.do?hC=",

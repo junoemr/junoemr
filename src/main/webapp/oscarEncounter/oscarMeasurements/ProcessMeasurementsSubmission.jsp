@@ -40,13 +40,17 @@
 
 <script language="javascript"> 
 function closeWin() {
-  <% if (pasteEncounterNote == null || !pasteEncounterNote.equals("true")) { %>
-    self.opener.location.reload();
-  <% }
-    else {
-  %>
-    self.opener.pasteToEncounterNote("<%=request.getAttribute("textOnEncounter")%>");
-  <%}%>
+  if (self.opener != null)
+  {
+    <% if (pasteEncounterNote == null || !pasteEncounterNote.equals("true")) { %>
+      self.opener.location.reload();
+    <% }
+      else {
+    %>
+      self.opener.pasteToEncounterNote("<%=request.getAttribute("textOnEncounter")%>");
+      self.opener.location.reload();
+    <%}%>
+  }
   self.close();
 }
 </script>

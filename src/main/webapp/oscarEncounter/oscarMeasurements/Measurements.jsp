@@ -80,7 +80,8 @@ parentChanged = false;
 function check() {
     var ret = true;
     
-    if( parentChanged ) {
+    if( !isEchartOriginal() ) {
+		parentChanged = true
         document.forms[0].elements["value(parentChanged)"].value = "true";
         
         if( !confirm("<bean:message key="oscarEncounter.oscarMeasurements.Measurements.msgParentChanged"/> <oscar:nameage demographicNo="<%=demo%>"/>") ) 
@@ -88,6 +89,21 @@ function check() {
     }
 
     return ret;
+}
+
+// check that our eChart parent is the same window that opened us.
+function isEchartOriginal()
+{
+	if (opener != null)
+	{
+		parentUUID = opener.getEChartUUID();
+		myUUID = "<%=request.getParameter("uuid")%>"
+		return myUUID === parentUUID;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 </script>

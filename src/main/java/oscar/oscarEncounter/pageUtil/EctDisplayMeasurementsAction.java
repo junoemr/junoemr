@@ -67,6 +67,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 			String menuId = "3"; //div id for popup menu
 			String roleName$ = request.getSession().getAttribute("userrole") + "," + request.getSession().getAttribute("user");
 			String uuid="";
+			String eChartUUID = request.getParameter("eChartUUID");
 
 			//set text for lefthand module title
 			Dao.setLeftHeading(messages.getMessage(request.getLocale(), "oscarEncounter.Index.measurements"));
@@ -197,7 +198,8 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 				MeasurementGroupStyle group = groups.get(j);
 				winName = group.getGroupName() + bean.demographicNo;
 				hash = Math.abs(winName.hashCode());
-				url = "popupPage(500,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/SetupMeasurements.do?groupName=" + group.getGroupName() + "');measurementLoaded('" + hash + "')";
+				url = "popupPage(500,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/SetupMeasurements.do?groupName=" + group.getGroupName() +
+						"&uuid=" + eChartUUID + "');measurementLoaded('" + hash + "')";
 				Dao.addPopUpUrl(url);
 				Dao.addPopUpText(group.getGroupName());
 			}
