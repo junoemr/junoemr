@@ -30,6 +30,7 @@ import java.util.Comparator;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.dao.LabReportInformationDao;
 import org.oscarehr.common.model.LabReportInformation;
 import org.oscarehr.util.MiscUtils;
@@ -48,7 +49,7 @@ import oscar.util.UtilDateUtilities;
  */
 public class LabResultData implements Comparable<LabResultData> {
 
-	Logger logger = MiscUtils.getLogger();
+	private Logger logger = MiscUtils.getLogger();
 
 	public static final String CML = "CML";
 	public static final String EPSILON = "Epsilon";
@@ -98,23 +99,36 @@ public class LabResultData implements Comparable<LabResultData> {
 	public LabResultData() {
 	}
 
-	public LabResultData(String labT) {
-		if (CML.equals(labT)){
+	public LabResultData(String labT)
+	{
+		if (CML.equals(labT))
+		{
 			labType = CML;
-		}else if (MDS.equals(labT)){
+		}
+		else if (MDS.equals(labT))
+		{
 			labType = MDS;
-		}else if (EXCELLERIS.equals(labT)){
+		}
+		else if (EXCELLERIS.equals(labT))
+		{
 			labType = EXCELLERIS;
-		}else if (HL7TEXT.equals(labT)){
+		}
+		else if (HL7TEXT.equals(labT))
+		{
 			labType = HL7TEXT;
-		}else if(EPSILON.equals(labT)){
+		}
+		else if(EPSILON.equals(labT))
+		{
 			labType = EPSILON;
-		}else if (HRM.equals(labT)) {
+		}
+		else if (HRM.equals(labT))
+		{
 			labType = HRM;
-		}else if (Spire.equals(labT)) {
+		}
+		else if (Spire.equals(labT))
+		{
 			labType = Spire;
 		}
-
 	}
 
 	public String getLabPatientId(){
@@ -151,6 +165,16 @@ public class LabResultData implements Comparable<LabResultData> {
 
 	}
 
+	// Relevant for Alberta Health Services as they are not currently
+	// sending any abnormal indications in their pathologies. We want
+	// to flag them all as "Unknown" so user notices and hopefully reads
+	public boolean isUnknown()
+	{
+		Hl7TextMessageDao msgDao = (Hl7TextMessageDao)SpringUtils.getBean("hl7TextMessageDao");
+		String msgType = msgDao.getLabTypeFromLabId(Integer.parseInt(this.segmentID));
+		boolean isLabCLS = msgType.equals("CLS") || msgType.equals("CLSDI") || msgType.equals("AHS");
+		return this.discipline.equals("CYTOPATHOLOGY") && isLabCLS;
+	}
 
 	public boolean isFinal(){ return finalRes ;}
 
