@@ -80,13 +80,16 @@
 		updateParent = "true";
 
 %>
-<%@ page
-		import="java.util.*, java.sql.*, oscar.*, java.net.*, oscar.oscarEncounter.pageUtil.EctSessionBean" %>
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.common.model.Appointment" %>
-<%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
-<%@page import="org.oscarehr.common.model.Provider" %>
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
+<%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
+<%@page import="org.oscarehr.common.dao.SiteDao" %>
+<%@page import="org.oscarehr.common.model.Appointment" %>
+<%@page import="org.oscarehr.common.model.Provider" %>
+<%@page import="org.oscarehr.common.model.Site" %>
+<%@page import="org.oscarehr.util.SpringUtils" %>
+<%@page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
+<%@page import="oscar.MyDateFormat" %>
+<%@page import="java.util.Calendar" %>
 
 <%
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
@@ -106,10 +109,9 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 
-<%@page import="org.oscarehr.common.dao.SiteDao" %>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
-<%@page import="org.oscarehr.common.model.Site" %>
-<%@page import="org.oscarehr.common.model.Provider" %>
+<%@page import="java.util.GregorianCalendar" %>
+<%@page import="java.util.Iterator" %>
+<%@page import="java.util.List" %>
 <html:html locale="true">
 	<head>
 		<title><bean:message key="tickler.ticklerAdd.title"/></title>
@@ -256,7 +258,7 @@
 			{
 				var gCurrentDate = new Date();
 				var newDate = DateAdd(gCurrentDate, 0, no, 0);
-				var newYear = newDate.getFullYear()
+				var newYear = newDate.getFullYear();
 				var newMonth = newDate.getMonth() + 1;
 				var newDay = newDate.getDate();
 				var newD = newYear + "-" + newMonth + "-" + newDay;
@@ -356,7 +358,7 @@
 				</td>
 				<td colspan="2">
 					<div align="left"><INPUT TYPE="hidden" NAME="demographic_no"
-											 VALUE="<%=bFirstDisp?"":request.getParameter("demographic_no").equals("")?"":request.getParameter("demographic_no")%>"><%=ChartNo%>
+											 VALUE="<%=bFirstDisp?"":(demoNo.isEmpty()?"":demoNo)%>"><%=ChartNo%>
 					</div>
 				</td>
 			</tr>
@@ -474,10 +476,7 @@ else
 								proLast = p.getLastName();
 								proOHIP = p.getProviderNo();
 
-								if (defaultProvider.equals(proOHIP))
-								{
-									selected = "selected";
-								} else if (defaultProvider.isEmpty() && user_no.equals(proOHIP))
+								if (defaultProvider.equals(proOHIP) || (defaultProvider.isEmpty() && user_no.equals(proOHIP)))
 								{
 									selected = "selected";
 								}

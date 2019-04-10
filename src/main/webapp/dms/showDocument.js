@@ -36,14 +36,15 @@ Oscar.ShowDocument.popupPatient = function popupPatient(height, width, url, wind
 	return popup2(height, width, 0, 0, urlNew, windowName);
 };
 
-Oscar.ShowDocument.popupPatientTickler = function popupPatientTickler(height, width, url, windowName, docId)
+Oscar.ShowDocument.popupPatientTickler = function popupPatientTickler(height, width, contextPath, windowName, docId)
 {
 	var demographicNo = document.getElementById('demofind' + docId).value;
 	var demographicName = document.getElementById('demofindName' + docId).value;
-	var urlNew = url + "method=edit" +
-		"&tickler.demographic_webName=" + demographicName +
-		"&tickler.demographicNo=" + demographicNo +
-		"&docType=DOC&docId=" + docId;
+	var urlNew = contextPath + "/tickler/ForwardDemographicTickler.do" +
+		"?docType=DOC" +
+		"&docId=" + docId +
+		"&demographic_no=" + demographicNo +
+		"&demoName=" + demographicName;
 
 	return popup2(height, width, 0, 0, urlNew, windowName);
 };

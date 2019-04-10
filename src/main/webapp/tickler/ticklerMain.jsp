@@ -23,40 +23,34 @@
     Ontario, Canada
 
 --%>
-<%@page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 
-<%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.common.model.*" %>
-<%@ page import="oscar.oscarLab.ca.on.*" %>
-<%@ page import="org.oscarehr.util.DbConnectionFilter" %>
 <%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
-<%@ page import="org.oscarehr.common.dao.ViewDao" %>
 <%@ page import="org.oscarehr.common.dao.DemographicDao" %>
-<%@ page import="org.oscarehr.common.model.View,org.oscarehr.util.LocaleUtils" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="java.util.Set" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Iterator" %>
-<%@ page import="org.oscarehr.common.model.TicklerLink" %>
-<%@ page import="org.oscarehr.common.dao.TicklerLinkDao" %>
-<%@ page import="java.util.Calendar" %>
-<%@ page import="java.time.LocalDate" %>
-<%@ page import="oscar.MyDateFormat" %>
-<%@ page import="oscar.OscarProperties" %>
-<%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.common.dao.SiteDao" %>
+<%@ page import="org.oscarehr.common.dao.TicklerLinkDao" %>
+<%@ page import="org.oscarehr.common.model.CustomFilter" %>
+<%@ page import="org.oscarehr.common.model.Demographic" %>
+<%@ page import="org.oscarehr.common.model.Provider" %>
+<%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.common.model.Tickler" %>
 <%@ page import="org.oscarehr.common.model.TicklerComment" %>
-<%@ page import="org.oscarehr.common.model.TicklerUpdate" %>
-<%@ page import="org.oscarehr.common.model.CustomFilter" %>
+<%@ page import="org.oscarehr.common.model.TicklerLink" %>
 <%@ page import="org.oscarehr.managers.TicklerManager" %>
-<%@ page import="java.text.DateFormat" %>
-<%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="java.util.Locale" %>
-<%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.time.ZoneId" %>
+<%@ page import="org.oscarehr.util.LocaleUtils" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.MyDateFormat" %>
+<%@ page import="oscar.OscarProperties" %>
+<%@ page import="oscar.oscarLab.ca.on.LabResultData" %>
 <%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Locale" %>
+<%@ page import="java.util.Set" %>
 
 <%
 	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -166,13 +160,15 @@
 		xml_appointment_date = request.getParameter("xml_appointment_date");
 	}*/
 	String xml_appointment_date;
-	if (request.getParameter("xml_appointment_date") != null)
+	if(request.getParameter("xml_appointment_date") != null)
 	{
 		xml_appointment_date = request.getParameter("xml_appointment_date");
-	} else if (demographic_no != null && !demographic_no.equals("all"))
+	}
+	else if(demographic_no != null && !demographic_no.equals("all"))
 	{
 		xml_appointment_date = "8888-12-31";
-	} else
+	}
+	else
 	{
 		xml_appointment_date = MyDateFormat.getMysqlStandardDate(curYear, curMonth, curDay);
 	}
