@@ -26,16 +26,19 @@
 'use strict';
 
 window.Oscar = window.Oscar || {};
-window.Oscar.AttachConsultation = window.Oscar.AttachConsultation ||
-{
+window.Oscar.AttachConsultation = {
 
 	DOCTYPE_DOC: 'D',
 	DOCTYPE_LAB: 'L',
 	DOCTYPE_EFORM: 'E',
 
 	//if consultation has not been saved, load existing docs into proper select boxes
-	init: function init(docs)
+	init: function init(loadFromOpener, docs)
 	{
+		if(loadFromOpener)
+		{
+			docs = window.opener.document.EctConsultationFormRequestForm.documents.value;
+		}
 		docs = docs.split("|");
 		this.checkDocuments(docs);
 	},
@@ -67,7 +70,7 @@ window.Oscar.AttachConsultation = window.Oscar.AttachConsultation ||
 					inputName = "eFormNo";
 					break;
 				default:
-					console.error("Invalid doctype: " + docs[idx].charAt(0));
+					console.error("Invalid doctype: " + docs[idx].charAt(0) + " for value '" + docs[idx] + "'");
 					continue;
 			}
 			$("input[name='" + inputName + "'][value='" + docs[idx].substring(1) + "']").attr("checked", "checked");
@@ -94,7 +97,7 @@ window.Oscar.AttachConsultation = window.Oscar.AttachConsultation ||
 
 			$("input[name='docNo']:checked").each(function ()
 			{
-				saved += (saved === "" ? "" : "|") + this.DOCTYPE_DOC + $(this).attr("value");
+				saved += (saved === "" ? "" : "|") + Oscar.AttachConsultation.DOCTYPE_DOC + $(this).val();
 				let listElem = window.opener.document.createElement("li");
 				listElem.innerHTML = $(this).next().get(0).innerHTML;
 				listElem.className = "doc";
@@ -102,7 +105,7 @@ window.Oscar.AttachConsultation = window.Oscar.AttachConsultation ||
 			});
 			$("input[name='labNo']:checked").each(function ()
 			{
-				saved += (saved === "" ? "" : "|") + this.DOCTYPE_LAB + $(this).attr("value");
+				saved += (saved === "" ? "" : "|") + Oscar.AttachConsultation.DOCTYPE_LAB + $(this).val();
 				let listElem = window.opener.document.createElement("li");
 				listElem.innerHTML = $(this).next().get(0).innerHTML;
 				listElem.className = "lab";
@@ -110,7 +113,7 @@ window.Oscar.AttachConsultation = window.Oscar.AttachConsultation ||
 			});
 			$("input[name='eFormNo']:checked").each(function ()
 			{
-				saved += (saved === "" ? "" : "|") + this.DOCTYPE_EFORM + $(this).attr("value");
+				saved += (saved === "" ? "" : "|") + Oscar.AttachConsultation.DOCTYPE_EFORM + $(this).val();
 				let listElem = window.opener.document.createElement("li");
 				listElem.innerHTML = $(this).next().get(0).innerHTML;
 				listElem.className = "eform";

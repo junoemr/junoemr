@@ -53,12 +53,12 @@ public class ScheduleDateDao extends AbstractDao<ScheduleDate>
 		return(getSingleResultOrNull(query));
 	}
 
-	public ScheduleDate findByProviderNoReasonAndDate(String providerNo, String reason, Date date) {
-		Query query = entityManager.createQuery("select s from ScheduleDate s where s.providerNo=:providerNo and s.date=:date and s.status=:status and s.reason=:reason");
+	public ScheduleDate findByProviderNoSiteAndDate(String providerNo, String site, Date date) {
+		Query query = entityManager.createQuery("select sd from ScheduleDate sd where sd.providerNo=:providerNo and sd.date=:date and sd.status=:status and sd.site.name = :site");
 		query.setParameter("providerNo", providerNo);
 		query.setParameter("date", date);
 		query.setParameter("status", 'A');
-		query.setParameter("reason", reason);// aka site
+		query.setParameter("site", site);
 
 		return(getSingleResultOrNull(query));
 	}

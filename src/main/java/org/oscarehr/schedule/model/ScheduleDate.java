@@ -26,14 +26,18 @@
 package org.oscarehr.schedule.model;
 
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.common.model.Site;
 
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -62,6 +66,13 @@ public class ScheduleDate extends AbstractModel<Integer>
 	private String hour;
 	private String creator;
 	private char status;
+
+	@Column(name="site_id")
+	private Integer siteId;
+
+	@OneToOne(fetch= FetchType.LAZY)
+	@JoinColumn(name="site_id", referencedColumnName="site_id", insertable=false, updatable=false)
+	private Site site;
 	
 	public Integer getId() {
 		return id;
@@ -143,6 +154,24 @@ public class ScheduleDate extends AbstractModel<Integer>
 	public void setStatus(char status) {
     	this.status = status;
     }
-	
 
+	public Site getSite()
+	{
+		return site;
+	}
+
+	public void setSite(Site site)
+	{
+		this.site = site;
+	}
+
+	public int getSiteId()
+	{
+		return siteId;
+	}
+
+	public void setSiteId(int siteId)
+	{
+		this.siteId = siteId;
+	}
 }
