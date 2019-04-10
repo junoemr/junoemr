@@ -1396,9 +1396,6 @@ var requestIdKey = "<%=signatureRequestId %>";
 
 	%>
 
-	<% if (!faxEnabled || !OscarProperties.getInstance().isPropertyActive("consultation_dynamic_labelling_enabled")) { %>
-	<input type="hidden" name="providerNo" value="<%=providerNo%>">
-	<% } %>
 	<input type="hidden" name="demographicNo" value="<%=demo%>">
 	<input type="hidden" name="requestId" value="<%=requestId%>">
 	<input type="hidden" name="documents" value="">
@@ -1753,7 +1750,6 @@ var requestIdKey = "<%=signatureRequestId %>";
 					<td>
 
 					<table border=0 width="100%">
-						<% if (faxEnabled && OscarProperties.getInstance().isPropertyActive("consultation_dynamic_labelling_enabled")) { %>
 						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgAssociated2" />:</td>
 							<td align="right" class="tite1">
@@ -1772,7 +1768,6 @@ var requestIdKey = "<%=signatureRequestId %>";
 								</html:select>
 							</td>
 						</tr>
-						<% } %>
 						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formRefDate" />:
 							</td>
