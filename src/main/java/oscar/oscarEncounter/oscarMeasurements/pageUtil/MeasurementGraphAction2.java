@@ -505,7 +505,9 @@ public class MeasurementGraphAction2 extends Action {
                     newSeries.setKey(typeLegendName);
                     nameSet = true;
                 }
-                newSeries.addOrUpdate(new Day((Date) mdb.get("collDateDate")), Double.parseDouble(""+mdb.get("result")));
+                String mdbResult = (String)mdb.get("result");
+                mdbResult = mdbResult.replaceAll("[^0-9.]", "");
+                newSeries.addOrUpdate(new Day((Date) mdb.get("collDateDate")), Double.parseDouble(mdbResult));
 
                 if (mdb.get("range") != null)
                 {
@@ -519,12 +521,15 @@ public class MeasurementGraphAction2 extends Action {
                     if (range.contains("-"))
                     {
                         String[] sp = range.split("-");
-                        double open = Double.parseDouble(sp[0]);
-                        double high = Double.parseDouble(sp[1]);
-                        double low = Double.parseDouble(sp[0]);
-                        double close = Double.parseDouble(sp[1]);
-                        double volume = 1045;
-                        dataItems.add(new OHLCDataItem(new Day((Date) mdb.get("collDateDate")).getStart(), open, high, low, close, volume));
+                        if (sp.length > 1)
+                        {
+                            double open = Double.parseDouble(sp[0]);
+                            double high = Double.parseDouble(sp[1]);
+                            double low = Double.parseDouble(sp[0]);
+                            double close = Double.parseDouble(sp[1]);
+                            double volume = 1045;
+                            dataItems.add(new OHLCDataItem(new Day((Date) mdb.get("collDateDate")).getStart(), open, high, low, close, volume));
+                        }
                     }
                 }
 
