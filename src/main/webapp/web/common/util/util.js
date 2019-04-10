@@ -150,7 +150,7 @@ Juno.Common.Util.validateDateString = function validateDateString(dateString)
 Juno.Common.Util.validateDate = function validateDate(year, month, day)
 {
 	var dateString = year + "-" + month + "-" + day;
-	return Juno.Common.Util.validateDateString(dateString);
+	return !(isNaN(Juno.Common.Util.validateDateString(dateString)));
 };
 
 Juno.Common.Util.noNull = function noNull(val)

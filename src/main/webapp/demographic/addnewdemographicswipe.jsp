@@ -83,7 +83,7 @@
         {
         	setValueIfExists(form.year_of_birth,       healthCardData.data.dobYear);
         	setValueIfExists(form.month_of_birth,      healthCardData.data.dobMonth);
-        	setValueIfExists(form.date_of_birth,       healthCardData.data.dobYear);
+        	setValueIfExists(form.date_of_birth,       healthCardData.data.dobDay);
         }
 
         if (Juno.Common.Util.validateDate(healthCardData.data.effYear,
