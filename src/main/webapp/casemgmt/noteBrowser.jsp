@@ -23,13 +23,13 @@
 
 --%>
 
+<%@page import="org.oscarehr.casemgmt.model.CaseManagementNote"%>
+<%@page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
+<%@page import="org.oscarehr.casemgmt.web.NoteDisplay"%>
+<%@page import="org.oscarehr.casemgmt.web.NoteDisplayLocal"%>
+<%@page import="org.oscarehr.common.dao.QueueDao"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="java.util.Hashtable"%>
-<%@page import="oscar.util.UtilDateUtilities"%>
-<%@page import="java.util.Collections"%>
-<%@page import="oscar.MyDateFormat"%>
-<%@page import="oscar.util.DateUtils"%>
-<%@page import="java.util.ArrayList" %>
+<%@page import="org.oscarehr.util.SpringUtils" %>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
@@ -41,14 +41,15 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="oscarVariables" class="java.util.Properties" scope="page" />
 
-<%@page import="java.net.URLDecoder, java.net.URLEncoder,java.util.Date, java.util.List"%>
-<%@page import="oscar.dms.EDocUtil,oscar.dms.EDoc"%>
-<%@page import="org.oscarehr.casemgmt.web.NoteDisplay,org.oscarehr.casemgmt.web.NoteDisplayLocal"%>
-<%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.casemgmt.service.CaseManagementManager,org.oscarehr.casemgmt.model.CaseManagementNote"%>
-<%@page import="org.oscarehr.common.dao.CtlDocClassDao,org.oscarehr.common.dao.QueueDao" %>
-<%@page import="org.springframework.web.context.WebApplicationContext"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@page import="org.springframework.web.context.WebApplicationContext,
+                org.springframework.web.context.support.WebApplicationContextUtils,
+                oscar.MyDateFormat,
+                oscar.dms.EDoc" %>
+<%@page import="oscar.dms.EDocUtil,oscar.util.DateUtils" %>
+<%@page import="oscar.util.UtilDateUtilities,java.net.URLDecoder" %>
+<%@page import="java.net.URLEncoder" %>
+<%@page import="java.util.ArrayList,java.util.Collections" %>
+<%@page import="java.util.Hashtable,java.util.List" %>
 <%
     if (session.getAttribute("userrole") == null) {
         response.sendRedirect("../logout.jsp");
@@ -109,7 +110,6 @@
     String module="demographic"; 
      
     ArrayList doctypes = EDocUtil.getDoctypes("demographic");
-    ArrayList<ArrayList<EDoc>> categories = new ArrayList<ArrayList<EDoc>>();
     ArrayList<EDoc> docs = new ArrayList<EDoc>();
     
     String sortorder = "";
@@ -235,19 +235,21 @@
                     document.getElementById('docextrainfo').innerHTML='';
                 }
                                                   
-            }
+            };
             showPageCombineImg=function(doclist){
                 
                 var url2='<%=request.getContextPath()%>'+'/dms/combinePDFs.do?ContentDisposition=inline'+doclist;
-                document.getElementById('docdisp').innerHTML = '<object	data="' +url2 +'" type="application/pdf" width="' +(getWidth()-40) +'" height="' +(getHeight()-50) +'"></object>';
+                document.getElementById('docdisp').innerHTML = '<object	data="' +url2 +'" ' +
+	                'type="application/pdf" width="' +(getWidth()-40) +'" height="' +(getHeight()-50) +'"></object>';
                 document.getElementById('docinfo').innerHTML='';
                 document.getElementById('docextrainfo').innerHTML='';
                 document.getElementById('printnotesbutton').style.visibility = 'hidden'; 
                                                   
-            }
+            };
             function showEncounter(encList){
                  var url2='<%=request.getContextPath()%>'+'/CaseManagementEntry.do?method=displayNotes&demographicNo=<%=demographicID%>'+encList+'&printCPP=false&printRx=false';
-                 document.getElementById('docdisp').innerHTML = '<object data="' +url2 +'"  width="' +(getWidth()-40) +'" height="' +(getHeight()-300) +'" type="text/html"></object>';
+                 document.getElementById('docdisp').innerHTML = '<object data="' +url2 +
+	                 '"  width="' +(getWidth()-40) +'" height="' +(getHeight()-300) +'" type="text/html"></object>';
                  document.getElementById('docinfo').innerHTML='';
                  document.getElementById('docextrainfo').innerHTML = '';
                  document.getElementById('printnotesbutton').style.visibility = 'visible'; 
@@ -271,8 +273,7 @@
             function getDoc()
             {
                 var th = document.getElementById('doclist');
-                var selected = new Array();
-                selected=getSelected(th);
+                var selected = getSelected(th);
    
                 if(selected.length==0) {
               
@@ -371,8 +372,7 @@
             function getEncounter()
             {
                 var th = document.getElementById('encounterlist');
-                var selected = new Array();
-                selected=getSelected(th);
+                var selected = getSelected(th);
                 
                 var encList='';
                 if(selected.length>=1) {
@@ -393,8 +393,7 @@
             {
     
                 var th = document.getElementById('encounterlist');
-                var selected = new Array();
-                selected=getSelected(th);
+                var selected = getSelected(th);
                 var encList='';
                 if(selected.length>=1) {
                     var th1 = document.getElementById('doclist');
@@ -406,7 +405,8 @@
                         encList=encList+','+selected[k].value;}
                     }
              
-                    popup(700,960,'<%=request.getContextPath()%>'+'/CaseManagementEntry.do?method=print&demographicNo=<%=demographicID%>'+encList+'&printCPP=false&printRx=false','PrintEncounter');          
+                    popup(700,960,'<%=request.getContextPath()%>'+'/CaseManagementEntry.do?method=print&demographicNo=<%=demographicID%>'+
+	                    encList+'&printCPP=false&printRx=false','PrintEncounter');
                 }
             }
 
@@ -422,8 +422,7 @@
             function DocEdit()
             {
                 var th = document.getElementById('doclist');
-                var selected = new Array();
-                selected=getSelected(th);
+                var selected = getSelected(th);
                 var docidindexend=selected[0].value.indexOf('-');
                 docid=selected[0].value.substring(0,docidindexend);
                 var doctype=selected[0].value.substring(docidindexend+1,selected[0].value.length);
@@ -491,8 +490,8 @@
                                     <%=sortorder.equalsIgnoreCase("Observation") ? "selected":""%>><bean:message key="oscarEncounter.noteBrowser.msgObservation"/></option>
                             <option value="Update"
                                     <%=sortorder.equalsIgnoreCase("Update") ? "selected":""%>><bean:message key="oscarEncounter.noteBrowser.msgUpdate"/></option>
-				
-			</select>
+
+						</select>
                         <fieldset><legend><bean:message key="oscarEncounter.noteBrowser.msgView"/>:</legend>      
                             <input type="hidden" name="view" value="<%=view%>">
                             <input type="hidden" name="demographic_no" value="<%=demographicID%>">
@@ -502,9 +501,12 @@
                             <input type="hidden" name="queueId" value="<%=queueId%>">
 
                             <a
-                                href="#" onclick="LoadView('all')" ><%=view.equals("all") ? "<b>":""%>All<%=view.equals("all") ? "</b>":""%></a> <% for (int i3 = 0; i3 < doctypes.size(); i3++) {%>
+                                href="#" onclick="LoadView('all')" ><%=view.equals("all") ? "<b>":""%>All<%=view.equals("all") ? "</b>":""%></a>
+	                        <% for(int i3 = 0; i3 < doctypes.size(); i3++)
+	                        {%>
                             | <a
-                                href="#" onclick="LoadView('<%=URLEncoder.encode((String) doctypes.get(i3),"UTF-8")%>')"><%=view.equals(doctypes.get(i3)) ? "<b>":""%><%=(String) doctypes.get(i3)%><%=view.equals(doctypes.get(i3)) ? "</b>":""%></a>
+                                href="#" onclick="LoadView('<%=URLEncoder.encode((String) doctypes.get(i3),"UTF-8")%>')"><%=view.equals(doctypes.get(i3)) ? "<b>":""%>
+		                        <%=(String) doctypes.get(i3)%><%=view.equals(doctypes.get(i3)) ? "</b>":""%></a>
                             <%}%> 
                         </fieldset>
                         <div id="docbuttons">
@@ -533,7 +535,8 @@
                             
                             
                         <div id="docinfo"></div>
-                        <div id="printnotesbutton"><input type='image' src="../oscarEncounter/graphics/document-print.png" onclick="PrintEncounter();" title='<bean:message key="oscarEncounter.Index.btnPrint"/>' id="imgPrintEncounter"></div>  
+                        <div id="printnotesbutton"><input type='image' src="../oscarEncounter/graphics/document-print.png" onclick="PrintEncounter();"
+                                                          title='<bean:message key="oscarEncounter.Index.btnPrint"/>' id="imgPrintEncounter"></div>
                     </td><td valign="top">
                         <fieldset><legend><%
                         if(sortorder.equals("Content")) { %>
@@ -545,7 +548,11 @@
                                     for (int i2 = 0; i2 < docs.size(); i2++) {
                                         EDoc cmicurdoc = docs.get(i2);
                                 %>
-                                <option VALUE="<%=cmicurdoc.getDocId()%>-<%=cmicurdoc.getContentType()%>" title="<%=cmicurdoc.getDescription()%>"><%=sortorder.equals("Content")?UtilDateUtilities.DateToString(cmicurdoc.getContentDateTime(),"yyyy-MM-dd"):cmicurdoc.getDateTimeStamp()%>&nbsp;&nbsp; <%=cmicurdoc.getObservationDate()%> [<%=cmicurdoc.getType()%>] <%=(cmicurdoc.getDescription().length()<30?cmicurdoc.getDescription():cmicurdoc.getDescription().substring(0,30)+"...")%>
+                                <option VALUE="<%=cmicurdoc.getDocId()%>-<%=cmicurdoc.getContentType()%>"
+                                        title="<%=cmicurdoc.getDescription()%>"><%=sortorder.equals("Content")?
+		                                    UtilDateUtilities.DateToString(cmicurdoc.getContentDateTime(),"yyyy-MM-dd"):cmicurdoc.getDateTimeStamp()%>
+	                                &nbsp;&nbsp; <%=cmicurdoc.getObservationDate()%> [<%=cmicurdoc.getType()%>]
+	                                <%=(cmicurdoc.getDescription().length()<30?cmicurdoc.getDescription():cmicurdoc.getDescription().substring(0,30)+"...")%>
                                 </option> <%}%>
                             </SELECT>
                         </fieldset>
@@ -555,10 +562,12 @@
                             <% 
                                 CaseManagementManager caseManagementManager=(CaseManagementManager)SpringUtils.getBean("caseManagementManager");
                                 List<CaseManagementNote> notes =  caseManagementManager.getNotes(demographicID);
-               
-                                ArrayList<NoteDisplay> notesToDisplay = new ArrayList<NoteDisplay>();
-                                for (CaseManagementNote noteTemp : notes)
-                                    notesToDisplay.add(new NoteDisplayLocal(loggedInInfo, noteTemp));
+
+	                            ArrayList<NoteDisplay> notesToDisplay = new ArrayList<NoteDisplay>();
+	                            for(CaseManagementNote noteTemp : notes)
+	                            {
+		                            notesToDisplay.add(new NoteDisplayLocal(loggedInInfo, noteTemp));
+	                            }
                                 Collections.sort(notesToDisplay, NoteDisplay.noteObservationDateComparator);
                                 int noteSize = notes.size();
                                 int idx=0;
@@ -567,7 +576,9 @@
                                     NoteDisplay curNote = notesToDisplay.get(idx); 
                                     if (!(curNote.isDocument()) && !(curNote.isEformData()) && !(curNote.isRxAnnotation()) && !(curNote.isCpp())) {
                             %>
-                                <option value="<%=curNote.getNoteId()%>"><%=DateUtils.getDate(MyDateFormat.getCalendar(curNote.getObservationDate()).getTime(), "yyyy-MM-dd  HH:mm ", request.getLocale())%> <%=curNote.getProviderName()%></option>
+                                <option value="<%=curNote.getNoteId()%>">
+	                                <%=DateUtils.getDate(MyDateFormat.getCalendar(curNote.getObservationDate()).getTime(), "yyyy-MM-dd  HH:mm ",
+		                                request.getLocale())%> <%=curNote.getProviderName()%></option>
                             <%          
                                     }
                                 }  

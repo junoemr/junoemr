@@ -66,14 +66,14 @@ public class DemographicMergeRecordAction  extends Action {
     public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response) {
 
     	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-    	
-    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_demographic", "w", null)) {
-			throw new SecurityException("missing required security object (_demographic)");
-		}
-    	
-        if (request.getParameterValues("records")==null) {
+
+    	securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), securityInfoManager.WRITE, null, "_demographic");
+
+        if (request.getParameterValues("records")==null)
+        {
             return mapping.findForward("failure");
         }
+
         String outcome = "success";
         ArrayList<String> records = new ArrayList<String>(Arrays.asList(request.getParameterValues("records")));
         String head = request.getParameter("head");

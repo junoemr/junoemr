@@ -66,6 +66,9 @@ public class GenericFile
 	public static final String OUTBOUND_FAX_DIR_SENT = new File(OUTBOUND_FAX_DIR_PENDING, "sent").getPath();
 	public static final String OUTBOUND_FAX_DIR_UNSENT = new File(OUTBOUND_FAX_DIR_PENDING, "unsent").getPath();
 
+	public static final String BILLING_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("BILLING_BASE_DIR")).getPath();
+	public static final String BILLING_REMITTANCE_DIR = new File(BILLING_BASE_DIR, props.getProperty("BILLING_REMITTANCE_DIR")).getPath();
+
 	public static final String EMAIL_TEMPLATE_DIRECTORY = props.getProperty("template_file_location");
 
 	// file info
@@ -75,6 +78,7 @@ public class GenericFile
 	protected boolean hasBeenValidated;
 	protected boolean isValid;
 	protected String reasonInvalid;
+	protected String invalidContentType;
 
 	public GenericFile(File file)
 	{
@@ -83,13 +87,17 @@ public class GenericFile
 		this.hasBeenValidated = false;
 		this.isValid = false;
 		this.reasonInvalid = null;
+		this.invalidContentType = "application/octet-stream";
 	}
 
 	public boolean moveToDocuments() throws IOException
 	{
 		return moveFile(DOCUMENT_BASE_DIR);
 	}
-
+	public boolean moveToBillingRemittance() throws IOException
+	{
+		return moveFile(BILLING_REMITTANCE_DIR);
+	}
 	public boolean moveToCorrupt() throws IOException
 	{
 		return moveFile(DOCUMENT_CORRUPT_DIR);
@@ -177,18 +185,18 @@ public class GenericFile
 		this.hasBeenValidated = replacementFile.hasBeenValidated();
 		this.isValid = replacementFile.isValid();
 		this.reasonInvalid = replacementFile.getReasonInvalid();
+		this.invalidContentType = replacementFile.getInvalidContentType();
 	}
 
-	public boolean validate() throws IOException, InterruptedException
-	{
-		this.hasBeenValidated = true;
-		this.isValid = true;
-		return true;
-	}
 	public void process() throws IOException, InterruptedException
 	{
 	}
 
+	public void forceSetValidation(boolean isValid)
+	{
+		this.isValid = isValid;
+		this.hasBeenValidated = true;
+	}
 	public boolean isValid()
 	{
 		return this.isValid;
@@ -200,6 +208,10 @@ public class GenericFile
 	public String getReasonInvalid()
 	{
 		return this.reasonInvalid;
+	}
+	public String getInvalidContentType()
+	{
+		return this.invalidContentType;
 	}
 
 	/**
@@ -216,7 +228,16 @@ public class GenericFile
 	}
 	public String getContentType() throws IOException
 	{
-		return GenericFile.getContentType(javaFile);
+		String contentType;
+		if(isValid)
+		{
+			contentType = GenericFile.getContentType(javaFile);
+		}
+		else
+		{
+			contentType = getInvalidContentType();
+		}
+		return contentType;
 	}
 	public int getPageCount() throws IOException
 	{

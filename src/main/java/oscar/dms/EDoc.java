@@ -81,6 +81,7 @@ public class EDoc extends TagObject implements Comparable<EDoc> {
 	private int numberOfPages = 0;
 	private Integer appointmentNo = -1;
 	private boolean restrictToProgram=false;
+	private boolean hasEncodingError=false;
 	
 
 	/** Creates a new instance of EDoc */
@@ -519,6 +520,16 @@ public class EDoc extends TagObject implements Comparable<EDoc> {
 
 	public void setRestrictToProgram(boolean restrictToProgram) {
 		this.restrictToProgram = restrictToProgram;
+	}
+
+	public boolean hasEncodingError()
+	{
+		return hasEncodingError;
+	}
+
+	public void setHasEncodingError(boolean hasEncodingError)
+	{
+		this.hasEncodingError = hasEncodingError;
 	}
 
 	@Override

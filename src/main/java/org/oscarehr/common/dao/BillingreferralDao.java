@@ -41,7 +41,11 @@ public class BillingreferralDao extends AbstractDao<Billingreferral> {
 		super(Billingreferral.class);
 	}
 
-	 public Billingreferral getByReferralNo(String referral_no) {
+	public Billingreferral getByReferralNo(String referral_no) {
+		if (referral_no == null || referral_no.isEmpty())
+		{
+			return null;
+		}
 		 String sql = "select br From Billingreferral br WHERE br.referralNo=?";
 		 Query query = entityManager.createQuery(sql);
 		 query.setParameter(1, referral_no);

@@ -44,6 +44,7 @@ import org.oscarehr.util.SpringUtils;
 import oscar.form.dao.Rourke2009DAO;
 import oscar.form.model.FormRourke2009;
 import oscar.oscarEncounter.data.EctFormData;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 public class FrmRourke2009Record extends FrmRecord {
@@ -60,64 +61,67 @@ public class FrmRourke2009Record extends FrmRecord {
         String updated = "false";
         java.util.Date dob = null;
 
-        if(existingID <= 0) {
-
-            if(demo != null) {
+        if (existingID <= 0)
+        {
+            if (demo != null)
+            {
                 props.setProperty("demographic_no", String.valueOf(demographicNo));
                 props.setProperty("c_pName", demo.getFormattedName());
-                //props.setProperty("formDate", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
-                props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(), "dd/MM/yyyy"));
-                //props.setProperty("formEdited", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
+                props.setProperty("formCreated", ConversionUtils.toDateString(new Date(), dateFormat));
                 dob = UtilDateUtilities.calcDate(demo.getYearOfBirth(), demo.getMonthOfBirth(), demo.getDateOfBirth());
-                props.setProperty("c_birthDate", UtilDateUtilities.DateToString(dob, "dd/MM/yyyy"));
-                //props.setProperty("age", String.valueOf(UtilDateUtilities.calcAge(dob)));
+                props.setProperty("c_birthDate", ConversionUtils.toDateString(dob, dateFormat));
                 String postal = demo.getPostal();
-                if( postal != null && postal.length() >= 6 ) {
+                if (postal != null && postal.length() >= 6)
+                {
                     postal = postal.replaceAll("\\s+", "");
                     postal = postal.substring(0,3);
                 }
-                else {
+                else
+                {
                     postal = "";
                 }
 
                 props.setProperty("c_fsa", postal);
             }
 
-        } else {
-
+        }
+        else
+        {
             String sql = "SELECT * FROM formRourke2009 WHERE demographic_no = " +demographicNo +" AND ID = " +existingID;
             FrmRecordHelp frmRec = new FrmRecordHelp();
-            frmRec.setDateFormat("dd/MM/yyyy");
+            frmRec.setDateFormat(dateFormat);
             props = frmRec.getFormRecord(sql);
-            sql = "SELECT demographic_no, CONCAT(last_name, ', ', first_name) AS pName, "
-                + "year_of_birth, month_of_birth, date_of_birth, sex, postal "
-                + "FROM demographic WHERE demographic_no = " + demographicNo;
             demo = demographicManager.getDemographic(loggedInInfo, demographicNo);
 
-            if(demo != null) {
+            if (demo != null)
+            {
                 String rourkeVal = props.getProperty("c_pName","");
                 String demoVal = demo.getFormattedName();
 
-                if( !rourkeVal.equals(demoVal) ) {
+                if (!rourkeVal.equals(demoVal))
+                {
                     props.setProperty("c_pName", demoVal);
                     updated = "true";
                 }
 
                 rourkeVal = props.getProperty("c_birthDate","");
                 dob = UtilDateUtilities.calcDate(demo.getYearOfBirth(), demo.getMonthOfBirth(), demo.getDateOfBirth());
-                demoVal = UtilDateUtilities.DateToString(dob, "dd/MM/yyyy");
+                demoVal = ConversionUtils.toDateString(dob, dateFormat);
 
-                if( !rourkeVal.equals(demoVal) ) {
+                if (!rourkeVal.equals(demoVal))
+                {
                     props.setProperty("c_birthDate", demoVal);
                     updated = "true";
                 }
 
                 demoVal = demo.getPostal();
-                if( demoVal != null && demoVal.length() >= 6 ) {
+                if (demoVal != null && demoVal.length() >= 6)
+                {
                     demoVal = demoVal.replaceAll("\\s+", "");
                     demoVal = demoVal.substring(0,3);
                     rourkeVal = props.getProperty("c_fsa","");
-                    if( !rourkeVal.equals(demoVal) ) {
+                    if (!rourkeVal.equals(demoVal))
+                    {
                         props.setProperty("c_fsa", demoVal);
                         updated = "true";
                     }
@@ -128,14 +132,14 @@ public class FrmRourke2009Record extends FrmRecord {
 
         if (dob != null)
         {
-            //set startdate for second page as defined in config file
+            //set start date for second page as defined in config file
             Calendar cal = Calendar.getInstance();
             cal.setTime(dob);
             cal.add(Calendar.YEAR, 2);
-            props.setProperty("__startDate",  UtilDateUtilities.DateToString(cal.getTime(), "dd/MM/yyyy"));
+            props.setProperty("__startDate",  ConversionUtils.toDateString(cal.getTime(), dateFormat));
         }
 
-        //don't forget to set the xAxis scale for the 2 pages
+        // Don't forget to set the xAxis scale for the 2 pages
         props.setProperty("__xDateScale_1", String.valueOf(Calendar.MONTH));
         props.setProperty("__xDateScale_2", String.valueOf(Calendar.YEAR));
 
@@ -146,22 +150,23 @@ public class FrmRourke2009Record extends FrmRecord {
         String demographic_no = props.getProperty("demographic_no");
         String sql = "SELECT * FROM formRourke2009 WHERE demographic_no=" +demographic_no +" AND ID=0";
         FrmRecordHelp frmRec = new FrmRecordHelp();
-        frmRec.setDateFormat("dd/MM/yyyy");
+        frmRec.setDateFormat(dateFormat);
 
         return frmRec.saveFormRecord(props, sql);
     }
 
-//////////////new/ Done By Jay////
-    public boolean isFemale(LoggedInInfo loggedInInfo, int demoNo){
-	boolean retval = false;
-	Demographic demo = demographicManager.getDemographic(loggedInInfo, demoNo);
-     
-	if( demo != null && demo.getSex().equalsIgnoreCase("F") ) {
-            retval = true;
-        }
-	return retval;
-    }
-///////////////////////////////////
+	public boolean isFemale(LoggedInInfo loggedInInfo, int demoNo)
+	{
+		boolean retval = false;
+		Demographic demo = demographicManager.getDemographic(loggedInInfo, demoNo);
+
+		if (demo != null && demo.getSex().equalsIgnoreCase("F"))
+		{
+			retval = true;
+		}
+		return retval;
+	}
+
   
     public Properties getGraph(LoggedInInfo loggedInInfo, int demographicNo, int existingID) {
     	String formClass = "Growth0_36";

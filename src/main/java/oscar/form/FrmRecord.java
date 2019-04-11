@@ -38,6 +38,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.SxmlMisc;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 /**
@@ -64,7 +65,6 @@ public abstract class FrmRecord {
 
 	public abstract String createActionURL(String where, String action, String demoId, String formId) throws SQLException;
 
-
 	public Properties getGraph(int demographicNo, int existingID) {
 		return new Properties();
 	}
@@ -75,15 +75,13 @@ public abstract class FrmRecord {
 
 	public void setGraphType(String graphType) { /*Rourke needs to know whether plotting head circ or height*/
 	}
-
-	
 	
 	public FrmRecord() {	
 		this.demographicManager = SpringUtils.getBean(DemographicManager.class);
 		this.demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
+		this.dateFormat = "dd/MM/yyyy";
 	} 
-	
-	
+
 	protected void setDemoProperties(LoggedInInfo loggedInInfo, int demographicNo, Properties demoProps) {
 		
 		this.setDemographic(loggedInInfo, demographicNo);
@@ -98,7 +96,7 @@ public abstract class FrmRecord {
 		demoProps.setProperty("c_province", StringUtils.trimToEmpty(demographic.getProvince()));
 		demoProps.setProperty("c_postal", StringUtils.trimToEmpty(demographic.getPostal()));
 		demoProps.setProperty("c_phn", StringUtils.trimToEmpty(demographic.getHin()));
-		demoProps.setProperty("pg1_dateOfBirth", UtilDateUtilities.DateToString(date, dateFormat));
+		demoProps.setProperty("pg1_dateOfBirth", ConversionUtils.toDateString(date, dateFormat));
 		demoProps.setProperty("pg1_age", String.valueOf(UtilDateUtilities.getNumYears(date, GregorianCalendar.getInstance().getTime())));
 		demoProps.setProperty("c_phone", StringUtils.trimToEmpty(demographic.getPhone()));
 		demoProps.setProperty("c_phoneAlt1", StringUtils.trimToEmpty(demographic.getPhone2()));
@@ -109,8 +107,9 @@ public abstract class FrmRecord {
 
 		Map<String,String> demoExt = demographicExtDao.getAllValuesForDemo(demographicNo);
 		String cell = demoExt.get("demo_cell");
-		if ( cell != null ){
-			demoProps.setProperty("c_phoneAlt2",cell );
+		if (cell != null)
+		{
+			demoProps.setProperty("c_phoneAlt2", cell);
 		}
 	}
 	
@@ -128,11 +127,12 @@ public abstract class FrmRecord {
 		demoProps.setProperty("c_phone_cur", StringUtils.trimToEmpty(demographic.getPhone()));
 		demoProps.setProperty("c_phoneAlt1_cur", StringUtils.trimToEmpty(demographic.getPhone2()));
 		
-        Map<String,String> demoExt = demographicExtDao.getAllValuesForDemo(demographicNo);
-        String cell = demoExt.get("demo_cell");
-        if ( cell != null ){
-        	demoProps.setProperty("c_phoneAlt2_cur",cell );
-        }
+		Map<String,String> demoExt = demographicExtDao.getAllValuesForDemo(demographicNo);
+		String cell = demoExt.get("demo_cell");
+		if (cell != null)
+		{
+			demoProps.setProperty("c_phoneAlt2_cur", cell);
+		}
 	}
 	
 	protected void setDemographic(LoggedInInfo loggedInInfo, int demographicNo) {
