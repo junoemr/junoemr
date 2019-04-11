@@ -23,10 +23,10 @@
     Ontario, Canada
 
 --%>
-<%@ page import="oscar.util.ConversionUtils" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
 	String roleName2$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -61,50 +61,9 @@
 
 		<%
 			oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
-			RxPatientData.Patient patient = (RxPatientData.Patient)request.getSession().getAttribute("Patient");
-
 			String name = (String) request.getAttribute("name");
 			String type = (String) request.getAttribute("type");
-			String drugrefId = (String)request.getAttribute("drugrefId");
-			String allergyToArchive = (String)request.getAttribute("allergyToArchive");
-			String nkdaId = (String)request.getAttribute("nkdaId");
-
-			String reaction = "";
-			String startDate = "";
-			String ageOfOnset = "";
-			String lifeStage = "";
-			String severity = "";
-			String onsetOfReaction = "";
-			// Their changes include this, but IIRC we can't really do anything with it rn
-			// Boolean nonDrug = null;
-
-			if (allergyToArchive != null && !allergyToArchive.isEmpty())
-			{
-				Allergy allergy = patient.getAllergy(Integer.parseInt(allergyToArchive));
-				if (allergy != null)
-				{
-					reaction = allergy.getReaction();
-					startDate = ConversionUtils.toDateString(allergy.getStartDate(), allergy.getStartDateFormat());
-					ageOfOnset = allergy.getAgeOfOnset();
-					lifeStage = allergy.getLifeStage();
-					severity = allergy.getSeverityOfReaction();
-					onsetOfReaction = allergy.getOnsetOfReaction();
-				}
-
-				if (allergy.getArchived() && nkdaId != null)
-				{
-					allergyToArchive = nkdaId;
-				}
-			}
-			else
-			{
-				if (nkdaId != null)
-				{
-					allergyToArchive = nkdaId;
-				}
-			}
-			//String allergyId = (String) request.getAttribute("allergyId");
-			boolean isNKDA = "No Known Drug Allergies".equals(name);
+			String allergyId = (String) request.getAttribute("allergyId");
 		%>
 
 		<link rel="stylesheet" type="text/css" href="styles.css">
@@ -117,9 +76,11 @@
 		<%@ include file="TopLinks.jsp"%><!-- Row One included here-->
 		<tr>
 			<%@ include file="SideLinksNoEditFavorites2.jsp"%><!-- <td></td>Side Bar File --->
-			<td width="100%" style="border-left: 2px solid #A9A9A9;" height="100%" valign="top">
-				<!-- height, bordercolor invalid attrs for table -->
-				<table cellpadding="0" cellspacing="2" style="border-collapse: collapse" bordercolor="#111111" width="100%" height="100%">
+			<td width="100%" style="border-left: 2px solid #A9A9A9;" height="100%"
+				valign="top">
+				<table cellpadding="0" cellspacing="2"
+					   style="border-collapse: collapse" bordercolor="#111111" width="100%"
+					   height="100%">
 					<tr>
 						<td width="0%" valign="top">
 							<div class="DivCCBreadCrumbs"><a href="SearchDrug3.jsp"> <bean:message
@@ -139,51 +100,6 @@
 					<tr>
 						<td id="addAllergyDialogue"><html:form action="/oscarRx/addAllergy2"
 															   focus="reactionDescription">
-							<script type="text/javascript">
-								function checkStartDate() {
-									var field = document.forms.RxAddAllergyForm.startDate;
-									if (field.value.trim()!="") {
-										var t = /^\d{4}(-[0-1]*\d{1}(-[0-3]*\d{1})*)*$/;
-										var startDate = new Date(field.value);
-
-										if (!t.test(field.value) || startDate=="Invalid Date") {
-											alert("Invalid Start Date");
-											setTimeout(function(){ field.focus(); }, 100);
-										}
-									}
-								}
-
-								function checkAgeOfOnset() {
-									var field = document.forms.RxAddAllergyForm.ageOfOnset;
-									if (field.value.trim()!="") {
-										var t = /^\d{1,3}$/;
-										if (!t.test(field.value)) {
-											alert("Invalid Age of Onset (3-digit integer only)");
-											setTimeout(function(){ field.focus(); }, 100);
-										}
-									}
-								}
-
-								function doSubmit() {
-
-									if(document.forms.RxAddAllergyForm.nonDrug.value == '') {
-										alert("Please choose value for non-drug");
-										return false;
-									}
-
-									confirmRemoveNKDA();
-
-									return true;
-								}
-								function confirmRemoveNKDA() {
-									<% if (nkdaId!=null && !nkdaId.isEmpty()) { %>
-									if (<%=nkdaId%>>0) {
-										var yes = confirm("Remove \"No Known Drug Allergies\" from list?");
-										if (!yes) document.forms.RxAddAllergyForm.allergyToArchive.value = "";
-									}
-									<% } %>
-								}
-							</script>
 							<table>
 								<tr id="addReactionSubheading">
 									<td>
@@ -191,36 +107,27 @@
 									</td>
 								</tr>
 								<tr valign="center">
+
 									<td>
 										<span class="label">Comment: </span>
-										<html:textarea property="reactionDescription" cols="40" rows="3" />
-										<!-- < html:hidden property="" value="< %=drugrefId% >" /> -->
-										<html:hidden property="name" value="<%=name%>" />
-										<html:hidden property="type" value="<%=type%>" />
-									</td>
+										<html:textarea
+												property="reactionDescription" cols="40" rows="3" /> <html:hidden
+											property="ID" value="<%=allergyId%>" /> <html:hidden
+											property="name" value="<%=name%>" /> <html:hidden
+											property="type" value="<%=type%>" /></td>
 								</tr>
 
-								<html:hidden property="type" value="<%=type%>" />
-
 								<tr valign="center">
-									<td>
-										<link rel="stylesheet" type="text/css" media="all" href="<%= request.getContextPath() %>/share/calendar/calendar.css" title="win2k-cold-1" />
-										<script type="text/javascript" src="<%= request.getContextPath() %>/share/calendar/calendar.js"></script>
-										<script type="text/javascript" src="<%= request.getContextPath() %>/share/calendar/lang/<bean:message key="global.javascript.calendar"/>"></script>
-										<script type="text/javascript" src="<%= request.getContextPath() %>/share/calendar/calendar-setup.js"></script>
-										<script type="text/javascript">
-											Calendar.setup({ inputField : "startDate", ifFormat : "%Y-%m-%d", showsTime :false, button : "startDateCal", singleClick : true, step : 1 });
-										</script>
+									<td ><span class="label">Start Date:</span> <html:text
+											property="startDate" size="10" maxlength="10"/>
+										(yyyy-mm-dd OR yyyy-mm OR yyyy)</td>
 
-										<span class="label">Start Date:</span>
-										<input type="text" name="startDate" id="startDate" size="10" maxlength="10" value="<%=startDate%>" onblur="checkStartDate();"/>
-										<img src="../images/cal.gif" id="startDateCal">(yyyy-mm-dd OR yyyy-mm OR yyyy)
-									</td>
 								</tr>
 
 								<tr valign="center">
 									<td><span class="label">Age Of Onset:</span> <html:text
-											property="ageOfOnset" size="4" maxlength="4" value="<%=ageOfOnset%>" onblur="checkAgeOfOnset();"/></td>
+											property="ageOfOnset" size="4" maxlength="4" /></td>
+
 								</tr>
 
 
@@ -236,87 +143,50 @@
 										</html:select>
 									</td>
 								</tr>
-
-								<%
-								if (isNKDA)
-								{
-								%>
-									<html:hidden property="severityOfReaction" value="4" />
-									<html:hidden property="onSetOfReaction" value="4" />
-								<%
-								}
-								else
-								{
-								%>
 								<tr valign="center">
-									<td>
-										<span class="label">Severity Of Reaction:</span>
-										<html:select property="severityOfReaction">
-											<html:option value="4">Unknown</html:option>
-											<html:option value="1">Mild</html:option>
-											<html:option value="2">Moderate</html:option>
-											<html:option value="3">Severe</html:option>
-											<html:option value="5">No Reaction</html:option>
-										</html:select>
-									</td>
+
+									<td ><span class="label">Severity Of Reaction:</span> <html:select
+											property="severityOfReaction">
+										<html:option value="1">Mild</html:option>
+										<html:option value="2">Moderate</html:option>
+										<html:option value="3">Severe</html:option>
+										<html:option value="4">Unknown</html:option>
+									</html:select></td>
+
 								</tr>
 
 								<tr valign="center">
-									<td>
-										<span class="label">Onset Of Reaction:</span>
-										<html:select property="onSetOfReaction">
-											<html:option value="4">Unknown</html:option>
-											<html:option value="1">Immediate</html:option>
-											<html:option value="2">Gradual</html:option>
-											<html:option value="3">Slow</html:option>
-										</html:select>
-									</td>
+
+									<td ><span class="label">Onset Of Reaction:</span> <html:select
+											property="onSetOfReaction">
+										<html:option value="1">Immediate</html:option>
+										<html:option value="2">Gradual</html:option>
+										<html:option value="3">Slow</html:option>
+										<html:option value="4">Unknown</html:option>
+									</html:select></td>
+
 								</tr>
 
-								<%
-								if (drugrefId == null || "0".equals(drugrefId) || "null".equals(drugrefId))
-								{
-								%>
-								<tr valign="center">
-									<td><span class="label">Non Drug:</span>
-										<select name="nonDrug" id="nonDrug">
-											<option value="">Select Below</option>
-											<option value="on">Allergy to non-drug substance</option>
-											<option value="off">Adverse reaction to drug</option>
-										</select>
-									</td>
-								</tr>
-								<%
-								}
-								%>
 
-								<%
-								}
-								%>
 								<tr>
-									<td>
-										<html:submit property="submit" value="Add Allergy" styleClass="ControlPushButton"
-													 onclick="return doSubmit()" />
-										<input type=button class="ControlPushButton" id="cancelAddReactionButton"
+									<td ><html:submit property="submit"
+													  value="Add Allergy" styleClass="ControlPushButton" /> <input
+											type=button class="ControlPushButton" id="cancelAddReactionButton"
 											onclick="window.location='ShowAllergies2.jsp?demographicNo=<%=bean.getDemographicNo() %>'"
-											value="Cancel" />
-									</td>
+											value="Cancel" /></td>
 								</tr>
 							</table>
 
-						</html:form>
-						</td>
+						</html:form></td>
 					</tr>
 
 					<tr>
 						<td>
 							<%
 								String sBack="ShowAllergies2.jsp";
-							%>
-							<input type=button class="ControlPushButton"
-								   onclick="javascript:window.location.href='<%=sBack%>';"
-								   value="Back to View Allergies" />
-						</td>
+							%> <input type=button class="ControlPushButton"
+									  onclick="javascript:window.location.href='<%=sBack%>';"
+									  value="Back to View Allergies" /></td>
 					</tr>
 					<!----End new rows here-->
 					<tr height="100%">
@@ -335,7 +205,7 @@
 			<td width="100%" height="0%" colspan="2">&nbsp;</td>
 		</tr>
 		<tr>
-			<td width="100%" height="0%" style="padding: 5px" bgcolor="#DCDCDC"
+			<td width="100%" height="0%" style="padding: 5" bgcolor="#DCDCDC"
 				colspan="2"></td>
 		</tr>
 	</table>

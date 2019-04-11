@@ -26,11 +26,8 @@
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
 <%@page import="org.oscarehr.util.WebUtilsOld"%>
 <%@page import="org.oscarehr.myoscar.utils.MyOscarLoggedInInfo"%>
-<%@page import="org.oscarehr.util.WebUtils"%>
 <%@page import="org.oscarehr.util.LocaleUtils"%>
 <%@page import="org.oscarehr.phr.util.MyOscarUtils"%>
-<%@page import="org.oscarehr.util.MiscUtils"%>
-<%@ page language="java" import="oscar.OscarProperties"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -42,24 +39,23 @@
 <%@page import="org.oscarehr.casemgmt.model.CaseManagementNoteLink" %>
 <%@page import="org.oscarehr.common.dao.PartialDateDao" %>
 <%@page import="org.oscarehr.common.model.PartialDate" %>
+<%@ page import="oscar.oscarRx.pageUtil.RxSessionBean" %>
 
 <%
-	String roleName2$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-	boolean authed=true;
+	String roleName2$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
+	boolean authenticated = true;
 %>
 <security:oscarSec roleName="<%=roleName2$%>" objectName="_allergy" rights="r" reverse="<%=true%>">
-	<%authed=false; %>
+	<%authenticated =false; %>
 	<%response.sendRedirect("../securityError.jsp?type=_allergy");%>
 </security:oscarSec>
 <%
-	if(!authed) {
+	if(!authenticated) {
 		return;
 	}
 %>
 
 <%
-	OscarProperties props = OscarProperties.getInstance();
-
 	PartialDateDao partialDateDao = (PartialDateDao) SpringUtils.getBean("partialDateDao");
 %>
 
@@ -74,11 +70,9 @@
 	</logic:equal>
 </logic:present>
 <%
-	oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
+	RxSessionBean sessionBean = (RxSessionBean)pageContext.findAttribute("sessionBean");
 	String annotation_display = org.oscarehr.casemgmt.model.CaseManagementNoteLink.DISP_ALLERGY;
-
 	com.quatro.service.security.SecurityManager securityManager = new com.quatro.service.security.SecurityManager();
-
 %>
 <html:html locale="true">
 	<head>
@@ -228,23 +222,34 @@
 			}); //--> end document ready
 
 			//--> AJAX the data to the server.
-			function sendSearchRequest(path, param, target) {
+			// TODO fix this, currently it's 404'ing (not sending params properly OR not being called properly)
+			function sendSearchRequest(path, param, target)
+			{
 				var iNKDA = document.forms.searchAllergy2.iNKDA.value;
-				if (param.indexOf(paramNKDA)>=0) {
+				if (param.indexOf(paramNKDA) >= 0)
+				{
 					var hasDrugAllergy = document.forms.searchAllergy2.hasDrugAllergy.value;
-					if (hasDrugAllergy=="true") {
+					if (hasDrugAllergy === "true")
+					{
 						alert("Active drug allergy exists!");
 						return;
 					}
-					if (iNKDA>0) {
+					if (iNKDA > 0)
+					{
 						var iAtoA = param.indexOf("allergyToArchive=");
-						if (iAtoA>0) iAtoA = param.substring(iAtoA+"allergyToArchive=".length);
-						if (iAtoA<0 || iNKDA>iAtoA) {
+						if (iAtoA > 0)
+						{
+							iAtoA = param.substring(iAtoA + "allergyToArchive=".length);
+						}
+						if (iAtoA < 0 || iNKDA > iAtoA)
+						{
 							alert("\"No Known Drug Allergies\" already exists!");
 							return;
 						}
 					}
-				} else if (param.indexOf("ID=0")<0 && iNKDA>0) {
+				}
+				else if (param.indexOf("ID=0") < 0 && iNKDA > 0)
+				{
 					param += "&nkdaId="+iNKDA;
 				}
 				$.ajax({
@@ -254,7 +259,10 @@
 					dataType: 'html',
 					success: function(data) {
 						renderSearchResults(data, target);
-						if (path.indexOf("deleteAllergy")>=0) location.reload();
+						if (path.indexOf("deleteAllergy") >= 0)
+						{
+							location.reload();
+						}
 					}
 				});
 			}
@@ -276,7 +284,7 @@
 
 			//--> Check if search field is empty.
 			function isEmpty(){
-				if (document.forms.searchAllergy2.searchString.value.length == 0){
+				if (document.forms.searchAllergy2.searchString.value.length === 0){
 					alert("Search Field is Empty");
 					document.forms.searchAllergy2.searchString.focus();
 					return false;
@@ -287,7 +295,7 @@
 			function show_Search_Criteria(){
 				var tbl_as = document.getElementById("advancedSearch");
 
-				if (tbl_as.style.display == '') {
+				if (tbl_as.style.display === '') {
 					tbl_as.style.display = 'none';
 				}else{
 					tbl_as.style.display = '';
@@ -317,7 +325,7 @@
 			function addCustomAllergy(){
 				$(".highLightButton").removeClass("highLightButton");
 				var name = document.getElementById('searchString').value;
-				if(isEmpty() == true){
+				if(isEmpty() === true){
 					name = name.toUpperCase();
 					confirm("Adding custom allergy: " + name);
 					sendSearchRequest("${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do",
@@ -339,7 +347,7 @@
 				$(".highLightButton").removeClass("highLightButton");
 				var param = "ID=44159&name=SULFONAMIDES&type=10";
 
-				sendSearchRequest("${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do",
+				sendSearchRequest("${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do?",
 					param, "#addAllergyDialogue");
 				$("input[value='Sulfa']").addClass("highLightButton");
 			}
@@ -362,7 +370,6 @@
 	<body>
 	<%=WebUtilsOld.popErrorAndInfoMessagesAsHtml(session)%>
 	<table id="AutoNumber1">
-		<%-- include file="TopLinks.jsp"--%><!-- Row One included here-->
 		<tr id="allergiesRowOne" >
 			<td colspan="2">
 				<jsp:include page="TopLinks.jsp">
@@ -377,16 +384,16 @@
 		</tr>
 		<tr>
 			<td id="allergiesColumnOneRowTwo" >
-				<%@ include file="SideLinksEditFavorites2.jsp" %><!-- <td></td>Side Bar File --->
+				<%@ include file="SideLinksEditFavorites2.jsp" %>
 			</td>
-			<td id="allergiesColumnTwoRowTwo" ><!--Column Two Row Two-->
+			<td id="allergiesColumnTwoRowTwo" >
 				<table>
 					<tr class="DivCCBreadCrumbs" >
 						<td>
 							<a href="SearchDrug3.jsp" >
 								<bean:message key="SearchDrug.title" />
 							</a>
-							&nbsp;&gt;&nbsp;
+							<!-- &nbsp;&gt;&nbsp; -->
 							<b><bean:message key="EditAllergies.title" /></b>
 						</td>
 					</tr>
@@ -405,8 +412,8 @@
 										<jsp:getProperty name="patient" property="surname" />,
 										<jsp:getProperty name="patient" property="firstName" />
 									</td>
-									<td>&nbsp;</td>
-									<td><b>Age:</b> <jsp:getProperty name="patient" property="age" /></td>
+									<td></td>
+									<td><b>Age</b> <jsp:getProperty name="patient" property="age" /></td>
 								</tr>
 							</table>
 						</td>
@@ -420,42 +427,48 @@
 
 							String demoNo=request.getParameter("demographicNo");
 
-							if(demoNo==null) {
+							if (demoNo==null)
+							{
 								demoNo = (String)session.getAttribute("demographicNo");
-							}else{
+							}
+							else
+							{
 								session.setAttribute("demographicNo", demoNo);
 							}
 
-							if(demoNo == null || demoNo.equals("null")) {
-								demoNo = String.valueOf(bean.getDemographicNo());
+							if (demoNo == null || demoNo.equals("null"))
+							{
+								demoNo = String.valueOf(sessionBean.getDemographicNo());
 							}
 
 							String strView=request.getParameter("view");
-							if (strView==null) strView = "Active";
+							if (strView==null)
+							{
+								strView = "Active";
+							}
 
 							String[] navArray={"Active","All","Inactive"};
 
-							int i=0;
-							for(i=0;i<navArray.length;i++)
+							for (int i = 0;i < navArray.length; i++)
 							{
-								if( strView.equals(navArray[i]) ){
-									out.print(" <span class='view_selected'>"+navArray[i]+"</span>");
-								}else{
-									out.print("<span class='view_menu'><a href='ShowAllergies2.jsp?demographicNo="+demoNo+"&view="+navArray[i]+"'>");
+								if (strView.equals(navArray[i]))
+								{
+									out.print(" <span class='view_selected'>" + navArray[i] + "</span>");
+								}
+								else
+								{
+									out.print("<span class='view_menu'><a href='ShowAllergies2.jsp?demographicNo=" + demoNo + "&view=" + navArray[i] + "'>");
 									out.print(navArray[i]);
 									out.print("</a></span>");
 								}
 							}
-						//1 mild 2 moderate 3 severe 4 unknown
 
 							String[] ColourCodesArray=new String[6];
-							ColourCodesArray[1]="#F5F5F5"; // Mild Was set to yellow (#FFFF33) SJHH requested not to flag mild
+							ColourCodesArray[1]="#F5F5F5"; // Mild Was set to yellow (#FFFF33)
 							ColourCodesArray[2]="#FF6600"; // Moderate
 							ColourCodesArray[3]="#CC0000"; // Severe
 							ColourCodesArray[4]="#E0E0E0"; // unknown
 							ColourCodesArray[5]="#FFFFFF"; // no reaction
-
-							String allergy_colour_codes = "<table class='allergy_legend' cellspacing='0'><tr><td><b>Legend:</b></td> <td > <table class='colour_codes' bgcolor='"+ColourCodesArray[1]+"'><td> </td></table></td> <td >Mild</td> <td > <table class='colour_codes' bgcolor='"+ColourCodesArray[2]+"'><td> </td></table></td> <td >Moderate</td><td > <table class='colour_codes' bgcolor='"+ColourCodesArray[3]+"'><td> </td></table></td> <td >Severe</td> </tr></table>";
 						%>
 							</span>
 							<%
@@ -488,7 +501,31 @@
 							<table border="0">
 								<tr>
 									<td class="Step1Text">
-										<%=allergy_colour_codes%>
+										<table class='allergy_legend' cellspacing='0'>
+											<tr>
+												<td>
+													<b>Legend:</b>
+												</td>
+												<td >
+													<table class='colour_codes' bgcolor='#F5F5F5'>
+														<tr></tr>
+													</table>
+												</td>
+												<td>Mild</td>
+												<td >
+													<table class='colour_codes' bgcolor='#FF6600'>
+														<tr></tr>
+													</table>
+												</td>
+												<td>Moderate</td>
+												<td>
+													<table class='colour_codes' bgcolor='#CC0000'>
+														<tr></tr>
+													</table>
+												</td>
+												<td>Severe</td>
+											</tr>
+										</table>
 
 										<table class="allergy_table" >
 											<tr>
@@ -501,48 +538,55 @@
 												<td><b>Reaction</b></td>
 												<td><b>Start Date</b></td>
 												<td><b>Life Stage</b></td>
-												<td><img src="../images/notes.gif" border="0" width="10" height="12" alt="Annotation"></td>
+												<td><b>Age of Onset</b></td>
+												<td><img src="../images/notes.gif" border="0" width="13" height="16" alt="Annotation"></td>
 												<td><b>Action</b></td>
 											</tr>
 											<%
 												String strArchived;
-												int intArchived=0;
+												int intArchived = 0;
 												String labelStatus;
 												String labelAction;
 												String actionPath;
 												String trColour;
 												String strSOR;
 												int intSOR;
-												boolean hasDrugAllergy=false;
+												boolean hasDrugAllergy = false;
 												int iNKDA = 0;
 
 												for(Allergy allergy : patient.getAllergies(LoggedInInfo.getLoggedInInfoFromSession(request)))
 												{
 													if (!allergy.getArchived())
 													{
-														if (allergy.getTypeCode()>0) hasDrugAllergy = true;
-														if (allergy.getDescription().equals("No Known Drug Allergies")) iNKDA = allergy.getId();
+														if (allergy.getTypeCode()>0)
+														{
+															hasDrugAllergy = true;
+														}
+														if (allergy.getDescription().equals("No Known Drug Allergies"))
+														{
+															iNKDA = allergy.getId();
+														}
 													}
 
 													String title = "";
-													if(allergy.getRegionalIdentifier() != null && !allergy.getRegionalIdentifier().trim().equalsIgnoreCase("null") && !allergy.getRegionalIdentifier().trim().equals(""))
+													if (allergy.getRegionalIdentifier() != null && !allergy.getRegionalIdentifier().trim().equalsIgnoreCase("null") && !allergy.getRegionalIdentifier().trim().equals(""))
 													{
-														title= " title=\"Din: "+allergy.getRegionalIdentifier()+"\" ";
+														title = " title=\"Din: "+allergy.getRegionalIdentifier()+"\" ";
 													}
 
 													boolean filterOut=false;
-													strArchived=allergy.getArchived()?"1":"0";
+													strArchived=allergy.getArchived() ? "1" : "0";
 
 													try
 													{
 														intArchived = Integer.parseInt(strArchived);
 
-														if(strView.equals("Active") && intArchived == 1)
+														if (strView.equals("Active") && intArchived == 1)
 														{
 															filterOut=true;
 														}
 
-														if(strView.equals("Inactive") && intArchived == 0)
+														if (strView.equals("Inactive") && intArchived == 0)
 														{
 															filterOut=true;
 														}
@@ -552,28 +596,26 @@
 														// that's okay , most likely the value is not set so we don't know, leave blank
 													}
 
-													strSOR=allergy.getSeverityOfReaction();
+													strSOR = allergy.getSeverityOfReaction();
 													intSOR = Integer.parseInt(strSOR);
 													String sevColour;
 
-													if(intArchived==1)
+													if (intArchived == 1)
 													{
 														//if allergy is set as archived
-														labelStatus="Inactive";
-														labelAction="Reactivate";
-														actionPath="activate";
-														trColour="#C0C0C0";
-
-														sevColour="#C0C0C0"; //clearing severity bgcolor
+														labelStatus = "Inactive";
+														labelAction = "Reactivate";
+														actionPath = "activate";
+														trColour = "#C0C0C0";
+														sevColour = "#C0C0C0"; //clearing severity bgcolor
 													}
 													else
 													{
-														labelStatus="Active";
-														labelAction="Inactivate";
-														actionPath="delete";
-
-														trColour="#E0E0E0";
-														sevColour=ColourCodesArray[intSOR];
+														labelStatus = "Active";
+														labelAction = "Deactivate";
+														actionPath = "delete";
+														trColour = "#E0E0E0";
+														sevColour = ColourCodesArray[intSOR];
 													}
 
 
@@ -587,14 +629,12 @@
 												<td><%=entryDate==null ? "" : entryDate %></td>
 												<td <%=title%> ><%=allergy.getDescription() %></td>
 												<td><%=allergy.getTypeDesc() %></td>
-												<!-- We do not have allergy.isNonDrug -->
-												<td><%=allergy.getTypeCode() == 0 ? "<i>&lt;Not Set&gt;</i>" :""%><%=allergy.getTypeCode() == 0 ? "*" : "" %></td>
+												<td><%=allergy.getTypeCode() == 0 ? "<i>&lt;Not Set&gt;</i>" : ""%><%=allergy.getTypeCode() == 0 ? "*" : "" %></td>
 												<td bgcolor="<%=sevColour%>"><%=allergy.getSeverityOfReactionDesc() %></td>
 												<td><%=allergy.getOnSetOfReactionDesc() %></td>
-												<td><%=allergy.getReaction()!=null?allergy.getReaction():"" %></td>
-												<td><%=startDate==null ? "" : startDate %></td>
+												<td><%=startDate == null ? "" : startDate %></td>
 												<td><%=allergy.getLifeStageDesc() %></td>
-												<td><%=allergy.getAgeOfOnset()==null ? "" : allergy.getAgeOfOnset()%></td>
+												<td><%=allergy.getAgeOfOnset() == null ? "" : allergy.getAgeOfOnset()%></td>
 												<%
 													CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 													@SuppressWarnings("unchecked")
@@ -606,29 +646,32 @@
 														{
 													%>
 													<a href="#" title="Annotation" onclick="window.open('../annotation/annotation.jsp?display=<%=annotation_display%>&table_id=<%=String.valueOf(allergy.getAllergyId())%>&demo=<jsp:getProperty name="patient" property="demographicNo"/>','anwin','width=400,height=500');">
-														<%			if(existingAnnots.size()>0) {%>
-														<img src="../images/filledNotes.gif" border="0"/>
+														<%
+															if(existingAnnots.size()>0)
+															{
+														%>
+														<img alt="filled notes" src="../images/filledNotes.gif" border="0"/>
 														<%			} else { %>
-														<img src="../images/notes.gif" border="0">
+														<img alt="note" src="../images/notes.gif" border="0">
 														<%			} %>
 													</a>
 													<%	} %>
 												</td>
 												<td>
 													<%
-														if(!allergy.isIntegratorResult() && securityManager.hasDeleteAccess("_allergies",roleName$))
+														if (!allergy.isIntegratorResult() && securityManager.hasDeleteAccess("_allergies", roleName$))
 														{
-															if(intArchived==0)
+															if (intArchived == 0)
 															{
 													%>
 													<a href="#" class="deleteAllergyLink"
-													   id="deleteAllergy:<%= labelAction %>_ID=<%=allergy.getAllergyId() %>&demographicNo=<%=demoNo %>&action=<%=actionPath %>" >
+													   id="deleteAllergy:<%=labelAction%>_ID=<%=allergy.getAllergyId() %>&demographicNo=<%=demoNo %>&action=<%=actionPath %>">
 														<%=labelAction%>
-													</a> |
+													</a>
 													<%		} %>
 													<a href="#" class="modifyAllergyLink"
 													   id="modifyAllergy:<%= labelAction %>_ID=<%=allergy.getDrugrefId() %>&name=<%=allergy.getDescription() %>&type=<%=allergy.getTypeCode() %>&allergyToArchive=<%=allergy.getId() %>" >
-														<%=intArchived==0?"Modify":labelAction%>
+														<%=intArchived==0 ? "Modify" : labelAction%>
 													</a>
 													<%	} %>
 												</td>
@@ -636,12 +679,13 @@
 											<%
 													}
 												} //end of iterate
-											if (hasDrugAllergy) iNKDA = 0;
+											if (hasDrugAllergy)
+											{
+												iNKDA = 0;
+											}
 											%>
 
 										</table>
-
-										<%=allergy_colour_codes%>
 									</td>
 								</tr>
 							</table>
@@ -669,7 +713,7 @@
 									<tr>
 										<td id="addAllergyDialogue"></td>
 									</tr>
-									<tr id="allergySearchCriteraRow">
+									<tr id="allergySearchCriteriaRow">
 										<td>
 											<div id="allergySearchSelectors">
 												<input type="checkbox" name="type4" id="type4" ${ type4 ? 'checked' : '' } />

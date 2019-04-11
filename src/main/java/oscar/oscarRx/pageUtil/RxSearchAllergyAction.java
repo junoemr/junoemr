@@ -51,26 +51,20 @@ import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarProperties;
 import oscar.form.pharmaForms.formBPMH.util.JsonUtil;
-import oscar.oscarRx.data.RxAllergyData;
 import oscar.oscarRx.util.RxDrugRef;
 
 public final class RxSearchAllergyAction extends Action {
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 
 
-    public ActionForward execute(ActionMapping mapping,
-    ActionForm form,
-    HttpServletRequest request,
-    HttpServletResponse response)
-    throws IOException, ServletException {
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
 
-		if (!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_allergy", "r", null)) {
-			throw new RuntimeException("missing required security object (_allergy)");
-		}
-
+        LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+        String providerNo = loggedInInfo.getLoggedInProviderNo();
+        securityInfoManager.requireOnePrivilege(providerNo, securityInfoManager.READ, null, "_allergy");
 
         // Setup variables
-
         // execute search
 
         RxSearchAllergyForm frm = (RxSearchAllergyForm)form;
@@ -81,12 +75,6 @@ public final class RxSearchAllergyAction extends Action {
         {
             frm = (RxSearchAllergyForm) JsonUtil.jsonToPojo(jsondata, RxSearchAllergyForm.class);
         }
-
-        RxAllergyData aData = new RxAllergyData();
-        //RxAllergyData.Allergy[] arr =
-        //    aData.AllergySearch(frm.getSearchString(), frm.getType5(),
-        //    frm.getType4(), frm.getType3(), frm.getType2(), frm.getType1());
-
 
         ///Search a drug like another one
 
@@ -112,11 +100,13 @@ public final class RxSearchAllergyAction extends Action {
          *
          *
          **/
-        if(frm.getType1()){
+        if(frm.getType1())
+        {
             catVec.add("13");
         }
 
-        if(frm.getType2()){
+        if(frm.getType2())
+        {
             catVec.add("11");
             catVec.add("12");
         }
@@ -142,7 +132,6 @@ public final class RxSearchAllergyAction extends Action {
         String includeClassesStr = OscarProperties.getInstance().getProperty("allergies.include_ahfs_class_in_results", "true");
         boolean includeClasses = Boolean.valueOf(includeClassesStr);
 
-        boolean flatResults = Boolean.valueOf(OscarProperties.getInstance().getProperty("allergies.flat_results", "false"));
         TreeMap<String,Allergy> flatList = new TreeMap<String,Allergy>();
 
         //we want to categorize the search results.
@@ -154,8 +143,6 @@ public final class RxSearchAllergyAction extends Action {
         allergyResults.put(13, new ArrayList<Allergy>());
         allergyResults.put(14, new ArrayList<Allergy>());
 
-        Map<Integer,Allergy> classResults = new HashMap<Integer,Allergy>();
-
         Vector classVec = new Vector() ;
         for (int i = 0; i < vec.size(); i++){
         	java.util.Hashtable hash = (java.util.Hashtable) vec.get(i);
@@ -166,7 +153,8 @@ public final class RxSearchAllergyAction extends Action {
                 arr[i].setDrugrefId( String.valueOf(hash.get("id")));
                 arr[i].setDescription(((String) hash.get("name")));
 
-                if( arr[i].getTypeCode() == 13){
+                if (arr[i].getTypeCode() == 13)
+                {
                     classVec.add(""+arr[i].getDrugrefId());
                 }
 

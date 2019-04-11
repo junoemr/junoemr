@@ -37,7 +37,7 @@
 <%@ page import="org.oscarehr.allergy.model.Allergy" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
-	String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+	String roleName$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
 %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -46,7 +46,10 @@
 
 	Allergy[] allergies = RxPatientData.getPatient(LoggedInInfo.getLoggedInInfoFromSession(request),bean2.getDemographicNo()).getActiveAllergies();
 	String alle = "";
-	if (allergies.length > 0 ){ alle = "Red"; }
+	if (allergies.length > 0 )
+	{
+		alle = "Red";
+	}
 %>
 
 <div class="PropSheetMenu">
@@ -55,7 +58,7 @@
 
 		<p class="PropSheetLevel1CurrentItem<%=alle%>">
 			<bean:message key="oscarRx.sideLinks.msgAllergies"/>
-			<a href="javascript:void(0);" name="cmdAllergies"   onclick="javascript:window.location.href='ShowAllergies2.jsp?demographicNo=<%=request.getParameter("demographicNo")%>';" style="width: 200px" >+</a>
+			<a href="javascript:void(0);" name="cmdAllergies"   onclick="javascript:window.location.href='ShowAllergies2.jsp?demographicNo=<%=request.getParameter("demographicNo")%>';">+</a>
 		</p>
 		<p class="PropSheetMenuItemLevel1">
 					<%
@@ -126,7 +129,7 @@
 
 	<p class="PropSheetLevel1CurrentItem"><bean:message key="oscarRx.sideLinks.msgFavorites"/>
 		<a href="EditFavorites2.jsp">edit</a>
-		<a href="CopyFavorites2.jsp">copy</a>  <%-- <bean:message key="oscarRx.sideLinks.msgCopyFavorites"/> --%>
+		<a href="CopyFavorites2.jsp">copy</a>
 	</p>
 	<p class="PropSheetMenuItemLevel1">
 			<%

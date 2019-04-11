@@ -28,8 +28,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
-<c:set var="ctx" value="${ pageContext.servletContext.contextPath }" />
-<c:set var="url" value="${ ctx }/demographic/demographiccontrol.jsp?demographic_no=${ param.demographicNo }&displaymode=edit&dboperation=search_detail&appointment=" />
+<c:set var="context" value="${ pageContext.servletContext.contextPath }" />
+<c:set var="url" value="${ context }/demographic/demographiccontrol.jsp?demographic_no=${ param.demographicNo }&displaymode=edit&dboperation=search_detail&appointment=" />
 
 <table id="${ not empty param.tableId ? param.tableId : 'topLink' }" >
 	<tr>
@@ -38,36 +38,31 @@
 		</td>
 
 		<td id="topLinkCenterColumn" >
-
 			<c:if test="${ not empty param.patientName }" >
-				<a href="#" onClick="popupPage(700,1000,'${ param.title }','${ url }'); return false;"
+				<a href="#" onClick="popupPage(700,1000,'${ url }'); return false;"
 				   title="<bean:message key="provider.appointmentProviderAdminDay.msgMasterFile"/>" >
 					<c:out value="${ param.patientName }" />
 				</a>
 			</c:if>
 
 			<c:if test="${ not empty param.sex }" >
-	        <span class="label">
-	        	sex
-	        </span>
+				<span class="label">Sex:</span>
 				<span>
 						${ param.sex }
 				</span>
 			</c:if>
 
 			<c:if test="${ not empty param.age }" >
-	        <span class="label">
-	        	age
-	        </span>
+				<span class="label">Age:</span>
 				<span>
 						${ param.age }
 				</span>
 			</c:if>
 
 			<c:if test="${ not empty param.phone }" >
-	        <span class="label">
-	        	home
-	        </span>
+				<span class="label">
+					Home #:
+				</span>
 				<span>
 						${ param.phone }
 				</span>
@@ -75,20 +70,19 @@
 
 			<c:if test="${ not empty param.mrp }" >
 				<security:oscarSec roleName="${ security }" objectName="_newCasemgmt.doctorName" rights="r">
-	    	<span class="label">
-	    		  <bean:message key="oscarEncounter.Index.msgMRP"/>
-		    </span>
+					<span class="label">
+						<bean:message key="oscarEncounter.Index.msgMRP"/>
+					</span>
 					<span>
-		     	<c:out value="${ param.mrp }" />
-		    </span>
+						<c:out value="${ param.mrp }" />
+					</span>
 				</security:oscarSec>
 			</c:if>
 		</td>
-
 		<td id="topLinkRightColumn">
-	 		<span class="HelpAboutLogout" style="color:white;">
-                 <oscar:help keywords="2.2.4" key="app.top1" style="color:white;" />
-                 <a style="color:white;" href="${ ctx }/oscarEncounter/About.jsp" target="_new">About</a>
+	 		<span class="HelpAboutLogout">
+                 <oscar:help keywords="2.2.4" key="app.top1"/>
+                 <a href="${ context }/oscarEncounter/About.jsp" target="_new">About</a>
              </span>
 		</td>
 	</tr>

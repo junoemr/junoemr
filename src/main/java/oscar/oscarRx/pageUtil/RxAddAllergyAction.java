@@ -92,7 +92,7 @@ public final class RxAddAllergyAction extends Action
 		allergy.setOnsetOfReaction(onSetOfReaction);
 		allergy.setLifeStage(lifeStage);
 
-		if(type != null && type.equals("13"))
+		if (type.equals("13"))
 		{
 			RxDrugData drugData = new RxDrugData();
 			try
