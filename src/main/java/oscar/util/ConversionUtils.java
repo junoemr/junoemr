@@ -387,11 +387,14 @@ public class ConversionUtils {
 	 *
 	 * LocalDate can interpret these properly if we individually feed in the year, month, and day.
 	 *
-	 * @param dateString Date string of form like (yyyy-MM-dd).
-	 *                   This input string is allowed to be missing leading zero on MM or dd.
-	 *                   Note that LocalDate *could* fix a bad year (a year like 019 or 219)
-	 *                   but allowing a year entry like these to be entered could cause more problems.
-	 * @return dateString original dateString if we can't fix, fixed dateString otherwise
+	 * @param dateString
+	 *		Date string of form like (yyyy-MM-dd).
+	 *		This input string is allowed to be missing leading zero on MM or dd.
+	 *		Note that LocalDate *could* fix a bad year (a year like 019 or 219)
+	 *		but allowing a year entry like these to be entered could cause more problems.
+	 * @return dateString
+	 *		Original dateString if parsing and splitting fails at any point, otherwise
+	 *		returns a new dateString of format yyyy-MM-dd
 	 */
 	public static String padDateString(String dateString)
 	{
@@ -417,6 +420,7 @@ public class ConversionUtils {
 
 	public static Date coalesceTimeStampString(String dateString)
 	{
+		dateString = padDateString(dateString);
 		return coalesceTimeStampString(dateString, DEFAULT_TS_PATTERN);
 	}
 	public static Date coalesceTimeStampString(String plain, String inFormat)
@@ -428,8 +432,6 @@ public class ConversionUtils {
 			logger.warn("Cannot Coalesce a null/empty date string");
 			return returnDate;
 		}
-
-		plain = padDateString(plain);
 
 		if(inFormat.length() > plain.length())
 			inFormat = inFormat.substring(0, plain.length());
