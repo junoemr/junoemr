@@ -119,24 +119,24 @@ public class MeasurementGraphAction2 extends Action {
         JFreeChart chart;
         if (method == null)
         {
-            chart = defaultChart(demographicNo, typeIdName, typeIdName2, patientName, chartTitle);
+            chart = defaultChart(demographicNo, typeIdName, typeIdName2, chartTitle);
         }
         else if (method.equals("inclRef"))
         {
-            chart = referenceRangeChart(demographicNo, typeIdName, typeIdName2, patientName, chartTitle);
+            chart = referenceRangeChart(demographicNo, typeIdName);
 
         }
         else if (method.equals("rxincl"))
         {
-            chart = rxAndLabChart(demographicNo, typeIdName, typeIdName2, patientName, chartTitle);
+            chart = rxAndLabChart(demographicNo, typeIdName, chartTitle);
         }
         else if (method.equals("lab"))
         {
-            chart = labChart(demographicNo, typeIdName, typeIdName2, patientName, chartTitle);
+            chart = labChart(demographicNo, typeIdName, chartTitle);
         }
         else if (method.equals("labRef"))
         {
-            chart = labChartRef(demographicNo, typeIdName, typeIdName2, patientName, chartTitle);
+            chart = labChartRef(demographicNo, typeIdName, chartTitle);
         }
         else if (method.equals("actualLab"))
         {
@@ -149,7 +149,7 @@ public class MeasurementGraphAction2 extends Action {
         else if(method.equals("ChartMeds"))
         {
             String drugs[] = request.getParameterValues("drug");
-            chart =ChartMeds( demographicNo, patientName,  chartTitle, drugs);
+            chart =ChartMeds(demographicNo, chartTitle, drugs);
             if (drugs != null && drugs.length >10)
             {
                 height = (drugs.length * 30);
@@ -157,7 +157,7 @@ public class MeasurementGraphAction2 extends Action {
         }
         else
         {
-            chart = defaultChart(demographicNo, typeIdName, typeIdName2, patientName, chartTitle);
+            chart = defaultChart(demographicNo, typeIdName, typeIdName2, chartTitle);
         }
 
         response.setContentType("image/png");
@@ -167,7 +167,7 @@ public class MeasurementGraphAction2 extends Action {
         return null;
     }
 
-    ArrayList<EctMeasurementsDataBean> getList(Integer demographicNo, String typeIdName) {
+    private ArrayList<EctMeasurementsDataBean> getList(Integer demographicNo, String typeIdName) {
         EctMeasurementsDataBeanHandler ectMeasure = new EctMeasurementsDataBeanHandler(demographicNo, typeIdName);
         Collection<EctMeasurementsDataBean> dataVector = ectMeasure.getMeasurementsDataVector();
         ArrayList<EctMeasurementsDataBean> list = new ArrayList<EctMeasurementsDataBean>(dataVector);
@@ -218,7 +218,7 @@ public class MeasurementGraphAction2 extends Action {
         return ret;
     }
 
-    JFreeChart referenceRangeChart(Integer demographicNo, String typeIdName, String typeIdName2, String patientName, String chartTitle) {
+    private JFreeChart referenceRangeChart(Integer demographicNo, String typeIdName) {
              org.jfree.data.time.TimeSeriesCollection dataset = new org.jfree.data.time.TimeSeriesCollection();
 
         ArrayList<EctMeasurementsDataBean> list = getList(demographicNo, typeIdName);
@@ -301,7 +301,7 @@ public class MeasurementGraphAction2 extends Action {
         return chart;
     }
 
-    JFreeChart rxAndLabChart(Integer demographicNo, String typeIdName, String typeIdName2, String patientName, String chartTitle) {
+    private JFreeChart rxAndLabChart(Integer demographicNo, String typeIdName, String chartTitle) {
         org.jfree.data.time.TimeSeriesCollection dataset = new org.jfree.data.time.TimeSeriesCollection();
 
         ArrayList<EctMeasurementsDataBean> list = getList(demographicNo, typeIdName);
@@ -406,7 +406,7 @@ public class MeasurementGraphAction2 extends Action {
             return chart;
     }
 
-    JFreeChart labChart(Integer demographicNo, String typeIdName, String typeIdName2, String patientName, String chartTitle) {
+    private JFreeChart labChart(Integer demographicNo, String typeIdName, String chartTitle) {
         org.jfree.data.time.TimeSeriesCollection dataset = new org.jfree.data.time.TimeSeriesCollection();
         ArrayList<EctMeasurementsDataBean> list = getList(demographicNo, typeIdName);
         String typeYAxisName = "";
@@ -472,7 +472,7 @@ public class MeasurementGraphAction2 extends Action {
             return chart;
     }
 
-        JFreeChart actualLabChartRef(Integer demographicNo, String labType, String identifier,String testName, String chartTitle, String[] drugs) {
+    private JFreeChart actualLabChartRef(Integer demographicNo, String labType, String identifier,String testName, String chartTitle, String[] drugs) {
             org.jfree.data.time.TimeSeriesCollection dataset = new org.jfree.data.time.TimeSeriesCollection();
 
             ArrayList<Map<String,Serializable>> list;
@@ -602,7 +602,7 @@ public class MeasurementGraphAction2 extends Action {
             return chart;
         }
 
-       JFreeChart labChartRef(Integer demographicNo, String typeIdName, String typeIdName2, String patientName, String chartTitle) {
+        private JFreeChart labChartRef(Integer demographicNo, String typeIdName, String chartTitle) {
         org.jfree.data.time.TimeSeriesCollection dataset = new org.jfree.data.time.TimeSeriesCollection();
         ArrayList<EctMeasurementsDataBean> list = getList(demographicNo, typeIdName);
         String typeYAxisName = "";
@@ -690,9 +690,7 @@ public class MeasurementGraphAction2 extends Action {
             return chart;
     }
 
-    JFreeChart defaultChart(Integer demographicNo, String typeIdName,
-            String typeIdName2, String patientName,
-            String chartTitle) {
+    private JFreeChart defaultChart(Integer demographicNo, String typeIdName, String typeIdName2, String chartTitle) {
         org.jfree.data.time.TimeSeriesCollection dataset = new org.jfree.data.time.TimeSeriesCollection();
 
         ArrayList<EctMeasurementsDataBean> list = getList(demographicNo, typeIdName);
@@ -786,7 +784,7 @@ public class MeasurementGraphAction2 extends Action {
     /*
      * Just Drugs
      */
-    JFreeChart ChartMeds(Integer demographicNo,String patientName, String chartTitle,String[] drugs) {
+    private JFreeChart ChartMeds(Integer demographicNo, String chartTitle, String[] drugs) {
             MiscUtils.getLogger().debug("In ChartMeds");
             org.jfree.data.time.TimeSeriesCollection dataset = new org.jfree.data.time.TimeSeriesCollection();
             JFreeChart chart = ChartFactory.createTimeSeriesChart(chartTitle, "Days", "MEDS", dataset, true, true, true);
