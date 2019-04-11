@@ -116,7 +116,7 @@ if(!authed) {
 	{
 		SiteDao siteDao = (SiteDao) WebApplicationContextUtils.getWebApplicationContext(application).getBean("siteDao");
 
-		sites = siteDao.getAllSites();
+		sites = siteDao.getActiveSitesByProviderNo((String) session.getAttribute("user"));
 		if(!appNo.isEmpty())
 		{
 			defaultSiteName = siteDao.getSiteNameByAppointmentNo(appNo);
