@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.oscarehr.util.LocaleUtils;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.PrescriptionQrCodeUIBean;
 
 import com.lowagie.text.Document;
@@ -177,6 +178,7 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 		BaseFont bf; // = normFont;
 
 		cb.setRGBColorStroke(0, 0, 255);
+
 		// render prescriptions
 		for (String rxStr : listRx) {
 			// bf = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252,
@@ -279,6 +281,7 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 		public void renderPage(PdfWriter writer, Document document) {
 			Rectangle page = document.getPageSize();
 			PdfContentByte cb = writer.getDirectContent();
+
 
 			try {
 
@@ -408,11 +411,19 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				cb.lineTo(275f, endPara - 50f);
 				cb.stroke();
 
-				if (this.imgPath != null) {
-					Image img = Image.getInstance(this.imgPath);
-					img.scaleToFit(100, 50);
-					img.setAbsolutePosition(75f, endPara - 50f);
-					cb.addImage(img);
+				try
+				{
+					if (this.imgPath != null)
+					{
+						Image img = Image.getInstance(this.imgPath);
+						img.scaleToFit(100, 50);
+						img.setAbsolutePosition(75f, endPara - 50f);
+						cb.addImage(img);
+					}
+				}
+				catch (IOException ioe)
+				{
+					MiscUtils.getLogger().error("signature error: " + ioe.getMessage());
 				}
 
 				// Render doctor name
@@ -428,6 +439,15 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				// print page number
 				String footer = "" + writer.getPageNumber();
 				writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_RIGHT, footer, 280, endPara - 77, 0);
+
+				// render watermark
+				if (OscarProperties.getInstance().isPropertyActive("enable_rx_watermark"))
+				{
+					Image watermarkImg = Image.getInstance(OscarProperties.getInstance().getProperty("rx_watermark_file"));
+					watermarkImg.setAbsolutePosition(285f/2 - watermarkImg.getWidth()/2, (page.getHeight() - (page.getHeight() - (endPara - 80))/2) - watermarkImg.getHeight()/2);
+					cb.addImage(watermarkImg);
+				}
+
 			} catch (Exception e) {
 				logger.error("Error", e);
 			}

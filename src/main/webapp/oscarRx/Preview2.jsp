@@ -106,7 +106,6 @@
 
 </head>
 <body topmargin="0" leftmargin="0" vlink="#0000FF">
-
 <%
 Date rxDate = oscar.oscarRx.util.RxUtil.Today();
 //String rePrint = request.getParameter("rePrint");
@@ -207,6 +206,7 @@ if(custom_logo_name != null ){
 	}
 }
 %>
+
 <html:form action="/form/formname" styleId="preview2Form">
 
 	<input type="hidden" name="demographic_no" value="<%=bean.getDemographicNo()%>"/>
@@ -215,6 +215,10 @@ if(custom_logo_name != null ){
     <table>
         <tr>
             <td>
+				<div style="position: relative;">
+					<oscar:oscarPropertiesCheck property="enable_rx_watermark" value="true">
+						<img style="position:absolute; left:50%; top: 50%; transform: translate(-50%, -50%);" src="../getRxWatermark.do"/>
+					</oscar:oscarPropertiesCheck>
                             <table id="pwTable" width="400px" height="500px" cellspacing=0 cellpadding=10 border=2>
                                     <tr>
                                             <td valign=top height="100px"><input type="image"
@@ -601,6 +605,7 @@ if(custom_logo_name != null ){
                                             </td>
                                     </tr>
                             </table>
+				</div>
 			</td>
 		</tr>
 	</table>
