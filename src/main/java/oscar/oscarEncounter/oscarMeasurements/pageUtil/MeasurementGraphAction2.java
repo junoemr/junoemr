@@ -171,8 +171,7 @@ public class MeasurementGraphAction2 extends Action {
 	private ArrayList<EctMeasurementsDataBean> getList(Integer demographicNo, String typeIdName) {
 		EctMeasurementsDataBeanHandler ectMeasure = new EctMeasurementsDataBeanHandler(demographicNo, typeIdName);
 		Collection<EctMeasurementsDataBean> dataVector = ectMeasure.getMeasurementsDataVector();
-		ArrayList<EctMeasurementsDataBean> list = new ArrayList<EctMeasurementsDataBean>(dataVector);
-		return list;
+		return new ArrayList<>(dataVector);
 	}
 
 	private static XYTaskDataset getDrugDataSet(Integer demographicId, String[] dins) {
@@ -214,9 +213,8 @@ public class MeasurementGraphAction2 extends Action {
 
 		}
 
-		String[] ret = list.toArray(new String[list.size()]);
-
-		return ret;
+		int listSize = list.size();
+		return list.toArray(new String[listSize]);
 	}
 
 	private JFreeChart referenceRangeChart(Integer demographicNo, String typeIdName) {
@@ -268,7 +266,8 @@ public class MeasurementGraphAction2 extends Action {
 			dataset.addSeries(newSeries);
 		}
 
-		OHLCDataItem[] ohlc = dataItems.toArray(new OHLCDataItem[dataItems.size()]);
+		int dataSize = dataItems.size();
+		OHLCDataItem[] ohlc = dataItems.toArray(new OHLCDataItem[dataSize]);
 		JFreeChart chart = ChartFactory.createHighLowChart("HighLowChartDemo2","Time","Value",new DefaultOHLCDataset("DREFERENCE RANGE", ohlc),true);
 		XYPlot plot = (XYPlot) chart.getPlot();
 
@@ -306,7 +305,7 @@ public class MeasurementGraphAction2 extends Action {
 
 		ArrayList<EctMeasurementsDataBean> list = getList(demographicNo, typeIdName);
 
-		String typeYAxisName = "";
+		String typeYAxisName;
 
 		if (typeIdName.equals("BP")) {
 			log.debug("Using BP LOGIC FOR type 1 ");
@@ -415,7 +414,7 @@ public class MeasurementGraphAction2 extends Action {
 	private JFreeChart labChart(Integer demographicNo, String typeIdName, String chartTitle) {
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
 		ArrayList<EctMeasurementsDataBean> list = getList(demographicNo, typeIdName);
-		String typeYAxisName = "";
+		String typeYAxisName;
 
 		if (typeIdName.equals("BP")) {
 			log.debug("Using BP LOGIC FOR type 1 ");
@@ -574,9 +573,11 @@ public class MeasurementGraphAction2 extends Action {
 
 		plot.setRenderer(renderer);
 
-		if (dataItems != null && dataItems.size() > 0)
+		int dataSize = dataItems.size();
+
+		if (dataSize > 0)
 		{
-			OHLCDataItem[] ohlc = dataItems.toArray(new OHLCDataItem[dataItems.size()]);
+			OHLCDataItem[] ohlc = dataItems.toArray(new OHLCDataItem[dataSize]);
 			XYDataset referenceRangeDataset = new DefaultOHLCDataset("Normal Reference Range", ohlc);
 			plot.setDataset(1, referenceRangeDataset);
 			plot.mapDatasetToRangeAxis(1, 0);
@@ -687,10 +688,12 @@ public class MeasurementGraphAction2 extends Action {
 
 		plot.setRenderer(renderer);
 
-		if (dataItems != null && dataItems.size() > 0){
-			OHLCDataItem[] ohlc = dataItems.toArray(new OHLCDataItem[dataItems.size()]);
+		int dataSize = dataItems.size();
+
+		if (dataSize > 0){
+			OHLCDataItem[] ohlc = dataItems.toArray(new OHLCDataItem[dataSize]);
 			XYDataset referenceRangeDataset = new DefaultOHLCDataset("Reference Range", ohlc);
-			plot.setRenderer(1, setAxisAndDataSet(1,plot,plot.getRangeAxis(),referenceRangeDataset,Color.GREEN,new HighLowRenderer() ));
+			plot.setRenderer(1, setAxisAndDataSet(plot, plot.getRangeAxis(), referenceRangeDataset, new HighLowRenderer()));
 		}
 
 		return chart;
@@ -821,24 +824,26 @@ public class MeasurementGraphAction2 extends Action {
 
 	private Hashtable getMeasurementsExt(Integer measurementId) {
 		Hashtable<String,String> hash = new Hashtable<String,String>();
-		if (measurementId!=null) {
+		if (measurementId != null) {
 			MeasurementsExtDao dao = SpringUtils.getBean(MeasurementsExtDao.class);
-			MeasurementsExt m = dao.find(measurementId);
-			if(m != null) {
-				hash.put(m.getKeyVal(), m.getVal());
+			MeasurementsExt measurementsExt = dao.find(measurementId);
+			if(measurementsExt != null) {
+				hash.put(measurementsExt.getKeyVal(), measurementsExt.getVal());
 			}
 		}
 		return hash;
 	}
 
-	private static XYItemRenderer setAxisAndDataSet(int i,XYPlot plot, ValueAxis axis,XYDataset dataset,Paint p,XYItemRenderer renderer){
-		plot.setRangeAxis(i, axis);
-		plot.setDataset(i, dataset);
-		plot.mapDatasetToRangeAxis(i, i);
+	private static XYItemRenderer setAxisAndDataSet(XYPlot plot, ValueAxis axis, XYDataset dataset, XYItemRenderer renderer) {
+		final int range = 1;
+		final Paint green = Color.GREEN;
+		plot.setRangeAxis(range, axis);
+		plot.setDataset(range, dataset);
+		plot.mapDatasetToRangeAxis(range, range);
 
-		renderer.setSeriesPaint(0,p);
-		axis.setLabelPaint(p);
-		axis.setTickLabelPaint(p);
+		renderer.setSeriesPaint(0, green);
+		axis.setLabelPaint(green);
+		axis.setTickLabelPaint(green);
 		return renderer;
 	}
 
