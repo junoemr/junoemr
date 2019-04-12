@@ -47,8 +47,7 @@
 <%@page import="org.oscarehr.common.dao.DemographicDao" %>
 <%@page import="org.oscarehr.common.model.DemographicCust" %>
 <%@page import="org.oscarehr.common.dao.DemographicCustDao" %>
-<%@ page import="org.opensaml.xml.signature.P" %>
-<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="org.oscarehr.managers.DemographicManager" %>
 <%
 	DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
@@ -191,35 +190,14 @@
 			demographic.setVeteranNo(request.getParameter("veteranNo"));
 		}
 
-		if (oscarVariables.isPropertyActive("demographic.showReferralSource"))
-		{
-		    String referralSourceParam = request.getParameter("referral_source");
+	if (oscarVariables.isPropertyActive("demographic.showReferralSource"))
+	{
+		String referralSourceParam = request.getParameter("referral_source");
+		String newReferralSource = request.getParameter("referral_source_new");
 
-		    if (referralSourceParam == null || referralSourceParam.equals(""))
-			{
-			    demographic.setReferralSourceID(null);
-			}
-			else
-			{
-				final Integer NEW_SOURCE_ID = -1;
-				Integer referralSourceID = Integer.parseInt(request.getParameter("referral_source"));
-
-				if (referralSourceID.equals(NEW_SOURCE_ID))
-				{
-					String newReferralSource = request.getParameter("referral_source_new");
-
-					DBPreparedHandler db = new DBPreparedHandler();
-
-					// apptMainBean doesn't let us get the id back from an insert.  Use the DBPreparedHandler directly instead.
-
-					DBPreparedHandlerParam[] params =  {new DBPreparedHandlerParam(newReferralSource), new DBPreparedHandlerParam(new java.sql.Timestamp(System.currentTimeMillis()))};
-					Integer createdReferralSourceID = db.queryExecuteInsertReturnId("insert into referral_source (source, updated_at) values (?, ?)", params);
-					referralSourceID = Integer.valueOf(createdReferralSourceID);
-				}
-
-				demographic.setReferralSourceID(referralSourceID);
-			}
-		}
+		Integer referralSourceID = DemographicManager.fetchReferralSourceID(referralSourceParam, newReferralSource);
+		demographic.setReferralSourceID(referralSourceID);
+	}
 
 		List<Demographic> duplicateList = demographicDao.getDemographicWithLastFirstDOBExact(demographic.getLastName(),demographic.getFirstName(),
 				demographic.getYearOfBirth(),demographic.getMonthOfBirth(),demographic.getDateOfBirth());

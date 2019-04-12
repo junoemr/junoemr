@@ -753,10 +753,6 @@ while(field_itr.hasNext()){
 
                     selectElement.options[selectElement.length - 1].selected = true;
                 }
-                else
-                {
-                    alert("Invalid value for " + optionType);
-                }
             }
 
 			function removeAccents(s)

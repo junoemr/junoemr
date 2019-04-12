@@ -192,8 +192,8 @@
 			// Custom demographic status
 			{"search_demo_cust_status", "SELECT * FROM demographic_custom_status WHERE deleted = 0"},
 			// Referral Source Info
-			{"search_referral_source", "SELECT id, source FROM referral_source WHERE deleted_at IS null ORDER BY source"},
-			{"referral_source", "SELECT source FROM referral_source WHERE id = ?"},
+			{"search_referral_source", "SELECT DISTINCT d.referral_source_id AS id, rs.source FROM demographic d JOIN referral_source rs on d.referral_source_id = id WHERE rs.deleted_at IS NULL ORDER BY source;"},
+			{"referral_source", "SELECT source FROM referral_source WHERE id = ?"}
 	};
 
 	//associate each operation with an output JSP file -- displaymode

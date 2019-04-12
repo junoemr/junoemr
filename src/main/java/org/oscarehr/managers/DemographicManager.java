@@ -25,6 +25,8 @@
 
 package org.oscarehr.managers;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -42,6 +44,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import oscar.log.LogAction;
+import oscar.oscarDB.DBPreparedHandler;
+import oscar.oscarDB.DBPreparedHandlerParam;
 
 
 @Service
@@ -482,5 +486,48 @@ public class DemographicManager
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Get a referral source id to associate with a demographic.  If a new referral source is requested, check to make
+	 * sure that an equivalent referral source doesn't already exist.
+	 *
+	 * @param requestedID ID of the referral source to use, or -1 if a new referral source should be created.
+	 * @param newReferralSourceName	If a new referral source is requested, then the source name to create.
+	 * @return The referral source ID to use.
+	 * @throws SQLException
+	 */
+	public static Integer fetchReferralSourceID(String requestedID, String newReferralSourceName) throws SQLException
+	{
+		final String CREATE_NEW_SOURCE = "-1";
+		Integer idToReturn;
+
+		if (requestedID == null || requestedID.equals(""))
+		{
+			idToReturn = null;
+		}
+		else if (requestedID.equals(CREATE_NEW_SOURCE))
+		{
+			DBPreparedHandler db = new DBPreparedHandler();
+
+			ResultSet checkIfExists = db.queryResults("SELECT ID FROM referral_source WHERE source = ? AND deleted_at IS NULL", new String[]{newReferralSourceName});
+			if (checkIfExists.first())
+			{
+				// Don't create a new referral source if the name (not id) of the referral source already exists in the database.  Use the old one instead.
+				idToReturn = checkIfExists.getInt("id");
+			}
+			else
+			{
+				DBPreparedHandlerParam[] params = {new DBPreparedHandlerParam(newReferralSourceName), new DBPreparedHandlerParam(new java.sql.Timestamp(System.currentTimeMillis()))};
+				Integer createdReferralSourceID = db.queryExecuteInsertReturnId("INSERT INTO referral_source (source, updated_at) VALUES (?, ?)", params);
+				idToReturn = Integer.valueOf(createdReferralSourceID);
+			}
+		}
+		else
+		{
+			idToReturn = Integer.parseInt(requestedID);
+		}
+		return idToReturn;
 	}
 }

@@ -303,10 +303,12 @@ function addOption (selectElement, optionType, valueOfNew, hiddenNameField) {
 		}
 
 	    selectElement.options[selectElement.length - 1].selected = true;
+
+	    return true;
 	}
 	else
 	{
-    	alert("Invalid value for " + optionType);
+	    return false;
 	}
 }
 
@@ -1359,7 +1361,7 @@ for(int i=0; i<custom_demographic_fields.size(); i++){
 					    String source = referralSources.getString("source");
 					    Integer id = referralSources.getInt("id");
 				%>
-			<option value="<%=id%>"><%=source%></option>
+				<option value="<%=id%>"><%=source%></option>
 				<%
 					}
 					referralSources.close();
