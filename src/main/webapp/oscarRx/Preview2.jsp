@@ -217,7 +217,7 @@ if(custom_logo_name != null ){
             <td>
 				<div style="position: relative;">
 					<oscar:oscarPropertiesCheck property="enable_rx_watermark" value="true">
-						<img style="position:absolute; left:50%; top: 50%; transform: translate(-50%, -50%);" src="../getRxWatermark.do"/>
+						<img style="position:absolute; left:50%; top: 50%; transform: translate(-50%, -50%);" src="../RxWatermark.do?method=getWatermark"/>
 					</oscar:oscarPropertiesCheck>
                             <table id="pwTable" width="400px" height="500px" cellspacing=0 cellpadding=10 border=2>
                                     <tr>

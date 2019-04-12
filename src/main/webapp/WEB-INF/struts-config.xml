@@ -2861,7 +2861,7 @@
 			<forward name="list" path="/oscarRx/dispensary/list.jsp" />	
 		</action>
 
-		<action path="/getRxWatermark" type="org.oscarehr.rx.web.RxWatermarkAction" >
+		<action path="/RxWatermark" type="org.oscarehr.rx.web.RxWatermarkAction" parameter="method">
 		</action>
 
      <action path="/consults/Consultations" type="org.oscarehr.consultations.ConsultationAction">

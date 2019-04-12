@@ -26,7 +26,8 @@ package org.oscarehr.rx.web;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.Action;
+import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 
 import javax.servlet.ServletOutputStream;
@@ -36,10 +37,10 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 
-public class RxWatermarkAction  extends Action
+public class RxWatermarkAction  extends DispatchAction
 {
 	//returns the watermark image
-	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
+	public ActionForward getWatermark(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
 	{
 		File outfile = new File(OscarProperties.getInstance().getProperty("rx_watermark_file"));
 		response.setContentType("image/png");
@@ -59,6 +60,13 @@ public class RxWatermarkAction  extends Action
 		output.flush();
 		output.close();
 
+		return null;
+	}
+
+	//update the watermark image
+	public ActionForward setWatermark(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
+		MiscUtils.getLogger().info("WATERMAKR: ");
 		return null;
 	}
 }

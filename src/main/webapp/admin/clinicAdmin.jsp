@@ -54,6 +54,10 @@
     <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
     <title>Clinic</title>
     <link rel="stylesheet" type="text/css"
+          href="../css/bootstrap.css">
+    <link rel="stylesheet" type="text/css"
+          href="../css/bootstrap-toggle.min.css">
+    <link rel="stylesheet" type="text/css"
           href="../share/css/OscarStandardLayout.css">
     <link rel="stylesheet" type="text/css" href="../share/css/OscarStandardLayout.css"/>
     <link rel="stylesheet" href="../css/clinicAdmin.css">
@@ -62,6 +66,13 @@
             src="../share/javascript/prototype.js"></script>
     <script type="text/javascript" language="JavaScript"
             src="../share/javascript/Oscar.js"></script>
+    <script type="text/javascript" language="JavaScript"
+            src="../js/jquery-1.9.1.js"></script>
+    <script type="text/javascript" language="JavaScript"
+            src="../js/bootstrap.js"></script>
+
+    <script type="text/javascript" language="JavaScript"
+            src="../js/bootstrap-toggle.min.js"></script>
 
 
     <div class="header">
@@ -178,7 +189,49 @@
             </fieldset>
         </div>
     </div>
+    <div id="clinic">
+        <div class="clinic-details">
+            <div class="clinic-info">
+                <fieldset>
+                    <legend>Prescription Watermark</legend>
+                    <form>
+                        <input hidden="true" name="method" value="setWatermark" />
+                        <div class="input-field flex-fill-row">
+                            <input id="watermark-toggle" checked type="checkbox">
+                            <script>
+                                let toggle = $('#watermark-toggle');
+                                toggle.bootstrapToggle({
+                                    width: 50,
+                                    height: 20,
+                                    size: 'small'
+                                });
+                                toggle.change(function() {
+                                    toggleWatermarkFields(this);
+                                })
+                            </script>
+                        </div>
+                        <div class="watermark-fields" id="watermark-input-form">
+                            <div class="watermark-input-field flex-fill-row">
+                                <div style="display:flex; flex-direction:row;">
+                                    <div style="margin-right: 5px;">
+                                        <img src="../RxWatermark.do?method=getWatermark" width="100" height="100" style="background-color: #fefefe;"/>
+                                    </div>
+                                    <div>
+                                        <p><b>Rx Prescription watermark</b></p>
+                                        <input type="file" name="watermarkFile" accept="image/png"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="watermark-input-field flex-fill-row">
+                                <input class="submit-button" type="submit" value="Save">
+                            </div>
+                        </div>
+                    </form>
+                </fieldset>
+            </div>
+        </div>
     </div>
+
     <script>
         const billingCheckbox = document.querySelector('#billingCheckbox');
         const billingFields = document.querySelector('#billing-fields');
@@ -211,6 +264,22 @@
                 showBilling(false);
             }
         });
+
+        function toggleWatermarkFields(toggle)
+        {
+            let watermarkForm = jQuery("#watermark-input-form");
+            if (watermarkForm.length > 0)
+            {
+                if (jQuery(toggle).prop('checked'))
+                {
+                    watermarkForm.css("display", "flex");
+                }
+                else
+                {
+                    watermarkForm.css("display", "none");
+                }
+            }
+        }
     </script>
     </body>
 </html:html>
