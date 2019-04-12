@@ -59,7 +59,7 @@ import java.util.List;
 public class TeleplanRemittanceService
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final String DUPLICATE_MESSAGE = "Duplicate line item detected! Processing skipped:\n";
+	private static final String DUPLICATE_MESSAGE = "Duplicate line item detected! ";
 
 	@Autowired
 	private TeleplanS21Dao s21Dao;
@@ -80,6 +80,7 @@ public class TeleplanRemittanceService
         MSPReconcile mspReconcile = new MSPReconcile();
 
         int recFlag = 0;
+        int lineNo = 0;
         String raNo = "";
         String forwardPage = "S21";
 
@@ -90,6 +91,7 @@ public class TeleplanRemittanceService
 
 	    while((nextline = input.readLine()) != null)
 	    {
+		    lineNo++;
 		    String header = nextline.substring(0, 3);
 		    if(header.equals("S21"))
 		    {
@@ -122,7 +124,17 @@ public class TeleplanRemittanceService
                     t.setNewBalance(s21.getT_newbalance());
                     t.setFiller(s21.getT_filler());
                     t.setStatus('N');
-                    s21Dao.persist(t);
+
+                    List<TeleplanS21> s21Matches = s21Dao.findDuplicates(t);
+				    if(s21Matches.isEmpty())
+				    {
+					    s21Dao.persist(t);
+				    }
+				    else
+				    {
+					    logger.warn(getDuplicateMessage(header, lineNo, filename, t.getDataSeq()));
+					    t = s21Matches.get(0);
+				    }
                     raNo=t.getId().toString();
                 }
             }
@@ -188,7 +200,7 @@ public class TeleplanRemittanceService
 
 	                if(s00Dao.isDuplicate(t))
 	                {
-		                logger.warn(DUPLICATE_MESSAGE + nextline);
+		                logger.warn(getDuplicateMessage(header, lineNo, filename, t.getDataSeq()));
 	                }
 	                else
 	                {
@@ -261,7 +273,7 @@ public class TeleplanRemittanceService
 
 	                if(s00Dao.isDuplicate(t))
 	                {
-		                logger.warn(DUPLICATE_MESSAGE + nextline);
+		                logger.warn(getDuplicateMessage(header, lineNo, filename, t.getDataSeq()));
 	                }
 	                else
 	                {
@@ -353,7 +365,7 @@ public class TeleplanRemittanceService
 
 	                if(s00Dao.isDuplicate(t))
 	                {
-		                logger.warn(DUPLICATE_MESSAGE + nextline);
+		                logger.warn(getDuplicateMessage(header, lineNo, filename, t.getDataSeq()));
 	                }
 	                else
 	                {
@@ -392,7 +404,7 @@ public class TeleplanRemittanceService
 
 				    if(s23Dao.isDuplicate(t))
 				    {
-						logger.warn(DUPLICATE_MESSAGE + nextline);
+						logger.warn(getDuplicateMessage(header, lineNo, filename, t.getDataSeq()));
 				    }
 				    else
 				    {
@@ -420,7 +432,7 @@ public class TeleplanRemittanceService
 
 	                if(s25Dao.isDuplicate(t))
 	                {
-		                logger.warn(DUPLICATE_MESSAGE + nextline);
+		                logger.warn(getDuplicateMessage(header, lineNo, filename, t.getDataSeq()));
 	                }
 	                else
 	                {
@@ -450,7 +462,7 @@ public class TeleplanRemittanceService
 
 	                if(s22Dao.isDuplicate(t))
 	                {
-		                logger.warn(DUPLICATE_MESSAGE + nextline);
+		                logger.warn(getDuplicateMessage(header, lineNo, filename, t.getDataSeq()));
 	                }
 	                else
 	                {
@@ -523,7 +535,7 @@ public class TeleplanRemittanceService
 
 	                if(c12Dao.isDuplicate(t))
 	                {
-		                logger.warn(DUPLICATE_MESSAGE + nextline);
+		                logger.warn(getDuplicateMessage(header, lineNo, filename, t.getDataSeq()));
 	                }
 	                else
 	                {
@@ -542,6 +554,11 @@ public class TeleplanRemittanceService
 	    logger.info("Completed Remittance file parse");
 
         return mapping.findForward(forwardPage);
+    }
+
+    private String getDuplicateMessage(String header, int lineNumber, String filename, String sequenceNumber)
+    {
+		return DUPLICATE_MESSAGE + filename + "[" + lineNumber + "]: " + header + " sequence number " + sequenceNumber;
     }
 }
 
