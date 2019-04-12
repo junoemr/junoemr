@@ -46,6 +46,7 @@
 %>
 
 <%@ page import="java.util.*,oscar.oscarReport.reportByTemplate.*" %>
+<%@ page import="org.oscarehr.rx.service.RxWatermarkService" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -194,10 +195,11 @@
             <div class="clinic-info">
                 <fieldset>
                     <legend>Prescription Watermark</legend>
-                    <form>
-                        <input hidden="true" name="method" value="setWatermark" />
+                    <form action="../RxWatermark.do" method="POST" enctype="multipart/form-data" id="watermark-form">
+                        <input type="hidden" name="method" value="setWatermark">
+
                         <div class="input-field flex-fill-row">
-                            <input id="watermark-toggle" checked type="checkbox">
+                            <input id="watermark-toggle" <% if (RxWatermarkService.isWatermarkEnabled()) {%>checked<%}%> type="checkbox">
                             <script>
                                 let toggle = $('#watermark-toggle');
                                 toggle.bootstrapToggle({
@@ -206,7 +208,9 @@
                                     size: 'small'
                                 });
                                 toggle.change(function() {
-                                    toggleWatermarkFields(this);
+                                    let enabled = jQuery(this).prop('checked');
+                                    toggleWatermarkFields(enabled);
+                                    enableWatermark(enabled);
                                 })
                             </script>
                         </div>
@@ -214,16 +218,16 @@
                             <div class="watermark-input-field flex-fill-row">
                                 <div style="display:flex; flex-direction:row;">
                                     <div style="margin-right: 5px;">
-                                        <img src="../RxWatermark.do?method=getWatermark" width="100" height="100" style="background-color: #fefefe;"/>
+                                        <img id="current-watermark-preview" src="../RxWatermark.do?method=getWatermark" width="100" height="100" style="background-color: #fefefe;"/>
                                     </div>
                                     <div>
-                                        <p><b>Rx Prescription watermark</b></p>
-                                        <input type="file" name="watermarkFile" accept="image/png"/>
+                                        <label><b>Rx Prescription watermark</b></label>
+                                        <input id="watermark-file" type="file" name="watermarkFile" accept="image/png"/>
                                     </div>
                                 </div>
                             </div>
                             <div class="watermark-input-field flex-fill-row">
-                                <input class="submit-button" type="submit" value="Save">
+                                <input class="submit-button" type="submit" value="Upload">
                             </div>
                         </div>
                     </form>
@@ -265,12 +269,27 @@
             }
         });
 
-        function toggleWatermarkFields(toggle)
+        function enableWatermark(enable)
+        {
+            jQuery.ajax({
+                url: "../RxWatermark.do",
+                type: "post",
+                data: {
+                    method: "enableWatermark",
+                    enable: enable
+                },
+                success: function() {
+                    console.log("JOB DONE");
+                }
+            });
+        }
+
+        function toggleWatermarkFields(enable)
         {
             let watermarkForm = jQuery("#watermark-input-form");
             if (watermarkForm.length > 0)
             {
-                if (jQuery(toggle).prop('checked'))
+                if (enable)
                 {
                     watermarkForm.css("display", "flex");
                 }
@@ -280,6 +299,32 @@
                 }
             }
         }
+
+        function submitWatermarkForm(event)
+        {
+            let formData = new FormData(this);
+            event.preventDefault();
+            jQuery.ajax({
+                url: "../RxWatermark.do",
+                type: "post",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function() {
+                    jQuery("#watermark-file").val("");
+                    jQuery("#current-watermark-preview").attr("src", "../RxWatermark.do?method=getWatermark&rand=" + Math.random())
+                }
+            })
+        }
+
+        jQuery(document).ready(function ()
+        {
+            jQuery("#watermark-form").submit(submitWatermarkForm);
+            <% if (!RxWatermarkService.isWatermarkEnabled()) { %>
+                toggleWatermarkFields(false);
+            <%}%>
+        });
+
     </script>
     </body>
 </html:html>

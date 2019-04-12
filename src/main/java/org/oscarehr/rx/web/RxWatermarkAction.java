@@ -27,8 +27,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.apache.struts.upload.FormFile;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.rx.service.RxWatermarkService;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import oscar.OscarProperties;
+import org.oscarehr.util.SpringUtils;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -36,37 +40,75 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 public class RxWatermarkAction  extends DispatchAction
 {
+	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+
 	//returns the watermark image
 	public ActionForward getWatermark(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
 	{
-		File outfile = new File(OscarProperties.getInstance().getProperty("rx_watermark_file"));
-		response.setContentType("image/png");
+		try
+		{
+			File outfile = RxWatermarkService.getWatermark().getFileObject();
+			response.setContentType("image/png");
 
-		ServletOutputStream output = response.getOutputStream();
-		BufferedInputStream buffIn = null;
-		try {
-			buffIn = new BufferedInputStream(new FileInputStream(outfile));
-			int data;
-			while ((data = buffIn.read()) != -1) {
-				output.write(data);
+			ServletOutputStream output = response.getOutputStream();
+			BufferedInputStream buffIn = null;
+			try {
+				buffIn = new BufferedInputStream(new FileInputStream(outfile));
+				int data;
+				while ((data = buffIn.read()) != -1) {
+					output.write(data);
+				}
+			} finally {
+				if (buffIn!=null) buffIn.close();
 			}
-		} finally {
-			if (buffIn!=null) buffIn.close();
+
+			output.flush();
+			output.close();
+
+			return null;
 		}
-
-		output.flush();
-		output.close();
-
-		return null;
+		catch (FileNotFoundException e)
+		{
+			MiscUtils.getLogger().error("could not find watermark file: " + e.getMessage());
+			response.setStatus(500);
+			return null;
+		}
 	}
 
 	//update the watermark image
 	public ActionForward setWatermark(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
 	{
-		MiscUtils.getLogger().info("WATERMAKR: ");
+		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null,  "_admin");
+
+		FormFile watermarkFile = (FormFile) form.getMultipartRequestHandler().getFileElements().get("watermarkFile");
+		if (watermarkFile != null)
+		{
+			MiscUtils.getLogger().info("new watermark file: " + watermarkFile.getFileName());
+			RxWatermarkService.setWatermark(watermarkFile.getInputStream());
+		}
+		else
+		{
+			MiscUtils.getLogger().error("failed to retrieve watermark file");
+		}
+
+		response.setStatus(200);
+		return null;
+	}
+
+	public ActionForward enableWatermark(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
+		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null,  "_admin");
+
+		boolean enableWatermark = Boolean.parseBoolean(request.getParameter("enable"));
+		RxWatermarkService.enableWatermark(enableWatermark);
+
+		response.setStatus(200);
 		return null;
 	}
 }

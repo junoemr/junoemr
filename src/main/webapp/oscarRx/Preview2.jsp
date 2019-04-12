@@ -43,6 +43,7 @@
 <!-- Classes needed for signature injection -->
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
+<%@ page import="org.oscarehr.rx.service.RxWatermarkService" %>
 <!-- end -->
 <%
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -216,9 +217,9 @@ if(custom_logo_name != null ){
         <tr>
             <td>
 				<div style="position: relative;">
-					<oscar:oscarPropertiesCheck property="enable_rx_watermark" value="true">
-						<img style="position:absolute; left:50%; top: 50%; transform: translate(-50%, -50%);" src="../RxWatermark.do?method=getWatermark"/>
-					</oscar:oscarPropertiesCheck>
+					<% if (RxWatermarkService.isWatermarkEnabled()) {%>
+						<img style="position:absolute; left:50%; top: 50%; transform: translate(-50%, -50%);" src="../RxWatermark.do?method=getWatermark" onerror="this.style.display='none'"/>
+					<% } %>
                             <table id="pwTable" width="400px" height="500px" cellspacing=0 cellpadding=10 border=2>
                                     <tr>
                                             <td valign=top height="100px"><input type="image"

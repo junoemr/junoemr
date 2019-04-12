@@ -33,6 +33,7 @@ import java.util.Locale;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.oscarehr.rx.service.RxWatermarkService;
 import org.oscarehr.util.LocaleUtils;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -441,9 +442,9 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_RIGHT, footer, 280, endPara - 77, 0);
 
 				// render watermark
-				if (OscarProperties.getInstance().isPropertyActive("enable_rx_watermark"))
+				if (RxWatermarkService.isWatermarkEnabled())
 				{
-					Image watermarkImg = Image.getInstance(OscarProperties.getInstance().getProperty("rx_watermark_file"));
+					Image watermarkImg = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
 					watermarkImg.setAbsolutePosition(285f/2 - watermarkImg.getWidth()/2, (page.getHeight() - (page.getHeight() - (endPara - 80))/2) - watermarkImg.getHeight()/2);
 					cb.addImage(watermarkImg);
 				}
