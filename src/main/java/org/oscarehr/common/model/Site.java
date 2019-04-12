@@ -67,6 +67,7 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="site_id")
 	private Integer siteId;
+	@Column(name="name")
 	private String name;
 	@Column(name="short_name")
 	private String shortName;

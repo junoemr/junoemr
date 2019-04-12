@@ -31,6 +31,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 
 import oscar.SxmlMisc;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 
@@ -44,8 +45,6 @@ import oscar.util.UtilDateUtilities;
  *
  */
 public class FrmBCAR2012Record extends FrmRecord{
-	
-	private final String _dateFormat = "dd/MM/yyyy";
 
 	private Properties props;
 	
@@ -54,11 +53,13 @@ public class FrmBCAR2012Record extends FrmRecord{
         Date dateOfBirth;
         Date dateToday = new Date();
     	
-        if(demographicNo > 0) {
+        if (demographicNo > 0)
+        {
     		super.setDemographic(loggedInInfo, demographicNo);
         }
     	
-        if (existingID <= 0) {
+        if (existingID <= 0)
+        {
         	
         	props = new Properties();
         	
@@ -67,32 +68,32 @@ public class FrmBCAR2012Record extends FrmRecord{
             this.setDemographicProperties();
             
             props.setProperty("demographic_no", demographic.getDemographicNo().toString());            
-            props.setProperty("formCreated", UtilDateUtilities.DateToString(dateToday, _dateFormat));        
-            props.setProperty("pg1_dateOfBirth", UtilDateUtilities.DateToString(dateOfBirth, _dateFormat));           
+            props.setProperty("formCreated", ConversionUtils.toDateString(dateToday, dateFormat));
+            props.setProperty("pg1_dateOfBirth", ConversionUtils.toDateString(dateOfBirth, dateFormat));
             props.setProperty("pg1_age", String.valueOf(UtilDateUtilities.calcAge(dateOfBirth)));
-            props.setProperty("pg1_formDate", UtilDateUtilities.DateToString(dateToday, _dateFormat));
-            props.setProperty("pg2_formDate", UtilDateUtilities.DateToString(dateToday, _dateFormat));
-            props.setProperty("pg3_formDate", UtilDateUtilities.DateToString(dateToday, _dateFormat));
+            props.setProperty("pg1_formDate", ConversionUtils.toDateString(dateToday, dateFormat));
+            props.setProperty("pg2_formDate", ConversionUtils.toDateString(dateToday, dateFormat));
+            props.setProperty("pg3_formDate", ConversionUtils.toDateString(dateToday, dateFormat));
+
             String rd = SxmlMisc.getXmlContent(demographic.getFamilyDoctor(), "rd");
             rd = rd != null ? rd : "";
             props.setProperty("pg1_famPhy", rd);
-
-            
-        } else {
+        }
+        else
+        {
         	
             String sql = "SELECT * FROM formBCAR2012 WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;     
         	FrmRecordHelp frh = new FrmRecordHelp();
-            frh.setDateFormat(_dateFormat); 
+            frh.setDateFormat(dateFormat);
             
-            try {
-            	
+            try
+            {
 	            props = frh.getFormRecord(sql);
 	            this.setDemographicProperties();
- 
-            } catch (SQLException e) {
-            	
+            }
+            catch (SQLException e)
+            {
             	MiscUtils.getLogger().error("Error", e);
-            	
             }
 
         }
@@ -113,37 +114,55 @@ public class FrmBCAR2012Record extends FrmRecord{
         String province = demographic.getProvince();
         String postal = demographic.getPostal();
         String phn = demographic.getHin();
-        String dateOfBirth = UtilDateUtilities.DateToString(date, _dateFormat);
-        String age = String.valueOf(UtilDateUtilities.calcAge(date));
         String phone = demographic.getPhone();
         String phoneAlt = demographic.getPhone2();
     	
-        if(surname != null)
+        if (surname != null)
+        {
             props.setProperty("c_surname", surname);
-        if(firstname != null)
+        }
+        if (firstname != null)
+        {
             props.setProperty("c_givenName", firstname);
-        if(address != null)
+        }
+        if (address != null)
+        {
             props.setProperty("c_address", address);
-        if(city != null)
+        }
+        if (city != null)
+        {
             props.setProperty("c_city", city);
-        if(province != null)
+        }
+        if (province != null)
+        {
             props.setProperty("c_province", province);
-        if(postal != null)
+        }
+        if (postal != null)
+        {
             props.setProperty("c_postal", postal);
-        if(phn != null)
-            props.setProperty("c_phn", phn); 
-        if(phone != null)
+        }
+        if (phn != null)
+        {
+            props.setProperty("c_phn", phn);
+        }
+        if (phone != null)
+        {
             props.setProperty("c_phone", phone);
-        if(phoneAlt != null)
+        }
+        if (phoneAlt != null)
+        {
             props.setProperty("c_phoneAlt1", demographic.getPhone2());
+        }
         
         String cell = null;  
  
-        if(demographicExtMap.containsKey("demo_cell")) {
+        if (demographicExtMap.containsKey("demo_cell"))
+        {
         	cell = demographicExtMap.get("demo_cell");
         }
         		
-        if ( cell != null ){
+        if (cell != null)
+        {
             props.setProperty("c_phoneAlt2",cell );
         }
         
@@ -154,26 +173,26 @@ public class FrmBCAR2012Record extends FrmRecord{
         String sql = "SELECT * FROM formBCAR2012 WHERE demographic_no=" + demographic_no + " AND ID=0";
 
         FrmRecordHelp frh = new FrmRecordHelp();
-        frh.setDateFormat(_dateFormat);
+        frh.setDateFormat(dateFormat);
         return ((frh).saveFormRecord(props, sql));
     }
 
     public Properties getPrintRecord(int demographicNo, int existingID) throws SQLException {
         String sql = "SELECT * FROM formBCAR2012 WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
         FrmRecordHelp frh = new FrmRecordHelp();
-        frh.setDateFormat(_dateFormat);
+        frh.setDateFormat(dateFormat);
         return ((frh).getPrintRecord(sql));
     }
 
     public String findActionValue(String submit) throws SQLException {
         FrmRecordHelp frh = new FrmRecordHelp();
-        frh.setDateFormat(_dateFormat);
+        frh.setDateFormat(dateFormat);
         return ((frh).findActionValue(submit));
     }
 
     public String createActionURL(String where, String action, String demoId, String formId) throws SQLException {
         FrmRecordHelp frh = new FrmRecordHelp();
-        frh.setDateFormat(_dateFormat);
+        frh.setDateFormat(dateFormat);
         return ((frh).createActionURL(where, action, demoId, formId));
     }
 

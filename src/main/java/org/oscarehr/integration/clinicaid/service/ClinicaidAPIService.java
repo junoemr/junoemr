@@ -342,7 +342,7 @@ public class ClinicaidAPIService
 		{
 			if (request.getParameter("patient_remote_id") != null && !request.getParameter("patient_remote_id").isEmpty())
 			{
-				clinicaidLink = clinicaidLink + "/?nonce=" + nonce + "#/reports?patient_remote_id=" + request.getParameter("patient_remote_id");
+				clinicaidLink = clinicaidLink + "/?nonce=" + nonce + "#/reports?patient_remote_id=" + request.getParameter("patient_remote_id") + "&status_group=all";
 			}
 			else
 			{

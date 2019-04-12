@@ -1079,7 +1079,7 @@ function importFromEnct(reqInfo,txtArea)
 }
 
 
-
+// used by consultation attachments
 function updateAttached() {
     var t = setTimeout('fetchAttached()', 2000);
 }

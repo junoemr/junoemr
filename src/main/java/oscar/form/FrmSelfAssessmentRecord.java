@@ -30,50 +30,53 @@ import java.util.Properties;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.util.LoggedInInfo;
 
-import oscar.util.UtilDateUtilities;
+import oscar.util.ConversionUtils;
 /**
  *
  * @author kimleanhoffman
  */
 
 public class FrmSelfAssessmentRecord extends FrmRecord{
-    
-    @Override
-    public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID) throws SQLException{
-        Properties props = new Properties();
-        Demographic demographic = demographicManager.getDemographic(loggedInInfo, demographicNo);
 
-        if(existingID <= 0 && demographic != null) {
-            props.setProperty("demographic_no", String.valueOf(demographicNo));
-            props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(),"dd/MM/yyyy"));
-        } else {
-            String sql = "SELECT * FROM formSelfAssessment WHERE demographic_no = " +demographicNo +" AND ID = " +existingID;
-            FrmRecordHelp frmRec = new FrmRecordHelp();
-            frmRec.setDateFormat("dd/MM/yyyy");
-            props = frmRec.getFormRecord(sql);
-        }
+	@Override
+	public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID) throws SQLException{
+		Properties props = new Properties();
+		Demographic demographic = demographicManager.getDemographic(loggedInInfo, demographicNo);
 
-        return props;
-    }
+		if (existingID <= 0 && demographic != null)
+		{
+			props.setProperty("demographic_no", String.valueOf(demographicNo));
+			props.setProperty("formCreated", ConversionUtils.toDateString(new Date(),dateFormat));
+		}
+		else
+		{
+			String sql = "SELECT * FROM formSelfAssessment WHERE demographic_no = " +demographicNo +" AND ID = " +existingID;
+			FrmRecordHelp frmRec = new FrmRecordHelp();
+			frmRec.setDateFormat(dateFormat);
+			props = frmRec.getFormRecord(sql);
+		}
 
-    @Override
-    public int saveFormRecord(Properties props) throws SQLException {
-        String demographicNo = props.getProperty("demographic_no");
-        String sql = "SELECT * FROM formSelfAssessment WHERE demographic_no=" +demographicNo +" AND ID=0";
-        FrmRecordHelp frmRec = new FrmRecordHelp();
-        frmRec.setDateFormat("dd/MM/yyyy");
+		return props;
+	}
 
-        return frmRec.saveFormRecord(props, sql);
-    }
+	@Override
+	public int saveFormRecord(Properties props) throws SQLException {
+		String demographicNo = props.getProperty("demographic_no");
+		String sql = "SELECT * FROM formSelfAssessment WHERE demographic_no=" +demographicNo +" AND ID=0";
+		FrmRecordHelp frmRec = new FrmRecordHelp();
+		frmRec.setDateFormat(dateFormat);
 
-    @Override
-    public String findActionValue(String submit) throws SQLException {
- 		return ((new FrmRecordHelp()).findActionValue(submit));
-    }
+		return frmRec.saveFormRecord(props, sql);
+	}
 
-    @Override
-    public String createActionURL(String where, String action, String demoId, String formId) throws SQLException {
- 		return ((new FrmRecordHelp()).createActionURL(where, action, demoId, formId));
-    }
+	@Override
+	public String findActionValue(String submit) throws SQLException {
+		return ((new FrmRecordHelp()).findActionValue(submit));
+	}
+
+	@Override
+	public String createActionURL(String where, String action, String demoId, String formId) throws SQLException {
+		return ((new FrmRecordHelp()).createActionURL(where, action, demoId, formId));
+	}
 
 }

@@ -192,6 +192,11 @@ public class GenericFile
 	{
 	}
 
+	public void forceSetValidation(boolean isValid)
+	{
+		this.isValid = isValid;
+		this.hasBeenValidated = true;
+	}
 	public boolean isValid()
 	{
 		return this.isValid;
