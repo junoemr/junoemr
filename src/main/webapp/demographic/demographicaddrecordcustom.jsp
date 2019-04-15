@@ -54,7 +54,7 @@
     {"search_rsstatus", "select distinct roster_status from demographic where roster_status != '' and roster_status != 'RO' and roster_status != 'NR' and roster_status != 'TE' and roster_status != 'FS' "},
     {"search_ptstatus", "select distinct patient_status from demographic where patient_status != '' and patient_status != 'AC' and patient_status != 'IN' and patient_status != 'DE' and patient_status != 'MO' and patient_status != 'FI'"},
     {"search_waiting_list", "select * from waitingListName where group_no='" + ((ProviderPreference)session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER_PREFERENCE)).getMyGroupNo() +"' and is_history='N'  order by name"},
-	{"search_referral_source", "select id, source from referral_source where deleted_at is null"}
+	{"search_referral_source", "SELECT DISTINCT d.referral_source_id AS id, rs.source FROM demographic d JOIN referral_source rs ON d.referral_source_id = rs.id WHERE rs.deleted_at IS NULL"}
   };
   String[][] responseTargets=new String[][] {  };
   addDemoBean.doConfigure(dbQueries,responseTargets);
