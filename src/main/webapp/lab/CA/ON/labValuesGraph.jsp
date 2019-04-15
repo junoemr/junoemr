@@ -26,7 +26,7 @@
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
-      String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+      String roleName$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
 	  boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_lab" rights="r" reverse="<%=true%>">
@@ -40,51 +40,49 @@ if(!authed) {
 %>
 
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@ page
-    import="java.util.*,oscar.oscarLab.ca.on.*,oscar.oscarDemographic.data.*"%>
+<%@ page import="oscar.oscarRx.data.RxPrescriptionData" %>
+<%@ page import="java.util.Hashtable" %>
+<%@ page import="oscar.oscarDemographic.data.DemographicData" %>
+<%@ page import="org.oscarehr.common.model.Demographic" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%
+    String labType = request.getParameter("labType");
+    String demographicNo = request.getParameter("demographic_no");
+    String testName = request.getParameter("testName");
+    String identifier = request.getParameter("identifier");
+    if (identifier == null)
+    {
+        identifier = "NULL";
+    }
 
-            String labType = request.getParameter("labType");
-            String demographicNo = request.getParameter("demographic_no");
-            String testName = request.getParameter("testName");
-            String identifier = request.getParameter("identifier");
-            if (identifier == null)
-            {
-                identifier = "NULL";
-            }
+    DemographicData dData = new DemographicData();
 
-            DemographicData dData = new DemographicData();
+    Demographic demographic = dData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demographicNo);
 
-            org.oscarehr.common.model.Demographic demographic = dData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demographicNo);
-
-            StringBuffer buffer = new StringBuffer();
-            Hashtable<String, String> drugTable = new Hashtable<String, String>();
-            String drugForGraph = "";
-            if (request.getParameterValues("drug") != null)
-            {
-                String[] drugs = request.getParameterValues("drug");
-                for (String drug : drugs)
-                {
-                    buffer.append("&drug=" + drug);
-                    drugTable.put(drug, "drug");
-                }
-                drugForGraph = buffer.toString();
-            }
-
-
-
+    StringBuffer buffer = new StringBuffer();
+    Hashtable<String, String> drugTable = new Hashtable<String, String>();
+    String drugForGraph = "";
+    if (request.getParameterValues("drug") != null)
+    {
+        String[] drugs = request.getParameterValues("drug");
+        for (String drug : drugs)
+        {
+            buffer.append("&drug=" + drug);
+            drugTable.put(drug, "drug");
+        }
+        drugForGraph = buffer.toString();
+    }
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
     <head>
         <script type="text/javascript" src="<%= request.getContextPath()%>/js/global.js"></script>
         <html:base />
-        <title><%=""/*lab.pLastName*/%>, <%=""/*lab.pFirstName*/%> <bean:message
-            key="oscarMDS.segmentDisplay.title" /></title>
-        <link rel="stylesheet" type="text/css"
-              href="../../../share/css/OscarStandardLayout.css">
+        <title><%=""/*lab.pLastName*/%>, <%=""/*lab.pFirstName*/%>
+            <bean:message key="oscarMDS.segmentDisplay.title" /></title>
+        <link rel="stylesheet" type="text/css" href="../../../share/css/OscarStandardLayout.css">
         <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
     </head>
 
@@ -103,119 +101,110 @@ if(!authed) {
     </script>
 
     <body>
-            <table width="100%" height="100%" border="0" cellspacing="0"
-                   cellpadding="0">
-                <tr>
-                    <td valign="top">
-
-                        <table width="100%" border="1" cellspacing="0" cellpadding="3"
-                               bgcolor="#9999CC" bordercolordark="#bfcbe3">
-                            <tr>
-                                <td width="66%" align="middle" class="Cell">
-                                    <div class="Field2"><bean:message
-                                        key="oscarMDS.segmentDisplay.formDetailResults" /></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td bgcolor="white" valign="top">
-                                    <table valign="top" border="0" cellpadding="2" cellspacing="0" width="100%">
-                                        <tr valign="top">
-                                            <td valign="top" width="33%" align="left">
-                                                <table width="100%" border="0" cellpadding="2" cellspacing="0"valign="top">
-                                                    <tr>
-                                                        <td valign="top" align="left">
-                                                            <table valign="top" border="0" cellpadding="3" cellspacing="0" width="50%">
-                                                                <tr>
-                                                                    <td colspan="2" nowrap>
-                                                                        <div class="FieldData"><strong><bean:message
-                                                                                key="oscarMDS.segmentDisplay.formPatientName" />: </strong> <%=demographic.getLastName()%>,
-                                                                        <%=demographic.getFirstName()%></div>
-
-                                                                    </td>
-                                                                    <td colspan="2" nowrap>
-                                                                        <div class="FieldData" nowrap="nowrap"><strong><bean:message
-                                                                                key="oscarMDS.segmentDisplay.formSex" />: </strong><%=demographic.getSex()%>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td colspan="2" nowrap>
-                                                                        <div class="FieldData"><strong><bean:message
-                                                                                key="oscarMDS.segmentDisplay.formDateBirth" />: </strong> <%=DemographicData.getDob(demographic,"-")%>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td colspan="2" nowrap>
-                                                                        <div class="FieldData" nowrap="nowrap"><strong><bean:message
-                                                                                key="oscarMDS.segmentDisplay.formAge" />: </strong><%=demographic.getAge()%>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-
-
-                                                            </table>
-                                                        </td>
-                                                        <td width="33%" valign="top"></td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-
-                            </tr>
-
-                            <tr>
-                                <td align="center" bgcolor="white" colspan="2">
-                                    <table width="100%" height="20" border="0" cellpadding="0"
-                                           cellspacing="0">
-                                        <tr>
-                                            <td align="center" bgcolor="white">
-                                                <div class="FieldData">
-                                                    <center></center>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
+    <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <td valign="top">
+                <table width="100%" border="1" cellspacing="0" cellpadding="3" bgcolor="#9999CC" bordercolordark="#bfcbe3">
+                    <tr>
+                        <td width="66%" align="middle" class="Cell">
+                            <div class="Field2">
+                                <bean:message key="oscarMDS.segmentDisplay.formDetailResults" />
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="white" valign="top">
+                            <table valign="top" border="0" cellpadding="2" cellspacing="0" width="100%">
+                                <tr valign="top">
+                                    <td valign="top" width="33%" align="left">
+                                        <table width="100%" border="0" cellpadding="2" cellspacing="0"valign="top">
+                                            <tr>
+                                                <td valign="top" align="left">
+                                                    <table valign="top" border="0" cellpadding="3" cellspacing="0" width="50%">
+                                                        <tr>
+                                                            <td colspan="2" nowrap>
+                                                                <div class="FieldData">
+                                                                    <strong><bean:message key="oscarMDS.segmentDisplay.formPatientName" />: </strong>
+                                                                    <%=demographic.getLastName()%>,<%=demographic.getFirstName()%>
+                                                                </div>
+                                                            </td>
+                                                            <td colspan="2" nowrap>
+                                                                <div class="FieldData" nowrap="nowrap">
+                                                                    <strong><bean:message key="oscarMDS.segmentDisplay.formSex" />: </strong>
+                                                                    <%=demographic.getSex()%>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="2" nowrap>
+                                                                <div class="FieldData">
+                                                                    <strong><bean:message key="oscarMDS.segmentDisplay.formDateBirth" />: </strong>
+                                                                    <%=DemographicData.getDob(demographic,"-")%>
+                                                                </div>
+                                                            </td>
+                                                            <td colspan="2" nowrap>
+                                                                <div class="FieldData" nowrap="nowrap">
+                                                                    <strong><bean:message key="oscarMDS.segmentDisplay.formAge" />: </strong><%=demographic.getAge()%>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
 
 
+                                                    </table>
+                                                </td>
+                                                <td width="33%" valign="top">
 
-                        <table style="page-break-inside: avoid;" bgcolor="#003399" border="0"
-                               cellpadding="0" cellspacing="0" width="100%">
-                            <tr>
-                                <td colspan="4" height="7">&nbsp;</td>
-                            </tr>
-                            <tr>
-                                <td colspan="4" height="7">&nbsp;</td>
-                            </tr>
-                        </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
-                        <img src="../../../oscarEncounter/GraphMeasurements.do?method=actualLab&demographic_no=<%=demographicNo%>&labType=<%=labType%>&identifier=<%=identifier%>&testName=<%=testName%><%=drugForGraph%>"/>
+                    <tr>
+                        <td align="center" bgcolor="white" colspan="2">
+                            <table width="100%" height="20" border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center" bgcolor="white">
+                                        <div class="FieldData">
+                                            <center></center>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                <table style="page-break-inside: avoid;" bgcolor="#003399" border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td colspan="4" height="7">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" height="7">&nbsp;</td>
+                    </tr>
+                </table>
+                <img alt="Graph" src="../../../oscarEncounter/GraphMeasurements.do?method=actualLab&demographic_no=<%=demographicNo%>&labType=<%=labType%>&identifier=<%=identifier%>&testName=<%=testName%><%=drugForGraph%>"/>
 
+                <table width="100%" border="0" cellspacing="0" cellpadding="3" class="MainTableBottomRowRightColumn" bgcolor="#003399">
+                    <tr>
+                        <td align="left">
+                            <input type="button" value=" <bean:message key="global.btnClose"/> " onClick="window.close()">
+                            <input type="button" value=" <bean:message key="global.btnPrint"/> " onClick="window.print()">
 
-                        <table width="100%" border="0" cellspacing="0" cellpadding="3"
-                               class="MainTableBottomRowRightColumn" bgcolor="#003399">
-                            <tr>
-                                <td align="left"><input type="button"
-                                                            value=" <bean:message key="global.btnClose"/> "
-                                                            onClick="window.close()"> <input type="button"
-                                                                     value=" <bean:message key="global.btnPrint"/> "
-                                                                     onClick="window.print()">
-
-                                </td>
-                            </tr>
-                        </table>
-                        <form action="labValuesGraph.jsp">
-                            <input type="hidden" name="labType" value="<%=labType%>" />
-                            <input type="hidden" name="demographic_no" value="<%=demographicNo%>" />
-                            <input type="hidden" name="testName" value="<%=testName%>" />
-                            <input type="hidden" name="identifier" value="<%=identifier%>" />
-                        <ul>
+                        </td>
+                    </tr>
+                </table>
+                <form action="labValuesGraph.jsp">
+                    <input type="hidden" name="labType" value="<%=labType%>" />
+                    <input type="hidden" name="demographic_no" value="<%=demographicNo%>" />
+                    <input type="hidden" name="testName" value="<%=testName%>" />
+                    <input type="hidden" name="identifier" value="<%=identifier%>" />
+                    <ul>
                         <%
-                        oscar.oscarRx.data.RxPrescriptionData prescriptData = new oscar.oscarRx.data.RxPrescriptionData();
-                        oscar.oscarRx.data.RxPrescriptionData.Prescription[] arr = prescriptData.getUniquePrescriptionsByPatient(Integer.parseInt(demographicNo));
+                        RxPrescriptionData prescriptData = new RxPrescriptionData();
+                        RxPrescriptionData.Prescription[] arr = prescriptData.getUniquePrescriptionsByPatient(Integer.parseInt(demographicNo));
 
                         for (int idx = 0; idx < arr.length; ++idx)
                         {
@@ -230,14 +219,13 @@ if(!authed) {
                             <%
                          }
                         %>
-                        </ul>
-                        <input type="submit" value="Add Meds to Graph"/>
-                        </form>
+                    </ul>
+                    <input type="submit" value="Add Meds to Graph"/>
+                </form>
 
-                    </td>
-                </tr>
-            </table>
-
+            </td>
+        </tr>
+    </table>
     </body>
 </html>
 

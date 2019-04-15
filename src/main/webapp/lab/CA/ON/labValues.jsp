@@ -26,7 +26,7 @@
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
-      String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+      String roleName$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
 	  boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_lab" rights="r" reverse="<%=true%>">
@@ -34,9 +34,10 @@
 	<%response.sendRedirect("../../../securityError.jsp?type=_lab");%>
 </security:oscarSec>
 <%
-if(!authed) {
-	return;
-}
+	if(!authed)
+	{
+		return;
+	}
 %>
 
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
@@ -44,69 +45,69 @@ if(!authed) {
 <%@page import="org.w3c.dom.Document"%>
 <%@page import="org.oscarehr.caisi_integrator.ws.CachedDemographicLabResult"%>
 <%@page import="oscar.oscarLab.ca.all.web.LabDisplayHelper"%>
-<%@ page
-	import="java.util.*,oscar.oscarLab.ca.on.*,oscar.oscarDemographic.data.*"%>
-<%@ page import="org.oscarehr.util.MiscUtils" %>
-<%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="org.oscarehr.util.DateMapComparator" %>
+<%@page import="java.util.*"%>
+<%@page import="oscar.oscarLab.ca.on.*"%>
+<%@page import="oscar.oscarDemographic.data.*"%>
+<%@page import="org.oscarehr.util.MiscUtils" %>
+<%@page import="org.oscarehr.util.DateMapComparator" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%
+	String labType = request.getParameter("labType");
+	String demographicNo = request.getParameter("demo");
+	String testName = request.getParameter("testName");
+	String identifier = request.getParameter("identifier");
+	String remoteFacilityIdString = request.getParameter("remoteFacilityId");
+	String remoteLabKey = request.getParameter("remoteLabKey");
 
-String labType = request.getParameter("labType");
-String demographicNo = request.getParameter("demo");
-String testName = request.getParameter("testName");
-String identifier = request.getParameter("identifier");
-String remoteFacilityIdString = request.getParameter("remoteFacilityId");
-String remoteLabKey = request.getParameter("remoteLabKey");
+	if (identifier == null)
+	{
+		identifier = "NULL";
+	}
+	String highlight = "#E0E0FF";
+	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
-if (identifier == null) identifier = "NULL";
+	DemographicData dData = new DemographicData();
+	org.oscarehr.common.model.Demographic demographic =  dData.getDemographic(loggedInInfo, demographicNo);
 
-String highlight = "#E0E0FF";
+	ArrayList list = null;
 
-LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-
-DemographicData dData = new DemographicData();
-org.oscarehr.common.model.Demographic demographic =  dData.getDemographic(loggedInInfo, demographicNo);
-
-ArrayList list = null;
-
-	SimpleDateFormat dateOutputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
 	DateMapComparator comparator = new DateMapComparator("collDate");
-if (!(demographicNo == null || demographicNo.equals("null"))){
-	if(remoteFacilityIdString==null)
+	if (!(demographicNo == null || demographicNo.equals("null")))
 	{
-		list = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographicNo), testName, identifier);
-	}
-	else
-	{
-		CachedDemographicLabResult remoteLab=LabDisplayHelper.getRemoteLab(loggedInInfo, Integer.parseInt(remoteFacilityIdString), remoteLabKey,Integer.parseInt(demographicNo));
-		Document labContentsAsXml=LabDisplayHelper.getXmlDocument(remoteLab);
-		HashMap<String, ArrayList<Map<String, Serializable>>> mapOfTestValues=LabDisplayHelper.getMapOfTestValues(labContentsAsXml);
-		list=mapOfTestValues.get(identifier);
-	}
+		if(remoteFacilityIdString==null)
+		{
+			list = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographicNo), testName, identifier);
+		}
+		else
+		{
+			CachedDemographicLabResult remoteLab = LabDisplayHelper.getRemoteLab(loggedInInfo, Integer.parseInt(remoteFacilityIdString), remoteLabKey,Integer.parseInt(demographicNo));
+			Document labContentsAsXml = LabDisplayHelper.getXmlDocument(remoteLab);
+			HashMap<String, ArrayList<Map<String, Serializable>>> mapOfTestValues=LabDisplayHelper.getMapOfTestValues(labContentsAsXml);
+			list=mapOfTestValues.get(identifier);
+		}
 
-	// Attempt to sort the lab result dates
-	try
-	{
-		Collections.sort(list, Collections.reverseOrder(comparator));
-	} catch (RuntimeException e) {
-		MiscUtils.getLogger().error("Cannot sort lab dates: " + e);
-		MiscUtils.getLogger().error("Returning unsorted list.");
+		// Attempt to sort the lab result dates
+		try
+		{
+			Collections.sort(list, Collections.reverseOrder(comparator));
+		} catch (RuntimeException e) {
+			MiscUtils.getLogger().error("Cannot sort lab dates: " + e);
+			MiscUtils.getLogger().error("Returning unsorted list.");
+		}
 	}
-}
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<html:base />
-<title><%=""%>, <%=""%> <bean:message
-	key="oscarMDS.segmentDisplay.title" /></title>
-<link rel="stylesheet" type="text/css"
-	href="../../../share/css/OscarStandardLayout.css">
-<link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	<html:base />
+	<title><%=""%>, <%=""%>
+		<bean:message key="oscarMDS.segmentDisplay.title" />
+	</title>
+	<link rel="stylesheet" type="text/css" href="../../../share/css/OscarStandardLayout.css">
+	<link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
 </head>
 
 <script language="JavaScript">
@@ -125,98 +126,95 @@ function popupStart(vheight,vwidth,varpage,windowname) {
 
 <body>
 
-  <%  if(demographic==null){%>
+  <%
+	  if(demographic==null)
+	  {
+  %>
+  <script language="JavaScript">
+	  alert("The demographic number is not valid");
+	  window.close();
+  </script>
 
-<script language="JavaScript">
-alert("The demographic number is not valid");
-window.close();
-</script>
+    <%
+	  }
+	%>
+<form name="acknowledgeForm" method="post" action="../../../oscarMDS/UpdateStatus.do">
 
-    <%} else{%>
-<form name="acknowledgeForm" method="post"
-	action="../../../oscarMDS/UpdateStatus.do">
-
-<table width="100%" height="100%" border="0" cellspacing="0"
-	cellpadding="0">
+<table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
 	<tr>
 		<td valign="top">
+		<table width="100%" border="1" cellspacing="0" cellpadding="3" bgcolor="#9999CC" bordercolordark="#bfcbe3">
 
-		<table width="100%" border="1" cellspacing="0" cellpadding="3"
-			bgcolor="#9999CC" bordercolordark="#bfcbe3">
 			<tr>
 				<td width="66%" align="middle" class="Cell">
-				<div class="Field2"><bean:message
-					key="oscarMDS.segmentDisplay.formDetailResults" /></div>
+					<div class="Field2">
+						<bean:message key="oscarMDS.segmentDisplay.formDetailResults" />
+					</div>
 				</td>
 			</tr>
+
 			<tr>
 				<td bgcolor="white" valign="top">
-				<table valign="top" border="0" cellpadding="2" cellspacing="0"
-					width="100%">
-					<tr valign="top">
-						<td valign="top" width="33%" align="left">
-						<table width="100%" border="0" cellpadding="2" cellspacing="0"
-							valign="top">
-							<tr>
-								<td valign="top" align="left">
-								<table valign="top" border="0" cellpadding="3" cellspacing="0"
-									width="50%">
+					<table valign="top" border="0" cellpadding="2" cellspacing="0" width="100%">
+						<tr valign="top">
+							<td valign="top" width="33%" align="left">
+								<table width="100%" border="0" cellpadding="2" cellspacing="0" valign="top">
 									<tr>
-										<td colspan="2" nowrap>
-										<div class="FieldData"><strong><bean:message
-											key="oscarMDS.segmentDisplay.formPatientName" />: </strong> <%=demographic.getLastName()%>,
-										<%=demographic.getFirstName()%></div>
-
+										<td valign="top" align="left">
+											<table valign="top" border="0" cellpadding="3" cellspacing="0" width="50%">
+												<tr>
+													<td colspan="2" nowrap>
+													<div class="FieldData">
+														<strong><bean:message key="oscarMDS.segmentDisplay.formPatientName" />:</strong>
+														<%=demographic.getLastName()%>,<%=demographic.getFirstName()%>
+													</div>
+													</td>
+													<td colspan="2" nowrap>
+													<div class="FieldData" nowrap="nowrap">
+														<strong><bean:message key="oscarMDS.segmentDisplay.formSex" />: </strong>
+														<%=demographic.getSex()%>
+													</div>
+													</td>
+												</tr>
+												<tr>
+													<td colspan="2" nowrap>
+													<div class="FieldData">
+														<strong><bean:message key="oscarMDS.segmentDisplay.formDateBirth" />: </strong>
+														<%=DemographicData.getDob(demographic,"-")%>
+													</div>
+													</td>
+													<td colspan="2" nowrap>
+													<div class="FieldData" nowrap="nowrap">
+														<strong><bean:message key="oscarMDS.segmentDisplay.formAge" />: </strong>
+														<%=demographic.getAge()%>
+													</div>
+													</td>
+												</tr>
+											</table>
 										</td>
-										<td colspan="2" nowrap>
-										<div class="FieldData" nowrap="nowrap"><strong><bean:message
-											key="oscarMDS.segmentDisplay.formSex" />: </strong><%=demographic.getSex()%>
-										</div>
-										</td>
+										<td width="33%" valign="top"></td>
 									</tr>
-									<tr>
-										<td colspan="2" nowrap>
-										<div class="FieldData"><strong><bean:message
-											key="oscarMDS.segmentDisplay.formDateBirth" />: </strong> <%=DemographicData.getDob(demographic,"-")%>
-										</div>
-										</td>
-										<td colspan="2" nowrap>
-										<div class="FieldData" nowrap="nowrap"><strong><bean:message
-											key="oscarMDS.segmentDisplay.formAge" />: </strong><%=demographic.getAge()%>
-										</div>
-										</td>
-									</tr>
-
-
 								</table>
-								</td>
-								<td width="33%" valign="top"></td>
-							</tr>
-						</table>
-						</td>
-					</tr>
-				</table>
+							</td>
+						</tr>
+					</table>
 				</td>
-
 			</tr>
 
 			<tr>
 				<td align="center" bgcolor="white" colspan="2">
-				<table width="100%" height="20" border="0" cellpadding="0"
-					cellspacing="0">
-					<tr>
-						<td align="center" bgcolor="white">
-						<div class="FieldData">
-						<center></center>
-						</div>
-						</td>
-					</tr>
-				</table>
+					<table width="100%" height="20" border="0" cellpadding="0" cellspacing="0">
+						<tr>
+							<td align="center" bgcolor="white">
+							<div class="FieldData">
+							<center></center>
+							</div>
+							</td>
+						</tr>
+					</table>
 				</td>
 			</tr>
 		</table>
-
-
 
 		<table style="page-break-inside: avoid;" bgcolor="#003399" border="0"
 			cellpadding="0" cellspacing="0" width="100%">
@@ -233,29 +231,37 @@ window.close();
 			bgcolor="#CCCCFF" bordercolor="#9966FF" bordercolordark="#bfcbe3"
 			name="tblDiscs" id="tblDiscs">
 			<tr class="Field2">
-				<td width="25%" align="middle" valign="bottom" class="Cell"><bean:message
-					key="oscarMDS.segmentDisplay.formTestName" /></td>
-				<td width="15%" align="middle" valign="bottom" class="Cell"><bean:message
-					key="oscarMDS.segmentDisplay.formResult" /></td>
-				<td width="5%" align="middle" valign="bottom" class="Cell"><bean:message
-					key="oscarMDS.segmentDisplay.formAbn" /></td>
-				<td width="15%" align="middle" valign="bottom" class="Cell"><bean:message
-					key="oscarMDS.segmentDisplay.formReferenceRange" /></td>
-				<td width="10%" align="middle" valign="bottom" class="Cell"><bean:message
-					key="oscarMDS.segmentDisplay.formUnits" /></td>
-				<td width="15%" align="middle" valign="bottom" class="Cell"><bean:message
-					key="oscarMDS.segmentDisplay.formDateTimeCompleted" /></td>
+				<td width="25%" align="middle" valign="bottom" class="Cell">
+					<bean:message key="oscarMDS.segmentDisplay.formTestName" />
+				</td>
+				<td width="15%" align="middle" valign="bottom" class="Cell">
+					<bean:message key="oscarMDS.segmentDisplay.formResult" />
+				</td>
+				<td width="5%" align="middle" valign="bottom" class="Cell">
+					<bean:message key="oscarMDS.segmentDisplay.formAbn" />
+				</td>
+				<td width="15%" align="middle" valign="bottom" class="Cell">
+					<bean:message key="oscarMDS.segmentDisplay.formReferenceRange" />
+				</td>
+				<td width="10%" align="middle" valign="bottom" class="Cell">
+					<bean:message key="oscarMDS.segmentDisplay.formUnits" /></td>
+				<td width="15%" align="middle" valign="bottom" class="Cell">
+					<bean:message key="oscarMDS.segmentDisplay.formDateTimeCompleted" />
+				</td>
 			</tr>
-			<%  int linenum = 0;
-				
-                            if (list != null){
-                               for (int i = 0 ;  i < list.size(); i++){                            	                               		                               	   
-                                   Map h = (Map) list.get(i);
-                                   String lineClass = "NormalRes";
-                                   if ( h.get("abn") != null && h.get("abn").equals("A")){
-                                      lineClass = "AbnormalRes";
-                                   }
-%>
+			<%
+				int linenum = 0;
+				if (list != null)
+				{
+					for (int i = 0 ;  i < list.size(); i++)
+					{
+						Map h = (Map) list.get(i);
+						String lineClass = "NormalRes";
+						if (h.get("abn") != null && h.get("abn").equals("A"))
+						{
+							lineClass = "AbnormalRes";
+						}
+			%>
 
 			<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>"
 				class="<%=lineClass%>">
@@ -267,8 +273,10 @@ window.close();
 				<td align="center"><%=h.get("collDate")%></td>
 			</tr>
 
-			<%     }
-                            } %>
+			<%
+					}
+				}
+			%>
 
 		</table>
 
@@ -280,20 +288,15 @@ window.close();
 					onClick="window.close()"> <input type="button"
 					value=" <bean:message key="global.btnPrint"/> "
 					onClick="window.print()">
-                               <%-- <input type="button" value="Plot"
-                                onclick="window.open('../../../oscarEncounter/GraphMeasurements.do?method=actualLab&demographic_no=<%=demographicNo%>&labType=<%=labType%>&identifier=<%=identifier%>&testName=<%=testName%>');"/>
-                                --%>
-                               <input type="button" value="Plot"
-                                onclick="window.location = 'labValuesGraph.jsp?demographic_no=<%=demographicNo%>&labType=<%=labType%>&identifier=<%=identifier%>&testName=<%=testName%>';"/>
-
-                                </td>
+					<input type="button"
+						   value="Plot"
+						   onclick="window.location = 'labValuesGraph.jsp?demographic_no=<%=demographicNo%>&labType=<%=labType%>&identifier=<%=identifier%>&testName=<%=testName%>';"/>
+				</td>
 			</tr>
 		</table>
 		</td>
 	</tr>
 </table>
-
 </form>
-<%}%>
 </body>
 </html>
