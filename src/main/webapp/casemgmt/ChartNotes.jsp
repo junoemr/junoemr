@@ -540,9 +540,17 @@ try
 			$("encMainDiv").style.height = divHeight+'px';
 		}
 	</script>
-
 	<div id='save' style="width: 99%; background-color: #CCCCFF; padding-top: 5px; margin-left: 2px; border-left: thin solid #000000; border-right: thin solid #000000; border-bottom: thin solid #000000;">
 		<span style="float: right; margin-right: 5px;">
+
+		<div class="encounter_timer_container">
+			<div style="display: inline-block; position:relative;">
+				<div id="encounter_timer_background"></div>
+				<div id="encounter_timer" title="Paste timer data" onclick="encounterTimer.putEncounterTimeInNote()">00:00</div>
+			</div>
+			<div id="encounter_timer_pause" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"><i class="fa fa-pause"></i></div>
+			<div id="encounter_timer_play" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"><i class="fa fa-play"></i></div>
+		</div>
 		<%
 
 			if(facility.isEnableGroupNotes()) {
@@ -578,14 +586,6 @@ try
 	    	</span>
     	</div>
     	<div style="padding-top: 3px;">
-			<div class="encounter_timer_container">
-				<div style="display: inline-block; position:relative;">
-					<div id="encounter_timer_background"></div>
-					<div id="encounter_timer" title="Paste timer data" onclick="encounterTimer.putEncounterTimeInNote()">00:00</div>
-				</div>
-				<div id="encounter_timer_pause" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"><i class="fa fa-pause"></i></div>
-				<div id="encounter_timer_play" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"><i class="fa fa-play"></i></div>
-			</div>
     		<button type="button" onclick="return showHideIssues(event, 'noteIssues-resolved');"><bean:message key="oscarEncounter.Index.btnDisplayResolvedIssues"/></button> &nbsp;
     		<button type="button" onclick="return showHideIssues(event, 'noteIssues-unresolved');"><bean:message key="oscarEncounter.Index.btnDisplayUnresolvedIssues"/></button> &nbsp;
     		<button type="button" onclick="javascript:spellCheck();">Spell Check</button> &nbsp;
