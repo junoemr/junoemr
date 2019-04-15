@@ -65,7 +65,6 @@
 	{
 		identifier = "NULL";
 	}
-	String highlight = "#E0E0FF";
 	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
 	DemographicData dData = new DemographicData();
@@ -107,30 +106,15 @@
 		<bean:message key="oscarMDS.segmentDisplay.title" />
 	</title>
 	<link rel="stylesheet" type="text/css" href="../../../share/css/OscarStandardLayout.css">
-	<link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
+	<link rel="stylesheet" type="text/css" media="all" href="../../../share/css/extractedFromPages.css"/>
 </head>
-
-<script language="JavaScript">
-function getComment() {
-    var commentVal = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', '');
-    document.acknowledgeForm.comment.value = commentVal;
-    return true;
-}
-
-function popupStart(vheight,vwidth,varpage,windowname) {
-    var page = varpage;
-    windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes";
-    var popup=window.open(varpage, windowname, windowprops);
-}
-</script>
-
 <body>
 
   <%
-	  if(demographic==null)
+	  if(demographic == null)
 	  {
   %>
-  <script language="JavaScript">
+  <script type="text/javascript" language="JavaScript">
 	  alert("The demographic number is not valid");
 	  window.close();
   </script>
@@ -140,13 +124,13 @@ function popupStart(vheight,vwidth,varpage,windowname) {
 	%>
 <form name="acknowledgeForm" method="post" action="../../../oscarMDS/UpdateStatus.do">
 
-<table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
 	<tr>
 		<td valign="top">
-		<table width="100%" border="1" cellspacing="0" cellpadding="3" bgcolor="#9999CC" bordercolordark="#bfcbe3">
+		<table width="100%" border="1" cellspacing="0" cellpadding="3" bgcolor="#9999CC">
 
 			<tr>
-				<td width="66%" align="middle" class="Cell">
+				<td width="66%" align="center" class="Cell">
 					<div class="Field2">
 						<bean:message key="oscarMDS.segmentDisplay.formDetailResults" />
 					</div>
@@ -155,13 +139,13 @@ function popupStart(vheight,vwidth,varpage,windowname) {
 
 			<tr>
 				<td bgcolor="white" valign="top">
-					<table valign="top" border="0" cellpadding="2" cellspacing="0" width="100%">
+					<table border="0" cellpadding="2" cellspacing="0" width="100%">
 						<tr valign="top">
 							<td valign="top" width="33%" align="left">
-								<table width="100%" border="0" cellpadding="2" cellspacing="0" valign="top">
+								<table width="100%" border="0" cellpadding="2" cellspacing="0">
 									<tr>
 										<td valign="top" align="left">
-											<table valign="top" border="0" cellpadding="3" cellspacing="0" width="50%">
+											<table border="0" cellpadding="3" cellspacing="0" width="50%">
 												<tr>
 													<td colspan="2" nowrap>
 													<div class="FieldData">
@@ -170,7 +154,7 @@ function popupStart(vheight,vwidth,varpage,windowname) {
 													</div>
 													</td>
 													<td colspan="2" nowrap>
-													<div class="FieldData" nowrap="nowrap">
+													<div class="FieldData">
 														<strong><bean:message key="oscarMDS.segmentDisplay.formSex" />: </strong>
 														<%=demographic.getSex()%>
 													</div>
@@ -184,7 +168,7 @@ function popupStart(vheight,vwidth,varpage,windowname) {
 													</div>
 													</td>
 													<td colspan="2" nowrap>
-													<div class="FieldData" nowrap="nowrap">
+													<div class="FieldData">
 														<strong><bean:message key="oscarMDS.segmentDisplay.formAge" />: </strong>
 														<%=demographic.getAge()%>
 													</div>
@@ -203,11 +187,10 @@ function popupStart(vheight,vwidth,varpage,windowname) {
 
 			<tr>
 				<td align="center" bgcolor="white" colspan="2">
-					<table width="100%" height="20" border="0" cellpadding="0" cellspacing="0">
+					<table width="100%" border="0" cellpadding="0" cellspacing="0">
 						<tr>
 							<td align="center" bgcolor="white">
 							<div class="FieldData">
-							<center></center>
 							</div>
 							</td>
 						</tr>
@@ -227,25 +210,23 @@ function popupStart(vheight,vwidth,varpage,windowname) {
 
 		</table>
 
-		<table width="100%" border="0" cellspacing="0" cellpadding="2"
-			bgcolor="#CCCCFF" bordercolor="#9966FF" bordercolordark="#bfcbe3"
-			name="tblDiscs" id="tblDiscs">
+		<table width="100%" border="0" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF" name="tblDiscs" id="tblDiscs">
 			<tr class="Field2">
-				<td width="25%" align="middle" valign="bottom" class="Cell">
+				<td width="25%" align="center" valign="bottom" class="Cell">
 					<bean:message key="oscarMDS.segmentDisplay.formTestName" />
 				</td>
-				<td width="15%" align="middle" valign="bottom" class="Cell">
+				<td width="15%" align="center" valign="bottom" class="Cell">
 					<bean:message key="oscarMDS.segmentDisplay.formResult" />
 				</td>
-				<td width="5%" align="middle" valign="bottom" class="Cell">
+				<td width="5%" align="center" valign="bottom" class="Cell">
 					<bean:message key="oscarMDS.segmentDisplay.formAbn" />
 				</td>
-				<td width="15%" align="middle" valign="bottom" class="Cell">
+				<td width="15%" align="center" valign="bottom" class="Cell">
 					<bean:message key="oscarMDS.segmentDisplay.formReferenceRange" />
 				</td>
-				<td width="10%" align="middle" valign="bottom" class="Cell">
+				<td width="10%" align="center" valign="bottom" class="Cell">
 					<bean:message key="oscarMDS.segmentDisplay.formUnits" /></td>
-				<td width="15%" align="middle" valign="bottom" class="Cell">
+				<td width="15%" align="center" valign="bottom" class="Cell">
 					<bean:message key="oscarMDS.segmentDisplay.formDateTimeCompleted" />
 				</td>
 			</tr>
@@ -263,8 +244,7 @@ function popupStart(vheight,vwidth,varpage,windowname) {
 						}
 			%>
 
-			<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>"
-				class="<%=lineClass%>">
+			<tr class="<%=lineClass%>">
 				<td valign="top" align="left"><%=h.get("testName") %></td>
 				<td align="right"><%=h.get("result") %></td>
 				<td align="center"><%=h.get("abn") %></td>

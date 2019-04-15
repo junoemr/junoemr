@@ -61,7 +61,7 @@ if(!authed) {
 
     Demographic demographic = dData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demographicNo);
 
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     Hashtable<String, String> drugTable = new Hashtable<String, String>();
     String drugForGraph = "";
     if (request.getParameterValues("drug") != null)
@@ -69,7 +69,8 @@ if(!authed) {
         String[] drugs = request.getParameterValues("drug");
         for (String drug : drugs)
         {
-            buffer.append("&drug=" + drug);
+            String drugParam = "&drug=" + drug;
+            buffer.append(drugParam);
             drugTable.put(drug, "drug");
         }
         drugForGraph = buffer.toString();
@@ -80,33 +81,17 @@ if(!authed) {
     <head>
         <script type="text/javascript" src="<%= request.getContextPath()%>/js/global.js"></script>
         <html:base />
-        <title><%=""/*lab.pLastName*/%>, <%=""/*lab.pFirstName*/%>
-            <bean:message key="oscarMDS.segmentDisplay.title" /></title>
+        <title><bean:message key="oscarMDS.segmentDisplay.title" /></title>
         <link rel="stylesheet" type="text/css" href="../../../share/css/OscarStandardLayout.css">
-        <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
+        <link rel="stylesheet" type="text/css" media="all" href="../../../share/css/extractedFromPages.css"  />
     </head>
-
-    <script language="JavaScript">
-        function getComment() {
-            var commentVal = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', '');
-            document.acknowledgeForm.comment.value = commentVal;
-            return true;
-        }
-
-        function popupStart(vheight,vwidth,varpage,windowname) {
-            var page = varpage;
-            windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes";
-            var popup=window.open(varpage, windowname, windowprops);
-        }
-    </script>
-
     <body>
-    <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr>
             <td valign="top">
-                <table width="100%" border="1" cellspacing="0" cellpadding="3" bgcolor="#9999CC" bordercolordark="#bfcbe3">
+                <table width="100%" border="1" cellspacing="0" cellpadding="3" bgcolor="#9999CC">
                     <tr>
-                        <td width="66%" align="middle" class="Cell">
+                        <td width="66%" align="center" class="Cell">
                             <div class="Field2">
                                 <bean:message key="oscarMDS.segmentDisplay.formDetailResults" />
                             </div>
@@ -114,13 +99,13 @@ if(!authed) {
                     </tr>
                     <tr>
                         <td bgcolor="white" valign="top">
-                            <table valign="top" border="0" cellpadding="2" cellspacing="0" width="100%">
+                            <table border="0" cellpadding="2" cellspacing="0" width="100%">
                                 <tr valign="top">
                                     <td valign="top" width="33%" align="left">
-                                        <table width="100%" border="0" cellpadding="2" cellspacing="0"valign="top">
+                                        <table width="100%" border="0" cellpadding="2" cellspacing="0">
                                             <tr>
                                                 <td valign="top" align="left">
-                                                    <table valign="top" border="0" cellpadding="3" cellspacing="0" width="50%">
+                                                    <table border="0" cellpadding="3" cellspacing="0" width="50%">
                                                         <tr>
                                                             <td colspan="2" nowrap>
                                                                 <div class="FieldData">
@@ -129,7 +114,7 @@ if(!authed) {
                                                                 </div>
                                                             </td>
                                                             <td colspan="2" nowrap>
-                                                                <div class="FieldData" nowrap="nowrap">
+                                                                <div class="FieldData">
                                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formSex" />: </strong>
                                                                     <%=demographic.getSex()%>
                                                                 </div>
@@ -143,7 +128,7 @@ if(!authed) {
                                                                 </div>
                                                             </td>
                                                             <td colspan="2" nowrap>
-                                                                <div class="FieldData" nowrap="nowrap">
+                                                                <div class="FieldData">
                                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formAge" />: </strong><%=demographic.getAge()%>
                                                                 </div>
                                                             </td>
@@ -165,11 +150,10 @@ if(!authed) {
 
                     <tr>
                         <td align="center" bgcolor="white" colspan="2">
-                            <table width="100%" height="20" border="0" cellpadding="0" cellspacing="0">
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td align="center" bgcolor="white">
                                         <div class="FieldData">
-                                            <center></center>
                                         </div>
                                     </td>
                                 </tr>
@@ -206,16 +190,14 @@ if(!authed) {
                         RxPrescriptionData prescriptData = new RxPrescriptionData();
                         RxPrescriptionData.Prescription[] arr = prescriptData.getUniquePrescriptionsByPatient(Integer.parseInt(demographicNo));
 
-                        for (int idx = 0; idx < arr.length; ++idx)
+                        for (RxPrescriptionData.Prescription drug : arr)
                         {
-                            oscar.oscarRx.data.RxPrescriptionData.Prescription drug = arr[idx];
                             if (drug.isArchived() || drug.isCustom())
                             {
                                 continue;
                             }
-
                             %>
-                            <li><input type="checkbox"  <%=getChecked(drugTable, drug.getRegionalIdentifier())%> name="drug" value="<%=drug.getRegionalIdentifier()%>" /> <%=drug.getFullOutLine().replaceAll(";", " ")%> </li>
+                            <li><input type="checkbox" <%=getChecked(drugTable, drug.getRegionalIdentifier())%> name="drug" value="<%=drug.getRegionalIdentifier()%>" /> <%=drug.getFullOutLine().replaceAll(";", " ")%> </li>
                             <%
                          }
                         %>
