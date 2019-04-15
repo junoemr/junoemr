@@ -86,15 +86,19 @@ public class EFormExportZip {
 			_log.debug("before:>" + fileName + "<");
 			if (fileName == null || fileName.equals(""))
 			{
-				// Make fileName = formname with all spaces removed
-				fileName = eForm.getFormName().replaceAll("\\s", "") + ".html";
+				// Make fileName = formname with all spaces and '/' removed
+				fileName = eForm.getFormName()
+						.replaceAll("/", "_")
+						.replaceAll("\\s", "")
+						+ ".html";
 			}
 			_log.debug("after:>"+fileName+"<");
 
+			//formName with all spaces and intermediary '/' removed
 			String directoryName = eForm.getFormName()
 					.replaceAll("/", "_")
 					.replaceAll("\\s", "")
-					+ "/"; //formName with all spaces removed
+					+ "/";
 			String html = eForm.getFormHtml();
 			properties.setProperty("form.htmlFilename", fileName);
 			if (eForm.getFormName() != null && !eForm.getFormName().isEmpty())
@@ -133,7 +137,7 @@ public class EFormExportZip {
 			zos.closeEntry();
 
 			// Write html
-			String htmlFilename = directoryName + fileName.replaceAll("/", "");
+			String htmlFilename = directoryName + fileName;
 			_log.debug("html file name " + htmlFilename);
 			ZipEntry htmlZipEntry = new ZipEntry(htmlFilename);
 			zos.putNextEntry(htmlZipEntry);
