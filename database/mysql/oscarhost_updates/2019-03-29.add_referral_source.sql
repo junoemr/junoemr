@@ -8,7 +8,8 @@ CREATE PROCEDURE demographic_referral_source()
   IF NOT EXISTS
     (SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
       WHERE table_name = 'demographic'
-      AND column_name='referral_source_id') THEN
+      AND column_name='referral_source_id'
+      AND table_schema=DATABASE()) THEN
     ALTER TABLE demographic
     ADD COLUMN referral_source_id INT DEFAULT NULL,
     ADD CONSTRAINT demographic_referral_source_id_fk FOREIGN KEY (referral_source_id) REFERENCES referral_source(id) ON DELETE SET NULL;
@@ -20,7 +21,8 @@ CREATE PROCEDURE demographicArchive_referral_source()
   IF NOT EXISTS
     (SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
       WHERE table_name = 'demographicArchive'
-      AND column_name='referral_source_id') THEN
+      AND column_name='referral_source_id'
+      AND table_schema=DATABASE()) THEN
     ALTER TABLE demographicArchive
     ADD COLUMN referral_source_id INT DEFAULT NULL,
     ADD CONSTRAINT demographicArchive_referral_source_id_fk FOREIGN KEY (referral_source_id) REFERENCES referral_source(id) ON DELETE SET NULL;
