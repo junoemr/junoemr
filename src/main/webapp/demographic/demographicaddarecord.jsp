@@ -108,7 +108,6 @@
 		<form method="post" name="addappt">
 			<%
 				LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-
 				//If this is from adding appointment screen, then back to there
 				String fromAppt = request.getParameter("fromAppt");
 				String originalPage2 = request.getParameter("originalPage");
