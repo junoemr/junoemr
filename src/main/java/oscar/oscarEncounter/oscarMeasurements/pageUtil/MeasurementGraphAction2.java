@@ -115,13 +115,7 @@ public class MeasurementGraphAction2 extends Action {
 		String method = request.getParameter("method");
 
 		JFreeChart chart;
-		// Only this and ChartMeds are ever referenced, considering deleting the rest...
-		// Reasons for straight up removing the rest:
-		// (1) it's all theoretical and duplicated code from original Oscar
-		// (2) this module only ever gets called from a single action -- GraphMeasurements.do
-		//     Said strut action only gets called from two places:
-		//     [a] labValuesGraph.jsp with parameter method=actualLab
-		//     [b] chartDrugProfile.jsp with parameter method=ChartMeds
+
 		if (method.equals("actualLab"))
 		{
 			String labType    = request.getParameter("labType");
@@ -145,9 +139,9 @@ public class MeasurementGraphAction2 extends Action {
 		}
 
 		response.setContentType("image/png");
-		OutputStream o = response.getOutputStream();
-		ChartUtilities.writeChartAsPNG(o, chart, width, height);
-		o.close();
+		OutputStream outputStream = response.getOutputStream();
+		ChartUtilities.writeChartAsPNG(outputStream, chart, width, height);
+		outputStream.close();
 		return null;
 	}
 
@@ -311,7 +305,7 @@ public class MeasurementGraphAction2 extends Action {
 		{
 			XYTaskDataset drugDataset = getDrugDataSet(demographicNo, drugs);
 
-			SymbolAxis yAxis = new SymbolAxis("Meds",  getDrugSymbol(demographicNo,drugs));
+			SymbolAxis yAxis = new SymbolAxis("Meds", getDrugSymbol(demographicNo, drugs));
 			yAxis.setGridBandsVisible(false);
 			XYBarRenderer xyrenderer = new XYBarRenderer();
 			xyrenderer.setUseYInterval(true);
@@ -326,7 +320,7 @@ public class MeasurementGraphAction2 extends Action {
 			cplot.add(plot);
 			cplot.add(xyplot);
 
-			chart = new JFreeChart(chartTitle,cplot);
+			chart = new JFreeChart(chartTitle, cplot);
 			chart.setBackgroundPaint(Color.white);
 		}
 		return chart;
@@ -336,7 +330,7 @@ public class MeasurementGraphAction2 extends Action {
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
 
 		ArrayList<EctMeasurementsDataBean> list = getList(demographicNo, typeIdName);
-		String typeYAxisName = "";
+		String typeYAxisName;
 
 		if (typeIdName.equals("BP"))
 		{
@@ -412,29 +406,29 @@ public class MeasurementGraphAction2 extends Action {
 					log.debug("Error passing measurement value to chart. DataField is empty for ID:" + mdb.getId());
 				}
 			}
-		dataset2.addSeries(newSeries);
+            dataset2.addSeries(newSeries);
 
-		final XYPlot plot = chart.getXYPlot();
-		final NumberAxis axis2 = new NumberAxis(typeYAxisName2);
-		axis2.setAutoRangeIncludesZero(false);
-		plot.setRangeAxis(1, axis2);
-		plot.setDataset(1, dataset2);
-		plot.mapDatasetToRangeAxis(1, 1);
-		final XYItemRenderer renderer = plot.getRenderer();
-		renderer.setBaseToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
-		if (renderer instanceof StandardXYItemRenderer) {
-			final StandardXYItemRenderer rr = (StandardXYItemRenderer) renderer;
+            final XYPlot plot = chart.getXYPlot();
+            final NumberAxis axis2 = new NumberAxis(typeYAxisName2);
+            axis2.setAutoRangeIncludesZero(false);
+            plot.setRangeAxis(1, axis2);
+            plot.setDataset(1, dataset2);
+            plot.mapDatasetToRangeAxis(1, 1);
+            final XYItemRenderer renderer = plot.getRenderer();
+            renderer.setBaseToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
+            if (renderer instanceof StandardXYItemRenderer) {
+                final StandardXYItemRenderer rr = (StandardXYItemRenderer) renderer;
 
-			rr.setBaseShapesFilled(true);
-		}
+                rr.setBaseShapesFilled(true);
+            }
 
-		final StandardXYItemRenderer renderer2 = new StandardXYItemRenderer();
-		renderer2.setSeriesPaint(0, Color.black);
-		renderer.setBaseToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
-		plot.setRenderer(1, renderer2);
+            final StandardXYItemRenderer renderer2 = new StandardXYItemRenderer();
+            renderer2.setSeriesPaint(0, Color.black);
+            renderer.setBaseToolTipGenerator(StandardXYToolTipGenerator.getTimeSeriesInstance());
+            plot.setRenderer(1, renderer2);
 
-		}
-		return chart;
+            }
+            return chart;
 	}
 
 	/*
