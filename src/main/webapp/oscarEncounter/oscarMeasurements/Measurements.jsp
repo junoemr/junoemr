@@ -49,7 +49,6 @@
 
 <head>
 	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-	<link rel="stylesheet" type="text/css" href="styles/measurementStyle.css">
 
 	<title>
 		<logic:present name="groupName">
@@ -98,6 +97,7 @@ function check() {
 </script>
 <body class="BodyStyle" vlink="#0000FF" onload="window.focus();">
 <html:form action="/oscarEncounter/Measurements">
+	<link rel="stylesheet" type="text/css" href="styles/measurementStyle.css">
 	<logic:present name="css">
 		<link rel="stylesheet" type="text/css"
 			href="<bean:write name="css" />">
