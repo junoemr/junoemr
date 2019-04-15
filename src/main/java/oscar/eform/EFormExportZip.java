@@ -74,41 +74,67 @@ public class EFormExportZip {
         ZipOutputStream zos = new ZipOutputStream(os);
         zos.setLevel(9);
 
-        for (EForm eForm: eForms) {
-            if (eForm.getFormName() == null || eForm.getFormName().equals("")) {
+        for (EForm eForm: eForms)
+        {
+            if (eForm.getFormName() == null || eForm.getFormName().equals(""))
+            {
                 _log.error("Eform must have a name to export.  FID: " + eForm.getFid());
                 throw new Exception("EForm must have a name to export");
             }
             Properties properties = new Properties(); //put all form properties into here
             String fileName = eForm.getFormFileName();
-            _log.debug("before:>"+fileName+"<");
-            if (fileName == null || fileName.equals("")) {
-                fileName = eForm.getFormName().replaceAll("\\s", "") + ".html"; //make fileName = formname with all spaces removed
+            _log.debug("before:>" + fileName + "<");
+            if (fileName == null || fileName.equals(""))
+            {
+                // Make fileName = formname with all spaces removed
+                fileName = eForm.getFormName().replaceAll("\\s", "") + ".html";
             }
             _log.debug("after:>"+fileName+"<");
 
-            String directoryName = eForm.getFormName().replaceAll("/", "_").replaceAll("\\s", "") + "/"; //formName with all spaces removed
-
+            String directoryName = eForm.getFormName()
+                    .replaceAll("/", "_")
+                    .replaceAll("\\s", "")
+                    + "/"; //formName with all spaces removed
             String html = eForm.getFormHtml();
             properties.setProperty("form.htmlFilename", fileName);
-            if (eForm.getFormName()!=null && !eForm.getFormName().equals("")) properties.setProperty("form.name", eForm.getFormName());
-            if (eForm.getFormSubject()!=null && !eForm.getFormSubject().equals("")) properties.setProperty("form.details", eForm.getFormSubject());
-            if (eForm.getFormCreator()!=null && !eForm.getFormCreator().equals("")) properties.setProperty("form.creator", eForm.getFormCreator());
-            if (eForm.getFormDate()!=null && !eForm.getFormDate().equals("")) properties.setProperty("form.date", eForm.getFormDate());
-            if (eForm.isShowLatestFormOnly()) properties.setProperty("form.showLatestFormOnly", "true");
-            if (eForm.isPatientIndependent()) properties.setProperty("form.patientIndependent", "true");
-	        if (eForm.isInstanced()) properties.setProperty("form.instanced", "true");
+            if (eForm.getFormName() != null && !eForm.getFormName().isEmpty())
+            {
+                properties.setProperty("form.name", eForm.getFormName());
+            }
+            if (eForm.getFormSubject() != null && !eForm.getFormSubject().isEmpty())
+            {
+                properties.setProperty("form.details", eForm.getFormSubject());
+            }
+            if (eForm.getFormCreator() != null && !eForm.getFormCreator().isEmpty())
+            {
+                properties.setProperty("form.creator", eForm.getFormCreator());
+            }
+            if (eForm.getFormDate() != null && !eForm.getFormDate().isEmpty())
+            {
+                properties.setProperty("form.date", eForm.getFormDate());
+            }
+            if (eForm.isShowLatestFormOnly())
+            {
+                properties.setProperty("form.showLatestFormOnly", "true");
+            }
+            if (eForm.isPatientIndependent())
+            {
+                properties.setProperty("form.patientIndependent", "true");
+            }
+	        if (eForm.isInstanced())
+            {
+                properties.setProperty("form.instanced", "true");
+            }
 
-            //write properties file
+            // Write properties file
             ZipEntry propertiesZipEntry = new ZipEntry(directoryName + "eform.properties");
             zos.putNextEntry(propertiesZipEntry);
             properties.store(zos, "");
             zos.closeEntry();
 
-            //write html
-            String htmlFilename = "";
-            htmlFilename = directoryName + fileName.replaceAll("/", "");
-            _log.debug("html file name "+htmlFilename);
+            // Write html
+            String htmlFilename = directoryName + fileName.replaceAll("/", "");
+            _log.debug("html file name " + htmlFilename);
             ZipEntry htmlZipEntry = new ZipEntry(htmlFilename);
             zos.putNextEntry(htmlZipEntry);
             byte[] bytes = html.getBytes("UTF-8");
@@ -117,10 +143,12 @@ public class EFormExportZip {
             zos.closeEntry();
 
             //get Images, must do html search for image name
-            Pattern eformImagePattern = Pattern.compile("\\$\\{oscar_image_path\\}.+?[\"|'|>|<]"); //searches for ${oscar_image_path}xxx...xxx" (terminated by ", ', or >)
+            //searches for ${oscar_image_path}xxx...xxx" (terminated by ", ', or >)
+            Pattern eformImagePattern = Pattern.compile("\\$\\{oscar_image_path\\}.+?[\"|'|>|<]");
             Matcher matcher = eformImagePattern.matcher(html);
             int start = 0;
-            while (matcher.find(start)) {
+            while (matcher.find(start))
+            {
                 String match = matcher.group();
                 MiscUtils.getLogger().debug(match);
                 start = matcher.end();
@@ -128,16 +156,18 @@ public class EFormExportZip {
                 String imageFileName = match.substring(length, match.length()-1);
                 MiscUtils.getLogger().debug("Image Name: " + imageFileName);
                 File imageFile = DisplayImageAction.getImageFile(imageFileName);
-                try {
-                    FileInputStream fis = new FileInputStream(imageFile);  //should error out if image not found, in this case, skip the image
+                try
+                {
+                    FileInputStream fis = new FileInputStream(imageFile);
                     ZipEntry imageZipEntry = new ZipEntry(directoryName + imageFileName);
                     zos.putNextEntry(imageZipEntry);
                     outputToInput(zos, fis);
                     zos.closeEntry();
-                } catch (FileNotFoundException fnfe) {
-                     continue;
                 }
-
+                catch (FileNotFoundException fnfe)
+                {
+                    // Skip image if we errored out (couldn't find image)
+                }
             }
         }
 
@@ -219,11 +249,6 @@ public class EFormExportZip {
                 FileOutputStream fos = new FileOutputStream(tempFile);
                 inputToOutput(zis, fos);
                 fos.close();
-                //store temp files in memory
-                /*ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                inputToOutput(zis, baos);
-                tempFiles.put(file.getName(), baos.toByteArray());
-                baos.close();*/
             }
             zis.closeEntry();
         }
