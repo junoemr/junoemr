@@ -23,6 +23,7 @@
  */
 package oscar.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
@@ -382,7 +383,6 @@ public class ConversionUtils {
 	/**
 	 * Some date strings that we receive are sometimes missing leading zeroes, i.e:
 	 * - 2019-4-8
-	 * - 019-04-8
 	 * - 2019-4-08
 	 *
 	 * LocalDate can interpret these properly if we individually feed in the year, month, and day.
@@ -393,19 +393,27 @@ public class ConversionUtils {
 	 *		Note that LocalDate *could* fix a bad year (a year like 019 or 219)
 	 *		but allowing a year entry like these to be entered could cause more problems.
 	 * @return dateString
-	 *		Original dateString if parsing and splitting fails at any point, otherwise
-	 *		returns a new dateString of format yyyy-MM-dd
+	 *		Original dateString if it's already in good shape or parsing fails
+	 *		Otherwise return a new dateString of format yyyy-MM-dd
 	 */
 	public static String padDateString(String dateString)
 	{
+		// Don't operate on strings that are either already formatted correctly
+		// or have no chance of being formatted correctly
+		if (dateString.length() < 8 || dateString.length() >= 10 || StringUtils.countMatches(dateString, "-") != 2)
+		{
+			return dateString;
+		}
+
+		String[] splitDate = dateString.split("-");
+		// If we didn't get [yyyy, (M)M, (d)d] then there's no point
+		if (splitDate.length != 3 || splitDate[0].length() != 4)
+		{
+			return dateString;
+		}
+
 		try
 		{
-			String[] splitDate = dateString.split("-");
-			// If we didn't get [year, month, day] then there's no point
-			if (splitDate.length != 3 || splitDate[0].length() != 4)
-			{
-				return dateString;
-			}
 			int year = Integer.parseInt(splitDate[0]);
 			int month = Integer.parseInt(splitDate[1]);
 			int date = Integer.parseInt(splitDate[2]);
@@ -420,7 +428,6 @@ public class ConversionUtils {
 
 	public static Date coalesceTimeStampString(String dateString)
 	{
-		dateString = padDateString(dateString);
 		return coalesceTimeStampString(dateString, DEFAULT_TS_PATTERN);
 	}
 	public static Date coalesceTimeStampString(String plain, String inFormat)

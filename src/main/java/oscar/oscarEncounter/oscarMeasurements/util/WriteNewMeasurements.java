@@ -242,7 +242,7 @@ public class WriteNewMeasurements {
             String inputType = (String) measure.get("type");
             String mInstrc = (String) measure.get("measuringInstruction");
             String comments = (String) measure.get("comments");
-            String dateObserved = (String) measure.get("dateObserved");
+            String dateObserved = ConversionUtils.padDateString((String) measure.get("dateObserved"));
             String dateEntered = (String) measure.get("dateEntered");
             //write....
             Measurement m = new Measurement();
