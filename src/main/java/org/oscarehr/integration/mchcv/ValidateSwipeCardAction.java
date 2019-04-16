@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.util.MiscUtils;
 
 public class ValidateSwipeCardAction extends org.apache.struts.action.Action {
 
@@ -48,8 +47,6 @@ public class ValidateSwipeCardAction extends org.apache.struts.action.Action {
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         ValidateSwipeCard formBean = (ValidateSwipeCard) form;
-        String magneticStripe = formBean.getMagneticStripe();
-        MiscUtils.getLogger().info("New Card Data: [" + magneticStripe + "]");
 
         HCValidator validator = HCValidationFactory.getHCValidator();
         HCValidationResult validationResult = validator.validate(formBean.getHin(), formBean.getHinVer());
