@@ -2812,7 +2812,6 @@
 
 	function savePage(method, chain)
 	{
-
 		if (typeof jQuery("form[name='resident'] input[name='residentMethod']").val() != "undefined" &&
 			jQuery("form[name='resident'] input[name='residentMethod']").val().trim().length == 0 &&
 			method.match(/.*[Ee]xit$/g) != null)
@@ -2954,7 +2953,7 @@
 						 }
 					   );
 	*/
-		return false;
+		return true;
 	}
 
 	function maximizeWindow()
@@ -2970,11 +2969,13 @@
 		document.forms['caseManagementEntryForm'].sign.value='on';
 		document.forms['caseManagementEntryForm'].toBill.value='true';
 
-		Event.stop(event);
-
-		maximizeWindow();
-
-		return savePage('saveAndExit', '');
+		var saved = savePage('saveAndExit', '');
+		if (saved === true)
+		{
+			Event.stop(event);
+			maximizeWindow();
+		}
+		return saved;
 	}
 
 	var changeIssueMsg;
