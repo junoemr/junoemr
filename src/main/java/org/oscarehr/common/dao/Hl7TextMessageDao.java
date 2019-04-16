@@ -83,11 +83,8 @@ public class Hl7TextMessageDao extends AbstractDao<Hl7TextMessage> {
 	 */
 	public String getLabTypeFromLabId(Integer labID)
 	{
-		String queryStr = "select h from Hl7TextMessage h WHERE h.id=?1";
-		Query query = entityManager.createQuery(queryStr);
-		query.setParameter(1, labID);
+		Hl7TextMessage result = find(labID);
 
-		Hl7TextMessage result = getSingleResultOrNull(query);
 		if (result != null)
 		{
 			return result.getType();
