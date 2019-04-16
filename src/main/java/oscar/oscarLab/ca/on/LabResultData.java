@@ -170,7 +170,7 @@ public class LabResultData implements Comparable<LabResultData> {
 	// to flag them all as "Unknown" so user notices and hopefully reads
 	public boolean isUnknown()
 	{
-		if (this.segmentID == null || this.discipline == null)
+		if (this.segmentID == null || this.discipline == null || this.labType.equals(DOCUMENT))
 		{
 			return false;
 		}
