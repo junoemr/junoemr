@@ -170,6 +170,11 @@ public class LabResultData implements Comparable<LabResultData> {
 	// to flag them all as "Unknown" so user notices and hopefully reads
 	public boolean isUnknown()
 	{
+		if (this.segmentID == null || this.discipline == null)
+		{
+			return false;
+		}
+
 		Hl7TextMessageDao msgDao = (Hl7TextMessageDao)SpringUtils.getBean("hl7TextMessageDao");
 		String msgType = msgDao.getLabTypeFromLabId(Integer.parseInt(this.segmentID));
 		boolean isLabCLS = msgType.equals("CLS") || msgType.equals("CLSDI") || msgType.equals("AHS");
