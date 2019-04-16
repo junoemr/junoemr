@@ -2844,15 +2844,6 @@
 			}
 		}
 
-		var noteStr;
-		noteStr = $F(caseNote);
-		/*
-		if( noteStr.replace(/^\s+|\s+$/g,"").length == 0 ) {
-			alert("Please enter a note before saving");
-			return false;
-		}
-		*/
-
 		if ($("observationDate") != undefined && $("observationDate").value.length > 0 && !validDate())
 		{
 			alert(pastObservationDateError);
@@ -2866,12 +2857,7 @@
 				alert(assignIssueError);
 				return false;
 			}
-			/* the observationDate could be the default one as today.
-			if( requireObsDate && $("observationDate").value.length == 0 ) {
-				alert(assignObservationDateError);
-				return false;
-			}
-			*/
+
 			if ($("encTypeSelect0") != null && $("encTypeSelect0").options[$("encTypeSelect0").selectedIndex].value.length == 0)
 			{
 				alert(assignEncTypeError);
@@ -2900,8 +2886,6 @@
 					}
 				}
 			}
-
-
 		}
 
 
@@ -2932,27 +2916,6 @@
 			}
 		);
 
-
-		/*var frm = document.forms["caseManagementViewForm"];
-		var url = ctx + "/CaseManagementView.do";
-		var objAjax = new Ajax.Request (
-						url,
-						{
-							method: 'post',
-							postBody: Form.serialize(frm),
-							onSuccess: function(request) {
-								tmpSaveNeeded = false;
-								caseMgtEntryfrm.submit();
-							},
-							onFailure: function(request) {
-								if( request.status == 403 )
-									alert(sessionExpiredError);
-								else
-									alert(request.status + " " + savingNoteError);
-							}
-						 }
-					   );
-	*/
 		return true;
 	}
 
