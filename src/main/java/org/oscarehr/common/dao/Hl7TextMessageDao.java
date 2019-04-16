@@ -72,22 +72,4 @@ public class Hl7TextMessageDao extends AbstractDao<Hl7TextMessage> {
 		
 		return result;
 	}
-
-	/**
-	 * Used primarily for previewing lab results (i.e. from inbox)
-	 * Most labs get listed as HL7 at this point, but sometimes we need more detailed information
-	 * on where the lab came from and the textInfo table does not have this labType stored.
-	 *
-	 * @param labID unique ID of the lab we need labType for
-	 * @return String indicating the type of lab we're working with
-	 */
-	public String getLabTypeFromLabId(Integer labID)
-	{
-		String query = "select type from Hl7TextMessage WHERE id=?1";
-		Query q = entityManager.createQuery(query);
-
-		q.setParameter(1, labID);
-
-		return (String)q.getSingleResult();
-	}
 }
