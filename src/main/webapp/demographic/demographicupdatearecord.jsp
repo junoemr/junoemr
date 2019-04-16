@@ -130,7 +130,7 @@
 	demographic.setRosterStatus(request.getParameter("roster_status"));
 	demographic.setPatientStatus(request.getParameter("patient_status"));
 	demographic.setChartNo(request.getParameter("chart_no"));
-	demographic.setProviderNo(request.getParameter("provider_no"));
+	demographic.setProviderNo(StringUtils.trimToNull(request.getParameter("provider_no")));
 	demographic.setSex(request.getParameter("sex"));
 	demographic.setPcnIndicator(request.getParameter("pcn_indicator"));
 	demographic.setHcType(request.getParameter("hc_type"));
