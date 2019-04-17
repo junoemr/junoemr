@@ -135,7 +135,7 @@ public class MeasurementGraphAction2 extends Action {
 		}
 		else
 		{
-			// This should never get hit, but exists as a fail-safe
+			// This should never get hit. Left as a fail-safe
 			chart = defaultChart(demographicNo, typeIdName, typeIdName2, chartTitle);
 		}
 
@@ -229,7 +229,6 @@ public class MeasurementGraphAction2 extends Action {
 				nameSet = true;
 			}
 			String mdbResult = (String)mdb.get("result");
-			mdbResult = mdbResult.replaceAll("[^0-9.]", "");
 			newSeries.addOrUpdate(new Day((Date) mdb.get("collDateDate")), Double.parseDouble(mdbResult));
 
 			if (mdb.get("range") != null)
@@ -244,15 +243,12 @@ public class MeasurementGraphAction2 extends Action {
 				if (range.contains("-"))
 				{
 					String[] sp = range.split("-");
-					if (sp.length > 1)
-					{
-						double open = Double.parseDouble(sp[0]);
-						double high = Double.parseDouble(sp[1]);
-						double low = Double.parseDouble(sp[0]);
-						double close = Double.parseDouble(sp[1]);
-						double volume = 1045;
-						dataItems.add(new OHLCDataItem(new Day((Date) mdb.get("collDateDate")).getStart(), open, high, low, close, volume));
-					}
+					double open = Double.parseDouble(sp[0]);
+					double high = Double.parseDouble(sp[1]);
+					double low = Double.parseDouble(sp[0]);
+					double close = Double.parseDouble(sp[1]);
+					double volume = 1045;
+					dataItems.add(new OHLCDataItem(new Day((Date) mdb.get("collDateDate")).getStart(), open, high, low, close, volume));
 				}
 			}
 
@@ -354,6 +350,30 @@ public class MeasurementGraphAction2 extends Action {
 		return chart;
 	}
 
+	/**
+	 * Wrapper for creating and filling a TimeSeries object with measurement data.
+	 * @param typeLegendName
+	 * 		name of the types in the legend
+	 * @param list
+	 * 		list of measurement data to add to the time series
+	 * @return
+	 * 		a TimeSeries object containing all non-empty data fields
+	 */
+	private TimeSeries fillTimeSeries(String typeLegendName, ArrayList<EctMeasurementsDataBean> list)
+	{
+		TimeSeries timeSeries = new TimeSeries(typeLegendName);
+		for (EctMeasurementsDataBean mdb : list)
+		{
+			if (mdb.getDataField().isEmpty())
+			{
+				log.debug("Error passing measurement value to chart. DataField is empty for ID: " + mdb.getId());
+				continue;
+			}
+			timeSeries.addOrUpdate(new Day(mdb.getDateObservedAsDate()), Double.parseDouble(mdb.getDataField()));
+		}
+		return timeSeries;
+	}
+
 	private JFreeChart defaultChart(Integer demographicNo, String typeIdName, String typeIdName2, String chartTitle) {
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
 
@@ -392,18 +412,7 @@ public class MeasurementGraphAction2 extends Action {
 			String typeLegendName = sampleLine.getTypeDisplayName();
 			typeYAxisName = sampleLine.getTypeDescription(); // this should be the type of measurement
 
-			TimeSeries newSeries = new TimeSeries(typeLegendName);
-			for (EctMeasurementsDataBean mdb : list)
-			{
-				if (!mdb.getDataField().equals(""))
-				{
-					newSeries.addOrUpdate(new Day(mdb.getDateObservedAsDate()), Double.parseDouble(mdb.getDataField()));
-				}
-				else
-				{
-					log.debug("Error passing measurement value to chart. DataField is empty for ID:" + mdb.getId());
-				}
-			}
+			TimeSeries newSeries = fillTimeSeries(typeLegendName, list);
 			dataset.addSeries(newSeries);
 		}
 
@@ -422,18 +431,7 @@ public class MeasurementGraphAction2 extends Action {
 			String typeLegendName = sampleLine2.getTypeDisplayName();
 			String typeYAxisName2 = sampleLine2.getTypeDescription(); // this should be the type of measurement
 
-			TimeSeries newSeries = new TimeSeries(typeLegendName);
-			for (EctMeasurementsDataBean mdb : list2)
-			{
-				if (!mdb.getDataField().equals(""))
-				{
-					newSeries.addOrUpdate(new Day(mdb.getDateObservedAsDate()), Double.parseDouble(mdb.getDataField()));
-				}
-				else
-				{
-					log.debug("Error passing measurement value to chart. DataField is empty for ID:" + mdb.getId());
-				}
-			}
+			TimeSeries newSeries = fillTimeSeries(typeLegendName, list2);
             dataset2.addSeries(newSeries);
 
             final XYPlot plot = chart.getXYPlot();

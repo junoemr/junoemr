@@ -84,7 +84,7 @@
 			CachedDemographicLabResult remoteLab = LabDisplayHelper.getRemoteLab(loggedInInfo, Integer.parseInt(remoteFacilityIdString), remoteLabKey,Integer.parseInt(demographicNo));
 			Document labContentsAsXml = LabDisplayHelper.getXmlDocument(remoteLab);
 			HashMap<String, ArrayList<Map<String, Serializable>>> mapOfTestValues=LabDisplayHelper.getMapOfTestValues(labContentsAsXml);
-			list=mapOfTestValues.get(identifier);
+			list = mapOfTestValues.get(identifier);
 		}
 
 		// Attempt to sort the lab result dates
@@ -231,26 +231,40 @@
 				</td>
 			</tr>
 			<%
-				int linenum = 0;
+				boolean canGraph = true;
 				if (list != null)
 				{
 					for (int i = 0 ;  i < list.size(); i++)
 					{
-						Map h = (Map) list.get(i);
+						Map hashMap = (Map) list.get(i);
 						String lineClass = "NormalRes";
-						if (h.get("abn") != null && h.get("abn").equals("A"))
+						if (hashMap.get("abn") != null && hashMap.get("abn").equals("A"))
 						{
 							lineClass = "AbnormalRes";
+						}
+
+						// Try casting result and referenceRange to double - if it works, we can graph
+						if (hashMap.get("result") != null && hashMap.get("range") != null)
+						{
+							try
+							{
+								Double.parseDouble((String)hashMap.get("result"));
+								Double.parseDouble((String)hashMap.get("range"));
+							}
+							catch (NumberFormatException ex)
+							{
+								canGraph = false;
+							}
 						}
 			%>
 
 			<tr class="<%=lineClass%>">
-				<td valign="top" align="left"><%=h.get("testName") %></td>
-				<td align="right"><%=h.get("result") %></td>
-				<td align="center"><%=h.get("abn") %></td>
-				<td align="left"><%=h.get("range")%></td>
-				<td align="left"><%=h.get("units") %></td>
-				<td align="center"><%=h.get("collDate")%></td>
+				<td valign="top" align="left"><%=hashMap.get("testName") %></td>
+				<td align="center"><%=hashMap.get("result") %></td>
+				<td align="center"><%=hashMap.get("abn") %></td>
+				<td align="center"><%=hashMap.get("range")%></td>
+				<td align="center"><%=hashMap.get("units") %></td>
+				<td align="center"><%=hashMap.get("collDate")%></td>
 			</tr>
 
 			<%
@@ -268,9 +282,25 @@
 					onClick="window.close()"> <input type="button"
 					value=" <bean:message key="global.btnPrint"/> "
 					onClick="window.print()">
+					<%
+						if (canGraph)
+						{
+					%>
 					<input type="button"
 						   value="Plot"
 						   onclick="window.location = 'labValuesGraph.jsp?demographic_no=<%=demographicNo%>&labType=<%=labType%>&identifier=<%=identifier%>&testName=<%=testName%>';"/>
+					<%
+						}
+						else
+						{
+					%>
+					<input type="button"
+						   value="Plot"
+						   title="Can't make a graph, either the range or the result can't be interpreted properly."
+						   disabled/>
+					<%
+						}
+					%>
 				</td>
 			</tr>
 		</table>
