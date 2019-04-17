@@ -122,7 +122,7 @@ public class MeasurementGraphAction2 extends Action {
 			String identifier = request.getParameter("identifier");
 			String testName   = request.getParameter("testName");
 			String[] drugs = request.getParameterValues("drug");
-			chart =  actualLabChartRef(demographicNo, labType, identifier, testName, chartTitle, drugs);
+			chart = actualLabChartRef(demographicNo, labType, identifier, testName, chartTitle, drugs);
 		}
 		else if(method.equals("ChartMeds"))
 		{
@@ -135,6 +135,7 @@ public class MeasurementGraphAction2 extends Action {
 		}
 		else
 		{
+			// This should never get hit, but exists as a fail-safe
 			chart = defaultChart(demographicNo, typeIdName, typeIdName2, chartTitle);
 		}
 
@@ -303,26 +304,53 @@ public class MeasurementGraphAction2 extends Action {
 
 		if (drugs != null)
 		{
-			XYTaskDataset drugDataset = getDrugDataSet(demographicNo, drugs);
-
-			SymbolAxis yAxis = new SymbolAxis("Meds", getDrugSymbol(demographicNo, drugs));
-			yAxis.setGridBandsVisible(false);
-			XYBarRenderer xyrenderer = new XYBarRenderer();
-			xyrenderer.setUseYInterval(true);
-			xyrenderer.setBarPainter(new StandardXYBarPainter());
-
-			XYPlot xyplot = new XYPlot(drugDataset, plot.getDomainAxis(), yAxis, xyrenderer);
-
-			xyplot.getDomainAxis().setUpperMargin(0.9);
-			xyplot.getDomainAxis().setLowerMargin(0.9);
-
-			CombinedDomainXYPlot cplot = new CombinedDomainXYPlot(new DateAxis("Date/Time"));
-			cplot.add(plot);
-			cplot.add(xyplot);
-
-			chart = new JFreeChart(chartTitle, cplot);
-			chart.setBackgroundPaint(Color.white);
+			chart = setupMedGraphChart(demographicNo, drugs, plot, chartTitle, true);
 		}
+		return chart;
+	}
+
+	/**
+	 * Sub-procedure to generate a graph indicating which medications were prescribed when and for how long.
+	 *
+	 * @param demographicNo
+	 * 		patient's demographic number
+	 * @param drugs
+	 * 		a list of every drug prescribed to the patient we want to add to the chart
+	 * @param plot
+	 * 		pre-existing plot that may be used alongside the medical graph we're setting up
+	 * @param chartTitle
+	 * 		name to apply to the overall set of graphs
+	 * @param multiPlot
+	 * 		boolean indicating whether we want to graph just the medication timeline or other data with it
+	 * @return
+	 * 		a chart containing a medication history plot along with any other plots we wanted to graph beside it
+	 */
+	private JFreeChart setupMedGraphChart(Integer demographicNo, String[] drugs, XYPlot plot, String chartTitle, boolean multiPlot)
+	{
+		XYTaskDataset drugDataset = getDrugDataSet(demographicNo, drugs);
+
+		SymbolAxis yAxis = new SymbolAxis("Meds", getDrugSymbol(demographicNo, drugs));
+		yAxis.setGridBandsVisible(false);
+		XYBarRenderer xyRenderer = new XYBarRenderer();
+		xyRenderer.setUseYInterval(true);
+		xyRenderer.setBarPainter(new StandardXYBarPainter());
+
+		XYPlot xyplot = new XYPlot(drugDataset, plot.getDomainAxis(), yAxis, xyRenderer);
+
+		final double percentMargin = 0.9;
+		xyplot.getDomainAxis().setUpperMargin(percentMargin);
+		xyplot.getDomainAxis().setLowerMargin(percentMargin);
+
+		CombinedDomainXYPlot combinedPlot = new CombinedDomainXYPlot(new DateAxis("Date/Time"));
+		if (multiPlot)
+		{
+			combinedPlot.add(plot);
+		}
+		combinedPlot.add(xyplot);
+
+		JFreeChart chart = new JFreeChart(chartTitle, combinedPlot);
+		chart.setBackgroundPaint(Color.white);
+
 		return chart;
 	}
 
@@ -441,25 +469,8 @@ public class MeasurementGraphAction2 extends Action {
 
 		XYPlot plot = chart.getXYPlot();
 
-		XYTaskDataset drugDataset = getDrugDataSet( demographicNo,drugs);
+		chart = setupMedGraphChart(demographicNo, drugs, plot, chartTitle, false);
 
-		SymbolAxis yAxis = new SymbolAxis("Meds",  getDrugSymbol(demographicNo,drugs));
-
-		yAxis.setGridBandsVisible(false);
-		XYBarRenderer xyrenderer = new XYBarRenderer();
-		xyrenderer.setUseYInterval(true);
-		xyrenderer.setBarPainter(new StandardXYBarPainter());
-
-		XYPlot xyplot = new XYPlot(drugDataset, plot.getDomainAxis(), yAxis, xyrenderer);
-
-		xyplot.getDomainAxis().setUpperMargin(0.9);
-		xyplot.getDomainAxis().setLowerMargin(0.9);
-
-		CombinedDomainXYPlot cplot = new CombinedDomainXYPlot(new DateAxis("Date/Time"));
-		cplot.add(xyplot);
-
-		chart = new JFreeChart(chartTitle,cplot);
-		chart.setBackgroundPaint(Color.white);
 		return chart;
 	}
 }
