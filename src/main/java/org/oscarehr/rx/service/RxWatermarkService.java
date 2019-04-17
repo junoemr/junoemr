@@ -28,29 +28,40 @@ import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.UserProperty;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 
-
+@Service
 public class RxWatermarkService
 {
 	// document dir appended to this
 	private static String WATERMARK_FILE = "watermark.png";
 
+	private static UserPropertyDAO userPropertyDao;
+	@Autowired
+	@Qualifier("UserPropertyDAO")
+	private UserPropertyDAO _userPropertyDao;
+
+
+	@PostConstruct
+	public void PostConstructRxWatermarkService() {
+		RxWatermarkService.userPropertyDao = this._userPropertyDao;
+	}
+
 
 	public static void enableWatermark(Boolean enable)
 	{
-		UserPropertyDAO propertyDAO  = SpringUtils.getBean(UserPropertyDAO.class);
-		propertyDAO.saveProp(UserProperty.ENABLE_RX_WATERMARK, enable.toString());
+		userPropertyDao.saveProp(UserProperty.ENABLE_RX_WATERMARK, enable.toString());
 	}
 
 	public static boolean isWatermarkEnabled()
 	{
-		UserPropertyDAO propertyDAO  = SpringUtils.getBean(UserPropertyDAO.class);
-		UserProperty watermarkEnabledProperty = propertyDAO.getProp(UserProperty.ENABLE_RX_WATERMARK);
+		UserProperty watermarkEnabledProperty = userPropertyDao.getProp(UserProperty.ENABLE_RX_WATERMARK);
 
 		if (watermarkEnabledProperty != null)
 		{
@@ -64,24 +75,15 @@ public class RxWatermarkService
 		return FileFactory.getResourceFile(WATERMARK_FILE);
 	}
 
-	public static void setWatermark(InputStream fileData)
+	public static void setWatermark(InputStream fileData) throws IOException, InterruptedException
 	{
-		try
+		if (!FileFactory.isResourceFileExist(WATERMARK_FILE))
 		{
-			GenericFile watermark = null;
-			if (!FileFactory.isResourceFileExist(WATERMARK_FILE))
-			{
-				FileFactory.createResourceFile(fileData, WATERMARK_FILE);
-			}
-			else
-			{
-				FileFactory.overwriteFileContents(FileFactory.getResourceFile(WATERMARK_FILE), fileData);
-			}
-
+			FileFactory.createResourceFile(fileData, WATERMARK_FILE);
 		}
-		catch (Exception e)
+		else
 		{
-			MiscUtils.getLogger().error("error while writing watermark file: " + e.getMessage());
+			FileFactory.overwriteFileContents(FileFactory.getResourceFile(WATERMARK_FILE), fileData);
 		}
 	}
 

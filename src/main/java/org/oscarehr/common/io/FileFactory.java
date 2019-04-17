@@ -101,7 +101,7 @@ public class FileFactory
 	 */
 	public static GenericFile createResourceFile(InputStream fileInputStream, String fileName) throws IOException, InterruptedException
 	{
-		return createNewFile(fileInputStream, fileName, GenericFile.RESOURCE_BASE_DIR);
+		return createNewSanitizedFile(fileInputStream, fileName, GenericFile.RESOURCE_BASE_DIR);
 	}
 
 	/**
@@ -239,7 +239,7 @@ public class FileFactory
 	{
 		String formattedFileName = GenericFile.getFormattedFileName(fileName);
 
-		return _createNewFile(fileInputStream, formattedFileName, folder);
+		return createNewFile(fileInputStream, formattedFileName, folder);
 	}
 
 	/**
@@ -251,14 +251,14 @@ public class FileFactory
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	private static GenericFile createNewFile(InputStream fileInputStream, String fileName, String folder) throws IOException, InterruptedException
+	private static GenericFile createNewSanitizedFile(InputStream fileInputStream, String fileName, String folder) throws IOException, InterruptedException
 	{
 		String sanitizedFileName = GenericFile.getSanitizedFileName(fileName);
 
-		return _createNewFile(fileInputStream, sanitizedFileName, folder);
+		return createNewFile(fileInputStream, sanitizedFileName, folder);
 	}
 
-	private static GenericFile _createNewFile(InputStream fileInputStream, String fileName, String folder) throws IOException, InterruptedException
+	private static GenericFile createNewFile(InputStream fileInputStream, String fileName, String folder) throws IOException, InterruptedException
 	{
 		File directory = new File(folder);
 		if(!directory.exists())

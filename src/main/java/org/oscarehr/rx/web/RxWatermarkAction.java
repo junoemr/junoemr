@@ -28,6 +28,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.rx.service.RxWatermarkService;
 import org.oscarehr.util.LoggedInInfo;
@@ -37,10 +38,8 @@ import org.oscarehr.util.SpringUtils;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 public class RxWatermarkAction  extends DispatchAction
 {
@@ -51,13 +50,13 @@ public class RxWatermarkAction  extends DispatchAction
 	{
 		try
 		{
-			File outfile = RxWatermarkService.getWatermark().getFileObject();
+			GenericFile outfile = RxWatermarkService.getWatermark();
 			response.setContentType("image/png");
 
 			ServletOutputStream output = response.getOutputStream();
-			BufferedInputStream buffIn = null;
+			InputStream buffIn = null;
 			try {
-				buffIn = new BufferedInputStream(new FileInputStream(outfile));
+				buffIn = outfile.asFileInputStream();
 				int data;
 				while ((data = buffIn.read()) != -1) {
 					output.write(data);
@@ -89,7 +88,14 @@ public class RxWatermarkAction  extends DispatchAction
 		if (watermarkFile != null)
 		{
 			MiscUtils.getLogger().info("new watermark file: " + watermarkFile.getFileName());
-			RxWatermarkService.setWatermark(watermarkFile.getInputStream());
+			try
+			{
+				RxWatermarkService.setWatermark(watermarkFile.getInputStream());
+			}
+			catch (Exception e)
+			{
+				MiscUtils.getLogger().error("error while writing watermark file: " + e.getMessage());
+			}
 		}
 		else
 		{

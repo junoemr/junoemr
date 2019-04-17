@@ -362,8 +362,8 @@ function toggleView(form) {
 			<tr>
 				<td width=440px>
 				<div class="DivContentPadding"><!-- src modified by vic, hsfo -->
-				<iframe id=preview name=preview width=440px height=580px
-					src="<%= dx<0?"Preview.jsp?rePrint="+reprint:dx==7?"HsfoPreview.jsp?dxCode=7":"about:blank" %>"
+				<iframe id=preview name=preview width=440px height=650px
+					src="<%= dx<0?"Preview2.jsp?rePrint="+reprint:dx==7?"HsfoPreview.jsp?dxCode=7":"about:blank" %>"
 					align=center border=0 frameborder=0></iframe></div>
 				</td>
 
