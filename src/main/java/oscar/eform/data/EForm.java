@@ -770,7 +770,20 @@ public class EForm extends EFormBase {
 			html.insert(pointer, " " + OPENER_VALUE + "=\"" + value + "\"");
 		} else if (type.equals("text") || type.equals("hidden"))
 		{
-			html.insert(pointer, " value=\"" + value + "\"");
+			// Here I am using the convention for an html attribute <element attributeKey="attributeValue">
+			final String valueKey = "value=";
+			// The pointer is actually on the space before the first letter of the attribute name, need to move it up 1 place.
+			int attributeKeyStart = pointer + 1;
+			// If the pointer is at a value attribute, we will update it.  This is a necessary check for this implementation
+			// because on first save, this could also be an oscarUpdateDb (or some other) attribute.
+			if (html.substring(attributeKeyStart, attributeKeyStart + valueKey.length()).equals(valueKey))
+			{
+				// + 1 to the index here because we want to clear the opening " before looking for the closing ".
+				int attributeValueEnd = html.indexOf("\"", attributeKeyStart + valueKey.length() + 1);
+				html.delete(attributeKeyStart, attributeValueEnd + 1);
+			}
+
+			html.insert(attributeKeyStart, valueKey + "\"" + value + "\"");
 		} else if (type.equals("textarea"))
 		{
 			pointer = html.indexOf(">", pointer) + 1;
