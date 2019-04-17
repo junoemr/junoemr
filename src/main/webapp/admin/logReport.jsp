@@ -25,10 +25,12 @@
 
 --%>
 <%@ page errorPage="../errorpage.jsp"%>
-<%@ page import="java.util.*"%>
-<%@ page import="java.sql.*"%>
-<%@ page import="oscar.login.*, oscar.oscarDB.*, oscar.MyDateFormat"%>
+<%@ page import="oscar.Misc"%>
+<%@ page import="oscar.MyDateFormat"%>
 <%@ page import="oscar.log.LogConst"%>
+<%@ page import="oscar.oscarDB.DBPreparedHandler"%>
+<%@ page import="oscar.oscarDB.DBPreparedHandlerParam"%>
+<%@ page import="java.sql.ResultSet"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
@@ -91,7 +93,9 @@ boolean authed=true;
   }
 %>
 
-<%@page import="oscar.Misc"%><html:html locale="true">
+<%@page import="java.util.Properties"%>
+<%@ page import="java.util.Vector" %>
+<html:html locale="true">
 <head>
 
 
@@ -134,7 +138,7 @@ label{margin-top:6px;margin-bottom:0px;}
 
 </head>
 <body>
-<form name="myform" class="well form-horizontal" action="logReport.jsp" method="POST" onSubmit="return(onSub());">
+<form name="myform" class="well form-horizontal" action="LogReportAction.do" method="POST" onSubmit="return(onSub());">
 	<fieldset>
 		<h3>Log Admin Report <small>Please select the provider, start and end dates.</small></h3>
 		
