@@ -171,7 +171,8 @@ public class WriteNewMeasurements {
             Integer iMax;
             Integer iMin;
 
-            if (GenericValidator.isBlankOrNull(inputValue)) {
+            if (GenericValidator.isBlankOrNull(inputValue))
+            {
                 measures.removeElementAt(i);
                 i--;
                 continue;
@@ -180,22 +181,22 @@ public class WriteNewMeasurements {
             instruction = (String) measure.get("measuringInstruction");
             vs = ectValidation.getValidationType(inputType, instruction);
 
-            if (!vs.isEmpty())
+            if (vs.isEmpty())
             {
-    			Validations v = vs.iterator().next();
-    			dMax = v.getMaxValue();
-    			dMin = v.getMinValue();
-    			iMax = v.getMaxLength();
-    			iMin = v.getMinLength();
-    			regExp = v.getRegularExp();
-    		}
-            else {
                 //if type with instruction does not exist
                 errors.add(inputType,
-                new ActionMessage("errors.oscarEncounter.Measurements.cannotFindType", inputType, instruction));
+                    new ActionMessage("errors.oscarEncounter.Measurements.cannotFindType", inputType, instruction));
                 valid = false;
                 continue;
             }
+
+            Validations validation = vs.iterator().next();
+            dMax = validation.getMaxValue();
+            dMin = validation.getMinValue();
+            iMax = validation.getMaxLength();
+            iMin = validation.getMinLength();
+            regExp = validation.getRegularExp();
+
 
             if (!ectValidation.isInRange(dMax, dMin, inputValue))
             {
@@ -273,21 +274,7 @@ public class WriteNewMeasurements {
         for (int i=0; i<measures.size(); i++)
         {
             Hashtable measure = (Hashtable) measures.get(i);
-            String inputValue = (String) measure.get("value");
-            String inputType = (String) measure.get("type");
-            String mInstrc = (String) measure.get("measuringInstruction");
-            String comments = (String) measure.get("comments");
-            String dateObserved = ConversionUtils.padDateString((String) measure.get("dateObserved"));
-            //write....
-            Measurement measurement = new Measurement();
-            measurement.setType(inputType);
-            measurement.setDemographicId(Integer.parseInt(demographicNo));
-            measurement.setProviderNo(providerNo);
-            measurement.setDataField(inputValue);
-            measurement.setMeasuringInstruction(mInstrc);
-            measurement.setComments(comments);
-            measurement.setDateObserved(ConversionUtils.coalesceTimeStampString(dateObserved));
-            dao.persist(measurement);
+            write(measure, demographicNo, providerNo);
         }
 
     }
@@ -297,7 +284,7 @@ public class WriteNewMeasurements {
         String inputType = (String) measure.get("type");
         String mInstrc = (String) measure.get("measuringInstruction");
         String comments = (String) measure.get("comments");
-        String dateObserved = (String) measure.get("dateObserved");
+        String dateObserved = ConversionUtils.padDateString((String) measure.get("dateObserved"));
         //write....
         Measurement measurement = new Measurement();
         measurement.setType(inputType);
