@@ -2916,7 +2916,7 @@
 			}
 		);
 
-		return true;
+		return false;
 	}
 
 	function maximizeWindow()
@@ -2933,11 +2933,14 @@
 		document.forms['caseManagementEntryForm'].toBill.value='true';
 
 		var saved = savePage('saveAndExit', '');
-		if (saved === true)
+
+		// savePage always returns false, but we can check note differences before redirecting
+		if (origCaseNote === $F(caseNote))
 		{
 			Event.stop(event);
 			maximizeWindow();
 		}
+
 		return saved;
 	}
 
