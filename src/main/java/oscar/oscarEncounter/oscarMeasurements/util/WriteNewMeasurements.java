@@ -143,6 +143,7 @@ public class WriteNewMeasurements {
             String inputType = (String) measure.get("type");
             String inputValue = (String) measure.get("value");
             String dateObserved = (String) measure.get("dateObserved");
+            dateObserved = ConversionUtils.padDateString(dateObserved);
             String comments = (String) measure.get("comments");
             String mInstrc, regCharExp;
             String regExp = null;
@@ -205,7 +206,7 @@ public class WriteNewMeasurements {
                 new ActionMessage("errors.invalidDate", inputType));
                 valid=false;
             }
-            
+
             if (!valid) continue;
             inputValue = org.apache.commons.lang.StringEscapeUtils.escapeSql(inputValue);
             inputType = org.apache.commons.lang.StringEscapeUtils.escapeSql(inputType);
@@ -233,11 +234,9 @@ public class WriteNewMeasurements {
     }
 
     static public void write(Vector measures, String demographicNo, String providerNo) {
-       
-            
+
         for (int i=0; i<measures.size(); i++) {
             Hashtable measure = (Hashtable) measures.get(i);
-
             String inputValue = (String) measure.get("value");
             String inputType = (String) measure.get("type");
             String mInstrc = (String) measure.get("measuringInstruction");

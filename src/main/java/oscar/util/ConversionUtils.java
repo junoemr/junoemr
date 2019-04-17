@@ -385,23 +385,24 @@ public class ConversionUtils {
 	 * Some date strings that we receive are sometimes missing leading zeroes, i.e:
 	 * - 2019-4-8
 	 * - 2019-4-08
+	 * - 2019-4-5 hh:mm:ss
 	 *
 	 * LocalDate can interpret these properly if we individually feed in the year, month, and day.
 	 *
 	 * @param dateString
-	 *		Date string of form like (yyyy-MM-dd).
+	 *		Date string of form like yyyy-MM-dd (hh:mm:ss).
 	 *		This input string is allowed to be missing leading zero on MM or dd.
 	 *		Note that LocalDate *could* fix a bad year (a year like 019 or 219)
 	 *		but allowing a year entry like these to be entered could cause more problems.
 	 * @return dateString
 	 *		Original dateString if it's already in good shape or parsing fails
-	 *		Otherwise return a new dateString of format yyyy-MM-dd
+	 *		Otherwise return a new dateString of format yyyy-MM-dd (hh:mm:ss)
 	 */
 	public static String padDateString(String dateString)
 	{
 		// Don't operate on strings that are either already formatted correctly
 		// or have no chance of being formatted correctly
-		if (dateString.length() < 8 || dateString.length() >= 10 || StringUtils.countMatches(dateString, "-") != 2)
+		if (dateString.length() < 8 || StringUtils.countMatches(dateString, "-") != 2)
 		{
 			return dateString;
 		}
@@ -413,13 +414,22 @@ public class ConversionUtils {
 			return dateString;
 		}
 
+		String timestamp = "";
+		// Date portion can have a leading space following into a timestamp - need to pad this accordingly
+		if (splitDate[2].contains(" "))
+		{
+			String[] splitTimestamp = splitDate[2].split(" ");
+			splitDate[2] = splitTimestamp[0];
+			timestamp = " " + splitTimestamp[1];
+		}
+
 		try
 		{
 			int year = Integer.parseInt(splitDate[0]);
 			int month = Integer.parseInt(splitDate[1]);
 			int date = Integer.parseInt(splitDate[2]);
 			LocalDate desiredDate = LocalDate.of(year, month, date);
-			return desiredDate.toString();
+			return desiredDate.toString() + timestamp;
 		}
 		catch (NumberFormatException | DateTimeParseException ex)
 		{
