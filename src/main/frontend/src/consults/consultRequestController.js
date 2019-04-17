@@ -34,6 +34,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 		controller.consult = consult;
 
+		console.log(consult);
 		consult.faxList = Juno.Common.Util.toArray(consult.faxList);
 		consult.serviceList = Juno.Common.Util.toArray(consult.serviceList);
 		consult.sendToList = Juno.Common.Util.toArray(consult.sendToList);
@@ -199,7 +200,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				$scope.specialists = null;
 				return;
 			}
-			controller.specialists = toArray(consult.serviceList[index].specialists);
+			controller.specialists = Juno.Common.Util.toArray(consult.serviceList[index].specialists);
 		};
 
 		controller.writeToBox = function writeToBox(results, boxId)

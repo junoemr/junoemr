@@ -81,9 +81,9 @@
                         <label class="control-label">Start Time</label>
 						<ca-field-time
                                 class="form-control form-control-details"
-                                ca-template="bare"
+                                ca-template="no_button"
                                 ca-name="startTime"
-                                ca-model="appointmkentAddCtrl.appointment.startTime"
+                                ca-model="appointmentAddCtrl.appointment.startTime"
                                 placeholder="Start Time" />
                         <%--<div class="bootstrap-timepicker"> --%>
 <%--                            <input ng-model="appointmentAddCtrl.appointment.startTime" id="startTime"

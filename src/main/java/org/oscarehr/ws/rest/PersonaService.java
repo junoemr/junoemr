@@ -241,6 +241,10 @@ public class PersonaService extends AbstractServiceImpl {
 		{
 			menu.addWithState(idCounter++, bundle.getString("navbar.menu.schedule"), null, "schedule");
 		}
+		else
+		{
+			menu.add(idCounter++, bundle.getString("navbar.menu.schedule"),null,"../provider/providercontrol.jsp");
+		}
 
 		menu.addWithState(idCounter++,bundle.getString("navbar.menu.inbox"),null,"inbox");
 

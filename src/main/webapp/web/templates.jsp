@@ -97,6 +97,9 @@
 <script type="text/ng-template" id="src/common/directives/clinicaid/ca_field_time_bare.jsp">
 	<jsp:include page="src/common/directives/clinicaid/ca_field_time_bare.jsp"/>
 </script>
+<script type="text/ng-template" id="src/common/directives/clinicaid/ca_field_time_no_button.jsp">
+	<jsp:include page="src/common/directives/clinicaid/ca_field_time_no_button.jsp"/>
+</script>
 <script type="text/ng-template" id="src/common/directives/clinicaid/ca_field_time.jsp">
 	<jsp:include page="src/common/directives/clinicaid/ca_field_time.jsp"/>
 </script>

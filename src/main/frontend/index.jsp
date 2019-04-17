@@ -50,9 +50,6 @@
 
 	<title><bean:message key="global.title" bundle="ui"/></title>
 
-	<%-- TODO move to a SCSS file and include in Juno SCSS/CSS --%>
-	<link href="../library/bootstrap/3.0.0/assets/css/bootstrap3_badge_colours.css" rel="stylesheet">
-
 	<%-- This is in the HTML to make sure it is loaded with the page --%>
 	<style>
 		[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {

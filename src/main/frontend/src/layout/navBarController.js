@@ -347,6 +347,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				angular.isDefined(item.url) &&
 				item.url !== null)
 			{
+				console.log(item);
 
 				if (item.label === "Schedule")
 				{

@@ -48,7 +48,8 @@ module.exports = {
 			jQuery: "jquery",
 			"window.jQuery": "jquery",
 			moment: "moment",
-			datepicker: "bootstrap-datepicker"
+			datepicker: "bootstrap-datepicker",
+			pym: "pym.js"
 		}),
 
 		// Create the HTML to include webpack-created files
