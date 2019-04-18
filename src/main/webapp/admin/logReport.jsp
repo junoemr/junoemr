@@ -30,7 +30,7 @@
 <%@ page import="org.oscarehr.provider.dao.ProviderDataDao"%>
 <%@ page import="org.oscarehr.provider.model.ProviderData"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
-<%@ page import="oscar.util.ConversionUtils"%>
+<%@ page import="oscar.log.LogConst"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
@@ -55,11 +55,7 @@ boolean authed=true;
 <security:oscarSec objectName="_site_access_privacy" roleName="<%=roleName$%>" rights="r" reverse="false">
 	<%isSiteAccessPrivacy=true; %>
 </security:oscarSec>
-
-
 <%
-	String tdTitleColor = "#CCCC99";
-	String tdSubtitleColor = "#CCFF99";
 	String startDate = StringUtils.trimToEmpty(request.getParameter("startDate"));
 	String endDate = StringUtils.trimToEmpty(request.getParameter("endDate"));
 	String selectedProviderNo = StringUtils.trimToNull(request.getParameter("providerNo"));
@@ -71,6 +67,7 @@ boolean authed=true;
 
 	List<OscarLog> resultList = (List<OscarLog>)request.getAttribute("resultList");
 	HashMap<String, String> providerNameMap = new HashMap<String, String>();
+	HashMap<String, String> contentTypeMap = new LinkedHashMap<String, String>();
 	// select provider list
 	if(isSiteAccessPrivacy)
 	{
@@ -98,11 +95,25 @@ boolean authed=true;
 		providerNameMap.put(provider.getId(), provider.getDisplayName());
 	}
 
+	/* Map the log content constants to visible labels */
+	contentTypeMap.put(LogConst.CON_APPT, "Appointment");
+	contentTypeMap.put(LogConst.CON_DEMOGRAPHIC, "Demographic");
+	contentTypeMap.put(LogConst.CON_DOCUMENT, "Document");
+	contentTypeMap.put(LogConst.CON_CME_NOTE, "Encounter Note");
+	contentTypeMap.put(LogConst.CON_EFORM_DATA, "E-Form");
+	contentTypeMap.put(LogConst.CON_EFORM_TEMPLATE, "E-Form Template");
+	contentTypeMap.put(LogConst.CON_FAX, "Fax");
+	contentTypeMap.put(LogConst.CON_LOGIN, "Login");
+	contentTypeMap.put(LogConst.CON_ADMIN, "Admin");
+	contentTypeMap.put(LogConst.CON_SYSTEM, "System");
 %>
 
-<%@ page import="java.time.LocalDate"%>
-<%@ page import="java.util.List" %>
+<%@ page import="oscar.util.ConversionUtils"%>
+<%@ page import="java.time.LocalDate" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.LinkedHashMap" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <html:html locale="true">
 	<head>
 		<script type="text/javascript" src="<%=request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>
@@ -134,7 +145,6 @@ boolean authed=true;
 			<h3>Log Admin Report
 				<small>Please select the provider, start and end dates.</small>
 			</h3>
-
 			<div class="span4">
 				<label for="provider_select">Provider: </label>
 				<select id="provider_select" name="providerNo">
@@ -146,28 +156,29 @@ boolean authed=true;
 							String providerName = provider.getDisplayName();
 							boolean selected = providerId.equals(selectedProviderNo);
 					%>
-					<option value="<%=providerId%>"<%=(selected ? "selected" : "")%>><%= providerName %>
-					</option>
+					<option value="<%=providerId%>"<%=(selected ? "selected" : "")%>><%= providerName %></option>
 					<%
 						}
 					%>
 				</select>
 			</div>
-
 			<div class="span4">
 				<label for="contentType">Content Type:</label>
 				<select name="contentType" id="contentType">
 					<option value="">All</option>
-					<option value="demographic">Demographic</option>
-					<option value="document">Document</option>
-					<option value="eform_data">EForm</option>
-					<option value="eform_template">EForm Template</option>
-					<option value="fax">Fax</option>
-					<option value="cme_notes">Encounter Note</option>
-					<option value="login">Log in</option>
+					<%
+						for(Map.Entry<String, String> entry : contentTypeMap.entrySet())
+						{
+							String contentValue = entry.getKey();
+							String displayName = entry.getValue();
+							boolean selected = contentValue.equals(selectedContentType);
+					%>
+					<option value="<%=contentValue%>"<%=(selected ? "selected" : "")%>><%= displayName %></option>
+					<%
+						}
+					%>
 				</select>
 			</div>
-
 			<div class="span4">
 				<label for="startDate">Start Date: </label>
 				<div class="input-append">
@@ -205,7 +216,7 @@ boolean authed=true;
 
 	<p>Period: ( <%=startDate%> ~ <%=endDate%>)</p>
 	<table class="table table-bordered table-striped table-hover table-condensed">
-		<tr bgcolor="<%=tdTitleColor%>">
+		<tr bgcolor="#CCCC99">
 			<TH>Time</TH>
 			<% if(showAll)
 			{ %>
