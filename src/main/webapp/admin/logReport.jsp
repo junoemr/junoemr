@@ -25,12 +25,12 @@
 
 --%>
 <%@ page errorPage="../errorpage.jsp"%>
-<%@ page import="oscar.Misc"%>
-<%@ page import="oscar.MyDateFormat"%>
-<%@ page import="oscar.log.LogConst"%>
-<%@ page import="oscar.oscarDB.DBPreparedHandler"%>
-<%@ page import="oscar.oscarDB.DBPreparedHandlerParam"%>
-<%@ page import="java.sql.ResultSet"%>
+<%@ page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="org.oscarehr.common.model.OscarLog"%>
+<%@ page import="org.oscarehr.provider.dao.ProviderDataDao"%>
+<%@ page import="org.oscarehr.provider.model.ProviderData"%>
+<%@ page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="oscar.util.ConversionUtils"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
@@ -52,274 +52,203 @@ boolean authed=true;
 	}
 %>
 
-
 <security:oscarSec objectName="_site_access_privacy" roleName="<%=roleName$%>" rights="r" reverse="false">
 	<%isSiteAccessPrivacy=true; %>
 </security:oscarSec>
 
 
 <%
-  String   tdTitleColor = "#CCCC99";
-  String   tdSubtitleColor = "#CCFF99";
-  String   tdInterlColor = "white";
-  String   startDate    = request.getParameter("startDate");
-  String   endDate      = request.getParameter("endDate");
-  Vector   vecProvider  = new Vector();
-  Properties prop = null;
-  String   providerName   = "";
-  String sql = "";
-//provider name list, date, action, create button
-%>
+	String tdTitleColor = "#CCCC99";
+	String tdSubtitleColor = "#CCFF99";
+	String startDate = StringUtils.trimToEmpty(request.getParameter("startDate"));
+	String endDate = StringUtils.trimToEmpty(request.getParameter("endDate"));
+	String selectedProviderNo = StringUtils.trimToNull(request.getParameter("providerNo"));
+	String selectedContentType = request.getParameter("contentType");
+	boolean showAll = (selectedProviderNo == null);
 
-<%
-  DBPreparedHandler dbObj = new DBPreparedHandler();
-  Properties propName = new   Properties();
-  // select provider list
-  if (isSiteAccessPrivacy) { 
- 	sql = "select p.* from provider p INNER JOIN providersite s ON p.provider_no = s.provider_no WHERE s.site_id IN (SELECT site_id from providersite where provider_no=" + curUser_no + ") order by p.first_name, p.last_name"; 
-  }
-  else {
-  	sql = "select * from provider p order by p.first_name, p.last_name ";
-  }
-  ResultSet rs = dbObj.queryResults(sql);
+	ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
+	List<ProviderData> providerList;
 
-  while (rs.next()) {
-    propName.setProperty(Misc.getString(rs,"provider_no"), Misc.getString(rs,"first_name") + " " + Misc.getString(rs,"last_name"));
-    prop = new Properties();
-
-    prop.setProperty("providerNo", Misc.getString(rs,"provider_no"));
-    prop.setProperty("name", Misc.getString(rs,"first_name") + " " + Misc.getString(rs,"last_name"));
-    vecProvider.add(prop);
-  }
-%>
-
-<%@page import="java.util.Properties"%>
-<%@ page import="java.util.Vector" %>
-<html:html locale="true">
-<head>
-
-
-<script type="text/javascript" src="<%=request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>
-<script src="<%=request.getContextPath() %>/js/bootstrap.min.js"></script>
-
-<script type="text/javascript" src="<%=request.getContextPath() %>/js/bootstrap-datepicker.js"></script>
-
-<link href="<%=request.getContextPath() %>/css/bootstrap.min.css" rel="stylesheet">
-
-<link href="<%=request.getContextPath() %>/css/datepicker.css" rel="stylesheet" type="text/css">
-
-
-
-<link rel="stylesheet" href="<%=request.getContextPath() %>/css/font-awesome.min.css">
-<title>Log Report</title>
-<script language="JavaScript">
-
-                <!--
-function setfocus() {
-	this.focus();
-	//  document.titlesearch.keyword.select();
-}
-function onSub() {
-	if( document.myform.startDate.value=="" || document.myform.endDate.value=="") {
-		alert("Please set Start and End Dates.");
-		return false ;
-	} else {
-		return true;
+	List<OscarLog> resultList = (List<OscarLog>)request.getAttribute("resultList");
+	HashMap<String, String> providerNameMap = new HashMap<String, String>();
+	// select provider list
+	if(isSiteAccessPrivacy)
+	{
+		providerList = providerDao.findByProviderSite(curUser_no);
 	}
-}
+	else
+	{
+		providerList = providerDao.findAll();
+	}
 
-//-->
-      </script>
+	if(startDate.isEmpty())
+	{
+		startDate = ConversionUtils.toDateString(LocalDate.now());
+	}
+	if(endDate.isEmpty())
+	{
+		endDate = ConversionUtils.toDateString(LocalDate.now());
+	}
 
-<style>
+	/* put all the provider names in a map for easy lookup.
+	These names should always match the result set providers due to the site filtering,
+	so finding them outside of the result set is ok */
+	for(ProviderData provider : providerList)
+	{
+		providerNameMap.put(provider.getId(), provider.getDisplayName());
+	}
 
-label{margin-top:6px;margin-bottom:0px;}
-</style>
+%>
 
-</head>
-<body>
-<form name="myform" class="well form-horizontal" action="LogReportAction.do" method="POST" onSubmit="return(onSub());">
-	<fieldset>
-		<h3>Log Admin Report <small>Please select the provider, start and end dates.</small></h3>
-		
+<%@ page import="java.time.LocalDate"%>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.HashMap" %>
+<html:html locale="true">
+	<head>
+		<script type="text/javascript" src="<%=request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>
+		<script src="<%=request.getContextPath() %>/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="<%=request.getContextPath() %>/js/bootstrap-datepicker.js"></script>
+
+		<link href="<%=request.getContextPath() %>/css/bootstrap.min.css" rel="stylesheet">
+		<link href="<%=request.getContextPath() %>/css/datepicker.css" rel="stylesheet" type="text/css">
+
+		<link rel="stylesheet" href="<%=request.getContextPath() %>/css/font-awesome.min.css">
+		<title>Log Report</title>
+		<script language="JavaScript">
+			function setfocus()
+			{
+				this.focus();
+			}
+		</script>
+		<style>
+			label {
+				margin-top: 6px;
+				margin-bottom: 0;
+			}
+		</style>
+
+	</head>
+	<body>
+	<form name="myform" class="well form-horizontal" action="LogReportAction.do" method="POST">
+		<fieldset>
+			<h3>Log Admin Report
+				<small>Please select the provider, start and end dates.</small>
+			</h3>
+
 			<div class="span4">
-			<label>Provider: </label>
-			
-				<select name="providerNo">
-					<option value="*">All</option>
+				<label for="provider_select">Provider: </label>
+				<select id="provider_select" name="providerNo">
+					<option value="">All</option>
 					<%
-		                for (int i = 0; i < vecProvider.size(); i++) {
-		                    String prov = ((Properties)vecProvider.get(i)).getProperty("providerNo", "");
-		                    String selected = request.getParameter("providerNo");
+						for(ProviderData provider : providerList)
+						{
+							String providerId = provider.getId();
+							String providerName = provider.getDisplayName();
+							boolean selected = providerId.equals(selectedProviderNo);
 					%>
-					<option value="<%=prov %>"
-						<% if ((selected != null) && (selected.equals(prov))) { %> selected
-						<% } %>><%= ((Properties)vecProvider.get(i)).getProperty("name", "") %>
+					<option value="<%=providerId%>"<%=(selected ? "selected" : "")%>><%= providerName %>
 					</option>
 					<%
-		                }
+						}
 					%>
 				</select>
 			</div>
 
 			<div class="span4">
-			<label>Content Type:</label>
-			<select name="content" >
-				<option value="all">All</option>
-				<option value="demographic">Demographic</option>
-				<option value="document">Document</option>
-				<option value="eform_data">EForm</option>
-				<option value="eform_template">EForm Template</option>
-				<option value="fax">Fax</option>
-				<option value="cme_notes">Encounter Note</option>
-				<option value="login">Log in</option>
-			</select>
-			</div>
-		
-			<div class="span4">		
-			<label>Start Date: </label>
-			<div class="input-append">
-				<input type="text" name="startDate" id="startDate1" value="<%=startDate!=null?startDate:""%>" pattern="^\d{4}-((0\d)|(1[012]))-(([012]\d)|3[01])$" autocomplete="off" />
-				<span class="add-on"><i class="icon-calendar"></i></span>
-			</div>
-			</div>
-			
-			<div class="span4">		
-			<label >End Date: </label>
-			<div class="input-append">
-				<input type="text" name="endDate" id="endDate1" value="<%=endDate!=null?endDate:""%>" pattern="^\d{4}-((0\d)|(1[012]))-(([012]\d)|3[01])$" autocomplete="off" />
-				<span class="add-on"><i class="icon-calendar"></i></span>
-			</div>
+				<label for="contentType">Content Type:</label>
+				<select name="contentType" id="contentType">
+					<option value="">All</option>
+					<option value="demographic">Demographic</option>
+					<option value="document">Document</option>
+					<option value="eform_data">EForm</option>
+					<option value="eform_template">EForm Template</option>
+					<option value="fax">Fax</option>
+					<option value="cme_notes">Encounter Note</option>
+					<option value="login">Log in</option>
+				</select>
 			</div>
 
+			<div class="span4">
+				<label for="startDate">Start Date: </label>
+				<div class="input-append">
+					<input type="text" name="startDate" id="startDate" value="<%=startDate%>" placeholder="yyyy-mm-dd"
+					       pattern="^\d{4}-((0\d)|(1[012]))-(([012]\d)|3[01])$" autocomplete="off"/>
+					<span class="add-on"><i class="icon-calendar"></i></span>
+				</div>
+			</div>
 
-		
+			<div class="span4">
+				<label for="endDate">End Date: </label>
+				<div class="input-append">
+					<input type="text" name="endDate" id="endDate" value="<%=endDate%>" placeholder="yyyy-mm-dd"
+					       pattern="^\d{4}-((0\d)|(1[012]))-(([012]\d)|3[01])$" autocomplete="off"/>
+					<span class="add-on"><i class="icon-calendar"></i></span>
+				</div>
+			</div>
+
 			<div class="span8" style="padding-top:10px;">
-			<input class="btn btn-primary" type="submit" name="submit" value="Run Report">
+				<input class="btn btn-primary" type="submit" name="submit" value="Run Report">
 			</div>
-
-	</fieldset>
-</form>
+			<input type="hidden" name="restrictBySite" value="<%=isSiteAccessPrivacy%>">
+		</fieldset>
+	</form>
 <%
-	out.flush();
-	//String startDate = "";
-	//String endDate = "";
-	boolean bAll = false;
-	Vector<Properties> vec = new Vector<Properties>();
-	String providerNo = "";
-	if (request.getParameter("submit") != null) {
-		providerNo = request.getParameter("providerNo");
-		String action = request.getParameter("submit");
-		String content = request.getParameter("content");
-		if(content.equals("login")) content = LogConst.CON_LOGIN;
-		if(content.equals("document")) content = LogConst.CON_DOCUMENT;
-		if(content.equals("demographic")) content = LogConst.CON_DEMOGRAPHIC;
-		if(content.equals("cme_notes")) content = LogConst.CON_CME_NOTE;
-		if(content.equals("eform_data")) content = LogConst.CON_EFORM_DATA;
-		if(content.equals("eform_template")) content = LogConst.CON_EFORM_TEMPLATE;
-		if(content.equals("fax")) content = LogConst.CON_FAX;
-		if(content.equals("all")) content = "%";
-	  
-	  String sDate = request.getParameter("startDate");
-	  String eDate = request.getParameter("endDate");
-	  String strDbType = oscar.OscarProperties.getInstance().getProperty("db_type").trim();
-	  if("".equals(sDate) || sDate==null)  sDate = "1900-01-01";
-	  if("".equals(eDate) || eDate==null)  eDate = "2999-01-01";
+	if(resultList != null)
+	{
+%>
+	<h4><%=(selectedProviderNo == null)? "All" : providerNameMap.get(selectedProviderNo)%> - Log Report</h4>
 
-	  DBPreparedHandlerParam[] params = new DBPreparedHandlerParam[2];
-	  params[0]= new DBPreparedHandlerParam(MyDateFormat.getSysDateEX(eDate, 1));
-	  params[1]= new DBPreparedHandlerParam(MyDateFormat.getSysDate(sDate));
+	<button class="btn pull-right" onClick="window.print()" style="margin-bottom:4px">
+		<i class="icon-print"></i> Print
+	</button>
 
-      sql = "select * from log force index (datetime) where provider_no='" + providerNo + "' and dateTime <= ?";
-      sql += " and dateTime >= ? and content like '" + content + "' order by dateTime desc ";
 
-      if("*".equals(providerNo)) {
-		  bAll = true;
-		   if (isSiteAccessPrivacy)   { 
-			      sql = "select * from log force index (datetime) where dateTime <= ?";
-			      sql += " and dateTime >= ? and content like '" + content + "' ";
-			      sql += "and provider_no IN (SELECT provider_no FROM providersite WHERE site_id IN (SELECT site_id from providersite where provider_no= " + curUser_no +") )";
-			      sql += " order by dateTime desc ";
-		   }
-		   else {
-		      sql = "select * from log force index (datetime) where dateTime <= ?";
-		      sql += " and dateTime >= ? and content like '" + content + "' order by dateTime desc ";
-		   }
-      }
-      rs = dbObj.queryResults(sql, params);
-      while (rs.next()) {
-        prop = new Properties();
-        prop.setProperty("dateTime", "" + rs.getTimestamp("dateTime"));
-        prop.setProperty("action", Misc.getString(rs,"action"));
-        prop.setProperty("content", Misc.getString(rs,"content"));
-        prop.setProperty("contentId", Misc.getString(rs,"contentId"));
-        prop.setProperty("ip", Misc.getString(rs,"ip"));
-        prop.setProperty("provider_no", Misc.getString(rs,"provider_no"));
-        prop.setProperty("demographic_no",Misc.getString(rs,"demographic_no"));
-        prop.setProperty("data", Misc.getString(rs, "data"));
-        prop.setProperty("status", Misc.getString(rs, "status"));
-        vec.add(prop);
-      }
-
-	  //startDate = sDate;
-	  //endDate = eDate;
+	<p>Period: ( <%=startDate%> ~ <%=endDate%>)</p>
+	<table class="table table-bordered table-striped table-hover table-condensed">
+		<tr bgcolor="<%=tdTitleColor%>">
+			<TH>Time</TH>
+			<% if(showAll)
+			{ %>
+			<TH>Provider</TH>
+			<% } %>
+			<TH>Action</TH>
+			<TH>Content</TH>
+			<TH>Status</TH>
+			<TH>Keyword</TH>
+			<TH>IP</TH>
+			<TH>Demo</TH>
+			<TH>Data</TH>
+		</tr>
+		<%
+		for(OscarLog logEntry : resultList)
+		{
+		%>
+		<tr align="center">
+			<td><%=ConversionUtils.toTimestampString(logEntry.getCreated())%>&nbsp;</td>
+			<% if(showAll)
+			{ %>
+			<td><%=StringUtils.trimToEmpty(providerNameMap.get(logEntry.getProviderNo()))%>&nbsp;</td>
+			<% } %>
+			<td><%=StringUtils.trimToEmpty(logEntry.getAction())%>&nbsp;</td>
+			<td><%=StringUtils.trimToEmpty(logEntry.getContent())%>&nbsp;</td>
+			<td><%=StringUtils.trimToEmpty(logEntry.getStatus())%>&nbsp;</td>
+			<td><%=StringUtils.trimToEmpty(logEntry.getContentId())%>&nbsp;</td>
+			<td><%=StringUtils.trimToEmpty(logEntry.getIp())%>&nbsp;</td>
+			<td><%=(logEntry.getDemographicId() != null) ? logEntry.getDemographicId() : ""%>&nbsp;</td>
+			<td><%=StringUtils.trimToEmpty(logEntry.getData())%>&nbsp;</td>
+		</tr>
+		<%
+		}
 	}
-%>
-<h4><%if(propName.getProperty(providerNo,"").equals("")){ out.print("All");}else{out.print(propName.getProperty(providerNo,""));}%> - Log Report</h4>
+	%>
+		<script type="text/javascript">
+			var startDate = $("#startDate").datepicker({
+				format: "yyyy-mm-dd"
+			});
 
-<button class="btn pull-right" onClick="window.print()" style="margin-bottom:4px">
-	<i class="icon-print"></i> Print
-</button> 
-
-
-<p>Period: ( <%= startDate==null?"":startDate %> ~ <%= endDate==null?"":endDate %>)</p>	
-<table class="table table-bordered table-striped table-hover table-condensed">
-	<tr bgcolor="<%=tdTitleColor%>">
-		<TH>Time</TH>
-		<% if(bAll) { %>
-		<TH>Provider</TH>
-		<% } %>
-		<TH>Action</TH>
-		<TH>Content</TH>
-		<TH>Status</TH>
-		<TH>Keyword</TH>
-		<TH>IP</TH>
-
-		<TH>Demo</TH>
-		<TH>Data</TH>
-	</tr>
-	<%
-String catName = "";
-String color = "";
-int codeNum = 0;
-int vecNum = 0;
-for (int i = 0; i < vec.size(); i++) {
-	prop = (Properties) vec.get(i);
-    color = i%2==0?tdInterlColor:"white";
-%>
-	<tr bgcolor="<%=color %>" align="center">
-		<td><%=prop.getProperty("dateTime")%>&nbsp;</td>
-		<% if(bAll) { %>
-		<td><%=propName.getProperty(prop.getProperty("provider_no"), "")%>&nbsp;</td>
-		<% } %>
-		<td><%=prop.getProperty("action")%>&nbsp;</td>
-		<td><%=prop.getProperty("content")%>&nbsp;</td>
-		<td><%=prop.getProperty("status")%>&nbsp;</td>
-		<td><%=prop.getProperty("contentId")%>&nbsp;</td>
-		<td><%=prop.getProperty("ip")%>&nbsp;</td>
-        <td><%=prop.getProperty("demographic_no")%>&nbsp;</td>
-        <td><%=prop.getProperty("data") %>&nbsp;</td>
-	</tr>
-	<% } %>
-
-<script type="text/javascript">
-var startDate = $("#startDate1").datepicker({
-	format : "yyyy-mm-dd"
-});
-
-var endDate = $("#endDate1").datepicker({
-	format : "yyyy-mm-dd"
-});
-</script>
-</body>
+			var endDate = $("#endDate").datepicker({
+				format: "yyyy-mm-dd"
+			});
+		</script>
+	</body>
 </html:html>

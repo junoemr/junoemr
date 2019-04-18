@@ -30,7 +30,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.common.dao.OscarLogDao;
 import org.oscarehr.common.model.OscarLog;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.securityLog.search.SecurityLogCriteriaSearch;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.util.ConversionUtils;
@@ -38,12 +41,15 @@ import oscar.util.ConversionUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class LogReportAction extends Action
 {
 	private static final Logger logger = MiscUtils.getLogger();
 	private static OscarLogDao oscarLogDao = SpringUtils.getBean(OscarLogDao.class);
+	private static ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 	                             HttpServletRequest request, HttpServletResponse response)
@@ -52,21 +58,39 @@ public class LogReportAction extends Action
 		String endDateStr = StringUtils.trimToNull(request.getParameter("endDate"));
 		String providerNo = StringUtils.trimToNull(request.getParameter("providerNo"));
 		String contentType = StringUtils.trimToNull(request.getParameter("contentType"));
+		boolean restrictResultsBySite = Boolean.parseBoolean(request.getParameter("restrictBySite"));
 
-		LocalDate startDate = ConversionUtils.toNullableLocalDate(startDateStr);
-		LocalDate endDate = ConversionUtils.toNullableLocalDate(endDateStr);
+		List<OscarLog> resultList = null;
+		try
+		{
+			LocalDate startDate = ConversionUtils.toNullableLocalDate(startDateStr);
+			LocalDate endDate = ConversionUtils.toNullableLocalDate(endDateStr);
 
-		logger.info("LogReportAction true");
+			SecurityLogCriteriaSearch criteriaSearch = new SecurityLogCriteriaSearch();
+			criteriaSearch.setProviderNo(providerNo);
+			criteriaSearch.setContentType(contentType);
+			criteriaSearch.setStartDate(startDate);
+			criteriaSearch.setEndDate(endDate);
+			criteriaSearch.setSortDirDescending();
 
-		SecurityLogCriteriaSearch criteriaSearch = new SecurityLogCriteriaSearch();
-		criteriaSearch.setProviderNo(providerNo);
-		criteriaSearch.setContentType(contentType);
-		criteriaSearch.setStartDate(startDate);
-		criteriaSearch.setEndDate(endDate);
-		criteriaSearch.setSortDirDescending();
+			if(restrictResultsBySite)
+			{
+				String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromRequest(request).getLoggedInProviderNo();
+				List<ProviderData> providerList = providerDao.findByProviderSite(loggedInProviderNo);
+				List<String> providerIdList = new ArrayList<>(providerList.size());
+				for(ProviderData provider : providerList)
+				{
+					providerIdList.add(provider.getId());
+				}
+				criteriaSearch.setProviderIdFilterList(providerIdList);
+			}
 
-		List<OscarLog> resultList = oscarLogDao.criteriaSearch(criteriaSearch);
-
+			resultList = oscarLogDao.criteriaSearch(criteriaSearch);
+		}
+		catch(DateTimeParseException e)
+		{
+			logger.warn("Invalid date parameter: " + e.getParsedString());
+		}
 		request.setAttribute("resultList", resultList);
 		return mapping.findForward("success");
 	}

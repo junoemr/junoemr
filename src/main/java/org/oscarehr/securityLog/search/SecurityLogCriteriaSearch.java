@@ -30,6 +30,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 public class SecurityLogCriteriaSearch extends AbstractCriteriaSearch
 {
@@ -44,6 +45,8 @@ public class SecurityLogCriteriaSearch extends AbstractCriteriaSearch
 	private String providerNo;
 	private String contentType;
 
+	private List<String> providerIdFilterList;
+
 	@Override
 	public Criteria setCriteriaProperties(Criteria criteria)
 	{
@@ -55,6 +58,11 @@ public class SecurityLogCriteriaSearch extends AbstractCriteriaSearch
 		{
 			criteria.add(Restrictions.eq("content", getContentType()));
 		}
+		else
+		{
+			criteria.add(Restrictions.isNotNull("content"));
+		}
+
 		if(getEndDate() != null)
 		{
 			criteria.add(Restrictions.le("created", Timestamp.from(getEndDate().atTime(LocalTime.MAX).toInstant(ZoneOffset.UTC))));
@@ -62,6 +70,11 @@ public class SecurityLogCriteriaSearch extends AbstractCriteriaSearch
 		if(getStartDate() != null)
 		{
 			criteria.add(Restrictions.ge("created", Timestamp.from(getStartDate().atStartOfDay().toInstant(ZoneOffset.UTC))));
+		}
+
+		if(getProviderIdFilterList() != null)
+		{
+			criteria.add(Restrictions.in("providerNo", getProviderIdFilterList()));
 		}
 
 		setOrderByCriteria(criteria);
@@ -115,5 +128,15 @@ public class SecurityLogCriteriaSearch extends AbstractCriteriaSearch
 	public void setContentType(String contentType)
 	{
 		this.contentType = contentType;
+	}
+
+	public List<String> getProviderIdFilterList()
+	{
+		return providerIdFilterList;
+	}
+
+	public void setProviderIdFilterList(List<String> providerIdFilterList)
+	{
+		this.providerIdFilterList = providerIdFilterList;
 	}
 }
