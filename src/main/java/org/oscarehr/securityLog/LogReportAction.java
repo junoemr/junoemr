@@ -56,8 +56,10 @@ public class LogReportAction extends Action
 	{
 		String startDateStr = StringUtils.trimToNull(request.getParameter("startDate"));
 		String endDateStr = StringUtils.trimToNull(request.getParameter("endDate"));
+		String demographicNoStr = StringUtils.trimToNull(request.getParameter("demographicNo"));
 		String providerNo = StringUtils.trimToNull(request.getParameter("providerNo"));
 		String contentType = StringUtils.trimToNull(request.getParameter("contentType"));
+		String actionType = StringUtils.trimToNull(request.getParameter("actionType"));
 		boolean restrictResultsBySite = Boolean.parseBoolean(request.getParameter("restrictBySite"));
 
 		List<OscarLog> resultList = null;
@@ -65,10 +67,13 @@ public class LogReportAction extends Action
 		{
 			LocalDate startDate = ConversionUtils.toNullableLocalDate(startDateStr);
 			LocalDate endDate = ConversionUtils.toNullableLocalDate(endDateStr);
+			Integer demographicNo = (demographicNoStr != null)? Integer.parseInt(demographicNoStr): null;
 
 			SecurityLogCriteriaSearch criteriaSearch = new SecurityLogCriteriaSearch();
 			criteriaSearch.setProviderNo(providerNo);
+			criteriaSearch.setDemographicId(demographicNo);
 			criteriaSearch.setContentType(contentType);
+			criteriaSearch.setAction(actionType);
 			criteriaSearch.setStartDate(startDate);
 			criteriaSearch.setEndDate(endDate);
 			criteriaSearch.setSortDirDescending();

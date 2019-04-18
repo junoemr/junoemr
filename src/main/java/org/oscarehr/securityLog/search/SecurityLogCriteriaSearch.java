@@ -42,8 +42,10 @@ public class SecurityLogCriteriaSearch extends AbstractCriteriaSearch
 
 	private LocalDate startDate;
 	private LocalDate endDate;
+	private Integer demographicId;
 	private String providerNo;
 	private String contentType;
+	private String action;
 
 	private List<String> providerIdFilterList;
 
@@ -54,6 +56,10 @@ public class SecurityLogCriteriaSearch extends AbstractCriteriaSearch
 		{
 			criteria.add(Restrictions.eq("providerNo", getProviderNo()));
 		}
+		if(getDemographicId() != null)
+		{
+			criteria.add(Restrictions.eq("demographicId", getDemographicId()));
+		}
 		if(getContentType() != null)
 		{
 			criteria.add(Restrictions.eq("content", getContentType()));
@@ -61,6 +67,10 @@ public class SecurityLogCriteriaSearch extends AbstractCriteriaSearch
 		else
 		{
 			criteria.add(Restrictions.isNotNull("content"));
+		}
+		if(getAction() != null)
+		{
+			criteria.add(Restrictions.eq("action", getAction()));
 		}
 
 		if(getEndDate() != null)
@@ -110,6 +120,16 @@ public class SecurityLogCriteriaSearch extends AbstractCriteriaSearch
 		this.endDate = endDate;
 	}
 
+	public Integer getDemographicId()
+	{
+		return demographicId;
+	}
+
+	public void setDemographicId(Integer demographicId)
+	{
+		this.demographicId = demographicId;
+	}
+
 	public String getProviderNo()
 	{
 		return providerNo;
@@ -123,6 +143,16 @@ public class SecurityLogCriteriaSearch extends AbstractCriteriaSearch
 	public String getContentType()
 	{
 		return contentType;
+	}
+
+	public String getAction()
+	{
+		return action;
+	}
+
+	public void setAction(String action)
+	{
+		this.action = action;
 	}
 
 	public void setContentType(String contentType)

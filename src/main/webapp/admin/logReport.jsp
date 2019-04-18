@@ -59,7 +59,9 @@ boolean authed=true;
 	String startDate = StringUtils.trimToEmpty(request.getParameter("startDate"));
 	String endDate = StringUtils.trimToEmpty(request.getParameter("endDate"));
 	String selectedProviderNo = StringUtils.trimToNull(request.getParameter("providerNo"));
-	String selectedContentType = request.getParameter("contentType");
+	String selectedContentType = StringUtils.trimToEmpty(request.getParameter("contentType"));
+	String selectedActionType = StringUtils.trimToEmpty(request.getParameter("actionType"));
+	String selectedDemographicNo = StringUtils.trimToEmpty(request.getParameter("demographicNo"));
 	boolean showAll = (selectedProviderNo == null);
 
 	ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
@@ -68,6 +70,7 @@ boolean authed=true;
 	List<OscarLog> resultList = (List<OscarLog>)request.getAttribute("resultList");
 	HashMap<String, String> providerNameMap = new HashMap<String, String>();
 	HashMap<String, String> contentTypeMap = new LinkedHashMap<String, String>();
+	HashMap<String, String> actionTypeMap = new LinkedHashMap<String, String>();
 	// select provider list
 	if(isSiteAccessPrivacy)
 	{
@@ -96,6 +99,8 @@ boolean authed=true;
 	}
 
 	/* Map the log content constants to visible labels */
+	contentTypeMap.put(LogConst.CON_ADMIN, "Admin");
+	contentTypeMap.put(LogConst.CON_ALLERGY, "Allergy");
 	contentTypeMap.put(LogConst.CON_APPT, "Appointment");
 	contentTypeMap.put(LogConst.CON_DEMOGRAPHIC, "Demographic");
 	contentTypeMap.put(LogConst.CON_DOCUMENT, "Document");
@@ -103,9 +108,22 @@ boolean authed=true;
 	contentTypeMap.put(LogConst.CON_EFORM_DATA, "E-Form");
 	contentTypeMap.put(LogConst.CON_EFORM_TEMPLATE, "E-Form Template");
 	contentTypeMap.put(LogConst.CON_FAX, "Fax");
+	contentTypeMap.put(LogConst.CON_HL7_LAB, "Lab");
 	contentTypeMap.put(LogConst.CON_LOGIN, "Login");
-	contentTypeMap.put(LogConst.CON_ADMIN, "Admin");
+	contentTypeMap.put(LogConst.CON_MEDICATION, "Medication");
+	contentTypeMap.put(LogConst.CON_PRESCRIPTION, "Prescription");
 	contentTypeMap.put(LogConst.CON_SYSTEM, "System");
+
+	/* Map the log action constants to visible labels */
+	actionTypeMap.put(LogConst.ACTION_ACCESS, "Access");
+	actionTypeMap.put(LogConst.ACTION_ADD, "Add");
+	actionTypeMap.put(LogConst.ACTION_DELETE, "Delete");
+	actionTypeMap.put(LogConst.ACTION_DOWNLOAD, "Download");
+	actionTypeMap.put(LogConst.ACTION_EDIT, "Edit");
+	actionTypeMap.put(LogConst.ACTION_READ, "Read");
+	actionTypeMap.put(LogConst.ACTION_SENT, "Sent");
+	actionTypeMap.put(LogConst.ACTION_UPDATE, "Update");
+
 %>
 
 <%@ page import="oscar.util.ConversionUtils"%>
@@ -146,7 +164,7 @@ boolean authed=true;
 				<small>Please select the provider, start and end dates.</small>
 			</h3>
 			<div class="span4">
-				<label for="provider_select">Provider: </label>
+				<label for="provider_select">Provider:</label>
 				<select id="provider_select" name="providerNo">
 					<option value="">All</option>
 					<%
@@ -180,20 +198,44 @@ boolean authed=true;
 				</select>
 			</div>
 			<div class="span4">
-				<label for="startDate">Start Date: </label>
+				<label for="actionType">Action:</label>
+				<select name="actionType" id="actionType">
+					<option value="">All</option>
+					<%
+						for(Map.Entry<String, String> entry : actionTypeMap.entrySet())
+						{
+							String actionValue = entry.getKey();
+							String displayName = entry.getValue();
+							boolean selected = actionValue.equals(selectedActionType);
+					%>
+					<option value="<%=actionValue%>"<%=(selected ? "selected" : "")%>><%= displayName %></option>
+					<%
+						}
+					%>
+				</select>
+			</div>
+			<div class="span4">
+				<label for="startDate">Start Date:</label>
 				<div class="input-append">
 					<input type="text" name="startDate" id="startDate" value="<%=startDate%>" placeholder="yyyy-mm-dd"
 					       pattern="^\d{4}-((0\d)|(1[012]))-(([012]\d)|3[01])$" autocomplete="off"/>
 					<span class="add-on"><i class="icon-calendar"></i></span>
 				</div>
 			</div>
-
 			<div class="span4">
-				<label for="endDate">End Date: </label>
+				<label for="endDate">End Date:</label>
 				<div class="input-append">
 					<input type="text" name="endDate" id="endDate" value="<%=endDate%>" placeholder="yyyy-mm-dd"
 					       pattern="^\d{4}-((0\d)|(1[012]))-(([012]\d)|3[01])$" autocomplete="off"/>
 					<span class="add-on"><i class="icon-calendar"></i></span>
+				</div>
+			</div>
+
+			<div class="span4">
+				<label for="demographicNo">Demographic ID:</label>
+				<div class="input-append">
+					<input type="text" name="demographicNo" id="demographicNo" value="<%=selectedDemographicNo%>"
+					       pattern="^\d*$" autocomplete="off"/>
 				</div>
 			</div>
 
