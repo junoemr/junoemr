@@ -251,8 +251,14 @@
 						{
 							try
 							{
+								String refRange = (String)hashMap.get("range");
 								Double.parseDouble((String)hashMap.get("result"));
-								Double.parseDouble((String)hashMap.get("range"));
+								if (refRange.contains("-"))
+								{
+									String[] rangeValues = refRange.split("-");
+									Double.parseDouble(rangeValues[0]);
+									Double.parseDouble(rangeValues[1]);
+								}
 							}
 							catch (NumberFormatException ex)
 							{
