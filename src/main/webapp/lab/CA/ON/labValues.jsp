@@ -45,14 +45,14 @@
 <%@ page import="org.w3c.dom.Document"%>
 <%@ page import="org.oscarehr.caisi_integrator.ws.CachedDemographicLabResult"%>
 <%@ page import="oscar.oscarLab.ca.all.web.LabDisplayHelper"%>
-<%@ page import="oscar.oscarLab.ca.on.*"%>
-<%@ page import="oscar.oscarDemographic.data.*"%>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="org.oscarehr.util.DateMapComparator" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Collections" %>
+<%@ page import="oscar.oscarDemographic.data.DemographicData" %>
+<%@ page import="oscar.oscarLab.ca.on.CommonLabTestValues" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -78,7 +78,7 @@
 	DateMapComparator comparator = new DateMapComparator("collDate");
 	if (!(demographicNo == null || demographicNo.equals("null")))
 	{
-		if(remoteFacilityIdString==null)
+		if (remoteFacilityIdString == null)
 		{
 			list = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographicNo), testName, identifier);
 		}
