@@ -51,6 +51,9 @@ public class LogReportAction extends Action
 	private static OscarLogDao oscarLogDao = SpringUtils.getBean(OscarLogDao.class);
 	private static ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
 
+	public static final Integer DEFAULT_PAGE = 1;
+	public static final Integer DEFAULT_PAGE_LIMIT = 1000;
+
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 	                             HttpServletRequest request, HttpServletResponse response)
 	{
@@ -61,14 +64,22 @@ public class LogReportAction extends Action
 		String contentType = StringUtils.trimToNull(request.getParameter("contentType"));
 		String actionType = StringUtils.trimToNull(request.getParameter("actionType"));
 		boolean restrictResultsBySite = Boolean.parseBoolean(request.getParameter("restrictBySite"));
+		String pageNoStr = StringUtils.trimToNull(request.getParameter("page"));
+		String perPageStr = StringUtils.trimToNull(request.getParameter("perPage"));
 
 		List<OscarLog> resultList = null;
+		Integer total = 0;
 		try
 		{
+			// do some formatting and edge case checking
 			LocalDate startDate = ConversionUtils.toNullableLocalDate(startDateStr);
 			LocalDate endDate = ConversionUtils.toNullableLocalDate(endDateStr);
-			Integer demographicNo = (demographicNoStr != null)? Integer.parseInt(demographicNoStr): null;
+			Integer demographicNo = (StringUtils.isNumeric(demographicNoStr))? Integer.parseInt(demographicNoStr): null;
+			Integer pageNo = (StringUtils.isNumeric(pageNoStr))? Integer.parseInt(pageNoStr): DEFAULT_PAGE;
+			Integer perPage = (StringUtils.isNumeric(pageNoStr))? Integer.parseInt(perPageStr): DEFAULT_PAGE_LIMIT;
+			pageNo = (pageNo < 1)? DEFAULT_PAGE : pageNo;
 
+			// set up the search
 			SecurityLogCriteriaSearch criteriaSearch = new SecurityLogCriteriaSearch();
 			criteriaSearch.setProviderNo(providerNo);
 			criteriaSearch.setDemographicId(demographicNo);
@@ -76,8 +87,12 @@ public class LogReportAction extends Action
 			criteriaSearch.setAction(actionType);
 			criteriaSearch.setStartDate(startDate);
 			criteriaSearch.setEndDate(endDate);
+
+			criteriaSearch.setOffset(perPage * (pageNo - 1));
+			criteriaSearch.setLimit(perPage);
 			criteriaSearch.setSortDirDescending();
 
+			// if this flag is set, results need to be limited to providers within the site restrictions
 			if(restrictResultsBySite)
 			{
 				String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromRequest(request).getLoggedInProviderNo();
@@ -90,6 +105,7 @@ public class LogReportAction extends Action
 				criteriaSearch.setProviderIdFilterList(providerIdList);
 			}
 
+			total = oscarLogDao.criteriaSearchCount(criteriaSearch);
 			resultList = oscarLogDao.criteriaSearch(criteriaSearch);
 		}
 		catch(DateTimeParseException e)
@@ -97,6 +113,7 @@ public class LogReportAction extends Action
 			logger.warn("Invalid date parameter: " + e.getParsedString());
 		}
 		request.setAttribute("resultList", resultList);
+		request.setAttribute("total", total);
 		return mapping.findForward("success");
 	}
 }

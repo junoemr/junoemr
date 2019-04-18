@@ -31,6 +31,14 @@
 <%@ page import="org.oscarehr.provider.model.ProviderData"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
 <%@ page import="oscar.log.LogConst"%>
+<%@ page import="oscar.util.ConversionUtils"%>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.LinkedHashMap" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="static org.oscarehr.securityLog.LogReportAction.DEFAULT_PAGE_LIMIT" %>
+<%@ page import="static org.oscarehr.securityLog.LogReportAction.DEFAULT_PAGE" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
@@ -62,12 +70,21 @@ boolean authed=true;
 	String selectedContentType = StringUtils.trimToEmpty(request.getParameter("contentType"));
 	String selectedActionType = StringUtils.trimToEmpty(request.getParameter("actionType"));
 	String selectedDemographicNo = StringUtils.trimToEmpty(request.getParameter("demographicNo"));
+	String pageNoStr = StringUtils.trimToNull(request.getParameter("page"));
+	String perPageStr = StringUtils.trimToNull(request.getParameter("perPage"));
+
+	List<OscarLog> resultList = (List<OscarLog>) request.getAttribute("resultList");
+	Integer totalResultCount = (Integer) request.getAttribute("total");
+
+	totalResultCount = (totalResultCount != null)? totalResultCount : 0;
 	boolean showAll = (selectedProviderNo == null);
+	Integer pageNo = (StringUtils.isNumeric(pageNoStr))? Integer.parseInt(pageNoStr): DEFAULT_PAGE;
+	Integer perPage = (StringUtils.isNumeric(pageNoStr))? Integer.parseInt(perPageStr): DEFAULT_PAGE_LIMIT;
+	boolean disableLastPageBtn = (pageNo <= 1);
+	boolean disableNextPageBtn = (pageNo * perPage > totalResultCount);
 
 	ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
 	List<ProviderData> providerList;
-
-	List<OscarLog> resultList = (List<OscarLog>)request.getAttribute("resultList");
 	HashMap<String, String> providerNameMap = new HashMap<String, String>();
 	HashMap<String, String> contentTypeMap = new LinkedHashMap<String, String>();
 	HashMap<String, String> actionTypeMap = new LinkedHashMap<String, String>();
@@ -125,13 +142,6 @@ boolean authed=true;
 	actionTypeMap.put(LogConst.ACTION_UPDATE, "Update");
 
 %>
-
-<%@ page import="oscar.util.ConversionUtils"%>
-<%@ page import="java.time.LocalDate" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.LinkedHashMap" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Map" %>
 <html:html locale="true">
 	<head>
 		<script type="text/javascript" src="<%=request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>
@@ -148,6 +158,20 @@ boolean authed=true;
 			{
 				this.focus();
 			}
+
+			function changePage(pageNo)
+			{
+				document.securityLogSearchForm.page.value = pageNo;
+				document.securityLogSearchForm.submit();
+			}
+			function nextPage()
+			{
+				changePage(Number(document.securityLogSearchForm.page.value) + 1);
+			}
+			function lastPage()
+			{
+				changePage(Number(document.securityLogSearchForm.page.value) - 1);
+			}
 		</script>
 		<style>
 			label {
@@ -158,7 +182,7 @@ boolean authed=true;
 
 	</head>
 	<body>
-	<form name="myform" class="well form-horizontal" action="LogReportAction.do" method="POST">
+	<form name="securityLogSearchForm" id="securityLogSearchForm" class="well form-horizontal" action="LogReportAction.do" method="POST">
 		<fieldset>
 			<h3>Log Admin Report
 				<small>Please select the provider, start and end dates.</small>
@@ -240,9 +264,11 @@ boolean authed=true;
 			</div>
 
 			<div class="span8" style="padding-top:10px;">
-				<input class="btn btn-primary" type="submit" name="submit" value="Run Report">
+				<input class="btn btn-primary" type="button" name="submitBtn" value="Run Report" onClick="changePage(<%=DEFAULT_PAGE%>);">
 			</div>
 			<input type="hidden" name="restrictBySite" value="<%=isSiteAccessPrivacy%>">
+			<input type="hidden" name="page" value="<%=pageNo%>">
+			<input type="hidden" name="perPage" value="<%=perPage%>">
 		</fieldset>
 	</form>
 <%
@@ -292,6 +318,15 @@ boolean authed=true;
 		</tr>
 		<%
 		}
+		%>
+	</table>
+	<div class="pull-right" style="padding-top:10px;">
+		<p>Displaying <%=((pageNo-1) * perPage + 1)%> - <%=((pageNo-1) * perPage) + resultList.size()%> of <%=totalResultCount%> Results</p>
+		<button class="btn" onClick="lastPage();" <%=(disableLastPageBtn)? "disabled":""%>>Last Page</button>
+		<span class="btn disabled"><%=pageNo%></span>
+		<button class="btn" onClick="nextPage();" <%=(disableNextPageBtn)? "disabled":""%>>Next Page</button>
+	</div>
+	<%
 	}
 	%>
 		<script type="text/javascript">
