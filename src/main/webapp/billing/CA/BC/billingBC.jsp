@@ -51,7 +51,6 @@ if(!authed) {
 <%@page import="oscar.entities.PaymentType, oscar.oscarBilling.ca.bc.data.BillingFormData, oscar.oscarBilling.ca.bc.data.SupServiceCodeAssocDAO,oscar.oscarBilling.ca.bc.pageUtil.BillingAssociationPersistence,oscar.oscarBilling.ca.bc.pageUtil.BillingCreateBillingForm,oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean"%>
 <%@page import="oscar.oscarBilling.ca.bc.pageUtil.ServiceCodeAssociation" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.Calendar" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.GregorianCalendar" %>
 <%@ page import="java.util.HashMap" %>
@@ -60,6 +59,8 @@ if(!authed) {
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="oscar.oscarBilling.ca.bc.data.BillingPreference" %>
+<%@ page import="org.oscarehr.common.dao.ProviderPreferenceDao" %>
+<%@ page import="org.oscarehr.common.model.ProviderPreference" %>
 <%!
   public void fillDxcodeList(BillingFormData.BillingService[] servicelist, Map dxcodeList) {
     for (int i = 0; i < servicelist.length; i++) {
@@ -90,19 +91,48 @@ if(!authed) {
     }
     return out.toString();
   }
+
+  public void populateInitialDxCodeList(HttpServletRequest request, BillingCreateBillingForm form, String providerNo)
+  {
+      String diag_code_1 = request.getParameter("diag_code_1");
+      String diag_code_2 = request.getParameter("diag_code_2");
+      String diag_code_3 = request.getParameter("diag_code_3");
+
+      if (diag_code_1 == null && diag_code_2 == null && diag_code_3 == null)
+      {
+          ProviderPreferenceDao preferenceDao = SpringUtils.getBean(ProviderPreferenceDao.class);
+
+          ProviderPreference preference = preferenceDao.find(providerNo);
+
+          if (preference != null && preference.getDefaultDxCode() != null)
+          {
+              form.setXml_diagnostic_detail1(preference.getDefaultDxCode());
+          }
+      }
+      else
+      {
+          if (diag_code_1 != null)
+          {
+              form.setXml_diagnostic_detail1(diag_code_1);
+          }
+          if (diag_code_2 != null)
+          {
+              form.setXml_diagnostic_detail2(diag_code_2);
+          }
+          if (diag_code_3 != null)
+          {
+              form.setXml_diagnostic_detail3(diag_code_3);
+          }
+      }
+
+
+  }
 %>
 <%
-	OscarProperties oscarProperties = OscarProperties.getInstance();
+    OscarProperties oscarProperties = OscarProperties.getInstance();
 
-	int year = 0; //Integer.parseInt(request.getParameter("year"));
-	int month = 0; //Integer.parseInt(request.getParameter("month"));
-	//int day = now.get(Calendar.DATE);
-	int delta = 0; //request.getParameter("delta")==null?0:Integer.parseInt(request.getParameter("delta")); //add or minus month
 	GregorianCalendar now = new GregorianCalendar();
-	year = now.get(Calendar.YEAR);
-	month = now.get(Calendar.MONTH) + 1;
 	String sxml_location = "", sxml_provider = "", sxml_visittype = "";
-	String color = "", colorflag = "";
 	BillingSessionBean bean = (BillingSessionBean) pageContext.findAttribute("billingSessionBean");
 	oscar.oscarDemographic.data.DemographicData demoData = new oscar.oscarDemographic.data.DemographicData();
 	org.oscarehr.common.model.Demographic demo = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), bean.getPatientNo());
@@ -929,10 +959,8 @@ if(wcbneeds != null){%>
 			thisForm.setXml_refer1(bean.getReferral1());
 		}
 
-	    // OHSUPORT-2883 - autofill diagnostic codes with specific values (from url)
-	    if ( request.getParameter("diag_code_1") != null ) { thisForm.setXml_diagnostic_detail1(request.getParameter("diag_code_1")); }
-	    if ( request.getParameter("diag_code_2") != null ) { thisForm.setXml_diagnostic_detail2(request.getParameter("diag_code_2")); }
-	    if ( request.getParameter("diag_code_3") != null ) { thisForm.setXml_diagnostic_detail3(request.getParameter("diag_code_3")); }
+        // OHSUPORT-2883 - autofill diagnostic codes with specific values (from url)
+		populateInitialDxCodeList(request, thisForm, bean.getCreator());
 
 		// OHSUPORT-2883 - autofill other codes with specific values (from url)
 		if ( request.getParameter("other_code_1") != null ) { thisForm.setXml_other1(request.getParameter("other_code_1")); }
