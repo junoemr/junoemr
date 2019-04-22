@@ -33,13 +33,12 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 
-<%@page import="java.util.List" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="org.oscarehr.casemgmt.service.CaseManagementManager" %>
-<%@page import="org.oscarehr.casemgmt.model.CaseManagementNoteLink" %>
 <%@page import="org.oscarehr.common.dao.PartialDateDao" %>
 <%@page import="org.oscarehr.common.model.PartialDate" %>
 <%@ page import="oscar.oscarRx.pageUtil.RxSessionBean" %>
+<%@ page import="org.oscarehr.casemgmt.model.CaseManagementNoteLink" %>
 
 <%
 	String roleName2$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
@@ -71,7 +70,7 @@
 </logic:present>
 <%
 	RxSessionBean sessionBean = (RxSessionBean)pageContext.findAttribute("sessionBean");
-	String annotation_display = org.oscarehr.casemgmt.model.CaseManagementNoteLink.DISP_ALLERGY;
+	String annotation_display = CaseManagementNoteLink.DISP_ALLERGY;
 	com.quatro.service.security.SecurityManager securityManager = new com.quatro.service.security.SecurityManager();
 %>
 <html:html locale="true">
@@ -182,7 +181,7 @@
 				//--> set default checkboxes on load
 				$.fn.setDefaults = function() {
 					// default set Drug Classes checked.
-					document.forms.searchAllergy2.typeDrugClass.checked = true;
+					document.getElementById("typeDrugClass").checked = true;
 				};
 
 
@@ -190,7 +189,7 @@
 				{
 					if (event.which === 13)
 					{
-						//triggerSearchRequest();
+						triggerSearchRequest();
 					}
 				});
 
@@ -248,6 +247,7 @@
 				$(".highLightButton").removeClass("highLightButton");
 				var form = $("#searchAllergy2");
 				var url = "${ pageContext.servletContext.contextPath }" + form.attr('action');
+				document.getElementById("inputSearchString").value = document.getElementById("searchString").value;
 				var params = form.serializeArray();
 				var json = {};
 				$.each(params, function() {
@@ -258,9 +258,9 @@
 				var param = "jsonData=" + JSON.stringify(json);
 
 				// thinking action
-				$('#searchString').addClass('ajax-loader');
 				if (!isEmpty())
 				{
+					$('#searchString').addClass('ajax-loader');
 					sendSearchRequest(url, param, "#searchResultsContainer");
 				}
 				return false;
@@ -331,10 +331,11 @@
 			//--> Check if search field is empty.
 			function isEmpty()
 			{
-				if (document.forms.searchAllergy2.searchString.value.length === 0)
+				var searchStrField = document.getElementById("searchString");
+				if (searchStrField.value.length === 0)
 				{
 					alert("Search Field is Empty");
-					document.forms.searchAllergy2.searchString.focus();
+					searchStrField.focus();
 					return true;
 				}
 				return false;
@@ -343,20 +344,26 @@
 			//--> Checkboxes for search allergy criteria
 			function typeSelect()
 			{
-				var frm = document.forms.searchAllergy2;
-				frm.typeBrandName.checked = true;
-				frm.typeGenericName.checked = true;
-				frm.typeIngredient.checked = true;
-				frm.typeDrugClass.checked = true;
+				document.getElementById("typeBrandName").checked = true;
+				document.getElementById("inputBrandName").checked = true;
+				document.getElementById("typeGenericName").checked = true;
+				document.getElementById("inputGenericName").checked = true;
+				document.getElementById("typeIngredient").checked = true;
+				document.getElementById("inputIngredient").value = true;
+				document.getElementById("typeDrugClass").checked = true;
+				document.getElementById("inputDrugClass").value = true;
 			}
 
 			function typeClear()
 			{
-				var frm = document.forms.searchAllergy2;
-				frm.typeBrandName.checked = false;
-				frm.typeGenericName.checked = false;
-				frm.typeIngredient.checked = false;
-				frm.typeDrugClass.checked = false;
+				document.getElementById("typeBrandName").checked = false;
+				document.getElementById("inputBrandName").checked = false;
+				document.getElementById("typeGenericName").checked = false;
+				document.getElementById("inputGenericName").checked = false;
+				document.getElementById("typeIngredient").checked = false;
+				document.getElementById("inputIngredient").value = false;
+				document.getElementById("typeDrugClass").checked = false;
+				document.getElementById("inputDrugClass").value = false;
 			}
 
 
@@ -675,7 +682,8 @@
 												<%
 													CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 													@SuppressWarnings("unchecked")
-													List<CaseManagementNoteLink> existingAnnots = cmm.getLinkByTableId(org.oscarehr.casemgmt.model.CaseManagementNoteLink.ALLERGIES,Long.valueOf(allergy.getAllergyId()));
+													// Only other place where we're using CaseManagementNoteLink, is this really necessary
+													int numAnnotations = (cmm.getLinkByTableId(CaseManagementNoteLink.ALLERGIES, Long.valueOf(allergy.getAllergyId()))).size();
 												%>
 												<td>
 													<%
@@ -684,7 +692,7 @@
 													%>
 													<a href="#" title="Annotation" onclick="window.open('../annotation/annotation.jsp?display=<%=annotation_display%>&table_id=<%=String.valueOf(allergy.getAllergyId())%>&demo=<jsp:getProperty name="patient" property="demographicNo"/>','anwin','width=400,height=500');">
 														<%
-															if(existingAnnots.size()>0)
+															if(numAnnotations > 0)
 															{
 														%>
 														<img alt="filled notes" src="../images/filledNotes.gif" border="0"/>
@@ -742,43 +750,58 @@
 							<form action="/oscarRx/searchAllergy2.do" id="searchAllergy2" onsubmit="triggerSearchRequest();">
 								<input type="hidden" name="iNKDA" value="<%=iNKDA%>"/>
 								<input type="hidden" name="hasDrugAllergy" value="<%=hasDrugAllergy%>"/>
-
-								<table>
-									<tr>
-										<th>Add an Allergy</th>
-									</tr>
-									<tr id="allergyQuickButtonRow">
-										<td>
-											<input type=button class="ControlPushButton" onclick="addCustomNKDA();" value="NKDA" />
-											<input type=button class="ControlPushButton" onclick="addPenicillinAllergy();" value="Penicillin" />
-											<input type=button class="ControlPushButton" onclick="addSulfonamideAllergy();" value="Sulfa" />
-										</td>
-									</tr>
-									<tr>
-										<td id="addAllergyDialogue"></td>
-									</tr>
-									<tr id="allergySearchCriteriaRow">
-										<td>
-											<div id="allergySearchSelectors">
-												<input type="checkbox" name="typeDrugClass" id="typeDrugClass" ${ typeDrugClass ? 'checked' : '' } />
-												<label for="typeDrugClass" >Drug Classes</label>
-												<input type="checkbox" name="typeIngredient" id="typeIngredient" ${ typeIngredient ? 'checked' : '' } />
-												<label for="typeIngredient" >Ingredients</label>
-												<input type="checkbox" name="typeGenericName" id="typeGenericName" ${ typeGenericName ? 'checked' : '' } />
-												<label for="typeGenericName" >Generic Names</label>
-												<input type="checkbox" name="typeBrandName" id="typeBrandName" ${ typeBrandName ? 'checked' : '' } />
-												<label for="typeBrandName" >Brand Names</label>
-												<input type="checkbox" name="typeSelectAll" id="typeSelectAll" />
-												<label for="typeSelectAll" >All</label>
-											</div>
-											<input type="text" name="searchString" value="${ searchString }" size="16" id="searchString" maxlength="16" />
-											<input type="submit" value="Search" id="searchStringButton" class="ControlPushButton" />
-											OR
-											<input type=button class="ControlPushButton" onclick="addCustomAllergy();" value="Custom Allergy" />
-										</td>
-									</tr>
-								</table>
+								<!-- Duplicated fields so the jquery form submission is more idiomatic -->
+								<input type="hidden" id="inputDrugClass" name="typeDrugClass" value="true" />
+								<input type="hidden" id="inputIngredient" name="typeIngredient" value="false" />
+								<input type="hidden" id="inputGenericName" name="typeGenericName" value="false" />
+								<input type="hidden" id="inputBrandName" name="typeBrandName" value="false" />
+								<input type="hidden" id="inputSearchString" name="searchString" value="" />
 							</form>
+							<table>
+								<tr>
+									<th>Add an Allergy</th>
+								</tr>
+								<tr id="allergyQuickButtonRow">
+									<td>
+										<button type=button class="ControlPushButton" onclick="addCustomNKDA();">
+											NKDA
+										</button>
+										<button type=button class="ControlPushButton" onclick="addPenicillinAllergy();">
+											Penicillin
+										</button>
+										<button type=button class="ControlPushButton" onclick="addSulfonamideAllergy();">
+											Sulfa
+										</button>
+									</td>
+								</tr>
+								<tr>
+									<td id="addAllergyDialogue"></td>
+								</tr>
+								<tr id="allergySearchCriteriaRow">
+									<td>
+										<div id="allergySearchSelectors">
+											<input type="checkbox" name="typeDrugClass" id="typeDrugClass" ${ typeDrugClass ? 'checked' : '' } />
+											<label for="typeDrugClass" >Drug Classes</label>
+											<input type="checkbox" name="typeIngredient" id="typeIngredient" ${ typeIngredient ? 'checked' : '' } />
+											<label for="typeIngredient" >Ingredients</label>
+											<input type="checkbox" name="typeGenericName" id="typeGenericName" ${ typeGenericName ? 'checked' : '' } />
+											<label for="typeGenericName" >Generic Names</label>
+											<input type="checkbox" name="typeBrandName" id="typeBrandName" ${ typeBrandName ? 'checked' : '' } />
+											<label for="typeBrandName" >Brand Names</label>
+											<input type="checkbox" name="typeSelectAll" id="typeSelectAll" />
+											<label for="typeSelectAll" >All</label>
+										</div>
+										<input type="text" name="searchString" value="" size="16" id="searchString" maxlength="16" />
+										<button type="submit" value="Search" id="searchStringButton" class="ControlPushButton">
+											Search
+										</button>
+										OR
+										<button type=button class="ControlPushButton" onclick="addCustomAllergy();" value="Custom Allergy">
+											Custom Allergy
+										</button>
+									</td>
+								</tr>
+							</table>
 						</td>
 					</tr>
 

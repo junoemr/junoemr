@@ -67,7 +67,6 @@ public final class RxSearchAllergyAction extends Action {
         // execute search
 
         RxSearchAllergyForm frm = (RxSearchAllergyForm)form;
-
         // JSON overrides the form.
         String jsonData = request.getParameter("jsonData");
         if (jsonData != null)
