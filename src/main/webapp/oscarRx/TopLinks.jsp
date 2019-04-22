@@ -80,9 +80,8 @@
 			</c:if>
 		</td>
 		<td id="topLinkRightColumn">
-	 		<span class="HelpAboutLogout">
+	 		<span class="Help">
                  <oscar:help keywords="2.2.4" key="app.top1"/>
-                 <a href="${ context }/oscarEncounter/About.jsp" target="_new">About</a>
              </span>
 		</td>
 	</tr>

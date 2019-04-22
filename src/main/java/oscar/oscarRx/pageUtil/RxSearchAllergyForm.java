@@ -33,13 +33,25 @@ import org.apache.struts.action.ActionMapping;
 
 
 public final class RxSearchAllergyForm extends ActionForm {
-    
+
+    public static final int ANATOMICAL = 8;
+    public static final int CHEMICAL = 9;
+    public static final int THERAPEUTIC = 10;
+    public static final int GENERIC = 11;
+    public static final int COMPOSITE_GENERIC = 12;
+    public static final int BRANDED_PRODUCT = 13;
+    public static final int INGREDIENT = 14;
+
     private String searchString = null;
     private boolean type5 = false;
-    private boolean type4 = false;
-    private boolean type3 = false;
-    private boolean type2 = false;
-    private boolean type1 = false;
+    // type 4 drug classes
+    private boolean typeDrugClass = false;
+    // type 3ingredients
+    private boolean typeIngredient = false;
+    // type 2 generic names
+    private boolean typeGenericName = false;
+    // type 1 brand names
+    private boolean typeBrandName = false;
     
     public String getSearchString() {
         return (this.searchString);
@@ -56,32 +68,32 @@ public final class RxSearchAllergyForm extends ActionForm {
         this.type5 = RHS;
     }
     
-    public boolean getType4() {
-        return (this.type4);
+    public boolean getTypeDrugClass() {
+        return (this.typeDrugClass);
     }
-    public void setType4(boolean RHS) {
-        this.type4 = RHS;
-    }
-    
-    public boolean getType3() {
-        return (this.type3);
-    }
-    public void setType3(boolean RHS) {
-        this.type3 = RHS;
+    public void setTypeDrugClass(boolean RHS) {
+        this.typeDrugClass = RHS;
     }
     
-    public boolean getType2() {
-        return (this.type2);
+    public boolean getTypeIngredient() {
+        return (this.typeIngredient);
     }
-    public void setType2(boolean RHS) {
-        this.type2 = RHS;
+    public void setTypeIngredient(boolean RHS) {
+        this.typeIngredient = RHS;
     }
     
-    public boolean getType1() {
-        return (this.type1);
+    public boolean getTypeGenericName() {
+        return (this.typeGenericName);
     }
-    public void setType1(boolean RHS) {
-        this.type1 = RHS;
+    public void setTypeGenericName(boolean RHS) {
+        this.typeGenericName = RHS;
+    }
+    
+    public boolean getTypeBrandName() {
+        return (this.typeBrandName);
+    }
+    public void setTypeBrandName(boolean RHS) {
+        this.typeBrandName = RHS;
     }
     
     /**
@@ -93,10 +105,10 @@ public final class RxSearchAllergyForm extends ActionForm {
     public void reset(ActionMapping mapping, HttpServletRequest request) {
         this.searchString = null;
         this.type5 = false;
-        this.type4 = false;
-        this.type3 = false;
-        this.type2 = false;
-        this.type1 = false;
+        this.typeDrugClass = false;
+        this.typeIngredient = false;
+        this.typeGenericName = false;
+        this.typeBrandName = false;
     }
     
     
@@ -110,8 +122,7 @@ public final class RxSearchAllergyForm extends ActionForm {
      * @param mapping The mapping used to select this instance
      * @param request The servlet request we are processing
      */
-    public ActionErrors validate(ActionMapping mapping,
-    HttpServletRequest request) {
+    public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
         
         ActionErrors errors = new ActionErrors();
         

@@ -88,21 +88,28 @@
 		</style>
 		<script type="text/javascript">
 
-			$(document).ready( function() {
+			$(document).ready(function()
+			{
+				$.fn.bindActionEvents = function()
+				{
+					// Cache all the selectors we're using
+					var deleteLink = $(".deleteAllergyLink");
+					var modifyLink = $(".modifyAllergyLink");
+					var searchContainer = $("#searchResultsContainer a");
+					var sectionHead = $(".DivContentSectionHead a img");
 
-				$.fn.bindActionEvents = function() {
-
-					//--> unbind first to avoid multiple binds.
-					$(".deleteAllergyLink").unbind("click");
-					$(".modifyAllergyLink").unbind("click");
-					$("#searchResultsContainer a").unbind("click");
-					$(".DivContentSectionHead a img").unbind("click");
+					// Unbind click events first to avoid multiple binds
+					deleteLink.unbind("click");
+					modifyLink.unbind("click");
+					searchContainer.unbind("click");
+					sectionHead.unbind("click");
 
 					//--> action for selecting from search results.
-					$("#searchResultsContainer div[id $= '_content'] a").bind("click", function(event){
+					$("#searchResultsContainer div[id $= '_content'] a").bind("click", function(event)
+					{
 						event.preventDefault();
 						// override the old addReaction.do with the new addReaction2.do
-						var path = "${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do"
+						var path = "${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do";
 						var param = this.href.split("?")[1];
 
 						sendSearchRequest(path, param, "#addAllergyDialogue");
@@ -110,23 +117,26 @@
 					});
 
 					//--> delete allergy.
-					$(".deleteAllergyLink").bind("click", function(event){
+					deleteLink.bind("click", function()
+					{
 						var ids = this.id.split("_");
 						var action = ids[0].split(":")[1];
 						var param = ids[1].trim();
 						var allergyId = param.split("&")[0];
-						allergyId = allergyId.split("=")[1].trim()
+						allergyId = allergyId.split("=")[1].trim();
 						$("#allergy_" + allergyId).addClass("highLightRow");
 
 						var path = "${ pageContext.servletContext.contextPath }/oscarRx/deleteAllergy2.do";
 
-						if( confirm(action+" this Allergy?") ) {
+						if (confirm(action + " this Allergy?"))
+						{
 							sendSearchRequest(path, param, ".Step1Text");
 						}
 					});
 
 					//--> modify allergy.
-					$(".modifyAllergyLink").bind("click", function(event){
+					modifyLink.bind("click", function()
+					{
 						var ids = this.id.split("_");
 						var param = ids[1].trim();
 						sendSearchRequest("${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do",
@@ -134,71 +144,73 @@
 					});
 
 					//--> Toggle search results listing.
-					$.fn.toggleSection = function(typecode) {
-						var imgsrc = document.getElementById(typecode+"_img").src;
-						if(imgsrc.indexOf('expander')!=-1) {
-							document.getElementById(typecode+"_img").src='../images/collapser.png';
-							Effect.BlindDown(document.getElementById(typecode+"_content"), {duration: 0.1 });
-						} else {
-							document.getElementById(typecode+"_img").src='../images/expander.png';
-							Effect.BlindUp(document.getElementById(typecode+"_content"), {duration: 0.1 });
+					$.fn.toggleSection = function(typeCode)
+					{
+						var imgSrc = document.getElementById(typeCode + "_img").src;
+						if (imgSrc.indexOf('expander') !== -1)
+						{
+							document.getElementById(typeCode + "_img").src='../images/collapser.png';
+							Effect.BlindDown(document.getElementById(typeCode + "_content"), {duration: 0.1 });
 						}
-					}
+						else
+						{
+							document.getElementById(typeCode + "_img").src='../images/expander.png';
+							Effect.BlindUp(document.getElementById(typeCode + "_content"), {duration: 0.1 });
+						}
+					};
 
 					//--> Toggle search results listing.
-					$(".DivContentSectionHead a img").bind("click", function(event){
+					sectionHead.bind("click", function(event)
+					{
 						event.preventDefault();
-						var typecode = this.id.split("_")[0];
-						var imgsrc = document.getElementById(typecode+"_img").src;
-						if(imgsrc.indexOf('expander')!=-1) {
-							document.getElementById(typecode+"_img").src='../images/collapser.png';
-							$("#"+typecode+"_content").show();
-						} else {
-							document.getElementById(typecode+"_img").src='../images/expander.png';
-							$("#"+typecode+"_content").hide();
+						var typeCode = this.id.split("_")[0];
+						var imgSrc = document.getElementById(typeCode + "_img").src;
+						if (imgSrc.indexOf('expander') !== -1)
+						{
+							document.getElementById(typeCode + "_img").src='../images/collapser.png';
+							$("#" + typeCode + "_content").show();
+						}
+						else
+						{
+							document.getElementById(typeCode + "_img").src='../images/expander.png';
+							$("#" + typeCode + "_content").hide();
 						}
 					})
 
-				} //--> end bind events function.
+				}; //--> end bind events function.
 
 				//--> set default checkboxes on load
 				$.fn.setDefaults = function() {
 					// default set Drug Classes checked.
-					document.forms.searchAllergy2.type4.checked = true;
-				}
+					document.forms.searchAllergy2.typeDrugClass.checked = true;
+				};
 
-				//--> Send allergy search to server
-				$("#searchStringButton").click( function(){
 
-					if( isEmpty() ) {
-						$(".highLightButton").removeClass("highLightButton");
-						var form = $("#searchAllergy2");
-						var url = "${ pageContext.servletContext.contextPath }" + form.attr('action');
-						var params = form.serializeArray();
-						var json = {};
-						$.each(params, function() {
-							json[this.name] = this.value || '';
-						});
-						json.submit = 'Search';
-						// servlet looks for "jsonData" request parameter
-						param = "jsonData=" + JSON.stringify(json);
-
-						// thinking action
-						$('#searchString').addClass('ajax-loader');
-
-						sendSearchRequest(url, param, "#searchResultsContainer");
+				$("#searchString").keypress(function(event)
+				{
+					if (event.which === 13)
+					{
+						//triggerSearchRequest();
 					}
 				});
 
+
+				//--> Send allergy search to server
+				// Want to copy the functionality of this to the event above
+				$("#searchStringButton").click(function()
+				{
+					if (!isEmpty())
+					{
+						triggerSearchRequest();
+					}
+				});
 
 				//--> Toggle checkboxes all or none
 				$("#typeSelectAll").change( function(){
 					if(this.checked) {
 						typeSelect();
-						//$("label[for='" + this.id + "']").text("None");
 					} else {
 						typeClear();
-						//$("label[for='" + this.id + "']").text("All");
 					}
 				});
 
@@ -209,20 +221,53 @@
 					document.forms.RxAddAllergyForm.startDate.value='';
 					document.forms.RxAddAllergyForm.ageOfOnset.value='';
 					location.reload();
-				})
+				});
 
 				//--> Actions after allergy has been added.
-				$("input[value='Add Allergy'], .ControlPushButton").click(function() {
+				$("input[value='Add Allergy'], .ControlPushButton").click(function()
+				{
 					$(".ControlPushButton").removeClass("highLightButton");
-				})
+				});
 
 				$().bindActionEvents();
 				$().setDefaults();
 
+				$("searchAllergy2").submit(function(event)
+				{
+					event.preventDefault();
+					if (!isEmpty())
+					{
+						triggerSearchRequest();
+					}
+				});
+
 			}); //--> end document ready
 
+			function triggerSearchRequest()
+			{
+				$(".highLightButton").removeClass("highLightButton");
+				var form = $("#searchAllergy2");
+				var url = "${ pageContext.servletContext.contextPath }" + form.attr('action');
+				var params = form.serializeArray();
+				var json = {};
+				$.each(params, function() {
+					json[this.name] = this.value || '';
+				});
+				json.submit = 'Search';
+				// servlet looks for "jsonData" request parameter
+				var param = "jsonData=" + JSON.stringify(json);
+
+				// thinking action
+				$('#searchString').addClass('ajax-loader');
+				if (!isEmpty())
+				{
+					sendSearchRequest(url, param, "#searchResultsContainer");
+				}
+				return false;
+			}
+
+
 			//--> AJAX the data to the server.
-			// TODO fix this, currently it's 404'ing (not sending params properly OR not being called properly)
 			function sendSearchRequest(path, param, target)
 			{
 				var iNKDA = document.forms.searchAllergy2.iNKDA.value;
@@ -250,14 +295,15 @@
 				}
 				else if (param.indexOf("ID=0") < 0 && iNKDA > 0)
 				{
-					param += "&nkdaId="+iNKDA;
+					param += "&nkdaId=" + iNKDA;
 				}
 				$.ajax({
 					url: path,
 					type: 'POST',
 					data: param,
 					dataType: 'html',
-					success: function(data) {
+					success: function(data)
+					{
 						renderSearchResults(data, target);
 						if (path.indexOf("deleteAllergy") >= 0)
 						{
@@ -283,49 +329,41 @@
 			}
 
 			//--> Check if search field is empty.
-			function isEmpty(){
-				if (document.forms.searchAllergy2.searchString.value.length === 0){
+			function isEmpty()
+			{
+				if (document.forms.searchAllergy2.searchString.value.length === 0)
+				{
 					alert("Search Field is Empty");
 					document.forms.searchAllergy2.searchString.focus();
-					return false;
+					return true;
 				}
-				return true;
-			}
-
-			function show_Search_Criteria(){
-				var tbl_as = document.getElementById("advancedSearch");
-
-				if (tbl_as.style.display === '') {
-					tbl_as.style.display = 'none';
-				}else{
-					tbl_as.style.display = '';
-				}
+				return false;
 			}
 
 			//--> Checkboxes for search allergy criteria
-			function typeSelect(){
+			function typeSelect()
+			{
 				var frm = document.forms.searchAllergy2;
-
-				frm.type1.checked = true;
-				frm.type2.checked = true;
-				frm.type3.checked = true;
-				frm.type4.checked = true;
+				frm.typeBrandName.checked = true;
+				frm.typeGenericName.checked = true;
+				frm.typeIngredient.checked = true;
+				frm.typeDrugClass.checked = true;
 			}
 
-			function typeClear(){
+			function typeClear()
+			{
 				var frm = document.forms.searchAllergy2;
-
-				frm.type1.checked = false;
-				frm.type2.checked = false;
-				frm.type3.checked = false;
-				frm.type4.checked = false;
+				frm.typeBrandName.checked = false;
+				frm.typeGenericName.checked = false;
+				frm.typeIngredient.checked = false;
+				frm.typeDrugClass.checked = false;
 			}
 
 
 			function addCustomAllergy(){
 				$(".highLightButton").removeClass("highLightButton");
 				var name = document.getElementById('searchString').value;
-				if(isEmpty() === true){
+				if(!isEmpty()){
 					name = name.toUpperCase();
 					confirm("Adding custom allergy: " + name);
 					sendSearchRequest("${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do",
@@ -360,8 +398,6 @@
 					"ID=0&type=0&"+paramNKDA, "#addAllergyDialogue");
 				$("input[value='NKDA']").addClass("highLightButton");
 			}
-
-
 		</script>
 
 	</head>
@@ -427,7 +463,7 @@
 
 							String demoNo=request.getParameter("demographicNo");
 
-							if (demoNo==null)
+							if (demoNo == null)
 							{
 								demoNo = (String)session.getAttribute("demographicNo");
 							}
@@ -441,28 +477,29 @@
 								demoNo = String.valueOf(sessionBean.getDemographicNo());
 							}
 
-							String strView=request.getParameter("view");
-							if (strView==null)
+							String strView = request.getParameter("view");
+							if (strView == null)
 							{
 								strView = "Active";
 							}
 
-							String[] navArray={"Active","All","Inactive"};
+							String[] navArray = {"Active","All","Inactive"};
 
-							for (int i = 0;i < navArray.length; i++)
+							for (String navItem : navArray)
 							{
-								if (strView.equals(navArray[i]))
+								if (strView.equals(navItem))
 								{
-									out.print(" <span class='view_selected'>" + navArray[i] + "</span>");
+									out.print(" <span class='view selected'>" + navItem + "</span>");
 								}
 								else
 								{
-									out.print("<span class='view_menu'><a href='ShowAllergies2.jsp?demographicNo=" + demoNo + "&view=" + navArray[i] + "'>");
-									out.print(navArray[i]);
+									out.print("<span class='view_menu'><a href='ShowAllergies2.jsp?demographicNo=" + demoNo + "&view=" + navItem + "'>");
+									out.print(navItem);
 									out.print("</a></span>");
 								}
 							}
 
+							// Can probably revisit this for minor optimization (index [0] unused)
 							String[] ColourCodesArray=new String[6];
 							ColourCodesArray[1]="#F5F5F5"; // Mild Was set to yellow (#FFFF33)
 							ColourCodesArray[2]="#FF6600"; // Moderate
@@ -558,7 +595,7 @@
 												{
 													if (!allergy.getArchived())
 													{
-														if (allergy.getTypeCode()>0)
+														if (allergy.getTypeCode() > 0)
 														{
 															hasDrugAllergy = true;
 														}
@@ -574,8 +611,8 @@
 														title = " title=\"Din: "+allergy.getRegionalIdentifier()+"\" ";
 													}
 
-													boolean filterOut=false;
-													strArchived=allergy.getArchived() ? "1" : "0";
+													boolean filterOut = false;
+													strArchived = allergy.getArchived() ? "1" : "0";
 
 													try
 													{
@@ -583,12 +620,12 @@
 
 														if (strView.equals("Active") && intArchived == 1)
 														{
-															filterOut=true;
+															filterOut = true;
 														}
 
 														if (strView.equals("Inactive") && intArchived == 0)
 														{
-															filterOut=true;
+															filterOut = true;
 														}
 													}
 													catch (Exception e)
@@ -619,7 +656,7 @@
 													}
 
 
-													if(!filterOut)
+													if (!filterOut)
 													{
 														String entryDate = partialDateDao.getDatePartial(allergy.getEntryDate(), PartialDate.ALLERGIES, allergy.getAllergyId(), PartialDate.ALLERGIES_ENTRYDATE);
 														String startDate = partialDateDao.getDatePartial(allergy.getStartDate(), PartialDate.ALLERGIES, allergy.getAllergyId(), PartialDate.ALLERGIES_STARTDATE);
@@ -651,9 +688,13 @@
 															{
 														%>
 														<img alt="filled notes" src="../images/filledNotes.gif" border="0"/>
-														<%			} else { %>
+														<%
+															}
+															else
+															{
+														%>
 														<img alt="note" src="../images/notes.gif" border="0">
-														<%			} %>
+														<%	} %>
 													</a>
 													<%	} %>
 												</td>
@@ -692,10 +733,13 @@
 						</td>
 					</tr>
 
-					<tr id="addAllergyInterface" >
+					<tr id="addAllergyInterface">
 						<td>
-							<form action="/oscarRx/searchAllergy2.do" focus="searchString" id="searchAllergy2" onSubmit="return submitSearchForm()">
-
+							<!--
+							This looks like a form but it really shouldn't be one
+							None of its inputs actually want to submit the form
+							  -->
+							<form action="/oscarRx/searchAllergy2.do" id="searchAllergy2" onsubmit="triggerSearchRequest();">
 								<input type="hidden" name="iNKDA" value="<%=iNKDA%>"/>
 								<input type="hidden" name="hasDrugAllergy" value="<%=hasDrugAllergy%>"/>
 
@@ -703,11 +747,11 @@
 									<tr>
 										<th>Add an Allergy</th>
 									</tr>
-									<tr id="allergyQuickButtonRow" >
+									<tr id="allergyQuickButtonRow">
 										<td>
-											<input type=button class="ControlPushButton" onclick="javascript:addCustomNKDA();" value="NKDA" />
-											<input type=button class="ControlPushButton" onclick="javascript:addPenicillinAllergy();" value="Penicillin" />
-											<input type=button class="ControlPushButton" onclick="javascript:addSulfonamideAllergy();" value="Sulfa" />
+											<input type=button class="ControlPushButton" onclick="addCustomNKDA();" value="NKDA" />
+											<input type=button class="ControlPushButton" onclick="addPenicillinAllergy();" value="Penicillin" />
+											<input type=button class="ControlPushButton" onclick="addSulfonamideAllergy();" value="Sulfa" />
 										</td>
 									</tr>
 									<tr>
@@ -716,21 +760,21 @@
 									<tr id="allergySearchCriteriaRow">
 										<td>
 											<div id="allergySearchSelectors">
-												<input type="checkbox" name="type4" id="type4" ${ type4 ? 'checked' : '' } />
-												<label for="type4" >Drug Classes</label>
-												<input type="checkbox" name="type3" id="type3" ${ type3 ? 'checked' : '' } />
-												<label for="type3" >Ingredients</label>
-												<input type="checkbox" name="type2" id="type2" ${ type2 ? 'checked' : '' } />
-												<label for="type2" >Generic Names</label>
-												<input type="checkbox" name="type1" id="type1" ${ type1 ? 'checked' : '' } />
-												<label for="type1" >Brand Names</label>
+												<input type="checkbox" name="typeDrugClass" id="typeDrugClass" ${ typeDrugClass ? 'checked' : '' } />
+												<label for="typeDrugClass" >Drug Classes</label>
+												<input type="checkbox" name="typeIngredient" id="typeIngredient" ${ typeIngredient ? 'checked' : '' } />
+												<label for="typeIngredient" >Ingredients</label>
+												<input type="checkbox" name="typeGenericName" id="typeGenericName" ${ typeGenericName ? 'checked' : '' } />
+												<label for="typeGenericName" >Generic Names</label>
+												<input type="checkbox" name="typeBrandName" id="typeBrandName" ${ typeBrandName ? 'checked' : '' } />
+												<label for="typeBrandName" >Brand Names</label>
 												<input type="checkbox" name="typeSelectAll" id="typeSelectAll" />
 												<label for="typeSelectAll" >All</label>
 											</div>
 											<input type="text" name="searchString" value="${ searchString }" size="16" id="searchString" maxlength="16" />
-											<input type="button" value="Search" id="searchStringButton" class="ControlPushButton" />
+											<input type="submit" value="Search" id="searchStringButton" class="ControlPushButton" />
 											OR
-											<input type=button class="ControlPushButton" onclick="javascript:addCustomAllergy();" value="Custom Allergy" />
+											<input type=button class="ControlPushButton" onclick="addCustomAllergy();" value="Custom Allergy" />
 										</td>
 									</tr>
 								</table>
@@ -749,8 +793,6 @@
 		<tr class="lastRow">
 			<td colspan="2"></td>
 		</tr>
-
-			<%-- } --%>
 	</table>
 	</body>
 </html:html>

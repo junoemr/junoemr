@@ -56,7 +56,6 @@ import oscar.oscarRx.util.RxDrugRef;
 public final class RxSearchAllergyAction extends Action {
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 
-
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
@@ -70,18 +69,17 @@ public final class RxSearchAllergyAction extends Action {
         RxSearchAllergyForm frm = (RxSearchAllergyForm)form;
 
         // JSON overrides the form.
-        String jsondata = request.getParameter("jsonData");
-        if (jsondata != null)
+        String jsonData = request.getParameter("jsonData");
+        if (jsonData != null)
         {
-            frm = (RxSearchAllergyForm) JsonUtil.jsonToPojo(jsondata, RxSearchAllergyForm.class);
+            frm = (RxSearchAllergyForm)JsonUtil.jsonToPojo(jsonData, RxSearchAllergyForm.class);
         }
 
-        ///Search a drug like another one
-
+        // Search a drug like another one
         RxDrugRef drugRef = new RxDrugRef();
 
-        java.util.Vector vec    = new java.util.Vector();
-        java.util.Vector catVec = new java.util.Vector();
+        java.util.Vector vec;
+        java.util.Vector<String> catVec = new java.util.Vector<>();
 
         /**
          * <html:checkbox property="type4" /> Drug Classes   9 |  4 | ther_class
@@ -100,92 +98,116 @@ public final class RxSearchAllergyAction extends Action {
          *
          *
          **/
-        if(frm.getType1())
+
+        if (frm.getTypeBrandName())
         {
-            catVec.add("13");
+            catVec.add(Integer.toString(RxSearchAllergyForm.BRANDED_PRODUCT));
         }
 
-        if(frm.getType2())
+        if (frm.getTypeGenericName())
         {
-            catVec.add("11");
-            catVec.add("12");
+            catVec.add(Integer.toString(RxSearchAllergyForm.GENERIC));
+            catVec.add(Integer.toString(RxSearchAllergyForm.COMPOSITE_GENERIC));
         }
 
-        if(frm.getType3()){
-            catVec.add("14");
+        if (frm.getTypeIngredient()){
+            catVec.add(Integer.toString(RxSearchAllergyForm.INGREDIENT));
         }
 
-        if(frm.getType4()){
-            catVec.add("8");
-            catVec.add("10");
+        if (frm.getTypeDrugClass()){
+            catVec.add(Integer.toString(RxSearchAllergyForm.ANATOMICAL));
+            catVec.add(Integer.toString(RxSearchAllergyForm.THERAPEUTIC));
 
         }
 
         boolean itemsFound = true;
 
         String wildcardRightOnly = OscarProperties.getInstance().getProperty("allergies.search_right_wildcard_only", "false");
-        vec  = drugRef.list_search_element_select_categories(frm.getSearchString(),catVec,Boolean.valueOf(wildcardRightOnly));
+        vec = drugRef.list_search_element_select_categories(frm.getSearchString(),catVec,Boolean.valueOf(wildcardRightOnly));
 
         //  'id':'0','category':'','name'
-        Allergy[] arr = new Allergy[vec==null?0:vec.size()];
+        Allergy[] allergies = new Allergy[vec == null ? 0:vec.size()];
 
         String includeClassesStr = OscarProperties.getInstance().getProperty("allergies.include_ahfs_class_in_results", "true");
         boolean includeClasses = Boolean.valueOf(includeClassesStr);
 
-        TreeMap<String,Allergy> flatList = new TreeMap<String,Allergy>();
+        TreeMap<String,Allergy> flatList = new TreeMap<>();
 
         //we want to categorize the search results.
-        Map<Integer,List<Allergy>> allergyResults = new HashMap<Integer,List<Allergy>>();
-        allergyResults.put(8, new ArrayList<Allergy>());
-        allergyResults.put(10, new ArrayList<Allergy>());
-        allergyResults.put(11, new ArrayList<Allergy>());
-        allergyResults.put(12, new ArrayList<Allergy>());
-        allergyResults.put(13, new ArrayList<Allergy>());
-        allergyResults.put(14, new ArrayList<Allergy>());
+        Map<Integer,List<Allergy>> allergyResults = new HashMap<>();
+        allergyResults.put(RxSearchAllergyForm.ANATOMICAL, new ArrayList<>());
+        allergyResults.put(RxSearchAllergyForm.CHEMICAL, new ArrayList<>());
+        allergyResults.put(RxSearchAllergyForm.THERAPEUTIC, new ArrayList<>());
+        allergyResults.put(RxSearchAllergyForm.GENERIC, new ArrayList<>());
+        allergyResults.put(RxSearchAllergyForm.COMPOSITE_GENERIC, new ArrayList<>());
+        allergyResults.put(RxSearchAllergyForm.BRANDED_PRODUCT, new ArrayList<>());
+        allergyResults.put(RxSearchAllergyForm.INGREDIENT, new ArrayList<>());
 
-        Vector classVec = new Vector() ;
-        for (int i = 0; i < vec.size(); i++){
-        	java.util.Hashtable hash = (java.util.Hashtable) vec.get(i);
-            if (!hash.get("name").equals("None found")){
-                arr[i] = new Allergy();
+        Vector<String> classVec = new Vector<>();
 
-                arr[i].setTypeCode(((Integer) hash.get("category")).intValue());
-                arr[i].setDrugrefId( String.valueOf(hash.get("id")));
-                arr[i].setDescription(((String) hash.get("name")));
+        // Vec may still be null at this point (error occurred when attempting to instantiate it earlier)
+        if (vec != null)
+        {
+            for (int i = 0; i < vec.size(); i++)
+            {
+                java.util.Hashtable hash = (java.util.Hashtable) vec.get(i);
 
-                if (arr[i].getTypeCode() == 13)
+                String name = (String)hash.get("name");
+                int typeCode = (Integer)hash.get("category");
+                String id = String.valueOf(hash.get("id"));
+
+                if (!name.equals("None found") && allergies != null && allergies.length > 0)
                 {
-                    classVec.add(""+arr[i].getDrugrefId());
+                    allergies[i] = new Allergy();
+
+                    allergies[i].setTypeCode(typeCode);
+                    allergies[i].setDrugrefId(id);
+                    allergies[i].setDescription(name);
+
+                    if (allergies[i].getTypeCode() == RxSearchAllergyForm.BRANDED_PRODUCT)
+                    {
+                        classVec.add("" + allergies[i].getDrugrefId());
+                    }
+
+                    String listKey = allergies[i].getDescription();
+                    allergyResults.get(typeCode).add(allergies[i]);
+
+                    boolean inFlatList = false;
+                    for (Allergy allergy : flatList.values())
+                    {
+                        if (allergy.getDescription().equals(listKey))
+                        {
+                            inFlatList = true;
+                        }
+                    }
+
+                    if (!inFlatList)
+                    {
+                        flatList.put(listKey, allergies[i]);
+                    }
+                }
+                else
+                {
+                    itemsFound = false;
+                    allergies = null;
                 }
 
-                allergyResults.get(hash.get("category")).add(arr[i]);
-                if(flatList.get(arr[i].getDescription()) == null) {
-                	flatList.put(arr[i].getDescription(),arr[i]);
-                }
-            }else{
-                MiscUtils.getLogger().debug("IM FLAGGING IT AS NOT FOUND");
-                itemsFound = false;
-                arr= null;
             }
-
         }
 
         Hashtable returnHash = new Hashtable();
 
-        if (itemsFound && includeClasses){
+        if (itemsFound && includeClasses && classVec.size() > 0)
+        {
+            Vector classVec2 = drugRef.list_drug_class(classVec);
 
-            if (classVec.size() > 0){
-                Vector classVec2 = drugRef.list_drug_class(classVec);
+            if (classVec2 != null)
+            {
+                Hashtable hash;
+                Vector strVec;
 
-
-                Hashtable hash ;
-                String compString = null;
-                Vector strVec = null;
-
-                if(classVec2!=null) {
-                	for(int j = 0; j < classVec2.size(); j++){
-
-                    MiscUtils.getLogger().debug("LOOPING");
+                for (int j = 0; j < classVec2.size(); j++)
+                {
                     hash = (java.util.Hashtable) classVec2.get(j);
                     //'id_drug'     'id_class'      'name'
                     String idDrug  = String.valueOf(hash.get("id_drug"));
@@ -195,25 +217,27 @@ public final class RxSearchAllergyAction extends Action {
                     strArr[0] = idClass;
                     strArr[1] = name;
                     MiscUtils.getLogger().debug(j+" idDrug "+idDrug+" idClass "+idClass+" name "+name);
-                    if(returnHash.containsKey(idDrug)){
+
+                    if (returnHash.containsKey(idDrug))
+                    {
                         strVec = (Vector) returnHash.get(idDrug);
                         strVec.add(strArr);
-                        returnHash.put(idDrug,strVec);
-                    }else{
+                        returnHash.put(idDrug, strVec);
+                    }
+                    else
+                    {
                         strVec = new Vector();
                         strVec.add(strArr);
                         returnHash.put(idDrug,strVec);
                     }
                 }
-                }
             }
-          	MiscUtils.getLogger().debug("Sending this many vector of this size back "+returnHash.values().size());
-
         }
 
-        if(arr != null && arr.length>0) {
+        if (allergies != null && allergies.length > 0)
+        {
         	request.setAttribute("allergyResults", allergyResults);
-            request.setAttribute("allergies", arr);
+            request.setAttribute("allergies", allergies);
             request.setAttribute("drugClasses", returnHash);
             request.setAttribute("flatMap", flatList);
         }

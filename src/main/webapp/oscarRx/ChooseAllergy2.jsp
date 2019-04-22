@@ -39,7 +39,8 @@
 	<%response.sendRedirect("../securityError.jsp?type=_allergy");%>
 </security:oscarSec>
 <%
-	if(!authed) {
+	if (!authed)
+	{
 		return;
 	}
 %>
@@ -110,20 +111,19 @@
 				window.location="addReaction2.do?ID=0&type=0&name=NKDA";
 			}
 
-			function toggleSection(typecode)
+			function toggleSection(typeCode)
 			{
-				var imgsrc = document.getElementById(typecode+"_img").src;
-				if (imgsrc.indexOf('expander') !==- 1)
+				var imgSrc = document.getElementById(typeCode + "_img").src;
+				if (imgSrc.indexOf('expander') !==- 1)
 				{
-					document.getElementById(typecode+"_img").src='../images/collapser.png';
-					Effect.BlindDown(document.getElementById(typecode+"_content"), {duration: 0.1 });
+					document.getElementById(typeCode + "_img").src = '../images/collapser.png';
+					Effect.BlindDown(document.getElementById(typeCode + "_content"), {duration: 0.1 });
 				}
 				else
 				{
-					document.getElementById(typecode+"_img").src='../images/expander.png';
-					Effect.BlindUp(document.getElementById(typecode+"_content"), {duration: 0.1 });
+					document.getElementById(typeCode + "_img").src = '../images/expander.png';
+					Effect.BlindUp(document.getElementById(typeCode + "_content"), {duration: 0.1 });
 				}
-
 			}
 		</script>
 	</head>
@@ -133,8 +133,7 @@
 		<!-- Row One included here-->
 		<tr>
 			<%@ include file="SideLinksNoEditFavorites2.jsp"%>
-			<td width="100%" style="border-left: 2px solid #A9A9A9;" height="100%"
-				valign="top">
+			<td width="100%" style="border-left: 2px solid #A9A9A9;" height="100%" valign="top">
 				<table cellpadding="0" cellspacing="2" style="border-collapse: collapse" width="100%">
 					<tr>
 						<td width="0%" valign="top">
@@ -174,27 +173,27 @@
 									</td>
 									<td>
 										<input type=button class="ControlPushButton"
-											   onclick="javascript:document.forms.RxSearchAllergyForm.searchString.value='';document.forms.RxSearchAllergyForm.searchString.focus();"
+											   onclick=document.forms.RxSearchAllergyForm.searchString.value='';document.forms.RxSearchAllergyForm.searchString.focus();"
 											   value="Reset" />
-										<input type=button class="ControlPushButton" onclick="javascript:addCustomAllergy();" value="Custom Allergy" />
-										<input type=button class="ControlPushButton" onclick="javascript:addCustomNKDA();" value="NKDA" />
-										<input type=button class="ControlPushButton" onclick="javascript:addPenicillinAllergy();" value="Penicillin" />
-										<input type=button class="ControlPushButton" onclick="javascript:addSulfonamideAllergy();" value="Sulfa" />
+										<input type=button class="ControlPushButton" onclick="addCustomAllergy();" value="Custom Allergy" />
+										<input type=button class="ControlPushButton" onclick="addCustomNKDA();" value="NKDA" />
+										<input type=button class="ControlPushButton" onclick="addPenicillinAllergy();" value="Penicillin" />
+										<input type=button class="ControlPushButton" onclick="addSulfonamideAllergy();" value="Sulfa" />
 									</td>
 								</tr>
 							</table>
 							&nbsp;
-							<table bgcolor="#F5F5F5" cellspacing=2
-								   cellpadding=2>
+							<table bgcolor="#F5F5F5" cellspacing=2 cellpadding=2>
 								<tr>
-									<td colspan=4>Search the following categories: <i>(Listed
-										general to specific)</i></td>
+									<td colspan=4>
+										Search the following categories: <i>(Listed general to specific)</i>
+									</td>
 								</tr>
 								<tr>
-									<td><html:checkbox property="type4" /> Drug Classes</td>
-									<td><html:checkbox property="type3" /> Ingredients</td>
-									<td><html:checkbox property="type2" /> Generic Names</td>
-									<td><html:checkbox property="type1" /> Brand Names</td>
+									<td><html:checkbox property="typeDrugClass" /> Drug Classes</td>
+									<td><html:checkbox property="typeIngredient" /> Ingredients</td>
+									<td><html:checkbox property="typeGenericName" /> Generic Names</td>
+									<td><html:checkbox property="typeBrandName" /> Brand Names</td>
 								</tr>
 								<tr>
 									<td colspan=4>
@@ -250,8 +249,6 @@
 										<div class="LeftMargin">
 											<logic:notPresent name="allergies">Search returned no results. Revise your search and try again.</logic:notPresent>
 											<logic:present name="allergies">
-
-
 												<%
 													boolean flatResults = Boolean.valueOf(oscar.OscarProperties.getInstance().getProperty("allergies.flat_results", "false"));
 													if (flatResults)
@@ -266,8 +263,10 @@
 												<a href="addReaction.do?ID=<%= allergy.getDrugrefId() %>&name=<%=java.net.URLEncoder.encode(allergy.getDescription())%>&type=<%=allergy.getTypeCode()%>"><%=allergy.getDescription()%></a>
 												<%
 													java.util.Vector vect = (Vector) drugClassHash.get(""+allergy.getDrugrefId());
-													if (vect != null){
-														for (int k = 0; k < vect.size() ; k++){
+													if (vect != null)
+													{
+														for (int k = 0; k < vect.size() ; k++)
+														{
 															String[] drugClassPair = (String[]) vect.get(k);
 												%>
 												&nbsp;&nbsp;&nbsp;
@@ -279,137 +278,196 @@
 												<br/>
 												<%
 														}
-
 													}
 												%>
 
 
-												<% } else { //not flat results %>
+												<% } else { // Not flat results %>
 
 												<%
 													Map<Integer, List<Allergy>> allergyResults = (Map<Integer,List<Allergy>>)request.getAttribute("allergyResults");
-													if(allergyResults.get(8).size()>0) {
-												%><div class="DivContentSectionHead"><a href="javascript:void(0)" onclick="toggleSection('8');return false;"><img border="0" id="8_img" src="../images/collapser.png"/></a>ATC Class</div><%
-											%><div id="8_content"><%
-												for(Allergy allergy:allergyResults.get(8)) {
-											%>
-												<a href="addReaction.do?ID=<%= allergy.getDrugrefId() %>&name=<%=java.net.URLEncoder.encode(allergy.getDescription())%>&type=<%=allergy.getTypeCode()%>"><%=allergy.getDescription()%></a>
-												<br/>
-												<%
-													}
-												%></div><%
-												}
-
-												if(allergyResults.get(10).size()>0) {
-											%><div class="DivContentSectionHead"><a href="javascript:void(0)" onclick="toggleSection('10');return false;"><img border="0" id="10_img" src="../images/collapser.png"/></a>AHFS Class</div><%
-											%><div id="10_content"><%
-												for(Allergy allergy:allergyResults.get(10)) {
-											%>
-												<a href="addReaction.do?ID=<%= allergy.getDrugrefId() %>&name=<%=java.net.URLEncoder.encode(allergy.getDescription())%>&type=<%=allergy.getTypeCode()%>"><%=allergy.getDescription()%></a>
-												<br/>
-												<%
-													}
-												%></div><%
-												}
-
-												if(allergyResults.get(13).size()>0) {
-											%><div class="DivContentSectionHead"><a href="javascript:void(0)" onclick="toggleSection('13');return false;"><img border="0" id="13_img" src="../images/collapser.png"/></a>Brand Name</div><%
-											%><div id="13_content"><%
-												for(Allergy allergy:allergyResults.get(13)) {
-											%>
-												<a href="addReaction.do?ID=<%= allergy.getDrugrefId() %>&name=<%=java.net.URLEncoder.encode(allergy.getDescription())%>&type=<%=allergy.getTypeCode()%>"><%=allergy.getDescription() %></a>
-												<%
-													java.util.Vector vect = (Vector) drugClassHash.get(""+allergy.getDrugrefId());
-													if (vect != null){
-														for (int k = 0; k < vect.size() ; k++){
-															String[] drugClassPair = (String[]) vect.get(k);
+													if (allergyResults.get(8).size() > 0)
+													{
 												%>
+												<div class="DivContentSectionHead">
+													<a href="javascript:void(0)" onclick="toggleSection('8');return false;">
+														<img border="0" id="8_img" src="../images/collapser.png"/>
+													</a>ATC Class
+												</div>
+												<!-- ANATOMICAL -->
+												<div id="8_content">
+													<%
+														for(Allergy allergy:allergyResults.get(8))
+														{
+													%>
+												<a href="addReaction.do?ID=<%= allergy.getDrugrefId() %>&name=<%=java.net.URLEncoder.encode(allergy.getDescription())%>&type=<%=allergy.getTypeCode()%>"><%=allergy.getDescription()%></a>
+												<br/>
+													<%
+														}
+													%>
+												</div>
+												<%
+													}
+
+													if(allergyResults.get(10).size() > 0)
+													{
+												%>
+												<div class="DivContentSectionHead">
+													<a href="javascript:void(0)" onclick="toggleSection('10');return false;">
+														<img border="0" id="10_img" src="../images/collapser.png"/>
+													</a>AHFS Class
+												</div>
+												<!-- THERAPEUTIC -->
+												<div id="10_content">
+													<%
+														for (Allergy allergy : allergyResults.get(10))
+														{
+													%>
+													<a href="addReaction.do?ID=<%= allergy.getDrugrefId() %>&name=<%=java.net.URLEncoder.encode(allergy.getDescription())%>&type=<%=allergy.getTypeCode()%>"><%=allergy.getDescription()%></a>
+													<br/>
+													<%
+														}
+													%>
+												</div>
+												<%
+													}
+
+													if (allergyResults.get(13).size() > 0)
+													{
+												%>
+												<div class="DivContentSectionHead">
+													<a href="javascript:void(0)" onclick="toggleSection('13');return false;">
+														<img border="0" id="13_img" src="../images/collapser.png"/>
+													</a>Brand Name
+												</div>
+												<!-- BRANDED_PRODUCT -->
+												<div id="13_content">
+													<%
+														for (Allergy allergy : allergyResults.get(13))
+														{
+													%>
+													<a href="addReaction.do?ID=<%= allergy.getDrugrefId() %>&name=<%=java.net.URLEncoder.encode(allergy.getDescription())%>&type=<%=allergy.getTypeCode()%>"><%=allergy.getDescription() %></a>
+													<%
+														java.util.Vector vect = (Vector) drugClassHash.get(""+allergy.getDrugrefId());
+														if (vect != null){
+															for (int k = 0; k < vect.size() ; k++)
+															{
+																String[] drugClassPair = (String[]) vect.get(k);
+													%>
 												&nbsp;&nbsp;&nbsp;
-												<a style="color: orange" href="addReaction.do?ID=<%=drugClassPair[0] %>&name=<%=java.net.URLEncoder.encode(drugClassPair[1])%>&type=10"><%=drugClassPair[1] %></a>
+													<a style="color: orange" href="addReaction.do?ID=<%=drugClassPair[0] %>&name=<%=java.net.URLEncoder.encode(drugClassPair[1])%>&type=10"><%=drugClassPair[1] %></a>
+													<%
+															}
+														}
+													%>
+													<br/>
+													<%
+														}
+													%>
+												</div>
+												<%
+													}
+													if (allergyResults.get(11).size() > 0)
+													{
+												%>
+												<div class="DivContentSectionHead">
+													<a href="javascript:void(0)" onclick="toggleSection('11');return false;">
+														<img border="0" id="11_img" src="../images/expander.png"/>
+													</a>Generic Name
+												</div>
+												<!-- GENERIC -->
+												<div id="11_content" style="display:none">
+													<%
+														for (Allergy allergy : allergyResults.get(11))
+														{
+													%>
+													<a href="addReaction.do?ID=<%= allergy.getDrugrefId() %>&name=<%=java.net.URLEncoder.encode(allergy.getDescription())%>&type=<%=allergy.getTypeCode()%>"><%=allergy.getDescription() %></a>
+													<br/>
+													<%
+														}
+													%>
+												</div>
+												<%
+													}
+
+													if (allergyResults.get(12).size() > 0)
+													{
+												%>
+												<div class="DivContentSectionHead">
+													<a href="javascript:void(0)" onclick="toggleSection('12');return false;">
+														<img border="0" id="12_img" src="../images/expander.png"/>
+													</a>Compound
+												</div>
+												<!-- COMPOSITE_GENERIC -->
+												<div id="12_content" style="display:none">
+													<%
+														for (Allergy allergy : allergyResults.get(12))
+														{
+													%>
+													<a href="addReaction.do?ID=<%= allergy.getDrugrefId() %>&name=<%=java.net.URLEncoder.encode(allergy.getDescription())%>&type=<%=allergy.getTypeCode()%>"><%=allergy.getDescription() %></a>
+													<br/>
 												<%
 														}
+												%>
+												</div>
+												<%
+													}
+													if (allergyResults.get(14).size() > 0)
+													{
+												%>
+												<div class="DivContentSectionHead">
+													<a href="javascript:void(0)" onclick="toggleSection('14');return false;">
+														<img border="0" id="14_img" src="../images/collapser.png"/>
+													</a>Ingredient
+												</div>
+												<!-- INGREDIENT -->
+												<div id="14_content">
+													<%
+														for (Allergy allergy : allergyResults.get(14))
+														{
+													%>
+													<a href="addReaction.do?ID=<%= allergy.getDrugrefId() %>&name=<%=java.net.URLEncoder.encode(allergy.getDescription())%>&type=<%=allergy.getTypeCode()%>"><%=allergy.getDescription() %></a>
+													<br/>
+													<%
+														}
+													%>
+												</div>
+												<%
+													}
+
 													}
 												%>
-												<br/>
-												<%
-													}
-												%></div><%
-												}
-
-
-												if(allergyResults.get(11).size()>0) {
-											%><div class="DivContentSectionHead"><a href="javascript:void(0)" onclick="toggleSection('11');return false;"><img border="0" id="11_img" src="../images/expander.png"/></a>Generic Name</div><%
-											%><div id="11_content" style="display:none"><%
-												for(Allergy allergy:allergyResults.get(11)) {
-											%>
-												<a href="addReaction.do?ID=<%= allergy.getDrugrefId() %>&name=<%=java.net.URLEncoder.encode(allergy.getDescription())%>&type=<%=allergy.getTypeCode()%>"><%=allergy.getDescription() %></a>
-												<br/>
-												<%
-													}
-												%></div><%
-												}
-
-												if(allergyResults.get(12).size()>0) {
-											%><div class="DivContentSectionHead"><a href="javascript:void(0)" onclick="toggleSection('12');return false;"><img border="0" id="12_img" src="../images/expander.png"/></a>Compound</div><%
-											%><div id="12_content" style="display:none"><%
-												for(Allergy allergy:allergyResults.get(12)) {
-											%>
-												<a href="addReaction.do?ID=<%= allergy.getDrugrefId() %>&name=<%=java.net.URLEncoder.encode(allergy.getDescription())%>&type=<%=allergy.getTypeCode()%>"><%=allergy.getDescription() %></a>
-												<br/>
-												<%
-													}
-												%></div><%
-												}
-
-
-												if(allergyResults.get(14).size()>0) {
-											%><div class="DivContentSectionHead"><a href="javascript:void(0)" onclick="toggleSection('14');return false;"><img border="0" id="14_img" src="../images/collapser.png"/></a>Ingredient</div><%
-											%><div id="14_content"><%
-												for(Allergy allergy:allergyResults.get(14)) {
-											%>
-												<a href="addReaction.do?ID=<%= allergy.getDrugrefId() %>&name=<%=java.net.URLEncoder.encode(allergy.getDescription())%>&type=<%=allergy.getTypeCode()%>"><%=allergy.getDescription() %></a>
-												<br/>
-												<%
-													}
-												%></div><%
-												}
-											%>
-
-												<% } %>
 											</logic:present>
 										</div>
 
 										<%
 											String sBack="ShowAllergies2.jsp";
-										%> <input type=button class="ControlPushButton"
-												  onclick="javascript:window.location.href='<%=sBack%>';"
-												  value="Back to View Allergies" /></td>
+										%>
+										<input type=button class="ControlPushButton"
+											   onclick="javascript:window.location.href='<%=sBack%>';"
+											   value="Back to View Allergies" />
+									</td>
 								</tr>
 							</table>
 						</td>
 					</tr>
 					<!----End new rows here-->
-					<tr height="100%">
+					<tr>
 						<td></td>
 					</tr>
 				</table>
 			</td>
 		</tr>
 		<tr>
-			<td height="0%"
-				style="border-bottom: 2px solid #A9A9A9; border-top: 2px solid #A9A9A9;"></td>
-			<td height="0%"
-				style="border-bottom: 2px solid #A9A9A9; border-top: 2px solid #A9A9A9;"></td>
+			<td height="0%" style="border-bottom: 2px solid #A9A9A9; border-top: 2px solid #A9A9A9;"></td>
+			<td height="0%" style="border-bottom: 2px solid #A9A9A9; border-top: 2px solid #A9A9A9;"></td>
 		</tr>
 		<tr>
 			<td width="100%" height="0%" colspan="2">&nbsp;</td>
 		</tr>
 		<tr>
-			<td width="100%" height="0%" style="padding: 5px" bgcolor="#DCDCDC"
-				colspan="2"></td>
+			<td width="100%" height="0%" style="padding: 5px" bgcolor="#DCDCDC" colspan="2"></td>
 		</tr>
 	</table>
-
 	</body>
-
 </html:html>
