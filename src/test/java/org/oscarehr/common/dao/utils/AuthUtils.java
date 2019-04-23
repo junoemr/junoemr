@@ -23,18 +23,38 @@
  */
 package org.oscarehr.common.dao.utils;
 
+import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpSession;
 
+import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.model.Facility;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.util.LoggedInInfo;
 
+import org.oscarehr.util.SpringUtils;
 import oscar.util.ConversionUtils;
 
 public class AuthUtils {
+
+	public static final String TEST_PROVIDER_ID	= "999998";
+	public static final String TEST_USER_NAME 	= "oscardoc";
+	public static final String TEST_PASSWORD  	= "mac2002";
+	public static final String TEST_PIN		  	= "1117";
+
+	public static void configureTestUser()
+	{
+		SecurityDao securityDao = (SecurityDao) SpringUtils.getBean(SecurityDao.class);
+		List<Security> testUser = securityDao.findByLikeProviderNo(TEST_PROVIDER_ID);
+
+		assert(testUser.size() == 1);
+		testUser.get(0).setForcePasswordReset(false);
+		testUser.get(0).setBExpireset(0);
+		testUser.get(0).setDateExpiredate(ConversionUtils.fromDateString("2099-01-01"));
+		securityDao.merge(testUser.get(0));
+	}
 
 	public static LoggedInInfo initLoginContext() {
 		HttpSession session = null;
