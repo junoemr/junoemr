@@ -92,7 +92,7 @@ if(!authed) {
     return out.toString();
   }
 
-  public void populateInitialDxCodeList(HttpServletRequest request, BillingCreateBillingForm form, String providerNo)
+  private void populateInitialDxCodeList(HttpServletRequest request, BillingCreateBillingForm form, String apptProviderNo, String userProviderNo)
   {
       String diag_code_1 = request.getParameter("diag_code_1");
       String diag_code_2 = request.getParameter("diag_code_2");
@@ -100,13 +100,16 @@ if(!authed) {
 
       if (diag_code_1 == null && diag_code_2 == null && diag_code_3 == null)
       {
-          ProviderPreferenceDao preferenceDao = SpringUtils.getBean(ProviderPreferenceDao.class);
-
-          ProviderPreference preference = preferenceDao.find(providerNo);
-
-          if (preference != null && preference.getDefaultDxCode() != null)
+          // Mirror what billing Ontario does.  Try the default dx code of the appt provider first, then the user's.
+          String defaultDxCode = getDefaultDxCode(apptProviderNo);
+          if (defaultDxCode == null)
           {
-              form.setXml_diagnostic_detail1(preference.getDefaultDxCode());
+              defaultDxCode = getDefaultDxCode(userProviderNo);
+          }
+
+          if (defaultDxCode != null)
+          {
+              form.setXml_diagnostic_detail1(defaultDxCode);
           }
       }
       else
@@ -124,8 +127,21 @@ if(!authed) {
               form.setXml_diagnostic_detail3(diag_code_3);
           }
       }
+  }
 
+  private String getDefaultDxCode(String providerNo)
+  {
+      ProviderPreferenceDao prefDao = SpringUtils.getBean(ProviderPreferenceDao.class);
+      ProviderPreference preference = prefDao.find(providerNo);
 
+      if (preference != null)
+      {
+          return preference.getDefaultDxCode();
+      }
+      else
+      {
+          return null;
+      }
   }
 %>
 <%
@@ -269,34 +285,26 @@ function codeEntered(svcCode)
 
 function addSvcCode(serviceCheckbox, svcCode)
 {
-	var myform = document.forms[0];
+	var billingForm = document.forms[0];
 
 	if (serviceCheckbox.checked)
 	{
-		if (myform.xml_other1.value == "")
+		if (!billingForm.xml_other1.value)
 		{
-			myform.xml_other1.value = svcCode;
-			var trayCode = getAssocCode(svcCode, trayAssocCodes);
-			if (trayCode != '')
-			{
-				myform.xml_other2.value = trayCode;
-			}
-			myform.xml_diagnostic_detail1.value = getAssocCode(svcCode, jsAssocCodes);
+			billingForm.xml_other1.value = svcCode;
+			linkServiceAssocCode(svcCode, billingForm.xml_other2);
+			linkDxAssocCode(svcCode, billingForm.xml_diagnostic_detail1);
 		}
-		else if (myform.xml_other2.value == "")
+		else if (!billingForm.xml_other2.value)
 		{
-			myform.xml_other2.value = svcCode;
-			var trayCode = getAssocCode(svcCode, trayAssocCodes);
-			if (trayCode != '')
-			{
-				myform.xml_other3.value = trayCode;
-			}
-			myform.xml_diagnostic_detail2.value = getAssocCode(svcCode, jsAssocCodes);
+            billingForm.xml_other2.value = svcCode;
+            linkServiceAssocCode(svcCode, billingForm.xml_other3);
+			linkDxAssocCode(svcCode, billingForm.xml_diagnostic_detail2);
 		}
-		else if (myform.xml_other3.value == "")
+		else if (!billingForm.xml_other3.value)
 		{
-			myform.xml_other3.value = svcCode;
-			myform.xml_diagnostic_detail3.value = getAssocCode(svcCode, jsAssocCodes);
+			billingForm.xml_other3.value = svcCode;
+			linkDxAssocCode(svcCode, billingForm.xml_diagnostic_detail3);
 		}
 		else
 		{
@@ -307,24 +315,40 @@ function addSvcCode(serviceCheckbox, svcCode)
 	}
 	else
 	{
-		if (myform.xml_other1.value == svcCode)
+		if (billingForm.xml_other1.value === svcCode)
 		{
-			myform.xml_other1.value = "";
-			myform.xml_other2.value = "";
-			myform.xml_diagnostic_detail1.value = "";
+			billingForm.xml_other1.value = "";
 		}
-		else if (myform.xml_other2.value == svcCode)
+		else if (billingForm.xml_other2.value === svcCode)
 		{
-			myform.xml_other2.value = "";
-			myform.xml_diagnostic_detail2.value = "";
+			billingForm.xml_other2.value = "";
 		}
-		else if (myform.xml_other3.value == svcCode)
+		else if (billingForm.xml_other3.value === svcCode)
 		{
-			myform.xml_other3.value = "";
-			myform.xml_diagnostic_detail3.value = "";
+			billingForm.xml_other3.value = "";
 		}
 	}
 	return true;
+}
+
+function linkServiceAssocCode(serviceCode, serviceCodeElement)
+{
+    var trayCode = getAssocCode(serviceCode, trayAssocCodes);
+
+    if (trayCode)
+    {
+        serviceCodeElement.value = trayCode;
+    }
+}
+
+function linkDxAssocCode(serviceCode, dxCodeElement)
+{
+    var assocCode = getAssocCode(serviceCode, jsAssocCodes);
+
+    if (assocCode)
+    {
+        dxCodeElement.value = assocCode;
+    }
 }
 
 function getAssocCode(svcCode, assocCodes)
@@ -959,8 +983,7 @@ if(wcbneeds != null){%>
 			thisForm.setXml_refer1(bean.getReferral1());
 		}
 
-        // OHSUPORT-2883 - autofill diagnostic codes with specific values (from url)
-		populateInitialDxCodeList(request, thisForm, bean.getCreator());
+		populateInitialDxCodeList(request, thisForm, request.getParameter("apptProvider_no"), bean.getCreator());
 
 		// OHSUPORT-2883 - autofill other codes with specific values (from url)
 		if ( request.getParameter("other_code_1") != null ) { thisForm.setXml_other1(request.getParameter("other_code_1")); }
