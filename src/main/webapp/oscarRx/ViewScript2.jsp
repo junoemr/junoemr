@@ -91,7 +91,7 @@
 </logic:present>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <%
-oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
+oscar.oscarRx.pageUtil.RxSessionBean sessionBean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
 
 Vector vecPageSizes=new Vector();
 vecPageSizes.add("A4 page");
@@ -109,7 +109,7 @@ Boolean isReprint = Boolean.parseBoolean(reprint);
 
 String createAnewRx;
 if(isReprint) {
-    bean = (oscar.oscarRx.pageUtil.RxSessionBean)session.getAttribute("tmpBeanRX");
+    sessionBean = (oscar.oscarRx.pageUtil.RxSessionBean)session.getAttribute("tmpBeanRX");
     createAnewRx = "window.location.href = '" + request.getContextPath() + "/oscarRx/SearchDrug.jsp'";
 }
 else
@@ -129,12 +129,12 @@ if(bMultisites) {
 		if (result!=null) location = result.getLocation();
 	}
 
-    oscar.oscarRx.data.RxProviderData.Provider provider = new oscar.oscarRx.data.RxProviderData().getProvider(bean.getProviderNo());
+    oscar.oscarRx.data.RxProviderData.Provider provider = new oscar.oscarRx.data.RxProviderData().getProvider(sessionBean.getProviderNo());
     ProSignatureData sig = new ProSignatureData();
-    boolean hasSig = sig.hasSignature(bean.getProviderNo());
+    boolean hasSig = sig.hasSignature(sessionBean.getProviderNo());
     String doctorName = "";
     if (hasSig){
-       doctorName = sig.getSignature(bean.getProviderNo());
+       doctorName = sig.getSignature(sessionBean.getProviderNo());
     }else{
        doctorName = (provider.getFirstName() + ' ' + provider.getSurname());
     }
@@ -161,12 +161,12 @@ if(bMultisites) {
 
 
 } else if(props.getProperty("clinicSatelliteName") != null) {
-    oscar.oscarRx.data.RxProviderData.Provider provider = new oscar.oscarRx.data.RxProviderData().getProvider(bean.getProviderNo());
+    oscar.oscarRx.data.RxProviderData.Provider provider = new oscar.oscarRx.data.RxProviderData().getProvider(sessionBean.getProviderNo());
     ProSignatureData sig = new ProSignatureData();
-    boolean hasSig = sig.hasSignature(bean.getProviderNo());
+    boolean hasSig = sig.hasSignature(sessionBean.getProviderNo());
     String doctorName = "";
     if (hasSig){
-       doctorName = sig.getSignature(bean.getProviderNo());
+       doctorName = sig.getSignature(sessionBean.getProviderNo());
     }else{
        doctorName = (provider.getFirstName() + ' ' + provider.getSurname());
     }
@@ -329,45 +329,38 @@ function printIframe(){
 			}
 	}
 
-function printPaste2Parent(print){
-    //console.log("in printPaste2Parent");
-   try{
-      text =""; // "****<%=oscar.oscarProvider.data.ProviderData.getProviderName(bean.getProviderNo())%>********************************************************************************";
-      //console.log("1");
-      //text = text.substring(0, 82) + "\n";
-      if (document.all){
-         text += preview.document.forms[0].rx_no_newlines.value
-      } else {
-         text += preview.document.forms[0].rx_no_newlines.value + "\n";
-      }
-      //console.log("2");
-      text+=document.getElementById('additionalNotes').value+"\n";
-      //text += "**********************************************************************************\n";
-      //oscarLog(text);
+function printPaste2Parent(print)
+{
+	try
+	{
+		var text = preview.document.forms[0].rx_no_newlines.value;
+		text += document.getElementById('additionalNotes').value + "\n";
 
-      //we support pasting into orig encounter and new casemanagement
-      demographicNo = <%=bean.getDemographicNo()%>;
-      noteEditor = "noteEditor"+demographicNo;
-      if( window.parent.opener.document.forms["caseManagementEntryForm"] != undefined ) {
-          //oscarLog("3");
-        window.parent.opener.pasteToEncounterNote(text);
-      }else if( window.parent.opener.document.encForm != undefined ){
-          //oscarLog("4");
-        window.parent.opener.document.encForm.enTextarea.value = window.parent.opener.document.encForm.enTextarea.value + text;
-      }else if( window.parent.opener.document.getElementById(noteEditor) != undefined ){
-    	window.parent.opener.document.getElementById(noteEditor).value = window.parent.opener.document.getElementById(noteEditor).value + text; 
-      }
-      
-   }catch (e){
-      alert ("ERROR: could not paste to EMR");
-   }
-   
-   if (print) { printIframe(); }
-   
+		// We support pasting into orig encounter and new caseManagement
+		demographicNo = <%=sessionBean.getDemographicNo()%>;
+		var noteEditor = "noteEditor"+ demographicNo;
+		if (window.parent.opener.document.forms["caseManagementEntryForm"] !== undefined)
+		{
+			window.parent.opener.pasteToEncounterNote(text);
+		}
+		else if (window.parent.opener.document.encForm !== undefined)
+		{
+			window.parent.opener.document.encForm.enTextarea.value = window.parent.opener.document.encForm.enTextarea.value + text;
+		}
+		else if (window.parent.opener.document.getElementById(noteEditor) !== undefined)
+		{
+			window.parent.opener.document.getElementById(noteEditor).value = window.parent.opener.document.getElementById(noteEditor).value + text;
+		}
+	}
+	catch (e)
+	{
+		alert ("ERROR: could not paste to EMR");
+	}
+	if (print)
+	{
+		printIframe();
+	}
 }
-
-
-
 
 function addressSelect() {
    <% if(vecAddressName != null) {
@@ -480,7 +473,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 
 <!-- added by vic, hsfo -->
 <%
-	int hsfo_patient_id = bean.getDemographicNo();
+	int hsfo_patient_id = sessionBean.getDemographicNo();
 	oscar.form.study.HSFO.HSFODAO hsfoDAO = new oscar.form.study.HSFO.HSFODAO();
 	int dx = hsfoDAO.retrievePatientDx(String.valueOf(hsfo_patient_id));
 	if (dx >=0 && dx < 7) {
@@ -677,9 +670,9 @@ function toggleView(form) {
                         // enable the fax button if there is a pre-set signature for the creator of the prescription or the logged in user
 					    String disabled = "disabled";
 						oscar.oscarRx.data.RxPrescriptionData.Prescription rx = null;
-						if(bean.getStashSize() != 0)
+						if(sessionBean.getStashSize() != 0)
 						{
-							rx = bean.getStashItem(bean.getStashSize() - 1);
+							rx = sessionBean.getStashItem(sessionBean.getStashSize() - 1);
 						}
                         if(oscar.OscarProperties.getInstance().isPropertyActive("rx_preset_signatures"))
                         {
@@ -689,7 +682,7 @@ function toggleView(form) {
 								imgFile += rx.getProviderNo() + ".png";
 							} else
 							{
-								imgFile += bean.getProviderNo() + ".png";
+								imgFile += sessionBean.getProviderNo() + ".png";
 							}
 							File f = new File(imgFile);
                             if(f.exists() && !f.isDirectory() && hasFaxNumber)
@@ -768,9 +761,8 @@ function toggleView(form) {
 						<td colspan=2 style="font-weight: bold"><span><bean:message key="ViewScript.msgDrugInfo"/></span></td>
 					</tr>
 					<%
-                        for(int i=0; i<bean.getStashSize(); i++){
-                            oscar.oscarRx.data.RxPrescriptionData.Prescription rx
-                                = bean.getStashItem(i);
+                        for(int i=0; i<sessionBean.getStashSize(); i++){
+                            oscar.oscarRx.data.RxPrescriptionData.Prescription rx = sessionBean.getStashItem(i);
 
                             if (! rx.isCustom()){
                             %>
