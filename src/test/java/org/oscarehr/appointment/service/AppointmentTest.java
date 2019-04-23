@@ -35,10 +35,11 @@ import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+//import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
@@ -52,6 +53,9 @@ public class AppointmentTest
 
 	@Mock
 	private OscarAppointmentDao appointmentDao;
+
+	@Mock
+	private HttpSession session;
 
 	@Before
 	public void setUp()
@@ -71,7 +75,7 @@ public class AppointmentTest
 
 		Mockito.when(appointmentDao.findAppointmentDetailsByDateAndProvider(startDate, endDate, providerId, site)).thenReturn(mockData);
 
-		List<CalendarEvent> result = appointmentService.getCalendarEvents(providerId, startDate, endDate, site);
+		List<CalendarEvent> result = appointmentService.getCalendarEvents(session, providerId, startDate, endDate, site);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
@@ -85,7 +89,8 @@ public class AppointmentTest
 		LocalDate endDate = LocalDate.of(2018,1,1);
 		Integer providerId = 1;
 		String site = null;
-		LocalTime keyTime = LocalTime.of(0,0);
+		LocalTime keyTime1 = LocalTime.of(0,0);
+		LocalTime keyTime2 = LocalTime.of(0,59);
 
 		SortedMap<LocalTime, List<AppointmentDetails>> mockData = new TreeMap<>();
 
@@ -95,8 +100,8 @@ public class AppointmentTest
 			1,
 			1,
 			startDate,
-			keyTime,
-			keyTime,
+			keyTime1,
+			keyTime2,
 			"name1",
 			"notes1",
 			"reason1",
@@ -120,23 +125,26 @@ public class AppointmentTest
 			null,
 			null,
 			null,
-			null,
 			LocalDate.of(2000,1,1),
+			null,
+			null,
+			null,
+			LocalDate.of(2000, 1, 1),
 			false,
 			null
 		));
 
-		mockData.put(keyTime, valueList);
+		mockData.put(keyTime1, valueList);
 
 		Mockito.when(appointmentDao.findAppointmentDetailsByDateAndProvider(startDate, endDate, providerId, site)).thenReturn(mockData);
 
-		List<CalendarEvent> result = appointmentService.getCalendarEvents(providerId, startDate, endDate, site);
+		List<CalendarEvent> result = appointmentService.getCalendarEvents(session, providerId, startDate, endDate, site);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
 		expectedResult.add(new CalendarEvent(
 			LocalDateTime.of(2018,1,1,0,0,0),
-			LocalDateTime.of(2018,1,1,0,0,0),
+			LocalDateTime.of(2018,1,1,1,0,0),
 			"color1",
 			null,
 			"text-dark",
@@ -144,18 +152,25 @@ public class AppointmentTest
 			null,
 			null,
 			new CalendarAppointment(
-				1,
+				1, //appointmentNo
+				null,
+				null,
+				null,
+				"1",
+				"First1",
+				"Last1",
 				LocalDate.of(2000,1,1),
 				"Last1, First1",
 				null, // TODO get phone number
 				1,
-				null, // TODO get patient's doctor
+				null,
 				LocalDateTime.of(2018,1,1,0,0,0),
-				LocalDateTime.of(2018,1,1,0,0,0),
+				LocalDateTime.of(2018,1,1,1,0,0),
 				"A",
 				null,
 				null,
 				"reason1",
+				"notes1",
 				null,
 				"site1",
 				false,
@@ -174,7 +189,8 @@ public class AppointmentTest
 		LocalDate endDate = LocalDate.of(2018,1,1);
 		Integer providerId = 1;
 		String site = null;
-		LocalTime keyTime = LocalTime.of(0,0);
+		LocalTime keyTime1 = LocalTime.of(0,0);
+		LocalTime keyTime2 = LocalTime.of(0,59);
 
 		SortedMap<LocalTime, List<AppointmentDetails>> mockData = new TreeMap<>();
 
@@ -184,8 +200,8 @@ public class AppointmentTest
 			1,
 			1,
 			startDate,
-			keyTime,
-			keyTime,
+			keyTime1,
+			keyTime2,
 			"name1",
 			"notes1",
 			"reason1",
@@ -209,23 +225,26 @@ public class AppointmentTest
 			null,
 			null,
 			null,
-			null,
 			LocalDate.of(2000,1,1),
+			null,
+			null,
+			null,
+			LocalDate.of(2000, 1, 1),
 			false,
 			null
 		));
 
-		mockData.put(keyTime, valueList);
+		mockData.put(keyTime1, valueList);
 
 		Mockito.when(appointmentDao.findAppointmentDetailsByDateAndProvider(startDate, endDate, providerId, site)).thenReturn(mockData);
 
-		List<CalendarEvent> result = appointmentService.getCalendarEvents(providerId, startDate, endDate, site);
+		List<CalendarEvent> result = appointmentService.getCalendarEvents(session, providerId, startDate, endDate, site);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
 		expectedResult.add(new CalendarEvent(
 			LocalDateTime.of(2018,1,1,0,0,0),
-			LocalDateTime.of(2018,1,1,0,0,0),
+			LocalDateTime.of(2018,1,1,1,0,0),
 			"color1",
 			null,
 			"text-dark",
@@ -234,17 +253,30 @@ public class AppointmentTest
 			null,
 			new CalendarAppointment(
 				1,
+				null,
+				null,
+				null,
+
+/*				"1",
+				"First1",
+				"Last1",*/
+
+				null,
+				null,
+				null,
+
 				LocalDate.of(2000,1,1),
 				"Last1, First1",
 				null, // TODO get phone number
 				1,
-				null, // TODO get patient's doctor
+				null,
 				LocalDateTime.of(2018,1,1,0,0,0),
-				LocalDateTime.of(2018,1,1,0,0,0),
+				LocalDateTime.of(2018,1,1,1,0,0),
 				null,
 				null,
 				null,
 				"reason1",
+				"notes1",
 				null,
 				"site1",
 				false,
@@ -263,7 +295,8 @@ public class AppointmentTest
 		LocalDate endDate = LocalDate.of(2018,1,1);
 		Integer providerId = 1;
 		String site = null;
-		LocalTime keyTime = LocalTime.of(0,0);
+		LocalTime keyTime1 = LocalTime.of(0,0);
+		LocalTime keyTime2 = LocalTime.of(0,59);
 
 		SortedMap<LocalTime, List<AppointmentDetails>> mockData = new TreeMap<>();
 
@@ -273,8 +306,8 @@ public class AppointmentTest
 			1,
 			1,
 			startDate,
-			keyTime,
-			keyTime,
+			keyTime1,
+			keyTime2,
 			"name1",
 			"notes1",
 			"reason1",
@@ -298,23 +331,26 @@ public class AppointmentTest
 			null,
 			null,
 			null,
-			null,
 			LocalDate.of(2000,1,1),
+			null,
+			null,
+			null,
+			LocalDate.of(2000, 1, 1),
 			false,
 			null
 		));
 
-		mockData.put(keyTime, valueList);
+		mockData.put(keyTime1, valueList);
 
 		Mockito.when(appointmentDao.findAppointmentDetailsByDateAndProvider(startDate, endDate, providerId, site)).thenReturn(mockData);
 
-		List<CalendarEvent> result = appointmentService.getCalendarEvents(providerId, startDate, endDate, site);
+		List<CalendarEvent> result = appointmentService.getCalendarEvents(session, providerId, startDate, endDate, site);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
 		expectedResult.add(new CalendarEvent(
 			LocalDateTime.of(2018,1,1,0,0,0),
-			LocalDateTime.of(2018,1,1,0,0,0),
+			LocalDateTime.of(2018,1,1,1,0,0),
 			"color1",
 			null,
 			"text-dark",
@@ -323,17 +359,29 @@ public class AppointmentTest
 			null,
 			new CalendarAppointment(
 				1,
+				null,
+				null,
+				null,
+
+/*				"1",
+				"First1",
+				"Last1",*/
+
+				null,
+				null,
+				null,
 				LocalDate.of(2000,1,1),
 				"Last1, First1",
 				null, // TODO get phone number
 				1,
 				null, // TODO get patient's doctor
 				LocalDateTime.of(2018,1,1,0,0,0),
-				LocalDateTime.of(2018,1,1,0,0,0),
+				LocalDateTime.of(2018,1,1,1,0,0),
 				"A",
 				"s",
 				null,
 				"reason1",
+				"notes1",
 				null,
 				"site1",
 				false,

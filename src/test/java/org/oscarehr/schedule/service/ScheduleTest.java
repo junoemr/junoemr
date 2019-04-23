@@ -33,6 +33,7 @@ import org.oscarehr.appointment.service.Appointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -49,6 +50,9 @@ public class ScheduleTest
 
 	@Mock
 	private Appointment appointmentService;
+
+	@Mock
+	private HttpSession session;
 
 	@Before
 	public void setUp()
@@ -67,9 +71,9 @@ public class ScheduleTest
 		List<CalendarEvent> mockData = new ArrayList<>();
 
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(mockData);
-		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate, siteName)).thenReturn(mockData);
+		Mockito.when(appointmentService.getCalendarEvents(session, providerId, startDate, endDate, siteName)).thenReturn(mockData);
 
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(session, providerId, startDate, endDate, siteName);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
@@ -98,9 +102,9 @@ public class ScheduleTest
 
 
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(templateMockData);
-		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
+		Mockito.when(appointmentService.getCalendarEvents(session, providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
 
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(session, providerId, startDate, endDate, siteName);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 		expectedResult.add(new CalendarEvent(start1, end1, color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
@@ -129,9 +133,9 @@ public class ScheduleTest
 		appointmentMockData.add(new CalendarEvent(start1, end1, color1, null, className1, resourceId1, scheduleTemplateCode1, null, null));
 
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(templateMockData);
-		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
+		Mockito.when(appointmentService.getCalendarEvents(session, providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
 
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(session, providerId, startDate, endDate, siteName);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 		expectedResult.add(new CalendarEvent(start1, end1, color1, null, className1, resourceId1, scheduleTemplateCode1, null, null));
@@ -168,9 +172,9 @@ public class ScheduleTest
 		appointmentMockData.add(new CalendarEvent(start2, end2, color2, null, className2, resourceId2, scheduleTemplateCode2, null, null));
 
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(templateMockData);
-		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
+		Mockito.when(appointmentService.getCalendarEvents(session, providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
 
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(session, providerId, startDate, endDate, siteName);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 		expectedResult.add(new CalendarEvent(start1, end1, color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
@@ -214,9 +218,9 @@ public class ScheduleTest
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate)).thenReturn(templateMockData1);
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate.plusDays(1))).thenReturn(templateMockData2);
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate.plusDays(2))).thenReturn(templateMockData3);
-		Mockito.when(appointmentService.getCalendarEvents(providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
+		Mockito.when(appointmentService.getCalendarEvents(session, providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
 
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(providerId, startDate, endDate, siteName);
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(session, providerId, startDate, endDate, siteName);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 		expectedResult.add(new CalendarEvent(start1, end1, color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
