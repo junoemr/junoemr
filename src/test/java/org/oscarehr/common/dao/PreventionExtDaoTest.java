@@ -40,6 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.dao.PreventionExtDao;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.model.PreventionExt;
@@ -47,19 +48,25 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 public class PreventionExtDaoTest extends DaoTestFixtures {
-	
+
+	protected PreventionDao preventionDao = (PreventionDao)SpringUtils.getBean(PreventionDao.class);
 	protected PreventionExtDao dao = (PreventionExtDao)SpringUtils.getBean(PreventionExtDao.class);
 	
 	@Before
 	public void before() throws Exception {
-		SchemaUtils.restoreTable("preventionsExt");
+		SchemaUtils.restoreTable("preventionsExt", "preventions");
 	}
 
 	@Test
 	public void testFindByPreventionId() throws Exception {
 
 		Prevention prevention1 = new Prevention();
+		EntityDataGenerator.generateTestDataForModelClass(prevention1);
+		preventionDao.persist(prevention1);
+
 		Prevention prevention2 = new Prevention();
+		EntityDataGenerator.generateTestDataForModelClass(prevention2);
+		preventionDao.persist(prevention2);
 
 		
 		PreventionExt prevenExt1 = new PreventionExt();
@@ -144,8 +151,13 @@ public class PreventionExtDaoTest extends DaoTestFixtures {
 	public void testFindByPreventionIdAndKey() throws Exception {
 
 		Prevention prevention1 = new Prevention();
+		EntityDataGenerator.generateTestDataForModelClass(prevention1);
+		preventionDao.persist(prevention1);
+
 		Prevention prevention2 = new Prevention();
-		
+		EntityDataGenerator.generateTestDataForModelClass(prevention2);
+		preventionDao.persist(prevention2);
+
 		String keyVal1 = "alpha";
 		String keyVal2 = "bravo";
 				
@@ -189,8 +201,13 @@ public class PreventionExtDaoTest extends DaoTestFixtures {
 	public void testGetPreventionExt() throws Exception {
 
 		Prevention prevention1 = new Prevention();
+		EntityDataGenerator.generateTestDataForModelClass(prevention1);
+		preventionDao.persist(prevention1);
+
 		Prevention prevention2 = new Prevention();
-		
+		EntityDataGenerator.generateTestDataForModelClass(prevention2);
+		preventionDao.persist(prevention2);
+
 		String val1 = "100";
 		String val2 = "200";
 		

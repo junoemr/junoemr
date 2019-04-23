@@ -62,8 +62,11 @@ public class BillingreferralDaoTest extends DaoTestFixtures {
 		entity.setReferralNo("123456");
 		entity.setLastName("Smith");
 		entity.setFirstName("John");
+		entity.setDeletedAt(null);
 		dao.updateBillingreferral(entity);
 
-		assertEquals(1,dao.searchReferralCode("123456", "123456", "123456", "Smith", "John", "Smith", "John", "Smith", "John").size());
+		assertEquals(1,dao.searchReferralCode("123456", "123456",
+				"123456", "Smith", "John", "Smith", "John",
+				"Smith", "John").size());
 	}
 }
