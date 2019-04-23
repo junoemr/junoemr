@@ -142,6 +142,18 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>el-api</artifactId>
+			<version>2.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.web</groupId>
+			<artifactId>el-impl</artifactId>
+			<version>2.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 			<version>2.5</version>
@@ -1564,7 +1576,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<skipTests>false</skipTests>
-					<argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
+					<argLine>-Xms1024m -Xmx1024m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
 					<excludes>
 						<exclude>**/AR2005*.java</exclude>
 						<exclude>**/OntarioMDSpec4DataTest.java</exclude>

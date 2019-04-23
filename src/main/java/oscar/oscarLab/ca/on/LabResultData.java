@@ -30,7 +30,9 @@ import java.util.Comparator;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.dao.LabReportInformationDao;
+import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.LabReportInformation;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -48,7 +50,8 @@ import oscar.util.UtilDateUtilities;
  */
 public class LabResultData implements Comparable<LabResultData> {
 
-	Logger logger = MiscUtils.getLogger();
+	private Logger logger = MiscUtils.getLogger();
+	private static Hl7TextMessageDao msgDao = (Hl7TextMessageDao)SpringUtils.getBean("hl7TextMessageDao");
 
 	public static final String CML = "CML";
 	public static final String EPSILON = "Epsilon";
@@ -83,6 +86,7 @@ public class LabResultData implements Comparable<LabResultData> {
 	public boolean abn = false;
 	public String labType; // ie CML or MDS
 	public boolean finalRes = true;
+	public boolean correctedRes = false;
 	public Boolean isMatchedToPatient = null;
 	public String multiLabId;
 	public String label;
@@ -98,23 +102,36 @@ public class LabResultData implements Comparable<LabResultData> {
 	public LabResultData() {
 	}
 
-	public LabResultData(String labT) {
-		if (CML.equals(labT)){
+	public LabResultData(String labT)
+	{
+		if (CML.equals(labT))
+		{
 			labType = CML;
-		}else if (MDS.equals(labT)){
+		}
+		else if (MDS.equals(labT))
+		{
 			labType = MDS;
-		}else if (EXCELLERIS.equals(labT)){
+		}
+		else if (EXCELLERIS.equals(labT))
+		{
 			labType = EXCELLERIS;
-		}else if (HL7TEXT.equals(labT)){
+		}
+		else if (HL7TEXT.equals(labT))
+		{
 			labType = HL7TEXT;
-		}else if(EPSILON.equals(labT)){
+		}
+		else if(EPSILON.equals(labT))
+		{
 			labType = EPSILON;
-		}else if (HRM.equals(labT)) {
+		}
+		else if (HRM.equals(labT))
+		{
 			labType = HRM;
-		}else if (Spire.equals(labT)) {
+		}
+		else if (Spire.equals(labT))
+		{
 			labType = Spire;
 		}
-
 	}
 
 	public String getLabPatientId(){
@@ -132,14 +149,12 @@ public class LabResultData implements Comparable<LabResultData> {
 
 	public boolean isAbnormal(){
 		if (EXCELLERIS.equals(this.labType)){
-			//logger.debug("excelleris is doc type");
 			PathnetResultsData prd = new PathnetResultsData();
 			if (prd.findPathnetAdnormalResults(this.segmentID) > 0){
 				this.abn= true;
 			}
 		}else if(CML.equals(this.labType)||EPSILON.equals(this.labType)){
 
-			//logger.debug("cml is doc type");
 			CMLLabTest cml = new CMLLabTest();
 			if (cml.findCMLAdnormalResults(this.segmentID) > 0){
 				this.abn= true;
@@ -151,81 +166,163 @@ public class LabResultData implements Comparable<LabResultData> {
 
 	}
 
+	// Relevant for Alberta Health Services as they are not currently sending any abnormal indications
+	// in their pathologies. We want to flag them all as "Unknown" so user notices and hopefully reads
+	public boolean isUnknown()
+	{
+		if (this.segmentID == null || this.discipline == null || this.labType.equals(DOCUMENT))
+		{
+			return false;
+		}
 
-	public boolean isFinal(){ return finalRes ;}
+		boolean isLabCLS = false;
 
-	public boolean isReportCancelled(){ return cancelledReport ;}
+		// Only hit the DB if we have a chance of this being an Albertan pathology
+		if (this.discipline.equals("CYTOPATHOLOGY"))
+		{
+			Hl7TextMessage msg = msgDao.find(Integer.parseInt(this.segmentID));
+			if (msg == null)
+			{
+				return false;
+			}
 
-	public boolean isMDS(){
+			String msgType = msg.getType();
+			isLabCLS = msgType.equals("CLS") || msgType.equals("CLSDI") || msgType.equals("AHS");
+		}
+
+		return isLabCLS;
+	}
+
+	public boolean isFinal()
+	{
+		return finalRes;
+	}
+
+	public boolean isCorrected()
+	{
+		return correctedRes;
+	}
+
+	public boolean isReportCancelled()
+	{
+		return cancelledReport ;
+	}
+
+	public boolean isMDS()
+	{
 		boolean ret = false;
-		if (MDS.equals(labType)){ ret = true; }
+		if (MDS.equals(labType))
+		{
+			ret = true;
+		}
 		return ret;
 	}
 
-	public boolean isCML(){
+	public boolean isCML()
+	{
 		boolean ret = false;
-		if (CML.equals(labType)){ ret = true; }
+		if (CML.equals(labType))
+		{
+			ret = true;
+		}
 		return ret;
 	}
 
-	public boolean isHL7TEXT(){
+	public boolean isHL7TEXT()
+	{
 		boolean ret = false;
-		if (HL7TEXT.equals(labType)){ ret = true; }
+		if (HL7TEXT.equals(labType))
+		{
+			ret = true;
+		}
 		return ret;
 	}
 
-	public boolean isDocument(){
+	public boolean isDocument()
+	{
 		boolean ret = false;
-		if (DOCUMENT.equals(labType)){ ret = true; }
+		if (DOCUMENT.equals(labType))
+		{
+			ret = true;
+		}
 		return ret;
 	}
 
-	public boolean isHRM(){
+	public boolean isHRM()
+	{
 		boolean ret = false;
-		if(HRM.equals(labType)){ ret = true; }
-		return ret;
-	}
-	////
-
-	public static boolean isMDS(String type){
-		boolean ret = false;
-		if (MDS.equals(type)){ ret = true; }
+		if(HRM.equals(labType))
+		{
+			ret = true;
+		}
 		return ret;
 	}
 
-	public static boolean isCML(String type){
+	public static boolean isMDS(String type)
+	{
 		boolean ret = false;
-		if (CML.equals(type)){ ret = true; }
+		if (MDS.equals(type))
+		{
+			ret = true;
+		}
 		return ret;
 	}
 
-	public static boolean isHL7TEXT(String type){
+	public static boolean isCML(String type)
+	{
 		boolean ret = false;
-		if (HL7TEXT.equals(type)){ ret = true; }
+		if (CML.equals(type))
+		{
+			ret = true;
+		}
 		return ret;
 	}
 
-	public static boolean isDocument(String type){
+	public static boolean isHL7TEXT(String type)
+	{
 		boolean ret = false;
-		if (DOCUMENT.equals(type)){ ret = true; }
+		if (HL7TEXT.equals(type))
+		{
+			ret = true;
+		}
 		return ret;
 	}
 
-	public static boolean isHRM(String type){
+	public static boolean isDocument(String type)
+	{
 		boolean ret = false;
-		if (HRM.equals(type)){ ret = true; }
+		if (DOCUMENT.equals(type))
+		{
+			ret = true;
+		}
+		return ret;
+	}
+
+	public static boolean isHRM(String type)
+	{
+		boolean ret = false;
+		if (HRM.equals(type))
+		{
+			ret = true;
+		}
 		return ret;
 	}
 
 
-	public String getDiscipline(){
-		if (CML.equals(this.labType)){
+	public String getDiscipline()
+	{
+		if (CML.equals(this.labType))
+		{
 			CMLLabTest cml = new CMLLabTest();
 			this.discipline = cml.getDiscipline(this.segmentID);
-		}else if (EXCELLERIS.equals(this.labType)){
+		}
+		else if (EXCELLERIS.equals(this.labType))
+		{
 			PathnetResultsData prd = new PathnetResultsData();
 			this.discipline = prd.findPathnetDisipline(this.segmentID);
-		}else if (Spire.equals(this.labType)){
+		}
+		else if (Spire.equals(this.labType))
+		{
 			SpireLabTest spire = new SpireLabTest();
 			this.discipline = spire.getDiscipline(this.segmentID);
 		}
@@ -245,18 +342,20 @@ public class LabResultData implements Comparable<LabResultData> {
 	}
 
 	public boolean isMatchedToPatient(){
-		//       if (EXCELLERIS.equals(this.labType)){
-			//          PathnetResultsData prd = new PathnetResultsData();
-			//          this.isMatchedToPatient = prd.isLabLinkedWithPatient(this.segmentID);
-			//       }
 		CommonLabResultData commonLabResultData = new CommonLabResultData();
 		logger.debug("in ismatchedtopatient, "+this.segmentID+"--"+this.labType);
-		if( this.isMatchedToPatient == null ) {
-			if(this.labType.equals("DOC")){
+		if(this.isMatchedToPatient == null)
+		{
+			if (this.labType.equals("DOC"))
+			{
 				this.isMatchedToPatient=commonLabResultData.isDocLinkedWithPatient(this.segmentID,this.labType);
-			}else if(this.labType.equals("HRM")){
+			}
+			else if (this.labType.equals("HRM"))
+			{
 				this.isMatchedToPatient = commonLabResultData.isHRMLinkedWithPatient(this.segmentID, this.labType);
-			}else{
+			}
+			else
+			{
 				this.isMatchedToPatient = commonLabResultData.isLabLinkedWithPatient(this.segmentID,this.labType);
 			}
 		}
@@ -264,11 +363,8 @@ public class LabResultData implements Comparable<LabResultData> {
 	}
 
 
-	public String getDateTime(){
-		/* if (EXCELLERIS.equals(this.labType)){
-            PathnetResultsData prd = new PathnetResultsData();
-            this.dateTime = prd.findPathnetObservationDate(this.segmentID);
-        }*/
+	public String getDateTime()
+	{
 		return this.dateTime;
 	}
 
@@ -279,11 +375,8 @@ public class LabResultData implements Comparable<LabResultData> {
 	public void setAcknowledgedStatus(String as){
 		this.acknowledgedStatus=as;
 	}
-	public String getReportStatus(){
-		/* if (EXCELLERIS.equals(this.labType)){
-            PathnetResultsData prd = new PathnetResultsData();
-            this.reportStatus = prd.findPathnetStatus(this.segmentID);
-        }*/
+	public String getReportStatus()
+	{
 		return this.reportStatus;
 	}
 
@@ -291,27 +384,28 @@ public class LabResultData implements Comparable<LabResultData> {
 		return this.priority;
 	}
 
-
-
-	public String getRequestingClient(){
-		/*if (EXCELLERIS.equals(this.labType)){
-            PathnetResultsData prd = new PathnetResultsData();
-            this.requestingClient = prd.findPathnetOrderingProvider(this.segmentID);
-        }*/
+	public String getRequestingClient()
+	{
 		return this.requestingClient;
 	}
 
-	public Date getDateObj(){
-		if (EXCELLERIS.equals(this.labType)){
-			
+	public Date getDateObj()
+	{
+		if (EXCELLERIS.equals(this.labType))
+		{
 			this.dateTimeObr = UtilDateUtilities.getDateFromString(this.getDateTime(), "yyyy-MM-dd HH:mm:ss");
-		}else if(HL7TEXT.equals(this.labType) || Spire.equals(this.labType)){
+		}
+		else if (HL7TEXT.equals(this.labType) || Spire.equals(this.labType))
+		{
 			this.dateTimeObr = UtilDateUtilities.getDateFromString(this.getDateTime(), "yyyy-MM-dd HH:mm:ss");
-		}else if(CML.equals(this.labType)){
+		}
+		else if (CML.equals(this.labType))
+		{
 			String date="";
 			
 			LabReportInformationDao dao = SpringUtils.getBean(LabReportInformationDao.class);
-			for(Object[] i : dao.findReportsByPhysicianId(Integer.parseInt(this.getSegmentID()))) {
+			for (Object[] i : dao.findReportsByPhysicianId(Integer.parseInt(this.getSegmentID())))
+			{
 				LabReportInformation lri = (LabReportInformation) i[0];  
 				date = lri.getPrintDate() + lri.getPrintTime(); 
 			}
@@ -325,25 +419,40 @@ public class LabResultData implements Comparable<LabResultData> {
 		this.dateTimeObr = d;
 	}
 
-	public int compareTo(LabResultData object) {
+	public int compareTo(LabResultData object)
+	{
 		int ret = 0;
-		if (this.getDateObj()!=null && object.getDateObj()!=null && this.segmentID!=null && object.segmentID!=null){
-			try {
-				if (this.dateTimeObr.after( object.getDateObj() )){
+		if (this.getDateObj() != null && object.getDateObj() != null
+				&& this.segmentID != null && object.segmentID != null)
+		{
+			try
+			{
+				if (this.dateTimeObr.after(object.getDateObj()))
+				{
 					ret = -1;
-				}else if(this.dateTimeObr.before( object.getDateObj() )){
+				}
+				else if(this.dateTimeObr.before(object.getDateObj()))
+				{
 					ret = 1;
-				}else if(this.finalResultsCount > object.finalResultsCount){
+				}
+				else if(this.finalResultsCount > object.finalResultsCount)
+				{
 					ret = -1;
-				}else if(this.finalResultsCount < object.finalResultsCount){
+				}
+				else if(this.finalResultsCount < object.finalResultsCount)
+				{
 					ret = 1;
-				}else if(Integer.parseInt(this.segmentID)>Integer.parseInt(object.segmentID)){
+				}
+				else if(Integer.parseInt(this.segmentID)>Integer.parseInt(object.segmentID))
+				{
 					ret = -1;
-				}else{
+				}
+				else
+				{
 					ret = 1;
 				}
 			} catch (NumberFormatException ex) {
-				if (this.segmentID.compareTo(object.segmentID)>0){
+				if (this.segmentID.compareTo(object.segmentID) > 0){
 					ret = -1;
 				}else{
 					ret = 1;
@@ -358,18 +467,25 @@ public class LabResultData implements Comparable<LabResultData> {
 	}
 
 
-	public class CompareId implements Comparator<LabResultData> {
-
-		public int compare( LabResultData lab1, LabResultData lab2 ) {
+	public class CompareId implements Comparator<LabResultData>
+	{
+		public int compare( LabResultData lab1, LabResultData lab2 )
+		{
 			int labPatientId1 = Integer.parseInt(lab1.labPatientId);
 			int labPatientId2 = Integer.parseInt(lab2.labPatientId);
 
-			if( labPatientId1 < labPatientId2 )
+			if (labPatientId1 < labPatientId2)
+			{
 				return -1;
-			else if( labPatientId1 > labPatientId2 )
+			}
+			else if (labPatientId1 > labPatientId2)
+			{
 				return 1;
+			}
 			else
+			{
 				return 0;
+			}
 		}
 	}
 
@@ -377,16 +493,27 @@ public class LabResultData implements Comparable<LabResultData> {
 	{
 		String temp;
 
-		if ("REF_I12".equals(discipline)) temp="REFERRAL";
-		else if (discipline!=null && discipline.startsWith("ORU_R01:")) return(discipline.substring("ORU_R01:".length()));
-		else temp=discipline;
+		if ("REF_I12".equals(discipline))
+		{
+			temp="REFERRAL";
+		}
+		else if (discipline!=null && discipline.startsWith("ORU_R01:"))
+		{
+			return(discipline.substring("ORU_R01:".length()));
+		}
+		else
+		{
+			temp=discipline;
+		}
 
 		return(StringUtils.maxLenString(temp, 13, 10, "..."));
 	}
 
 
-	public int getAckCount() {
-		if (ackCount == null) {
+	public int getAckCount()
+	{
+		if (ackCount == null)
+		{
 			CommonLabResultData data = new CommonLabResultData();
 			ackCount = data.getAckCount(this.segmentID, this.labType);
 		}
@@ -394,21 +521,26 @@ public class LabResultData implements Comparable<LabResultData> {
 		return (ackCount);
 	}
 
-	public void setAckCount(Integer ackCount) {
+	public void setAckCount(Integer ackCount)
+	{
 		this.ackCount = ackCount;
 	}
 
-	public int getMultipleAckCount() {
-		if (multiplAckCount == null) {
-
-			// String[] multiId = this.multiLabId.split(",");
+	public int getMultipleAckCount()
+	{
+		if (multiplAckCount == null)
+		{
 			CommonLabResultData data = new CommonLabResultData();
 			String[] multiId = data.getMatchingLabs(this.segmentID, this.labType).split(",");
 			int count = 0;
-			if (multiId.length == 1) {
+			if (multiId.length == 1)
+			{
 				count = -1;
-			} else {
-				for (int i = 0; i < multiId.length; i++) {
+			}
+			else
+			{
+				for (int i = 0; i < multiId.length; i++)
+				{
 					count = count + data.getAckCount(multiId[i], this.labType);
 				}
 			}
@@ -423,27 +555,33 @@ public class LabResultData implements Comparable<LabResultData> {
 		this.multiplAckCount=multipleAckCount;
 	}
 
-	public Integer getRemoteFacilityId() {
+	public Integer getRemoteFacilityId()
+	{
 		return (remoteFacilityId);
 	}
 
-	public void setRemoteFacilityId(Integer remoteFacilityId) {
+	public void setRemoteFacilityId(Integer remoteFacilityId)
+	{
 		this.remoteFacilityId = remoteFacilityId;
 	}
 
-	public ArrayList<Integer> getDuplicateLabIds() {
+	public ArrayList<Integer> getDuplicateLabIds()
+	{
 		return (duplicateLabIds);
 	}
 
-	public String getLabel() {
+	public String getLabel()
+	{
 		return label;
 	}
 
-	public void setLabel(String label) {
+	public void setLabel(String label)
+	{
 		this.label = label;
 	}
 
-    public boolean isRemoteLab() {
-        return getRemoteFacilityId() != null;
-    }
+	public boolean isRemoteLab()
+	{
+		return getRemoteFacilityId() != null;
+	}
 }
