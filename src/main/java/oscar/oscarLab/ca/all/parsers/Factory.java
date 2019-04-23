@@ -54,6 +54,9 @@ import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.ConnectCareDiagnosticImagingHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.ConnectCareDocumentationHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v251.ConnectCareLabHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v22.SpecimenGateHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIORMHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestORMHandler;
@@ -171,7 +174,13 @@ public final class Factory {
 			Message msg = p.parse(hl7Body);
 
 			// attempt to read the msh header and determine lab type handler
-			if(CLSHandler.handlerTypeMatch(msg))
+			if(ConnectCareDiagnosticImagingHandler.handlerTypeMatch(msg))
+				handler = new ConnectCareDiagnosticImagingHandler(msg);
+			else if(ConnectCareDocumentationHandler.handlerTypeMatch(msg))
+				handler = new ConnectCareDocumentationHandler(msg);
+			else if(ConnectCareLabHandler.handlerTypeMatch(msg))
+				handler = new ConnectCareLabHandler(msg);
+			else if(CLSHandler.handlerTypeMatch(msg))
 				handler = new CLSHandler(msg);
 			else if(CLSDIHandler.handlerTypeMatch(msg))
 				handler = new CLSDIHandler(msg);
