@@ -35,6 +35,7 @@ public class FaxOutboxTransferOutbound implements Serializable
 	private Long faxAccountId;
 
 	private String providerNo;
+	private String providerName;
 	private Integer demographicNo;
 	private String toFaxNumber;
 	/* file type: document, form, consult, etc. */
@@ -82,6 +83,16 @@ public class FaxOutboxTransferOutbound implements Serializable
 	public void setProviderNo(String providerNo)
 	{
 		this.providerNo = providerNo;
+	}
+
+	public String getProviderName()
+	{
+		return providerName;
+	}
+
+	public void setProviderName(String providerName)
+	{
+		this.providerName = providerName;
 	}
 
 	public Integer getDemographicNo()

@@ -23,6 +23,7 @@
 package org.oscarehr.fax.model;
 
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.provider.model.ProviderData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -102,6 +103,10 @@ public class FaxOutbound extends AbstractModel<Long>
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "fax_account_id")
 	private FaxAccount faxAccount;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="provider_no", referencedColumnName="provider_no", insertable=false, updatable=false)
+	private ProviderData provider;
 
 	@Override
 	public Long getId()
@@ -192,6 +197,16 @@ public class FaxOutbound extends AbstractModel<Long>
 	public void setProviderNo(String providerNo)
 	{
 		this.providerNo = providerNo;
+	}
+
+	public ProviderData getProvider()
+	{
+		return provider;
+	}
+
+	public void setProvider(ProviderData provider)
+	{
+		this.provider = provider;
 	}
 
 	public Integer getDemographicNo()
