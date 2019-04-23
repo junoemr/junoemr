@@ -372,8 +372,17 @@ angular.module('Record').controller('Record.RecordController', [
 			controller.$storage.hideNote = true;
 		};
 
+		// This is a hack wrapper until we figure out a more sane way to check the DOM for updated content
+		controller.updateCurrentNote = function updateCurrentNote()
+		{
+			var noteId = "noteEditor" + $stateParams.demographicNo;
+			controller.page.encounterNote.note = document.getElementById(noteId).value;
+		};
+
 		controller.saveNote = function saveNote()
 		{
+			// Text may have been inserted directly into the DOM - check
+			controller.updateCurrentNote();
 			// Don't let users save an empty note
 			if (controller.page.encounterNote.note.length === 0)
 			{
