@@ -23,7 +23,11 @@
     Ontario, Canada
 
 --%>
-<%@ page import="org.oscarehr.fax.dao.FaxAccountDao, org.oscarehr.common.dao.OscarAppointmentDao,org.oscarehr.common.dao.SiteDao, org.oscarehr.common.model.Appointment, org.oscarehr.fax.model.FaxAccount"%>
+<%@ page import="org.oscarehr.fax.dao.FaxAccountDao" %>
+<%@ page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
+<%@ page import="org.oscarehr.common.dao.SiteDao" %>
+<%@ page import="org.oscarehr.common.model.Appointment" %>
+<%@ page import="org.oscarehr.fax.model.FaxAccount"%>
 <%@ page import="org.oscarehr.common.model.PharmacyInfo" %>
 <%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet" %>
@@ -41,8 +45,6 @@
 <%@ page import="oscar.OscarProperties"%>
 <%! boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable(); %>
 
-
-<%@page import="oscar.oscarClinic.ClinicData"%>
 <%@page import="oscar.oscarProvider.data.ProSignatureData"%>
 <%@page import="oscar.oscarRx.data.RxPharmacyData"%>
 <%@page import="java.io.File"%>
@@ -101,25 +103,17 @@ Vector vecPageSizeValues=new Vector();
 vecPageSizeValues.add("PageSize.A4");
 vecPageSizeValues.add("PageSize.A6");
 vecPageSizeValues.add("PageSize.Letter");
-//are we printing in the past?
-//String reprint = (String)request.getAttribute("rePrint") != null ? (String)request.getAttribute("rePrint") : "false";
 
 String reprint = (String)request.getSession().getAttribute("rePrint") != null ? (String)request.getSession().getAttribute("rePrint") : "false";
 Boolean isReprint = Boolean.parseBoolean(reprint);
 
-String createAnewRx;
 if(isReprint) {
     sessionBean = (oscar.oscarRx.pageUtil.RxSessionBean)session.getAttribute("tmpBeanRX");
-    createAnewRx = "window.location.href = '" + request.getContextPath() + "/oscarRx/SearchDrug.jsp'";
 }
-else
-    createAnewRx = "javascript:clearPending('')";
 
 // for satellite clinics
 Vector vecAddressName = null;
 Vector vecAddress = null;
-Vector vecAddressPhone = null;
-Vector vecAddressFax = null;
 OscarProperties props = OscarProperties.getInstance();
 if(bMultisites) {
 	String appt_no=(String)session.getAttribute("cur_appointment_no");
@@ -129,22 +123,9 @@ if(bMultisites) {
 		if (result!=null) location = result.getLocation();
 	}
 
-    oscar.oscarRx.data.RxProviderData.Provider provider = new oscar.oscarRx.data.RxProviderData().getProvider(sessionBean.getProviderNo());
-    ProSignatureData sig = new ProSignatureData();
-    boolean hasSig = sig.hasSignature(sessionBean.getProviderNo());
-    String doctorName = "";
-    if (hasSig){
-       doctorName = sig.getSignature(sessionBean.getProviderNo());
-    }else{
-       doctorName = (provider.getFirstName() + ' ' + provider.getSurname());
-    }
-    doctorName = doctorName.replaceAll("\\d{6}","");
-    doctorName = doctorName.replaceAll("\\-","");
 
     vecAddressName = new Vector();
     vecAddress = new Vector();
-    vecAddressPhone = new Vector();
-    vecAddressFax = new Vector();
 
     java.util.ResourceBundle rb = java.util.ResourceBundle.getBundle("oscarResources",request.getLocale());
 
@@ -164,18 +145,9 @@ if(bMultisites) {
     oscar.oscarRx.data.RxProviderData.Provider provider = new oscar.oscarRx.data.RxProviderData().getProvider(sessionBean.getProviderNo());
     ProSignatureData sig = new ProSignatureData();
     boolean hasSig = sig.hasSignature(sessionBean.getProviderNo());
-    String doctorName = "";
-    if (hasSig){
-       doctorName = sig.getSignature(sessionBean.getProviderNo());
-    }else{
-       doctorName = (provider.getFirstName() + ' ' + provider.getSurname());
-    }
 
-    ClinicData clinic = new ClinicData();
     vecAddressName = new Vector();
     vecAddress = new Vector();
-    vecAddressPhone = new Vector();
-    vecAddressFax = new Vector();
     String[] temp0 = props.getProperty("clinicSatelliteName", "").split("\\|");
     String[] temp1 = props.getProperty("clinicSatelliteAddress", "").split("\\|");
     String[] temp2 = props.getProperty("clinicSatelliteCity", "").split("\\|");
@@ -208,14 +180,6 @@ if (pharmacyId != null && !"null".equalsIgnoreCase(pharmacyId)) {
 }
 
 String userAgent = request.getHeader("User-Agent");
-String browserType = "";
-if (userAgent != null) {
-	if (userAgent.toLowerCase().indexOf("ipad") > -1) {
-		browserType = "IPAD";
-	} else {
-		browserType = "ALL";
-	}
-}
 %>
 <link rel="stylesheet" type="text/css" href="styles.css" />
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
@@ -528,7 +492,7 @@ function toggleView(form) {
 	id="AutoNumber1" height="100%">
 	<tr>
 		<td width="100%"
-			style="padding-left: 3; padding-right: 3; padding-top: 2; padding-bottom: 2"
+			style="padding-left: 3px; padding-right: 3px; padding-top: 2px; padding-bottom: 2px"
 			height="0%" colspan="2">
 
 		</td>
