@@ -24,26 +24,31 @@
 package org.oscarehr.e2e.constant;
 
 import org.junit.Test;
+import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.e2e.constant.BodyConstants;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.constant.Mappings;
 
-public class ConstantsTest {
+public class ConstantsTest extends DaoTestFixtures
+{
 	@SuppressWarnings("unused")
 	@Test(expected=UnsupportedOperationException.class)
-	public void bodyConstantsInstantiationTest() {
+	public void bodyConstantsInstantiationTest()
+	{
 		new BodyConstants();
 	}
 
 	@SuppressWarnings("unused")
 	@Test(expected=UnsupportedOperationException.class)
-	public void constantsInstantiationTest() {
+	public void constantsInstantiationTest()
+	{
 		new Constants();
 	}
 
 	@SuppressWarnings("unused")
 	@Test(expected=UnsupportedOperationException.class)
-	public void mappingsInstantiationTest() {
+	public void mappingsInstantiationTest()
+	{
 		new Mappings();
 	}
 }

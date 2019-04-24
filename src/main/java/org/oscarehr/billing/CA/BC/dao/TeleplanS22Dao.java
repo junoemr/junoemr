@@ -25,13 +25,12 @@
 
 package org.oscarehr.billing.CA.BC.dao;
 
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.oscarehr.billing.CA.BC.model.TeleplanS22;
 import org.oscarehr.common.dao.AbstractDao;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.List;
 
 @Repository
 public class TeleplanS22Dao extends AbstractDao<TeleplanS22>{
@@ -47,5 +46,34 @@ public class TeleplanS22Dao extends AbstractDao<TeleplanS22>{
 		q.setParameter(2, type);
 		q.setParameter(3, practitionerNo);
 		return q.getResultList();
+	}
+
+	public List<TeleplanS22> findDuplicates(TeleplanS22 lineEntry)
+	{
+		Query q = entityManager.createQuery(
+				"SELECT t FROM TeleplanS22 t " +
+						"WHERE t.s22Type = :s22Type " +
+						"AND t.dataCentre = :dataCenter " +
+						"AND t.dataSeq = :sequenceNumber " +
+						"AND t.mspCtlNo = :mspInternal " +
+						"AND t.practitionerNo = :practitionerNo " +
+						"AND t.payment = :paymentDate " +
+						"AND t.amountPaid = :paidAmount " +
+						"AND t.amountBilled = :billedAmount " +
+						"ORDER BY t.id ASC");
+		q.setParameter("s22Type", lineEntry.getS22Type());
+		q.setParameter("dataCenter", lineEntry.getDataCentre());
+		q.setParameter("sequenceNumber", lineEntry.getDataSeq());
+		q.setParameter("mspInternal", lineEntry.getMspCtlNo());
+		q.setParameter("practitionerNo", lineEntry.getPractitionerNo());
+		q.setParameter("paymentDate", lineEntry.getPayment());
+		q.setParameter("paidAmount", lineEntry.getAmountPaid());
+		q.setParameter("billedAmount", lineEntry.getAmountBilled());
+		return q.getResultList();
+	}
+
+	public boolean isDuplicate(TeleplanS22 lineEntry)
+	{
+		return !findDuplicates(lineEntry).isEmpty();
 	}
 }

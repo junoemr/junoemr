@@ -143,6 +143,7 @@
 			};
 		</script>
 
+		<script type="text/javascript" src="EncounterTimer.js"></script>
 		<!--js code for newCaseManagementView.jsp -->
 		<script type="text/javascript" src="<c:out value="${ctx}/js/newCaseManagementView.js.jsp"/>"></script>
 

@@ -174,6 +174,13 @@ public final class ProviderPreferencesUIBean {
 		temp = StringUtils.trimToNull(request.getParameter("erx_sso_url"));
 		if (temp != null) providerPreference.setERx_SSO_URL(temp);
 
+		temp = request.getParameter("appointmentReasonDisplayLevel");
+		if (temp != null)
+		{
+			ProviderPreference.AppointmentReasonDisplayLevel displayLevel = ProviderPreference.AppointmentReasonDisplayLevel.valueOf(temp);
+			providerPreference.setAppointmentReasonDisplayLevel(displayLevel);
+		}
+
 		providerPreferenceDao.merge(providerPreference);
 
 		return (providerPreference);
