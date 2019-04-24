@@ -51,7 +51,10 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 		//=========================================================================
 
 		controller.demographicReadAccess = null;
-		controller.search = null;
+		controller.search = {};
+		controller.STATUS_MODE = demographicsService.STATUS_MODE;
+		controller.SEARCH_MODE = demographicsService.SEARCH_MODE;
+		controller.defaultStatus = demographicsService.STATUS_MODE.ACTIVE;
 
 		controller.init = function init()
 		{
@@ -60,6 +63,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 			{
 				controller.search.term = $stateParams.term;
 			}
+			controller.search.status = controller.defaultStatus;
 
 			securityService.hasRights(
 			{
@@ -104,7 +108,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 				count: 10,
 				sorting:
 				{
-					Name: 'asc'
+					DemographicName: 'asc'
 				}
 			},
 			{
@@ -119,7 +123,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 
 					var promiseArray = [];
 					promiseArray.push(demographicsService.search(
-						controller.search, ((page - 1) * count), count));
+						controller.search, page, count));
 
 					controller.integratorResults = null;
 					if (controller.search.integrator)
@@ -132,14 +136,14 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 						function success(results)
 						{
 							var demographicSearchResults = results[0];
-							params.total(demographicSearchResults.total);
+							params.total(demographicSearchResults.meta.total);
 
 							if (controller.search.integrator)
 							{
 								controller.integratorResults = results[1];
 							}
 
-							deferred.resolve(demographicSearchResults.content);
+							deferred.resolve(demographicSearchResults.data);
 						},
 						function error(promiseErrors)
 						{
@@ -154,7 +158,7 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 
 		controller.searchPatients = function searchPatients()
 		{
-			if (controller.search.type === "DOB")
+			if (controller.search.type === demographicsService.SEARCH_MODE.DOB)
 			{
 				var dobMoment = moment(controller.search.term, ["YYYY-MM-DD", "YYYY/MM/DD"], true);
 				if (dobMoment.isValid())
@@ -178,20 +182,20 @@ angular.module('Patient.Search').controller('Patient.Search.PatientSearchControl
 			// default search type
 			if (!Juno.Common.Util.exists(searchType))
 			{
-				searchType = 'Name';
+				searchType = demographicsService.SEARCH_MODE.Name;
 			}
 
 			// reset the parameters
 			controller.search = {
 				type: searchType,
 				term: '',
-				status: "all",
+				status: controller.defaultStatus,
 				integrator: false,
 				outofdomain: true
 			};
 
 			// update the placeholder
-			controller.searchTermPlaceHolder = (controller.search.type === "DOB") ?
+			controller.searchTermPlaceHolder = (controller.search.type === demographicsService.SEARCH_MODE.DOB) ?
 				"YYYY-MM-DD" : "Search Term";
 
 			// do the search (if initialized)
