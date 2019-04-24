@@ -226,7 +226,6 @@ angular.module('Record').controller('Record.RecordController', [
 
 		var delayTmpSave = function delayTmpSave(newVal, oldVal)
 		{
-			console.log("whats the val ", (newVal != oldVal));
 			if (!skipTmpSave)
 			{
 				if (newVal != oldVal)
@@ -469,9 +468,6 @@ angular.module('Record').controller('Record.RecordController', [
 
 			window.open(url, "billingWin", "scrollbars=yes, location=no, width=" + screen.width + ", height=" + screen.height, "");
 		};
-
-
-		console.log('RecordCtrlEnd', $state);
 
 		controller.page.currentNoteConfig = {};
 

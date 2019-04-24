@@ -176,8 +176,7 @@ angular.module("Common.Services").service("providerService", [
 					deferred.resolve(response.data);
 				},
 				function error(error) {
-					console.log("providerService::getRecentDemographicsViewed error", error);
-					deferred.reject("An error occurred while getting RecentDemographicsViewed");
+					deferred.reject("An error occurred while getting RecentDemographicsViewed: " + error);
 				});
 			return deferred.promise;
 		};
