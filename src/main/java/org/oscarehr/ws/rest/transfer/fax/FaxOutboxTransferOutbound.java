@@ -46,6 +46,8 @@ public class FaxOutboxTransferOutbound implements Serializable
 	private String systemStatusMessage;
 	/* the sent date of the document as recorded in the system */
 	private String systemDateSent;
+	private Boolean archived;
+	private String notificationStatus;
 
 	/* the sent status of the document as retrieved from the api */
 	private String integrationStatus;
@@ -143,6 +145,26 @@ public class FaxOutboxTransferOutbound implements Serializable
 	public void setSystemStatusMessage(String systemStatusMessage)
 	{
 		this.systemStatusMessage = systemStatusMessage;
+	}
+
+	public Boolean getArchived()
+	{
+		return archived;
+	}
+
+	public void setArchived(Boolean archived)
+	{
+		this.archived = archived;
+	}
+
+	public String getNotificationStatus()
+	{
+		return notificationStatus;
+	}
+
+	public void setNotificationStatus(String notificationStatus)
+	{
+		this.notificationStatus = notificationStatus;
 	}
 
 	public String getSystemDateSent()

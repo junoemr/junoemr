@@ -76,6 +76,40 @@ angular.module("Common.Services").service("faxOutboundService", [
 			return service.apiPath + '/' + id + '/download';
 		};
 
+		service.setNotificationStatus = function setNotificationStatus(id, status)
+		{
+			var deferred = $q.defer();
+
+			junoHttp.put(service.apiPath + '/' + id + '/notificationStatus', status).then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("faxService::setNotificationStatus error", error);
+					deferred.reject("An error occurred while acknowledging a fax");
+				});
+			return deferred.promise;
+		};
+
+		service.archive = function archive(id)
+		{
+			var deferred = $q.defer();
+
+			junoHttp.put(service.apiPath + '/' + id + '/archive').then(
+				function success(response)
+				{
+					deferred.resolve(response.data);
+				},
+				function error(error)
+				{
+					console.log("faxService::archive error", error);
+					deferred.reject("An error occurred while archiveing a fax");
+				});
+			return deferred.promise;
+		};
+
 		return service;
 	}
 ]);

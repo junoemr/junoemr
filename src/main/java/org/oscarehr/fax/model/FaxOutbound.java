@@ -59,6 +59,12 @@ public class FaxOutbound extends AbstractModel<Long>
 		SENT
 	}
 
+	public enum NotificationStatus
+	{
+		NOTIFY,
+		SILENT
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
@@ -77,6 +83,13 @@ public class FaxOutbound extends AbstractModel<Long>
 
 	@Column(name= "sent_to")
 	private String sentTo;
+
+	@Column(name= "notification_status")
+	@Enumerated(EnumType.STRING)
+	private NotificationStatus notificationStatus = NotificationStatus.NOTIFY;
+
+	@Column(name= "archived")
+	private Boolean archived = false;
 
 	@Column(name= "provider_no")
 	private String providerNo;
@@ -99,6 +112,13 @@ public class FaxOutbound extends AbstractModel<Long>
 
 	@Column(name= "external_reference_id")
 	private Long externalReferenceId;
+
+	@Column(name= "external_status")
+	private String externalStatus;
+
+	@Column(name= "external_delivery_date")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date externalDeliveryDate;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "fax_account_id")
@@ -179,6 +199,16 @@ public class FaxOutbound extends AbstractModel<Long>
 		this.statusMessage = statusMessage;
 	}
 
+	public Boolean getArchived()
+	{
+		return archived;
+	}
+
+	public void setArchived(Boolean acknowledged)
+	{
+		this.archived = acknowledged;
+	}
+
 	public String getSentTo()
 	{
 		return sentTo;
@@ -187,6 +217,16 @@ public class FaxOutbound extends AbstractModel<Long>
 	public void setSentTo(String sentTo)
 	{
 		this.sentTo = sentTo;
+	}
+
+	public NotificationStatus getNotificationStatus()
+	{
+		return notificationStatus;
+	}
+
+	public void setNotificationStatus(NotificationStatus notificationStatus)
+	{
+		this.notificationStatus = notificationStatus;
 	}
 
 	public String getProviderNo()
@@ -267,6 +307,26 @@ public class FaxOutbound extends AbstractModel<Long>
 	public void setExternalReferenceId(Long externalReferenceId)
 	{
 		this.externalReferenceId = externalReferenceId;
+	}
+
+	public String getExternalStatus()
+	{
+		return externalStatus;
+	}
+
+	public void setExternalStatus(String externalStatus)
+	{
+		this.externalStatus = externalStatus;
+	}
+
+	public Date getExternalDeliveryDate()
+	{
+		return externalDeliveryDate;
+	}
+
+	public void setExternalDeliveryDate(Date externalDeliveryDate)
+	{
+		this.externalDeliveryDate = externalDeliveryDate;
 	}
 
 	public FaxAccount getFaxAccount()

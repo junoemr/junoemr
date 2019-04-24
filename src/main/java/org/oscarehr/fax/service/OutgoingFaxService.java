@@ -190,6 +190,21 @@ public class OutgoingFaxService
 		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
 	}
 
+	public FaxOutboxTransferOutbound setNotificationStatus(Long faxOutId, String status)
+	{
+		FaxOutbound faxOutbound = faxOutboundDao.find(faxOutId);
+		faxOutbound.setNotificationStatus(FaxOutbound.NotificationStatus.valueOf(status));
+		faxOutboundDao.persist(faxOutbound);
+		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
+	}
+	public FaxOutboxTransferOutbound setArchived(Long faxOutId, boolean isArchived)
+	{
+		FaxOutbound faxOutbound = faxOutboundDao.find(faxOutId);
+		faxOutbound.setArchived(isArchived);
+		faxOutboundDao.persist(faxOutbound);
+		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
+	}
+
 	/**
 	 * find a list of all queued faxes and attempt to send them.
 	 */

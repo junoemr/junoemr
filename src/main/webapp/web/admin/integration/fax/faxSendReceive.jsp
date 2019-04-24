@@ -177,7 +177,7 @@
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.fileType"/>'">{{item.fileType}}</td>
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.systemStatus"/>'">{{item.systemStatus}}</td>
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.toFaxNumber"/>'">{{item.toFaxNumber}}</td>
-						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationDateQueued"/>'">{{item.integrationDateQueued}}</td>
+						<%--<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationDateQueued"/>'">{{item.integrationDateQueued}}</td>--%>
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationDateSent"/>'">{{item.integrationDateSent}}</td>
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationStatus"/>'">{{item.integrationStatus}}</td>
 						<td>
@@ -189,6 +189,7 @@
 						<td>
 							<button class="btn btn-xs"
 							        title="<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.resend-tooltip"/>"
+							        ng-hide="item.archived"
 							        ng-disabled="item.systemStatus != faxSendReceiveController.systemStatusEnum.queued
 					                    && item.systemStatus != faxSendReceiveController.systemStatusEnum.error"
 							        ng-class="{'btn-success': item.systemStatus == faxSendReceiveController.systemStatusEnum.queued,
@@ -197,6 +198,19 @@
 								<span class="glyphicon glyphicon-repeat"></span>
 								<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.resend"/>
 							</button>
+							<span ng-show="item.archived">
+								<bean:message bundle="ui" key="admin.fax.sr.outbox.archived"/>
+							</span>
+						</td>
+						<td>
+							<button class="btn btn-xs"
+							        ng-show="item.notificationStatus == faxSendReceiveController.notificationStatusEnum.notify"
+									ng-click="faxSendReceiveController.dismissNotification(item);">
+								<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.notification.dismiss"/>
+							</button>
+							<span ng-show="item.notificationStatus == faxSendReceiveController.notificationStatusEnum.dismissed">
+								<bean:message bundle="ui" key="admin.fax.sr.outbox.notification.dismissed"/>
+							</span>
 						</td>
 					</tr>
 					</tbody>

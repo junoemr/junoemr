@@ -12,6 +12,7 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 	{
 		var controller = this;
 		controller.systemStatusEnum = Object.freeze({"sent":"SENT", "queued":"QUEUED", "error":"ERROR"});
+		controller.notificationStatusEnum = Object.freeze({"notify":"NOTIFY", "dismissed":"SILENT"});
 		controller.tabEnum = Object.freeze({"inbox":0, "outbox":1});
 		controller.activeTab = controller.tabEnum.outbox;
 		controller.loggedInProviderNo = null;
@@ -202,6 +203,36 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 		controller.changeTab = function(tabId)
 		{
 			controller.activeTab = tabId;
+		};
+
+		controller.dismissNotification = function(outboxItem)
+		{
+			faxOutboundService.setNotificationStatus(outboxItem.id, controller.notificationStatusEnum.dismissed).then(
+				function success(response)
+				{
+					angular.copy(response, outboxItem);
+				},
+				function error(error)
+				{
+					console.error(error);
+					alert(error);
+				}
+			);
+		};
+
+		controller.archive = function(outboxItem)
+		{
+			faxOutboundService.archive(outboxItem.id).then(
+				function success(response)
+				{
+					angular.copy(response, outboxItem);
+				},
+				function error(error)
+				{
+					console.error(error);
+					alert(error);
+				}
+			);
 		};
 
 		controller.openDocument = function(documentId)
