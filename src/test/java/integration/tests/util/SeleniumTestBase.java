@@ -23,31 +23,61 @@
  */
 package integration.tests.util;
 
+import org.apache.log4j.Logger;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.oscarehr.common.dao.DaoTestFixtures;
+import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.oscarehr.util.MiscUtils;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
 public class SeleniumTestBase
 {
+	public static final Integer WEB_DRIVER_IMPLICIT_TIMEOUT = 20;
 	private static final String GECKO_DRIVER="src/test/resources/vendor/geckodriver";
-	protected WebDriver driver;
+
+	protected static WebDriver driver;
+	protected static Logger logger= MiscUtils.getLogger();
 
 	@BeforeClass
-	public void buildWebDriver()
+	public static void buildWebDriver() throws SQLException, InstantiationException,
+			IllegalAccessException, ClassNotFoundException, IOException
 	{
+		//load database (during the integration-test phase this will only populate table creation maps)
+		SchemaUtils.createDatabaseAndTables();
+
 		//build and start selenium web driver
+		createWebDriver();
+	}
+
+	@AfterClass
+	public static void closeWebDriver()
+	{
+		driver.quit();
+	}
+
+
+	private static void createWebDriver()
+	{
 		System.setProperty("webdriver.gecko.driver", GECKO_DRIVER);
 		FirefoxBinary ffb = new FirefoxBinary();
 		FirefoxOptions ffo = new FirefoxOptions();
 		ffb.addCommandLineOptions("--headless");
 		ffo.setBinary(ffb);
-		this.driver = new FirefoxDriver(ffo);
-		this.driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver = new FirefoxDriver(ffo);
+		driver.manage().timeouts().implicitlyWait(WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 	}
 
+	private static void loadSpringBeans()
+	{
+		DaoTestFixtures.setupBeanFactory();
+	}
 }

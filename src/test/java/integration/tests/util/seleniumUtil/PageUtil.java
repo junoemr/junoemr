@@ -23,15 +23,42 @@
  */
 package integration.tests.util.seleniumUtil;
 
+import integration.tests.util.SeleniumTestBase;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.concurrent.TimeUnit;
+
 public class PageUtil
 {
+	/**
+	 * wait until the webdriver changes pages
+	 * @param oldUrl
+	 * @param driver
+	 */
 	public static void waitForPageChange(String oldUrl, WebDriver driver)
 	{
-		WebDriverWait wait = new WebDriverWait(driver, 10);
+		WebDriverWait wait = new WebDriverWait(driver, 20);
 		wait.until(ExpectedConditions.not(ExpectedConditions.urlMatches(oldUrl)));
 	}
+
+	public static boolean isExistsBy(By search, WebDriver driver)
+	{
+		driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		try
+		{
+			driver.findElement(search);
+			driver.manage().timeouts().implicitlyWait(SeleniumTestBase.WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+			return true;
+		}
+		catch (NoSuchElementException e)
+		{
+			driver.manage().timeouts().implicitlyWait(SeleniumTestBase.WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+			return false;
+		}
+	}
+
 }

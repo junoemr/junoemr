@@ -1968,7 +1968,6 @@
 								</goals>
 								<phase>test</phase>
 								<configuration>
-									<testFailureIgnore>true</testFailureIgnore>
 									<skipTests>false</skipTests>
 									<argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
 									<test>SetupDatabase</test>
@@ -1994,7 +1993,7 @@
 										<include>integration/tests/*</include>
 									</includes>
 									<systemPropertyVariables>
-										<oscar.dbinit.skip>${oscar.dbinit.skip}</oscar.dbinit.skip>
+										<oscar.dbinit.skip>true</oscar.dbinit.skip>
 										<buildDirectory>${project.build.directory}</buildDirectory>
 									</systemPropertyVariables>
 								</configuration>

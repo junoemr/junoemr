@@ -26,6 +26,7 @@ package integration.tests.util.junoUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.oscarehr.util.MiscUtils;
@@ -64,5 +65,16 @@ public class Navigation
 		PageUtil.waitForPageChange(oldUrl, driver);
 
 		logger.info("Logged in!");
+	}
+
+	/**
+	 * checks if the webdriver already has a session object from Oscar (does not insure said object is valid)
+	 * @param driver
+	 * @return true if driver appears to be logged in
+	 */
+	public static boolean isLoggedIn(WebDriver driver)
+	{
+		Cookie session = driver.manage().getCookieNamed("JSESSIONID");
+		return session != null;
 	}
 }

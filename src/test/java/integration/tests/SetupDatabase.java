@@ -24,8 +24,9 @@
 package integration.tests;
 
 import org.apache.log4j.Logger;
-import org.junit.Before;
 import org.junit.Test;
+import org.oscarehr.common.dao.DaoTestFixtures;
+import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.util.MiscUtils;
 
@@ -35,6 +36,7 @@ import java.sql.SQLException;
 // "hack" test to initialize the database to a workable state before embedded tomcat is run
 public class SetupDatabase
 {
+	private static final String INITALIZE_DATABASE_SQL = System.getProperty("basedir") + "/src/test/java/integration/tests/sql/initialize_database.sql";
 	private static Logger logger= MiscUtils.getLogger();
 
 	//initialize database and make all tables available for the subsequent embedded Tomcat invocation.
@@ -49,6 +51,9 @@ public class SetupDatabase
 				logger.info("dropAndRecreateDatabase");
 				SchemaUtils.dropAndRecreateDatabase();
 			}
+
+			//setup database for integration tests
+			SchemaUtils.loadFileIntoMySQL(INITALIZE_DATABASE_SQL);
 			SchemaUtils.restoreAllTables();
 
 			long end = System.currentTimeMillis();
@@ -57,6 +62,19 @@ public class SetupDatabase
 			{
 				logger.info("Setting up db took " + secsTaken + " seconds.");
 			}
+
+			// load spring
+			start = System.currentTimeMillis();
+			DaoTestFixtures.setupBeanFactory();
+			end = System.currentTimeMillis();
+			secsTaken = (end-start)/1000;
+			logger.info("Setting up spring took " + secsTaken + " seconds.");
+
+			// configure test user. mainly to turn of forced password reset.
+			logger.info("Configuring test account");
+			AuthUtils.configureTestUser();
+
 		}
+
 	}
 }
