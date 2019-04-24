@@ -303,17 +303,22 @@ function printPaste2Parent(print)
 		// We support pasting into orig encounter and new caseManagement
 		demographicNo = <%=sessionBean.getDemographicNo()%>;
 		var noteEditor = "noteEditor"+ demographicNo;
-		if (window.parent.opener.document.forms["caseManagementEntryForm"] !== undefined)
+		var myParent = window.parent.opener;
+		if (myParent.document.forms["caseManagementEntryForm"] !== undefined)
 		{
-			window.parent.opener.pasteToEncounterNote(text);
+			myParent.pasteToEncounterNote(text);
 		}
-		else if (window.parent.opener.document.encForm !== undefined)
+		else if (myParent.document.encForm !== undefined)
 		{
-			window.parent.opener.document.encForm.enTextarea.value = window.parent.opener.document.encForm.enTextarea.value + text;
+			myParent.document.encForm.enTextarea.value = myParent.document.encForm.enTextarea.value + text;
 		}
 		else if (window.parent.opener.document.getElementById(noteEditor) !== undefined)
 		{
-			window.parent.opener.document.getElementById(noteEditor).value = window.parent.opener.document.getElementById(noteEditor).value + text;
+			// Instead of making the parent AngularJS document paranoia check every note in case we
+			// directly shoved content into the DOM, we'll connect the note properly for them
+			text = myParent.document.getElementById(noteEditor).value + text;
+			myParent.angular.element(myParent.document.querySelector("#note-editor"))
+				.scope().recordCtrl.updateCurrentNote(text);
 		}
 	}
 	catch (e)
