@@ -57,41 +57,43 @@ import oscar.oscarLab.ca.all.util.Utilities;
 
 public class InsideLabUploadAction extends Action {
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-    Logger logger = Logger.getLogger(InsideLabUploadAction.class);
+	private Logger logger = Logger.getLogger(InsideLabUploadAction.class);
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)  {
-        logger.debug("Uploading lab file");
-    	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-    	if(!securityInfoManager.hasPrivilege(loggedInInfo, "_lab", "w", null)) {
-    		throw new SecurityException("missing required security object (_lab)");
-    	}
-    	
-    	LabUploadForm frm = (LabUploadForm) form;
-        FormFile importFile = frm.getImportFile();
-        String filename = importFile.getFileName();
-        String providerNumber = (String) request.getSession().getAttribute("user");
-        String outcome = "failure";
-        
-        InputStream formFileIs=null;
-        try {
-            formFileIs = importFile.getInputStream();
-            
-            
-            String type = request.getParameter("type");
-            if (type.equals("OTHER"))
-                type = request.getParameter("otherType");
-            
-            String filePath = Utilities.saveFile(formFileIs, filename);
-            File file = new File(filePath);
-            
+	@Override
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)  {
+		logger.debug("Uploading lab file");
+		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
+		securityInfoManager.requireOnePrivilege(providerNo, securityInfoManager.WRITE, null, "_lab");
+
+		LabUploadForm frm = (LabUploadForm) form;
+		FormFile importFile = frm.getImportFile();
+		String filename = importFile.getFileName();
+		String providerNumber = (String) request.getSession().getAttribute("user");
+		String outcome = "failure";
+
+		InputStream formFileIs=null;
+		try
+		{
+			formFileIs = importFile.getInputStream();
+
+
+			String type = request.getParameter("type");
+			if (type.equals("OTHER"))
+			{
+				type = request.getParameter("otherType");
+			}
+
+			// Check that we can use this filepath before attempting an import (throws NullPointerException)
+			String filePath = Utilities.saveFile(formFileIs, filename);
+			new File(filePath);
 
 			logger.info("Lab Type: " + type);
 			logger.info("Lab file path: " + filePath);
 			String serviceName = getClass().getSimpleName();
 			LabHandlerService labHandlerService = SpringUtils.getBean(LabHandlerService.class);
 
-			outcome = labHandlerService.importLab(
+			labHandlerService.importLab(
 					type,
 					loggedInInfo,
 					serviceName,
@@ -106,15 +108,15 @@ public class InsideLabUploadAction extends Action {
 		} catch(FileAlreadyExistsException e) {
 			logger.error("Error: ",e);
 			outcome = "uploaded previously";
-        } catch(Exception e) {
-            logger.error("Error: ",e);
-            outcome = "exception";
-        }
-        finally {
-        	IOUtils.closeQuietly(formFileIs);
-        }
+		} catch(Exception e) {
+			logger.error("Error: ",e);
+			outcome = "exception";
+		}
+		finally {
+			IOUtils.closeQuietly(formFileIs);
+		}
 
-        request.setAttribute("outcome", outcome);
-        return mapping.findForward("success");
-    }
+		request.setAttribute("outcome", outcome);
+		return mapping.findForward("success");
+	}
 }

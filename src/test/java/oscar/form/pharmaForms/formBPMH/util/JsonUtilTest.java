@@ -50,7 +50,7 @@ public class JsonUtilTest {
 	private static List<BpmhDrug> bpmhDrugList;
 	private static String jsonListString = "[{\"atc\":\"\",\"code\":\"\",\"codingSystem\":\"\",\"comment\":\"\",\"comments\":\"\",\"customInstructions\":\"\",\"customName\":\"\",\"customNote\":\"\",\"demographicId\":\"\",\"dosage\":\"\",\"drugForm\":\"\",\"durUnit\":\"\",\"duration\":\"\",\"freqCode\":\"\",\"genericName\":\"GENERIC DRUG\",\"how\":\"this is how one\",\"id\":\"\",\"instruction\":\"\",\"method\":\"\",\"outsideProviderName\":\"\",\"outsideProviderOhip\":\"\",\"position\":\"\",\"prn\":\"\",\"quantity\":\"\",\"repeat\":\"\",\"route\":\"\",\"special\":\"\",\"special_instruction\":\"\",\"takeMax\":\"\",\"takeMin\":\"\",\"unit\":\"\",\"what\":\"GENERIC DRUG \",\"why\":\"This is a description.\"},{\"atc\":\"\",\"code\":\"\",\"codingSystem\":\"\",\"comment\":\"\",\"comments\":\"\",\"customInstructions\":\"\",\"customName\":\"\",\"customNote\":\"\",\"demographicId\":\"\",\"dosage\":\"\",\"drugForm\":\"\",\"durUnit\":\"\",\"duration\":\"\",\"freqCode\":\"\",\"genericName\":\"DRUG NAME\",\"how\":\"this is how two\",\"id\":\"\",\"instruction\":\"\",\"method\":\"\",\"outsideProviderName\":\"\",\"outsideProviderOhip\":\"\",\"position\":\"\",\"prn\":\"\",\"quantity\":\"\",\"repeat\":\"\",\"route\":\"\",\"special\":\"\",\"special_instruction\":\"\",\"takeMax\":\"\",\"takeMin\":\"\",\"unit\":\"\",\"what\":\"DRUG NAME \",\"why\":\"take this drug daily\"}]";
 	private static String jsonString = "{\"atc\":\"\",\"code\":\"\",\"codingSystem\":\"\",\"comment\":\"\",\"comments\":\"\",\"customInstructions\":\"\",\"customName\":\"\",\"customNote\":\"\",\"demographicId\":\"\",\"dosage\":\"\",\"drugForm\":\"\",\"durUnit\":\"\",\"duration\":\"\",\"freqCode\":\"\",\"genericName\":\"GENERIC DRUG\",\"how\":\"this is how one\",\"id\":\"\",\"instruction\":\"\",\"method\":\"\",\"outsideProviderName\":\"\",\"outsideProviderOhip\":\"\",\"position\":\"\",\"prn\":\"\",\"quantity\":\"\",\"repeat\":\"\",\"route\":\"\",\"special\":\"\",\"special_instruction\":\"\",\"takeMax\":\"\",\"takeMin\":\"\",\"unit\":\"\",\"what\":\"GENERIC DRUG \",\"why\":\"This is a description.\"}";
-	private static String[] ignoreMethods = new String[] {"handler", "hibernateLazyInitializer", "hours", "minutes", "seconds"};
+	private static String[] ignoreMethods = new String[] {"handler", "hibernateLazyInitializer", "hours", "minutes", "seconds", "isNewBorn"};
 	
 	@BeforeClass
 	public static void setUpBeforeClass() {
@@ -62,7 +62,10 @@ public class JsonUtilTest {
 		demographic.setHin("9374636728674");
 		demographic.setEffDate(new java.sql.Date(new Date().getTime()));
 		demographic.setFamilyDoctor("<rd>Who, Doctor</rd><rdohip>973637</rdohip>");
-		
+		demographic.setYearOfBirth("1900");
+		demographic.setMonthOfBirth("01");
+		demographic.setDateOfBirth("01");
+
 		bpmhDrug1 = new BpmhDrug();
 		bpmhDrug1.setGenericName("GENERIC DRUG");
 		bpmhDrug1.setWhy("This is a description.");
@@ -78,6 +81,7 @@ public class JsonUtilTest {
 		bpmhDrugList.add(bpmhDrug2);
 	}
 
+	//@Test(expected = java.time.format.DateTimeParseException)
 	@Test
 	public void testPojoToJson() {
 		assertNotNull(JsonUtil.pojoToJson(demographic, ignoreMethods));

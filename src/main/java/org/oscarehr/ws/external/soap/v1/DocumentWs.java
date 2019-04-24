@@ -34,7 +34,7 @@ import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.DocumentManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.common.SkipContentLogging;
+import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
 import org.oscarehr.ws.external.soap.v1.transfer.DocumentTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -87,7 +87,7 @@ public class DocumentWs extends AbstractWs {
 		return (DocumentTransfer.getTransfers(loggedInInfo, documents));
 	}
 
-	@SkipContentLogging
+	@SkipContentLoggingInbound
 	public String addDocument(String docFilename, String docContentsBase64, String providerId, String responsibleId) throws IOException, InterruptedException
 	{
 		// Decode document

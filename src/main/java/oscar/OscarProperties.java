@@ -40,7 +40,7 @@ import org.oscarehr.util.MiscUtils;
 public class OscarProperties extends Properties {
 	private static final long serialVersionUID = -5965807410049845132L;
 	private static OscarProperties oscarProperties = new OscarProperties();
-	private static final Set<String> activeMarkers = new HashSet<String>(Arrays.asList(new String[] { "true", "yes", "on" }));
+	private static final Set<String> activeMarkers = new HashSet<>(Arrays.asList("true", "yes", "on"));
 	
 	// Put property names here
 	private static final String KEY_INSTANCE_TYPE = "instance_type";
@@ -385,29 +385,15 @@ public class OscarProperties extends Properties {
 	public boolean isOscarLearning() {
 		return isPropertyActive("OSCAR_LEARNING");
 	}
-	
-	public boolean isRxFaxEnabled() {
-		return isPropertyActive("faxEnable") && isPropertyActive("rx_fax_enabled");
-	}
-		
-	public boolean isConsultationFaxEnabled() {
-		return isPropertyActive("faxEnable") && isPropertyActive("consultation_fax_enabled");
-	}
 
-	public boolean isEFormFaxEnabled() {
-		return isPropertyActive("faxEnable") && isPropertyActive("eform_fax_enabled");
-	}
-
-	public boolean isFormFaxEnabled() {
-		return isPropertyActive("faxEnable") && isPropertyActive("form_fax_enabled");
-	}
-
-	public boolean isDocumentFaxEnabled() {
-		return isPropertyActive("faxEnable") && isPropertyActive("document_fax_enabled");
+	/** for legacy faxing setup, use the outboundFaxService check */
+	public boolean isFaxEnabled()
+	{
+		return isPropertyActive("faxEnable");
 	}
 
 	public boolean isRxSignatureEnabled() {
-		return isRxFaxEnabled() || isPropertyActive("rx_signature_enabled");
+		return isFaxEnabled() || isPropertyActive("rx_signature_enabled");
 	}
 	
 	public boolean isConsultationSignatureEnabled() {
@@ -561,5 +547,10 @@ public class OscarProperties extends Properties {
 	
 	public static boolean isLdapAuthenticationEnabled() {
 		return Boolean.parseBoolean(oscarProperties.getProperty("ldap.enabled"));
+	}
+
+	public boolean isEChartAdditionalPatientInfoEnabled()
+	{
+		return isPropertyActive("echart_additional_patient_info");
 	}
 }

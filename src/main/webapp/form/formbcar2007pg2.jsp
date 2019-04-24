@@ -43,6 +43,8 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.fax.service.OutgoingFaxService" %>
 <% oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance(); %>
 
 <%
@@ -54,6 +56,8 @@ int formId = Integer.parseInt(request.getParameter("formId"));
 int provNo = Integer.parseInt((String) session.getAttribute("user"));
 FrmRecord rec = (new FrmRecordFactory()).factory(formClass);
 java.util.Properties props = rec.getFormRecord(LoggedInInfo.getLoggedInInfoFromSession(request),demoNo, formId);
+    OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
+    boolean faxEnabled = outgoingFaxService.isOutboundFaxEnabled();
 
 FrmData fd = new FrmData();
 String resource = fd.getResource();
@@ -104,6 +108,14 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
     <!-- the following script defines the Calendar.setup helper function, which makes
        adding a calendar a matter of 1 or 2 lines of code. -->
     <script type="text/javascript" src="../share/calendar/calendar-setup.js"></script>
+
+    <!-- Form submission helper scripts -->
+    <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+    <script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0.min.js"></script>
+    <script type="text/javascript" src="<%=request.getContextPath() %>/js/juno-jquery-plugin.js"></script>
+    <script type="text/javascript" src="./OscarFormHelpers.js"></script>
+    <link href= "<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0/themes/smoothness/jquery-ui.min.css" rel="stylesheet">
+
     <style type="text/css">
         <!--
 .demo  {color:#000033; background-color:#cccccc; layer-background-color:#cccccc;
@@ -306,26 +318,33 @@ function calcBMIMetric() {
         document.forms[0].target = "";
         document.forms[0].action = "/<%=project_home%>/form/formname.do" ;
 	}
+
     function onPrint() {
         document.forms[0].submit.value="print"; 
-        var ret = checkAllDates();
-        if(ret==true)
+
+        if(checkAllDates())
         {            
             document.forms[0].action = "../form/createpdf?__title=British+Columbia+Antenatal+Record+Part+2&__cfgfile=bcar2PrintCfgPg1_2007&__cfgGraphicFile=bcar2PrintGraphCfgPg1_2007&__template=bcar2_2007";
-            document.forms[0].target="_blank";            
+            document.forms[0].target="_blank";
+            return true;
         }
-       return ret;
+
+       return false;
     }
+
     function onPrintScores() {
         document.forms[0].submit.value="print"; 
-        var ret = checkAllDates();
-        if(ret==true)
+
+        if(checkAllDates())
         {            
             document.forms[0].action = "../form/createpdf?__title=British+Columbia+Antenatal+Record+EPDS/TWEAK+Scores&__cfgfile=bcar2PrintCfgScores_2007&__template=EPDS_TWEAK";
-            document.forms[0].target="_blank";            
+            document.forms[0].target="_blank";
+            return true;
         }
-       return ret;
+
+       return false;
     }
+
     function onPrint12() {
         document.forms[0].submit.value="printAll"; 
                 
@@ -334,6 +353,7 @@ function calcBMIMetric() {
         
         return true;
     }
+
     function onPrintAll() {
         document.forms[0].submit.value="printAll"; 
                 
@@ -358,31 +378,27 @@ function calcBMIMetric() {
     }
 
     function onSave() {
+        if(checkAllDates() && checkAllNumber() && confirm("Are you sure you want to save this form?")) {
+            var $links = $('a:not([href^="javascript:"])');
+            Oscar.FormHelpers.disableLinks($links);
 
-        document.forms[0].submit.value="save";
-        var ret = checkAllDates();
-        ret = checkAllNumber();
-        if(ret==true) {
+            document.forms[0].submit.value="save";
             reset();
-            ret = confirm("Are you sure you want to save this form?");
+            return true;
         }
-        return ret;
+
+        return false;
     }
-    function onExit() {
-        if(confirm("Are you sure you wish to exit without saving your changes?")==true) {
-            window.close();
-        }
-        return(false);
-    }
+
     function onSaveExit() {
         document.forms[0].submit.value="exit";
-        var ret = checkAllDates();
-        ret = checkAllNumber();
-        if(ret == true) {
+
+        if(checkAllDates() && checkAllNumber()) {
             reset();
-            ret = confirm("Are you sure you wish to save and close this window?");
+            return confirm("Are you sure you wish to save and close this window?");
         }
-        return ret;
+
+        return false;
     }
     function popupPage(varpage) {
         windowprops = "height=700,width=960"+
@@ -851,6 +867,26 @@ function setEPDSscores(){
     }
 }
 
+$(document).ready(function()
+{
+    var $form = $('#bcar2007pg2');
+    $form.juno_trackIsChanged();
+
+    var $links = $('a:not([href^="javascript:"])');
+    $.each($links, function()
+    {
+        var $link = $(this);
+        Oscar.FormHelpers.alertDirtyBeforeLink($link, $form);
+    });
+
+    var $exitButtons = $('input[name="exitButton"]');
+    $.each($exitButtons, function()
+    {
+        var $exitButton = $(this);
+        Oscar.FormHelpers.alertDirtyBeforeClose($exitButton, $form);
+    });
+});
+
 </script>
 
 
@@ -929,7 +965,7 @@ function setEPDSscores(){
     <center><i>Send Hospital copy at 36 weeks</i></center>
 </div>
 
-<html:form action="/form/formname">
+<html:form action="/form/formname" styleId="bcar2007pg2">
 
 <input type="hidden" name="commonField" value="ar2_" />
 <input type="hidden" name="c_lastVisited" value="pg2" />
@@ -983,18 +1019,18 @@ function setEPDSscores(){
             <%
             if (!bView) {
             %>
-            <input type="submit" style="width:40px;" value="Save" onclick="javascript:return onSave();" />
+            <input type="submit" name="saveButton" style="width:40px;" value="Save" onclick="javascript:return onSave();" />
             <input type="submit" value="Save and Exit" onclick="javascript:return onSaveExit();"/>
             <%
             }
             %>
-            <input type="submit" style="width:40px;" value="Exit" onclick="javascript:return onExit();"/>
+            <input type="submit" style="width:40px;" name="exitButton" value="Exit"/>
             <input type="submit" style="width:50px;" value="Print" onclick="javascript:return onPrint();"/>
             <input type="submit" style="width:125px;" value="Print EPDS/TWEAK" onclick="javascript:return onPrintScores();"/>
             <input type="submit" value="Print AR1 & AR2" onclick="javascript:return onPrint12();"/>
             <input type="submit" style="width:75px;" value="Print All" onclick="javascript:return onPrintAll();"/>
             <%
-                if (oscarProperties.isFormFaxEnabled())
+                if (faxEnabled)
                 {
             %>
             <input type="button" style="width: 65px;" value="Fax All"
@@ -2450,18 +2486,18 @@ function setEPDSscores(){
             <%
             if (!bView) {
             %>
-            <input type="submit" style="width:40px;" value="Save" onclick="javascript:return onSave();" />
+            <input type="submit" name="saveButton" style="width:40px;" value="Save" onclick="javascript:return onSave();" />
             <input type="submit" value="Save and Exit" onclick="javascript:return onSaveExit();"/>
             <%
             }
             %>
-            <input type="submit" style="width:40px;" value="Exit" onclick="javascript:return onExit();"/>
+            <input type="submit" name="exitButton" style="width:40px;" value="Exit"/>
             <input type="submit" style="width:50px;" value="Print" onclick="javascript:return onPrint();"/>
             <input type="submit" style="width:125px;" value="Print EPDS/TWEAK" onclick="javascript:return onPrintScores();"/>
             <input type="submit" value="Print AR1 & AR2" onclick="javascript:return onPrint12();"/>
             <input type="submit" style="width:75px;" value="Print All" onclick="javascript:return onPrintAll();"/>
             <%
-                if (oscarProperties.isFormFaxEnabled())
+                if (faxEnabled)
                 {
             %>
             <input type="button" style="width: 65px;" value="Fax All"

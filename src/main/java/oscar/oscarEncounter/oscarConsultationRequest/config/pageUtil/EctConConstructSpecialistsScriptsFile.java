@@ -96,7 +96,8 @@ public class EctConConstructSpecialistsScriptsFile
 					String address = pro.getStreetAddress();
 					address = this.escapeString(address);
 					String fax = pro.getFaxNumber();
-					fileWriter.write("D(" + servId + ",\"" + specId + "\",\"" + phone + "\",\"" + name + "\",\"" + fax + "\",\"" + address + "\");\n");
+					String referralNo = pro.getReferralNo();
+					fileWriter.write("D(" + servId + ",\"" + specId + "\",\"" + phone + "\",\"" + name + "\",\"" + fax + "\",\"" + address + "\",\"" + referralNo +"\");\n");
 				}
 
 				fileWriter.write("\n");
@@ -148,7 +149,8 @@ public class EctConConstructSpecialistsScriptsFile
 				String address = pro.getStreetAddress();
 				address = this.escapeString(address);
 				String fax = pro.getFaxNumber();
-				stringBuffer.append("D(" + servId + ",\"" + specId + "\",\"" + phone + "\",\"" + name + "\",\"" + fax + "\",\"" + address + "\");\n");
+				String referralNo = pro.getReferralNo();
+				stringBuffer.append("D(" + servId + ",\"" + specId + "\",\"" + phone + "\",\"" + name + "\",\"" + fax + "\",\"" + address + "\",\"" + referralNo +"\");\n");
 			}
 
 			stringBuffer.append("\n");

@@ -25,9 +25,27 @@
 */
 'use strict';
 
-if (!window.Oscar) { window.Oscar = {} }
-if (!Oscar.HealthCardParser) { Oscar.HealthCardParser = {} }
+if (!window.Oscar)
+{
+	window.Oscar = {}
+}
+if (!Oscar.HealthCardParser)
+{
+	Oscar.HealthCardParser = {}
+}
 
+var BC_STANDALONE = "%B610043";
+var BC_PREFIX = "%BC";
+var BC_COMBINED = "?;636028";
+var ON_STANDALONE = "%B610054";
+
+Oscar.HealthCardParser.isWhitelisted = function isWhitelisted(cardNo)
+{
+	cardNo = cardNo.toUpperCase();
+	return (cardNo.startsWith(BC_STANDALONE) ||
+			cardNo.startsWith(ON_STANDALONE) ||
+			(cardNo.startsWith(BC_PREFIX) && cardNo.substring(cardNo.indexOf("?")).startsWith(BC_COMBINED)));
+};
 
 Oscar.HealthCardParser.getFieldValue = function getFieldValue(track, trackIndex, length)
 {
@@ -167,7 +185,8 @@ Oscar.HealthCardParser.parseBCStandalone = function parseBCStandalone(cardData,c
 	var metaHash = cardHash.meta;
 
 	// BC standalone photo card, non-photo card, or care card
-	// specs defined in http://www.health.gov.bc.ca/msp/infoprac/teleplanspecs/ch4.pdf
+	// https://www2.gov.bc.ca/assets/gov/health/practitioner-pro/medical-services-plan/teleplan-v4-4.pdf
+	// begins p. 106
 	dataHash.hin = cardData.substring(8, cardData.indexOf("0^"));
 	dataHash.lastName = cardData.substring(cardData.indexOf("^")+1, cardData.indexOf("/")).toUpperCase();
 
@@ -258,16 +277,17 @@ Oscar.HealthCardParser.parse = function parse(cardData)
 		cardData = cardData.toUpperCase();
 		console.info(cardData);
 
-		if (cardData.startsWith("%B610043"))
+		if (cardData.startsWith(BC_STANDALONE))
 		{
 			cardHashOut = Oscar.HealthCardParser.parseBCStandalone(cardData, cardHashOut);
 		}
-		else if (cardData.startsWith("%BC") && cardData.substring(cardData.indexOf("?")).startsWith("?;636028"))
+		else if (cardData.startsWith(BC_PREFIX) && cardData.substring(cardData.indexOf("?")).startsWith(BC_COMBINED))
 		{
 			cardHashOut = Oscar.HealthCardParser.parseBCCombined(cardData, cardHashOut);
 		}
 		else
 		{
+			// Card may be unsupported, but as a temporary measure we're letting it through
 			cardHashOut = Oscar.HealthCardParser.parseOntario(cardData, cardHashOut);
 		}
 	}

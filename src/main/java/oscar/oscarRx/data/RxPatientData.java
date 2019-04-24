@@ -156,9 +156,24 @@ public class RxPatientData {
 			else return "";
 		}
 
+		public String getVer()
+		{
+			if (demographic != null)
+			{
+				return demographic.getVer();
+			}
+			else
+			{
+				return "";
+			}
+		}
+
 		public java.util.Date getDOB() {
 			Date dob = null;
-			if (demographic != null) dob = demographic.getBirthDay().getTime();
+			if (demographic != null)
+			{
+				dob = demographic.getBirthDay().getTime();
+			}
 
 			return dob;
 		}

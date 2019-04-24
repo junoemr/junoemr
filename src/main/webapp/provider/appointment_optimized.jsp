@@ -797,7 +797,7 @@ private long getAppointmentRowSpan(
 
 					<security:oscarSec roleName="<%=roleName$%>" objectName="_billing" rights="r">
 						<li>
-							<a HREF="#" ONCLICK ="popupPage2('../billing/CA/<%=prov%>/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;" TITLE='<bean:message key="global.genBillReport"/>' onMouseOver="window.status='<bean:message key="global.genBillReport"/>';return true"><bean:message key="global.billing"/></a>
+							<a HREF="#" ONCLICK ="popupPage2('../billing/CA/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;" TITLE='<bean:message key="global.genBillReport"/>' onMouseOver="window.status='<bean:message key="global.genBillReport"/>';return true"><bean:message key="global.billing"/></a>
 						</li>
 					</security:oscarSec>
 
@@ -1384,7 +1384,8 @@ private long getAppointmentRowSpan(
 											"&day=" + schedule.getScheduleDate().getDayOfMonth() +
 											"&view=0" +
 											"&displaymode=day" +
-											"&dboperation=searchappointmentday";
+											"&dboperation=searchappointmentday" +
+											"&viewall=" + viewall;
 									%>
 									<b><a href="<%= dayUrl %>">
 										<%=schedule.getScheduleDate().format(DateTimeFormatter.ofPattern("EEE, yyyy-MM-dd"))%>
@@ -1675,6 +1676,9 @@ private long getAppointmentRowSpan(
 												String demographic_no = appointment.getDemographicNo().toString();
 												String appointment_no = appointment.getAppointmentNo().toString();
 
+												String demo_alert = "";
+
+
 
 											%>
 
@@ -1832,6 +1836,18 @@ private long getAppointmentRowSpan(
 																${appointmentInfo.appointmentLinkTitle}
 															</oscar:oscarPropertiesCheck>
 														>
+
+															<oscar:oscarPropertiesCheck property="show_demographic_alert_flag" value="true" defaultVal="false">
+																<%
+																	if (!appointmentInfo.getAlert().equals(""))
+																	{
+																%>
+																		<img height="14px" src="../images/icons/071.png" alt="${appointmentInfo.alert}" title="${appointmentInfo.alert}" />
+																<%
+																	}
+																%>
+
+															</oscar:oscarPropertiesCheck>
 
 															<oscar:oscarPropertiesCheck property="show_hc_eligibility" value="true" defaultVal="false">
 																<c:if test="${appointmentInfo.activeMedicalCoverage}">+&nbsp</c:if>
@@ -2143,7 +2159,7 @@ private long getAppointmentRowSpan(
 			//use (evt.altKey || evt.metaKey) for Mac if you want Apple+A, you will probably want a seperate onkeypress handler in that case to return false to prevent propagation
 			switch(evt.keyCode) {
 				case <bean:message key="global.adminShortcut"/> : newWindow("../administration/","admin");  return false;  //run code for 'A'dmin
-				case <bean:message key="global.billingShortcut"/> : popupOscarRx(600,1024,'../billing/CA/<%=prov%>/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;  //code for 'B'illing
+				case <bean:message key="global.billingShortcut"/> : popupOscarRx(600,1024,'../billing/CA/billingReportCenter.jsp?displaymode=billreport&providerview=<%=curUser_no%>');return false;  //code for 'B'illing
 				case <bean:message key="global.calendarShortcut"/> : popupOscarRx(425,430,'../share/CalendarPopup.jsp?urlfrom=../provider/providercontrol.jsp&year=<%=strYear%>&month=<%=strMonth%>&param=<%=URLEncoder.encode("&view=0&displaymode=day&dboperation=searchappointmentday&viewall="+viewall,"UTF-8")%>');  return false;  //run code for 'C'alendar
 				case <bean:message key="global.edocShortcut"/> : popupOscarRx('700', '1024', '../dms/documentReport.jsp?function=provider&functionid=<%=curUser_no%>&curUser=<%=curUser_no%>', 'edocView');  return false;  //run code for e'D'oc
 				case <bean:message key="global.resourcesShortcut"/> : popupOscarRx(550,687,'<%=resourceBaseUrl%>'); return false; // code for R'e'sources

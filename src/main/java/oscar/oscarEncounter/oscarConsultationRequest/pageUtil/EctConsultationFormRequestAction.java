@@ -25,23 +25,10 @@
 
 package oscar.oscarEncounter.oscarConsultationRequest.pageUtil;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Set;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.v26.message.ORU_R01;
+import ca.uhn.hl7v2.model.v26.message.REF_I12;
+import com.lowagie.text.DocumentException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
@@ -49,7 +36,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.common.IsPropertiesOn;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.dao.ConsultationRequestDao;
 import org.oscarehr.common.dao.ConsultationRequestExtDao;
@@ -67,6 +53,9 @@ import org.oscarehr.common.model.DigitalSignature;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.consultations.model.ConsultDocs;
+import org.oscarehr.consultations.service.ConsultationAttachmentService;
+import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.DigitalSignatureUtils;
@@ -74,19 +63,29 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WebUtils;
-
-import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.oscarLab.ca.all.pageUtil.LabPDFCreator;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ParameterActionForward;
-import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.v26.message.ORU_R01;
-import ca.uhn.hl7v2.model.v26.message.REF_I12;
 
-import com.lowagie.text.DocumentException;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 public class EctConsultationFormRequestAction extends Action {
 
@@ -98,6 +97,9 @@ public class EctConsultationFormRequestAction extends Action {
 			.getBean("consultationRequestExtDao");
 	private static ProfessionalSpecialistDao professionalSpecialistDao = (ProfessionalSpecialistDao) SpringUtils
 			.getBean("professionalSpecialistDao");
+	private static ConsultationAttachmentService consultationAttachmentService =  SpringUtils.getBean(ConsultationAttachmentService.class);
+	private static OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
+	private static boolean faxEnabled = outgoingFaxService.isOutboundFaxEnabled();
 	
 	private static String[] format = new String[] {"yyyy-MM-dd","yyyy/MM/dd"};
 	
@@ -168,16 +170,16 @@ public class EctConsultationFormRequestAction extends Action {
 				// format of input is D2|L2 for doc and lab
 				String[] docs = frm.getDocuments().split("\\|");
 
-				for (int idx = 0; idx < docs.length; ++idx) {
-					if (docs[idx].length() > 0) {
-						if (docs[idx].charAt(0) == 'D')
-							EDocUtil.attachDocConsult(providerNo, docs[idx].substring(1), requestId);
-						else if (docs[idx].charAt(0) == 'L')
-							ConsultationAttachLabs.attachLabConsult(providerNo, docs[idx].substring(1), requestId);
-					}
-				}
+				List<Integer> docIdList = filterIdList(docs, ConsultDocs.DOCTYPE_DOC);
+				List<Integer> labIdList = filterIdList(docs, ConsultDocs.DOCTYPE_LAB);
+				List<Integer> eformIdList = filterIdList(docs, ConsultDocs.DOCTYPE_EFORM);
+
+				consultationAttachmentService.setAttachedDocuments(Integer.parseInt(requestId), providerNo, docIdList);
+				consultationAttachmentService.setAttachedLabs(Integer.parseInt(requestId), providerNo, labIdList);
+				consultationAttachmentService.setAttachedEForms(Integer.parseInt(requestId), providerNo, eformIdList);
 			}
-			catch (ParseException e) {
+			catch (ParseException e)
+			{
 				MiscUtils.getLogger().error("Error", e);
 			}
 			request.setAttribute("transType", "2");
@@ -230,34 +232,36 @@ public class EctConsultationFormRequestAction extends Action {
 
 		request.setAttribute("teamVar", sendTo);
 
-		if (submission.endsWith("And Print Preview")) {
-
+		ConsultationRequest consult = consultationRequestDao.find(Integer.parseInt(requestId));
+		if (submission.endsWith("And Print Preview"))
+		{
 			request.setAttribute("reqId", requestId);
-			if (OscarProperties.getInstance().isConsultationFaxEnabled()
-					|| IsPropertiesOn.propertiesOn("consultation_pdf_enabled")) {
-				return mapping.findForward("printIndivica");
-			}
-			else if (IsPropertiesOn.propertiesOn("CONSULT_PRINT_PDF")) {
-				return mapping.findForward("printpdf");
-			}
-			else if (IsPropertiesOn.propertiesOn("CONSULT_PRINT_ALT")) {
-				return mapping.findForward("printalt");
-			}
-			else {
-				return mapping.findForward("print");
-			}
-
+			return mapping.findForward("print");
 		}
 		else if (submission.endsWith("And Fax")) {
 
 			request.setAttribute("reqId", requestId);
-			if (OscarProperties.getInstance().isConsultationFaxEnabled()) {
+			if (faxEnabled) {
 				return mapping.findForward("faxIndivica");
 			}
 			else {
 				return mapping.findForward("fax");
 			}
 
+		}
+		else if (submission.endsWith("And Email Details"))
+		{
+			// email consultation details to patient
+			request.setAttribute("consult_request_id", requestId);
+			request.setAttribute("template", "details");
+			return mapping.findForward("emailalt");
+		}
+		else if (submission.endsWith("And Email Notification") && !consult.isNotificationSent())
+		{
+			// email consultation notification to patient
+			request.setAttribute("consult_request_id", requestId);
+			request.setAttribute("template", "notification");
+			return mapping.findForward("emailalt");
 		}
 		else if (submission.endsWith("esend")) {
 			// upon success continue as normal with success message
@@ -372,7 +376,7 @@ public class EctConsultationFormRequestAction extends Action {
 	    Clinic clinic=clinicDAO.getClinic();
 	    
 	    // set status now so the remote version shows this status
-	    consultationRequest.setStatus("2");
+	    consultationRequest.setStatus(ConsultationRequest.STATUS_PEND_SPECIAL);
 
 	    REF_I12 refI12=RefI12.makeRefI12(clinic, consultationRequest);
 	    SendingUtils.send(loggedInInfo, refI12, professionalSpecialist);
@@ -423,5 +427,24 @@ public class EctConsultationFormRequestAction extends Action {
             }	    	
 	    }
     }
+
+	/**
+	 * filter the attachedDocs id list on prefix. ids start with a doctype letter, followed by the integerID value for that attachment
+	 * @param idList
+	 * @param filterPrefix
+	 * @return filtered list converted to integers
+	 */
+	private List<Integer> filterIdList(String[] idList, String filterPrefix)
+	{
+		List<Integer> filteredList = new ArrayList<>();
+		for(String id : idList)
+		{
+			if(id.startsWith(filterPrefix))
+			{
+				filteredList.add(Integer.parseInt(id.substring(filterPrefix.length())));
+			}
+		}
+		return filteredList;
+	}
 
 }

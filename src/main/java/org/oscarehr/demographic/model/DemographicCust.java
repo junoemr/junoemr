@@ -26,11 +26,17 @@
 package org.oscarehr.demographic.model;
 
 import org.oscarehr.common.model.AbstractModel;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringReader;
 
 @Entity
 @Table(name="demographiccust")
@@ -103,6 +109,33 @@ public class DemographicCust extends AbstractModel<Integer>
 	public void setId(Integer id) {
     	this.id = id;
     }
+
+	public String getParsedNotes()
+	{
+		try
+		{
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			Document document = builder.parse(new InputSource(new StringReader(notes)));
+
+			NodeList list = document.getElementsByTagName("unotes");
+
+			if (list != null && list.getLength() > 0)
+			{
+				return list.item(0).getTextContent();
+			}
+
+		} catch (Exception e)
+		{
+		}
+
+		return null;
+	}
+
+	public void setParsedNotes(String notes)
+	{
+		this.notes = "<unotes>" + notes + "</unotes>";
+	}
 
 
 

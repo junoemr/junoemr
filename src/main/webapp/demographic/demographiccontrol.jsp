@@ -42,7 +42,6 @@
   LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 
   OscarProperties props = OscarProperties.getInstance();
-
   //operation available to the client -- dboperation
   //construct SQL expression
   String orderby="", limit="", limit1="", limit2="";

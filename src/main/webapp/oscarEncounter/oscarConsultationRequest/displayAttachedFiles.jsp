@@ -38,40 +38,40 @@ if(!authed) {
     return;
 }
 %>
-
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page
-    import="java.util.ArrayList, oscar.dms.*, oscar.oscarLab.ca.on.*, oscar.util.StringUtils"%>
-<%@page import="org.oscarehr.util.SessionConstants"%>
-
+<%@ page import="java.util.List"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
-
 <%
-    LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-    String demo = request.getParameter("demo") ;
-    String requestId = request.getParameter("requestId");
-    String displayValue = (String) request.getAttribute("displayValue");
-    ArrayList labs = (ArrayList) request.getAttribute("labArray");
-    ArrayList docs = (ArrayList) request.getAttribute("docArray");
+    List<String> labLabels = (List<String>) request.getAttribute("labArray");
+    List<String> docLabels = (List<String>) request.getAttribute("docArray");
+    List<String> eFormLabels = (List<String>) request.getAttribute("eFormArray");
+
+	String displayValue = "display: none;";
+	if(docLabels.isEmpty() && labLabels.isEmpty() && eFormLabels.isEmpty())
+	{
+		displayValue = "";
+	}
 
 %>
 <ul id="attachedList"
     style="background-color: white; padding-left: 20px; list-style-position: outside; list-style-type: lower-roman;">
     <%
-        for(int idx = 0; idx < docs.size(); ++idx) {
-            EDoc curDoc = (EDoc) docs.get(idx);
+        for(String docLabel : docLabels)
+        {
     %>
-    <li class="doc"><%=StringUtils.maxLenString(curDoc.getDescription(),19,16,"...")%></li>
+    <li class="doc"><%=docLabel%></li>
     <%
         }
-
-        LabResultData resData;
-
-        for(int idx = 0; idx < labs.size(); ++idx) {
-            resData = (LabResultData)labs.get(idx);
+        for(String labLabel : labLabels)
+        {
     %>
-    <li class="lab"><%=resData.getDiscipline()+" "+resData.getDateTime()%></li>
+    <li class="lab"><%=labLabel%></li>
     <%
+        }
+        for(String eFormLabel : eFormLabels)
+        {
+    %>
+	<li class="eform"><%=eFormLabel%></li>
+	<%
         }
     %>
 </ul>

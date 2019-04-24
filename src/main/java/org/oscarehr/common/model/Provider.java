@@ -44,6 +44,14 @@ public class Provider implements Serializable, Comparable<Provider>{
 	public static final String SYSTEM_PROVIDER_NO = "-1";
 	public static final String UNCLAIMED_PROVIDER_NO = "0";
 
+	// providerTypes
+	public static final String PROVIDER_TYPE_DOCTOR 		= "doctor";
+	public static final String PROVIDER_TYPE_RECEPTIONIST 	= "receptionist";
+	public static final String PROVIDER_TYPE_NURSE			= "nurse";
+	public static final String PROVIDER_TYPE_RESIDENT 		= "resident";
+	public static final String PROVIDER_TYPE_MIDWIFE		= "midwife";
+	public static final String PROVIDER_TYPE_ADMIN			= "admin";
+
 	private String providerNo;
 	private String comments;
 	private String phone;
@@ -223,6 +231,10 @@ public class Provider implements Serializable, Comparable<Provider>{
 		this.status = status;
 	}
 
+	public boolean isActive() {
+		return this.status.equals("1");
+	}
+
 	public String getLastName() {
 		return lastName;
 	}
@@ -240,6 +252,36 @@ public class Provider implements Serializable, Comparable<Provider>{
 
 	public void setProviderType(String providerType) {
 		this.providerType = providerType;
+	}
+
+	public boolean isProviderTypeDoctor()
+	{
+		return this.providerType.equals(PROVIDER_TYPE_DOCTOR);
+	}
+
+	public boolean isProviderTypeReceptionist()
+	{
+		return this.providerType.equals(PROVIDER_TYPE_RECEPTIONIST);
+	}
+
+	public boolean isProviderTypeNurse()
+	{
+		return this.providerType.equals(PROVIDER_TYPE_NURSE);
+	}
+
+	public boolean isProviderTypeResident()
+	{
+		return this.providerType.equals(PROVIDER_TYPE_RESIDENT);
+	}
+
+	public boolean isProviderTypeMidwife()
+	{
+		return this.providerType.equals(PROVIDER_TYPE_MIDWIFE);
+	}
+
+	public boolean isProviderTypeAdmin()
+	{
+		return this.providerType.equals(PROVIDER_TYPE_ADMIN);
 	}
 
 	public String getSex() {

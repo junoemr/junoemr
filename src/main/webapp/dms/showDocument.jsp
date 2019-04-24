@@ -122,6 +122,7 @@
 			String creator = (String) session.getAttribute("user");
 			ArrayList doctypes = EDocUtil.getActiveDocTypes("demographic");
 			EDoc curdoc = EDocUtil.getDoc(documentNo);
+			boolean isValidPdf = !curdoc.hasEncodingError() && curdoc.getContentType().toLowerCase().contains("pdf");
 
 			String demographicID = curdoc.getModuleId();
 			if ((demographicID != null) && !demographicID.isEmpty() && !demographicID.equals("-1")){
@@ -141,17 +142,10 @@
 				ackFunc = "getDocComment('" + docId + "','" + providerNo + "'," + inQueueB + ");";
 			}
 
-
 			int slash = 0;
 			String contentType = "";
 			if ((slash = curdoc.getContentType().indexOf('/')) != -1) {
 				contentType = curdoc.getContentType().substring(slash + 1);
-			}
-			String dStatus = "";
-			if ((curdoc.getStatus() + "").compareTo("A") == 0) {
-				dStatus = "active";
-			} else if ((curdoc.getStatus() + "").compareTo("H") == 0) {
-				dStatus = "html";
 			}
 			int numOfPage=curdoc.getNumberOfPages();
 			String numOfPageStr="";
@@ -160,12 +154,13 @@
 			else
 				numOfPageStr=(new Integer(numOfPage)).toString();
 			String contextPath = request.getContextPath();
-			String url = contextPath +"/dms/ManageDocument.do?method=viewDocPage&doc_no=" + docId+"&curPage=1";
+			String url = contextPath +"/dms/ManageDocument.do?method=viewDocPage&doc_no=" + docId+"&curPage=1&rand=" + Math.random();
 			String url2 = contextPath +"/dms/ManageDocument.do?method=display&doc_no=" + docId;
 			String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 %>
 <% if (request.getParameter("inWindow") != null && request.getParameter("inWindow").equalsIgnoreCase("true")) {  %>
 <html>
+<title>Show Document <%=documentNo%></title>
 <head>
 	<script type="text/javascript" src="<%= contextPath %>/share/calendar/calendar.js"></script>
 	<!-- language for the calendar -->
@@ -291,7 +286,7 @@
 
 								%>
 								<input type="button" id="msgBtn_<%=docId%>" value="Msg" onclick="Oscar.ShowDocument.popupPatient(700,960,'<%= contextPath %>/oscarMessenger/SendDemoMessage.do?demographic_no=','msg', '<%=docId%>')" <%=btnDisabled %>/>
-								<input type="button" id="mainTickler_<%=docId%>" value="Tickler" onClick="Oscar.ShowDocument.popupPatientTickler(710, 1024,'<%= contextPath %>/Tickler.do?', 'Tickler','<%=docId%>')" <%=btnDisabled %>>
+								<input type="button" id="mainTickler_<%=docId%>" value="Tickler" onClick="Oscar.ShowDocument.popupPatientTickler(710, 1024,'<%= contextPath %>', 'Tickler','<%=docId%>')" <%=btnDisabled %>>
 								<input type="button" id="mainEchart_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="Oscar.ShowDocument.popupPatient(710, 1024,'<%= contextPath %>/oscarEncounter/IncomingEncounter.do?reason=<bean:message key="oscarMDS.segmentDisplay.labResults"/>&curDate=<%=currentDate%>>&appointmentNo=&appointmentDate=&startTime=&status=&demographicNo=', 'encounter', '<%=docId%>')" <%=btnDisabled %>>
 								<input type="button" id="mainMaster_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnMaster"/>" onClick="Oscar.ShowDocument.popupPatient(710,1024,'<%= contextPath %>/demographic/demographiccontrol.jsp?displaymode=edit&dboperation=search_detail&demographic_no=','master','<%=docId%>')" <%=btnDisabled %>>
 								<input type="button" id="mainApptHistory_<%=docId%>" value=" <bean:message key="oscarMDS.segmentDisplay.btnApptHist"/>" onClick="Oscar.ShowDocument.popupPatient(710,1024,'<%= contextPath %>/demographic/demographiccontrol.jsp?orderby=appttime&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=25&demographic_no=','ApptHist','<%=docId%>')" <%=btnDisabled %>>
@@ -352,14 +347,14 @@
 
 								<tr><td></td>
 									<td>
-										<% boolean updatableContent = !inChart; %>
+										<% boolean updatableContent = isValidPdf && !inChart; %>
 										<oscar:oscarPropertiesCheck property="ALLOW_UPDATE_DOCUMENT_CONTENT" value="false" defaultVal="false">
 											<%
 												if(!demographicID.equals("-1")) { updatableContent=false; }
 											%>
 										</oscar:oscarPropertiesCheck>
 
-										<div style="<%=updatableContent==true?"":"visibility: hidden"%>">
+										<div style="<%=(updatableContent)?"":"visibility: hidden"%>">
 											<input onclick="split('<%=docId%>','<%=StringEscapeUtils.escapeJavaScript(demoName) %>')" type="button" value="<bean:message key="inboxmanager.document.split" />" />
 											<input id="rotate180btn_<%=docId %>" onclick="rotate180('<%=docId %>')" type="button" value="<bean:message key="inboxmanager.document.rotate180" />" />
 											<input id="rotate90btn_<%=docId %>" onclick="rotate90('<%=docId %>')" type="button" value="<bean:message key="inboxmanager.document.rotate90" />" />

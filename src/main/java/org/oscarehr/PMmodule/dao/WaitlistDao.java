@@ -351,19 +351,19 @@ public class WaitlistDao {
 			+ "FROM eform_values LEFT JOIN client_referral cr ON cr.client_id=demographic_no, " 
 			+ "(SELECT demographic_no AS dmb,MAX(fdid) AS ffdid FROM eform_values GROUP BY demographic_no) xyz " 
 			+ "WHERE cr.referral_id IS NULL AND " + "demographic_no= xyz.dmb AND fdid=xyz.ffdid";
-	
-	private static final String QUERY_ALL_CLIENT_DATA_BY_PROGRAMID = "SELECT DISTINCT ef.demographic_no, ef.fdid, ef.var_name, ef.var_value "
-			+ "FROM eform_values ef LEFT JOIN client_referral cr ON cr.client_id=ef.demographic_no" 
-			+ " where cr.program_id=?1 and ef.var_name in ('age-years','gender','current-housing','preferred-language','location-preferences','referrer-contact-province','contact-province','Age category','prepared-live-toronto','bed_community_program_id','has-mental-illness-primary','current-legal-involvements')"
-			+ " and LENGTH(ef.var_value)>0 and not exists (select * from eform_values where demographic_no=ef.demographic_no and var_name=ef.var_name and fdid>ef.fdid)";
 
-		
-	private static final String QUERY_GET_CLIENT_DATA = "SELECT ef.demographic_no, ef.fdid, ef.var_name, ef.var_value "
+	private static final String QUERY_ALL_CLIENT_DATA_BY_PROGRAMID = "SELECT DISTINCT ef.demographic_no, MAX(ef.fdid) ,ef.var_name, " +
+			"SUBSTRING_INDEX(GROUP_CONCAT(ef.var_value ORDER BY ef.fdid DESC), ',', 1) as var_value " +
+			"FROM eform_values ef LEFT JOIN client_referral cr ON cr.client_id=ef.demographic_no where" +
+			" cr.program_id=?1  and LENGTH(ef.var_value)>0 and " +
+			"ef.var_name in ('age-years','gender','current-housing','preferred-language','location-preferences','referrer-contact-province','contact-province','Age category','prepared-live-toronto','bed_community_program_id','has-mental-illness-primary','current-legal-involvements') " +
+			"GROUP BY ef.demographic_no, ef.var_name";
+
+	private static final String QUERY_GET_CLIENT_DATA = "SELECT ef.demographic_no, MAX(ef.fdid), ef.var_name, ef.var_value "
 			+ "FROM eform_values ef WHERE ef.demographic_no= ?1 and "
 			+" ef.var_name in ('age-years','gender','current-housing','preferred-language','location-preferences','referrer-contact-province','contact-province','Age category','prepared-live-toronto','bed_community_program_id','has-mental-illness-primary','current-legal-involvements') "
-			+ "and LENGTH(ef.var_value)>0 AND not exists (select * from eform_values where ef.demographic_no=demographic_no and var_name=ef.var_name and fdid>ef.fdid) "
-			+ "GROUP BY ef.demographic_no, ef.fdid, ef.var_name, ef.var_value ";
-
+			+ "and LENGTH(ef.var_value)>0 "
+			+ "GROUP BY ef.demographic_no, ef.var_name, ef.var_value ";
 
 	
 		

@@ -243,13 +243,18 @@
 			<form-property name="installDate" type="java.lang.String" />
 		</form-bean>
 		<form-bean name="ticklerForm" type="org.apache.struts.validator.DynaValidatorForm">
-			<form-property name="tickler" type="org.oscarehr.common.model.Tickler" />
-			<form-property name="filter" type="org.oscarehr.common.model.CustomFilter" />
+			<form-property name="tickler" type="org.oscarehr.common.model.Tickler"/>
+			<form-property name="filter" type="org.oscarehr.common.model.CustomFilter"/>
 		</form-bean>
+		<form-bean name="unreadTicklerForm" type="org.apache.struts.validator.LazyValidatorForm" />
+		<form-bean name="tsTicklerForm" type="org.apache.struts.validator.DynaValidatorForm">
+			<form-property name="activeText" type="java.lang.String[]"></form-property>
+			<form-property name="inactiveText" type="java.lang.String[]"></form-property>
+		</form-bean>
+
 		<form-bean name="customFilterForm" type="org.apache.struts.validator.DynaValidatorForm">
 			<form-property name="filter" type="org.oscarehr.common.model.CustomFilter" />
 		</form-bean>
-		<form-bean name="unreadTicklerForm" type="org.apache.struts.validator.LazyValidatorForm" />
 		<form-bean name="editProviderFaxForm" type="org.apache.struts.action.DynaActionForm">
 			<form-property name="faxNumber" type="java.lang.String" />
 		</form-bean>
@@ -544,13 +549,9 @@
 			<form-property name="selectedStyle" type="java.lang.String"></form-property>
 			<form-property name="editStyle" type="java.lang.String"></form-property>
 		</form-bean>
-                <form-bean name="serviceform" type="org.apache.struts.validator.DynaValidatorForm">
-                     <form-property name="emailDemographic" type="java.lang.Boolean" initial="false"></form-property>
-                </form-bean>
-                <form-bean name="tsTicklerForm" type="org.apache.struts.validator.DynaValidatorForm">
-                    <form-property name="activeText" type="java.lang.String[]"></form-property>
-                    <form-property name="inactiveText" type="java.lang.String[]"></form-property>
-                </form-bean>
+		<form-bean name="serviceform" type="org.apache.struts.validator.DynaValidatorForm">
+			<form-property name="emailDemographic" type="java.lang.Boolean" initial="false"></form-property>
+		</form-bean>
 		<form-bean name="episodeForm" type="org.apache.struts.action.DynaActionForm">
 			<form-property name="episode" type="org.oscarehr.common.model.Episode"/>
 		</form-bean>
@@ -619,13 +620,6 @@
 		<action name="FrmForm" path="/web/dashboard/display/DrilldownDisplay" 
 			parameter="method" type="org.oscarehr.dashboard.display.DisplayDrilldownAction" scope="request" >
 			<forward name="success" path="/web/dashboard/display/DrilldownDisplay.jsp" />
-			<forward name="unauthorized" path="/securityError.jsp" />
-			<forward name="error" path="/failure.jsp" />
-		</action>
-		
-		<action name="FrmForm" path="/web/dashboard/display/AssignTickler" 
-			parameter="method" type="org.oscarehr.dashboard.admin.AssignTicklerAction" scope="request" >
-			<forward name="success" path="/web/dashboard/display/AssignTickler.jsp" />
 			<forward name="unauthorized" path="/securityError.jsp" />
 			<forward name="error" path="/failure.jsp" />
 		</action>
@@ -1198,22 +1192,17 @@
 		>
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/ConfirmConsultationRequest.jsp" />
 			<forward name="failESend" path="/oscarEncounter/ViewRequest.do" />
-			<forward name="print" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormPrint.jsp" />
-			<forward name="printalt" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormPrint2.jsp" />
-			<forward name="printpdf" path="/oscarEncounter/oscarConsultationRequest/printPdf.do" />
-			<forward name="printIndivica" path="/oscarEncounter/oscarConsultationRequest/printPdf2.do" />
+			<forward name="print" path="/oscarEncounter/oscarConsultationRequest/printPdf2.do" />
 			<forward name="fax" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormFax.jsp" />
 			<forward name="faxIndivica" path="/fax/CoverPage.jsp" />
+			<forward name="emailalt" path="/oscarEncounter/oscarConsultationRequest/emailPatient.jsp" />
 		</action>
-		<action input="/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/printPdf" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestPrintAction">
-			<forward name="error" path="/oscarEncounter/ViewRequest.do?error=error" />
-		</action>
-		<action input="/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/printPdf2" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestPrintAction2">
+		<action input="/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/printPdf2" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormRequestPrintAction">
 			<forward name="error" path="/oscarEncounter/ViewRequest.do?error=error" />
 		</action>
 		<action input="/oscarEncounter/oscarConsultationRequest/ConsultationFormRequest.jsp" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormFax" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctConsultationFormFaxAction">
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/ConfirmConsultationRequest.jsp" />
-			<forward name="error" path="/oscarEncounter/ViewRequest.do?error=error" />
+			<forward name="error" path="/oscarEncounter/oscarConsultationRequest/ConfirmConsultationRequest.jsp" />
 		</action>
 		<action input="/oscarEncounter/oscarConsultationRequest/attachmentReport.jsp" name="FrmForm" path="/oscarEncounter/oscarConsultation/printAttached" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationPrintDocsAction">
 			<forward name="noprint" path="/oscarEncounter/oscarConsultationRequest/nothingtoPrint.jsp" />
@@ -1509,7 +1498,7 @@
 			<forward name="success" path="/oscarEncounter/ViewAttachment.jsp" />
 		</action>
 		<action input="/ConsultationReport.jsp" name="RptShowConsultForm" path="/oscarReport/ShowConsult" scope="request" type="oscar.oscarReport.pageUtil.RptShowConsultAction">
-			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/ConsultationFormPrint.jsp" />
+			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/printPdf2.do" />
 		</action>
 		<action input="/oscarReport/oscarReportFluBilling.jsp" name="RptFluBillingForm" path="/oscarReport/FluBilling" scope="request" type="oscar.oscarReport.pageUtil.RptFluBillingAction">
 			<forward name="success" path="/oscarReport/oscarReportFluBilling.jsp" />
@@ -1605,12 +1594,6 @@
 			<forward name="success" path="/provider/providerFax.jsp" />
 			<forward name="error" path="/provider/providerFaxErr.jsp" />
 			<forward name="eject" path="/index.jsp" />
-		</action>
-		<action input="/admin/configureFax.jsp" path="/admin/ManageFax" scope="request" parameter="method" type="org.oscarehr.fax.admin.ConfigureFaxAction">
-			<forward name="completed" path="/admin/manageFax.jsp"/>			
-		</action>
-		<action input="/admin/manageFaxes.jsp" path="/admin/ManageFaxes" scope="request" parameter="method" validate="false" type="org.oscarehr.fax.admin.ManageFaxes">
-			<forward name="faxstatus" path="/admin/faxStatusResults.jspf" />			
 		</action>
 		
 		<action input="/provider/providerColourPicker.jsp" name="setProviderColour" path="/setProviderColour" scope="request" type="oscar.oscarProvider.pageUtil.ProEditColourAction">
@@ -1853,12 +1836,6 @@
 		<action input="/oscarReport/demographicSetEdit.jsp" name="FrmForm" path="/report/SetEligibility" scope="request" type="oscar.oscarReport.pageUtil.DemographicSetEligibilityAction">
 			<forward name="success" path="/oscarReport/demographicSetEdit.jsp" />
 		</action>
-		<action name="FrmForm" path="/tickler/ForwardDemographicTickler" scope="request" type="oscar.oscarTickler.pageUtil.ForwardDemographicTicklerAction">
-			<forward name="success" path="/tickler/ticklerAdd.jsp" />
-		</action>
-		<action name="FrmForm" path="/tickler/AddTickler" scope="request" type="oscar.oscarTickler.pageUtil.AddTicklerAction">
-			<forward name="close" path="/close.html" />
-		</action>
 		<action input="/eform/partials/upload.jsp" name="eFormHtmlUpload" path="/eform/uploadHtml" scope="request" type="oscar.eform.upload.HtmlUploadAction" validate="true">
 			<forward name="success" path="/eform/partials/upload.jsp" />
 			<forward name="fail" path="/eform/partials/upload.jsp" />
@@ -2086,9 +2063,10 @@
 			<forward name="success" path="/billing/CA/BC/TeleplanSubmission.jsp" />
 		</action>
 
-		<action path="/billing/CA/BC/ProcessRemittance" scope="request" name="FrmForm" type="oscar.oscarBilling.ca.bc.MSP.GenTaAction">
+		<action path="/billing/CA/BC/ProcessRemittance" scope="request" name="FrmForm" type="oscar.oscarBilling.ca.bc.MSP.TeleplanRemittanceAction">
 			<forward name="C12" path="/billing/CA/BC/billStatus.jsp" />
 			<forward name="S21" path="/billing/CA/BC/viewReconcileReports.jsp" />
+			<forward name="error" path="/billing/CA/BC/teleplan/ManageTeleplan.jsp" />
 		</action>
 
 		<action path="/billing/CA/BC/SimulateTeleplanFile" scope="request" name="FrmForm" type="oscar.oscarBilling.ca.bc.pageUtil.SimulateTeleplanFileAction">
@@ -2105,22 +2083,52 @@
 		</action>
 		<action path="/billing/CA/BC/DownloadBilling" type="oscar.oscarBilling.ca.bc.pageUtil.DownloadFileAction" />
 
-
-		<action path="/Tickler" type="org.springframework.web.struts.DelegatingActionProxy" parameter="method" scope="session" name="ticklerForm" input="/ticklerPlus/ticklerForm.jsp" validate="false">
+		<action name="FrmForm" path="/web/dashboard/display/AssignTickler"
+		        parameter="method" type="org.oscarehr.dashboard.admin.AssignTicklerAction" scope="request" >
+			<forward name="success" path="/web/dashboard/display/AssignTickler.jsp" />
+			<forward name="unauthorized" path="/securityError.jsp" />
+			<forward name="error" path="/failure.jsp" />
+		</action>
+		<action name="FrmForm" path="/tickler/ForwardDemographicTickler" scope="request"
+		        type="oscar.oscarTickler.pageUtil.ForwardDemographicTicklerAction">
+			<forward name="success" path="/tickler/ticklerAdd.jsp" />
+		</action>
+		<action name="FrmForm" path="/tickler/AddTickler" scope="request" type="oscar.oscarTickler.pageUtil.AddTicklerAction">
+			<forward name="close" path="/close.html" />
+		</action>
+		<action path="/Tickler" type="org.springframework.web.struts.DelegatingActionProxy" parameter="method" scope="session" name="ticklerForm"
+		        input="/ticklerPlus/ticklerForm.jsp" validate="false">
 			<forward name="list" path="/ticklerPlus/ticklerList.jsp" />
 			<forward name="view" path="/ticklerPlus/ticklerView.jsp" />
 			<forward name="edit" path="/ticklerPlus/ticklerForm.jsp" />
 			<forward name="failed" path="/ticklerPlus/ticklerForm.jsp" />
 			<forward name="preparedTicklerList" path="/ticklerPlus/preparedTicklerList.jsp" />
 		</action>
-		<action path="/CustomFilter" type="org.springframework.web.struts.DelegatingActionProxy" parameter="method" scope="request" name="customFilterForm" input="/ticklerPlus/customFilterForm.jsp" validate="false">
+		<action path="/CustomFilter" type="org.springframework.web.struts.DelegatingActionProxy" parameter="method" scope="request" name="customFilterForm"
+		        input="/ticklerPlus/customFilterForm.jsp" validate="false">
 			<forward name="customFilterList" path="/ticklerPlus/customFilterList.jsp" />
 			<forward name="customFilterForm" path="/ticklerPlus/customFilterForm.jsp" />
 		</action>
-		<action path="/UnreadTickler" type="org.caisi.tickler.web.UnreadTicklerAction" parameter="method" scope="request" name="unreadTicklerForm" input="/ticklerPlus/loginUnreadTickler.jsp" validate="false">
+		<action path="/UnreadTickler" type="org.caisi.tickler.web.UnreadTicklerAction" parameter="method" scope="request" name="unreadTicklerForm"
+		        input="/ticklerPlus/loginUnreadTickler.jsp" validate="false">
 			<forward name="error" path="/loginfailed.jsp" />
 			<forward name="view" path="/ticklerPlus/viewUnreadTicklers.jsp" />
 			<forward name="login" path="/ticklerPlus/loginUnreadTicklers.jsp" />
+		</action>
+		<action input="/tickler/ticklerEdit.jsp" name="serviceform" path="/tickler/EditTickler" scope="request"
+		        type="oscar.oscarTickler.pageUtil.EditTicklerAction"
+		        parameter="method">
+			<forward name="close" path="/closenreload.html"/>
+			<forward name="failure" path="/failure.jsp"/>
+			<forward name="error" path="/errorpage.jsp"/>
+		</action>
+		<action input="/tickler/ticklerTextSuggest.jsp" name="tsTicklerForm" path="/tickler/EditTicklerTextSuggest" scope="request"
+		        type="oscar.oscarTickler.pageUtil.EditTicklerAction" parameter="method">
+			<forward name="close" path="/closenreload.html"/>
+			<forward name="error" path="/errorpage.jsp"/>
+		</action>
+		<action path="/eyeform/SendTickler" type="org.oscarehr.eyeform.EyeformSendTicklerAction"
+		        scope="request" validate="false">
 		</action>
 		<action path="/PMmodule/StreetHealthIntakeReportAction" type="org.oscarehr.PMmodule.streethealth.StreetHealthIntakeReportAction" name="StreetHealthIntakeReportForm" scope="request" input="/PMmodule/StreetHealthIntakeReport.jsp">
 			<forward name="success" path="/PMmodule/StreetHealthIntakeReport.jsp" />
@@ -2405,10 +2413,6 @@
 			<forward name="list" path="/eyeform/conreportlist.jsp" />
 		</action>
 
-		<action path="/eyeform/SendTickler" type="org.oscarehr.eyeform.EyeformSendTicklerAction"
-			scope="request" validate="false">
-		</action>
-
 		<action path="/eyeform/Util" type="org.oscarehr.eyeform.EyeformUtilAction"
 			scope="request" parameter="method">
 		</action>
@@ -2657,16 +2661,6 @@
 
 
 		<action path="/caseload/CaseloadContent" scope="request" type="org.oscarehr.caseload.CaseloadContentAction" parameter="method" />
-
-                <action input="/tickler/ticklerEdit.jsp" name="serviceform" path="/tickler/EditTickler" scope="request" type="oscar.oscarTickler.pageUtil.EditTicklerAction" parameter="method">
-			<forward name="close" path="/closenreload.html" />
-                        <forward name="failure" path="/failure.jsp"/>
-                        <forward name="error" path="/errorpage.jsp" />
-		</action>
-                <action input="/tickler/ticklerTextSuggest.jsp" name="tsTicklerForm" path="/tickler/EditTicklerTextSuggest" scope="request" type="oscar.oscarTickler.pageUtil.EditTicklerAction" parameter="method">
-			<forward name="close" path="/closenreload.html" />
-                        <forward name="error" path="/errorpage.jsp" />
-		</action>
 
         <action path="/CodeSearch" type="org.oscarehr.common.web.CodeSearchService">
         </action>

@@ -208,7 +208,15 @@ ProviderData user = new ProviderData(strUser);
 					<%= patient.getCity() %>, <%= patient.getProvince() %> <%= patient.getPostal() %><br>
 					<%= patient.getPhone() %><br>
 					<b> <% if(!props.getProperty("showRxHin", "").equals("false")) { %>
-					<bean:message key="oscar.oscarRx.hin" /><%= patient.getHin() %> <% } %>                                        
+						<% if(props.isOntarioInstanceType())
+						{ %>
+							<bean:message key="oscar.oscarRx.hin" /><%= patient.getHin() %> <%= patient.getVer() %>
+						<% }
+						else
+						{%>
+							<bean:message key="oscar.oscarRx.hin" /><%= patient.getHin() %>
+						<%}%>
+					<% } %>
 					</b><br>
                                         <% if(props.getProperty("showRxChartNo", "").equalsIgnoreCase("true")) { %>
 					<bean:message key="oscar.oscarRx.chartNo" /><%=patient.getChartNo()%> <% } %></td>

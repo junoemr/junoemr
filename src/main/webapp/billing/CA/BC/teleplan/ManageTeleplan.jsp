@@ -140,6 +140,9 @@ oscar.oscarBilling.ca.bc.Teleplan.TeleplanUserPassDAO"%>
         <html:form action="/billing/CA/BC/ManageTeleplan">
              <input type="hidden" name="method" value="remit"/>
              <input class="btn" type="submit" value="Get Remittance" />
+	        <oscar:oscarPropertiesCheck property="billing.remit_load_from_file.enabled" value="true" >
+		        <span>Load From File Enabled: will not hit teleplan</span>
+	        </oscar:oscarPropertiesCheck>
         </html:form>
 	    <%}%> 
 	     

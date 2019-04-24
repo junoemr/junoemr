@@ -46,6 +46,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import oscar.OscarProperties;
+import oscar.SxmlMisc;
 import oscar.oscarEncounter.oscarConsultation.data.EctConProviderData;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
@@ -102,6 +103,10 @@ public class EctSessionBean implements java.io.Serializable {
     public ArrayList<String> templateNames;
     public ArrayList<String> measurementGroupNames;
     public String source;
+    public String patientBirthdate;
+    public String referringDoctorName;
+    public String referringDoctorNumber;
+    public Date rosterDate;
 
     public void resetAll() {
         eChartTimeStamp = null;
@@ -111,6 +116,7 @@ public class EctSessionBean implements java.io.Serializable {
         yearOfBirth = "";
         monthOfBirth = "";
         dateOfBirth = "";
+        patientBirthdate = "";
         patientSex = "";
         patientAge = "";
         chartNo = "";
@@ -129,6 +135,9 @@ public class EctSessionBean implements java.io.Serializable {
         roster = "";
         template = "";
         oscarMsg = "";
+        referringDoctorName = "";
+        referringDoctorNumber = "";
+        rosterDate = null;
     }
 
     /**
@@ -340,6 +349,11 @@ public class EctSessionBean implements java.io.Serializable {
         return patientAge;
     }
 
+    public boolean hasRosterDate()
+    {
+        return rosterDate != null && !"".equals(rosterDate.toString());
+    }
+
     private void setupDemographicInfo(LoggedInInfo loggedInInfo, String demoNo)
     {
         // Note: We do not set the demographicNo in this method because the natural overload to
@@ -347,43 +361,51 @@ public class EctSessionBean implements java.io.Serializable {
         // Therefore, we assume that the demographic number is already set prior to calling this method.
 
         DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-        Demographic d = demographicManager.getDemographic(loggedInInfo, demoNo);
+        Demographic demographic = demographicManager.getDemographic(loggedInInfo, demoNo);
 
-        patientLastName = d.getLastName();
-        patientFirstName = d.getFirstName();
-        address = d.getAddress();
-        city = d.getCity();
-        postal = d.getPostal();
-        phone = d.getPhone();
-        familyDoctorNo = d.getProviderNo();
-        chartNo = d.getChartNo();
-        yearOfBirth = d.getYearOfBirth();
-        monthOfBirth = d.getMonthOfBirth();
-        dateOfBirth = d.getDateOfBirth();
-        roster = d.getRosterStatus();
-        patientSex = d.getSex();
+        patientLastName = demographic.getLastName();
+        patientFirstName = demographic.getFirstName();
+        address = demographic.getAddress();
+        city = demographic.getCity();
+        postal = demographic.getPostal();
+        phone = demographic.getPhone();
+        familyDoctorNo = demographic.getProviderNo();
+        chartNo = demographic.getChartNo();
+        yearOfBirth = demographic.getYearOfBirth();
+        monthOfBirth = demographic.getMonthOfBirth();
+        dateOfBirth = demographic.getDateOfBirth();
+        roster = demographic.getRosterStatus();
+        patientSex = demographic.getSex();
+        rosterDate = demographic.getRosterDate();
 
-        if (yearOfBirth.equals("null") || yearOfBirth.equals(""))
+        if (yearOfBirth == null || yearOfBirth.equals("null") || yearOfBirth.equals(""))
         {
             yearOfBirth = "0";
         }
-        if (monthOfBirth.equals("null") || monthOfBirth.equals(""))
+        if (monthOfBirth == null || monthOfBirth.equals("null") || monthOfBirth.equals(""))
         {
             monthOfBirth = "0";
         }
-        if (dateOfBirth.equals("null") || dateOfBirth.equals(""))
+        if (dateOfBirth == null || dateOfBirth.equals("null") || dateOfBirth.equals(""))
         {
             dateOfBirth = "0";
         }
 
-        if (yearOfBirth.equals("0") || yearOfBirth == null)
+        if (yearOfBirth == null || yearOfBirth.equals("0"))
         {
             MiscUtils.getLogger().warn("Demographic no " + demographicNo + " does not have birth year. Unable to calculate age");
         }
         else
         {
             patientAge = UtilDateUtilities.calcAge(UtilDateUtilities.calcDate(yearOfBirth, monthOfBirth, dateOfBirth));
+            patientBirthdate = yearOfBirth + "-" + monthOfBirth + "-" + dateOfBirth;
+        }
 
+        String referringDoctor = demographic.getFamilyDoctor();
+        if (referringDoctor != null)
+        {
+            referringDoctorName = SxmlMisc.getXmlContent(referringDoctor, "rd") != null ? SxmlMisc.getXmlContent(referringDoctor, "rd") : "";
+            referringDoctorNumber = SxmlMisc.getXmlContent(referringDoctor, "rdohip") != null ? SxmlMisc.getXmlContent(referringDoctor, "rdohip") : "";
         }
     }
 

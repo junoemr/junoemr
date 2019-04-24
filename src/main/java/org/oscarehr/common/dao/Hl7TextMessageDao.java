@@ -50,7 +50,7 @@ public class Hl7TextMessageDao extends AbstractDao<Hl7TextMessage> {
 	}
 	
 	public List<Hl7TextMessage> findByFileUploadCheckId(int id) {
-		Query query = entityManager.createQuery("select x from Hl7TextMessage x where x.fileUploadCheckId = ?");
+		Query query = entityManager.createQuery("select x from Hl7TextMessage x where x.fileUploadCheckId = ?1");
 		query.setParameter(1,id);
 		
 		@SuppressWarnings("unchecked")

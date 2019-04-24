@@ -53,8 +53,6 @@
 <%@page import="java.util.*, oscar.oscarDemographic.data.*" %>
 <%@page import="oscar.oscarBilling.ca.bc.data.*,oscar.oscarBilling.ca.bc.pageUtil.*,oscar.*,oscar.oscarClinic.*" %>
 <%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="org.oscarehr.clinic.model.ClinicBillingAddress" %>
-<%@ page import="org.oscarehr.util.MiscUtils" %>
 <%
     double totalPayments = 0;
     double totalRefunds = 0;
@@ -572,13 +570,20 @@
                                                                 <td align="right" colspan="2"></td>
                                                             </tr>
                                                             <tr class="secHead">
-                                                                <td height="14" colspan="2">Please Make Cheque Payable
-                                                                    To:
+                                                                <td height="14"
+                                                                    colspan="2"><%=props.getProperty("invoice_payment_message", "Please Make Cheque Payable To: ")%>
                                                                 </td>
                                                             </tr>
                                                             <tr>
                                                                 <td class="title4">
-                                                                    Dr. <%=bean.getDefaultPayeeFirstName() + " " + bean.getDefaultPayeeLastName()%>
+                                                                    <%
+                                                                        if (!bean.isOmitPayee())
+                                                                        {
+                                                                    %>
+                                                                        Dr. <%=bean.getDefaultPayeeFirstName() + " " + bean.getDefaultPayeeLastName()%>
+                                                                    <%
+                                                                        }
+                                                                    %>
                                                                 </td>
                                                             </tr>
                                                             <tr>

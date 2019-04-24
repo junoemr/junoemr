@@ -392,6 +392,7 @@ receptionist_alt_view = no
 ENABLE_EDIT_APPT_STATUS=yes
 
 # Fax configuration
+faxEnable=no
 faxLogo =
 faxIdentifier = zwf4t%8*9@s
 faxURI = https://67.69.12.117:14043/OSCARFaxWebService
@@ -771,25 +772,11 @@ rx_enhance=false
 # True if signatures should be enabled in the rx module and false otherwise.
 rx_signature_enabled=true
 
-# True if fax should be enabled in the rx module and false otherwise.
-rx_fax_enabled=false
-
-# True if signatures should be enabled in the consultation module and false otherwise.
-# Requires faxEnable=yes
-consultation_fax_enabled=false
-faxEnable=no
-
 # True if consultation printing should generate a pdf with attachments and false otherwise.
 consultation_pdf_enabled=true
 
 #number of days until tickler text turns red
 tickler_warn_period=1
-
-# True if fax should be enabled in forms and false otherwise.
-form_fax_enabled=false
-
-# True if fax should be enabled in eforms and false otherwise.
-eform_fax_enabled=true
 
 # True if signature should be enabled in eforms and false otherwise.
 eform_signature_enabled=true
@@ -798,9 +785,6 @@ eform_signature_enabled=true
 eform_generator_indivica_signature_enabled=false
 eform_generator_indivica_print_enabled=false
 eform_generator_indivica_fax_enabled=false
-
-# Enable faxing from the document list
-document_fax_enabled=false
 
 # True if Indivica Rich Text Letter is enabled and false otherwise.
 indivica_rich_text_letter_enabled=true
@@ -909,7 +893,7 @@ web_service_client.received_timeout_ms=3000
 oscarhost_login=https://www.junoemr.com/{oscar_practice_id}
 
 # Set the location to write fax files to
-#fax_file_location=/var/lib/OscarDocument/{oscar_practice_id}/fax/
+fax_file_location=/var/lib/OscarDocument/{oscar_practice_id}/fax/outgoing/
 
 # Enable full demographics merge
 #enable_full_merge = true

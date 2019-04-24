@@ -125,18 +125,6 @@ public final class BillingCodeData implements Comparable
     return retval;
   }
 
-  public boolean updateBillingCodePrice(String code, String val) {
-    boolean retval = true;
-    BillingService billingservice = billingServiceDao.searchBillingCode(code,"BC");
-    billingservice.setBillingserviceNo(0);
-    billingservice.setBillingserviceDate(new Date());
-    billingservice.setValue(val);
-    billingServiceDao.merge(billingservice);
-    return retval;
-  }
-
-
-
   public BillingService getBillingCodeByCode(String code,Date date){
     List list = billingServiceDao.findBillingCodesByCode( code,BillingServiceDao.BC,date,1);
 

@@ -57,6 +57,8 @@ public class ConversionUtils {
 	public static final String DEFAULT_TIME_PATTERN = "HH:mm:ss";
 	public static final String DEFAULT_TS_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
+	public static final String TS_NO_SEC_PATTERN = "yyyy-MM-dd H:mm";
+
 	private static final Long ZERO_LONG = new Long(0);
 	private static final Integer ZERO_INT = new Integer(0);
 	private static final Double ZERO_DOUBLE = new Double(0.0);
@@ -178,6 +180,15 @@ public class ConversionUtils {
 		return date.format(format);
 	}
 
+	public static String toDateTimeString(LocalDateTime date, String formatPattern) {
+		if (date == null) {
+			return "";
+		}
+
+		DateTimeFormatter format = DateTimeFormatter.ofPattern(formatPattern);
+		return date.format(format);
+	}
+
 	/**
 	 * Formats the date instance into a string keeping only the time of the day and excluding the remaining info.   
 	 * 
@@ -213,6 +224,16 @@ public class ConversionUtils {
 	public static String toDateString(LocalDate date)
 	{
 		return toDateString(date, DEFAULT_DATE_PATTERN);
+	}
+
+	public static String toDateTimeString(LocalDateTime date)
+	{
+		return toDateTimeString(date, DEFAULT_TS_PATTERN);
+	}
+
+	public static String toDateTimeNoSecString(LocalDateTime date)
+	{
+		return toDateTimeString(date, TS_NO_SEC_PATTERN);
 	}
 
 	/**
