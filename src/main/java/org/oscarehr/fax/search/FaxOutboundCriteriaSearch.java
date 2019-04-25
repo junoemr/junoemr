@@ -23,6 +23,7 @@
 package org.oscarehr.fax.search;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
 import org.oscarehr.fax.model.FaxOutbound;
@@ -31,6 +32,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 {
@@ -48,6 +50,9 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 	private Long faxAccountId;
 	private LocalDate startDate;
 	private LocalDate endDate;
+	private Boolean archived;
+	private List<String> remoteStatusList;
+	private boolean includeExternalStatuses;
 
 	private SORTMODE sortMode = SORTMODE.CreationDate;
 
@@ -92,6 +97,20 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 		{
 			criteria.add(Restrictions.ge("createdAt", Timestamp.from(getStartDate().atStartOfDay().toInstant(ZoneOffset.UTC))));
 		}
+		if(getArchived() != null)
+		{
+			criteria.add(Restrictions.eq("archived", getArchived()));
+		}
+		if(getRemoteStatusList() != null && !getRemoteStatusList().isEmpty())
+		{
+			Criterion criterion = Restrictions.in("externalStatus", getRemoteStatusList());
+			if(!includeExternalStatuses)
+			{
+				criterion = Restrictions.or(Restrictions.not(criterion), Restrictions.isNull("externalStatus"));
+			}
+			criteria.add(criterion);
+		}
+
 		setOrderByCriteria(criteria);
 		return criteria;
 	}
@@ -184,5 +203,46 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 	public void setStartDate(LocalDate startDate)
 	{
 		this.startDate = startDate;
+	}
+
+	public Boolean getArchived()
+	{
+		return archived;
+	}
+
+	public void setArchived(Boolean archived)
+	{
+		this.archived = archived;
+	}
+
+	/**
+	 * the list of remote statuses values to filter.
+	 */
+	public List<String> getRemoteStatusList()
+	{
+		return remoteStatusList;
+	}
+
+	/**
+	 * set the list of remote statuses values to filter.
+	 * @param includeExternalStatuses
+	 * if true, results will be filtered to included only statuses in the given list.
+	 * if false, results will be filtered to exclude these statuses
+	 * this setting is ignored in the remote status list is not set or is empty
+	 */
+	public void setRemoteStatusList(List<String> remoteStatusList, boolean includeExternalStatuses)
+	{
+		this.remoteStatusList = remoteStatusList;
+		this.includeExternalStatuses = includeExternalStatuses;
+	}
+
+	/**
+	 * if true, results will be filtered to included only statuses in the given list.
+	 * if false, results will be filtered to exclude these statuses
+	 * this setting is ignored in the remote status list is not set or is empty
+	 */
+	public boolean isIncludeExternalStatuses()
+	{
+		return includeExternalStatuses;
 	}
 }

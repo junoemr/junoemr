@@ -35,9 +35,11 @@ import org.oscarehr.fax.exception.FaxApiValidationException;
 import org.oscarehr.fax.exception.FaxException;
 import org.oscarehr.fax.exception.FaxNumberException;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
+import org.oscarehr.fax.externalApi.srfax.result.GetFaxStatusResult;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
@@ -48,6 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
+import oscar.util.ConversionUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -229,7 +232,53 @@ public class OutgoingFaxService
 					logger.error("IOError", e);
 					continue;
 				}
+				logger.info("Attempting to send queued fax: (id=" + queuedFax.getId() + ")");
 				sendQueuedFax(queuedFax, fileToSend);
+			}
+		}
+	}
+
+	/**
+	 * Ask remote sources for status updates on sent files that have not been completed.
+	 * Update any records that have status changes
+	 */
+	public void requestPendingStatusUpdates()
+	{
+		FaxOutboundCriteriaSearch criteriaSearch = new FaxOutboundCriteriaSearch();
+		criteriaSearch.setStatus(FaxOutbound.Status.SENT); // only check records with a local sent status
+		criteriaSearch.setArchived(false); // ignore archived records
+		criteriaSearch.setRemoteStatusList(SRFaxApiConnector.RESPONSE_STATUSES_FINAL, false);
+		List<FaxOutbound> pendingList = faxOutboundDao.criteriaSearch(criteriaSearch);
+
+		if(!pendingList.isEmpty() && faxStatus.canSendFaxesAndIsMaster())
+		{
+			for(FaxOutbound faxOutbound : pendingList)
+			{
+				logger.info("Checking status for outbound record id:" + faxOutbound.getId() +
+						" (Current status: " + faxOutbound.getExternalStatus() + ")");
+				FaxAccount faxAccount = faxOutbound.getFaxAccount();
+				SRFaxApiConnector apiConnector = new SRFaxApiConnector(faxAccount.getLoginId(), faxAccount.getLoginPassword());
+				SingleWrapper<GetFaxStatusResult> apiResult = apiConnector.getFaxStatus(String.valueOf(faxOutbound.getExternalReferenceId()));
+
+				if(apiResult.isSuccess())
+				{
+					GetFaxStatusResult result = apiResult.getResult();
+					String remoteSentStatus = result.getSentStatus();
+					faxOutbound.setExternalStatus(result.getSentStatus());
+
+					// if the remote status is sent, update accordingly.
+					if(SRFaxApiConnector.RESPONSE_STATUS_SENT.equalsIgnoreCase(remoteSentStatus))
+					{
+						Date dateDelivered = ConversionUtils.fromDateString(result.getDateSent(), "MMM dd/yy hh:mm a");
+						faxOutbound.setExternalDeliveryDate(dateDelivered);
+						faxOutbound.setArchived(true);
+					}
+					faxOutboundDao.merge(faxOutbound);
+				}
+				else
+				{
+					logger.warn("SRFAX API Connection Failure: " + apiResult.getError());
+				}
 			}
 		}
 	}
