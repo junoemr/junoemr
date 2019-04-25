@@ -33,6 +33,7 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -414,13 +415,17 @@ public class ConversionUtils {
 			return dateString;
 		}
 
-		String timestamp = "";
-		// Date portion can have a leading space following into a timestamp - need to pad this accordingly
+		String[] timestamp = null;
+		// Date portion can have a leading space following into a timestamp
+		// Timestamp can be of format h:m(m)(:ss), need to pad and support
 		if (splitDate[2].contains(" "))
 		{
 			String[] splitTimestamp = splitDate[2].split(" ");
 			splitDate[2] = splitTimestamp[0];
-			timestamp = " " + splitTimestamp[1];
+			if (splitTimestamp[1].contains(":"))
+			{
+				timestamp = splitTimestamp[1].split(":");
+			}
 		}
 
 		try
@@ -428,8 +433,21 @@ public class ConversionUtils {
 			int year = Integer.parseInt(splitDate[0]);
 			int month = Integer.parseInt(splitDate[1]);
 			int date = Integer.parseInt(splitDate[2]);
-			LocalDate desiredDate = LocalDate.of(year, month, date);
-			return desiredDate.toString() + timestamp;
+			int hour = 0;
+			int minute = 0;
+			int second = 0;
+			if (timestamp != null)
+			{
+				hour = Integer.parseInt(timestamp[0]);
+				minute = Integer.parseInt(timestamp[1]);
+				if (timestamp.length > 2)
+				{
+					second = Integer.parseInt(timestamp[2]);
+				}
+			}
+			LocalDateTime desiredDate = LocalDateTime.of(year, month, date, hour, minute, second);
+			// toString creates format of yyyy-MM-ddThh:mm:ss
+			return desiredDate.toString().replace("T", " ");
 		}
 		catch (NumberFormatException | DateTimeParseException ex)
 		{
@@ -438,22 +456,25 @@ public class ConversionUtils {
 		}
 	}
 
-	public static Date coalesceTimeStampString(String dateString)
+	public static Date getLegacyDateFromDateString(String dateString)
 	{
-		return coalesceTimeStampString(dateString, DEFAULT_TS_PATTERN);
+		return getLegacyDateFromDateString(dateString, DEFAULT_TS_PATTERN);
 	}
-	public static Date coalesceTimeStampString(String plain, String inFormat)
+
+	public static Date getLegacyDateFromDateString(String dateString, String inFormat)
 	{
 		Date returnDate = null;
 
-		if(plain == null || plain.trim().isEmpty())
+		if (dateString == null || dateString.trim().isEmpty())
 		{
 			logger.warn("Cannot Coalesce a null/empty date string");
 			return returnDate;
 		}
 
-		if(inFormat.length() > plain.length())
-			inFormat = inFormat.substring(0, plain.length());
+		if (inFormat.length() > dateString.length())
+		{
+			inFormat = inFormat.substring(0, dateString.length());
+		}
 
 		try
 		{
@@ -466,11 +487,10 @@ public class ConversionUtils {
 					.parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
 					.toFormatter();
 
-			LocalDateTime parsedDate = LocalDateTime.parse(plain, customFormatter);
+			LocalDateTime parsedDate = LocalDateTime.parse(dateString, customFormatter);
+			returnDate = Date.from(parsedDate.toInstant(OffsetDateTime.now(ZoneId.systemDefault()).getOffset()));
 
-			returnDate = Date.from(parsedDate.toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
-
-			logger.debug("Coalesce " + plain + " to " + parsedDate.format(inFormatter));
+			logger.debug("Transform " + dateString + " to " + parsedDate.format(inFormatter));
 		}
 		catch(DateTimeException e)
 		{
