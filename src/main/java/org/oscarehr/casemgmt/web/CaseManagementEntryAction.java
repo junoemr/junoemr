@@ -1896,7 +1896,11 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 			Demographic demographic = demographicDao.getDemographic(demoNo);
 			//Should we get the billform based on the appointment provider or the demographic's provider?
-			ProviderPreference providerPreference = providerPreferenceDao.find(demographic.getProviderNo());
+			ProviderPreference providerPreference = null;
+			if (demographic.getProviderNo() != null)
+			{
+				providerPreference = providerPreferenceDao.find(demographic.getProviderNo());
+			}
 
 			if (providerPreference != null &&
 					providerPreference.getDefaultServiceType() != null &&
