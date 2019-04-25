@@ -1534,6 +1534,9 @@
 			<forward name="failure" path="/oscar_sfhc/JAYREPORTS/DemographicReport.jsp" />
 			<forward name="addToStudy" path="/study/ManageStudy.do?method=AddToStudy" />			
 		</action>
+		<action path="/admin/LogReportAction" scope="request" type="org.oscarehr.securityLog.LogReportAction">
+			<forward name="success" path="/admin/logReport.jsp" />
+		</action>
 		<action input="/oscarReport/ReportDemographicReport.jsp" name="FrmForm" path="/report/CreateDemographicSet" scope="request" type="oscar.oscarReport.pageUtil.RptCreateDemographicSetAction">
 			<forward name="success" path="/oscarReport/ReportDemographicReport.jsp" />
 		</action>

@@ -204,58 +204,66 @@ public class ManageDocumentAction extends DispatchAction {
 	}
 
 	public ActionForward removeLinkFromDocument(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
+	                                            HttpServletRequest request, HttpServletResponse response)
 	{
 		String docType = request.getParameter("docType");
 		String docId = request.getParameter("docId");
 		String providerNo = request.getParameter("providerNo");
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
-        	throw new SecurityException("missing required security object (_edoc)");
-        }
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		String logStatus = LogConst.STATUS_FAILURE;
+
+		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
 
 		try
 		{
 			try
 			{
 				providerInboxRoutingDAO.removeLinkFromDocument(Integer.parseInt(docId), providerNo);
+				logStatus = LogConst.STATUS_SUCCESS;
 			}
-			catch (SQLException e)
+			catch(SQLException e)
 			{
 				MiscUtils.getLogger().error("Failed to remove link from document.", e);
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to remove link from document.");
 			}
-			HashMap<String, List> hm = new HashMap<String, List>();
+			HashMap<String, List> hm = new HashMap<>();
 			hm.put("linkedProviders", providerInboxRoutingDAO.getProvidersWithRoutingForDocument(docType, Integer.parseInt(docId)));
 
 			JSONObject jsonObject = JSONObject.fromObject(hm);
 			response.getOutputStream().write(jsonObject.toString().getBytes());
 		}
-		catch (IOException e)
+		catch(IOException e)
 		{
 			MiscUtils.getLogger().error("Error writing response.", e);
 		}
+		LogAction.addLogEntry(loggedInProviderNo, null,
+				LogConst.ACTION_UNLINK, LogConst.CON_DOCUMENT, logStatus, docId, request.getRemoteAddr(), providerNo);
 
 		return null;
-	}	
-        public ActionForward refileDocumentAjax(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-	
+	}
+
+	public ActionForward refileDocumentAjax(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+
 		String documentId = request.getParameter("documentId");
 		String queueId = request.getParameter("queueId");
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
-        	throw new SecurityException("missing required security object (_edoc)");
-                }
-                
-                try {
-                    EDocUtil.refileDocument(documentId,queueId);
-                } catch (Exception e) {
-                    MiscUtils.getLogger().error("Error", e);
-                }
-                return null;
-        }
+		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
 
-	private String getDemoName(LoggedInInfo loggedInInfo, String demog) {
+		try
+		{
+			EDocUtil.refileDocument(documentId, queueId);
+		}
+		catch(Exception e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+		}
+		return null;
+	}
+
+	private String getDemoName(LoggedInInfo loggedInInfo, String demog)
+	{
 		DemographicData demoD = new DemographicData();
 		org.oscarehr.common.model.Demographic demo = demoD.getDemographic(loggedInInfo, demog);
 		String demoName = demo.getLastName() + ", " + demo.getFirstName();

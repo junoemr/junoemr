@@ -71,7 +71,7 @@ public class UnlinkDemographicAction  extends Action {
         plr.setDemographicNo(PatientLabRoutingDao.UNMATCHED);
         plrDao.merge(plr);
         
-        OscarAuditLogger.getInstance().log(loggedInInfo, LogConst.UNLINK, LogConst.CON_HL7_LAB, String.valueOf(labNo), request.getRemoteAddr(), demoNo, reason);
+        OscarAuditLogger.getInstance().log(loggedInInfo, LogConst.ACTION_UNLINK, LogConst.CON_HL7_LAB, String.valueOf(labNo), request.getRemoteAddr(), demoNo, reason);
         
         logger.debug("Unlinked lab with segmentID: " + labNo + " from eChart of Demographic " + demoNo);
         
