@@ -1897,7 +1897,10 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			Demographic demographic = demographicDao.getDemographic(demoNo);
 			//Should we get the billform based on the appointment provider or the demographic's provider?
 			ProviderPreference providerPreference = null;
-			providerPreference = providerPreferenceDao.find(demographic.getProviderNo());
+			if (demographic.getProviderNo() != null)
+			{
+				providerPreference = providerPreferenceDao.find(demographic.getProviderNo());
+			}
 
 			if (providerPreference != null &&
 					providerPreference.getDefaultServiceType() != null &&
