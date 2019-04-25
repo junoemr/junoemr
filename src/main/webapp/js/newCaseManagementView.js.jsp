@@ -620,7 +620,7 @@
 		//update each ajax div with info from request
 		this.popColumn = function(url, div, params, navBar, navBarObj)
 		{
-			params = "reloadURL=" + url + "&numToDisplay=6&cmd=" + params;
+			params = "reloadURL=" + encodeURIComponent(url) + "&numToDisplay=6&cmd=" + params;
 
 			var objAjax = new Ajax.Request(
 				url,

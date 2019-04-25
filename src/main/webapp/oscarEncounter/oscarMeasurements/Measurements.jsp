@@ -84,7 +84,7 @@ function check() {
 		parentChanged = true
         document.forms[0].elements["value(parentChanged)"].value = "true";
         
-        if( !confirm("<bean:message key="oscarEncounter.oscarMeasurements.Measurements.msgParentChanged"/> <oscar:nameage demographicNo="<%=demo%>"/>") ) 
+        if( !confirm("<bean:message key="oscarEncounter.oscarMeasurements.Measurements.msgParentChanged.start"/> <oscar:nameage demographicNo="<%=demo%>"/> <bean:message key="oscarEncounter.oscarMeasurements.Measurements.msgParentChanged.end"/> "))
             ret = false;        
     }
 
