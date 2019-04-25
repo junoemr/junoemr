@@ -293,7 +293,7 @@ public class WriteNewMeasurements {
         measurement.setDataField(inputValue);
         measurement.setMeasuringInstruction(mInstrc);
         measurement.setComments(comments);
-        measurement.setDateObserved(ConversionUtils.fromTimestampString(dateObserved));
+        measurement.setDateObserved(ConversionUtils.coalesceTimeStampString(dateObserved));
         dao.persist(measurement);
     }
 
