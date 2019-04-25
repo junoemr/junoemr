@@ -47,6 +47,7 @@
 		<netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
 		<antrun.skip.jspc>false</antrun.skip.jspc>
 		<oscar.use.integration.prop>false</oscar.use.integration.prop>
+		<oscar.dbinit.skip>false</oscar.dbinit.skip>
 	</properties>
 	<repositories>
 		<repository>
@@ -1609,7 +1610,7 @@
 								<exclude>integration/tests/*</exclude>
 							</excludes>
 							<systemPropertyVariables>
-								<oscar.dbinit.skip>${oscar.dbinit.skip}</oscar.dbinit.skip>
+								<oscar.skip.dbinit>${oscar.dbinit.skip}</oscar.skip.dbinit>
 								<buildDirectory>${project.build.directory}</buildDirectory>
 							</systemPropertyVariables>
 						</configuration>
@@ -1976,7 +1977,7 @@
 									<argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
 									<test>SetupDatabase</test>
 									<systemPropertyVariables>
-										<oscar.dbinit.skip>${oscar.dbinit.skip}</oscar.dbinit.skip>
+										<oscar.skip.dbinit>${oscar.dbinit.skip}</oscar.skip.dbinit>
 										<buildDirectory>${project.build.directory}</buildDirectory>
 									</systemPropertyVariables>
 								</configuration>
@@ -1997,7 +1998,7 @@
 										<include>integration/tests/*</include>
 									</includes>
 									<systemPropertyVariables>
-										<oscar.dbinit.skip>true</oscar.dbinit.skip>
+										<oscar.skip.dbinit>true</oscar.skip.dbinit>
 										<buildDirectory>${project.build.directory}</buildDirectory>
 									</systemPropertyVariables>
 								</configuration>

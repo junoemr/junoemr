@@ -43,7 +43,7 @@ public class SetupDatabase
 	@Test
 	public void setupDatabase() throws SQLException, InstantiationException, ClassNotFoundException, IllegalAccessException, IOException
 	{
-		if(System.getProperty("oscar.dbinit.skip") == null || !System.getProperty("oscar.dbinit.skip").equalsIgnoreCase("true"))
+		if(System.getProperty("oscar.skip.dbinit") == null || !System.getProperty("oscar.skip.dbinit").equalsIgnoreCase("true"))
 		{
 			long start = System.currentTimeMillis();
 			if (!SchemaUtils.inited)
@@ -62,18 +62,6 @@ public class SetupDatabase
 			{
 				logger.info("Setting up db took " + secsTaken + " seconds.");
 			}
-
-			// load spring
-			start = System.currentTimeMillis();
-			DaoTestFixtures.setupBeanFactory();
-			end = System.currentTimeMillis();
-			secsTaken = (end-start)/1000;
-			logger.info("Setting up spring took " + secsTaken + " seconds.");
-
-			// configure test user. mainly to turn of forced password reset.
-			logger.info("Configuring test account");
-			AuthUtils.configureTestUser();
-
 		}
 
 	}

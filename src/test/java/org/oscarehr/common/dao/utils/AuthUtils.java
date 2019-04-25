@@ -44,18 +44,6 @@ public class AuthUtils {
 	public static final String TEST_PASSWORD  	= "mac2002";
 	public static final String TEST_PIN		  	= "1117";
 
-	public static void configureTestUser()
-	{
-		SecurityDao securityDao = (SecurityDao) SpringUtils.getBean(SecurityDao.class);
-		List<Security> testUser = securityDao.findByLikeProviderNo(TEST_PROVIDER_ID);
-
-		assert(testUser.size() == 1);
-		testUser.get(0).setForcePasswordReset(false);
-		testUser.get(0).setBExpireset(0);
-		testUser.get(0).setDateExpiredate(ConversionUtils.fromDateString("2099-01-01"));
-		securityDao.merge(testUser.get(0));
-	}
-
 	public static LoggedInInfo initLoginContext() {
 		HttpSession session = null;
 		Facility currentFacility = new Facility("Test Facility", "Test Facility Desription");

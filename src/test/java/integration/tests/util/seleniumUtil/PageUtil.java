@@ -27,10 +27,13 @@ import integration.tests.util.SeleniumTestBase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 public class PageUtil
 {
@@ -45,6 +48,12 @@ public class PageUtil
 		wait.until(ExpectedConditions.not(ExpectedConditions.urlMatches(oldUrl)));
 	}
 
+	/**
+	 * check if a given WebElement exists (with no implicit delay)
+	 * @param search search method used to find element
+	 * @param driver webDriver
+	 * @return true / false depending on if the WebElement exists in the DOM
+	 */
 	public static boolean isExistsBy(By search, WebDriver driver)
 	{
 		driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
@@ -61,4 +70,35 @@ public class PageUtil
 		}
 	}
 
+	public static boolean isErrorPage(WebDriver driver)
+	{
+		// check for error page title
+		if (Pattern.compile("Error report").matcher(driver.getTitle()).find())
+		{
+			return true;
+		}
+
+		// look for apache error pages
+		List<WebElement> titles =  driver.findElements(By.xpath("//title"));
+		for (WebElement title : titles)
+		{
+			if (Pattern.compile("HTTP Status").matcher(title.getText()).find())
+			{
+				return true;
+			}
+		}
+
+		if (PageUtil.isExistsBy(By.xpath("//h1[contains(., 'HTTP Status')]"), driver))
+		{
+			return true;
+		}
+
+		// look for hibernate error page
+		if (PageUtil.isExistsBy(By.xpath("//h1[contains(., 'Error Page')]"), driver))
+		{
+			return true;
+		}
+
+		return false;
+	}
 }
