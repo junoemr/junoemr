@@ -11,9 +11,30 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 	          faxOutboundService)
 	{
 		var controller = this;
-		controller.systemStatusEnum = Object.freeze({"sent":"SENT", "queued":"QUEUED", "error":"ERROR"});
-		controller.notificationStatusEnum = Object.freeze({"notify":"NOTIFY", "dismissed":"SILENT"});
-		controller.tabEnum = Object.freeze({"inbox":0, "outbox":1});
+		controller.displayStatusEnum = Object.freeze({
+			error:"Error",
+			queued:"Queued",
+			sent:"In Progress",
+			integrationFailed:"Failed",
+			integrationSuccess:"Delivered"
+		});
+		controller.systemStatusEnum = Object.freeze({
+			sent:"SENT",
+			queued:"QUEUED",
+			error:"ERROR"
+		});
+		controller.remoteStatusEnum = Object.freeze({
+			sent:"Sent",
+			failed:"Failed"
+		});
+		controller.notificationStatusEnum = Object.freeze({
+			notify:"NOTIFY",
+			dismissed:"SILENT"
+		});
+		controller.tabEnum = Object.freeze({
+			inbox:0,
+			outbox:1
+		});
 		controller.activeTab = controller.tabEnum.outbox;
 		controller.loggedInProviderNo = null;
 
@@ -233,6 +254,38 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 					alert(error);
 				}
 			);
+		};
+
+		controller.getDisplayStatus = function(outboxItem)
+		{
+			let systemStatus = outboxItem.systemStatus;
+			let remoteStatus = outboxItem.integrationStatus;
+			let displayStatus = null;
+
+			if(systemStatus === controller.systemStatusEnum.error)
+			{
+				displayStatus = controller.displayStatusEnum.error;
+			}
+			else if(systemStatus === controller.systemStatusEnum.queued)
+			{
+				displayStatus = controller.displayStatusEnum.queued;
+			}
+			else if(systemStatus === controller.systemStatusEnum.sent
+				&& remoteStatus === controller.remoteStatusEnum.failed)
+			{
+				displayStatus = controller.displayStatusEnum.integrationFailed;
+			}
+			else if(systemStatus === controller.systemStatusEnum.sent
+			&& remoteStatus === controller.remoteStatusEnum.sent)
+			{
+				displayStatus = controller.displayStatusEnum.integrationSuccess;
+			}
+			else if(systemStatus === controller.systemStatusEnum.sent)
+			{
+				displayStatus = controller.displayStatusEnum.sent;
+			}
+
+			return displayStatus;
 		};
 
 		controller.openDocument = function(documentId)

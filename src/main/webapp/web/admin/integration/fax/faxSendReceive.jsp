@@ -185,17 +185,14 @@
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.fileType"/>'">
 							{{item.fileType}}
 						</td>
-						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.systemStatus"/>'">
-							<span title="{{item.systemStatusMessage}}">{{item.systemStatus}}</span>
-						</td>
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.toFaxNumber"/>'">
 							{{item.toFaxNumber}}
 						</td>
+						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.sentStatus"/>'">
+							<span title="{{item.systemStatusMessage}}">{{faxSendReceiveController.getDisplayStatus(item)}}</span>
+						</td>
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationDateSent"/>'">
 							{{item.integrationDateSent}}
-						</td>
-						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationStatus"/>'">
-							{{item.integrationStatus}}
 						</td>
 						<td>
 							<button class="btn btn-primary btn-xs"
