@@ -24,13 +24,12 @@
 
 package org.oscarehr.billing.CA.BC.dao;
 
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.oscarehr.billing.CA.BC.model.TeleplanC12;
 import org.oscarehr.common.dao.AbstractDao;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.List;
 
 @Repository
 public class TeleplanC12Dao extends AbstractDao<TeleplanC12> {
@@ -68,5 +67,32 @@ public class TeleplanC12Dao extends AbstractDao<TeleplanC12> {
 		query.setParameter("status", status);
 		return query.getResultList();
     }
-	
+
+	public List<TeleplanC12> findDuplicates(TeleplanC12 lineEntry)
+	{
+		Query q = entityManager.createQuery(
+				"SELECT t FROM TeleplanC12 t " +
+						"WHERE t.dataCentre = :dataCenter " +
+						"AND t.dataSeq = :sequenceNumber " +
+						"AND t.officeFolioClaimNo = :officeNo " +
+						"AND t.practitionerNo = :practitionerNo " +
+						"AND t.exp1 = :explanatory1 " +
+						"AND t.exp2 = :explanatory2 " +
+						"AND t.exp3 = :explanatory3 " +
+						"ORDER BY t.id ASC");
+		q.setParameter("dataCenter", lineEntry.getDataCentre());
+		q.setParameter("sequenceNumber", lineEntry.getDataSeq());
+		q.setParameter("officeNo", lineEntry.getOfficeFolioClaimNo());
+		q.setParameter("practitionerNo", lineEntry.getPractitionerNo());
+		q.setParameter("explanatory1", lineEntry.getExp1());
+		q.setParameter("explanatory2", lineEntry.getExp2());
+		q.setParameter("explanatory3", lineEntry.getExp3());
+
+		return q.getResultList();
+	}
+
+	public boolean isDuplicate(TeleplanC12 lineEntry)
+	{
+		return !findDuplicates(lineEntry).isEmpty();
+	}
 }
