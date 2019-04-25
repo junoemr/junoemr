@@ -1753,7 +1753,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgAssociated2" />:</td>
 							<td align="right" class="tite1">
-								<html:select property="providerNo" onchange="switchProvider(this.value)">
+								<html:select property="providerNo">
 									<%
 										for (Provider p : prList) {
 											if (p.getProviderNo().compareTo("-1") != 0) {
