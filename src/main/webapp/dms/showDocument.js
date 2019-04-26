@@ -44,7 +44,8 @@ Oscar.ShowDocument.popupPatientTickler = function popupPatientTickler(height, wi
 		"?docType=DOC" +
 		"&docId=" + docId +
 		"&demographic_no=" + demographicNo +
-		"&demoName=" + demographicName;
+		"&demoName=" + demographicName +
+		"&updateParent=" + false;
 
 	return popup2(height, width, 0, 0, urlNew, windowName);
 };
