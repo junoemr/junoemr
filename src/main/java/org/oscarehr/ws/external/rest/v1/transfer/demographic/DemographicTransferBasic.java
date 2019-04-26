@@ -189,7 +189,6 @@ public class DemographicTransferBasic implements Serializable
 	private String newsletter;
 	@Size(max=32)
 	private String anonymous;
-
 	// notes
 	@Schema(description = "The note on the patient master file")
 	private String notes;
