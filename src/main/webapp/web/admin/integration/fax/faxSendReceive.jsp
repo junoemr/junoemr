@@ -203,7 +203,9 @@
 							{{item.toFaxNumber}}
 						</td>
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.sentStatus"/>'">
-							<span title="{{item.systemStatusMessage}}">{{faxSendReceiveController.getStatusDisplayLabel(item.combinedStatus)}}</span>
+							<span title="{{item.systemStatusMessage}}">
+								{{faxSendReceiveController.getStatusDisplayLabel(item.combinedStatus)}}
+							</span>
 						</td>
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationDateSent"/>'">
 							{{item.integrationDateSent}}
@@ -233,6 +235,8 @@
 								<button class="btn btn-xs"
 								        title="<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.archive-tooltip"/>"
 								        ng-hide="item.archived"
+								        ng-disabled="item.combinedStatus != faxSendReceiveController.displayStatus.error.value
+											&& item.combinedStatus != faxSendReceiveController.displayStatus.integrationFailed.value"
 								        ng-click="faxSendReceiveController.archive(item);">
 									<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.archive"/>
 								</button>

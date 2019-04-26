@@ -247,6 +247,7 @@ public class FaxOutbound extends AbstractModel<Long>
 	public void setProvider(ProviderData provider)
 	{
 		this.provider = provider;
+		this.providerNo = provider.getId();
 	}
 
 	public Integer getDemographicNo()

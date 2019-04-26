@@ -85,7 +85,7 @@ public class FaxTransferConverter
 		transfer.setProviderNo(faxOutbound.getProviderNo());
 		transfer.setProviderName(faxOutbound.getProvider().getDisplayName());
 		transfer.setDemographicNo(faxOutbound.getDemographicNo());
-		transfer.setSystemStatus(String.valueOf(faxOutbound.getStatus()));
+		transfer.setSystemStatus(faxOutbound.getStatus());
 		transfer.setSystemStatusMessage(faxOutbound.getStatusMessage());
 		transfer.setArchived(faxOutbound.getArchived());
 		transfer.setNotificationStatus(faxOutbound.getNotificationStatus().name());

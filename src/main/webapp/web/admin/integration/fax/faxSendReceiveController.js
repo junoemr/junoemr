@@ -205,20 +205,28 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 
 		controller.resendFax = function(outboxItem)
 		{
-			outboxItem.systemStatus = 'RESEND';
+			// the resend will create a new record for some resend attempts, in that case force a reload of the table items
+			let requireFullRefresh = (outboxItem.combinedStatus === controller.displayStatus.integrationFailed.value);
+
+			// set a temp status to provider feedback/disable resend button
+			outboxItem.combinedStatus = controller.displayStatus.inProgress.value;
 			faxOutboundService.resendOutboundFax(outboxItem.id).then(
 				function success(response)
 				{
 					angular.copy(response, outboxItem);
-					console.info(outboxItem);
 					if(outboxItem.systemStatus === controller.systemStatusEnum.error)
 					{
 						alert(outboxItem.systemStatusMessage);
 					}
+
+					if(requireFullRefresh)
+					{
+						controller.loadOutboxItems();
+					}
 				},
 				function error(error)
 				{
-					outboxItem.systemStatus = controller.systemStatusEnum.error;
+					outboxItem.combinedStatus = controller.displayStatus.error.value;
 					console.error(error);
 					alert(error);
 				}

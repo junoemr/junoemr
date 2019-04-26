@@ -23,6 +23,7 @@
 package org.oscarehr.ws.rest.transfer.fax;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.oscarehr.fax.model.FaxOutbound;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
@@ -50,7 +51,7 @@ public class FaxOutboxTransferOutbound implements Serializable
 	/* file type: document, form, consult, etc. */
 	private String fileType;
 	/* the sent status of the document as recorded in the system */
-	private String systemStatus;
+	private FaxOutbound.Status systemStatus;
 	/* a message sent along with the status, usually for error explanations */
 	private String systemStatusMessage;
 	/* the sent date of the document as recorded in the system */
@@ -139,12 +140,12 @@ public class FaxOutboxTransferOutbound implements Serializable
 		this.fileType = fileType;
 	}
 
-	public String getSystemStatus()
+	public FaxOutbound.Status getSystemStatus()
 	{
 		return systemStatus;
 	}
 
-	public void setSystemStatus(String systemStatus)
+	public void setSystemStatus(FaxOutbound.Status systemStatus)
 	{
 		this.systemStatus = systemStatus;
 	}

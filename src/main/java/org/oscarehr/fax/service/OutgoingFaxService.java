@@ -40,6 +40,8 @@ import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
@@ -73,6 +75,9 @@ public class OutgoingFaxService
 	private static final String DEFAULT_MAX_SEND_COUNT = "5";
 	private static HashMap<Long, Integer> faxAttemptCounterMap = new HashMap<>();
 	private static int MAX_SEND_COUNT = Integer.parseInt(props.getProperty("fax.max_send_attempts", DEFAULT_MAX_SEND_COUNT));
+
+	@Autowired
+	private ProviderDataDao providerDataDao;
 
 	@Autowired
 	private FaxOutboundDao faxOutboundDao;
@@ -145,7 +150,7 @@ public class OutgoingFaxService
 
 			// fake a transfer object to return
 			transfer = new FaxOutboxTransferOutbound();
-			transfer.setSystemStatus(FaxOutbound.Status.SENT.name());
+			transfer.setSystemStatus(FaxOutbound.Status.SENT);
 			transfer.setToFaxNumber(faxNumber);
 			transfer.setFileType(fileType.name());
 			transfer.setDemographicNo(demographicId);
@@ -181,13 +186,33 @@ public class OutgoingFaxService
 		else if(faxOutbound.isStatusError())
 		{
 			fileToResend = FileFactory.getOutboundUnsentFaxFile(faxOutbound.getFileName());
+			fileToResend.moveToOutgoingFaxPending();
+			faxOutbound.setStatusQueued();
+		}
+		else if(faxOutbound.isStatusSent()
+				&& SRFaxApiConnector.RESPONSE_STATUS_FAILED.equalsIgnoreCase(faxOutbound.getExternalStatus()))
+		{
+			/*Here the fax was sent to the integration but failed remotely.
+			* In this case, duplicate the fax record and send it again as a new copy.
+			* Archive the old one to prevent multiple resend attempts by the user. */
+
+			GenericFile fileToCopy = FileFactory.getOutboundSentFaxFile(faxOutbound.getFileName());
+			fileToResend = FileFactory.copy(fileToCopy);
+			faxOutbound.setArchived(true);
+			faxOutboundDao.merge(faxOutbound);
+
+			faxOutbound = queueNewFax(
+					faxOutbound.getProviderNo(),
+					faxOutbound.getDemographicNo(),
+					faxOutbound.getFaxAccount(),
+					faxOutbound.getSentTo(),
+					faxOutbound.getFileType(),
+					fileToResend);
 		}
 		else
 		{
 			throw new FaxException("Attempt to resend fax with invalid status: " + faxOutbound.getStatus().name());
 		}
-		fileToResend.moveToOutgoingFaxPending();
-		faxOutbound.setStatusQueued();
 
 		sendQueuedFax(faxOutbound, fileToResend);
 		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
@@ -326,6 +351,8 @@ public class OutgoingFaxService
 	private FaxOutbound queueNewFax(String providerId, Integer demographicId, FaxAccount faxAccount, String faxNumber,
 	                                FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException
 	{
+		ProviderData provider = providerDataDao.find(providerId);
+
 		FaxOutbound faxOutbound = new FaxOutbound();
 		faxOutbound.setStatusQueued();
 		faxOutbound.setFaxAccount(faxAccount);
@@ -335,7 +362,7 @@ public class OutgoingFaxService
 		faxOutbound.setFileType(fileType);
 		faxOutbound.setFileName(fileToFax.getName());
 		faxOutbound.setCreatedAt(new Date());
-		faxOutbound.setProviderNo(providerId);
+		faxOutbound.setProvider(provider);
 		faxOutbound.setDemographicNo(demographicId);
 		faxOutboundDao.persist(faxOutbound);
 
