@@ -22,13 +22,14 @@
  */
 package org.oscarehr.ws.rest.conversion;
 
+import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxInbound;
 import org.oscarehr.fax.model.FaxOutbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferInbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
@@ -93,6 +94,7 @@ public class FaxTransferConverter
 		transfer.setFileType(faxOutbound.getFileType().name());
 		transfer.setIntegrationStatus(faxOutbound.getExternalStatus());
 		transfer.setIntegrationDateSent(ConversionUtils.toTimestampString(faxOutbound.getExternalDeliveryDate()));
+		transfer.setCombinedStatus(toCombinedStatus(faxOutbound.getStatus(), faxOutbound.getExternalStatus()));
 
 		return transfer;
 	}
@@ -108,5 +110,33 @@ public class FaxTransferConverter
 		transfer.setSentFrom(faxInbound.getSentFrom());
 
 		return transfer;
+	}
+
+	private static FaxOutboxTransferOutbound.CombinedStatus toCombinedStatus(FaxOutbound.Status systemStatus, String remoteStatus)
+	{
+		FaxOutboxTransferOutbound.CombinedStatus combinedStatus = null;
+		if(FaxOutbound.Status.ERROR.equals(systemStatus))
+		{
+			combinedStatus = FaxOutboxTransferOutbound.CombinedStatus.ERROR;
+		}
+		else if(FaxOutbound.Status.QUEUED.equals(systemStatus))
+		{
+			combinedStatus = FaxOutboxTransferOutbound.CombinedStatus.QUEUED;
+		}
+		else if(FaxOutbound.Status.SENT.equals(systemStatus)
+				&& SRFaxApiConnector.RESPONSE_STATUS_SENT.equalsIgnoreCase(remoteStatus))
+		{
+			combinedStatus = FaxOutboxTransferOutbound.CombinedStatus.INTEGRATION_SUCCESS;
+		}
+		else if(FaxOutbound.Status.SENT.equals(systemStatus)
+				&& SRFaxApiConnector.RESPONSE_STATUS_FAILED.equalsIgnoreCase(remoteStatus))
+		{
+			combinedStatus = FaxOutboxTransferOutbound.CombinedStatus.INTEGRATION_FAILED;
+		}
+		else if(FaxOutbound.Status.SENT.equals(systemStatus))
+		{
+			combinedStatus = FaxOutboxTransferOutbound.CombinedStatus.IN_PROGRESS;
+		}
+		return combinedStatus;
 	}
 }

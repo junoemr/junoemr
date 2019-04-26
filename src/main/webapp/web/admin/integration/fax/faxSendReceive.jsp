@@ -165,6 +165,13 @@
 							                       type="Input">
 							</juno-datepicker-popup>
 						</div>
+						<div>
+							<label for="outbox-select-combinedStatus"><bean:message bundle="ui" key="admin.fax.sr.search.combinedStatus"/></label>
+							<select class="col-lg-3 col-xs-6" id="outbox-select-combinedStatus"
+							        ng-model="faxSendReceiveController.outbox.combinedStatus"
+							        ng-options="statusOption for statusOption in faxSendReceiveController.displayStatusEnum">
+							</select>
+						</div>
 					</div>
 					<div class="row search-buttons">
 						<button type="button" class="btn btn-primary"
@@ -189,7 +196,7 @@
 							{{item.toFaxNumber}}
 						</td>
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.sentStatus"/>'">
-							<span title="{{item.systemStatusMessage}}">{{faxSendReceiveController.getDisplayStatus(item)}}</span>
+							<span title="{{item.systemStatusMessage}}">{{faxSendReceiveController.getStatusDisplayLabel(item)}}</span>
 						</td>
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationDateSent"/>'">
 							{{item.integrationDateSent}}
@@ -205,10 +212,13 @@
 								<button class="btn btn-xs"
 								        title="<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.resend-tooltip"/>"
 								        ng-hide="item.archived
-								            || (item.systemStatus != faxSendReceiveController.systemStatusEnum.queued
-						                    && item.systemStatus != faxSendReceiveController.systemStatusEnum.error)"
-								        ng-class="{'btn-success': item.systemStatus == faxSendReceiveController.systemStatusEnum.queued,
-						                    'btn-warning': item.systemStatus == faxSendReceiveController.systemStatusEnum.error}"
+								            || (item.combinedStatus != faxSendReceiveController.displayStatusEnum.queued
+						                    && item.combinedStatus != faxSendReceiveController.displayStatusEnum.error
+						                    && item.combinedStatus != faxSendReceiveController.displayStatusEnum.integrationFailed)"
+								        ng-class="{
+								            'btn-warning': item.combinedStatus == faxSendReceiveController.displayStatusEnum.error,
+						                    'btn-success': item.combinedStatus == faxSendReceiveController.displayStatusEnum.integrationFailed
+						                    }"
 								        ng-click="faxSendReceiveController.resendFax(item);">
 									<span class="glyphicon glyphicon-repeat"></span>
 									<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.resend"/>
@@ -224,7 +234,7 @@
 								<bean:message bundle="ui" key="admin.fax.sr.outbox.archived"/>
 							</span>
 						</td>
-						<td>
+						<td ng-if="faxSendReceiveController.displayNotificationColumn == true">
 							<button class="btn btn-xs"
 							        ng-show="item.notificationStatus == faxSendReceiveController.notificationStatusEnum.notify"
 									ng-click="faxSendReceiveController.dismissNotification(item);">

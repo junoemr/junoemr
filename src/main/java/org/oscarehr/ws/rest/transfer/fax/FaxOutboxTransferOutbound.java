@@ -31,6 +31,15 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
 public class FaxOutboxTransferOutbound implements Serializable
 {
+	public enum CombinedStatus
+	{
+		ERROR,
+		QUEUED,
+		IN_PROGRESS,
+		INTEGRATION_FAILED,
+		INTEGRATION_SUCCESS
+	}
+
 	private Long id;
 	private Long faxAccountId;
 
@@ -56,6 +65,9 @@ public class FaxOutboxTransferOutbound implements Serializable
 	private String integrationDateQueued;
 	/* the sent date of the document as retrieved from the api */
 	private String integrationDateSent;
+
+	/* the single combined state of the systemStatus and the integrationStatus */
+	private CombinedStatus combinedStatus;
 
 	public Long getId()
 	{
@@ -205,5 +217,15 @@ public class FaxOutboxTransferOutbound implements Serializable
 	public void setIntegrationDateSent(String integrationDateSent)
 	{
 		this.integrationDateSent = integrationDateSent;
+	}
+
+	public CombinedStatus getCombinedStatus()
+	{
+		return combinedStatus;
+	}
+
+	public void setCombinedStatus(CombinedStatus combinedStatus)
+	{
+		this.combinedStatus = combinedStatus;
 	}
 }

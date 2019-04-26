@@ -12,20 +12,16 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 	{
 		var controller = this;
 		controller.displayStatusEnum = Object.freeze({
-			error:"Error",
-			queued:"Queued",
-			sent:"In Progress",
-			integrationFailed:"Failed",
-			integrationSuccess:"Delivered"
+			error:"ERROR",
+			queued:"QUEUED",
+			inProgress:"IN_PROGRESS",
+			integrationFailed:"INTEGRATION_FAILED",
+			integrationSuccess:"INTEGRATION_SUCCESS"
 		});
 		controller.systemStatusEnum = Object.freeze({
 			sent:"SENT",
 			queued:"QUEUED",
 			error:"ERROR"
-		});
-		controller.remoteStatusEnum = Object.freeze({
-			sent:"Sent",
-			failed:"Failed"
 		});
 		controller.notificationStatusEnum = Object.freeze({
 			notify:"NOTIFY",
@@ -37,6 +33,7 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 		});
 		controller.activeTab = controller.tabEnum.outbox;
 		controller.loggedInProviderNo = null;
+		controller.displayNotificationColumn = false;
 
 		controller.nextPullTime = null;
 		controller.nextPushTime = null;
@@ -70,7 +67,8 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 					}
 				},
 				startDate: null,
-				endDate: null
+				endDate: null,
+				combinedStatus: null
 			};
 
 		controller.initialize = function()
@@ -109,6 +107,7 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 						let searchParams = {
 							startDate:  controller.formatOptionalDateParam(controller.outbox.startDate),
 							endDate: controller.formatOptionalDateParam(controller.outbox.endDate),
+							combinedStatus: controller.outbox.combinedStatus
 						};
 						var searchListHelper = new Juno.Common.SearchListHelper(defaults, searchParams);
 						return faxAccountService.getOutbox(controller.selectedFaxAccount.id, searchListHelper).then(
@@ -256,38 +255,6 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 			);
 		};
 
-		controller.getDisplayStatus = function(outboxItem)
-		{
-			let systemStatus = outboxItem.systemStatus;
-			let remoteStatus = outboxItem.integrationStatus;
-			let displayStatus = null;
-
-			if(systemStatus === controller.systemStatusEnum.error)
-			{
-				displayStatus = controller.displayStatusEnum.error;
-			}
-			else if(systemStatus === controller.systemStatusEnum.queued)
-			{
-				displayStatus = controller.displayStatusEnum.queued;
-			}
-			else if(systemStatus === controller.systemStatusEnum.sent
-				&& remoteStatus === controller.remoteStatusEnum.failed)
-			{
-				displayStatus = controller.displayStatusEnum.integrationFailed;
-			}
-			else if(systemStatus === controller.systemStatusEnum.sent
-			&& remoteStatus === controller.remoteStatusEnum.sent)
-			{
-				displayStatus = controller.displayStatusEnum.integrationSuccess;
-			}
-			else if(systemStatus === controller.systemStatusEnum.sent)
-			{
-				displayStatus = controller.displayStatusEnum.sent;
-			}
-
-			return displayStatus;
-		};
-
 		controller.openDocument = function(documentId)
 		{
 			let openDocumentWindow = function()
@@ -329,6 +296,20 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 		controller.formatOptionalDateParam = function(dateObj)
 		{
 			return Juno.Common.Util.isUndefinedOrNull(dateObj)? null : moment(dateObj).format('YYYY-MM-DD')
+		};
+		controller.getStatusDisplayLabel = function(outboxItem)
+		{
+			let displayLabel = null;
+			switch(outboxItem.combinedStatus)
+			{
+				case controller.displayStatusEnum.error :               displayLabel = "Error";         break;
+				case controller.displayStatusEnum.queued :              displayLabel = "Queued";        break;
+				case controller.displayStatusEnum.inProgress :          displayLabel = "In Progress";   break;
+				case controller.displayStatusEnum.integrationFailed :   displayLabel = "Failed";        break;
+				case controller.displayStatusEnum.integrationSuccess :  displayLabel = "Delivered";     break;
+				default: displayLabel = "Unknown";
+			}
+			return displayLabel;
 		};
 
 		controller.initialize();
