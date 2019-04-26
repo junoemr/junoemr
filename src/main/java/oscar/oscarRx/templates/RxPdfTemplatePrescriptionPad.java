@@ -408,7 +408,7 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				cb.lineTo(275f, endPara - 50f);
 				cb.stroke();
 
-				if (this.imgPath != null) {
+				if (this.imgPath != null && !this.imgPath.isEmpty()) {
 					Image img = Image.getInstance(this.imgPath);
 					img.scaleToFit(100, 50);
 					img.setAbsolutePosition(75f, endPara - 50f);
