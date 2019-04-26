@@ -547,8 +547,8 @@ try
 			<div style="display: inline-block; position:relative;">
 				<button id="encounter_timer" title="Paste timer data" type="button" onclick="encounterTimer.putEncounterTimeInNote()">00:00</button>
 			</div>
-			<button id="encounter_timer_pause" class="encounter_timer_control" type="button" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"><i class="fa fa-pause"></i></button>
-			<button id="encounter_timer_play" class="encounter_timer_control" type="button" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"><i class="fa fa-play"></i></button>
+			<button id="encounter_timer_pause" class="encounter_timer_control" type="button" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')">||</button>
+			<button id="encounter_timer_play" class="encounter_timer_control" type="button" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')">&gt;</button>
 		</div>
 		<%
 
