@@ -97,7 +97,7 @@ function isEchartOriginal()
 	if (opener != null)
 	{
 		parentUUID = opener.getEChartUUID();
-		myUUID = "<%=request.getParameter("uuid")%>"
+		myUUID = "<%=request.getParameter("echartUUID")%>"
 		return myUUID === parentUUID;
 	}
 	else

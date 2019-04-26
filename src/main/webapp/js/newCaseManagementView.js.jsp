@@ -59,6 +59,20 @@
 	var reloadDiv;
 	var eChartUUID = "<%=UUID.randomUUID().toString()%>";
 
+	// load echart uuid if possible from local storage. If not found
+	// save new uuid to storage.
+	function getEchartUUID()
+	{
+		let storageUUID = sessionStorage.getItem(document.title)
+		console.log(storageUUID);
+		if (storageUUID !== null)
+		{
+			eChartUUID = storageUUID;
+		}
+		sessionStorage.setItem(document.title, eChartUUID);
+	}
+	getEchartUUID()
+
 	function checkLengthofObject(o)
 	{
 		var c = 0;

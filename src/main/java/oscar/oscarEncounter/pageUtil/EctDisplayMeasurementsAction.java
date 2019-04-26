@@ -106,7 +106,8 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 					winName = flowsheetName + bean.demographicNo;
 					uuid = UUID.randomUUID().toString();
 					hash = Math.abs(winName.hashCode());
-					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?uuid=" + uuid + "&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "');return false;";
+					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?uuid=" + uuid + "&demographic_no="
+							+ bean.demographicNo + "&template=" + flowsheetName + "&echartUUID="+ eChartUUID + "');return false;";
 					item.setLinkTitle(dispname);
 					dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 					item.setTitle(dispname);
@@ -149,7 +150,8 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 					winName = flowsheetName + bean.demographicNo;
 					uuid = UUID.randomUUID().toString();
 					hash = Math.abs(winName.hashCode());
-					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?uuid=" + uuid + "&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "');return false;";
+					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?uuid=" + uuid +
+							"&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "&echartUUID=" + eChartUUID + "');return false;";
 					item.setLinkTitle(dispname);
 					dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 					item.setTitle(dispname);
@@ -181,7 +183,8 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 					winName = flowsheetName + bean.demographicNo;
 					uuid = UUID.randomUUID().toString();
 					hash = Math.abs(winName.hashCode());
-					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?uuid=" + uuid + "&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "');return false;";
+					url = "popupPage(700,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/TemplateFlowSheet.jsp?uuid=" + uuid +
+							"&demographic_no=" + bean.demographicNo + "&template=" + flowsheetName + "&echartUUID=" + eChartUUID + "');return false;";
 					item.setLinkTitle(dispname);
 					dispname = StringUtils.maxLenString(dispname, MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
 					item.setTitle(dispname);
@@ -199,7 +202,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 				winName = group.getGroupName() + bean.demographicNo;
 				hash = Math.abs(winName.hashCode());
 				url = "popupPage(500,1000,'" + hash + "','" + request.getContextPath() + "/oscarEncounter/oscarMeasurements/SetupMeasurements.do?groupName=" + group.getGroupName() +
-						"&uuid=" + eChartUUID + "');measurementLoaded('" + hash + "')";
+						"&echartUUID=" + eChartUUID + "');measurementLoaded('" + hash + "')";
 				Dao.addPopUpUrl(url);
 				Dao.addPopUpText(group.getGroupName());
 			}
