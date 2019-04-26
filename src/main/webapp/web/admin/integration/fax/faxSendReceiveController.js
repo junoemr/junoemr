@@ -11,13 +11,47 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 	          faxOutboundService)
 	{
 		var controller = this;
-		controller.displayStatusEnum = Object.freeze({
-			error:"ERROR",
-			queued:"QUEUED",
-			inProgress:"IN_PROGRESS",
-			integrationFailed:"INTEGRATION_FAILED",
-			integrationSuccess:"INTEGRATION_SUCCESS"
+		controller.displayStatus = Object.freeze({
+			all: {
+				value: null,
+				label: "All"
+			},
+			error: {
+				value: "ERROR",
+				label: "Error"
+			},
+			queued: {
+				value: "QUEUED",
+				label: "Queued"
+			},
+			inProgress: {
+				value: "IN_PROGRESS",
+				label: "In Progress"
+			},
+			integrationFailed: {
+				value: "INTEGRATION_FAILED",
+				label: "Failed"
+			},
+			integrationSuccess: {
+				value: "INTEGRATION_SUCCESS",
+				label: "Delivered"
+			}
 		});
+		controller.archivedStatus = Object.freeze({
+			all: {
+				value: null,
+				label: "All"
+			},
+			active: {
+				value: false,
+				label: "Active"
+			},
+			archived: {
+				value: true,
+				label: "Archived"
+			}
+		});
+
 		controller.systemStatusEnum = Object.freeze({
 			sent:"SENT",
 			queued:"QUEUED",
@@ -58,18 +92,19 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 		};
 		// ngTable object for storing search parameters
 		controller.outbox =
-			{
-				search: {
-					page: 1,
-					count: 10,
-					sorting: {
-						DateSent: "desc"
-					}
-				},
-				startDate: null,
-				endDate: null,
-				combinedStatus: null
-			};
+		{
+			search: {
+				page: 1,
+				count: 10,
+				sorting: {
+					DateSent: "desc"
+				}
+			},
+			startDate: null,
+			endDate: null,
+			displayStatus: controller.displayStatus.all,
+			archivedStatus: controller.archivedStatus.all
+		};
 
 		controller.initialize = function()
 		{
@@ -107,7 +142,8 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 						let searchParams = {
 							startDate:  controller.formatOptionalDateParam(controller.outbox.startDate),
 							endDate: controller.formatOptionalDateParam(controller.outbox.endDate),
-							combinedStatus: controller.outbox.combinedStatus
+							combinedStatus: controller.outbox.displayStatus.value,
+							archived: controller.outbox.archivedStatus.value
 						};
 						var searchListHelper = new Juno.Common.SearchListHelper(defaults, searchParams);
 						return faxAccountService.getOutbox(controller.selectedFaxAccount.id, searchListHelper).then(
@@ -297,16 +333,16 @@ angular.module("Admin.Integration.Fax").controller('Admin.Integration.Fax.FaxSen
 		{
 			return Juno.Common.Util.isUndefinedOrNull(dateObj)? null : moment(dateObj).format('YYYY-MM-DD')
 		};
-		controller.getStatusDisplayLabel = function(outboxItem)
+		controller.getStatusDisplayLabel = function(statusEnum)
 		{
 			let displayLabel = null;
-			switch(outboxItem.combinedStatus)
+			switch(statusEnum)
 			{
-				case controller.displayStatusEnum.error :               displayLabel = "Error";         break;
-				case controller.displayStatusEnum.queued :              displayLabel = "Queued";        break;
-				case controller.displayStatusEnum.inProgress :          displayLabel = "In Progress";   break;
-				case controller.displayStatusEnum.integrationFailed :   displayLabel = "Failed";        break;
-				case controller.displayStatusEnum.integrationSuccess :  displayLabel = "Delivered";     break;
+				case controller.displayStatus.error.value :                 displayLabel = controller.displayStatus.error.label; break;
+				case controller.displayStatus.queued.value :                displayLabel = controller.displayStatus.queued.label; break;
+				case controller.displayStatus.inProgress.value :            displayLabel = controller.displayStatus.inProgress.label; break;
+				case controller.displayStatus.integrationFailed.value :     displayLabel = controller.displayStatus.integrationFailed.label; break;
+				case controller.displayStatus.integrationSuccess.value :    displayLabel = controller.displayStatus.integrationSuccess.label; break;
 				default: displayLabel = "Unknown";
 			}
 			return displayLabel;

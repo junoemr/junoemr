@@ -165,11 +165,18 @@
 							                       type="Input">
 							</juno-datepicker-popup>
 						</div>
-						<div>
+						<div class="col-lg-2 col-sm-3 col-xs-6">
 							<label for="outbox-select-combinedStatus"><bean:message bundle="ui" key="admin.fax.sr.search.combinedStatus"/></label>
-							<select class="col-lg-3 col-xs-6" id="outbox-select-combinedStatus"
-							        ng-model="faxSendReceiveController.outbox.combinedStatus"
-							        ng-options="statusOption for statusOption in faxSendReceiveController.displayStatusEnum">
+							<select id="outbox-select-combinedStatus" class="form-control"
+							        ng-model="faxSendReceiveController.outbox.displayStatus"
+							        ng-options="statusOption.label for statusOption in faxSendReceiveController.displayStatus">
+							</select>
+						</div>
+						<div class="col-lg-2 col-sm-3 col-xs-6">
+							<label for="outbox-select-archived"><bean:message bundle="ui" key="admin.fax.sr.search.archived"/></label>
+							<select id="outbox-select-archived" class="form-control"
+							        ng-model="faxSendReceiveController.outbox.archivedStatus"
+							        ng-options="archivedStatus.label for archivedStatus in faxSendReceiveController.archivedStatus">
 							</select>
 						</div>
 					</div>
@@ -196,7 +203,7 @@
 							{{item.toFaxNumber}}
 						</td>
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.sentStatus"/>'">
-							<span title="{{item.systemStatusMessage}}">{{faxSendReceiveController.getStatusDisplayLabel(item)}}</span>
+							<span title="{{item.systemStatusMessage}}">{{faxSendReceiveController.getStatusDisplayLabel(item.combinedStatus)}}</span>
 						</td>
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationDateSent"/>'">
 							{{item.integrationDateSent}}
@@ -212,12 +219,12 @@
 								<button class="btn btn-xs"
 								        title="<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.resend-tooltip"/>"
 								        ng-hide="item.archived
-								            || (item.combinedStatus != faxSendReceiveController.displayStatusEnum.queued
-						                    && item.combinedStatus != faxSendReceiveController.displayStatusEnum.error
-						                    && item.combinedStatus != faxSendReceiveController.displayStatusEnum.integrationFailed)"
+								            || (item.combinedStatus != faxSendReceiveController.displayStatus.queued.value
+						                    && item.combinedStatus != faxSendReceiveController.displayStatus.error.value
+						                    && item.combinedStatus != faxSendReceiveController.displayStatus.integrationFailed.value)"
 								        ng-class="{
-								            'btn-warning': item.combinedStatus == faxSendReceiveController.displayStatusEnum.error,
-						                    'btn-success': item.combinedStatus == faxSendReceiveController.displayStatusEnum.integrationFailed
+								            'btn-warning': item.combinedStatus == faxSendReceiveController.displayStatus.error.value,
+						                    'btn-success': item.combinedStatus == faxSendReceiveController.displayStatus.integrationFailed.value
 						                    }"
 								        ng-click="faxSendReceiveController.resendFax(item);">
 									<span class="glyphicon glyphicon-repeat"></span>
