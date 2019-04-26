@@ -3,17 +3,14 @@
     position: relative;
     display: inline-block;
     overflow: hidden;
-    background-color: #dddddd;
+    background-color: transparent;
+    vertical-align: bottom;
+    border: none;
     top: 0px;
-
-    border-radius: 2px;
-    border-width: 1px;
-    border-color: black;
     padding: 3px;
 }
 
 .encounter_timer_container div {
-    cursor: pointer;
     border-style: none;
 }
 
@@ -25,40 +22,29 @@
 }
 
 #encounter_timer {
+    cursor: pointer;
     display: inline-block;
     position: relative;
-    background-color: transparent;
-
-    padding-right: 5px;
-    min-width: 20px;
+    background-color: #fefefe;
+    min-width: 60px;
 }
 
-#encounter_timer_background {
-    position:absolute;
-    background-color: white;
-    left: -20px;
-    right: 0px;
-    top:-20px;
-    bottom:-20px;
-}
+.encounter_timer_control {
+    cursor: pointer;
+    border-style: solid;
+    border-width: 1px;
+    border-color: darkgray;
+    position:relative;
 
-#encounter_timer:active {
-    background-color: #bbbbff;
+    width: 30px;
+    height: 22px;
+    background-color: #d4d4d4;
 }
-
 
 #encounter_timer_pause {
     display: inline-block;
-    position:relative;
-
-    width: 15px;
-    background-color: transparent;
 }
 
 #encounter_timer_play {
     display: none;
-    position:relative;
-
-    width: 15px;
-    background-color: transparent;
 }

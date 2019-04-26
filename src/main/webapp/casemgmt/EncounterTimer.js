@@ -92,5 +92,5 @@ window.encounterTimer =
 
 jQuery(document).ready( function () {
     encounterTimer.startTime = new Date();
-    encounterTimer.intervalId = window.setInterval(encounterTimer.updateTimer, 1000, "#encounter_timer", "#encounter_timer_background", encounterTimer.currentTime, encounterTimer.isPaused);
+    encounterTimer.intervalId = window.setInterval(encounterTimer.updateTimer, 1000, "#encounter_timer", "#encounter_timer", encounterTimer.currentTime, encounterTimer.isPaused);
 });
