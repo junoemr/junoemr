@@ -63,13 +63,13 @@
 	// save new uuid to storage.
 	function getEchartUUID()
 	{
-		let storageUUID = sessionStorage.getItem(document.title)
+		let storageUUID = sessionStorage.getItem("eChartUUID: " + document.title)
 		console.log(storageUUID);
 		if (storageUUID !== null)
 		{
 			eChartUUID = storageUUID;
 		}
-		sessionStorage.setItem(document.title, eChartUUID);
+		sessionStorage.setItem("eChartUUID: " + document.title, eChartUUID);
 	}
 	getEchartUUID()
 
