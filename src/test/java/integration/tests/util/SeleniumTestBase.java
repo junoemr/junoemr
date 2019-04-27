@@ -55,6 +55,9 @@ public class SeleniumTestBase
 
 		//build and start selenium web driver
 		createWebDriver();
+
+		//practically all integration tests rely on the security table. restore it.
+		SchemaUtils.restoreTable("security");
 	}
 
 	@AfterClass

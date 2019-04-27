@@ -156,27 +156,6 @@ public class SchemaUtils
 	{
 		restoreTable(true,tableNames);
 	}
-
-	public static void dropTable(String... tableNames) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException
-	{
-		String schema=ConfigUtils.getProperty("db_schema");
-
-		Connection c=getConnection();
-		try
-		{
-			Statement s=c.createStatement();
-			s.executeUpdate("use "+schema);
-			for (int i = 0; i < tableNames.length; i++) {
-				s.executeUpdate("drop table if exists " + tableNames[i]);
-            }
-			s.close();
-
-		}
-		finally
-		{
-			c.close();
-		}
-	}
 	
 	private static boolean isWindows() {
 		String osName = System.getProperty("os.name");
@@ -358,6 +337,9 @@ public class SchemaUtils
 					assertEquals(loadFileIntoMySQL(update_file.getAbsolutePath()),0);
 				}
 			}
+
+			// Fix test specific problems with the database
+			assertEquals(loadFileIntoMySQL(baseDir + "/src/test/java/integration/tests/sql/initialize_database.sql"), 0);
 		 
 			createTableStatements.clear();
 			try {

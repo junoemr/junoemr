@@ -35,33 +35,24 @@ import java.sql.SQLException;
 // "hack" test to initialize the database to a workable state before embedded tomcat is run
 public class SetupDatabase
 {
-	private static final String INITALIZE_DATABASE_SQL = System.getProperty("basedir") + "/src/test/java/integration/tests/sql/initialize_database.sql";
 	private static Logger logger= MiscUtils.getLogger();
 
 	//initialize database and make all tables available for the subsequent embedded Tomcat invocation.
 	@Test
 	public void setupDatabase() throws SQLException, InstantiationException, ClassNotFoundException, IllegalAccessException, IOException
 	{
-		if(System.getProperty("oscar.skip.dbinit") == null || !System.getProperty("oscar.skip.dbinit").equalsIgnoreCase("true"))
+		long start = System.currentTimeMillis();
+		if (!SchemaUtils.inited)
 		{
-			long start = System.currentTimeMillis();
-			if (!SchemaUtils.inited)
-			{
-				logger.info("dropAndRecreateDatabase");
-				SchemaUtils.dropAndRecreateDatabase();
-			}
-
-			//setup database for integration tests
-			SchemaUtils.loadFileIntoMySQL(INITALIZE_DATABASE_SQL);
-			SchemaUtils.restoreAllTables();
-
-			long end = System.currentTimeMillis();
-			long secsTaken = (end - start) / 1000;
-			if (secsTaken > 30)
-			{
-				logger.info("Setting up db took " + secsTaken + " seconds.");
-			}
+			logger.info("dropAndRecreateDatabase");
+			SchemaUtils.dropAndRecreateDatabase();
 		}
 
+		long end = System.currentTimeMillis();
+		long secsTaken = (end - start) / 1000;
+		if (secsTaken > 30)
+		{
+			logger.info("Setting up db took " + secsTaken + " seconds.");
+		}
 	}
 }
