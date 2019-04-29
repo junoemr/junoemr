@@ -581,6 +581,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				function success(results)
 				{
 					console.log(results);
+					getLeftItems();
+					getRightItems();
 				},
 				function error(errors)
 				{
@@ -595,6 +597,9 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 					}
 					console.log('Modal dismissed at: ' + new Date());
 					console.log(errors);
+
+					getLeftItems();
+					getRightItems();
 				});
 
 			console.log($('#myModal'));
