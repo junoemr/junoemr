@@ -25,21 +25,13 @@
     cursor: pointer;
     display: inline-block;
     position: relative;
-    background-color: #dededd;
-    border-color: #cececc;
     min-width: 60px;
 }
 
 .encounter_timer_control {
     cursor: pointer;
-    border-style: solid;
-    border-width: 1px;
-    border-color: darkgray;
     position:relative;
 
-    width: 30px;
-    height: 22px;
-    background-color: #d4d4d4;
 }
 
 #encounter_timer_pause {

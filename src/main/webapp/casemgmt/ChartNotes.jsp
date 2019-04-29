@@ -545,10 +545,10 @@ try
 
 		<div class="encounter_timer_container">
 			<div style="display: inline-block; position:relative;">
-				<button id="encounter_timer" title="Paste timer data" type="button" onclick="encounterTimer.putEncounterTimeInNote()">00:00</button>
+				<input id="encounter_timer" title="Paste timer data" type="button" onclick="encounterTimer.putEncounterTimeInNote()" value="00:00"/>
 			</div>
-			<button id="encounter_timer_pause" class="encounter_timer_control" type="button" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')">||</button>
-			<button id="encounter_timer_play" class="encounter_timer_control" type="button" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')">&gt;</button>
+			<input id="encounter_timer_pause" class="encounter_timer_control" type="button" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')" value="||"/>
+			<input id="encounter_timer_play" class="encounter_timer_control" type="button" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')" value="&gt;"/>
 		</div>
 		<%
 
