@@ -449,7 +449,6 @@ public class DemographicManager {
 	}
 
 	public PHRVerification getLatestPhrVerificationByDemographicId(LoggedInInfo loggedInInfo, Integer demographicId) {
-		checkPrivilege(loggedInInfo, securityInfoManager.READ);
 		return phrVerificationDao.findLatestByDemographicId(demographicId);
 	}
 
