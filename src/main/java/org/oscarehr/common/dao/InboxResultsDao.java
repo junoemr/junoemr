@@ -10,8 +10,6 @@
 package org.oscarehr.common.dao;
 
 import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -673,18 +671,8 @@ public class InboxResultsDao
 					lbData.accessionNumber = accessionNum;
 					lbData.label = label;
 
-
 					lbData.requestingClient = requesting_client;
 					lbData.reportStatus = report_status;
-
-					// the "C" is for corrected excelleris labs
-					if (lbData.reportStatus != null && (lbData.reportStatus.equals("F") || lbData.reportStatus.equals("C"))) {
-						lbData.finalRes = true;
-					} else if (lbData.reportStatus != null && lbData.reportStatus.equals("X")) {
-						lbData.cancelledReport = true;
-					} else {
-						lbData.finalRes = false;
-					}
 
 					lbData.discipline = discipline;
 					lbData.finalResultsCount = ConversionUtils.fromIntString(final_result_count);
@@ -744,7 +732,6 @@ public class InboxResultsDao
 
 				lbData.dateTime = getStringValue(r[obsDateLoc]);
 
-				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 				lbData.setDateObj(UtilDateUtilities.StringToDate(getStringValue(r[obsDateLoc])));
 
 				String priority = getStringValue(r[priorityLoc]);
@@ -773,13 +760,27 @@ public class InboxResultsDao
 					lbData.priority = "----";
 				}
 
-				// the "C" is for corrected excelleris labs
-				if (lbData.reportStatus != null && (lbData.reportStatus.equals("F") || lbData.reportStatus.equals("C"))) {
-					lbData.finalRes = true;
-				} else if (lbData.reportStatus != null && lbData.reportStatus.equals("X")){
-					lbData.cancelledReport = true;
-				} else{
-
+				// the "C" is for corrected Excelleris labs
+				if (lbData.reportStatus != null)
+				{
+					switch(lbData.reportStatus)
+					{
+						case "C":
+							lbData.correctedRes = true;
+							break;
+						case "F":
+							lbData.finalRes = true;
+							break;
+						case "X":
+							lbData.cancelledReport = true;
+							break;
+						default:
+							lbData.finalRes = false;
+							break;
+					}
+				}
+				else
+				{
 					lbData.finalRes = false;
 				}
 

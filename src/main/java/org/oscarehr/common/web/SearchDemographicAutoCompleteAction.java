@@ -25,8 +25,8 @@
 
 package org.oscarehr.common.web;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,11 +43,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.demographic.dao.DemographicCustDao;
-import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.model.Demographic;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
+import org.oscarehr.demographic.search.DemographicCriteriaSearch;
+import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.util.AppointmentUtil;
-import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
@@ -60,146 +61,168 @@ import oscar.oscarRx.data.RxProviderData.Provider;
  * @author jaygallagher
  */
 public class SearchDemographicAutoCompleteAction extends Action {
-    
 
-	
+    private final int MAX_SEARCH_RESULTS = 100;
+
     public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response) throws Exception{
-    	String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-    	
-    	boolean outOfDomain = false;
-    	if(request.getParameter("outofdomain")!=null && request.getParameter("outofdomain").equals("true")) {
-    		outOfDomain=true;
-    	}
-    	
-        DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao"); 
         String searchStr = request.getParameter("demographicKeyword");
-        
-        if (searchStr == null){
-           searchStr = request.getParameter("query");
+
+        DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+
+        if (searchStr == null)
+        {
+            searchStr = request.getParameter("query");
         }
         
-        if (searchStr == null){
-           searchStr = request.getParameter("name");
+        if (searchStr == null)
+        {
+            searchStr = request.getParameter("name");
         }
         
-        if(searchStr == null){
-        	searchStr = request.getParameter("term");
+        if (searchStr == null)
+        {
+            searchStr = request.getParameter("term");
         }
         
         boolean activeOnly = "true".equalsIgnoreCase(request.getParameter("activeOnly"));
         boolean jqueryJSON = "true".equalsIgnoreCase(request.getParameter("jqueryJSON"));
         RxProviderData rx = new RxProviderData();
-        
 
-        List<Demographic> list = null;
+        DemographicService demoService = (DemographicService) SpringUtils.getBean("demographic.service.DemographicService");
+        DemographicCriteriaSearch.SORT_MODE sortMode = DemographicCriteriaSearch.SORT_MODE.DemographicName;
 
-        // search by birth date
-        if (searchStr.length() == 8 && searchStr.matches("([0-9]*)")) {
-            list = demographicDao.searchDemographicByDOB(searchStr.substring(0,4)+"-"+searchStr.substring(4,6)+"-"+searchStr.substring(6,8), 100, 0,providerNo,outOfDomain);
+        List<Demographic> list;
+        DemographicService.SEARCH_MODE searchMode;
+        DemographicService.STATUS_MODE statusMode;
+
+        // search by birth date (format has to be yyyyMMdd)
+        if (searchStr.length() == 8 && searchStr.matches("([0-9]*)"))
+        {
+            searchStr = searchStr.substring(0,4) + "-" + searchStr.substring(4,6) + "-" + searchStr.substring(6, 8);
+            searchMode = DemographicService.SEARCH_MODE.dob;
+            statusMode = DemographicService.STATUS_MODE.all;
         } 
-        else if( activeOnly ) {
-        	OscarProperties props = OscarProperties.getInstance();
-        	String pstatus = props.getProperty("inactive_statuses", "IN, DE, IC, ID, MO, FI");
-            pstatus = pstatus.replaceAll("'","").replaceAll("\\s", "");
-            List<String>stati = Arrays.asList(pstatus.split(","));
+        else if (activeOnly)
+        {
+            searchMode = DemographicService.SEARCH_MODE.name;
+            statusMode = DemographicService.STATUS_MODE.active;
+        }
+        else
+        {
+            searchMode = DemographicService.SEARCH_MODE.name;
+            statusMode = DemographicService.STATUS_MODE.all;
+        }
 
-        	list = demographicDao.searchDemographicByNameAndNotStatus(searchStr, stati, 100, 0, providerNo, outOfDomain);
-        	if(list.size() == 100) {
-        		MiscUtils.getLogger().warn("More results exists than returned");
-        	}
-        }
-        else {
-        	list = demographicDao.searchDemographicByName(searchStr, 100, 0, providerNo, outOfDomain);
-        	if(list.size() == 100) {
-        		MiscUtils.getLogger().warn("More results exists than returned");
-        	}
+        DemographicCriteriaSearch demoCriteriaSearch = demoService.buildDemographicSearch(searchStr, searchMode, statusMode, sortMode);
+
+        demoCriteriaSearch.setLimit(MAX_SEARCH_RESULTS);
+        list = demographicDao.criteriaSearch(demoCriteriaSearch);
+
+        if (list.size() == demoCriteriaSearch.getLimit())
+        {
+            MiscUtils.getLogger().warn("More results exists than returned");
         }
         
-        
-        
-        List<HashMap<String, String>> secondList= new ArrayList<HashMap<String,String>>();
-        for(Demographic demo :list){
-            HashMap<String,String> h = new HashMap<String,String>();
-             h.put("fomattedDob",demo.getFormattedDob());
-             h.put("formattedName",StringEscapeUtils.escapeJava(demo.getFormattedName().replaceAll("\"", "\\\"")));
-             h.put("demographicNo",String.valueOf(demo.getDemographicNo()));
-             h.put("status",demo.getPatientStatus());
+        List<HashMap<String, String>> secondList= new ArrayList<>();
+        for(Demographic demo :list)
+        {
+            int demoId = demo.getDemographicId();
+            HashMap<String,String> hashMap = new HashMap<>();
+            LocalDate dob = demo.getDateOfBirth();
+            if (dob != null)
+            {
+                hashMap.put("formattedDob", dob.toString());
+            }
+            hashMap.put("formattedName",StringEscapeUtils.escapeJava(demo.getFormattedName().replaceAll("\"", "\\\"")));
+            hashMap.put("demographicNo",String.valueOf(demoId));
+            hashMap.put("status",demo.getPatientStatus());
              
 
-            Provider p = rx.getProvider(demo.getProviderNo());
-            if ( demo.getProviderNo() != null ) {
-                h.put("providerNo", demo.getProviderNo());
+            Provider provider = rx.getProvider(demo.getProviderNo());
+            if (demo.getProviderNo() != null)
+            {
+                hashMap.put("providerNo", demo.getProviderNo());
             }
-            if ( p.getSurname() != null && p.getFirstName() != null ) {
-                h.put("providerName", p.getSurname() + ", " + p.getFirstName());
+            if (provider.getSurname() != null && provider.getFirstName() != null)
+            {
+                hashMap.put("providerName", provider.getSurname() + ", " + provider.getFirstName());
             }
             
-            if (OscarProperties.getInstance().isPropertyActive("workflow_enhance")) {            	 
-            	 h.put("nextAppointment", AppointmentUtil.getNextAppointment(demo.getDemographicNo() + ""));
-            	 DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
-            	 DemographicCust demographicCust = demographicCustDao.find(demo.getDemographicNo());
-            	 
-            	 if (demographicCust!=null) {
-            		 String cust1 = StringUtils.trimToNull(demographicCust.getNurse());
-            		 String cust2 = StringUtils.trimToNull(demographicCust.getResident());
-            		 String cust4 = StringUtils.trimToNull(demographicCust.getMidwife())
-            				 ;
-					if (cust1 != null) {
-						h.put("cust1", cust1);
-						p = rx.getProvider(cust1);
-						h.put("cust1Name", p.getSurname() + ", " + p.getFirstName());
-					}
-					if (cust2 != null) {
-						h.put("cust2", cust2);
-						p = rx.getProvider(cust2);
-						h.put("cust2Name", p.getSurname() + ", " + p.getFirstName());
-					}
-					if (cust4 != null) {
-						h.put("cust4", cust4);
-						p = rx.getProvider(cust4);
-						h.put("cust4Name", p.getSurname() + ", " + p.getFirstName());
-					}
- 				}
- 			}
-             
-             
-             secondList.add(h);
+            if (OscarProperties.getInstance().isPropertyActive("workflow_enhance"))
+            {
+                 hashMap.put("nextAppointment", AppointmentUtil.getNextAppointment(demoId + ""));
+                 DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
+                 DemographicCust demographicCust = demographicCustDao.find(demoId);
+
+                 if (demographicCust != null)
+                 {
+                     String cust1 = StringUtils.trimToNull(demographicCust.getNurse());
+                     String cust2 = StringUtils.trimToNull(demographicCust.getResident());
+                     String cust4 = StringUtils.trimToNull(demographicCust.getMidwife());
+
+                     if (cust1 != null)
+                     {
+                        hashMap.put("cust1", cust1);
+                        provider = rx.getProvider(cust1);
+                        hashMap.put("cust1Name", provider.getSurname() + ", " + provider.getFirstName());
+                     }
+
+                     if (cust2 != null)
+                     {
+                        hashMap.put("cust2", cust2);
+                        provider = rx.getProvider(cust2);
+                        hashMap.put("cust2Name", provider.getSurname() + ", " + provider.getFirstName());
+                     }
+
+                     if (cust4 != null)
+                     {
+                        hashMap.put("cust4", cust4);
+                        provider = rx.getProvider(cust4);
+                        hashMap.put("cust4Name", provider.getSurname() + ", " + provider.getFirstName());
+                     }
+                 }
+            }
+
+            secondList.add(hashMap);
         }
 
-        HashMap<String,List<HashMap<String, String>>> d = new HashMap<String,List<HashMap<String, String>>>();
-        d.put("results",secondList);
+        HashMap<String,List<HashMap<String, String>>> demoMap = new HashMap<String,List<HashMap<String, String>>>();
+        demoMap.put("results",secondList);
         response.setContentType("text/x-json");
-        if( jqueryJSON ) {
-        	response.getWriter().print(formatJSON(secondList));
-        	response.getWriter().flush();
+        if (jqueryJSON)
+        {
+            response.getWriter().print(formatJSON(secondList));
+            response.getWriter().flush();
         }
-        else {
-        	JSONObject jsonArray = (JSONObject) JSONSerializer.toJSON( d );
-        	jsonArray.write(response.getWriter());        	
+        else
+        {
+            JSONObject jsonArray = (JSONObject) JSONSerializer.toJSON( demoMap );
+            jsonArray.write(response.getWriter());
         }
         return null;
 
     }
     
     private String formatJSON(List<HashMap<String, String>>info) {
-    	StringBuilder json = new StringBuilder("[");
-    	
-    	HashMap<String, String>record;
-    	int size = info.size();
-    	for( int idx = 0; idx < size; ++idx) {
-    		record = info.get(idx);
-    		json.append("{\"label\":\"" + record.get("formattedName") + " " + record.get("fomattedDob") + " (" + record.get("status") + ")\",\"value\":\"" + record.get("demographicNo") + "\"");
-    		json.append(",\"providerNo\":\"" + record.get("providerNo") + "\",\"provider\":\"" + record.get("providerName") + "\",\"nextAppt\":\"" + record.get("nextAppointment")+"\",");
-    		json.append("\"formattedName\":\"" + record.get("formattedName") + "\"}");
-    		
-    		if( idx < size-1) {
-    			json.append(",");
-    		}
-    	}    	
-    		json.append("]");
+        StringBuilder json = new StringBuilder("[");
 
-    	MiscUtils.getLogger().info(json.toString());
-    	return json.toString();
+        HashMap<String, String>record;
+        int size = info.size();
+        for(int idx = 0; idx < size; ++idx)
+        {
+            record = info.get(idx);
+            json.append("{\"label\":\"" + record.get("formattedName") + " " + record.get("formattedDob") + " (" + record.get("status") + ")\",\"value\":\"" + record.get("demographicNo") + "\"");
+            json.append(",\"providerNo\":\"" + record.get("providerNo") + "\",\"provider\":\"" + record.get("providerName") + "\",\"nextAppt\":\"" + record.get("nextAppointment")+"\",");
+            json.append("\"formattedName\":\"" + record.get("formattedName") + "\"}");
+
+            if(idx < size-1)
+            {
+                json.append(",");
+            }
+        }
+        json.append("]");
+
+        return json.toString();
     }
 
 }

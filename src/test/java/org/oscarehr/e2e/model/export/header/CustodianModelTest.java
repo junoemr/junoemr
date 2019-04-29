@@ -29,6 +29,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.marc.everest.datatypes.ENXP;
@@ -37,6 +38,7 @@ import org.marc.everest.datatypes.NullFlavor;
 import org.marc.everest.datatypes.ON;
 import org.marc.everest.datatypes.generic.SET;
 import org.oscarehr.common.dao.ClinicDAO;
+import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.model.export.AbstractExportModelTest;
@@ -52,13 +54,14 @@ public class CustodianModelTest extends AbstractExportModelTest {
 	public static CustodianModel nullCustodianModel;
 
 	@BeforeClass
-	public static void beforeClass() {
+	public static void beforeClass() throws Exception {
 		dao = SpringUtils.getBean(ClinicDAO.class);
 		clinic = dao.getClinic();
 		custodianModel = new CustodianModel(clinic);
 
 		nullClinic = new Clinic();
 		nullCustodianModel = new CustodianModel(nullClinic);
+
 	}
 
 	@Test

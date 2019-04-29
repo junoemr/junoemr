@@ -31,6 +31,7 @@ import java.util.Properties;
 
 import org.oscarehr.util.LoggedInInfo;
 
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 public class FrmBCNewBorn2008Record extends FrmRecord {
@@ -42,19 +43,20 @@ public class FrmBCNewBorn2008Record extends FrmRecord {
 	public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID) throws SQLException {
 		Properties props = new Properties();
 
-		if (existingID <= 0) {
+		if (existingID <= 0)
+		{
 			
 			this.setDemoProperties(loggedInInfo, demographicNo, props);
 			props.setProperty("MothersName", demographic.getLastName() + ", " + demographic.getFirstName());
 			props.setProperty("MothersAge", String.valueOf(UtilDateUtilities.calcAge(this.date)));
-
-			props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(), dateFormat));
-			props.setProperty("formEdited", UtilDateUtilities.DateToString(new Date(), dateFormat));
-			props.setProperty("pg1_formDate", UtilDateUtilities.DateToString(new Date(), dateFormat));
-			props.setProperty("pg2_formDate", UtilDateUtilities.DateToString(new Date(), dateFormat));
-			props.setProperty("pg3_formDate", UtilDateUtilities.DateToString(new Date(), dateFormat));
+			props.setProperty("formCreated", ConversionUtils.toDateString(new Date(), dateFormat));
+			props.setProperty("formEdited", ConversionUtils.toDateString(new Date(), dateFormat));
+			props.setProperty("pg1_formDate", ConversionUtils.toDateString(new Date(), dateFormat));
+			props.setProperty("pg2_formDate", ConversionUtils.toDateString(new Date(), dateFormat));
+			props.setProperty("pg3_formDate", ConversionUtils.toDateString(new Date(), dateFormat));
 		} 
-		else {
+		else
+		{
 			String sql = "SELECT * FROM formBCNewBorn2008 WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
 			FrmRecordHelp frh = new FrmRecordHelp();
 			frh.setDateFormat(dateFormat);

@@ -139,11 +139,11 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 		return results;
 	}
 	
-    public List<ProviderData> findByProviderSite(String providerNo) {
-    	
-		String queryStr = "select * from provider p inner join providersite s on s.provider_no = p.provider_no " 
-				 + " where s.site_id in (select site_id from providersite where provider_no=?)";
-			
+    public List<ProviderData> findByProviderSite(String providerNo)
+    {
+	    String queryStr = "select * from provider p inner join providersite s on s.provider_no = p.provider_no " +
+			    "WHERE s.site_id in (select site_id from providersite where provider_no=?) " +
+			    "ORDER BY p.lastName, p.firstName";
 
 		Query query = entityManager.createNativeQuery(queryStr, modelClass);
         query.setParameter(1, providerNo);

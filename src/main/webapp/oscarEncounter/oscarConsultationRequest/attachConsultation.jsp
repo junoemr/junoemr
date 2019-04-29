@@ -108,7 +108,8 @@ String userlastname = (String) session.getAttribute("userlastname");
 	List<LabResultData> attachedLabs;
 	List<EFormData> attachedEForms;
 
-	if(StringUtils.isNumeric(requestId))
+	boolean existingRequest = StringUtils.isNumeric(requestId);
+	if(existingRequest)
 	{
 		attachedDocuments = consultationAttachmentService.getAttachedDocuments(loggedInInfo, demoNo, requestId);
 		attachedLabs = consultationAttachmentService.getAttachedLabs(loggedInInfo, demoNo, requestId);
@@ -121,11 +122,7 @@ String userlastname = (String) session.getAttribute("userlastname");
 		attachedEForms = new ArrayList<EFormData>(0);
 	}
 	String attachedDocs = "";
-	if(requestId == null || requestId.isEmpty() || requestId.equals("null"))
-	{
-		attachedDocs = "window.opener.document.EctConsultationFormRequestForm.documents.value";
-	}
-	else
+	if(existingRequest)
 	{
 		for (EDoc document : attachedDocuments)
 		{
@@ -139,11 +136,10 @@ String userlastname = (String) session.getAttribute("userlastname");
 		{
 		    attachedDocs += (attachedDocs.equals("") ? "" : "|") + ConsultDocs.DOCTYPE_EFORM + eForm.getId();
 		}
-		attachedDocs = "\'" + attachedDocs + "\'";
 	}
 %>
 </head>
-<body onload="Oscar.AttachConsultation.init(<%=attachedDocs%>)">
+<body onload="Oscar.AttachConsultation.init(<%=!existingRequest%>,'<%=attachedDocs%>')">
 	<div class="header">
 		<h3><bean:message key="oscarEncounter.oscarConsultationRequest.AttachDocPopup.header"/>&nbsp<%=patientName%></h3>
 	</div>
@@ -235,7 +231,8 @@ String userlastname = (String) session.getAttribute("userlastname");
 				                    <div>
 				                        <input class="tightCheckbox1"
 						                        type="checkbox" name="docNo" id="docNo<%=curDoc.getDocId()%>"
-						                        value="<%=curDoc.getDocId()%>"/>
+						                        value="<%=curDoc.getDocId()%>"
+				                                <%=curDoc.isPrintable() ? "":"disabled=\"disabled\""%>/>
 					                    <div class="hiddenLabel doc"><%=truncatedDisplayName%></div>
 					                    <img title="<%= printTitle %>" src="<%= printImage %>" alt="<%= printAlt %>">
 					                    <a class="preview-link-name" href="#" onclick="<%=onClick%>" >

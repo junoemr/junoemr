@@ -39,17 +39,17 @@
 %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
-<%@page import="org.oscarehr.util.MiscUtils"%>
-<%@page import="org.oscarehr.util.LoggedInInfo" %>
-<%@page import="org.oscarehr.caisi_integrator.ws.CachedProvider"%>
-<%@page import="org.oscarehr.caisi_integrator.ws.FacilityIdStringCompositePk"%>
-<%@page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager"%>
+<%@page import="org.apache.commons.lang.StringUtils"%>
 <%@page import="org.apache.commons.lang.time.DateFormatUtils"%>
+<%@page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager" %>
+<%@page import="org.oscarehr.caisi_integrator.ws.CachedProvider"%>
 <%@page import="org.oscarehr.caisi_integrator.ws.DemographicTransfer"%>
-<%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchResult"%>
+<%@page import="org.oscarehr.caisi_integrator.ws.FacilityIdStringCompositePk"%>
 <%@page import="org.oscarehr.caisi_integrator.ws.MatchingDemographicTransferScore"%>
 <%@page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
+<%@page import="org.oscarehr.demographic.dao.DemographicDao"%>
+<%@page import="org.oscarehr.demographic.model.Demographic"%>
+<%@page import="org.oscarehr.demographic.search.DemographicCriteriaSearch"%>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -72,14 +72,17 @@
 
 %>
 
-<%@ page import="java.util.*, java.net.URLEncoder, oscar.*" errorPage="errorpage.jsp" %>
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.demographic.dao.DemographicDao" %>
-<%@ page import="oscar.oscarDemographic.data.DemographicMerged" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="org.oscarehr.demographic.service.DemographicService" %>
-<%@ page import="org.oscarehr.demographic.search.DemographicCriteriaSearch" %>
-<%@ page import="org.oscarehr.demographic.model.Demographic" %>
+<%@ page import="org.oscarehr.demographic.service.DemographicService,
+                 org.oscarehr.util.MiscUtils,
+                 org.oscarehr.util.SpringUtils"
+         errorPage="errorpage.jsp" %>
+<%@page import="oscar.Misc" %>
+<%@page import="oscar.oscarDemographic.data.DemographicMerged" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ResourceBundle" %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties"	scope="session" />
 
@@ -504,65 +507,69 @@ Boolean isLocal(MatchingDemographicTransferScore matchingDemographicTransferScor
 List<Demographic> doSearch(DemographicDao demographicDao, LoggedInInfo loggedInInfo, String searchMode, String searchStatus, String searchKeyword, int limit, int offset, String orderBy, boolean outOfDomain) {
 	DemographicService demoSrvc = (DemographicService) SpringUtils.getBean("demographic.service.DemographicService");
 
-	DemographicService.STATIS_MODE statisMode = DemographicService.STATIS_MODE.all;
+	DemographicService.STATUS_MODE statusMode = DemographicService.STATUS_MODE.all;
 	if( "inactive".equals(searchStatus) )
 	{
-		statisMode = DemographicService.STATIS_MODE.inactive;
+		statusMode = DemographicService.STATUS_MODE.inactive;
 	}
 	else if ( "active".equals(searchStatus))
 	{
-		statisMode = DemographicService.STATIS_MODE.active;
+		statusMode = DemographicService.STATUS_MODE.active;
 	}
 
 	// set sort mode
-	DemographicCriteriaSearch.SORTMODE sortMode = DemographicCriteriaSearch.SORTMODE.DemographicName;
+	DemographicCriteriaSearch.SORT_MODE sortMode = DemographicCriteriaSearch.SORT_MODE.DemographicName;
 	if (orderBy.equals("demographic_no"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.DemographicNo;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.DemographicNo;
 	}
 	else if (orderBy.equals("last_name"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.DemographicLastName;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.DemographicLastName;
 	}
 	else if(orderBy.equals("first_name"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.DemographicFirstName;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.DemographicFirstName;
 	}
 	else if (orderBy.equals("chart_no"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.ChartNo;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.ChartNo;
 	}
 	else if (orderBy.equals("dob"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.DOB;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.DOB;
 	}
 	else if (orderBy.equals("sex"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.Sex;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.Sex;
 	}
 	else if (orderBy.equals("patient_status"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.Status;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.Status;
 	}
 	else if (orderBy.equals("roster_status"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.RosterStatus;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.RosterStatus;
 	}
 	else if (orderBy.equals("phone"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.Phone;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.Phone;
 	}
 	else if (orderBy.equals("provider_name"))
 	{
-		sortMode = DemographicCriteriaSearch.SORTMODE.ProviderName;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.ProviderName;
 	}
 	else if (orderBy.equals("hin"))
 	{
-			sortMode = DemographicCriteriaSearch.SORTMODE.Hin;
+		sortMode = DemographicCriteriaSearch.SORT_MODE.Hin;
+	}
+	else if (orderBy.equals("email"))
+	{
+		sortMode = DemographicCriteriaSearch.SORT_MODE.Email;
 	}
 
 	DemographicService.SEARCH_MODE demoSearchMode = demoSrvc.searchModeStringToEnum(searchMode);
-	DemographicCriteriaSearch demoCS = demoSrvc.buildDemographicSearch(searchKeyword, demoSearchMode, statisMode, sortMode);
+	DemographicCriteriaSearch demoCS = demoSrvc.buildDemographicSearch(searchKeyword, demoSearchMode, statusMode, sortMode);
 	demoCS.setLimit(limit);
 	demoCS.setOffset(offset);
 	return demographicDao.criteriaSearch(demoCS);

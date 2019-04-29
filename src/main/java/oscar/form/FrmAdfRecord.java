@@ -9,6 +9,7 @@ import java.util.Properties;
 import org.oscarehr.util.LoggedInInfo;
 
 import oscar.oscarDB.DBHandler;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 public class FrmAdfRecord extends FrmRecord {
@@ -27,17 +28,15 @@ public class FrmAdfRecord extends FrmRecord {
 			if (rs.next()) {
 				java.util.Date date = UtilDateUtilities.calcDate(oscar.Misc.getString(rs, "year_of_birth"), oscar.Misc.getString(rs, "month_of_birth"), oscar.Misc.getString(rs, "date_of_birth"));
 				props.setProperty("demographic_no", oscar.Misc.getString(rs, "demographic_no"));
-				props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(), _dateFormat));
-				// props.setProperty("formEdited",
-				// UtilDateUtilities.DateToString(new Date(),_dateFormat));
+				props.setProperty("formCreated", ConversionUtils.toDateString(new Date(), _dateFormat));
 				props.setProperty("c_surname", oscar.Misc.getString(rs, "last_name"));
 				props.setProperty("c_givenName", oscar.Misc.getString(rs, "first_name"));
 				props.setProperty("c_address", oscar.Misc.getString(rs, "address") + ", " + oscar.Misc.getString(rs, "city") + ", " + oscar.Misc.getString(rs, "province") + " " + oscar.Misc.getString(rs, "postal"));
 				props.setProperty("c_phn", oscar.Misc.getString(rs, "hin"));
-				props.setProperty("pg1_dateOfBirth", UtilDateUtilities.DateToString(date, _dateFormat));
+				props.setProperty("pg1_dateOfBirth", ConversionUtils.toDateString(date, _dateFormat));
 				props.setProperty("pg1_age", String.valueOf(UtilDateUtilities.calcAge(date)));
 				props.setProperty("c_phone", oscar.Misc.getString(rs, "phone"));
-				props.setProperty("sigDate", UtilDateUtilities.DateToString(new Date(), _dateFormat));
+				props.setProperty("sigDate", ConversionUtils.toDateString(new Date(), _dateFormat));
 			}
 			rs.close();
 		} else {
@@ -84,12 +83,9 @@ public class FrmAdfRecord extends FrmRecord {
 		return ((frh).findActionValue(submit));
 	}
 
-	public String createActionURL(
-		String where,
-		String action,
-		String demoId,
-		String formId)
-		throws SQLException {
+	public String createActionURL(String where, String action, String demoId, String formId)
+		throws SQLException
+	{
 		FrmRecordHelp frh = new FrmRecordHelp();
 		frh.setDateFormat(_dateFormat);
 		return ((frh).createActionURL(where, action, demoId, formId));

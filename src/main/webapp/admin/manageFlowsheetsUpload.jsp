@@ -58,6 +58,7 @@
 <%@ page import="org.oscarehr.common.model.Flowsheet" %>
 <%@ page import="org.oscarehr.common.dao.FlowsheetDao" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 
 <%
 boolean isMultipart = FileUpload.isMultipartContent(request);
@@ -77,30 +78,41 @@ try {
             String contents = item.getString();
             
             //validate the data
-            //TODO: make sure no duplicates
             MeasurementFlowSheet fs = null;
             fs = MeasurementTemplateFlowSheetConfig.getInstance().validateFlowsheet(contents);
+
+            //Check if flowsheet is in the flowsheet table
+			FlowsheetDao flowsheetDao = (FlowsheetDao)SpringUtils.getBean("flowsheetDao");
+			Flowsheet existingFlowsheet = flowsheetDao.findByName(fs.getName());
             if(fs != null) {
-            	//save to db
-            	Flowsheet f = new Flowsheet();
-            	f.setContent(contents);
-            	f.setCreatedDate(new java.util.Date());
-            	f.setEnabled(true);
-            	f.setExternal(false);
-            	f.setName(fs.getName());
-            	
-            	FlowsheetDao flowsheetDao = (FlowsheetDao)SpringUtils.getBean("flowsheetDao");
-            	flowsheetDao.persist(f);
-            	MeasurementTemplateFlowSheetConfig.getInstance().reloadFlowsheets();            	
+				if(existingFlowsheet == null)
+				{
+					//save to db
+					Flowsheet f = new Flowsheet();
+					f.setContent(contents);
+					f.setCreatedDate(new java.util.Date());
+					f.setEnabled(true);
+					f.setExternal(false);
+					f.setName(fs.getName());
+
+					flowsheetDao.persist(f);
+				} else
+				{
+					existingFlowsheet.setContent(contents);
+					flowsheetDao.merge(existingFlowsheet);
+				}
+
+				MeasurementTemplateFlowSheetConfig.getInstance().reloadFlowsheets();
             } else {
-            	//error            	
-            }                                   
+				MiscUtils.getLogger().error("Invalid Flowsheet XML Format");
+            }
         }
     }
-} catch (FileUploadException e) {
-    
+} catch (FileUploadException e)
+{
+	MiscUtils.getLogger().error("Flowsheet Upload Error: ", e);
 } catch (Exception e) {
-    
+	MiscUtils.getLogger().error("Error Uploading Flowsheet: ", e);
 }   
 
 response.sendRedirect("manageFlowsheets.jsp");

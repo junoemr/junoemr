@@ -7,7 +7,7 @@ import java.util.Properties;
 
 import org.oscarehr.util.LoggedInInfo;
 
-import oscar.util.UtilDateUtilities;
+import oscar.util.ConversionUtils;
 
 public class FrmBCARRecord extends FrmRecord {
 	
@@ -19,16 +19,18 @@ public class FrmBCARRecord extends FrmRecord {
 
 		Properties props = new Properties();
 
-		if (existingID <= 0) {
-
+		if (existingID <= 0)
+		{
 			this.setDemoProperties(loggedInInfo, demographicNo, props);
 
-			props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(), dateFormat));
-			props.setProperty("pg1_formDate", UtilDateUtilities.DateToString(new Date(), dateFormat));
-			props.setProperty("pg2_formDate", UtilDateUtilities.DateToString(new Date(), dateFormat));
-			props.setProperty("pg3_formDate", UtilDateUtilities.DateToString(new Date(), dateFormat));
+			props.setProperty("formCreated", ConversionUtils.toDateString(new Date(), dateFormat));
+			props.setProperty("pg1_formDate", ConversionUtils.toDateString(new Date(), dateFormat));
+			props.setProperty("pg2_formDate", ConversionUtils.toDateString(new Date(), dateFormat));
+			props.setProperty("pg3_formDate", ConversionUtils.toDateString(new Date(), dateFormat));
 
-		} else {
+		}
+		else
+		{
 			String sql = "SELECT * FROM formBCAR WHERE demographic_no = " + demographicNo + " AND ID = " + existingID;
 			FrmRecordHelp frh = new FrmRecordHelp();
 			frh.setDateFormat(dateFormat);

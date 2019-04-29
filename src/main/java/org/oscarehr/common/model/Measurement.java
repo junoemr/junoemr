@@ -124,7 +124,7 @@ public class Measurement extends AbstractModel<Integer> implements Serializable 
 	}
 
 	public void setMeasuringInstruction(String measuringInstruction) {
-		this.measuringInstruction = measuringInstruction;
+		this.measuringInstruction = StringUtils.trimToEmpty(measuringInstruction);
 	}
 
 	public String getComments() {
