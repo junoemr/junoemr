@@ -142,7 +142,6 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			$scope.onSelect = function onSelect($item, $model, $label, $event)
 			{
-				console.log('typeaheadHelper::onSelect - setting model', $item);
 				$scope.model = $item;
 			};
 
@@ -161,7 +160,6 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 			{
 				if (!$scope.hasForceSelectionEnabled())
 				{
-					console.log('typeaheadHelper::onChange - setting model (isTypeaheadSearchQuery)');
 					// as user types into the typeahead, select a 'dummy' selection;
 					// consumers need to check the isTypeaheadSearchQuery property
 					$scope.onSelect($scope.createDummySelection());

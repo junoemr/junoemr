@@ -41,154 +41,164 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 	 * Converts TO, excluding provider and extras.
 	 */
 	@Override
-	public Demographic getAsDomainObject(LoggedInInfo loggedInInfo,DemographicTo1 t) throws ConversionException {
-		Demographic d = new Demographic();
-		
-		d.setDemographicNo(t.getDemographicNo());
-		d.setPhone(t.getPhone());
-		d.setPatientStatus(t.getPatientStatus());
-		d.setPatientStatusDate(t.getPatientStatusDate());
-		d.setRosterStatus(t.getRosterStatus());
-		d.setProviderNo(t.getProviderNo());
-		d.setMyOscarUserName(t.getMyOscarUserName());
-		d.setHin(t.getHin());
-		d.setAddress(t.getAddress().getAddress());
-		d.setProvince(t.getAddress().getProvince());
-		d.setVer(t.getVer());
-		d.setSex(t.getSex());
-		d.setDateOfBirth(t.getDobDay());
-		d.setMonthOfBirth(t.getDobMonth());
-		d.setYearOfBirth(t.getDobYear());
-		d.setSexDesc(t.getSexDesc());
-		d.setDateJoined(t.getDateJoined());
-		d.setFamilyDoctor(t.getFamilyDoctor());
+	public Demographic getAsDomainObject(LoggedInInfo loggedInInfo,DemographicTo1 transfer) throws ConversionException {
+		Demographic demographic = new Demographic();
+
+		demographic.setDemographicNo(transfer.getDemographicNo());
+		demographic.setPhone(transfer.getPhone());
+		demographic.setPatientStatus(transfer.getPatientStatus());
+		demographic.setPatientStatusDate(transfer.getPatientStatusDate());
+		demographic.setRosterStatus(transfer.getRosterStatus());
+		demographic.setProviderNo(transfer.getProviderNo());
+		demographic.setMyOscarUserName(transfer.getMyOscarUserName());
+		demographic.setHin(transfer.getHin());
+		demographic.setAddress(transfer.getAddress().getAddress());
+		demographic.setProvince(transfer.getAddress().getProvince());
+		demographic.setVer(transfer.getVer());
+		demographic.setSex(transfer.getSex());
+		demographic.setDateOfBirth(transfer.getDobDay());
+		demographic.setMonthOfBirth(transfer.getDobMonth());
+		demographic.setYearOfBirth(transfer.getDobYear());
+		demographic.setSexDesc(transfer.getSexDesc());
+		demographic.setDateJoined(transfer.getDateJoined());
+		demographic.setFamilyDoctor(transfer.getFamilyDoctor());
 		if (OscarProperties.getInstance().isPropertyActive("demographic_family_doctor"))
 		{
-			d.setFamilyDoctor2(t.getFamilyDoctor2());
+			demographic.setFamilyDoctor2(transfer.getFamilyDoctor2());
 		}
-		d.setCity(t.getAddress().getCity());
-		d.setFirstName(t.getFirstName());
-		d.setPostal(t.getAddress().getPostal());
-		d.setHcRenewDate(t.getHcRenewDate());
-		d.setPhone2(t.getAlternativePhone());
-		d.setPcnIndicator(t.getPcnIndicator());
-		d.setEndDate(t.getEndDate());
-		d.setLastName(t.getLastName());
-		d.setHcType(t.getHcType());
-		d.setChartNo(t.getChartNo());
-		d.setEmail(t.getEmail());
-		
-		d.setEffDate(t.getEffDate());
-		d.setRosterDate(t.getRosterDate());
-		d.setRosterTerminationDate(t.getRosterTerminationDate());
-		d.setRosterTerminationReason(t.getRosterTerminationReason());
-		d.setLinks(t.getRosterTerminationReason());
-		d.setAlias(t.getAlias());
-		d.setPreviousAddress(t.getPreviousAddress().getAddress());
-		d.setChildren(t.getChildren());
-		d.setSourceOfIncome(t.getSourceOfIncome());
-		d.setCitizenship(t.getCitizenship());
-		d.setSin(t.getSin());
-		d.setAnonymous(t.getAnonymous());
-		d.setSpokenLanguage(t.getSpokenLanguage());
-		d.setActiveCount(t.getActiveCount());
-		d.setHsAlertCount(t.getHsAlertCount());
-		d.setTitle(t.getTitle());
-		d.setOfficialLanguage(t.getOfficialLanguage());
-		d.setCountryOfOrigin(t.getCountryOfOrigin());
-		d.setNewsletter(t.getNewsletter());
+		demographic.setCity(transfer.getAddress().getCity());
+		demographic.setFirstName(transfer.getFirstName());
+		demographic.setPostal(transfer.getAddress().getPostal());
+		demographic.setHcRenewDate(transfer.getHcRenewDate());
+		demographic.setPhone2(transfer.getAlternativePhone());
+		demographic.setPcnIndicator(transfer.getPcnIndicator());
+		demographic.setEndDate(transfer.getEndDate());
+		demographic.setLastName(transfer.getLastName());
+		demographic.setHcType(transfer.getHcType());
+		demographic.setChartNo(transfer.getChartNo());
+		demographic.setEmail(transfer.getEmail());
 
-		DemographicExt[] exts = new DemographicExt[t.getExtras().size()];
-		for (int i = 0; i < t.getExtras().size(); i++) {
-			exts[i] = demoExtConverter.getAsDomainObject(loggedInInfo,t.getExtras().get(i));
+		demographic.setEffDate(transfer.getEffDate());
+		demographic.setRosterDate(transfer.getRosterDate());
+		demographic.setRosterTerminationDate(transfer.getRosterTerminationDate());
+		demographic.setRosterTerminationReason(transfer.getRosterTerminationReason());
+		demographic.setLinks(transfer.getRosterTerminationReason());
+		demographic.setAlias(transfer.getAlias());
+		demographic.setPreviousAddress(transfer.getPreviousAddress().getAddress());
+		demographic.setChildren(transfer.getChildren());
+		demographic.setSourceOfIncome(transfer.getSourceOfIncome());
+		demographic.setCitizenship(transfer.getCitizenship());
+		demographic.setSin(transfer.getSin());
+		demographic.setAnonymous(transfer.getAnonymous());
+		demographic.setSpokenLanguage(transfer.getSpokenLanguage());
+		demographic.setActiveCount(transfer.getActiveCount());
+		demographic.setHsAlertCount(transfer.getHsAlertCount());
+		demographic.setTitle(transfer.getTitle());
+		demographic.setOfficialLanguage(transfer.getOfficialLanguage());
+		demographic.setCountryOfOrigin(transfer.getCountryOfOrigin());
+		demographic.setNewsletter(transfer.getNewsletter());
+		demographic.setNameOfMother(transfer.getNameOfMother());
+		demographic.setNameOfFather(transfer.getNameOfFather());
+
+		DemographicExt[] exts = new DemographicExt[transfer.getExtras().size()];
+		for (int i = 0; i < transfer.getExtras().size(); i++) {
+			exts[i] = demoExtConverter.getAsDomainObject(loggedInInfo,transfer.getExtras().get(i));
 			
-			if (exts[i].getDemographicNo()==null) exts[i].setDemographicNo(d.getDemographicNo());
-			if (exts[i].getProviderNo()==null) exts[i].setProviderNo(loggedInInfo.getLoggedInProviderNo());
+			if (exts[i].getDemographicNo() == null)
+			{
+				exts[i].setDemographicNo(demographic.getDemographicNo());
+			}
+			if (exts[i].getProviderNo() == null)
+			{
+				exts[i].setProviderNo(loggedInInfo.getLoggedInProviderNo());
+			}
 		}
-		d.setExtras(exts);
+		demographic.setExtras(exts);
 
-		if (t.getProvider() != null) {
-			d.setProvider(providerConverter.getAsDomainObject(loggedInInfo, t.getProvider()));
+		if (transfer.getProvider() != null) {
+			demographic.setProvider(providerConverter.getAsDomainObject(loggedInInfo, transfer.getProvider()));
 		}
 
-		return d;
+		return demographic;
 	}
 
 	@Override
-	public DemographicTo1 getAsTransferObject(LoggedInInfo loggedInInfo,Demographic d) throws ConversionException {
-		DemographicTo1 t = new DemographicTo1();
-		
-		t.setDemographicNo(d.getDemographicNo());
-		t.setPhone(d.getPhone());
-		t.setPatientStatus(d.getPatientStatus());
-		t.setPatientStatusDate(d.getPatientStatusDate());
-		t.setRosterStatus(d.getRosterStatus());
-		t.setProviderNo(d.getProviderNo());
-		t.setMyOscarUserName(d.getMyOscarUserName());
-		t.setHin(d.getHin());
-		t.getAddress().setAddress(d.getAddress());
-		t.getAddress().setProvince(d.getProvince());
-		t.setVer(d.getVer());
-		t.setSex(d.getSex());
+	public DemographicTo1 getAsTransferObject(LoggedInInfo loggedInInfo,Demographic demographic) throws ConversionException {
+		DemographicTo1 transfer = new DemographicTo1();
+
+		transfer.setDemographicNo(demographic.getDemographicNo());
+		transfer.setPhone(demographic.getPhone());
+		transfer.setPatientStatus(demographic.getPatientStatus());
+		transfer.setPatientStatusDate(demographic.getPatientStatusDate());
+		transfer.setRosterStatus(demographic.getRosterStatus());
+		transfer.setProviderNo(demographic.getProviderNo());
+		transfer.setMyOscarUserName(demographic.getMyOscarUserName());
+		transfer.setHin(demographic.getHin());
+		transfer.getAddress().setAddress(demographic.getAddress());
+		transfer.getAddress().setProvince(demographic.getProvince());
+		transfer.setVer(demographic.getVer());
+		transfer.setSex(demographic.getSex());
 		try {
-			t.setDateOfBirth(d.getBirthDay().getTime());
+			transfer.setDateOfBirth(demographic.getBirthDay().getTime());
 		} catch (Exception e ) {
-			logger.warn("Unable to parse date: " + d.getBirthDayAsString());
+			logger.warn("Unable to parse date: " + demographic.getBirthDayAsString());
 		}
-		t.setDobYear(d.getYearOfBirth());
-		t.setDobMonth(d.getMonthOfBirth());
-		t.setDobDay(d.getDateOfBirth());
-		t.setSexDesc(d.getSexDesc());
-		t.setDateJoined(d.getDateJoined());
-		t.setFamilyDoctor(d.getFamilyDoctor());
+		transfer.setDobYear(demographic.getYearOfBirth());
+		transfer.setDobMonth(demographic.getMonthOfBirth());
+		transfer.setDobDay(demographic.getDateOfBirth());
+		transfer.setSexDesc(demographic.getSexDesc());
+		transfer.setDateJoined(demographic.getDateJoined());
+		transfer.setFamilyDoctor(demographic.getFamilyDoctor());
 		if (OscarProperties.getInstance().isPropertyActive("demographic_family_doctor"))
 		{
-			t.setFamilyDoctor2(d.getFamilyDoctor2());
+			transfer.setFamilyDoctor2(demographic.getFamilyDoctor2());
 		}
-		t.getAddress().setCity(d.getCity());
-		t.setFirstName(d.getFirstName());
-		t.getAddress().setPostal(d.getPostal());
-		t.setHcRenewDate(d.getHcRenewDate());
-		t.setAlternativePhone(d.getPhone2());
-		t.setPcnIndicator(d.getPcnIndicator());
-		t.setEndDate(d.getEndDate());
-		t.setLastName(d.getLastName());
-		t.setHcType(d.getHcType());
-		t.setChartNo(d.getChartNo());
-		t.setEmail(d.getEmail());
-		t.setEffDate(d.getEffDate());
-		t.setRosterDate(d.getRosterDate());
-		t.setRosterTerminationDate(d.getRosterTerminationDate());
-		t.setRosterTerminationReason(d.getRosterTerminationReason());
-		t.setLinks(d.getRosterTerminationReason());
-		t.setAlias(d.getAlias());
-		t.getPreviousAddress().setAddress(d.getPreviousAddress());
-		t.setChildren(d.getChildren());
-		t.setSourceOfIncome(d.getSourceOfIncome());
-		t.setCitizenship(d.getCitizenship());
-		t.setSin(d.getSin());
-		t.setAnonymous(d.getAnonymous());
-		t.setSpokenLanguage(d.getSpokenLanguage());
-		t.setActiveCount(d.getActiveCount());
-		t.setHsAlertCount(d.getHsAlertCount());
-		t.setLastUpdateUser(d.getLastUpdateUser());
-		t.setLastUpdateDate(d.getLastUpdateDate());
-		t.setTitle(d.getTitle());
-		t.setOfficialLanguage(d.getOfficialLanguage());
-		t.setCountryOfOrigin(d.getCountryOfOrigin());
-		t.setNewsletter(d.getNewsletter());
+		transfer.getAddress().setCity(demographic.getCity());
+		transfer.setFirstName(demographic.getFirstName());
+		transfer.getAddress().setPostal(demographic.getPostal());
+		transfer.setHcRenewDate(demographic.getHcRenewDate());
+		transfer.setAlternativePhone(demographic.getPhone2());
+		transfer.setPcnIndicator(demographic.getPcnIndicator());
+		transfer.setEndDate(demographic.getEndDate());
+		transfer.setLastName(demographic.getLastName());
+		transfer.setHcType(demographic.getHcType());
+		transfer.setChartNo(demographic.getChartNo());
+		transfer.setEmail(demographic.getEmail());
+		transfer.setEffDate(demographic.getEffDate());
+		transfer.setRosterDate(demographic.getRosterDate());
+		transfer.setRosterTerminationDate(demographic.getRosterTerminationDate());
+		transfer.setRosterTerminationReason(demographic.getRosterTerminationReason());
+		transfer.setLinks(demographic.getRosterTerminationReason());
+		transfer.setAlias(demographic.getAlias());
+		transfer.getPreviousAddress().setAddress(demographic.getPreviousAddress());
+		transfer.setChildren(demographic.getChildren());
+		transfer.setSourceOfIncome(demographic.getSourceOfIncome());
+		transfer.setCitizenship(demographic.getCitizenship());
+		transfer.setSin(demographic.getSin());
+		transfer.setAnonymous(demographic.getAnonymous());
+		transfer.setSpokenLanguage(demographic.getSpokenLanguage());
+		transfer.setActiveCount(demographic.getActiveCount());
+		transfer.setHsAlertCount(demographic.getHsAlertCount());
+		transfer.setLastUpdateUser(demographic.getLastUpdateUser());
+		transfer.setLastUpdateDate(demographic.getLastUpdateDate());
+		transfer.setTitle(demographic.getTitle());
+		transfer.setOfficialLanguage(demographic.getOfficialLanguage());
+		transfer.setCountryOfOrigin(demographic.getCountryOfOrigin());
+		transfer.setNewsletter(demographic.getNewsletter());
+		transfer.setNameOfMother(demographic.getNameOfMother());
+		transfer.setNameOfFather(demographic.getNameOfFather());
 
-		if (d.getExtras() != null) {
-			for (DemographicExt ext : d.getExtras()) {
-				t.getExtras().add(demoExtConverter.getAsTransferObject(loggedInInfo,ext));
+		if (demographic.getExtras() != null) {
+			for (DemographicExt ext : demographic.getExtras()) {
+				transfer.getExtras().add(demoExtConverter.getAsTransferObject(loggedInInfo,ext));
 			}
 		}
 
-		if (d.getProvider() != null) {
-			t.setProvider(providerConverter.getAsTransferObject(loggedInInfo,d.getProvider()));
+		if (demographic.getProvider() != null) {
+			transfer.setProvider(providerConverter.getAsTransferObject(loggedInInfo,demographic.getProvider()));
 		}
 
-		return t;
+		return transfer;
 	}
 
 	
