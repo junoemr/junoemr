@@ -25,7 +25,8 @@
     cursor: pointer;
     display: inline-block;
     position: relative;
-    background-color: #fefefe;
+    background-color: #dededd;
+    border-color: #cececc;
     min-width: 60px;
 }
 
