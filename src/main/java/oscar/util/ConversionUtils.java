@@ -58,6 +58,7 @@ public class ConversionUtils {
 	
 	public static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
 	public static final String DEFAULT_TIME_PATTERN = "HH:mm:ss";
+	public static final String TIME_PATTERN_NO_SEC = "HH:mm";
 	public static final String DEFAULT_TS_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
 	public static final String TS_NO_SEC_PATTERN = "yyyy-MM-dd H:mm";
@@ -93,11 +94,11 @@ public class ConversionUtils {
 	}
 
 	public static Date fromTimeStringNoSeconds(String timeString) {
-		return fromDateString(timeString, "HH:mm");
+		return fromDateString(timeString, TIME_PATTERN_NO_SEC);
 	}
 	
 	public static String toTimeStringNoSeconds(Date timeString) {
-		return toDateString(timeString, "HH:mm");
+		return toDateString(timeString, TIME_PATTERN_NO_SEC);
 	}
 
 	/**
