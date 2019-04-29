@@ -204,9 +204,9 @@ angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 		controller.searchPatients = function searchPatients(term)
 		{
 			var search = {
-				type: 'Name',
-				'term': term,
-				active: true,
+				type: demographicsService.SEARCH_MODE.Name,
+				term: term,
+				status: demographicsService.STATUS_MODE.ACTIVE,
 				integrator: false,
 				outofdomain: true
 			};
@@ -214,12 +214,12 @@ angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 				function(results)
 				{
 					var resp = [];
-					for (var x = 0; x < results.content.length; x++)
+					for (var x = 0; x < results.data.length; x++)
 					{
 						resp.push(
 						{
-							demographicNo: results.content[x].demographicNo,
-							name: results.content[x].lastName + ',' + results.content[x].firstName
+							demographicNo: results.data[x].demographicNo,
+							name: results.data[x].lastName + ',' + results.data[x].firstName
 						});
 					}
 					return resp;

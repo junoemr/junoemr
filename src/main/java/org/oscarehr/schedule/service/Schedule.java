@@ -365,7 +365,7 @@ public class Schedule
 					new Integer(provider.getProviderNo()),
 					provider.getFirstName(),
 					provider.getLastName(),
-					null
+					site
 			);
 		}
 		else
@@ -376,7 +376,8 @@ public class Schedule
 					new Integer(provider.getProviderNo()),
 					provider.getFirstName(),
 					provider.getLastName(),
-					site
+					site,
+					true
 			);
 		}
 
@@ -442,7 +443,7 @@ public class Schedule
 						new Integer(result.getId().getProviderNo()),
 						result.getFirstName(),
 						result.getLastName(),
-						null
+						site
 				);
 			}
 			else
@@ -452,7 +453,8 @@ public class Schedule
 						new Integer(result.getId().getProviderNo()),
 						result.getFirstName(),
 						result.getLastName(),
-						site
+						site,
+						true
 				);
 			}
 
@@ -512,11 +514,23 @@ public class Schedule
 	}
 
 	private UserDateSchedule getUserDateSchedule(
+			LocalDate date,
+			Integer providerNo,
+			String firstName,
+			String lastName,
+			String site
+	)
+	{
+		return getUserDateSchedule(date, providerNo, firstName, lastName, site, false);
+	}
+
+	private UserDateSchedule getUserDateSchedule(
 		LocalDate date,
 		Integer providerNo,
 		String firstName,
 		String lastName,
-		String site
+		String site,
+		boolean filterScheduleBySite
 	)
 	{
 		boolean isAvailable = false;
@@ -530,7 +544,7 @@ public class Schedule
 			appointmentDao.findAppointmentDetailsByDateAndProvider(date, providerNo, site);
 
 		ScheduleDate scheduleDate;
-		if (site != null)
+		if (site != null && filterScheduleBySite)
 		{
 			scheduleDate = scheduleDateDao.findByProviderNoSiteAndDate(Integer.toString(providerNo), site, java.sql.Date.valueOf(date));
 		}

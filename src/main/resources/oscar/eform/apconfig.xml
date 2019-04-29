@@ -1148,8 +1148,9 @@
 	</databaseap>
 	<databaseap>
 		<ap-name>bcEDD</ap-name>
-		<ap-sql>SELECT c_EDD FROM formBCAR2012 f where
-			demographic_no=${demographic} order by ID desc limit 1;</ap-sql>
+		<ap-sql>SELECT bcar.c_EDD FROM
+			(select id, demographic_no, c_EDD, formEdited from formBCAR2007 UNION select id, demographic_no, c_EDD, formEdited from formBCAR2012) as bcar
+			where bcar.demographic_no=${demographic} order by bcar.formEdited desc limit 1;</ap-sql>
 		<ap-output>${c_EDD}</ap-output>
 	</databaseap>
 

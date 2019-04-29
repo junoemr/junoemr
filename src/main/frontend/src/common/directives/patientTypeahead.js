@@ -46,16 +46,16 @@ angular.module('Common.Directives').directive('junoPatientTypeahead', [
 				var deferred = $q.defer();
 
 				var params = {
-					type: 'Name',
-					'term': search,
-					active: true,
+					type: demographicsService.SEARCH_MODE.Name,
+					term: search,
+					status: demographicsService.STATUS_MODE.ACTIVE,
 					integrator: false,
 					outofdomain: true
 				};
-				demographicsService.search(params, 0, 25).then(function success(data)
+				demographicsService.search(params, 0, 25).then(
+					function success(response)
 					{
-						deferred.resolve(data.content);
-						console.log('dataa', data);
+						deferred.resolve(response.data);
 					},
 					function error()
 					{

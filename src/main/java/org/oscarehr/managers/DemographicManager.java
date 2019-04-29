@@ -31,31 +31,29 @@ import org.oscarehr.common.Gender;
 import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.dao.DemographicContactDao;
-import org.oscarehr.demographic.dao.DemographicCustArchiveDao;
-import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.demographic.dao.DemographicExtArchiveDao;
-import org.oscarehr.demographic.dao.DemographicExtDao;
-import org.oscarehr.demographic.dao.DemographicMergedDao;
 import org.oscarehr.common.dao.PHRVerificationDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Demographic.PatientStatus;
 import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.common.model.PHRVerification;
+import org.oscarehr.common.model.Provider;
+import org.oscarehr.demographic.dao.DemographicCustArchiveDao;
+import org.oscarehr.demographic.dao.DemographicCustDao;
+import org.oscarehr.demographic.dao.DemographicExtArchiveDao;
+import org.oscarehr.demographic.dao.DemographicExtDao;
+import org.oscarehr.demographic.dao.DemographicMergedDao;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.model.DemographicExtArchive;
 import org.oscarehr.demographic.model.DemographicMerged;
-import org.oscarehr.common.model.PHRVerification;
-import org.oscarehr.common.model.Provider;
 import org.oscarehr.provider.dao.RecentDemographicAccessDao;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
-import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
-import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -536,16 +534,6 @@ public class DemographicManager {
 
 	public List<String> getRosterStatusList() {
 		return demographicDao.getRosterStatuses();
-	}
-
-	public List<DemographicSearchResult> searchPatients(LoggedInInfo loggedInInfo, DemographicSearchRequest searchRequest, int startIndex, int itemsToReturn) {
-		List<DemographicSearchResult> results = demographicDao.searchPatients(loggedInInfo, searchRequest, startIndex, itemsToReturn);
-
-		return results;
-	}
-
-	public int searchPatientsCount(LoggedInInfo loggedInInfo, DemographicSearchRequest searchRequest) {
-		return demographicDao.searchPatientCount(loggedInInfo, searchRequest);
 	}
 
 	/**
