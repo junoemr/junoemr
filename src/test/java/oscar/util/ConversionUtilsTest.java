@@ -23,17 +23,24 @@
 
 package oscar.util;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
 
+import com.sun.istack.Nullable;
 import junit.framework.Assert;
 import org.junit.Test;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 public class ConversionUtilsTest
@@ -128,10 +135,15 @@ public class ConversionUtilsTest
 
 	@Test
 	public void testToTimeStringNoSeconds() {
-		List<Date> validDates = new ArrayList<>();
-		List<Date> invalidDates = new ArrayList<>();
+
+		Assert.assertEquals("", ConversionUtils.toTimeStringNoSeconds(null));
+		Date today = new Date();
+		SimpleDateFormat timeFormat = new SimpleDateFormat(ConversionUtils.TIME_PATTERN_NO_SEC);
+		String expectedTime = timeFormat.format(today);
+		Assert.assertEquals(expectedTime, ConversionUtils.toTimeStringNoSeconds(today));
 	}
 
+	// Multiple places call this - need to ensure we support all the different formats
 	@Test
 	public void testFromDateString() {
 		List<String> validDateStrings = new ArrayList<>();
@@ -140,8 +152,11 @@ public class ConversionUtilsTest
 
 	@Test
 	public void testFromTimestampString() {
-		List<String> validTimestampStrings = new ArrayList<>();
-		List<String> invalidTimestampStrings = new ArrayList<>();
+		Assert.assertNull(ConversionUtils.fromTimestampString(null));
+		Assert.assertNull(ConversionUtils.fromTimestampString(""));
+
+		// also check that this actually matches
+		Assert.assertNotNull(ConversionUtils.fromTimestampString("2019-04-09 09:05:15"));
 	}
 
 	@Test
@@ -185,9 +200,10 @@ public class ConversionUtilsTest
 		List<String> invalidIntStrings = new ArrayList<>();
 	}
 
-	// might be a really straightforward test three things, revisit
 	@Test
 	public void testToIntString() {
+		Assert.assertEquals("0", ConversionUtils.toIntString(null));
+		Assert.assertEquals("1", ConversionUtils.toIntString(1));
 	}
 
 	@Test
@@ -227,7 +243,7 @@ public class ConversionUtilsTest
 
 	@Test
 	public void testToDaysFromDate() {
-
+		// test exists as a stub but we do not currently use this function
 	}
 
 	@Test
@@ -260,56 +276,112 @@ public class ConversionUtilsTest
 
 	@Test
 	public void testGetLegacyDateFromDateString() {
+		// *** getLegacyDateFromDateString(dateString, ConversionUtils.DEFAULT_TS_PATTERN) ***
+		Assert.assertNotNull(ConversionUtils.getLegacyDateFromDateString("2019-04-03"));
+		Assert.assertNotNull(ConversionUtils.getLegacyDateFromDateString("2019-04-03 09:30:00"));
+		Assert.assertNotNull(ConversionUtils.getLegacyDateFromDateString("2019-04-03 09:30"));
+		Assert.assertNotNull(ConversionUtils.getLegacyDateFromDateString("2019-04-3"));
 
+		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("2019-4-03"));
+		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("2019-4-3"));
+		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("2019-04-03 9:30"));
+		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("2019-04-03 9:30:05"));
+		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("19-04-03"));
+		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("2019-0403"));
+		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("not a date"));
+		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString(null));
 	}
 
 	@Test
 	public void testToNullableLegacyDate() {
-
-	}
-
-	@Test
-	public void testToLegacyDate() {
+		Assert.assertNull(ConversionUtils.toNullableLegacyDate(null));
+		Calendar today = new GregorianCalendar();
+		today.set(Calendar.HOUR_OF_DAY, 0);
+		today.set(Calendar.MINUTE, 0);
+		today.set(Calendar.SECOND, 0);
+		today.set(Calendar.MILLISECOND, 0);
+		Date expectedDate = today.getTime();
+		assertThat(expectedDate, is(ConversionUtils.toNullableLegacyDate(LocalDate.now())));
 
 	}
 
 	@Test
 	public void testToNullableLegacyDateTime() {
-
+		Assert.assertNull(ConversionUtils.toNullableLegacyDateTime(null));
+		Date expectedDate = new Date();
+		LocalDateTime equalLocalDate = LocalDateTime.ofInstant(expectedDate.toInstant(), ZoneId.systemDefault());
+		assertThat(expectedDate, is(ConversionUtils.toNullableLegacyDateTime(equalLocalDate)));
+		LocalDateTime differentLocalDate = LocalDateTime.now();
+		assertThat(expectedDate, not(ConversionUtils.toNullableLegacyDateTime(differentLocalDate)));
 	}
 
+	// Need to figure out a more proper way to assert that we can properly go
+	// String -> LocalDate
+	// Date -> LocalDate
 	@Test
-	public void testToLegacyDateTime() {
-
-	}
-
-	@Test
+	@Nullable
 	public void testToNullableLocalDate() {
+		LocalDate today = LocalDate.now();
+		Date legacyDate = new Date();
+		String dateString = legacyDate.toString();
 
+		assertThat(today, is(ConversionUtils.toNullableLocalDate(dateString)));
+		assertThat(today, is(ConversionUtils.toNullableLocalDate(legacyDate)));
+
+		dateString = null;
+		Assert.assertNull(ConversionUtils.toNullableLocalDate(dateString));
+
+		legacyDate = null;
+		Assert.assertNull(ConversionUtils.toNullableLocalDate(legacyDate));
 	}
 
-	@Test
-	public void testToZonedLocalDate() {
-
-	}
-
+	// IsNewBorn
+	// getInbox [endDate, startDate]
+	// getOutbox [endDate, startDate]
 	@Test
 	public void testToLocalDate() {
 
 	}
 
+	// DocumentConverter
 	@Test
 	public void testToNullableLocalDateTime() {
 
 	}
 
+	// LocalDateTime == Date
 	@Test
 	public void testToLocalDateTime() {
 
 	}
 
+	// Date A + Date B = Date A with timestamp of date B
 	@Test
+	@SuppressWarnings("deprecation")
 	public void testCombineDateAndTime() {
+		Calendar desiredTime = new GregorianCalendar();
+		desiredTime.set(Calendar.DAY_OF_YEAR, 16);
+		desiredTime.set(Calendar.MONTH, 7);
+		desiredTime.set(Calendar.YEAR, 1969);
+		desiredTime.set(Calendar.HOUR_OF_DAY, 13);
+		desiredTime.set(Calendar.MINUTE, 32);
+		desiredTime.set(Calendar.SECOND, 0);
 
+		Date today = new Date();
+		Date timeToCombine = desiredTime.getTime();
+
+		Date combined = ConversionUtils.combineDateAndTime(today, timeToCombine);
+
+		Assert.assertEquals(combined.getHours(), 13);
+		Assert.assertEquals(combined.getMinutes(), 32);
+		Assert.assertEquals(combined.getSeconds(), 0);
+
+		Assert.assertEquals(today.getDate(), combined.getDate());
+		Assert.assertEquals(today.getMonth(), combined.getMonth());
+		Assert.assertEquals(today.getYear(), combined.getYear());
+
+		Assert.assertNotSame(timeToCombine.getYear(), combined.getYear());
+		Assert.assertNotSame(timeToCombine.getMonth(), combined.getMonth());
+		Assert.assertNotSame(timeToCombine.getDate(), combined.getDate());
 	}
 }
