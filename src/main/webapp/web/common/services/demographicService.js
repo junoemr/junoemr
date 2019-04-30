@@ -51,7 +51,6 @@ angular.module("Common.Services").service("demographicService", [
 	                if(results.data.dateJoined)results.data.dateJoined = moment(results.data.dateJoined).toDate();
 	                if(results.data.rosterTerminationDate)results.data.rosterTerminationDate = moment(results.data.rosterTerminationDate).toDate();
 	                if(results.data.rosterDate)results.data.rosterDate = moment(results.data.rosterDate).toDate();
-                    console.log('converted RESULTS: ', results.data);
                     deferred.resolve(results.data);
                 },
                 function error(errors)

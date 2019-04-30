@@ -59,6 +59,7 @@ import java.util.List;
 public class TeleplanRemittanceService
 {
 	private static final Logger logger = MiscUtils.getLogger();
+	private static final String DUPLICATE_MESSAGE = "Duplicate line item detected! ";
 
 	@Autowired
 	private TeleplanS21Dao s21Dao;
@@ -79,6 +80,7 @@ public class TeleplanRemittanceService
         MSPReconcile mspReconcile = new MSPReconcile();
 
         int recFlag = 0;
+        int lineNo = 0;
         String raNo = "";
         String forwardPage = "S21";
 
@@ -86,20 +88,25 @@ public class TeleplanRemittanceService
 	    BufferedReader input = new BufferedReader(new InputStreamReader(file));
         String nextline;
 	    logger.info("Begin Remittance file parse: " + filename);
-        
-        while ((nextline=input.readLine())!=null){
-            String header = nextline.substring(0,3);
-            if (header.equals("S21")) {
+
+	    while((nextline = input.readLine()) != null)
+	    {
+		    lineNo++;
+		    String header = nextline.substring(0, 3);
+		    if(header.equals("S21"))
+		    {
                 S21 s21 = new S21();
                 s21.parse(nextline);
                 raNo = "";
-               
-                List<TeleplanS21> rs = s21Dao.findByFilenamePaymentPayeeNo(filename, s21.getT_payment(), s21.getT_payeeno());
-                for(TeleplanS21 r:rs) {
-                	raNo = String.valueOf(r.getId());
-                }
-                if (raNo.equals("")  || raNo == null){
-                    recFlag = 1;
+
+			    List<TeleplanS21> rs = s21Dao.findByFilenamePaymentPayeeNo(filename, s21.getT_payment(), s21.getT_payeeno());
+			    for(TeleplanS21 r : rs)
+			    {
+				    raNo = String.valueOf(r.getId());
+			    }
+			    if(raNo.equals("") || raNo == null)
+			    {
+				    recFlag = 1;
                     //persist here
                     TeleplanS21 t = new TeleplanS21();
                     t.setFileName(filename);
@@ -117,10 +124,22 @@ public class TeleplanRemittanceService
                     t.setNewBalance(s21.getT_newbalance());
                     t.setFiller(s21.getT_filler());
                     t.setStatus('N');
-                    s21Dao.persist(t);
+
+                    List<TeleplanS21> s21Matches = s21Dao.findDuplicates(t);
+				    if(s21Matches.isEmpty())
+				    {
+					    s21Dao.persist(t);
+				    }
+				    else
+				    {
+					    logger.warn(getDuplicateMessage(header, lineNo, filename, t.getDataSeq()));
+					    t = s21Matches.get(0);
+				    }
                     raNo=t.getId().toString();
                 }
-            }else if (header.equals("S01")){
+            }
+		    else if(header.equals("S01"))
+		    {
                 S01 s01 = new S01(nextline);
                 if(recFlag >0){
                 	TeleplanS00 t = new TeleplanS00();
@@ -178,12 +197,20 @@ public class TeleplanRemittanceService
                     t.setIcBcWcb(s01.t_icbcwcb);
                     t.setInsurerCode(s01.t_insurercode);
                     t.setFiller(s01.t_filler);
-                    
-                    s00Dao.persist(t);
-                	
-                    mspReconcile.updateStat(MSPReconcile.SETTLED,s01.getBillingMasterNo());
+
+	                if(s00Dao.isDuplicate(t))
+	                {
+		                logger.warn(getDuplicateMessage(header, lineNo, filename, t.getDataSeq()));
+	                }
+	                else
+	                {
+		                s00Dao.persist(t);
+		                mspReconcile.updateStat(MSPReconcile.SETTLED, s01.getBillingMasterNo());
+	                }
                 }
-            }else if (header.equals("S02")  || header.equals("S00")  || header.equals("S03") ){
+		    }
+		    else if(header.equals("S02") || header.equals("S00") || header.equals("S03"))
+		    {
                 S02 s02 = new S02(nextline);
                 if (recFlag >0) {
                     recFlag = recFlag +1;
@@ -243,19 +270,31 @@ public class TeleplanRemittanceService
                     t.setIcBcWcb(s02.t_icbcwcb);
                     t.setInsurerCode(s02.t_insurercode);
                     t.setFiller(s02.t_filler);
-                    
-                    s00Dao.persist(t);
-                   
-                  
-                    if(header.equals("S02")){ //header.compareTo("S00") == 0 || header.compareTo("S03") == 0){
-                        mspReconcile.updateStat(MSPReconcile.PAIDWITHEXP,s02.getBillingMasterNo());
-                    }else if (header.equals("S03")){
-                        mspReconcile.updateStat(MSPReconcile.REFUSED,s02.getBillingMasterNo());
-                    }else if (header.equals("S00")){
-                        mspReconcile.updateStat(MSPReconcile.DATACENTERCHANGED,s02.getBillingMasterNo());
-                    }
+
+	                if(s00Dao.isDuplicate(t))
+	                {
+		                logger.warn(getDuplicateMessage(header, lineNo, filename, t.getDataSeq()));
+	                }
+	                else
+	                {
+		                s00Dao.persist(t);
+		                if(header.equals("S02"))
+		                { //header.compareTo("S00") == 0 || header.compareTo("S03") == 0){
+			                mspReconcile.updateStat(MSPReconcile.PAIDWITHEXP, s02.getBillingMasterNo());
+		                }
+		                else if(header.equals("S03"))
+		                {
+			                mspReconcile.updateStat(MSPReconcile.REFUSED, s02.getBillingMasterNo());
+		                }
+		                else if(header.equals("S00"))
+		                {
+			                mspReconcile.updateStat(MSPReconcile.DATACENTERCHANGED, s02.getBillingMasterNo());
+		                }
+	                }
                 }
-            }else if (header.equals("S04")){
+		    }
+		    else if(header.equals("S04"))
+		    {
                 S04 s04 = new S04(nextline);
                 if (recFlag >0) {
                 	TeleplanS00 t = new TeleplanS00();
@@ -323,15 +362,23 @@ public class TeleplanRemittanceService
                     t.setIcBcWcb(s04.t_icbcwcb);
                     t.setInsurerCode(s04.t_insurercode);
                     t.setFiller(s04.t_filler);
-                    
-                    s00Dao.persist(t);
-                  
-           
-                    mspReconcile.updateStat(MSPReconcile.HELD,s04.getBillingMasterNo());
+
+	                if(s00Dao.isDuplicate(t))
+	                {
+		                logger.warn(getDuplicateMessage(header, lineNo, filename, t.getDataSeq()));
+	                }
+	                else
+	                {
+		                s00Dao.persist(t);
+		                mspReconcile.updateStat(MSPReconcile.HELD, s04.getBillingMasterNo());
+	                }
                 }
-            } else if (header.equals("S23") ||header.equals("S24")){
-                S23 s23 = new S23(nextline);
-                if (recFlag >0) {
+		    }
+		    else if(header.equals("S23") || header.equals("S24"))
+		    {
+			    S23 s23 = new S23(nextline);
+			    if(recFlag > 0)
+			    {
                 	TeleplanS23 t = new TeleplanS23();
                 	t.setS21Id(Integer.parseInt(raNo));
                 	t.setFileName(filename);
@@ -354,12 +401,20 @@ public class TeleplanRemittanceService
                 	t.setAdjMade(s23.t_adjmade);
                 	t.setAdjOutstanding(s23.t_adjoutstanding);
                 	t.setFiller(s23.t_filler);
-                	
-                	s23Dao.persist(t);
 
+				    if(s23Dao.isDuplicate(t))
+				    {
+						logger.warn(getDuplicateMessage(header, lineNo, filename, t.getDataSeq()));
+				    }
+				    else
+				    {
+					    s23Dao.persist(t);
+				    }
                 }
-            } else if (header.equals("S25")){
-                S25 s25 = new S25(nextline);
+		    }
+		    else if(header.equals("S25"))
+		    {
+			    S25 s25 = new S25(nextline);
                 if (recFlag >0) {
                 	TeleplanS25 t = new TeleplanS25();
                 	t.setS21Id(Integer.parseInt(raNo));
@@ -374,10 +429,19 @@ public class TeleplanRemittanceService
                 	t.setPractitionerNo(s25.t_practitionerno);
                 	t.setMessage(s25.t_message);
                 	t.setFiller(s25.t_filler);
-                	
-                	s25Dao.persist(t);
+
+	                if(s25Dao.isDuplicate(t))
+	                {
+		                logger.warn(getDuplicateMessage(header, lineNo, filename, t.getDataSeq()));
+	                }
+	                else
+	                {
+		                s25Dao.persist(t);
+	                }
                 }
-            } else if (header.equals("S22")){
+		    }
+		    else if(header.equals("S22"))
+		    {
                 S22 s22 = new S22(nextline);
                 if (recFlag >0) {
                 	TeleplanS22 t = new TeleplanS22();
@@ -395,7 +459,15 @@ public class TeleplanRemittanceService
                 	t.setAmountBilled(s22.t_amtbilled);
                 	t.setAmountPaid(s22.t_amtpaid);
                 	t.setFiller(s22.t_filler);
-                	s22Dao.persist(t);
+
+	                if(s22Dao.isDuplicate(t))
+	                {
+		                logger.warn(getDuplicateMessage(header, lineNo, filename, t.getDataSeq()));
+	                }
+	                else
+	                {
+		                s22Dao.persist(t);
+	                }
                 }
                 
             /*
@@ -407,10 +479,13 @@ public class TeleplanRemittanceService
              *3.File with C12 records at the bottom.  
              *     one record with a status of N
              *
-             */    
-            }else if (header.equals("C12")){
-                C12 c12 = new C12(nextline);
-                if (raNo.equals("")){
+             */
+		    }
+		    else if(header.equals("C12"))
+		    {
+			    C12 c12 = new C12(nextline);
+			    if(raNo.equals(""))
+			    {
                 	
                 	List<TeleplanS21> rs = s21Dao.findByFilenamePaymentPayeeNo(filename,"","");
                     for(TeleplanS21 r:rs) {
@@ -439,7 +514,8 @@ public class TeleplanRemittanceService
                         raNo = t.getId().toString();
                     }
                 }  // This will be +1 if the records are at the bottom
-                if (recFlag > 0){
+                if (recFlag > 0)
+                {
                 	TeleplanC12 t = new TeleplanC12();
                 	t.setS21Id(Integer.parseInt(raNo));
                 	t.setFileName(filename);
@@ -456,21 +532,33 @@ public class TeleplanRemittanceService
                 	t.setExp7(c12.getT_exp7());
                 	t.setOfficeFolioClaimNo(c12.getT_officefolioclaimno());
                 	t.setFiller(c12.getT_filler());
-                	
-                	c12Dao.persist(t);
-                	
-                    mspReconcile.updateStat(MSPReconcile.REJECTED,c12.getBillingMasterNo());
+
+	                if(c12Dao.isDuplicate(t))
+	                {
+		                logger.warn(getDuplicateMessage(header, lineNo, filename, t.getDataSeq()));
+	                }
+	                else
+	                {
+		                c12Dao.persist(t);
+		                mspReconcile.updateStat(MSPReconcile.REJECTED, c12.getBillingMasterNo());
+	                }
                 }
                 forwardPage = "C12";
-           
-           }else if (header.equals("M01")){
-            
-           }
+
+		    }
+		    else if(header.equals("M01"))
+		    {
+		    }
             
         }
 	    logger.info("Completed Remittance file parse");
 
         return mapping.findForward(forwardPage);
+    }
+
+    private String getDuplicateMessage(String header, int lineNumber, String filename, String sequenceNumber)
+    {
+		return DUPLICATE_MESSAGE + filename + "[" + lineNumber + "]: " + header + " sequence number " + sequenceNumber;
     }
 }
 

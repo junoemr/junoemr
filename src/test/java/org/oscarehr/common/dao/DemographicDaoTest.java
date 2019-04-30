@@ -36,17 +36,20 @@ import org.oscarehr.common.Gender;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.SpringUtils;
 
 public class DemographicDaoTest extends DaoTestFixtures {
 
 	protected DemographicDao dao = (DemographicDao)SpringUtils.getBean("demographicDao");
+	protected ProviderDataDao providerDataDao = (ProviderDataDao) SpringUtils.getBean("providerDataDao");
 
 	@Before
 	public void before() throws Exception {
-		this.beforeForInnoDB();
 		SchemaUtils.restoreTable("demographic", "lst_gender", "admission", "demographic_merged", "program", 
-				"health_safety", "provider", "providersite", "site", "program_team","log", "Facility","demographicExt");
+				"health_safety", "provider", "providersite", "site", "program_team","log", "Facility","demographicExt",
+				"provider");
 	}
 
 	
@@ -74,10 +77,16 @@ public class DemographicDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testGetDemographicByProvider() throws Exception {
+		ProviderData provider = new ProviderData();
+		EntityDataGenerator.generateTestDataForModelClass(provider);
+		provider.setProviderNo(null);
+		providerDataDao.saveEntity(provider);
+
+
 		Demographic entity = new Demographic();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setDemographicNo(null);
-		entity.setProviderNo("000001");
+		entity.setProviderNo(provider.getId());
 		entity.setPatientStatus("AC");
 		dao.save(entity);
 

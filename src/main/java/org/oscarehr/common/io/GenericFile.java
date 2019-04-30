@@ -68,6 +68,7 @@ public class GenericFile
 
 	public static final String BILLING_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("BILLING_BASE_DIR")).getPath();
 	public static final String BILLING_REMITTANCE_DIR = new File(BILLING_BASE_DIR, props.getProperty("BILLING_REMITTANCE_DIR")).getPath();
+	public static final String BILLING_REMITTANCE_FAILED_DIR = new File(BILLING_BASE_DIR, props.getProperty("BILLING_REMITTANCE_FAILED_DIR")).getPath();
 
 	public static final String EMAIL_TEMPLATE_DIRECTORY = props.getProperty("template_file_location");
 
@@ -97,6 +98,10 @@ public class GenericFile
 	public boolean moveToBillingRemittance() throws IOException
 	{
 		return moveFile(BILLING_REMITTANCE_DIR);
+	}
+	public boolean moveToBillingRemittanceFailed() throws IOException
+	{
+		return moveFile(BILLING_REMITTANCE_FAILED_DIR);
 	}
 	public boolean moveToCorrupt() throws IOException
 	{

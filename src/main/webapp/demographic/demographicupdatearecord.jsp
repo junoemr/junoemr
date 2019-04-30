@@ -39,14 +39,16 @@
 %>
 
 <%@page import="org.apache.commons.lang.StringUtils"%>
-<%@ page import="org.oscarehr.PMmodule.model.Program, org.oscarehr.PMmodule.service.AdmissionManager, org.oscarehr.PMmodule.service.ProgramManager, org.oscarehr.PMmodule.web.GenericIntakeEditAction, org.oscarehr.common.OtherIdManager" errorPage="errorpage.jsp"%>
-
+<%@page import="org.oscarehr.PMmodule.model.Program"%>
+<%@page import="org.oscarehr.PMmodule.service.AdmissionManager"%>
+<%@page import="org.oscarehr.PMmodule.service.ProgramManager"%>
+<%@page import="org.oscarehr.PMmodule.web.GenericIntakeEditAction"%>
+<%@page import="org.oscarehr.common.OtherIdManager"%>
 <%@page import="org.oscarehr.common.dao.DemographicArchiveDao"%>
-<%@page import="org.oscarehr.demographic.dao.DemographicCustDao"%>
-<%@page import="org.oscarehr.common.dao.DemographicDao" %>
-
+<%@page import="org.oscarehr.common.dao.DemographicDao"%>
 <%@page import="org.oscarehr.common.model.ConsentType" %>
 <%@page import="org.oscarehr.common.model.Demographic" %>
+<%@page import="org.oscarehr.demographic.dao.DemographicCustDao" %>
 <%@page import="org.oscarehr.demographic.model.DemographicCust" %>
 <%@page import="org.oscarehr.demographic.model.DemographicExt" %>
 <%@page import="org.oscarehr.managers.DemographicManager" %>
@@ -54,20 +56,18 @@
 <%@page import="org.oscarehr.provider.model.ProviderPreventionManager" %>
 <%@page import="org.oscarehr.provider.service.RecentDemographicAccessService" %>
 <%@page import="org.oscarehr.util.LoggedInInfo" %>
-
-<%@ page import="org.oscarehr.util.MiscUtils" %>
-
+<%@page import="org.oscarehr.util.MiscUtils" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="oscar.MyDateFormat" %>
-
-<%@ page import="oscar.OscarProperties" %>
+<%@page import="oscar.OscarProperties" %>
 <%@page import="oscar.log.LogAction" %>
 <%@page import="oscar.log.LogConst" %>
 <%@page import="oscar.oscarWaitingList.util.WLWaitingListUtil" %>
 <%@page import="java.util.ArrayList" %>
 <%@page import="java.util.HashSet" %>
 <%@page import="java.util.List" %>
-<%@ page import="java.util.Set" %>
+<%@page import="java.util.Set" %>
+<%@page errorPage="errorpage.jsp"%>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -130,7 +130,7 @@
 	demographic.setRosterStatus(request.getParameter("roster_status"));
 	demographic.setPatientStatus(request.getParameter("patient_status"));
 	demographic.setChartNo(request.getParameter("chart_no"));
-	demographic.setProviderNo(request.getParameter("provider_no"));
+	demographic.setProviderNo(StringUtils.trimToNull(request.getParameter("provider_no")));
 	demographic.setSex(request.getParameter("sex"));
 	demographic.setPcnIndicator(request.getParameter("pcn_indicator"));
 	demographic.setHcType(request.getParameter("hc_type"));

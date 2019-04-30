@@ -34,6 +34,25 @@ angular.module("Common.Services").service("demographicsService", [
 
 		service.apiPath = '../ws/rs/demographics';
 
+		service.SEARCH_MODE = Object.freeze(
+			{
+				Name: "search_name",
+				DOB: "search_dob",
+				Phone: "search_phone",
+				Hin: "search_hin",
+				Address: "search_address",
+				Email: "search_email",
+				ChartNo: "search_chart_no",
+				DemographicNo: "search_demographic_no"
+			});
+
+		service.STATUS_MODE = Object.freeze(
+			{
+				ALL: "all",
+				ACTIVE: "active",
+				INACTIVE: "inactive"
+			});
+
 		service.quickSearch = function quickSearch(search)
 		{
 			var deferred = $q.defer();
@@ -57,21 +76,21 @@ angular.module("Common.Services").service("demographicsService", [
 			return deferred.promise;
 		};
 
-		service.search = function search(search, startIndex, itemsToReturn)
+		service.search = function search(search, page, perPage)
 		{
 			var deferred = $q.defer();
 
 			var config = Juno.Common.ServiceHelper.configHeaders();
 			config.params = {
 				jsonData: search,
-				startIndex: startIndex,
-				itemsToReturn: itemsToReturn
+				page: page,
+				perPage: perPage
 			};
 
 			junoHttp.get(service.apiPath + '/search', config).then(
 				function success(results)
 				{
-					deferred.resolve(results.data);
+					deferred.resolve(results);
 				},
 				function error(errors)
 				{
