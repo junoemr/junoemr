@@ -140,30 +140,33 @@ public class Appointment
 				}
 
 				CalendarAppointment appointment = new CalendarAppointment(
-					details.getAppointmentNo(),
-					province,
-					defaultView,
-					userProviderNo,
-					userFirstName,
-					userLastName,
-					rdohip,
-					details.getBirthday(),
-					formatName(details.getFirstName(), details.getLastName()),
-					null, // TODO get phone number
-					details.getDemographicNo(),
-					null, // TODO get patient's doctor
-					startDateTime,
-					endDateTime,
-					getStatus(rawStatus),
-					getStatusModifier(rawStatus),
-					null,
-					details.getReason(),
-					details.getNotes(),
-					null,
-					details.getLocation(),
-					false,
-					false,
-					null
+						details.getAppointmentNo(),
+						province,
+						defaultView,
+						userProviderNo,
+						userFirstName,
+						userLastName,
+						rdohip,
+						details.getBirthday(),
+						formatName(details.getFirstName(), details.getLastName()),
+						null, // TODO get phone number
+						details.getDemographicNo(),
+						null, // TODO get patient's doctor
+						startDateTime,
+						endDateTime,
+						getStatus(rawStatus),
+						getStatusModifier(rawStatus),
+						null,
+						details.getReason(),
+						details.getNotes(),
+						null,
+						details.getLocation(),
+						details.getType(),
+						details.getResources(),
+						details.getUrgency(),
+						false,
+						false,
+						null
 				);
 
 				calendarEvents.add(new CalendarEvent(

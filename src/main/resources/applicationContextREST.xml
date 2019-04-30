@@ -38,26 +38,16 @@
 		<property name="dataProvider" ref="oauthProvider"/>
 	</bean>
 
-	<bean id="validationExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.ValidationExceptionMapper"/>
-	<bean id="constraintViolationExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.ConstraintViolationExceptionExceptionMapper"/>
-	<bean id="generalExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.GeneralExceptionMapper"/>
-	<bean id="invalidFormatExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.InvalidFormatExceptionMapper"/>
-	<bean id="jsonParseExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.JsonParseExceptionMapper"/>
-	<bean id="securityExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.SecurityExceptionMapper"/>
-	<bean id="missingArgumentExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.MissingArgumentExceptionMapper"/>
-	<bean id="rateLimitExceptionMapper" class="org.oscarehr.ws.rest.exceptionMapping.RateLimitExceptionMapper"/>
+	<bean id="validationExceptionMapper"            class="org.oscarehr.ws.rest.exceptionMapping.ValidationExceptionMapper"/>
+	<bean id="constraintViolationExceptionMapper"   class="org.oscarehr.ws.rest.exceptionMapping.ConstraintViolationExceptionExceptionMapper"/>
+	<bean id="generalExceptionMapper"               class="org.oscarehr.ws.rest.exceptionMapping.GeneralExceptionMapper"/>
+	<bean id="invalidFormatExceptionMapper"         class="org.oscarehr.ws.rest.exceptionMapping.InvalidFormatExceptionMapper"/>
+	<bean id="jsonParseExceptionMapper"             class="org.oscarehr.ws.rest.exceptionMapping.JsonParseExceptionMapper"/>
+	<bean id="securityExceptionMapper"              class="org.oscarehr.ws.rest.exceptionMapping.SecurityExceptionMapper"/>
+	<bean id="missingArgumentExceptionMapper"       class="org.oscarehr.ws.rest.exceptionMapping.MissingArgumentExceptionMapper"/>
+	<bean id="rateLimitExceptionMapper"             class="org.oscarehr.ws.rest.exceptionMapping.RateLimitExceptionMapper"/>
 
 	<bean id="objectMapperProvider" class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
-
-	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider"/>
-
-	<bean id="validationInInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor">
-		<property name="provider" ref="validationProvider"/>
-	</bean>
-
-	<bean id="validationOutInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationOutInterceptor">
-		<property name="provider" ref="validationProvider"/>
-	</bean>
 
 	<jaxrs:server id="oauthService" address="/oauth">
 
@@ -83,16 +73,6 @@
 	<!-- ========================================================================================-->
 	<!-- Settings for the Juno external rest services -->
 	<!-- ========================================================================================-->
-
-	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider"/>
-
-	<bean id="validationInInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor">
-		<property name="provider" ref="validationProvider"/>
-	</bean>
-
-	<bean id="validationOutInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationOutInterceptor">
-		<property name="provider" ref="validationProvider"/>
-	</bean>
 
 	<!--
 					EXTERNAL REST SERVICES
@@ -141,7 +121,6 @@
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.ValidationExceptionMapper"/>
 
 			<!-- Juno filters. -->
-			<bean class="org.oscarehr.ws.rest.filter.LoggingFilter"/>
 			<ref bean="constraintViolationExceptionMapper"/>
 			<ref bean="objectMapperProvider"/>
 			<bean class="org.oscarehr.ws.rest.filter.LoggingFilterExternal"/>

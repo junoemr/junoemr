@@ -26,11 +26,6 @@ package org.oscarehr.common.model;
 import org.oscarehr.common.annotation.SiteLocation;
 import org.oscarehr.common.listeners.BeanValidationEventListener;
 
-import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -44,6 +39,10 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
 
 @Entity
 @EntityListeners(BeanValidationEventListener.class)

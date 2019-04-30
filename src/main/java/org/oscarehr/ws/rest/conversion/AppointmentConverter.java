@@ -34,6 +34,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.to.model.AppointmentTo1;
 import org.springframework.beans.BeanUtils;
+import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
 import java.text.ParseException;
@@ -101,6 +102,9 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		appointment.setReason(t.getReason());
 		appointment.setLocation(t.getSite());
 		appointment.setStatus(t.getEventStatusCode());
+		appointment.setResources(t.getResources());
+		appointment.setUrgency(t.getUrgency());
+		appointment.setType(t.getType());
 
 
 		//String resources = StringUtils.transformNullInEmptyString(t.getResources());
@@ -223,42 +227,32 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 
 		if(demographic != null)
 		{
-
 			birthDate = demographic.getBirthDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 			displayName = demographic.getDisplayName();
 			phone = demographic.getPhone();
 			demographicNo = demographic.getDemographicNo();
 		}
 
-		return new CalendarAppointment(
-				appointment.getId(),
-				null,
-				null,
-				null,
-				null,
-				null,
-				null,
-				birthDate,
-				displayName,
-				phone,
-				demographicNo,
-				Integer.parseInt(appointment.getProviderNo()),
-				appointment.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(),
+		CalendarAppointment calendarAppointment = new CalendarAppointment();
+		calendarAppointment.setAppointmentNo(appointment.getId());
+		calendarAppointment.setDemographicDob(birthDate);
+		calendarAppointment.setDemographicName(displayName);
+		calendarAppointment.setDemographicPhone(phone);
+		calendarAppointment.setDemographicNo(demographicNo);
+		calendarAppointment.setProviderNo(Integer.parseInt(appointment.getProviderNo())); //TODO make this a string
+		calendarAppointment.setStartTime(ConversionUtils.toLocalDateTime(appointment.getStartTime()));
+		calendarAppointment.setEndTime(ConversionUtils.toLocalDateTime(appointment.getStartTime()).plusMinutes(1));
+		calendarAppointment.setEventStatusCode(appointment.getStatus());
+		calendarAppointment.setEventStatusModifier(appointment.getAppointmentStatusModifier());
+		calendarAppointment.setReason(appointment.getReason());
+		calendarAppointment.setNotes(appointment.getNotes());
+		calendarAppointment.setType(appointment.getType());
+		calendarAppointment.setResources(appointment.getResources());
+		calendarAppointment.setSite(appointment.getLocation());
+		calendarAppointment.setTagSelfBooked(false);
+		calendarAppointment.setTagSelfCancelled(false);
 
-				// Add a minute to the end time because Oscar stores the minute before the end time
-				appointment.getEndTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusMinutes(1),
-
-				appointment.getAppointmentStatus(),
-				appointment.getAppointmentStatusModifier(),
-				null,
-				appointment.getReason(),
-				appointment.getNotes(),
-				null,
-				appointment.getLocation(),
-				false,
-				false,
-				null
-		);
+		return calendarAppointment;
 	}
 
 	@Override

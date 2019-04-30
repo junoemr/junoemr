@@ -110,7 +110,6 @@
                         </select>
                     </div>
 
-
                     <div class="form-group col-sm-6">
                         <label class="control-label">Reason</label>
                         <textarea ng-model="appointmentAddCtrl.appointment.reason" placeholder="Reason"
@@ -132,7 +131,7 @@
                     </div>
 
                     <div class="form-group col-sm-6">
-                        <label class="control-label">Resources</label> 
+                        <label class="control-label">Resources</label>
                         <input ng-model="appointmentAddCtrl.appointment.resources"
                             type="text" placeholder="Resources" class="form-control"/>
                     </div>

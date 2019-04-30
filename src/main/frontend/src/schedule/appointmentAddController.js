@@ -1,9 +1,13 @@
+import {AppointmentApi} from "../../generated/api/AppointmentApi";
+
 angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 
 	'$scope',
 	'$filter',
 	'$uibModalInstance',
 	'$timeout',
+	'$http',
+	'$httpParamSerializer',
 	'demographicService',
 	'demographicsService',
 	'me',
@@ -16,6 +20,8 @@ angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 		$filter,
 		$uibModalInstance,
 		$timeout,
+		$http,
+		$httpParamSerializer,
 		demographicService,
 		demographicsService,
 		me,
@@ -25,6 +31,9 @@ angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 	{
 
 		var controller = this;
+
+		controller.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
+			'../ws/rs');
 
 		controller.types = [];
 
@@ -153,23 +162,32 @@ angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 				return;
 			}
 
-			var x = {};
-			x.status = controller.appointment.status;
-			x.appointmentDate = controller.appointment.appointmentDate;
-			x.startTime12hWithMedian = controller.appointment.startTime;
-			x.type = controller.appointment.type;
-			x.duration = controller.appointment.duration;
-			x.providerNo = controller.appointment.providerNo;
-			x.reason = controller.appointment.reason;
-			x.notes = controller.appointment.notes;
-			x.location = controller.appointment.location;
-			x.resources = controller.appointment.resources;
-			x.urgency = controller.appointment.critical;
-			x.demographicNo = controller.appointment.demographicNo;
+			var momentStart = Juno.Common.Util.getDateAndTimeMoment(
+				controller.appointment.appointmentDate,
+				controller.formattedTime(controller.appointment.startTime));
+
+			var momentEnd = Juno.Common.Util.getDateAndTimeMoment(
+				controller.appointment.appointmentDate,
+				controller.formattedTime(controller.appointment.startTime))
+				.add(moment.duration(controller.appointment.duration, 'minutes'));
+
+			var calendarAppt = {
+				eventStatusCode: controller.appointment.status,
+				startTime: momentStart,
+				endTime: momentEnd,
+				reason: controller.appointment.reason,
+				notes: controller.appointment.notes,
+				demographicNo: controller.appointment.demographicNo,
+				providerNo: controller.appointment.providerNo,
+				site: controller.appointment.location,
+				type: controller.appointment.type,
+				resources: controller.appointment.resources,
+				urgency: controller.appointment.critical,
+			};
 
 			// TODO: make sure this works with the updated backend service (response changed)
-			console.log(JSON.stringify(x));
-			scheduleService.addAppointment(x).then(
+			console.log(JSON.stringify(calendarAppt));
+			controller.appointmentApi.addAppointment(calendarAppt).then(
 				function success(results)
 				{
 					$uibModalInstance.close(true);
@@ -178,8 +196,11 @@ angular.module('Schedule').controller('Schedule.AppointmentAddController', [
 				{
 					console.log(errors);
 				});
-
-
+		};
+		controller.formattedTime = function formattedTime(time_str)
+		{
+			// the time picker format is HH:MM AM - need to strip spaces
+			return time_str.replace(/ /g,'');
 		};
 
 

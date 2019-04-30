@@ -45,7 +45,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <html lang="en" ng-app="oscarProviderViewModule">
-<head><link href="vendors~bundle.b4bbc6bc59deaab5d10c.css" rel="stylesheet"><link href="bundle.76ba1f9b050c8fe9c3b1.css" rel="stylesheet"></head>
+<head><link href="vendors~bundle.c25b517e95b618b31bb5.css" rel="stylesheet"><link href="bundle.8ae6dd26d6b7864fb08d.css" rel="stylesheet"></head>
 <body ng-controller="Admin.Integration.Know2act.k2aConfigController as k2aConfigCtrl">
 
 <!--
@@ -106,5 +106,5 @@
 		</form>
 	</div>
 </div>
-<script type="text/javascript" src="runtime~bundle.7992018fb2957a8c565c.js"></script><script type="text/javascript" src="vendors~bundle.b4bbc6bc59deaab5d10c.js"></script><script type="text/javascript" src="bundle.76ba1f9b050c8fe9c3b1.js"></script></body>
+<script type="text/javascript" src="runtime~bundle.7992018fb2957a8c565c.js"></script><script type="text/javascript" src="vendors~bundle.c25b517e95b618b31bb5.js"></script><script type="text/javascript" src="bundle.8ae6dd26d6b7864fb08d.js"></script></body>
 </html>

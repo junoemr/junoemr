@@ -25,6 +25,7 @@ package org.oscarehr.schedule.dto;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class CalendarAppointment implements Serializable
 {
@@ -49,6 +50,9 @@ public class CalendarAppointment implements Serializable
 	private String notes;
 	private String tagNames;
 	private String site;
+	private String type;
+	private String resources;
+	private String urgency;
 	private boolean tagSelfBooked;
 	private boolean tagSelfCancelled;
 	private String tagSystemCodes;
@@ -57,12 +61,14 @@ public class CalendarAppointment implements Serializable
 	{}
 
 	public CalendarAppointment(Integer appointmentNo, String billingRegion, String billingForm,
-		String billingRdohip, String userProviderNo, String userFirstName, String userLastName, LocalDate demographicDob,
-		String demographicName, String demographicPhone,
-		Integer demographicNo, Integer providerNo,
-		LocalDateTime startTime, LocalDateTime endTime, String eventStatusCode,
-		String eventStatusModifier, Integer numInvoices, String reason, String notes, String tagNames,
-		String site, boolean tagSelfBooked, boolean tagSelfCancelled, String tagSystemCodes)
+	                           String billingRdohip, String userProviderNo, String userFirstName,
+	                           String userLastName, LocalDate demographicDob, String demographicName,
+	                           String demographicPhone, Integer demographicNo, Integer providerNo,
+	                           LocalDateTime startTime, LocalDateTime endTime, String eventStatusCode,
+	                           String eventStatusModifier, Integer numInvoices, String reason,
+	                           String notes, String tagNames, String site, String type,
+	                           String resources, String urgency, boolean tagSelfBooked,
+	                           boolean tagSelfCancelled, String tagSystemCodes)
 	{
 		this.appointmentNo = appointmentNo;
 		this.billingRegion = billingRegion;
@@ -85,6 +91,9 @@ public class CalendarAppointment implements Serializable
 		this.notes = notes;
 		this.tagNames = tagNames;
 		this.site = site;
+		this.type = type;
+		this.resources = resources;
+		this.urgency = urgency;
 		this.tagSelfBooked = tagSelfBooked;
 		this.tagSelfCancelled = tagSelfCancelled;
 		this.tagSystemCodes = tagSystemCodes;
@@ -300,6 +309,36 @@ public class CalendarAppointment implements Serializable
 		this.site = site;
 	}
 
+	public String getType()
+	{
+		return type;
+	}
+
+	public void setType(String type)
+	{
+		this.type = type;
+	}
+
+	public String getResources()
+	{
+		return resources;
+	}
+
+	public void setResources(String resources)
+	{
+		this.resources = resources;
+	}
+
+	public String getUrgency()
+	{
+		return urgency;
+	}
+
+	public void setUrgency(String urgency)
+	{
+		this.urgency = urgency;
+	}
+
 	public boolean isTagSelfBooked()
 	{
 		return tagSelfBooked;
@@ -333,64 +372,43 @@ public class CalendarAppointment implements Serializable
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-
+		if(this == o) return true;
+		if(!(o instanceof CalendarAppointment)) return false;
 		CalendarAppointment that = (CalendarAppointment) o;
-
-		if (tagSelfBooked != that.tagSelfBooked) return false;
-		if (tagSelfCancelled != that.tagSelfCancelled) return false;
-		if (appointmentNo != null ? !appointmentNo.equals(that.appointmentNo) : that.appointmentNo != null)
-			return false;
-		if (demographicDob != null ? !demographicDob.equals(that.demographicDob) : that.demographicDob != null)
-			return false;
-		if (demographicName != null ? !demographicName.equals(that.demographicName) : that.demographicName != null)
-			return false;
-		if (demographicPhone != null ? !demographicPhone.equals(that.demographicPhone) : that.demographicPhone != null)
-			return false;
-		if (demographicNo != null ? !demographicNo.equals(that.demographicNo) : that.demographicNo != null)
-			return false;
-		if (providerNo != null ? !providerNo.equals(that.providerNo) : that.providerNo != null)
-			return false;
-		if (startTime != null ? !startTime.equals(that.startTime) : that.startTime != null)
-			return false;
-		if (endTime != null ? !endTime.equals(that.endTime) : that.endTime != null) return false;
-		if (eventStatusCode != null ? !eventStatusCode.equals(that.eventStatusCode) : that.eventStatusCode != null)
-			return false;
-		if (eventStatusModifier != null ? !eventStatusModifier.equals(that.eventStatusModifier) : that.eventStatusModifier != null)
-			return false;
-		if (numInvoices != null ? !numInvoices.equals(that.numInvoices) : that.numInvoices != null)
-			return false;
-		if (reason != null ? !reason.equals(that.reason) : that.reason != null) return false;
-		if (notes != null ? !notes.equals(that.notes) : that.notes != null) return false;
-		if (tagNames != null ? !tagNames.equals(that.tagNames) : that.tagNames != null)
-			return false;
-		if (site != null ? !site.equals(that.site) : that.site != null) return false;
-		return tagSystemCodes != null ? tagSystemCodes.equals(that.tagSystemCodes) : that.tagSystemCodes == null;
+		return tagSelfBooked == that.tagSelfBooked &&
+				tagSelfCancelled == that.tagSelfCancelled &&
+				Objects.equals(appointmentNo, that.appointmentNo) &&
+				Objects.equals(billingRegion, that.billingRegion) &&
+				Objects.equals(billingForm, that.billingForm) &&
+				Objects.equals(billingRdohip, that.billingRdohip) &&
+				Objects.equals(userProviderNo, that.userProviderNo) &&
+				Objects.equals(userFirstName, that.userFirstName) &&
+				Objects.equals(userLastName, that.userLastName) &&
+				Objects.equals(demographicDob, that.demographicDob) &&
+				Objects.equals(demographicName, that.demographicName) &&
+				Objects.equals(demographicPhone, that.demographicPhone) &&
+				Objects.equals(demographicNo, that.demographicNo) &&
+				Objects.equals(providerNo, that.providerNo) &&
+				Objects.equals(startTime, that.startTime) &&
+				Objects.equals(endTime, that.endTime) &&
+				Objects.equals(eventStatusCode, that.eventStatusCode) &&
+				Objects.equals(eventStatusModifier, that.eventStatusModifier) &&
+				Objects.equals(numInvoices, that.numInvoices) &&
+				Objects.equals(reason, that.reason) &&
+				Objects.equals(notes, that.notes) &&
+				Objects.equals(tagNames, that.tagNames) &&
+				Objects.equals(site, that.site) &&
+				Objects.equals(type, that.type) &&
+				Objects.equals(resources, that.resources) &&
+				Objects.equals(urgency, that.urgency) &&
+				Objects.equals(tagSystemCodes, that.tagSystemCodes);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		int result = appointmentNo != null ? appointmentNo.hashCode() : 0;
-		result = 31 * result + (demographicDob != null ? demographicDob.hashCode() : 0);
-		result = 31 * result + (demographicName != null ? demographicName.hashCode() : 0);
-		result = 31 * result + (demographicPhone != null ? demographicPhone.hashCode() : 0);
-		result = 31 * result + (demographicNo != null ? demographicNo.hashCode() : 0);
-		result = 31 * result + (providerNo != null ? providerNo.hashCode() : 0);
-		result = 31 * result + (startTime != null ? startTime.hashCode() : 0);
-		result = 31 * result + (endTime != null ? endTime.hashCode() : 0);
-		result = 31 * result + (eventStatusCode != null ? eventStatusCode.hashCode() : 0);
-		result = 31 * result + (eventStatusModifier != null ? eventStatusModifier.hashCode() : 0);
-		result = 31 * result + (numInvoices != null ? numInvoices.hashCode() : 0);
-		result = 31 * result + (reason != null ? reason.hashCode() : 0);
-		result = 31 * result + (notes != null ? notes.hashCode() : 0);
-		result = 31 * result + (tagNames != null ? tagNames.hashCode() : 0);
-		result = 31 * result + (site != null ? site.hashCode() : 0);
-		result = 31 * result + (tagSelfBooked ? 1 : 0);
-		result = 31 * result + (tagSelfCancelled ? 1 : 0);
-		result = 31 * result + (tagSystemCodes != null ? tagSystemCodes.hashCode() : 0);
-		return result;
+
+		return Objects.hash(appointmentNo, billingRegion, billingForm, billingRdohip, userProviderNo, userFirstName, userLastName, demographicDob, demographicName, demographicPhone, demographicNo, providerNo, startTime, endTime, eventStatusCode, eventStatusModifier, numInvoices, reason, notes, tagNames, site, type, resources, urgency, tagSelfBooked, tagSelfCancelled, tagSystemCodes);
 	}
 
 	@Override
@@ -398,6 +416,12 @@ public class CalendarAppointment implements Serializable
 	{
 		return "CalendarAppointment{" +
 				"appointmentNo=" + appointmentNo +
+				", billingRegion='" + billingRegion + '\'' +
+				", billingForm='" + billingForm + '\'' +
+				", billingRdohip='" + billingRdohip + '\'' +
+				", userProviderNo='" + userProviderNo + '\'' +
+				", userFirstName='" + userFirstName + '\'' +
+				", userLastName='" + userLastName + '\'' +
 				", demographicDob=" + demographicDob +
 				", demographicName='" + demographicName + '\'' +
 				", demographicPhone='" + demographicPhone + '\'' +
@@ -412,6 +436,9 @@ public class CalendarAppointment implements Serializable
 				", notes='" + notes + '\'' +
 				", tagNames='" + tagNames + '\'' +
 				", site='" + site + '\'' +
+				", type='" + type + '\'' +
+				", resources='" + resources + '\'' +
+				", urgency='" + urgency + '\'' +
 				", tagSelfBooked=" + tagSelfBooked +
 				", tagSelfCancelled=" + tagSelfCancelled +
 				", tagSystemCodes='" + tagSystemCodes + '\'' +

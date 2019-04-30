@@ -1059,7 +1059,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				controller.page.demo.rosterStatus = controller.page.newRosterStatus;
 			}
 			controller.showAddNewRosterStatus();
-		}
+		};
 
 		//add new Patient Status
 		controller.addNewPatientStatus = function addNewPatientStatus()
@@ -1074,7 +1074,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				controller.page.demo.patientStatus = controller.page.newPatientStatus;
 			}
 			controller.showAddNewPatientStatus();
-		}
+		};
 
 		//check phone numbers
 		controller.checkPhone = function checkPhone(type)
@@ -1104,7 +1104,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				if (!isNumber(controller.page.demo.scrWPhoneExt)) controller.page.demo.scrWPhoneExt = phoneNum["WX"];
 				else phoneNum["WX"] = controller.page.demo.scrWPhoneExt;
 			}
-		}
+		};
 
 		//set preferred contact phone number
 		controller.setPreferredPhone = function setPreferredPhone()
@@ -1134,27 +1134,27 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				controller.page.workPhonePreferredMsg = prefPhTitle;
 				controller.page.workPhonePreferredColor = colorAttn;
 			}
-		}
+		};
 
 		//disable set-preferred if phone number empty
 		controller.isPhoneVoid = function isPhoneVoid(phone)
 		{
 			return (phone == null || phone == "");
-		}
+		};
 
 		//show enrollment history (roster staus history)
 		controller.showEnrollmentHistory = function showEnrollmentHistory()
 		{
 			var url = "../demographic/EnrollmentHistory.jsp?demographicNo=" + controller.page.demo.demographicNo;
 			window.open(url, "enrollmentHistory", "width=650, height=1000");
-		}
+		};
 
 		//upload photo
 		controller.launchPhoto = function launchPhoto()
 		{
 			var url = "../casemgmt/uploadimage.jsp?demographicNo=" + controller.page.demo.demographicNo;
 			window.open(url, "uploadWin", "width=500, height=300");
-		}
+		};
 
 		//manage contacts
 		controller.manageContacts = function manageContacts()
@@ -1169,19 +1169,19 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				var url = "../demographic/Contact.do?method=manage&demographic_no=" + controller.page.demo.demographicNo;
 				window.open(url, "ManageContacts", "width=960, height=700");
 			}
-		}
+		};
 
 		//print buttons
 		controller.printLabel = function printLabel(label)
 		{
 			var url = null;
-			if (label == "PDFLabel") url = "../demographic/printDemoLabelAction.do?appointment_no=null&demographic_no=" + controller.page.demo.demographicNo;
-			else if (label == "PDFAddress") url = "../demographic/printDemoAddressLabelAction.do?demographic_no=" + controller.page.demo.demographicNo;
-			else if (label == "PDFChart") url = "../demographic/printDemoChartLabelAction.do?demographic_no=" + controller.page.demo.demographicNo;
-			else if (label == "PrintLabel") url = "../demographic/demographiclabelprintsetting.jsp?demographic_no=" + controller.page.demo.demographicNo;
-			else if (label == "ClientLab") url = "../demographic/printClientLabLabelAction.do?demographic_no=" + controller.page.demo.demographicNo;
+			if (label === "PDFLabel") url = "../demographic/printDemoLabelAction.do?appointment_no=null&demographic_no=" + controller.page.demo.demographicNo;
+			else if (label === "PDFAddress") url = "../demographic/printDemoAddressLabelAction.do?demographic_no=" + controller.page.demo.demographicNo;
+			else if (label === "PDFChart") url = "../demographic/printDemoChartLabelAction.do?demographic_no=" + controller.page.demo.demographicNo;
+			else if (label === "PrintLabel") url = "../demographic/demographiclabelprintsetting.jsp?demographic_no=" + controller.page.demo.demographicNo;
+			else if (label === "ClientLab") url = "../demographic/printClientLabLabelAction.do?demographic_no=" + controller.page.demo.demographicNo;
 			window.open(url, "Print", "width=960, height=700");
-		}
+		};
 
 		//integrator buttons
 		controller.integratorDo = function integratorDo(func)
@@ -1193,7 +1193,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			else if (func == "Update") url = "../demographic/copyLinkedDemographicInfoAction.jsp?displaymode=edit&dboperation=search_detail&demographicId=" + controller.page.demo.demographicNo + "&demographic_no=" + controller.page.demo.demographicNo;
 			else if (func == "SendNote") url = "../demographic/followUpSelection.jsp?demographicId=" + controller.page.demo.demographicNo;
 			window.open(url, "Integrator", "width=960, height=700");
-		}
+		};
 
 		//MacPHR buttons
 		controller.macPHRDo = function macPHRDo(func)
@@ -1221,7 +1221,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				url = "../phr/PHRVerification.jsp?demographic_no=" + controller.page.demo.demographicNo;
 			}
 			window.open(url, "MacPHR", "width=960, height=700");
-		}
+		};
 
 		//appointment buttons
 		controller.appointmentDo = function appointmentDo(func)
@@ -1230,25 +1230,25 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			if (func == "ApptHistory") url = "../demographic/demographiccontrol.jsp?displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=25&orderby=appttime&demographic_no=" + controller.page.demo.demographicNo + "&last_name=" + encodeURI(controller.page.demo.lastName) + "&first_name=" + encodeURI(controller.page.demo.firstName);
 			else if (func == "WaitingList") url = "../oscarWaitingList/SetupDisplayPatientWaitingList.do?demographic_no=" + controller.page.demo.demographicNo;
 			window.open(url, "Appointment", "width=960, height=700");
-		}
+		};
 
 		controller.isClinicaidBilling = function isClinicaidBilling()
 		{
 			return controller.page.billregion == "CLINICAID";
-		}
+		};
 
 		//billing buttons
 		controller.billingDo = function billingDo(func)
 		{
 			var now = new Date();
 			var url = null;
-			if (func == "BillingHistory")
+			if (func === "BillingHistory")
 			{
-				if (controller.page.billregion == "CLINICAID")
+				if (controller.page.billregion === "CLINICAID")
 				{
 					url = "../billing.do?billRegion=CLINICAID&action=invoice_reports&patient_remote_id=" + controller.page.demo.demographicNo;
 				}
-				else if (controller.page.billregion == "ON")
+				else if (controller.page.billregion === "ON")
 				{
 					url = "../billing/CA/ON/billinghistory.jsp?demographic_no=" + controller.page.demo.demographicNo + "&last_name=" + encodeURI(controller.page.demo.lastName) + "&first_name=" + encodeURI(controller.page.demo.firstName) + "&orderby=appointment_date&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=10";
 				}
@@ -1257,39 +1257,39 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					url = "../billing/CA/BC/billcontroller.page.jsp?lastName=" + encodeURI(controller.page.demo.lastName) + "&firstName=" + encodeURI(controller.page.demo.firstName) + "&filterPatient=true&demographicNo=" + controller.page.demo.demographicNo;
 				}
 			}
-			else if (func == "CreateInvoice")
+			else if (func === "CreateInvoice")
 			{
-				url = "../billing.do?billRegion=" + controller.page.billregion + "&billForm=" + controller.page.defaultView + "&hotclick=&appointment_no=0&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) + "&demographic_no=" + controller.page.demo.demographicNo + "&providerview=" + controller.page.demo.providerNo + "&user_no=" + user.providerNo + "&apptProvider_no=none&appointment_date=" + now.getFullYear + "-" + (now.getMonth() + 1) + "-" + now.getDate() + "&start_time=00:00:00&bNewForm=1&status=t";
+				url = "../billing.do?billRegion=" + controller.page.billregion + "&billForm=" + controller.page.defaultView + "&hotclick=&appointment_no=0&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) + "&demographic_no=" + controller.page.demo.demographicNo + "&providerview=" + controller.page.demo.providerNo + "&user_no=" + user.providerNo + "&apptProvider_no=none&appointment_date=" + now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + "&start_time=00:00:00&bNewForm=1&status=t";
 			}
-			else if (func == "FluBilling")
+			else if (func === "FluBilling")
 			{
 				url = "../billing/CA/ON/specialtyBilling/fluBilling/addFluBilling.jsp?function=demographic&functionid=" + controller.page.demo.demographicNo + "&creator=" + user.providerNo + "&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) + "&hin=" + controller.page.demo.hin + controller.page.demo.ver + "&demo_sex=" + controller.page.demo.sex + "&demo_hctype=" + controller.page.demo.hcType + "&rd=" + encodeURI(controller.page.demo.scrReferralDoc) + "&rdohip=" + controller.page.demo.scrReferralDocNo + "&dob=" + controller.page.demo.dobYear + controller.page.demo.dobMonth + controller.page.demo.dobDay + "&mrp=" + controller.page.demo.providerNo;
 			}
-			else if (func == "HospitalBilling")
+			else if (func === "HospitalBilling")
 			{
 				url = "../billing/CA/ON/billingShortcutPg1.jsp?billRegion=" + controller.page.billregion + "&billForm=" + encodeURI(controller.page.hospitalView) + "&hotclick=&appointment_no=0&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) + "&demographic_no=" + controller.page.demo.demographicNo + "&providerview=" + controller.page.demo.providerNo + "&user_no=" + user.providerNo + "&apptProvider_no=none&appointment_date=" + now.getFullYear + "-" + (now.getMonth() + 1) + "-" + now.getDate() + "&start_time=00:00:00&bNewForm=1&status=t";
 			}
-			else if (func == "AddBatchBilling")
+			else if (func === "AddBatchBilling")
 			{
 				url = "../billing/CA/ON/addBatchBilling.jsp?demographic_no=" + controller.page.demo.demographicNo + "&creator=" + user.providerNo + "&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) + "&hin=" + controller.page.demo.hin + controller.page.demo.ver + "&dob=" + controller.page.demo.dobYear + controller.page.demo.dobMonth + controller.page.demo.dobDay;
 			}
-			else if (func == "AddINR")
+			else if (func === "AddINR")
 			{
 				url = "../billing/CA/ON/inr/addINRbilling.jsp?function=demographic&functionid=" + controller.page.demo.demographicNo + "&creator=" + user.providerNo + "&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) + "&hin=" + controller.page.demo.hin + controller.page.demo.ver + "&dob=" + controller.page.demo.dobYear + controller.page.demo.dobMonth + controller.page.demo.dobDay;
 			}
-			else if (func == "BillINR")
+			else if (func === "BillINR")
 			{
 				url = "../billing/CA/ON/inr/reportINR.jsp?provider_no=" + user.providerNo;
 			}
 			window.open(url, "Billing", "width=960, height=700");
-		}
+		};
 
 		//export demographic
 		controller.exportDemographic = function exportDemographic()
 		{
 			var url = "../demographic/demographicExport.jsp?demographicNo=" + controller.page.demo.demographicNo;
 			window.open(url, "DemographicExport", "width=960, height=700");
-		}
+		};
 
 		controller.formatDocOutput = function formatDocOutput(value)
 		{
