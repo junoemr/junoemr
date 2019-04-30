@@ -24,11 +24,9 @@
 package oscar.util;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
-import com.sun.istack.Nullable;
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -37,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -78,64 +77,60 @@ public class ConversionUtilsTest
 		assertThat(expectedList, is(resultList));
 	}
 
-	// Revisit the test cases here later
 	@Test
 	public void testFromTimeString() throws ParseException
 	{
-		List<String> validTimeFormats = new ArrayList<>();
-		validTimeFormats.add("12:30:45");
-		validTimeFormats.add("7:20:00");
-		validTimeFormats.add("10:0:27");
-		validTimeFormats.add("09:30:0");
-		validTimeFormats.add("0:0:55");
-		validTimeFormats.add("0:45:0");
-		validTimeFormats.add("0:0:0");
+		Assert.assertNull(ConversionUtils.fromTimeString(null));
+		Assert.assertNull(ConversionUtils.fromTimeString(""));
+		Assert.assertNull(ConversionUtils.fromTimeString("not a time string"));
+
+		String timeString;
 		SimpleDateFormat format = new SimpleDateFormat(ConversionUtils.DEFAULT_TIME_PATTERN);
 		Date validDate;
-		Date returnedDate;
-		for (String validTimeFormat : validTimeFormats)
-		{
-			validDate = format.parse(validTimeFormat);
-			returnedDate = ConversionUtils.fromTimeString(validTimeFormat);
-			assertThat(validDate, is(returnedDate));
 
-		}
+		timeString = "12:30:45";
+		validDate = format.parse(timeString);
+		assertThat(validDate, is(ConversionUtils.fromTimeString(timeString)));
 
-		List<String> invalidTimeFormats = new ArrayList<>();
-		invalidTimeFormats.add("12:10");
-		invalidTimeFormats.add("0:30");
-		invalidTimeFormats.add("20:0");
-		invalidTimeFormats.add("1:1");
-		invalidTimeFormats.add("00");
+		timeString = "7:20:00";
+		validDate = format.parse(timeString);
+		assertThat(validDate, is(ConversionUtils.fromTimeString(timeString)));
 
-		for (String timeFormat : invalidTimeFormats)
-		{
-			assertNull(ConversionUtils.fromTimeString(timeFormat));
-		}
+		timeString = "10:0:27";
+		validDate = format.parse(timeString);
+		assertThat(validDate, is(ConversionUtils.fromTimeString(timeString)));
+
+		timeString = "09:30:0";
+		validDate = format.parse(timeString);
+		assertThat(validDate, is(ConversionUtils.fromTimeString(timeString)));
+
+		timeString = "12:10";
+		assertNull(ConversionUtils.fromTimeString(timeString));
+
+		timeString = "1:1";
+		assertNull(ConversionUtils.fromTimeString(timeString));
+
+		timeString = "0";
+		assertNull(ConversionUtils.fromTimeString(timeString));
 	}
 
 	@Test
 	public void testFromTimeStringNoSeconds() throws ParseException {
 		Date validDate;
-		Date returnedDate;
+		String validFormat;
 		SimpleDateFormat format = new SimpleDateFormat(ConversionUtils.TIME_PATTERN_NO_SEC);
-		List<String> validTimeFormats = new ArrayList<>();
-		validTimeFormats.add("12:30");
-		validTimeFormats.add("5:15");
-		validTimeFormats.add("20:0");
-		validTimeFormats.add("1:3");
 
-		for (String validFormat : validTimeFormats)
-		{
-			validDate = format.parse(validFormat);
-			returnedDate = ConversionUtils.fromTimeStringNoSeconds(validFormat);
-			assertThat(validDate, is(returnedDate));
-		}
+		validFormat = "12:30";
+		validDate = format.parse(validFormat);
+		assertThat(validDate, is(ConversionUtils.fromTimeStringNoSeconds(validFormat)));
+
+		validFormat = "0:3";
+		validDate = format.parse(validFormat);
+		assertThat(validDate, is(ConversionUtils.fromTimeStringNoSeconds(validFormat)));
 	}
 
 	@Test
 	public void testToTimeStringNoSeconds() {
-
 		Assert.assertEquals("", ConversionUtils.toTimeStringNoSeconds(null));
 		Date today = new Date();
 		SimpleDateFormat timeFormat = new SimpleDateFormat(ConversionUtils.TIME_PATTERN_NO_SEC);
@@ -143,11 +138,15 @@ public class ConversionUtilsTest
 		Assert.assertEquals(expectedTime, ConversionUtils.toTimeStringNoSeconds(today));
 	}
 
-	// Multiple places call this - need to ensure we support all the different formats
 	@Test
 	public void testFromDateString() {
-		List<String> validDateStrings = new ArrayList<>();
-		List<String> invalidDateStrings = new ArrayList<>();
+		Assert.assertNull(ConversionUtils.fromDateString(null, null));
+		Assert.assertNull(ConversionUtils.fromDateString("", null));
+		String dateString = "2019-04-23 09:30:15";
+
+		Date returnedDate = ConversionUtils.fromDateString(dateString, ConversionUtils.DEFAULT_TS_PATTERN);
+		SimpleDateFormat formatter = new SimpleDateFormat(ConversionUtils.DEFAULT_TS_PATTERN);
+		Assert.assertEquals(dateString, formatter.format(returnedDate));
 	}
 
 	@Test
@@ -155,49 +154,90 @@ public class ConversionUtilsTest
 		Assert.assertNull(ConversionUtils.fromTimestampString(null));
 		Assert.assertNull(ConversionUtils.fromTimestampString(""));
 
-		// also check that this actually matches
-		Assert.assertNotNull(ConversionUtils.fromTimestampString("2019-04-09 09:05:15"));
+		Calendar fixedDate = new GregorianCalendar();
+		fixedDate.set(Calendar.YEAR, 2019);
+		fixedDate.set(Calendar.MONTH, 4);
+		fixedDate.set(Calendar.DAY_OF_MONTH, 9);
+		fixedDate.set(Calendar.HOUR_OF_DAY, 9);
+		fixedDate.set(Calendar.MINUTE, 5);
+		fixedDate.set(Calendar.SECOND, 15);
+		fixedDate.set(Calendar.MILLISECOND, 0);
+
+		Date expectedDay = fixedDate.getTime();
+
+		SimpleDateFormat formatter = new SimpleDateFormat(ConversionUtils.DEFAULT_TS_PATTERN);
+		String dateString = formatter.format(expectedDay);
+
+		assertThat(expectedDay, is(ConversionUtils.fromTimestampString(dateString)));
 	}
 
 	@Test
 	public void testToTimestampString() {
-		List<Date> validDates = new ArrayList<>();
-		List<Date> invalidDates = new ArrayList<>();
+		Assert.assertEquals("", ConversionUtils.toTimestampString(null));
+		Date today = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat(ConversionUtils.DEFAULT_TS_PATTERN);
+		String expectedDateString = formatter.format(today);
+		Assert.assertEquals(expectedDateString, ConversionUtils.toTimestampString(today));
 	}
 
-	// this is called everywhere... going to be a very large set of tests
-	// since we need to accommodate all of our currently supported SimpleDateFormats
+	// This gets called with a wide variety of different formats that we shouldn't try to cover
+	// Ensure that for a ConversionUtils level format and for one fed in time format it works as expected
 	@Test
 	public void testToDateString() {
-
+		Assert.assertEquals("", ConversionUtils.toDateTimeString(null));
+		Assert.assertEquals("", ConversionUtils.toDateTimeNoSecString(null));
 	}
 
 	@Test
 	public void testToDateTimeString() {
+		Assert.assertEquals("", ConversionUtils.toDateTimeString(null));
 
+		LocalDateTime now = LocalDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ConversionUtils.DEFAULT_TS_PATTERN);
+
+		String expectedString = now.format(formatter);
+
+		Assert.assertEquals(expectedString, ConversionUtils.toDateTimeString(now));
 	}
 
 	@Test
 	public void testToTimeString() {
-		List<String> validTimeStrings = new ArrayList<>();
-		List<String> invalidTimeStrings = new ArrayList<>();
-	}
+		Assert.assertEquals("", ConversionUtils.toTimeString(null));
 
-	@Test
-	public void testToDateTimeNoSecString() {
+		Calendar expectedTime = new GregorianCalendar();
+		expectedTime.set(Calendar.HOUR_OF_DAY, 13);
+		expectedTime.set(Calendar.MINUTE, 32);
+		expectedTime.set(Calendar.SECOND, 0);
 
+		Date today = expectedTime.getTime();
+		SimpleDateFormat formatter = new SimpleDateFormat(ConversionUtils.DEFAULT_TIME_PATTERN);
+		String expectedTimeString = formatter.format(today);
+
+		Assert.assertEquals(expectedTimeString, ConversionUtils.toTimeString(today));
 	}
 
 	@Test
 	public void testFromLongString () {
-		List<String> validLongStrings = new ArrayList<>();
-		List<String> invalidLongStrings = new ArrayList<>();
+		long returnedVal = ConversionUtils.fromLongString(null);
+		Assert.assertEquals(0L, returnedVal);
+		returnedVal = ConversionUtils.fromLongString("");
+		Assert.assertEquals(0L, returnedVal);
+		returnedVal = ConversionUtils.fromLongString("not a string");
+		Assert.assertEquals(0L, returnedVal);
+		returnedVal = ConversionUtils.fromLongString("12345");
+		Assert.assertEquals(12345L, returnedVal);
 	}
 
 	@Test
 	public void testFromIntString() {
-		List<String> validIntStrings = new ArrayList<>();
-		List<String> invalidIntStrings = new ArrayList<>();
+		int returnedVal = ConversionUtils.fromIntString(null);
+		Assert.assertEquals(0, returnedVal);
+		returnedVal = ConversionUtils.fromIntString("");
+		Assert.assertEquals(0, returnedVal);
+		returnedVal = ConversionUtils.fromIntString("not an integer");
+		Assert.assertEquals(0, returnedVal);
+		returnedVal = ConversionUtils.fromIntString("123456789");
+		Assert.assertEquals(123456789, returnedVal);
 	}
 
 	@Test
@@ -218,7 +258,7 @@ public class ConversionUtilsTest
 		Assert.assertFalse(ConversionUtils.fromBoolString(""));
 		Assert.assertFalse(ConversionUtils.fromBoolString(null));
 		Assert.assertFalse(ConversionUtils.fromBoolString("0"));
-		// technically this is what happens!!!!
+
 		Assert.assertTrue(ConversionUtils.fromBoolString("false"));
 		Assert.assertTrue(ConversionUtils.fromBoolString("true"));
 		Assert.assertTrue(ConversionUtils.fromBoolString("1"));
@@ -236,14 +276,7 @@ public class ConversionUtilsTest
 	@Test
 	public void testToDoubleString() {
 		Assert.assertEquals("0.3", ConversionUtils.toDoubleString(0.3));
-		// We may want to consider whether this is the behavior we really want
-		// Look at what else relies on this behavior
 		Assert.assertEquals("0", ConversionUtils.toDoubleString(null));
-	}
-
-	@Test
-	public void testToDaysFromDate() {
-		// test exists as a stub but we do not currently use this function
 	}
 
 	@Test
@@ -276,7 +309,6 @@ public class ConversionUtilsTest
 
 	@Test
 	public void testGetLegacyDateFromDateString() {
-		// *** getLegacyDateFromDateString(dateString, ConversionUtils.DEFAULT_TS_PATTERN) ***
 		Assert.assertNotNull(ConversionUtils.getLegacyDateFromDateString("2019-04-03"));
 		Assert.assertNotNull(ConversionUtils.getLegacyDateFromDateString("2019-04-03 09:30:00"));
 		Assert.assertNotNull(ConversionUtils.getLegacyDateFromDateString("2019-04-03 09:30"));
@@ -311,48 +343,26 @@ public class ConversionUtilsTest
 		Date expectedDate = new Date();
 		LocalDateTime equalLocalDate = LocalDateTime.ofInstant(expectedDate.toInstant(), ZoneId.systemDefault());
 		assertThat(expectedDate, is(ConversionUtils.toNullableLegacyDateTime(equalLocalDate)));
-		LocalDateTime differentLocalDate = LocalDateTime.now();
-		assertThat(expectedDate, not(ConversionUtils.toNullableLegacyDateTime(differentLocalDate)));
 	}
 
-	// Need to figure out a more proper way to assert that we can properly go
-	// String -> LocalDate
-	// Date -> LocalDate
 	@Test
-	@Nullable
+	@SuppressWarnings("ConstantConditions")
 	public void testToNullableLocalDate() {
 		LocalDate today = LocalDate.now();
 		Date legacyDate = new Date();
-		String dateString = legacyDate.toString();
 
-		assertThat(today, is(ConversionUtils.toNullableLocalDate(dateString)));
 		assertThat(today, is(ConversionUtils.toNullableLocalDate(legacyDate)));
-
-		dateString = null;
-		Assert.assertNull(ConversionUtils.toNullableLocalDate(dateString));
 
 		legacyDate = null;
 		Assert.assertNull(ConversionUtils.toNullableLocalDate(legacyDate));
 	}
 
-	// IsNewBorn
-	// getInbox [endDate, startDate]
-	// getOutbox [endDate, startDate]
-	@Test
-	public void testToLocalDate() {
-
-	}
-
-	// DocumentConverter
 	@Test
 	public void testToNullableLocalDateTime() {
-
-	}
-
-	// LocalDateTime == Date
-	@Test
-	public void testToLocalDateTime() {
-
+		Assert.assertNull(ConversionUtils.toNullableLocalDateTime(null));
+		Date today = new Date();
+		LocalDateTime expectedTime = LocalDateTime.ofInstant(today.toInstant(), ZoneId.systemDefault());
+		assertThat(expectedTime, is(ConversionUtils.toNullableLocalDateTime(today)));
 	}
 
 	// Date A + Date B = Date A with timestamp of date B
