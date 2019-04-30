@@ -854,8 +854,6 @@ public class EForm extends EFormBase {
 		return html;
 	}
 
-	private final int MAX_ATTRIBUTE_SEARCH = 100;
-
 	/**
 	 * find the index of the requested attribute
 	 * @param html html to parse
@@ -870,7 +868,7 @@ public class EForm extends EFormBase {
 		int currIndex = tagStart;
 		currIndex = html.indexOf(" ", currIndex);
 
-		for (int i =0; currIndex <= tagEnd && i < MAX_ATTRIBUTE_SEARCH; i++)
+		while(currIndex < tagEnd && currIndex < html.length())
 		{
 			StringBuilder attribKey = new StringBuilder();
 			StringBuilder attribString = new StringBuilder();
@@ -887,7 +885,6 @@ public class EForm extends EFormBase {
 		throw new AttributeNotFoundException("attribute [" + attrib + "] was not found");
 	}
 
-	private final int MAX_ATTRIBUTE_LENGTH = 99999;
 	/**
 	 * 	read the next attribute from an html tag.
 	 * @param html the html to scan
@@ -908,7 +905,7 @@ public class EForm extends EFormBase {
 		int attrKeyStart = currIndex;
 		int attrKeyEnd = currIndex;
 		boolean inQuotes = false;
-		for (int i =0; i < MAX_ATTRIBUTE_LENGTH; i++)
+		while(currIndex < html.length())
 		{
 			if (!inQuotes && html.charAt(currIndex) == ' ')
 			{
@@ -922,11 +919,11 @@ public class EForm extends EFormBase {
 			{
 				attrKeyEnd = currIndex;
 			}
-			else if (!inQuotes && html.charAt(currIndex) == '"')
+			else if (!inQuotes && (html.charAt(currIndex) == '"' || html.charAt(currIndex) == '\''))
 			{
 				inQuotes = true;
 			}
-			else if (inQuotes && html.charAt(currIndex) == '"')
+			else if (inQuotes && (html.charAt(currIndex) == '"' || html.charAt(currIndex) == '\''))
 			{
 				inQuotes = false;
 			}
@@ -975,7 +972,7 @@ public class EForm extends EFormBase {
 		boolean inQuotes = false;
 		for (int i = currIndex;i < html.length(); i++)
 		{
-			if (!inQuotes && html.charAt(i) == '"')
+			if (!inQuotes && (html.charAt(currIndex) == '"' || html.charAt(currIndex) == '\''))
 			{
 				inQuotes = true;
 			}
@@ -983,7 +980,7 @@ public class EForm extends EFormBase {
 			{
 				return i;
 			}
-			else if (html.charAt(i) == '"')
+			else if (html.charAt(currIndex) == '"' || html.charAt(currIndex) == '\'')
 			{
 				inQuotes = false;
 			}
