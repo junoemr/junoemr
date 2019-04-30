@@ -195,6 +195,49 @@ public class MeasurementGraphAction2 extends Action {
 		return list.toArray(new String[listSize]);
 	}
 
+	/**
+	 * pull and parse measurement parameters out of a string-based range
+	 * @param range
+	 * 		The string that we're trying to interpret
+	 * @param units
+	 * 		Any written suffix associated with the measurement that we want to discard
+	 * @return
+	 * 		A Double array containing the measurements we can pull out, empty array if we can't pull them out
+	 */
+	public static double[] getParameters(String range, String units)
+	{
+		double[] measurementParams = {};
+		if (range == null)
+		{
+			return measurementParams;
+		}
+
+		if (units != null)
+		{
+			range = range.replace(units, "");
+		}
+
+		if (range.contains("-"))
+		{
+			try
+			{
+				String[] split = range.split("-");
+				double open = Double.parseDouble(split[0]);
+				double high = Double.parseDouble(split[1]);
+				double low = Double.parseDouble(split[0]);
+				double close = Double.parseDouble(split[1]);
+				double volume = 1045;
+				measurementParams = new double[]{open, high, low, close, volume};
+			}
+			catch (NumberFormatException | ArrayIndexOutOfBoundsException ex)
+			{
+				return measurementParams;
+			}
+		}
+
+		return measurementParams;
+	}
+
 	private JFreeChart actualLabChartRef(Integer demographicNo, String labType, String identifier,String testName, String chartTitle, String[] drugs) {
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
 
@@ -235,20 +278,17 @@ public class MeasurementGraphAction2 extends Action {
 			{
 				String range = (String) mdb.get("range");
 				String units = (String) mdb.get("units");
-				if (units != null)
-				{
-					range = range.replace(units, "");
-				}
 
-				if (range.contains("-"))
+				double[] measurementRange = getParameters(range, units);
+				if (measurementRange.length > 0)
 				{
-					String[] sp = range.split("-");
-					double open = Double.parseDouble(sp[0]);
-					double high = Double.parseDouble(sp[1]);
-					double low = Double.parseDouble(sp[0]);
-					double close = Double.parseDouble(sp[1]);
-					double volume = 1045;
-					dataItems.add(new OHLCDataItem(new Day((Date) mdb.get("collDateDate")).getStart(), open, high, low, close, volume));
+					dataItems.add(new OHLCDataItem(
+							new Day((Date) mdb.get("collDateDate")).getStart(),
+							measurementRange[0],
+							measurementRange[1],
+							measurementRange[2],
+							measurementRange[3],
+							measurementRange[4]));
 				}
 			}
 

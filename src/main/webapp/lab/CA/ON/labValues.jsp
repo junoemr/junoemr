@@ -53,6 +53,7 @@
 <%@ page import="java.util.Collections" %>
 <%@ page import="oscar.oscarDemographic.data.DemographicData" %>
 <%@ page import="oscar.oscarLab.ca.on.CommonLabTestValues" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.pageUtil.MeasurementGraphAction2" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -251,16 +252,18 @@
 						{
 							try
 							{
-								String refRange = (String)hashMap.get("range");
-								Double.parseDouble((String)hashMap.get("result"));
-								if (refRange.contains("-"))
-								{
-									String[] rangeValues = refRange.split("-");
-									Double.parseDouble(rangeValues[0]);
-									Double.parseDouble(rangeValues[1]);
-								}
+								Double.parseDouble((String) hashMap.get("result"));
 							}
 							catch (NumberFormatException ex)
+							{
+								canGraph = false;
+							}
+
+							String refRange = (String)hashMap.get("range");
+							String units = (String)hashMap.get("units");
+
+							double[] possibleMeasurements = MeasurementGraphAction2.getParameters(refRange, units);
+							if (possibleMeasurements.length == 0)
 							{
 								canGraph = false;
 							}
