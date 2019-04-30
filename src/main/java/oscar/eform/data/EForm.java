@@ -47,6 +47,7 @@ import oscar.util.ConversionUtils;
 import oscar.util.StringBuilderUtils;
 import oscar.util.UtilDateUtilities;
 
+import javax.management.AttributeNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -406,10 +407,10 @@ public class EForm extends EFormBase {
 				if (curAP == null) curAP = getAPExtra(apName, fieldHeader);
 				if (curAP == null) continue;
 				if (!setAP2nd) { // 1st run
-					html = putValuesFromAP(curAP, fieldType, pointer, html);
+					html = putValuesFromAP(curAP, fieldType, pointer, markerLoc, html);
 					saveFieldValue(html, markerLoc);
 				} else { // 2nd run
-					if (needing > needValueInForm) html = putValuesFromAP(curAP, fieldType, pointer, html);
+					if (needing > needValueInForm) html = putValuesFromAP(curAP, fieldType, pointer, markerLoc, html);
 				}
 
 				log.debug("Marker ==== " + markerLoc);
@@ -774,22 +775,23 @@ public class EForm extends EFormBase {
 			final String valueKey = "value=";
 			String toInsert = valueKey + "\"" + value + "\"";
 			// The pointer is actually on the space before the first letter of the attribute name, need to move it up 1 place.
-			int attributeKeyStart = pointer + 1;
-			// If the pointer is at a value attribute, we will update it.  This is a necessary check for this implementation
-			// because on first save, this could also be an oscarUpdateDb (or some other) attribute.
+			int attributeStartIndex = pointer + 1;
 
-			if (html.substring(attributeKeyStart, attributeKeyStart + valueKey.length()).equals(valueKey))
+			try
 			{
-				// + 1 to the index here because we want to clear the opening " before looking for the closing ".
-				int attributeValueEnd = html.indexOf("\"", attributeKeyStart + valueKey.length() + 1);
-				html.delete(attributeKeyStart, attributeValueEnd + 1);
+				// look for existing value attribute and delete it.
+				attributeStartIndex = findAttributeIndex(html, pointer, valueKey);
+				int attributeEndIndex = nextAttribute(html, attributeStartIndex, null, null);
+
+				html.delete(attributeStartIndex, attributeEndIndex);
 			}
-			else
+			catch (AttributeNotFoundException e)
 			{
-				// On first insert, we need to add a space to pad our new value attribute from the one next to it
+				// new attribute
 				toInsert += " ";
 			}
-			html.insert(attributeKeyStart, toInsert);
+
+			html.insert(attributeStartIndex, toInsert);
 
 		} else if (type.equals("textarea"))
 		{
@@ -850,6 +852,143 @@ public class EForm extends EFormBase {
 			}
 		}
 		return html;
+	}
+
+	private final int MAX_ATTRIBUTE_SEARCH = 100;
+
+	/**
+	 * find the index of the requested attribute
+	 * @param html html to parse
+	 * @param tagStart position at which to start (should be the start of a tag)
+	 * @param attrib the attribute to look for
+	 * @return the index of the start of the attribute.
+	 */
+	private int findAttributeIndex(StringBuilder html, int tagStart, String attrib) throws AttributeNotFoundException
+	{
+		int tagEnd = findTagEnd(html, tagStart);
+
+		int currIndex = tagStart;
+		currIndex = html.indexOf(" ", currIndex);
+
+		for (int i =0; currIndex <= tagEnd && i < MAX_ATTRIBUTE_SEARCH; i++)
+		{
+			StringBuilder attribKey = new StringBuilder();
+			StringBuilder attribString = new StringBuilder();
+			int attributeEnd = nextAttribute(html, currIndex, attribKey, attribString);
+
+			if (attribKey.toString().equals(attrib))
+			{
+				return nextNonSpace(html, currIndex);
+			}
+
+			currIndex = attributeEnd;
+		}
+
+		throw new AttributeNotFoundException("attribute [" + attrib + "] was not found");
+	}
+
+	private final int MAX_ATTRIBUTE_LENGTH = 99999;
+	/**
+	 * 	read the next attribute from an html tag.
+	 * @param html the html to scan
+	 * @param currIndex  the index at which to start
+	 * @param attributeKey the key part of the attribute string
+	 * @param attributeString the attribute tag string (return value)
+	 * @return end index of the attribute (index of trainling white space).
+	 */
+	private int nextAttribute(StringBuilder html, int currIndex, StringBuilder attributeKey, StringBuilder attributeString)
+	{
+		// eat white space up to the attribute
+		while (html.charAt(currIndex) == ' ')
+		{
+			currIndex ++;
+		}
+
+		// read attribute
+		int attrKeyStart = currIndex;
+		int attrKeyEnd = currIndex;
+		boolean inQuotes = false;
+		for (int i =0; i < MAX_ATTRIBUTE_LENGTH; i++)
+		{
+			if (!inQuotes && html.charAt(currIndex) == ' ')
+			{
+				break;
+			}
+			if (!inQuotes && html.charAt(currIndex) == '>')
+			{
+				break;
+			}
+			else if (!inQuotes && html.charAt(currIndex) == '=')
+			{
+				attrKeyEnd = currIndex;
+			}
+			else if (!inQuotes && html.charAt(currIndex) == '"')
+			{
+				inQuotes = true;
+			}
+			else if (inQuotes && html.charAt(currIndex) == '"')
+			{
+				inQuotes = false;
+			}
+
+			currIndex ++;
+		}
+
+		if (attributeKey != null)
+		{
+			attributeKey.append(html.substring(attrKeyStart, attrKeyEnd + 1));
+		}
+		if (attributeString != null)
+		{
+			attributeString.append(html.substring(attrKeyStart, currIndex));
+		}
+		return currIndex;
+	}
+
+	/**
+	 * get the index of the next non space character
+	 * @param html html to scan
+	 * @param currIndex current index in the string
+	 * @return index of the next non space character
+	 */
+	private int nextNonSpace(StringBuilder html, int currIndex)
+	{
+		while(currIndex < html.toString().length())
+		{
+			if (html.charAt(currIndex) != ' ')
+			{
+				break;
+			}
+			currIndex++;
+		}
+		return currIndex;
+	}
+
+	/**
+	 * locate the end '>' of a tag.
+	 * @param html the html to scan
+	 * @param currIndex the index at which to start. cannot be inside quotes
+	 * @return the index if the '>' character.
+	 */
+	private int findTagEnd(StringBuilder html, int currIndex)
+	{
+		boolean inQuotes = false;
+		for (int i = currIndex;i < html.length(); i++)
+		{
+			if (!inQuotes && html.charAt(i) == '"')
+			{
+				inQuotes = true;
+			}
+			else if(!inQuotes && html.charAt(i) == '>')
+			{
+				return i;
+			}
+			else if (html.charAt(i) == '"')
+			{
+				inQuotes = false;
+			}
+		}
+		return 0;
 	}
 
 	private int nextIndex(StringBuilder text, String option1, String option2, int pointer) {
@@ -939,7 +1078,7 @@ public class EForm extends EFormBase {
  *
  */
 
-	private StringBuilder putValuesFromAP(DatabaseAP ap, String type, int pointer, StringBuilder html) {
+	private StringBuilder putValuesFromAP(DatabaseAP ap, String type, int pointer, int tagStart, StringBuilder html) {
 		//prepare all sql & output
 		String sql = ap.getApSQL();
 		String output = ap.getApOutput();
@@ -978,6 +1117,20 @@ public class EForm extends EFormBase {
 				html = html.insert(pointer, " selected");
 			}
 		} else { //type=input
+
+			//delete existing value tag
+			try
+			{
+				int attributeStartIndex = findAttributeIndex(html, tagStart, "value=");
+				int attributeEndIndex = nextAttribute(html, attributeStartIndex, null, null);
+				html.delete(attributeStartIndex, attributeEndIndex);
+				pointer = attributeStartIndex;
+			}
+			catch (AttributeNotFoundException e)
+			{
+				//guess there is no value tag...
+			}
+
 			output = output.replace("\"", "&quot;");
 			html.insert(pointer, " value=\""+output+"\"");
 			log.debug("insert: (" + pointer + ")' value=\""+output+"\"'");
