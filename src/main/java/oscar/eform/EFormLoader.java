@@ -57,6 +57,11 @@ public class EFormLoader {
         return _instance;
     }
 
+    static public void clearDatabaseAPs()
+    {
+        eFormAPs = new Vector<DatabaseAP>();
+    }
+
     static public void addDatabaseAP(DatabaseAP ap) {
         String processed = ap.getApOutput();
         //-------allow user to enter '\n' for new line---
