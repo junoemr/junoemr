@@ -57,7 +57,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		var controller = this;
 
-		console.log("in summary Ctrl ", $stateParams);
 
 		controller.page = {};
 		controller.page.columnOne = {};
@@ -158,7 +157,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		//Note display functions
 		controller.addMoreItems = function addMoreItems()
 		{
-			console.log(controller.busy);
 			if (controller.busy) return;
 
 			controller.busy = true;
@@ -166,13 +164,11 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			noteService.getNotesFrom($stateParams.demographicNo, controller.index, 20, controller.page.noteFilter).then(
 				function success(results)
 				{
-					console.log('whats the data', angular.isUndefined(results.notelist), results.notelist);
 					if (angular.isDefined(results.notelist))
 					{
 						//controller.page.notes = data;
 						if (results.notelist instanceof Array)
 						{
-							console.log("ok its in an array", controller.busy);
 							for (var i = 0; i < results.notelist.length; i++)
 							{
 								controller.page.notes.notelist.push(results.notelist[i]);
@@ -264,13 +260,11 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		$rootScope.$on('noteSaved', function(event, data)
 		{
-			console.log('new data coming in', data);
 			var noteFound = false;
 			for (var notecount = 0; notecount < controller.page.notes.notelist.length; notecount++)
 			{
 				if (data.uuid == controller.page.notes.notelist[notecount].uuid)
 				{
-					console.log('uuid ' + data.uuid + ' notecount ' + notecount, data, controller.page.notes.notelist[notecount]);
 					controller.page.notes.notelist[notecount] = data;
 					noteFound = true;
 					break;
@@ -486,7 +480,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			summaryService.getSummaryHeaders($stateParams.demographicNo, 'left').then(
 				function success(results)
 				{
-					console.log("left", results);
 					controller.page.columnOne.modules = results;
 					fillItems(controller.page.columnOne.modules);
 				},
@@ -505,7 +498,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			summaryService.getSummaryHeaders($stateParams.demographicNo, 'right').then(
 				function success(results)
 				{
-					console.log("right", results);
 					controller.page.columnThree.modules = results;
 					fillItems(controller.page.columnThree.modules);
 				},
@@ -593,19 +585,13 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 						itvCheck = null;
 						editingNoteId = null;
 					}
-					console.log('Modal dismissed at: ' + new Date());
 					console.log(errors);
 				});
-
-			console.log($('#myModal'));
 		};
 
 
 		controller.gotoState = function gotoState(item, mod, itemId)
 		{
-			console.log('ITEM: ', item);
-			console.log('MOD: ', mod);
-
 			if (item == "add")
 			{
 				controller.editGroupedNotes('md', mod, null);
@@ -733,7 +719,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				},
 				function error(errors)
 				{
-					console.log('Modal dismissed at: ' + new Date());
 					console.log(errors);
 				});
 		};

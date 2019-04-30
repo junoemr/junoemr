@@ -47,6 +47,9 @@
 		<netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
 		<tomcat.version>7.0.76</tomcat.version>
 		<webpack.env>prod</webpack.env>
+		<antrun.skip.jspc>false</antrun.skip.jspc>
+		<oscar.use.integration.prop>false</oscar.use.integration.prop>
+		<oscar.dbinit.skip>false</oscar.dbinit.skip>
 	</properties>
 	<repositories>
 		<repository>
@@ -1251,6 +1254,11 @@
 			<artifactId>javax.annotation-api</artifactId>
 			<version>1.3.1</version>
 		</dependency>-->
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>3.141.59</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<resources>
@@ -1578,25 +1586,29 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<skipTests>false</skipTests>
-					<argLine>-Xms1024m -Xmx1024m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
-					<excludes>
-						<exclude>**/AR2005*.java</exclude>
-						<exclude>**/OntarioMDSpec4DataTest.java</exclude>
-						<exclude>**/ONAREnhancedBornConnectorTest.java</exclude>
-					</excludes>
-					<systemPropertyVariables>
-						<oscar.dbinit.skip>${oscar.dbinit.skip}</oscar.dbinit.skip>
-						<buildDirectory>${project.build.directory}</buildDirectory>
-					</systemPropertyVariables>
-<!--					<properties>
-						<property>
-							<name>junit</name>
-							<value>false</value>
-						</property>
-					</properties>-->
-				</configuration>
+				<executions>
+					<execution>
+						<id>default-test</id>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<phase>test</phase>
+						<configuration>
+							<skipTests>false</skipTests>
+							<argLine>-Xms1024m -Xmx1024m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
+							<excludes>
+								<exclude>**/AR2005*.java</exclude>
+								<exclude>**/OntarioMDSpec4DataTest.java</exclude>
+								<exclude>**/ONAREnhancedBornConnectorTest.java</exclude>
+								<exclude>integration/tests/*</exclude>
+							</excludes>
+							<systemPropertyVariables>
+								<oscar.skip.dbinit>${oscar.dbinit.skip}</oscar.skip.dbinit>
+								<buildDirectory>${project.build.directory}</buildDirectory>
+							</systemPropertyVariables>
+						</configuration>
+					</execution>
+				</executions>
 				<version>2.10</version>
 			</plugin>
 			<plugin>
@@ -1764,6 +1776,7 @@
 							<goal>run</goal>
 						</goals>
 						<configuration>
+							<skip>${antrun.skip.jspc}</skip>
 							<target>
 								<property name="build.compiler" value="extJavac"/>
 								<property name='jspc_target' value="${project.name}-${project.version}"/>
@@ -2099,6 +2112,99 @@
 			</build>
 		</profile>
 		<profile>
+			<id>integration</id>
+			<activation>
+				<property>
+					<name>environment</name>
+					<value>integration</value>
+				</property>
+			</activation>
+			<properties>
+				<antrun.skip.jspc>true</antrun.skip.jspc>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.tomcat.maven</groupId>
+						<artifactId>tomcat7-maven-plugin</artifactId>
+						<version>2.2</version>
+						<executions>
+							<execution>
+								<id>tomcat7-run</id>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<phase>pre-integration-test</phase>
+								<configuration>
+									<port>9090</port>
+									<path>/</path>
+									<hostName>localhost</hostName>
+									<fork>true</fork>
+									<systemProperties>
+										<oscar.use.integration.prop.file>true</oscar.use.integration.prop.file>
+									</systemProperties>
+								</configuration>
+							</execution>
+							<execution>
+								<id>tomcat7-shutdown</id>
+								<goals>
+									<goal>shutdown</goal>
+								</goals>
+								<phase>post-integration-test</phase>
+								<configuration>
+									<path>/</path>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>default-test</id>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<phase>test</phase>
+								<configuration>
+									<skipTests>false</skipTests>
+									<argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
+									<test>SetupDatabase</test>
+									<systemPropertyVariables>
+										<oscar.skip.dbinit>${oscar.dbinit.skip}</oscar.skip.dbinit>
+										<buildDirectory>${project.build.directory}</buildDirectory>
+									</systemPropertyVariables>
+								</configuration>
+							</execution>
+							<execution>
+								<id>integration-test</id>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<phase>integration-test</phase>
+								<configuration>
+									<skipTests>false</skipTests>
+									<argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
+									<excludes>
+										<exclude>**/SetupDatabase.java</exclude>
+									</excludes>
+									<includes>
+										<include>integration/tests/*</include>
+									</includes>
+									<systemPropertyVariables>
+										<oscar.skip.dbinit>true</oscar.skip.dbinit>
+										<buildDirectory>${project.build.directory}</buildDirectory>
+									</systemPropertyVariables>
+								</configuration>
+							</execution>
+						</executions>
+						<version>2.10</version>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
 			<id>environment-dev</id>
 			<activation>
 				<property>
@@ -2233,6 +2339,11 @@
 								<version>${tomcat.version}</version>
 							</dependency>
 						</dependencies>
+						<configuration>
+							<systemProperties>
+								<oscar.use.integration.prop.file>${oscar.use.integration.prop}</oscar.use.integration.prop.file>
+							</systemProperties>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>

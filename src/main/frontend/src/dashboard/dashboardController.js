@@ -57,7 +57,6 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
         {
             return new Date();
         };
-        console.log('TABLE PARAMS', NgTableParams);
         controller.me = null;
         controller.k2aActive = false;
 	    controller.k2aFeedActive = false;
@@ -347,8 +346,6 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
             k2aService.getK2aFeed(startPoint, numberOfRows).then(
                 function(response)
                 {
-                	console.log("k2a feed response", response);
-
 	                if (response.content instanceof Array)
 	                {
 	                	var content = response.content;

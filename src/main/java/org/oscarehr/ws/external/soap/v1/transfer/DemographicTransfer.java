@@ -95,6 +95,8 @@ public final class DemographicTransfer {
 	private String newsletter;
 	private String veteranNo;
 	private String notes;
+	private String nameOfMother;
+	private String nameOfFather;
 
 	
 	public Integer getDemographicNo() {
@@ -555,8 +557,31 @@ public final class DemographicTransfer {
 		return notes;
 	}
 
+	public String getNameOfMother()
+	{
+		return nameOfMother;
+	}
+
+	public String getNameOfFather()
+	{
+		return nameOfFather;
+	}
+
+	public void setNameOfMother(String mother)
+	{
+		this.nameOfMother = mother;
+	}
+
+	public void setNameOfFather(String father)
+	{
+		this.nameOfFather = father;
+	}
+
 	public static DemographicTransfer toTransfer(Demographic demographic) {
-		if (demographic==null) return(null);
+		if (demographic == null)
+		{
+			return null;
+		}
 		
 		DemographicTransfer demographicTransfer = new DemographicTransfer();
 
@@ -568,8 +593,8 @@ public final class DemographicTransfer {
 			DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
 			Map<String,String> demoExt = demographicExtDao.getAllValuesForDemo(demographic.getDemographicNo());
 			demographicTransfer.setCellPhone(demoExt.get("demo_cell"));
-			//demographicTransfer.setCellPhone(apptMainBean.getString(demoExt.get("demo_cell")));
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			Logger logger = Logger.getLogger(DemographicTransfer.class);
 			logger.error("Failed to get extended demographic data into DemographicTransform.", e);

@@ -76,7 +76,6 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 						console.log('hiding patientlist');
 					}
 				}
-				console.log("params", params);
 				$state.go('record.summary', params);
 			}
 		};

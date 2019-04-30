@@ -18,10 +18,10 @@ window.encounterTimer =
             let timeHours = parseInt(parseInt(currTime.seconds / 60) / 60);
 
             if (timeHours > 0) {
-                timer.html((timeHours < 10 ? ("0" + timeHours).slice(-2) : timeHours) + ":" +
+                timer.val((timeHours < 10 ? ("0" + timeHours).slice(-2) : timeHours) + ":" +
                     (timeMinutes < 10 ? ("0" + timeMinutes).slice(-2) : timeMinutes) + ":" + ("0" + timeSeconds).slice(-2));
             } else {
-                timer.html((timeMinutes < 10 ? ("0" + timeMinutes).slice(-2) : timeMinutes) + ":" + ("0" + timeSeconds).slice(-2));
+                timer.val((timeMinutes < 10 ? ("0" + timeMinutes).slice(-2) : timeMinutes) + ":" + ("0" + timeSeconds).slice(-2));
             }
 
             //modify color if over certain time
@@ -72,7 +72,7 @@ window.encounterTimer =
         let activeNote = jQuery($(caseNote));
         if (activeNote.length && timer.length) {
             let endTime = new Date();
-            let timeStr = timer.html();
+            let timeStr = timer.val();
 
             if (timeStr.split(":").length < 3) {
                 timeStr = "00:" + timeStr;
@@ -92,5 +92,5 @@ window.encounterTimer =
 
 jQuery(document).ready( function () {
     encounterTimer.startTime = new Date();
-    encounterTimer.intervalId = window.setInterval(encounterTimer.updateTimer, 1000, "#encounter_timer", "#encounter_timer_background", encounterTimer.currentTime, encounterTimer.isPaused);
+    encounterTimer.intervalId = window.setInterval(encounterTimer.updateTimer, 1000, "#encounter_timer", "#encounter_timer", encounterTimer.currentTime, encounterTimer.isPaused);
 });

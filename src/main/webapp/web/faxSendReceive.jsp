@@ -42,7 +42,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <html lang="en" ng-app="oscarProviderViewModule">
-<head><link href="vendors~bundle.c25b517e95b618b31bb5.css" rel="stylesheet"><link href="bundle.8ae6dd26d6b7864fb08d.css" rel="stylesheet"></head>
+<head><link href="vendors~bundle.c25b517e95b618b31bb5.css" rel="stylesheet"><link href="bundle.aad48bc8738b916c5fd6.css" rel="stylesheet"></head>
 <body ng-controller="Admin.Integration.Fax.FaxSendReceiveController as faxSendReceiveController">
 
 <link href="<%=request.getContextPath() %>/library/bootstrap/3.0.0/css/bootstrap.css" rel="stylesheet">
@@ -211,5 +211,5 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="runtime~bundle.7992018fb2957a8c565c.js"></script><script type="text/javascript" src="vendors~bundle.c25b517e95b618b31bb5.js"></script><script type="text/javascript" src="bundle.8ae6dd26d6b7864fb08d.js"></script></body>
+<script type="text/javascript" src="runtime~bundle.7992018fb2957a8c565c.js"></script><script type="text/javascript" src="vendors~bundle.c25b517e95b618b31bb5.js"></script><script type="text/javascript" src="bundle.aad48bc8738b916c5fd6.js"></script></body>
 </html>

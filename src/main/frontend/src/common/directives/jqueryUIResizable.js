@@ -4,8 +4,6 @@ require('jquery-ui/ui/widgets/resizable');
 angular.module('Common.Directives').directive('resizable', [
 	function()
 	{
-		console.log('RESIZABLE DIRECTIVE LOADED');
-
 		return {
 			restrict: 'A',
 			scope:
@@ -14,8 +12,6 @@ angular.module('Common.Directives').directive('resizable', [
 			},
 			link: function postLink(scope, elem, attrs)
 			{
-
-				console.log('RESIZABLE DIRECTIVE HEIGHT ', $(".note-editor-textarea").height());
 				elem.resizable(
 				{
 					handles: 'n, nw, ne',
