@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.log4j.Logger;
+import org.json.simple.parser.ParseException;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentArchive;
@@ -40,17 +41,21 @@ import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.external.soap.v1.transfer.AppointmentArchiveTransfer;
-import org.oscarehr.ws.external.soap.v1.transfer.AppointmentTransfer;
-import org.oscarehr.ws.external.soap.v1.transfer.AppointmentTypeTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentArchiveTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentTypeTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.Appointment.ValidatedAppointmentBookingTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.DayWorkScheduleTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ScheduleTemplateCodeTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.jws.WebService;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -120,14 +125,14 @@ public class ScheduleWs extends AbstractWs {
 		else return (DayWorkScheduleTransfer.toTransfer(dayWorkSchedule));
 	}
 
-	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots(
-			String providerNo, Calendar date, String[] appointmentTypes, String demographicNo, String bookingRulesStr)
+	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots (
+			String providerNo, Calendar date, String[] appointmentTypes, String demographicNo, String jsonRules)
 	{
 		HashMap<String, DayTimeSlots[]> scheduleTransfer = new HashMap<>();
-
 		try
 		{
-			Map<String, Object> bookingRules = new ObjectMapper().readValue(bookingRulesStr, new TypeReference<Map<String, Object>>(){});
+			// TODO:  changed booking rule object, will need to rewrite appointment search
+			Map<String, Object> bookingRules = new ObjectMapper().readValue(jsonRules, new TypeReference<Map<String, Object>>(){});
 			ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(providerNo, date, appointmentTypes, demographicNo, bookingRules);
 			scheduleTransfer = providerScheduleTransfer.toTransfer();
 		}
@@ -137,6 +142,30 @@ public class ScheduleWs extends AbstractWs {
 		}
 
 		return scheduleTransfer;
+	}
+
+	public ValidatedAppointmentBookingTransfer addAppointmentValidated(AppointmentTransfer appointmentTransfer, String jsonRules) throws ParseException
+	{
+		Appointment appointment = new Appointment();
+		appointmentTransfer.copyTo(appointment);
+
+		List<BookingRule> bookingRules = BookingRuleFactory.createBookingRuleSet(jsonRules);
+		List<BookingRule> violatedRules = new ArrayList<>();
+		for (BookingRule rule : bookingRules)
+		{
+			if (!rule.isViolated(appointment))
+			{
+				violatedRules.add(rule);
+			}
+		}
+
+		if (violatedRules.isEmpty())
+		{
+			scheduleManager.addAppointment(getLoggedInInfo(), getLoggedInSecurity(), appointment);
+		}
+
+		ValidatedAppointmentBookingTransfer response = new ValidatedAppointmentBookingTransfer(appointment, violatedRules);
+		return response;
 	}
 
 	public AppointmentTypeTransfer[] getAppointmentTypes() {

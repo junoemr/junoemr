@@ -24,6 +24,7 @@
 package org.oscarehr.common.dao;
 
 import java.time.DateTimeException;
+import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import java.util.TreeMap;
 
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
+
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.Appointment;
@@ -189,7 +191,6 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 		return rs;
 	}
 
-
 	public List<Appointment> findByDateRangeAndProvider(Date startTime, Date endTime, String providerNo) {
 		String sql = "SELECT a FROM Appointment a WHERE a.appointmentDate >=? and a.appointmentDate < ? and providerNo = ?";
 
@@ -198,7 +199,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 		query.setParameter(2, endTime);
 		query.setParameter(3, providerNo);
 
-		
+
 		List<Appointment> rs = query.getResultList();
 
 		return rs;
@@ -1029,38 +1030,19 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 
 	public Map<LocalDate, List<Appointment>> findProviderAppointmentsForMonth(String providerNo, LocalDate minDate, LocalDate maxDate)
 	{
-	    Map<LocalDate, List<Appointment>> monthlyAppointments = new HashMap<>();
-
-		String sql = "SELECT a FROM Appointment a\n" +
-				"WHERE a.providerNo = :providerNo\n" +
-				"AND a.status != :cancelledStatus\n" +
-				"AND a.appointmentDate BETWEEN :minDate AND :maxDate\n" +
-				"ORDER BY a.appointmentDate, a.startTime";
-
-		Query query = entityManager.createQuery(sql);
-		query.setParameter("providerNo", providerNo);
-		query.setParameter("minDate", java.sql.Date.valueOf(minDate));
-		query.setParameter("maxDate", java.sql.Date.valueOf(maxDate));
-		query.setParameter("cancelledStatus", Appointment.CANCELLED);
-
-		@SuppressWarnings("unchecked")
-		List<Appointment> results =  query.getResultList();
-
-        for (Appointment appointment : results)
-        {
-            LocalDate appointmentDate = LocalDate.parse(appointment.getAppointmentDate().toString());
-
-            List<Appointment> dayAppointments = monthlyAppointments.get(appointmentDate);
-
-            if (dayAppointments == null) {
-				dayAppointments = new ArrayList<>();
-			}
-
-            dayAppointments.add(appointment);
-
-            monthlyAppointments.put(appointmentDate, dayAppointments);
-        }
-
-		return monthlyAppointments;
+		return null;
 	}
+
+    public List<Appointment> findByDateRangeAndDemographic(LocalDateTime startDate, LocalDateTime endDate, Integer demographicNo)
+    {
+    	String sql = "SELECT a from Appointment a " +
+					 "WHERE a.demographicNo = :demographicNo " +
+					 "AND a.appointmentDate BETWEEN :startDate AND :endDate";
+    	Query query = entityManager.createQuery(sql);
+    	query.setParameter("demographicNo", demographicNo);
+    	query.setParameter("startDate", startDate);
+    	query.setParameter("endDate", endDate);
+
+    	return query.getResultList();
+    }
 }
