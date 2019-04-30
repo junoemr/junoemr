@@ -180,12 +180,40 @@ public class ConversionUtilsTest
 		Assert.assertEquals(expectedDateString, ConversionUtils.toTimestampString(today));
 	}
 
-	// This gets called with a wide variety of different formats that we shouldn't try to cover
-	// Ensure that for a ConversionUtils level format and for one fed in time format it works as expected
 	@Test
+	@SuppressWarnings("ConstantConditions")
 	public void testToDateString() {
-		Assert.assertEquals("", ConversionUtils.toDateTimeString(null));
+		// [1] toDateString(Date date, String formatPattern)
+		Date legacyDate = null;
+		Assert.assertEquals("", ConversionUtils.toDateString(legacyDate));
+
+		legacyDate = new Date();
+		SimpleDateFormat legacyFormatter = new SimpleDateFormat(ConversionUtils.DEFAULT_DATE_PATTERN);
+		String expectedString = legacyFormatter.format(legacyDate);
+
+		Assert.assertEquals(expectedString, ConversionUtils.toDateString(legacyDate));
+
+		// [2] toDateString(LocalDate date, String formatPattern)
+		LocalDate localDate = null;
+		Assert.assertEquals("", ConversionUtils.toDateString(localDate));
+
+		localDate = LocalDate.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ConversionUtils.DEFAULT_DATE_PATTERN);
+		expectedString = formatter.format(localDate);
+
+		Assert.assertEquals(expectedString, ConversionUtils.toDateString(localDate));
+
+	}
+
+	@Test
+	public void testToDateTimeNoSecString() {
 		Assert.assertEquals("", ConversionUtils.toDateTimeNoSecString(null));
+
+		LocalDateTime today = LocalDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ConversionUtils.TS_NO_SEC_PATTERN);
+		String expectedString = today.format(formatter);
+
+		Assert.assertEquals(expectedString, ConversionUtils.toDateTimeNoSecString(today));
 	}
 
 	@Test
