@@ -42,6 +42,7 @@ import java.util.Set;
 
 public class EFormTests extends SeleniumTestBase
 {
+	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
 	private static String EFORM_URL = "/eform/efmformslistadd.jsp?demographic_no=1&appointment=&parentAjaxId=eforms";
 
 	@BeforeClass
@@ -50,7 +51,7 @@ public class EFormTests extends SeleniumTestBase
 		SchemaUtils.restoreTable("admission", "demographic",
 				"demographicArchive", "demographiccust", "log", "program", "provider_recent_demographic_access",
 				"casemgmt_note", "casemgmt_cpp", "casemgmt_issue", "casemgmt_note_ext", "casemgmt_note_link", "casemgmt_note_lock",
-				"casemgmt_tmpsave", "validations", "measurementType", "eChart", "eform");
+				"casemgmt_tmpsave", "validations", "measurementType", "eChart", "eform", "eform_values");
 
 		SchemaUtils.loadFileIntoMySQL(SqlFiles.DEMOGRAPHIC_ADD);
 		SchemaUtils.loadFileIntoMySQL(SqlFiles.EFORM_ADD_TRAVLE_FORM_V4);
@@ -66,7 +67,7 @@ public class EFormTests extends SeleniumTestBase
 	}
 
 	@Test
-	public void canReachTravel_Form_v4EForm() throws InterruptedException
+	public void canAddTravel_Form_v4EForm() throws InterruptedException
 	{
 		//navigate to eform addition page
 		String oldUrl = driver.getCurrentUrl();
@@ -91,5 +92,13 @@ public class EFormTests extends SeleniumTestBase
 
 		Assert.assertFalse("got error page on eform page", PageUtil.isErrorPage(driver));
 		logger.info("Open eform travel_form_v4. OK");
+
+		driver.findElement(By.xpath("//input[@id='SubmitButton']")).click();
+		PageUtil.switchToWindow(currWindowHandle, driver);
+		logger.info("Submit eform travel_form_v4. OK");
+
+		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		Assert.assertNotNull(driver.findElement(By.xpath("//a[contains(., 'travel_from_v4:')]")));
+		logger.info("Eform added to Echart? OK");
 	}
 }
