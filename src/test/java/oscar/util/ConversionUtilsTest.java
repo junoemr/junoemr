@@ -44,9 +44,9 @@ import java.util.List;
 
 public class ConversionUtilsTest
 {
-
 	@Test
-	public void testToIntList() {
+	public void toIntList_ValidIntegersAsStrings_ExpectConversion()
+	{
 		List<String> stringList = new ArrayList<>();
 		stringList.add("1");
 		stringList.add("2");
@@ -63,75 +63,122 @@ public class ConversionUtilsTest
 		List<Integer> resultList = ConversionUtils.toIntList(stringList);
 
 		assertThat(expectedList, is(resultList));
+	}
 
-		stringList.add("not-a-string");
+	@Test
+	public void toIntList_NonIntegersAsString_ExpectSetToZero()
+	{
+		List<String> stringList = new ArrayList<>();
+		stringList.add("1");
+		stringList.add("2");
+		stringList.add("not an integer");
 		stringList.add("0.3");
 		stringList.add("4L");
 
+		List<Integer> expectedList = new ArrayList<>();
+		expectedList.add(1);
+		expectedList.add(2);
 		expectedList.add(0);
 		expectedList.add(0);
 		expectedList.add(0);
 
-		resultList = ConversionUtils.toIntList(stringList);
+		List<Integer> resultList = ConversionUtils.toIntList(stringList);
 
 		assertThat(expectedList, is(resultList));
 	}
 
 	@Test
-	public void testFromTimeString() throws ParseException
+	public void fromTimeString_NullParameter_ExpectNull()
 	{
 		Assert.assertNull(ConversionUtils.fromTimeString(null));
+	}
+
+	@Test
+	public void fromTimeString_EmptyStringParameter_ExpectNull()
+	{
 		Assert.assertNull(ConversionUtils.fromTimeString(""));
+	}
+
+	@Test
+	public void fromTimeString_InvalidTimeString_ExpectNull()
+	{
 		Assert.assertNull(ConversionUtils.fromTimeString("not a time string"));
+	}
 
-		String timeString;
+	@Test
+	public void fromTimeString_ValidTimeFormat_ExpectValidDate() throws ParseException
+	{
+		String timeString = "12:30:45";
 		SimpleDateFormat format = new SimpleDateFormat(ConversionUtils.DEFAULT_TIME_PATTERN);
-		Date validDate;
-
-		timeString = "12:30:45";
-		validDate = format.parse(timeString);
+		Date validDate = format.parse(timeString);
 		assertThat(validDate, is(ConversionUtils.fromTimeString(timeString)));
-
-		timeString = "7:20:00";
-		validDate = format.parse(timeString);
-		assertThat(validDate, is(ConversionUtils.fromTimeString(timeString)));
-
-		timeString = "10:0:27";
-		validDate = format.parse(timeString);
-		assertThat(validDate, is(ConversionUtils.fromTimeString(timeString)));
-
-		timeString = "09:30:0";
-		validDate = format.parse(timeString);
-		assertThat(validDate, is(ConversionUtils.fromTimeString(timeString)));
-
-		timeString = "12:10";
-		assertNull(ConversionUtils.fromTimeString(timeString));
-
-		timeString = "1:1";
-		assertNull(ConversionUtils.fromTimeString(timeString));
-
-		timeString = "0";
-		assertNull(ConversionUtils.fromTimeString(timeString));
 	}
 
 	@Test
-	public void testFromTimeStringNoSeconds() throws ParseException {
-		Date validDate;
-		String validFormat;
-		SimpleDateFormat format = new SimpleDateFormat(ConversionUtils.TIME_PATTERN_NO_SEC);
+	public void fromTimeString_ValidFormatSingleHour_ExpectValidDate() throws ParseException
+	{
+		String timeString = "7:20:00";
+		SimpleDateFormat format = new SimpleDateFormat(ConversionUtils.DEFAULT_TIME_PATTERN);
+		Date validDate = format.parse(timeString);
+		assertThat(validDate, is(ConversionUtils.fromTimeString(timeString)));
+	}
 
-		validFormat = "12:30";
-		validDate = format.parse(validFormat);
-		assertThat(validDate, is(ConversionUtils.fromTimeStringNoSeconds(validFormat)));
+	@Test
+	public void fromTimeString_ValidFormatSingleMinute_ExpectValidDate() throws ParseException
+	{
+		String timeString = "10:0:27";
+		SimpleDateFormat format = new SimpleDateFormat(ConversionUtils.DEFAULT_TIME_PATTERN);
+		Date validDate = format.parse(timeString);
+		assertThat(validDate, is(ConversionUtils.fromTimeString(timeString)));
+	}
 
-		validFormat = "0:3";
-		validDate = format.parse(validFormat);
+	@Test
+	public void fromTimeString_ValidFormatSingleSecond_ExpectValidDate() throws ParseException
+	{
+		String timeString = "09:30:0";
+		SimpleDateFormat format = new SimpleDateFormat(ConversionUtils.DEFAULT_TIME_PATTERN);
+		Date validDate = format.parse(timeString);
+		assertThat(validDate, is(ConversionUtils.fromTimeString(timeString)));
+	}
+
+	@Test
+	public void fromTimeString_MissingSeconds_ExpectNull()
+	{
+		assertNull(ConversionUtils.fromTimeString("12:10"));
+	}
+
+	@Test
+	public void fromTimeString_MissingMinutesAndSeconds_ExpectNull()
+	{
+		assertNull(ConversionUtils.fromTimeString("0"));
+	}
+
+	@Test
+	public void fromTimeStringNoSeconds_ValidString_ExpectValidDate() throws ParseException
+	{
+		String validFormat = "12:30";
+		SimpleDateFormat formatter = new SimpleDateFormat(ConversionUtils.TIME_PATTERN_NO_SEC);
+		Date validDate = formatter.parse(validFormat);
 		assertThat(validDate, is(ConversionUtils.fromTimeStringNoSeconds(validFormat)));
 	}
 
 	@Test
-	public void testToTimeStringNoSeconds() {
+	public void fromTimeStringNoSeconds_SingleDigitHourMinute_ExpectValidDate() throws ParseException
+	{
+		String validFormat = "0:3";
+		SimpleDateFormat formatter = new SimpleDateFormat(ConversionUtils.TIME_PATTERN_NO_SEC);
+		Date validDate = formatter.parse(validFormat);
+		assertThat(validDate, is(ConversionUtils.fromTimeStringNoSeconds(validFormat)));
+	}
+
+	@Test
+	public void toTimeStringNoSeconds_NullParameter_ExpectEmptyString()
+	{
 		Assert.assertEquals("", ConversionUtils.toTimeStringNoSeconds(null));
+	}
+
+	@Test
+	public void toTimeStringNoSeconds_TodayDate_ExpectDateString() {
 		Date today = new Date();
 		SimpleDateFormat timeFormat = new SimpleDateFormat(ConversionUtils.TIME_PATTERN_NO_SEC);
 		String expectedTime = timeFormat.format(today);
@@ -139,21 +186,42 @@ public class ConversionUtilsTest
 	}
 
 	@Test
-	public void testFromDateString() {
+	public void fromDateString_NullDateString_ExpectNull()
+	{
 		Assert.assertNull(ConversionUtils.fromDateString(null, null));
-		Assert.assertNull(ConversionUtils.fromDateString("", null));
-		String dateString = "2019-04-23 09:30:15";
+	}
 
+	@Test
+	public void fromDateString_EmptyDateString_ExpectNull()
+	{
+		Assert.assertNull(ConversionUtils.fromDateString("", null));
+	}
+
+	@Test
+	public void fromDateString_DefaultTSPattern_ExpectDate()
+	{
+		String dateString = "2019-04-23 09:30:15";
 		Date returnedDate = ConversionUtils.fromDateString(dateString, ConversionUtils.DEFAULT_TS_PATTERN);
 		SimpleDateFormat formatter = new SimpleDateFormat(ConversionUtils.DEFAULT_TS_PATTERN);
 		Assert.assertEquals(dateString, formatter.format(returnedDate));
 	}
 
 	@Test
-	public void testFromTimestampString() {
+	public void fromTimestampString_NullParameter_ExpectNull()
+	{
 		Assert.assertNull(ConversionUtils.fromTimestampString(null));
-		Assert.assertNull(ConversionUtils.fromTimestampString(""));
 
+	}
+
+	@Test
+	public void fromTimestampString_EmptyParameter_ExpectNull()
+	{
+		Assert.assertNull(ConversionUtils.fromTimestampString(""));
+	}
+
+	@Test
+	public void fromTimestampString_FixedTimestamp_ExpectDate()
+	{
 		Calendar fixedDate = new GregorianCalendar();
 		fixedDate.set(Calendar.YEAR, 2019);
 		fixedDate.set(Calendar.MONTH, 4);
@@ -172,8 +240,14 @@ public class ConversionUtilsTest
 	}
 
 	@Test
-	public void testToTimestampString() {
+	public void toTimestampString_NullParameter_ExpectEmptyString()
+	{
 		Assert.assertEquals("", ConversionUtils.toTimestampString(null));
+	}
+
+	@Test
+	public void toTimestampString_DateToday_ExpectTodayTimestampString()
+	{
 		Date today = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat(ConversionUtils.DEFAULT_TS_PATTERN);
 		String expectedDateString = formatter.format(today);
@@ -181,57 +255,149 @@ public class ConversionUtilsTest
 	}
 
 	@Test
-	@SuppressWarnings("ConstantConditions")
-	public void testToDateString() {
-		// [1] toDateString(Date date, String formatPattern)
-		Date legacyDate = null;
-		Assert.assertEquals("", ConversionUtils.toDateString(legacyDate));
-
-		legacyDate = new Date();
-		SimpleDateFormat legacyFormatter = new SimpleDateFormat(ConversionUtils.DEFAULT_DATE_PATTERN);
-		String expectedString = legacyFormatter.format(legacyDate);
-
-		Assert.assertEquals(expectedString, ConversionUtils.toDateString(legacyDate));
-
-		// [2] toDateString(LocalDate date, String formatPattern)
-		LocalDate localDate = null;
-		Assert.assertEquals("", ConversionUtils.toDateString(localDate));
-
-		localDate = LocalDate.now();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ConversionUtils.DEFAULT_DATE_PATTERN);
-		expectedString = formatter.format(localDate);
-
-		Assert.assertEquals(expectedString, ConversionUtils.toDateString(localDate));
-
+	public void fromDateString_NullDateStringAndDefaultFormatPattern_ExpectNull()
+	{
+		Assert.assertNull(ConversionUtils.fromDateString(null, ConversionUtils.DEFAULT_DATE_PATTERN));
 	}
 
 	@Test
-	public void testToDateTimeNoSecString() {
-		Assert.assertEquals("", ConversionUtils.toDateTimeNoSecString(null));
+	public void fromDateString_EmptyDateStringAndDefaultFormatPattern_ExpectNull()
+	{
+		Assert.assertNull(ConversionUtils.fromDateString("", ConversionUtils.DEFAULT_DATE_PATTERN));
+	}
 
+	@Test
+	public void fromDateString_FixedDateAndFormatPattern_ExpectDate()
+	{
+		Calendar fixedDate = new GregorianCalendar();
+		fixedDate.set(Calendar.YEAR, 2019);
+		fixedDate.set(Calendar.MONTH, 4);
+		fixedDate.set(Calendar.DAY_OF_MONTH, 9);
+		fixedDate.set(Calendar.HOUR_OF_DAY, 9);
+		fixedDate.set(Calendar.MINUTE, 5);
+		fixedDate.set(Calendar.SECOND, 15);
+		fixedDate.set(Calendar.MILLISECOND, 0);
+
+		Date expectedDay = fixedDate.getTime();
+
+		SimpleDateFormat formatter = new SimpleDateFormat(ConversionUtils.DEFAULT_TS_PATTERN);
+		String dateString = formatter.format(expectedDay);
+
+		assertThat(expectedDay, is(ConversionUtils.fromDateString(dateString, ConversionUtils.DEFAULT_TS_PATTERN)));
+	}
+
+	@Test
+	@SuppressWarnings("ConstantConditions")
+	public void toDateString_NullUtilDateAndDefaultFormatPattern_ExpectEmptyString()
+	{
+		Date nullDate = null;
+		Assert.assertEquals("", ConversionUtils.toDateString(nullDate, ConversionUtils.DEFAULT_TS_PATTERN));
+	}
+
+	@Test
+	public void toDateString_UtilDateAndDefaultFormatPattern_ExpectDateString()
+	{
+		Date today = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat(ConversionUtils.DEFAULT_TS_PATTERN);
+		String expectedDateString = formatter.format(today);
+		Assert.assertEquals(expectedDateString, ConversionUtils.toDateString(today, ConversionUtils.DEFAULT_TS_PATTERN));
+	}
+
+	@Test
+	@SuppressWarnings("ConstantConditions")
+	public void toDateString_NullLocalDateAndDefaultFormatPattern_ExpectEmptyString()
+	{
+		LocalDate nullDate = null;
+		Assert.assertEquals("", ConversionUtils.toDateString(nullDate, ConversionUtils.DEFAULT_TS_PATTERN));
+	}
+
+	@Test
+	public void toDateString_FixedLocalDateAndDefaultFormatPattern_ExpectDateString()
+	{
+		LocalDate fixedDate = LocalDate.now();
+		String expectedString = fixedDate.toString();
+		Assert.assertEquals(expectedString, ConversionUtils.toDateString(fixedDate, ConversionUtils.DEFAULT_DATE_PATTERN));
+	}
+
+	@Test
+	@SuppressWarnings("ConstantConditions")
+	public void toDateString_NullUtilDate_ExpectEmptyString()
+	{
+		Date legacyDate = null;
+		Assert.assertEquals("", ConversionUtils.toDateString(legacyDate));
+	}
+
+	@Test
+	@SuppressWarnings("ConstantConditions")
+	public void toDateString_NullLocalDate_ExpectEmptyString()
+	{
+		LocalDate localDate = null;
+		Assert.assertEquals("", ConversionUtils.toDateString(localDate));
+	}
+
+	@Test
+	public void toDateString_UtilDate_ExpectDateString()
+	{
+		Date legacyDate = new Date();
+		SimpleDateFormat legacyFormatter = new SimpleDateFormat(ConversionUtils.DEFAULT_DATE_PATTERN);
+		String expectedString = legacyFormatter.format(legacyDate);
+		Assert.assertEquals(expectedString, ConversionUtils.toDateString(legacyDate));
+	}
+
+	@Test
+	public void toDateString_LocalDate_ExpectDateString()
+	{
+		LocalDate localDate = LocalDate.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ConversionUtils.DEFAULT_DATE_PATTERN);
+		String expectedString = formatter.format(localDate);
+		Assert.assertEquals(expectedString, ConversionUtils.toDateString(localDate));
+	}
+
+	@Test
+	public void toDateTimeString_NullLocalDateTimeAndDefaultFormatPattern_ExpectEmptyString()
+	{
+		Assert.assertEquals("", ConversionUtils.toDateTimeString(null, ConversionUtils.DEFAULT_TS_PATTERN));
+	}
+
+	@Test
+	public void toDateTimeNoSecString_NullParameter_ExpectEmptyString()
+	{
+		Assert.assertEquals("", ConversionUtils.toDateTimeNoSecString(null));
+	}
+
+	@Test
+	public void toDateTimeNoSecString_LocalDateTimeOfNow_ExpectDateTimeString()
+	{
 		LocalDateTime today = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ConversionUtils.TS_NO_SEC_PATTERN);
 		String expectedString = today.format(formatter);
-
 		Assert.assertEquals(expectedString, ConversionUtils.toDateTimeNoSecString(today));
 	}
 
 	@Test
-	public void testToDateTimeString() {
+	public void toDateTimeString_NullParameter_ExpectEmptyString()
+	{
 		Assert.assertEquals("", ConversionUtils.toDateTimeString(null));
+	}
 
+	@Test
+	public void toDateTimeString_LocalDateTimeOfNow_ExpectDateTimeString()
+	{
 		LocalDateTime now = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(ConversionUtils.DEFAULT_TS_PATTERN);
-
 		String expectedString = now.format(formatter);
-
 		Assert.assertEquals(expectedString, ConversionUtils.toDateTimeString(now));
 	}
 
 	@Test
-	public void testToTimeString() {
+	public void toTimeString_NullParameter_ExpectEmptyString()
+	{
 		Assert.assertEquals("", ConversionUtils.toTimeString(null));
+	}
 
+	@Test
+	public void toTimeString_FixedTime_ExpectTimeString()
+	{
 		Calendar expectedTime = new GregorianCalendar();
 		expectedTime.set(Calendar.HOUR_OF_DAY, 13);
 		expectedTime.set(Calendar.MINUTE, 32);
@@ -245,116 +411,395 @@ public class ConversionUtilsTest
 	}
 
 	@Test
-	public void testFromLongString () {
+	public void fromLongString_NullParameter_ExpectZero()
+	{
 		long returnedVal = ConversionUtils.fromLongString(null);
 		Assert.assertEquals(0L, returnedVal);
-		returnedVal = ConversionUtils.fromLongString("");
+	}
+
+	@Test
+	public void fromLongString_EmptyStringParameter_ExpectZero()
+	{
+		long returnedVal = ConversionUtils.fromLongString("");
 		Assert.assertEquals(0L, returnedVal);
-		returnedVal = ConversionUtils.fromLongString("not a string");
+	}
+
+	@Test
+	public void fromLongString_NotLongStringParameter_ExpectZero()
+	{
+		long returnedVal = ConversionUtils.fromLongString("not a string");
 		Assert.assertEquals(0L, returnedVal);
-		returnedVal = ConversionUtils.fromLongString("12345");
+	}
+
+	@Test
+	public void fromLongString_LongStringParameter_ExpectStringAsLong()
+	{
+		long returnedVal = ConversionUtils.fromLongString("12345");
 		Assert.assertEquals(12345L, returnedVal);
 	}
 
 	@Test
-	public void testFromIntString() {
+	public void fromIntString_NullParameter_ExpectZero()
+	{
 		int returnedVal = ConversionUtils.fromIntString(null);
 		Assert.assertEquals(0, returnedVal);
-		returnedVal = ConversionUtils.fromIntString("");
+	}
+
+	@Test
+	public void fromIntString_EmptyStringParameter_ExpectZero()
+	{
+		int returnedVal = ConversionUtils.fromIntString("");
 		Assert.assertEquals(0, returnedVal);
-		returnedVal = ConversionUtils.fromIntString("not an integer");
+	}
+
+	@Test
+	public void fromIntString_NonIntStringParameter_ExpectZero()
+	{
+		int returnedVal = ConversionUtils.fromIntString("not an integer");
 		Assert.assertEquals(0, returnedVal);
-		returnedVal = ConversionUtils.fromIntString("123456789");
+	}
+
+	@Test
+	public void fromIntString_IntStringParameter_ExpectStringAsInt()
+	{
+		int returnedVal = ConversionUtils.fromIntString("123456789");
 		Assert.assertEquals(123456789, returnedVal);
 	}
 
 	@Test
-	public void testToIntString() {
+	public void toIntString_NullParameter_ExpectZeroString()
+	{
 		Assert.assertEquals("0", ConversionUtils.toIntString(null));
+	}
+
+	@Test
+	public void toIntString_IntParameter_ExpectIntAsString() {
 		Assert.assertEquals("1", ConversionUtils.toIntString(1));
 	}
 
 	@Test
-	public void testToBoolString() {
+	public void toBoolString_NullParameter_ExpectZeroString()
+	{
 		Assert.assertEquals("0", ConversionUtils.toBoolString(null));
+	}
+
+	@Test
+	public void toBoolString_FalseParameter_ExpectZeroString()
+	{
 		Assert.assertEquals("0", ConversionUtils.toBoolString(false));
+	}
+
+	@Test
+	public void toBoolString_TrueParameter_ExpectOneString()
+	{
 		Assert.assertEquals("1", ConversionUtils.toBoolString(true));
 	}
 
 	@Test
-	public void testFromBoolString() {
-		Assert.assertFalse(ConversionUtils.fromBoolString(""));
+	public void fromBoolString_NullParameter_ExpectFalse()
+	{
 		Assert.assertFalse(ConversionUtils.fromBoolString(null));
-		Assert.assertFalse(ConversionUtils.fromBoolString("0"));
-
-		Assert.assertTrue(ConversionUtils.fromBoolString("false"));
-		Assert.assertTrue(ConversionUtils.fromBoolString("true"));
-		Assert.assertTrue(ConversionUtils.fromBoolString("1"));
-		Assert.assertTrue(ConversionUtils.fromBoolString("you can shove whatever you want in here"));
 	}
 
 	@Test
-	public void testFromDoubleString() {
+	public void fromBoolString_EmptyStringParameter_ExpectFalse()
+	{
+		Assert.assertFalse(ConversionUtils.fromBoolString(""));
+	}
+
+	@Test
+	public void fromBoolString_FalseParameter_ExpectFalse()
+	{
+		Assert.assertFalse(ConversionUtils.fromBoolString("0"));
+		Assert.assertFalse(ConversionUtils.fromBoolString("false"));
+	}
+
+	@Test
+	public void fromBoolString_OtherStringParameter_ExpectFalse()
+	{
+		Assert.assertFalse(ConversionUtils.fromBoolString("any other string"));
+	}
+
+	@Test
+	public void fromBoolString_TrueParameter_ExpectTrue() {
+
+		Assert.assertTrue(ConversionUtils.fromBoolString("true"));
+		Assert.assertTrue(ConversionUtils.fromBoolString("1"));
+	}
+
+	@Test
+	public void fromDoubleString_NullParameter_ExpectZero()
+	{
 		Assert.assertEquals(0.0, ConversionUtils.fromDoubleString(null));
+	}
+
+	@Test
+	public void fromDoubleString_EmptyStringParameter_ExpectZero()
+	{
 		Assert.assertEquals(0.0, ConversionUtils.fromDoubleString(""));
-		Assert.assertEquals(0.3, ConversionUtils.fromDoubleString("0.3"));
+	}
+
+	@Test
+	public void fromDoubleString_NotDoubleStringParameter_ExpectZero()
+	{
 		Assert.assertEquals(0.0, ConversionUtils.fromDoubleString("not a double"));
 	}
 
 	@Test
-	public void testToDoubleString() {
-		Assert.assertEquals("0.3", ConversionUtils.toDoubleString(0.3));
-		Assert.assertEquals("0", ConversionUtils.toDoubleString(null));
+	public void fromDoubleString_DoubleParameter_ExpectStringAsDouble() {
+		Assert.assertEquals(0.3, ConversionUtils.fromDoubleString("0.3"));
 	}
 
 	@Test
-	public void testToDaysFromLong() {
-		long MS_IN_DAY = 1000 * 60 * 60 * 24;
+	public void toDoubleString_NullParameter_ExpectZero()
+	{
+		Assert.assertEquals("0.0", ConversionUtils.toDoubleString(null));
+	}
 
+	@Test
+	public void toDoubleString_DoubleParameter_ExpectDoubleAsString() {
+		Assert.assertEquals("0.3", ConversionUtils.toDoubleString(0.3));
+	}
+
+	@Test
+	public void toDays_NegativeLongParameter_ExpectZero()
+	{
 		Assert.assertEquals(0, ConversionUtils.toDays(-1L));
+	}
+
+	@Test
+	public void toDays_ZeroParameter_ExpectZero()
+	{
 		Assert.assertEquals(0, ConversionUtils.toDays(0));
-		Assert.assertEquals(1, ConversionUtils.toDays(MS_IN_DAY));
+	}
+
+	@Test
+	public void toDays_LongParameter_ExpectInteger()
+	{
+		long MS_IN_DAY = 1000 * 60 * 60 * 24;
 		Assert.assertEquals(3, ConversionUtils.toDays(MS_IN_DAY * 3 + 1L));
 	}
 
 	@Test
-	public void testPadDateString() {
+	public void padDateString_FormatOf_DateStringSingleDigitDate_ExpectPaddedString()
+	{
 		Assert.assertEquals("2019-04-03 00:00", ConversionUtils.padDateString("2019-4-3"));
+	}
+
+	@Test
+	public void padDateString_DateStringSingleDigitMonthAndDate_ExpectPaddedString()
+	{
 		Assert.assertEquals("2019-04-03 00:00", ConversionUtils.padDateString("2019-04-3"));
+	}
+
+	@Test
+	public void padDateString_DateStringSingleDigitMonth_ExpectPaddedString()
+	{
 		Assert.assertEquals("2019-04-03 00:00", ConversionUtils.padDateString("2019-4-03"));
+	}
+
+	@Test
+	public void padDateString_ShortString_ExpectInputAsOutput()
+	{
 		Assert.assertEquals("1-2-3", ConversionUtils.padDateString("1-2-3"));
+	}
+
+	@Test
+	public void padDateString_OtherString_ExpectInputAsOutput()
+	{
 		Assert.assertEquals("not a date", ConversionUtils.padDateString("not a date"));
+	}
+
+	@Test
+	public void padDateString_DateTimeStringSingleDigitMonthAndDate_ExpectPaddedDateString()
+	{
 		Assert.assertEquals("2019-04-03 12:43:08", ConversionUtils.padDateString("2019-4-3 12:43:08"));
+	}
+
+	@Test
+	public void padDateString_DateTimeStringSingleDigitMonth_ExpectPaddedDateString()
+	{
 		Assert.assertEquals("2019-04-03 12:43:08", ConversionUtils.padDateString("2019-4-03 12:43:08"));
+	}
+
+	@Test
+	public void padDateString_DateTimeStringSingleDigitDate_ExpectPaddedDateString()
+	{
 		Assert.assertEquals("2019-04-03 12:43:08", ConversionUtils.padDateString("2019-04-3 12:43:08"));
+	}
+
+	@Test
+	public void padDateString_DateTimeStringSingleDigitHour_ExpectPaddedDateString()
+	{
 		Assert.assertEquals("2019-04-03 09:05:02", ConversionUtils.padDateString("2019-04-03 9:05:02"));
+	}
+
+	@Test
+	public void padDateString_DateTimeStringSingleDigitMinute_ExpectPaddedDateString()
+	{
 		Assert.assertEquals("2019-04-03 09:05:02", ConversionUtils.padDateString("2019-04-03 09:5:02"));
+	}
+
+	@Test
+	public void padDateString_DateTimeStringSingleDigitSecond_ExpectPaddedDateString()
+	{
 		Assert.assertEquals("2019-04-03 09:05:02", ConversionUtils.padDateString("2019-04-03 09:05:2"));
+	}
+
+	@Test
+	public void padDateString_DateTimeStringSingleDigitHourAndMinuteAndSecond_ExpectPaddedDateString()
+	{
 		Assert.assertEquals("2019-04-03 09:05:02", ConversionUtils.padDateString("2019-04-03 9:5:2"));
-		Assert.assertEquals("2019-04-03 09:05:02", ConversionUtils.padDateString("2019-4-3 9:05:02"));
+	}
+
+	@Test
+	public void padDateString_DateTimeStringSingleDigitHourNoSeconds_ExpectPaddedDateString()
+	{
 		Assert.assertEquals("2019-04-03 09:05", ConversionUtils.padDateString("2019-04-03 9:05"));
 	}
 
 	@Test
-	public void testGetLegacyDateFromDateString() {
-		Assert.assertNotNull(ConversionUtils.getLegacyDateFromDateString("2019-04-03"));
-		Assert.assertNotNull(ConversionUtils.getLegacyDateFromDateString("2019-04-03 09:30:00"));
-		Assert.assertNotNull(ConversionUtils.getLegacyDateFromDateString("2019-04-03 09:30"));
-		Assert.assertNotNull(ConversionUtils.getLegacyDateFromDateString("2019-04-3"));
+	public void getLegacyDateFromDateString_DateString_ExpectDate()
+	{
+		// assert that this produces the correct date instead of just not null
+		String dateString = "2019-04-03";
 
+		Calendar expectedCalendarDate = new GregorianCalendar();
+		expectedCalendarDate.set(Calendar.YEAR, 2019);
+		expectedCalendarDate.set(Calendar.MONTH, Calendar.APRIL);
+		expectedCalendarDate.set(Calendar.DAY_OF_MONTH, 3);
+		expectedCalendarDate.set(Calendar.HOUR_OF_DAY, 0);
+		expectedCalendarDate.set(Calendar.MINUTE, 0);
+		expectedCalendarDate.set(Calendar.SECOND, 0);
+		expectedCalendarDate.set(Calendar.MILLISECOND, 0);
+		Date expectedDate = expectedCalendarDate.getTime();
+
+		assertThat(expectedDate, is(ConversionUtils.getLegacyDateFromDateString(dateString)));
+	}
+
+	@Test
+	public void getLegacyDateFromDateString_DateTimeString_ExpectDate()
+	{
+		String dateTimeString = "2019-04-03 09:30:00";
+
+		Calendar expectedCalendarDate = new GregorianCalendar();
+		expectedCalendarDate.set(Calendar.YEAR, 2019);
+		expectedCalendarDate.set(Calendar.MONTH, Calendar.APRIL);
+		expectedCalendarDate.set(Calendar.DAY_OF_MONTH, 3);
+		expectedCalendarDate.set(Calendar.HOUR_OF_DAY, 9);
+		expectedCalendarDate.set(Calendar.MINUTE, 30);
+		expectedCalendarDate.set(Calendar.SECOND, 0);
+		expectedCalendarDate.set(Calendar.MILLISECOND, 0);
+		Date expectedDate = expectedCalendarDate.getTime();
+
+		assertThat(expectedDate, is(ConversionUtils.getLegacyDateFromDateString(dateTimeString)));
+	}
+
+	@Test
+	public void getLegacyDateFromDateString_DateTimeStringWithoutSecond_ExpectDate()
+	{
+		String dateTimeString = "2019-04-03 09:30";
+
+		Calendar expectedCalendarDate = new GregorianCalendar();
+		expectedCalendarDate.set(Calendar.YEAR, 2019);
+		expectedCalendarDate.set(Calendar.MONTH, Calendar.APRIL);
+		expectedCalendarDate.set(Calendar.DAY_OF_MONTH, 3);
+		expectedCalendarDate.set(Calendar.HOUR_OF_DAY, 9);
+		expectedCalendarDate.set(Calendar.MINUTE, 30);
+		expectedCalendarDate.set(Calendar.SECOND, 0);
+		expectedCalendarDate.set(Calendar.MILLISECOND, 0);
+		Date expectedDate = expectedCalendarDate.getTime();
+
+		assertThat(expectedDate, is(ConversionUtils.getLegacyDateFromDateString(dateTimeString)));
+	}
+
+	@Test
+	public void getLegacyDateFromDateString_DateStringSingleDigitDate_ExpectDate()
+	{
+		String dateString = "2019-04-3";
+
+		Calendar expectedCalendarDate = new GregorianCalendar();
+		expectedCalendarDate.set(Calendar.YEAR, 2019);
+		expectedCalendarDate.set(Calendar.MONTH, Calendar.APRIL);
+		expectedCalendarDate.set(Calendar.DAY_OF_MONTH, 3);
+		expectedCalendarDate.set(Calendar.HOUR_OF_DAY, 0);
+		expectedCalendarDate.set(Calendar.MINUTE, 0);
+		expectedCalendarDate.set(Calendar.SECOND, 0);
+		expectedCalendarDate.set(Calendar.MILLISECOND, 0);
+		Date expectedDate = expectedCalendarDate.getTime();
+
+		assertThat(expectedDate, is(ConversionUtils.getLegacyDateFromDateString(dateString)));
+	}
+
+	@Test
+	public void getLegacyDateFromDateString_DateTimeStringSingleDigitSecond_ExpectDate()
+	{
+		String dateTimeString = "2019-04-03 09:30:5";
+
+		Calendar expectedCalendarDate = new GregorianCalendar();
+		expectedCalendarDate.set(Calendar.YEAR, 2019);
+		expectedCalendarDate.set(Calendar.MONTH, Calendar.APRIL);
+		expectedCalendarDate.set(Calendar.DAY_OF_MONTH, 3);
+		expectedCalendarDate.set(Calendar.HOUR_OF_DAY, 9);
+		expectedCalendarDate.set(Calendar.MINUTE, 30);
+		expectedCalendarDate.set(Calendar.SECOND, 5);
+		expectedCalendarDate.set(Calendar.MILLISECOND, 0);
+		Date expectedDate = expectedCalendarDate.getTime();
+
+		assertThat(expectedDate, is(ConversionUtils.getLegacyDateFromDateString(dateTimeString)));
+	}
+
+	@Test
+	public void getLegacyDateFromDateString_DateStringSingleDigitMonth_ExpectNull()
+	{
 		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("2019-4-03"));
-		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("2019-4-3"));
+	}
+
+	@Test
+	public void getLegacyDateFromDateString_DateTimeStringSingleDigitHour_ExpectNull()
+	{
 		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("2019-04-03 9:30"));
-		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("2019-04-03 9:30:05"));
+	}
+
+	@Test
+	public void getLegacyDateFromDateString_DateTimeStringSingleDigitMinute_ExpectNull()
+	{
+		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("2019-04-03 09:3:05"));
+	}
+
+	@Test
+	public void getLegacyDateFromDateString_DateStringTwoDigitYear_ExpectNull()
+	{
 		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("19-04-03"));
-		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("2019-0403"));
-		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("not a date"));
+	}
+
+	@Test
+	public void getLegacyDateFromDateString_NullParameter_ExpectNull()
+	{
 		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString(null));
 	}
 
 	@Test
-	public void testToNullableLegacyDate() {
+	public void getLegacyDateFromDateString_UnknownDateFormat_ExpectNull()
+	{
+		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("2019-0403"));
+	}
+
+	@Test
+	public void getLegacyDateFromDateString_NonDateString_ExpectNull()
+	{
+		Assert.assertNull(ConversionUtils.getLegacyDateFromDateString("not a date"));
+	}
+
+	@Test
+	public void toNullableLegacyDate_NullParameter_ExpectNull()
+	{
 		Assert.assertNull(ConversionUtils.toNullableLegacyDate(null));
+	}
+
+	@Test
+	public void toNullableLegacyDate_LocalDateAtNow_ExpectDate()
+	{
 		Calendar today = new GregorianCalendar();
 		today.set(Calendar.HOUR_OF_DAY, 0);
 		today.set(Calendar.MINUTE, 0);
@@ -362,41 +807,186 @@ public class ConversionUtilsTest
 		today.set(Calendar.MILLISECOND, 0);
 		Date expectedDate = today.getTime();
 		assertThat(expectedDate, is(ConversionUtils.toNullableLegacyDate(LocalDate.now())));
-
 	}
 
 	@Test
-	public void testToNullableLegacyDateTime() {
+	public void toLegacyDate_FixedLocalDate_ExpectDate() throws ParseException
+	{
+		String fixedDateString = "2019-04-30";
+		LocalDate fixedLocalDate = LocalDate.parse(fixedDateString);
+		SimpleDateFormat formatter = new SimpleDateFormat(ConversionUtils.DEFAULT_DATE_PATTERN);
+		Date expectedDate = formatter.parse(fixedDateString);
+		assertThat(expectedDate, is(ConversionUtils.toLegacyDate(fixedLocalDate)));
+	}
+
+	@Test
+	public void toNullableLegacyDateTime_NullParameter_ExpectNull()
+	{
 		Assert.assertNull(ConversionUtils.toNullableLegacyDateTime(null));
+	}
+
+	@Test
+	public void toNullableLegacyDateTime_FixedLocalDateTime_ExpectDate()
+	{
 		Date expectedDate = new Date();
 		LocalDateTime equalLocalDate = LocalDateTime.ofInstant(expectedDate.toInstant(), ZoneId.systemDefault());
 		assertThat(expectedDate, is(ConversionUtils.toNullableLegacyDateTime(equalLocalDate)));
 	}
 
 	@Test
+	public void toLegacyDateTime_FixedLocalDateTime_ExpectDate()
+	{
+		Date expectedDate = new Date();
+		LocalDateTime equalLocalDate = LocalDateTime.ofInstant(expectedDate.toInstant(), ZoneId.systemDefault());
+		assertThat(expectedDate, is(ConversionUtils.toLegacyDateTime(equalLocalDate)));
+	}
+
+	@Test
 	@SuppressWarnings("ConstantConditions")
-	public void testToNullableLocalDate() {
-		LocalDate today = LocalDate.now();
-		Date legacyDate = new Date();
+	public void toNullableLocalDate_NullString_ExpectNull()
+	{
+		String nullString = null;
+		Assert.assertNull(ConversionUtils.toNullableLocalDate(nullString));
+	}
 
-		assertThat(today, is(ConversionUtils.toNullableLocalDate(legacyDate)));
+	@Test
+	public void toNullableLocalDate_EmptyString_ExpectNull()
+	{
+		Assert.assertNull(ConversionUtils.toNullableLocalDate(""));
+	}
 
-		legacyDate = null;
+	@Test
+	public void toNullableLocalDate_FixedDateString_ExpectLocalDate()
+	{
+		String fixedDateString = "2019-04-30T20:30:40-08:00";
+		LocalDate expectedDate = LocalDate.of(2019, 4, 30);
+		assertThat(expectedDate, is(ConversionUtils.toNullableLocalDate(fixedDateString)));
+	}
+
+	@Test
+	@SuppressWarnings("ConstantConditions")
+	public void toNullableLocalDate_NullUtilDate_ExpectNull()
+	{
+		Date legacyDate = null;
 		Assert.assertNull(ConversionUtils.toNullableLocalDate(legacyDate));
 	}
 
 	@Test
-	public void testToNullableLocalDateTime() {
+	public void toNullableLocalDate_FixedDate_ExpectLocalDate()
+	{
+		LocalDate expectedLocalDate = LocalDate.of(2019, 4,30);
+		Calendar expectedTime = new GregorianCalendar();
+		expectedTime.set(Calendar.YEAR, 2019);
+		expectedTime.set(Calendar.MONTH, Calendar.APRIL);
+		expectedTime.set(Calendar.DAY_OF_MONTH, 30);
+		expectedTime.set(Calendar.HOUR, 2);
+		expectedTime.set(Calendar.MINUTE, 25);
+		expectedTime.set(Calendar.SECOND, 0);
+		expectedTime.set(Calendar.MILLISECOND, 0);
+		Date fixedDate = expectedTime.getTime();
+		assertThat(expectedLocalDate, is(ConversionUtils.toNullableLocalDate(fixedDate)));
+	}
+
+	@Test
+	public void toZonedLocalDate_DateString_ExpectLocalDate()
+	{
+		String dateString = "2019-04-30T18:40:33-08:00";
+		LocalDate expectedDate = LocalDate.of(2019, 4, 30);
+		assertThat(expectedDate, is(ConversionUtils.toZonedLocalDate(dateString)));
+	}
+
+	@Test
+	public void toZonedLocalDate_DateStringSpecifiedFormatter_ExpectLocalDate()
+	{
+		String dateString = "2019-04-03T11:59:59Z";
+		LocalDate expectedDate = LocalDate.parse(dateString, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+		assertThat(expectedDate, is(ConversionUtils.toZonedLocalDate(dateString, DateTimeFormatter.ISO_ZONED_DATE_TIME)));
+	}
+
+	@Test
+	public void toLocalDate_DateString_ExpectLocalDate()
+	{
+		String dateString = "2019-04-30";
+		LocalDate expectedDate = LocalDate.of(2019, 4, 30);
+		assertThat(expectedDate, is(ConversionUtils.toLocalDate(dateString)));
+	}
+
+	@Test
+	public void toLocalDate_DateStringSpecifiedFormatter_ExpectLocalDate()
+	{
+		String dateString = "2019-04-30";
+		LocalDate expectedDate = LocalDate.of(2019, 4, 30);
+		assertThat(expectedDate, is(ConversionUtils.toLocalDate(dateString, DateTimeFormatter.ISO_LOCAL_DATE)));
+	}
+
+	@Test
+	public void toZonedLocalDate_FixedDate_ExpectLocalDate()
+	{
+		LocalDate expectedLocalDate = LocalDate.of(2019, 4,30);
+		Calendar expectedTime = new GregorianCalendar();
+		expectedTime.set(Calendar.YEAR, 2019);
+		expectedTime.set(Calendar.MONTH, Calendar.APRIL);
+		expectedTime.set(Calendar.DAY_OF_MONTH, 30);
+		Date fixedDate = expectedTime.getTime();
+		assertThat(expectedLocalDate, is(ConversionUtils.toZonedLocalDate(fixedDate)));
+	}
+
+	@Test
+	public void toNullableLocalDateTime_NullParameter_ExpectNull()
+	{
 		Assert.assertNull(ConversionUtils.toNullableLocalDateTime(null));
+	}
+
+	@Test
+	public void toNullableLocalDateTime_FixedDate_ExpectSameDate()
+	{
 		Date today = new Date();
 		LocalDateTime expectedTime = LocalDateTime.ofInstant(today.toInstant(), ZoneId.systemDefault());
 		assertThat(expectedTime, is(ConversionUtils.toNullableLocalDateTime(today)));
 	}
 
-	// Date A + Date B = Date A with timestamp of date B
+	@Test
+	public void toLocalDateTime_FixedDate_ExpectLocalDateTime()
+	{
+		LocalDateTime expectedDateTime = LocalDateTime.of(2019, 4, 30, 12, 30, 45);
+		Calendar expectedTime = new GregorianCalendar();
+		expectedTime.set(Calendar.YEAR, 2019);
+		expectedTime.set(Calendar.MONTH, Calendar.APRIL);
+		expectedTime.set(Calendar.DAY_OF_MONTH, 30);
+		expectedTime.set(Calendar.HOUR, 12);
+		expectedTime.set(Calendar.MINUTE, 30);
+		expectedTime.set(Calendar.SECOND, 45);
+		expectedTime.set(Calendar.MILLISECOND, 0);
+		Date fixedDate = expectedTime.getTime();
+		assertThat(expectedDateTime, is(ConversionUtils.toLocalDateTime(fixedDate)));
+	}
+
 	@Test
 	@SuppressWarnings("deprecation")
-	public void testCombineDateAndTime() {
+	public void combineDateAndTime_TodayDateAndFixedTime_ExpectTodayDate()
+	{
+		Calendar desiredTime = new GregorianCalendar();
+		desiredTime.set(Calendar.DAY_OF_YEAR, 16);
+		desiredTime.set(Calendar.MONTH, 7);
+		desiredTime.set(Calendar.YEAR, 1969);
+		desiredTime.set(Calendar.HOUR_OF_DAY, 13);
+		desiredTime.set(Calendar.MINUTE, 32);
+		desiredTime.set(Calendar.SECOND, 0);
+
+		Date today = new Date();
+		Date timeToCombine = desiredTime.getTime();
+
+		Date combined = ConversionUtils.combineDateAndTime(today, timeToCombine);
+
+		Assert.assertEquals(today.getDate(), combined.getDate());
+		Assert.assertEquals(today.getMonth(), combined.getMonth());
+		Assert.assertEquals(today.getYear(), combined.getYear());
+	}
+
+	@Test
+	@SuppressWarnings("deprecation")
+	public void combineDateAndTime_TodayDateAndFixedTime_ExpectFixedTime()
+	{
 		Calendar desiredTime = new GregorianCalendar();
 		desiredTime.set(Calendar.DAY_OF_YEAR, 16);
 		desiredTime.set(Calendar.MONTH, 7);
@@ -413,10 +1003,24 @@ public class ConversionUtilsTest
 		Assert.assertEquals(combined.getHours(), 13);
 		Assert.assertEquals(combined.getMinutes(), 32);
 		Assert.assertEquals(combined.getSeconds(), 0);
+	}
 
-		Assert.assertEquals(today.getDate(), combined.getDate());
-		Assert.assertEquals(today.getMonth(), combined.getMonth());
-		Assert.assertEquals(today.getYear(), combined.getYear());
+	@Test
+	@SuppressWarnings("deprecation")
+	public void combineDateAndTime_TodayDateAndFixedTime_ExpectTodayDateAndNotFixedDate()
+	{
+		Calendar desiredTime = new GregorianCalendar();
+		desiredTime.set(Calendar.DAY_OF_YEAR, 16);
+		desiredTime.set(Calendar.MONTH, 7);
+		desiredTime.set(Calendar.YEAR, 1969);
+		desiredTime.set(Calendar.HOUR_OF_DAY, 13);
+		desiredTime.set(Calendar.MINUTE, 32);
+		desiredTime.set(Calendar.SECOND, 0);
+
+		Date today = new Date();
+		Date timeToCombine = desiredTime.getTime();
+
+		Date combined = ConversionUtils.combineDateAndTime(today, timeToCombine);
 
 		Assert.assertNotSame(timeToCombine.getYear(), combined.getYear());
 		Assert.assertNotSame(timeToCombine.getMonth(), combined.getMonth());
