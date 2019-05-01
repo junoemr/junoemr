@@ -101,6 +101,7 @@ public class EchartTests extends SeleniumTestBase
 		// test auto save
 		Thread.sleep(10000); // oscar auto saves every 5 seconds
 		driver.navigate().refresh();
+		Thread.sleep(5000);
 		newNote = driver.findElement(By.xpath("//textarea[@name='caseNote_note']"));
 		Assert.assertTrue("Auto save note. FAIL", Pattern.compile(myUUID.toString()).matcher(newNote.getText()).find());
 		logger.info("Auto save note. OK");

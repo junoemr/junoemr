@@ -86,7 +86,7 @@ public class EFormTests extends SeleniumTestBase
 		Thread.sleep(2000);
 		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
 
-		Assert.assertTrue("more than one window opened when opening eform",newWindows.size() == 1);
+		Assert.assertEquals("more than one window opened when opening eform", 1, newWindows.size());
 		PageUtil.switchToWindow(newWindows.get(0), driver);
 		Thread.sleep(2000);
 
@@ -98,6 +98,7 @@ public class EFormTests extends SeleniumTestBase
 		logger.info("Submit eform travel_form_v4. OK");
 
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+		Thread.sleep(5000);
 		Assert.assertNotNull(driver.findElement(By.xpath("//a[contains(., 'travel_from_v4:')]")));
 		logger.info("Eform added to Echart? OK");
 	}

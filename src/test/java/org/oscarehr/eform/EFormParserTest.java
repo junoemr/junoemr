@@ -81,7 +81,7 @@ public class EFormParserTest
 
 			String outputHTML = eform.getFormHtml();
 			Matcher match = lookForInputFields.matcher(outputHTML);
-			Assert.assertTrue("did not find eform fields list in html", match.find());
+			Assert.assertTrue("did not find eform fields list in html: \n" + outputHTML + " with inputHTML: \n" + html, match.find());
 			String[] fields = match.group(1).split("%");
 
 			int found = 0;
@@ -93,7 +93,8 @@ public class EFormParserTest
 				}
 			}
 
-			Assert.assertTrue("all input fields not present in the output field list", inputFieldList.get(i).size() == found);
+			Assert.assertTrue("all input fields not present in the output field list. html: \n" + outputHTML + "with inputHTML: \n" + html
+					, inputFieldList.get(i).size() == found);
 
 			i ++;
 		}
@@ -158,8 +159,8 @@ public class EFormParserTest
 					found = match.find();
 				}
 
-				Assert.assertTrue("did not find value attribute: " + outHTML, found);
-				Assert.assertFalse("found more that one value attribute: " + outHTML, match.find());
+				Assert.assertTrue("did not find value attribute in html: \n" + outHTML + "with inputHTML: \n" + html, found);
+				Assert.assertFalse("found more that one value attribute in html: \n" + outHTML + "with inputHTML: \n" + html, match.find());
 			}
 
 
@@ -215,7 +216,7 @@ public class EFormParserTest
 
 			String outputHTML = eform.getFormHtml();
 
-			checkTestApResult(outputHTML, outputExpectedValues[i], outputExpectedCount[i]);
+			checkTestApResult(outputHTML, html, outputExpectedValues[i], outputExpectedCount[i]);
 
 			i++;
 		}
@@ -268,7 +269,7 @@ public class EFormParserTest
 			eform.setDatabaseUpdateAPs();
 
 			String outputHTML = eform.getFormHtml();
-			checkTestApResult(outputHTML, outputExpectedValues[i], outputExpectedCounts[i]);
+			checkTestApResult(outputHTML, html, outputExpectedValues[i], outputExpectedCounts[i]);
 			i++;
 		}
 	}
@@ -291,7 +292,7 @@ public class EFormParserTest
 			eform.setSignatureCode("test","firefox", "1", "1");
 
 			String outputHTML = eform.getFormHtml();
-			Assert.assertTrue("could not find signature java script in output: " + outputHTML,
+			Assert.assertTrue("could not find signature java script in output html: \n" + outputHTML + " inputHTML: \n" + html,
 					outputHTML.contains("<script") &&
 					outputHTML.contains("_signatureRequestId") &&
 					outputHTML.contains("_contextPath = 'test'")
@@ -318,7 +319,7 @@ public class EFormParserTest
 			eform.setSource(source);
 
 			String outputHTML = eform.getFormHtml();
-			Assert.assertTrue("could not find signature java script in output: " + outputHTML,
+			Assert.assertTrue("could not find signature java script in output html: \n" + outputHTML + " inputHTML: \n" + html,
 								outputHTML.contains(source)
 			);
 		}
@@ -350,26 +351,28 @@ public class EFormParserTest
 			EForm eform = new EForm();
 			eform.setFormHtml(html);
 			String template = eform.getTemplate();
-			Assert.assertTrue("template output did not contain expected output: " + template + " expecting: " + templateResult[i],
+			Assert.assertTrue("template output did not contain expected output: " + template + " expecting: " + templateResult[i] +
+					" inputHTML: \n" + html,
 					template.contains(templateResult[i]));
 
 			i ++;
 		}
 	}
 
-	private void checkTestApResult(String outputHTML, String expectedValue, int expectedCount)
+	private void checkTestApResult(String outputHTML, String inputHTML, String expectedValue, int expectedCount)
 	{
 		Matcher match = Pattern.compile("value=['\"]" + expectedValue).matcher(outputHTML);
 		for (int z =0; z < expectedCount; z ++)
 		{
-			Assert.assertTrue("did not find expected value in html output: " + outputHTML + "looking for: value=" +expectedValue,
+			Assert.assertTrue("did not find expected value in html output: \n" + outputHTML + "looking for: value=" +expectedValue + "" +
+							" inputHTML: \n" + inputHTML,
 					match.find());
 		}
-		Assert.assertFalse("found more attributes than expected: " + outputHTML,
+		Assert.assertFalse("found more attributes than expected in html: \n" + outputHTML + " inputHTML: \n" + inputHTML,
 				match.find());
 
 
-		Assert.assertFalse("found attribute value that should have been deleted: " + outputHTML,
+		Assert.assertFalse("found attribute value that should have been deleted in html: \n" + outputHTML + " inputHTML: \n" + inputHTML,
 				Pattern.compile("value=['\"]deleteMe").matcher(outputHTML).find());
 
 	}
