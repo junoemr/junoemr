@@ -315,13 +315,16 @@ public class ConversionUtils {
 	 * @param str
 	 * 		String to be parsed
 	 * @return
-	 * 		Returns false for empty, null or 0 or true otherwise. 
+	 * 		Returns false for empty, null or 0.
+	 * 		Returns true only if the string is "1" or "true", false otherwise.
 	 */
 	public static boolean fromBoolString(String str) {
-		if (str == null || str.trim().isEmpty() || ZERO_STRING.equals(str)) {
+		if (str == null || str.trim().isEmpty())
+		{
 			return false;
 		}
-		return true;
+
+		return str.equals("1") || str.toLowerCase().equals("true");
 	}
 
 	/**
@@ -353,8 +356,9 @@ public class ConversionUtils {
 	 * 		Returns the formatted string, or 0 for null value.
 	 */
 	public static String toDoubleString(Double d) {
-		if (d == null) {
-			return ZERO_STRING;
+		if (d == null)
+		{
+			return "0.0";
 		}
 		return d.toString();
 	}
@@ -524,7 +528,7 @@ public class ConversionUtils {
 
 	public static LocalDate toNullableLocalDate(String dateString)
 	{
-		if(dateString == null) return null;
+		if(dateString == null || dateString.isEmpty()) return null;
 		return toZonedLocalDate(dateString);
 	}
 
