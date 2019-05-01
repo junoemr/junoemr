@@ -25,8 +25,8 @@ package org.oscarehr.appointment.service;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.oscarehr.common.dao.OscarAppointmentDao;
@@ -34,12 +34,12 @@ import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import oscar.OscarProperties;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-//import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
@@ -137,6 +137,11 @@ public class AppointmentTest
 		mockData.put(keyTime1, valueList);
 
 		Mockito.when(appointmentDao.findAppointmentDetailsByDateAndProvider(startDate, endDate, providerId, site)).thenReturn(mockData);
+		Mockito.doReturn("1").when(session).getAttribute("user");
+		Mockito.doReturn("First1").when(session).getAttribute("userfirstname");
+		Mockito.doReturn("Last1").when(session).getAttribute("userlastname");
+		OscarProperties.getInstance().setProperty("billing_type", "BC");
+		OscarProperties.getInstance().setProperty("default_view", "MFP");
 
 		List<CalendarEvent> result = appointmentService.getCalendarEvents(session, providerId, startDate, endDate, site);
 
@@ -153,8 +158,8 @@ public class AppointmentTest
 			null,
 			new CalendarAppointment(
 				1, //appointmentNo
-				null,
-				null,
+				"BC",
+				"MFP",
 				null,
 				"1",
 				"First1",
@@ -173,6 +178,9 @@ public class AppointmentTest
 				"notes1",
 				null,
 				"site1",
+				null,
+				null,
+				null,
 				false,
 				false,
 				null
@@ -237,6 +245,11 @@ public class AppointmentTest
 		mockData.put(keyTime1, valueList);
 
 		Mockito.when(appointmentDao.findAppointmentDetailsByDateAndProvider(startDate, endDate, providerId, site)).thenReturn(mockData);
+		Mockito.doReturn(null).when(session).getAttribute("user");
+		Mockito.doReturn(null).when(session).getAttribute("userfirstname");
+		Mockito.doReturn(null).when(session).getAttribute("userlastname");
+		OscarProperties.getInstance().setProperty("billing_type", "BC");
+		OscarProperties.getInstance().setProperty("default_view", "MFP");
 
 		List<CalendarEvent> result = appointmentService.getCalendarEvents(session, providerId, startDate, endDate, site);
 
@@ -253,8 +266,8 @@ public class AppointmentTest
 			null,
 			new CalendarAppointment(
 				1,
-				null,
-				null,
+				"BC",
+				"MFP",
 				null,
 
 /*				"1",
@@ -279,6 +292,9 @@ public class AppointmentTest
 				"notes1",
 				null,
 				"site1",
+				null,
+				null,
+				null,
 				false,
 				false,
 				null
@@ -343,6 +359,11 @@ public class AppointmentTest
 		mockData.put(keyTime1, valueList);
 
 		Mockito.when(appointmentDao.findAppointmentDetailsByDateAndProvider(startDate, endDate, providerId, site)).thenReturn(mockData);
+		Mockito.doReturn(null).when(session).getAttribute("user");
+		Mockito.doReturn(null).when(session).getAttribute("userfirstname");
+		Mockito.doReturn(null).when(session).getAttribute("userlastname");
+		OscarProperties.getInstance().setProperty("billing_type", "BC");
+		OscarProperties.getInstance().setProperty("default_view", "MFP");
 
 		List<CalendarEvent> result = appointmentService.getCalendarEvents(session, providerId, startDate, endDate, site);
 
@@ -359,8 +380,8 @@ public class AppointmentTest
 			null,
 			new CalendarAppointment(
 				1,
-				null,
-				null,
+				"BC",
+				"MFP",
 				null,
 
 /*				"1",
@@ -384,6 +405,9 @@ public class AppointmentTest
 				"notes1",
 				null,
 				"site1",
+				null,
+				null,
+				null,
 				false,
 				false,
 				null

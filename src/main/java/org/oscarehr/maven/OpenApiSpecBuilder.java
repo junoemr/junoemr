@@ -40,12 +40,9 @@ public class OpenApiSpecBuilder
 
 	public static void main(String[] args)
 	{
-		String resourceClassCsv = System.getProperty("openApiSpecBuilder.resourceClassCsv"); //"org.oscarehr.ws.rest.ScheduleService"
+		String resourceClassCsv = System.getProperty("openApiSpecBuilder.resourceClassCsv");
 		String outputDirectory = System.getProperty("openApiSpecBuilder.outputDirectory");
 		String filename = outputDirectory + "/" + FILENAME;
-
-		System.out.println("-- OpenApiSpecBuilder -----------------------------------------------");
-		System.out.println("Generating " + filename);
 
 		SwaggerConfiguration oasConfig = new SwaggerConfiguration()
 			.resourceClasses(Stream.of(resourceClassCsv.split(",")).collect(Collectors.toSet()));

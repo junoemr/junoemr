@@ -143,10 +143,10 @@ public class Appointment
 						details.getAppointmentNo(),
 						province,
 						defaultView,
+						rdohip,
 						userProviderNo,
 						userFirstName,
 						userLastName,
-						rdohip,
 						details.getBirthday(),
 						formatName(details.getFirstName(), details.getLastName()),
 						null, // TODO get phone number
