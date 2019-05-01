@@ -806,7 +806,9 @@ public class ConversionUtilsTest
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MILLISECOND, 0);
 		Date expectedDate = today.getTime();
-		assertThat(expectedDate, is(ConversionUtils.toNullableLegacyDate(LocalDate.now())));
+
+		LocalDate comparisonDate = expectedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		assertThat(expectedDate, is(ConversionUtils.toNullableLegacyDate(comparisonDate)));
 	}
 
 	@Test
@@ -953,12 +955,27 @@ public class ConversionUtilsTest
 		expectedTime.set(Calendar.YEAR, 2019);
 		expectedTime.set(Calendar.MONTH, Calendar.APRIL);
 		expectedTime.set(Calendar.DAY_OF_MONTH, 30);
-		expectedTime.set(Calendar.HOUR, 12);
+		expectedTime.set(Calendar.HOUR_OF_DAY, 12);
 		expectedTime.set(Calendar.MINUTE, 30);
 		expectedTime.set(Calendar.SECOND, 45);
 		expectedTime.set(Calendar.MILLISECOND, 0);
 		Date fixedDate = expectedTime.getTime();
 		assertThat(expectedDateTime, is(ConversionUtils.toLocalDateTime(fixedDate)));
+	}
+
+	@Test
+	public void toNullableLocalDateTime_BackAndForthDateConversions_ExpectSameLocalDateTime()
+	{
+		String startTime = "2019-04-30T23:30:45-08:00";
+		String parseFormat = "yyyy-MM-dd'T'HH:mm:ssxxx";
+		LocalDateTime expectedLocalDateTime = LocalDateTime.parse(startTime, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+		Date transformUtilDate = ConversionUtils.getLegacyDateFromDateString(startTime, parseFormat);
+
+		LocalDateTime comparisonLocalDatetime = ConversionUtils.toNullableLocalDateTime(transformUtilDate);
+		transformUtilDate = java.sql.Timestamp.valueOf(comparisonLocalDatetime);
+		comparisonLocalDatetime = ConversionUtils.toNullableLocalDateTime(transformUtilDate);
+
+		assertThat(expectedLocalDateTime, is(comparisonLocalDatetime));
 	}
 
 	@Test
