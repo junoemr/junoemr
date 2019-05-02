@@ -218,7 +218,7 @@ if(custom_logo_name != null ){
             <td>
 				<div style="position: relative;">
 					<% if (RxWatermarkService.isWatermarkEnabled()) {%>
-						<img style="position:absolute; left:50%; top: 50%; transform: translate(-50%, -50%);" src="../RxWatermark.do?method=getWatermark" onerror="this.style.display='none'"/>
+						<img style="position:absolute; left:50%; top: 50%; transform: translate(-50%, -50%); width:80%" src="../RxWatermark.do?method=getWatermark" onerror="this.style.display='none'"/>
 					<% } %>
                             <table id="pwTable" width="400px" height="500px" cellspacing=0 cellpadding=10 border=2>
                                     <tr>

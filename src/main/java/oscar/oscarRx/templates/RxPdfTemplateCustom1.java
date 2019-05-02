@@ -145,8 +145,10 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		try
 		{
 			Image watermarkImg = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
-			watermarkImg.setAbsolutePosition(document.getPageSize().getWidth()/2 -watermarkImg.getWidth() / 2,
-					document.getPageSize().getHeight()/2 -watermarkImg.getHeight() / 2);
+			float scaleFactor = (document.getPageSize().getWidth()*0.8f)/watermarkImg.getWidth();
+			watermarkImg.scalePercent(scaleFactor*100f);
+			watermarkImg.setAbsolutePosition(document.getPageSize().getWidth()/2 - (watermarkImg.getWidth()*scaleFactor) / 2,
+					document.getPageSize().getHeight()/2 - (watermarkImg.getHeight()*scaleFactor) / 2);
 			cb.addImage(watermarkImg);
 		}
 		catch(Exception e)
