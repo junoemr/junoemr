@@ -218,7 +218,7 @@
                             <div class="watermark-input-field flex-fill-row">
                                 <div style="display:flex; flex-direction:row;">
                                     <div style="margin-right: 5px;">
-                                        <img id="current-watermark-preview" src="../RxWatermark.do?method=getWatermark" width="100" height="100" style="background-color: #fefefe;"/>
+                                        <img id="current-watermark-preview" src="../RxWatermark.do?method=getWatermark" width="100" height="100" style="background-color: #fefefe;" onerror="this.style.display='none';"/>
                                     </div>
                                     <div>
                                         <label><b>Rx Prescription watermark</b></label>
@@ -312,7 +312,9 @@
                 processData: false,
                 success: function() {
                     jQuery("#watermark-file").val("");
-                    jQuery("#current-watermark-preview").attr("src", "../RxWatermark.do?method=getWatermark&rand=" + Math.random())
+                    let watermarkPreview = jQuery("#current-watermark-preview")
+                    watermarkPreview.css("display", "flex");
+                    watermarkPreview.attr("src", "../RxWatermark.do?method=getWatermark&rand=" + Math.random())
                 }
             })
         }
