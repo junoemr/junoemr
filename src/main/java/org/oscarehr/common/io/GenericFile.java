@@ -151,6 +151,11 @@ public class GenericFile
 		throw new IOException("Invalid Directory: " + directoryFile.getPath());
 	}
 
+	public boolean deleteFile() throws IOException
+	{
+		return Files.deleteIfExists(this.javaFile.toPath());
+	}
+
 	public void rename(String newName) throws IOException
 	{
 		File directoryFile = javaFile.getParentFile();

@@ -196,7 +196,7 @@
                 <fieldset>
                     <legend>Prescription Watermark</legend>
                     <form action="../RxWatermark.do" method="POST" enctype="multipart/form-data" id="watermark-form">
-                        <input type="hidden" name="method" value="setWatermark">
+                        <input id="watermark-upload-action" type="hidden" name="method" value="setWatermark">
 
                         <div class="input-field flex-fill-row">
                             <input id="watermark-toggle" <% if (RxWatermarkService.isWatermarkEnabled()) {%>checked<%}%> type="checkbox">
@@ -226,8 +226,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="watermark-input-field flex-fill-row">
-                                <input class="submit-button" type="submit" value="Upload">
+                            <div class="watermark-input-field flex-fill-row" style="flex-direction: row; justify-content: center;">
+                                <input id="watermark-submit-upload" class="submit-button" style="display:flex; flex: 0 1 auto; margin-right: 10px" type="submit" value="Upload">
+                                <input id="watermark-submit-delete" class="submit-button" style="display:flex; flex: 0 1 auto;" type="submit" value="Delete">
                             </div>
                         </div>
                     </form>
@@ -300,10 +301,20 @@
             }
         }
 
-        function submitWatermarkForm(event)
+        function submitWatermarkForm(event, action)
         {
-            let formData = new FormData(this);
             event.preventDefault();
+            if (action === "deleteWatermark")
+            {
+                if(!confirm("are you sure you want to delete your Rx watermark image"))
+                {
+                    return;
+                }
+            }
+
+            jQuery("#watermark-upload-action").val(action);
+            let formData = new FormData(event.target);
+
             jQuery.ajax({
                 url: "../RxWatermark.do",
                 type: "post",
@@ -321,7 +332,21 @@
 
         jQuery(document).ready(function ()
         {
-            jQuery("#watermark-form").submit(submitWatermarkForm);
+            let submitAction = "setWatermark";
+            jQuery("#watermark-submit-upload").click(function()
+            {
+                submitAction = "setWatermark";
+            });
+            jQuery("#watermark-submit-delete").click(function()
+            {
+                submitAction = "deleteWatermark";
+            });
+
+            jQuery("#watermark-form").submit(function(event)
+            {
+                submitWatermarkForm(event, submitAction);
+            });
+
             <% if (!RxWatermarkService.isWatermarkEnabled()) { %>
                 toggleWatermarkFields(false);
             <%}%>

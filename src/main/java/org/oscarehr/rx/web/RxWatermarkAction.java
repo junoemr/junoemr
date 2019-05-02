@@ -85,7 +85,7 @@ public class RxWatermarkAction  extends DispatchAction
 		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null,  "_admin");
 
 		FormFile watermarkFile = (FormFile) form.getMultipartRequestHandler().getFileElements().get("watermarkFile");
-		if (watermarkFile != null)
+		if (watermarkFile != null && !watermarkFile.getFileName().isEmpty())
 		{
 			MiscUtils.getLogger().info("new watermark file: " + watermarkFile.getFileName());
 			try
@@ -101,6 +101,18 @@ public class RxWatermarkAction  extends DispatchAction
 		{
 			MiscUtils.getLogger().error("failed to retrieve watermark file");
 		}
+
+		response.setStatus(200);
+		return null;
+	}
+
+	// delete the watermark file
+	public ActionForward deleteWatermark(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
+		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null,  "_admin");
+
+		RxWatermarkService.deleteWatermark();
 
 		response.setStatus(200);
 		return null;

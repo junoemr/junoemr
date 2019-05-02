@@ -87,4 +87,9 @@ public class RxWatermarkService
 		}
 	}
 
+	public static void deleteWatermark() throws IOException
+	{
+		getWatermark().deleteFile();
+	}
+
 }
