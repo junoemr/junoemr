@@ -33,7 +33,6 @@ import java.util.TimeZone;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Appointment.BookingSource;
 import org.oscarehr.provider.dao.ProviderDataDao;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.BeanUtils;
 
