@@ -634,6 +634,42 @@ private long getAppointmentRowSpan(
 		jQuery.noConflict();
 	</script>
 
+	<script type="text/javascript">
+
+		var billedAppointmentNos = [];
+
+		// Mostly works, but it requires two clicks instead of one
+		// TODO look into registering this for every appointment loaded onto the page
+		function disableBillingLinkAfterClick(link)
+		{
+			link.onclick = function(event)
+			{
+				event.preventDefault();
+				console.log(link);
+				var target = link.href;
+				var targetLink = target.split("&");
+				var appointmentNo = "";
+				targetLink.forEach(function (param)
+				{
+					if (param.indexOf("appointment_no") !== -1)
+					{
+						appointmentNo = param.split("=")[1];
+						console.log(appointmentNo);
+					}
+				});
+				if (billedAppointmentNos.includes(appointmentNo))
+				{
+					console.log("Already billed " + appointmentNo);
+				}
+				else
+				{
+					billedAppointmentNos.push(appointmentNo);
+					window.open(target, '_blank');
+				}
+			};
+		}
+	</script>
+
 	<script type="text/javascript" src="schedulePage.js.jsp"></script>
 
 
@@ -1903,8 +1939,10 @@ private long getAppointmentRowSpan(
 																		</c:when>
 																		<c:otherwise>
 																			&#124; <a
+																				id="billingLink"
 																				href="${appointmentInfo.billLink}"
 																				target="_blank"
+																				onclick="disableBillingLinkAfterClick(this); return false;"
 																				title="<bean:message key="global.billingtag"/>"
 																			>
 																				<bean:message key="provider.appointmentProviderAdminDay.btnB"/>
