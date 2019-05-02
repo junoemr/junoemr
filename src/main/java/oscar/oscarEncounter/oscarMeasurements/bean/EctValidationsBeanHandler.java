@@ -68,12 +68,12 @@ public class EctValidationsBeanHandler {
 		Double maxValue = validation.getMaxValue() != null ? ConversionUtils.fromDoubleString(validation.getMaxValue()) : null;
 		Integer minLength = validation.getMinLength() != null ? ConversionUtils.fromIntString(validation.getMinLength()) : null;
 		Integer maxLength = validation.getMaxLength() != null ? ConversionUtils.fromIntString(validation.getMaxLength()) : null;
-		Boolean isNumeric = ConversionUtils.fromBoolString(validation.getIsNumeric());
+		Boolean isNumeric = ConversionUtils.hasContent(validation.getIsNumeric());
 		if (!isNumeric)
 		{
 			isNumeric = null;
 		}
-		Boolean isDate = ConversionUtils.fromBoolString(validation.getIsDate());
+		Boolean isDate = ConversionUtils.hasContent(validation.getIsDate());
 		if (!isDate)
 		{
 			isDate = null;

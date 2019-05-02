@@ -147,21 +147,8 @@ public class DemographicRelationship {
 			h.put("phone", demographic.getPhone());
 			h.put("demographicNo", demo);
 			h.put("relation", r.getRelation());
-
-			boolean subDecisionMaker = true;
-			if (r.getSubDecisionMaker() == null || !r.getSubDecisionMaker().isEmpty())
-			{
-				subDecisionMaker = false;
-			}
-			h.put("subDecisionMaker", subDecisionMaker);
-
-			boolean hasEmergencyContact = true;
-			if (r.getEmergencyContact() == null || !r.getEmergencyContact().isEmpty())
-			{
-				hasEmergencyContact = false;
-			}
-			h.put("emergencyContact", hasEmergencyContact);
-
+			h.put("subDecisionMaker", ConversionUtils.hasContent(r.getSubDecisionMaker()));
+			h.put("emergencyContact", ConversionUtils.hasContent(r.getEmergencyContact()));
 			h.put("notes", r.getNotes());
 			h.put("age", demographic.getAge());
 			list.add(h);
@@ -185,20 +172,8 @@ public class DemographicRelationship {
 			h.put("phone", demographic.getPhone());
 			h.put("demographicNo", demo);
 			h.put("relation", r.getRelation());
-
-			boolean subDecisionMaker = true;
-			if (r.getSubDecisionMaker() == null || !r.getSubDecisionMaker().isEmpty())
-			{
-				subDecisionMaker = false;
-			}
-			h.put("subDecisionMaker", subDecisionMaker);
-
-			boolean hasEmergencyContact = true;
-			if (r.getEmergencyContact() == null || !r.getEmergencyContact().isEmpty())
-			{
-				hasEmergencyContact = false;
-			}
-			h.put("emergencyContact", hasEmergencyContact);
+			h.put("subDecisionMaker", ConversionUtils.hasContent(r.getSubDecisionMaker()));
+			h.put("emergencyContact", ConversionUtils.hasContent(r.getEmergencyContact()));
 			h.put("notes", r.getNotes());
 			h.put("age", demographic.getAge());
 			list.add(h);

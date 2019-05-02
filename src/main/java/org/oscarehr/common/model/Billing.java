@@ -25,6 +25,8 @@
 
 package org.oscarehr.common.model;
 
+import oscar.util.ConversionUtils;
+
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -238,7 +240,7 @@ public class Billing extends AbstractModel<Integer>{
     }
 	
 	public boolean getStatusAsBoolean() {
-		return (status == null || status.trim().isEmpty());
+		return ConversionUtils.hasContent(status);
 	}
 
 	public void setStatus(String status) {

@@ -193,7 +193,7 @@ public class EctValidation
 			}
 			// Measurements uses following function to record date, which is different from the above check
 			// Sanity check by calling it and ensuring we won't get a null value back
-			inputValue = ConversionUtils.padDateString(inputValue);
+			inputValue = ConversionUtils.padDateTimeString(inputValue);
 			if (getLegacyDateFromDateString(inputValue) == null)
 			{
 				validation = false;

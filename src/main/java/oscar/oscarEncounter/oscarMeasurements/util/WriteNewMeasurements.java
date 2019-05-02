@@ -162,7 +162,7 @@ public class WriteNewMeasurements {
             Hashtable measure = (Hashtable) measures.get(i);
             String inputType = (String) measure.get("type");
             String inputValue = (String) measure.get("value");
-            String dateObserved = ConversionUtils.padDateString((String) measure.get("dateObserved"));
+            String dateObserved = ConversionUtils.padDateTimeString((String) measure.get("dateObserved"));
             String comments = (String) measure.get("comments");
             String instruction;
             String regExp;
@@ -284,7 +284,7 @@ public class WriteNewMeasurements {
         String inputType = (String) measure.get("type");
         String mInstrc = (String) measure.get("measuringInstruction");
         String comments = (String) measure.get("comments");
-        String dateObserved = ConversionUtils.padDateString((String) measure.get("dateObserved"));
+        String dateObserved = ConversionUtils.padDateTimeString((String) measure.get("dateObserved"));
         //write....
         Measurement measurement = new Measurement();
         measurement.setType(inputType);

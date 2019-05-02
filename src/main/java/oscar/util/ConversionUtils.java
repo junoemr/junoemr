@@ -23,7 +23,6 @@
  */
 package oscar.util;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
@@ -44,6 +43,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Yet another conversion utility class for bridging JPA entity to legacy schema mismatch. 
@@ -69,6 +70,9 @@ public class ConversionUtils {
 	private static final String ZERO_STRING = "0";
 
 	private static final long MS_IN_DAY = 1000 * 60 * 60 * 24;
+
+	private static final Pattern datePattern = Pattern.compile("(\\d{4})-(\\d{1,2})-(\\d{1,2})");
+	private static final Pattern dateTimePattern = Pattern.compile("(\\d{4})-(\\d{1,2})-(\\d{1,2})\\s(\\d{1,2}):(\\d{1,2})[:]?(\\d{1,2})?");
 
 	private ConversionUtils() {
 	}
@@ -319,12 +323,17 @@ public class ConversionUtils {
 	 * 		Returns true only if the string is "1" or "true", false otherwise.
 	 */
 	public static boolean fromBoolString(String str) {
-		if (str == null || str.trim().isEmpty())
+		if (!hasContent(str) || "0".equals(str))
 		{
 			return false;
 		}
 
 		return str.equals("1") || str.toLowerCase().equals("true");
+	}
+
+	public static boolean hasContent(String str)
+	{
+		return !(str == null || str.trim().isEmpty());
 	}
 
 	/**
@@ -389,76 +398,104 @@ public class ConversionUtils {
 
 	/**
 	 * Some date strings that we receive are sometimes missing leading zeroes, i.e:
-	 * - 2019-4-8
+	 * - 2019-04-8
 	 * - 2019-4-08
-	 * - 2019-4-5 hh:mm:ss
 	 *
 	 * LocalDate can interpret these properly if we individually feed in the year, month, and day.
 	 *
 	 * @param dateString
-	 *		Date string of form like yyyy-MM-dd (hh:mm:ss).
+	 *		Date string of form like yyyy-MM-dd
 	 *		This input string is allowed to be missing leading zero on MM or dd.
 	 *		Note that LocalDate *could* fix a bad year (a year like 019 or 219)
 	 *		but allowing a year entry like these to be entered could cause more problems.
 	 * @return dateString
 	 *		Original dateString if it's already in good shape or parsing fails
-	 *		Otherwise return a new dateString of format yyyy-MM-dd (hh:mm:ss)
+	 *		Otherwise return a new dateString of format yyyy-MM-dd
 	 */
 	public static String padDateString(String dateString)
 	{
-		// Don't operate on strings that are either already formatted correctly
-		// or have no chance of being formatted correctly
-		if (dateString.length() < 8 || StringUtils.countMatches(dateString, "-") != 2)
-		{
-			return dateString;
-		}
-
-		String[] splitDate = dateString.split("-");
-		// If we didn't get [yyyy, (M)M, (d)d] then there's no point
-		if (splitDate.length != 3 || splitDate[0].length() != 4)
-		{
-			return dateString;
-		}
-
-		String[] timestamp = null;
-		// Date portion can have a leading space following into a timestamp
-		// Timestamp can be of format h:m(m)(:ss), need to pad and support
-		if (splitDate[2].contains(" "))
-		{
-			String[] splitTimestamp = splitDate[2].split(" ");
-			splitDate[2] = splitTimestamp[0];
-			if (splitTimestamp[1].contains(":"))
-			{
-				timestamp = splitTimestamp[1].split(":");
-			}
-		}
-
+		Matcher match;
 		try
 		{
-			int year = Integer.parseInt(splitDate[0]);
-			int month = Integer.parseInt(splitDate[1]);
-			int date = Integer.parseInt(splitDate[2]);
-			int hour = 0;
-			int minute = 0;
-			int second = 0;
-			if (timestamp != null)
-			{
-				hour = Integer.parseInt(timestamp[0]);
-				minute = Integer.parseInt(timestamp[1]);
-				if (timestamp.length > 2)
-				{
-					second = Integer.parseInt(timestamp[2]);
-				}
-			}
-			LocalDateTime desiredDate = LocalDateTime.of(year, month, date, hour, minute, second);
-			// toString creates format of yyyy-MM-ddThh:mm:ss
-			return desiredDate.toString().replace("T", " ");
+			match = datePattern.matcher(dateString);
 		}
-		catch (NumberFormatException | DateTimeParseException ex)
+		catch (IllegalStateException ex)
 		{
-			logger.warn("Error attempting to pad " + dateString + ": " + ex);
 			return dateString;
 		}
+
+		if (match.matches())
+		{
+			try
+			{
+				int year = Integer.parseInt(match.group(1));
+				int month = Integer.parseInt(match.group(2));
+				int day = Integer.parseInt(match.group(3));
+
+				LocalDate desiredDate = LocalDate.of(year, month, day);
+				return desiredDate.toString();
+			}
+			catch (NumberFormatException | DateTimeParseException ex)
+			{
+				return dateString;
+			}
+		}
+
+		return dateString;
+	}
+
+	/**
+	 * Some datetime strings we receive are missing leading zeroes in one or
+	 * more of their fields. If we pull out the individual fields and feed them into
+	 * LocalDateTime we can reconstruct a properly formatted string for future needs.
+	 *
+	 * @param dateTimeString
+	 * 		Datetime string of format like yyyy-MM-dd hh:mm:ss
+	 * 		yyyy must be 4 digits. MM, dd, HH, mm can all be 1 or 2 digits.
+	 * 	    ss is optional and can be 1 or 2 digits.
+	 * @return
+	 * 		New dateTimeString of format yyyy-MM:dd hh:mm(:ss) if parsing was successful
+	 * 		If string couldn't be fit to the datetime format, attempt to fit it to yyyy-MM-dd and return that
+	 * 		If the internal call to try and fit to yyyy-MM-dd fails the user gets their original string back
+	 */
+	public static String padDateTimeString(String dateTimeString)
+	{
+		Matcher match;
+		try
+		{
+			match = dateTimePattern.matcher(dateTimeString);
+		}
+		catch (IllegalStateException ex)
+		{
+			MiscUtils.getLogger().error("error matching: " + ex);
+			return dateTimeString;
+		}
+
+		if (match.matches())
+		{
+			try
+			{
+				int year = Integer.parseInt(match.group(1));
+				int month = Integer.parseInt(match.group(2));
+				int day = Integer.parseInt(match.group(3));
+				int hour = Integer.parseInt(match.group(4));
+				int minute = Integer.parseInt(match.group(5));
+				int second = 0;
+				if (match.group(6) != null)
+				{
+					second = Integer.parseInt(match.group(6));
+				}
+				LocalDateTime desiredDate = LocalDateTime.of(year, month, day, hour, minute, second);
+				return desiredDate.toString().replace("T", " ");
+			}
+			catch (NumberFormatException | DateTimeParseException ex)
+			{
+				logger.warn("Error attempting to pad " + dateTimeString + ": " + ex);
+				return dateTimeString;
+			}
+		}
+		// Could have gotten a format of yyyy-MM-dd - try throwing it in the other pad function to be safe
+		return padDateString(dateTimeString);
 	}
 
 	public static Date getLegacyDateFromDateString(String dateString)

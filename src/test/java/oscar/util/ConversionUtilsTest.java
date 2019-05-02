@@ -528,6 +528,26 @@ public class ConversionUtilsTest
 	}
 
 	@Test
+	public void hasContent_Null_ExpectFalse()
+	{
+		Assert.assertFalse(ConversionUtils.hasContent(null));
+	}
+
+	@Test
+	public void hasContent_EmptyString_ExpectFalse()
+	{
+		Assert.assertFalse(ConversionUtils.hasContent(""));
+		Assert.assertFalse(ConversionUtils.hasContent(" "));
+	}
+
+	@Test
+	public void hasContent_SomeStr_ExpectTrue()
+	{
+		Assert.assertTrue(ConversionUtils.hasContent("0"));
+		Assert.assertTrue(ConversionUtils.hasContent("anything you want"));
+	}
+
+	@Test
 	public void fromDoubleString_NullParameter_ExpectZero()
 	{
 		Assert.assertEquals(0.0, ConversionUtils.fromDoubleString(null));
@@ -574,88 +594,127 @@ public class ConversionUtilsTest
 	}
 
 	@Test
-	public void toDays_LongParameter_ExpectInteger()
+	public void toDays_LongParameterBetweenDays_ExpectFlooredDayCount()
 	{
 		long MS_IN_DAY = 1000 * 60 * 60 * 24;
 		Assert.assertEquals(3, ConversionUtils.toDays(MS_IN_DAY * 3 + 1L));
+		Assert.assertEquals(2, ConversionUtils.toDays(MS_IN_DAY * 3 - 1L));
 	}
 
 	@Test
-	public void padDateString_FormatOf_DateStringSingleDigitDate_ExpectPaddedString()
+	public void padDateTimeString_DateTimeStringSingleDigitDate_ExpectPaddedString()
 	{
-		Assert.assertEquals("2019-04-03 00:00", ConversionUtils.padDateString("2019-4-3"));
+		Assert.assertEquals("2019-04-03 00:00", ConversionUtils.padDateTimeString("2019-04-3 00:00:00"));
 	}
 
 	@Test
-	public void padDateString_DateStringSingleDigitMonthAndDate_ExpectPaddedString()
+	public void padDateTimeString_DateTimeStringSingleDigitMonth_ExpectPaddedString()
 	{
-		Assert.assertEquals("2019-04-03 00:00", ConversionUtils.padDateString("2019-04-3"));
+		Assert.assertEquals("2019-04-03 12:43:08", ConversionUtils.padDateTimeString("2019-4-03 12:43:08"));
 	}
 
 	@Test
-	public void padDateString_DateStringSingleDigitMonth_ExpectPaddedString()
+	public void padDateTimeString_MultipleSingleDigitFields_ExpectPaddedString()
 	{
-		Assert.assertEquals("2019-04-03 00:00", ConversionUtils.padDateString("2019-4-03"));
+		Assert.assertEquals("2019-05-01 09:30:05", ConversionUtils.padDateTimeString("2019-5-1 9:30:5"));
 	}
 
 	@Test
-	public void padDateString_ShortString_ExpectInputAsOutput()
+	public void padDateTimeString_DateTimeStringSingleDigitHour_ExpectPaddedString()
 	{
-		Assert.assertEquals("1-2-3", ConversionUtils.padDateString("1-2-3"));
+		Assert.assertEquals("2019-04-03 09:05:02", ConversionUtils.padDateTimeString("2019-04-03 9:05:02"));
 	}
 
 	@Test
-	public void padDateString_OtherString_ExpectInputAsOutput()
+	public void padDateTimeString_DateTimeStringSingleDigitMinute_ExpectPaddedString()
+	{
+		Assert.assertEquals("2019-04-03 09:05:02", ConversionUtils.padDateTimeString("2019-04-03 09:5:02"));
+	}
+
+	@Test
+	public void padDateTimeString_DateTimeStringSingleDigitSecond_ExpectPaddedString()
+	{
+		Assert.assertEquals("2019-04-03 09:05:02", ConversionUtils.padDateTimeString("2019-04-03 09:05:2"));
+	}
+
+	@Test
+	public void padDateTimeString_DateTimeStringNoSeconds_ExpectPaddedString()
+	{
+		Assert.assertEquals("2019-04-03 09:05", ConversionUtils.padDateTimeString("2019-04-03 9:05"));
+	}
+
+	@Test
+	public void padDateTimeString_DateTimeString_ExpectSameString()
+	{
+		Assert.assertEquals("2019-04-03 09:05:05", ConversionUtils.padDateTimeString("2019-04-03 09:05:05"));
+	}
+
+	@Test
+	public void padDateTimeString_DateString_ExpectSameString()
+	{
+		Assert.assertEquals("2019-04-03", ConversionUtils.padDateTimeString("2019-04-03"));
+	}
+
+	@Test
+	public void padDateTimeString_DateStringSingleDigitFields_ExpectPaddedDateString()
+	{
+		Assert.assertEquals("2019-04-03", ConversionUtils.padDateTimeString("2019-4-3"));
+	}
+
+	@Test
+	public void padDateTimeString_OtherString_ExpectSameString()
+	{
+		Assert.assertEquals("some other string", ConversionUtils.padDateTimeString("some other string"));
+	}
+
+	@Test
+	public void padDateTimeString_DateTimeStringNoMinutesOrSeconds_ExpectSameString()
+	{
+		Assert.assertEquals("2019-04-03 09", ConversionUtils.padDateTimeString("2019-04-03 09"));
+	}
+
+	@Test
+	public void padDateTimeString_DateTimeStringNotFourDigitYear_ExpectSameString()
+	{
+		Assert.assertEquals("123-04-05 06:07:08", ConversionUtils.padDateTimeString("123-04-05 06:07:08"));
+		Assert.assertEquals("12345-06-07 08:09:10", ConversionUtils.padDateTimeString("12345-06-07 08:09:10"));
+	}
+
+	@Test
+	public void padDateString_SingleDigitMonth_ExpectPaddedString()
+	{
+		Assert.assertEquals("2019-04-03", ConversionUtils.padDateString("2019-4-03"));
+	}
+
+	@Test
+	public void padDateString_SingleDigitDate_ExpectPaddedString()
+	{
+		Assert.assertEquals("2019-04-03", ConversionUtils.padDateString("2019-04-3"));
+	}
+
+	@Test
+	public void padDateString_NotFourDigitYear_ExpectSameString()
+	{
+		Assert.assertEquals("12345-6-7", ConversionUtils.padDateString("12345-6-7"));
+		Assert.assertEquals("123-4-5", ConversionUtils.padDateString("123-4-5"));
+	}
+
+	@Test
+	public void padDateString_MissingDate_ExpectSameString()
+	{
+		Assert.assertEquals("2019-04", ConversionUtils.padDateString("2019-04"));
+	}
+
+	@Test
+	public void padDateString_OnlyYear_ExpectSameString()
+	{
+		Assert.assertEquals("2019", ConversionUtils.padDateString("2019"));
+	}
+
+	@Test
+	public void padDateString_OtherString_ExpectSameString()
 	{
 		Assert.assertEquals("not a date", ConversionUtils.padDateString("not a date"));
-	}
-
-	@Test
-	public void padDateString_DateTimeStringSingleDigitMonthAndDate_ExpectPaddedDateString()
-	{
-		Assert.assertEquals("2019-04-03 12:43:08", ConversionUtils.padDateString("2019-4-3 12:43:08"));
-	}
-
-	@Test
-	public void padDateString_DateTimeStringSingleDigitMonth_ExpectPaddedDateString()
-	{
-		Assert.assertEquals("2019-04-03 12:43:08", ConversionUtils.padDateString("2019-4-03 12:43:08"));
-	}
-
-	@Test
-	public void padDateString_DateTimeStringSingleDigitDate_ExpectPaddedDateString()
-	{
-		Assert.assertEquals("2019-04-03 12:43:08", ConversionUtils.padDateString("2019-04-3 12:43:08"));
-	}
-
-	@Test
-	public void padDateString_DateTimeStringSingleDigitHour_ExpectPaddedDateString()
-	{
-		Assert.assertEquals("2019-04-03 09:05:02", ConversionUtils.padDateString("2019-04-03 9:05:02"));
-	}
-
-	@Test
-	public void padDateString_DateTimeStringSingleDigitMinute_ExpectPaddedDateString()
-	{
-		Assert.assertEquals("2019-04-03 09:05:02", ConversionUtils.padDateString("2019-04-03 09:5:02"));
-	}
-
-	@Test
-	public void padDateString_DateTimeStringSingleDigitSecond_ExpectPaddedDateString()
-	{
-		Assert.assertEquals("2019-04-03 09:05:02", ConversionUtils.padDateString("2019-04-03 09:05:2"));
-	}
-
-	@Test
-	public void padDateString_DateTimeStringSingleDigitHourAndMinuteAndSecond_ExpectPaddedDateString()
-	{
-		Assert.assertEquals("2019-04-03 09:05:02", ConversionUtils.padDateString("2019-04-03 9:5:2"));
-	}
-
-	@Test
-	public void padDateString_DateTimeStringSingleDigitHourNoSeconds_ExpectPaddedDateString()
-	{
-		Assert.assertEquals("2019-04-03 09:05", ConversionUtils.padDateString("2019-04-03 9:05"));
 	}
 
 	@Test
