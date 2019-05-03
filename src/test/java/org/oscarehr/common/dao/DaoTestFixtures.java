@@ -95,11 +95,6 @@ public abstract class DaoTestFixtures
 		}
 	}
 	
-	public void beforeForInnoDB() throws Exception {
-		SchemaUtils.dropTable("IntegratorConsent","HnrDataValidation","ClientLink","IntegratorConsentComplexExitInterview",
-				"DigitalSignature","appointment","admission" ,"program","demographic");
-	}
-	
 	@BeforeClass
 	public static void classSetUp() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException
 	{

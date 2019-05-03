@@ -40,6 +40,7 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Id;
 
 import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.MiscUtils;
 
@@ -62,6 +63,11 @@ public class EntityDataGenerator {
             }
 	        if(isId)
 	        	continue;
+
+	        if(model.getClass() == Demographic.class && f[i].getName() == "providerNo")
+			{
+				continue;
+			}
 
 	        int modifiers = f[i].getModifiers();
 	        if((modifiers & Modifier.STATIC) == Modifier.STATIC) {

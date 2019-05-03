@@ -71,18 +71,29 @@ public class Startup implements ServletContextListener {
 			}
 
 			String propName = contextPath + ".properties";
+			propFileName = "";
 
-			char sep = System.getProperty("file.separator").toCharArray()[0];
-			propFileName = System.getProperty("user.home") + sep + propName;
-			logger.info("looking up " + propFileName);
-			// oscar.OscarProperties p = oscar.OscarProperties.getInstance();
-			try {
-				// This has been used to look in the users home directory that started tomcat
+			if (System.getProperty("oscar.use.integration.prop.file") != null && System.getProperty("oscar.use.integration.prop.file").equals("true"))
+			{
+				propFileName = "src/test/resources/integration.properties";
+			}
+			else
+			{
+				char sep = System.getProperty("file.separator").toCharArray()[0];
+				propFileName = System.getProperty("user.home") + sep + propName;
+			}
+
+			try
+			{
+				// load property file
+				logger.info("looking up " + propFileName);
 				p.readFromFile(propFileName);
 				logger.info("loading properties from " + propFileName);
-			} catch (java.io.FileNotFoundException ex) {
+			} catch (java.io.FileNotFoundException ex)
+			{
 				logger.info(propFileName + " not found");
 			}
+
 			if (p.isEmpty()) {
 				/* if the file not found in the user root, look in the WEB-INF directory */
 				try {
