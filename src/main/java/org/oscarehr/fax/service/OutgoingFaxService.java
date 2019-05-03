@@ -69,7 +69,7 @@ import java.util.List;
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class OutgoingFaxService
 {
-	private static final String STATUS_MESSAGE_IN_TRANSIT = "Sent through integration";
+	private static final String STATUS_MESSAGE_IN_TRANSIT = "Sending";
 	private static final String STATUS_MESSAGE_COMPLETED = "Success";
 	private static final String DEFAULT_MAX_SEND_COUNT = "5";
 

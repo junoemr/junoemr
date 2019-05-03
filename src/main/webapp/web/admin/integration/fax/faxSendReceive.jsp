@@ -216,7 +216,6 @@
 						                    && item.combinedStatus != faxSendReceiveController.displayStatus.error.value
 						                    && item.combinedStatus != faxSendReceiveController.displayStatus.integrationFailed.value)"
 								        ng-click="faxSendReceiveController.resendFax(item);">
-									<span class="glyphicon glyphicon-repeat"></span>
 									<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.resend"/>
 								</button>
 								<button class="btn btn-primary btn-xs"
