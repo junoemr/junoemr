@@ -43,7 +43,6 @@ public class ProviderDataDaoTest extends DaoTestFixtures {
 
 	@Before
 	public void before() throws Exception {
-		this.beforeForInnoDB();
 		SchemaUtils.restoreTable("provider","providersite","secUserRole");
 	}
 

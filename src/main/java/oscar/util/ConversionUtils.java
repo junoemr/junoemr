@@ -446,25 +446,12 @@ public class ConversionUtils {
 	public static LocalDate toNullableLocalDate(String dateString)
 	{
 		if(dateString == null) return null;
-		return toZonedLocalDate(dateString);
+		return toLocalDate(dateString);
 	}
-
 	public static LocalDate toNullableLocalDate(Date legacyDate)
 	{
 		if(legacyDate == null) return null;
 		return toZonedLocalDate(legacyDate);
-	}
-
-
-	public static LocalDate toZonedLocalDate(String dateString)
-	{
-		return toZonedLocalDate(dateString, DateTimeFormatter.ISO_DATE_TIME);
-	}
-
-	public static LocalDate toZonedLocalDate(String dateString, DateTimeFormatter dateTimeFormatter)
-	{
-		ZonedDateTime result = ZonedDateTime.parse(dateString, dateTimeFormatter);
-		return result.toLocalDate();
 	}
 	public static LocalDate toLocalDate(String dateString)
 	{
@@ -475,7 +462,16 @@ public class ConversionUtils {
 	{
 		return LocalDate.parse(dateString, dateTimeFormatter);
 	}
-
+	public static LocalDate toNullableZonedLocalDate(String dateString)
+	{
+		if(dateString == null) return null;
+		return toZonedLocalDate(dateString, DateTimeFormatter.ISO_DATE_TIME);
+	}
+	public static LocalDate toZonedLocalDate(String dateString, DateTimeFormatter dateTimeFormatter)
+	{
+		ZonedDateTime result = ZonedDateTime.parse(dateString, dateTimeFormatter);
+		return result.toLocalDate();
+	}
 	public static LocalDate toZonedLocalDate(Date legacyDate)
 	{
 		LocalDate date = Instant

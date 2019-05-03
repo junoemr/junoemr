@@ -50,6 +50,7 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		ChartNo,
 		Sex,
 		Hin,
+		Email,
 		ProviderName
 	}
 
@@ -77,6 +78,7 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	private String chartNo;
 	private String sex;
 	private String providerNo;
+	private String email;
 
 	private SORT_MODE sortMode = SORT_MODE.DemographicNo;
 	private List<STATUS_MODE> statusModes = new ArrayList<>();
@@ -138,6 +140,11 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 		{
 			criteria.add(getRestrictionCriterion("providerNo", getProviderNo()));
 		}
+		if(getEmail() != null)
+		{
+			criteria.add(getRestrictionCriterion("email", getEmail()));
+		}
+
 
 		// set status filters and result ordering
 		setStatusCriteria(criteria);
@@ -368,6 +375,16 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 	public void setProviderNo(String providerNo)
 	{
 		this.providerNo = providerNo;
+	}
+
+	public String getEmail()
+	{
+		return email;
+	}
+
+	public void setEmail(String email)
+	{
+		this.email = email;
 	}
 
 	public SORT_MODE getSortMode()

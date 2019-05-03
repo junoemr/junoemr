@@ -23,19 +23,6 @@
 
 package org.oscarehr.PMmodule.caisi_integrator;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -74,6 +61,8 @@ import org.oscarehr.common.model.Facility;
 import org.oscarehr.common.model.IntegratorConsent;
 import org.oscarehr.common.model.IntegratorConsent.ConsentStatus;
 import org.oscarehr.common.model.IntegratorConsent.SignatureStatus;
+import org.oscarehr.demographic.search.DemographicCriteriaSearch;
+import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.hnr.ws.MatchingClientParameters;
 import org.oscarehr.hnr.ws.MatchingClientScore;
 import org.oscarehr.util.CxfClientUtilsOld;
@@ -81,8 +70,18 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.QueueCache;
 import org.oscarehr.util.SessionConstants;
-import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
-import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SEARCHMODE;
+
+import javax.servlet.http.HttpSession;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * This class is a manager for integration related functionality. <br />
@@ -580,44 +579,42 @@ public class CaisiIntegratorManager {
 		if (demographicTransfer.getPhone1()!=null) demographic.setPhone(demographicTransfer.getPhone1());
 		if (demographicTransfer.getPhone2()!=null) demographic.setPhone2(demographicTransfer.getPhone2());
     }
-    
-    public static MatchingDemographicParameters getMatchingDemographicParameters(LoggedInInfo loggedInInfo, DemographicSearchRequest searchRequest) {
-		MatchingDemographicParameters matchingDemographicParameters=null;
-		
-		
-		if(searchRequest.getMode() == SEARCHMODE.HIN) {
-			matchingDemographicParameters=new MatchingDemographicParameters();
-		    matchingDemographicParameters.setHin(searchRequest.getKeyword());	    
+
+	public static MatchingDemographicParameters getMatchingDemographicParameters(DemographicService.SEARCH_MODE searchMode, DemographicCriteriaSearch searchRequest)
+	{
+		MatchingDemographicParameters matchingDemographicParameters = null;
+
+
+		if(searchMode == DemographicService.SEARCH_MODE.hin)
+		{
+			matchingDemographicParameters = new MatchingDemographicParameters();
+			matchingDemographicParameters.setHin(searchRequest.getHin());
 		}
-		if(searchRequest.getMode() == SEARCHMODE.DOB) {
+		if(searchMode == DemographicService.SEARCH_MODE.dob)
+		{
 			try
-	    	{
-	    		String year=searchRequest.getKeyword().substring(0, 4);
-	    		String month=searchRequest.getKeyword().substring(5, 7);
-	    		String day=searchRequest.getKeyword().substring(8);
+			{
+				int year = searchRequest.getDateOfBirth().getYear();
+				int month = searchRequest.getDateOfBirth().getMonthValue();
+				int day = searchRequest.getDateOfBirth().getDayOfMonth();
 
-		    	GregorianCalendar cal=new GregorianCalendar(Integer.parseInt(year), Integer.parseInt(month)-1, Integer.parseInt(day));
-		    	matchingDemographicParameters=new MatchingDemographicParameters();
-		    	matchingDemographicParameters.setBirthDate(cal);
-	    	}
-	    	catch (Exception e){
-	    		matchingDemographicParameters=null;
-	    	}
+				GregorianCalendar cal = new GregorianCalendar(year, month - 1, day);
+				matchingDemographicParameters = new MatchingDemographicParameters();
+				matchingDemographicParameters.setBirthDate(cal);
+			}
+			catch(Exception e)
+			{
+				matchingDemographicParameters = null;
+			}
 		}
-				    
-		if(searchRequest.getMode() == SEARCHMODE.Name) {
-		  	matchingDemographicParameters=new MatchingDemographicParameters();
-		  	String[] lastfirst = searchRequest.getKeyword().split(",");
 
-	        if (lastfirst.length > 1) {
-	            matchingDemographicParameters.setLastName(lastfirst[0].trim());
-	            matchingDemographicParameters.setFirstName(lastfirst[1].trim());
-	        }else{
-	            matchingDemographicParameters.setLastName(lastfirst[0].trim());
-	        }	
-			
+		if(searchMode == DemographicService.SEARCH_MODE.name)
+		{
+			matchingDemographicParameters = new MatchingDemographicParameters();
+			matchingDemographicParameters.setLastName(searchRequest.getLastName());
+			matchingDemographicParameters.setFirstName(searchRequest.getFirstName());
 		}
-		
+
 		return matchingDemographicParameters;
-    }
+	}
 }
