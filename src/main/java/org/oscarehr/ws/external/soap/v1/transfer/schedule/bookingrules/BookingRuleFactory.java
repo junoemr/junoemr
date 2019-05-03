@@ -30,11 +30,12 @@ import org.json.simple.parser.ParseException;
 
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BookingRuleFactory
 {
-
     private static final String PERIOD_TYPE_CUTOFF_DAY = "cuttoff_day";
     private static final String PERIOD_TYPE_BLACKOUT_NOW_UNTIL_HOUR = "blackout_now_until_hour";
     private static final String PERIOD_TYPE_BLACKOUT_NOW_UNTIL_DAY = "blackout_now_until_day";
@@ -47,7 +48,8 @@ public class BookingRuleFactory
     private static final String PRIMARY_PROVIDER_ONLY = "primary_provider_only";    // TODO: Placeholder
     private static final String APPOINTMENT_AVAILABLE = "appointment_is_available"; // TODO: Placeholder
 
-    public static List<BookingRule> createBookingRuleSet(String jsonRuleString) throws ParseException
+    // TODO: Class into component and autowire?
+    public static List<BookingRule> createBookingRuleList(Integer demographicNo, String jsonRuleString) throws ParseException
     {
         List<BookingRule> bookingRules = createNewBookingRulesList();
 
@@ -55,7 +57,7 @@ public class BookingRuleFactory
 
         for (Object jsonRule : json)
         {
-            BookingRule rule = createBookingRule((JSONObject) jsonRule);
+            BookingRule rule = createBookingRule(demographicNo, (JSONObject) jsonRule);
 
             if (rule != null)
             {
@@ -66,10 +68,31 @@ public class BookingRuleFactory
         return bookingRules;
     }
 
-    private static BookingRule createBookingRule(JSONObject jsonRule)
+    public static Map<BookingRuleType, List<BookingRule>> createBookingRuleMap(Integer demographicNo, String jsonRuleString) throws ParseException
+    {
+        Map<BookingRuleType, List<BookingRule>> ruleMap = createNewBookingRulesMap();
+
+        JSONArray json = (JSONArray) new JSONParser().parse(jsonRuleString);
+
+        for (Object jsonRule : json)
+        {
+            BookingRule rule = createBookingRule(demographicNo, (JSONObject) jsonRule);
+
+            if (rule != null)
+            {
+                List<BookingRule> ruleList = ruleMap.get(rule.getType());
+                ruleList.add(rule);
+                ruleMap.put(rule.getType(), ruleList);
+            }
+        }
+
+        return ruleMap;
+    }
+
+    private static BookingRule createBookingRule(Integer demographicNo, JSONObject jsonRule)
     {
         BookingRule bookingRule;
-        String type = (String) jsonRule.get("name");
+        String type = (String) jsonRule.get("type");
 
         switch (type)
         {
@@ -91,7 +114,7 @@ public class BookingRuleFactory
                 bookingRule = createMultipleBookingRule(jsonRule);
                 break;
             case (PRIMARY_PROVIDER_ONLY):
-                bookingRule = createPrimaryProviderOnlyRule(jsonRule);
+                bookingRule = createPrimaryProviderOnlyRule(demographicNo, jsonRule);
                 break;
             case (APPOINTMENT_AVAILABLE):
                 bookingRule = createAvailableRule();
@@ -107,7 +130,7 @@ public class BookingRuleFactory
     {
         Integer timeAmount = jsonRule.get("period_of_time") != null ? ((Long) jsonRule.get("period_of_time")).intValue() : null;
         Integer bookingAmount = jsonRule.get("bookings") != null ? ((Long) jsonRule.get("bookings")).intValue() : null;
-        String name = (String) jsonRule.get("name");
+        String name = (String) jsonRule.get("type");
         ChronoUnit timeUnit = getChronoUnit(name);
 
         if (bookingAmount != null && timeAmount != null && timeUnit != null)
@@ -121,8 +144,9 @@ public class BookingRuleFactory
     private static CancelCutoffRule createCancelRule(JSONObject jsonRule)
     {
         Integer amount = jsonRule.get("period_of_time") != null ? ((Long) jsonRule.get("period_of_time")).intValue() : null;
-        ChronoUnit timeUnit = getChronoUnit((String) jsonRule.get("name"));
-        String name = (String) jsonRule.get("name");
+        String name = (String) jsonRule.get("type");
+        ChronoUnit timeUnit = getChronoUnit(name);
+
 
         if (amount != null && timeUnit != null)
         {
@@ -135,7 +159,7 @@ public class BookingRuleFactory
     private static BookingCutoffRule createCutoffRule(JSONObject jsonRule)
     {
         Integer amount = jsonRule.get("period_of_time") != null ? ((Long) jsonRule.get("period_of_time")).intValue() : null;
-        String name = (String) jsonRule.get("name");
+        String name = (String) jsonRule.get("type");
         ChronoUnit timeUnit = getChronoUnit(name);
 
         if (amount != null && timeUnit != null)
@@ -149,8 +173,8 @@ public class BookingRuleFactory
     private static BlackoutRule createBlackOutRule(JSONObject jsonRule)
     {
         Integer amount = jsonRule.get("period_of_time") != null ? ((Long) jsonRule.get("period_of_time")).intValue() : null;
-        String name = (String) jsonRule.get("name");
-        ChronoUnit timeUnit = getChronoUnit("name");
+        String name = (String) jsonRule.get("type");
+        ChronoUnit timeUnit = getChronoUnit(name);
 
         if (amount != null && timeUnit != null)
         {
@@ -163,13 +187,13 @@ public class BookingRuleFactory
     private static AvailableRule createAvailableRule()
     {
         // TODO:  Should this come in from MHA?
-        return new AvailableRule("AppointmentIsAvailable");
+        return new AvailableRule("appointment_is_available");
     }
 
-    private static PrimaryProviderOnlyRule createPrimaryProviderOnlyRule(JSONObject jsonRule)
+    private static PrimaryProviderOnlyRule createPrimaryProviderOnlyRule(Integer demographicNo, JSONObject jsonRule)
     {
-        String name = (String) jsonRule.get("name");
-        return new PrimaryProviderOnlyRule(name);
+        String name = (String) jsonRule.get("type");
+        return new PrimaryProviderOnlyRule(demographicNo, name);
     }
 
     private static List<BookingRule> createNewBookingRulesList()
@@ -180,6 +204,25 @@ public class BookingRuleFactory
         bookingRules.add(createAvailableRule());
 
         return bookingRules;
+    }
+
+    private static Map<BookingRuleType, List<BookingRule>> createNewBookingRulesMap()
+    {
+        HashMap<BookingRuleType, List<BookingRule>> ruleMap = new HashMap<>();
+
+        for(BookingRuleType ruleType : BookingRuleType.values())
+        {
+            ruleMap.put(ruleType, new ArrayList<>());
+        }
+
+        // There is an implicit rule in every set of rules that an appointment must be available.
+        BookingRule availableRule = createAvailableRule();
+        List<BookingRule> availableRules = ruleMap.get(BookingRuleType.BOOKING_AVAILABLE);
+        availableRules.add(availableRule);
+
+        ruleMap.put(BookingRuleType.BOOKING_AVAILABLE, availableRules);
+
+        return ruleMap;
     }
 
     private static ChronoUnit getChronoUnit(String bookingRuleName)

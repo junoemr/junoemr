@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class ValidatedAppointmentBookingTransfer implements Serializable
 {
-    private Integer appointmentID;
+    private Appointment appointment;
     private Boolean validated;
     private String ruleViolations;
 
@@ -49,13 +49,13 @@ public class ValidatedAppointmentBookingTransfer implements Serializable
         if (violatedBookingRules.isEmpty())
         {
             setValidated(true);
-            setAppointmentID(appointment.getId());
+            setAppointment(appointment);
             setRuleViolations(new JSONArray().toJSONString());
         }
         else
         {
             setValidated(false);
-            setAppointmentID(null);
+            setAppointment(null);
             setRuleViolations(bookingRulesToJSONString(violatedBookingRules));
         }
     }
@@ -72,14 +72,14 @@ public class ValidatedAppointmentBookingTransfer implements Serializable
         return jsonArray.toJSONString();
     }
 
-    public Integer getAppointmentID()
+    public Appointment getAppointment()
     {
-        return appointmentID;
+        return this.appointment;
     }
 
-    public void setAppointmentID(Integer appointmentID)
+    public void setAppointment(Appointment appointment)
     {
-        this.appointmentID = appointmentID;
+        this.appointment = appointment;
     }
 
     public Boolean getValidated()

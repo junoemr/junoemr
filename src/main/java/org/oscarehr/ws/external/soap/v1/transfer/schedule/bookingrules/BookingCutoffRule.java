@@ -25,6 +25,7 @@ package org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules;
 
 import org.json.simple.JSONObject;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.schedule.model.ScheduleSearchResult;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDateTime;
@@ -40,7 +41,7 @@ public class BookingCutoffRule extends BookingRule
 
     public BookingCutoffRule(String jsonType, Integer amount, ChronoUnit timePeriod)
     {
-        super(jsonType);
+        super(BookingRuleType.BOOKING_CUTOFF, jsonType);
         this.amount = amount;
         this.timePeriod = timePeriod;
     }
@@ -48,12 +49,15 @@ public class BookingCutoffRule extends BookingRule
     @Override
     public Boolean isViolated(Appointment appointment)
     {
-        LocalDateTime appointmentTime = ConversionUtils.toLocalDateTime(appointment.getAppointmentDate()).truncatedTo(timePeriod);
-        LocalDateTime now = LocalDateTime.now().truncatedTo(timePeriod);
+        LocalDateTime appointmentTime = ConversionUtils.toLocalDateTime(appointment.getAppointmentDate());
+        return isAfterCutoff(appointmentTime);
+    }
 
-        LocalDateTime cutoff = now.plus(amount, timePeriod);
-
-        return appointmentTime.isAfter(cutoff);
+    @Override
+    public Boolean isViolated(ScheduleSearchResult result)
+    {
+        LocalDateTime slotDate = ConversionUtils.toLocalDateTime(result.date);
+        return isAfterCutoff(slotDate);
     }
 
     @Override
@@ -64,5 +68,12 @@ public class BookingCutoffRule extends BookingRule
         json.put("period_of_time", this.amount);
 
         return json;
+    }
+
+    private Boolean isAfterCutoff(LocalDateTime dateTime)
+    {
+        LocalDateTime cutoff = LocalDateTime.now().truncatedTo(timePeriod).plus(amount, timePeriod);
+
+        return dateTime.isAfter(cutoff);
     }
 }

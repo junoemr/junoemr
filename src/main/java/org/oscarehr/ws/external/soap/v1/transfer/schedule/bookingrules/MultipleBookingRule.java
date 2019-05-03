@@ -26,6 +26,7 @@ package org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules;
 import org.json.simple.JSONObject;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.schedule.model.ScheduleSearchResult;
 import org.oscarehr.util.SpringUtils;
 import oscar.util.ConversionUtils;
 
@@ -42,15 +43,29 @@ public class MultipleBookingRule extends BookingRule
     private Integer bookingAmount;
     private Integer timePeriodAmount;
     private ChronoUnit timePeriod;
-    private final OscarAppointmentDao appointmentDao;
+
+    /*
+        These two fields are used to cache existing patient appointment counts when calculating multi-booking rules.
+        For any pair of potential appointment dates, the number of existing encounters will be the same as long as
+        each potential date is within the same calendar timePeriod unit (defined by .truncateTo(timePeriod)).
+
+        For example: If the timePeriod is weeks, the number of existing appointments relevant to the multi-booking rule
+        will not change as long as the queries are within the same calendar week.
+
+        As a result cache the result and reuse it for any additional searches within the same window.
+     */
+
+    private Integer appointmentCountCache;                      // lazy instantiation of this variable
+    private LocalDateTime cacheWindow;                          // lazy instatiation of this variable
+
+    private static final OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 
     MultipleBookingRule (String jsonType, Integer bookingAmount, Integer timePeriodAmount, ChronoUnit timePeriod)
     {
-        super(jsonType);
+        super(BookingRuleType.BOOKING_MULTI, jsonType);
         this.bookingAmount = bookingAmount;
         this.timePeriodAmount = timePeriodAmount;
         this.timePeriod = timePeriod;
-        this.appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
     }
 
     @Override
@@ -59,7 +74,22 @@ public class MultipleBookingRule extends BookingRule
         LocalDateTime startDate = ConversionUtils.toLocalDateTime(appointment.getStartTimeAsFullDate()).truncatedTo(timePeriod);
         LocalDateTime endDate = startDate.plus(timePeriodAmount, timePeriod);
         List<Appointment> patientAppointments = appointmentDao.findByDateRangeAndDemographic(startDate, endDate, appointment.getDemographicNo());
+
         return patientAppointments.size() >= bookingAmount;
+    }
+
+    @Override
+    public Boolean isViolated(ScheduleSearchResult result)
+    {
+        // calculate result start time
+        // if it's in the window, return the result
+
+
+        // else, recalculate result store it then return the cached value
+        //return appointmentCountCache >= bookingAmount;
+
+
+        return false;
     }
 
     @Override
@@ -71,6 +101,4 @@ public class MultipleBookingRule extends BookingRule
         json.put("period_of_time", this.timePeriodAmount);
         return json;
     }
-
-
 }

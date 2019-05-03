@@ -27,6 +27,7 @@ import org.json.simple.JSONObject;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.schedule.model.ScheduleSearchResult;
 import org.oscarehr.util.SpringUtils;
 
 /**
@@ -34,20 +35,30 @@ import org.oscarehr.util.SpringUtils;
  */
 public class PrimaryProviderOnlyRule extends BookingRule
 {
-    private String mrpProviderNo;
-    private static DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+    private String demographicMRP;
+    private static final DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 
-    PrimaryProviderOnlyRule(String jsonType)
+    PrimaryProviderOnlyRule(Integer demographicNo, String jsonType)
     {
-        super("PrimaryProvider");
+        super(BookingRuleType.BOOKING_PRIMARY_PROVIDER_ONLY, jsonType);
+
+        Demographic demographic = demographicDao.find(demographicNo);
+        if (demographic != null)
+        {
+            this.demographicMRP = demographic.getProviderNo();
+        }
     }
 
     @Override
     public Boolean isViolated(Appointment appointment)
     {
-        Demographic demographic = demographicDao.find(appointment.getDemographicNo());
-        String mrp = demographic.getProviderNo();
-        return (mrp == null || !appointment.getProviderNo().equals(mrpProviderNo));
+        return !appointment.getProviderNo().equals(demographicMRP);
+    }
+
+    @Override
+    public Boolean isViolated(ScheduleSearchResult result)
+    {
+        return !result.providerNo.equals(demographicMRP);
     }
 
     @Override
@@ -57,6 +68,4 @@ public class PrimaryProviderOnlyRule extends BookingRule
         json.put("name", this.jsonType);
         return json;
     }
-
-
 }

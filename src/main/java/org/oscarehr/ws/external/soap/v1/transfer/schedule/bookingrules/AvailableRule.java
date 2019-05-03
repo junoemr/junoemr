@@ -26,6 +26,7 @@ package org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules;
 import org.json.simple.JSONObject;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.schedule.model.ScheduleSearchResult;
 import org.oscarehr.util.SpringUtils;
 
 /**
@@ -35,15 +36,21 @@ public class AvailableRule extends BookingRule
 {
     private static final OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 
-    public AvailableRule(String jsonType)
+    AvailableRule(String jsonType)
     {
-        super(jsonType);
+        super(BookingRuleType.BOOKING_AVAILABLE, jsonType);
     }
 
     @Override
     public Boolean isViolated(Appointment appointment)
     {
         return appointmentDao.checkForConflict(appointment);
+    }
+
+    @Override
+    public Boolean isViolated(ScheduleSearchResult result)
+    {
+        return null;
     }
 
     @Override

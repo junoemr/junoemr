@@ -36,6 +36,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,12 +50,17 @@ import com.google.common.collect.TreeRangeMap;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.managers.ScheduleManager;
+import org.oscarehr.schedule.model.ScheduleSearchResult;
 import org.oscarehr.schedule.model.ScheduleTemplate;
 import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.MhaBookingRules;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BlackoutRule;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingCutoffRule;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleType;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.MultipleBookingRule;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.PrimaryProviderOnlyRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -241,9 +248,9 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
 	public ProviderScheduleTransfer getValidProviderScheduleSlots(
-			String providerNo, Calendar calendarDate, String[] appointmentTypesArr, String demographicNo, Map<String, Object> bookingRulesObj)
+			String providerNo, Calendar calendarDate, String[] appointmentTypesArr, String demographicNo, Map<BookingRuleType, List<BookingRule>> bookingRules)
 	{
-
+		// This looks like it is retrieving all calendar slots for the year
 		int year = calendarDate.get(Calendar.YEAR);
 		int month = calendarDate.get(Calendar.MONTH) + 1; // Calendar month is 0 based indexing...
 
@@ -259,8 +266,6 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		{
 			minDate = LocalDate.now();
 		}
-
-		MhaBookingRules bookingRules = new MhaBookingRules(bookingRulesObj);
 
 		String sql = "SELECT STRAIGHT_JOIN\n" +
 				"  SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1) AS code_char,\n" +
@@ -293,6 +298,49 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
 
 		List<Object[]> results = query.getResultList();
+
+		/*
+		 * Use a linked list here, because we will be removing individual elements from this list if they violate booking rules.
+		 * Adding to the end is not a concern here because the LinkedList is doubly linked.
+		 */
+		LinkedList<ScheduleSearchResult> possibleSlots = new LinkedList<>();
+
+		for (Object[] result : results)
+		{
+			String whatIsThis = (String) result[0];
+			java.sql.Date date = (java.sql.Date) result[1];
+			java.sql.Time time = (java.sql.Time) result[2];
+			char templateCode = (char) result[3];
+			Long length = ((BigInteger)result[4]).longValueExact();
+
+			ScheduleSearchResult ssr = new ScheduleSearchResult(whatIsThis, date, time, templateCode, length, providerNo);
+
+			possibleSlots.addLast(ssr);
+		}
+
+		/*
+		 * Successively apply different types of booking rules to remove slots from the list which we currently have.
+		 * These are generally ordered by how many slots each type of rule has the potential to remove, which makes calculations
+		 * further down slightly more performant.
+		 */
+
+		// Casting through a wildcard type allows us to cast generic type parameters
+		// TODO:  This can be moved above the search such that the SQL search is not even run if the provider's don't match.
+		List<PrimaryProviderOnlyRule> providerRules = (List<PrimaryProviderOnlyRule>)(List<? extends BookingRule>)bookingRules.get(BookingRuleType.BOOKING_PRIMARY_PROVIDER_ONLY);
+		applyRules(providerRules, possibleSlots);
+
+		List<BlackoutRule> blackoutRules = (List<BlackoutRule>)(List<? extends BookingRule>)bookingRules.get(BookingRuleType.BOOKING_BLACKOUT);
+		applyRules(blackoutRules, possibleSlots);
+
+		List<BookingCutoffRule> cutoffRules = (List<BookingCutoffRule>)(List<? extends BookingRule>)bookingRules.get(BookingRuleType.BOOKING_CUTOFF);
+		applyRules(cutoffRules, possibleSlots);
+
+		List<MultipleBookingRule> multiRules = (List<MultipleBookingRule>)(List<? extends BookingRule>)bookingRules.get(BookingRuleType.BOOKING_MULTI);
+		applyRules(multiRules, possibleSlots);
+
+		// now return good slots after some transformation;
+
+		/*
 
 		HashMap<String, List<DayTimeSlots>> providerSchedule = new HashMap<>();
 		HashMap<String, Boolean> scheduleArrMap = new HashMap<>();
@@ -406,6 +454,38 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 		scheduleResponse.setProviderScheduleResponse(providerSchedule);
 		return scheduleResponse;
+		*/
+
+		return null;
+	}
+
+	/**
+	 * Remove elements from the list of possible slots if they violate any of the booking rules.  To minimize time complexity,
+	 * we enforce the requirement that the booking rules be stored in a LinkedList.
+	 */
+	private <T extends BookingRule> void applyRules(List<T> bookingRules, LinkedList<ScheduleSearchResult> possibleSlots)
+	{
+		/*
+		 * An important consideration here is which .remove method is used.
+		 *
+		 * Java's LinkedList.remove is O(n) because it requires an additional find as the list cannot be modified in place
+		 * without an iterator. Iterator.remove on a LinkedList is O(1).
+		 */
+		Iterator<ScheduleSearchResult> it = possibleSlots.iterator();
+
+		while (it.hasNext())
+		{
+			ScheduleSearchResult result = it.next();
+
+			for (T rule : bookingRules)
+			{
+				if (rule.isViolated(result))
+				{
+					it.remove();
+					break;
+				}
+			}
+		}
 	}
 
 	private List<Map<String, LocalTime>> getAppointmentsTimeMap(List<Appointment> dayAppointments)

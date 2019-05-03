@@ -59,22 +59,26 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 		super(Appointment.class);
 	}
 
-	public boolean checkForConflict(Appointment appt) {
+	/**
+	 * Check if the provided appointment conflicts with another appointment.  A conflict occurs if the provider has
+	 * another active appointment which occurs at any point during the provided appointment's time.
+	 *
+	 * @param appointment An appointment to check
+	 * @return true if a conflict is detected.
+	 */
+	public boolean checkForConflict(Appointment appointment) {
 		String sb = "select a from Appointment a where a.appointmentDate = ? and a.startTime >= ? and a.endTime <= ? and a.providerNo = ? and a.status != 'N' and a.status != 'C'";
 
 		Query query = entityManager.createQuery(sb);
 
-		query.setParameter(1, appt.getAppointmentDate());
-		query.setParameter(2, appt.getStartTime());
-		query.setParameter(3, appt.getEndTime());
-		query.setParameter(4, appt.getProviderNo());
+		query.setParameter(1, appointment.getAppointmentDate());
+		query.setParameter(2, appointment.getStartTime());
+		query.setParameter(3, appointment.getEndTime());
+		query.setParameter(4, appointment.getProviderNo());
 
-		
 		List<Facility> results = query.getResultList();
 
-		if (!results.isEmpty()) return true;
-
-		return false;
+		return !results.isEmpty();
 	}
 	
 	public List<Appointment> getAppointmentHistory(Integer demographicNo, Integer offset, Integer limit) {
@@ -612,7 +616,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 	}
     
     public List<Appointment> searchappointmentday(String providerNo, Date appointmentDate, Integer programId) {
-    	Query query = createQuery("appt", "appt.providerNo = :providerNo AND appt.appointmentDate = :appointmentDate AND appt.programId = :programId ORDER BY appt.startTime, appt.status DESC");
+    	Query query = createQuery("appointment", "appointment.providerNo = :providerNo AND appointment.appointmentDate = :appointmentDate AND appointment.programId = :programId ORDER BY appointment.startTime, appointment.status DESC");
     	query.setParameter("providerNo", providerNo);
         query.setParameter("appointmentDate", appointmentDate);
         query.setParameter("programId", programId);

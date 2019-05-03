@@ -24,8 +24,6 @@
 
 package org.oscarehr.ws.external.soap.v1;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.log4j.Logger;
@@ -51,6 +49,7 @@ import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleFactory;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -125,6 +124,7 @@ public class ScheduleWs extends AbstractWs {
 		else return (DayWorkScheduleTransfer.toTransfer(dayWorkSchedule));
 	}
 
+	// TODO: annotation, remove the giant response
 	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots (
 			String providerNo, Calendar date, String[] appointmentTypes, String demographicNo, String jsonRules)
 	{
@@ -132,7 +132,7 @@ public class ScheduleWs extends AbstractWs {
 		try
 		{
 			// TODO:  changed booking rule object, will need to rewrite appointment search
-			Map<String, Object> bookingRules = new ObjectMapper().readValue(jsonRules, new TypeReference<Map<String, Object>>(){});
+			Map<BookingRuleType, List<BookingRule>> bookingRules = BookingRuleFactory.createBookingRuleMap(Integer.valueOf(demographicNo), jsonRules);
 			ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(providerNo, date, appointmentTypes, demographicNo, bookingRules);
 			scheduleTransfer = providerScheduleTransfer.toTransfer();
 		}
@@ -149,11 +149,11 @@ public class ScheduleWs extends AbstractWs {
 		Appointment appointment = new Appointment();
 		appointmentTransfer.copyTo(appointment);
 
-		List<BookingRule> bookingRules = BookingRuleFactory.createBookingRuleSet(jsonRules);
+		List<BookingRule> bookingRules = BookingRuleFactory.createBookingRuleList(appointment.getDemographicNo(), jsonRules);
 		List<BookingRule> violatedRules = new ArrayList<>();
 		for (BookingRule rule : bookingRules)
 		{
-			if (!rule.isViolated(appointment))
+			if (rule.isViolated(appointment))
 			{
 				violatedRules.add(rule);
 			}
