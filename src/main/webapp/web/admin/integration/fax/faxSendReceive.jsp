@@ -108,9 +108,11 @@
 						</div>
 					</div>
 					<div class="row search-buttons">
-						<button type="button" class="btn btn-primary"
-						        ng-click="faxSendReceiveController.loadInboxItems();"><bean:message bundle="ui" key="global.search"/>
-						</button>
+						<div class="col-lg-3 col-xs-6">
+							<button type="button" class="btn btn-primary"
+							        ng-click="faxSendReceiveController.loadInboxItems();"><bean:message bundle="ui" key="global.search"/>
+							</button>
+						</div>
 					</div>
 				</div>
 
@@ -172,18 +174,13 @@
 							        ng-options="statusOption.label for statusOption in faxSendReceiveController.displayStatus">
 							</select>
 						</div>
-						<div class="col-lg-2 col-sm-3 col-xs-6">
-							<label for="outbox-select-archived"><bean:message bundle="ui" key="admin.fax.sr.search.archived"/></label>
-							<select id="outbox-select-archived" class="form-control"
-							        ng-model="faxSendReceiveController.outbox.archivedStatus"
-							        ng-options="archivedStatus.label for archivedStatus in faxSendReceiveController.archivedStatus">
-							</select>
-						</div>
 					</div>
 					<div class="row search-buttons">
-						<button type="button" class="btn btn-primary"
-						        ng-click="faxSendReceiveController.loadOutboxItems();"><bean:message bundle="ui" key="global.search"/>
-						</button>
+						<div class="col-lg-3 col-xs-6">
+							<button type="button" class="btn btn-primary"
+							        ng-click="faxSendReceiveController.loadOutboxItems();"><bean:message bundle="ui" key="global.search"/>
+							</button>
+						</div>
 					</div>
 				</div>
 
@@ -210,40 +207,23 @@
 						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationDateSent"/>'">
 							{{item.integrationDateSent}}
 						</td>
-						<td>
-							<button class="btn btn-primary btn-xs"
-							ng-click="faxSendReceiveController.viewDownloadFile(item.id);">
-							<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.download"/>
-							</button>
-						</td>
-						<td>
-							<div>
-								<button class="btn btn-xs"
+						<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.actionButtons"/>'">
+							<div class="float-right">
+								<button class="btn btn-xs btn-success"
 								        title="<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.resend-tooltip"/>"
 								        ng-hide="item.archived
 								            || (item.combinedStatus != faxSendReceiveController.displayStatus.queued.value
 						                    && item.combinedStatus != faxSendReceiveController.displayStatus.error.value
 						                    && item.combinedStatus != faxSendReceiveController.displayStatus.integrationFailed.value)"
-								        ng-class="{
-								            'btn-warning': item.combinedStatus == faxSendReceiveController.displayStatus.error.value,
-						                    'btn-success': item.combinedStatus == faxSendReceiveController.displayStatus.integrationFailed.value
-						                    }"
 								        ng-click="faxSendReceiveController.resendFax(item);">
 									<span class="glyphicon glyphicon-repeat"></span>
 									<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.resend"/>
 								</button>
-								<button class="btn btn-xs"
-								        title="<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.archive-tooltip"/>"
-								        ng-hide="item.archived"
-								        ng-disabled="item.combinedStatus != faxSendReceiveController.displayStatus.error.value
-											&& item.combinedStatus != faxSendReceiveController.displayStatus.integrationFailed.value"
-								        ng-click="faxSendReceiveController.archive(item);">
-									<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.archive"/>
+								<button class="btn btn-primary btn-xs"
+								        ng-click="faxSendReceiveController.viewDownloadFile(item.id);">
+									<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.download"/>
 								</button>
 							</div>
-							<span ng-show="item.archived">
-								<bean:message bundle="ui" key="admin.fax.sr.outbox.archived"/>
-							</span>
 						</td>
 						<td ng-if="faxSendReceiveController.displayNotificationColumn == true">
 							<button class="btn btn-xs"

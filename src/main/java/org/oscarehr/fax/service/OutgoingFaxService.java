@@ -69,10 +69,13 @@ import java.util.List;
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class OutgoingFaxService
 {
+	private static final String STATUS_MESSAGE_IN_TRANSIT = "Sent through integration";
+	private static final String STATUS_MESSAGE_COMPLETED = "Success";
+	private static final String DEFAULT_MAX_SEND_COUNT = "5";
+
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarProperties props = OscarProperties.getInstance();
 
-	private static final String DEFAULT_MAX_SEND_COUNT = "5";
 	private static HashMap<Long, Integer> faxAttemptCounterMap = new HashMap<>();
 	private static int MAX_SEND_COUNT = Integer.parseInt(props.getProperty("fax.max_send_attempts", DEFAULT_MAX_SEND_COUNT));
 
@@ -296,9 +299,15 @@ public class OutgoingFaxService
 					{
 						Date dateDelivered = ConversionUtils.fromDateString(result.getDateSent(), "MMM dd/yy hh:mm a");
 						faxOutbound.setExternalDeliveryDate(dateDelivered);
+						faxOutbound.setStatusMessage(STATUS_MESSAGE_COMPLETED);
 						faxOutbound.setArchived(true);
 					}
+					else
+					{
+						faxOutbound.setStatusMessage(result.getErrorCode());
+					}
 					faxOutboundDao.merge(faxOutbound);
+					logger.info("Updated Status to: " + remoteSentStatus);
 				}
 				else
 				{
@@ -409,7 +418,7 @@ public class OutgoingFaxService
 				{
 					logger.info("Fax send success " + String.valueOf(resultWrapper.getResult()));
 					faxOutbound.setStatusSent();
-					faxOutbound.setStatusMessage("Success");
+					faxOutbound.setStatusMessage(STATUS_MESSAGE_IN_TRANSIT);
 					faxOutbound.setExternalReferenceId(resultWrapper.getResult().longValue());
 					logStatus = LogConst.STATUS_SUCCESS;
 					logData = "Faxed To: " + faxOutbound.getSentTo();
