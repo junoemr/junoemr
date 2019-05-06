@@ -50,8 +50,8 @@ public class CancelCutoffRule extends BookingRule
     @Override
     public Boolean isViolated(Appointment appointment)
     {
-        LocalDateTime appointmentDateTime = ConversionUtils.toLocalDateTime(appointment.getAppointmentDate()).truncatedTo(timePeriod);
-        LocalDateTime now = LocalDateTime.now().truncatedTo(timePeriod);
+        LocalDateTime appointmentDateTime = ConversionUtils.toLocalDateTime(appointment.getAppointmentDate());
+        LocalDateTime now = ConversionUtils.truncateLocalDateTime(LocalDateTime.now(), timePeriod);
 
         LocalDateTime cutoff = appointmentDateTime.minus(amount, timePeriod);
         return now.isAfter(cutoff);

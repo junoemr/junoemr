@@ -27,7 +27,6 @@ import org.json.simple.JSONObject;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.schedule.model.ScheduleSearchResult;
 
-
 public abstract class BookingRule
 {
     protected BookingRule(BookingRuleType ruletype, String jsonType)

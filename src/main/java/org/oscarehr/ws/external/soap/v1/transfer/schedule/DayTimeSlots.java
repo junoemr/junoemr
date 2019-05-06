@@ -32,21 +32,19 @@ import java.util.HashMap;
 @XmlType(name = "timeSlot")
 public class DayTimeSlots
 {
+
     private HashMap<String, String> timeSlotEntry = new HashMap<>();
 
-    public DayTimeSlots(String timeSlot, String isBookable, String timecode, String duration, String slotStartTime, String maxBookingDuration)
+    public DayTimeSlots(String timeSlot, String timecode, String duration, String slotStartTime, String maxBookingDuration)
     {
-        this.setTimeSlotEntry(timeSlot, isBookable, timecode, duration, slotStartTime, maxBookingDuration);
+        this.setTimeSlotEntry(timeSlot, "true", timecode, duration, slotStartTime, maxBookingDuration);
     }
 
-    public DayTimeSlots()
-    {
-
-    }
+    public DayTimeSlots() {} // required
 
     public HashMap<String, String> getTimeSlotEntry()
     {
-        return timeSlotEntry;
+       return timeSlotEntry;
     }
 
     public void setTimeSlotEntry(String timeSlot, String isBookable, String timecode, String duration, String slotStartTime, String maxBookingDuration)

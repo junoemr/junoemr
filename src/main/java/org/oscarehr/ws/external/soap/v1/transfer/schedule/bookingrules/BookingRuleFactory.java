@@ -111,10 +111,10 @@ public class BookingRuleFactory
             case (PERIOD_TYPE_DAY):
             case (PERIOD_TYPE_WEEK):
             case (PERIOD_TYPE_MONTH):
-                bookingRule = createMultipleBookingRule(jsonRule);
+                bookingRule = createMultipleBookingRule(jsonRule, demographicNo);
                 break;
             case (PRIMARY_PROVIDER_ONLY):
-                bookingRule = createPrimaryProviderOnlyRule(demographicNo, jsonRule);
+                bookingRule = createPrimaryProviderOnlyRule(jsonRule, demographicNo);
                 break;
             case (APPOINTMENT_AVAILABLE):
                 bookingRule = createAvailableRule();
@@ -126,7 +126,7 @@ public class BookingRuleFactory
         return bookingRule;
     }
 
-    private static MultipleBookingRule createMultipleBookingRule(JSONObject jsonRule)
+    private static MultipleBookingRule createMultipleBookingRule(JSONObject jsonRule, Integer demographicNo)
     {
         Integer timeAmount = jsonRule.get("period_of_time") != null ? ((Long) jsonRule.get("period_of_time")).intValue() : null;
         Integer bookingAmount = jsonRule.get("bookings") != null ? ((Long) jsonRule.get("bookings")).intValue() : null;
@@ -135,7 +135,7 @@ public class BookingRuleFactory
 
         if (bookingAmount != null && timeAmount != null && timeUnit != null)
         {
-            return new MultipleBookingRule(name, bookingAmount, timeAmount, timeUnit);
+            return new MultipleBookingRule(name, demographicNo, bookingAmount, timeAmount, timeUnit);
         }
 
         return null;
@@ -190,10 +190,10 @@ public class BookingRuleFactory
         return new AvailableRule("appointment_is_available");
     }
 
-    private static PrimaryProviderOnlyRule createPrimaryProviderOnlyRule(Integer demographicNo, JSONObject jsonRule)
+    private static PrimaryProviderOnlyRule createPrimaryProviderOnlyRule(JSONObject jsonRule, Integer demographicNo)
     {
         String name = (String) jsonRule.get("type");
-        return new PrimaryProviderOnlyRule(demographicNo, name);
+        return new PrimaryProviderOnlyRule(name, demographicNo);
     }
 
     private static List<BookingRule> createNewBookingRulesList()

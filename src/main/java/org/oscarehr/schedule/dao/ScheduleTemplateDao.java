@@ -34,6 +34,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,6 +48,7 @@ import javax.persistence.TemporalType;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
+import org.apache.poi.hssf.record.formula.functions.T;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.managers.ScheduleManager;
@@ -54,6 +56,7 @@ import org.oscarehr.schedule.model.ScheduleSearchResult;
 import org.oscarehr.schedule.model.ScheduleTemplate;
 import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BlackoutRule;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingCutoffRule;
@@ -338,97 +341,50 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		List<MultipleBookingRule> multiRules = (List<MultipleBookingRule>)(List<? extends BookingRule>)bookingRules.get(BookingRuleType.BOOKING_MULTI);
 		applyRules(multiRules, possibleSlots);
 
-		// now return good slots after some transformation;
+		Map<LocalDate, List<Appointment>> monthlyAppointments = scheduleManager.getProviderAppointmentsForMonth(providerNo, minDate, maxDate);
+		return generateAppointmentSlots(possibleSlots, monthlyAppointments);
+	}
 
-		/*
-
+	private ProviderScheduleTransfer generateAppointmentSlots(List<ScheduleSearchResult> results, Map<LocalDate, List<Appointment>> monthlyAppointments)
+	{
+		// Monthly appointments here is not the right structure???
+		// Looks like it needs to be converted to a map<Date, List<Appointment>>
 		HashMap<String, List<DayTimeSlots>> providerSchedule = new HashMap<>();
+
 		HashMap<String, Boolean> scheduleArrMap = new HashMap<>();
+
 		ProviderScheduleTransfer scheduleResponse = new ProviderScheduleTransfer();
 
-		if (!results.isEmpty())
+		// Sorting the results will simplify the resulting calculations... I think
+		Collections.sort(results);
+		for (ScheduleSearchResult result : results)
 		{
-			java.sql.Date firstSqlDate = (java.sql.Date) results.get(0)[1];
-			java.sql.Date lastSqlDate = (java.sql.Date) results.get(results.size()-1)[1];
+			List<DayTimeSlots> dayTimeSlots;
 
-			bookingRules.setMultiBookingRuleDays(firstSqlDate.toLocalDate());
-			List<Integer> multiBookingRuleDays = bookingRules.getMultiBookingRuleDays();
+			List<Appointment> dayAppointments = monthlyAppointments.get(result.dateTime.toLocalDate());
+			List<Map<String, LocalTime>> appointmentsTimeMap = this.getAppointmentsTimeMap(dayAppointments);
 
-			Map<LocalDate, List<Appointment>> monthlyAppointments = scheduleManager.getProviderAppointmentsForMonth(providerNo, minDate, maxDate);
+			String scheduleDate = result.dateTime.toLocalDate().toString();
+			String timeSlotCodeStr = result.whatIsThis;
 
-			// Fetch patient appointments for testing booking rules against each time slot
-			if (!multiBookingRuleDays.isEmpty())
+			LocalTime windowSlotStartTime = result.dateTime.toLocalTime();
+			LocalTime scheduleSlotEndTime = windowSlotStartTime.plusMinutes(result.length);
+
+			// Loop through all the 5 minute iterations of this schedule slot, and check whether or not
+			// there is an appointment booked within that 5 minute window in this specific slot
+
+			while (windowSlotStartTime.isBefore(scheduleSlotEndTime))
 			{
-				Integer daysToQueryForPatient = multiBookingRuleDays.get(0);
-
-				List<Appointment> patientAppointments = this.getPatientAppointmentsForBookingRules(
-						demographicNo,
-						providerNo,
-						firstSqlDate.toLocalDate(),
-						lastSqlDate.toLocalDate(),
-						daysToQueryForPatient
-				);
-
-				bookingRules.setPatientAppointments(patientAppointments);
-			}
-
-			// Loop through all of this provider's schedule slots for the month
-			for (Object[] result : results)
-			{
-				List<DayTimeSlots> dayTimeSlots;
-				Map<LocalDate, Boolean> invalidDates = bookingRules.getInvalidDates();
-
-				java.sql.Date slotDate = (java.sql.Date) result[1];
-				Time slotStartTime = (Time) result[2];
-				BigInteger iDuration = (BigInteger) result[4];
-
-				LocalDateTime slotDateTime = LocalDateTime.of(slotDate.toLocalDate(), slotStartTime.toLocalTime());
-
-				List<Appointment> dayAppointments = monthlyAppointments.get(slotDate.toLocalDate());
-				List<Map<String, LocalTime>> appointmentsTimeMap = this.getAppointmentsTimeMap(dayAppointments);
-
-				String scheduleDate = slotDate.toString();
-				String timeSlotCodeStr = (String) result[0];
-
-				LocalTime windowSlotStartTime = slotStartTime.toLocalTime();
-				LocalTime scheduleSlotEndTime = windowSlotStartTime.plusMinutes(iDuration.longValue());
-
-				// Loop through all the 5 minute iterations of this schedule slot, and check whether or not
-				// there is an appointment booked within that 5 minute window in this specific slot
-				while (windowSlotStartTime.isBefore(scheduleSlotEndTime))
+				Long maxBookingDuration = this.getMaxBookingDurationForSlot(appointmentsTimeMap, windowSlotStartTime, scheduleSlotEndTime);
+				if (maxBookingDuration > 0L)
 				{
-					Long maxBookingDuration = this.getMaxBookingDurationForSlot(appointmentsTimeMap, windowSlotStartTime, scheduleSlotEndTime);
-
-					// If the maxBookingDuration is 0, then this slot is not bookable
-					Boolean bookable = maxBookingDuration != 0L;
-
-					// If the slot is bookable, apply MHA booking rules
-					if (bookable)
-					{
-						if (invalidDates.get(slotDateTime.toLocalDate()) == null)
-						{
-							bookable = bookingRules.scheduleSlotIsValid(slotDateTime);
-						}
-						else
-						{
-							bookable = false;
-						}
-
-						// If the slot is not bookable after applying booking rules, then set maxBookingDuration to 0
-						if (!bookable)
-						{
-							maxBookingDuration = 0L;
-						}
-					}
-
-					LocalDateTime windowDateTime = LocalDateTime.of(slotDate.toLocalDate(), windowSlotStartTime);
+					LocalDateTime windowDateTime = LocalDateTime.of(result.dateTime.toLocalDate(), windowSlotStartTime);
 
 					DayTimeSlots timeSlotEntry = new DayTimeSlots(
 							windowDateTime.toString(),
-							bookable.toString(),
 							timeSlotCodeStr,
 							String.valueOf(SCHEDULE_SLOT_DURATION),
-							slotStartTime.toLocalTime().toString(),
+							result.dateTime.toLocalTime().toString(),
 							maxBookingDuration.toString()
 					);
 
@@ -454,9 +410,6 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 		scheduleResponse.setProviderScheduleResponse(providerSchedule);
 		return scheduleResponse;
-		*/
-
-		return null;
 	}
 
 	/**

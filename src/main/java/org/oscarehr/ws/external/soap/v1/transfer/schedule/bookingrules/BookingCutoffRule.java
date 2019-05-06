@@ -56,7 +56,7 @@ public class BookingCutoffRule extends BookingRule
     @Override
     public Boolean isViolated(ScheduleSearchResult result)
     {
-        LocalDateTime slotDate = ConversionUtils.toLocalDateTime(result.date);
+        LocalDateTime slotDate = result.dateTime;
         return isAfterCutoff(slotDate);
     }
 
@@ -72,7 +72,7 @@ public class BookingCutoffRule extends BookingRule
 
     private Boolean isAfterCutoff(LocalDateTime dateTime)
     {
-        LocalDateTime cutoff = LocalDateTime.now().truncatedTo(timePeriod).plus(amount, timePeriod);
+        LocalDateTime cutoff = ConversionUtils.truncateLocalDateTime(LocalDateTime.now(), timePeriod).plus(amount, timePeriod);
 
         return dateTime.isAfter(cutoff);
     }

@@ -29,6 +29,7 @@ import org.oscarehr.util.MiscUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,6 +38,9 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -511,5 +515,24 @@ public class ConversionUtils {
 		calendarA.set(Calendar.MILLISECOND, calendarB.get(Calendar.MILLISECOND));
 
 		return calendarA.getTime();
+	}
+
+	public static LocalDateTime truncateLocalDateTime(LocalDateTime dateTime, ChronoUnit timeUnit)
+	{
+		switch (timeUnit)
+		{
+			case HOURS:
+				return dateTime.truncatedTo(ChronoUnit.HOURS);
+			case DAYS:
+				return dateTime.truncatedTo(ChronoUnit.DAYS);
+			case WEEKS:
+				return dateTime.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)).truncatedTo(ChronoUnit.DAYS);
+			case MONTHS:
+				return dateTime.with(TemporalAdjusters.firstDayOfMonth()).truncatedTo(ChronoUnit.DAYS);
+			case YEARS:
+				return dateTime.with(TemporalAdjusters.firstDayOfYear()).truncatedTo(ChronoUnit.DAYS);
+			default:
+				throw new UnsupportedTemporalTypeException("Unimplemented temporal type for truncation");
+		}
 	}
 }

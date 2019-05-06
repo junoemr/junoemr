@@ -38,7 +38,7 @@ public class PrimaryProviderOnlyRule extends BookingRule
     private String demographicMRP;
     private static final DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 
-    PrimaryProviderOnlyRule(Integer demographicNo, String jsonType)
+    PrimaryProviderOnlyRule(String jsonType, Integer demographicNo)
     {
         super(BookingRuleType.BOOKING_PRIMARY_PROVIDER_ONLY, jsonType);
 

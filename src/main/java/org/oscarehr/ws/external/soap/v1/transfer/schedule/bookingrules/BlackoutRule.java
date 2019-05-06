@@ -55,7 +55,7 @@ public class BlackoutRule extends BookingRule
     @Override
     public Boolean isViolated(ScheduleSearchResult result)
     {
-        return isBeforeBlackOutEnds(ConversionUtils.toLocalDateTime(result.date));
+        return isBeforeBlackOutEnds(result.dateTime);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class BlackoutRule extends BookingRule
 
     private Boolean isBeforeBlackOutEnds(LocalDateTime dateTime)
     {
-        LocalDateTime cutoff = LocalDateTime.now().truncatedTo(timePeriod).plus(amount, timePeriod);
+        LocalDateTime cutoff = ConversionUtils.truncateLocalDateTime(LocalDateTime.now(),timePeriod).plus(amount, timePeriod);
 
         return dateTime.isBefore(cutoff);
     }

@@ -30,9 +30,9 @@ import org.oscarehr.schedule.model.ScheduleSearchResult;
 import org.oscarehr.util.SpringUtils;
 import oscar.util.ConversionUtils;
 
-
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+
 import java.util.List;
 
 /**
@@ -40,6 +40,7 @@ import java.util.List;
  */
 public class MultipleBookingRule extends BookingRule
 {
+    private Integer demographicNo;
     private Integer bookingAmount;
     private Integer timePeriodAmount;
     private ChronoUnit timePeriod;
@@ -50,22 +51,29 @@ public class MultipleBookingRule extends BookingRule
         each potential date is within the same calendar timePeriod unit (defined by .truncateTo(timePeriod)).
 
         For example: If the timePeriod is weeks, the number of existing appointments relevant to the multi-booking rule
-        will not change as long as the queries are within the same calendar week.
+        will not change as long as the each of the queries are within the same calendar week.  This week is a window
+        which can be cached.
 
-        As a result cache the result and reuse it for any additional searches within the same window.
+        For an existing window, the existing appointment count is defined by the following boundaries:
+        - Low End:  WindowStart - (timePeriodAmount * timePeriod -1)
+        - High End:  WindowStart + (timePeriodAmount * timePeriod -1)
+        The -1 arises because include the week of the window.  A two week period encompasses the time from the week
+        before the window, to the week after the window.
      */
-
-    private Integer appointmentCountCache;                      // lazy instantiation of this variable
-    private LocalDateTime cacheWindow;                          // lazy instatiation of this variable
+    private Integer appointmentCountCache;
+    private LocalDateTime cacheWindow;
 
     private static final OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 
-    MultipleBookingRule (String jsonType, Integer bookingAmount, Integer timePeriodAmount, ChronoUnit timePeriod)
+    MultipleBookingRule (String jsonType, Integer demographicNo, Integer bookingAmount, Integer timePeriodAmount, ChronoUnit timePeriod)
     {
         super(BookingRuleType.BOOKING_MULTI, jsonType);
         this.bookingAmount = bookingAmount;
         this.timePeriodAmount = timePeriodAmount;
         this.timePeriod = timePeriod;
+        this.demographicNo = demographicNo;
+        this.appointmentCountCache = null;
+        this.cacheWindow = null;
     }
 
     @Override
@@ -73,7 +81,9 @@ public class MultipleBookingRule extends BookingRule
     {
         LocalDateTime startDate = ConversionUtils.toLocalDateTime(appointment.getStartTimeAsFullDate()).truncatedTo(timePeriod);
         LocalDateTime endDate = startDate.plus(timePeriodAmount, timePeriod);
-        List<Appointment> patientAppointments = appointmentDao.findByDateRangeAndDemographic(startDate, endDate, appointment.getDemographicNo());
+        List<Appointment> patientAppointments = appointmentDao.findByDateRangeAndDemographic(startDate.toLocalDate(),
+                                                                                             endDate.toLocalDate(),
+                                                                                             appointment.getDemographicNo());
 
         return patientAppointments.size() >= bookingAmount;
     }
@@ -81,15 +91,15 @@ public class MultipleBookingRule extends BookingRule
     @Override
     public Boolean isViolated(ScheduleSearchResult result)
     {
-        // calculate result start time
-        // if it's in the window, return the result
+        LocalDateTime resultWindow = ConversionUtils.truncateLocalDateTime(result.dateTime, timePeriod)
+                                                    .minus(timePeriodAmount, timePeriod);
 
+        if (this.cacheWindow == null || resultWindow != this.cacheWindow)
+        {
+            cacheAppointmentCounts(resultWindow);
+        }
 
-        // else, recalculate result store it then return the cached value
-        //return appointmentCountCache >= bookingAmount;
-
-
-        return false;
+        return appointmentCountCache >= bookingAmount;
     }
 
     @Override
@@ -100,5 +110,23 @@ public class MultipleBookingRule extends BookingRule
         json.put("bookings", this.bookingAmount);
         json.put("period_of_time", this.timePeriodAmount);
         return json;
+    }
+
+    /**
+     * Recalculate the number of appointments within the date range specified by this rule and cache it.
+     *
+     * @param startOfCache Start of the time period to cache
+     */
+    private void cacheAppointmentCounts(LocalDateTime startOfCache)
+    {
+        LocalDateTime endOfCache = startOfCache.plus(2 * timePeriodAmount - 1, this.timePeriod);
+
+        OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
+        List<Appointment> appointments = appointmentDao.findByDateRangeAndDemographic(startOfCache.toLocalDate(),
+                                                                                      endOfCache.toLocalDate(),
+                                                                                      this.demographicNo);
+
+        this.cacheWindow = startOfCache;
+        this.appointmentCountCache = appointments.size();
     }
 }
