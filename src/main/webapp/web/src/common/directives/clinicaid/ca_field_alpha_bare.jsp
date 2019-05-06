@@ -1,9 +1,0 @@
-<input type="text"
-			 id="input-{{name}}"
-			 class="form-control"
-			 ng-model="model"
-			 ng-focus="focus_fn()"
-			 ng-change="change_fn()"
-			 ng-disabled="disabled"
-			 maxlength="{{text_length}}"
-			 tabindex="{{tab_index}}"/>
