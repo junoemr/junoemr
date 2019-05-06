@@ -919,7 +919,7 @@ public class ConversionUtilsTest
 	@Test
 	public void toNullableLocalDate_FixedDateString_ExpectLocalDate()
 	{
-		String fixedDateString = "2019-04-30T20:30:40-08:00";
+		String fixedDateString = "2019-04-30";
 		LocalDate expectedDate = LocalDate.of(2019, 4, 30);
 		assertThat(expectedDate, is(ConversionUtils.toNullableLocalDate(fixedDateString)));
 	}

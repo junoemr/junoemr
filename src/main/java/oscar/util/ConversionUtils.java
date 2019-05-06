@@ -566,7 +566,7 @@ public class ConversionUtils {
 	public static LocalDate toNullableLocalDate(String dateString)
 	{
 		if(dateString == null || dateString.isEmpty()) return null;
-		return toZonedLocalDate(dateString);
+		return toLocalDate(dateString);
 	}
 
 	public static LocalDate toNullableLocalDate(Date legacyDate)
