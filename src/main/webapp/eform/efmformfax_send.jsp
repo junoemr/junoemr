@@ -35,12 +35,12 @@
 			List<FaxOutboxTransferOutbound> faxTransferList = bean.faxForms(faxRecipients, formId, providerId);
 			for(FaxOutboxTransferOutbound transfer : faxTransferList)
 			{
-				if(FaxOutbound.Status.QUEUED.name().equals(transfer.getSystemStatus()))
+				if(FaxOutbound.Status.QUEUED.equals(transfer.getSystemStatus()))
 				{
 					errorMessages.add("Failed to send fax, it has been queued for automatic resend. " +
 							"Reason: " + transfer.getSystemStatusMessage());
 				}
-				else if(FaxOutbound.Status.ERROR.name().equals(transfer.getSystemStatus()))
+				else if(FaxOutbound.Status.ERROR.equals(transfer.getSystemStatus()))
 				{
 					errorMessages.add("Failed to send fax. Check account settings. " +
 							"Reason: " + transfer.getSystemStatusMessage());
