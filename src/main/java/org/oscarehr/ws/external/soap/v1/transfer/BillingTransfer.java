@@ -33,7 +33,7 @@ public final class BillingTransfer extends TransferBase<BillingMasterClinicaid>
 {
 	private Integer 	id;
 	private Integer 	billingNo;
-	private Date createDate;
+	private Date 		createDate;
 	private String 		billingStatus;
 	private Integer 	demographicNo;
 	private Integer 	appointmentNo;
@@ -41,7 +41,7 @@ public final class BillingTransfer extends TransferBase<BillingMasterClinicaid>
 	private String 		dataCenter;
 	private String 		payeeNo;
 	private String		practitionerNo;
-	private String 		PHN;
+	private String 		phn;
 	private String 		nameVerify;
 	private String		dependentNum;
 	private String		billingUnit;
@@ -92,6 +92,8 @@ public final class BillingTransfer extends TransferBase<BillingMasterClinicaid>
 	private String		oinPostalCode;
 	private Integer 	paymentMethod;
 	private Integer		wcbId;
+	private Integer		sequenceNo;
+	private Integer 	invoiceCreationYear;
 
 
 	public Integer getId()
@@ -194,14 +196,14 @@ public final class BillingTransfer extends TransferBase<BillingMasterClinicaid>
 		this.practitionerNo = practitionerNo;
 	}
 
-	public String getPHN()
+	public String getPhn()
 	{
-		return PHN;
+		return phn;
 	}
 
-	public void setPHN(String PHN)
+	public void setPhn(String phn)
 	{
-		this.PHN = PHN;
+		this.phn = phn;
 	}
 
 	public String getNameVerify()
@@ -702,5 +704,25 @@ public final class BillingTransfer extends TransferBase<BillingMasterClinicaid>
 	public void setWcbId(Integer wcbId)
 	{
 		this.wcbId = wcbId;
+	}
+
+	public Integer getSequenceNo()
+	{
+		return sequenceNo;
+	}
+
+	public void setSequenceNo(Integer sequenceNo)
+	{
+		this.sequenceNo = sequenceNo;
+	}
+
+	public Integer getInvoiceCreationYear()
+	{
+		return invoiceCreationYear;
+	}
+
+	public void setInvoiceCreationYear(Integer invoiceCreationYear)
+	{
+		this.invoiceCreationYear = invoiceCreationYear;
 	}
 }

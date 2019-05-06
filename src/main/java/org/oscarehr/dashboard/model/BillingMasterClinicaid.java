@@ -63,7 +63,7 @@ public class BillingMasterClinicaid extends AbstractModel<Integer> implements Se
 	@Column(name="practitioner_no")
 	private String		practitionerNo;
 	@Column(name="phn")
-	private String 		PHN;
+	private String 		phn;
 	@Column(name="name_verify")
 	private String 		nameVerify;
 	@Column(name="dependent_num")
@@ -164,6 +164,10 @@ public class BillingMasterClinicaid extends AbstractModel<Integer> implements Se
 	private Integer 	paymentMethod;
 	@Column(name="wcb_id")
 	private Integer		wcbId;
+	@Column(name="sequence_no")
+	private Integer 	sequenceNo;
+	@Column(name="invoice_creation_year")
+	private Integer		invoiceCreationYear;
 
 
 	@Override
@@ -267,14 +271,14 @@ public class BillingMasterClinicaid extends AbstractModel<Integer> implements Se
 		this.practitionerNo = practitionerNo;
 	}
 
-	public String getPHN()
+	public String getPhn()
 	{
-		return PHN;
+		return phn;
 	}
 
-	public void setPHN(String PHN)
+	public void setPhn(String PHN)
 	{
-		this.PHN = PHN;
+		this.phn = PHN;
 	}
 
 	public String getNameVerify()
@@ -775,5 +779,25 @@ public class BillingMasterClinicaid extends AbstractModel<Integer> implements Se
 	public void setWcbId(Integer wcbId)
 	{
 		this.wcbId = wcbId;
+	}
+
+	public Integer getSequenceNo()
+	{
+		return sequenceNo;
+	}
+
+	public void setSequenceNo(Integer sequenceNo)
+	{
+		this.sequenceNo = sequenceNo;
+	}
+
+	public Integer getInvoiceCreationYear()
+	{
+		return invoiceCreationYear;
+	}
+
+	public void setInvoiceCreationYear(Integer invoiceCreationYear)
+	{
+		this.invoiceCreationYear = invoiceCreationYear;
 	}
 }
