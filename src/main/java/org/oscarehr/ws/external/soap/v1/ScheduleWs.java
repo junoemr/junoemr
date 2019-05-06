@@ -39,6 +39,7 @@ import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentArchiveTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentTypeTransfer;
@@ -124,19 +125,19 @@ public class ScheduleWs extends AbstractWs {
 		else return (DayWorkScheduleTransfer.toTransfer(dayWorkSchedule));
 	}
 
-	// TODO: annotation, remove the giant response
+	@SkipContentLoggingOutbound
 	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots (
 			String providerNo, Calendar date, String[] appointmentTypes, String demographicNo, String jsonRules)
 	{
 		HashMap<String, DayTimeSlots[]> scheduleTransfer = new HashMap<>();
+
 		try
 		{
-			// TODO:  changed booking rule object, will need to rewrite appointment search
 			Map<BookingRuleType, List<BookingRule>> bookingRules = BookingRuleFactory.createBookingRuleMap(Integer.valueOf(demographicNo), jsonRules);
 			ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(providerNo, date, appointmentTypes, demographicNo, bookingRules);
 			scheduleTransfer = providerScheduleTransfer.toTransfer();
 		}
-		catch(Exception e)
+		catch(ParseException e)
 		{
 			MiscUtils.getLogger().error("Exception: " + e);
 		}

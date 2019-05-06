@@ -187,7 +187,7 @@ public class BookingRuleFactory
     private static AvailableRule createAvailableRule()
     {
         // TODO:  Should this come in from MHA?
-        return new AvailableRule("appointment_is_available");
+        return new AvailableRule(APPOINTMENT_AVAILABLE);
     }
 
     private static PrimaryProviderOnlyRule createPrimaryProviderOnlyRule(JSONObject jsonRule, Integer demographicNo)
