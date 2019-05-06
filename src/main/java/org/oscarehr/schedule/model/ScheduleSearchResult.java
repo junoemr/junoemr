@@ -32,15 +32,13 @@ import java.time.LocalTime;
 public class ScheduleSearchResult implements Comparable<ScheduleSearchResult>
 {
 
-    public String whatIsThis;
     public LocalDateTime dateTime;
     public char templateCode;
     public Long length;
     public String providerNo;
 
-    public ScheduleSearchResult(String whatIsThis, Date date, Time time, char templateCode, Long length, String providerNo)
+    public ScheduleSearchResult(Date date, Time time, char templateCode, Long length, String providerNo)
     {
-        this.whatIsThis = whatIsThis;
         this.templateCode = templateCode;
         this.length = length;
         this.providerNo = providerNo;

@@ -27,7 +27,7 @@ import org.json.simple.JSONObject;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.schedule.model.ScheduleSearchResult;
 
-public abstract class BookingRule
+public abstract class BookingRule implements Comparable<BookingRule>
 {
     protected BookingRule(BookingRuleType ruletype, String jsonType)
     {
@@ -65,5 +65,15 @@ public abstract class BookingRule
     public BookingRuleType getType()
     {
         return this.ruleType;
+    }
+
+    /**
+     * Collections of BookingRules can be sorted based on the order in which they should be applied
+     * @param o Another booking rule
+     * @return order comparison
+     */
+    public int compareTo(BookingRule o)
+    {
+        return Integer.compare(this.ruleType.ordinal(), o.getType().ordinal());
     }
 }

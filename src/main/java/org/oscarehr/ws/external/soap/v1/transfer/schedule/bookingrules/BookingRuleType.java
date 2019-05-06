@@ -25,10 +25,17 @@ package org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules;
 
 public enum BookingRuleType
 {
-    BOOKING_AVAILABLE,
-    BOOKING_BLACKOUT,
-    BOOKING_CUTOFF,
-    BOOKING_MULTI,
-    BOOKING_PRIMARY_PROVIDER_ONLY,
+    /*
+     * The booking rules are declared in the order in which they should be applied.
+     *
+     * In general, rules nearer to the front of the list should be cheaper to run and/or have the potential to filter
+     * a large number of entries.  This helps reduce the search space for rules defined at the end of the list, which
+     * may be more expensive to validate.
+     */
     CANCEL_CUTOFF,
+    BOOKING_PRIMARY_PROVIDER_ONLY,
+    BOOKING_CUTOFF,
+    BOOKING_BLACKOUT,
+    BOOKING_AVAILABLE,
+    BOOKING_MULTI,
 }

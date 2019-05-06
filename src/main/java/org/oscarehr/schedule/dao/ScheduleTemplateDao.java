@@ -48,7 +48,6 @@ import javax.persistence.TemporalType;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
-import org.apache.poi.hssf.record.formula.functions.T;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.managers.ScheduleManager;
@@ -58,12 +57,7 @@ import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BlackoutRule;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingCutoffRule;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleType;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.MultipleBookingRule;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.PrimaryProviderOnlyRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -251,9 +245,8 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
 	public ProviderScheduleTransfer getValidProviderScheduleSlots(
-			String providerNo, Calendar calendarDate, String[] appointmentTypesArr, String demographicNo, Map<BookingRuleType, List<BookingRule>> bookingRules)
+			String providerNo, Calendar calendarDate, String[] appointmentTypesArr, String demographicNo, List<BookingRule> bookingRules)
 	{
-		// This looks like it is retrieving all calendar slots for the year
 		int year = calendarDate.get(Calendar.YEAR);
 		int month = calendarDate.get(Calendar.MONTH) + 1; // Calendar month is 0 based indexing...
 
@@ -310,36 +303,17 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 		for (Object[] result : results)
 		{
-			String whatIsThis = (String) result[0];
 			java.sql.Date date = (java.sql.Date) result[1];
 			java.sql.Time time = (java.sql.Time) result[2];
 			char templateCode = (char) result[3];
 			Long length = ((BigInteger)result[4]).longValueExact();
 
-			ScheduleSearchResult ssr = new ScheduleSearchResult(whatIsThis, date, time, templateCode, length, providerNo);
+			ScheduleSearchResult ssr = new ScheduleSearchResult(date, time, templateCode, length, providerNo);
 
 			possibleSlots.addLast(ssr);
 		}
 
-		/*
-		 * Successively apply different types of booking rules to remove slots from the list which we currently have.
-		 * These are generally ordered by how many slots each type of rule has the potential to remove, which makes calculations
-		 * further down slightly more performant.
-		 */
-
-		// Casting through a wildcard type allows us to cast generic type parameters
-		// TODO:  This can be moved above the search such that the SQL search is not even run if the provider's don't match.
-		List<PrimaryProviderOnlyRule> providerRules = (List<PrimaryProviderOnlyRule>)(List<? extends BookingRule>)bookingRules.get(BookingRuleType.BOOKING_PRIMARY_PROVIDER_ONLY);
-		applyRules(providerRules, possibleSlots);
-
-		List<BlackoutRule> blackoutRules = (List<BlackoutRule>)(List<? extends BookingRule>)bookingRules.get(BookingRuleType.BOOKING_BLACKOUT);
-		applyRules(blackoutRules, possibleSlots);
-
-		List<BookingCutoffRule> cutoffRules = (List<BookingCutoffRule>)(List<? extends BookingRule>)bookingRules.get(BookingRuleType.BOOKING_CUTOFF);
-		applyRules(cutoffRules, possibleSlots);
-
-		List<MultipleBookingRule> multiRules = (List<MultipleBookingRule>)(List<? extends BookingRule>)bookingRules.get(BookingRuleType.BOOKING_MULTI);
-		applyRules(multiRules, possibleSlots);
+		applyRules(bookingRules, possibleSlots);
 
 		Map<LocalDate, List<Appointment>> monthlyAppointments = scheduleManager.getProviderAppointmentsForMonth(providerNo, minDate, maxDate);
 		return generateAppointmentSlots(possibleSlots, monthlyAppointments);
@@ -347,16 +321,13 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 	private ProviderScheduleTransfer generateAppointmentSlots(List<ScheduleSearchResult> results, Map<LocalDate, List<Appointment>> monthlyAppointments)
 	{
-		// Monthly appointments here is not the right structure???
-		// Looks like it needs to be converted to a map<Date, List<Appointment>>
 		HashMap<String, List<DayTimeSlots>> providerSchedule = new HashMap<>();
 
 		HashMap<String, Boolean> scheduleArrMap = new HashMap<>();
 
 		ProviderScheduleTransfer scheduleResponse = new ProviderScheduleTransfer();
 
-		// Sorting the results will simplify the resulting calculations... I think
-		Collections.sort(results);
+		Collections.sort(results);		// needed?
 		for (ScheduleSearchResult result : results)
 		{
 			List<DayTimeSlots> dayTimeSlots;
@@ -365,7 +336,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 			List<Map<String, LocalTime>> appointmentsTimeMap = this.getAppointmentsTimeMap(dayAppointments);
 
 			String scheduleDate = result.dateTime.toLocalDate().toString();
-			String timeSlotCodeStr = result.whatIsThis;
+			String timeSlotCodeStr = Character.toString(result.templateCode);
 
 			LocalTime windowSlotStartTime = result.dateTime.toLocalTime();
 			LocalTime scheduleSlotEndTime = windowSlotStartTime.plusMinutes(result.length);
@@ -414,9 +385,9 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 	/**
 	 * Remove elements from the list of possible slots if they violate any of the booking rules.  To minimize time complexity,
-	 * we enforce the requirement that the booking rules be stored in a LinkedList.
+	 * we enforce the requirement that the schedule search results be stored in a LinkedList.
 	 */
-	private <T extends BookingRule> void applyRules(List<T> bookingRules, LinkedList<ScheduleSearchResult> possibleSlots)
+	private void applyRules(List<BookingRule> bookingRules, LinkedList<ScheduleSearchResult> possibleSlots)
 	{
 		/*
 		 * An important consideration here is which .remove method is used.
@@ -430,7 +401,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		{
 			ScheduleSearchResult result = it.next();
 
-			for (T rule : bookingRules)
+			for (BookingRule rule : bookingRules)
 			{
 				if (rule.isViolated(result))
 				{

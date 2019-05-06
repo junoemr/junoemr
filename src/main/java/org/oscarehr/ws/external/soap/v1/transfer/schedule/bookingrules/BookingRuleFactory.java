@@ -30,9 +30,8 @@ import org.json.simple.parser.ParseException;
 
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class BookingRuleFactory
 {
@@ -65,28 +64,8 @@ public class BookingRuleFactory
             }
         }
 
+        Collections.sort(bookingRules);
         return bookingRules;
-    }
-
-    public static Map<BookingRuleType, List<BookingRule>> createBookingRuleMap(Integer demographicNo, String jsonRuleString) throws ParseException
-    {
-        Map<BookingRuleType, List<BookingRule>> ruleMap = createNewBookingRulesMap();
-
-        JSONArray json = (JSONArray) new JSONParser().parse(jsonRuleString);
-
-        for (Object jsonRule : json)
-        {
-            BookingRule rule = createBookingRule(demographicNo, (JSONObject) jsonRule);
-
-            if (rule != null)
-            {
-                List<BookingRule> ruleList = ruleMap.get(rule.getType());
-                ruleList.add(rule);
-                ruleMap.put(rule.getType(), ruleList);
-            }
-        }
-
-        return ruleMap;
     }
 
     private static BookingRule createBookingRule(Integer demographicNo, JSONObject jsonRule)
@@ -204,25 +183,6 @@ public class BookingRuleFactory
         bookingRules.add(createAvailableRule());
 
         return bookingRules;
-    }
-
-    private static Map<BookingRuleType, List<BookingRule>> createNewBookingRulesMap()
-    {
-        HashMap<BookingRuleType, List<BookingRule>> ruleMap = new HashMap<>();
-
-        for(BookingRuleType ruleType : BookingRuleType.values())
-        {
-            ruleMap.put(ruleType, new ArrayList<>());
-        }
-
-        // There is an implicit rule in every set of rules that an appointment must be available.
-        BookingRule availableRule = createAvailableRule();
-        List<BookingRule> availableRules = ruleMap.get(BookingRuleType.BOOKING_AVAILABLE);
-        availableRules.add(availableRule);
-
-        ruleMap.put(BookingRuleType.BOOKING_AVAILABLE, availableRules);
-
-        return ruleMap;
     }
 
     private static ChronoUnit getChronoUnit(String bookingRuleName)

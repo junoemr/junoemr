@@ -50,7 +50,11 @@ public class AvailableRule extends BookingRule
     @Override
     public Boolean isViolated(ScheduleSearchResult result)
     {
-        return null;
+        // We don't actually validate this rule when generating slots because we create a list of valid slots,
+        // instead of filtering out available slots from a list of all possibilities.  This value is a placeholder
+        // in case we need to rework the logic at a later date.
+        
+        return false;
     }
 
     @Override

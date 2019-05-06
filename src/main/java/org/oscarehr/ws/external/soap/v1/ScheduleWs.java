@@ -50,7 +50,6 @@ import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleFactory;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -61,7 +60,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @WebService
 @Component
@@ -133,7 +131,7 @@ public class ScheduleWs extends AbstractWs {
 
 		try
 		{
-			Map<BookingRuleType, List<BookingRule>> bookingRules = BookingRuleFactory.createBookingRuleMap(Integer.valueOf(demographicNo), jsonRules);
+			List<BookingRule> bookingRules = BookingRuleFactory.createBookingRuleList(Integer.valueOf(demographicNo), jsonRules);
 			ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(providerNo, date, appointmentTypes, demographicNo, bookingRules);
 			scheduleTransfer = providerScheduleTransfer.toTransfer();
 		}
