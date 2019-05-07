@@ -310,7 +310,7 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 	@SuppressWarnings("unchecked")
 	public List<ProviderData> findAll(boolean inactive) {
 		if (inactive) return findAll();
-		Query query = createQuery("p", ACTIVE_WHERE_CLAUSE);
+		Query query = createQuery("p", ACTIVE_WHERE_CLAUSE + " ORDER BY p.lastName, p.firstName");
 		return query.getResultList();
 	}
 

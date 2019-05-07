@@ -250,6 +250,11 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		this.lastName = lastName;
 	}
 
+	public String getDisplayName()
+	{
+		return getFormattedName();
+	}
+
 	public String getFormattedName()
 	{
 		String lastName = (getLastName() == null) ? "" : getLastName().trim();

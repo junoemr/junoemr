@@ -77,7 +77,7 @@ if(!authed) {
 	</tr>
 	<tr>
 		<td class="MainTableLeftColumn" valign="top" width="160px;">
-		<a href="javascript:void(0)" onclick="newWindow('<%=request.getContextPath()%>/web/#!/k2aTemplate','templates')"
+		<a href="javascript:void(0)" onclick="newWindow('<%=request.getContextPath()%>/web/Know2actTemplate.jsp','templates')"
 		   title="<bean:message key='oscarReport.oscarReportByTemplate.msgK2ATemplate' />">
 			<bean:message key="oscarReport.oscarReportByTemplate.msgDownloadFromK2A" />
 		</a>

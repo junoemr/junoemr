@@ -36,9 +36,9 @@ import org.oscarehr.schedule.model.ScheduleTemplate;
 import org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey;
 import org.oscarehr.util.SpringUtils;
 
-public class ScheduleTemplateDaoTest extends DaoTestFixtures {
-
-	protected ScheduleTemplateDao dao = SpringUtils.getBean(ScheduleTemplateDao.class);
+public class ScheduleTemplateDaoTest extends DaoTestFixtures
+{
+	protected ScheduleTemplateDao scheduleTemplateDao = SpringUtils.getBean(ScheduleTemplateDao.class);
 
 	public ScheduleTemplateDaoTest() {
 	}
@@ -54,13 +54,13 @@ public class ScheduleTemplateDaoTest extends DaoTestFixtures {
 		ScheduleTemplate entity = new ScheduleTemplate();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		entity.setId(new ScheduleTemplatePrimaryKey("000001","a"));
-		dao.persist(entity);
+		scheduleTemplateDao.persist(entity);
 
 		assertNotNull(entity.getId());
 	}
 
     @Test
     public void testFindSchedules() {
-	    assertNotNull(dao.findSchedules(new Date(), new Date(), "100"));
+	    assertNotNull(scheduleTemplateDao.findSchedules(new Date(), new Date(), "100"));
     }
 }

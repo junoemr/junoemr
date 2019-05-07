@@ -23,8 +23,30 @@
  */
 package org.oscarehr.ws.rest;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.util.DateUtils;
+import org.oscarehr.appointment.dto.CalendarAppointmentStatus;
+import org.oscarehr.appointment.service.AppointmentStatusService;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentStatus;
@@ -34,6 +56,12 @@ import org.oscarehr.managers.AppointmentManager;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.ScheduleManager;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.schedule.dto.CalendarEvent;
+import org.oscarehr.schedule.dto.ScheduleGroup;
+import org.oscarehr.schedule.model.ScheduleTemplateCode;
+import org.oscarehr.schedule.service.Schedule;
+import org.oscarehr.schedule.service.ScheduleGroupService;
+import org.oscarehr.schedule.service.ScheduleTemplateService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.PatientListApptBean;
@@ -42,31 +70,19 @@ import org.oscarehr.ws.rest.conversion.AppointmentConverter;
 import org.oscarehr.ws.rest.conversion.AppointmentStatusConverter;
 import org.oscarehr.ws.rest.conversion.AppointmentTypeConverter;
 import org.oscarehr.ws.rest.conversion.LookupListItemConverter;
-import org.oscarehr.ws.rest.conversion.NewAppointmentConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.SchedulingResponse;
 import org.oscarehr.ws.rest.to.model.AppointmentStatusTo1;
 import org.oscarehr.ws.rest.to.model.AppointmentTo1;
-import org.oscarehr.ws.rest.to.model.NewAppointmentTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import oscar.util.ConversionUtils;
 
 @Path("/schedule")
 @Component("scheduleService")
+@Tag(name = "schedule")
 public class ScheduleService extends AbstractServiceImpl {
 
 	Logger logger = MiscUtils.getLogger();
@@ -76,9 +92,17 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Autowired
 	private AppointmentManager appointmentManager;
 	@Autowired
+	private AppointmentStatusService appointmentStatusService;
+	@Autowired
 	private DemographicManager demographicManager;
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
+	@Autowired
+	private Schedule scheduleService;
+	@Autowired
+	private ScheduleGroupService scheduleGroupService;
+	@Autowired
+	private ScheduleTemplateService scheduleTemplateService;
 
 	@GET
 	@Path("/day/{date}")
@@ -161,12 +185,15 @@ public class ScheduleService extends AbstractServiceImpl {
 		return response;
 	}
 
+	/*
 	@POST
 	@Path("/add")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public SchedulingResponse addAppointment(NewAppointmentTo1 appointmentTo) {
-		SchedulingResponse response = new SchedulingResponse();
+	public RestResponse<AppointmentTo1> addAppointment(NewAppointmentTo1 appointmentTo) {
+		//SchedulingResponse response = new SchedulingResponse();
+
+		logger.info(appointmentTo.toString());
 
 		NewAppointmentConverter converter = new NewAppointmentConverter();
 
@@ -176,10 +203,12 @@ public class ScheduleService extends AbstractServiceImpl {
 
 		appointmentManager.addAppointment(getLoggedInInfo(), appt);
 
-		response.setAppointment(new AppointmentConverter().getAsTransferObject(getLoggedInInfo(), appt));
-		
-		return response;
+		//response.setAppointment(new AppointmentConverter().getAsTransferObject(getLoggedInInfo(), appt));
+		AppointmentTo1 appointment = new AppointmentConverter().getAsTransferObject(getLoggedInInfo(), appt);
+
+		return RestResponse.successResponse(appointment);
 	}
+	*/
 
 	@POST
 	@Path("/getAppointment")
@@ -197,17 +226,7 @@ public class ScheduleService extends AbstractServiceImpl {
 		return response;
 	}
 
-	@POST
-	@Path("/deleteAppointment")
-	@Consumes("application/json")
-	@Produces("application/json")
-	public Response deleteAppointment(AppointmentTo1 appointmentTo) {
-
-		appointmentManager.deleteAppointment(getLoggedInInfo(), appointmentTo.getId());
-
-		return Response.status(Status.OK).build();
-	}
-
+	/*
 	@POST
 	@Path("/updateAppointment")
 	@Consumes("application/json")
@@ -218,11 +237,12 @@ public class ScheduleService extends AbstractServiceImpl {
 		AppointmentConverter converter = new AppointmentConverter();
 		Appointment appt = converter.getAsDomainObject(getLoggedInInfo(), appointmentTo);
 
-		scheduleManager.updateAppointment(getLoggedInInfo(), appt);
+		appointmentManager.updateAppointment(getLoggedInInfo(), appt);
 
 		response.setAppointment(converter.getAsTransferObject(getLoggedInInfo(), appt));
 		return response;
 	}
+	*/
 
 	@POST
 	@Path("/{demographicNo}/appointmentHistory")
@@ -370,4 +390,68 @@ public class ScheduleService extends AbstractServiceImpl {
 		return response;
 	}
 
+	// TODO: make the services below match the current status quo (logging, limits, etc)
+	@GET
+	@Path("/groups")
+	@Produces("application/json")
+	public RestSearchResponse<ScheduleGroup> getScheduleGroups()
+	{
+		List<ScheduleGroup> scheduleGroups = scheduleGroupService.getScheduleGroups();
+
+		// TODO: paginate?
+		return RestSearchResponse.successResponseOnePage(scheduleGroups);
+	}
+
+	@GET
+	@Path("/templateCodes")
+	@Produces("application/json")
+	public RestSearchResponse<ScheduleTemplateCode> getScheduleTemplateCodes()
+	{
+		List<ScheduleTemplateCode> scheduleTemplateCodes =
+			scheduleTemplateService.getScheduleTemplateCodes();
+
+		return RestSearchResponse.successResponseOnePage(scheduleTemplateCodes);
+	}
+
+	@GET
+	@Path("/calendar/statuses")
+	@Produces("application/json")
+	public RestSearchResponse<CalendarAppointmentStatus> getCalendarAppointmentStatuses()
+	{
+		List<CalendarAppointmentStatus> appointmentStatusList =
+			appointmentStatusService.getCalendarAppointmentStatusList();
+
+		return RestSearchResponse.successResponseOnePage(appointmentStatusList);
+	}
+
+	@GET
+	@Path("/calendar/{providerId}/")
+	@Produces("application/json")
+	public RestSearchResponse<CalendarEvent> getCalendarEvents(
+		@PathParam("providerId") Integer providerId,
+		@QueryParam("startDate") String startDateString,
+		@QueryParam("endDate") String endDateString,
+		@QueryParam("site") String siteName
+	)
+	{
+		Message message = PhaseInterceptorChain.getCurrentMessage();
+		HttpServletRequest request = (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
+		HttpSession session = request.getSession(true);
+
+		LocalDate startDate = ConversionUtils.dateStringToNullableLocalDate(startDateString);
+		LocalDate endDate = ConversionUtils.dateStringToNullableLocalDate(endDateString);
+
+		// TODO: Change this to throw an exception
+		// Default to today if either date is null
+		if(startDate == null || endDate == null)
+		{
+			startDate = LocalDate.now();
+			endDate = LocalDate.now();
+		}
+
+		List<CalendarEvent> calendarEvents =
+			scheduleService.getCalendarEvents(session, providerId, startDate, endDate, siteName);
+
+		return RestSearchResponse.successResponseOnePage(calendarEvents);
+	}
 }

@@ -1,0 +1,106 @@
+
+.uib-datepicker-inline-wrapper {
+	display: inline-block;
+	min-height: 187px;
+}
+
+.uib-datepicker {
+
+	// custom colors for button styles used in the uib-datepicker
+
+	thead {
+
+		// override btn-default colors to match info-box header colors
+		.btn-default {
+			@include button-variant($color-info-box-top-text, $color-info-box-top-bg, lighten($color-info-box-top-bg, 10%));
+		}
+
+		// match info-box header colors
+		th {
+			background-color: $color-info-box-top-bg;
+			color: $color-info-box-top-text;
+		}
+	}
+
+	tbody {
+
+		// override btn-default colors
+		.btn-default {
+			@include button-variant($color-btn-addon-text, $color-btn-addon-bg, $color-btn-addon-border);
+		}
+
+		// override active style to be primary color
+		.btn-default:active, .btn-default.active, .btn-default.dropdown-toggle
+		{
+			background-color: $primary-blue;
+			color: $color-info-box-top-text;
+			.text-info { color: $color-info-box-top-text; }
+		}
+	}
+
+	// square buttons, including days
+	.btn,
+	.btn-sm,
+	.btn-group-sm > .btn { border-radius: 0 }
+
+	// no focus ring after selecting a day
+	.uib-daypicker { outline: none !important; }
+}
+
+
+div.datepicker.datepicker-dropdown
+{
+	background-color: $color-info-box-table-header-bg;
+	thead
+	{
+		background-color: $color-info-box-content-border;
+		text-shadow: none;
+
+		color: #474747;
+		th.dow, th.datepicker-switch, th.prev, th.next
+		{
+			border-radius: 0px;
+		}
+
+		th.dow
+		{
+			margin-bottom: 5px;
+		}
+	}
+	tbody
+	{
+		background-color: white;
+		td.active, td.active:hover, span.month.active, span.month.active:hover, span.year.active,
+		span.year.active:hover
+		{
+			background-color: $primary-blue;
+			background-image: linear-gradient($primary-blue, rgb(0, 166, 204));
+		}
+
+		td.day
+		{
+			border-radius: 0px;
+		}
+		td.active, td:hover, td.today
+		{
+			border-radius: 3px;
+		}
+	}
+	tfoot
+	{
+		tr
+		{
+			th.active
+			{
+				background-color: $primary-blue;
+				background-image: linear-gradient($primary-blue, rgb(0, 166, 204));
+				color: white;
+				text-shadow: none;
+			}
+			th:hover
+			{
+				background-color: $color-info-box-content-border;
+			}
+		}
+	}
+}

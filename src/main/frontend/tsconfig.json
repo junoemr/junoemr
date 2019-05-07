@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+  },
+  "include": [
+    "src/**/*",
+    "generated/**/*"
+  ]
+}
