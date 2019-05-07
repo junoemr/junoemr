@@ -328,17 +328,12 @@
 			margin: 0;
 		}
 
-		/* remove firefox webkit so that checkboxes are resizable */
-		.gen-widget input[type=checkbox] {
-			-moz-appearance: none;
-		}
-
 		/* define xbox styling */
 		.gen-xBox input {
 			background: #f3f3f3;
 			text-align: center;
 			font-weight: bold;
-			font-size: 11px;
+			font-size: 9px;
 			border: 1px solid black;
 			cursor: pointer;
 		}
@@ -352,7 +347,7 @@
 			background: #f3f3f3;
 			text-align: center;
 			font-weight: bold;
-			font-size: 14px;
+			font-size: 9px;
 			border: 1px solid black;
 			cursor: pointer;
 		}
@@ -1690,11 +1685,12 @@
 			var $checkboxSizeSpinner = createSpinnerElem("checkboxSizeSpinner", "Template Size:", checkboxSize);
 			var changeTemplateSize = function (event, ui) {
 				checkboxSize = this.value;
+				let fontSize = Math.ceil(checkboxSize * 0.75);
 				$checkBoxTemplate.css({width: checkboxSize, height: checkboxSize});
 				$xBoxTemplate.css({width: checkboxSize, height: checkboxSize});
-				$xBoxTemplate.find(XBOX_INPUT_SELECTOR).css({'font-size': (checkboxSize - 1) + 'px'});
+				$xBoxTemplate.find(XBOX_INPUT_SELECTOR).css({'font-size': fontSize + 'px'});
 				$utf8CheckBoxTemplate.css({width: checkboxSize, height: checkboxSize});
-				$utf8CheckBoxTemplate.find(XBOX_INPUT_SELECTOR).css({'font-size': (checkboxSize - 1) + 'px'});
+				$utf8CheckBoxTemplate.find(XBOX_INPUT_SELECTOR).css({'font-size': fontSize + 'px'});
 			};
 			$checkboxSizeSpinner.find(":input").spinner({
 				min: checkboxSizeRange[0],
@@ -2092,7 +2088,7 @@
 				type: "checkbox",
 				css: {width: "16px", height: "16px"},
 				checked: defaultIncludeFaxControl
-			})
+			});
 			$options_menu.append($("<div>").append($("<label>", {
 					text: "Eform Name",
 					for: "eformNameInput"
