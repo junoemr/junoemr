@@ -52,6 +52,7 @@ public class GenericFile
 			"application/image",
 			"application/doc",
 			"application/msword",
+			"application/octet-stream",
 			"text/plain",
 			"image/tiff",
 			"image/jpeg",
@@ -70,6 +71,8 @@ public class GenericFile
 	public static final String BILLING_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("BILLING_BASE_DIR")).getPath();
 	public static final String BILLING_REMITTANCE_DIR = new File(BILLING_BASE_DIR, props.getProperty("BILLING_REMITTANCE_DIR")).getPath();
 	public static final String BILLING_REMITTANCE_FAILED_DIR = new File(BILLING_BASE_DIR, props.getProperty("BILLING_REMITTANCE_FAILED_DIR")).getPath();
+
+	public static final String RESOURCE_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("RESOURCE_BASE_DIR")).getPath();
 
 	public static final String EMAIL_TEMPLATE_DIRECTORY = props.getProperty("template_file_location");
 
@@ -152,6 +155,11 @@ public class GenericFile
 			return true;
 		}
 		throw new IOException("Invalid Directory: " + directoryFile.getPath());
+	}
+
+	public boolean deleteFile() throws IOException
+	{
+		return Files.deleteIfExists(this.javaFile.toPath());
 	}
 
 	public void rename(String newName) throws IOException

@@ -33,8 +33,10 @@ import java.util.Locale;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.oscarehr.rx.service.RxWatermarkService;
 import org.oscarehr.util.LocaleUtils;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.PrescriptionQrCodeUIBean;
 
 import com.lowagie.text.Document;
@@ -177,6 +179,7 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 		BaseFont bf; // = normFont;
 
 		cb.setRGBColorStroke(0, 0, 255);
+
 		// render prescriptions
 		for (String rxStr : listRx) {
 			// bf = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252,
@@ -280,10 +283,12 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 			Rectangle page = document.getPageSize();
 			PdfContentByte cb = writer.getDirectContent();
 
+
 			try {
 
 
 				float height = page.getHeight();
+				float pageWidth = 285f;
 				boolean showPatientDOB=false;
 				//head.writeSelectedRows(0, 1,document.leftMargin(), page.height() - document.topMargin()+ head.getTotalHeight(),writer.getDirectContent());
 				if(this.patientDOB!=null && this.patientDOB.length()>0){
@@ -379,14 +384,14 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				cb.setRGBColorStrokeF(0f, 0f, 0f);
 				cb.setLineWidth(0.5f);
 				// cb.moveTo(285f, 20f);
-				cb.moveTo(285f, endPara - 80);
-				cb.lineTo(285f, height - 15f);
+				cb.moveTo(pageWidth, endPara - 80);
+				cb.lineTo(pageWidth, height - 15f);
 				cb.stroke();
 				// draw top line 10, 405, 285, 405, 0.5
 				cb.setRGBColorStrokeF(0f, 0f, 0f);
 				cb.setLineWidth(0.5f);
 				cb.moveTo(13f, height - 15f);
-				cb.lineTo(285f, height - 15f);
+				cb.lineTo(pageWidth, height - 15f);
 				cb.stroke();
 
 				// draw bottom line 10, 20, 285, 20, 0.5
@@ -395,7 +400,7 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				// cb.moveTo(13f, 20f);
 				// cb.lineTo(285f, 20f);
 				cb.moveTo(13f, endPara - 80);
-				cb.lineTo(285f, endPara - 80);
+				cb.lineTo(pageWidth, endPara - 80);
 				cb.stroke();
 				// Render "Signature:"
 				writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_LEFT, geti18nTagValue(locale, "RxPreview.msgSignature"), 20f, endPara - 50f, 0);
@@ -408,11 +413,19 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				cb.lineTo(275f, endPara - 50f);
 				cb.stroke();
 
-				if (this.imgPath != null) {
-					Image img = Image.getInstance(this.imgPath);
-					img.scaleToFit(100, 50);
-					img.setAbsolutePosition(75f, endPara - 50f);
-					cb.addImage(img);
+				try
+				{
+					if (this.imgPath != null)
+					{
+						Image img = Image.getInstance(this.imgPath);
+						img.scaleToFit(100, 50);
+						img.setAbsolutePosition(75f, endPara - 50f);
+						cb.addImage(img);
+					}
+				}
+				catch (IOException ioe)
+				{
+					MiscUtils.getLogger().error("signature error: " + ioe.getMessage());
 				}
 
 				// Render doctor name
@@ -428,6 +441,18 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 				// print page number
 				String footer = "" + writer.getPageNumber();
 				writeDirectContent(cb, bf, 10, PdfContentByte.ALIGN_RIGHT, footer, 280, endPara - 77, 0);
+
+				// render watermark
+				if (RxWatermarkService.isWatermarkEnabled())
+				{
+					Image watermarkImg = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
+					float scaleFactor = (pageWidth*0.8f)/watermarkImg.getWidth();
+					watermarkImg.scalePercent(scaleFactor*100f);
+					watermarkImg.setAbsolutePosition(pageWidth/2 - (watermarkImg.getWidth()*scaleFactor)/2,
+							(page.getHeight() - (page.getHeight() - (endPara - 80))/2) - (watermarkImg.getHeight()*scaleFactor)/2);
+					cb.addImage(watermarkImg);
+				}
+
 			} catch (Exception e) {
 				logger.error("Error", e);
 			}

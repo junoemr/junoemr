@@ -153,12 +153,12 @@ public class EctConsultationFormFaxAction extends Action
 					GenericFile fileToFax = FileFactory.copy(fileToCopy);
 					fileToFax.rename(tempName);
 					FaxOutboxTransferOutbound transfer = outgoingFaxService.queueAndSendFax(providerNo, Integer.parseInt(demoNo), faxNo, FaxOutbound.FileType.CONSULTATION, fileToFax);
-					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
+					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR))
 					{
 						errorList.add("Failed to send fax. Check account settings. " +
 									"Reason: " + transfer.getSystemStatusMessage());
 					}
-					else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED.name()))
+					else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED))
 					{
 						errorList.add("Failed to send fax, it has been queued for automatic resend. " +
 									"Reason: " + transfer.getSystemStatusMessage());

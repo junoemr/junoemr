@@ -130,6 +130,15 @@ public class SRFaxApiConnector
 		add("Personal");
 	}};
 
+	public static final String RESPONSE_STATUS_SENT="Sent";
+	public static final String RESPONSE_STATUS_FAILED="Failed";
+	public static final String RESPONSE_STATUS_PROGRESS="In Progress";
+	public static final String RESPONSE_STATUS_EMAIL="Sending Email";
+	public static final List<String> RESPONSE_STATUSES_FINAL = new ArrayList<String>(2) {{
+		add(RESPONSE_STATUS_SENT);
+		add(RESPONSE_STATUS_FAILED);
+	}};
+
 	private final String access_id;
 	private final String access_pwd;
 
@@ -235,7 +244,7 @@ public class SRFaxApiConnector
 		String[] requiredFields = {S_FAX_DETAILS_ID};
 		String[] optionalFields = {S_RESPONSE_FORMAT};
 		String result = processRequest(ACTION_GET_FAX_STATUS, requiredFields, optionalFields, parameters);
-		return processSingleResponse(result);
+		return processSingleResponse(result, new TypeReference<SingleWrapper<GetFaxStatusResult>>(){});
 	}
 	public SingleWrapper<GetFaxStatusResult> getFaxStatus(String sFaxDetailsID, String sResponseFormat)
 	{
@@ -243,6 +252,10 @@ public class SRFaxApiConnector
 		parameters.put(S_FAX_DETAILS_ID, sFaxDetailsID);
 		parameters.put(S_RESPONSE_FORMAT, sResponseFormat);
 		return getFaxStatus(parameters);
+	}
+	public SingleWrapper<GetFaxStatusResult> getFaxStatus(String sFaxDetailsID)
+	{
+		return getFaxStatus(sFaxDetailsID, RESPONSE_FORMAT_JSON);
 	}
 
 	private ListWrapper<GetFaxStatusResult> getMultiFaxStatus(Map<String, String> parameters)
@@ -458,6 +471,10 @@ public class SRFaxApiConnector
 
 	private static <T> SingleWrapper processSingleResponse(String response)
 	{
+		return processSingleResponse(response, new TypeReference<SingleWrapper<T>>(){});
+	}
+	private static <T> SingleWrapper processSingleResponse(String response, TypeReference typeReference)
+	{
 		JSONObject json = new JSONObject(response);
 		String status = json.getString("Status");
 		SingleWrapper<T> result = null;
@@ -467,7 +484,7 @@ public class SRFaxApiConnector
 			if(SingleWrapper.STATUS_SUCCESS.equals(status))
 			{
 				ObjectMapper mapper = new ObjectMapper();
-				result = mapper.readValue(response, new TypeReference<SingleWrapper<T>>(){});
+				result = mapper.readValue(response, typeReference);
 			}
 			else
 			{

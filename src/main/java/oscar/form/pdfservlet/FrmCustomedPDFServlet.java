@@ -99,12 +99,12 @@ public class FrmCustomedPDFServlet extends HttpServlet
 					GenericFile fileToFax = FileFactory.createTempFile(baosPDF, ".pdf");
 					fileToFax.rename(pdfFile);
 					FaxOutboxTransferOutbound transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicNo, recipient, FaxOutbound.FileType.PRESCRIPTION, fileToFax);
-					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
+					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR))
 					{
 						faxMessage = "Failed to send fax. Check account settings. " +
 								"Reason: " + transfer.getSystemStatusMessage();
 					}
-					else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED.name()))
+					else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED))
 					{
 						faxMessage = "Failed to send fax, it has been queued for automatic resend. " +
 								"Reason: " + transfer.getSystemStatusMessage();
