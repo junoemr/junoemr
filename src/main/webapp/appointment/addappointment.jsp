@@ -174,8 +174,10 @@
 
 		<!-- polyfill for IE support -->
 		<script type="text/javascript">
-			if (!String.prototype.startsWith) {
-				String.prototype.startsWith = function(searchString, position) {
+			if (!String.prototype.startsWith)
+			{
+				String.prototype.startsWith = function(searchString, position)
+				{
 					position = position || 0;
 					return this.indexOf(searchString, position) === position;
 				};
