@@ -221,7 +221,6 @@
 					return false;
 				}
 				// set no-show status if no demographic selected and "Last Name" starts with '.'
-				// Object doesn't support property or method 'startsWith'
 				if (document.ADDAPPT.keyword.value.startsWith(".")
 					&& document.ADDAPPT.demographic_no.value.length === 0)
 				{
@@ -255,7 +254,6 @@
 					window.alert("<bean:message key="Appointment.msgCheckDuration"/>");
 					return false;
 				}
-				window.alert(document.ADDAPPT.end_time.value);
 				return true;
 			}
 
