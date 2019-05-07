@@ -415,7 +415,7 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 
 				try
 				{
-					if (this.imgPath != null)
+					if (this.imgPath != null && !this.imgPath.isEmpty())
 					{
 						Image img = Image.getInstance(this.imgPath);
 						img.scaleToFit(100, 50);
