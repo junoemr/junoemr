@@ -573,6 +573,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				function success(results)
 				{
 					console.log(results);
+					getLeftItems();
+					getRightItems();
 				},
 				function error(errors)
 				{
@@ -586,6 +588,9 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 						editingNoteId = null;
 					}
 					console.log(errors);
+
+					getLeftItems();
+					getRightItems();
 				});
 		};
 

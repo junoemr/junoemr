@@ -250,6 +250,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			{
 				controller.groupNotesForm.encounterNote.noteId = 0;
 			}
+
 			controller.groupNotesForm.encounterNote.cpp = true;
 			controller.groupNotesForm.encounterNote.editable = true;
 			controller.groupNotesForm.encounterNote.isSigned = true;
@@ -265,7 +266,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				{
 					$uibModalInstance.dismiss('cancel');
 					$state.transitionTo($state.current, $stateParams, {
-						reload: true,
+						reload: false,
 						inherit: false,
 						notify: true
 					});
