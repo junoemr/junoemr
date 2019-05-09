@@ -30,7 +30,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		uiCalendarConfig
 	)
 	{
-		//var controller = this;
+		let controller = this;
 
 		// XXX: put this address somewhere else
 		$scope.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
@@ -72,6 +72,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.timeIntervalOptions =
 			['00:05:00','00:10:00','00:15:00','00:30:00'];
 		$scope.selectedTimeInterval = $scope.defaultTimeInterval;
+		$scope.selectedSlotLabelInterval = {hours: 1};
 		$scope.defaultAutoRefreshMinutes = 3;
 		$scope.defaultCalendarView = 'agendaWeek';
 		$scope.eventStatuses = {};
@@ -542,7 +543,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.selectedTimeInterval = $scope.getSelectedTimeInterval(
 				$scope.timeIntervalOptions, $scope.defaultTimeInterval);
 			$scope.uiConfig.calendar.slotDuration = $scope.selectedTimeInterval;
-			$scope.uiConfig.calendar.slotLabelInterval = $scope.selectedTimeInterval;
+			$scope.uiConfig.calendar.slotLabelInterval = $scope.selectedSlotLabelInterval;
 
 			$scope.uiConfig.calendar.minTime = $scope.getScheduleMinTime();
 			$scope.uiConfig.calendar.maxTime = $scope.getScheduleMaxTime();
@@ -985,6 +986,21 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				$(element).find('.fc-content').html(eventSiteHtml + eventStatusHtml + eventEncounterHtml +
 					eventInvoiceHtml + eventDemographicHtml + eventRxHtml + eventDetails);
 			}
+			else
+			{
+				let scheduleTemplateColor = '#ffffff';
+				if(Juno.Common.Util.exists(event.color))
+				{
+					scheduleTemplateColor = Juno.Common.Util.escapeHtml(event.color);
+				}
+
+				let mainDiv = "<div class='schedule-event'>" +
+					"<div class='schedule-body'></div>" +
+					"<span class='schedule-code' style='background-color: " + scheduleTemplateColor +"'>" + event.scheduleTemplateCode + "</span>" +
+					"</div>";
+				$(element).html(mainDiv);
+			}
+
 		};
 
 		$scope.onViewRender = function onViewRender()
@@ -1349,7 +1365,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 			// updating the config will automatically trigger an events refresh
 			$scope.uiConfig.calendar.slotDuration = $scope.selectedTimeInterval;
-			$scope.uiConfig.calendar.slotLabelInterval = $scope.selectedTimeInterval;
+			$scope.uiConfig.calendar.slotLabelInterval = $scope.selectedSlotLabelInterval;
 
 			$scope.applyUiConfig($scope.uiConfig);
 		};
@@ -1543,7 +1559,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				defaultView: null,
 				defaultDate: $scope.defaultDate,
 				slotDuration: $scope.selectedTimeInterval,
-				slotLabelInterval: $scope.selectedTimeInterval,
+				slotLabelInterval: $scope.selectedSlotLabelInterval,
 				slotLabelFormat: 'h:mma',
 
 				loading: $scope.setCalendarLoading,
@@ -1558,7 +1574,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				editable: true,
 				eventDrop: $scope.onEventDrop,
 				eventResize: $scope.onEventResize,
-				schedulerLicenseKey: "GPL-My-Project-Is-Open-Source"
+				schedulerLicenseKey: "GPL-My-Project-Is-Open-Source",
 			}
 		};
 

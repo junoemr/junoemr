@@ -45,7 +45,7 @@
 
 .calendar
 {
-
+	font-family: "Arial", "Helvetica", sans-serif;
 	.fc-toolbar
 	{
 		h2 { font-size: 1.571em; }
@@ -123,6 +123,38 @@
 			{
 				margin-left: 3px;
 			}
+		}
+	  	/* background event custom styling */
+		.fc-bgevent {
+		  	background-color: transparent !important;
+		  	opacity: 1;
+		  	display: flex;
+		  	justify-content: center;
+		  	.schedule-event {
+			  	flex-grow: 1;
+			  	display: flex;
+				.schedule-code {
+					float: right;
+				  	width: 16px;
+				  	text-align: center;
+				  	height: 100%;
+				  	border: 1px solid #dcdfe6;
+				  	border-right: 0;
+				}
+				.schedule-body {
+				  flex-grow: 1;
+				  background-color: #ffffff;
+				  border-top: 1px solid #dcdfe6;
+				}
+			}
+		}
+		/* Remove that awful yellow color from today */
+		.fc-today {
+		  opacity: 0;
+		}
+	  	/* custom stying for the time column*/
+	  	.fc-time {
+		  background-color: #edf0f5;
 		}
 	}
 }

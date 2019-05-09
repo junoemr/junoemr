@@ -24,10 +24,12 @@
 
 package org.oscarehr.schedule.service;
 
+import com.google.common.collect.RangeMap;
 import org.oscarehr.schedule.dao.ScheduleTemplateCodeDao;
 import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.dto.AvailabilityType;
 import org.oscarehr.schedule.dto.CalendarEvent;
+import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.schedule.model.ScheduleTemplate;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +42,8 @@ import java.sql.Time;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-//import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -54,8 +55,8 @@ public class ScheduleTemplateService
 	@Autowired
 	ScheduleTemplateCodeDao scheduleTemplateCodeDao;
 
-	private final String NO_APPOINTMENT_CHARACTER = "_";
-	private final String SCHEDULE_TEMPLATE_CLASSNAME= null;
+	private static final String NO_APPOINTMENT_CHARACTER = "_";
+	private static final String SCHEDULE_TEMPLATE_CLASSNAME= null;
 
 
 	/**
@@ -90,63 +91,78 @@ public class ScheduleTemplateService
 	{
 		List<Object[]> results = scheduleTemplateDao.getRawScheduleSlots(providerId, date);
 
+		// Get schedule slots
+		RangeMap<LocalTime, ScheduleSlot> scheduleSlots = scheduleTemplateDao.findScheduleSlots(
+				date, providerId);
+
 		List<CalendarEvent> calendarEvents = new ArrayList<>();
 
-		Iterator<Object[]> iterator = results.iterator();
+		int slotLengthInMinutes = 15;
+		LocalTime startTime = LocalTime.of(8,0);
+		LocalTime endTime = LocalTime.of(19,45);
 
-		int resourceId = 1; // Increments to identify rows
-		Object[] previousRow = null; // Save the previous row to at to result
-		LocalDateTime startDateTime = null;
-
-		while(iterator.hasNext())
+		for(LocalTime slotTime = startTime; slotTime.isBefore(endTime); slotTime = plusNoWrap(slotTime, slotLengthInMinutes))
 		{
-			Object[] result = iterator.next();
+			LocalTime slotEndTime = plusNoWrap(slotTime, slotLengthInMinutes);
+			LocalDateTime startDateTime = LocalDateTime.of(date, slotTime);
 
+			ScheduleSlot slot = scheduleSlots.get(slotTime);
+
+			/* add a fake event if there is no schedule slot at this time,
+			it is the no-appt slot marker, or the slot ends before the time period */
+			if(slot == null
+					|| NO_APPOINTMENT_CHARACTER.equals(slot.getCode())
+					|| slot.getAppointmentDateTime().toLocalTime().plusMinutes(slot.getDurationMinutes()).isBefore(slotEndTime))
+			{
+				calendarEvents.add(createFakeCalendarEvent(startDateTime, slotLengthInMinutes, providerId));
+			}
+
+		}
+
+		for(Object[] result : results)
+		{
 			String currentCode = (String)result[1];
-
-			// If the code changed or if this is the last row
-			//   save the previous row with the saved start date
-			//   reset the saved row and start date
-			if(previousRow != null && previousRow[1] != null && !previousRow[1].equals(currentCode))
-			{
-				calendarEvents.add(createCalendarEvent(startDateTime, previousRow, providerId));
-
-				previousRow = null;
-				startDateTime = null;
-			}
-
-			// If this is the last row, also add a result for that
-			if(!iterator.hasNext() && !NO_APPOINTMENT_CHARACTER.equals(currentCode))
-			{
-				// Use this date if there wasn't one set already
-				if(startDateTime == null)
-				{
-					startDateTime = ConversionUtils.getLocalDateTimeFromSqlDateAndTime(
-						(java.sql.Date) result[2],
-						(java.sql.Time) result[3]
-					);
-				}
-
-				// Add this row because it is the last
-				calendarEvents.add(createCalendarEvent(startDateTime, result, providerId));
-			}
-
-			// If this is not a _, save the current row and maybe start date
 
 			if(!NO_APPOINTMENT_CHARACTER.equals(currentCode))
 			{
-				previousRow = result;
-				if(startDateTime == null)
-				{
-					startDateTime = ConversionUtils.getLocalDateTimeFromSqlDateAndTime(
+				LocalDateTime startDateTime = ConversionUtils.getLocalDateTimeFromSqlDateAndTime(
 						(java.sql.Date) result[2],
-						(java.sql.Time)result[3]
-					);
-				}
+						(java.sql.Time) result[3]
+				);
+				// Add this row because it is the last
+				calendarEvents.add(createCalendarEvent(startDateTime, result, providerId));
 			}
 		}
-
 		return calendarEvents;
+	}
+
+	private LocalTime plusNoWrap(LocalTime time, int slotLengthInMinutes)
+	{
+		LocalTime outTime = time.plusMinutes(slotLengthInMinutes);
+
+		if(outTime.compareTo(time) == -1 || slotLengthInMinutes >= (24*60))
+		{
+			return LocalTime.MAX;
+		}
+
+		return outTime;
+	}
+
+	private CalendarEvent createFakeCalendarEvent(LocalDateTime startDateTime, int durationMin, int resourceId)
+	{
+		Object[] fakeResult = {
+				null, //position
+				"", //code char
+				java.sql.Date.valueOf(startDateTime.toLocalDate()), //appt date
+				java.sql.Time.valueOf(startDateTime.toLocalTime()), //appt time
+				"", //code
+				BigInteger.valueOf(durationMin),  //duration
+				"No Schedule", //description
+				"#ffffff", //colour
+				"N", //confirm
+				10 //booking limit
+		};
+		return createCalendarEvent(startDateTime, fakeResult, resourceId);
 	}
 
 	private CalendarEvent createCalendarEvent(LocalDateTime startDateTime, Object[] result, int resourceId)
