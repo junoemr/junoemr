@@ -31,6 +31,8 @@ import java.util.HashSet;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -72,6 +74,27 @@ public class ProviderPreference extends AbstractModel<String> implements Seriali
         	this.url = url;
         }
 	}
+
+	/**
+	 * AppointmentReason display levels.
+	 */
+	public enum AppointmentReasonDisplayLevel
+	{
+		DEFAULT_ALL ("Show category and reason"),
+		REASON_ONLY ("Show reason only");
+
+		private String label;
+
+		AppointmentReasonDisplayLevel(String label)
+		{
+			this.label = label;
+		}
+
+		public String toLabel()
+		{
+			return this.label;
+		}
+	}
 	
 	@Id
 	private String providerNo;
@@ -88,8 +111,9 @@ public class ProviderPreference extends AbstractModel<String> implements Seriali
 	private int appointmentScreenLinkNameDisplayLength=3;
 	private int defaultDoNotDeleteBilling=0;
 	private String defaultDxCode=null;
+
 	private byte[] encryptedMyOscarPassword=null;
-	
+
 	/**
 	* Whether or not the provider has enabled the use of an external
 	* prescription service.
@@ -139,8 +163,13 @@ public class ProviderPreference extends AbstractModel<String> implements Seriali
 	* Whether or not the provider has enabled training mode in the external prescriber
 	*/
 	private boolean eRxTrainingMode = false;
-	
-	
+
+
+	/**
+	 * How much appointment reason information to display on the schedule page.
+	 */
+	@Enumerated(EnumType.STRING)
+	private AppointmentReasonDisplayLevel appointmentReasonDisplayLevel = AppointmentReasonDisplayLevel.DEFAULT_ALL;
 	
 	@CollectionOfElements(targetElement = String.class)
 	@JoinTable(name = "ProviderPreferenceAppointmentScreenForm",joinColumns = @JoinColumn(name = "providerNo"))
@@ -431,6 +460,14 @@ public class ProviderPreference extends AbstractModel<String> implements Seriali
 	public void setEncryptedMyOscarPassword(byte[] encryptedMyOscarPassword) {
     	this.encryptedMyOscarPassword = encryptedMyOscarPassword;
     }
-    
-    
+
+	public AppointmentReasonDisplayLevel getAppointmentReasonDisplayLevel()
+	{
+		return this.appointmentReasonDisplayLevel;
+	}
+
+	public void setAppointmentReasonDisplayLevel(AppointmentReasonDisplayLevel level)
+	{
+		this.appointmentReasonDisplayLevel = level;
+	}
 }

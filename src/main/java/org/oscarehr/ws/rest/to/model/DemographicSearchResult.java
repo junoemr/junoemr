@@ -28,10 +28,11 @@ import java.util.Date;
 
 import org.apache.tools.ant.util.DateUtils;
 
-public class DemographicSearchResult {
+public class DemographicSearchResult
+{
 
 	private SimpleDateFormat sdf = new SimpleDateFormat(DateUtils.ISO8601_DATE_PATTERN);
-	
+
 	private Integer demographicNo;
 	private String lastName;
 	private String firstName;
@@ -44,40 +45,27 @@ public class DemographicSearchResult {
 	private String patientStatus;
 	private String phone;
 	private String hin;
-	
+	private String email;
+
 	private Integer remoteFacilityId;
-	
-	
-	public DemographicSearchResult() {
-		
-	}
-	
-	public DemographicSearchResult(Integer demographicNo, String lastName, String firstName, String chartNo, String sex, String providerNo, 
-			String rosterStatus, String patientStatus, String phone, Date dob, String providerLastName, String providerFirstName, String hin) {
-		setDemographicNo(demographicNo);
-		setLastName(lastName);
-		setFirstName(firstName);
-		setChartNo(chartNo);
-		setSex(sex);
-		setProviderNo(providerNo);
-		setRosterStatus(rosterStatus);
-		setPatientStatus(patientStatus);
-		setPhone(phone);
-		setDob(dob);
-		setHin(hin);
-		
-		if(providerLastName != null && providerFirstName != null) {
-			setProviderName(providerLastName + "," + providerFirstName);
-		}
+
+
+	public DemographicSearchResult()
+	{
 	}
 
-	public Integer getDemographicNo() {
+	public Integer getDemographicNo()
+	{
 		return demographicNo;
 	}
-	public void setDemographicNo(Integer demographicNo) {
+
+	public void setDemographicNo(Integer demographicNo)
+	{
 		this.demographicNo = demographicNo;
 	}
-	public String getLastName() {
+
+	public String getLastName()
+	{
 		return lastName;
 	}
 	public void setLastName(String lastName) {
@@ -146,6 +134,16 @@ public class DemographicSearchResult {
 
 	public void setHin(String hin) {
 		this.hin = hin;
+	}
+
+	public String getEmail()
+	{
+		return email;
+	}
+
+	public void setEmail(String email)
+	{
+		this.email = email;
 	}
 
 	public String getFormattedDOB() {

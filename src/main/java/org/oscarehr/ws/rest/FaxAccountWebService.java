@@ -22,6 +22,7 @@
  */
 package org.oscarehr.ws.rest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.oscarehr.fax.dao.FaxAccountDao;
@@ -259,7 +260,9 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	                                                               @QueryParam("page") @DefaultValue("1") Integer page,
 	                                                               @QueryParam("perPage") @DefaultValue("10") Integer perPage,
 	                                                               @QueryParam("endDate") String endDateStr,
-	                                                               @QueryParam("startDate") String startDateStr)
+	                                                               @QueryParam("startDate") String startDateStr,
+	                                                               @QueryParam("combinedStatus") String combinedStatus,
+	                                                               @QueryParam("archived") String archived)
 	{
 		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
 		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin", "_admin.fax");
@@ -280,6 +283,14 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		if(startDateStr != null)
 		{
 			criteriaSearch.setStartDate(ConversionUtils.toLocalDate(startDateStr));
+		}
+		if(StringUtils.trimToNull(combinedStatus) != null)
+		{
+			criteriaSearch.setCombinedStatus(FaxOutboxTransferOutbound.CombinedStatus.valueOf(combinedStatus));
+		}
+		if(StringUtils.trimToNull(archived) != null)
+		{
+			criteriaSearch.setArchived(Boolean.parseBoolean(archived));
 		}
 
 		int total = faxOutboundDao.criteriaSearchCount(criteriaSearch);

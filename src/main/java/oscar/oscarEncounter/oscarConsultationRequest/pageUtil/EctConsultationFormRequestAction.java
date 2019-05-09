@@ -36,7 +36,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.common.IsPropertiesOn;
 import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.dao.ConsultationRequestDao;
 import org.oscarehr.common.dao.ConsultationRequestExtDao;
@@ -54,6 +53,8 @@ import org.oscarehr.common.model.DigitalSignature;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.consultations.model.ConsultDocs;
+import org.oscarehr.consultations.service.ConsultationAttachmentService;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -83,6 +84,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 public class EctConsultationFormRequestAction extends Action {
@@ -95,6 +97,7 @@ public class EctConsultationFormRequestAction extends Action {
 			.getBean("consultationRequestExtDao");
 	private static ProfessionalSpecialistDao professionalSpecialistDao = (ProfessionalSpecialistDao) SpringUtils
 			.getBean("professionalSpecialistDao");
+	private static ConsultationAttachmentService consultationAttachmentService =  SpringUtils.getBean(ConsultationAttachmentService.class);
 	private static OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
 	private static boolean faxEnabled = outgoingFaxService.isOutboundFaxEnabled();
 	
@@ -167,16 +170,16 @@ public class EctConsultationFormRequestAction extends Action {
 				// format of input is D2|L2 for doc and lab
 				String[] docs = frm.getDocuments().split("\\|");
 
-				for (int idx = 0; idx < docs.length; ++idx) {
-					if (docs[idx].length() > 0) {
-						if (docs[idx].charAt(0) == 'D')
-							EDocUtil.attachDocConsult(providerNo, docs[idx].substring(1), requestId);
-						else if (docs[idx].charAt(0) == 'L')
-							ConsultationAttachLabs.attachLabConsult(providerNo, docs[idx].substring(1), requestId);
-					}
-				}
+				List<Integer> docIdList = filterIdList(docs, ConsultDocs.DOCTYPE_DOC);
+				List<Integer> labIdList = filterIdList(docs, ConsultDocs.DOCTYPE_LAB);
+				List<Integer> eformIdList = filterIdList(docs, ConsultDocs.DOCTYPE_EFORM);
+
+				consultationAttachmentService.setAttachedDocuments(Integer.parseInt(requestId), providerNo, docIdList);
+				consultationAttachmentService.setAttachedLabs(Integer.parseInt(requestId), providerNo, labIdList);
+				consultationAttachmentService.setAttachedEForms(Integer.parseInt(requestId), providerNo, eformIdList);
 			}
-			catch (ParseException e) {
+			catch (ParseException e)
+			{
 				MiscUtils.getLogger().error("Error", e);
 			}
 			request.setAttribute("transType", "2");
@@ -230,23 +233,10 @@ public class EctConsultationFormRequestAction extends Action {
 		request.setAttribute("teamVar", sendTo);
 
 		ConsultationRequest consult = consultationRequestDao.find(Integer.parseInt(requestId));
-		if (submission.endsWith("And Print Preview")) {
-
+		if (submission.endsWith("And Print Preview"))
+		{
 			request.setAttribute("reqId", requestId);
-			if (faxEnabled
-					|| IsPropertiesOn.propertiesOn("consultation_pdf_enabled")) {
-				return mapping.findForward("printIndivica");
-			}
-			else if (IsPropertiesOn.propertiesOn("CONSULT_PRINT_PDF")) {
-				return mapping.findForward("printpdf");
-			}
-			else if (IsPropertiesOn.propertiesOn("CONSULT_PRINT_ALT")) {
-				return mapping.findForward("printalt");
-			}
-			else {
-				return mapping.findForward("print");
-			}
-
+			return mapping.findForward("print");
 		}
 		else if (submission.endsWith("And Fax")) {
 
@@ -322,9 +312,7 @@ public class EctConsultationFormRequestAction extends Action {
 			}
 		}
 
-		if (consult.getProviderNo() == null || consult.getProviderNo().equals("")) {
-			consult.setProviderNo(frm.getProviderNo());
-		}
+		consult.setProviderNo(frm.getProviderNo());
 		consult.setReasonForReferral(frm.getReasonForConsultation());
 		consult.setClinicalInfo(frm.getClinicalInformation());
 		consult.setCurrentMeds(frm.getCurrentMedications());
@@ -437,5 +425,24 @@ public class EctConsultationFormRequestAction extends Action {
             }	    	
 	    }
     }
+
+	/**
+	 * filter the attachedDocs id list on prefix. ids start with a doctype letter, followed by the integerID value for that attachment
+	 * @param idList
+	 * @param filterPrefix
+	 * @return filtered list converted to integers
+	 */
+	private List<Integer> filterIdList(String[] idList, String filterPrefix)
+	{
+		List<Integer> filteredList = new ArrayList<>();
+		for(String id : idList)
+		{
+			if(id.startsWith(filterPrefix))
+			{
+				filteredList.add(Integer.parseInt(id.substring(filterPrefix.length())));
+			}
+		}
+		return filteredList;
+	}
 
 }

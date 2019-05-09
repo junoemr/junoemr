@@ -24,10 +24,9 @@
 
 --%>
 
-<%@page import="org.oscarehr.util.LoggedInInfo" %>
-<%@ page import="java.lang.*" %>
-<%@page import="oscar.OscarProperties" %>
 <%@page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@page import="org.oscarehr.util.LoggedInInfo" %>
+<%@page import="oscar.OscarProperties" %>
 
 <%
 	boolean fromMessenger = request.getParameter("fromMessenger") == null ? false : (request.getParameter("fromMessenger")).equalsIgnoreCase("true") ? true : false;
@@ -108,6 +107,9 @@
 					</option>
 					<option value="search_hin" <%=searchMode.equals("search_hin") ? "selected" : ""%>>
 						<bean:message key="demographic.zdemographicfulltitlesearch.formHIN"/>
+					</option>
+					<option value="search_email" <%=searchMode.equals("search_email") ? "selected" : ""%>>
+						<bean:message key="demographic.zdemographicfulltitlesearch.formEmail"/>
 					</option>
 					<option value="search_chart_no" <%=searchMode.equals("search_chart_no") ? "selected" : ""%>>
 						<bean:message key="demographic.zdemographicfulltitlesearch.formChart"/>

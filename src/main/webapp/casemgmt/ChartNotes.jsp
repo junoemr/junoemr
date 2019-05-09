@@ -119,7 +119,8 @@ try
 	}
 %>
 
-
+<link href="ChartNotes.css" rel="stylesheet" type="text/css">
+<link href="../web/bower_components/components-font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
 
 <script type="text/javascript">
     ctx = "<c:out value="${ctx}"/>";
@@ -164,7 +165,8 @@ try
     <% if( request.getAttribute("NoteLockError") != null ) { %>
 		alert("<%=request.getAttribute("NoteLockError")%>");
 	<%}%>
-	
+
+
 </script>
 
  <html:form action="/CaseManagementView" method="post">
@@ -538,9 +540,16 @@ try
 			$("encMainDiv").style.height = divHeight+'px';
 		}
 	</script>
-
 	<div id='save' style="width: 99%; background-color: #CCCCFF; padding-top: 5px; margin-left: 2px; border-left: thin solid #000000; border-right: thin solid #000000; border-bottom: thin solid #000000;">
 		<span style="float: right; margin-right: 5px;">
+
+		<div class="encounter_timer_container">
+			<div style="display: inline-block; position:relative;">
+				<input id="encounter_timer" title="Paste timer data" type="button" onclick="encounterTimer.putEncounterTimeInNote()" value="00:00"/>
+			</div>
+			<input id="encounter_timer_pause" class="encounter_timer_control" type="button" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')" value="||"/>
+			<input id="encounter_timer_play" class="encounter_timer_control" type="button" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')" value="&gt;"/>
+		</div>
 		<%
 
 			if(facility.isEnableGroupNotes()) {

@@ -88,7 +88,6 @@ function Attach(lname, fname, hin, yob,mob,dob, vercode, sex, effyear, effmonth,
 <table BORDER="0" CELLPADDING="1" CELLSPACING="0" WIDTH="100%"
 	BGCOLOR="#C4D9E7">
     <%
-   HCMagneticStripe hcMagneticStripe = (HCMagneticStripe) request.getAttribute("hcMagneticStripe");
    HCValidationResult validationResult = (HCValidationResult) request.getAttribute("validationResult");
    
    String responseCode = validationResult.getResponseCode();
@@ -97,45 +96,64 @@ function Attach(lname, fname, hin, yob,mob,dob, vercode, sex, effyear, effmonth,
    
    String firstName = validationResult.getFirstName();
    if (firstName == null) {
-       firstName = hcMagneticStripe.getFirstName();
+       firstName = (String)request.getAttribute("firstName");
    }
    if(firstName != null) {firstName = firstName.toUpperCase();}
    
    String lastName = validationResult.getLastName();
    if (lastName == null) {
-       lastName = hcMagneticStripe.getLastName();
+       lastName = (String)request.getAttribute("lastName");
    }
    if(lastName != null) {lastName = lastName.toUpperCase();}
            
    String birthDate = validationResult.getBirthDate();
    if (birthDate == null) {
-       birthDate = hcMagneticStripe.getBirthDate();
-   }
-   
-   String dobyear = birthDate.substring(0, 4);
-   String dobmonth = birthDate.substring(4, 6);
-   String dobdate = birthDate.substring(6, 8);
-   
-   String expiryDate = validationResult.getExpiryDate();
-   if (expiryDate == null) {
-       expiryDate = hcMagneticStripe.getExpiryDate();
+       birthDate = (String)request.getAttribute("birthDate");
    }
 
-   String endyear = expiryDate.substring(0, 4);
-   String endmonth = expiryDate.substring(4, 6);
-   String enddate = expiryDate.substring(6, 8);
-   
+   String dobyear = "";
+   String dobmonth = "";
+   String dobday = "";
+   if (birthDate != null && birthDate.length() >= 8)
+   {
+   	   dobyear = birthDate.substring(0, 4);
+       dobmonth = birthDate.substring(4, 6);
+       dobday = birthDate.substring(6, 8);
+   }
+
+   String expiryDate = validationResult.getExpiryDate();
+   if (expiryDate == null) {
+       expiryDate = (String)request.getAttribute("expiryDate");
+   }
+
+   String endyear = "";
+   String endmonth = "";
+   String endday = "";
+   if (expiryDate != null && expiryDate.length() >= 8)
+   {
+   	    endyear = expiryDate.substring(0, 4);
+        endmonth = expiryDate.substring(4, 6);
+       endday = expiryDate.substring(6, 8);
+   }
+
    String issueDate = validationResult.getIssueDate();
    if (issueDate == null) {
-       issueDate = hcMagneticStripe.getIssueDate();
-   }   
-   String effyear = issueDate.substring(0, 4);
-   String effmonth = issueDate.substring(4, 6);
-   String effdate = issueDate.substring(6, 8);
-   
+       issueDate = (String)request.getAttribute("issueDate");
+   }
+
+   String effyear = "";
+   String effmonth = "";
+   String effday = "";
+   if(issueDate != null && issueDate.length() >= 8)
+   {
+        effyear = issueDate.substring(0, 4);
+        effmonth = issueDate.substring(4, 6);
+        effday = issueDate.substring(6, 8);
+   }
+
    String gender = validationResult.getGender();
    if (gender == null) {
-       gender = hcMagneticStripe.getSex();
+       gender = (String)request.getAttribute("sex");
    }
    %>
    
@@ -169,7 +187,7 @@ function Attach(lname, fname, hin, yob,mob,dob, vercode, sex, effyear, effmonth,
 					value="<%=dobmonth%>" size="2" maxlength="2"></td>
 				<td>-</td>
 				<td><input type="text" name="date_of_birth"
-					value="<%=dobdate%>" size="2" maxlength="2"></td>
+					value="<%=dobday%>" size="2" maxlength="2"></td>
 			</tr>
 		</table>
 		</td>
@@ -179,10 +197,10 @@ function Attach(lname, fname, hin, yob,mob,dob, vercode, sex, effyear, effmonth,
 	</tr>
 	<tr valign="top">
 		<td align="right"><b>HIN: </b></td>
-                <td align="left"><input type="text" name="hin" value="<%=hcMagneticStripe.getHealthNumber()%>"></td>
+                <td align="left"><input type="text" name="hin" value="<%=request.getAttribute("hin") %>"></td>
 		<td align="right"><b>Ver.</b></td>
 		<td align="left"><input type="text" name="ver"
-			value="<%=hcMagneticStripe.getCardVersion().toUpperCase()%>"></td>
+			value="<%=((String)request.getAttribute("hinVer")).toUpperCase()%>"></td>
 	</tr>
         <tr valign="top">
                 <td align="right"><b>EFF Date:</b></td>
@@ -196,7 +214,7 @@ function Attach(lname, fname, hin, yob,mob,dob, vercode, sex, effyear, effmonth,
                                         value="<%=effmonth%>" size="2" maxlength="2"></td>
                                 <td>-</td>
                                 <td><input type="text" name="eff_date_date"
-                                        value="<%=effdate%>" size="2" maxlength="2"></td>
+                                        value="<%=effday%>" size="2" maxlength="2"></td>
                         </tr>
                 </table>
                 </td>
@@ -211,7 +229,7 @@ function Attach(lname, fname, hin, yob,mob,dob, vercode, sex, effyear, effmonth,
                                         value="<%=endmonth%>" size="2" maxlength="2"></td>
                                 <td>-</td>
                                 <td><input type="text" name="end_date_date"
-                                        value="<%=enddate%>" size="2" maxlength="2"></td>
+                                        value="<%=endday%>" size="2" maxlength="2"></td>
                         </tr>
                 </table>
                 </td>
@@ -223,9 +241,9 @@ function Attach(lname, fname, hin, yob,mob,dob, vercode, sex, effyear, effmonth,
 <br>
 <br>
 <form><input type="button" name="Button1" value="Confirm"
-	onclick="javascript:Attach('<%=lastName%>','<%=firstName%>','<%=hcMagneticStripe.getHealthNumber()%>','<%=dobyear%>'
-            ,'<%=dobmonth%>','<%=dobdate%>', '<%=hcMagneticStripe.getCardVersion().toUpperCase()%>','<%=gender%>', '<%=effyear%>', '<%=effmonth%>', '<%=effdate%>'
-            , '<%=endyear%>', '<%=endmonth%>', '<%=enddate%>');"><input
+	onclick="javascript:Attach('<%=lastName%>','<%=firstName%>','<%=request.getAttribute("hin")%>','<%=dobyear%>'
+            ,'<%=dobmonth%>','<%=dobday%>', '<%=((String)request.getAttribute("hinVer")).toUpperCase()%>','<%=gender%>', '<%=effyear%>', '<%=effmonth%>', '<%=effday%>'
+            , '<%=endyear%>', '<%=endmonth%>', '<%=endday%>');"><input
 	type="button" name="Button" value="Cancel" onclick=self.close();>
 </form>
 </body>

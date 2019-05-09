@@ -1011,7 +1011,7 @@ if(wLReadonly.equals("")){
 							if (oscarProps.isEligibilityCheckEnabled())
 							{
 							%>
-									<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
+									<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg', event);"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
 									<div id='menu2' class='menu' onclick='event.cancelBubble = true;' style="width:350px;">
 										<span id="search_spinner" ><bean:message key="demographic.demographiceditdemographic.msgLoading"/></span>
 										<span id="eligibilityMsg"></span>
@@ -1035,7 +1035,7 @@ if(wLReadonly.equals("")){
 
 
 						<br/>
-						<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
+						<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg', event);"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
 						<div id='menu2' class='menu' onclick='event.cancelBubble = true;' style="width:350px;">
 							<span id="search_spinner" ><bean:message key="demographic.demographiceditdemographic.msgLoading"/></span>
 							<span id="eligibilityMsg"></span>
@@ -1468,13 +1468,19 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
 										<span class="_hc_status_icon _hc_status_success"></span>Ready for Card Swipe
 									</span>
 								<% } %>	
-                                <% if (!OscarProperties.getInstance().getBooleanProperty("workflow_enhance", "true")) { %>
+                                <% if (!OscarProperties.getInstance().getBooleanProperty("workflow_enhance", "true"))
+                                {
+                                	if(oscarProps.isOntarioInstanceType())
+									{
+								%>
 								<span id="swipeButton" style="display: inline;"> 
                                     <input type="button" name="Button"
                                     value="<bean:message key="demographic.demographiceditdemographic.btnSwipeCard"/>"
                                     onclick="window.open('zdemographicswipe.jsp','', 'scrollbars=yes,resizable=yes,width=600,height=300, top=360, left=0')">
                                 </span> <!--input type="button" name="Button" value="<bean:message key="demographic.demographiceditdemographic.btnSwipeCard"/>" onclick="javascript:window.alert('Health Card Number Already Inuse');"-->
-                                <% } %>
+                                <% 	}
+								}
+								%>
                                 </td>
                                 <td width="40%" align='right' valign="top">
 								<input type="button" size="110" name="Button"
@@ -3788,12 +3794,20 @@ if(oscarVariables.getProperty("demographicExtJScript") != null) { out.println(os
 									<input type="submit" <%=(showCbiReminder?"onclick='showCbiReminder()'":"")%>
 										value="<bean:message key="demographic.demographiceditdemographic.btnUpdate"/>">
 								</security:oscarSec> </span> <!-- security code block --></td>
-								<td width="40%" align='right' valign="top"><span
+								<td width="40%" align='right' valign="top">
+									<%
+										if(oscarProps.isOntarioInstanceType())
+										{
+									%>
+									<span
 									id="swipeButton" style="display: none;"> <input
 									type="button" name="Button"
 									value="<bean:message key="demographic.demographiceditdemographic.btnSwipeCard"/>"
 									onclick="window.open('zdemographicswipe.jsp','', 'scrollbars=yes,resizable=yes,width=600,height=300, top=360, left=0')">
 								</span> <!--input type="button" name="Button" value="<bean:message key="demographic.demographiceditdemographic.btnSwipeCard"/>" onclick="javascript:window.alert('Health Card Number Already Inuse');"-->
+									<%
+										}
+									%>
 									<input type="button" size="110" name="Button"
 									    value="<bean:message key="demographic.demographiceditdemographic.btnCreatePDFEnvelope"/>"
 									    onclick="popupPage(400,700,'<%=printEnvelope%><%=demographic.getDemographicNo()%>');return false;">
@@ -3868,17 +3882,30 @@ Calendar.setup({ inputField : "waiting_list_referral_date", ifFormat : "%Y-%m-%d
 
 Calendar.setup({ inputField : "paper_chart_archived_date", ifFormat : "%Y-%m-%d", showsTime :false, button : "archive_date_cal", singleClick : true, step : 1 });
 
-function callEligibilityWebService(url,id){
+//mutex for callEligibilityWebService
+let doingEligibilityCheck = false;
+function callEligibilityWebService(url,id, event){
 
-       var ran_number=Math.round(Math.random()*1000000);
-       var params = "demographic=<%=demographic_no%>&method=checkElig&rand="+ran_number;  //hack to get around ie caching the page
-		 var response;
-       new Ajax.Request(url+'?'+params, {
-           onSuccess: function(response) {
-                document.getElementById(id).innerHTML=response.responseText ;
-                document.getElementById('search_spinner').innerHTML="";
-           }
-        } );
+	if (doingEligibilityCheck)
+	{
+		return;
+	}
+	doingEligibilityCheck = true;
+	jQuery(event.target).css("cursor", "default");
+
+	var ran_number = Math.round(Math.random() * 1000000);
+	var params = "demographic=<%=demographic_no%>&method=checkElig&rand=" + ran_number;  //hack to get around ie caching the page
+	var response;
+	new Ajax.Request(url + '?' + params, {
+		onSuccess: function (response) {
+			document.getElementById(id).innerHTML = response.responseText;
+			document.getElementById('search_spinner').innerHTML = "";
+		},
+		onComplete: function () {
+			jQuery(event.target).css("cursor", "pointer");
+			doingEligibilityCheck = false;
+		}
+	});
  }
 
 <%

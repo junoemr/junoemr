@@ -8,16 +8,13 @@
     and "gnu.org/licenses/gpl-2.0.html".
 
 --%>
-<%@ page import="oscar.dms.*,java.util.*" %>
-<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils,org.oscarehr.document.dao.DocumentDao" %>
+<%@ page import="org.oscarehr.document.model.Document" %>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite"%>
-<%@page import="oscar.oscarLab.ca.all.*,oscar.oscarMDS.data.*,oscar.oscarLab.ca.all.util.*"%>
-<%@page import="org.oscarehr.document.dao.DocumentDao" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
-<%@ page import="org.oscarehr.document.model.Document" %>
+<%@page import="org.oscarehr.util.SpringUtils"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");

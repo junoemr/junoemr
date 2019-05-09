@@ -42,6 +42,8 @@ public class GetFaxStatusResult
 	private String dateQueued;
 	@JsonProperty("DateSent")
 	private String dateSent;
+	@JsonProperty("EpochTime")
+	private Long epochTime;
 	@JsonProperty("ToFaxNumber")
 	private String toFaxNumber;
 	@JsonProperty("Pages")
@@ -108,6 +110,16 @@ public class GetFaxStatusResult
 	public void setDateSent(String dateSent)
 	{
 		this.dateSent = dateSent;
+	}
+
+	public Long getEpochTime()
+	{
+		return epochTime;
+	}
+
+	public void setEpochTime(Long epochTime)
+	{
+		this.epochTime = epochTime;
 	}
 
 	public String getToFaxNumber()

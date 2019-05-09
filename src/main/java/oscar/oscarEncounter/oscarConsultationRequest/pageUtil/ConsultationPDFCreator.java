@@ -478,7 +478,7 @@ public class ConsultationPDFCreator extends PdfPageEventHelper {
 		return infoTable;
 	}
 
-private void addSignature(PdfPTable infoTable) {
+	private void addSignature(PdfPTable infoTable) {
 		float[] tableWidths;
 		PdfPCell cell;
 		tableWidths = new float[]{ 0.55f, 2.75f };

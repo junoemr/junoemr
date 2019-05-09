@@ -36,14 +36,16 @@ Oscar.ShowDocument.popupPatient = function popupPatient(height, width, url, wind
 	return popup2(height, width, 0, 0, urlNew, windowName);
 };
 
-Oscar.ShowDocument.popupPatientTickler = function popupPatientTickler(height, width, url, windowName, docId)
+Oscar.ShowDocument.popupPatientTickler = function popupPatientTickler(height, width, contextPath, windowName, docId)
 {
 	var demographicNo = document.getElementById('demofind' + docId).value;
 	var demographicName = document.getElementById('demofindName' + docId).value;
-	var urlNew = url + "method=edit" +
-		"&tickler.demographic_webName=" + demographicName +
-		"&tickler.demographicNo=" + demographicNo +
-		"&docType=DOC&docId=" + docId;
+	var urlNew = contextPath + "/tickler/ForwardDemographicTickler.do" +
+		"?docType=DOC" +
+		"&docId=" + docId +
+		"&demographic_no=" + demographicNo +
+		"&demoName=" + demographicName +
+		"&updateParent=" + false;
 
 	return popup2(height, width, 0, 0, urlNew, windowName);
 };
@@ -173,12 +175,15 @@ Oscar.ShowDocument.updateDocument = function updateDocument(elementId)
 
 				// TODO: update side navigation to reflect the new document counts for the patient
 			}
+		},
+		onComplete: function ()
+		{
+			// Reload the window the document was opened from only if it's the inbox
+			if (window.opener.location.href.includes('inboxManage.do'))
+			//window.opener.location.reload();
+				window.opener.reloadListView();
 		}
 	});
-
-	// Reload the window the document was opened from only if it's the inbox
-	if (window.opener.location.href.includes('inboxManage.do'))
-		window.opener.location.reload();
 
 	return false;
 };

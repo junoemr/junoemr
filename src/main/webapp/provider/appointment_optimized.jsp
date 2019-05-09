@@ -871,7 +871,7 @@ private long getAppointmentRowSpan(
 										} else {
 											jQuery("#k2a_new_notifications").text(returnVal);
 											jQuery("#K2ALink").click(function () {
-												var win = window.open("<%=request.getContextPath()%>/web/#!/k2aNotification",
+												var win = window.open("<%=request.getContextPath()%>/web/Know2actNotifications.jsp",
 													'appAuth', 'width=450,height=700,scrollbars=1');
 												win.focus();
 											});

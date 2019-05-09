@@ -9,37 +9,29 @@ import java.util.Properties;
 import org.oscarehr.util.LoggedInInfo;
 
 import oscar.oscarDB.DBHandler;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 public class FrmAdfV2Record extends FrmRecord {
 	private String _dateFormat = "yyyy/MM/dd";
-
 	public Properties getFormRecord(LoggedInInfo loggedInInfo, int demographicNo, int existingID)
 	throws SQLException {
 		Properties props = new Properties();
 
-		if (existingID <= 0) {
+		if (existingID <= 0)
+		{
 			
 			String sql =
 				"SELECT demographic_no, last_name, first_name, sex, address, city, province, postal, phone, phone2, year_of_birth, month_of_birth, date_of_birth, hin FROM demographic WHERE demographic_no = "
 				+ demographicNo;
 			ResultSet rs = DBHandler.GetSQL(sql);
 			if (rs.next()) {
-				java.util.Date date =
-					UtilDateUtilities.calcDate(
+				java.util.Date date = UtilDateUtilities.calcDate(
 							oscar.Misc.getString(rs, "year_of_birth"),
 							oscar.Misc.getString(rs, "month_of_birth"),
 							oscar.Misc.getString(rs, "date_of_birth"));
-				props.setProperty(
-						"demographic_no",
-						oscar.Misc.getString(rs, "demographic_no"));
-				props.setProperty(
-						"formCreated",
-						UtilDateUtilities.DateToString(
-								new Date(),
-								_dateFormat));
-				//props.setProperty("formEdited",
-				// UtilDateUtilities.DateToString(new Date(),_dateFormat));
+				props.setProperty("demographic_no", oscar.Misc.getString(rs, "demographic_no"));
+				props.setProperty("formCreated", ConversionUtils.toDateString(new Date(), _dateFormat));
 				props.setProperty("c_patientname", oscar.Misc.getString(rs, "last_name") + ", " + oscar.Misc.getString(rs, "first_name"));
 				props.setProperty(
 						"c_address",
@@ -51,18 +43,10 @@ public class FrmAdfV2Record extends FrmRecord {
 						+ " "
 						+ oscar.Misc.getString(rs, "postal"));
 				props.setProperty("c_phn", oscar.Misc.getString(rs, "hin"));
-				props.setProperty(
-						"pg1_dateOfBirth",
-						UtilDateUtilities.DateToString(date, _dateFormat));
-				props.setProperty(
-						"pg1_age",
-						String.valueOf(UtilDateUtilities.calcAge(date)));
+				props.setProperty("pg1_dateOfBirth", ConversionUtils.toDateString(date, _dateFormat));
+				props.setProperty("pg1_age", String.valueOf(UtilDateUtilities.calcAge(date)));
 				props.setProperty("c_phone", oscar.Misc.getString(rs, "phone"));
-				props.setProperty(
-						"sigDate",
-						UtilDateUtilities.DateToString(
-								new Date(),
-								_dateFormat));
+				props.setProperty("sigDate", ConversionUtils.toDateString(new Date(), _dateFormat));
 			}
 			rs.close();
 		} else {
@@ -109,12 +93,9 @@ public class FrmAdfV2Record extends FrmRecord {
 		return ((frh).findActionValue(submit));
 	}
 
-	public String createActionURL(
-			String where,
-			String action,
-			String demoId,
-			String formId)
-	throws SQLException {
+	public String createActionURL(String where, String action, String demoId, String formId)
+		throws SQLException
+	{
 		FrmRecordHelp frh = new FrmRecordHelp();
 		frh.setDateFormat(_dateFormat);
 		return ((frh).createActionURL(where, action, demoId, formId));

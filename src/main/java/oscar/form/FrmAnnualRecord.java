@@ -33,6 +33,7 @@ import java.util.Properties;
 import org.oscarehr.util.LoggedInInfo;
 
 import oscar.oscarDB.DBHandler;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 public class FrmAnnualRecord  extends FrmRecord {
@@ -49,9 +50,8 @@ public class FrmAnnualRecord  extends FrmRecord {
             if(rs.next()) {
                 props.setProperty("demographic_no", oscar.Misc.getString(rs, "demographic_no"));
                 props.setProperty("pName", oscar.Misc.getString(rs, "pName"));
-                props.setProperty("formDate", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
-                props.setProperty("formCreated", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
-                //props.setProperty("formEdited", UtilDateUtilities.DateToString(new Date(), "yyyy/MM/dd"));
+                props.setProperty("formDate", ConversionUtils.toDateString(new Date(), "yyyy/MM/dd"));
+                props.setProperty("formCreated", ConversionUtils.toDateString(new Date(), "yyyy/MM/dd"));
                 java.util.Date dob = UtilDateUtilities.calcDate(oscar.Misc.getString(rs, "year_of_birth"), oscar.Misc.getString(rs, "month_of_birth"), oscar.Misc.getString(rs, "date_of_birth"));
                 props.setProperty("age", String.valueOf(UtilDateUtilities.calcAge(dob)));
             }

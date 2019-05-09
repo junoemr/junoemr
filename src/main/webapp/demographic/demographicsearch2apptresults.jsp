@@ -68,6 +68,7 @@
 <%@ page import="java.time.LocalDate" %>
 <%@ page import="java.time.format.DateTimeParseException" %>
 <%@ page import="java.time.temporal.ChronoUnit" %>
+<%@ page import="org.oscarehr.demographic.service.DemographicService" %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
 
@@ -202,9 +203,15 @@ function searchAll() {
 				<option value="search_hin" <%=request.getParameter("search_mode").equals("search_hin")?"selected":""%>>
                     <bean:message key="demographic.demographicsearch2apptresults.optHIN" />
                 </option>
+	            <option value="search_email" <%=request.getParameter("search_mode").equals("search_email")?"selected":""%>>
+		            <bean:message key="demographic.demographicsearch2apptresults.optEmail" />
+	            </option>
                 <option value="search_chart_no" <%=request.getParameter("search_mode").equals("search_chart_no")?"selected":""%>>
                     <bean:message key="demographic.demographicsearch2apptresults.optChart"/>
                 </option>
+				<option value="search_demographic_no" <%=request.getParameter("search_mode").equals("search_demographic_no")?"selected":""%>>
+					<bean:message key="demographic.demographicsearch2apptresults.demographicId"/>
+				</option>
             </select>
         </li>
         <li>
@@ -381,70 +388,24 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
 	int rowCounter=0;
 	String bgColor = rowCounter%2==0?"#EEEEFF":"white";
 
-	String pstatus = props.getProperty("inactive_statuses", "IN, DE, IC, ID, MO, FI");
-	pstatus = pstatus.replaceAll("'","").replaceAll("\\s", "");
-	List<String>stati = Arrays.asList(pstatus.split(","));
+    DemographicService demoSrvc = (DemographicService) SpringUtils.getBean("demographic.service.DemographicService");
 
-	//build criteria search
-	DemographicCriteriaSearch demoCS = new DemographicCriteriaSearch();
-	demoCS.setCustomWildcardsEnabled(true);
-	demoCS.setLimit(limit);
-	demoCS.setOffset(offset);
-	demoCS.setSortMode(DemographicCriteriaSearch.SORTMODE.DemographicName);
-
-	if(searchMode.equals("search_name"))
+	DemographicService.STATUS_MODE statisMode = DemographicService.STATUS_MODE.all;
+	if( "inactive".equals(ptstatus) )
 	{
-		String [] names = keyword.split(",");
-		if (names.length == 2)
-		{
-			demoCS.setFirstName(names[1].trim() + "*");
-			demoCS.setLastName(names[0].trim() + "*");
-		}
-		else
-		{
-			demoCS.setLastName(keyword.replace(",", "").trim() + "*");
-		}
+		statisMode = DemographicService.STATUS_MODE.inactive;
 	}
-	else if(searchMode.equals("search_phone"))
+	else if ("active".equals(ptstatus))
 	{
-		demoCS.setPhone("*" + keyword.trim() + "*");
-	}
-	else if(searchMode.equals("search_dob"))
-	{
-		try
-		{
-			SimpleDateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd");
-			LocalDate dob = LocalDate.parse(keyword);
-			demoCS.setDateOfBirth(dob);
-		}
-		catch (DateTimeParseException ex)
-		{
-			MiscUtils.getLogger().error(ex.getMessage());
-		}
-	}
-	else if(searchMode.equals("search_address"))
-	{
-		demoCS.setAddress("*"+keyword.trim()+"*");
-	}
-	else if(searchMode.equals("search_hin"))
-	{
-		demoCS.setHin(keyword.trim()+"*");
-	}
-	else if(searchMode.equals("search_chart_no"))
-	{
-		demoCS.setChartNo(keyword.trim()+"*");
+		statisMode = DemographicService.STATUS_MODE.active;
 	}
 
-	if( "active".equals(ptstatus) )
-	{
-		demoCS.setStatusMode(DemographicCriteriaSearch.STATUSMODE.active);
-	}
-	else if( "inactive".equals(ptstatus) )
-	{
-		demoCS.setStatusMode(DemographicCriteriaSearch.STATUSMODE.inactive);
-	}
-
+	DemographicService.SEARCH_MODE demoSearchMode = demoSrvc.searchModeStringToEnum(searchMode);
+	DemographicCriteriaSearch demoCS = demoSrvc.buildDemographicSearch(keyword, demoSearchMode, statisMode, DemographicCriteriaSearch.SORT_MODE.DemographicName);
+    demoCS.setLimit(limit);
+    demoCS.setOffset(offset);
 	List<Demographic> demoList = demographicDao.criteriaSearch(demoCS);
+
 	if(demoList != null) {
 		DemographicMerged dmDAO = new DemographicMerged();
 
@@ -469,10 +430,10 @@ function addNameCaisi(demographic_no,lastname,firstname,chartno,messageID) {
         </td>
 		<td class="lastName"><%=Misc.toUpperLowerCase(demo.getLastName())%></td>
 		<td class="firstName"><%=Misc.toUpperLowerCase(demo.getFirstName())%></td>
-		<td class="age"><%=ChronoUnit.YEARS.between(demo.getDateOfBirth(), LocalDate.now())%></td>
+		<td class="age"><%=demo.getDateOfBirth() != null ? ChronoUnit.YEARS.between(demo.getDateOfBirth(), LocalDate.now()) : ""%></td>
 		<td class="rosterStatus"><%=demo.getRosterStatus()==null||demo.getRosterStatus().equals("")?"&nbsp;":demo.getRosterStatus()%></td>
 		<td class="sex"><%=demo.getSex()%></td>
-		<td class="dob"><%=demo.getYearOfBirth() + "-" + demo.getMonthOfBirth() + "-" + demo.getDateOfBirth()%></td>
+		<td class="dob"><%=demo.getDateOfBirth() != null ? demo.getDateOfBirth() : ""%></td>
 		<td class="hin"><%=demo.getHin()%></td>
         <td class="doctor"><%=providerBean.getProperty(demo.getProviderNo()==null?"":demo.getProviderNo())==null?"":providerBean.getProperty(demo.getProviderNo())%></td>
         </tr>

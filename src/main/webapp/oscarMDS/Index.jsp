@@ -376,7 +376,27 @@
 			handleScroll(scroller);
 		}
 
-		function updateListView()
+		// reload the list view
+		function reloadListView()
+		{
+			let listView = jQuery("#listViewDocs").get()[0];
+			if (listView !== undefined)
+			{
+				let currentScrollPos = listView.scrollTop;
+
+				listView.innerHTML = "";
+				page = 1;
+				updateListView(function complete() {
+					let newListView = jQuery("#listViewDocs").get()[0];
+					if (newListView !== undefined)
+					{
+						newListView.scrollTop = currentScrollPos;
+					}
+				});
+			}
+		}
+
+		function updateListView(completeCallback)
 		{
 			var query = getQuery();
 			if (page == 1) {
@@ -411,6 +431,7 @@
 					parameters: query,
 					insertion: Insertion.Bottom,
 					evalScripts: true,
+					onComplete: completeCallback,
 					onSuccess: function (transport)
 					{
 						loadingDocs = false;

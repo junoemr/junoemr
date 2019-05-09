@@ -20,7 +20,7 @@
     <context:component-scan base-package="org.oscarehr.survey.service.impl" />
     <context:component-scan base-package="org.oscarehr.survey.service" />
     <context:component-scan base-package="org.oscarehr.PMmodule.service"/>
-    <context:component-scan base-package="org.oscarehr.ticklers.service"/>
+    <context:component-scan base-package="org.oscarehr.ticklers"/>
     <context:component-scan base-package="org.oscarehr.consultations"/>
     <context:component-scan base-package="oscar.oscarPrevention"/>
     <context:component-scan base-package="org.oscarehr.billing.CA.filters"/>

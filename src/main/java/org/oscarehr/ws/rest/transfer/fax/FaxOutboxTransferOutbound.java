@@ -23,6 +23,7 @@
 package org.oscarehr.ws.rest.transfer.fax;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.oscarehr.fax.model.FaxOutbound;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
@@ -31,20 +32,32 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
 public class FaxOutboxTransferOutbound implements Serializable
 {
+	public enum CombinedStatus
+	{
+		ERROR,
+		QUEUED,
+		IN_PROGRESS,
+		INTEGRATION_FAILED,
+		INTEGRATION_SUCCESS
+	}
+
 	private Long id;
 	private Long faxAccountId;
 
 	private String providerNo;
+	private String providerName;
 	private Integer demographicNo;
 	private String toFaxNumber;
 	/* file type: document, form, consult, etc. */
 	private String fileType;
 	/* the sent status of the document as recorded in the system */
-	private String systemStatus;
+	private FaxOutbound.Status systemStatus;
 	/* a message sent along with the status, usually for error explanations */
 	private String systemStatusMessage;
 	/* the sent date of the document as recorded in the system */
 	private String systemDateSent;
+	private Boolean archived;
+	private String notificationStatus;
 
 	/* the sent status of the document as retrieved from the api */
 	private String integrationStatus;
@@ -53,6 +66,9 @@ public class FaxOutboxTransferOutbound implements Serializable
 	private String integrationDateQueued;
 	/* the sent date of the document as retrieved from the api */
 	private String integrationDateSent;
+
+	/* the single combined state of the systemStatus and the integrationStatus */
+	private CombinedStatus combinedStatus;
 
 	public Long getId()
 	{
@@ -82,6 +98,16 @@ public class FaxOutboxTransferOutbound implements Serializable
 	public void setProviderNo(String providerNo)
 	{
 		this.providerNo = providerNo;
+	}
+
+	public String getProviderName()
+	{
+		return providerName;
+	}
+
+	public void setProviderName(String providerName)
+	{
+		this.providerName = providerName;
 	}
 
 	public Integer getDemographicNo()
@@ -114,12 +140,12 @@ public class FaxOutboxTransferOutbound implements Serializable
 		this.fileType = fileType;
 	}
 
-	public String getSystemStatus()
+	public FaxOutbound.Status getSystemStatus()
 	{
 		return systemStatus;
 	}
 
-	public void setSystemStatus(String systemStatus)
+	public void setSystemStatus(FaxOutbound.Status systemStatus)
 	{
 		this.systemStatus = systemStatus;
 	}
@@ -132,6 +158,26 @@ public class FaxOutboxTransferOutbound implements Serializable
 	public void setSystemStatusMessage(String systemStatusMessage)
 	{
 		this.systemStatusMessage = systemStatusMessage;
+	}
+
+	public Boolean getArchived()
+	{
+		return archived;
+	}
+
+	public void setArchived(Boolean archived)
+	{
+		this.archived = archived;
+	}
+
+	public String getNotificationStatus()
+	{
+		return notificationStatus;
+	}
+
+	public void setNotificationStatus(String notificationStatus)
+	{
+		this.notificationStatus = notificationStatus;
 	}
 
 	public String getSystemDateSent()
@@ -172,5 +218,15 @@ public class FaxOutboxTransferOutbound implements Serializable
 	public void setIntegrationDateSent(String integrationDateSent)
 	{
 		this.integrationDateSent = integrationDateSent;
+	}
+
+	public CombinedStatus getCombinedStatus()
+	{
+		return combinedStatus;
+	}
+
+	public void setCombinedStatus(CombinedStatus combinedStatus)
+	{
+		this.combinedStatus = combinedStatus;
 	}
 }

@@ -1,0 +1,77 @@
+html {
+	height: 100%;
+}
+body {
+	font-family: Verdana, Tahoma, Arial, sans-serif;
+	background-color: #ddddff;
+}
+.header {
+	text-align: left;
+	margin-left: 5px;
+}
+.flexV {
+	display: flex;
+	flex-direction: column;
+}
+.flexH {
+	display: flex;
+	flex-direction: row;
+}
+.flexGrow {
+	flex-grow: 1;
+}
+.itemGroup {
+	align-items: baseline;
+	justify-content: space-between;
+}
+.hiddenLabel {
+	display: none;
+}
+.submitButton {
+	padding: 5px;
+	margin: 10px;
+	color: #ffffff;
+	background-color: #5cb85c;
+	border-color: #4cae4c;
+	height: 30px;
+	min-height: 30px;
+}
+#contentFrame {
+	flex-wrap: nowrap;
+	height: calc(100vh - 66px); /*subtract margin space to avoid permanent scroll bar*/
+	width: auto;
+	border: solid 1px blue;
+	font-size: x-small;
+	background-color:white;
+	margin: 5px;
+}
+#tableFrame {
+	position:relative;
+	border-right: solid 1px blue;
+	padding:5px;
+}
+#tableFrame th {
+	font-size: 14px;
+}
+#tableFrame td {
+	padding: 2px;
+}
+.table-scroll-wrapper {
+	overflow:auto;
+}
+#contentTable {
+	width: 250px;
+	overflow:auto;
+	font-size: x-small;
+}
+.preview-link-name {
+	padding: 0 2px;
+}
+.preview-link-date {
+	white-space: nowrap;
+}
+#previewPane {
+	width:100%;
+	overflow: auto;
+	border:0;
+}

@@ -25,105 +25,122 @@
 
 package oscar.oscarMDS.pageUtil;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
+import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.dao.ProviderLabRoutingFavoritesDao;
 import org.oscarehr.common.model.ProviderLabRoutingFavorite;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 
-public class ReportReassignAction extends Action {
-    
-    Logger logger = Logger.getLogger(ReportReassignAction.class);
-    private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-    
-    public ReportReassignAction() {
-    }
-    
-    public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws ServletException, IOException {
-        
-    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_lab", "w", null)) {
-			throw new SecurityException("missing required security object (_lab)");
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+
+public class ReportReassignAction extends Action
+{
+
+	private static final Logger logger = Logger.getLogger(ReportReassignAction.class);
+	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+
+	public ReportReassignAction()
+	{
+	}
+
+	public ActionForward execute(ActionMapping mapping,
+	                             ActionForm form,
+	                             HttpServletRequest request,
+	                             HttpServletResponse response)
+			throws ServletException, IOException
+	{
+
+
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_lab");
+
+		String providerNo = request.getParameter("providerNo");
+		String searchProviderNo = request.getParameter("searchProviderNo");
+		String status = request.getParameter("status");
+		if(status == null)
+		{
+			status = "";
 		}
-    	
-        String providerNo = request.getParameter("providerNo");
-        String searchProviderNo = request.getParameter("searchProviderNo");
-        String status = request.getParameter("status");        
-        if( status == null) {
-        	status = "";
-        }
-        
-        String[] flaggedLabs = request.getParameterValues("flaggedLabs");
-        MiscUtils.getLogger().info("Flagged Labs is null " + String.valueOf(flaggedLabs == null));
 
-        String selectedProviders = request.getParameter("selectedProviders");
-        MiscUtils.getLogger().info("selectedProviders " + selectedProviders);
-        String newFavorites = request.getParameter("favorites");
-        if(newFavorites == null || newFavorites.equals("null") ) {
-        	newFavorites = "";
-        }
-        
-       // String labType = request.getParameter("labType");
-        String ajax=request.getParameter("ajax");
-        //Hashtable htable = new Hashtable();
-        String[] labTypes = CommonLabResultData.getLabTypes();
-        ArrayList listFlaggedLabs = new ArrayList();
-       /* Enumeration em=request.getParameterNames();
-        while(em.hasMoreElements()){
-            MiscUtils.getLogger().info("ele="+em.nextElement());
-            MiscUtils.getLogger().info("val="+request.getParameter((em.nextElement()).toString()));
-        }*/
+		String[] flaggedLabs = request.getParameterValues("flaggedLabs");
+		logger.info("Flagged Labs is null " + String.valueOf(flaggedLabs == null));
 
-        if(flaggedLabs != null && labTypes != null){
-        	MiscUtils.getLogger().info("flagged Labs length " + flaggedLabs.length);
-            for (int i = 0; i < flaggedLabs.length; i++){
-                MiscUtils.getLogger().info("FLAGGED LABS " + i + " " + flaggedLabs[i]);
-                for (int j = 0; j < labTypes.length; j++){
-                    MiscUtils.getLogger().info("LAB TYPE " + labTypes[j]);
-                    String s =  request.getParameter("labType"+flaggedLabs[i]+labTypes[j]);                    
-                    MiscUtils.getLogger().info(s);
-                    if (s != null){  //This means that the lab was of this type.
-                        String[] la =  new String[] {flaggedLabs[i],labTypes[j]};
-                        listFlaggedLabs.add(la);
-                        j = labTypes.length;
-                        
-                    }
-                    
-                }
-            }
-        }
-        
-        String newURL = "";
-       // MiscUtils.getLogger().info(listFlaggedLabs.size());
-        try {
-        	//Only route if there are selected providers
-        	if( !("".equals(selectedProviders) || selectedProviders == null)) {
-        		CommonLabResultData.updateLabRouting(listFlaggedLabs, selectedProviders);
-        	}
-        	//update favorites
-        	ProviderLabRoutingFavoritesDao favDao = (ProviderLabRoutingFavoritesDao)SpringUtils.getBean("ProviderLabRoutingFavoritesDao");
-        	String user = (String)request.getSession().getAttribute("user");
-        	List<ProviderLabRoutingFavorite>currentFavorites = favDao.findFavorites(user);
+		String selectedProviders = request.getParameter("selectedProviders");
+		logger.info("selectedProviders " + selectedProviders);
+		String newFavorites = request.getParameter("favorites");
+		if(newFavorites == null || newFavorites.equals("null"))
+		{
+			newFavorites = "";
+		}
+
+		String ajax = request.getParameter("ajax");
+		String[] labTypes = CommonLabResultData.getLabTypes();
+		ArrayList<String[]> listFlaggedLabs = new ArrayList<>();
+
+		if(flaggedLabs != null)
+		{
+			// use a hash set to remove duplicated IDs
+			HashSet<String> uniqueLabIds = new HashSet<>(flaggedLabs.length);
+			uniqueLabIds.addAll(Arrays.asList(flaggedLabs));
+
+			logger.info("flagged Labs length " + uniqueLabIds.size());
+			for(String labId : uniqueLabIds)
+			{
+				logger.info("FLAGGED LABS " + labId);
+				for(int j = 0; j < labTypes.length; j++)
+				{
+					logger.info("LAB TYPE " + labTypes[j]);
+					String s = request.getParameter("labType" + labId + labTypes[j]);
+					logger.info(s);
+					if(s != null)
+					{  //This means that the lab was of this type.
+						String[] la = new String[]{labId, labTypes[j]};
+						listFlaggedLabs.add(la);
+						j = labTypes.length;
+					}
+				}
+			}
+		}
+
+		String newURL = "";
+		try
+		{
+			//Only route if there are selected providers
+			if(!(selectedProviders == null || selectedProviders.isEmpty()))
+			{
+				CommonLabResultData.updateLabRouting(listFlaggedLabs, selectedProviders);
+
+				/* log the lab assignments in the security log */
+				for(String[] flaggedLabPair : listFlaggedLabs)
+				{
+					String iLabId = flaggedLabPair[0];
+					String iLabType = flaggedLabPair[1];
+					String logConst = (iLabType.equalsIgnoreCase(ProviderLabRoutingDao.LAB_TYPE_DOC)) ? LogConst.CON_DOCUMENT : LogConst.CON_HL7_LAB;
+					LogAction.addLogEntry(loggedInProviderNo, null, LogConst.ACTION_ASSIGN, logConst, LogConst.STATUS_SUCCESS,
+							iLabId, request.getRemoteAddr(), selectedProviders);
+				}
+			}
+		    //update favorites
+		    ProviderLabRoutingFavoritesDao favDao = (ProviderLabRoutingFavoritesDao) SpringUtils.getBean("ProviderLabRoutingFavoritesDao");
+		    String user = (String) request.getSession().getAttribute("user");
+		    List<ProviderLabRoutingFavorite> currentFavorites = favDao.findFavorites(user);
         	
         	if( "".equals(newFavorites) ) {
         		for( ProviderLabRoutingFavorite fav : currentFavorites ) {

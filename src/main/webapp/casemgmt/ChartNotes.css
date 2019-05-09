@@ -1,0 +1,43 @@
+
+.encounter_timer_container {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    background-color: transparent;
+    vertical-align: bottom;
+    border: none;
+    top: 0px;
+    padding: 3px;
+}
+
+.encounter_timer_container div {
+    border-style: none;
+}
+
+.encounter_timer_container .fa {
+    position: relative;
+    color: #222222;
+    left: 0px;
+    top: 0px;
+}
+
+#encounter_timer {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    min-width: 60px;
+}
+
+.encounter_timer_control {
+    cursor: pointer;
+    position:relative;
+
+}
+
+#encounter_timer_pause {
+    display: inline-block;
+}
+
+#encounter_timer_play {
+    display: none;
+}

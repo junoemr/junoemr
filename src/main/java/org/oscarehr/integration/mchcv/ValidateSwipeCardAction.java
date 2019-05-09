@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.util.MiscUtils;
 
 public class ValidateSwipeCardAction extends org.apache.struts.action.Action {
 
@@ -48,16 +47,18 @@ public class ValidateSwipeCardAction extends org.apache.struts.action.Action {
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         ValidateSwipeCard formBean = (ValidateSwipeCard) form;
-        
-        String magneticStripe = formBean.getMagneticStripe();
-        MiscUtils.getLogger().info("New Card Data: [" + magneticStripe + "]");
-
-        HCMagneticStripe hcMagneticStripe = new HCMagneticStripe(magneticStripe);
 
         HCValidator validator = HCValidationFactory.getHCValidator();
-        HCValidationResult validationResult = validator.validate(hcMagneticStripe.getHealthNumber(), hcMagneticStripe.getCardVersion());
-        
-        request.setAttribute("hcMagneticStripe", hcMagneticStripe);
+        HCValidationResult validationResult = validator.validate(formBean.getHin(), formBean.getHinVer());
+
+        request.setAttribute("firstName", formBean.getFirstName());
+        request.setAttribute("lastName", formBean.getLastName());
+        request.setAttribute("birthDate", formBean.getDobYYYYMMdd());
+        request.setAttribute("expiryDate", formBean.getEndYYYYMMdd());
+        request.setAttribute("issueDate", formBean.getEffYYYYMMdd());
+        request.setAttribute("sex", formBean.getSex());
+        request.setAttribute("hin", formBean.getHin());
+        request.setAttribute("hinVer", formBean.getHinVer());
         request.setAttribute("validationResult", validationResult);
         return mapping.findForward(SUCCESS);
     }
