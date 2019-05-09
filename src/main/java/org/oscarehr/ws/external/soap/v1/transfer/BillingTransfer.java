@@ -32,7 +32,7 @@ import java.util.Date;
 public final class BillingTransfer extends TransferBase<BillingMasterClinicaid>
 {
 	private Integer 	id;
-	private Integer 	billingNo;
+	private Integer 	billingNo = 0;
 	private Date 		createDate;
 	private String 		billingStatus;
 	private Integer 	demographicNo;
@@ -94,6 +94,7 @@ public final class BillingTransfer extends TransferBase<BillingMasterClinicaid>
 	private Integer		wcbId;
 	private Integer		sequenceNo;
 	private Integer 	invoiceCreationYear;
+	private String 		dataCenterNo;
 
 
 	public Integer getId()
@@ -724,5 +725,15 @@ public final class BillingTransfer extends TransferBase<BillingMasterClinicaid>
 	public void setInvoiceCreationYear(Integer invoiceCreationYear)
 	{
 		this.invoiceCreationYear = invoiceCreationYear;
+	}
+
+	public String getDataCenterNo()
+	{
+		return dataCenterNo;
+	}
+
+	public void setDataCenterNo(String dataCenterNo)
+	{
+		this.dataCenterNo = dataCenterNo;
 	}
 }

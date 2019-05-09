@@ -43,7 +43,7 @@ public class BillingMasterClinicaid extends AbstractModel<Integer> implements Se
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="billingmaster_no")
 	private Integer id;
-	@Column(name="billing_no")
+	@Column(name="billing_no", nullable = false, columnDefinition="int default 0")
 	private Integer 	billingNo;
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="createdate")
@@ -168,6 +168,8 @@ public class BillingMasterClinicaid extends AbstractModel<Integer> implements Se
 	private Integer 	sequenceNo;
 	@Column(name="invoice_creation_year")
 	private Integer		invoiceCreationYear;
+	@Column(name="data_center_no")
+	private String 		dataCenterNo;
 
 
 	@Override
@@ -799,5 +801,15 @@ public class BillingMasterClinicaid extends AbstractModel<Integer> implements Se
 	public void setInvoiceCreationYear(Integer invoiceCreationYear)
 	{
 		this.invoiceCreationYear = invoiceCreationYear;
+	}
+
+	public String getDataCenterNo()
+	{
+		return dataCenterNo;
+	}
+
+	public void setDataCenterNo(String dataCenterNumber)
+	{
+		this.dataCenterNo = dataCenterNumber;
 	}
 }
