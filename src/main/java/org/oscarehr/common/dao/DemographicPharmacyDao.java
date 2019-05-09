@@ -121,7 +121,7 @@ public class DemographicPharmacyDao extends AbstractDao<DemographicPharmacy> {
 		
 		if( demographicPharmacy != null ) {
 			
-			demographicPharmacy.setStatus("0");
+			demographicPharmacy.setStatus(DemographicPharmacy.INACTIVE);
 		    merge(demographicPharmacy);
 		    
 			sql = "select x from DemographicPharmacy x where x.status = ? and x.demographicNo = ? and x.preferredOrder > ?";
