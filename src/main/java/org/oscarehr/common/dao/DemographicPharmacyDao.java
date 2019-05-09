@@ -49,66 +49,69 @@ public class DemographicPharmacyDao extends AbstractDao<DemographicPharmacy> {
 		query.setParameter(3, pharmacyId);
 		DemographicPharmacy demographicPharmacy = getSingleResultOrNull(query);
 		int currentOrder;
-		if( demographicPharmacy != null ) {
-			
-			int min,max;
-			currentOrder = demographicPharmacy.getPreferredOrder();
-			min = currentOrder > preferredOrder ? preferredOrder : currentOrder;
-			max = currentOrder > preferredOrder ? currentOrder : preferredOrder;
-			
-			sql = "select x from DemographicPharmacy x where x.status = ? and x.demographicNo = ? and x.preferredOrder >= ? and x.preferredOrder < ?";
-			query = entityManager.createQuery(sql);
-			query.setParameter(1, DemographicPharmacy.ACTIVE);
-			query.setParameter(2, demographicNo);
-			query.setParameter(3, min);
-			query.setParameter(4, max);			
+		if (demographicPharmacy != null && demographicPharmacy.getPreferredOrder() == preferredOrder)
+		{
+			// no-op so don't bother with further DB hits
+			return demographicPharmacy;
 		}
-		else {
-			sql = "select x from DemographicPharmacy x where x.status = ? and x.demographicNo = ? and x.preferredOrder >= ?";
-			query = entityManager.createQuery(sql);
-			query.setParameter(1, DemographicPharmacy.ACTIVE);
-			query.setParameter(2, demographicNo);
-			query.setParameter(3, preferredOrder);
-		}
-		 		
+
+		sql = "SELECT x FROM DemographicPharmacy x WHERE x.status = ? AND x.demographicNo = ?";
+		sql += " AND x.preferredOrder >= ? ORDER BY x.preferredOrder";
+		query = entityManager.createQuery(sql);
+		query.setParameter(1, DemographicPharmacy.ACTIVE);
+		query.setParameter(2, demographicNo);
+		query.setParameter(3, preferredOrder);
+
 		@SuppressWarnings("unchecked")
 		List<DemographicPharmacy> results = query.getResultList();
-		
-		for( DemographicPharmacy demographicPharmacy2 : results ) {
+
+		int prevOrder = preferredOrder;
+		if (demographicPharmacy != null)
+		{
+			prevOrder = demographicPharmacy.getPreferredOrder();
+		}
+
+		for (DemographicPharmacy demographicPharmacy2 : results)
+		{
 			currentOrder = demographicPharmacy2.getPreferredOrder();
+			// only increment the preferredOrder if there's a collision
+			if (currentOrder - prevOrder > 1)
+			{
+				break;
+			}
+
+			prevOrder = currentOrder;
+
 			++currentOrder;
-			if( currentOrder > 10 ) {
+			if (currentOrder > 10)
+			{
 				demographicPharmacy2.setStatus(DemographicPharmacy.INACTIVE);
 			}
-			
 			demographicPharmacy2.setPreferredOrder(currentOrder);
 			merge(demographicPharmacy2);
 		}
 		
 		
-		if( demographicPharmacy == null ) {
-		
-			DemographicPharmacy dp = new DemographicPharmacy();
-			dp.setAddDate(new Date());
-			dp.setStatus(DemographicPharmacy.ACTIVE);
-			dp.setDemographicNo(demographicNo);
-			dp.setPharmacyId(pharmacyId);
-			dp.setPreferredOrder(preferredOrder);
-			persist(dp);
-			return dp;
+		if (demographicPharmacy == null)
+		{
+			DemographicPharmacy newPharmacy = new DemographicPharmacy();
+			newPharmacy.setAddDate(new Date());
+			newPharmacy.setStatus(DemographicPharmacy.ACTIVE);
+			newPharmacy.setDemographicNo(demographicNo);
+			newPharmacy.setPharmacyId(pharmacyId);
+			newPharmacy.setPreferredOrder(preferredOrder);
+			persist(newPharmacy);
+			return newPharmacy;
 		}
-		else {
-			
+		else
+		{
 			demographicPharmacy.setPreferredOrder(preferredOrder);
 			merge(demographicPharmacy);
 			return demographicPharmacy;
 		}
-		
-		
 	}
 	
 	public void unlinkPharmacy(Integer pharmacyId, Integer demographicNo ) {
-		
 		String sql = "select x from DemographicPharmacy x where x.status = ? and x.demographicNo = ? and x.pharmacyId = ?";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, DemographicPharmacy.ACTIVE);
