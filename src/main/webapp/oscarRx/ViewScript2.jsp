@@ -320,6 +320,11 @@ function printPaste2Parent(print)
 			myParent.angular.element(myParent.document.querySelector("#note-editor"))
 				.scope().recordCtrl.updateCurrentNote(text);
 		}
+		else
+		{
+			alert("WARNING: No suitable field found to paste note into. " +
+				"If you want to paste into an encounter note you need to open the Rx page from the encounter note.");
+		}
 	}
 	catch (e)
 	{
