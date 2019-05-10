@@ -37,10 +37,12 @@ import java.util.Collection;
 public class TestSetSource
 {
 	private String inputHtml;
+	private String expect;
 
-	public TestSetSource(String html)
+	public TestSetSource(String html, String expect)
 	{
-		inputHtml = html;
+		this.inputHtml = html;
+		this.expect = expect;
 	}
 
 	@BeforeClass
@@ -54,11 +56,20 @@ public class TestSetSource
 	{
 		return Arrays.asList(new Object[][]
 				{
-					{"${source}"},
+					{
+						"${source}",
+
+						"<script> console.log('foobar') </script>"
+					},
 					{
 						"<h1> hello I'm a doctor </h1>" +
 						"${source} " +
+						"<h2> and this is my source </h2> ",
+
+						"<h1> hello I'm a doctor </h1>" +
+						"<script> console.log('foobar') </script> " +
 						"<h2> and this is my source </h2> "
+
 					}
 				});
 	}
@@ -73,9 +84,8 @@ public class TestSetSource
 		eform.setSource(source);
 
 		String outputHTML = eform.getFormHtml();
-		Assert.assertTrue("could not find signature java script in output html: \n" + outputHTML + " inputHTML: \n" + this.inputHtml,
-				outputHTML.contains(source)
-		);
+		Assert.assertEquals("could not find source java script in output html: \n" + outputHTML + " inputHTML: \n" + this.inputHtml,
+				outputHTML, this.expect);
 	}
 
 }
