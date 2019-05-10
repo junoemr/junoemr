@@ -69,47 +69,110 @@
 			text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.8);
 		}
 
-		.fc-event
-		{
+		$scheduleCodeWidth: 16px;
+		/* styling for normal events */
+		.fc-event {
 			cursor: hand;
+			margin-left: $scheduleCodeWidth;
+
+			.schedule-event {
+				display: flex;
+				padding: 0;
+				margin: 0;
+				font-size: 12px;
+				font-weight: normal;
+				color: $white;
+				.event-blk {
+					display: flex;
+					align-items: center;
+					justify-content: space-evenly;
+				}
+				.event-blk-icon {
+				}
+				.event-blk-link {
+					width: 24px;
+					font-weight: bold;
+					color: $white;
+				}
+				.event-blk-label {
+					flex-grow: 1;
+				}
+				.icon {
+					display: inline-block;
+					width: 24px;
+					height: 24px;
+					background-size: 100%;
+					background-repeat: no-repeat;
+				}
+				.icon-down {
+					background-image: url($images-root + 'icon-16-arrow-down.svg');
+					width: 16px;
+					height: 16px;
+					margin: 4px;
+				}
+				.icon-status-starbill {
+					background-image: url($icon-status-starbill);
+				}
+				.icon-status-todo {
+					background-image: url($icon-status-todo);
+				}
+				.icon-status-here {
+					background-image: url($icon-status-here);
+				}
+				.icon-status-picked {
+					background-image: url($icon-status-picked);
+				}
+				.icon-status-empty {
+					background-image: url($icon-status-empty);
+				}
+				.icon-status-noshow {
+					background-image: url($icon-status-noshow);
+				}
+				.icon-status-cancel {
+					background-image: url($icon-status-cancel);
+				}
+				.icon-status-billed {
+					background-image: url($icon-status-billed);
+				}
+
+				.icon-status-1 {
+					background-image: url($icon-status-1);
+				}
+				.icon-status-2 {
+					background-image: url($icon-status-2);
+				}
+				.icon-status-3 {
+					background-image: url($icon-status-3);
+				}
+				.icon-status-4 {
+					background-image: url($icon-status-4);
+				}
+				.icon-status-5 {
+					background-image: url($icon-status-5);
+				}
+				.icon-status-6 {
+					background-image: url($icon-status-6);
+				}
+				.icon-status-7 {
+					background-image: url($icon-status-7);
+				}
+				.icon-status-8 {
+					background-image: url($icon-status-8);
+				}
+				.icon-status-9 {
+					background-image: url($icon-status-9);
+				}
+				.icon-status-10 {
+					background-image: url($icon-status-10);
+				}
+				.icon-status-11 {
+					background-image: url($icon-status-11);
+				}
+			}
 
 			.fc-time
 			{
 				display: none;
-			}
-
-			span.event-status, span.event-encounter, span.event-invoice, span.event-demographic, span.event-rx
-			{
-				display: inline-block;
-				width: 18px;
-				text-align: center;
-			}
-
-			span.event-status.rotate, span.event-encounter, span.event-invoice, span.event-demographic, span.event-rx
-			{
-				background-color: #EEE;
-				color: #000;
-				text-shadow: none;
-			}
-
-			.event-invoice
-			{
-				margin: 0 2px 0 2px;
-			}
-
-			.event-demographic
-			{
-				margin: 0 2px 0 0;
-			}
-
-			.event-rx
-			{
-				margin: 0 2px 0 0;
-			}
-
-			.event-note
-			{
-				margin: 0 4px 0 0;
 			}
 
 			.event-tags
@@ -118,7 +181,6 @@
 				text-align: center;
 				margin: 0 4px;
 			}
-
 			.event-details
 			{
 				margin-left: 3px;
@@ -129,13 +191,13 @@
 		  	opacity: 1;
 		  	display: flex;
 		  	justify-content: center;
-		  	.schedule-event {
+		  	.schedule-background-event {
 			  	flex-grow: 1;
 			  	display: flex;
-				.schedule-code {
-				  	background-color: $white;
+				.background-event-schedulecode {
+				  	background-color: $grey-06;
 					float: right;
-				  	width: 16px;
+				  	width: $scheduleCodeWidth;
 				  	height: 100%;
 				  	text-align: center;
 				  	border-left: 1px solid $grey-07;
@@ -143,11 +205,12 @@
 					font-weight: bold;
 					font-style: normal;
 					font-stretch: normal;
+					color: $white;
 					line-height: normal;
 					letter-spacing: normal;
 				  	padding: 0;
 				}
-				.schedule-body {
+				.background-event-body {
 				  flex-grow: 1;
 				  background-color: $white;
 				  border-top: 1px solid $grey-07;
@@ -163,43 +226,45 @@
 		  background-color: $grey-08;
 		}
 
-	  .fc-resource-cell {
-		.column-ctl-root {
-		  background-color: $white;
-		  display: flex;
-		  padding: 10px;
-		  .column-ctl {
-			display: flex;
-			align-items: center;
-			justify-content: space-evenly;
-			padding: 5px;
-		  }
-		  .ctl-container-label {
-			flex-grow: 4;
-		  }
-		  .ctl-container-icon {
-			flex-grow: 1;
-		  }
-		  .icon {
-			display:inline-block;
-			width: 18px;
-			height: 18px;
-		  }
-		  .icon-daysheet {
-			background: url($images-root + 'cal-daysheetblue.svg') no-repeat;
-		  }
-		  .icon-search {
-			background: url($images-root + 'cal-searchblue.svg') no-repeat;
-		  }
-		  .icon-week-view {
-			background: url($images-root + 'cal-weekblue.svg') no-repeat;
-		  }
-		  .icon-month-view {
-			background: url($images-root + 'cal-monthblue.svg') no-repeat;
-		  }
+		/* styling for the column-control headers */
+		.fc-resource-cell {
+			.column-ctl-root {
+				background-color: $white;
+				display: flex;
+				padding: 10px;
+				.column-ctl {
+					display: flex;
+					align-items: center;
+					justify-content: space-evenly;
+					padding: 5px;
+				}
+				.ctl-container-label {
+					flex-grow: 4;
+				}
+				.ctl-container-icon {
+					flex-grow: 1;
+				}
+				.icon {
+					display: inline-block;
+					width: 18px;
+					height: 18px;
+					background-size: 100%;
+					background-repeat: no-repeat;
+				}
+				.icon-daysheet {
+					background-image: url($images-root + 'cal-daysheetblue.svg');
+				}
+				.icon-search {
+					background-image: url($images-root + 'cal-searchblue.svg');
+				}
+				.icon-week-view {
+					background-image: url($images-root + 'cal-weekblue.svg');
+				}
+				.icon-month-view {
+					background-image: url($images-root + 'cal-monthblue.svg');
+				}
+			}
 		}
-	  }
-
 	}
 	.flexV {
 	  display: flex;

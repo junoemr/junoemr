@@ -918,57 +918,53 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			if(event.rendering !== 'background')
 			{
-				var eventSiteHtml = '';
-				var eventSite = $scope.sites[event.data.site];
+				let eventElement = element.find('.fc-content');
+				eventElement.html(require('./view-event.html'));
 
-				if(Juno.Common.Util.exists(eventSite))
+				let statusElem = eventElement.find('.icon-status');
+				let detailElem = eventElement.find('.event-details');
+
+
+				// var eventSiteHtml = '';
+				// var eventSite = $scope.sites[event.data.site];
+
+				// if(Juno.Common.Util.exists(eventSite))
+				// {
+				// 	eventSiteHtml += "<span style='background-color: " + eventSite.color + "'>&nbsp;</span>"
+				// }
+
+
+				// var eventStatusHtml = '';
+				let eventStatus = $scope.eventStatuses[event.data.eventStatusCode];
+
+
+
+				if(Juno.Common.Util.exists(eventStatus))
 				{
-					eventSiteHtml += "<span style='background-color: " + eventSite.color + "'>&nbsp;</span>"
-				}
+					statusElem.attr("title", Juno.Common.Util.escapeHtml(eventStatus.name));
 
-
-				var eventStatusHtml = '';
-				var eventStatus =
-					$scope.eventStatuses[event.data.eventStatusCode];
-				var eventStatusRotate = Juno.Common.Util.exists(eventStatus.sortOrder);
-
-				if(Juno.Common.Util.exists(eventStatus) && Juno.Common.Util.exists(eventStatus.icon) &&
-					Juno.Common.Util.exists(event) && Juno.Common.Util.exists(event.data))
-				{
-					eventStatusHtml += "<img class='event-status";
-					if(eventStatusRotate)
+					if (Juno.Common.Util.exists(eventStatus.icon)
+						&& Juno.Common.Util.exists(event)
+						&& Juno.Common.Util.exists(event.data))
 					{
-						eventStatusHtml += ' rotate';
-					}
-					eventStatusHtml += "' src='" + $scope.getIconPath(eventStatus.icon, event.data.eventStatusModifier) + "' />";
-				}
-				else
-				{
-					eventStatusHtml = '<span class="event-status';
-					if(Juno.Common.Util.exists(eventStatus))
-					{
-						if(eventStatusRotate)
-						{
-							eventStatusHtml += ' rotate ';
-						}
-						eventStatusHtml += '"' + ' title="' + Juno.Common.Util.escapeHtml(eventStatus.name) + '">' +
-							Juno.Common.Util.escapeHtml(eventStatus.displayLetter) + '</span>';
+						// class matches the icon name without the extension
+						statusElem.addClass("icon-status-" + eventStatus.icon.substr(0, eventStatus.icon.indexOf('.')));
 					}
 					else
 					{
-						eventStatusHtml += '" title="Unknown">?</span>';
+						statusElem.text(Juno.Common.Util.escapeHtml(eventStatus.displayLetter));
+					}
+
+					if(Juno.Common.Util.exists(eventStatus.sortOrder))
+					{
+						statusElem.addClass("rotate");
 					}
 				}
-
-				var eventEncounterHtml = '<span class="event-encounter" title="Open Encounter">E</span>';
-
-				var eventInvoiceHtml = '<span class="event-invoice" title="Create Invoice">B</span>';
-
-				var eventDemographicHtml = '<span class="event-demographic" title="View Patient">M</span>';
-
-				var eventRxHtml = '<span class="event-rx" title="View Prescription">Rx</span>';
-
-				var eventDetails = "";
+				else
+				{
+					statusElem.attr("title", "Unknown").text("?");
+				}
+				let eventDetails = "";
 				if(!Juno.Common.Util.isBlank(event.data.demographicName))
 				{
 					eventDetails = Juno.Common.Util.escapeHtml(event.data.demographicName);
@@ -981,30 +977,19 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					eventDetails = Juno.Common.Util.escapeHtml(event.data.reason);
 				}
-
-				$(element).find('.fc-content').html(eventSiteHtml + eventStatusHtml + eventEncounterHtml +
-					eventInvoiceHtml + eventDemographicHtml + eventRxHtml + eventDetails);
+				detailElem.text(eventDetails);
 			}
 			else
 			{
-				let scheduleTemplateColor = '';
-				let scheduleTemplateCode = '';
+				element.html(require('./view-backgroundEvent.html'));
 				if(Juno.Common.Util.exists(event.color))
 				{
-					scheduleTemplateColor = "style='background-color: " + Juno.Common.Util.escapeHtml(event.color) + "'";
+					element.find(".background-event-schedulecode").css("background-color", Juno.Common.Util.escapeHtml(event.color))
 				}
 				if(Juno.Common.Util.exists(event.scheduleTemplateCode))
 				{
-					scheduleTemplateCode = event.scheduleTemplateCode;
+					element.find(".background-event-schedulecode").text(event.scheduleTemplateCode);
 				}
-
-				let mainDiv = "<div class='schedule-event'>" +
-					"<div class='schedule-body'></div>" +
-					"<span class='schedule-code' " + scheduleTemplateColor + ">" +
-					"" + scheduleTemplateCode + "" +
-					"</span>" +
-					"</div>";
-				$(element).html(mainDiv);
 			}
 
 		};
@@ -1023,7 +1008,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.onResourceRender = function onResourceRender(resourceObj, labelTds, bodyTds)
 		{
-			labelTds.html(require('./view-tableHeader.html'));
+			labelTds.html(require('./view-columnControl.html'));
 			labelTds.on('click', $scope.onHeaderClick);
 
 			console.info(resourceObj);
@@ -1034,11 +1019,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			if($(jsEvent.target).is(".onclick-daysheet"))
 			{
-				console.info("onclick-daysheet clicked");
+				$state.go('dashboard');
 			}
 			else if($(jsEvent.target).is(".onclick-search"))
 			{
-				console.info("onclick-search clicked");
+				$state.go('search');
 			}
 			else if($(jsEvent.target).is(".onclick-week-view"))
 			{
@@ -1260,19 +1245,19 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			{
 				$scope.rotateEventStatus(calEvent);
 			}
-			else if($(jsEvent.target).is(".event-encounter"))
+			else if($(jsEvent.target).is(".onclick-event-encounter"))
 			{
 				window.open($scope.getEncounterLink(calEvent));
 			}
-			else if($(jsEvent.target).is(".event-invoice"))
+			else if($(jsEvent.target).is(".onclick-event-invoice"))
 			{
 				window.open($scope.getBillingLink(calEvent));
 			}
-			else if($(jsEvent.target).is(".event-demographic"))
+			else if($(jsEvent.target).is(".onclick-event-demographic"))
 			{
 				$scope.openPatientDemographic(calEvent);
 			}
-			else if($(jsEvent.target).is(".event-rx"))
+			else if($(jsEvent.target).is(".onclick-event-rx"))
 			{
 				window.open($scope.getRxLink(calEvent));
 			}
@@ -1584,7 +1569,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				height: 'auto', //$scope.get_schedule_height(),
 				nowIndicator: true,
 				header: {
-					left: 'prev,next today title',
+					left: 'prev next',
 					center: '',
 					right: ''
 				},
