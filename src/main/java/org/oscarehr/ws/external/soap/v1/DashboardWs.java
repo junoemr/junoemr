@@ -30,6 +30,7 @@ import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
 import org.oscarehr.ws.external.soap.v1.transfer.BillingTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -55,12 +56,14 @@ public class DashboardWs extends AbstractWs
 	DemographicDao demographicDao;
 
 	//add a record to the, billingmaster_clinicaid table (used for dashboard reports)
+	@SkipContentLoggingInbound
 	public String addBillingRecord(BillingTransfer billingTransfer)
 	{
 		return saveBillingTransfer(billingTransfer);
 	}
 
 	//add a records to the, billingmaster_clinicaid table (used for dashboard reports)
+	@SkipContentLoggingInbound
 	public String[] addBillingRecords(BillingTransfer[] billingTransfers)
 	{
 		ArrayList<String> result_list = new ArrayList<>();
@@ -74,57 +77,49 @@ public class DashboardWs extends AbstractWs
 
 	private String saveBillingTransfer(BillingTransfer billingTransfer)
 	{
-		MiscUtils.getLogger().info(billingTransfer.toString());
-
-		// save record
-		BillingMasterClinicaid newBillingRecord = new BillingMasterClinicaid();
-		billingTransfer.copyTo(newBillingRecord);
 		try
 		{
-			if (newBillingRecord.getDemographicNo() == null && newBillingRecord.getPhn() != null)
+			//check for existing record
+			BillingMasterClinicaid billingRecord = null;
+			BillingMasterClinicaid existingRecord = billingMasterClinicaidDao.getRecordByUniqueIndex(
+					billingTransfer.getSequenceNo(), billingTransfer.getInvoiceCreationYear(), billingTransfer.getDataCenterNo());
+			if (existingRecord != null)
+			{// update existing record
+				billingRecord = existingRecord;
+
+			}
+			else
+			{// create new record
+				billingRecord = new BillingMasterClinicaid();
+			}
+			billingTransfer.copyTo(billingRecord);
+
+			if (billingRecord.getDemographicNo() == null && billingRecord.getPhn() != null)
 			{
 				//attempt to map to demographic by health number
 				DemographicCriteriaSearch demographicCs = new DemographicCriteriaSearch();
-				demographicCs.setHin(newBillingRecord.getPhn());
+				demographicCs.setHin(billingRecord.getPhn());
 				List<Demographic> demographicResults = demographicDao.criteriaSearch(demographicCs);
 				if (demographicResults.size() == 1)
 				{
-					newBillingRecord.setDemographicNo(demographicResults.get(0).getId());
+					billingRecord.setDemographicNo(demographicResults.get(0).getId());
 				}
 				else
 				{
-					MiscUtils.getLogger().warn("failed to map billing data. hin: [" + newBillingRecord.getPhn() + "] does not map to unique demographic");
+					MiscUtils.getLogger().warn("failed to map billing data. hin: [" + billingRecord.getPhn() + "] does not map to unique demographic");
 				}
 			}
 
-			if (newBillingRecord.getDemographicNo() == null)
+			if (billingRecord.getDemographicNo() == null)
 			{
 				MiscUtils.getLogger().warn("billing data [" +
-						newBillingRecord.getSequenceNo() + "-" + newBillingRecord.getInvoiceCreationYear() + "-" + newBillingRecord.getDataCenterNo() + "]" +
+						billingRecord.getSequenceNo() + "-" + billingRecord.getInvoiceCreationYear() + "-" + billingRecord.getDataCenterNo() + "]" +
 						" is not mapped to a demographic");
 			}
 
-			billingMasterClinicaidDao.persist(newBillingRecord);
-			return ADD_BILLING_STATUS_OK;
-		}
-		catch (PersistenceException e)
-		{
-			Throwable cause = e.getCause();
-			while (cause != null && !(cause instanceof ConstraintViolationException))
-			{
-				cause = cause.getCause();
-			}
+			billingMasterClinicaidDao.merge(billingRecord);
 
-			if (cause != null)
-			{
-				MiscUtils.getLogger().warn("Attempt to insert duplicate record: " +
-						newBillingRecord.getSequenceNo() + "-" + newBillingRecord.getInvoiceCreationYear() + "-" + newBillingRecord.getDataCenterNo());
-				return ADD_BILLING_STATUS_DUPLICATE;
-			}
-			else
-			{
-				throw e;
-			}
+			return ADD_BILLING_STATUS_OK;
 		}
 		catch (Exception e)
 		{

@@ -23,6 +23,7 @@
 package org.oscarehr.ws.external.soap.v1.transfer;
 
 import org.oscarehr.dashboard.model.BillingMasterClinicaid;
+import org.springframework.beans.BeanUtils;
 
 import java.util.Date;
 
@@ -735,5 +736,15 @@ public final class BillingTransfer extends TransferBase<BillingMasterClinicaid>
 	public void setDataCenterNo(String dataCenterNo)
 	{
 		this.dataCenterNo = dataCenterNo;
+	}
+
+
+	@Override
+	public BillingMasterClinicaid copyTo(BillingMasterClinicaid copyTo)
+	{
+		String[] ignored = {"id"};
+		BeanUtils.copyProperties(this, copyTo, ignored);
+
+		return copyTo;
 	}
 }

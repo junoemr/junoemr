@@ -28,6 +28,8 @@ import org.oscarehr.dashboard.model.BillingMasterClinicaid;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Query;
+
 @Repository
 @Transactional
 public class BillingMasterClinicaidDao extends AbstractDao<BillingMasterClinicaid>
@@ -35,5 +37,23 @@ public class BillingMasterClinicaidDao extends AbstractDao<BillingMasterClinicai
 	public BillingMasterClinicaidDao()
 	{
 		super(BillingMasterClinicaid.class);
+	}
+
+	/**
+	 * gets a billingMasterClinicaid by the unique index (sequenceNo-invoiceCreationYear-datacenterNo).
+	 * @param sequenceNo the sequence number
+	 * @param invoiceCreationYear the creation year
+	 * @param datacenterNo the datacenter number
+	 * @return a single billingMasterClinicaid result or null
+	 */
+	public BillingMasterClinicaid getRecordByUniqueIndex(Integer sequenceNo, Integer invoiceCreationYear, String datacenterNo)
+	{
+		Query query = entityManager.createQuery("SELECT bmc FROM BillingMasterClinicaid bmc WHERE" +
+				" bmc.sequenceNo = :sequence AND bmc.invoiceCreationYear = :year AND bmc.dataCenterNo = :center");
+		query.setParameter("sequence", sequenceNo);
+		query.setParameter("year", invoiceCreationYear);
+		query.setParameter("center", datacenterNo);
+
+		return getSingleResultOrNull(query);
 	}
 }
