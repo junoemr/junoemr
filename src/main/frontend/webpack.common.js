@@ -24,12 +24,17 @@ module.exports = {
 			},
 			{
 				// URL loader.  Falls back to file loader for large files.
-				test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+				test: /\.(woff(2)?|ttf|eot|svg|gif|png)(\?v=\d+\.\d+\.\d+)?$/,
 				loader: 'url-loader',
 				options: {
 					limit: 10000,
 				}
-			}
+			},
+			{
+				// html loader
+				test: /\.html?$/,
+				use: 'html-loader'
+			},
 		]
 	},
 	plugins: [

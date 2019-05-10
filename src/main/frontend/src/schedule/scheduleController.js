@@ -98,7 +98,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.scheduleService = scheduleService;
 
-
 		$scope.init = function init()
 		{
 			$scope.uiConfig.calendar.defaultView = $scope.calendarViewName();
@@ -988,22 +987,29 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 			else
 			{
-				let scheduleTemplateColor = '#ffffff';
+				let scheduleTemplateColor = '';
+				let scheduleTemplateCode = '';
 				if(Juno.Common.Util.exists(event.color))
 				{
-					scheduleTemplateColor = Juno.Common.Util.escapeHtml(event.color);
+					scheduleTemplateColor = "style='background-color: " + Juno.Common.Util.escapeHtml(event.color) + "'";
+				}
+				if(Juno.Common.Util.exists(event.scheduleTemplateCode))
+				{
+					scheduleTemplateCode = event.scheduleTemplateCode;
 				}
 
 				let mainDiv = "<div class='schedule-event'>" +
 					"<div class='schedule-body'></div>" +
-					"<span class='schedule-code' style='background-color: " + scheduleTemplateColor +"'>" + event.scheduleTemplateCode + "</span>" +
+					"<span class='schedule-code' " + scheduleTemplateColor + ">" +
+					"" + scheduleTemplateCode + "" +
+					"</span>" +
 					"</div>";
 				$(element).html(mainDiv);
 			}
 
 		};
 
-		$scope.onViewRender = function onViewRender()
+		$scope.onViewRender = function onViewRender(view, element)
 		{
 			if($scope.isInitialized() && $scope.calendar())
 			{
@@ -1013,6 +1019,35 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 			// Voodoo to set the resource view column width from https://stackoverflow.com/a/39297864
 			$("#ca-calendar").css('min-width',$('.fc-resource-cell').length*200);
+		};
+
+		$scope.onResourceRender = function onResourceRender(resourceObj, labelTds, bodyTds)
+		{
+			labelTds.html(require('./view-tableHeader.html'));
+			labelTds.on('click', $scope.onHeaderClick);
+
+			console.info(resourceObj);
+			labelTds.find(".hdr-label").text(resourceObj.display_name);
+		};
+
+		$scope.onHeaderClick = function onHeaderClick(jsEvent)
+		{
+			if($(jsEvent.target).is(".onclick-daysheet"))
+			{
+				console.info("onclick-daysheet clicked");
+			}
+			else if($(jsEvent.target).is(".onclick-search"))
+			{
+				console.info("onclick-search clicked");
+			}
+			else if($(jsEvent.target).is(".onclick-week-view"))
+			{
+				console.info("onclick-week-view clicked");
+			}
+			else if($(jsEvent.target).is(".onclick-month-view"))
+			{
+				console.info("onclick-month-view clicked");
+			}
 		};
 
 		$scope.afterRender = function afterRender()
@@ -1219,7 +1254,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.openingDialog = false;
 		};
 
-		$scope.onEventClicked = function onEventClicked(calEvent, jsEvent, view)
+		$scope.onEventClick = function onEventClick(calEvent, jsEvent, view)
 		{
 			if($(jsEvent.target).is(".event-status.rotate"))
 			{
@@ -1301,7 +1336,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.setCalendarLoading(true);
 
 			var appointment = angular.copy(calEvent.data);
-			appointment.providerNo = calEvent.resourceId
+			appointment.providerNo = calEvent.resourceId;
 
 			$scope.moveEvent(appointment, delta, false).then(
 				function success(eventData)
@@ -1566,9 +1601,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 				selectable: true,
 				select: $scope.openCreateEventDialog,
-				eventClick: $scope.onEventClicked,
+				eventClick: $scope.onEventClick,
 				eventRender: $scope.onEventRender,
 				viewRender: $scope.onViewRender,
+				resourceRender: $scope.onResourceRender,
+				navLinkDayClick: $scope.onHeaderClick,
+				navLinkWeekClick: $scope.onHeaderClick,
 				eventAfterAllRender: $scope.afterRender,
 
 				editable: true,

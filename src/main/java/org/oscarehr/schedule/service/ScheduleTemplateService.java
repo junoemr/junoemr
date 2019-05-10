@@ -152,13 +152,13 @@ public class ScheduleTemplateService
 	{
 		Object[] fakeResult = {
 				null, //position
-				"", //code char
+				null, //code char
 				java.sql.Date.valueOf(startDateTime.toLocalDate()), //appt date
 				java.sql.Time.valueOf(startDateTime.toLocalTime()), //appt time
-				"", //code
+				null, //code
 				BigInteger.valueOf(durationMin),  //duration
 				"No Schedule", //description
-				"#ffffff", //colour
+				null, //colour
 				"N", //confirm
 				10 //booking limit
 		};

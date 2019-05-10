@@ -126,7 +126,6 @@
 		}
 	  	/* background event custom styling */
 		.fc-bgevent {
-		  	background-color: transparent !important;
 		  	opacity: 1;
 		  	display: flex;
 		  	justify-content: center;
@@ -134,17 +133,24 @@
 			  	flex-grow: 1;
 			  	display: flex;
 				.schedule-code {
+				  	background-color: $white;
 					float: right;
 				  	width: 16px;
-				  	text-align: center;
 				  	height: 100%;
-				  	border: 1px solid #dcdfe6;
-				  	border-right: 0;
+				  	text-align: center;
+				  	border-left: 1px solid $grey-07;
+				  	border-top: 1px solid $grey-07;
+					font-weight: bold;
+					font-style: normal;
+					font-stretch: normal;
+					line-height: normal;
+					letter-spacing: normal;
+				  	padding: 0;
 				}
 				.schedule-body {
 				  flex-grow: 1;
-				  background-color: #ffffff;
-				  border-top: 1px solid #dcdfe6;
+				  background-color: $white;
+				  border-top: 1px solid $grey-07;
 				}
 			}
 		}
@@ -154,8 +160,57 @@
 		}
 	  	/* custom stying for the time column*/
 	  	.fc-time {
-		  background-color: #edf0f5;
+		  background-color: $grey-08;
 		}
+
+	  .fc-resource-cell {
+		.column-ctl-root {
+		  background-color: $white;
+		  display: flex;
+		  padding: 10px;
+		  .column-ctl {
+			display: flex;
+			align-items: center;
+			justify-content: space-evenly;
+			padding: 5px;
+		  }
+		  .ctl-container-label {
+			flex-grow: 4;
+		  }
+		  .ctl-container-icon {
+			flex-grow: 1;
+		  }
+		  .icon {
+			display:inline-block;
+			width: 18px;
+			height: 18px;
+		  }
+		  .icon-daysheet {
+			background: url($images-root + 'cal-daysheetblue.svg') no-repeat;
+		  }
+		  .icon-search {
+			background: url($images-root + 'cal-searchblue.svg') no-repeat;
+		  }
+		  .icon-week-view {
+			background: url($images-root + 'cal-weekblue.svg') no-repeat;
+		  }
+		  .icon-month-view {
+			background: url($images-root + 'cal-monthblue.svg') no-repeat;
+		  }
+		}
+	  }
+
+	}
+	.flexV {
+	  display: flex;
+	  flex-direction: column;
+	}
+	.flexH {
+	  display: flex;
+	  flex-direction: row;
+	}
+	.flexGrow {
+	  flex-grow: 1;
 	}
 }
 
