@@ -312,7 +312,7 @@ function printPaste2Parent(print)
 		{
 			myParent.document.encForm.enTextarea.value = myParent.document.encForm.enTextarea.value + text;
 		}
-		else if (window.parent.opener.document.getElementById(noteEditor) !== undefined)
+		else if (myParent.document.getElementById(noteEditor) !== null)
 		{
 			// Instead of making the parent AngularJS document paranoia check every note in case we
 			// directly shoved content into the DOM, we'll connect the note properly for them
