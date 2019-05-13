@@ -2,6 +2,11 @@
 $images-root: '../images/';
 $images-appt-status: '../images/appointmentStatus/';
 
+$icon-modal-close: $images-root + 'icon-16-window-close.svg';
+$icon-modal-min: $images-root + 'icon-16-window-min.svg';
+$icon-modal-max: $images-root + 'icon-16-window-max.svg';
+
+$icon-add-appt: $images-root + 'icon-48-add-appintment.svg';
 
 $icon-status-starbill: $images-appt-status + 'icon-48-todo.svg';
 $icon-status-todo: $images-appt-status + 'icon-48-folder.svg';

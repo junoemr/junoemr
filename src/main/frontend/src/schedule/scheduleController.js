@@ -1106,7 +1106,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						editMode: [function() { return false }],
 						keyBinding: [function() {return {bindKeyGlobal: function(){}}}],
 						focus: [function() {return focusService}],
-					}
+					},
+					windowClass: "modal-large",
 				});
 
 				$scope.dialog.result.catch(function(res) {

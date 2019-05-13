@@ -8,6 +8,23 @@
 	white-space: nowrap;
 }
 
+.flexV {
+	display: flex;
+	flex-direction: column;
+}
+.flexH {
+	display: flex;
+	flex-direction: row;
+}
+.flexGrow {
+	flex-grow: 1;
+}
+.icon {
+	display: inline-block;
+	background-size: 100%;
+	background-repeat: no-repeat;
+}
+
 
 .calendar-loading
 {
@@ -98,11 +115,8 @@
 					flex-grow: 1;
 				}
 				.icon {
-					display: inline-block;
 					width: 24px;
 					height: 24px;
-					background-size: 100%;
-					background-repeat: no-repeat;
 				}
 				.icon-down {
 					background-image: url($images-root + 'icon-16-arrow-down.svg');
@@ -245,11 +259,8 @@
 					flex-grow: 1;
 				}
 				.icon {
-					display: inline-block;
 					width: 18px;
 					height: 18px;
-					background-size: 100%;
-					background-repeat: no-repeat;
 				}
 				.icon-daysheet {
 					background-image: url($images-root + 'cal-daysheetblue.svg');
@@ -266,17 +277,6 @@
 			}
 		}
 	}
-	.flexV {
-	  display: flex;
-	  flex-direction: column;
-	}
-	.flexH {
-	  display: flex;
-	  flex-direction: row;
-	}
-	.flexGrow {
-	  flex-grow: 1;
-	}
 }
 
 .schedule-options
@@ -291,79 +291,154 @@
 		.form-group { margin-left: 20px; }
 		.form-group:first-child { margin-left: 0 }
 	}
-
 }
 
+.modal-large {
+	.modal-dialog {
+		width: 1200px;
+		.modal-content {
+			background-color: transparent;
+			-webkit-border-radius: 16px !important;
+			-moz-border-radius: 16px !important;
+			border-radius: 16px !important;
+		}
+	}
+}
+
+.modal-background {
+	background: linear-gradient(-45deg, $white 50%, transparent 0) no-repeat 100% 100%,
+	linear-gradient(247deg, #5c8be8, $primary 30%, $primary 64%, #355085) no-repeat;
+	border-radius: 16px;
+	padding: 0 16px 16px 16px;
+}
 .schedule-modal {
+	.schedule-modal-header {
+		align-items: center;
+		padding: 10px 0;
 
-	.panel { overflow-x: auto; }
+		.modal-title {
+			color: $white;
+			font-family: "Arial", "Helvetica", sans-serif;
+			font-size: 20px;
+			font-weight: bold;
+			font-style: normal;
+			align-items: center;
+		}
+		.modal-ctl-buttons {
+			width: 80px;
+			padding: 6px;
+			align-items: center;
+			justify-content: space-between;
+		}
 
-	.event-color {
-		width: 20px;
-		height: 20px;
-		display: inline-block;
-	}
-
-	&.legend {
-		.event-color {
-			float: left;
-			margin-right: 15px;
+		.icon-modal-ctl {
+			width: 16px;
+			height: 16px;
+		}
+		.icon-modal-close {
+			background-image: url($icon-modal-close);
+		}
+		.icon-modal-min {
+			background-image: url($icon-modal-min);
+		}
+		.icon-modal-max {
+			background-image: url($icon-modal-max);
+		}
+		.icon-modal-add-appt {
+			width: 48px;
+			height: 48px;
+			background-image: url($icon-add-appt);
 		}
 	}
 
-	&.event {
+	.schedule-modal-body {
+		background-color: $white;
 
-		.schedule-header {
-			@include clearfix;
-			border-bottom: 1px solid #CCC;
-			padding-bottom: 4px;
-			margin-bottom: 5px;
-
-			h4.schedule-title {
-				font-size: 1.571em;
-				margin: 0;
-			}
-
-			button { margin-left: 4px; }
-			.label { margin-left: 4px; }
-		}
+		.panel { overflow-x: auto; }
 
 		.event-color {
-			position: relative;
-			top: 5px;
+			width: 20px;
+			height: 20px;
+			display: inline-block;
 		}
 
-		.time-wrapper { padding-left: 0 }
-
-		.availability {
-			@include clearfix;
-			margin-top: 5px;
-
-			.color { width: 30px; }
-			.info { width: 230px; }
-			.availability-detail { display: inline-block; }
-		}
-
-		.patient-image {
-
-			img { width: 120px; height: 120px; }
-
-			.upload-text {
-				position: absolute;
-				bottom: 0;
-				left: 33px;
+		&.legend {
+			.event-color {
+				float: left;
+				margin-right: 15px;
 			}
 		}
 
-		.patient-health-number {
-			margin-right: 10px;
-		}
+		&.event {
 
-		.modal-body .bootstrap-timepicker button {
-			height: 34px;
+			.schedule-header {
+				@include clearfix;
+				border-bottom: 1px solid #CCC;
+				padding-bottom: 4px;
+				margin-bottom: 5px;
+
+				h4.schedule-title {
+					font-size: 1.571em;
+					margin: 0;
+				}
+
+				button {
+					margin-left: 4px;
+				}
+				.label {
+					margin-left: 4px;
+				}
+			}
+
+			.event-color {
+				position: relative;
+				top: 5px;
+			}
+
+			.time-wrapper {
+				padding-left: 0
+			}
+
+			.availability {
+				@include clearfix;
+				margin-top: 5px;
+
+				.color {
+					width: 30px;
+				}
+				.info {
+					width: 230px;
+				}
+				.availability-detail {
+					display: inline-block;
+				}
+			}
+
+			.patient-image {
+
+				img {
+					width: 120px;
+					height: 120px;
+				}
+
+				.upload-text {
+					position: absolute;
+					bottom: 0;
+					left: 33px;
+				}
+			}
+
+			.patient-health-number {
+				margin-right: 10px;
+			}
+
+			.modal-body .bootstrap-timepicker button {
+				height: 34px;
+			}
 		}
 	}
 }
+
 
 .schedule-daysheet {
 
