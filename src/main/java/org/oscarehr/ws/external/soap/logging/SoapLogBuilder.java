@@ -30,6 +30,7 @@ import java.lang.annotation.Annotation;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.ws.common.annotation.LogAllContentInbound;
 import org.oscarehr.ws.common.annotation.MaskParameter;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
@@ -48,9 +49,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * This class keeps track of all data needed to create a single entry for a request to response SOAP exchange
@@ -161,15 +160,20 @@ public class SoapLogBuilder
         {
             logEntry.setSoapMethod(this.soapMethod.getName());
 
+            // inbound
+            String postData = generatePostData(isSoapMethodAnnotatedWith(LogAllContentInbound.class));
+
             if (!isSoapMethodAnnotatedWith(SkipContentLoggingInbound.class))
             {
-                logEntry.setPostData(generatePostData());
+                logEntry.setPostData(postData);
             }
             else
             {
                 logEntry.setPostData(SkipContentLoggingInbound.SKIP_CONTENT_LOGGING_INBOUND);
             }
 
+
+            // outbound
             if (!isSoapMethodAnnotatedWith(SkipContentLoggingOutbound.class))
             {
                 logEntry.setRawOutput(this.rawOutput);
@@ -190,17 +194,21 @@ public class SoapLogBuilder
      *
      * @return Transformed post data.
      */
-    private String generatePostData()
+    private String generatePostData(boolean keepHeader)
     {
-        if (isSoapMethodAnnotatedWith(MaskParameter.class) && isPostBodyParseable())
+        String xml = this.rawPostData;
+        if (!keepHeader && isPostBodyParseable())
+        {
+            xml = stripTag("env:Header", xml);
+        }
+
+        if (isSoapMethodAnnotatedWith(MaskParameter.class ) && isPostBodyParseable())
         {
             String[] parametersToMask = getMaskParameters();
-            return applyParameterMasking(parametersToMask);
+            xml = applyParameterMasking(parametersToMask, xml);
         }
-        else
-        {
-            return this.rawPostData;
-        }
+
+        return xml;
     }
 
     /**
@@ -244,7 +252,6 @@ public class SoapLogBuilder
     {
         MaskParameter maskParameters = AnnotationUtils.getMethodAnnotation(this.soapMethod, MaskParameter.class);
         String[] fieldNames = maskParameters.fields();
-
         return fieldNames;
     }
 
@@ -256,7 +263,7 @@ public class SoapLogBuilder
      *
      * @return postData with any specified parameter masking applied
      */
-    private String applyParameterMasking(String[] parametersToMask)
+    private String applyParameterMasking(String[] parametersToMask, String xml)
     {
         try
         {
@@ -299,7 +306,66 @@ public class SoapLogBuilder
 
             };
 
-            Source src = new SAXSource(xmlReader, new InputSource(new StringReader(this.rawPostData)));
+            Source src = new SAXSource(xmlReader, new InputSource(new StringReader(xml)));
+            StringWriter sanitizedPostData = new StringWriter();
+            Result res = new StreamResult(sanitizedPostData);
+            TransformerFactory.newInstance().newTransformer().transform(src, res);
+
+            return sanitizedPostData.toString();
+        }
+        catch (Exception e)
+        {
+            throw new Fault(e);
+        }
+    }
+
+
+    private String stripTag(String tagToStrip, String xml)
+    {
+        try
+        {
+            XMLReader xmlReader = new XMLFilterImpl(XMLReaderFactory.createXMLReader())
+            {
+                boolean skipping = false;
+
+                @Override
+                public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException
+                {
+                    if (tagToStrip.equals(qName))
+                    {
+                        skipping = true;
+                    }
+                    else if (!skipping)
+                    {
+                        super.startElement(uri, localName, qName, atts);
+                    }
+                }
+
+                @Override
+                public void endElement(String uri, String localName, String qName) throws SAXException
+                {
+                    if (tagToStrip.equals(qName))
+                    {
+                        skipping = false;
+                    }
+                    else if (!skipping)
+                    {
+                        super.endElement(uri, localName, qName);
+                    }
+                }
+
+                @Override
+                public void characters(char[] ch, int start, int length) throws SAXException
+                {
+                    if (!skipping)
+                    {
+                        super.characters(ch, start, length);
+                    }
+                }
+
+            };
+
+            Source src = new SAXSource(xmlReader, new InputSource(new StringReader(xml)));
             StringWriter sanitizedPostData = new StringWriter();
             Result res = new StreamResult(sanitizedPostData);
             TransformerFactory.newInstance().newTransformer().transform(src, res);
