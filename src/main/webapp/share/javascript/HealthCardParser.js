@@ -47,6 +47,19 @@ Oscar.HealthCardParser.isWhitelisted = function isWhitelisted(cardNo)
 			(cardNo.startsWith(BC_PREFIX) && cardNo.substring(cardNo.indexOf("?")).startsWith(BC_COMBINED)));
 };
 
+/**
+ * take in separated year, month, day values and ensure that their combination
+ * produces a valid date
+ * @param year
+ * @param month
+ * @param day
+ */
+Oscar.HealthCardParser.validateDate = function validateDate(year, month, day)
+{
+	var dateString = year + "-" + month + "-" + day;
+	return !(isNaN(Date.parse(dateString)));
+};
+
 Oscar.HealthCardParser.getFieldValue = function getFieldValue(track, trackIndex, length)
 {
 	var fieldValue = "";
