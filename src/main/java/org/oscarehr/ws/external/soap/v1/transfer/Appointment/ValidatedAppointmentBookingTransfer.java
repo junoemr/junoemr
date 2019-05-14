@@ -25,7 +25,6 @@ package org.oscarehr.ws.external.soap.v1.transfer.Appointment;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.oscarehr.common.model.Appointment;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
 
 import java.io.Serializable;
