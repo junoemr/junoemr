@@ -30,7 +30,7 @@ import java.lang.annotation.Annotation;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.ws.common.annotation.LogAllContentInbound;
+import org.oscarehr.ws.common.annotation.LogHeaderInbound;
 import org.oscarehr.ws.common.annotation.MaskParameter;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
@@ -161,26 +161,26 @@ public class SoapLogBuilder
             logEntry.setSoapMethod(this.soapMethod.getName());
 
             // inbound
-            String postData = generatePostData(isSoapMethodAnnotatedWith(LogAllContentInbound.class));
+            String postData = generatePostData(isSoapMethodAnnotatedWith(LogHeaderInbound.class));
 
-            if (!isSoapMethodAnnotatedWith(SkipContentLoggingInbound.class))
+            if (isSoapMethodAnnotatedWith(SkipContentLoggingInbound.class))
             {
-                logEntry.setPostData(postData);
+                logEntry.setPostData(SkipContentLoggingInbound.SKIP_CONTENT_LOGGING_INBOUND);
             }
             else
             {
-                logEntry.setPostData(SkipContentLoggingInbound.SKIP_CONTENT_LOGGING_INBOUND);
+                logEntry.setPostData(postData);
             }
 
 
             // outbound
-            if (!isSoapMethodAnnotatedWith(SkipContentLoggingOutbound.class))
+            if (isSoapMethodAnnotatedWith(SkipContentLoggingOutbound.class))
             {
-                logEntry.setRawOutput(this.rawOutput);
+                logEntry.setRawOutput(SkipContentLoggingOutbound.SKIP_CONTENT_LOGGING_OUTBOUND);
             }
             else
             {
-                logEntry.setRawOutput(SkipContentLoggingOutbound.SKIP_CONTENT_LOGGING_OUTBOUND);
+                logEntry.setRawOutput(this.rawOutput);
             }
         }
 

@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface LogAllContentInbound
+public @interface LogHeaderInbound
 {
-    String LOG_ALL_CONTENT_INBOUDN = "logging.LogAllContentInbound";
+    String LOG_ALL_CONTENT_INBOUDN = "logging.LogHeaderInbound";
 }
