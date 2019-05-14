@@ -6,6 +6,7 @@ $icon-modal-close: $images-root + 'icon-16-window-close.svg';
 $icon-modal-min: $images-root + 'icon-16-window-min.svg';
 $icon-modal-max: $images-root + 'icon-16-window-max.svg';
 
+$icon-checked: $images-root + 'icon-16-check.svg';
 $icon-add-appt: $images-root + 'icon-48-add-appintment.svg';
 
 $icon-status-starbill: $images-appt-status + 'icon-48-todo.svg';
@@ -28,3 +29,88 @@ $icon-status-8: $images-appt-status + 'icon-48-1.svg';
 $icon-status-9: $images-appt-status + 'icon-48-1.svg';
 $icon-status-10: $images-appt-status + 'icon-48-1.svg';
 $icon-status-11: $images-appt-status + 'icon-48-1.svg';
+
+/* add the icon class + a icon specific class with the background url
+ * add sizing + non-standard stuff in the page specific stylesheets */
+.icon {
+	display: inline-block;
+	background-size: 100%;
+	background-repeat: no-repeat;
+}
+
+.icon-down {
+	background-image: url($images-root + 'icon-16-arrow-down.svg');
+}
+.icon-daysheet {
+	background-image: url($images-root + 'cal-daysheetblue.svg');
+}
+.icon-search {
+	background-image: url($images-root + 'cal-searchblue.svg');
+}
+.icon-week-view {
+	background-image: url($images-root + 'cal-weekblue.svg');
+}
+.icon-month-view {
+	background-image: url($images-root + 'cal-monthblue.svg');
+}
+
+
+/* appointment status icons */
+.icon-status-starbill {
+	background-image: url($icon-status-starbill);
+}
+.icon-status-todo {
+	background-image: url($icon-status-todo);
+}
+.icon-status-here {
+	background-image: url($icon-status-here);
+}
+.icon-status-picked {
+	background-image: url($icon-status-picked);
+}
+.icon-status-empty {
+	background-image: url($icon-status-empty);
+}
+.icon-status-noshow {
+	background-image: url($icon-status-noshow);
+}
+.icon-status-cancel {
+	background-image: url($icon-status-cancel);
+}
+.icon-status-billed {
+	background-image: url($icon-status-billed);
+}
+
+.icon-status-1 {
+	background-image: url($icon-status-1);
+}
+.icon-status-2 {
+	background-image: url($icon-status-2);
+}
+.icon-status-3 {
+	background-image: url($icon-status-3);
+}
+.icon-status-4 {
+	background-image: url($icon-status-4);
+}
+.icon-status-5 {
+	background-image: url($icon-status-5);
+}
+.icon-status-6 {
+	background-image: url($icon-status-6);
+}
+.icon-status-7 {
+	background-image: url($icon-status-7);
+}
+.icon-status-8 {
+	background-image: url($icon-status-8);
+}
+.icon-status-9 {
+	background-image: url($icon-status-9);
+}
+.icon-status-10 {
+	background-image: url($icon-status-10);
+}
+.icon-status-11 {
+	background-image: url($icon-status-11);
+}

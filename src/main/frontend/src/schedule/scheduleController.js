@@ -1096,7 +1096,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				$scope.dialog = $uibModal.open({
 					animation: false,
 					backdrop: 'static',
-					controller: 'Schedule.EventController',
+					controller: 'Schedule.EventController as eventController',
 					templateUrl: 'src/schedule/event.jsp',
 					resolve: {
 						type: [function() { return 'create_edit_event' }],
@@ -1107,7 +1107,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						keyBinding: [function() {return {bindKeyGlobal: function(){}}}],
 						focus: [function() {return focusService}],
 					},
-					windowClass: "modal-large",
+					windowClass: "modal-large schedule-modal",
 				});
 
 				$scope.dialog.result.catch(function(res) {
@@ -1211,7 +1211,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				$scope.dialog = $uibModal.open({
 					animation: false,
 					backdrop: 'static',
-					controller: 'Schedule.EventController',
+					controller: 'Schedule.EventController as eventController',
 					templateUrl: 'src/schedule/event.jsp',
 					resolve: {
 						type: [function() { return 'create_edit_event' }],
@@ -1221,7 +1221,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						editMode: [function() { return true }],
 						keyBinding: [function() {return {bindKeyGlobal: function(){}}}],
 						focus: [function() {return focusService}],
-					}
+					},
+					windowClass: "modal-large schedule-modal",
 				});
 
 				$scope.dialog.result.catch(function(res) {

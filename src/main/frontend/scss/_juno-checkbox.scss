@@ -1,0 +1,47 @@
+/**
+set the html structure up like this:
+<label class="juno-checkbox">
+    <input type="checkbox"/>
+    <span class="checkmark"></span>
+</label>
+ */
+
+/* The switch - the box around the slider */
+.juno-checkbox {
+	display: block;
+	position: relative;
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+
+	/* Hide default HTML checkbox */
+	input {
+		position: absolute;
+		opacity: 0;
+		cursor: pointer;
+		height: 0;
+		width: 0;
+
+		/* When the checkbox is checked, add a blue background */
+		&:checked + .checkmark {
+			display: inline-block;
+			background: url($icon-checked) no-repeat, $primary;
+			background-size: 100%;
+			border: solid 1px $primary-hover;
+		}
+	}
+	/* Create a custom checkbox */
+	.checkmark {
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 20px;
+		width: 20px;
+		background-color: $white;
+		border: solid 1px $grey-07;
+		border-radius: 4px;
+	}
+}
+

@@ -19,11 +19,6 @@
 .flexGrow {
 	flex-grow: 1;
 }
-.icon {
-	display: inline-block;
-	background-size: 100%;
-	background-repeat: no-repeat;
-}
 
 
 .calendar-loading
@@ -119,68 +114,9 @@
 					height: 24px;
 				}
 				.icon-down {
-					background-image: url($images-root + 'icon-16-arrow-down.svg');
 					width: 16px;
 					height: 16px;
 					margin: 4px;
-				}
-				.icon-status-starbill {
-					background-image: url($icon-status-starbill);
-				}
-				.icon-status-todo {
-					background-image: url($icon-status-todo);
-				}
-				.icon-status-here {
-					background-image: url($icon-status-here);
-				}
-				.icon-status-picked {
-					background-image: url($icon-status-picked);
-				}
-				.icon-status-empty {
-					background-image: url($icon-status-empty);
-				}
-				.icon-status-noshow {
-					background-image: url($icon-status-noshow);
-				}
-				.icon-status-cancel {
-					background-image: url($icon-status-cancel);
-				}
-				.icon-status-billed {
-					background-image: url($icon-status-billed);
-				}
-
-				.icon-status-1 {
-					background-image: url($icon-status-1);
-				}
-				.icon-status-2 {
-					background-image: url($icon-status-2);
-				}
-				.icon-status-3 {
-					background-image: url($icon-status-3);
-				}
-				.icon-status-4 {
-					background-image: url($icon-status-4);
-				}
-				.icon-status-5 {
-					background-image: url($icon-status-5);
-				}
-				.icon-status-6 {
-					background-image: url($icon-status-6);
-				}
-				.icon-status-7 {
-					background-image: url($icon-status-7);
-				}
-				.icon-status-8 {
-					background-image: url($icon-status-8);
-				}
-				.icon-status-9 {
-					background-image: url($icon-status-9);
-				}
-				.icon-status-10 {
-					background-image: url($icon-status-10);
-				}
-				.icon-status-11 {
-					background-image: url($icon-status-11);
 				}
 			}
 
@@ -262,18 +198,6 @@
 					width: 18px;
 					height: 18px;
 				}
-				.icon-daysheet {
-					background-image: url($images-root + 'cal-daysheetblue.svg');
-				}
-				.icon-search {
-					background-image: url($images-root + 'cal-searchblue.svg');
-				}
-				.icon-week-view {
-					background-image: url($images-root + 'cal-weekblue.svg');
-				}
-				.icon-month-view {
-					background-image: url($images-root + 'cal-monthblue.svg');
-				}
 			}
 		}
 	}
@@ -293,29 +217,34 @@
 	}
 }
 
+/* TODO move to modal scss file for general use.*/
 .modal-large {
 	.modal-dialog {
-		width: 1200px;
+		width: 960px;
+		height: 552px;
 		.modal-content {
-			background-color: transparent;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+
 			-webkit-border-radius: 16px !important;
 			-moz-border-radius: 16px !important;
 			border-radius: 16px !important;
+			background: linear-gradient(-45deg, $white 50%, transparent 0) no-repeat 100% 100%,
+			linear-gradient(247deg, #5c8be8, $primary 30%, $primary 64%, #355085) no-repeat;
+
+			padding: 0 16px 16px 16px;
+			.modal-header {
+				padding: 10px 0;
+			}
 		}
 	}
 }
 
-.modal-background {
-	background: linear-gradient(-45deg, $white 50%, transparent 0) no-repeat 100% 100%,
-	linear-gradient(247deg, #5c8be8, $primary 30%, $primary 64%, #355085) no-repeat;
-	border-radius: 16px;
-	padding: 0 16px 16px 16px;
-}
+/* schedule specific modal styling */
 .schedule-modal {
-	.schedule-modal-header {
+	.modal-header {
 		align-items: center;
-		padding: 10px 0;
-
 		.modal-title {
 			color: $white;
 			font-family: "Arial", "Helvetica", sans-serif;
@@ -351,15 +280,139 @@
 		}
 	}
 
-	.schedule-modal-body {
+	.modal-body {
 		background-color: $white;
+		border-radius: 16px;
+		padding: 0;
+		flex-grow: 1;
 
-		.panel { overflow-x: auto; }
+		.tabs-heading {
+			background-color: $grey-08;
+		}
+		.nav-tabs {
+			border: 0;
+			margin: 0;
+			li {
+				a {
+					border: 0;
+					margin: 0;
+					padding: 12px 48px;
+					color: $grey-04;
+					background-color: $grey-08;
+					&:hover, &:focus {
+						background-color: $grey-07;
+					}
+				}
+				&.active {
+					a {
+						color: $primary;
+						font-weight: bold;
+						background-color: $white;
+					}
+				}
+			}
+		}
+		.tab-pane {
+			padding: 16px;
+		}
+
+		.flex-row {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: flex-start;
+			padding: 4px 0;
+			&.content-center {
+				justify-content: center;
+			}
+			&.content-end {
+				justify-content: flex-end;
+			}
+			&.label-top {
+				align-items: flex-start;
+			}
+			&.label-center {
+				align-items: center;
+			}
+			.flex-row-label {
+				width: 80px;
+				padding: 0 5px;
+				margin: 0;
+				text-align: right;
+				&.sml {
+					width: 35px;
+				}
+				&.med {
+					width: 70px;
+				}
+			}
+			.flex-row-content {
+				text-align: left;
+				flex-grow: 1;
+			}
+			.juno-checkbox {
+				margin: 6px;
+			}
+			select, input {
+				border-radius: 8px;
+				border: solid 1px $grey-07;
+				background-color: $white;
+				padding: 8px;
+				&.sml {
+					width: 16px;
+				}
+			}
+			label {
+				font-family: "Arial", "Helvetica", sans-serif;
+				font-size: 12px;
+				font-weight: normal;
+				font-style: normal;
+				font-stretch: normal;
+				line-height: normal;
+				letter-spacing: normal;
+				text-align: right;
+				color: $grey-05;
+			}
+		}
+		.display-frame-lg {
+			height: 144px;
+			margin-bottom: 12px;
+		}
+		.info-frame {
+			background-color: $grey-08;
+			border: solid 1px $grey-07;
+			border-radius: 8px;
+		}
+		ca-info-messages {
+			height: 40px;
+		}
 
 		.event-color {
 			width: 20px;
 			height: 20px;
 			display: inline-block;
+		}
+
+		.bottom-buttons {
+			.btn {
+				color: $primary;
+				background-color: $white;
+				border: solid 1px $grey-07;
+				font-weight: bold;
+				width: 128px;
+				height: 40px;
+
+				&.btn-success {
+					color: $white;
+					background-color: $green;
+					border: solid 1px $green-hover;
+				}
+				&.btn-primary {
+					color: $white;
+					background-color: $primary;
+					border: solid 1px $primary-hover;
+				}
+			}
 		}
 
 		&.legend {

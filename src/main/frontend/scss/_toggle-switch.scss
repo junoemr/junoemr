@@ -1,3 +1,12 @@
+
+/**
+set the html structure up like this:
+<label class="switch">
+    <input type="checkbox"/>
+    <span class="slider [round]"></span>
+</label>
+ */
+
 /* The switch - the box around the slider */
   .switch {
     position: relative;

@@ -35,7 +35,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	)
 {
 	$scope.parentScope = parentScope;
-
+	let controller = this;
 
 	//=========================================================================
 	// Access Control
@@ -45,6 +45,15 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	//=========================================================================
 	// Local scope variables
 	//=========================================================================/
+
+	controller.tabEnum = Object.freeze({
+		appointment:0,
+		appointmentHistory:1
+	});
+	controller.activeTab = controller.tabEnum.appointment;
+
+	controller.selectedProvider = null;
+	controller.selectedResource = null;
 
 	$scope.label = label;
 	$scope.editMode = editMode;
@@ -207,6 +216,8 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 			$scope.initialized = true;
 		}
+
+		controller.changeTab(controller.tabEnum.appointment);
 	};
 
 	$scope.initPatientAutocomplete = function initPatientAutocomplete(demographicNo)
@@ -705,6 +716,11 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			});
 
 		console.log($('#myModal'));
+	};
+
+	controller.changeTab = function changeTab(tabId)
+	{
+		controller.activeTab = tabId;
 	};
 
 
