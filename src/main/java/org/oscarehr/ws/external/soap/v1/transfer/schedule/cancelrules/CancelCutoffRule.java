@@ -27,8 +27,6 @@ package org.oscarehr.ws.external.soap.v1.transfer.schedule.cancelrules;
 import org.json.simple.JSONObject;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.schedule.model.ScheduleSearchResult;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleType;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDateTime;
@@ -44,7 +42,7 @@ public class CancelCutoffRule extends CancelRule
 
     CancelCutoffRule (String jsonType, Integer amount, ChronoUnit timePeriod)
     {
-        super(jsonType);
+        super(CancelRuleType.CANCEL_CUTOFF, jsonType);
         this.amount = amount;
         this.timePeriod = timePeriod;
     }

@@ -27,7 +27,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.cancelrules.CancelCutoffRule;
 
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
