@@ -163,7 +163,8 @@ public class ScheduleWs extends AbstractWs {
 			scheduleManager.addAppointment(getLoggedInInfo(), getLoggedInSecurity(), appointment);
 		}
 
-		ValidatedAppointmentBookingTransfer response = new ValidatedAppointmentBookingTransfer(appointment, violatedRules);
+		AppointmentTransfer apptTransfer = AppointmentTransfer.toTransfer(appointment, false);
+		ValidatedAppointmentBookingTransfer response = new ValidatedAppointmentBookingTransfer(apptTransfer, violatedRules);
 		return response;
 	}
 
