@@ -36,6 +36,36 @@ DROP TRIGGER IF EXISTS cacheObrDate_hl7_update;
 
 DELIMITER //
 
+CREATE PROCEDURE cacheObrDate_hl7(IN in_hl7_no INT(20), IN in_obr_date DATE)
+SQL SECURITY INVOKER
+BEGIN
+UPDATE providerLabRouting plr
+SET plr.obr_date = in_obr_date
+WHERE plr.lab_no = in_hl7_no
+AND plr.lab_type = 'HL7';
+END //
+
+CREATE PROCEDURE cacheObrDate_doc(IN in_doc_no INT(20), IN in_obr_date DATE)
+SQL SECURITY INVOKER
+BEGIN
+UPDATE providerLabRouting plr
+SET plr.obr_date = in_obr_date
+WHERE plr.lab_no = in_doc_no
+  AND plr.lab_type = 'DOC';
+END //
+
+CREATE PROCEDURE getObrDate_plr(IN in_lab_no INT(10), IN in_lab_type VARCHAR(3), OUT out_obr_date DATPropETIME)
+SQL SECURITY INVOKER
+BEGIN
+IF in_lab_type = 'HL7' THEN
+  SET out_obr_date = (SELECT hl7.obr_date FROM hl7TextInfo hl7 WHERE hl7.lab_no = in_lab_no);
+ELSEIF in_lab_type = 'DOC' THEN
+  SET out_obr_date = (SELECT doc.observationdate FROM document doc WHERE doc.document_no = in_lab_no);
+ELSE
+  SET out_obr_date = NULL;
+END IF;
+END //
+
 -- Can't update a table in a procedure if it is the same one called by the invoking trigger.
 -- In this case, let the trigger set the value as the row is created.
 CREATE TRIGGER cacheObrDate_plr_insert
@@ -80,32 +110,5 @@ AFTER UPDATE ON hl7TextInfo
 FOR EACH ROW
 BEGIN
 CALL cacheObrDate_hl7(NEW.lab_no, NEW.obr_date);
-END //
-
-CREATE PROCEDURE cacheObrDate_hl7(IN in_hl7_no INT(20), IN in_obr_date DATE)
-BEGIN
-UPDATE providerLabRouting plr
-SET plr.obr_date = in_obr_date
-WHERE plr.lab_no = in_hl7_no
-AND plr.lab_type = 'HL7';
-END //
-
-CREATE PROCEDURE cacheObrDate_doc(IN in_doc_no INT(20), IN in_obr_date DATE)
-UPDATE providerLabRouting plr
-SET plr.obr_date = in_obr_date
-WHERE plr.lab_no = in_doc_no
-  AND plr.lab_type = 'DOC';
-END //
-
-
-CREATE PROCEDURE getObrDate_plr(IN in_lab_no INT(10), IN in_lab_type VARCHAR(3), OUT out_obr_date DATETIME)
-BEGIN
-IF in_lab_type = 'HL7' THEN
-  SET out_obr_date = (SELECT hl7.obr_date FROM hl7TextInfo hl7 WHERE hl7.lab_no = in_lab_no);
-ELSEIF in_lab_type = 'DOC' THEN
-  SET out_obr_date = (SELECT doc.observationdate FROM document doc WHERE doc.document_no = in_lab_no);
-ELSE
-  SET out_obr_date = NULL;
-END IF;
 END //
 DELIMITER ;
