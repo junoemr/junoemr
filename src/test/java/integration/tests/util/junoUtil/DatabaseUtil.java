@@ -20,10 +20,27 @@
  * Victoria, British Columbia
  * Canada
  */
-package integration.tests.sql;
+package integration.tests.util.junoUtil;
 
-public class SqlFiles
+import org.oscarehr.common.dao.utils.AuthUtils;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.util.SpringUtils;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+
+public class DatabaseUtil
 {
-	public static final String SQL_BASE_PATH = System.getProperty("basedir") + "/src/test/java/integration/tests/sql/";
-	public static final String EFORM_ADD_TRAVLE_FORM_V4 = SQL_BASE_PATH + "add_eform_travel_form_v4.sql";
+	public static Demographic createTestDemographic()
+	{
+		DemographicService demoService = (DemographicService)SpringUtils.getBean("demographic.service.DemographicService");
+		Demographic demo = new Demographic();
+		demo.setDateOfBirth(LocalDate.now());
+		demo.setFirstName("test");
+		demo.setLastName("test");
+		demo.setSex("F");
+		return demoService.addNewDemographicRecord(AuthUtils.TEST_PROVIDER_ID, demo, null, new ArrayList<DemographicExt>());
+	}
 }

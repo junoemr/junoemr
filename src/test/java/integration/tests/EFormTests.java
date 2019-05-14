@@ -24,6 +24,7 @@ package integration.tests;
 
 import integration.tests.sql.SqlFiles;
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
@@ -53,7 +54,9 @@ public class EFormTests extends SeleniumTestBase
 				"casemgmt_note", "casemgmt_cpp", "casemgmt_issue", "casemgmt_note_ext", "casemgmt_note_link", "casemgmt_note_lock",
 				"casemgmt_tmpsave", "validations", "measurementType", "eChart", "eform", "eform_values");
 
-		SchemaUtils.loadFileIntoMySQL(SqlFiles.DEMOGRAPHIC_ADD);
+		loadSpringBeans();
+		DatabaseUtil.createTestDemographic();
+
 		SchemaUtils.loadFileIntoMySQL(SqlFiles.EFORM_ADD_TRAVLE_FORM_V4);
 	}
 
