@@ -125,14 +125,14 @@ public class ScheduleWs extends AbstractWs {
 
 	@SkipContentLoggingOutbound
 	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots (
-			String providerNo, Calendar date, String[] appointmentTypes, String demographicNo, String jsonRules)
+			String providerNo, Calendar startDate, Calendar endDate, String[] appointmentTypes, String demographicNo, String jsonRules)
 	{
 		HashMap<String, DayTimeSlots[]> scheduleTransfer = new HashMap<>();
 
 		try
 		{
 			List<BookingRule> bookingRules = BookingRuleFactory.createBookingRuleList(Integer.valueOf(demographicNo), jsonRules);
-			ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(providerNo, date, appointmentTypes, demographicNo, bookingRules);
+			ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(providerNo, startDate, endDate, appointmentTypes, demographicNo, bookingRules);
 			scheduleTransfer = providerScheduleTransfer.toTransfer();
 		}
 		catch(ParseException e)

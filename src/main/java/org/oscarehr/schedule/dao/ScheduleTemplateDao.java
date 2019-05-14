@@ -245,16 +245,19 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
 	public ProviderScheduleTransfer getValidProviderScheduleSlots(
-			String providerNo, Calendar calendarDate, String[] appointmentTypesArr, String demographicNo, List<BookingRule> bookingRules)
+			String providerNo, Calendar startDate, Calendar endDate, String[] appointmentTypesArr, String demographicNo, List<BookingRule> bookingRules)
 	{
-		int year = calendarDate.get(Calendar.YEAR);
-		int month = calendarDate.get(Calendar.MONTH) + 1; // Calendar month is 0 based indexing...
+		LocalDate minDate = LocalDate.of(
+				startDate.get(Calendar.YEAR),
+				startDate.get(Calendar.MONTH) + 1,
+				startDate.get(Calendar.DAY_OF_MONTH)
+		);
 
-		int minMonthDay = 1;
-		int maxMonthDay = calendarDate.getActualMaximum(Calendar.DAY_OF_MONTH);
-
-		LocalDate minDate = LocalDate.of(year, month, minMonthDay);
-		LocalDate maxDate = LocalDate.of(year, month, maxMonthDay);
+		LocalDate maxDate = LocalDate.of(
+				endDate.get(Calendar.YEAR),
+				endDate.get(Calendar.MONTH) + 1,
+				endDate.get(Calendar.DAY_OF_MONTH)
+		);
 
 		List<String> appointmentTypesList = Arrays.asList(appointmentTypesArr);
 
@@ -374,8 +377,9 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 					dayTimeSlots.add(timeSlotEntry);
 					providerSchedule.put(scheduleDate, dayTimeSlots);
 
-					windowSlotStartTime = windowSlotStartTime.plusMinutes(SCHEDULE_SLOT_DURATION);
 				}
+
+				windowSlotStartTime = windowSlotStartTime.plusMinutes(SCHEDULE_SLOT_DURATION);
 			}
 		}
 
