@@ -21,12 +21,14 @@
  * Canada
  */
 
-package org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules;
+package org.oscarehr.ws.external.soap.v1.transfer.schedule.cancelrules;
 
 
 import org.json.simple.JSONObject;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.schedule.model.ScheduleSearchResult;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleType;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDateTime;
@@ -35,14 +37,14 @@ import java.time.temporal.ChronoUnit;
 /**
  * Appointments cannot be cancelled within {amount} calendar {timePeriod(s)} of the current time
  */
-public class CancelCutoffRule extends BookingRule
+public class CancelCutoffRule extends CancelRule
 {
     private Integer amount;
     private ChronoUnit timePeriod;
 
     CancelCutoffRule (String jsonType, Integer amount, ChronoUnit timePeriod)
     {
-        super(BookingRuleType.CANCEL_CUTOFF, jsonType);
+        super(jsonType);
         this.amount = amount;
         this.timePeriod = timePeriod;
     }

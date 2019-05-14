@@ -27,6 +27,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.cancelrules.CancelCutoffRule;
 
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -38,8 +39,6 @@ public class BookingRuleFactory
     private static final String PERIOD_TYPE_CUTOFF_DAY = "cuttoff_day";
     private static final String PERIOD_TYPE_BLACKOUT_NOW_UNTIL_HOUR = "blackout_now_until_hour";
     private static final String PERIOD_TYPE_BLACKOUT_NOW_UNTIL_DAY = "blackout_now_until_day";
-    private static final String PERIOD_TYPE_CANCEL_HOUR = "cancel_hour";
-    private static final String PERIOD_TYPE_CANCEL_DAY = "cancel_day";
     private static final String PERIOD_TYPE_HOUR = "hour";
     private static final String PERIOD_TYPE_DAY = "day";
     private static final String PERIOD_TYPE_WEEK = "week";
@@ -82,10 +81,6 @@ public class BookingRuleFactory
             case (PERIOD_TYPE_CUTOFF_DAY):
                 bookingRule = createCutoffRule(jsonRule);
                 break;
-            case(PERIOD_TYPE_CANCEL_HOUR):
-            case(PERIOD_TYPE_CANCEL_DAY):
-                bookingRule = createCancelRule(jsonRule);
-                break;
             case (PERIOD_TYPE_HOUR):
             case (PERIOD_TYPE_DAY):
             case (PERIOD_TYPE_WEEK):
@@ -115,21 +110,6 @@ public class BookingRuleFactory
         if (bookingAmount != null && timeAmount != null && timeUnit != null)
         {
             return new MultipleBookingRule(name, demographicNo, bookingAmount, timeAmount, timeUnit);
-        }
-
-        return null;
-    }
-
-    private static CancelCutoffRule createCancelRule(JSONObject jsonRule)
-    {
-        Integer amount = jsonRule.get("period_of_time") != null ? ((Long) jsonRule.get("period_of_time")).intValue() : null;
-        String name = (String) jsonRule.get("type");
-        ChronoUnit timeUnit = getChronoUnit(name);
-
-
-        if (amount != null && timeUnit != null)
-        {
-            return new CancelCutoffRule(name, amount, timeUnit);
         }
 
         return null;
@@ -196,11 +176,9 @@ public class BookingRuleFactory
         {
             case (PERIOD_TYPE_BLACKOUT_NOW_UNTIL_DAY):
             case (PERIOD_TYPE_CUTOFF_DAY):
-            case (PERIOD_TYPE_CANCEL_DAY):
             case (PERIOD_TYPE_DAY):
                 return ChronoUnit.DAYS;
             case (PERIOD_TYPE_BLACKOUT_NOW_UNTIL_HOUR):
-            case (PERIOD_TYPE_CANCEL_HOUR):
             case (PERIOD_TYPE_HOUR):
                 return ChronoUnit.HOURS;
             case (PERIOD_TYPE_WEEK):

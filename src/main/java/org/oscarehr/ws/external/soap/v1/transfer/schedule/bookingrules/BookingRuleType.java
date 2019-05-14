@@ -32,7 +32,7 @@ public enum BookingRuleType
      * a large number of entries.  This helps reduce the search space for rules defined at the end of the list, which
      * may be more expensive to validate.
      */
-    CANCEL_CUTOFF,
+
     BOOKING_PRIMARY_PROVIDER_ONLY,
     BOOKING_CUTOFF,
     BOOKING_BLACKOUT,
