@@ -54,7 +54,7 @@ WHERE plr.lab_no = in_doc_no
   AND plr.lab_type = 'DOC';
 END //
 
-CREATE PROCEDURE getObrDate_plr(IN in_lab_no INT(10), IN in_lab_type VARCHAR(3), OUT out_obr_date DATPropETIME)
+CREATE PROCEDURE getObrDate_plr(IN in_lab_no INT(10), IN in_lab_type VARCHAR(3), OUT out_obr_date DATETIME)
 SQL SECURITY INVOKER
 BEGIN
 IF in_lab_type = 'HL7' THEN
@@ -64,6 +64,7 @@ ELSEIF in_lab_type = 'DOC' THEN
 ELSE
   SET out_obr_date = NULL;
 END IF;
+
 END //
 
 -- Can't update a table in a procedure if it is the same one called by the invoking trigger.
