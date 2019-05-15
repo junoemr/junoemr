@@ -1321,7 +1321,7 @@ private long getAppointmentRowSpan(
 								.getResourceScheduleByProvider(mygroupno, selectedDate,
 									selectedSite, showForSure);
 						}
-						else if(".default".equals(mygroupno))
+						else if(("."+ResourceBundle.getBundle("oscarResources", request.getLocale()).getString("global.default")).equals(mygroupno)) // .<bean:message key="global.default"/>
 						{
 							// Always show the schedule because it will
 							resourceScheduleDTO = scheduleService
