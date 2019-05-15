@@ -95,15 +95,15 @@ public class MultipleBookingRule extends BookingRule
         // We apply -1 to the timePeriodAmount here because we count starting on on our current timePeriod.
         // For example:  Two weeks ahead means this week (week 1) and next week (week 2).
 
-        LocalDateTime resultindowStart = ConversionUtils.truncateLocalDateTime(result.dateTime, timePeriod)
+        LocalDateTime resultWindowStart = ConversionUtils.truncateLocalDateTime(result.dateTime, timePeriod)
                                                     .minus(timePeriodAmount - 1, timePeriod);
 
-        if (this.cacheWindow == null || !resultindowStart.equals(this.cacheWindow))
+        if (this.cacheWindow == null || !resultWindowStart.equals(this.cacheWindow))
         {
             LocalDateTime resultWindowEnd = ConversionUtils.truncateLocalDateTime(result.dateTime, timePeriod)
                                                            .plus(timePeriodAmount - 1, timePeriod);
 
-            cacheAppointmentCounts(resultindowStart, resultWindowEnd);
+            cacheAppointmentCounts(resultWindowStart, resultWindowEnd);
         }
 
         return appointmentCountCache >= bookingAmount;
