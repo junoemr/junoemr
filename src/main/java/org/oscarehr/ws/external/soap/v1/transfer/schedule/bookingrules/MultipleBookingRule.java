@@ -51,14 +51,15 @@ public class MultipleBookingRule extends BookingRule
         each potential date is within the same calendar timePeriod unit (defined by .truncateTo(timePeriod)).
 
         For example: If the timePeriod is weeks, the number of existing appointments relevant to the multi-booking rule
-        will not change as long as the each of the queries are within the same calendar week.  This week is a window
-        which can be cached.
+        will not change as long as the each of the possible slots falls with within the same calendar week.  Therefore
+        the number of appointments can be cached and reused for any slots within the same period.
 
         For an existing window, the existing appointment count is defined by the following boundaries:
-        - Low End:  WindowStart - (timePeriodAmount * timePeriod -1)
-        - High End:  WindowStart + (timePeriodAmount * timePeriod -1)
-        The -1 arises because include the week of the window.  A two week period encompasses the time from the week
-        before the window, to the week after the window.
+        ** Window start: truncateToTimePeriod - (timePeriodAmount - 1 * timePeriod)
+        ** Window end: truncateToTimePeriod + (timePeriodAmount - 1 * timePeriod)
+        The -1 arises because include the week of the window is included in the calculation. In the past,
+        the two week window is the current week and the week before it.  In the future, the two
+        week window is the current week and the week after it.
      */
     private Integer appointmentCountCache;
     private LocalDateTime cacheWindow;
@@ -91,12 +92,18 @@ public class MultipleBookingRule extends BookingRule
     @Override
     public Boolean isViolated(ScheduleSearchResult result)
     {
-        LocalDateTime resultWindow = ConversionUtils.truncateLocalDateTime(result.dateTime, timePeriod)
-                                                    .minus(timePeriodAmount, timePeriod);
+        // We apply -1 to the timePeriodAmount here because we count starting on on our current timePeriod.
+        // For example:  Two weeks ahead means this week (week 1) and next week (week 2).
 
-        if (this.cacheWindow == null || resultWindow != this.cacheWindow)
+        LocalDateTime resultindowStart = ConversionUtils.truncateLocalDateTime(result.dateTime, timePeriod)
+                                                    .minus(timePeriodAmount - 1, timePeriod);
+
+        if (this.cacheWindow == null || !resultindowStart.equals(this.cacheWindow))
         {
-            cacheAppointmentCounts(resultWindow);
+            LocalDateTime resultWindowEnd = ConversionUtils.truncateLocalDateTime(result.dateTime, timePeriod)
+                                                           .plus(timePeriodAmount - 1, timePeriod);
+
+            cacheAppointmentCounts(resultindowStart, resultWindowEnd);
         }
 
         return appointmentCountCache >= bookingAmount;
@@ -117,15 +124,12 @@ public class MultipleBookingRule extends BookingRule
      *
      * @param startOfCache Start of the time period to cache
      */
-    private void cacheAppointmentCounts(LocalDateTime startOfCache)
+    private void cacheAppointmentCounts(LocalDateTime startOfCache, LocalDateTime endOfCache)
     {
-        LocalDateTime endOfCache = startOfCache.plus(2 * timePeriodAmount - 1, this.timePeriod);
-
         OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
         List<Appointment> appointments = appointmentDao.findByDateRangeAndDemographic(startOfCache.toLocalDate(),
                                                                                       endOfCache.toLocalDate(),
                                                                                       this.demographicNo);
-
         this.cacheWindow = startOfCache;
         this.appointmentCountCache = appointments.size();
     }
