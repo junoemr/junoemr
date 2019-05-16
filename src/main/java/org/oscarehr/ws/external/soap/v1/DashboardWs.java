@@ -23,7 +23,6 @@
 package org.oscarehr.ws.external.soap.v1;
 
 import org.apache.cxf.annotations.GZIP;
-import org.hibernate.exception.ConstraintViolationException;
 import org.oscarehr.dashboard.dao.BillingMasterClinicaidDao;
 import org.oscarehr.dashboard.model.BillingMasterClinicaid;
 import org.oscarehr.demographic.dao.DemographicDao;
@@ -36,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.jws.WebService;
-import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.List;
 
