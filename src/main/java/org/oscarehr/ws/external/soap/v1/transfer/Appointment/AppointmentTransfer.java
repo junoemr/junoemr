@@ -23,7 +23,7 @@
  */
 
 
-package org.oscarehr.ws.external.soap.v1.transfer;
+package org.oscarehr.ws.external.soap.v1.transfer.Appointment;
 
 import java.util.Arrays;
 import java.util.Calendar;

@@ -24,10 +24,12 @@
 
 package org.oscarehr.managers;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang.time.DateUtils;
@@ -203,6 +205,16 @@ public class ScheduleManager {
 		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.getAppointmentsForPatient", "appointments for demographicId=" + demographicId + ", startIndex=" + startIndex + ", itemsToReturn=" + itemsToReturn);
 
 		return (results);
+	}
+
+	public List<Appointment> getPatientAppointmentsWithProvider(String demographicNo, String providerNo, LocalDate minDate, LocalDate maxDate)
+	{
+		return oscarAppointmentDao.findPatientAppointmentsWithProvider(demographicNo, providerNo, minDate, maxDate);
+	}
+
+	public Map<LocalDate, List<Appointment>> getProviderAppointmentsForMonth(String providerNo, LocalDate minDate, LocalDate maxDate)
+	{
+		return oscarAppointmentDao.findProviderAppointmentsForMonth(providerNo, minDate, maxDate);
 	}
 
 	public List<Appointment> getAppointmentsByProgramProviderDemographicDate(LoggedInInfo loggedInInfo, Integer programId, String providerNo, Integer demographicId, Calendar updatedAfterThisDateExclusive, int itemsToReturn) {

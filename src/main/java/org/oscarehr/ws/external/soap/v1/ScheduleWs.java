@@ -27,6 +27,7 @@ package org.oscarehr.ws.external.soap.v1;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.log4j.Logger;
+import org.json.simple.parser.ParseException;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.AppointmentArchive;
@@ -34,21 +35,30 @@ import org.oscarehr.common.model.AppointmentType;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.managers.DayWorkSchedule;
 import org.oscarehr.managers.ScheduleManager;
+import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.external.soap.v1.transfer.AppointmentArchiveTransfer;
-import org.oscarehr.ws.external.soap.v1.transfer.AppointmentTransfer;
-import org.oscarehr.ws.external.soap.v1.transfer.AppointmentTypeTransfer;
+import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
+import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentArchiveTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentTypeTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.Appointment.ValidatedAppointmentBookingTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.DayWorkScheduleTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ScheduleTemplateCodeTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.jws.WebService;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 
 @WebService
@@ -59,6 +69,9 @@ public class ScheduleWs extends AbstractWs {
 	
 	@Autowired
 	private ScheduleManager scheduleManager;
+
+	@Autowired
+	private ScheduleTemplateDao scheduleTemplateDao;
 
 	public ScheduleTemplateCodeTransfer[] getScheduleTemplateCodes() {
 		List<ScheduleTemplateCode> scheduleTemplateCodes = scheduleManager.getScheduleTemplateCodes();
@@ -108,6 +121,51 @@ public class ScheduleWs extends AbstractWs {
 		DayWorkSchedule dayWorkSchedule = scheduleManager.getDayWorkSchedule(providerNo, date);
 		if (dayWorkSchedule == null) return (null);
 		else return (DayWorkScheduleTransfer.toTransfer(dayWorkSchedule));
+	}
+
+	@SkipContentLoggingOutbound
+	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots (
+			String providerNo, Calendar startDate, Calendar endDate, String[] appointmentTypes, String demographicNo, String jsonRules)
+	{
+		HashMap<String, DayTimeSlots[]> scheduleTransfer = new HashMap<>();
+
+		try
+		{
+			List<BookingRule> bookingRules = BookingRuleFactory.createBookingRuleList(Integer.valueOf(demographicNo), jsonRules);
+			ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(providerNo, startDate, endDate, appointmentTypes, demographicNo, bookingRules);
+			scheduleTransfer = providerScheduleTransfer.toTransfer();
+		}
+		catch(ParseException e)
+		{
+			MiscUtils.getLogger().error("Exception: " + e);
+		}
+
+		return scheduleTransfer;
+	}
+
+	public ValidatedAppointmentBookingTransfer addAppointmentValidated(AppointmentTransfer appointmentTransfer, String jsonRules) throws ParseException
+	{
+		Appointment appointment = new Appointment();
+		appointmentTransfer.copyTo(appointment);
+
+		List<BookingRule> bookingRules = BookingRuleFactory.createBookingRuleList(appointment.getDemographicNo(), jsonRules);
+		List<BookingRule> violatedRules = new ArrayList<>();
+		for (BookingRule rule : bookingRules)
+		{
+			if (rule.isViolated(appointment))
+			{
+				violatedRules.add(rule);
+			}
+		}
+
+		if (violatedRules.isEmpty())
+		{
+			scheduleManager.addAppointment(getLoggedInInfo(), getLoggedInSecurity(), appointment);
+		}
+
+		AppointmentTransfer apptTransfer = AppointmentTransfer.toTransfer(appointment, false);
+		ValidatedAppointmentBookingTransfer response = new ValidatedAppointmentBookingTransfer(apptTransfer, violatedRules);
+		return response;
 	}
 
 	public AppointmentTypeTransfer[] getAppointmentTypes() {
