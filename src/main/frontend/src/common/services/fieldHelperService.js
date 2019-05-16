@@ -45,7 +45,6 @@ angular.module('Common.Services').factory(
 
 			helper.resolve_template = function(attributes, base_default_template)
 			{
-				console.info(attributes, attributes['caTemplate']);
 				// if tag has a ca-template on it, add it to the template path
 				if(Juno.Common.Util.exists(attributes['caTemplate']))
 				{

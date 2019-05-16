@@ -55,6 +55,11 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	controller.selectedProvider = null;
 	controller.selectedResource = null;
 
+	controller.amSelected = false;
+
+	controller.appointmentTypeList = ["type 1", "type 2"];
+	controller.reasonTypeList = ["type 1", "type 2"];
+
 	$scope.label = label;
 	$scope.editMode = editMode;
 
@@ -69,7 +74,11 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		endDate: null,
 		endTime: null,
 		reason: null,
-		notes: null
+		reasonType: null,
+		notes: null,
+		type: null,
+		duration: null,
+		doNotBook: null,
 	};
 
 	$scope.timeInterval = data.timeInterval;

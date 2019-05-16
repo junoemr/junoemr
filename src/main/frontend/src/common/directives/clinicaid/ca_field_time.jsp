@@ -6,7 +6,7 @@
 	<label for="input-{{name}}"
 				 class="{{label_size}} control-label"
 				 title="{{hint}}">
-		{{title}}<span ng-if="!hide_label_colon">:</span>
+		{{title}}
 	</label>
 
 	<div class="{{input_size}}">

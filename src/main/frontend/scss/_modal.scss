@@ -1,43 +1,70 @@
 
-@media (min-width: $screen-md-min) {
-	.modal-wide {
-		width: 1200px;
+//@media (min-width: $screen-md-min) {
+//	.modal-wide {
+//		width: 1200px;
+//	}
+//}
+//
+//@media (min-width: 1000px) and (max-width: $screen-md-min)  {
+//	.modal-wide {
+//		width: 900px;
+//	}
+//}
+//
+//@media (min-width: 600px)  and (max-width: 1000px){
+//	.modal-wide {
+//		width: 654px;
+//	}
+//}
+
+//.modal-header {
+//	background-color: $color-bg-modal-header;
+//
+//	.close {
+//		margin-top: 2px;
+//	}
+//
+//	.form-inline .form-control {
+//		margin-right: 15px;
+//	}
+//}
+
+//.modal-content {
+//	border-radius: 0;
+//}
+
+//.modal-title {
+//	color: white;
+//	//@include text-shadow(0 0 0.5px #888);
+//}
+
+//.close {
+//	opacity: 0.3;
+//}
+
+.juno-modal {
+	.modal-dialog {
+		width: 960px;
+		height: 552px;
+		.modal-content {
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+
+			-webkit-border-radius: 16px !important;
+			-moz-border-radius: 16px !important;
+			border-radius: 16px !important;
+			background: linear-gradient(-45deg, $white 50%, transparent 0) no-repeat 100% 100%,
+			linear-gradient(247deg, #5c8be8, $primary 30%, $primary 64%, #355085) no-repeat;
+
+			padding: 0 16px 16px 16px;
+			.modal-header {
+				padding: 10px 0;
+			}
+
+			.form-control-static {
+				min-height: 10px;
+			}
+		}
 	}
-}
-
-@media (min-width: 1000px) and (max-width: $screen-md-min)  {
-	.modal-wide {
-		width: 900px;
-	}
-}
-
-@media (min-width: 600px)  and (max-width: 1000px){
-	.modal-wide {
-		width: 654px;
-	}
-}
-
-.modal-header {
-	background-color: $color-bg-modal-header;
-
-	.close {
-		margin-top: 2px;
-	}
-
-	.form-inline .form-control {
-		margin-right: 15px;
-	}
-}
-
-.modal-content {
-	border-radius: 0;
-}
-
-.modal-title {
-	color: white;
-	//@include text-shadow(0 0 0.5px #888);
-}
-
-.close {
-	opacity: 0.3;
 }

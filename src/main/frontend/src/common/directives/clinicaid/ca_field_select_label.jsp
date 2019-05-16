@@ -5,7 +5,7 @@
 
 	<label for="input-{{name}}"
 				 class="{{label_size}} control-label">
-		{{title}}:
+		{{title}}
 	</label>
 
 	<div class="{{input_size}}">

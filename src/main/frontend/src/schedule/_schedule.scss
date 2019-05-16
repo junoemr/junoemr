@@ -8,19 +8,6 @@
 	white-space: nowrap;
 }
 
-.flexV {
-	display: flex;
-	flex-direction: column;
-}
-.flexH {
-	display: flex;
-	flex-direction: row;
-}
-.flexGrow {
-	flex-grow: 1;
-}
-
-
 .calendar-loading
 {
 	position: absolute;
@@ -200,6 +187,18 @@
 				}
 			}
 		}
+
+		.flexV {
+			display: flex;
+			flex-direction: column;
+		}
+		.flexH {
+			display: flex;
+			flex-direction: row;
+		}
+		.flexGrow {
+			flex-grow: 1;
+		}
 	}
 }
 
@@ -217,66 +216,43 @@
 	}
 }
 
-/* TODO move to modal scss file for general use.*/
-.modal-large {
-	.modal-dialog {
-		width: 960px;
-		height: 552px;
-		.modal-content {
-			height: 100%;
-			display: flex;
-			flex-direction: column;
-
-			-webkit-border-radius: 16px !important;
-			-moz-border-radius: 16px !important;
-			border-radius: 16px !important;
-			background: linear-gradient(-45deg, $white 50%, transparent 0) no-repeat 100% 100%,
-			linear-gradient(247deg, #5c8be8, $primary 30%, $primary 64%, #355085) no-repeat;
-
-			padding: 0 16px 16px 16px;
-			.modal-header {
-				padding: 10px 0;
-			}
-		}
-	}
-}
-
 /* schedule specific modal styling */
 .schedule-modal {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+
 	.modal-header {
+		display: flex;
 		align-items: center;
+		flex-direction: row;
+		justify-content: space-between;
 		.modal-title {
-			color: $white;
-			font-family: "Arial", "Helvetica", sans-serif;
-			font-size: 20px;
-			font-weight: bold;
-			font-style: normal;
-			align-items: center;
+			display: flex;
+			flex-grow: 1;
+			flex-direction: row;
+			h3 {
+				color: $white;
+				font-family: "Arial", "Helvetica", sans-serif;
+				font-size: 20px;
+				font-weight: bold;
+				font-style: normal;
+			}
 		}
 		.modal-ctl-buttons {
 			width: 80px;
 			padding: 6px;
 			align-items: center;
 			justify-content: space-between;
+			display: flex;
 		}
-
 		.icon-modal-ctl {
 			width: 16px;
 			height: 16px;
 		}
-		.icon-modal-close {
-			background-image: url($icon-modal-close);
-		}
-		.icon-modal-min {
-			background-image: url($icon-modal-min);
-		}
-		.icon-modal-max {
-			background-image: url($icon-modal-max);
-		}
 		.icon-modal-add-appt {
 			width: 48px;
 			height: 48px;
-			background-image: url($icon-add-appt);
 		}
 	}
 
@@ -286,8 +262,10 @@
 		padding: 0;
 		flex-grow: 1;
 
+		$tabs-height: 42px;
 		.tabs-heading {
 			background-color: $grey-08;
+			height: $tabs-height;
 		}
 		.nav-tabs {
 			border: 0;
@@ -314,54 +292,20 @@
 		}
 		.tab-pane {
 			padding: 16px;
-		}
 
-		.flex-row {
+			.tab-bar-inputs {
+				position: absolute;
+				right: 0;
+				top: 0;
+				height: $tabs-height;
+				width: 50%;
+			}
+		}
+		.form-group {
+			margin-bottom: 10px;
 			display: flex;
-			flex-direction: row;
 			align-items: center;
-			justify-content: flex-start;
-			padding: 4px 0;
-			&.content-center {
-				justify-content: center;
-			}
-			&.content-end {
-				justify-content: flex-end;
-			}
-			&.label-top {
-				align-items: flex-start;
-			}
-			&.label-center {
-				align-items: center;
-			}
-			.flex-row-label {
-				width: 80px;
-				padding: 0 5px;
-				margin: 0;
-				text-align: right;
-				&.sml {
-					width: 35px;
-				}
-				&.med {
-					width: 70px;
-				}
-			}
-			.flex-row-content {
-				text-align: left;
-				flex-grow: 1;
-			}
-			.juno-checkbox {
-				margin: 6px;
-			}
-			select, input {
-				border-radius: 8px;
-				border: solid 1px $grey-07;
-				background-color: $white;
-				padding: 8px;
-				&.sml {
-					width: 16px;
-				}
-			}
+
 			label {
 				font-family: "Arial", "Helvetica", sans-serif;
 				font-size: 12px;
@@ -372,26 +316,139 @@
 				letter-spacing: normal;
 				text-align: right;
 				color: $grey-05;
+				padding-top: 3px;
+				padding-bottom: 3px;
+			}
+			select, input, textarea {
+				border-radius: 8px;
+				border: solid 1px $grey-07;
+				background-color: $white;
+				padding: 8px;
+
+				font-family: "Arial", "Helvetica", sans-serif;
+				font-size: 13px;
+				font-weight: normal;
+				font-style: normal;
+				font-stretch: normal;
+				line-height: normal;
+				letter-spacing: normal;
+				color: $grey-04;
+			}
+			&.label-top {
+				align-items: flex-start;
+			}
+
+			//.flex-row {
+			//	display: flex;
+			//	flex-direction: row;
+			//	align-items: center;
+			//	justify-content: flex-start;
+			//	padding: 4px 0;
+			//	&.content-center {
+			//		justify-content: center;
+			//	}
+			//	&.content-end {
+			//		justify-content: flex-end;
+			//	}
+			//	&.label-top {
+			//		align-items: flex-start;
+			//	}
+			//	&.label-center {
+			//		align-items: center;
+			//	}
+			//	.flex-row-label {
+			//		width: 80px;
+			//		padding: 0 5px;
+			//		margin: 0;
+			//		text-align: right;
+			//		&.sml {
+			//			width: 35px;
+			//		}
+			//		&.med {
+			//			width: 70px;
+			//		}
+			//	}
+			//	.flex-row-content {
+			//		text-align: left;
+			//		flex-grow: 1;
+			//	}
+			//	.juno-checkbox {
+			//		margin: 6px;
+			//	}
+			//	select, input {
+			//		border-radius: 8px;
+			//		border: solid 1px $grey-07;
+			//		background-color: $white;
+			//		padding: 8px;
+			//		&.sml {
+			//			width: 16px;
+			//		}
+			//	}
+			//	label {
+			//		font-family: "Arial", "Helvetica", sans-serif;
+			//		font-size: 12px;
+			//		font-weight: normal;
+			//		font-style: normal;
+			//		font-stretch: normal;
+			//		line-height: normal;
+			//		letter-spacing: normal;
+			//		text-align: right;
+			//		color: $grey-05;
+			//	}
+			//}
+			//.display-frame-lg {
+			//	height: 144px;
+			//	margin-bottom: 12px;
+			//}
+			.demographic-info-frame {
+				height: 144px;
+				margin-bottom: 12px;
+				background-color: $grey-08;
+				border: solid 1px $grey-07;
+				border-radius: 8px;
+
+				.form-group {
+					margin: 0;
+
+					label {
+						font-family: "Arial", "Helvetica", sans-serif;
+						font-size: 11px;
+						font-weight: normal;
+						font-style: normal;
+						font-stretch: normal;
+						line-height: normal;
+						letter-spacing: normal;
+						text-align: right;
+						color: $grey-05;
+					}
+					span {
+						font-family: "Arial", "Helvetica", sans-serif;
+						font-size: 11px;
+						font-weight: normal;
+						font-style: normal;
+						font-stretch: normal;
+						line-height: normal;
+						letter-spacing: normal;
+						color: $grey-04;
+
+						//padding-bottom: 2px;
+						//align-self: center;
+					}
+				}
 			}
 		}
-		.display-frame-lg {
-			height: 144px;
-			margin-bottom: 12px;
-		}
-		.info-frame {
-			background-color: $grey-08;
-			border: solid 1px $grey-07;
-			border-radius: 8px;
+		.alert-container {
+			height: 40px;
 		}
 		ca-info-messages {
 			height: 40px;
 		}
 
-		.event-color {
-			width: 20px;
-			height: 20px;
-			display: inline-block;
-		}
+		//.event-color {
+		//	width: 20px;
+		//	height: 20px;
+		//	display: inline-block;
+		//}
 
 		.bottom-buttons {
 			.btn {
@@ -415,80 +472,80 @@
 			}
 		}
 
-		&.legend {
-			.event-color {
-				float: left;
-				margin-right: 15px;
-			}
-		}
-
-		&.event {
-
-			.schedule-header {
-				@include clearfix;
-				border-bottom: 1px solid #CCC;
-				padding-bottom: 4px;
-				margin-bottom: 5px;
-
-				h4.schedule-title {
-					font-size: 1.571em;
-					margin: 0;
-				}
-
-				button {
-					margin-left: 4px;
-				}
-				.label {
-					margin-left: 4px;
-				}
-			}
-
-			.event-color {
-				position: relative;
-				top: 5px;
-			}
-
-			.time-wrapper {
-				padding-left: 0
-			}
-
-			.availability {
-				@include clearfix;
-				margin-top: 5px;
-
-				.color {
-					width: 30px;
-				}
-				.info {
-					width: 230px;
-				}
-				.availability-detail {
-					display: inline-block;
-				}
-			}
-
-			.patient-image {
-
-				img {
-					width: 120px;
-					height: 120px;
-				}
-
-				.upload-text {
-					position: absolute;
-					bottom: 0;
-					left: 33px;
-				}
-			}
-
-			.patient-health-number {
-				margin-right: 10px;
-			}
-
-			.modal-body .bootstrap-timepicker button {
-				height: 34px;
-			}
-		}
+		//&.legend {
+		//	.event-color {
+		//		float: left;
+		//		margin-right: 15px;
+		//	}
+		//}
+		//
+		//&.event {
+		//
+		//	.schedule-header {
+		//		@include clearfix;
+		//		border-bottom: 1px solid #CCC;
+		//		padding-bottom: 4px;
+		//		margin-bottom: 5px;
+		//
+		//		h4.schedule-title {
+		//			font-size: 1.571em;
+		//			margin: 0;
+		//		}
+		//
+		//		button {
+		//			margin-left: 4px;
+		//		}
+		//		.label {
+		//			margin-left: 4px;
+		//		}
+		//	}
+		//
+		//	.event-color {
+		//		position: relative;
+		//		top: 5px;
+		//	}
+		//
+		//	.time-wrapper {
+		//		padding-left: 0
+		//	}
+		//
+		//	.availability {
+		//		@include clearfix;
+		//		margin-top: 5px;
+		//
+		//		.color {
+		//			width: 30px;
+		//		}
+		//		.info {
+		//			width: 230px;
+		//		}
+		//		.availability-detail {
+		//			display: inline-block;
+		//		}
+		//	}
+		//
+		//	.patient-image {
+		//
+		//		img {
+		//			width: 120px;
+		//			height: 120px;
+		//		}
+		//
+		//		.upload-text {
+		//			position: absolute;
+		//			bottom: 0;
+		//			left: 33px;
+		//		}
+		//	}
+		//
+		//	.patient-health-number {
+		//		margin-right: 10px;
+		//	}
+		//
+		//	.modal-body .bootstrap-timepicker button {
+		//		height: 34px;
+		//	}
+		//}
 	}
 }
 

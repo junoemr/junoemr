@@ -54,6 +54,20 @@ $icon-status-11: $images-appt-status + 'icon-48-1.svg';
 	background-image: url($images-root + 'cal-monthblue.svg');
 }
 
+/* modal images */
+.icon-modal-close {
+	background-image: url($icon-modal-close);
+}
+.icon-modal-min {
+	background-image: url($icon-modal-min);
+}
+.icon-modal-max {
+	background-image: url($icon-modal-max);
+}
+.icon-modal-add-appt {
+	background-image: url($icon-add-appt);
+}
+
 
 /* appointment status icons */
 .icon-status-starbill {

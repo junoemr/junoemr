@@ -1107,7 +1107,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						keyBinding: [function() {return {bindKeyGlobal: function(){}}}],
 						focus: [function() {return focusService}],
 					},
-					windowClass: "modal-large schedule-modal",
+					windowClass: "juno-modal",
 				});
 
 				$scope.dialog.result.catch(function(res) {
@@ -1222,7 +1222,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						keyBinding: [function() {return {bindKeyGlobal: function(){}}}],
 						focus: [function() {return focusService}],
 					},
-					windowClass: "modal-large schedule-modal",
+					windowClass: "juno-modal",
 				});
 
 				$scope.dialog.result.catch(function(res) {
