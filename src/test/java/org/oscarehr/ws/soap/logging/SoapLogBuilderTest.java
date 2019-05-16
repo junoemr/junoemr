@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.oscarehr.ws.common.annotation.LogHeaderInbound;
 import org.oscarehr.ws.common.annotation.MaskParameter;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
 import org.oscarehr.ws.external.soap.logging.SoapLogBuilder;
@@ -42,19 +43,35 @@ import static org.mockito.Mockito.when;
 
 public class SoapLogBuilderTest
 {
-    public void noAnnotationsStub() {}
+    public void noAnnotationsStub()
+    {
+    }
 
     @SkipContentLoggingInbound
-    public void skipContentLoggingStub() {}
+    public void skipContentLoggingStub()
+    {
+    }
+
+    @LogHeaderInbound
+    public void logHeaderInbound()
+    {
+
+    }
 
     @MaskParameter
-    public void maskParameterStubDefault(){}
+    public void maskParameterStubDefault()
+    {
+    }
 
-    @MaskParameter(fields ="mask_me")
-    public void maskParameterStubSpecifiedField() {}
+    @MaskParameter(fields = "mask_me")
+    public void maskParameterStubSpecifiedField()
+    {
+    }
 
-    @MaskParameter(fields ={"secret0", "secret1"})
-    public void maskParameterStubArray(){}
+    @MaskParameter(fields = {"secret0", "secret1"})
+    public void maskParameterStubArray()
+    {
+    }
 
     private static HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
     private SoapLogBuilder logBuilder;
@@ -83,9 +100,33 @@ public class SoapLogBuilderTest
     }
 
     @Test
+    public void testStripHeader()
+    {
+        String expectData = makeSoapMessage("color", "red", "shape", "square");
+        String testData = makeSoapMessage("color", "red", "shape", "square",true);
+
+        configureBuilder(testData, "noAnnotationsStub");
+        SoapServiceLog logEntry = logBuilder.buildSoapLog();
+
+        assertThat(logEntry.getPostData(), equalTo(expectData));
+    }
+
+    @Test
+    public void testLogHeaderInboundAnnotation()
+    {
+        String expectData = makeSoapMessage("color", "red", "shape", "square", true);
+        String testData = makeSoapMessage("color", "red", "shape", "square",true);
+
+        configureBuilder(testData, "logHeaderInbound");
+        SoapServiceLog logEntry = logBuilder.buildSoapLog();
+
+        assertThat(logEntry.getPostData(), equalTo(expectData));
+    }
+
+    @Test
     public void testDefaultSkipContentLogging()
     {
-        String testData = makeSoapMessage("lab provider", "medical labs ltd.", "labData", "really_long_string");
+        String testData = makeSoapMessage("lab_provider", "medical labs ltd.", "labData", "really_long_string");
         String expected = SkipContentLoggingInbound.SKIP_CONTENT_LOGGING_INBOUND;
 
         configureBuilder(testData, "skipContentLoggingStub");
@@ -228,16 +269,27 @@ public class SoapLogBuilderTest
      * @param arg0Value value of the first element
      * @param arg1 name of the second element
      * @param arg1Value value of the second element
+     * @param includeHeader if true include header in soap message
      * @return example SOAP login message containing the elements and values specified.
      */
-    private String makeSoapMessage(String arg0, String arg0Value, String arg1, String arg1Value)
+    private String makeSoapMessage(String arg0, String arg0Value, String arg1, String arg1Value, boolean includeHeader)
     {
-        final String soapMessage = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><env:Envelope xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:tns=\"http://v1.soap.external.ws.oscarehr.org/\" xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ins0=\"http://v1.soap.external.ws.oscarehr.org/\"><env:Body><ins0:login>%s%s</ins0:login></env:Body></env:Envelope>";
+        String soapMessage = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><env:Envelope xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:tns=\"http://v1.soap.external.ws.oscarehr.org/\" xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ins0=\"http://v1.soap.external.ws.oscarehr.org/\">";
+        if (includeHeader)
+        {
+            soapMessage += "<env:Header><wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\"><wsse:UsernameToken wsu:Id=\"UsernameToken-1\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"><wsse:Username>99</wsse:Username><wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">6144625613578</wsse:Password></wsse:UsernameToken></wsse:Security></env:Header>";
+        }
+        soapMessage += "<env:Body><ins0:login>%s%s</ins0:login></env:Body></env:Envelope>";
 
         String firstElement = "<" + arg0 + ">" + arg0Value + "</" + arg0 + ">";
         String secondElement = "<" + arg1 + ">" + arg1Value + "</" + arg1 + ">";
 
         return String.format(soapMessage, firstElement, secondElement);
+    }
+
+    private String makeSoapMessage(String arg0, String arg0Value, String arg1, String arg1Value)
+    {
+        return makeSoapMessage(arg0, arg0Value, arg1, arg1Value, false);
     }
 
     /**

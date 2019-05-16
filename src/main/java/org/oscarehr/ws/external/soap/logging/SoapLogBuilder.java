@@ -35,10 +35,7 @@ import org.oscarehr.ws.common.annotation.MaskParameter;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
 import org.oscarehr.ws.external.soap.logging.model.SoapServiceLog;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
+import org.xml.sax.*;
 import org.xml.sax.helpers.XMLFilterImpl;
 import org.xml.sax.helpers.XMLReaderFactory;
 
@@ -338,6 +335,15 @@ public class SoapLogBuilder
                     else if (!skipping)
                     {
                         super.startElement(uri, localName, qName, atts);
+                    }
+                }
+
+                @Override
+                public void startPrefixMapping(String prefix, String uri) throws SAXException
+                {
+                    if (!skipping)
+                    {
+                        super.startPrefixMapping(prefix, uri);
                     }
                 }
 
