@@ -23,19 +23,22 @@
     Ontario, Canada
 
 --%>
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="java.util.Set, java.util.List,org.oscarehr.util.LocaleUtils, java.util.Calendar, java.util.GregorianCalendar" %>
-<%@page import="org.oscarehr.common.dao.TicklerTextSuggestDao" %>
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
-<%@page import="org.oscarehr.common.model.Provider" %>
+<%@page import="org.oscarehr.common.dao.TicklerTextSuggestDao" %>
 <%@page import="org.oscarehr.common.model.Demographic" %>
+<%@page import="org.oscarehr.common.model.Provider" %>
+<%@page import="org.oscarehr.common.model.Tickler" %>
+<%@page import="org.oscarehr.common.model.TicklerComment" %>
 <%@page import="org.oscarehr.common.model.TicklerTextSuggest" %>
-<%@ page import="org.oscarehr.common.model.Tickler" %>
-<%@ page import="org.oscarehr.common.model.TicklerComment" %>
-<%@ page import="oscar.util.UtilDateUtilities" %>
-<%@ page import="org.oscarehr.util.LoggedInInfo" %>
-<%@ page import="org.oscarehr.managers.TicklerManager" %>
+<%@page import="org.oscarehr.managers.TicklerManager" %>
+<%@page import="org.oscarehr.util.LocaleUtils" %>
+<%@page import="org.oscarehr.util.LoggedInInfo" %>
+<%@page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Set" %>
 
 <%
 	TicklerManager ticklerManager = SpringUtils.getBean(TicklerManager.class);
@@ -45,7 +48,6 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
-
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 <%
 	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");

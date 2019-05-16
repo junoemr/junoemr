@@ -1,0 +1,13 @@
+	<input id="input-{{name}}"
+		   type="text"
+		   class="form-control input-group bootstrap-timepicker {{input_group_class}}"
+		   autocomplete="off"
+		   spellcheck="false"
+		   placeholder="00:00 AM"
+		   title="{{hint}}"
+		   ng-click="toggle_widget()"
+		   ng-focus="focus_fn()"
+		   ng-change="change_fn()"
+		   ng-disabled="disabled"
+		   ng-model="model"
+		   tabindex="{{tab_index}}"/>

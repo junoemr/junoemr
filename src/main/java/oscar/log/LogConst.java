@@ -43,6 +43,7 @@ public class LogConst {
 	public static final String ACTION_RESTORE = "restore";
 	public static final String ACTION_ACCESS = "access";
 	public static final String ACTION_UNLOCK = "unlock";
+	public static final String ACTION_ASSIGN = "assign";
 	public static final String DISCONTINUE = "discontinue";
 	public static final String ARCHIVE = "archive";
 	public static final String REPRINT = "reprint";
@@ -54,7 +55,7 @@ public class LogConst {
 	public static final String ANNOTATE = "annotate";
 	public static final String VERIFY = "verify";
 	public static final String REFUSED = "refused";
-	public static final String UNLINK = "unlink";
+	public static final String ACTION_UNLINK = "unlink";
 	public static final String ACTION_SENT = "sent";
 	public static final String ACTION_DOWNLOAD = "download";
 

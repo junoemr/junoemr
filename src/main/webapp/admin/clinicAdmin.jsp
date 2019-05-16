@@ -46,6 +46,7 @@
 %>
 
 <%@ page import="java.util.*,oscar.oscarReport.reportByTemplate.*" %>
+<%@ page import="org.oscarehr.rx.service.RxWatermarkService" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -53,6 +54,10 @@
     <head>
     <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
     <title>Clinic</title>
+    <link rel="stylesheet" type="text/css"
+          href="../css/bootstrap.css">
+    <link rel="stylesheet" type="text/css"
+          href="../css/bootstrap-toggle.min.css">
     <link rel="stylesheet" type="text/css"
           href="../share/css/OscarStandardLayout.css">
     <link rel="stylesheet" type="text/css" href="../share/css/OscarStandardLayout.css"/>
@@ -62,6 +67,13 @@
             src="../share/javascript/prototype.js"></script>
     <script type="text/javascript" language="JavaScript"
             src="../share/javascript/Oscar.js"></script>
+    <script type="text/javascript" language="JavaScript"
+            src="../js/jquery-1.9.1.js"></script>
+    <script type="text/javascript" language="JavaScript"
+            src="../js/bootstrap.js"></script>
+
+    <script type="text/javascript" language="JavaScript"
+            src="../js/bootstrap-toggle.min.js"></script>
 
 
     <div class="header">
@@ -178,7 +190,53 @@
             </fieldset>
         </div>
     </div>
+    <div id="clinic">
+        <div class="clinic-details">
+            <div class="clinic-info">
+                <fieldset>
+                    <legend>Prescription Watermark</legend>
+                    <form action="../RxWatermark.do" method="POST" enctype="multipart/form-data" id="watermark-form">
+                        <input id="watermark-upload-action" type="hidden" name="method" value="setWatermark">
+
+                        <div class="input-field flex-fill-row">
+                            <input id="watermark-toggle" <% if (RxWatermarkService.isWatermarkEnabled()) {%>checked<%}%> type="checkbox">
+                            <script>
+                                let toggle = $('#watermark-toggle');
+                                toggle.bootstrapToggle({
+                                    width: 50,
+                                    height: 20,
+                                    size: 'small'
+                                });
+                                toggle.change(function() {
+                                    let enabled = jQuery(this).prop('checked');
+                                    toggleWatermarkFields(enabled);
+                                    enableWatermark(enabled);
+                                })
+                            </script>
+                        </div>
+                        <div class="watermark-fields" id="watermark-input-form">
+                            <div class="watermark-input-field flex-fill-row">
+                                <div style="display:flex; flex-direction:row;">
+                                    <div style="margin-right: 5px;">
+                                        <img id="current-watermark-preview" src="../RxWatermark.do?method=getWatermark" width="100" height="100" style="background-color: #fefefe;" onerror="this.style.display='none';"/>
+                                    </div>
+                                    <div>
+                                        <label><b>Rx Prescription watermark</b></label>
+                                        <input id="watermark-file" type="file" name="watermarkFile" accept="image/png"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="watermark-input-field flex-fill-row" style="flex-direction: row; justify-content: center;">
+                                <input id="watermark-submit-upload" class="submit-button" style="display:flex; flex: 0 1 auto; margin-right: 10px" type="submit" value="Upload">
+                                <input id="watermark-submit-delete" class="submit-button" style="display:flex; flex: 0 1 auto;" type="submit" value="Delete">
+                            </div>
+                        </div>
+                    </form>
+                </fieldset>
+            </div>
+        </div>
     </div>
+
     <script>
         const billingCheckbox = document.querySelector('#billingCheckbox');
         const billingFields = document.querySelector('#billing-fields');
@@ -211,6 +269,89 @@
                 showBilling(false);
             }
         });
+
+        function enableWatermark(enable)
+        {
+            jQuery.ajax({
+                url: "../RxWatermark.do",
+                type: "post",
+                data: {
+                    method: "enableWatermark",
+                    enable: enable
+                },
+                success: function() {
+                    console.log("JOB DONE");
+                }
+            });
+        }
+
+        function toggleWatermarkFields(enable)
+        {
+            let watermarkForm = jQuery("#watermark-input-form");
+            if (watermarkForm.length > 0)
+            {
+                if (enable)
+                {
+                    watermarkForm.css("display", "flex");
+                }
+                else
+                {
+                    watermarkForm.css("display", "none");
+                }
+            }
+        }
+
+        function submitWatermarkForm(event, action)
+        {
+            event.preventDefault();
+            if (action === "deleteWatermark")
+            {
+                if(!confirm("are you sure you want to delete your Rx watermark image"))
+                {
+                    return;
+                }
+            }
+
+            jQuery("#watermark-upload-action").val(action);
+            let formData = new FormData(event.target);
+
+            jQuery.ajax({
+                url: "../RxWatermark.do",
+                type: "post",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function() {
+                    jQuery("#watermark-file").val("");
+                    let watermarkPreview = jQuery("#current-watermark-preview")
+                    watermarkPreview.css("display", "flex");
+                    watermarkPreview.attr("src", "../RxWatermark.do?method=getWatermark&rand=" + Math.random())
+                }
+            })
+        }
+
+        jQuery(document).ready(function ()
+        {
+            let submitAction = "setWatermark";
+            jQuery("#watermark-submit-upload").click(function()
+            {
+                submitAction = "setWatermark";
+            });
+            jQuery("#watermark-submit-delete").click(function()
+            {
+                submitAction = "deleteWatermark";
+            });
+
+            jQuery("#watermark-form").submit(function(event)
+            {
+                submitWatermarkForm(event, submitAction);
+            });
+
+            <% if (!RxWatermarkService.isWatermarkEnabled()) { %>
+                toggleWatermarkFields(false);
+            <%}%>
+        });
+
     </script>
     </body>
 </html:html>

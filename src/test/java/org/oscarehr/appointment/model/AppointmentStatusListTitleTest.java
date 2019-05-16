@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.oscarehr.common.model.AppointmentStatus;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,7 +88,8 @@ public class AppointmentStatusListTitleTest
 	@Test
 	public void testGetTitle()
 	{
-		AppointmentStatusList asl = new AppointmentStatusList(testStatusList, testDescriptionMap);
+		List<AppointmentStatus> appointmentStatuses = new ArrayList<>();
+		AppointmentStatusList asl = new AppointmentStatusList(testStatusList, testDescriptionMap, appointmentStatuses);
 		Locale locale = new Locale.Builder().setLanguage("en").setRegion("CA").build();
 
 		String result = asl.getTitle(inputValue, locale);

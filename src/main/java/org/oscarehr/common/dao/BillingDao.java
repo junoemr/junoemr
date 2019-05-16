@@ -280,7 +280,12 @@ public class BillingDao extends AbstractDao<Billing> {
 	    }
 	    else
 		{
-	    	String[] statusTypes = statusType.split(",");
+	    	String[] statusTypes = new String[0];
+	    	if(statusType != null)
+			{
+				statusTypes = statusType.split(",");
+			}
+
 	    	if (statusTypes.length > 1)
 			{
 				statusTypeClause += " in ('" + String.join("','", statusTypes) + "')";

@@ -951,9 +951,10 @@ public class ConversionUtilsTest
 	@Test
 	public void toZonedLocalDate_DateString_ExpectLocalDate()
 	{
-		String dateString = "2019-04-30T18:40:33-08:00";
+		String dateString = "2019-04-30 18:40:33";
 		LocalDate expectedDate = LocalDate.of(2019, 4, 30);
-		assertThat(expectedDate, is(ConversionUtils.toZonedLocalDate(dateString)));
+		Date legacyDate = ConversionUtils.getLegacyDateFromDateString(dateString);
+		assertThat(expectedDate, is(ConversionUtils.toZonedLocalDate(legacyDate)));
 	}
 
 	@Test
@@ -1042,7 +1043,7 @@ public class ConversionUtilsTest
 	public void combineDateAndTime_TodayDateAndFixedTime_ExpectTodayDate()
 	{
 		Calendar desiredTime = new GregorianCalendar();
-		desiredTime.set(Calendar.DAY_OF_YEAR, 16);
+		desiredTime.set(Calendar.DAY_OF_MONTH, 16);
 		desiredTime.set(Calendar.MONTH, 7);
 		desiredTime.set(Calendar.YEAR, 1969);
 		desiredTime.set(Calendar.HOUR_OF_DAY, 13);
@@ -1064,8 +1065,8 @@ public class ConversionUtilsTest
 	public void combineDateAndTime_TodayDateAndFixedTime_ExpectFixedTime()
 	{
 		Calendar desiredTime = new GregorianCalendar();
-		desiredTime.set(Calendar.DAY_OF_YEAR, 16);
-		desiredTime.set(Calendar.MONTH, 7);
+		desiredTime.set(Calendar.DAY_OF_MONTH, 16);
+		desiredTime.set(Calendar.MONTH, Calendar.JULY);
 		desiredTime.set(Calendar.YEAR, 1969);
 		desiredTime.set(Calendar.HOUR_OF_DAY, 13);
 		desiredTime.set(Calendar.MINUTE, 32);
@@ -1083,20 +1084,27 @@ public class ConversionUtilsTest
 
 	@Test
 	@SuppressWarnings("deprecation")
-	public void combineDateAndTime_TodayDateAndFixedTime_ExpectTodayDateAndNotFixedDate()
+	public void combineDateAndTime_DifferentFixedDates_ExpectFirstDate()
 	{
 		Calendar desiredTime = new GregorianCalendar();
-		desiredTime.set(Calendar.DAY_OF_YEAR, 16);
-		desiredTime.set(Calendar.MONTH, 7);
+		desiredTime.set(Calendar.DAY_OF_MONTH, 16);
+		desiredTime.set(Calendar.MONTH, Calendar.JULY);
 		desiredTime.set(Calendar.YEAR, 1969);
 		desiredTime.set(Calendar.HOUR_OF_DAY, 13);
 		desiredTime.set(Calendar.MINUTE, 32);
 		desiredTime.set(Calendar.SECOND, 0);
-
-		Date today = new Date();
 		Date timeToCombine = desiredTime.getTime();
 
-		Date combined = ConversionUtils.combineDateAndTime(today, timeToCombine);
+		Calendar baseTime = new GregorianCalendar();
+		baseTime.set(Calendar.DAY_OF_MONTH, 8);
+		baseTime.set(Calendar.MONTH, Calendar.MARCH);
+		baseTime.set(Calendar.YEAR, 2006);
+		baseTime.set(Calendar.HOUR_OF_DAY, 17);
+		baseTime.set(Calendar.MINUTE, 17);
+		baseTime.set(Calendar.SECOND, 17);
+		Date baseDate = baseTime.getTime();
+
+		Date combined = ConversionUtils.combineDateAndTime(baseDate, timeToCombine);
 
 		Assert.assertNotSame(timeToCombine.getYear(), combined.getYear());
 		Assert.assertNotSame(timeToCombine.getMonth(), combined.getMonth());

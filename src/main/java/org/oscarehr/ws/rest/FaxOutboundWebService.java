@@ -33,6 +33,7 @@ import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -68,6 +69,30 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin.fax");
 
 		return RestResponse.successResponse(outgoingFaxService.resendFax(id));
+	}
+
+	@PUT
+	@Path("/{id}/notificationStatus")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<FaxOutboxTransferOutbound> setNotificationStatus(@PathParam("id") Long id, String status)
+	{
+		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin.fax");
+
+		return RestResponse.successResponse(outgoingFaxService.setNotificationStatus(id, status));
+	}
+
+	@PUT
+	@Path("/{id}/archive")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<FaxOutboxTransferOutbound> archive(@PathParam("id") Long id)
+	{
+		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_admin.fax");
+
+		return RestResponse.successResponse(outgoingFaxService.setArchived(id, true));
 	}
 
 	@GET

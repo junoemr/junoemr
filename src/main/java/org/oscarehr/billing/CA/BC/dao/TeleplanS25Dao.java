@@ -48,4 +48,29 @@ public class TeleplanS25Dao extends AbstractDao<TeleplanS25>{
 		q.setParameter(3, practitionerNo);
 		return q.getResultList();
 	}
+
+	public List<TeleplanS25> findDuplicates(TeleplanS25 lineEntry)
+	{
+		Query q = entityManager.createQuery(
+				"SELECT t FROM TeleplanS25 t " +
+						"WHERE t.s25Type = :s25Type " +
+						"AND t.dataCentre = :dataCenter " +
+						"AND t.dataSeq = :sequenceNumber " +
+						"AND t.mspCtlNo = :mspInternal " +
+						"AND t.practitionerNo = :practitionerNo " +
+						"AND t.payment = :paymentDate " +
+						"ORDER BY t.id ASC");
+		q.setParameter("s25Type", lineEntry.getS25Type());
+		q.setParameter("dataCenter", lineEntry.getDataCentre());
+		q.setParameter("sequenceNumber", lineEntry.getDataSeq());
+		q.setParameter("mspInternal", lineEntry.getMspCtlNo());
+		q.setParameter("practitionerNo", lineEntry.getPractitionerNo());
+		q.setParameter("paymentDate", lineEntry.getPayment());
+		return q.getResultList();
+	}
+
+	public boolean isDuplicate(TeleplanS25 lineEntry)
+	{
+		return !findDuplicates(lineEntry).isEmpty();
+	}
 }

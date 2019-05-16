@@ -1011,7 +1011,7 @@ if(wLReadonly.equals("")){
 							if (oscarProps.isEligibilityCheckEnabled())
 							{
 							%>
-									<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
+									<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg', event);"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
 									<div id='menu2' class='menu' onclick='event.cancelBubble = true;' style="width:350px;">
 										<span id="search_spinner" ><bean:message key="demographic.demographiceditdemographic.msgLoading"/></span>
 										<span id="eligibilityMsg"></span>
@@ -1035,7 +1035,7 @@ if(wLReadonly.equals("")){
 
 
 						<br/>
-						<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg');"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
+						<a  href="javascript: void();" onclick="return !showMenu('2', event);" onmousedown="callEligibilityWebService('../billing/CA/BC/ManageTeleplan.do','eligibilityMsg', event);"><bean:message key="demographic.demographiceditdemographic.btnCheckElig"/></a>
 						<div id='menu2' class='menu' onclick='event.cancelBubble = true;' style="width:350px;">
 							<span id="search_spinner" ><bean:message key="demographic.demographiceditdemographic.msgLoading"/></span>
 							<span id="eligibilityMsg"></span>
@@ -3882,17 +3882,30 @@ Calendar.setup({ inputField : "waiting_list_referral_date", ifFormat : "%Y-%m-%d
 
 Calendar.setup({ inputField : "paper_chart_archived_date", ifFormat : "%Y-%m-%d", showsTime :false, button : "archive_date_cal", singleClick : true, step : 1 });
 
-function callEligibilityWebService(url,id){
+//mutex for callEligibilityWebService
+let doingEligibilityCheck = false;
+function callEligibilityWebService(url,id, event){
 
-       var ran_number=Math.round(Math.random()*1000000);
-       var params = "demographic=<%=demographic_no%>&method=checkElig&rand="+ran_number;  //hack to get around ie caching the page
-		 var response;
-       new Ajax.Request(url+'?'+params, {
-           onSuccess: function(response) {
-                document.getElementById(id).innerHTML=response.responseText ;
-                document.getElementById('search_spinner').innerHTML="";
-           }
-        } );
+	if (doingEligibilityCheck)
+	{
+		return;
+	}
+	doingEligibilityCheck = true;
+	jQuery(event.target).css("cursor", "default");
+
+	var ran_number = Math.round(Math.random() * 1000000);
+	var params = "demographic=<%=demographic_no%>&method=checkElig&rand=" + ran_number;  //hack to get around ie caching the page
+	var response;
+	new Ajax.Request(url + '?' + params, {
+		onSuccess: function (response) {
+			document.getElementById(id).innerHTML = response.responseText;
+			document.getElementById('search_spinner').innerHTML = "";
+		},
+		onComplete: function () {
+			jQuery(event.target).css("cursor", "pointer");
+			doingEligibilityCheck = false;
+		}
+	});
  }
 
 <%

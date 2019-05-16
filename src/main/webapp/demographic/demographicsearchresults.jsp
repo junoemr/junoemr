@@ -39,17 +39,17 @@
 %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
-<%@page import="org.oscarehr.util.MiscUtils"%>
-<%@page import="org.oscarehr.util.LoggedInInfo" %>
-<%@page import="org.oscarehr.caisi_integrator.ws.CachedProvider"%>
-<%@page import="org.oscarehr.caisi_integrator.ws.FacilityIdStringCompositePk"%>
-<%@page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager"%>
+<%@page import="org.apache.commons.lang.StringUtils"%>
 <%@page import="org.apache.commons.lang.time.DateFormatUtils"%>
+<%@page import="org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager" %>
+<%@page import="org.oscarehr.caisi_integrator.ws.CachedProvider"%>
 <%@page import="org.oscarehr.caisi_integrator.ws.DemographicTransfer"%>
-<%@page import="org.oscarehr.ws.rest.to.model.DemographicSearchResult"%>
+<%@page import="org.oscarehr.caisi_integrator.ws.FacilityIdStringCompositePk"%>
 <%@page import="org.oscarehr.caisi_integrator.ws.MatchingDemographicTransferScore"%>
 <%@page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
+<%@page import="org.oscarehr.demographic.dao.DemographicDao"%>
+<%@page import="org.oscarehr.demographic.model.Demographic"%>
+<%@page import="org.oscarehr.demographic.search.DemographicCriteriaSearch"%>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -72,14 +72,17 @@
 
 %>
 
-<%@ page import="java.util.*, java.net.URLEncoder, oscar.*" errorPage="errorpage.jsp" %>
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.demographic.dao.DemographicDao" %>
-<%@ page import="oscar.oscarDemographic.data.DemographicMerged" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="org.oscarehr.demographic.service.DemographicService" %>
-<%@ page import="org.oscarehr.demographic.search.DemographicCriteriaSearch" %>
-<%@ page import="org.oscarehr.demographic.model.Demographic" %>
+<%@ page import="org.oscarehr.demographic.service.DemographicService,
+                 org.oscarehr.util.MiscUtils,
+                 org.oscarehr.util.SpringUtils"
+         errorPage="errorpage.jsp" %>
+<%@page import="oscar.Misc" %>
+<%@page import="oscar.oscarDemographic.data.DemographicMerged" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ResourceBundle" %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties"	scope="session" />
 
@@ -559,6 +562,10 @@ List<Demographic> doSearch(DemographicDao demographicDao, LoggedInInfo loggedInI
 	else if (orderBy.equals("hin"))
 	{
 		sortMode = DemographicCriteriaSearch.SORT_MODE.Hin;
+	}
+	else if (orderBy.equals("email"))
+	{
+		sortMode = DemographicCriteriaSearch.SORT_MODE.Email;
 	}
 
 	DemographicService.SEARCH_MODE demoSearchMode = demoSrvc.searchModeStringToEnum(searchMode);

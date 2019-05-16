@@ -33,18 +33,22 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Yet another conversion utility class for bridging JPA entity to legacy schema mismatch. 
@@ -542,6 +546,29 @@ public class ConversionUtils {
 	}
 
 
+	public static LocalDateTime getLocalDateTimeFromSqlDateAndTime(java.sql.Date date, java.sql.Time time)
+	{
+		LocalDate localDate = date.toLocalDate();
+		LocalTime localTime = time.toLocalTime();
+		return LocalDateTime.of(localDate, localTime);
+	}
+
+	/**
+	 * Creates a list of dates.  Taken from http://www.baeldung.com/java-between-dates
+	 * @param startDate
+	 * @param endDate
+	 * @return An inclusive list of dates
+	 */
+	public static List<LocalDate> getDateList(LocalDate startDate, LocalDate endDate)
+	{
+		long numOfDaysBetween = ChronoUnit.DAYS.between(startDate, endDate) + 1;
+
+		return IntStream.iterate(0, i -> i + 1)
+			.limit(numOfDaysBetween)
+			.mapToObj(i -> startDate.plusDays(i))
+			.collect(Collectors.toList());
+	}
+
 	public static Date toNullableLegacyDate(LocalDate localDate)
 	{
 		if(localDate == null) return null;
@@ -568,23 +595,10 @@ public class ConversionUtils {
 		if(dateString == null || dateString.isEmpty()) return null;
 		return toLocalDate(dateString);
 	}
-
 	public static LocalDate toNullableLocalDate(Date legacyDate)
 	{
 		if(legacyDate == null) return null;
 		return toZonedLocalDate(legacyDate);
-	}
-
-
-	public static LocalDate toZonedLocalDate(String dateString)
-	{
-		return toZonedLocalDate(dateString, DateTimeFormatter.ISO_DATE_TIME);
-	}
-
-	public static LocalDate toZonedLocalDate(String dateString, DateTimeFormatter dateTimeFormatter)
-	{
-		ZonedDateTime result = ZonedDateTime.parse(dateString, dateTimeFormatter);
-		return result.toLocalDate();
 	}
 	public static LocalDate toLocalDate(String dateString)
 	{
@@ -595,7 +609,16 @@ public class ConversionUtils {
 	{
 		return LocalDate.parse(dateString, dateTimeFormatter);
 	}
-
+	public static LocalDate toNullableZonedLocalDate(String dateString)
+	{
+		if(dateString == null) return null;
+		return toZonedLocalDate(dateString, DateTimeFormatter.ISO_DATE_TIME);
+	}
+	public static LocalDate toZonedLocalDate(String dateString, DateTimeFormatter dateTimeFormatter)
+	{
+		ZonedDateTime result = ZonedDateTime.parse(dateString, dateTimeFormatter);
+		return result.toLocalDate();
+	}
 	public static LocalDate toZonedLocalDate(Date legacyDate)
 	{
 		LocalDate date = Instant
@@ -631,5 +654,15 @@ public class ConversionUtils {
 		calendarA.set(Calendar.MILLISECOND, calendarB.get(Calendar.MILLISECOND));
 
 		return calendarA.getTime();
+	}
+
+	public static LocalDate dateStringToNullableLocalDate(String dateString)
+	{
+		if(dateString == null) return null;
+		return dateStringToLocalDate(dateString);
+	}
+	public static LocalDate dateStringToLocalDate(String dateString)
+	{
+		return LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE);
 	}
 }

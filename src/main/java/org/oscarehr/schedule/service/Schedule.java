@@ -24,6 +24,7 @@ package org.oscarehr.schedule.service;
 
 import com.google.common.collect.RangeMap;
 import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.appointment.service.Appointment;
 import org.oscarehr.common.dao.MyGroupDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.SiteDao;
@@ -31,6 +32,7 @@ import org.oscarehr.common.model.MyGroup;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.schedule.dto.AppointmentDetails;
+import org.oscarehr.schedule.dto.CalendarEvent;
 import org.oscarehr.schedule.dto.ResourceSchedule;
 import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.schedule.dto.UserDateSchedule;
@@ -51,6 +53,7 @@ import oscar.MyDateFormat;
 import oscar.RscheduleBean;
 import oscar.util.ConversionUtils;
 
+import javax.servlet.http.HttpSession;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -75,6 +78,9 @@ public class Schedule
 	OscarAppointmentDao appointmentDao;
 
 	@Autowired
+	Appointment appointmentService;
+
+	@Autowired
 	MyGroupDao myGroupDao;
 
 	@Autowired
@@ -88,6 +94,9 @@ public class Schedule
 
 	@Autowired
 	ScheduleHolidayDao scheduleHolidayDao;
+
+	@Autowired
+	ScheduleTemplateService scheduleTemplateService;
 
 	@Autowired
 	ScheduleTemplateDao scheduleTemplateDao;
@@ -216,6 +225,14 @@ public class Schedule
 				sd.setHour(scheduleRscheduleBean.getDateAvailHour(cal));
 				sd.setCreator(providerName);
 				sd.setStatus(scheduleRscheduleBean.active.toCharArray()[0]);
+
+				//attempt to map to a schedule
+				Site site = siteDao.findByName(scheduleRscheduleBean.getSiteAvail(cal));
+				if (site != null)
+				{
+					sd.setSiteId(site.getId());
+				}
+
 				scheduleDateDao.persist(sd);
 			}
 			if((year + "-" + MyDateFormat.getDigitalXX(month) + "-" + MyDateFormat.getDigitalXX(day)).equals(endDateString)) break;
@@ -300,6 +317,14 @@ public class Schedule
 		sd.setHour(hour);
 		sd.setCreator(userName);
 		sd.setStatus(status.toCharArray()[0]);
+
+		//attempt to map to a schedule
+		Site site = siteDao.findByName(reason);
+		if (site != null)
+		{
+			sd.setSiteId(site.getId());
+		}
+
 		scheduleDateDao.persist(sd);
 	}
 
@@ -340,7 +365,7 @@ public class Schedule
 					new Integer(provider.getProviderNo()),
 					provider.getFirstName(),
 					provider.getLastName(),
-					null
+					site
 			);
 		}
 		else
@@ -351,7 +376,8 @@ public class Schedule
 					new Integer(provider.getProviderNo()),
 					provider.getFirstName(),
 					provider.getLastName(),
-					site
+					site,
+					true
 			);
 		}
 
@@ -417,7 +443,7 @@ public class Schedule
 						new Integer(result.getId().getProviderNo()),
 						result.getFirstName(),
 						result.getLastName(),
-						null
+						site
 				);
 			}
 			else
@@ -427,7 +453,8 @@ public class Schedule
 						new Integer(result.getId().getProviderNo()),
 						result.getFirstName(),
 						result.getLastName(),
-						site
+						site,
+						true
 				);
 			}
 
@@ -487,11 +514,23 @@ public class Schedule
 	}
 
 	private UserDateSchedule getUserDateSchedule(
+			LocalDate date,
+			Integer providerNo,
+			String firstName,
+			String lastName,
+			String site
+	)
+	{
+		return getUserDateSchedule(date, providerNo, firstName, lastName, site, false);
+	}
+
+	private UserDateSchedule getUserDateSchedule(
 		LocalDate date,
 		Integer providerNo,
 		String firstName,
 		String lastName,
-		String site
+		String site,
+		boolean filterScheduleBySite
 	)
 	{
 		boolean isAvailable = false;
@@ -505,9 +544,9 @@ public class Schedule
 			appointmentDao.findAppointmentDetailsByDateAndProvider(date, providerNo, site);
 
 		ScheduleDate scheduleDate;
-		if (site != null)
+		if (site != null && filterScheduleBySite)
 		{
-			scheduleDate = scheduleDateDao.findByProviderNoReasonAndDate(Integer.toString(providerNo), site, java.sql.Date.valueOf(date));
+			scheduleDate = scheduleDateDao.findByProviderNoSiteAndDate(Integer.toString(providerNo), site, java.sql.Date.valueOf(date));
 		}
 		else
 		{
@@ -528,5 +567,30 @@ public class Schedule
 			appointments,
 			isAvailable
 		);
+	}
+
+	public List<CalendarEvent> getCalendarEvents(
+		HttpSession session,
+		Integer providerId,
+		LocalDate startDate,
+		LocalDate endDate,
+		String siteName
+	)
+	{
+		List<CalendarEvent> calendarEvents = new ArrayList<>();
+
+		// Loop through the dates between startDate and endDate (inclusive) and add schedule
+		// templates
+		for(LocalDate date: ConversionUtils.getDateList(startDate, endDate))
+		{
+			// Get schedule templates for this provider/date
+			calendarEvents.addAll(scheduleTemplateService.getCalendarEvents(providerId, date));
+		}
+
+		// Get appointments for this provider/date range
+		calendarEvents.addAll(appointmentService.getCalendarEvents(
+			session, providerId, startDate, endDate, siteName));
+
+		return calendarEvents;
 	}
 }

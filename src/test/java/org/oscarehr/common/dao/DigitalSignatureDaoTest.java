@@ -45,7 +45,6 @@ public class DigitalSignatureDaoTest extends DaoTestFixtures {
 
 	@Before
 	public void before() throws Exception {
-		beforeForInnoDB();
 		SchemaUtils.restoreTable("demographic","provider","Facility","DigitalSignature");
 	}
 
