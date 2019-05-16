@@ -76,7 +76,7 @@ public class ConversionUtils {
 	private static final long MS_IN_DAY = 1000 * 60 * 60 * 24;
 
 	private static final Pattern datePattern = Pattern.compile("(\\d{4})-(\\d{1,2})-(\\d{1,2})");
-	private static final Pattern dateTimePattern = Pattern.compile("(\\d{4})-(\\d{1,2})-(\\d{1,2})\\s(\\d{1,2}):(\\d{1,2})[:]?(\\d{1,2})?");
+	private static final Pattern dateTimePattern = Pattern.compile("(\\d{4})-(\\d{1,2})-(\\d{1,2})\\s(\\d{1,2})[:]?(\\d{1,2})?[:]?(\\d{1,2})?");
 
 	private ConversionUtils() {
 	}
@@ -483,7 +483,11 @@ public class ConversionUtils {
 				int month = Integer.parseInt(match.group(2));
 				int day = Integer.parseInt(match.group(3));
 				int hour = Integer.parseInt(match.group(4));
-				int minute = Integer.parseInt(match.group(5));
+				int minute = 0;
+				if (match.group(5) != null)
+				{
+					minute = Integer.parseInt(match.group(5));
+				}
 				int second = 0;
 				if (match.group(6) != null)
 				{

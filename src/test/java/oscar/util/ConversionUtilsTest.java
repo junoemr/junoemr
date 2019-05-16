@@ -668,9 +668,9 @@ public class ConversionUtilsTest
 	}
 
 	@Test
-	public void padDateTimeString_DateTimeStringNoMinutesOrSeconds_ExpectSameString()
+	public void padDateTimeString_DateTimeStringNoMinutesOrSeconds_ExpectPaddedString()
 	{
-		Assert.assertEquals("2019-04-03 09", ConversionUtils.padDateTimeString("2019-04-03 09"));
+		Assert.assertEquals("2019-04-03 09:00", ConversionUtils.padDateTimeString("2019-04-03 09"));
 	}
 
 	@Test
