@@ -94,7 +94,7 @@ public class DashboardWs extends AbstractWs
 			}
 			billingTransfer.copyTo(billingRecord);
 
-			if (billingRecord.getDemographicNo() == null && billingRecord.getPhn() != null)
+			if ((billingRecord.getDemographicNo() == null || billingRecord.getDemographicNo() == 0) && billingRecord.getPhn() != null)
 			{
 				//attempt to map to demographic by health number
 				DemographicCriteriaSearch demographicCs = new DemographicCriteriaSearch();
