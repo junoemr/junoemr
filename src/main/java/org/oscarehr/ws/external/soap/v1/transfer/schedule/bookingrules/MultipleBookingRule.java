@@ -80,7 +80,8 @@ public class MultipleBookingRule extends BookingRule
     @Override
     public Boolean isViolated(Appointment appointment)
     {
-        LocalDateTime startDate = ConversionUtils.toLocalDateTime(appointment.getStartTimeAsFullDate()).truncatedTo(timePeriod);
+        LocalDateTime startDate = ConversionUtils.toLocalDateTime(appointment.getStartTimeAsFullDate());
+        startDate = ConversionUtils.truncateLocalDateTime(startDate, timePeriod);
         LocalDateTime endDate = startDate.plus(timePeriodAmount, timePeriod);
         List<Appointment> patientAppointments = appointmentDao.findByDateRangeAndDemographic(startDate.toLocalDate(),
                                                                                              endDate.toLocalDate(),
