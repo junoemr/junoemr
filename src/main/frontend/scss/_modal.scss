@@ -45,7 +45,7 @@
 .juno-modal {
 	.modal-dialog {
 		width: 960px;
-		height: 552px;
+		height: 600px;
 		.modal-content {
 			height: 100%;
 			display: flex;
@@ -57,14 +57,87 @@
 			background: linear-gradient(-45deg, $white 50%, transparent 0) no-repeat 100% 100%,
 			linear-gradient(247deg, #5c8be8, $primary 30%, $primary 64%, #355085) no-repeat;
 
+			&.alert-color {
+				background: linear-gradient(-45deg, $white 50%, transparent 0) no-repeat 100% 100%,
+				linear-gradient(247deg, $yellow, $yellow 30%, $yellow-hover 64%, $yellow-hover) no-repeat;
+			}
+
 			padding: 0 16px 16px 16px;
 			.modal-header {
 				padding: 10px 0;
+			}
+			.modal-body {
+				background-color: $white;
+				border-radius: 16px 16px 0 0;
+				padding: 0;
+				flex-grow: 1;
+			}
+			.modal-footer {
+				border-radius: 0 0 16px 16px;
+				background-color: $white;
+				border: 0;
+				.btn {
+					color: $primary;
+					background-color: $white;
+					border: solid 1px $grey-07;
+					font-weight: bold;
+					width: 128px;
+					height: 40px;
+
+					&.btn-success {
+						color: $white;
+						background-color: $green;
+						border: solid 1px $green-hover;
+					}
+					&.btn-primary {
+						color: $white;
+						background-color: $primary;
+						border: solid 1px $primary-hover;
+					}
+				}
 			}
 
 			.form-control-static {
 				min-height: 10px;
 			}
 		}
+	}
+	label {
+		font-family: "Arial", "Helvetica", sans-serif;
+		font-size: 12px;
+		font-weight: normal;
+		font-style: normal;
+		font-stretch: normal;
+		line-height: normal;
+		letter-spacing: normal;
+		text-align: right;
+		color: $grey-05;
+		padding-top: 3px;
+		padding-bottom: 3px;
+	}
+	select, input, textarea {
+		border-radius: 8px;
+		border: solid 1px $grey-07;
+		background-color: $white;
+		padding: 8px;
+
+		font-family: "Arial", "Helvetica", sans-serif;
+		font-size: 13px;
+		font-weight: normal;
+		font-style: normal;
+		font-stretch: normal;
+		line-height: normal;
+		letter-spacing: normal;
+		color: $grey-04;
+	}
+	span {
+		font-family: "Arial", "Helvetica", sans-serif;
+		font-size: 11px;
+		font-weight: normal;
+		font-style: normal;
+		font-stretch: normal;
+		line-height: normal;
+		letter-spacing: normal;
+		color: $grey-04;
 	}
 }

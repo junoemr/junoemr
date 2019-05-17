@@ -9,7 +9,7 @@
 		{{title}}
 	</label>
 
-	<label class="juno-checkbox {{input_size}}">
+	<div class="{{input_size}} form-control-static juno-checkbox">
 		<input type="checkbox"
 					 bs-switch
 					 switch-on-text="{{true_text}}"
@@ -22,7 +22,7 @@
 					 ng-focus="focus_fn()"
 					 ng-change="change_fn()"
 					 tabindex="{{tab_index}}"/>
-		<span class="checkmark"></span>
-	</label>
+		<label for="input-{{name}}" class="form-control checkmark"></label>
+	</div>
 
 </div>

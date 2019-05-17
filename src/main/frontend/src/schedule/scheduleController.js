@@ -1011,7 +1011,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			labelTds.html(require('./view-columnControl.html'));
 			labelTds.on('click', $scope.onHeaderClick);
 
-			console.info(resourceObj);
 			labelTds.find(".hdr-label").text(resourceObj.display_name);
 		};
 

@@ -48,7 +48,8 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	controller.tabEnum = Object.freeze({
 		appointment:0,
-		appointmentHistory:1
+		appointmentHistory:1,
+		appointmentEdits:2
 	});
 	controller.activeTab = controller.tabEnum.appointment;
 
@@ -91,6 +92,17 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	$scope.activeTemplateEvents = [];
 
 	$scope.eventStatuses = $scope.parentScope.eventStatuses;
+	console.info('eventStatuses', $scope.eventStatuses);
+	// controller.statusOptionsSelect = Object.keys($scope.eventStatuses).map(function(key, index) {
+	// 	let obj = {
+	// 		label: $scope.eventStatuses[key].name,
+	// 		value: $scope.eventStatuses[key].displayLetter
+	// 	};
+	// 	console.info(key, index, obj);
+	// 	return obj;
+	// });
+	// console.info('statusOptionsSelect', controller.statusOptionsSelect);
+
 	$scope.eventStatusOptions = [];
 	$scope.selectedEventStatus = null;
 	$scope.defaultEventStatus = null;
@@ -198,6 +210,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		}
 		$scope.defaultEventStatus = data.defaultEventStatus;
 		$scope.setSelectedEventStatus(data.eventData.eventStatusCode);
+		// controller.statusOptionsSelect = $scope.eventStatuses.map(a => a.displayLetter);
 
 
 		if(editMode)
@@ -731,6 +744,14 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	{
 		controller.activeTab = tabId;
 	};
+
+	// controller.changeSelectColor = function changeSelectColor(element)
+	// {
+	// 	console.info(element);
+	// 	// element.filter("option:selected")
+	// 	// console.info($(element).find("select option:selected").css('backgroundColor'));
+	// 	// $(element).find("select option:selected").css('backgroundColor');
+	// };
 
 
 	//=========================================================================

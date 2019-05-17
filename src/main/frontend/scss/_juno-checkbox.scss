@@ -1,16 +1,10 @@
 /**
-set the html structure up like this:
-<label class="juno-checkbox">
-    <input type="checkbox"/>
-    <span class="checkmark"></span>
-</label>
+ * custom css for the field-toggle-juno directive
  */
 
-/* The switch - the box around the slider */
 .juno-checkbox {
-	display: block;
+	display: flex;
 	position: relative;
-	cursor: pointer;
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
@@ -19,12 +13,9 @@ set the html structure up like this:
 	/* Hide default HTML checkbox */
 	input {
 		position: absolute;
-		opacity: 0;
-		cursor: pointer;
-		height: 0;
-		width: 0;
+		display: none;
 
-		/* When the checkbox is checked, add a blue background */
+		/* When the checkbox is checked, add a background */
 		&:checked + .checkmark {
 			display: inline-block;
 			background: url($icon-checked) no-repeat, $primary;
@@ -32,16 +23,16 @@ set the html structure up like this:
 			border: solid 1px $primary-hover;
 		}
 	}
-	/* Create a custom checkbox */
+	/* style a custom checkbox */
 	.checkmark {
-		position: absolute;
-		top: 0;
-		left: 0;
 		height: 20px;
 		width: 20px;
 		background-color: $white;
 		border: solid 1px $grey-07;
 		border-radius: 4px;
+		cursor: pointer;
+		margin: 0;
+		padding: 0;
 	}
 }
 

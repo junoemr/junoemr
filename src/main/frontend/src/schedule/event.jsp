@@ -63,16 +63,20 @@
 	</div>
 
 	<div class="modal-body">
-		<div class="tabs-heading">
+		<div class="tabs-heading round-top">
 			<ul class="nav nav-tabs">
 				<li class="active">
-					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.appointment);">
+					<a class="round-top-left" data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.appointment);">
 						Appointment</a>
 				</li>
 				<li>
 					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.appointmentHistory);">
 						Appointment History
 					</a>
+				</li>
+				<li>
+					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.appointmentEdits);">
+						Edits</a>
 				</li>
 			</ul>
 		</div>
@@ -83,28 +87,28 @@
 				<form ng-submit="save()" ng-init="init()">
 					<div ng-show="!isInitialized() || isWorking()" ng-include="'src/common/spinner.jsp'"></div>
 					<div ng-show="isInitialized() && !isWorking()" class="row">
-						<div class="tab-bar-inputs">
-							<div class="row">
-								<div class="col-sm-6">
-									<ca-field-toggle
-											ca-name="check-do-not-book"
-											ca-title="Do Not Book"
-											ca-label-size="col-md-4"
-											ca-input-size="col-md-8"
-											ca-model="eventData.doNotBook"
-											ca-template="juno">
-									</ca-field-toggle>
-								</div>
-								<div class="col-sm-6">
-									<ca-field-select
-											ca-template="no_label"
-											ca-label-size="col-md-2"
-											ca-input-size="col-md-6"
-											ca-model="selectedEventStatus"
-											ca-options="eventStatuses"
-									>
-									</ca-field-select>
-								</div>
+						<div class="tab-bar-inputs form-horizontal">
+							<div class="col-sm-6">
+								<ca-field-toggle
+										ca-name="check-do-not-book"
+										ca-title="Do Not Book"
+										ca-label-size="col-md-8"
+										ca-input-size="col-md-4"
+										ca-model="eventData.doNotBook"
+										ca-template="juno">
+								</ca-field-toggle>
+							</div>
+							<div class="col-sm-6">
+								<ca-field-select
+										ca-name="appt-status"
+										ca-template="appt_status"
+										ca-no-label="true"
+										ca-input-size="col-md-12"
+										ca-model="selectedEventStatus"
+										ca-options="eventStatuses"
+										<%--ca-change="eventController.changeSelectColor()"--%>
+								>
+								</ca-field-select>
 							</div>
 						</div>
 						<div class="alert-container">
@@ -298,8 +302,8 @@
 															<ca-field-toggle
 																	ca-name="check-am"
 																	ca-title="am"
-																	ca-label-size="col-md-4"
-																	ca-input-size="col-md-8"
+																	ca-label-size="col-md-5"
+																	ca-input-size="col-md-7"
 																	ca-model="eventController.amSelected"
 																	ca-template="juno">
 															</ca-field-toggle>
@@ -308,8 +312,8 @@
 															<ca-field-toggle
 																	ca-name="check-pm"
 																	ca-title="pm"
-																	ca-label-size="col-md-4"
-																	ca-input-size="col-md-8"
+																	ca-label-size="col-md-5"
+																	ca-input-size="col-md-7"
 																	ca-model="eventController.pmSelected"
 																	ca-template="juno">
 															</ca-field-toggle>
@@ -318,18 +322,38 @@
 												</div>
 											</div>
 											<div class="row">
-												<div class="col-md-9"></div>
-												<div class="col-md-3">
-													<ca-field-toggle
-															ca-name="check-critical"
-															ca-title="Critical"
-															ca-label-size="col-md-4"
-															ca-input-size="col-md-8"
-															ca-model="eventController.critical"
-															ca-template="juno">
-													</ca-field-toggle>
+												<div class="col-md-6">
+												</div>
+												<div class="col-md-6">
+													<div class="row">
+														<div class="col-md-6">
+														</div>
+														<div class="col-md-6">
+															<ca-field-toggle
+																	ca-name="check-critical"
+																	ca-title="Critical"
+																	ca-label-size="col-md-5"
+																	ca-input-size="col-md-7"
+																	ca-model="eventController.critical"
+																	ca-template="juno">
+															</ca-field-toggle>
+														</div>
+													</div>
 												</div>
 											</div>
+											<%--<div class="row">--%>
+												<%--<div class="col-md-9"></div>--%>
+												<%--<div class="col-md-3">--%>
+													<%--<ca-field-toggle--%>
+															<%--ca-name="check-critical"--%>
+															<%--ca-title="Critical"--%>
+															<%--ca-label-size="col-md-4"--%>
+															<%--ca-input-size="col-md-8"--%>
+															<%--ca-model="eventController.critical"--%>
+															<%--ca-template="juno">--%>
+													<%--</ca-field-toggle>--%>
+												<%--</div>--%>
+											<%--</div>--%>
 										</div>
 									</div>
 								</div>
@@ -587,57 +611,6 @@
 									<%--</button>--%>
 								<%--</div>--%>
 							</div>
-							<div class="row bottom-buttons">
-								<div class="pull-right">
-									<button
-											type="button"
-											class="btn btn-default"
-											ng-click="cancel()"
-											ng-disabled="isWorking()">Cancel
-									</button>
-
-									<button
-											type="button"
-											class="btn btn-primary"
-											tooltip-placement="top"
-											tooltip-append-to-body="true"
-											uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
-											>Print
-									</button>
-
-									<button
-											type="submit"
-											class="btn btn-success"
-											tooltip-placement="top"
-											tooltip-append-to-body="true"
-											uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
-											ng-show="!editMode"
-											ng-disabled="isWorking()">Create
-									</button>
-
-									<button
-											type="submit"
-											class="btn btn-success"
-											tooltip-placement="top"
-											tooltip-append-to-body="true"
-											uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
-											ng-show="editMode"
-											ng-disabled="isWorking()">Modify
-									</button>
-
-									<button
-											type="button"
-											class="btn btn-success"
-											tooltip-placement="top"
-											tooltip-append-to-body="true"
-											uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+shift+enter')}}"
-											ng-click="saveAndBill()"
-											ng-show="numInvoices == 0"
-											ng-disabled="isWorking()">Modify &amp; Bill
-									</button>
-
-								</div>
-							</div>
 						</div>
 					</div>
 				</form>
@@ -649,6 +622,59 @@
 		</div>
 	</div>
 
+	<div class="modal-footer">
+		<div class="bottom-buttons">
+			<div class="pull-right">
+				<button
+						type="button"
+						class="btn btn-default"
+						ng-click="cancel()"
+						ng-disabled="isWorking()">Cancel
+				</button>
+
+				<button
+						type="button"
+						class="btn btn-primary"
+						tooltip-placement="top"
+						tooltip-append-to-body="true"
+						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
+				>Print
+				</button>
+
+				<button
+						type="submit"
+						class="btn btn-success"
+						tooltip-placement="top"
+						tooltip-append-to-body="true"
+						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
+						ng-show="!editMode"
+						ng-disabled="isWorking()">Create
+				</button>
+
+				<button
+						type="submit"
+						class="btn btn-success"
+						tooltip-placement="top"
+						tooltip-append-to-body="true"
+						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
+						ng-show="editMode"
+						ng-disabled="isWorking()">Modify
+				</button>
+
+				<button
+						type="button"
+						class="btn btn-success"
+						tooltip-placement="top"
+						tooltip-append-to-body="true"
+						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+shift+enter')}}"
+						ng-click="saveAndBill()"
+						ng-show="numInvoices == 0"
+						ng-disabled="isWorking()">Modify &amp; Bill
+				</button>
+
+			</div>
+		</div>
+	</div>
 	<div id="start-time-auto-wrapper"></div>
 	<div id="end-time-auto-wrapper"></div>
 </div>
