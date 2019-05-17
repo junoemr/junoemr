@@ -161,7 +161,9 @@
 								Just Encounter Notes
 							</label>
 						</div>
-						<div infinite-scroll="summaryCtrl.addMoreItems()">
+						<div 	infinite-scroll="summaryCtrl.addMoreItems()"
+								infinite-scroll-distance="2"
+								infinite-scroll-use-document-bottom="true">
 
 							<div class="note-container col-xs-12 note"
 								 ng-repeat="note in summaryCtrl.page.notes.notelist"
