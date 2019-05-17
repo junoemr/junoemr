@@ -25,6 +25,7 @@
 
 package org.oscarehr.ws.external.soap.v1.transfer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -249,7 +250,7 @@ public final class AppointmentTransfer {
 
 	public Appointment copyTo(Appointment appointment) {
 
-		List<String> ignored = Arrays.asList("id", "appointmentDate", "startTime", "endTime", "createDateTime", "updateDateTime", "creator", "creatorSecurityId");
+		List<String> ignored = new ArrayList<>(Arrays.asList("id", "appointmentDate", "startTime", "endTime", "createDateTime", "updateDateTime", "creator", "creatorSecurityId"));
 		ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
 
 		if (lastUpdateUser == null || providerDao.find(lastUpdateUser) == null)
