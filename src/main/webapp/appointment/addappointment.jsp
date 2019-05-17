@@ -172,17 +172,6 @@
 		<script src="<%=request.getContextPath()%>/js/jquery-ui-1.8.18.custom.min.js"></script>
 		<script src="<%=request.getContextPath()%>/js/fg.menu.js"></script>
 
-		<!-- polyfill for IE support -->
-		<script type="text/javascript">
-			if (!String.prototype.startsWith)
-			{
-				String.prototype.startsWith = function(searchString, position)
-				{
-					position = position || 0;
-					return this.indexOf(searchString, position) === position;
-				};
-			}
-		</script>
 
 		<link rel="stylesheet"
 			  href="<%=request.getContextPath()%>/css/cupertino/jquery-ui-1.8.18.custom.css">
@@ -223,7 +212,7 @@
 					return false;
 				}
 				// set no-show status if no demographic selected and "Last Name" starts with '.'
-				if (document.ADDAPPT.keyword.value.startsWith(".")
+				if (document.ADDAPPT.keyword.value.indexOf(".") !== -1
 					&& document.ADDAPPT.demographic_no.value.length === 0)
 				{
 					document.ADDAPPT.status.value = 'N';
