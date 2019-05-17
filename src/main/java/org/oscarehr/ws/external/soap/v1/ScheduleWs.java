@@ -146,6 +146,12 @@ public class ScheduleWs extends AbstractWs {
 	public ValidatedAppointmentBookingTransfer addAppointmentValidated(AppointmentTransfer appointmentTransfer, String jsonRules) throws ParseException
 	{
 		Appointment appointment = new Appointment();
+
+		if (appointmentTransfer.getLastUpdateUser() == null)
+		{
+			appointmentTransfer.setLastUpdateUser(getLoggedInInfo().getLoggedInProviderNo());
+		}
+
 		appointmentTransfer.copyTo(appointment);
 
 		List<BookingRule> bookingRules = BookingRuleFactory.createBookingRuleList(appointment.getDemographicNo(), jsonRules);

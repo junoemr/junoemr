@@ -80,7 +80,8 @@ public class MultipleBookingRule extends BookingRule
     @Override
     public Boolean isViolated(Appointment appointment)
     {
-        LocalDateTime startDate = ConversionUtils.toLocalDateTime(appointment.getStartTimeAsFullDate()).truncatedTo(timePeriod);
+        LocalDateTime startDate = ConversionUtils.toLocalDateTime(appointment.getStartTimeAsFullDate());
+        startDate = ConversionUtils.truncateLocalDateTime(startDate, timePeriod);
         LocalDateTime endDate = startDate.plus(timePeriodAmount, timePeriod);
         List<Appointment> patientAppointments = appointmentDao.findByDateRangeAndDemographic(startDate.toLocalDate(),
                                                                                              endDate.toLocalDate(),
@@ -96,7 +97,7 @@ public class MultipleBookingRule extends BookingRule
         // For example:  Two weeks ahead means this week (week 1) and next week (week 2).
 
         LocalDateTime resultWindowStart = ConversionUtils.truncateLocalDateTime(result.dateTime, timePeriod)
-                                                    .minus(timePeriodAmount - 1, timePeriod);
+                                                         .minus(timePeriodAmount - 1, timePeriod);
 
         if (this.cacheWindow == null || !resultWindowStart.equals(this.cacheWindow))
         {
