@@ -251,11 +251,13 @@ public final class AppointmentTransfer {
 
 		List<String> ignored = Arrays.asList("id", "appointmentDate", "startTime", "endTime", "createDateTime", "updateDateTime", "creator", "creatorSecurityId");
 		ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
-		if (providerDao.find(lastUpdateUser) == null)
+
+		if (lastUpdateUser == null || providerDao.find(lastUpdateUser) == null)
 		{
 			ignored.add("lastUpdateUser");
 		}
-		BeanUtils.copyProperties(this, appointment, (String[])ignored.toArray());
+
+		BeanUtils.copyProperties(this, appointment, ignored.toArray(new String[0]));
 
 		if (appointmentStartDateTime != null) {
 			appointment.setAppointmentDate(appointmentStartDateTime.getTime());
