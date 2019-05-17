@@ -323,7 +323,8 @@ function printPaste2Parent(print)
 		else
 		{
 			alert("WARNING: No suitable field found to paste note into. " +
-				"If you want to paste into an encounter note you need to open the Rx page from the encounter note.");
+				"To allow pasting from the prescription into the encounter note, " +
+				"the Rx page must be opened from the encounter note page.");
 		}
 	}
 	catch (e)
