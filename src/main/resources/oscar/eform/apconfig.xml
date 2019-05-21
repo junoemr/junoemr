@@ -1226,8 +1226,9 @@
 	<databaseap>
 		<ap-name>app_provider_email</ap-name>
 		<ap-sql>SELECT provider.email FROM provider JOIN
-			    (SELECT * FROM appointment WHERE appointment.appointment_no=${appt_no}) as appt
+			    appointment as appt
 				ON appt.provider_no=provider.provider_no
+				WHERE appt.appointment_no=${appt_no}
 		</ap-sql>
 		<ap-output>${email}</ap-output>
 	</databaseap>
@@ -1283,8 +1284,9 @@
 	<databaseap>
 		<ap-name>doctor_email</ap-name>
 		<ap-sql>SELECT provider.email FROM provider JOIN
-				(SELECT * From demographic where demographic_no=${demographic}) as demo ON
-				provider.provider_no = demo.provider_no
+				demographic as demo
+				ON provider.provider_no = demo.provider_no
+				WHERE demographic_no=${demographic}
 		</ap-sql>
 		<ap-output>${email}</ap-output>
 	</databaseap>
