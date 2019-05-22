@@ -1167,6 +1167,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                       for(i=0;i<headers.size();i++){
                            linenum=0;
 						boolean isUnstructuredDoc = false;
+						boolean isPDF = false;
 						boolean	isVIHARtf = false;
 						boolean isSGorCDC = false;
 
@@ -1174,6 +1175,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						//labs that fall into any of these categories have certain requirements per Excelleris
 						if(handler.getMsgType().equals("PATHL7")){
 							isUnstructuredDoc = ((PATHL7Handler) handler).unstructuredDocCheck(headers.get(i));
+							isPDF = "ED".equals(handler.getOBXValueType(i, j));
 							isVIHARtf = ((PATHL7Handler) handler).vihaRtfCheck(headers.get(i));
 							if(handler.getPatientLocation().equals("SG") || handler.getPatientLocation().equals("CDC")){
 								isSGorCDC = true;
@@ -1199,7 +1201,19 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 	                               <td width="*">&nbsp;</td>
 	                           </tr>
 	                       </table>
-                       	<%if(isUnstructuredDoc){%>
+						<%
+							if (isPDF)
+							{
+
+						%>
+							<table width="100%" border="0" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF" bordercolor="#9966FF" bordercolordark="#bfcbe3" name="tblDiscs" id="tblDiscs">
+								<tr class="Field2">
+									<td class="Cell"><bean:message key="oscarMDS.segmentDisplay.formTestName"/></td>
+									<td class="Cell"><bean:message key="oscarMDS.segmentDisplay.formResult"/></td>
+								</tr>
+						<%
+							}
+							else if (isUnstructuredDoc){%>
 	                       <table width="100%" border="0" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF" bordercolor="#9966FF" bordercolordark="#bfcbe3" name="tblDiscs" id="tblDiscs">
 	                           <tr class="Field2">
 	                               <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formTestName"/></td>
@@ -1281,7 +1295,16 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                    	b1 = !obrFlag && !obrName.equals("");
                                    	b2 = !(obxName.contains(obrName));
 
-                                       if( b1 && b2 && !isUnstructuredDoc){
+                                   		if (isPDF)
+										{
+							%>
+						   				<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" >
+											<td><%=obrName%></td>
+											<td colspan="6"></td>
+										</tr>
+						   <%
+										}
+                                   		else if( b1 && b2 && !isUnstructuredDoc){
                                        %>
                                            <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" >
                                                <td valign="top" align="left"><%=obrName%></td>
@@ -1552,7 +1575,20 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                     } else if ((!handler.getOBXResultStatus(j, k).equals("TDIS") && !handler.getMsgType().equals("EPSILON")) )  {
 
-                                    	if(isUnstructuredDoc){%>
+                                       	if (isPDF)
+										{
+											int docId = hl7TextMessage.getEmbeddedDocId();
+									   %>
+						  					<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>">
+												<td valign="top" align="left">something nice and fluffy and descriptive goes here but maybe less wordy</td>
+												<td>
+													<a href="../../../dms/showDocument.jsp?inWindow=true&segmentID=<%=docId%>&providerNo=<%=providerNo%>" target="_blank">Display Included PDF</a>
+												</td>
+											</tr>
+						   <%
+										}
+
+                                    	else if(isUnstructuredDoc){%>
                                    			<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>"><%
                                    			if((obxCount>1) && k>0 && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1))) {%>
                                    				<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"></a><%

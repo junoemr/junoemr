@@ -438,6 +438,33 @@ public class PATHL7Handler extends MessageHandler
 		}
 	}
 
+    /**
+     * Very similar to the getOBXResult procedure above, except that some results are not immediately available
+     * at the first rep.
+     *  Example: "^TEXT^PDF^Base64^{msg}"
+     *  To get the "PDF" value here you would need to provide a rep value of 2
+     * @param i
+     *      OBR record
+     * @param j
+     *      OBX record
+     * @param k
+     *      component in OBX field
+     * @return
+     *      jth OBX result at kth rep from ith OBR record if available, empty string otherwise
+     */
+    @Override
+    public String getOBXResult(int i, int j, int k)
+    {
+        try
+        {
+            return (getString(Terser.get(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX(), 5, 0, k, 1)));
+        }
+        catch (Exception e)
+        {
+            return "";
+        }
+    }
+
     public String getOBXReferenceRange(int i, int j){
         try{
             return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getReferencesRange().getValue()));

@@ -34,8 +34,12 @@
 
 package oscar.oscarLab.ca.all.upload;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,6 +56,7 @@ import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
@@ -59,9 +64,12 @@ import org.oscarehr.common.model.OtherId;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
+import org.oscarehr.document.model.Document;
+import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.model.OLISSystemPreferences;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -77,6 +85,8 @@ import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
 import oscar.oscarLab.ca.all.parsers.SpireHandler;
 import oscar.util.UtilDateUtilities;
 
+import static org.oscarehr.common.io.FileFactory.createDocumentFile;
+
 public final class MessageUploader {
 
 	private static final Logger logger = MiscUtils.getLogger();
@@ -86,6 +96,7 @@ public final class MessageUploader {
 	private static DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
 	private static ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 	private static DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+	private static DocumentService documentService = SpringUtils.getBean(DocumentService.class);
 
 	private MessageUploader() {
 		// there's no reason to instantiate a class with no fields.
@@ -205,7 +216,6 @@ public final class MessageUploader {
 			Hl7TextMessage hl7TextMessage = new Hl7TextMessage();
 			Hl7TextInfo hl7TextInfo = new Hl7TextInfo();
 
-
 			if (isTDIS) {
 				List<Hl7TextInfo> matchingTdisLab =  hl7TextInfoDao.searchByFillerOrderNumber(fillerOrderNum, sendingFacility);
 				if (matchingTdisLab.size()>0) {
@@ -217,14 +227,80 @@ public final class MessageUploader {
 				}
 			}
 			int insertID = 0;
+
+			// Embedded Document - check has to be here
+			// If we get a document with identifier ED we need to switch up how we're storing it
+			// [1] Strip out the embedded PDF in the OBX message
+			// [2] Convert it to a document and get the document ID
+			boolean hasPDF = false;
+			List<String> embeddedPdfs = new ArrayList<>();
+			String embeddedPdf = "";
+
+			if (type.equals("PATHL7"))
+			{
+				for (i = 0; i < messageHandler.getOBRCount(); i++)
+				{
+					int obxCount = messageHandler.getOBXCount(i);
+					if (messageHandler.getOBXValueType(i, 0).equals("ED"))
+					{
+						String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
+						for (j = 0; j < obxCount; j++)
+						{
+							// Some embedded PDFs simply have the lab as-is, some have it split up like above
+							for (int k = 1; k <= referenceStrings.length; k++)
+							{
+								embeddedPdf = messageHandler.getOBXResult(i, j, k);
+								if (embeddedPdf.length() > referenceStrings[k-1].length()
+										&& !embeddedPdf.contains("parsed_embedded_pdf_document_id_"))
+								{
+									hasPDF = true;
+									embeddedPdfs.add(embeddedPdf);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			int docId = 0;
+
 			if (!isTDIS || !hasBeenUpdated) {
+				if (hasPDF)
+				{
+					for (String pdf : embeddedPdfs)
+					{
+						Demographic demographic = null;
+						try
+						{
+							demographic = getDemographicFromLabInfo(lastName, firstName, sex, dob, hin);
+						}
+						catch (Exception ignoringNoDemographic)
+						{
+
+						}
+						String fileName = accessionNum + ".pdf";
+						// TODO instead of demographic, pass in more meta information to build out docdesc properly
+						docId = createDocumentFromEmbeddedPDF(pdf, demographic, fileName);
+						if (docId <= 0)
+						{
+							throw new ParseException("did not save embedded lab document correctly", 0);
+						}
+					}
+				}
+
+				if (docId > 0)
+				{
+					hl7TextMessage.setEmbeddedDocId(docId);
+					// Replace original PDF string with meta info to prevent saving > 500k char strings in table
+					hl7Body = hl7Body.replace(embeddedPdf, "embedded_pdf_doc_id_" + docId);
+				}
 				hl7TextMessage.setFileUploadCheckId(fileId);
 				hl7TextMessage.setType(type);
 				hl7TextMessage.setBase64EncodedeMessage(new String(Base64.encodeBase64(hl7Body.getBytes(MiscUtils.DEFAULT_UTF8_ENCODING)), MiscUtils.DEFAULT_UTF8_ENCODING));
 				hl7TextMessage.setServiceName(serviceName);
 				hl7TextMessageDao.persist(hl7TextMessage);
-
 				insertID = hl7TextMessage.getId();
+
 				hl7TextInfo.setLabNumber(insertID);
 				hl7TextInfo.setLastName(lastName);
 				hl7TextInfo.setFirstName(firstName);
@@ -500,28 +576,7 @@ public final class MessageUploader {
 		PatientLabRoutingResult patientLabRoutingResult = null;
 		Integer demographicNumber = 0;
 		String providerNumber = "0";
-		GregorianCalendar dateOfBirth = null;
-
-		if (hin != null) {
-			// This is for one of the Ontario labs I think??
-			if (hin.length() == 12) {
-				hin = hin.substring(0, 10);
-			}
-		}
-
-		if (dob != null && !dob.trim().equals("")) {
-			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-			Date date = dateFormat.parse(dob.trim());
-			dateOfBirth = new GregorianCalendar();
-			dateOfBirth.setTime(date);
-		}
-
-		// Only match against first chars of patient name
-		if (!firstName.equals("")) firstName = firstName.substring(0, 1);
-		if (!lastName.equals("")) lastName = lastName.substring(0, 1);
-
-		Demographic demographic = demographicDao.findMatchingLab(
-				hin, firstName, lastName, sex, dateOfBirth);
+		Demographic demographic = getDemographicFromLabInfo(lastName, firstName, sex, dob, hin);
 
 		patientLabRoutingResult = new PatientLabRoutingResult();
 		demographicNumber = demographic.getDemographicNo();
@@ -564,5 +619,92 @@ public final class MessageUploader {
 		patientLabRoutingDao.persist(patientLabRouting);
 
 		return patientLabRoutingResult.getProviderNo();
+	}
+
+	/**
+	 * Helper function to get a Demographic object based off information pulled from the lab.
+	 * @param lastName
+	 * 		last name of the demographic we're looking for
+	 * @param firstName
+	 * 		first name of the demographic we're looking for
+	 * @param sex
+	 * 		gender of the demographic (M/F)
+	 * @param dob
+	 * 		string representation of the demographic's DOB (gets converted to GregorianCalendar)
+	 * @param hin
+	 * 		hin for the demographic we're looking for
+	 * @return
+	 * 		a Demographic object matching the search parameters
+	 * @throws ParseException
+	 * 		only throws if the DOB can't be parsed
+	 */
+	private static Demographic getDemographicFromLabInfo(String lastName, String firstName, String sex, String dob, String hin)
+			throws ParseException
+	{
+		GregorianCalendar dateOfBirth = null;
+
+		if (hin != null)
+		{
+			// This is for one of the Ontario labs I think??
+			if (hin.length() == 12)
+			{
+				hin = hin.substring(0, 10);
+			}
+		}
+
+		if (dob != null && !dob.trim().equals(""))
+		{
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			Date date = dateFormat.parse(dob.trim());
+			dateOfBirth = new GregorianCalendar();
+			dateOfBirth.setTime(date);
+		}
+
+		// Only match against first chars of patient name
+		if (!firstName.equals(""))
+		{
+			firstName = firstName.substring(0, 1);
+		}
+		if (!lastName.equals(""))
+		{
+			lastName = lastName.substring(0, 1);
+		}
+
+		return demographicDao.findMatchingLab(hin, firstName, lastName, sex, dateOfBirth);
+	}
+
+	/**
+	 * Helper function for creating a proper document from an embedded PDF string.
+	 * These PDFs are encoded in the lab message as a base64 string.
+	 * @param embeddedPDF
+	 * 		base64-encoded String representing the PDF we want to save
+	 * @return
+	 * 		an integer corresponding to the document ID we've created
+	 */
+	private static int createDocumentFromEmbeddedPDF(String embeddedPDF, Demographic demographic, String fileName)
+			throws InterruptedException, IOException
+	{
+		InputStream fileStream = new ByteArrayInputStream(Base64.decodeBase64(embeddedPDF));
+
+		GenericFile embeddedLabDoc = createDocumentFile(fileStream, fileName);
+
+		Document document = new Document();
+		document.setDocCreator(ProviderData.SYSTEM_PROVIDER_NO);
+		document.setResponsible(ProviderData.SYSTEM_PROVIDER_NO);
+		document.setDocfilename("embedded_lab/" + fileName);
+		// TODO read more meta-information from lab and pass it in to assemble a better doc description
+		document.setDocdesc("embedded_pdf");
+		document.setSourceFacility("HL7Upload");
+		document.setSource("Excelleris");
+
+		int demographicNo = 0;
+		if (demographic != null)
+		{
+			demographicNo = demographic.getDemographicNo();
+		}
+
+		Document savedDoc = documentService.uploadNewDemographicDocument(document, embeddedLabDoc, null);
+
+		return savedDoc.getDocumentNo();
 	}
 }
