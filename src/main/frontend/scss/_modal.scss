@@ -45,7 +45,7 @@
 .juno-modal {
 	.modal-dialog {
 		width: 960px;
-		height: 600px;
+		height: 584px;
 		.modal-content {
 			height: 100%;
 			display: flex;
@@ -104,16 +104,15 @@
 	}
 	label {
 		font-family: "Arial", "Helvetica", sans-serif;
-		font-size: 12px;
+		font-size: 11px;
 		font-weight: normal;
 		font-style: normal;
 		font-stretch: normal;
 		line-height: normal;
 		letter-spacing: normal;
 		text-align: right;
-		color: $grey-05;
-		padding-top: 3px;
-		padding-bottom: 3px;
+		color: $grey-04;
+		padding: 3px 2px;
 	}
 	select, input, textarea {
 		border-radius: 8px;
@@ -128,16 +127,6 @@
 		font-stretch: normal;
 		line-height: normal;
 		letter-spacing: normal;
-		color: $grey-04;
-	}
-	span {
-		font-family: "Arial", "Helvetica", sans-serif;
-		font-size: 11px;
-		font-weight: normal;
-		font-style: normal;
-		font-stretch: normal;
-		line-height: normal;
-		letter-spacing: normal;
-		color: $grey-04;
+		color: $grey-05;
 	}
 }

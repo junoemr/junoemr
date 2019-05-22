@@ -67,20 +67,31 @@
 
 					<div class="pull-left form-inline">
 						<div ng-show="hasSites()">
-							<div class="form-group">
-								<label for="site-select">Site:</label>
-								<select id="site-select"
-										class="form-control"
-										ng-change="onSiteChanged()"
-										ng-model="selectedSiteName">
-									<option
-											ng-repeat="option in getSiteOptions()"
-											value="{{option.name}}"
-											style="background-color: {{option.color}}">
-										{{option.display_name}}
-									</option>
-								</select>
-							</div>
+							<%--<div class="form-group">--%>
+								<%--<label for="site-select">Site:</label>--%>
+								<%--<select id="site-select"--%>
+										<%--class="form-control"--%>
+										<%--ng-change="onSiteChanged()"--%>
+										<%--ng-model="selectedSiteName">--%>
+									<%--<option--%>
+											<%--ng-repeat="option in getSiteOptions()"--%>
+											<%--value="{{option.name}}"--%>
+											<%--style="background-color: {{option.color}}">--%>
+										<%--{{option.display_name}}--%>
+									<%--</option>--%>
+								<%--</select>--%>
+							<%--</div>--%>
+							<ca-field-select
+									ca-name="site"
+									ca-title="Site"
+									ca-template="label"
+									ca-label-size="col-md-4"
+									ca-input-size="col-md-8"
+									ca-model="selectedSiteName"
+									ca-options="getSiteOptions()"
+									ca-change="onSiteChanged()"
+							>
+							</ca-field-select>
 						</div>
 					</div>
 

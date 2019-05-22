@@ -20,21 +20,22 @@ angular.module('Common').directive(
 		};
 
 		var linkFunction = function linkFunction($scope, element, attribute, controller) {
-			$scope.select_change_fn = function select_change_fn(elementId)
+			$scope.select_change_fn = function select_change_fn(model, elementId)
 			{
-				var element = $("#"+elementId);
-				var selectedOption = element.find(":selected");
-				var selectedColor = selectedOption.css('background-color');
+				// var element = $("#"+elementId);
+				// var selectedOption = element.find(":selected");
+				// var selectedColor = selectedOption.css('background-color');
+				// var new_model = $scope.options[model.displayLetter];
 
 				// change the background color to match the selected option
-				element.css('background-color', selectedColor);
+				// element.css('background-color', selectedColor);
 
 				//remove existing icon classes & add selected one
-				element.find(".icon-status").removeClass(function (index, className)
-				{
-					return (className.match(/(^|\s)icon-status-\S+/g) || []).join(' ');
-				});
-				element.addClass("icon-status-todo")
+				// element.find(".icon-status").removeClass(function (index, className)
+				// {
+				// 	return (className.match(/(^|\s)icon-status-\S+/g) || []).join(' ');
+				// });
+				// element.addClass("icon-status-todo")
 			};
 			helper.default_link_function($scope, element, attribute, controller);
 		};

@@ -328,7 +328,13 @@
 						color: $grey-05;
 					}
 					span {
+						font-family: "Arial", "Helvetica", sans-serif;
 						font-size: 11px;
+						font-weight: normal;
+						font-style: normal;
+						font-stretch: normal;
+						line-height: normal;
+						letter-spacing: normal;
 						color: $grey-04;
 					}
 				}
@@ -336,88 +342,6 @@
 		}
 		.alert-container {
 			height: 40px;
-		}
-
-
-		//&.legend {
-		//	.event-color {
-		//		float: left;
-		//		margin-right: 15px;
-		//	}
-		//}
-		//
-		//&.event {
-		//
-		//	.schedule-header {
-		//		@include clearfix;
-		//		border-bottom: 1px solid #CCC;
-		//		padding-bottom: 4px;
-		//		margin-bottom: 5px;
-		//
-		//		h4.schedule-title {
-		//			font-size: 1.571em;
-		//			margin: 0;
-		//		}
-		//
-		//		button {
-		//			margin-left: 4px;
-		//		}
-		//		.label {
-		//			margin-left: 4px;
-		//		}
-		//	}
-		//
-		//	.event-color {
-		//		position: relative;
-		//		top: 5px;
-		//	}
-		//
-		//	.time-wrapper {
-		//		padding-left: 0
-		//	}
-		//
-		//	.availability {
-		//		@include clearfix;
-		//		margin-top: 5px;
-		//
-		//		.color {
-		//			width: 30px;
-		//		}
-		//		.info {
-		//			width: 230px;
-		//		}
-		//		.availability-detail {
-		//			display: inline-block;
-		//		}
-		//	}
-		//
-		//	.patient-image {
-		//
-		//		img {
-		//			width: 120px;
-		//			height: 120px;
-		//		}
-		//
-		//		.upload-text {
-		//			position: absolute;
-		//			bottom: 0;
-		//			left: 33px;
-		//		}
-		//	}
-		//
-		//	.patient-health-number {
-		//		margin-right: 10px;
-		//	}
-		//
-		//	.modal-body .bootstrap-timepicker button {
-		//		height: 34px;
-		//	}
-		//}
-	}
-
-	.modal-footer {
-		.bottom-buttons {
-
 		}
 	}
 }

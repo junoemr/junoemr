@@ -5,28 +5,32 @@
 // Calendar Event Controller
 //=========================================================================/
 
+import {ScheduleApi} from "../../generated/api/ScheduleApi";
+
 angular.module('Schedule').controller('Schedule.EventController', [
 
-		'$scope',
-		'$q',
-		'$timeout',
-		'$state',
-		'$uibModal',
-		'$uibModalInstance',
-
-		'errorsService',
-
-		'demographicService',
-		'securityService',
-		'keyBinding',
-		'focus',
-		'type', 'parentScope', 'label', 'editMode', 'data',
+	'$scope',
+	'$q',
+	'$http',
+	'$httpParamSerializer',
+	'$timeout',
+	'$state',
+	'$uibModal',
+	'$uibModalInstance',
+	'errorsService',
+	'demographicService',
+	'securityService',
+	'keyBinding',
+	'focus',
+	'type', 'parentScope', 'label', 'editMode', 'data',
 
 	function (
-		$scope, $q, $timeout, $state, $uibModal, $uibModalInstance,
-
+		$scope,
+		$q,
+		$http,
+		$httpParamSerializer,
+		$timeout, $state, $uibModal, $uibModalInstance,
 		messagesFactory,
-
 		demographicService,
 		securityService,
 		keyBinding,
@@ -36,6 +40,11 @@ angular.module('Schedule').controller('Schedule.EventController', [
 {
 	$scope.parentScope = parentScope;
 	let controller = this;
+
+	$scope.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
+		'../ws/rs');
+
+	console.info('data', data);
 
 	//=========================================================================
 	// Access Control
@@ -48,18 +57,13 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	controller.tabEnum = Object.freeze({
 		appointment:0,
-		appointmentHistory:1,
-		appointmentEdits:2
+		reoccurring:1,
+		history:2
 	});
 	controller.activeTab = controller.tabEnum.appointment;
 
-	controller.selectedProvider = null;
-	controller.selectedResource = null;
-
-	controller.amSelected = false;
-
-	controller.appointmentTypeList = ["type 1", "type 2"];
-	controller.reasonTypeList = ["type 1", "type 2"];
+	controller.appointmentTypeList = [];
+	controller.reasonCodeList = [];
 
 	$scope.label = label;
 	$scope.editMode = editMode;
@@ -75,11 +79,12 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		endDate: null,
 		endTime: null,
 		reason: null,
-		reasonType: null,
+		reasonCode: null,
 		notes: null,
 		type: null,
 		duration: null,
-		doNotBook: null,
+		doNotBook: false,
+		critical: false,
 	};
 
 	$scope.timeInterval = data.timeInterval;
@@ -91,12 +96,13 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	$scope.activeTemplateEvents = [];
 
-	$scope.eventStatuses = $scope.parentScope.eventStatuses;
-	console.info('eventStatuses', $scope.eventStatuses);
-	// controller.statusOptionsSelect = Object.keys($scope.eventStatuses).map(function(key, index) {
+	controller.eventStatuses = $scope.parentScope.eventStatuses;
+	// controller.eventStatusesArray = Object.values(controller.eventStatuses);
+	// console.info('eventStatuses', controller.eventStatuses);
+	// controller.statusOptionsSelect = Object.keys(controller.eventStatuses).map(function(key, index) {
 	// 	let obj = {
-	// 		label: $scope.eventStatuses[key].name,
-	// 		value: $scope.eventStatuses[key].displayLetter
+	// 		label: controller.eventStatuses[key].name,
+	// 		value: controller.eventStatuses[key].displayLetter
 	// 	};
 	// 	console.info(key, index, obj);
 	// 	return obj;
@@ -104,10 +110,11 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	// console.info('statusOptionsSelect', controller.statusOptionsSelect);
 
 	$scope.eventStatusOptions = [];
-	$scope.selectedEventStatus = null;
+	controller.selectedEventStatus = null;
 	$scope.defaultEventStatus = null;
 
-	$scope.selectedSiteName = null;
+	controller.selectedSiteName = null;
+	controller.siteOptions = $scope.parentScope.siteOptions;
 
 	$scope.timepickerFormat = "h:mm A";
 
@@ -185,6 +192,9 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			});
 		}
 
+		controller.loadAppointmentReasons();
+		controller.loadAppointmentTypes();
+
 		$scope.demographicModel.clear();
 
 		var momentStart = data.startTime;
@@ -200,31 +210,32 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		// maintain a list of the 'active' templates based on start time
 		$scope.setActiveTemplateEvents();
 
-		//$scope.eventStatusOptions.push("");
-		for(var key in $scope.eventStatuses)
+		for(var key in controller.eventStatuses)
 		{
-			if($scope.eventStatuses.hasOwnProperty(key))
+			if(controller.eventStatuses.hasOwnProperty(key))
 			{
-				$scope.eventStatusOptions.push($scope.eventStatuses[key]);
+				$scope.eventStatusOptions.push(controller.eventStatuses[key]);
 			}
 		}
 		$scope.defaultEventStatus = data.defaultEventStatus;
-		$scope.setSelectedEventStatus(data.eventData.eventStatusCode);
-		// controller.statusOptionsSelect = $scope.eventStatuses.map(a => a.displayLetter);
-
+		controller.setSelectedEventStatus(data.eventData.eventStatusCode);
 
 		if(editMode)
 		{
 			$scope.eventUuid = data.eventData.appointmentNo;
 			$scope.eventData.reason = data.eventData.reason;
 			$scope.eventData.notes = data.eventData.notes;
+			$scope.eventData.type = data.eventData.type;
+			$scope.eventData.reasonCode = data.eventData.reasonCode;
+			$scope.eventData.doNotBook = data.eventData.doNotBook;
+			$scope.eventData.critical = data.eventData.urgency != null;
 
 			// either load the patient data and init the autocomplete
 			// or ensure the patient model is clear
 			$scope.initPatientAutocomplete(data.eventData.demographicNo).then(function() {
 				$scope.initialized = true;
 			});
-			$scope.selectedSiteName = data.eventData.site;
+			controller.selectedSiteName = data.eventData.site;
 		}
 		else
 		{
@@ -232,12 +243,14 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			// and clear the patient model
 			$scope.adjustEndDatetime();
 			$scope.demographicModel.clear();
+			controller.selectedSiteName = $scope.parentScope.selectedSiteName;
 
-			// autofocus the patient field
 			focus.element("#input-patient");
 
 			$scope.initialized = true;
 		}
+
+		console.info('eventData', $scope.eventData);
 
 		controller.changeTab(controller.tabEnum.appointment);
 	};
@@ -274,7 +287,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	// Private methods
 	//=========================================================================/
 
-	$scope.setSelectedEventStatus = function setSelectedEventStatus(selectedCode)
+	controller.setSelectedEventStatus = function setSelectedEventStatus(selectedCode)
 	{
 		var eventStatusCode = $scope.defaultEventStatus;
 
@@ -284,13 +297,13 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		}
 
 		if(!Juno.Common.Util.exists(eventStatusCode) ||
-			!Juno.Common.Util.exists($scope.eventStatuses[eventStatusCode]))
+			!Juno.Common.Util.exists(controller.eventStatuses[eventStatusCode]))
 		{
 			// if not set or found just pick the first one
 			eventStatusCode = $scope.eventStatusOptions[0].displayLetter;
 		}
 
-		$scope.selectedEventStatus = $scope.eventStatuses[eventStatusCode];
+		controller.selectedEventStatus = eventStatusCode;
 	};
 
 	// Make a list of the types of appointments available for this appointment
@@ -348,6 +361,64 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			$scope.eventData.endDate = Juno.Common.Util.formatMomentDate(momentEnd);
 			$scope.eventData.endTime = Juno.Common.Util.formatMomentTime(momentEnd, $scope.timepickerFormat);
 		}
+	};
+
+	controller.loadAppointmentReasons = function loadAppointmentReasons()
+	{
+		var deferred = $q.defer();
+
+		$scope.scheduleApi.getAppointmentReasons().then(
+			function success(rawResults)
+			{
+				var results = rawResults.data.body;
+				var out = [];
+				if(angular.isArray(results))
+				{
+					for(var i = 0; i < results.length; i++)
+					{
+						out.push({
+							label: results[i].label,
+							value: results[i].id,
+						});
+					}
+				}
+				controller.reasonCodeList = out;
+
+				// set the default selected option
+				if(!Juno.Common.Util.exists($scope.eventData.reasonCode))
+				{
+					$scope.eventData.reasonCode = controller.reasonCodeList[0].value;
+				}
+				deferred.resolve(controller.reasonCodeList);
+			});
+
+		return deferred.promise;
+	};
+
+	controller.loadAppointmentTypes = function loadAppointmentTypes()
+	{
+		var deferred = $q.defer();
+
+		$scope.scheduleApi.getAppointmentTypes().then(
+			function success(rawResults)
+			{
+				var results = rawResults.data.body;
+				var out = [];
+				if(angular.isArray(results))
+				{
+					for(var i = 0; i < results.length; i++)
+					{
+						out.push({
+							label: results[i].name,
+							value: results[i].name,
+						});
+					}
+				}
+				controller.appointmentTypeList = out;
+				deferred.resolve(controller.appointmentTypeList);
+			});
+
+		return deferred.promise;
 	};
 
 	$scope.updateLastEventLength = function updateLastEventLength()
@@ -413,6 +484,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		var endDatetime = Juno.Common.Util.getDateAndTimeMoment(
 				$scope.eventData.endDate, $scope.formattedTime($scope.eventData.endTime));
 
+		var demographicNo = ($scope.eventData.doNotBook)? null : $scope.demographicModel.demographicNo;
 
 		parentScope.saveEvent(
 			editMode,
@@ -420,12 +492,16 @@ angular.module('Schedule').controller('Schedule.EventController', [
 				appointmentNo: $scope.eventUuid,
 				startTime: startDatetime,
 				endTime: endDatetime,
+				type: $scope.eventData.type,
 				reason: $scope.eventData.reason,
+				reasonCode: $scope.eventData.reasonCode,
 				notes: $scope.eventData.notes,
 				providerNo: $scope.schedule.uuid,
-				eventStatusCode: $scope.selectedEventStatus.displayLetter,
-				demographicNo: $scope.demographicModel.demographicNo,
-				site: $scope.selectedSiteName
+				eventStatusCode: controller.selectedEventStatus,
+				demographicNo: demographicNo,
+				site: controller.selectedSiteName,
+				doNotBook: $scope.eventData.doNotBook,
+				urgency: (($scope.eventData.critical)? 'critical' : null),
 			}
 		).then(
 			function(results)
@@ -563,8 +639,8 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	$scope.hasSites = function hasSites()
 	{
-		return (parentScope.siteOptions.length > 0)
-	}
+		return (controller.siteOptions.length > 0)
+	};
 
 	$scope.clearPatient = function clearPatient()
 	{

@@ -47,12 +47,14 @@ public class CalendarAppointment implements Serializable
 	private String eventStatusModifier;
 	private Integer numInvoices;
 	private String reason;
+	private Integer reasonCode;
 	private String notes;
 	private String tagNames;
 	private String site;
 	private String type;
 	private String resources;
 	private String urgency;
+	private boolean doNotBook;
 	private boolean tagSelfBooked;
 	private boolean tagSelfCancelled;
 	private String tagSystemCodes;
@@ -65,9 +67,9 @@ public class CalendarAppointment implements Serializable
 	                           String userLastName, LocalDate demographicDob, String demographicName,
 	                           String demographicPhone, Integer demographicNo, Integer providerNo,
 	                           LocalDateTime startTime, LocalDateTime endTime, String eventStatusCode,
-	                           String eventStatusModifier, Integer numInvoices, String reason,
+	                           String eventStatusModifier, Integer numInvoices, String reason, Integer reasonCode,
 	                           String notes, String tagNames, String site, String type,
-	                           String resources, String urgency, boolean tagSelfBooked,
+	                           String resources, String urgency, boolean doNotBook, boolean tagSelfBooked,
 	                           boolean tagSelfCancelled, String tagSystemCodes)
 	{
 		this.appointmentNo = appointmentNo;
@@ -88,12 +90,14 @@ public class CalendarAppointment implements Serializable
 		this.eventStatusModifier = eventStatusModifier;
 		this.numInvoices = numInvoices;
 		this.reason = reason;
+		this.reasonCode = reasonCode;
 		this.notes = notes;
 		this.tagNames = tagNames;
 		this.site = site;
 		this.type = type;
 		this.resources = resources;
 		this.urgency = urgency;
+		this.doNotBook = doNotBook;
 		this.tagSelfBooked = tagSelfBooked;
 		this.tagSelfCancelled = tagSelfCancelled;
 		this.tagSystemCodes = tagSystemCodes;
@@ -279,6 +283,16 @@ public class CalendarAppointment implements Serializable
 		this.reason = reason;
 	}
 
+	public Integer getReasonCode()
+	{
+		return reasonCode;
+	}
+
+	public void setReasonCode(Integer reasonCode)
+	{
+		this.reasonCode = reasonCode;
+	}
+
 	public String getNotes()
 	{
 		return notes;
@@ -337,6 +351,16 @@ public class CalendarAppointment implements Serializable
 	public void setUrgency(String urgency)
 	{
 		this.urgency = urgency;
+	}
+
+	public boolean isDoNotBook()
+	{
+		return doNotBook;
+	}
+
+	public void setDoNotBook(boolean doNotBook)
+	{
+		this.doNotBook = doNotBook;
 	}
 
 	public boolean isTagSelfBooked()

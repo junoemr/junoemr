@@ -678,6 +678,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			var deferred = $q.defer();
 
+			console.info('saveEvent', calendarAppointment);
+
 			if(editMode)
 			{
 				this.appointmentApi.updateAppointment(calendarAppointment).then(
@@ -1081,7 +1083,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 				var data = {
 					schedule: modalSchedule,
-					defaultEventStatus: null, //defaultEventStatus,
+					defaultEventStatus: 't', //defaultEventStatus,
 					startTime: start,
 					endTime: end,
 					timeInterval: $scope.timeIntervalMinutes(),
@@ -1466,8 +1468,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						$scope.siteOptions = [
 							{
 								uuid: null,
-								name: null,
-								display_name: "All",
+								value: null,
+								label: "All",
 							}
 						];
 
@@ -1494,8 +1496,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						{
 							out.push({
 								uuid: results[i].siteId,
-								name: results[i].name,
-								display_name: results[i].name,
+								value: results[i].name,
+								label: results[i].name,
 								color: results[i].bgColor,
 							});
 						}

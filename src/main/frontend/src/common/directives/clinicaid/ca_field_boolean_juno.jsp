@@ -6,16 +6,14 @@
 	<label for="input-{{name}}"
 				 class="{{label_size}} control-label"
 				 title="{{hint}}">
-		{{title}}
+		{{title}}:
 	</label>
 
 	<div class="{{input_size}} form-control-static juno-checkbox">
 		<input type="checkbox"
 					 bs-switch
-					 switch-on-text="{{true_text}}"
-					 switch-off-text="{{false_text}}"
-					 ng-true-value="'{{true_value}}'"
-					 ng-false-value="'{{false_value}}'"
+					 switch-on-text="Yes"
+					 switch-off-text="No"
 					 switch-active="{{!disabled}}"
 					 id="input-{{name}}"
 					 ng-model="model"

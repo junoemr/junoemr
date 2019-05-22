@@ -185,7 +185,6 @@ public class AppointmentManager {
 		// Copy automatic information
 		appointment.setCreator(existing.getCreator());
 		appointment.setCreateDateTime(existing.getCreateDateTime());
-		appointment.setReasonCode(existing.getReasonCode());
 
 		try
 		{

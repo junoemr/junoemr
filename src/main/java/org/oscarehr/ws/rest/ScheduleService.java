@@ -76,6 +76,8 @@ import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.SchedulingResponse;
 import org.oscarehr.ws.rest.to.model.AppointmentStatusTo1;
 import org.oscarehr.ws.rest.to.model.AppointmentTo1;
+import org.oscarehr.ws.rest.to.model.AppointmentTypeTo1;
+import org.oscarehr.ws.rest.to.model.LookupListItemTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -359,35 +361,61 @@ public class ScheduleService extends AbstractServiceImpl {
 	}
 */
 	
+//	@GET
+//	@Path("/types")
+//	@Produces("application/json")
+//	public SchedulingResponse getAppointmentTypes() {
+//		SchedulingResponse response = new SchedulingResponse();
+//
+//		List<AppointmentType> types = scheduleManager.getAppointmentTypes();
+//
+//		AppointmentTypeConverter converter = new AppointmentTypeConverter();
+//
+//		response.setTypes(converter.getAllAsTransferObjects(getLoggedInInfo(), types));
+//
+//		return response;
+//	}
+
 	@GET
 	@Path("/types")
 	@Produces("application/json")
-	public SchedulingResponse getAppointmentTypes() {
-		SchedulingResponse response = new SchedulingResponse();
+	public RestSearchResponse<AppointmentTypeTo1> getAppointmentTypes() {
 
 		List<AppointmentType> types = scheduleManager.getAppointmentTypes();
 
 		AppointmentTypeConverter converter = new AppointmentTypeConverter();
+		List<AppointmentTypeTo1> transferList = converter.getAllAsTransferObjects(getLoggedInInfo(), types);
 
-		response.setTypes(converter.getAllAsTransferObjects(getLoggedInInfo(), types));
-
-		return response;
+		return RestSearchResponse.successResponseOnePage(transferList);
 	}
+
+//	@GET
+//	@Path("/reasons")
+//	@Produces("application/json")
+//	public SchedulingResponse getAppointmentReasons() {
+//
+//		SchedulingResponse response = new SchedulingResponse();
+//
+//		List<LookupListItem> items = appointmentManager.getReasons();
+//
+//		LookupListItemConverter converter = new LookupListItemConverter();
+//
+//		response.setReasons(converter.getAllAsTransferObjects(getLoggedInInfo(), items));
+//
+//		return response;
+//	}
 
 	@GET
 	@Path("/reasons")
 	@Produces("application/json")
-	public SchedulingResponse getAppointmentReasons() {
-
-		SchedulingResponse response = new SchedulingResponse();
-
+	public RestSearchResponse<LookupListItemTo1> getAppointmentReasons()
+	{
 		List<LookupListItem> items = appointmentManager.getReasons();
 
 		LookupListItemConverter converter = new LookupListItemConverter();
+		List<LookupListItemTo1> transferList = converter.getAllAsTransferObjects(getLoggedInInfo(), items);
 
-		response.setReasons(converter.getAllAsTransferObjects(getLoggedInInfo(), items));
-		
-		return response;
+		return RestSearchResponse.successResponseOnePage(transferList);
 	}
 
 	// TODO: make the services below match the current status quo (logging, limits, etc)

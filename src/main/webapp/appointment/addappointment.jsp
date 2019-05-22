@@ -51,7 +51,7 @@
 <%@page import="org.oscarehr.managers.ProgramManager2" %>
 <%
 
-	String DONOTBOOK = "Do_Not_Book";
+	String DONOTBOOK = Appointment.DONOTBOOK;
 	String curProvider_no = request.getParameter("provider_no");
 	String curDoctor_no = request.getParameter("doctor_no") != null ? request.getParameter("doctor_no") : "";
 	String curUser_no = (String) session.getAttribute("user");

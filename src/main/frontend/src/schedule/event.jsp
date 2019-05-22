@@ -70,13 +70,13 @@
 						Appointment</a>
 				</li>
 				<li>
-					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.appointmentHistory);">
-						Appointment History
-					</a>
+					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.reoccurring);">
+						Reocurring</a>
 				</li>
 				<li>
-					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.appointmentEdits);">
-						Edits</a>
+					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.history);">
+						History
+					</a>
 				</li>
 			</ul>
 		</div>
@@ -89,14 +89,6 @@
 					<div ng-show="isInitialized() && !isWorking()" class="row">
 						<div class="tab-bar-inputs form-horizontal">
 							<div class="col-sm-6">
-								<ca-field-toggle
-										ca-name="check-do-not-book"
-										ca-title="Do Not Book"
-										ca-label-size="col-md-8"
-										ca-input-size="col-md-4"
-										ca-model="eventData.doNotBook"
-										ca-template="juno">
-								</ca-field-toggle>
 							</div>
 							<div class="col-sm-6">
 								<ca-field-select
@@ -104,9 +96,8 @@
 										ca-template="appt_status"
 										ca-no-label="true"
 										ca-input-size="col-md-12"
-										ca-model="selectedEventStatus"
-										ca-options="eventStatuses"
-										<%--ca-change="eventController.changeSelectColor()"--%>
+										ca-model="eventController.selectedEventStatus"
+										ca-options="eventController.eventStatuses"
 								>
 								</ca-field-select>
 							</div>
@@ -124,25 +115,43 @@
 							<div class="row">
 								<div class="col-md-6">
 									<!-- patient search -->
-									<div class="form-group" title="Patient">
+									<div class="form-group" title="Patient"
+									     ng-hide="eventData.doNotBook">
 										<label for="input-patient" class="col-md-2">
 											Patient
 										</label>
 										<juno-patient-search-typeahead
 												id="input-patient"
 												class="col-md-10"
-												juno-model="patientTypeahead">
+												juno-model="patientTypeahead"
+										>
 										</juno-patient-search-typeahead>
+									</div>
+									<div class="form-group" title="Patient"
+									     ng-show="eventData.doNotBook">
+										<label for="input-patient-dnb" class="col-md-2">
+											Patient
+										</label>
+										<div class="col-md-10">
+											<input type="text"
+											       id="input-patient-dnb"
+											       ng-readonly="true"
+											       class="form-control"
+											       value="Do Not Book"
+											/>
+										</div>
 									</div>
 								</div>
 								<div class="col-md-6">
 									<ca-field-select
 											ca-name="type"
 											ca-title="Type"
+											ca-template="label"
 											ca-label-size="col-md-2"
 											ca-input-size="col-md-10"
 											ca-model="eventData.type"
-											ca-options="controller.appointmentTypeList"
+											ca-options="eventController.appointmentTypeList"
+											ca-empty-option="true"
 									>
 									</ca-field-select>
 								</div>
@@ -299,44 +308,56 @@
 												<div class="col-md-6">
 													<div class="row">
 														<div class="col-md-6">
-															<ca-field-toggle
+															<ca-field-boolean
 																	ca-name="check-am"
 																	ca-title="am"
 																	ca-label-size="col-md-5"
 																	ca-input-size="col-md-7"
 																	ca-model="eventController.amSelected"
-																	ca-template="juno">
-															</ca-field-toggle>
+																	ca-template="juno"
+															>
+															</ca-field-boolean>
 														</div>
 														<div class="col-md-6">
-															<ca-field-toggle
+															<ca-field-boolean
 																	ca-name="check-pm"
 																	ca-title="pm"
 																	ca-label-size="col-md-5"
 																	ca-input-size="col-md-7"
 																	ca-model="eventController.pmSelected"
-																	ca-template="juno">
-															</ca-field-toggle>
+																	ca-template="juno"
+															>
+															</ca-field-boolean>
 														</div>
 													</div>
 												</div>
 											</div>
 											<div class="row">
 												<div class="col-md-6">
+													<ca-field-boolean
+															ca-name="check-do-not-book"
+															ca-title="Do Not Book"
+															ca-label-size="col-md-8"
+															ca-input-size="col-md-4"
+															ca-model="eventData.doNotBook"
+															ca-template="juno"
+													>
+													</ca-field-boolean>
 												</div>
 												<div class="col-md-6">
 													<div class="row">
 														<div class="col-md-6">
 														</div>
 														<div class="col-md-6">
-															<ca-field-toggle
+															<ca-field-boolean
 																	ca-name="check-critical"
 																	ca-title="Critical"
 																	ca-label-size="col-md-5"
 																	ca-input-size="col-md-7"
-																	ca-model="eventController.critical"
-																	ca-template="juno">
-															</ca-field-toggle>
+																	ca-model="eventData.critical"
+																	ca-template="juno"
+															>
+															</ca-field-boolean>
 														</div>
 													</div>
 												</div>
@@ -364,10 +385,11 @@
 									<ca-field-select
 											ca-name="site"
 											ca-title="Site"
+											ca-template="label"
 											ca-label-size="col-md-2"
 											ca-input-size="col-md-10"
-											ca-model="selectedSiteName"
-											ca-options="parentScope.siteOptions"
+											ca-model="eventController.selectedSiteName"
+											ca-options="eventController.siteOptions"
 									>
 									</ca-field-select>
 									<%--<div class="form-group">--%>
@@ -387,12 +409,13 @@
 								<div class="col-md-6">
 									<!-- reason type -->
 									<ca-field-select
+											ca-template="label"
 											ca-label-size="col-md-2"
 											ca-input-size="col-md-10"
-											ca-name="reason-type"
+											ca-name="reason-code"
 											ca-title="Reason Type"
-											ca-model="eventData.reasonType"
-											ca-options="eventController.reasonTypeList"
+											ca-model="eventData.reasonCode"
+											ca-options="eventController.reasonCodeList"
 											ca-empty-option="false"
 									>
 									</ca-field-select>
@@ -615,8 +638,12 @@
 					</div>
 				</form>
 			</div>
-			<div id="tabAppointmentHistory" class="tab-pane"
-			     ng-show="eventController.activeTab == eventController.tabEnum.appointmentHistory">
+			<div id="tabReoccurring" class="tab-pane"
+			     ng-show="eventController.activeTab == eventController.tabEnum.reoccurring">
+				<span>TO DO</span>
+			</div>
+			<div id="tabHistory" class="tab-pane"
+			     ng-show="eventController.activeTab == eventController.tabEnum.history">
 				<span>TO DO</span>
 			</div>
 		</div>
@@ -628,13 +655,13 @@
 				<button
 						type="button"
 						class="btn btn-default"
-						ng-click="cancel()"
-						ng-disabled="isWorking()">Cancel
+						<%--ng-click="cancel()"--%>
+						ng-disabled="isWorking()">Receipt
 				</button>
 
 				<button
 						type="button"
-						class="btn btn-primary"
+						class="btn btn-default"
 						tooltip-placement="top"
 						tooltip-append-to-body="true"
 						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
@@ -643,27 +670,29 @@
 
 				<button
 						type="submit"
-						class="btn btn-success"
+						class="btn btn-primary"
 						tooltip-placement="top"
 						tooltip-append-to-body="true"
 						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
 						ng-show="!editMode"
+						ng-click="save()"
 						ng-disabled="isWorking()">Create
 				</button>
 
 				<button
 						type="submit"
-						class="btn btn-success"
+						class="btn btn-primary"
 						tooltip-placement="top"
 						tooltip-append-to-body="true"
 						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
 						ng-show="editMode"
+						ng-click="save()"
 						ng-disabled="isWorking()">Modify
 				</button>
 
 				<button
 						type="button"
-						class="btn btn-success"
+						class="btn btn-primary"
 						tooltip-placement="top"
 						tooltip-append-to-body="true"
 						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+shift+enter')}}"

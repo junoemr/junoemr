@@ -26,6 +26,7 @@ package org.oscarehr.ws.rest.conversion;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.DemographicDao;
+import org.oscarehr.common.dao.LookupListItemDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.schedule.dto.CalendarAppointment;
@@ -96,15 +97,24 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		appointment.setAppointmentDate(adjustedAppointmentDate);
 		appointment.setStartTime(adjustedStartDate);
 		appointment.setEndTime(adjustedEndDate);
-		appointment.setName(demographicName);
 		appointment.setDemographicNo(demographicNo);
 		appointment.setNotes(t.getNotes());
 		appointment.setReason(t.getReason());
+		appointment.setReasonCode(t.getReasonCode());
 		appointment.setLocation(t.getSite());
 		appointment.setStatus(t.getEventStatusCode());
 		appointment.setResources(t.getResources());
 		appointment.setUrgency(t.getUrgency());
 		appointment.setType(t.getType());
+
+		if(t.isDoNotBook())
+		{
+			appointment.setName(Appointment.DONOTBOOK);
+		}
+		else
+		{
+			appointment.setName(demographicName);
+		}
 
 
 		//String resources = StringUtils.transformNullInEmptyString(t.getResources());
@@ -197,6 +207,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		appointment.setProgramId(t.getProgramId());
 		appointment.setNotes(t.getNotes());
 		appointment.setReason(t.getReason());
+		appointment.setReasonCode(t.getReasonCode());
 		appointment.setLocation(t.getLocation());
 		appointment.setResources(resources);
 		appointment.setType(type);
@@ -211,7 +222,6 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		appointment.setUrgency(urgency);
 		appointment.setCreatorSecurityId(t.getCreatorSecurityId());
 		appointment.setBookingSource(t.getBookingSource());
-		appointment.setReasonCode(t.getReasonCode());
 
 		return appointment;
     }
@@ -245,12 +255,14 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		calendarAppointment.setEventStatusCode(appointment.getStatus());
 		calendarAppointment.setEventStatusModifier(appointment.getAppointmentStatusModifier());
 		calendarAppointment.setReason(appointment.getReason());
+		calendarAppointment.setReasonCode(appointment.getReasonCode());
 		calendarAppointment.setNotes(appointment.getNotes());
 		calendarAppointment.setType(appointment.getType());
 		calendarAppointment.setResources(appointment.getResources());
 		calendarAppointment.setSite(appointment.getLocation());
 		calendarAppointment.setTagSelfBooked(false);
 		calendarAppointment.setTagSelfCancelled(false);
+		calendarAppointment.setDoNotBook(appointment.getName().equals(Appointment.DONOTBOOK));
 
 		return calendarAppointment;
 	}
