@@ -24,30 +24,13 @@
 --%>
 <div class="schedule-modal">
 	<div class="modal-header">
-		<%--<div class="row">--%>
-			<%--<div class="col-md-2 center-block">--%>
-				<%--<span class="icon icon-modal-add-appt"></span>--%>
-			<%--</div>--%>
-			<%--<div class="col-md-8 modal-title text-left">--%>
-				<%--<h3 ng-hide="editMode">Add {{label}}</h3>--%>
-				<%--<h3 ng-show="editMode">Modify {{label}}</h3>--%>
-			<%--</div>--%>
-			<%--<div class="col-md-2 center-block modal-ctl-buttons">--%>
-				<%--<button type="button" class="close" aria-label="Maximaze">--%>
-					<%--<a class="icon icon-modal-ctl icon-modal-max"></a>--%>
-				<%--</button>--%>
-				<%--<button type="button" class="close" aria-label="Minimize">--%>
-					<%--<a class="icon icon-modal-ctl icon-modal-min"></a>--%>
-				<%--</button>--%>
-				<%--<button type="button" class="close" aria-label="Close" ng-click="cancel()">--%>
-					<%--<a class="icon icon-modal-ctl icon-modal-close"></a>--%>
-				<%--</button>--%>
-			<%--</div>--%>
-		<%--</div>--%>
 		<div class="modal-title">
 			<span class="icon icon-modal-add-appt"></span>
-			<h3 ng-hide="editMode">Add {{label}}</h3>
-			<h3 ng-show="editMode">Modify {{label}}</h3>
+			<div class="align-baseline">
+				<h3 ng-hide="editMode">Add {{label}}</h3>
+				<h3 ng-show="editMode">Modify {{label}}</h3>
+				<h4>with {{eventController.providerModel.displayName}}</h4>
+			</div>
 		</div>
 		<div class="modal-ctl-buttons">
 			<button type="button" class="close" aria-label="Maximaze">
@@ -71,7 +54,7 @@
 				</li>
 				<li>
 					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.reoccurring);">
-						Reocurring</a>
+						Reoccurring</a>
 				</li>
 				<li>
 					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.history);">
@@ -159,7 +142,8 @@
 							<div class="row">
 								<div class="col-md-6">
 									<!-- patient details display -->
-									<div class="form-group label-top">
+									<div class="form-group label-top info-frame-container"
+									     ng-show="isPatientSelected()">
 										<label class="col-md-2">Demographic</label>
 										<div class="col-md-10">
 											<div class="demographic-info-frame">
@@ -290,7 +274,8 @@
 															ca-title="Duration"
 															ca-name="duration"
 															ca-model="eventData.duration"
-															ca-rows="1">
+															ca-rows="1"
+															ca-change="onDurationChange()">
 													</ca-field-text>
 												</div>
 											</div>

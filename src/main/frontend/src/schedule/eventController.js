@@ -19,6 +19,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	'$uibModalInstance',
 	'errorsService',
 	'demographicService',
+	'providerService',
 	'securityService',
 	'keyBinding',
 	'focus',
@@ -32,6 +33,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		$timeout, $state, $uibModal, $uibModalInstance,
 		messagesFactory,
 		demographicService,
+		providerService,
 		securityService,
 		keyBinding,
 		focus,
@@ -43,8 +45,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	$scope.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
 		'../ws/rs');
-
-	console.info('data', data);
 
 	//=========================================================================
 	// Access Control
@@ -76,8 +76,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	$scope.eventData = {
 		startDate: null,
 		startTime: null,
-		endDate: null,
-		endTime: null,
 		reason: null,
 		reasonCode: null,
 		notes: null,
@@ -89,25 +87,12 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	$scope.timeInterval = data.timeInterval;
 
-	$scope.lastEventLength = null;
-
 	$scope.patientTypeahead = {};
 	$scope.autocompleteValues = {};
 
 	$scope.activeTemplateEvents = [];
 
 	controller.eventStatuses = $scope.parentScope.eventStatuses;
-	// controller.eventStatusesArray = Object.values(controller.eventStatuses);
-	// console.info('eventStatuses', controller.eventStatuses);
-	// controller.statusOptionsSelect = Object.keys(controller.eventStatuses).map(function(key, index) {
-	// 	let obj = {
-	// 		label: controller.eventStatuses[key].name,
-	// 		value: controller.eventStatuses[key].displayLetter
-	// 	};
-	// 	console.info(key, index, obj);
-	// 	return obj;
-	// });
-	// console.info('statusOptionsSelect', controller.statusOptionsSelect);
 
 	$scope.eventStatusOptions = [];
 	controller.selectedEventStatus = null;
@@ -128,6 +113,30 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	$scope.initialized = false;
 	$scope.working = false;
+
+	controller.providerModel = {
+		providerNo: null,
+		firstName: null,
+		lastName: null,
+		displayName: "",
+		title: null,
+		fillData: function fillData(id)
+		{
+			var model = this;
+			model.providerNo = id;
+			providerService.getProvider(id).then(
+				function success(results)
+				{
+					model.firstName = results.firstName;
+					model.lastName = results.lastName;
+					model.title = 'Dr.'; //results.title;
+					model.displayName = Juno.Common.Util.toTrimmedString(model.title) + ' ' +
+						Juno.Common.Util.toTrimmedString(model.firstName) + ' ' +
+						Juno.Common.Util.toTrimmedString(model.lastName);
+				}
+			);
+		}
+	};
 
 	$scope.demographicModel = {
 		demographicNo: null,
@@ -194,18 +203,13 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 		controller.loadAppointmentReasons();
 		controller.loadAppointmentTypes();
-
+		controller.providerModel.fillData(data.schedule.uuid);
 		$scope.demographicModel.clear();
 
 		var momentStart = data.startTime;
 		var momentEnd = data.endTime;
-
 		$scope.eventData.startTime = Juno.Common.Util.formatMomentTime(momentStart, $scope.timepickerFormat);
-		$scope.eventData.endTime = Juno.Common.Util.formatMomentTime(momentEnd, $scope.timepickerFormat);
 		$scope.eventData.startDate = Juno.Common.Util.formatMomentDate(momentStart);
-		$scope.eventData.endDate = Juno.Common.Util.formatMomentDate(momentEnd);
-
-		$scope.lastEventLength = momentEnd.diff(momentStart, 'minutes');
 
 		// maintain a list of the 'active' templates based on start time
 		$scope.setActiveTemplateEvents();
@@ -228,7 +232,8 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			$scope.eventData.type = data.eventData.type;
 			$scope.eventData.reasonCode = data.eventData.reasonCode;
 			$scope.eventData.doNotBook = data.eventData.doNotBook;
-			$scope.eventData.critical = data.eventData.urgency != null;
+			$scope.eventData.critical = data.eventData.urgency === 'critical';
+			$scope.eventData.duration = momentEnd.diff(momentStart, 'minutes');
 
 			// either load the patient data and init the autocomplete
 			// or ensure the patient model is clear
@@ -241,16 +246,16 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		{
 			// create mode: adjust the end date (if needed)
 			// and clear the patient model
-			$scope.adjustEndDatetime();
 			$scope.demographicModel.clear();
 			controller.selectedSiteName = $scope.parentScope.selectedSiteName;
+			controller.setDurationByTemplate($scope.activeTemplateEvents[0], parentScope.timeIntervalMinutes());
 
 			focus.element("#input-patient");
 
 			$scope.initialized = true;
 		}
 
-		console.info('eventData', $scope.eventData);
+		// console.info('eventData', $scope.eventData);
 
 		controller.changeTab(controller.tabEnum.appointment);
 	};
@@ -312,8 +317,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		// Get templates that happen during the time period
 		var momentStart = Juno.Common.Util.getDateAndTimeMoment(
 			$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
-		var momentEnd = Juno.Common.Util.getDateAndTimeMoment(
-			$scope.eventData.endDate, $scope.formattedTime($scope.eventData.endTime));
+		var momentEnd = controller.calculateEndTime();
 
 		var activeEvents = [];
 
@@ -343,24 +347,19 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		$scope.activeTemplateEvents = activeEvents;
 	};
 
-	$scope.adjustEndDatetime = function adjustEndDatetime(lengthMinutes)
+	controller.setDurationByTemplate = function setDurationByTemplate(templateEvent, defaultDuration)
 	{
-		// adjusts the end time to the specified length or
-		// adjusts to keep the event length the same as it last was
-
-		var momentStart = Juno.Common.Util.getDateAndTimeMoment(
-			$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
-
-		if(momentStart.isValid())
+		var duration = defaultDuration;
+		if(Juno.Common.Util.exists(templateEvent) && Juno.Common.Util.exists(templateEvent.availabilityType))
 		{
-			var newEventLength = Juno.Common.Util.exists(lengthMinutes) ?
-				lengthMinutes : $scope.lastEventLength;
-
-			var momentEnd = momentStart.add(newEventLength, 'minutes');
-
-			$scope.eventData.endDate = Juno.Common.Util.formatMomentDate(momentEnd);
-			$scope.eventData.endTime = Juno.Common.Util.formatMomentTime(momentEnd, $scope.timepickerFormat);
+			var templateDuration = templateEvent.availabilityType.duration;
+			if(Juno.Common.Util.exists(templateDuration)
+				&& Juno.Common.Util.isIntegerString(templateDuration))
+			{
+				duration = templateDuration;
+			}
 		}
+		$scope.eventData.duration = duration;
 	};
 
 	controller.loadAppointmentReasons = function loadAppointmentReasons()
@@ -421,25 +420,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		return deferred.promise;
 	};
 
-	$scope.updateLastEventLength = function updateLastEventLength()
-	{
-		// saves the current event length, if the date/times are valid
-
-		var momentStart = Juno.Common.Util.getDateAndTimeMoment(
-			$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
-		var momentEnd = Juno.Common.Util.getDateAndTimeMoment(
-			$scope.eventData.endDate, $scope.formattedTime($scope.eventData.endTime));
-
-		if(momentStart.isValid() && momentEnd.isValid())
-		{
-			var eventLength = momentEnd.diff(momentStart, 'minutes');
-			if(eventLength > 0)
-			{
-				$scope.lastEventLength = eventLength;
-			}
-		}
-	};
-
 	$scope.validateForm = function validateForm()
 	{
 		$scope.displayMessages.clear();
@@ -450,25 +430,17 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		Juno.Common.Util.validateTimeString($scope.formattedTime($scope.eventData.startTime),
 			$scope.displayMessages, 'startTime', 'Start Time', true);
 
-		Juno.Common.Util.validateDateString($scope.eventData.endDate,
-			$scope.displayMessages, 'endDate', 'End Time', true);
-
-		Juno.Common.Util.validateTimeString($scope.formattedTime($scope.eventData.endTime),
-			$scope.displayMessages, 'endTime', 'End Time', true);
-
 		// if all the date/time fields look good, validate range
 		if(!$scope.displayMessages.has_errors())
 		{
-			var startDatetime = Juno.Common.Util.getDateAndTimeMoment(
-				$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
-			var endDatetime = Juno.Common.Util.getDateAndTimeMoment(
-				$scope.eventData.endDate, $scope.formattedTime($scope.eventData.endTime));
+			// var startDatetime = Juno.Common.Util.getDateAndTimeMoment(
+			// 	$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
 
-			if(endDatetime.isSame(startDatetime) ||
-				endDatetime.isBefore(startDatetime))
-			{
-				$scope.displayMessages.addStandardError("The appointment must end after it starts");
-			}
+			// if(endDatetime.isSame(startDatetime) ||
+			// 	endDatetime.isBefore(startDatetime))
+			// {
+			// 	$scope.displayMessages.addStandardError("The appointment must end after it starts");
+			// }
 		}
 
 		return !$scope.displayMessages.has_errors();
@@ -481,8 +453,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		var startDatetime = Juno.Common.Util.getDateAndTimeMoment(
 				$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
 
-		var endDatetime = Juno.Common.Util.getDateAndTimeMoment(
-				$scope.eventData.endDate, $scope.formattedTime($scope.eventData.endTime));
+		var endDatetime = controller.calculateEndTime();
 
 		var demographicNo = ($scope.eventData.doNotBook)? null : $scope.demographicModel.demographicNo;
 
@@ -546,6 +517,13 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		return time_str.replace(/ /g,'');
 	};
 
+	controller.calculateEndTime = function calculateEndTime()
+	{
+		var momentStart = Juno.Common.Util.getDateAndTimeMoment(
+				$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
+		return momentStart.add($scope.eventData.duration, 'minutes');
+	};
+
 	$scope.loadPatientFromTypeahead = function loadPatientFromTypeahead(patientTypeahead)
 	{
 		$scope.demographicModel.fillData(patientTypeahead);
@@ -554,52 +532,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	//=========================================================================
 	// Watches
 	//=========================================================================/
-
-	// when the start date is changed,
-	// update the active template events
-	$scope.$watch('startDate', function(newStartDate, oldStartDate)
-	{
-		// avoid running first time this fires during initialization
-		if(newStartDate !== oldStartDate)
-		{
-			$scope.setActiveTemplateEvents();
-			$scope.adjustEndDatetime();
-		}
-	});
-
-	// when the start time is changed,
-	// update the active template events and adjust the end time
-	$scope.$watch('startTime', function(newStartTime, oldStartTime)
-	{
-		// avoid running first time this fires during initialization
-		if(newStartTime !== oldStartTime)
-		{
-			$scope.setActiveTemplateEvents();
-			$scope.adjustEndDatetime();
-		}
-	});
-
-	// when the end date is changed, track the event length
-	$scope.$watch('endDate', function(newEndDate, oldEndDate)
-	{
-		// avoid running first time this fires during initialization
-		if(newEndDate !== oldEndDate)
-		{
-			$scope.setActiveTemplateEvents();
-			$scope.updateLastEventLength();
-		}
-	});
-
-	// when the end time is changed, track the event length
-	$scope.$watch('endTime', function(newEndTime, oldEndTime)
-	{
-		// avoid running first time this fires during initialization
-		if(newEndTime !== oldEndTime)
-		{
-			$scope.setActiveTemplateEvents();
-			$scope.updateLastEventLength();
-		}
-	});
 
 	$scope.$watch('patientTypeahead', function()
 	{
@@ -646,11 +578,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	{
 		$scope.autocompleteValues.patient = null;
 		$scope.demographicModel.clear();
-	};
-
-	$scope.setEventLength = function setEventLength(minutes)
-	{
-		$scope.adjustEndDatetime(minutes);
 	};
 
 	$scope.save = function save()
@@ -820,14 +747,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	{
 		controller.activeTab = tabId;
 	};
-
-	// controller.changeSelectColor = function changeSelectColor(element)
-	// {
-	// 	console.info(element);
-	// 	// element.filter("option:selected")
-	// 	// console.info($(element).find("select option:selected").css('backgroundColor'));
-	// 	// $(element).find("select option:selected").css('backgroundColor');
-	// };
 
 
 	//=========================================================================

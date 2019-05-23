@@ -926,7 +926,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let statusElem = eventElement.find('.icon-status');
 				let detailElem = eventElement.find('.event-details');
 
-
+				console.info('render event data', event.data);
 				// var eventSiteHtml = '';
 				// var eventSite = $scope.sites[event.data.site];
 
@@ -967,7 +967,15 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					statusElem.attr("title", "Unknown").text("?");
 				}
 				let eventDetails = "";
-				if(!Juno.Common.Util.isBlank(event.data.demographicName))
+				if(event.data.doNotBook)
+				{
+					eventDetails = "Do Not Book";
+					if(!Juno.Common.Util.isBlank(event.data.reason))
+					{
+						eventDetails += " (" + Juno.Common.Util.escapeHtml(event.data.reason) + ")"
+					}
+				}
+				else if(!Juno.Common.Util.isBlank(event.data.demographicName))
 				{
 					eventDetails = Juno.Common.Util.escapeHtml(event.data.demographicName);
 					if(!Juno.Common.Util.isBlank(event.data.reason))
@@ -1284,7 +1292,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.setCalendarLoading(true);
 
 			var appointment = angular.copy(calEvent.data);
-			appointment.providerNo = calEvent.resourceId
+			appointment.providerNo = calEvent.resourceId;
 
 			$scope.moveEvent(appointment, delta, true).then(
 				function success(eventData)

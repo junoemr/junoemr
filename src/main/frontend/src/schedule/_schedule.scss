@@ -221,12 +221,15 @@
 			display: flex;
 			flex-grow: 1;
 			flex-direction: row;
-			h3 {
-				color: $white;
-				font-family: "Arial", "Helvetica", sans-serif;
-				font-size: 20px;
-				font-weight: bold;
-				font-style: normal;
+			align-items: center;
+			.align-baseline {
+				display: flex;
+				flex-grow: 1;
+				flex-direction: row;
+				align-items: baseline;
+				h4 {
+					padding: 0 16px;
+				}
 			}
 		}
 		.modal-ctl-buttons {
@@ -241,8 +244,8 @@
 			height: 16px;
 		}
 		.icon-modal-add-appt {
-			width: 48px;
-			height: 48px;
+			width: 40px;
+			height: 40px;
 		}
 	}
 
@@ -313,6 +316,13 @@
 			&.label-top {
 				align-items: flex-start;
 			}
+
+		}
+		.alert-container {
+			height: 40px;
+		}
+		.info-frame-container {
+			height: 144px;
 			.demographic-info-frame {
 				height: 144px;
 				margin-bottom: 12px;
@@ -339,9 +349,6 @@
 					}
 				}
 			}
-		}
-		.alert-container {
-			height: 40px;
 		}
 	}
 }
