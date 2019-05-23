@@ -69,17 +69,17 @@
 				font-size: 12px;
 				font-weight: normal;
 				color: $white;
+				.btn-event-link {
+					background: transparent;
+					border: 0;
+					width: 24px;
+					font-weight: bold;
+					color: $white;
+				}
 				.event-blk {
 					display: flex;
 					align-items: center;
 					justify-content: space-evenly;
-				}
-				.event-blk-icon {
-				}
-				.event-blk-link {
-					width: 24px;
-					font-weight: bold;
-					color: $white;
 				}
 				.event-blk-label {
 					flex-grow: 1;
@@ -92,6 +92,9 @@
 					width: 16px;
 					height: 16px;
 					margin: 4px;
+				}
+				.disabled {
+					color: $red;
 				}
 			}
 

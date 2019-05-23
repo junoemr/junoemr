@@ -126,7 +126,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 									$scope.initEventsAutoRefresh();
 
 									$scope.applyUiConfig($scope.uiConfig);
-									console.log("-- Calendar Initialized ----------------------------");
 									$scope.initialized = true;
 								});
 							});
@@ -689,8 +688,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			var deferred = $q.defer();
 
-			console.info('saveEvent', calendarAppointment);
-
 			if(editMode)
 			{
 				this.appointmentApi.updateAppointment(calendarAppointment).then(
@@ -717,7 +714,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					}
 				);
 			}
-
 
 			return deferred.promise;
 		};
@@ -998,6 +994,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					eventDetails = Juno.Common.Util.escapeHtml(event.data.reason);
 				}
 				detailElem.text(eventDetails);
+
+				if(!controller.hasPatientSelected(event))
+				{
+					//disable demographic specific links if there is no attached demographic;
+					var linkElements = eventElement.find('.event-encounter, .event-invoice, .event-demographic, .event-rx');
+					linkElements.hide();
+				}
 			}
 			else
 			{
@@ -1263,23 +1266,23 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.onEventClick = function onEventClick(calEvent, jsEvent, view)
 		{
-			if($(jsEvent.target).is(".event-status.rotate"))
+			if($(jsEvent.target).is(".event-status.rotate:not(.disabled)"))
 			{
 				$scope.rotateEventStatus(calEvent);
 			}
-			else if($(jsEvent.target).is(".onclick-event-encounter"))
+			else if($(jsEvent.target).is(".onclick-event-encounter:not(.disabled)"))
 			{
 				window.open($scope.getEncounterLink(calEvent));
 			}
-			else if($(jsEvent.target).is(".onclick-event-invoice"))
+			else if($(jsEvent.target).is(".onclick-event-invoice:not(.disabled)"))
 			{
 				window.open($scope.getBillingLink(calEvent));
 			}
-			else if($(jsEvent.target).is(".onclick-event-demographic"))
+			else if($(jsEvent.target).is(".onclick-event-demographic:not(.disabled)"))
 			{
 				$scope.openPatientDemographic(calEvent);
 			}
-			else if($(jsEvent.target).is(".onclick-event-rx"))
+			else if($(jsEvent.target).is(".onclick-event-rx:not(.disabled)"))
 			{
 				window.open($scope.getRxLink(calEvent));
 			}
@@ -1287,6 +1290,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			{
 				$scope.openEditEventDialog(calEvent);
 			}
+		};
+
+		controller.hasPatientSelected = function hasPatientSelected(calEvent)
+		{
+			return Juno.Common.Util.exists(calEvent.data.demographicNo)
+				&& Number(calEvent.data.demographicNo) > 0;
 		};
 
 		$scope.onEventDrop = function onEventDrop(
@@ -1547,17 +1556,26 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.$watch('datepickerSelectedDate', function(newValue, oldValue)
 		{
-			var momentDate = Juno.Common.Util.getDateMoment(newValue);
-			$scope.changeDate(momentDate);
+			if($scope.isInitialized())
+			{
+				var momentDate = Juno.Common.Util.getDateMoment(newValue);
+				$scope.changeDate(momentDate);
+			}
 		});
 
 		$scope.$watch('selectedSiteName', function(newValue, oldValue)
 		{
-			$scope.onSiteChanged();
+			if($scope.isInitialized())
+			{
+				$scope.onSiteChanged();
+			}
 		});
 		$scope.$watch('selectedTimeInterval', function(newValue, oldValue)
 		{
-			$scope.onTimeIntervalChanged();
+			if($scope.isInitialized())
+			{
+				$scope.onTimeIntervalChanged();
+			}
 		});
 
 

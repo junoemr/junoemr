@@ -26,7 +26,6 @@ package org.oscarehr.ws.rest.conversion;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.dao.LookupListItemDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.schedule.dto.CalendarAppointment;
@@ -251,7 +250,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		calendarAppointment.setDemographicNo(demographicNo);
 		calendarAppointment.setProviderNo(Integer.parseInt(appointment.getProviderNo())); //TODO make this a string
 		calendarAppointment.setStartTime(ConversionUtils.toLocalDateTime(appointment.getStartTime()));
-		calendarAppointment.setEndTime(ConversionUtils.toLocalDateTime(appointment.getStartTime()).plusMinutes(1));
+		calendarAppointment.setEndTime(ConversionUtils.toLocalDateTime(appointment.getEndTime()).plusMinutes(1));
 		calendarAppointment.setEventStatusCode(appointment.getStatus());
 		calendarAppointment.setEventStatusModifier(appointment.getAppointmentStatusModifier());
 		calendarAppointment.setReason(appointment.getReason());
