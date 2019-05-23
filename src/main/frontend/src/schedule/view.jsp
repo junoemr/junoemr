@@ -31,123 +31,128 @@
 
 	<div ng-show="isSchedulingEnabled()">
 
-		<div class="schedule-options">
-
-			<div ng-show="!isInitialized()">
-				<p>Loading...</p>
-			</div>
-
-			<div ng-show="isInitialized()">
-
-				<div class="alert alert-info"
-					 ng-show="!hasSchedules()">
-					Please set up a schedule at <a href="#/schedule/admin/schedule">Schedule Admin</a>
+		<div class="schedule-options-container">
+			<%--<div>--%>
+				<%--<button class="btn btn-aside"></button>--%>
+			<%--</div>--%>
+			<div class="schedule-options">
+				<div ng-show="!isInitialized()">
+					<p>Loading...</p>
 				</div>
 
-				<div ng-show="hasSchedules()">
+				<div ng-show="isInitialized()">
 
-					<div class="pull-left form-inline">
-
-						<div class="form-group">
-							<label for="schedule-select">Schedule:</label>
-							<select id="schedule-select"
-									class="form-control"
-									ng-change="onScheduleChanged()"
-									ng-model="selectedSchedule"
-									ng-options="option as option.name for option in getScheduleOptions()">
-							</select>
-						</div>
-						<button type="button"
-								class="btn btn-icon-bare"
-								title="Refresh Schedule"
-								ng-click="refetchEvents()">
-							<i class="fa fa-refresh"></i>
-						</button>
+					<div class="alert alert-info"
+						 ng-show="!hasSchedules()">
+						Please set up a schedule at <a href="#/schedule/admin/schedule">Schedule Admin</a>
 					</div>
 
-					<div class="pull-left form-inline">
-						<div ng-show="hasSites()">
-							<%--<div class="form-group">--%>
-								<%--<label for="site-select">Site:</label>--%>
-								<%--<select id="site-select"--%>
-										<%--class="form-control"--%>
-										<%--ng-change="onSiteChanged()"--%>
-										<%--ng-model="selectedSiteName">--%>
-									<%--<option--%>
-											<%--ng-repeat="option in getSiteOptions()"--%>
-											<%--value="{{option.name}}"--%>
-											<%--style="background-color: {{option.color}}">--%>
-										<%--{{option.display_name}}--%>
-									<%--</option>--%>
-								<%--</select>--%>
-							<%--</div>--%>
-							<ca-field-select
-									ca-name="site"
-									ca-title="Site"
-									ca-template="label"
-									ca-label-size="col-md-4"
-									ca-input-size="col-md-8"
-									ca-model="selectedSiteName"
-									ca-options="getSiteOptions()"
-									ca-change="onSiteChanged()"
-							>
-							</ca-field-select>
-						</div>
-					</div>
+					<div ng-show="hasSchedules()">
+						<div class="form-inline">
+							<div class="pull-left">
+								<div class="form-group cal-step-button-group">
+									<div class="form-group">
+										<button class="btn btn-cal-nav"
+										        ng-click="stepBack()">
+											<span class="icon icon-left"></span>
+										</button>
+									</div>
+									<div class="form-group">
+										<button class="btn btn-cal-nav"
+										        ng-click="stepForward()">
+											<span class="icon icon-right"></span>
+										</button>
+									</div>
+								</div>
 
-					<div class="pull-right form-inline">
+								<div class="form-group">
+									<ca-field-date
+											ca-template="bare"
+											ca-date-picker-id="select-date"
+											ca-name="Date"
+											ca-model="datepickerSelectedDate"
+											ca-orientation="auto"
+									></ca-field-date>
+								</div>
 
-						<a href="#/schedule/daysheet"
-						   class="btn btn-success">
-							Daysheet
-						</a>
+								<div class="form-group divider-vertical"></div>
+								<ca-field-select
+										ng-show="hasSites()"
+										ca-name="site"
+										ca-title="Site"
+										ca-template="label"
+										ca-no-label="true"
+										ca-model="selectedSiteName"
+										ca-options="getSiteOptions()"
+								>
+								</ca-field-select>
 
-						<button type="button"
-								class="btn btn-black"
-								ng-click="showLegend()">
-							Legend
-						</button>
+								<div class="form-group">
+									<select id="schedule-select"
+									        class="form-control"
+									        ng-change="onScheduleChanged()"
+									        ng-model="selectedSchedule"
+									        ng-options="option as option.name for option in getScheduleOptions()">
+									</select>
 
-						<div class="form-group"
-							 ng-show="showTimeIntervals()">
-							<label for="interval-select">Time Interval:</label>
-							<select id="interval-select"
-									class="form-control"
-									ng-change="onTimeIntervalChanged()"
-									ng-model="selectedTimeInterval"
-									ng-options="option for option in getTimeIntervalOptions()">
-							</select>
-					</div>
+									<%--<ca-field-select--%>
+											<%--ca-name="schedule-select"--%>
+											<%--ca-no-label="true"--%>
+											<%--ca-template="label"--%>
+											<%--ca-model="selectedSchedule"--%>
+											<%--ca-options="getScheduleOptions()"--%>
+											<%--ca-change="onScheduleChanged()"--%>
+									<%-->--%>
+									<%--</ca-field-select>--%>
+								</div>
+								<div class="form-group"
+								     ng-show="showTimeIntervals()">
+									<ca-field-select
+											ca-name="interval-select"
+											ca-no-label="true"
+											ca-model="selectedTimeInterval"
+											ca-options="getTimeIntervalOptions()"
+									>
+									</ca-field-select>
+								</div>
+								<div class="form-group divider-vertical"></div>
+							</div>
 
-
-						<div class="form-group">
-							<div class="btn-group" role="group" ng-show="isAgendaView()">
-								<button type="button"
-										class="btn"
-										ng-class=" { 'btn-addon': viewName() != 'agendaDay', 'btn-primary': viewName() == 'agendaDay' } "
-										viewName="agendaDay"
-										ng-click="changeView('agendaDay')">
-									Day
-								</button>
-								<button type="button"
-										class="btn"
-										ng-class=" { 'btn-addon': viewName() != 'agendaWeek', 'btn-primary': viewName() == 'agendaWeek' } "
-										viewName="agendaWeek"
-										ng-click="changeView('agendaWeek')">
-									Week
-								</button>
-								<button type="button"
-										class="btn"
-										ng-class=" { 'btn-addon': viewName() != 'month', 'btn-primary': viewName() == 'month' } "
-										viewName="month"
-										ng-click="changeView('month')">
-									Month
-								</button>
+							<div class="form-group pull-right">
+								<div class="form-group">
+									<div class="btn-group" role="group" ng-show="isAgendaView()">
+										<button type="button"
+										        class="btn"
+										        ng-class=" { 'btn-addon': viewName() != 'agendaDay', 'btn-primary': viewName() == 'agendaDay' } "
+										        viewName="agendaDay"
+										        ng-click="changeView('agendaDay')">
+											Day
+										</button>
+										<button type="button"
+										        class="btn"
+										        ng-class=" { 'btn-addon': viewName() != 'agendaWeek', 'btn-primary': viewName() == 'agendaWeek' } "
+										        viewName="agendaWeek"
+										        ng-click="changeView('agendaWeek')">
+											Week
+										</button>
+										<button type="button"
+										        class="btn"
+										        ng-class=" { 'btn-addon': viewName() != 'month', 'btn-primary': viewName() == 'month' } "
+										        viewName="month"
+										        ng-click="changeView('month')">
+											Month
+										</button>
+									</div>
+								</div>
+								<div class="form-group">
+									<button class="btn btn-cal-nav"
+									        ng-click="refetchEvents()">
+										<span class="icon icon-refresh"></span>
+									</button>
+								</div>
 							</div>
 						</div>
-
 					</div>
-
 				</div>
 			</div>
 		</div>

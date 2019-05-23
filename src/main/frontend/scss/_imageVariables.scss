@@ -41,6 +41,15 @@ $icon-status-11: $images-appt-status + 'icon-48-1.svg';
 .icon-down {
 	background-image: url($images-root + 'icon-16-arrow-down.svg');
 }
+.icon-left {
+	background-image: url($images-root + 'icon-16-arrow-left.svg');
+}
+.icon-right {
+	background-image: url($images-root + 'icon-16-arrow-right.svg');
+}
+.icon-refresh {
+	background-image: url($images-root + 'icon-16-refresh.svg');
+}
 .icon-daysheet {
 	background-image: url($images-root + 'cal-daysheetblue.svg');
 }

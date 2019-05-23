@@ -190,17 +190,79 @@
 	}
 }
 
-.schedule-options
-{
-	@include clearfix;
-	margin-bottom: 15px;
+.schedule-options-container {
+	background-color: $primary;
+	padding-top: 8px;
 
-	.form-inline {
-		label { margin-right: 5px; }
-		button:focus { outline: none; }
-		#schedule-select { width: 220px; }
-		.form-group { margin-left: 20px; }
-		.form-group:first-child { margin-left: 0 }
+	.btn-aside {
+		width: 72px;
+		height: 72px;
+		background-color: $primary;
+	}
+
+	.schedule-options {
+		background-color: $grey-07;
+		padding: 12px;
+
+		$input-height: 40px;
+		.btn-cal-nav {
+			width: $input-height;
+			height: $input-height;
+			background-color: $white;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0;
+			.icon {
+				width: 16px;
+				height: 16px;
+			}
+		}
+		.divider-vertical {
+			//border-left: 2px solid $grey-06;
+			background-color: $grey-06;
+			width: 2px;
+			height: calc(#{$input-height} * 0.75);
+		}
+
+		.form-inline {
+			label {
+				margin-right: 5px;
+			}
+			button:focus {
+				outline: none;
+			}
+			.form-group {
+				margin-left: 20px;
+			}
+			.form-group:first-child {
+				margin-left: 0
+			}
+			.cal-step-button-group {
+				.form-group {
+					margin-left: 10px;
+				}
+			}
+		}
+		select, input, textarea {
+			border-radius: 8px;
+			border: solid 1px $grey-07;
+			background-color: $white;
+			padding: 8px;
+			height: $input-height;
+			min-width: 200px;
+
+			font-family: "Arial", "Helvetica", sans-serif;
+			font-size: 13px;
+			font-weight: normal;
+			font-style: normal;
+			font-stretch: normal;
+			line-height: normal;
+			letter-spacing: normal;
+			color: $grey-04;
+		}
+
+		@include clearfix;
 	}
 }
 

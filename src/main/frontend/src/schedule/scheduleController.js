@@ -98,6 +98,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.scheduleService = scheduleService;
 
+		$scope.datepickerSelectedDate = null;
+
 		$scope.init = function init()
 		{
 			$scope.uiConfig.calendar.defaultView = $scope.calendarViewName();
@@ -255,6 +257,15 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			{
 				$scope.updateCalendarView();
 			}
+		};
+
+		$scope.stepBack = function stepBack()
+		{
+			$scope.calendar().fullCalendar('prev');
+		};
+		$scope.stepForward = function stepForward()
+		{
+			$scope.calendar().fullCalendar('next');
 		};
 
 		$scope.showLegend = function showLegend()
@@ -926,7 +937,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let statusElem = eventElement.find('.icon-status');
 				let detailElem = eventElement.find('.event-details');
 
-				console.info('render event data', event.data);
 				// var eventSiteHtml = '';
 				// var eventSite = $scope.sites[event.data.site];
 
@@ -1010,6 +1020,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			{
 				$scope.selectedDate = moment(Juno.Common.Util.formatMomentDate(
 					moment($scope.calendar().fullCalendar('getDate'))));
+				$scope.datepickerSelectedDate = Juno.Common.Util.formatMomentDate($scope.selectedDate);
 			}
 
 			// Voodoo to set the resource view column width from https://stackoverflow.com/a/39297864
@@ -1423,6 +1434,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 						results[i].uuid = results[i].identifier;
 
+						results[i].label = results[i].name;
+						results[i].value = results[i].identifier;
+
 						$scope.scheduleOptions.push(scheduleData);
 
 						// Get the possible resources by inferring that the group is a provider
@@ -1531,6 +1545,21 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 		});
 
+		$scope.$watch('datepickerSelectedDate', function(newValue, oldValue)
+		{
+			var momentDate = Juno.Common.Util.getDateMoment(newValue);
+			$scope.changeDate(momentDate);
+		});
+
+		$scope.$watch('selectedSiteName', function(newValue, oldValue)
+		{
+			$scope.onSiteChanged();
+		});
+		$scope.$watch('selectedTimeInterval', function(newValue, oldValue)
+		{
+			$scope.onTimeIntervalChanged();
+		});
+
 
 		//=========================================================================
 		// Config Array
@@ -1579,11 +1608,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			calendar: {
 				height: 'auto', //$scope.get_schedule_height(),
 				nowIndicator: true,
-				header: {
-					left: 'prev next',
-					center: '',
-					right: ''
-				},
+				header: false,
 
 				allDaySlot: false,
 
