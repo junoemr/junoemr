@@ -983,7 +983,7 @@ if(wcbneeds != null){%>
 			thisForm.setXml_refer1(bean.getReferral1());
 		}
 
-		populateInitialDxCodeList(request, thisForm, request.getParameter("apptProvider_no"), bean.getCreator());
+		populateInitialDxCodeList(request, thisForm, bean.getApptProviderNo(), bean.getCreator());
 
 		// OHSUPORT-2883 - autofill other codes with specific values (from url)
 		if ( request.getParameter("other_code_1") != null ) { thisForm.setXml_other1(request.getParameter("other_code_1")); }
