@@ -116,6 +116,7 @@ module.exports = {
 	entry: {
 		bundle: [
 			'../webapp/share/javascript/Oscar.js',
+			'../webapp/share/javascript/HealthCardParser.js',
 			'./src/common/displayMessages.js',
 			'./src/common/util/util.js',
 			'./src/common/util/serviceHelper.js',

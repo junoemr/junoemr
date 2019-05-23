@@ -35,9 +35,8 @@
 %>
 <html>
 <head>
-	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-	<script type="text/javascript" src="<%= request.getContextPath() %>/web/common/util/HealthCardParser.js"></script>
-    <script type="text/javascript" src="<%= request.getContextPath() %>/web/common/util/util.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/global.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/share/javascript/HealthCardParser.js"></script>
 	<title>PATIENT DETAIL INFO</title>
 	<link rel="stylesheet" href="../web.css"/>
 </head>
@@ -62,7 +61,9 @@
 			}
 		}
 
-		var healthCardData = Oscar.HealthCardParser.parse('<%=trimmedCardData %>');
+		var rawCard = "<%=trimmedCardData%>";
+
+		var healthCardData = Oscar.HealthCardParser.parse(rawCard);
 
 		var form = self.opener.document.adddemographic;
 
@@ -78,7 +79,7 @@
 		setValueIfExists(form.hc_type,                 healthCardData.data.province);
 		// If we somehow read from a card that has bad values, don't allow weird date values through
 		// This will force the user inputting to the demographic form to correct errors before adding
-        if (Juno.Common.Util.validateDate(healthCardData.data.dobYear,
+        if (Oscar.HealthCardParser.validateDate(healthCardData.data.dobYear,
             healthCardData.data.dobMonth, healthCardData.data.dobDay))
         {
         	setValueIfExists(form.year_of_birth,       healthCardData.data.dobYear);
@@ -86,7 +87,7 @@
         	setValueIfExists(form.date_of_birth,       healthCardData.data.dobDay);
         }
 
-        if (Juno.Common.Util.validateDate(healthCardData.data.effYear,
+        if (Oscar.HealthCardParser.validateDate(healthCardData.data.effYear,
 			healthCardData.data.effMonth, healthCardData.data.effDay))
         {
         	setValueIfExists(form.eff_date_year,       healthCardData.data.effYear);
@@ -94,7 +95,7 @@
 			setValueIfExists(form.eff_date_date,       healthCardData.data.effDay);
         }
 
-        if (Juno.Common.Util.validateDate(healthCardData.data.endYear,
+        if (Oscar.HealthCardParser.validateDate(healthCardData.data.endYear,
             healthCardData.data.endMonth, healthCardData.data.endDay))
         {
 			setValueIfExists(form.hc_renew_date_year,  healthCardData.data.endYear);
