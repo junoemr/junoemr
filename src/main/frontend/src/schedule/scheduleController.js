@@ -684,7 +684,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				providerId,
 				startDateString,
 				endDateString,
-				siteName
+				siteName,
+				$scope.timeIntervalMinutes()
 			).then(
 				function(results)
 				{
@@ -1043,6 +1044,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 			// Voodoo to set the resource view column width from https://stackoverflow.com/a/39297864
 			$("#ca-calendar").css('min-width',$('.fc-resource-cell').length*200);
+			element.addClass('calendar-background');
 		};
 
 		$scope.onResourceRender = function onResourceRender(resourceObj, labelTds, bodyTds)

@@ -87,7 +87,7 @@ public class ScheduleTemplateService
 	 * @param providerId The provider to get the schedule for
 	 * @return A list of CalendarEvent objects
 	 */
-	public List<CalendarEvent> getCalendarEvents(Integer providerId, LocalDate date)
+	public List<CalendarEvent> getCalendarEvents(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, int slotLengthInMinutes)
 	{
 		List<Object[]> results = scheduleTemplateDao.getRawScheduleSlots(providerId, date);
 
@@ -96,10 +96,6 @@ public class ScheduleTemplateService
 				date, providerId);
 
 		List<CalendarEvent> calendarEvents = new ArrayList<>();
-
-		int slotLengthInMinutes = 15;
-		LocalTime startTime = LocalTime.of(8,0);
-		LocalTime endTime = LocalTime.of(19,45);
 
 		for(LocalTime slotTime = startTime; slotTime.isBefore(endTime); slotTime = plusNoWrap(slotTime, slotLengthInMinutes))
 		{

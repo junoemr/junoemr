@@ -360,21 +360,6 @@ public class ScheduleService extends AbstractServiceImpl {
 		return Response.status(Status.OK).build();
 	}
 */
-	
-//	@GET
-//	@Path("/types")
-//	@Produces("application/json")
-//	public SchedulingResponse getAppointmentTypes() {
-//		SchedulingResponse response = new SchedulingResponse();
-//
-//		List<AppointmentType> types = scheduleManager.getAppointmentTypes();
-//
-//		AppointmentTypeConverter converter = new AppointmentTypeConverter();
-//
-//		response.setTypes(converter.getAllAsTransferObjects(getLoggedInInfo(), types));
-//
-//		return response;
-//	}
 
 	@GET
 	@Path("/types")
@@ -388,22 +373,6 @@ public class ScheduleService extends AbstractServiceImpl {
 
 		return RestSearchResponse.successResponseOnePage(transferList);
 	}
-
-//	@GET
-//	@Path("/reasons")
-//	@Produces("application/json")
-//	public SchedulingResponse getAppointmentReasons() {
-//
-//		SchedulingResponse response = new SchedulingResponse();
-//
-//		List<LookupListItem> items = appointmentManager.getReasons();
-//
-//		LookupListItemConverter converter = new LookupListItemConverter();
-//
-//		response.setReasons(converter.getAllAsTransferObjects(getLoggedInInfo(), items));
-//
-//		return response;
-//	}
 
 	@GET
 	@Path("/reasons")
@@ -459,7 +428,8 @@ public class ScheduleService extends AbstractServiceImpl {
 		@PathParam("providerId") Integer providerId,
 		@QueryParam("startDate") String startDateString,
 		@QueryParam("endDate") String endDateString,
-		@QueryParam("site") String siteName
+		@QueryParam("site") String siteName,
+		@QueryParam("slotDuration") String slotDurationStr
 	)
 	{
 		Message message = PhaseInterceptorChain.getCurrentMessage();
@@ -468,6 +438,7 @@ public class ScheduleService extends AbstractServiceImpl {
 
 		LocalDate startDate = ConversionUtils.dateStringToNullableLocalDate(startDateString);
 		LocalDate endDate = ConversionUtils.dateStringToNullableLocalDate(endDateString);
+		Integer slotDurationInMin = Integer.parseInt(slotDurationStr);
 
 		// TODO: Change this to throw an exception
 		// Default to today if either date is null
@@ -478,7 +449,7 @@ public class ScheduleService extends AbstractServiceImpl {
 		}
 
 		List<CalendarEvent> calendarEvents =
-			scheduleService.getCalendarEvents(session, providerId, startDate, endDate, siteName);
+			scheduleService.getCalendarEvents(session, providerId, startDate, endDate, siteName, slotDurationInMin);
 
 		return RestSearchResponse.successResponseOnePage(calendarEvents);
 	}

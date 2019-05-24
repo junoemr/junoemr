@@ -90,6 +90,11 @@ $btn-aside-size: 72px;
 		background: #f6f6f6;
 		overflow-x: scroll;
 
+		// hide the vertical scrollbar when the schedule is too tall
+		.fc-scroller {
+			overflow: visible !important;
+		}
+
 		$scheduleCodeWidth: 16px;
 		/* styling for normal events */
 		.fc-event {
@@ -217,6 +222,14 @@ $btn-aside-size: 72px;
 		.fc-axis {
 			width: $btn-aside-size !important;
 			padding: 0;
+		}
+
+		/* solid border lines separating empty cells */
+		.fc-time-grid .fc-slats .fc-minor td {
+			border-top: 1px solid $grey-07;
+		}
+		.calendar-background {
+			background-color: $white;
 		}
 	}
 }

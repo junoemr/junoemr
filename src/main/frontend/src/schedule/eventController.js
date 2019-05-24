@@ -317,27 +317,27 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		// Get templates that happen during the time period
 		var momentStart = Juno.Common.Util.getDateAndTimeMoment(
 			$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
-		var momentEnd = controller.calculateEndTime();
-
 		var activeEvents = [];
 
 		// Loop through the events for this day
 		for(var i = 0; i < data.events.length; i++)
 		{
-			if(data.events[i].rendering != "background" || data.events[i].resourceId != $scope.schedule.uuid)
+			// filter events that should not be checked (background, wrong schedule, no template code)
+			if(data.events[i].rendering !== "background"
+				|| data.events[i].resourceId != $scope.schedule.uuid
+				|| !Juno.Common.Util.exists(data.events[i].scheduleTemplateCode))
 			{
 				continue;
 			}
 
 			var event = angular.copy(data.events[i]);
 
-			// if start time is before event end time or if end time is after event start
+			// if start time is between event start and end
 			event.start = Juno.Common.Util.getDatetimeNoTimezoneMoment(event.start);
 			event.end = Juno.Common.Util.getDatetimeNoTimezoneMoment(event.end);
 
-			if(momentStart.isValid() && momentEnd.isValid() &&
-				event.start.isValid() && event.end.isValid() &&
-				momentStart.isBefore(event.end) && momentEnd.isAfter(event.start))
+			if(momentStart.isValid() && event.start.isValid() && event.end.isValid() &&
+				momentStart.isBefore(event.end) && momentStart.isSameOrAfter(event.start))
 			{
 				event.availabilityType = data.availabilityTypes[event.scheduleTemplateCode];
 				activeEvents.push(event);

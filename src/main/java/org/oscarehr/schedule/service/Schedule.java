@@ -574,7 +574,8 @@ public class Schedule
 		Integer providerId,
 		LocalDate startDate,
 		LocalDate endDate,
-		String siteName
+		String siteName,
+		Integer slotDurationInMin
 	)
 	{
 		List<CalendarEvent> calendarEvents = new ArrayList<>();
@@ -583,8 +584,10 @@ public class Schedule
 		// templates
 		for(LocalDate date: ConversionUtils.getDateList(startDate, endDate))
 		{
+			LocalTime startTime = LocalTime.of(8,0);
+			LocalTime endTime = LocalTime.of(20,0);
 			// Get schedule templates for this provider/date
-			calendarEvents.addAll(scheduleTemplateService.getCalendarEvents(providerId, date));
+			calendarEvents.addAll(scheduleTemplateService.getCalendarEvents(providerId, date, startTime, endTime, slotDurationInMin));
 		}
 
 		// Get appointments for this provider/date range
