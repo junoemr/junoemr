@@ -25,32 +25,37 @@
 
 --%>
 
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="oscar.util.ConversionUtils"%>
-<%@page import="org.oscarehr.common.dao.PatientLabRoutingDao"%>
-<%@page import="org.oscarehr.common.model.PatientLabRouting"%>
-<%@page import="org.oscarehr.myoscar.utils.MyOscarLoggedInInfo"%>
-<%@page import="java.net.URLEncoder"%>
-<%@page import="org.apache.commons.lang.builder.ReflectionToStringBuilder"%>
-<%@page import="org.oscarehr.util.MiscUtils"%>
-<%@page import="org.w3c.dom.Document"%>
-<%@page import="org.oscarehr.caisi_integrator.ws.CachedDemographicLabResult"%>
-<%@page import="oscar.oscarLab.ca.all.web.LabDisplayHelper"%>
-<%@page errorPage="../../../provider/errorpage.jsp" %>
-<%@ page import="java.util.*,
-		 oscar.util.UtilDateUtilities,
-		 oscar.oscarLab.ca.all.*,
-		 oscar.oscarLab.ca.all.parsers.*,
-		 oscar.oscarLab.LabRequestReportLink,
-		 oscar.oscarMDS.data.ReportStatus,oscar.log.*,
-         oscar.OscarProperties" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo"%>
+<%@ page import="oscar.util.ConversionUtils"%>
+<%@ page import="org.oscarehr.common.dao.PatientLabRoutingDao"%>
+<%@ page import="org.oscarehr.common.model.PatientLabRouting"%>
+<%@ page import="org.oscarehr.myoscar.utils.MyOscarLoggedInInfo"%>
+<%@ page import="java.net.URLEncoder"%>
+<%@ page import="org.apache.commons.lang.builder.ReflectionToStringBuilder"%>
+<%@ page import="org.oscarehr.util.MiscUtils"%>
+<%@ page import="org.w3c.dom.Document"%>
+<%@ page import="org.oscarehr.caisi_integrator.ws.CachedDemographicLabResult"%>
+<%@ page import="oscar.oscarLab.ca.all.web.LabDisplayHelper"%>
+<%@ page errorPage="../../../provider/errorpage.jsp" %>
+<%@ page import="java.util.*" %>
+<%@ page import="oscar.oscarLab.ca.all.*" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.*"%>
+<%@ page import="oscar.oscarLab.LabRequestReportLink" %>
+<%@ page import="oscar.oscarMDS.data.ReportStatus,oscar.log.*"%>
+<%@ page import="oscar.OscarProperties" %>
 <%@ page import="org.oscarehr.casemgmt.model.CaseManagementNoteLink"%>
 <%@ page import="org.oscarehr.casemgmt.model.CaseManagementNote"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
-<%@ page import="org.oscarehr.common.dao.UserPropertyDAO, org.oscarehr.common.model.UserProperty" %>
-<%@ page import="org.oscarehr.common.model.MeasurementMap, org.oscarehr.common.dao.MeasurementMapDao" %>
+<%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
+<%@ page import="org.oscarehr.common.model.UserProperty" %>
+<%@ page import="org.oscarehr.common.model.MeasurementMap" %>
+<%@ page import="org.oscarehr.common.dao.MeasurementMapDao" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="org.oscarehr.casemgmt.service.CaseManagementManager, org.oscarehr.common.dao.Hl7TextMessageDao, org.oscarehr.common.model.Hl7TextMessage,org.oscarehr.common.dao.Hl7TextInfoDao,org.oscarehr.common.model.Hl7TextInfo"%>
+<%@ page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
+<%@ page import="org.oscarehr.common.dao.Hl7TextMessageDao"%>
+<%@ page import="org.oscarehr.common.model.Hl7TextMessage" %>
+<%@ page import="org.oscarehr.common.dao.Hl7TextInfoDao" %>
+<%@ page import="org.oscarehr.common.model.Hl7TextInfo"%>
 <jsp:useBean id="oscarVariables" class="java.util.Properties" scope="session" />
 <%@	page import="javax.swing.text.rtf.RTFEditorKit"%>
 <%@	page import="java.io.ByteArrayInputStream"%>
@@ -62,7 +67,7 @@
 <%@ taglib uri="/WEB-INF/indivo-tag.tld" prefix="indivo"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
-      String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+      String roleName$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
 	  boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_lab" rights="r" reverse="<%=true%>">
@@ -76,151 +81,179 @@ if(!authed) {
 %>
 
 <%
-LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-oscar.OscarProperties props = oscar.OscarProperties.getInstance();
-String segmentID = request.getParameter("segmentID");
-String providerNo =request.getParameter("providerNo");
-String searchProviderNo = StringUtils.trimToEmpty(request.getParameter("searchProviderNo"));
-String patientMatched = request.getParameter("patientMatched");
-String remoteFacilityIdString = request.getParameter("remoteFacilityId");
-String remoteLabKey = request.getParameter("remoteLabKey");
-String demographicID = request.getParameter("demographicId");
-String showAllstr = request.getParameter("all");
+	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+	oscar.OscarProperties props = oscar.OscarProperties.getInstance();
+	String segmentID = request.getParameter("segmentID");
+	String providerNo =request.getParameter("providerNo");
+	String searchProviderNo = StringUtils.trimToEmpty(request.getParameter("searchProviderNo"));
+	String remoteFacilityIdString = request.getParameter("remoteFacilityId");
+	String remoteLabKey = request.getParameter("remoteLabKey");
+	String demographicID = request.getParameter("demographicId");
+	String showAllstr = request.getParameter("all");
 
-
-if(providerNo == null) {
-	providerNo = loggedInInfo.getLoggedInProviderNo();
-}
-
-
-UserPropertyDAO userPropertyDAO = (UserPropertyDAO)SpringUtils.getBean("UserPropertyDAO");
-UserProperty uProp = userPropertyDAO.getProp(providerNo, UserProperty.LAB_ACK_COMMENT);
-boolean skipComment = false;
-if( uProp != null && uProp.getValue().equalsIgnoreCase("yes")) {
-	skipComment = true;
-}
-
-
-//Need date lab was received by OSCAR
-Hl7TextMessageDao hl7TxtMsgDao = (Hl7TextMessageDao)SpringUtils.getBean("hl7TextMessageDao");
-MeasurementMapDao measurementMapDao = (MeasurementMapDao) SpringUtils.getBean("measurementMapDao");
-Hl7TextMessage hl7TextMessage = hl7TxtMsgDao.find(Integer.parseInt(segmentID));
-
-String dateLabReceived = "n/a";
-if(hl7TextMessage != null){
-	java.util.Date date = hl7TextMessage.getCreated();
-	String stringFormat = "yyyy-MM-dd HH:mm";
-    dateLabReceived = UtilDateUtilities.DateToString(date, stringFormat);
-}
-
-boolean isLinkedToDemographic=false;
-ArrayList<ReportStatus> ackList=null;
-String multiLabId = null;
-MessageHandler handler=null;
-String hl7 = null;
-String reqID = null, reqTableID = null;
-String remoteFacilityIdQueryString="";
-
-boolean bShortcutForm = OscarProperties.getInstance().getProperty("appt_formview", "").equalsIgnoreCase("on") ? true : false;
-String formName = bShortcutForm ? OscarProperties.getInstance().getProperty("appt_formview_name") : "";
-String formNameShort = formName.length() > 3 ? (formName.substring(0,2)+".") : formName;
-String formName2 = bShortcutForm ? OscarProperties.getInstance().getProperty("appt_formview_name2", "") : "";
-String formName2Short = formName2.length() > 3 ? (formName2.substring(0,2)+".") : formName2;
-boolean bShortcutForm2 = bShortcutForm && !formName2.equals("");
-List<MessageHandler>handlers = new ArrayList<MessageHandler>();
-String []segmentIDs = null;
-Boolean showAll = showAllstr != null && !"null".equalsIgnoreCase(showAllstr);
-
-if (remoteFacilityIdString==null) // local lab
-{
-    
-	Long reqIDL = LabRequestReportLink.getIdByReport("hl7TextMessage",Long.valueOf(segmentID));
-	reqID = reqIDL==null ? "" : reqIDL.toString();
-	reqIDL = LabRequestReportLink.getRequestTableIdByReport("hl7TextMessage",Long.valueOf(segmentID));
-	reqTableID = reqIDL==null ? "" : reqIDL.toString();
-	
-	
-
-	PatientLabRoutingDao dao = SpringUtils.getBean(PatientLabRoutingDao.class); 
-	for(PatientLabRouting r : dao.findByLabNoAndLabType(ConversionUtils.fromIntString(segmentID), "HL7")) {
-		demographicID = "" + r.getDemographicNo();
+	if (providerNo == null)
+	{
+		providerNo = loggedInInfo.getLoggedInProviderNo();
 	}
 
-	if(demographicID != null && !demographicID.equals("")&& !demographicID.equals("0")){
-	    isLinkedToDemographic=true;
-	    LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_HL7_LAB, segmentID, request.getRemoteAddr(),demographicID);
-	}else{
-	    LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_HL7_LAB, segmentID, request.getRemoteAddr());
+
+	UserPropertyDAO userPropertyDAO = (UserPropertyDAO)SpringUtils.getBean("UserPropertyDAO");
+	UserProperty uProp = userPropertyDAO.getProp(providerNo, UserProperty.LAB_ACK_COMMENT);
+	boolean skipComment = false;
+	if (uProp != null && uProp.getValue().equalsIgnoreCase("yes"))
+	{
+		skipComment = true;
 	}
 
-	
-	if( showAll ) {
-		multiLabId = request.getParameter("multiID");		
-		segmentIDs = multiLabId.split(",");
-		for( int i = 0; i < segmentIDs.length; ++i) {
-		    handlers.add(Factory.getHandler(segmentIDs[i]));
+
+	//Need date lab was received by OSCAR
+	Hl7TextMessageDao hl7TxtMsgDao = (Hl7TextMessageDao)SpringUtils.getBean("hl7TextMessageDao");
+	MeasurementMapDao measurementMapDao = (MeasurementMapDao) SpringUtils.getBean("measurementMapDao");
+	Hl7TextMessage hl7TextMessage = hl7TxtMsgDao.find(Integer.parseInt(segmentID));
+
+	String dateLabReceived = "n/a";
+	if (hl7TextMessage != null)
+	{
+		java.util.Date date = hl7TextMessage.getCreated();
+		String stringFormat = "yyyy-MM-dd HH:mm";
+		dateLabReceived = ConversionUtils.toDateString(date, stringFormat);
+		// dateLabReceived = UtilDateUtilities.DateToString(date, stringFormat);
+	}
+
+	boolean isLinkedToDemographic = false;
+	ArrayList<ReportStatus> ackList = null;
+	String multiLabId = null;
+	MessageHandler handler = null;
+	String hl7 = null;
+	String reqID = null;
+	String reqTableID = null;
+	String remoteFacilityIdQueryString = "";
+
+	boolean bShortcutForm = OscarProperties.getInstance().getProperty("appt_formview", "").equalsIgnoreCase("on");
+	String formName = bShortcutForm ? OscarProperties.getInstance().getProperty("appt_formview_name") : "";
+	String formNameShort = formName.length() > 3 ? (formName.substring(0,2)+".") : formName;
+	String formName2 = bShortcutForm ? OscarProperties.getInstance().getProperty("appt_formview_name2", "") : "";
+	String formName2Short = formName2.length() > 3 ? (formName2.substring(0,2)+".") : formName2;
+	boolean bShortcutForm2 = bShortcutForm && !formName2.equals("");
+	List<MessageHandler>handlers = new ArrayList<MessageHandler>();
+	String []segmentIDs = null;
+	Boolean showAll = showAllstr != null && !"null".equalsIgnoreCase(showAllstr);
+
+	if (remoteFacilityIdString == null) // local lab
+	{
+		Long reqIDL = LabRequestReportLink.getIdByReport("hl7TextMessage", Long.valueOf(segmentID));
+		reqID = reqIDL == null ? "" : reqIDL.toString();
+		reqIDL = LabRequestReportLink.getRequestTableIdByReport("hl7TextMessage", Long.valueOf(segmentID));
+		reqTableID = reqIDL == null ? "" : reqIDL.toString();
+
+		PatientLabRoutingDao dao = SpringUtils.getBean(PatientLabRoutingDao.class);
+		for(PatientLabRouting routing : dao.findByLabNoAndLabType(ConversionUtils.fromIntString(segmentID), "HL7"))
+		{
+			demographicID = "" + routing.getDemographicNo();
 		}
-		
-		handler = handlers.get(0);
+
+		if (demographicID != null && !demographicID.equals("")&& !demographicID.equals("0"))
+		{
+			isLinkedToDemographic = true;
+			LogAction.addLog((String) session.getAttribute("user"),
+					LogConst.ACTION_READ,
+					LogConst.CON_HL7_LAB,
+					segmentID,
+					request.getRemoteAddr(),
+					demographicID);
+		}
+		else
+		{
+			LogAction.addLog((String) session.getAttribute("user"),
+					LogConst.ACTION_READ,
+					LogConst.CON_HL7_LAB,
+					segmentID,
+					request.getRemoteAddr());
+		}
+
+		if (showAll)
+		{
+			multiLabId = request.getParameter("multiID");
+			segmentIDs = multiLabId.split(",");
+			for (int i = 0; i < segmentIDs.length; ++i)
+			{
+				handlers.add(Factory.getHandler(segmentIDs[i]));
+			}
+
+			handler = handlers.get(0);
+		}
+		else
+		{
+			multiLabId = Hl7textResultsData.getMatchingLabs(segmentID);
+			segmentIDs = multiLabId.split(",");
+
+			List<String> segmentIdList = new ArrayList<String>();
+			handler = Factory.getHandler(segmentID);
+			handlers.add(handler);
+			segmentIdList.add(segmentID);
+
+			// this is where it gets weird.
+			// We want to show all messages with different filler order num but same accession in a single report
+			segmentIDs = segmentIdList.toArray(new String[segmentIdList.size()]);
+
+			hl7 = Factory.getHL7Body(segmentID);
+			if (handler instanceof OLISHL7Handler)
+			{
+				%>
+				<jsp:forward page="labDisplayOLIS.jsp" />
+				<%
+			}
+		}
 	}
-	else {
-		multiLabId = Hl7textResultsData.getMatchingLabs(segmentID);
-		segmentIDs = multiLabId.split(",");
-		
-		List<String> segmentIdList = new ArrayList<String>();
-		handler = Factory.getHandler(segmentID);
+	else // remote lab
+	{
+		CachedDemographicLabResult remoteLabResult = LabDisplayHelper.getRemoteLab(loggedInInfo,
+				Integer.parseInt(remoteFacilityIdString),
+				remoteLabKey,
+				Integer.parseInt(demographicID));
+		MiscUtils.getLogger().debug("retrieved remoteLab:" + ReflectionToStringBuilder.toString(remoteLabResult));
+		isLinkedToDemographic = true;
+
+		LogAction.addLog((String) session.getAttribute("user"),
+				LogConst.ACTION_READ,
+				LogConst.CON_HL7_LAB,
+				"segmentId="
+						+ segmentID
+						+ ", remoteFacilityId="
+						+ remoteFacilityIdString
+						+ ", remoteDemographicId="
+						+ demographicID);
+
+		Document cachedDemographicLabResultXmlData = LabDisplayHelper.getXmlDocument(remoteLabResult);
+
+		ackList = LabDisplayHelper.getReportStatus(cachedDemographicLabResultXmlData);
+		multiLabId = LabDisplayHelper.getMultiLabId(cachedDemographicLabResultXmlData);
+		handler = LabDisplayHelper.getMessageHandler(cachedDemographicLabResultXmlData);
 		handlers.add(handler);
-		segmentIdList.add(segmentID);
-		
-		//this is where it gets weird. We want to show all messages with different filler order num but same accession in a single report
-		segmentIDs = segmentIdList.toArray(new String[segmentIdList.size()]);
-		
-		hl7 = Factory.getHL7Body(segmentID);
-		if (handler instanceof OLISHL7Handler) {
-			%>
-			<jsp:forward page="labDisplayOLIS.jsp" />
-			<%
+		segmentIDs = new String[] {"0"};  //fake segment ID for the for loop below to execute
+		hl7 = LabDisplayHelper.getHl7Body(cachedDemographicLabResultXmlData);
+
+		try
+		{
+			remoteFacilityIdQueryString="&remoteFacilityId="+remoteFacilityIdString+"&remoteLabKey="+URLEncoder.encode(remoteLabKey, "UTF-8");
+		}
+		catch (Exception e)
+		{
+			MiscUtils.getLogger().error("Error", e);
 		}
 	}
-    
-}
-else // remote lab
-{
-	CachedDemographicLabResult remoteLabResult=LabDisplayHelper.getRemoteLab(loggedInInfo, Integer.parseInt(remoteFacilityIdString), remoteLabKey,Integer.parseInt(demographicID));
-	MiscUtils.getLogger().debug("retrieved remoteLab:"+ReflectionToStringBuilder.toString(remoteLabResult));
-	isLinkedToDemographic=true;
 
-	LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_HL7_LAB, "segmentId="+segmentID+", remoteFacilityId="+remoteFacilityIdString+", remoteDemographicId="+demographicID);
-
-	Document cachedDemographicLabResultXmlData=LabDisplayHelper.getXmlDocument(remoteLabResult);
-
-	ackList=LabDisplayHelper.getReportStatus(cachedDemographicLabResultXmlData);
-	multiLabId=LabDisplayHelper.getMultiLabId(cachedDemographicLabResultXmlData);
-	handler=LabDisplayHelper.getMessageHandler(cachedDemographicLabResultXmlData);
-	handlers.add(handler);
-	segmentIDs = new String[] {"0"};  //fake segment ID for the for loop below to execute
-	hl7=LabDisplayHelper.getHl7Body(cachedDemographicLabResultXmlData);
-	
-	try {
-		remoteFacilityIdQueryString="&remoteFacilityId="+remoteFacilityIdString+"&remoteLabKey="+URLEncoder.encode(remoteLabKey, "UTF-8");
-	} catch (Exception e) {
-		MiscUtils.getLogger().error("Error", e);
-	}
-}
-
-boolean isLabCLS = ("CLS".equals(handler.getMsgType()) || "CLSDI".equals(handler.getMsgType()));
+	boolean isLabCLS = ("CLS".equals(handler.getMsgType()) || "CLSDI".equals(handler.getMsgType()));
 
 /********************** Converted to this sport *****************************/
-
-
-// check for errors printing
-if (request.getAttribute("printError") != null && (Boolean) request.getAttribute("printError")){
+	// check for errors printing
+	if (request.getAttribute("printError") != null && (Boolean) request.getAttribute("printError"))
+	{
 %>
-<script language="JavaScript">
+<script type="text/javascript">
     alert("The lab could not be printed due to an error. Please see the server logs for more detail.");
 </script>
-<%}
-
+<%	}
 
 	String annotation_display = org.oscarehr.casemgmt.model.CaseManagementNoteLink.DISP_LABTEST;
 	CaseManagementManager caseManagementManager = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
@@ -242,24 +275,22 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
         <script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-1.4.2.js"></script>
       	<script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/jquery/jquery.form.js"></script>
       	
-
-       <script  type="text/javascript" charset="utf-8">
-
-     	  jQuery.noConflict();
+		<script type="text/javascript" charset="utf-8">
+			jQuery.noConflict();
 		</script>
-		
-	
-	<oscar:customInterface section="labView"/>
 
-		
-        <script language="javascript" type="text/javascript">
+		<oscar:customInterface section="labView"/>
+
+		<script type="text/javascript">
             // alternately refer to this function in oscarMDSindex.js as labDisplayAjax.jsp does
-		function updateLabDemoStatus(labno){
-                                    if(document.getElementById("DemoTable"+labno)){
-                                       document.getElementById("DemoTable"+labno).style.backgroundColor="#FFF";
-                                    }
-                                }
-	</script>
+			function updateLabDemoStatus(labno)
+			{
+				if (document.getElementById("DemoTable" + labno))
+				{
+					document.getElementById("DemoTable" + labno).style.backgroundColor="#FFF";
+				}
+			}
+		</script>
         <link rel="stylesheet" type="text/css" href="../../../share/css/OscarStandardLayout.css">
         <style type="text/css">
             <!--
@@ -372,55 +403,71 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
         </style>
 
         <script language="JavaScript">
-        var providerNo = '<%=providerNo%>';
-        function popupStart(vheight,vwidth,varpage,windowname) {
-            var page = varpage;
-            windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes";
-            var popup=window.open(varpage, windowname, windowprops);
-        }
-        function getComment(action, segmentId) {
-       
-            var ret = true;
-            var comment = "";
-            var text = providerNo + "_" + segmentId + "commentText";
-            if( $(text) != null ) {
-	            comment = $(text).innerHTML;
-	            if( comment == null ) {
-	            	comment = "";
-	            }
-            }
-            var commentVal = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', comment);
+			var providerNo = '<%=providerNo%>';
+			function popupStart(vheight,vwidth,varpage,windowname)
+			{
+				var page = varpage;
+				windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes";
+				var popup=window.open(varpage, windowname, windowprops);
+			}
 
-            if( commentVal == null ) {
-            	ret = false;
-            }
-            else if( commentVal != null && commentVal.length > 0 )
-                document.forms['acknowledgeForm_'+ segmentId].comment.value = commentVal;
-            else
-            	document.forms['acknowledgeForm_'+ segmentId].comment.value = comment;
+			function getComment(action, segmentId)
+			{
 
-           if(ret) handleLab('acknowledgeForm_'+segmentId,segmentId, action);
+				var ret = true;
+				var comment = "";
+				var text = providerNo + "_" + segmentId + "commentText";
+				if ($(text) != null)
+				{
+					comment = $(text).innerHTML;
+					if (comment == null)
+					{
+						comment = "";
+					}
+				}
+				var commentVal = prompt('<bean:message key="oscarMDS.segmentDisplay.msgComment"/>', comment);
 
-            return false;
-        }
+				if (commentVal == null)
+				{
+					ret = false;
+				}
+				else if (commentVal != null && commentVal.length > 0)
+				{
+					document.forms['acknowledgeForm_'+ segmentId].comment.value = commentVal;
+				}
+				else
+				{
+					document.forms['acknowledgeForm_'+ segmentId].comment.value = comment;
+				}
 
-        function printPDF(labid){
-        	var frm = "acknowledgeForm_" + labid;
-        	document.forms[frm].action="PrintPDF.do";
-        	document.forms[frm].submit();            
-        }
+				if (ret)
+				{
+					handleLab('acknowledgeForm_'+segmentId,segmentId, action);
+				}
 
-	function linkreq(rptId, reqId) {
-	    var link = "../../LinkReq.jsp?table=hl7TextMessage&rptid="+rptId+"&reqid="+reqId;
-	    window.open(link, "linkwin", "width=500, height=200");
-	}
+				return false;
+			}
 
-        function sendToPHR(labId, demographicNo) {
+			function printPDF(labid)
+			{
+				var frm = "acknowledgeForm_" + labid;
+				document.forms[frm].action="PrintPDF.do";
+				document.forms[frm].submit();
+			}
+
+			function linkreq(rptId, reqId)
+			{
+				var link = "../../LinkReq.jsp?table=hl7TextMessage&rptid="+rptId+"&reqid="+reqId;
+				window.open(link, "linkwin", "width=500, height=200");
+			}
+
+			function sendToPHR(labId, demographicNo)
+			{
         	<%
-        		MyOscarLoggedInInfo myOscarLoggedInInfo=MyOscarLoggedInInfo.getLoggedInInfo(session);
+				MyOscarLoggedInInfo myOscarLoggedInInfo = MyOscarLoggedInInfo.getLoggedInInfo(session);
 
-        		if (myOscarLoggedInInfo==null || !myOscarLoggedInInfo.isLoggedIn())
-        		{
+				if (myOscarLoggedInInfo == null || !myOscarLoggedInInfo.isLoggedIn())
+				{
         			%>
     					alert('Please Login to MyOscar before performing this action.');
         			<%
@@ -432,152 +479,214 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
         			<%
         		}
         	%>
-        }
-
-        function matchMe() {
-            <% if ( !isLinkedToDemographic) { %>
-               	popupStart(360, 680, '../../../oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%= segmentID %>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow');
-            <% } %>
-	}
-
-
-        function handleLab(formid,labid,action){
-            var url='../../../dms/inboxManage.do';
-                                           var data='method=isLabLinkedToDemographic&labid='+labid;
-                                           new Ajax.Request(url, {method: 'post',parameters:data,onSuccess:function(transport){
-                                                                    var json=transport.responseText.evalJSON();
-                                                                    if(json!=null){
-                                                                        var success=json.isLinkedToDemographic;
-                                                                        var demoid='';
-                                                                        //check if lab is linked to a provider
-                                                                        if(success){
-                                                                            if(action=='ackLab'){
-                                                                                if(confirmAck()){
-                                                                                	$("labStatus_"+labid).value = "A";
-                                                                                    updateStatus(formid,labid);
-                                                                                }
-                                                                            }else if(action=='msgLab'){
-                                                                                demoid=json.demoId;
-                                                                                if(demoid!=null && demoid.length>0)
-                                                                                    window.popup(700,960,'../../../oscarMessenger/SendDemoMessage.do?demographic_no='+demoid,'msg');
-                                                                            }else if(action=='ticklerLab'){
-                                                                                demoid=json.demoId;
-                                                                                if(demoid!=null && demoid.length>0)
-                                                                                    window.popup(450,600,'../../../tickler/ForwardDemographicTickler.do?docType=HL7&docId='+labid+'&demographic_no='+demoid,'tickler')
-                                                                            }
-                                                                            else if( action == 'addComment' ) {
-                                                                            	addComment(formid,labid);
-                                                                            } else if (action == 'unlinkDemo') {
-                                                                                unlinkDemographic(labid);
-                                                                            }
-
-                                                                        }else{
-                                                                            if(action=='ackLab'){
-                                                                                if(confirmAckUnmatched()) {
-                                                                                	$("labStatus_"+labid).value = "A";
-                                                                                    updateStatus(formid,labid);
-                                                                                }
-                                                                                else {
-                                                                                    matchMe();
-                                                                                }
-
-                                                                            }else{
-                                                                                alert("Please relate lab to a patient");
-                                                                                matchMe();
-                                                                            }
-                                                                        }
-                                                                    }
-                                                            }});
-        }
-        function confirmAck(){
-		<% if (props.getProperty("confirmAck", "").equals("yes")) { %>
-            		return confirm('<bean:message key="oscarMDS.index.msgConfirmAcknowledge"/>');
-            	<% } else { %>
-            		return true;
-            	<% } %>
-	}
-
-        function confirmCommentUnmatched(){
-            return confirm('<bean:message key="oscarMDS.index.msgConfirmAcknowledgeUnmatched"/>');
-        }
-
-        function confirmAckUnmatched(){
-            return confirm('<bean:message key="oscarMDS.index.msgConfirmAcknowledgeUnmatched"/>');
-        }
-        function updateStatus(formid,labid){
-        	
-            var url='<%=request.getContextPath()%>'+"/oscarMDS/UpdateStatus.do";
-            var data=$(formid).serialize(true);
-
-            new Ajax.Request(url,{method:'post',parameters:data,onSuccess:function(transport){
-            	
-            	if( <%=showAll%> ) {                	
-                	window.location.reload();
-                }
-            	else if( window.opener.document.getElementById('labdoc_'+labid) != null ) {
-                	window.opener.Effect.BlindUp('labdoc_'+labid);
-                    window.opener.refreshCategoryList();  
-                    window.close();
-            	}
-                else {
-                	window.close();
-                }
-                
-        }});
-
-        }
-        
-        function unlinkDemographic(labNo){           
-            var reason = "Incorrect demographic";
-            reason = prompt('<bean:message key="oscarMDS.segmentDisplay.msgUnlink"/>', reason);
-
-            //must include reason
-            if( reason == null || reason.length == 0) {
-            	return false;
-            }
-            
-            var urlStr='<%=request.getContextPath()%>'+"/lab/CA/ALL/UnlinkDemographic.do";
-            var dataStr="reason="+reason+"&labNo="+labNo;
-            jQuery.ajax({
-    			type: "POST",
-    			url:  urlStr,
-    			data: dataStr,
-    			success: function (data) {
-                            top.opener.location.reload();
-                            window.close();
-    			}
-            });                            
-        }
-
-        function addComment(formid,labid) {
-        	var url='<%=request.getContextPath()%>'+"/oscarMDS/UpdateStatus.do?method=addComment";
-			if( $F("labStatus_"+labid) == "" ) {
-				$("labStatus_"+labid).value = "N";
 			}
-			
-        	var data=$(formid).serialize(true);
-        	
-            new Ajax.Request(url,{method:'post',parameters:data,onSuccess:function(transport){				
-            		window.location.reload();
-            	
-        }});
-        }
 
-        window.ForwardSelectedRows = function() {
-    		var query = jQuery(document.reassignForm).formSerialize();
-    		jQuery.ajax({
-    			type: "POST",
-    			url:  "<%=request.getContextPath()%>/oscarMDS/ReportReassign.do",
-    			data: query,
-    			success: function (data) {
-    				self.close();
-    			}
-    		});
-    	}
+			function matchMe()
+			{
+			<%
+				if (!isLinkedToDemographic)
+				{
+			%>
+				popupStart(360, 680, '../../../oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%= segmentID %>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow');
+			<%
+				}
+			%>
+			}
 
-        function submitLabel(lblval, segmentID){
-       		document.forms['TDISLabelForm_'+segmentID].label.value = document.forms['acknowledgeForm_'+segmentID].label.value;
-       	}
+			function handleLab(formid, labid, action)
+			{
+				var url = '../../../dms/inboxManage.do';
+				var data = 'method=isLabLinkedToDemographic&labid=' + labid;
+				new Ajax.Request(url, {
+					method: 'post',
+					parameters: data,
+					onSuccess: function(transport)
+					{
+						var json = transport.responseText.evalJSON();
+						if (json != null)
+						{
+							var success = json.isLinkedToDemographic;
+							var demoid = '';
+							//check if lab is linked to a provider
+							if (success)
+							{
+								if (action === 'ackLab')
+								{
+									if(confirmAck())
+									{
+										$("labStatus_" + labid).value = "A";
+										updateStatus(formid, labid);
+									}
+								}
+								else if (action === 'msgLab')
+								{
+									demoid = json.demoId;
+									if(demoid != null && demoid.length > 0)
+									{
+										window.popup(700,960,'../../../oscarMessenger/SendDemoMessage.do?demographic_no='+demoid,'msg');
+									}
+								}
+								else if (action === 'ticklerLab')
+								{
+									demoid = json.demoId;
+									if (demoid != null && demoid.length > 0)
+									{
+										window.popup(450,600,'../../../tickler/ForwardDemographicTickler.do?docType=HL7&docId='+labid+'&demographic_no='+demoid,'tickler')
+									}
+								}
+								else if (action === 'addComment')
+								{
+									addComment(formid, labid);
+								}
+								else if (action === 'unlinkDemo')
+								{
+									unlinkDemographic(labid);
+								}
+							}
+							else
+							{
+								if (action == 'ackLab')
+								{
+									if (confirmAckUnmatched())
+									{
+										$("labStatus_"+labid).value = "A";
+										updateStatus(formid,labid);
+									}
+									else
+									{
+										matchMe();
+									}
+								}
+								else
+								{
+									alert("Please relate lab to a patient");
+									matchMe();
+								}
+							}
+						}
+					}});
+			}
+
+			function confirmAck()
+			{
+				<%
+				if (props.getProperty("confirmAck", "").equals("yes"))
+				{
+				%>
+            		return confirm('<bean:message key="oscarMDS.index.msgConfirmAcknowledge"/>');
+				<%
+				}
+				else
+				{
+				%>
+            		return true;
+				<%
+				}
+				%>
+			}
+
+			function confirmCommentUnmatched()
+			{
+				return confirm('<bean:message key="oscarMDS.index.msgConfirmAcknowledgeUnmatched"/>');
+			}
+
+			function confirmAckUnmatched()
+			{
+				return confirm('<bean:message key="oscarMDS.index.msgConfirmAcknowledgeUnmatched"/>');
+			}
+
+			function updateStatus(formid,labid)
+			{
+				var url='<%=request.getContextPath()%>'+"/oscarMDS/UpdateStatus.do";
+				var data=$(formid).serialize(true);
+
+				new Ajax.Request(url, {
+					method:'post',
+					parameters:data,
+					onSuccess:function(transport)
+					{
+						if (<%=showAll%>)
+						{
+							window.location.reload();
+						}
+						else if (window.opener.document.getElementById('labdoc_' + labid) != null )
+						{
+							window.opener.Effect.BlindUp('labdoc_'+labid);
+							window.opener.refreshCategoryList();
+							window.close();
+						}
+						else
+						{
+							window.close();
+						}
+					}
+				});
+
+			}
+
+			function unlinkDemographic(labNo)
+			{
+				var reason = "Incorrect demographic";
+				reason = prompt('<bean:message key="oscarMDS.segmentDisplay.msgUnlink"/>', reason);
+
+				//must include reason
+				if( reason == null || reason.length == 0)
+				{
+					return false;
+				}
+
+				var urlStr='<%=request.getContextPath()%>'+"/lab/CA/ALL/UnlinkDemographic.do";
+				var dataStr="reason="+reason+"&labNo="+labNo;
+				jQuery.ajax({
+					type: "POST",
+					url:  urlStr,
+					data: dataStr,
+					success: function (data)
+					{
+						top.opener.location.reload();
+						window.close();
+					}
+				});
+			}
+
+			function addComment(formid, labid)
+			{
+				var url='<%=request.getContextPath()%>'+"/oscarMDS/UpdateStatus.do?method=addComment";
+				if ($F("labStatus_"+labid) == "")
+				{
+					$("labStatus_"+labid).value = "N";
+				}
+
+				var data=$(formid).serialize(true);
+
+				new Ajax.Request(url, {
+					method:'post',
+					parameters:data,
+					onSuccess:function(transport)
+					{
+						window.location.reload();
+					}
+				});
+			}
+
+			window.ForwardSelectedRows = function()
+			{
+				var query = jQuery(document.reassignForm).formSerialize();
+				jQuery.ajax({
+					type: "POST",
+					url:  "<%=request.getContextPath()%>/oscarMDS/ReportReassign.do",
+					data: query,
+					success: function (data)
+					{
+						self.close();
+					}
+				});
+			}
+
+			function submitLabel(lblval, segmentID)
+			{
+				document.forms['TDISLabelForm_'+segmentID].label.value = document.forms['acknowledgeForm_'+segmentID].label.value;
+			}
         </script>
 
     </head>
@@ -585,68 +694,85 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
     <body onLoad="javascript:matchMe();">
         <!-- form forwarding of the lab -->
         <%        
-        	for( int idx = 0; idx < segmentIDs.length; ++idx ) {
-        		       		
-        		if (remoteFacilityIdString==null) {
-        			ackList = AcknowledgementData.getAcknowledgements(segmentID);
-        			segmentID = segmentIDs[idx];          		
-                	handler = handlers.get(idx);
-        		}
-        		
-        		boolean notBeenAcked = ackList.size() == 0;
-        		boolean ackFlag = false;
-        		String labStatus = "";
-        		if (ackList != null){
-        		    for (int i=0; i < ackList.size(); i++){
-        		        ReportStatus reportStatus = ackList.get(i);
-        		        if (reportStatus.getProviderNo() != null && reportStatus.getProviderNo().equals(providerNo) ) {
-        		        	labStatus = reportStatus.getStatus();
-        		        	if( labStatus.equals("A") ){
-        		            	ackFlag = true;//lab has been ack by this provider.
-        		            	break;
-        		        	}
-        		        }
-        		    }
-        		}
-        		
-        		Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
-        		int lab_no = Integer.parseInt(segmentID);
-        		Hl7TextInfo hl7Lab = hl7TextInfoDao.findLabId(lab_no);
-        		String label = "";
-        		if (hl7Lab != null && hl7Lab.getLabel()!=null) label = hl7Lab.getLabel();
-        		
-        		String ackLabFunc;
-        		if( skipComment ) {
-        			ackLabFunc = "handleLab('acknowledgeForm_" + segmentID + "','" + segmentID + "','ackLab');";
-        		}
-        		else {
-        			ackLabFunc = "getComment('ackLab', " + segmentID + ");";
-        		}
+			for (int idx = 0; idx < segmentIDs.length; ++idx )
+			{
+				if (remoteFacilityIdString == null)
+				{
+					ackList = AcknowledgementData.getAcknowledgements(segmentID);
+					segmentID = segmentIDs[idx];
+					handler = handlers.get(idx);
+				}
 
-        %>
+				boolean notBeenAcked = ackList.size() == 0;
+				boolean ackFlag = false;
+				String labStatus = "";
+				if (ackList != null)
+				{
+					for (int i = 0; i < ackList.size(); i++)
+					{
+						ReportStatus reportStatus = ackList.get(i);
+						if (reportStatus.getProviderNo() != null && reportStatus.getProviderNo().equals(providerNo))
+						{
+							labStatus = reportStatus.getStatus();
+							if (labStatus.equals("A"))
+							{
+								ackFlag = true;//lab has been ack by this provider.
+								break;
+							}
+						}
+					}
+				}
+
+				Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
+				int lab_no = Integer.parseInt(segmentID);
+				Hl7TextInfo hl7Lab = hl7TextInfoDao.findLabId(lab_no);
+				String label = "";
+				if (hl7Lab != null && hl7Lab.getLabel()!=null)
+				{
+					label = hl7Lab.getLabel();
+				}
+
+				String ackLabFunc;
+				if (skipComment)
+				{
+					ackLabFunc = "handleLab('acknowledgeForm_" + segmentID + "','" + segmentID + "','ackLab');";
+				}
+				else
+				{
+					ackLabFunc = "getComment('ackLab', " + segmentID + ");";
+				}
+		%>
         <script type="text/javascript">
-
-        jQuery(function() {
-      	  jQuery("#createLabel_<%=segmentID%>").click(function() {
-      	    jQuery.ajax( {
-      	      type: "POST",
-      	      url: '<%=request.getContextPath()%>'+"/lab/CA/ALL/createLabelTDIS.do",
-      	      dataType: "json",
-      	      data: { lab_no: jQuery("#labNum_<%=segmentID%>").val(),accessionNum: jQuery("#accNum").val(), label: jQuery("#label_<%=segmentID%>").val(), ajaxcall: true },
-      	      success: function(result)
-			  {
-			  	<%
-			  	if(!OscarProperties.getInstance().isPropertyActive("disable_lab_label_alert")) {%>
-				  alert("label applied");
-			  	<%}%>
-      	    	jQuery("#labelspan_<%=segmentID%>").children().get(0).innerHTML = "Label: " +  jQuery("#label_<%=segmentID%>").val();
-        	  	document.forms['acknowledgeForm_<%=segmentID%>'].label.value = "";    
-      	      }
-      	    }
-      	   );
-      	});
-      });
-
+			jQuery(function()
+			{
+				jQuery("#createLabel_<%=segmentID%>").click(function()
+				{
+					jQuery.ajax({
+						type: "POST",
+						url: '<%=request.getContextPath()%>'+"/lab/CA/ALL/createLabelTDIS.do",
+						dataType: "json",
+						data: {
+							lab_no: jQuery("#labNum_<%=segmentID%>").val(),
+							accessionNum: jQuery("#accNum").val(),
+							label: jQuery("#label_<%=segmentID%>").val(),
+							ajaxcall: true
+						},
+						success: function(result)
+						{
+						<%
+							if(!OscarProperties.getInstance().isPropertyActive("disable_lab_label_alert"))
+							{
+						%>
+							alert("label applied");
+						<%
+							}
+						%>
+							jQuery("#labelspan_<%=segmentID%>").children().get(0).innerHTML = "Label: " +  jQuery("#label_<%=segmentID%>").val();
+							document.forms['acknowledgeForm_<%=segmentID%>'].label.value = "";
+						}
+					});
+				});
+			});
 		</script>
 		<div id="lab_<%=segmentID%>">
         <form name="reassignForm_<%=segmentID%>" method="post" action="Forward.do">
@@ -1251,7 +1377,6 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                            
  							<%
 						}
-                           
                            for ( j=0; j < OBRCount; j++){
 
                                boolean obrFlag = false;
@@ -1523,6 +1648,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 											   </tr>
 									   		<%}
                                        } else if ((!handler.getOBXResultStatus(j, k).equals("TDIS") && handler.getMsgType().equals("Spire")) )  { %>
+
 											<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
                                            <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName %></a>
                                            &nbsp;<%if(loincCode != null){ %>
