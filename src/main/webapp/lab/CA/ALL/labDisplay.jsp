@@ -1256,6 +1256,13 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                boolean obrFlag = false;
                                int obxCount = handler.getOBXCount(j);
+                               // I don't know why old Excelleris labs have this quirk but
+							   // they have an obxCount of 0 if it was just the PDF in the field and nothing else
+                               if (obxCount == 0 && handler.getMsgType().equals("PATHL7") && isPDF)
+							   {
+							   	obxCount = 1;
+							   }
+
                                for (k=0; k < obxCount; k++){
 
                                	String obxName = handler.getOBXName(j, k);
@@ -1289,7 +1296,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                    	b2=true;
                                    }
 
-                                    if (!fail && b1 && b2 && b3){ // <<--  DNS only needed for MDS messages
+                                    if ((!fail && b1 && b2 && b3) || isPDF){ // <<--  DNS only needed for MDS messages
 
                                    	String obrName = handler.getOBRName(j);
                                    	b1 = !obrFlag && !obrName.equals("");
