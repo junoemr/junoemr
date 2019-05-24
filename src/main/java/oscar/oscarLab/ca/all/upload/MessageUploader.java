@@ -233,28 +233,36 @@ public final class MessageUploader {
 			// [1] Strip out the embedded PDF in the OBX message
 			// [2] Convert it to a document and get the document ID
 			boolean hasPDF = false;
-			List<String> embeddedPdfs = new ArrayList<>();
-			String embeddedPdf = "";
+			List<String> embeddedPDFs = new ArrayList<>();
 
 			if (type.equals("PATHL7"))
 			{
+				MiscUtils.getLogger().info("confirmed PATHL7");
 				for (i = 0; i < messageHandler.getOBRCount(); i++)
 				{
 					int obxCount = messageHandler.getOBXCount(i);
 					if (messageHandler.getOBXValueType(i, 0).equals("ED"))
 					{
+						MiscUtils.getLogger().info("Found embedded document OBX, looking for encoded PDF");
 						String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
+						if (obxCount == 0)
+						{
+							obxCount = 1;
+						}
 						for (j = 0; j < obxCount; j++)
 						{
+							MiscUtils.getLogger().info("Found embedded document OBX, looking for encoded PDF");
 							// Some embedded PDFs simply have the lab as-is, some have it split up like above
 							for (int k = 1; k <= referenceStrings.length; k++)
 							{
-								embeddedPdf = messageHandler.getOBXResult(i, j, k);
+								String embeddedPdf = messageHandler.getOBXResult(i, j, k);
+								MiscUtils.getLogger().info(embeddedPdf.length());
 								if (embeddedPdf.length() > referenceStrings[k-1].length()
 										&& !embeddedPdf.contains("parsed_embedded_pdf_document_id_"))
 								{
+									MiscUtils.getLogger().info("Found possible embedded lab PDF");
 									hasPDF = true;
-									embeddedPdfs.add(embeddedPdf);
+									embeddedPDFs.add(embeddedPdf);
 								}
 							}
 						}
@@ -267,20 +275,13 @@ public final class MessageUploader {
 			if (!isTDIS || !hasBeenUpdated) {
 				if (hasPDF)
 				{
-					for (String pdf : embeddedPdfs)
+					for (String pdf : embeddedPDFs)
 					{
-						Demographic demographic = null;
-						try
-						{
-							demographic = getDemographicFromLabInfo(lastName, firstName, sex, dob, hin);
-						}
-						catch (Exception ignoringNoDemographic)
-						{
-
-						}
 						String fileName = accessionNum + ".pdf";
 						// TODO instead of demographic, pass in more meta information to build out docdesc properly
-						docId = createDocumentFromEmbeddedPDF(pdf, demographic, fileName);
+						// Replace original PDF string with meta info to prevent saving > 500k char strings in table
+						docId = createDocumentFromEmbeddedPDF(pdf, fileName);
+						hl7Body = hl7Body.replace(pdf, "embedded_doc_id_" + docId);
 						if (docId <= 0)
 						{
 							throw new ParseException("did not save embedded lab document correctly", 0);
@@ -291,8 +292,6 @@ public final class MessageUploader {
 				if (docId > 0)
 				{
 					hl7TextMessage.setEmbeddedDocId(docId);
-					// Replace original PDF string with meta info to prevent saving > 500k char strings in table
-					hl7Body = hl7Body.replace(embeddedPdf, "embedded_pdf_doc_id_" + docId);
 				}
 				hl7TextMessage.setFileUploadCheckId(fileId);
 				hl7TextMessage.setType(type);
@@ -681,7 +680,7 @@ public final class MessageUploader {
 	 * @return
 	 * 		an integer corresponding to the document ID we've created
 	 */
-	private static int createDocumentFromEmbeddedPDF(String embeddedPDF, Demographic demographic, String fileName)
+	private static int createDocumentFromEmbeddedPDF(String embeddedPDF, String fileName)
 			throws InterruptedException, IOException
 	{
 		InputStream fileStream = new ByteArrayInputStream(Base64.decodeBase64(embeddedPDF));
@@ -696,12 +695,6 @@ public final class MessageUploader {
 		document.setDocdesc("embedded_pdf");
 		document.setSourceFacility("HL7Upload");
 		document.setSource("Excelleris");
-
-		int demographicNo = 0;
-		if (demographic != null)
-		{
-			demographicNo = demographic.getDemographicNo();
-		}
 
 		Document savedDoc = documentService.uploadNewDemographicDocument(document, embeddedLabDoc, null);
 
