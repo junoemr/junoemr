@@ -68,9 +68,24 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.resourceOptions = [];
 		$scope.siteOptions = [];
 		$scope.defaultEventColor = "#333";
-		$scope.defaultTimeInterval = '00:15:00';
 		$scope.timeIntervalOptions =
-			['00:05:00','00:10:00','00:15:00','00:30:00'];
+			[{
+				label: '5 min intervals',
+				value: '00:05:00'
+			},
+			{
+				label: '10 min intervals',
+				value: '00:10:00'
+			},
+			{
+				label: '15 min intervals',
+				value: '00:15:00'
+			},
+			{
+				label: '30 min intervals',
+				value: '00:30:00'
+			}];
+		$scope.defaultTimeInterval = $scope.timeIntervalOptions[2].value;
 		$scope.selectedTimeInterval = $scope.defaultTimeInterval;
 		$scope.selectedSlotLabelInterval = {hours: 1};
 		$scope.defaultAutoRefreshMinutes = 3;
@@ -580,9 +595,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				// only choose it if it can be found in the options list
 				for(var i = 0; i < timeIntervalOptions.length; i++)
 				{
-					if(timeInterval === timeIntervalOptions[i])
+					if(timeInterval === timeIntervalOptions[i].value)
 					{
-						selectedTimeInterval = timeIntervalOptions[i];
+						selectedTimeInterval = timeIntervalOptions[i].value;
 						break;
 					}
 				}
@@ -1418,6 +1433,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.uiConfig.calendar.slotDuration = $scope.selectedTimeInterval;
 			$scope.uiConfig.calendar.slotLabelInterval = $scope.selectedSlotLabelInterval;
 
+			// ensure the selected date doesn't change on events refresh
+			$scope.uiConfig.calendar.defaultDate = $scope.calendar().fullCalendar('getDate');
 			$scope.applyUiConfig($scope.uiConfig);
 		};
 
@@ -1500,7 +1517,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 							{
 								uuid: null,
 								value: null,
-								label: "All",
+								label: "All Sites",
 							}
 						];
 

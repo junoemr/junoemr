@@ -32,7 +32,7 @@ body {
 }
 
 li.cpp-note-list {
-	background: #fff;
+	background: $white;
 	border: none;
 	border-bottom: 1px solid #ddd;
 	text-align: left;
@@ -47,7 +47,7 @@ li.cpp-note-list:last-child {
 
 .highlight,
 .highlight:hover {
-	color: #FF0000;
+	color: $red;
 }
 
 .refused,
@@ -57,12 +57,12 @@ li.cpp-note-list:last-child {
 
 .ineligible,
 .ineligible:hover {
-	color: #FFCC24;
+	color: $yellow;
 }
 
 .pending,
 .pending:hover {
-	color: #FF00FF;
+	color: $pink;
 }
 
 .abnormal-prev,
@@ -72,7 +72,7 @@ li.cpp-note-list:last-child {
 
 .abnormal,
 .abnormal:hover {
-	color: red;
+	color: $red;
 }
 
 #main-nav {
@@ -126,7 +126,12 @@ li.cpp-note-list:last-child {
 		}
 	}
 	#right-pane {
-		//margin-top: $margin-sm;
+		margin-top: $margin-sm;
+
+		// When the left-pane is hidden we need to account for the fixed toggle button
+		&.right-pane-padded {
+			padding-left: $toggle-patient-list-btn-width + 10px;
+		}
 	}
 	.toggle-patient-list-button {
 		height: $dashboard-header-height;
@@ -160,9 +165,6 @@ li.cpp-note-list:last-child {
 		padding-right: 0;
 		background-color: $light-grey;
 		width: $toggle-patient-list-btn-width;
-	} // When the left-pane is hidden we need to account for the fixed toggle button
-	.right-pane-padded {
-		padding-left: $toggle-patient-list-btn-width + 10px;
 	}
 }
 

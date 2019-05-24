@@ -8,6 +8,18 @@
 	white-space: nowrap;
 }
 
+$btn-aside-size: 72px;
+.btn-aside {
+	width: $btn-aside-size;
+	height: $btn-aside-size;
+	background-color: #3c5a96;
+	border-radius: 0;
+	border: 1px solid transparent;
+	&:focus {
+		outline: 1px solid transparent !important;
+	}
+}
+
 .calendar-loading
 {
 	position: absolute;
@@ -40,6 +52,28 @@
 
 .fc-view.fc-agendaTwoDay-view.fc-agenda-view{
     width: 100%;
+}
+
+.flexV {
+	display: flex;
+	flex-direction: column;
+}
+.flexH {
+	display: flex;
+	flex-direction: row;
+}
+.flexGrow {
+	flex-grow: 1;
+}
+
+/* remove border space around the schedule pane */
+.schedule-center-panel
+{
+	margin: -10px -15px 0 -15px;
+	// when the parent(#right-pane) has this class, apply this correction
+	.right-pane-padded & {
+		margin-left: -10px;
+	}
 }
 
 .calendar
@@ -92,9 +126,6 @@
 					width: 16px;
 					height: 16px;
 					margin: 4px;
-				}
-				.disabled {
-					color: $red;
 				}
 			}
 
@@ -149,46 +180,43 @@
 		.fc-today {
 		  opacity: 0;
 		}
-	  	/* custom stying for the time column*/
-	  	.fc-time {
-		  background-color: $grey-08;
-		}
+		.fc-head-container {
+			border: 0;
+			/* styling for the column-control headers */
+			.fc-resource-cell {
+				border-left: 0;
+				border-right: 0;
 
-		/* styling for the column-control headers */
-		.fc-resource-cell {
-			.column-ctl-root {
-				background-color: $white;
-				display: flex;
-				padding: 10px;
-				.column-ctl {
+				.column-ctl-root {
+					background-color: $white;
 					display: flex;
-					align-items: center;
-					justify-content: space-evenly;
-					padding: 5px;
-				}
-				.ctl-container-label {
-					flex-grow: 4;
-				}
-				.ctl-container-icon {
-					flex-grow: 1;
-				}
-				.icon {
-					width: 18px;
-					height: 18px;
+					padding: 10px;
+					.column-ctl {
+						display: flex;
+						align-items: center;
+						justify-content: space-evenly;
+						padding: 5px;
+					}
+					.ctl-container-label {
+						flex-grow: 4;
+					}
+					.ctl-container-icon {
+						flex-grow: 1;
+					}
+					.icon {
+						width: 18px;
+						height: 18px;
+					}
 				}
 			}
 		}
-
-		.flexV {
-			display: flex;
-			flex-direction: column;
+		/* custom stying for the time column*/
+		.fc-time {
+			background-color: $grey-08;
 		}
-		.flexH {
-			display: flex;
-			flex-direction: row;
-		}
-		.flexGrow {
-			flex-grow: 1;
+		.fc-axis {
+			width: $btn-aside-size !important;
+			padding: 0;
 		}
 	}
 }
@@ -197,18 +225,12 @@
 	background-color: $primary;
 	padding-top: 8px;
 
-	.btn-aside {
-		width: 72px;
-		height: 72px;
-		background-color: $primary;
-	}
-
 	.schedule-options {
 		background-color: $grey-07;
 		padding: 12px;
 
 		$input-height: 40px;
-		.btn-cal-nav {
+		.btn-nav-icon {
 			width: $input-height;
 			height: $input-height;
 			background-color: $white;
@@ -222,7 +244,6 @@
 			}
 		}
 		.divider-vertical {
-			//border-left: 2px solid $grey-06;
 			background-color: $grey-06;
 			width: 2px;
 			height: calc(#{$input-height} * 0.75);
