@@ -425,10 +425,14 @@ function signatureHandler(e) {
 	isSignatureDirty = e.isDirty;
 	isSignatureSaved = e.isSave;
 	e.target.onbeforeunload = null;
-	<% if (faxEnabled) { //%>
+	<% if (faxEnabled) { %>
 	e.target.document.getElementById("faxButton").disabled = !hasFaxNumber || !e.isSave;
+		<% if (!isReprint) {%>
 	e.target.document.getElementById("faxAndPasteButton").disabled = !hasFaxNumber || !e.isSave;
-	<% } %>
+	<%
+		}
+	}
+	%>
 	if (e.isSave) {
 		<% if (faxEnabled) { //%>
 		if (hasFaxNumber) {
