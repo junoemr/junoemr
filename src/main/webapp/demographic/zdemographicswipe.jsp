@@ -32,7 +32,7 @@
     <head>
         <script type="text/javascript" src="<%= request.getContextPath()%>/js/global.js"></script>
         <script type="text/javascript" src="<%= request.getContextPath()%>/js/jquery.js"></script>
-        <script type="text/javascript" src="<%= request.getContextPath() %>/web/common/util/HealthCardParser.js"></script>
+        <script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/HealthCardParser.js"></script>
         <link href="<%=request.getContextPath()%>/css/bootstrap.min.css" rel="stylesheet">
         <title>PATIENT DETAIL INFO</title>
         <link rel="stylesheet" href="../web.css" />
