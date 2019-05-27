@@ -1005,6 +1005,14 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						eventDetails += " (" + Juno.Common.Util.escapeHtml(event.data.reason) + ")"
 					}
 				}
+				else if(!Juno.Common.Util.isBlank(event.data.appointmentName))
+				{
+					eventDetails = Juno.Common.Util.escapeHtml(event.data.appointmentName);
+					if(!Juno.Common.Util.isBlank(event.data.reason))
+					{
+						eventDetails += " (" + Juno.Common.Util.escapeHtml(event.data.reason) + ")"
+					}
+				}
 				else if(!Juno.Common.Util.isBlank(event.data.reason))
 				{
 					eventDetails = Juno.Common.Util.escapeHtml(event.data.reason);

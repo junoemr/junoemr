@@ -67,7 +67,7 @@
 			<div id="tabAppointmentEdit" class="tab-pane"
 			     ng-show="eventController.activeTab == eventController.tabEnum.appointment">
 
-				<form ng-submit="save()" ng-init="init()">
+				<form ng-submit="save()" ng-init="eventController.init()">
 					<div ng-show="!isInitialized() || isWorking()" ng-include="'src/common/spinner.jsp'"></div>
 					<div ng-show="isInitialized() && !isWorking()" class="row">
 						<div class="tab-bar-inputs form-horizontal">
@@ -215,7 +215,7 @@
 																Address:
 															</label>
 															<div class="col-sm-11">
-																<span class="form-control-static">{{demographicModel.data.address}}</span>
+																<span class="form-control-static">{{demographicModel.data.addressLine}}</span>
 															</div>
 														</div>
 													</div>
@@ -640,7 +640,7 @@
 				<button
 						type="button"
 						class="btn btn-default"
-						<%--ng-click="cancel()"--%>
+						ng-click="save()"
 						ng-disabled="isWorking()">Receipt
 				</button>
 
@@ -650,7 +650,8 @@
 						tooltip-placement="top"
 						tooltip-append-to-body="true"
 						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
-				>Print
+						ng-click="saveAndPrint()"
+						ng-disabled="isWorking()">Print
 				</button>
 
 				<button

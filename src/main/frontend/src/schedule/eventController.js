@@ -158,6 +158,9 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			this.data.healthNumber = null;
 			this.data.ontarioVersionCode = null;
 			this.data.phoneNumberPrimary = null;
+			this.data.addressLine = null;
+			this.data.sex = null;
+			this.data.email = null;
 		},
 		fillData: function fillData(data)
 		{
@@ -166,10 +169,10 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			this.patientPhotoUrl = '/imageRenderingServlet?source=local_client&clientId=' + (data.demographicNo? data.demographicNo: 0);
 
 			var dateOfBirth = null;
-			if(Juno.Common.Util.exists(data.dob))
+			if(Juno.Common.Util.exists(data.dateOfBirth))
 			{
 				// XXX: Perhaps put this in util?  Is this date format common for juno?
-				dateOfBirth = moment(data.dob, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
+				dateOfBirth = moment(data.dateOfBirth, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
 			}
 			else
 			{
@@ -183,6 +186,13 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			// XXX: no version code when loaded from autocomplete?  Does that matter?
 			this.data.ontarioVersionCode = data.ver;
 			this.data.phoneNumberPrimary = data.phone;
+			this.data.sex = data.sex;
+			this.data.email = data.email;
+
+			if(Juno.Common.Util.exists(data.address))
+			{
+				this.data.addressLine = data.address.address + ' ' + data.address.city + ' ' + data.address.province + ' ' + data.address.postal;
+			}
 		},
 		uploadPhoto: function uploadPhoto(file){}
 	};
@@ -191,7 +201,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	// Init
 	//=========================================================================/
 
-	$scope.init = function init()
+	controller.init = function init()
 	{
 		if (!securityService.hasPermission('scheduling_create'))
 		{
@@ -204,7 +214,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		controller.loadAppointmentReasons();
 		controller.loadAppointmentTypes();
 		controller.providerModel.fillData(data.schedule.uuid);
-		$scope.demographicModel.clear();
 
 		var momentStart = data.startTime;
 		var momentEnd = data.endTime;
@@ -237,30 +246,35 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 			// either load the patient data and init the autocomplete
 			// or ensure the patient model is clear
-			$scope.initPatientAutocomplete(data.eventData.demographicNo).then(function() {
+			controller.setPatientData(data.eventData.demographicNo).then(function() {
+				// hack to initialize typahead value without a selected demographic model
+				if(!$scope.isPatientSelected())
+				{
+					$scope.patientTypeahead.isTypeaheadSearchQuery = true;
+					$scope.patientTypeahead.searchQuery = data.eventData.appointmentName;
+				}
 				$scope.initialized = true;
 			});
+
 			controller.selectedSiteName = data.eventData.site;
 		}
 		else
 		{
 			// create mode: adjust the end date (if needed)
 			// and clear the patient model
-			$scope.demographicModel.clear();
+			controller.setPatientData();
 			controller.selectedSiteName = $scope.parentScope.selectedSiteName;
-			controller.setDurationByTemplate($scope.activeTemplateEvents[0], parentScope.timeIntervalMinutes());
+			controller.setTimeAndDurationByTemplate($scope.activeTemplateEvents[0], parentScope.timeIntervalMinutes());
 
 			focus.element("#input-patient");
 
 			$scope.initialized = true;
 		}
 
-		// console.info('eventData', $scope.eventData);
-
 		controller.changeTab(controller.tabEnum.appointment);
 	};
 
-	$scope.initPatientAutocomplete = function initPatientAutocomplete(demographicNo)
+	controller.setPatientData = function setPatientData(demographicNo)
 	{
 		var deferred = $q.defer();
 
@@ -268,7 +282,9 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		{
 			demographicService.getDemographic(demographicNo).then(function(data)
 			{
+				$scope.demographicModel.fillData(data);
 				$scope.patientTypeahead = data;
+
 				deferred.resolve();
 			},
 			function(errors)
@@ -347,11 +363,13 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		$scope.activeTemplateEvents = activeEvents;
 	};
 
-	controller.setDurationByTemplate = function setDurationByTemplate(templateEvent, defaultDuration)
+	controller.setTimeAndDurationByTemplate = function setTimeAndDurationByTemplate(templateEvent, defaultDuration)
 	{
 		var duration = defaultDuration;
 		if(Juno.Common.Util.exists(templateEvent) && Juno.Common.Util.exists(templateEvent.availabilityType))
 		{
+			$scope.eventData.startTime = Juno.Common.Util.formatMomentTime(templateEvent.start, $scope.timepickerFormat);
+
 			var templateDuration = templateEvent.availabilityType.duration;
 			if(Juno.Common.Util.exists(templateDuration)
 				&& Juno.Common.Util.isIntegerString(templateDuration))
@@ -456,6 +474,8 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		var endDatetime = controller.calculateEndTime();
 
 		var demographicNo = ($scope.eventData.doNotBook)? null : $scope.demographicModel.demographicNo;
+		var appointmentName = (demographicNo == null && Juno.Common.Util.exists($scope.patientTypeahead.searchQuery))?
+			$scope.patientTypeahead.searchQuery : null;
 
 		parentScope.saveEvent(
 			editMode,
@@ -470,6 +490,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 				providerNo: $scope.schedule.uuid,
 				eventStatusCode: controller.selectedEventStatus,
 				demographicNo: demographicNo,
+				appointmentName: appointmentName,
 				site: controller.selectedSiteName,
 				doNotBook: $scope.eventData.doNotBook,
 				urgency: (($scope.eventData.critical)? 'critical' : null),
@@ -535,7 +556,10 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	$scope.$watch('patientTypeahead', function()
 	{
-		$scope.loadPatientFromTypeahead($scope.patientTypeahead);
+		if($scope.isInitialized())
+		{
+			$scope.loadPatientFromTypeahead($scope.patientTypeahead);
+		}
 	});
 
 	//=========================================================================
@@ -584,7 +608,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	{
 		if(!$scope.validateForm())
 		{
-				return false;
+			return false;
 		}
 
 		$scope.working = true;
@@ -648,6 +672,32 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		});
 	};
 
+	$scope.saveAndPrint = function saveAndPrint()
+	{
+		if(!$scope.validateForm())
+		{
+			return false;
+		}
+
+		$scope.working = true;
+		$scope.saveEvent().then(function()
+		{
+			$scope.parentScope.refetchEvents();
+			$uibModalInstance.close();
+			$scope.working = false;
+			window.print();
+
+			// $scope.parentScope.openCreateInvoice(
+			// 	$scope.eventUuid,
+			// 	$scope.schedule.uuid,
+			// 	$scope.demographicModel.demographicNo);
+		}, function()
+		{
+			$scope.displayMessages.add_generic_fatal_error();
+			$scope.working = false;
+		});
+	};
+
 	$scope.viewInvoices = function viewInvoices()
 	{
 		$scope.parentScope.open_view_invoices($scope.eventUuid);
@@ -683,38 +733,38 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	{
 		// load the newly created/updated patient
 		$scope.demographicModel.demographicNo = demographicNo;
-		$scope.initPatientAutocomplete();
+		controller.setPatientData();
 	};
 
-	$scope.searchPatients = function searchPatients(term)
-	{
-		var search = {
-			type: 'Name',
-			'term': term,
-			status: 'active',
-			integrator: false,
-			outofdomain: true
-		};
-		return demographicsService.search(search, 0, 25).then(
-			function(results)
-			{
-				var resp = [];
-				for (var x = 0; x < results.content.length; x++)
-				{
-					resp.push(
-						{
-							demographicNo: results.content[x].demographicNo,
-							name: Juno.Common.Util.formatName(
-								results.content[x].firstName, results.content[x].lastName)
-						});
-				}
-				return resp;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-	};
+	// $scope.searchPatients = function searchPatients(term)
+	// {
+	// 	var search = {
+	// 		type: 'Name',
+	// 		'term': term,
+	// 		status: 'active',
+	// 		integrator: false,
+	// 		outofdomain: true
+	// 	};
+	// 	return demographicsService.search(search, 0, 25).then(
+	// 		function(results)
+	// 		{
+	// 			var resp = [];
+	// 			for (var x = 0; x < results.content.length; x++)
+	// 			{
+	// 				resp.push(
+	// 					{
+	// 						demographicNo: results.content[x].demographicNo,
+	// 						name: Juno.Common.Util.formatName(
+	// 							results.content[x].firstName, results.content[x].lastName)
+	// 					});
+	// 			}
+	// 			return resp;
+	// 		},
+	// 		function error(errors)
+	// 		{
+	// 			console.log(errors);
+	// 		});
+	// };
 
 	$scope.newDemographic = function newDemographic(size)
 	{
@@ -732,7 +782,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 				console.log(results);
 				console.log('patient #: ', results.demographicNo);
 
-				$scope.initPatientAutocomplete(results.demographicNo)
+				controller.setPatientData(results.demographicNo);
 			},
 			function error(errors)
 			{

@@ -69,15 +69,24 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 	{
 		logger.info(t);
 
-		Demographic demographic = demographicDao.getDemographicById(t.getDemographicNo());
+		Demographic demographic = null;
+		if(t.getDemographicNo() != null && t.getDemographicNo() > 0)
+		{
+			demographic = demographicDao.getDemographicById(t.getDemographicNo());
+		}
 
 		// Copy the defaults from the old frontend
 		int demographicNo = 0;
-		String demographicName = "";
+		String name = "";
 		if (demographic != null)
 		{
 			demographicNo = demographic.getDemographicNo();
-			demographicName = demographic.getDisplayName();
+			name = demographic.getDisplayName();
+		}
+		// sometimes a name string is set without aq demographic (appts without attached demographic)
+		else if (t.getAppointmentName() != null)
+		{
+			name = t.getAppointmentName();
 		}
 
 		Date adjustedAppointmentDate =
@@ -112,7 +121,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		}
 		else
 		{
-			appointment.setName(demographicName);
+			appointment.setName(name);
 		}
 
 
@@ -227,7 +236,11 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 
 	public CalendarAppointment getAsCalendarAppointment(Appointment appointment)
 	{
-		Demographic demographic = demographicDao.getDemographicById(appointment.getDemographicNo());
+		Demographic demographic = null;
+		if(appointment.getDemographicNo() > 0)
+		{
+			demographic = demographicDao.getDemographicById(appointment.getDemographicNo());
+		}
 
 		LocalDate birthDate = null;
 		String displayName = null;
@@ -240,6 +253,13 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 			displayName = demographic.getDisplayName();
 			phone = demographic.getPhone();
 			demographicNo = demographic.getDemographicNo();
+		}
+
+		// set appointment name if the demographic is not assigned
+		String appointmentName = null;
+		if(appointment.getName() != null && appointment.getName().isEmpty())
+		{
+			appointmentName = appointment.getName();
 		}
 
 		CalendarAppointment calendarAppointment = new CalendarAppointment();
@@ -262,6 +282,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		calendarAppointment.setTagSelfBooked(false);
 		calendarAppointment.setTagSelfCancelled(false);
 		calendarAppointment.setDoNotBook(appointment.getName().equals(Appointment.DONOTBOOK));
+		calendarAppointment.setAppointmentName(appointmentName);
 
 		return calendarAppointment;
 	}

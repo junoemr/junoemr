@@ -296,7 +296,7 @@ $btn-aside-size: 72px;
 			font-stretch: normal;
 			line-height: normal;
 			letter-spacing: normal;
-			color: $grey-04;
+			color: $grey-02;
 		}
 
 		@include clearfix;
@@ -368,10 +368,10 @@ $btn-aside-size: 72px;
 					height: $tabs-height;
 					padding: 16px 46px;
 					border-color: transparent;
-					color: $grey-04;
-					background-color: $grey-08;
+					color: $grey-02;
+					background-color: $grey-07;
 					&:hover, &:focus {
-						background-color: $grey-07;
+						background-color: $grey-06;
 					}
 				}
 				&.active {
@@ -433,8 +433,8 @@ $btn-aside-size: 72px;
 					margin: 0;
 
 					label {
-						font-size: 11px;
-						color: $grey-05;
+						font-size: 9px;
+						color: $grey-03;
 					}
 					span {
 						font-family: "Arial", "Helvetica", sans-serif;
@@ -444,7 +444,7 @@ $btn-aside-size: 72px;
 						font-stretch: normal;
 						line-height: normal;
 						letter-spacing: normal;
-						color: $grey-04;
+						color: $grey-02;
 					}
 				}
 			}
