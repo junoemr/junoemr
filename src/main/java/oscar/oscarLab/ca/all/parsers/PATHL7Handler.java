@@ -75,6 +75,13 @@ public class PATHL7Handler extends MessageHandler
         msg = (ORU_R01) parser.parse(hl7Body.replaceAll( "\n", "\r\n" ).replace("\\.Zt\\", "\t"));
         this.message = msg;
         this.terser = new Terser(msg);
+
+        // Legacy Excelleris labs with embedded PDFs don't have proper identifier segment set-up
+        // if this is the case then we need to modify the message
+        if (hasEmbeddedPDF() && getOBXCount(0) == 0)
+        {
+            addOBXIdentifierText("PDF");
+        }
     }
 
     @Override
@@ -745,6 +752,22 @@ public class PATHL7Handler extends MessageHandler
     /*
      *  END OF PUBLIC METHODS
      */
+
+    /**
+     * This should only be used for situations where we have a single OBX message that has an
+     * identifier without any associated text. Without associated text the parser returns an OBX count of 0.
+     *
+     * Example situation: OBX|1|ED|PDF|...
+     * If this is the only message in the lab, this would return a count of 0 when we want a count of 1.
+     *
+     * NOTE: this only modifies the in-memory version. The persisted lab text contains the original text.
+     *
+     * @param text the text to append to identifier so that it takes the form of "identifier^text"
+     */
+    private void addOBXIdentifierText(String text) throws HL7Exception
+    {
+        terser.set("/.ORDER_OBSERVATION(" + 0 + ")/OBSERVATION(" + 0 + ")/OBX-3-2", text);
+    }
 
     @Override
     protected String getString(String retrieve) {
