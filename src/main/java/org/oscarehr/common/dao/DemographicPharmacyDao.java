@@ -41,74 +41,60 @@ public class DemographicPharmacyDao extends AbstractDao<DemographicPharmacy> {
 	}
 
 	public DemographicPharmacy addPharmacyToDemographic(Integer pharmacyId, Integer demographicNo, Integer preferredOrder) {
-
-		String sql = "select x from DemographicPharmacy x where x.status = ? and x.demographicNo = ? and x.pharmacyId = ?";
+		// If there is an existing pharmacy entry existing that we want to modify, grab it
+		String sql = "SELECT x FROM DemographicPharmacy x WHERE x.status = ? AND x.demographicNo = ? AND x.pharmacyId = ?";
 		Query query = entityManager.createQuery(sql);		
 		query.setParameter(1, DemographicPharmacy.ACTIVE);
 		query.setParameter(2, demographicNo);
 		query.setParameter(3, pharmacyId);
 		DemographicPharmacy demographicPharmacy = getSingleResultOrNull(query);
-		int currentOrder;
-		if (demographicPharmacy != null && demographicPharmacy.getPreferredOrder() == preferredOrder)
-		{
-			// no-op so don't bother with further DB hits
-			return demographicPharmacy;
-		}
 
-		sql = "SELECT x FROM DemographicPharmacy x WHERE x.status = ? AND x.demographicNo = ?";
-		sql += " AND x.preferredOrder >= ? ORDER BY x.preferredOrder";
+		sql = "SELECT x FROM DemographicPharmacy x WHERE x.status = ? AND x.demographicNo = ? ORDER BY x.preferredOrder";
 		query = entityManager.createQuery(sql);
 		query.setParameter(1, DemographicPharmacy.ACTIVE);
 		query.setParameter(2, demographicNo);
-		query.setParameter(3, preferredOrder);
 
 		@SuppressWarnings("unchecked")
 		List<DemographicPharmacy> results = query.getResultList();
+		DemographicPharmacy targetPharmacy;
 
-		int prevOrder = preferredOrder;
-		if (demographicPharmacy != null)
-		{
-			prevOrder = demographicPharmacy.getPreferredOrder();
-		}
-
-		for (DemographicPharmacy demographicPharmacy2 : results)
-		{
-			currentOrder = demographicPharmacy2.getPreferredOrder();
-			// only increment the preferredOrder if there's a collision
-			if (currentOrder - prevOrder > 1)
-			{
-				break;
-			}
-
-			prevOrder = currentOrder;
-
-			++currentOrder;
-			if (currentOrder > 10)
-			{
-				demographicPharmacy2.setStatus(DemographicPharmacy.INACTIVE);
-			}
-			demographicPharmacy2.setPreferredOrder(currentOrder);
-			merge(demographicPharmacy2);
-		}
-		
-		
+		// Determine if the pharmacy we want is already in the list or needs a new DB entry
 		if (demographicPharmacy == null)
 		{
-			DemographicPharmacy newPharmacy = new DemographicPharmacy();
-			newPharmacy.setAddDate(new Date());
-			newPharmacy.setStatus(DemographicPharmacy.ACTIVE);
-			newPharmacy.setDemographicNo(demographicNo);
-			newPharmacy.setPharmacyId(pharmacyId);
-			newPharmacy.setPreferredOrder(preferredOrder);
-			persist(newPharmacy);
-			return newPharmacy;
+			targetPharmacy = new DemographicPharmacy();
+			targetPharmacy.setAddDate(new Date());
+			targetPharmacy.setStatus(DemographicPharmacy.ACTIVE);
+			targetPharmacy.setDemographicNo(demographicNo);
+			targetPharmacy.setPharmacyId(pharmacyId);
+			targetPharmacy.setPreferredOrder(preferredOrder);
+			persist(targetPharmacy);
 		}
 		else
 		{
-			demographicPharmacy.setPreferredOrder(preferredOrder);
-			merge(demographicPharmacy);
-			return demographicPharmacy;
+			targetPharmacy = demographicPharmacy;
+			results.remove(targetPharmacy);
 		}
+		// Now that we know the list no longer contains the pharmacy being modified, add it to the correct spot
+		results.add(preferredOrder - 1, targetPharmacy);
+
+		// Use the list's order to re-assign the correct preferredPharmacy order (index+1 for every node)
+		for (DemographicPharmacy demographicPharmacy2 : results)
+		{
+			if (demographicPharmacy2.getPreferredOrder() - 1 == results.indexOf(demographicPharmacy2))
+			{
+				continue;
+			}
+			int newOrder = results.indexOf(demographicPharmacy2) + 1;
+			demographicPharmacy2.setPreferredOrder(newOrder);
+			if (newOrder > 10)
+			{
+				demographicPharmacy2.setStatus(DemographicPharmacy.INACTIVE);
+			}
+
+			merge(demographicPharmacy2);
+		}
+
+		return targetPharmacy;
 	}
 	
 	public void unlinkPharmacy(Integer pharmacyId, Integer demographicNo ) {
