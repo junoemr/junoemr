@@ -47,6 +47,19 @@ Oscar.HealthCardParser.isWhitelisted = function isWhitelisted(cardNo)
 			(cardNo.startsWith(BC_PREFIX) && cardNo.substring(cardNo.indexOf("?")).startsWith(BC_COMBINED)));
 };
 
+/**
+ * take in separated year, month, day values and ensure that their combination
+ * produces a valid date
+ * @param year
+ * @param month
+ * @param day
+ */
+Oscar.HealthCardParser.validateDate = function validateDate(year, month, day)
+{
+	var dateString = year + "-" + month + "-" + day;
+	return !(isNaN(Date.parse(dateString)));
+};
+
 Oscar.HealthCardParser.getFieldValue = function getFieldValue(track, trackIndex, length)
 {
 	var fieldValue = "";
@@ -101,7 +114,6 @@ Oscar.HealthCardParser.parseBCCombined = function parseBCCombined(cardData,cardH
 	var names = Oscar.HealthCardParser.getFieldValue(track1,index,35);
 	index += names.length+1;
 	var fullAddress = Oscar.HealthCardParser.getFieldValue(track1,index,29);
-	index += fullAddress.length+1;
 
 	dataHash.lastName = names.substring(0, names.indexOf("$")-1).toUpperCase();
 	dataHash.firstName = names.substring(names.indexOf("$")+1).toUpperCase();
@@ -131,7 +143,6 @@ Oscar.HealthCardParser.parseBCCombined = function parseBCCombined(cardData,cardH
 	}
 
 	var dobCCYYMMDD = Oscar.HealthCardParser.getFieldValue(track2,index,8);
-	index += dobCCYYMMDD.length;
 
 	dataHash.dobYear = dobCCYYMMDD.substring(0, 4);
 	dataHash.dobMonth = dobCCYYMMDD.substring(4, 6);
@@ -171,7 +182,6 @@ Oscar.HealthCardParser.parseBCCombined = function parseBCCombined(cardData,cardH
 	metaHash.ecc = Oscar.HealthCardParser.getFieldValue(track3,index,6);
 	index += 6;
 	metaHash.securityFunction = Oscar.HealthCardParser.getFieldValue(track3,index,5);
-	index += 5;
 
 	cardHash.meta = metaHash;
 	cardHash.data = dataHash;

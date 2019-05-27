@@ -634,6 +634,22 @@ private long getAppointmentRowSpan(
 		jQuery.noConflict();
 	</script>
 
+	<script type="text/javascript">
+
+		var billedAppointmentNos = [];
+
+		jQuery('a#billingLink').live('click', function(event) {
+			if (jQuery(event.target).hasClass("clicked"))
+			{
+				event.preventDefault();
+			}
+			jQuery(event.target).addClass("clicked");
+			setTimeout(function() {
+				jQuery(event.target).removeClass("clicked");
+			}, 200);
+		});
+	</script>
+
 	<script type="text/javascript" src="schedulePage.js.jsp"></script>
 
 
@@ -1321,7 +1337,7 @@ private long getAppointmentRowSpan(
 								.getResourceScheduleByProvider(mygroupno, selectedDate,
 									selectedSite, showForSure);
 						}
-						else if(".default".equals(mygroupno))
+						else if(("."+ResourceBundle.getBundle("oscarResources", request.getLocale()).getString("global.default")).equals(mygroupno))
 						{
 							// Always show the schedule because it will
 							resourceScheduleDTO = scheduleService
@@ -1903,6 +1919,7 @@ private long getAppointmentRowSpan(
 																		</c:when>
 																		<c:otherwise>
 																			&#124; <a
+																				id="billingLink"
 																				href="${appointmentInfo.billLink}"
 																				target="_blank"
 																				title="<bean:message key="global.billingtag"/>"

@@ -1,4 +1,4 @@
-<%--
+<%@ page import="java.util.UUID"%><%--
 
 
     Copyright (c) 2005-2012. Centre for Research on Inner City Health, St. Michael's Hospital, Toronto. All Rights Reserved.
@@ -57,6 +57,21 @@
 	var updateDivTimer = null;
 	var reloadDivUrl;
 	var reloadDiv;
+	var eChartUUID = "<%=UUID.randomUUID().toString()%>";
+
+	// load echart uuid if possible from local storage. If not found
+	// save new uuid to storage.
+	function getEchartUUID()
+	{
+		let storageUUID = sessionStorage.getItem("eChartUUID: " + document.title)
+		console.log(storageUUID);
+		if (storageUUID !== null)
+		{
+			eChartUUID = storageUUID;
+		}
+		sessionStorage.setItem("eChartUUID: " + document.title, eChartUUID);
+	}
+	getEchartUUID()
 
 	function checkLengthofObject(o)
 	{
@@ -70,7 +85,11 @@
 		}
 
 		return c;
+	}
 
+	function getEChartUUID()
+	{
+		return eChartUUID;
 	}
 
 	function popupPage(vheight, vwidth, name, varpage)
@@ -523,7 +542,7 @@
 				ctx + "/oscarEncounter/displayDocuments.do?hC=" + Colour.documents,
 				ctx + "/oscarEncounter/displayLabs.do?hC=" + Colour.labs,
 				ctx + "/oscarEncounter/displayMessages.do?hC=" + Colour.messages,
-				ctx + "/oscarEncounter/displayMeasurements.do?hC=" + Colour.measurements,
+				ctx + "/oscarEncounter/displayMeasurements.do?hC=" + Colour.measurements + "&eChartUUID=" + eChartUUID,
 				ctx + "/oscarEncounter/displayConsultation.do?hC=" + Colour.consultation,
 				//ctx + "/oscarEncounter/displayHRM.do?hC="
 				//ctx + "/oscarEncounter/displayMyOscar.do?hC=",
@@ -615,7 +634,7 @@
 		//update each ajax div with info from request
 		this.popColumn = function(url, div, params, navBar, navBarObj)
 		{
-			params = "reloadURL=" + url + "&numToDisplay=6&cmd=" + params;
+			params = "reloadURL=" + encodeURIComponent(url) + "&numToDisplay=6&cmd=" + params;
 
 			var objAjax = new Ajax.Request(
 				url,

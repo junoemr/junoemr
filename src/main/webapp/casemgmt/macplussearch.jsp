@@ -110,6 +110,11 @@
     		ServiceSoap serviceSoap = service.getServiceSoap();
     		String sKey = getsKey();
     		String SearchTerm =  request.getParameter("searchterm");
+    		if (SearchTerm.isEmpty())
+			{
+				out.write("Please provide a search term");
+				return;
+			}
     		String Disciplines = "-1";
     		String Category = "-1";
     		String Population = "-1";
