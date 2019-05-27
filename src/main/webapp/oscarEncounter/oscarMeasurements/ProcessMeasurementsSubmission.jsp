@@ -24,6 +24,7 @@
 
 --%>
 <%
+  String pasteEncounterNote = request.getParameter("pasteEncounterNote");
   if(session.getValue("user") == null) response.sendRedirect("../../logout.jsp");
 %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
@@ -39,15 +40,24 @@
 
 <script language="javascript"> 
 function closeWin() {
-     self.opener.location.reload(); 
-     self.close();     
+  if (self.opener != null)
+  {
+    <% if (pasteEncounterNote == null || !pasteEncounterNote.equals("true")) { %>
+      self.opener.location.reload();
+    <% }
+      else {
+    %>
+      self.opener.pasteToEncounterNote("<%=request.getAttribute("textOnEncounter")%>");
+      self.opener.location.reload();
+    <%}%>
+  }
+  self.close();
 }
 </script>
 
 <body onload="closeWin();">
 <html:errors />
 Processing...
-
 <%
 //clear so values don't repeat after added to note
 session.setAttribute("textOnEncounter", null);
