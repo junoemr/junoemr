@@ -25,16 +25,17 @@
 --%>
 
 <%
-  if(session.getValue("user") == null) response.sendRedirect("../../logout.jsp");
+	if (session.getAttribute("user") == null)
+	{
+		response.sendRedirect("../../logout.jsp");
+	}
 %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
-<%@ page import="oscar.oscarEncounter.pageUtil.*"%>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.pageUtil.*"%>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasuringInstructionBeanHandler, oscar.oscarEncounter.oscarMeasurements.bean.EctMeasuringInstructionBean"%>
-<%@ page import="java.util.Vector"%>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasuringInstructionBeanHandler"%>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasuringInstructionBean"%>
 <%@ page import="org.oscarehr.managers.MeasurementManager"%>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%
@@ -47,10 +48,14 @@
 <html:html locale="true">
 
 <head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<title><logic:present name="groupName">
-	<bean:write name="groupName" />
-</logic:present> <bean:message key="oscarEncounter.Index.measurements" /></title>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+
+	<title>
+		<logic:present name="groupName">
+			<bean:write name="groupName" />
+		</logic:present>
+		<bean:message key="oscarEncounter.Index.measurements" />
+	</title>
 
 <html:base />
 
@@ -109,15 +114,12 @@ function isEchartOriginal()
 </script>
 <body class="BodyStyle" vlink="#0000FF" onload="window.focus();">
 <html:form action="/oscarEncounter/Measurements">
+	<link rel="stylesheet" type="text/css" href="styles/measurementStyle.css">
 	<logic:present name="css">
 		<link rel="stylesheet" type="text/css"
 			href="<bean:write name="css" />">
 	</logic:present>
-	<logic:notPresent name="css">
-		<link rel="stylesheet" type="text/css"
-			href="styles/measurementStyle.css">
-	</logic:notPresent>
-		
+
 	<table class="MainTable" id="scrollNumber1" name="encounterTable">
 		<tr class="MainTableTopRow">
 			<td class="MainTableTopRowLeftColumn"><logic:present
