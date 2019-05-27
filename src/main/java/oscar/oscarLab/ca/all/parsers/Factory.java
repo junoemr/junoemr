@@ -200,6 +200,21 @@ public final class Factory {
 	 * Create and return the message handler corresponding to the message type
 	 */
 	private static MessageHandler getHandlerOld(String type, String hl7Body) {
+		if (type.equals("PATHL7"))
+		{
+			// Really old embedded PDF labs have OBX segments like OBX|1|ED|PDF|...
+			// Without an identifier/name pair, i.e. PDF^PDF, it may be mistaken for an NTE segment
+			String[] hl7 = hl7Body.split("\n");
+			for (String segment : hl7)
+			{
+				if (segment.startsWith("OBX") && segment.substring(0, 16).contains("|PDF|"))
+				{
+					String correctedSegment = segment.replace("|PDF|", "|PDF^PDF|");
+					hl7Body = hl7Body.replace(segment, correctedSegment);
+					logger.info("New OBX after injection: " + correctedSegment.substring(0, 16));
+				}
+			}
+		}
 		Document doc = null;
 		String msgType;
 		String msgHandler = "";

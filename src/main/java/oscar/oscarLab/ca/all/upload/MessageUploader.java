@@ -124,8 +124,9 @@ public final class MessageUploader {
 	public static String routeReport(String loggedInProviderNo, String serviceName, String type, String hl7Body, int fileId, RouteReportResults results) throws Exception
 	{
 
-		String retVal = "";
-		try {
+		String retVal;
+		try
+		{
 			MessageHandler messageHandler = Factory.getHandler(type, hl7Body);
 
 			String firstName = messageHandler.getFirstName();
@@ -144,48 +145,64 @@ public final class MessageUploader {
 			int finalResultCount = messageHandler.getOBXFinalResultCount();
 			String obrDate = messageHandler.getMsgDate();
 
-			if(messageHandler instanceof HHSEmrDownloadHandler) {
-				try{
-	            	String chartNo = ((HHSEmrDownloadHandler)messageHandler).getPatientIdByType("MR");
-	            	if(chartNo != null) {
-	            		//let's get the hin
-	            		List<Demographic> clients = demographicManager.getDemosByChartNo(loggedInProviderNo, chartNo);
-	            		if(clients!=null && clients.size()>0) {
-	            			hin = clients.get(0).getHin();
-	            		}
-	            	}
-				}catch(Exception e){
+			if (messageHandler instanceof HHSEmrDownloadHandler)
+			{
+				try
+				{
+					String chartNo = ((HHSEmrDownloadHandler)messageHandler).getPatientIdByType("MR");
+					if (chartNo != null)
+					{
+						//let's get the hin
+						List<Demographic> clients = demographicManager.getDemosByChartNo(loggedInProviderNo, chartNo);
+						if (clients!=null && clients.size() > 0)
+						{
+							hin = clients.get(0).getHin();
+						}
+					}
+				}
+				catch(Exception e)
+				{
 					logger.error("HHS ERROR",e);
 				}
-            }
-            
-            // get actual ohip numbers based on doctor first and last name for spire lab
-            if(messageHandler instanceof SpireHandler) {
+			}
+
+			// get actual ohip numbers based on doctor first and last name for spire lab
+			if (messageHandler instanceof SpireHandler)
+			{
 				List<String> docNames = ((SpireHandler)messageHandler).getDocNames();
-				//logger.debug("docNames:");
-	            for (int i=0; i < docNames.size(); i++) {
+				for (int i = 0; i < docNames.size(); i++)
+				{
 					logger.info(i + " " + docNames.get(i));
 				}
-            	if (docNames != null) {
+				if (docNames != null)
+				{
 					docNums = findProvidersForSpireLab(docNames);
 				}
-            }
+			}
 
-			try {
+			try
+			{
 				// reformat date
 				String format = "yyyy-MM-dd HH:mm:ss".substring(0, obrDate.length() - 1);
 				obrDate = UtilDateUtilities.DateToString(UtilDateUtilities.StringToDate(obrDate, format), "yyyy-MM-dd HH:mm:ss");
-			} catch (Exception e) {				
+			}
+			catch (Exception e)
+			{
 				logger.error("Error parsing obr date : ", e);
 				throw e;
 			}
 
 			int i = 0;
-			int j = 0;
-			while (resultStatus.equals("") && i < messageHandler.getOBRCount()) {
+			int j;
+			while (resultStatus.equals("") && i < messageHandler.getOBRCount())
+			{
 				j = 0;
-				while (resultStatus.equals("") && j < messageHandler.getOBXCount(i)) {
-					if (messageHandler.isOBXAbnormal(i, j)) resultStatus = "A";
+				while (resultStatus.equals("") && j < messageHandler.getOBXCount(i))
+				{
+					if (messageHandler.isOBXAbnormal(i, j))
+					{
+						resultStatus = "A";
+					}
 					j++;
 				}
 				i++;
@@ -193,22 +210,36 @@ public final class MessageUploader {
 
 			ArrayList<String> disciplineArray = messageHandler.getHeaders();
 			String next = "";
-			if (disciplineArray != null && disciplineArray.size() > 0) next = disciplineArray.get(0);
+			if (disciplineArray != null && disciplineArray.size() > 0)
+			{
+				next = disciplineArray.get(0);
+			}
 
 			int sepMark;
-			if ((sepMark = next.indexOf("<br />")) < 0) {
-				if ((sepMark = next.indexOf(" ")) < 0) sepMark = next.length();
+			if ((sepMark = next.indexOf("<br />")) < 0)
+			{
+				if ((sepMark = next.indexOf(" ")) < 0)
+				{
+					sepMark = next.length();
+				}
 			}
 			String discipline = next.substring(0, sepMark).trim();
 
-			for (i = 1; i < disciplineArray.size(); i++) {
-
+			for (i = 1; i < disciplineArray.size(); i++)
+			{
 				next = disciplineArray.get(i);
-				if ((sepMark = next.indexOf("<br />")) < 0) {
-					if ((sepMark = next.indexOf(" ")) < 0) sepMark = next.length();
+				if ((sepMark = next.indexOf("<br />")) < 0)
+				{
+					if ((sepMark = next.indexOf(" ")) < 0)
+					{
+						sepMark = next.length();
+					}
 				}
 
-				if (!next.trim().equals("")) discipline = discipline + "/" + next.substring(0, sepMark);
+				if (!next.trim().equals(""))
+				{
+					discipline = discipline + "/" + next.substring(0, sepMark);
+				}
 			}
 
 			boolean isTDIS = type.equals("TDIS");
@@ -216,12 +247,12 @@ public final class MessageUploader {
 			Hl7TextMessage hl7TextMessage = new Hl7TextMessage();
 			Hl7TextInfo hl7TextInfo = new Hl7TextInfo();
 
-			if (isTDIS) {
+			if (isTDIS)
+			{
 				List<Hl7TextInfo> matchingTdisLab =  hl7TextInfoDao.searchByFillerOrderNumber(fillerOrderNum, sendingFacility);
-				if (matchingTdisLab.size()>0) {
-
+				if (matchingTdisLab.size() > 0)
+				{
 					hl7TextMessageDao.updateIfFillerOrderNumberMatches(new String(Base64.encodeBase64(hl7Body.getBytes(MiscUtils.DEFAULT_UTF8_ENCODING)), MiscUtils.DEFAULT_UTF8_ENCODING),fileId,matchingTdisLab.get(0).getLabNumber());
-
 					hl7TextInfoDao.updateReportStatusByLabId(reportStatus,matchingTdisLab.get(0).getLabNumber());
 					hasBeenUpdated = true;
 				}
@@ -237,30 +268,22 @@ public final class MessageUploader {
 
 			if (type.equals("PATHL7"))
 			{
-				MiscUtils.getLogger().info("confirmed PATHL7");
+				String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
 				for (i = 0; i < messageHandler.getOBRCount(); i++)
 				{
-					int obxCount = messageHandler.getOBXCount(i);
 					if (messageHandler.getOBXValueType(i, 0).equals("ED"))
 					{
-						MiscUtils.getLogger().info("Found embedded document OBX, looking for encoded PDF");
-						String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
-						if (obxCount == 0)
-						{
-							obxCount = 1;
-						}
+						int obxCount = messageHandler.getOBXCount(i);
 						for (j = 0; j < obxCount; j++)
 						{
-							MiscUtils.getLogger().info("Found embedded document OBX, looking for encoded PDF");
 							// Some embedded PDFs simply have the lab as-is, some have it split up like above
 							for (int k = 1; k <= referenceStrings.length; k++)
 							{
 								String embeddedPdf = messageHandler.getOBXResult(i, j, k);
-								MiscUtils.getLogger().info(embeddedPdf.length());
 								if (embeddedPdf.length() > referenceStrings[k-1].length()
 										&& !embeddedPdf.contains("parsed_embedded_pdf_document_id_"))
 								{
-									MiscUtils.getLogger().info("Found possible embedded lab PDF");
+									MiscUtils.getLogger().info("Found embedded PDF in lab upload, pulling it out");
 									hasPDF = true;
 									embeddedPDFs.add(embeddedPdf);
 								}
@@ -272,13 +295,13 @@ public final class MessageUploader {
 
 			int docId = 0;
 
-			if (!isTDIS || !hasBeenUpdated) {
+			if (!isTDIS || !hasBeenUpdated)
+			{
 				if (hasPDF)
 				{
 					for (String pdf : embeddedPDFs)
 					{
-						String fileName = accessionNum + ".pdf";
-						// TODO instead of demographic, pass in more meta information to build out docdesc properly
+						String fileName = "-" + accessionNum + ".pdf";
 						// Replace original PDF string with meta info to prevent saving > 500k char strings in table
 						docId = createDocumentFromEmbeddedPDF(pdf, fileName);
 						hl7Body = hl7Body.replace(pdf, "embedded_doc_id_" + docId);
@@ -322,18 +345,18 @@ public final class MessageUploader {
 
 			try
 			{
-				demProviderNo = patientRouteReport(loggedInProviderNo, insertID, lastName,
-						firstName, sex, dob, hin);
-			} catch (Exception ignored)
+				demProviderNo = patientRouteReport(loggedInProviderNo, insertID, lastName, firstName, sex, dob, hin);
+			}
+			catch (Exception ignored)
 			{
 
 			}
 
-			if(type.equals("OLIS_HL7") && demProviderNo.equals("0"))
+			if (type.equals("OLIS_HL7") && demProviderNo.equals("0"))
 			{
 				OLISSystemPreferencesDao olisPrefDao = SpringUtils.getBean(OLISSystemPreferencesDao.class);
 				OLISSystemPreferences olisPreferences = olisPrefDao.getPreferences();
-				if(olisPreferences.isFilterPatients())
+				if (olisPreferences.isFilterPatients())
 				{
 					//set as unclaimed
 					providerRouteReport(String.valueOf(insertID), null, DbConnectionFilter.getThreadLocalDbConnection(), String.valueOf(0), type);
@@ -349,7 +372,7 @@ public final class MessageUploader {
 				String custom_lab_route="";
 				boolean orderByLength = false;
 				String search = null;
-				if(type.equals("Spire"))
+				if (type.equals("Spire"))
 				{
 					limit = new Integer(1);
 					orderByLength = true;
@@ -362,7 +385,8 @@ public final class MessageUploader {
 				else if(type.equals("IHA"))
 				{
 					search = "alberta_e_delivery_ids";
-				} else if (type.equals("PATHL7"))
+				}
+				else if (type.equals("PATHL7"))
 				{
 					//custom lab routing for excelleris labs
 					//Parses custom_lab_routeX properties (starting at 1)
@@ -423,7 +447,7 @@ public final class MessageUploader {
 			throw e;
 		}
 
-		return (retVal);
+		return retVal;
 
 	}
 	
@@ -675,10 +699,9 @@ public final class MessageUploader {
 	/**
 	 * Helper function for creating a proper document from an embedded PDF string.
 	 * These PDFs are encoded in the lab message as a base64 string.
-	 * @param embeddedPDF
-	 * 		base64-encoded String representing the PDF we want to save
-	 * @return
-	 * 		an integer corresponding to the document ID we've created
+	 * @param embeddedPDF base64-encoded String representing the PDF we want to save
+	 * @return an integer corresponding to the document ID we've created. Document gets saved
+	 * in same generic OscarDocument/{instance}/document directory
 	 */
 	private static int createDocumentFromEmbeddedPDF(String embeddedPDF, String fileName)
 			throws InterruptedException, IOException
@@ -690,8 +713,7 @@ public final class MessageUploader {
 		Document document = new Document();
 		document.setDocCreator(ProviderData.SYSTEM_PROVIDER_NO);
 		document.setResponsible(ProviderData.SYSTEM_PROVIDER_NO);
-		document.setDocfilename("embedded_lab/" + fileName);
-		// TODO read more meta-information from lab and pass it in to assemble a better doc description
+		document.setDocfilename(fileName);
 		document.setDocdesc("embedded_pdf");
 		document.setSourceFacility("HL7Upload");
 		document.setSource("Excelleris");

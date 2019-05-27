@@ -70,9 +70,9 @@ public class PATHL7Handler extends MessageHandler
     }
 
     public void init(String hl7Body) throws HL7Exception {
-        Parser p = new PipeParser();
-        p.setValidationContext(new NoValidation());
-        msg = (ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ).replace("\\.Zt\\", "\t"));
+        Parser parser = new PipeParser();
+        parser.setValidationContext(new NoValidation());
+        msg = (ORU_R01) parser.parse(hl7Body.replaceAll( "\n", "\r\n" ).replace("\\.Zt\\", "\t"));
         this.message = msg;
         this.terser = new Terser(msg);
     }
@@ -122,17 +122,20 @@ public class PATHL7Handler extends MessageHandler
     }
 
     public String getMiddleName(){
-    	return (getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName(0).getXpn3_MiddleInitialOrName().getValue()));
+        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName(0).getXpn3_MiddleInitialOrName().getValue()));
     }
     public String getLastName(){
         return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName(0).getFamilyName().getValue()));
     }
 
     public String getDOB(){
-        try{
-            return(formatDateTime(getString(msg.getRESPONSE().getPATIENT().getPID().getDateOfBirth().getTimeOfAnEvent().getValue())).substring(0, 10));
-        }catch(Exception e){
-            return("");
+        try
+        {
+            return formatDateTime(getString(msg.getRESPONSE().getPATIENT().getPID().getDateOfBirth().getTimeOfAnEvent().getValue())).substring(0, 10);
+        }
+        catch (Exception e)
+        {
+            return "";
         }
     }
 
@@ -141,13 +144,16 @@ public class PATHL7Handler extends MessageHandler
 		String age = "N/A";
 		String dob = getDOB();
 		String service = getServiceDate();
-		try {
+		try
+		{
 			// Some examples
 			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			java.util.Date birthDate = formatter.parse(dob);
 			java.util.Date serviceDate = formatter.parse(service);
 			age = UtilDateUtilities.calcAgeAtDate(birthDate, serviceDate);
-		} catch (ParseException e) {
+		}
+		catch (ParseException e)
+		{
 			logger.error("Could not get age", e);
 		}
 		return age;
@@ -169,28 +175,35 @@ public class PATHL7Handler extends MessageHandler
      *  OBC METHODS
      */
     public String getAccessionNum(){
-        try{
-
-            String str=msg.getRESPONSE().getORDER_OBSERVATION(0).getORC().getFillerOrderNumber().getEntityIdentifier().getValue();
-
+        try
+        {
+            String str = msg.getRESPONSE().getORDER_OBSERVATION(0).getORC().getFillerOrderNumber().getEntityIdentifier().getValue();
             String accessionNum = getString(str);
-
             String[] nums = accessionNum.split("-");
-            if (nums.length == 3){
+
+            if (nums.length == 3)
+            {
                 return nums[0];
-            }else if (nums.length == 5){
-                return nums[0]+"-"+nums[1]+"-"+nums[2];
-            }else{
-
-
-                if(nums.length>1)
-                    return nums[0]+"-"+nums[1];
-                else
-                    return "";
             }
-        }catch(Exception e){
+            else if (nums.length == 5)
+            {
+                return nums[0]+"-"+nums[1]+"-"+nums[2];
+            }
+            else
+            {
+                if(nums.length>1)
+                {
+                    return nums[0]+"-"+nums[1];
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+        catch(Exception e)
+        {
             logger.error("Could not return accession number", e);
-
             return("");
         }
     }
@@ -204,99 +217,133 @@ public class PATHL7Handler extends MessageHandler
     }
 
     public String getOBRName(int i){
-        try{
-            return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getUniversalServiceIdentifier().getText().getValue()));
-        }catch(Exception e){
-            return("");
+        try
+        {
+            return getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getUniversalServiceIdentifier().getText().getValue());
+        }
+        catch (Exception e)
+        {
+            return "";
         }
     }
 
     public String getObservationHeader(int i, int j){
-        try{
-            return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getDiagnosticServiceSectionID().getValue()));
-        }catch(Exception e){
-            return("");
+        try
+        {
+            return getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getDiagnosticServiceSectionID().getValue());
+        }
+        catch(Exception e)
+        {
+            return "";
         }
     }
 
     public int getOBRCommentCount(int i){
-        try {
-            if ( !getOBRComment(i, 0).equals("") ){
+        try
+        {
+            if (!getOBRComment(i, 0).isEmpty())
+            {
                 return(1);
-            }else{
+            }
+            else
+            {
                 return(0);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return(0);
         }
     }
 
     public String getOBRComment(int i, int j){
-        try {
+        try
+        {
             return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getNTE(j).getComment(0).getValue()));
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return("");
         }
     }
 
     public String getServiceDate(){
-        try{
+        try
+        {
             return(formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getObservationDateTime().getTimeOfAnEvent().getValue())));
-            //return(formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getObservationDateTime().getTimeOfAnEvent().getValue())));
-        }catch(Exception e){
+        }
+        catch(Exception e)
+        {
             return("");
         }
     }
 
     public String getRequestDate(int i){
-        try{
+        try
+        {
             return(formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBR().getRequestedDateTime().getTimeOfAnEvent().getValue())));
-        }catch(Exception e){
+        }
+        catch (Exception e)
+        {
             return("");
         }
     }
 
     public String getOrderStatus(){
-        try{
+        try
+        {
             String orderStatus = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultStatus().getValue());
             int obrCount = getOBRCount();
             int obxCount;
             int count = 0;
-            for (int i=0; i < obrCount; i++){
+            for (int i = 0; i < obrCount; i++)
+            {
                 obxCount = getOBXCount(i);
-                for (int j=0; j < obxCount; j++){
+                for (int j = 0; j < obxCount; j++)
+                {
                     String obxStatus = getOBXResultStatus(i, j);
                     if (obxStatus.equalsIgnoreCase("C"))
+                    {
                         count++;
+                    }
                 }
             }
-            if(count >= 1){//if any of the OBX's have been corrected, mark the entire report as corrected
+
+            // If any of the OBX's have been corrected, mark the entire report as corrected
+            if (count >= 1)
+            {
             	orderStatus = "C";
-            	return orderStatus;
-            }else{
-            	return orderStatus;
             }
-        }catch(Exception e){
+            return orderStatus;
+        }
+        catch(Exception e)
+        {
             return("");
         }
     }
 
     public String getClientRef(){
         String docNum = "";
-        int i=0;
-        try{
-            while(!getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue()).equals("")){
-                if (i==0){
+        int i = 0;
+        try
+        {
+            while (!getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue()).equals(""))
+            {
+                if (i == 0)
+                {
                     docNum = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue());
-                }else{
+                }
+                else
+                {
                     docNum = docNum + ", " + getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue());
                 }
                 i++;
             }
             return(docNum);
-        }catch(Exception e){
+        }
+        catch(Exception e)
+        {
             logger.error("Could not return doctor id numbers", e);
-
             return("");
         }
     }
@@ -304,19 +351,24 @@ public class PATHL7Handler extends MessageHandler
     public String getDocName(){
         String docName = "";
         int i=0;
-        try{
+        try
+        {
             while(!getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i)).equals("")){
-                if (i==0){
+                if (i == 0)
+                {
                     docName = getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i));
-                }else{
+                }
+                else
+                {
                     docName = docName + ", " + getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i));
                 }
                 i++;
             }
             return(docName);
-        }catch(Exception e){
+        }
+        catch (Exception e)
+        {
             logger.error("Could not return doctor names", e);
-
             return("");
         }
     }
@@ -324,19 +376,24 @@ public class PATHL7Handler extends MessageHandler
     public String getCCDocs(){
         String docName = "";
         int i=0;
-        try{
+        try
+        {
             while(!getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i)).equals("")){
-                if (i==0){
+                if (i == 0)
+                {
                     docName = getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i));
-                }else{
+                }
+                else
+                {
                     docName = docName + ", " + getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i));
                 }
                 i++;
             }
             return(docName);
-        }catch(Exception e){
+        }
+        catch (Exception e)
+        {
             logger.error("Could not return cc'ed doctors", e);
-
             return("");
         }
     }
@@ -346,19 +403,23 @@ public class PATHL7Handler extends MessageHandler
         String id;
         int i;
 
-        try{
+        try
+        {
             String providerId = msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(0).getIDNumber().getValue();
             docNums.add(providerId);
-
             i=0;
-            while((id = msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i).getIDNumber().getValue()) != null){
+            while ((id = msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i).getIDNumber().getValue()) != null)
+            {
                 if (!id.equals(providerId))
+                {
                     docNums.add(id);
+                }
                 i++;
             }
-        }catch(Exception e){
+        }
+        catch(Exception e)
+        {
             logger.error("Could not return doctor nums", e);
-
         }
 
         return(docNums);
@@ -369,17 +430,25 @@ public class PATHL7Handler extends MessageHandler
      *  OBX METHODS
      */
     public int getOBXCount(int i){
-        int count = 0;
-        try{
+        int count;
+        try
+        {
             count = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATIONReps();
             // if count is 1 there may only be an nte segment and no obx segments so check
-            if (count == 1){
+            // We can identify the difference by using the fact that NTE segments have only the identifier
+            // whereas an OBX segment will have identifier^text
+            if (count == 1)
+            {
                 String test = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(0).getOBX().getObservationIdentifier().getText().getValue();
-                logger.info("name: "+test);
+                logger.info("OBX Name: " + test);
                 if (test == null)
+                {
                     count = 0;
+                }
             }
-        }catch(Exception e){
+        }
+        catch(Exception e)
+        {
             logger.error("Error retrieving obx count", e);
             count = 0;
         }
@@ -439,18 +508,12 @@ public class PATHL7Handler extends MessageHandler
 	}
 
     /**
-     * Very similar to the getOBXResult procedure above, except that some results are not immediately available
-     * at the first rep.
-     *  Example: "^TEXT^PDF^Base64^{msg}"
-     *  To get the "PDF" value here you would need to provide a rep value of 2
-     * @param i
-     *      OBR record
-     * @param j
-     *      OBX record
-     * @param k
-     *      component in OBX field
-     * @return
-     *      jth OBX result at kth rep from ith OBR record if available, empty string otherwise
+     * Very similar to the getOBXResult procedure above, except that some results are
+     * not immediately available at the first component.
+     * @param i OBR record
+     * @param j OBX record
+     * @param k component in OBX field
+     * @return jth OBX result at kth component from ith OBR record if available, empty string otherwise
      */
     @Override
     public String getOBXResult(int i, int j, int k)
@@ -466,25 +529,34 @@ public class PATHL7Handler extends MessageHandler
     }
 
     public String getOBXReferenceRange(int i, int j){
-        try{
+        try
+        {
             return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getReferencesRange().getValue()));
-        }catch(Exception e){
+        }
+        catch (Exception e)
+        {
             return("");
         }
     }
 
     public String getOBXUnits(int i, int j){
-        try{
+        try
+        {
             return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getUnits().getIdentifier().getValue()));
-        }catch(Exception e){
+        }
+        catch(Exception e)
+        {
             return("");
         }
     }
 
     public String getOBXResultStatus(int i, int j){
-        try{
+        try
+        {
             return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservResultStatus().getValue()));
-        }catch(Exception e){
+        }
+        catch(Exception e)
+        {
             return("");
         }
     }
@@ -493,12 +565,16 @@ public class PATHL7Handler extends MessageHandler
         int obrCount = getOBRCount();
         int obxCount;
         int count = 0;
-        for (int i=0; i < obrCount; i++){
+        for (int i = 0; i < obrCount; i++)
+        {
             obxCount = getOBXCount(i);
-            for (int j=0; j < obxCount; j++){
+            for (int j = 0; j < obxCount; j++)
+            {
                 String status = getOBXResultStatus(i, j);
                 if (status.equalsIgnoreCase("F") || status.equalsIgnoreCase("C"))
+                {
                     count++;
+                }
             }
         }
 
@@ -507,67 +583,87 @@ public class PATHL7Handler extends MessageHandler
         // add extra so final reports are always the ordered as the latest except
         // if the report has been changed in which case that report should be the latest
         if (orderStatus.equalsIgnoreCase("F"))
+        {
             count = count + 100;
+        }
         else if (orderStatus.equalsIgnoreCase("C"))
+        {
             count = count + 150;
+        }
 
         return count;
     }
 
     public String getTimeStamp(int i, int j){
-        try{
+        try
+        {
             return(formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getDateTimeOfTheObservation().getTimeOfAnEvent().getValue())));
-        }catch(Exception e){
+        }
+        catch(Exception e)
+        {
             return("");
         }
     }
 
     public boolean isOBXAbnormal(int i, int j){
-        try{
+        try
+        {
             String abnormalFlag = getOBXAbnormalFlag(i, j);
-            if(!abnormalFlag.equals("") && !abnormalFlag.equalsIgnoreCase("N")){
+            if (!abnormalFlag.equals("") && !abnormalFlag.equalsIgnoreCase("N"))
+            {
                 return(true);
-            }else{
+            }
+            else
+            {
                 return(false);
             }
-
-        }catch(Exception e){
+        }
+        catch(Exception e)
+        {
             return(false);
         }
     }
 
     public String getOBXAbnormalFlag(int i, int j){
-        try{
+        try
+        {
             return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getAbnormalFlags(0).getValue()));
-        }catch(Exception e){
+        }
+        catch(Exception e)
+        {
             logger.error("Error retrieving obx abnormal flag", e);
             return("");
         }
     }
 
     public int getOBXCommentCount(int i, int j){
-        try {
-            if ( !getOBXComment(i, j, 0).equals("") ){
+        try
+        {
+            if (!getOBXComment(i, j, 0).equals("") )
+            {
                 return(1);
-            }else{
+            }
+            else
+            {
                 return(0);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return(0);
         }
     }
 
     public String getOBXComment(int i, int j, int k){
-        try {
+        try
+        {
             return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE(k).getComment(0).getValue()));
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return("");
         }
     }
-
-
-
-
 
     /**
      *  Retrieve the possible segment headers from the OBX fields
@@ -580,27 +676,69 @@ public class PATHL7Handler extends MessageHandler
         ArrayList<String> headers = new ArrayList<String>();
         String currentHeader;
 
-        try{
-            for (i=0; i < msg.getRESPONSE().getORDER_OBSERVATIONReps(); i++){
+        try
+        {
+            for (i = 0; i < msg.getRESPONSE().getORDER_OBSERVATIONReps(); i++)
+            {
 
                 currentHeader = getObservationHeader(i, 0);
                 arraySize = headers.size();
-                if (arraySize == 0 || !currentHeader.equals(headers.get(arraySize-1))){
+                if (arraySize == 0 || !currentHeader.equals(headers.get(arraySize-1)))
+                {
                     logger.info("Adding header: '"+currentHeader+"' to list");
                     headers.add(currentHeader);
                 }
-
             }
             return(headers);
-        }catch(Exception e){
+        }
+        catch(Exception e)
+        {
             logger.error("Could not create header list", e);
-
             return(null);
         }
-
     }
 
     public String audit(){
+        return "";
+    }
+
+    public String getFillerOrderNumber(){
+        return "";
+    }
+    public String getEncounterId(){
+        return "";
+    }
+    public String getRadiologistInfo(){
+        return "";
+    }
+
+    public String getNteForOBX(int i, int j){
+        return "";
+    }
+
+    /*
+     * Checks to see if the PATHL7 lab is an unstructured document or a VIHA RTF pathology report
+     * labs that fall into any of these categories have certain requirements per Excelleris
+     */
+    public boolean unstructuredDocCheck(String header){
+        return (labDocuments.contains(header));
+    }
+    public boolean vihaRtfCheck(String header){
+        return (header.equals(VIHARTF));
+    }
+
+    /*
+     * Only commonalities between embedded PDF uploads:
+     * - They have a value type of ED
+     * - The embedded PDF is contained in a single OBX message at the beginning of the lab
+     */
+    public boolean hasEmbeddedPDF()
+    {
+        return getOBXValueType(0, 0).equals("ED");
+    }
+
+    public String getNteForPID(){
+
         return "";
     }
 
@@ -611,39 +749,12 @@ public class PATHL7Handler extends MessageHandler
     @Override
     protected String getString(String retrieve) {
         if (retrieve != null)
+        {
             return (retrieve.trim().replaceAll("\\\\\\.br\\\\", "<br />"));
+        }
         else
+        {
             return ("");
-    }
-
-    public String getFillerOrderNumber(){
-		return "";
-	}
-    public String getEncounterId(){
-    	return "";
-    }
-    public String getRadiologistInfo(){
-		return "";
-	}
-
-    public String getNteForOBX(int i, int j){
-
-    	return "";
-    }
-
-	/*
-	 * Checks to see if the PATHL7 lab is an unstructured document or a VIHA RTF pathology report
-	 * labs that fall into any of these categories have certain requirements per Excelleris
-	*/
-	public boolean unstructuredDocCheck(String header){
-		return (labDocuments.contains(header));
-	}
-	public boolean vihaRtfCheck(String header){
-		return (header.equals(VIHARTF));
-	}
-
-    public String getNteForPID(){
-    	
-    	return "";
+        }
     }
 }

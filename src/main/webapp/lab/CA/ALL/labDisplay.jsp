@@ -56,6 +56,7 @@
 <%@ page import="org.oscarehr.common.model.Hl7TextMessage" %>
 <%@ page import="org.oscarehr.common.dao.Hl7TextInfoDao" %>
 <%@ page import="org.oscarehr.common.model.Hl7TextInfo"%>
+<%@ page import="oscar.util.UtilDateUtilities"%>
 <jsp:useBean id="oscarVariables" class="java.util.Properties" scope="session" />
 <%@	page import="javax.swing.text.rtf.RTFEditorKit"%>
 <%@	page import="java.io.ByteArrayInputStream"%>
@@ -67,25 +68,26 @@
 <%@ taglib uri="/WEB-INF/indivo-tag.tld" prefix="indivo"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
-      String roleName$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
-	  boolean authed=true;
+	String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+	boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName$%>" objectName="_lab" rights="r" reverse="<%=true%>">
 	<%authed=false; %>
 	<%response.sendRedirect("../../../securityError.jsp?type=_lab");%>
 </security:oscarSec>
 <%
-if(!authed) {
-	return;
-}
+	if(!authed) {
+		return;
+	}
 %>
 
 <%
-	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 	oscar.OscarProperties props = oscar.OscarProperties.getInstance();
 	String segmentID = request.getParameter("segmentID");
-	String providerNo =request.getParameter("providerNo");
+	String providerNo = request.getParameter("providerNo");
 	String searchProviderNo = StringUtils.trimToEmpty(request.getParameter("searchProviderNo"));
+	String patientMatched = request.getParameter("patientMatched");
 	String remoteFacilityIdString = request.getParameter("remoteFacilityId");
 	String remoteLabKey = request.getParameter("remoteLabKey");
 	String demographicID = request.getParameter("demographicId");
@@ -96,7 +98,6 @@ if(!authed) {
 		providerNo = loggedInInfo.getLoggedInProviderNo();
 	}
 
-
 	UserPropertyDAO userPropertyDAO = (UserPropertyDAO)SpringUtils.getBean("UserPropertyDAO");
 	UserProperty uProp = userPropertyDAO.getProp(providerNo, UserProperty.LAB_ACK_COMMENT);
 	boolean skipComment = false;
@@ -104,7 +105,6 @@ if(!authed) {
 	{
 		skipComment = true;
 	}
-
 
 	//Need date lab was received by OSCAR
 	Hl7TextMessageDao hl7TxtMsgDao = (Hl7TextMessageDao)SpringUtils.getBean("hl7TextMessageDao");
@@ -116,8 +116,7 @@ if(!authed) {
 	{
 		java.util.Date date = hl7TextMessage.getCreated();
 		String stringFormat = "yyyy-MM-dd HH:mm";
-		dateLabReceived = ConversionUtils.toDateString(date, stringFormat);
-		// dateLabReceived = UtilDateUtilities.DateToString(date, stringFormat);
+		dateLabReceived = UtilDateUtilities.DateToString(date, stringFormat);
 	}
 
 	boolean isLinkedToDemographic = false;
@@ -125,11 +124,10 @@ if(!authed) {
 	String multiLabId = null;
 	MessageHandler handler = null;
 	String hl7 = null;
-	String reqID = null;
-	String reqTableID = null;
+	String reqID = null, reqTableID = null;
 	String remoteFacilityIdQueryString = "";
 
-	boolean bShortcutForm = OscarProperties.getInstance().getProperty("appt_formview", "").equalsIgnoreCase("on");
+	boolean bShortcutForm = OscarProperties.getInstance().getProperty("appt_formview", "").equalsIgnoreCase("on") ? true : false;
 	String formName = bShortcutForm ? OscarProperties.getInstance().getProperty("appt_formview_name") : "";
 	String formNameShort = formName.length() > 3 ? (formName.substring(0,2)+".") : formName;
 	String formName2 = bShortcutForm ? OscarProperties.getInstance().getProperty("appt_formview_name2", "") : "";
@@ -147,12 +145,12 @@ if(!authed) {
 		reqTableID = reqIDL == null ? "" : reqIDL.toString();
 
 		PatientLabRoutingDao dao = SpringUtils.getBean(PatientLabRoutingDao.class);
-		for(PatientLabRouting routing : dao.findByLabNoAndLabType(ConversionUtils.fromIntString(segmentID), "HL7"))
+		for (PatientLabRouting route : dao.findByLabNoAndLabType(ConversionUtils.fromIntString(segmentID), "HL7"))
 		{
-			demographicID = "" + routing.getDemographicNo();
+			demographicID = "" + route.getDemographicNo();
 		}
 
-		if (demographicID != null && !demographicID.equals("")&& !demographicID.equals("0"))
+		if (demographicID != null && !demographicID.equals("") && !demographicID.equals("0"))
 		{
 			isLinkedToDemographic = true;
 			LogAction.addLog((String) session.getAttribute("user"),
@@ -192,16 +190,15 @@ if(!authed) {
 			handlers.add(handler);
 			segmentIdList.add(segmentID);
 
-			// this is where it gets weird.
-			// We want to show all messages with different filler order num but same accession in a single report
+			//this is where it gets weird. We want to show all messages with different filler order num but same accession in a single report
 			segmentIDs = segmentIdList.toArray(new String[segmentIdList.size()]);
 
 			hl7 = Factory.getHL7Body(segmentID);
 			if (handler instanceof OLISHL7Handler)
 			{
-				%>
+%>
 				<jsp:forward page="labDisplayOLIS.jsp" />
-				<%
+<%
 			}
 		}
 	}
@@ -217,12 +214,7 @@ if(!authed) {
 		LogAction.addLog((String) session.getAttribute("user"),
 				LogConst.ACTION_READ,
 				LogConst.CON_HL7_LAB,
-				"segmentId="
-						+ segmentID
-						+ ", remoteFacilityId="
-						+ remoteFacilityIdString
-						+ ", remoteDemographicId="
-						+ demographicID);
+				"segmentId=" + segmentID + ", remoteFacilityId=" + remoteFacilityIdString + ", remoteDemographicId=" + demographicID);
 
 		Document cachedDemographicLabResultXmlData = LabDisplayHelper.getXmlDocument(remoteLabResult);
 
@@ -235,7 +227,10 @@ if(!authed) {
 
 		try
 		{
-			remoteFacilityIdQueryString="&remoteFacilityId="+remoteFacilityIdString+"&remoteLabKey="+URLEncoder.encode(remoteLabKey, "UTF-8");
+			remoteFacilityIdQueryString = "&remoteFacilityId=" +
+					remoteFacilityIdString +
+					"&remoteLabKey=" +
+					URLEncoder.encode(remoteLabKey, "UTF-8");
 		}
 		catch (Exception e)
 		{
@@ -250,11 +245,11 @@ if(!authed) {
 	if (request.getAttribute("printError") != null && (Boolean) request.getAttribute("printError"))
 	{
 %>
-<script type="text/javascript">
+<script language="JavaScript">
     alert("The lab could not be printed due to an error. Please see the server logs for more detail.");
 </script>
-<%	}
-
+<%
+	}
 	String annotation_display = org.oscarehr.casemgmt.model.CaseManagementNoteLink.DISP_LABTEST;
 	CaseManagementManager caseManagementManager = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 
@@ -274,20 +269,18 @@ if(!authed) {
         <script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/effects.js"></script>
         <script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-1.4.2.js"></script>
       	<script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/jquery/jquery.form.js"></script>
-      	
 		<script type="text/javascript" charset="utf-8">
 			jQuery.noConflict();
 		</script>
-
 		<oscar:customInterface section="labView"/>
 
-		<script type="text/javascript">
-            // alternately refer to this function in oscarMDSindex.js as labDisplayAjax.jsp does
+		<script language="javascript">
+			// alternately refer to this function in oscarMDSindex.js as labDisplayAjax.jsp does
 			function updateLabDemoStatus(labno)
 			{
 				if (document.getElementById("DemoTable" + labno))
 				{
-					document.getElementById("DemoTable" + labno).style.backgroundColor="#FFF";
+					document.getElementById("DemoTable" + labno).style.backgroundColor = "#FFF";
 				}
 			}
 		</script>
@@ -404,7 +397,8 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
         <script language="JavaScript">
 			var providerNo = '<%=providerNo%>';
-			function popupStart(vheight,vwidth,varpage,windowname)
+
+			function popupStart(vheight, vwidth, varpage, windowname)
 			{
 				var page = varpage;
 				windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes";
@@ -463,70 +457,62 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
 			function sendToPHR(labId, demographicNo)
 			{
-        	<%
-				MyOscarLoggedInInfo myOscarLoggedInInfo = MyOscarLoggedInInfo.getLoggedInInfo(session);
+				<%
+					MyOscarLoggedInInfo myOscarLoggedInInfo = MyOscarLoggedInInfo.getLoggedInInfo(session);
 
-				if (myOscarLoggedInInfo == null || !myOscarLoggedInInfo.isLoggedIn())
-				{
-        			%>
-    					alert('Please Login to MyOscar before performing this action.');
-        			<%
-        		}
-        		else
-        		{
-        			%>
-	                    popup(450, 600, "<%=request.getContextPath()%>/phr/SendToPhrPreview.jsp?labId=" + labId + "&demographic_no=" + demographicNo, "sendtophr");
-        			<%
-        		}
-        	%>
+					if (myOscarLoggedInInfo == null || !myOscarLoggedInInfo.isLoggedIn())
+					{
+						%>
+							alert('Please Login to MyOscar before performing this action.');
+						<%
+					}
+					else
+					{
+						%>
+							popup(450, 600, "<%=request.getContextPath()%>/phr/SendToPhrPreview.jsp?labId=" + labId + "&demographic_no=" + demographicNo, "sendtophr");
+						<%
+					}
+				%>
 			}
 
 			function matchMe()
 			{
-			<%
-				if (!isLinkedToDemographic)
-				{
-			%>
-				popupStart(360, 680, '../../../oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%= segmentID %>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow');
-			<%
-				}
-			%>
+				<% if (!isLinkedToDemographic) { %>
+					popupStart(360, 680, '../../../oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%= segmentID %>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow');
+				<% } %>
 			}
+
 
 			function handleLab(formid, labid, action)
 			{
 				var url = '../../../dms/inboxManage.do';
 				var data = 'method=isLabLinkedToDemographic&labid=' + labid;
-				new Ajax.Request(url, {
-					method: 'post',
-					parameters: data,
-					onSuccess: function(transport)
-					{
+				new Ajax.Request(url, {method: 'post', parameters:data, onSuccess:function(transport){
 						var json = transport.responseText.evalJSON();
 						if (json != null)
 						{
 							var success = json.isLinkedToDemographic;
 							var demoid = '';
-							//check if lab is linked to a provider
+							// Check if lab is linked to a provider
 							if (success)
 							{
-								if (action === 'ackLab')
+								if (action == 'ackLab')
 								{
-									if(confirmAck())
+									if (confirmAck())
 									{
 										$("labStatus_" + labid).value = "A";
 										updateStatus(formid, labid);
 									}
 								}
-								else if (action === 'msgLab')
+								else if (action == 'msgLab')
 								{
 									demoid = json.demoId;
-									if(demoid != null && demoid.length > 0)
+									if (demoid != null && demoid.length > 0)
 									{
 										window.popup(700,960,'../../../oscarMessenger/SendDemoMessage.do?demographic_no='+demoid,'msg');
 									}
 								}
-								else if (action === 'ticklerLab')
+								else if (action == 'ticklerLab')
 								{
 									demoid = json.demoId;
 									if (demoid != null && demoid.length > 0)
@@ -534,11 +520,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										window.popup(450,600,'../../../tickler/ForwardDemographicTickler.do?docType=HL7&docId='+labid+'&demographic_no='+demoid,'tickler')
 									}
 								}
-								else if (action === 'addComment')
+								else if (action == 'addComment')
 								{
 									addComment(formid, labid);
 								}
-								else if (action === 'unlinkDemo')
+								else if (action == 'unlinkDemo')
 								{
 									unlinkDemographic(labid);
 								}
@@ -550,7 +536,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 									if (confirmAckUnmatched())
 									{
 										$("labStatus_"+labid).value = "A";
-										updateStatus(formid,labid);
+										updateStatus(formid, labid);
 									}
 									else
 									{
@@ -569,20 +555,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
 			function confirmAck()
 			{
-				<%
-				if (props.getProperty("confirmAck", "").equals("yes"))
-				{
-				%>
-            		return confirm('<bean:message key="oscarMDS.index.msgConfirmAcknowledge"/>');
-				<%
-				}
-				else
-				{
-				%>
-            		return true;
-				<%
-				}
-				%>
+				<% if (props.getProperty("confirmAck", "").equals("yes")) { %>
+				return confirm('<bean:message key="oscarMDS.index.msgConfirmAcknowledge"/>');
+				<% } else { %>
+					return true;
+				<% } %>
 			}
 
 			function confirmCommentUnmatched()
@@ -595,32 +572,30 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 				return confirm('<bean:message key="oscarMDS.index.msgConfirmAcknowledgeUnmatched"/>');
 			}
 
-			function updateStatus(formid,labid)
+			function updateStatus(formid, labid)
 			{
+
 				var url='<%=request.getContextPath()%>'+"/oscarMDS/UpdateStatus.do";
 				var data=$(formid).serialize(true);
 
-				new Ajax.Request(url, {
-					method:'post',
-					parameters:data,
-					onSuccess:function(transport)
+				new Ajax.Request(url, {method:'post', parameters:data, onSuccess:function(transport){
+
+					if (<%=showAll%>)
 					{
-						if (<%=showAll%>)
-						{
-							window.location.reload();
-						}
-						else if (window.opener.document.getElementById('labdoc_' + labid) != null )
-						{
-							window.opener.Effect.BlindUp('labdoc_'+labid);
-							window.opener.refreshCategoryList();
-							window.close();
-						}
-						else
-						{
-							window.close();
-						}
+						window.location.reload();
 					}
-				});
+					else if (window.opener.document.getElementById('labdoc_' + labid) != null)
+					{
+						window.opener.Effect.BlindUp('labdoc_' + labid);
+						window.opener.refreshCategoryList();
+						window.close();
+					}
+					else
+					{
+						window.close();
+					}
+
+				}});
 
 			}
 
@@ -630,7 +605,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 				reason = prompt('<bean:message key="oscarMDS.segmentDisplay.msgUnlink"/>', reason);
 
 				//must include reason
-				if( reason == null || reason.length == 0)
+				if (reason == null || reason.length == 0)
 				{
 					return false;
 				}
@@ -641,15 +616,14 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 					type: "POST",
 					url:  urlStr,
 					data: dataStr,
-					success: function (data)
-					{
+					success: function (data) {
 						top.opener.location.reload();
 						window.close();
 					}
 				});
 			}
 
-			function addComment(formid, labid)
+			function addComment(formid,labid)
 			{
 				var url='<%=request.getContextPath()%>'+"/oscarMDS/UpdateStatus.do?method=addComment";
 				if ($F("labStatus_"+labid) == "")
@@ -659,14 +633,9 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
 				var data=$(formid).serialize(true);
 
-				new Ajax.Request(url, {
-					method:'post',
-					parameters:data,
-					onSuccess:function(transport)
-					{
+				new Ajax.Request(url,{method:'post',parameters:data,onSuccess:function(transport){
 						window.location.reload();
-					}
-				});
+				}});
 			}
 
 			window.ForwardSelectedRows = function()
@@ -676,8 +645,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 					type: "POST",
 					url:  "<%=request.getContextPath()%>/oscarMDS/ReportReassign.do",
 					data: query,
-					success: function (data)
-					{
+					success: function (data) {
 						self.close();
 					}
 				});
@@ -687,14 +655,14 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 			{
 				document.forms['TDISLabelForm_'+segmentID].label.value = document.forms['acknowledgeForm_'+segmentID].label.value;
 			}
-        </script>
+		</script>
 
     </head>
 
     <body onLoad="javascript:matchMe();">
-        <!-- form forwarding of the lab -->
-        <%        
-			for (int idx = 0; idx < segmentIDs.length; ++idx )
+		<!-- form forwarding of the lab -->
+		<%
+			for (int idx = 0; idx < segmentIDs.length; ++idx)
 			{
 				if (remoteFacilityIdString == null)
 				{
@@ -742,16 +710,16 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 					ackLabFunc = "getComment('ackLab', " + segmentID + ");";
 				}
 		%>
-        <script type="text/javascript">
-			jQuery(function()
-			{
-				jQuery("#createLabel_<%=segmentID%>").click(function()
-				{
-					jQuery.ajax({
+		<script type="text/javascript">
+
+			jQuery(function() {
+				jQuery("#createLabel_<%=segmentID%>").click(function() {
+					jQuery.ajax( {
 						type: "POST",
 						url: '<%=request.getContextPath()%>'+"/lab/CA/ALL/createLabelTDIS.do",
 						dataType: "json",
-						data: {
+						data:
+						{
 							lab_no: jQuery("#labNum_<%=segmentID%>").val(),
 							accessionNum: jQuery("#accNum").val(),
 							label: jQuery("#label_<%=segmentID%>").val(),
@@ -759,14 +727,10 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						},
 						success: function(result)
 						{
-						<%
-							if(!OscarProperties.getInstance().isPropertyActive("disable_lab_label_alert"))
-							{
-						%>
+							<%
+							if(!OscarProperties.getInstance().isPropertyActive("disable_lab_label_alert")) {%>
 							alert("label applied");
-						<%
-							}
-						%>
+							<%}%>
 							jQuery("#labelspan_<%=segmentID%>").children().get(0).innerHTML = "Label: " +  jQuery("#label_<%=segmentID%>").val();
 							document.forms['acknowledgeForm_<%=segmentID%>'].label.value = "";
 						}
@@ -1301,7 +1265,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						//labs that fall into any of these categories have certain requirements per Excelleris
 						if(handler.getMsgType().equals("PATHL7")){
 							isUnstructuredDoc = ((PATHL7Handler) handler).unstructuredDocCheck(headers.get(i));
-							isPDF = "ED".equals(handler.getOBXValueType(i, j));
+							isPDF = ((PATHL7Handler)handler).hasEmbeddedPDF();
 							isVIHARtf = ((PATHL7Handler) handler).vihaRtfCheck(headers.get(i));
 							if(handler.getPatientLocation().equals("SG") || handler.getPatientLocation().equals("CDC")){
 								isSGorCDC = true;
@@ -1330,16 +1294,18 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						<%
 							if (isPDF)
 							{
-
 						%>
 							<table width="100%" border="0" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF" bordercolor="#9966FF" bordercolordark="#bfcbe3" name="tblDiscs" id="tblDiscs">
 								<tr class="Field2">
-									<td class="Cell"><bean:message key="oscarMDS.segmentDisplay.formTestName"/></td>
-									<td class="Cell"><bean:message key="oscarMDS.segmentDisplay.formResult"/></td>
+									<td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formTestName"/></td>
+									<td width="60%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formResult"/></td>
 								</tr>
+
 						<%
 							}
-							else if (isUnstructuredDoc){%>
+							else if(isUnstructuredDoc)
+							{
+						%>
 	                       <table width="100%" border="0" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF" bordercolor="#9966FF" bordercolordark="#bfcbe3" name="tblDiscs" id="tblDiscs">
 	                           <tr class="Field2">
 	                               <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formTestName"/></td>
@@ -1377,17 +1343,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                            
  							<%
 						}
+                           
                            for ( j=0; j < OBRCount; j++){
 
                                boolean obrFlag = false;
                                int obxCount = handler.getOBXCount(j);
-                               // I don't know why old Excelleris labs have this quirk but
-							   // they have an obxCount of 0 if it was just the PDF in the field and nothing else
-                               if (obxCount == 0 && handler.getMsgType().equals("PATHL7") && isPDF)
-							   {
-							   	obxCount = 1;
-							   }
-
                                for (k=0; k < obxCount; k++){
 
                                	String obxName = handler.getOBXName(j, k);
@@ -1421,7 +1381,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                    	b2=true;
                                    }
 
-                                    if ((!fail && b1 && b2 && b3) || isPDF){ // <<--  DNS only needed for MDS messages
+                                    if (!fail && b1 && b2 && b3){ // <<--  DNS only needed for MDS messages
 
                                    	String obrName = handler.getOBRName(j);
                                    	b1 = !obrFlag && !obrName.equals("");
@@ -1429,14 +1389,9 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                    		if (isPDF)
 										{
-							%>
-						   				<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" >
-											<td><%=obrName%></td>
-											<td colspan="6"></td>
-										</tr>
-						   <%
+											// don't insert any extraneous rows
 										}
-                                   		else if( b1 && b2 && !isUnstructuredDoc){
+										else if( b1 && b2 && !isUnstructuredDoc){
                                        %>
                                            <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" >
                                                <td valign="top" align="left"><%=obrName%></td>
@@ -1648,7 +1603,6 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 											   </tr>
 									   		<%}
                                        } else if ((!handler.getOBXResultStatus(j, k).equals("TDIS") && handler.getMsgType().equals("Spire")) )  { %>
-
 											<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
                                            <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName %></a>
                                            &nbsp;<%if(loincCode != null){ %>
@@ -1711,17 +1665,17 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                        	if (isPDF)
 										{
 											int docId = hl7TextMessage.getEmbeddedDocId();
-									   %>
-						  					<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>">
-												<td valign="top" align="left">something nice and fluffy and descriptive goes here but maybe less wordy</td>
-												<td>
-													<a href="../../../dms/showDocument.jsp?inWindow=true&segmentID=<%=docId%>&providerNo=<%=providerNo%>" target="_blank">Display Included PDF</a>
+										%>
+						   					<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>">
+												<td valign="top" align="left">
+													<a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../../../dms/ManageDocument.do?method=display&doc_no=<%=docId%>&providerNo=<%=providerNo%>');">Display PDF</a>
 												</td>
 											</tr>
-						   <%
+						   			<%
 										}
-
-                                    	else if(isUnstructuredDoc){%>
+                                    	else if(isUnstructuredDoc)
+                                    	{
+									%>
                                    			<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>"><%
                                    			if((obxCount>1) && k>0 && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1))) {%>
                                    				<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"></a><%
