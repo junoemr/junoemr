@@ -81,25 +81,32 @@
     <body>
         <%
         String searchString = request.getParameter("searchterm");
-        List<HashMap <String,String>> list = searchTripDatabase(searchString);
-        if (list != null && list.size() > 0){%>
-        <table class="sample">
-            <%for (HashMap<String,String> h : list) {%>
+        if (searchString.isEmpty())
+        {
+            %><p>Please provide a search term</p><%
+        }
+        else
+        {
+            List<HashMap <String,String>> list = searchTripDatabase(searchString);
+            if (list != null && list.size() > 0){%>
+            <table class="sample">
+                <%for (HashMap<String,String> h : list) {%>
 
-            <tr>
-                <td>
-                    <a href="<%=h.get("link")%>" ><%=h.get("title")%></a><br/>
-                     <%=h.get("publication")%> -- <%=h.get("year")%>
-                </td>
+                <tr>
+                    <td>
+                        <a href="<%=h.get("link")%>" ><%=h.get("title")%></a><br/>
+                         <%=h.get("publication")%> -- <%=h.get("year")%>
+                    </td>
 
-            </tr>
+                </tr>
 
-            <%}%>
-        </table>
+                <%}%>
+            </table>
 
-        <%} else {%>
-        No Results
-        <%}%>
+            <%} else {%>
+            No Results
+            <%}
+        }%>
     </body>
 </html>
 

@@ -25,16 +25,17 @@
 --%>
 
 <%
-  if(session.getValue("user") == null) response.sendRedirect("../../logout.jsp");
+	if (session.getAttribute("user") == null)
+	{
+		response.sendRedirect("../../logout.jsp");
+	}
 %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
-<%@ page import="oscar.oscarEncounter.pageUtil.*"%>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.pageUtil.*"%>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasuringInstructionBeanHandler, oscar.oscarEncounter.oscarMeasurements.bean.EctMeasuringInstructionBean"%>
-<%@ page import="java.util.Vector"%>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasuringInstructionBeanHandler"%>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasuringInstructionBean"%>
 <%@ page import="org.oscarehr.managers.MeasurementManager"%>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%
@@ -47,10 +48,14 @@
 <html:html locale="true">
 
 <head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<title><logic:present name="groupName">
-	<bean:write name="groupName" />
-</logic:present> <bean:message key="oscarEncounter.Index.measurements" /></title>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+
+	<title>
+		<logic:present name="groupName">
+			<bean:write name="groupName" />
+		</logic:present>
+		<bean:message key="oscarEncounter.Index.measurements" />
+	</title>
 
 <html:base />
 
@@ -80,27 +85,41 @@ parentChanged = false;
 function check() {
     var ret = true;
     
-    if( parentChanged ) {
+    if( !isEchartOriginal() ) {
+		parentChanged = true
         document.forms[0].elements["value(parentChanged)"].value = "true";
         
-        if( !confirm("<bean:message key="oscarEncounter.oscarMeasurements.Measurements.msgParentChanged"/> <oscar:nameage demographicNo="<%=demo%>"/>") ) 
+        if( !confirm("<bean:message key="oscarEncounter.oscarMeasurements.Measurements.msgParentChanged.start"/> <oscar:nameage demographicNo="<%=demo%>"/> <bean:message key="oscarEncounter.oscarMeasurements.Measurements.msgParentChanged.end"/> "))
             ret = false;        
     }
-    
+
     return ret;
 }
+
+// check that our eChart parent is the same window that opened us.
+function isEchartOriginal()
+{
+	if (opener != null)
+	{
+		parentUUID = opener.getEChartUUID();
+		myUUID = "<%=request.getParameter("echartUUID")%>"
+		return myUUID === parentUUID;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 </script>
 <body class="BodyStyle" vlink="#0000FF" onload="window.focus();">
 <html:form action="/oscarEncounter/Measurements">
+	<link rel="stylesheet" type="text/css" href="styles/measurementStyle.css">
 	<logic:present name="css">
 		<link rel="stylesheet" type="text/css"
 			href="<bean:write name="css" />">
 	</logic:present>
-	<logic:notPresent name="css">
-		<link rel="stylesheet" type="text/css"
-			href="styles/measurementStyle.css">
-	</logic:notPresent>
-		
+
 	<table class="MainTable" id="scrollNumber1" name="encounterTable">
 		<tr class="MainTableTopRow">
 			<td class="MainTableTopRowLeftColumn"><logic:present
@@ -163,7 +182,8 @@ function check() {
 									<tr class="data">
 										<td width="5"><a
 											title="<bean:write name="measurementType" property="typeDesc" />"><bean:write
-											name="measurementType" property="typeDisplayName" /></a></td>
+											name="measurementType" property="typeDisplayName" /></a>
+										</td>
 										<td><logic:iterate id="mInstrc"
 											name="<%=\"mInstrcs\"+ ctr%>"
 											property="measuringInstructionList">
@@ -239,6 +259,7 @@ function check() {
 								<input type="hidden" name="value(demographicNo)"
 									value="<%=demo%>" />
 								<input type="hidden" name="demographic_no" value="<%=demo%>" />
+								<input type="hidden" name="pasteEncounterNote" value="true" />
 								<logic:present name="css">
 									<input type="hidden" name="value(css)"
 										value="<bean:write name="css"/>" />

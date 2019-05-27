@@ -147,9 +147,8 @@ public class DemographicRelationship {
 			h.put("phone", demographic.getPhone());
 			h.put("demographicNo", demo);
 			h.put("relation", r.getRelation());
-
-			h.put("subDecisionMaker", ConversionUtils.fromBoolString(r.getSubDecisionMaker()));
-			h.put("emergencyContact", ConversionUtils.fromBoolString(r.getEmergencyContact()));
+			h.put("subDecisionMaker", ConversionUtils.hasContent(r.getSubDecisionMaker()));
+			h.put("emergencyContact", ConversionUtils.hasContent(r.getEmergencyContact()));
 			h.put("notes", r.getNotes());
 			h.put("age", demographic.getAge());
 			list.add(h);
@@ -173,9 +172,8 @@ public class DemographicRelationship {
 			h.put("phone", demographic.getPhone());
 			h.put("demographicNo", demo);
 			h.put("relation", r.getRelation());
-
-			h.put("subDecisionMaker", ConversionUtils.fromBoolString(r.getSubDecisionMaker()));
-			h.put("emergencyContact", ConversionUtils.fromBoolString(r.getEmergencyContact()));
+			h.put("subDecisionMaker", ConversionUtils.hasContent(r.getSubDecisionMaker()));
+			h.put("emergencyContact", ConversionUtils.hasContent(r.getEmergencyContact()));
 			h.put("notes", r.getNotes());
 			h.put("age", demographic.getAge());
 			list.add(h);
