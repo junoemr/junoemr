@@ -1883,6 +1883,9 @@ private long getAppointmentRowSpan(
 																&#124; <a href='#' onClick='popupPage(700, 1024, "formIntake.jsp?demographic_no=${appointmentInfo.demographicNo}")' title='Intake Form'>In</a>
 															</c:if>
 
+														<c:if test="${true}">
+																&#124; <a href="#" onClick='popupPage(800, 1280, "../telehealth/start.do");return false;' title="Telehealth">Tel</a>
+														</c:if>
 															<!--  eyeform open link -->
 															<c:if test="${appointmentInfo.showEyeformLink}">
 																&#124; <a href="#" onClick='popupPage(800, 1280, "../eyeform/eyeform.jsp?demographic_no=${appointmentInfo.demographicNo}&appointment_no=${appointmentInfo.appointmentNo}");return false;' title="EyeForm">EF</a>
