@@ -1297,7 +1297,6 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						%>
 							<table width="100%" border="0" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF" bordercolor="#9966FF" bordercolordark="#bfcbe3" name="tblDiscs" id="tblDiscs">
 								<tr class="Field2">
-									<td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formTestName"/></td>
 									<td width="60%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formResult"/></td>
 								</tr>
 
@@ -1667,7 +1666,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 											int docId = hl7TextMessage.getEmbeddedDocId();
 										%>
 						   					<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>">
-												<td valign="top" align="left">
+												<td valign="top" align="middle">
 													<a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../../../dms/ManageDocument.do?method=display&doc_no=<%=docId%>&providerNo=<%=providerNo%>');">Display PDF</a>
 												</td>
 											</tr>
