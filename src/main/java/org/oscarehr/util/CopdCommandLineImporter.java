@@ -55,7 +55,6 @@ public class CopdCommandLineImporter
 	 */
 	public static void main (String [] args)
 	{
-
 		if(args == null || args.length != 6)
 		{
 			BasicConfigurator.configure();
@@ -110,15 +109,7 @@ public class CopdCommandLineImporter
 
 		try
 		{
-			// load properties from file
-			OscarProperties properties = OscarProperties.getInstance();
-			// This has been used to look in the users home directory that started tomcat
-			properties.readFromFile(propertiesFileName);
-			logger.info("loading properties from " + propertiesFileName);
-
-			ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
-			// initialize spring bean factory for old style access
-			SpringUtils.beanFactory = ctx.getBeanFactory();
+			ctx = loadSpring(propertiesFileName);
 
 			coPDImportService = ctx.getBean(CoPDImportService.class);
 			coPDPreProcessorService = ctx.getBean(CoPDPreProcessorService.class);
@@ -187,14 +178,51 @@ public class CopdCommandLineImporter
 		logger.info("IMPORT PROCESS COMPLETE (" + importCount + " files imported. " + failureCount + " failures)");
 	}
 
+	/**
+	 * load spring beans.
+	 * @param propertiesFileName the name of the oscar properties file to use during loading
+	 * @return
+	 * @throws IOException
+	 */
+	public static ClassPathXmlApplicationContext loadSpring(String propertiesFileName) throws IOException{
+		// load properties from file
+		OscarProperties properties = OscarProperties.getInstance();
+		// This has been used to look in the users home directory that started tomcat
+		properties.readFromFile(propertiesFileName);
+		logger.info("loading properties from " + propertiesFileName);
+
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
+		context.setConfigLocations(new String[]{"/applicationContext.xml","/applicationContextBORN.xml"});
+		context.refresh();
+		SpringUtils.beanFactory = context;
+
+		return context;
+	}
+
+
 	private static void importFileString(String fileString, String documentDirectory, CoPDImportService.IMPORT_SOURCE importSource, boolean skipMissingDocs)
 			throws HL7Exception, IOException, InterruptedException
 	{
+		boolean hasFailure = false;
+		int failureCount = 0;
 		List<String> messageList = coPDPreProcessorService.separateMessages(fileString);
 		for(String message : messageList)
 		{
-			message = coPDPreProcessorService.preProcessMessage(message, importSource);
-			coPDImportService.importFromHl7Message(message, documentDirectory, importSource, skipMissingDocs);
+			try
+			{
+				message = coPDPreProcessorService.preProcessMessage(message, importSource);
+				coPDImportService.importFromHl7Message(message, documentDirectory, importSource, skipMissingDocs);
+			}
+			catch (Exception e)
+			{
+				logger.error("failed to import message: \n " + message, e);
+				hasFailure = true;
+			}
+		}
+
+		if (hasFailure)
+		{
+			throw new RuntimeException("[" + failureCount + "] messages failed to import");
 		}
 	}
 
