@@ -646,20 +646,13 @@ public final class MessageUploader {
 
 	/**
 	 * Helper function to get a Demographic object based off information pulled from the lab.
-	 * @param lastName
-	 * 		last name of the demographic we're looking for
-	 * @param firstName
-	 * 		first name of the demographic we're looking for
-	 * @param sex
-	 * 		gender of the demographic (M/F)
-	 * @param dob
-	 * 		string representation of the demographic's DOB (gets converted to GregorianCalendar)
-	 * @param hin
-	 * 		hin for the demographic we're looking for
-	 * @return
-	 * 		a Demographic object matching the search parameters
-	 * @throws ParseException
-	 * 		only throws if the DOB can't be parsed
+	 * @param lastName last name of the demographic we're looking for
+	 * @param firstName first name of the demographic we're looking for
+	 * @param sex gender of the demographic (M/F)
+	 * @param dob string representation of the demographic's DOB (gets converted to GregorianCalendar)
+	 * @param hin HIN for the demographic we're looking for
+	 * @return a Demographic object matching the search parameters
+	 * @throws ParseException only thrown if the DOB can't be parsed
 	 */
 	private static Demographic getDemographicFromLabInfo(String lastName, String firstName, String sex, String dob, String hin)
 			throws ParseException
