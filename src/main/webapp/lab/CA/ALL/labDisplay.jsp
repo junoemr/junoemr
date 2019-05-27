@@ -274,7 +274,7 @@
 		</script>
 		<oscar:customInterface section="labView"/>
 
-		<script language="javascript">
+		<script language="javascript" type="text/javascript">
 			// alternately refer to this function in oscarMDSindex.js as labDisplayAjax.jsp does
 			function updateLabDemoStatus(labno)
 			{
