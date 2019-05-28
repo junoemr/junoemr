@@ -71,9 +71,9 @@
 					<div ng-show="!isInitialized() || isWorking()" ng-include="'src/common/spinner.jsp'"></div>
 					<div ng-show="isInitialized() && !isWorking()" class="row">
 						<div class="tab-bar-inputs form-horizontal">
-							<div class="col-sm-6">
+							<div class="col-sm-5">
 							</div>
-							<div class="col-sm-6">
+							<div class="col-sm-7">
 								<ca-field-select
 										ca-name="appt-status"
 										ca-template="appt_status"

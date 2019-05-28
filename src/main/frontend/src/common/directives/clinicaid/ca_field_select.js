@@ -19,24 +19,33 @@ angular.module('Common').directive(
 			return helper.resolve_template(attributes, 'src/common/directives/clinicaid/ca_field_select');
 		};
 
-		var linkFunction = function linkFunction($scope, element, attribute, controller) {
-			$scope.select_change_fn = function select_change_fn(model, elementId)
+		var linkFunction = function linkFunction($scope, element, attribute, controller)
+		{
+			$scope.appt_status_change_fn = function select_change_fn(model)
 			{
-				// var element = $("#"+elementId);
-				// var selectedOption = element.find(":selected");
-				// var selectedColor = selectedOption.css('background-color');
-				// var new_model = $scope.options[model.displayLetter];
+				var option = $scope.options[model];
 
-				// change the background color to match the selected option
-				// element.css('background-color', selectedColor);
+				$(".directive-appt-status-select").css("background-color", option.color);
+				var statusElem = $(".icon-status");
 
-				//remove existing icon classes & add selected one
-				// element.find(".icon-status").removeClass(function (index, className)
-				// {
-				// 	return (className.match(/(^|\s)icon-status-\S+/g) || []).join(' ');
-				// });
-				// element.addClass("icon-status-todo")
+				var statusIcon = option.icon.substr(0, option.icon.indexOf('.'));
+
+				// remove old status icon class
+				statusElem.removeClass(function (index, className)
+				{
+					return (className.match(/(^|\s)icon-status-\S+/g) || []).join(' ');
+				});
+				if(statusIcon != null)
+				{
+					statusElem.addClass("icon-status-" + statusIcon);
+				}
 			};
+
+			//call this to init the dropdown stuff
+			if($scope.template === "appt_status")
+			{
+				$scope.appt_status_change_fn($scope.model);
+			}
 			helper.default_link_function($scope, element, attribute, controller);
 		};
 

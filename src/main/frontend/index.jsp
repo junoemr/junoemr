@@ -318,11 +318,11 @@
 					<%--</form>--%>
 				</div>
 				<%--NOTE: Need to give this controller access to the addNewAppointment() function before this button can be used here --%>
-				<div class="col-md-2">
-					<a class="hand-hover" ng-click="patientListAppointmentListCtrl.addNewAppointment()">
-						<span class="glyphicon glyphicon-plus" title="Add appointment"></span>
-					</a>
-				</div>
+				<%--<div class="col-md-2">--%>
+					<%--<a class="hand-hover" ng-click="patientListAppointmentListCtrl.addNewAppointment()">--%>
+						<%--<span class="glyphicon glyphicon-plus" title="Add appointment"></span>--%>
+					<%--</a>--%>
+				<%--</div>--%>
 			</div>
 
 			<div id="left-pane-calendar" ng-show="patientListAppointmentListCtrl.isScheduleActive();">
