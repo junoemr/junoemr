@@ -17,8 +17,10 @@
 
 		// match info-box header colors
 		th {
-			background-color: $color-info-box-top-bg;
-			color: $color-info-box-top-text;
+			//background-color: $color-info-box-top-bg;
+			//color: $color-info-box-top-text;
+			background-color: $white;
+			color: $grey-06;
 		}
 	}
 
@@ -26,15 +28,17 @@
 
 		// override btn-default colors
 		.btn-default {
-			@include button-variant($color-btn-addon-text, $color-btn-addon-bg, $color-btn-addon-border);
+			//@include button-variant($color-btn-addon-text, $color-btn-addon-bg, $color-btn-addon-border);
+			//background-color: $white;
+			//color: $grey-06;
 		}
 
 		// override active style to be primary color
 		.btn-default:active, .btn-default.active, .btn-default.dropdown-toggle
 		{
-			background-color: $primary-blue;
-			color: $color-info-box-top-text;
-			.text-info { color: $color-info-box-top-text; }
+			background-color: $primary;
+			color: $white;
+			.text-info { color: $grey-06; }
 		}
 	}
 
@@ -50,21 +54,29 @@
 
 div.datepicker.datepicker-dropdown
 {
-	background-color: $color-info-box-table-header-bg;
+	background-color: $white;
 	thead
 	{
-		background-color: $color-info-box-content-border;
+		background-color: $white;
 		text-shadow: none;
 
-		color: #474747;
-		th.dow, th.datepicker-switch, th.prev, th.next
-		{
-			border-radius: 0px;
-		}
+		color: $grey-03;
 
+		th.prev {
+			color: transparent;
+			background: url($images-root + 'icon-16-arrow-left.svg') 50% center no-repeat;
+		}
+		th.next {
+			color: transparent;
+			background: url($images-root + 'icon-16-arrow-right.svg') 50% center no-repeat;
+		}
+		th.prev:hover, th.next:hover, th.datepicker-switch:hover {
+			background-color: $grey-07;
+		}
 		th.dow
 		{
 			margin-bottom: 5px;
+			font-size: 10px;
 		}
 	}
 	tbody
@@ -73,17 +85,37 @@ div.datepicker.datepicker-dropdown
 		td.active, td.active:hover, span.month.active, span.month.active:hover, span.year.active,
 		span.year.active:hover
 		{
-			background-color: $primary-blue;
-			background-image: linear-gradient($primary-blue, rgb(0, 166, 204));
+			background-image: none;
+			background-color: $primary;
+			color: $white;
 		}
 
 		td.day
 		{
-			border-radius: 0px;
-		}
-		td.active, td:hover, td.today
-		{
-			border-radius: 3px;
+			border-radius: 50%;
+			width: 32px;
+			height: 32px;
+			font-size: 12px;
+			color: $grey-02;
+
+			&.today {
+				background-color: $secondary;
+				background-image: none;
+				&:hover {
+					background-color: $secondary-hover;
+				}
+			}
+			&.active {
+				background-color: $primary;
+				color: $white;
+				font-weight: bold;
+				&:hover {
+					background-color: $primary-hover;
+				}
+			}
+			&.old, &.new {
+				color: $grey-04;
+			}
 		}
 	}
 	tfoot
@@ -92,14 +124,13 @@ div.datepicker.datepicker-dropdown
 		{
 			th.active
 			{
-				background-color: $primary-blue;
-				background-image: linear-gradient($primary-blue, rgb(0, 166, 204));
-				color: white;
+				background-color: $primary;
+				color: $white;
 				text-shadow: none;
 			}
 			th:hover
 			{
-				background-color: $color-info-box-content-border;
+				background-color: $grey-07;
 			}
 		}
 	}
