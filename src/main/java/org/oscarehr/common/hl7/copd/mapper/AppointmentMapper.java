@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.model.v24.segment.SCH;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.provider.model.ProviderData;
 import oscar.util.ConversionUtils;
 
@@ -47,31 +48,36 @@ public class AppointmentMapper extends AbstractMapper
 		return this.message.getPATIENT().getSCHReps();
 	}
 
-	public List<Appointment> getAppointmentList() throws HL7Exception
+	public List<Appointment> getAppointmentList(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		int numAppointments = getNumAppointments();
 		List<Appointment> appointmentList = new ArrayList<>(numAppointments);
 		for(int i=0; i< numAppointments; i++)
 		{
-			appointmentList.add(getAppointment(i));
+			appointmentList.add(getAppointment(i, importSource));
 		}
 		return appointmentList;
 	}
 
-	public Appointment getAppointment(int rep) throws HL7Exception
+	public Appointment getAppointment(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		Appointment appointment = new Appointment();
 		Date appointmentDate = getAppointmentDate(rep);
 
+		if (appointmentDate == null && CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{
+			appointmentDate = getCreationDate(rep);
+		}
+
 		appointment.setAppointmentDate(appointmentDate);
 		appointment.setStartTime(appointmentDate);
-		appointment.setEndTime(getAppointmentEnd(rep));
+		appointment.setEndTime(getAppointmentEnd(rep, importSource));
 
 		// hopefully one day appointments will handle null values correctly. until then, trim to empty
 		appointment.setNotes(StringUtils.trimToEmpty(getNotes(rep)));
 		appointment.setReason(StringUtils.trimToEmpty(getReason(rep)));
 		appointment.setCreateDateTime(getCreationDate(rep));
-		appointment.setStatus(getStatus(rep));
+		appointment.setStatus(getStatus(rep, importSource));
 		appointment.setType("");
 		appointment.setLocation("");
 		appointment.setResources("");
@@ -118,20 +124,36 @@ public class AppointmentMapper extends AbstractMapper
 		return ConversionUtils.fromDateString(sch.getSch11_AppointmentTimingQuantity(0).getStartDateTime().getTimeOfAnEvent().getValue(), "yyyyMMddHHmmss");
 	}
 
-	public Date getAppointmentEnd(int rep) throws HL7Exception
+	public Date getAppointmentEnd(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		SCH sch = message.getPATIENT().getSCH(rep);
 		Date appointmentDate = getAppointmentDate(rep);
 		Integer apptDuration = Integer.parseInt(sch.getSch9_AppointmentDuration().getValue());
 		String apptDurationUnit = sch.getSch10_AppointmentDurationUnits().getCe1_Identifier().getValue();
 
+		if (appointmentDate == null && CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{// if no appointment date, use creation date instead.
+			appointmentDate = getCreationDate(rep);
+		}
+
 		return calcEndTime(appointmentDate, apptDuration, apptDurationUnit);
 	}
 
 	public String getStatus(int rep) throws HL7Exception
 	{
+		return getStatus(rep, CoPDImportService.IMPORT_SOURCE.UNKNOWN);
+	}
+
+	public String getStatus(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	{
 		//TODO how to determine status from import data?
 		Date apptDate = getAppointmentDate(rep);
+
+		if (apptDate == null && CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{
+			apptDate = getCreationDate(rep);
+		}
+
 		if(apptDate.compareTo(new Date()) < 0)
 		{
 			// appointment date is before current date

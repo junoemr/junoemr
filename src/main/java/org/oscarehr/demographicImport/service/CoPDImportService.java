@@ -107,6 +107,7 @@ public class CoPDImportService
 	public enum IMPORT_SOURCE
 	{
 		WOLF,
+		MEDIPLAN,
 		UNKNOWN
 	}
 
@@ -198,7 +199,7 @@ public class CoPDImportService
 		demographicDao.merge(demographic);
 
 		logger.info("Create Appointments ...");
-		importAppointmentData(zpdZtrMessage, demographic, mrpProvider);
+		importAppointmentData(zpdZtrMessage, demographic, mrpProvider, importSource);
 	}
 
 	/**
@@ -331,7 +332,7 @@ public class CoPDImportService
 		return demographic;
 	}
 
-	private void importAppointmentData(ZPD_ZTR zpdZtrMessage, Demographic demographic, ProviderData defaultProvider) throws HL7Exception
+	private void importAppointmentData(ZPD_ZTR zpdZtrMessage, Demographic demographic, ProviderData defaultProvider, IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		if(properties.isPropertyActive("multisites"))
 		{
@@ -345,7 +346,7 @@ public class CoPDImportService
 
 		for(int i=0; i<numAppointments; i++)
 		{
-			Appointment appointment = appointmentMapper.getAppointment(i);
+			Appointment appointment = appointmentMapper.getAppointment(i, importSource);
 			ProviderData apptProvider = appointmentMapper.getAppointmentProvider(i);
 			ProviderData assignedProvider = defaultProvider;
 			if(apptProvider != null)
@@ -502,7 +503,7 @@ public class CoPDImportService
 	{
 		DocumentMapper documentMapper = new DocumentMapper(zpdZtrMessage, providerRep);
 
-		for(Document document : documentMapper.getDocumentList())
+		for(Document document : documentMapper.getDocumentList(importSource))
 		{
 			document.setDocCreator(provider.getId());
 			document.setResponsible(provider.getId());

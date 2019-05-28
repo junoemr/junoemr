@@ -98,6 +98,10 @@ public class CopdCommandLineImporter
 		{
 			importSource = CoPDImportService.IMPORT_SOURCE.WOLF;
 		}
+		else if (importSourceStr.equalsIgnoreCase("MEDIPLAN"))
+		{
+			importSource = CoPDImportService.IMPORT_SOURCE.MEDIPLAN;
+		}
 
 		// flag to allow importing demographics with missing document files by skipping those records.
 		boolean skipMissingDocs= Boolean.parseBoolean(args[5]);
@@ -215,7 +219,7 @@ public class CopdCommandLineImporter
 			}
 			catch (Exception e)
 			{
-				logger.error("failed to import message: \n " + message, e);
+				logger.error("failed to import message: \n " + message.substring(0, Math.min(message.length(), 5000)) + "\n With error:", e);
 				hasFailure = true;
 			}
 		}

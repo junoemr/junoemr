@@ -40,6 +40,7 @@ import java.util.List;
 public class DemographicMapper extends AbstractMapper
 {
 	private final PID messagePID;
+	private final String DEMO_NULL_NAME="NULL_NAME";
 
 	public DemographicMapper(ZPD_ZTR message)
 	{
@@ -101,11 +102,21 @@ public class DemographicMapper extends AbstractMapper
 
 	public String getFirstName(int rep) throws HL7Exception
 	{
-		return messagePID.getPatientName(rep).getGivenName().getValue();
+		String firstName = messagePID.getPatientName(rep).getGivenName().getValue();
+		if (firstName == null)
+		{
+			return 	DEMO_NULL_NAME;
+		}
+		return firstName;
 	}
 	public String getLastName(int rep) throws HL7Exception
 	{
-		return messagePID.getPatientName(rep).getFamilyName().getSurname().getValue();
+		String lastName = messagePID.getPatientName(rep).getFamilyName().getSurname().getValue();
+		if (lastName == null)
+		{
+			return DEMO_NULL_NAME;
+		}
+		return lastName;
 	}
 	public String getSex()
 	{

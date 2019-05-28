@@ -25,6 +25,7 @@ package org.oscarehr.common.hl7.copd.mapper;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
+import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.document.model.Document;
 
 import java.util.ArrayList;
@@ -43,24 +44,33 @@ public class DocumentMapper extends AbstractMapper
 		return provider.getZATReps();
 	}
 
-	public List<Document> getDocumentList()
+	public List<Document> getDocumentList(CoPDImportService.IMPORT_SOURCE importSource)
 	{
 		int numDocuments = getNumDocuments();
 		List<Document> documentList = new ArrayList<>(numDocuments);
 		for(int i=0; i< numDocuments; i++)
 		{
-			documentList.add(getDocument(i));
+			documentList.add(getDocument(i, importSource));
 		}
 		return documentList;
 	}
 
-	public Document getDocument(int rep)
+	public Document getDocument(int rep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
 		Document document = new Document();
 
 		document.setObservationdate(getObservationDate(rep));
 		document.setDocdesc(getDescription(rep));
-		document.setDocfilename(getFileName(rep));
+
+		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{// Mediplan file names can include HTML escape sequences!
+			document.setDocfilename(StringEscapeUtils.unescapeHtml(getFileName(rep)));
+		}
+		else
+		{
+			document.setDocfilename(getFileName(rep));
+		}
+
 		document.setContenttype(getContentType(rep));
 		document.setStatus(Document.STATUS_ACTIVE);
 
