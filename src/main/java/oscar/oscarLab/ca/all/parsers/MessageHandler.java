@@ -627,7 +627,7 @@ public abstract class MessageHandler {
      */
     public String getOBXResult(int i, int j)
     {
-	    return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-5"));
+        return getOBXResult(i, j, 1);
     }
 
 	/**
