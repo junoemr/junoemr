@@ -82,6 +82,7 @@ public class EctMeasurementsAction extends Action
 		String providerNo = (String) session.getAttribute("user");
 		String prog_no = new EctProgram(session).getProgram(providerNo);
 		String noteUUID = StringUtils.trimToNull(request.getParameter("uuid"));
+		String pasteEncounterNote = request.getParameter("pasteEncounterNote");
 
 		String template = request.getParameter("template");
 		MeasurementFlowSheet mFlowsheet = null;
@@ -291,14 +292,17 @@ public class EctMeasurementsAction extends Action
 		}
 
 		/* save a new note OR append encounter text to the note if a matching uuid exists */
-		CaseManagementNote existingNote = (noteUUID != null) ? caseManagementNoteDao.findLatestByUUID(noteUUID) : null;
-		if(existingNote != null)
+		if (pasteEncounterNote == null || !pasteEncounterNote.equals("true"))
 		{
-			encounterNoteService.appendTextToNote(existingNote, textOnEncounter, providerNo, Integer.parseInt(demographicNo));
-		}
-		else
-		{
-			encounterNoteService.addNewNoteWithUUID(noteUUID, textOnEncounter, providerNo, Integer.parseInt(demographicNo));
+			CaseManagementNote existingNote = (noteUUID != null) ? caseManagementNoteDao.findLatestByUUID(noteUUID) : null;
+			if (existingNote != null)
+			{
+				encounterNoteService.appendTextToNote(existingNote, textOnEncounter, providerNo, Integer.parseInt(demographicNo));
+			}
+			else
+			{
+				encounterNoteService.addNewNoteWithUUID(noteUUID, textOnEncounter, providerNo, Integer.parseInt(demographicNo));
+			}
 		}
 
 		request.setAttribute("textOnEncounter", StringEscapeUtils.escapeJavaScript(textOnEncounter));

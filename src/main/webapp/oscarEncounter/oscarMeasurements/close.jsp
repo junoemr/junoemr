@@ -33,12 +33,13 @@
 <title>close</title>
 <script LANGUAGE="JavaScript">
 function closeWin() {
-      if (opener.refreshEncounter !== undefined)
+      if (opener.refreshEncounter !== undefined && opener.pasteToEncounterNote !== undefined )
       {
-         opener.refreshEncounter();
+         let encounterText = '<%=request.getAttribute("textOnEncounter")%>';
+         opener.pasteToEncounterNote(encounterText.trim());
       }
-      self.opener.location.reload(); 
-      self.close();     
+      self.opener.location.reload();
+      self.close();
 }
 </script>
 

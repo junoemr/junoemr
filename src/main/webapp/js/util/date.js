@@ -11,6 +11,12 @@ Oscar.Util.Date.DepricatedDateFormatAlt = "YYYY/M/D";
 Oscar.Util.Date.DateFormat = "YYYY-MM-DD";
 Oscar.Util.Date.DateFormatAlt = "YYYY/MM/DD";
 
+if (!String.prototype.trim) {
+	String.prototype.trim = function () {
+		return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+	};
+}
+
 /**
  * Normalizes a date input value to use the default format delimiters.
  * The input value is assumed to already be in the correct format.

@@ -68,8 +68,16 @@ public class EctValidationsBeanHandler {
 		Double maxValue = validation.getMaxValue() != null ? ConversionUtils.fromDoubleString(validation.getMaxValue()) : null;
 		Integer minLength = validation.getMinLength() != null ? ConversionUtils.fromIntString(validation.getMinLength()) : null;
 		Integer maxLength = validation.getMaxLength() != null ? ConversionUtils.fromIntString(validation.getMaxLength()) : null;
-		Boolean isNumeric = validation.getIsNumeric() != null ? ConversionUtils.fromBoolString(validation.getIsNumeric()) : null;
-		Boolean isDate = validation.getIsDate() != null ? ConversionUtils.fromBoolString(validation.getIsDate()) : null;
+		Boolean isNumeric = ConversionUtils.hasContent(validation.getIsNumeric());
+		if (!isNumeric)
+		{
+			isNumeric = null;
+		}
+		Boolean isDate = ConversionUtils.hasContent(validation.getIsDate());
+		if (!isDate)
+		{
+			isDate = null;
+		}
 
 		ValidationsDao dao = SpringUtils.getBean(ValidationsDao.class);
 		List<Validations> vs = dao.findByAll(regularExp, minValue, maxValue, minLength, maxLength, isNumeric, isDate);
