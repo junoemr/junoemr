@@ -263,6 +263,10 @@ $btn-aside-size: 72px;
 	background-color: $primary;
 	padding-top: 8px;
 
+	select {
+		@include juno-select(16px);
+	}
+
 	.schedule-options {
 		background-color: $grey-07;
 		padding: 12px;
@@ -282,7 +286,7 @@ $btn-aside-size: 72px;
 			}
 		}
 		.divider-vertical {
-			background-color: $grey-06;
+			background-color: $grey-05;
 			width: 2px;
 			height: calc(#{$input-height} * 0.75);
 		}
@@ -374,65 +378,10 @@ $btn-aside-size: 72px;
 	}
 
 	.modal-body {
-		$tabs-height: 48px;
-		.tabs-heading {
-			background-color: $grey-08;
-		}
-		.round-top {
-			border-radius: 18px 18px 0 0;
-		}
-		.round-top-left {
-			border-radius: 18px 0 0 0;
-		}
-		.nav-tabs {
-			border-color: transparent;
-			li {
-				a {
-					display: flex;
-					align-items: center;
-					height: $tabs-height;
-					padding: 16px 46px;
-					border-color: transparent;
-					color: $grey-02;
-					background-color: $grey-07;
-					&:hover, &:focus {
-						background-color: $grey-06;
-					}
-				}
-				&.active {
-					a {
-						color: $primary;
-						font-weight: bold;
-						background-color: $white;
-					}
-				}
-			}
-		}
-		.tab-pane {
-			padding: 0 16px 16px 16px;
 
-			.tab-bar-inputs {
-				position: absolute;
-				right: 0;
-				top: 0;
-				height: $tabs-height;
-				width: 40%;
-				display: flex;
-				align-items: center;
-				.form-group {
-					margin-bottom: 0;
-				}
-				.directive-appt-status-select {
-					select {
-						height: 32px;
-					}
-					.icon {
-						width: 20px;
-						height: 20px;
-					}
-				}
-			}
-		}
+		$tabs-height: 48px;
+		@include juno-tab-light($tabs-height);
+
 		.form-group {
 			margin-bottom: 10px;
 			display: flex;
@@ -471,6 +420,31 @@ $btn-aside-size: 72px;
 						line-height: normal;
 						letter-spacing: normal;
 						color: $grey-02;
+					}
+				}
+			}
+		}
+		.tab-pane {
+			padding: 0 16px 16px 16px;
+
+			.tab-bar-inputs {
+				position: absolute;
+				right: 0;
+				top: 0;
+				height: $tabs-height;
+				width: 40%;
+				display: flex;
+				align-items: center;
+				.form-group {
+					margin-bottom: 0;
+				}
+				.directive-appt-status-select {
+					select {
+						height: 32px;
+					}
+					.icon {
+						width: 20px;
+						height: 20px;
 					}
 				}
 			}

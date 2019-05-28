@@ -1,0 +1,37 @@
+
+@mixin juno-tab-light($tabs-height) {
+	.nav {
+		background-color: $grey-08;
+		border-color: transparent;
+		li {
+			a {
+				display: flex;
+				align-items: center;
+				height: $tabs-height;
+				padding: 16px 46px;
+				border-color: transparent;
+				color: $grey-02;
+				background-color: $grey-07;
+				&:hover, &:focus {
+					background-color: $grey-06;
+				}
+			}
+			&.active {
+				a {
+					color: $primary;
+					font-weight: bold;
+					background-color: $white;
+				}
+			}
+		}
+	}
+	.round-top {
+		border-radius: 18px 18px 0 0;
+	}
+	.round-top-left {
+		border-radius: 18px 0 0 0;
+	}
+	.round-top-right {
+		border-radius: 0 18px 0 0;
+	}
+}

@@ -1,0 +1,11 @@
+
+
+@mixin juno-select($arrow-size) {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	background-image: url($images-root + 'icon-16-arrow-down.svg');
+	background-repeat: no-repeat;
+	background-size: $arrow-size;
+	background-position-y: 50%;
+	background-position-x: calc(100% - #{$arrow-size}/2);
+}

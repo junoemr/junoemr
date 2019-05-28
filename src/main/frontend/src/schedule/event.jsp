@@ -46,8 +46,8 @@
 	</div>
 
 	<div class="modal-body">
-		<div class="tabs-heading round-top">
-			<ul class="nav nav-tabs">
+		<div class="tabs-heading">
+			<ul class="nav nav-tabs round-top">
 				<li class="active">
 					<a class="round-top-left" data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.appointment);">
 						Appointment</a>
