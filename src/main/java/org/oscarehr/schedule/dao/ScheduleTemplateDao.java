@@ -154,7 +154,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"  stc.code,\n" +
 				"  CAST(COALESCE(stc.duration, ((24*60)/LENGTH(st.timecode))) AS integer) AS duration,\n" +
 				"  stc.description,\n" +
-				"  stc.color,\n" +
+				"  stc.juno_color,\n" +
 				"  stc.confirm,\n" +
 				"  stc.bookinglimit\n" +
 				"FROM \n" +

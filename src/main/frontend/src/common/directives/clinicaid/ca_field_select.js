@@ -25,8 +25,8 @@ angular.module('Common').directive(
 			{
 				var option = $scope.options[model];
 
-				$(".directive-appt-status-select").css("background-color", option.color);
-				var statusElem = $(".icon-status");
+				element.find(".directive-appt-status-select").css("background-color", option.color);
+				var statusElem = element.find(".icon-status");
 
 				var statusIcon = option.icon.substr(0, option.icon.indexOf('.'));
 

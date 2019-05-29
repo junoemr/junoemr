@@ -32,6 +32,7 @@ import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 import javax.persistence.Table;
 
+import org.hibernate.validator.constraints.Length;
 import oscar.appt.status.service.impl.AppointmentStatusMgrImpl;
 
 
@@ -54,6 +55,10 @@ public class AppointmentStatus extends AbstractModel<Integer> {
 	private String description;
 	
 	private String color;
+
+	@Length(min=7, max=7)
+	@Column(name="juno_color")
+	private String junoColor;
 	
 	private String icon;
 	
@@ -97,6 +102,16 @@ public class AppointmentStatus extends AbstractModel<Integer> {
 
 	public void setColor(String color) {
 		this.color = color;
+	}
+
+	public String getJunoColor()
+	{
+		return junoColor;
+	}
+
+	public void setJunoColor(String junoColor)
+	{
+		this.junoColor = junoColor;
 	}
 
 	public String getIcon() {

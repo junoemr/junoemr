@@ -179,7 +179,7 @@ public class Appointment
 				calendarEvents.add(new CalendarEvent(
 					startDateTime,
 					endDateTime,
-					details.getColor(),
+					details.getJunoColor(),
 					null,
 					"text-dark",       // TODO remove?
 					providerId, // TODO remove?

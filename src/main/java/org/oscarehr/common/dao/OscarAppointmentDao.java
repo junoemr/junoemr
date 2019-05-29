@@ -800,6 +800,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  a.urgency,\n" +
 				"  aps.description,\n" +
 				"  aps.color,\n" +
+				"  aps.juno_color,\n" +
 				"  aps.icon,\n" +
 				"  aps.short_letter_colour,\n" +
 				"  aps.short_letters,\n" +
@@ -857,6 +858,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  a.urgency,\n" +
 				"  aps.description,\n" +
 				"  aps.color,\n" +
+				"  aps.juno_color,\n" +
 				"  aps.icon,\n" +
 				"  aps.short_letter_colour,\n" +
 				"  aps.short_letters,\n" +
@@ -912,6 +914,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 			String urgency = (String) result[index++];
 			String statusTitle = (String) result[index++];
 			String color = (String) result[index++];
+			String junoColor = (String) result[index++];
 			String iconImage = (String) result[index++];
 			Integer shortLetterColour = (Integer) result[index++];
 			String shortLetters = (String) result[index++];
@@ -994,6 +997,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				urgency,
 				statusTitle,
 				color,
+				junoColor,
 				iconImage,
 				shortLetterColour,
 				shortLetters,

@@ -46,6 +46,7 @@ public class AppointmentDetails
 	private String urgency;
 	private String statusTitle;
 	private String color;
+	private String junoColor;
 	private String iconImage;
 	private Integer shortLetterColour;
 	private String shortLetters;
@@ -83,6 +84,7 @@ public class AppointmentDetails
 		String urgency,
 		String statusTitle,
 		String color,
+		String junoColor,
 		String iconImage,
 		Integer shortLetterColour,
 		String shortLetters,
@@ -120,6 +122,7 @@ public class AppointmentDetails
 		this.urgency = urgency;
 		this.statusTitle = statusTitle;
 		this.color = color;
+		this.junoColor = junoColor;
 		this.iconImage = iconImage;
 		this.shortLetters = shortLetters;
 		this.shortLetterColour = shortLetterColour;
@@ -227,6 +230,16 @@ public class AppointmentDetails
 	public String getColor()
 	{
 		return color;
+	}
+
+	public String getJunoColor()
+	{
+		return junoColor;
+	}
+
+	public void setJunoColor(String junoColor)
+	{
+		this.junoColor = junoColor;
 	}
 
 	public String getIconImage()
