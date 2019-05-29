@@ -28,11 +28,15 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserAccessTokenTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserTo1;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import oscar.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,24 +52,18 @@ public class MyHealthAccess extends Action
 		String clinicID = "57100c58-9d0c-425f-8b8c-f55f6818a1c0";
 		String remoteUserID = "999998";
 		ClinicService clinicService = new ClinicService();
+		ClinicUserTo1 linkedUser;
 		try
 		{
-			ClinicUserTo1 linkedUser = clinicService.getLinkedUser(clinicID, remoteUserID);
-			MiscUtils.getLogger().error("+++++++++++++++++++++++++++++++");
-			MiscUtils.getLogger().error("Linked user first name: " + linkedUser.getFirstName());
-			MiscUtils.getLogger().error("Linked user last name: " + linkedUser.getLastName());
-			MiscUtils.getLogger().error("Linked user id: " + linkedUser.getMyhealthaccesID());
-			MiscUtils.getLogger().error("+++++++++++++++++++++++++++++++");
+			linkedUser = clinicService.getLinkedUser(clinicID, remoteUserID);
 			String email = request.getParameter("email");
 			String password = request.getParameter("password");
+			String demographicNo = request.getParameter("demographicNo");
 			ClinicUserAccessTokenTo1 accessToken;
 			try
 			{
 				accessToken = clinicService.getLoginToken(
 						clinicID, linkedUser.getMyhealthaccesID(), email, password);
-				MiscUtils.getLogger().error("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-				MiscUtils.getLogger().error("accessToken: " + accessToken.getToken());
-				MiscUtils.getLogger().error("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 			} catch (BaseException e)
 			{
 				MiscUtils.getLogger().error("*******************************");
@@ -79,29 +77,43 @@ public class MyHealthAccess extends Action
 				}
 				else if(e.getErrorObject().isHasAuthError())
 				{
+
+
 					MiscUtils.getLogger().error("STATUS: " +
 							e.getErrorObject().getAuthError().getCode());
 					MiscUtils.getLogger().error("Message: " +
 							e.getErrorObject().getAuthError().getMessage());
 				}
-				MiscUtils.getLogger().error("*******************************");
-				return mapping.findForward("login");
+				ActionRedirect loginAction = new ActionRedirect(mapping.findForward("login"));
+				loginAction.addParameter("demographicNo", demographicNo);
+				return loginAction;
 			}
-			ActionForward myHealthAccess = new ActionForward();
-			String redirectUrl = URLEncoder.encode("patient/e688ef95-4e42-4079-907d-b93773d56a53");
-			String myHealthAccessURL = "https://conan.mhadev.ca/clinic_users/push_login" +
-					"?token=" + URLEncoder.encode(accessToken.getToken()) +
-					"&redirect_url=" + redirectUrl;
-			myHealthAccess.setPath(myHealthAccessURL);
-			myHealthAccess.setRedirect(true);
-			ActionRedirect myHealthAccessRedirect = new ActionRedirect(myHealthAccess);
-			myHealthAccessRedirect.addParameter("email", email);
-			myHealthAccessRedirect.addParameter("password", password);
-			return myHealthAccessRedirect;
+
+			DemographicDao demographicDao =
+					(DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+			Demographic patient = demographicDao.find(Integer.parseInt(demographicNo));
+
+			String redirectUrl = URLEncoder.encode("patient/remote_patient_id/" +
+					demographicNo + "?" +
+					"&patient_first_name=" + StringUtils.noNull(patient.getFirstName()) +
+					"&patient_last_name=" + StringUtils.noNull(patient.getLastName()));
+
+			ActionRedirect myHealthAccessRedirectAction = new ActionRedirect();
+			String myHealthAccessURL = "https://conan.mhadev.ca/clinic_users/push_token?" +
+					"clinic_id=" + clinicID +
+					"&user_id=" + linkedUser.getMyhealthaccesID() +
+					"&redirect_url=" + redirectUrl +
+					"#token=" +accessToken.getToken();
+
+			myHealthAccessRedirectAction.setPath(myHealthAccessURL);
+			myHealthAccessRedirectAction.setRedirect(true);
+			return myHealthAccessRedirectAction;
 		} catch (Exception e)
 		{
 			MiscUtils.getLogger().error("Error", e);
 		}
-		return mapping.findForward("success");
+
+		// TODO Add failure action
+		return mapping.findForward("failure");
 	}
 }

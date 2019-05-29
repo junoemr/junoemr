@@ -25,19 +25,15 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-		<title>MyHealthAccess Login</title>
+		<title>MyHealthAccess Redirect</title>
 </head>
 <body>
-<form action="<%= request.getContextPath() %>/telehealth/start.do" method="post">
-		<input
-						type="hidden"
-						id="demographicNo"
-						name="demographicNo"
-						value="<%=request.getParameter("demographicNo")%>"
-		/>
-		<input type="text" id="email" name="email"/>
-		<input type="password" id="password" name="password"/>
-		<button type="submit"/>
-</form>
+<%
+		String myHealthAccessURL = request.getParameter("myHealthAccessURL");
+		response.setHeader("Authorization", "Bearer " + request.getParameter("token"));
+		response.sendRedirect(myHealthAccessURL);
+%>
+<script>
+</script>
 </body>
 </html>
