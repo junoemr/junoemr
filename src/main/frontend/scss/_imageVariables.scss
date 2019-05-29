@@ -9,6 +9,11 @@ $icon-modal-max: $images-root + 'icon-16-window-max.svg';
 $icon-checked: $images-root + 'icon-16-check.svg';
 $icon-add-appt: $images-root + 'icon-48-add-appintment.svg';
 
+$icon-up: $images-root + 'icon-16-arrow-up.svg';
+$icon-down: $images-root + 'icon-16-arrow-down.svg';
+$icon-left: $images-root + 'icon-16-arrow-left.svg';
+$icon-right: $images-root + 'icon-16-arrow-right.svg';
+
 $icon-status-starbill: $images-appt-status + 'icon-48-todo.svg';
 $icon-status-todo: $images-appt-status + 'icon-48-folder.svg';
 $icon-status-here: $images-appt-status + 'icon-48-user.svg';
@@ -40,13 +45,13 @@ $icon-status-11: $images-appt-status + 'icon-48-1.svg';
 }
 
 .icon-down {
-	background-image: url($images-root + 'icon-16-arrow-down.svg');
+	background-image: url($icon-down);
 }
 .icon-left {
-	background-image: url($images-root + 'icon-16-arrow-left.svg');
+	background-image: url($icon-left);
 }
 .icon-right {
-	background-image: url($images-root + 'icon-16-arrow-right.svg');
+	background-image: url($icon-right);
 }
 .icon-refresh {
 	background-image: url($images-root + 'icon-16-refresh.svg');

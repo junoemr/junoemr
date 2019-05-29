@@ -274,8 +274,7 @@
 															ca-title="Duration"
 															ca-name="duration"
 															ca-model="eventData.duration"
-															ca-rows="1"
-															ca-change="onDurationChange()">
+															ca-rows="1">
 													</ca-field-text>
 												</div>
 											</div>
@@ -662,7 +661,10 @@
 						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
 						ng-show="!editMode"
 						ng-click="save()"
-						ng-disabled="isWorking()">Create
+						ng-class="{
+							'double-book': (eventController.isDoubleBook && !eventController.isDoubleBookPrevented),
+						    'double-book-prevented':eventController.isDoubleBookPrevented}"
+						ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Create
 				</button>
 
 				<button
@@ -673,7 +675,10 @@
 						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
 						ng-show="editMode"
 						ng-click="save()"
-						ng-disabled="isWorking()">Modify
+						ng-class="{
+							'double-book': (eventController.isDoubleBook && !eventController.isDoubleBookPrevented),
+						    'double-book-prevented':eventController.isDoubleBookPrevented}"
+						ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Modify
 				</button>
 
 				<button

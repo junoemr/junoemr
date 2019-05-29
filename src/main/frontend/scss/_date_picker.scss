@@ -64,11 +64,11 @@ div.datepicker.datepicker-dropdown
 
 		th.prev {
 			color: transparent;
-			background: url($images-root + 'icon-16-arrow-left.svg') 50% center no-repeat;
+			background: url($icon-left) 50% center no-repeat;
 		}
 		th.next {
 			color: transparent;
-			background: url($images-root + 'icon-16-arrow-right.svg') 50% center no-repeat;
+			background: url($icon-right) 50% center no-repeat;
 		}
 		th.prev:hover, th.next:hover, th.datepicker-switch:hover {
 			background-color: $grey-07;

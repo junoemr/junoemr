@@ -114,6 +114,9 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	$scope.initialized = false;
 	$scope.working = false;
 
+	controller.isDoubleBook = false;
+	controller.isDoubleBookPrevented = false;
+
 	controller.providerModel = {
 		providerNo: null,
 		firstName: null,
@@ -169,10 +172,10 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			this.patientPhotoUrl = '/imageRenderingServlet?source=local_client&clientId=' + (data.demographicNo? data.demographicNo: 0);
 
 			var dateOfBirth = null;
-			if(Juno.Common.Util.exists(data.dateOfBirth))
+			if(Juno.Common.Util.exists(data.dob))
 			{
 				// XXX: Perhaps put this in util?  Is this date format common for juno?
-				dateOfBirth = moment(data.dateOfBirth, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
+				dateOfBirth = moment(data.dob, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
 			}
 			else
 			{
@@ -244,6 +247,8 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			$scope.eventData.critical = data.eventData.urgency === 'critical';
 			$scope.eventData.duration = momentEnd.diff(momentStart, 'minutes');
 
+			controller.checkEventConflicts(); // uses the eventData
+
 			// either load the patient data and init the autocomplete
 			// or ensure the patient model is clear
 			controller.setPatientData(data.eventData.demographicNo).then(function() {
@@ -267,6 +272,8 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			controller.setTimeAndDurationByTemplate($scope.activeTemplateEvents[0], parentScope.timeIntervalMinutes());
 
 			focus.element("#input-patient");
+
+			controller.checkEventConflicts(); // uses the eventData
 
 			$scope.initialized = true;
 		}
@@ -438,6 +445,71 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		return deferred.promise;
 	};
 
+	controller.checkEventConflicts = function()
+	{
+		//TODO a better way to access the modal content window
+		var modalContent = $(".modal-content");
+
+		// Get templates that happen during the time period
+		var momentStart = Juno.Common.Util.getDateAndTimeMoment(
+			$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
+		var momentEnd = controller.calculateEndTime();
+
+		controller.isDoubleBook = false;
+		controller.isDoubleBookPrevented = false;
+		modalContent.removeClass("double-book double-book-prevented");
+
+		if(momentStart.isValid() && momentEnd.isValid() && momentStart.isSameOrBefore(momentEnd))
+		{
+			// Loop through the events for this day
+			for (var i = 0; i < data.events.length; i++)
+			{
+				var event = data.events[i];
+
+				// filter events that should not be checked (background, wrong schedule, etc.)
+				if (event.rendering === "background"
+					|| event.resourceId != $scope.schedule.uuid
+					|| $scope.eventUuid == event.data.appointmentNo)
+				{
+					continue;
+				}
+
+
+				// if start time is between event start and end
+				var eventStart = Juno.Common.Util.getDatetimeNoTimezoneMoment(event.start);
+				var eventEnd = Juno.Common.Util.getDatetimeNoTimezoneMoment(event.end);
+				var eventDoNotBook = event.data.doNotBook;
+
+				if (eventStart.isValid() && eventEnd.isValid() &&
+					((momentStart.isSameOrAfter(eventStart) && momentStart.isBefore(eventEnd)) ||
+					(momentEnd.isAfter(eventStart) && momentEnd.isSameOrBefore(eventEnd))))
+				{
+					// console.info('event conflict', event);
+
+					controller.isDoubleBook = true;
+					if (eventDoNotBook)
+					{
+						controller.isDoubleBookPrevented = true;
+						break;
+					}
+				}
+			}
+
+			if (controller.isDoubleBookPrevented)
+			{
+				modalContent.addClass("double-book-prevented");
+			}
+			else if (controller.isDoubleBook)
+			{
+				modalContent.addClass("double-book");
+			}
+		}
+		else
+		{
+			console.warn("unable to check double booking, invalid event time/duration", momentStart, momentEnd);
+		}
+	};
+
 	$scope.validateForm = function validateForm()
 	{
 		$scope.displayMessages.clear();
@@ -559,6 +631,13 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		if($scope.isInitialized())
 		{
 			$scope.loadPatientFromTypeahead($scope.patientTypeahead);
+		}
+	});
+	$scope.$watch('[eventData.startTime, eventData.duration]', function()
+	{
+		if($scope.isInitialized())
+		{
+			controller.checkEventConflicts();
 		}
 	});
 
@@ -686,11 +765,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			$uibModalInstance.close();
 			$scope.working = false;
 			window.print();
-
-			// $scope.parentScope.openCreateInvoice(
-			// 	$scope.eventUuid,
-			// 	$scope.schedule.uuid,
-			// 	$scope.demographicModel.demographicNo);
 		}, function()
 		{
 			$scope.displayMessages.add_generic_fatal_error();
@@ -735,36 +809,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		$scope.demographicModel.demographicNo = demographicNo;
 		controller.setPatientData();
 	};
-
-	// $scope.searchPatients = function searchPatients(term)
-	// {
-	// 	var search = {
-	// 		type: 'Name',
-	// 		'term': term,
-	// 		status: 'active',
-	// 		integrator: false,
-	// 		outofdomain: true
-	// 	};
-	// 	return demographicsService.search(search, 0, 25).then(
-	// 		function(results)
-	// 		{
-	// 			var resp = [];
-	// 			for (var x = 0; x < results.content.length; x++)
-	// 			{
-	// 				resp.push(
-	// 					{
-	// 						demographicNo: results.content[x].demographicNo,
-	// 						name: Juno.Common.Util.formatName(
-	// 							results.content[x].firstName, results.content[x].lastName)
-	// 					});
-	// 			}
-	// 			return resp;
-	// 		},
-	// 		function error(errors)
-	// 		{
-	// 			console.log(errors);
-	// 		});
-	// };
 
 	$scope.newDemographic = function newDemographic(size)
 	{

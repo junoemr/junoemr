@@ -57,9 +57,13 @@
 			background: linear-gradient(-45deg, $white 50%, transparent 0) no-repeat 100% 100%,
 			linear-gradient(247deg, #5c8be8, $primary 30%, $primary 64%, #355085) no-repeat;
 
-			&.alert-color {
+			&.double-book {
 				background: linear-gradient(-45deg, $white 50%, transparent 0) no-repeat 100% 100%,
 				linear-gradient(247deg, $yellow, $yellow 30%, $yellow-hover 64%, $yellow-hover) no-repeat;
+			}
+			&.double-book-prevented {
+				background: linear-gradient(-45deg, $white 50%, transparent 0) no-repeat 100% 100%,
+				linear-gradient(247deg, $orange, $orange 30%, $orange-hover 64%, $orange-hover) no-repeat;
 			}
 
 			padding: 0 16px 16px 16px;
@@ -93,6 +97,14 @@
 						color: $white;
 						background-color: $primary;
 						border: solid 1px $primary-hover;
+						&.double-book {
+							background-color: $yellow;
+							border-color: $yellow-hover;
+						}
+						&.double-book-prevented {
+							background-color: $orange;
+							border-color: $orange-hover;
+						}
 					}
 				}
 			}
