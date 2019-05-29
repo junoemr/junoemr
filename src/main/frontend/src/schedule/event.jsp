@@ -126,23 +126,43 @@
 									</div>
 								</div>
 								<div class="col-md-6">
-									<ca-field-select
-											ca-name="type"
-											ca-title="Type"
-											ca-template="label"
-											ca-label-size="col-md-2"
-											ca-input-size="col-md-10"
-											ca-model="eventData.type"
-											ca-options="eventController.appointmentTypeList"
-											ca-empty-option="true"
-									>
-									</ca-field-select>
+									<!-- patient type/critical -->
+									<div class="form-group">
+										<label class="col-md-2">Type</label>
+										<div class="col-md-10">
+											<div class="row">
+												<div class="col-md-8">
+													<ca-field-select
+															ca-name="type"
+															ca-template="label"
+															ca-no-label="true"
+															ca-input-size="col-md-12"
+															ca-model="eventData.type"
+															ca-options="eventController.appointmentTypeList"
+															ca-empty-option="true"
+													>
+													</ca-field-select>
+												</div>
+												<div class="col-md-4">
+													<ca-field-boolean
+															ca-name="check-critical"
+															ca-title="Critical"
+															ca-label-size="col-md-5"
+															ca-input-size="col-md-7"
+															ca-model="eventData.critical"
+															ca-template="juno"
+													>
+													</ca-field-boolean>
+												</div>
+											</div>
+										</div>
+									</div>
 								</div>
 							</div>
 							<div class="row">
-								<div class="col-md-6">
+								<div class="col-md-6 info-frame-container">
 									<!-- patient details display -->
-									<div class="form-group label-top info-frame-container"
+									<div class="form-group label-top"
 									     ng-show="isPatientSelected()">
 										<label class="col-md-2">Demographic</label>
 										<div class="col-md-10">
@@ -256,17 +276,18 @@
 										<label class="col-md-2">Session Date</label>
 										<div class="col-md-10">
 											<div class="row">
-												<div class="col-md-6">
+												<div class="col-md-12">
 													<ca-field-date
-															ca-label-size="col-md-2"
-															ca-input-size="col-md-10"
-															ca-template="bare"
+															ca-input-size="col-md-12"
+															ca-no-label="true"
 															ca-date-picker-id="select-date"
 															ca-name="startDate"
 															ca-model="eventData.startDate"
 															ca-orientation="auto"
 													></ca-field-date>
 												</div>
+											</div>
+											<div class="row">
 												<div class="col-md-6">
 													<ca-field-text
 															ca-label-size="col-md-4"
@@ -277,8 +298,7 @@
 															ca-rows="1">
 													</ca-field-text>
 												</div>
-											</div>
-											<div class="row">
+
 												<div class="col-md-6">
 													<ca-field-time
 															ca-label-size="col-md-4"
@@ -286,81 +306,21 @@
 															ca-title="Time"
 															ca-name="startTime"
 															ca-model="eventData.startTime"
+															ca-template="no_button"
 															ca-minute-step="parentScope.timeIntervalMinutes()">
 													</ca-field-time>
 												</div>
-												<div class="col-md-6">
-													<div class="row">
-														<div class="col-md-6">
-															<ca-field-boolean
-																	ca-name="check-am"
-																	ca-title="am"
-																	ca-label-size="col-md-5"
-																	ca-input-size="col-md-7"
-																	ca-model="eventController.amSelected"
-																	ca-template="juno"
-															>
-															</ca-field-boolean>
-														</div>
-														<div class="col-md-6">
-															<ca-field-boolean
-																	ca-name="check-pm"
-																	ca-title="pm"
-																	ca-label-size="col-md-5"
-																	ca-input-size="col-md-7"
-																	ca-model="eventController.pmSelected"
-																	ca-template="juno"
-															>
-															</ca-field-boolean>
-														</div>
-													</div>
-												</div>
 											</div>
-											<div class="row">
-												<div class="col-md-6">
-													<ca-field-boolean
-															ca-name="check-do-not-book"
-															ca-title="Do Not Book"
-															ca-label-size="col-md-8"
-															ca-input-size="col-md-4"
-															ca-model="eventData.doNotBook"
-															ca-template="juno"
-													>
-													</ca-field-boolean>
-												</div>
-												<div class="col-md-6">
-													<div class="row">
-														<div class="col-md-6">
-														</div>
-														<div class="col-md-6">
-															<ca-field-boolean
-																	ca-name="check-critical"
-																	ca-title="Critical"
-																	ca-label-size="col-md-5"
-																	ca-input-size="col-md-7"
-																	ca-model="eventData.critical"
-																	ca-template="juno"
-															>
-															</ca-field-boolean>
-														</div>
-													</div>
-												</div>
-											</div>
-											<%--<div class="row">--%>
-												<%--<div class="col-md-9"></div>--%>
-												<%--<div class="col-md-3">--%>
-													<%--<ca-field-toggle--%>
-															<%--ca-name="check-critical"--%>
-															<%--ca-title="Critical"--%>
-															<%--ca-label-size="col-md-4"--%>
-															<%--ca-input-size="col-md-8"--%>
-															<%--ca-model="eventController.critical"--%>
-															<%--ca-template="juno">--%>
-													<%--</ca-field-toggle>--%>
-												<%--</div>--%>
-											<%--</div>--%>
 										</div>
 									</div>
+								</div>
+							</div>
+							<div class="row">
+								<!-- show patient alerts -->
+								<div class="col-md-6">
+								</div>
+								<!-- show additional alerts -->
+								<div class="col-md-6">
 								</div>
 							</div>
 							<div class="row">
@@ -376,19 +336,6 @@
 											ca-options="eventController.siteOptions"
 									>
 									</ca-field-select>
-									<%--<div class="form-group">--%>
-										<%--<label for="select-site" class="flex-row-label">Site</label>--%>
-										<%--<select id="select-site" class="flex-row-content"></select>--%>
-									<%--</div>--%>
-
-									<%--<!-- provider selection -->--%>
-									<%--<div class="flex-row">--%>
-										<%--<label for="select-provider" class="flex-row-label">Provider</label>--%>
-										<%--<select id="select-provider" class="flex-row-content"--%>
-										        <%--ng-model="eventController.selectedProvider">--%>
-										        <%--&lt;%&ndash;ng-options="faxAccount.displayName for faxAccount in faxSendReceiveController.faxAccountList">&ndash;%&gt;--%>
-										<%--</select>--%>
-									<%--</div>--%>
 								</div>
 								<div class="col-md-6">
 									<!-- reason type -->
@@ -403,11 +350,6 @@
 											ca-empty-option="false"
 									>
 									</ca-field-select>
-
-									<%--<div class="form-group">--%>
-										<%--<label for="select-resources" class="flex-row-label">Notes</label>--%>
-										<%--<input id="select-resources" class="flex-row-content" type="text"/>--%>
-									<%--</div>--%>
 								</div>
 							</div>
 							<div class="row">
@@ -431,7 +373,6 @@
 											ca-title="Reason"
 											ca-name="event_reason"
 											ca-model="eventData.reason"
-											<%--ca-max-characters="600"--%>
 											ca-rows="1">
 									</ca-field-text>
 								</div>
@@ -639,8 +580,15 @@
 				<button
 						type="button"
 						class="btn btn-default"
+						ng-click="saveDoNotBook()"
+						ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Do Not Book
+				</button>
+
+				<button
+						type="button"
+						class="btn btn-default"
 						ng-click="save()"
-						ng-disabled="isWorking()">Receipt
+						ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Receipt
 				</button>
 
 				<button
@@ -650,7 +598,7 @@
 						tooltip-append-to-body="true"
 						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
 						ng-click="saveAndPrint()"
-						ng-disabled="isWorking()">Print
+						ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Print
 				</button>
 
 				<button

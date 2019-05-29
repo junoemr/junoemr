@@ -771,6 +771,27 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			$scope.working = false;
 		});
 	};
+	$scope.saveDoNotBook = function saveDoNotBook()
+	{
+		if(!$scope.validateForm())
+		{
+			return false;
+		}
+
+		$scope.working = true;
+		$scope.clearPatient();
+		$scope.eventData.doNotBook = true;
+		$scope.saveEvent().then(function()
+		{
+			$scope.parentScope.refetchEvents();
+			$uibModalInstance.close();
+			$scope.working = false;
+		}, function()
+		{
+			$scope.displayMessages.add_generic_fatal_error();
+			$scope.working = false;
+		});
+	};
 
 	$scope.viewInvoices = function viewInvoices()
 	{

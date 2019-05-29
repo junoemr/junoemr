@@ -5,9 +5,11 @@
 		 title="{{title_string}}"
 		 ng-hide="hide">
 
-	<label for="input-{{name}}"
-				 class="{{label_size}} control-label">
-		{{title}}<span ng-if="!hide_label_colon">:</span>
+	<label ng-if="no_label != 'true'"
+	       for="input-{{name}}"
+	       class="{{label_size}} control-label"
+	       title="{{hint}}">
+		{{title}}
 	</label>
 
 	<div class="{{input_size}} {{ date_picker_id }}-body">
@@ -25,6 +27,5 @@
 					 autocomplete="off"
 					 placeholder="yyyy-mm-dd">
 	</div>
-
 </div>
 

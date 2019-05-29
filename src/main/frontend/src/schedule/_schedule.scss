@@ -384,20 +384,22 @@ $btn-aside-size: 72px;
 		@include juno-tab-light($tabs-height);
 
 		.form-group {
-			margin-bottom: 10px;
+			margin-bottom: 8px;
 			display: flex;
 			align-items: center;
 
 			&.label-top {
 				align-items: flex-start;
+				& > label {
+					margin-top: 8px;
+				}
 			}
-
 		}
 		.alert-container {
 			height: 40px;
 		}
 		.info-frame-container {
-			height: 144px;
+			height: 160px;
 			.demographic-info-frame {
 				height: 144px;
 				margin-bottom: 12px;

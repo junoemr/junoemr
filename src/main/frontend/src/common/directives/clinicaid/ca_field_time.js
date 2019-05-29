@@ -13,6 +13,7 @@ angular.module('Common').directive(
 	var scope = angular.copy(helper.default_scope);
 
 	scope.minute_step = '=caMinuteStep';
+	scope.no_label = '@caNoLabel';
 
 	/* These are all available for the timepicker, but are not wired up yet
 	 scope.input_size = '@caInputSize';

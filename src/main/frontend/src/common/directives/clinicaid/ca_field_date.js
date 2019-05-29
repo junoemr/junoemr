@@ -18,6 +18,7 @@
 	 scope.orientation = '@caOrientation';
 	 scope.use_multi_date = '@caUseMultiDate';
 	 scope.container_id = '@caContainerId';
+	 scope.no_label = '@caNoLabel';
 
 	 var template_function = function template_function(element, attributes) {
 		 if(attributes['caTemplate'] == 'bare')
