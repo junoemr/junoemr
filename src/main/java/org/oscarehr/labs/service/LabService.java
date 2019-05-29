@@ -96,7 +96,7 @@ public class LabService
 		String accessionNum = messageHandler.getAccessionNum();
 		String fillerOrderNum = messageHandler.getFillerOrderNumber();
 		int finalResultCount = messageHandler.getOBXFinalResultCount();
-		String obrDate = ConversionUtils.toTimestampString(ConversionUtils.coalesceTimeStampString(messageHandler.getMsgDate()));
+		String obrDate = ConversionUtils.toTimestampString(ConversionUtils.getLegacyDateFromDateString(messageHandler.getMsgDate()));
 		String discipline = findDiscipline(messageHandler);
 
 		Hl7TextMessage hl7TextMessage = new Hl7TextMessage();
