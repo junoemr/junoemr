@@ -226,7 +226,7 @@
 	   //potentially need admission date.
 	   document.forms['caseManagementEntryForm'].sign.value='on';
 	   jQuery("form[name='caseManagementEntryForm']").append("<input type=\"hidden\" name=\"macro.id\" value=\""+macroId+"\"/>");
-	   var result =  savePage('runMacro', '');
+	   savePage('runMacro', '');
 	   return false;
    }
 

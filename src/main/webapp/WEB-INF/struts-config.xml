@@ -604,7 +604,7 @@
 		<!-- OMD Dashboard Proof of Concept -->
 		<action input="/web/dashboard/admin/DashboardManager.jsp" name="FrmForm" path="/web/dashboard/admin/DashboardManager" 
 			parameter="method" type="org.oscarehr.dashboard.admin.ManageDashboardAction" scope="request" >
-			<forward name="success" path="/web/dashboard/admin/DashboardManager.jsp" />
+			<forward name="success" path="/web/src/dashboard/admin/DashboardManager.jsp" />
 			<forward name="unauthorized" path="/securityError.jsp" />
 			<forward name="error" path="/failure.jsp" />
 			<forward name="ajax" path="/web/dashboard/admin/DashboardManager.do" />
@@ -612,14 +612,14 @@
 		
 		<action name="FrmForm" path="/web/dashboard/display/DashboardDisplay" 
 			parameter="method" type="org.oscarehr.dashboard.display.DisplayDashboardAction" scope="request" >
-			<forward name="success" path="/web/dashboard/display/DashboardDisplay.jsp" />
+			<forward name="success" path="/web/src/dashboard/display/DashboardDisplay.jsp" />
 			<forward name="unauthorized" path="/securityError.jsp" />
 			<forward name="error" path="/failure.jsp" />
 		</action>
 		
 		<action name="FrmForm" path="/web/dashboard/display/DrilldownDisplay" 
 			parameter="method" type="org.oscarehr.dashboard.display.DisplayDrilldownAction" scope="request" >
-			<forward name="success" path="/web/dashboard/display/DrilldownDisplay.jsp" />
+			<forward name="success" path="/web/src/dashboard/display/DrilldownDisplay.jsp" />
 			<forward name="unauthorized" path="/securityError.jsp" />
 			<forward name="error" path="/failure.jsp" />
 		</action>
@@ -632,7 +632,7 @@
 		
 		<action name="FrmForm" path="/web/dashboard/display/DisplayIndicator" 
 			parameter="method" type="org.oscarehr.dashboard.display.DisplayIndicatorAction" scope="request" >
-			<forward name="success" path="/web/dashboard/display/IndicatorPanel.jsp" />
+			<forward name="success" path="/web/src/dashboard/display/IndicatorPanel.jsp" />
 			<forward name="unauthorized" path="/securityError.jsp" />
 			<forward name="error" path="/failure.jsp" />
 		</action>
@@ -2868,6 +2868,10 @@
 		<action path="/oscarRx/Dispense" type="org.oscarehr.rx.dispensary.DispensaryAction" parameter="method" scope="request">	
 			<forward name="list" path="/oscarRx/dispensary/list.jsp" />	
 		</action>
+
+		<action path="/RxWatermark" name="FrmForm" type="org.oscarehr.rx.web.RxWatermarkAction" parameter="method">
+		</action>
+
      <action path="/consults/Consultations" type="org.oscarehr.consultations.ConsultationAction">
       </action>
 		     

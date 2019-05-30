@@ -1,0 +1,5 @@
+INSERT INTO `admission` VALUES (1,1,10034,'999998','2019-04-24 09:29:38',0,'',NULL,NULL,0,NULL,NULL,'current',NULL,0,NULL,NULL,0,'2019-04-24 09:29:38');
+INSERT INTO `demographic` VALUES (1,'','TEST','TEST','','','BC','','250-','','',NULL,'1999','06','15','9124580433','','',NULL,NULL,NULL,'AC','2019-04-24','2019-04-24','','English','',NULL,'F',NULL,NULL,NULL,'BC',NULL,'<rdohip></rdohip><rd></rd>',NULL,NULL,NULL,NULL,NULL,'','-1','Unknown',NULL,'999998','2019-04-24 09:29:37',NULL,'<fd>null</fd>');
+INSERT INTO `demographicArchive` VALUES (1,1,'','TEST','TEST','','','BC','','250-','','',NULL,'1999','06','15','9124580433','','',NULL,NULL,NULL,'AC','2019-04-24','2019-04-24','','English','',NULL,'F',NULL,NULL,NULL,'BC',NULL,'<rdohip></rdohip><rd></rd>',NULL,NULL,NULL,NULL,NULL,'','-1','Unknown',NULL,'999998','2019-04-24',NULL,'<fd>null</fd>');
+INSERT INTO `demographiccust` VALUES (1,'','','','','<unotes></unotes>');
+INSERT INTO `provider_recent_demographic_access` VALUES (999998,1,'2019-04-24 09:29:38');

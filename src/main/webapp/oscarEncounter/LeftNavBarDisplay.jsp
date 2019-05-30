@@ -45,6 +45,7 @@
 <%@page
 		import="oscar.util.DateUtils, java.io.IOException, java.util.ArrayList, java.util.Calendar, java.util.Date, java.util.regex.Matcher" %>
 <%@ page import="java.util.regex.Pattern" %>
+<%@ page import="java.net.URLEncoder" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}"
 	   scope="request"/>
@@ -154,7 +155,7 @@ else
 		String div = (String) request.getAttribute("navbarName");
 		div = div.trim();
 		int numItems = dao.numItems();
-		StringBuilder reloadURL = new StringBuilder(request.getParameter("reloadURL") + "&reloadURL=" + request.getParameter("reloadURL"));
+		StringBuilder reloadURL = new StringBuilder(request.getParameter("reloadURL") + "&reloadURL=" + URLEncoder.encode(request.getParameter("reloadURL")));
 		String strToDisplay = request.getParameter("numToDisplay");
 		int numToDisplay;
 		boolean expanded = false;

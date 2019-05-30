@@ -46,7 +46,6 @@ public class HnrDataValidationDaoTest extends DaoTestFixtures {
 
 	@Before
 	public void before() throws Exception {
-		this.beforeForInnoDB();
 		SchemaUtils.restoreTable("Facility","provider","demographic","HnrDataValidation");
 	}
 

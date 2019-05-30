@@ -945,9 +945,9 @@ OscarProperties props = OscarProperties.getInstance();
 					<div class="accordion-inner">
 						<ul>
 							<security:oscarSec roleName="<%=roleName$%>" objectName="_admin" rights="r" reverse="<%=false%>">
-								<li><a href="javascript:void(0);" class="xlink" rel="${ctx}/web/#!/faxConfig" >Fax Configuration</a></li>
+								<li><a href="javascript:void(0);" class="xlink" rel="${ctx}/web/faxConfiguration.jsp" >Fax Configuration</a></li>
 							</security:oscarSec>
-							<li><a href="javascript:void(0);" class="xlink" rel="${ctx}/web/#!/faxSendReceive" >Fax Sent/Received</a></li>
+							<li><a href="javascript:void(0);" class="xlink" rel="${ctx}/web/faxSendReceive.jsp" >Fax Sent/Received</a></li>
 						</ul>
 					</div>
 				</div>		
@@ -1084,7 +1084,7 @@ OscarProperties props = OscarProperties.getInstance();
 		                        %>		
 			
 					<!-- <li><a href="javascript:void(0);" class="xlink" rel="${ctx}/admin/updateDrugref.jsp" ><bean:message key="admin.admin.UpdateDrugref"/></a></li> -->	
-					<li><a href="javascript:void(0);" class="xlink" rel="${ctx}/web/#!/k2aConfig" ><bean:message key="admin.admin.Know2ActConfig"/></a></li>
+					<li><a href="javascript:void(0);" class="xlink" rel="${ctx}/web/Know2actConfiguration.jsp" ><bean:message key="admin.admin.Know2ActConfig"/></a></li>
 					<li><a  href='javascript:void(0);' class="xlink" rel="${ctx}/admin/integratorPushStatus.jsp"><bean:message key="admin.admin.integratorPush" /></a></li>
 					<li><a  href='javascript:void(0);' class="xlink" rel="${ctx}/admin/born.jsp"><bean:message key="admin.admin.born" /></a></li>
 

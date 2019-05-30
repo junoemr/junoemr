@@ -50,7 +50,7 @@ public class FileFactory
 	 */
 	public static GenericFile createDocumentFile(InputStream fileInputStream, String fileName) throws IOException, InterruptedException
 	{
-		return createNewFile(fileInputStream, fileName, GenericFile.DOCUMENT_BASE_DIR);
+		return createNewFormattedFile(fileInputStream, fileName, GenericFile.DOCUMENT_BASE_DIR);
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class FileFactory
 	 */
 	public static GenericFile createOutboundFaxFile(InputStream fileInputStream, String fileName) throws IOException, InterruptedException
 	{
-		return createNewFile(fileInputStream, fileName, GenericFile.OUTBOUND_FAX_DIR_PENDING);
+		return createNewFormattedFile(fileInputStream, fileName, GenericFile.OUTBOUND_FAX_DIR_PENDING);
 	}
 
 	/**
@@ -90,6 +90,18 @@ public class FileFactory
 		File file = File.createTempFile("juno", suffix);
 		logger.info("Created tempfile: " + file.getPath());
 		return writeOutputStream(outputStream, file);
+	}
+
+	/**
+	 * Write the input stream to a resource file
+	 * @param fileInputStream - input stream of the new file
+	 * @param fileName - name of the new file
+	 * @return the file
+	 * @throws IOException - if an error occurs
+	 */
+	public static GenericFile createResourceFile(InputStream fileInputStream, String fileName) throws IOException, InterruptedException
+	{
+		return createNewSanitizedFile(fileInputStream, fileName, GenericFile.RESOURCE_BASE_DIR);
 	}
 
 	/**
@@ -151,6 +163,34 @@ public class FileFactory
 	}
 
 	/**
+	 * load an existing resource file
+	 * @param fileName - name of the file to load
+	 * @return - the file
+	 */
+	public static GenericFile getResourceFile(String fileName) throws IOException
+	{
+		return getExistingFile(GenericFile.RESOURCE_BASE_DIR, fileName);
+	}
+
+	/**
+	 * overwrite a resource file
+	 * @param newFileContent the content to overwrite the file with
+	 * @param fileName the name of the file to overwrite
+	 * @return the overwriten file
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public static GenericFile overwriteResourceFile(InputStream newFileContent, String fileName) throws IOException, InterruptedException
+	{
+		return overwriteFileContents(getResourceFile(fileName), newFileContent);
+	}
+
+	public static boolean isResourceFileExist(String fileName)
+	{
+		return fileExists(GenericFile.RESOURCE_BASE_DIR, fileName);
+	}
+
+	/**
 	 * Copy the given file to a new file.
 	 * This will be placed in the tempfile location, and should be moved afterwards
 	 * @param fileToCopy - the file to be copied
@@ -187,15 +227,39 @@ public class FileFactory
 	}
 
 	/**
-	 * save and load a new file with the given name, folder, and input stream
-	 * @param fileInputStream - input stream of the new file
-	 * @param fileName - name of the file to be saved and opened
-	 * @return - the file, or null if no file exists with the given filename
+	 * creates a new file with the given name an content. NOTE a datatime string is prepended to the file name.
+	 * @param fileInputStream content to be placed in the file
+	 * @param fileName the file name to use for the file
+	 * @param folder the folder in which to place the file
+	 * @return
+	 * @throws IOException
+	 * @throws InterruptedException
 	 */
-	private static GenericFile createNewFile(InputStream fileInputStream, String fileName, String folder) throws IOException, InterruptedException
+	private static GenericFile createNewFormattedFile(InputStream fileInputStream, String fileName, String folder) throws IOException, InterruptedException
 	{
 		String formattedFileName = GenericFile.getFormattedFileName(fileName);
 
+		return createNewFile(fileInputStream, formattedFileName, folder);
+	}
+
+	/**
+	 * creates a new file with the given name an content
+	 * @param fileInputStream content to be placed in the file
+	 * @param fileName the file name to use for the file
+	 * @param folder the folder in which to place the file
+	 * @return
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	private static GenericFile createNewSanitizedFile(InputStream fileInputStream, String fileName, String folder) throws IOException, InterruptedException
+	{
+		String sanitizedFileName = GenericFile.getSanitizedFileName(fileName);
+
+		return createNewFile(fileInputStream, sanitizedFileName, folder);
+	}
+
+	private static GenericFile createNewFile(InputStream fileInputStream, String fileName, String folder) throws IOException, InterruptedException
+	{
 		File directory = new File(folder);
 		if(!directory.exists())
 		{
@@ -206,9 +270,10 @@ public class FileFactory
 			}
 		}
 
-		File file = new File(directory.getPath(), formattedFileName);
+		File file = new File(directory.getPath(), fileName);
 		return writeInputStream(fileInputStream, file, false);
 	}
+
 	private static GenericFile writeInputStream(InputStream fileInputStream, File file, boolean allowOverwrite) throws IOException, InterruptedException
 	{
 		// copy the stream to the file

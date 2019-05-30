@@ -43,7 +43,6 @@ public class FacilityDaoTest extends DaoTestFixtures {
 
 	@Before
 	public void before() throws Exception {
-		this.beforeForInnoDB();
 		SchemaUtils.restoreTable(true, "Facility");
 	}
 

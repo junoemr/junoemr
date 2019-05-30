@@ -373,7 +373,6 @@ try
 					
 					<!-- channel -->
 					<select id="channel">
-					<option value="http://resource.oscarmcmaster.org/oscarResource/OSCAR_search?query="><bean:message key="oscarEncounter.Index.oscarSearch" /></option>
 					<option value="http://www.google.com/search?q="><bean:message key="global.google" /></option>
 					<option value="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?SUBMIT=y&amp;CDM=Search&amp;DB=PubMed&amp;term="><bean:message key="global.pubmed" /></option>
 					<option value="http://search.nlm.nih.gov/medlineplus/query?DISAMBIGUATION=true&amp;FUNCTION=search&amp;SERVER2=server2&amp;SERVER1=server1&amp;PARAMETER="><bean:message key="global.medlineplus" /></option>
@@ -545,11 +544,10 @@ try
 
 		<div class="encounter_timer_container">
 			<div style="display: inline-block; position:relative;">
-				<div id="encounter_timer_background"></div>
-				<div id="encounter_timer" title="Paste timer data" onclick="encounterTimer.putEncounterTimeInNote()">00:00</div>
+				<input id="encounter_timer" title="Paste timer data" type="button" onclick="encounterTimer.putEncounterTimeInNote()" value="00:00"/>
 			</div>
-			<div id="encounter_timer_pause" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"><i class="fa fa-pause"></i></div>
-			<div id="encounter_timer_play" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')"><i class="fa fa-play"></i></div>
+			<input id="encounter_timer_pause" class="encounter_timer_control" type="button" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')" value="||"/>
+			<input id="encounter_timer_play" class="encounter_timer_control" type="button" onclick="encounterTimer.toggleEncounterTimer('#encounter_timer_pause', '#encounter_timer_play')" value="&gt;"/>
 		</div>
 		<%
 
