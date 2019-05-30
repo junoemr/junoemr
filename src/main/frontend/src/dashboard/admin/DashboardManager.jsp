@@ -55,7 +55,7 @@
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/library/bootstrap/3.0.0/js/bootstrap.min.js" ></script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/library/DataTables-1.10.12/media/js/dataTables.bootstrap.min.js" ></script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/library/DataTables-1.10.12/media/js/jquery.dataTables.min.js" ></script>
-	<script type="text/javascript" src="${ pageContext.request.contextPath }/web/dashboard/admin/dashboardManagerController.js"></script>
+	<script type="text/javascript" src="${ pageContext.request.contextPath }/dashboard/admin/dashboardManagerController.js"></script>
 
 </head>
 <body>

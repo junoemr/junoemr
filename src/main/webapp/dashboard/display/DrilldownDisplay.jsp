@@ -57,7 +57,7 @@
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/js/bootstrap-timepicker.min.js" ></script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/library/moment.js" ></script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/library/datetime-moment.js" ></script>
-	<script type="text/javascript" src="${ pageContext.request.contextPath }/web/dashboard/display/drilldownDisplayController.js" ></script>
+	<script type="text/javascript" src="${ pageContext.request.contextPath }/dashboard/display/drilldownDisplayController.js" ></script>
 </head>
 <body>
 
