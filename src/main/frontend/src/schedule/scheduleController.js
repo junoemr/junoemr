@@ -82,6 +82,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				value: '00:15:00'
 			},
 			{
+				label: '20 min intervals',
+				value: '00:20:00'
+			},
+			{
 				label: '30 min intervals',
 				value: '00:30:00'
 			}];

@@ -35,10 +35,8 @@ import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import oscar.util.ConversionUtils;
 
 import java.math.BigInteger;
-import java.sql.Time;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -87,46 +85,38 @@ public class ScheduleTemplateService
 	 * @param providerId The provider to get the schedule for
 	 * @return A list of CalendarEvent objects
 	 */
-	public List<CalendarEvent> getCalendarEvents(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, int slotLengthInMinutes)
+	public List<CalendarEvent> getCalendarEvents(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, int defaultSlotLengthInMin)
 	{
-		List<Object[]> results = scheduleTemplateDao.getRawScheduleSlots(providerId, date);
-
-		// Get schedule slots
-		RangeMap<LocalTime, ScheduleSlot> scheduleSlots = scheduleTemplateDao.findScheduleSlots(
-				date, providerId);
-
 		List<CalendarEvent> calendarEvents = new ArrayList<>();
 
-		for(LocalTime slotTime = startTime; slotTime.isBefore(endTime); slotTime = plusNoWrap(slotTime, slotLengthInMinutes))
+		// get the schedule slot length, or use the default
+		Integer scheduleSlotLength = scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date);
+		if(scheduleSlotLength == null)
 		{
-			LocalTime slotEndTime = plusNoWrap(slotTime, slotLengthInMinutes);
-			LocalDateTime startDateTime = LocalDateTime.of(date, slotTime);
+			scheduleSlotLength = defaultSlotLengthInMin;
+		}
 
+		// Get schedule slots
+		RangeMap<LocalTime, ScheduleSlot> scheduleSlots = scheduleTemplateDao.findScheduleSlots(date, providerId);
+
+		for(LocalTime slotTime = startTime; slotTime.isBefore(endTime); slotTime = plusNoWrap(slotTime, scheduleSlotLength))
+		{
+			LocalDateTime startDateTime = LocalDateTime.of(date, slotTime);
 			ScheduleSlot slot = scheduleSlots.get(slotTime);
 
 			/* add a fake event if there is no schedule slot at this time,
 			it is the no-appt slot marker, or the slot ends before the time period */
-			if(slot == null
-					|| NO_APPOINTMENT_CHARACTER.equals(slot.getCode())
-					|| slot.getAppointmentDateTime().toLocalTime().plusMinutes(slot.getDurationMinutes()).isBefore(slotEndTime))
+			if(slot == null || NO_APPOINTMENT_CHARACTER.equals(slot.getCode()))
 			{
-				calendarEvents.add(createFakeCalendarEvent(startDateTime, slotLengthInMinutes, providerId));
+				calendarEvents.add(createFakeCalendarEvent(startDateTime, scheduleSlotLength, scheduleSlotLength, providerId));
 			}
-
-		}
-
-		for(Object[] result : results)
-		{
-			String currentCode = (String)result[1];
-
-			if(!NO_APPOINTMENT_CHARACTER.equals(currentCode))
+			else
 			{
-				LocalDateTime startDateTime = ConversionUtils.getLocalDateTimeFromSqlDateAndTime(
-						(java.sql.Date) result[2],
-						(java.sql.Time) result[3]
-				);
-				// Add this row because it is the last
-				calendarEvents.add(createCalendarEvent(startDateTime, result, providerId));
+				if(!NO_APPOINTMENT_CHARACTER.equals(slot.getCode()))
+				{
+					// Add this row because it is the last
+					calendarEvents.add(createCalendarEvent(slot, scheduleSlotLength, providerId));
+				}
 			}
 		}
 		return calendarEvents;
@@ -144,57 +134,42 @@ public class ScheduleTemplateService
 		return outTime;
 	}
 
-	private CalendarEvent createFakeCalendarEvent(LocalDateTime startDateTime, int durationMin, int resourceId)
+	private CalendarEvent createFakeCalendarEvent(LocalDateTime startDateTime, int durationMin, int scheduleSlotLength, int resourceId)
 	{
-		Object[] fakeResult = {
-				null, //position
-				null, //code char
-				java.sql.Date.valueOf(startDateTime.toLocalDate()), //appt date
-				java.sql.Time.valueOf(startDateTime.toLocalTime()), //appt time
-				null, //code
-				BigInteger.valueOf(durationMin),  //duration
-				"No Schedule", //description
-				null, //colour
-				"N", //confirm
-				10 //booking limit
-		};
-		return createCalendarEvent(startDateTime, fakeResult, resourceId);
+		ScheduleSlot slot = new ScheduleSlot(
+				startDateTime,
+				null,
+				BigInteger.valueOf(durationMin).intValue(),
+				"No Schedule",
+				null,
+				"N",
+				10);
+
+		return createCalendarEvent(slot, scheduleSlotLength, resourceId);
 	}
 
-	private CalendarEvent createCalendarEvent(LocalDateTime startDateTime, Object[] result, int resourceId)
+	private CalendarEvent createCalendarEvent(ScheduleSlot slot, int scheduleSlotLength, int resourceId)
 	{
-		java.sql.Date appointmentDate = (java.sql.Date) result[2];
-		Time appointmentTime = (java.sql.Time) result[3];
-		String code = (String) result[1];
-		Integer durationMinutes = ((BigInteger) result[5]).intValue();
-		String description = (String) result[6];
-		String color = (String) result[7];
-
-		LocalDateTime appointmentDateTime = ConversionUtils.getLocalDateTimeFromSqlDateAndTime(
-			appointmentDate,
-			appointmentTime
-		);
-
 		// package up the event and add to the list
-		LocalDateTime endDateTime =
-			appointmentDateTime.plus(Duration.ofMinutes(durationMinutes));
+		LocalDateTime startDateTime = slot.getAppointmentDateTime();
+		LocalDateTime endDateTime = startDateTime.plus(Duration.ofMinutes(scheduleSlotLength));
 
 		AvailabilityType availabilityType = new AvailabilityType(
-			color,
-			description,
-			durationMinutes,
-			null
+			slot.getColor(),
+			slot.getDescription(),
+			slot.getDurationMinutes(),
+			slot.getCode()
 		);
 
 		return new CalendarEvent(
-			startDateTime, //.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-			endDateTime, //.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-			color,
-			CalendarEvent.RENDERING_BACKGROUND,
-			SCHEDULE_TEMPLATE_CLASSNAME,
-			resourceId,
-			code,
-			availabilityType,
-			null);
+				startDateTime,
+				endDateTime,
+				slot.getColor(),
+				CalendarEvent.RENDERING_BACKGROUND,
+				SCHEDULE_TEMPLATE_CLASSNAME,
+				resourceId,
+				slot.getCode(),
+				availabilityType,
+				null);
 	}
 }

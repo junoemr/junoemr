@@ -345,10 +345,8 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		// Loop through the events for this day
 		for(var i = 0; i < data.events.length; i++)
 		{
-			// filter events that should not be checked (background, wrong schedule, no template code)
-			if(data.events[i].rendering !== "background"
-				|| data.events[i].resourceId != $scope.schedule.uuid
-				|| !Juno.Common.Util.exists(data.events[i].scheduleTemplateCode))
+			// filter events that should not be checked (non-background, wrong schedule, etc.)
+			if(data.events[i].rendering !== "background" || data.events[i].resourceId != $scope.schedule.uuid)
 			{
 				continue;
 			}
@@ -362,7 +360,16 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			if(momentStart.isValid() && event.start.isValid() && event.end.isValid() &&
 				momentStart.isBefore(event.end) && momentStart.isSameOrAfter(event.start))
 			{
-				event.availabilityType = data.availabilityTypes[event.scheduleTemplateCode];
+				//TODO refactor availability type lists
+				var extendedAvailabilityType = data.availabilityTypes[event.scheduleTemplateCode];
+				if(Juno.Common.Util.exists(extendedAvailabilityType))
+				{
+					event.availabilityType = extendedAvailabilityType;
+				}
+				else
+				{
+					event.availabilityType.duration = event.availabilityType.preferredEventLengthMinutes;
+				}
 				activeEvents.push(event);
 			}
 		}

@@ -25,6 +25,18 @@
 
 package org.oscarehr.schedule.dao;
 
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeMap;
+import com.google.common.collect.TreeRangeMap;
+import org.oscarehr.common.NativeSql;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.schedule.dto.ScheduleSlot;
+import org.oscarehr.schedule.model.ScheduleTemplate;
+import org.oscarehr.util.MiscUtils;
+import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import javax.persistence.TemporalType;
 import java.math.BigInteger;
 import java.sql.Time;
 import java.time.Duration;
@@ -33,18 +45,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
-
-import javax.persistence.Query;
-import javax.persistence.TemporalType;
-
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeMap;
-import com.google.common.collect.TreeRangeMap;
-import org.oscarehr.common.NativeSql;
-import org.oscarehr.schedule.model.ScheduleTemplate;
-import org.oscarehr.schedule.dto.ScheduleSlot;
-import org.oscarehr.common.dao.AbstractDao;
-import org.springframework.stereotype.Repository;
 
 import static org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey.DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES;
 
@@ -139,6 +139,33 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		return query.getResultList();
 	}
 
+	public Integer getScheduleSlotLengthInMin(Integer providerNo, LocalDate date)
+	{
+		Integer result = null;
+		String sql = "SELECT " +
+				"CAST(((24*60)/LENGTH(st.timecode)) AS integer) AS slotLength\n" +
+				"FROM scheduledate sd " +
+				"JOIN scheduletemplate st ON (sd.hour = st.name AND (sd.provider_no = st.provider_no OR st.provider_no = :publicCode ))\n" +
+				"WHERE sd.status = 'A'\n" +
+				"AND sd.sdate = :scheduleDate\n" +
+				"AND sd.provider_no = :providerNo\n";
+
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("scheduleDate", java.sql.Date.valueOf(date), TemporalType.DATE);
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
+
+		List<BigInteger> results = query.getResultList();
+		if(!results.isEmpty())
+		{
+			result = results.get(0).intValue();
+			if(results.size() > 1)
+			{
+				MiscUtils.getLogger().warn("Multiple values found for provider schedule slot length");
+			}
+		}
+		return result;
+	}
 	public List<Object[]> getRawScheduleSlots(Integer providerNo, LocalDate date)
 	{
 		// This query is a bit hard to read.  The mess with all of the UNION ALLs is a way to make a
