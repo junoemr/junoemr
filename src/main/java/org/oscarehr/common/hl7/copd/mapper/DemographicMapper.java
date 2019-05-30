@@ -29,6 +29,7 @@ import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
@@ -105,6 +106,7 @@ public class DemographicMapper extends AbstractMapper
 		String firstName = messagePID.getPatientName(rep).getGivenName().getValue();
 		if (firstName == null)
 		{
+			MiscUtils.getLogger().warn("demographic has no first name! using: " + DEMO_NULL_NAME);
 			return 	DEMO_NULL_NAME;
 		}
 		return firstName;
@@ -114,6 +116,7 @@ public class DemographicMapper extends AbstractMapper
 		String lastName = messagePID.getPatientName(rep).getFamilyName().getSurname().getValue();
 		if (lastName == null)
 		{
+			MiscUtils.getLogger().warn("demographic has no last name! using: " + DEMO_NULL_NAME);
 			return DEMO_NULL_NAME;
 		}
 		return lastName;

@@ -121,7 +121,12 @@ public class AppointmentMapper extends AbstractMapper
 	public Date getAppointmentDate(int rep) throws HL7Exception
 	{
 		SCH sch = message.getPATIENT().getSCH(rep);
-		return ConversionUtils.fromDateString(sch.getSch11_AppointmentTimingQuantity(0).getStartDateTime().getTimeOfAnEvent().getValue(), "yyyyMMddHHmmss");
+		Date apptDate = ConversionUtils.fromDateString(sch.getSch11_AppointmentTimingQuantity(0).getStartDateTime().getTimeOfAnEvent().getValue(), "yyyyMMddHHmmss");
+		if (apptDate == null)
+		{// try alternate date format (wrong according to spec)
+			apptDate = ConversionUtils.fromDateString(sch.getSch11_AppointmentTimingQuantity(0).getStartDateTime().getTimeOfAnEvent().getValue(), "yyyyMMdd");
+		}
+		return apptDate;
 	}
 
 	public Date getAppointmentEnd(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception

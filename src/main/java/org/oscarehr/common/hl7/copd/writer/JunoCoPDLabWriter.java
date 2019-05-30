@@ -23,6 +23,7 @@
 package org.oscarehr.common.hl7.copd.writer;
 
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.v24.datatype.IS;
 import ca.uhn.hl7v2.model.v24.message.ORU_R01;
 import ca.uhn.hl7v2.model.v24.segment.NTE;
 import ca.uhn.hl7v2.model.v24.segment.OBR;
@@ -86,6 +87,12 @@ public class JunoCoPDLabWriter extends HL7LabWriter
 			{
 				OBX obx = oru_r01.getPATIENT_RESULT().getORDER_OBSERVATION(ObrIndex).getOBSERVATION(i).getOBX();
 				DeepCopy.copy(zpdZtrLab.getOBX(i), obx);
+
+				IS abnFlags = obx.getAbnormalFlags();
+				if ( abnFlags == null || abnFlags.isEmpty())
+				{
+					terser.set("/.ORDER_OBSERVATION(" + ObrIndex + ")/.OBSERVATION(" + i + ")/OBX-8", "N");
+				}
 			}
 
 			// copy observation notes info

@@ -30,13 +30,13 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.demographicImport.service.CoPDMessageStream;
 import org.oscarehr.demographicImport.service.CoPDPreProcessorService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import oscar.OscarProperties;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 public class CopdCommandLineImporter
 {
@@ -137,14 +137,13 @@ public class CopdCommandLineImporter
 				GenericFile copdFile = FileFactory.getExistingFile(file);
 				if(copdFile instanceof XMLFile)
 				{
-					String fileString = coPDPreProcessorService.getFileString(copdFile);
-					if(coPDPreProcessorService.looksLikeCoPDFormat(fileString))
+					if(coPDPreProcessorService.looksLikeCoPDFormat(copdFile))
 					{
 						logger.info("Import from file: " + copdFile.getName());
 
 						try
 						{
-							importFileString(fileString, copdDocumentLocation, importSource, skipMissingDocs);
+							importFileMessages(new CoPDMessageStream(copdFile), copdDocumentLocation, importSource, skipMissingDocs);
 							importCount++;
 							moveToCompleted(copdFile, copdDirectory);
 						}
@@ -204,13 +203,13 @@ public class CopdCommandLineImporter
 	}
 
 
-	private static void importFileString(String fileString, String documentDirectory, CoPDImportService.IMPORT_SOURCE importSource, boolean skipMissingDocs)
+	private static void importFileMessages(CoPDMessageStream messageStream, String documentDirectory, CoPDImportService.IMPORT_SOURCE importSource, boolean skipMissingDocs)
 			throws HL7Exception, IOException, InterruptedException
 	{
 		boolean hasFailure = false;
 		int failureCount = 0;
-		List<String> messageList = coPDPreProcessorService.separateMessages(fileString);
-		for(String message : messageList)
+		String message;
+		while (!(message = messageStream.getNextMessage()).isEmpty())
 		{
 			try
 			{
@@ -219,7 +218,7 @@ public class CopdCommandLineImporter
 			}
 			catch (Exception e)
 			{
-				logger.error("failed to import message: \n " + message.substring(0, Math.min(message.length(), 5000)) + "\n With error:", e);
+				logger.error("failed to import message: \n " + message + "\n With error:", e);
 				hasFailure = true;
 			}
 		}

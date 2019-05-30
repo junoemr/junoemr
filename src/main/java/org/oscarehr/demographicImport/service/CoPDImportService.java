@@ -90,6 +90,7 @@ import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -536,7 +537,15 @@ public class CoPDImportService
 				continue;
 			}
 			InputStream stream = new FileInputStream(documentFile.getFileObject());
-			documentService.uploadNewDemographicDocument(document, stream, demographic.getDemographicId());
+			try
+			{
+				documentService.uploadNewDemographicDocument(document, stream, demographic.getDemographicId());
+			}
+			catch (FileAlreadyExistsException e)
+			{
+				logger.warn("SKIPPING: File: " + document.getDocfilename() + " already exists in document directory! skipping.");
+				continue;
+			}
 			documentService.routeToProviderInbox(document.getDocumentNo(), true, provider.getId());
 		}
 	}
@@ -544,7 +553,7 @@ public class CoPDImportService
 	private void importAlerts(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		AlertMapper alertMapper = new AlertMapper(zpdZtrMessage, providerRep, importSource);
-		for(CaseManagementNote reminderNote : alertMapper.getReminderNoteList())
+		for(CaseManagementNote reminderNote : alertMapper.getReminderNoteList(importSource))
 		{
 			reminderNote.setProvider(provider);
 			reminderNote.setSigningProvider(provider);
@@ -605,21 +614,21 @@ public class CoPDImportService
 		}
 
 		HistoryNoteMapper historyNoteMapper = new HistoryNoteMapper(zpdZtrMessage, providerRep, importSource);
-		for(CaseManagementNote medHistNote : historyNoteMapper.getMedicalHistoryNoteList())
+		for(CaseManagementNote medHistNote : historyNoteMapper.getMedicalHistoryNoteList(importSource))
 		{
 			medHistNote.setProvider(provider);
 			medHistNote.setSigningProvider(provider);
 			medHistNote.setDemographic(demographic);
 			encounterNoteService.saveMedicalHistoryNote(medHistNote);
 		}
-		for(CaseManagementNote socHistNote : historyNoteMapper.getSocialHistoryNoteList())
+		for(CaseManagementNote socHistNote : historyNoteMapper.getSocialHistoryNoteList(importSource))
 		{
 			socHistNote.setProvider(provider);
 			socHistNote.setSigningProvider(provider);
 			socHistNote.setDemographic(demographic);
 			encounterNoteService.saveSocialHistoryNote(socHistNote);
 		}
-		for(CaseManagementNote famHistNote : historyNoteMapper.getFamilyHistoryNoteList())
+		for(CaseManagementNote famHistNote : historyNoteMapper.getFamilyHistoryNoteList(importSource))
 		{
 			famHistNote.setProvider(provider);
 			famHistNote.setSigningProvider(provider);

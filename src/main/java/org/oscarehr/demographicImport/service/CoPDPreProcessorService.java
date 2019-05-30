@@ -45,26 +45,28 @@ public class CoPDPreProcessorService
 	private final String HL7_TIMESTAMP_BEGINNING_OF_TIME = "19700101";
 	private static final Logger logger = MiscUtils.getLogger();
 
-	public String getFileString(GenericFile genericFile) throws IOException
+	public boolean looksLikeCoPDFormat(GenericFile genericFile) throws IOException
 	{
-		logger.info("Read import file");
+		// read first 100 lines to check file format
 		File file = genericFile.getFileObject();
 		InputStream is = new FileInputStream(file);
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
 		StringBuffer sb = new StringBuffer();
 		String line;
+		int lineCount = 0;
 		while((line = br.readLine()) != null)
 		{
+			if (lineCount > 100)
+			{
+				break;
+			}
 			sb.append(line);
+			lineCount++;
 		}
-		return sb.toString();
-	}
 
-	public boolean looksLikeCoPDFormat(String fileString)
-	{
 		//TODO make this more robust or whatever
-		return fileString.contains("<ZPD_ZTR");
+		return sb.toString().contains("<ZPD_ZTR");
 	}
 
 	/**
@@ -146,14 +148,36 @@ public class CoPDPreProcessorService
 	private String fixTimestamps(String message)
 	{
 		Function<String, String> callback = new Function<String,String>() {
+
+			private final Pattern timeStampPattern = Pattern.compile("(\\d{8})(\\d{2})(\\d{4})$");
+
 			@Override
 			public String apply(String timeStamp)
 			{
-				Pattern fiveZeroTs = Pattern.compile("00000");
-				Pattern zeroYearMonthDayTs = Pattern.compile("00000000");
-				if (fiveZeroTs.matcher(timeStamp).find() || zeroYearMonthDayTs.matcher(timeStamp).find())
+				Matcher timeStampMatcher = timeStampPattern.matcher(timeStamp);
+				if ("00000".equals(timeStamp) || "00000000".equals(timeStamp)
+						|| "00000060000".equals(timeStamp) || "00000060100".equals(timeStamp)
+						|| "00000113000".equals(timeStamp) || "9531121".equals(timeStamp)
+						|| "00000092000".equals(timeStamp) || "9310728".equals(timeStamp)
+						|| "9550612".equals(timeStamp) || "00000132000".equals(timeStamp)
+						|| "00000123000".equals(timeStamp))
 				{
 					return HL7_TIMESTAMP_BEGINNING_OF_TIME;
+				}
+				else if (timeStampMatcher.find())
+				{// look for timestamps with bad hour.
+					try
+					{
+						Integer hours = Integer.parseInt(timeStampMatcher.group(2));
+						if (hours > 23)
+						{// sub in fake hour
+							return timeStampMatcher.group(1) + "12" + timeStampMatcher.group(3);
+						}
+					}
+					catch (NumberFormatException e)
+					{
+						//nop
+					}
 				}
 				return timeStamp;
 			}

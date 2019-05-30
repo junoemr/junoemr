@@ -44,19 +44,25 @@ public class AlertMapper extends AbstractMapper
 		return provider.getZALReps();
 	}
 
-	public List<CaseManagementNote> getReminderNoteList() throws HL7Exception
+	public List<CaseManagementNote> getReminderNoteList(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		int numNotes = getNumAlerts();
 		List<CaseManagementNote> noteList = new ArrayList<>(numNotes);
-		for(int i = 0; i < numNotes; i++)
+		for (int i = 0; i < numNotes; i++)
 		{
 			CaseManagementNote note = getReminderNote(i);
-			if(note != null)
+			if (note != null && (!CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource) || !isNoteFilteredMediplan(note)))
 			{
 				noteList.add(note);
 			}
 		}
 		return noteList;
+	}
+
+	public boolean isNoteFilteredMediplan(CaseManagementNote note)
+	{
+		return (note.getNote().indexOf(HistoryNoteMapper.MEDIPLAN_FAMILY_HISTORY_ID) == 0 ||
+				note.getNote().indexOf(HistoryNoteMapper.MEDIPLAN_MEDICAL_NOTE_ID) == 0);
 	}
 
 	public CaseManagementNote getReminderNote(int rep) throws HL7Exception
