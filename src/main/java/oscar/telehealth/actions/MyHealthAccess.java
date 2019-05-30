@@ -62,6 +62,12 @@ public class MyHealthAccess extends Action
 			ClinicUserAccessTokenTo1 accessToken;
 			try
 			{
+				if(email == null || email.isEmpty() || password == null || password.isEmpty())
+				{
+					ActionRedirect loginAction = new ActionRedirect(mapping.findForward("login"));
+					loginAction.addParameter("demographicNo", demographicNo);
+					return loginAction;
+				}
 				accessToken = clinicService.getLoginToken(
 						clinicID, linkedUser.getMyhealthaccesID(), email, password);
 			} catch (BaseException e)
