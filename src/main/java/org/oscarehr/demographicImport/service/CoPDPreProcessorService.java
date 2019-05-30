@@ -111,6 +111,7 @@ public class CoPDPreProcessorService
 		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
 			message = fixTimestamps(message);
+			message = fixTimestampsAttachments(message);
 		}
 
 		return message;
@@ -160,7 +161,7 @@ public class CoPDPreProcessorService
 						|| "00000113000".equals(timeStamp) || "9531121".equals(timeStamp)
 						|| "00000092000".equals(timeStamp) || "9310728".equals(timeStamp)
 						|| "9550612".equals(timeStamp) || "00000132000".equals(timeStamp)
-						|| "00000123000".equals(timeStamp))
+						|| "00000123000".equals(timeStamp) || "00000124000".equals(timeStamp))
 				{
 					return HL7_TIMESTAMP_BEGINNING_OF_TIME;
 				}
@@ -184,6 +185,28 @@ public class CoPDPreProcessorService
 		};
 
 		return foreachTag(message, "TS.1", callback);
+	}
+
+	/**
+	 * fix timestamps in ZAT segments (attachments)
+	 * @param message the message to fix
+	 * @return the fixed message
+	 */
+	public String fixTimestampsAttachments(String message)
+	{
+		Function<String, String> callback = new Function<String,String>() {
+			@Override
+			public String apply(String timeStamp)
+			{
+				if (timeStamp.contains("00000"))
+				{
+					return HL7_TIMESTAMP_BEGINNING_OF_TIME;
+				}
+				return timeStamp;
+			}
+		};
+
+		return foreachTag(message, "ZAT.2", callback);
 	}
 
 	/**
