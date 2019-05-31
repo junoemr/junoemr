@@ -29,6 +29,7 @@ import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
@@ -51,7 +52,7 @@ public class DemographicMapper extends AbstractMapper
 
 	/* Methods for converting to oscar model */
 
-	public Demographic getDemographic() throws HL7Exception
+	public Demographic getDemographic(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		Demographic demographic = new Demographic();
 		demographic.setFirstName(getFirstName(0));
@@ -59,7 +60,7 @@ public class DemographicMapper extends AbstractMapper
 		demographic.setSex(getSex());
 		demographic.setDateOfBirth(getDOB());
 		demographic.setTitle(getTitle(0));
-		demographic.setHin(getPHN());
+		demographic.setHin(getPHN(importSource));
 		demographic.setHcType(getHCType());
 		demographic.setSin(getSIN());
 
@@ -193,9 +194,18 @@ public class DemographicMapper extends AbstractMapper
 		return StringUtils.trimToNull(StringUtils.trimToEmpty(areaCode) + StringUtils.trimToEmpty(phoneNumber));
 	}
 
-	public String getPHN() throws HL7Exception
+	public String getPHN(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		Integer rep = getPatientIdentifierRepByCode("PHN");
+		Integer rep = 0;
+		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{
+			rep = getPatientIdentifierRepByCode("ULI");
+		}
+		else
+		{
+			rep = getPatientIdentifierRepByCode("PHN");
+		}
+
 		if(rep != null)
 		{
 			return messagePID.getPid3_PatientIdentifierList(rep).getCx1_ID().getValue();

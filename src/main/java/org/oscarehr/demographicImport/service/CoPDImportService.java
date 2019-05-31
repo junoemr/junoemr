@@ -264,7 +264,7 @@ public class CoPDImportService
 			logger.info("Import Immunizations ...");
 			importPreventionData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Labs ...");
-			importLabData(zpdZtrMessage, i, assignedProvider, demographic);
+			importLabData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 			logger.info("Import Documents ...");
 			importDocumentData(zpdZtrMessage, i, assignedProvider, demographic, documentLocation, importSource, skipMissingDocs);
 			logger.info("Import Ticklers ...");
@@ -325,7 +325,7 @@ public class CoPDImportService
 	private Demographic importDemographicData(ZPD_ZTR zpdZtrMessage, IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		DemographicMapper demographicMapper = new DemographicMapper(zpdZtrMessage);
-		Demographic demographic = demographicMapper.getDemographic();
+		Demographic demographic = demographicMapper.getDemographic(importSource);
 		DemographicCust demographicCust = demographicMapper.getDemographicCust();
 		List<DemographicExt> demographicExtList = demographicMapper.getDemographicExtensions();
 
@@ -460,11 +460,11 @@ public class CoPDImportService
 		}
 	}
 
-	private void importLabData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception, IOException
+	private void importLabData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception, IOException
 	{
 		LabMapper labMapper = new LabMapper(zpdZtrMessage, providerRep);
 
-		for(String msg : labMapper.getLabList())
+		for(String msg : labMapper.getLabList(importSource))
 		{
 			MessageHandler parser = Factory.getHandler(JunoGenericLabHandler.LAB_TYPE_VALUE, msg);
 			// just in case
@@ -590,7 +590,7 @@ public class CoPDImportService
 		int numNotes = encounterNoteMapper.getNumEncounterNotes();
 		for(int i=0; i< numNotes; i++)
 		{
-			CaseManagementNote encounterNote = encounterNoteMapper.getEncounterNote(i);
+			CaseManagementNote encounterNote = encounterNoteMapper.getEncounterNote(i, importSource);
 			ProviderData signingProvider = encounterNoteMapper.getSigningProvider(i);
 			ProviderData noteProvider = provider;
 			if(signingProvider == null)

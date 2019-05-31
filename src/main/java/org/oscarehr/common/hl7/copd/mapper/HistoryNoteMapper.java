@@ -26,7 +26,6 @@ import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.common.hl7.copd.model.v24.segment.ZAL;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.model.CaseManagementNoteExt;
@@ -38,13 +37,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public class HistoryNoteMapper extends AbstractMapper
 {
 	//because mediplan sucks
-	public static final String MEDIPLAN_MEDICAL_NOTE_ID="MEDIPLAN SURGICAL HISTORY SECTION";
+	public static final String MEDIPLAN_MEDICAL_NOTE_ID_1="MEDIPLAN SURGICAL HISTORY SECTION";
+	public static final String MEDIPLAN_MEDICAL_NOTE_ID_2="MEDIPLAN DEVELOPMENTAL HISTORY SECTION";
 	public static final String MEDIPLAN_FAMILY_HISTORY_ID="MEDIPLAN FAMILY HISTORY SECTION";
+	public static final String MEDIPLAN_SOCIAL_HISTORY_ID="MEDIPLAN CARE PLAN SECTION";
 
 	private static final Logger logger = MiscUtils.getLogger();
 	private final Date oldestEncounterNoteDate; // used as a default for notes with no date info
@@ -89,7 +89,7 @@ public class HistoryNoteMapper extends AbstractMapper
 		String ZALText = provider.getZAL(rep).getZal5_alertTextSent().getValue();
 		if ( ZALText != null)
 		{
-			 return ZALText.indexOf(MEDIPLAN_MEDICAL_NOTE_ID) == 0;
+			 return ZALText.indexOf(MEDIPLAN_MEDICAL_NOTE_ID_1) == 0 || ZALText.indexOf(MEDIPLAN_MEDICAL_NOTE_ID_2) == 0;
 		}
 		return false;
 	}
@@ -106,7 +106,11 @@ public class HistoryNoteMapper extends AbstractMapper
 
 	private boolean isSocialHistoryNoteMediplan(int rep) throws HL7Exception
 	{
-		//TODO figure this out
+		String ZALText = provider.getZAL(rep).getZal5_alertTextSent().getValue();
+		if ( ZALText != null)
+		{
+			return ZALText.indexOf(MEDIPLAN_SOCIAL_HISTORY_ID) == 0;
+		}
 		return false;
 	}
 
@@ -123,17 +127,42 @@ public class HistoryNoteMapper extends AbstractMapper
 
 	public List<CaseManagementNote> getSocialHistoryNoteList(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		int numNotes = getNumSocialHistoryNotes();
-		List<CaseManagementNote> noteList = new ArrayList<>(numNotes);
-		for(int i=0; i< numNotes; i++)
+		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
-			CaseManagementNote note = getSocialHistoryNote(i);
-			if(note != null)
+			return getSocialHistoryNoteListMediplan();
+		}
+		else
+		{
+			int numNotes = getNumSocialHistoryNotes();
+			List<CaseManagementNote> noteList = new ArrayList<>(numNotes);
+			for (int i = 0; i < numNotes; i++)
 			{
-				noteList.add(note);
+				CaseManagementNote note = getSocialHistoryNote(i);
+				if (note != null)
+				{
+					noteList.add(note);
+				}
+			}
+			return noteList;
+		}
+	}
+
+	public List<CaseManagementNote> getSocialHistoryNoteListMediplan() throws HL7Exception
+	{
+		ArrayList<CaseManagementNote> outList = new ArrayList<>();
+		int numZALs = provider.getZALReps();
+		for (int i =0; i < numZALs; i ++)
+		{
+			if (isSocialHistoryNoteMediplan(i))
+			{
+				CaseManagementNote newNote = getSocialHistoryNoteMediplan(i);
+				if (newNote != null)
+				{
+					outList.add(newNote);
+				}
 			}
 		}
-		return noteList;
+		return outList;
 	}
 
 	public List<CaseManagementNote> getFamilyHistoryNoteList(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
@@ -287,6 +316,18 @@ public class HistoryNoteMapper extends AbstractMapper
 		return note;
 	}
 
+	public CaseManagementNote getSocialHistoryNoteMediplan(int rep) throws HL7Exception
+	{
+		CaseManagementNote note = new CaseManagementNote();
+
+		Date date = oldestEncounterNoteDate;
+		note.setObservationDate(date);
+		note.setUpdateDate(date);
+
+		note.setNote(getSocialHistNoteTextMeidplan(rep));
+		return note;
+	}
+
 	public CaseManagementNote getFamilyHistoryNote(int rep) throws HL7Exception
 	{
 		CaseManagementNote note = new CaseManagementNote();
@@ -392,7 +433,7 @@ public class HistoryNoteMapper extends AbstractMapper
 
 	public String getMedHistProcedureNameMediplan(int rep) throws HL7Exception
 	{
-		return StringUtils.trimToEmpty(provider.getZAL(rep).getZal5_alertTextSent().getValue());
+		return StringUtils.trimToEmpty(provider.getZAL(rep).getZal5_alertTextSent().getValue()).replace(" / ", "\n");
 	}
 
 	public String getMedHistResults(int rep) throws HL7Exception
@@ -470,7 +511,12 @@ public class HistoryNoteMapper extends AbstractMapper
 
 	public String getFamHistNoteTextMediplan(int rep) throws HL7Exception
 	{
-		return StringUtils.trimToEmpty(provider.getZAL(rep).getZal5_alertTextSent().getValue());
+		return StringUtils.trimToEmpty(provider.getZAL(rep).getZal5_alertTextSent().getValue()).replace(" / ", "\n");
+	}
+
+	public String getSocialHistNoteTextMeidplan(int rep) throws HL7Exception
+	{
+		return StringUtils.trimToEmpty(provider.getZAL(rep).getZal5_alertTextSent().getValue()).replace(" / ", "\n");
 	}
 
 	static

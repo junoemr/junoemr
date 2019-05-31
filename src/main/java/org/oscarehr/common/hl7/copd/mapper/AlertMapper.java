@@ -50,7 +50,7 @@ public class AlertMapper extends AbstractMapper
 		List<CaseManagementNote> noteList = new ArrayList<>(numNotes);
 		for (int i = 0; i < numNotes; i++)
 		{
-			CaseManagementNote note = getReminderNote(i);
+			CaseManagementNote note = getReminderNote(i, importSource);
 			if (note != null && (!CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource) || !isNoteFilteredMediplan(note)))
 			{
 				noteList.add(note);
@@ -62,10 +62,12 @@ public class AlertMapper extends AbstractMapper
 	public boolean isNoteFilteredMediplan(CaseManagementNote note)
 	{
 		return (note.getNote().indexOf(HistoryNoteMapper.MEDIPLAN_FAMILY_HISTORY_ID) == 0 ||
-				note.getNote().indexOf(HistoryNoteMapper.MEDIPLAN_MEDICAL_NOTE_ID) == 0);
+				note.getNote().indexOf(HistoryNoteMapper.MEDIPLAN_MEDICAL_NOTE_ID_1) == 0 ||
+				note.getNote().indexOf(HistoryNoteMapper.MEDIPLAN_MEDICAL_NOTE_ID_2) == 0 ||
+				note.getNote().indexOf(HistoryNoteMapper.MEDIPLAN_SOCIAL_HISTORY_ID) == 0);
 	}
 
-	public CaseManagementNote getReminderNote(int rep) throws HL7Exception
+	public CaseManagementNote getReminderNote(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		CaseManagementNote note = null;
 
@@ -77,7 +79,14 @@ public class AlertMapper extends AbstractMapper
 			Date date = getAlertDate(rep);
 			note.setObservationDate(date);
 			note.setUpdateDate(date);
-			note.setNote(noteText.replaceAll("~crlf~", "\n"));
+			if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+			{
+				note.setNote(noteText.replace(" / ", "\n"));
+			}
+			else
+			{
+				note.setNote(noteText.replaceAll("~crlf~", "\n"));
+			}
 		}
 		return note;
 	}

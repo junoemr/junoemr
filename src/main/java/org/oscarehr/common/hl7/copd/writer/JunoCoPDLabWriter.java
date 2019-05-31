@@ -36,6 +36,7 @@ import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_LAB;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.writer.HL7LabWriter;
+import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.util.MiscUtils;
 
 import java.io.IOException;
@@ -48,7 +49,8 @@ public class JunoCoPDLabWriter extends HL7LabWriter
 
 	private ORU_R01 oru_r01;
 
-	public JunoCoPDLabWriter(ZPD_ZTR message, String accessionNumber, String labDateString, List<ZPD_ZTR_LAB> zpdZtrLabList) throws IOException, HL7Exception
+	public JunoCoPDLabWriter(ZPD_ZTR message, String accessionNumber, String labDateString,
+							 List<ZPD_ZTR_LAB> zpdZtrLabList, CoPDImportService.IMPORT_SOURCE importSource) throws IOException, HL7Exception
 	{
 		super(new ORU_R01(), new PipeParser());
 		oru_r01 = (ORU_R01) this.message;
@@ -65,7 +67,7 @@ public class JunoCoPDLabWriter extends HL7LabWriter
 		//copy the CoPD incoming segment info to the newly created hl7 message segments
 		PID pid = oru_r01.getPATIENT_RESULT().getPATIENT().getPID();
 		DeepCopy.copy(message.getPATIENT().getPID(), pid);
-		terser.set("/.PID-2", demographicMapper.getPHN());
+		terser.set("/.PID-2", demographicMapper.getPHN(importSource));
 
 		if(accessionNumber == null)
 		{
