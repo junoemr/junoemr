@@ -29,6 +29,8 @@ import org.oscarehr.util.MiscUtils;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SQLReportHelper
 {
@@ -95,6 +97,45 @@ public class SQLReportHelper
 			}
 		}
 		return queryString;
+	}
+
+	//TODO unit test me
+	public static String applyEnforcedLimit(String unlimitedSql, Integer maxLimit)
+	{
+		String maxLimitStr = "LIMIT " + maxLimit;
+		String limitedSql;
+
+		Pattern messagePattern = Pattern.compile("LIMIT\\s+(\\d+)\\s*;?\\s*$", Pattern.CASE_INSENSITIVE);
+		Matcher messagePatternMatcher = messagePattern.matcher(unlimitedSql);
+
+		/* if a limit is found, check that it does not exceed the enforced maximum.
+		 * if it does, replace the limit statement with the max */
+		if(messagePatternMatcher.find())
+		{
+			StringBuffer sb = new StringBuffer(unlimitedSql.length());
+
+			String limitNoStr = messagePatternMatcher.group(1);
+			Integer existingLimit = Integer.parseInt(limitNoStr);
+
+			if(existingLimit > maxLimit)
+			{
+				messagePatternMatcher.appendReplacement(sb, maxLimitStr);
+				messagePatternMatcher.appendTail(sb);
+				limitedSql = sb.toString();
+			}
+			else
+			{
+				limitedSql = unlimitedSql;
+			}
+		}
+		else // append a limit
+		{
+			limitedSql = unlimitedSql + " " + maxLimitStr;
+		}
+
+		logger.info("Limited sql query string:\n" + limitedSql);
+
+		return limitedSql;
 	}
 
 	private static boolean isValidTable(String tableName)

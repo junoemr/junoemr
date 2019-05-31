@@ -55,6 +55,8 @@ public class RptByExampleAction extends Action
 {
 	private static final OscarProperties properties = OscarProperties.getInstance();
 	private static final Long maxRows = Long.parseLong(properties.getProperty("rpt_by_example.max_rows"));
+	private static final Integer maxResults = Integer.parseInt(properties.getProperty("rpt_by_example.max_results"));
+	private static final Boolean enforceQueryRestrictions = properties.isPropertyActive("rpt_by_example.enforce_restrictions");
 	private static final Logger logger = MiscUtils.getLogger();
 
 	private ReportByExamplesDao rptByExampleDao = SpringUtils.getBean(ReportByExamplesDao.class);
@@ -83,16 +85,22 @@ public class RptByExampleAction extends Action
 			{
 				logger.info("User Query: " + userSql);
 
+				boolean allowRun = true;
 				List<Explain> explainResultList = null;
-				boolean allowRun = SQLReportHelper.canSkipExplainCheck(preparedUserSql);
-				if(allowRun)
+
+				if(enforceQueryRestrictions)
 				{
-					preparedUserSql = SQLReportHelper.getExplainSkippableQuery(preparedUserSql);
-				}
-				else
-				{
-					explainResultList = rptByExampleDao.getExplainResultList(preparedUserSql);
-					allowRun = SQLReportHelper.allowQueryRun(explainResultList, maxRows);
+					allowRun = SQLReportHelper.canSkipExplainCheck(preparedUserSql);
+					if(allowRun)
+					{
+						preparedUserSql = SQLReportHelper.getExplainSkippableQuery(preparedUserSql);
+					}
+					else
+					{
+						preparedUserSql = SQLReportHelper.applyEnforcedLimit(preparedUserSql, maxResults);
+						explainResultList = rptByExampleDao.getExplainResultList(preparedUserSql);
+						allowRun = SQLReportHelper.allowQueryRun(explainResultList, maxRows);
+					}
 				}
 
 				write2Database(userSql, providerNo);

@@ -59,6 +59,8 @@ public class SQLReporter implements Reporter
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarProperties properties = OscarProperties.getInstance();
 	private static final Long maxRows = Long.parseLong(properties.getProperty("rpt_by_template.max_rows"));
+	private static final Integer maxResults = Integer.parseInt(properties.getProperty("rpt_by_template.max_results"));
+	private static final Boolean enforceQueryRestrictions = properties.isPropertyActive("rpt_by_template.enforce_restrictions");
 
 	private static ReportByTemplateService reportByTemplateService = SpringUtils.getBean(ReportByTemplateService.class);
 	private static LogReportByTemplateDao logReportByTemplateDao = SpringUtils.getBean(LogReportByTemplateDao.class);
@@ -99,8 +101,9 @@ public class SQLReporter implements Reporter
 				request.setAttribute("templateid", templateIdStr);
 				return false;
 			}
+
 			// admin verified reports bypass the maximum row limitations
-			if(!curReport.isSuperAdminVerified())
+			if(enforceQueryRestrictions && !curReport.isSuperAdminVerified())
 			{
 				List<Explain> explainResultList = null;
 				boolean allowRun = SQLReportHelper.canSkipExplainCheck(nativeSQL);
@@ -110,6 +113,7 @@ public class SQLReporter implements Reporter
 				}
 				else
 				{
+					nativeSQL = SQLReportHelper.applyEnforcedLimit(nativeSQL, maxResults);
 					explainResultList = rptTemplatesDao.getExplainResultList(nativeSQL);
 					allowRun = SQLReportHelper.allowQueryRun(explainResultList, maxRows);
 				}
