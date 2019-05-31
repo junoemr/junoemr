@@ -513,7 +513,6 @@ public class CoPDImportService
 			try
 			{
 				documentFile = FileFactory.getExistingFile(documentLocation, document.getDocfilename());
-
 			}
 			catch(IOException e)
 			{
@@ -539,7 +538,7 @@ public class CoPDImportService
 			InputStream stream = new FileInputStream(documentFile.getFileObject());
 			try
 			{
-				documentService.uploadNewDemographicDocument(document, stream, demographic.getDemographicId());
+				documentService.uploadNewDemographicDocument(document, stream, demographic.getDemographicId(), true);
 			}
 			catch (FileAlreadyExistsException e)
 			{
