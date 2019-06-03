@@ -82,6 +82,10 @@ public class JunoCoPDLabWriter extends HL7LabWriter
 			OBR obr = oru_r01.getPATIENT_RESULT().getORDER_OBSERVATION(ObrIndex).getOBR();
 			DeepCopy.copy(zpdZtrLab.getOBR(), obr);
 			terser.set("/.ORDER_OBSERVATION("+ObrIndex+")/OBR-1", String.valueOf(ObrIndex+1)); // force set the SetId
+			if (obr.getObr4_UniversalServiceIdentifier().getCe2_Text().getValue().isEmpty())
+			{
+				terser.set("/.ORDER_OBSERVATION("+ObrIndex+")/OBR-4-2", "Imported lab");
+			}
 
 			// copy observation info
 			int obxReps = zpdZtrLab.getOBXReps();
