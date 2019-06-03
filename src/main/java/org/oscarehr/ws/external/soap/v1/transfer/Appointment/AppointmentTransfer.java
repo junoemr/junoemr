@@ -23,7 +23,7 @@
  */
 
 
-package org.oscarehr.ws.external.soap.v1.transfer;
+package org.oscarehr.ws.external.soap.v1.transfer.Appointment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -260,7 +260,8 @@ public final class AppointmentTransfer {
 
 		BeanUtils.copyProperties(this, appointment, ignored.toArray(new String[0]));
 
-		if (appointmentStartDateTime != null) {
+		if (appointmentStartDateTime != null)
+		{
 			appointment.setAppointmentDate(appointmentStartDateTime.getTime());
 			appointment.setStartTime(appointmentStartDateTime.getTime());
 		}
