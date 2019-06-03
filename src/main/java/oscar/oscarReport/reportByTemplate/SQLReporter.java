@@ -140,17 +140,9 @@ public class SQLReporter implements Reporter
 			updateLog(logEntry);
 		}
 		// since users can write custom queries this error is expected and should not generate an error in the log
-		catch(ReportByTemplateException e)
+		catch(ReportByTemplateException | SQLException e)
 		{
 			logger.warn("An Exception occurred while generating a report by template (from user defined query): " + e.getMessage());
-		}
-		catch(SQLException e)
-		{
-			logger.warn("An SQL Exception occurred while generating a report by template (from user defined query): " + e.getMessage());
-		}
-		catch(PersistenceException e)
-		{
-			logger.warn("An SQL Exception occurred while generating a report by template (from user defined query)", e);
 		}
 		catch(Exception sqe)
 		{
@@ -177,7 +169,7 @@ public class SQLReporter implements Reporter
 			logReportByTemplate.setDatetimeStart(new Date());
 			logReportByTemplateDao.persist(logReportByTemplate);
 		}
-		catch(Exception e)
+		catch(PersistenceException e)
 		{
 			logger.error("Failed to persist initial ReportByTemplate Log entry.", e);
 		}
@@ -191,7 +183,7 @@ public class SQLReporter implements Reporter
 			logReportByTemplate.setDatetimeEnd(new Date());
 			logReportByTemplateDao.merge(logReportByTemplate);
 		}
-		catch(Exception e)
+		catch(PersistenceException e)
 		{
 			logger.error("Failed to update ReportByTemplate Log entry.", e);
 		}

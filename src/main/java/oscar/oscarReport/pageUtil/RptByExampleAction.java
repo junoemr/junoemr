@@ -133,12 +133,6 @@ public class RptByExampleAction extends Action
 			logger.warn("Query Attempt: " + userSql);
 			request.setAttribute("errorMessage", "Invalid SQL");
 		}
-		catch(PersistenceException e)
-		{
-			logger.warn("Report By Example Error: " + e.getMessage());
-			logger.warn("Query Attempt: " + userSql);
-			request.setAttribute("errorMessage", "Failed to run query");
-		}
 		catch(Exception e)
 		{
 			logger.error("Report By Example Unknown Error", e);
@@ -150,13 +144,20 @@ public class RptByExampleAction extends Action
 
 	private void write2Database(String query, String providerNo)
 	{
-		if(query != null && query.compareTo("") != 0)
+		try
 		{
-			ReportByExamples r = new ReportByExamples();
-			r.setProviderNo(providerNo);
-			r.setQuery(query);
-			r.setDate(new Date());
-			dao.persist(r);
+			if(query != null && query.compareTo("") != 0)
+			{
+				ReportByExamples r = new ReportByExamples();
+				r.setProviderNo(providerNo);
+				r.setQuery(query);
+				r.setDate(new Date());
+				dao.persist(r);
+			}
+		}
+		catch(PersistenceException e)
+		{
+			logger.error("Failed to update ReportByExample Log entry.", e);
 		}
 	}
 }
