@@ -99,42 +99,60 @@ public class SQLReportHelper
 		return queryString;
 	}
 
-	//TODO unit test me
+	/** if a limit is found, check that it does not exceed the enforced maximum.
+	 * if it does, replace the limit statement with the max
+	 */
 	public static String applyEnforcedLimit(String unlimitedSql, Integer maxLimit)
 	{
-		String maxLimitStr = "LIMIT " + maxLimit;
+		String maxLimitStr = " LIMIT " + maxLimit;
 		String limitedSql;
 
-		Pattern messagePattern = Pattern.compile("LIMIT\\s+(\\d+)\\s*;?\\s*$", Pattern.CASE_INSENSITIVE);
-		Matcher messagePatternMatcher = messagePattern.matcher(unlimitedSql);
+		Pattern limitPattern = Pattern.compile("(\\s+LIMIT\\s+(\\d+))?((,|\\s+OFFSET\\s)\\s*(\\d+))?\\s*;?\\s*$", Pattern.CASE_INSENSITIVE);
+		Matcher patternMatcher = limitPattern.matcher(unlimitedSql);
 
-		/* if a limit is found, check that it does not exceed the enforced maximum.
-		 * if it does, replace the limit statement with the max */
-		if(messagePatternMatcher.find())
+		if(patternMatcher.find())
 		{
 			StringBuffer sb = new StringBuffer(unlimitedSql.length());
 
-			String limitNoStr = messagePatternMatcher.group(1);
-			Integer existingLimit = Integer.parseInt(limitNoStr);
+			String limitStr = patternMatcher.group(1);
+			String offsetStr = patternMatcher.group(3);
 
-			if(existingLimit > maxLimit)
+			// a limit is already specified.
+			if(limitStr != null)
 			{
-				messagePatternMatcher.appendReplacement(sb, maxLimitStr);
-				messagePatternMatcher.appendTail(sb);
+				String limitNoStr = patternMatcher.group(2);
+				Integer existingLimit = Integer.parseInt(limitNoStr);
+
+				if(existingLimit > maxLimit) // existing limit exceeds max, replace it
+				{
+					if(offsetStr != null)
+					{
+						maxLimitStr += offsetStr;
+					}
+					patternMatcher.appendReplacement(sb, maxLimitStr);
+					patternMatcher.appendTail(sb);
+					limitedSql = sb.toString();
+				}
+				else // current limit is OK, no modification needed
+				{
+					limitedSql = unlimitedSql;
+				}
+			}
+			else // no limit, we will add one
+			{
+				if(offsetStr != null)
+				{
+					maxLimitStr += offsetStr;
+				}
+				patternMatcher.appendReplacement(sb, maxLimitStr);
+				patternMatcher.appendTail(sb);
 				limitedSql = sb.toString();
 			}
-			else
-			{
-				limitedSql = unlimitedSql;
-			}
 		}
-		else // append a limit
+		else
 		{
-			limitedSql = unlimitedSql + " " + maxLimitStr;
+			throw new RuntimeException("Unknown SQL syntax. unable to enforce required limit");
 		}
-
-		logger.info("Limited sql query string:\n" + limitedSql);
-
 		return limitedSql;
 	}
 
