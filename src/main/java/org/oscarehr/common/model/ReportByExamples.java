@@ -27,6 +27,7 @@ package org.oscarehr.common.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -49,6 +50,11 @@ public class ReportByExamples extends AbstractModel<Integer> {
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date date;
+
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="datetime_end")
+	private Date datetimeEnd;
 
 	public Integer getId() {
     	return id;
@@ -82,6 +88,13 @@ public class ReportByExamples extends AbstractModel<Integer> {
     	this.date = date;
     }
 
+	public Date getDatetimeEnd()
+	{
+		return datetimeEnd;
+	}
 
-
+	public void setDatetimeEnd(Date datetimeEnd)
+	{
+		this.datetimeEnd = datetimeEnd;
+	}
 }

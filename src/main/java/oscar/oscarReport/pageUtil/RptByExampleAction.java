@@ -32,6 +32,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.hibernate.exception.SQLGrammarException;
 import org.oscarehr.common.dao.ReportByExamplesDao;
+import org.oscarehr.common.dao.ReportByExamplesExplainDao;
 import org.oscarehr.common.model.Explain;
 import org.oscarehr.common.model.ReportByExamples;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -53,15 +54,17 @@ import java.util.List;
 
 public class RptByExampleAction extends Action
 {
+	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarProperties properties = OscarProperties.getInstance();
+
+	private static final Boolean enableQueryRestrictions = properties.isPropertyActive("rpt_by_example.enable_restrictions");
+	private static final Boolean enforceQueryRestrictions = properties.isPropertyActive("rpt_by_example.enforce_restrictions");
 	private static final Long maxRows = Long.parseLong(properties.getProperty("rpt_by_example.max_rows"));
 	private static final Integer maxResults = Integer.parseInt(properties.getProperty("rpt_by_example.max_results"));
-	private static final Boolean enforceQueryRestrictions = properties.isPropertyActive("rpt_by_example.enforce_restrictions");
-	private static final Logger logger = MiscUtils.getLogger();
 
-	private ReportByExamplesDao rptByExampleDao = SpringUtils.getBean(ReportByExamplesDao.class);
-	private ReportByExamplesDao dao = SpringUtils.getBean(ReportByExamplesDao.class);
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private ReportByExamplesDao reportByExamplesDao = SpringUtils.getBean(ReportByExamplesDao.class);
+	private ReportByExamplesExplainDao reportByExamplesExplainDao = SpringUtils.getBean(ReportByExamplesExplainDao.class);
 
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
@@ -88,26 +91,34 @@ public class RptByExampleAction extends Action
 				boolean allowRun = true;
 				List<Explain> explainResultList = null;
 
-				if(enforceQueryRestrictions)
+				ReportByExamples logEntry = saveInitialLog(providerNo, userSql);
+
+				if(enableQueryRestrictions)
 				{
-					allowRun = SQLReportHelper.canSkipExplainCheck(preparedUserSql);
-					if(allowRun)
+					//check for special exempt cases
+					String explainExemptSql = SQLReportHelper.getExplainSkippableQuery(preparedUserSql);
+					if(explainExemptSql != null)
 					{
-						preparedUserSql = SQLReportHelper.getExplainSkippableQuery(preparedUserSql);
+						preparedUserSql = explainExemptSql;
 					}
 					else
 					{
-						preparedUserSql = SQLReportHelper.applyEnforcedLimit(preparedUserSql, maxResults);
-						explainResultList = rptByExampleDao.getExplainResultList(preparedUserSql);
-						allowRun = SQLReportHelper.allowQueryRun(explainResultList, maxRows);
+						explainResultList = reportByExamplesDao.getExplainResultList(preparedUserSql);
+						saveExplainResults(logEntry, explainResultList);
+
+						if(enforceQueryRestrictions)
+						{
+							preparedUserSql = SQLReportHelper.applyEnforcedLimit(preparedUserSql, maxResults);
+							allowRun = SQLReportHelper.allowQueryRun(explainResultList, maxRows);
+						}
 					}
 				}
 
-				write2Database(userSql, providerNo);
 				if(allowRun)
 				{
 					RptByExampleData exampleData = new RptByExampleData();
 					String results = exampleData.exampleReportGenerate(preparedUserSql, properties);
+					updateLog(logEntry);
 
 					request.setAttribute("results", results);
 					request.setAttribute("resultText", results);
@@ -142,22 +153,45 @@ public class RptByExampleAction extends Action
 		return mapping.findForward("failure");
 	}
 
-	private void write2Database(String query, String providerNo)
+	private void saveExplainResults(ReportByExamples logEntry, List<Explain> explainResultList)
 	{
 		try
 		{
-			if(query != null && query.compareTo("") != 0)
-			{
-				ReportByExamples r = new ReportByExamples();
-				r.setProviderNo(providerNo);
-				r.setQuery(query);
-				r.setDate(new Date());
-				dao.persist(r);
-			}
+			reportByExamplesExplainDao.persistAll(logEntry, explainResultList);
 		}
 		catch(PersistenceException e)
 		{
-			logger.error("Failed to update ReportByExample Log entry.", e);
+			logger.error("Failed to persist ReportByExample explain results.", e);
+		}
+
+	}
+	private ReportByExamples saveInitialLog(String providerNo, String querySql)
+	{
+		ReportByExamples reportByExamples = new ReportByExamples();
+		try
+		{
+			reportByExamples.setProviderNo(providerNo);
+			reportByExamples.setQuery(querySql);
+			reportByExamples.setDate(new Date());
+			reportByExamplesDao.persist(reportByExamples);
+		}
+		catch(PersistenceException e)
+		{
+			logger.error("Failed to persist initial ReportByExample entry.", e);
+		}
+
+		return reportByExamples;
+	}
+	private void updateLog(ReportByExamples reportByExamples)
+	{
+		try
+		{
+			reportByExamples.setDatetimeEnd(new Date());
+			reportByExamplesDao.merge(reportByExamples);
+		}
+		catch(PersistenceException e)
+		{
+			logger.error("Failed to update ReportByExample entry.", e);
 		}
 	}
 }

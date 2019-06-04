@@ -28,6 +28,7 @@ import com.Ostermiller.util.CSVPrinter;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Explain;
 import org.oscarehr.log.dao.LogReportByTemplateDao;
+import org.oscarehr.log.dao.LogReportByTemplateExplainDao;
 import org.oscarehr.log.model.LogReportByTemplate;
 import org.oscarehr.report.SQLReportHelper;
 import org.oscarehr.report.reportByTemplate.dao.ReportTemplatesDao;
@@ -60,10 +61,12 @@ public class SQLReporter implements Reporter
 	private static final OscarProperties properties = OscarProperties.getInstance();
 	private static final Long maxRows = Long.parseLong(properties.getProperty("rpt_by_template.max_rows"));
 	private static final Integer maxResults = Integer.parseInt(properties.getProperty("rpt_by_template.max_results"));
+	private static final Boolean enableQueryRestrictions = properties.isPropertyActive("rpt_by_template.enable_restrictions");
 	private static final Boolean enforceQueryRestrictions = properties.isPropertyActive("rpt_by_template.enforce_restrictions");
 
 	private static ReportByTemplateService reportByTemplateService = SpringUtils.getBean(ReportByTemplateService.class);
 	private static LogReportByTemplateDao logReportByTemplateDao = SpringUtils.getBean(LogReportByTemplateDao.class);
+	private static LogReportByTemplateExplainDao logReportByTemplateExplainDao = SpringUtils.getBean(LogReportByTemplateExplainDao.class);
 	private static ReportTemplatesDao rptTemplatesDao = SpringUtils.getBean(ReportTemplatesDao.class);
 
 	/**
@@ -102,32 +105,36 @@ public class SQLReporter implements Reporter
 				return false;
 			}
 
-			// admin verified reports bypass the maximum row limitations
-			if(enforceQueryRestrictions && !curReport.isSuperAdminVerified())
+			LogReportByTemplate logEntry = saveInitialLog(templateId, providerNo, nativeSQL);
+			if(enableQueryRestrictions)
 			{
-				List<Explain> explainResultList = null;
-				boolean allowRun = SQLReportHelper.canSkipExplainCheck(nativeSQL);
-				if(allowRun)
+				//check for special exempt cases
+				String explainExemptSql = SQLReportHelper.getExplainSkippableQuery(nativeSQL);
+				if(explainExemptSql != null)
 				{
-					nativeSQL = SQLReportHelper.getExplainSkippableQuery(nativeSQL);
+					nativeSQL = explainExemptSql;
 				}
 				else
 				{
-					nativeSQL = SQLReportHelper.applyEnforcedLimit(nativeSQL, maxResults);
-					explainResultList = rptTemplatesDao.getExplainResultList(nativeSQL);
-					allowRun = SQLReportHelper.allowQueryRun(explainResultList, maxRows);
-				}
-				if(!allowRun)
-				{
-					logger.info("User Template Query: " + nativeSQL);
-					request.setAttribute("errormsg", "Error: The report examines more than the maximum " + maxRows + " rows");
-					request.setAttribute("explainResults", explainResultList);
-					request.setAttribute("templateid", templateIdStr);
-					return false;
+					List<Explain> explainResultList = rptTemplatesDao.getExplainResultList(nativeSQL);
+					saveExplainResults(logEntry, explainResultList);
+
+					// admin verified reports bypass the maximum row limitations
+					if(enforceQueryRestrictions && !curReport.isSuperAdminVerified())
+					{
+						nativeSQL = SQLReportHelper.applyEnforcedLimit(nativeSQL, maxResults);
+						boolean allowRun = SQLReportHelper.allowQueryRun(explainResultList, maxRows);
+
+						if(!allowRun)
+						{
+							request.setAttribute("errormsg", "Error: The report examines more than the maximum " + maxRows + " rows");
+							request.setAttribute("explainResults", explainResultList);
+							request.setAttribute("templateid", templateIdStr);
+							return false;
+						}
+					}
 				}
 			}
-
-			LogReportByTemplate logEntry = saveInitialLog(templateId, providerNo, nativeSQL);
 
 			//TODO use the entityManager sql equivalent. can't get the column headers until spring upgrade to 2.0 or higher
 			ResultSet rs = DBHandler.GetSQL(nativeSQL);
@@ -158,6 +165,18 @@ public class SQLReporter implements Reporter
 		return true;
 	}
 
+	private void saveExplainResults(LogReportByTemplate logEntry, List<Explain> explainResultList)
+	{
+		try
+		{
+			logReportByTemplateExplainDao.persistAll(logEntry, explainResultList);
+		}
+		catch(PersistenceException e)
+		{
+			logger.error("Failed to persist ReportByExample explain results.", e);
+		}
+
+	}
 	private LogReportByTemplate saveInitialLog(Integer templateId, String providerNo, String querySql)
 	{
 		LogReportByTemplate logReportByTemplate = new LogReportByTemplate();

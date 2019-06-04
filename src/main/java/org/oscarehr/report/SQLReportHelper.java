@@ -64,10 +64,6 @@ public class SQLReportHelper
 	 * @param sql - the query to check
 	 * @return - true if the explain can be skipped, false otherwise
 	 */
-	public static boolean canSkipExplainCheck(String sql)
-	{
-		return getExplainSkippableQuery(sql) != null;
-	}
 	public static String getExplainSkippableQuery(String sql)
 	{
 		String sqlTrimmed = sql.trim().replaceAll(";", "");
@@ -95,6 +91,10 @@ public class SQLReportHelper
 			{
 				queryString = "SHOW COLUMNS FROM " + queryWords[3];
 			}
+		}
+		else if(sqlTrimmedUpper.startsWith("EXPLAIN"))
+		{
+			queryString = sqlTrimmed; // has no semi-colons so you can't run 2 queries
 		}
 		return queryString;
 	}
