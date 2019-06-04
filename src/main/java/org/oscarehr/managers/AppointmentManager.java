@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.appointment.model.AppointmentStatusList;
 import org.oscarehr.common.dao.AppointmentArchiveDao;
 import org.oscarehr.appointment.dao.AppointmentStatusDao;
 import org.oscarehr.common.dao.LookupListDao;
@@ -40,9 +41,11 @@ import org.oscarehr.common.model.LookupList;
 import org.oscarehr.common.model.LookupListItem;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.TransactionSystemException;
 import oscar.log.LogAction;
 
 @Service
@@ -137,34 +140,69 @@ public class AppointmentManager {
 
 	/**
 	 * Returns appointment for display.
-	 * 
+	 *
 	 * @param loggedInInfo
 	 * @param appointment - appointment data
 	 */
-	public void addAppointment(LoggedInInfo loggedInInfo, Appointment appointment) {
+	public Appointment addAppointment(LoggedInInfo loggedInInfo, Appointment appointment) {
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null)) {
 			throw new RuntimeException("Access Denied");
 		}
-		
+
+		// Set automatic information
+		appointment.setCreator(loggedInInfo.getLoggedInProviderNo());
+		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
+		appointment.setCreateDateTime(new Date());
+		appointment.setUpdateDateTime(new Date());
+		appointment.setReasonCode(Appointment.DEFAULT_REASON_CODE);
+
+		// Subtract a minute
+
 		appointmentDao.persist(appointment);
 
 		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.saveAppointment", "id=" + appointment.getId());
+
+		return appointment;
 	}
 
-	public void updateAppointment(LoggedInInfo loggedInInfo, Appointment appointment) {
+	public Appointment updateAppointment(LoggedInInfo loggedInInfo, Appointment appointment) throws Throwable {
 		
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null)) {
 			throw new RuntimeException("Access Denied");
 		}
 
 		Appointment existing = appointmentDao.find(appointment.getId());
-		if(existing != null) {
-			appointmentArchiveDao.archiveAppointment(existing);	
+		if(existing == null) {
+			throw new RuntimeException("Attempt to update an appointment that doesn't exist");
 		}
-		appointmentDao.merge(appointment);
+
+		appointmentArchiveDao.archiveAppointment(existing);
+
+		// Update automatic information
+		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
+		appointment.setUpdateDateTime(new Date());
+
+		// Copy automatic information
+		appointment.setCreator(existing.getCreator());
+		appointment.setCreateDateTime(existing.getCreateDateTime());
+		appointment.setReasonCode(existing.getReasonCode());
+
+		try
+		{
+			logger.info(appointment.toString());
+			appointmentDao.merge(appointment);
+		}
+		catch(TransactionSystemException exception)
+		{
+			// If a transaction exception is thrown, it might have been caused by a validation error,
+			// but won't be caught by the exception mapper.
+			// XXX: maybe just throw the root cause if it's a ConstraintViolationException?
+			throw exception.getRootCause();
+		}
 
 		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.updateAppointment", "id=" + appointment.getId());
 
+		return appointment;
 	}
 
 	public void deleteAppointment(LoggedInInfo loggedInInfo, int apptNo) {
@@ -180,6 +218,27 @@ public class AppointmentManager {
 
 		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.deleteAppointment", "id=" + apptNo);
 
+	}
+
+	public String rotateStatus(LoggedInInfo loggedInInfo, int apptNo)
+	{
+		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null)) {
+			throw new RuntimeException("Access Denied");
+		}
+
+		Appointment appointment = appointmentDao.find(apptNo);
+
+		AppointmentManager appointmentManager = SpringUtils.getBean(AppointmentManager.class);
+		AppointmentStatusList appointmentStatusList =
+				AppointmentStatusList.factory(appointmentManager);
+
+		String nextStatus = appointmentStatusList.getStatusAfter(appointment.getStatus());
+
+		appointment.setStatus(nextStatus);
+
+		appointmentDao.merge(appointment);
+
+		return appointment.getStatus();
 	}
 
 	public Appointment getAppointment(LoggedInInfo loggedInInfo, int apptNo) {

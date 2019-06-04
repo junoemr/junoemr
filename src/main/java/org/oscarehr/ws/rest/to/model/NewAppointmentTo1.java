@@ -195,7 +195,26 @@ public class NewAppointmentTo1 implements Serializable {
 	public void setStartTime12hWithMedian(String startTime12hWithMedian) {
 		this.startTime12hWithMedian = startTime12hWithMedian;
 	}
-	
-	
-	
+
+
+	@Override
+	public String toString()
+	{
+		return "NewAppointmentTo1{" +
+				"providerNo='" + providerNo + '\'' +
+				", appointmentDate='" + appointmentDate + '\'' +
+				", startTime='" + startTime + '\'' +
+				", startTime12hWithMedian='" + startTime12hWithMedian + '\'' +
+				", name='" + name + '\'' +
+				", demographicNo=" + demographicNo +
+				", notes='" + notes + '\'' +
+				", reason='" + reason + '\'' +
+				", location='" + location + '\'' +
+				", resources='" + resources + '\'' +
+				", type='" + type + '\'' +
+				", status='" + status + '\'' +
+				", duration=" + duration +
+				", urgency='" + urgency + '\'' +
+				'}';
+	}
 }

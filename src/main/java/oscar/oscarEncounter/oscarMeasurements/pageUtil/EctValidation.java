@@ -46,7 +46,7 @@ import org.oscarehr.util.SpringUtils;
 
 import oscar.util.ConversionUtils;
 
-import static oscar.util.ConversionUtils.coalesceTimeStampString;
+import static oscar.util.ConversionUtils.getLegacyDateFromDateString;
 
 public class EctValidation
 {
@@ -193,7 +193,8 @@ public class EctValidation
 			}
 			// Measurements uses following function to record date, which is different from the above check
 			// Sanity check by calling it and ensuring we won't get a null value back
-			if (coalesceTimeStampString(inputValue) == null)
+			inputValue = ConversionUtils.padDateTimeString(inputValue);
+			if (getLegacyDateFromDateString(inputValue) == null)
 			{
 				validation = false;
 			}

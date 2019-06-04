@@ -1,4 +1,4 @@
-<%--
+<%@ page import="java.util.UUID"%><%--
 
 
     Copyright (c) 2005-2012. Centre for Research on Inner City Health, St. Michael's Hospital, Toronto. All Rights Reserved.
@@ -57,6 +57,21 @@
 	var updateDivTimer = null;
 	var reloadDivUrl;
 	var reloadDiv;
+	var eChartUUID = "<%=UUID.randomUUID().toString()%>";
+
+	// load echart uuid if possible from local storage. If not found
+	// save new uuid to storage.
+	function getEchartUUID()
+	{
+		let storageUUID = sessionStorage.getItem("eChartUUID: " + document.title)
+		console.log(storageUUID);
+		if (storageUUID !== null)
+		{
+			eChartUUID = storageUUID;
+		}
+		sessionStorage.setItem("eChartUUID: " + document.title, eChartUUID);
+	}
+	getEchartUUID()
 
 	function checkLengthofObject(o)
 	{
@@ -70,7 +85,11 @@
 		}
 
 		return c;
+	}
 
+	function getEChartUUID()
+	{
+		return eChartUUID;
 	}
 
 	function popupPage(vheight, vwidth, name, varpage)
@@ -523,7 +542,7 @@
 				ctx + "/oscarEncounter/displayDocuments.do?hC=" + Colour.documents,
 				ctx + "/oscarEncounter/displayLabs.do?hC=" + Colour.labs,
 				ctx + "/oscarEncounter/displayMessages.do?hC=" + Colour.messages,
-				ctx + "/oscarEncounter/displayMeasurements.do?hC=" + Colour.measurements,
+				ctx + "/oscarEncounter/displayMeasurements.do?hC=" + Colour.measurements + "&eChartUUID=" + eChartUUID,
 				ctx + "/oscarEncounter/displayConsultation.do?hC=" + Colour.consultation,
 				//ctx + "/oscarEncounter/displayHRM.do?hC="
 				//ctx + "/oscarEncounter/displayMyOscar.do?hC=",
@@ -615,7 +634,7 @@
 		//update each ajax div with info from request
 		this.popColumn = function(url, div, params, navBar, navBarObj)
 		{
-			params = "reloadURL=" + url + "&numToDisplay=6&cmd=" + params;
+			params = "reloadURL=" + encodeURIComponent(url) + "&numToDisplay=6&cmd=" + params;
 
 			var objAjax = new Ajax.Request(
 				url,
@@ -2812,7 +2831,6 @@
 
 	function savePage(method, chain)
 	{
-
 		if (typeof jQuery("form[name='resident'] input[name='residentMethod']").val() != "undefined" &&
 			jQuery("form[name='resident'] input[name='residentMethod']").val().trim().length == 0 &&
 			method.match(/.*[Ee]xit$/g) != null)
@@ -2845,15 +2863,6 @@
 			}
 		}
 
-		var noteStr;
-		noteStr = $F(caseNote);
-		/*
-		if( noteStr.replace(/^\s+|\s+$/g,"").length == 0 ) {
-			alert("Please enter a note before saving");
-			return false;
-		}
-		*/
-
 		if ($("observationDate") != undefined && $("observationDate").value.length > 0 && !validDate())
 		{
 			alert(pastObservationDateError);
@@ -2867,12 +2876,7 @@
 				alert(assignIssueError);
 				return false;
 			}
-			/* the observationDate could be the default one as today.
-			if( requireObsDate && $("observationDate").value.length == 0 ) {
-				alert(assignObservationDateError);
-				return false;
-			}
-			*/
+
 			if ($("encTypeSelect0") != null && $("encTypeSelect0").options[$("encTypeSelect0").selectedIndex].value.length == 0)
 			{
 				alert(assignEncTypeError);
@@ -2901,8 +2905,6 @@
 					}
 				}
 			}
-
-
 		}
 
 
@@ -2933,27 +2935,6 @@
 			}
 		);
 
-
-		/*var frm = document.forms["caseManagementViewForm"];
-		var url = ctx + "/CaseManagementView.do";
-		var objAjax = new Ajax.Request (
-						url,
-						{
-							method: 'post',
-							postBody: Form.serialize(frm),
-							onSuccess: function(request) {
-								tmpSaveNeeded = false;
-								caseMgtEntryfrm.submit();
-							},
-							onFailure: function(request) {
-								if( request.status == 403 )
-									alert(sessionExpiredError);
-								else
-									alert(request.status + " " + savingNoteError);
-							}
-						 }
-					   );
-	*/
 		return false;
 	}
 
@@ -2970,11 +2951,16 @@
 		document.forms['caseManagementEntryForm'].sign.value='on';
 		document.forms['caseManagementEntryForm'].toBill.value='true';
 
-		Event.stop(event);
+		var saved = savePage('saveAndExit', '');
 
-		maximizeWindow();
+		// savePage always returns false, but we can check note differences before redirecting
+		if (origCaseNote === $F(caseNote))
+		{
+			Event.stop(event);
+			maximizeWindow();
+		}
 
-		return savePage('saveAndExit', '');
+		return saved;
 	}
 
 	var changeIssueMsg;
