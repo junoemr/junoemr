@@ -1,20 +1,7 @@
-body {
-	// padding: 70px 0 0 0;
-	padding-top: 50px;
-}
-
-.hand-hover {
-	cursor: pointer;
-	cursor: hand;
-}
-
-.hand-hover:hover {
-	text-decoration: none;
-}
 
 #parent {
 	position: fixed;
-	bottom: 0px;
+	bottom: 0;
 	width: 100%;
 	/*width should be 100%*/
 }
@@ -45,35 +32,6 @@ li.cpp-note-list:last-child {
 	border-bottom: none;
 }
 
-.highlight,
-.highlight:hover {
-	color: $red;
-}
-
-.refused,
-.refused:hover {
-	color: #EAACAC;
-}
-
-.ineligible,
-.ineligible:hover {
-	color: $yellow;
-}
-
-.pending,
-.pending:hover {
-	color: $pink;
-}
-
-.abnormal-prev,
-.abnormal-prev:hover {
-	color: #FF4D4D;
-}
-
-.abnormal,
-.abnormal:hover {
-	color: $red;
-}
 
 #main-nav {
 	height: 50px;

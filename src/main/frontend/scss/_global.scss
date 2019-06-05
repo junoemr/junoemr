@@ -1,4 +1,17 @@
 // global styles
+
+body {
+	padding-top: 50px;
+}
+
+.hand-hover {
+	cursor: hand;
+}
+
+.hand-hover:hover {
+	text-decoration: none;
+}
+
 .vertical-align {
 	display: flex;
 	align-items: center;
@@ -28,24 +41,6 @@
 	margin: 0;
 }
 
-// Displays a red asterisk next to form labels if they are marked as required
-.form-group {
-	.required:after {
-		content: "*";
-		color: $red;
-	}
-}
-
-// Hides wrapping buttons, allowing for icon buttons
-.icon-button {
-	appearance: none;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	outline: none;
-	border: 0;
-	background: transparent;
-}
-
 // Makes checkbox flush with input (as long as checkbox margin is 0)
 .big-checkbox {
 	height: 34px;
@@ -56,39 +51,44 @@
 	width: 100%;
 }
 
+a,.clickable {
+	&:hover {
+		cursor: pointer;
+	}
+}
+
 .blue-text {
 	color: $primary-blue-text;
 }
 
-.clickable {
-	&:hover {
-		cursor: pointer;
-	}
+.highlight,
+.highlight:hover {
+	color: $red;
 }
 
-a {
-	&:hover {
-		cursor: pointer;
-	}
+.refused,
+.refused:hover {
+	color: #EAACAC;
 }
 
-.btn-warning-static {
-	background-color: $btn-warning-bg;
-	cursor: default;
-	color: $white;
-}
-.btn-warning-static:focus,
-.btn-warning-static:visited,
-.btn-warning-static:hover
-{
-	color: $white;
+.ineligible,
+.ineligible:hover {
+	color: $yellow;
 }
 
-.btn-warning-static:active {
-	-moz-box-shadow:    inset 0 0 0px $btn-warning-bg;
-	-webkit-box-shadow: inset 0 0 0px $btn-warning-bg;
-	box-shadow:         inset 0 0 0px $btn-warning-bg;
-	color: $white;
+.pending,
+.pending:hover {
+	color: $pink;
+}
+
+.abnormal-prev,
+.abnormal-prev:hover {
+	color: #FF4D4D;
+}
+
+.abnormal,
+.abnormal:hover {
+	color: $red;
 }
 
 @media (max-width: 1730px) {

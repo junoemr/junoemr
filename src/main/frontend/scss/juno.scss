@@ -12,7 +12,7 @@
 @import "bootstrap/dropdown";
 @import "bootstrap/badge_colours";
 // UIB overrides
-@import "uib-datepicker";
+@import "directives/uib-datepicker";
 // bootstrap-timepicker does not provide a CSS file so compile as SCSS
 @import "bootstrap-timepicker/timepicker";
 // Global stuff
@@ -20,13 +20,13 @@
 // TODO: pre-existing CSS files, need to be reorganized
 @import "navbar-fixed-top";
 @import "index";
-@import "note-editor";
-@import "date_picker";
-@import "time_picker";
+@import "directives/date_picker";
+@import "directives/time_picker";
 @import "forms";
+@import "buttons";
 @import "modal"; // Style copied from clinicaid for schedule.
-@import "toggle-switch";
-@import "juno-checkbox";
+@import "directives/toggle-switch";
+@import "directives/juno-checkbox";
 // Section-specific things
 @import "../src/schedule/schedule";
 @import "../src/common/directives/patientSelectorOption";

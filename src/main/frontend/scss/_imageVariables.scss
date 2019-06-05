@@ -8,6 +8,11 @@ $icon-modal-max: $images-root + 'icon-16-window-max.svg';
 
 $icon-checked: $images-root + 'icon-16-check.svg';
 $icon-add-appt: $images-root + 'icon-48-add-appintment.svg';
+$icon-refresh: $images-root + 'icon-16-refresh.svg';
+$icon-daysheet-blue: $images-root + 'cal-daysheetblue.svg';
+$icon-search-blue: $images-root + 'cal-searchblue.svg';
+$icon-week-view-blue: $images-root + 'cal-weekblue.svg';
+$icon-month-view-blue: $images-root + 'cal-monthblue.svg';
 
 $icon-up: $images-root + 'icon-16-arrow-up.svg';
 $icon-down: $images-root + 'icon-16-arrow-down.svg';
@@ -54,19 +59,19 @@ $icon-status-11: $images-appt-status + 'icon-48-1.svg';
 	background-image: url($icon-right);
 }
 .icon-refresh {
-	background-image: url($images-root + 'icon-16-refresh.svg');
+	background-image: url($icon-refresh);
 }
 .icon-daysheet {
-	background-image: url($images-root + 'cal-daysheetblue.svg');
+	background-image: url($icon-daysheet-blue);
 }
 .icon-search {
-	background-image: url($images-root + 'cal-searchblue.svg');
+	background-image: url($icon-search-blue);
 }
 .icon-week-view {
-	background-image: url($images-root + 'cal-weekblue.svg');
+	background-image: url($icon-week-view-blue);
 }
 .icon-month-view {
-	background-image: url($images-root + 'cal-monthblue.svg');
+	background-image: url($icon-month-view-blue);
 }
 
 /* modal images */

@@ -1,0 +1,64 @@
+
+// Hides wrapping buttons, allowing for icon buttons
+.icon-button {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	outline: none;
+	border: 0;
+	background: transparent;
+}
+
+.btn {
+	display: inline-block;
+	margin-bottom: 0;
+	font-weight: 400;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	touch-action: manipulation;
+	cursor: pointer;
+	background-image: none;
+	border: 1px solid transparent;
+	padding: .8em;
+	font-size: 13px;
+	line-height: 1.3;
+	border-radius: 8px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+
+	&.btn-default {
+		background-color: $white;
+		border-color: $grey-06;
+		color: $primary;
+	}
+	&.btn-success {
+		color: $white;
+		background-color: $green;
+		border-color: $green-hover;
+	}
+	&.btn-primary {
+		color: $white;
+		background-color: $primary;
+		border-color: $primary-hover;
+	}
+}
+
+.btn-warning-static {
+	background-color: $btn-warning-bg;
+	cursor: default;
+	color: $white;
+
+	&:focus,
+	&:visited,
+	&:hover {
+		color: $white;
+	}
+	&:active {
+		-moz-box-shadow:    inset 0 0 0 $btn-warning-bg;
+		-webkit-box-shadow: inset 0 0 0 $btn-warning-bg;
+		box-shadow:         inset 0 0 0 $btn-warning-bg;
+		color: $white;
+	}
+}
