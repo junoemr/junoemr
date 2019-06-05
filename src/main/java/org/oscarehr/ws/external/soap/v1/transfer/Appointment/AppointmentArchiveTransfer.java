@@ -23,7 +23,7 @@
  */
 
 
-package org.oscarehr.ws.external.soap.v1.transfer;
+package org.oscarehr.ws.external.soap.v1.transfer.Appointment;
 
 import java.util.Calendar;
 import java.util.List;
@@ -252,7 +252,7 @@ public final class AppointmentArchiveTransfer {
 		BeanUtils.copyProperties(appointment, appointmentTransfer, ignored);
 
 		Calendar cal = DateUtils.toGregorianCalendar(appointment.getAppointmentDate(), appointment.getStartTime());
-		cal=AppointmentTransfer.setToGMTIfRequired(cal,useGMTTime);
+		cal=AppointmentTransfer.setToGMTIfRequired(cal, useGMTTime);
 		appointmentTransfer.setAppointmentStartDateTime(cal);
 
 		cal = DateUtils.toGregorianCalendar(appointment.getAppointmentDate(), appointment.getEndTime());
