@@ -119,7 +119,7 @@ public class WCBTeleplanSubmission {
 				// check maximum length
 				if(wcbNo.length() > WCB_CLAIM_NO_MAX_LENGTH)
 				{
-					m.append(": WCB claim # exceeds maximum length of " + WCB_CLAIM_NO_MAX_LENGTH + " digits ");
+					m.append(wcbNo + ": WCB claim # exceeds maximum length of " + WCB_CLAIM_NO_MAX_LENGTH + " digits ");
 				}
 				// if not a number
 				if(!StringUtils.isNumeric(wcbNo))
