@@ -33,7 +33,6 @@ angular.module('Layout').controller('Layout.BodyController', [
 		$scope.$on('configureShowPatientList',
 			function(event, value)
 			{
-				console.log("Layout.BodyController updating showPatientList", value);
 				controller.showPatientList = value;
 			});
 	}

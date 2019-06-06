@@ -92,16 +92,6 @@ $btn-aside-size: 72px;
 	}
 }
 
-/* remove border space around the schedule pane */
-.schedule-center-panel
-{
-	margin: -10px -15px 0 -15px;
-	// when the parent(#right-pane) has this class, apply this correction
-	.right-pane-padded & {
-		margin-left: -10px;
-	}
-}
-
 .calendar
 {
 	font-family: "Arial", "Helvetica", sans-serif;
@@ -381,7 +371,8 @@ $btn-aside-size: 72px;
 	.modal-body {
 
 		$tabs-height: 48px;
-		@include juno-tab-light($tabs-height);
+		@include juno-tab-lg($tabs-height);
+		@include juno-tab-light();
 
 		.form-group {
 			margin-bottom: 8px;

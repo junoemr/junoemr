@@ -292,8 +292,6 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		//to help ng-clicks on buttons
 		controller.transition = function transition(item)
 		{
-			console.log('transition', item);
-
 			var newWindow;
 
 			if (angular.isDefined(item) &&
@@ -347,8 +345,6 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				angular.isDefined(item.url) &&
 				item.url !== null)
 			{
-				console.log(item);
-
 				if (item.label === "Schedule")
 				{
 					var qs = "";
@@ -426,6 +422,13 @@ angular.module('Layout').controller('Layout.NavBarController', [
 						'msgs', 'height=700,width=1024,scrollbars=1');
 				}
 			}
+		};
+
+		controller.openScratchpad = function ()
+		{
+			var win = window.open('../scratch/index.jsp',
+				'scratch', 'height=700,width=1024,scrollbars=1');
+			win.focus();
 		};
 
 		controller.newDemographic = function newDemographic(size)

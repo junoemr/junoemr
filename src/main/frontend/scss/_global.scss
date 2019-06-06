@@ -1,11 +1,6 @@
 // global styles
-
-body {
-	padding-top: 50px;
-}
-
 .hand-hover {
-	cursor: hand;
+	cursor: pointer;
 }
 
 .hand-hover:hover {
@@ -15,6 +10,23 @@ body {
 .vertical-align {
 	display: flex;
 	align-items: center;
+}
+
+.flex-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+}
+.flex-column {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+}
+.flex-grow {
+	flex-grow: 1;
+}
+.overflow-auto {
+	overflow: auto;
 }
 
 .p-inline p {
