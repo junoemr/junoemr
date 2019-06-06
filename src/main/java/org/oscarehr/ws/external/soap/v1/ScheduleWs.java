@@ -45,6 +45,7 @@ import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentTransfer
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentTypeTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.ValidatedAppointmentBookingTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.DayWorkScheduleTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.ScheduleCodeDurationTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ScheduleTemplateCodeTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
@@ -52,6 +53,9 @@ import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRu
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import javax.jws.WebService;
 import java.util.ArrayList;
@@ -125,14 +129,27 @@ public class ScheduleWs extends AbstractWs {
 
 	@SkipContentLoggingOutbound
 	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots (
-			String providerNo, Calendar startDate, Calendar endDate, String[] appointmentTypes, String demographicNo, String jsonRules)
+			String providerNo, Calendar startDate, Calendar endDate, String templateDurations, String demographicNo, String jsonRules)
 	{
 		HashMap<String, DayTimeSlots[]> scheduleTransfer = new HashMap<>();
+		List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = new ArrayList<>();
 
 		try
 		{
+			JSONArray templateDurationJsonArr = (JSONArray) new JSONParser().parse(templateDurations);
+
+			for (Object templateDurationObj : templateDurationJsonArr)
+			{
+				JSONObject templateDurationJson = (JSONObject) templateDurationObj;
+				String templateCode = (String) templateDurationJson.get("schedule_template_id");
+				Long duration = (Long) templateDurationJson.get("appointment_duration");
+
+				ScheduleCodeDurationTransfer scheduleDurationTransfer = new ScheduleCodeDurationTransfer(templateCode, duration.intValue());
+				scheduleDurationTransfers.add(scheduleDurationTransfer);
+			}
+
 			List<BookingRule> bookingRules = BookingRuleFactory.createBookingRuleList(Integer.valueOf(demographicNo), jsonRules);
-			ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(providerNo, startDate, endDate, appointmentTypes, demographicNo, bookingRules);
+			ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(providerNo, startDate, endDate, scheduleDurationTransfers, demographicNo, bookingRules);
 			scheduleTransfer = providerScheduleTransfer.toTransfer();
 		}
 		catch(ParseException e)
