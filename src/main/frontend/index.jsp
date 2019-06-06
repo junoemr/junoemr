@@ -69,35 +69,49 @@
 	<nav class="nav">
 		<div class="container-fluid">
 			<div class="navbar-header">
-				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-nav-collapse">
-					<span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+				<button class="btn btn-icon"
+				        ng-click="navBarCtrl.loadClassicUi();"
+				        title="<bean:message key="global.goToClassic" bundle="ui"/>" border="0">
+					<a class="icon icon-logo"></a>
 				</button>
-
-				<%--<div class="navbar-text">
-					<a  href="../provider/providercontrol.jsp" style="color: white;">
-						Switch UI
-					</a>
-				</div>--%>
-				<!-- link back to 'classic' view -->
-				<a href="../provider/providercontrol.jsp">
-					<img id="navbarlogo" src="../images/Oscar.ico"
-						 title="<bean:message key="global.goToClassic" bundle="ui"/>" border="0"/>
-				</a>
 			</div>
 			<div class="navbar-collapse collapse" id="main-nav-collapse">
 
-				<form class="navbar-form navbar-left" role="search">
-					<div class="form-group" ng-cloak>
-						<juno-patient-search-typeahead
-								juno-model="navBarCtrl.demographicSearch"
-								juno-placeholder="<bean:message key="navbar.searchPatients" bundle="ui"/>"
-								juno-on-search-fn="navBarCtrl.onPatientSearch"
-								juno-on-add-fn="navBarCtrl.newDemographic"
-								juno-search-button-title="<bean:message key="navbar.searchPatients" bundle="ui"/>"
-								juno-add-button-title="<bean:message key="navbar.newPatient" bundle="ui"/>">
-						</juno-patient-search-typeahead>
+				<%--<form class="navbar-form navbar-left" role="search">--%>
+					<%--<div class="form-group patient-search-typeahead" ng-cloak>--%>
+						<%--<juno-patient-search-typeahead--%>
+								<%--juno-model="navBarCtrl.demographicSearch"--%>
+								<%--juno-placeholder="<bean:message key="navbar.searchPatients" bundle="ui"/>"--%>
+								<%-->--%>
+								<%--&lt;%&ndash;juno-on-search-fn="navBarCtrl.onPatientSearch"&ndash;%&gt;--%>
+								<%--&lt;%&ndash;juno-on-add-fn="navBarCtrl.newDemographic"&ndash;%&gt;--%>
+								<%--&lt;%&ndash;juno-search-button-title="<bean:message key="navbar.searchPatients" bundle="ui"/>"&ndash;%&gt;--%>
+								<%--&lt;%&ndash;juno-add-button-title="<bean:message key="navbar.newPatient" bundle="ui"/>">&ndash;%&gt;--%>
+						<%--</juno-patient-search-typeahead>--%>
+					<%--</div>--%>
+				<%--</form>--%>
+
+					<div class="navbar-left">
+						<form class="vertical-align patient-search-form" role="search">
+							<div class="form-group" ng-cloak>
+								<juno-patient-search-typeahead
+										juno-model="navBarCtrl.demographicSearch"
+										juno-placeholder="<bean:message key="navbar.searchPatients" bundle="ui"/>"
+								>
+									<%--juno-on-search-fn="navBarCtrl.onPatientSearch"--%>
+									<%--juno-on-add-fn="navBarCtrl.newDemographic"--%>
+									<%--juno-search-button-title="<bean:message key="navbar.searchPatients" bundle="ui"/>"--%>
+									<%--juno-add-button-title="<bean:message key="navbar.newPatient" bundle="ui"/>">--%>
+								</juno-patient-search-typeahead>
+							</div>
+							<div class="form-group">
+								<button class="btn btn-icon btn-add-patient"
+								        ng-click="navBarCtrl.newDemographic()">
+									<span class="icon icon-add"></span>
+								</button>
+							</div>
+						</form>
 					</div>
-				</form>
 
 				<!-- Large view -->
 				<ul class="nav navbar-nav visible-nav-lg" ng-cloak>
@@ -221,42 +235,44 @@
 					</li>
 				</ul>
 
-				<div class="nav navbar-text pull-right navbar-right-menu" ng-cloak>
-					<span>
-						<a ng-click="navBarCtrl.openScratchpad()"
-						   title="<bean:message key="navbar.scratchpad" bundle="ui"/>"
-						   class="hand-hover">
-							<span class="fa fa-pencil-square"></span>
-						</a>
-					</span>
-					<span ng-show="navBarCtrl.messageRights === true">
-							<a ng-click="navBarCtrl.openMessenger()"
-							   title="<bean:message key="navbar.messenger" bundle="ui"/>"
+				<div class="vertical-align pull-right navbar-right-menu">
+					<div class="nav navbar-text pull-right" ng-cloak>
+						<span>
+							<a ng-click="navBarCtrl.openScratchpad()"
+							   title="<bean:message key="navbar.scratchpad" bundle="ui"/>"
 							   class="hand-hover">
-								<span class="fa fa-envelope"></span>
-								<span ng-show="navBarCtrl.unreadMessageTotal > 0"
-								      class="badge badge-danger">{{navBarCtrl.unreadMessageTotal}}
-								</span>
+								<span class="fa fa-pencil-square"></span>
 							</a>
-							<a ng-click="navBarCtrl.openMessenger(navBarCtrl.messengerMenu)"
-							   title="{{navBarCtrl.messengerMenu.label}}"
-							   class="hand-hover">{{navBarCtrl.messengerMenu.extra}}</a>
-
-							<span ng-if="!$last"></span>
-					</span>
-					<span class="dropdown-toggle hand-hover"
-					      data-toggle="dropdown"
-					      title="<bean:message key="navbar.user" bundle="ui"/>">
-							<span class="fa fa-user"></span>
-						{{navBarCtrl.me.firstName}}
 						</span>
-					<ul class="dropdown-menu" role="menu">
-						<li ng-repeat="item in navBarCtrl.userMenuItems">
-							<a ng-click="navBarCtrl.transition(item)"
-							   ng-class="{'more-tab-highlight':  navBarCtrl.isActive(item) }"
-							   class="hand-hover">{{item.label}}</a>
-						</li>
-					</ul>
+						<span ng-show="navBarCtrl.messageRights === true">
+								<a ng-click="navBarCtrl.openMessenger()"
+								   title="<bean:message key="navbar.messenger" bundle="ui"/>"
+								   class="hand-hover">
+									<span class="fa fa-envelope"></span>
+									<span ng-show="navBarCtrl.unreadMessageTotal > 0"
+									      class="badge badge-danger">{{navBarCtrl.unreadMessageTotal}}
+									</span>
+								</a>
+								<a ng-click="navBarCtrl.openMessenger(navBarCtrl.messengerMenu)"
+								   title="{{navBarCtrl.messengerMenu.label}}"
+								   class="hand-hover">{{navBarCtrl.messengerMenu.extra}}</a>
+
+								<span ng-if="!$last"></span>
+						</span>
+						<span class="dropdown-toggle hand-hover"
+						      data-toggle="dropdown"
+						      title="<bean:message key="navbar.user" bundle="ui"/>">
+								<span class="fa fa-user"></span>
+							{{navBarCtrl.me.firstName}}
+							</span>
+						<ul class="dropdown-menu" role="menu">
+							<li ng-repeat="item in navBarCtrl.userMenuItems">
+								<a ng-click="navBarCtrl.transition(item)"
+								   ng-class="{'more-tab-highlight':  navBarCtrl.isActive(item) }"
+								   class="hand-hover">{{item.label}}</a>
+							</li>
+						</ul>
+					</div>
 				</div>
 			</div>
 			<!--/.nav-collapse -->

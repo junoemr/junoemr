@@ -2,92 +2,76 @@
 @mixin juno-tab-rounded($radius)
 {
 	.round-top {
-		border-radius: #{$radius} #{$radius} 0 0;
+		border-radius: $radius $radius 0 0;
 	}
 	.round-top-left {
-		border-radius: #{$radius} 0 0 0;
+		border-radius: $radius 0 0 0;
 	}
 	.round-top-right {
-		border-radius: 0 #{$radius} 0 0;
+		border-radius: 0 $radius 0 0;
 	}
 }
+@mixin juno-tab($tabs-height, $padding-v, $padding-h, $round-radius) {
+	li {
+		a {
+			font-weight: 400;
+			display: flex;
+			align-items: center;
+			height: $tabs-height;
+			padding: $padding-v $padding-h;
+		}
+		&.active {
+			a {
+				font-weight: 700;
+			}
+		}
+	}
+	@include juno-tab-rounded($round-radius);
+}
+
 
 @mixin juno-tab-sm($tabs-height) {
-	li {
-		a {
-			height: $tabs-height;
-			padding: 4px 12px;
-		}
-	}
-	@include juno-tab-rounded(8px);
+	@include juno-tab($tabs-height, 4px, 12px, 8px);
 }
 @mixin juno-tab-md($tabs-height) {
-	li {
-		a {
-			height: $tabs-height;
-			padding: 8px 24px;
-		}
-	}
-	@include juno-tab-rounded(12px);
+	@include juno-tab($tabs-height, 1em, 2em, 12px);
 }
 @mixin juno-tab-lg($tabs-height) {
-	li {
-		a {
-			height: $tabs-height;
-			padding: 16px 46px;
-		}
-	}
-	@include juno-tab-rounded(18px);
+	@include juno-tab($tabs-height, 16px, 46px, 18px);
 }
 
-@mixin juno-tab-light {
+@mixin juno-tab-color-scheme($bg-color, $tab-bg-color, $font-color, $hover-color, $active-bg-color, $active-font-color) {
 	.nav {
-		background-color: $grey-08;
+		background-color: $bg-color;
 		border-color: transparent;
+	}
+	ul {
+		background-color: $bg-color;
 	}
 	li {
 		a {
-			display: flex;
-			align-items: center;
 			border-color: transparent;
-			color: $grey-02;
-			background-color: $grey-07;
+			color: $font-color;
+			background-color: $tab-bg-color;
 			&:hover {
-				background-color: $grey-06;
+				background-color: $hover-color;
 			}
 		}
 		&.active {
 			a {
-				color: $primary;
-				font-weight: bold;
-				background-color: $white;
+				color: $active-font-color;
+				background-color: $active-bg-color;
 			}
 		}
 	}
 }
 
-@mixin juno-tab-dark {
-	.nav {
-		background-color: $primary;
-		border-color: transparent;
-	}
-	li {
-		a {
-			display: flex;
-			align-items: center;
-			border-color: transparent;
-			color: $white;
-			background-color: $primary;
-			&:hover {
-				background-color: $primary-hover;
-			}
-		}
-		&.active {
-			a {
-				color: $white;
-				font-weight: bold;
-				background-color: $primary-hover;
-			}
-		}
-	}
+@mixin juno-tab-color-scheme-light {
+	@include juno-tab-color-scheme($grey-08, $grey-07, $grey-02,
+			$grey-06, $white, $primary);
+}
+
+@mixin juno-tab-color-scheme-dark {
+	@include juno-tab-color-scheme($grey-01, $grey-01, $white,
+			$primary-hover, $primary, $white);
 }

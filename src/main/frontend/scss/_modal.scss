@@ -73,13 +73,7 @@
 		}
 	}
 	label {
-		font-family: "Arial", "Helvetica", sans-serif;
-		font-size: 11px;
-		font-weight: normal;
-		font-style: normal;
-		font-stretch: normal;
-		line-height: normal;
-		letter-spacing: normal;
+		@include juno-font-label;
 		text-align: right;
 		color: $grey-03;
 		padding: 3px 2px;
@@ -90,13 +84,7 @@
 		background-color: $white;
 		padding: 8px;
 
-		font-family: "Arial", "Helvetica", sans-serif;
-		font-size: 13px;
-		font-weight: normal;
-		font-style: normal;
-		font-stretch: normal;
-		line-height: normal;
-		letter-spacing: normal;
+		@include juno-font-input;
 		color: $grey-02;
 	}
 	select {

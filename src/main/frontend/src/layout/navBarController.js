@@ -383,6 +383,11 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			}
 		};
 
+		controller.loadClassicUi = function()
+		{
+			window.location = "../provider/providercontrol.jsp";
+		};
+
 		controller.openMessenger = function(item)
 		{
 			if (controller.me != null)

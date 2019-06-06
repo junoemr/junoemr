@@ -2,17 +2,17 @@
 .navbar-default {
 	.navbar-text {
 		.glyphicon {
-			color: $primary-white-text;
+			color: $white;
 			&:hover
 			{
-				color: $hover-white;
+				color: $grey-08;
 			}
 		}
 	}
 	.navbar-toggle {
 		&:hover,
 		&:focus {
-			background-color: $primary-hover-blue;
+			background-color: $primary;
 		}
 	}
 }

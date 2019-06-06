@@ -1,5 +1,5 @@
 
-$navbar-height: 56px;
+$primary-navbar-height: 56px;
 
 #parent {
 	position: fixed;
@@ -16,7 +16,7 @@ $navbar-height: 56px;
 }
 
 #navbarlogo {
-	height: $navbar-height;
+	height: $primary-navbar-height;
 	padding: 10px;
 }
 
@@ -37,12 +37,53 @@ li.cpp-note-list:last-child {
 
 #index-header {
 
-	height: $navbar-height;
-	@include juno-tab-md($navbar-height);
-	@include juno-tab-dark();
+	height: $primary-navbar-height;
+	@include juno-tab-md($primary-navbar-height);
+	@include juno-tab-color-scheme-dark;
+	@include juno-font-tab;
 
+	.btn-icon {
+		width: $primary-navbar-height;
+		height: $primary-navbar-height;
+		.icon {
+			width: 48px;
+			height: 16px;
+		}
+	}
+
+	.navbar-left {
+		.patient-search-form {
+			height: $primary-navbar-height;
+			padding: 0 24px;
+
+			.form-group {
+				margin-bottom: 0;
+				padding: 0 4px;
+
+				$input-size: 32px;
+				.form-control {
+					height: $input-size;
+					width: 304px;
+					background-color: $white;
+					border: 1px solid $grey-06;
+				}
+				.btn-add-patient {
+					height: $input-size;
+					width: $input-size;
+					background-color: $white;
+					border: 1px solid $grey-06;
+					.icon {
+						width: 16px;
+						height: 16px;
+					}
+				}
+			}
+
+		}
+	}
 	.navbar-right-menu {
-		//height: $navbar-height;
+		height: $primary-navbar-height;
+
 		span {
 			padding: 2px;
 		}
@@ -59,7 +100,7 @@ li.cpp-note-list:last-child {
 	}
 }
 #index-content {
-	height: calc(100vh - #{$navbar-height});
+	height: calc(100vh - #{$primary-navbar-height});
 	overflow: auto;
 
 	$left-aside-width: 320px;
@@ -76,7 +117,7 @@ li.cpp-note-list:last-child {
 
 		#left-aside {
 			position: fixed;
-			top: $navbar-height;
+			top: $primary-navbar-height;
 			bottom: 0;
 			left: 0;
 			z-index: 1000;
@@ -137,7 +178,7 @@ li.cpp-note-list:last-child {
 		}
 		#left-aside-hidden {
 			position: fixed;
-			top: $navbar-height;
+			top: $primary-navbar-height;
 			bottom: 0;
 			left: 0;
 			z-index: 1000;

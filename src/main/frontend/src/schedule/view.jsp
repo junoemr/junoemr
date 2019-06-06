@@ -53,13 +53,13 @@
 								<div class="pull-left">
 									<div class="form-group cal-step-button-group">
 										<div class="form-group">
-											<button class="btn btn-nav-icon"
+											<button class="btn btn-icon"
 											        ng-click="stepBack()">
 												<span class="icon icon-left"></span>
 											</button>
 										</div>
 										<div class="form-group">
-											<button class="btn btn-nav-icon"
+											<button class="btn btn-icon"
 											        ng-click="stepForward()">
 												<span class="icon icon-right"></span>
 											</button>
@@ -147,7 +147,7 @@
 										</div>
 									</div>
 									<div class="form-group">
-										<button class="btn btn-nav-icon"
+										<button class="btn btn-icon"
 										        ng-click="refetchEvents()">
 											<span class="icon icon-refresh"></span>
 										</button>

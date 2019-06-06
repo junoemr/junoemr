@@ -13,6 +13,8 @@ $icon-daysheet-blue: $images-root + 'cal-daysheetblue.svg';
 $icon-search-blue: $images-root + 'cal-searchblue.svg';
 $icon-week-view-blue: $images-root + 'cal-weekblue.svg';
 $icon-month-view-blue: $images-root + 'cal-monthblue.svg';
+$icon-logo: $images-root + 'logo.svg';
+$icon-add: $images-root + 'icon-16-add.svg';
 
 $icon-up: $images-root + 'icon-16-arrow-up.svg';
 $icon-down: $images-root + 'icon-16-arrow-down.svg';
@@ -49,6 +51,9 @@ $icon-status-11: $images-appt-status + 'icon-48-1.svg';
 	background-repeat: no-repeat;
 }
 
+.icon-logo {
+	background-image: url($icon-logo);
+}
 .icon-down {
 	background-image: url($icon-down);
 }
@@ -57,6 +62,9 @@ $icon-status-11: $images-appt-status + 'icon-48-1.svg';
 }
 .icon-right {
 	background-image: url($icon-right);
+}
+.icon-add {
+	background-image: url($icon-add);
 }
 .icon-refresh {
 	background-image: url($icon-refresh);

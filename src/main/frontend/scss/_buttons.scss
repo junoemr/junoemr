@@ -44,6 +44,13 @@
 		border-color: $primary-hover;
 	}
 }
+.btn-icon {
+	background-color: transparent;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+}
 
 .btn-warning-static {
 	background-color: $btn-warning-bg;

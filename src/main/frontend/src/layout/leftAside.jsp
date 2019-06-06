@@ -54,57 +54,19 @@
 					</button>
 				</div>
 				<div class="col-sm-9">
-					<%--<h3 class="no-margin-top" id="left-pane-header-title">Appointments</h3>--%>
-					<%--<form id="patient-search" class="form-search" role="search">--%>
-					<%--<span ng-show="showFilter === true" class="form-group ">--%>
 					<input type="text" class="form-control"
 					       placeholder="<bean:message key="patientList.search" bundle="ui"/>"
 					       ng-model="query"/>
-					<%--</span>--%>
-					<%--</form>--%>
-				</div>
-				<%--NOTE: Need to give this controller access to the addNewAppointment() function before this button can be used here --%>
-				<%--<div class="col-md-2">--%>
-				<%--<a class="hand-hover" ng-click="patientListAppointmentListCtrl.addNewAppointment()">--%>
-				<%--<span class="glyphicon glyphicon-plus" title="Add appointment"></span>--%>
-				<%--</a>--%>
-				<%--</div>--%>
-			</div>
-
-			<div id="left-pane-calendar" ng-show="patientListAppointmentListCtrl.isScheduleActive();">
-				<div class="calendar-daypicker-container">
-					<div uib-datepicker
-					     ng-model="selectedDate"
-					     datepicker-options="{showWeeks: false}"
-					     class="well well-sm"
-					></div>
 				</div>
 			</div>
-
 			<div class="col-sm-12">
 				<div class="row" ng-cloak>
-					<%--<button type="button" class="btn btn-default" ng-click="refresh()" title="<bean:message key="patientList.refresh" bundle="ui"/>">
-						<span class="glyphicon glyphicon-refresh"></span>
-					</button>
-					--%>
-					<%--Remove these? --%>
-					<%--<button type="button" class="btn btn-default" ng-disabled="currentPage == 0" ng-click="changePage(currentPage-1)" title="<bean:message key="patientList.pageUp" bundle="ui"/>">
-						<span class="glyphicon glyphicon-circle-arrow-up"></span>
-					</button>
-
-					<button type="button" class="btn btn-default" ng-disabled="currentPage == nPages-1"  ng-click="changePage(currentPage+1)" title="<bean:message key="patientList.pageDown" bundle="ui"/>">
-						<span class="glyphicon glyphicon-circle-arrow-down"></span>
-					</button>--%>
 					<ul class="nav nav-tabs">
 						<li ng-repeat="item in patientListCtrl.getTabItems()"
 						    ng-class="{'active': patientListCtrl.isActive(item.id)}"
 						    class="hand-hover">
 							<a ng-click="patientListCtrl.changeTab(item.id)" data-toggle="tab">{{item.label}}</a>
 						</li>
-						<%--<li class="hand-hover">--%>
-						<%--<a ng-click="patientListCtrl.changeTab(0)" data-toggle="tab">Appts.</a>--%>
-						<%--<a ng-click="patientListCtrl.changeTab(1)" data-toggle="tab">Recent</a>--%>
-						<%--</li>--%>
 
 						<li class="dropdown" ng-class="{'active': patientListCtrl.currentmoretab != null}">
 							<a class="dropdown-toggle hand-hover" data-toggle="dropdown"><b class="caret"></b></a>
@@ -130,6 +92,5 @@
 				</div>
 			</div>
 		</div>
-
-	<%--</div>--%>
+	</div>
 </div>

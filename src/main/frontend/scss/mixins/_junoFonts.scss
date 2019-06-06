@@ -1,0 +1,24 @@
+@mixin juno-font-default($font-size)
+{
+	font-family: Arial, Helvetica, sans-serif;
+    font-size: $font-size;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: normal;
+}
+
+@mixin juno-font-tab()
+{
+	@include juno-font-default(12px);
+}
+
+@mixin juno-font-input()
+{
+	@include juno-font-default(13px);
+}
+@mixin juno-font-label()
+{
+	@include juno-font-default(11px);
+}

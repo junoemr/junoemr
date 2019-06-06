@@ -1,7 +1,7 @@
 
 // bootstrap fonts look better on form elements
 input, button, select, textarea {
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	@include juno-font-input;
 }
 
 // don't resize textareas
