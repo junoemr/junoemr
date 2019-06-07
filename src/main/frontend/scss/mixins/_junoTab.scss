@@ -1,5 +1,5 @@
 
-@mixin juno-tab-rounded($radius)
+@mixin juno-tab-rounded($radius: 8px)
 {
 	.round-top {
 		border-radius: $radius $radius 0 0;

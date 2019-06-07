@@ -8,6 +8,8 @@
 	background: transparent;
 }
 
+$btn-aside-size: 72px;
+
 .btn {
 	display: inline-block;
 	margin-bottom: 0;
@@ -42,6 +44,17 @@
 		color: $white;
 		background-color: $primary;
 		border-color: $primary-hover;
+	}
+
+	&.btn-aside {
+		width: $btn-aside-size;
+		height: $btn-aside-size;
+		background-color: #3c5a96;
+		border-radius: 0;
+		border: 1px solid transparent;
+		&:focus {
+			outline: 1px solid transparent !important;
+		}
 	}
 }
 .btn-icon {

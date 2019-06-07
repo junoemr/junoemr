@@ -8,18 +8,6 @@
 	white-space: nowrap;
 }
 
-$btn-aside-size: 72px;
-.btn-aside {
-	width: $btn-aside-size;
-	height: $btn-aside-size;
-	background-color: #3c5a96;
-	border-radius: 0;
-	border: 1px solid transparent;
-	&:focus {
-		outline: 1px solid transparent !important;
-	}
-}
-
 .calendar-loading
 {
 	position: absolute;
@@ -50,21 +38,10 @@ $btn-aside-size: 72px;
     width: 100%;
 }
 
-.fc-view.fc-agendaTwoDay-view.fc-agenda-view{
-    width: 100%;
+.fc-view.fc-agendaTwoDay-view.fc-agenda-view {
+	width: 100%;
 }
 
-.flexV {
-	display: flex;
-	flex-direction: column;
-}
-.flexH {
-	display: flex;
-	flex-direction: row;
-}
-.flexGrow {
-	flex-grow: 1;
-}
 .directive-appt-status-select-wrapper {
 	.directive-appt-status-select {
 		display: flex;
@@ -250,30 +227,30 @@ $btn-aside-size: 72px;
 	}
 }
 
-.schedule-options-container {
+.juno-page-header {
+	height: $btn-aside-size;
 	background-color: $primary;
-	padding-top: 8px;
+	padding-left: $btn-aside-size;
 
 	select {
 		@include juno-select(16px);
 	}
 
 	.schedule-options {
-		background-color: $grey-07;
 		padding: 12px;
 
 		$input-height: 40px;
 		.btn-icon {
 			width: $input-height;
 			height: $input-height;
-			background-color: $white;
+			background-color: $grey-08;
 			.icon {
 				width: 16px;
 				height: 16px;
 			}
 		}
 		.divider-vertical {
-			background-color: $grey-05;
+			background-color: $grey-06;
 			width: 2px;
 			height: calc(#{$input-height} * 0.75);
 		}
@@ -299,19 +276,11 @@ $btn-aside-size: 72px;
 		}
 		select, input, textarea {
 			border-radius: 8px;
-			border: solid 1px $grey-07;
-			background-color: $white;
+			border: solid 1px $grey-06;
+			background-color: $grey-08;
 			padding: 8px;
 			height: $input-height;
 			min-width: 200px;
-
-			font-family: "Arial", "Helvetica", sans-serif;
-			font-size: 13px;
-			font-weight: normal;
-			font-style: normal;
-			font-stretch: normal;
-			line-height: normal;
-			letter-spacing: normal;
 			color: $grey-02;
 		}
 

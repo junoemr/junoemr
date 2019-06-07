@@ -76,51 +76,32 @@
 				</button>
 			</div>
 			<div class="navbar-collapse collapse" id="main-nav-collapse">
-
-				<%--<form class="navbar-form navbar-left" role="search">--%>
-					<%--<div class="form-group patient-search-typeahead" ng-cloak>--%>
-						<%--<juno-patient-search-typeahead--%>
-								<%--juno-model="navBarCtrl.demographicSearch"--%>
-								<%--juno-placeholder="<bean:message key="navbar.searchPatients" bundle="ui"/>"--%>
-								<%-->--%>
-								<%--&lt;%&ndash;juno-on-search-fn="navBarCtrl.onPatientSearch"&ndash;%&gt;--%>
-								<%--&lt;%&ndash;juno-on-add-fn="navBarCtrl.newDemographic"&ndash;%&gt;--%>
-								<%--&lt;%&ndash;juno-search-button-title="<bean:message key="navbar.searchPatients" bundle="ui"/>"&ndash;%&gt;--%>
-								<%--&lt;%&ndash;juno-add-button-title="<bean:message key="navbar.newPatient" bundle="ui"/>">&ndash;%&gt;--%>
-						<%--</juno-patient-search-typeahead>--%>
-					<%--</div>--%>
-				<%--</form>--%>
-
-					<div class="navbar-left">
-						<form class="vertical-align patient-search-form" role="search">
-							<div class="form-group" ng-cloak>
-								<juno-patient-search-typeahead
-										juno-model="navBarCtrl.demographicSearch"
-										juno-icon-left="true",
-										juno-placeholder="<bean:message key="navbar.searchPatients" bundle="ui"/>"
-								>
-									<%--juno-on-search-fn="navBarCtrl.onPatientSearch"--%>
-									<%--juno-on-add-fn="navBarCtrl.newDemographic"--%>
-									<%--juno-search-button-title="<bean:message key="navbar.searchPatients" bundle="ui"/>"--%>
-									<%--juno-add-button-title="<bean:message key="navbar.newPatient" bundle="ui"/>">--%>
-								</juno-patient-search-typeahead>
-							</div>
-							<div class="form-group">
-								<button class="btn btn-default"
-								        title="<bean:message key="navbar.searchPatients" bundle="ui"/>"
-								        ng-click="navBarCtrl.onPatientSearch(null)">
-									Advanced Search
-								</button>
-							</div>
-							<div class="form-group">
-								<button class="btn btn-icon btn-add-patient"
-								        title="<bean:message key="navbar.newPatient" bundle="ui"/>"
-								        ng-click="navBarCtrl.newDemographic()">
-									<span class="icon icon-add"></span>
-								</button>
-							</div>
-						</form>
-					</div>
+				<div class="navbar-left">
+					<form class="vertical-align patient-search-form" role="search">
+						<div class="form-group" ng-cloak>
+							<juno-patient-search-typeahead
+									juno-model="navBarCtrl.demographicSearch"
+									juno-icon-left="true"
+									juno-placeholder="<bean:message key="navbar.searchPatients" bundle="ui"/>"
+							>
+							</juno-patient-search-typeahead>
+						</div>
+						<div class="form-group">
+							<button class="btn btn-icon btn-visible"
+							        title="<bean:message key="navbar.searchPatients" bundle="ui"/>"
+							        ng-click="navBarCtrl.onPatientSearch(null)">
+								<span class="icon icon-search"></span>
+							</button>
+						</div>
+						<div class="form-group">
+							<button class="btn btn-icon btn-visible"
+							        title="<bean:message key="navbar.newPatient" bundle="ui"/>"
+							        ng-click="navBarCtrl.newDemographic()">
+								<span class="icon icon-add"></span>
+							</button>
+						</div>
+					</form>
+				</div>
 
 				<!-- Large view -->
 				<ul class="nav navbar-nav visible-nav-lg" ng-cloak>

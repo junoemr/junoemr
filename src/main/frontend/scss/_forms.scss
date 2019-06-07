@@ -41,6 +41,10 @@ label {
 	border: 1px solid $grey-06;
 	border-radius: 8px;
 	transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+
+	&.ng-dirty {
+		background-color: $white;
+	}
 }
 .form-control, output {
 	display: block;

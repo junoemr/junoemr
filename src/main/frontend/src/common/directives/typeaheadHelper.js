@@ -125,14 +125,12 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			$scope.hasLeftIcon = function hasLeftIcon()
 			{
-				console.info('left', $scope.iconLeft);
-				return $scope.iconLeft == true;
+				return $scope.iconLeft === true;
 			};
 
 			$scope.hasRightIcon = function hasRightIcon()
 			{
-				console.info('right', $scope.iconRight);
-				return $scope.iconRight == true;
+				return $scope.iconRight === true;
 			};
 
 			$scope.hasTemplateUrl = function hasTemplateUrl()
