@@ -50,6 +50,9 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			scope.addButtonTitle = '@junoAddButtonTitle';
 
+			scope.iconLeft = '=junoIconLeft';
+			scope.iconRight = '=junoIconRight';
+
 			return scope;
 		};
 
@@ -113,6 +116,23 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 			$scope.hasAddButton = function hasAddButton()
 			{
 				return angular.isFunction($scope.onAddFn());
+			};
+
+			$scope.hasIcon = function hasIcon()
+			{
+				return $scope.hasLeftIcon() || $scope.hasRightIcon();
+			};
+
+			$scope.hasLeftIcon = function hasLeftIcon()
+			{
+				console.info('left', $scope.iconLeft);
+				return $scope.iconLeft == true;
+			};
+
+			$scope.hasRightIcon = function hasRightIcon()
+			{
+				console.info('right', $scope.iconRight);
+				return $scope.iconRight == true;
 			};
 
 			$scope.hasTemplateUrl = function hasTemplateUrl()

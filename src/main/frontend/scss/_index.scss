@@ -67,6 +67,12 @@ li.cpp-note-list:last-child {
 					background-color: $white;
 					border: 1px solid $grey-06;
 				}
+				.btn {
+					height: $input-size;
+					padding-top: 0;
+					padding-bottom: 0;
+					color: $grey-01;
+				}
 				.btn-add-patient {
 					height: $input-size;
 					width: $input-size;
@@ -95,6 +101,7 @@ li.cpp-note-list:last-child {
 		}
 		.dropdown-menu {
 			top: auto;
+			@include juno-tab-color-scheme-light;
 			@include juno-tab-sm(24px)
 		}
 	}

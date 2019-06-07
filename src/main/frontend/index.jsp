@@ -96,6 +96,7 @@
 							<div class="form-group" ng-cloak>
 								<juno-patient-search-typeahead
 										juno-model="navBarCtrl.demographicSearch"
+										juno-icon-left="true",
 										juno-placeholder="<bean:message key="navbar.searchPatients" bundle="ui"/>"
 								>
 									<%--juno-on-search-fn="navBarCtrl.onPatientSearch"--%>
@@ -105,7 +106,15 @@
 								</juno-patient-search-typeahead>
 							</div>
 							<div class="form-group">
+								<button class="btn btn-default"
+								        title="<bean:message key="navbar.searchPatients" bundle="ui"/>"
+								        ng-click="navBarCtrl.onPatientSearch(null)">
+									Advanced Search
+								</button>
+							</div>
+							<div class="form-group">
 								<button class="btn btn-icon btn-add-patient"
+								        title="<bean:message key="navbar.newPatient" bundle="ui"/>"
 								        ng-click="navBarCtrl.newDemographic()">
 									<span class="icon icon-add"></span>
 								</button>
