@@ -25,36 +25,35 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <div id="patient-record-page">
-	<div class="row vertical-align patient-record-header">
-		<div class="col-xs-4">
-			<h2 class="patient-header-name" ng-cloak>
+	<div class="flex-row align-items-center patient-record-header">
+		<div class="flex-row align-items-baseline">
+			<h3 class="patient-header-name" ng-cloak>
 				{{recordCtrl.demographic.lastName}}, {{recordCtrl.demographic.firstName}}
 				<span ng-show="recordCtrl.demographic.alias">({{recordCtrl.demographic.alias}})</span>
-			</h2>
-		</div>
-		<div class="col-xs-8">
-			<div class="pull-right">
-				<h4 class="patient-header-info">
-					<span class="patient-header-label">
-						<bean:message key="demographic.patient.context.born"/>:
-					</span>
-					{{recordCtrl.demographic.dobYear}}-{{recordCtrl.demographic.dobMonth}}-{{recordCtrl.demographic.dobDay}}
-					(<span ng-if="!recordCtrl.isNaN(recordCtrl.demographic.age)">{{recordCtrl.demographic.age}}</span>)
-					<span class="patient-header-label">
-						<bean:message key="demographic.patient.context.sex"/>: 
-					</span>
-					{{recordCtrl.demographic.sex}}
-					<span class="patient-header-label">
-						<bean:message key="Appointment.msgTelephone"/>:
-					</span>
-					{{recordCtrl.demographic.phone}}
-				</h4>
-				<!-- <span class="glyphicon glyphicon-new-window"></span>-->
-			</div>
+			</h3>
+			<h5 class="patient-header-info">
+				<span class="patient-header-label">
+					<bean:message key="demographic.patient.context.sex"/>:
+				</span>
+				{{recordCtrl.demographic.sex}}
+				<span class="patient-header-label">
+					<bean:message key="demographic.patient.context.born"/>:
+				</span>
+				{{recordCtrl.demographic.dobYear}}-{{recordCtrl.demographic.dobMonth}}-{{recordCtrl.demographic.dobDay}}
+				(<span ng-if="!recordCtrl.isNaN(recordCtrl.demographic.age)">{{recordCtrl.demographic.age}}</span>)
+
+				<%--<span class="patient-header-label">--%>
+					<%--<bean:message key="Appointment.msgTelephone"/>:--%>
+				<%--</span>--%>
+			</h5>
+			<span class="icon icon-phone"></span>
+			<h5 class="patient-header-info">
+				{{recordCtrl.demographic.phone}}
+			</h5>
 		</div>
 	</div>
 
-	<nav class="navbar navbar-default record-navbar" role="navigation" id="record-nav">
+	<nav class="nav navbar navbar-default record-navbar" role="navigation" id="record-nav">
 		<!-- Brand and toggle get grouped for better mobile display -->
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle" data-toggle="collapse"

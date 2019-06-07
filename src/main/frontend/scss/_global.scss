@@ -1,4 +1,13 @@
 // global styles
+
+h1,h2,h3,h4,h5,h6 {
+	font-family: Arial, Helvetica, sans-serif;
+}
+h1,h2,h3 {
+	font-weight: bold;
+}
+
+
 .hand-hover {
 	cursor: pointer;
 }
@@ -13,6 +22,9 @@
 }
 .align-items-center {
 	align-items: center;
+}
+.align-items-baseline {
+	align-items: baseline;
 }
 
 .flex-row {
@@ -122,4 +134,12 @@ a,.clickable {
 	.visible-1500 {
 		display: block !important;
 	}
+}
+
+/* page header css. page specific css should extend this */
+%juno-page-header {
+	height: $btn-aside-size;
+	color: $white;
+	background-color: $primary;
+	padding-left: $btn-aside-size;
 }

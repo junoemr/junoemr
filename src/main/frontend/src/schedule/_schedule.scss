@@ -227,10 +227,8 @@
 	}
 }
 
-.juno-page-header {
-	height: $btn-aside-size;
-	background-color: $primary;
-	padding-left: $btn-aside-size;
+.schedule-page-header {
+	@extend %juno-page-header;
 
 	select {
 		@include juno-select(16px);

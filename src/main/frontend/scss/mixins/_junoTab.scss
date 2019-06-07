@@ -41,26 +41,36 @@
 }
 
 @mixin juno-tab-color-scheme($bg-color, $tab-bg-color, $font-color, $hover-color, $active-bg-color, $active-font-color) {
-	.nav {
+	&.nav,.nav,ul {
 		background-color: $bg-color;
 		border-color: transparent;
-	}
-	ul {
-		background-color: $bg-color;
-	}
-	li {
-		a {
-			border-color: transparent;
-			color: $font-color;
-			background-color: $tab-bg-color;
-			&:hover {
-				background-color: $hover-color;
+
+		li {
+			a {
+				border-color: transparent;
+				color: $font-color;
+				background-color: $tab-bg-color;
+				&:hover {
+					background-color: $hover-color;
+				}
+			}
+			&.active {
+				a {
+					color: $active-font-color;
+					background-color: $active-bg-color;
+				}
 			}
 		}
-		&.active {
-			a {
-				color: $active-font-color;
-				background-color: $active-bg-color;
+	}
+}
+
+@mixin juno-tab-color-scheme-white {
+	@include juno-tab-color-scheme($white, $white, $grey-02,
+			$grey-07, $white, $primary);
+	&.nav,.nav,ul {
+		li {
+			&.active {
+				border-bottom: 4px solid $primary;
 			}
 		}
 	}
