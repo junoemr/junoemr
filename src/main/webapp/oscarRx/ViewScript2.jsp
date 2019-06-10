@@ -312,13 +312,19 @@ function printPaste2Parent(print)
 		{
 			myParent.document.encForm.enTextarea.value = myParent.document.encForm.enTextarea.value + text;
 		}
-		else if (window.parent.opener.document.getElementById(noteEditor) !== undefined)
+		else if (myParent.document.getElementById(noteEditor) !== null)
 		{
 			// Instead of making the parent AngularJS document paranoia check every note in case we
 			// directly shoved content into the DOM, we'll connect the note properly for them
 			text = myParent.document.getElementById(noteEditor).value + text;
 			myParent.angular.element(myParent.document.querySelector("#note-editor"))
 				.scope().recordCtrl.updateCurrentNote(text);
+		}
+		else
+		{
+			alert("WARNING: No suitable field found to paste note into. " +
+				"To allow pasting from the prescription into the encounter note, " +
+				"the Rx page must be opened from the encounter note page.");
 		}
 	}
 	catch (e)
@@ -419,10 +425,14 @@ function signatureHandler(e) {
 	isSignatureDirty = e.isDirty;
 	isSignatureSaved = e.isSave;
 	e.target.onbeforeunload = null;
-	<% if (faxEnabled) { //%>
+	<% if (faxEnabled) { %>
 	e.target.document.getElementById("faxButton").disabled = !hasFaxNumber || !e.isSave;
+		<% if (!isReprint) {%>
 	e.target.document.getElementById("faxAndPasteButton").disabled = !hasFaxNumber || !e.isSave;
-	<% } %>
+	<%
+		}
+	}
+	%>
 	if (e.isSave) {
 		<% if (faxEnabled) { //%>
 		if (hasFaxNumber) {
