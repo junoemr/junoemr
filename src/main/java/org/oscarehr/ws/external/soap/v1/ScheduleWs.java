@@ -40,6 +40,7 @@ import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
+import org.oscarehr.ws.external.soap.util.LocalDateAdapter;
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentArchiveTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentTypeTransfer;
@@ -54,6 +55,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.jws.WebService;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -124,8 +127,12 @@ public class ScheduleWs extends AbstractWs {
 	}
 
 	@SkipContentLoggingOutbound
-	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots (
-			String providerNo, Calendar startDate, Calendar endDate, String[] appointmentTypes, String demographicNo, String jsonRules)
+	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots (String providerNo,
+																		  @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate startDate,
+																		  @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate endDate,
+																		  String[] appointmentTypes,
+																		  String demographicNo,
+																		  String jsonRules)
 	{
 		HashMap<String, DayTimeSlots[]> scheduleTransfer = new HashMap<>();
 

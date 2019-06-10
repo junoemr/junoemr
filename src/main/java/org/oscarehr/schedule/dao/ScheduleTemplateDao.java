@@ -33,7 +33,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -249,25 +248,13 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
 	public ProviderScheduleTransfer getValidProviderScheduleSlots(
-			String providerNo, Calendar startDate, Calendar endDate, String[] appointmentTypesArr, String demographicNo, List<BookingRule> bookingRules)
+			String providerNo, LocalDate startDate, LocalDate endDate, String[] appointmentTypesArr, String demographicNo, List<BookingRule> bookingRules)
 	{
-		LocalDate minDate = LocalDate.of(
-				startDate.get(Calendar.YEAR),
-				startDate.get(Calendar.MONTH) + 1,
-				startDate.get(Calendar.DAY_OF_MONTH)
-		);
-
-		LocalDate maxDate = LocalDate.of(
-				endDate.get(Calendar.YEAR),
-				endDate.get(Calendar.MONTH) + 1,
-				endDate.get(Calendar.DAY_OF_MONTH)
-		);
-
 		List<String> appointmentTypesList = Arrays.asList(appointmentTypesArr);
 
-		if (minDate.isBefore(LocalDate.now()))
+		if (startDate.isBefore(LocalDate.now()))
 		{
-			minDate = LocalDate.now();
+			startDate = LocalDate.now();
 		}
 
 		String sql = "SELECT STRAIGHT_JOIN\n" +
@@ -294,8 +281,8 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"ORDER BY sd.sdate, (n3.i + (10 * n2.i) + (100 * n1.i));";
 
 		Query query = entityManager.createNativeQuery(sql);
-		query.setParameter("minDate", java.sql.Date.valueOf(minDate), TemporalType.DATE);
-		query.setParameter("maxDate", java.sql.Date.valueOf(maxDate), TemporalType.DATE);
+		query.setParameter("minDate", java.sql.Date.valueOf(startDate), TemporalType.DATE);
+		query.setParameter("maxDate", java.sql.Date.valueOf(endDate), TemporalType.DATE);
 		query.setParameter("providerNo", providerNo);
 		query.setParameter("appointmentTypes", appointmentTypesList);
 		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
@@ -322,7 +309,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 		applyRules(bookingRules, possibleSlots);
 
-		Map<LocalDate, List<Appointment>> monthlyAppointments = scheduleManager.getProviderAppointmentsForMonth(providerNo, minDate, maxDate);
+		Map<LocalDate, List<Appointment>> monthlyAppointments = scheduleManager.getProviderAppointmentsForMonth(providerNo, startDate, endDate);
 		return generateAppointmentSlots(possibleSlots, monthlyAppointments);
 	}
 
