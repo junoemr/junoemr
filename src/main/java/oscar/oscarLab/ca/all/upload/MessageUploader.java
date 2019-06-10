@@ -85,7 +85,7 @@ import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
 import oscar.oscarLab.ca.all.parsers.SpireHandler;
 import oscar.util.UtilDateUtilities;
 
-import static org.oscarehr.common.io.FileFactory.createDocumentFile;
+import static org.oscarehr.common.io.FileFactory.createEmbeddedLabFile;
 
 public final class MessageUploader {
 
@@ -701,7 +701,7 @@ public final class MessageUploader {
 	{
 		InputStream fileStream = new ByteArrayInputStream(Base64.decodeBase64(embeddedPDF));
 
-		GenericFile embeddedLabDoc = createDocumentFile(fileStream, fileName);
+		GenericFile embeddedLabDoc = createEmbeddedLabFile(fileStream, fileName);
 
 		Document document = new Document();
 		document.setDocCreator(ProviderData.SYSTEM_PROVIDER_NO);
