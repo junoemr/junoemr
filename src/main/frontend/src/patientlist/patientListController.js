@@ -35,7 +35,6 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 	'Navigation',
 	'personaService',
 	'providerService',
-	'patientListState',
 	'scheduleService',
 
 	function(
@@ -48,7 +47,6 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		Navigation,
 		personaService,
 		providerService,
-		patientListState,
 		scheduleService)
 	{
 

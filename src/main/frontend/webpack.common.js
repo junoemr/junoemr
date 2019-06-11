@@ -242,12 +242,7 @@ module.exports = {
 			'./src/dashboard/ticklerConfigureController.js',
 
 			'./src/patientlist/module.js',
-			'./src/patientlist/patientListState.js',
 			'./src/patientlist/patientListController.js',
-			'./src/patientlist/patientListAppointmentListController.js',
-			'./src/patientlist/patientListConfigController.js',
-			'./src/patientlist/patientListDemographicSetController.js',
-			'./src/patientlist/patientListProgramController.js',
 
 			'./src/record/module.js',
 			'./src/record/recordController.js',
