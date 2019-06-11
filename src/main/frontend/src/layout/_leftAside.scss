@@ -4,6 +4,7 @@
 	.btn-aside-container {
 		position:absolute;
 		left: 0;
+		z-index: 1000;
 	}
 
 	.patient-list-header {
@@ -12,23 +13,24 @@
 	}
 
 	.patient-list-content {
-		height: calc(100vh - #{$primary-navbar-height} - #{$btn-aside-size});
+		height: calc(100vh - #{$primary-navbar-height} - #{$page-header-height});
 
 		#patient-list-nav {
-			@include juno-tab-md(48px);
+			$margin-height: 4px;
+			@include juno-tab-md(calc(#{$page-tabs-height} - #{$margin-height}));
 			@include juno-tab-color-scheme-primary;
 			@include juno-font-tab;
 			border-right: $primary-hover 8px solid !important;
 			li a {
-				margin-top: 4px;
-				margin-left: 4px;
-				margin-right: 4px;
+				margin-top: $margin-height;
+				margin-left: $margin-height;
+				margin-right: $margin-height;
 			}
 		}
 
 		.content-controller {
 			@extend %juno-content-control;
-			height: 72px;
+			height: $page-header-height;
 			border-right: $grey-07 8px solid;
 			.form-control {
 				background-color: $white;
@@ -42,8 +44,8 @@
 					background-color: $white;
 				}
 				.icon {
-					width: 24px;
-					height: 24px;
+					width: 20px;
+					height: 20px;
 				}
 			}
 			.form-inline {
@@ -118,8 +120,8 @@
 }
 
 .toggle-patient-list-button {
-	height: $btn-aside-size;
-	width: $toggle-patient-list-btn-width;
+	height: $page-header-height;
+	width: $left-aside-width-collapsed;
 	background-color: $secondary-blue;
 	border-style: solid;
 	border-width: 1px;
@@ -148,5 +150,5 @@
 	padding-left: 0;
 	padding-right: 0;
 	background-color: $light-grey;
-	width: $toggle-patient-list-btn-width;
+	width: $left-aside-width-collapsed;
 }

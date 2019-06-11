@@ -1,6 +1,4 @@
 
-$primary-navbar-height: 56px;
-
 #parent {
 	position: fixed;
 	bottom: 0;
@@ -110,16 +108,13 @@ li.cpp-note-list:last-child {
 	height: calc(100vh - #{$primary-navbar-height});
 	overflow: auto;
 
-	$left-aside-width: 400px;
-	$right-aside-width: 400px;
-
 	#content-left-pane {
 		&.expanded {
 			width: $left-aside-width;
 			min-width: $left-aside-width;
 		}
 		&.collapsed {
-			width: $toggle-patient-list-btn-width;
+			width: $left-aside-width-collapsed;
 		}
 	}
 	#content-center-pane {

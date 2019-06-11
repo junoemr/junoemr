@@ -21,7 +21,7 @@
 		@extend %juno-page-header;
 		padding-right: 12px;
 
-		margin-bottom: $margin-md;
+		//margin-bottom: $margin-md;
 		h3 {
 			color: $white;
 		}
@@ -31,6 +31,9 @@
 	}
 
 	#dashboard-body {
+		@extend %juno-primary-view-pane;
+		@include juno-page-padding-default;
+
 		.dashboard-row {
 			margin-bottom: $margin-sm;
 		}

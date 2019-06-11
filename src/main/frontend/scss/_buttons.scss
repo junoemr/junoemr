@@ -27,6 +27,18 @@
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	&.btn-sm {
+		padding: 5px 10px;
+		font-size: 12px;
+		line-height: 1.5;
+		border-radius: 3px;
+	}
+	&.btn-xs {
+		padding: 1px 5px;
+		font-size: 12px;
+		line-height: 1.5;
+		border-radius: 3px;
+	}
 
 	&.btn-default {
 		background-color: $white;
@@ -45,8 +57,8 @@
 	}
 
 	&.btn-aside {
-		width: $btn-aside-size;
-		height: $btn-aside-size;
+		width: $page-header-height;
+		height: $page-header-height;
 		background-color: #3c5a96;
 		border-radius: 0;
 		border: 1px solid transparent;

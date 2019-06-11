@@ -1,0 +1,30 @@
+
+@mixin juno-page-margin($margin-size)
+{
+	margin-left: $margin-size;
+	margin-right: $margin-size;
+}
+@mixin juno-page-padding($padding-size)
+{
+	padding-left: $padding-size;
+	padding-right: $padding-size;
+}
+
+
+@mixin juno-page-margin-default
+{
+	@include juno-page-margin(30px);
+}
+@mixin juno-page-margin-none
+{
+	@include juno-page-margin(0);
+}
+
+@mixin juno-page-padding-default
+{
+	@include juno-page-padding(30px);
+}
+@mixin juno-page-padding-none
+{
+	@include juno-page-padding(0);
+}

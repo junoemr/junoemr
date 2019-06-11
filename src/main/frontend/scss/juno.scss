@@ -5,6 +5,7 @@
 @import "mixins/junoFonts";
 @import "mixins/junoSelect";
 @import "mixins/junoTab";
+@import "mixins/junoPageSizing";
 // Custom Bootstrap
 @import "bootstrap/bootstrap_variables";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
@@ -36,6 +37,7 @@
 @import "../src/patient/patient";
 @import "../src/patientlist/patient-list";
 @import "../src/patientlist/patient-list-appointment-list";
+@import "../src/report/reports";
 @import "../src/record/record";
 @import "../src/record/details/details";
 @import "../src/record/summary/summary";

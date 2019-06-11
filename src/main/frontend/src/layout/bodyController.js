@@ -40,5 +40,9 @@ angular.module('Layout').controller('Layout.BodyController', [
 		{
 			controller.showPatientList = !controller.showPatientList;
 		};
+		controller.isLeftAsideOpen = function()
+		{
+			return (controller.showPatientList === true);
+		};
 	}
 ]);

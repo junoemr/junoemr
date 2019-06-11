@@ -40,7 +40,7 @@
 	@include juno-tab($tabs-height, 16px, 46px, 18px);
 }
 
-@mixin juno-tab-color-scheme($bg-color, $tab-bg-color, $font-color, $hover-color, $active-bg-color, $active-font-color) {
+@mixin juno-tab-color-scheme($bg-color, $tab-bg-color, $font-color, $hover-color, $active-bg-color, $active-font-color, $bottom-border-size: 0) {
 	&.nav,.nav,ul {
 		background-color: $bg-color;
 		border-color: transparent;
@@ -55,6 +55,7 @@
 				}
 			}
 			&.active {
+				border-bottom: $bottom-border-size solid $active-font-color;
 				a {
 					color: $active-font-color;
 					background-color: $active-bg-color;
@@ -64,16 +65,9 @@
 	}
 }
 
-@mixin juno-tab-color-scheme-white {
+@mixin juno-tab-color-scheme-white($bottom-border-size: 0) {
 	@include juno-tab-color-scheme($white, $white, $grey-02,
-			$grey-07, $white, $primary);
-	&.nav,.nav,ul {
-		li {
-			&.active {
-				border-bottom: 4px solid $primary;
-			}
-		}
-	}
+			$grey-07, $white, $primary, $bottom-border-size);
 }
 
 @mixin juno-tab-color-scheme-light {

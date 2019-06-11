@@ -80,6 +80,9 @@
 
 	.fc-view-container
 	{
+		@extend %juno-primary-view-pane;
+		@include juno-page-margin-none;
+
 		background: #f6f6f6;
 		overflow-x: scroll;
 
@@ -213,7 +216,7 @@
 			background-color: $grey-08;
 		}
 		.fc-axis {
-			width: $btn-aside-size !important;
+			width: $page-header-height !important;
 			padding: 0;
 		}
 

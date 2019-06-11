@@ -141,13 +141,22 @@ a,.clickable {
 
 /* page header css. page specific css should extend this */
 %juno-page-header {
-	height: $btn-aside-size;
+	height: $page-header-height;
 	color: $white;
 	background-color: $primary;
-	padding-left: $btn-aside-size;
+	padding-left: $page-header-height;
 }
 
 %juno-content-control {
 	color: $grey-02;
 	background-color: $grey-08;
+}
+
+%juno-primary-view-pane {
+	overflow: auto;
+	height: calc(100vh - #{$primary-navbar-height} - #{$page-header-height});
+}
+%juno-primary-view-pane-tabs {
+	overflow: auto;
+	height: calc(100vh - #{$primary-navbar-height} - #{$page-header-height} - #{$page-tabs-height});
 }
