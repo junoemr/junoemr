@@ -85,3 +85,8 @@
 	@include juno-tab-color-scheme($grey-01, $grey-01, $white,
 			$primary-hover, $primary, $white);
 }
+
+@mixin juno-tab-color-scheme-primary {
+	@include juno-tab-color-scheme($primary, $primary, $white,
+			$primary-hover, $grey-08, $primary);
+}

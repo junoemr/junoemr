@@ -16,6 +16,8 @@ $icon-month-view-blue: $images-root + 'cal-monthblue.svg';
 $icon-logo: $images-root + 'logo.svg';
 $icon-add: $images-root + 'icon-16-add.svg';
 $icon-phone: $images-root + 'icon-16-phone.svg';
+$icon-aside: $images-root + 'icon-48-aside.svg';
+$icon-setting: $images-root + 'icon-48-setting.svg';
 
 $icon-up: $images-root + 'icon-16-arrow-up.svg';
 $icon-down: $images-root + 'icon-16-arrow-down.svg';
@@ -54,6 +56,12 @@ $icon-status-11: $images-appt-status + 'icon-48-1.svg';
 
 .icon-logo {
 	background-image: url($icon-logo);
+}
+.icon-aside {
+	background-image: url($icon-aside);
+}
+.icon-setting {
+	background-image: url($icon-setting);
 }
 .icon-down {
 	background-image: url($icon-down);

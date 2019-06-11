@@ -110,8 +110,8 @@ li.cpp-note-list:last-child {
 	height: calc(100vh - #{$primary-navbar-height});
 	overflow: auto;
 
-	$left-aside-width: 320px;
-	$right-aside-width: 320px;
+	$left-aside-width: 400px;
+	$right-aside-width: 400px;
 
 	#content-left-pane {
 		&.expanded {
@@ -119,81 +119,6 @@ li.cpp-note-list:last-child {
 			min-width: $left-aside-width;
 		}
 		&.collapsed {
-			width: $toggle-patient-list-btn-width;
-		}
-
-		#left-aside {
-			position: fixed;
-			top: $primary-navbar-height;
-			bottom: 0;
-			left: 0;
-			z-index: 1000;
-			display: block;
-			overflow-x: hidden;
-			overflow-y: auto;
-			background-color: $light-grey;
-			padding-left: 0;
-			padding-right: 0;
-			li {
-				color: $secondary-white;
-			}
-			.list-group-item {
-				border-right: 0;
-			}
-			#left-aside-header {
-				background-color: $secondary-blue;
-				margin-right: 0;
-				h1 {
-					margin: 0;
-				}
-				a {
-					color: $secondary-white;
-					&:hover {
-						color: $hover-white;
-					}
-				}
-				#left-pane-header-title {
-					text-align: center;
-					font-size: 20px;
-					color: $secondary-white;
-				}
-			}
-			#patient-search {
-				padding: 20px;
-			}
-		}
-
-		.toggle-patient-list-button {
-			height: $btn-aside-size;
-			width: $toggle-patient-list-btn-width;
-			background-color: $secondary-blue;
-			border-style: solid;
-			border-width: 1px;
-			border-color: $primary-blue;
-			border-bottom: 0;
-			border-top: 0;
-			border-left: 0;
-			&:hover {
-				background-color: $secondary-hover-blue;
-			}
-			.glyphicon-chevron-left {
-				color: $secondary-white;
-			}
-			.glyphicon-chevron-right {
-				color: $secondary-white;
-			}
-		}
-		#left-aside-hidden {
-			position: fixed;
-			top: $primary-navbar-height;
-			bottom: 0;
-			left: 0;
-			z-index: 1000;
-			display: block;
-			overflow-x: hidden;
-			padding-left: 0;
-			padding-right: 0;
-			background-color: $light-grey;
 			width: $toggle-patient-list-btn-width;
 		}
 	}

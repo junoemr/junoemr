@@ -29,6 +29,7 @@
 @import "directives/toggle-switch";
 @import "directives/juno-checkbox";
 // Section-specific things
+@import "../src/layout/leftAside";
 @import "../src/schedule/schedule";
 @import "../src/common/directives/junoDirectives";
 @import "../src/dashboard/dashboard";

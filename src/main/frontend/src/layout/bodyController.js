@@ -35,5 +35,10 @@ angular.module('Layout').controller('Layout.BodyController', [
 			{
 				controller.showPatientList = value;
 			});
+
+		controller.toggleShowPatientList = function()
+		{
+			controller.showPatientList = !controller.showPatientList;
+		};
 	}
 ]);

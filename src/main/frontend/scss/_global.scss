@@ -26,6 +26,9 @@ h1,h2,h3 {
 .align-items-baseline {
 	align-items: baseline;
 }
+.justify-content-evenly {
+	justify-content: space-evenly;
+}
 
 .flex-row {
 	display: flex;
@@ -142,4 +145,9 @@ a,.clickable {
 	color: $white;
 	background-color: $primary;
 	padding-left: $btn-aside-size;
+}
+
+%juno-content-control {
+	color: $grey-02;
+	background-color: $grey-08;
 }

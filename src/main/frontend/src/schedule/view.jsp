@@ -65,7 +65,7 @@
 							<div class="form-group">
 								<ca-field-date
 										ca-template="bare"
-										ca-date-picker-id="select-date"
+										ca-date-picker-id="schedule-view-select-date"
 										ca-name="Date"
 										ca-model="datepickerSelectedDate"
 										ca-orientation="auto"
