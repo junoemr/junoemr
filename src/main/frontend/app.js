@@ -30,6 +30,7 @@ require('font-awesome/css/font-awesome.min.css');
 
 var oscarApp = angular.module('oscarProviderViewModule', [
 	'ui.router',
+	'infinite-scroll',
 	'ui.router.state.events',
 	'ngResource',
 	'ui.bootstrap',
