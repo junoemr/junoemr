@@ -51,10 +51,10 @@ public final class OscarSpringContextLoader extends ContextLoader
 		String[] configLocations = wac.getConfigLocations();
 		String moduleNames = (String) OscarProperties.getInstance().get(MODULE_PROPERTY_NAME);
 		ArrayList<String> moduleLocations = new ArrayList<String>();
+		moduleLocations.add(BASE_CONTEXT_NAME + ".xml");
 		if (moduleNames != null && moduleNames.trim().length() > 0)
 		{
 			String[] moduleList = moduleNames.split(",");
-			moduleLocations.add(BASE_CONTEXT_NAME + ".xml");
 			for (String module : moduleList)
 			{
 				log.error("Adding module: " + module);
