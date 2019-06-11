@@ -30,6 +30,7 @@ import java.lang.annotation.Annotation;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.common.annotation.LogHeaderInbound;
 import org.oscarehr.ws.common.annotation.MaskParameter;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
@@ -196,7 +197,7 @@ public class SoapLogBuilder
         String xml = this.rawPostData;
         if (!keepHeader && isPostBodyParseable())
         {
-            xml = stripTag("env:Header", xml);
+            xml = stripTag("env:Body", xml, true);
         }
 
         if (isSoapMethodAnnotatedWith(MaskParameter.class ) && isPostBodyParseable())
@@ -316,21 +317,31 @@ public class SoapLogBuilder
         }
     }
 
-
-    private String stripTag(String tagToStrip, String xml)
+    /**
+     * strips a tag out from an xml string
+     * @param tagToStrip the tag to strip
+     * @param xml the xml string on which the operation is to be performed
+     * @param invert if true every thing but the provided tag is stripped
+     * @return xml after the strip operation is carried out
+     */
+    private String stripTag(String tagToStrip, String xml, boolean invert)
     {
         try
         {
             XMLReader xmlReader = new XMLFilterImpl(XMLReaderFactory.createXMLReader())
             {
-                boolean skipping = false;
+                boolean skipping = invert;
 
                 @Override
                 public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException
                 {
                     if (tagToStrip.equals(qName))
                     {
-                        skipping = true;
+                        skipping = !invert;
+                        if (invert)
+                        {
+                            super.startElement(uri, localName, qName, atts);
+                        }
                     }
                     else if (!skipping)
                     {
@@ -352,7 +363,11 @@ public class SoapLogBuilder
                 {
                     if (tagToStrip.equals(qName))
                     {
-                        skipping = false;
+                        skipping = invert;
+                        if (invert)
+                        {
+                            super.endElement(uri, localName, qName);
+                        }
                     }
                     else if (!skipping)
                     {
