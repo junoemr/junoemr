@@ -39,15 +39,19 @@
 	}
 %>
 
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@ page import="java.sql.*, java.util.*, oscar.MyDateFormat, org.oscarehr.common.OtherIdManager,oscar.oscarDemographic.data.*,java.text.SimpleDateFormat,org.oscarehr.util.SpringUtils"%>
-<%@ page import="org.oscarehr.event.EventService"%>
+<%@page import="org.oscarehr.common.OtherIdManager"%>
+<%@ page import="org.oscarehr.common.dao.OscarAppointmentDao,
+org.oscarehr.common.model.Appointment,
+org.oscarehr.event.EventService,
+org.oscarehr.util.LoggedInInfo,
+org.oscarehr.util.SpringUtils,
+oscar.log.LogAction,oscar.log.LogConst"%>
+<%@ page import="oscar.oscarDemographic.data.DemographicData"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
-<%@page import="org.oscarehr.common.model.Appointment" %>
+<%@page import="oscar.oscarDemographic.data.DemographicMerged" %>
 <%@page import="oscar.util.ConversionUtils" %>
-<%@page import="oscar.util.UtilDateUtilities"%>
+<%@page import="oscar.util.UtilDateUtilities" %>
 <%
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
     		
@@ -68,11 +72,10 @@
 <%
 	int demographicNo = 0;
 	org.oscarehr.common.model.Demographic demo = null;
-        String createDateTime = UtilDateUtilities.DateToString(new java.util.Date(),"yyyy-MM-dd HH:mm:ss");
-	if (request.getParameter("demographic_no") != null && !(request.getParameter("demographic_no").equals(""))) {
-    	demographicNo = Integer.parseInt(request.getParameter("demographic_no"));
-    	DemographicData demData = new DemographicData();
-        demo = demData.getDemographic(loggedInInfo, request.getParameter("demographic_no"));
+	String createDateTime = UtilDateUtilities.DateToString(new java.util.Date(), "yyyy-MM-dd HH:mm:ss");
+	if(request.getParameter("demographic_no") != null && !(request.getParameter("demographic_no").equals("")))
+	{
+		demographicNo = Integer.parseInt(request.getParameter("demographic_no"));
 	}
 
 	Appointment a = new Appointment();
@@ -94,25 +97,28 @@
 	a.setRemarks(request.getParameter("remarks"));
 	a.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
 	//the keyword(name) must match the demographic_no if it has been changed
-    demo = null;
-if (request.getParameter("demographic_no") != null && !(request.getParameter("demographic_no").equals(""))) {
-    DemographicMerged dmDAO = new DemographicMerged();
-    a.setDemographicNo(Integer.parseInt(dmDAO.getHead(request.getParameter("demographic_no"))));
+	if(request.getParameter("demographic_no") != null && !(request.getParameter("demographic_no").equals("")))
+	{
+		DemographicMerged dmDAO = new DemographicMerged();
+		a.setDemographicNo(Integer.parseInt(dmDAO.getHead(request.getParameter("demographic_no"))));
 
-	DemographicData demData = new DemographicData();
-	demo = demData.getDemographic(loggedInInfo, String.valueOf(a.getDemographicNo()));
-	a.setName(demo.getLastName()+","+demo.getFirstName());
-} else {
-    a.setDemographicNo(0);
-	a.setName(request.getParameter("keyword"));
-}
+		DemographicData demData = new DemographicData();
+		demo = demData.getDemographic(loggedInInfo, String.valueOf(a.getDemographicNo()));
+		a.setName(demo.getLastName() + "," + demo.getFirstName());
+	}
+	else
+	{
+		a.setDemographicNo(0);
+		a.setName(request.getParameter("keyword"));
+	}
 	
 	a.setProgramId(Integer.parseInt((String)request.getSession().getAttribute("programId_oscarView")));
 	a.setUrgency((request.getParameter("urgency")!=null)?request.getParameter("urgency"):"");
 	
 	appointmentDao.persist(a);
-	
-    
+
+	LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), a.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_APPT,
+			LogConst.STATUS_SUCCESS, String.valueOf(a.getId()), request.getRemoteAddr());
     
     int rowsAffected = 1;
 	if (rowsAffected == 1) {

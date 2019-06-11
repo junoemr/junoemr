@@ -39,15 +39,18 @@
 	}
 %>
 
-<%@ page import="java.sql.*, java.util.*, oscar.*, oscar.util.*, org.oscarehr.common.OtherIdManager"%>
-<%@ page import="org.oscarehr.event.EventService"%>
+<%@ page import="org.oscarehr.common.OtherIdManager,
+org.oscarehr.common.dao.AppointmentArchiveDao,
+org.oscarehr.common.dao.OscarAppointmentDao,
+org.oscarehr.common.model.Appointment,
+org.oscarehr.event.EventService"%>
+<%@ page import="org.oscarehr.util.SpringUtils"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@page import="org.oscarehr.common.dao.AppointmentArchiveDao" %>
-<%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
-<%@page import="org.oscarehr.common.model.Appointment" %>
-<%@page import="org.oscarehr.util.SpringUtils" %>
+<%@page import="oscar.MyDateFormat" %>
 <%@page import="oscar.util.ConversionUtils" %>
+<%@ page import="oscar.log.LogAction" %>
+<%@ page import="oscar.log.LogConst" %>
 <%
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
@@ -85,6 +88,9 @@
       	appt.setLastUpdateUser(updateuser);
       	appointmentDao.merge(appt);
       	rowsAffected=1;
+
+		  LogAction.addLogEntry(updateuser, appt.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_APPT,
+				  LogConst.STATUS_SUCCESS, String.valueOf(appt.getId()), request.getRemoteAddr());
       }
 
   } else {
@@ -118,6 +124,9 @@
 			}
 			
 			appointmentDao.merge(appt);
+
+		  LogAction.addLogEntry(updateuser, appt.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_APPT,
+				  LogConst.STATUS_SUCCESS, String.valueOf(appt.getId()), request.getRemoteAddr());
 			rowsAffected=1;
 	  }
 	  

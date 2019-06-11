@@ -41,74 +41,63 @@ public class DemographicPharmacyDao extends AbstractDao<DemographicPharmacy> {
 	}
 
 	public DemographicPharmacy addPharmacyToDemographic(Integer pharmacyId, Integer demographicNo, Integer preferredOrder) {
-
-		String sql = "select x from DemographicPharmacy x where x.status = ? and x.demographicNo = ? and x.pharmacyId = ?";
+		// If there is an existing pharmacy entry existing that we want to modify, grab it
+		String sql = "SELECT x FROM DemographicPharmacy x WHERE x.status = ? AND x.demographicNo = ? AND x.pharmacyId = ?";
 		Query query = entityManager.createQuery(sql);		
 		query.setParameter(1, DemographicPharmacy.ACTIVE);
 		query.setParameter(2, demographicNo);
 		query.setParameter(3, pharmacyId);
 		DemographicPharmacy demographicPharmacy = getSingleResultOrNull(query);
-		int currentOrder;
-		if( demographicPharmacy != null ) {
-			
-			int min,max;
-			currentOrder = demographicPharmacy.getPreferredOrder();
-			min = currentOrder > preferredOrder ? preferredOrder : currentOrder;
-			max = currentOrder > preferredOrder ? currentOrder : preferredOrder;
-			
-			sql = "select x from DemographicPharmacy x where x.status = ? and x.demographicNo = ? and x.preferredOrder >= ? and x.preferredOrder < ?";
-			query = entityManager.createQuery(sql);
-			query.setParameter(1, DemographicPharmacy.ACTIVE);
-			query.setParameter(2, demographicNo);
-			query.setParameter(3, min);
-			query.setParameter(4, max);			
-		}
-		else {
-			sql = "select x from DemographicPharmacy x where x.status = ? and x.demographicNo = ? and x.preferredOrder >= ?";
-			query = entityManager.createQuery(sql);
-			query.setParameter(1, DemographicPharmacy.ACTIVE);
-			query.setParameter(2, demographicNo);
-			query.setParameter(3, preferredOrder);
-		}
-		 		
+
+		sql = "SELECT x FROM DemographicPharmacy x WHERE x.status = ? AND x.demographicNo = ? ORDER BY x.preferredOrder";
+		query = entityManager.createQuery(sql);
+		query.setParameter(1, DemographicPharmacy.ACTIVE);
+		query.setParameter(2, demographicNo);
+
 		@SuppressWarnings("unchecked")
 		List<DemographicPharmacy> results = query.getResultList();
-		
-		for( DemographicPharmacy demographicPharmacy2 : results ) {
-			currentOrder = demographicPharmacy2.getPreferredOrder();
-			++currentOrder;
-			if( currentOrder > 10 ) {
+		DemographicPharmacy targetPharmacy;
+
+		// Determine if the pharmacy we want is already in the list or needs a new DB entry
+		if (demographicPharmacy == null)
+		{
+			targetPharmacy = new DemographicPharmacy();
+			targetPharmacy.setAddDate(new Date());
+			targetPharmacy.setStatus(DemographicPharmacy.ACTIVE);
+			targetPharmacy.setDemographicNo(demographicNo);
+			targetPharmacy.setPharmacyId(pharmacyId);
+			targetPharmacy.setPreferredOrder(preferredOrder);
+			persist(targetPharmacy);
+		}
+		else
+		{
+			targetPharmacy = demographicPharmacy;
+			results.remove(targetPharmacy);
+		}
+		// Now that we know the list no longer contains the pharmacy being modified, add it to the correct spot
+		results.add(preferredOrder - 1, targetPharmacy);
+
+		// Use the list's order to re-assign the correct preferredPharmacy order (index+1 for every node)
+		for (DemographicPharmacy demographicPharmacy2 : results)
+		{
+			if (demographicPharmacy2.getPreferredOrder() - 1 == results.indexOf(demographicPharmacy2))
+			{
+				continue;
+			}
+			int newOrder = results.indexOf(demographicPharmacy2) + 1;
+			demographicPharmacy2.setPreferredOrder(newOrder);
+			if (newOrder > 10)
+			{
 				demographicPharmacy2.setStatus(DemographicPharmacy.INACTIVE);
 			}
-			
-			demographicPharmacy2.setPreferredOrder(currentOrder);
+
 			merge(demographicPharmacy2);
 		}
-		
-		
-		if( demographicPharmacy == null ) {
-		
-			DemographicPharmacy dp = new DemographicPharmacy();
-			dp.setAddDate(new Date());
-			dp.setStatus(DemographicPharmacy.ACTIVE);
-			dp.setDemographicNo(demographicNo);
-			dp.setPharmacyId(pharmacyId);
-			dp.setPreferredOrder(preferredOrder);
-			persist(dp);
-			return dp;
-		}
-		else {
-			
-			demographicPharmacy.setPreferredOrder(preferredOrder);
-			merge(demographicPharmacy);
-			return demographicPharmacy;
-		}
-		
-		
+
+		return targetPharmacy;
 	}
 	
 	public void unlinkPharmacy(Integer pharmacyId, Integer demographicNo ) {
-		
 		String sql = "select x from DemographicPharmacy x where x.status = ? and x.demographicNo = ? and x.pharmacyId = ?";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter(1, DemographicPharmacy.ACTIVE);
@@ -118,7 +107,7 @@ public class DemographicPharmacyDao extends AbstractDao<DemographicPharmacy> {
 		
 		if( demographicPharmacy != null ) {
 			
-			demographicPharmacy.setStatus("0");
+			demographicPharmacy.setStatus(DemographicPharmacy.INACTIVE);
 		    merge(demographicPharmacy);
 		    
 			sql = "select x from DemographicPharmacy x where x.status = ? and x.demographicNo = ? and x.preferredOrder > ?";

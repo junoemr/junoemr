@@ -49,11 +49,13 @@
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@page import="oscar.MyDateFormat" %>
 <%@page import="oscar.appt.AppointmentMailer" %>
-<%@page import="oscar.oscarDemographic.data.DemographicData" %>
-<%@page import="oscar.oscarDemographic.data.DemographicMerged" %>
-<%@page import="oscar.util.ConversionUtils"%>
-<%@ page import="oscar.util.UtilDateUtilities"%>
-<%@page import="javax.validation.ConstraintViolationException" %>
+<%@page import="oscar.log.LogAction" %>
+<%@page import="oscar.log.LogConst" %>
+<%@page import="oscar.oscarDemographic.data.DemographicData"%>
+<%@ page import="oscar.oscarDemographic.data.DemographicMerged"%>
+<%@page import="oscar.util.ConversionUtils" %>
+<%@ page import="oscar.util.UtilDateUtilities" %>
+<%@ page import="javax.validation.ConstraintViolationException" %>
 <%@ page import="java.util.List" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -152,6 +154,9 @@ if (request.getParameter("demographic_no") != null && !(request.getParameter("de
 	try{
 		appointmentDao.persist(a);
 		appointmentNo = a.getId();
+
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), a.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_APPT,
+				LogConst.STATUS_SUCCESS, String.valueOf(a.getId()), request.getRemoteAddr());
 	} catch (ConstraintViolationException e)
 	{
 		MiscUtils.getLogger().error("ConstraintViolation", e);
