@@ -39,16 +39,16 @@
 	}
 %>
 
-<%@page import="org.oscarehr.util.SessionConstants"%>
-<%@page import="org.oscarehr.common.model.ProviderPreference"%>
-<%@page import="org.oscarehr.common.dao.AppointmentArchiveDao" %>
+<%@page import="org.oscarehr.common.OtherIdManager"%>
+<%@page import="org.oscarehr.common.dao.AppointmentArchiveDao"%>
+<%@page import="org.oscarehr.common.dao.MyGroupDao" %>
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@page import="org.oscarehr.common.model.Appointment" %>
-<%@page import="org.oscarehr.common.dao.MyGroupDao" %>
-<%@page import="org.oscarehr.common.model.MyGroup" %>
 <%@page import="org.oscarehr.common.model.Provider" %>
+<%@page import="org.oscarehr.common.model.ProviderPreference" %>
 <%@page import="org.oscarehr.schedule.dao.ScheduleDateDao" %>
 <%@page import="org.oscarehr.schedule.model.ScheduleDate" %>
+<%@page import="org.oscarehr.util.SessionConstants" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
@@ -64,8 +64,11 @@
 	boolean bEdit = request.getParameter("appointment_no") != null ? true : false;
 %>
 <%@ page
-	import="java.util.*, java.sql.*,java.net.*, oscar.*, oscar.util.*, org.oscarehr.common.OtherIdManager"
+	import="oscar.MyDateFormat, oscar.log.LogAction,oscar.log.LogConst, oscar.util.ConversionUtils, oscar.util.UtilDateUtilities, oscar.util.UtilMisc"
 	errorPage="errorpage.jsp"%>
+<%@ page import="java.util.Enumeration" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Properties" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
@@ -262,6 +265,9 @@
 				
 				appointmentDao.persist(a);
 				rowsAffected=1;
+
+	            LogAction.addLogEntry(userName, a.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_APPT,
+			            LogConst.STATUS_SUCCESS, String.valueOf(a.getId()), request.getRemoteAddr());
 		    	
 				if (rowsAffected==1) {				
 					

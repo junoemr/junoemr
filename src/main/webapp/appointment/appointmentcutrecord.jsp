@@ -35,6 +35,9 @@
 <%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@page import="org.oscarehr.common.model.Appointment" %>
 <%@page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="oscar.log.LogAction" %>
+<%@ page import="oscar.log.LogConst" %>
 <%
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
@@ -57,9 +60,14 @@
 	Appointment appt = appointmentDao.find(Integer.parseInt(request.getParameter("appointment_no")));
 	appointmentArchiveDao.archiveAppointment(appt);
 	int rowsAffected=0;
-	if(appt != null) {
+	if(appt != null)
+	{
+		LogAction.addLogEntry(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
+				appt.getDemographicNo(), LogConst.ACTION_DELETE, LogConst.CON_APPT,
+				LogConst.STATUS_SUCCESS, String.valueOf(appt.getId()), request.getRemoteAddr());
 		appointmentDao.remove(appt.getId());
-		rowsAffected=1;
+		rowsAffected = 1;
+
 	}
 	if (rowsAffected == 1) {
 %>
