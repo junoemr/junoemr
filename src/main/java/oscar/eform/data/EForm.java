@@ -774,8 +774,17 @@ public class EForm extends EFormBase {
 			// Here I am using the convention for an html attribute <element attributeKey="attributeValue">
 			final String valueKey = "value=";
 			String toInsert = valueKey + "\"" + value + "\"";
-			// The pointer is actually on the space before the first letter of the attribute name, need to move it up 1 place.
-			int attributeStartIndex = pointer + 1;
+
+			int attributeStartIndex = pointer;
+
+			if (html.charAt(pointer) == '>')
+			{ // handle special case where pointer is on closing ">".
+				toInsert = " " + toInsert;
+			}
+			else
+			{ // if not on closing ">" then we are on end of last attribute add + 1
+				attributeStartIndex++;
+			}
 
 			try
 			{
@@ -867,19 +876,21 @@ public class EForm extends EFormBase {
 
 		int currIndex = tagStart;
 		currIndex = html.indexOf(" ", currIndex);
-
-		while(currIndex < tagEnd && currIndex < html.length())
+		if (currIndex != -1)
 		{
-			StringBuilder attribKey = new StringBuilder();
-			StringBuilder attribString = new StringBuilder();
-			int attributeEnd = nextAttribute(html, currIndex, attribKey, attribString);
-
-			if (attribKey.toString().equals(attrib))
+			while (currIndex < tagEnd && currIndex < html.length())
 			{
-				return nextNonSpace(html, currIndex);
-			}
+				StringBuilder attribKey = new StringBuilder();
+				StringBuilder attribString = new StringBuilder();
+				int attributeEnd = nextAttribute(html, currIndex, attribKey, attribString);
 
-			currIndex = attributeEnd;
+				if (attribKey.toString().equals(attrib))
+				{
+					return nextNonSpace(html, currIndex);
+				}
+
+				currIndex = attributeEnd;
+			}
 		}
 
 		throw new AttributeNotFoundException("attribute [" + attrib + "] was not found");
