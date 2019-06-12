@@ -36,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -108,15 +107,12 @@ public class ScheduleTemplateService
 			it is the no-appt slot marker, or the slot ends before the time period */
 			if(slot == null || NO_APPOINTMENT_CHARACTER.equals(slot.getCode()))
 			{
-				calendarEvents.add(createFakeCalendarEvent(startDateTime, scheduleSlotLength, scheduleSlotLength, providerId));
+				calendarEvents.add(createFakeCalendarEvent(startDateTime, scheduleSlotLength, providerId));
 			}
 			else
 			{
-				if(!NO_APPOINTMENT_CHARACTER.equals(slot.getCode()))
-				{
-					// Add this row because it is the last
-					calendarEvents.add(createCalendarEvent(slot, scheduleSlotLength, providerId));
-				}
+				// Add this row because it is the last
+				calendarEvents.add(createCalendarEvent(slot, scheduleSlotLength, providerId));
 			}
 		}
 		return calendarEvents;
@@ -134,18 +130,18 @@ public class ScheduleTemplateService
 		return outTime;
 	}
 
-	private CalendarEvent createFakeCalendarEvent(LocalDateTime startDateTime, int durationMin, int scheduleSlotLength, int resourceId)
+	private CalendarEvent createFakeCalendarEvent(LocalDateTime startDateTime, int durationMin, int resourceId)
 	{
 		ScheduleSlot slot = new ScheduleSlot(
 				startDateTime,
 				null,
-				BigInteger.valueOf(durationMin).intValue(),
+				durationMin,
 				"No Schedule",
 				null,
 				"N",
 				10);
 
-		return createCalendarEvent(slot, scheduleSlotLength, resourceId);
+		return createCalendarEvent(slot, durationMin, resourceId);
 	}
 
 	private CalendarEvent createCalendarEvent(ScheduleSlot slot, int scheduleSlotLength, int resourceId)

@@ -59,7 +59,7 @@ public class AppointmentStatusListTest
 		List<AppointmentStatus> appointmentStatuses = new ArrayList<>();
 
 		AppointmentStatus appointmentStatus = new AppointmentStatus();
-		appointmentStatus.setColor("color1");
+		appointmentStatus.setJunoColor("color1");
 		appointmentStatus.setStatus("a");
 		appointmentStatus.setId(1);
 		appointmentStatus.setDescription("description1");
@@ -96,7 +96,7 @@ public class AppointmentStatusListTest
 		List<AppointmentStatus> appointmentStatuses = new ArrayList<>();
 
 		AppointmentStatus appointmentStatus = new AppointmentStatus();
-		appointmentStatus.setColor("color1");
+		appointmentStatus.setJunoColor("color1");
 		appointmentStatus.setStatus("a");
 		appointmentStatus.setId(1);
 		appointmentStatus.setDescription("description1");
@@ -133,7 +133,7 @@ public class AppointmentStatusListTest
 		List<AppointmentStatus> appointmentStatuses = new ArrayList<>();
 
 		AppointmentStatus appointmentStatus = new AppointmentStatus();
-		appointmentStatus.setColor("color1");
+		appointmentStatus.setJunoColor("color1");
 		appointmentStatus.setStatus("B");
 		appointmentStatus.setId(1);
 		appointmentStatus.setDescription("description1");
@@ -170,7 +170,7 @@ public class AppointmentStatusListTest
 		List<AppointmentStatus> appointmentStatuses = new ArrayList<>();
 
 		AppointmentStatus appointmentStatus1 = new AppointmentStatus();
-		appointmentStatus1.setColor("color1");
+		appointmentStatus1.setJunoColor("color1");
 		appointmentStatus1.setStatus("a");
 		appointmentStatus1.setId(1);
 		appointmentStatus1.setDescription("description1");
@@ -179,7 +179,7 @@ public class AppointmentStatusListTest
 		appointmentStatuses.add(appointmentStatus1);
 
 		AppointmentStatus appointmentStatus2 = new AppointmentStatus();
-		appointmentStatus2.setColor("color1");
+		appointmentStatus2.setJunoColor("color1");
 		appointmentStatus2.setStatus("B");
 		appointmentStatus2.setId(1);
 		appointmentStatus2.setDescription("description1");
