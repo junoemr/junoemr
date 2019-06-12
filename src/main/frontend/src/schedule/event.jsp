@@ -33,12 +33,12 @@
 			</div>
 		</div>
 		<div class="modal-ctl-buttons">
-			<button type="button" class="close" aria-label="Maximaze">
-				<a class="icon icon-modal-ctl icon-modal-max"></a>
-			</button>
-			<button type="button" class="close" aria-label="Minimize">
-				<a class="icon icon-modal-ctl icon-modal-min"></a>
-			</button>
+			<%--<button type="button" class="close" aria-label="Maximaze">--%>
+				<%--<a class="icon icon-modal-ctl icon-modal-max"></a>--%>
+			<%--</button>--%>
+			<%--<button type="button" class="close" aria-label="Minimize">--%>
+				<%--<a class="icon icon-modal-ctl icon-modal-min"></a>--%>
+			<%--</button>--%>
 			<button type="button" class="close" aria-label="Close" ng-click="eventController.cancel()">
 				<a class="icon icon-modal-ctl icon-modal-close"></a>
 			</button>
@@ -283,6 +283,7 @@
 															ca-date-picker-id="select-date"
 															ca-name="startDate"
 															ca-model="eventData.startDate"
+															ca-error="{{displayMessages.field_errors()['startDate']}}"
 															ca-orientation="auto"
 													></ca-field-date>
 												</div>
@@ -295,6 +296,7 @@
 															ca-title="Duration"
 															ca-name="duration"
 															ca-model="eventData.duration"
+															ca-error="{{displayMessages.field_errors()['duration']}}"
 															ca-rows="1">
 													</ca-field-text>
 												</div>
@@ -306,6 +308,7 @@
 															ca-title="Time"
 															ca-name="startTime"
 															ca-model="eventData.startTime"
+															ca-error="{{displayMessages.field_errors()['startTime']}}"
 															ca-template="no_button"
 															ca-minute-step="parentScope.timeIntervalMinutes()">
 													</ca-field-time>

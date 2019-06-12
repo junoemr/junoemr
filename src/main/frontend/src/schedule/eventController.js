@@ -548,18 +548,8 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		Juno.Common.Util.validateTimeString($scope.formattedTime($scope.eventData.startTime),
 			$scope.displayMessages, 'startTime', 'Start Time', true);
 
-		// if all the date/time fields look good, validate range
-		if(!$scope.displayMessages.has_errors())
-		{
-			// var startDatetime = Juno.Common.Util.getDateAndTimeMoment(
-			// 	$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
-
-			// if(endDatetime.isSame(startDatetime) ||
-			// 	endDatetime.isBefore(startDatetime))
-			// {
-			// 	$scope.displayMessages.addStandardError("The appointment must end after it starts");
-			// }
-		}
+		Juno.Common.Util.validateIntegerString($scope.eventData.duration,
+			$scope.displayMessages, 'duration', 'Duration', true, true, true);
 
 		return !$scope.displayMessages.has_errors();
 	};
