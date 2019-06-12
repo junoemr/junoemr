@@ -156,12 +156,16 @@ public class CoPDPreProcessorService
 			public String apply(String timeStamp)
 			{
 				Matcher timeStampMatcher = timeStampPattern.matcher(timeStamp);
-				if ("00000".equals(timeStamp) || "00000000".equals(timeStamp)
+				if ("00000".equals(timeStamp) || "00000000".equals(timeStamp) || "00000000000".equals(timeStamp)
 						|| "00000060000".equals(timeStamp) || "00000060100".equals(timeStamp)
 						|| "00000113000".equals(timeStamp) || "9531121".equals(timeStamp)
 						|| "00000092000".equals(timeStamp) || "9310728".equals(timeStamp)
 						|| "9550612".equals(timeStamp) || "00000132000".equals(timeStamp)
-						|| "00000123000".equals(timeStamp) || "00000124000".equals(timeStamp))
+						|| "00000123000".equals(timeStamp) || "00000124000".equals(timeStamp)
+						|| "00000150000".equals(timeStamp) || "9820416".equals(timeStamp)
+						|| "9461121".equals(timeStamp) || "9880203".equals(timeStamp)
+						|| "00000121500".equals(timeStamp) || "1330222".equals(timeStamp)
+						|| "9550506".equals(timeStamp))
 				{
 					return HL7_TIMESTAMP_BEGINNING_OF_TIME;
 				}

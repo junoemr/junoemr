@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
+import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
@@ -41,75 +42,146 @@ import java.util.List;
 public class AllergyMapper extends AbstractMapper
 {
 	private static final Logger logger = MiscUtils.getLogger();
+	public static final String MEDIPLAN_ALLERGY_NOTE_ID = "MEDIPLAN ALLERGY SECTION";
 
 	public AllergyMapper(ZPD_ZTR message, int providerRep)
 	{
 		super(message, providerRep);
 	}
 
-	public int getNumAllergies()
+	public int getNumAllergies(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		return provider.getALLERGYReps();
+		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{
+			int count = 0;
+			for (int i =0; i < provider.getZALReps(); i++)
+			{
+				if (isMedicalAllergyNoteMediplan(i))
+				{
+					count ++;
+				}
+			}
+			return count;
+		}
+		else
+		{
+			return provider.getALLERGYReps();
+		}
 	}
 
-	public List<Allergy> getAllergyList() throws HL7Exception
+	public List<Allergy> getAllergyList(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		int numAllergies = getNumAllergies();
+		int numAllergies = getNumAllergies(importSource);
 		List<Allergy> allergyList = new ArrayList<>(numAllergies);
 		for(int i=0; i< numAllergies; i++)
 		{
-			allergyList.add(getAllergy(i));
+			allergyList.add(getAllergy(i, importSource));
 		}
 		return allergyList;
 	}
 
-	public Allergy getAllergy(int rep) throws HL7Exception
+	public Allergy getAllergy(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		Allergy allergy = new Allergy();
+		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{
+			return getAllergyMediplan(rep);
+		}
+		else
+		{
+			Allergy allergy = new Allergy();
 
-		String description = getDescription(rep);
-		if(description == null)
+			String description = getDescription(rep);
+			if (description == null)
+			{
+				description = "INVALID/MISSING DESCRIPTION";
+				logger.warn("Missing allergy description. values set to:" + description);
+			}
+			allergy.setStartDate(getStartDate(rep));
+			allergy.setEntryDate(getStartDate(rep));
+			allergy.setDescription(description);
+			allergy.setArchived(false);
+			allergy.setTypeCode(0);// TODO can numeric code be mapped from string in IAM.2.1?
+			allergy.setDrugrefId("0");
+			allergy.setSeverityOfReaction(getSeverity(rep));
+			allergy.setOnsetOfReaction(Allergy.ONSET_CODE_UNKNOWN);
+			allergy.setReaction(getReaction(rep));
+			allergy.setPosition(0);
+
+			allergy.setAgeOfOnset(getAgeAtOnset(rep));
+
+			return allergy;
+		}
+	}
+
+	public Allergy getAllergyMediplan(int rep) throws HL7Exception
+	{
+		rep = translateAllergyRepToZALRep(rep);
+
+		Allergy allergy = new Allergy();
+		String description = provider.getZAL(rep).getZal5_alertTextSent().getValue().replace(" / ", "\n");
+		if (description == null)
 		{
 			description = "INVALID/MISSING DESCRIPTION";
 			logger.warn("Missing allergy description. values set to:" + description);
 		}
-		allergy.setStartDate(getStartDate(rep));
-		allergy.setEntryDate(getStartDate(rep));
+		allergy.setStartDate(provider.getZAL(rep).getZal2_dateOfAlert().getTs1_TimeOfAnEvent().getValueAsDate());
+		allergy.setEntryDate(provider.getZAL(rep).getZal2_dateOfAlert().getTs1_TimeOfAnEvent().getValueAsDate());
 		allergy.setDescription(description);
+
 		allergy.setArchived(false);
 		allergy.setTypeCode(0);// TODO can numeric code be mapped from string in IAM.2.1?
 		allergy.setDrugrefId("0");
-		allergy.setSeverityOfReaction(getSeverity(rep));
+		allergy.setSeverityOfReaction(Allergy.SEVERITY_CODE_UNKNOWN);
 		allergy.setOnsetOfReaction(Allergy.ONSET_CODE_UNKNOWN);
-		allergy.setReaction(getReaction(rep));
+
+		allergy.setReaction("");
 		allergy.setPosition(0);
-
-		allergy.setAgeOfOnset(getAgeAtOnset(rep));
-
 		return allergy;
 	}
 
-	public List<CaseManagementNote> getAllergyNoteList() throws HL7Exception
+	public List<CaseManagementNote> getAllergyNoteList(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		int numAllergies = getNumAllergies();
+		int numAllergies = getNumAllergies(importSource);
 		List<CaseManagementNote> allergyNoteList = new ArrayList<>(numAllergies);
 		for(int i=0; i< numAllergies; i++)
 		{
-			allergyNoteList.add(getAllergyNote(i));
+			allergyNoteList.add(getAllergyNote(i, importSource));
 		}
 		return allergyNoteList;
 	}
 
-	public CaseManagementNote getAllergyNote(int rep) throws HL7Exception
+	public CaseManagementNote getAllergyNote(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		String nteNote = StringUtils.trimToNull(getComment(rep));
+		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{
+			return getAllergyNoteMediplan(rep);
+		}
+		else
+		{
+			String nteNote = StringUtils.trimToNull(getComment(rep));
+			CaseManagementNote note = null;
+			if (nteNote != null)
+			{
+				note = new CaseManagementNote();
+				note.setNote(nteNote.replaceAll("~crlf~", "\n"));
+				note.setObservationDate(getStartDate(rep));
+				note.setUpdateDate(getStartDate(rep));
+			}
+			return note;
+		}
+	}
+
+	public CaseManagementNote getAllergyNoteMediplan(int rep) throws HL7Exception
+	{
+		rep = translateAllergyRepToZALRep(rep);
+		String nteNote = StringUtils.trimToNull(provider.getZAL(rep).getZal5_alertTextSent().getValue().replace(" / ", "\n"));
 		CaseManagementNote note = null;
-		if(nteNote != null)
+		if (nteNote != null)
 		{
 			note = new CaseManagementNote();
 			note.setNote(nteNote.replaceAll("~crlf~", "\n"));
-			note.setObservationDate(getStartDate(rep));
-			note.setUpdateDate(getStartDate(rep));
+			note.setObservationDate(provider.getZAL(rep).getZal2_dateOfAlert().getTs1_TimeOfAnEvent().getValueAsDate());
+			note.setUpdateDate(provider.getZAL(rep).getZal2_dateOfAlert().getTs1_TimeOfAnEvent().getValueAsDate());
 		}
 		return note;
 	}
@@ -160,4 +232,39 @@ public class AllergyMapper extends AbstractMapper
 	{
 		return StringUtils.trimToNull(provider.getALLERGY(rep).getNTE().getComment(0).getValue());
 	}
+
+	private boolean isMedicalAllergyNoteMediplan(int rep) throws HL7Exception
+	{
+		String ZALText = provider.getZAL(rep).getZal5_alertTextSent().getValue();
+		if ( ZALText != null)
+		{
+			return ZALText.indexOf(MEDIPLAN_ALLERGY_NOTE_ID) == 0;
+		}
+		return false;
+	}
+
+	/**
+	 * convert allergy rep which is an absolute offset to a ZAL rep which may have holes.
+	 * @param rep
+	 * @return
+	 * @throws HL7Exception
+	 */
+	private int translateAllergyRepToZALRep(int rep) throws HL7Exception
+	{
+		int count = 0;
+		for (int i =0; i < provider.getZALReps(); i++)
+		{
+			if (isMedicalAllergyNoteMediplan(i))
+			{
+				count ++;
+			}
+
+			if (count > rep)
+			{
+				return i;
+			}
+		}
+		return count;
+	}
+
 }

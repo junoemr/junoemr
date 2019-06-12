@@ -64,7 +64,8 @@ public class AlertMapper extends AbstractMapper
 		return (note.getNote().indexOf(HistoryNoteMapper.MEDIPLAN_FAMILY_HISTORY_ID) == 0 ||
 				note.getNote().indexOf(HistoryNoteMapper.MEDIPLAN_MEDICAL_NOTE_ID_1) == 0 ||
 				note.getNote().indexOf(HistoryNoteMapper.MEDIPLAN_MEDICAL_NOTE_ID_2) == 0 ||
-				note.getNote().indexOf(HistoryNoteMapper.MEDIPLAN_SOCIAL_HISTORY_ID) == 0);
+				note.getNote().indexOf(HistoryNoteMapper.MEDIPLAN_SOCIAL_HISTORY_ID) == 0 ||
+				note.getNote().indexOf(AllergyMapper.MEDIPLAN_ALLERGY_NOTE_ID) == 0);
 	}
 
 	public CaseManagementNote getReminderNote(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception

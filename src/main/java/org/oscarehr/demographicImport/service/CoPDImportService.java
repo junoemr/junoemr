@@ -190,17 +190,20 @@ public class CoPDImportService
 	{
 		logger.info("Creating Demographic Record ...");
 		Demographic demographic = importDemographicData(zpdZtrMessage, importSource);
-		logger.info("Created record " + demographic.getDemographicId() + " for patient: " + demographic.getLastName() + ", " + demographic.getFirstName());
+		if (demographic != null)
+		{
+			logger.info("Created record " + demographic.getDemographicId() + " for patient: " + demographic.getLastName() + ", " + demographic.getFirstName());
 
-		logger.info("Find/Create Provider Record(s) ...");
-		ProviderData mrpProvider = importProviderData(zpdZtrMessage, demographic, documentLocation, importSource, skipMissingDocs);
+			logger.info("Find/Create Provider Record(s) ...");
+			ProviderData mrpProvider = importProviderData(zpdZtrMessage, demographic, documentLocation, importSource, skipMissingDocs);
 
-		// set the mrp doctor after all the provider records are created
-		demographic.setProviderNo(mrpProvider.getId());
-		demographicDao.merge(demographic);
+			// set the mrp doctor after all the provider records are created
+			demographic.setProviderNo(mrpProvider.getId());
+			demographicDao.merge(demographic);
 
-		logger.info("Create Appointments ...");
-		importAppointmentData(zpdZtrMessage, demographic, mrpProvider, importSource);
+			logger.info("Create Appointments ...");
+			importAppointmentData(zpdZtrMessage, demographic, mrpProvider, importSource);
+		}
 	}
 
 	/**
@@ -260,7 +263,7 @@ public class CoPDImportService
 			logger.info("Import Pregnancy ...");
 			importPregnancyData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Allergies ...");
-			importAllergyData(zpdZtrMessage, i, assignedProvider, demographic);
+			importAllergyData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 			logger.info("Import Immunizations ...");
 			importPreventionData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Labs ...");
@@ -326,10 +329,13 @@ public class CoPDImportService
 	{
 		DemographicMapper demographicMapper = new DemographicMapper(zpdZtrMessage);
 		Demographic demographic = demographicMapper.getDemographic(importSource);
-		DemographicCust demographicCust = demographicMapper.getDemographicCust();
-		List<DemographicExt> demographicExtList = demographicMapper.getDemographicExtensions();
+		if (demographic != null)
+		{
+			DemographicCust demographicCust = demographicMapper.getDemographicCust();
+			List<DemographicExt> demographicExtList = demographicMapper.getDemographicExtensions();
 
-		demographicService.addNewDemographicRecord(IMPORT_PROVIDER, demographic, demographicCust, demographicExtList);
+			demographicService.addNewDemographicRecord(IMPORT_PROVIDER, demographic, demographicCust, demographicExtList);
+		}
 		return demographic;
 	}
 
@@ -421,20 +427,20 @@ public class CoPDImportService
 		//TODO - not implemented
 	}
 
-	private void importAllergyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception
+	private void importAllergyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		AllergyMapper allergyMapper = new AllergyMapper(zpdZtrMessage, providerRep);
 
-		for(int rep=0; rep < allergyMapper.getNumAllergies(); rep++)
+		for (int rep = 0; rep < allergyMapper.getNumAllergies(importSource); rep++)
 		{
-			Allergy allergy = allergyMapper.getAllergy(rep);
-			CaseManagementNote allergyNote = allergyMapper.getAllergyNote(rep);
+			Allergy allergy = allergyMapper.getAllergy(rep, importSource);
+			CaseManagementNote allergyNote = allergyMapper.getAllergyNote(rep, importSource);
 
 			allergy.setDemographicNo(demographic.getDemographicId());
 			allergy.setProviderNo(String.valueOf(provider.getProviderNo()));
 			allergyService.addNewAllergy(allergy);
 
-			if(allergyNote != null)
+			if (allergyNote != null)
 			{
 				allergyNote.setProvider(provider);
 				allergyNote.setSigningProvider(provider);

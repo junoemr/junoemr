@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AppointmentMapper extends AbstractMapper
 {
@@ -159,13 +161,70 @@ public class AppointmentMapper extends AbstractMapper
 			apptDate = getCreationDate(rep);
 		}
 
-		if(apptDate.compareTo(new Date()) < 0)
+		// attempt to map status based on znote text
+		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{
+			String znote = getNotes(0);
+			if (znote != null)
+			{
+				try
+				{
+					return getStatusFromNote(znote);
+				}
+				catch (RuntimeException e)
+				{
+					// use default logic
+				}
+			}
+
+		}
+
+		if (apptDate.compareTo(new Date()) < 0)
 		{
 			// appointment date is before current date
 			return "B";
 		}
 		return "t";
+	}
 
+	private String getStatusFromNote(String note) throws RuntimeException
+	{
+		Matcher statusMatcher = Pattern.compile("^\\s*([\\w\\d]+)").matcher(note);
+		if (statusMatcher.find())
+		{
+			String statusString = statusMatcher.group(1);
+
+			switch (statusString)
+			{
+				case "Done":
+				case "Billed":
+				{
+					return "B";
+				}
+				case "Arrived":
+				{
+					return "H";
+				}
+				case "Cancel":
+				case "Resched":
+				case "Recall":
+				{
+					return "C";
+				}
+				case "No":
+				{
+					if (note.contains("Show"))
+					{
+						return "N";
+					}
+				}
+				case "Left":
+				{
+					return "N";
+				}
+			}
+		}
+		throw new RuntimeException("Cannot match znote text to appointment status");
 	}
 
 	private Date calcEndTime(Date startTime, Integer duration, String units)
