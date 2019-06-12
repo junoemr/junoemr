@@ -29,6 +29,7 @@ import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -833,19 +834,10 @@ public class ManageDocumentAction extends DispatchAction {
 
 		String doc_no = request.getParameter("doc_no");
 		Document document = documentDao.getDocument(doc_no);
-
-		File documentDir = new File(GenericFile.DOCUMENT_BASE_DIR);
-		File file = new File(documentDir, document.getDocfilename());
-		byte[] pdfBytes;
-		if(file.exists())
-		{
-			pdfBytes = FileUtils.readFileToByteArray(file);
-		}
-		else
-		{
-			throw new IllegalStateException("Local document doesn't exist for eDoc (ID " + document.getId() + "): " + file.getAbsolutePath());
-		}
-		String filename = document.getDocfilename();
+		GenericFile file = FileFactory.getDocumentFile(document.getDocfilename());
+		FileInputStream stream = new FileInputStream(file.getFileObject());
+		byte[] pdfBytes = IOUtils.toByteArray(stream);
+		String filename = "lab-document-" + doc_no + ".pdf";
 
 		response.setContentType("application/pdf");
 		response.setContentLength(pdfBytes.length);
