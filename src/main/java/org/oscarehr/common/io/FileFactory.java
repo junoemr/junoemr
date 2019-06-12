@@ -50,7 +50,7 @@ public class FileFactory
 	 */
 	public static GenericFile createDocumentFile(InputStream fileInputStream, String fileName) throws IOException, InterruptedException
 	{
-		return createNewFormattedFile(fileInputStream, fileName, GenericFile.DOCUMENT_BASE_DIR);
+		return createNewFormattedFile(fileInputStream, fileName, GenericFile.DOCUMENT_BASE_DIR, true);
 	}
 
 	/**
@@ -62,8 +62,7 @@ public class FileFactory
 	 */
 	public static GenericFile createEmbeddedLabFile(InputStream fileInputStream, String fileName) throws IOException, InterruptedException
 	{
-		String formattedFileName = GenericFile.getFormattedFileName(fileName);
-		return createNewFile(fileInputStream, formattedFileName, GenericFile.DOCUMENT_BASE_DIR, false);
+		return createNewFormattedFile(fileInputStream, fileName, GenericFile.DOCUMENT_BASE_DIR, false);
 	}
 
 	/**
@@ -75,7 +74,7 @@ public class FileFactory
 	 */
 	public static GenericFile createOutboundFaxFile(InputStream fileInputStream, String fileName) throws IOException, InterruptedException
 	{
-		return createNewFormattedFile(fileInputStream, fileName, GenericFile.OUTBOUND_FAX_DIR_PENDING);
+		return createNewFormattedFile(fileInputStream, fileName, GenericFile.OUTBOUND_FAX_DIR_PENDING, true);
 	}
 
 	/**
@@ -248,11 +247,11 @@ public class FileFactory
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	private static GenericFile createNewFormattedFile(InputStream fileInputStream, String fileName, String folder) throws IOException, InterruptedException
+	private static GenericFile createNewFormattedFile(InputStream fileInputStream, String fileName, String folder, boolean reprocess) throws IOException, InterruptedException
 	{
 		String formattedFileName = GenericFile.getFormattedFileName(fileName);
 
-		return createNewFile(fileInputStream, formattedFileName, folder, true);
+		return createNewFile(fileInputStream, formattedFileName, folder, reprocess);
 	}
 
 	/**

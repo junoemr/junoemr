@@ -824,6 +824,40 @@ public class ManageDocumentAction extends DispatchAction {
 		return null;
 	}
 
+	// For documents where we've ignored reprocessing via GhostScript and do not want tomcat to
+	// have any chance of serving the PDF (in case of tomcat infinite loop/crash)
+	public ActionForward downloadPdf(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.READ, null, "_edoc");
+
+		String doc_no = request.getParameter("doc_no");
+		Document document = documentDao.getDocument(doc_no);
+
+		File documentDir = new File(GenericFile.DOCUMENT_BASE_DIR);
+		File file = new File(documentDir, document.getDocfilename());
+		byte[] pdfBytes;
+		if(file.exists())
+		{
+			pdfBytes = FileUtils.readFileToByteArray(file);
+		}
+		else
+		{
+			throw new IllegalStateException("Local document doesn't exist for eDoc (ID " + document.getId() + "): " + file.getAbsolutePath());
+		}
+		String filename = document.getDocfilename();
+
+		response.setContentType("application/pdf");
+		response.setContentLength(pdfBytes.length);
+		response.setHeader("Content-Disposition", "attachment;filename=" + filename);
+		ServletOutputStream outs = response.getOutputStream();
+		outs.write(pdfBytes);
+		outs.flush();
+		outs.close();
+
+		return null;
+	}
+
         public ActionForward viewDocumentInfo(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
                 response.setContentType("text/html");
 		doViewDocumentInfo(request, response.getWriter(),true,true);
