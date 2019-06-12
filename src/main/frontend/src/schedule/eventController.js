@@ -83,6 +83,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		duration: null,
 		doNotBook: false,
 		critical: false,
+		site: null,
 	};
 
 	$scope.timeInterval = data.timeInterval;
@@ -98,7 +99,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	controller.selectedEventStatus = null;
 	$scope.defaultEventStatus = null;
 
-	controller.selectedSiteName = null;
 	controller.siteOptions = $scope.parentScope.siteOptions;
 
 	$scope.timepickerFormat = "h:mm A";
@@ -261,14 +261,14 @@ angular.module('Schedule').controller('Schedule.EventController', [
 				$scope.initialized = true;
 			});
 
-			controller.selectedSiteName = data.eventData.site;
+			$scope.eventData.site = data.eventData.site;
 		}
 		else
 		{
 			// create mode: adjust the end date (if needed)
 			// and clear the patient model
 			controller.setPatientData();
-			controller.selectedSiteName = $scope.parentScope.selectedSiteName;
+			$scope.eventData.site = $scope.parentScope.selectedSiteName;
 			controller.setTimeAndDurationByTemplate($scope.activeTemplateEvents[0], parentScope.timeIntervalMinutes());
 
 			focus.element("#input-patient");
@@ -442,6 +442,14 @@ angular.module('Schedule').controller('Schedule.EventController', [
 						out.push({
 							label: results[i].name,
 							value: results[i].name,
+							data: {
+								id: results[i].id,
+								location: results[i].location,
+								duration: results[i].duration,
+								notes: results[i].notes,
+								reason: results[i].reason,
+								resources: results[i].resources,
+							}
 						});
 					}
 				}
@@ -450,6 +458,19 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			});
 
 		return deferred.promise;
+	};
+	controller.getTypeDataByTypeValue = function(typeValue)
+	{
+		var data = {};
+		for(var i=0; i < controller.appointmentTypeList.length; i++)
+		{
+			if(controller.appointmentTypeList[i].value === typeValue)
+			{
+				data = controller.appointmentTypeList[i].data;
+				break;
+			}
+		}
+		return data;
 	};
 
 	controller.checkEventConflicts = function()
@@ -570,7 +591,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 				eventStatusCode: controller.selectedEventStatus,
 				demographicNo: demographicNo,
 				appointmentName: appointmentName,
-				site: controller.selectedSiteName,
+				site: $scope.eventData.site,
 				doNotBook: $scope.eventData.doNotBook,
 				urgency: (($scope.eventData.critical)? 'critical' : null),
 			}
@@ -629,22 +650,56 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		$scope.demographicModel.fillData(patientTypeahead);
 	};
 
+	controller.autofillDataFromType = function(typeValue)
+	{
+		var typeData = controller.getTypeDataByTypeValue(typeValue);
+		console.info(typeData);
+
+		if(Juno.Common.Util.exists(typeData.duration) &&
+			typeData.duration > 0)
+		{
+			$scope.eventData.duration = typeData.duration;
+		}
+		if(Juno.Common.Util.exists(typeData.location) &&
+			controller.isValidSiteValue(typeData.location))
+		{
+			$scope.eventData.site = typeData.location;
+		}
+		if(Juno.Common.Util.exists(typeData.notes) &&
+			!Juno.Common.Util.isBlank(typeData.notes))
+		{
+			$scope.eventData.notes = typeData.notes;
+		}
+		if(Juno.Common.Util.exists(typeData.reason) &&
+			!Juno.Common.Util.isBlank(typeData.reason))
+		{
+			$scope.eventData.reason = typeData.reason;
+		}
+	};
+
 	//=========================================================================
 	// Watches
 	//=========================================================================/
 
-	$scope.$watch('patientTypeahead', function()
+	$scope.$watch('patientTypeahead', function(newValue, oldValue)
 	{
 		if($scope.isInitialized())
 		{
 			$scope.loadPatientFromTypeahead($scope.patientTypeahead);
 		}
 	});
-	$scope.$watch('[eventData.startTime, eventData.duration]', function()
+	$scope.$watch('[eventData.startTime, eventData.duration]', function(newValue, oldValue)
 	{
 		if($scope.isInitialized())
 		{
 			controller.checkEventConflicts();
+		}
+	});
+	$scope.$watch('eventData.type', function(newValue, oldValue)
+	{
+		if($scope.isInitialized())
+		{
+			controller.autofillDataFromType(newValue);
 		}
 	});
 
@@ -682,6 +737,17 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	$scope.hasSites = function hasSites()
 	{
 		return (controller.siteOptions.length > 0)
+	};
+	controller.isValidSiteValue = function(valueToTest)
+	{
+		for(var i=0; i < controller.siteOptions.length; i++)
+		{
+			if(controller.siteOptions[i].value === valueToTest)
+			{
+				return true;
+			}
+		}
+		return false;
 	};
 
 	$scope.clearPatient = function clearPatient()

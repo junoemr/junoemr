@@ -332,7 +332,7 @@
 											ca-template="label"
 											ca-label-size="col-md-2"
 											ca-input-size="col-md-10"
-											ca-model="eventController.selectedSiteName"
+											ca-model="eventData.site"
 											ca-options="eventController.siteOptions"
 									>
 									</ca-field-select>
