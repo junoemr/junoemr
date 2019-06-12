@@ -280,7 +280,12 @@ public class BillingDao extends AbstractDao<Billing> {
 	    }
 	    else
 		{
-	    	String[] statusTypes = statusType.split(",");
+	    	String[] statusTypes = new String[0];
+	    	if(statusType != null)
+			{
+				statusTypes = statusType.split(",");
+			}
+
 	    	if (statusTypes.length > 1)
 			{
 				statusTypeClause += " in ('" + String.join("','", statusTypes) + "')";
@@ -322,7 +327,7 @@ public class BillingDao extends AbstractDao<Billing> {
 
 	public List<Object[]> findOutstandingBills(Integer demographicNo, String billingType, List<String> statuses) {
 		String q = "FROM Billingmaster bm, Billing b " +
-				"WHERE bm.billingmasterNo = b.id " +
+				"WHERE bm.billingNo = b.id " +
 				"AND b.demographicNo = :dNo " +
 				(statuses.isEmpty() ? "" : "AND bm.billingstatus NOT IN ( :statuses ) ") +
 				"AND b.billingtype = :bType";

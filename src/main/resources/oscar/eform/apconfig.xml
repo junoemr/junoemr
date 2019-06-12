@@ -1035,36 +1035,74 @@
 	</databaseap>
 	<databaseap>
 		<ap-name>druglist_generic</ap-name>
-		<ap-sql>SELECT GROUP_CONCAT(DISTINCT if(LENGTH(d.GN) &gt; 4, GN,
-			d.customName) , if(d.takemax &gt; d.takemin, CONCAT('
-			',d.takemin,'-',d.takemax,' '), CONCAT(' ',d.takemin,' ')) ,
-			d.freqcode , if(d.prn=1,' prn','') ORDER BY d.rx_date DESC SEPARATOR
-			' \n' ) AS rxgen
-			FROM drugs d WHERE d.demographic_no=${demographic} AND d.end_date &gt;
-			DATE_ADD(CURDATE(), INTERVAL -1 WEEK) AND d.archived='0';</ap-sql>
-		<ap-output>${rxgen}</ap-output>
+		<ap-sql>SELECT GROUP_CONCAT(DISTINCT
+            IF (LENGTH(d.GN) &gt; 4,
+                GN,
+                d.customName),
+            IF (d.takemax &gt; d.takemin,
+                CONCAT(' ',d.takemin,'-',d.takemax, ' '),
+                IF (d.takemin != 0,
+                    CONCAT(' ',d.takemin,' '),
+                    CONCAT(' '))),
+			COALESCE(d.freqcode, ''),
+            IF (d.prn=1,
+                ' prn',
+                '')
+            ORDER BY d.rx_date DESC
+            SEPARATOR ' \n' ) AS rxlist
+			FROM drugs d
+            WHERE d.demographic_no=${demographic}
+            AND d.end_date &gt; DATE_ADD(CURDATE(), INTERVAL -1 WEEK)
+            AND d.archived='0';
+        </ap-sql>
+		<ap-output>${rxlist}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>druglist_trade</ap-name>
-		<ap-sql>SELECT GROUP_CONCAT(DISTINCT if(LENGTH(d.GN) &gt; 4, BN,
-			d.customName) , if(d.takemax &gt; d.takemin, CONCAT('
-			',d.takemin,'-',d.takemax,' '), CONCAT(' ',d.takemin,' ')) ,
-			d.freqcode , if(d.prn=1,' prn','') ORDER BY d.rx_date DESC SEPARATOR
-			' \n' ) AS rxlist
-			FROM drugs d WHERE d.demographic_no=${demographic} AND d.end_date &gt;
-			DATE_ADD(CURDATE(), INTERVAL -1 WEEK) AND d.archived='0';</ap-sql>
+		<ap-sql>SELECT GROUP_CONCAT(DISTINCT
+            IF (LENGTH(d.GN) &gt; 4,
+                BN,
+                d.customName),
+            IF (d.takemax &gt; d.takemin,
+                CONCAT(' ',d.takemin,'-',d.takemax,' '),
+                IF (d.takemin != 0,
+                    CONCAT(' ',d.takemin,' '),
+                    CONCAT(' '))),
+			COALESCE(d.freqcode, ''),
+            IF (d.prn=1,
+                ' prn',
+                '')
+            ORDER BY d.rx_date DESC
+            SEPARATOR ' \n' ) AS rxlist
+			FROM drugs d
+            WHERE d.demographic_no=${demographic}
+            AND d.end_date &gt; DATE_ADD(CURDATE(), INTERVAL -1 WEEK)
+            AND d.archived='0';
+        </ap-sql>
 		<ap-output>${rxlist}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>druglist_line</ap-name>
-		<ap-sql>SELECT GROUP_CONCAT(DISTINCT if(LENGTH(d.GN) &gt; 4,
-			CONCAT(UCASE(SUBSTRING(d.BN, 1, 1)),LOWER(SUBSTRING(d.BN, 2))),
-			d.customName) , IF(d.takemax &gt; d.takemin, CONCAT('
-			',d.takemin,'-',d.takemax,' '), CONCAT(' ',d.takemin,' ')) ,
-			d.freqcode , IF(d.prn=1,' prn','') ORDER BY d.rx_date DESC SEPARATOR
-			', ' ) AS rxlist
-			FROM drugs d WHERE d.demographic_no=${demographic} AND d.end_date &gt;
-			DATE_ADD(CURDATE(), INTERVAL -1 WEEK) AND d.archived='0';</ap-sql>
+		<ap-sql>SELECT GROUP_CONCAT(DISTINCT
+            IF (LENGTH(d.GN) &gt; 4,
+                CONCAT(UCASE(SUBSTRING(d.BN, 1, 1)),
+                LOWER(SUBSTRING(d.BN, 2))),d.customName),
+            IF (d.takemax > d.takemin,
+                CONCAT(' ',d.takemin,'-',d.takemax,' '),
+                IF (d.takemin != 0,
+                    CONCAT(' ',d.takemin,' '),
+                    CONCAT(' '))),
+            COALESCE(d.freqcode, ''),
+            IF (d.prn=1,
+                ' prn',
+                '')
+            ORDER BY d.rx_date DESC
+            SEPARATOR ', ' ) AS rxlist
+            FROM drugs d
+            WHERE d.demographic_no=${demographic}
+            AND d.end_date &gt; DATE_ADD(CURDATE(), INTERVAL -1 WEEK)
+            AND d.archived='0';
+        </ap-sql>
 		<ap-output>${rxlist}</ap-output>
 	</databaseap>
 	<databaseap>
@@ -1110,8 +1148,9 @@
 	</databaseap>
 	<databaseap>
 		<ap-name>bcEDD</ap-name>
-		<ap-sql>SELECT c_EDD FROM formBCAR2012 f where
-			demographic_no=${demographic} order by ID desc limit 1;</ap-sql>
+		<ap-sql>SELECT bcar.c_EDD FROM
+			(select id, demographic_no, c_EDD, formEdited from formBCAR2007 UNION select id, demographic_no, c_EDD, formEdited from formBCAR2012) as bcar
+			where bcar.demographic_no=${demographic} order by bcar.formEdited desc limit 1;</ap-sql>
 		<ap-output>${c_EDD}</ap-output>
 	</databaseap>
 

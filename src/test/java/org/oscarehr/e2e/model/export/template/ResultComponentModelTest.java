@@ -69,6 +69,7 @@ import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActMoodDocumentObservation;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActRelationshipEntryRelationship;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.MeasurementsExtDao;
+import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.MeasurementsExt;
 import org.oscarehr.e2e.constant.BodyConstants.Labs;
@@ -90,7 +91,7 @@ public class ResultComponentModelTest extends AbstractExportModelTest {
 	public static ResultComponentModel resultComponentModel;
 
 	@BeforeClass
-	public static void beforeClass() {
+	public static void beforeClass() throws Exception {
 		measurementDao = SpringUtils.getBean(MeasurementDao.class);
 		measurementsExtDao = SpringUtils.getBean(MeasurementsExtDao.class);
 

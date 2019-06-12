@@ -44,22 +44,30 @@
   String deepcolor = "#CCCCFF", weakcolor = "#EEEEFF", tableTitle = "#99ccff";
   boolean bEdit = request.getParameter("appointment_no") != null ? true : false;
 %>
-<%@ page import="java.util.*, oscar.*, oscar.util.*, java.sql.*"
+<%@ page import="org.oscarehr.common.dao.AppointmentArchiveDao,
+org.oscarehr.common.dao.OscarAppointmentDao,
+org.oscarehr.common.model.Appointment,
+org.oscarehr.util.SpringUtils"
 	errorPage="errorpage.jsp"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 
-<%@page import="org.oscarehr.common.dao.AppointmentArchiveDao" %>
-<%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
-<%@page import="org.oscarehr.common.model.Appointment" %>
-<%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="java.text.SimpleDateFormat" %>
+<%@page import="oscar.MyDateFormat" %>
+<%@page import="oscar.log.LogAction" %>
+<%@page import="oscar.util.ConversionUtils" %>
+<%@page import="oscar.util.UtilDateUtilities" %>
+<%@page import="oscar.util.UtilMisc" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.Enumeration" %>
+<%@ page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="oscar.log.LogConst" %>
 <%
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
 	SimpleDateFormat dayFormatter = new SimpleDateFormat("yyyy-MM-dd");
-	SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
-	SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 %>
 <%!
   GregorianCalendar addDateByYMD(GregorianCalendar cal, String unit, int n) {
@@ -93,7 +101,6 @@
     // repeat adding
     if (request.getParameter("groupappt").equals("Add Group Appointment") ) {
         String[] param = new String[19];
-        int rowsAffected=0, datano=0;
 
   	    java.util.Date iDate = ConversionUtils.fromDateString(request.getParameter("appointment_date"));
   	        
@@ -125,7 +132,10 @@
 			a.setUrgency(request.getParameter("urgency"));
 			a.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
 			appointmentDao.persist(a);
-			
+
+			LogAction.addLogEntry(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
+					a.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_APPT,
+					LogConst.STATUS_SUCCESS, String.valueOf(a.getId()), request.getRemoteAddr());
 
 			gCalDate.setTime(UtilDateUtilities.StringToDate(param[1], "yyyy-MM-dd"));
 			gCalDate = addDateByYMD(gCalDate, everyUnit, delta);
@@ -182,6 +192,10 @@
             		a.setLastUpdateUser(userName);
             		appointmentDao.merge(a);
             		rowsAffected++;
+
+		            LogAction.addLogEntry(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
+				            a.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_APPT,
+				            LogConst.STATUS_SUCCESS, String.valueOf(a.getId()), request.getRemoteAddr());
             	}
 				
 				gCalDate.setTime(UtilDateUtilities.StringToDate((String)param[3], "yyyy-MM-dd"));
@@ -205,6 +219,10 @@
 						(String)param[4], (String)param[5], (String)param[6],  ConversionUtils.fromTimestampString((String)param[7]), (String)param[8], Integer.parseInt((String)param[9]));
 				for(Appointment appt:appts) {
 					appointmentArchiveDao.archiveAppointment(appt);
+
+					LogAction.addLogEntry(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
+							appt.getDemographicNo(), LogConst.ACTION_DELETE, LogConst.CON_APPT,
+							LogConst.STATUS_SUCCESS, String.valueOf(appt.getId()), request.getRemoteAddr());
 					appointmentDao.remove(appt.getId());
 					rowsAffected++;
 				}
@@ -255,9 +273,12 @@
 					appt.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
 					appointmentDao.merge(appt);
 					rowsAffected++;
+
+					LogAction.addLogEntry(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
+							appt.getDemographicNo(), LogConst.ACTION_UPDATE, LogConst.CON_APPT,
+							LogConst.STATUS_SUCCESS, String.valueOf(appt.getId()), request.getRemoteAddr());
 				}
-				
-				
+
 				gCalDate.setTime(UtilDateUtilities.StringToDate((String)param[12], "yyyy-MM-dd"));
 				gCalDate = addDateByYMD(gCalDate, everyUnit, delta);
 

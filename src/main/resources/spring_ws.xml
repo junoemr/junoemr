@@ -20,6 +20,18 @@
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
+
+	<!-- ========================================================================================-->
+	<!-- Settings for the external SOAP web services -->
+	<!-- ========================================================================================-->
+
+	<!-- interceptors -->
+	<bean id="abstractLoggingInterceptor" abstract="true">
+		<property name="prettyLogging" value="true" />
+	</bean>
+	<bean id="loggingInInterceptor" class="org.apache.cxf.interceptor.LoggingInInterceptor" parent="abstractLoggingInterceptor" />
+	<bean id="loggingOutInterceptor" class="org.apache.cxf.interceptor.LoggingOutInterceptor" parent="abstractLoggingInterceptor" />
+
 	<!-- ========================================================================================-->
 	<!-- Shared SOAP/REST bus-->
 	<!-- ========================================================================================-->
@@ -170,6 +182,19 @@
 		</jaxws:features>
 	</jaxws:endpoint>
 
+	<jaxws:endpoint implementor="#dashboardWs" address="/DashboardService" >
+		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
+	</jaxws:endpoint>
+
 	<jaxws:endpoint implementor="#preventionWs" address="/PreventionService" >
 		<jaxws:inInterceptors>
 			<ref bean="IPInWSS4JInterceptor"/>
@@ -255,6 +280,9 @@
 		</property>
 	</bean>
 
+<!--	<bean id="restLoggingInInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingInInterceptor" parent="abstractLoggingInterceptor"/>
+	<bean id="restLoggingOutInterceptor" class="org.oscarehr.ws.rest.util.RestLoggingOutInterceptor" parent="abstractLoggingInterceptor"/>-->
+
 	<bean id="validationProvider" class="org.apache.cxf.validation.BeanValidationProvider"/>
 
 	<bean id="validationInInterceptor" class="org.apache.cxf.jaxrs.validation.JAXRSBeanValidationInInterceptor">
@@ -292,6 +320,7 @@
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.MissingArgumentExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.RateLimitExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.SecurityExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.ConstraintViolationExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.ValidationExceptionMapper"/>
 
 			<!-- Juno filters. -->
@@ -308,6 +337,7 @@
 		<jaxrs:serviceBeans>
 			<!-- Alphabetically Please! -->
 			<bean autowire="byName" class="org.oscarehr.ws.rest.AllergyService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.AppointmentService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.AppService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.BillingService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ConsultationWebService"/>
@@ -340,6 +370,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ResourceService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.RSSFeedService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ScheduleService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.SitesService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.SpecialistsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.StatusService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.SystemPreferenceWebService"/>
@@ -348,7 +379,6 @@
 
 			<!--  Not yet implemented
 
-			<bean class="org.oscarehr.ws.rest.SitesService"  autowire="byName"/>
 			<bean class="org.oscarehr.ws.rest.WaitListWebService" autowire="byName"/>
 			
 			-->

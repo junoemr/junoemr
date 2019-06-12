@@ -1,0 +1,10 @@
+<input type="text"
+			 id="input-{{name}}"
+			 class="form-control"
+			 placeholder="{{input_placeholder}}"
+			 ng-model="model"
+			 ng-blur="on_blur()"
+			 ng-focus="focus_fn()"
+			 ng-change="change_fn()"
+			 ng-disabled="disabled"
+			 tabindex="{{tab_index}}"/>

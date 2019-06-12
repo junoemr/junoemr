@@ -2,7 +2,21 @@
 SET FOREIGN_KEY_CHECKS = 0;
 BEGIN;
 TRUNCATE TABLE `clinic`;
-INSERT INTO `clinic` VALUES (123456,'McMaster Hospital','Hamilton','Hamilton','L0R 4K3','555-555-5555','555-555-5555','444','A','Ontario','','');
+INSERT INTO `clinic` (
+  `clinic_no`,
+  `clinic_name`,
+  `clinic_address`,
+  `clinic_city`,
+  `clinic_postal`,
+  `clinic_phone`,
+  `clinic_fax`,
+  `clinic_location_code`,
+  `status`,
+  `clinic_province`,
+  `clinic_delim_phone`,
+  `clinic_delim_fax`
+)
+ VALUES (123456,'McMaster Hospital','Hamilton','Hamilton','L0R 4K3','555-555-5555','555-555-5555','444','A','Ontario','','');
 TRUNCATE TABLE `demographic`;
 INSERT INTO `demographic` (
   demographic_no,

@@ -26,16 +26,14 @@
 
 <%@ taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite" %>
 
-<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
-<%@ page import="org.springframework.web.context.WebApplicationContext"%>
-<%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.common.model.Tickler" %>
+<%@ page import="org.oscarehr.common.dao.TicklerLinkDao"%>
+<%@ page import="org.oscarehr.common.model.Tickler"%>
 <%@ page import="org.oscarehr.common.model.TicklerLink" %>
-<%@ page import="org.oscarehr.common.dao.TicklerLinkDao" %>
-<%@ page import="oscar.util.UtilDateUtilities" %>
-<%@page import="org.oscarehr.util.MiscUtils"%>
-<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ page import="org.oscarehr.managers.TicklerManager" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.util.UtilDateUtilities"%>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%

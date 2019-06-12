@@ -127,7 +127,7 @@ public class SchemaUtils
 	public static void createDatabaseAndTables() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException
 	{
 		boolean skipDbInit = false;
-		if(System.getProperty("oscar.dbinit.skip") != null && System.getProperty("oscar.dbinit.skip").equalsIgnoreCase("true")) 
+		if(System.getProperty("oscar.skip.dbinit") != null && System.getProperty("oscar.skip.dbinit").equalsIgnoreCase("true"))
 			skipDbInit=true;
 		
 		String schema=ConfigUtils.getProperty("db_schema");
@@ -156,27 +156,6 @@ public class SchemaUtils
 	{
 		restoreTable(true,tableNames);
 	}
-
-	public static void dropTable(String... tableNames) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException
-	{
-		String schema=ConfigUtils.getProperty("db_schema");
-
-		Connection c=getConnection();
-		try
-		{
-			Statement s=c.createStatement();
-			s.executeUpdate("use "+schema);
-			for (int i = 0; i < tableNames.length; i++) {
-				s.executeUpdate("drop table if exists " + tableNames[i]);
-            }
-			s.close();
-
-		}
-		finally
-		{
-			c.close();
-		}
-	}
 	
 	private static boolean isWindows() {
 		String osName = System.getProperty("os.name");
@@ -189,9 +168,9 @@ public class SchemaUtils
 		String schema=ConfigUtils.getProperty("db_schema");
 
 		Connection c=getConnection();
+		Statement s=c.createStatement();
 		try
 		{
-			Statement s=c.createStatement();
 			s.executeUpdate("use "+schema);
 			s.executeUpdate("set foreign_key_checks = 0");
 			for (int i = 0; i < tableNames.length; i++) {
@@ -199,24 +178,19 @@ public class SchemaUtils
 				if (isWindows()) {
 					tableName = tableName.toLowerCase(); // make it case insensitive by default
 				}
-				String sql = "drop table if exists " + tableName;
+				String sql = "truncate table " + tableName;
 				s.executeUpdate(sql);
-				
-				String createTableStatement = createTableStatements.get(tableName);
-				if (createTableStatement == null) {
-					throw new IllegalStateException("Unable to locate create table statement for " + tableName + ". Please make sure that the table exists in the schema.");
-				}
-				s.executeUpdate(createTableStatement.replaceAll("_maventest", ""));
-				
 				if(includeInitData)
+				{
 					s.executeUpdate("insert into " + tableName + " select * from " + tableName + "_maventest");
+				}
             }
-			s.executeUpdate("set foreign_key_checks = 1");
-			s.close();
 
 		}
 		finally
 		{
+			s.executeUpdate("set foreign_key_checks = 1");
+			s.close();
 			c.close();
 		}
 		long end = System.currentTimeMillis();
@@ -233,20 +207,29 @@ public class SchemaUtils
 		String schema=ConfigUtils.getProperty("db_schema");
 
 		Connection c=getConnection();
+		Statement s=c.createStatement();
 		try
 		{
-			Statement s=c.createStatement();
 			s.executeUpdate("use "+schema);
+			s.executeUpdate("SET foreign_key_checks = 0");
 			for (String tableName:createTableStatements.keySet()) {
-				s.executeUpdate("drop table if exists " + tableName);
-				s.executeUpdate(createTableStatements.get(tableName));
-				s.executeUpdate("insert into " + tableName + " select * from " + tableName + "_maventest");
+				try
+				{
+					s.executeUpdate("truncate table " + tableName);
+					s.executeUpdate("insert into " + tableName + " select * from " + tableName + "_maventest");
+				}
+				catch(SQLException e)
+				{
+					logger.error("failed to restore table [" + tableName +"] with error: " + e.getMessage());
+					throw e;
+				}
             }
-			s.close();
 
 		}
 		finally
 		{
+			s.executeUpdate("SET foreign_key_checks = 1");
+			s.close();
 			c.close();
 		}
 		long end = System.currentTimeMillis();
@@ -316,7 +299,7 @@ public class SchemaUtils
 	private static void runCreateTablesScript(Connection c) throws IOException
 	{
 		boolean skipDbInit = false;
-		if(System.getProperty("oscar.dbinit.skip") != null && System.getProperty("oscar.dbinit.skip").equalsIgnoreCase("true")) 
+		if(System.getProperty("oscar.skip.dbinit") != null && System.getProperty("oscar.skip.dbinit").equalsIgnoreCase("true"))
 			skipDbInit=true;
 		
 		if(!skipDbInit) {
@@ -354,6 +337,9 @@ public class SchemaUtils
 					assertEquals(loadFileIntoMySQL(update_file.getAbsolutePath()),0);
 				}
 			}
+
+			// Fix test specific problems with the database
+			assertEquals(loadFileIntoMySQL(baseDir + "/src/test/java/integration/tests/sql/initialize_database.sql"), 0);
 		 
 			createTableStatements.clear();
 			try {
@@ -368,11 +354,24 @@ public class SchemaUtils
 						sql = renameConstraint(sql);
 						createTableStatements.put(tableName, sql);
 
-						// Rename the table so it's out of the way
-						Statement stmt = c.createStatement();
-						stmt.executeUpdate("alter table "+ tableName + " rename to " + tableName + "_maventest");
+						// Create table restore point
+						Statement getTableInfoStmt = c.createStatement();
+						ResultSet tableInfo = getTableInfoStmt.executeQuery("SHOW TABLE STATUS WHERE Name='" + tableName + "'");
+						if (tableInfo.next())
+						{
+							Statement stmt = c.createStatement();
+							String tableEngine = "";
+							if (tableInfo.getString(2) != null)
+							{
+								tableEngine = " ENGINE = " + tableInfo.getString(2);
+							}
 
-						stmt.close();
+							stmt.executeUpdate("CREATE TABLE " + tableName + "_maventest" + tableEngine + " SELECT * FROM " + tableName);
+							//stmt.executeUpdate("alter table "+ tableName + " rename to " + tableName + "_maventest");
+
+							stmt.close();
+						}
+						getTableInfoStmt.close();
 					}
 					rs2.close();
 					stmt2.close();
@@ -433,7 +432,7 @@ public class SchemaUtils
 	public static void dropAndRecreateDatabase() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException
 	{
 		boolean skipDbInit = false;
-		if(System.getProperty("oscar.dbinit.skip") != null && System.getProperty("oscar.dbinit.skip").equalsIgnoreCase("true")) 
+		if(System.getProperty("oscar.skip.dbinit") != null && System.getProperty("oscar.skip.dbinit").equalsIgnoreCase("true"))
 			skipDbInit=true;
 		if(!skipDbInit)
 			dropDatabaseIfExists();

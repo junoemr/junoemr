@@ -312,9 +312,7 @@ public class EctConsultationFormRequestAction extends Action {
 			}
 		}
 
-		if (consult.getProviderNo() == null || consult.getProviderNo().equals("")) {
-			consult.setProviderNo(frm.getProviderNo());
-		}
+		consult.setProviderNo(frm.getProviderNo());
 		consult.setReasonForReferral(frm.getReasonForConsultation());
 		consult.setClinicalInfo(frm.getClinicalInformation());
 		consult.setCurrentMeds(frm.getCurrentMedications());

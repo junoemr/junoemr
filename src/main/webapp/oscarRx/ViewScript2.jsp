@@ -23,7 +23,11 @@
     Ontario, Canada
 
 --%>
-<%@ page import="org.oscarehr.fax.dao.FaxAccountDao, org.oscarehr.common.dao.OscarAppointmentDao,org.oscarehr.common.dao.SiteDao, org.oscarehr.common.model.Appointment, org.oscarehr.fax.model.FaxAccount"%>
+<%@ page import="org.oscarehr.fax.dao.FaxAccountDao" %>
+<%@ page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
+<%@ page import="org.oscarehr.common.dao.SiteDao" %>
+<%@ page import="org.oscarehr.common.model.Appointment" %>
+<%@ page import="org.oscarehr.fax.model.FaxAccount"%>
 <%@ page import="org.oscarehr.common.model.PharmacyInfo" %>
 <%@ page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.ui.servlet.ImageRenderingServlet" %>
@@ -41,8 +45,6 @@
 <%@ page import="oscar.OscarProperties"%>
 <%! boolean bMultisites = org.oscarehr.common.IsPropertiesOn.isMultisitesEnable(); %>
 
-
-<%@page import="oscar.oscarClinic.ClinicData"%>
 <%@page import="oscar.oscarProvider.data.ProSignatureData"%>
 <%@page import="oscar.oscarRx.data.RxPharmacyData"%>
 <%@page import="java.io.File"%>
@@ -91,7 +93,7 @@
 </logic:present>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <%
-oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
+oscar.oscarRx.pageUtil.RxSessionBean sessionBean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
 
 Vector vecPageSizes=new Vector();
 vecPageSizes.add("A4 page");
@@ -101,25 +103,17 @@ Vector vecPageSizeValues=new Vector();
 vecPageSizeValues.add("PageSize.A4");
 vecPageSizeValues.add("PageSize.A6");
 vecPageSizeValues.add("PageSize.Letter");
-//are we printing in the past?
-//String reprint = (String)request.getAttribute("rePrint") != null ? (String)request.getAttribute("rePrint") : "false";
 
 String reprint = (String)request.getSession().getAttribute("rePrint") != null ? (String)request.getSession().getAttribute("rePrint") : "false";
 Boolean isReprint = Boolean.parseBoolean(reprint);
 
-String createAnewRx;
 if(isReprint) {
-    bean = (oscar.oscarRx.pageUtil.RxSessionBean)session.getAttribute("tmpBeanRX");
-    createAnewRx = "window.location.href = '" + request.getContextPath() + "/oscarRx/SearchDrug.jsp'";
+    sessionBean = (oscar.oscarRx.pageUtil.RxSessionBean)session.getAttribute("tmpBeanRX");
 }
-else
-    createAnewRx = "javascript:clearPending('')";
 
 // for satellite clinics
 Vector vecAddressName = null;
 Vector vecAddress = null;
-Vector vecAddressPhone = null;
-Vector vecAddressFax = null;
 OscarProperties props = OscarProperties.getInstance();
 if(bMultisites) {
 	String appt_no=(String)session.getAttribute("cur_appointment_no");
@@ -129,22 +123,9 @@ if(bMultisites) {
 		if (result!=null) location = result.getLocation();
 	}
 
-    oscar.oscarRx.data.RxProviderData.Provider provider = new oscar.oscarRx.data.RxProviderData().getProvider(bean.getProviderNo());
-    ProSignatureData sig = new ProSignatureData();
-    boolean hasSig = sig.hasSignature(bean.getProviderNo());
-    String doctorName = "";
-    if (hasSig){
-       doctorName = sig.getSignature(bean.getProviderNo());
-    }else{
-       doctorName = (provider.getFirstName() + ' ' + provider.getSurname());
-    }
-    doctorName = doctorName.replaceAll("\\d{6}","");
-    doctorName = doctorName.replaceAll("\\-","");
 
     vecAddressName = new Vector();
     vecAddress = new Vector();
-    vecAddressPhone = new Vector();
-    vecAddressFax = new Vector();
 
     java.util.ResourceBundle rb = java.util.ResourceBundle.getBundle("oscarResources",request.getLocale());
 
@@ -161,21 +142,12 @@ if(bMultisites) {
 
 
 } else if(props.getProperty("clinicSatelliteName") != null) {
-    oscar.oscarRx.data.RxProviderData.Provider provider = new oscar.oscarRx.data.RxProviderData().getProvider(bean.getProviderNo());
+    oscar.oscarRx.data.RxProviderData.Provider provider = new oscar.oscarRx.data.RxProviderData().getProvider(sessionBean.getProviderNo());
     ProSignatureData sig = new ProSignatureData();
-    boolean hasSig = sig.hasSignature(bean.getProviderNo());
-    String doctorName = "";
-    if (hasSig){
-       doctorName = sig.getSignature(bean.getProviderNo());
-    }else{
-       doctorName = (provider.getFirstName() + ' ' + provider.getSurname());
-    }
+    boolean hasSig = sig.hasSignature(sessionBean.getProviderNo());
 
-    ClinicData clinic = new ClinicData();
     vecAddressName = new Vector();
     vecAddress = new Vector();
-    vecAddressPhone = new Vector();
-    vecAddressFax = new Vector();
     String[] temp0 = props.getProperty("clinicSatelliteName", "").split("\\|");
     String[] temp1 = props.getProperty("clinicSatelliteAddress", "").split("\\|");
     String[] temp2 = props.getProperty("clinicSatelliteCity", "").split("\\|");
@@ -208,14 +180,6 @@ if (pharmacyId != null && !"null".equalsIgnoreCase(pharmacyId)) {
 }
 
 String userAgent = request.getHeader("User-Agent");
-String browserType = "";
-if (userAgent != null) {
-	if (userAgent.toLowerCase().indexOf("ipad") > -1) {
-		browserType = "IPAD";
-	} else {
-		browserType = "ALL";
-	}
-}
 %>
 <link rel="stylesheet" type="text/css" href="styles.css" />
 <link rel="stylesheet" type="text/css" media="all" href="../share/css/extractedFromPages.css"  />
@@ -329,45 +293,49 @@ function printIframe(){
 			}
 	}
 
-function printPaste2Parent(print){
-    //console.log("in printPaste2Parent");
-   try{
-      text =""; // "****<%=oscar.oscarProvider.data.ProviderData.getProviderName(bean.getProviderNo())%>********************************************************************************";
-      //console.log("1");
-      //text = text.substring(0, 82) + "\n";
-      if (document.all){
-         text += preview.document.forms[0].rx_no_newlines.value
-      } else {
-         text += preview.document.forms[0].rx_no_newlines.value + "\n";
-      }
-      //console.log("2");
-      text+=document.getElementById('additionalNotes').value+"\n";
-      //text += "**********************************************************************************\n";
-      //oscarLog(text);
+function printPaste2Parent(print)
+{
+	try
+	{
+		var text = preview.document.forms[0].rx_no_newlines.value;
+		text += document.getElementById('additionalNotes').value + "\n";
 
-      //we support pasting into orig encounter and new casemanagement
-      demographicNo = <%=bean.getDemographicNo()%>;
-      noteEditor = "noteEditor"+demographicNo;
-      if( window.parent.opener.document.forms["caseManagementEntryForm"] != undefined ) {
-          //oscarLog("3");
-        window.parent.opener.pasteToEncounterNote(text);
-      }else if( window.parent.opener.document.encForm != undefined ){
-          //oscarLog("4");
-        window.parent.opener.document.encForm.enTextarea.value = window.parent.opener.document.encForm.enTextarea.value + text;
-      }else if( window.parent.opener.document.getElementById(noteEditor) != undefined ){
-    	window.parent.opener.document.getElementById(noteEditor).value = window.parent.opener.document.getElementById(noteEditor).value + text; 
-      }
-      
-   }catch (e){
-      alert ("ERROR: could not paste to EMR");
-   }
-   
-   if (print) { printIframe(); }
-   
+		// We support pasting into orig encounter and new caseManagement
+		demographicNo = <%=sessionBean.getDemographicNo()%>;
+		var noteEditor = "noteEditor"+ demographicNo;
+		var myParent = window.parent.opener;
+		if (myParent.document.forms["caseManagementEntryForm"] !== undefined)
+		{
+			myParent.pasteToEncounterNote(text);
+		}
+		else if (myParent.document.encForm !== undefined)
+		{
+			myParent.document.encForm.enTextarea.value = myParent.document.encForm.enTextarea.value + text;
+		}
+		else if (myParent.document.getElementById(noteEditor) !== null)
+		{
+			// Instead of making the parent AngularJS document paranoia check every note in case we
+			// directly shoved content into the DOM, we'll connect the note properly for them
+			text = myParent.document.getElementById(noteEditor).value + text;
+			myParent.angular.element(myParent.document.querySelector("#note-editor"))
+				.scope().recordCtrl.updateCurrentNote(text);
+		}
+		else
+		{
+			alert("WARNING: No suitable field found to paste note into. " +
+				"To allow pasting from the prescription into the encounter note, " +
+				"the Rx page must be opened from the encounter note page.");
+		}
+	}
+	catch (e)
+	{
+		alert ("ERROR: could not paste to EMR");
+	}
+	if (print)
+	{
+		printIframe();
+	}
 }
-
-
-
 
 function addressSelect() {
    <% if(vecAddressName != null) {
@@ -457,10 +425,14 @@ function signatureHandler(e) {
 	isSignatureDirty = e.isDirty;
 	isSignatureSaved = e.isSave;
 	e.target.onbeforeunload = null;
-	<% if (faxEnabled) { //%>
+	<% if (faxEnabled) { %>
 	e.target.document.getElementById("faxButton").disabled = !hasFaxNumber || !e.isSave;
+		<% if (!isReprint) {%>
 	e.target.document.getElementById("faxAndPasteButton").disabled = !hasFaxNumber || !e.isSave;
-	<% } %>
+	<%
+		}
+	}
+	%>
 	if (e.isSave) {
 		<% if (faxEnabled) { //%>
 		if (hasFaxNumber) {
@@ -480,7 +452,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 
 <!-- added by vic, hsfo -->
 <%
-	int hsfo_patient_id = bean.getDemographicNo();
+	int hsfo_patient_id = sessionBean.getDemographicNo();
 	oscar.form.study.HSFO.HSFODAO hsfoDAO = new oscar.form.study.HSFO.HSFODAO();
 	int dx = hsfoDAO.retrievePatientDx(String.valueOf(hsfo_patient_id));
 	if (dx >=0 && dx < 7) {
@@ -535,7 +507,7 @@ function toggleView(form) {
 	id="AutoNumber1" height="100%">
 	<tr>
 		<td width="100%"
-			style="padding-left: 3; padding-right: 3; padding-top: 2; padding-bottom: 2"
+			style="padding-left: 3px; padding-right: 3px; padding-top: 2px; padding-bottom: 2px"
 			height="0%" colspan="2">
 
 		</td>
@@ -677,9 +649,9 @@ function toggleView(form) {
                         // enable the fax button if there is a pre-set signature for the creator of the prescription or the logged in user
 					    String disabled = "disabled";
 						oscar.oscarRx.data.RxPrescriptionData.Prescription rx = null;
-						if(bean.getStashSize() != 0)
+						if(sessionBean.getStashSize() != 0)
 						{
-							rx = bean.getStashItem(bean.getStashSize() - 1);
+							rx = sessionBean.getStashItem(sessionBean.getStashSize() - 1);
 						}
                         if(oscar.OscarProperties.getInstance().isPropertyActive("rx_preset_signatures"))
                         {
@@ -689,7 +661,7 @@ function toggleView(form) {
 								imgFile += rx.getProviderNo() + ".png";
 							} else
 							{
-								imgFile += bean.getProviderNo() + ".png";
+								imgFile += sessionBean.getProviderNo() + ".png";
 							}
 							File f = new File(imgFile);
                             if(f.exists() && !f.isDirectory() && hasFaxNumber)
@@ -768,9 +740,8 @@ function toggleView(form) {
 						<td colspan=2 style="font-weight: bold"><span><bean:message key="ViewScript.msgDrugInfo"/></span></td>
 					</tr>
 					<%
-                        for(int i=0; i<bean.getStashSize(); i++){
-                            oscar.oscarRx.data.RxPrescriptionData.Prescription rx
-                                = bean.getStashItem(i);
+                        for(int i=0; i<sessionBean.getStashSize(); i++){
+                            oscar.oscarRx.data.RxPrescriptionData.Prescription rx = sessionBean.getStashItem(i);
 
                             if (! rx.isCustom()){
                             %>

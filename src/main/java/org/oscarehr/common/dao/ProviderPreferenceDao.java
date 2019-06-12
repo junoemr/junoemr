@@ -24,6 +24,7 @@
 package org.oscarehr.common.dao;
 
 import org.oscarehr.common.model.ProviderPreference;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -31,5 +32,24 @@ public class ProviderPreferenceDao extends AbstractDao<ProviderPreference> {
 
 	public ProviderPreferenceDao() {
 		super(ProviderPreference.class);
+	}
+
+	/*
+	 * TEMPORARY OVERRIDE
+	 * We know that some portions of Oscar are essentially calling ProviderPreferenceDao.find(null)
+	 * This override is here to figure out what is being bad
+	 */
+	@Override
+	public ProviderPreference find(Object id)
+	{
+		try
+		{
+			return entityManager.find(ProviderPreference.class, id);
+		}
+		catch (Exception e)
+		{
+			MiscUtils.getLogger().error("OVERRIDE ProviderPreference.find: ", e);
+		}
+		return null;
 	}
 }

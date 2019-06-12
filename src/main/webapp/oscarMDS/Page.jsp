@@ -344,7 +344,7 @@ String curUser_no = (String) session.getAttribute("user");
                                     <center><%=result.getSex() %></center>
                                 </td>
                                 <td nowrap>
-                                    <%= (result.isAbnormal() ? "Abnormal" : "" ) %>
+                                    <%= (result.isAbnormal() ? "Abnormal" : (result.isUnknown() ? "Unknown" : "" )) %>
                                 </td>
                                 <td nowrap>
                                     <%=result.getDateTime() + (result.isDocument() ? " / " + result.lastUpdateDate : "")%>
@@ -359,7 +359,7 @@ String curUser_no = (String) session.getAttribute("user");
                                     <%=result.isDocument() ? result.description == null ? "" : result.description : result.getDisciplineDisplayString()%>
                                 </td>
                                 <td nowrap> <!--  -->
-                                    <%= ((result.isReportCancelled())? "Cancelled" : result.isFinal() ? "Final" : "Partial")%>
+                                    <%= (result.isReportCancelled() ? "Cancelled" : (result.isCorrected() ? "Corrected" : (result.isFinal() ? "Final" : "Partial")))%>
                                 </td>
                                 <td nowrap>
                                     <% int multiLabCount = result.getMultipleAckCount(); %>

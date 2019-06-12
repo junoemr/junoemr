@@ -203,6 +203,9 @@ function searchAll() {
 				<option value="search_hin" <%=request.getParameter("search_mode").equals("search_hin")?"selected":""%>>
                     <bean:message key="demographic.demographicsearch2apptresults.optHIN" />
                 </option>
+	            <option value="search_email" <%=request.getParameter("search_mode").equals("search_email")?"selected":""%>>
+		            <bean:message key="demographic.demographicsearch2apptresults.optEmail" />
+	            </option>
                 <option value="search_chart_no" <%=request.getParameter("search_mode").equals("search_chart_no")?"selected":""%>>
                     <bean:message key="demographic.demographicsearch2apptresults.optChart"/>
                 </option>

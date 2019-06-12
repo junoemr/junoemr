@@ -52,7 +52,7 @@ public class UtilDateUtilities {
         return StringToDate(s, spattern, defaultLocale);
     }
     public static Date StringToDate(String s, String spattern, Locale locale)    {
-        if (s == null || spattern == null || locale == null)
+        if (s == null)
         {
             return null;
         }
