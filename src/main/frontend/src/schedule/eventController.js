@@ -543,7 +543,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		$scope.displayMessages.clear();
 
 		Juno.Common.Util.validateDateString($scope.eventData.startDate,
-			$scope.displayMessages, 'startDate', 'Start Time', true);
+			$scope.displayMessages, 'startDate', 'Session Date', true);
 
 		Juno.Common.Util.validateTimeString($scope.formattedTime($scope.eventData.startTime),
 			$scope.displayMessages, 'startTime', 'Start Time', true);
@@ -821,12 +821,26 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		}
 
 		$scope.working = true;
-		$scope.saveEvent().then(function()
+		$scope.saveEvent().then(function(response)
 		{
 			$scope.parentScope.refetchEvents();
 			$uibModalInstance.close();
 			$scope.working = false;
-			window.print();
+
+			if (Juno.Common.Util.exists(response) &&
+				Juno.Common.Util.exists(response.body) &&
+				Juno.Common.Util.exists(response.body.appointmentNo))
+			{
+				var win = window.open('../appointment/appointmentcontrol.jsp' +
+					'?displaymode=PrintCard' +
+					'&appointment_no=' + encodeURIComponent(response.body.appointmentNo),
+					'printappointmentcard', 'height=700,width=1024,scrollbars=1');
+				win.focus();
+			}
+			else
+			{
+				console.error('invalid response data', response);
+			}
 		}, function()
 		{
 			$scope.displayMessages.add_generic_fatal_error();
