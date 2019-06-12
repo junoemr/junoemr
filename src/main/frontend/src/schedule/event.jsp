@@ -39,7 +39,7 @@
 			<button type="button" class="close" aria-label="Minimize">
 				<a class="icon icon-modal-ctl icon-modal-min"></a>
 			</button>
-			<button type="button" class="close" aria-label="Close" ng-click="cancel()">
+			<button type="button" class="close" aria-label="Close" ng-click="eventController.cancel()">
 				<a class="icon icon-modal-ctl icon-modal-close"></a>
 			</button>
 		</div>
@@ -580,14 +580,14 @@
 				<button
 						type="button"
 						class="btn btn-default"
-						ng-click="saveDoNotBook()"
+						ng-click="eventController.saveDoNotBook()"
 						ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Do Not Book
 				</button>
 
 				<button
 						type="button"
 						class="btn btn-default"
-						ng-click="save()"
+						ng-click="eventController.saveAndReceipt()"
 						ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Receipt
 				</button>
 
@@ -597,7 +597,7 @@
 						tooltip-placement="top"
 						tooltip-append-to-body="true"
 						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
-						ng-click="saveAndPrint()"
+						ng-click="eventController.saveAndPrint()"
 						ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Print
 				</button>
 
@@ -608,7 +608,7 @@
 						tooltip-append-to-body="true"
 						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
 						ng-show="!editMode"
-						ng-click="save()"
+						ng-click="eventController.save()"
 						ng-class="{
 							'double-book': (eventController.isDoubleBook && !eventController.isDoubleBookPrevented),
 						    'double-book-prevented':eventController.isDoubleBookPrevented}"
@@ -622,7 +622,7 @@
 						tooltip-append-to-body="true"
 						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
 						ng-show="editMode"
-						ng-click="save()"
+						ng-click="eventController.save()"
 						ng-class="{
 							'double-book': (eventController.isDoubleBook && !eventController.isDoubleBookPrevented),
 						    'double-book-prevented':eventController.isDoubleBookPrevented}"
@@ -635,7 +635,7 @@
 						tooltip-placement="top"
 						tooltip-append-to-body="true"
 						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+shift+enter')}}"
-						ng-click="saveAndBill()"
+						ng-click="eventController.saveAndBill()"
 						ng-show="numInvoices == 0"
 						ng-disabled="isWorking()">Modify &amp; Bill
 				</button>

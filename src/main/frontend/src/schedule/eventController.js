@@ -653,7 +653,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	controller.autofillDataFromType = function(typeValue)
 	{
 		var typeData = controller.getTypeDataByTypeValue(typeValue);
-		console.info(typeData);
 
 		if(Juno.Common.Util.exists(typeData.duration) &&
 			typeData.duration > 0)
@@ -756,7 +755,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		$scope.demographicModel.clear();
 	};
 
-	$scope.save = function save()
+	controller.save = function save()
 	{
 		if(!$scope.validateForm())
 		{
@@ -780,7 +779,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		});
 	};
 
-	$scope.del = function del()
+	controller.del = function del()
 	{
 		$scope.working = true;
 		$scope.deleteEvent().then(function()
@@ -795,12 +794,12 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		});
 	};
 
-	$scope.cancel = function cancel()
+	controller.cancel = function cancel()
 	{
 		$uibModalInstance.dismiss('cancel');
 	};
 
-	$scope.saveAndBill = function saveAndBill()
+	controller.saveAndBill = function saveAndBill()
 	{
 		if(!$scope.validateForm())
 		{
@@ -824,7 +823,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		});
 	};
 
-	$scope.saveAndPrint = function saveAndPrint()
+	controller.saveAndPrint = function saveAndPrint()
 	{
 		if(!$scope.validateForm())
 		{
@@ -844,7 +843,41 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			$scope.working = false;
 		});
 	};
-	$scope.saveDoNotBook = function saveDoNotBook()
+	controller.saveAndReceipt = function saveAndPrint()
+	{
+		if(!$scope.validateForm())
+		{
+			return false;
+		}
+
+		$scope.working = true;
+		$scope.saveEvent().then(function(response)
+		{
+			$scope.parentScope.refetchEvents();
+			$uibModalInstance.close();
+			$scope.working = false;
+
+			if (Juno.Common.Util.exists(response) &&
+				Juno.Common.Util.exists(response.body) &&
+				Juno.Common.Util.exists(response.body.appointmentNo))
+			{
+				var win = window.open('../appointment/printappointment.jsp' +
+					'?appointment_no=' + encodeURIComponent(response.body.appointmentNo),
+					'printappointment', 'height=700,width=1024,scrollbars=1');
+				win.focus();
+			}
+			else
+			{
+				console.error('invalid response data', response);
+			}
+
+		}, function()
+		{
+			$scope.displayMessages.add_generic_fatal_error();
+			$scope.working = false;
+		});
+	};
+	controller.saveDoNotBook = function saveDoNotBook()
 	{
 		if(!$scope.validateForm())
 		{
