@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 	Test a bug where buy the inserted value="" tag escapes its tag, getting injected in to the HTML body instead.
  */
 @RunWith(Parameterized.class)
-public class TestValueEscapeBug
+public class TestSetValuesValueEscapeBug
 {
 	private String inputHtml;
 	private String expectHtml;
@@ -48,7 +48,7 @@ public class TestValueEscapeBug
 	private List<String> allValues;
 
 
-	public TestValueEscapeBug(String html, List<String> allNames, List<String> allValues, String expectHtml)
+	public TestSetValuesValueEscapeBug(String html, List<String> allNames, List<String> allValues, String expectHtml)
 	{
 		this.inputHtml = html;
 		this.expectHtml = expectHtml;
