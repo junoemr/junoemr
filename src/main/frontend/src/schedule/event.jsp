@@ -328,12 +328,14 @@
 								<div class="col-md-6">
 									<!-- location/site -->
 									<ca-field-select
+											ca-hide="!eventController.sitesEnabled"
 											ca-name="site"
 											ca-title="Site"
 											ca-template="label"
 											ca-label-size="col-md-2"
 											ca-input-size="col-md-10"
 											ca-model="eventData.site"
+											ca-error="{{displayMessages.field_errors()['site']}}"
 											ca-options="eventController.siteOptions"
 									>
 									</ca-field-select>

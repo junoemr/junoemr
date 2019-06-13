@@ -382,6 +382,27 @@ angular.module("Common.Services").service("scheduleService", [
 
 			return deferred.promise;
 		};
+		service.getSitesEnabled = function getSites()
+		{
+			var deferred = $q.defer();
+
+			junoHttp.get(
+				service.apiPath + 'sites/enabled',
+				{headers: Juno.Common.ServiceHelper.configHeaders()}
+			).then(
+				function success(results)
+				{
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("scheduleService::getSitesEnabled error", errors);
+					deferred.reject();
+				}
+			);
+
+			return deferred.promise;
+		};
 
 		return service;
 	}

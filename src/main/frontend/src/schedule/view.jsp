@@ -36,9 +36,6 @@
 			Please set up a schedule at <a href="#/schedule/admin/schedule">Schedule Admin</a>
 		</div>
 		<div ng-show="hasSchedules()">
-				<%--<div class="form-group">--%>
-					<%--<button class="btn btn-aside"></button>--%>
-				<%--</div>--%>
 			<div class="flex-column flex-grow schedule-page-header">
 				<div ng-show="!isInitialized()">
 					<p>Loading...</p>
@@ -74,7 +71,7 @@
 
 							<div class="form-group divider-vertical"></div>
 							<ca-field-select
-									ng-show="hasSites()"
+									ca-hide="!hasSites()"
 									ca-name="site"
 									ca-title="Site"
 									ca-template="label"
@@ -91,16 +88,6 @@
 								        ng-model="selectedSchedule"
 								        ng-options="option as option.name for option in getScheduleOptions()">
 								</select>
-
-								<%--<ca-field-select--%>
-										<%--ca-name="schedule-select"--%>
-										<%--ca-no-label="true"--%>
-										<%--ca-template="label"--%>
-										<%--ca-model="selectedSchedule"--%>
-										<%--ca-options="getScheduleOptions()"--%>
-										<%--ca-change="onScheduleChanged()"--%>
-								<%-->--%>
-								<%--</ca-field-select>--%>
 							</div>
 							<div class="form-group"
 							     ng-show="showTimeIntervals()">
@@ -163,34 +150,5 @@
 			ng-model="eventSources"
 			ng-enabled="initialized"
 		></div>
-		<!--
-		<div>
-			<div
-				id="cp-calendar"
-				class="calendar"
-				ng-model="event_sources"
-				calendar="cpCalendar"
-				ui-calendar="ui_config_applied.calendar"
-				ng-enabled="initialized"
-			></div>
-		</div>
-		-->
-
-		<!--
-		<div
-			id="ca-calendar"
-			class="calendar"
-			cp-calendar="uiConfig"
-			cp-calendar-control="cpCalendarControl"
-			cp-calendar-selected-schedule="selectedSchedule"
-			cp-calendar-selected-time-interval="selectedTimeInterval"
-			cp-calendar-calendar-api-adapter="Schedule.CalendarApiAdapter"
-			cp-calendar-access-control = "securityService"
-			cp-calendar-auto-complete="autoCompleteService"
-			cp-calendar-global-state = "globalStateService"
-			cp-calendar-patient-model="demographicService"
-		></div>
-		-->
-
 	</div>
 </div>

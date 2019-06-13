@@ -101,6 +101,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.events = [];
 		$scope.scheduleTemplates = {};
 		$scope.sites = {};
+		$scope.sitesEnabled = false;
 
 		$scope.openingDialog = false;
 		$scope.dialog = null;
@@ -181,7 +182,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.hasSites = function hasSites()
 		{
-			return $scope.siteOptions.length > 0;
+			return $scope.sitesEnabled;
 		};
 
 		$scope.getTimeIntervalOptions = function getTimeIntervalOptions()
@@ -578,6 +579,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 			// scroll so that one hour ago is the top of the calendar
 			$scope.uiConfig.calendar.scrollTime = moment().subtract(1, 'hours').format('HH:mm:ss');
+		};
+
+		controller.getSlotDurationByLCD = function()
+		{
+
 		};
 
 		$scope.getSelectedTimeInterval = function getSelectedTimeInterval(
@@ -1513,37 +1519,62 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			var deferred = $q.defer();
 
-			$scope.loadSites().then(
-				function success(results)
+			controller.loadSitesEnabled().then(
+				function success()
 				{
-					$scope.sites = {};
-					$scope.siteOptions = [];
-					if(angular.isArray(results) && results.length > 0)
+					if($scope.sitesEnabled)
 					{
-						// Fill up lookup table
-						for(var i = 0; i < results.length; i++)
-						{
-							$scope.sites[results[i].name] = results[i];
-						}
-
-						// Create the dropdown options
-						$scope.siteOptions = [
+						$scope.loadSites().then(
+							function success(results)
 							{
-								uuid: null,
-								value: null,
-								label: "All Sites",
-							}
-						];
+								$scope.sites = {};
+								$scope.siteOptions = [];
+								if (angular.isArray(results) && results.length > 0)
+								{
+									// Fill up lookup table
+									for (var i = 0; i < results.length; i++)
+									{
+										$scope.sites[results[i].name] = results[i];
+									}
 
-						$scope.siteOptions = $scope.siteOptions.concat(results);
+									// Create the dropdown options
+									$scope.siteOptions = [
+										{
+											uuid: null,
+											value: null,
+											label: "All Sites",
+										}
+									];
+
+									$scope.siteOptions = $scope.siteOptions.concat(results);
+								}
+
+								deferred.resolve(results);
+							});
 					}
-
-					deferred.resolve(results);
-				});
-
+					else
+					{
+						deferred.resolve();
+					}
+				}
+			);
 			return deferred.promise;
 		};
 
+		controller.loadSitesEnabled = function()
+		{
+			var deferred = $q.defer();
+
+			scheduleService.getSitesEnabled().then(
+				function success(enabled)
+				{
+					$scope.sitesEnabled = enabled;
+					deferred.resolve(enabled);
+				}
+			);
+
+			return deferred.promise;
+		};
 		$scope.loadSites = function loadSites()
 		{
 			var deferred = $q.defer();

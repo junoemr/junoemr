@@ -99,7 +99,15 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	controller.selectedEventStatus = null;
 	$scope.defaultEventStatus = null;
 
-	controller.siteOptions = $scope.parentScope.siteOptions;
+	// filter site options to only include valid sites.
+	controller.siteOptions = $scope.parentScope.siteOptions.filter(function(value, index, arr)
+	{
+		return (value.uuid != null);
+	});
+
+
+
+	controller.sitesEnabled = $scope.parentScope.hasSites();
 
 	$scope.timepickerFormat = "h:mm A";
 
@@ -246,6 +254,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			$scope.eventData.doNotBook = data.eventData.doNotBook;
 			$scope.eventData.critical = data.eventData.urgency === 'critical';
 			$scope.eventData.duration = momentEnd.diff(momentStart, 'minutes');
+			$scope.eventData.site = data.eventData.site;
 
 			controller.checkEventConflicts(); // uses the eventData
 
@@ -260,8 +269,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 				}
 				$scope.initialized = true;
 			});
-
-			$scope.eventData.site = data.eventData.site;
 		}
 		else
 		{
@@ -269,6 +276,12 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			// and clear the patient model
 			controller.setPatientData();
 			$scope.eventData.site = $scope.parentScope.selectedSiteName;
+			// set the default site selection if the current one is invalid
+			if(controller.sitesEnabled && !controller.isValidSiteValue($scope.eventData.site))
+			{
+				$scope.eventData.site = controller.siteOptions[0].value;
+			}
+
 			controller.setTimeAndDurationByTemplate($scope.activeTemplateEvents[0], parentScope.timeIntervalMinutes());
 
 			focus.element("#input-patient");
@@ -550,6 +563,11 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 		Juno.Common.Util.validateIntegerString($scope.eventData.duration,
 			$scope.displayMessages, 'duration', 'Duration', true, true, true);
+
+		if(controller.sitesEnabled && !controller.isValidSiteValue($scope.eventData.site))
+		{
+			$scope.displayMessages.add_field_error('site', "A valid site must be selected");
+		}
 
 		return !$scope.displayMessages.has_errors();
 	};

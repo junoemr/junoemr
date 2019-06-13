@@ -25,6 +25,7 @@ package org.oscarehr.ws.rest;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.ws.rest.conversion.SiteConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.transfer.SiteTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,5 +53,12 @@ public class SitesService extends AbstractServiceImpl
 		List<SiteTransfer> transferList = converter.getAllAsTransferObjects(null, sites);
 
 		return RestSearchResponse.successResponseOnePage(transferList);
+	}
+
+	@GET
+	@Path("/enabled")
+	public RestResponse<Boolean> geSitesEnabled()
+	{
+		return RestResponse.successResponse(org.oscarehr.common.IsPropertiesOn.isMultisitesEnable());
 	}
 }
