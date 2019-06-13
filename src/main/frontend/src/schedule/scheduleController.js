@@ -251,6 +251,25 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			return $scope.viewName() !== 'month';
 		};
 
+		controller.changeToSchedule = function(resourceId, view)
+		{
+			var scheduleOptions = $scope.getScheduleOptions();
+			console.info('scheduleOptions', scheduleOptions);
+
+			for(var i=0; i < scheduleOptions.length; i++)
+			{
+				if(scheduleOptions[i].uuid === resourceId)
+				{
+					$scope.selectedSchedule = scheduleOptions[i];
+					break;
+				}
+			}
+
+			//TODO prevent the double schedule loading calls
+			$scope.onScheduleChanged();
+			$scope.changeView(view);
+		};
+
 		$scope.changeView = function changeView(view)
 		{
 			// if switching to or from resourceDay view, need to update schedules
@@ -368,6 +387,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 
 			return null;
+		};
+
+		controller.hasPatientSelected = function hasPatientSelected(calEvent)
+		{
+			return Juno.Common.Util.exists(calEvent.data.demographicNo)
+				&& Number(calEvent.data.demographicNo) > 0;
 		};
 
 		$scope.loadSelectedSchedules = function loadSelectedSchedules()
@@ -831,23 +856,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$window.open(url, '_blank');
 		};
 
-		$scope.getIconPath = function getIconPath(icon, statusModifier)
-		{
-			if(!Juno.Common.Util.exists(icon))
-			{
-				return "";
-			}
-
-			var modifierString = "";
-
-			if(Juno.Common.Util.exists(statusModifier))
-			{
-				modifierString = statusModifier;
-			}
-
-			return "../images/" + modifierString + icon;
-		};
-
 		$scope.rotateEventStatus = function rotateEventStatus(calEvent)
 		{
 			$scope.setCalendarLoading(true);
@@ -1068,29 +1076,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.onResourceRender = function onResourceRender(resourceObj, labelTds, bodyTds)
 		{
 			labelTds.html(require('./view-columnControl.html'));
-			labelTds.on('click', $scope.onHeaderClick);
 
 			labelTds.find(".hdr-label").text(resourceObj.display_name);
-		};
 
-		$scope.onHeaderClick = function onHeaderClick(jsEvent)
-		{
-			if($(jsEvent.target).is(".onclick-daysheet"))
-			{
-				$state.go('dashboard');
-			}
-			else if($(jsEvent.target).is(".onclick-search"))
-			{
-				$state.go('search');
-			}
-			else if($(jsEvent.target).is(".onclick-week-view"))
-			{
-				console.info("onclick-week-view clicked");
-			}
-			else if($(jsEvent.target).is(".onclick-month-view"))
-			{
-				console.info("onclick-month-view clicked");
-			}
+			// append data to the root element so it can be accessed by click events
+			labelTds.find(".column-ctl-root").attr("data-resourceId", resourceObj.id);
+			labelTds.on('click', $scope.onHeaderClick);
 		};
 
 		$scope.afterRender = function afterRender()
@@ -1100,6 +1091,57 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			{
 				$("#schedule_container").css('min-width',$('.fc-resource-cell').length*200);
 			});
+		};
+
+		$scope.onHeaderClick = function onHeaderClick(jsEvent)
+		{
+			var resourceId = jsEvent.currentTarget.dataset.resourceId;
+			if($(jsEvent.target).is(".onclick-daysheet"))
+			{
+				controller.openDaysheet(resourceId);
+			}
+			else if($(jsEvent.target).is(".onclick-search"))
+			{
+				console.info("onclick-search clicked");
+			}
+			else if($(jsEvent.target).is(".onclick-week-view"))
+			{
+				console.info("onclick-week-view clicked");
+				controller.changeToSchedule(resourceId, 'agendaWeek');
+			}
+			else if($(jsEvent.target).is(".onclick-month-view"))
+			{
+				console.info("onclick-month-view clicked");
+				controller.changeToSchedule(resourceId, 'month');
+			}
+		};
+
+		$scope.onEventClick = function onEventClick(calEvent, jsEvent, view)
+		{
+			if($(jsEvent.target).is(".event-status.rotate:not(.disabled)"))
+			{
+				$scope.rotateEventStatus(calEvent);
+			}
+			else if($(jsEvent.target).is(".onclick-event-encounter:not(.disabled)"))
+			{
+				window.open($scope.getEncounterLink(calEvent));
+			}
+			else if($(jsEvent.target).is(".onclick-event-invoice:not(.disabled)"))
+			{
+				window.open($scope.getBillingLink(calEvent));
+			}
+			else if($(jsEvent.target).is(".onclick-event-demographic:not(.disabled)"))
+			{
+				$scope.openPatientDemographic(calEvent);
+			}
+			else if($(jsEvent.target).is(".onclick-event-rx:not(.disabled)"))
+			{
+				window.open($scope.getRxLink(calEvent));
+			}
+			else
+			{
+				$scope.openEditEventDialog(calEvent);
+			}
 		};
 
 		$scope.openCreateEventDialog = function openCreateEventDialog(
@@ -1297,40 +1339,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 
 			$scope.openingDialog = false;
-		};
-
-		$scope.onEventClick = function onEventClick(calEvent, jsEvent, view)
-		{
-			if($(jsEvent.target).is(".event-status.rotate:not(.disabled)"))
-			{
-				$scope.rotateEventStatus(calEvent);
-			}
-			else if($(jsEvent.target).is(".onclick-event-encounter:not(.disabled)"))
-			{
-				window.open($scope.getEncounterLink(calEvent));
-			}
-			else if($(jsEvent.target).is(".onclick-event-invoice:not(.disabled)"))
-			{
-				window.open($scope.getBillingLink(calEvent));
-			}
-			else if($(jsEvent.target).is(".onclick-event-demographic:not(.disabled)"))
-			{
-				$scope.openPatientDemographic(calEvent);
-			}
-			else if($(jsEvent.target).is(".onclick-event-rx:not(.disabled)"))
-			{
-				window.open($scope.getRxLink(calEvent));
-			}
-			else
-			{
-				$scope.openEditEventDialog(calEvent);
-			}
-		};
-
-		controller.hasPatientSelected = function hasPatientSelected(calEvent)
-		{
-			return Juno.Common.Util.exists(calEvent.data.demographicNo)
-				&& Number(calEvent.data.demographicNo) > 0;
 		};
 
 		$scope.onEventDrop = function onEventDrop(
@@ -1600,6 +1608,18 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			);
 
 			return deferred.promise;
+		};
+
+		controller.openDaysheet = function(resourceId)
+		{
+			var formattedDate = Juno.Common.Util.formatMomentDate($scope.selectedDate);
+			var win = window.open('../report/reportdaysheet.jsp' +
+				'?dsmode=all' +
+				'&provider_no=' + encodeURIComponent(resourceId) +
+				'&sdate=' + encodeURIComponent(formattedDate) +
+				'&edate=' + encodeURIComponent(formattedDate),
+				'daysheet', 'height=700,width=1024,scrollbars=1');
+			win.focus();
 		};
 
 
