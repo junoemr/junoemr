@@ -164,7 +164,7 @@ public class AppointmentMapper extends AbstractMapper
 		// attempt to map status based on znote text
 		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
-			String znote = getNotes(0);
+			String znote = getNotes(rep);
 			if (znote != null)
 			{
 				try
