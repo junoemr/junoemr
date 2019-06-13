@@ -97,6 +97,12 @@
 			cursor: hand;
 			margin-left: $scheduleCodeWidth;
 
+			// remove white opacity filter on events
+			.fc-bg {
+				background: transparent;
+				opacity: 1;
+			}
+
 			.schedule-event {
 				display: flex;
 				padding: 0;
@@ -114,7 +120,7 @@
 				.event-blk {
 					display: flex;
 					align-items: center;
-					justify-content: space-evenly;
+					justify-content: flex-start;
 				}
 				.event-blk-label {
 					flex-grow: 1;
@@ -148,33 +154,39 @@
 		}
 	  	/* background event custom styling */
 		.fc-bgevent {
-		  	opacity: 1;
-		  	display: flex;
-		  	justify-content: center;
-		  	.schedule-background-event {
-			  	flex-grow: 1;
-			  	display: flex;
-				.background-event-schedulecode {
-				  	background-color: $grey-06;
-					float: right;
-				  	width: $scheduleCodeWidth;
-				  	height: 100%;
-				  	text-align: center;
-				  	border-left: 1px solid $grey-07;
-				  	border-top: 1px solid $grey-07;
-					font-weight: bold;
-					font-style: normal;
-					font-stretch: normal;
-					color: $white;
-					line-height: normal;
-					letter-spacing: normal;
-				  	padding: 0;
-				}
-				.background-event-body {
-				  flex-grow: 1;
-				  background-color: $white;
-				  border-top: 1px solid $grey-07;
-				}
+			opacity: 1;
+			display: flex;
+			justify-content: center;
+			.schedule-background-event {
+				flex-grow: 1;
+				display: flex;
+			    .background-event-schedulecode {
+				    background-color: $grey-06;
+				    float: right;
+				    width: $scheduleCodeWidth;
+				    height: 100%;
+				    text-align: center;
+				    font-weight: bold;
+				    font-style: normal;
+				    font-stretch: normal;
+				    color: $white;
+				    line-height: normal;
+				    letter-spacing: normal;
+				    padding: 0;
+
+				    &.hour-marker {
+					    border-top: 1px solid $grey-05;
+				    }
+			    }
+			    .background-event-body {
+				    flex-grow: 1;
+				    background-color: $white;
+				    border-top: 1px solid $grey-07;
+
+				    &.hour-marker {
+					    border-top: 1px solid $grey-05;
+				    }
+			    }
 			}
 		}
 		/* Remove that awful yellow color from today */

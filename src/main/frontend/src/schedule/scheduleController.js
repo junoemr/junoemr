@@ -1046,6 +1046,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 			else
 			{
+				console.info(event.start, event.start.minute());
 				element.html(require('./view-backgroundEvent.html'));
 				if(Juno.Common.Util.exists(event.color))
 				{
@@ -1054,6 +1055,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				if(Juno.Common.Util.exists(event.scheduleTemplateCode))
 				{
 					element.find(".background-event-schedulecode").text(event.scheduleTemplateCode);
+				}
+				if(Juno.Common.Util.exists(event.start) && event.start.minute() === 0) // on the hour
+				{
+					element.find(".background-event-schedulecode,.background-event-body").addClass("hour-marker");
 				}
 			}
 
