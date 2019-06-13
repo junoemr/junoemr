@@ -46,6 +46,7 @@
 		border-color: transparent;
 
 		li {
+			border-bottom: $bottom-border-size solid $tab-bg-color;
 			a {
 				border-color: transparent;
 				color: $font-color;
