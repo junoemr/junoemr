@@ -46,6 +46,7 @@ import oscar.oscarReport.data.RptByExampleData;
 import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
@@ -57,10 +58,10 @@ public class RptByExampleAction extends Action
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarProperties properties = OscarProperties.getInstance();
 
-	private static final Boolean enableQueryRestrictions = properties.isPropertyActive("rpt_by_example.enable_restrictions");
-	private static final Boolean enforceQueryRestrictions = properties.isPropertyActive("rpt_by_example.enforce_restrictions");
-	private static final Long maxRows = Long.parseLong(properties.getProperty("rpt_by_example.max_rows"));
-	private static final Integer maxResults = Integer.parseInt(properties.getProperty("rpt_by_example.max_results"));
+	private static final Boolean enableQueryRestrictions = properties.isPropertyActive("report_by_example.enable_restrictions");
+	private static final Boolean enforceQueryRestrictions = properties.isPropertyActive("report_by_example.enforce_restrictions");
+	private static final Long maxRows = Long.parseLong(properties.getProperty("report_by_example.max_rows"));
+	private static final Integer maxResults = Integer.parseInt(properties.getProperty("report_by_example.max_results"));
 
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	private ReportByExamplesDao reportByExamplesDao = SpringUtils.getBean(ReportByExamplesDao.class);
@@ -118,7 +119,8 @@ public class RptByExampleAction extends Action
 				{
 					RptByExampleData exampleData = new RptByExampleData();
 					String results = exampleData.exampleReportGenerate(preparedUserSql, properties);
-					updateLog(logEntry);
+
+					updateLog(logEntry, exampleData.resultSet);
 
 					request.setAttribute("results", results);
 					request.setAttribute("resultText", results);
@@ -182,14 +184,22 @@ public class RptByExampleAction extends Action
 
 		return reportByExamples;
 	}
-	private void updateLog(ReportByExamples reportByExamples)
+	private void updateLog(ReportByExamples reportByExamples, ResultSet resultSet)
 	{
 		try
 		{
+			Long rowCount = -1L;
+			if(resultSet != null)
+			{
+				resultSet.last();
+				rowCount = new Integer(resultSet.getRow()).longValue();
+			}
+
 			reportByExamples.setDatetimeEnd(new Date());
+			reportByExamples.setRowsReturned(rowCount);
 			reportByExamplesDao.merge(reportByExamples);
 		}
-		catch(PersistenceException e)
+		catch(SQLException | PersistenceException e)
 		{
 			logger.error("Failed to update ReportByExample entry.", e);
 		}

@@ -41,6 +41,7 @@ public class RptByExampleData
 
 	public ArrayList demoList = null;
 	public String sql = "";
+	public ResultSet resultSet = null;
 	public String results = null;
 	public String connect = null;
 	private DBPreparedHandler accessDB = null;
@@ -62,12 +63,11 @@ public class RptByExampleData
 
 		accessDB = new DBPreparedHandler();
 
-		ResultSet rs = accessDB.queryResults(this.sql);
+		this.resultSet = accessDB.queryResults(this.sql);
 
-		if(rs != null)
+		if(resultSet != null)
 		{
-			results = RptResultStruct.getStructure(rs);
-			rs.close();
+			results = RptResultStruct.getStructure(resultSet);
 		}
 		else
 		{

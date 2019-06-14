@@ -56,6 +56,9 @@ public class ReportByExamples extends AbstractModel<Integer> {
 	@Column(name="datetime_end")
 	private Date datetimeEnd;
 
+	@Column(name = "rows_returned")
+	private Long rowsReturned;
+
 	public Integer getId() {
     	return id;
     }
@@ -96,5 +99,15 @@ public class ReportByExamples extends AbstractModel<Integer> {
 	public void setDatetimeEnd(Date datetimeEnd)
 	{
 		this.datetimeEnd = datetimeEnd;
+	}
+
+	public Long getRowsReturned()
+	{
+		return rowsReturned;
+	}
+
+	public void setRowsReturned(Long rowsReturned)
+	{
+		this.rowsReturned = rowsReturned;
 	}
 }

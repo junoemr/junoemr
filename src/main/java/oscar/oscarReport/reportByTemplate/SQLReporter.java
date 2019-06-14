@@ -59,10 +59,10 @@ public class SQLReporter implements Reporter
 
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarProperties properties = OscarProperties.getInstance();
-	private static final Long maxRows = Long.parseLong(properties.getProperty("rpt_by_template.max_rows"));
-	private static final Integer maxResults = Integer.parseInt(properties.getProperty("rpt_by_template.max_results"));
-	private static final Boolean enableQueryRestrictions = properties.isPropertyActive("rpt_by_template.enable_restrictions");
-	private static final Boolean enforceQueryRestrictions = properties.isPropertyActive("rpt_by_template.enforce_restrictions");
+	private static final Long maxRows = Long.parseLong(properties.getProperty("report_by_template.max_rows"));
+	private static final Integer maxResults = Integer.parseInt(properties.getProperty("report_by_template.max_results"));
+	private static final Boolean enableQueryRestrictions = properties.isPropertyActive("report_by_template.enable_restrictions");
+	private static final Boolean enforceQueryRestrictions = properties.isPropertyActive("report_by_template.enforce_restrictions");
 
 	private static ReportByTemplateService reportByTemplateService = SpringUtils.getBean(ReportByTemplateService.class);
 	private static LogReportByTemplateDao logReportByTemplateDao = SpringUtils.getBean(LogReportByTemplateDao.class);
@@ -144,7 +144,9 @@ public class SQLReporter implements Reporter
 			csvp.writeln(UtilMisc.getArrayFromResultSet(rs));
 			csv = swr.toString();
 
-			updateLog(logEntry);
+			rs.last();
+			long rowCount = new Integer(rs.getRow()).longValue();
+			updateLog(logEntry, rowCount);
 		}
 		// since users can write custom queries this error is expected and should not generate an error in the log
 		catch(ReportByTemplateException | SQLException e)
@@ -195,11 +197,12 @@ public class SQLReporter implements Reporter
 
 		return logReportByTemplate;
 	}
-	private void updateLog(LogReportByTemplate logReportByTemplate)
+	private void updateLog(LogReportByTemplate logReportByTemplate, Long rowCount)
 	{
 		try
 		{
 			logReportByTemplate.setDatetimeEnd(new Date());
+			logReportByTemplate.setRowsReturned(rowCount);
 			logReportByTemplateDao.merge(logReportByTemplate);
 		}
 		catch(PersistenceException e)

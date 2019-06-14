@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS log_report_by_template (
   provider_no VARCHAR(6),
   datetime_start DATETIME,
   datetime_end DATETIME,
+  rows_returned BIGINT,
   query_string text
 );
 
@@ -26,6 +27,7 @@ CREATE TABLE IF NOT EXISTS log_report_by_template_explain (
 );
 
 ALTER TABLE reportByExamples ADD COLUMN IF NOT EXISTS datetime_end DATETIME;
+ALTER TABLE reportByExamples ADD COLUMN IF NOT EXISTS rows_returned BIGINT;
 
 CREATE TABLE IF NOT EXISTS reportByExamples_explain (
   id int(10) AUTO_INCREMENT PRIMARY KEY,

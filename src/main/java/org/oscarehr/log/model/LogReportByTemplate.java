@@ -43,7 +43,6 @@ public class LogReportByTemplate extends AbstractModel<Integer>
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	//TODO link with a template jpa object when ported to oscar 15.
 	@Column(name = "template_id")
 	private Integer templateId;
 
@@ -57,6 +56,9 @@ public class LogReportByTemplate extends AbstractModel<Integer>
 	@Column(name = "datetime_end")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date datetimeEnd;
+
+	@Column(name = "rows_returned")
+	private Long rowsReturned;
 
 	@Column(name = "query_string")
 	private String queryString;
@@ -119,6 +121,16 @@ public class LogReportByTemplate extends AbstractModel<Integer>
 	public void setQueryString(String queryString)
 	{
 		this.queryString = queryString;
+	}
+
+	public Long getRowsReturned()
+	{
+		return rowsReturned;
+	}
+
+	public void setRowsReturned(Long rowsReturned)
+	{
+		this.rowsReturned = rowsReturned;
 	}
 }
 
