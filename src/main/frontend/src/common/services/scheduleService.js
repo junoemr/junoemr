@@ -382,7 +382,7 @@ angular.module("Common.Services").service("scheduleService", [
 
 			return deferred.promise;
 		};
-		service.getSitesEnabled = function getSites()
+		service.getSitesEnabled = function getSitesEnabled()
 		{
 			var deferred = $q.defer();
 

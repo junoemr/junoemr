@@ -68,8 +68,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.resourceOptions = [];
 		$scope.siteOptions = [];
 		$scope.defaultEventColor = "#333";
-		$scope.timeIntervalOptions =
-			[{
+		$scope.timeIntervalOptions = [
+			{
 				label: '5 min intervals',
 				value: '00:05:00'
 			},
@@ -254,7 +254,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		controller.changeToSchedule = function(resourceId, view)
 		{
 			var scheduleOptions = $scope.getScheduleOptions();
-			console.info('scheduleOptions', scheduleOptions);
 
 			for(var i=0; i < scheduleOptions.length; i++)
 			{
@@ -606,11 +605,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.uiConfig.calendar.scrollTime = moment().subtract(1, 'hours').format('HH:mm:ss');
 		};
 
-		controller.getSlotDurationByLCD = function()
-		{
-
-		};
-
 		$scope.getSelectedTimeInterval = function getSelectedTimeInterval(
 			timeIntervalOptions, defaultTimeInterval)
 		{
@@ -797,6 +791,33 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 
 			return deferred.promise;
+		};
+		controller.moveEventSuccess = function(eventData, calEvent)
+		{
+			var startMoment = moment(eventData.startTime, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
+			var endMoment = moment(eventData.endTime, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
+
+			calEvent.start = Juno.Common.Util.formatMomentTime(
+				startMoment, Juno.Common.Util.settings.datetime_no_timezone_format);
+			calEvent.end = Juno.Common.Util.formatMomentTime(
+				endMoment, Juno.Common.Util.settings.datetime_no_timezone_format);
+
+			calEvent.data.startTime = calEvent.start;
+			calEvent.data.endTime = calEvent.end;
+
+			calEvent.data.providerNo = eventData.providerNo;
+			calEvent.resourceId = eventData.providerNo;
+
+			/* update the event in the main list of events.
+			this gets passed to the modal and used for date collision checking*/
+			for(var i=0; i < $scope.events.length; i++)
+			{
+				if ($scope.events[i].rendering !== "background" && $scope.events[i].data.appointmentNo === calEvent.data.appointmentNo)
+				{
+					$scope.events[i] = angular.copy(calEvent);
+					break;
+				}
+			}
 		};
 
 		// Read the implementation-specific results and return a calendar-compatible object.
@@ -1046,7 +1067,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 			else
 			{
-				console.info(event.start, event.start.minute());
 				element.html(require('./view-backgroundEvent.html'));
 				if(Juno.Common.Util.exists(event.color))
 				{
@@ -1365,16 +1385,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.moveEvent(appointment, delta, true).then(
 				function success(eventData)
 				{
-					var startMoment = moment(eventData.startTime, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
-					var endMoment = moment(eventData.endTime, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
-
-					calEvent.data.startTime = Juno.Common.Util.formatMomentTime(
-						startMoment, Juno.Common.Util.settings.datetime_no_timezone_format);
-					calEvent.data.endTime = Juno.Common.Util.formatMomentTime(
-						endMoment, Juno.Common.Util.settings.datetime_no_timezone_format);
-
-					calEvent.data.providerNo = eventData.providerNo;
-
+					controller.moveEventSuccess(eventData, calEvent);
 					$scope.setCalendarLoading(false);
 
 				}, function error(errors)
@@ -1405,18 +1416,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.moveEvent(appointment, delta, false).then(
 				function success(eventData)
 				{
-					var startMoment = moment(eventData.startTime, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
-					var endMoment = moment(eventData.endTime, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
-
-					calEvent.data.startTime = Juno.Common.Util.formatMomentTime(
-						startMoment, Juno.Common.Util.settings.datetime_no_timezone_format);
-					calEvent.data.endTime = Juno.Common.Util.formatMomentTime(
-						endMoment, Juno.Common.Util.settings.datetime_no_timezone_format);
-
-					calEvent.data.providerNo = eventData.providerNo;
-
-					//$scope.update_event(calEvent);
-
+					controller.moveEventSuccess(eventData, calEvent);
 					$scope.setCalendarLoading(false);
 
 				}, function error(errors)
