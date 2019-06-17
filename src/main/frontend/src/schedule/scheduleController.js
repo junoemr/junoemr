@@ -1720,6 +1720,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				defaultView: null,
 				defaultDate: $scope.defaultDate,
 				slotDuration: $scope.selectedTimeInterval,
+				snapDuration: '00:05:00',
 				slotLabelInterval: $scope.selectedSlotLabelInterval,
 				slotLabelFormat: 'h:mma',
 
