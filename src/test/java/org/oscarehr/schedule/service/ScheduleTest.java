@@ -77,7 +77,7 @@ public class ScheduleTest
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate, scheduleStartTime, scheduleEndTime, scheduleSlotLength)).thenReturn(mockData);
 		Mockito.when(appointmentService.getCalendarEvents(session, providerId, startDate, endDate, siteName)).thenReturn(mockData);
 
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(session, providerId, startDate, endDate, siteName, scheduleSlotLength);
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(session, providerId, startDate, endDate, scheduleStartTime, scheduleEndTime, siteName, scheduleSlotLength);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
@@ -111,7 +111,7 @@ public class ScheduleTest
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate, scheduleStartTime, scheduleEndTime, scheduleSlotLength)).thenReturn(templateMockData);
 		Mockito.when(appointmentService.getCalendarEvents(session, providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
 
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(session, providerId, startDate, endDate, siteName,15);
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(session, providerId, startDate, endDate, scheduleStartTime, scheduleEndTime, siteName,15);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 		expectedResult.add(new CalendarEvent(start1, end1, color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
@@ -145,7 +145,7 @@ public class ScheduleTest
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate, scheduleStartTime, scheduleEndTime, scheduleSlotLength)).thenReturn(templateMockData);
 		Mockito.when(appointmentService.getCalendarEvents(session, providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
 
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(session, providerId, startDate, endDate, siteName, scheduleSlotLength);
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(session, providerId, startDate, endDate, scheduleStartTime, scheduleEndTime, siteName, scheduleSlotLength);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 		expectedResult.add(new CalendarEvent(start1, end1, color1, null, className1, resourceId1, scheduleTemplateCode1, null, null));
@@ -187,7 +187,7 @@ public class ScheduleTest
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate, scheduleStartTime, scheduleEndTime, scheduleSlotLength)).thenReturn(templateMockData);
 		Mockito.when(appointmentService.getCalendarEvents(session, providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
 
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(session, providerId, startDate, endDate, siteName, scheduleSlotLength);
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(session, providerId, startDate, endDate, scheduleStartTime, scheduleEndTime, siteName, scheduleSlotLength);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 		expectedResult.add(new CalendarEvent(start1, end1, color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));
@@ -236,7 +236,7 @@ public class ScheduleTest
 		Mockito.when(scheduleTemplateService.getCalendarEvents(providerId, startDate.plusDays(2), scheduleStartTime, scheduleEndTime, scheduleSlotLength)).thenReturn(templateMockData3);
 		Mockito.when(appointmentService.getCalendarEvents(session, providerId, startDate, endDate, siteName)).thenReturn(appointmentMockData);
 
-		List<CalendarEvent> result = scheduleService.getCalendarEvents(session, providerId, startDate, endDate, siteName, scheduleSlotLength);
+		List<CalendarEvent> result = scheduleService.getCalendarEvents(session, providerId, startDate, endDate, scheduleStartTime, scheduleEndTime, siteName, scheduleSlotLength);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 		expectedResult.add(new CalendarEvent(start1, end1, color1, CalendarEvent.RENDERING_BACKGROUND, className1, resourceId1, scheduleTemplateCode1, null, null));

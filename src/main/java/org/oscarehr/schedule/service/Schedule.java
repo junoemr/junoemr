@@ -31,15 +31,15 @@ import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.MyGroup;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Site;
+import org.oscarehr.schedule.dao.RScheduleDao;
+import org.oscarehr.schedule.dao.ScheduleDateDao;
+import org.oscarehr.schedule.dao.ScheduleHolidayDao;
+import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarEvent;
 import org.oscarehr.schedule.dto.ResourceSchedule;
 import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.schedule.dto.UserDateSchedule;
-import org.oscarehr.schedule.dao.RScheduleDao;
-import org.oscarehr.schedule.dao.ScheduleDateDao;
-import org.oscarehr.schedule.dao.ScheduleHolidayDao;
-import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.model.RSchedule;
 import org.oscarehr.schedule.model.ScheduleDate;
 import org.oscarehr.schedule.model.ScheduleHoliday;
@@ -55,17 +55,17 @@ import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpSession;
 import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.ArrayList;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.Locale;
 import java.util.SortedMap;
 
@@ -574,6 +574,8 @@ public class Schedule
 		Integer providerId,
 		LocalDate startDate,
 		LocalDate endDate,
+		LocalTime startTime,
+		LocalTime endTime,
 		String siteName,
 		Integer slotDurationInMin
 	)
@@ -584,8 +586,6 @@ public class Schedule
 		// templates
 		for(LocalDate date: ConversionUtils.getDateList(startDate, endDate))
 		{
-			LocalTime startTime = LocalTime.of(8,0);
-			LocalTime endTime = LocalTime.of(20,0);
 			// Get schedule templates for this provider/date
 			calendarEvents.addAll(scheduleTemplateService.getCalendarEvents(providerId, date, startTime, endTime, slotDurationInMin));
 		}

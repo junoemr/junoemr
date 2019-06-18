@@ -84,7 +84,7 @@
 		@include juno-page-margin-none;
 
 		background: #f6f6f6;
-		overflow-x: scroll;
+		overflow-x: auto;
 
 		// hide the vertical scrollbar when the schedule is too tall
 		.fc-scroller {

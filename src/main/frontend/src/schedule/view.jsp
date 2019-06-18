@@ -22,7 +22,7 @@
 	Canada
 
 --%>
-<div id="center-panel" class="schedule-center-panel" ng-controller="Schedule.ScheduleController as scheduleController">
+<div id="center-panel" class="schedule-center-panel">
 
 	<div ng-show="!isSchedulingEnabled()"
 		 class="alert alert-danger">

@@ -26,6 +26,7 @@ package org.oscarehr.ws.rest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 
@@ -428,28 +429,24 @@ public class ScheduleService extends AbstractServiceImpl {
 		@PathParam("providerId") Integer providerId,
 		@QueryParam("startDate") String startDateString,
 		@QueryParam("endDate") String endDateString,
+		@QueryParam("startTime") String startTimeString,
+		@QueryParam("endTime") String endTimeString,
 		@QueryParam("site") String siteName,
-		@QueryParam("slotDuration") String slotDurationStr
+		@QueryParam("slotDuration") Integer slotDurationInMin
 	)
 	{
 		Message message = PhaseInterceptorChain.getCurrentMessage();
 		HttpServletRequest request = (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
 		HttpSession session = request.getSession(true);
 
-		LocalDate startDate = ConversionUtils.dateStringToNullableLocalDate(startDateString);
-		LocalDate endDate = ConversionUtils.dateStringToNullableLocalDate(endDateString);
-		Integer slotDurationInMin = Integer.parseInt(slotDurationStr);
-
-		// TODO: Change this to throw an exception
-		// Default to today if either date is null
-		if(startDate == null || endDate == null)
-		{
-			startDate = LocalDate.now();
-			endDate = LocalDate.now();
-		}
+		// conversions will throw exception without valid date/time strings
+		LocalDate startDate = ConversionUtils.dateStringToLocalDate(startDateString);
+		LocalDate endDate = ConversionUtils.dateStringToLocalDate(endDateString);
+		LocalTime startTime = ConversionUtils.toLocalTime(startTimeString);
+		LocalTime endTime = ConversionUtils.toLocalTime(endTimeString);
 
 		List<CalendarEvent> calendarEvents =
-			scheduleService.getCalendarEvents(session, providerId, startDate, endDate, siteName, slotDurationInMin);
+			scheduleService.getCalendarEvents(session, providerId, startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
 
 		return RestSearchResponse.successResponseOnePage(calendarEvents);
 	}

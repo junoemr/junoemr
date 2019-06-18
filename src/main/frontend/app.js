@@ -117,7 +117,14 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/schedule',
 			templateUrl: 'src/schedule/view.jsp',
-			controller: 'Schedule.ScheduleController as scheduleController'
+			controller: 'Schedule.ScheduleController as scheduleController',
+			resolve:
+			{
+				loadedSettings: ['providerService', function (providerService)
+				{
+					return providerService.getSettings();
+				}],
+			}
 		})
 		.state('admin',
 		{

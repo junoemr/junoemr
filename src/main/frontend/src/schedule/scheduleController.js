@@ -11,6 +11,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 	'$httpParamSerializer',
 	'$uibModal',
 	'$state',
+	'loadedSettings',
+	'providerService',
 	'focusService',
 	'scheduleService',
 	'securityService',
@@ -24,6 +26,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$httpParamSerializer,
 		$uibModal,
 		$state,
+		loadedSettings,
+		providerService,
 		focusService,
 		scheduleService,
 		securityService,
@@ -39,6 +43,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
 			'../ws/rs');
 
+		controller.providerSettings = loadedSettings;
+		console.info(controller.providerSettings);
 
 		//=========================================================================
 		// Local scope variables
@@ -361,12 +367,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			// priority: last used from global state, then preference setting,
 			// then default (first in the list)
-			var selectedUuid = null;
-			if($scope.scheduleDefault)
+			if($scope.selectedSchedule !== null)
 			{
-				selectedUuid = $scope.scheduleDefault;
+				return $scope.selectedSchedule;
 			}
 
+			var selectedUuid = controller.providerSettings.groupNo;
 			if(Juno.Common.Util.exists(selectedUuid))
 			{
 				// only choose it if it can be found in the options list
@@ -616,7 +622,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			var timeInterval = $scope.scheduleTimeInterval;
 			if(timeInterval === null)
 			{
-				timeInterval = $scope.scheduleTimeInterval;
+				var preference = controller.providerSettings.period;
+				if(Juno.Common.Util.exists(preference) && Juno.Common.Util.isIntegerString(preference))
+				{
+					timeInterval = "00:" + Juno.Common.Util.pad0(preference) + ":00";
+				}
 			}
 
 			if(Juno.Common.Util.exists(timeInterval))
@@ -642,30 +652,26 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.getScheduleMinTime = function getScheduleMinTime()
 		{
-			// restrict day view if user preferences are set
-
-			/*				var min_time = service.get_global_preference_setting('schedule_min_time');
-						if (util.exists(min_time)) {
-							// format: HH24:MM:SS - expect HH24:MM in preference
-							return min_time + ":00";
-						}
-
-						return null;*/
-
-			return "08:00";
+			var timeStr = "08:00";
+			var preference = controller.providerSettings.startHour;
+			if(Juno.Common.Util.exists(preference) && Juno.Common.Util.isIntegerString(preference)
+				&& Number(preference) > 0 && Number(preference) < 24)
+			{
+				timeStr = Juno.Common.Util.pad0(preference) + ":00";
+			}
+			return timeStr;
 		};
 
 		$scope.getScheduleMaxTime = function getScheduleMaxTime()
 		{
-			/*				var max_time = service.get_global_preference_setting('schedule_max_time');
-							if(util.exists(max_time))
-							{
-								// format: HH24:MM:SS - expect HH24:MM in preference
-								return max_time + ":00";
-							}
-
-							return null;*/
-			return "20:00";
+			var timeStr = "20:00";
+			var preference = controller.providerSettings.endHour;
+			if(Juno.Common.Util.exists(preference) && Juno.Common.Util.isIntegerString(preference)
+				&& Number(preference) > 0 && Number(preference) < 24)
+			{
+				timeStr = Juno.Common.Util.pad0(preference) + ":00";
+			}
+			return timeStr;
 		};
 
 		// Loads the list of event statuses from the API (i.e. appointment statuses).  Sets the following:
@@ -713,6 +719,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				providerId,
 				startDateString,
 				endDateString,
+				$scope.getScheduleMinTime(),
+				$scope.getScheduleMaxTime(),
 				siteName,
 				$scope.timeIntervalMinutes()
 			).then(
@@ -1661,6 +1669,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			if($scope.isInitialized())
 			{
+				console.info('onTimeIntervalChanged', $scope.isInitialized());
 				$scope.onTimeIntervalChanged();
 			}
 		});
