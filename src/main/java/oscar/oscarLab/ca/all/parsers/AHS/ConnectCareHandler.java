@@ -24,7 +24,11 @@ package oscar.oscarLab.ca.all.parsers.AHS;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
+import org.apache.commons.lang.StringUtils;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
+
+import java.util.Collection;
+import java.util.HashMap;
 
 public abstract class ConnectCareHandler extends MessageHandler
 {
@@ -62,20 +66,47 @@ public abstract class ConnectCareHandler extends MessageHandler
 	}
 
 	@Override
-	public String getAccessionNum()
+	public String getHealthNum()
 	{
-		return null;
+		return get("/.PID-3(2)-1");
 	}
 
 	@Override
-	public String getNteForPID()
+	public String getAccessionNum()
 	{
-		return null;
+		return get("/.ORDER_OBSERVATION/ORC-3-1");
 	}
+
+	@Override
+	public String getNteForPID() {
+		return get("/.NTE-3");
+	}
+
+	@Override
+	public String getPatientLocation()
+	{
+		return getAssignedPatientLocation();
+	}
+
 
 	@Override
 	public String getNteForOBX(int i, int j)
 	{
-		return null;
+		return get("/.ORDER_OBSERVATION("+ i +")/OBSERVATION("+ j +")/NTE-3");
+	}
+
+	/**
+	 *  Retrieve the abnormal flag if any from the OBX segment specified by j in
+	 *  the ith OBR group.
+	 */
+	@Override
+	public String getOBXAbnormalFlag( int i, int j)
+	{
+		String ab = StringUtils.trimToNull(getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-8")));
+		if (ab == null)
+		{ // no flag == normal result
+			ab = "N";
+		}
+		return ab;
 	}
 }

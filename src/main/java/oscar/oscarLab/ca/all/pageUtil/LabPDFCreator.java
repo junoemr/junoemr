@@ -746,6 +746,69 @@ public class LabPDFCreator extends PdfPageEventHelper {
 						cell.setColspan(1);
 					}
 				}
+
+				// and specimen description
+				if (handler.hasSpecimenSegment(j))
+				{
+					for (int s = 0; s < handler.getSpecimenCount(j); s ++)
+					{
+						if (handler.hasExtendedSpecimenDescription(j, s))
+						{
+							cell.setColspan(1);
+							cell.setPhrase(new Phrase("Specimen: " + handler.getSpecimenType(j, s), font));
+							table.addCell(cell);
+
+							if (isUnstructuredDoc)
+							{
+								cell.setColspan(2);
+							}
+							else
+							{
+								cell.setColspan(6);
+							}
+							cell.setPhrase(new Phrase(handler.getSpecimenExtendedDescription(j, s), font));
+							table.addCell(cell);
+						}
+						else
+						{
+							cell.setColspan(1);
+							cell.setPhrase(new Phrase("Specimen: " + handler.getSpecimenType(j, s), font));
+							table.addCell(cell);
+
+							if (isUnstructuredDoc)
+							{
+								cell.setColspan(2);
+							}
+							else
+							{
+								cell.setColspan(6);
+							}
+							cell.setPhrase(new Phrase(" " + handler.getSpecimenSite(j, s) + " Collected: " + handler.getSpecimenCollectionDateTime(j, s) +
+									" Received: " + handler.getSpecimenReceivedDateTime(j, s), font));
+							table.addCell(cell);
+						}
+					}
+				}
+
+				if (handler.getPerformingOrganizationName(j, 0) != null && handler.getPerformingOrganizationAddress(j, 0) != null &&
+						handler.getAssignedPatientLocation() != null)
+				{
+					cell.setColspan(1);
+					cell.setPhrase(new Phrase("Location: " + handler.getAssignedPatientLocation(), font));
+					table.addCell(cell);
+
+					if (isUnstructuredDoc)
+					{
+						cell.setColspan(2);
+					}
+					else
+					{
+						cell.setColspan(6);
+					}
+					cell.setPhrase(new Phrase(handler.getPerformingOrganizationName(j, 0) + " " + handler.getPerformingOrganizationAddress(j, 0), font));
+					table.addCell(cell);
+				}
+
 			} // for (j)
 
 		}// if (isMEDVUE)

@@ -54,6 +54,7 @@
 <jsp:useBean id="oscarVariables" class="java.util.Properties" scope="session" />
 <%@	page import="javax.swing.text.rtf.RTFEditorKit"%>
 <%@	page import="java.io.ByteArrayInputStream"%>
+<%@ page import="oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -1614,8 +1615,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 	                                                </a>
                                                 </td>
                                        </tr>
-
-										<%}
+                                        <%}
 
                                         for (l=0; l < handler.getOBXCommentCount(j, k); l++){%>
                                         <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
@@ -1645,6 +1645,44 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                     }
 
                                }
+
+                               if (handler.hasSpecimenSegment(j))
+                               {
+                               	    for (int s = 0; s < handler.getSpecimenCount(j); s ++)
+                                    {
+                                        if (handler.hasExtendedSpecimenDescription(j, s))
+                                        {
+                                        	%>
+                                                <tr>
+                                                    <td><bean:message key="oscarMDS.segmentDisplay.specimen"/><%=" " + handler.getSpecimenType(j, s)%> </td>
+													<td><%=handler.getSpecimenExtendedDescription(j, s)%></td>
+                                                </tr>
+                                            <%
+                                        }
+                                        else
+										{
+											%>
+											   <tr>
+												   <td><bean:message key="oscarMDS.segmentDisplay.specimen"/> <%=handler.getSpecimenType(j, s)%></td>
+												   <td><bean:message key="oscarMDS.segmentDisplay.site"/><%=" " + handler.getSpecimenSite(j, s) + " "%>
+													   <bean:message key="oscarMDS.segmentDisplay.collected"/><%=" " + handler.getSpecimenCollectionDateTime(j, s) + " "%>
+													   <bean:message key="oscarMDS.segmentDisplay.received"/><%=" " + handler.getSpecimenReceivedDateTime(j, s)%></td>
+											   </tr>
+										   <%
+										}
+                                    }
+                               }
+
+                               if (handler.getPerformingOrganizationName(j, 0) != null && handler.getPerformingOrganizationAddress(j, 0) != null &&
+                                    handler.getAssignedPatientLocation() != null)
+                               {
+                               %>
+                               <tr>
+                                   <td><bean:message key="oscarMDS.segmentDisplay.location"/> <%=" " +handler.getAssignedPatientLocation()%></td>
+                                   <td><%=handler.getPerformingOrganizationName(j, 0) + " " + handler.getPerformingOrganizationAddress(j, 0)%></td>
+                               </tr>
+
+                               <%  }
                            //}
 
 

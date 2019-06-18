@@ -37,6 +37,7 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
+import org.oscarehr.common.hl7.v2.oscar_to_oscar.DataTypeUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.util.UtilDateUtilities;
 
@@ -333,7 +334,7 @@ public abstract class MessageHandler {
      */
 	public int getOBRCount()
 	{
-		return getReps("RESPONSE", 0, "ORDER_OBSERVATION");
+		return getReps(getRootGroupName(), 0, "ORDER_OBSERVATION");
 	}
 
 	public String getFillerOrderNumber()
@@ -565,6 +566,17 @@ public abstract class MessageHandler {
 		return getReps("ORDER_OBSERVATION", i, "OBSERVATION");
 	}
 
+	/**
+	 * get the number of OBX reps for the specimen j in order observation i
+	 * @param i order observation rep
+	 * @param j specimen rep
+	 * @return the number of OBX reps
+	 */
+	public int getSpecimenOBXCount(int i, int j)
+	{
+		return getReps("ORDER_OBSERVATION", i, "SPECIMEN", j, "OBX");
+	}
+
     /**
      *  Return true if an abnormal flag other than 'N' is returned by
      *  getOBXAbnormalFlag( i, j ) for the OBX segment specified by j, in the
@@ -723,6 +735,153 @@ public abstract class MessageHandler {
 
 	public abstract String getNteForOBX(int i,int j);
 
+	/**
+	 * get the long name of the lab responsible for the given OBX segment
+	 * @param i OBR rep
+	 * @param k OBX rep
+	 * @return lab name
+	 */
+	public String getPerformingOrganizationName(int i, int k)
+	{
+		return get("/.ORDER_OBSERVATION("+ i +")/OBSERVATION("+ k +")/OBX-23");
+	}
+
+	/**
+	 * get address string for the lab responsible for the given OBX segment
+	 * @param i OBR rep
+	 * @param k OBX rep
+	 * @return lab address string
+	 */
+	public String getPerformingOrganizationAddress(int i, int k)
+	{
+		if (get("/.ORDER_OBSERVATION("+ i +")/OBSERVATION("+ k +")/OBX-24") != null &&
+				get("/.ORDER_OBSERVATION("+ i +")/OBSERVATION("+ k +")/OBX-24-3") != null &&
+				get("/.ORDER_OBSERVATION("+ i +")/OBSERVATION("+ k +")/OBX-24-4") != null &&
+				get("/.ORDER_OBSERVATION("+ i +")/OBSERVATION("+ k +")/OBX-24-5") != null)
+		{
+			return get("/.ORDER_OBSERVATION(" + i + ")/OBSERVATION(" + k + ")/OBX-24") + ", " +
+					get("/.ORDER_OBSERVATION(" + i + ")/OBSERVATION(" + k + ")/OBX-24-3") + " " +
+					get("/.ORDER_OBSERVATION(" + i + ")/OBSERVATION(" + k + ")/OBX-24-4") + " " +
+					get("/.ORDER_OBSERVATION(" + i + ")/OBSERVATION(" + k + ")/OBX-24-5");
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	/**
+	 * get the short name of the lab responsible for the lab
+	 * @return lab short name
+	 */
+	public String getAssignedPatientLocation()
+	{
+		return get("/.PV1-3-9");
+	}
+
+	/**
+	 * true if this order observation has at least one specimen segment
+	 * @param i the order observation group to check
+	 * @return true / false indicating existence of specimen segment
+	 */
+	public boolean hasSpecimenSegment(int i )
+	{
+		return getSpecimenCount(i) != 0;
+	}
+
+	/**
+	 * return the number of specimen segments in the given order observation group
+	 * @param i the order observation group to check
+	 * @return count of specimen segments
+	 */
+	public int getSpecimenCount(int i)
+	{
+		return getReps("ORDER_OBSERVATION", i, "SPECIMEN");
+	}
+
+	/**
+	 * get the type string of the specimen j in order observation i
+	 * @param i the order observation in which to look
+	 * @param j the specimen to check
+	 * @return the specimen type string
+	 */
+	public String getSpecimenType(int i, int j)
+	{
+		return get("/.ORDER_OBSERVATION(" + i + ")/SPECIMEN(" + j + ")/SPM-4-1");
+	}
+
+	/**
+	 * get the specimen site for specimen j in order observation i
+	 * @param i the order observation in which to look
+	 * @param j the specimen to check
+	 * @return the specimen site string
+	 */
+	public String getSpecimenSite(int i, int j)
+	{
+		return get("/.ORDER_OBSERVATION(" + i + ")/SPECIMEN(" + j + ")/SPM-8-1");
+	}
+
+	/**
+	 * get the specimen collection datetime
+	 * @param i the order observation rep
+	 * @param j the specimen rep
+	 * @return the specimen collection date as a string
+	 */
+	public String getSpecimenCollectionDateTime(int i, int j)
+	{
+		return formatDateTime(get("/.ORDER_OBSERVATION(" + i + ")/SPECIMEN(" + j + ")/SPM-17"));
+	}
+
+	/**
+	 * get the specimen received datetime
+	 * @param i the order observation rep
+	 * @param j the specimen rep
+	 * @return the specimen received date as a string
+	 */
+	public String getSpecimenReceivedDateTime(int i, int j)
+	{
+		return formatDateTime(get("/.ORDER_OBSERVATION(" + i + ")/SPECIMEN(" + j + ")/SPM-18"));
+	}
+
+	/**
+	 * get extended specimen description built by concatenating specimen OBX segments
+	 * @param i the order observation rep
+	 * @param j the specimen rep
+	 * @return a specimen description string
+	 */
+	public String getSpecimenExtendedDescription(int i, int j)
+	{
+		String desc = "";
+		for (int k = 0; k < getSpecimenOBXCount(i, j); k ++)
+		{
+			String obs = getSpecimenOBXObservationValue(i, j, k);
+			desc += (obs != null ? obs: "") + " ";
+		}
+		return desc;
+	}
+
+	/**
+	 * check if the specimen, j has an extended description
+	 * @param i the order observation rep
+	 * @param j the specimen rep
+	 * @return true if the specimen has an extended description
+	 */
+	public boolean hasExtendedSpecimenDescription(int i, int j)
+	{
+		return getSpecimenOBXCount(i, j) != 0;
+	}
+
+	/**
+	 * get the OBX observation value for order observation i , specimen j , OBX k
+	 * @param i order observation rep
+	 * @param j specimen rep
+	 * @param k OBX rep
+	 * @return the OBX Observation value string
+	 */
+	public String getSpecimenOBXObservationValue(int i, int j, int k)
+	{
+		return get("/.ORDER_OBSERVATION(" + i + ")/SPECIMEN(" + j + ")/OBX(" + k + ")-5");
+	}
 
 	/* ===================================== MISC ====================================== */
 
@@ -963,5 +1122,22 @@ public abstract class MessageHandler {
 		}
 
 		return (docName);
+	}
+
+	protected String getRootGroupName()
+	{
+		if (getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
+		{
+			return "PATIENT_RESULT";
+		}
+		else
+		{
+			return "RESPONSE";
+		}
+	}
+
+	protected DataTypeUtils.HL7_VERSION getMsgVersion()
+	{
+		return DataTypeUtils.getHL7Version(this.message);
 	}
 }
