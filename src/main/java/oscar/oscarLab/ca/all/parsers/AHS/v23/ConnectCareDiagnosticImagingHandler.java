@@ -51,4 +51,32 @@ public class ConnectCareDiagnosticImagingHandler extends ConnectCareHandler
 	{
 		super(msg);
 	}
+
+	/**
+	 *  Return the name of the jth OBX segment of the ith OBR group.
+	 * @param i the OBR group rep
+	 * @param j the OBX rep
+	 * @return the obx name
+	 */
+	@Override
+	public String getOBXName( int i, int j)
+	{ // NOTE, OBX name is in a sub component
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-3-1-2"));
+	}
+
+	@Override
+	public boolean isUnstructured()
+	{
+		return true;
+	}
+
+	/**
+	 * get service date
+	 * @return the service date as a string
+	 */
+	@Override
+	public String getServiceDate()
+	{
+		return formatDateTime(get("/.ORDER_OBSERVATION/OBR-6"));
+	}
 }

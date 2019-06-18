@@ -786,7 +786,11 @@ public abstract class MessageHandler {
 	 */
 	public boolean hasSpecimenSegment(int i )
 	{
-		return getSpecimenCount(i) != 0;
+		if (getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
+		{
+			return getSpecimenCount(i) != 0;
+		}
+		return false;
 	}
 
 	/**

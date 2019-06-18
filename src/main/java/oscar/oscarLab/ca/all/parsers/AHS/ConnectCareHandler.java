@@ -27,9 +27,6 @@ import ca.uhn.hl7v2.model.Message;
 import org.apache.commons.lang.StringUtils;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 
-import java.util.Collection;
-import java.util.HashMap;
-
 public abstract class ConnectCareHandler extends MessageHandler
 {
 	public ConnectCareHandler(Message msg) throws HL7Exception
@@ -60,15 +57,15 @@ public abstract class ConnectCareHandler extends MessageHandler
 	}
 
 	@Override
-	public String getMsgType()
+	public String getHealthNum()
 	{
-		return "AHS";
+		return get("/.PID-3(1)-1");
 	}
 
 	@Override
-	public String getHealthNum()
+	public String getMsgType()
 	{
-		return get("/.PID-3(2)-1");
+		return "AHS";
 	}
 
 	@Override

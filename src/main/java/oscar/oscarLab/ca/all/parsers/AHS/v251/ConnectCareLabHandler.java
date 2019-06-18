@@ -51,4 +51,20 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 	{
 		super(msg);
 	}
+
+	@Override
+	public String getHealthNum()
+	{
+		return get("/.PID-3(2)-1");
+	}
+
+	/**
+	 * get service date
+	 * @return the service date as a string
+	 */
+	@Override
+	public String getServiceDate()
+	{
+		return formatDateTime(get("/.ORDER_OBSERVATION/OBR-7"));
+	}
 }
