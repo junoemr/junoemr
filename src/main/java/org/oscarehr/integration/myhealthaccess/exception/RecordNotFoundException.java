@@ -21,32 +21,17 @@
  * Canada
  */
 
-package org.oscarehr.integration.myhealthaccess.dto;
+package org.oscarehr.integration.myhealthaccess.exception;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.io.Serializable;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ClinicUserAccessTokenTo1 implements Serializable
+public class RecordNotFoundException extends IllegalArgumentException
 {
-	@JsonProperty("token")
-	private String token;
-
-	public String getToken()
+	public RecordNotFoundException()
 	{
-		return token;
+		super();
 	}
 
-	public void setToken(String token)
+	public RecordNotFoundException(String s)
 	{
-		this.token = token;
-	}
-
-	public boolean isExpired()
-	{
-		// TODO check JWT expire time
-		return token != null;
+		super(s);
 	}
 }

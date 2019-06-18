@@ -21,32 +21,26 @@
  * Canada
  */
 
-package org.oscarehr.integration.myhealthaccess.dto;
+package org.oscarehr.integration;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ClinicUserAccessTokenTo1 implements Serializable
+@Service
+public class BaseService
 {
-	@JsonProperty("token")
-	private String token;
+	protected static final String DEFAULT_PROTOCOL = "https";
 
-	public String getToken()
+	public static String concatEndpointStrings(String baseString, String concatString)
 	{
-		return token;
+		baseString = baseString.replaceAll("/$", "");
+		baseString = baseString.replaceAll("http(s)?://", "");
+		concatString = concatString.replaceAll("^/", "");
+		return baseString + "/" + concatString;
 	}
 
-	public void setToken(String token)
+	public static String buildUrl(String protocol, String endPoint)
 	{
-		this.token = token;
-	}
-
-	public boolean isExpired()
-	{
-		// TODO check JWT expire time
-		return token != null;
+		endPoint = endPoint.replaceAll("http(s)?://", "");
+		return protocol + "://" + endPoint;
 	}
 }

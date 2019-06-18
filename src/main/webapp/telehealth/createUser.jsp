@@ -22,18 +22,25 @@
     Canada
 
 --%>
-<% String email = request.getParameter("email") == null ? "" : request.getParameter("email"); %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-		<title>MyHealthAccess Login</title>
+		<title>MyHealthAccess Create User</title>
 </head>
 <body>
-- This Juno user has a MHA account, but has not been authenticated from Juno yet
+- You do not currently have a linked myhealthaccess account.
 <br>
-- Authenticate once, and in the future Juno will Auto log into MHA
+- Fill out a valid email address to create an account.
 <br>
-<form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=login" method="post">
+- If an account already exists with this email, forward to the login.jsp page to link account
+<br>
+- You will get an email sent with a confirmation link
+<br>
+- You may optionally set a password to log directly into MHA
+<br>
+- In the future this Juno account will auto log into this MHA account
+<br>
+<form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=createUser" method="post">
 		<input
 						type="hidden"
 						id="demographicNo"
@@ -46,10 +53,10 @@
 						name="siteName"
 						value="<%=request.getParameter("siteName")%>"
 		/>
-		<input type="text" id="email" name="email" value="<%=email%>"/>
-
-		<input type="password" id="password" name="password"/>
+		Email: <input type="text" id="email" name="email"/> <br>
+		Email Confirm: <input type="text" id="emailConfirm" name="emailConfirm"/> <br>
 		<button type="submit">Submit</button>
 </form>
 </body>
 </html>
+

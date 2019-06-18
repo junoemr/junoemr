@@ -1900,7 +1900,7 @@ private long getAppointmentRowSpan(
 															</c:if>
 
 														<c:if test="<%= org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
-																&#124; <a href="#" onClick='popupPage(800, 1280, "../telehealth/start.do?demographicNo=${appointmentInfo.demographicNo}");return false;' title="Telehealth">Tel</a>
+																&#124; <a href="#" onClick='popupPage(800, 1280, "../telehealth/myhealthaccess.do?method=startTelehealth&demographicNo=${appointmentInfo.demographicNo}&siteName=${appointmentInfo.siteName}");return false;' title="Telehealth">Tel</a>
 														</c:if>
 															<!--  eyeform open link -->
 															<c:if test="${appointmentInfo.showEyeformLink}">

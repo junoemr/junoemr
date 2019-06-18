@@ -31,6 +31,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 import oscar.OscarProperties;
@@ -38,26 +39,18 @@ import oscar.OscarProperties;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 
-public class BaseService
+@Service
+public class BaseService extends org.oscarehr.integration.BaseService
 {
 	protected static OscarProperties oscarProps = OscarProperties.getInstance();
 	protected final String MYHEALTHACCESS_PROTOCOL = oscarProps.getProperty("myhealthaccess_protocol");
 	protected final String MYHEALTHACCESS_DOMAIN = oscarProps.getProperty("myhealthaccess_domain");
+	protected final String BASE_API_URI = oscarProps.getProperty("myhealthaccess_api_uri");
+	protected final String BASE_END_POINT = concatEndpointStrings(MYHEALTHACCESS_DOMAIN, BASE_API_URI);
 	protected final String CLINIC_ID = oscarProps.getProperty("myhealthaccess_clinic_id");
 	protected final String CLINIC_API_KEY = oscarProps.getProperty("myhealthaccess_clinic_api_key");
-	protected final String BASE_END_POINT = concatEndpointStrings(
-			MYHEALTHACCESS_DOMAIN, "/api/rest/v1");
 
-
-	protected static String concatEndpointStrings(String baseString, String concatString)
-	{
-		baseString = baseString.replaceAll("/$", "");
-		baseString = baseString.replaceAll("http(s)?://", "");
-		concatString = concatString.replaceAll("^/", "");
-		return baseString + "/" + concatString;
-	}
-
-	protected String buildUrl(String endPoint)
+	public String buildUrl(String endPoint)
 	{
 		endPoint = endPoint.replaceAll("http(s)?://", "");
 		return MYHEALTHACCESS_PROTOCOL + "://" + endPoint;
