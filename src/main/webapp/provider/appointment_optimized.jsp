@@ -1899,6 +1899,9 @@ private long getAppointmentRowSpan(
 																&#124; <a href='#' onClick='popupPage(700, 1024, "formIntake.jsp?demographic_no=${appointmentInfo.demographicNo}")' title='Intake Form'>In</a>
 															</c:if>
 
+														<c:if test="<%= org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
+																&#124; <a href="#" onClick='popupPage(800, 1280, "../telehealth/myhealthaccess.do?method=startTelehealth&demographicNo=${appointmentInfo.demographicNo}&siteName=${appointmentInfo.siteName}");return false;' title="Telehealth">Tel</a>
+														</c:if>
 															<!--  eyeform open link -->
 															<c:if test="${appointmentInfo.showEyeformLink}">
 																&#124; <a href="#" onClick='popupPage(800, 1280, "../eyeform/eyeform.jsp?demographic_no=${appointmentInfo.demographicNo}&appointment_no=${appointmentInfo.appointmentNo}");return false;' title="EyeForm">EF</a>
