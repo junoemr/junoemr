@@ -325,6 +325,8 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 
 
     <div id="labdoc_<%=segmentID%>">
+        <form name="you cannot nest form elements. hack to prevent page from breaking">
+        </form>
         <!-- form forwarding of the lab -->
         <form name="reassignForm_<%=segmentID%>" method="post" action="Forward.do">
             <input type="hidden" name="flaggedLabs" value="<%= segmentID %>" />
