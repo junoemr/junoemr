@@ -44,7 +44,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			'../ws/rs');
 
 		controller.providerSettings = loadedSettings;
-		console.info(controller.providerSettings);
 
 		//=========================================================================
 		// Local scope variables
@@ -178,7 +177,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.isInitialized = function isInitialized()
 		{
-			return $scope.initialized;
+			return $scope.initialized && Juno.Common.Util.exists($scope.calendar());
 		};
 
 		$scope.hasSchedules = function hasSchedules()
@@ -1669,7 +1668,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			if($scope.isInitialized())
 			{
-				console.info('onTimeIntervalChanged', $scope.isInitialized());
 				$scope.onTimeIntervalChanged();
 			}
 		});

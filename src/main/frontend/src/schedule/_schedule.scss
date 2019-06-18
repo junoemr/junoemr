@@ -200,32 +200,33 @@
 		}
 		.fc-head-container {
 			border: 0;
-			/* styling for the column-control headers */
+			/* styling for the resource view column-control headers */
 			.fc-resource-cell {
 				border-left: 0;
 				border-right: 0;
 
 				.column-ctl-root {
+					@include juno-font-tab;
 					background-color: $white;
 					display: flex;
-					padding: 10px;
+					height: $page-tabs-height;
+					padding: 0 10px;
+
 					.column-ctl {
 						display: flex;
 						align-items: center;
 						justify-content: space-evenly;
-						padding: 5px;
-					}
-					.ctl-container-label {
-						flex-grow: 4;
-					}
-					.ctl-container-icon {
-						flex-grow: 1;
 					}
 					.icon {
-						width: 18px;
-						height: 18px;
+						width: 16px;
+						height: 16px;
+						margin: 8px;
 					}
 				}
+			}
+			/* styling for the day/week/month view column-control headers */
+			.fc-day-header {
+				height: $page-tabs-height;
 			}
 		}
 		/* custom stying for the time column*/
@@ -293,15 +294,8 @@
 			}
 		}
 		select, input, textarea {
-			border-radius: 8px;
-			border: solid 1px $grey-06;
-			background-color: $grey-08;
-			padding: 8px;
-			height: $input-height;
 			min-width: 200px;
-			color: $grey-02;
 		}
-
 		@include clearfix;
 	}
 }
