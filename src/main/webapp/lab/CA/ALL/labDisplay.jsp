@@ -1655,7 +1655,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                         	%>
                                                 <tr>
                                                     <td><bean:message key="oscarMDS.segmentDisplay.specimen"/><%=" " + handler.getSpecimenType(j, s)%> </td>
-													<td><%=handler.getSpecimenExtendedDescription(j, s)%></td>
+													<td colspan="3"><%=handler.getSpecimenExtendedDescription(j, s)%></td>
                                                 </tr>
                                             <%
                                         }
@@ -1664,7 +1664,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 											%>
 											   <tr>
 												   <td><bean:message key="oscarMDS.segmentDisplay.specimen"/> <%=handler.getSpecimenType(j, s)%></td>
-												   <td><bean:message key="oscarMDS.segmentDisplay.site"/><%=" " + handler.getSpecimenSite(j, s) + " "%>
+												   <td colspan="3"><bean:message key="oscarMDS.segmentDisplay.site"/><%=" " + handler.getSpecimenSite(j, s) + " "%>
 													   <bean:message key="oscarMDS.segmentDisplay.collected"/><%=" " + handler.getSpecimenCollectionDateTime(j, s) + " "%>
 													   <bean:message key="oscarMDS.segmentDisplay.received"/><%=" " + handler.getSpecimenReceivedDateTime(j, s)%></td>
 											   </tr>
@@ -1679,7 +1679,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                %>
                                <tr>
                                    <td><bean:message key="oscarMDS.segmentDisplay.location"/> <%=" " +handler.getAssignedPatientLocation()%></td>
-                                   <td><%=handler.getPerformingOrganizationName(j, 0) + " " + handler.getPerformingOrganizationAddress(j, 0)%></td>
+                                   <td colspan="3"><%=handler.getPerformingOrganizationName(j, 0) + " " + handler.getPerformingOrganizationAddress(j, 0)%></td>
                                </tr>
 
                                <%  }
