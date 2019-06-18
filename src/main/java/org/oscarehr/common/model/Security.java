@@ -208,11 +208,18 @@ public class Security extends AbstractModel<Integer> {
 		{
 			return null;
 		}
+		MiscUtils.getLogger().error("this id: " + this.getId());
+		MiscUtils.getLogger().error("this token: " + this.myHealthAccessAuthToken);
 
 		ClinicUserAccessTokenTo1 accessTokenTo = new ClinicUserAccessTokenTo1();
 		accessTokenTo.setToken(this.myHealthAccessAuthToken);
 
 		return accessTokenTo;
+	}
+
+	public void setMyHealthAccessAuthToken(String myHealthAccessAuthToken)
+	{
+		this.myHealthAccessAuthToken = myHealthAccessAuthToken;
 	}
 
 	/**

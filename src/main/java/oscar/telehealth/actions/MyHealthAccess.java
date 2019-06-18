@@ -35,6 +35,7 @@ import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserAccessTokenTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserTo1;
+import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.provider.model.ProviderData;
@@ -87,6 +88,7 @@ public class MyHealthAccess extends DispatchAction
 		ClinicUserAccessTokenTo1 myHealthAccessAuthToken = loggedInUser.getMyHealthAccessAuthToken();
 		if (myHealthAccessAuthToken == null || myHealthAccessAuthToken.isExpired())
 		{
+			MiscUtils.getLogger().error("token null or expired");
 			ActionRedirect loginAction = new ActionRedirect(mapping.findForward("pushLogin"));
 			loginAction.addParameter(
 					"demographicNo", request.getParameter("demographicNo"));
@@ -109,10 +111,11 @@ public class MyHealthAccess extends DispatchAction
 		try
 		{
 			clinicUser = myHealthAccessService.getUserByEmail(email, getSite(request));
-		}
-		catch (RecordNotFoundException e)
+		} catch (RecordNotFoundException e)
 		{
 			// CREATE USER if not exists
+			clinicUser = myHealthAccessService.createUser(
+					loggedInUser, loggedInProvider, email, getSite(request));
 			ActionRedirect createdUserAction =
 					new ActionRedirect(mapping.findForward("createdUser"));
 			createdUserAction.addParameter(
@@ -142,12 +145,30 @@ public class MyHealthAccess extends DispatchAction
 		setLoggedInData(request);
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
-		ClinicUserAccessTokenTo1 myHealthAccessAuthToken = myHealthAccessService.getLoginToken(
-				loggedInUser,
-				getSite(request),
-				remoteUser.getMyhealthaccesID(),
-				email,
-				password);
+		ClinicUserAccessTokenTo1 myHealthAccessAuthToken;
+		try
+		{
+			myHealthAccessAuthToken = myHealthAccessService.getLoginToken(
+					loggedInUser,
+					getSite(request),
+					remoteUser.getMyhealthaccesID(),
+					email,
+					password);
+		} catch (BaseException e)
+		{
+			if (e.getErrorObject().hasAuthError())
+			{
+				ActionRedirect loginAction =
+						new ActionRedirect(mapping.findForward("pushLogin"));
+				loginAction.addParameter(
+						"demographicNo", request.getParameter("demographicNo"));
+				loginAction.addParameter("siteName", request.getParameter("siteName"));
+				loginAction.addParameter("email", email);
+				loginAction.addParameter("errorMessage", "Failed to authenticate");
+				return loginAction;
+			}
+			throw e;
+		}
 		return pushLogin(myHealthAccessAuthToken, mapping, form, request, response);
 	}
 
@@ -159,6 +180,7 @@ public class MyHealthAccess extends DispatchAction
 			HttpServletRequest request,
 			HttpServletResponse response)
 	{
+		MiscUtils.getLogger().error("LOGGING IN!");
 		Demographic patient = getDemographic(request);
 		if (patient == null)
 		{
@@ -209,15 +231,13 @@ public class MyHealthAccess extends DispatchAction
 		try
 		{
 			remoteUser = myHealthAccessService.getLinkedUser(loggedInUser, getSite(request));
-		}
-		catch (RecordNotFoundException e)
+		} catch (RecordNotFoundException e)
 		{
 			String email = request.getParameter("email");
-			if(email != null && !email.isEmpty())
+			if (email != null && !email.isEmpty())
 			{
 				remoteUser = myHealthAccessService.getUserByEmail(email, getSite(request));
-			}
-			else
+			} else
 			{
 				throw e;
 			}

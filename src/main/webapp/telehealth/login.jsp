@@ -33,6 +33,19 @@
 <br>
 - Authenticate once, and in the future Juno will Auto log into MHA
 <br>
+<% if(request.getParameter("errorMessage") != null && !request.getParameter("errorMessage").isEmpty())
+{
+%>
+
+<br>
+<strong><%= request.getParameter("errorMessage") %></strong>
+<br>
+<br>
+
+<%
+}
+%>
+
 <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=login" method="post">
 		<input
 						type="hidden"

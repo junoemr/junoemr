@@ -23,6 +23,7 @@
 
 package org.oscarehr.telehealth.service;
 
+import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.demographic.model.Demographic;
@@ -30,6 +31,7 @@ import org.oscarehr.integration.myhealthaccess.dto.ClinicUserAccessTokenTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserTo1;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,6 +53,9 @@ public class MyHealthAccessService
 
 	@Autowired
 	ClinicService clinicService;
+
+	@Autowired
+	SecurityDao securityDao;
 
 	protected static OscarProperties oscarProps = OscarProperties.getInstance();
 	protected final String MYHEALTHACCESS_PROTOCOL = oscarProps.getProperty("myhealthaccess_protocol");
@@ -88,6 +93,18 @@ public class MyHealthAccessService
 		return clinicService.getUserByEmail(getClinicID(site), email);
 	}
 
+	public ClinicUserTo1 createUser(
+			Security loggedInUser, ProviderData loggedInProvider, String email, Site site)
+	{
+		MiscUtils.getLogger().error("email1: " + email);
+		return clinicService.createUser(
+				getClinicID(site),
+				Integer.toString(loggedInUser.getId()),
+				email,
+				loggedInProvider.getFirstName(),
+				loggedInProvider.getLastName()
+		);
+	}
 
 	public ClinicUserAccessTokenTo1 getLoginToken(
 			Security loggedInUser,
@@ -96,13 +113,19 @@ public class MyHealthAccessService
 			String email,
 			String password) throws NoSuchAlgorithmException, IOException, KeyManagementException
 	{
-		return clinicService.getLoginToken(
+		ClinicUserAccessTokenTo1 myHealthAccessAuthToken = clinicService.getLoginToken(
 				getClinicID(site),
 				myHealthAccessUserID,
 				email,
 				password,
 				Integer.toString(loggedInUser.getId())
 				);
+		MiscUtils.getLogger().info("Saving Token: " + myHealthAccessAuthToken.getToken());
+		Security securityRecord = securityDao.find(loggedInUser.getId());
+		securityRecord.setMyHealthAccessAuthToken(myHealthAccessAuthToken.getToken());
+		securityDao.persist(securityRecord);
+		MiscUtils.getLogger().info("SAVED!");
+		return myHealthAccessAuthToken;
 	}
 
 	public String getClinicID(Site site)

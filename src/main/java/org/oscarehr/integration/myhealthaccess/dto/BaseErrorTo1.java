@@ -41,9 +41,6 @@ public class BaseErrorTo1 implements Serializable
 	@JsonProperty("auth_error")
 	private GenericErrorTo1 authError;
 
-	private boolean hasGenericErrors = false;
-	private boolean hasAuthError = false;
-
 	public List<GenericErrorTo1> getGenericErrors()
 	{
 		return genericErrors;
@@ -52,7 +49,6 @@ public class BaseErrorTo1 implements Serializable
 	public void setGenericErrors(List<GenericErrorTo1> genericErrors)
 	{
 		this.genericErrors = genericErrors;
-		this.setHasGenericErrors(true);
 	}
 
 	public void addGenericError(String code, String message)
@@ -62,7 +58,6 @@ public class BaseErrorTo1 implements Serializable
 		genericError.setCode(code);
 		genericError.setMessage(message);
 		this.genericErrors.add(genericError);
-		this.setHasGenericErrors(true);
 	}
 
 	public GenericErrorTo1 getAuthError()
@@ -73,26 +68,15 @@ public class BaseErrorTo1 implements Serializable
 	public void setAuthError(GenericErrorTo1 authError)
 	{
 		this.authError = authError;
-		this.setHasAuthError(true);
 	}
 
-	public boolean isHasGenericErrors()
+	public boolean hasGenericErrors()
 	{
-		return hasGenericErrors;
+		return genericErrors != null && genericErrors.size() > 0;
 	}
 
-	public void setHasGenericErrors(boolean hasGenericErrors)
+	public boolean hasAuthError()
 	{
-		this.hasGenericErrors = hasGenericErrors;
-	}
-
-	public boolean isHasAuthError()
-	{
-		return hasAuthError;
-	}
-
-	public void setHasAuthError(boolean hasAuthError)
-	{
-		this.hasAuthError = hasAuthError;
+		return authError != null;
 	}
 }
