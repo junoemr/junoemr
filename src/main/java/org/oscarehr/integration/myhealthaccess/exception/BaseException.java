@@ -21,39 +21,33 @@
  * Canada
  */
 
-package org.oscarehr.ws.external.soap.v1.transfer.schedule;
+package org.oscarehr.integration.myhealthaccess.exception;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
-import java.util.HashMap;
+import org.oscarehr.integration.myhealthaccess.dto.BaseErrorTo1;
+import org.springframework.web.client.RestClientException;
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "timeSlot")
-public class DayTimeSlots
+public class BaseException extends RestClientException
 {
+	private BaseErrorTo1 errorObject;
 
-    private HashMap<String, String> timeSlotEntry = new HashMap<>();
+	public BaseException(String msg)
+	{
+		super(msg);
+	}
 
-    public DayTimeSlots(String timeSlot, String duration)
-    {
-        this.setTimeSlotEntry(timeSlot, duration);
-    }
+	public BaseException(String msg, Throwable ex)
+	{
+		super(msg, ex);
+	}
 
-    public DayTimeSlots() {} // required
+	public BaseErrorTo1 getErrorObject()
+	{
+		return errorObject;
+	}
 
-    public HashMap<String, String> getTimeSlotEntry()
-    {
-       return timeSlotEntry;
-    }
+	public void setErrorObject(BaseErrorTo1 errorObject)
+	{
+		this.errorObject = errorObject;
+	}
 
-    public void setTimeSlotEntry(String timeSlot, String duration)
-    {
-        HashMap<String, String> timeSlotEntry = new HashMap<>();
-
-        timeSlotEntry.put("start_datetime", timeSlot);
-        timeSlotEntry.put("duration_minutes", duration);
-
-        this.timeSlotEntry = timeSlotEntry;
-    }
 }

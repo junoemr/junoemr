@@ -36,6 +36,7 @@ import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.schedule.model.ScheduleSearchResult;
 import org.oscarehr.schedule.model.ScheduleTemplate;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.external.soap.v1.transfer.ScheduleCodeDurationTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
@@ -51,9 +52,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -275,26 +273,13 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 	}
 
 	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
-	public ProviderScheduleTransfer getValidProviderScheduleSlots(
-			String providerNo, Calendar startDate, Calendar endDate, String[] appointmentTypesArr, String demographicNo, List<BookingRule> bookingRules)
+	public ProviderScheduleTransfer getValidProviderScheduleSlots(String providerNo, LocalDate startDate, LocalDate endDate, List<ScheduleCodeDurationTransfer> scheduleCodeDurationTransfer, String demographicNo, List<BookingRule> bookingRules)
 	{
-		LocalDate minDate = LocalDate.of(
-				startDate.get(Calendar.YEAR),
-				startDate.get(Calendar.MONTH) + 1,
-				startDate.get(Calendar.DAY_OF_MONTH)
-		);
+		List<String> appointmentTypeList = ScheduleCodeDurationTransfer.getAllTemplateCodes(scheduleCodeDurationTransfer);
 
-		LocalDate maxDate = LocalDate.of(
-				endDate.get(Calendar.YEAR),
-				endDate.get(Calendar.MONTH) + 1,
-				endDate.get(Calendar.DAY_OF_MONTH)
-		);
-
-		List<String> appointmentTypesList = Arrays.asList(appointmentTypesArr);
-
-		if (minDate.isBefore(LocalDate.now()))
+		if (startDate.isBefore(LocalDate.now()))
 		{
-			minDate = LocalDate.now();
+			startDate = LocalDate.now();
 		}
 
 		String sql = "SELECT STRAIGHT_JOIN\n" +
@@ -321,10 +306,10 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"ORDER BY sd.sdate, (n3.i + (10 * n2.i) + (100 * n1.i));";
 
 		Query query = entityManager.createNativeQuery(sql);
-		query.setParameter("minDate", java.sql.Date.valueOf(minDate), TemporalType.DATE);
-		query.setParameter("maxDate", java.sql.Date.valueOf(maxDate), TemporalType.DATE);
+		query.setParameter("minDate", java.sql.Date.valueOf(startDate), TemporalType.DATE);
+		query.setParameter("maxDate", java.sql.Date.valueOf(endDate), TemporalType.DATE);
 		query.setParameter("providerNo", providerNo);
-		query.setParameter("appointmentTypes", appointmentTypesList);
+		query.setParameter("appointmentTypes", appointmentTypeList);
 		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
 
 		List<Object[]> results = query.getResultList();
@@ -349,11 +334,13 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 		applyRules(bookingRules, possibleSlots);
 
-		Map<LocalDate, List<Appointment>> monthlyAppointments = scheduleManager.getProviderAppointmentsForMonth(providerNo, minDate, maxDate);
-		return generateAppointmentSlots(possibleSlots, monthlyAppointments);
+		Map<LocalDate, List<Appointment>> monthlyAppointments = scheduleManager.getProviderAppointmentsForMonth(providerNo, startDate, endDate);
+		return generateAppointmentSlots(possibleSlots, monthlyAppointments, scheduleCodeDurationTransfer);
 	}
 
-	private ProviderScheduleTransfer generateAppointmentSlots(List<ScheduleSearchResult> results, Map<LocalDate, List<Appointment>> monthlyAppointments)
+	private ProviderScheduleTransfer generateAppointmentSlots(
+			List<ScheduleSearchResult> results, Map<LocalDate, List<Appointment>> monthlyAppointments,
+			List<ScheduleCodeDurationTransfer> scheduleCodeDurationTransfer)
 	{
 		HashMap<String, List<DayTimeSlots>> providerSchedule = new HashMap<>();
 
@@ -361,7 +348,8 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 		ProviderScheduleTransfer scheduleResponse = new ProviderScheduleTransfer();
 
-		Collections.sort(results);		// needed?
+		int bookingDuration = scheduleCodeDurationTransfer.get(0).getDurationMinutes();
+
 		for (ScheduleSearchResult result : results)
 		{
 			List<DayTimeSlots> dayTimeSlots;
@@ -370,27 +358,29 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 			List<Map<String, LocalTime>> appointmentsTimeMap = this.getAppointmentsTimeMap(dayAppointments);
 
 			String scheduleDate = result.dateTime.toLocalDate().toString();
-			String timeSlotCodeStr = Character.toString(result.templateCode);
+			// String timeSlotCodeStr = Character.toString(result.templateCode);
 
 			LocalTime windowSlotStartTime = result.dateTime.toLocalTime();
 			LocalTime scheduleSlotEndTime = windowSlotStartTime.plusMinutes(result.length);
 
+			if (bookingDuration > result.length)
+			{
+				continue;
+			}
+
 			// Loop through all the 5 minute iterations of this schedule slot, and check whether or not
 			// there is an appointment booked within that 5 minute window in this specific slot
-
 			while (windowSlotStartTime.isBefore(scheduleSlotEndTime))
 			{
 				Long maxBookingDuration = this.getMaxBookingDurationForSlot(appointmentsTimeMap, windowSlotStartTime, scheduleSlotEndTime);
-				if (maxBookingDuration > 0L)
+
+				if (maxBookingDuration > 0L && maxBookingDuration >= bookingDuration)
 				{
 					LocalDateTime windowDateTime = LocalDateTime.of(result.dateTime.toLocalDate(), windowSlotStartTime);
 
 					DayTimeSlots timeSlotEntry = new DayTimeSlots(
-							windowDateTime.toString(),
-							timeSlotCodeStr,
-							String.valueOf(SCHEDULE_SLOT_DURATION),
-							result.dateTime.toLocalTime().toString(),
-							maxBookingDuration.toString()
+						windowDateTime.toString(),
+						String.valueOf(bookingDuration)
 					);
 
 					// scheduleArrMap keeps track of schedule slots that have already been added to this slot's date.
@@ -410,7 +400,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 				}
 
-				windowSlotStartTime = windowSlotStartTime.plusMinutes(SCHEDULE_SLOT_DURATION);
+				windowSlotStartTime = windowSlotStartTime.plusMinutes(bookingDuration);
 			}
 		}
 
@@ -467,6 +457,14 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		}
 
 		return startEndTimeMap;
+	}
+
+	private boolean maxBookingDurationIsValid(List<ScheduleCodeDurationTransfer> codeDurationTransfers, Long maxBookingDuration)
+	{
+		int maxTransferDuration = codeDurationTransfers.get(0).getDurationMinutes();
+		int minTransferDuration = codeDurationTransfers.get(codeDurationTransfers.size() - 1).getDurationMinutes();
+
+		return maxBookingDuration <= maxTransferDuration && maxBookingDuration >= minTransferDuration;
 	}
 
 	private List<Appointment> getPatientAppointmentsForBookingRules(String demographicNo, String providerNo, LocalDate minDate, LocalDate maxDate, Integer daysToQuery)

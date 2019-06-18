@@ -21,39 +21,32 @@
  * Canada
  */
 
-package org.oscarehr.ws.external.soap.v1.transfer.schedule;
+package org.oscarehr.integration.myhealthaccess.dto;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
-import java.util.HashMap;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "timeSlot")
-public class DayTimeSlots
+import java.io.Serializable;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ClinicUserAccessTokenTo1 implements Serializable
 {
+	@JsonProperty("token")
+	private String token;
 
-    private HashMap<String, String> timeSlotEntry = new HashMap<>();
+	public String getToken()
+	{
+		return token;
+	}
 
-    public DayTimeSlots(String timeSlot, String duration)
-    {
-        this.setTimeSlotEntry(timeSlot, duration);
-    }
+	public void setToken(String token)
+	{
+		this.token = token;
+	}
 
-    public DayTimeSlots() {} // required
-
-    public HashMap<String, String> getTimeSlotEntry()
-    {
-       return timeSlotEntry;
-    }
-
-    public void setTimeSlotEntry(String timeSlot, String duration)
-    {
-        HashMap<String, String> timeSlotEntry = new HashMap<>();
-
-        timeSlotEntry.put("start_datetime", timeSlot);
-        timeSlotEntry.put("duration_minutes", duration);
-
-        this.timeSlotEntry = timeSlotEntry;
-    }
+	public boolean isExpired()
+	{
+		// TODO check JWT expire time
+		return token != null;
+	}
 }
