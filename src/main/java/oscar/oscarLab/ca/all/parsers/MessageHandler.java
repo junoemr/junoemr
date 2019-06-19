@@ -62,7 +62,7 @@ import java.util.HashSet;
  */
 public abstract class MessageHandler {
 
-	private static Logger logger = Logger.getLogger(MessageHandler.class);
+	protected static Logger logger = Logger.getLogger(MessageHandler.class);
 
 	protected Hl7TextInfoDao hl7TextInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
 
@@ -779,6 +779,8 @@ public abstract class MessageHandler {
 		return get("/.PV1-3-9");
 	}
 
+
+	/* ============================== Specimen ============================= */
 	/**
 	 * true if this order observation has at least one specimen segment
 	 * @param i the order observation group to check

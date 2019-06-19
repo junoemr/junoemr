@@ -24,7 +24,7 @@ package oscar.oscarLab.ca.all.parsers.AHS.v23;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.v23.message.ORU_R01;
+import ca.uhn.hl7v2.model.v23.message.MDM_T08;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
 
@@ -35,7 +35,7 @@ public class ConnectCareDocumentationHandler extends ConnectCareHandler
 		String version = message.getVersion();
 		if(version.equals("2.3"))
 		{
-			ORU_R01 msh = (ORU_R01) message;
+			MDM_T08 msh = (MDM_T08) message;
 			MSH messageHeaderSegment = msh.getMSH();
 
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();

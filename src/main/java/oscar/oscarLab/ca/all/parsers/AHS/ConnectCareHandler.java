@@ -71,6 +71,12 @@ public abstract class ConnectCareHandler extends MessageHandler
 	@Override
 	public String getAccessionNum()
 	{
+		return get("/.ORDER_OBSERVATION/OBR-3-1");
+	}
+
+	@Override
+	public String getFillerOrderNumber()
+	{
 		return get("/.ORDER_OBSERVATION/ORC-3-1");
 	}
 

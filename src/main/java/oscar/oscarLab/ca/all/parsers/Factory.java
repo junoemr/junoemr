@@ -169,6 +169,14 @@ public final class Factory {
 			else if(CLSDIORMHandler.handlerTypeMatch(msg))
 				handler = new CLSDIORMHandler(msg);
 		}
+		else if(mshSplit[8].equals("MDM^T08"))
+		{
+			Message msg = p.parse(hl7Body);
+			if (ConnectCareDocumentationHandler.handlerTypeMatch(msg))
+			{
+				handler = new ConnectCareDocumentationHandler(msg);
+			}
+		}
 		else //handle default ORU^R01 messages
 		{
 			Message msg = p.parse(hl7Body);
@@ -176,8 +184,6 @@ public final class Factory {
 			// attempt to read the msh header and determine lab type handler
 			if(ConnectCareDiagnosticImagingHandler.handlerTypeMatch(msg))
 				handler = new ConnectCareDiagnosticImagingHandler(msg);
-			else if(ConnectCareDocumentationHandler.handlerTypeMatch(msg))
-				handler = new ConnectCareDocumentationHandler(msg);
 			else if(ConnectCareLabHandler.handlerTypeMatch(msg))
 				handler = new ConnectCareLabHandler(msg);
 			else if(CLSHandler.handlerTypeMatch(msg))

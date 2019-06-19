@@ -89,7 +89,7 @@ public class Utilities
 			    }
 			    if(header.equals("MSH"))
 			    {
-				    if(line.contains("ORU") || line.contains("ORM^002"))
+				    if(line.contains("ORU") || line.contains("ORM^002") || line.contains("MDM^T08"))
 				    {
 					    skipMessage = false;
 				    }
