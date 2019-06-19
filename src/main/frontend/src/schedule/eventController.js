@@ -131,7 +131,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		lastName: null,
 		displayName: "",
 		title: null,
-		fillData: function fillData(id)
+		loadData: function loadData(id)
 		{
 			var model = this;
 			model.providerNo = id;
@@ -149,35 +149,36 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		}
 	};
 
-	$scope.demographicModel = {
+	controller.demographicModel = {
 		demographicNo: null,
-		fullName: null,
-		hasPhoto: true,
-		patientPhotoUrl: '/imageRenderingServlet?source=local_client&clientId=0',
-		data: {
+		data: {},
+		displayData: {
 			birthDate: null,
-			healthNumber: null,
-			ontarioVersionCode: null,
-			phoneNumberPrimary: null
+			fullName: null,
+			hasPhoto: true,
+			patientPhotoUrl: '/imageRenderingServlet?source=local_client&clientId=0',
+			addressLine: null,
 		},
+
 		clear: function clear()
 		{
 			this.demographicNo = null;
-			this.fullName = null;
-			this.patientPhotoUrl = '/imageRenderingServlet?source=local_client&clientId=0';
-			this.data.birthDate = null;
-			this.data.healthNumber = null;
-			this.data.ontarioVersionCode = null;
-			this.data.phoneNumberPrimary = null;
-			this.data.addressLine = null;
-			this.data.sex = null;
-			this.data.email = null;
+			this.data = {};
+			this.displayData = {
+				birthDate: null,
+				fullName: null,
+				hasPhoto: true,
+				patientPhotoUrl: '/imageRenderingServlet?source=local_client&clientId=0',
+				addressLine: null,
+			};
 		},
 		fillData: function fillData(data)
 		{
+			this.data = data;
+
 			this.demographicNo = data.demographicNo;
-			this.fullName = Juno.Common.Util.formatName(data.firstName, data.lastName);
-			this.patientPhotoUrl = '/imageRenderingServlet?source=local_client&clientId=' + (data.demographicNo? data.demographicNo: 0);
+			this.displayData.fullName = Juno.Common.Util.formatName(data.firstName, data.lastName);
+			this.displayData.patientPhotoUrl = '/imageRenderingServlet?source=local_client&clientId=' + (data.demographicNo? data.demographicNo: 0);
 
 			var dateOfBirth = null;
 			if(Juno.Common.Util.exists(data.dob))
@@ -190,20 +191,43 @@ angular.module('Schedule').controller('Schedule.EventController', [
 				dateOfBirth = Juno.Common.Util.getDateMomentFromComponents(
 					data.dobYear, data.dobMonth, data.dobDay);
 			}
-			this.data.birthDate = Juno.Common.Util.formatMomentDate(dateOfBirth);
-
-
-			this.data.healthNumber = data.hin;
-			// XXX: no version code when loaded from autocomplete?  Does that matter?
-			this.data.ontarioVersionCode = data.ver;
-			this.data.phoneNumberPrimary = data.phone;
-			this.data.sex = data.sex;
-			this.data.email = data.email;
+			this.displayData.birthDate = Juno.Common.Util.formatMomentDate(dateOfBirth);
 
 			if(Juno.Common.Util.exists(data.address))
 			{
-				this.data.addressLine = data.address.address + ' ' + data.address.city + ' ' + data.address.province + ' ' + data.address.postal;
+				this.displayData.addressLine =
+					Juno.Common.Util.noNull(data.address.address) + ' ' +
+					Juno.Common.Util.noNull(data.address.city) + ' ' +
+					Juno.Common.Util.noNull(data.address.province) + ' ' +
+					Juno.Common.Util.noNull(data.address.postal);
 			}
+		},
+		loadData: function loadData(demographicNo)
+		{
+			var deferred = $q.defer();
+
+			if (Juno.Common.Util.exists(demographicNo) && demographicNo !== 0)
+			{
+				demographicService.getDemographic(demographicNo).then(
+					function (data)
+					{
+						controller.demographicModel.fillData(data);
+						deferred.resolve();
+					},
+					function (errors)
+					{
+						console.log('error initializing patient autocomplete', errors);
+						controller.demographicModel.clear();
+						deferred.resolve();
+					});
+			}
+			else
+			{
+				controller.demographicModel.clear();
+				deferred.resolve();
+			}
+
+			return deferred.promise;
 		},
 		uploadPhoto: function uploadPhoto(file){}
 	};
@@ -224,7 +248,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 		controller.loadAppointmentReasons();
 		controller.loadAppointmentTypes();
-		controller.providerModel.fillData(data.schedule.uuid);
+		controller.providerModel.loadData(data.schedule.uuid);
 
 		var momentStart = data.startTime;
 		var momentEnd = data.endTime;
@@ -260,21 +284,29 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 			// either load the patient data and init the autocomplete
 			// or ensure the patient model is clear
-			controller.setPatientData(data.eventData.demographicNo).then(function() {
-				// hack to initialize typahead value without a selected demographic model
-				if(!$scope.isPatientSelected())
+			controller.demographicModel.loadData(data.eventData.demographicNo).then(
+				function success()
 				{
-					$scope.patientTypeahead.isTypeaheadSearchQuery = true;
-					$scope.patientTypeahead.searchQuery = data.eventData.appointmentName;
-				}
-				$scope.initialized = true;
-			});
+					if ($scope.isPatientSelected())
+					{
+						$scope.patientTypeahead = controller.demographicModel.data;
+					}
+					else
+					{
+						// to initialize typeahead value without a selected demographic model
+						$scope.patientTypeahead.isTypeaheadSearchQuery = true;
+						$scope.patientTypeahead.searchQuery = data.eventData.appointmentName;
+					}
+
+					$timeout(controller.loadWatches);
+					$scope.initialized = true;
+				});
 		}
 		else
 		{
 			// create mode: adjust the end date (if needed)
 			// and clear the patient model
-			controller.setPatientData();
+			controller.demographicModel.clear();
 			$scope.eventData.site = $scope.parentScope.selectedSiteName;
 			// set the default site selection if the current one is invalid
 			if(controller.sitesEnabled && !controller.isValidSiteValue($scope.eventData.site))
@@ -288,41 +320,12 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 			controller.checkEventConflicts(); // uses the eventData
 
+			$timeout(controller.loadWatches);
 			$scope.initialized = true;
 		}
 
 		controller.changeTab(controller.tabEnum.appointment);
 	};
-
-	controller.setPatientData = function setPatientData(demographicNo)
-	{
-		var deferred = $q.defer();
-
-		if(Juno.Common.Util.exists(demographicNo) && demographicNo != 0)
-		{
-			demographicService.getDemographic(demographicNo).then(function(data)
-			{
-				$scope.demographicModel.fillData(data);
-				$scope.patientTypeahead = data;
-
-				deferred.resolve();
-			},
-			function(errors)
-			{
-				console.log('error initializing patient autocomplete', errors);
-				$scope.demographicModel.clear();
-				deferred.resolve();
-			});
-		}
-		else
-		{
-			$scope.demographicModel.clear();
-			deferred.resolve();
-		}
-
-		return deferred.promise;
-	};
-
 
 	//=========================================================================
 	// Private methods
@@ -525,8 +528,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 					((momentStart.isSameOrAfter(eventStart) && momentStart.isBefore(eventEnd)) ||
 					(momentEnd.isAfter(eventStart) && momentEnd.isSameOrBefore(eventEnd))))
 				{
-					// console.info('event conflict', event);
-
 					controller.isDoubleBook = true;
 					if (eventDoNotBook)
 					{
@@ -581,7 +582,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 		var endDatetime = controller.calculateEndTime();
 
-		var demographicNo = ($scope.eventData.doNotBook)? null : $scope.demographicModel.demographicNo;
+		var demographicNo = ($scope.eventData.doNotBook)? null : controller.demographicModel.demographicNo;
 		var appointmentName = (demographicNo == null && Juno.Common.Util.exists($scope.patientTypeahead.searchQuery))?
 			$scope.patientTypeahead.searchQuery : null;
 
@@ -655,7 +656,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	$scope.loadPatientFromTypeahead = function loadPatientFromTypeahead(patientTypeahead)
 	{
-		$scope.demographicModel.fillData(patientTypeahead);
+		controller.demographicModel.loadData(patientTypeahead.demographicNo);
 	};
 
 	controller.autofillDataFromType = function(typeValue)
@@ -688,27 +689,30 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	// Watches
 	//=========================================================================/
 
-	$scope.$watch('patientTypeahead', function(newValue, oldValue)
+	controller.loadWatches = function loadWatches()
 	{
-		if($scope.isInitialized())
+		$scope.$watch('patientTypeahead', function(newValue, oldValue)
 		{
-			$scope.loadPatientFromTypeahead($scope.patientTypeahead);
-		}
-	});
-	$scope.$watch('[eventData.startTime, eventData.duration]', function(newValue, oldValue)
-	{
-		if($scope.isInitialized())
+			if(newValue != oldValue)
+			{
+				$scope.loadPatientFromTypeahead($scope.patientTypeahead);
+			}
+		}, true);
+		$scope.$watch('[eventData.startTime, eventData.duration]', function(newValue, oldValue)
 		{
-			controller.checkEventConflicts();
-		}
-	});
-	$scope.$watch('eventData.type', function(newValue, oldValue)
-	{
-		if($scope.isInitialized())
+			if(newValue != oldValue)
+			{
+				controller.checkEventConflicts();
+			}
+		});
+		$scope.$watch('eventData.type', function(newValue, oldValue)
 		{
-			controller.autofillDataFromType(newValue);
-		}
-	});
+			if(newValue != oldValue)
+			{
+				controller.autofillDataFromType(newValue);
+			}
+		});
+	};
 
 	//=========================================================================
 	// Public methods
@@ -722,8 +726,8 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		}
 		$scope.preview_patient_image = file;
 		$scope.new_photo = true;
-		$scope.demographicModel.hasPhoto = true;
-		$scope.demographicModel.uploadPhoto(file);
+		controller.demographicModel.hasPhoto = true;
+		controller.demographicModel.uploadPhoto(file);
 	};
 
 	$scope.isWorking = function isWorking()
@@ -738,7 +742,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	$scope.isPatientSelected = function isPatientSelected()
 	{
-		return Juno.Common.Util.exists($scope.demographicModel.demographicNo);
+		return Juno.Common.Util.exists(controller.demographicModel.demographicNo);
 	};
 
 	$scope.hasSites = function hasSites()
@@ -760,7 +764,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	$scope.clearPatient = function clearPatient()
 	{
 		$scope.autocompleteValues.patient = null;
-		$scope.demographicModel.clear();
+		controller.demographicModel.clear();
 	};
 
 	controller.save = function save()
@@ -823,7 +827,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			$scope.parentScope.openCreateInvoice(
 				$scope.eventUuid,
 				$scope.schedule.uuid,
-				$scope.demographicModel.demographicNo);
+				controller.demographicModel.demographicNo);
 		}, function()
 		{
 			$scope.displayMessages.add_generic_fatal_error();
@@ -938,7 +942,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	$scope.modify_patient = function modify_patient()
 	{
-		if(!$scope.demographicModel.demographicNo)
+		if(!$scope.isPatientSelected())
 		{
 			return;
 		}
@@ -955,8 +959,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	$scope.onPatientModalSave = function onPatientModalSave(demographicNo)
 	{
 		// load the newly created/updated patient
-		$scope.demographicModel.demographicNo = demographicNo;
-		controller.setPatientData();
+		controller.demographicModel.loadData(demographicNo); //TODO why?
 	};
 
 	$scope.newDemographic = function newDemographic(size)
@@ -975,7 +978,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 				console.log(results);
 				console.log('patient #: ', results.demographicNo);
 
-				controller.setPatientData(results.demographicNo);
+				controller.demographicModel.loadData(results.demographicNo);
 			},
 			function error(errors)
 			{

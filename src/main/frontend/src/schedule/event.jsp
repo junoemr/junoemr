@@ -176,7 +176,7 @@
 														</label>
 														<div class="col-sm-10">
 															<span class="form-control-static input-sm">
-																{{ demographicModel.data.birthDate }}
+																{{ eventController.demographicModel.displayData.birthDate }}
 															</span>
 														</div>
 													</div>
@@ -189,7 +189,7 @@
 														</label>
 														<div class="col-sm-8">
 															<span class="form-control-static input-sm">
-																{{ demographicModel.data.sex }}
+																{{ eventController.demographicModel.data.sex }}
 															</span>
 														</div>
 													</div>
@@ -204,20 +204,20 @@
 															</label>
 															<div class="col-sm-11">
 																<span class="form-control-static">
-																	<span class="patient-health-number" ng-if="demographicModel.data.healthNumber">
-																		{{demographicModel.data.healthNumber}}
-																		{{demographicModel.data.ontarioVersionCode}}
+																	<span class="patient-health-number" ng-if="eventController.demographicModel.data.hin">
+																		{{eventController.demographicModel.data.hin}}
+																		{{eventController.demographicModel.data.ver}}
 																	</span>
 																	<%--<button type="button"--%>
 																	        <%--aria-label="Check Eligibility"--%>
-																	        <%--title="{{demographicModel.eligibilityText}}"--%>
+																	        <%--title="{{eventController.demographicModel.eligibilityText}}"--%>
 																	        <%--class="btn"--%>
 																	        <%--ng-class="{--%>
-																							<%--'btn-addon': (demographicModel.checkingEligibility || demographicModel.eligibility == null) && !demographicModel.pollingEligibility,--%>
-																							<%--'btn-warning': demographicModel.pollingEligibility,--%>
-																							<%--'btn-success': demographicModel.eligibility == 'eligible',--%>
-																							<%--'btn-danger': demographicModel.eligibility == 'ineligible' }"--%>
-																	        <%--ng-click="demographicModel.getEligibility(true, true)">--%>
+																							<%--'btn-addon': (eventController.demographicModel.checkingEligibility || eventController.demographicModel.eligibility == null) && !eventController.demographicModel.pollingEligibility,--%>
+																							<%--'btn-warning': eventController.demographicModel.pollingEligibility,--%>
+																							<%--'btn-success': eventController.demographicModel.eligibility == 'eligible',--%>
+																							<%--'btn-danger': eventController.demographicModel.eligibility == 'ineligible' }"--%>
+																	        <%--ng-click="eventController.demographicModel.getEligibility(true, true)">--%>
 																		<%--<i class="fa fa-user" aria-hidden="true"></i>--%>
 																	<%--</button>--%>
 																</span>
@@ -233,7 +233,7 @@
 																Address:
 															</label>
 															<div class="col-sm-11">
-																<span class="form-control-static">{{demographicModel.data.addressLine}}</span>
+																<span class="form-control-static">{{eventController.demographicModel.displayData.addressLine}}</span>
 															</div>
 														</div>
 													</div>
@@ -246,7 +246,7 @@
 																Phone:
 															</label>
 															<div class="col-sm-11">
-																<span class="form-control-static">{{demographicModel.data.phoneNumberPrimary}}</span>
+																<span class="form-control-static">{{eventController.demographicModel.data.phone}}</span>
 															</div>
 														</div>
 													</div>
@@ -259,7 +259,7 @@
 																Email:
 															</label>
 															<div class="col-sm-11">
-																<span class="form-control-static">{{demographicModel.data.email}}</span>
+																<span class="form-control-static">{{eventController.demographicModel.data.email}}</span>
 															</div>
 														</div>
 													</div>
@@ -319,6 +319,13 @@
 							<div class="row">
 								<!-- show patient alerts -->
 								<div class="col-md-6">
+									<div class="form-group">
+										<label class="col-md-2">
+										</label>
+										<div class="col-md-10">
+											<span class="form-control-static alert-message">{{eventController.demographicModel.data.alert}}</span>
+										</div>
+									</div>
 								</div>
 								<!-- show additional alerts -->
 								<div class="col-md-6">

@@ -366,6 +366,10 @@
 		.alert-container {
 			height: 40px;
 		}
+		.alert-message {
+			color: $red;
+			@include juno-font-label;
+		}
 		.info-frame-container {
 			height: 160px;
 			.demographic-info-frame {
