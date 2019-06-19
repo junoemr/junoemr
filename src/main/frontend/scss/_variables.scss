@@ -16,6 +16,15 @@ $primary-navbar-height: 56px;
 $page-header-height: 72px;
 $page-tabs-height: 48px;
 
+$modal-height: 584px;
+$modal-width: 960px;
+$modal-header-height: 64px;
+$modal-footer-height: 64px;
+
+$modal-border-space: 16px;
+
+$modal-body-height: calc(#{$modal-height} - #{$modal-header-height} - #{$modal-footer-height} - #{$modal-border-space});
+
 // Media queries breakpoints
 // $screen-nav-lg-max: 1305px;
 $screen-nav-lg: 1357px;

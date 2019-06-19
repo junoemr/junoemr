@@ -140,7 +140,7 @@ Juno.Common.Util.validateTimeString = function validateTimeString(
 Juno.Common.Util.validateIntegerString = function validateInputString(
 	inputString, displayErrors, field, fieldDisplayName, required, nonNegative, nonZero)
 {
-	if (Juno.Common.Util.exists(inputString))
+	if (!Juno.Common.Util.isBlank(inputString))
 	{
 		if (!Juno.Common.Util.isIntegerString(inputString) ||
 			(nonNegative && Number(inputString) < 0) ||

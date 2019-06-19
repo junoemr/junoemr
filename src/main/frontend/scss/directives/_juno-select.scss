@@ -1,0 +1,12 @@
+
+// scss for the custom select dropdown directives
+.directive-appt-status-select {
+	select {
+		@include juno-select(16px);
+		height: 32px;
+	}
+	.icon {
+		width: 20px;
+		height: 20px;
+	}
+}

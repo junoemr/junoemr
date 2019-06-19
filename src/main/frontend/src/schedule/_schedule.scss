@@ -351,6 +351,8 @@
 		@include juno-tab-lg($tabs-height);
 		@include juno-tab-color-scheme-light;
 
+		height: calc(#{$modal-body-height} - #{$tabs-height});
+
 		.form-group {
 			margin-bottom: 8px;
 			display: flex;
@@ -394,7 +396,8 @@
 			}
 		}
 		.tab-pane {
-			padding: 0 16px 16px 16px;
+			padding: 0 $modal-border-space $modal-border-space $modal-border-space;
+			overflow: auto;
 
 			.tab-bar-inputs {
 				position: absolute;
@@ -406,15 +409,6 @@
 				align-items: center;
 				.form-group {
 					margin-bottom: 0;
-				}
-				.directive-appt-status-select {
-					select {
-						height: 32px;
-					}
-					.icon {
-						width: 20px;
-						height: 20px;
-					}
 				}
 			}
 		}

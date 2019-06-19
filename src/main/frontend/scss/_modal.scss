@@ -1,8 +1,8 @@
 
 .juno-modal {
 	.modal-dialog {
-		width: 960px;
-		height: 584px;
+		width: $modal-width;
+		height: $modal-height;
 		.modal-content {
 			height: 100%;
 			display: flex;
@@ -23,39 +23,28 @@
 				linear-gradient(247deg, $orange, $orange 30%, $orange-hover 64%, $orange-hover) no-repeat;
 			}
 
-			padding: 0 16px 16px 16px;
+			// header counts as modal top border, so don't apply the spacing to main content pane
+			padding: 0 $modal-border-space $modal-border-space $modal-border-space;
 			.modal-header {
+				height: $modal-header-height;
 				padding: 12px 0;
 			}
 			.modal-body {
+				height: $modal-body-height;
 				background-color: $white;
 				border-radius: 16px 16px 0 0;
 				padding: 0;
-				flex-grow: 1;
-				overflow: auto;
 			}
 			.modal-footer {
+				height: $modal-footer-height;
 				border-radius: 0 0 16px 16px;
 				background-color: $white;
 				border: 0;
 				.btn {
-					color: $primary;
-					background-color: $white;
-					border: solid 1px $grey-07;
-					font-weight: bold;
-					font-size: 13px;
 					width: 112px;
 					height: 40px;
 
-					&.btn-success {
-						color: $white;
-						background-color: $green;
-						border: solid 1px $green-hover;
-					}
 					&.btn-primary {
-						color: $white;
-						background-color: $primary;
-						border: solid 1px $primary-hover;
 						&.double-book {
 							background-color: $yellow;
 							border-color: $yellow-hover;
@@ -74,19 +63,8 @@
 		}
 	}
 	label {
-		@include juno-font-label;
 		text-align: right;
-		color: $grey-03;
 		padding: 3px 2px;
-	}
-	select, input, textarea {
-		border-radius: 8px;
-		border: solid 1px $grey-07;
-		background-color: $white;
-		padding: 8px;
-
-		@include juno-font-input;
-		color: $grey-02;
 	}
 	select {
 		@include juno-select(16px);
@@ -95,7 +73,6 @@
 		margin-top: 0;
 		margin-bottom: 0;
 
-		font-family: "Arial", "Helvetica", sans-serif;
 		font-size: 18px;
 		font-weight: 900;
 		font-style: normal;
@@ -108,7 +85,6 @@
 		margin-top: 0;
 		margin-bottom: 0;
 
-		font-family: "Arial", "Helvetica", sans-serif;
 		font-size: 14px;
 		font-weight: bold;
 		font-style: normal;

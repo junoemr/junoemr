@@ -13,16 +13,16 @@
 
 	<div class="{{input_size}}">
 
-		<input id="input-{{name}}"
-		       type="text"
-		       class="form-control"
-		       ng-class="{'no_scroll_bar': max_characters > 0}"
-		       ng-model="model"
-		       ng-focus="focus_fn()"
-		       ng-change="change_fn()"
-		       ng-disabled="disabled"
-		       tabindex="{{tab_index}}">
-		</input>
+		<textarea id="input-{{name}}"
+							class="form-control"
+							ng-class="{'no_scroll_bar': max_characters > 0}"
+							rows="{{rows}}"
+							ng-model="model"
+							ng-focus="focus_fn()"
+							ng-change="change_fn()"
+							ng-disabled="disabled"
+							tabindex="{{tab_index}}">
+		</textarea>
 		<span class="label label-default textarea-char-counter"
 					ng-class="{'hidden': max_characters == null}">
 			{{model.length}}/{{max_characters}}

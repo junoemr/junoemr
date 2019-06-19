@@ -86,6 +86,29 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		site: null,
 	};
 
+	controller.repeatBooking =
+	{
+		periodOptions: [
+			{
+				label: 'days',
+				value: 'days'
+			},
+			{
+				label: 'weeks',
+				value: 'weeks'
+			},
+			{
+				label: 'months',
+				value: 'months'
+			},
+		]
+	};
+	controller.repeatBookingData = {
+		units: null,
+		period: controller.repeatBooking.periodOptions[0].value,
+		endDate: null
+	};
+
 	$scope.timeInterval = data.timeInterval;
 
 	$scope.patientTypeahead = {};
@@ -565,6 +588,12 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		Juno.Common.Util.validateIntegerString($scope.eventData.duration,
 			$scope.displayMessages, 'duration', 'Duration', true, true, true);
 
+		Juno.Common.Util.validateIntegerString(controller.repeatBookingData.units,
+			$scope.displayMessages, 'repeatUnits', 'Repeat Units', false, true, false);
+
+		Juno.Common.Util.validateDateString(controller.repeatBookingData.endDate,
+			$scope.displayMessages, 'repeatEndDate', 'Repeat End Date', false);
+
 		if(controller.sitesEnabled && !controller.isValidSiteValue($scope.eventData.site))
 		{
 			$scope.displayMessages.add_field_error('site', "A valid site must be selected");
@@ -759,6 +788,15 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			}
 		}
 		return false;
+	};
+
+	controller.changeTab = function changeTab(tabId)
+	{
+		controller.activeTab = tabId;
+	};
+	controller.isTabActive = function(tabId)
+	{
+		return (tabId === controller.activeTab);
 	};
 
 	$scope.clearPatient = function clearPatient()
@@ -988,12 +1026,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 		console.log($('#myModal'));
 	};
-
-	controller.changeTab = function changeTab(tabId)
-	{
-		controller.activeTab = tabId;
-	};
-
 
 	//=========================================================================
 	//  Key Bindings
