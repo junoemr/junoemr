@@ -6,6 +6,7 @@
 //=========================================================================/
 
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
+import {AppointmentApi} from "../../generated/api/AppointmentApi";
 
 angular.module('Schedule').controller('Schedule.EventController', [
 
@@ -44,6 +45,9 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	let controller = this;
 
 	$scope.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
+		'../ws/rs');
+
+	$scope.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
 		'../ws/rs');
 
 	//=========================================================================
@@ -108,6 +112,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		period: controller.repeatBooking.periodOptions[0].value,
 		endDate: null
 	};
+	controller.eventHistory = [];
 
 	$scope.timeInterval = data.timeInterval;
 
@@ -324,6 +329,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 					$timeout(controller.loadWatches);
 					$scope.initialized = true;
 				});
+			controller.loadAppointmentHistory($scope.eventUuid);
 		}
 		else
 		{
@@ -573,6 +579,31 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		{
 			console.warn("unable to check double booking, invalid event time/duration", momentStart, momentEnd);
 		}
+	};
+	controller.loadAppointmentHistory = function(appointmentId)
+	{
+		var deferred = $q.defer();
+
+		$scope.appointmentApi.getEditHistory(appointmentId).then(
+			function success(results)
+			{
+				controller.eventHistory = results.data.body;
+
+				for(var i=0; i< controller.eventHistory.length; i++)
+				{
+					controller.eventHistory[i].formattedUpdateDate = Juno.Common.Util.formatMomentDate(moment(controller.eventHistory[i].updateDateTime));
+					controller.eventHistory[i].formattedCreateDate = Juno.Common.Util.formatMomentDate(moment(controller.eventHistory[i].createDateTime));
+
+					controller.eventHistory[i].formattedUpdateTime = Juno.Common.Util.formatMomentTime(moment(controller.eventHistory[i].updateDateTime));
+					controller.eventHistory[i].formattedCreateTime = Juno.Common.Util.formatMomentTime(moment(controller.eventHistory[i].createDateTime));
+				}
+
+				console.info(controller.eventHistory);
+				deferred.resolve(controller.eventHistory);
+			}
+		);
+
+		return deferred.promise;
 	};
 
 	$scope.validateForm = function validateForm()

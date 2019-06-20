@@ -13,7 +13,7 @@ $right-aside-width: 400px;
 $right-aside-width-collapsed: 0;
 
 $primary-navbar-height: 56px;
-$page-header-height: 72px;
+$page-header-height: 56px;
 $page-tabs-height: 48px;
 
 $modal-height: 584px;
@@ -24,6 +24,9 @@ $modal-footer-height: 64px;
 $modal-border-space: 16px;
 
 $modal-body-height: calc(#{$modal-height} - #{$modal-header-height} - #{$modal-footer-height} - #{$modal-border-space});
+
+
+$form-input-height: 2.5em;
 
 // Media queries breakpoints
 // $screen-nav-lg-max: 1305px;

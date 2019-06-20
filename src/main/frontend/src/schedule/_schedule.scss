@@ -42,33 +42,6 @@
 	width: 100%;
 }
 
-.directive-appt-status-select-wrapper {
-	.directive-appt-status-select {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		border-radius: 4px;
-
-		select {
-			border: 0;
-			border-radius: 0;
-			box-shadow: transparent 0 0 0 0;
-			color: $white;
-		}
-		.icon-wrapper {
-			display: flex;
-			justify-content: space-evenly;
-			align-items: center;
-			padding: 2px;
-			.icon {
-				width: 24px;
-				height: 24px;
-				margin: 4px;
-			}
-		}
-	}
-}
-
 .calendar
 {
 	font-family: "Arial", "Helvetica", sans-serif;
@@ -258,7 +231,7 @@
 	.schedule-options {
 		padding: 12px;
 
-		$input-height: 40px;
+		$input-height: $form-input-height;
 		.btn-icon {
 			width: $input-height;
 			height: $input-height;
@@ -348,10 +321,9 @@
 	.modal-body {
 
 		$tabs-height: 48px;
+		$alert-container-height: 40px;
 		@include juno-tab-lg($tabs-height);
 		@include juno-tab-color-scheme-light;
-
-		height: calc(#{$modal-body-height} - #{$tabs-height});
 
 		.form-group {
 			margin-bottom: 8px;
@@ -366,7 +338,7 @@
 			}
 		}
 		.alert-container {
-			height: 40px;
+			height: $alert-container-height;
 		}
 		.alert-message {
 			color: $red;
@@ -398,6 +370,7 @@
 		.tab-pane {
 			padding: 0 $modal-border-space $modal-border-space $modal-border-space;
 			overflow: auto;
+			height: calc(#{$modal-body-height} - #{$tabs-height} - #{$alert-container-height});
 
 			.tab-bar-inputs {
 				position: absolute;
@@ -410,6 +383,11 @@
 				.form-group {
 					margin-bottom: 0;
 				}
+			}
+
+			.edit-history-header {
+				background-color: $grey-08;
+				padding: 12px;
 			}
 		}
 	}

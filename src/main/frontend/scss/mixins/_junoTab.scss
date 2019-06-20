@@ -72,7 +72,7 @@
 }
 
 @mixin juno-tab-color-scheme-light {
-	@include juno-tab-color-scheme($grey-08, $grey-07, $grey-02,
+	@include juno-tab-color-scheme($grey-07, $grey-07, $grey-02,
 			$grey-06, $white, $primary);
 }
 

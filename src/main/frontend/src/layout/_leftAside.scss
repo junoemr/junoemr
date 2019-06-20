@@ -36,7 +36,7 @@
 				background-color: $white;
 			}
 
-			$input-height: 40px;
+			$input-height: $form-input-height;
 			.btn-icon {
 				width: $input-height;
 				height: $input-height;

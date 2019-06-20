@@ -452,9 +452,23 @@
 					</div>
 				</div>
 			</div>
-			<div id="tabHistory" class="tab-pane"
+			<div id="tabAppointmentHistory" class="tab-pane"
 			     ng-show="eventController.isTabActive(eventController.tabEnum.history)">
-				<span>TO DO</span>
+
+				<h5 class="edit-history-header">Edit History</h5>
+
+				<div class="content-display flex-grow overflow-scroll">
+					<div class="list-group">
+						<span ng-repeat="record in eventController.eventHistory"
+						   class="list-group-item">
+
+							<div>
+								<span ng-if="$last">Provider {{record.creator}} Created On {{record.formattedCreateDate}} at {{record.formattedCreateTime}}</span>
+								<span ng-if="!$last">Provider {{record.lastUpdateUser}} Updated On {{record.formattedUpdateDate}} at {{record.formattedUpdateTime}}</span>
+							</div>
+						</span>
+					</div>
+				</div>
 			</div>
 		</form>
 	</div>
