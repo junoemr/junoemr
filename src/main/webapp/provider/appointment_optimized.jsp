@@ -898,6 +898,14 @@ private long getAppointmentRowSpan(
 						</script>
 					</li>
 				</c:if>
+				<c:if test="<%= org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
+					<li id="admin2">
+						<a href="../telehealth/myhealthaccess.do?method=startTelehealth"
+							 id="myhealthaccess"
+							 title='MyHealthAccess'
+							 target="_blank">MyHealthAccess</a>
+					</li>
+				</c:if>
 
 				<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.userAdmin,_admin.schedule,_admin.billing,_admin.resource,_admin.reporting,_admin.backup,_admin.messenger,_admin.eform,_admin.encounter,_admin.consult,_admin.misc,_admin.fax" rights="r">
 

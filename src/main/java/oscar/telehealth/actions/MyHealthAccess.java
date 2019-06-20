@@ -47,6 +47,7 @@ import org.oscarehr.util.SpringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
@@ -65,7 +66,7 @@ public class MyHealthAccess extends DispatchAction
 	public ActionForward startTelehealth(ActionMapping mapping,
 										 ActionForm form,
 										 HttpServletRequest request,
-										 HttpServletResponse response)
+										 HttpServletResponse response) throws UnsupportedEncodingException
 	{
 		MiscUtils.getLogger().error("Start Telehealth!");
 		try
@@ -178,18 +179,18 @@ public class MyHealthAccess extends DispatchAction
 			ActionMapping mapping,
 			ActionForm form,
 			HttpServletRequest request,
-			HttpServletResponse response)
+			HttpServletResponse response) throws UnsupportedEncodingException
 	{
 		MiscUtils.getLogger().error("LOGGING IN!");
 		Demographic patient = getDemographic(request);
-		if (patient == null)
-		{
-			ActionRedirect errorAction = new ActionRedirect(mapping.findForward("error"));
-			errorAction.addParameter(
-					"errorMessage",
-					"Failed to find patient record");
-			return errorAction;
-		}
+//		if (patient == null)
+//		{
+//			ActionRedirect errorAction = new ActionRedirect(mapping.findForward("error"));
+//			errorAction.addParameter(
+//					"errorMessage",
+//					"Failed to find patient record");
+//			return errorAction;
+//		}
 
 		Site site = getSite(request);
 		String myHealthAccessURL = myHealthAccessService.buildTeleHealthRedirectURL(
@@ -207,6 +208,10 @@ public class MyHealthAccess extends DispatchAction
 	private Demographic getDemographic(HttpServletRequest request)
 	{
 		String demographicNo = request.getParameter("demographicNo");
+		if(demographicNo == null || demographicNo.isEmpty())
+		{
+			return null;
+		}
 		return demographicDao.find(Integer.parseInt(demographicNo));
 	}
 

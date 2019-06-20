@@ -40,6 +40,7 @@ import oscar.OscarProperties;
 import oscar.util.StringUtils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -66,20 +67,27 @@ public class MyHealthAccessService
 			ClinicUserAccessTokenTo1 accessToken,
 			ClinicUserTo1 linkedUser,
 			Demographic patient,
-			Site site)
+			Site site) throws UnsupportedEncodingException
 	{
-		String redirectUrl = URLEncoder.encode("patient/remote_patient_id/" +
-				patient.getDemographicId() + "?" +
-				"&patient_first_name=" + StringUtils.noNull(patient.getFirstName()) +
-				"&patient_last_name=" + StringUtils.noNull(patient.getLastName()));
+		String redirectUrl;
+		if (patient == null)
+		{
+			redirectUrl = "home";
+		} else
+		{
+			redirectUrl = URLEncoder.encode("patient/remote_patient_id/" +
+					patient.getDemographicId() + "?" +
+					"&patient_first_name=" + StringUtils.noNull(patient.getFirstName()) +
+					"&patient_last_name=" + StringUtils.noNull(patient.getLastName()), "UTF-8");
+		}
 
 		String endPointPath = "clinic_users/push_token?";
 		String endPoint = ClinicService.concatEndpointStrings(MYHEALTHACCESS_DOMAIN, endPointPath);
-		return  clinicService.buildUrl(endPoint) +
+		return clinicService.buildUrl(endPoint) +
 				"clinic_id=" + getClinicID(site) +
 				"&user_id=" + linkedUser.getMyhealthaccesID() +
 				"&redirect_url=" + redirectUrl +
-				"#token=" +accessToken.getToken();
+				"#token=" + accessToken.getToken();
 	}
 
 	public ClinicUserTo1 getLinkedUser(Security loggedInUser, Site site)
@@ -119,7 +127,7 @@ public class MyHealthAccessService
 				email,
 				password,
 				Integer.toString(loggedInUser.getId())
-				);
+		);
 		MiscUtils.getLogger().info("Saving Token: " + myHealthAccessAuthToken.getToken());
 		Security securityRecord = securityDao.find(loggedInUser.getId());
 		loggedInUser.setMyHealthAccessAuthToken(myHealthAccessAuthToken.getToken());
@@ -132,17 +140,16 @@ public class MyHealthAccessService
 	public String getClinicID(Site site)
 	{
 		String clinic_id;
-		if(site == null)
+		if (site == null)
 		{
 			clinic_id = CLINIC_ID;
-		}
-		else
+		} else
 		{
 			// TODO GET BY SITE
 			clinic_id = CLINIC_ID;
 		}
 
-		if(clinic_id.isEmpty())
+		if (clinic_id.isEmpty())
 		{
 			throw new IllegalArgumentException("Missing required MyHealthAccess Clinic ID");
 		}
