@@ -80,6 +80,7 @@ public class DefaultNoteServiceTest extends DaoTestFixtures {
 			"casemgmt_issue",
 			"casemgmt_issue_notes",
 			"eform_data",
+			"eform_instance",
 			"encounterForm",
 			"formBCBirthSumMo2008",
 			"formBCAR",

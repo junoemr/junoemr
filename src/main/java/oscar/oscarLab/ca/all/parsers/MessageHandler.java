@@ -626,10 +626,18 @@ public abstract class MessageHandler
 		return "";
 	}
 
+    /**
+     *  Return the result from the jth OBX segment of the ith OBR group
+     */
+    public String getOBXResult(int i, int j)
+    {
+        return getOBXResult(i, j, 1);
+    }
+
 	/**
-	 *  Return the result from the jth OBX segment of the ith OBR group
+	 *  Return the result from the jth OBX segment at the kth component of the ith OBR group
 	 */
-	public String getOBXResult(int i, int j)
+	public String getOBXResult(int i, int j, int k)
 	{
 		return "";
 	}

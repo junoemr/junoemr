@@ -52,7 +52,7 @@ import static org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey.DODGY_FAKE_
 @SuppressWarnings("unchecked")
 public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 {
-	
+
 	public ScheduleTemplateDao() {
 		super(ScheduleTemplate.class);
 	}
@@ -139,9 +139,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		return query.getResultList();
 	}
 
-
-	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
-	public RangeMap<LocalTime, ScheduleSlot> findScheduleSlots(LocalDate date, Integer providerNo)
+	public List<Object[]> getRawScheduleSlots(Integer providerNo, LocalDate date)
 	{
 		// This query is a bit hard to read.  The mess with all of the UNION ALLs is a way to make a
 		// sequence of numbers.  This is then used to find the position in the scheduletemplate.timecode
@@ -180,7 +178,13 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		query.setParameter("providerNo", providerNo);
 		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
 
-		List<Object[]> results = query.getResultList();
+		return query.getResultList();
+	}
+
+	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
+	public RangeMap<LocalTime, ScheduleSlot> findScheduleSlots(LocalDate date, Integer providerNo)
+	{
+		List<Object[]> results = getRawScheduleSlots(providerNo, date);
 
 		RangeMap<LocalTime, ScheduleSlot> slots = TreeRangeMap.create();
 		for(Object[] result: results)

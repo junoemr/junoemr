@@ -168,6 +168,10 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private String newsletter;
 	@Column(name = "veteran_no")
 	private String veteranNo;
+	@Column(name = "name_of_mother")
+	private String nameOfMother;
+	@Column(name = "name_of_father")
+	private String nameOfFather;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "id")
 	private List<DemographicCust> demographicCust;
@@ -244,6 +248,11 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public void setLastName(String lastName)
 	{
 		this.lastName = lastName;
+	}
+
+	public String getDisplayName()
+	{
+		return getFormattedName();
 	}
 
 	public String getFormattedName()
@@ -735,6 +744,26 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public void setVeteranNo(String veteranNo)
 	{
 		this.veteranNo = veteranNo;
+	}
+
+	public String getNameOfMother()
+	{
+		return nameOfMother;
+	}
+
+	public void setNameOfMother(String mother)
+	{
+		this.nameOfMother = mother;
+	}
+
+	public String getNameOfFather()
+	{
+		return nameOfFather;
+	}
+
+	public void setNameOfFather(String father)
+	{
+		this.nameOfFather = father;
 	}
 
 	public List<DemographicCust> getDemographicCust()

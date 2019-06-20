@@ -1,0 +1,74 @@
+
+// bootstrap fonts look better on form elements
+input, button, select, textarea {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+// use semi-bold on labels
+label { font-weight: 600; }
+
+// don't resize textareas
+textarea { resize: none; }
+
+// make same height as other inputs, unless inside a label
+input[type="radio"],
+input[type="checkbox"] {
+	margin: 7px 0 10px 0;
+}
+
+label {
+	input[type="radio"],
+	input[type="checkbox"] {
+		margin: 4px 0 0;
+	}
+}
+
+// use to compact read-only forms vertically
+.form-compact .form-group,
+.form-group.form-group-compact {
+	margin-bottom: 0;
+}
+
+// make form-control-static the same height as input
+.form-control-static {
+	min-height: $input-height-base;
+}
+
+// for ca-field-date3 date in separate inputs
+.form-group {
+	.ca-field-date3 {
+		input.form-control {
+			display: inline-block;
+			margin-right: 3px;
+			&:last-of-type { margin-right: 0 }
+			&.yyyy { width: 50px; }
+			&.mmdd { width: 45px; }
+		}
+	}
+
+	&.form-group-sm {
+		.ca-field-date3 {
+			input.form-control {
+				&.yyyy { width: 42px; }
+				&.mmdd { width: 35px; }
+			}
+		}
+	}
+
+	textarea.no_scroll_bar {
+		overflow: hidden;
+	}
+
+	.textarea-char-counter {
+		margin-top: -20px;
+		margin-right: 5px;
+		float: right;
+	}
+}
+
+// for 'stacked labels' where the label is above the field in a form-horizontal
+.form-horizontal.stacked-labels {
+	.form-group .control-label { text-align: left; }
+	.form-group { margin-bottom: 5px; }
+}
+

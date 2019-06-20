@@ -29,6 +29,7 @@ import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -204,58 +205,66 @@ public class ManageDocumentAction extends DispatchAction {
 	}
 
 	public ActionForward removeLinkFromDocument(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
+	                                            HttpServletRequest request, HttpServletResponse response)
 	{
 		String docType = request.getParameter("docType");
 		String docId = request.getParameter("docId");
 		String providerNo = request.getParameter("providerNo");
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
-        	throw new SecurityException("missing required security object (_edoc)");
-        }
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		String logStatus = LogConst.STATUS_FAILURE;
+
+		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
 
 		try
 		{
 			try
 			{
 				providerInboxRoutingDAO.removeLinkFromDocument(Integer.parseInt(docId), providerNo);
+				logStatus = LogConst.STATUS_SUCCESS;
 			}
-			catch (SQLException e)
+			catch(SQLException e)
 			{
 				MiscUtils.getLogger().error("Failed to remove link from document.", e);
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to remove link from document.");
 			}
-			HashMap<String, List> hm = new HashMap<String, List>();
+			HashMap<String, List> hm = new HashMap<>();
 			hm.put("linkedProviders", providerInboxRoutingDAO.getProvidersWithRoutingForDocument(docType, Integer.parseInt(docId)));
 
 			JSONObject jsonObject = JSONObject.fromObject(hm);
 			response.getOutputStream().write(jsonObject.toString().getBytes());
 		}
-		catch (IOException e)
+		catch(IOException e)
 		{
 			MiscUtils.getLogger().error("Error writing response.", e);
 		}
+		LogAction.addLogEntry(loggedInProviderNo, null,
+				LogConst.ACTION_UNLINK, LogConst.CON_DOCUMENT, logStatus, docId, request.getRemoteAddr(), providerNo);
 
 		return null;
-	}	
-        public ActionForward refileDocumentAjax(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-	
+	}
+
+	public ActionForward refileDocumentAjax(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+
 		String documentId = request.getParameter("documentId");
 		String queueId = request.getParameter("queueId");
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
-        	throw new SecurityException("missing required security object (_edoc)");
-                }
-                
-                try {
-                    EDocUtil.refileDocument(documentId,queueId);
-                } catch (Exception e) {
-                    MiscUtils.getLogger().error("Error", e);
-                }
-                return null;
-        }
+		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
 
-	private String getDemoName(LoggedInInfo loggedInInfo, String demog) {
+		try
+		{
+			EDocUtil.refileDocument(documentId, queueId);
+		}
+		catch(Exception e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+		}
+		return null;
+	}
+
+	private String getDemoName(LoggedInInfo loggedInInfo, String demog)
+	{
 		DemographicData demoD = new DemographicData();
 		org.oscarehr.common.model.Demographic demo = demoD.getDemographic(loggedInInfo, demog);
 		String demoName = demo.getLastName() + ", " + demo.getFirstName();
@@ -813,6 +822,31 @@ public class ManageDocumentAction extends DispatchAction {
 		outs.write(contentBytes);
 		outs.flush();
 		outs.close();
+		return null;
+	}
+
+	// For documents where we've ignored reprocessing via GhostScript and do not want tomcat to
+	// have any chance of serving the PDF (in case of tomcat infinite loop/crash)
+	public ActionForward downloadPdf(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.READ, null, "_edoc");
+
+		String doc_no = request.getParameter("doc_no");
+		Document document = documentDao.getDocument(doc_no);
+		GenericFile file = FileFactory.getDocumentFile(document.getDocfilename());
+		FileInputStream stream = new FileInputStream(file.getFileObject());
+		byte[] pdfBytes = IOUtils.toByteArray(stream);
+		String filename = "lab-document-" + doc_no + ".pdf";
+
+		response.setContentType("application/pdf");
+		response.setContentLength(pdfBytes.length);
+		response.setHeader("Content-Disposition", "attachment;filename=" + filename);
+		ServletOutputStream outs = response.getOutputStream();
+		outs.write(pdfBytes);
+		outs.flush();
+		outs.close();
+
 		return null;
 	}
 

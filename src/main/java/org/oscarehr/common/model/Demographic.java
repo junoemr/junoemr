@@ -134,7 +134,8 @@ public class Demographic implements Serializable
 	private String countryOfOrigin;
 	private String newsletter;
 	private String veteranNo;
-
+	private String nameOfMother;
+	private String nameOfFather;
 
 	public String getTitle()
 	{
@@ -1057,6 +1058,26 @@ public class Demographic implements Serializable
 	public String getVeteranNo()
 	{
 		return veteranNo;
+	}
+
+	public String getNameOfMother()
+	{
+		return nameOfMother;
+	}
+
+	public void setNameOfMother(String mother)
+	{
+		this.nameOfMother = mother;
+	}
+
+	public String getNameOfFather()
+	{
+		return nameOfFather;
+	}
+
+	public void setNameOfFather(String father)
+	{
+		this.nameOfFather = father;
 	}
 
 	@Override

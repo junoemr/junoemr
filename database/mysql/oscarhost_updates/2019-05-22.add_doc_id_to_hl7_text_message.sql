@@ -1,0 +1,2 @@
+ALTER TABLE hl7TextMessage ADD COLUMN IF NOT EXISTS embedded_doc_id int(20) DEFAULT NULL;
+ALTER TABLE hl7TextMessage ADD FOREIGN KEY IF NOT EXISTS hl7TextMessage_embedded_doc_id_fk(embedded_doc_id) REFERENCES document(document_no) ON DELETE SET NULL;

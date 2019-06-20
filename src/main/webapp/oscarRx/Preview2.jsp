@@ -43,6 +43,7 @@
 <!-- Classes needed for signature injection -->
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
+<%@ page import="org.oscarehr.rx.service.RxWatermarkService" %>
 <!-- end -->
 <%
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -106,7 +107,6 @@
 
 </head>
 <body topmargin="0" leftmargin="0" vlink="#0000FF">
-
 <%
 Date rxDate = oscar.oscarRx.util.RxUtil.Today();
 //String rePrint = request.getParameter("rePrint");
@@ -207,6 +207,7 @@ if(custom_logo_name != null ){
 	}
 }
 %>
+
 <html:form action="/form/formname" styleId="preview2Form">
 
 	<input type="hidden" name="demographic_no" value="<%=bean.getDemographicNo()%>"/>
@@ -215,6 +216,10 @@ if(custom_logo_name != null ){
     <table>
         <tr>
             <td>
+				<div style="position: relative;">
+					<% if (RxWatermarkService.isWatermarkEnabled()) {%>
+						<img style="position:absolute; left:50%; top: 50%; transform: translate(-50%, -50%); width:80%" src="../RxWatermark.do?method=getWatermark" onerror="this.style.display='none'"/>
+					<% } %>
                             <table id="pwTable" width="400px" height="500px" cellspacing=0 cellpadding=10 border=2>
                                     <tr>
                                             <td valign=top height="100px"><input type="image"
@@ -601,6 +606,7 @@ if(custom_logo_name != null ){
                                             </td>
                                     </tr>
                             </table>
+				</div>
 			</td>
 		</tr>
 	</table>

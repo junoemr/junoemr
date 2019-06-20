@@ -616,6 +616,25 @@ Event.observe('rxInteractionWarningLevel', 'change', function(event) {
 					</select>
 				</td>
 			</tr>
+			<tr>
+
+				<td class="preferenceLabel">
+					<bean:message key="provider.providerpreference.appointmentReasonLevel"/>:
+				</td>
+				<%
+				ProviderPreference.AppointmentReasonDisplayLevel providerReasonLevel = providerPreference.getAppointmentReasonDisplayLevel();
+				%>
+				<td>
+					<select name="appointmentReasonDisplayLevel">
+						<% for (ProviderPreference.AppointmentReasonDisplayLevel displayLevel : ProviderPreference.AppointmentReasonDisplayLevel.values())
+						{ %>
+						<option value="<%=displayLevel%>" <%=(providerReasonLevel == null || displayLevel == providerReasonLevel) ? "selected" : ""%>>
+							<%=displayLevel.toLabel()%>
+						</option>
+						<% } %>
+					</select>
+				</td>
+			</tr>
 			<script>
         Event.observe('reviewMsg', 'change', function(event) {
 	var value = $('reviewMsg').getValue();
@@ -743,7 +762,7 @@ Event.observe('rxInteractionWarningLevel', 'change', function(event) {
         <tr>
             <td align="center"><a href=# onClick ="popupPage(230,860,'../setProviderStaleDate.do?method=viewUseMyMeds');return false;"><bean:message key="provider.btnSetUseMyMeds"/></a></td>
         </tr>
-  
+
   		<tr>
           <td align="center"><a href=# onClick ="popupPage(400,860,'../provider/CppPreferences.do');return false;"><bean:message key="provider.cppPrefs" /></a></td>
       	</tr>
@@ -792,7 +811,7 @@ Event.observe('rxInteractionWarningLevel', 'change', function(event) {
 	<tr>
           <td align="center"><a href=# onClick ="popupPage(230,860,'../setProviderStaleDate.do?method=viewAppointmentCardPrefs');return false;"><bean:message key="provider.btnEditSetAppointmentCardPrefs"/></a></td>
       </tr>
-     
+
 	 <oscar:oscarPropertiesCheck property="util.erx.enabled" value="true">
 	 	<security:oscarSec roleName="<%=roleName$%>" objectName="_rx" rights="r">
         <tr>
@@ -803,29 +822,29 @@ Event.observe('rxInteractionWarningLevel', 'change', function(event) {
         <tr>
 			<td align="center">
             	<div id="eRxPref">
-                <%  
+                <%
             	String eRxEnabledChecked="unchecked";
                 String eRxTrainingModeChecked="unchecked";
-                                        
+
 				boolean eRxEnabled = false;
                 String eRx_SSO_URL = "";
                 String eRxUsername = "";
                 String eRxPassword = "";
                 String eRxFacility = "";
                 boolean eRxTrainingMode = false;
-                                                        
-                if (providerPreference != null){                                       
+
+                if (providerPreference != null){
                 	eRxEnabled = providerPreference.isERxEnabled();
                     if(eRxEnabled) eRxEnabledChecked = "checked";
-                                
+
                     eRx_SSO_URL = providerPreference.getERx_SSO_URL();
                     eRxUsername = providerPreference.getERxUsername();
                     eRxPassword = providerPreference.getERxPassword();
                     eRxFacility = providerPreference.getERxFacility();
-                                
+
                     eRxTrainingMode = providerPreference.isERxTrainingMode();
                     if(eRxTrainingMode) eRxTrainingModeChecked = "checked";
-                                
+
                     if(eRx_SSO_URL==null || "null".equalsIgnoreCase(eRx_SSO_URL)) eRx_SSO_URL=OscarProperties.getInstance().getProperty("util.erx.oscarerx_sso_url");
                     if(eRxUsername==null || "null".equalsIgnoreCase(eRxUsername)) eRxUsername="";
                     if(eRxPassword==null || "null".equalsIgnoreCase(eRxPassword)) eRxPassword="";
@@ -857,7 +876,7 @@ Event.observe('rxInteractionWarningLevel', 'change', function(event) {
                           	<td><bean:message key="provider.eRx.labelURL"/>:</td>
                           	<td><input name="erx_sso_url" type="text" value="<%=eRx_SSO_URL%>" title="The URL to access the Web Interface from OSCAR Rx" /></td>
                         </tr>
-                        
+
                      </table>
                   </div>
               </td>

@@ -205,7 +205,7 @@ public abstract class ORM_O01MessageHandler extends MessageHandler
 	@Override
 	public int getOBRCommentCount(int i)
 	{
-		return getReps("ORDER", i, "ORDER_DETAIL", 1, "NTE");
+		return getReps("ORDER", i, "ORDER_DETAIL", 0, "NTE");
 	}
 
 	/**
@@ -334,13 +334,14 @@ public abstract class ORM_O01MessageHandler extends MessageHandler
 	}
 
 	/**
-	 *  Return the result from the jth OBX segment of the ith OBR group
+	 *  Return the result from the jth OBX segment at the kth component of the ith OBR group
 	 */
 	@Override
-	public String getOBXResult(int i, int j)
+	public String getOBXResult(int i, int j, int k)
 	{
-		return getString(get("/.ORDER("+i+")/ORDER_DETAIL/OBSERVATION("+j+")/OBX-5"));
+		return getString(get("/.ORDER("+i+")/ORDER_DETAIL/OBSERVATION("+j+")/OBX-5-" + k));
 	}
+
 
 	/**
 	 *  Return the units from the jth OBX segment of the ith OBR group

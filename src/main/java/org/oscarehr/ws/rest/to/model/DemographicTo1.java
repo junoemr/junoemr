@@ -98,6 +98,8 @@ public class DemographicTo1 implements Serializable {
 	private String waitingListNote;
 	private Date onWaitingListSinceDate;
 	private Integer admissionProgramId;
+	private String nameOfMother;
+	private String nameOfFather;
 
 	private List<DemographicExtTo1> extras = new ArrayList<DemographicExtTo1>();
 	private List<WaitingListNameTo1> waitingListNames = new ArrayList<WaitingListNameTo1>();
@@ -597,5 +599,13 @@ public class DemographicTo1 implements Serializable {
 	public void setAdmissionProgramId(Integer programId) {
 		this.admissionProgramId = programId;
 	}
+
+	public String getNameOfMother() { return nameOfMother; }
+
+	public void setNameOfMother(String mother) { this.nameOfMother = mother; }
+
+	public String getNameOfFather() { return nameOfFather; }
+
+	public void setNameOfFather(String father) { this.nameOfFather = father; }
 
 }

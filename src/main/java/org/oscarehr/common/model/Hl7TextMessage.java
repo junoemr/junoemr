@@ -58,6 +58,9 @@ public class Hl7TextMessage extends AbstractModel<Integer> implements Serializab
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date created = new Date();
 
+	@Column(name = "embedded_doc_id")
+	private Integer embeddedDocId;
+
 	/* Apperantly we can delete them, and an entry goes into RecycleBin
 	 * 
 	@PreRemove
@@ -110,5 +113,15 @@ public class Hl7TextMessage extends AbstractModel<Integer> implements Serializab
 
 	public Date getCreated() {
 		return created;
+	}
+
+	public Integer getEmbeddedDocId()
+	{
+		return embeddedDocId;
+	}
+
+	public void setEmbeddedDocId(Integer embeddedDocId)
+	{
+		this.embeddedDocId = embeddedDocId;
 	}
 }

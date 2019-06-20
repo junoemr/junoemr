@@ -32,7 +32,10 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import com.lowagie.text.pdf.PdfContentByte;
+import org.oscarehr.rx.service.RxWatermarkService;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.PrescriptionQrCodeUIBean;
 
 import com.lowagie.text.Document;
@@ -129,7 +132,29 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		PdfPTable outerTable = new PdfPTable(1);
 		outerTable.addCell(borderCell);*/
 
+		if (RxWatermarkService.isWatermarkEnabled())
+		{
+			renderWaterMark(document, writer);
+		}
 		document.add(mainTable);
+	}
+
+	protected void renderWaterMark(Document document, PdfWriter writer)
+	{
+		PdfContentByte cb = writer.getDirectContent();
+		try
+		{
+			Image watermarkImg = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
+			float scaleFactor = (document.getPageSize().getWidth()*0.8f)/watermarkImg.getWidth();
+			watermarkImg.scalePercent(scaleFactor*100f);
+			watermarkImg.setAbsolutePosition(document.getPageSize().getWidth()/2 - (watermarkImg.getWidth()*scaleFactor) / 2,
+					document.getPageSize().getHeight()/2 - (watermarkImg.getHeight()*scaleFactor) / 2);
+			cb.addImage(watermarkImg);
+		}
+		catch(Exception e)
+		{
+			MiscUtils.getLogger().error("error rendering watermark to rx pdf: " + e.getMessage());
+		}
 	}
 
 	protected Image buildLogoImage() {

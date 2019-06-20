@@ -51,7 +51,6 @@ public class WaitingListDaoTest extends DaoTestFixtures {
 
 	@Before
 	public void before() throws Exception {
-		beforeForInnoDB();
 		SchemaUtils.restoreTable("Facility","lst_gender","demographic_merged","admission","health_safety","program","waitingList", "waitingListName", "demographic","appointment");
 
 		wn = new WaitingListName();

@@ -1534,6 +1534,9 @@
 			<forward name="failure" path="/oscar_sfhc/JAYREPORTS/DemographicReport.jsp" />
 			<forward name="addToStudy" path="/study/ManageStudy.do?method=AddToStudy" />			
 		</action>
+		<action path="/admin/LogReportAction" scope="request" type="org.oscarehr.securityLog.LogReportAction">
+			<forward name="success" path="/admin/logReport.jsp" />
+		</action>
 		<action input="/oscarReport/ReportDemographicReport.jsp" name="FrmForm" path="/report/CreateDemographicSet" scope="request" type="oscar.oscarReport.pageUtil.RptCreateDemographicSetAction">
 			<forward name="success" path="/oscarReport/ReportDemographicReport.jsp" />
 		</action>
@@ -2864,6 +2867,10 @@
 		<action path="/oscarRx/Dispense" type="org.oscarehr.rx.dispensary.DispensaryAction" parameter="method" scope="request">	
 			<forward name="list" path="/oscarRx/dispensary/list.jsp" />	
 		</action>
+
+		<action path="/RxWatermark" name="FrmForm" type="org.oscarehr.rx.web.RxWatermarkAction" parameter="method">
+		</action>
+
      <action path="/consults/Consultations" type="org.oscarehr.consultations.ConsultationAction">
       </action>
 		     
