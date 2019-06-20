@@ -202,7 +202,7 @@ public class CoPDPreProcessorService
 			@Override
 			public String apply(String timeStamp)
 			{
-				if (timeStamp.contains("00000"))
+				if (timeStamp.contains("00000") || timeStamp.equals("1330222"))
 				{
 					return HL7_TIMESTAMP_BEGINNING_OF_TIME;
 				}
