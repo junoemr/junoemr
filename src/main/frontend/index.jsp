@@ -90,7 +90,7 @@
 							<button class="btn btn-icon btn-visible"
 							        title="<bean:message key="navbar.searchPatients" bundle="ui"/>"
 							        ng-click="navBarCtrl.onPatientSearch(null)">
-								<span class="icon icon-search"></span>
+								<span class="icon icon-user-search"></span>
 							</button>
 						</div>
 						<div class="form-group">

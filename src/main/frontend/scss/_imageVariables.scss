@@ -8,6 +8,7 @@ $icon-modal-max: $images-root + 'icon-16-window-max.svg';
 
 $icon-checked: $images-root + 'icon-16-check.svg';
 $icon-add-appt: $images-root + 'icon-48-add-appintment.svg';
+$icon-user-search: $images-root + 'icon-16-search-user.svg';
 $icon-refresh: $images-root + 'icon-16-refresh.svg';
 $icon-daysheet-blue: $images-root + 'cal-daysheetblue.svg';
 $icon-search-blue: $images-root + 'cal-searchblue.svg';
@@ -15,12 +16,13 @@ $icon-week-view-blue: $images-root + 'cal-weekblue.svg';
 $icon-month-view-blue: $images-root + 'cal-monthblue.svg';
 $icon-logo: $images-root + 'logo.svg';
 $icon-add: $images-root + 'icon-16-add.svg';
-$icon-phone: $images-root + 'icon-16-phone.svg';
+$icon-phone: $images-root + 'icon-16-phone-white.svg';
 $icon-aside: $images-root + 'icon-48-aside.svg';
 $icon-setting: $images-root + 'icon-48-setting.svg';
 
 $icon-up: $images-root + 'icon-16-arrow-up.svg';
 $icon-down: $images-root + 'icon-16-arrow-down.svg';
+$icon-down-white: $images-root + 'icon-16-arrow-down-white.svg';
 $icon-left: $images-root + 'icon-16-arrow-left.svg';
 $icon-right: $images-root + 'icon-16-arrow-right.svg';
 
@@ -33,17 +35,18 @@ $icon-status-noshow: $images-appt-status + 'icon-48-noshow.svg';
 $icon-status-cancel: $images-appt-status + 'icon-48-cancel.svg';
 $icon-status-billed: $images-appt-status + 'icon-48-check.svg';
 
-$icon-status-1: $images-appt-status + 'icon-48-1.svg';
-$icon-status-2: $images-appt-status + 'icon-48-1.svg';
-$icon-status-3: $images-appt-status + 'icon-48-1.svg';
-$icon-status-4: $images-appt-status + 'icon-48-1.svg';
-$icon-status-5: $images-appt-status + 'icon-48-1.svg';
-$icon-status-6: $images-appt-status + 'icon-48-1.svg';
-$icon-status-7: $images-appt-status + 'icon-48-1.svg';
-$icon-status-8: $images-appt-status + 'icon-48-1.svg';
-$icon-status-9: $images-appt-status + 'icon-48-1.svg';
-$icon-status-10: $images-appt-status + 'icon-48-1.svg';
-$icon-status-11: $images-appt-status + 'icon-48-1.svg';
+$icon-status-1: $images-appt-status + 'icon-48-number-1.svg';
+$icon-status-2: $images-appt-status + 'icon-48-number-2.svg';
+$icon-status-3: $images-appt-status + 'icon-48-number-3.svg';
+$icon-status-4: $images-appt-status + 'icon-48-number-4.svg';
+$icon-status-5: $images-appt-status + 'icon-48-number-5.svg';
+$icon-status-6: $images-appt-status + 'icon-48-number-6.svg';
+$icon-status-7: $images-appt-status + 'icon-48-number-7.svg';
+$icon-status-8: $images-appt-status + 'icon-48-number-8.svg';
+$icon-status-9: $images-appt-status + 'icon-48-number-9.svg';
+$icon-status-10: $images-appt-status + 'icon-48-number-10.svg';
+$icon-status-11: $images-appt-status + 'icon-48-number-11.svg';
+$icon-status-12: $images-appt-status + 'icon-48-number-12.svg';
 
 /* add the icon class + a icon specific class with the background url
  * add sizing + non-standard stuff in the page specific stylesheets */
@@ -92,6 +95,9 @@ $icon-status-11: $images-appt-status + 'icon-48-1.svg';
 }
 .icon-month-view {
 	background-image: url($icon-month-view-blue);
+}
+.icon-user-search {
+	background-image: url($icon-user-search);
 }
 
 /* modal images */
