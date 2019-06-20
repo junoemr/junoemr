@@ -168,12 +168,28 @@ public final class Factory {
 				handler = new ConnectCareDiagnosticImagingCancelHandler(msg);
 			}
 		}
+		else if (mshSplit[8].equals("MDM^T02"))
+		{
+			Message msg = p.parse(hl7Body);
+			if (ConnectCareDocumentationAddHandler.handlerTypeMatch(msg))
+			{
+				handler = new ConnectCareDocumentationAddHandler(msg);
+			}
+		}
 		else if(mshSplit[8].equals("MDM^T08"))
 		{
 			Message msg = p.parse(hl7Body);
-			if (ConnectCareDocumentationHandler.handlerTypeMatch(msg))
+			if (ConnectCareDocumentationEditHandler.handlerTypeMatch(msg))
 			{
-				handler = new ConnectCareDocumentationHandler(msg);
+				handler = new ConnectCareDocumentationEditHandler(msg);
+			}
+		}
+		else if (mshSplit[8].equals("MDM^T11"))
+		{
+			Message msg = p.parse(hl7Body);
+			if (ConnectCareDocumentationCancelHandler.handlerTypeMatch(msg))
+			{
+				handler = new ConnectCareDocumentationCancelHandler(msg);
 			}
 		}
 		else //handle default ORU^R01 messages

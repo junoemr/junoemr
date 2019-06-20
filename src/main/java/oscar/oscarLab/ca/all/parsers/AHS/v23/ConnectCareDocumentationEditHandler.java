@@ -26,10 +26,15 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.MDM_T08;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
-import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
+import oscar.oscarLab.ca.all.parsers.messageTypes.MDM_T08_T02MessageHandler;
 
-public class ConnectCareDocumentationHandler extends ConnectCareHandler
+public class ConnectCareDocumentationEditHandler extends MDM_T08_T02MessageHandler
 {
+	public ConnectCareDocumentationEditHandler(Message msg) throws HL7Exception
+	{
+		super(msg);
+	}
+
 	public static boolean handlerTypeMatch(Message message)
 	{
 		String version = message.getVersion();
@@ -47,8 +52,31 @@ public class ConnectCareDocumentationHandler extends ConnectCareHandler
 		return false;
 	}
 
-	public ConnectCareDocumentationHandler(Message msg) throws HL7Exception
+	@Override
+	public String getMsgType()
 	{
-		super(msg);
+		return "AHS";
+	}
+
+	@Override
+	public String preUpload(String hl7Message) throws HL7Exception
+	{
+		return hl7Message;
+	}
+
+	@Override
+	public boolean canUpload()
+	{
+		return true;
+	}
+
+	@Override
+	public void postUpload()
+	{
+	}
+
+	@Override
+	public void init(String hl7Body) throws HL7Exception
+	{
 	}
 }
