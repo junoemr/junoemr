@@ -1,10 +1,10 @@
 /**
- * Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,14 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * This software was written for the
- * Department of Family Medicine
- * McMaster University
- * Hamilton
- * Ontario, Canada
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
  */
-
-
 package oscar.oscarLab.ca.all.parsers;
 
 import ca.uhn.hl7v2.DefaultHapiContext;
@@ -52,16 +49,8 @@ import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-/**
- * This is the main class for parsing hl7 text values.
- * This class is meant to provide default getters for all hl7 labs based on the hl7 spec
- * Individual labs will have unique usages of some hl7 fields, and lab handlers should extend this class.
- *
- * This class uses the terser to traverse hl7 messages without specific version requirements,
- * and it is recommended whenever possible to avoid versioned handlers unless necessary.
- */
-public abstract class MessageHandler {
-
+public abstract class MessageHandler
+{
 	protected static Logger logger = Logger.getLogger(MessageHandler.class);
 
 	protected Hl7TextInfoDao hl7TextInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
@@ -75,6 +64,7 @@ public abstract class MessageHandler {
 	public MessageHandler()
 	{
 	}
+
 	/**
 	 * constructor which also calls init
 	 * @param hl7Body - hl7 formatted string
@@ -103,6 +93,7 @@ public abstract class MessageHandler {
 	 * @return - the same hl7 message as the parameter with any required modifications
 	 */
 	public abstract String preUpload(String hl7Message) throws HL7Exception;
+
 	/**
 	 * This method should determine if the lab can be routed
 	 * @return true if the lab can be routed, false otherwise
@@ -115,8 +106,7 @@ public abstract class MessageHandler {
 	public abstract void postUpload();
 
 
-    /* ===================================== Hl7 Parsing ====================================== */
-
+	/* ===================================== Hl7 Parsing ====================================== */
 
 	/**
 	 * Each handler should implement this method.
@@ -130,57 +120,58 @@ public abstract class MessageHandler {
 		return true;
 	}
 
-    /**
-     *  Initialize the 'msg' object and any other global variables that may be
-     *  needed.
-     *
-     *  The 'msg' object should be initialized with the following code:
-     *       Parser p = new PipeParser();
-     *       p.setValidationContext(new NoValidation());
-     *       msg = (ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ));
 
-     *	- If you wish to validate the message please see the hapi documentation at
-     *		'http://hl7api.sourceforge.net/'
-     *  - The replaceAll statement is necessary to ensure that the parser
-     *  correctly reads the end of each line.
-     *
-     *  @deprecated - initialization should be done in constructors.
-     */
-    @Deprecated
-    public abstract void init(String hl7Body) throws HL7Exception;
+	/**
+	 *  Initialize the 'msg' object and any other global variables that may be
+	 *  needed.
+	 *
+	 *  The 'msg' object should be initialized with the following code:
+	 *       Parser p = new PipeParser();
+	 *       p.setValidationContext(new NoValidation());
+	 *       msg = (ORU_R01) p.parse(hl7Body.replaceAll( "\n", "\r\n" ));
 
+	 *	- If you wish to validate the message please see the hapi documentation at
+	 *		'http://hl7api.sourceforge.net/'
+	 *  - The replaceAll statement is necessary to ensure that the parser
+	 *  correctly reads the end of each line.
+	 *
+	 *  @deprecated - initialization should be done in constructors.
+	 */
+	@Deprecated
+	public abstract void init(String hl7Body) throws HL7Exception;
 
-    /* ===================================== MSH ====================================== */
-    /**
-     *  Return the message type
-     *  - The message type returned should be the same as the prefix of your
-     *  handlers name
-     *      ie/ message type = XXXX
-     *          handler name = XXXXHandler
-     */
-    public abstract String getMsgType();
+	/* ===================================== MSH ====================================== */
 
-    /**
-     *  Return the date and time of the message, usually located in the 7th
-     *  field of the MSH segment
-     */
-    public String getMsgDate()
-    {
-	    return formatDateTime(get("/.MSH-7"));
-    }
+	/**
+	 *  Return the message type
+	 *  - The message type returned should be the same as the prefix of your
+	 *  handlers name
+	 *      ie/ message type = XXXX
+	 *          handler name = XXXXHandler
+	 */
+	public abstract String getMsgType();
 
-    /**
-     *  A String containing a single letter represinting the priority
-     *		"C" - Critical 		"S" - Stat/Urgent
-     *		"U" - Unclaimed 	"A" - ASAP
-     *		"L" - Alert 		""  - Routine
-     *  If there is no priority specified in the documentation for your message
-     *  type then just return the empty string ""
-     */
-    public String getMsgPriority()
-    {
-    	return "";
-    }
+	/**
+	 *  Return the date and time of the message, usually located in the 7th
+	 *  field of the MSH segment
+	 */
+	public String getMsgDate()
+	{
+		return formatDateTime(get("/.MSH-7"));
+	}
+
+	/**
+	 *  A String containing a single letter represinting the priority
+	 *		"C" - Critical 		"S" - Stat/Urgent
+	 *		"U" - Unclaimed 	"A" - ASAP
+	 *		"L" - Alert 		""  - Routine
+	 *  If there is no priority specified in the documentation for your message
+	 *  type then just return the empty string ""
+	 */
+	public String getMsgPriority()
+	{
+		return "";
+	}
 
 	/**
 	 *  Return the patients location, usually the facility from which the
@@ -191,12 +182,7 @@ public abstract class MessageHandler {
 		return getString(get("/.MSH-4"));
 	}
 
-	/**
-	 *  Return the accession number
-	 */
-	public abstract String getAccessionNum();
-
-    /* ===================================== PID ====================================== */
+	/* ===================================== PID ====================================== */
 
 	/**
 	 *  Return the name of the patient. The format should be the first name
@@ -206,7 +192,7 @@ public abstract class MessageHandler {
 	 */
 	public String getPatientName()
 	{
-		return(getFirstName()+" "+getMiddleName()+" "+getLastName());
+		return "";
 	}
 
 	/**
@@ -214,7 +200,7 @@ public abstract class MessageHandler {
 	 */
 	public String getHealthNum()
 	{
-		return getString(get("/.PID-2"));
+		return "";
 	}
 
 	/**
@@ -222,14 +208,15 @@ public abstract class MessageHandler {
 	 */
 	public String getLastName()
 	{
-		return getString(get("/.PID-5-1"));
+		return "";
 	}
+
 	/**
 	 *  Return the given name of the patient
 	 */
 	public String getFirstName()
 	{
-		return getString(get("/.PID-5-2"));
+		return "";
 	}
 
 	/**
@@ -237,7 +224,7 @@ public abstract class MessageHandler {
 	 */
 	public String getMiddleName()
 	{
-		return getString(get("/.PID-5-3"));
+		return "";
 	}
 
 	/**
@@ -245,24 +232,28 @@ public abstract class MessageHandler {
 	 */
 	public String getDOB()
 	{
-		return formatDate(getString(get("/.PID-7")));
+		return "";
 	}
+
 	/**
 	 *  Return the gender of the patient: 'M' or 'F'
 	 */
 	public String getSex()
 	{
-		return getString(get("/.PID-8"));
+		return "";
 	}
+
 
 	protected String getBusinessPhone(int i) throws HL7Exception
 	{
-		return getString(get("/.PID-14-"+i));
+		return "";
 	}
+
 	protected String getHomePhone(int i) throws HL7Exception
 	{
-		return getString(get("/.PID-13-"+i));
+		return "";
 	}
+
 	/**
 	 *  Return the home phone number of the patient
 	 */
@@ -293,8 +284,10 @@ public abstract class MessageHandler {
 			return ("");
 		}
 	}
+
 	/**
-	 *  Return the work phone number of the patient
+	 * get work phone number
+	 * @return work phone number
 	 */
 	public String getWorkPhone()
 	{
@@ -326,20 +319,26 @@ public abstract class MessageHandler {
 
 	public abstract String getNteForPID();
 
-
 	/* ===================================== OBR ====================================== */
 
-    /**
-     *  Return the number of OBR Segments in the message
-     */
+	/**
+	 * get lab accession number
+	 * @return accession number
+	 */
+	public abstract String getAccessionNum();
+
+	/**
+	 *  Return the number of OBR Segments in the message
+	 */
 	public int getOBRCount()
 	{
-		return getReps(getRootGroupName(), 0, "ORDER_OBSERVATION");
+		return 0;
 	}
+
 
 	public String getFillerOrderNumber()
 	{
-		return getString(get("/.OBR-3"));
+		return "";
 	}
 
 	/**
@@ -348,7 +347,7 @@ public abstract class MessageHandler {
 	 */
 	public String getOBRName(int i)
 	{
-		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-4-2"));
+		return "";
 	}
 
 	/**
@@ -356,7 +355,7 @@ public abstract class MessageHandler {
 	 */
 	public String getRequestDate(int i)
 	{
-		return formatDateTime(get("/.ORDER_OBSERVATION("+i+")/OBR-6"));
+		return "";
 	}
 
 	/**
@@ -364,7 +363,7 @@ public abstract class MessageHandler {
 	 */
 	public String getServiceDate()
 	{
-		return formatDateTime(get("/.OBR(0)-14"));
+		return "";
 	}
 
 	/**
@@ -373,7 +372,7 @@ public abstract class MessageHandler {
 	 */
 	public String getOrderStatus()
 	{
-		return getString(get("/.OBR(0)-25"));
+		return "";
 	}
 
 	/**
@@ -382,7 +381,7 @@ public abstract class MessageHandler {
 	 */
 	public int getOBRCommentCount(int i)
 	{
-		return getReps("ORDER_OBSERVATION", i, "NTE");
+		return 0;
 	}
 
 	/**
@@ -390,7 +389,7 @@ public abstract class MessageHandler {
 	 */
 	public String getOBRComment(int i, int k)
 	{
-		return getString(get("/.ORDER_OBSERVATION("+i+")/NTE("+k+")-3"));
+		return "";
 	}
 
 	/**
@@ -401,7 +400,7 @@ public abstract class MessageHandler {
 	 */
 	public String getObservationHeader(int i, int j)
 	{
-		return getOBRName(i);
+		return "";
 	}
 
 	/**
@@ -418,10 +417,12 @@ public abstract class MessageHandler {
 		return new ArrayList<>(headers);
 	}
 
+
 	protected String getClientRef(int i, int k) throws HL7Exception
 	{
-		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-1"));
+		return "";
 	}
+
 	/**
 	 *  Return the clients reference number, usually corresponds to the doctor
 	 *  who requested the report or the requesting facility.
@@ -445,37 +446,28 @@ public abstract class MessageHandler {
 		}
 	}
 
+
 	protected String getOrderingProvider(int i, int k) throws HL7Exception
 	{
-		String familyName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-2"));
-		String givenName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-3"));
-		String middleName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-4"));
-		String suffix = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-5"));
-		String prefix = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-6"));
-		String degree = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-7"));
-
-		String fullName = prefix + " " + givenName + " " + middleName + " " + familyName + " " + suffix + " " + degree;
-		return fullName.trim().replaceAll("\\s+", " ");
+		return "";
 	}
+
+
 	protected String getResultCopiesTo(int i, int k) throws HL7Exception
 	{
-		String familyName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-2"));
-		String givenName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-3"));
-		String middleName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-4"));
-		String suffix = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-5"));
-		String prefix = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-6"));
-		String degree = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-7"));
-
-		String fullName = prefix + " " + givenName + " " + middleName + " " + familyName + " " + suffix + " " + degree;
-		return fullName.trim().replaceAll("\\s+", " ");
+		return "";
 	}
+
+
 	protected String getOrderingProviderNo(int i, int k) throws HL7Exception
 	{
-		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-1"));
+		return "";
 	}
+
+
 	protected String getResultCopiesToProviderNo(int i, int k) throws HL7Exception
 	{
-		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-1"));
+		return "";
 	}
 
 	/**
@@ -556,14 +548,14 @@ public abstract class MessageHandler {
 		return (docNums);
 	}
 
-    /* ===================================== OBX ====================================== */
+	/* ===================================== OBX ====================================== */
 
 	/**
 	 *  Return the number of OBX Segments within the OBR group specified by i.
 	 */
 	public int getOBXCount(int i)
 	{
-		return getReps("ORDER_OBSERVATION", i, "OBSERVATION");
+		return 0;
 	}
 
 	/**
@@ -574,19 +566,19 @@ public abstract class MessageHandler {
 	 */
 	public int getSpecimenOBXCount(int i, int j)
 	{
-		return getReps("ORDER_OBSERVATION", i, "SPECIMEN", j, "OBX");
+		return 0;
 	}
 
-    /**
-     *  Return true if an abnormal flag other than 'N' is returned by
-     *  getOBXAbnormalFlag( i, j ) for the OBX segment specified by j, in the
-     *  ith OBR group. Return false otherwise.
-     */
-    public boolean isOBXAbnormal(int i, int j)
-    {
-    	String abnormalFlags = getOBXAbnormalFlag(i,j);
-	    return !("N".equals(abnormalFlags));
-    }
+	/**
+	 *  Return true if an abnormal flag other than 'N' is returned by
+	 *  getOBXAbnormalFlag( i, j ) for the OBX segment specified by j, in the
+	 *  ith OBR group. Return false otherwise.
+	 */
+	public boolean isOBXAbnormal(int i, int j)
+	{
+		String abnormalFlags = getOBXAbnormalFlag(i,j);
+		return !("N".equals(abnormalFlags));
+	}
 
 	public boolean isAbnormal()
 	{
@@ -603,15 +595,15 @@ public abstract class MessageHandler {
 		return false;
 	}
 
-    /**
-     * Return the obx value type
-     * @param i
-     * @param j
-     * @return String the obx value
-     */
+	/**
+	 * Return the obx value type
+	 * @param i
+	 * @param j
+	 * @return String the obx value
+	 */
 	public String getOBXValueType(int i, int j)
 	{
-		return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-2"));
+		return "";
 	}
 
 	/**
@@ -621,42 +613,42 @@ public abstract class MessageHandler {
 	 */
 	public String getOBXIdentifier(int i, int j)
 	{
-		return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-3-1"));
+		return "";
 	}
 
-    /**
-     *  Return the name of the jth OBX segment of the ith OBR group. It is
-     *  usually stored in the second component of the third field of the OBX
-     *  segment.
-     */
-    public String getOBXName( int i, int j)
-    {
-	    return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-3-2"));
-    }
+	/**
+	 *  Return the name of the jth OBX segment of the ith OBR group. It is
+	 *  usually stored in the second component of the third field of the OBX
+	 *  segment.
+	 */
+	public String getOBXName( int i, int j)
+	{
+		return "";
+	}
 
-    /**
-     *  Return the result from the jth OBX segment of the ith OBR group
-     */
-    public String getOBXResult(int i, int j)
-    {
-	    return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-5"));
-    }
+	/**
+	 *  Return the result from the jth OBX segment of the ith OBR group
+	 */
+	public String getOBXResult(int i, int j)
+	{
+		return "";
+	}
 
 	/**
 	 *  Return the units from the jth OBX segment of the ith OBR group
 	 */
 	public String getOBXUnits( int i, int j)
 	{
-		return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-6"));
+		return "";
 	}
 
-    /**
-     *  Return the reference range from the jth OBX segment of the ith OBR group
-     */
-    public String getOBXReferenceRange( int i, int j)
-    {
-	    return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-7"));
-    }
+	/**
+	 *  Return the reference range from the jth OBX segment of the ith OBR group
+	 */
+	public String getOBXReferenceRange( int i, int j)
+	{
+		return "";
+	}
 
 	/**
 	 *  Retrieve the abnormal flag if any from the OBX segment specified by j in
@@ -664,16 +656,16 @@ public abstract class MessageHandler {
 	 */
 	public String getOBXAbnormalFlag( int i, int j)
 	{
-		return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-8"));
+		return "N";
 	}
 
-    /**
-     *  Return the result status from the jth OBX segment of the ith OBR group
-     */
-    public String getOBXResultStatus( int i, int j)
-    {
-	    return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-11"));
-    }
+	/**
+	 *  Return the result status from the jth OBX segment of the ith OBR group
+	 */
+	public String getOBXResultStatus( int i, int j)
+	{
+		return "";
+	}
 
 	/**
 	 *  Return the date and time of the observation referred to by the jth obx
@@ -682,25 +674,25 @@ public abstract class MessageHandler {
 	 */
 	public String getTimeStamp(int i, int j)
 	{
-		return formatDateTime(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-14"));
+		return "";
 	}
 
-    /**
-     *  Return the number of comments (usually NTE segments) following the jth
-     *  OBX segment of the ith OBR group.
-     */
-    public int getOBXCommentCount( int i, int j)
-    {
-    	return getReps("ORDER_OBSERVATION", i, "OBSERVATION", j, "NTE");
-    }
+	/**
+	 *  Return the number of comments (usually NTE segments) following the jth
+	 *  OBX segment of the ith OBR group.
+	 */
+	public int getOBXCommentCount( int i, int j)
+	{
+		return 0;
+	}
 
-    /**
-     *  Return the kth comment of the jth OBX segment of the ith OBR group
-     */
-    public String getOBXComment( int i, int j, int k)
-    {
-	    return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/NTE("+k+")-3"));
-    }
+	/**
+	 *  Return the kth comment of the jth OBX segment of the ith OBR group
+	 */
+	public String getOBXComment( int i, int j, int k)
+	{
+		return "";
+	}
 
 	/**
 	 *  Returns the number used to order labs with matching accession numbers.
@@ -733,8 +725,6 @@ public abstract class MessageHandler {
 		return count;
 	}
 
-	public abstract String getNteForOBX(int i,int j);
-
 	/**
 	 * get the long name of the lab responsible for the given OBX segment
 	 * @param i OBR rep
@@ -743,7 +733,7 @@ public abstract class MessageHandler {
 	 */
 	public String getPerformingOrganizationName(int i, int k)
 	{
-		return get("/.ORDER_OBSERVATION("+ i +")/OBSERVATION("+ k +")/OBX-23");
+		return "";
 	}
 
 	/**
@@ -754,20 +744,7 @@ public abstract class MessageHandler {
 	 */
 	public String getPerformingOrganizationAddress(int i, int k)
 	{
-		if (get("/.ORDER_OBSERVATION("+ i +")/OBSERVATION("+ k +")/OBX-24") != null &&
-				get("/.ORDER_OBSERVATION("+ i +")/OBSERVATION("+ k +")/OBX-24-3") != null &&
-				get("/.ORDER_OBSERVATION("+ i +")/OBSERVATION("+ k +")/OBX-24-4") != null &&
-				get("/.ORDER_OBSERVATION("+ i +")/OBSERVATION("+ k +")/OBX-24-5") != null)
-		{
-			return get("/.ORDER_OBSERVATION(" + i + ")/OBSERVATION(" + k + ")/OBX-24") + ", " +
-					get("/.ORDER_OBSERVATION(" + i + ")/OBSERVATION(" + k + ")/OBX-24-3") + " " +
-					get("/.ORDER_OBSERVATION(" + i + ")/OBSERVATION(" + k + ")/OBX-24-4") + " " +
-					get("/.ORDER_OBSERVATION(" + i + ")/OBSERVATION(" + k + ")/OBX-24-5");
-		}
-		else
-		{
-			return null;
-		}
+		return null;
 	}
 
 	/**
@@ -776,9 +753,10 @@ public abstract class MessageHandler {
 	 */
 	public String getAssignedPatientLocation()
 	{
-		return get("/.PV1-3-9");
+		return "";
 	}
 
+	public abstract String getNteForOBX(int i,int j);
 
 	/* ============================== Specimen ============================= */
 	/**
@@ -788,10 +766,6 @@ public abstract class MessageHandler {
 	 */
 	public boolean hasSpecimenSegment(int i )
 	{
-		if (getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
-		{
-			return getSpecimenCount(i) != 0;
-		}
 		return false;
 	}
 
@@ -802,7 +776,7 @@ public abstract class MessageHandler {
 	 */
 	public int getSpecimenCount(int i)
 	{
-		return getReps("ORDER_OBSERVATION", i, "SPECIMEN");
+		return 0;
 	}
 
 	/**
@@ -813,7 +787,7 @@ public abstract class MessageHandler {
 	 */
 	public String getSpecimenType(int i, int j)
 	{
-		return get("/.ORDER_OBSERVATION(" + i + ")/SPECIMEN(" + j + ")/SPM-4-1");
+		return "";
 	}
 
 	/**
@@ -824,7 +798,7 @@ public abstract class MessageHandler {
 	 */
 	public String getSpecimenSite(int i, int j)
 	{
-		return get("/.ORDER_OBSERVATION(" + i + ")/SPECIMEN(" + j + ")/SPM-8-1");
+		return "";
 	}
 
 	/**
@@ -835,7 +809,7 @@ public abstract class MessageHandler {
 	 */
 	public String getSpecimenCollectionDateTime(int i, int j)
 	{
-		return formatDateTime(get("/.ORDER_OBSERVATION(" + i + ")/SPECIMEN(" + j + ")/SPM-17"));
+		return "";
 	}
 
 	/**
@@ -846,7 +820,7 @@ public abstract class MessageHandler {
 	 */
 	public String getSpecimenReceivedDateTime(int i, int j)
 	{
-		return formatDateTime(get("/.ORDER_OBSERVATION(" + i + ")/SPECIMEN(" + j + ")/SPM-18"));
+		return "";
 	}
 
 	/**
@@ -886,33 +860,34 @@ public abstract class MessageHandler {
 	 */
 	public String getSpecimenOBXObservationValue(int i, int j, int k)
 	{
-		return get("/.ORDER_OBSERVATION(" + i + ")/SPECIMEN(" + j + ")/OBX(" + k + ")-5");
+		return "";
 	}
 
 	/* ===================================== MISC ====================================== */
 
-    /**
-     * Returns a string audit of the messages.  If not required handler should just return an empty string;
-     */
-    public String audit()
-    {
-    	return "";
-    }
+	/**
+	 * Returns a string audit of the messages.  If not required handler should just return an empty string;
+	 */
+	public String audit()
+	{
+		return "";
+	}
 
-    public String getEncounterId()
-    {
-	    return "";
-    }
+	public String getEncounterId()
+	{
+		return "";
+	}
 
-    public String getRadiologistInfo()
-    {
-    	return "";
-    }
+	public String getRadiologistInfo()
+	{
+		return "";
+	}
 
 	public boolean isUnstructured()
 	{
 		return false;
 	}
+
 
 	/* ================================== Extra Methods and helpers ==================================== */
 
@@ -932,6 +907,30 @@ public abstract class MessageHandler {
 			logger.warn("Unable to get field at " + path, e);
 			return null;
 		}
+	}
+
+	/**
+	 * finds a count of the segments under the group name. This uses terser groups
+	 * The basic group structure of HL7 is similar to this:
+	 * ORU_R01/(RESPONSE|PATIENT_RESULT)/ORDER_OBSERVATION/OBSERVATION
+	 * for searching an OBR count, the parent group would be RESPONSE, and the rep 0 (only 1 response per message)
+	 * but OBX would have parent ORDER_OBSERVATION, with n reps
+	 * Overload of getReps but searches at the root level of the message.
+	 * @param groupName - the group to count
+	 * @return - the group count matching the group name
+	 */
+	protected int getReps(String groupName)
+	{
+		int count = 0;
+		try
+		{
+			count = message.getAll(groupName).length;
+			logger.debug("get reps -> " + groupName + ": " + count);
+		}
+		catch(HL7Exception e) {
+			logger.error("Terser Repetition Error", e);
+		}
+		return count;
 	}
 
 	/**
@@ -986,6 +985,35 @@ public abstract class MessageHandler {
 			logger.error("Terser Repetition Error", e);
 		}
 		return count;
+	}
+
+	protected int getReps(String[] parentGroups, int[] parentReps, String subGroup)
+	{
+		try
+		{
+			Group currGroup = null;
+			for (int i =0; i < parentGroups.length; i ++)
+			{
+				if (currGroup == null)
+				{
+					currGroup = findGroupFromTop(parentGroups[i], parentReps[i]);
+				}
+				else
+				{
+					currGroup = (Group) currGroup.get(parentGroups[i], parentReps[i]);
+				}
+			}
+
+			if (currGroup != null)
+			{
+				return currGroup.getAll(subGroup).length;
+			}
+		}
+		catch (HL7Exception e)
+		{
+			logger.error("Terser Repetition Error", e);
+		}
+		return 0;
 	}
 
 	/**

@@ -54,18 +54,9 @@ import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.ConnectCareDiagnosticImagingHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.ConnectCareDocumentationHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.*;
 import oscar.oscarLab.ca.all.parsers.AHS.v251.ConnectCareLabHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v22.SpecimenGateHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIORMHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestORMHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.AITLHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.GLSHandler;
-import oscar.oscarLab.ca.all.parsers.AHS.v23.ProvlabHandler;
 import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
 
 import java.io.FileInputStream;
@@ -168,6 +159,14 @@ public final class Factory {
 				handler = new SunquestORMHandler(msg);
 			else if(CLSDIORMHandler.handlerTypeMatch(msg))
 				handler = new CLSDIORMHandler(msg);
+		}
+		else if (mshSplit[8].equals("ORM^O01"))
+		{
+			Message msg = p.parse(hl7Body);
+			if (ConnectCareDiagnosticImagingCancelHandler.handlerTypeMatch(msg))
+			{
+				handler = new ConnectCareDiagnosticImagingCancelHandler(msg);
+			}
 		}
 		else if(mshSplit[8].equals("MDM^T08"))
 		{

@@ -42,6 +42,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.UtilDateUtilities;
 
 import java.text.DateFormat;
@@ -56,7 +57,7 @@ import java.util.List;
  *
  * @author wrighd
  */
-public class PATHL7Handler extends MessageHandler
+public class PATHL7Handler extends ORU_R01MessageHandler
 {
 
     Logger logger = Logger.getLogger(PATHL7Handler.class);

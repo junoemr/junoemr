@@ -25,9 +25,9 @@ package oscar.oscarLab.ca.all.parsers.AHS;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import org.apache.commons.lang.StringUtils;
-import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
-public abstract class ConnectCareHandler extends MessageHandler
+public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 {
 	public ConnectCareHandler(Message msg) throws HL7Exception
 	{

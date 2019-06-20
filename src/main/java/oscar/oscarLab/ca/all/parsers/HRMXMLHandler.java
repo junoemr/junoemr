@@ -29,6 +29,7 @@ import org.oscarehr.hospitalReportManager.xsd.PhoneNumber;
 import org.oscarehr.hospitalReportManager.xsd.ReportsReceived;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.UtilDateUtilities;
 
 import javax.xml.XMLConstants;
@@ -55,7 +56,7 @@ import java.util.Random;
  *
  * @author dritan
  */
-public class HRMXMLHandler extends MessageHandler
+public class HRMXMLHandler extends ORU_R01MessageHandler
 {
 
 	private static Logger logger = MiscUtils.getLogger();

@@ -49,6 +49,7 @@ import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextMessageInfo;
 import org.oscarehr.common.model.Hl7TextMessageInfo2;
 import org.oscarehr.util.SpringUtils;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.UtilDateUtilities;
 
 import java.text.DateFormat;
@@ -64,7 +65,7 @@ import java.util.List;
  *
  * @author wrighd
  */
-public class GDMLHandler extends MessageHandler
+public class GDMLHandler extends ORU_R01MessageHandler
 {
 
     Logger logger = Logger.getLogger(GDMLHandler.class);

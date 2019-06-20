@@ -27,9 +27,9 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v24.message.ORU_R01;
 import ca.uhn.hl7v2.model.v24.segment.MSH;
 import org.oscarehr.common.hl7.copd.writer.JunoCoPDLabWriter;
-import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
-public class JunoGenericLabHandler extends MessageHandler
+public class JunoGenericLabHandler extends ORU_R01MessageHandler
 {
 	public static final String LAB_TYPE_VALUE= "JUNO-LAB";
 

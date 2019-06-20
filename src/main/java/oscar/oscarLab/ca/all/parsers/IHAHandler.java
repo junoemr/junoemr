@@ -37,8 +37,9 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
-public class IHAHandler extends MessageHandler
+public class IHAHandler extends ORU_R01MessageHandler
 {
     
     Logger logger = Logger.getLogger(IHAHandler.class);

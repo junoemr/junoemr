@@ -36,7 +36,7 @@ import org.oscarehr.common.Gender;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DataTypeUtils;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.OscarToOscarUtils;
 import org.oscarehr.util.MiscUtils;
-import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.DateUtils;
 
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ import java.util.GregorianCalendar;
  * This class is loosely based on the MessageHandler interface. The purpose of this class is to provide an adapter for that interface with some minor changes like a default parsing and an init method that's a message instead of a string. The general
  * expectation is that all HL7 messages will include an MSH and a PID, if your message does not, then this class will be of little use to you.
  */
-public abstract class ChainnedMessageAdapter<T extends AbstractMessage> extends MessageHandler
+public abstract class ChainnedMessageAdapter<T extends AbstractMessage> extends ORU_R01MessageHandler
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
