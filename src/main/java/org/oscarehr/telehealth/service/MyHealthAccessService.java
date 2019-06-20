@@ -122,6 +122,7 @@ public class MyHealthAccessService
 				);
 		MiscUtils.getLogger().info("Saving Token: " + myHealthAccessAuthToken.getToken());
 		Security securityRecord = securityDao.find(loggedInUser.getId());
+		loggedInUser.setMyHealthAccessAuthToken(myHealthAccessAuthToken.getToken());
 		securityRecord.setMyHealthAccessAuthToken(myHealthAccessAuthToken.getToken());
 		securityDao.persist(securityRecord);
 		MiscUtils.getLogger().info("SAVED!");

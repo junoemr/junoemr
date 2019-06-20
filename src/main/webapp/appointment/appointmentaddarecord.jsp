@@ -125,6 +125,8 @@ param[19]=request.getParameter("reasonCode");
 	a.setNotes(request.getParameter("notes"));
 	a.setReason(request.getParameter("reason"));
 	a.setLocation(request.getParameter("location"));
+	a.setIsVirtual(request.getParameter("isVirtual") != null &&
+			request.getParameter("isVirtual").equals("on"));
 	a.setResources(request.getParameter("resources"));
 	a.setType(request.getParameter("type"));
 	a.setStyle(request.getParameter("style"));
