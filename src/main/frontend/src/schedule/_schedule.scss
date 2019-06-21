@@ -321,13 +321,13 @@
 
 	.modal-body {
 
-		$tabs-height: 48px;
+		$tabs-height: $page-tabs-height;
 		$alert-container-height: 40px;
 		@include juno-tab-lg($tabs-height);
 		@include juno-tab-color-scheme-light;
+		@include juno-font-tab;
 
 		.form-group {
-			margin-bottom: 8px;
 			display: flex;
 			align-items: center;
 
@@ -353,6 +353,7 @@
 				background-color: $grey-08;
 				border: solid 1px $grey-07;
 				border-radius: 8px;
+				padding: 14px;
 
 				.form-group {
 					margin: 0;

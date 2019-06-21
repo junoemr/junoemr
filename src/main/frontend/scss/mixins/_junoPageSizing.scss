@@ -4,10 +4,11 @@
 	margin-left: $margin-size;
 	margin-right: $margin-size;
 }
-@mixin juno-page-padding($padding-size)
+@mixin juno-page-padding($padding-size-h: 0, $padding-size-v: 0)
 {
-	padding-left: $padding-size;
-	padding-right: $padding-size;
+	padding-left: $padding-size-h;
+	padding-right: $padding-size-h;
+	padding-top: $padding-size-v;
 }
 
 
@@ -22,9 +23,9 @@
 
 @mixin juno-page-padding-default
 {
-	@include juno-page-padding(30px);
+	@include juno-page-padding(30px, 12px);
 }
 @mixin juno-page-padding-none
 {
-	@include juno-page-padding(0);
+	@include juno-page-padding(0, 0);
 }

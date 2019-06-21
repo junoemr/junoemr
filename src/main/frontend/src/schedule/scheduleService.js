@@ -67,7 +67,6 @@ angular.module("Schedule").service("scheduleService", [
 						break;
 					}
 				}
-				console.info('rotate status', currentStatus, '->', nextStatusCode);
 				return nextStatusCode;
 			},
 

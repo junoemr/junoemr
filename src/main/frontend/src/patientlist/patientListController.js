@@ -37,6 +37,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 	'angularUtil',
 	'Navigation',
 	'personaService',
+	'scheduleService',
 	'providerService',
 
 	function(
@@ -49,6 +50,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		angularUtil,
 		Navigation,
 		personaService,
+		scheduleService,
 		providerService)
 	{
 
@@ -75,12 +77,20 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			scheduleAutoRefreshMinutes: null
 		};
 
+		controller.eventStatusOptions = [];
+		controller.selectedEventStatus = null;
 
 		controller.init = function()
 		{
-			controller.datepickerSelectedDate = Juno.Common.Util.formatMomentDate(moment());
-			controller.changeTab(controller.activeTab);
-			controller.initialized = true;
+			scheduleService.loadEventStatuses().then(
+				function success() {
+					controller.eventStatusOptions = scheduleService.eventStatuses;
+
+					controller.datepickerSelectedDate = Juno.Common.Util.formatMomentDate(moment());
+					controller.changeTab(controller.activeTab);
+					controller.initialized = true;
+				}
+			);
 		};
 
 		controller.changeTab = function changeTab(tabId)

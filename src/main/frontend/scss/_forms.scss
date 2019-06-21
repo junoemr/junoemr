@@ -36,10 +36,10 @@ label {
 	width: 100%;
 	height: $form-input-height;
 	padding-left: 1em;
-	padding-right: 3em;
+	padding-right: 1em;
 	background-color: $grey-08;
 	border: 1px solid $grey-06;
-	border-radius: 8px;
+	border-radius: 4px;
 	transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 
 	&.ng-dirty {
