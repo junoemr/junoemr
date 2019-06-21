@@ -213,6 +213,25 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 		return get("/.TXA-12");
 	}
 
+	@Override
+	public String getFillerOrderNumber()
+	{
+		//TODO better solution?
+		return getAccessionNum();
+	}
+
+	/* ================================= OBR ============================== */
+
+	/**
+	 *  Even though message has no OBR, return 1 for display purposes
+	 */
+	@Override
+	public int getOBRCount()
+	{
+		return 1;
+	}
+
+
 	/* ================================= OBX ============================== */
 
 	/**
@@ -227,5 +246,126 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 		return "";
 	}
 
+	/**
+	 * return the number of OBX segments
+	 * @param i ignored
+	 * @return the number of OBX segments
+	 */
+	@Override
+	public int getOBXCount(int i)
+	{
+		return getReps("OBX");
+	}
 
+	/**
+	 * Return the obx value type
+	 * @param i ignored
+	 * @param j the obx rep
+	 * @return String the obx value
+	 */
+	@Override
+	public String getOBXValueType(int i, int j)
+	{
+		return getString(get("/.OBX("+j+")-2"));
+	}
+
+	/**
+	 * get the OBX Identifier in the jth OBX segment
+	 * @param i ignored
+	 * @param j the obx rep
+	 * @return the OBX identifier
+	 */
+	@Override
+	public String getOBXIdentifier(int i, int j)
+	{
+		return getString(get("/.OBX("+j+")-3-1"));
+	}
+
+	/**
+	 *  Return the name of the jth OBX segment of the ith OBR group. It is
+	 *  usually stored in the second component of the third field of the OBX
+	 *  segment.
+	 * @param i ignored
+	 * @param j OBX rep
+	 * @return the OBX name
+	 */
+	@Override
+	public String getOBXName( int i, int j)
+	{
+		return getString(get("/.OBX("+j+")-3-2"));
+	}
+
+	/**
+	 *  Return the result from the jth OBX segment at the kth component of the ith OBR group
+	 * @param i ignored
+	 * @param j obx rep
+	 * @param k obx-5 component
+	 * @return the obx result
+	 */
+	@Override
+	public String getOBXResult(int i, int j, int k)
+	{
+		return getString(get("/.OBX("+j+")-5-"+k));
+	}
+
+	/**
+	 *  Return the units from the jth OBX segment of the ith OBR group
+	 * @param i ignored
+	 * @param j obx rep
+	 * @return the obx units
+	 */
+	@Override
+	public String getOBXUnits( int i, int j)
+	{
+		return getString(get("/.OBX("+j+")-6"));
+	}
+
+	/**
+	 *  Return the reference range from the jth OBX segment of the ith OBR group
+	 * @param i ignored
+	 * @param j obx rep
+	 * @return the obx reference range
+	 */
+	@Override
+	public String getOBXReferenceRange( int i, int j)
+	{
+		return getString(get("/.OBX("+j+")-7"));
+	}
+
+	/**
+	 *  Retrieve the abnormal flag if any from the OBX segment specified by j in
+	 *  the ith OBR group.
+	 * @param i ignored
+	 * @param j obx rep
+	 */
+	@Override
+	public String getOBXAbnormalFlag( int i, int j)
+	{
+		return getString(get("/.OBX("+j+")-8"));
+	}
+
+	/**
+	 *  Return the result status from the jth OBX segment of the ith OBR group
+	 * @param i ignored
+	 * @param j obx rep
+	 *
+	 */
+	@Override
+	public String getOBXResultStatus( int i, int j)
+	{
+		return getString(get("/.OBX("+j+")-11"));
+	}
+
+	/**
+	 *  Return the date and time of the observation referred to by the jth obx
+	 *  segment of the ith obr group. If the date and time is not specified
+	 *  within the obx segment it should be specified within the obr segment.
+	 * @param i ignored
+	 * @param j obx rep
+	 */
+	@Override
+	public String getTimeStamp(int i, int j)
+	{
+		return formatDateTime(get("/.OBX("+j+")-14"));
+	}
 }

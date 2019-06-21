@@ -266,7 +266,7 @@ public final class MessageUploader {
 			boolean hasPDF = false;
 			List<String> embeddedPDFs = new ArrayList<>();
 
-			if (type.equals("PATHL7"))
+			if (type.equals("PATHL7") || type.equals("AHS"))
 			{
 				String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
 				for (i = 0; i < messageHandler.getOBRCount(); i++)
