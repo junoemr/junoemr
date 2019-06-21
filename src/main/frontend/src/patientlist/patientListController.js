@@ -24,34 +24,39 @@
 
 */
 
+import {ScheduleApi} from "../../generated/api/ScheduleApi";
+
 angular.module('PatientList').controller('PatientList.PatientListController', [
 
 	'$scope',
 	'$q',
 	'$http',
+	'$httpParamSerializer',
 	'$state',
 	'$uibModal',
 	'angularUtil',
 	'Navigation',
 	'personaService',
 	'providerService',
-	'scheduleService',
 
 	function(
 		$scope,
 		$q,
 		$http,
+		$httpParamSerializer,
 		$state,
 		$uibModal,
 		angularUtil,
 		Navigation,
 		personaService,
-		providerService,
-		scheduleService)
+		providerService)
 	{
 
 		var controller = this;
 		controller.initialized = false;
+
+		controller.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
+			'../ws/rs');
 
 		controller.tabEnum = Object.freeze({
 			recent:0,
@@ -145,10 +150,10 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 
 		controller.refreshAppointmentPatientList = function()
 		{
-			scheduleService.getAppointments(controller.datepickerSelectedDate).then(
+			controller.scheduleApi.getAppointmentsForDay(controller.datepickerSelectedDate).then(
 				function success(results)
 				{
-					controller.activePatientList = results.patients;
+					controller.activePatientList = results.data.body.patients;
 				},
 				function error(errors)
 				{

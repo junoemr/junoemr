@@ -169,7 +169,6 @@ module.exports = {
 			'./src/common/services/providersService.js',
 			'./src/common/services/reportingService.js',
 			'./src/common/services/resultsService.js',
-			'./src/common/services/scheduleService.js',
 			'./src/common/services/securityService.js',
 			'./src/common/services/staticDataService.js',
 			'./src/common/services/summaryService.js',
@@ -268,8 +267,7 @@ module.exports = {
 			'./src/schedule/module.js',
 			'./src/schedule/scheduleController.js',
 			'./src/schedule/eventController.js',
-			'./src/schedule/appointmentAddController.js',
-			'./src/schedule/appointmentViewController.js',
+			'./src/schedule/scheduleService.js',
 
 			'./src/admin/module.js',
 			'./src/admin/adminController.js',

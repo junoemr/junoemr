@@ -110,26 +110,9 @@ public class ScheduleService extends AbstractServiceImpl {
 	@GET
 	@Path("/day/{date}")
 	@Produces("application/json")
-	public RestResponse<PatientListApptBean> getAppointmentsForDay(@PathParam("date") String date) throws ParseException
+	public RestResponse<PatientListApptBean> getAppointmentsForDay(@PathParam("date") String dateStr) throws ParseException
 	{
 		String providerNo = this.getCurrentProvider().getProviderNo();
-		return getAppointmentsForDay(providerNo, date);
-	}
-
-	/**
-	 * Will substitute "me" to your logged in provider no, and "today" to today's date.
-	 * eg /schedule/me/day/today
-	 *
-	 * @param providerNo
-	 * @param dateStr
-	 * @return list of appointments by provider and date
-	 */
-	@GET
-	@Path("/{providerNo}/day/{date}")
-	@Produces("application/json")
-	public RestResponse<PatientListApptBean> getAppointmentsForDay(@PathParam("providerNo") String providerNo,
-	                                                               @PathParam("date") String dateStr) throws ParseException
-	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		if("".equals(providerNo))
 		{
@@ -188,31 +171,6 @@ public class ScheduleService extends AbstractServiceImpl {
 		return response;
 	}
 
-	/*
-	@POST
-	@Path("/add")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public RestResponse<AppointmentTo1> addAppointment(NewAppointmentTo1 appointmentTo) {
-		//SchedulingResponse response = new SchedulingResponse();
-
-		logger.info(appointmentTo.toString());
-
-		NewAppointmentConverter converter = new NewAppointmentConverter();
-
-		//TODO: Need to add some more validation here
-
-		Appointment appt = converter.getAsDomainObject(getLoggedInInfo(), appointmentTo);
-
-		appointmentManager.addAppointment(getLoggedInInfo(), appt);
-
-		//response.setAppointment(new AppointmentConverter().getAsTransferObject(getLoggedInInfo(), appt));
-		AppointmentTo1 appointment = new AppointmentConverter().getAsTransferObject(getLoggedInInfo(), appt);
-
-		return RestResponse.successResponse(appointment);
-	}
-	*/
-
 	@POST
 	@Path("/getAppointment")
 	@Produces("application/json")
@@ -229,24 +187,6 @@ public class ScheduleService extends AbstractServiceImpl {
 		return response;
 	}
 
-	/*
-	@POST
-	@Path("/updateAppointment")
-	@Consumes("application/json")
-	@Produces("application/json")
-	public SchedulingResponse updateAppointment(AppointmentTo1 appointmentTo) {
-		SchedulingResponse response = new SchedulingResponse();
-
-		AppointmentConverter converter = new AppointmentConverter();
-		Appointment appt = converter.getAsDomainObject(getLoggedInInfo(), appointmentTo);
-
-		appointmentManager.updateAppointment(getLoggedInInfo(), appt);
-
-		response.setAppointment(converter.getAsTransferObject(getLoggedInInfo(), appt));
-		return response;
-	}
-	*/
-
 	@POST
 	@Path("/{demographicNo}/appointmentHistory")
 	@Produces("application/json")
@@ -258,7 +198,7 @@ public class ScheduleService extends AbstractServiceImpl {
 		}
 		AppointmentConverter converter = new AppointmentConverter();
 		response.setAppointments(converter.getAllAsTransferObjects(getLoggedInInfo(), appts));
-		
+
 		return response;
 	}
 
@@ -314,12 +254,12 @@ public class ScheduleService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public SchedulingResponse fetchMonthlyData(@PathParam("year") Integer year, @PathParam("month") Integer month, @PathParam("providerNo") String providerNo) {
 		SchedulingResponse response = new SchedulingResponse();
-		
+
 		List<Appointment> appts = appointmentManager.findMonthlyAppointments(getLoggedInInfo(), providerNo, year, month);
-		
+
 		AppointmentConverter converter = new AppointmentConverter();
 		response.setAppointments(converter.getAllAsTransferObjects(getLoggedInInfo(), appts));
-		
+
 		return response;
 	}
 

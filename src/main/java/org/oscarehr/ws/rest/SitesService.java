@@ -22,6 +22,7 @@
  */
 package org.oscarehr.ws.rest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.ws.rest.conversion.SiteConverter;
@@ -39,6 +40,7 @@ import java.util.List;
 @Path("/sites")
 @Component("SitesService")
 @Produces("application/json")
+@Tag(name = "sites")
 public class SitesService extends AbstractServiceImpl
 {
 	@Autowired
@@ -57,7 +59,7 @@ public class SitesService extends AbstractServiceImpl
 
 	@GET
 	@Path("/enabled")
-	public RestResponse<Boolean> geSitesEnabled()
+	public RestResponse<Boolean> getSitesEnabled()
 	{
 		return RestResponse.successResponse(org.oscarehr.common.IsPropertiesOn.isMultisitesEnable());
 	}

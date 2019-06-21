@@ -1,6 +1,7 @@
 
 import {AppointmentApi} from '../../generated/api/AppointmentApi';
 import {ScheduleApi} from '../../generated/api/ScheduleApi';
+import {SitesApi} from '../../generated/api/SitesApi';
 
 angular.module('Schedule').controller('Schedule.ScheduleController', [
 
@@ -14,7 +15,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 	'loadedSettings',
 	'providerService',
 	'focusService',
-	'scheduleService',
 	'securityService',
 	'uiCalendarConfig',
 
@@ -29,7 +29,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		loadedSettings,
 		providerService,
 		focusService,
-		scheduleService,
 		securityService,
 		uiCalendarConfig
 	)
@@ -41,6 +40,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			'../ws/rs');
 
 		$scope.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
+			'../ws/rs');
+
+		$scope.sitesApi = new SitesApi($http, $httpParamSerializer,
 			'../ws/rs');
 
 		controller.providerSettings = loadedSettings;
@@ -121,8 +123,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.scheduleAutoRefresh = null;
 		$scope.scheduleAutoRefreshMinutes = null;
 
-		$scope.scheduleService = scheduleService;
-
 		$scope.datepickerSelectedDate = null;
 
 		$scope.init = function init()
@@ -151,6 +151,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 									$scope.initEventsAutoRefresh();
 
 									$scope.applyUiConfig($scope.uiConfig);
+
+									controller.loadWatches();
 									$scope.initialized = true;
 								});
 							});
@@ -575,9 +577,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			var deferred = $q.defer();
 			var availabilityTypes = {};
 
-			scheduleService.getScheduleTemplateCodes().then(
-				function success(results)
+			$scope.scheduleApi.getScheduleTemplateCodes().then(
+				function success(rawResults)
 				{
+					var results = rawResults.data.body;
 					for(var i = 0; i < results.length; i++)
 					{
 						var result = results[i];
@@ -1491,9 +1494,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			var deferred = $q.defer();
 
-			scheduleService.getScheduleGroups().then(
-				function success(results)
+			$scope.scheduleApi.getScheduleGroups().then(
+				function success(rawResults)
 				{
+					var results = rawResults.data.body;
 					for(var i = 0; i < results.length; i++)
 					{
 						var scheduleData = results[i];
@@ -1585,9 +1589,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			var deferred = $q.defer();
 
-			scheduleService.getSitesEnabled().then(
-				function success(enabled)
+			$scope.sitesApi.getSitesEnabled().then(
+				function success(rawResults)
 				{
+					var enabled = rawResults.data.body;
 					$scope.sitesEnabled = enabled;
 					deferred.resolve(enabled);
 				}
@@ -1599,9 +1604,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			var deferred = $q.defer();
 
-			scheduleService.getSites().then(
-				function success(results)
+			$scope.sitesApi.getSiteList().then(
+				function success(rawResults)
 				{
+					var results = rawResults.data.body;
 					var out = [];
 					if(angular.isArray(results))
 					{
@@ -1639,38 +1645,41 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		// Watches
 		//=========================================================================/
 
-		$scope.$watch('scheduleService.selectedDate', function(newValue, oldValue)
+		controller.loadWatches = function loadWatches()
 		{
-			// avoid running first time this fires during initialization
-			if(newValue !== oldValue)
+			$scope.$watch('selectedDate', function(newValue, oldValue)
 			{
-				$scope.changeDate(newValue);
-			}
-		});
+				// avoid running first time this fires during initialization
+				if(newValue !== oldValue)
+				{
+					$scope.changeDate(newValue);
+				}
+			});
 
-		$scope.$watch('datepickerSelectedDate', function(newValue, oldValue)
-		{
-			if($scope.isInitialized())
+			$scope.$watch('datepickerSelectedDate', function(newValue, oldValue)
 			{
-				var momentDate = Juno.Common.Util.getDateMoment(newValue);
-				$scope.changeDate(momentDate);
-			}
-		});
+				if(newValue !== oldValue)
+				{
+					var momentDate = Juno.Common.Util.getDateMoment(newValue);
+					$scope.changeDate(momentDate);
+				}
+			});
 
-		$scope.$watch('selectedSiteName', function(newValue, oldValue)
-		{
-			if($scope.isInitialized())
+			$scope.$watch('selectedSiteName', function(newValue, oldValue)
 			{
-				$scope.onSiteChanged();
-			}
-		});
-		$scope.$watch('selectedTimeInterval', function(newValue, oldValue)
-		{
-			if($scope.isInitialized())
+				if(newValue !== oldValue)
+				{
+					$scope.onSiteChanged();
+				}
+			});
+			$scope.$watch('selectedTimeInterval', function(newValue, oldValue)
 			{
-				$scope.onTimeIntervalChanged();
-			}
-		});
+				if(newValue !== oldValue)
+				{
+					$scope.onTimeIntervalChanged();
+				}
+			});
+		};
 
 
 		//=========================================================================

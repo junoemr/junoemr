@@ -597,8 +597,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 					controller.eventHistory[i].formattedUpdateTime = Juno.Common.Util.formatMomentTime(moment(controller.eventHistory[i].updateDateTime));
 					controller.eventHistory[i].formattedCreateTime = Juno.Common.Util.formatMomentTime(moment(controller.eventHistory[i].createDateTime));
 				}
-
-				console.info(controller.eventHistory);
 				deferred.resolve(controller.eventHistory);
 			}
 		);
