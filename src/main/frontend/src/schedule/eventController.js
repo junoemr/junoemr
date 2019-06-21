@@ -22,6 +22,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	'demographicService',
 	'providerService',
 	'securityService',
+	'scheduleService',
 	'keyBinding',
 	'focus',
 	'type', 'parentScope', 'label', 'editMode', 'data',
@@ -36,6 +37,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		demographicService,
 		providerService,
 		securityService,
+		scheduleService,
 		keyBinding,
 		focus,
 		type, parentScope, label, editMode, data
@@ -121,7 +123,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	$scope.activeTemplateEvents = [];
 
-	controller.eventStatuses = $scope.parentScope.eventStatuses;
+	controller.eventStatuses = scheduleService.eventStatuses;
 
 	$scope.eventStatusOptions = [];
 	controller.selectedEventStatus = null;

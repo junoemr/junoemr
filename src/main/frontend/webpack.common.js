@@ -195,6 +195,8 @@ module.exports = {
 			'./src/common/directives/angular-ui-calendar.js',
 			'./src/common/directives/selectOptionTooltip.js',
 
+			'./src/common/directives/appointment/juno_appointment_status_select.js',
+
 			'./src/common/directives/clinicaid/ca_field_alphadate.js',
 			'./src/common/directives/clinicaid/ca_field_alpha.js',
 			'./src/common/directives/clinicaid/ca_field_autocomplete.js',

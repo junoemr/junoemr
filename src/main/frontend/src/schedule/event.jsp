@@ -85,15 +85,15 @@
 						<div class="col-sm-5">
 						</div>
 						<div class="col-sm-7">
-							<ca-field-select
-									ca-name="appt-status"
-									ca-template="appt_status"
+							<juno-appointment-status-select
+									ca-name="event-appt-status"
 									ca-no-label="true"
 									ca-input-size="col-md-12"
 									ca-model="eventController.selectedEventStatus"
 									ca-options="eventController.eventStatuses"
+									ca-change="eventController.onStatusChange()"
 							>
-							</ca-field-select>
+							</juno-appointment-status-select>
 						</div>
 					</div>
 					<div class="col-md-12 form-horizontal">

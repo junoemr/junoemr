@@ -16,6 +16,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 	'providerService',
 	'focusService',
 	'securityService',
+	'scheduleService',
 	'uiCalendarConfig',
 
 	function(
@@ -30,6 +31,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		providerService,
 		focusService,
 		securityService,
+		scheduleService,
 		uiCalendarConfig
 	)
 	{
@@ -101,8 +103,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.selectedSlotLabelInterval = {hours: 1};
 		$scope.defaultAutoRefreshMinutes = 3;
 		$scope.defaultCalendarView = 'agendaWeek';
-		$scope.eventStatuses = {};
-		$scope.rotateStatuses = [];
 		$scope.availabilityTypes = {};
 		$scope.resourceOptionHash = {};
 		$scope.events = [];
@@ -129,37 +129,33 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			$scope.uiConfig.calendar.defaultView = $scope.calendarViewName();
 
-			// XXX: loadScheduleTemplates seems to not be used
-
-			//{
-				$scope.loadAvailabilityTypes().then(function()
+			$scope.loadAvailabilityTypes().then(function()
+			{
+				scheduleService.loadEventStatuses().then(function()
 				{
-					$scope.loadEventStatuses().then(function()
+					$scope.loadScheduleOptions().then(function()
 					{
-						$scope.loadScheduleOptions().then(function()
+						$scope.loadSiteOptions().then(function()
 						{
-							$scope.loadSiteOptions().then(function()
+							$scope.loadDefaultSelections();
+
+							$scope.loadSelectedSchedules().then(function()
 							{
-								$scope.loadDefaultSelections();
+								$scope.setCalendarResources();
 
-								$scope.loadSelectedSchedules().then(function()
-								{
-									$scope.setCalendarResources();
+								$scope.setEventSources();
 
-									$scope.setEventSources();
+								$scope.initEventsAutoRefresh();
 
-									$scope.initEventsAutoRefresh();
+								$scope.applyUiConfig($scope.uiConfig);
 
-									$scope.applyUiConfig($scope.uiConfig);
-
-									controller.loadWatches();
-									$scope.initialized = true;
-								});
+								controller.loadWatches();
+								$scope.initialized = true;
 							});
 						});
 					});
 				});
-			//});
+			});
 		};
 
 
@@ -322,7 +318,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.openingDialog = true;
 
 			var data = {
-				event_statuses: $scope.eventStatuses,
+				event_statuses: scheduleService.eventStatuses,
 				availability_types: $scope.availabilityTypes
 			};
 
@@ -679,33 +675,33 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		// Loads the list of event statuses from the API (i.e. appointment statuses).  Sets the following:
 		// $scope.event_statuses - a table to look up a status by uuid.
 		// $scope.rotate_statuses - an array to describe how to cycle through statuses.
-		$scope.loadEventStatuses = function loadEventStatuses()
-		{
-			var deferred = $q.defer();
-
-			$scope.eventStatuses = {};
-			$scope.rotateStatuses = [];
-
-			$scope.scheduleApi.getCalendarAppointmentStatuses().then(
-				function success(rawResults)
-				{
-					var results = rawResults.data.body;
-
-					for(var i = 0; i < results.length; i++)
-					{
-						var result = results[i];
-						$scope.eventStatuses[result.displayLetter] = result;
-						if(result.rotates)
-						{
-							$scope.rotateStatuses.push(result);
-						}
-					}
-
-					deferred.resolve(results);
-				});
-
-			return deferred.promise;
-		};
+		// $scope.loadEventStatuses = function loadEventStatuses()
+		// {
+		// 	var deferred = $q.defer();
+		//
+		// 	$scope.eventStatuses = {};
+		// 	$scope.rotateStatuses = [];
+		//
+		// 	$scope.scheduleApi.getCalendarAppointmentStatuses().then(
+		// 		function success(rawResults)
+		// 		{
+		// 			var results = rawResults.data.body;
+		//
+		// 			for(var i = 0; i < results.length; i++)
+		// 			{
+		// 				var result = results[i];
+		// 				$scope.eventStatuses[result.displayLetter] = result;
+		// 				if(result.rotates)
+		// 				{
+		// 					$scope.rotateStatuses.push(result);
+		// 				}
+		// 			}
+		//
+		// 			deferred.resolve(results);
+		// 		});
+		//
+		// 	return deferred.promise;
+		// };
 
 		$scope.loadScheduleEvents = function loadScheduleEvents(providerId, siteName, start, end)
 		{
@@ -898,7 +894,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					var newStatus = response.data.body;
 
-					calEvent.color = $scope.eventStatuses[newStatus].color;
+					calEvent.color = scheduleService.getStatusByCode(newStatus).color;
 					calEvent.data.eventStatusCode = newStatus;
 
 					$scope.updateEvent(calEvent);
@@ -1008,7 +1004,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 
 				// var eventStatusHtml = '';
-				let eventStatus = $scope.eventStatuses[event.data.eventStatusCode];
+				let eventStatus = scheduleService.eventStatuses[event.data.eventStatusCode];
 
 
 

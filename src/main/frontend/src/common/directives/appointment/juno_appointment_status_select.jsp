@@ -14,7 +14,10 @@
 	<div class="{{input_size}} directive-appt-status-select-wrapper">
 		<div class="directive-appt-status-select">
 			<div class="icon-wrapper">
-				<a class="icon icon-status"></a>
+				<button class="btn btn-icon"
+					ng-click="button_change_fn()">
+					<span class="icon icon-status"></span>
+				</button>
 			</div>
 			<select type="text"
 			        id="input-{{name}}"
@@ -22,7 +25,7 @@
 			        ng-model="model"
 			        style="background-color: transparent"
 			        ng-focus="focus_fn()"
-			        ng-change="appt_status_change_fn(model)"
+			        ng-change="select_change_fn()"
 			        ng-disabled="disabled"
 			        tabindex="{{tab_index}}">
 				<option ng-if="include_empty_option == 'true'" value=""></option>
