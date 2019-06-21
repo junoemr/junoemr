@@ -108,12 +108,6 @@ public class CoPDPreProcessorService
 			message = formatWolfFollowupSegments(message);
 		}
 
-		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
-		{
-			message = fixTimestamps(message);
-			message = fixTimestampsAttachments(message);
-		}
-
 		return message;
 	}
 
@@ -138,79 +132,6 @@ public class CoPDPreProcessorService
 		}
 		tagMatcher.appendTail(sb);
 		return sb.toString();
-	}
-
-	/**
-	 * Fix timestamp strings. Mediplan outputs unknown timestamps like, 00000 or 00000000 this causes parsing exceptions.
-	 * This function switches <TS.1>00000[0000]</TS.1> to, <TS.1>00010101</TS.1>
-	 * @param message the message to process
-	 * @return fixed message
-	 */
-	private String fixTimestamps(String message)
-	{
-		Function<String, String> callback = new Function<String,String>() {
-
-			private final Pattern timeStampPattern = Pattern.compile("(\\d{8})(\\d{2})(\\d{4})$");
-
-			@Override
-			public String apply(String timeStamp)
-			{
-				Matcher timeStampMatcher = timeStampPattern.matcher(timeStamp);
-				if ("00000".equals(timeStamp) || "00000000".equals(timeStamp) || "00000000000".equals(timeStamp)
-						|| "00000060000".equals(timeStamp) || "00000060100".equals(timeStamp)
-						|| "00000113000".equals(timeStamp) || "9531121".equals(timeStamp)
-						|| "00000092000".equals(timeStamp) || "9310728".equals(timeStamp)
-						|| "9550612".equals(timeStamp) || "00000132000".equals(timeStamp)
-						|| "00000123000".equals(timeStamp) || "00000124000".equals(timeStamp)
-						|| "00000150000".equals(timeStamp) || "9820416".equals(timeStamp)
-						|| "9461121".equals(timeStamp) || "9880203".equals(timeStamp)
-						|| "00000121500".equals(timeStamp) || "1330222".equals(timeStamp)
-						|| "9550506".equals(timeStamp))
-				{
-					return HL7_TIMESTAMP_BEGINNING_OF_TIME;
-				}
-				else if (timeStampMatcher.find())
-				{// look for timestamps with bad hour.
-					try
-					{
-						Integer hours = Integer.parseInt(timeStampMatcher.group(2));
-						if (hours > 23)
-						{// sub in fake hour
-							return timeStampMatcher.group(1) + "12" + timeStampMatcher.group(3);
-						}
-					}
-					catch (NumberFormatException e)
-					{
-						//nop
-					}
-				}
-				return timeStamp;
-			}
-		};
-
-		return foreachTag(message, "TS.1", callback);
-	}
-
-	/**
-	 * fix timestamps in ZAT segments (attachments)
-	 * @param message the message to fix
-	 * @return the fixed message
-	 */
-	public String fixTimestampsAttachments(String message)
-	{
-		Function<String, String> callback = new Function<String,String>() {
-			@Override
-			public String apply(String timeStamp)
-			{
-				if (timeStamp.contains("00000") || timeStamp.equals("1330222"))
-				{
-					return HL7_TIMESTAMP_BEGINNING_OF_TIME;
-				}
-				return timeStamp;
-			}
-		};
-
-		return foreachTag(message, "ZAT.2", callback);
 	}
 
 	/**
