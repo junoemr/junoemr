@@ -56,7 +56,7 @@ import java.util.List;
 @Tag(name = "appointment")
 public class AppointmentService extends AbstractServiceImpl
 {
-	Logger logger = MiscUtils.getLogger();
+	private static final Logger logger = MiscUtils.getLogger();
 
 	@Autowired
 	private AppointmentManager appointmentManager;
@@ -73,8 +73,8 @@ public class AppointmentService extends AbstractServiceImpl
 		AppointmentConverter converter = new AppointmentConverter();
 		Appointment appointment = converter.getAsDomainObject(calendarAppointment);
 
-		logger.info(calendarAppointment.toString());
-		logger.info(appointment.toString());
+//		logger.info(calendarAppointment.toString());
+//		logger.info(appointment.toString());
 
 		Appointment savedAppointment =
 				appointmentManager.addAppointment(getLoggedInInfo(), appointment);
@@ -100,8 +100,8 @@ public class AppointmentService extends AbstractServiceImpl
 		AppointmentConverter converter = new AppointmentConverter();
 		Appointment appointment = converter.getAsDomainObject(calendarAppointment);
 
-		logger.info(calendarAppointment.toString());
-		logger.info(appointment.toString());
+//		logger.info(calendarAppointment.toString());
+//		logger.info(appointment.toString());
 
 		Appointment savedAppointment =
 				appointmentManager.updateAppointment(getLoggedInInfo(), appointment);
@@ -129,6 +129,18 @@ public class AppointmentService extends AbstractServiceImpl
 		return RestResponse.successResponse(appointmentNo);
 	}
 
+
+	@PUT
+	@Path("/{appointmentNo}/set_status")
+	@Consumes("application/json")
+	@Produces("application/json")
+	public RestResponse<String> setStatus(@PathParam("appointmentNo") Integer appointmentNo,
+	                                      String statusCode)
+	{
+		Appointment appointment = appointmentManager.updateAppointmentStatus(getLoggedInInfo(), appointmentNo, statusCode);
+
+		return RestResponse.successResponse(appointment.getAppointmentStatus());
+	}
 
 	@POST
 	@Path("/{appointmentNo}/rotate_status")

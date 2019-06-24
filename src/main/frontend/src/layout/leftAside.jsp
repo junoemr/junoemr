@@ -52,14 +52,14 @@
 		<!-- main content pane -->
 		<div class="patient-list-content flex-column">
 			<ul class="nav nav-tabs" id="patient-list-nav">
-				<li class="active">
-					<a class="round-top" data-toggle="tab"
-					   ng-click="patientListCtrl.changeTab(patientListCtrl.tabEnum.recent);">Patients
-					</a>
-				</li>
-				<li>
+				<li ng-class="{'active' : patientListCtrl.activeTab === patientListCtrl.tabEnum.appointments}">
 					<a class="round-top" data-toggle="tab"
 					   ng-click="patientListCtrl.changeTab(patientListCtrl.tabEnum.appointments);">Appointments
+					</a>
+				</li>
+				<li ng-class="{'active' : patientListCtrl.activeTab === patientListCtrl.tabEnum.recent}">
+					<a class="round-top" data-toggle="tab"
+					   ng-click="patientListCtrl.changeTab(patientListCtrl.tabEnum.recent);">Patients
 					</a>
 				</li>
 			</ul>
@@ -115,12 +115,11 @@
 							</div>
 							<div class="col-md-8">
 								<juno-appointment-status-select
-								ca-name="aside-appt-status"
+								ca-name="aside-appt-status-{{patient.appointmentNo}}"
 								ca-no-label="true"
 								ca-input-size="col-md-12"
 								ca-model="patient.status"
 								ca-options="patientListCtrl.eventStatusOptions"
-								<%--ca-change="patientListCtrl.onStatusChange()"--%>
 								>
 								</juno-appointment-status-select>
 							</div>

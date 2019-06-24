@@ -25,6 +25,7 @@
 */
 
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
+import {AppointmentApi} from "../../generated/api/AppointmentApi";
 
 angular.module('PatientList').controller('PatientList.PatientListController', [
 
@@ -59,13 +60,16 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 
 		controller.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
 			'../ws/rs');
+		controller.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
+			'../ws/rs');
 
 		controller.tabEnum = Object.freeze({
-			recent:0,
-			appointments:1
+			appointments:0,
+			recent:1,
 		});
-		controller.activeTab = controller.tabEnum.recent;
+		controller.activeTab = controller.tabEnum.appointments;
 		controller.activePatientList = [];
+		controller.activePatientListUnregisterFunctions = [];
 
 		//for filter box
 		controller.query = '';
@@ -88,6 +92,8 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 
 					controller.datepickerSelectedDate = Juno.Common.Util.formatMomentDate(moment());
 					controller.changeTab(controller.activeTab);
+
+					controller.loadWatches();
 					controller.initialized = true;
 				}
 			);
@@ -147,39 +153,104 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 
 		controller.refreshRecentPatientList = function()
 		{
+			var deferred = $q.defer();
+
+			controller.unregisterPatientListWatches();
 			providerService.getRecentPatientList().then(
 				function success(results)
 				{
 					controller.activePatientList = results;
+					deferred.resolve(controller.activePatientList);
 				},
 				function error(errors)
 				{
 					console.log(errors);
+					deferred.reject();
 				});
+			return deferred.promise;
 		};
 
 		controller.refreshAppointmentPatientList = function()
 		{
+			var deferred = $q.defer();
+
+			controller.unregisterPatientListWatches();
 			controller.scheduleApi.getAppointmentsForDay(controller.datepickerSelectedDate).then(
 				function success(results)
 				{
 					controller.activePatientList = results.data.body.patients;
+					controller.registerPatientListWatches();
+					deferred.resolve(controller.activePatientList);
 				},
 				function error(errors)
 				{
 					console.log(errors);
+					deferred.reject();
 				});
+
+			return deferred.promise;
 		};
+		controller.unregisterPatientListWatches = function()
+		{
+			for(var i = 0; i< controller.activePatientListUnregisterFunctions.length; i++)
+			{
+				// deregister the watch function by calling it's function
+				controller.activePatientListUnregisterFunctions[i]();
+			}
+			controller.activePatientListUnregisterFunctions = [];
+		};
+		controller.registerPatientListWatches = function()
+		{
+			for(var i=0; i < controller.activePatientList.length; i++)
+			{
+				var deregisterFn = $scope.$watch('patientListCtrl.activePatientList['+i+']', function (newValue, oldValue)
+				{
+					if (oldValue !== newValue)
+					{
+						controller.updateAppointmentStatus(newValue);
+					}
+				}, true);
+				controller.activePatientListUnregisterFunctions.push(deregisterFn);
+			}
+		};
+		controller.updateAppointmentStatus = function(appointment)
+		{
+			var deferred = $q.defer();
+
+			controller.appointmentApi.setStatus(appointment.appointmentNo, appointment.status).then(
+				function success(result)
+				{
+					deferred.resolve(result);
+				}
+			);
+
+			return deferred.promise;
+		};
+
 		controller.refresh = function refresh(filter)
 		{
-			if(controller.isRecentPatientView() === true)
+			var deferred = $q.defer();
+
+			if(controller.isRecentPatientView())
 			{
-				controller.refreshRecentPatientList();
+				controller.refreshRecentPatientList().then(
+					function success()
+					{
+						deferred.resolve();
+					}
+				);
 			}
-			else if(controller.isAppointmentPatientView() === true)
+			else if(controller.isAppointmentPatientView())
 			{
-				controller.refreshAppointmentPatientList();
+				controller.refreshAppointmentPatientList().then(
+					function success()
+					{
+						deferred.resolve();
+					}
+				);
 			}
+
+			return deferred.promise;
 		};
 
 		$scope.$on('juno:patientListRefresh', function()
@@ -209,13 +280,16 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		// Watches
 		//=========================================================================/
 
-		$scope.$watch('patientListCtrl.datepickerSelectedDate', function(newValue, oldValue)
+		controller.loadWatches = function loadWatches()
 		{
-			if(controller.isInitialized())
+			$scope.$watch('patientListCtrl.datepickerSelectedDate', function (newValue, oldValue)
 			{
-				controller.refresh();
-			}
-		});
+				if (oldValue !== newValue)
+				{
+					controller.refresh();
+				}
+			});
+		};
 
 		controller.init();
 	}
