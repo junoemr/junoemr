@@ -1667,7 +1667,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										%>
 						   					<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>">
 												<td valign="top" align="middle">
-													<a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../../../dms/ManageDocument.do?method=downloadPdf&doc_no=<%=docId%>');">Download PDF</a>
+													<a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../../../dms/ManageDocument.do?method=display&doc_no=<%=docId%>');">Download PDF</a>
 												</td>
 											</tr>
 						   			<%
