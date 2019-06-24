@@ -60,6 +60,8 @@
 <jsp:useBean id="oscarVariables" class="java.util.Properties" scope="session" />
 <%@	page import="javax.swing.text.rtf.RTFEditorKit"%>
 <%@	page import="java.io.ByteArrayInputStream"%>
+<%@ page import="org.oscarehr.labs.dao.Hl7DocumentLinkDao" %>
+<%@ page import="org.oscarehr.labs.model.Hl7DocumentLink" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -110,6 +112,7 @@
 	Hl7TextMessageDao hl7TxtMsgDao = (Hl7TextMessageDao)SpringUtils.getBean("hl7TextMessageDao");
 	MeasurementMapDao measurementMapDao = (MeasurementMapDao) SpringUtils.getBean("measurementMapDao");
 	Hl7TextMessage hl7TextMessage = hl7TxtMsgDao.find(Integer.parseInt(segmentID));
+	Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
 
 	String dateLabReceived = "n/a";
 	if (hl7TextMessage != null)
@@ -1261,6 +1264,8 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						boolean	isVIHARtf = false;
 						boolean isSGorCDC = false;
 
+						List<Hl7DocumentLink> documentLinks = null;
+
 						//Checks to see if the PATHL7 lab is an unstructured document, a VIHA RTF pathology report, or if the patient location is SG/CDC
 						//labs that fall into any of these categories have certain requirements per Excelleris
 						if(handler.getMsgType().equals("PATHL7")){
@@ -1294,6 +1299,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						<%
 							if (isPDF)
 							{
+								documentLinks = hl7DocumentLinkDao.getDocumentsForLab(lab_no);
 						%>
 							<table width="100%" border="0" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF" bordercolor="#9966FF" bordercolordark="#bfcbe3" name="tblDiscs" id="tblDiscs">
 								<tr class="Field2">
@@ -1663,11 +1669,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                        	if (isPDF)
 										{
-											int docId = hl7TextMessage.getEmbeddedDocId();
+											int docId = documentLinks.get(j).getDocumentNo();
 										%>
 						   					<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>">
 												<td valign="top" align="middle">
-													<a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../../../dms/ManageDocument.do?method=display&doc_no=<%=docId%>');">Download PDF</a>
+													<a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../../../dms/ManageDocument.do?method=display&doc_no=<%=docId%>');">Display PDF</a>
 												</td>
 											</tr>
 						   			<%
