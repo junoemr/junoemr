@@ -57,7 +57,7 @@ public class JunoCoPDLabWriter extends HL7LabWriter
 
 		// use the demographic mapper to pull some values into the new hl7, because the incoming data
 		// doesn't always match the usual format
-		DemographicMapper demographicMapper = new DemographicMapper(message);
+		DemographicMapper demographicMapper = new DemographicMapper(message, importSource);
 
 		//initialize an MSH header segment with some custom CoPD values
 		oru_r01.initQuickstart("ORU", "R01", "P");
@@ -67,7 +67,7 @@ public class JunoCoPDLabWriter extends HL7LabWriter
 		//copy the CoPD incoming segment info to the newly created hl7 message segments
 		PID pid = oru_r01.getPATIENT_RESULT().getPATIENT().getPID();
 		DeepCopy.copy(message.getPATIENT().getPID(), pid);
-		terser.set("/.PID-2", demographicMapper.getPHN(importSource));
+		terser.set("/.PID-2", demographicMapper.getPHN());
 
 		if(accessionNumber == null)
 		{

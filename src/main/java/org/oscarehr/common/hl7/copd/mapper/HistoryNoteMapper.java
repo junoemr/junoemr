@@ -125,7 +125,7 @@ public class HistoryNoteMapper extends AbstractMapper
 		return provider.getZHFReps();
 	}
 
-	public List<CaseManagementNote> getSocialHistoryNoteList(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public List<CaseManagementNote> getSocialHistoryNoteList() throws HL7Exception
 	{
 		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
@@ -165,7 +165,7 @@ public class HistoryNoteMapper extends AbstractMapper
 		return outList;
 	}
 
-	public List<CaseManagementNote> getFamilyHistoryNoteList(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public List<CaseManagementNote> getFamilyHistoryNoteList() throws HL7Exception
 	{
 		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
@@ -205,7 +205,7 @@ public class HistoryNoteMapper extends AbstractMapper
 		return outList;
 	}
 
-	public List<CaseManagementNote> getMedicalHistoryNoteList(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public List<CaseManagementNote> getMedicalHistoryNoteList() throws HL7Exception
 	{
 		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{

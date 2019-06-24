@@ -46,29 +46,28 @@ public class EncounterNoteMapper extends AbstractMapper
 		return provider.getZPVReps();
 	}
 
-	public List<CaseManagementNote> getEncounterNoteList(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public List<CaseManagementNote> getEncounterNoteList() throws HL7Exception
 	{
 		int numNotes = getNumEncounterNotes();
 		List<CaseManagementNote> encounterNoteList = new ArrayList<>(numNotes);
 		for(int i=0; i< numNotes; i++)
 		{
-			encounterNoteList.add(getEncounterNote(i, importSource));
+			encounterNoteList.add(getEncounterNote(i));
 		}
 		return encounterNoteList;
 	}
 
-	public CaseManagementNote getEncounterNote(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public CaseManagementNote getEncounterNote(int rep) throws HL7Exception
 	{
 		CaseManagementNote note = new CaseManagementNote();
 
+		String noteText = getEncounterNoteText(rep);
 		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
-			note.setNote(getEncounterNoteText(rep).replace(" / ", "\n"));
+			noteText = noteText.replace(" / ", "\n");
 		}
-		else
-		{
-			note.setNote(getEncounterNoteText(rep));
-		}
+
+		note.setNote(noteText);
 		note.setObservationDate(getEncounterNoteContactDate(rep));
 		note.setUpdateDate(getEncounterNoteContactDate(rep));
 

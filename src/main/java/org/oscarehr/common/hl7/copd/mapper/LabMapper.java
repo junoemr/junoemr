@@ -40,9 +40,9 @@ import java.util.Map;
 
 public class LabMapper extends AbstractMapper
 {
-	public LabMapper(ZPD_ZTR message, int providerRep)
+	public LabMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		super(message, providerRep);
+		super(message, providerRep, importSource);
 	}
 
 	public int getNumLabs()
@@ -50,7 +50,7 @@ public class LabMapper extends AbstractMapper
 		return provider.getLABReps();
 	}
 
-	public List<String> getLabList(CoPDImportService.IMPORT_SOURCE importSource) throws IOException, HL7Exception
+	public List<String> getLabList() throws IOException, HL7Exception
 	{
 		int numLabs = getNumLabs();
 

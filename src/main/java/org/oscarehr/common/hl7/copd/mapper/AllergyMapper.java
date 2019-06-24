@@ -44,12 +44,12 @@ public class AllergyMapper extends AbstractMapper
 	private static final Logger logger = MiscUtils.getLogger();
 	public static final String MEDIPLAN_ALLERGY_NOTE_ID = "MEDIPLAN ALLERGY SECTION";
 
-	public AllergyMapper(ZPD_ZTR message, int providerRep)
+	public AllergyMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		super(message, providerRep);
+		super(message, providerRep, importSource);
 	}
 
-	public int getNumAllergies(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public int getNumAllergies() throws HL7Exception
 	{
 		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
@@ -69,18 +69,18 @@ public class AllergyMapper extends AbstractMapper
 		}
 	}
 
-	public List<Allergy> getAllergyList(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public List<Allergy> getAllergyList() throws HL7Exception
 	{
-		int numAllergies = getNumAllergies(importSource);
+		int numAllergies = getNumAllergies();
 		List<Allergy> allergyList = new ArrayList<>(numAllergies);
 		for(int i=0; i< numAllergies; i++)
 		{
-			allergyList.add(getAllergy(i, importSource));
+			allergyList.add(getAllergy(i));
 		}
 		return allergyList;
 	}
 
-	public Allergy getAllergy(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public Allergy getAllergy(int rep) throws HL7Exception
 	{
 		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
@@ -139,18 +139,18 @@ public class AllergyMapper extends AbstractMapper
 		return allergy;
 	}
 
-	public List<CaseManagementNote> getAllergyNoteList(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public List<CaseManagementNote> getAllergyNoteList() throws HL7Exception
 	{
-		int numAllergies = getNumAllergies(importSource);
+		int numAllergies = getNumAllergies();
 		List<CaseManagementNote> allergyNoteList = new ArrayList<>(numAllergies);
 		for(int i=0; i< numAllergies; i++)
 		{
-			allergyNoteList.add(getAllergyNote(i, importSource));
+			allergyNoteList.add(getAllergyNote(i));
 		}
 		return allergyNoteList;
 	}
 
-	public CaseManagementNote getAllergyNote(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public CaseManagementNote getAllergyNote(int rep) throws HL7Exception
 	{
 		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{

@@ -44,7 +44,7 @@ public class AlertMapper extends AbstractMapper
 		return provider.getZALReps();
 	}
 
-	public List<CaseManagementNote> getReminderNoteList(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public List<CaseManagementNote> getReminderNoteList() throws HL7Exception
 	{
 		int numNotes = getNumAlerts();
 		List<CaseManagementNote> noteList = new ArrayList<>(numNotes);

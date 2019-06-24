@@ -108,6 +108,12 @@ public class CoPDPreProcessorService
 			message = formatWolfFollowupSegments(message);
 		}
 
+		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{
+			message = fixTimestamps(message);
+			message = fixTimestampsAttachments(message);
+		}
+
 		return message;
 	}
 
@@ -133,6 +139,71 @@ public class CoPDPreProcessorService
 		tagMatcher.appendTail(sb);
 		return sb.toString();
 	}
+
+	/**
+	 * Fix timestamp strings. Mediplan outputs unknown timestamps like, 00000 or 00000000 this causes parsing exceptions.
+	 * This function switches <TS.1>00000[0000]</TS.1> to, <TS.1>00010101</TS.1>
+	 * @param message the message to process
+	 * @return fixed message
+	 */
+	private String fixTimestamps(String message)
+	{
+		Function<String, String> callback = new Function<String,String>() {
+
+			private final Pattern timeStampPattern = Pattern.compile("(\\d{8})(\\d{2})(\\d{4})$");
+
+			@Override
+			public String apply(String timeStamp)
+			{
+				Matcher timeStampMatcher = timeStampPattern.matcher(timeStamp);
+				if ("00000".equals(timeStamp) || "00000000".equals(timeStamp) || "00000000000".equals(timeStamp))
+				{
+					return HL7_TIMESTAMP_BEGINNING_OF_TIME;
+				}
+				else if (timeStampMatcher.find())
+				{// look for timestamps with bad hour.
+					try
+					{
+						Integer hours = Integer.parseInt(timeStampMatcher.group(2));
+						if (hours > 23)
+						{// sub in fake hour
+							return timeStampMatcher.group(1) + "12" + timeStampMatcher.group(3);
+						}
+					}
+					catch (NumberFormatException e)
+					{
+						//nop
+					}
+				}
+				return timeStamp;
+			}
+		};
+
+		return foreachTag(message, "TS.1", callback);
+	}
+
+	/**
+	 * fix timestamps in ZAT segments (attachments)
+	 * @param message the message to fix
+	 * @return the fixed message
+	 */
+	public String fixTimestampsAttachments(String message)
+	{
+		Function<String, String> callback = new Function<String,String>() {
+			@Override
+			public String apply(String timeStamp)
+			{
+				if (timeStamp.contains("00000"))
+				{
+					return HL7_TIMESTAMP_BEGINNING_OF_TIME;
+				}
+				return timeStamp;
+			}
+		};
+
+		return foreachTag(message, "ZAT.2", callback);
+	}
+
 
 	/**
 	 * CoPD requires hl7V2.4, but often the value is not correctly set. this enforces the version

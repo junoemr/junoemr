@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.model.v24.segment.SCH;
 import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.provider.model.ProviderData;
 import oscar.util.ConversionUtils;
@@ -40,9 +41,9 @@ import java.util.regex.Pattern;
 
 public class AppointmentMapper extends AbstractMapper
 {
-	public AppointmentMapper(ZPD_ZTR message)
+	public AppointmentMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		super(message);
+		super(message, importSource);
 	}
 
 	public int getNumAppointments()
@@ -50,18 +51,18 @@ public class AppointmentMapper extends AbstractMapper
 		return this.message.getPATIENT().getSCHReps();
 	}
 
-	public List<Appointment> getAppointmentList(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public List<Appointment> getAppointmentList() throws HL7Exception
 	{
 		int numAppointments = getNumAppointments();
 		List<Appointment> appointmentList = new ArrayList<>(numAppointments);
 		for(int i=0; i< numAppointments; i++)
 		{
-			appointmentList.add(getAppointment(i, importSource));
+			appointmentList.add(getAppointment(i));
 		}
 		return appointmentList;
 	}
 
-	public Appointment getAppointment(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public Appointment getAppointment(int rep) throws HL7Exception
 	{
 		Appointment appointment = new Appointment();
 		Date appointmentDate = getAppointmentDate(rep);
@@ -73,7 +74,7 @@ public class AppointmentMapper extends AbstractMapper
 
 		appointment.setAppointmentDate(appointmentDate);
 		appointment.setStartTime(appointmentDate);
-		appointment.setEndTime(getAppointmentEnd(rep, importSource));
+		appointment.setEndTime(getAppointmentEnd(rep));
 
 		// hopefully one day appointments will handle null values correctly. until then, trim to empty
 		appointment.setNotes(StringUtils.trimToEmpty(getNotes(rep)));
@@ -123,15 +124,11 @@ public class AppointmentMapper extends AbstractMapper
 	public Date getAppointmentDate(int rep) throws HL7Exception
 	{
 		SCH sch = message.getPATIENT().getSCH(rep);
-		Date apptDate = ConversionUtils.fromDateString(sch.getSch11_AppointmentTimingQuantity(0).getStartDateTime().getTimeOfAnEvent().getValue(), "yyyyMMddHHmmss");
-		if (apptDate == null)
-		{// try alternate date format (wrong according to spec)
-			apptDate = ConversionUtils.fromDateString(sch.getSch11_AppointmentTimingQuantity(0).getStartDateTime().getTimeOfAnEvent().getValue(), "yyyyMMdd");
-		}
+		Date apptDate = ConversionUtils.getLegacyDateFromDateString(sch.getSch11_AppointmentTimingQuantity(0).getStartDateTime().getTimeOfAnEvent().getValue(), "yyyyMMddHHmmss");
 		return apptDate;
 	}
 
-	public Date getAppointmentEnd(int rep, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public Date getAppointmentEnd(int rep) throws HL7Exception
 	{
 		SCH sch = message.getPATIENT().getSCH(rep);
 		Date appointmentDate = getAppointmentDate(rep);
@@ -182,9 +179,9 @@ public class AppointmentMapper extends AbstractMapper
 		if (apptDate.compareTo(new Date()) < 0)
 		{
 			// appointment date is before current date
-			return "B";
+			return AppointmentStatus.APPOINTMENT_STATUS_BILLED;
 		}
-		return "t";
+		return AppointmentStatus.APPOINTMENT_STATUS_NEW;
 	}
 
 	private String getStatusFromNote(String note) throws RuntimeException
@@ -199,28 +196,28 @@ public class AppointmentMapper extends AbstractMapper
 				case "Done":
 				case "Billed":
 				{
-					return "B";
+					return AppointmentStatus.APPOINTMENT_STATUS_BILLED;
 				}
 				case "Arrived":
 				{
-					return "H";
+					return AppointmentStatus.APPOINTMENT_STATUS_HERE;
 				}
 				case "Cancel":
 				case "Resched":
 				case "Recall":
 				{
-					return "C";
+					return AppointmentStatus.APPOINTMENT_STATUS_CANCELLED;
 				}
 				case "No":
 				{
 					if (note.contains("Show"))
 					{
-						return "N";
+						return AppointmentStatus.APPOINTMENT_STATUS_NO_SHOW;
 					}
 				}
 				case "Left":
 				{
-					return "N";
+					return AppointmentStatus.APPOINTMENT_STATUS_NO_SHOW;
 				}
 			}
 		}

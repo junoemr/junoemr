@@ -327,8 +327,8 @@ public class CoPDImportService
 
 	private Demographic importDemographicData(ZPD_ZTR zpdZtrMessage, IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		DemographicMapper demographicMapper = new DemographicMapper(zpdZtrMessage);
-		Demographic demographic = demographicMapper.getDemographic(importSource);
+		DemographicMapper demographicMapper = new DemographicMapper(zpdZtrMessage, importSource);
+		Demographic demographic = demographicMapper.getDemographic();
 		if (demographic != null)
 		{
 			DemographicCust demographicCust = demographicMapper.getDemographicCust();
@@ -347,13 +347,13 @@ public class CoPDImportService
 			throw new RuntimeException("Multisite Imports not supported");
 		}
 
-		AppointmentMapper appointmentMapper = new AppointmentMapper(zpdZtrMessage);
+		AppointmentMapper appointmentMapper = new AppointmentMapper(zpdZtrMessage, importSource);
 
 		int numAppointments = appointmentMapper.getNumAppointments();
 
 		for(int i=0; i<numAppointments; i++)
 		{
-			Appointment appointment = appointmentMapper.getAppointment(i, importSource);
+			Appointment appointment = appointmentMapper.getAppointment(i);
 			ProviderData apptProvider = appointmentMapper.getAppointmentProvider(i);
 			ProviderData assignedProvider = defaultProvider;
 			if(apptProvider != null)
@@ -429,12 +429,12 @@ public class CoPDImportService
 
 	private void importAllergyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		AllergyMapper allergyMapper = new AllergyMapper(zpdZtrMessage, providerRep);
+		AllergyMapper allergyMapper = new AllergyMapper(zpdZtrMessage, providerRep, importSource);
 
-		for (int rep = 0; rep < allergyMapper.getNumAllergies(importSource); rep++)
+		for (int rep = 0; rep < allergyMapper.getNumAllergies(); rep++)
 		{
-			Allergy allergy = allergyMapper.getAllergy(rep, importSource);
-			CaseManagementNote allergyNote = allergyMapper.getAllergyNote(rep, importSource);
+			Allergy allergy = allergyMapper.getAllergy(rep);
+			CaseManagementNote allergyNote = allergyMapper.getAllergyNote(rep);
 
 			allergy.setDemographicNo(demographic.getDemographicId());
 			allergy.setProviderNo(String.valueOf(provider.getProviderNo()));
@@ -468,9 +468,9 @@ public class CoPDImportService
 
 	private void importLabData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception, IOException
 	{
-		LabMapper labMapper = new LabMapper(zpdZtrMessage, providerRep);
+		LabMapper labMapper = new LabMapper(zpdZtrMessage, providerRep, importSource);
 
-		for(String msg : labMapper.getLabList(importSource))
+		for(String msg : labMapper.getLabList())
 		{
 			MessageHandler parser = Factory.getHandler(JunoGenericLabHandler.LAB_TYPE_VALUE, msg);
 			// just in case
@@ -508,9 +508,9 @@ public class CoPDImportService
 	                                String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs)
 			throws IOException, InterruptedException
 	{
-		DocumentMapper documentMapper = new DocumentMapper(zpdZtrMessage, providerRep);
+		DocumentMapper documentMapper = new DocumentMapper(zpdZtrMessage, providerRep, importSource);
 
-		for(Document document : documentMapper.getDocumentList(importSource))
+		for(Document document : documentMapper.getDocumentList())
 		{
 			document.setDocCreator(provider.getId());
 			document.setResponsible(provider.getId());
@@ -544,7 +544,7 @@ public class CoPDImportService
 			InputStream stream = new FileInputStream(documentFile.getFileObject());
 			try
 			{
-				documentService.uploadNewDemographicDocument(document, stream, demographic.getDemographicId(), true);
+				documentService.uploadNewDemographicDocument(document, stream, demographic.getDemographicId(), false);
 			}
 			catch (FileAlreadyExistsException e)
 			{
@@ -558,7 +558,7 @@ public class CoPDImportService
 	private void importAlerts(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		AlertMapper alertMapper = new AlertMapper(zpdZtrMessage, providerRep, importSource);
-		for(CaseManagementNote reminderNote : alertMapper.getReminderNoteList(importSource))
+		for(CaseManagementNote reminderNote : alertMapper.getReminderNoteList())
 		{
 			reminderNote.setProvider(provider);
 			reminderNote.setSigningProvider(provider);
@@ -595,7 +595,7 @@ public class CoPDImportService
 		int numNotes = encounterNoteMapper.getNumEncounterNotes();
 		for(int i=0; i< numNotes; i++)
 		{
-			CaseManagementNote encounterNote = encounterNoteMapper.getEncounterNote(i, importSource);
+			CaseManagementNote encounterNote = encounterNoteMapper.getEncounterNote(i);
 			ProviderData signingProvider = encounterNoteMapper.getSigningProvider(i);
 			ProviderData noteProvider = provider;
 			if(signingProvider == null)
@@ -619,21 +619,21 @@ public class CoPDImportService
 		}
 
 		HistoryNoteMapper historyNoteMapper = new HistoryNoteMapper(zpdZtrMessage, providerRep, importSource);
-		for(CaseManagementNote medHistNote : historyNoteMapper.getMedicalHistoryNoteList(importSource))
+		for(CaseManagementNote medHistNote : historyNoteMapper.getMedicalHistoryNoteList())
 		{
 			medHistNote.setProvider(provider);
 			medHistNote.setSigningProvider(provider);
 			medHistNote.setDemographic(demographic);
 			encounterNoteService.saveMedicalHistoryNote(medHistNote);
 		}
-		for(CaseManagementNote socHistNote : historyNoteMapper.getSocialHistoryNoteList(importSource))
+		for(CaseManagementNote socHistNote : historyNoteMapper.getSocialHistoryNoteList())
 		{
 			socHistNote.setProvider(provider);
 			socHistNote.setSigningProvider(provider);
 			socHistNote.setDemographic(demographic);
 			encounterNoteService.saveSocialHistoryNote(socHistNote);
 		}
-		for(CaseManagementNote famHistNote : historyNoteMapper.getFamilyHistoryNoteList(importSource))
+		for(CaseManagementNote famHistNote : historyNoteMapper.getFamilyHistoryNoteList())
 		{
 			famHistNote.setProvider(provider);
 			famHistNote.setSigningProvider(provider);

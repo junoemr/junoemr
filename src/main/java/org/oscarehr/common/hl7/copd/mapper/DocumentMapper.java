@@ -34,9 +34,9 @@ import java.util.List;
 
 public class DocumentMapper extends AbstractMapper
 {
-	public DocumentMapper(ZPD_ZTR message, int providerRep)
+	public DocumentMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		super(message, providerRep);
+		super(message, providerRep, importSource);
 	}
 
 	public int getNumDocuments()
@@ -44,18 +44,18 @@ public class DocumentMapper extends AbstractMapper
 		return provider.getZATReps();
 	}
 
-	public List<Document> getDocumentList(CoPDImportService.IMPORT_SOURCE importSource)
+	public List<Document> getDocumentList()
 	{
 		int numDocuments = getNumDocuments();
 		List<Document> documentList = new ArrayList<>(numDocuments);
 		for(int i=0; i< numDocuments; i++)
 		{
-			documentList.add(getDocument(i, importSource));
+			documentList.add(getDocument(i));
 		}
 		return documentList;
 	}
 
-	public Document getDocument(int rep, CoPDImportService.IMPORT_SOURCE importSource)
+	public Document getDocument(int rep)
 	{
 		Document document = new Document();
 

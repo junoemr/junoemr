@@ -44,15 +44,15 @@ public class DemographicMapper extends AbstractMapper
 	private final PID messagePID;
 	private final String DEMO_NULL_NAME="NULL_NAME";
 
-	public DemographicMapper(ZPD_ZTR message)
+	public DemographicMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		super(message);
+		super(message, importSource);
 		this.messagePID = message.getPATIENT().getPID();
 	}
 
 	/* Methods for converting to oscar model */
 
-	public Demographic getDemographic(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public Demographic getDemographic() throws HL7Exception
 	{
 		if ((hasFirstName(0) && hasLastName(0)) || !CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
 		{
@@ -62,7 +62,7 @@ public class DemographicMapper extends AbstractMapper
 			demographic.setSex(getSex());
 			demographic.setDateOfBirth(getDOB());
 			demographic.setTitle(getTitle(0));
-			demographic.setHin(getPHN(importSource));
+			demographic.setHin(getPHN());
 			demographic.setHcType(getHCType());
 			demographic.setSin(getSIN());
 
@@ -211,7 +211,7 @@ public class DemographicMapper extends AbstractMapper
 		return StringUtils.trimToNull(StringUtils.trimToEmpty(areaCode) + StringUtils.trimToEmpty(phoneNumber));
 	}
 
-	public String getPHN(CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
+	public String getPHN() throws HL7Exception
 	{
 		Integer rep = 0;
 		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
