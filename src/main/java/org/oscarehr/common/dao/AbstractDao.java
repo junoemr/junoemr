@@ -26,6 +26,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.common.model.Explain;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.transaction.annotation.Propagation;
@@ -36,6 +37,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 @Transactional(propagation = Propagation.REQUIRED)
@@ -44,8 +47,11 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 
 	protected Class<T> modelClass;
 
-	@PersistenceContext
+	@PersistenceContext(unitName = "persistenceUnit")
 	protected EntityManager entityManager = null;
+
+	@PersistenceContext(unitName = "readOnlyPersistenceUnit")
+	protected EntityManager readOnlyEntityManager = null;
 
 	protected AbstractDao(Class<T> modelClass) {
 		setModelClass(modelClass);
@@ -336,11 +342,12 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 	 * @return
 	 * 		Returns list containing query results.
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<Object[]> runNativeQuery(String sql) {
-		Query query = entityManager.createNativeQuery(sql);
-		List resultList = query.getResultList();
-		return resultList;
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	@Transactional(readOnly = true)
+	public List<Object[]> runNativeQuery(String sql)
+	{
+		Query query = readOnlyEntityManager.createNativeQuery(escapeJpaParamCharacters(sql));
+		return query.getResultList();
 	}
 
 	/**
@@ -385,5 +392,64 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 	{
 		query.setFirstResult(startIndex);
 		setLimit(query, itemsToReturn);
+	}
+
+	/**
+	 * Run explain on a raw sql statement
+	 * This will run the query string as unescaped natural sql. when using this method, ensure that all sql is safe before hand
+	 * @param userQueryString raw sql string
+	 * @return list of Explain results
+	 */
+	@Transactional(readOnly = true)
+	public List<Explain> getExplainResultList(String userQueryString)
+	{
+		// use string concat with explain over setParameter, as the parameter gives invalid sql syntax
+		Query query = readOnlyEntityManager.createNativeQuery("EXPLAIN " + escapeJpaParamCharacters(userQueryString));
+		@SuppressWarnings("unchecked")
+		List<Object[]> list = query.getResultList();
+		return toExplainList(list);
+	}
+
+	/**
+	 * convert a list of object[] to Explain results
+	 * @param list
+	 * @return
+	 */
+	private List<Explain> toExplainList(List<Object[]> list)
+	{
+		List<Explain> results = new ArrayList<>(list.size());
+
+		for(Object[] result : list)
+		{
+			Explain explain = new Explain();
+			explain.setId((BigInteger) result[0]);
+			explain.setSelectType((String) result[1]);
+			explain.setTable((String) result[2]);
+			explain.setType((String) result[3]);
+			explain.setPossibleKeys((String) result[4]);
+			explain.setKey((String) result[5]);
+			explain.setKeyLen((String) result[6]);
+			explain.setRef((String) result[7]);
+			explain.setRows((BigInteger) result[8]);
+			explain.setExtra((String) result[9]);
+
+			results.add(explain);
+		}
+		return results;
+	}
+
+	/** escapes some special characters that the entity manager will not allow in native queries correctly.
+	 * Proper escaping (\\: etc.) is not available until hibernate version 4.1.3
+	 * So this uses a quick and dirty hack to allow the characters through:
+	 *    Hibernate code treats everything between ' as a string (ignores it).
+	 *    MySQL on the other hand will ignore everything inside a blockquote and will evaluate the whole expression to an assignment operator.
+	 */
+	private String escapeJpaParamCharacters(String unescapedSql)
+	{
+		String escapedSql = unescapedSql
+				.replaceAll(":=", "/*'*/:=/*'*/")
+				.replaceAll("\\?", "/*'*/?/*'*/");
+		MiscUtils.getLogger().info("ESCAPED:\n" + escapedSql);
+		return escapedSql;
 	}
 }

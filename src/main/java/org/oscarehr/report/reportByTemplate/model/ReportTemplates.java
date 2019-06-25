@@ -23,7 +23,9 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.report.reportByTemplate.model;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,7 +36,8 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="reportTemplates")
-public class ReportTemplates extends AbstractModel<Integer> {
+public class ReportTemplates extends AbstractModel<Integer>
+{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,12 +56,19 @@ public class ReportTemplates extends AbstractModel<Integer> {
 	@Column(name="templatexml")
 	private String templateXml;
 
+	@Column(name="active")
 	private int active;
 
+	@Column(name="type")
 	private String type;
-	
+
+	@Column(name="super_admin_verified")
+	private Boolean adminVerified = false;
+
+	@Column(name="sequence")
 	private Boolean sequence;
-	
+
+	@Column(name="uuid")
 	private String uuid;
 
 	public Integer getId() {
@@ -116,6 +126,20 @@ public class ReportTemplates extends AbstractModel<Integer> {
 	public void setType(String type) {
     	this.type = type;
     }
+
+	public Boolean getAdminVerified()
+	{
+		return adminVerified;
+	}
+	public boolean isAdminVerified()
+	{
+		return adminVerified;
+	}
+
+	public void setAdminVerified(Boolean adminVerified)
+	{
+		this.adminVerified = adminVerified;
+	}
 
 	public Boolean isSequence() {
 		return (sequence!=null)?sequence:false;

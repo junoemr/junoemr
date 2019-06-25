@@ -28,8 +28,9 @@
 <%--This JSP displays the result of the report query--%>
 
 
-<%@ page
-	import="java.util.*,oscar.oscarReport.reportByTemplate.*,java.sql.*, org.apache.commons.lang.StringEscapeUtils"%>
+<%@ page import="oscar.oscarReport.reportByTemplate.ReportObjectGeneric"%>
+<%@ page import="java.util.ArrayList"%>
+<%@ page import="java.util.List"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
@@ -126,7 +127,8 @@ function clearSession(){
 		<div class="sqlBorderDiv" id="sqlDiv" style="display: none;"><b>Query:</b><br />
 		<code style="font-size: 11px;">
 			<%
-			for(int x=0;x<sqlList.size();x++) {
+			for(int x=0;x<sqlList.size();x++)
+			{
 				out.println((x+1) + ")" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(sqlList.get(x).trim()) + "<br/>");
 			}
 			%>
@@ -134,11 +136,11 @@ function clearSession(){
 		</div>
 		<div class="reportBorderDiv">
 		<%
-		
-			for(int x=0;x<htmlList.size();x++) {
-				 out.println(htmlList.get(x));
-				 out.println("<br/>");
-				 
+
+			for(int x = 0; x < htmlList.size(); x++)
+			{
+				out.println(htmlList.get(x));
+				out.println("<br/>");
 			}
 			
         %>

@@ -26,6 +26,7 @@ import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Embeddable
 public class CaseManagementIssueNotePK implements Serializable
@@ -64,5 +65,27 @@ public class CaseManagementIssueNotePK implements Serializable
 	public void setCaseManagementNote(CaseManagementNote caseManagementNote)
 	{
 		this.caseManagementNote = caseManagementNote;
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof CaseManagementIssueNotePK))
+		{
+			return false;
+		}
+		CaseManagementIssueNotePK that = (CaseManagementIssueNotePK) o;
+		return Objects.equals(caseManagementIssue, that.caseManagementIssue) &&
+				Objects.equals(caseManagementNote, that.caseManagementNote);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(caseManagementIssue, caseManagementNote);
 	}
 }
