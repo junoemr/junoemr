@@ -120,6 +120,7 @@
 								ca-input-size="col-md-12"
 								ca-model="patient.status"
 								ca-options="patientListCtrl.eventStatusOptions"
+								ca-change="patientListCtrl.updateAppointmentStatus(patient)"
 								>
 								</juno-appointment-status-select>
 							</div>

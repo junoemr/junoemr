@@ -2,10 +2,12 @@ angular.module('Common').directive(
 	'junoAppointmentStatusSelect',
 
 	[
+		'$timeout',
 		'fieldHelperService',
 		'scheduleService',
 
 	function(
+		$timeout,
 		helper,
 		scheduleService,
 	)
@@ -28,7 +30,10 @@ angular.module('Common').directive(
 				$scope.setStatus();
 
 				// call the custom ng-change function
-				$scope.change_fn();
+				$timeout(function ()
+				{
+					$scope.change_fn();
+				});
 			};
 			$scope.button_change_fn = function button_change_fn()
 			{
@@ -36,7 +41,10 @@ angular.module('Common').directive(
 				$scope.setStatus();
 
 				// call the custom ng-change function
-				$scope.change_fn();
+				$timeout(function ()
+				{
+					$scope.change_fn();
+				});
 			};
 			$scope.setStatus = function setStatus()
 			{

@@ -71,7 +71,6 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		});
 		controller.activeTab = controller.tabEnum.appointments;
 		controller.activePatientList = [];
-		controller.activePatientListUnregisterFunctions = [];
 
 		//for filter box
 		controller.query = '';
@@ -157,7 +156,6 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		{
 			var deferred = $q.defer();
 
-			controller.unregisterPatientListWatches();
 			providerService.getRecentPatientList().then(
 				function success(results)
 				{
@@ -176,12 +174,10 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		{
 			var deferred = $q.defer();
 
-			controller.unregisterPatientListWatches();
 			controller.scheduleApi.getAppointmentsForDay(controller.datepickerSelectedDate).then(
 				function success(results)
 				{
 					controller.activePatientList = results.data.body.patients;
-					controller.registerPatientListWatches();
 					deferred.resolve(controller.activePatientList);
 				},
 				function error(errors)
@@ -192,33 +188,9 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 
 			return deferred.promise;
 		};
-		controller.unregisterPatientListWatches = function()
-		{
-			for(var i = 0; i< controller.activePatientListUnregisterFunctions.length; i++)
-			{
-				// deregister the watch function by calling it's function
-				controller.activePatientListUnregisterFunctions[i]();
-			}
-			controller.activePatientListUnregisterFunctions = [];
-		};
-		controller.registerPatientListWatches = function()
-		{
-			for(var i=0; i < controller.activePatientList.length; i++)
-			{
-				var deregisterFn = $scope.$watch('patientListCtrl.activePatientList['+i+']', function (newValue, oldValue)
-				{
-					if (oldValue !== newValue)
-					{
-						controller.updateAppointmentStatus(newValue);
-					}
-				}, true);
-				controller.activePatientListUnregisterFunctions.push(deregisterFn);
-			}
-		};
 		controller.updateAppointmentStatus = function(appointment)
 		{
 			var deferred = $q.defer();
-
 			controller.appointmentApi.setStatus(appointment.appointmentNo, appointment.status).then(
 				function success(result)
 				{
