@@ -21,39 +21,22 @@
  * Canada
  */
 
-package org.oscarehr.ws.external.soap.v1.transfer.schedule;
+package org.oscarehr.ws.external.soap.util;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
-import java.util.HashMap;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "timeSlot")
-public class DayTimeSlots
+public class LocalDateAdapter extends XmlAdapter<String, LocalDate>
 {
-
-    private HashMap<String, String> timeSlotEntry = new HashMap<>();
-
-    public DayTimeSlots(String timeSlot, String duration)
-    {
-        this.setTimeSlotEntry(timeSlot, duration);
+    @Override
+    public String marshal(LocalDate date) throws Exception {
+        return date.format(DateTimeFormatter.ISO_DATE);
     }
 
-    public DayTimeSlots() {} // required
 
-    public HashMap<String, String> getTimeSlotEntry()
-    {
-       return timeSlotEntry;
-    }
-
-    public void setTimeSlotEntry(String timeSlot, String duration)
-    {
-        HashMap<String, String> timeSlotEntry = new HashMap<>();
-
-        timeSlotEntry.put("start_datetime", timeSlot);
-        timeSlotEntry.put("duration_minutes", duration);
-
-        this.timeSlotEntry = timeSlotEntry;
+    @Override
+    public LocalDate unmarshal(String date) throws Exception {
+        return LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
     }
 }

@@ -21,39 +21,26 @@
  * Canada
  */
 
-package org.oscarehr.ws.external.soap.v1.transfer.schedule;
+package org.oscarehr.integration;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
-import java.util.HashMap;
+import org.springframework.stereotype.Service;
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "timeSlot")
-public class DayTimeSlots
+@Service
+public class BaseService
 {
+	protected static final String DEFAULT_PROTOCOL = "https";
 
-    private HashMap<String, String> timeSlotEntry = new HashMap<>();
+	public static String concatEndpointStrings(String baseString, String concatString)
+	{
+		baseString = baseString.replaceAll("/$", "");
+		baseString = baseString.replaceAll("http(s)?://", "");
+		concatString = concatString.replaceAll("^/", "");
+		return baseString + "/" + concatString;
+	}
 
-    public DayTimeSlots(String timeSlot, String duration)
-    {
-        this.setTimeSlotEntry(timeSlot, duration);
-    }
-
-    public DayTimeSlots() {} // required
-
-    public HashMap<String, String> getTimeSlotEntry()
-    {
-       return timeSlotEntry;
-    }
-
-    public void setTimeSlotEntry(String timeSlot, String duration)
-    {
-        HashMap<String, String> timeSlotEntry = new HashMap<>();
-
-        timeSlotEntry.put("start_datetime", timeSlot);
-        timeSlotEntry.put("duration_minutes", duration);
-
-        this.timeSlotEntry = timeSlotEntry;
-    }
+	public static String buildUrl(String protocol, String endPoint)
+	{
+		endPoint = endPoint.replaceAll("http(s)?://", "");
+		return protocol + "://" + endPoint;
+	}
 }

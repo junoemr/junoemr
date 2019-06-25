@@ -21,39 +21,17 @@
  * Canada
  */
 
-package org.oscarehr.ws.external.soap.v1.transfer.schedule;
+package org.oscarehr.integration.myhealthaccess.exception;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
-import java.util.HashMap;
-
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "timeSlot")
-public class DayTimeSlots
+public class RecordNotFoundException extends IllegalArgumentException
 {
+	public RecordNotFoundException()
+	{
+		super();
+	}
 
-    private HashMap<String, String> timeSlotEntry = new HashMap<>();
-
-    public DayTimeSlots(String timeSlot, String duration)
-    {
-        this.setTimeSlotEntry(timeSlot, duration);
-    }
-
-    public DayTimeSlots() {} // required
-
-    public HashMap<String, String> getTimeSlotEntry()
-    {
-       return timeSlotEntry;
-    }
-
-    public void setTimeSlotEntry(String timeSlot, String duration)
-    {
-        HashMap<String, String> timeSlotEntry = new HashMap<>();
-
-        timeSlotEntry.put("start_datetime", timeSlot);
-        timeSlotEntry.put("duration_minutes", duration);
-
-        this.timeSlotEntry = timeSlotEntry;
-    }
+	public RecordNotFoundException(String s)
+	{
+		super(s);
+	}
 }

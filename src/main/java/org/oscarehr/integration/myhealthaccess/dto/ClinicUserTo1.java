@@ -21,39 +21,54 @@
  * Canada
  */
 
-package org.oscarehr.ws.external.soap.v1.transfer.schedule;
+package org.oscarehr.integration.myhealthaccess.dto;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
-import java.util.HashMap;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "timeSlot")
-public class DayTimeSlots
+import java.io.Serializable;
+
+public class ClinicUserTo1 implements Serializable
 {
+	@JsonProperty("first_name")
+	private String firstName;
 
-    private HashMap<String, String> timeSlotEntry = new HashMap<>();
+	@JsonProperty("last_name")
+	private String lastName;
 
-    public DayTimeSlots(String timeSlot, String duration)
-    {
-        this.setTimeSlotEntry(timeSlot, duration);
-    }
+	@JsonProperty("id")
+	private String myhealthaccesID;
 
-    public DayTimeSlots() {} // required
+	public String getFirstName()
+	{
+		return firstName;
+	}
 
-    public HashMap<String, String> getTimeSlotEntry()
-    {
-       return timeSlotEntry;
-    }
+	public void setFirstName(String firstName)
+	{
+		this.firstName = firstName;
+	}
 
-    public void setTimeSlotEntry(String timeSlot, String duration)
-    {
-        HashMap<String, String> timeSlotEntry = new HashMap<>();
+	public String getLastName()
+	{
+		return lastName;
+	}
 
-        timeSlotEntry.put("start_datetime", timeSlot);
-        timeSlotEntry.put("duration_minutes", duration);
+	public void setLastName(String lastName)
+	{
+		this.lastName = lastName;
+	}
 
-        this.timeSlotEntry = timeSlotEntry;
-    }
+	public String getMyhealthaccesID()
+	{
+		return myhealthaccesID;
+	}
+
+	public void setMyhealthaccesID(String myhealthaccesID)
+	{
+		this.myhealthaccesID = myhealthaccesID;
+	}
+
+	public ClinicUserTo1()
+	{
+	}
 }

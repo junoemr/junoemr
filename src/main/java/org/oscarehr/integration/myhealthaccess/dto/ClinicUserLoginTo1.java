@@ -21,39 +21,43 @@
  * Canada
  */
 
-package org.oscarehr.ws.external.soap.v1.transfer.schedule;
+package org.oscarehr.integration.myhealthaccess.dto;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
-import java.util.HashMap;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "timeSlot")
-public class DayTimeSlots
+import java.io.Serializable;
+
+public class ClinicUserLoginTo1 implements Serializable
 {
+	@JsonProperty("email")
+	private String email;
 
-    private HashMap<String, String> timeSlotEntry = new HashMap<>();
+	@JsonProperty("password")
+	private String password;
 
-    public DayTimeSlots(String timeSlot, String duration)
-    {
-        this.setTimeSlotEntry(timeSlot, duration);
-    }
+	public ClinicUserLoginTo1(String email, String password)
+	{
+		this.email = email;
+		this.password = password;
+	}
 
-    public DayTimeSlots() {} // required
+	public String getEmail()
+	{
+		return email;
+	}
 
-    public HashMap<String, String> getTimeSlotEntry()
-    {
-       return timeSlotEntry;
-    }
+	public void setEmail(String email)
+	{
+		this.email = email;
+	}
 
-    public void setTimeSlotEntry(String timeSlot, String duration)
-    {
-        HashMap<String, String> timeSlotEntry = new HashMap<>();
+	public String getPassword()
+	{
+		return password;
+	}
 
-        timeSlotEntry.put("start_datetime", timeSlot);
-        timeSlotEntry.put("duration_minutes", duration);
-
-        this.timeSlotEntry = timeSlotEntry;
-    }
+	public void setPassword(String password)
+	{
+		this.password = password;
+	}
 }
