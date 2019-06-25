@@ -29,6 +29,7 @@ import {AppointmentApi} from "../../generated/api/AppointmentApi";
 
 angular.module('PatientList').controller('PatientList.PatientListController', [
 
+	'$rootScope',
 	'$scope',
 	'$q',
 	'$http',
@@ -42,6 +43,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 	'providerService',
 
 	function(
+		$rootScope,
 		$scope,
 		$q,
 		$http,
@@ -220,6 +222,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			controller.appointmentApi.setStatus(appointment.appointmentNo, appointment.status).then(
 				function success(result)
 				{
+					$rootScope.$broadcast('schedule:refreshEvents');
 					deferred.resolve(result);
 				}
 			);

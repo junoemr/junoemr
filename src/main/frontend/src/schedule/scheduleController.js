@@ -345,6 +345,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.calendar().fullCalendar('refetchEvents');
 		};
 
+		$scope.$on('schedule:refreshEvents', function(event, data)
+		{
+			$scope.refetchEvents();
+		});
+
 		$scope.changeDate = function changeDate(date)
 		{
 			$scope.calendar().fullCalendar('gotoDate', date);
@@ -354,7 +359,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			return ($scope.viewName() != 'resourceDay')
 		};
-
 
 		//=========================================================================
 		// Private methods
@@ -671,37 +675,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 			return timeStr;
 		};
-
-		// Loads the list of event statuses from the API (i.e. appointment statuses).  Sets the following:
-		// $scope.event_statuses - a table to look up a status by uuid.
-		// $scope.rotate_statuses - an array to describe how to cycle through statuses.
-		// $scope.loadEventStatuses = function loadEventStatuses()
-		// {
-		// 	var deferred = $q.defer();
-		//
-		// 	$scope.eventStatuses = {};
-		// 	$scope.rotateStatuses = [];
-		//
-		// 	$scope.scheduleApi.getCalendarAppointmentStatuses().then(
-		// 		function success(rawResults)
-		// 		{
-		// 			var results = rawResults.data.body;
-		//
-		// 			for(var i = 0; i < results.length; i++)
-		// 			{
-		// 				var result = results[i];
-		// 				$scope.eventStatuses[result.displayLetter] = result;
-		// 				if(result.rotates)
-		// 				{
-		// 					$scope.rotateStatuses.push(result);
-		// 				}
-		// 			}
-		//
-		// 			deferred.resolve(results);
-		// 		});
-		//
-		// 	return deferred.promise;
-		// };
 
 		$scope.loadScheduleEvents = function loadScheduleEvents(providerId, siteName, start, end)
 		{
