@@ -229,7 +229,7 @@
 						<span class="fa fa-chevron-down"></span>
 					</div>--%>
 					<div class="pull-right text-right" >
-						<button class="icon-button" id="note-editor-minimize-button" ng-click="recordCtrl.toggleNote();">
+						<button class="btn btn-icon" id="note-editor-minimize-button" ng-click="recordCtrl.toggleNote();">
 							<span class="btn btn-xs fa fa-window-minimize" role="button"></span>
 						</button>
 					</div>

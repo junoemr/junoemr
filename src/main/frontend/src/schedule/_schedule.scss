@@ -15,19 +15,6 @@
 	top: 65px;
 }
 
-#calendar-container
-{
-  //border: 2px solid blue;
-  //height: 1000px;
-	/*
-        position: fixed;
-        top: 100px;
-        left: 100px;
-        right: 200px;
-        bottom: 200px;
-    */
-}
-
 .fc-view-container {
 	background: #f6f6f6;
 	overflow-x: scroll;
@@ -72,7 +59,7 @@
 		$scheduleCodeWidth: 16px;
 		/* styling for normal events */
 		.fc-event {
-			cursor: hand;
+			cursor: pointer;
 			margin-left: $scheduleCodeWidth;
 
 			// remove white opacity filter on events
@@ -88,12 +75,17 @@
 				font-size: 12px;
 				font-weight: normal;
 				color: $white;
+
+				$button-size: 24px;
+
 				.btn-event-link {
 					background: transparent;
 					border: 0;
-					width: 24px;
+					width: $button-size;
+					height: $button-size;
 					font-weight: bold;
 					color: $white;
+					padding: 0;
 				}
 				.event-blk {
 					display: flex;
@@ -103,15 +95,13 @@
 				.event-blk-label {
 					flex-grow: 1;
 				}
-				.icon {
-					width: 24px;
-					height: 24px;
-				}
-				.icon-down {
-					width: 16px;
-					height: 16px;
-					margin: 4px;
-					background-image: url($icon-down-white);
+				.btn-icon {
+					width: $button-size;
+					height: $button-size;
+					.icon {
+						width: $button-size;
+						height: $button-size;
+					}
 				}
 			}
 

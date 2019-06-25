@@ -109,15 +109,15 @@
 
 						<div ng-if="patientListCtrl.isAppointmentPatientView()"
 								class="row">
-							<div class="col-md-4">
+							<div class="col-md-6">
 								<h6>{{patient.name}}</h6>
 								<span>{{patient.startTime}} {{patient.reason}}</span>
 							</div>
-							<div class="col-md-8">
+							<div class="col-md-6">
 								<juno-appointment-status-select
 								ca-name="aside-appt-status-{{patient.appointmentNo}}"
 								ca-no-label="true"
-								ca-input-size="col-md-12"
+								<%--ca-input-size="col-md-12"--%>
 								ca-model="patient.status"
 								ca-options="patientListCtrl.eventStatusOptions"
 								ca-change="patientListCtrl.updateAppointmentStatus(patient)"
