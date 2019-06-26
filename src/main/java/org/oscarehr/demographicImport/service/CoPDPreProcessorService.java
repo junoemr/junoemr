@@ -35,34 +35,38 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
 public class CoPDPreProcessorService
 {
+	private final String HL7_TIMESTAMP_BEGINNING_OF_TIME = "19700101";
 	private static final Logger logger = MiscUtils.getLogger();
 
-	public String getFileString(GenericFile genericFile) throws IOException
+	public boolean looksLikeCoPDFormat(GenericFile genericFile) throws IOException
 	{
-		logger.info("Read import file");
+		// read first 100 lines to check file format
 		File file = genericFile.getFileObject();
 		InputStream is = new FileInputStream(file);
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
 		StringBuffer sb = new StringBuffer();
 		String line;
+		int lineCount = 0;
 		while((line = br.readLine()) != null)
 		{
+			if (lineCount > 100)
+			{
+				break;
+			}
 			sb.append(line);
+			lineCount++;
 		}
-		return sb.toString();
-	}
 
-	public boolean looksLikeCoPDFormat(String fileString)
-	{
 		//TODO make this more robust or whatever
-		return fileString.contains("<ZPD_ZTR");
+		return sb.toString().contains("<ZPD_ZTR");
 	}
 
 	/**
@@ -104,8 +108,102 @@ public class CoPDPreProcessorService
 			message = formatWolfFollowupSegments(message);
 		}
 
+		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{
+			message = fixTimestamps(message);
+			message = fixTimestampsAttachments(message);
+		}
+
 		return message;
 	}
+
+	/**
+	 * iterate over each tag with name=tagName found in the message. Allowing modification
+	 * to its content
+	 * @param message message to process
+	 * @param tagName the tag on which the callback is triggered
+	 * @param callback the callback to call for all instances of the tag (tag content in -> , -> modified content out).
+	 * @return a modified message.
+	 */
+	private String foreachTag(String message, String tagName, Function<String, String> callback)
+	{
+		Pattern tagPattern = Pattern.compile("<" + tagName + ">(.*?)<\\/" + tagName + ">");
+		Matcher tagMatcher = tagPattern.matcher(message);
+
+		StringBuffer sb = new StringBuffer(message.length());
+		while (tagMatcher.find())
+		{
+			String newContent = callback.apply(tagMatcher.group(1));
+			tagMatcher.appendReplacement(sb, "<" + tagName + ">" + newContent + "</" + tagName + ">");
+		}
+		tagMatcher.appendTail(sb);
+		return sb.toString();
+	}
+
+	/**
+	 * Fix timestamp strings. Mediplan outputs unknown timestamps like, 00000 or 00000000 this causes parsing exceptions.
+	 * This function switches <TS.1>00000[0000]</TS.1> to, <TS.1>00010101</TS.1>
+	 * @param message the message to process
+	 * @return fixed message
+	 */
+	private String fixTimestamps(String message)
+	{
+		Function<String, String> callback = new Function<String,String>() {
+
+			private final Pattern timeStampPattern = Pattern.compile("(\\d{8})(\\d{2})(\\d{4})$");
+
+			@Override
+			public String apply(String timeStamp)
+			{
+				Matcher timeStampMatcher = timeStampPattern.matcher(timeStamp);
+				if ("00000".equals(timeStamp) || "00000000".equals(timeStamp) || "00000000000".equals(timeStamp))
+				{
+					return HL7_TIMESTAMP_BEGINNING_OF_TIME;
+				}
+				else if (timeStampMatcher.find())
+				{// look for timestamps with bad hour.
+					try
+					{
+						Integer hours = Integer.parseInt(timeStampMatcher.group(2));
+						if (hours > 23)
+						{// sub in fake hour
+							return timeStampMatcher.group(1) + "12" + timeStampMatcher.group(3);
+						}
+					}
+					catch (NumberFormatException e)
+					{
+						//nop
+					}
+				}
+				return timeStamp;
+			}
+		};
+
+		return foreachTag(message, "TS.1", callback);
+	}
+
+	/**
+	 * fix timestamps in ZAT segments (attachments)
+	 * @param message the message to fix
+	 * @return the fixed message
+	 */
+	public String fixTimestampsAttachments(String message)
+	{
+		Function<String, String> callback = new Function<String,String>() {
+			@Override
+			public String apply(String timeStamp)
+			{
+				if (timeStamp.contains("00000"))
+				{
+					return HL7_TIMESTAMP_BEGINNING_OF_TIME;
+				}
+				return timeStamp;
+			}
+		};
+
+		return foreachTag(message, "ZAT.2", callback);
+	}
+
 
 	/**
 	 * CoPD requires hl7V2.4, but often the value is not correctly set. this enforces the version

@@ -30,13 +30,13 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.demographicImport.service.CoPDMessageStream;
 import org.oscarehr.demographicImport.service.CoPDPreProcessorService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import oscar.OscarProperties;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 public class CopdCommandLineImporter
 {
@@ -55,7 +55,6 @@ public class CopdCommandLineImporter
 	 */
 	public static void main (String [] args)
 	{
-
 		if(args == null || args.length != 6)
 		{
 			BasicConfigurator.configure();
@@ -99,6 +98,10 @@ public class CopdCommandLineImporter
 		{
 			importSource = CoPDImportService.IMPORT_SOURCE.WOLF;
 		}
+		else if (importSourceStr.equalsIgnoreCase("MEDIPLAN"))
+		{
+			importSource = CoPDImportService.IMPORT_SOURCE.MEDIPLAN;
+		}
 
 		// flag to allow importing demographics with missing document files by skipping those records.
 		boolean skipMissingDocs= Boolean.parseBoolean(args[5]);
@@ -110,15 +113,7 @@ public class CopdCommandLineImporter
 
 		try
 		{
-			// load properties from file
-			OscarProperties properties = OscarProperties.getInstance();
-			// This has been used to look in the users home directory that started tomcat
-			properties.readFromFile(propertiesFileName);
-			logger.info("loading properties from " + propertiesFileName);
-
-			ctx = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
-			// initialize spring bean factory for old style access
-			SpringUtils.beanFactory = ctx.getBeanFactory();
+			ctx = loadSpring(propertiesFileName);
 
 			coPDImportService = ctx.getBean(CoPDImportService.class);
 			coPDPreProcessorService = ctx.getBean(CoPDPreProcessorService.class);
@@ -142,14 +137,13 @@ public class CopdCommandLineImporter
 				GenericFile copdFile = FileFactory.getExistingFile(file);
 				if(copdFile instanceof XMLFile)
 				{
-					String fileString = coPDPreProcessorService.getFileString(copdFile);
-					if(coPDPreProcessorService.looksLikeCoPDFormat(fileString))
+					if(coPDPreProcessorService.looksLikeCoPDFormat(copdFile))
 					{
 						logger.info("Import from file: " + copdFile.getName());
 
 						try
 						{
-							importFileString(fileString, copdDocumentLocation, importSource, skipMissingDocs);
+							importFileMessages(new CoPDMessageStream(copdFile), copdDocumentLocation, importSource, skipMissingDocs);
 							importCount++;
 							moveToCompleted(copdFile, copdDirectory);
 						}
@@ -187,14 +181,51 @@ public class CopdCommandLineImporter
 		logger.info("IMPORT PROCESS COMPLETE (" + importCount + " files imported. " + failureCount + " failures)");
 	}
 
-	private static void importFileString(String fileString, String documentDirectory, CoPDImportService.IMPORT_SOURCE importSource, boolean skipMissingDocs)
+	/**
+	 * load spring beans.
+	 * @param propertiesFileName the name of the oscar properties file to use during loading
+	 * @return
+	 * @throws IOException
+	 */
+	public static ClassPathXmlApplicationContext loadSpring(String propertiesFileName) throws IOException{
+		// load properties from file
+		OscarProperties properties = OscarProperties.getInstance();
+		// This has been used to look in the users home directory that started tomcat
+		properties.readFromFile(propertiesFileName);
+		logger.info("loading properties from " + propertiesFileName);
+
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
+		context.setConfigLocations(new String[]{"/applicationContext.xml","/applicationContextBORN.xml"});
+		context.refresh();
+		SpringUtils.beanFactory = context;
+
+		return context;
+	}
+
+
+	private static void importFileMessages(CoPDMessageStream messageStream, String documentDirectory, CoPDImportService.IMPORT_SOURCE importSource, boolean skipMissingDocs)
 			throws HL7Exception, IOException, InterruptedException
 	{
-		List<String> messageList = coPDPreProcessorService.separateMessages(fileString);
-		for(String message : messageList)
+		boolean hasFailure = false;
+		int failureCount = 0;
+		String message;
+		while (!(message = messageStream.getNextMessage()).isEmpty())
 		{
-			message = coPDPreProcessorService.preProcessMessage(message, importSource);
-			coPDImportService.importFromHl7Message(message, documentDirectory, importSource, skipMissingDocs);
+			try
+			{
+				message = coPDPreProcessorService.preProcessMessage(message, importSource);
+				coPDImportService.importFromHl7Message(message, documentDirectory, importSource, skipMissingDocs);
+			}
+			catch (Exception e)
+			{
+				logger.error("failed to import message: \n " + message + "\n With error:", e);
+				hasFailure = true;
+			}
+		}
+
+		if (hasFailure)
+		{
+			throw new RuntimeException("[" + failureCount + "] messages failed to import");
 		}
 	}
 
