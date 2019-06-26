@@ -34,6 +34,7 @@ import ca.uhn.hl7v2.model.v23.segment.OBX;
 import ca.uhn.hl7v2.model.v23.segment.ORC;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
+import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
@@ -168,6 +169,7 @@ public class CLSHandler extends AHSHandler
     public String preUpload(String hl7Message) throws HL7Exception
     {
 	    Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
+		Hl7TextMessageDao hl7TextMessageDao = (Hl7TextMessageDao) SpringUtils.getBean("hl7TextMessageDao");
 
 	    String accessionNumber = this.getAccessionNum();
 	    String fillerOrderNumber = this.getFillerOrderNumber();
@@ -184,8 +186,12 @@ public class CLSHandler extends AHSHandler
 	    }
 
 	    if(hl7TextInfo != null) {
-		    String lastVersionLab = oscar.oscarLab.ca.all.parsers.Factory.getHL7Body(Integer.toString(hl7TextInfo.getLabNumber()));
-		    hl7Message = mergeLabs(lastVersionLab, hl7Message);
+	    	String labType = hl7TextMessageDao.getHl7TextMessageType(hl7TextInfo.getLabNumber());
+	    	if (labType.equals(getMsgType()))
+			{// merge only if lab is of same type.
+				String lastVersionLab = oscar.oscarLab.ca.all.parsers.Factory.getHL7Body(Integer.toString(hl7TextInfo.getLabNumber()));
+				hl7Message = mergeLabs(lastVersionLab, hl7Message);
+			}
 	    }
 	    return hl7Message;
     }
