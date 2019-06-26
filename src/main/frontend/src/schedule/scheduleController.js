@@ -985,9 +985,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					statusElem.attr("title", Juno.Common.Util.escapeHtml(eventStatus.name));
 
-					if (Juno.Common.Util.exists(eventStatus.icon)
-						&& Juno.Common.Util.exists(event)
-						&& Juno.Common.Util.exists(event.data))
+					if (Juno.Common.Util.exists(eventStatus.icon))
 					{
 						// class matches the icon name without the extension
 						statusElem.addClass("icon-status-" + eventStatus.icon.substr(0, eventStatus.icon.indexOf('.')));
@@ -1029,6 +1027,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					eventReason = Juno.Common.Util.escapeHtml(event.data.reason);
 				}
+				if(!Juno.Common.Util.isBlank(event.data.notes))
+				{
+					eventNotes = Juno.Common.Util.escapeHtml(event.data.notes);
+				}
 
 				detailElem.text(eventName + " (" + eventReason + ")");
 
@@ -1042,6 +1044,21 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					var linkElements = eventElement.find('.event-encounter, .event-invoice, .event-demographic, .event-rx');
 					linkElements.hide();
+				}
+
+				var maxNameLengthProp = controller.providerSettings.appointmentScreenLinkNameDisplayLength;
+				if(Juno.Common.Util.exists(maxNameLengthProp)
+					&& Juno.Common.Util.isIntegerString(maxNameLengthProp)
+					&& Number(maxNameLengthProp) > 0)
+				{
+					detailElem.css(
+						{
+							'max-width': maxNameLengthProp + 'ch',
+							'text-overflow': 'clip',
+							'white-space': 'nowrap',
+							'overflow': 'hidden',
+						}
+					);
 				}
 			}
 			else //background events (appointment slots)
