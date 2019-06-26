@@ -30,7 +30,7 @@
 
 		.content-controller {
 			@extend %juno-content-control;
-			height: $page-header-height;
+			height: $page-subheader-height;
 			border-right: $grey-07 8px solid;
 			.form-control {
 				background-color: $white;
@@ -61,17 +61,16 @@
 			}
 		}
 		.content-display {
+			@extend %juno-primary-view-pane-tabs-subheader;
 			border-right: $grey-07 8px solid;
 
 			.list-group {
 				.list-group-item {
 					padding: 0;
-
 					border-top: 0;
 					border-left: 0;
 					border-right: 0;
 					border-bottom: 2px solid $grey-08;
-					//border-color: black;
 
 					.list-group-clickable {
 						padding: 10px 15px;

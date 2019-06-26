@@ -959,6 +959,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.onEventRender = function onEventRender(event, element, view)
 		{
+			// appointment event type
 			if(event.rendering !== 'background')
 			{
 				let eventElement = element.find('.fc-content');
@@ -977,10 +978,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 
 				// var eventStatusHtml = '';
+
+				/* set up status icon + color/hover etc. */
 				let eventStatus = scheduleService.eventStatuses[event.data.eventStatusCode];
-
-
-
 				if(Juno.Common.Util.exists(eventStatus))
 				{
 					statusElem.attr("title", Juno.Common.Util.escapeHtml(eventStatus.name));
@@ -1006,45 +1006,45 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					statusElem.attr("title", "Unknown").text("?");
 				}
-				let eventDetails = "";
+
+				/* set up event display text (name, reason, notes, etc.)*/
+				let eventName = "";
+				let eventReason = "";
+				let eventNotes = "";
+
 				if(event.data.doNotBook)
 				{
-					eventDetails = "Do Not Book";
-					if(!Juno.Common.Util.isBlank(event.data.reason))
-					{
-						eventDetails += " (" + Juno.Common.Util.escapeHtml(event.data.reason) + ")"
-					}
+					eventName = "Do Not Book";
 				}
 				else if(!Juno.Common.Util.isBlank(event.data.demographicName))
 				{
-					eventDetails = Juno.Common.Util.escapeHtml(event.data.demographicName);
-					if(!Juno.Common.Util.isBlank(event.data.reason))
-					{
-						eventDetails += " (" + Juno.Common.Util.escapeHtml(event.data.reason) + ")"
-					}
+					eventName = Juno.Common.Util.escapeHtml(event.data.demographicName);
 				}
 				else if(!Juno.Common.Util.isBlank(event.data.appointmentName))
 				{
-					eventDetails = Juno.Common.Util.escapeHtml(event.data.appointmentName);
-					if(!Juno.Common.Util.isBlank(event.data.reason))
-					{
-						eventDetails += " (" + Juno.Common.Util.escapeHtml(event.data.reason) + ")"
-					}
+					eventName = Juno.Common.Util.escapeHtml(event.data.appointmentName);
 				}
-				else if(!Juno.Common.Util.isBlank(event.data.reason))
-				{
-					eventDetails = Juno.Common.Util.escapeHtml(event.data.reason);
-				}
-				detailElem.text(eventDetails);
 
+				if(!Juno.Common.Util.isBlank(event.data.reason))
+				{
+					eventReason = Juno.Common.Util.escapeHtml(event.data.reason);
+				}
+
+				detailElem.text(eventName + " (" + eventReason + ")");
+
+				let eventTitle = eventName + "\n" +
+					"Reason: " + eventReason + "\n" +
+					"Notes: " + eventNotes;
+				eventElement.attr("title", eventTitle);
+
+				//disable demographic specific links if there is no attached demographic;
 				if(!controller.hasPatientSelected(event))
 				{
-					//disable demographic specific links if there is no attached demographic;
 					var linkElements = eventElement.find('.event-encounter, .event-invoice, .event-demographic, .event-rx');
 					linkElements.hide();
 				}
 			}
-			else
+			else //background events (appointment slots)
 			{
 				element.html(require('./view-backgroundEvent.html'));
 				if(Juno.Common.Util.exists(event.color))

@@ -138,6 +138,7 @@ public class ScheduleTemplateService
 				durationMin,
 				"No Schedule",
 				null,
+				null,
 				"N",
 				10);
 
@@ -151,7 +152,7 @@ public class ScheduleTemplateService
 		LocalDateTime endDateTime = startDateTime.plus(Duration.ofMinutes(scheduleSlotLength));
 
 		AvailabilityType availabilityType = new AvailabilityType(
-			slot.getColor(),
+			slot.getJunoColor(),
 			slot.getDescription(),
 			slot.getDurationMinutes(),
 			slot.getCode()
@@ -160,7 +161,7 @@ public class ScheduleTemplateService
 		return new CalendarEvent(
 				startDateTime,
 				endDateTime,
-				slot.getColor(),
+				slot.getJunoColor(),
 				CalendarEvent.RENDERING_BACKGROUND,
 				SCHEDULE_TEMPLATE_CLASSNAME,
 				resourceId,

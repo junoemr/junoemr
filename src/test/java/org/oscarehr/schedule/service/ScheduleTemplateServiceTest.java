@@ -102,6 +102,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description",
 						"color",
+						"juno-color",
 						"confirm",
 						1
 				));
@@ -111,11 +112,11 @@ public class ScheduleTemplateServiceTest
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
-		AvailabilityType availabilityType = new AvailabilityType("color", "description", 15, "code");
+		AvailabilityType availabilityType = new AvailabilityType("juno-color", "description", 15, "code");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 0),
 				LocalDateTime.of(2018, 1, 1, 8, 15),
-				"color", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code", availabilityType, null));
+				"juno-color", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code", availabilityType, null));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 15), defaultSlotLengthMin, providerId));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 30), defaultSlotLengthMin, providerId));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 45), defaultSlotLengthMin, providerId));
@@ -143,6 +144,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description",
 						"color",
+						"juno-color",
 						"confirm",
 						1
 				));
@@ -155,6 +157,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description2",
 						"color2",
+						"juno-color2",
 						"confirm2",
 						1
 				));
@@ -164,16 +167,16 @@ public class ScheduleTemplateServiceTest
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
-		AvailabilityType availabilityType1 = new AvailabilityType("color", "description", 15, "code");
+		AvailabilityType availabilityType1 = new AvailabilityType("juno-color", "description", 15, "code");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 0),
 				LocalDateTime.of(2018, 1, 1, 8, 15),
-				"color", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code", availabilityType1, null));
-		AvailabilityType availabilityType2 = new AvailabilityType("color2", "description2", 15, "code2");
+				"juno-color", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code", availabilityType1, null));
+		AvailabilityType availabilityType2 = new AvailabilityType("juno-color2", "description2", 15, "code2");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 15),
 				LocalDateTime.of(2018, 1, 1, 8, 30),
-				"color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
+				"juno-color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 30), scheduleSlotLength, providerId));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 45), scheduleSlotLength, providerId));
 
@@ -200,6 +203,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description",
 						"color",
+						"juno-color",
 						"confirm",
 						1
 				));
@@ -212,6 +216,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description2",
 						"color2",
+						"juno-color2",
 						"confirm2",
 						1
 				));
@@ -224,6 +229,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description3",
 						"color3",
+						"juno-color3",
 						"confirm3",
 						1
 				));
@@ -233,21 +239,21 @@ public class ScheduleTemplateServiceTest
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
-		AvailabilityType availabilityType1 = new AvailabilityType("color", "description", 15, "code");
+		AvailabilityType availabilityType1 = new AvailabilityType("juno-color", "description", 15, "code");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 0),
 				LocalDateTime.of(2018, 1, 1, 8, 15),
-				"color", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code", availabilityType1, null));
-		AvailabilityType availabilityType2 = new AvailabilityType("color2", "description2", 15, "code2");
+				"juno-color", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code", availabilityType1, null));
+		AvailabilityType availabilityType2 = new AvailabilityType("juno-color2", "description2", 15, "code2");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 15),
 				LocalDateTime.of(2018, 1, 1, 8, 30),
-				"color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
-		AvailabilityType availabilityType3 = new AvailabilityType("color3", "description3", 15, "code3");
+				"juno-color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
+		AvailabilityType availabilityType3 = new AvailabilityType("juno-color3", "description3", 15, "code3");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 30),
 				LocalDateTime.of(2018, 1, 1, 8, 45),
-				"color3", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code3", availabilityType3, null));
+				"juno-color3", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code3", availabilityType3, null));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 45), scheduleSlotLength, providerId));
 
 		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, scheduleSlotLength);
@@ -273,6 +279,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description",
 						"color",
+						"juno-color",
 						"confirm",
 						1
 				));
@@ -285,6 +292,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description2",
 						"color2",
+						"juno-color2",
 						"confirm2",
 						1
 				));
@@ -297,6 +305,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description3",
 						"color3",
+						"juno-color3",
 						"confirm3",
 						1
 				));
@@ -309,6 +318,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description4",
 						"color4",
+						"juno-color4",
 						"confirm4",
 						1
 				));
@@ -319,16 +329,16 @@ public class ScheduleTemplateServiceTest
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 0), scheduleSlotLength, providerId));
-		AvailabilityType availabilityType2 = new AvailabilityType("color2", "description2", 15, "code2");
+		AvailabilityType availabilityType2 = new AvailabilityType("juno-color2", "description2", 15, "code2");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 15),
 				LocalDateTime.of(2018, 1, 1, 8, 30),
-				"color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
-		AvailabilityType availabilityType3 = new AvailabilityType("color3", "description3", 15, "code3");
+				"juno-color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
+		AvailabilityType availabilityType3 = new AvailabilityType("juno-color3", "description3", 15, "code3");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 30),
 				LocalDateTime.of(2018, 1, 1, 8, 45),
-				"color3", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code3", availabilityType3, null));
+				"juno-color3", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code3", availabilityType3, null));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 45), scheduleSlotLength, providerId));
 
 		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, scheduleSlotLength);
@@ -354,6 +364,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description",
 						"color",
+						"juno-color",
 						"confirm",
 						1
 				));
@@ -366,6 +377,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description2",
 						"color2",
+						"juno-color2",
 						"confirm2",
 						1
 				));
@@ -376,17 +388,17 @@ public class ScheduleTemplateServiceTest
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 0), scheduleSlotLength, providerId));
-		AvailabilityType availabilityType1 = new AvailabilityType("color", "description", 15, "code");
+		AvailabilityType availabilityType1 = new AvailabilityType("juno-color", "description", 15, "code");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 15),
 				LocalDateTime.of(2018, 1, 1, 8, 30),
-				"color", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code", availabilityType1, null));
+				"juno-color", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code", availabilityType1, null));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 30), scheduleSlotLength, providerId));
-		AvailabilityType availabilityType2 = new AvailabilityType("color2", "description2", 15, "code2");
+		AvailabilityType availabilityType2 = new AvailabilityType("juno-color2", "description2", 15, "code2");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 45),
 				LocalDateTime.of(2018, 1, 1, 9, 0),
-				"color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
+				"juno-color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
 
 		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, scheduleSlotLength);
 
@@ -411,6 +423,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description",
 						"color",
+						"juno-color",
 						"confirm",
 						1
 				));
@@ -423,6 +436,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description2",
 						"color2",
+						"juno-color2",
 						"confirm2",
 						1
 				));
@@ -435,6 +449,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description3",
 						"color3",
+						"juno-color3",
 						"confirm3",
 						1
 				));
@@ -447,6 +462,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description4",
 						"color4",
+						"juno-color4",
 						"confirm4",
 						1
 				));
@@ -458,6 +474,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description5",
 						"color5",
+						"juno-color5",
 						"confirm5",
 						1
 				));
@@ -468,17 +485,17 @@ public class ScheduleTemplateServiceTest
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 0), scheduleSlotLength, providerId));
-		AvailabilityType availabilityType2 = new AvailabilityType("color2", "description2", 15, "code2");
+		AvailabilityType availabilityType2 = new AvailabilityType("juno-color2", "description2", 15, "code2");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 15),
 				LocalDateTime.of(2018, 1, 1, 8, 30),
-				"color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
+				"juno-color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 30), scheduleSlotLength, providerId));
-		AvailabilityType availabilityType4 = new AvailabilityType("color4", "description4", 15, "code4");
+		AvailabilityType availabilityType4 = new AvailabilityType("juno-color4", "description4", 15, "code4");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 45),
 				LocalDateTime.of(2018, 1, 1, 9, 0),
-				"color4", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code4", availabilityType4, null));
+				"juno-color4", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code4", availabilityType4, null));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 9, 0), scheduleSlotLength, providerId));
 
 		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, scheduleSlotLength);
@@ -504,6 +521,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description",
 						"color",
+						"juno-color",
 						"confirm",
 						1
 				));
@@ -516,6 +534,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description2",
 						"color2",
+						"juno-color2",
 						"confirm2",
 						1
 				));
@@ -528,6 +547,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description3",
 						"color3",
+						"juno-color3",
 						"confirm3",
 						1
 				));
@@ -540,6 +560,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description4",
 						"color4",
+						"juno-color4",
 						"confirm4",
 						1
 				));
@@ -551,6 +572,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description5",
 						"color5",
+						"juno-color5",
 						"confirm5",
 						1
 				));
@@ -561,21 +583,21 @@ public class ScheduleTemplateServiceTest
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 0), scheduleSlotLength, providerId));
-		AvailabilityType availabilityType2 = new AvailabilityType("color2", "description2", 15, "code2");
+		AvailabilityType availabilityType2 = new AvailabilityType("juno-color2", "description2", 15, "code2");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 15),
 				LocalDateTime.of(2018, 1, 1, 8, 30),
-				"color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
-		AvailabilityType availabilityType3 = new AvailabilityType("color3", "description3", 15, "code3");
+				"juno-color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
+		AvailabilityType availabilityType3 = new AvailabilityType("juno-color3", "description3", 15, "code3");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 30),
 				LocalDateTime.of(2018, 1, 1, 8, 45),
-				"color3", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code3", availabilityType3, null));
-		AvailabilityType availabilityType4 = new AvailabilityType("color4", "description4", 15, "code4");
+				"juno-color3", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code3", availabilityType3, null));
+		AvailabilityType availabilityType4 = new AvailabilityType("juno-color4", "description4", 15, "code4");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 45),
 				LocalDateTime.of(2018, 1, 1, 9, 0),
-				"color4", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code4", availabilityType4, null));
+				"juno-color4", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code4", availabilityType4, null));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 9, 0), scheduleSlotLength, providerId));
 
 		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, scheduleSlotLength);
@@ -601,6 +623,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description",
 						"color",
+						"juno-color",
 						"confirm",
 						1
 				));
@@ -613,6 +636,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description1",
 						"color1",
+						"juno-color1",
 						"confirm1",
 						1
 				));
@@ -625,6 +649,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description1",
 						"color1",
+						"juno-color1",
 						"confirm1",
 						1
 				));
@@ -637,6 +662,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description2",
 						"color2",
+						"juno-color2",
 						"confirm2",
 						1
 				));
@@ -648,6 +674,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description2",
 						"color2",
+						"juno-color2",
 						"confirm2",
 						1
 				));
@@ -659,6 +686,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description3",
 						"color3",
+						"juno-color3",
 						"confirm3",
 						1
 				));
@@ -670,6 +698,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description3",
 						"color3",
+						"juno-color3",
 						"confirm3",
 						1
 				));
@@ -681,6 +710,7 @@ public class ScheduleTemplateServiceTest
 						15,
 						"description",
 						"color",
+						"juno-color",
 						"confirm",
 						1
 				));
@@ -691,33 +721,33 @@ public class ScheduleTemplateServiceTest
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 0), scheduleSlotLength, providerId));
-		AvailabilityType availabilityType1 = new AvailabilityType("color1", "description1", 15, "code1");
+		AvailabilityType availabilityType1 = new AvailabilityType("juno-color1", "description1", 15, "code1");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 15),
 				LocalDateTime.of(2018, 1, 1, 8, 30),
-				"color1", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code1", availabilityType1, null));
+				"juno-color1", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code1", availabilityType1, null));
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 30),
 				LocalDateTime.of(2018, 1, 1, 8, 45),
-				"color1", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code1", availabilityType1, null));
-		AvailabilityType availabilityType2 = new AvailabilityType("color2", "description2", 15, "code2");
+				"juno-color1", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code1", availabilityType1, null));
+		AvailabilityType availabilityType2 = new AvailabilityType("juno-color2", "description2", 15, "code2");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 8, 45),
 				LocalDateTime.of(2018, 1, 1, 9, 0),
-				"color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
+				"juno-color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 9, 0),
 				LocalDateTime.of(2018, 1, 1, 9, 15),
-				"color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
-		AvailabilityType availabilityType3 = new AvailabilityType("color3", "description3", 15, "code3");
+				"juno-color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
+		AvailabilityType availabilityType3 = new AvailabilityType("juno-color3", "description3", 15, "code3");
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 9, 15),
 				LocalDateTime.of(2018, 1, 1, 9, 30),
-				"color3", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code3", availabilityType3, null));
+				"juno-color3", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code3", availabilityType3, null));
 		expectedResult.add(new CalendarEvent(
 				LocalDateTime.of(2018, 1, 1, 9, 30),
 				LocalDateTime.of(2018, 1, 1, 9, 45),
-				"color3", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code3", availabilityType3, null));
+				"juno-color3", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code3", availabilityType3, null));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 9, 45), scheduleSlotLength, providerId));
 
 		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, scheduleSlotLength);
@@ -733,13 +763,14 @@ public class ScheduleTemplateServiceTest
 				durationMin,
 				"No Schedule",
 				null,
+				null,
 				"N",
 				10);
 
 		LocalDateTime endDateTime = startDateTime.plus(Duration.ofMinutes(durationMin));
 
 		AvailabilityType availabilityType = new AvailabilityType(
-				slot.getColor(),
+				slot.getJunoColor(),
 				slot.getDescription(),
 				slot.getDurationMinutes(),
 				slot.getCode()
@@ -748,7 +779,7 @@ public class ScheduleTemplateServiceTest
 		return new CalendarEvent(
 				startDateTime,
 				endDateTime,
-				slot.getColor(),
+				slot.getJunoColor(),
 				CalendarEvent.RENDERING_BACKGROUND,
 				null,
 				resourceId,

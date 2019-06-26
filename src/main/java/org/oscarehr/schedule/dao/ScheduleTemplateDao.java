@@ -183,7 +183,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		}
 		return result;
 	}
-	public List<Object[]> getRawScheduleSlots(Integer providerNo, LocalDate date)
+	private List<Object[]> getRawScheduleSlots(Integer providerNo, LocalDate date)
 	{
 		// This query is a bit hard to read.  The mess with all of the UNION ALLs is a way to make a
 		// sequence of numbers.  This is then used to find the position in the scheduletemplate.timecode
@@ -198,6 +198,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"  stc.code,\n" +
 				"  CAST(COALESCE(stc.duration, ((24*60)/LENGTH(st.timecode))) AS integer) AS duration,\n" +
 				"  stc.description,\n" +
+				"  stc.color,\n" +
 				"  stc.juno_color,\n" +
 				"  stc.confirm,\n" +
 				"  stc.bookinglimit\n" +
@@ -239,8 +240,9 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 			Integer durationMinutes = ((BigInteger) result[5]).intValue();
 			String description = (String) result[6];
 			String color = (String) result[7];
-			String confirm = (String) result[8];
-			Integer bookingLimit = (Integer) result[9];
+			String junoColor = (String) result[8];
+			String confirm = (String) result[9];
+			Integer bookingLimit = (Integer) result[10];
 
 			LocalDate slotDate = appointmentDate.toLocalDate();
 			LocalTime slotTime = appointmentTime.toLocalTime();
@@ -266,7 +268,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 			}
 
 			slots.put(range, new ScheduleSlot(appointmentDateTime, code, durationMinutes, description,
-					color, confirm, bookingLimit));
+					color, junoColor, confirm, bookingLimit));
 		}
 
 		return slots;
