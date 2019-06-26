@@ -102,7 +102,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.selectedTimeInterval = $scope.defaultTimeInterval;
 		$scope.selectedSlotLabelInterval = {hours: 1};
 		$scope.defaultAutoRefreshMinutes = 3;
-		$scope.defaultCalendarView = 'agendaWeek';
+		$scope.defaultCalendarView = 'agendaDay';
 		$scope.availabilityTypes = {};
 		$scope.resourceOptionHash = {};
 		$scope.events = [];
@@ -433,8 +433,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				else
 				{
 					// Reset everything to single-provider view mode
-					$scope.uiConfig.calendar.defaultView = "agendaWeek";
-					$scope.scheduleViewName = 'agendaWeek';
+					$scope.uiConfig.calendar.defaultView = "agendaDay";
+					$scope.scheduleViewName = 'agendaDay';
 					$scope.uiConfig.calendar.resources = false;
 				}
 
@@ -1122,7 +1122,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.onEventClick = function onEventClick(calEvent, jsEvent, view)
 		{
-			if($(jsEvent.target).is(".event-status.rotate:not(.disabled)"))
+			if($(jsEvent.target).is(".onclick-event-status:not(.disabled)"))
 			{
 				$scope.rotateEventStatus(calEvent);
 			}
@@ -1708,6 +1708,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				snapDuration: '00:05:00',
 				slotLabelInterval: $scope.selectedSlotLabelInterval,
 				slotLabelFormat: 'h:mma',
+				slotEventOverlap: false,
 
 				loading: $scope.setCalendarLoading,
 

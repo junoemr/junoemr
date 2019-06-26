@@ -57,50 +57,72 @@
 		}
 
 		$scheduleCodeWidth: 16px;
-		/* styling for normal events */
-		.fc-event {
-			cursor: pointer;
+		.fc-event-container {
 			margin-left: $scheduleCodeWidth;
 
-			// remove white opacity filter on events
-			.fc-bg {
-				background: transparent;
-				opacity: 1;
-			}
+			/* styling for normal events */
+			.fc-event {
+				cursor: pointer;
+				border: 1px solid $white !important;
+				border-radius: 8px;
 
-			.schedule-event {
-				display: flex;
-				padding: 0;
-				margin: 0;
-				font-size: 12px;
-				font-weight: normal;
-				color: $white;
-
-				$button-size: 24px;
-
-				.btn-event-link {
+				// remove white opacity filter on events
+				.fc-bg {
 					background: transparent;
-					border: 0;
-					width: $button-size;
-					height: $button-size;
-					font-weight: bold;
-					color: $white;
-					padding: 0;
+					opacity: 1;
 				}
-				.event-blk {
+				// resize/style the grabable resize bar on the bottom of events
+				.fc-resizer {
+					height: 3px;
+				}
+
+				.schedule-event {
 					display: flex;
-					align-items: center;
-					justify-content: flex-start;
-				}
-				.event-blk-label {
-					flex-grow: 1;
-				}
-				.btn-icon {
-					width: $button-size;
-					height: $button-size;
-					.icon {
+					padding: 0;
+					margin: 0;
+					font-size: 10px;
+					font-weight: normal;
+					color: $white;
+
+					$button-size: 16px;
+
+					.btn-event-link {
+						background: transparent;
+						border: 0;
+						width: $button-size;
+						min-width: $button-size;
+						height: $button-size;
+						font-weight: bold;
+						color: $white;
+						padding: 0;
+						&:hover {
+							background-color: rgba(0,0,0,0.2);
+							border-radius: 50%;
+						}
+					}
+					.event-blk {
+						display: flex;
+						align-items: center;
+						justify-content: flex-start;
+					}
+					.event-blk-label {
+						flex-grow: 1;
+						font-weight: bold;
+					}
+					.btn-icon {
 						width: $button-size;
 						height: $button-size;
+						.icon {
+							width: $button-size;
+							height: $button-size;
+						}
+						&:hover {
+							background-color: rgba(0,0,0,0.2);
+							border-radius: 50%;
+						}
+					}
+					.event-status {
+						margin-left: 8px;
 					}
 				}
 			}

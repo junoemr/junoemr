@@ -104,12 +104,12 @@
 			<div class="content-display flex-grow overflow-scroll">
 				<div class="list-group">
 					<a ng-repeat="patient in patientListCtrl.activePatientList | filter:query"
-					   ng-click="patientListCtrl.goToRecord(patient)"
 						class="list-group-item">
 
 						<div ng-if="patientListCtrl.isAppointmentPatientView()"
-								class="row">
-							<div class="col-md-6">
+								class="flex-row vertical-align">
+							<div class="col-md-6 list-group-clickable"
+								ng-click="patientListCtrl.goToRecord(patient)">
 								<h6>{{patient.name}}</h6>
 								<span>{{patient.startTime}} {{patient.reason}}</span>
 							</div>
@@ -117,7 +117,6 @@
 								<juno-appointment-status-select
 								ca-name="aside-appt-status-{{patient.appointmentNo}}"
 								ca-no-label="true"
-								<%--ca-input-size="col-md-12"--%>
 								ca-model="patient.status"
 								ca-options="patientListCtrl.eventStatusOptions"
 								ca-change="patientListCtrl.updateAppointmentStatus(patient)"
@@ -125,7 +124,9 @@
 								</juno-appointment-status-select>
 							</div>
 						</div>
-						<div ng-if="patientListCtrl.isRecentPatientView()">
+						<div ng-if="patientListCtrl.isRecentPatientView()"
+						     ng-click="patientListCtrl.goToRecord(patient)"
+						     class="list-group-clickable">
 							<h6>{{patient.name}}</h6>
 						</div>
 					</a>

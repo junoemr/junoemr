@@ -31,10 +31,10 @@
 		border-radius: 3px;
 	}
 
-	&.btn-default {
+	&.btn-default,&.btn-addon {
+		color: $primary;
 		background-color: $white;
 		border-color: $grey-06;
-		color: $primary;
 	}
 	&.btn-success {
 		color: $white;
