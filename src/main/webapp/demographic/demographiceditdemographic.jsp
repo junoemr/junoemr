@@ -1915,18 +1915,18 @@ if ( Dead.equals(PatStat) ) {%>
 							</li>
 							<li>
 								<span class="label">
-									Name of Mother:
+									<bean:message key="demographic.demographiceditdemographic.nameOfMother"/>:
 								</span>
 								<span class="info">
-									<%=demographic.getNameOfMother() != null ? demographic.getNameOfMother() : "Unknown"%>
+									<%=demographic.getNameOfMother() != null ? demographic.getNameOfMother() : ""%>
 								</span>
 							</li>
 							<li>
 								<span class="label">
-									Name of Father:
+									<bean:message key="demographic.demographiceditdemographic.nameOfFather"/>:
 								</span>
 								<span class="info">
-									<%=demographic.getNameOfFather() != null ? demographic.getNameOfFather() : "Unknown"%>
+									<%=demographic.getNameOfFather() != null ? demographic.getNameOfFather() : ""%>
 								</span>
 							</li>
 
