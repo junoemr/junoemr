@@ -145,6 +145,8 @@
 	demographic.setRosterTerminationReason(request.getParameter("roster_termination_reason"));
 	demographic.setLastUpdateUser(currentUserNoStr);
 	demographic.setLastUpdateDate(new java.util.Date());
+	demographic.setNameOfMother(request.getParameter("nameOfMother"));
+	demographic.setNameOfFather(request.getParameter("nameOfFather"));
 
 	if(oscarVariables.isPropertyActive("demographic_veteran_no"))
 	{
