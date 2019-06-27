@@ -57,7 +57,7 @@ public class CoPDMessageStreamTest
 	{
 		return Arrays.asList(new Object[][]
 				{
-						{"<ZPD_ZTR.MESSAGE></ZPD_ZTR.MESSAGE>", 1, new Object[] {"<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\"></ZPD_ZTR>"}},
+						{"<ZPD_ZTR.MESSAGE></ZPD_ZTR.MESSAGE>", 1, new Object[] {"<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\"/>"}},
 						{"<ZPD_ZTR.MESSAGE><SCH><TS.1>1970</TS.1></SCH></ZPD_ZTR.MESSAGE>", 1, new Object[] {"<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\"><SCH><TS.1>1970</TS.1></SCH></ZPD_ZTR>"}},
 						{
 							"<ZPD_ZTR.MESSAGE><SCH><TS.1>1970</TS.1></SCH></ZPD_ZTR.MESSAGE>" +
@@ -73,13 +73,32 @@ public class CoPDMessageStreamTest
 						{
 								"<ZPD_ZTR.MESSAGE></ZPD_ZTR.MESSAGE><ZPD_ZTR.MESSAGE></ZPD_ZTR.MESSAGE>",
 								2,
-								new Object[] {"<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\"></ZPD_ZTR>", "<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\"></ZPD_ZTR>"}
+								new Object[] {"<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\"/>", "<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\"/>"}
 						},
 						{
 								"<CRAP><ZPD_ZTR.MESSAGE></ZPD_ZTR.MESSAGE><ZPD_ZTR.MESSAGE></ZPD_ZTR.MESSAGE></CRAP>",
 								2,
-								new Object[] {"<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\"></ZPD_ZTR>", "<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\"></ZPD_ZTR>"}
-						}
+								new Object[] {"<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\"/>", "<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\"/>"}
+						},
+						{
+							"<v2:ZPD_ZTR.MESSAGE xmlns:v2=\"http://www.hl7.org/\"></v2:ZPD_ZTR.MESSAGE>",
+							1,
+							new Object[] {"<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\"/>"}
+						},
+						{
+							"<v2:ZPD_ZTR.MESSAGE xmlns:v2=\"http://www.hl7.org/\"><v2:ST xmlns:v2=\"http://www.hl7.org/\">namespaces are cool!</v2:ST></v2:ZPD_ZTR.MESSAGE>",
+							1,
+							new Object [] {"<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\"><ST>namespaces are cool!</ST></ZPD_ZTR>"}
+						},
+						{
+								"<v2:ZPD_ZTR.MESSAGE xmlns:v2=\"http://www.hl7.org/\"><v2:ST>namespaces are cool!</v2:ST></v2:ZPD_ZTR.MESSAGE>" +
+								"<v2:ZPD_ZTR.MESSAGE xmlns:v2=\"http://www.hl7.org/\"><v2:ST>Tow messages! my god!</v2:ST></v2:ZPD_ZTR.MESSAGE>",
+								2,
+								new Object [] {
+										"<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\"><ST>namespaces are cool!</ST></ZPD_ZTR>",
+										"<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\"><ST>Tow messages! my god!</ST></ZPD_ZTR>",
+								}
+						},
 				});
 	}
 

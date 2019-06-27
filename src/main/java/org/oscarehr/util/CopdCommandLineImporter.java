@@ -102,6 +102,10 @@ public class CopdCommandLineImporter
 		{
 			importSource = CoPDImportService.IMPORT_SOURCE.MEDIPLAN;
 		}
+		else if (importSourceStr.equalsIgnoreCase("MEDACCESS"))
+		{
+			importSource = CoPDImportService.IMPORT_SOURCE.MEDACCESS;
+		}
 
 		// flag to allow importing demographics with missing document files by skipping those records.
 		boolean skipMissingDocs= Boolean.parseBoolean(args[5]);
@@ -126,7 +130,7 @@ public class CopdCommandLineImporter
 			for(File file : fileList)
 			{
 				fileCounter++;
-				logger.info("Process file " + fileCounter + "/" + fileList.length);
+				logger.info("==== Process file " + fileCounter + "/" + fileList.length + " ====");
 
 				// skip sub directories
 				if(file.isDirectory())

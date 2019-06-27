@@ -22,6 +22,7 @@
  */
 package org.oscarehr.demographicImport.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.util.MiscUtils;
@@ -42,7 +43,7 @@ import java.util.regex.Pattern;
 @Service
 public class CoPDPreProcessorService
 {
-	private final String HL7_TIMESTAMP_BEGINNING_OF_TIME = "19700101";
+	public static final String HL7_TIMESTAMP_BEGINNING_OF_TIME = "19700101";
 	private static final Logger logger = MiscUtils.getLogger();
 
 	public boolean looksLikeCoPDFormat(GenericFile genericFile) throws IOException
@@ -66,7 +67,7 @@ public class CoPDPreProcessorService
 		}
 
 		//TODO make this more robust or whatever
-		return sb.toString().contains("<ZPD_ZTR");
+		return sb.toString().contains("<ZPD_ZTR") || sb.toString().contains("<v2:ZPD_ZTR");
 	}
 
 	/**
@@ -112,6 +113,20 @@ public class CoPDPreProcessorService
 		{
 			message = fixTimestamps(message);
 			message = fixTimestampsAttachments(message);
+		}
+
+		if (CoPDImportService.IMPORT_SOURCE.MEDACCESS.equals(importSource))
+		{
+			message = stripTagWhiteSpace(message);
+			message = fixDoubleBPMeasurements(message);
+			message = fixSlashBPMeasurements(message);
+			message = fixZATDateString(message);
+
+			// delete this
+			message = importKabongoSpecificHax(message);
+
+			// should come last
+			message = ensureNumeric(message);
 		}
 
 		return message;
@@ -204,6 +219,161 @@ public class CoPDPreProcessorService
 		return foreachTag(message, "ZAT.2", callback);
 	}
 
+	/**
+	 * strip out white space in tag values ie. <ZQO.5> 80</ZQO.5> => <ZQO.5>80</ZQO.5>. The Hl7 parser
+	 * sees ' 80' as invalid while '80' is valid.
+	 * @param message - the message to process
+	 * @return - the message with tag white space striped.
+	 */
+	private String stripTagWhiteSpace(String message)
+	{
+		Function<String, String> trimValueCallback = new Function<String, String>() {
+			@Override
+			public String apply(String tagValue)
+			{
+				return StringUtils.trimToEmpty(tagValue);
+			}
+		};
+
+		message = foreachTag(message, "ZQO.5", trimValueCallback);
+		message =  foreachTag(message, "ZQO.4", trimValueCallback);
+		return foreachTag(message, "ZQO.7", trimValueCallback);
+	}
+
+	/**
+	 * Insure that some numeric elements of the hl7 message are indeed numeric. If not replace with "0".
+	 * @param message - the message to operate on.
+	 * @return - the resulting message
+	 */
+	private String ensureNumeric(String message)
+	{
+		Function<String, String> ensureNumeric = new Function<String, String>() {
+			@Override
+			public String apply(String tagValue)
+			{
+				try
+				{
+					Integer.parseInt(tagValue);
+					return tagValue;
+				}
+				catch (NumberFormatException e)
+				{
+					logger.warn("Replacing invalid numeric value:" + tagValue + " with: \"0\"");
+					return "0";
+				}
+			}
+		};
+
+		message = foreachTag(message, "ZQO.4", ensureNumeric);
+		return foreachTag(message, "ZQO.5", ensureNumeric);
+	}
+
+	/**
+	 * Fix double blood pressure measurements in the ZQO.4 / ZQO.5 tags.
+	 * Some times blood pressure is recorded as "num num" but the COPD spec only allows "num".
+	 * To fix simply take the first number.
+	 * @param message - the message to fix
+	 * @return - the fixed message
+	 */
+	private String fixDoubleBPMeasurements(String message)
+	{
+		Function<String, String> deleteDoubleValue = new Function<String, String>() {
+			@Override
+			public String apply(String tagValue)
+			{
+				if (tagValue.contains(" "))
+				{
+					String [] nums = tagValue.split(" ");
+					return nums[0];
+				}
+				else
+				{
+					return tagValue;
+				}
+			}
+		};
+
+		message = foreachTag(message, "ZQO.4", deleteDoubleValue);
+		return foreachTag(message, "ZQO.5", deleteDoubleValue);
+	}
+
+	/**
+	 * fix BP measurements of the form "/<num>" convert to "<num>".
+	 * @param message - message to operate on
+	 * @return - the transformed message
+	 */
+	private String fixSlashBPMeasurements(String message)
+	{
+		Function<String, String> fixBPSlash = new Function<String, String>() {
+			@Override
+			public String apply(String tagValue)
+			{
+				if (StringUtils.trimToEmpty(tagValue).startsWith("/"))
+				{
+					return tagValue.substring(tagValue.indexOf("/") + 1);
+				}
+				else
+				{
+					return tagValue;
+				}
+			}
+		};
+
+		message = foreachTag(message, "ZQO.4", fixBPSlash);
+		return foreachTag(message, "ZQO.5", fixBPSlash);
+	}
+
+	/**
+	 * Some ZAT.2 date strings do not follow the spec and include a timestamp instead of a date. This causes parsing errors.
+	 * If there is a timestamp in ZAT.2 simply strip the timestamp information.
+	 * @param message
+	 * @return
+	 */
+	private String fixZATDateString(String message)
+	{
+		Function<String, String> fixZATDate = new Function<String, String>() {
+			@Override
+			public String apply(String tagValue)
+			{
+				if (tagValue.length() > 8)
+				{ // ZAT.2 length is 8 in CoPD spec (YYYYMMDD)
+					return tagValue.substring(0,8);
+				}
+				else
+				{
+					return tagValue;
+				}
+			}
+		};
+
+		return foreachTag(message, "ZAT.2", fixZATDate);
+	}
+
+	/**
+	 * kabongo import specific data hacks DELETE ME
+	 * @param message - the message to fix
+	 * @return - the fixed message
+	 */
+	private String importKabongoSpecificHax(String message)
+	{
+		// convert the string "41 inches" to "104.14" aka 41 inches in centimeters
+		Function<String, String> fix41Inch = new Function<String, String>() {
+			@Override
+			public String apply(String tagValue)
+			{
+				if (tagValue.equals("41 inches"))
+				{
+					return "104.14";
+				}
+				else
+				{
+					return tagValue;
+				}
+			}
+		};
+
+		return foreachTag(message, "ZAT.8", fix41Inch);
+	}
 
 	/**
 	 * CoPD requires hl7V2.4, but often the value is not correctly set. this enforces the version

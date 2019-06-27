@@ -173,7 +173,6 @@ public class AppointmentMapper extends AbstractMapper
 					// use default logic
 				}
 			}
-
 		}
 
 		if (apptDate.compareTo(new Date()) < 0)

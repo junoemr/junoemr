@@ -34,19 +34,7 @@ import org.oscarehr.allergy.service.AllergyService;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.TicklerDao;
-import org.oscarehr.common.hl7.copd.mapper.AlertMapper;
-import org.oscarehr.common.hl7.copd.mapper.AllergyMapper;
-import org.oscarehr.common.hl7.copd.mapper.AppointmentMapper;
-import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
-import org.oscarehr.common.hl7.copd.mapper.DocumentMapper;
-import org.oscarehr.common.hl7.copd.mapper.DxMapper;
-import org.oscarehr.common.hl7.copd.mapper.EncounterNoteMapper;
-import org.oscarehr.common.hl7.copd.mapper.HistoryNoteMapper;
-import org.oscarehr.common.hl7.copd.mapper.LabMapper;
-import org.oscarehr.common.hl7.copd.mapper.MedicationMapper;
-import org.oscarehr.common.hl7.copd.mapper.PreventionMapper;
-import org.oscarehr.common.hl7.copd.mapper.ProviderMapper;
-import org.oscarehr.common.hl7.copd.mapper.TicklerMapper;
+import org.oscarehr.common.hl7.copd.mapper.*;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.parser.CoPDParser;
 import org.oscarehr.common.io.FileFactory;
@@ -109,6 +97,7 @@ public class CoPDImportService
 	{
 		WOLF,
 		MEDIPLAN,
+		MEDACCESS,
 		UNKNOWN
 	}
 
@@ -218,7 +207,7 @@ public class CoPDImportService
 			throws HL7Exception, IOException, InterruptedException
 	{
 		ProviderData mrpProvider = null;
-		ProviderMapper providerMapper = new ProviderMapper(zpdZtrMessage);
+		ProviderMapper providerMapper = MapperFactory.newProviderMapper(zpdZtrMessage);
 
 		int numProviders = providerMapper.getNumProviders();
 		logger.info("Found " + numProviders + " provider groups");
@@ -327,7 +316,7 @@ public class CoPDImportService
 
 	private Demographic importDemographicData(ZPD_ZTR zpdZtrMessage, IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		DemographicMapper demographicMapper = new DemographicMapper(zpdZtrMessage, importSource);
+		DemographicMapper demographicMapper = MapperFactory.newDemographicMapper(zpdZtrMessage, importSource);
 		Demographic demographic = demographicMapper.getDemographic();
 		if (demographic != null)
 		{
@@ -347,7 +336,7 @@ public class CoPDImportService
 			throw new RuntimeException("Multisite Imports not supported");
 		}
 
-		AppointmentMapper appointmentMapper = new AppointmentMapper(zpdZtrMessage, importSource);
+		AppointmentMapper appointmentMapper = MapperFactory.newAppointmentMapper(zpdZtrMessage, importSource);
 
 		int numAppointments = appointmentMapper.getNumAppointments();
 
@@ -373,7 +362,7 @@ public class CoPDImportService
 	private void importMedicationData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource)
 			throws HL7Exception
 	{
-		MedicationMapper medicationMapper = new MedicationMapper(zpdZtrMessage, providerRep, importSource);
+		MedicationMapper medicationMapper = MapperFactory.newMedicationMapper(zpdZtrMessage, providerRep, importSource);
 
 		int numMedications = medicationMapper.getNumMedications();
 
@@ -404,7 +393,7 @@ public class CoPDImportService
 
 	private void importDxData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception
 	{
-		DxMapper dxMapper = new DxMapper(zpdZtrMessage, providerRep);
+		DxMapper dxMapper = MapperFactory.newDxMapper(zpdZtrMessage, providerRep);
 
 		for(Dxresearch dx : dxMapper.getDxResearchList())
 		{
@@ -429,7 +418,7 @@ public class CoPDImportService
 
 	private void importAllergyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		AllergyMapper allergyMapper = new AllergyMapper(zpdZtrMessage, providerRep, importSource);
+		AllergyMapper allergyMapper = MapperFactory.newAllergyMapper(zpdZtrMessage, providerRep, importSource);
 
 		for (int rep = 0; rep < allergyMapper.getNumAllergies(); rep++)
 		{
@@ -452,7 +441,7 @@ public class CoPDImportService
 
 	private void importPreventionData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception
 	{
-		PreventionMapper preventionMapper = new PreventionMapper(zpdZtrMessage, providerRep);
+		PreventionMapper preventionMapper = MapperFactory.newPreventionMapper(zpdZtrMessage, providerRep);
 		preventionMapper.setValidPreventionTypes(preventionManager.getPreventionTypeList());
 
 		for(Prevention prevention : preventionMapper.getPreventionList())
@@ -468,7 +457,7 @@ public class CoPDImportService
 
 	private void importLabData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception, IOException
 	{
-		LabMapper labMapper = new LabMapper(zpdZtrMessage, providerRep, importSource);
+		LabMapper labMapper = MapperFactory.newLabMapper(zpdZtrMessage, providerRep, importSource);
 
 		for(String msg : labMapper.getLabList())
 		{
@@ -508,7 +497,7 @@ public class CoPDImportService
 	                                String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs)
 			throws IOException, InterruptedException
 	{
-		DocumentMapper documentMapper = new DocumentMapper(zpdZtrMessage, providerRep, importSource);
+		DocumentMapper documentMapper = MapperFactory.newDocumentMapper(zpdZtrMessage, providerRep, importSource);
 
 		for(Document document : documentMapper.getDocumentList())
 		{
@@ -557,7 +546,7 @@ public class CoPDImportService
 
 	private void importAlerts(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		AlertMapper alertMapper = new AlertMapper(zpdZtrMessage, providerRep, importSource);
+		AlertMapper alertMapper = MapperFactory.newAlertMapper(zpdZtrMessage, providerRep, importSource);
 		for(CaseManagementNote reminderNote : alertMapper.getReminderNoteList())
 		{
 			reminderNote.setProvider(provider);
@@ -569,7 +558,7 @@ public class CoPDImportService
 
 	private void importTicklers(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		TicklerMapper ticklerMapper = new TicklerMapper(zpdZtrMessage, providerRep, importSource);
+		TicklerMapper ticklerMapper = MapperFactory.newTicklerMapper(zpdZtrMessage, providerRep, importSource);
 
 		int numTicklers = ticklerMapper.getNumTicklers();
 		for(int i=0; i< numTicklers; i++)
@@ -590,7 +579,7 @@ public class CoPDImportService
 
 	private void importProviderNotes(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		EncounterNoteMapper encounterNoteMapper = new EncounterNoteMapper(zpdZtrMessage, providerRep, importSource);
+		EncounterNoteMapper encounterNoteMapper = MapperFactory.newEncounterNoteMapper(zpdZtrMessage, providerRep, importSource);
 
 		int numNotes = encounterNoteMapper.getNumEncounterNotes();
 		for(int i=0; i< numNotes; i++)
@@ -618,7 +607,7 @@ public class CoPDImportService
 			encounterNoteService.saveChartNote(encounterNote);
 		}
 
-		HistoryNoteMapper historyNoteMapper = new HistoryNoteMapper(zpdZtrMessage, providerRep, importSource);
+		HistoryNoteMapper historyNoteMapper = MapperFactory.newHistoryNoteMapper(zpdZtrMessage, providerRep, importSource);
 		for(CaseManagementNote medHistNote : historyNoteMapper.getMedicalHistoryNoteList())
 		{
 			medHistNote.setProvider(provider);

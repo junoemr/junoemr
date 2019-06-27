@@ -35,7 +35,7 @@ import java.util.Date;
 
 public class AbstractMapper
 {
-	private static final Logger logger = MiscUtils.getLogger();
+	protected static final Logger logger = MiscUtils.getLogger();
 
 	protected final ZPD_ZTR message;
 	protected final ZPD_ZTR_PROVIDER provider;

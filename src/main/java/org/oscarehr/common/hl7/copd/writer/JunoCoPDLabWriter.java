@@ -23,6 +23,7 @@
 package org.oscarehr.common.hl7.copd.writer;
 
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.v24.datatype.CE;
 import ca.uhn.hl7v2.model.v24.datatype.IS;
 import ca.uhn.hl7v2.model.v24.message.ORU_R01;
 import ca.uhn.hl7v2.model.v24.segment.NTE;
@@ -33,6 +34,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.DeepCopy;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.copd.mapper.DemographicMapper;
+import org.oscarehr.common.hl7.copd.mapper.MapperFactory;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_LAB;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.writer.HL7LabWriter;
@@ -57,7 +59,7 @@ public class JunoCoPDLabWriter extends HL7LabWriter
 
 		// use the demographic mapper to pull some values into the new hl7, because the incoming data
 		// doesn't always match the usual format
-		DemographicMapper demographicMapper = new DemographicMapper(message, importSource);
+		DemographicMapper demographicMapper = MapperFactory.newDemographicMapper(message, importSource);
 
 		//initialize an MSH header segment with some custom CoPD values
 		oru_r01.initQuickstart("ORU", "R01", "P");
@@ -94,10 +96,18 @@ public class JunoCoPDLabWriter extends HL7LabWriter
 				OBX obx = oru_r01.getPATIENT_RESULT().getORDER_OBSERVATION(ObrIndex).getOBSERVATION(i).getOBX();
 				DeepCopy.copy(zpdZtrLab.getOBX(i), obx);
 
+				// if there is not lab status set to normal.
 				IS abnFlags = obx.getAbnormalFlags();
 				if ( abnFlags == null || abnFlags.isEmpty())
 				{
 					terser.set("/.ORDER_OBSERVATION(" + ObrIndex + ")/.OBSERVATION(" + i + ")/OBX-8", "N");
+				}
+
+				// if there is not identifier use name as id.
+				CE identifier = obx.getObservationIdentifier();
+				if (identifier.getCe1_Identifier().getValue() == null || identifier.getCe1_Identifier().getValue().isEmpty())
+				{
+					terser.set("/.ORDER_OBSERVATION(" + ObrIndex + ")/OBSERVATION(" + i + ")/OBX-3-1", obx.getObservationIdentifier().getCe2_Text().getValue());
 				}
 			}
 
