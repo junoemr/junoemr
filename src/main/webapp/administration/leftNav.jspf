@@ -520,6 +520,7 @@ OscarProperties props = OscarProperties.getInstance();
 			
 				<ul>
 				<oscar:oscarPropertiesCheck property="enable_dashboards" value="true">
+				<oscar:oscarPropertiesCheck property="instance_type" value="BC">
 				<security:oscarSec roleName="<%=roleName$%>" objectName="_dashboardManager" rights="w" reverse="<%=false%>" >
 					<li>
 						<a href="javascript:void(0);" class="xlink" rel="${ctx}/web/dashboard/admin/DashboardManager.do" >
@@ -527,6 +528,7 @@ OscarProperties props = OscarProperties.getInstance();
 						</a>
 					</li>
 				</security:oscarSec>
+				</oscar:oscarPropertiesCheck>
 				</oscar:oscarPropertiesCheck>
 					<li>
 					<a href="javascript:void(0);" class="xlink" rel="${ctx}/oscarReport/RptByExample.do"><bean:message key="admin.admin.btnQueryByExample" /></a>

@@ -907,6 +907,7 @@ private long getAppointmentRowSpan(
 
 					<security:oscarSec roleName="<%=roleName$%>" objectName="_dashboardDisplay" rights="r">
 						<oscar:oscarPropertiesCheck property="enable_dashboards" value="true">
+						<oscar:oscarPropertiesCheck property="instance_type" value="BC">
 							<li id="dashboardList">
 								<div class="dropdown">
 									<a href="#" class="dashboardBtn">Dashboard</a>
@@ -919,6 +920,7 @@ private long getAppointmentRowSpan(
 									</div>
 								</div>
 							</li>
+						</oscar:oscarPropertiesCheck>
 						</oscar:oscarPropertiesCheck>
 					</security:oscarSec>
 
