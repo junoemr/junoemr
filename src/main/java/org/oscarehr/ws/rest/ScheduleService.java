@@ -23,23 +23,6 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -82,6 +65,22 @@ import org.oscarehr.ws.rest.to.model.LookupListItemTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Date;
+import java.util.List;
 
 @Path("/schedule")
 @Component("scheduleService")
@@ -156,21 +155,7 @@ public class ScheduleService extends AbstractServiceImpl {
 		return RestResponse.successResponse(response);
 	}
 
-	@GET
-	@Path("/statuses")
-	@Produces("application/json")
-	public AbstractSearchResponse<AppointmentStatusTo1> getAppointmentStatuses() {
-		AbstractSearchResponse<AppointmentStatusTo1> response = new AbstractSearchResponse<AppointmentStatusTo1>();
-
-		List<AppointmentStatus> results = scheduleManager.getAppointmentStatuses(getLoggedInInfo());
-		AppointmentStatusConverter converter = new AppointmentStatusConverter();
-
-		response.setContent(converter.getAllAsTransferObjects(getLoggedInInfo(), results));
-		response.setTotal(results.size());
-
-		return response;
-	}
-
+	@Deprecated // this should be in appointment service
 	@POST
 	@Path("/getAppointment")
 	@Produces("application/json")
@@ -187,76 +172,17 @@ public class ScheduleService extends AbstractServiceImpl {
 		return response;
 	}
 
-	@POST
+	@GET
 	@Path("/{demographicNo}/appointmentHistory")
 	@Produces("application/json")
-	public SchedulingResponse findExistAppointments(@PathParam("demographicNo") Integer demographicNo) {
+	public SchedulingResponse getAppointmentHistory(@PathParam("demographicNo") Integer demographicNo)
+	{
 		SchedulingResponse response = new SchedulingResponse();
 		List<Appointment> appts = appointmentManager.getAppointmentHistoryWithoutDeleted(getLoggedInInfo(), demographicNo, 0, OscarAppointmentDao.MAX_LIST_RETURN_SIZE);
-		if(appts.size() == OscarAppointmentDao.MAX_LIST_RETURN_SIZE) {
+		if(appts.size() == OscarAppointmentDao.MAX_LIST_RETURN_SIZE)
+		{
 			logger.warn("appointment history over MAX_LIST_RETURN_SIZE for demographic " + demographicNo);
 		}
-		AppointmentConverter converter = new AppointmentConverter();
-		response.setAppointments(converter.getAllAsTransferObjects(getLoggedInInfo(), appts));
-
-		return response;
-	}
-
-	@POST
-	@Path("/appointment/{id}/updateStatus")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public SchedulingResponse updateAppointmentStatus(@PathParam("id") Integer id, AppointmentTo1 appt) {
-		SchedulingResponse response = new SchedulingResponse();
-		AppointmentConverter converter = new AppointmentConverter();
-		String status = appt.getStatus();
-
-		Appointment appointment = appointmentManager.updateAppointmentStatus(getLoggedInInfo(), id, status);
-
-		response.setAppointment(converter.getAsTransferObject(getLoggedInInfo(), appointment));
-
-		return response;
-	}
-
-	@POST
-	@Path("/appointment/{id}/updateType")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public SchedulingResponse updateAppointmentType(@PathParam("id") Integer id, AppointmentTo1 appt) {
-		SchedulingResponse response = new SchedulingResponse();
-		AppointmentConverter converter = new AppointmentConverter();
-		String type = appt.getType();
-
-		Appointment appointment = appointmentManager.updateAppointmentType(getLoggedInInfo(), id, type);
-
-		response.setAppointment(converter.getAsTransferObject(getLoggedInInfo(), appointment));
-
-		return response;
-	}
-
-	@Path("/appointment/{id}/updateUrgency")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public SchedulingResponse updateAppointmentUrgency(@PathParam("id") Integer id, AppointmentTo1 appt) {
-		SchedulingResponse response = new SchedulingResponse();
-		AppointmentConverter converter = new AppointmentConverter();
-		String urgency = appt.getUrgency();
-
-		Appointment appointment = appointmentManager.updateAppointmentUrgency(getLoggedInInfo(), id, urgency);
-
-		response.setAppointment(converter.getAsTransferObject(getLoggedInInfo(), appointment));
-
-		return response;
-	}
-
-	@GET
-	@Path("/fetchMonthly/{providerNo}/{year}/{month}")
-	@Produces("application/json")
-	public SchedulingResponse fetchMonthlyData(@PathParam("year") Integer year, @PathParam("month") Integer month, @PathParam("providerNo") String providerNo) {
-		SchedulingResponse response = new SchedulingResponse();
-
-		List<Appointment> appts = appointmentManager.findMonthlyAppointments(getLoggedInInfo(), providerNo, year, month);
-
 		AppointmentConverter converter = new AppointmentConverter();
 		response.setAppointments(converter.getAllAsTransferObjects(getLoggedInInfo(), appts));
 
@@ -301,6 +227,21 @@ public class ScheduleService extends AbstractServiceImpl {
 		return Response.status(Status.OK).build();
 	}
 */
+
+	@GET
+	@Path("/statuses")
+	@Produces("application/json")
+	public AbstractSearchResponse<AppointmentStatusTo1> getAppointmentStatuses() {
+		AbstractSearchResponse<AppointmentStatusTo1> response = new AbstractSearchResponse<>();
+
+		List<AppointmentStatus> results = scheduleManager.getAppointmentStatuses(getLoggedInInfo());
+		AppointmentStatusConverter converter = new AppointmentStatusConverter();
+
+		response.setContent(converter.getAllAsTransferObjects(getLoggedInInfo(), results));
+		response.setTotal(results.size());
+
+		return response;
+	}
 
 	@GET
 	@Path("/types")

@@ -23,15 +23,10 @@
  */
 package org.oscarehr.managers;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.log4j.Logger;
+import org.oscarehr.appointment.dao.AppointmentStatusDao;
 import org.oscarehr.appointment.model.AppointmentStatusList;
 import org.oscarehr.common.dao.AppointmentArchiveDao;
-import org.oscarehr.appointment.dao.AppointmentStatusDao;
 import org.oscarehr.common.dao.LookupListDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.Appointment;
@@ -44,9 +39,11 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.TransactionSystemException;
-import oscar.log.LogAction;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class AppointmentManager {
@@ -78,12 +75,6 @@ public class AppointmentManager {
 			ids.append(tmp.getId() + ",");
 		}
 		result.addAll(nonDeleted);
-
-		//--- log action ---
-		if (result.size() > 0) {
-
-			LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.getAppointmentHistoryWithDeleted", "ids returned=" + ids);
-		}
 		return result;
 	}
 
@@ -110,11 +101,6 @@ public class AppointmentManager {
 			}
 		}
 
-		//--- log action ---
-		if (result.size() > 0) {
-
-			LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.getAppointmentHistoryWithDeleted", "ids returned=" + ids);
-		}
 		return result;
 	}
 
@@ -159,9 +145,6 @@ public class AppointmentManager {
 		// Subtract a minute
 
 		appointmentDao.persist(appointment);
-
-		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.saveAppointment", "id=" + appointment.getId());
-
 		return appointment;
 	}
 
@@ -198,9 +181,6 @@ public class AppointmentManager {
 			// XXX: maybe just throw the root cause if it's a ConstraintViolationException?
 			throw exception.getRootCause();
 		}
-
-		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.updateAppointment", "id=" + appointment.getId());
-
 		return appointment;
 	}
 
@@ -214,9 +194,6 @@ public class AppointmentManager {
 		}
 		
 		appointmentDao.remove(apptNo);
-
-		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.deleteAppointment", "id=" + apptNo);
-
 	}
 
 	public String rotateStatus(LoggedInInfo loggedInInfo, int apptNo)
@@ -226,6 +203,8 @@ public class AppointmentManager {
 		}
 
 		Appointment appointment = appointmentDao.find(apptNo);
+
+		appointmentArchiveDao.archiveAppointment(appointment);
 
 		AppointmentManager appointmentManager = SpringUtils.getBean(AppointmentManager.class);
 		AppointmentStatusList appointmentStatusList =
@@ -244,12 +223,7 @@ public class AppointmentManager {
 		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "r", null)) {
 			throw new RuntimeException("Access Denied");
 		}
-		
-
 		Appointment appt = appointmentDao.find(apptNo);
-
-		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.getAppointment", "id=" + apptNo);
-
 		return appt;
 	}
 
@@ -265,45 +239,33 @@ public class AppointmentManager {
 			appt.setStatus(status);
 		}
 		appointmentDao.merge(appt);
-
-		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.updateAppointmentStatus", "id=" + appt.getId());
-
 		return appt;
-
 	}
 
 	
-	public Appointment updateAppointmentType(LoggedInInfo loggedInInfo, int apptNo, String type) {
-
-		Appointment appt = appointmentDao.find(apptNo);
-		if (appt != null) {
-			appointmentArchiveDao.archiveAppointment(appt);	
-			
-			appt.setType(type);
-		}
-		appointmentDao.merge(appt);
-
-		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.updateAppointmentType", "id=" + appt.getId());
-
-		return appt;
-
-	}
-
-	public Appointment updateAppointmentUrgency(LoggedInInfo loggedInInfo, int apptNo, String urgency) {
-
-		Appointment appt = appointmentDao.find(apptNo);
-		if (appt != null) {
-			appointmentArchiveDao.archiveAppointment(appt);	
-			
-			appt.setUrgency(urgency);
-		}
-		appointmentDao.merge(appt);
-
-		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.updateAppointmentUrgency", "id=" + appt.getId());
-
-		return appt;
-
-	}
+//	public Appointment updateAppointmentType(LoggedInInfo loggedInInfo, int apptNo, String type) {
+//
+//		Appointment appt = appointmentDao.find(apptNo);
+//		if (appt != null) {
+//			appointmentArchiveDao.archiveAppointment(appt);
+//
+//			appt.setType(type);
+//		}
+//		appointmentDao.merge(appt);
+//		return appt;
+//	}
+//
+//	public Appointment updateAppointmentUrgency(LoggedInInfo loggedInInfo, int apptNo, String urgency) {
+//
+//		Appointment appt = appointmentDao.find(apptNo);
+//		if (appt != null) {
+//			appointmentArchiveDao.archiveAppointment(appt);
+//
+//			appt.setUrgency(urgency);
+//		}
+//		appointmentDao.merge(appt);
+//		return appt;
+//	}
 
 	
 	
@@ -330,32 +292,26 @@ public class AppointmentManager {
 		return itemsList;
 	}
 
-	public List<Appointment> findMonthlyAppointments(LoggedInInfo loggedInInfo, String providerNo, int year, int month) {
-		
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, year);
-		cal.set(Calendar.MONTH, month);
-		cal.set(Calendar.DAY_OF_MONTH, 1);
-		cal.set(Calendar.HOUR_OF_DAY, 0);
-		cal.set(Calendar.MINUTE, 0);
-		
-		Date startDate = cal.getTime();
-		
-		cal.set(Calendar.DAY_OF_MONTH,cal.getActualMaximum(Calendar.DAY_OF_MONTH)+1);
-		cal.add(Calendar.MINUTE,-1);
-		
-		Date endDate = cal.getTime();
-		
-		logger.info("monthly - checking from " + startDate + " to " + endDate);
-		
-		
-		List<Appointment> results = appointmentDao.findByDateRangeAndProvider(startDate, endDate, providerNo);
-		
-		if (results.size() > 0) {
-			LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.findMonthlyAppointments", "");
-		}
-		
-		return results;
-	}
+//	public List<Appointment> findMonthlyAppointments(LoggedInInfo loggedInInfo, String providerNo, int year, int month) {
+//
+//		Calendar cal = Calendar.getInstance();
+//		cal.set(Calendar.YEAR, year);
+//		cal.set(Calendar.MONTH, month);
+//		cal.set(Calendar.DAY_OF_MONTH, 1);
+//		cal.set(Calendar.HOUR_OF_DAY, 0);
+//		cal.set(Calendar.MINUTE, 0);
+//
+//		Date startDate = cal.getTime();
+//
+//		cal.set(Calendar.DAY_OF_MONTH,cal.getActualMaximum(Calendar.DAY_OF_MONTH)+1);
+//		cal.add(Calendar.MINUTE,-1);
+//
+//		Date endDate = cal.getTime();
+//
+//		logger.info("monthly - checking from " + startDate + " to " + endDate);
+//
+//		List<Appointment> results = appointmentDao.findByDateRangeAndProvider(startDate, endDate, providerNo);
+//		return results;
+//	}
 	
 }

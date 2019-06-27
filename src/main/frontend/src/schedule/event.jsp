@@ -463,8 +463,8 @@
 						   class="list-group-item">
 
 							<div>
-								<span ng-if="$last">Provider {{record.creator}} Created On {{record.formattedCreateDate}} at {{record.formattedCreateTime}}</span>
-								<span ng-if="!$last">Provider {{record.lastUpdateUser}} Updated On {{record.formattedUpdateDate}} at {{record.formattedUpdateTime}}</span>
+								<span ng-if="$last">Provider {{record.creator}} created appointment on {{record.formattedCreateDate}} at {{record.formattedCreateTime}}</span>
+								<span ng-if="!$last">Provider {{record.lastUpdateUser}} updated appointment on {{record.formattedUpdateDate}} at {{record.formattedUpdateTime}}</span>
 							</div>
 						</span>
 					</div>
