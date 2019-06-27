@@ -799,17 +799,18 @@ function f_filterResults(n_win, n_docel, n_body) {
                                 var div=$(childId);
                                 //alert(div);
                                 var url='';
-                                if(type=='DOC')
+                                if (type=='DOC')
+                                {
                                     url="../dms/showDocument.jsp";
-                                else if(type=='MDS')
-                                    url="";
-                                else if(type=='HL7')
-                                    url="../lab/CA/ALL/labDisplayAjax.jsp";
-                                else if(type=='CML')
-                                    url="";
+                                }
+                                else if (type=='HL7')
+                                {
+                                    url="../lab/CA/ALL/labDisplay.jsp";
+                                }
                                 else
+                                {
                                     url="";
-
+                                }
                                         //oscarLog('url='+url);
                                         var data="segmentID="+docNo+"&providerNo="+providerNo+"&searchProviderNo="+searchProviderNo+"&status="+status+"&demoName="+demoName;
                                         if(inQueue)

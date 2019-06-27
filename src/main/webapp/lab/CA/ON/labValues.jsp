@@ -74,10 +74,24 @@ ArrayList list = null;
 
 	SimpleDateFormat dateOutputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
 	DateMapComparator comparator = new DateMapComparator("collDate");
-if (!(demographicNo == null || demographicNo.equals("null"))){
+
+	int demographicNoAsNumber = 0;
+
+	try
+	{
+		demographicNoAsNumber = Integer.valueOf(demographicNo);
+	}
+	catch (NumberFormatException exception)
+	{
+		MiscUtils.getLogger().warn("Failed to parse '" + demographicNo + "' as an integer");
+	}
+
+
+if (!(demographicNo == null || demographicNo.equals("null") || demographicNoAsNumber == 0)){
+
 	if(remoteFacilityIdString==null)
 	{
-		list = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographicNo), testName, identifier);
+		list = CommonLabTestValues.findValuesForTest(labType, demographicNoAsNumber, testName, identifier);
 	}
 	else
 	{
