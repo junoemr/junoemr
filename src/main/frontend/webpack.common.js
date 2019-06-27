@@ -82,10 +82,7 @@ module.exports = {
 		new CopyWebpackPlugin([
 
 			// Copy templates
-			{from: 'src/**/*.jsp'},
-			// copy dashboard js files.
-			{from: 'src/dashboard/display/dashboardDisplayController.js', to: 'dashboard/display/'},
-			{from: 'src/dashboard/display/drilldownDisplayController.js', to: 'dashboard/display/'}
+			{from: 'src/**/*.jsp'}
 		],{}),
 
 		new CreateTemplates(

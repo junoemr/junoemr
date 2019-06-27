@@ -612,14 +612,14 @@
 		
 		<action name="FrmForm" path="/web/dashboard/display/DashboardDisplay" 
 			parameter="method" type="org.oscarehr.dashboard.display.DisplayDashboardAction" scope="request" >
-			<forward name="success" path="/web/src/dashboard/display/DashboardDisplay.jsp" />
+			<forward name="success" path="/dashboard/display/DashboardDisplay.jsp" />
 			<forward name="unauthorized" path="/securityError.jsp" />
 			<forward name="error" path="/failure.jsp" />
 		</action>
 		
 		<action name="FrmForm" path="/web/dashboard/display/DrilldownDisplay" 
 			parameter="method" type="org.oscarehr.dashboard.display.DisplayDrilldownAction" scope="request" >
-			<forward name="success" path="/web/src/dashboard/display/DrilldownDisplay.jsp" />
+			<forward name="success" path="/dashboard/display/DrilldownDisplay.jsp" />
 			<forward name="unauthorized" path="/securityError.jsp" />
 			<forward name="error" path="/failure.jsp" />
 		</action>
@@ -632,7 +632,7 @@
 		
 		<action name="FrmForm" path="/web/dashboard/display/DisplayIndicator" 
 			parameter="method" type="org.oscarehr.dashboard.display.DisplayIndicatorAction" scope="request" >
-			<forward name="success" path="/web/src/dashboard/display/IndicatorPanel.jsp" />
+			<forward name="success" path="/dashboard/display/IndicatorPanel.jsp" />
 			<forward name="unauthorized" path="/securityError.jsp" />
 			<forward name="error" path="/failure.jsp" />
 		</action>
@@ -1505,6 +1505,7 @@
 		</action>
 		<action input="/oscarReport/RptByExample.jsp" name="RptByExampleForm" path="/oscarReport/RptByExample" scope="request" type="oscar.oscarReport.pageUtil.RptByExampleAction">
 			<forward name="success" path="/oscarReport/RptByExample.jsp" />
+			<forward name="failure" path="/oscarReport/RptByExample.jsp" />
 		</action>
 		<action input="/admin/gstControl.jsp" name="GstControlForm" path="/admin/GstControl" scope="request" type="oscar.oscarBilling.ca.on.administration.GstControlAction">
 			<forward name="success" path="/admin/gstControl.jsp" />
@@ -2093,7 +2094,7 @@
 
 		<action name="FrmForm" path="/web/dashboard/display/AssignTickler"
 		        parameter="method" type="org.oscarehr.dashboard.admin.AssignTicklerAction" scope="request" >
-			<forward name="success" path="/web/dashboard/display/AssignTickler.jsp" />
+			<forward name="success" path="/dashboard/display/AssignTickler.jsp" />
 			<forward name="unauthorized" path="/securityError.jsp" />
 			<forward name="error" path="/failure.jsp" />
 		</action>

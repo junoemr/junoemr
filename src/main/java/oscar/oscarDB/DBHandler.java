@@ -24,12 +24,11 @@
 
 package oscar.oscarDB;
 
-import java.sql.PreparedStatement;
+import org.oscarehr.util.DbConnectionFilter;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import org.oscarehr.util.DbConnectionFilter;
 
 /**
  * @deprecated Use JPA instead, no new code should be written against this class.
@@ -57,12 +56,4 @@ public final class DBHandler {
 		rs = stmt.executeQuery(SQLStatement);
 		return rs;
 	}
-	
-	public static java.sql.ResultSet GetPreSQL(String SQLStatement, String para1) throws SQLException {
-		PreparedStatement ps = DbConnectionFilter.getThreadLocalDbConnection().prepareStatement(SQLStatement);
-		ps.setString(1, para1);
-		ResultSet result = ps.executeQuery();
-		return result;
-	}
-
 }

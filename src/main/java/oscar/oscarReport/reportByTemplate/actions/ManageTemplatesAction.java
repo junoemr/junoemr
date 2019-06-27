@@ -33,48 +33,85 @@
 package oscar.oscarReport.reportByTemplate.actions;
 
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.jcs.access.exception.InvalidArgumentException;
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.report.reportByTemplate.exception.ReportByTemplateException;
+import org.oscarehr.report.reportByTemplate.model.ReportTemplates;
+import org.oscarehr.report.reportByTemplate.service.ReportByTemplateService;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 
-import oscar.oscarReport.reportByTemplate.ReportManager;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  *
  * @author apavel (Paul)
  */
-public class ManageTemplatesAction extends Action {
-    public ActionForward execute(ActionMapping mapping, ActionForm form,
-                                 HttpServletRequest request, HttpServletResponse response) {
-    	
-    	String roleName$ = (String)request.getSession().getAttribute("userrole") + "," + (String) request.getSession().getAttribute("user");
-    	if(!com.quatro.service.security.SecurityManager.hasPrivilege("_admin", roleName$)  && !com.quatro.service.security.SecurityManager.hasPrivilege("_report", roleName$)) {
-    		throw new SecurityException("Insufficient Privileges");
-    	}
-    	
-         String action = request.getParameter("action");
-         String templateId = request.getParameter("templateid");
-         String xmltext = request.getParameter("xmltext");
-         ReportManager reportManager = new ReportManager();
-         String message = "Error: Improper request - Action param missing";
-         if (action.equals("delete")) {
-            message = reportManager.deleteTemplate(templateId);
-            if (message.equals("")) return mapping.findForward("deleted");
-         }
-         else if (action.equals("add"))
-            message = reportManager.addTemplate(null, xmltext, LoggedInInfo.getLoggedInInfoFromSession(request));
-         else if (action.equals("edit"))
-            message = reportManager.updateTemplate(null, templateId, xmltext, LoggedInInfo.getLoggedInInfoFromSession(request));
-         request.setAttribute("message", message);
-         request.setAttribute("action", action);
-         request.setAttribute("templateid", request.getParameter("templateid"));
-         request.setAttribute("opentext", request.getParameter("opentext"));
-         return mapping.findForward("success");
-    }
-    
+public class ManageTemplatesAction extends Action
+{
+	private static final Logger logger = MiscUtils.getLogger();
+	private static ReportByTemplateService reportByTemplateService = SpringUtils.getBean(ReportByTemplateService.class);
+	private static SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+
+
+	public ActionForward execute(ActionMapping mapping, ActionForm form,
+	                             HttpServletRequest request, HttpServletResponse response)
+	{
+		String action = request.getParameter("action");
+		String templateIdStr = request.getParameter("templateid");
+		String templateIdStrReturn = templateIdStr;
+		String xmlText = request.getParameter("xmltext");
+		boolean adminVerifiedChecked = Boolean.parseBoolean(request.getParameter("admin_verified"));
+		String sessionProviderNo = (String) request.getSession().getAttribute("user");
+
+		securityInfoManager.requireAllPrivilege(sessionProviderNo, SecurityInfoManager.WRITE, null, "_admin", "_report");
+
+		String message;
+		try
+		{
+			if(action.equals("add"))
+			{
+				ReportTemplates template = reportByTemplateService.addTemplate(xmlText, sessionProviderNo, adminVerifiedChecked);
+				templateIdStrReturn = String.valueOf(template.getId());
+			}
+			else if(action.equals("edit"))
+			{
+				ReportTemplates template = reportByTemplateService.updateTemplate(Integer.parseInt(templateIdStr), xmlText, sessionProviderNo, adminVerifiedChecked);
+				templateIdStrReturn = String.valueOf(template.getId());
+			}
+			else if(action.equals("delete"))
+			{
+				reportByTemplateService.deleteTemplate(Integer.parseInt(templateIdStr));
+				return mapping.findForward("deleted");
+			}
+			else
+			{
+				throw new InvalidArgumentException("Invalid action: " + action);
+			}
+			message = "Success";
+		}
+		catch(ReportByTemplateException e)
+		{
+			logger.warn(e.getMessage());
+			message = e.getPublicMessage();
+		}
+		catch(Exception e)
+		{
+			logger.error("Error", e);
+			message = "Error";
+		}
+
+		request.setAttribute("message", message);
+		request.setAttribute("action", action);
+		request.setAttribute("templateid", templateIdStrReturn);
+		request.setAttribute("opentext", request.getParameter("opentext"));
+		return mapping.findForward("success");
+	}
+
 }

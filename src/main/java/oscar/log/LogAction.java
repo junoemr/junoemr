@@ -34,10 +34,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.OscarLogDao;
-import org.oscarehr.common.dao.RestServiceLogDao;
+import org.oscarehr.log.dao.RestServiceLogDao;
 import org.oscarehr.common.model.OscarLog;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.RestServiceLog;
+import org.oscarehr.log.model.RestServiceLog;
 import org.oscarehr.util.DeamonThreadFactory;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -48,7 +48,7 @@ import org.oscarehr.ws.external.soap.logging.model.SoapServiceLog;
 public class LogAction {
 	private static Logger logger = MiscUtils.getLogger();
 	private static OscarLogDao oscarLogDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
-	private static RestServiceLogDao restLogDao = (RestServiceLogDao) SpringUtils.getBean(org.oscarehr.common.dao.RestServiceLogDao.class);
+	private static RestServiceLogDao restLogDao = (RestServiceLogDao) SpringUtils.getBean(org.oscarehr.log.dao.RestServiceLogDao.class);
 	private static SoapServiceLogDao soapLogDao = (SoapServiceLogDao) SpringUtils.getBean(SoapServiceLogDao.class);
 	private static ExecutorService executorService = Executors.newCachedThreadPool(new DeamonThreadFactory(LogAction.class.getSimpleName()+".executorService", Thread.MAX_PRIORITY));
 	
