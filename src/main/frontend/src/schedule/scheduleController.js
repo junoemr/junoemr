@@ -102,7 +102,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.defaultTimeInterval = $scope.timeIntervalOptions[2].value;
 		$scope.selectedTimeInterval = $scope.defaultTimeInterval;
 		$scope.selectedSlotLabelInterval = {hours: 1};
-		$scope.defaultAutoRefreshMinutes = 3;
 		$scope.defaultCalendarView = 'agendaDay';
 		$scope.availabilityTypes = {};
 		$scope.resourceOptionHash = {};
@@ -121,8 +120,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.scheduleViewName = null;
 		$scope.scheduleDefault = null;
 		$scope.scheduleTimeInterval = null;
-		$scope.scheduleAutoRefresh = null;
-		$scope.scheduleAutoRefreshMinutes = null;
+
+		controller.refreshSettings = {
+			timerVariable: null,
+			defaultAutoRefreshMinutes: 3,
+			preferredAutoRefreshMinutes: null
+		};
 
 		$scope.datepickerSelectedDate = null;
 
@@ -146,7 +149,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 								$scope.setEventSources();
 
-								$scope.initEventsAutoRefresh();
+								controller.initEventsAutoRefresh();
 
 								$scope.applyUiConfig($scope.uiConfig);
 
@@ -1678,22 +1681,22 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.uiConfigApplied = angular.copy(uiConfig);
 		};
 
-		$scope.initEventsAutoRefresh = function initEventsAutoRefresh()
+		controller.initEventsAutoRefresh = function initEventsAutoRefresh()
 		{
 			var deferred = $q.defer();
 
 			// if there is already a refresh set up, stop it
-			var refresh = $scope.scheduleAutoRefresh;
+			var refresh = controller.refreshSettings.timerVariable;
 			if(refresh !== null)
 			{
 				clearInterval(refresh);
 			}
 
 			// get the refresh interval from preferences, or use default
-			var minutes = $scope.scheduleAutoRefreshMinutes;
+			var minutes = controller.refreshSettings.preferredAutoRefreshMinutes;
 			if(!Juno.Common.Util.exists(minutes) || !Juno.Common.Util.isIntegerString(minutes))
 			{
-				minutes = $scope.defaultAutoRefreshMinutes;
+				minutes = controller.refreshSettings.defaultAutoRefreshMinutes;
 			}
 			else
 			{
@@ -1703,9 +1706,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			if(minutes > 0)
 			{
 				// start the auto refresh and save its ID to global state
-				$scope.scheduleAutoRefresh = setInterval($scope.refetchEvents, minutes * 60 * 1000);
+				controller.refreshSettings.timerVariable = setInterval($scope.refetchEvents, minutes * 60 * 1000);
 			}
-
 			deferred.resolve();
 
 			return deferred.promise;

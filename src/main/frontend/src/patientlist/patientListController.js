@@ -77,9 +77,9 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		controller.datepickerSelectedDate = null;
 
 		controller.refreshSettings = {
-			scheduleAutoRefresh: null,
-			defaultAutoRefreshMinutes: 1,
-			scheduleAutoRefreshMinutes: null
+			timerVariable: null,
+			defaultAutoRefreshMinutes: 3,
+			preferredAutoRefreshMinutes: null
 		};
 
 		controller.eventStatusOptions = [];
@@ -95,6 +95,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 					controller.changeTab(controller.activeTab);
 
 					controller.loadWatches();
+					controller.initListAutoRefresh();
 					controller.initialized = true;
 				}
 			);
@@ -249,6 +250,38 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 		controller.isInitialized = function isInitialized()
 		{
 			return controller.initialized;
+		};
+
+		controller.initListAutoRefresh = function initListAutoRefresh()
+		{
+			var deferred = $q.defer();
+
+			// if there is already a refresh set up, stop it
+			var refresh = controller.refreshSettings.timerVariable;
+			if(refresh !== null)
+			{
+				clearInterval(refresh);
+			}
+
+			// get the refresh interval from preferences, or use default
+			var minutes = controller.refreshSettings.preferredAutoRefreshMinutes;
+			if(!Juno.Common.Util.exists(minutes) || !Juno.Common.Util.isIntegerString(minutes))
+			{
+				minutes = controller.refreshSettings.defaultAutoRefreshMinutes;
+			}
+			else
+			{
+				minutes = parseInt(minutes);
+			}
+
+			if(minutes > 0)
+			{
+				// start the auto refresh and save its ID to global state
+				controller.refreshSettings.timerVariable = setInterval(controller.refresh, minutes * 60 * 1000);
+			}
+			deferred.resolve();
+
+			return deferred.promise;
 		};
 
 		//=========================================================================
