@@ -52,10 +52,11 @@
 					<a class="round-top-left" data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.appointment);">
 						Appointment</a>
 				</li>
-				<li>
-					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.reoccurring);">
-						Reoccurring</a>
-				</li>
+				<!-- tab temporarily removed -->
+				<%--<li>--%>
+					<%--<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.reoccurring);">--%>
+						<%--Reoccurring</a>--%>
+				<%--</li>--%>
 				<li>
 					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.history);">
 						History
@@ -346,6 +347,7 @@
 														ca-model="eventData.startTime"
 														ca-error="{{displayMessages.field_errors()['startTime']}}"
 														ca-template="no_button"
+														ca-disable-widget="true"
 														ca-minute-step="parentScope.timeIntervalMinutes()">
 												</ca-field-time>
 											</div>
@@ -528,16 +530,16 @@
 						ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Modify
 				</button>
 
-				<button
-						type="button"
-						class="btn btn-primary"
-						tooltip-placement="top"
-						tooltip-append-to-body="true"
-						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+shift+enter')}}"
-						ng-click="eventController.saveAndBill()"
-						ng-show="numInvoices == 0"
-						ng-disabled="isWorking()">Modify &amp; Bill
-				</button>
+				<%--<button--%>
+						<%--type="button"--%>
+						<%--class="btn btn-primary"--%>
+						<%--tooltip-placement="top"--%>
+						<%--tooltip-append-to-body="true"--%>
+						<%--uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+shift+enter')}}"--%>
+						<%--ng-click="eventController.saveAndBill()"--%>
+						<%--ng-show="numInvoices == 0"--%>
+						<%--ng-disabled="isWorking()">Modify &amp; Bill--%>
+				<%--</button>--%>
 
 			</div>
 		</div>
