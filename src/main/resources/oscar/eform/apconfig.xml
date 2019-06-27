@@ -248,6 +248,13 @@
 			p.provider_no='${loggedInProvider}' </ap-sql>
 		<ap-output>${takno}</ap-output>
 	</databaseap>
+	<databaseap>
+		<ap-name>appt_provider_takno</ap-name>
+		<ap-sql>SELECT p.alberta_tak_no AS takno FROM provider p JOIN appointment a ON p.provider_no=a.provider_no
+			WHERE a.appointment_no='${appt_no}'
+		</ap-sql>
+		<ap-output>${takno}</ap-output>
+	</databaseap>
 
 	<!-- Patient demographic information -->
 	<databaseap>
