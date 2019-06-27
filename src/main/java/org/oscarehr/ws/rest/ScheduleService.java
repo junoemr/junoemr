@@ -59,7 +59,6 @@ import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.SchedulingResponse;
 import org.oscarehr.ws.rest.to.model.AppointmentStatusTo1;
-import org.oscarehr.ws.rest.to.model.AppointmentTo1;
 import org.oscarehr.ws.rest.to.model.AppointmentTypeTo1;
 import org.oscarehr.ws.rest.to.model.LookupListItemTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,9 +67,7 @@ import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -153,23 +150,6 @@ public class ScheduleService extends AbstractServiceImpl {
 			response.getPatients().add(item);
 		}
 		return RestResponse.successResponse(response);
-	}
-
-	@Deprecated // this should be in appointment service
-	@POST
-	@Path("/getAppointment")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public SchedulingResponse getAppointment(AppointmentTo1 appointmentTo) {
-		SchedulingResponse response = new SchedulingResponse();
-
-		AppointmentConverter converter = new AppointmentConverter(true, true);
-
-		Appointment appt = appointmentManager.getAppointment(getLoggedInInfo(), appointmentTo.getId());
-
-		response.setAppointment(converter.getAsTransferObject(getLoggedInInfo(), appt));
-
-		return response;
 	}
 
 	@GET

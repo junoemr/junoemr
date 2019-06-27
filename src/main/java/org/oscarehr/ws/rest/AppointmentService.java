@@ -67,7 +67,6 @@ public class AppointmentService extends AbstractServiceImpl
 	@GET
 	@Path("/{appointmentNo}")
 	@Produces("application/json")
-	@Consumes("application/json")
 	public RestResponse<AppointmentTo1> getAppointment(@PathParam("appointmentNo") Integer appointmentNo)
 	{
 		AppointmentConverter converter = new AppointmentConverter(true, true);

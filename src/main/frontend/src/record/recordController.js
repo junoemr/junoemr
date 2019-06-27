@@ -23,7 +23,7 @@
     Ontario, Canada
 
 */
-import {ScheduleApi} from '../../generated/api/ScheduleApi';
+import {AppointmentApi} from "../../generated/api/AppointmentApi";
 
 angular.module('Record').controller('Record.RecordController', [
 
@@ -73,7 +73,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 		var controller = this;
 
-		controller.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
+		controller.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
 			'../ws/rs');
 
 		controller.demographicNo = $stateParams.demographicNo;
@@ -426,13 +426,10 @@ angular.module('Record').controller('Record.RecordController', [
 			});
 		if ($location.search().appointmentNo != null)
 		{
-			var data = {
-				id: $location.search().appointmentNo
-			};
-			controller.scheduleApi.getAppointment(data).then(
+			controller.appointmentApi.getAppointment($location.search().appointmentNo).then(
 				function success(results)
 				{
-					controller.page.appointment = results.data.appointment;
+					controller.page.appointment = results.data.body;
 				},
 				function error(errors)
 				{

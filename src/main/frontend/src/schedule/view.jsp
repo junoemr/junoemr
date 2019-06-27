@@ -139,16 +139,16 @@
 					</div>
 				</div>
 			</div>
+			<div class="schedule-page-content">
+				<div
+						id="ca-calendar"
+						class="calendar"
+						ui-calendar="uiConfigApplied.calendar"
+						calendar="cpCalendar"
+						ng-model="eventSources"
+						ng-enabled="initialized"
+				></div>
+			</div>
 		</div>
-
-
-		<div
-			id="ca-calendar"
-			class="calendar"
-			ui-calendar="uiConfigApplied.calendar"
-			calendar="cpCalendar"
-			ng-model="eventSources"
-			ng-enabled="initialized"
-		></div>
 	</div>
 </div>

@@ -48,6 +48,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			'../ws/rs');
 
 		controller.providerSettings = loadedSettings;
+		controller.calendarMinColumnWidth = 250;
 
 		//=========================================================================
 		// Local scope variables
@@ -1090,7 +1091,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 
 			// Voodoo to set the resource view column width from https://stackoverflow.com/a/39297864
-			$("#ca-calendar").css('min-width',$('.fc-resource-cell').length*200);
+			$("#ca-calendar").css('min-width',$('.fc-resource-cell,.fc-day-header').length*controller.calendarMinColumnWidth);
 			element.addClass('calendar-background');
 		};
 
@@ -1110,7 +1111,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			// Voodoo to set the resource view column width from https://stackoverflow.com/a/39297864
 			$('.fc-agendaDay-button').click(function()
 			{
-				$("#schedule_container").css('min-width',$('.fc-resource-cell').length*200);
+				$("#schedule_container").css('min-width',$('.fc-resource-cell,.fc-day-header').length*controller.calendarMinColumnWidth);
 			});
 		};
 

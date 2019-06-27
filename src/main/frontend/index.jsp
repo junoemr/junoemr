@@ -281,7 +281,7 @@
 		     ng-include="'src/layout/leftAside.jsp'">
 		</div>
 		<div id="content-center-pane"
-		     class="flex-grow overflow-auto"
+		     class="flex-grow overflow-hidden"
 		     ui-view
 		     ng-cloak>
 		</div>

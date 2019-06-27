@@ -107,7 +107,7 @@
 						class="list-group-item">
 
 						<div ng-if="patientListCtrl.isAppointmentPatientView()"
-								class="flex-row vertical-align">
+								class="flex-row vertical-align justify-content-between">
 							<div class="col-md-6 list-group-clickable"
 								ng-click="patientListCtrl.goToRecord(patient)">
 								<h6>{{patient.name}}</h6>

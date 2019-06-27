@@ -29,22 +29,26 @@ h1,h2,h3 {
 .justify-content-evenly {
 	justify-content: space-evenly;
 }
+.justify-content-between {
+	justify-content: space-between;
+}
 
 .flex-row {
 	display: flex;
 	flex-direction: row;
-	justify-content: flex-start;
 }
 .flex-column {
 	display: flex;
 	flex-direction: column;
-	justify-content: flex-start;
 }
 .flex-grow {
 	flex-grow: 1;
 }
 .overflow-auto {
 	overflow: auto;
+}
+.overflow-hidden {
+	overflow: hidden;
 }
 
 .p-inline p {

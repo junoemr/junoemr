@@ -8,232 +8,6 @@
 	white-space: nowrap;
 }
 
-.calendar-loading
-{
-	position: absolute;
-	right: 50%;
-	top: 65px;
-}
-
-.fc-view-container {
-	background: #f6f6f6;
-	overflow-x: scroll;
-}
-
-.fc-view.fc-agendaDay-view.fc-agendaDay-view
-{
-    width: 100%;
-}
-
-.fc-view.fc-agendaTwoDay-view.fc-agenda-view {
-	width: 100%;
-}
-
-.calendar
-{
-	font-family: "Arial", "Helvetica", sans-serif;
-	.fc-toolbar
-	{
-		h2 { font-size: 1.571em; }
-		margin-bottom: 0.5em;
-	}
-
-	.fc-view-container
-	{
-		@extend %juno-primary-view-pane;
-		@include juno-page-margin-none;
-
-		background: #f6f6f6;
-		overflow-x: auto;
-
-		// hide the vertical scrollbar when the schedule is too tall
-		.fc-scroller {
-			overflow: visible !important;
-		}
-		// hide the highlight area selection. hidden so that it does not look like a draggable appointment can be made
-		// remove if the start time/end time go back to relying on the selected area
-		.fc-highlight {
-			background: transparent;
-		}
-
-		$scheduleCodeWidth: 16px;
-		.fc-event-container {
-			margin-left: $scheduleCodeWidth;
-
-			/* styling for normal events */
-			.fc-event {
-				cursor: pointer;
-				border: 1px solid $white !important;
-				border-radius: 8px;
-
-				// remove white opacity filter on events
-				.fc-bg {
-					background: transparent;
-					opacity: 1;
-				}
-				// resize/style the grabable resize bar on the bottom of events
-				.fc-resizer {
-					height: 3px;
-				}
-
-				.schedule-event {
-					display: flex;
-					padding: 0;
-					margin: 0;
-					font-size: 10px;
-					font-weight: normal;
-					color: $white;
-
-					$button-size: 16px;
-
-					.btn-event-link {
-						background: transparent;
-						border: 0;
-						width: $button-size;
-						min-width: $button-size;
-						height: $button-size;
-						font-weight: bold;
-						color: $white;
-						padding: 0;
-						&:hover {
-							background-color: rgba(0,0,0,0.2);
-							border-radius: 50%;
-						}
-					}
-					.event-blk {
-						display: flex;
-						align-items: center;
-						justify-content: flex-start;
-					}
-					.event-blk-label {
-						flex-grow: 1;
-						font-weight: bold;
-					}
-					.btn-icon {
-						width: $button-size;
-						height: $button-size;
-						.icon {
-							width: $button-size;
-							height: $button-size;
-						}
-						&:hover {
-							background-color: rgba(0,0,0,0.2);
-							border-radius: 50%;
-						}
-					}
-					.event-status {
-						margin-left: 8px;
-					}
-				}
-			}
-
-			.fc-time
-			{
-				display: none;
-			}
-
-			.event-tags
-			{
-				display: inline-block;
-				text-align: center;
-				margin: 0 4px;
-			}
-			.event-details
-			{
-				margin-left: 3px;
-			}
-		}
-	  	/* background event custom styling */
-		.fc-bgevent {
-			opacity: 1;
-			display: flex;
-			justify-content: center;
-			.schedule-background-event {
-				flex-grow: 1;
-				display: flex;
-			    .background-event-schedulecode {
-				    background-color: $grey-06;
-				    float: right;
-				    width: $scheduleCodeWidth;
-				    height: 100%;
-				    text-align: center;
-				    font-weight: bold;
-				    font-style: normal;
-				    font-stretch: normal;
-				    color: $white;
-				    line-height: normal;
-				    letter-spacing: normal;
-				    padding: 0;
-
-				    &.hour-marker {
-					    border-top: 1px solid $grey-05;
-				    }
-			    }
-			    .background-event-body {
-				    flex-grow: 1;
-				    background-color: $white;
-				    border-top: 1px solid $grey-07;
-
-				    &.hour-marker {
-					    border-top: 1px solid $grey-05;
-				    }
-			    }
-			}
-		}
-		/* Remove that awful yellow color from today */
-		.fc-today {
-		  opacity: 0;
-		}
-		.fc-head-container {
-			border: 0;
-			/* styling for the resource view column-control headers */
-			.fc-resource-cell {
-				border-left: 0;
-				border-right: 0;
-
-				.column-ctl-root {
-					@include juno-font-tab;
-					background-color: $white;
-					display: flex;
-					height: $page-tabs-height;
-					padding: 0 10px;
-
-					.column-ctl {
-						display: flex;
-						align-items: center;
-						justify-content: space-evenly;
-					}
-					.icon {
-						width: 16px;
-						height: 16px;
-						margin: 8px;
-					}
-				}
-			}
-			/* styling for the day/week/month view column-control headers */
-			.fc-day-header {
-				height: $page-tabs-height;
-			}
-		}
-		/* custom stying for the time column*/
-		.fc-time {
-			background-color: $grey-08;
-		}
-		.fc-axis {
-			width: $page-header-height !important;
-			padding: 0;
-		}
-
-		/* solid border lines separating empty cells */
-		.fc-time-grid .fc-slats .fc-minor td {
-			border-top: 1px solid $grey-07;
-		}
-		.calendar-background {
-			background-color: $white;
-		}
-	}
-}
-
 .schedule-page-header {
 	@extend %juno-page-header;
 
@@ -283,6 +57,224 @@
 			min-width: 200px;
 		}
 		@include clearfix;
+	}
+}
+
+
+.schedule-page-content {
+	@extend %juno-primary-view-pane;
+	@include juno-page-margin-none;
+
+	.calendar-loading
+	{
+		position: absolute;
+		right: 50%;
+		top: 65px;
+	}
+	.calendar {
+		font-family: "Arial", "Helvetica", sans-serif;
+		.fc-toolbar {
+			h2 {
+				font-size: 1.571em;
+			}
+			margin-bottom: 0.5em;
+		}
+
+		.fc-view-container {
+			background: #f6f6f6;
+
+			.fc-view.fc-agendaDay-view.fc-agendaDay-view
+			{
+				width: 100%;
+			}
+
+			.fc-view.fc-agendaTwoDay-view.fc-agenda-view {
+				width: 100%;
+			}
+
+			// hide the vertical scrollbar when the schedule is too tall
+			.fc-scroller {
+				overflow: visible !important;
+			}
+			// hide the highlight area selection. hidden so that it does not look like a draggable appointment can be made
+			// remove if the start time/end time go back to relying on the selected area
+			.fc-highlight {
+				background: transparent;
+			}
+
+			$scheduleCodeWidth: 16px;
+			.fc-event-container {
+				margin-left: $scheduleCodeWidth;
+
+				/* styling for normal events */
+				.fc-event {
+					cursor: pointer;
+					border: 1px solid $white !important;
+					border-radius: 8px;
+
+					// remove white opacity filter on events
+					.fc-bg {
+						background: transparent;
+						opacity: 1;
+					}
+					// resize/style the grabable resize bar on the bottom of events
+					.fc-resizer {
+						height: 3px;
+					}
+
+					.schedule-event {
+						display: flex;
+						padding: 0;
+						margin: 0;
+						font-size: 10px;
+						font-weight: normal;
+						color: $white;
+
+						$button-size: 16px;
+
+						.btn-event-link {
+							background: transparent;
+							border: 0;
+							width: $button-size;
+							min-width: $button-size;
+							height: $button-size;
+							font-weight: bold;
+							color: $white;
+							padding: 0;
+							&:hover {
+								background-color: rgba(0, 0, 0, 0.2);
+								border-radius: 50%;
+							}
+						}
+						.event-blk {
+							display: flex;
+							align-items: center;
+							justify-content: flex-start;
+						}
+						.event-blk-label {
+							flex-grow: 1;
+							font-weight: bold;
+						}
+						.btn-icon {
+							width: $button-size;
+							height: $button-size;
+							.icon {
+								width: $button-size;
+								height: $button-size;
+							}
+							&:hover {
+								background-color: rgba(0, 0, 0, 0.2);
+								border-radius: 50%;
+							}
+						}
+						.event-status {
+							margin-left: 8px;
+						}
+					}
+				}
+
+				.fc-time {
+					display: none;
+				}
+
+				.event-tags {
+					display: inline-block;
+					text-align: center;
+					margin: 0 4px;
+				}
+				.event-details {
+					margin-left: 3px;
+				}
+			}
+			/* background event custom styling */
+			.fc-bgevent {
+				opacity: 1;
+				display: flex;
+				justify-content: center;
+				.schedule-background-event {
+					flex-grow: 1;
+					display: flex;
+					.background-event-schedulecode {
+						background-color: $grey-06;
+						float: right;
+						width: $scheduleCodeWidth;
+						height: 100%;
+						text-align: center;
+						font-weight: bold;
+						font-style: normal;
+						font-stretch: normal;
+						color: $white;
+						line-height: normal;
+						letter-spacing: normal;
+						padding: 0;
+
+						&.hour-marker {
+							border-top: 1px solid $grey-05;
+						}
+					}
+					.background-event-body {
+						flex-grow: 1;
+						background-color: $white;
+						border-top: 1px solid $grey-07;
+
+						&.hour-marker {
+							border-top: 1px solid $grey-05;
+						}
+					}
+				}
+			}
+			/* Remove that awful yellow color from today */
+			.fc-today {
+				opacity: 0;
+			}
+			.fc-head-container {
+				border: 0;
+				/* styling for the resource view column-control headers */
+				.fc-resource-cell {
+					border-left: 0;
+					border-right: 0;
+
+					.column-ctl-root {
+						@include juno-font-tab;
+						background-color: $white;
+						display: flex;
+						height: $page-tabs-height;
+						padding: 0 10px;
+
+						.column-ctl {
+							display: flex;
+							align-items: center;
+							justify-content: space-evenly;
+						}
+						.icon {
+							width: 16px;
+							height: 16px;
+							margin: 8px;
+						}
+					}
+				}
+				/* styling for the day/week/month view column-control headers */
+				.fc-day-header {
+					height: $page-tabs-height;
+				}
+			}
+			/* custom stying for the time column*/
+			.fc-time {
+				background-color: $grey-08;
+			}
+			.fc-axis {
+				width: $page-header-height !important;
+				padding: 0;
+			}
+
+			/* solid border lines separating empty cells */
+			.fc-time-grid .fc-slats .fc-minor td {
+				border-top: 1px solid $grey-07;
+			}
+			.calendar-background {
+				background-color: $white;
+			}
+		}
 	}
 }
 
