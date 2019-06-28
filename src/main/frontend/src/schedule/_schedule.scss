@@ -10,31 +10,50 @@
 
 .schedule-page-header {
 	@extend %juno-page-header;
+	@include juno-font-label;
 
 	select {
 		@include juno-select(16px);
+		background-image: url($icon-down-white);
 	}
 
 	.schedule-options {
 		padding: 12px;
 
 		$input-height: $form-input-height;
-		.btn-icon {
-			width: $input-height;
-			height: $input-height;
-			background-color: $grey-08;
-			.icon {
-				width: 16px;
-				height: 16px;
-			}
-		}
-		.divider-vertical {
-			background-color: $grey-06;
-			width: 2px;
-			height: calc(#{$input-height} * 0.75);
-		}
 
 		.form-inline {
+			.btn {
+				font-weight: bold;
+				height: $input-height;
+
+				&.btn-addon {
+					@include juno-button-colour-scheme($white, $primary-hover, $primary-hover);
+				}
+				&.btn-primary {
+					@include juno-button-colour-scheme($white, $grey-01, $grey-01);
+				}
+				&.btn-icon {
+					width: $input-height;
+					background-color: $primary-hover;
+					.icon {
+						width: 16px;
+						height: 16px;
+					}
+				}
+			}
+			.divider-vertical {
+				background-color: $primary-hover;
+				width: 2px;
+				height: calc(#{$input-height} * 0.75);
+			}
+			.form-control {
+				@include juno-form-colour-scheme-dark;
+			}
+
+			input,select {
+				font-weight: bold;
+			}
 			label {
 				margin-right: 5px;
 			}
@@ -42,7 +61,7 @@
 				outline: none;
 			}
 			.form-group {
-				margin-left: 20px;
+				margin-left: 4px;
 			}
 			.form-group:first-child {
 				margin-left: 0
@@ -81,8 +100,6 @@
 		}
 
 		.fc-view-container {
-			background: #f6f6f6;
-
 			.fc-view.fc-agendaDay-view.fc-agendaDay-view
 			{
 				width: 100%;
@@ -100,6 +117,15 @@
 			// remove if the start time/end time go back to relying on the selected area
 			.fc-highlight {
 				background: transparent;
+			}
+			// adjust style for left hand time column
+			.fc-time {
+				font-size: 11px;
+				font-weight: bold;
+				background-color: $grey-08;
+				span {
+					padding-right: 4px;
+				}
 			}
 
 			$scheduleCodeWidth: 16px;
@@ -170,20 +196,15 @@
 						.event-status {
 							margin-left: 8px;
 						}
+						.event-tags {
+							display: inline-block;
+							text-align: center;
+							margin: 0 4px;
+						}
+						.event-details {
+							margin-left: 3px;
+						}
 					}
-				}
-
-				.fc-time {
-					display: none;
-				}
-
-				.event-tags {
-					display: inline-block;
-					text-align: center;
-					margin: 0 4px;
-				}
-				.event-details {
-					margin-left: 3px;
 				}
 			}
 			/* background event custom styling */
@@ -195,7 +216,6 @@
 					flex-grow: 1;
 					display: flex;
 					.background-event-schedulecode {
-						background-color: $grey-06;
 						float: right;
 						width: $scheduleCodeWidth;
 						height: 100%;
@@ -204,6 +224,7 @@
 						font-style: normal;
 						font-stretch: normal;
 						color: $white;
+						background-color: $grey-06;
 						line-height: normal;
 						letter-spacing: normal;
 						padding: 0;
@@ -258,15 +279,10 @@
 					height: $page-tabs-height;
 				}
 			}
-			/* custom stying for the time column*/
-			.fc-time {
-				background-color: $grey-08;
-			}
 			.fc-axis {
 				width: $page-header-height !important;
 				padding: 0;
 			}
-
 			/* solid border lines separating empty cells */
 			.fc-time-grid .fc-slats .fc-minor td {
 				border-top: 1px solid $grey-07;

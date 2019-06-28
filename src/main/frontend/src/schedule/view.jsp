@@ -41,14 +41,16 @@
 						<div class="form-group cal-step-button-group">
 							<div class="form-group">
 								<button class="btn btn-icon"
+								        title="Previous Day"
 								        ng-click="stepBack()">
-									<span class="icon icon-left"></span>
+									<span class="icon icon-left-white"></span>
 								</button>
 							</div>
 							<div class="form-group">
 								<button class="btn btn-icon"
+								        title="Next Day"
 								        ng-click="stepForward()">
-									<span class="icon icon-right"></span>
+									<span class="icon icon-right-white"></span>
 								</button>
 							</div>
 						</div>
@@ -63,7 +65,7 @@
 							></ca-field-date>
 						</div>
 
-						<div class="form-group divider-vertical"></div>
+						<%--<div class="form-group divider-vertical"></div>--%>
 						<ca-field-select
 								ca-hide="!hasSites()"
 								ca-name="site"
@@ -94,28 +96,28 @@
 							>
 							</ca-field-select>
 						</div>
-						<div class="form-group divider-vertical"></div>
+						<%--<div class="form-group divider-vertical"></div>--%>
 					</div>
 
 					<div class="form-group pull-right">
 						<div class="form-group">
 							<div class="btn-group" role="group" ng-show="isAgendaView()">
 								<button type="button"
-								        class="btn"
+								        class="btn btn-sm"
 								        ng-class=" { 'btn-addon': viewName() != 'agendaDay', 'btn-primary': viewName() == 'agendaDay' } "
 								        viewName="agendaDay"
 								        ng-click="changeView('agendaDay')">
 									Day
 								</button>
 								<button type="button"
-								        class="btn"
+								        class="btn btn-sm"
 								        ng-class=" { 'btn-addon': viewName() != 'agendaWeek', 'btn-primary': viewName() == 'agendaWeek' } "
 								        viewName="agendaWeek"
 								        ng-click="changeView('agendaWeek')">
 									Week
 								</button>
 								<button type="button"
-								        class="btn"
+								        class="btn btn-sm"
 								        ng-class=" { 'btn-addon': viewName() != 'month', 'btn-primary': viewName() == 'month' } "
 								        viewName="month"
 								        ng-click="changeView('month')">
@@ -125,8 +127,9 @@
 						</div>
 						<div class="form-group">
 							<button class="btn btn-icon"
+							        title="Refresh Appointments"
 							        ng-click="refetchEvents()">
-								<span class="icon icon-refresh"></span>
+								<span class="icon icon-refresh-white"></span>
 							</button>
 						</div>
 					</div>

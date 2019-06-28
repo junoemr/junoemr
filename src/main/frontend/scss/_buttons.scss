@@ -1,4 +1,10 @@
 
+@mixin juno-button-colour-scheme($text-color, $background-color, $border-color) {
+	color: $text-color;
+	background-color: $background-color;
+	border-color: $border-color;
+}
+
 .btn {
 	display: inline-block;
 	margin-bottom: 0;
@@ -20,31 +26,23 @@
 	user-select: none;
 	&.btn-sm {
 		padding: 5px 10px;
-		font-size: 12px;
 		line-height: 1.5;
 		border-radius: 3px;
 	}
 	&.btn-xs {
 		padding: 1px 5px;
-		font-size: 12px;
 		line-height: 1.5;
 		border-radius: 3px;
 	}
 
 	&.btn-default,&.btn-addon {
-		color: $primary;
-		background-color: $white;
-		border-color: $grey-06;
+		@include juno-button-colour-scheme($primary, $white, $grey-06);
 	}
 	&.btn-success {
-		color: $white;
-		background-color: $green;
-		border-color: $green-hover;
+		@include juno-button-colour-scheme($white, $green, $green-hover);
 	}
 	&.btn-primary {
-		color: $white;
-		background-color: $primary;
-		border-color: $primary-hover;
+		@include juno-button-colour-scheme($white, $primary, $primary-hover);
 	}
 
 	// for icon only buttons

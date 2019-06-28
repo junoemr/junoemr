@@ -10,6 +10,7 @@ $icon-checked: $images-root + 'icon-16-check-white.svg';
 $icon-add-appt: $images-root + 'icon-48-add-appintment.svg';
 $icon-user-search: $images-root + 'icon-16-search-user.svg';
 $icon-refresh: $images-root + 'icon-16-refresh.svg';
+$icon-refresh-white: $images-root + 'icon-16-refresh-white.svg';
 $icon-daysheet-blue: $images-root + 'cal-daysheetblue.svg';
 $icon-search-blue: $images-root + 'cal-searchblue.svg';
 $icon-week-view-blue: $images-root + 'cal-weekblue.svg';
@@ -21,10 +22,13 @@ $icon-aside: $images-root + 'icon-48-aside.svg';
 $icon-setting: $images-root + 'icon-48-setting.svg';
 
 $icon-up: $images-root + 'icon-16-arrow-up.svg';
+$icon-up-white: $images-root + 'icon-16-arrow-down-white.svg';
 $icon-down: $images-root + 'icon-16-arrow-down.svg';
 $icon-down-white: $images-root + 'icon-16-arrow-down-white.svg';
 $icon-left: $images-root + 'icon-16-arrow-left.svg';
+$icon-left-white: $images-root + 'icon-16-arrow-left-white.svg';
 $icon-right: $images-root + 'icon-16-arrow-right.svg';
+$icon-right-white: $images-root + 'icon-16-arrow-right-white.svg';
 
 $icon-status-starbill: $images-appt-status + 'icon-48-todo.svg';
 $icon-status-todo: $images-appt-status + 'icon-48-folder.svg';
@@ -69,11 +73,20 @@ $icon-status-12: $images-appt-status + 'icon-48-number-12.svg';
 .icon-down {
 	background-image: url($icon-down);
 }
+.icon-down-white {
+	background-image: url($icon-down-white);
+}
 .icon-left {
 	background-image: url($icon-left);
 }
+.icon-left-white {
+	background-image: url($icon-left-white);
+}
 .icon-right {
 	background-image: url($icon-right);
+}
+.icon-right-white {
+	background-image: url($icon-right-white);
 }
 .icon-add {
 	background-image: url($icon-add);
@@ -83,6 +96,9 @@ $icon-status-12: $images-appt-status + 'icon-48-number-12.svg';
 }
 .icon-refresh {
 	background-image: url($icon-refresh);
+}
+.icon-refresh-white {
+	background-image: url($icon-refresh-white);
 }
 .icon-daysheet {
 	background-image: url($icon-daysheet-blue);
