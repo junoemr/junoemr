@@ -61,6 +61,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	// Local scope variables
 	//=========================================================================/
 
+	controller.useOldEchart = true; //TODO load from a setting?
 	controller.tabEnum = Object.freeze({
 		appointment:0,
 		reoccurring:1,
@@ -134,8 +135,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	{
 		return (value.uuid != null);
 	});
-
-
 
 	controller.sitesEnabled = $scope.parentScope.hasSites();
 
@@ -804,6 +803,10 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	{
 		return Juno.Common.Util.exists(controller.demographicModel.demographicNo);
 	};
+	controller.hasAppointmentId = function hasAppointmentId()
+	{
+		return Juno.Common.Util.exists($scope.eventUuid);
+	};
 
 	$scope.hasSites = function hasSites()
 	{
@@ -1057,6 +1060,96 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 		console.log($('#myModal'));
 	};
+
+	controller.openEncounterPage = function()
+	{
+		if ($scope.isPatientSelected())
+		{
+			if(controller.useOldEchart)
+			{
+				var params = {
+					providerNo: controller.providerModel.providerNo,
+					curProviderNo:  data.eventData.userProviderNo,
+					demographicNo: controller.demographicModel.demographicNo,
+					userName: "",
+					reason: $scope.eventData.reason,
+					curDate: Juno.Common.Util.formatMomentDate(moment()),
+					providerview:  data.eventData.userProviderNo,
+
+					appointmentNo: $scope.eventUuid,
+					appointmentDate: $scope.eventData.startDate,
+					startTime: $scope.eventData.startTime,
+					status: controller.selectedEventStatus,
+					apptProvider_no: controller.providerModel.providerNo,
+					encType: "face to face encounter with client",
+				};
+				window.open(scheduleService.getEncounterLink(params));
+			}
+			else
+			{
+				var params = {
+					demographicNo: controller.demographicModel.demographicNo,
+				};
+				if (angular.isDefined($scope.eventUuid))
+				{
+					params.appointmentNo = $scope.eventUuid;
+					params.encType = "face to face encounter with client";
+				}
+				$state.go('record.summary', params);
+			}
+			controller.cancel();
+		}
+	};
+	controller.openBillingPage = function()
+	{
+		if ($scope.isPatientSelected() && Juno.Common.Util.exists($scope.eventUuid))
+		{
+			var params = {
+				demographic_no: controller.demographicModel.demographicNo,
+				demographic_name: controller.demographicModel.fullName,
+				providerNo: controller.providerModel.providerNo,
+				providerview: controller.providerModel.providerNo,
+				user_no: data.eventData.userProviderNo,
+
+				billRegion: data.eventData.billingRegion,
+				billForm: data.eventData.billingForm,
+				hotclick: "",
+				bNewForm: 1,
+
+				apptProvider_no: controller.providerModel.providerNo,
+				appointment_no: $scope.eventUuid,
+				appointmentDate: $scope.eventData.startDate,
+				status: controller.selectedEventStatus,
+				start_time: $scope.eventData.startTime,
+
+				referral_no_1: "",
+			};
+			window.open(scheduleService.getBillingLink(params));
+			controller.cancel();
+		}
+	};
+	controller.openMasterRecord = function()
+	{
+		if ($scope.isPatientSelected())
+		{
+			var params = {
+				demographicNo: controller.demographicModel.demographicNo,
+			};
+			$state.go('record.details', params);
+			controller.cancel();
+		}
+	};
+
+	controller.openRxWindow = function()
+	{
+		var params = {
+			demographicNo: controller.demographicModel.demographicNo,
+			providerNo: controller.providerModel.providerNo,
+		};
+		window.open(scheduleService.getRxLink(params));
+		controller.cancel();
+	};
+
 
 	//=========================================================================
 	//  Key Bindings

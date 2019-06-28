@@ -312,6 +312,13 @@
 			align-items: center;
 			justify-content: space-between;
 			display: flex;
+
+			.modal-patient-links {
+				margin-right: 20px;
+				.btn {
+					width: 28px;
+				}
+			}
 		}
 		.icon-modal-ctl {
 			width: 16px;

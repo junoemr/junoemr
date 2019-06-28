@@ -100,8 +100,57 @@ angular.module("Schedule").service("scheduleService", [
 
 				return deferred.promise;
 			},
-		};
 
+
+			getBillingLink: function getBillingLink(params)
+			{
+				return "../billing.do" +
+					"?billRegion=" +        encodeURIComponent(Juno.Common.Util.toTrimmedString(params.billRegion)) +
+					"&billForm=" +          encodeURIComponent(Juno.Common.Util.toTrimmedString(params.billForm)) +
+					"&hotclick=" +          encodeURIComponent(Juno.Common.Util.toTrimmedString(params.hotclick)) +
+					"&appointment_no=" +    encodeURIComponent(Juno.Common.Util.toTrimmedString(params.appointment_no)) +
+					"&demographic_name=" +  encodeURIComponent(Juno.Common.Util.toTrimmedString(params.demographic_name)) +
+					"&status=" +            encodeURIComponent(Juno.Common.Util.toTrimmedString(params.status)) +
+					"&demographic_no=" +    encodeURIComponent(Juno.Common.Util.toTrimmedString(params.demographic_no)) +
+					"&providerview=" +      encodeURIComponent(Juno.Common.Util.toTrimmedString(params.providerview)) +
+					"&user_no=" +           encodeURIComponent(Juno.Common.Util.toTrimmedString(params.user_no)) +
+					"&apptProvider_no=" +   encodeURIComponent(Juno.Common.Util.toTrimmedString(params.apptProvider_no)) +
+					"&appointment_date=" +  encodeURIComponent(Juno.Common.Util.toTrimmedString(params.appointment_date)) +
+					"&start_time=" +        encodeURIComponent(Juno.Common.Util.toTrimmedString(params.start_time)) +
+					"&bNewForm=" +          encodeURIComponent(Juno.Common.Util.toTrimmedString(params.bNewForm)) +
+					"&referral_no_1=" +     encodeURIComponent(Juno.Common.Util.toTrimmedString(params.referral_no_1))
+			},
+
+			getEncounterLink: function getEncounterLink(params)
+			{
+				return "../oscarEncounter/IncomingEncounter.do" +
+					"?providerNo=" +        encodeURIComponent(Juno.Common.Util.toTrimmedString(params.providerNo)) +
+					"&appointmentNo=" +     encodeURIComponent(Juno.Common.Util.toTrimmedString(params.appointmentNo)) +
+					"&demographicNo=" +     encodeURIComponent(Juno.Common.Util.toTrimmedString(params.demographicNo)) +
+					"&curProviderNo=" +     encodeURIComponent(Juno.Common.Util.toTrimmedString(params.curProviderNo)) +
+					"&reason=" +            encodeURIComponent(Juno.Common.Util.toTrimmedString(params.reason)) +
+					"&encType=" +           encodeURIComponent(Juno.Common.Util.toTrimmedString(params.encType)) +
+
+					"&userName=" +          encodeURIComponent(Juno.Common.Util.toTrimmedString(params.userName)) +
+					"&curDate=" +           encodeURIComponent(Juno.Common.Util.toTrimmedString(params.curDate)) +
+
+					"&appointmentDate=" +   encodeURIComponent(Juno.Common.Util.toTrimmedString(params.appointmentDate)) +
+					"&startTime=" +         encodeURIComponent(Juno.Common.Util.toTrimmedString(params.startTime)) +
+					"&status=" +            encodeURIComponent(Juno.Common.Util.toTrimmedString(params.status)) +
+					"&apptProvider_no=" +   encodeURIComponent(Juno.Common.Util.toTrimmedString(params.apptProvider_no)) +
+					"&providerview=" +      encodeURIComponent(Juno.Common.Util.toTrimmedString(params.providerview))
+			},
+
+			getRxLink: function getRxLink(params)
+			{
+				if (params.demographicNo !== 0)
+				{
+					return "../oscarRx/choosePatient.do" +
+						"?providerNo=" + encodeURIComponent(params.providerNo) +
+						"&demographicNo=" + encodeURIComponent(params.demographicNo);
+				}
+			}
+		};
 		return service;
 	}
 ]);

@@ -237,7 +237,7 @@ public class PersonaService extends AbstractServiceImpl {
 		MenuTo1 menu = new MenuTo1()
 				.addWithState(idCounter++,bundle.getString("navbar.menu.dashboard"), null, "dashboard");
 
-		if(OscarProperties.getInstance().isScheduleEnabled())
+		if(OscarProperties.getInstance().isScheduleEnabled() || getLoggedInInfo().getLoggedInProvider().getSuperAdmin())
 		{
 			menu.addWithState(idCounter++, bundle.getString("navbar.menu.schedule"), null, "schedule");
 		}

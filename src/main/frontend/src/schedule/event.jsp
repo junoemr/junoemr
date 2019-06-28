@@ -33,6 +33,26 @@
 			</div>
 		</div>
 		<div class="modal-ctl-buttons">
+			<div class="modal-patient-links"
+			     ng-show="isPatientSelected()">
+				<button type="button" class="btn btn-xs btn-default"
+				        ng-click="eventController.openEncounterPage()">
+					<span class="">E</span>
+				</button>
+				<button type="button" class="btn btn-xs btn-default"
+				        ng-disabled="!eventController.hasAppointmentId()"
+				        ng-click="eventController.openBillingPage()">
+					<span class="">B</span>
+				</button>
+				<button type="button" class="btn btn-xs btn-default"
+				        ng-click="eventController.openMasterRecord()">
+					<span class="">M</span>
+				</button>
+				<button type="button" class="btn btn-xs btn-default"
+				        ng-click="eventController.openRxWindow()">
+					<span class="">Rx</span>
+				</button>
+			</div>
 			<%--<button type="button" class="close" aria-label="Maximaze">--%>
 				<%--<a class="icon icon-modal-ctl icon-modal-max"></a>--%>
 			<%--</button>--%>
