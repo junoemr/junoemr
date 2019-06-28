@@ -190,4 +190,16 @@ public class MapperFactory
 	{
 		return new TicklerMapper(message, providerRep, importSource);
 	}
+
+	/**
+	 * new measurements mapper
+	 * @param message - message to import
+	 * @param providerRep - rep of provider
+	 * @param importSource - source of import
+	 * @return - new measurements mapper
+	 */
+	public static MeasurementsMapper newMeasurementsMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
+	{
+		return new MeasurementsMapper(message, providerRep, importSource);
+	}
 }

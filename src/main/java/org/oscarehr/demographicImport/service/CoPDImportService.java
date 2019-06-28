@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.allergy.service.AllergyService;
 import org.oscarehr.common.dao.DxresearchDAO;
+import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.TicklerDao;
 import org.oscarehr.common.hl7.copd.mapper.*;
@@ -42,6 +43,7 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Dxresearch;
+import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.demographic.dao.DemographicDao;
@@ -145,6 +147,9 @@ public class CoPDImportService
 
 	@Autowired
 	TicklerDao ticklerDao;
+
+	@Autowired
+	MeasurementDao measurementDao;
 
 	private static long missingDocumentCount = 0;
 
@@ -261,6 +266,8 @@ public class CoPDImportService
 			importDocumentData(zpdZtrMessage, i, assignedProvider, demographic, documentLocation, importSource, skipMissingDocs);
 			logger.info("Import Ticklers ...");
 			importTicklers(zpdZtrMessage, i, assignedProvider, demographic, importSource);
+			logger.info("Importing Measurements ...");
+			importMeasurements(zpdZtrMessage, demographic, i, assignedProvider, importSource);
 		}
 
 		return mrpProvider;
@@ -326,6 +333,18 @@ public class CoPDImportService
 			demographicService.addNewDemographicRecord(IMPORT_PROVIDER, demographic, demographicCust, demographicExtList);
 		}
 		return demographic;
+	}
+
+	private void importMeasurements(ZPD_ZTR zpdZtrMessage, Demographic demographic, int provderRep, ProviderData assignedProvider, IMPORT_SOURCE importSource) throws HL7Exception
+	{
+		MeasurementsMapper measurementsMapper = MapperFactory.newMeasurementsMapper(zpdZtrMessage, provderRep, importSource);
+
+		List<Measurement> measurements = measurementsMapper.getMeasurementList(demographic, assignedProvider);
+		for (Measurement measurement : measurements)
+		{
+			logger.info("Saving measurement of type: " + measurement.getType() + " value: " + measurement.getDataField() + " to demographic: " + demographic.getDemographicId());
+			measurementDao.persist(measurement);
+		}
 	}
 
 	private void importAppointmentData(ZPD_ZTR zpdZtrMessage, Demographic demographic, ProviderData defaultProvider, IMPORT_SOURCE importSource) throws HL7Exception
