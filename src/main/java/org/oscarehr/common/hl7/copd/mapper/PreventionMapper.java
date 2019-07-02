@@ -210,5 +210,28 @@ public class PreventionMapper extends AbstractMapper
 		preventionTypeMap.put("zostavax".toUpperCase(), 			"Zostavax");
 		preventionTypeMap.put("zoster".toUpperCase(), 				"HZV");
 		preventionTypeMap.put("zoster vaccine".toUpperCase(), 		"HZV");
+		preventionTypeMap.put("".toUpperCase(), "");
+		preventionTypeMap.put("Agriflu".toUpperCase(), "Flu");
+		preventionTypeMap.put("Avaxim".toUpperCase(), "HepA");
+		preventionTypeMap.put("BOOSTRIX- POLIO".toUpperCase(), "dTap");
+		preventionTypeMap.put("ENGERIX-B".toUpperCase(), "HepB");
+		preventionTypeMap.put("flumist".toUpperCase(), "Flu");
+		preventionTypeMap.put("FLUVIRAL".toUpperCase(), "Flu");
+		preventionTypeMap.put("fluzone".toUpperCase(), "Flu");
+		preventionTypeMap.put("GARDASIL".toUpperCase(), "HPV Vaccine");
+		preventionTypeMap.put("HAVRIX 1440".toUpperCase(), "HepA");
+		preventionTypeMap.put("Havrix 720".toUpperCase(), "HepA");
+		preventionTypeMap.put("HEXA-VALENT".toUpperCase(), "Dtap-IPV-Hib-HB");
+		preventionTypeMap.put("INFANRIX IPV".toUpperCase(), "DTap-IPV");
+		preventionTypeMap.put("INFANRIX IPV+HIB".toUpperCase(), "DTaP-IPV-Hib");
+		preventionTypeMap.put("NEIS VAC".toUpperCase(), "MenC-C");
+		preventionTypeMap.put("Pediacel".toUpperCase(), "DTaP-IPV-Hib");
+		preventionTypeMap.put("PENTAVALENT".toUpperCase(), "DTaP-IPV-Hib");
+		preventionTypeMap.put("PNEU-P-23".toUpperCase(), "Pneumovax");
+		preventionTypeMap.put("PROQUAD".toUpperCase(), "MMRV");
+		preventionTypeMap.put("RotaTeq".toUpperCase(), "Rot");
+		preventionTypeMap.put("ROTAVIRUS".toUpperCase(), "Rot");
+		preventionTypeMap.put("TYPHERIX".toUpperCase(), "Thyphoid");
+		preventionTypeMap.put("QUADRIVALENT".toUpperCase(), "Flu");
 	}
 }

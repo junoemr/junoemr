@@ -235,9 +235,11 @@ public class CoPDPreProcessorService
 			}
 		};
 
+		message = foreachTag(message, "ZQO.4", trimValueCallback);
 		message = foreachTag(message, "ZQO.5", trimValueCallback);
-		message =  foreachTag(message, "ZQO.4", trimValueCallback);
-		return foreachTag(message, "ZQO.7", trimValueCallback);
+		message = foreachTag(message, "ZQO.6", trimValueCallback);
+		message = foreachTag(message, "ZQO.7", trimValueCallback);
+		return message;
 	}
 
 	/**
@@ -265,7 +267,10 @@ public class CoPDPreProcessorService
 		};
 
 		message = foreachTag(message, "ZQO.4", ensureNumeric);
-		return foreachTag(message, "ZQO.5", ensureNumeric);
+		message = foreachTag(message, "ZQO.5", ensureNumeric);
+		message = foreachTag(message, "ZQO.6", ensureNumeric);
+		message = foreachTag(message, "ZQO.7", ensureNumeric);
+		return message;
 	}
 
 	/**
@@ -356,23 +361,66 @@ public class CoPDPreProcessorService
 	 */
 	private String importKabongoSpecificHax(String message)
 	{
-		// convert the string "41 inches" to "104.14" aka 41 inches in centimeters
-		Function<String, String> fix41Inch = new Function<String, String>() {
+		// convert the string "num inches" to "num" in cm.
+		Function<String, String> fixInch = new Function<String, String>() {
 			@Override
 			public String apply(String tagValue)
 			{
-				if (tagValue.equals("41 inches"))
+				String[] tagLst = tagValue.split(" ");
+				if (tagLst.length == 2 && tagLst[1].equalsIgnoreCase("inches"))
 				{
-					return "104.14";
+					try
+					{
+						int inches = Integer.parseInt(tagLst[0]);
+						return "" + (inches * 2.54);
+					}
+					catch (NumberFormatException e)
+					{
+						return tagValue;
+					}
 				}
 				else
 				{
 					return tagValue;
 				}
 			}
+
 		};
 
-		return foreachTag(message, "ZAT.8", fix41Inch);
+		// replace "135cm" with "135".
+		Function<String, String> fixZQO = new Function<String, String>() {
+			@Override
+			public String apply(String tagValue)
+			{
+				if (tagValue.equals("135cm"))
+				{
+					return "135";
+				}
+				else if (tagValue.equals("109cm"))
+				{
+					return "109";
+				}
+				else if (tagValue.equals("67 kg"))
+				{
+					return "67";
+				}
+				else if (tagValue.equals("56 kg"))
+				{
+					return "56";
+				}
+				else
+				{
+					return tagValue;
+				}
+			}
+
+		};
+
+		message = foreachTag(message, "ZAT.8", fixInch);
+		message = foreachTag(message, "ZQO.8", fixInch);
+		message = foreachTag(message, "ZQO.8", fixZQO);
+		message = foreachTag(message, "ZQO.7", fixZQO);
+		return message;
 	}
 
 	/**
