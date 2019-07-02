@@ -898,6 +898,14 @@ private long getAppointmentRowSpan(
 						</script>
 					</li>
 				</c:if>
+				<c:if test="<%= org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
+					<li id="admin2">
+						<a href="../telehealth/myhealthaccess.do?method=startTelehealth"
+							 id="myhealthaccess"
+							 title='MyHealthAccess'
+							 target="_blank">MyHealthAccess</a>
+					</li>
+				</c:if>
 
 				<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.userAdmin,_admin.schedule,_admin.billing,_admin.resource,_admin.reporting,_admin.backup,_admin.messenger,_admin.eform,_admin.encounter,_admin.consult,_admin.misc,_admin.fax" rights="r">
 
@@ -1848,7 +1856,25 @@ private long getAppointmentRowSpan(
 
 														</c:if>
 
-														<a class="apptLink" href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;"
+														<c:if test="<%= appointmentInfo.isVirtual() && org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
+																<a href="#"
+																	 onClick='popupPage(800, 1280,
+																					 "../telehealth/myhealthaccess.do?method=startTelehealth" +
+																					 "&demographicNo=${appointmentInfo.demographicNo}" +
+																					 "&siteName=${appointmentInfo.siteName}");return false;'
+																	 title="Telehealth">
+																		<img
+																						style="vertical-align: bottom"
+																						src="../images/icons/telehealth.svg"
+																						border="0"
+																						height="14px"
+																						title="Telehealth Appointment"
+																						alt="Tel"
+																		/>
+																</a>
+														</c:if>
+
+															<a class="apptLink" href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;"
 
 															<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON_TOOLTIP" value="yes" defaultVal="true">
 																${appointmentInfo.appointmentLinkTitle}
@@ -1901,9 +1927,6 @@ private long getAppointmentRowSpan(
 																&#124; <a href='#' onClick='popupPage(700, 1024, "formIntake.jsp?demographic_no=${appointmentInfo.demographicNo}")' title='Intake Form'>In</a>
 															</c:if>
 
-														<c:if test="<%= org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
-																&#124; <a href="#" onClick='popupPage(800, 1280, "../telehealth/myhealthaccess.do?method=startTelehealth&demographicNo=${appointmentInfo.demographicNo}&siteName=${appointmentInfo.siteName}");return false;' title="Telehealth">Tel</a>
-														</c:if>
 															<!--  eyeform open link -->
 															<c:if test="${appointmentInfo.showEyeformLink}">
 																&#124; <a href="#" onClick='popupPage(800, 1280, "../eyeform/eyeform.jsp?demographic_no=${appointmentInfo.demographicNo}&appointment_no=${appointmentInfo.appointmentNo}");return false;' title="EyeForm">EF</a>

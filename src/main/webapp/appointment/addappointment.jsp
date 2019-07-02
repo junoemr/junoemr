@@ -1125,6 +1125,21 @@
 							   width="25" height="20" border="0" hspace="2">
 					</div>
 				</li>
+
+				<% if(org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() ) { %>
+
+				<li class="weak row">
+						<div class="label">Virtual:</div>
+						<div class="input">
+						<input type="checkbox" name="isVirtual" />
+					</div>
+					<div class="space">&nbsp;</div>
+					<div class="label"></div>
+					<div class="input"></div>
+				</li>
+
+				<% } %>
+
 				<li class="row weak">
 					<div class="label"><bean:message key="Appointment.formCreator"/>:</div>
 					<div class="input">

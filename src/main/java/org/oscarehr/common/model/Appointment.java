@@ -119,6 +119,7 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 
 	private String remarks;
 	private String urgency;
+	private boolean isVirtual;
 	private Integer creatorSecurityId;
 	
 	@Enumerated(EnumType.STRING)
@@ -331,6 +332,16 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 
 	public void setUrgency(String urgency) {
 		this.urgency = urgency;
+	}
+
+	public boolean isVirtual()
+	{
+		return isVirtual;
+	}
+
+	public void setIsVirtual(boolean isVirtual)
+	{
+		this.isVirtual = isVirtual;
 	}
 
 	public Integer getCreatorSecurityId() {
