@@ -549,6 +549,16 @@
 			demographic_no=${demographic}</ap-sql>
 		<ap-output>${sin}</ap-output>
 	</databaseap>
+	<databaseap>
+		<ap-name>name_of_mother</ap-name>
+		<ap-sql>SELECT name_of_mother FROM demographic WHERE demographic_no=${demographic}</ap-sql>
+		<ap-output>${name_of_mother}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>name_of_father</ap-name>
+		<ap-sql>SELECT name_of_father FROM demographic WHERE demographic_no=${demographic}</ap-sql>
+		<ap-output>${name_of_father}</ap-output>
+	</databaseap>
 
 	<!-- OHSUPPORT-2712 licensed Marijuana Producers (requires custom database tables)-->
 	<databaseap>
