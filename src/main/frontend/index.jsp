@@ -78,7 +78,7 @@
 			<div class="navbar-collapse collapse" id="main-nav-collapse">
 				<div class="navbar-left">
 					<form class="vertical-align patient-search-form" role="search">
-						<div class="form-group" ng-cloak>
+						<div class="form-group breakpoint-sm-visible" ng-cloak>
 							<juno-patient-search-typeahead
 									juno-model="navBarCtrl.demographicSearch"
 									juno-icon-left="true"
@@ -104,7 +104,7 @@
 				</div>
 
 				<!-- Large view -->
-				<ul class="nav navbar-nav visible-nav-lg" ng-cloak>
+				<ul class="nav navbar-nav breakpoint-lg-visible-exclusive" ng-cloak>
 					<li ng-repeat="item in navBarCtrl.menuItems"
 						ng-class="{'active': navBarCtrl.isActive(item) }">
 
@@ -134,7 +134,7 @@
 				</ul>
 
 				<!-- Medium view -->
-				<ul class="nav navbar-nav visible-nav-md" ng-cloak>
+				<ul class="nav navbar-nav breakpoint-md-visible-exclusive" ng-cloak>
 					<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.mediumNavItemFilter(false)"
 						ng-class="{'active': navBarCtrl.isActive(item) }">
 
@@ -184,8 +184,8 @@
 					</li>
 				</ul>
 
-				<%--Small View--%>
-				<ul class="nav navbar-nav visible-nav-sm" ng-cloak>
+				<!--Small View-->
+				<ul class="nav navbar-nav breakpoint-sm-visible-exclusive" ng-cloak>
 					<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.smallNavItemFilter(false)"
 						ng-class="{'active': navBarCtrl.isActive(item) }">
 						<a ng-click="navBarCtrl.transition(item)" data-toggle="tab">{{item.label}}
@@ -221,6 +221,42 @@
 									 ng-click="navBarCtrl.transition(item)">{{item.label}}
 								<span ng-if="item.extra.length>0" class="label">{{item.extra}}</span></a>
 							</li>--%>
+						</ul>
+					</li>
+				</ul>
+
+				<!-- Mobile View -->
+				<ul class="nav navbar-nav breakpoint-mb-visible-exclusive" ng-cloak>
+					<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.mobileNavItemFilter(false)"
+					    ng-class="{'active': navBarCtrl.isActive(item) }">
+						<a ng-click="navBarCtrl.transition(item)" data-toggle="tab">{{item.label}}
+							<span ng-if="item.extra.length>0">({{item.extra}})</span>
+						</a>
+					</li>
+					<li class="dropdown hand-hover">
+						<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
+							More
+							<b class="caret"></b>
+						</a>
+
+						<ul class="dropdown-menu" role="menu">
+							<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.mobileNavItemFilter(true)"
+							    ng-class="{'active': navBarCtrl.isActive(item) }">
+								<a href="javascript:void(0)"
+								   ng-if="!item.dropdown"
+								   ng-click="navBarCtrl.transition(item)">{{item.label}}
+									<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
+									      class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
+								</a>
+
+								<a href="javascript:void(0)"
+								   ng-if="item.dropdown"
+								   ng-repeat="dropdownItem in item.dropdownItems"
+								   ng-class="{'active': navBarCtrl.isActive(dropdownItem) }"
+								   ng-click="navBarCtrl.transition(dropdownItem)">
+									{{dropdownItem.label}}
+								</a>
+							</li>
 						</ul>
 					</li>
 				</ul>

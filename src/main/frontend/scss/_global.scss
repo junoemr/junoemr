@@ -125,24 +125,6 @@ a,.clickable {
 	color: $red;
 }
 
-@media (max-width: 1730px) {
-	.hidden-1730 {
-		display: none !important;
-	}
-	.visible-1730 {
-		display: block !important;
-	}
-}
-
-@media (max-width: 1500px) {
-	.hidden-1500 {
-		display: none !important;
-	}
-	.visible-1500 {
-		display: block !important;
-	}
-}
-
 /* page header css. page specific css should extend this */
 %juno-page-header {
 	height: $page-header-height;

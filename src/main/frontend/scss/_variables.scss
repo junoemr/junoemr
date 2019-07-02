@@ -31,6 +31,6 @@ $form-input-height: 2.25em;
 
 // Media queries breakpoints
 // $screen-nav-lg-max: 1305px;
-$screen-nav-lg: 1357px;
-$screen-nav-md: 1130px;
-$screen-nav-sm: 768px;
+$screen-nav-lg: 1540px;
+$screen-nav-md: 1290px;
+$screen-nav-sm: 768px; //matches the angular.js mobile check size, probably should not be changed

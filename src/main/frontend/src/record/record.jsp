@@ -69,7 +69,7 @@
 		<div class="collapse navbar-collapse" id="record-nav-collapse">
 
 			<%-- Large view --%>
-			<ul class="nav navbar-nav visible-nav-lg" id="myTabs">
+			<ul class="nav navbar-nav breakpoint-lg-visible-exclusive" id="myTabs">
 				<li ng-repeat="tab in recordCtrl.recordtabs2"
 					ng-class="{'active': recordCtrl.isActive(tab) }">
 					<a href="javascript:void(0)"
@@ -104,7 +104,7 @@
 			</ul>
 
 			<%-- Medium view --%>
-			<ul class="nav navbar-nav visible-nav-md">
+			<ul class="nav navbar-nav breakpoint-md-visible-exclusive">
 				<li ng-repeat="tab in recordCtrl.recordtabs2 | filter: recordCtrl.mediumNavItemFilter(false)"
 					ng-class="{'active': recordCtrl.isActive(tab) }">
 					<a href="javascript:void(0)"
@@ -171,7 +171,7 @@
 			</ul>
 
 			<%-- Small view --%>
-			<ul class="nav navbar-nav visible-nav-sm">
+			<ul class="nav navbar-nav breakpoint-sm-visible-exclusive">
 				<li class="dropdown hand-hover">
 					<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
 						Menu <b class="caret"></b>

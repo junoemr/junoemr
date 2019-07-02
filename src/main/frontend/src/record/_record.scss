@@ -22,6 +22,8 @@
 		@include juno-tab-md(calc(#{$page-tabs-height} - #{$border-bottom-size}));
 		@include juno-tab-color-scheme-white($border-bottom-size);
 		@include juno-font-tab;
+
+		@include juno-breakpoints(1600px, $screen-nav-md, $screen-nav-sm);
 	}
 
 	.primary-content-window {

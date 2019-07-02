@@ -1781,7 +1781,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				slotDuration: $scope.selectedTimeInterval,
 				snapDuration: '00:05:00',
 				slotLabelInterval: $scope.selectedSlotLabelInterval,
-				slotLabelFormat: 'h:mma',
+				slotLabelFormat: 'h:mm A',
 				slotEventOverlap: false,
 
 				loading: $scope.setCalendarLoading,

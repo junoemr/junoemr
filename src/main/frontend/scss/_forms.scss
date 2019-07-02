@@ -25,7 +25,11 @@ input, button, select, textarea {
 }
 
 // don't resize textareas
-textarea { resize: none; }
+textarea {
+	max-width: 100%;
+	min-height: 35px;
+	resize: none;
+}
 
 // make same height as other inputs, unless inside a label
 input[type="radio"],
