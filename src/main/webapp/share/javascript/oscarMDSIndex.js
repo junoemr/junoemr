@@ -37,6 +37,11 @@ function  updateDocStatusInQueue(docid){//change status of queue document link r
 }
 
 function saveNext(docid) {
+	let saveNextButton = jQuery("#saveNext" + docid);
+	if (saveNextButton.length > 0)
+	{
+		saveNextButton.prop("disabled", true);
+	}
 	updateDocumentAndNext('forms_'+docid);
 }
 
