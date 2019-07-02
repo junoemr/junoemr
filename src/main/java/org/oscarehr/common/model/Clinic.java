@@ -73,6 +73,8 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     private String clinicDelimPhone;
     @Column(name = "clinic_delim_fax")
     private String clinicDelimFax;
+    @Column(name = "email")
+    private String clinicEmail;
     // foreign key
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinColumn(name = "clinic_billing_address_id", referencedColumnName = "id")
@@ -198,6 +200,16 @@ public class Clinic extends AbstractModel<Integer> implements Serializable
     public String getClinicDelimFax()
     {
         return clinicDelimFax;
+    }
+
+    public String getClinicEmail()
+    {
+        return clinicEmail;
+    }
+
+    public void setClinicEmail(String clinicEmail)
+    {
+        this.clinicEmail = clinicEmail;
     }
 
     public void setClinicDelimFax(String clinicDelimFax)
