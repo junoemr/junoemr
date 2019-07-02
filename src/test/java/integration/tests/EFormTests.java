@@ -28,22 +28,23 @@ import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.UUID;
-import java.util.regex.Pattern;
+import java.util.List;
+import java.util.Set;
 
-public class EchartTests extends SeleniumTestBase
+public class EFormTests extends SeleniumTestBase
 {
 	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
+	private static String EFORM_URL = "/eform/efmformslistadd.jsp?demographic_no=1&appointment=&parentAjaxId=eforms";
 
 	@BeforeClass
 	public static void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
@@ -51,71 +52,57 @@ public class EchartTests extends SeleniumTestBase
 		SchemaUtils.restoreTable("admission", "demographic",
 				"demographicArchive", "demographiccust", "log", "program", "provider_recent_demographic_access",
 				"casemgmt_note", "casemgmt_cpp", "casemgmt_issue", "casemgmt_note_ext", "casemgmt_note_link", "casemgmt_note_lock",
-				"casemgmt_tmpsave", "validations", "measurementType", "eChart");
+				"casemgmt_tmpsave", "validations", "measurementType", "eChart", "eform", "eform_values");
 
 		loadSpringBeans();
 		DatabaseUtil.createTestDemographic();
+
+		SchemaUtils.loadFileIntoMySQL(SqlFiles.EFORM_ADD_TRAVLE_FORM_V4);
 	}
 
-	@Test
-	public void testWritingNote() throws InterruptedException
+	@Before
+	public void login()
 	{
-		// login
-		if (!Navigation.isLoggedIn(driver))
+		if(!Navigation.isLoggedIn(driver))
 		{
 			Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.OSCAR_URL, driver);
 		}
+	}
 
-		driver.get(Navigation.OSCAR_URL + ECHART_URL);
+	@Test
+	public void canAddTravel_Form_v4EForm() throws InterruptedException
+	{
+		//navigate to eform addition page
+		String oldUrl = driver.getCurrentUrl();
+		driver.get(Navigation.OSCAR_URL + EFORM_URL);
+		PageUtil.waitForPageChange(oldUrl, driver);
+		Assert.assertFalse("expecting eform page but found error page!", PageUtil.isErrorPage(driver));
+		logger.info("Navigate to eform add page. OK");
 
-		// create new encounter note
-		String noteId = null;
-		if (PageUtil.isExistsBy(By.xpath("//textarea[@name='caseNote_note']"), driver))
-		{
-			noteId = driver.findElement(By.xpath("//textarea[@name='caseNote_note']")).getAttribute("id");
-		}
+		//open eform
+		WebElement eformButton = driver.findElement(By.xpath("//a[contains(., 'travel_from_v4')]"));
+		Assert.assertNotNull(eformButton);
 
-		WebElement newNoteButton = driver.findElement(By.id("newNoteImg"));
-		newNoteButton.click();
-
-		WebElement newNote = null;
-		try
-		{
-			newNote = driver.findElement(By.xpath("//textarea[@name='caseNote_note']"));
-		}
-		catch (NoSuchElementException e)
-		{
-			Assert.fail("Create new note. FAIL");
-		}
-
-		if (noteId != null)
-		{
-			Assert.assertEquals("Create new note. FAIL", noteId, newNote.getAttribute("id"));
-		}
-		logger.info("Create new note. OK");
-
-		//write in note
-		UUID myUUID = UUID.randomUUID();
-		newNote.sendKeys(myUUID.toString());
-		Assert.assertTrue("Write to encounter note. FAIL", !newNote.getText().isEmpty());
-		logger.info("Write to encounter note. OK");
-
-		// test auto save
-		Thread.sleep(10000); // oscar auto saves every 5 seconds
-		driver.navigate().refresh();
-		Thread.sleep(5000);
-		newNote = driver.findElement(By.xpath("//textarea[@name='caseNote_note']"));
-		Assert.assertTrue("Auto save note. FAIL", Pattern.compile(myUUID.toString()).matcher(newNote.getText()).find());
-		logger.info("Auto save note. OK");
-
-		// sign and save
-		String currentUrl = driver.getCurrentUrl();
-		driver.findElement(By.id("signSaveImg")).click();
+		String currWindowHandle = driver.getWindowHandle();
+		Set<String> oldWindowHandles = driver.getWindowHandles();
+		eformButton.click();
 		Thread.sleep(2000);
+		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
+
+		Assert.assertEquals("more than one window opened when opening eform", 1, newWindows.size());
+		PageUtil.switchToWindow(newWindows.get(0), driver);
+		Thread.sleep(2000);
+
+		Assert.assertFalse("got error page on eform page", PageUtil.isErrorPage(driver));
+		logger.info("Open eform travel_form_v4. OK");
+
+		driver.findElement(By.xpath("//input[@id='SubmitButton']")).click();
+		PageUtil.switchToWindow(currWindowHandle, driver);
+		logger.info("Submit eform travel_form_v4. OK");
+
 		driver.get(Navigation.OSCAR_URL + ECHART_URL);
 		Thread.sleep(5000);
-		Assert.assertTrue("Sign and save note. FAILED",
-				PageUtil.isExistsBy(By.xpath("//*[contains(., '" + myUUID + "') and contains(., 'Signed on') and contains(@id, 'txt')]"), driver));
-		logger.info("Sign and save note. OK");
+		Assert.assertNotNull(driver.findElement(By.xpath("//a[contains(., 'travel_from_v4:')]")));
+		logger.info("Eform added to Echart? OK");
 	}
 }

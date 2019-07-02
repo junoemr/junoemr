@@ -78,7 +78,7 @@ public class SeleniumTestBase
 		driver.manage().timeouts().implicitlyWait(WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 	}
 
-	private static void loadSpringBeans()
+	protected static void loadSpringBeans()
 	{
 		DaoTestFixtures.setupBeanFactory();
 	}
