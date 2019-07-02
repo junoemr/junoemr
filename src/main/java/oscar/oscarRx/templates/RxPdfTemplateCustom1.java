@@ -114,6 +114,7 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 
 		PdfPTable mainTable = new PdfPTable(1);
 		mainTable.setExtendLastRow(false);//last cell will try to fill the page
+		mainTable.setTotalWidth(document.getPageSize().getWidth());
 		//mainTable.getDefaultCell().setPadding(10f);
 
 		// render background watermark
@@ -132,7 +133,7 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		PdfPCell cell = new PdfPCell(buildPageFooter());
 		cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
 		cell.setBorder(0);
-		cell.setFixedHeight(mainTable.getTotalHeight() - document.getPageSize().getHeight());//last cell will try to fill the page
+		cell.setFixedHeight(document.getPageSize().getHeight() - mainTable.getTotalHeight() - 36);//last cell will try to fill the page
 		mainTable.addCell(cell);
 
 		/*PdfPCell borderCell = new PdfPCell(mainTable);
