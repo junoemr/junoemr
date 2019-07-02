@@ -230,6 +230,24 @@
                                 <input id="watermark-submit-upload" class="submit-button" style="display:flex; flex: 0 1 auto; margin-right: 10px" type="submit" value="Upload">
                                 <input id="watermark-submit-delete" class="submit-button" style="display:flex; flex: 0 1 auto;" type="submit" value="Delete">
                             </div>
+                            <div class="watermark-input-field flex-fill-row" style="margin-top: 20px;">
+                                <label><b>Watermark Position</b></label>
+                                <div class="watermark-background-selector">
+                                <input id="watermark-background-toggle" <% if (!RxWatermarkService.isWatermarkBackground()) {%>checked<%}%> type="checkbox" data-toggle="toggle" data-on="Foreground" data-off="Background">
+                                <script>
+                                    let backgroundToggle = $('#watermark-background-toggle');
+                                    backgroundToggle.bootstrapToggle({
+                                        width: 90,
+                                        height: 20,
+                                        size: 'small'
+                                    });
+                                    backgroundToggle.change(function() {
+                                        let state = !jQuery(this).prop('checked');
+                                        setWatermarkBackground(state);
+                                    })
+                                </script>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </fieldset>
@@ -280,7 +298,29 @@
                     enable: enable
                 },
                 success: function() {
-                    console.log("JOB DONE");
+                    console.log("watermark on");
+                }
+            });
+        }
+
+        function setWatermarkBackground(isBackground)
+        {
+            jQuery.ajax({
+                url: "../RxWatermark.do",
+                type: "post",
+                data: {
+                    method: "setWatermarkBackground",
+                    isBackground: isBackground
+                },
+                success: function() {
+                    if (isBackground)
+                    {
+                        console.log("watermark background");
+                    }
+                    else
+                    {
+                        console.log("watermark foreground");
+                    }
                 }
             });
         }

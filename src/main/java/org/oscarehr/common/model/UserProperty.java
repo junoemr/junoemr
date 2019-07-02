@@ -85,6 +85,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String EFORM_NAME = "encounter.eform_name";
     public static final String RX_SHOW_QR_CODE = "rx_show_qr_code";
     public static final String ENABLE_RX_WATERMARK = "enable_rx_watermark";
+    public static final String IS_BACKGROUND_RX_WATERMARK = "is_background_rx_watermark";
     public static final String MYMEDS = "mymeds";
     public static final String NEW_TICKLER_WARNING_WINDOW = "new_tickler_warning_window";
     public static final String CAISI_DEFAULT_PMM = "caisi.default_pmm";
