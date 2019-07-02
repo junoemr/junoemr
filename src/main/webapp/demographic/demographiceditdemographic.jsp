@@ -1913,6 +1913,23 @@ if ( Dead.equals(PatStat) ) {%>
                                                             key="demographic.demographiceditdemographic.formNewsLetter" />:</span>
                                                         <span class="info"><%=demographic.getNewsletter()!=null? demographic.getNewsletter() : "Unknown"%></span>
 							</li>
+							<li>
+								<span class="label">
+									<bean:message key="demographic.demographiceditdemographic.nameOfMother"/>:
+								</span>
+								<span class="info">
+									<%=demographic.getNameOfMother() != null ? demographic.getNameOfMother() : ""%>
+								</span>
+							</li>
+							<li>
+								<span class="label">
+									<bean:message key="demographic.demographiceditdemographic.nameOfFather"/>:
+								</span>
+								<span class="info">
+									<%=demographic.getNameOfFather() != null ? demographic.getNameOfFather() : ""%>
+								</span>
+							</li>
+
 						</ul>
 						</div>
 
@@ -2886,6 +2903,27 @@ if ( Dead.equals(PatStat) ) {%>
 
 <%-- TOGGLE OFF PATIENT CLINIC STATUS --%>
 <oscar:oscarPropertiesCheck property="DEMOGRAPHIC_PATIENT_CLINIC_STATUS" value="true">
+
+							<tr valign="top">
+								<td align="right">
+									<b><bean:message key="demographic.demographicaddrecordhtm.formMotherName"/>:</b>
+								</td>
+								<td>
+									<input type="text"
+										   name="nameOfMother"
+										   maxlength="60"
+										   value="<%=demographic.getNameOfMother() != null ? demographic.getNameOfMother() : ""%>">
+								</td>
+								<td align="right">
+									<b><bean:message key="demographic.demographicaddrecordhtm.formFatherName"/>:</b>
+								</td>
+								<td>
+									<input type="text"
+										   name="nameOfFather"
+										   maxlength="60"
+										   value="<%=demographic.getNameOfFather() != null ? demographic.getNameOfFather() : ""%>">
+								</td>
+							</tr>
 
 							<tr valign="top">
 								<td align="right" nowrap><b>

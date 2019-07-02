@@ -39,14 +39,20 @@
 	}
 %>
 
-<%@ page import="java.sql.*, java.util.*, oscar.MyDateFormat, org.oscarehr.common.OtherIdManager, oscar.util.ConversionUtils"%>
+<%@ page import="org.oscarehr.common.OtherIdManager,
+org.oscarehr.common.dao.AppointmentArchiveDao,
+org.oscarehr.common.dao.OscarAppointmentDao,
+org.oscarehr.common.model.Appointment,
+org.oscarehr.common.model.Provider"%>
 <%@ page import="org.oscarehr.event.EventService, org.oscarehr.util.SpringUtils"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@page import="org.oscarehr.common.dao.AppointmentArchiveDao" %>
-<%@page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
-<%@page import="org.oscarehr.common.model.Appointment" %>
-<%@page import="org.oscarehr.common.model.Provider" %>
+<%@page import="oscar.MyDateFormat" %>
+<%@page import="oscar.log.LogAction" %>
+<%@page import="oscar.log.LogConst" %>
+<%@page import="oscar.util.ConversionUtils" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.List" %>
 <%
 	AppointmentArchiveDao appointmentArchiveDao = (AppointmentArchiveDao)SpringUtils.getBean("appointmentArchiveDao");
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
@@ -97,17 +103,16 @@
     	a.setCreator(request.getParameter("creator"));
     	a.setRemarks(request.getParameter("remarks"));
     	a.setUrgency((request.getParameter("urgency")!=null)?request.getParameter("urgency"):"");
-    	if (request.getParameter("demographic_no")!=null && !(request.getParameter("demographic_no").equals(""))) {
-      		a.setDemographicNo(Integer.parseInt(request.getParameter("demographic_no")));
-     	} else {
-    	 	a.setDemographicNo(0);
-     	}
+    	a.setDemographicNo(demographicNo);
     	a.setProgramId(Integer.parseInt((String)request.getSession().getAttribute("programId_oscarView")));
     	a.setCreator(request.getParameter("creator"));
     	a.setCreateDateTime(ConversionUtils.fromDateString(request.getParameter("createdatetime")));
     	a.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
     	appointmentDao.persist(a);
    		rowsAffected=1;
+
+	    LogAction.addLogEntry(request.getParameter("creator"), demographicNo, LogConst.ACTION_ADD, LogConst.CON_APPT,
+			    LogConst.STATUS_SUCCESS, String.valueOf(a.getId()), request.getRemoteAddr());
     }
     if(request.getParameter("appointment_no") != null) {
 	    Appointment appt = appointmentDao.find(Integer.parseInt(request.getParameter("appointment_no")));
@@ -129,17 +134,16 @@
 	    	appt.setRemarks(request.getParameter("remarks"));
 	    	appt.setUpdateDateTime(new java.util.Date());
 	    	appt.setUrgency((request.getParameter("urgency")!=null)?request.getParameter("urgency"):"");
-	    	if (request.getParameter("demographic_no")!=null && !(request.getParameter("demographic_no").equals(""))) {
-	      		appt.setDemographicNo(Integer.parseInt(request.getParameter("demographic_no")));
-	     	} else {
-	    	 	appt.setDemographicNo(0);
-	     	}
+	    	appt.setDemographicNo(demographicNo);
 	    	appt.setProgramId(Integer.parseInt((String)request.getSession().getAttribute("programId_oscarView")));
 	    	appt.setCreator(request.getParameter("creator"));
 	    	appt.setCreateDateTime(ConversionUtils.fromDateString(request.getParameter("createdatetime")));
 	    	appt.setReasonCode(Integer.parseInt(request.getParameter("reasonCode")));
 	    	appointmentDao.merge(appt);
 	    	rowsAffected=1;
+
+		    LogAction.addLogEntry(request.getParameter("creator"), demographicNo, LogConst.ACTION_UPDATE, LogConst.CON_APPT,
+				    LogConst.STATUS_SUCCESS, String.valueOf(appt.getId()), request.getRemoteAddr());
 	    }
     
     }

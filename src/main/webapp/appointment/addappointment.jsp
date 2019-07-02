@@ -172,6 +172,7 @@
 		<script src="<%=request.getContextPath()%>/js/jquery-ui-1.8.18.custom.min.js"></script>
 		<script src="<%=request.getContextPath()%>/js/fg.menu.js"></script>
 
+
 		<link rel="stylesheet"
 			  href="<%=request.getContextPath()%>/css/cupertino/jquery-ui-1.8.18.custom.css">
 		<link rel="stylesheet" href="<%=request.getContextPath()%>/css/fg.menu.css">
@@ -211,7 +212,7 @@
 					return false;
 				}
 				// set no-show status if no demographic selected and "Last Name" starts with '.'
-				if (document.ADDAPPT.keyword.value.startsWith(".")
+				if (document.ADDAPPT.keyword.value.indexOf(".") !== -1
 					&& document.ADDAPPT.demographic_no.value.length === 0)
 				{
 					document.ADDAPPT.status.value = 'N';
@@ -501,7 +502,6 @@
 				var startTime = document.forms[0].start_time.value;
 				var apptDate = document.forms[0].appointment_date.value;
 				updatePageLock(100, apptDate, startTime, endTime);
-
 			}
 
 			function updatePageLock(timeout, apptDate, startTime, endTime)
@@ -1125,6 +1125,21 @@
 							   width="25" height="20" border="0" hspace="2">
 					</div>
 				</li>
+
+				<% if(org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() ) { %>
+
+				<li class="weak row">
+						<div class="label">Virtual:</div>
+						<div class="input">
+						<input type="checkbox" name="isVirtual" />
+					</div>
+					<div class="space">&nbsp;</div>
+					<div class="label"></div>
+					<div class="input"></div>
+				</li>
+
+				<% } %>
+
 				<li class="row weak">
 					<div class="label"><bean:message key="Appointment.formCreator"/>:</div>
 					<div class="input">

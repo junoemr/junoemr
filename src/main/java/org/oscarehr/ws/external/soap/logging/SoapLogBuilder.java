@@ -32,6 +32,7 @@ import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.common.annotation.MaskParameter;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
+import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
 import org.oscarehr.ws.external.soap.logging.model.SoapServiceLog;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -153,13 +154,29 @@ public class SoapLogBuilder
         logEntry.setHttpMethod(this.httpMethod);
         logEntry.setUrl(this.url);
         logEntry.setProviderNo(this.providerNo);
-        logEntry.setRawOutput(this.rawOutput);
         logEntry.setErrorMessage(this.errorMessage.toString());
 
         if (this.soapMethod != null)
         {
             logEntry.setSoapMethod(this.soapMethod.getName());
-            logEntry.setPostData(generatePostData());
+
+            if (!isSoapMethodAnnotatedWith(SkipContentLoggingInbound.class))
+            {
+                logEntry.setPostData(generatePostData());
+            }
+            else
+            {
+                logEntry.setPostData(SkipContentLoggingInbound.SKIP_CONTENT_LOGGING_INBOUND);
+            }
+
+            if (!isSoapMethodAnnotatedWith(SkipContentLoggingOutbound.class))
+            {
+                logEntry.setRawOutput(this.rawOutput);
+            }
+            else
+            {
+                logEntry.setRawOutput(SkipContentLoggingOutbound.SKIP_CONTENT_LOGGING_OUTBOUND);
+            }
         }
 
         return logEntry;
@@ -176,23 +193,16 @@ public class SoapLogBuilder
     {
         String postData;
 
-        if (!isSoapMethodAnnotatedWith(SkipContentLoggingInbound.class))
+        if (isSoapMethodAnnotatedWith(MaskParameter.class) && isPostBodyParseable())
         {
-            if (isSoapMethodAnnotatedWith(MaskParameter.class) && isPostBodyParseable())
-            {
-                String[] parametersToMask = getMaskParameters();
-                String sanitizedPostData = applyParameterMasking(parametersToMask);
+            String[] parametersToMask = getMaskParameters();
+            String sanitizedPostData = applyParameterMasking(parametersToMask);
 
-                postData = sanitizedPostData;
-            }
-            else
-            {
-                postData = this.rawPostData;
-            }
+            postData = sanitizedPostData;
         }
         else
         {
-            postData = SkipContentLoggingInbound.SKIP_CONTENT_LOGGING_INBOUND;
+            postData = this.rawPostData;
         }
 
         return postData;

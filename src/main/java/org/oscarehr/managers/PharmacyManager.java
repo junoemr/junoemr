@@ -82,7 +82,7 @@ public class PharmacyManager {
 			throw new IllegalArgumentException("Pharmacy association with id " + pharmacyId + " does't belong to demographic record with ID " + demographicId);
 		}
 		
-		pharmacy.setStatus("0");
+		pharmacy.setStatus(DemographicPharmacy.INACTIVE);
 		demographicPharmacyDao.saveEntity(pharmacy);
 		
 		//--- log action ---

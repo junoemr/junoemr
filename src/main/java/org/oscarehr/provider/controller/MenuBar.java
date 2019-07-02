@@ -120,7 +120,8 @@ public class MenuBar
 
 	private List<Dashboard> loadDashboards()
 	{
-		if (OscarProperties.getInstance().isPropertyActive("enable_dashboards"))
+		if (OscarProperties.getInstance().isPropertyActive("enable_dashboards")
+				&& OscarProperties.getInstance().isBritishColumbiaInstanceType())
 		{
 			DashboardManager dashboardManager = SpringUtils.getBean(DashboardManager.class);
 			return dashboardManager.getActiveDashboards(this.loggedInInfo);

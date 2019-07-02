@@ -24,32 +24,32 @@
 
 package oscar.oscarReport.reportByTemplate;
 
-import java.sql.ResultSet;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.Measurement;
+import org.oscarehr.report.reportByTemplate.service.ReportByTemplateService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.util.ConversionUtils;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  *
  * @author rjonasz
  */
 public class INRReporter implements Reporter {
-    
+
+    private static ReportByTemplateService reportByTemplateService = SpringUtils.getBean(ReportByTemplateService.class);
+
     /** Creates a new instance of INRReporter */
     public INRReporter() {
     }
     
     public boolean generateReport( HttpServletRequest request) {
         String templateId = request.getParameter("templateId");
-        ReportObject curReport = (new ReportManager()).getReportTemplateNoParam(templateId);
+		ReportObject curReport = reportByTemplateService.getAsLegacyReport(Integer.parseInt(templateId), false);
         String fromDate = request.getParameter("from_date");
         String toDate = request.getParameter("to_date");
         StringBuilder csvBody = new StringBuilder();
@@ -60,7 +60,6 @@ public class INRReporter implements Reporter {
         StringBuilder body = new StringBuilder();
         int numHeaders = 1;
         int curHeader = 0;
-        ResultSet rs;
         long demographicNo;
         
         if( fromDate == null || toDate == null ) {

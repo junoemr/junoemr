@@ -25,6 +25,8 @@
 
 package org.oscarehr.common.model;
 
+import oscar.util.ConversionUtils;
+
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -35,8 +37,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import oscar.util.ConversionUtils;
 
 @Entity
 @Table(name="billing")
@@ -240,7 +240,7 @@ public class Billing extends AbstractModel<Integer>{
     }
 	
 	public boolean getStatusAsBoolean() {
-		return ConversionUtils.fromBoolString(getStatus());
+		return ConversionUtils.hasContent(status);
 	}
 
 	public void setStatus(String status) {

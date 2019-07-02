@@ -29,7 +29,6 @@ import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -708,13 +707,13 @@ public class ManageDocumentAction extends DispatchAction {
 
 	public ActionForward display(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
 	{
-		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
 		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.READ, null, "_edoc");
 		
 		String temp = request.getParameter("remoteFacilityId");
 		Integer remoteFacilityId = null;
-		if(temp != null && !temp.trim().isEmpty())
+		if (temp != null && !temp.trim().isEmpty())
 		{
 			remoteFacilityId = Integer.parseInt(temp);
 		}
@@ -728,7 +727,8 @@ public class ManageDocumentAction extends DispatchAction {
 		String filename = null;
 
 		// local document
-		if (remoteFacilityId == null) {
+		if (remoteFacilityId == null)
+		{
 			CtlDocument ctld = ctlDocumentDao.getCtrlDocument(Integer.parseInt(doc_no));
 			Integer demographicNo = ctld.isDemographicDocument() ? ctld.getId().getModuleId() : null;
 			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), demographicNo,
@@ -746,7 +746,7 @@ public class ManageDocumentAction extends DispatchAction {
 			File file = new File(documentDir, document.getDocfilename());
 			filename = document.getDocfilename();
 
-			if(contentType != null && !contentType.trim().equals("text/html"))
+			if (contentType != null && !contentType.trim().equals("text/html"))
 			{
 				if(file.exists())
 				{
@@ -768,24 +768,31 @@ public class ManageDocumentAction extends DispatchAction {
 			CachedDemographicDocument remoteDocument = null;
 			CachedDemographicDocumentContents remoteDocumentContents = null;
 
-			try {
-				if (!CaisiIntegratorManager.isIntegratorOffline(request.getSession())){
+			try
+			{
+				if (!CaisiIntegratorManager.isIntegratorOffline(request.getSession()))
+				{
 					DemographicWs demographicWs = CaisiIntegratorManager.getDemographicWs(loggedInInfo, loggedInInfo.getCurrentFacility());
 					remoteDocument = demographicWs.getCachedDemographicDocument(remotePk);
 					remoteDocumentContents = demographicWs.getCachedDemographicDocumentContents(remotePk);
 				}
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				MiscUtils.getLogger().error("Unexpected error.", e);
 				CaisiIntegratorManager.checkForConnectionError(request.getSession(),e);
 			}
 
-			if(CaisiIntegratorManager.isIntegratorOffline(request.getSession())){
+			if (CaisiIntegratorManager.isIntegratorOffline(request.getSession()))
+			{
 				Integer demographicId = IntegratorFallBackManager.getDemographicNoFromRemoteDocument(loggedInInfo,remotePk);
 				MiscUtils.getLogger().debug("got demographic no from remote document "+demographicId);
 				List<CachedDemographicDocument> remoteDocuments = IntegratorFallBackManager.getRemoteDocuments(loggedInInfo,demographicId);
-				for(CachedDemographicDocument demographicDocument: remoteDocuments){
+				for(CachedDemographicDocument demographicDocument: remoteDocuments)
+				{
 					if(demographicDocument.getFacilityIntegerPk().getIntegratorFacilityId() == remotePk.getIntegratorFacilityId()
-							&& demographicDocument.getFacilityIntegerPk().getCaisiItemId() == remotePk.getCaisiItemId() ){
+							&& demographicDocument.getFacilityIntegerPk().getCaisiItemId() == remotePk.getCaisiItemId() )
+					{
 						remoteDocument = demographicDocument;
 						remoteDocumentContents = IntegratorFallBackManager.getRemoteDocument(loggedInInfo,demographicId, remotePk);
 						break;
@@ -794,14 +801,14 @@ public class ManageDocumentAction extends DispatchAction {
 				}
 			}
 
-
 			docxml = remoteDocument.getDocXml();
 			contentType = remoteDocument.getContentType();
 			filename = remoteDocument.getDocFilename();
 			contentBytes = remoteDocumentContents.getFileContents();
 		}
 
-		if (docxml != null && !docxml.trim().equals("")) {
+		if (docxml != null && !docxml.trim().equals(""))
+		{
 			ServletOutputStream outs = response.getOutputStream();
 			outs.write(docxml.getBytes());
 			outs.flush();
@@ -810,7 +817,8 @@ public class ManageDocumentAction extends DispatchAction {
 		}
 
 		// TODO: Right now this assumes it's a pdf which it shouldn't
-		if (contentType == null) {
+		if (contentType == null)
+		{
 			contentType = "application/pdf";
 		}
 
@@ -822,31 +830,6 @@ public class ManageDocumentAction extends DispatchAction {
 		outs.write(contentBytes);
 		outs.flush();
 		outs.close();
-		return null;
-	}
-
-	// For documents where we've ignored reprocessing via GhostScript and do not want tomcat to
-	// have any chance of serving the PDF (in case of tomcat infinite loop/crash)
-	public ActionForward downloadPdf(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
-	{
-		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.READ, null, "_edoc");
-
-		String doc_no = request.getParameter("doc_no");
-		Document document = documentDao.getDocument(doc_no);
-		GenericFile file = FileFactory.getDocumentFile(document.getDocfilename());
-		FileInputStream stream = new FileInputStream(file.getFileObject());
-		byte[] pdfBytes = IOUtils.toByteArray(stream);
-		String filename = "lab-document-" + doc_no + ".pdf";
-
-		response.setContentType("application/pdf");
-		response.setContentLength(pdfBytes.length);
-		response.setHeader("Content-Disposition", "attachment;filename=" + filename);
-		ServletOutputStream outs = response.getOutputStream();
-		outs.write(pdfBytes);
-		outs.flush();
-		outs.close();
-
 		return null;
 	}
 

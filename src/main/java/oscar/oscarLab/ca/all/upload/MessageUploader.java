@@ -66,6 +66,8 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
+import org.oscarehr.labs.dao.Hl7DocumentLinkDao;
+import org.oscarehr.labs.model.Hl7DocumentLink;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.model.OLISSystemPreferences;
@@ -93,6 +95,7 @@ public final class MessageUploader {
 	private static PatientLabRoutingDao patientLabRoutingDao = SpringUtils.getBean(PatientLabRoutingDao.class);
 	private static Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
 	private static Hl7TextMessageDao hl7TextMessageDao = (Hl7TextMessageDao) SpringUtils.getBean("hl7TextMessageDao");
+	private static Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
 	private static DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
 	private static ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 	private static DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
@@ -269,6 +272,9 @@ public final class MessageUploader {
 			if (type.equals("PATHL7") || type.equals("AHS"))
 			{
 				String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
+				// Every PDF should be prefixed with this due to b64 encoding of PDF header
+				final String pdfPrefix = "JVBERi0xLj";
+
 				for (i = 0; i < messageHandler.getOBRCount(); i++)
 				{
 					if (messageHandler.getOBXValueType(i, 0).equals("ED"))
@@ -280,8 +286,7 @@ public final class MessageUploader {
 							for (int k = 1; k <= referenceStrings.length; k++)
 							{
 								String embeddedPdf = messageHandler.getOBXResult(i, j, k);
-								if (embeddedPdf.length() > referenceStrings[k-1].length()
-										&& !embeddedPdf.contains("parsed_embedded_pdf_document_id_"))
+								if (embeddedPdf.startsWith(pdfPrefix))
 								{
 									MiscUtils.getLogger().info("Found embedded PDF in lab upload, pulling it out");
 									hasPDF = true;
@@ -312,10 +317,6 @@ public final class MessageUploader {
 					}
 				}
 
-				if (docId > 0)
-				{
-					hl7TextMessage.setEmbeddedDocId(docId);
-				}
 				hl7TextMessage.setFileUploadCheckId(fileId);
 				hl7TextMessage.setType(type);
 				hl7TextMessage.setBase64EncodedeMessage(new String(Base64.encodeBase64(hl7Body.getBytes(MiscUtils.DEFAULT_UTF8_ENCODING)), MiscUtils.DEFAULT_UTF8_ENCODING));
@@ -338,6 +339,14 @@ public final class MessageUploader {
 				hl7TextInfo.setAccessionNumber(accessionNum);
 				hl7TextInfo.setFillerOrderNum(fillerOrderNum);
 				hl7TextInfoDao.persist(hl7TextInfo);
+
+				if (docId > 0)
+				{
+					Hl7DocumentLink documentLink = new Hl7DocumentLink();
+					documentLink.setDocumentNo(docId);
+					documentLink.setLabNo(insertID);
+					hl7DocumentLinkDao.persist(documentLink);
+				}
 			}
 
 			String demProviderNo = "0";

@@ -24,6 +24,7 @@
 package org.oscarehr.common.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Embeddable;
 
@@ -60,6 +61,28 @@ public class SpecialtyPK implements Serializable{
 	
 	public String toString() {
 		return getRegion()+getSpecialty();
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if(this == o)
+		{
+			return true;
+		}
+		if(!(o instanceof SpecialtyPK))
+		{
+			return false;
+		}
+		SpecialtyPK that = (SpecialtyPK) o;
+		return Objects.equals(region, that.region) &&
+				Objects.equals(specialty, that.specialty);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(region, specialty);
 	}
 }
 
