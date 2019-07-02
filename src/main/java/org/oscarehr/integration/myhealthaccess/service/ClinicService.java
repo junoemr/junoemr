@@ -51,13 +51,13 @@ public class ClinicService extends BaseService
 	}
 
 	// Get myhealthaccess user linked to the specified oscar user
-	public ClinicUserTo1 getLinkedUser(String clinicID, String userID)
+	public ClinicUserTo1 getLinkedUser(String clinicID, String oscarUserID)
 	{
 		ClinicUserTo1 clinicUser = null;
 		try
 		{
 			String endPoint = concatEndpointStrings(clinicEndPoint, "/" +
-					clinicID + "/user_from_remote_id/" + userID);
+					clinicID + "/user_from_remote_id/" + oscarUserID);
 			clinicUser = executeRequest(
 					endPoint, HttpMethod.GET, ClinicUserTo1.class, BaseErrorTo1.class);
 		} catch (BaseException e)
@@ -85,11 +85,33 @@ public class ClinicService extends BaseService
 		{
 			clinicUser = executeRequest(
 					endPoint, HttpMethod.GET, ClinicUserTo1.class, BaseErrorTo1.class);
-		}
-		catch (BaseException e)
+		} catch (BaseException e)
 		{
 			handleRecordNotFound(e);
 		}
+		return clinicUser;
+	}
+
+	public ClinicUserTo1 createUser(
+			String clinicID,
+			String oscarUserID,
+			String email,
+			String firstName,
+			String lastName
+			)
+	{
+		MiscUtils.getLogger().error("create user for: " + email);
+		String endPoint = null;
+		endPoint = concatEndpointStrings(clinicEndPoint, "/" +
+				clinicID + "/user/create");
+		MiscUtils.getLogger().error("endPoint: " + endPoint);
+		ClinicUserTo1 clinicUser = new ClinicUserTo1();
+		clinicUser.setEmail(email);
+		clinicUser.setRemoteID(oscarUserID);
+		clinicUser.setFirstName(firstName);
+		clinicUser.setLastName(lastName);
+		clinicUser = executeRequest(
+				endPoint, HttpMethod.POST, clinicUser, ClinicUserTo1.class, BaseErrorTo1.class);
 		return clinicUser;
 	}
 
@@ -99,7 +121,7 @@ public class ClinicService extends BaseService
 			String email,
 			String password,
 			String oscarUserID
-			)
+	)
 			throws IOException, NoSuchAlgorithmException, KeyManagementException
 	{
 		String endPoint = concatEndpointStrings(clinicEndPoint, "/" +
@@ -114,7 +136,7 @@ public class ClinicService extends BaseService
 	private void handleRecordNotFound(BaseException e)
 	{
 		MiscUtils.getLogger().error("HANDLING base exception");
-		if (e.getErrorObject().isHasGenericErrors())
+		if (e.getErrorObject().hasGenericErrors())
 		{
 			MiscUtils.getLogger().error("HAS GENERIC ERRORS");
 			// TODO Get the first generic error. I'm thinking for an external API we might want

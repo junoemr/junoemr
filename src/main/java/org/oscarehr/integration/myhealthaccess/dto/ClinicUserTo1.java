@@ -38,6 +38,16 @@ public class ClinicUserTo1 implements Serializable
 	@JsonProperty("id")
 	private String myhealthaccesID;
 
+	@JsonProperty("remote_id")
+	private String remoteID;
+
+	@JsonProperty("email")
+	private String email;
+
+	public ClinicUserTo1()
+	{
+	}
+
 	public String getFirstName()
 	{
 		return firstName;
@@ -68,7 +78,23 @@ public class ClinicUserTo1 implements Serializable
 		this.myhealthaccesID = myhealthaccesID;
 	}
 
-	public ClinicUserTo1()
+	public String getRemoteID()
 	{
+		return remoteID;
+	}
+
+	public void setRemoteID(String remoteID)
+	{
+		this.remoteID = remoteID;
+	}
+
+	public String getEmail()
+	{
+		return email;
+	}
+
+	public void setEmail(String email)
+	{
+		this.email = email;
 	}
 }

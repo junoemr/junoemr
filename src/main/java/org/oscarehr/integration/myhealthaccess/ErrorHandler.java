@@ -54,9 +54,17 @@ public class ErrorHandler <T> extends DefaultResponseErrorHandler
 			String body = IOUtils.toString(inputStream);
 			MiscUtils.getLogger().error("body: " + body);
 			BaseErrorTo1 baseError = new ObjectMapper().readValue(body, BaseErrorTo1.class);
-			if(baseError.isHasGenericErrors())
+			if(baseError.hasAuthError())
 			{
-				MiscUtils.getLogger().error("baseError status: " + baseError.getGenericErrors().get(0).getCode());
+				MiscUtils.getLogger().error("Auth Error: " +
+						baseError.getAuthError().getCode());
+				MiscUtils.getLogger().error(baseError.getAuthError().getMessage());
+			}
+			if(baseError.hasGenericErrors())
+			{
+				MiscUtils.getLogger().error("baseError status: " +
+						baseError.getGenericErrors().get(0).getCode());
+				MiscUtils.getLogger().error(baseError.getGenericErrors().get(0).getMessage());
 			}
 			BaseException baseException = new BaseException(body);
 			baseException.setErrorObject(baseError);

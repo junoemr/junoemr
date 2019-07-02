@@ -143,6 +143,12 @@
                                 </label>
                                 <html:text property="clinic.clinicDelimFax"/>
                             </div>
+                            <div class="input-field">
+                                <label for="clinic.clinicEmail">
+                                    Email
+                                </label>
+                                <html:text property="clinic.clinicEmail"/>
+                            </div>
                         </div>
                         <div class="address" id="billing-fields">
                             <div class="title">

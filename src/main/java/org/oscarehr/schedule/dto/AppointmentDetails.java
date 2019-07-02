@@ -64,6 +64,7 @@ public class AppointmentDetails
 	private LocalDate birthday;
 	private boolean hasTicklers;
 	private String ticklerMessages;
+	private boolean isVirtual;
 
 	public AppointmentDetails(
 		Integer appointmentNo,
@@ -101,7 +102,8 @@ public class AppointmentDetails
 		String colorProperty,
 		LocalDate birthday,
 		boolean hasTicklers,
-		String ticklerMessages
+		String ticklerMessages,
+		boolean isVirtual
 	)
 	{
 		this.appointmentNo = appointmentNo;
@@ -140,6 +142,7 @@ public class AppointmentDetails
 		this.birthday = birthday;
 		this.hasTicklers = hasTicklers;
 		this.ticklerMessages = ticklerMessages;
+		this.isVirtual = isVirtual;
 	}
 
 	public Integer getAppointmentNo()
@@ -305,6 +308,10 @@ public class AppointmentDetails
 	public boolean hasTicklers()
 	{
 		return hasTicklers;
+	}
+	public boolean isVirtual()
+	{
+		return isVirtual;
 	}
 
 	public String getTicklerMessages()

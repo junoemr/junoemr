@@ -214,6 +214,12 @@
 		<ap-output>${fax}</ap-output>
 	</databaseap>
 	<databaseap>
+		<ap-name>current_user_email</ap-name>
+		<ap-sql>SELECT provider.email FROM provider
+			WHERE provider.provider_no='${loggedInProvider}' </ap-sql>
+		<ap-output>${email}</ap-output>
+	</databaseap>
+	<databaseap>
 		<ap-name>current_logged_in_user_work_phone</ap-name>
 		<ap-sql>SELECT provider.work_phone FROM provider
 			WHERE provider.provider_no='${loggedInProvider}' </ap-sql>
@@ -542,6 +548,16 @@
 		<ap-sql>SELECT sin FROM demographic WHERE
 			demographic_no=${demographic}</ap-sql>
 		<ap-output>${sin}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>name_of_mother</ap-name>
+		<ap-sql>SELECT name_of_mother FROM demographic WHERE demographic_no=${demographic}</ap-sql>
+		<ap-output>${name_of_mother}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>name_of_father</ap-name>
+		<ap-sql>SELECT name_of_father FROM demographic WHERE demographic_no=${demographic}</ap-sql>
+		<ap-output>${name_of_father}</ap-output>
 	</databaseap>
 
 	<!-- OHSUPPORT-2712 licensed Marijuana Producers (requires custom database tables)-->
@@ -1225,6 +1241,15 @@
 		<ap-output>${practitionerNo}</ap-output>
 	</databaseap>
 	<databaseap>
+		<ap-name>app_provider_email</ap-name>
+		<ap-sql>SELECT provider.email FROM provider JOIN
+			    appointment as appt
+				ON appt.provider_no=provider.provider_no
+				WHERE appt.appointment_no=${appt_no}
+		</ap-sql>
+		<ap-output>${email}</ap-output>
+	</databaseap>
+	<databaseap>
 		<ap-name>appt_provider_specialty</ap-name>
 		<ap-sql>SELECT provider.specialty FROM provider, appointment
 			WHERE appointment.appointment_no=${appt_no} AND
@@ -1272,6 +1297,15 @@
 			demographic.provider_no=provider.provider_no
 		</ap-sql>
 		<ap-output>${work_phone}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>doctor_email</ap-name>
+		<ap-sql>SELECT provider.email FROM provider JOIN
+				demographic as demo
+				ON provider.provider_no = demo.provider_no
+				WHERE demographic_no=${demographic}
+		</ap-sql>
+		<ap-output>${email}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>doctor_fax</ap-name>
@@ -1517,6 +1551,11 @@
 		<ap-name>clinic_fax</ap-name>
 		<ap-sql>SELECT clinic_fax FROM clinic</ap-sql>
 		<ap-output>${clinic_fax}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>clinic_email</ap-name>
+		<ap-sql>SELECT email FROM clinic </ap-sql>
+		<ap-output>${email}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>clinic_label</ap-name>

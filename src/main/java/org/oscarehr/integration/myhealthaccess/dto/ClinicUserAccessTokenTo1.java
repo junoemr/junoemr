@@ -47,6 +47,6 @@ public class ClinicUserAccessTokenTo1 implements Serializable
 	public boolean isExpired()
 	{
 		// TODO check JWT expire time
-		return token != null;
+		return token == null;
 	}
 }
