@@ -307,7 +307,7 @@ public final class MessageUploader {
 					int count = 0;
 					for (String pdf : embeddedPDFs)
 					{
-						String fileName = "-" + accessionNum + "-" + fillerOrderNum + "-" + count + "-" + ".pdf";
+						String fileName = "-" + accessionNum + "-" + fillerOrderNum + "-" + count + "-" + (int)(Math.random()*1000000000) + ".pdf";
 						// Replace original PDF string with meta info to prevent saving > 500k char strings in table
 						docId = createDocumentFromEmbeddedPDF(pdf, fileName);
 						hl7Body = hl7Body.replace(pdf, "embedded_doc_id_" + docId);

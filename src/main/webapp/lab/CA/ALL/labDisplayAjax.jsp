@@ -41,6 +41,8 @@
 		 org.oscarehr.common.dao.UserPropertyDAO, org.oscarehr.common.model.UserProperty,
 		javax.swing.text.rtf.RTFEditorKit,
 		java.io.ByteArrayInputStream"%>
+<%@ page import="java.util.regex.Pattern" %>
+<%@ page import="java.net.URLEncoder" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -958,26 +960,44 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                    			}//end of isUnstructuredDoc
 
                                    			else{//if it isn't a PATHL7 doc
-                                   				//if there are duplicate FT/TX obxNames, only display the first (only if handler is PATHL7)
-	                                   			if(handler.getMsgType().equals("PATHL7")&& !isAllowedDuplicate && (obxCount>1) && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (handler.getOBXValueType(j, k).equals("TX") || handler.getOBXValueType(j, k).equals("FT"))){%>
-	                                   				<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= handler.getOBXIdentifier(j, k) %>')"></a><%
-	                                   				}
-	                               				else{%>
-	                                            <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../lab/CA/ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(j, k)%>'))"><%=obxName %></a></td><%}%>
-	                                            <%
-	                                          	//for pathl7, if it is an SG/CDC result greater than 100 characters, left justify it 
-	                                            if((handler.getOBXResult(j, k).length() > 100) && isSGorCDC){%>
-	                                            	<td align="left"><%= handler.getOBXResult( j, k) %></td><%
-	                                            }else{%>
-	                                            <td align="right"><%= handler.getOBXResult( j, k) %></td><%}%>
-	                                            <td align="center">
-	                                                    <%= handler.getOBXAbnormalFlag(j, k)%>
-	                                            </td>
-	                                            <td align="left"><%=handler.getOBXReferenceRange( j, k)%></td>
-	                                            <td align="left"><%=handler.getOBXUnits( j, k) %></td>
-	                                            <td align="center"><%= handler.getTimeStamp(j, k) %></td>
-	                                            <td align="center"><%= handler.getOBXResultStatus( j, k) %></td><%
-	                                   			}//end of PATHL7 else %>
+                                                if (handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
+                                                {
+                                                    String obxDocId = "";
+                                                    java.util.regex.Matcher docIdMatcher = java.util.regex.Pattern.compile("embedded_doc_id_(\\d+)").matcher(handler.getOBXResult(j, k));
+                                                    if (docIdMatcher.find())
+                                                    {
+                                                        obxDocId = docIdMatcher.group(1);
+                                                    }
+
+                                                    %>
+                                                    <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%=  java.net.URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName %></a>
+                                                    <td> <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../dms/ManageDocument.do?method=display&doc_no=<%=obxDocId%>');">Display PDF</a> </td>
+                                                    </tr>
+                                                    <%
+                                                }
+                                                else
+                                                {
+                                                    //if there are duplicate FT/TX obxNames, only display the first (only if handler is PATHL7)
+                                                    if(handler.getMsgType().equals("PATHL7")&& !isAllowedDuplicate && (obxCount>1) && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (handler.getOBXValueType(j, k).equals("TX") || handler.getOBXValueType(j, k).equals("FT"))){%>
+                                                        <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= handler.getOBXIdentifier(j, k) %>')"></a><%
+                                                        }
+                                                    else{%>
+                                                    <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../lab/CA/ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(j, k)%>'))"><%=obxName %></a></td><%}%>
+                                                    <%
+                                                    //for pathl7, if it is an SG/CDC result greater than 100 characters, left justify it
+                                                    if((handler.getOBXResult(j, k).length() > 100) && isSGorCDC){%>
+                                                        <td align="left"><%= handler.getOBXResult( j, k) %></td><%
+                                                    }else{%>
+                                                    <td align="right"><%= handler.getOBXResult( j, k) %></td><%}%>
+                                                    <td align="center">
+                                                            <%= handler.getOBXAbnormalFlag(j, k)%>
+                                                    </td>
+                                                    <td align="left"><%=handler.getOBXReferenceRange( j, k)%></td>
+                                                    <td align="left"><%=handler.getOBXUnits( j, k) %></td>
+                                                    <td align="center"><%= handler.getTimeStamp(j, k) %></td>
+                                                    <td align="center"><%= handler.getOBXResultStatus( j, k) %></td><%
+                                                }
+                                   			}//end of PATHL7 else %>
                                         </tr>
 
                                         <%for (l=0; l < handler.getOBXCommentCount(j, k); l++){%>

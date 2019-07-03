@@ -26,6 +26,9 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 /**
  * handler for both MDM T08 and MDM T02 Messages. This is because
  * they both share the same message format
@@ -201,6 +204,14 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	}
 
 
+	@Override
+	public String getFillerOrderNumber()
+	{
+		//TODO better solution?
+		return getString(get("/.EVN-2"));
+	}
+
+
 	/* =================================== TXA ========================== */
 
 	/**
@@ -213,12 +224,130 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 		return get("/.TXA-12");
 	}
 
+	/**
+	 * get the k'th ordering provider name
+	 * @param i - ignored
+	 * @param k - provider rep
+	 * @return - ordering provider name (for display)
+	 * @throws HL7Exception
+	 */
 	@Override
-	public String getFillerOrderNumber()
+	protected String getOrderingProvider(int i, int k) throws HL7Exception
 	{
-		//TODO better solution?
-		return get("/.EVN-2");// event recorded date time.
+		String familyName = getString(get("/.TXA-5(" + k + ")-2"));
+		String givenName = getString(get("/.TXA-5(" + k + ")-3"));
+		String middleName = getString(get("/.TXA-5("+ k + ")-4"));
+		String suffix = getString(get("/.TXA-5(" + k + ")-5"));
+		String prefix = getString(get("/.TXA-5(" + k + ")-6"));
+		String degree = getString(get("/.TXA-5(" + k + ")-7"));
+
+		String fullName = prefix + " " + givenName + " " + middleName + " " + familyName + " " + suffix + " " + degree;
+		return fullName.trim().replaceAll("\\s+", " ");
 	}
+
+	/**
+	 * get the kth copy to provider name
+	 * @param i - ignored
+	 * @param k - provider rep
+	 * @return - the provider name (for display)
+	 * @throws HL7Exception
+	 */
+	@Override
+	protected String getResultCopiesTo(int i, int k) throws HL7Exception
+	{
+		String familyName = getString(get("/.TXA-23(" + k + ")-2"));
+		String givenName = getString(get("/.TXA-23(" + k + ")-3"));
+		String middleName = getString(get("/.TXA-23("+ k + ")-4"));
+		String suffix = getString(get("/.TXA-23(" + k + ")-5"));
+		String prefix = getString(get("/.TXA-23(" + k + ")-6"));
+		String degree = getString(get("/.TXA-23(" + k + ")-7"));
+
+		String fullName = prefix + " " + givenName + " " + middleName + " " + familyName + " " + suffix + " " + degree;
+		return fullName.trim().replaceAll("\\s+", " ");
+	}
+
+
+	/**
+	 *  Return the status of the report, 'F' is returned for a final report,
+	 *  otherwise the report is partial
+	 */
+	@Override
+	public String getOrderStatus()
+	{
+		return getString(get("/.TXA-17"));
+	}
+
+	/**
+	 * get the kth ordering providers id code
+	 * @param i - ignored
+	 * @param k - the provider rep
+	 * @return - the providers id code
+	 * @throws HL7Exception
+	 */
+	@Override
+	protected String getClientRef(int i, int k) throws HL7Exception
+	{
+		return getString(get("/.TXA-5(" + k + ")-1"));
+	}
+
+	/**
+	 * get the provider no of the kth provider
+	 * @param i - ignored
+	 * @param k - the provider rep
+	 * @return - the "provider number"
+	 * @throws HL7Exception
+	 */
+	@Override
+	protected String getOrderingProviderNo(int i, int k) throws HL7Exception
+	{
+		return getString(get("/.TXA-5(" + k + ")-1"));
+	}
+
+	/**
+	 * get the provider no of the kth copying provider
+	 * @param i - ignored
+	 * @param k - the provider rep
+	 * @return - the "provider number"
+	 * @throws HL7Exception
+	 */
+	@Override
+	protected String getResultCopiesToProviderNo(int i, int k) throws HL7Exception
+	{
+		return getString(get("/.TXA-23(" + k + ")-1"));
+	}
+
+
+	/**
+	 * return the document type as the observation header
+	 */
+	public String getObservationHeader(int i, int j)
+	{
+		return getString(get("/.TXA-2"));
+	}
+
+	/**
+	 * return the document type as the one and only header
+	 */
+	@Override
+	public ArrayList<String> getHeaders()
+	{
+		ArrayList<String> res = new ArrayList<>();
+		res.add(getString(get("/.TXA-2")));
+		return res;
+	}
+
+
+	/* ================================= EVN ============================== */
+
+	/**
+	 *  Return the service date of the message
+	 */
+	@Override
+	public String getServiceDate()
+	{
+		return formatDateTime(get("/.EVN-2"));
+	}
+
 
 	/* ================================= OBR ============================== */
 
@@ -230,7 +359,6 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	{
 		return 1;
 	}
-
 
 	/* ================================= OBX ============================== */
 
@@ -341,7 +469,12 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXAbnormalFlag( int i, int j)
 	{
-		return getString(get("/.OBX("+j+")-8"));
+		String ab = getString(get("/.OBX("+j+")-8"));
+		if (ab == null || ab.isEmpty())
+		{// no ab string means normal
+			return "N";
+		}
+		return ab;
 	}
 
 	/**
@@ -368,4 +501,5 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	{
 		return formatDateTime(get("/.OBX("+j+")-14"));
 	}
+
 }
