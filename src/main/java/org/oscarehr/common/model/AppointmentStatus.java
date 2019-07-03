@@ -43,6 +43,8 @@ public class AppointmentStatus extends AbstractModel<Integer> {
     public static final String APPOINTMENT_STATUS_CANCELLED = "C";
 	public static final String APPOINTMENT_STATUS_DAYSHEET_PRINTED = "T";
 	public static final String APPOINTMENT_STATUS_NEW = "t";
+	public static final String APPOINTMENT_STATUS_BILLED = "B";
+	public static final String APPOINTMENT_STATUS_NO_SHOW = "N";
 
 
 	@Id

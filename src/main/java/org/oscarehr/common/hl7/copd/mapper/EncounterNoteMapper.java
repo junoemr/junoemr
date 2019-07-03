@@ -61,7 +61,13 @@ public class EncounterNoteMapper extends AbstractMapper
 	{
 		CaseManagementNote note = new CaseManagementNote();
 
-		note.setNote(getEncounterNoteText(rep));
+		String noteText = getEncounterNoteText(rep);
+		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{
+			noteText = noteText.replace(" / ", "\n");
+		}
+
+		note.setNote(noteText);
 		note.setObservationDate(getEncounterNoteContactDate(rep));
 		note.setUpdateDate(getEncounterNoteContactDate(rep));
 
