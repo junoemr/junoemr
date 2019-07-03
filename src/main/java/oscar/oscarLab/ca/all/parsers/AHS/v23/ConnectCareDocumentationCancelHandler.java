@@ -26,9 +26,9 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.MDM_T11;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
-import oscar.oscarLab.ca.all.parsers.messageTypes.MDM_T08_T02MessageHandler;
+import oscar.oscarLab.ca.all.parsers.messageTypes.MDM_T11MessageHandler;
 
-public class ConnectCareDocumentationCancelHandler extends MDM_T08_T02MessageHandler
+public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 {
 	public ConnectCareDocumentationCancelHandler(Message msg) throws HL7Exception
 	{
@@ -79,4 +79,5 @@ public class ConnectCareDocumentationCancelHandler extends MDM_T08_T02MessageHan
 	public void init(String hl7Body) throws HL7Exception
 	{
 	}
+
 }

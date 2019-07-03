@@ -269,7 +269,7 @@ public final class MessageUploader {
 			boolean hasPDF = false;
 			List<String> embeddedPDFs = new ArrayList<>();
 
-			if (type.equals("PATHL7") || type.equals("AHS"))
+			if (messageHandler.isSupportEmbeddedPdf())
 			{
 				String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
 				// Every PDF should be prefixed with this due to b64 encoding of PDF header
@@ -304,9 +304,10 @@ public final class MessageUploader {
 			{
 				if (hasPDF)
 				{
+					int count = 0;
 					for (String pdf : embeddedPDFs)
 					{
-						String fileName = "-" + accessionNum + ".pdf";
+						String fileName = "-" + accessionNum + "-" + fillerOrderNum + "-" + count + "-" + ".pdf";
 						// Replace original PDF string with meta info to prevent saving > 500k char strings in table
 						docId = createDocumentFromEmbeddedPDF(pdf, fileName);
 						hl7Body = hl7Body.replace(pdf, "embedded_doc_id_" + docId);
@@ -314,6 +315,7 @@ public final class MessageUploader {
 						{
 							throw new ParseException("did not save embedded lab document correctly", 0);
 						}
+						count ++;
 					}
 				}
 

@@ -102,6 +102,12 @@ public class PATHL7Handler extends ORU_R01MessageHandler
         return("PATHL7");
     }
 
+    @Override
+    public boolean isSupportEmbeddedPdf()
+    {
+        return true;
+    }
+
     public String getMsgPriority(){
         return("");
     }

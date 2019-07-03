@@ -62,6 +62,8 @@
 <%@	page import="java.io.ByteArrayInputStream"%>
 <%@ page import="org.oscarehr.labs.dao.Hl7DocumentLinkDao" %>
 <%@ page import="org.oscarehr.labs.model.Hl7DocumentLink" %>
+<%@ page import="java.util.regex.Pattern" %>
+<%@ page import="java.util.regex.Matcher" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -1711,6 +1713,25 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                    			
                                    			else{//if it isn't a PATHL7 doc%>
                                		<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>"><%
+
+										   if (handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
+										   {
+										   		String obxDocId = "";
+										   		java.util.regex.Matcher docIdMatcher = Pattern.compile("embedded_doc_id_(\\d+)").matcher(handler.getOBXResult(j, k));
+										   		if (docIdMatcher.find())
+												{
+													obxDocId = docIdMatcher.group(1);
+												}
+
+												%>
+											    <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName %></a>
+						   						<td> <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../../../dms/ManageDocument.do?method=display&doc_no=<%=obxDocId%>');">Display PDF</a> </td>
+												</tr>
+											   <%
+										   }
+										   else
+										   {
+
                                				if(handler.getMsgType().equals("PATHL7") && !isAllowedDuplicate && (obxCount>1) && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (handler.getOBXValueType(j, k).equals("TX") || handler.getOBXValueType(j, k).equals("FT"))){%>
                                    				<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"></a><%
                                    				}
@@ -1725,7 +1746,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                            	if((handler.getOBXResult(j, k).length() > 100) && (isSGorCDC)){
                                            		align="left";
                                            	}%>
-                                           	
+
                                            	
                                            <td align="<%=align%>"><%= handler.getOBXResult( j, k) %></td>
                                           
@@ -1742,7 +1763,9 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 	                                                </a>
                                                 </td>
                                        </tr>
-                                        <%}
+                                        <%
+											}
+									   }
 
                                         for (l=0; l < handler.getOBXCommentCount(j, k); l++){%>
                                         <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">

@@ -79,4 +79,43 @@ public class ConnectCareDocumentationEditHandler extends MDM_T08_T02MessageHandl
 	public void init(String hl7Body) throws HL7Exception
 	{
 	}
+
+	@Override
+	public boolean isSupportEmbeddedPdf()
+	{
+		return true;
+	}
+
+	/* ================================= OBX ======================================= */
+
+	/**
+	 * get obx results. aka document id.
+	 * @param i - ignored
+	 * @param j - the obx segment
+	 * @return - the document id string
+	 */
+	@Override
+	public String getOBXResult(int i, int j)
+	{
+		return get("/.OBX(" + j + ")-5-5");
+	}
+
+	/**
+	 * check for obx content type
+	 * @param i - ignored
+	 * @param j - obx rep
+	 * @return PDF or UNKNOWN if type is not PDF
+	 */
+	@Override
+	public OBX_CONTENT_TYPE getOBXContentType(int i, int j)
+	{
+		if (get("/.OBX(" + j + ")-5-2") != null && get("/.OBX(" + j + ")-5-2").equals("PDF"))
+		{
+			return OBX_CONTENT_TYPE.PDF;
+		}
+		else
+		{
+			return OBX_CONTENT_TYPE.UNKNOWN;
+		}
+	}
 }

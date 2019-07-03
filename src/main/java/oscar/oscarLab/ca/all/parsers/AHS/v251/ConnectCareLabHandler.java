@@ -47,6 +47,12 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 		return false;
 	}
 
+	@Override
+	public String getMsgType()
+	{
+		return "AHS";
+	}
+
 	public ConnectCareLabHandler(Message msg) throws HL7Exception
 	{
 		super(msg);

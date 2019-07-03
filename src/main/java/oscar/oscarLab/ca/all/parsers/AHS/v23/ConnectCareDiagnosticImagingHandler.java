@@ -52,6 +52,12 @@ public class ConnectCareDiagnosticImagingHandler extends ConnectCareHandler
 		super(msg);
 	}
 
+	@Override
+	public String getMsgType()
+	{
+		return "AHS";
+	}
+
 	/**
 	 *  Return the name of the jth OBX segment of the ith OBR group.
 	 * @param i the OBR group rep

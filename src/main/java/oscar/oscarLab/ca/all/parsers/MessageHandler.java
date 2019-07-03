@@ -58,6 +58,13 @@ public abstract class MessageHandler
 	protected Terser terser;
 	protected Message message;
 
+
+	public enum OBX_CONTENT_TYPE {
+		UNKNOWN,
+		TEXT,
+		PDF
+	}
+
 	/**
 	 * default constructor. init must be called after instantiation.
 	 */
@@ -139,6 +146,15 @@ public abstract class MessageHandler
 	 */
 	@Deprecated
 	public abstract void init(String hl7Body) throws HL7Exception;
+
+	/**
+	 * true if the hl7 spec referenced by this message handler supports embedded pdfs
+	 * @return true if embedded pdfs are supported.
+	 */
+	public boolean isSupportEmbeddedPdf()
+	{
+		return false;
+	}
 
 	/* ===================================== MSH ====================================== */
 
@@ -567,6 +583,17 @@ public abstract class MessageHandler
 	public int getSpecimenOBXCount(int i, int j)
 	{
 		return 0;
+	}
+
+	/**
+	 * get the content type of the OBX segment
+	 * @param i - obr group
+	 * @param j - obx rep
+	 * @return - the content type of this obx segment
+	 */
+	public OBX_CONTENT_TYPE getOBXContentType(int i, int j)
+	{
+		return OBX_CONTENT_TYPE.TEXT;
 	}
 
 	/**

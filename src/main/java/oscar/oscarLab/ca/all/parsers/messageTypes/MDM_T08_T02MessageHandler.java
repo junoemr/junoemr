@@ -217,7 +217,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	public String getFillerOrderNumber()
 	{
 		//TODO better solution?
-		return getAccessionNum();
+		return get("/.EVN-2");// event recorded date time.
 	}
 
 	/* ================================= OBR ============================== */

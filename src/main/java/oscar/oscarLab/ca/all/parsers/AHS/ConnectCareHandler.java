@@ -112,4 +112,10 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 		}
 		return ab;
 	}
+
+	@Override
+	public boolean isSupportEmbeddedPdf()
+	{
+		return true;
+	}
 }
