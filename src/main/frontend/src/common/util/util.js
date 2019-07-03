@@ -137,6 +137,23 @@ Juno.Common.Util.validateTimeString = function validateTimeString(
 		displayErrors.add_field_error(field, fieldDisplayName + 'is required');
 	}
 };
+Juno.Common.Util.validateIntegerString = function validateInputString(
+	inputString, displayErrors, field, fieldDisplayName, required, nonNegative, nonZero)
+{
+	if (!Juno.Common.Util.isBlank(inputString))
+	{
+		if (!Juno.Common.Util.isIntegerString(inputString) ||
+			(nonNegative && Number(inputString) < 0) ||
+			(nonZero && Number(inputString) === 0))
+		{
+			displayErrors.add_field_error(field, fieldDisplayName + 'is invalid');
+		}
+	}
+	else if (required)
+	{
+		displayErrors.add_field_error(field, fieldDisplayName + 'is required');
+	}
+};
 
 Juno.Common.Util.addNewLine = function addNewLine(line, mssg) {
 	if (line == null || line.trim() == "") return mssg;

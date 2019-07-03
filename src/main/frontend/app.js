@@ -1,8 +1,8 @@
 
 require('jquery');
-require('jquery-ui/ui/widgets/draggable')
+require('jquery-ui/ui/widgets/draggable');
 require('jquery-ui/themes/base/draggable.css');
-require('jquery-ui/ui/widgets/resizable')
+require('jquery-ui/ui/widgets/resizable');
 require('jquery-ui/themes/base/resizable.css');
 require('moment');
 require('angular');
@@ -117,7 +117,14 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 		{
 			url: '/schedule',
 			templateUrl: 'src/schedule/view.jsp',
-			controller: 'Schedule.ScheduleController'
+			controller: 'Schedule.ScheduleController as scheduleController',
+			resolve:
+			{
+				loadedSettings: ['providerService', function (providerService)
+				{
+					return providerService.getSettings();
+				}],
+			}
 		})
 		.state('admin',
 		{

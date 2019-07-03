@@ -64,4 +64,16 @@ public class AppointmentArchiveDao extends AbstractDao<AppointmentArchive> {
 		List<AppointmentArchive> results = query.getResultList();
 		return (results);
 	}
+
+	public List<AppointmentArchive> findByAppointmentId(Integer id, int limit, int offset) {
+		String sqlCommand = "select x from "+modelClass.getSimpleName()+" x where x.appointmentNo =:id order by x.updateDateTime";
+
+		Query query = entityManager.createQuery(sqlCommand);
+		query.setParameter("id", id);
+		setLimit(query, offset, limit);
+
+		@SuppressWarnings("unchecked")
+		List<AppointmentArchive> results = query.getResultList();
+		return (results);
+	}
 }

@@ -59,6 +59,8 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 		MYOSCAR_SELF_BOOKING
 	}
 
+	public static final String DONOTBOOK = "Do_Not_Book";
+
 	public static final int DEFAULT_REASON_CODE = 17;
 
 	@Id

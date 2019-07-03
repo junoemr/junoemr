@@ -28,6 +28,10 @@
 
 <!-- this CSS makes it so the modals don't have the vertical sliding animation. Not sure if I will keep this or how I will use this yet -->
 
+<div class="consult-page-header"
+ng-if="consultResponseListCtrl.hideSearchPatient != true">
+	<!-- TODO -->
+</div>
 <div ng-show="consultResponseListCtrl.consultReadAccess" class="col-lg-12">
 
 	<form name="searchForm" id="search-form">

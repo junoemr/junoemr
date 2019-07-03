@@ -11,28 +11,36 @@
 }
 
 #patient-search-page {
-	#patient-search-table {
-		tr {
-			cursor: pointer;
-		}
+	.patient-search-header {
+		@extend %juno-page-header;
 	}
+	.patient-search-content {
+		@extend %juno-primary-view-pane;
+		@include juno-page-padding-default;
 
-	#search-form {
-		.search-filters>div {
-			margin-bottom: $margin-sm;
+		#patient-search-table {
+			tr {
+				cursor: pointer;
+			}
 		}
-		.search-buttons {
-			margin-bottom: $margin-md;
-			margin-top: $margin-md;
-		}
-		.demo-search-options {
-			padding-left: 0;
-			.dropdown-toggle {
-				border: 1px solid #ccc;
-				line-height: 1.42857;
-				color: #555555;
-				webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-				box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+
+		#search-form {
+			.search-filters > div {
+				margin-bottom: $margin-sm;
+			}
+			.search-buttons {
+				margin-bottom: $margin-md;
+				margin-top: $margin-md;
+			}
+			.demo-search-options {
+				padding-left: 0;
+				.dropdown-toggle {
+					border: 1px solid #ccc;
+					line-height: 1.42857;
+					color: #555555;
+					webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+					box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+				}
 			}
 		}
 	}

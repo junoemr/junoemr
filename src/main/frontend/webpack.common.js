@@ -24,12 +24,17 @@ module.exports = {
 			},
 			{
 				// URL loader.  Falls back to file loader for large files.
-				test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+				test: /\.(woff(2)?|ttf|eot|svg|gif|png)(\?v=\d+\.\d+\.\d+)?$/,
 				loader: 'url-loader',
 				options: {
 					limit: 10000,
 				}
-			}
+			},
+			{
+				// html loader
+				test: /\.html?$/,
+				use: 'html-loader'
+			},
 		]
 	},
 	plugins: [
@@ -164,7 +169,6 @@ module.exports = {
 			'./src/common/services/providersService.js',
 			'./src/common/services/reportingService.js',
 			'./src/common/services/resultsService.js',
-			'./src/common/services/scheduleService.js',
 			'./src/common/services/securityService.js',
 			'./src/common/services/staticDataService.js',
 			'./src/common/services/summaryService.js',
@@ -190,6 +194,8 @@ module.exports = {
 			'./src/common/directives/jqueryUIDraggable.js',
 			'./src/common/directives/angular-ui-calendar.js',
 			'./src/common/directives/selectOptionTooltip.js',
+
+			'./src/common/directives/appointment/juno_appointment_status_select.js',
 
 			'./src/common/directives/clinicaid/ca_field_alphadate.js',
 			'./src/common/directives/clinicaid/ca_field_alpha.js',
@@ -234,12 +240,7 @@ module.exports = {
 			'./src/dashboard/ticklerConfigureController.js',
 
 			'./src/patientlist/module.js',
-			'./src/patientlist/patientListState.js',
 			'./src/patientlist/patientListController.js',
-			'./src/patientlist/patientListAppointmentListController.js',
-			'./src/patientlist/patientListConfigController.js',
-			'./src/patientlist/patientListDemographicSetController.js',
-			'./src/patientlist/patientListProgramController.js',
 
 			'./src/record/module.js',
 			'./src/record/recordController.js',
@@ -268,8 +269,7 @@ module.exports = {
 			'./src/schedule/module.js',
 			'./src/schedule/scheduleController.js',
 			'./src/schedule/eventController.js',
-			'./src/schedule/appointmentAddController.js',
-			'./src/schedule/appointmentViewController.js',
+			'./src/schedule/scheduleService.js',
 
 			'./src/admin/module.js',
 			'./src/admin/adminController.js',

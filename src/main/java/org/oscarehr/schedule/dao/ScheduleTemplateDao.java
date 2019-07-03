@@ -25,6 +25,26 @@
 
 package org.oscarehr.schedule.dao;
 
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeMap;
+import com.google.common.collect.TreeRangeMap;
+import org.oscarehr.common.NativeSql;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.common.model.Appointment;
+import org.oscarehr.managers.ScheduleManager;
+import org.oscarehr.schedule.dto.ScheduleSlot;
+import org.oscarehr.schedule.model.ScheduleSearchResult;
+import org.oscarehr.schedule.model.ScheduleTemplate;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.external.soap.v1.transfer.ScheduleCodeDurationTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import javax.persistence.TemporalType;
 import java.math.BigInteger;
 import java.sql.Time;
 import java.time.Duration;
@@ -38,26 +58,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.persistence.Query;
-import javax.persistence.TemporalType;
-
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeMap;
-import com.google.common.collect.TreeRangeMap;
-import org.oscarehr.common.NativeSql;
-import org.oscarehr.common.model.Appointment;
-import org.oscarehr.managers.ScheduleManager;
-import org.oscarehr.schedule.model.ScheduleSearchResult;
-import org.oscarehr.schedule.model.ScheduleTemplate;
-import org.oscarehr.schedule.dto.ScheduleSlot;
-import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.ws.external.soap.v1.transfer.ScheduleCodeDurationTransfer;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 import static org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey.DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES;
 
@@ -156,7 +156,34 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		return query.getResultList();
 	}
 
-	public List<Object[]> getRawScheduleSlots(Integer providerNo, LocalDate date)
+	public Integer getScheduleSlotLengthInMin(Integer providerNo, LocalDate date)
+	{
+		Integer result = null;
+		String sql = "SELECT " +
+				"CAST(((24*60)/LENGTH(st.timecode)) AS integer) AS slotLength\n" +
+				"FROM scheduledate sd " +
+				"JOIN scheduletemplate st ON (sd.hour = st.name AND (sd.provider_no = st.provider_no OR st.provider_no = :publicCode ))\n" +
+				"WHERE sd.status = 'A'\n" +
+				"AND sd.sdate = :scheduleDate\n" +
+				"AND sd.provider_no = :providerNo\n";
+
+		Query query = entityManager.createNativeQuery(sql);
+		query.setParameter("scheduleDate", java.sql.Date.valueOf(date), TemporalType.DATE);
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
+
+		List<BigInteger> results = query.getResultList();
+		if(!results.isEmpty())
+		{
+			result = results.get(0).intValue();
+			if(results.size() > 1)
+			{
+				MiscUtils.getLogger().warn("Multiple values found for provider schedule slot length");
+			}
+		}
+		return result;
+	}
+	private List<Object[]> getRawScheduleSlots(Integer providerNo, LocalDate date)
 	{
 		// This query is a bit hard to read.  The mess with all of the UNION ALLs is a way to make a
 		// sequence of numbers.  This is then used to find the position in the scheduletemplate.timecode
@@ -172,6 +199,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"  CAST(COALESCE(stc.duration, ((24*60)/LENGTH(st.timecode))) AS integer) AS duration,\n" +
 				"  stc.description,\n" +
 				"  stc.color,\n" +
+				"  stc.juno_color,\n" +
 				"  stc.confirm,\n" +
 				"  stc.bookinglimit\n" +
 				"FROM \n" +
@@ -212,8 +240,9 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 			Integer durationMinutes = ((BigInteger) result[5]).intValue();
 			String description = (String) result[6];
 			String color = (String) result[7];
-			String confirm = (String) result[8];
-			Integer bookingLimit = (Integer) result[9];
+			String junoColor = (String) result[8];
+			String confirm = (String) result[9];
+			Integer bookingLimit = (Integer) result[10];
 
 			LocalDate slotDate = appointmentDate.toLocalDate();
 			LocalTime slotTime = appointmentTime.toLocalTime();
@@ -239,7 +268,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 			}
 
 			slots.put(range, new ScheduleSlot(appointmentDateTime, code, durationMinutes, description,
-					color, confirm, bookingLimit));
+					color, junoColor, confirm, bookingLimit));
 		}
 
 		return slots;

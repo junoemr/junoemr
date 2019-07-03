@@ -1,3 +1,8 @@
+
+.consult-page-header {
+	@extend %juno-page-header;
+}
+
 #consult-request-section,
 #consult-response-section {
 	.consult-request-form {

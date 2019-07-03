@@ -1,3 +1,7 @@
+.tickler-page-header {
+	@extend %juno-page-header;
+}
+
 #tickler-list-page {
 	#search-form {
 		.search-filters>div {
