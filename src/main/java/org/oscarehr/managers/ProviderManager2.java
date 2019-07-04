@@ -743,12 +743,60 @@ public class ProviderManager2 {
 		providerExtDao.merge(providerExt);		
 				
 	}
-	
-	public void updateProvider(LoggedInInfo loggedInInfo, Provider provider) {
-		providerDao.updateProvider(provider);
-		
-		//--- log action ---
-		LogAction.addLogSynchronous(loggedInInfo, "ProviderManager.updateProvider", "providerNo=" + provider.getProviderNo());
 
+	/**
+	 * update a single user setting
+	 * @param providerNo - the provider id
+	 * @param key - the property name
+	 * @param value - the property value to save
+	 * @throws IllegalArgumentException - if the key or value is invalid
+	 */
+	public void updateSingleSetting(String providerNo, String key, String value)
+	{
+		boolean isProviderPreferenceEntry = updateSinglePreference(providerNo, key, value);
+
+		if(!isProviderPreferenceEntry)
+		{
+			//TODO check for valid key and update/insert in key value table
+
+			throw new IllegalArgumentException(key + " is not a valid provider property");
+		}
+	}
+
+	/**
+	 * convert a key value pair to a provider preference entry. save if key value is valid.
+	 * @param providerNo - the provider id
+	 * @param key - the property name
+	 * @param value - the property value to save
+	 * @return true if the key was a valid provider preference entry and the entry was updated, false otherwise
+	 */
+	private boolean updateSinglePreference(String providerNo, String key, String value)
+	{
+		ProviderPreference preference = providerPreferenceDao.find(providerNo);
+		if(preference == null)
+		{
+			preference = new ProviderPreference();
+		}
+
+		switch(key)
+		{
+			case "startHour" : preference.setStartHour(Integer.parseInt(value)); break;
+			case "endHour" : preference.setEndHour(Integer.parseInt(value)); break;
+			case "everyMin" : preference.setEveryMin(Integer.parseInt(value)); break;
+			case "myGroupNo" : preference.setMyGroupNo(value); break;
+			case "colourTemplate" : preference.setColourTemplate(value); break;
+			case "newTicklerWarningWindow" : preference.setNewTicklerWarningWindow(value); break;
+			case "defaultServiceType" : preference.setDefaultServiceType(value); break;
+			case "defaultCaisiPmm" : preference.setDefaultCaisiPmm(value); break;
+			case "defaultNewOscarCme" : preference.setDefaultNewOscarCme(value); break;
+			case "printQrCodeOnPrescriptions" : preference.setPrintQrCodeOnPrescriptions(Boolean.parseBoolean(value)); break;
+			case "appointmentScreenLinkNameDisplayLength" : preference.setAppointmentScreenLinkNameDisplayLength(Integer.parseInt(value)); break;
+			case "defaultDoNotDeleteBilling" : preference.setDefaultDoNotDeleteBilling(Integer.parseInt(value)); break;
+			case "defaultDxCode" : preference.setDefaultDxCode(value); break;
+			default: return false;
+		}
+
+		providerPreferenceDao.merge(preference);
+		return true;
 	}
 }

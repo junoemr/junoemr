@@ -1,6 +1,7 @@
 import {AppointmentApi} from '../../generated/api/AppointmentApi';
 import {ScheduleApi} from '../../generated/api/ScheduleApi';
 import {SitesApi} from '../../generated/api/SitesApi';
+import {ProviderPreferenceApi} from '../../generated/api/ProviderPreferenceApi';
 
 angular.module('Schedule').controller('Schedule.ScheduleController', [
 
@@ -12,6 +13,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 	'$uibModal',
 	'$state',
 	'loadedSettings',
+	'user',
 	'providerService',
 	'focusService',
 	'securityService',
@@ -27,6 +29,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$uibModal,
 		$state,
 		loadedSettings,
+		user,
 		providerService,
 		focusService,
 		securityService,
@@ -46,7 +49,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.sitesApi = new SitesApi($http, $httpParamSerializer,
 			'../ws/rs');
 
+		$scope.providerPreferenceApi = new ProviderPreferenceApi($http, $httpParamSerializer,
+			'../ws/rs');
+
 		controller.providerSettings = loadedSettings;
+		controller.currentUser = user;
 		controller.calendarMinColumnWidth = 250;
 
 		//=========================================================================
@@ -1509,7 +1516,18 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 
 			// reload the schedule and then events data, triggering a rerender
-			$scope.loadSelectedSchedules().then($scope.refetchEvents);
+			$scope.loadSelectedSchedules().then(
+				function success()
+				{
+					var currentUserNo = controller.currentUser.providerNo;
+					$scope.providerPreferenceApi.updateProviderSetting(currentUserNo, "myGroupNo", selectedSchedule.identifier).then(
+						function success()
+						{
+							controller.providerSettings.groupNo = selectedSchedule.identifier;
+							$scope.refetchEvents();
+						}
+					);
+				});
 		};
 
 		$scope.onTimeIntervalChanged = function onTimeIntervalChanged()
