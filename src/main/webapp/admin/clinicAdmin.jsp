@@ -200,19 +200,6 @@
 
                         <div class="input-field flex-fill-row">
                             <input id="watermark-toggle" <% if (RxWatermarkService.isWatermarkEnabled()) {%>checked<%}%> type="checkbox">
-                            <script>
-                                let toggle = $('#watermark-toggle');
-                                toggle.bootstrapToggle({
-                                    width: 50,
-                                    height: 20,
-                                    size: 'small'
-                                });
-                                toggle.change(function() {
-                                    let enabled = jQuery(this).prop('checked');
-                                    toggleWatermarkFields(enabled);
-                                    enableWatermark(enabled);
-                                })
-                            </script>
                         </div>
                         <div class="watermark-fields" id="watermark-input-form">
                             <div class="watermark-input-field flex-fill-row">
@@ -234,18 +221,6 @@
                                 <label><b>Watermark Position</b></label>
                                 <div class="watermark-background-selector">
                                 <input id="watermark-background-toggle" <% if (!RxWatermarkService.isWatermarkBackground()) {%>checked<%}%> type="checkbox" data-toggle="toggle" data-on="Foreground" data-off="Background">
-                                <script>
-                                    let backgroundToggle = $('#watermark-background-toggle');
-                                    backgroundToggle.bootstrapToggle({
-                                        width: 90,
-                                        height: 20,
-                                        size: 'small'
-                                    });
-                                    backgroundToggle.change(function() {
-                                        let state = !jQuery(this).prop('checked');
-                                        setWatermarkBackground(state);
-                                    })
-                                </script>
                                 </div>
                             </div>
                         </div>
@@ -259,6 +234,34 @@
         const billingCheckbox = document.querySelector('#billingCheckbox');
         const billingFields = document.querySelector('#billing-fields');
         const addressFields = document.querySelector('#address-fields');
+
+        // setup toggle switches
+
+        // watermark on / off toggle
+        let toggle = $('#watermark-toggle');
+        toggle.bootstrapToggle({
+            width: 50,
+            height: 20,
+            size: 'small'
+        });
+        toggle.change(function() {
+            let enabled = jQuery(this).prop('checked');
+            toggleWatermarkFields(enabled);
+            enableWatermark(enabled);
+        })
+
+        // watermark position toggle
+        let backgroundToggle = $('#watermark-background-toggle');
+        backgroundToggle.bootstrapToggle({
+            width: 90,
+            height: 20,
+            size: 'small'
+        });
+        backgroundToggle.change(function() {
+            let state = !jQuery(this).prop('checked');
+            setWatermarkBackground(state);
+        })
+
 
         function showBilling(showBilling) {
             if (showBilling) {
