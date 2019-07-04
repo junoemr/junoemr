@@ -52,7 +52,10 @@ public final class OscarSpringContextLoader extends ContextLoader {
     protected WebApplicationContext createWebApplicationContext(ServletContext servletContext, ApplicationContext parent) throws BeansException {
 		String contextClassName = servletContext.getInitParameter(CONTEXT_CLASS_PARAM);
 
-        Class<?> contextClass;
+		log.info("==================================================");
+		log.info("Loading Context");
+		log.info("==================================================");
+		Class<?> contextClass;
         if (contextClassName != null) {
 			try {
 				contextClass = Class.forName(contextClassName, true, Thread.currentThread().getContextClassLoader());

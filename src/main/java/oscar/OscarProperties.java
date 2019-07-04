@@ -558,4 +558,9 @@ public class OscarProperties extends Properties {
 	{
 		return isPropertyActive("echart_additional_patient_info");
 	}
+
+	public boolean isJunoEncounterEnabled()
+	{
+		return isPropertyActive("juno_encounter.enabled");
+	}
 }

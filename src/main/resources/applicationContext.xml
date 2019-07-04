@@ -9,6 +9,9 @@
                 http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd"
        default-autowire="no">
 
+	<!-- Note that this appears to be a separate context from the one configured by -->
+	<!-- action-servlet.xml -->
+
 	<!--
 		load properties from additional property files; oscar.properties is
 		already loaded
@@ -285,6 +288,18 @@
 	<bean id="appointmentService" class="org.oscarehr.appointment.service.Appointment" autowire="byName" />
 	<bean id="appointmentStatusService" class="org.oscarehr.appointment.service.AppointmentStatusService" autowire="byName" />
 	<bean id="scheduleService" class="org.oscarehr.schedule.service.Schedule" autowire="byName" />
+	<bean id="vacancyProgramManager" class="org.oscarehr.schedule.service.Schedule" autowire="byName" />
+	<bean id="encounterService" class="org.oscarehr.casemgmt.service.EncounterService" autowire="byName" />
+	<bean id="encounterCPPNoteService" class="org.oscarehr.casemgmt.service.EncounterCPPNoteService" autowire="byName" />
+
+	<!-- This is from the applicationContextCaisi.xml, but there is a struts action that relies -->
+	<!-- on it existing. -->
+	<bean id="populationReportDao" class="org.oscarehr.common.dao.PopulationReportDao" autowire="byName" />
+	<bean id="populationReportManager" class="org.oscarehr.common.service.PopulationReportManager" autowire="byName">
+		<property name="issueDAO" ref="IssueDAO" />
+		<property name="populationReportDao" ref="populationReportDao" />
+	</bean>
+	<bean id="genericIntakeManager" class="org.oscarehr.PMmodule.service.GenericIntakeManager" autowire="byName" />
 
 	<!--
 	<task:executor id="taskExecutor" />
@@ -293,5 +308,5 @@
 
 	<!-- Enables scheduled tasks annotated with @Scheduled etc. -->
 	<task:annotation-driven/>
-		
+
 </beans>
