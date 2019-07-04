@@ -74,6 +74,14 @@ public class AbstractMapper
 		{
 			return null;
 		}
+
+		//strip trailing time information, as we are only interested in the date.
+		//if this is not done SimpleDateFormater will produce incorrect date strings WITHOUT throwing exceptions
+		if (segmentValue.length() > 8)
+		{
+			segmentValue = segmentValue.substring(0, 8);
+		}
+
 		return ConversionUtils.fromDateString(segmentValue, "yyyyMMdd");
 	}
 
