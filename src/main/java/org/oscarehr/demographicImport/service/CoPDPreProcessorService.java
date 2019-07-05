@@ -255,7 +255,7 @@ public class CoPDPreProcessorService
 			{
 				try
 				{
-					Integer.parseInt(tagValue);
+					Float.parseFloat(tagValue);
 					return tagValue;
 				}
 				catch (NumberFormatException e)
