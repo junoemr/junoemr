@@ -174,6 +174,7 @@ public class SendFaxPDFAction extends DispatchAction {
 		ArrayList<Object> errorList = new ArrayList<>();
 		try
 		{
+			int numSending = 0;
 			Set<String> faxNoList = OutgoingFaxService.preProcessFaxNumbers(recipients);
 			for(String faxNo : faxNoList)
 			{
@@ -181,7 +182,8 @@ public class SendFaxPDFAction extends DispatchAction {
 				try
 				{
 					GenericFile fileToFax = FileFactory.getExistingFile(pdfPath);
-					fileToFax.rename(GenericFile.getFormattedFileName("-Form-" + formName + ".pdf"));
+					fileToFax.rename(GenericFile.getFormattedFileName("-Form-" + formName + "-" + numSending + ".pdf"));
+					numSending++;
 					transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicNo, faxNo, FaxOutbound.FileType.FORM, fileToFax);
 					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
 					{

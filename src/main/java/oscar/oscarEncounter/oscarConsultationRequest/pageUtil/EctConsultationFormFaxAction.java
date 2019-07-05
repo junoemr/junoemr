@@ -145,10 +145,12 @@ public class EctConsultationFormFaxAction extends Action
 				PdfReader pdfReader = new PdfReader(faxPdf);
 				pdfReader.close();
 				GenericFile fileToCopy = FileFactory.getExistingFile(faxPdf);
+				int numSending = 0;
 
 				for(String faxNo : recipients)
 				{
-					String tempName = String.format("CRF-%s%s.%s.%d.pdf", faxClinicId, reqId, faxNo, System.currentTimeMillis());
+					String tempName = String.format("CRF-%s%s.%s.%d.%d.pdf", faxClinicId, reqId, faxNo, System.currentTimeMillis(), numSending);
+					numSending++;
 
 					GenericFile fileToFax = FileFactory.copy(fileToCopy);
 					fileToFax.rename(tempName);

@@ -56,11 +56,13 @@ public final class FaxAction
 	{
 		HashSet<String> recipients = OutgoingFaxService.preProcessFaxNumbers(numbers);
 		List<FaxOutboxTransferOutbound> transferList = new ArrayList<>(recipients.size());
+		int numSending = 0;
 		for (String recipient : recipients)
 		{
 			logger.info("Generating PDF for eForm with fdid = " + formId);
 
-			String pdfFile = "EForm." + formId + "-" + System.currentTimeMillis() + "-";
+			String pdfFile = "EForm." + formId + "-" + System.currentTimeMillis() + "-" + numSending;
+			numSending++;
 			File tempFile = File.createTempFile(pdfFile, ".pdf");
 
 			// convert to PDF

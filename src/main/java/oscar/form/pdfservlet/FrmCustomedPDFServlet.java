@@ -92,10 +92,12 @@ public class FrmCustomedPDFServlet extends HttpServlet
 				HashSet<String> recipients = OutgoingFaxService.preProcessFaxNumbers(pharmacyFaxNo);
 				String faxMessage = "Fax sent to: " + pharmacyName + " (" + pharmacyFaxNo + ")";
 
+				int numSending = 0;
 				for(String recipient : recipients) // only ever has one element
 				{
 					// write to file
-					String pdfFile = "prescription_" + pdfId + ".pdf";
+					String pdfFile = "prescription_" + pdfId + "-" + numSending + ".pdf";
+					numSending++;
 					GenericFile fileToFax = FileFactory.createTempFile(baosPDF, ".pdf");
 					fileToFax.rename(pdfFile);
 					FaxOutboxTransferOutbound transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicNo, recipient, FaxOutbound.FileType.PRESCRIPTION, fileToFax);
