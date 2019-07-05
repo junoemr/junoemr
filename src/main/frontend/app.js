@@ -120,10 +120,6 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 			controller: 'Schedule.ScheduleController as scheduleController',
 			resolve:
 			{
-				user: ['providerService', function(providerService)
-				{
-					return providerService.getMe();
-				}],
 				loadedSettings: ['providerService', function (providerService)
 				{
 					return providerService.getSettings();
