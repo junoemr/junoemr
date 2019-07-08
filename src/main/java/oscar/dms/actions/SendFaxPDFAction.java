@@ -93,6 +93,7 @@ public class SendFaxPDFAction extends DispatchAction {
 	        {
 		        MiscUtils.getLogger().debug("size = " + docNoArray.length);
 		        EDocUtil docData = new EDocUtil();
+		        int numSending = 0;
 		        for(String docNo : docNoArray)
 		        {
 			        String filename = docData.getDocumentName(docNo);
@@ -104,7 +105,8 @@ public class SendFaxPDFAction extends DispatchAction {
 					        GenericFile fileToCopy = FileFactory.getDocumentFile(docData.getDocumentName(docNo));
 					        GenericFile fileToFax = FileFactory.copy(fileToCopy);
 
-					        String faxFileName = "DOC-" + docNo + "-" + filename + "-" + faxNo + "." + System.currentTimeMillis();
+					        String faxFileName = "DOC-" + docNo + "-" + filename + "-" + faxNo + "-" + numSending + "." + System.currentTimeMillis();
+					        numSending++;
 					        fileToFax.rename(faxFileName + ".pdf");
 
 					        transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicId, faxNo, FaxOutbound.FileType.DOCUMENT, fileToFax);
