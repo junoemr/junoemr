@@ -1270,7 +1270,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						//labs that fall into any of these categories have certain requirements per Excelleris
 						if(handler.getMsgType().equals("PATHL7")){
 							isUnstructuredDoc = ((PATHL7Handler) handler).unstructuredDocCheck(headers.get(i));
-							isPDF = ((PATHL7Handler)handler).hasEmbeddedPDF();
+							isPDF = ((PATHL7Handler)handler).hasEmbeddedPDF(lab_no);
 							isVIHARtf = ((PATHL7Handler) handler).vihaRtfCheck(headers.get(i));
 							if(handler.getPatientLocation().equals("SG") || handler.getPatientLocation().equals("CDC")){
 								isSGorCDC = true;
