@@ -497,6 +497,15 @@
 
 	<div class="modal-footer">
 		<div class="bottom-buttons">
+			<div class="pull-left">
+				<button
+						type="button"
+						class="btn btn-danger"
+						ng-show="eventController.hasAppointmentId()"
+						ng-click="eventController.del()"
+						ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Delete
+				</button>
+			</div>
 			<div class="pull-right">
 				<button
 						type="button"
