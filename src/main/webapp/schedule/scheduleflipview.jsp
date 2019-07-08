@@ -72,7 +72,8 @@ sites = siteDao.getAllSites();
   int nStartTime=providerPreference.getStartHour();
   int nEndTime=providerPreference.getEndHour() + 1;     // +1 here, because we want to display up to the end of the last preferred hour.
   int nStep=providerPreference.getEveryMin();
-  String mygroupno = providerPreference.getMyGroupNo();  
+  String mygroupno = providerPreference.getMyGroupNo();
+  String viewall = request.getParameter("viewall") != null ? request.getParameter("viewall") : "0";
 
   String curProvider_no=request.getParameter("provider_no")!=null?request.getParameter("provider_no"):"174";
   String curDemoNo = request.getParameter("demographic_no")!=null?request.getParameter("demographic_no"):"";
@@ -275,7 +276,7 @@ function t(s1,s2,s3,s4,s5,s6) {
 	<tr align="center" bgcolor="<%=bgcolor%>">
 <% if (bMultisites) out.print("<td align='right'>"+getSiteHTML(strTempDate, curProvider_no, sites)+"</td>"); %>			
 		<td align="right" nowrap><a
-			href="<%=request.getParameter("originalpage")%>?year=<%=cal.get(Calendar.YEAR)%>&month=<%=cal.get(Calendar.MONTH)+1%>&day=<%=cal.get(Calendar.DATE)%>&view=0&displaymode=day&dboperation=searchappointmentday"><%=outform.format(inform.parse(strTempDate) )%>&nbsp;</a></td>
+			href="<%=request.getParameter("originalpage")%>?year=<%=cal.get(Calendar.YEAR)%>&month=<%=cal.get(Calendar.MONTH)+1%>&day=<%=cal.get(Calendar.DATE)%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>"><%=outform.format(inform.parse(strTempDate) )%>&nbsp;</a></td>
 		<%
   String bookinglimit;
   String scheduleCode;
@@ -340,11 +341,11 @@ function t(s1,s2,s3,s4,s5,s6) {
 
 </table>
 <a
-	href="scheduleflipview.jsp?originalpage=<%=request.getParameter("originalpage")%>&provider_no=<%=curProvider_no%>&startDate=<%=lastMonth.get(Calendar.YEAR)+"-"+(lastMonth.get(Calendar.MONTH)+1)+"-"+lastMonth.get(Calendar.DATE)%>"><bean:message
+	href="scheduleflipview.jsp?originalpage=<%=request.getParameter("originalpage")%>&provider_no=<%=curProvider_no%>&startDate=<%=lastMonth.get(Calendar.YEAR)+"-"+(lastMonth.get(Calendar.MONTH)+1)+"-"+lastMonth.get(Calendar.DATE)%>&viewall=<%=viewall%>"><bean:message
 	key="schedule.scheduleflipview.btnLastMonth" /> </a>
 |
 <a
-	href="scheduleflipview.jsp?originalpage=<%=request.getParameter("originalpage")%>&provider_no=<%=curProvider_no%>&startDate=<%=nextMonth.get(Calendar.YEAR)+"-"+(nextMonth.get(Calendar.MONTH)+1)+"-"+nextMonth.get(Calendar.DATE)%>"><bean:message
+	href="scheduleflipview.jsp?originalpage=<%=request.getParameter("originalpage")%>&provider_no=<%=curProvider_no%>&startDate=<%=nextMonth.get(Calendar.YEAR)+"-"+(nextMonth.get(Calendar.MONTH)+1)+"-"+nextMonth.get(Calendar.DATE)%>&viewall=<%=viewall%>"><bean:message
 	key="schedule.scheduleflipview.btnNextMonth" /></a>
 </body>
 </html:html>
