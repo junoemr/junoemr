@@ -925,6 +925,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				eventElement.html(require('./view-event.html'));
 
 				let statusElem = eventElement.find('.icon-status');
+				let labelElem = eventElement.find('.event-label');
 				let detailElem = eventElement.find('.event-details');
 
 				// var eventSiteHtml = '';
@@ -991,11 +992,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					eventNotes = event.data.notes;
 				}
 
-				var detailText = eventName;
+				var detailText = "";
 				if(!Juno.Common.Util.isBlank(eventReason))
 				{
-					detailText += " (" + eventReason + ")";
+					detailText += "(" + eventReason + ")";
 				}
+				labelElem.text(eventName);
 				detailElem.text(detailText);
 
 				let eventTitle = eventName + "\n" +
@@ -1015,7 +1017,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					&& Juno.Common.Util.isIntegerString(maxNameLengthProp)
 					&& Number(maxNameLengthProp) > 0)
 				{
-					detailElem.css(
+					labelElem.css(
 						{
 							'max-width': maxNameLengthProp + 'ch',
 							'text-overflow': 'clip',
