@@ -31,6 +31,10 @@ angular.module("Common.Services").service("globalStateService", [
 				global_settings: {
 					interface_preferences: {
 						scheduler_license_key: ""
+					},
+					schedule: {
+						date_selected: null,
+						view_selected: null
 					}
 				}
 		};
