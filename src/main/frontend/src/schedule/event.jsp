@@ -503,7 +503,7 @@
 						class="btn btn-danger"
 						ng-show="eventController.hasAppointmentId()"
 						ng-click="eventController.del()"
-						ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Delete
+						ng-disabled="isWorking()">Delete
 				</button>
 			</div>
 			<div class="pull-right">
