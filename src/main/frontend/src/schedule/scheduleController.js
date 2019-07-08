@@ -942,7 +942,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let eventStatus = scheduleService.eventStatuses[event.data.eventStatusCode];
 				if (Juno.Common.Util.exists(eventStatus))
 				{
-					statusElem.attr("title", Juno.Common.Util.escapeHtml(eventStatus.name));
+					statusElem.attr("title", eventStatus.name);
 
 					if (Juno.Common.Util.exists(eventStatus.icon))
 					{
@@ -951,7 +951,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					}
 					else
 					{
-						statusElem.text(Juno.Common.Util.escapeHtml(eventStatus.displayLetter));
+						statusElem.text(eventStatus.displayLetter);
 					}
 
 					if (Juno.Common.Util.exists(eventStatus.sortOrder))
@@ -975,20 +975,20 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				}
 				else if (!Juno.Common.Util.isBlank(event.data.demographicName))
 				{
-					eventName = Juno.Common.Util.escapeHtml(event.data.demographicName);
+					eventName = event.data.demographicName;
 				}
 				else if (!Juno.Common.Util.isBlank(event.data.appointmentName))
 				{
-					eventName = Juno.Common.Util.escapeHtml(event.data.appointmentName);
+					eventName = event.data.appointmentName;
 				}
 
 				if (!Juno.Common.Util.isBlank(event.data.reason))
 				{
-					eventReason = Juno.Common.Util.escapeHtml(event.data.reason);
+					eventReason = event.data.reason;
 				}
 				if (!Juno.Common.Util.isBlank(event.data.notes))
 				{
-					eventNotes = Juno.Common.Util.escapeHtml(event.data.notes);
+					eventNotes = event.data.notes;
 				}
 
 				var detailText = eventName;
@@ -1030,7 +1030,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				element.html(require('./view-backgroundEvent.html'));
 				if (Juno.Common.Util.exists(event.color))
 				{
-					element.find(".background-event-schedulecode").css("background-color", Juno.Common.Util.escapeHtml(event.color))
+					element.find(".background-event-schedulecode").css("background-color", event.color)
 				}
 				if (Juno.Common.Util.exists(event.scheduleTemplateCode))
 				{
