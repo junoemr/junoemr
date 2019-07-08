@@ -54,21 +54,4 @@ public class Hl7DocumentLinkDao extends AbstractDao<Hl7DocumentLink>
 
 		return documentLinks;
 	}
-
-	/**
-	 * Given a lab number, we can determine whether this particular lab has any documents associated.
-	 * @param labNo lab number to check
-	 * @return true if any entry exists in this table for it, false otherwise
-	 */
-	public boolean labHasDocument(Integer labNo)
-	{
-		String sql = "SELECT h FROM hl7DocumentLink h WHERE labNo=?";
-		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, labNo);
-
-		Hl7DocumentLink possibleLab = getSingleResultOrNull(query);
-
-		return possibleLab != null;
-	}
-
 }
