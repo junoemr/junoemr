@@ -974,4 +974,10 @@ public class DemographicManager {
 
 		return true;
 	}
+
+	public Demographic getDemographicByHealthNumberAndVersion(String healthNumber, String version)
+	{
+		return this.demographicDao.getDemographicByHealthNumberAndVersion(healthNumber, version);
+	}
+
 }
