@@ -24,6 +24,7 @@
 
 package org.oscarehr.managers;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.casemgmt.model.ProviderExt;
@@ -244,6 +245,12 @@ public class ProviderManager2 {
 		if(map.get(UserProperty.SCHEDULE_SITE) != null)
 		{
 			settings.setSiteSelected(map.get(UserProperty.SCHEDULE_SITE).getValue());
+		}
+
+		String patientNameLengthStr = map.get(UserProperty.PATIENT_NAME_LENGTH).getValue();
+		if(StringUtils.isNumeric(patientNameLengthStr))
+		{
+			settings.setPatientNameLength(Integer.parseInt(patientNameLengthStr));
 		}
 		
 		//custom summary display
@@ -719,6 +726,10 @@ public class ProviderManager2 {
 
 		p = getMappedOrNewProperty(map, UserProperty.SCHEDULE_SITE, providerNo);
 		p.setValue(settings.getSiteSelected());
+
+		p = getMappedOrNewProperty(map, UserProperty.PATIENT_NAME_LENGTH, providerNo);
+		Integer patientNameLength = settings.getPatientNameLength();
+		p.setValue((patientNameLength == null)? null : String.valueOf(patientNameLength));
 	
 		if(map.get("rx_use_rx3") != null) {
 			settings.setUseRx3("yes".equals(map.get("rx_use_rx3").getValue())?true:false);

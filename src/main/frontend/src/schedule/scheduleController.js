@@ -1012,7 +1012,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					linkElements.hide();
 				}
 
-				var maxNameLengthProp = controller.providerSettings.appointmentScreenLinkNameDisplayLength;
+				var maxNameLengthProp = controller.providerSettings.patientNameLength;
 				if (Juno.Common.Util.exists(maxNameLengthProp)
 					&& Juno.Common.Util.isIntegerString(maxNameLengthProp)
 					&& Number(maxNameLengthProp) > 0)

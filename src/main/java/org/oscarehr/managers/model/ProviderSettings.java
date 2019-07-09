@@ -141,6 +141,8 @@ public class ProviderSettings {
 	private String myDrugRefId;
 	private boolean useMyMeds;
 	private boolean disableBornPrompts;
+
+	private Integer patientNameLength;
 	
 	
 
@@ -669,9 +671,14 @@ public class ProviderSettings {
 	public void setDisableBornPrompts(boolean disableBornPrompts) {
 		this.disableBornPrompts = disableBornPrompts;
 	}
-	
-	
-	
-	
 
+	public Integer getPatientNameLength()
+	{
+		return patientNameLength;
+	}
+
+	public void setPatientNameLength(Integer patientNameLength)
+	{
+		this.patientNameLength = patientNameLength;
+	}
 }
