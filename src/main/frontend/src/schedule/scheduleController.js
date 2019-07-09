@@ -1030,13 +1030,20 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			else //background events (appointment slots)
 			{
 				element.html(require('./view-backgroundEvent.html'));
+				var scheduleCodeElement = element.find(".background-event-schedulecode");
+
 				if (Juno.Common.Util.exists(event.color))
 				{
-					element.find(".background-event-schedulecode").css("background-color", event.color)
+					scheduleCodeElement.css("background-color", event.color)
 				}
 				if (Juno.Common.Util.exists(event.scheduleTemplateCode))
 				{
-					element.find(".background-event-schedulecode").text(event.scheduleTemplateCode);
+					scheduleCodeElement.text(event.scheduleTemplateCode);
+
+					if (Juno.Common.Util.exists(event.availabilityType.name))
+					{
+						scheduleCodeElement.attr("title", event.availabilityType.name);
+					}
 				}
 				if (Juno.Common.Util.exists(event.start) && event.start.minute() === 0) // on the hour
 				{
