@@ -1,6 +1,7 @@
 angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 	'$scope',
+	'$state',
 	'$timeout',
 	'$resource',
 	'$uibModal',
@@ -17,6 +18,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 	function(
 		$scope,
+		$state,
 		$timeout,
 		$resource,
 		$uibModal,
@@ -372,5 +374,9 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
             }
 
 		};
+		controller.inDemographicView = function()
+		{
+			return ($state.params.demographicNo != null);
+		}
 	}
 ]);

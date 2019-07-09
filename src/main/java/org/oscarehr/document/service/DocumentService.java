@@ -103,13 +103,23 @@ public class DocumentService
 	 * @param document - the un-persisted document model
 	 * @param fileInputStream - input stream
 	 * @param demographicNo - demographic id of the attached demographic
+	 * @param markValid - mark the file as valid, allowing file type inference.
 	 * @return - the persisted document model
 	 * @throws IOException
 	 */
-	public Document uploadNewDemographicDocument(Document document, InputStream fileInputStream, Integer demographicNo) throws IOException, InterruptedException
+	public Document uploadNewDemographicDocument(Document document, InputStream fileInputStream, Integer demographicNo, boolean markValid) throws IOException, InterruptedException
 	{
 		GenericFile file = FileFactory.createDocumentFile(fileInputStream, document.getDocfilename());
+		if (markValid)
+		{
+			file.forceSetValidation(true);
+		}
 		return uploadNewDemographicDocumentLogic(document, file, demographicNo);
+	}
+
+	public Document uploadNewDemographicDocument(Document document, InputStream fileInputStream, Integer demographicNo) throws IOException, InterruptedException
+	{
+		return uploadNewDemographicDocument(document, fileInputStream, demographicNo, false);
 	}
 
 	public Document uploadNewDemographicDocument(Document document, InputStream fileInputStream) throws IOException, InterruptedException

@@ -116,7 +116,6 @@ public class RecordUxService extends AbstractServiceImpl {
 	@Path("/{demographicNo}/recordMenu")
 	@Produces("application/json")
 	public List<MenuItemTo1> getRecordMenu(@PathParam("demographicNo") Integer demographicNo){
-		logger.error("getRecordMenu getting called for demo "+demographicNo);
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		ResourceBundle bundle = getResourceBundle();
 		

@@ -37,17 +37,15 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.ProviderManager2;
-import org.oscarehr.managers.model.ProviderSettings;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.PatientListApptItemBean;
+import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
-import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.model.ProviderTo1;
-import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -249,30 +247,30 @@ public class ProviderService extends AbstractServiceImpl {
 		return response;
 	}
 	
-	@GET
-	@Path("/settings/get")
-	@Produces("application/json")
-	public AbstractSearchResponse<ProviderSettings> getProviderSettings() {	
-		AbstractSearchResponse<ProviderSettings> response = new AbstractSearchResponse<ProviderSettings>();
-		
-		ProviderSettings settings = providerManager.getProviderSettings(getLoggedInInfo().getLoggedInProviderNo());
-		List<ProviderSettings> content = new ArrayList<ProviderSettings>();
-		content.add(settings);
-		response.setContent(content);
-		response.setTotal(1);
-		return response;
-	}
-	
-	@POST
-	@Path("/settings/{providerNo}/save")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public GenericRESTResponse saveProviderSettings(ProviderSettings json,@PathParam("providerNo")String providerNo){
-		GenericRESTResponse response = new GenericRESTResponse();
-		
-		MiscUtils.getLogger().warn(json.toString());
-		
-		providerManager.updateProviderSettings(getLoggedInInfo(),providerNo,json);
-		return response;
-	}
+//	@GET
+//	@Path("/settings/get")
+//	@Produces("application/json")
+//	public AbstractSearchResponse<ProviderSettings> getProviderSettings() {
+//		AbstractSearchResponse<ProviderSettings> response = new AbstractSearchResponse<ProviderSettings>();
+//
+//		ProviderSettings settings = providerManager.getProviderSettings(getLoggedInInfo().getLoggedInProviderNo());
+//		List<ProviderSettings> content = new ArrayList<ProviderSettings>();
+//		content.add(settings);
+//		response.setContent(content);
+//		response.setTotal(1);
+//		return response;
+//	}
+//
+//	@POST
+//	@Path("/settings/{providerNo}/save")
+//	@Produces("application/json")
+//	@Consumes("application/json")
+//	public GenericRESTResponse saveProviderSettings(ProviderSettings json,@PathParam("providerNo")String providerNo){
+//		GenericRESTResponse response = new GenericRESTResponse();
+//
+//		MiscUtils.getLogger().warn(json.toString());
+//
+//		providerManager.updateProviderSettings(getLoggedInInfo(),providerNo,json);
+//		return response;
+//	}
 }

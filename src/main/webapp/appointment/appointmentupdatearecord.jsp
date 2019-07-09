@@ -108,6 +108,8 @@ org.oscarehr.event.EventService"%>
 			appt.setNotes(request.getParameter("notes"));
 			appt.setReason(request.getParameter("reason"));
 			appt.setLocation(request.getParameter("location"));
+			appt.setIsVirtual(request.getParameter("isVirtual") != null &&
+							request.getParameter("isVirtual").equals("on"));
 			appt.setResources(request.getParameter("resources"));
 			appt.setType(request.getParameter("type"));
 			appt.setStyle(request.getParameter("style"));

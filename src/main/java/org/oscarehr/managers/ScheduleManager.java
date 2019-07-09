@@ -24,6 +24,31 @@
 
 package org.oscarehr.managers;
 
+import org.apache.commons.lang.time.DateUtils;
+import org.apache.log4j.Logger;
+import org.oscarehr.appointment.dao.AppointmentStatusDao;
+import org.oscarehr.common.dao.AppointmentArchiveDao;
+import org.oscarehr.common.dao.AppointmentTypeDao;
+import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.model.Appointment;
+import org.oscarehr.common.model.AppointmentArchive;
+import org.oscarehr.common.model.AppointmentStatus;
+import org.oscarehr.common.model.AppointmentType;
+import org.oscarehr.common.model.Security;
+import org.oscarehr.schedule.dao.ScheduleDateDao;
+import org.oscarehr.schedule.dao.ScheduleHolidayDao;
+import org.oscarehr.schedule.dao.ScheduleTemplateCodeDao;
+import org.oscarehr.schedule.dao.ScheduleTemplateDao;
+import org.oscarehr.schedule.model.ScheduleDate;
+import org.oscarehr.schedule.model.ScheduleHoliday;
+import org.oscarehr.schedule.model.ScheduleTemplate;
+import org.oscarehr.schedule.model.ScheduleTemplateCode;
+import org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
@@ -31,33 +56,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.apache.commons.lang.time.DateUtils;
-import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.AppointmentArchiveDao;
-import org.oscarehr.appointment.dao.AppointmentStatusDao;
-import org.oscarehr.common.dao.AppointmentTypeDao;
-import org.oscarehr.common.dao.OscarAppointmentDao;
-import org.oscarehr.schedule.dao.ScheduleDateDao;
-import org.oscarehr.schedule.dao.ScheduleHolidayDao;
-import org.oscarehr.schedule.dao.ScheduleTemplateCodeDao;
-import org.oscarehr.schedule.dao.ScheduleTemplateDao;
-import org.oscarehr.common.model.Appointment;
-import org.oscarehr.common.model.AppointmentArchive;
-import org.oscarehr.common.model.AppointmentStatus;
-import org.oscarehr.common.model.AppointmentType;
-import org.oscarehr.schedule.model.ScheduleDate;
-import org.oscarehr.schedule.model.ScheduleHoliday;
-import org.oscarehr.schedule.model.ScheduleTemplate;
-import org.oscarehr.schedule.model.ScheduleTemplateCode;
-import org.oscarehr.schedule.model.ScheduleTemplatePrimaryKey;
-import org.oscarehr.common.model.Security;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import oscar.log.LogAction;
 
 @Service
 public class ScheduleManager {
@@ -163,10 +161,6 @@ public class ScheduleManager {
 
 	public List<Appointment> getDayAppointments(LoggedInInfo loggedInInfo, String providerNo, Date date) {
 		List<Appointment> appointments = oscarAppointmentDao.findByProviderAndDayandNotStatus(providerNo, date, AppointmentStatus.APPOINTMENT_STATUS_CANCELLED);
-
-		//--- log action ---
-		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.getDayAppointments", "appointments for providerNo=" + providerNo + ", appointments for date=" + date);
-
 		return (appointments);
 	}
 
@@ -193,17 +187,10 @@ public class ScheduleManager {
 		appointment.setCreator(security.getUserName());
 
 		oscarAppointmentDao.persist(appointment);
-
-		//--- log action ---
-		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.addAppointment", appointment.toString());
 	}
 
 	public List<Appointment> getAppointmentsForPatient(LoggedInInfo loggedInInfo, Integer demographicId, int startIndex, int itemsToReturn) {
 		List<Appointment> results = oscarAppointmentDao.findByDemographicId(demographicId, startIndex, itemsToReturn);
-
-		//--- log action ---
-		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.getAppointmentsForPatient", "appointments for demographicId=" + demographicId + ", startIndex=" + startIndex + ", itemsToReturn=" + itemsToReturn);
-
 		return (results);
 	}
 
@@ -219,28 +206,15 @@ public class ScheduleManager {
 
 	public List<Appointment> getAppointmentsByProgramProviderDemographicDate(LoggedInInfo loggedInInfo, Integer programId, String providerNo, Integer demographicId, Calendar updatedAfterThisDateExclusive, int itemsToReturn) {
 		List<Appointment> results = oscarAppointmentDao.findByProgramProviderDemographicDate(programId, providerNo, demographicId, updatedAfterThisDateExclusive.getTime(), itemsToReturn);
-
-		//--- log action ---
-		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.getAppointmentsByProgramProviderPatientDate", "appointments for programId="+programId+", providerNo="+providerNo+", demographicId=" + demographicId + ", updatedAfterThisDateExclusive=" + updatedAfterThisDateExclusive.getTime() + ", itemsToReturn=" + itemsToReturn);
-
 		return (results);
 	}
 
 	public Appointment getAppointment(LoggedInInfo loggedInInfo, Integer appointmentId) {
 		Appointment result = oscarAppointmentDao.find(appointmentId);
-
-		//--- log action ---
-		if (result != null) {
-			LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.getAppointment", "appointmentId=" + appointmentId);
-		}
-
 		return (result);
 	}
 
 	public void updateAppointment(LoggedInInfo loggedInInfo, Appointment appointment) {
-		//--- log action ---
-		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.updateAppointment", "appointmentId=" + appointment.getId());
-
 		// generate archive object
 		oscarAppointmentDao.archiveAppointment(appointment.getId());
 
@@ -250,26 +224,16 @@ public class ScheduleManager {
 
 	public List<Appointment> getAppointmentsForDateRangeAndProvider(LoggedInInfo loggedInInfo, Date startTime, Date endTime, String providerNo) {
 		List<Appointment> appointments = oscarAppointmentDao.findByDateRangeAndProvider(startTime, endTime, providerNo);
-
-		//--- log action ---
-		LogAction.addLogSynchronous(loggedInInfo, "AppointmentManager.getAppointmentsForDateRangeAndProvider", "appointments for providerNo=" + providerNo + ", appointments for " + startTime + " to: " + endTime);
-
 		return (appointments);
 	}
 
 	public List<Appointment> getAppointmentUpdatedAfterDate(LoggedInInfo loggedInInfo, Date updatedAfterThisDateExclusive, int itemsToReturn) {
 		List<Appointment> results = oscarAppointmentDao.findByUpdateDate(updatedAfterThisDateExclusive, itemsToReturn);
-
-		LogAction.addLogSynchronous(loggedInInfo, "ScheduleManager.getAppointmentUpdatedAfterDate", "updatedAfterThisDateExclusive=" + updatedAfterThisDateExclusive);
-
 		return (results);
 	}
 
 	public List<AppointmentArchive> getAppointmentArchiveUpdatedAfterDate(LoggedInInfo loggedInInfo, Date updatedAfterThisDateExclusive, int itemsToReturn) {
 		List<AppointmentArchive> results = appointmentArchiveDao.findByUpdateDate(updatedAfterThisDateExclusive, itemsToReturn);
-
-		LogAction.addLogSynchronous(loggedInInfo, "ScheduleManager.getAppointmentArchiveUpdatedAfterDate", "updatedAfterThisDateExclusive=" + updatedAfterThisDateExclusive);
-
 		return (results);
 	}
 
@@ -279,17 +243,11 @@ public class ScheduleManager {
 		if (results.size() >= 100) {
 			logger.error("We reached a hard coded limit, why >100 statuses?");
 		}
-
-		LogAction.addLogSynchronous(loggedInInfo, "ScheduleManager.getAppointmentStatuses", null);
-
 		return (results);
 	}
 	
 	public List<Integer> getAllDemographicIdByProgramProvider(LoggedInInfo loggedInInfo, Integer programId, String providerNo) {
 		List<Integer> results = oscarAppointmentDao.findAllDemographicIdByProgramProvider(programId, providerNo);
-
-		LogAction.addLogSynchronous(loggedInInfo, "ScheduleManager.getAllDemographicIdByProgramProvider", "programId=" + programId+", providerNo="+providerNo);
-
 		return (results);
 	}
 }

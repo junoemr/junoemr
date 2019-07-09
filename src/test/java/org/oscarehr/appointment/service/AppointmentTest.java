@@ -115,6 +115,7 @@ public class AppointmentTest
 			null,
 			null,
 			"color1",
+			"color1",
 			null,
 			null,
 			null,
@@ -131,7 +132,8 @@ public class AppointmentTest
 			null,
 			LocalDate.of(2000, 1, 1),
 			false,
-			null
+			null,
+			false
 		));
 
 		mockData.put(keyTime1, valueList);
@@ -175,12 +177,14 @@ public class AppointmentTest
 				null,
 				null,
 				"reason1",
+				1,
 				"notes1",
 				null,
 				"site1",
 				null,
 				null,
 				null,
+				false,
 				false,
 				false,
 				null
@@ -223,6 +227,7 @@ public class AppointmentTest
 			null,
 			null,
 			"color1",
+			"color1",
 			null,
 			null,
 			null,
@@ -239,7 +244,8 @@ public class AppointmentTest
 			null,
 			LocalDate.of(2000, 1, 1),
 			false,
-			null
+			null,
+			false
 		));
 
 		mockData.put(keyTime1, valueList);
@@ -289,12 +295,14 @@ public class AppointmentTest
 				null,
 				null,
 				"reason1",
+				1,
 				"notes1",
 				null,
 				"site1",
 				null,
 				null,
 				null,
+				false,
 				false,
 				false,
 				null
@@ -337,6 +345,7 @@ public class AppointmentTest
 			null,
 			null,
 			"color1",
+			"color1",
 			null,
 			null,
 			null,
@@ -353,7 +362,8 @@ public class AppointmentTest
 			null,
 			LocalDate.of(2000, 1, 1),
 			false,
-			null
+			null,
+			false
 		));
 
 		mockData.put(keyTime1, valueList);
@@ -402,12 +412,14 @@ public class AppointmentTest
 				"s",
 				null,
 				"reason1",
+				1,
 				"notes1",
 				null,
 				"site1",
 				null,
 				null,
 				null,
+				false,
 				false,
 				false,
 				null

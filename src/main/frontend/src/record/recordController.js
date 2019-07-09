@@ -23,6 +23,7 @@
     Ontario, Canada
 
 */
+import {AppointmentApi} from "../../generated/api/AppointmentApi";
 
 angular.module('Record').controller('Record.RecordController', [
 
@@ -30,6 +31,7 @@ angular.module('Record').controller('Record.RecordController', [
 	'$scope',
 	'$window',
 	'$http',
+	'$httpParamSerializer',
 	'$localStorage',
 	'$location',
 	'$state',
@@ -44,7 +46,6 @@ angular.module('Record').controller('Record.RecordController', [
 	'noteService',
 	'uxService',
 	'securityService',
-	'scheduleService',
 	'billingService',
 
 	function(
@@ -52,6 +53,7 @@ angular.module('Record').controller('Record.RecordController', [
 		$scope,
 		$window,
 		$http,
+		$httpParamSerializer,
 		$localStorage,
 		$location,
 		$state,
@@ -66,11 +68,13 @@ angular.module('Record').controller('Record.RecordController', [
 		noteService,
 		uxService,
 		securityService,
-		scheduleService,
 		billingService)
 	{
 
 		var controller = this;
+
+		controller.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
+			'../ws/rs');
 
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.demographic = demo;
@@ -153,6 +157,7 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 			else if (angular.isDefined(temp.url))
 			{
+				var win;
 				if (temp.label == "Rx")
 				{
 					win = temp.label + controller.demographicNo;
@@ -421,10 +426,10 @@ angular.module('Record').controller('Record.RecordController', [
 			});
 		if ($location.search().appointmentNo != null)
 		{
-			scheduleService.getAppointment($location.search().appointmentNo).then(
+			controller.appointmentApi.getAppointment($location.search().appointmentNo).then(
 				function success(results)
 				{
-					controller.page.appointment = results;
+					controller.page.appointment = results.data.body;
 				},
 				function error(errors)
 				{

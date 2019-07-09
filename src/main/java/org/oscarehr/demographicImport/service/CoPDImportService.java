@@ -90,6 +90,7 @@ import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,6 +108,7 @@ public class CoPDImportService
 	public enum IMPORT_SOURCE
 	{
 		WOLF,
+		MEDIPLAN,
 		UNKNOWN
 	}
 
@@ -188,17 +190,20 @@ public class CoPDImportService
 	{
 		logger.info("Creating Demographic Record ...");
 		Demographic demographic = importDemographicData(zpdZtrMessage, importSource);
-		logger.info("Created record " + demographic.getDemographicId() + " for patient: " + demographic.getLastName() + ", " + demographic.getFirstName());
+		if (demographic != null)
+		{
+			logger.info("Created record " + demographic.getDemographicId() + " for patient: " + demographic.getLastName() + ", " + demographic.getFirstName());
 
-		logger.info("Find/Create Provider Record(s) ...");
-		ProviderData mrpProvider = importProviderData(zpdZtrMessage, demographic, documentLocation, importSource, skipMissingDocs);
+			logger.info("Find/Create Provider Record(s) ...");
+			ProviderData mrpProvider = importProviderData(zpdZtrMessage, demographic, documentLocation, importSource, skipMissingDocs);
 
-		// set the mrp doctor after all the provider records are created
-		demographic.setProviderNo(mrpProvider.getId());
-		demographicDao.merge(demographic);
+			// set the mrp doctor after all the provider records are created
+			demographic.setProviderNo(mrpProvider.getId());
+			demographicDao.merge(demographic);
 
-		logger.info("Create Appointments ...");
-		importAppointmentData(zpdZtrMessage, demographic, mrpProvider);
+			logger.info("Create Appointments ...");
+			importAppointmentData(zpdZtrMessage, demographic, mrpProvider, importSource);
+		}
 	}
 
 	/**
@@ -258,11 +263,11 @@ public class CoPDImportService
 			logger.info("Import Pregnancy ...");
 			importPregnancyData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Allergies ...");
-			importAllergyData(zpdZtrMessage, i, assignedProvider, demographic);
+			importAllergyData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 			logger.info("Import Immunizations ...");
 			importPreventionData(zpdZtrMessage, i, assignedProvider, demographic);
 			logger.info("Import Labs ...");
-			importLabData(zpdZtrMessage, i, assignedProvider, demographic);
+			importLabData(zpdZtrMessage, i, assignedProvider, demographic, importSource);
 			logger.info("Import Documents ...");
 			importDocumentData(zpdZtrMessage, i, assignedProvider, demographic, documentLocation, importSource, skipMissingDocs);
 			logger.info("Import Ticklers ...");
@@ -322,16 +327,19 @@ public class CoPDImportService
 
 	private Demographic importDemographicData(ZPD_ZTR zpdZtrMessage, IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		DemographicMapper demographicMapper = new DemographicMapper(zpdZtrMessage);
+		DemographicMapper demographicMapper = new DemographicMapper(zpdZtrMessage, importSource);
 		Demographic demographic = demographicMapper.getDemographic();
-		DemographicCust demographicCust = demographicMapper.getDemographicCust();
-		List<DemographicExt> demographicExtList = demographicMapper.getDemographicExtensions();
+		if (demographic != null)
+		{
+			DemographicCust demographicCust = demographicMapper.getDemographicCust();
+			List<DemographicExt> demographicExtList = demographicMapper.getDemographicExtensions();
 
-		demographicService.addNewDemographicRecord(IMPORT_PROVIDER, demographic, demographicCust, demographicExtList);
+			demographicService.addNewDemographicRecord(IMPORT_PROVIDER, demographic, demographicCust, demographicExtList);
+		}
 		return demographic;
 	}
 
-	private void importAppointmentData(ZPD_ZTR zpdZtrMessage, Demographic demographic, ProviderData defaultProvider) throws HL7Exception
+	private void importAppointmentData(ZPD_ZTR zpdZtrMessage, Demographic demographic, ProviderData defaultProvider, IMPORT_SOURCE importSource) throws HL7Exception
 	{
 		if(properties.isPropertyActive("multisites"))
 		{
@@ -339,7 +347,7 @@ public class CoPDImportService
 			throw new RuntimeException("Multisite Imports not supported");
 		}
 
-		AppointmentMapper appointmentMapper = new AppointmentMapper(zpdZtrMessage);
+		AppointmentMapper appointmentMapper = new AppointmentMapper(zpdZtrMessage, importSource);
 
 		int numAppointments = appointmentMapper.getNumAppointments();
 
@@ -419,11 +427,11 @@ public class CoPDImportService
 		//TODO - not implemented
 	}
 
-	private void importAllergyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception
+	private void importAllergyData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception
 	{
-		AllergyMapper allergyMapper = new AllergyMapper(zpdZtrMessage, providerRep);
+		AllergyMapper allergyMapper = new AllergyMapper(zpdZtrMessage, providerRep, importSource);
 
-		for(int rep=0; rep < allergyMapper.getNumAllergies(); rep++)
+		for (int rep = 0; rep < allergyMapper.getNumAllergies(); rep++)
 		{
 			Allergy allergy = allergyMapper.getAllergy(rep);
 			CaseManagementNote allergyNote = allergyMapper.getAllergyNote(rep);
@@ -432,7 +440,7 @@ public class CoPDImportService
 			allergy.setProviderNo(String.valueOf(provider.getProviderNo()));
 			allergyService.addNewAllergy(allergy);
 
-			if(allergyNote != null)
+			if (allergyNote != null)
 			{
 				allergyNote.setProvider(provider);
 				allergyNote.setSigningProvider(provider);
@@ -458,9 +466,9 @@ public class CoPDImportService
 		}
 	}
 
-	private void importLabData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic) throws HL7Exception, IOException
+	private void importLabData(ZPD_ZTR zpdZtrMessage, int providerRep, ProviderData provider, Demographic demographic, CoPDImportService.IMPORT_SOURCE importSource) throws HL7Exception, IOException
 	{
-		LabMapper labMapper = new LabMapper(zpdZtrMessage, providerRep);
+		LabMapper labMapper = new LabMapper(zpdZtrMessage, providerRep, importSource);
 
 		for(String msg : labMapper.getLabList())
 		{
@@ -500,7 +508,7 @@ public class CoPDImportService
 	                                String documentLocation, IMPORT_SOURCE importSource, boolean skipMissingDocs)
 			throws IOException, InterruptedException
 	{
-		DocumentMapper documentMapper = new DocumentMapper(zpdZtrMessage, providerRep);
+		DocumentMapper documentMapper = new DocumentMapper(zpdZtrMessage, providerRep, importSource);
 
 		for(Document document : documentMapper.getDocumentList())
 		{
@@ -511,7 +519,6 @@ public class CoPDImportService
 			try
 			{
 				documentFile = FileFactory.getExistingFile(documentLocation, document.getDocfilename());
-
 			}
 			catch(IOException e)
 			{
@@ -535,7 +542,15 @@ public class CoPDImportService
 				continue;
 			}
 			InputStream stream = new FileInputStream(documentFile.getFileObject());
-			documentService.uploadNewDemographicDocument(document, stream, demographic.getDemographicId());
+			try
+			{
+				documentService.uploadNewDemographicDocument(document, stream, demographic.getDemographicId(), false);
+			}
+			catch (FileAlreadyExistsException e)
+			{
+				logger.warn("SKIPPING: File: " + document.getDocfilename() + " already exists in document directory! skipping.");
+				continue;
+			}
 			documentService.routeToProviderInbox(document.getDocumentNo(), true, provider.getId());
 		}
 	}

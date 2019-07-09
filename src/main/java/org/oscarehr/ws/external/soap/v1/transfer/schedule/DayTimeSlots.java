@@ -35,9 +35,9 @@ public class DayTimeSlots
 
     private HashMap<String, String> timeSlotEntry = new HashMap<>();
 
-    public DayTimeSlots(String timeSlot, String timecode, String duration, String slotStartTime, String maxBookingDuration)
+    public DayTimeSlots(String timeSlot, String duration)
     {
-        this.setTimeSlotEntry(timeSlot, "true", timecode, duration, slotStartTime, maxBookingDuration);
+        this.setTimeSlotEntry(timeSlot, duration);
     }
 
     public DayTimeSlots() {} // required
@@ -47,16 +47,12 @@ public class DayTimeSlots
        return timeSlotEntry;
     }
 
-    public void setTimeSlotEntry(String timeSlot, String isBookable, String timecode, String duration, String slotStartTime, String maxBookingDuration)
+    public void setTimeSlotEntry(String timeSlot, String duration)
     {
         HashMap<String, String> timeSlotEntry = new HashMap<>();
 
         timeSlotEntry.put("start_datetime", timeSlot);
-        timeSlotEntry.put("is_bookable", isBookable);
-        timeSlotEntry.put("schedule_template_code", timecode);
         timeSlotEntry.put("duration_minutes", duration);
-        timeSlotEntry.put("slot_start_time", slotStartTime);
-        timeSlotEntry.put("max_booking_duration", maxBookingDuration);
 
         this.timeSlotEntry = timeSlotEntry;
     }

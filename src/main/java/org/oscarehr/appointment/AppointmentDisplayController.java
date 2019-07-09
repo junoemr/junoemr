@@ -175,6 +175,11 @@ public class AppointmentDisplayController
 			appointment.getBookingSource());
 	}
 
+	public boolean isVirtual()
+	{
+		return appointment.isVirtual();
+	}
+
 	public boolean isMultisitesEnabled()
 	{
 		return multisitesEnabled;

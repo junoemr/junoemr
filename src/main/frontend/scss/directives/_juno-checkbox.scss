@@ -1,0 +1,40 @@
+/**
+ * custom css for the field-toggle-juno directive
+ */
+
+.juno-checkbox {
+	display: flex;
+	position: relative;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	padding-top: 0;
+	padding-bottom: 0;
+
+	/* Hide default HTML checkbox */
+	input {
+		position: absolute;
+		display: none;
+
+		/* When the checkbox is checked, add a background */
+		&:checked + .checkmark {
+			display: inline-block;
+			background: url($icon-checked) no-repeat, $primary;
+			background-size: 100%;
+			border: solid 1px $primary-hover;
+		}
+	}
+	/* style a custom checkbox */
+	.checkmark {
+		height: 20px;
+		width: 20px;
+		background-color: $white;
+		border: solid 1px $grey-07;
+		border-radius: 4px;
+		cursor: pointer;
+		margin: 0;
+		padding: 0;
+	}
+}
+

@@ -12,6 +12,7 @@ angular.module('Common').directive(
 
 	scope.rows = '@caRows';
 	scope.max_characters = '@caMaxCharacters';
+	scope.no_label = '@caNoLabel';
 
 	var template_function = function template_function(element, attributes) {
 		return helper.resolve_template(attributes, 'src/common/directives/clinicaid/ca_field_text');

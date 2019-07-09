@@ -22,7 +22,9 @@
  */
 package integration.tests;
 
+import integration.tests.sql.SqlFiles;
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
@@ -41,7 +43,6 @@ import java.util.regex.Pattern;
 
 public class EchartTests extends SeleniumTestBase
 {
-	private static final String DEMOGRAPHIC_LOAD_SQL = System.getProperty("basedir") + "/src/test/java/integration/tests/sql/add_demographic.sql";
 	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
 
 	@BeforeClass
@@ -52,7 +53,8 @@ public class EchartTests extends SeleniumTestBase
 				"casemgmt_note", "casemgmt_cpp", "casemgmt_issue", "casemgmt_note_ext", "casemgmt_note_link", "casemgmt_note_lock",
 				"casemgmt_tmpsave", "validations", "measurementType", "eChart");
 
-		SchemaUtils.loadFileIntoMySQL(DEMOGRAPHIC_LOAD_SQL);
+		loadSpringBeans();
+		DatabaseUtil.createTestDemographic();
 	}
 
 	@Test
@@ -99,8 +101,9 @@ public class EchartTests extends SeleniumTestBase
 		logger.info("Write to encounter note. OK");
 
 		// test auto save
-		Thread.sleep(7000); // oscar auto saves every 5 seconds
+		Thread.sleep(10000); // oscar auto saves every 5 seconds
 		driver.navigate().refresh();
+		Thread.sleep(5000);
 		newNote = driver.findElement(By.xpath("//textarea[@name='caseNote_note']"));
 		Assert.assertTrue("Auto save note. FAIL", Pattern.compile(myUUID.toString()).matcher(newNote.getText()).find());
 		logger.info("Auto save note. OK");

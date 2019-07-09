@@ -111,4 +111,5 @@ public class Hl7TextMessage extends AbstractModel<Integer> implements Serializab
 	public Date getCreated() {
 		return created;
 	}
+
 }

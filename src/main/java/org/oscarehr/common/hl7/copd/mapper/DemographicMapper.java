@@ -29,6 +29,8 @@ import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
@@ -40,10 +42,11 @@ import java.util.List;
 public class DemographicMapper extends AbstractMapper
 {
 	private final PID messagePID;
+	private final String DEMO_NULL_NAME="NULL_NAME";
 
-	public DemographicMapper(ZPD_ZTR message)
+	public DemographicMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		super(message);
+		super(message, importSource);
 		this.messagePID = message.getPATIENT().getPID();
 	}
 
@@ -51,25 +54,29 @@ public class DemographicMapper extends AbstractMapper
 
 	public Demographic getDemographic() throws HL7Exception
 	{
-		Demographic demographic = new Demographic();
-		demographic.setFirstName(getFirstName(0));
-		demographic.setLastName(getLastName(0));
-		demographic.setSex(getSex());
-		demographic.setDateOfBirth(getDOB());
-		demographic.setTitle(getTitle(0));
-		demographic.setHin(getPHN());
-		demographic.setHcType(getHCType());
-		demographic.setSin(getSIN());
+		if ((hasFirstName(0) && hasLastName(0)) || !CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{
+			Demographic demographic = new Demographic();
+			demographic.setFirstName(getFirstName(0));
+			demographic.setLastName(getLastName(0));
+			demographic.setSex(getSex());
+			demographic.setDateOfBirth(getDOB());
+			demographic.setTitle(getTitle(0));
+			demographic.setHin(getPHN());
+			demographic.setHcType(getHCType());
+			demographic.setSin(getSIN());
 
-		demographic.setAddress(getStreetAddress(0));
-		demographic.setCity(getCity(0));
-		demographic.setProvince(getProvinceCode(0));
-		demographic.setPostal(getPostalCode(0));
+			demographic.setAddress(getStreetAddress(0));
+			demographic.setCity(getCity(0));
+			demographic.setProvince(getProvinceCode(0));
+			demographic.setPostal(getPostalCode(0));
 
-		demographic.setPhone(getHomePhone());
-		demographic.setPhone2(getBuisnessPhone());
+			demographic.setPhone(getHomePhone());
+			demographic.setPhone2(getBuisnessPhone());
 
-		return demographic;
+			return demographic;
+		}
+		return null;
 	}
 
 	public DemographicCust getDemographicCust()
@@ -101,12 +108,37 @@ public class DemographicMapper extends AbstractMapper
 
 	public String getFirstName(int rep) throws HL7Exception
 	{
-		return messagePID.getPatientName(rep).getGivenName().getValue();
+		String firstName = messagePID.getPatientName(rep).getGivenName().getValue();
+		if (firstName == null)
+		{
+			MiscUtils.getLogger().warn("demographic has no first name! using: " + DEMO_NULL_NAME);
+			return 	DEMO_NULL_NAME;
+		}
+		return firstName;
 	}
 	public String getLastName(int rep) throws HL7Exception
 	{
-		return messagePID.getPatientName(rep).getFamilyName().getSurname().getValue();
+		String lastName = messagePID.getPatientName(rep).getFamilyName().getSurname().getValue();
+		if (lastName == null)
+		{
+			MiscUtils.getLogger().warn("demographic has no last name! using: " + DEMO_NULL_NAME);
+			return DEMO_NULL_NAME;
+		}
+		return lastName;
 	}
+
+	public boolean hasFirstName(int rep) throws HL7Exception
+	{
+		String firstName = messagePID.getPatientName(rep).getGivenName().getValue();
+		return  firstName != null;
+	}
+
+	public boolean hasLastName(int rep) throws HL7Exception
+	{
+		String lastName = messagePID.getPatientName(rep).getFamilyName().getSurname().getValue();
+		return  lastName != null;
+	}
+
 	public String getSex()
 	{
 		return messagePID.getAdministrativeSex().getValue();
@@ -181,7 +213,16 @@ public class DemographicMapper extends AbstractMapper
 
 	public String getPHN() throws HL7Exception
 	{
-		Integer rep = getPatientIdentifierRepByCode("PHN");
+		Integer rep = 0;
+		if (CoPDImportService.IMPORT_SOURCE.MEDIPLAN.equals(importSource))
+		{
+			rep = getPatientIdentifierRepByCode("ULI");
+		}
+		else
+		{
+			rep = getPatientIdentifierRepByCode("PHN");
+		}
+
 		if(rep != null)
 		{
 			return messagePID.getPid3_PatientIdentifierList(rep).getCx1_ID().getValue();

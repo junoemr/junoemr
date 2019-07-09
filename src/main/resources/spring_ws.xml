@@ -362,6 +362,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ProductDispensingService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ProgramService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ProviderService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.ProviderPreferenceWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ProvidersService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.RecordUxService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ReferralDoctorsService"/>

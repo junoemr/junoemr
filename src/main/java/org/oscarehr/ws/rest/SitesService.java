@@ -22,9 +22,13 @@
  */
 package org.oscarehr.ws.rest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Site;
+import org.oscarehr.ws.rest.conversion.SiteConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
+import org.oscarehr.ws.rest.transfer.SiteTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,16 +40,27 @@ import java.util.List;
 @Path("/sites")
 @Component("SitesService")
 @Produces("application/json")
-public class SitesService
+@Tag(name = "sites")
+public class SitesService extends AbstractServiceImpl
 {
 	@Autowired
 	SiteDao siteDao;
 
 	@GET
-	public RestSearchResponse<Site> getSiteList()
+	public RestSearchResponse<SiteTransfer> getSiteList()
 	{
 		List<Site> sites = siteDao.getAllSites();
 
-		return RestSearchResponse.successResponseOnePage(sites);
+		SiteConverter converter = new SiteConverter();
+		List<SiteTransfer> transferList = converter.getAllAsTransferObjects(null, sites);
+
+		return RestSearchResponse.successResponseOnePage(transferList);
+	}
+
+	@GET
+	@Path("/enabled")
+	public RestResponse<Boolean> getSitesEnabled()
+	{
+		return RestResponse.successResponse(org.oscarehr.common.IsPropertiesOn.isMultisitesEnable());
 	}
 }

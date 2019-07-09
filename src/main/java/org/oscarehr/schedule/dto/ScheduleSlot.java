@@ -32,17 +32,19 @@ public class ScheduleSlot
 	private Integer durationMinutes;
 	private String description;
 	private String color;
+	private String junoColor;
 	private String confirm;
 	private Integer bookingLimit;
 
 	public ScheduleSlot(LocalDateTime appointmentDateTime, String code, Integer durationMinutes,
-		String description, String color, String confirm, Integer bookingLimit)
+		String description, String color, String junoColor, String confirm, Integer bookingLimit)
 	{
 		this.appointmentDateTime = appointmentDateTime;
 		this.code = code;
 		this.durationMinutes = durationMinutes;
 		this.description = description;
 		this.color = color;
+		this.junoColor = junoColor;
 		this.confirm = confirm;
 		this.bookingLimit = bookingLimit;
 	}
@@ -70,6 +72,11 @@ public class ScheduleSlot
 	public String getColor()
 	{
 		return color;
+	}
+
+	public String getJunoColor()
+	{
+		return junoColor;
 	}
 
 	public String getConfirm()

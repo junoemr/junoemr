@@ -26,8 +26,8 @@
 --%>
 <%@ page errorPage="../errorpage.jsp"%>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
-<%@ page import="org.oscarehr.common.dao.RestServiceLogDao"%>
-<%@ page import="org.oscarehr.common.model.RestServiceLog, org.oscarehr.util.SpringUtils"%>
+<%@ page import="org.oscarehr.log.dao.RestServiceLogDao"%>
+<%@ page import="org.oscarehr.log.model.RestServiceLog, org.oscarehr.util.SpringUtils"%>
 <%@ page import="java.util.List"%>
 <%@ page import="oscar.OscarProperties" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>

@@ -3,9 +3,11 @@
 		 title="{{title_string}}"
 		 ng-hide="hide">
 
-	<label for="input-{{name}}"
-				 class="{{label_size}} control-label">
-		{{title}}:
+	<label ng-if="no_label != 'true'"
+	       for="input-{{name}}"
+	       class="{{label_size}} control-label"
+	       title="{{hint}}">
+		{{title}}
 	</label>
 
 	<div class="{{input_size}}">
@@ -13,7 +15,7 @@
 						id="input-{{name}}"
 						class="form-control"
 						ng-model="model"
-						ng-options="option.value as option.label group by option.group for option in options"
+						ng-options="option.value as option.label for option in options"
 						ng-focus="focus_fn()"
 						ng-change="change_fn()"
 						ng-disabled="disabled"

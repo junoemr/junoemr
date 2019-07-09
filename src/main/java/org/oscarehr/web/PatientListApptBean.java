@@ -34,7 +34,7 @@ import java.util.List;
 public class PatientListApptBean implements Serializable
 {
 
-	private String template = "patientlist/patientList1.jsp";
+	private String template = "layout/leftAside.jsp";
 
 	private List<PatientListApptItemBean> patients = new ArrayList<>();
 

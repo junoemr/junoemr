@@ -1,0 +1,19 @@
+
+.support-header {
+	@extend %juno-page-header;
+
+	h2,h4 {
+		margin: 0;
+		small {
+			color: $grey-08;
+		}
+	}
+	.experimental {
+		color: $grey-08;
+		background-color: $red;
+	}
+}
+.support-content {
+	@extend %juno-primary-view-pane;
+	@include juno-page-padding-default;
+}

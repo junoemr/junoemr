@@ -135,7 +135,10 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 </script>
 <%}
 %>
+<% if (request.getParameter("insertIntoPage") == null || request.getParameter("insertIntoPage").equalsIgnoreCase("false"))
+{ %>
 <script type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-1.4.2.js"></script>
+<% } %>
 
                 <script language="JavaScript">
          popupStart=function(vheight,vwidth,varpage,windowname) {
@@ -322,10 +325,13 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 
 
     <div id="labdoc_<%=segmentID%>">
+        <form name="you cannot nest form elements. hack to prevent page from breaking">
+        </form>
         <!-- form forwarding of the lab -->
-        <form name="reassignForm_<%=segmentID%>" >
+        <form name="reassignForm_<%=segmentID%>" method="post" action="Forward.do">
             <input type="hidden" name="flaggedLabs" value="<%= segmentID %>" />
             <input type="hidden" name="selectedProviders" value="" />
+            <input type="hidden" name="favorites" value="">
             <input type="hidden" name="labType" value="HL7" />
             <input type="hidden" name="labType<%= segmentID %>HL7" value="imNotNull" />
             <input type="hidden" name="providerNo" id="providerNo" value="<%= providerNo %>" />
@@ -355,7 +361,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                     <input type="button" value="<bean:message key="oscarMDS.segmentDisplay.btnAcknowledge"/>" onclick="<%=ackLabFunc%>">
                                     <input type="button" value="<bean:message key="oscarMDS.segmentDisplay.btnComment"/>" onclick="return getComment('<%=segmentID%>','addComment');">
                                     <% } %>
-                                    <input type="button" class="smallButton" value="<bean:message key="oscarMDS.index.btnForward"/>" onClick="popupStart(300, 400, '../oscarMDS/SelectProviderAltView.jsp?doc_no=<%=segmentID%>&providerNo=<%=providerNo%>&searchProviderNo=<%=searchProviderNo%>', 'providerselect')">
+                                    <input type="button" class="smallButton" value="<bean:message key="oscarMDS.index.btnForward"/>" onClick="popupStart(355, 675, '../oscarMDS/SelectProvider.jsp?docId=<%=segmentID%>&labDisplay=preview', 'providerselect')">
                                     <input type="button" value=" <bean:message key="global.btnPrint"/> " onClick="printPDF('<%=segmentID%>')">
 
                                     <input type="button" value="Msg" onclick="handleLab('','<%=segmentID%>','msgLab');"/>
@@ -1036,7 +1042,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                     <input type="button" value="<bean:message key="oscarMDS.segmentDisplay.btnAcknowledge"/>" onclick="<%=ackLabFunc%>">
                                     <input type="button" value="<bean:message key="oscarMDS.segmentDisplay.btnComment"/>" onclick="getComment('<%=segmentID%>','addComment')">
                                     <% } %>
-                                    <input type="button" class="smallButton" value="<bean:message key="oscarMDS.index.btnForward"/>" onClick="popupStart(300, 400, '../oscarMDS/SelectProviderAltView.jsp?doc_no=<%=segmentID%>&providerNo=<%=providerNo%>&searchProviderNo=<%=searchProviderNo%>', 'providerselect')">
+                                    <input type="button" class="smallButton" value="<bean:message key="oscarMDS.index.btnForward"/>" onClick="popupStart(355, 675, '../oscarMDS/SelectProvider.jsp?docId=<%=segmentID%>&labDisplay=preview', 'providerselect')">
 
                                     <input type="button" value=" <bean:message key="global.btnPrint"/> " onClick="printPDF('<%=segmentID%>')">
                                         <indivo:indivoRegistered demographic="<%=demographicID%>" provider="<%=providerNo%>">

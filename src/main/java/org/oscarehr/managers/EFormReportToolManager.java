@@ -63,10 +63,6 @@ public class EFormReportToolManager {
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
 	
-	//@PersistenceContext
-	//protected EntityManager entityManager = null;
-
-	
 	public List<EFormReportTool> findAll(LoggedInInfo loggedInInfo, Integer offset, Integer limit) {
 		
 		if(!securityInfoManager.hasPrivilege(loggedInInfo, "_admin.eformreporttool", "r", null)) {

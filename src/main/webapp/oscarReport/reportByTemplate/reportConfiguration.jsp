@@ -28,9 +28,15 @@
    "http://www.w3.org/TR/html4/loose.dtd">
 <%--This JSP is to configure the report before it is run, this is where the user fills in all the param--%>
 
-
-
-<%@ page import="java.util.*,oscar.oscarReport.reportByTemplate.*"%>
+<%@ page import="org.oscarehr.report.reportByTemplate.service.ReportByTemplateService"%>
+<%@ page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="oscar.oscarReport.reportByTemplate.Choice" %>
+<%@ page import="oscar.oscarReport.reportByTemplate.Parameter" %>
+<%@ page import="oscar.oscarReport.reportByTemplate.ReportObject" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="org.oscarehr.common.model.Explain" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
@@ -43,9 +49,12 @@
 	<%response.sendRedirect("../../securityError.jsp?type=_report&type=_admin.reporting&type=_admin");%>
 </security:oscarSec>
 <%
-if(!authed) {
-	return;
-}
+	if(!authed)
+	{
+		return;
+	}
+
+	ReportByTemplateService reportByTemplateService = SpringUtils.getBean(ReportByTemplateService.class);
 %>
 
 <html:html locale="true">
@@ -103,14 +112,39 @@ if(!authed) {
 			<jsp:param name="templateviewid" value="<%=templateid%>" />
 		</jsp:include></td>
 		<td class="MainTableRightColumn" valign="top">
-		<%ReportObject curreport = (new ReportManager()).getReportTemplate(templateid);
-		  		 String xml = (new ReportManager()).getTemplateXml(templateid);
-                 ArrayList parameters = curreport.getParameters();
-                 int step = 0;
-                 if (request.getAttribute("errormsg") != null) {
-                    String errormsg = (String) request.getAttribute("errormsg");%>
-		<div class="warning"><%=errormsg%></div>
-		<%}%>
+			<%
+			ReportObject curreport = reportByTemplateService.getAsLegacyReport(Integer.parseInt(templateid), true);
+			ArrayList parameters = curreport.getParameters();
+			int step = 0;
+			if(request.getAttribute("errormsg") != null)
+			{
+			String errormsg = (String) request.getAttribute("errormsg");%>
+			<div class="warning"><%=errormsg%>
+			</div>
+			<% if(request.getAttribute("explainResults") != null)
+			{ %>
+			<table class="table-explain">
+				<tr>
+					<th>Table</th>
+					<th>Rows</th>
+				</tr>
+				<%
+					List<Explain> explainResultList = (List<Explain>) request.getAttribute("explainResults");
+					for(Explain result : explainResultList)
+					{
+				%>
+				<tr>
+					<td><%=StringUtils.trimToEmpty(result.getTable())%> </td>
+					<td><%=(result.getRows() != null) ? result.getRows() : ""%></td>
+				</tr>
+				<%
+					}
+				%>
+			</table>
+			<%
+
+					}
+				}%>
 		<div class="reportTitle"
 			<%if (curreport.getTitle().indexOf("Error") != -1) {%>
 			style="color: red;" <%}%>><%=curreport.getTitle()%></div>
@@ -121,46 +155,81 @@ if(!authed) {
 				value="<%=curreport.getTemplateId()%>">
 			<input type="hidden" name="type" value="<%=curreport.getType()%>">
 			<div class="configDiv">
-			<table class="configTable">
-				<%for (int i=0; i<parameters.size(); i++) {
-                             step++;
-                             Parameter curparam = (Parameter) parameters.get(i);
-                     %>
-				<tr>
-					<th class="stepRC">Step <%=step%>:</th>
-					<td class="descriptionRC" style="max-width: 550px"><%=curparam.getParamDescription()%>
-					</td>
-					<td id="enclosingCol<%=i%>"><%-- If LIST field --%> <%if (curparam.getParamType().equals(curparam.LIST)) {%>
-					<select name="<%=curparam.getParamId()%>">
-						<%ArrayList paramChoices = curparam.getParamChoices();
-                                         for (int i2=0; i2<paramChoices.size(); i2++) { 
-                                         Choice curchoice = (Choice) paramChoices.get(i2);%>
-						<option value="<%=curchoice.getChoiceId()%>"><%=curchoice.getChoiceText()%></option>
-						<%}%>
-					</select> <%--If TEXT field --%> <% } else if (curparam.getParamType().equals(curparam.TEXT)) {%>
-					<input type="text" size="20" name="<%=curparam.getParamId()%>">
-					<%--If DATE field --%> <% } else if (curparam.getParamType().equals(curparam.DATE)) {%>
-					<input type="text" class="datefield" id="datefield<%=i%>"
-						name="<%=curparam.getParamId()%>"><a id="obsdate<%=i%>"><img
-						title="Calendar" src="../../images/cal.gif" alt="Calendar"
-						border="0" /></a> <script type="text/javascript">
-                                    Calendar.setup( { inputField : "datefield<%=i%>", ifFormat : "%Y-%m-%d", showsTime :false, button : "obsdate<%=i%>", singleClick : true, step : 1 } );
-                                 </script> <%--If CHECK field --%> <% } else if (curparam.getParamType().equals(curparam.CHECK)) {%>
-					<input type="hidden" name="<%=curparam.getParamId()%>:check"
-						value=""> <input type="checkbox" name="mastercheck"
-						onclick="checkAll(this, 'enclosingCol<%=i%>', 'checkclass<%=i%>')"><br />
-					<%ArrayList paramChoices = curparam.getParamChoices();
-                                     for (int i2=0; i2<paramChoices.size(); i2++) {
-                                         Choice curchoice = (Choice) paramChoices.get(i2);%>
-					<input type="checkbox" name="<%=curparam.getParamId()%>"
-						class="checkclass<%=i%>" value="<%=curchoice.getChoiceId()%>">
-					<%=curchoice.getChoiceText()%><br />
-					<%}%> <% } else if (curparam.getParamType().equals(curparam.TEXTLIST)) {%>
-					<input type="text" size="20" name="<%=curparam.getParamId()%>:list">
-					<font style="font-size: 10px;">(Comma Separated)</font> <% }%>
-					</td>
-				</tr>
-				<%} %>
+				<table class="configTable">
+					<%
+						for(int i = 0; i < parameters.size(); i++)
+						{
+							step++;
+							Parameter curparam = (Parameter) parameters.get(i);
+					%>
+					<tr>
+						<th class="stepRC">Step <%=step%>:</th>
+						<td class="descriptionRC" style="max-width: 550px"><%=curparam.getParamDescription()%>
+						</td>
+						<td id="enclosingCol<%=i%>"><%-- If LIST field --%> <%
+							if(curparam.getParamType().equals(Parameter.LIST))
+							{
+						%>
+							<select name="<%=curparam.getParamId()%>">
+								<%
+									ArrayList paramChoices = curparam.getParamChoices();
+									for(int i2 = 0; i2 < paramChoices.size(); i2++)
+									{
+										Choice curchoice = (Choice) paramChoices.get(i2);
+								%>
+								<option value="<%=curchoice.getChoiceId()%>"><%=curchoice.getChoiceText()%>
+								</option>
+								<%}%>
+							</select> <%--If TEXT field --%> <%
+							}
+							else if(curparam.getParamType().equals(Parameter.TEXT))
+							{%>
+							<input type="text" size="20" name="<%=curparam.getParamId()%>">
+								<%--If DATE field --%> <% }
+							else if(curparam.getParamType().equals(Parameter.DATE))
+							{%>
+							<input type="text" class="datefield" id="datefield<%=i%>"
+							       name="<%=curparam.getParamId()%>"><a id="obsdate<%=i%>"><img
+									title="Calendar" src="../../images/cal.gif" alt="Calendar"
+									border="0"/></a>
+							<script type="text/javascript">
+								Calendar.setup({inputField: "datefield<%=i%>", ifFormat: "%Y-%m-%d", showsTime: false, button: "obsdate<%=i%>", singleClick: true, step: 1});
+							</script>
+								<%--If CHECK field --%> <% }
+							else if(curparam.getParamType().equals(Parameter.CHECK))
+							{%>
+							<input type="hidden" name="<%=curparam.getParamId()%>:check" value="">
+							<input type="checkbox" name="mastercheck" onclick="checkAll(this, 'enclosingCol<%=i%>', 'checkclass<%=i%>')"><br/>
+							<%
+								ArrayList paramChoices = curparam.getParamChoices();
+								for(int i2 = 0; i2 < paramChoices.size(); i2++)
+								{
+									Choice curchoice = (Choice) paramChoices.get(i2);
+							%>
+							<input type="checkbox" name="<%=curparam.getParamId()%>"
+							       class="checkclass<%=i%>" value="<%=curchoice.getChoiceId()%>">
+								<%=curchoice.getChoiceText()%><br/><%
+								}
+							}
+							else if(curparam.getParamType().equals(Parameter.TEXTLIST))
+							{%>
+							<input type="text" size="20" name="<%=curparam.getParamId()%>:list">
+							<font style="font-size: 10px;">(Comma Separated)</font> <%
+							}
+							else if(curparam.getParamType().equals(Parameter.LIMIT))
+							{%>
+								<input type="text" name="<%=curparam.getParamId()%>:limit" value="">
+							<%
+							}
+							else if(curparam.getParamType().equals(Parameter.OFFSET))
+							{%>
+								<input type="text" name="<%=curparam.getParamId()%>:offset" value="">
+							<%
+							}
+							%>
+						</td>
+					</tr>
+					<%} %>
 				<tr>
 					<th>Step <%=step+1%>:</th>
 					<td>Generate Query</td>

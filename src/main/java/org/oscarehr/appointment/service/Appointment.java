@@ -109,8 +109,9 @@ public class Appointment
 						LocalDateTime.of(details.getDate(), details.getStartTime());
 
 				// Add an extra minute because oscar stores the endtime minus a minute
+				// set the seconds to 0 to prevent overlap issues
 				LocalDateTime endDateTime =
-						LocalDateTime.of(details.getDate(), details.getEndTime()).plusMinutes(1);
+						LocalDateTime.of(details.getDate(), details.getEndTime()).plusMinutes(1).withSecond(0);
 
 
 				String rawStatus = details.getStatus();
@@ -158,21 +159,28 @@ public class Appointment
 						getStatusModifier(rawStatus),
 						null,
 						details.getReason(),
+						details.getReasonCode(),
 						details.getNotes(),
 						null,
 						details.getLocation(),
 						details.getType(),
 						details.getResources(),
 						details.getUrgency(),
+						details.getName().equals(org.oscarehr.common.model.Appointment.DONOTBOOK),
 						false,
 						false,
 						null
 				);
+				// for the case where appointments are saved with a name but no demographic
+				if((appointment.getDemographicNo() == null || appointment.getDemographicNo() == 0) && details.getName() != null)
+				{
+					appointment.setAppointmentName(details.getName());
+				}
 
 				calendarEvents.add(new CalendarEvent(
 					startDateTime,
 					endDateTime,
-					details.getColor(),
+					details.getJunoColor(),
 					null,
 					"text-dark",       // TODO remove?
 					providerId, // TODO remove?

@@ -23,27 +23,21 @@
     Ontario, Canada
 
 --%>
-<style>
-.experimental {
-  color: #ffffff;
-  background-color: #da4f49;
-  *background-color: #bd362f;
-}
+<div class="support-header">
+    <h2>OSCAR Support&nbsp;<small class="experimental">In Development</small></h2>
 
-</style>
-<h2>OSCAR Support&nbsp;<small class="experimental">In Development</small></h2>
+    <h4>Version: <small>{{buildInfo.versionDisplayName}}  ({{buildInfo.version}})</small></h4>
+</div>
 
-<h4>Version: <small>{{buildInfo.versionDisplayName}}  ({{buildInfo.version}})</small></h4>
+<div class="support-content">
+	<address>
+	  <strong>{{ospInfo.name}}</strong><br>
+	  <abbr title="Phone">P:</abbr> {{ospInfo.phone}}
+	</address>
 
-<p></p>
-
-<address>
-  <strong>{{ospInfo.name}}</strong><br>
-  <abbr title="Phone">P:</abbr> {{ospInfo.phone}}
-</address>
-
-<address>
-  <strong>{{ospInfo.contact}}</strong><br>
-  <a href="mailto:{{ospInfo.email}}">{{ospInfo.email}}</a><br/>
-   <a href="{{ospInfo.url}}">{{ospInfo.url}}</a>
-</address>
+	<address>
+	  <strong>{{ospInfo.contact}}</strong><br>
+	  <a href="mailto:{{ospInfo.email}}">{{ospInfo.email}}</a><br/>
+	   <a href="{{ospInfo.url}}">{{ospInfo.url}}</a>
+	</address>
+</div>

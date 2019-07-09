@@ -23,9 +23,6 @@
  */
 package org.oscarehr.common.service;
 
-import java.util.List;
-import java.util.TimerTask;
-
 import org.apache.log4j.Logger;
 import org.caisi.dao.ProviderDAO;
 import org.oscarehr.PMmodule.dao.ProviderDao;
@@ -37,8 +34,10 @@ import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.OscarProperties;
+
+import java.util.List;
+import java.util.TimerTask;
 
 public class BORNSchedulerJob extends TimerTask {
 
