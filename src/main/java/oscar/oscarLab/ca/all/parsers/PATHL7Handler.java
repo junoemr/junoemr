@@ -65,6 +65,10 @@ public class PATHL7Handler extends MessageHandler
 	private static List<String> labDocuments = Arrays.asList("BLOODBANKT","CELLPATH","CELLPATHR","CYTO", "DIAG IMAGE","MICRO3T", "MICROGCMT","MICROGRT", "MICROBCT","TRANSCRIP", "NOTIF", "BCCASMP", "BCCACSP");
 	public static final String VIHARTF = "CELLPATHR";
 
+	// Embedded PDF strings that show up in OBX messages
+	public static final String embeddedPdfPrefix = "JVBERi0xLj";
+	public static final String pdfReplacement = "embedded_doc_id";
+
     /** Creates a new instance of CMLHandler */
     public PATHL7Handler(){
     }
@@ -78,12 +82,9 @@ public class PATHL7Handler extends MessageHandler
 
         // Legacy Excelleris labs with embedded PDFs don't have proper identifier segment set-up
         // if this is the case then we need to modify the message
-        for (int j = 0; j < getOBXCount(0); j++)
+        if (getOBXValueType(0, 0).equals("ED") && getOBXCount(0) == 0)
         {
-            if (getOBXValueType(0, j).equals("ED") && getOBXCount(0) == 0)
-            {
-                addOBXIdentifierText("PDF");
-            }
+            addOBXIdentifierText("PDF");
         }
 
     }
@@ -752,17 +753,24 @@ public class PATHL7Handler extends MessageHandler
             return true;
         }
 
-        final String embeddedPdfPrefix = "JVBERi0xLj";
-        for (int j = 0; j < getOBXCount(0); j++)
+        for (int i = 0; i < getOBRCount(); i++)
         {
-            if (getOBXValueType(0, j).equals("ED")
-                    && getOBXResult(0, j, 1).equals("TEXT")
-                    && getOBXResult(0, j, 2).equals("PDF")
-                    && getOBXResult(0, j, 3).equals("Base64")
-                    && (getOBXResult(0, j,4).startsWith(embeddedPdfPrefix)
-                        || getOBXResult(0, j, 4).startsWith("embedded_doc_id_")))
+            for (int j = 0; j < getOBXCount(i); j++)
             {
-                return true;
+                if (getOBXResult(i, j,4).startsWith(embeddedPdfPrefix))
+                {
+                    logger.error("LAB " + getAccessionNum() + " CONTAINS UNPROCESSED EMBEDDED PDF");
+                    return false;
+                }
+
+                if (getOBXValueType(i, j).equals("ED")
+                        && getOBXResult(i, j, 1).equals("TEXT")
+                        && getOBXResult(i, j, 2).equals("PDF")
+                        && getOBXResult(i, j, 3).equals("Base64")
+                        && getOBXResult(i, j, 4).startsWith(pdfReplacement))
+                {
+                    return true;
+                }
             }
         }
         return false;
