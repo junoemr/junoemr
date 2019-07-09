@@ -122,9 +122,6 @@ public class CoPDPreProcessorService
 			message = fixSlashBPMeasurements(message);
 			message = fixZATDateString(message);
 
-			// delete this
-			message = importKabongoSpecificHax(message);
-
 			// should come last
 			message = ensureNumeric(message);
 		}
@@ -352,75 +349,6 @@ public class CoPDPreProcessorService
 		};
 
 		return foreachTag(message, "ZAT.2", fixZATDate);
-	}
-
-	/**
-	 * kabongo import specific data hacks DELETE ME
-	 * @param message - the message to fix
-	 * @return - the fixed message
-	 */
-	private String importKabongoSpecificHax(String message)
-	{
-		// convert the string "num inches" to "num" in cm.
-		Function<String, String> fixInch = new Function<String, String>() {
-			@Override
-			public String apply(String tagValue)
-			{
-				String[] tagLst = tagValue.split(" ");
-				if (tagLst.length == 2 && tagLst[1].equalsIgnoreCase("inches"))
-				{
-					try
-					{
-						int inches = Integer.parseInt(tagLst[0]);
-						return "" + (inches * 2.54);
-					}
-					catch (NumberFormatException e)
-					{
-						return tagValue;
-					}
-				}
-				else
-				{
-					return tagValue;
-				}
-			}
-
-		};
-
-		// replace "135cm" with "135".
-		Function<String, String> fixZQO = new Function<String, String>() {
-			@Override
-			public String apply(String tagValue)
-			{
-				if (tagValue.equals("135cm"))
-				{
-					return "135";
-				}
-				else if (tagValue.equals("109cm"))
-				{
-					return "109";
-				}
-				else if (tagValue.equals("67 kg"))
-				{
-					return "67";
-				}
-				else if (tagValue.equals("56 kg"))
-				{
-					return "56";
-				}
-				else
-				{
-					return tagValue;
-				}
-			}
-
-		};
-
-		message = foreachTag(message, "ZAT.8", fixInch);
-		message = foreachTag(message, "ZQO.8", fixInch);
-		message = foreachTag(message, "ZQO.8", fixZQO);
-		message = foreachTag(message, "ZQO.7", fixZQO);
-		return message;
 	}
 
 	/**
