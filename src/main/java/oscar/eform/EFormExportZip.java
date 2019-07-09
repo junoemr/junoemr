@@ -221,6 +221,13 @@ public class EFormExportZip {
 		//first runthrough, get the properties files, construct eforms, cache files
 		while ((ze = zis.getNextEntry()) != null) {
 			File file = new File(ze.getName());
+
+			if (containsIllegalCharacters(file.getName()))
+			{
+				errors.add("File: " + file.getName() + " has a name that contains illegal characters. (')");
+				continue;
+			}
+
 			_log.info("Unzipping..." + file.getName());
 			if (file.getName().equalsIgnoreCase("eform.properties")) {
 				Properties properties = new Properties();
@@ -296,6 +303,11 @@ public class EFormExportZip {
 		}
 		deleteDirectory(imageTempFolderDir);
 		return errors;
+	}
+
+	private boolean containsIllegalCharacters(String fileName)
+	{ // really should throw in some more, but dont want to break working forms
+		return fileName.contains("'");
 	}
 
 	private void deleteDirectory(File directory) {
