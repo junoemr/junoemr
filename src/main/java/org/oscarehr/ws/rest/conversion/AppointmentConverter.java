@@ -88,6 +88,12 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		{
 			name = t.getAppointmentName();
 		}
+		String status = t.getEventStatusCode();
+		String statusModifier = t.getEventStatusModifier();
+		if(statusModifier != null)
+		{
+			status += statusModifier;
+		}
 
 		Date adjustedAppointmentDate =
 				Date.from(t.getStartTime().toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -110,7 +116,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		appointment.setReason(t.getReason());
 		appointment.setReasonCode(t.getReasonCode());
 		appointment.setLocation(t.getSite());
-		appointment.setStatus(t.getEventStatusCode());
+		appointment.setStatus(status);
 		appointment.setResources(t.getResources());
 		appointment.setUrgency(t.getUrgency());
 		appointment.setType(t.getType());

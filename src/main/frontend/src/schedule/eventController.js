@@ -296,6 +296,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		}
 		$scope.defaultEventStatus = data.defaultEventStatus;
 		controller.setSelectedEventStatus(data.eventData.eventStatusCode);
+		$scope.eventData.eventStatusModifier = data.eventData.eventStatusModifier;
 
 		if(editMode)
 		{
@@ -657,6 +658,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 				notes: $scope.eventData.notes,
 				providerNo: $scope.schedule.uuid,
 				eventStatusCode: controller.selectedEventStatus,
+				eventStatusModifier: $scope.eventData.eventStatusModifier,
 				demographicNo: demographicNo,
 				appointmentName: appointmentName,
 				site: $scope.eventData.site,

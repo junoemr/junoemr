@@ -115,17 +115,6 @@ public class Appointment
 
 
 				String rawStatus = details.getStatus();
-				String status = null;
-				String statusModifier = null;
-				if(rawStatus != null && rawStatus.length() > 0)
-				{
-					status = rawStatus.substring(0, 1);
-
-					if(rawStatus.length() > 1)
-					{
-						statusModifier = rawStatus.substring(1,2);
-					}
-				}
 
 				String province = OscarProperties.getInstance().getBillingTypeUpperCase();
 				String defaultView = OscarProperties.getInstance().getProperty("default_view");

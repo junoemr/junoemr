@@ -48,13 +48,11 @@ import org.oscarehr.schedule.service.ScheduleGroupService;
 import org.oscarehr.schedule.service.ScheduleTemplateService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.web.PatientListApptBean;
-import org.oscarehr.web.PatientListApptItemBean;
+import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
 import org.oscarehr.ws.rest.conversion.AppointmentConverter;
 import org.oscarehr.ws.rest.conversion.AppointmentStatusConverter;
 import org.oscarehr.ws.rest.conversion.AppointmentTypeConverter;
 import org.oscarehr.ws.rest.conversion.LookupListItemConverter;
-import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.SchedulingResponse;
@@ -76,6 +74,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -106,7 +105,7 @@ public class ScheduleService extends AbstractServiceImpl {
 	@GET
 	@Path("/day/{date}")
 	@Produces("application/json")
-	public RestResponse<PatientListApptBean> getAppointmentsForDay(@PathParam("date") String dateStr) throws ParseException
+	public RestSearchResponse<PatientListItemTransfer> getAppointmentsForDay(@PathParam("date") String dateStr) throws ParseException
 	{
 		String providerNo = this.getCurrentProvider().getProviderNo();
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
@@ -117,7 +116,6 @@ public class ScheduleService extends AbstractServiceImpl {
 		securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.READ, null, "_appointment");
 
 		SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm aa");
-		PatientListApptBean response = new PatientListApptBean();
 
 		Date dateObj;
 		if("today".equals(dateStr))
@@ -130,9 +128,11 @@ public class ScheduleService extends AbstractServiceImpl {
 		}
 
 		List<Appointment> appts = scheduleManager.getDayAppointments(loggedInInfo, providerNo, dateObj);
+		List<PatientListItemTransfer> response = new ArrayList<>(appts.size());
+
 		for(Appointment appt : appts)
 		{
-			PatientListApptItemBean item = new PatientListApptItemBean();
+			PatientListItemTransfer item = new PatientListItemTransfer();
 			item.setDemographicNo(appt.getDemographicNo());
 			if(appt.getDemographicNo() == 0)
 			{
@@ -142,14 +142,29 @@ public class ScheduleService extends AbstractServiceImpl {
 			{
 				item.setName(demographicManager.getDemographicFormattedName(loggedInInfo, appt.getDemographicNo()));
 			}
+
+			String rawStatus = appt.getStatus();
+			String status = null;
+			String statusModifier = null;
+			if(rawStatus != null && rawStatus.length() > 0)
+			{
+				status = rawStatus.substring(0, 1);
+
+				if(rawStatus.length() > 1)
+				{
+					statusModifier = rawStatus.substring(1,2);
+				}
+			}
+
 			item.setStartTime(timeFormatter.format(appt.getStartTime()));
 			item.setReason(appt.getReason());
-			item.setStatus(appt.getStatus());
+			item.setStatus(status);
+			item.setStatusModifier(statusModifier);
 			item.setAppointmentNo(appt.getId());
 			item.setDate(appt.getStartTimeAsFullDate());
-			response.getPatients().add(item);
+			response.add(item);
 		}
-		return RestResponse.successResponse(response);
+		return RestSearchResponse.successResponseOnePage(response);
 	}
 
 	@GET
