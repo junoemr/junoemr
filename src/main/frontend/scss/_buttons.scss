@@ -38,12 +38,19 @@
 	&.btn-default,&.btn-addon {
 		@include juno-button-colour-scheme($primary, $white, $grey-06);
 	}
-	&.btn-success {
-		@include juno-button-colour-scheme($white, $green, $green-hover);
-	}
 	&.btn-primary {
 		@include juno-button-colour-scheme($white, $primary, $primary-hover);
 	}
+	&.btn-success {
+		@include juno-button-colour-scheme($white, $green, $green-hover);
+	}
+	&.btn-warning {
+		@include juno-button-colour-scheme($white, $yellow, $yellow-hover);
+	}
+	&.btn-danger {
+		@include juno-button-colour-scheme($white, $red, $red-hover);
+	}
+
 
 	// for icon only buttons
 	&.btn-icon {
