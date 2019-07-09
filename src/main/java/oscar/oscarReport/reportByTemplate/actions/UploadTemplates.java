@@ -42,6 +42,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.report.reportByTemplate.exception.ReportByTemplateException;
 import org.oscarehr.report.reportByTemplate.model.ReportTemplates;
 import org.oscarehr.report.reportByTemplate.service.ReportByTemplateService;
@@ -59,6 +60,7 @@ import java.io.IOException;
 public class UploadTemplates extends Action {
     private static final Logger logger = MiscUtils.getLogger();
     private static ReportByTemplateService reportByTemplateService = SpringUtils.getBean(ReportByTemplateService.class);
+    private static SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 
     public ActionForward execute(ActionMapping mapping, ActionForm form,
                                  HttpServletRequest request, HttpServletResponse response)
@@ -68,6 +70,8 @@ public class UploadTemplates extends Action {
         String sessionProviderNo = (String) request.getSession().getAttribute("user");
         String templateIdStr = request.getParameter("templateid");
         String templateIdStrReturn = templateIdStr;
+
+        securityInfoManager.requireAllPrivilege(sessionProviderNo, SecurityInfoManager.WRITE, null, "_admin", "_report");
 
         String message;
         try
