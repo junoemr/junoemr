@@ -50,7 +50,8 @@ public class ImageUploadAction extends Action {
     
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+    {
     	
     	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_eform", "w", null)) {
 			throw new SecurityException("missing required security object (_eform)");
@@ -58,12 +59,8 @@ public class ImageUploadAction extends Action {
     	
          ImageUploadForm fm = (ImageUploadForm) form;
          FormFile image = fm.getImage();
-         try {
-             if (!isEformImageNameValid(image.getFileName()))
-             {
-                 throw new RuntimeException("Invalid image file name: " + image.getFileName());
-             }
-
+         try
+         {
              byte[] imagebytes = image.getFileData();
              OutputStream fos = ImageUploadAction.getEFormImageOutputStream(image.getFileName());
              fos.write(imagebytes);
@@ -71,26 +68,17 @@ public class ImageUploadAction extends Action {
          return mapping.findForward("success");
     }
 
-    public static OutputStream getEFormImageOutputStream(String imageFileName) throws FileNotFoundException {
+    public static OutputStream getEFormImageOutputStream(String imageFileName) throws FileNotFoundException
+    {
         String filepath = OscarProperties.getInstance().getProperty("eform_image") + "/" + imageFileName;
         FileOutputStream fos = new FileOutputStream(new File(filepath));
         return fos;
     }
 
-    public static File getImageFolder() throws IOException {
+    public static File getImageFolder() throws IOException
+    {
         File imageFolder = new File(OscarProperties.getInstance().getProperty("eform_image") + "/");
         if (!imageFolder.exists() && !imageFolder.mkdirs()) throw new IOException("Could not create directory " + imageFolder.getAbsolutePath() + " check permissions and ensure the correct eform_image property is set in the properties file");
         return imageFolder;
     }
-
-    /**
-     * check if the image file has a valid name
-     * @param imgFileName - the file name to check
-     * @return - true if the image file name is valid.
-     */
-    public static boolean isEformImageNameValid(String imgFileName)
-    {
-        return !imgFileName.contains("'");
-    }
-    
 }
