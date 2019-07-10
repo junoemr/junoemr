@@ -190,7 +190,7 @@ public class DemographicWs extends AbstractWs {
 		return (out);
 	}
 
-	public DemographicTransfer getDemographicByHealthNumber(String healthNumber, String version) throws Exception
+	public DemographicTransfer getDemographicByHealthNumber(String healthNumber) throws Exception
 	{
 
 		if (healthNumber == null || healthNumber.isEmpty())
@@ -198,7 +198,7 @@ public class DemographicWs extends AbstractWs {
 			throw new Exception("null or empty health numbers are not permitted");
 		}
 
-		Demographic demographic = demographicManager.getDemographicByHealthNumberAndVersion(healthNumber, version);
+		Demographic demographic = demographicManager.getDemographicByHealthNumberAndVersion(healthNumber);
 
 		if (demographic != null)
 		{

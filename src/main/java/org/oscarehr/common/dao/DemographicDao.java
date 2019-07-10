@@ -1506,16 +1506,21 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		}
 	}
 
-	public Demographic getDemographicByHealthNumberAndVersion(String healthNumber, String version)
+	public Demographic getDemographicByHealthNumber(String healthNumber)
 	{
-		String hql = "from Demographic d where d.Hin = :hin and d.Ver = :version";
+		String hql = "from Demographic d where d.Hin = :hin";
+
+		OscarProperties oscarProperties = OscarProperties.getInstance();
+		if (oscarProperties.isBritishColumbiaInstanceType())
+		{
+				hql += " and d.Ver != '66'";
+		}
 
 		Session session = this.getSession();
 		try
 		{
 			Query query = session.createQuery(hql);
 			query.setParameter("hin", healthNumber);
-			query.setParameter("version", version);
 
 			return (Demographic)query.uniqueResult();
 		}

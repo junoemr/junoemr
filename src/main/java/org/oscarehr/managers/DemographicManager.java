@@ -975,9 +975,9 @@ public class DemographicManager {
 		return true;
 	}
 
-	public Demographic getDemographicByHealthNumberAndVersion(String healthNumber, String version)
+	public Demographic getDemographicByHealthNumberAndVersion(String healthNumber)
 	{
-		return this.demographicDao.getDemographicByHealthNumberAndVersion(healthNumber, version);
+		return this.demographicDao.getDemographicByHealthNumber(healthNumber);
 	}
 
 }
