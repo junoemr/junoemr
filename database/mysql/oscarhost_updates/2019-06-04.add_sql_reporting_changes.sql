@@ -9,6 +9,10 @@ CREATE TABLE IF NOT EXISTS log_report_by_template (
   rows_returned BIGINT,
   query_string text
 );
+-- to ensure upgrades from 12 also work
+ALTER TABLE log_report_by_template ADD COLUMN IF NOT EXISTS rows_returned BIGINT AFTER datetime_end;
+ALTER TABLE log_report_by_template ENGINE = InnoDB;
+
 
 CREATE TABLE IF NOT EXISTS log_report_by_template_explain (
   id int(10) AUTO_INCREMENT PRIMARY KEY,
@@ -28,6 +32,7 @@ CREATE TABLE IF NOT EXISTS log_report_by_template_explain (
 
 ALTER TABLE reportByExamples ADD COLUMN IF NOT EXISTS datetime_end DATETIME;
 ALTER TABLE reportByExamples ADD COLUMN IF NOT EXISTS rows_returned BIGINT;
+ALTER TABLE reportByExamples ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS reportByExamples_explain (
   id int(10) AUTO_INCREMENT PRIMARY KEY,

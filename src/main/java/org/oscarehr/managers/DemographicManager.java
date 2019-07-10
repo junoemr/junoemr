@@ -779,9 +779,9 @@ public class DemographicManager {
 			demographic.setLastUpdateDate(new Date());
 		}
 
-		if (demographic.getProviderNo() == null)
+		if (StringUtils.isBlank(demographic.getProviderNo()))
 		{
-			demographic.setProviderNo("");
+			demographic.setProviderNo(null);
 		}
 
 	}
