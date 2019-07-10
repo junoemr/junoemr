@@ -59,6 +59,11 @@ public class ImageUploadAction extends Action {
          ImageUploadForm fm = (ImageUploadForm) form;
          FormFile image = fm.getImage();
          try {
+             if (!isEformImageNameValid(image.getFileName()))
+             {
+                 throw new RuntimeException("Invalid image file name: " + image.getFileName());
+             }
+
              byte[] imagebytes = image.getFileData();
              OutputStream fos = ImageUploadAction.getEFormImageOutputStream(image.getFileName());
              fos.write(imagebytes);
@@ -76,6 +81,16 @@ public class ImageUploadAction extends Action {
         File imageFolder = new File(OscarProperties.getInstance().getProperty("eform_image") + "/");
         if (!imageFolder.exists() && !imageFolder.mkdirs()) throw new IOException("Could not create directory " + imageFolder.getAbsolutePath() + " check permissions and ensure the correct eform_image property is set in the properties file");
         return imageFolder;
+    }
+
+    /**
+     * check if the image file has a valid name
+     * @param imgFileName - the file name to check
+     * @return - true if the image file name is valid.
+     */
+    public static boolean isEformImageNameValid(String imgFileName)
+    {
+        return !imgFileName.contains("'");
     }
     
 }
