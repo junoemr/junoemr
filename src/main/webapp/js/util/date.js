@@ -92,7 +92,7 @@ Oscar.Util.Date.validateDateInputTolerant = function validateDateInputTolerant(e
 
 	if (isValid)
 	{
-		this.depricatedNormalizeDateInput(elem);
+		this.normalizeDateInput(elem);
 	}
 
 	return isValid;
