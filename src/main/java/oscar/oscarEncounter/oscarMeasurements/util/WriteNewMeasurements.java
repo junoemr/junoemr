@@ -35,11 +35,13 @@ import org.oscarehr.common.dao.MeasurementTypeDao;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.MeasurementType;
 import org.oscarehr.common.model.Validations;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarEncounter.oscarMeasurements.pageUtil.EctValidation;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -50,8 +52,21 @@ public class WriteNewMeasurements {
 	private static MeasurementTypeDao measurementTypeDao = SpringUtils.getBean(MeasurementTypeDao.class);
 	private static MeasurementDao dao = SpringUtils.getBean(MeasurementDao.class);
 
-    public static ActionMessages addMeasurements(List<String> names, List<String> values, String demographicNo, String providerNo) {
-        // Must be called on the same eForm object because it retrieves some of its properties
+	public static List<String> validateMeasurements(List<String> names, List<String> values)
+	{
+		Vector measures = createMeasurementVector(names, values);
+		preProcess(measures);
+		return checkMappedMeasurements(measures);
+	}
+
+    /**
+     * Common method to generate a vector of measurements from a set of name, value mappings.
+     * @param names list of measurement names to map
+     * @param values list of measurement values associated with each name
+     * @return a vector containing the measurement/value mappings
+     */
+    private static Vector createMeasurementVector(List<String> names, List<String> values)
+    {
         Vector measures = new Vector();
         for (int i = 0; i < names.size(); i++)
         {
@@ -88,6 +103,12 @@ public class WriteNewMeasurements {
                 measures.addElement(measure);
             }
         }
+        return measures;
+    }
+
+    public static ActionMessages addMeasurements(List<String> names, List<String> values, String demographicNo, String providerNo) {
+        // Must be called on the same eForm object because it retrieves some of its properties
+        Vector measures = createMeasurementVector(names, values);
         //--------All measurement values are organized in Hashtables in an arraylist
         //--------validation......
         preProcess(measures);
@@ -152,6 +173,32 @@ public class WriteNewMeasurements {
         }
     }
 
+    /**
+     * pre-validation to check which measurements don't have mappings
+     * @param measures vector of measurements to check against
+     * @return ActionMessage set containing warnings for all measurements without mappings
+     */
+    static private List<String> checkMappedMeasurements(Vector measures)
+    {
+        EctValidation ectValidation = new EctValidation();
+
+        List<String> problemTypes = new ArrayList<>();
+
+        for (int i = 0; i < measures.size(); i++)
+        {
+            Hashtable measure = (Hashtable) measures.get(i);
+            String inputType = (String)measure.get("type");
+            String instruction = (String)measure.get("measuringInstruction");
+            List<Validations> vs = ectValidation.getValidationType(inputType, instruction);
+            if (vs.isEmpty())
+            {
+                problemTypes.add(inputType);
+            }
+        }
+
+        return problemTypes;
+    }
+
     static private ActionMessages validate(Vector measures, String demographicNo) {
         ActionMessages errors = new ActionMessages();
         EctValidation ectValidation = new EctValidation();
@@ -165,11 +212,12 @@ public class WriteNewMeasurements {
             String dateObserved = ConversionUtils.padDateTimeString((String) measure.get("dateObserved"));
             String comments = (String) measure.get("comments");
             String instruction;
-            String regExp;
-            Double dMax;
-            Double dMin;
-            Integer iMax;
-            Integer iMin;
+            String regExp = "";
+            Double dMax = 0.0;
+            Double dMin = 0.0;
+            Integer iMax = 0;
+            Integer iMin = 0;
+            boolean skip = false;
 
             if (GenericValidator.isBlankOrNull(inputValue))
             {
@@ -184,56 +232,56 @@ public class WriteNewMeasurements {
             if (vs.isEmpty())
             {
                 //if type with instruction does not exist
-                errors.add(inputType,
-                    new ActionMessage("errors.oscarEncounter.Measurements.cannotFindType", inputType, instruction));
-                valid = false;
-                continue;
+                skip = true;
+            }
+            else
+            {
+                Validations validation = vs.iterator().next();
+                dMax = validation.getMaxValue();
+                dMin = validation.getMinValue();
+                iMax = validation.getMaxLength();
+                iMin = validation.getMinLength();
+                regExp = validation.getRegularExp();
             }
 
-            Validations validation = vs.iterator().next();
-            dMax = validation.getMaxValue();
-            dMin = validation.getMinValue();
-            iMax = validation.getMaxLength();
-            iMin = validation.getMinLength();
-            regExp = validation.getRegularExp();
 
 
-            if (!ectValidation.isInRange(dMax, dMin, inputValue))
+            if (!skip && !ectValidation.isInRange(dMax, dMin, inputValue))
             {
                 errors.add(inputType,
                 new ActionMessage("errors.range", inputType, Double.toString(dMin), Double.toString(dMax)));
                 valid = false;
             }
 
-            if (!ectValidation.maxLength(iMax, inputValue))
+            if (!skip && !ectValidation.maxLength(iMax, inputValue))
             {
                 errors.add(inputType,
                 new ActionMessage("errors.maxlength", inputType, Integer.toString(iMax)));
                 valid = false;
             }
 
-            if (!ectValidation.minLength(iMin, inputValue))
+            if (!skip && !ectValidation.minLength(iMin, inputValue))
             {
                 errors.add(inputType,
                 new ActionMessage("errors.minlength", inputType, Integer.toString(iMin)));
                 valid = false;
             }
 
-            if (!ectValidation.matchRegExp(regExp, inputValue))
+            if (!skip && !ectValidation.matchRegExp(regExp, inputValue))
             {
                 errors.add(inputType,
                 new ActionMessage("errors.invalid", inputType));
                 valid = false;
             }
 
-            if (!ectValidation.isValidBloodPressure(regExp, inputValue))
+            if (!skip && !ectValidation.isValidBloodPressure(regExp, inputValue))
             {
                 errors.add(inputType,
                 new ActionMessage("error.bloodPressure"));
                 valid = false;
             }
 
-            if (!ectValidation.isDate(dateObserved)&&inputValue.compareTo("")!=0)
+            if (!skip && !ectValidation.isDate(dateObserved)&&inputValue.compareTo("")!=0)
             {
                 errors.add(inputType,
                 new ActionMessage("errors.invalidDate", inputType));
