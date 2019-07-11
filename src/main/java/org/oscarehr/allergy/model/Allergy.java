@@ -346,15 +346,62 @@ public class Allergy extends AbstractModel<Integer>
     		return "Not Set"; //"oscarEncounter.lifestage.opt.notset"; // = Not Set
     }
 
-    public String getOnSetOfReactionDesc() {
+	/**
+	 * Expression language tags (${}) can't directly access static methods, and we'd like
+	 * to be able to expose the mappings to our JSPs.
+	 * @param lifeStage code for the life stage of the allergy
+	 * @return oscar resource property corresponding to the code given
+	 */
+	public String getDescForLifeStageCode(String lifeStage)
+	{
+		switch(lifeStage)
+		{
+			case "N":
+				return "oscarEncounter.lifestage.opt.newborn";
+			case "I":
+				return "oscarEncounter.lifestage.opt.infant";
+			case "C":
+				return "oscarEncounter.lifestage.opt.child";
+			case "T":
+				return "oscarEncounter.lifestage.opt.adolescent";
+			case "A":
+				return "oscarEncounter.lifestage.opt.adult";
+			default:
+				return "oscarEncounter.lifestage.opt.notset";
+		}
+	}
+
+	public String getOnSetOfReactionDesc() {
     	return Allergy.getOnSetOfReactionDesc(this.getOnsetOfReaction());
     }
-    public static String getOnSetOfReactionDesc(String onsetCode){
-        if ("1".equals(onsetCode)) return("Immediate");
-        if ("2".equals(onsetCode)) return("Gradual");
-        if ("3".equals(onsetCode)) return("Slow");
-        else return("Unknown "+onsetCode);
-     }
+
+	/**
+	 * Expression language tags (${}) can't directly access static methods, and we'd like
+	 * to be able to expose the mappings to our JSPs.
+	 * @param onsetCode onset code that we want the textual description for
+	 * @return textual description corresponding to onset code, Unknown if we can't find it
+	 */
+	public String getDescForOnsetCode(String onsetCode)
+	{
+		return Allergy.getOnSetOfReactionDesc(onsetCode);
+	}
+
+	public static String getOnSetOfReactionDesc(String onsetCode)
+	{
+		if (ONSET_CODE_IMMEDIATE.equals(onsetCode))
+		{
+			return("Immediate");
+		}
+		if (ONSET_CODE_GRADUAL.equals(onsetCode))
+		{
+			return("Gradual");
+		}
+		if (ONSET_CODE_SLOW.equals(onsetCode))
+		{
+			return("Slow");
+		}
+		return("Unknown " + onsetCode);
+	 }
 
     public String getTypeDesc() {
     	return Allergy.getTypeDesc(this.getTypeCode());
@@ -406,13 +453,36 @@ public class Allergy extends AbstractModel<Integer>
     public String getSeverityOfReactionDesc() {
     	return Allergy.getSeverityOfReactionDesc(this.getSeverityOfReaction());
     }
-    //TODO: NEEDS I18N
-    public static String getSeverityOfReactionDesc(String severityCode){
-        if ("1".equals(severityCode)) return("Mild");
-        if ("2".equals(severityCode)) return("Moderate");
-        if ("3".equals(severityCode)) return("Severe");
-        else return("Unknown "+severityCode);
-    }
+
+	/**
+	 * Expression language tags (${}) can't directly access static methods, and we'd like
+	 * to be able to expose the mappings to our JSPs.
+	 * @param severityOfReaction severity code we want the textual description for
+	 * @return the textual description for the severity code, or Unknown if we can't map it
+	 */
+	public String getDescForSeverityValue(String severityOfReaction)
+	{
+		return Allergy.getSeverityOfReactionDesc(severityOfReaction);
+	}
+
+	//TODO: NEEDS I18N
+	public static String getSeverityOfReactionDesc(String severityCode)
+	{
+		if (SEVERITY_CODE_MILD.equals(severityCode))
+		{
+			return("Mild");
+		}
+		if (SEVERITY_CODE_MODERATE.equals(severityCode))
+		{
+			return("Moderate");
+		}
+		if (SEVERITY_CODE_SEVERE.equals(severityCode))
+		{
+			return("Severe");
+		}
+
+		return("Unknown "+severityCode);
+	}
 
     public String getAuditString() {
         return getAllergyDisp();

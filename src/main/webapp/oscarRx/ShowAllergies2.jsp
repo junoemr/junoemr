@@ -251,9 +251,12 @@
 				var params = form.serializeArray();
 				var json = {};
 				$.each(params, function() {
-					json[this.name] = this.value || '';
+					if (!(this.name === "iNKDA" || this.name === "hasDrugAllergy" || this.name === "submit"))
+					{
+						json[this.name] = this.value || '';
+					}
 				});
-				json.submit = 'Search';
+
 				// servlet looks for "jsonData" request parameter
 				var param = "jsonData=" + JSON.stringify(json);
 
@@ -349,9 +352,21 @@
 				document.getElementById("typeGenericName").checked = true;
 				document.getElementById("inputGenericName").checked = true;
 				document.getElementById("typeIngredient").checked = true;
-				document.getElementById("inputIngredient").value = true;
+				document.getElementById("inputIngredient").checked = true;
 				document.getElementById("typeDrugClass").checked = true;
-				document.getElementById("inputDrugClass").value = true;
+				document.getElementById("inputDrugClass").checked = true;
+			}
+
+			function toggleInput(input, parentBox)
+			{
+				if (parentBox.checked === true)
+				{
+					document.getElementById(input).value = "true";
+				}
+				else
+				{
+					document.getElementById(input).value = "false";
+				}
 			}
 
 			function typeClear()
@@ -361,48 +376,53 @@
 				document.getElementById("typeGenericName").checked = false;
 				document.getElementById("inputGenericName").checked = false;
 				document.getElementById("typeIngredient").checked = false;
-				document.getElementById("inputIngredient").value = false;
+				document.getElementById("inputIngredient").checked = false;
 				document.getElementById("typeDrugClass").checked = false;
-				document.getElementById("inputDrugClass").value = false;
+				document.getElementById("inputDrugClass").checked = false;
 			}
 
-
-			function addCustomAllergy(){
+			function addCustomAllergy()
+			{
 				$(".highLightButton").removeClass("highLightButton");
 				var name = document.getElementById('searchString').value;
 				if(!isEmpty()){
 					name = name.toUpperCase();
-					confirm("Adding custom allergy: " + name);
-					sendSearchRequest("${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do",
-						"ID=0&type=0&name="+name,"#addAllergyDialogue");
-					$("input[value='Custom Allergy']").addClass("highLightButton");
+					if (confirm("Adding custom allergy: " + name))
+					{
+						var searchPath = "${pageContext.servletContext.contextPath}/oscarRx/addReaction2.do";
+						var param = "ID=0&type=0&name=" + name;
+						sendSearchRequest(searchPath, param, "#addAllergyDialogue");
+						$("input[value='Custom Allergy']").addClass("highLightButton");
+					}
 				}
 			}
 
-			function addPenicillinAllergy(){
+			function addPenicillinAllergy()
+			{
 				$(".highLightButton").removeClass("highLightButton");
 				var param = "ID=44452&name=PENICILLINS&type=10";
-
-				sendSearchRequest("${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do",
-					param, "#addAllergyDialogue");
+				var searchPath = "${pageContext.servletContext.contextPath}/oscarRx/addReaction2.do";
+				sendSearchRequest(searchPath, param, "#addAllergyDialogue");
 				$("input[value='Penicillin']").addClass("highLightButton");
 			}
 
-			function addSulfonamideAllergy(){
+			function addSulfonamideAllergy()
+			{
 				$(".highLightButton").removeClass("highLightButton");
 				var param = "ID=44159&name=SULFONAMIDES&type=10";
-
-				sendSearchRequest("${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do?",
-					param, "#addAllergyDialogue");
+				var searchPath = "${pageContext.servletContext.contextPath}/oscarRx/addReaction2.do";
+				sendSearchRequest(searchPath, param, "#addAllergyDialogue");
 				$("input[value='Sulfa']").addClass("highLightButton");
 			}
 
 			var paramNKDA = "name=No Known Drug Allergies";
 
-			function addCustomNKDA(){
+			function addCustomNKDA()
+			{
 				$(".highLightButton").removeClass("highLightButton");
-				sendSearchRequest("${ pageContext.servletContext.contextPath }/oscarRx/addReaction2.do",
-					"ID=0&type=0&"+paramNKDA, "#addAllergyDialogue");
+				var param = "ID=0&type=0&" + paramNKDA;
+				var searchPath = "${pageContext.servletContext.contextPath}/oscarRx/addReaction2.do";
+				sendSearchRequest(searchPath, param, "#addAllergyDialogue");
 				$("input[value='NKDA']").addClass("highLightButton");
 			}
 		</script>
@@ -546,7 +566,7 @@
 								<tr>
 									<td class="Step1Text">
 										<table class='allergy_legend' cellspacing='0'>
-											<tr>
+											<tr class="">
 												<td>
 													<b>Legend:</b>
 												</td>
@@ -577,6 +597,7 @@
 												<td><b>Entry Date</b></td>
 												<td><b>Description</b></td>
 												<td><b>Allergy Type</b></td>
+												<td><b>Type Code</b></td>
 												<td><b>Severity</b></td>
 												<td><b>Onset of Reaction</b></td>
 												<td><b>Reaction</b></td>
@@ -656,7 +677,7 @@
 													else
 													{
 														labelStatus = "Active";
-														labelAction = "Deactivate";
+														labelAction = "Inactivate";
 														actionPath = "delete";
 														trColour = "#E0E0E0";
 														sevColour = ColourCodesArray[intSOR];
@@ -676,13 +697,14 @@
 												<td><%=allergy.getTypeCode() == 0 ? "<i>&lt;Not Set&gt;</i>" : ""%><%=allergy.getTypeCode() == 0 ? "*" : "" %></td>
 												<td bgcolor="<%=sevColour%>"><%=allergy.getSeverityOfReactionDesc() %></td>
 												<td><%=allergy.getOnSetOfReactionDesc() %></td>
+												<td><%=allergy.getReaction() == null ? "" : allergy.getReaction()%></td>
 												<td><%=startDate == null ? "" : startDate %></td>
 												<td><%=allergy.getLifeStageDesc() %></td>
 												<td><%=allergy.getAgeOfOnset() == null ? "" : allergy.getAgeOfOnset()%></td>
 												<%
 													CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean("caseManagementManager");
 													@SuppressWarnings("unchecked")
-													// Only other place where we're using CaseManagementNoteLink, is this really necessary
+
 													int numAnnotations = (cmm.getLinkByTableId(CaseManagementNoteLink.ALLERGIES, Long.valueOf(allergy.getAllergyId()))).size();
 												%>
 												<td>
@@ -706,6 +728,7 @@
 													</a>
 													<%	} %>
 												</td>
+
 												<td>
 													<%
 														if (!allergy.isIntegratorResult() && securityManager.hasDeleteAccess("_allergies", roleName$))
@@ -713,10 +736,12 @@
 															if (intArchived == 0)
 															{
 													%>
-													<a href="#" class="deleteAllergyLink"
+													<a href="#"
+													   class="deleteAllergyLink"
 													   id="deleteAllergy:<%=labelAction%>_ID=<%=allergy.getAllergyId() %>&demographicNo=<%=demoNo %>&action=<%=actionPath %>">
-														<%=labelAction%>
-													</a>
+														<%=labelAction%></a>
+
+													|
 													<%		} %>
 													<a href="#" class="modifyAllergyLink"
 													   id="modifyAllergy:<%= labelAction %>_ID=<%=allergy.getDrugrefId() %>&name=<%=allergy.getDescription() %>&type=<%=allergy.getTypeCode() %>&allergyToArchive=<%=allergy.getId() %>" >
@@ -743,11 +768,9 @@
 
 					<tr id="addAllergyInterface">
 						<td>
-							<!--
-							This looks like a form but it really shouldn't be one
-							None of its inputs actually want to submit the form
-							  -->
-							<form action="/oscarRx/searchAllergy2.do" id="searchAllergy2" onsubmit="triggerSearchRequest();">
+							<form action="/oscarRx/searchAllergy2.do"
+								  id="searchAllergy2"
+								  onsubmit="triggerSearchRequest();">
 								<input type="hidden" name="iNKDA" value="<%=iNKDA%>"/>
 								<input type="hidden" name="hasDrugAllergy" value="<%=hasDrugAllergy%>"/>
 								<!-- Duplicated fields so the jquery form submission is more idiomatic -->
@@ -780,13 +803,13 @@
 								<tr id="allergySearchCriteriaRow">
 									<td>
 										<div id="allergySearchSelectors">
-											<input type="checkbox" name="typeDrugClass" id="typeDrugClass" ${ typeDrugClass ? 'checked' : '' } />
+											<input type="checkbox" name="typeDrugClass" id="typeDrugClass" onchange="toggleInput('inputDrugClass', this)"/>
 											<label for="typeDrugClass" >Drug Classes</label>
-											<input type="checkbox" name="typeIngredient" id="typeIngredient" ${ typeIngredient ? 'checked' : '' } />
+											<input type="checkbox" name="typeIngredient" id="typeIngredient" onchange="toggleInput('inputIngredient', this)"/>
 											<label for="typeIngredient" >Ingredients</label>
-											<input type="checkbox" name="typeGenericName" id="typeGenericName" ${ typeGenericName ? 'checked' : '' } />
+											<input type="checkbox" name="typeGenericName" id="typeGenericName" onchange="toggleInput('inputGenericName', this)"/>
 											<label for="typeGenericName" >Generic Names</label>
-											<input type="checkbox" name="typeBrandName" id="typeBrandName" ${ typeBrandName ? 'checked' : '' } />
+											<input type="checkbox" name="typeBrandName" id="typeBrandName" onchange="toggleInput('inputBrandName', this)"/>
 											<label for="typeBrandName" >Brand Names</label>
 											<input type="checkbox" name="typeSelectAll" id="typeSelectAll" />
 											<label for="typeSelectAll" >All</label>

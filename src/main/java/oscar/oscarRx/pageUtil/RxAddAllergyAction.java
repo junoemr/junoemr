@@ -65,6 +65,13 @@ public final class RxAddAllergyAction extends Action
 		String onSetOfReaction = request.getParameter("onSetOfReaction");
 		String lifeStage = request.getParameter("lifeStage");
 
+		String allergyToArchive = request.getParameter("allergyToArchive");
+		int oldAllergyId = 0;
+		if (allergyToArchive != null && !allergyToArchive.isEmpty())
+		{
+			oldAllergyId = Integer.parseInt(allergyToArchive);
+		}
+
 		RxPatientData.Patient patient = (RxPatientData.Patient) request.getSession().getAttribute("Patient");
 
 		Allergy allergy = new Allergy();
@@ -109,10 +116,28 @@ public final class RxAddAllergyAction extends Action
 		allergy.setDemographicNo(patient.getDemographicNo());
 		allergy.setArchived(false);
 
-		Allergy allerg = patient.addAllergy(oscar.oscarRx.util.RxUtil.Today(), allergy);
+		allergy = patient.addAllergy(oscar.oscarRx.util.RxUtil.Today(), allergy);
 
 		String ip = request.getRemoteAddr();
-		LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACTION_ADD, LogConst.CON_ALLERGY, "" + allerg.getAllergyId(), ip, "" + patient.getDemographicNo(), allergy.getAuditString());
+		LogAction.addLog((String)request.getSession().getAttribute("user"),
+				LogConst.ACTION_ADD,
+				LogConst.CON_ALLERGY,
+				"" + allergy.getAllergyId(),
+				ip,
+				"" + patient.getDemographicNo(),
+				allergy.getAuditString());
+
+		if (oldAllergyId > 0)
+		{
+			patient.deleteAllergy(oldAllergyId);
+			LogAction.addLog((String)request.getSession().getAttribute("user"),
+					LogConst.ACTION_DELETE,
+					LogConst.CON_ALLERGY,
+					"" + oldAllergyId,
+					ip,
+					"" + patient.getDemographicNo(),
+					patient.getAllergy(oldAllergyId).getAuditString());
+		}
 
 		return (mapping.findForward("success"));
 	}

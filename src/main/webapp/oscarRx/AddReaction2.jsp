@@ -27,6 +27,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="oscar.util.ConversionUtils" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
 	String roleName2$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -60,10 +61,17 @@
 		</logic:present>
 
 		<%
-			oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
+			oscar.oscarRx.pageUtil.RxSessionBean sessionBean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
 			String name = (String) request.getAttribute("name");
 			String type = (String) request.getAttribute("type");
 			String allergyId = (String) request.getAttribute("allergyId");
+
+			Allergy allergyToArchive = (Allergy)request.getAttribute("allergyToArchive");
+			if (allergyToArchive == null)
+			{
+				allergyToArchive = new Allergy();
+			}
+			request.setAttribute("allergy", allergyToArchive);
 		%>
 
 		<link rel="stylesheet" type="text/css" href="styles.css">
@@ -98,8 +106,8 @@
 						</td>
 					</tr>
 					<tr>
-						<td id="addAllergyDialogue"><html:form action="/oscarRx/addAllergy2"
-															   focus="reactionDescription">
+						<td id="addAllergyDialogue">
+							<html:form action="/oscarRx/addAllergy2" focus="reactionDescription">
 							<table>
 								<tr id="addReactionSubheading">
 									<td>
@@ -107,73 +115,88 @@
 									</td>
 								</tr>
 								<tr valign="center">
-
 									<td>
 										<span class="label">Comment: </span>
-										<html:textarea
-												property="reactionDescription" cols="40" rows="3" /> <html:hidden
-											property="ID" value="<%=allergyId%>" /> <html:hidden
-											property="name" value="<%=name%>" /> <html:hidden
-											property="type" value="<%=type%>" /></td>
+										<html:textarea property="reactionDescription" cols="40" rows="3" value="${allergy.description}" />
+										<html:hidden property="ID" value="<%=allergyId%>" />
+										<html:hidden property="name" value="<%=name%>" />
+										<html:hidden property="type" value="<%=type%>" />
+										<html:hidden property="allergyToArchive" value="${allergy.id}" />
+									</td>
 								</tr>
 
 								<tr valign="center">
-									<td ><span class="label">Start Date:</span> <html:text
-											property="startDate" size="10" maxlength="10"/>
+									<td ><span class="label">Start Date:</span>
+										<html:text property="startDate" size="10" maxlength="10"
+												   value="<%=ConversionUtils.toDateString(allergyToArchive.getStartDate(), ConversionUtils.DEFAULT_DATE_PATTERN)%>">
+										</html:text>
 										(yyyy-mm-dd OR yyyy-mm OR yyyy)</td>
-
 								</tr>
 
 								<tr valign="center">
-									<td><span class="label">Age Of Onset:</span> <html:text
-											property="ageOfOnset" size="4" maxlength="4" /></td>
-
+									<td>
+										<span class="label">Age Of Onset:</span>
+										<html:text property="ageOfOnset" size="4" maxlength="4" value="${allergy.ageOfOnset}" />
+									</td>
 								</tr>
 
 
 								<tr valign="center">
 									<td> <span class="label"><bean:message key="oscarEncounter.lifestage.title"/>:</span>
 										<html:select property="lifeStage">
-											<html:option value=""><bean:message key="oscarEncounter.lifestage.opt.notset"/></html:option>
-											<html:option value="N"><bean:message key="oscarEncounter.lifestage.opt.newborn"/></html:option>
-											<html:option value="I"><bean:message key="oscarEncounter.lifestage.opt.infant"/></html:option>
-											<html:option value="C"><bean:message key="oscarEncounter.lifestage.opt.child"/></html:option>
-											<html:option value="T"><bean:message key="oscarEncounter.lifestage.opt.adolescent"/></html:option>
-											<html:option value="A"><bean:message key="oscarEncounter.lifestage.opt.adult"/></html:option>
+											<c:if test="${allergy != null}">
+												<html:option value="${allergy.lifeStage}">${allergy.lifeStageDesc}</html:option>
+											</c:if>
+											<c:forTokens items=",N,I,C,T,A" delims="," var="item">
+												<c:if test="${allergy.lifeStage != item}">
+													<html:option value="${item}">
+														<bean:message key="${allergy.getDescForLifeStageCode(item)}" />
+													</html:option>
+												</c:if>
+											</c:forTokens>
 										</html:select>
 									</td>
 								</tr>
 								<tr valign="center">
-
-									<td ><span class="label">Severity Of Reaction:</span> <html:select
-											property="severityOfReaction">
-										<html:option value="1">Mild</html:option>
-										<html:option value="2">Moderate</html:option>
-										<html:option value="3">Severe</html:option>
-										<html:option value="4">Unknown</html:option>
-									</html:select></td>
-
+									<td>
+										<span class="label">Severity Of Reaction:</span>
+										<html:select property="severityOfReaction">
+											<c:if test="${allergy.severityOfReaction != null}">
+												<html:option value="${allergy.severityOfReaction}">${allergy.severityOfReactionDesc}</html:option>
+											</c:if>
+											<c:forTokens items="4,1,2,3" delims="," var="item">
+												<c:if test="${allergy.severityOfReaction != item}">
+													<html:option value="${item}">${allergy.getDescForSeverityValue(item)}</html:option>
+												</c:if>
+											</c:forTokens>
+										</html:select>
+									</td>
 								</tr>
 
 								<tr valign="center">
-
-									<td ><span class="label">Onset Of Reaction:</span> <html:select
-											property="onSetOfReaction">
-										<html:option value="1">Immediate</html:option>
-										<html:option value="2">Gradual</html:option>
-										<html:option value="3">Slow</html:option>
-										<html:option value="4">Unknown</html:option>
-									</html:select></td>
-
+									<td>
+										<span class="label">Onset Of Reaction:</span>
+										<html:select property="onSetOfReaction">
+											<c:if test="${allergy.onsetOfReaction != null}">
+												<html:option value="${allergy.onsetOfReaction}">${allergy.onSetOfReactionDesc}</html:option>
+											</c:if>
+											<c:forTokens items="4,1,2,3" delims="," var="item">
+												<c:if test="${allergy.onsetOfReaction != item}">
+													<html:option value="${item}">${allergy.getDescForOnsetCode(item)}</html:option>
+												</c:if>
+											</c:forTokens>
+										</html:select>
+									</td>
 								</tr>
 
 
 								<tr>
-									<td ><html:submit property="submit"
-													  value="Add Allergy" styleClass="ControlPushButton" /> <input
-											type=button class="ControlPushButton" id="cancelAddReactionButton"
-											onclick="window.location='ShowAllergies2.jsp?demographicNo=<%=bean.getDemographicNo() %>'"
-											value="Cancel" /></td>
+									<td >
+										<html:submit property="submit" value="Add Allergy" styleClass="ControlPushButton" />
+										<input type=button class="ControlPushButton" id="cancelAddReactionButton"
+											onclick="window.location='ShowAllergies2.jsp?demographicNo=<%=sessionBean.getDemographicNo() %>'"
+											value="Cancel" />
+									</td>
 								</tr>
 							</table>
 

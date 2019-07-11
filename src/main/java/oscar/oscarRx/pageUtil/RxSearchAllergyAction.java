@@ -61,7 +61,7 @@ public final class RxSearchAllergyAction extends Action {
 
         LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
         String providerNo = loggedInInfo.getLoggedInProviderNo();
-        securityInfoManager.requireOnePrivilege(providerNo, securityInfoManager.READ, null, "_allergy");
+        securityInfoManager.requireOnePrivilege(providerNo, SecurityInfoManager.READ, null, "_allergy");
 
         // Setup variables
         // execute search
@@ -77,8 +77,8 @@ public final class RxSearchAllergyAction extends Action {
         // Search a drug like another one
         RxDrugRef drugRef = new RxDrugRef();
 
-        java.util.Vector vec;
-        java.util.Vector<String> catVec = new java.util.Vector<>();
+        Vector vec;
+        Vector<String> catVec = new Vector<>();
 
         /**
          * <html:checkbox property="type4" /> Drug Classes   9 |  4 | ther_class
@@ -122,7 +122,7 @@ public final class RxSearchAllergyAction extends Action {
         boolean itemsFound = true;
 
         String wildcardRightOnly = OscarProperties.getInstance().getProperty("allergies.search_right_wildcard_only", "false");
-        vec = drugRef.list_search_element_select_categories(frm.getSearchString(),catVec,Boolean.valueOf(wildcardRightOnly));
+        vec = drugRef.list_search_element_select_categories(frm.getSearchString(), catVec, Boolean.valueOf(wildcardRightOnly));
 
         //  'id':'0','category':'','name'
         Allergy[] allergies = new Allergy[vec == null ? 0:vec.size()];
@@ -130,10 +130,10 @@ public final class RxSearchAllergyAction extends Action {
         String includeClassesStr = OscarProperties.getInstance().getProperty("allergies.include_ahfs_class_in_results", "true");
         boolean includeClasses = Boolean.valueOf(includeClassesStr);
 
-        TreeMap<String,Allergy> flatList = new TreeMap<>();
+        TreeMap<String, Allergy> flatList = new TreeMap<>();
 
         //we want to categorize the search results.
-        Map<Integer,List<Allergy>> allergyResults = new HashMap<>();
+        Map<Integer, List<Allergy>> allergyResults = new HashMap<>();
         allergyResults.put(RxSearchAllergyForm.ANATOMICAL, new ArrayList<>());
         allergyResults.put(RxSearchAllergyForm.CHEMICAL, new ArrayList<>());
         allergyResults.put(RxSearchAllergyForm.THERAPEUTIC, new ArrayList<>());
@@ -149,9 +149,13 @@ public final class RxSearchAllergyAction extends Action {
         {
             for (int i = 0; i < vec.size(); i++)
             {
-                java.util.Hashtable hash = (java.util.Hashtable) vec.get(i);
-
+                Hashtable hash = (Hashtable) vec.get(i);
                 String name = (String)hash.get("name");
+                // If the search result for that category turns up nothing, this is blank
+                if ("".equals(hash.get("category")))
+                {
+                    continue;
+                }
                 int typeCode = (Integer)hash.get("category");
                 String id = String.valueOf(hash.get("id"));
 
@@ -241,6 +245,6 @@ public final class RxSearchAllergyAction extends Action {
             request.setAttribute("flatMap", flatList);
         }
 
-        return (mapping.findForward("success"));
+        return mapping.findForward("success");
     }
 }

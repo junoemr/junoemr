@@ -79,10 +79,5 @@
 				</security:oscarSec>
 			</c:if>
 		</td>
-		<td id="topLinkRightColumn">
-	 		<span class="Help">
-                 <oscar:help keywords="2.2.4" key="app.top1"/>
-             </span>
-		</td>
 	</tr>
 </table>

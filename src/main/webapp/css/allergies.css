@@ -88,12 +88,12 @@ td.Step1Text {
 table.allergy_legend td {
 	padding-right:6px;
 	font-size: small;
+	background-color: #DCDCDC;
 }
 
 table.colour_codes {
 	width:10px;
 	height:10px;
-	border:1em solid #999999;
 }
 
 td#allergiesColumnOneRowTwo p.PropSheetLevel1CurrentItemRed {
