@@ -150,7 +150,7 @@
 											<c:forTokens items=",N,I,C,T,A" delims="," var="item">
 												<c:if test="${allergy.lifeStage != item}">
 													<html:option value="${item}">
-														<bean:message key="${allergy.getDescForLifeStageCode(item)}" />
+														${allergy.getDescForLifeStageCode(item, pageContext.response.locale)}
 													</html:option>
 												</c:if>
 											</c:forTokens>

@@ -39,6 +39,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import java.util.Date;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 @Entity
 @Table(name = "allergies")
@@ -49,10 +51,39 @@ public class Allergy extends AbstractModel<Integer>
 	public static final String SEVERITY_CODE_SEVERE="3";
 	public static final String SEVERITY_CODE_UNKNOWN="4";
 
+	public static final String SEVERITY_DESC_MILD = "Mild";
+	public static final String SEVERITY_DESC_MODERATE = "Moderate";
+	public static final String SEVERITY_DESC_SEVERE = "Severe";
+	public static final String SEVERITY_DESC_UNKNOWN = "Unknown";
+
 	public static final String ONSET_CODE_IMMEDIATE="1";
 	public static final String ONSET_CODE_GRADUAL="2";
 	public static final String ONSET_CODE_SLOW="3";
 	public static final String ONSET_CODE_UNKNOWN="4";
+
+	public static final String ONSET_DESC_IMMEDIATE = "Immediate";
+	public static final String ONSET_DESC_GRADUAL = "Gradual";
+	public static final String ONSET_DESC_SLOW = "Slow";
+	public static final String ONSET_DESC_UNKNOWN = "Unknown";
+
+	public static final String LIFESTAGE_CODE_NEWBORN ="N";
+	public static final String LIFESTAGE_CODE_INFANT ="I";
+	public static final String LIFESTAGE_CODE_CHILD ="C";
+	public static final String LIFESTAGE_CODE_ADOLESCENT ="T";
+	public static final String LIFESTAGE_CODE_ADULT ="A";
+
+	public static final String LIFESTAGE_DESC_NEWBORN = "Newborn";
+	public static final String LIFESTAGE_DESC_INFANT = "Infant";
+	public static final String LIFESTAGE_DESC_CHILD = "Child";
+	public static final String LIFESTAGE_DESC_ADOLESCENT = "Adolescent";
+	public static final String LIFESTAGE_DESC_ADULT = "Adult";
+
+	public static final String TYPECODE_DESC_GENERIC = "Generic Name";
+	public static final String TYPECODE_DESC_COMPOUND = "Compound";
+	public static final String TYPECODE_DESC_BRAND = "Brand Name";
+	public static final String TYPECODE_DESC_ATC = "ATC Class";
+	public static final String TYPECODE_DESC_AFHS = "AHFS Class";
+	public static final String TYPECODE_DESC_INGREDIENT = "Ingredient";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -328,23 +359,33 @@ public class Allergy extends AbstractModel<Integer>
            desc = desc.substring(0, 8) + "..." ;
         }
         return desc;
-     }
+	}
 
-    public String getLifeStageDesc(){
-    	String s = getLifeStage();
-    	if("N".equals(s)){
-    		return "Newborn"; //"oscarEncounter.lifestage.opt.newborn"; //  = Newborn: Birth to 28 days
-    	}else if ("I".equals(s)){
-    		return "Infant";  // "oscarEncounter.lifestage.opt.infant"; // = Infant: 29 days to 2 years
-    	}else if ("C".equals(s)){
-    		return "Child"; //"oscarEncounter.lifestage.opt.child"; // = Child: 2 years to 15 years
-    	}else if ("T".equals(s)){
-    		return "Adolescent"; //  "oscarEncounter.lifestage.opt.adolescent"; // = Adolescent: 16 to 17
-    	}else if ("A".equals(s)){
-    		return "Adult";  //"oscarEncounter.lifestage.opt.adult"; // = Adult: 18 years
-    	}
-    		return "Not Set"; //"oscarEncounter.lifestage.opt.notset"; // = Not Set
-    }
+	public String getLifeStageDesc()
+	{
+		String s = getLifeStage();
+		if(LIFESTAGE_CODE_NEWBORN.equals(s))
+		{
+			return LIFESTAGE_DESC_NEWBORN;
+		}
+		else if (LIFESTAGE_CODE_INFANT.equals(s))
+		{
+			return LIFESTAGE_DESC_INFANT;
+		}
+		else if (LIFESTAGE_CODE_CHILD.equals(s))
+		{
+			return LIFESTAGE_DESC_CHILD;
+		}
+		else if (LIFESTAGE_CODE_ADOLESCENT.equals(s))
+		{
+			return LIFESTAGE_DESC_ADOLESCENT;
+		}
+		else if (LIFESTAGE_CODE_ADULT.equals(s))
+		{
+			return LIFESTAGE_DESC_ADULT;
+		}
+		return "Not Set";
+	}
 
 	/**
 	 * Expression language tags (${}) can't directly access static methods, and we'd like
@@ -352,22 +393,24 @@ public class Allergy extends AbstractModel<Integer>
 	 * @param lifeStage code for the life stage of the allergy
 	 * @return oscar resource property corresponding to the code given
 	 */
-	public String getDescForLifeStageCode(String lifeStage)
+	public String getDescForLifeStageCode(String lifeStage, Locale locale)
 	{
+		ResourceBundle resourceBundle = ResourceBundle.getBundle("oscarResources", locale);
+
 		switch(lifeStage)
 		{
-			case "N":
-				return "oscarEncounter.lifestage.opt.newborn";
-			case "I":
-				return "oscarEncounter.lifestage.opt.infant";
-			case "C":
-				return "oscarEncounter.lifestage.opt.child";
-			case "T":
-				return "oscarEncounter.lifestage.opt.adolescent";
-			case "A":
-				return "oscarEncounter.lifestage.opt.adult";
+			case LIFESTAGE_CODE_NEWBORN:
+				return resourceBundle.getString("oscarEncounter.lifestage.opt.newborn");
+			case LIFESTAGE_CODE_INFANT:
+				return resourceBundle.getString("oscarEncounter.lifestage.opt.infant");
+			case LIFESTAGE_CODE_CHILD:
+				return resourceBundle.getString("oscarEncounter.lifestage.opt.child");
+			case LIFESTAGE_CODE_ADOLESCENT:
+				return resourceBundle.getString("oscarEncounter.lifestage.opt.adolescent");
+			case LIFESTAGE_CODE_ADULT:
+				return resourceBundle.getString("oscarEncounter.lifestage.opt.adult");
 			default:
-				return "oscarEncounter.lifestage.opt.notset";
+				return resourceBundle.getString("oscarEncounter.lifestage.opt.notset");
 		}
 	}
 
@@ -390,24 +433,33 @@ public class Allergy extends AbstractModel<Integer>
 	{
 		if (ONSET_CODE_IMMEDIATE.equals(onsetCode))
 		{
-			return("Immediate");
+			return ONSET_DESC_IMMEDIATE;
 		}
 		if (ONSET_CODE_GRADUAL.equals(onsetCode))
 		{
-			return("Gradual");
+			return ONSET_DESC_GRADUAL;
 		}
 		if (ONSET_CODE_SLOW.equals(onsetCode))
 		{
-			return("Slow");
+			return ONSET_DESC_SLOW;
 		}
-		return("Unknown " + onsetCode);
+		return ONSET_DESC_UNKNOWN + " " + onsetCode;
 	 }
 
     public String getTypeDesc() {
     	return Allergy.getTypeDesc(this.getTypeCode());
     }
 
-    public static String getTypeDesc(int typeCode) {
+	/*
+	 *|  8 | anatomical class
+	 *|  9 | chemical class
+	 *| 10 | therapeutic class
+	 *| 11 | generic
+	 *| 12 | composite generic
+	 *| 13 | branded product
+	 *| 14 | ingredient
+	 */
+	public static String getTypeDesc(int typeCode) {
         String s;
         /** 6 |  1 | generic
             7 |  2 | compound
@@ -417,32 +469,23 @@ public class Allergy extends AbstractModel<Integer>
            13 |  6 | ingredient
         **/
         switch(typeCode) {
-            /*
-            *|  8 | anatomical class
-            *|  9 | chemical class
-            *| 10 | therapeutic class
-            *| 11 | generic
-            *| 12 | composite generic
-            *| 13 | branded product
-            *| 14 | ingredient
-            */
             case 11:
-                s = "Generic Name";
+                s = TYPECODE_DESC_GENERIC;
                 break;
             case 12:
-                s = "Compound";
+                s = TYPECODE_DESC_COMPOUND;
                 break;
             case 13:
-                s = "Brand Name";
+                s = TYPECODE_DESC_BRAND;
                 break;
             case 8:
-                s = "ATC Class";
+                s = TYPECODE_DESC_ATC;
                 break;
             case 10:
-                s = "AHFS Class";
+                s = TYPECODE_DESC_AFHS;
                 break;
             case 14:
-                s = "Ingredient";
+                s = TYPECODE_DESC_INGREDIENT;
                 break;
             default:
                 s = "";
@@ -470,18 +513,18 @@ public class Allergy extends AbstractModel<Integer>
 	{
 		if (SEVERITY_CODE_MILD.equals(severityCode))
 		{
-			return("Mild");
+			return SEVERITY_DESC_MILD;
 		}
 		if (SEVERITY_CODE_MODERATE.equals(severityCode))
 		{
-			return("Moderate");
+			return SEVERITY_DESC_MODERATE;
 		}
 		if (SEVERITY_CODE_SEVERE.equals(severityCode))
 		{
-			return("Severe");
+			return SEVERITY_DESC_SEVERE;
 		}
 
-		return("Unknown "+severityCode);
+		return(SEVERITY_DESC_UNKNOWN + " " + severityCode);
 	}
 
     public String getAuditString() {
