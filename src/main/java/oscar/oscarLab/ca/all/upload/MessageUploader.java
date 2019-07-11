@@ -277,15 +277,14 @@ public final class MessageUploader {
 
 				for (i = 0; i < messageHandler.getOBRCount(); i++)
 				{
-					if (messageHandler.getOBXValueType(i, 0).equals("ED"))
+					for (int c =0; c < messageHandler.getOBXCount(i); c ++)
 					{
-						int obxCount = messageHandler.getOBXCount(i);
-						for (j = 0; j < obxCount; j++)
+						if (messageHandler.getOBXValueType(i, c).equals("ED"))
 						{
 							// Some embedded PDFs simply have the lab as-is, some have it split up like above
 							for (int k = 1; k <= referenceStrings.length; k++)
 							{
-								String embeddedPdf = messageHandler.getOBXResult(i, j, k);
+								String embeddedPdf = messageHandler.getOBXResult(i, c, k);
 								if (embeddedPdf.startsWith(pdfPrefix))
 								{
 									MiscUtils.getLogger().info("Found embedded PDF in lab upload, pulling it out");

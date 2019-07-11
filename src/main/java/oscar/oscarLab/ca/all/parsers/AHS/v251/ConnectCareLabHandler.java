@@ -73,4 +73,51 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 	{
 		return formatDateTime(get("/.ORDER_OBSERVATION/OBR-7"));
 	}
+
+	@Override
+	public boolean isSupportEmbeddedPdf()
+	{
+		return true;
+	}
+
+	/* ========================== OBX ========================== */
+
+	/**
+	 * get obx results. normal string result value or document id if OBX is a pdf.
+	 * @param i - obx rep
+	 * @param j - the obx segment
+	 * @return - normal result string or pdf document id.
+	 */
+	@Override
+	public String getOBXResult(int i, int j)
+	{
+		if (getOBXContentType(i, j) == OBX_CONTENT_TYPE.PDF)
+		{
+			return getOBXResult(i, j, 5);
+		}
+		else
+		{
+			return super.getOBXResult(i, j);
+		}
+	}
+
+	/**
+	 * check for obx content type
+	 * @param i - obr rep
+	 * @param j - obx rep
+	 * @return TEXT OR PDF
+	 */
+	@Override
+	public OBX_CONTENT_TYPE getOBXContentType(int i, int j)
+	{
+		if(getOBXValueType(i, j).equals("ED"))
+		{
+			if (getOBXResult(i, j, 2).equals("PDF"))
+			{
+				return OBX_CONTENT_TYPE.PDF;
+			}
+		}
+
+		return OBX_CONTENT_TYPE.TEXT;
+	}
 }

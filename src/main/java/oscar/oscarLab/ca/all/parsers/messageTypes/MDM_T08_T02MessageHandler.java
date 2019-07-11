@@ -27,8 +27,6 @@ import ca.uhn.hl7v2.model.Message;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-
 /**
  * handler for both MDM T08 and MDM T02 Messages. This is because
  * they both share the same message format
