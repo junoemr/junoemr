@@ -40,7 +40,7 @@ import org.oscarehr.managers.AppointmentManager;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.ScheduleManager;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.schedule.dto.CalendarEvent;
+import org.oscarehr.schedule.dto.CalendarSchedule;
 import org.oscarehr.schedule.dto.ScheduleGroup;
 import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.schedule.service.Schedule;
@@ -48,17 +48,18 @@ import org.oscarehr.schedule.service.ScheduleGroupService;
 import org.oscarehr.schedule.service.ScheduleTemplateService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
 import org.oscarehr.ws.rest.conversion.AppointmentConverter;
 import org.oscarehr.ws.rest.conversion.AppointmentStatusConverter;
 import org.oscarehr.ws.rest.conversion.AppointmentTypeConverter;
 import org.oscarehr.ws.rest.conversion.LookupListItemConverter;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.SchedulingResponse;
 import org.oscarehr.ws.rest.to.model.AppointmentStatusTo1;
 import org.oscarehr.ws.rest.to.model.AppointmentTypeTo1;
 import org.oscarehr.ws.rest.to.model.LookupListItemTo1;
+import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -298,17 +299,79 @@ public class ScheduleService extends AbstractServiceImpl {
 		return RestSearchResponse.successResponseOnePage(appointmentStatusList);
 	}
 
+//	@GET
+//	@Path("/calendar/{providerId}/")
+//	@Produces("application/json")
+//	public RestSearchResponse<CalendarEvent> getCalendarEvents(
+//		@PathParam("providerId") Integer providerId,
+//		@QueryParam("startDate") String startDateString,
+//		@QueryParam("endDate") String endDateString,
+//		@QueryParam("startTime") String startTimeString,
+//		@QueryParam("endTime") String endTimeString,
+//		@QueryParam("site") String siteName,
+//		@QueryParam("slotDuration") Integer slotDurationInMin
+//	)
+//	{
+//		Message message = PhaseInterceptorChain.getCurrentMessage();
+//		HttpServletRequest request = (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
+//		HttpSession session = request.getSession(true);
+//
+//		// conversions will throw exception without valid date/time strings
+//		LocalDate startDate = ConversionUtils.dateStringToLocalDate(startDateString);
+//		LocalDate endDate = ConversionUtils.dateStringToLocalDate(endDateString);
+//		LocalTime startTime = ConversionUtils.toLocalTime(startTimeString);
+//		LocalTime endTime = ConversionUtils.toLocalTime(endTimeString);
+//
+//		List<CalendarEvent> calendarEvents =
+//			scheduleService.getCalendarEvents(session, providerId, startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
+//
+//		return RestSearchResponse.successResponseOnePage(calendarEvents);
+//	}
+
+//	@GET
+//	@Path("/calendar/{providerId}/")
+//	@Produces("application/json")
+//	public RestResponse<CalendarSchedule> getCalendarScheduleForProvider(
+//			@PathParam("providerId") Integer providerId,
+//			@QueryParam("startDate") String startDateString,
+//			@QueryParam("endDate") String endDateString,
+//			@QueryParam("startTime") String startTimeString,
+//			@QueryParam("endTime") String endTimeString,
+//			@QueryParam("site") String siteName,
+//			@QueryParam("slotDuration") Integer slotDurationInMin
+//	)
+//	{
+//		Message message = PhaseInterceptorChain.getCurrentMessage();
+//		HttpServletRequest request = (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
+//		HttpSession session = request.getSession(true);
+//
+//		// conversions will throw exception without valid date/time strings
+//		LocalDate startDate = ConversionUtils.dateStringToLocalDate(startDateString);
+//		LocalDate endDate = ConversionUtils.dateStringToLocalDate(endDateString);
+//		LocalTime startTime = ConversionUtils.toLocalTime(startTimeString);
+//		LocalTime endTime = ConversionUtils.toLocalTime(endTimeString);
+//
+//		CalendarSchedule calendarSchedule =
+//				scheduleService.getCalendarScheduleByProvider(session, providerId,
+//						startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
+//
+//		return RestResponse.successResponse(calendarSchedule);
+//	}
+
+
 	@GET
-	@Path("/calendar/{providerId}/")
+	@Path("/calendar")
 	@Produces("application/json")
-	public RestSearchResponse<CalendarEvent> getCalendarEvents(
-		@PathParam("providerId") Integer providerId,
-		@QueryParam("startDate") String startDateString,
-		@QueryParam("endDate") String endDateString,
-		@QueryParam("startTime") String startTimeString,
-		@QueryParam("endTime") String endTimeString,
-		@QueryParam("site") String siteName,
-		@QueryParam("slotDuration") Integer slotDurationInMin
+	public RestResponse<CalendarSchedule> getCalendarSchedule(
+			@QueryParam("scheduleId") String scheduleId,
+			@QueryParam("scheduleIdType") String scheduleIdType,
+			@QueryParam("viewAll") String viewAllStr,
+			@QueryParam("startDate") String startDateString,
+			@QueryParam("endDate") String endDateString,
+			@QueryParam("startTime") String startTimeString,
+			@QueryParam("endTime") String endTimeString,
+			@QueryParam("site") String siteName,
+			@QueryParam("slotDuration") Integer slotDurationInMin
 	)
 	{
 		Message message = PhaseInterceptorChain.getCurrentMessage();
@@ -320,10 +383,26 @@ public class ScheduleService extends AbstractServiceImpl {
 		LocalDate endDate = ConversionUtils.dateStringToLocalDate(endDateString);
 		LocalTime startTime = ConversionUtils.toLocalTime(startTimeString);
 		LocalTime endTime = ConversionUtils.toLocalTime(endTimeString);
+		Boolean viewAll = Boolean.parseBoolean(viewAllStr);
 
-		List<CalendarEvent> calendarEvents =
-			scheduleService.getCalendarEvents(session, providerId, startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
+		CalendarSchedule calendarSchedule;
+		if(ScheduleGroup.IdentifierType.valueOf(scheduleIdType).equals(ScheduleGroup.IdentifierType.GROUP))
+		{
+			calendarSchedule =
+					scheduleService.getCalendarScheduleByGroup(session, scheduleId, viewAll,
+							startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
+		}
+		else
+		{
+			//TODO change all providerNos to strings in this chain
+			calendarSchedule =
+					scheduleService.getCalendarScheduleByProvider(session, Integer.parseInt(scheduleId),
+							startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
+		}
 
-		return RestSearchResponse.successResponseOnePage(calendarEvents);
+
+
+
+		return RestResponse.successResponse(calendarSchedule);
 	}
 }
