@@ -35,7 +35,6 @@ import org.oscarehr.common.dao.MeasurementTypeDao;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.MeasurementType;
 import org.oscarehr.common.model.Validations;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarEncounter.oscarMeasurements.pageUtil.EctValidation;
 import oscar.util.ConversionUtils;
@@ -174,9 +173,11 @@ public class WriteNewMeasurements {
     }
 
     /**
-     * pre-validation to check which measurements don't have mappings
+     * Pre-validation to check which measurements don't have mappings
+     * These measurements can be saved in the database pending any further issues and
+     * will sit in the background until the user creates an appropriate measurement mapping.
      * @param measures vector of measurements to check against
-     * @return ActionMessage set containing warnings for all measurements without mappings
+     * @return list of measurement types that don't have mappings set on the system
      */
     static private List<String> checkMappedMeasurements(Vector measures)
     {

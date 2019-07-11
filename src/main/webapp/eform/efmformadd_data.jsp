@@ -66,7 +66,7 @@
       This eForm is attempting to record measurements to the patient's eChart that do not match your current measurement types:
     </p>
     <c:forEach var="unsavedMeasurement" items="${measurements_unsaved}">
-      - ${unsavedMeasurement}
+      <li>${unsavedMeasurement}</li>
     </c:forEach>
     <p>
       If you would like to adjust your measurement types, please consult
