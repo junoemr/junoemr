@@ -109,8 +109,9 @@ public class Appointment
 						LocalDateTime.of(details.getDate(), details.getStartTime());
 
 				// Add an extra minute because oscar stores the endtime minus a minute
+				// set the seconds to 0 to prevent overlap issues
 				LocalDateTime endDateTime =
-						LocalDateTime.of(details.getDate(), details.getEndTime()).plusMinutes(1);
+						LocalDateTime.of(details.getDate(), details.getEndTime()).plusMinutes(1).withSecond(0);
 
 
 				String rawStatus = details.getStatus();
