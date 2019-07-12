@@ -101,29 +101,49 @@
 
 					<div class="form-group pull-right">
 						<div class="form-group">
+							<div class="btn-group" role="group">
+								<button type="button"
+								        class="btn btn-sm"
+								        ng-class=" { 'btn-addon': scheduleController.getScheduleView() !== scheduleController.scheduleViewEnum.all,
+								                     'btn-primary': scheduleController.getScheduleView() === scheduleController.scheduleViewEnum.all }"
+								        viewName="all"
+								        ng-click="scheduleController.changeScheduleView(scheduleController.scheduleViewEnum.all)">
+									All
+								</button>
+								<button type="button"
+								        class="btn btn-sm"
+								        ng-class=" { 'btn-addon': scheduleController.getScheduleView() !== scheduleController.scheduleViewEnum.schedule,
+								                     'btn-primary': scheduleController.getScheduleView() === scheduleController.scheduleViewEnum.schedule }"
+								        viewName="schedule"
+								        ng-click="scheduleController.changeScheduleView(scheduleController.scheduleViewEnum.schedule)">
+									Schedule
+								</button>
+							</div>
+						</div>
+						<div class="form-group">
 							<div class="btn-group" role="group" ng-show="isAgendaView()">
 								<button type="button"
 								        class="btn btn-sm"
-								        ng-class=" { 'btn-addon': viewName() != scheduleController.scheduleViewEnum.agendaDay,
-								                     'btn-primary': viewName() == scheduleController.scheduleViewEnum.agendaDay }"
+								        ng-class=" { 'btn-addon': getCalendarViewName() !== scheduleController.calendarViewEnum.agendaDay,
+								                     'btn-primary': getCalendarViewName() === scheduleController.calendarViewEnum.agendaDay }"
 								        viewName="agendaDay"
-								        ng-click="changeView(scheduleController.scheduleViewEnum.agendaDay)">
+								        ng-click="changeCalendarView(scheduleController.calendarViewEnum.agendaDay)">
 									Day
 								</button>
 								<button type="button"
 								        class="btn btn-sm"
-								        ng-class=" { 'btn-addon': viewName() != scheduleController.scheduleViewEnum.agendaWeek,
-								                     'btn-primary': viewName() == scheduleController.scheduleViewEnum.agendaWeek }"
+								        ng-class=" { 'btn-addon': getCalendarViewName() !== scheduleController.calendarViewEnum.agendaWeek,
+								                     'btn-primary': getCalendarViewName() === scheduleController.calendarViewEnum.agendaWeek }"
 								        viewName="agendaWeek"
-								        ng-click="changeView(scheduleController.scheduleViewEnum.agendaWeek)">
+								        ng-click="changeCalendarView(scheduleController.calendarViewEnum.agendaWeek)">
 									Week
 								</button>
 								<button type="button"
 								        class="btn btn-sm"
-								        ng-class=" { 'btn-addon': viewName() != scheduleController.scheduleViewEnum.agendaMonth,
-								                     'btn-primary': viewName() == scheduleController.scheduleViewEnum.agendaMonth }"
+								        ng-class=" { 'btn-addon': getCalendarViewName() !== scheduleController.calendarViewEnum.agendaMonth,
+								                     'btn-primary': getCalendarViewName() === scheduleController.calendarViewEnum.agendaMonth }"
 								        viewName="month"
-								        ng-click="changeView(scheduleController.scheduleViewEnum.agendaMonth)">
+								        ng-click="changeCalendarView(scheduleController.calendarViewEnum.agendaMonth)">
 									Month
 								</button>
 							</div>

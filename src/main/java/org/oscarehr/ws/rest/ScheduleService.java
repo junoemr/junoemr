@@ -299,66 +299,6 @@ public class ScheduleService extends AbstractServiceImpl {
 		return RestSearchResponse.successResponseOnePage(appointmentStatusList);
 	}
 
-//	@GET
-//	@Path("/calendar/{providerId}/")
-//	@Produces("application/json")
-//	public RestSearchResponse<CalendarEvent> getCalendarEvents(
-//		@PathParam("providerId") Integer providerId,
-//		@QueryParam("startDate") String startDateString,
-//		@QueryParam("endDate") String endDateString,
-//		@QueryParam("startTime") String startTimeString,
-//		@QueryParam("endTime") String endTimeString,
-//		@QueryParam("site") String siteName,
-//		@QueryParam("slotDuration") Integer slotDurationInMin
-//	)
-//	{
-//		Message message = PhaseInterceptorChain.getCurrentMessage();
-//		HttpServletRequest request = (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
-//		HttpSession session = request.getSession(true);
-//
-//		// conversions will throw exception without valid date/time strings
-//		LocalDate startDate = ConversionUtils.dateStringToLocalDate(startDateString);
-//		LocalDate endDate = ConversionUtils.dateStringToLocalDate(endDateString);
-//		LocalTime startTime = ConversionUtils.toLocalTime(startTimeString);
-//		LocalTime endTime = ConversionUtils.toLocalTime(endTimeString);
-//
-//		List<CalendarEvent> calendarEvents =
-//			scheduleService.getCalendarEvents(session, providerId, startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
-//
-//		return RestSearchResponse.successResponseOnePage(calendarEvents);
-//	}
-
-//	@GET
-//	@Path("/calendar/{providerId}/")
-//	@Produces("application/json")
-//	public RestResponse<CalendarSchedule> getCalendarScheduleForProvider(
-//			@PathParam("providerId") Integer providerId,
-//			@QueryParam("startDate") String startDateString,
-//			@QueryParam("endDate") String endDateString,
-//			@QueryParam("startTime") String startTimeString,
-//			@QueryParam("endTime") String endTimeString,
-//			@QueryParam("site") String siteName,
-//			@QueryParam("slotDuration") Integer slotDurationInMin
-//	)
-//	{
-//		Message message = PhaseInterceptorChain.getCurrentMessage();
-//		HttpServletRequest request = (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
-//		HttpSession session = request.getSession(true);
-//
-//		// conversions will throw exception without valid date/time strings
-//		LocalDate startDate = ConversionUtils.dateStringToLocalDate(startDateString);
-//		LocalDate endDate = ConversionUtils.dateStringToLocalDate(endDateString);
-//		LocalTime startTime = ConversionUtils.toLocalTime(startTimeString);
-//		LocalTime endTime = ConversionUtils.toLocalTime(endTimeString);
-//
-//		CalendarSchedule calendarSchedule =
-//				scheduleService.getCalendarScheduleByProvider(session, providerId,
-//						startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
-//
-//		return RestResponse.successResponse(calendarSchedule);
-//	}
-
-
 	@GET
 	@Path("/calendar")
 	@Produces("application/json")
@@ -399,10 +339,6 @@ public class ScheduleService extends AbstractServiceImpl {
 					scheduleService.getCalendarScheduleByProvider(session, Integer.parseInt(scheduleId),
 							startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
 		}
-
-
-
-
 		return RestResponse.successResponse(calendarSchedule);
 	}
 }
