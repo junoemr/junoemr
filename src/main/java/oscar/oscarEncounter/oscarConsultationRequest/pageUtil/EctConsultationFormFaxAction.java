@@ -145,14 +145,12 @@ public class EctConsultationFormFaxAction extends Action
 				PdfReader pdfReader = new PdfReader(faxPdf);
 				pdfReader.close();
 				GenericFile fileToCopy = FileFactory.getExistingFile(faxPdf);
-				int numSending = 0;
 
 				for(String faxNo : recipients)
 				{
-					String tempName = String.format("CRF-%s%s.%s.%d.%d.pdf", faxClinicId, reqId, faxNo, System.currentTimeMillis(), numSending);
-					numSending++;
-
 					GenericFile fileToFax = FileFactory.copy(fileToCopy);
+					String tempName = String.format("CRF-%s%s.%s.%d.%s", faxClinicId, reqId, faxNo, System.currentTimeMillis(), fileToFax.getName());
+
 					fileToFax.rename(tempName);
 					FaxOutboxTransferOutbound transfer = outgoingFaxService.queueAndSendFax(providerNo, Integer.parseInt(demoNo), faxNo, FaxOutbound.FileType.CONSULTATION, fileToFax);
 					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR))

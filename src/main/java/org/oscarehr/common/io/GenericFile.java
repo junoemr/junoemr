@@ -24,6 +24,7 @@
 package org.oscarehr.common.io;
 
 import com.google.common.collect.Sets;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
@@ -37,6 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Random;
 import java.util.Set;
 
 public class GenericFile
@@ -288,5 +290,20 @@ public class GenericFile
 		LocalDateTime now = LocalDateTime.now();
 
 		return formatter.format(now) + getSanitizedFileName(originalName);
+	}
+
+	/**
+	 * Very similar to FileFactory.createTempFile() except this only creates the filename in question
+	 * instead of creating an entirely new file.
+	 * @param originalName name to add random sequence to
+	 * @return originalName + random sequence + file extension
+	 */
+	public static String getTempGeneratedFileName(String originalName)
+	{
+		Random random = new Random();
+		String baseName = FilenameUtils.removeExtension(originalName);
+		String extension = FilenameUtils.getExtension(originalName);
+		String newName = baseName + "-" + Math.abs(random.nextLong()) + "." + extension;
+		return getFormattedFileName(newName);
 	}
 }

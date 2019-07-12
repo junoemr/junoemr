@@ -93,7 +93,6 @@ public class SendFaxPDFAction extends DispatchAction {
 	        {
 		        MiscUtils.getLogger().debug("size = " + docNoArray.length);
 		        EDocUtil docData = new EDocUtil();
-		        int numSending = 0;
 		        for(String docNo : docNoArray)
 		        {
 			        String filename = docData.getDocumentName(docNo);
@@ -105,9 +104,8 @@ public class SendFaxPDFAction extends DispatchAction {
 					        GenericFile fileToCopy = FileFactory.getDocumentFile(docData.getDocumentName(docNo));
 					        GenericFile fileToFax = FileFactory.copy(fileToCopy);
 
-					        String faxFileName = "DOC-" + docNo + "-" + filename + "-" + faxNo + "-" + numSending + "." + System.currentTimeMillis();
-					        numSending++;
-					        fileToFax.rename(faxFileName + ".pdf");
+					        String faxFileName = "DOC-" + docNo + "-" + filename + "-" + faxNo;
+					        fileToFax.rename(GenericFile.getTempGeneratedFileName(faxFileName + ".pdf"));
 
 					        transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicId, faxNo, FaxOutbound.FileType.DOCUMENT, fileToFax);
 					        if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR))
@@ -176,7 +174,6 @@ public class SendFaxPDFAction extends DispatchAction {
 		ArrayList<Object> errorList = new ArrayList<>();
 		try
 		{
-			int numSending = 0;
 			Set<String> faxNoList = OutgoingFaxService.preProcessFaxNumbers(recipients);
 			for(String faxNo : faxNoList)
 			{
@@ -184,8 +181,7 @@ public class SendFaxPDFAction extends DispatchAction {
 				try
 				{
 					GenericFile fileToFax = FileFactory.getExistingFile(pdfPath);
-					fileToFax.rename(GenericFile.getFormattedFileName("-Form-" + formName + "-" + numSending + ".pdf"));
-					numSending++;
+					fileToFax.rename(GenericFile.getTempGeneratedFileName("-Form-" + formName + ".pdf"));
 					transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicNo, faxNo, FaxOutbound.FileType.FORM, fileToFax);
 					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
 					{
