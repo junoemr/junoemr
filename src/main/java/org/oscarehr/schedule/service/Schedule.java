@@ -570,7 +570,7 @@ public class Schedule
 		);
 	}
 
-	private List<CalendarEvent> getCalendarEvents(
+	public List<CalendarEvent> getCalendarEvents(
 		HttpSession session,
 		Integer providerId,
 		LocalDate startDate,
