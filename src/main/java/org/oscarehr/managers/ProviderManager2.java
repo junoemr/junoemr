@@ -246,6 +246,10 @@ public class ProviderManager2 {
 		{
 			settings.setSiteSelected(map.get(UserProperty.SCHEDULE_SITE).getValue());
 		}
+		if(map.get(UserProperty.SCHEDULE_VIEW) != null)
+		{
+			settings.setViewSelected(map.get(UserProperty.SCHEDULE_VIEW).getValue());
+		}
 
 		String patientNameLengthStr = map.get(UserProperty.PATIENT_NAME_LENGTH).getValue();
 		if(StringUtils.isNumeric(patientNameLengthStr))
@@ -726,6 +730,9 @@ public class ProviderManager2 {
 
 		p = getMappedOrNewProperty(map, UserProperty.SCHEDULE_SITE, providerNo);
 		p.setValue(settings.getSiteSelected());
+
+		p = getMappedOrNewProperty(map, UserProperty.SCHEDULE_VIEW, providerNo);
+		p.setValue(settings.getViewSelected());
 
 		p = getMappedOrNewProperty(map, UserProperty.PATIENT_NAME_LENGTH, providerNo);
 		Integer patientNameLength = settings.getPatientNameLength();

@@ -47,6 +47,7 @@ public class ProviderSettings {
 	private int period = 15;
 	private String groupNo;
 	private String siteSelected;
+	private String viewSelected;
 	private int appointmentScreenLinkNameDisplayLength=3;
 	private boolean hideOldEchartLinkInAppointment=false;
 	
@@ -240,6 +241,16 @@ public class ProviderSettings {
 	public void setSiteSelected(String siteSelected)
 	{
 		this.siteSelected = siteSelected;
+	}
+
+	public String getViewSelected()
+	{
+		return viewSelected;
+	}
+
+	public void setViewSelected(String viewSelected)
+	{
+		this.viewSelected = viewSelected;
 	}
 
 	public int getAppointmentScreenLinkNameDisplayLength() {

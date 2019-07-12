@@ -287,17 +287,24 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			if(controller.selectedScheduleView !== view)
 			{
-				controller.selectedScheduleView = view;
+				$scope.providerPreferenceApi.updateProviderSetting(securityService.getUser().providerNo, "schedule.view", view)
+					.then(
+						function success()
+						{
+							controller.selectedScheduleView = view;
 
-				if($scope.isResourceView())
-				{
-					$scope.refetchEvents();
-				}
-				else
-				{
-					$scope.uiConfig.calendar.weekends = !$scope.isScheduleView();
-					$scope.applyUiConfig($scope.uiConfig);
-				}
+							if($scope.isResourceView())
+							{
+								$scope.refetchEvents();
+							}
+							else
+							{
+								$scope.uiConfig.calendar.weekends = !$scope.isScheduleView();
+								$scope.applyUiConfig($scope.uiConfig);
+							}
+						}
+					);
+
 			}
 		};
 
@@ -372,6 +379,19 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 
 			return null;
+		};
+
+		controller.getSelectedScheduleView = function()
+		{
+			var preference = controller.providerSettings.viewSelected;
+
+			console.info(controller.scheduleViewEnum.schedule, preference, (preference === controller.scheduleViewEnum.schedule));
+
+			if (Juno.Common.Util.exists(preference) && (preference === controller.scheduleViewEnum.schedule))
+			{
+				return controller.scheduleViewEnum.schedule;
+			}
+			return controller.scheduleViewEnum.all;
 		};
 
 		controller.getSelectedSite = function()
@@ -1545,6 +1565,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			$scope.selectedSchedule = $scope.getSelectedSchedule($scope.scheduleOptions);
 			$scope.selectedSiteName = controller.getSelectedSite();
+			controller.selectedScheduleView = controller.getSelectedScheduleView();
+			$scope.uiConfig.calendar.weekends = !$scope.isScheduleView();
 
 			$scope.selectedTimeInterval = $scope.getSelectedTimeInterval(
 				$scope.timeIntervalOptions, $scope.defaultTimeInterval);
@@ -1649,6 +1671,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 				allDaySlot: false,
 				agendaEventMinHeight: 18,
+				weekends: true,
 
 				defaultView: null,
 				defaultDate: $scope.defaultDate,

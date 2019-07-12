@@ -412,7 +412,7 @@ function showTopBtn(){
 	}
 }
 /*
-function changeCalendarView(){
+function changeView(){
 	if($('summaryView').getStyle('display')=='none'){
 		$('summaryView').show();
 		$('readerViewTable').hide();
