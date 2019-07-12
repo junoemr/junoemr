@@ -267,6 +267,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.onScheduleChanged();
 		};
 
+		/* changes the calender view
+		view must be one of agendaDay, agendaWeek, agendaMonth enum values*/
 		$scope.changeCalendarView = function changeCalendarView(view)
 		{
 			if($scope.calendarViewName !== view)
@@ -279,17 +281,24 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 		};
 
+		/* chances the schedule view type
+		* must be one of the all or schedule enum values*/
 		controller.changeScheduleView = function(view)
 		{
 			if(controller.selectedScheduleView !== view)
 			{
 				controller.selectedScheduleView = view;
-				$scope.refetchEvents();
+
+				if($scope.isResourceView())
+				{
+					$scope.refetchEvents();
+				}
+				else
+				{
+					$scope.uiConfig.calendar.weekends = !$scope.isScheduleView();
+					$scope.applyUiConfig($scope.uiConfig);
+				}
 			}
-		};
-		controller.getScheduleView = function()
-		{
-			return controller.selectedScheduleView;
 		};
 
 		$scope.stepBack = function stepBack()
@@ -324,6 +333,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.isResourceView = function isResourceView()
 		{
 			return ($scope.uiConfigApplied.calendar.resources !== null && $scope.uiConfigApplied.calendar.resources !== false)
+		};
+		$scope.isScheduleView = function()
+		{
+			return (controller.selectedScheduleView === controller.scheduleViewEnum.schedule);
 		};
 
 		//=========================================================================
@@ -470,12 +483,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			var startDateString = start.format(Juno.Common.Util.settings.date_format);
 			var endDateString = end.subtract(1, 'seconds').format(Juno.Common.Util.settings.date_format);
 
-			var isAllView = (controller.selectedScheduleView === controller.scheduleViewEnum.all);
-
 			$scope.scheduleApi.getCalendarSchedule(
 				selectedSchedule.identifier,
 				selectedSchedule.identifierType,
-				isAllView,
+				!$scope.isScheduleView(),
 				startDateString,
 				endDateString,
 				$scope.getScheduleMinTime(),

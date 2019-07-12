@@ -104,17 +104,15 @@
 							<div class="btn-group" role="group">
 								<button type="button"
 								        class="btn btn-sm"
-								        ng-class=" { 'btn-addon': scheduleController.getScheduleView() !== scheduleController.scheduleViewEnum.all,
-								                     'btn-primary': scheduleController.getScheduleView() === scheduleController.scheduleViewEnum.all }"
-								        viewName="all"
+								        ng-class=" { 'btn-addon': isScheduleView(),
+								                     'btn-primary': !isScheduleView() }"
 								        ng-click="scheduleController.changeScheduleView(scheduleController.scheduleViewEnum.all)">
 									All
 								</button>
 								<button type="button"
 								        class="btn btn-sm"
-								        ng-class=" { 'btn-addon': scheduleController.getScheduleView() !== scheduleController.scheduleViewEnum.schedule,
-								                     'btn-primary': scheduleController.getScheduleView() === scheduleController.scheduleViewEnum.schedule }"
-								        viewName="schedule"
+								        ng-class=" { 'btn-addon': !isScheduleView(),
+								                     'btn-primary': isScheduleView() }"
 								        ng-click="scheduleController.changeScheduleView(scheduleController.scheduleViewEnum.schedule)">
 									Schedule
 								</button>
