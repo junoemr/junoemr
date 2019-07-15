@@ -764,10 +764,10 @@ public class PATHL7Handler extends MessageHandler
                 }
 
                 if (getOBXValueType(i, j).equals("ED")
-                        && getOBXResult(i, j, 1).equals("TEXT")
-                        && getOBXResult(i, j, 2).equals("PDF")
-                        && getOBXResult(i, j, 3).equals("Base64")
-                        && getOBXResult(i, j, 4).startsWith(pdfReplacement))
+                        && getOBXResult(i, j, 2).equals("TEXT")
+                        && getOBXResult(i, j, 3).equals("PDF")
+                        && getOBXResult(i, j, 4).equals("Base64")
+                        && getOBXResult(i, j, 5).startsWith(pdfReplacement))
                 {
                     return true;
                 }
