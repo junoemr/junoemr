@@ -27,6 +27,7 @@ import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.appointment.service.Appointment;
 import org.oscarehr.common.dao.MyGroupDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.dao.ProviderSiteDao;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.MyGroup;
 import org.oscarehr.common.model.Provider;
@@ -86,6 +87,9 @@ public class Schedule
 
 	@Autowired
 	ProviderDao providerDao;
+
+	@Autowired
+	ProviderSiteDao providerSiteDao;
 
 	@Autowired
 	ScheduleDateDao scheduleDateDao;
@@ -652,6 +656,25 @@ public class Schedule
 		for(MyGroup userGroup : userGroupMappings)
 		{
 			String providerIdStr = userGroup.getId().getProviderNo();
+
+			// filter by site selection if applicable
+			if(siteName != null)
+			{
+				boolean siteMatch = false;
+				List<Site> providerSites = siteDao.getActiveSitesByProviderNo(providerIdStr);
+				for (Site providerSite : providerSites)
+				{
+					if (siteName.equals(providerSite.getName()))
+					{
+						siteMatch = true;
+					}
+				}
+				if (!siteMatch)
+				{ // skip this provider
+					continue;
+				}
+			}
+
 			providerIdList.add(providerIdStr);
 
 			List<CalendarEvent> calendarEvents = getCalendarEvents(session, Integer.parseInt(providerIdStr),

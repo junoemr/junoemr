@@ -305,7 +305,7 @@ public class ScheduleService extends AbstractServiceImpl {
 	public RestResponse<CalendarSchedule> getCalendarSchedule(
 			@QueryParam("scheduleId") String scheduleId,
 			@QueryParam("scheduleIdType") String scheduleIdType,
-			@QueryParam("viewAll") String viewAllStr,
+			@QueryParam("viewAll") Boolean viewAll,
 			@QueryParam("startDate") String startDateString,
 			@QueryParam("endDate") String endDateString,
 			@QueryParam("startTime") String startTimeString,
@@ -323,7 +323,6 @@ public class ScheduleService extends AbstractServiceImpl {
 		LocalDate endDate = ConversionUtils.dateStringToLocalDate(endDateString);
 		LocalTime startTime = ConversionUtils.toLocalTime(startTimeString);
 		LocalTime endTime = ConversionUtils.toLocalTime(endTimeString);
-		Boolean viewAll = Boolean.parseBoolean(viewAllStr);
 
 		CalendarSchedule calendarSchedule;
 		if(ScheduleGroup.IdentifierType.valueOf(scheduleIdType).equals(ScheduleGroup.IdentifierType.GROUP))
