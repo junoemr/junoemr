@@ -1661,7 +1661,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		// Any changes to this array need to be applied by calling applyUiConfig()
 		$scope.uiConfig = {
 			calendar: {
-				height: 'auto', //$scope.get_schedule_height(),
+				height: 'parent',
 				nowIndicator: true,
 				header: false,
 

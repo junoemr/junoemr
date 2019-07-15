@@ -84,6 +84,7 @@
 	@extend %juno-primary-view-pane;
 	@include juno-page-margin-none;
 	position: relative;
+	overflow: auto hidden;
 
 	.calendar-loading
 	{
@@ -110,10 +111,6 @@
 				width: 100%;
 			}
 
-			// hide the vertical scrollbar when the schedule is too tall
-			.fc-scroller {
-				overflow: visible !important;
-			}
 			// hide the highlight area selection. hidden so that it does not look like a draggable appointment can be made
 			// remove if the start time/end time go back to relying on the selected area
 			.fc-highlight {

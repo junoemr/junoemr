@@ -160,21 +160,19 @@
 		<div class="schedule-page-content"
 		     ng-class="{ 'no-scroll' : showNoResources}"
 		>
-			<div>
-				<%-- ng-hide on the calendar causes event render issues,
-					 so zero state is shown by rendering content on top of an empty calendar and removing scroll bars --%>
-				<div class="zero-state-message" ng-show="showNoResources">
-					<h1>No Providers Scheduled</h1>
-				</div>
-				<div
-						id="ca-calendar"
-						class="calendar"
-						ui-calendar="uiConfigApplied.calendar"
-						calendar="cpCalendar"
-						ng-model="eventSources"
-						ng-enabled="initialized"
-				></div>
+			<%-- ng-hide on the calendar causes event render issues,
+				 so zero state is shown by rendering content on top of an empty calendar and removing scroll bars --%>
+			<div class="zero-state-message" ng-show="showNoResources">
+				<h1>No Providers Scheduled</h1>
 			</div>
+			<div
+					id="ca-calendar"
+					class="calendar"
+					ui-calendar="uiConfigApplied.calendar"
+					calendar="cpCalendar"
+					ng-model="eventSources"
+					ng-enabled="initialized"
+			></div>
 		</div>
 
 	</div>
