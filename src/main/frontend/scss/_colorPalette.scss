@@ -1,15 +1,16 @@
 
 // Colour Palette
-$primary: #476bb3;
-$primary-hover: #3c5a96;
+$primary: #455899;
+$primary-hover: #394980;
 $primary-50: rgba(71,107,179,.50);
 $primary-30: rgba(71,107,179,.30);
-$secondary: #59ccde;
+$secondary: #5cb8cc;
 $secondary-hover: #4fb4c4;
 $secondary-50: rgba(67,174,191,.50);
 $secondary-30: rgba(67,174,191,.30);
+$variant: #f77f6f;
 
-$grey-01: #303540;
+$grey-01: #393e4d;
 $grey-02: #525866;
 $grey-03: #6c7380;
 $grey-04: #acb2bf;
@@ -71,8 +72,16 @@ $btn-grey-hover:    #dfe3eb;
 $btn-white:         #ffffff;
 $btn-white-hover:   #dfe3eb;
 
+$semantic-info-base: #455899;
+$semantic-info-light: #455899;
+$semantic-success-base: #7aa621;
+$semantic-success-light: #7aa621;
+$semantic-warning-base: #e89b0e;
+$semantic-warning-light: #e89b0e;
+$semantic-error-base: #f73e47;
+$semantic-error-light: #f73e47;
 
-// OLD names, use above
+	// OLD names, use above
 $primary-blue: #476bb3;
 $secondary-blue: #15417a;
 $primary-hover-blue: #3c5a96;

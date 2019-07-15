@@ -1,7 +1,9 @@
-@mixin juno-font-default($font-size)
+
+@import '../fonts/Cabin/stylesheet.css';
+
+@mixin juno-font-default()
 {
-	font-family: Arial, Helvetica, sans-serif;
-    font-size: $font-size;
+	font-family: Cabin, Ariel, sans-serif;
     font-weight: normal;
     font-style: normal;
     font-stretch: normal;
@@ -9,15 +11,21 @@
     letter-spacing: normal;
 }
 
+@mixin juno-font-default-size($font-size)
+{
+	@include juno-font-default;
+    font-size: $font-size;
+}
+
 @mixin juno-font-tab()
 {
-	@include juno-font-default(12px);
+	@include juno-font-default-size(12px);
 }
 @mixin juno-font-input()
 {
-	@include juno-font-default(13px);
+	@include juno-font-default-size(13px);
 }
-@mixin juno-font-label()
+@mixin juno-font-label($font-size : 11px)
 {
-	@include juno-font-default(11px);
+	@include juno-font-default-size($font-size);
 }

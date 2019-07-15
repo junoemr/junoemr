@@ -18,7 +18,7 @@
 	}
 
 	.schedule-options {
-		padding: 12px;
+		padding: 6px;
 
 		$input-height: $form-input-height;
 
@@ -93,7 +93,6 @@
 		top: 65px;
 	}
 	.calendar {
-		font-family: "Arial", "Helvetica", sans-serif;
 		.fc-toolbar {
 			h2 {
 				font-size: 1.571em;
@@ -118,9 +117,10 @@
 			}
 			// adjust style for left hand time column
 			.fc-time {
-				font-size: 11px;
+				@include juno-font-label;
 				font-weight: bold;
 				background-color: $grey-08;
+				color: $grey-01;
 				span {
 					padding-right: 4px;
 				}
@@ -133,8 +133,11 @@
 				/* styling for normal events */
 				.fc-event {
 					cursor: pointer;
+					background-color: $grey-04; // shows for invalid color codes
 					border: 1px solid $white !important;
 					border-radius: 8px;
+					display: flex;
+					align-items: center;
 
 					// remove white opacity filter on events
 					.fc-bg {
@@ -150,9 +153,9 @@
 						display: flex;
 						padding: 0;
 						margin: 0;
-						font-size: 10px;
+						font-size: 12px;
 						font-weight: normal;
-						color: $white;
+						color: $grey-01;
 
 						$button-size: 16px;
 
@@ -162,8 +165,7 @@
 							width: $button-size;
 							min-width: $button-size;
 							height: $button-size;
-							font-weight: bold;
-							color: $white;
+							color: $grey-01;
 							padding: 0;
 							&:hover {
 								background-color: rgba(0, 0, 0, 0.2);
@@ -214,18 +216,15 @@
 					flex-grow: 1;
 					display: flex;
 					.background-event-schedulecode {
+						@include juno-font-label;
+						text-align: center;
+						font-weight: bold;
 						float: right;
 						width: $scheduleCodeWidth;
 						height: 100%;
-						text-align: center;
-						font-weight: bold;
-						font-style: normal;
-						font-stretch: normal;
-						color: $white;
+						color: $grey-01;
 						background-color: $grey-06;
-						line-height: normal;
-						letter-spacing: normal;
-						padding: 0;
+						padding: 2px 0;
 
 						&.hour-marker {
 							border-top: 1px solid $grey-05;
@@ -257,7 +256,7 @@
 						@include juno-font-tab;
 						background-color: $white;
 						display: flex;
-						height: $page-tabs-height;
+						height: $page-tabs-height-alt;
 						padding: 0 10px;
 
 						.column-ctl {
@@ -294,7 +293,7 @@
 		text-align: center;
 		position: absolute;
 		top: 0;
-		z-index: 100;
+		z-index: 9;
 		width: 100%;
 		height: 100%;
 		background-color: $white;

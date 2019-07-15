@@ -58,6 +58,13 @@ label {
 	border-radius: 4px;
 	border-width: 1px;
 	transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+
+	// remove the blue glow
+	&:focus {
+		outline: 0;
+		-webkit-box-shadow: none;
+		box-shadow: none;
+	}
 }
 .form-control, output {
 	display: block;
