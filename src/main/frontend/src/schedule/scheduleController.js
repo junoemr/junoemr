@@ -77,6 +77,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.resourceOptions = [];
 		$scope.resourceOptionHash = {};
 		$scope.selectedResources = false;
+		$scope.showNoResources = false;
 
 		$scope.timeIntervalOptions = [
 			{
@@ -297,11 +298,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 							{
 								$scope.refetchEvents();
 							}
-							else
-							{
-								$scope.uiConfig.calendar.weekends = !$scope.isScheduleView();
-								$scope.applyUiConfig($scope.uiConfig);
-							}
 						}
 					);
 
@@ -384,9 +380,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		controller.getSelectedScheduleView = function()
 		{
 			var preference = controller.providerSettings.viewSelected;
-
-			console.info(controller.scheduleViewEnum.schedule, preference, (preference === controller.scheduleViewEnum.schedule));
-
 			if (Juno.Common.Util.exists(preference) && (preference === controller.scheduleViewEnum.schedule))
 			{
 				return controller.scheduleViewEnum.schedule;
@@ -516,7 +509,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			).then(
 				function (results)
 				{
-					$scope.events = results.data.body.eventList;
 					var providerNos = results.data.body.providerIdList;
 					if (selectedSchedule.identifierType === controller.scheduleTypeEnum.group)
 					{
@@ -526,6 +518,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 						// always show day view in resource mode
 						$scope.uiConfig.calendar.defaultView = controller.calendarViewEnum.agendaDay;
+						$scope.calendarViewName = controller.calendarViewEnum.agendaDay;
+
+						$scope.showNoResources = (providerNos.length === 0);
 					}
 					else
 					{
@@ -534,7 +529,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						$scope.calendarViewName = $scope.getCalendarViewName();
 						$scope.uiConfig.calendar.resources = false;
 					}
+
 					$scope.applyUiConfig($scope.uiConfig);
+					$scope.events = results.data.body.eventList;
 
 					deferred.resolve(results.data.body);
 				},
@@ -1566,7 +1563,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.selectedSchedule = $scope.getSelectedSchedule($scope.scheduleOptions);
 			$scope.selectedSiteName = controller.getSelectedSite();
 			controller.selectedScheduleView = controller.getSelectedScheduleView();
-			$scope.uiConfig.calendar.weekends = !$scope.isScheduleView();
 
 			$scope.selectedTimeInterval = $scope.getSelectedTimeInterval(
 				$scope.timeIntervalOptions, $scope.defaultTimeInterval);
@@ -1671,7 +1667,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 				allDaySlot: false,
 				agendaEventMinHeight: 18,
-				weekends: true,
 
 				defaultView: null,
 				defaultDate: $scope.defaultDate,
