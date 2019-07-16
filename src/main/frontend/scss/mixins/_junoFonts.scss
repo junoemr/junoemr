@@ -1,9 +1,10 @@
 
 @import '../fonts/Cabin/stylesheet.css';
+@import '../fonts/Hinde/stylesheet.css';
 
 @mixin juno-font-default()
 {
-	font-family: Cabin, Ariel, sans-serif;
+	font-family: Hinde, Arial, sans-serif;
     font-weight: normal;
     font-style: normal;
     font-stretch: normal;

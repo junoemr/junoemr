@@ -529,9 +529,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						$scope.calendarViewName = $scope.getCalendarViewName();
 						$scope.uiConfig.calendar.resources = false;
 					}
-
-					console.info($scope.uiConfig.calendar);
-
 					$scope.applyUiConfig($scope.uiConfig);
 					$scope.events = results.data.body.eventList;
 
@@ -1586,7 +1583,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			{
 				if (newValue !== oldValue)
 				{
-					console.info('change datepickerSelectedDate', newValue);
 					var momentDate = Juno.Common.Util.getDateMoment(newValue);
 					$scope.changeDate(momentDate);
 				}
@@ -1656,6 +1652,18 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				height: 'parent',
 				nowIndicator: true,
 				header: false,
+				columnHeader: true,
+				views: {
+					day: {
+						columnHeaderFormat: 'dddd MMMM Do'
+					},
+					week: {
+						columnHeaderFormat: 'dddd MMM Do'
+					},
+					month: {
+						columnHeaderFormat: 'dddd'
+					},
+				},
 
 				allDaySlot: false,
 				agendaEventMinHeight: 18,
@@ -1665,7 +1673,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				slotDuration: $scope.selectedTimeInterval,
 				snapDuration: '00:05:00',
 				slotLabelInterval: $scope.selectedSlotLabelInterval,
-				slotLabelFormat: 'h:mm A',
+				slotLabelFormat: 'h A',
 				slotEventOverlap: false,
 
 				resources: false, // contains the resource hash properties for each schedule in group view

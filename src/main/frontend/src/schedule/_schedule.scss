@@ -118,7 +118,7 @@
 			// adjust style for left hand time column
 			.fc-time {
 				@include juno-font-label;
-				font-weight: bold;
+				//font-weight: bold;
 				background-color: $grey-08;
 				color: $grey-01;
 				span {
@@ -168,7 +168,7 @@
 							color: $grey-01;
 							padding: 0;
 							&:hover {
-								background-color: rgba(0, 0, 0, 0.2);
+								background-color: rgba(255, 255, 255, 0.2);
 								border-radius: 50%;
 							}
 						}
@@ -189,7 +189,7 @@
 								height: $button-size;
 							}
 							&:hover {
-								background-color: rgba(0, 0, 0, 0.2);
+								background-color: rgba(255, 255, 255, 0.2);
 								border-radius: 50%;
 							}
 						}
@@ -273,7 +273,9 @@
 				}
 				/* styling for the day/week/month view column-control headers */
 				.fc-day-header {
-					height: $page-tabs-height;
+					@include juno-font-tab;
+					height: $page-tabs-height-alt;
+					vertical-align: middle;
 				}
 			}
 			.fc-axis {

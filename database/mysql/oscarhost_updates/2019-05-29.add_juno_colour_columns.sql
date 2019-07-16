@@ -2,8 +2,8 @@
 -- add a new colour column for the new schedule to use
 ALTER TABLE `appointment_status` ADD COLUMN IF NOT EXISTS `juno_color` CHAR(7) AFTER `color`;
 -- set the default status specific values;
-UPDATE `appointment_status` SET `juno_color`='#ffb366' WHERE `juno_color` IS NULL AND BINARY `status` = 't';
-UPDATE `appointment_status` SET `juno_color`='#ffb366' WHERE `juno_color` IS NULL AND BINARY `status` = 'T';
+UPDATE `appointment_status` SET `juno_color`='#8ac6e6' WHERE `juno_color` IS NULL AND BINARY `status` = 't';
+UPDATE `appointment_status` SET `juno_color`='#8ac6e6' WHERE `juno_color` IS NULL AND BINARY `status` = 'T';
 UPDATE `appointment_status` SET `juno_color`='#abd96c' WHERE `juno_color` IS NULL AND BINARY `status` = 'H';
 UPDATE `appointment_status` SET `juno_color`='#e66588' WHERE `juno_color` IS NULL AND BINARY `status` = 'P';
 UPDATE `appointment_status` SET `juno_color`='#ffea80' WHERE `juno_color` IS NULL AND BINARY `status` = 'E';
