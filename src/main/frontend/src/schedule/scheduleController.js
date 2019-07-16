@@ -143,7 +143,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		};
 
 		$scope.defaultDate = globalStateService.global_settings.schedule.date_selected;
-		$scope.selectedDate = null;
 		$scope.datepickerSelectedDate = null;
 
 		$scope.init = function init()
@@ -326,6 +325,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.changeDate = function changeDate(date)
 		{
 			globalStateService.global_settings.schedule.date_selected = date;
+			$scope.uiConfig.calendar.defaultDate = date;
 			$scope.calendar().fullCalendar('gotoDate', date);
 		};
 
@@ -529,6 +529,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						$scope.calendarViewName = $scope.getCalendarViewName();
 						$scope.uiConfig.calendar.resources = false;
 					}
+
+					console.info($scope.uiConfig.calendar);
 
 					$scope.applyUiConfig($scope.uiConfig);
 					$scope.events = results.data.body.eventList;
@@ -886,11 +888,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.onViewRender = function onViewRender(view, element)
 		{
-			if ($scope.isInitialized() && $scope.calendar())
+			if ($scope.isInitialized())
 			{
-				$scope.selectedDate = moment(Juno.Common.Util.formatMomentDate(
-					moment($scope.calendar().fullCalendar('getDate'))));
-				$scope.datepickerSelectedDate = Juno.Common.Util.formatMomentDate($scope.selectedDate);
+				$scope.datepickerSelectedDate = Juno.Common.Util.formatMomentDate(moment($scope.calendar().fullCalendar('getDate')));
 			}
 
 			// Voodoo to set the resource view column width from https://stackoverflow.com/a/39297864
@@ -1046,7 +1046,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		controller.openDaysheet = function (resourceId)
 		{
-			var formattedDate = Juno.Common.Util.formatMomentDate($scope.selectedDate);
+			var formattedDate = $scope.datepickerSelectedDate;
 			var win = window.open('../report/reportdaysheet.jsp' +
 				'?dsmode=all' +
 				'&provider_no=' + encodeURIComponent(resourceId) +
@@ -1582,19 +1582,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		controller.loadWatches = function loadWatches()
 		{
-			$scope.$watch('selectedDate', function (newValue, oldValue)
-			{
-				// avoid running first time this fires during initialization
-				if (newValue !== oldValue)
-				{
-					$scope.changeDate(newValue);
-				}
-			});
-
 			$scope.$watch('datepickerSelectedDate', function (newValue, oldValue)
 			{
 				if (newValue !== oldValue)
 				{
+					console.info('change datepickerSelectedDate', newValue);
 					var momentDate = Juno.Common.Util.getDateMoment(newValue);
 					$scope.changeDate(momentDate);
 				}
