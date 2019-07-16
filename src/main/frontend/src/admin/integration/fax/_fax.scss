@@ -24,10 +24,10 @@
 		  font-size: 15px;
 		}
 		&.enabled {
-		  color: $success-green;
+		  color: $semantic-success-base;
 		}
 		&.disabled {
-		  color: $failure-red;
+		  color: $semantic-error-base;
 		}
 	  }
 	}
@@ -93,10 +93,10 @@
 		color: $dark-grey;
 	  }
 	  &.success {
-		color: $success-green;
+		color: $semantic-success-base;
 	  }
 	  &.failure {
-		color: $failure-red;
+		color: $semantic-error-base;
 	  }
 	}
   }
