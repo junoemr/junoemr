@@ -26,6 +26,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.parser.DefaultModelClassFactory;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
 import org.oscarehr.common.hl7.AHS.model.v251.segment.ZBR;
+import org.oscarehr.util.MiscUtils;
 
 public class ORU_R01 extends ca.uhn.hl7v2.model.v251.message.ORU_R01
 {
@@ -42,5 +43,18 @@ public class ORU_R01 extends ca.uhn.hl7v2.model.v251.message.ORU_R01
 
 		// add custom connect care segment
 		this.add(ZBR.class, false, false);
+	}
+
+	public ZBR getZBR()
+	{
+		try
+		{
+			return (ZBR)get("ZBR");
+		}
+		catch (HL7Exception e)
+		{
+			MiscUtils.getLogger().error("Failed to get ZBR cound with error: " + e.getMessage(), e);
+		}
+		return null;
 	}
 }

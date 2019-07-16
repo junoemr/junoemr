@@ -27,6 +27,7 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v251.datatype.CWE;
 import ca.uhn.hl7v2.model.v251.message.ORU_R01;
 import ca.uhn.hl7v2.model.v251.segment.MSH;
+import org.oscarehr.common.hl7.AHS.model.v251.segment.ZBR;
 import org.oscarehr.util.MiscUtils;
 import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
 
@@ -58,7 +59,7 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 	@Override
 	public String getMsgType()
 	{
-		return "AHS";
+		return "CCLAB";
 	}
 
 	public ConnectCareLabHandler(Message msg) throws HL7Exception
@@ -176,7 +177,7 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 	 */
 	public boolean hasZBR()
 	{
-		return get("/.ZBR-2") != null;
+		return getReps("ZBR") != 0;
 	}
 
 	/**
@@ -194,25 +195,28 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 	 */
 	public List<Integer> getZBRSensitivitySetIDs()
 	{
-		ArrayList<Integer> ids = new ArrayList<>();
-
-		String currId = get("/.ZBR-3(0)");
-		int i = 1;
-		while(currId != null)
+		if (message instanceof org.oscarehr.common.hl7.AHS.model.v251.message.ORU_R01)
 		{
-			try
+			org.oscarehr.common.hl7.AHS.model.v251.message.ORU_R01 oruMessage = (org.oscarehr.common.hl7.AHS.model.v251.message.ORU_R01) message;
+			ZBR zbr = oruMessage.getZBR();
+
+			ArrayList<Integer> ids = new ArrayList<>();
+			for (int i = 0; i < zbr.getZBR3Reps(); i++)
 			{
-				ids.add(Integer.parseInt(currId) - 1);
-			}
-			catch (NumberFormatException nfe)
-			{
-				MiscUtils.getLogger().error("ZBR Sensitivity ID is not an integer! " + get("/.ZBR-3(" + Math.max(i - 1, 0) + ")"));
+				try
+				{
+					ids.add(Integer.parseInt(get("/.ZBR-3(" + i + ")")) - 1);
+				} catch (NumberFormatException nfe)
+				{
+					MiscUtils.getLogger().error("ZBR Sensitivity ID is not an integer! " + get("/.ZBR-3(" + i + ")"), nfe);
+				}
 			}
 
-			currId = get("/.ZBR-3(" + i + ")");
-			i++;
+			return ids;
 		}
-
-		return ids;
+		else
+		{
+			return null;
+		}
 	}
 }

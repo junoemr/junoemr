@@ -69,7 +69,7 @@ public final class Factory {
 
 	private static Logger logger = MiscUtils.getLogger();
 
-	private static final HashSet<String> REFACTORED_LAB_TYPES = Sets.newHashSet("AHS","CLS","CLSDI", JunoGenericLabHandler.LAB_TYPE_VALUE);
+	private static final HashSet<String> REFACTORED_LAB_TYPES = Sets.newHashSet("AHS", "CCLAB","CLS","CLSDI", JunoGenericLabHandler.LAB_TYPE_VALUE);
 
 	private Factory() {
 		// static methods no need for instance

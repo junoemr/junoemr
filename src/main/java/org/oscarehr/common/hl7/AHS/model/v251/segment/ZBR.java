@@ -39,13 +39,26 @@ public class ZBR extends AbstractSegment
 
 		try
 		{
-			this.add(ST.class, true, 1,20, new Object[]{message}, "Not Specified");
-			this.add(ST.class, true, 1,20, new Object[]{message}, "Culture set ID");
-			this.add(ST.class, true, 9999,20, new Object[]{message}, "Sensitivity Set IDs");
+			this.add(ST.class, false, 1,20, new Object[]{message}, "Not Specified");
+			this.add(ST.class, false, 1,20, new Object[]{message}, "Culture set ID");
+			this.add(ST.class, false, 9999,20, new Object[]{message}, "Sensitivity Set IDs");
 		}
 		catch (HL7Exception var5)
 		{
 			MiscUtils.getLogger().error("Can't instantiate " + this.getClass().getName(), var5);
 		}
+	}
+
+	public int getZBR3Reps()
+	{
+		try
+		{
+			return getField(3).length;
+		}
+		catch (HL7Exception e)
+		{
+			MiscUtils.getLogger().error("Could not get ZBR 3 Reps with error: " + e.getMessage(), e);
+		}
+		return 0;
 	}
 }
