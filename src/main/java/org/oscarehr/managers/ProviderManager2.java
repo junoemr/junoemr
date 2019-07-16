@@ -251,12 +251,16 @@ public class ProviderManager2 {
 			settings.setViewSelected(map.get(UserProperty.SCHEDULE_VIEW).getValue());
 		}
 
-		String patientNameLengthStr = map.get(UserProperty.PATIENT_NAME_LENGTH).getValue();
-		if(StringUtils.isNumeric(patientNameLengthStr))
+		Property patientNameLengthProp = map.get(UserProperty.PATIENT_NAME_LENGTH);
+		if(patientNameLengthProp != null)
 		{
-			settings.setPatientNameLength(Integer.parseInt(patientNameLengthStr));
+			String patientNameLengthStr = patientNameLengthProp.getValue();
+			if(StringUtils.isNumeric(patientNameLengthStr))
+			{
+				settings.setPatientNameLength(Integer.parseInt(patientNameLengthStr));
+			}
 		}
-		
+
 		//custom summary display
 		//NEW
 		/*

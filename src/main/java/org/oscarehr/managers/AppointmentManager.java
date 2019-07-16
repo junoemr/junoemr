@@ -216,7 +216,8 @@ public class AppointmentManager {
 
 		appointmentDao.merge(appointment);
 
-		return appointment.getStatus();
+		// return status without modifier
+		return appointment.getAppointmentStatus();
 	}
 
 	public Appointment getAppointment(LoggedInInfo loggedInInfo, int apptNo) {
