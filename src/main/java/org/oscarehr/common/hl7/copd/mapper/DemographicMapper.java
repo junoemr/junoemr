@@ -30,6 +30,7 @@ import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographicImport.service.CoPDImportService;
+import org.oscarehr.demographicImport.service.CoPDPreProcessorService;
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
@@ -143,9 +144,15 @@ public class DemographicMapper extends AbstractMapper
 	{
 		return messagePID.getAdministrativeSex().getValue();
 	}
-	public LocalDate getDOB()
+	public LocalDate getDOB() throws HL7Exception
 	{
 		String dateStr = messagePID.getDateTimeOfBirth().getTimeOfAnEvent().getValue();
+		if (dateStr.isEmpty())
+		{
+			logger.warn("Replacing empty DOB string with :" + CoPDPreProcessorService.HL7_TIMESTAMP_BEGINNING_OF_TIME +
+					" for demographic: " + getLastName(0) + "," + getFirstName(0));
+			dateStr = CoPDPreProcessorService.HL7_TIMESTAMP_BEGINNING_OF_TIME;
+		}
 		return ConversionUtils.toLocalDate(dateStr, DateTimeFormatter.ofPattern("yyyyMMdd"));
 	}
 	public String getTitle(int rep) throws HL7Exception
