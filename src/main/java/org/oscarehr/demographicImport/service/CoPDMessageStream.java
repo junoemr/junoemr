@@ -25,7 +25,19 @@ package org.oscarehr.demographicImport.service;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.util.MiscUtils;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.AttributesImpl;
+import org.xml.sax.helpers.XMLFilterImpl;
+import org.xml.sax.helpers.XMLReaderFactory;
 
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -36,7 +48,8 @@ public class CoPDMessageStream
 	private static final Logger logger = MiscUtils.getLogger();
 
 	private BufferedReader fileReader;
-	private Pattern messagePattern = Pattern.compile("<ZPD_ZTR\\.MESSAGE>(.*?)<\\/ZPD_ZTR\\.MESSAGE>", Pattern.DOTALL);
+	private Pattern messagePattern = Pattern.compile("<[^><]*ZPD_ZTR\\.MESSAGE[^><]*>(.*?)<\\/[^><]*ZPD_ZTR\\.MESSAGE>", Pattern.DOTALL);
+	private Pattern removeXmlTagPattern = Pattern.compile("<\\?xml.*\\?>(.*)", Pattern.DOTALL);
 
 	public CoPDMessageStream(GenericFile CoPDFile) throws FileNotFoundException
 	{
@@ -82,7 +95,12 @@ public class CoPDMessageStream
 
 	private String buildMessage(StringBuffer sb)
 	{
-		Matcher messagePatternMatcher = messagePattern.matcher(sb.toString());
+		return removeXmlStartTag(stripXmlNameSpace(extractMessage(sb.toString())));
+	}
+
+	private String extractMessage(String xml)
+	{
+		Matcher messagePatternMatcher = messagePattern.matcher(xml);
 		if (messagePatternMatcher.find())
 		{
 			return "<ZPD_ZTR xmlns=\"urn:hl7-org:v2xml\">" + messagePatternMatcher.group(1) + "</ZPD_ZTR>";
@@ -92,11 +110,91 @@ public class CoPDMessageStream
 
 	private boolean isCompleteMessage(StringBuffer sb)
 	{
-		if (sb.substring(Math.max(0, sb.length() - 1000), sb.length()).contains("/ZPD_ZTR.MESSAGE"))
+		if (sb.substring(Math.max(0, sb.length() - 1000), sb.length()).contains("ZPD_ZTR.MESSAGE"))
 		{
 			Matcher messagePatternMatcher = messagePattern.matcher(sb.toString());
 			return messagePatternMatcher.find();
 		}
 		return false;
+	}
+
+	/**
+	 * strip any namespace declartions / usages from an xml string
+	 * @param xml - the xml to strip
+	 * @return - a new xml string with the namespaces stripped.
+	 */
+	private String stripXmlNameSpace(String xml)
+	{
+		try
+		{
+			XMLReader xmlReader = new XMLFilterImpl(XMLReaderFactory.createXMLReader())
+			{
+				@Override
+				public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException
+				{
+					String cleanName = qName;
+					if(cleanName.contains(":"))
+					{
+						int sepIdx = cleanName.indexOf(":");
+						cleanName = cleanName.substring(sepIdx + 1);
+					}
+
+					AttributesImpl keepAttributes  = new AttributesImpl();
+					// keep only the xmlns="urn:hl7-org:v2xml" namespace attribute.
+					for (int i =0; i < atts.getLength(); i ++)
+					{
+						if ((!atts.getQName(i).startsWith("xmlns:") && !atts.getQName(i).equals("xmlns")) ||
+								(atts.getQName(i).equals("xmlns") && atts.getValue(i).equals("urn:hl7-org:v2xml")))
+						{
+							keepAttributes.addAttribute(atts.getURI(i), atts.getLocalName(i), atts.getQName(i), atts.getType(i), atts.getValue(i));
+						}
+					}
+
+
+					super.startElement(uri, localName, cleanName, keepAttributes);
+				}
+
+				@Override
+				public void endElement(String uri, String localName, String qName) throws SAXException
+				{
+					String cleanName = qName;
+					if(cleanName.contains(":"))
+					{
+						int sepIdx = cleanName.indexOf(":");
+						cleanName = cleanName.substring(sepIdx + 1);
+					}
+					super.endElement(uri, localName, cleanName);
+				}
+			};
+			xmlReader.setFeature("http://xml.org/sax/features/namespaces", false);
+			xmlReader.setFeature("http://xml.org/sax/features/namespace-prefixes", false);
+			Source src = new SAXSource(xmlReader, new InputSource(new StringReader(xml)));
+			StringWriter namespaceStrippedXml = new StringWriter();
+			Result res = new StreamResult(namespaceStrippedXml);
+			TransformerFactory.newInstance().newTransformer().transform(src, res);
+
+			return namespaceStrippedXml.toString();
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to strip xml namespace on message xml: " + xml, e);
+		}
+
+		return "";
+	}
+
+	/**
+	 * remove the xml start tag from an xml string
+	 * @param xml - the xml in which to remove the start tag
+	 * @return - the modified xml
+	 */
+	protected String removeXmlStartTag(String xml)
+	{
+		Matcher removeXmlTag = removeXmlTagPattern.matcher(xml);
+		if (removeXmlTag.find())
+		{
+			return removeXmlTag.group(1);
+		}
+		return xml;
 	}
 }

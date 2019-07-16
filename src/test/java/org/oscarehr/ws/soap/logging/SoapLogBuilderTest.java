@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.oscarehr.ws.common.annotation.LogHeaderInbound;
 import org.oscarehr.ws.common.annotation.MaskParameter;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
 import org.oscarehr.ws.external.soap.logging.SoapLogBuilder;
@@ -42,19 +43,35 @@ import static org.mockito.Mockito.when;
 
 public class SoapLogBuilderTest
 {
-    public void noAnnotationsStub() {}
+    public void noAnnotationsStub()
+    {
+    }
 
     @SkipContentLoggingInbound
-    public void skipContentLoggingStub() {}
+    public void skipContentLoggingStub()
+    {
+    }
+
+    @LogHeaderInbound
+    public void logHeaderInbound()
+    {
+
+    }
 
     @MaskParameter
-    public void maskParameterStubDefault(){}
+    public void maskParameterStubDefault()
+    {
+    }
 
-    @MaskParameter(fields ="mask_me")
-    public void maskParameterStubSpecifiedField() {}
+    @MaskParameter(fields = "mask_me")
+    public void maskParameterStubSpecifiedField()
+    {
+    }
 
-    @MaskParameter(fields ={"secret0", "secret1"})
-    public void maskParameterStubArray(){}
+    @MaskParameter(fields = {"secret0", "secret1"})
+    public void maskParameterStubArray()
+    {
+    }
 
     private static HttpServletRequest mockRequest = Mockito.mock(HttpServletRequest.class);
     private SoapLogBuilder logBuilder;
@@ -75,17 +92,42 @@ public class SoapLogBuilderTest
     public void testBaseCaseNoAnnotations()
     {
         String testData = makeSoapMessage("color", "red", "shape", "square");
+        String expectData = makeSoapMessageBodyOnly("color", "red", "shape", "square");
 
         configureBuilder(testData, "noAnnotationsStub");
         SoapServiceLog logEntry = logBuilder.buildSoapLog();
 
-        assertThat(logEntry.getPostData(), equalTo(testData));
+        assertThat(logEntry.getPostData(), equalTo(expectData));
+    }
+
+    @Test
+    public void testStripHeader()
+    {
+        String expectData = makeSoapMessageBodyOnly("color", "red", "shape", "square");
+        String testData = makeSoapMessage("color", "red", "shape", "square",true);
+
+        configureBuilder(testData, "noAnnotationsStub");
+        SoapServiceLog logEntry = logBuilder.buildSoapLog();
+
+        assertThat(logEntry.getPostData(), equalTo(expectData));
+    }
+
+    @Test
+    public void testLogHeaderInboundAnnotation()
+    {
+        String expectData = makeSoapMessage("color", "red", "shape", "square", true);
+        String testData = makeSoapMessage("color", "red", "shape", "square",true);
+
+        configureBuilder(testData, "logHeaderInbound");
+        SoapServiceLog logEntry = logBuilder.buildSoapLog();
+
+        assertThat(logEntry.getPostData(), equalTo(expectData));
     }
 
     @Test
     public void testDefaultSkipContentLogging()
     {
-        String testData = makeSoapMessage("lab provider", "medical labs ltd.", "labData", "really_long_string");
+        String testData = makeSoapMessage("lab_provider", "medical labs ltd.", "labData", "really_long_string");
         String expected = SkipContentLoggingInbound.SKIP_CONTENT_LOGGING_INBOUND;
 
         configureBuilder(testData, "skipContentLoggingStub");
@@ -98,7 +140,7 @@ public class SoapLogBuilderTest
     public void testDefaultParameterMasking()
     {
         String testData = makeSoapMessage("user", "my name", "password", "my secret");
-        String expected = makeSoapMessage("user", "my name", "password", MaskParameter.MASK);
+        String expected = makeSoapMessageBodyOnly("user", "my name", "password", MaskParameter.MASK);
 
         configureBuilder(testData, "maskParameterStubDefault");
         SoapServiceLog logEntry = logBuilder.buildSoapLog();
@@ -110,18 +152,19 @@ public class SoapLogBuilderTest
     public void testDefaultParameterMaskingMissing()
     {
         String testData = makeSoapMessage("user", "my name", "pazzword", "my zecret");
+        String expectData = makeSoapMessageBodyOnly("user", "my name", "pazzword", "my zecret");
 
         configureBuilder(testData, "maskParameterStubDefault");
         SoapServiceLog logEntry = logBuilder.buildSoapLog();
 
-        assertThat(logEntry.getPostData(), equalTo(testData));
+        assertThat(logEntry.getPostData(), equalTo(expectData));
     }
 
     @Test
     public void testTargetedParameterMasking()
     {
         String testData = makeSoapMessage("mask_me", "my secret", "version", "1.0");
-        String expected = makeSoapMessage("mask_me", MaskParameter.MASK, "version", "1.0");
+        String expected = makeSoapMessageBodyOnly("mask_me", MaskParameter.MASK, "version", "1.0");
 
         configureBuilder(testData, "maskParameterStubSpecifiedField");
         SoapServiceLog logEntry = logBuilder.buildSoapLog();
@@ -133,18 +176,19 @@ public class SoapLogBuilderTest
     public void testTargetedMaskingMissingField()
     {
         String testData = makeSoapMessage("username", "my name", "flask_me", "my whiskey");
+        String expectData = makeSoapMessageBodyOnly("username", "my name", "flask_me", "my whiskey");
 
         configureBuilder(testData, "maskParameterStubSpecifiedField");
         SoapServiceLog logEntry = logBuilder.buildSoapLog();
 
-        assertThat(logEntry.getPostData(), equalTo(testData));
+        assertThat(logEntry.getPostData(), equalTo(expectData));
     }
 
     @Test
     public void testMultipleMasking()
     {
         String testData = makeSoapMessage("secret0", "my secret", "secret1", "my other secret");
-        String expected = makeSoapMessage("secret0", MaskParameter.MASK, "secret1", MaskParameter.MASK);
+        String expected = makeSoapMessageBodyOnly("secret0", MaskParameter.MASK, "secret1", MaskParameter.MASK);
 
         configureBuilder(testData, "maskParameterStubArray");
         SoapServiceLog logEntry = logBuilder.buildSoapLog();
@@ -156,7 +200,7 @@ public class SoapLogBuilderTest
     public void testMultipleMaskingOutOfOrder()
     {
         String testData = makeSoapMessage("secret1", "my secret", "secret0", "my other secret");
-        String expected = makeSoapMessage("secret1", MaskParameter.MASK, "secret0", MaskParameter.MASK);
+        String expected = makeSoapMessageBodyOnly("secret1", MaskParameter.MASK, "secret0", MaskParameter.MASK);
 
         configureBuilder(testData, "maskParameterStubArray");
         SoapServiceLog logEntry = logBuilder.buildSoapLog();
@@ -168,7 +212,7 @@ public class SoapLogBuilderTest
     public void testMultipleMaskingMissingOneField()
     {
         String testData = makeSoapMessage("username", "my_name", "secret1", "my other secret");
-        String expected = makeSoapMessage("username", "my_name", "secret1", MaskParameter.MASK);
+        String expected = makeSoapMessageBodyOnly("username", "my_name", "secret1", MaskParameter.MASK);
 
         configureBuilder(testData, "maskParameterStubArray");
         SoapServiceLog logEntry = logBuilder.buildSoapLog();
@@ -180,18 +224,19 @@ public class SoapLogBuilderTest
     public void testMultipleMaskingMissingAllFields()
     {
         String testData = makeSoapMessage("not_secret0", "red", "not_secret1", "blue");
+        String expectData = makeSoapMessageBodyOnly("not_secret0", "red", "not_secret1", "blue");
 
         configureBuilder(testData, "maskParameterStubArray");
         SoapServiceLog logEntry = logBuilder.buildSoapLog();
 
-        assertThat(logEntry.getPostData(), equalTo(testData));
+        assertThat(logEntry.getPostData(), equalTo(expectData));
     }
 
     @Test
     public void testDoubleElementMasking()
     {
         String testData = makeSoapMessage("mask_me","my secret", "mask_me", "1234");
-        String expected = makeSoapMessage("mask_me", MaskParameter.MASK, "mask_me", MaskParameter.MASK);
+        String expected = makeSoapMessageBodyOnly("mask_me", MaskParameter.MASK, "mask_me", MaskParameter.MASK);
 
         configureBuilder(testData, "maskParameterStubSpecifiedField");
         SoapServiceLog logEntry = logBuilder.buildSoapLog();
@@ -228,11 +273,32 @@ public class SoapLogBuilderTest
      * @param arg0Value value of the first element
      * @param arg1 name of the second element
      * @param arg1Value value of the second element
+     * @param includeHeader if true include header in soap message
      * @return example SOAP login message containing the elements and values specified.
      */
+    private String makeSoapMessage(String arg0, String arg0Value, String arg1, String arg1Value, boolean includeHeader)
+    {
+        String soapMessage = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><env:Envelope xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:tns=\"http://v1.soap.external.ws.oscarehr.org/\" xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ins0=\"http://v1.soap.external.ws.oscarehr.org/\">";
+        if (includeHeader)
+        {
+            soapMessage += "<env:Header><wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\"><wsse:UsernameToken wsu:Id=\"UsernameToken-1\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"><wsse:Username>99</wsse:Username><wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">6144625613578</wsse:Password></wsse:UsernameToken></wsse:Security></env:Header>";
+        }
+        soapMessage += "<env:Body><ins0:login>%s%s</ins0:login></env:Body></env:Envelope>";
+
+        String firstElement = "<" + arg0 + ">" + arg0Value + "</" + arg0 + ">";
+        String secondElement = "<" + arg1 + ">" + arg1Value + "</" + arg1 + ">";
+
+        return String.format(soapMessage, firstElement, secondElement);
+    }
+
     private String makeSoapMessage(String arg0, String arg0Value, String arg1, String arg1Value)
     {
-        final String soapMessage = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><env:Envelope xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:tns=\"http://v1.soap.external.ws.oscarehr.org/\" xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ins0=\"http://v1.soap.external.ws.oscarehr.org/\"><env:Body><ins0:login>%s%s</ins0:login></env:Body></env:Envelope>";
+        return makeSoapMessage(arg0, arg0Value, arg1, arg1Value, false);
+    }
+
+    private String makeSoapMessageBodyOnly(String arg0, String arg0Value, String arg1, String arg1Value)
+    {
+        String soapMessage = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><env:Body xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\"><ins0:login xmlns:ins0=\"http://v1.soap.external.ws.oscarehr.org/\">%s%s</ins0:login></env:Body>";
 
         String firstElement = "<" + arg0 + ">" + arg0Value + "</" + arg0 + ">";
         String secondElement = "<" + arg1 + ">" + arg1Value + "</" + arg1 + ">";

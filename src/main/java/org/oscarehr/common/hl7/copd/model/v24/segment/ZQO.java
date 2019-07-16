@@ -73,4 +73,88 @@ public class ZQO extends AbstractSegment
 	{
 		return null;
 	}
+
+	public TS getZQO2_1_observationDate() throws HL7Exception
+	{
+		try
+		{
+			return (TS) getField(2, 0);
+		}
+		catch (ClassCastException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	public ST getZQO3_miniHealth() throws HL7Exception
+	{
+		try
+		{
+			return (ST) getField(3, 0);
+		}
+		catch (ClassCastException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	public NM getZQO4_systolicBP() throws HL7Exception
+	{
+		try
+		{
+			return (NM) getField(4, 0);
+		}
+		catch (ClassCastException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	public NM getZQO5_diastolicBP() throws HL7Exception
+	{
+		try
+		{
+			return (NM) getField(5, 0);
+		}
+		catch (ClassCastException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	public NM getZQO6_height() throws HL7Exception
+	{
+		try
+		{
+			return (NM) getField(6, 0);
+		}
+		catch (ClassCastException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	public NM getZQO7_weight() throws HL7Exception
+	{
+		try
+		{
+			return (NM) getField(7, 0);
+		}
+		catch (ClassCastException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	public NM getZQO8_waist() throws HL7Exception
+	{
+		try
+		{
+			return (NM) getField(8, 0);
+		}
+		catch (ClassCastException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
 }
