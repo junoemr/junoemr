@@ -62,6 +62,7 @@ public abstract class MessageHandler
 	public enum OBX_CONTENT_TYPE {
 		UNKNOWN,
 		TEXT,
+		SUSCEPTIBILITY,
 		PDF
 	}
 

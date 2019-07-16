@@ -1682,7 +1682,25 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										}
                                     	else if(isUnstructuredDoc)
                                     	{
-									%>
+											if (handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
+											{
+												String obxDocId = "";
+												java.util.regex.Matcher docIdMatcher = Pattern.compile("embedded_doc_id_(\\d+)").matcher(handler.getOBXResult(j, k));
+												if (docIdMatcher.find())
+												{
+													obxDocId = docIdMatcher.group(1);
+												}
+
+												%>
+						   							<tr>
+												   <td valign="top" align="left" class="NarrativeRes"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName %></a>
+												   <td class="NarrativeRes"> <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../../../dms/ManageDocument.do?method=display&doc_no=<%=obxDocId%>');">Display PDF</a> </td>
+												   </tr>
+											   <%
+										   }
+										   else
+										   {
+											%>
                                    			<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>"><%
                                    			if((obxCount>1) && k>0 && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1))) {%>
                                    				<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"></a><%
@@ -1709,7 +1727,8 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 	                                                else{%>
 				                                    <td align="center"><%= handler.getTimeStamp(j, k) %></td><%
 	                                            }
-                                   			}//end of isUnstructuredDoc
+											}
+										}//end of isUnstructuredDoc
                                    			
                                    			else{//if it isn't a PATHL7 doc%>
                                		<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>"><%

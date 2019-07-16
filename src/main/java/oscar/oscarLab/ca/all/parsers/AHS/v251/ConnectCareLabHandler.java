@@ -24,12 +24,20 @@ package oscar.oscarLab.ca.all.parsers.AHS.v251;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.model.v251.datatype.CWE;
 import ca.uhn.hl7v2.model.v251.message.ORU_R01;
 import ca.uhn.hl7v2.model.v251.segment.MSH;
+import org.oscarehr.util.MiscUtils;
 import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ConnectCareLabHandler extends ConnectCareHandler
 {
+	private final List<String> unstructuredLabTypes = Arrays.asList("IDENTITY TESTING", "SURGICAL PATHOLOGY", "BLOOD CULTURE, ROUTINE");
+
 	public static boolean handlerTypeMatch(Message message)
 	{
 		String version = message.getVersion();
@@ -80,6 +88,33 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 		return true;
 	}
 
+	@Override
+	public boolean isUnstructured()
+	{
+		if (getOBRCount() > 0)
+		{
+			return unstructuredLabTypes.contains(get("/.ORDER_OBSERVATION(0)/OBR-4-9"));
+		}
+		return false;
+	}
+
+	/* ========================== OBR ========================== */
+
+	/**
+	 * check if the ith OBR segment is a susceptibility segment.
+	 * @param i - the OBR index
+	 * @return true if the OBR is a susceptibility segment
+	 */
+	public boolean isOBRSusceptibility(int i)
+	{
+		if (hasZBR())
+		{
+			return getZBRSensitivitySetIDs().contains(i);
+		}
+		return false;
+	}
+
+
 	/* ========================== OBX ========================== */
 
 	/**
@@ -95,6 +130,14 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 		{
 			return getOBXResult(i, j, 5);
 		}
+		else if (getOBXContentType(i, j) == OBX_CONTENT_TYPE.SUSCEPTIBILITY)
+		{
+			return getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-26-3")) + ": " + getOBXAbnormalFlag(i, j);
+		}
+		else if (hasZBR() && getOBXValueType(i, j).equals(CWE.class.getSimpleName()))
+		{
+			return getOBXResult(i, j, 2);
+		}
 		else
 		{
 			return super.getOBXResult(i, j);
@@ -105,7 +148,7 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 	 * check for obx content type
 	 * @param i - obr rep
 	 * @param j - obx rep
-	 * @return TEXT OR PDF
+	 * @return TEXT, SUSCEPTIBILITY OR PDF
 	 */
 	@Override
 	public OBX_CONTENT_TYPE getOBXContentType(int i, int j)
@@ -117,7 +160,59 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 				return OBX_CONTENT_TYPE.PDF;
 			}
 		}
+		else if (isOBRSusceptibility(i))
+		{
+			return OBX_CONTENT_TYPE.SUSCEPTIBILITY;
+		}
 
 		return OBX_CONTENT_TYPE.TEXT;
+	}
+
+	/* ================== ZBR ========================= */
+
+	/**
+	 * check if this message contains a ZBR segment
+	 * @return true if such a segment is present
+	 */
+	public boolean hasZBR()
+	{
+		return get("/.ZBR-2") != null;
+	}
+
+	/**
+	 * get OBR that defines the culture set
+	 * @return - the index of the OBR segment that defines the culture
+	 */
+	public String getZBRCulterSetID()
+	{
+		return getString(get("/.ZBR-2"));
+	}
+
+	/**
+	 * get OBR segments that define the sensitivities
+	 * @return - list of OBR segments that define sensitivity
+	 */
+	public List<Integer> getZBRSensitivitySetIDs()
+	{
+		ArrayList<Integer> ids = new ArrayList<>();
+
+		String currId = get("/.ZBR-3(0)");
+		int i = 1;
+		while(currId != null)
+		{
+			try
+			{
+				ids.add(Integer.parseInt(currId) - 1);
+			}
+			catch (NumberFormatException nfe)
+			{
+				MiscUtils.getLogger().error("ZBR Sensitivity ID is not an integer! " + get("/.ZBR-3(" + Math.max(i - 1, 0) + ")"));
+			}
+
+			currId = get("/.ZBR-3(" + i + ")");
+			i++;
+		}
+
+		return ids;
 	}
 }

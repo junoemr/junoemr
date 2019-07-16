@@ -50,6 +50,7 @@ import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.hl7.AHS.model.v23.message.ORM_002;
+import org.oscarehr.common.hl7.AHS.model.v251.message.ORU_R01;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -194,6 +195,10 @@ public final class Factory {
 		}
 		else //handle default ORU^R01 messages
 		{
+			/* We need to use a custom HL7 message object because Connect Care Includes non standard segments */
+			// this package string needs to match the custom model location in the oscar source code.
+			ModelClassFactory modelClassFactory = new CustomModelClassFactory(ORU_R01.ROOT_PACKAGE);
+			context.setModelClassFactory(modelClassFactory);
 			Message msg = p.parse(hl7Body);
 
 			// attempt to read the msh header and determine lab type handler
