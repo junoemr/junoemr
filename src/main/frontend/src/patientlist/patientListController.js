@@ -81,9 +81,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			defaultAutoRefreshMinutes: 3,
 			preferredAutoRefreshMinutes: null
 		};
-
 		controller.eventStatusOptions = [];
-		controller.selectedEventStatus = null;
 
 		controller.init = function()
 		{
@@ -178,7 +176,7 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			controller.scheduleApi.getAppointmentsForDay(controller.datepickerSelectedDate).then(
 				function success(results)
 				{
-					controller.activePatientList = results.data.body.patients;
+					controller.activePatientList = results.data.body;
 					deferred.resolve(controller.activePatientList);
 				},
 				function error(errors)

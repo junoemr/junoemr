@@ -1,15 +1,17 @@
 
 // Colour Palette
-$primary: #476bb3;
-$primary-hover: #3c5a96;
+$primary: #455899;
+$primary-hover: #394980;
+$primary-active: #546499;
 $primary-50: rgba(71,107,179,.50);
 $primary-30: rgba(71,107,179,.30);
-$secondary: #59ccde;
+$secondary: #5cb8cc;
 $secondary-hover: #4fb4c4;
 $secondary-50: rgba(67,174,191,.50);
 $secondary-30: rgba(67,174,191,.30);
+$variant: #f77f6f;
 
-$grey-01: #303540;
+$grey-01: #393e4d;
 $grey-02: #525866;
 $grey-03: #6c7380;
 $grey-04: #acb2bf;
@@ -71,24 +73,18 @@ $btn-grey-hover:    #dfe3eb;
 $btn-white:         #ffffff;
 $btn-white-hover:   #dfe3eb;
 
+$semantic-info-base: #7381b2;
+$semantic-info-light: #cfd4e6;
+$semantic-success-base: #abd96c;
+$semantic-success-light: #d4d9ce;
+$semantic-warning-base: #ffb366;
+$semantic-warning-light: #fff2e6;
+$semantic-error-base: #e67d73;
+$semantic-error-light: #fff3f2;
 
-// OLD names, use above
-$primary-blue: #476bb3;
+	// OLD names, use above
 $secondary-blue: #15417a;
-$primary-hover-blue: #3c5a96;
 $secondary-hover-blue: #386fc1;
-$primary-blue-text: #235ba3;
-
-$primary-white: #fff;
-$secondary-white: #ebebeb;
-$hover-white: #fff;
-$primary-white-text: #fff;
-
-$light-grey: #ededed;
-$medium-grey: #c0c0c0;
-$dark-grey: #767676;
-
-$modal-color: #996633;
 
 // Imported from Clinicaid (schedule + datepicker stuff)
 $color-btn-addon-bg: #FFF;
@@ -114,9 +110,6 @@ $color-timepicker-text: #333;
 $color-timepicker-border: #CCC;
 
 // fax
-$success-green: rgb(153, 226, 120);
-$failure-red: rgb(188, 64, 71);
-
 $input-color-invalid-background: #ffefef;
 $input-color-invalid-border: #a94442;
 $input-color-invalid-text: #a94442;

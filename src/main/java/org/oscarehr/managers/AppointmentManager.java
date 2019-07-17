@@ -216,7 +216,8 @@ public class AppointmentManager {
 
 		appointmentDao.merge(appointment);
 
-		return appointment.getStatus();
+		// return status without modifier
+		return appointment.getAppointmentStatus();
 	}
 
 	public Appointment getAppointment(LoggedInInfo loggedInInfo, int apptNo) {
@@ -227,15 +228,26 @@ public class AppointmentManager {
 		return appt;
 	}
 
-	public Appointment updateAppointmentStatus(LoggedInInfo loggedInInfo, int apptNo, String status) {
-		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null)) {
+	public Appointment updateAppointmentStatus(LoggedInInfo loggedInInfo, int apptNo, String status)
+	{
+		if(!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null))
+		{
 			throw new RuntimeException("Access Denied");
 		}
-		
+
 		Appointment appt = appointmentDao.find(apptNo);
-		if (appt != null) {
-			appointmentArchiveDao.archiveAppointment(appt);	
-		
+		if(appt != null)
+		{
+			appointmentArchiveDao.archiveAppointment(appt);
+
+			String rawStatus = appt.getStatus();
+			String statusModifier = "";
+			if(rawStatus != null && rawStatus.length() > 1)
+			{
+				statusModifier = rawStatus.substring(1,2);
+			}
+			status = status + statusModifier;
+
 			appt.setStatus(status);
 		}
 		appointmentDao.merge(appt);

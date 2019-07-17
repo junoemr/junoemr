@@ -68,7 +68,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String OFFICIAL_LAST_NAME="official_last_name";
     public static final String OFFICIAL_OLIS_IDTYPE="official_olis_idtype";
     public static final String OSCAR_MSG_RECVD="oscarMsgRecvd";
-    
+
     
     //added to user properties with new interface
     public static final String FAX = "fax";
@@ -79,6 +79,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String SCHEDULE_END_HOUR = "schedule.end_hour";
     public static final String SCHEDULE_PERIOD = "schedule.period";
     public static final String SCHEDULE_SITE = "schedule.site";
+    public static final String SCHEDULE_VIEW = "schedule.view";
     public static final String MYGROUP_NO = "mygroup_no";
     public static final String NEW_CME = "new_cme";
     public static final String ENCOUNTER_FORM_LENGTH = "encounter.form_length";

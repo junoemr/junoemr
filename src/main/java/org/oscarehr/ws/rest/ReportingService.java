@@ -23,7 +23,6 @@
  */
 package org.oscarehr.ws.rest;
 
-import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.dao.EFormReportToolDao;
 import org.oscarehr.common.model.DemographicSets;
@@ -31,8 +30,6 @@ import org.oscarehr.common.model.EFormReportTool;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.DemographicSetsManager;
 import org.oscarehr.managers.EFormReportToolManager;
-import org.oscarehr.web.PatientListApptBean;
-import org.oscarehr.web.PatientListApptItemBean;
 import org.oscarehr.ws.rest.conversion.EFormReportToolConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
@@ -53,8 +50,6 @@ import java.util.List;
 @Component
 public class ReportingService extends AbstractServiceImpl {
 	
-	//private static final Logger logger = MiscUtils.getLogger();
-
 	@Autowired
 	DemographicSetsManager demographicSetsManager;
 	
@@ -85,27 +80,6 @@ public class ReportingService extends AbstractServiceImpl {
 		response.setContent(demographicSetsManager.getByName(getLoggedInInfo(), name));
 		response.setTotal(response.getContent().size());
 		
-		return (response);
-	}
-	
-	@POST
-	@Path("/demographicSets/patientList")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public PatientListApptBean getAsPatientList(JSONObject json){
-		
-		PatientListApptBean response = new PatientListApptBean();
-		
-		if(json.containsKey("name") && json.getString("name").length()>0) {
-		
-			for(DemographicSets demographicSet : demographicSetsManager.getByName(getLoggedInInfo(), json.getString("name"))) {
-				PatientListApptItemBean item = new PatientListApptItemBean();
-				item.setDemographicNo(demographicSet.getDemographicNo());
-				item.setName(demographicManager.getDemographicFormattedName(getLoggedInInfo(), item.getDemographicNo()));
-				response.getPatients().add(item);
-			}
-		} 
-
 		return (response);
 	}
 		

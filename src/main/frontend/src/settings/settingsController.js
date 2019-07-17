@@ -1,7 +1,11 @@
+import {SitesApi} from "../../generated/api/SitesApi";
+import {ScheduleApi} from "../../generated/api/ScheduleApi";
+
 angular.module('Settings').controller('Settings.SettingsController', [
 
 	'$scope',
 	'$http',
+	'$httpParamSerializer',
 	'$state',
 	'$uibModal',
 	'$filter',
@@ -20,6 +24,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 	function(
 		$scope,
 		$http,
+		$httpParamSerializer,
 		$state,
 		$uibModal,
 		$filter,
@@ -38,6 +43,11 @@ angular.module('Settings').controller('Settings.SettingsController', [
 
 		var controller = this;
 
+		controller.sitesApi = new SitesApi($http, $httpParamSerializer,
+		'../ws/rs');
+		controller.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
+			'../ws/rs');
+
 		$scope.$emit('configureShowPatientList', false);
 
 		controller.providerList = providerList;
@@ -47,6 +57,9 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		controller.encounterForms = encounterForms.content;
 		controller.eforms = eforms;
 		controller.loadedApps = loadedApps;
+
+		controller.siteOptions = [];
+		controller.scheduleOptions = [];
 
 		if (controller.pref.recentPatients == null)
 		{
@@ -447,6 +460,46 @@ angular.module('Settings').controller('Settings.SettingsController', [
 		}
 
 
+
+
+		controller.init = function()
+		{
+			controller.sitesApi.getSiteList().then(
+				function success(rawResults)
+				{
+					var results = rawResults.data.body;
+					var out = [];
+					if (angular.isArray(results))
+					{
+						for (var i = 0; i < results.length; i++)
+						{
+							out.push({
+								id: results[i].siteId,
+								value: results[i].name,
+								label: results[i].name,
+								color: results[i].bgColor,
+							});
+						}
+					}
+					controller.siteOptions = out;
+				}
+			);
+			controller.scheduleApi.getScheduleGroups().then(
+				function success(rawResults)
+				{
+					var results = rawResults.data.body;
+					for (var i = 0; i < results.length; i++)
+					{
+						var scheduleData = results[i];
+
+						results[i].label = results[i].name;
+						results[i].value = results[i].identifier;
+
+						controller.scheduleOptions.push(scheduleData);
+					}
+				});
+		};
+
 		controller.isActive = function(tab)
 		{
 			return (tab != null && controller.currentTab != null && tab.id == controller.currentTab.id);
@@ -612,5 +665,7 @@ angular.module('Settings').controller('Settings.SettingsController', [
 			///
 			console.log("refresh", controller.loadedApps);
 		};
+
+		controller.init();
 	}
 ]);

@@ -27,6 +27,7 @@ import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.appointment.service.Appointment;
 import org.oscarehr.common.dao.MyGroupDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.dao.ProviderSiteDao;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.MyGroup;
 import org.oscarehr.common.model.Provider;
@@ -37,6 +38,7 @@ import org.oscarehr.schedule.dao.ScheduleHolidayDao;
 import org.oscarehr.schedule.dao.ScheduleTemplateDao;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarEvent;
+import org.oscarehr.schedule.dto.CalendarSchedule;
 import org.oscarehr.schedule.dto.ResourceSchedule;
 import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.schedule.dto.UserDateSchedule;
@@ -85,6 +87,9 @@ public class Schedule
 
 	@Autowired
 	ProviderDao providerDao;
+
+	@Autowired
+	ProviderSiteDao providerSiteDao;
 
 	@Autowired
 	ScheduleDateDao scheduleDateDao;
@@ -595,5 +600,96 @@ public class Schedule
 			session, providerId, startDate, endDate, siteName));
 
 		return calendarEvents;
+	}
+	public CalendarSchedule getCalendarScheduleByProvider(
+			HttpSession session,
+			Integer providerId,
+			LocalDate startDate,
+			LocalDate endDate,
+			LocalTime startTime,
+			LocalTime endTime,
+			String siteName,
+			Integer slotDurationInMin
+	)
+	{
+		List<CalendarEvent> allCalendarEvents = getCalendarEvents(session, providerId,
+				startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
+		List<String> providerIdList = new ArrayList<>(1);
+		providerIdList.add(String.valueOf(providerId));
+
+		CalendarSchedule calendarSchedule = new CalendarSchedule();
+
+		calendarSchedule.setGroupName(String.valueOf(providerId));
+		calendarSchedule.setProviderIdList(providerIdList);
+		calendarSchedule.setEventList(allCalendarEvents);
+		calendarSchedule.setPreferredSlotDuration(slotDurationInMin);
+
+		return calendarSchedule;
+	}
+
+	public CalendarSchedule getCalendarScheduleByGroup(
+			HttpSession session,
+			String groupName,
+			boolean viewAll,
+			LocalDate startDate,
+			LocalDate endDate,
+			LocalTime startTime,
+			LocalTime endTime,
+			String siteName,
+			Integer slotDurationInMin
+	)
+	{
+		String userProviderNo = (String) session.getAttribute("user");
+
+		List<MyGroup> userGroupMappings;
+		if(viewAll)
+		{
+			userGroupMappings = myGroupDao.getGroupByGroupNo(groupName);
+		}
+		else
+		{
+			userGroupMappings = myGroupDao.getGroupWithScheduleByGroupNo(groupName, startDate, Integer.parseInt(userProviderNo));
+		}
+
+		List<String> providerIdList = new ArrayList<>(userGroupMappings.size());
+		List<CalendarEvent> allCalendarEvents = new ArrayList<>();
+		for(MyGroup userGroup : userGroupMappings)
+		{
+			String providerIdStr = userGroup.getId().getProviderNo();
+
+			// filter by site selection if applicable
+			if(siteName != null)
+			{
+				boolean siteMatch = false;
+				List<Site> providerSites = siteDao.getActiveSitesByProviderNo(providerIdStr);
+				for (Site providerSite : providerSites)
+				{
+					if (siteName.equals(providerSite.getName()))
+					{
+						siteMatch = true;
+					}
+				}
+				if (!siteMatch)
+				{ // skip this provider
+					continue;
+				}
+			}
+
+			providerIdList.add(providerIdStr);
+
+			List<CalendarEvent> calendarEvents = getCalendarEvents(session, Integer.parseInt(providerIdStr),
+					startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
+
+			allCalendarEvents.addAll(calendarEvents);
+		}
+
+		CalendarSchedule calendarSchedule = new CalendarSchedule();
+
+		calendarSchedule.setGroupName(groupName);
+		calendarSchedule.setProviderIdList(providerIdList);
+		calendarSchedule.setEventList(allCalendarEvents);
+		calendarSchedule.setPreferredSlotDuration(5); //TODO calculate based on lowest common slot size
+
+		return calendarSchedule;
 	}
 }
