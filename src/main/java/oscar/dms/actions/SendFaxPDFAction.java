@@ -96,42 +96,42 @@ public class SendFaxPDFAction extends DispatchAction {
 	        {
 		        MiscUtils.getLogger().debug("size = " + docNoArray.length);
 		        EDocUtil docData = new EDocUtil();
-		        for(String docNo : docNoArray)
-		        {
-			        String filename = docData.getDocumentName(docNo);
-			        // filename already has .pdf suffix
+				for(String docNo : docNoArray)
+				{
+					String filename = docData.getDocumentName(docNo);
+					// filename already has .pdf suffix
 					File tempFile = File.createTempFile("DOC-" + docNo + "-" + filename, "");
 					for(String faxNo : faxNoList)
-			        {
-				        FaxOutboxTransferOutbound transfer;
-				        try
-				        {
-					        GenericFile fileToCopy = FileFactory.getDocumentFile(docData.getDocumentName(docNo));
-					        GenericFile fileToFax = FileFactory.copy(fileToCopy);
+					{
+						FaxOutboxTransferOutbound transfer;
+						try
+						{
+							GenericFile fileToCopy = FileFactory.getDocumentFile(docData.getDocumentName(docNo));
+							GenericFile fileToFax = FileFactory.copy(fileToCopy);
 
-					        String faxFileName = FilenameUtils.removeExtension(tempFile.getName()) + "-" + faxNo;
-					        fileToFax.rename(faxFileName + ".pdf");
+							String faxFileName = FilenameUtils.removeExtension(tempFile.getName()) + "-" + faxNo;
+							fileToFax.rename(faxFileName + ".pdf");
 
-					        transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicId, faxNo, FaxOutbound.FileType.DOCUMENT, fileToFax);
-					        if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR))
-					        {
-						        errorList.add("Failed to send fax. Check account settings. " +
-								        "Reason: " + transfer.getSystemStatusMessage());
-					        }
-					        else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED))
-					        {
-						        errorList.add("Failed to send fax, it has been queued for automatic resend. " +
-								        "Reason: " + transfer.getSystemStatusMessage());
-					        }
-				        }
-				        catch(Exception e)
-				        {
-					        MiscUtils.getLogger().error(e.getClass().getCanonicalName() +
-							        " occurred while preparing document fax files.", e);
-					        String errorAt = " (Document: " + filename + " Recipient: " + faxNo + ")";
-					        errorList.add(getUserFriendlyError(e) + errorAt);
-					        continue;
-				        }
+							transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicId, faxNo, FaxOutbound.FileType.DOCUMENT, fileToFax);
+							if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR))
+							{
+								errorList.add("Failed to send fax. Check account settings. " +
+										"Reason: " + transfer.getSystemStatusMessage());
+							}
+							else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED))
+							{
+								errorList.add("Failed to send fax, it has been queued for automatic resend. " +
+										"Reason: " + transfer.getSystemStatusMessage());
+							}
+						}
+						catch(Exception e)
+						{
+							MiscUtils.getLogger().error(e.getClass().getCanonicalName() +
+									" occurred while preparing document fax files.", e);
+							String errorAt = " (Document: " + filename + " Recipient: " + faxNo + ")";
+							errorList.add(getUserFriendlyError(e) + errorAt);
+							continue;
+						}
 						finally
 						{
 							MiscUtils.getLogger().info("delete doc fax tempfile: " + tempFile.getPath());
