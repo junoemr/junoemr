@@ -69,7 +69,7 @@ public final class Factory {
 
 	private static Logger logger = MiscUtils.getLogger();
 
-	private static final HashSet<String> REFACTORED_LAB_TYPES = Sets.newHashSet("AHS", "CCLAB","CLS","CLSDI", JunoGenericLabHandler.LAB_TYPE_VALUE);
+	private static final HashSet<String> REFACTORED_LAB_TYPES = Sets.newHashSet("AHS", "CCLAB", "CCENDO","CLS","CLSDI", JunoGenericLabHandler.LAB_TYPE_VALUE);
 
 	private Factory() {
 		// static methods no need for instance
@@ -168,6 +168,10 @@ public final class Factory {
 			{
 				handler = new ConnectCareDiagnosticImagingCancelHandler(msg);
 			}
+			else if (ConnectCareEndoscopyCancelHandler.handlerTypeMatch(msg))
+			{
+				handler = new ConnectCareEndoscopyCancelHandler(msg);
+			}
 		}
 		else if (mshSplit[8].equals("MDM^T02"))
 		{
@@ -204,6 +208,8 @@ public final class Factory {
 			// attempt to read the msh header and determine lab type handler
 			if(ConnectCareDiagnosticImagingHandler.handlerTypeMatch(msg))
 				handler = new ConnectCareDiagnosticImagingHandler(msg);
+			else if (ConnectCareEndoscopyHandler.handlerTypeMatch(msg))
+				handler = new ConnectCareEndoscopyHandler(msg);
 			else if(ConnectCareLabHandler.handlerTypeMatch(msg))
 				handler = new ConnectCareLabHandler(msg);
 			else if(CLSHandler.handlerTypeMatch(msg))
