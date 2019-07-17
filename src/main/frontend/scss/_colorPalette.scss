@@ -2,6 +2,7 @@
 // Colour Palette
 $primary: #455899;
 $primary-hover: #394980;
+$primary-active: #546499;
 $primary-50: rgba(71,107,179,.50);
 $primary-30: rgba(71,107,179,.30);
 $secondary: #5cb8cc;
@@ -82,22 +83,8 @@ $semantic-error-base: #e67d73;
 $semantic-error-light: #fff3f2;
 
 	// OLD names, use above
-$primary-blue: #476bb3;
 $secondary-blue: #15417a;
-$primary-hover-blue: #3c5a96;
 $secondary-hover-blue: #386fc1;
-$primary-blue-text: #235ba3;
-
-$primary-white: #fff;
-$secondary-white: #ebebeb;
-$hover-white: #fff;
-$primary-white-text: #fff;
-
-$light-grey: #ededed;
-$medium-grey: #c0c0c0;
-$dark-grey: #767676;
-
-$modal-color: #996633;
 
 // Imported from Clinicaid (schedule + datepicker stuff)
 $color-btn-addon-bg: #FFF;

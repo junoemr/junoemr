@@ -80,7 +80,7 @@
 	#note-editor-minimized {
 		background-color: $secondary-blue;
 		padding: 0;
-		color: $primary-white-text;
+		color: $white;
 		opacity: 0.5;
 		&:hover {
 			opacity: 1;
@@ -88,7 +88,7 @@
 	}
 
 	#note-editor {
-		background-color: $light-grey;
+		background-color: $grey-07;
 		/* pre-emptively set the left edge due to a weird jqueryui bug
 		in which the left edge is not set if the user resizes the element from the right before doing any other resizing actions.
 		This causes the element to expand from both sides when resizing to the right*/
@@ -97,7 +97,7 @@
 		top: auto !important;
 		bottom: 0;
 		#note-editor-header {
-			color: $primary-white-text;
+			color: $white;
 			background-color: $secondary-blue;
 			margin-bottom: $margin-md;
 			#note-editor-minimize-button {

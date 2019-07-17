@@ -10,7 +10,7 @@
 
 .schedule-page-header {
 	@extend %juno-page-header;
-	@include juno-font-label;
+	//@include juno-font-label;
 
 	select {
 		@include juno-select(16px);
@@ -24,8 +24,8 @@
 
 		.form-inline {
 			.btn {
-				font-weight: bold;
 				height: $input-height;
+				font-weight: bold;
 
 				&.btn-addon {
 					@include juno-button-colour-scheme($white, $primary-hover, $primary-hover);
@@ -51,9 +51,9 @@
 				@include juno-form-colour-scheme-dark;
 			}
 
-			input,select {
-				font-weight: bold;
-			}
+			//input,select {
+				//font-weight: bold;
+			//}
 			label {
 				margin-right: 5px;
 			}
@@ -68,7 +68,7 @@
 			}
 			.cal-step-button-group {
 				.form-group {
-					margin-left: 10px;
+					margin-left: 4px;
 				}
 			}
 		}
@@ -84,7 +84,7 @@
 	@extend %juno-primary-view-pane;
 	@include juno-page-margin-none;
 	position: relative;
-	overflow: auto hidden;
+	overflow: hidden;
 
 	.calendar-loading
 	{
@@ -118,7 +118,6 @@
 			// adjust style for left hand time column
 			.fc-time {
 				@include juno-font-label;
-				//font-weight: bold;
 				background-color: $grey-08;
 				color: $grey-01;
 				span {
@@ -254,6 +253,7 @@
 
 					.column-ctl-root {
 						@include juno-font-tab;
+						font-weight: bold;
 						background-color: $white;
 						display: flex;
 						height: $page-tabs-height-alt;
@@ -274,6 +274,7 @@
 				/* styling for the day/week/month view column-control headers */
 				.fc-day-header {
 					@include juno-font-tab;
+					font-weight: bold;
 					height: $page-tabs-height-alt;
 					vertical-align: middle;
 				}
@@ -428,37 +429,6 @@
 			.edit-history-header {
 				background-color: $grey-08;
 				padding: 12px;
-			}
-		}
-	}
-}
-
-
-.schedule-daysheet {
-
-	table {
-
-		font-size: 0.929em;
-
-		@media print {
-			font-size: 0.643em;
-		}
-
-		thead tr th,
-		tbody tr td {
-
-			&.time, &.status, &.patient {
-				width: 1px;
-				white-space: nowrap;
-			}
-
-			&.text {
-				@include overflow-ellipsis;
-				max-width: 1px;
-
-				&.text-truncated {
-					@include overflow-ellipsis-nowrap;
-				}
 			}
 		}
 	}

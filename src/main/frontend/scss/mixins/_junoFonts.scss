@@ -1,5 +1,4 @@
 
-@import '../fonts/Cabin/stylesheet.css';
 @import '../fonts/Hinde/stylesheet.css';
 
 @mixin juno-font-default()
@@ -11,6 +10,16 @@
     line-height: normal;
     letter-spacing: normal;
 }
+@mixin juno-font-button($font-size: 12px, $weight : normal, $line-height: normal)
+{
+	font-family: Hinde, Arial, sans-serif;
+    font-weight: $weight;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: $line-height;
+    letter-spacing: normal;
+    font-size: $font-size;
+}
 
 @mixin juno-font-default-size($font-size)
 {
@@ -18,13 +27,13 @@
     font-size: $font-size;
 }
 
-@mixin juno-font-tab()
+@mixin juno-font-tab($font-size : 12px)
 {
-	@include juno-font-default-size(12px);
+	@include juno-font-default-size($font-size);
 }
-@mixin juno-font-input()
+@mixin juno-font-input($font-size : 13px)
 {
-	@include juno-font-default-size(13px);
+	@include juno-font-default-size($font-size);
 }
 @mixin juno-font-label($font-size : 11px)
 {

@@ -9,6 +9,7 @@
 	select {
 		@include juno-select(16px);
 		background-image: url($icon-down-white);
+		padding-right: 2.5em; //allow extra space for dropdown arrow
 		height: $form-input-height;
 		border: 0;
 		border-radius: 0;
