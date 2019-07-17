@@ -502,7 +502,8 @@
 						type="button"
 						class="btn btn-danger"
 						ng-show="eventController.hasAppointmentId()"
-						ng-click="eventController.del()"
+						juno-confirm-click="eventController.del()"
+						juno-confirm-message="Are you sure you want to delete this appointment?"
 						ng-disabled="isWorking()">Delete
 				</button>
 			</div>
