@@ -92,7 +92,6 @@ public class FrmCustomedPDFServlet extends HttpServlet
 				HashSet<String> recipients = OutgoingFaxService.preProcessFaxNumbers(pharmacyFaxNo);
 				String faxMessage = "Fax sent to: " + pharmacyName + " (" + pharmacyFaxNo + ")";
 
-				int numSending = 0;
 				for(String recipient : recipients) // only ever has one element
 				{
 					// write to file

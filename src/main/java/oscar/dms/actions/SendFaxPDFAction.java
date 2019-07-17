@@ -26,6 +26,7 @@
 package oscar.dms.actions;
 
 import com.lowagie.text.DocumentException;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -46,6 +47,7 @@ import oscar.util.FaxUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,7 +63,8 @@ public class SendFaxPDFAction extends DispatchAction {
 	private static final OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
 
     public ActionForward faxDocument(ActionMapping mapping, ActionForm form,
-		HttpServletRequest request, HttpServletResponse response) 
+		HttpServletRequest request, HttpServletResponse response)
+			throws IOException
 	{
 		if (!outgoingFaxService.isOutboundFaxEnabled())
 		{
@@ -96,7 +99,9 @@ public class SendFaxPDFAction extends DispatchAction {
 		        for(String docNo : docNoArray)
 		        {
 			        String filename = docData.getDocumentName(docNo);
-			        for(String faxNo : faxNoList)
+			        // filename already has .pdf suffix
+					File tempFile = File.createTempFile("DOC-" + docNo + "-" + filename, "");
+					for(String faxNo : faxNoList)
 			        {
 				        FaxOutboxTransferOutbound transfer;
 				        try
@@ -104,8 +109,8 @@ public class SendFaxPDFAction extends DispatchAction {
 					        GenericFile fileToCopy = FileFactory.getDocumentFile(docData.getDocumentName(docNo));
 					        GenericFile fileToFax = FileFactory.copy(fileToCopy);
 
-					        String faxFileName = "DOC-" + docNo + "-" + filename + "-" + faxNo;
-					        fileToFax.rename(GenericFile.getTempGeneratedFileName(faxFileName + ".pdf"));
+					        String faxFileName = FilenameUtils.removeExtension(tempFile.getName()) + "-" + faxNo;
+					        fileToFax.rename(faxFileName + ".pdf");
 
 					        transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicId, faxNo, FaxOutbound.FileType.DOCUMENT, fileToFax);
 					        if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR))
@@ -127,6 +132,11 @@ public class SendFaxPDFAction extends DispatchAction {
 					        errorList.add(getUserFriendlyError(e) + errorAt);
 					        continue;
 				        }
+						finally
+						{
+							MiscUtils.getLogger().info("delete doc fax tempfile: " + tempFile.getPath());
+							tempFile.delete();
+						}
 
 				        /* -- OHSUPPORT-2932 -- */
 				        if(OscarProperties.getInstance().isPropertyActive(
@@ -151,13 +161,14 @@ public class SendFaxPDFAction extends DispatchAction {
 		{
 			request.setAttribute("printError", true);
 		}
-		
+
 		request.setAttribute("errors", errorList);
         return mapping.findForward("success");
     }
 
 	public ActionForward faxForm(ActionMapping mapping, ActionForm form,
 								 HttpServletRequest request, HttpServletResponse response)
+			throws IOException
 	{
 		if (!outgoingFaxService.isOutboundFaxEnabled())
 		{
@@ -172,6 +183,7 @@ public class SendFaxPDFAction extends DispatchAction {
 		Integer demographicNo = Integer.parseInt(demographicNoStr);
 
 		ArrayList<Object> errorList = new ArrayList<>();
+		File tempFile = File.createTempFile("-Form-" + formName, ".pdf");
 		try
 		{
 			Set<String> faxNoList = OutgoingFaxService.preProcessFaxNumbers(recipients);
@@ -181,7 +193,7 @@ public class SendFaxPDFAction extends DispatchAction {
 				try
 				{
 					GenericFile fileToFax = FileFactory.getExistingFile(pdfPath);
-					fileToFax.rename(GenericFile.getTempGeneratedFileName("-Form-" + formName + ".pdf"));
+					fileToFax.rename(faxNo + "_" + tempFile.getName());
 					transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicNo, faxNo, FaxOutbound.FileType.FORM, fileToFax);
 					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
 					{
@@ -206,6 +218,10 @@ public class SendFaxPDFAction extends DispatchAction {
 		catch(FaxException e)
 		{
 			errorList.add(e.getUserFriendlyMessage());
+		}
+		finally
+		{
+			tempFile.delete();
 		}
 
 		request.setAttribute("errors", errorList);
