@@ -592,8 +592,8 @@ public abstract class ORU_R01MessageHandler extends MessageHandler
 	 */
 	@Override
 	public boolean hasExtendedSpecimenDescription(int i, int j)
-	{
-		return getSpecimenOBXCount(i, j) != 0;
+	{// disable for now, I don't trust the extended description
+		return false;
 	}
 
 	/**

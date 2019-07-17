@@ -133,7 +133,7 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 		}
 		else if (getOBXContentType(i, j) == OBX_CONTENT_TYPE.SUSCEPTIBILITY)
 		{
-			return getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-26-3")) + ": " + getOBXAbnormalFlag(i, j);
+			return getString(super.getOBXName(i, j) + ": " + getOBXAbnormalFlag(i, j));
 		}
 		else if (hasZBR() && getOBXValueType(i, j).equals(CWE.class.getSimpleName()))
 		{
@@ -167,6 +167,40 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 		}
 
 		return OBX_CONTENT_TYPE.TEXT;
+	}
+
+	/**
+	 * if OBX is in Susceptibility OBR just return fixed string.
+	 * @param i - OBR rep
+	 * @param j - OBX rep
+	 * @return - OBX name
+	 */
+	@Override
+	public String getOBXName(int i, int j)
+	{
+		if (isOBRSusceptibility(i))
+		{
+			return "Susceptibility, " + getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-26-3"));
+		}
+
+		return super.getOBXName(i, j);
+	}
+
+	/**
+	 * if OBX is in susceptibility OBR just return fixed id string
+	 * @param i - OBR rep
+	 * @param j - OBX rep
+	 * @return - obx identifier string
+	 */
+	@Override
+	public String getOBXIdentifier(int i, int j)
+	{
+		if (isOBRSusceptibility(i))
+		{
+			return "Susceptibility, " + getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-26-3"));
+		}
+
+		return super.getOBXIdentifier(i, j);
 	}
 
 	/* ================== ZBR ========================= */
