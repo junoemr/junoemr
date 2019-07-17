@@ -151,7 +151,7 @@ function t(s1,s2,s3,s4,s5,s6) {
 <div style="colur: #FF0000; text-decoration: none"><a
 	href="javascript:history.go(-1)"
 	style="text-decoration: none; color: #000000">Go Back</a> <a
-	href="../provider/providercontrol.jsp"
+	href="../provider/providercontrol.jsp?viewall=<%=viewall%>"
 	style="text-decoration: none; color: #000000">Day Page</a></div>
 <table width="100%" border="1" cellspacing="0" cellpadding="0">
 	<tr align="center" bgcolor="#CCCCFF">
