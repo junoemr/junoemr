@@ -269,10 +269,8 @@ public class AddEFormAction extends Action {
 			// If there were unmapped measurements, we want to redirect back to the main eForm page
 			if (!unmappedWarnings.isEmpty())
 			{
-				EForm curForm = new EForm(eForm);
-				request.setAttribute("curform", curForm);
 				request.setAttribute("measurements_unsaved", unmappedWarnings);
-				return mapping.getInputForward();
+				return mapping.findForward("close");
 			}
 
 		}

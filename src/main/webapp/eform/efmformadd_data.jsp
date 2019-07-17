@@ -54,31 +54,6 @@
 <% } %>
 
 <%
-  if (request.getAttribute("measurements_unsaved") != null)
-  {
-%>
-  <div id="hideshow" style="position: relative; z-index: 999; font-size: 12px; color: darkred;">
-    <p>
-      Your eForm has successfully saved, but the following issues were encountered while saving the eForm.
-    </p>
-
-    <p>
-      This eForm is attempting to record measurements to the patient's eChart that do not match your current measurement types:
-    </p>
-    <c:forEach var="unsavedMeasurement" items="${measurements_unsaved}">
-      <li>${unsavedMeasurement}</li>
-    </c:forEach>
-    <p>
-      If you would like to adjust your measurement types, please consult
-      <a target="_blank" href="https://help.junoemr.com/support/solutions/articles/3000088272-measurement-customization">this guide.</a>
-    </p>
-    <a href="javascript:hideDiv()">Hide Warnings</a>
-  </div>
-<%
-  }
-%>
-
-<%
   String provider_no = (String) session.getValue("user");
   String demographic_no = request.getParameter("demographic_no");
   String appointment_no = request.getParameter("appointment");
