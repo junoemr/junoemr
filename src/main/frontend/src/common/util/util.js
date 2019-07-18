@@ -88,7 +88,7 @@ Juno.Common.Util.getTimeMoment = function getTimeMoment(time_string)
 
 Juno.Common.Util.getDateMomentFromComponents = function getDateMomentFromComponents(year_string, month_string, day_string)
 {
-	return moment.utc({year: year_string, month: month_string, day: day_string});
+	return moment.utc({year: year_string, month: (Number(month_string)-1), day: day_string});
 };
 
 Juno.Common.Util.getDateAndTimeMoment = function getCombinedMoment(dateString, timeString)
