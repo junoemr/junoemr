@@ -304,7 +304,9 @@ public class RxPdfTemplatePrescriptionPad extends RxPdfTemplate {
 					float scale = (pageWidth*0.8f)/watermarkImg.getWidth();
 					float x = pageWidth/2 - (watermarkImg.getWidth()*scale)/2;
 					float y = (page.getHeight() - (page.getHeight() - (endPara - 80))/2) - (watermarkImg.getHeight()*scale)/2;
-					renderImageToPdf(watermarkImg, x, y, scale, cb);
+
+					PdfContentByte cbUnder = writer.getDirectContentUnder();
+					renderImageToPdf(watermarkImg, x, y, scale, cbUnder);
 				}
 
 				//header table for patient's information.
