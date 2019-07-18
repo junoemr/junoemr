@@ -30,6 +30,7 @@ import java.lang.annotation.Annotation;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.common.annotation.LogHeaderInbound;
 import org.oscarehr.ws.common.annotation.MaskParameter;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
@@ -192,19 +193,27 @@ public class SoapLogBuilder
      */
     private String generatePostData(boolean keepHeader)
     {
-        String xml = this.rawPostData;
-        if (!keepHeader && isPostBodyParseable())
+        try
         {
-            xml = stripTag("env:Body", xml, true);
-        }
+            String xml = this.rawPostData;
+            if (!keepHeader && isPostBodyParseable())
+            {
+                xml = stripTag("Body", xml, true);
+            }
 
-        if (isSoapMethodAnnotatedWith(MaskParameter.class ) && isPostBodyParseable())
+            if (isSoapMethodAnnotatedWith(MaskParameter.class) && isPostBodyParseable())
+            {
+                String[] parametersToMask = getMaskParameters();
+                xml = applyParameterMasking(parametersToMask, xml);
+            }
+
+            return xml;
+        }
+        catch (Exception e)
         {
-            String[] parametersToMask = getMaskParameters();
-            xml = applyParameterMasking(parametersToMask, xml);
+            MiscUtils.getLogger().error("Error while sanitizing post data: " + e.getMessage(), e);
+            return "Error while sanitizing post data: " + e.getMessage();
         }
-
-        return xml;
     }
 
     /**
@@ -333,7 +342,7 @@ public class SoapLogBuilder
                 @Override
                 public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException
                 {
-                    if (tagToStrip.equals(qName))
+                    if (tagToStrip.equals(localName))
                     {
                         skipping = !invert;
                         if (invert)
@@ -359,7 +368,7 @@ public class SoapLogBuilder
                 @Override
                 public void endElement(String uri, String localName, String qName) throws SAXException
                 {
-                    if (tagToStrip.equals(qName))
+                    if (tagToStrip.equals(localName))
                     {
                         skipping = invert;
                         if (invert)
