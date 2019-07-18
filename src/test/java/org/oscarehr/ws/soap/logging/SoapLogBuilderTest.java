@@ -256,6 +256,28 @@ public class SoapLogBuilderTest
     }
 
     @Test
+    public void testEmptySoapBody()
+    {
+        String testData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><env:Envelope xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:tns=\"http://v1.soap.external.ws.oscarehr.org/\" xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ins0=\"http://v1.soap.external.ws.oscarehr.org/\">";
+        testData += "<env:Body></env:Body></env:Envelope>";
+        configureBuilder(testData, "maskParameterStubDefault");
+        SoapServiceLog logEntry = logBuilder.buildSoapLog();
+
+        assertThat(logEntry.getPostData().trim(), equalTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><env:Body xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\"/>"));
+    }
+
+    @Test
+    public void testCustomNamespace()
+    {
+        String testData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Envelope xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:tns=\"http://v1.soap.external.ws.oscarehr.org/\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ins0=\"http://v1.soap.external.ws.oscarehr.org/\">";
+        testData += "<soapenv:Body></soapenv:Body></soapenv:Envelope>";
+        configureBuilder(testData, "maskParameterStubDefault");
+        SoapServiceLog logEntry = logBuilder.buildSoapLog();
+
+        assertThat(logEntry.getPostData().trim(), equalTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><soapenv:Body xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"/>"));
+    }
+
+    @Test
     public void testNullBody()
     {
         String testData = null;
