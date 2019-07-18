@@ -31,12 +31,10 @@
 
 	<div ng-show="isSchedulingEnabled()">
 		<div class="flex-column flex-grow schedule-page-header">
-			<div ng-show="!isInitialized()">
-				<p>Loading...</p>
-			</div>
-			<div ng-show="isInitialized()"
-			     class="schedule-options flex-row flex-grow align-items-center">
-				<div class="form-inline flex-grow">
+			<div class="schedule-options flex-row flex-grow align-items-center">
+				<h5 ng-show="!isInitialized()">Loading...</h5>
+
+				<div ng-show="isInitialized()" class="form-inline flex-grow">
 					<div class="pull-left">
 						<div class="form-group cal-step-button-group">
 							<div class="form-group">
@@ -162,8 +160,17 @@
 		>
 			<%-- ng-hide on the calendar causes event render issues,
 				 so zero state is shown by rendering content on top of an empty calendar and removing scroll bars --%>
-			<div class="zero-state-message" ng-show="showNoResources">
+			<div class="zero-state-message" ng-show="showNoResources && isInitialized() && !calendarLoading">
 				<h1>No Providers Scheduled</h1>
+			</div>
+			<div class="loading-screen" ng-show="calendarLoading || !isInitialized()">
+				<h1>Loading...</h1>
+				<div class="progress">
+					<div class="progress-bar progress-bar-striped active" role="progressbar"
+					     aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+						<span class="sr-only">Loading...</span>
+					</div>
+				</div>
 			</div>
 			<div
 					id="ca-calendar"
