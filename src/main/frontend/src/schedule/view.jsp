@@ -163,12 +163,13 @@
 			<div class="zero-state-message" ng-show="showNoResources && isInitialized() && !calendarLoading">
 				<h1>No Providers Scheduled</h1>
 			</div>
-			<div class="loading-screen" ng-show="calendarLoading || !isInitialized()">
-				<h1>Loading...</h1>
-				<div class="progress">
-					<div class="progress-bar progress-bar-striped active" role="progressbar"
-					     aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
-						<span class="sr-only">Loading...</span>
+			<div class="loading-screen flex-row flex-grow justify-content-center"
+			     ng-show="calendarLoading || !isInitialized()"
+			>
+				<div class="flex-column justify-content-center vertical-align">
+					<h1>Loading...</h1>
+					<div class="loading-dot-container">
+						<div class="dot-pulse"></div>
 					</div>
 				</div>
 			</div>
