@@ -83,19 +83,19 @@ public class BillingReProcessBillAction extends Action {
         ///
 		String providerNo = frm.getProviderNo();//f
 		String demoFirstName =demo.getFirstName(); //d
-		String demoLastName =demo.getLastName();  //d
+		String demoLastName = org.apache.commons.lang3.StringUtils.leftPad(demo.getLastName(), 2); //d
 
-		String name_verify = org.apache.commons.lang3.StringUtils.truncate(demoFirstName, 2)
+		String name_verify = org.apache.commons.lang3.StringUtils.truncate(demoFirstName, 1)
 				+ " "
-				+ org.apache.commons.lang3.StringUtils.truncate(demoLastName, 3);
+				+ org.apache.commons.lang3.StringUtils.truncate(demoLastName, 2);
 
 		String billingGroupNo=billform.getGroupNo(providerNo);
 		String practitionerNo=billform.getPracNo(providerNo);//p
 		String hcNo = demo.getHin().trim()+demo.getVer().trim();//d
 		String dependentNo = frm.getDependentNo();//f
 
-		String visitLocation = frm.getLocationVisit();//f
-		String clarificationCode = org.apache.commons.lang3.StringUtils.truncate(visitLocation, 3);
+		String visitLocation = org.apache.commons.lang3.StringUtils.leftPad(frm.getLocationVisit(), 2, "0");
+		String clarificationCode = org.apache.commons.lang3.StringUtils.truncate(visitLocation, 2);
 		String anatomicalArea = frm.getAnatomicalArea();//f
 		String afterHour = frm.getAfterHours();//f
 		String newProgram = frm.getNewProgram();//f
