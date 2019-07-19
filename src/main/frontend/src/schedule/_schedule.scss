@@ -173,7 +173,7 @@
 						}
 						.event-blk {
 							display: flex;
-							align-items: center;
+							align-items: start;
 							justify-content: flex-start;
 						}
 						.event-blk-label {
@@ -292,7 +292,7 @@
 			}
 		}
 	}
-	.zero-state-message, .loading-screen {
+	.zero-state-message {
 		text-align: center;
 		position: absolute;
 		top: 0;
@@ -300,12 +300,14 @@
 		width: 100%;
 		height: 100%;
 		background-color: $white;
-		.progress {
-			margin: 0 5%;
-			.progress-bar {
-				background-color: $primary;
-			}
-		}
+	}
+	.loading-screen {
+		position: absolute;
+		top: 0;
+		z-index: 9;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0,0,0,0.1);
 	}
 	&.no-scroll {
 		overflow: hidden;
@@ -341,7 +343,6 @@
 			}
 		}
 		.modal-ctl-buttons {
-			//width: 80px;
 			padding: 6px;
 			align-items: center;
 			justify-content: space-between;
