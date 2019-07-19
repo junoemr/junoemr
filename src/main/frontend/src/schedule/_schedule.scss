@@ -173,7 +173,7 @@
 						}
 						.event-blk {
 							display: flex;
-							align-items: center;
+							align-items: start;
 							justify-content: flex-start;
 						}
 						.event-blk-label {
@@ -343,7 +343,6 @@
 			}
 		}
 		.modal-ctl-buttons {
-			//width: 80px;
 			padding: 6px;
 			align-items: center;
 			justify-content: space-between;
