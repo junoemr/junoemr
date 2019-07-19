@@ -81,49 +81,49 @@ public class BillingReProcessBillAction extends Action {
 
 
         ///
-        String providerNo = frm.getProviderNo();//f
-        String demoFirstName =demo.getFirstName(); //d
-        String demoLastName =demo.getLastName();  //d
+		String providerNo = frm.getProviderNo();//f
+		String demoFirstName =demo.getFirstName(); //d
+		String demoLastName =demo.getLastName();  //d
 
 		String name_verify = (demoFirstName.length() > 2 ? demoFirstName.substring(0, 1) : demoFirstName) + " ";
 		name_verify += (demoLastName.length() > 3 ? demoLastName.substring(0, 2) : demoLastName);
 
-        String billingGroupNo=billform.getGroupNo(providerNo);
-        String practitionerNo=billform.getPracNo(providerNo);//p
-        String hcNo = demo.getHin().trim()+demo.getVer().trim();//d
-        String dependentNo = frm.getDependentNo();//f
+		String billingGroupNo=billform.getGroupNo(providerNo);
+		String practitionerNo=billform.getPracNo(providerNo);//p
+		String hcNo = demo.getHin().trim()+demo.getVer().trim();//d
+		String dependentNo = frm.getDependentNo();//f
 
-        String visitLocation = frm.getLocationVisit();//f
-        String clarificationCode = visitLocation.length() > 3 ? visitLocation.substring(0,2) : visitLocation;
-        String anatomicalArea = frm.getAnatomicalArea();//f
-        String afterHour = frm.getAfterHours();//f
-        String newProgram = frm.getNewProgram();//f
-        String billingUnit = frm.getBillingUnit();///f
-        String billingServiceCode = frm.getService_code();//f
-        String billingServicePrice =frm.getBillingAmount();//f
-        String payment_mode = frm.getPaymentMode();//f
-        String serviceDate = frm.getServiceDate();//f
-        String serviceToDate = frm.getServiceToDay();//f
-        String submissionCode = frm.getSubmissionCode();//f
-        String exSubmissionCode ="";//f
-        String dxCode1 = frm.getDx1();//f
-        String dxCode2= frm.getDx2();//f
-        String dxCode3= frm.getDx3();//f
-        String dxExpansion ="";//f
-        String serviceLocation = frm.getServiceLocation().substring(0,1);//f
+		String visitLocation = frm.getLocationVisit();//f
+		String clarificationCode = visitLocation.length() > 3 ? visitLocation.substring(0,2) : visitLocation;
+		String anatomicalArea = frm.getAnatomicalArea();//f
+		String afterHour = frm.getAfterHours();//f
+		String newProgram = frm.getNewProgram();//f
+		String billingUnit = frm.getBillingUnit();///f
+		String billingServiceCode = frm.getService_code();//f
+		String billingServicePrice =frm.getBillingAmount();//f
+		String payment_mode = frm.getPaymentMode();//f
+		String serviceDate = frm.getServiceDate();//f
+		String serviceToDate = frm.getServiceToDay();//f
+		String submissionCode = frm.getSubmissionCode();//f
+		String exSubmissionCode ="";//f
+		String dxCode1 = frm.getDx1();//f
+		String dxCode2= frm.getDx2();//f
+		String dxCode3= frm.getDx3();//f
+		String dxExpansion ="";//f
+		String serviceLocation = frm.getServiceLocation().substring(0,1);//f
 
-        String referralFlag1 = frm.getReferalPracCD1();//f
-        String referralNo1 = frm.getReferalPrac1();//f
-        String referralFlag2 = frm.getReferalPracCD2();//f
-        String referralNo2 =frm.getReferalPrac2();//f
-        String timeCall =frm.getTimeCallRec();//f
-        String serviceStartTime =frm.getStartTime();//f
-        String serviceEndTime = frm.getFinishTime();//f
-        String birthDate = DemographicData.getDob(demo);//d
-        String correspondenceCode = frm.getCorrespondenceCode();//f
-        String claimComment = frm.getShortComment();//f
+		String referralFlag1 = frm.getReferalPracCD1();//f
+		String referralNo1 = frm.getReferalPrac1();//f
+		String referralFlag2 = frm.getReferalPracCD2();//f
+		String referralNo2 =frm.getReferalPrac2();//f
+		String timeCall =frm.getTimeCallRec();//f
+		String serviceStartTime =frm.getStartTime();//f
+		String serviceEndTime = frm.getFinishTime();//f
+		String birthDate = DemographicData.getDob(demo);//d
+		String correspondenceCode = frm.getCorrespondenceCode();//f
+		String claimComment = frm.getShortComment();//f
 
-        String billingStatus =frm.getStatus();//f
+		String billingStatus =frm.getStatus();//f
 
 
 
