@@ -30,6 +30,7 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.model.ProviderTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -108,5 +109,15 @@ public class ProvidersService extends AbstractServiceImpl
 			logger.error("Error", e);
 		}
 		return RestResponse.errorResponse("Error");
+	}
+
+	@GET
+	@Path("/all")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestSearchResponse<ProviderTo1> getAll()
+	{
+		List<Provider> providers = providerDao.getProviders();
+		List<ProviderTo1> providersTo1 = providerConverter.getAllAsTransferObjects(getLoggedInInfo(), providers);
+		return RestSearchResponse.successResponseOnePage(providersTo1);
 	}
 }

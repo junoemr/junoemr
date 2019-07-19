@@ -80,7 +80,7 @@
 							        class="form-control"
 							        ng-change="onScheduleChanged()"
 							        ng-model="selectedSchedule"
-							        ng-options="option as option.name for option in getScheduleOptions()">
+							        ng-options="option as option.label for option in getScheduleOptions()">
 							</select>
 						</div>
 						<div class="form-group"
