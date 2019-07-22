@@ -106,7 +106,14 @@ public class BillingCreateBillingAction extends Action {
     bean.setPatientPostal(demo.getPostal());
     bean.setPatientSex(demo.getSex());
     bean.setPatientPHN(demo.getHin()+demo.getVer());
-    bean.setPatientHCType(demo.getHcType());
+    if (frm.isOinPayPatient())
+    {
+      bean.setPatientHCType("PP");
+    }
+    else
+    {
+      bean.setPatientHCType(demo.getHcType());
+    }
     bean.setPatientAge(demo.getAge());
     bean.setBillingType(frm.getXml_billtype());
     bean.setPaymentType(payMeth);
