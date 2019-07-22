@@ -791,7 +791,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 
                         for(i=0;i<headers.size();i++){
                             linenum=0;
-    						boolean isUnstructuredDoc = false;
+    						boolean isUnstructuredDoc = handler.isUnstructured();
     						boolean	isVIHARtf = false;
     						boolean isSGorCDC = false;
 
@@ -936,27 +936,46 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                       } else  if (!handler.getOBXResultStatus(j, k).equals("TDIS") && !handler.getMsgType().equals("EPSILON")) {
                                           	%><tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>"><%
                                        		if(isUnstructuredDoc){
-	                                   			if(handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (obxCount>1)){%>
-	                                   				<td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(j, k)%>'))"></a><%
-	                                   				}
-	                                   			else{%> <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= handler.getOBXIdentifier(j, k) %>')"><%=obxName %></a><%}%>
-												<%if(isVIHARtf){
-												    //create bytes from the rtf string
-											    	byte[] rtfBytes = handler.getOBXResult(j, k).getBytes();
-											    	ByteArrayInputStream rtfStream = new ByteArrayInputStream(rtfBytes);
+                                                if (handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
+                                                {
+                                                    String obxDocId = "";
+                                                    java.util.regex.Matcher docIdMatcher = Pattern.compile("embedded_doc_id_(\\d+)").matcher(handler.getOBXResult(j, k));
+                                                    if (docIdMatcher.find())
+                                                    {
+                                                        obxDocId = docIdMatcher.group(1);
+                                                    }
 
-											    	//Use RTFEditor Kit to get plaintext from RTF
-											    	RTFEditorKit rtfParser = new RTFEditorKit();
-											    	javax.swing.text.Document doc = rtfParser.createDefaultDocument();
-											    	rtfParser.read(rtfStream, doc, 0);
-											    	String rtfText = doc.getText(0, doc.getLength()).replaceAll("\n", "<br>");
-											    	String disclaimer = "<br>IMPORTANT DISCLAIMER: You are viewing a PREVIEW of the original report. The rich text formatting contained in the original report may convey critical information that must be considered for clinical decision making. Please refer to the ORIGINAL report, by clicking 'Print', prior to making any decision on diagnosis or treatment.";%>
-											    	<td align="left"><%= rtfText + disclaimer %></td><%} %><%
-												else{%>
-	                                           		<td align="left"><%= handler.getOBXResult( j, k) %></td><%} %>
-	                                           	<%if(handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, k-1)) && (obxCount>1)){
-	                                        			%><td align="center"></td><%}
-	                                        		else{%> <td align="center"><%= handler.getTimeStamp(j, k) %></td><%}
+                                                    %>
+                                                        <tr>
+                                                            <td valign="top" align="left" class="NarrativeRes"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName%></a>
+                                                            <td class="NarrativeRes"> <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../dms/ManageDocument.do?method=display&doc_no=<%=obxDocId%>');">Display PDF</a> </td>
+                                                        </tr>
+                                                    <%
+                                                }
+                                                else
+                                                {
+                                                    if(handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (obxCount>1)){%>
+                                                        <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(j, k)%>'))"></a><%
+                                                        }
+                                                    else{%> <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= handler.getOBXIdentifier(j, k) %>')"><%=obxName %></a><%}%>
+                                                    <%if(isVIHARtf){
+                                                        //create bytes from the rtf string
+                                                        byte[] rtfBytes = handler.getOBXResult(j, k).getBytes();
+                                                        ByteArrayInputStream rtfStream = new ByteArrayInputStream(rtfBytes);
+
+                                                        //Use RTFEditor Kit to get plaintext from RTF
+                                                        RTFEditorKit rtfParser = new RTFEditorKit();
+                                                        javax.swing.text.Document doc = rtfParser.createDefaultDocument();
+                                                        rtfParser.read(rtfStream, doc, 0);
+                                                        String rtfText = doc.getText(0, doc.getLength()).replaceAll("\n", "<br>");
+                                                        String disclaimer = "<br>IMPORTANT DISCLAIMER: You are viewing a PREVIEW of the original report. The rich text formatting contained in the original report may convey critical information that must be considered for clinical decision making. Please refer to the ORIGINAL report, by clicking 'Print', prior to making any decision on diagnosis or treatment.";%>
+                                                        <td align="left"><%= rtfText + disclaimer %></td><%} %><%
+                                                    else{%>
+                                                        <td align="left"><%= handler.getOBXResult( j, k) %></td><%} %>
+                                                    <%if(handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, k-1)) && (obxCount>1)){
+                                                            %><td align="center"></td><%}
+                                                        else{%> <td align="center"><%= handler.getTimeStamp(j, k) %></td><%}
+                                                }
                                    			}//end of isUnstructuredDoc
 
                                    			else{//if it isn't a PATHL7 doc
