@@ -27,22 +27,25 @@
 <%@page import="org.oscarehr.common.model.PatientLabRouting"%>
 <%@page import="oscar.util.ConversionUtils"%>
 <%@page import="org.oscarehr.common.dao.PatientLabRoutingDao"%>
-<%@page errorPage="../provider/errorpage.jsp" %>
-<%@ page import="java.util.*,
-		 java.sql.*,
-		 oscar.oscarDB.*,
-		 oscar.oscarLab.ca.all.*,
-		 oscar.oscarLab.ca.all.util.*,org.oscarehr.util.SpringUtils,
-		 oscar.oscarLab.ca.all.parsers.*,
-		 oscar.oscarLab.LabRequestReportLink,
-		 oscar.oscarMDS.data.ReportStatus,oscar.log.*,
-         oscar.OscarProperties,
-		 org.apache.commons.codec.binary.Base64,org.oscarehr.common.dao.Hl7TextInfoDao,org.oscarehr.common.model.Hl7TextInfo,
-		 org.oscarehr.common.dao.UserPropertyDAO, org.oscarehr.common.model.UserProperty,
-		javax.swing.text.rtf.RTFEditorKit,
-		java.io.ByteArrayInputStream"%>
+<%@page errorPage="../../../provider/errorpage.jsp" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.oscarLab.LabRequestReportLink" %>
+<%@ page import="oscar.oscarMDS.data.ReportStatus,oscar.log.*" %>
+<%@ page import="org.oscarehr.common.dao.Hl7TextInfoDao" %>
+<%@ page import="org.oscarehr.common.model.Hl7TextInfo" %>
+<%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
+<%@ page import="org.oscarehr.common.model.UserProperty" %>
+<%@ page import="javax.swing.text.rtf.RTFEditorKit" %>
+<%@ page import="java.io.ByteArrayInputStream"%>
 <%@ page import="org.oscarehr.labs.model.Hl7DocumentLink" %>
 <%@ page import="org.oscarehr.labs.dao.Hl7DocumentLinkDao" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
+<%@ page import="oscar.oscarLab.ca.all.AcknowledgementData" %>
+<%@ page import="oscar.oscarLab.ca.all.Hl7textResultsData" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.Factory" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.MessageHandler" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.PATHL7Handler" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -1003,7 +1006,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 	                                            <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../lab/CA/ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(j, k)%>'))"><%=obxName %></a></td><%}%>
 	                                            <%
 
-                                                // no more tabs for Excelleris
+                                                // Excelleris embedded PDFs only want a single link as the OBX result
                                                 if (!isPDF)
                                                 {
                                                     //for pathl7, if it is an SG/CDC result greater than 100 characters, left justify it
