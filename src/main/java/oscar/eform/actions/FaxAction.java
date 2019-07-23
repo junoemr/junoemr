@@ -60,7 +60,7 @@ public final class FaxAction
 		{
 			logger.info("Generating PDF for eForm with fdid = " + formId);
 
-			String pdfFile = "EForm." + formId + "-" + System.currentTimeMillis();
+			String pdfFile = "EForm." + formId + "-" + System.currentTimeMillis() + "-";
 			File tempFile = File.createTempFile(pdfFile, ".pdf");
 
 			// convert to PDF
