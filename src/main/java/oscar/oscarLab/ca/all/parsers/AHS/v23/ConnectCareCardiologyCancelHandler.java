@@ -24,13 +24,13 @@ package oscar.oscarLab.ca.all.parsers.AHS.v23;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.v23.message.MDM_T08;
+import ca.uhn.hl7v2.model.v23.message.ORM_O01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
-import oscar.oscarLab.ca.all.parsers.messageTypes.MDM_T08_T02MessageHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.ORM_O01ConnectCareCancelHandler;
 
-public class ConnectCareDocumentationEditHandler extends MDM_T08_T02MessageHandler
+public class ConnectCareCardiologyCancelHandler extends ORM_O01ConnectCareCancelHandler
 {
-	public ConnectCareDocumentationEditHandler(Message msg) throws HL7Exception
+	public ConnectCareCardiologyCancelHandler(Message msg) throws HL7Exception
 	{
 		super(msg);
 	}
@@ -40,23 +40,25 @@ public class ConnectCareDocumentationEditHandler extends MDM_T08_T02MessageHandl
 		String version = message.getVersion();
 		if(version.equals("2.3"))
 		{
-			MDM_T08 msh = (MDM_T08) message;
+			ORM_O01 msh = (ORM_O01) message;
 			MSH messageHeaderSegment = msh.getMSH();
 
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
 
-			return "CCDOC".equalsIgnoreCase(sendingApplication) &&
+			return "CCCARDIOLOGY".equalsIgnoreCase(sendingApplication) &&
 					"AHS".equalsIgnoreCase(sendingFacility);
 		}
 		return false;
 	}
 
+
 	@Override
 	public String getMsgType()
 	{
-		return "CCDOC";
+		return "CCCARDIOLOGY";
 	}
+
 
 	@Override
 	public String preUpload(String hl7Message) throws HL7Exception
@@ -78,44 +80,5 @@ public class ConnectCareDocumentationEditHandler extends MDM_T08_T02MessageHandl
 	@Override
 	public void init(String hl7Body) throws HL7Exception
 	{
-	}
-
-	@Override
-	public boolean isSupportEmbeddedPdf()
-	{
-		return true;
-	}
-
-	/* ================================= OBX ======================================= */
-
-	/**
-	 * get obx results. aka document id.
-	 * @param i - ignored
-	 * @param j - the obx segment
-	 * @return - the document id string
-	 */
-	@Override
-	public String getOBXResult(int i, int j)
-	{
-		return get("/.OBX(" + j + ")-5-5");
-	}
-
-	/**
-	 * check for obx content type
-	 * @param i - ignored
-	 * @param j - obx rep
-	 * @return PDF or UNKNOWN if type is not PDF
-	 */
-	@Override
-	public OBX_CONTENT_TYPE getOBXContentType(int i, int j)
-	{
-		if (get("/.OBX(" + j + ")-5-2") != null && get("/.OBX(" + j + ")-5-2").equals("PDF"))
-		{
-			return OBX_CONTENT_TYPE.PDF;
-		}
-		else
-		{
-			return OBX_CONTENT_TYPE.UNKNOWN;
-		}
 	}
 }

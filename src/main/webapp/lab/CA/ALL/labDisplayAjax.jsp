@@ -954,7 +954,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                                 }
                                                 else
                                                 {
-                                                    if(handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (obxCount>1)){%>
+                                                    if(handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, Math.max(k-1, 0))) && (obxCount>1)){%>
                                                         <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(j, k)%>'))"></a><%
                                                         }
                                                     else{%> <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= handler.getOBXIdentifier(j, k) %>')"><%=obxName %></a><%}%>
@@ -972,7 +972,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                                         <td align="left"><%= rtfText + disclaimer %></td><%} %><%
                                                     else{%>
                                                         <td align="left"><%= handler.getOBXResult( j, k) %></td><%} %>
-                                                    <%if(handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, k-1)) && (obxCount>1)){
+                                                    <%if(handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, Math.max(k-1, 0))) && (obxCount>1)){
                                                             %><td align="center"></td><%}
                                                         else{%> <td align="center"><%= handler.getTimeStamp(j, k) %></td><%}
                                                 }

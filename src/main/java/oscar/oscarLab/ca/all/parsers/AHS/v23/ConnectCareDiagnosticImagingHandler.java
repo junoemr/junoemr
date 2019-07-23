@@ -55,7 +55,7 @@ public class ConnectCareDiagnosticImagingHandler extends ConnectCareHandler
 	@Override
 	public String getMsgType()
 	{
-		return "AHS";
+		return "CCIMAGING";
 	}
 
 	/**

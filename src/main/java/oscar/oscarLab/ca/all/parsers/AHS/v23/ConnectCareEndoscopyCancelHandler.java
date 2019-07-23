@@ -26,9 +26,9 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORM_O01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
-import oscar.oscarLab.ca.all.parsers.messageTypes.ORM_O01MessageHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.ORM_O01ConnectCareCancelHandler;
 
-public class ConnectCareEndoscopyCancelHandler extends ORM_O01MessageHandler
+public class ConnectCareEndoscopyCancelHandler extends ORM_O01ConnectCareCancelHandler
 {
 	public ConnectCareEndoscopyCancelHandler(Message msg) throws HL7Exception
 	{
@@ -80,22 +80,6 @@ public class ConnectCareEndoscopyCancelHandler extends ORM_O01MessageHandler
 		return "CCENDO";
 	}
 
-	@Override
-	public String getOrderStatus()
-	{
-		return get("/.ORDER/ORC-1");
-	}
-
-	/**
-	 * always unstructured doc
-	 * @return true
-	 */
-	@Override
-	public boolean isUnstructured()
-	{
-		return true;
-	}
-
 	/**
 	 * patient location is the assigned patient location.
 	 * @return - patient location string
@@ -104,123 +88,5 @@ public class ConnectCareEndoscopyCancelHandler extends ORM_O01MessageHandler
 	public String getPatientLocation()
 	{
 		return getAssignedPatientLocation();
-	}
-
-	/* ======================== OBX =============================== */
-	/**
-	 * return 1 for obx count
-	 * @return fixed count of 1
-	 */
-	@Override
-	public int getOBXCount(int i) {return 1;}
-
-	/**
-	 * return fixed value type of ST
-	 * @param i ignored
-	 * @param j ignored
-	 * @return fixed string of "ST".
-	 */
-	@Override
-	public String getOBXValueType(int i, int j)
-	{
-		return "ST";
-	}
-
-	/**
-	 * return fixed identifier "ADT"
-	 * @param i ignored
-	 * @param j ignored
-	 * @return fixed string "ADT
-	 */
-	@Override
-	public String getOBXIdentifier(int i, int j)
-	{
-		return "ADT";
-	}
-
-	/**
-	 * return fixed name "Cancelled"
-	 * @param i ignored
-	 * @param j ignored
-	 * @return fixed string "Cancelled"
-	 */
-	@Override
-	public String getOBXName( int i, int j)
-	{
-		return "Cancelled";
-	}
-
-	/**
-	 * return fixed string
-	 * @param i ignored
-	 * @param j ignored
-	 * @return fixed string "Cancelled"
-	 */
-	@Override
-	public String getOBXResult(int i, int j)
-	{
-		return "Cancelled";
-	}
-
-	/**
-	 * return no units
-	 * @param i ignored
-	 * @param j ignored
-	 * @return return ""
-	 */
-	@Override
-	public String getOBXUnits( int i, int j)
-	{
-		return "";
-	}
-
-	/**
-	 * return no reference range
-	 * @param i ignored
-	 * @param j ignored
-	 * @return return ""
-	 */
-	@Override
-	public String getOBXReferenceRange( int i, int j)
-	{
-		return "";
-	}
-
-
-	/**
-	 * return fixed string "N"
-	 * @param i ignored
-	 * @param j ignored
-	 * @return return "N"
-	 */
-	@Override
-	public String getOBXAbnormalFlag( int i, int j)
-	{
-		return "N";
-	}
-
-	/**
-	 * return 1 comment
-	 * @param i ignored
-	 * @param j ignored
-	 * @return 1
-	 */
-	@Override
-	public int getOBXCommentCount( int i, int j)
-	{
-		return 1;
-	}
-
-	/**
-	 *  return help string for user
-	 * @param i ignored
-	 * @param j ignored
-	 * @param k ingored
-	 * @return help string
-	 */
-	@Override
-	public String getOBXComment( int i, int j, int k)
-	{
-		return "You can use the version buttons to view the cancelled report.";
 	}
 }

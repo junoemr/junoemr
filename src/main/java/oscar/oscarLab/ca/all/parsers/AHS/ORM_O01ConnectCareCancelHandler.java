@@ -20,80 +20,43 @@
  * Victoria, British Columbia
  * Canada
  */
-package oscar.oscarLab.ca.all.parsers.AHS.v23;
+package oscar.oscarLab.ca.all.parsers.AHS;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.v23.message.MDM_T11;
-import ca.uhn.hl7v2.model.v23.segment.MSH;
-import oscar.oscarLab.ca.all.parsers.messageTypes.MDM_T11MessageHandler;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORM_O01MessageHandler;
 
-public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
+public abstract class ORM_O01ConnectCareCancelHandler extends ORM_O01MessageHandler
 {
-	public ConnectCareDocumentationCancelHandler(Message msg) throws HL7Exception
+	public ORM_O01ConnectCareCancelHandler() {}
+
+	public ORM_O01ConnectCareCancelHandler(String hl7Body) throws HL7Exception
+	{
+		super(hl7Body);
+	}
+
+	public ORM_O01ConnectCareCancelHandler(Message msg) throws HL7Exception
 	{
 		super(msg);
 	}
 
-	public static boolean handlerTypeMatch(Message message)
+	@Override
+	public String getOrderStatus()
 	{
-		String version = message.getVersion();
-		if(version.equals("2.3"))
-		{
-			MDM_T11 msh = (MDM_T11) message;
-			MSH messageHeaderSegment = msh.getMSH();
-
-			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
-			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
-
-			return "CCDOC".equalsIgnoreCase(sendingApplication) &&
-					"AHS".equalsIgnoreCase(sendingFacility);
-		}
-		return false;
+		return get("/.ORDER/ORC-1");
 	}
 
+	/**
+	 * always unstructured doc
+	 * @return true
+	 */
 	@Override
-	public String getMsgType()
-	{
-		return "CCDOC";
-	}
-
-	@Override
-	public String preUpload(String hl7Message) throws HL7Exception
-	{
-		return hl7Message;
-	}
-
-	@Override
-	public boolean canUpload()
+	public boolean isUnstructured()
 	{
 		return true;
 	}
 
-	@Override
-	public void postUpload()
-	{
-	}
-
-	@Override
-	public void init(String hl7Body) throws HL7Exception
-	{
-	}
-
-	/* ================================= OBR ============================== */
-
-	/**
-	 *  Even though message has no OBR, return 1 for display purposes
-	 */
-	@Override
-	public int getOBRCount()
-	{
-		return 1;
-	}
-
-
-	/* ========================== OBX ========================== */
-
+	/* ======================== OBX =============================== */
 	/**
 	 * return 1 for obx count
 	 * @return fixed count of 1
@@ -210,17 +173,4 @@ public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 	{
 		return "You can use the version buttons to view the cancelled report.";
 	}
-
-	/**
-	 * always unstructured doc
-	 * @return true
-	 */
-	@Override
-	public boolean isUnstructured()
-	{
-		return true;
-	}
-
-
-
 }

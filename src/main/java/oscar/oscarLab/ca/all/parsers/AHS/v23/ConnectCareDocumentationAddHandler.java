@@ -55,7 +55,7 @@ public class ConnectCareDocumentationAddHandler extends MDM_T08_T02MessageHandle
 	@Override
 	public String getMsgType()
 	{
-		return "AHS";
+		return "CCDOC";
 	}
 
 	@Override
