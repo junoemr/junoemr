@@ -28,12 +28,38 @@ import ca.uhn.hl7v2.model.v23.datatype.CX;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.oscarehr.common.hl7.AHS.model.v23.message.ORU_R01;
+import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 {
+	private static final Map<String, String> orderStatusMap = new HashMap<String, String>();
+	static
+	{
+		orderStatusMap.put("PA", "Addendum");
+		orderStatusMap.put("A", "Addendum");
+		orderStatusMap.put("F", "Final");
+		orderStatusMap.put("C", "Corrected");
+		orderStatusMap.put("CA", "Canceled");
+	}
+
+	/**
+	 * Check if a given message handler is a connect care message handler
+	 * @param handler
+	 * @return
+	 */
+	public static boolean isConnectCareHandler(MessageHandler handler)
+	{
+		String handlerType = handler.getMsgType();
+		return handlerType.equals("CCIMAGING") || handlerType.equals("CCCARDIOLOGY") ||
+				handlerType.equals("CCENDO") ||
+				handlerType.equals("CCLAB");
+	}
+
 	public ConnectCareHandler(Message msg) throws HL7Exception
 	{
 		super(msg);
@@ -145,9 +171,26 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 		return ab;
 	}
 
+	// connect care labs support embedded PDFs
 	@Override
 	public boolean isSupportEmbeddedPdf()
 	{
 		return true;
+	}
+
+	/**
+	 * Interpolate order status according to Connect Card documentation "Message Processing Guidelines Appendix - IMG OUT Addendum Status [3102] AND IMG OUT Status Table [3101]"
+	 * @return Connect Care status string
+	 */
+	@Override
+	public String getOrderStatusDisplayString()
+	{
+		String orderStatus = getOrderStatus();
+		String displayString = orderStatusMap.get(orderStatus);
+		if (displayString == null)
+		{
+			displayString = "Partial";
+		}
+		return displayString;
 	}
 }

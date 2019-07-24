@@ -421,6 +421,15 @@ public abstract class MessageHandler
 	}
 
 	/**
+	 * Get an interpreted order status string for display
+	 * @return - a possibly interpreted order status string
+	 */
+	public String getOrderStatusDisplayString()
+	{
+		return getOrderStatus();
+	}
+
+	/**
 	 *  Return the number of comments (usually NTE segments) that follow ith
 	 *  OBR segment, this should usually be either 0 or 1.
 	 */

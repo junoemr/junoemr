@@ -43,6 +43,7 @@
 		java.io.ByteArrayInputStream"%>
 <%@ page import="java.util.regex.Pattern" %>
 <%@ page import="java.net.URLEncoder" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -623,7 +624,18 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                             </td>
                                             <td>
                                                 <div class="FieldData" nowrap="nowrap">
-                                                    <%= ( handler.getOrderStatus().equals("F") ? "Final" : handler.getOrderStatus().equals("C") ? "Corrected" : (handler.getMsgType().equals("PATHL7") && handler.getOrderStatus().equals("P")) ? "Preliminary": handler.getOrderStatus().equals("X") ? "DELETED": handler.getOrderStatus()) %>
+                                                    <%
+                                                    String orderStatus = "";
+                                                    if (ConnectCareHandler.isConnectCareHandler(handler))
+                                                    {
+                                                        orderStatus = handler.getOrderStatusDisplayString();
+                                                    }
+                                                    else
+                                                    {
+                                                        orderStatus = (handler.getOrderStatus().equals("F") ? "Final" : handler.getOrderStatus().equals("C") ? "Corrected" : (handler.getMsgType().equals("PATHL7") && handler.getOrderStatus().equals("P")) ? "Preliminary" : handler.getOrderStatus().equals("X") ? "DELETED" : handler.getOrderStatus());
+                                                    }
+                                                    %>
+                                                    <%=orderStatus%>
 										</div>
                                             </td>
                                         </tr>
