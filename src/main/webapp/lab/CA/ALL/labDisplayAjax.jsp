@@ -519,6 +519,30 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                                                     </td>
                                                                     <td colspan="2"></td>
                                                                 </tr>
+                                                                <%
+                                                                // insert extended description fields
+                                                                List<org.apache.commons.lang3.tuple.Pair<String, String>> extDesc = handler.getExtendedPatientDescriptionFields();
+                                                                for (org.apache.commons.lang3.tuple.Pair<String, String> extFeild : extDesc)
+                                                                {
+                                                                    %>
+                                                                    <tr>
+                                                                        <td nowrap>
+                                                                            <div class="FieldData">
+                                                                                <strong>
+                                                                                    <%=extFeild.getLeft()%>
+                                                                                </strong>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td nowrap>
+                                                                            <div class="FieldData" nowrap="nowrap">
+                                                                                <%=extFeild.getRight()%>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td colspan="2"></td>
+                                                                    </tr>
+                                                                    <%
+                                                                }
+                                                                %>
                                                             </table>
                                                         </td>
                                                         <td width="33%" valign="top">
@@ -643,7 +667,32 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                                 </div>
                                             </td>
                                         </tr>
-                                        <% } %>
+                                        <%
+                                        }
+
+										// insert extended description fields
+										List<org.apache.commons.lang3.tuple.Pair<String, String>> extResultDesc = handler.getExtendedResultDescriptionFields();
+										for (org.apache.commons.lang3.tuple.Pair<String, String> extFeild : extResultDesc)
+										{
+											%>
+                                            <tr>
+                                                <td nowrap>
+                                                    <div class="FieldData">
+                                                        <strong>
+                                                            <%=extFeild.getLeft()%>
+                                                        </strong>
+                                                    </div>
+                                                </td>
+                                                <td nowrap>
+                                                    <div class="FieldData" nowrap="nowrap">
+                                                        <%=extFeild.getRight()%>
+                                                    </div>
+                                                </td>
+                                                <td colspan="2"></td>
+                                            </tr>
+                                            <%
+										}
+										%>
                                     </table>
                                 </td>
                             </tr>
