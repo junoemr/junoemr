@@ -419,14 +419,24 @@ public class LabPDFCreator extends PdfPageEventHelper {
 							// add the obrname if necessary
 							if (!obrFlag && !obrName.equals("")
 									&& ((!(obxName.contains(obrName)) || obxCountBool)
-									&& !isUnstructuredDoc))
+									&& (!isUnstructuredDoc || handler.getMsgType().equals("CCIMAGING"))))
 							{
+								if (handler.getMsgType().equals("CCIMAGING"))
+								{
+									cell.setBackgroundColor(new Color(255, 204, 0));
+								}
+
 								cell.setPhrase(new Phrase(obrName, boldFont));
 								cell.setColspan(7);
 								cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 								table.addCell(cell);
 								cell.setColspan(1);
 								obrFlag = true;
+
+								if (handler.getMsgType().equals("CCIMAGING"))
+								{
+									cell.setBackgroundColor(new Color(255, 255, 255));
+								}
 							}
 
 							// add the obx results and info
