@@ -50,6 +50,7 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfPageEventHelper;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.rtf.RtfWriter2;
+import org.apache.commons.lang3.tuple.Pair;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.printing.FontSettings;
@@ -880,6 +881,26 @@ public class LabPDFCreator extends PdfPageEventHelper {
         cell.setPhrase(new Phrase(handler.getPatientLocation(), font));
         pInfoTable.addCell(cell);
 
+        // add additional patient information
+		ArrayList<Pair<String, String>> patientFieldsEx = handler.getExtendedPatientDescriptionFields();
+		for (Pair<String, String> patientField : patientFieldsEx)
+		{
+			cell.setPhrase(new Phrase(patientField.getLeft(), boldFont));
+			pInfoTable.addCell(cell);
+			cell.setPhrase(new Phrase(patientField.getRight(), font));
+			pInfoTable.addCell(cell);
+		}
+
+		// if a row is not complete it will not display.
+		// add padding cells if row is incomplete
+		if (patientFieldsEx.size() % 2 != 0)
+		{
+			cell.setPhrase(new Phrase(" ", font));
+			pInfoTable.addCell(cell);
+			cell.setPhrase(new Phrase(" ", font));
+			pInfoTable.addCell(cell);
+		}
+
         //Create results info table
         PdfPTable rInfoTable = new PdfPTable(2);
         cell.setPhrase(new Phrase("Date of Service: ", boldFont));
@@ -910,6 +931,16 @@ public class LabPDFCreator extends PdfPageEventHelper {
         rInfoTable.addCell(cell);
         cell.setPhrase(new Phrase(handler.getAccessionNum(), font));
         rInfoTable.addCell(cell);
+
+        // add additional result info fields
+		ArrayList<Pair<String, String>> resultFieldsEx = handler.getExtendedResultDescriptionFields();
+		for (Pair<String, String> resultFields : resultFieldsEx)
+		{
+			cell.setPhrase(new Phrase(resultFields.getLeft(), boldFont));
+			rInfoTable.addCell(cell);
+			cell.setPhrase(new Phrase(resultFields.getRight(), font));
+			rInfoTable.addCell(cell);
+		}
 
         // Create client table
         float[] clientWidths = {2f, 3f};
