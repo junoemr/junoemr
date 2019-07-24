@@ -402,6 +402,16 @@ public abstract class MessageHandler
 	}
 
 	/**
+	 * get the report date (obr-22)
+	 * @param i - obr rep
+	 * @return the report date string
+	 */
+	public String getReportDate(int i)
+	{
+		return "";
+	}
+
+	/**
 	 *  Return the status of the report, 'F' is returned for a final report,
 	 *  otherwise the report is partial
 	 */

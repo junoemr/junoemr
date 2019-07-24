@@ -866,7 +866,20 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 	                               <%--<td align="right" bgcolor="#FFCC00" width="100">&nbsp;</td>--%>
 	                               <td width="9">&nbsp;</td>
 	                               <td width="9">&nbsp;</td>
-	                               <td width="*">&nbsp;</td>
+                                   <%
+                                       if (handler.getMsgType().equals("CCIMAGING"))
+                                       {
+                                           %>
+                                           <td width="*" style="color: white;">Report Date: <%=handler.getReportDate(i)%></td>
+                                           <%
+                                       }
+                                       else
+                                       {
+                                           %>
+                                           <td width="*">&nbsp;</td>
+                                           <%
+                                       }
+                                   %>
 	                           </tr>
 	                       </table>
                            	<%if(isUnstructuredDoc){%>

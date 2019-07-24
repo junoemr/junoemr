@@ -232,6 +232,18 @@ public abstract class ORU_R01MessageHandler extends MessageHandler
 		return formatDateTime(get("/.OBR(0)-14"));
 	}
 
+
+	/**
+	 * Get the report date (obr-22)
+	 * @param i - obr rep
+	 * @return the report date string
+	 */
+	@Override
+	public String getReportDate(int i)
+	{
+		return formatDateTime(get("/.ORDER_OBSERVATION("+i+")/OBR-22"));
+	}
+
 	/**
 	 *  Return the status of the report, 'F' is returned for a final report,
 	 *  otherwise the report is partial
