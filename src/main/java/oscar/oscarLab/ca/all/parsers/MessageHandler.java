@@ -32,6 +32,7 @@ import ca.uhn.hl7v2.util.SegmentFinder;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DataTypeUtils;
@@ -113,6 +114,23 @@ public abstract class MessageHandler
 	 */
 	public abstract void postUpload();
 
+	/**
+	 * return a list of pairs <title, value> that will be displayed in the Patient Detail Results area of the lab display
+	 * @return - list of fields
+	 */
+	public  ArrayList<Pair<String, String>> getExtendedPatientDescriptionFields()
+	{
+		return new ArrayList<Pair<String, String>> ();
+	}
+
+	/**
+	 * return a list of pairs <title, value> Results Info area of the lab display
+	 * @return - list of fields
+	 */
+	public ArrayList<Pair<String, String>> getExtendedResultDescriptionFields()
+	{
+		return new ArrayList<>();
+	}
 
 	/* ===================================== Hl7 Parsing ====================================== */
 

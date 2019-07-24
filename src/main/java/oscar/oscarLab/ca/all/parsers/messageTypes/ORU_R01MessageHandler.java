@@ -100,7 +100,15 @@ public abstract class ORU_R01MessageHandler extends MessageHandler
 		return getString(get("/.MSH-4"));
 	}
 
-    /* ===================================== PID ====================================== */
+	/* ====================== MSH =============================== */
+
+	public String getMsgSendingApplication()
+	{
+		return getString(get("/.MSH-3"));
+	}
+
+
+	/* ===================================== PID ====================================== */
 
 	/**
 	 *  Return the name of the patient. The format should be the first name

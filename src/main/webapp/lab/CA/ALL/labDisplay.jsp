@@ -64,6 +64,7 @@
 <%@ page import="org.oscarehr.labs.model.Hl7DocumentLink" %>
 <%@ page import="java.util.regex.Pattern" %>
 <%@ page import="java.util.regex.Matcher" %>
+<%@ page import="org.apache.commons.lang3.tuple.Pair" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -948,6 +949,30 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                                     </td>
                                                                     <td colspan="2"></td>
                                                                 </tr>
+																<%
+																// insert extended description fields
+																List<org.apache.commons.lang3.tuple.Pair<String, String>> extDesc = handler.getExtendedPatientDescriptionFields();
+																for (org.apache.commons.lang3.tuple.Pair<String, String> extFeild : extDesc)
+																{
+																	%>
+																	<tr>
+																		<td nowrap>
+																			<div class="FieldData">
+																				<strong>
+																					<%=extFeild.getLeft()%>
+																				</strong>
+																			</div>
+																		</td>
+																		<td nowrap>
+																			<div class="FieldData" nowrap="nowrap">
+																				<%=extFeild.getRight()%>
+																			</div>
+																		</td>
+																		<td colspan="2"></td>
+																	</tr>
+																	<%
+																}
+																%>
                                                             </table>
                                                         </td>
                                                         <td width="33%" valign="top">
@@ -1096,7 +1121,31 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                 </div>
                                             </td>
                                         </tr>
-                                        <% } 
+										<%
+                                        }
+										// insert extended description fields
+										List<org.apache.commons.lang3.tuple.Pair<String, String>> extResultDesc = handler.getExtendedResultDescriptionFields();
+										for (org.apache.commons.lang3.tuple.Pair<String, String> extFeild : extResultDesc)
+										{
+											%>
+											<tr>
+												<td nowrap>
+													<div class="FieldData">
+														<strong>
+															<%=extFeild.getLeft()%>
+														</strong>
+													</div>
+												</td>
+												<td nowrap>
+													<div class="FieldData" nowrap="nowrap">
+														<%=extFeild.getRight()%>
+													</div>
+												</td>
+												<td colspan="2"></td>
+											</tr>
+											<%
+										}
+
                                         String comment = handler.getNteForPID();
                                         if (comment != null && !comment.equals("")) {%>
                                         <tr>

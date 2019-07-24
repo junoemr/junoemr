@@ -26,7 +26,10 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
+import org.apache.commons.lang3.tuple.Pair;
 import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
+
+import java.util.ArrayList;
 
 public class ConnectCareDiagnosticImagingHandler extends ConnectCareHandler
 {
@@ -84,5 +87,53 @@ public class ConnectCareDiagnosticImagingHandler extends ConnectCareHandler
 	public String getServiceDate()
 	{
 		return formatDateTime(get("/.ORDER_OBSERVATION/OBR-6"));
+	}
+
+	/**
+	 * As per Connect Care Conformance guidance abnormal flag is to be ignored in this type of lab.
+	 * @return
+	 */
+	@Override
+	public boolean isAbnormal()
+	{
+		return false;
+	}
+
+	/**
+	 * return additional fields,
+	 * - Patient ID \w assigning authority - all values
+	 * @return list of pairs <title, value>
+	 */
+	@Override
+	public ArrayList<Pair<String, String>> getExtendedPatientDescriptionFields()
+	{
+		ArrayList<Pair<String, String>> extDesc = new ArrayList<Pair<String, String>>();
+
+		// add additional patient ids
+		for (Pair<String, String> patientId : getPatientIdentificationList())
+		{
+			if (!patientId.getLeft().equalsIgnoreCase("ULI"))
+			{
+				extDesc.add(Pair.of(patientId.getLeft() + "# ", patientId.getRight()));
+			}
+		}
+
+		return extDesc;
+	}
+
+
+	/**
+	 * return additional fields
+	 * - Sending Application, always "CCIMAGING"
+	 * - Message Date and time (MSH-7)
+	 * @return - list of fields
+	 */
+	public ArrayList<Pair<String, String>> getExtendedResultDescriptionFields()
+	{
+		ArrayList<Pair<String, String>> extDesc = new ArrayList<Pair<String, String>>();
+
+		extDesc.add(Pair.of("Sending Application:", getMsgSendingApplication()));
+		extDesc.add(Pair.of("Message Date:", getMsgDate()));
+		return extDesc;
 	}
 }

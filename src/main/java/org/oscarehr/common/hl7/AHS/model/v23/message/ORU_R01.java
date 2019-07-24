@@ -20,15 +20,15 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.common.hl7.AHS.model.v251.message;
+package org.oscarehr.common.hl7.AHS.model.v23.message;
 
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.v23.segment.PID;
 import ca.uhn.hl7v2.parser.DefaultModelClassFactory;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
-import org.oscarehr.common.hl7.AHS.model.v251.segment.ZBR;
 import org.oscarehr.util.MiscUtils;
 
-public class ORU_R01 extends ca.uhn.hl7v2.model.v251.message.ORU_R01
+public class ORU_R01 extends ca.uhn.hl7v2.model.v23.message.ORU_R01
 {
 	// the CustomModelClassFactory requires the root package for the message as a string. exclude the version and sub-folders
 	public static final String ROOT_PACKAGE = "org.oscarehr.common.hl7.AHS.model";
@@ -37,24 +37,27 @@ public class ORU_R01 extends ca.uhn.hl7v2.model.v251.message.ORU_R01
 	{
 		this(new DefaultModelClassFactory());
 	}
+
 	public ORU_R01(ModelClassFactory theFactory) throws HL7Exception
 	{
 		super(theFactory);
-
-		// add custom connect care segment
-		this.add(ZBR.class, false, false);
 	}
 
-	public ZBR getZBR()
+	/**
+	 * get PID segment or null if none found
+	 * @return PID segment
+	 */
+	public PID getPID()
 	{
 		try
 		{
-			return (ZBR)get("ZBR");
+			return getRESPONSE().getPATIENT().getPID();
 		}
-		catch (HL7Exception e)
+		catch (NullPointerException e)
 		{
-			MiscUtils.getLogger().error("Failed to get ZBR segment with error: " + e.getMessage(), e);
+			MiscUtils.getLogger().error("Could not get PID segment with error: " + e.getMessage(), e);
 		}
 		return null;
 	}
+
 }
