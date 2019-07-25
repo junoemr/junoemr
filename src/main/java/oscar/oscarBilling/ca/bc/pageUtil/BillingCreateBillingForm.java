@@ -66,7 +66,8 @@ public final class BillingCreateBillingForm extends ActionForm {
   private String xml_endtime_min = "";
   private String xml_starttime_hr = "";
   private String xml_starttime_min = "";
-  private String oin_insurer_pay_patient = "off";
+  private final String CHECKBOX_OFF = "off";
+  private String oin_insurer_pay_patient = CHECKBOX_OFF;
   String requestId;
 
   /**
@@ -704,7 +705,7 @@ public final class BillingCreateBillingForm extends ActionForm {
     //checkbox's don't send any value on "off". manually set oin_insurer_pay_patient to "off"
     if (request.getParameter("oin_insurer_pay_patient") == null)
     {
-      setOin_insurer_pay_patient("off");
+      setOin_insurer_pay_patient(CHECKBOX_OFF);
     }
 
     this.refertype1 = this.xml_refer1.equals("")?"":this.refertype1;
