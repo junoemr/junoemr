@@ -515,7 +515,14 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                                                     </td>
                                                                     <td nowrap>
                                                                         <div class="FieldData" nowrap="nowrap">
-                                                                            <%=handler.getHealthNum()%>
+                                                                            <%
+                                                                                String hin = handler.getHealthNum();
+                                                                                if (ConnectCareHandler.isConnectCareHandler(handler))
+                                                                                {
+                                                                                    hin += " ABH";
+                                                                                }
+                                                                            %>
+                                                                            <%=hin%>
                                                                         </div>
                                                                     </td>
                                                                     <td colspan="2"></td>

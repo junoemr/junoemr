@@ -73,6 +73,30 @@ public class ConnectCareDiagnosticImagingHandler extends ConnectCareHandler
 		return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-3-1-2"));
 	}
 
+	/**
+	 * As per guidance from Connect Care NTE should be ignored in diagnostic imaging
+	 * @param i - ignored
+	 * @param j - gnored
+	 * @return always zero
+	 */
+	@Override
+	public int getOBXCommentCount( int i, int j)
+	{
+		return 0;
+	}
+
+	/**
+	 * As per guidance from Connect Care NTE should be ignored in diagnostic imaging
+	 * @param i - ignored
+	 * @return always zero
+	 */
+	@Override
+	public int getOBRCommentCount( int i)
+	{
+		return 0;
+	}
+
+
 	@Override
 	public boolean isUnstructured()
 	{

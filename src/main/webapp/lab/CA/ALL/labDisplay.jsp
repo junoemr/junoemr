@@ -945,7 +945,14 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                                     </td>
                                                                     <td nowrap>
                                                                         <div class="FieldData" nowrap="nowrap">
-                                                                            <%=handler.getHealthNum()%>
+																			<%
+																				String hin = handler.getHealthNum();
+																				if (ConnectCareHandler.isConnectCareHandler(handler))
+																				{
+																					hin += " ABH";
+																				}
+																			%>
+                                                                            <%=hin%>
                                                                         </div>
                                                                     </td>
                                                                     <td colspan="2"></td>

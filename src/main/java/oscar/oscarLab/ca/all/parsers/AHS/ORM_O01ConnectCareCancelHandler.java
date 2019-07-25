@@ -173,4 +173,17 @@ public abstract class ORM_O01ConnectCareCancelHandler extends ORM_O01MessageHand
 	{
 		return "You can use the version buttons to view the cancelled report.";
 	}
+
+	/* ========================= OBR ============================= */
+
+	/**
+	 * no comments should be displayed on cancel messages (as per guidance from connect care)
+	 * @param i - obr rep
+	 * @return
+	 */
+	@Override
+	public int 	getOBRCommentCount(int i)
+	{
+		return 0;
+	}
 }

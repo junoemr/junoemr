@@ -57,6 +57,7 @@ import org.oscarehr.common.printing.FontSettings;
 import org.oscarehr.common.printing.PdfWriterFactory;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
+import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
@@ -888,7 +889,12 @@ public class LabPDFCreator extends PdfPageEventHelper {
         pInfoTable.addCell(cell);
         cell.setPhrase(new Phrase("Health #: ", boldFont));
         pInfoTable.addCell(cell);
-        cell.setPhrase(new Phrase(handler.getHealthNum(), font));
+        String hin = handler.getHealthNum();
+        if (ConnectCareHandler.isConnectCareHandler(handler))
+		{
+			hin += " ABH";
+		}
+		cell.setPhrase(new Phrase(hin, font));
         pInfoTable.addCell(cell);
         cell.setPhrase(new Phrase("Patient Location: ", boldFont));
         pInfoTable.addCell(cell);
