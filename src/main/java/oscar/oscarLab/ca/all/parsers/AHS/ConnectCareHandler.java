@@ -40,8 +40,8 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 	private static final Map<String, String> orderStatusMap = new HashMap<String, String>();
 	static
 	{
-		orderStatusMap.put("PA", "Addendum");
-		orderStatusMap.put("A", "Addendum");
+		orderStatusMap.put("PA", "Preliminary");
+		orderStatusMap.put("A", "Final");
 		orderStatusMap.put("F", "Final");
 		orderStatusMap.put("C", "Corrected");
 		orderStatusMap.put("CA", "Canceled");
