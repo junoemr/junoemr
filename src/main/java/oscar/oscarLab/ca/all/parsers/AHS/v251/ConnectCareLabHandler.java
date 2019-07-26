@@ -25,14 +25,17 @@ package oscar.oscarLab.ca.all.parsers.AHS.v251;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v251.datatype.CWE;
+import ca.uhn.hl7v2.model.v251.datatype.CX;
 import ca.uhn.hl7v2.model.v251.message.ORU_R01;
 import ca.uhn.hl7v2.model.v251.segment.MSH;
+import org.apache.commons.lang3.tuple.Pair;
 import org.oscarehr.common.hl7.AHS.model.v251.segment.ZBR;
 import org.oscarehr.util.MiscUtils;
 import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 public class ConnectCareLabHandler extends ConnectCareHandler
@@ -99,6 +102,82 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 		return false;
 	}
 
+	/**
+	 * Connect Care labs send more than just health card number, they can also send, EPI, ABH, NWT, BKR
+	 * An overload of the implementation is required because this handler uses ORU_R01 v 2.5.1 message
+	 * @return - list of paris patient identification <id type , id + assigning authority >
+	 */
+	@Override
+	public ArrayList<Pair<String, String>> getPatientIdentificationList()
+	{
+		ArrayList<Pair<String, String>> ids = new ArrayList<Pair<String, String>>();
+		if (message instanceof org.oscarehr.common.hl7.AHS.model.v251.message.ORU_R01)
+		{
+			try
+			{
+				org.oscarehr.common.hl7.AHS.model.v251.message.ORU_R01 msg = (org.oscarehr.common.hl7.AHS.model.v251.message.ORU_R01) message;
+				for (int i = 0; i < msg.getPID().getPatientIdentifierListReps(); i++)
+				{
+					CX id = msg.getPID().getPatientIdentifierList(i);
+					if (id.getAssigningAuthority().getNamespaceID().getValue() != null && id.getIDNumber().getValue() != null &&
+							id.getIdentifierTypeCode().getValue() != null)
+					{
+						ids.add(Pair.of(id.getIdentifierTypeCode().getValue(), id.getIDNumber().getValue() + " " + id.getAssigningAuthority().getNamespaceID().getValue()));
+					}
+				}
+				return ids;
+			}
+			catch (HL7Exception e)
+			{
+				MiscUtils.getLogger().error("Failed to get Patient Identifier list with error: " + e.getMessage(), e);
+				return new ArrayList<Pair<String, String>>();
+			}
+		}
+		else
+		{
+			return new ArrayList<Pair<String, String>>();
+		}
+	}
+
+	/**
+	 * return additional fields,
+	 * - Patient ID \w assigning authority - all values
+	 * @return list of pairs <title, value>
+	 */
+	@Override
+	public ArrayList<Pair<String, String>> getExtendedPatientDescriptionFields()
+	{
+		ArrayList<Pair<String, String>> extDesc = new ArrayList<Pair<String, String>>();
+
+		// add additional patient ids
+		for (Pair<String, String> patientId : getPatientIdentificationList())
+		{
+			if (!patientId.getLeft().equalsIgnoreCase("ULI") && !patientId.getLeft().equalsIgnoreCase("PHN"))
+			{
+				extDesc.add(Pair.of(patientId.getLeft() + "# ", patientId.getRight()));
+			}
+		}
+
+		return extDesc;
+	}
+
+	/**
+	 * return additional fields
+	 * - epic order id (as required by docs)
+	 * @return - list of fields
+	 */
+	public ArrayList<Pair<String, String>> getExtendedResultDescriptionFields()
+	{
+		ArrayList<Pair<String, String>> extDesc = new ArrayList<Pair<String, String>>();
+
+		String epicId = getString(get("/.ORDER_OBSERVATION/ORC-2-1"));
+		if (!epicId.isEmpty())
+		{
+			extDesc.add(Pair.of("EPIC Order ID:", epicId));
+		}
+		return extDesc;
+	}
+
 	/* ========================== OBR ========================== */
 
 	/**
@@ -113,6 +192,16 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 			return getZBRSensitivitySetIDs().contains(i);
 		}
 		return false;
+	}
+
+	/**
+	 * Connect Care requires that the procedure code be displayed along with the OBR name (Procedure code description).
+	 * @param i - the OBR index
+	 * @return - the obr name
+	 */
+	public String getOBRName(int i)
+	{
+		return super.getOBRName(i) + ", " + getOBRProcedureCode(i);
 	}
 
 
@@ -170,10 +259,11 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 	}
 
 	/**
-	 * if OBX is in Susceptibility OBR just return fixed string.
+	 * get OBX name + OBX component code if OBX is not Susceptibility, else
+	 * get "Susceptibility:" + OBR 26-3
 	 * @param i - OBR rep
 	 * @param j - OBX rep
-	 * @return - OBX name
+	 * @return - OBX display name
 	 */
 	@Override
 	public String getOBXName(int i, int j)
@@ -183,7 +273,8 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 			return "Susceptibility, " + getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-26-3"));
 		}
 
-		return super.getOBXName(i, j);
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-3-2")) + ", "
+				+ getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-3-1"));
 	}
 
 	/**

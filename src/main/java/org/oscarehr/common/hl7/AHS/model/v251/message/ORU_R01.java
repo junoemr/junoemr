@@ -23,6 +23,7 @@
 package org.oscarehr.common.hl7.AHS.model.v251.message;
 
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.v251.segment.PID;
 import ca.uhn.hl7v2.parser.DefaultModelClassFactory;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
 import org.oscarehr.common.hl7.AHS.model.v251.segment.ZBR;
@@ -57,4 +58,22 @@ public class ORU_R01 extends ca.uhn.hl7v2.model.v251.message.ORU_R01
 		}
 		return null;
 	}
+
+	/**
+	 * get PID segment or null if none found
+	 * @return PID segment
+	 */
+	public PID getPID()
+	{
+		try
+		{
+			return getPATIENT_RESULT().getPATIENT().getPID();
+		}
+		catch (NullPointerException e)
+		{
+			MiscUtils.getLogger().error("Could not get PID segment with error: " + e.getMessage(), e);
+		}
+		return null;
+	}
+
 }

@@ -215,6 +215,16 @@ public abstract class ORU_R01MessageHandler extends MessageHandler
 	}
 
 	/**
+	 * get the OBR procedure code
+	 * @param i - obr rep
+	 * @return procedure code string
+	 */
+	public String getOBRProcedureCode(int i)
+	{
+		return getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-4-1"));
+	}
+
+	/**
 	 *  Return the request date of the message
 	 */
 	@Override

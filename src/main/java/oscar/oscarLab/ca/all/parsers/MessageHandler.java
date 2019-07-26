@@ -386,6 +386,16 @@ public abstract class MessageHandler
 	}
 
 	/**
+	 * get the OBR procedure code
+	 * @param i - obr rep
+	 * @return procedure code string
+	 */
+	public String getOBRProcedureCode(int i)
+	{
+		return "";
+	}
+
+	/**
 	 *  Return the request date of the message
 	 */
 	public String getRequestDate(int i)
