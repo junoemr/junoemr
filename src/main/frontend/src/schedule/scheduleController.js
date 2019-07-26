@@ -280,7 +280,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				scheduleData.uuid = scheduleData.id;
 				scheduleData.value = scheduleData.id;
 				scheduleData.identifier = scheduleData.id;
-				scheduleData.identifierType = "PROVIDER";
+				scheduleData.identifierType = controller.scheduleTypeEnum.provider;
 				scheduleData.providerNos = [resourceId];
 
 				$scope.selectedSchedule = scheduleData;
@@ -696,7 +696,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			var status = (results || {}).status;
 
-			if (status == 'SUCCESS')
+			if (status === 'SUCCESS')
 			{
 				return true;
 			}
@@ -788,6 +788,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let statusElem = eventElement.find('.icon-status');
 				let labelElem = eventElement.find('.event-label');
 				let detailElem = eventElement.find('.event-details');
+				let selfBookElem = eventElement.find('.self-book-indicator');
 
 				// var eventSiteHtml = '';
 				// var eventSite = $scope.sites[event.data.site];
@@ -871,6 +872,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					var linkElements = eventElement.find('.event-encounter, .event-invoice, .event-demographic, .event-rx');
 					linkElements.hide();
+				}
+
+				// mark self booked appointments
+				if(Juno.Common.Util.exists(event.data.tagSelfBooked) && event.data.tagSelfBooked)
+				{
+					selfBookElem.addClass('visible');
+					selfBookElem.attr("title", "Self Booked");
 				}
 
 				var maxNameLengthProp = controller.providerSettings.patientNameLength;
