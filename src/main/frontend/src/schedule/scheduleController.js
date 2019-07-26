@@ -269,7 +269,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				}
 			}
 
-			// hack to add invalid provider to schedule group list
+			// set the selected schedule to an object not in the options list.
+			// this will show as an empty option when selected, but will be removed once de-selected.
+			// this allows selection of inactive providers schedules
 			if($scope.selectedSchedule === null)
 			{
 				var scheduleData = $scope.resourceOptionHash[resourceId];
@@ -281,7 +283,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				scheduleData.identifierType = "PROVIDER";
 				scheduleData.providerNos = [resourceId];
 
-				$scope.scheduleOptions.push(scheduleData);
 				$scope.selectedSchedule = scheduleData;
 			}
 
