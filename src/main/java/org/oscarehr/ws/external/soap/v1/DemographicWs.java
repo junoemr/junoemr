@@ -198,7 +198,7 @@ public class DemographicWs extends AbstractWs {
 			throw new Exception("null or empty health numbers are not permitted");
 		}
 
-		Demographic demographic = demographicManager.getDemographicByHealthNumberAndVersion(healthNumber);
+		Demographic demographic = demographicManager.getDemographicByHealthNumber(healthNumber);
 
 		if (demographic != null)
 		{
