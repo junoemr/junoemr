@@ -65,6 +65,15 @@ Juno.Common.Util.formatMomentDate = function formatMomentDate(d) {
 	return d.format(Juno.Common.Util.settings.date_format);
 };
 
+Juno.Common.Util.formatMomentDate = function formatMomentDate(d, format)
+{
+	if (!format)
+	{
+		format = Juno.Common.Util.settings.date_format;
+	}
+	return d.format(format);
+};
+
 Juno.Common.Util.formatMomentTime = function formatMomentTime(d, format) {
 	if(!format) {
 		format = Juno.Common.Util.settings.time_format;

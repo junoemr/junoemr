@@ -590,15 +590,18 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			function success(results)
 			{
 				controller.eventHistory = results.data.body;
+				var date_format = 'DD MMMM YYYY';
+				var time_format = 'hh:mm A';
 
 				for(var i=0; i< controller.eventHistory.length; i++)
 				{
-					controller.eventHistory[i].formattedUpdateDate = Juno.Common.Util.formatMomentDate(moment(controller.eventHistory[i].updateDateTime));
-					controller.eventHistory[i].formattedCreateDate = Juno.Common.Util.formatMomentDate(moment(controller.eventHistory[i].createDateTime));
+					controller.eventHistory[i].formattedUpdateDate = Juno.Common.Util.formatMomentDate(moment(controller.eventHistory[i].updateDateTime), date_format);
+					controller.eventHistory[i].formattedCreateDate = Juno.Common.Util.formatMomentDate(moment(controller.eventHistory[i].createDateTime), date_format);
 
-					controller.eventHistory[i].formattedUpdateTime = Juno.Common.Util.formatMomentTime(moment(controller.eventHistory[i].updateDateTime));
-					controller.eventHistory[i].formattedCreateTime = Juno.Common.Util.formatMomentTime(moment(controller.eventHistory[i].createDateTime));
+					controller.eventHistory[i].formattedUpdateTime = Juno.Common.Util.formatMomentTime(moment(controller.eventHistory[i].updateDateTime), time_format);
+					controller.eventHistory[i].formattedCreateTime = Juno.Common.Util.formatMomentTime(moment(controller.eventHistory[i].createDateTime), time_format);
 				}
+				console.info(controller.eventHistory);
 				deferred.resolve(controller.eventHistory);
 			}
 		);
