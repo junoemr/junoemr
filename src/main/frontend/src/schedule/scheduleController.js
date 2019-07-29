@@ -315,11 +315,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						function success()
 						{
 							controller.selectedScheduleView = view;
-
-							if ($scope.isResourceView())
-							{
-								$scope.refetchEvents();
-							}
+							$scope.refetchEvents();
 						}
 					);
 
@@ -532,9 +528,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			).then(
 				function (results)
 				{
-					var providerNos = results.data.body.providerIdList;
 					if (selectedSchedule.identifierType === controller.scheduleTypeEnum.group)
 					{
+						var providerNos = results.data.body.providerIdList;
+
 						// Set the calendar to resource mode.  All of these values need to be set.
 						$scope.selectedResources = controller.buildSelectedResources(providerNos);
 						$scope.uiConfig.calendar.resources = $scope.selectedResources;
@@ -544,6 +541,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						$scope.calendarViewName = controller.calendarViewEnum.agendaDay;
 
 						$scope.showNoResources = (providerNos.length === 0);
+						$scope.uiConfig.calendar.hiddenDays = [];
+
 					}
 					else
 					{
@@ -551,6 +550,18 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						$scope.uiConfig.calendar.defaultView = $scope.getCalendarViewName();
 						$scope.calendarViewName = $scope.getCalendarViewName();
 						$scope.uiConfig.calendar.resources = false;
+
+						var hiddenDays = results.data.body.hiddenDaysList;
+						$scope.showNoResources = (hiddenDays.length === 7);
+
+						if(hiddenDays.length === 7)
+						{
+							$scope.uiConfig.calendar.hiddenDays = []; // hiding all days causes an error
+						}
+						else
+						{
+							$scope.uiConfig.calendar.hiddenDays = hiddenDays; // hide days without schedules
+						}
 					}
 					$scope.applyUiConfig($scope.uiConfig);
 					$scope.events = results.data.body.eventList;
@@ -1710,6 +1721,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						columnHeaderFormat: 'dddd'
 					},
 				},
+				hiddenDays: [],
 
 				allDaySlot: false,
 				agendaEventMinHeight: 18,

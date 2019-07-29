@@ -98,7 +98,7 @@
 					</div>
 
 					<div class="form-group pull-right">
-						<div class="form-group"  ng-show="isResourceView()">
+						<div class="form-group">
 							<div class="btn-group" role="group">
 								<button type="button"
 								        class="btn btn-sm"

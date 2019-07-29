@@ -335,7 +335,7 @@ public class ScheduleService extends AbstractServiceImpl {
 		{
 			//TODO change all providerNos to strings in this chain
 			calendarSchedule =
-					scheduleService.getCalendarScheduleByProvider(session, Integer.parseInt(scheduleId),
+					scheduleService.getCalendarScheduleByProvider(session, Integer.parseInt(scheduleId), viewAll,
 							startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
 		}
 		return RestResponse.successResponse(calendarSchedule);

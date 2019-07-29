@@ -75,6 +75,17 @@ public class ScheduleTemplateService
 		return scheduleTemplateCodeDao.findAll();
 	}
 
+	public List<CalendarEvent> getCalendarEventsScheduleOnly(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime)
+	{
+		// get the schedule slot length, return null if no schedule is set
+		Integer scheduleSlotLength = scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date);
+		if(scheduleSlotLength != null)
+		{
+			return getAllCalendarEvents(providerId, date, startTime, endTime, scheduleSlotLength);
+		}
+		return null;
+	}
+
 	/**
 	 * Gets a list of schedule template slots and creates a list with adjacent slots of the same
 	 * type grouped together.  It basically converts from the Juno database format into the format
@@ -86,14 +97,17 @@ public class ScheduleTemplateService
 	 */
 	public List<CalendarEvent> getCalendarEvents(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, int defaultSlotLengthInMin)
 	{
-		List<CalendarEvent> calendarEvents = new ArrayList<>();
-
 		// get the schedule slot length, or use the default
 		Integer scheduleSlotLength = scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date);
 		if(scheduleSlotLength == null)
 		{
 			scheduleSlotLength = defaultSlotLengthInMin;
 		}
+		return getAllCalendarEvents(providerId, date, startTime, endTime, scheduleSlotLength);
+	}
+	private List<CalendarEvent> getAllCalendarEvents(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, int scheduleSlotLength)
+	{
+		List<CalendarEvent> calendarEvents = new ArrayList<>();
 
 		// Get schedule slots
 		RangeMap<LocalTime, ScheduleSlot> scheduleSlots = scheduleTemplateDao.findScheduleSlots(date, providerId);

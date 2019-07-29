@@ -587,8 +587,7 @@ public class Schedule
 	{
 		List<CalendarEvent> calendarEvents = new ArrayList<>();
 
-		// Loop through the dates between startDate and endDate (inclusive) and add schedule
-		// templates
+		// Loop through the dates between startDate and endDate (inclusive) and add schedule templates
 		for(LocalDate date: ConversionUtils.getDateList(startDate, endDate))
 		{
 			// Get schedule templates for this provider/date
@@ -604,6 +603,7 @@ public class Schedule
 	public CalendarSchedule getCalendarScheduleByProvider(
 			HttpSession session,
 			Integer providerId,
+			boolean viewAll,
 			LocalDate startDate,
 			LocalDate endDate,
 			LocalTime startTime,
@@ -612,8 +612,51 @@ public class Schedule
 			Integer slotDurationInMin
 	)
 	{
-		List<CalendarEvent> allCalendarEvents = getCalendarEvents(session, providerId,
+		List<CalendarEvent> allCalendarEvents;
+		List<Integer> hiddenDaysList;
+
+		if(viewAll)
+		{
+			allCalendarEvents = getCalendarEvents(session, providerId,
 				startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
+			hiddenDaysList = new ArrayList<>(0); //always empty for all view
+		}
+		else
+		{
+			allCalendarEvents = new ArrayList<>();
+
+			int[] daysWithSchedules = {0,0,0,0,0,0,0};
+
+			//TODO somehow consolidate with regular getCalendarEvents method
+			// Loop through the dates between startDate and endDate (inclusive) and add schedule templates
+			for(LocalDate date: ConversionUtils.getDateList(startDate, endDate))
+			{
+				// Get schedule templates for this provider/date
+				List<CalendarEvent> eventList = scheduleTemplateService.getCalendarEventsScheduleOnly(providerId, date, startTime, endTime);
+				if(eventList != null)
+				{
+					// provider has a schedule, add them to results normally
+					allCalendarEvents.addAll(eventList);
+
+					int dayOfWeek = date.getDayOfWeek().getValue(); // 1 index based starting Monday
+					dayOfWeek = dayOfWeek % 7;// shift to be 0 index based starting on Sunday
+					daysWithSchedules[dayOfWeek] = 1;
+				}
+			}
+			hiddenDaysList = new ArrayList<>(7);
+			for(int i=0; i< daysWithSchedules.length; i++)
+			{
+				if(daysWithSchedules[i] == 0)
+				{
+					hiddenDaysList.add(i);
+				}
+			}
+
+			// Get appointments for this provider/date range
+			allCalendarEvents.addAll(appointmentService.getCalendarEvents(
+					session, providerId, startDate, endDate, siteName));
+		}
+
 		List<String> providerIdList = new ArrayList<>(1);
 		providerIdList.add(String.valueOf(providerId));
 
@@ -623,6 +666,7 @@ public class Schedule
 		calendarSchedule.setProviderIdList(providerIdList);
 		calendarSchedule.setEventList(allCalendarEvents);
 		calendarSchedule.setPreferredSlotDuration(slotDurationInMin);
+		calendarSchedule.setHiddenDaysList(hiddenDaysList);
 
 		return calendarSchedule;
 	}
@@ -689,6 +733,7 @@ public class Schedule
 		calendarSchedule.setProviderIdList(providerIdList);
 		calendarSchedule.setEventList(allCalendarEvents);
 		calendarSchedule.setPreferredSlotDuration(5); //TODO calculate based on lowest common slot size
+		calendarSchedule.setHiddenDaysList(new ArrayList<>(0)); // always empty in group view
 
 		return calendarSchedule;
 	}
