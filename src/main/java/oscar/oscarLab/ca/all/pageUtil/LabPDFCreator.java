@@ -938,6 +938,11 @@ public class LabPDFCreator extends PdfPageEventHelper {
         	cell.setPhrase(new Phrase((handler.getOrderStatus().equals("F") ? "Final" : (handler.getOrderStatus().equals("C") ? "Corrected" : "Preliminary")), font));
         	rInfoTable.addCell(cell);
         }
+        if (ConnectCareHandler.isConnectCareHandler(handler))
+		{
+			cell.setPhrase(new Phrase(handler.getOrderStatusDisplayString(), font));
+			rInfoTable.addCell(cell);
+		}
         else
         {
 			cell.setPhrase(new Phrase((handler.getOrderStatus().equals("F") ? "Final" : (handler.getOrderStatus().equals("C") ? "Corrected" : "Partial")), font));
