@@ -27,12 +27,30 @@ import ca.uhn.hl7v2.model.Message;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * handler for both MDM T08 and MDM T02 Messages. This is because
  * they both share the same message format
  */
 public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 {
+	/**
+	 * order status interpretation map as per hl7 [0271] Document Completion Status
+	 */
+	private static final Map<String, String> orderStatusMap = new HashMap<String,String>();
+	static
+	{
+		orderStatusMap.put("AU", "Authenticated");
+		orderStatusMap.put("DI", "Dictated");
+		orderStatusMap.put("DO", "Documented");
+		orderStatusMap.put("IN", "Incomplete");
+		orderStatusMap.put("IP", "In Progress");
+		orderStatusMap.put("LA", "Legally authenticated");
+		orderStatusMap.put("PA", "Pre-authenticated");
+	}
+
 	public MDM_T08_T02MessageHandler() {}
 
 	public MDM_T08_T02MessageHandler(String hl7Body) throws HL7Exception
@@ -273,6 +291,22 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	public String getOrderStatus()
 	{
 		return getString(get("/.TXA-17"));
+	}
+
+	/**
+	 * Interpolate order status according to hl7 table [0271] Document Completion Status
+	 * @return Connect Care status string
+	 */
+	@Override
+	public String getOrderStatusDisplayString()
+	{
+		String orderStatus = getOrderStatus();
+		String displayString = orderStatusMap.get(orderStatus);
+		if (displayString == null)
+		{
+			displayString = "Partial";
+		}
+		return displayString;
 	}
 
 	/**

@@ -57,7 +57,8 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 		String handlerType = handler.getMsgType();
 		return handlerType.equals("CCIMAGING") || handlerType.equals("CCCARDIOLOGY") ||
 				handlerType.equals("CCENDO") ||
-				handlerType.equals("CCLAB");
+				handlerType.equals("CCLAB") ||
+				handlerType.equals("CCDOC");
 	}
 
 	public ConnectCareHandler(Message msg) throws HL7Exception

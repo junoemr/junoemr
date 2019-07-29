@@ -35,7 +35,6 @@ import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 public class ConnectCareLabHandler extends ConnectCareHandler
