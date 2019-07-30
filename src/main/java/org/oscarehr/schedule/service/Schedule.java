@@ -625,6 +625,10 @@ public class Schedule
 		{
 			allCalendarEvents = new ArrayList<>();
 
+			/* The fullCalendar plugin we are using has a hiddenDays parameter that allows us to hide certain days in the middle of a week/month view etc.
+			   We are utilizing this setting to create the schedule view, but we don't want to send back events for hidden days, so here we are building a
+			   'day of the week' filter and sending back the days to be hidden based on if they have a schedule set up.
+			 */
 			int[] daysWithSchedules = {0,0,0,0,0,0,0};
 
 			//TODO somehow consolidate with regular getCalendarEvents method
@@ -654,7 +658,7 @@ public class Schedule
 
 			// Get appointments for this provider/date range
 			allCalendarEvents.addAll(appointmentService.getCalendarEvents(
-					session, providerId, startDate, endDate, siteName));
+					session, providerId, startDate, endDate, siteName, hiddenDaysList));
 		}
 
 		List<String> providerIdList = new ArrayList<>(1);
