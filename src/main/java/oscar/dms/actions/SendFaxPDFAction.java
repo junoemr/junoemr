@@ -100,7 +100,7 @@ public class SendFaxPDFAction extends DispatchAction {
 				{
 					String filename = docData.getDocumentName(docNo);
 					// filename already has .pdf suffix
-					File tempFile = File.createTempFile("DOC-" + docNo + "-" + filename, "");
+					File tempFile = File.createTempFile("DOC-" + docNo + "-", "");
 					for(String faxNo : faxNoList)
 					{
 						FaxOutboxTransferOutbound transfer;
@@ -132,11 +132,6 @@ public class SendFaxPDFAction extends DispatchAction {
 							errorList.add(getUserFriendlyError(e) + errorAt);
 							continue;
 						}
-						finally
-						{
-							MiscUtils.getLogger().info("delete doc fax tempfile: " + tempFile.getPath());
-							tempFile.delete();
-						}
 
 						/* -- OHSUPPORT-2932 -- */
 						if(OscarProperties.getInstance().isPropertyActive(
@@ -149,6 +144,7 @@ public class SendFaxPDFAction extends DispatchAction {
 									programNo, faxNo, Long.valueOf(docNo));
 						}
 					}
+					tempFile.delete();
 				}
 			}
 		}
