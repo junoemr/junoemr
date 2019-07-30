@@ -24,28 +24,85 @@
 
 --%>
 
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <html>
 <head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	<title>eForm Closing</title>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery-1.12.3.js"></script>
+	<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery-ui-1.10.2.custom.min.js"></script>
+
+	<script type="text/javascript">
+
+		function closePage()
+		{
+			if (!window.opener.closed) {
+				var parentAjaxId = "<%=request.getParameter("parentAjaxId")%>";
+				if( window.opener. writeToEncounterNote ) {
+					window.opener.reloadNav(parentAjaxId);
+				} else {
+					if (window.opener.location.href.indexOf("efmpatientformlist.jsp")>=0)
+						window.opener.location.reload();
+				}
+				window.opener.focus();
+				window.close();
+			}
+		}
+	</script>
 </head>
 <body>
-<center>Closing Window, Please Wait....</center>
-<%@taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<script type="text/javascript" language="javascript">
-   
-   if (!window.opener.closed) {
-        var parentAjaxId = "<%=request.getParameter("parentAjaxId")%>";
-        if( window.opener. writeToEncounterNote ) {
-            window.opener.reloadNav(parentAjaxId);
-            //window.opener.document.forms['encForm'].elements['reloadDiv'].value = parentAjaxId;
-            //window.opener.updateNeeded = true;
-        } else {
-            if (window.opener.location.href.indexOf("efmpatientformlist.jsp")>=0)
-                window.opener.location.reload();
-        }
-        window.opener.focus();
-        window.close();
-    }
-</script>
+<div id="closeDialog">
+	<p>
+		This eForm is attempting to record measurements to the patient's eChart that do not match your current measurement types:
+	</p>
+	<c:forEach var="unsavedMeasurement" items="${measurements_unsaved}">
+		<li>${unsavedMeasurement}</li>
+	</c:forEach>
+	<p>
+		If you would like to adjust your measurement types, please consult
+		<a target="_blank"
+		   href="https://help.junoemr.com/support/solutions/articles/3000088272-measurement-customization">
+			this guide.
+		</a>
+	</p>
+</div>
+
+	<script type="text/javascript">
+		<%
+			if (request.getAttribute("measurements_unsaved") != null)
+			{
+		%>
+				$(function() {
+					$("#closeDialog").dialog({
+						autoOpen: true,
+						dialogClass: "no-close",
+						buttons: [
+							{
+								text: "OK, Close Window",
+								click: function() {
+									closePage();
+								}
+							}
+						],
+						modal: false,
+						open: function()
+						{
+							$(".ui-dialog-titlebar-close").hide();
+						},
+						width: 600
+					});
+				});
+		<%
+			}
+			else
+			{
+		%>
+			closePage();
+		<%
+			}
+		%>
+	</script>
 </body>
 </html>
