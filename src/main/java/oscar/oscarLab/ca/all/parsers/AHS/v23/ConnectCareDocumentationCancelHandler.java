@@ -26,6 +26,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.MDM_T11;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
+import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.parsers.messageTypes.MDM_T11MessageHandler;
 
 public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
@@ -89,6 +90,17 @@ public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 	public int getOBRCount()
 	{
 		return 1;
+	}
+
+
+	/**
+	 * always return cancelled as the status
+	 * @return - always status X
+	 */
+	@Override
+	public Hl7TextInfo.REPORT_STATUS getJunoOrderStatus()
+	{
+		return Hl7TextInfo.REPORT_STATUS.X;
 	}
 
 

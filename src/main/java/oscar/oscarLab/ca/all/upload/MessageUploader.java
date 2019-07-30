@@ -80,6 +80,7 @@ import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.oscarDemographic.data.DemographicMerged;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
+import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.HHSEmrDownloadHandler;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
@@ -140,7 +141,21 @@ public final class MessageUploader {
 			String resultStatus = "";
 			String priority = messageHandler.getMsgPriority();
 			String requestingClient = messageHandler.getDocName();
-			String reportStatus = messageHandler.getOrderStatus();
+			String reportStatus = "";
+			if (ConnectCareHandler.isConnectCareHandler(messageHandler))
+			{
+				Hl7TextInfo.REPORT_STATUS junoReportStatus = messageHandler.getJunoOrderStatus();
+				if (junoReportStatus == null)
+				{
+					MiscUtils.getLogger().error("Could not get Juno report status for message with order status: " + messageHandler.getOrderStatus() + " defaulting to Partial");
+					junoReportStatus = Hl7TextInfo.REPORT_STATUS.P;
+				}
+				reportStatus = junoReportStatus.name();
+			}
+			else
+			{
+				reportStatus = messageHandler.getOrderStatus();
+			}
 			String accessionNum = messageHandler.getAccessionNum();
 			String fillerOrderNum = messageHandler.getFillerOrderNumber();
 			String sendingFacility = messageHandler.getPatientLocation();

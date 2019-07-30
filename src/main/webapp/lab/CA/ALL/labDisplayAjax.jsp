@@ -44,6 +44,7 @@
 <%@ page import="java.util.regex.Pattern" %>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler" %>
+<%@ page import="org.oscarehr.labs.service.Hl7TextInfoService" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -635,7 +636,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                                     String orderStatus = "";
                                                     if (ConnectCareHandler.isConnectCareHandler(handler))
                                                     {
-                                                        orderStatus = handler.getOrderStatusDisplayString();
+                                                        orderStatus = Hl7TextInfoService.getReportStatusDisplayString(handler.getJunoOrderStatus());
                                                     }
                                                     else
                                                     {

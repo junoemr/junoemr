@@ -115,7 +115,7 @@ public class ConnectCareDiagnosticImagingHandler extends ConnectCareHandler
 
 	/**
 	 * As per Connect Care Conformance guidance abnormal flag is to be ignored in this type of lab.
-	 * @return
+	 * @return - always false
 	 */
 	@Override
 	public boolean isAbnormal()

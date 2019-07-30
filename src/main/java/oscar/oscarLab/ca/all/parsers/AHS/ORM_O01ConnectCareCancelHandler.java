@@ -24,6 +24,7 @@ package oscar.oscarLab.ca.all.parsers.AHS;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
+import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORM_O01MessageHandler;
 
 public abstract class ORM_O01ConnectCareCancelHandler extends ORM_O01MessageHandler
@@ -44,6 +45,16 @@ public abstract class ORM_O01ConnectCareCancelHandler extends ORM_O01MessageHand
 	public String getOrderStatus()
 	{
 		return get("/.ORDER/ORC-1");
+	}
+
+	/**
+	 * always cancel
+	 * @return - only one possible status cancel
+	 */
+	@Override
+	public Hl7TextInfo.REPORT_STATUS getJunoOrderStatus()
+	{
+		return Hl7TextInfo.REPORT_STATUS.X;
 	}
 
 	/**

@@ -20,6 +20,7 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%@page import="java.util.List"%>
+<%@ page import="org.oscarehr.labs.service.Hl7TextInfoService" %>
 
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -359,7 +360,7 @@ String curUser_no = (String) session.getAttribute("user");
                                     <%=result.isDocument() ? result.description == null ? "" : result.description : result.getDisciplineDisplayString()%>
                                 </td>
                                 <td nowrap> <!--  -->
-                                    <%= (result.isReportCancelled() ? "Cancelled" : (result.isCorrected() ? "Corrected" : (result.isFinal() ? "Final" : "Partial")))%>
+                                    <%= (Hl7TextInfoService.getReportStatusDisplayString(Hl7TextInfoService.getReportStatusFromString(result.getReportStatus())))%>
                                 </td>
                                 <td nowrap>
                                     <% int multiLabCount = result.getMultipleAckCount(); %>

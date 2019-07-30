@@ -28,6 +28,7 @@ import ca.uhn.hl7v2.model.v23.datatype.CX;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.oscarehr.common.hl7.AHS.model.v23.message.ORU_R01;
+import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
@@ -37,20 +38,21 @@ import java.util.Map;
 
 public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 {
-	private static final Map<String, String> orderStatusMap = new HashMap<String, String>();
+	private static final Map<String, Hl7TextInfo.REPORT_STATUS> orderStatusMap = new HashMap<String,  Hl7TextInfo.REPORT_STATUS>();
 	static
 	{
-		orderStatusMap.put("PA", "Preliminary");
-		orderStatusMap.put("A", "Final");
-		orderStatusMap.put("F", "Final");
-		orderStatusMap.put("C", "Corrected");
-		orderStatusMap.put("CA", "Canceled");
+		orderStatusMap.put("P", 	Hl7TextInfo.REPORT_STATUS.P);
+		orderStatusMap.put("PA",	Hl7TextInfo.REPORT_STATUS.E);
+		orderStatusMap.put("A", 	Hl7TextInfo.REPORT_STATUS.F);
+		orderStatusMap.put("F", 	Hl7TextInfo.REPORT_STATUS.F);
+		orderStatusMap.put("C", 	Hl7TextInfo.REPORT_STATUS.C);
+		orderStatusMap.put("CA",	Hl7TextInfo.REPORT_STATUS.X);
 	}
 
 	/**
 	 * Check if a given message handler is a connect care message handler
 	 * @param handler
-	 * @return
+	 * @return - true if handler is connect care handler
 	 */
 	public static boolean isConnectCareHandler(MessageHandler handler)
 	{
@@ -180,18 +182,12 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 	}
 
 	/**
-	 * Interpolate order status according to Connect Card documentation "Message Processing Guidelines Appendix - IMG OUT Addendum Status [3102] AND IMG OUT Status Table [3101]"
-	 * @return Connect Care status string
+	 * map OBR order status to juno internal order status
+	 * @return - juno internal report status
 	 */
 	@Override
-	public String getOrderStatusDisplayString()
+	public Hl7TextInfo.REPORT_STATUS getJunoOrderStatus()
 	{
-		String orderStatus = getOrderStatus();
-		String displayString = orderStatusMap.get(orderStatus);
-		if (displayString == null)
-		{
-			displayString = "Partial";
-		}
-		return displayString;
+		return orderStatusMap.get(getOrderStatus());
 	}
 }

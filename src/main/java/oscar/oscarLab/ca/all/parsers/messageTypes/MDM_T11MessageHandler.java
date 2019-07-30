@@ -26,6 +26,7 @@ package oscar.oscarLab.ca.all.parsers.messageTypes;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 
 import java.util.HashMap;
@@ -35,17 +36,19 @@ public abstract class MDM_T11MessageHandler extends MessageHandler
 {
 	/**
 	 * order status interpretation map as per hl7 [0271] Document Completion Status
+	 * hl7 [0271] -> juno internal
 	 */
-	private static final Map<String, String> orderStatusMap = new HashMap<String,String>();
+	private static final Map<String, Hl7TextInfo.REPORT_STATUS> orderStatusMap = new HashMap<>();
 	static
 	{
-		orderStatusMap.put("AU", "Authenticated");
-		orderStatusMap.put("DI", "Dictated");
-		orderStatusMap.put("DO", "Documented");
-		orderStatusMap.put("IN", "Incomplete");
-		orderStatusMap.put("IP", "In Progress");
-		orderStatusMap.put("LA", "Legally authenticated");
-		orderStatusMap.put("PA", "Pre-authenticated");
+		orderStatusMap.put("AU", Hl7TextInfo.REPORT_STATUS.A);
+		orderStatusMap.put("DI", Hl7TextInfo.REPORT_STATUS.D);
+		orderStatusMap.put("DO", Hl7TextInfo.REPORT_STATUS.O);
+		orderStatusMap.put("IN", Hl7TextInfo.REPORT_STATUS.I);
+		orderStatusMap.put("IP", Hl7TextInfo.REPORT_STATUS.N);
+		orderStatusMap.put("LA", Hl7TextInfo.REPORT_STATUS.L);
+		orderStatusMap.put("PA", Hl7TextInfo.REPORT_STATUS.R);
+		orderStatusMap.put("P", Hl7TextInfo.REPORT_STATUS.P);
 	}
 
 	public MDM_T11MessageHandler() {}
@@ -150,19 +153,13 @@ public abstract class MDM_T11MessageHandler extends MessageHandler
 	}
 
 	/**
-	 * Interpolate order status according to hl7 table [0271] Document Completion Status
-	 * @return Connect Care status string
+	 * map hl7 [0271] Document Completion Status codes to Juno internal codes
+	 * @return - internal report status
 	 */
 	@Override
-	public String getOrderStatusDisplayString()
+	public Hl7TextInfo.REPORT_STATUS getJunoOrderStatus()
 	{
-		String orderStatus = getOrderStatus();
-		String displayString = orderStatusMap.get(orderStatus);
-		if (displayString == null)
-		{
-			displayString = "Partial";
-		}
-		return displayString;
+		return orderStatusMap.get(getOrderStatus());
 	}
 
 	/**

@@ -66,6 +66,7 @@
 <%@ page import="java.util.regex.Matcher" %>
 <%@ page import="org.apache.commons.lang3.tuple.Pair" %>
 <%@ page import="oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler" %>
+<%@ page import="org.oscarehr.labs.service.Hl7TextInfoService" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -1089,7 +1090,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 														String orderStatus = "";
 														if (oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler.isConnectCareHandler(handler))
 														{
-															orderStatus = handler.getOrderStatusDisplayString();
+															orderStatus = Hl7TextInfoService.getReportStatusDisplayString(handler.getJunoOrderStatus());
 														}
 														else
 														{

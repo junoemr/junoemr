@@ -36,6 +36,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DataTypeUtils;
+import org.oscarehr.common.model.Hl7TextInfo;
+import org.oscarehr.labs.service.Hl7TextInfoService;
 import org.oscarehr.util.SpringUtils;
 import oscar.util.UtilDateUtilities;
 
@@ -431,12 +433,12 @@ public abstract class MessageHandler
 	}
 
 	/**
-	 * Get an interpreted order status string for display
-	 * @return - a possibly interpreted order status string
+	 * get the internal juno order status code
+	 * @return - internal juno order status code
 	 */
-	public String getOrderStatusDisplayString()
+	public Hl7TextInfo.REPORT_STATUS  getJunoOrderStatus()
 	{
-		return getOrderStatus();
+		return Hl7TextInfoService.getReportStatusFromString(getOrderStatus());
 	}
 
 	/**

@@ -55,6 +55,7 @@ import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.printing.FontSettings;
 import org.oscarehr.common.printing.PdfWriterFactory;
+import org.oscarehr.labs.service.Hl7TextInfoService;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
@@ -940,7 +941,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
         }
         if (ConnectCareHandler.isConnectCareHandler(handler))
 		{
-			cell.setPhrase(new Phrase(handler.getOrderStatusDisplayString(), font));
+			cell.setPhrase(new Phrase(Hl7TextInfoService.getReportStatusDisplayString(handler.getJunoOrderStatus()), font));
 			rInfoTable.addCell(cell);
 		}
         else
