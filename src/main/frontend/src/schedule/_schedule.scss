@@ -147,61 +147,71 @@
 					.fc-resizer {
 						height: 3px;
 					}
+					.fc-content {
+						width: 100%;
 
-					.schedule-event {
-						display: flex;
-						padding: 0;
-						margin: 0;
-						font-size: 12px;
-						font-weight: normal;
-						color: $grey-01;
-
-						$button-size: 16px;
-
-						.btn-event-link {
-							background: transparent;
-							border: 0;
-							width: $button-size;
-							min-width: $button-size;
-							height: $button-size;
-							color: $grey-01;
-							padding: 0;
-							&:hover {
-								background-color: rgba(255, 255, 255, 0.2);
-								border-radius: 50%;
-							}
-						}
-						.event-blk {
+						.schedule-event {
 							display: flex;
-							align-items: center;
-							justify-content: flex-start;
-						}
-						.event-blk-label {
-							flex-grow: 1;
-							font-weight: bold;
-						}
-						.btn-icon {
-							width: $button-size;
-							height: $button-size;
-							.icon {
+							padding: 0;
+							margin: 0;
+							font-size: 12px;
+							font-weight: normal;
+							color: $grey-01;
+
+							$button-size: 16px;
+
+							.btn-event-link {
+								background: transparent;
+								border: 0;
+								width: $button-size;
+								min-width: $button-size;
+								height: $button-size;
+								color: $grey-01;
+								padding: 0;
+								&:hover {
+									background-color: rgba(255, 255, 255, 0.2);
+									border-radius: 50%;
+								}
+							}
+							.event-blk {
+								display: flex;
+								align-items: start;
+								justify-content: flex-start;
+							}
+							.event-blk-label {
+								flex-grow: 1;
+								font-weight: bold;
+							}
+							.btn-icon {
 								width: $button-size;
 								height: $button-size;
+								.icon {
+									width: $button-size;
+									height: $button-size;
+								}
+								&:hover {
+									background-color: rgba(255, 255, 255, 0.2);
+									border-radius: 50%;
+								}
 							}
-							&:hover {
-								background-color: rgba(255, 255, 255, 0.2);
+							.event-status {
+								margin-left: 8px;
+							}
+							.event-tags {
+								display: inline-block;
+								text-align: center;
+								margin: 0 4px;
+							}
+							.event-label, .event-details {
+								margin-left: 3px;
+							}
+							.self-book-indicator.visible {
+								width: 12px;
+								height: 12px;
+								background-color: $white;
 								border-radius: 50%;
+								margin: 2px;
 							}
-						}
-						.event-status {
-							margin-left: 8px;
-						}
-						.event-tags {
-							display: inline-block;
-							text-align: center;
-							margin: 0 4px;
-						}
-						.event-label,.event-details {
-							margin-left: 3px;
 						}
 					}
 				}
@@ -301,6 +311,14 @@
 		height: 100%;
 		background-color: $white;
 	}
+	.loading-screen {
+		position: absolute;
+		top: 0;
+		z-index: 9;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0,0,0,0.1);
+	}
 	&.no-scroll {
 		overflow: hidden;
 	}
@@ -335,7 +353,6 @@
 			}
 		}
 		.modal-ctl-buttons {
-			//width: 80px;
 			padding: 6px;
 			align-items: center;
 			justify-content: space-between;

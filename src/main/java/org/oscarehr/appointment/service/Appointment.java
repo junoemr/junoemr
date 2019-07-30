@@ -128,6 +128,7 @@ public class Appointment
 					rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(details.getFamilyDoctor()),"rdohip");
 					rdohip = rdohip !=null ? rdohip : null;
 				}
+				boolean isSelfBooked = org.oscarehr.common.model.Appointment.BookingSource.MYOSCAR_SELF_BOOKING.name().equals(details.getBookingSource());
 
 				CalendarAppointment appointment = new CalendarAppointment(
 						details.getAppointmentNo(),
@@ -156,7 +157,7 @@ public class Appointment
 						details.getResources(),
 						details.getUrgency(),
 						details.getName().equals(org.oscarehr.common.model.Appointment.DONOTBOOK),
-						false,
+						isSelfBooked,
 						false,
 						null
 				);

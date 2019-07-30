@@ -186,6 +186,7 @@ module.exports = {
 			'./src/common/filters/startFrom.js',
 
 			'./src/common/directives/module.js',
+			'./src/common/directives/junoConfirmClick.js',
 			'./src/common/directives/typeaheadHelper.js',
 			'./src/common/directives/patientSearchTypeahead.js',
 			'./src/common/directives/patientTypeahead.js',
