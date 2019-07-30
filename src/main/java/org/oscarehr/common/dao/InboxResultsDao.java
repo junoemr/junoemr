@@ -221,14 +221,14 @@ public class InboxResultsDao
 			}
 
 			if (startDate != null) {
-				filterSql += "AND COALESCE(doc.observationdate, lab.obr_date) >= :start_date ";
-				labSql += "AND COALESCE(doc.observationdate, lab_filter.obr_date) >= :start_date ";
+				filterSql += "AND proLR.obr_date >= :start_date ";
+				proLrSql += "AND proLR_filter.obr_date >= :start_date ";
 				qp_start_date = true;
 			}
 
 			if (endDate != null) {
-				filterSql += "AND COALESCE(doc.observationdate, lab.obr_date) <= :end_date + INTERVAL 1 DAY ";
-				labSql += "AND COALESCE(doc.observationdate, lab_filter.obr_date) <= :end_date + INTERVAL 1 DAY  ";
+				filterSql += "AND proLR.obr_date <= :end_date + INTERVAL 1 DAY ";
+				proLrSql += "AND proLR_filter.obr_date <= :end_date + INTERVAL 1 DAY  ";
 				qp_end_date = true;
 			}
 
@@ -331,7 +331,7 @@ public class InboxResultsDao
 					+ "    WHEN d1.demographic_no IS NOT NULL THEN d1.demographic_no "
 					+ "    WHEN d2.demographic_no IS NOT NULL THEN d2.demographic_no"
 					+ "    ELSE 0 END AS demographic_no, "
-					+ "  COALESCE(doc.observationdate, lab.obr_date) AS observationdate, "
+					+ "  proLR.obr_date AS observationdate, "
 					+ "  doc.doctype AS description, "
 					+ "  date(doc.updatedatetime) as update_date_time, "
 					+ "  CONCAT(creator.last_name, ', ', creator.first_name) AS uploadedBy, "
