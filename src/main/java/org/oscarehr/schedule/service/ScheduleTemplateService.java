@@ -75,13 +75,13 @@ public class ScheduleTemplateService
 		return scheduleTemplateCodeDao.findAll();
 	}
 
-	public List<CalendarEvent> getCalendarEventsScheduleOnly(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime)
+	public List<CalendarEvent> getCalendarEventsScheduleOnly(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, Integer siteId)
 	{
 		// get the schedule slot length, return null if no schedule is set
-		Integer scheduleSlotLength = scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date);
+		Integer scheduleSlotLength = scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date, siteId);
 		if(scheduleSlotLength != null)
 		{
-			return getAllCalendarEvents(providerId, date, startTime, endTime, scheduleSlotLength);
+			return getAllCalendarEvents(providerId, date, startTime, endTime, siteId, scheduleSlotLength);
 		}
 		return null;
 	}
@@ -95,7 +95,7 @@ public class ScheduleTemplateService
 	 * @param providerId The provider to get the schedule for
 	 * @return A list of CalendarEvent objects
 	 */
-	public List<CalendarEvent> getCalendarEvents(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, int defaultSlotLengthInMin)
+	public List<CalendarEvent> getCalendarEvents(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, Integer siteId, int defaultSlotLengthInMin)
 	{
 		// get the schedule slot length, or use the default
 		Integer scheduleSlotLength = scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date);
@@ -103,14 +103,14 @@ public class ScheduleTemplateService
 		{
 			scheduleSlotLength = defaultSlotLengthInMin;
 		}
-		return getAllCalendarEvents(providerId, date, startTime, endTime, scheduleSlotLength);
+		return getAllCalendarEvents(providerId, date, startTime, endTime, siteId, scheduleSlotLength);
 	}
-	private List<CalendarEvent> getAllCalendarEvents(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, int scheduleSlotLength)
+	private List<CalendarEvent> getAllCalendarEvents(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, Integer siteId, int scheduleSlotLength)
 	{
 		List<CalendarEvent> calendarEvents = new ArrayList<>();
 
 		// Get schedule slots
-		RangeMap<LocalTime, ScheduleSlot> scheduleSlots = scheduleTemplateDao.findScheduleSlots(date, providerId);
+		RangeMap<LocalTime, ScheduleSlot> scheduleSlots = scheduleTemplateDao.findScheduleSlots(date, providerId, siteId);
 
 		for(LocalTime slotTime = startTime; slotTime.isBefore(endTime); slotTime = plusNoWrap(slotTime, scheduleSlotLength))
 		{

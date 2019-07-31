@@ -350,17 +350,8 @@ public class Schedule
 
 		if (viewAll && site != null)
 		{
-			List<Site> providerSites = siteDao.getActiveSitesByProviderNo(providerNo);
-			boolean siteMatch = false;
-			for (Site providerSite : providerSites)
-			{
-				if (providerSite.getName().equals(site))
-				{
-					siteMatch = true;
-				}
-			}
-			if (!siteMatch)
-			{// no schedule results for this provider
+			if (!isProviderAssignedToSite(site, providerNo))
+			{ // skip this provider
 				return new ResourceSchedule(userDateSchedules);
 			}
 
@@ -428,17 +419,8 @@ public class Schedule
 				//in view all we filter by site assigned to provider
 				if (site != null)
 				{
-					List<Site> providerSites = siteDao.getActiveSitesByProviderNo(result.getId().getProviderNo());
-					boolean siteMatch = false;
-					for (Site providerSite : providerSites)
-					{
-						if (providerSite.getName().equals(site))
-						{
-							siteMatch = true;
-						}
-					}
-					if (!siteMatch)
-					{// skip this provider
+					if (!isProviderAssignedToSite(site, result.getId().getProviderNo()))
+					{ // skip this provider
 						continue;
 					}
 				}
@@ -582,6 +564,7 @@ public class Schedule
 		LocalTime startTime,
 		LocalTime endTime,
 		String siteName,
+		Integer siteId,
 		Integer slotDurationInMin
 	)
 	{
@@ -591,7 +574,7 @@ public class Schedule
 		for(LocalDate date: ConversionUtils.getDateList(startDate, endDate))
 		{
 			// Get schedule templates for this provider/date
-			calendarEvents.addAll(scheduleTemplateService.getCalendarEvents(providerId, date, startTime, endTime, slotDurationInMin));
+			calendarEvents.addAll(scheduleTemplateService.getCalendarEvents(providerId, date, startTime, endTime, siteId, slotDurationInMin));
 		}
 
 		// Get appointments for this provider/date range
@@ -614,6 +597,15 @@ public class Schedule
 	{
 		List<CalendarEvent> allCalendarEvents;
 		List<Integer> hiddenDaysList;
+		Integer siteId = null;
+		if(siteName != null)
+		{
+			Site site = siteDao.findByName(siteName);
+			if(site != null)
+			{
+				siteId = site.getSiteId();
+			}
+		}
 
 		if(viewSchedulesOnly)
 		{
@@ -630,7 +622,7 @@ public class Schedule
 			for(LocalDate date: ConversionUtils.getDateList(startDate, endDate))
 			{
 				// Get schedule templates for this provider/date
-				List<CalendarEvent> eventList = scheduleTemplateService.getCalendarEventsScheduleOnly(providerId, date, startTime, endTime);
+				List<CalendarEvent> eventList = scheduleTemplateService.getCalendarEventsScheduleOnly(providerId, date, startTime, endTime, siteId);
 				if(eventList != null)
 				{
 					// provider has a schedule, add them to results normally
@@ -657,7 +649,7 @@ public class Schedule
 		else
 		{
 			allCalendarEvents = getCalendarEvents(session, providerId,
-					startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
+					startDate, endDate, startTime, endTime, siteName, siteId, slotDurationInMin);
 			hiddenDaysList = new ArrayList<>(0); //always empty for all view
 		}
 
@@ -689,6 +681,16 @@ public class Schedule
 	{
 		String userProviderNo = (String) session.getAttribute("user");
 
+		Integer siteId = null;
+		if(siteName != null)
+		{
+			Site site = siteDao.findByName(siteName);
+			if(site != null)
+			{
+				siteId = site.getSiteId();
+			}
+		}
+
 		List<MyGroup> userGroupMappings;
 		if(viewSchedulesOnly)
 		{
@@ -708,16 +710,7 @@ public class Schedule
 			// filter by site selection if applicable
 			if(siteName != null)
 			{
-				boolean siteMatch = false;
-				List<Site> providerSites = siteDao.getActiveSitesByProviderNo(providerIdStr);
-				for (Site providerSite : providerSites)
-				{
-					if (siteName.equals(providerSite.getName()))
-					{
-						siteMatch = true;
-					}
-				}
-				if (!siteMatch)
+				if (!isProviderAssignedToSite(siteName, providerIdStr))
 				{ // skip this provider
 					continue;
 				}
@@ -726,7 +719,7 @@ public class Schedule
 			providerIdList.add(providerIdStr);
 
 			List<CalendarEvent> calendarEvents = getCalendarEvents(session, Integer.parseInt(providerIdStr),
-					startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
+					startDate, endDate, startTime, endTime, siteName, siteId, slotDurationInMin);
 
 			allCalendarEvents.addAll(calendarEvents);
 		}
@@ -740,5 +733,18 @@ public class Schedule
 		calendarSchedule.setHiddenDaysList(new ArrayList<>(0)); // always empty in group view
 
 		return calendarSchedule;
+	}
+
+	private boolean isProviderAssignedToSite(String siteName, String providerId)
+	{
+		List<Site> providerSites = siteDao.getActiveSitesByProviderNo(providerId);
+		for (Site providerSite : providerSites)
+		{
+			if (siteName.equals(providerSite.getName()))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }

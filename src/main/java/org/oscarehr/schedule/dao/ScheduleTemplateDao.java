@@ -158,6 +158,10 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 	public Integer getScheduleSlotLengthInMin(Integer providerNo, LocalDate date)
 	{
+		return getScheduleSlotLengthInMin(providerNo, date, null);
+	}
+	public Integer getScheduleSlotLengthInMin(Integer providerNo, LocalDate date, Integer siteId)
+	{
 		Integer result = null;
 		String sql = "SELECT " +
 				"CAST(((24*60)/LENGTH(st.timecode)) AS integer) AS slotLength\n" +
@@ -166,11 +170,19 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"WHERE sd.status = 'A'\n" +
 				"AND sd.sdate = :scheduleDate\n" +
 				"AND sd.provider_no = :providerNo\n";
+		if(siteId != null)
+		{
+			sql += "AND (sd.site_id = :siteId OR sd.site_id IS NULL)\n";
+		}
 
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter("scheduleDate", java.sql.Date.valueOf(date), TemporalType.DATE);
 		query.setParameter("providerNo", providerNo);
 		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
+		if(siteId != null)
+		{
+			query.setParameter("siteId", siteId);
+		}
 
 		List<BigInteger> results = query.getResultList();
 		if(!results.isEmpty())
@@ -183,8 +195,14 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		}
 		return result;
 	}
-	private List<Object[]> getRawScheduleSlots(Integer providerNo, LocalDate date)
+	private List<Object[]> getRawScheduleSlots(Integer providerNo, LocalDate date, Integer siteId)
 	{
+		String siteFilter = "";
+		if(siteId != null)
+		{
+			siteFilter = "AND (sd.site_id = :siteId OR sd.site_id IS NULL)\n";
+		}
+
 		// This query is a bit hard to read.  The mess with all of the UNION ALLs is a way to make a
 		// sequence of numbers.  This is then used to find the position in the scheduletemplate.timecode
 		// value to split it into rows so it can be joined.
@@ -214,6 +232,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"  ON BINARY stc.code = SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1)\n" +
 				"WHERE sd.status = 'A'\n" +
 				"AND sd.sdate = :date\n" +
+				siteFilter +
 				"AND sd.provider_no = :providerNo\n" +
 				"AND (n3.i + (10 * n2.i) + (100 * n1.i)) < LENGTH(st.timecode)\n" +
 				"ORDER BY (n3.i + (10 * n2.i) + (100 * n1.i));";
@@ -222,14 +241,22 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		query.setParameter("date", java.sql.Date.valueOf(date), TemporalType.DATE);
 		query.setParameter("providerNo", providerNo);
 		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
+		if(siteId != null)
+		{
+			query.setParameter("siteId", siteId);
+		}
 
 		return query.getResultList();
 	}
 
-	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
 	public RangeMap<LocalTime, ScheduleSlot> findScheduleSlots(LocalDate date, Integer providerNo)
 	{
-		List<Object[]> results = getRawScheduleSlots(providerNo, date);
+		return findScheduleSlots(date, providerNo, null);
+	}
+	@NativeSql({"scheduledate", "scheduletemplate", "scheduletemplate", "scheduletemplatecode"})
+	public RangeMap<LocalTime, ScheduleSlot> findScheduleSlots(LocalDate date, Integer providerNo, Integer siteId)
+	{
+		List<Object[]> results = getRawScheduleSlots(providerNo, date, siteId);
 
 		RangeMap<LocalTime, ScheduleSlot> slots = TreeRangeMap.create();
 		for(Object[] result: results)
