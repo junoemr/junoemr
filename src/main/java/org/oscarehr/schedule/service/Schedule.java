@@ -63,6 +63,7 @@ import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -597,64 +598,75 @@ public class Schedule
 	{
 		List<CalendarEvent> allCalendarEvents;
 		List<Integer> hiddenDaysList;
-		Integer siteId = null;
-		if(siteName != null)
+		List<String> providerIdList;
+
+		if(siteName == null || isProviderAssignedToSite(siteName, String.valueOf(providerId)))
 		{
-			Site site = siteDao.findByName(siteName);
-			if(site != null)
+			providerIdList = new ArrayList<>(1);
+			providerIdList.add(String.valueOf(providerId));
+
+			Integer siteId = null;
+			if(siteName != null)
 			{
-				siteId = site.getSiteId();
-			}
-		}
-
-		if(viewSchedulesOnly)
-		{
-			allCalendarEvents = new ArrayList<>();
-
-			/* The fullCalendar plugin we are using has a hiddenDays parameter that allows us to hide certain days in the middle of a week/month view etc.
-			   We are utilizing this setting to create the schedule view, but we don't want to send back events for hidden days, so here we are building a
-			   'day of the week' filter and sending back the days to be hidden based on if they have a schedule set up.
-			 */
-			int[] daysWithSchedules = {0,0,0,0,0,0,0};
-
-			//TODO somehow consolidate with regular getCalendarEvents method
-			// Loop through the dates between startDate and endDate (inclusive) and add schedule templates
-			for(LocalDate date: ConversionUtils.getDateList(startDate, endDate))
-			{
-				// Get schedule templates for this provider/date
-				List<CalendarEvent> eventList = scheduleTemplateService.getCalendarEventsScheduleOnly(providerId, date, startTime, endTime, siteId);
-				if(eventList != null)
+				Site site = siteDao.findByName(siteName);
+				if(site != null)
 				{
-					// provider has a schedule, add them to results normally
-					allCalendarEvents.addAll(eventList);
-
-					int dayOfWeek = date.getDayOfWeek().getValue(); // 1 index based starting Monday
-					dayOfWeek = dayOfWeek % 7;// shift to be 0 index based starting on Sunday
-					daysWithSchedules[dayOfWeek] = 1;
-				}
-			}
-			hiddenDaysList = new ArrayList<>(7);
-			for(int i=0; i< daysWithSchedules.length; i++)
-			{
-				if(daysWithSchedules[i] == 0)
-				{
-					hiddenDaysList.add(i);
+					siteId = site.getSiteId();
 				}
 			}
 
-			// Get appointments for this provider/date range
-			allCalendarEvents.addAll(appointmentService.getCalendarEvents(
-					session, providerId, startDate, endDate, siteName, hiddenDaysList));
-		}
-		else
-		{
-			allCalendarEvents = getCalendarEvents(session, providerId,
-					startDate, endDate, startTime, endTime, siteName, siteId, slotDurationInMin);
-			hiddenDaysList = new ArrayList<>(0); //always empty for all view
-		}
+			if(viewSchedulesOnly)
+			{
+				allCalendarEvents = new ArrayList<>();
 
-		List<String> providerIdList = new ArrayList<>(1);
-		providerIdList.add(String.valueOf(providerId));
+				/* The fullCalendar plugin we are using has a hiddenDays parameter that allows us to hide certain days in the middle of a week/month view etc.
+				   We are utilizing this setting to create the schedule view, but we don't want to send back events for hidden days, so here we are building a
+				   'day of the week' filter and sending back the days to be hidden based on if they have a schedule set up.
+				 */
+				int[] daysWithSchedules = {0, 0, 0, 0, 0, 0, 0};
+
+				//TODO somehow consolidate with regular getCalendarEvents method
+				// Loop through the dates between startDate and endDate (inclusive) and add schedule templates
+				for(LocalDate date : ConversionUtils.getDateList(startDate, endDate))
+				{
+					// Get schedule templates for this provider/date
+					List<CalendarEvent> eventList = scheduleTemplateService.getCalendarEventsScheduleOnly(providerId, date, startTime, endTime, siteId);
+					if(eventList != null)
+					{
+						// provider has a schedule, add them to results normally
+						allCalendarEvents.addAll(eventList);
+
+						int dayOfWeek = date.getDayOfWeek().getValue(); // 1 index based starting Monday
+						dayOfWeek = dayOfWeek % 7;// shift to be 0 index based starting on Sunday
+						daysWithSchedules[dayOfWeek] = 1;
+					}
+				}
+				hiddenDaysList = new ArrayList<>(7);
+				for(int i = 0; i < daysWithSchedules.length; i++)
+				{
+					if(daysWithSchedules[i] == 0)
+					{
+						hiddenDaysList.add(i);
+					}
+				}
+
+				// Get appointments for this provider/date range
+				allCalendarEvents.addAll(appointmentService.getCalendarEvents(
+						session, providerId, startDate, endDate, siteName, hiddenDaysList));
+			}
+			else
+			{
+				allCalendarEvents = getCalendarEvents(session, providerId,
+						startDate, endDate, startTime, endTime, siteName, siteId, slotDurationInMin);
+				hiddenDaysList = new ArrayList<>(0); //always empty for all view
+			}
+		}
+		else //provider not available with this site, return nothing.
+		{
+			allCalendarEvents = new ArrayList<>(0);
+			hiddenDaysList = Arrays.asList(0,1,2,3,4,5,6); //hide all the days (for consistency)
+			providerIdList = new ArrayList<>(0);
+		}
 
 		CalendarSchedule calendarSchedule = new CalendarSchedule();
 
