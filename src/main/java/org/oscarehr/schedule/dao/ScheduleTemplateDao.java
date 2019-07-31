@@ -156,10 +156,6 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		return query.getResultList();
 	}
 
-	public Integer getScheduleSlotLengthInMin(Integer providerNo, LocalDate date)
-	{
-		return getScheduleSlotLengthInMin(providerNo, date, null);
-	}
 	public Integer getScheduleSlotLengthInMin(Integer providerNo, LocalDate date, Integer siteId)
 	{
 		Integer result = null;

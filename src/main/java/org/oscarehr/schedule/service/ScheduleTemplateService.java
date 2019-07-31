@@ -98,7 +98,7 @@ public class ScheduleTemplateService
 	public List<CalendarEvent> getCalendarEvents(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, Integer siteId, int defaultSlotLengthInMin)
 	{
 		// get the schedule slot length, or use the default
-		Integer scheduleSlotLength = scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date);
+		Integer scheduleSlotLength = scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date, siteId);
 		if(scheduleSlotLength == null)
 		{
 			scheduleSlotLength = defaultSlotLengthInMin;
