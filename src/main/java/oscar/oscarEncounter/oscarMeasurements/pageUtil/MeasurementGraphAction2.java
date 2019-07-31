@@ -38,6 +38,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -196,13 +197,69 @@ public class MeasurementGraphAction2 extends Action {
 	}
 
 	/**
-	 * pull and parse measurement parameters out of a string-based range
-	 * @param range
-	 * 		The string that we're trying to interpret
-	 * @param units
-	 * 		Any written suffix associated with the measurement that we want to discard
-	 * @return
-	 * 		A Double array containing the measurements we can pull out, empty array if we can't pull them out
+	 * Helper procedure to modify ranges that we know we can reinterpret.
+	 * @param range String to modify
+	 * @return modified string, or original string if we can't do anything with it
+	 */
+	private static String reformatRange(String range)
+	{
+		// looks like "<= {num}"
+		if (range.contains("<="))
+		{
+			return "0 - " + range.split("<=")[1];
+		}
+
+		// looks like "< {num}
+		if (range.contains("<"))
+		{
+			return "0 - " + range.split("<")[1];
+		}
+
+		// looks like " - {num}"
+		if (range.contains("-") && StringUtils.trimToEmpty(range.split("-")[0]).isEmpty())
+		{
+			return "0 " + range;
+		}
+
+		// All of the following cases will go with the heuristic of [lowerBound, lowerBound*2.0]
+		try
+		{
+			final double upperBoundMagnitude = 2.0;
+			// ">= {num}"
+			if (range.contains(">="))
+			{
+				double lowerBound = Double.parseDouble(range.split(">=")[1]);
+				return lowerBound + " - " + (lowerBound * upperBoundMagnitude);
+			}
+
+			// "> {num}"
+			if (range.contains(">"))
+			{
+				double lowerBound = Double.parseDouble(range.split(">")[1]);
+				return lowerBound + " - " + (lowerBound * upperBoundMagnitude);
+			}
+
+			// initially "- {num}", reinterpreted to be like "> num "
+			if (range.contains("-") && range.split("-").length == 1)
+			{
+				double lowerBound = Double.parseDouble(range.split("-")[0]);
+				return lowerBound + " - " + (lowerBound * upperBoundMagnitude);
+			}
+		}
+		catch (Exception e)
+		{
+			MiscUtils.getLogger().error("Error: " + e);
+			return range;
+		}
+
+		return range;
+	}
+
+	/**
+	 * Pull and parse measurement parameters out of a string-based range
+	 * @param range The string that we're trying to interpret
+	 * @param units Any written suffix associated with the measurement that we want to discard
+	 * @return double array containing the measurements we can pull out, empty array if we can't pull them out
 	 */
 	public static double[] getParameters(String range, String units)
 	{
@@ -216,6 +273,9 @@ public class MeasurementGraphAction2 extends Action {
 		{
 			range = range.replace(units, "");
 		}
+
+		// Some range interpretations can be adjusted for graphing purposes
+		range = reformatRange(range);
 
 		if (range.contains("-"))
 		{
@@ -278,6 +338,8 @@ public class MeasurementGraphAction2 extends Action {
 			{
 				String range = (String) mdb.get("range");
 				String units = (String) mdb.get("units");
+
+
 
 				double[] measurementRange = getParameters(range, units);
 				if (measurementRange.length > 0)
