@@ -99,24 +99,6 @@
 
 					<div class="form-group pull-right">
 						<div class="form-group">
-							<div class="btn-group" role="group">
-								<button type="button"
-								        class="btn btn-sm"
-								        ng-class=" { 'btn-addon': isScheduleView(),
-								                     'btn-primary': !isScheduleView() }"
-								        ng-click="scheduleController.changeScheduleView(scheduleController.scheduleViewEnum.all)">
-									All
-								</button>
-								<button type="button"
-								        class="btn btn-sm"
-								        ng-class=" { 'btn-addon': !isScheduleView(),
-								                     'btn-primary': isScheduleView() }"
-								        ng-click="scheduleController.changeScheduleView(scheduleController.scheduleViewEnum.schedule)">
-									Schedule
-								</button>
-							</div>
-						</div>
-						<div class="form-group">
 							<div class="btn-group" role="group" ng-show="isAgendaView()">
 								<button type="button"
 								        class="btn btn-sm"
@@ -141,6 +123,26 @@
 								        viewName="month"
 								        ng-click="changeCalendarView(scheduleController.calendarViewEnum.agendaMonth)">
 									Month
+								</button>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="btn-group" role="group">
+								<button type="button"
+								        class="btn btn-sm"
+								        title="Show all schedule information"
+								        ng-class=" { 'btn-addon': isScheduleView(),
+								                     'btn-primary': !isScheduleView() }"
+								        ng-click="scheduleController.changeScheduleView(scheduleController.scheduleViewEnum.all)">
+									All
+								</button>
+								<button type="button"
+								        class="btn btn-sm"
+								        title="Show information for defined provider schedules only"
+								        ng-class=" { 'btn-addon': !isScheduleView(),
+								                     'btn-primary': isScheduleView() }"
+								        ng-click="scheduleController.changeScheduleView(scheduleController.scheduleViewEnum.schedule)">
+									Schedule
 								</button>
 							</div>
 						</div>

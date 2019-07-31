@@ -305,7 +305,7 @@ public class ScheduleService extends AbstractServiceImpl {
 	public RestResponse<CalendarSchedule> getCalendarSchedule(
 			@QueryParam("scheduleId") String scheduleId,
 			@QueryParam("scheduleIdType") String scheduleIdType,
-			@QueryParam("viewAll") Boolean viewAll,
+			@QueryParam("scheduleFilter") Boolean viewSchedulesOnly,
 			@QueryParam("startDate") String startDateString,
 			@QueryParam("endDate") String endDateString,
 			@QueryParam("startTime") String startTimeString,
@@ -328,14 +328,14 @@ public class ScheduleService extends AbstractServiceImpl {
 		if(ScheduleGroup.IdentifierType.valueOf(scheduleIdType).equals(ScheduleGroup.IdentifierType.GROUP))
 		{
 			calendarSchedule =
-					scheduleService.getCalendarScheduleByGroup(session, scheduleId, viewAll,
+					scheduleService.getCalendarScheduleByGroup(session, scheduleId, viewSchedulesOnly,
 							startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
 		}
 		else
 		{
 			//TODO change all providerNos to strings in this chain
 			calendarSchedule =
-					scheduleService.getCalendarScheduleByProvider(session, Integer.parseInt(scheduleId), viewAll,
+					scheduleService.getCalendarScheduleByProvider(session, Integer.parseInt(scheduleId), viewSchedulesOnly,
 							startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
 		}
 		return RestResponse.successResponse(calendarSchedule);

@@ -603,7 +603,7 @@ public class Schedule
 	public CalendarSchedule getCalendarScheduleByProvider(
 			HttpSession session,
 			Integer providerId,
-			boolean viewAll,
+			boolean viewSchedulesOnly,
 			LocalDate startDate,
 			LocalDate endDate,
 			LocalTime startTime,
@@ -615,13 +615,7 @@ public class Schedule
 		List<CalendarEvent> allCalendarEvents;
 		List<Integer> hiddenDaysList;
 
-		if(viewAll)
-		{
-			allCalendarEvents = getCalendarEvents(session, providerId,
-				startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
-			hiddenDaysList = new ArrayList<>(0); //always empty for all view
-		}
-		else
+		if(viewSchedulesOnly)
 		{
 			allCalendarEvents = new ArrayList<>();
 
@@ -660,6 +654,12 @@ public class Schedule
 			allCalendarEvents.addAll(appointmentService.getCalendarEvents(
 					session, providerId, startDate, endDate, siteName, hiddenDaysList));
 		}
+		else
+		{
+			allCalendarEvents = getCalendarEvents(session, providerId,
+					startDate, endDate, startTime, endTime, siteName, slotDurationInMin);
+			hiddenDaysList = new ArrayList<>(0); //always empty for all view
+		}
 
 		List<String> providerIdList = new ArrayList<>(1);
 		providerIdList.add(String.valueOf(providerId));
@@ -678,7 +678,7 @@ public class Schedule
 	public CalendarSchedule getCalendarScheduleByGroup(
 			HttpSession session,
 			String groupName,
-			boolean viewAll,
+			boolean viewSchedulesOnly,
 			LocalDate startDate,
 			LocalDate endDate,
 			LocalTime startTime,
@@ -690,13 +690,13 @@ public class Schedule
 		String userProviderNo = (String) session.getAttribute("user");
 
 		List<MyGroup> userGroupMappings;
-		if(viewAll)
+		if(viewSchedulesOnly)
 		{
-			userGroupMappings = myGroupDao.getGroupByGroupNo(groupName);
+			userGroupMappings = myGroupDao.getGroupWithScheduleByGroupNo(groupName, startDate, Integer.parseInt(userProviderNo));
 		}
 		else
 		{
-			userGroupMappings = myGroupDao.getGroupWithScheduleByGroupNo(groupName, startDate, Integer.parseInt(userProviderNo));
+			userGroupMappings = myGroupDao.getGroupByGroupNo(groupName);
 		}
 
 		List<String> providerIdList = new ArrayList<>(userGroupMappings.size());

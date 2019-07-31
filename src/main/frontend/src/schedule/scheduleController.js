@@ -518,7 +518,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.scheduleApi.getCalendarSchedule(
 				selectedSchedule.identifier,
 				selectedSchedule.identifierType,
-				!$scope.isScheduleView(),
+				$scope.isScheduleView(),
 				startDateString,
 				endDateString,
 				$scope.getScheduleMinTime(),
@@ -542,7 +542,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 						$scope.showNoResources = (providerNos.length === 0);
 						$scope.uiConfig.calendar.hiddenDays = [];
-
 					}
 					else
 					{
@@ -551,14 +550,18 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						$scope.calendarViewName = $scope.getCalendarViewName();
 						$scope.uiConfig.calendar.resources = false;
 
-						var hiddenDays = results.data.body.hiddenDaysList;
-						$scope.showNoResources = (hiddenDays.length === 7);
+						$scope.showNoResources = false;
+						$scope.uiConfig.calendar.hiddenDays = [];
 
+						var hiddenDays = results.data.body.hiddenDaysList;
 						if(hiddenDays.length === 7)
 						{
-							$scope.uiConfig.calendar.hiddenDays = []; // hiding all days causes an error
+							// hiding all days causes an error in fullCalendar, so instead hide the calendar with the no schedules screen
+							$scope.showNoResources = true;
 						}
-						else
+						// only hide days in week/month views. limiting day view causes re-fetch errors when changing to week view
+						else if ($scope.calendarViewName === controller.calendarViewEnum.agendaWeek
+							  || $scope.calendarViewName === controller.calendarViewEnum.agendaMonth)
 						{
 							$scope.uiConfig.calendar.hiddenDays = hiddenDays; // hide days without schedules
 						}
@@ -1733,6 +1736,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				slotLabelInterval: $scope.selectedSlotLabelInterval,
 				slotLabelFormat: 'h A',
 				slotEventOverlap: false,
+				lazyFetching: false, //for dev use
 
 				resources: false, // contains the resource hash properties for each schedule in group view
 				resourceOrder: 'id', // display order for multiple schedules, relies on a resource hash property
