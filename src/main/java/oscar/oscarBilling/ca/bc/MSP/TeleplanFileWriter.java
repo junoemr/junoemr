@@ -228,7 +228,14 @@ public class TeleplanFileWriter {
 //           appendToHTML(wcbSub.validate(wcbForm,bm)); //sb.validate());
 
 		String html = wcbSub.validate(wcbForm, bm);
-        appendToHTML(wcbSub.getHtmlLine(wcbForm, bm));
+		if (wcbForm == null)
+        {
+            appendToHTML(wcbSub.getHtmlLine(bm));
+        }
+		else
+        {
+            appendToHTML(wcbSub.getHtmlLine(wcbForm, bm));
+        }
         if (!html.equals(""))
         {
             appendToHTML(html);
