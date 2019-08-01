@@ -399,7 +399,6 @@ function sendFax()
 	{
 		frames['preview'].document.getElementById('pdfId').value = '<%=signatureRequestId%>';
 		frames['preview'].onPrint2('oscarRxFax');
-		frames['preview'].document.FrmForm.submit();
 		window.onbeforeunload = null;
 	}
 	else
