@@ -89,6 +89,8 @@ if(!authed) {
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.GregorianCalendar" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="oscar.util.ConversionUtils" %>
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 
 <html:html locale="true">
@@ -186,12 +188,8 @@ if(!authed) {
     </SCRIPT>
 <%
 	}
-
-		java.util.Calendar calender = java.util.Calendar.getInstance();
-		String day = Integer.toString(calender.get(java.util.Calendar.DAY_OF_MONTH));
-		String mon = Integer.toString(calender.get(java.util.Calendar.MONTH) + 1);
-		String year = Integer.toString(calender.get(java.util.Calendar.YEAR));
-		String formattedDate = year + "-" + mon + "-" + day;
+	  	LocalDate localDate = LocalDate.now();
+		String formattedDate = ConversionUtils.toDateString(localDate);
 
 		OscarProperties props = OscarProperties.getInstance();
 		ConsultationServiceDao consultationServiceDao = SpringUtils.getBean(ConsultationServiceDao.class);

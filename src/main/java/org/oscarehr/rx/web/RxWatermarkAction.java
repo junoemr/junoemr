@@ -129,4 +129,16 @@ public class RxWatermarkAction  extends DispatchAction
 		response.setStatus(200);
 		return null;
 	}
+
+	public ActionForward setWatermarkBackground(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
+		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null,  "_admin");
+
+		boolean isBackground = Boolean.parseBoolean(request.getParameter("isBackground"));
+		RxWatermarkService.setWatermarkBackground(isBackground);
+
+		response.setStatus(200);
+		return null;
+	}
 }

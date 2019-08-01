@@ -45,6 +45,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.web.context.WebApplicationContext;
@@ -106,7 +107,14 @@ public class BillingCreateBillingAction extends Action {
     bean.setPatientPostal(demo.getPostal());
     bean.setPatientSex(demo.getSex());
     bean.setPatientPHN(demo.getHin()+demo.getVer());
-    bean.setPatientHCType(demo.getHcType());
+    if (frm.isOinPayPatient())
+    {
+      bean.setPatientHCType(Demographic.HC_TYPE.PP.name());
+    }
+    else
+    {
+      bean.setPatientHCType(demo.getHcType());
+    }
     bean.setPatientAge(demo.getAge());
     bean.setBillingType(frm.getXml_billtype());
     bean.setPaymentType(payMeth);

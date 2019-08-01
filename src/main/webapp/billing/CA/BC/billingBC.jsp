@@ -1053,6 +1053,10 @@ if(wcbneeds != null){%>
                   <html:option value="Pri">Private</html:option>
                   <html:option value="DONOTBILL">Do Not Bill</html:option>
                 </html:select>
+				<span>
+					<bean:message key="billing.insurer.pay_patient"/>
+					<html:checkbox property="oin_insurer_pay_patient"/>
+				</span>
             </td>
             <td width="33%">
                 <b>Clarification Code:</b>

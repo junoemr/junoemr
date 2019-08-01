@@ -60,6 +60,7 @@ import org.oscarehr.util.SpringUtils;
 import oscar.eform.actions.DisplayImageAction;
 import oscar.eform.data.EForm;
 import oscar.eform.upload.ImageUploadAction;
+import oscar.eform.upload.ImageUploadForm;
 
 /**
  *
@@ -221,6 +222,13 @@ public class EFormExportZip {
 		//first runthrough, get the properties files, construct eforms, cache files
 		while ((ze = zis.getNextEntry()) != null) {
 			File file = new File(ze.getName());
+
+			if (!ImageUploadForm.isEformImageNameValid(file.getName()))
+			{
+				errors.add("File: " + file.getName() + " has a name that contains illegal characters. (')");
+				continue;
+			}
+
 			_log.info("Unzipping..." + file.getName());
 			if (file.getName().equalsIgnoreCase("eform.properties")) {
 				Properties properties = new Properties();

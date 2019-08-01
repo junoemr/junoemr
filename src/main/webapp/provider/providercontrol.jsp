@@ -122,10 +122,24 @@
         String caisiView = null;
         caisiView = request.getParameter("GoToCaisiViewFromOscarView");
         boolean viewAll_bool = true;  // false, restore original schedule view on appointment screen
-        
-        if (props.getProperty("default_schedule_viewall", "").startsWith("false") )
-            viewAll_bool = false;
-            
+
+		if (request.getParameter("viewall") != null)
+		{
+			if (request.getParameter("viewall").equals("1"))
+			{
+				viewAll_bool = true;
+			}
+			else
+			{
+				viewAll_bool = false;
+			}
+		}
+		else
+		{
+			if (props.getProperty("default_schedule_viewall", "").startsWith("false"))
+				viewAll_bool = false;
+		}
+
         if(caisiView!=null && "true".equals(caisiView)) {
         	if (viewAll_bool){
 	        	response.sendRedirect("./providercontrol.jsp?GoToCaisiViewFromOscarView=true&year="+nowYear+"&month="+(nowMonth)+"&day="+(nowDay)+"&view=0&displaymode=day&dboperation=searchappointmentday&viewall=1");
