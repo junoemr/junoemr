@@ -113,8 +113,16 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 	protected void createRxPdf(Document document, PdfWriter writer) throws DocumentException {
 
 		PdfPTable mainTable = new PdfPTable(1);
-		mainTable.setExtendLastRow(true);//last cell will try to fill the page
+		mainTable.setExtendLastRow(false);//last cell will try to fill the page
+		mainTable.setTotalWidth(document.getPageSize().getWidth());
 		//mainTable.getDefaultCell().setPadding(10f);
+
+		// render background watermark
+		if (RxWatermarkService.isWatermarkEnabled() && RxWatermarkService.isWatermarkBackground())
+		{
+			PdfContentByte cb = writer.getDirectContent();
+			cb.addImage(createWaterMarkImage(document));
+		}
 
 		addToTable(mainTable, buildClinicHeader(), true);
 
@@ -125,6 +133,7 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		PdfPCell cell = new PdfPCell(buildPageFooter());
 		cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
 		cell.setBorder(0);
+		cell.setFixedHeight(document.getPageSize().getHeight() - mainTable.getTotalHeight() - 36);//last cell will try to fill the page
 		mainTable.addCell(cell);
 
 		/*PdfPCell borderCell = new PdfPCell(mainTable);
@@ -132,16 +141,18 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		PdfPTable outerTable = new PdfPTable(1);
 		outerTable.addCell(borderCell);*/
 
-		if (RxWatermarkService.isWatermarkEnabled())
-		{
-			renderWaterMark(document, writer);
-		}
 		document.add(mainTable);
+
+		// render foreground watermark
+		if (RxWatermarkService.isWatermarkEnabled() && !RxWatermarkService.isWatermarkBackground())
+		{
+			PdfContentByte cb = writer.getDirectContent();
+			cb.addImage(createWaterMarkImage(document));
+		}
 	}
 
-	protected void renderWaterMark(Document document, PdfWriter writer)
+	protected Image createWaterMarkImage(Document document)
 	{
-		PdfContentByte cb = writer.getDirectContent();
 		try
 		{
 			Image watermarkImg = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
@@ -149,12 +160,13 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 			watermarkImg.scalePercent(scaleFactor*100f);
 			watermarkImg.setAbsolutePosition(document.getPageSize().getWidth()/2 - (watermarkImg.getWidth()*scaleFactor) / 2,
 					document.getPageSize().getHeight()/2 - (watermarkImg.getHeight()*scaleFactor) / 2);
-			cb.addImage(watermarkImg);
+			return watermarkImg;
 		}
 		catch(Exception e)
 		{
-			MiscUtils.getLogger().error("error rendering watermark to rx pdf: " + e.getMessage());
+			MiscUtils.getLogger().error("error creating watermark image: " + e.getMessage(), e);
 		}
+		return null;
 	}
 
 	protected Image buildLogoImage() {

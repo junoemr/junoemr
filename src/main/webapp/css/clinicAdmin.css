@@ -143,6 +143,15 @@ form {
     flex: 0 0 100%;
 }
 
+.watermark-background-selector .btn {
+    max-width: 100px;
+}
+
+.watermark-background-selector .btn label {
+    display: flex;
+    align-items: center;
+}
+
 @media only screen and (max-width: 1000px) {
     .address-fields {
         flex-direction: column;

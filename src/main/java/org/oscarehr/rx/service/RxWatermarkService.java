@@ -59,6 +59,11 @@ public class RxWatermarkService
 		userPropertyDao.saveProp(UserProperty.ENABLE_RX_WATERMARK, enable.toString());
 	}
 
+	public static void setWatermarkBackground(Boolean isForeground)
+	{
+		userPropertyDao.saveProp(UserProperty.IS_BACKGROUND_RX_WATERMARK, isForeground.toString());
+	}
+
 	public static boolean isWatermarkEnabled()
 	{
 		UserProperty watermarkEnabledProperty = userPropertyDao.getProp(UserProperty.ENABLE_RX_WATERMARK);
@@ -66,6 +71,17 @@ public class RxWatermarkService
 		if (watermarkEnabledProperty != null)
 		{
 			return Boolean.parseBoolean(watermarkEnabledProperty.getValue());
+		}
+		return false;
+	}
+
+	public static boolean isWatermarkBackground()
+	{
+		UserProperty watermarkForegroundProperty = userPropertyDao.getProp(UserProperty.IS_BACKGROUND_RX_WATERMARK);
+
+		if (watermarkForegroundProperty != null)
+		{
+			return Boolean.parseBoolean(watermarkForegroundProperty.getValue());
 		}
 		return false;
 	}
