@@ -718,6 +718,7 @@ public class Schedule
 		for(MyGroup userGroup : userGroupMappings)
 		{
 			String providerIdStr = userGroup.getId().getProviderNo();
+			List<CalendarEvent> calendarEvents;
 
 			// filter by site selection if applicable
 			if(siteName != null)
@@ -728,11 +729,35 @@ public class Schedule
 				}
 			}
 
-			providerIdList.add(providerIdStr);
+			if(viewSchedulesOnly)
+			{
+				//TODO refactor similar logic with provider version
+				calendarEvents = new ArrayList<>();
 
-			List<CalendarEvent> calendarEvents = getCalendarEvents(session, Integer.parseInt(providerIdStr),
-					startDate, endDate, startTime, endTime, siteName, siteId, slotDurationInMin);
+				// Loop through the dates between startDate and endDate (inclusive) and add schedule templates
+				for(LocalDate date: ConversionUtils.getDateList(startDate, endDate))
+				{
+					// Get schedule templates for this provider/date/site
+					List<CalendarEvent> eventList = scheduleTemplateService.getCalendarEventsScheduleOnly(Integer.parseInt(providerIdStr), date, startTime, endTime, siteId);
+					if(eventList != null)
+					{
+						// only add the provider to the provider list if they have a schedule for the correct site
+						calendarEvents.addAll(eventList);
+						providerIdList.add(providerIdStr);
 
+						// Get appointments for this provider/date range
+						calendarEvents.addAll(appointmentService.getCalendarEvents(
+								session, Integer.parseInt(providerIdStr), startDate, endDate, siteName));
+					}
+				}
+			}
+			else
+			{
+				providerIdList.add(providerIdStr);
+
+				calendarEvents = getCalendarEvents(session, Integer.parseInt(providerIdStr),
+						startDate, endDate, startTime, endTime, siteName, siteId, slotDurationInMin);
+			}
 			allCalendarEvents.addAll(calendarEvents);
 		}
 
