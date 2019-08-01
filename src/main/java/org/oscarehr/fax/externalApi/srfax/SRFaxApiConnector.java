@@ -34,7 +34,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxApiValidationException;
