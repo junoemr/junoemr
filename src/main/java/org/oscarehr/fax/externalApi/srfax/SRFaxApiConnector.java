@@ -450,10 +450,10 @@ public class SRFaxApiConnector
 		{
 			if (response.isEmpty())
 			{// if the response is empty. SRFax has locked the account
-				logger.warn("API Response Error: Account is locked at this IP");
+				logger.warn("API Response Error: Account is blocked at this IP");
 				result = new ListWrapper<>();
 				result.setStatus("Error");
-				result.setError("Account is Locked");
+				result.setError("Account is Blocked at this IP");
 			}
 			else
 			{
@@ -488,10 +488,10 @@ public class SRFaxApiConnector
 		SingleWrapper<T> result = null;
 		if (response.isEmpty())
 		{// if the response is empty. SRFax has locked the account
-			logger.warn("API Response Error: Account is locked at this IP");
+			logger.warn("API Response Error: Account is blocked at this IP");
 			result = new SingleWrapper<>();
 			result.setStatus("Error");
-			result.setError("Account is Locked");
+			result.setError("Account is Blocked at this IP");
 		}
 		else
 		{
