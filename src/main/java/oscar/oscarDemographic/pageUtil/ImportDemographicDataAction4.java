@@ -862,7 +862,7 @@ import java.util.zip.ZipInputStream;
             logger.info("IMPORT PERSONAL HISTORY: " + pHist.length + " entries found");
             for (int i=0; i<pHist.length; i++) {
                 if (i==0) scmi = getCMIssue("SocHistory");
-                CaseManagementNote cmNote = prepareCMNote("1",null);
+                CaseManagementNote cmNote = prepareCMNote(programId, null);
                 cmNote.setIssues(scmi);
 
                 //main field
@@ -888,7 +888,7 @@ import java.util.zip.ZipInputStream;
             logger.info("IMPORT FAMILY HISTORY: " + fHist.length + " entries found");
             for (int i=0; i<fHist.length; i++) {
                 if (i==0) scmi = getCMIssue("FamHistory");
-                CaseManagementNote cmNote = prepareCMNote("1",null);
+                CaseManagementNote cmNote = prepareCMNote(programId, null);
 
                 //diagnosis code
                 if (fHist[i].getDiagnosisProcedureCode()==null) {
@@ -906,7 +906,7 @@ import java.util.zip.ZipInputStream;
 
                 //annotation
                 Long hostNoteId = cmNote.getId();
-                cmNote = prepareCMNote("2",null);
+                cmNote = prepareCMNote(programId, null);
                 String note = StringUtils.noNull(fHist[i].getNotes());
                 cmNote.setNote(note);
                 saveLinkNote(hostNoteId, cmNote);
@@ -967,7 +967,7 @@ import java.util.zip.ZipInputStream;
             logger.info("IMPORT PAST HEALTH: " + pHealth.length + " entries found");
             for (int i=0; i< pHealth.length; i++) {
                 if (i==0) scmi = getCMIssue("MedHistory");
-                CaseManagementNote cmNote = prepareCMNote("1",null);
+                CaseManagementNote cmNote = prepareCMNote(programId, null);
 
                 //diagnosis code
                 if (pHealth[i].getDiagnosisProcedureCode()==null) {
@@ -985,7 +985,7 @@ import java.util.zip.ZipInputStream;
 
                 //annotation
                 Long hostNoteId = cmNote.getId();
-                cmNote = prepareCMNote("2",null);
+                cmNote = prepareCMNote(programId, null);
                 String note = pHealth[i].getNotes();
                 cmNote.setNote(note);
                 saveLinkNote(hostNoteId, cmNote);
@@ -1041,7 +1041,7 @@ import java.util.zip.ZipInputStream;
                 logger.info("IMPORT PROBLEM LIST: " + probList.length + " entries found");
                 for (int i=0; i<probList.length; i++) {
                     if (i==0) scmi = getCMIssue("Concerns");
-                    CaseManagementNote cmNote = prepareCMNote("1",null);
+                    CaseManagementNote cmNote = prepareCMNote(programId, null);
 
                     //diagnosis code
                     if (probList[i].getDiagnosisCode()==null) {
@@ -1059,7 +1059,7 @@ import java.util.zip.ZipInputStream;
 
                     //annotation
                     Long hostNoteId = cmNote.getId();
-                    cmNote = prepareCMNote("2",null);
+                    cmNote = prepareCMNote(programId, null);
                     String note = probList[i].getNotes();
                     cmNote.setNote(note);
                     saveLinkNote(hostNoteId, cmNote);
@@ -1123,7 +1123,7 @@ import java.util.zip.ZipInputStream;
                 logger.info("IMPORT RISK FACTORS: " + rFactors.length + " entries found");
                 for (int i=0; i<rFactors.length; i++) {
                     if (i==0) scmi = getCMIssue("RiskFactors");
-                    CaseManagementNote cmNote = prepareCMNote("1",null);
+                    CaseManagementNote cmNote = prepareCMNote(programId, null);
                     cmNote.setIssues(scmi);
 
                     //main field
@@ -1135,7 +1135,7 @@ import java.util.zip.ZipInputStream;
 
                     //annotation
                     Long hostNoteId = cmNote.getId();
-                    cmNote = prepareCMNote("2",null);
+                    cmNote = prepareCMNote(programId, null);
                     String note = rFactors[i].getNotes();
                     cmNote.setNote(note);
                     saveLinkNote(hostNoteId, cmNote);
@@ -1180,7 +1180,7 @@ import java.util.zip.ZipInputStream;
                 logger.info("IMPORT ALERTS & SPECIAL NEEDS: " + alerts.length + " entries found");
                 for (int i=0; i<alerts.length; i++) {
                     if (i==0) scmi = getCMIssue("Reminders");
-                    CaseManagementNote cmNote = prepareCMNote("1",null);
+                    CaseManagementNote cmNote = prepareCMNote(programId, null);
                     cmNote.setIssues(scmi);
 
                     //main field
@@ -1195,7 +1195,7 @@ import java.util.zip.ZipInputStream;
 
                     //annotation
                     Long hostNoteId = cmNote.getId();
-                    cmNote = prepareCMNote("2",null);
+                    cmNote = prepareCMNote(programId, null);
                     String note = alerts[i].getNotes();
                     cmNote.setNote(note);
                     saveLinkNote(hostNoteId, cmNote);
@@ -1242,7 +1242,7 @@ import java.util.zip.ZipInputStream;
 
                     }
 
-                    CaseManagementNote cmNote = prepareCMNote("1",null);
+                    CaseManagementNote cmNote = prepareCMNote(programId,null);
                     cmNote.setCreate_date(createDate);
                     cmNote.setObservation_date(observeDate);
                     cmNote.setNote(encounter);
@@ -1254,7 +1254,7 @@ import java.util.zip.ZipInputStream;
                     int p_total = participatingProviders.length + noteReviewers.length;
                     for (int p=0; p<p_total; p++) {
                         if (p>0) {
-                            cmNote = prepareCMNote("1",uuid);
+                            cmNote = prepareCMNote(programId,uuid);
                             cmNote.setObservation_date(observeDate);
                             cmNote.setCreate_date(createDate);
                             cmNote.setNote(encounter);
@@ -1367,7 +1367,7 @@ import java.util.zip.ZipInputStream;
 
                     //annotation
                     String note = StringUtils.noNull(aaReactArray[i].getNotes());
-                    CaseManagementNote cmNote = prepareCMNote("2",null);
+                    CaseManagementNote cmNote = prepareCMNote(programId,null);
                     cmNote.setNote(note);
                     saveLinkNote(cmNote, CaseManagementNoteLink.ALLERGIES, Long.valueOf(allergyId));
                 }
@@ -1526,7 +1526,7 @@ import java.util.zip.ZipInputStream;
                     partialDateDao.setPartialDate(PartialDate.DRUGS, drug.getId(), PartialDate.DRUGS_WRITTENDATE, writtenDateFormat);
 
                     //annotation
-                    CaseManagementNote cmNote = prepareCMNote("2",null);
+                    CaseManagementNote cmNote = prepareCMNote(programId,null);
                     String note = StringUtils.noNull(medArray[i].getNotes());
                     cmNote.setNote(note);
                     saveLinkNote(cmNote, CaseManagementNoteLink.DRUGS, (long)drug.getId());
@@ -1810,7 +1810,7 @@ import java.util.zip.ZipInputStream;
                         String annotation = labResults.getPhysiciansNotes();
                         if (StringUtils.filled(annotation)) {
                             saveMeasurementsExt(measId, "other_id", "0-0");
-                            CaseManagementNote cmNote = prepareCMNote("2",null);
+                            CaseManagementNote cmNote = prepareCMNote(programId,null);
                             cmNote.setNote(annotation);
                             saveLinkNote(cmNote, CaseManagementNoteLink.LABTEST2, Long.valueOf(lab_ppid), "0-0");
                         }
