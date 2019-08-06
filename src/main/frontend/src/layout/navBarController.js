@@ -35,11 +35,14 @@ angular.module('Layout').controller('Layout.NavBarController', [
 	'$location',
 	'$state',
 	'$uibModal',
+	'$interval',
 	'securityService',
 	'personaService',
 	'billingService',
+	'consultService',
 	'inboxService',
 	'messageService',
+	'ticklerService',
 
 	function(
 		$rootScope,
@@ -49,13 +52,24 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		$location,
 		$state,
 		$uibModal,
+		$interval,
 		securityService,
 		personaService,
 		billingService,
+		consultService,
 		inboxService,
-		messageService)
+		messageService,
+		ticklerService)
 	{
 		var controller = this;
+
+		// Controller-level variables to contain intervals
+		var unAckInterval;
+		var unreadMessageInterval;
+		var overdueTicklerInterval;
+		var activeConsultationInterval;
+
+		controller.intervalLength = 60000 * 5;
 
 		//=========================================================================
 		// Initialization
@@ -63,6 +77,8 @@ angular.module('Layout').controller('Layout.NavBarController', [
 
 		controller.init = function init()
 		{
+			controller.activeConsultationTotal = 0;
+			controller.ticklerTotal = 0;
 			controller.unAckLabDocTotal = 0;
 			controller.unreadMessageTotal = 0;
 			controller.demographicSearch = null;
@@ -138,10 +154,44 @@ angular.module('Layout').controller('Layout.NavBarController', [
 					controller.unreadPatientMessagesCount = results.unreadPatientMessagesCount;
 					controller.getUnAckLabDocCount();
 					controller.getUnreadMessageCount();
+					controller.getOverdueTicklerCount();
+					controller.getActiveConsultationCount();
 					controller.demographicSearchDropDownItems = results.menus.patientSearchMenu.items;
 					controller.menuItems = results.menus.menu.items;
 					controller.userMenuItems = results.menus.userMenu.items;
 					controller.messengerMenu = results.menus.messengerMenu.items;
+
+					if (!angular.isDefined(unAckInterval))
+					{
+						unAckInterval = $interval(function()
+						{
+							controller.getUnAckLabDocCount();
+						}, controller.intervalLength);
+					}
+
+					if (!angular.isDefined(unreadMessageInterval))
+					{
+						unreadMessageInterval = $interval(function()
+						{
+							controller.getUnreadMessageCount();
+						}, controller.intervalLength);
+					}
+
+					if (!angular.isDefined(overdueTicklerInterval))
+					{
+						overdueTicklerInterval = $interval(function()
+						{
+							controller.getOverdueTicklerCount();
+						}, controller.intervalLength);
+					}
+
+					if (!angular.isDefined(activeConsultationInterval))
+					{
+						activeConsultationInterval = $interval(function()
+						{
+							controller.getActiveConsultationCount();
+						}, controller.intervalLength);
+					}
 				},
 				function error(errors)
 				{
@@ -190,9 +240,43 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				}
 			}, true);
 
+		// for intervals
+		$scope.$on('$destroy', function()
+		{
+			$scope.cancelIntervals();
+		});
+
 		//=========================================================================
 		// Methods
 		//=========================================================================
+
+		// Need to do this so that requests aren't going off in the background after leaving new UI
+		controller.cancelIntervals = function cancelIntervals()
+		{
+			if (angular.isDefined(unAckInterval))
+			{
+				$interval.cancel(unAckInterval);
+				unAckInterval = undefined;
+			}
+
+			if (angular.isDefined(unreadMessageInterval))
+			{
+				$interval.cancel(unreadMessageInterval);
+				unreadMessageInterval = undefined;
+			}
+
+			if (angular.isDefined(overdueTicklerInterval))
+			{
+				$interval.cancel(overdueTicklerInterval);
+				overdueTicklerInterval = undefined;
+			}
+
+			if (angular.isDefined(activeConsultationInterval))
+			{
+				$interval.cancel(activeConsultationInterval);
+				activeConsultationInterval = undefined;
+			}
+		};
 
 		controller.getUnAckLabDocCount = function getUnAckLabDocCount()
 		{
@@ -219,6 +303,44 @@ angular.module('Layout').controller('Layout.NavBarController', [
 					console.log(errors);
 				});
 
+		};
+
+		controller.getOverdueTicklerCount = function getOverdueTicklerCount()
+		{
+			// for now this is a carbon copy of dashboardController::updateTicklers
+			// TODO redesign so both call the same updateTicklers function
+			ticklerService.search(
+				{
+					status: 'A',
+					creator: controller.me.providerNo,
+					overdueOnly: 'property'
+				}, 0, 6).then(
+					function success(results)
+					{
+						controller.ticklerTotal = results.total;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					}
+				);
+		};
+
+		controller.getActiveConsultationCount = function getActiveConsultationCount()
+		{
+			consultService.searchRequests(
+				{
+					search: 'status=1'
+				}).then(
+					function success(results)
+					{
+						controller.activeConsultationTotal = results.meta.total;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					}
+				);
 		};
 
 		controller.getNavBar = function getNavBar()

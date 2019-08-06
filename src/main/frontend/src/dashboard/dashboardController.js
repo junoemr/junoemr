@@ -27,6 +27,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
     '$scope',
     '$uibModal',
+    '$interval',
     'NgTableParams',
     'providerService',
     'ticklerService',
@@ -39,6 +40,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
     function($scope,
              $uibModal,
+             $interval,
              NgTableParams,
              providerService,
              ticklerService,
@@ -51,6 +53,9 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
     {
 
         var controller = this;
+
+        // Intervals for periodic updates
+        var dashboardInterval;
 
         //header
         controller.displayDate = function displayDate()
@@ -399,7 +404,6 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
             controller.updateReports();
             controller.updateFeed(0, 10);
             controller.updateK2aActive();
-
         };
 
         $scope.$watch(function()
@@ -413,6 +417,15 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
             {
                 controller.updateDashboard();
             }
+
+            if (!angular.isDefined(dashboardInterval))
+            {
+                dashboardInterval = $interval(function()
+                {
+                    controller.updateDashboard();
+                }, 60000*5);
+            }
+
         }, true);
 
 
@@ -541,5 +554,15 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
                 });
 
         };
+
+        // Destroy interval before controller closes to ensure background updates don't occur
+        $scope.$on('$destroy', function()
+        {
+            if (angular.isDefined(dashboardInterval))
+            {
+                $interval.cancel(dashboardInterval);
+                dashboardInterval = undefined;
+            }
+        })
     }
 ]);
