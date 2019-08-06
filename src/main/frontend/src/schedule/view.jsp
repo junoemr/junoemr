@@ -130,7 +130,7 @@
 							<div class="btn-group" role="group">
 								<button type="button"
 								        class="btn btn-sm"
-								        title="Show all schedule information"
+								        title="Do not hide unscheduled days and providers"
 								        ng-class=" { 'btn-addon': isScheduleView(),
 								                     'btn-primary': !isScheduleView() }"
 								        ng-click="scheduleController.changeScheduleView(scheduleController.scheduleViewEnum.all)">
@@ -138,11 +138,11 @@
 								</button>
 								<button type="button"
 								        class="btn btn-sm"
-								        title="Show information for defined provider schedules only"
+								        title="Hide unscheduled days and providers"
 								        ng-class=" { 'btn-addon': !isScheduleView(),
 								                     'btn-primary': isScheduleView() }"
 								        ng-click="scheduleController.changeScheduleView(scheduleController.scheduleViewEnum.schedule)">
-									Schedule
+									Scheduled
 								</button>
 							</div>
 						</div>

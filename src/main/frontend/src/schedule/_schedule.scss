@@ -447,6 +447,10 @@
 				background-color: $grey-08;
 				padding: 12px;
 			}
+
+			.directive-juno-typeahead {
+				@include juno-tab-lg(56px);
+			}
 		}
 	}
 }
