@@ -92,7 +92,12 @@ public class Appointment
 	}
 
 	public List<CalendarEvent> getCalendarEvents(HttpSession session,
-		Integer providerId, LocalDate startDate, LocalDate endDate, String siteName)
+	                                             Integer providerId, LocalDate startDate, LocalDate endDate, String siteName)
+	{
+		return getCalendarEvents(session, providerId, startDate, endDate, siteName, new ArrayList<>(0));
+	}
+	public List<CalendarEvent> getCalendarEvents(HttpSession session,
+		Integer providerId, LocalDate startDate, LocalDate endDate, String siteName, List<Integer> hiddenDays)
 	{
 		List<CalendarEvent> calendarEvents = new ArrayList<>();
 
@@ -107,6 +112,13 @@ public class Appointment
 			{
 				LocalDateTime startDateTime =
 						LocalDateTime.of(details.getDate(), details.getStartTime());
+
+				int dayValue = startDateTime.getDayOfWeek().getValue() % 7;
+				if (hiddenDays.contains(dayValue))
+				{
+					// don't include appointments on hidden days
+					continue;
+				}
 
 				// Add an extra minute because oscar stores the endtime minus a minute
 				// set the seconds to 0 to prevent overlap issues

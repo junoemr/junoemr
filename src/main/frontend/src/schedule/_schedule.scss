@@ -84,7 +84,8 @@
 	@extend %juno-primary-view-pane;
 	@include juno-page-margin-none;
 	position: relative;
-	overflow: hidden;
+	overflow-y: hidden;
+	overflow-x: auto;
 
 	.calendar-loading
 	{
@@ -446,6 +447,10 @@
 			.edit-history-header {
 				background-color: $grey-08;
 				padding: 12px;
+			}
+
+			.directive-juno-typeahead {
+				@include juno-tab-lg(56px);
 			}
 		}
 	}
