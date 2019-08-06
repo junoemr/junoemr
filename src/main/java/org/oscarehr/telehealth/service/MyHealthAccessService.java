@@ -28,6 +28,7 @@ import org.oscarehr.common.model.Security;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserAccessTokenTo1;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserTo1;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.provider.dao.ProviderDataDao;
@@ -39,11 +40,8 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
 import oscar.util.StringUtils;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 
 @Service("telehealth.service.MyHealthAccessService")
 @Transactional
@@ -59,12 +57,11 @@ public class MyHealthAccessService
 	SecurityDao securityDao;
 
 	protected static OscarProperties oscarProps = OscarProperties.getInstance();
-	protected final String MYHEALTHACCESS_PROTOCOL = oscarProps.getProperty("myhealthaccess_protocol");
-	protected final String MYHEALTHACCESS_DOMAIN = oscarProps.getProperty("myhealthaccess_domain");
-	protected final String CLINIC_ID = oscarProps.getProperty("myhealthaccess_clinic_id");
+	protected static final String MYHEALTHACCESS_PROTOCOL = oscarProps.getProperty("myhealthaccess_protocol");
+	protected static final String MYHEALTHACCESS_DOMAIN = oscarProps.getProperty("myhealthaccess_domain");
+	protected static final String CLINIC_ID = oscarProps.getProperty("myhealthaccess_clinic_id");
 
 	public String buildTeleHealthRedirectURL(
-			ClinicUserAccessTokenTo1 accessToken,
 			ClinicUserTo1 linkedUser,
 			Demographic patient,
 			Site site) throws UnsupportedEncodingException
@@ -73,7 +70,8 @@ public class MyHealthAccessService
 		if (patient == null)
 		{
 			redirectUrl = "home";
-		} else
+		}
+		else
 		{
 			redirectUrl = URLEncoder.encode("patient/remote_patient_id/" +
 					patient.getDemographicId() + "?" +
@@ -86,8 +84,7 @@ public class MyHealthAccessService
 		return clinicService.buildUrl(endPoint) +
 				"clinic_id=" + getClinicID(site) +
 				"&user_id=" + linkedUser.getMyhealthaccesID() +
-				"&redirect_url=" + redirectUrl +
-				"#token=" + accessToken.getToken();
+				"&redirect_url=" + redirectUrl;
 	}
 
 	public ClinicUserTo1 getLinkedUser(Security loggedInUser, Site site)
@@ -101,20 +98,29 @@ public class MyHealthAccessService
 		return clinicService.getUserByEmail(getClinicID(site), email);
 	}
 
-	public ClinicUserTo1 createUser(
-			Security loggedInUser, ProviderData loggedInProvider, String email, Site site)
+	public ClinicUserTo1 createUser(Security loggedInUser, ProviderData loggedInProvider, String email, Site site)
 	{
-		MiscUtils.getLogger().error("email1: " + email);
-		return clinicService.createUser(
+		ClinicUserCreateTo1 newUser = clinicService.createUser(
 				getClinicID(site),
 				Integer.toString(loggedInUser.getId()),
 				email,
 				loggedInProvider.getFirstName(),
 				loggedInProvider.getLastName()
 		);
+
+		loggedInUser.setMyHealthAccessAuthToken(newUser.getAccessToken());
+		persistToken(loggedInUser, newUser.getAccessToken());
+
+		return newUser;
 	}
 
-	public ClinicUserAccessTokenTo1 getLoginToken(
+	public ClinicUserAccessTokenTo1 getLoginToken(Site site, ClinicUserTo1 remoteUser, Security loggedInUser)
+	{
+		ClinicUserAccessTokenTo1 authToken = loggedInUser.getMyHealthAccessAuthToken();
+		return clinicService.getLoginToken(getClinicID(site), remoteUser.getMyhealthaccesID(), authToken);
+	}
+
+/*	public ClinicUserAccessTokenTo1 getAuthToken(
 			Security loggedInUser,
 			Site site,
 			String myHealthAccessUserID,
@@ -128,22 +134,21 @@ public class MyHealthAccessService
 				password,
 				Integer.toString(loggedInUser.getId())
 		);
-		MiscUtils.getLogger().info("Saving Token: " + myHealthAccessAuthToken.getToken());
-		Security securityRecord = securityDao.find(loggedInUser.getId());
-		loggedInUser.setMyHealthAccessAuthToken(myHealthAccessAuthToken.getToken());
-		securityRecord.setMyHealthAccessAuthToken(myHealthAccessAuthToken.getToken());
-		securityDao.persist(securityRecord);
-		MiscUtils.getLogger().info("SAVED!");
-		return myHealthAccessAuthToken;
-	}
 
-	public String getClinicID(Site site)
+		loggedInUser.setMyHealthAccessAuthToken(myHealthAccessAuthToken.getToken());
+		persistToken(loggedInUser, myHealthAccessAuthToken.getToken());
+
+		return myHealthAccessAuthToken;
+	}*/
+
+	public static String getClinicID(Site site)
 	{
 		String clinic_id;
 		if (site == null)
 		{
 			clinic_id = CLINIC_ID;
-		} else
+		}
+		else
 		{
 			// TODO GET BY SITE
 			clinic_id = CLINIC_ID;
@@ -155,5 +160,12 @@ public class MyHealthAccessService
 		}
 
 		return clinic_id;
+	}
+
+	private void persistToken(Security loggedInUser, String token)
+	{
+		Security securityRecord = securityDao.find(loggedInUser.getId());
+		securityRecord.setMyHealthAccessAuthToken(token);
+		securityDao.persist(securityRecord);
 	}
 }

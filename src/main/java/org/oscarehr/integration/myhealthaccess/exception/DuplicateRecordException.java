@@ -21,26 +21,17 @@
  * Canada
  */
 
-package org.oscarehr.integration.myhealthaccess.dto;
+package org.oscarehr.integration.myhealthaccess.exception;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.io.Serializable;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ClinicUserAccessTokenTo1 implements Serializable
+public class DuplicateRecordException extends IllegalArgumentException
 {
-	@JsonProperty("access_token")
-	private String token;
-
-	public String getToken()
+	public DuplicateRecordException()
 	{
-		return token;
+		super();
 	}
 
-	public void setToken(String token)
+	public DuplicateRecordException(String s)
 	{
-		this.token = token;
+		super(s);
 	}
 }

@@ -59,8 +59,10 @@
 						name="siteName"
 						value="<%=request.getParameter("siteName")%>"
 		/>
+        Email
 		<input type="text" id="email" name="email" value="<%=email%>"/>
 
+        Password
 		<input type="password" id="password" name="password"/>
 		<button type="submit">Submit</button>
 </form>

@@ -23,24 +23,21 @@
 
 package org.oscarehr.integration.myhealthaccess.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.io.Serializable;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ClinicUserAccessTokenTo1 implements Serializable
+public class ClinicUserCreateTo1 extends ClinicUserTo1
 {
-	@JsonProperty("access_token")
-	private String token;
 
-	public String getToken()
+	@JsonProperty(value="access_token")
+	String accessToken;
+
+	public String getAccessToken()
 	{
-		return token;
+		return accessToken;
 	}
 
-	public void setToken(String token)
+	public void setAccessToken(String accessToken)
 	{
-		this.token = token;
+		this.accessToken = accessToken;
 	}
 }

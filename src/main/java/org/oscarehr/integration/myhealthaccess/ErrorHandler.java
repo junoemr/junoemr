@@ -26,7 +26,10 @@ package org.oscarehr.integration.myhealthaccess;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.oscarehr.integration.myhealthaccess.dto.BaseErrorTo1;
+import org.oscarehr.integration.myhealthaccess.dto.GenericErrorTo1;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
+import org.oscarehr.integration.myhealthaccess.exception.DuplicateRecordException;
+import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.DefaultResponseErrorHandler;
@@ -36,7 +39,7 @@ import java.io.InputStream;
 
 public class ErrorHandler <T> extends DefaultResponseErrorHandler
 {
-	Class<T> errorClass;
+	private Class<T> errorClass;
 
 	public ErrorHandler(Class<T> errorClass)
 	{
@@ -46,40 +49,61 @@ public class ErrorHandler <T> extends DefaultResponseErrorHandler
 	@Override
 	public void handleError(ClientHttpResponse response)
 	{
-		MiscUtils.getLogger().error("EEEEEEEEEEEEEEEEEEEEEe");
 		MiscUtils.getLogger().error("Enter Handler");
 		try
 		{
 			InputStream inputStream = response.getBody();
 			String body = IOUtils.toString(inputStream);
-			MiscUtils.getLogger().error("body: " + body);
 			BaseErrorTo1 baseError = new ObjectMapper().readValue(body, BaseErrorTo1.class);
 			if(baseError.hasAuthError())
 			{
-				MiscUtils.getLogger().error("Auth Error: " +
-						baseError.getAuthError().getCode());
+				MiscUtils.getLogger().error("Auth Error: " + baseError.getAuthError().getCode());
 				MiscUtils.getLogger().error(baseError.getAuthError().getMessage());
 			}
 			if(baseError.hasGenericErrors())
 			{
-				MiscUtils.getLogger().error("baseError status: " +
-						baseError.getGenericErrors().get(0).getCode());
+				MiscUtils.getLogger().error("baseError status: " + baseError.getGenericErrors().get(0).getCode());
 				MiscUtils.getLogger().error(baseError.getGenericErrors().get(0).getMessage());
 			}
+
 			BaseException baseException = new BaseException(body);
 			baseException.setErrorObject(baseError);
-			MiscUtils.getLogger().error("eeeeeeeeeeeeeeee");
 			throw baseException;
 
-		} catch (IOException e)
+		}
+		catch (IOException e)
 		{
 			MiscUtils.getLogger().error("Error parsing: ", e);
 			BaseErrorTo1 baseError = new BaseErrorTo1();
 			baseError.addGenericError("juno_error", "Failed to parse yo");
 			BaseException baseException = new BaseException("Failed to process error response");
 			baseException.setErrorObject(baseError);
-			MiscUtils.getLogger().error("eeeeeeeeeeeeeeee");
 			throw baseException;
+		}
+	}
+
+	public static void handleError(BaseException e)
+	{
+		MiscUtils.getLogger().error("HANDLING base exception");
+		if (e.getErrorObject().hasGenericErrors())
+		{
+			// TODO Get the first generic error. I'm thinking for an external API we might want
+			// to change this to only ever return one. It gets too complicated when you can have
+			// multiple error messages
+			GenericErrorTo1 genericError = e.getErrorObject().getGenericErrors().get(0);
+			MiscUtils.getLogger().error(genericError.getCode() + " : " + genericError.getMessage());
+
+			if (genericError.getCode().equals(GenericErrorTo1.ERROR_RECORD_NOT_FOUND))
+			{
+				throw new RecordNotFoundException("Unable to find MyHealthAccess record");
+			}
+
+			if (genericError.getCode().equals(GenericErrorTo1.ERROR_DUPLICATE_RECORD))
+			{
+				throw new DuplicateRecordException("Duplicate MyHealthAccess record for key found");
+			}
+
+			throw e;
 		}
 	}
 }

@@ -23,22 +23,18 @@
 
 package org.oscarehr.integration.myhealthaccess.service;
 
+import org.oscarehr.integration.myhealthaccess.ErrorHandler;
 import org.oscarehr.integration.myhealthaccess.dto.BaseErrorTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserAccessTokenTo1;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTo1;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserTo1;
-import org.oscarehr.integration.myhealthaccess.dto.GenericErrorTo1;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
-import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
-import org.oscarehr.util.MiscUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+
 
 @Service
 public class ClinicService extends BaseService
@@ -46,114 +42,97 @@ public class ClinicService extends BaseService
 	private final String clinicEndPoint = concatEndpointStrings(
 			BASE_END_POINT, "/clinic");
 
-	public ClinicService()
-	{
-	}
-
 	// Get myhealthaccess user linked to the specified oscar user
 	public ClinicUserTo1 getLinkedUser(String clinicID, String oscarUserID)
 	{
 		ClinicUserTo1 clinicUser = null;
 		try
 		{
-			String endPoint = concatEndpointStrings(clinicEndPoint, "/" +
-					clinicID + "/user_from_remote_id/" + oscarUserID);
-			clinicUser = executeRequest(
-					endPoint, HttpMethod.GET, ClinicUserTo1.class, BaseErrorTo1.class);
-		} catch (BaseException e)
+			String getUserAPI = concatEndpointStrings(clinicEndPoint, "/" + clinicID + "/user_from_remote_id/" + oscarUserID);
+			clinicUser = executeRequest(getUserAPI, HttpMethod.GET, ClinicUserTo1.class, BaseErrorTo1.class);
+		}
+		catch (BaseException e)
 		{
-			handleRecordNotFound(e);
+			ErrorHandler.handleError(e);
 		}
 		return clinicUser;
 	}
 
 	public ClinicUserTo1 getUserByEmail(String clinicID, String email)
 	{
-		MiscUtils.getLogger().error("email2: " + email);
-		String endPoint = null;
+		ClinicUserTo1 clinicUser = null;
+
 		try
 		{
-			endPoint = concatEndpointStrings(clinicEndPoint, "/" +
-					clinicID + "/user_from_email/" + URLEncoder.encode(email, "UTF-8"));
-		} catch (UnsupportedEncodingException e)
+			String createUserAPI = concatEndpointStrings(clinicEndPoint, "/" + clinicID + "/user_from_email/" + URLEncoder.encode(email, "UTF-8"));
+			clinicUser = executeRequest(createUserAPI, HttpMethod.GET, ClinicUserTo1.class, BaseErrorTo1.class);
+		}
+		catch (UnsupportedEncodingException e)
 		{
 			throw new IllegalArgumentException("Could not encode email address");
 		}
-		MiscUtils.getLogger().error("endPoint: " + endPoint);
-		ClinicUserTo1 clinicUser = null;
+		catch (BaseException e)
+		{
+			ErrorHandler.handleError(e);
+		}
+
+		return clinicUser;
+	}
+
+	public ClinicUserCreateTo1 createUser(String clinicID, String oscarUserID, String email, String firstName, String lastName)
+	{
+		ClinicUserCreateTo1 response = null;
+
 		try
 		{
-			clinicUser = executeRequest(
-					endPoint, HttpMethod.GET, ClinicUserTo1.class, BaseErrorTo1.class);
-		} catch (BaseException e)
-		{
-			handleRecordNotFound(e);
+			String endPoint = concatEndpointStrings(clinicEndPoint, "/" + clinicID + "/user/create");
+
+			ClinicUserTo1 newUser = new ClinicUserTo1();
+			newUser.setEmail(email);
+			newUser.setRemoteID(oscarUserID);
+			newUser.setFirstName(firstName);
+			newUser.setLastName(lastName);
+
+
+			response = executeRequest(endPoint, HttpMethod.POST, newUser, ClinicUserCreateTo1.class, BaseErrorTo1.class);
 		}
-		return clinicUser;
+		catch (BaseException e)
+		{
+			ErrorHandler.handleError(e);
+		}
+
+		return response;
 	}
 
-	public ClinicUserTo1 createUser(
-			String clinicID,
-			String oscarUserID,
-			String email,
-			String firstName,
-			String lastName
-			)
+	public ClinicUserAccessTokenTo1 getLoginToken(String clinicID, String myHealthAccessUserID, ClinicUserAccessTokenTo1 authToken)
 	{
-		MiscUtils.getLogger().error("create user for: " + email);
-		String endPoint = null;
-		endPoint = concatEndpointStrings(clinicEndPoint, "/" +
-				clinicID + "/user/create");
-		MiscUtils.getLogger().error("endPoint: " + endPoint);
-		ClinicUserTo1 clinicUser = new ClinicUserTo1();
-		clinicUser.setEmail(email);
-		clinicUser.setRemoteID(oscarUserID);
-		clinicUser.setFirstName(firstName);
-		clinicUser.setLastName(lastName);
-		clinicUser = executeRequest(
-				endPoint, HttpMethod.POST, clinicUser, ClinicUserTo1.class, BaseErrorTo1.class);
-		return clinicUser;
+		ClinicUserAccessTokenTo1 loginToken = null;
+
+		try
+		{
+			String endPoint = concatEndpointStrings(clinicEndPoint, "/" + clinicID + "/user/" + myHealthAccessUserID + "/get_login_token");
+			String tokenString = authToken.getToken();
+			loginToken = executeRequestWithToken(endPoint, HttpMethod.POST, tokenString, null, ClinicUserAccessTokenTo1.class, BaseErrorTo1.class);
+		}
+
+		catch (BaseException e)
+		{
+			// TODO:  If the authToken is expired, fetch another one and redo the request
+			ErrorHandler.handleError(e);
+		}
+
+
+		return loginToken;
 	}
 
-	public ClinicUserAccessTokenTo1 getLoginToken(
-			String clinicID,
-			String myHealthAccessUserID,
-			String email,
-			String password,
-			String oscarUserID
-	)
-			throws IOException, NoSuchAlgorithmException, KeyManagementException
+/*	public ClinicUserAccessTokenTo1 getLoginToken(String clinicID, String myHealthAccessUserID, String email,
+	                                              String password, String oscarUserID) throws IOException,
+	                                                                                          NoSuchAlgorithmException,
+	                                                                                          KeyManagementException
 	{
-		String endPoint = concatEndpointStrings(clinicEndPoint, "/" +
-				clinicID + "/user/" + myHealthAccessUserID + "/get_login_token?" +
-				"remote_id=" + URLEncoder.encode(oscarUserID, "UTF-8"));
+		String endPoint = concatEndpointStrings(clinicEndPoint, "/" + clinicID + "/user/" + myHealthAccessUserID + "/get_login_token?" + "remote_id=" + URLEncoder.encode(oscarUserID, "UTF-8"));
 		ClinicUserLoginTo1 userLogin = new ClinicUserLoginTo1(email, password);
-		return executeRequest(
-				endPoint, HttpMethod.POST, userLogin, ClinicUserAccessTokenTo1.class,
-				BaseErrorTo1.class);
-	}
-
-	private void handleRecordNotFound(BaseException e)
-	{
-		MiscUtils.getLogger().error("HANDLING base exception");
-		if (e.getErrorObject().hasGenericErrors())
-		{
-			MiscUtils.getLogger().error("HAS GENERIC ERRORS");
-			// TODO Get the first generic error. I'm thinking for an external API we might want
-			// to change this to only ever return one. It gets too complicated when you can have
-			// multiple error messages
-			GenericErrorTo1 genericError = e.getErrorObject().getGenericErrors().get(0);
-			MiscUtils.getLogger().error("Code: " + genericError.getCode());
-			MiscUtils.getLogger().error("Message: " + genericError.getMessage());
-			MiscUtils.getLogger().error("Message: " + genericError.getMessage());
-			if (genericError.getCode().equals(GenericErrorTo1.ERROR_RECORD_NOT_FOUND))
-			{
-				MiscUtils.getLogger().error(
-						genericError.getCode() + " : " + genericError.getMessage());
-				throw new RecordNotFoundException("Unable to find MyHealthAccess record");
-			}
-			MiscUtils.getLogger().error("DOESN'T MATCH");
-			throw e;
-		}
-	}
+		return executeRequest(endPoint, HttpMethod.POST, userLogin,
+		                      ClinicUserAccessTokenTo1.class, BaseErrorTo1.class);
+	}*/
 }

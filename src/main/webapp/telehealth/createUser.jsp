@@ -41,21 +41,14 @@
 - In the future this Juno account will auto log into this MHA account
 <br>
 <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=createUser" method="post">
-		<input
-						type="hidden"
-						id="demographicNo"
-						name="demographicNo"
-						value="<%=request.getParameter("demographicNo")%>"
-		/>
-		<input
-						type="hidden"
-						id="siteName"
-						name="siteName"
-						value="<%=request.getParameter("siteName")%>"
-		/>
-		Email: <input type="text" id="email" name="email"/> <br>
-		Email Confirm: <input type="text" id="emailConfirm" name="emailConfirm"/> <br>
-		<button type="submit">Submit</button>
+		<input type="hidden" id="demographicNo" name="demographicNo" value="<%=request.getParameter("demographicNo")%>"/>
+		<input type="hidden" id="siteName" name="siteName" value="<%=request.getParameter("siteName")%>"/>
+
+        Email: <input type="text" id="email" name="email"/> <br>
+        Password: <input type="password" id="password" name="password"/> <br>
+        Confirm Password: <input type="password" id="password_confirmation" name="password_confirmation"/> <br>
+
+    <button type="submit">Submit</button>
 </form>
 </body>
 </html>
