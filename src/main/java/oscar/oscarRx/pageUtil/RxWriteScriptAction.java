@@ -473,8 +473,8 @@ public final class RxWriteScriptAction extends DispatchAction {
 			response.sendRedirect("error.html");
 			return null;
 		}
-		String randomId = request.getParameter("randomId");
-		String customDrugName = request.getParameter("customDrugName");
+		String randomId = org.apache.commons.lang.StringUtils.trimToNull(request.getParameter("randomId"));
+		String customDrugName = org.apache.commons.lang.StringUtils.trimToNull(request.getParameter("customDrugName"));
 		logger.debug("radomId=" + randomId);
 		if (randomId != null && customDrugName != null) {
 			RxPrescriptionData.Prescription normalRx = bean.getStashItem2(Integer.parseInt(randomId));
