@@ -93,11 +93,12 @@ public class ObecData {
 	public static String space(String oldString, int leng) {
 
 		String outputString = "";
+		int oldLength = oldString != null ? oldString.length() : 0;
 		int i;
-		for (i = oldString.length(); i < leng; i++) {
+		for (i = oldLength; i < leng; i++) {
 			outputString = outputString + " ";
 		}
-		outputString = oldString + outputString;
+		outputString = (oldString != null ? oldString : "") + outputString;
 		return outputString;
 	}
 
