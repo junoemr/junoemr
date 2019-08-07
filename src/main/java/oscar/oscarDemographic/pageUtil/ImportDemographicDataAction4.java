@@ -865,13 +865,9 @@ import java.util.zip.ZipInputStream;
                 CaseManagementNote cmNote = prepareCMNote(programId, null);
                 cmNote.setIssues(scmi);
 
-                //main field
-                String socialHist = "Imported Personal History";
-//                String summary = pHist[i].getCategorySummaryLine();
-                String residual = getResidual(pHist[i].getResidualInfo());
-                if (StringUtils.empty(residual)) continue;
+                String history = org.apache.commons.lang.StringUtils.trimToNull(pHist[i].toString());
 
-                cmNote.setNote(socialHist);
+                cmNote.setNote(history);
                 caseManagementManager.saveNoteSimple(cmNote);
                 addOneEntry(PERSONALHISTORY);
 
