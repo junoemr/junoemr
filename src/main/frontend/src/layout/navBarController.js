@@ -278,6 +278,28 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			}
 		};
 
+		/**
+		 * Used to generically update count for various elements.
+		 * @param label label we want to display an updated count for
+		 * @return associated value the controller has stored, or 0 if we don't recognize label
+		 */
+		controller.getCountForLabel = function getCountForLabel(label)
+		{
+			if (label === "Inbox")
+			{
+				return controller.unAckLabDocTotal;
+			}
+			else if (label === "Ticklers")
+			{
+				return controller.ticklerTotal;
+			}
+			else if (label === "Consultations")
+			{
+				return controller.activeConsultationTotal;
+			}
+			return 0;
+		};
+
 		controller.getUnAckLabDocCount = function getUnAckLabDocCount()
 		{
 			inboxService.getUnAckLabDocCount().then(
@@ -307,8 +329,6 @@ angular.module('Layout').controller('Layout.NavBarController', [
 
 		controller.getOverdueTicklerCount = function getOverdueTicklerCount()
 		{
-			// for now this is a carbon copy of dashboardController::updateTicklers
-			// TODO redesign so both call the same updateTicklers function
 			ticklerService.search(
 				{
 					status: 'A',
@@ -334,7 +354,6 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				}).then(
 					function success(results)
 					{
-						console.log(results);
 						controller.activeConsultationTotal = results.data;
 					},
 					function error(errors)
