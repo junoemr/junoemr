@@ -111,13 +111,8 @@
 						<a href="javascript:void(0)"
 						   ng-if="!item.dropdown"
 						   ng-click="navBarCtrl.transition(item)">{{item.label}}
-							<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
-								  class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
-							<span ng-if="item.label=='Ticklers' && navBarCtrl.ticklerTotal > 0"
-								  class="badge badge-danger">{{navBarCtrl.ticklerTotal}}</span>
-							<span ng-if="item.label=='Consultations' && navBarCtrl.activeConsultationTotal > 0"
-								  class="badge badge-danger">{{navBarCtrl.activeConsultationTotal}}</span>
-
+							<span ng-if="navBarCtrl.getCountForLabel(item.label) > 0"
+								  class="badge badge-danger">{{navBarCtrl.getCountForLabel(item.label)}}</span>
 						</a>
 
 						<a href="javascript:void(0)"
@@ -150,12 +145,8 @@
 						<a href="javascript:void(0)"
 						   ng-if="!item.dropdown"
 						   ng-click="navBarCtrl.transition(item)">{{item.label}}
-							<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
-								  class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
-							<span ng-if="item.label=='Ticklers' && navBarCtrl.ticklerTotal > 0"
-								  class="badge badge-danger">{{navBarCtrl.ticklerTotal}}</span>
-							<span ng-if="item.label=='Consultations' && navBarCtrl.activeConsultationTotal > 0"
-								  class="badge badge-danger">{{navBarCtrl.activeConsultationTotal}}</span>
+							<span ng-if="navBarCtrl.getCountForLabel(item.label) > 0"
+								  class="badge badge-danger">{{navBarCtrl.getCountForLabel(item.label)}}</span>
 						</a>
 
 						<a href="javascript:void(0)"
@@ -254,12 +245,8 @@
 								<a href="javascript:void(0)"
 								   ng-if="!item.dropdown"
 								   ng-click="navBarCtrl.transition(item)">{{item.label}}
-									<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
-									      class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
-									<span ng-if="item.label=='Ticklers' && navBarCtrl.ticklerTotal > 0"
-										  class="badge badge-danger">{{navBarCtrl.ticklerTotal}}</span>
-									<span ng-if="item.label=='Consultations' && navBarCtrl.activeConsultationTotal > 0"
-										  class="badge badge-danger">{{navBarCtrl.activeConsultationTotal}}</span>
+									<span ng-if="navBarCtrl.getCountForLabel(item.label) > 0"
+										  class="badge badge-danger">{{navBarCtrl.getCountForLabel(item.label)}}</span>
 								</a>
 
 								<a href="javascript:void(0)"

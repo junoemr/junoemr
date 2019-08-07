@@ -67,6 +67,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 	    controller.k2aFeedActive = false;
 
 	    controller.busyLoadingData = false;
+	    controller.intervalLength = 60000 * 5;
 
         personaService.getDashboardPreferences().then(
             function success(results)
@@ -423,7 +424,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
                 dashboardInterval = $interval(function()
                 {
                     controller.updateDashboard();
-                }, 60000*5);
+                }, controller.intervalLength);
             }
 
         }, true);
