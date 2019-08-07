@@ -18,12 +18,12 @@
 // Ontario, Canada
 #dashboard-page {
 	#dashboard-header {
-		margin-top: -$margin-sm;
-		background-color: #ededed;
-		height: $dashboard-header-height;
-		margin-bottom: $margin-md;
+		@extend %juno-page-header;
+		padding-right: 12px;
+
+		//margin-bottom: $margin-md;
 		h3 {
-			color: $primary-blue-text;
+			color: $white;
 		}
 		h3, p {
 			margin: 0;
@@ -31,13 +31,16 @@
 	}
 
 	#dashboard-body {
+		@extend %juno-primary-view-pane;
+		@include juno-page-padding-default;
+
 		.dashboard-row {
 			margin-bottom: $margin-sm;
 		}
 		.dashboard-table {
 			.dashboard-table-row {
 				&:hover {
-					background-color: $light-grey;
+					background-color: $grey-07;
 				}
 			}
 		}

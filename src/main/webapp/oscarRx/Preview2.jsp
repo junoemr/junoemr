@@ -217,10 +217,25 @@ if(custom_logo_name != null ){
         <tr>
             <td>
 				<div style="position: relative;">
-					<% if (RxWatermarkService.isWatermarkEnabled()) {%>
+					<% if (RxWatermarkService.isWatermarkEnabled() && !RxWatermarkService.isWatermarkBackground()) {%>
 						<img style="position:absolute; left:50%; top: 50%; transform: translate(-50%, -50%); width:80%" src="../RxWatermark.do?method=getWatermark" onerror="this.style.display='none'"/>
-					<% } %>
+					<%
+					}
+
+					if (RxWatermarkService.isWatermarkEnabled() && RxWatermarkService.isWatermarkBackground())
+					{
+					%>
+						<table id="pwTable" width="400px" height="500px" cellspacing=0 cellpadding=10 border=2
+							   style="background-image: url(../RxWatermark.do?method=getWatermark); background-size: contain; background-repeat: no-repeat; background-position: center; -webkit-print-color-adjust: exact; color-adjust: exact !important;">
+					<%
+					}
+					else
+					{
+					%>
                             <table id="pwTable" width="400px" height="500px" cellspacing=0 cellpadding=10 border=2>
+					<%
+						}
+					%>
                                     <tr>
                                             <td valign=top height="100px"><input type="image"
                                                     src="<%=logoSrc%>" border="0" alt="[Submit]" style="max-height:100px; max-width:100px;"

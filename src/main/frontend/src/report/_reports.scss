@@ -1,0 +1,10 @@
+
+.report-page {
+	.report-page-header {
+		@extend %juno-page-header;
+	}
+	.report-page-content {
+		@extend %juno-primary-view-pane;
+		@include juno-page-padding-default;
+	}
+}

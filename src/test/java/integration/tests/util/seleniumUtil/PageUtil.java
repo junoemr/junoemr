@@ -30,7 +30,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -100,4 +102,27 @@ public class PageUtil
 
 		return false;
 	}
+
+	public static List<String> getNewWindowHandles(Set<String> oldHandles, WebDriver driver)
+	{
+		ArrayList<String> output = new ArrayList<>();
+		Set<String> windowHandles = driver.getWindowHandles();
+
+		for (String handle : windowHandles)
+		{
+			if (!oldHandles.contains(handle))
+			{
+				output.add(handle);
+			}
+		}
+
+		return output;
+	}
+
+	public static void switchToWindow(String windowHandle, WebDriver driver)
+	{
+		WebDriver.TargetLocator targetLocator = driver.switchTo();
+		targetLocator.window(windowHandle);
+	}
+
 }

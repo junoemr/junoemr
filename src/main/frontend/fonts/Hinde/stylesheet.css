@@ -1,0 +1,35 @@
+@font-face {
+    font-family: 'Hind';
+    src: url('Hind-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Hind';
+    src: url('Hind-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Hind';
+    src: url('Hind-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Hind';
+    src: url('Hind-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Hind';
+    src: url('Hind-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+

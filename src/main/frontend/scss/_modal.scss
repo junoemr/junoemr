@@ -1,43 +1,96 @@
 
-@media (min-width: $screen-md-min) {
-	.modal-wide {
-		width: 1200px;
+.juno-modal {
+	.modal-dialog {
+		width: $modal-width;
+		height: $modal-height;
+		.modal-content {
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+
+			-webkit-border-radius: 16px !important;
+			-moz-border-radius: 16px !important;
+			border-radius: 16px !important;
+			background: linear-gradient(-45deg, $white 50%, transparent 0) no-repeat 100% 100%,
+			linear-gradient(247deg, #5c8be8, $primary 30%, $primary 64%, #355085) no-repeat;
+
+			&.double-book {
+				background: linear-gradient(-45deg, $white 50%, transparent 0) no-repeat 100% 100%,
+				linear-gradient(247deg, $yellow, $yellow 30%, $yellow-hover 64%, $yellow-hover) no-repeat;
+			}
+			&.double-book-prevented {
+				background: linear-gradient(-45deg, $white 50%, transparent 0) no-repeat 100% 100%,
+				linear-gradient(247deg, $orange, $orange 30%, $orange-hover 64%, $orange-hover) no-repeat;
+			}
+
+			// header counts as modal top border, so don't apply the spacing to main content pane
+			padding: 0 $modal-border-space $modal-border-space $modal-border-space;
+			.modal-header {
+				height: $modal-header-height;
+				padding: 12px 0;
+			}
+			.modal-body {
+				height: $modal-body-height;
+				background-color: $white;
+				border-radius: 16px 16px 0 0;
+				padding: 0;
+			}
+			.modal-footer {
+				height: $modal-footer-height;
+				border-radius: 0 0 16px 16px;
+				background-color: $white;
+				border: 0;
+				.btn {
+					width: 112px;
+					height: 32px;
+
+					&.btn-primary {
+						&.double-book {
+							background-color: $yellow;
+							border-color: $yellow-hover;
+						}
+						&.double-book-prevented {
+							background-color: $orange;
+							border-color: $orange-hover;
+						}
+					}
+				}
+			}
+
+			.form-control-static {
+				min-height: 10px;
+			}
+		}
 	}
-}
-
-@media (min-width: 1000px) and (max-width: $screen-md-min)  {
-	.modal-wide {
-		width: 900px;
+	label {
+		text-align: right;
+		padding: 3px 2px;
 	}
-}
-
-@media (min-width: 600px)  and (max-width: 1000px){
-	.modal-wide {
-		width: 654px;
+	select {
+		@include juno-select(16px);
 	}
-}
+	h3 {
+		margin-top: 0;
+		margin-bottom: 0;
 
-.modal-header {
-	background-color: $color-bg-modal-header;
-
-	.close {
-		margin-top: 2px;
+		font-size: 18px;
+		font-weight: 900;
+		font-style: normal;
+		font-stretch: normal;
+		line-height: 1.44;
+		letter-spacing: -0.7px;
+		color: $white;
 	}
+	h4 {
+		margin-top: 0;
+		margin-bottom: 0;
 
-	.form-inline .form-control {
-		margin-right: 15px;
+		font-size: 14px;
+		font-weight: bold;
+		font-style: normal;
+		font-stretch: normal;
+		line-height: 1.86;
+		letter-spacing: -0.6px;
+		color: $white;
 	}
-}
-
-.modal-content {
-	border-radius: 0;
-}
-
-.modal-title {
-	color: white;
-	//@include text-shadow(0 0 0.5px #888);
-}
-
-.close {
-	opacity: 0.3;
 }

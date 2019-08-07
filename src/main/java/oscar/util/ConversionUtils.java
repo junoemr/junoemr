@@ -467,6 +467,11 @@ public class ConversionUtils {
 	 */
 	public static String padDateTimeString(String dateTimeString)
 	{
+		if (dateTimeString == null || dateTimeString.isEmpty())
+		{
+			return "";
+		}
+
 		Matcher match;
 		try
 		{
@@ -691,5 +696,21 @@ public class ConversionUtils {
 			default:
 				throw new UnsupportedTemporalTypeException("Unimplemented temporal type for truncation");
 		}
+	}
+
+	public static LocalTime toNullableLocalTime(String timeString)
+	{
+		if(timeString == null || timeString.isEmpty()) return null;
+		return toLocalTime(timeString);
+	}
+
+	public static LocalTime toLocalTime(String timeString)
+	{
+		return toLocalTime(timeString, DateTimeFormatter.ISO_TIME);
+	}
+
+	public static LocalTime toLocalTime(String timeString, DateTimeFormatter dateTimeFormatter)
+	{
+		return LocalTime.parse(timeString, dateTimeFormatter);
 	}
 }

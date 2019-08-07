@@ -98,13 +98,14 @@ angular.module("Common.Services").service("providerService", [
 			return deferred.promise;
 		};
 
+		//TODO move to its own service
 		service.getSettings = function getSettings()
 		{
 			var deferred = $q.defer();
 
 			$http(
 			{
-				url: service.apiPath + '/settings/get',
+				url: '../ws/rs/providerSettings/get',
 				method: "GET"
 			}).then(
 				function success(results)
@@ -120,13 +121,14 @@ angular.module("Common.Services").service("providerService", [
 			return deferred.promise;
 		};
 
+		//TODO move to its own service
 		service.saveSettings = function saveSettings(providerNo, settings)
 		{
 			var deferred = $q.defer();
 
 			$http(
 			{
-				url: service.apiPath + '/settings/' + providerNo + '/save',
+				url: '../ws/rs/providerSettings/' + providerNo + '/save',
 				method: "POST",
 				data: JSON.stringify(settings),
 				headers: Juno.Common.ServiceHelper.configHeaders()

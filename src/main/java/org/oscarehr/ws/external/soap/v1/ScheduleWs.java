@@ -40,11 +40,13 @@ import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
+import org.oscarehr.ws.external.soap.util.LocalDateAdapter;
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentArchiveTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentTypeTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.ValidatedAppointmentBookingTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.DayWorkScheduleTransfer;
+import org.oscarehr.ws.external.soap.v1.transfer.ScheduleCodeDurationTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ScheduleTemplateCodeTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
@@ -52,8 +54,13 @@ import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRu
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import javax.jws.WebService;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -89,6 +96,7 @@ public class ScheduleWs extends AbstractWs {
 	/**
 	 * @deprecated you should use the method with the useGMTTime option
 	 */
+	@SkipContentLoggingOutbound
 	public AppointmentTransfer[] getAppointmentsForProvider(String providerNo, Calendar date) {
 		List<Appointment> appointments = scheduleManager.getDayAppointments(getLoggedInInfo(),providerNo, date);
 		return (AppointmentTransfer.toTransfers(appointments, false));
@@ -97,6 +105,7 @@ public class ScheduleWs extends AbstractWs {
 	/**
 	 * @deprecated you should use the method with the useGMTTime option
 	 */
+	@SkipContentLoggingOutbound
 	public AppointmentTransfer[] getAppointmentsForPatient(Integer demographicId, int startIndex, int itemsToReturn) {
 		List<Appointment> appointments = scheduleManager.getAppointmentsForPatient(getLoggedInInfo(),demographicId, startIndex, itemsToReturn);
 		return (AppointmentTransfer.toTransfers(appointments, false));
@@ -107,11 +116,13 @@ public class ScheduleWs extends AbstractWs {
 		return (AppointmentTransfer.toTransfer(appointment, useGMTTime));
 	}
 
+	@SkipContentLoggingOutbound
 	public AppointmentTransfer[] getAppointmentsForProvider2(String providerNo, Calendar date, boolean useGMTTime) {
 		List<Appointment> appointments = scheduleManager.getDayAppointments(getLoggedInInfo(),providerNo, date);
 		return (AppointmentTransfer.toTransfers(appointments, useGMTTime));
 	}
 
+	@SkipContentLoggingOutbound
 	public AppointmentTransfer[] getAppointmentsForPatient2(Integer demographicId, int startIndex, int itemsToReturn, boolean useGMTTime) {
 		List<Appointment> appointments = scheduleManager.getAppointmentsForPatient(getLoggedInInfo(),demographicId, startIndex, itemsToReturn);
 		return (AppointmentTransfer.toTransfers(appointments, useGMTTime));
@@ -124,15 +135,32 @@ public class ScheduleWs extends AbstractWs {
 	}
 
 	@SkipContentLoggingOutbound
-	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots (
-			String providerNo, Calendar startDate, Calendar endDate, String[] appointmentTypes, String demographicNo, String jsonRules)
+	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots (String providerNo,
+																		  @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate startDate,
+																		  @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate endDate,
+																		  String templateDurations,
+																		  String demographicNo,
+																		  String jsonRules)
 	{
 		HashMap<String, DayTimeSlots[]> scheduleTransfer = new HashMap<>();
+		List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = new ArrayList<>();
 
 		try
 		{
+			JSONArray templateDurationJsonArr = (JSONArray) new JSONParser().parse(templateDurations);
+
+			for (Object templateDurationObj : templateDurationJsonArr)
+			{
+				JSONObject templateDurationJson = (JSONObject) templateDurationObj;
+				String templateCode = (String) templateDurationJson.get("schedule_template_id");
+				Long duration = (Long) templateDurationJson.get("appointment_duration");
+
+				ScheduleCodeDurationTransfer scheduleDurationTransfer = new ScheduleCodeDurationTransfer(templateCode, duration.intValue());
+				scheduleDurationTransfers.add(scheduleDurationTransfer);
+			}
+
 			List<BookingRule> bookingRules = BookingRuleFactory.createBookingRuleList(Integer.valueOf(demographicNo), jsonRules);
-			ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(providerNo, startDate, endDate, appointmentTypes, demographicNo, bookingRules);
+			ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(providerNo, startDate, endDate, scheduleDurationTransfers, demographicNo, bookingRules);
 			scheduleTransfer = providerScheduleTransfer.toTransfer();
 		}
 		catch(ParseException e)
@@ -227,26 +255,31 @@ public class ScheduleWs extends AbstractWs {
 	/**
 	 * @deprecated you should use the method with the useGMTTime option
 	 */
+	@SkipContentLoggingOutbound
 	public AppointmentTransfer[] getAppointmentsForDateRangeAndProvider(Date startTime, Date endTime, String providerNo) {
 		List<Appointment> appointments = scheduleManager.getAppointmentsForDateRangeAndProvider(getLoggedInInfo(),startTime, endTime, providerNo);
 		return (AppointmentTransfer.toTransfers(appointments, false));
 	}
 
+	@SkipContentLoggingOutbound
 	public AppointmentTransfer[] getAppointmentsForDateRangeAndProvider2(Date startTime, Date endTime, String providerNo, boolean useGMTTime) {
 		List<Appointment> appointments = scheduleManager.getAppointmentsForDateRangeAndProvider(getLoggedInInfo(),startTime, endTime, providerNo);
 		return (AppointmentTransfer.toTransfers(appointments, useGMTTime));
 	}
 
+	@SkipContentLoggingOutbound
 	public AppointmentTransfer[] getAppointmentsUpdatedAfterDate(Date updatedAfterThisDateExclusive, int itemsToReturn, boolean useGMTTime) {
 		List<Appointment> appointments=scheduleManager.getAppointmentUpdatedAfterDate(getLoggedInInfo(),updatedAfterThisDateExclusive, itemsToReturn);
 		return(AppointmentTransfer.toTransfers(appointments, useGMTTime));
 	}
 
+	@SkipContentLoggingOutbound
 	public AppointmentArchiveTransfer[] getAppointmentArchivesUpdatedAfterDate(Date updatedAfterThisDateExclusive, int itemsToReturn, boolean useGMTTime) {
 		List<AppointmentArchive> appointments=scheduleManager.getAppointmentArchiveUpdatedAfterDate(getLoggedInInfo(),updatedAfterThisDateExclusive, itemsToReturn);
 		return(AppointmentArchiveTransfer.toTransfers(appointments, useGMTTime));
 	}
 
+	@SkipContentLoggingOutbound
 	public AppointmentTransfer[] getAppointmentsByProgramProviderDemographicDate(Integer programId, String providerNo, Integer demographicId, Calendar updatedAfterThisDateExclusive, int itemsToReturn, boolean useGMTTime) {
 		List<Appointment> appointments = scheduleManager.getAppointmentsByProgramProviderDemographicDate(getLoggedInInfo(),programId, providerNo, demographicId, updatedAfterThisDateExclusive, itemsToReturn);
 		return (AppointmentTransfer.toTransfers(appointments, useGMTTime));

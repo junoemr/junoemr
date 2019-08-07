@@ -90,7 +90,7 @@ public class ScheduleGroupServiceTest
 		List<Integer> providerList = new ArrayList<>();
 		providerList.add(1);
 
-		expectedResult.add(new ScheduleGroup("1", "last1, first1", providerList));
+		expectedResult.add(new ScheduleGroup("1", ScheduleGroup.IdentifierType.PROVIDER, "last1, first1", providerList));
 
 		Mockito.when(providerDataDao.findAll(false)).thenReturn(providerDataResults);
 		Mockito.when(myGroupDao.findAllOrdered()).thenReturn(myGroupResults);
@@ -122,12 +122,12 @@ public class ScheduleGroupServiceTest
 		List<Integer> providerList = new ArrayList<>();
 		providerList.add(1);
 
-		expectedResult.add(new ScheduleGroup("1", "last1, first1", providerList));
+		expectedResult.add(new ScheduleGroup("1", ScheduleGroup.IdentifierType.PROVIDER, "last1, first1", providerList));
 
 		List<Integer> providerList2 = new ArrayList<>();
 		providerList2.add(2);
 
-		expectedResult.add(new ScheduleGroup("2", "last2, first2", providerList2));
+		expectedResult.add(new ScheduleGroup("2", ScheduleGroup.IdentifierType.PROVIDER, "last2, first2", providerList2));
 
 		Mockito.when(providerDataDao.findAll(false)).thenReturn(providerDataResults);
 		Mockito.when(myGroupDao.findAllOrdered()).thenReturn(myGroupResults);
@@ -148,7 +148,7 @@ public class ScheduleGroupServiceTest
 		List<Integer> providerList = new ArrayList<>();
 		providerList.add(1);
 
-		expectedResult.add(new ScheduleGroup("name", "name", providerList));
+		expectedResult.add(new ScheduleGroup("name", ScheduleGroup.IdentifierType.GROUP, "name", providerList));
 
 		Mockito.when(providerDataDao.findAll(false)).thenReturn(providerDataResults);
 		Mockito.when(myGroupDao.findAllOrdered()).thenReturn(myGroupResults);
@@ -170,7 +170,7 @@ public class ScheduleGroupServiceTest
 		List<Integer> providerList1 = new ArrayList<>();
 		providerList1.add(1);
 		providerList1.add(2);
-		expectedResult.add(new ScheduleGroup("name1", "name1", providerList1));
+		expectedResult.add(new ScheduleGroup("name1", ScheduleGroup.IdentifierType.GROUP, "name1", providerList1));
 
 		Mockito.when(providerDataDao.findAll(false)).thenReturn(providerDataResults);
 		Mockito.when(myGroupDao.findAllOrdered()).thenReturn(myGroupResults);
@@ -191,11 +191,11 @@ public class ScheduleGroupServiceTest
 
 		List<Integer> providerList1 = new ArrayList<>();
 		providerList1.add(1);
-		expectedResult.add(new ScheduleGroup("name1", "name1", providerList1));
+		expectedResult.add(new ScheduleGroup("name1", ScheduleGroup.IdentifierType.GROUP, "name1", providerList1));
 
 		List<Integer> providerList2 = new ArrayList<>();
 		providerList2.add(2);
-		expectedResult.add(new ScheduleGroup("name2", "name2", providerList2));
+		expectedResult.add(new ScheduleGroup("name2", ScheduleGroup.IdentifierType.GROUP, "name2", providerList2));
 
 		Mockito.when(providerDataDao.findAll(false)).thenReturn(providerDataResults);
 		Mockito.when(myGroupDao.findAllOrdered()).thenReturn(myGroupResults);
@@ -218,11 +218,11 @@ public class ScheduleGroupServiceTest
 		List<Integer> providerList1 = new ArrayList<>();
 		providerList1.add(1);
 		providerList1.add(2);
-		expectedResult.add(new ScheduleGroup("name1", "name1", providerList1));
+		expectedResult.add(new ScheduleGroup("name1", ScheduleGroup.IdentifierType.GROUP, "name1", providerList1));
 
 		List<Integer> providerList2 = new ArrayList<>();
 		providerList2.add(3);
-		expectedResult.add(new ScheduleGroup("name2", "name2", providerList2));
+		expectedResult.add(new ScheduleGroup("name2", ScheduleGroup.IdentifierType.GROUP, "name2", providerList2));
 
 		Mockito.when(providerDataDao.findAll(false)).thenReturn(providerDataResults);
 		Mockito.when(myGroupDao.findAllOrdered()).thenReturn(myGroupResults);
@@ -244,12 +244,12 @@ public class ScheduleGroupServiceTest
 
 		List<Integer> providerList1 = new ArrayList<>();
 		providerList1.add(1);
-		expectedResult.add(new ScheduleGroup("name1", "name1", providerList1));
+		expectedResult.add(new ScheduleGroup("name1", ScheduleGroup.IdentifierType.GROUP, "name1", providerList1));
 
 		List<Integer> providerList2 = new ArrayList<>();
 		providerList2.add(2);
 		providerList2.add(3);
-		expectedResult.add(new ScheduleGroup("name2", "name2", providerList2));
+		expectedResult.add(new ScheduleGroup("name2", ScheduleGroup.IdentifierType.GROUP, "name2", providerList2));
 
 		Mockito.when(providerDataDao.findAll(false)).thenReturn(providerDataResults);
 		Mockito.when(myGroupDao.findAllOrdered()).thenReturn(myGroupResults);
@@ -279,19 +279,19 @@ public class ScheduleGroupServiceTest
 		providerList1.add(1);
 		providerList1.add(2);
 		providerList1.add(3);
-		expectedResult.add(new ScheduleGroup("name1", "name1", providerList1));
+		expectedResult.add(new ScheduleGroup("name1", ScheduleGroup.IdentifierType.GROUP, "name1", providerList1));
 
 		List<Integer> providerList2 = new ArrayList<>();
 		providerList2.add(4);
 		providerList2.add(5);
 		providerList2.add(6);
-		expectedResult.add(new ScheduleGroup("name2", "name2", providerList2));
+		expectedResult.add(new ScheduleGroup("name2", ScheduleGroup.IdentifierType.GROUP, "name2", providerList2));
 
 		List<Integer> providerList3 = new ArrayList<>();
 		providerList3.add(7);
 		providerList3.add(8);
 		providerList3.add(9);
-		expectedResult.add(new ScheduleGroup("name3", "name3", providerList3));
+		expectedResult.add(new ScheduleGroup("name3", ScheduleGroup.IdentifierType.GROUP, "name3", providerList3));
 
 		Mockito.when(providerDataDao.findAll(false)).thenReturn(providerDataResults);
 		Mockito.when(myGroupDao.findAllOrdered()).thenReturn(myGroupResults);
@@ -334,29 +334,29 @@ public class ScheduleGroupServiceTest
 		providerList1.add(1);
 		providerList1.add(2);
 		providerList1.add(3);
-		expectedResult.add(new ScheduleGroup("name1", "name1", providerList1));
+		expectedResult.add(new ScheduleGroup("name1", ScheduleGroup.IdentifierType.GROUP, "name1", providerList1));
 
 		List<Integer> providerList2 = new ArrayList<>();
 		providerList2.add(4);
 		providerList2.add(5);
 		providerList2.add(6);
-		expectedResult.add(new ScheduleGroup("name2", "name2", providerList2));
+		expectedResult.add(new ScheduleGroup("name2", ScheduleGroup.IdentifierType.GROUP, "name2", providerList2));
 
 		List<Integer> providerList3 = new ArrayList<>();
 		providerList3.add(7);
 		providerList3.add(8);
 		providerList3.add(9);
-		expectedResult.add(new ScheduleGroup("name3", "name3", providerList3));
+		expectedResult.add(new ScheduleGroup("name3", ScheduleGroup.IdentifierType.GROUP, "name3", providerList3));
 
 		List<Integer> providerList4 = new ArrayList<>();
 		providerList4.add(1);
 
-		expectedResult.add(new ScheduleGroup("1", "last1, first1", providerList4));
+		expectedResult.add(new ScheduleGroup("1", ScheduleGroup.IdentifierType.PROVIDER, "last1, first1", providerList4));
 
 		List<Integer> providerList5 = new ArrayList<>();
 		providerList5.add(2);
 
-		expectedResult.add(new ScheduleGroup("2", "last2, first2", providerList5));
+		expectedResult.add(new ScheduleGroup("2", ScheduleGroup.IdentifierType.PROVIDER, "last2, first2", providerList5));
 
 		Mockito.when(providerDataDao.findAll(false)).thenReturn(providerDataResults);
 		Mockito.when(myGroupDao.findAllOrdered()).thenReturn(myGroupResults);

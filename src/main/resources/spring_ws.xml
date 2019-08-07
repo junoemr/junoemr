@@ -182,6 +182,19 @@
 		</jaxws:features>
 	</jaxws:endpoint>
 
+	<jaxws:endpoint implementor="#dashboardWs" address="/DashboardService" >
+		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
+	</jaxws:endpoint>
+
 	<jaxws:endpoint implementor="#preventionWs" address="/PreventionService" >
 		<jaxws:inInterceptors>
 			<ref bean="IPInWSS4JInterceptor"/>
@@ -349,6 +362,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ProductDispensingService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ProgramService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ProviderService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.ProviderPreferenceWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ProvidersService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.RecordUxService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ReferralDoctorsService"/>

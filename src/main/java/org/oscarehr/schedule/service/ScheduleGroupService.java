@@ -77,7 +77,7 @@ public class ScheduleGroupService
 			ArrayList<Integer> providerIds = new ArrayList<>();
 			providerIds.add(providerNo);
 
-			groups.add(new ScheduleGroup(provider.getId(), providerName, providerIds));
+			groups.add(new ScheduleGroup(provider.getId(), ScheduleGroup.IdentifierType.PROVIDER, providerName, providerIds));
 		}
 
 		return groups;
@@ -114,7 +114,7 @@ public class ScheduleGroupService
 			{
 				// Add the group to the group list
 				scheduleGroupList.add(
-					new ScheduleGroup(currentGroupName, currentGroupName, currentProviderList));
+					new ScheduleGroup(currentGroupName, ScheduleGroup.IdentifierType.GROUP, currentGroupName, currentProviderList));
 
 				// Reset
 				currentProviderList = new ArrayList<>();
@@ -127,7 +127,7 @@ public class ScheduleGroupService
 		if(currentGroupName != null)
 		{
 			scheduleGroupList
-				.add(new ScheduleGroup(currentGroupName, currentGroupName, currentProviderList));
+				.add(new ScheduleGroup(currentGroupName, ScheduleGroup.IdentifierType.GROUP, currentGroupName, currentProviderList));
 		}
 
 		return scheduleGroupList;

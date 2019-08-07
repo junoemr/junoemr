@@ -92,7 +92,12 @@ public class Appointment
 	}
 
 	public List<CalendarEvent> getCalendarEvents(HttpSession session,
-		Integer providerId, LocalDate startDate, LocalDate endDate, String siteName)
+	                                             Integer providerId, LocalDate startDate, LocalDate endDate, String siteName)
+	{
+		return getCalendarEvents(session, providerId, startDate, endDate, siteName, new ArrayList<>(0));
+	}
+	public List<CalendarEvent> getCalendarEvents(HttpSession session,
+		Integer providerId, LocalDate startDate, LocalDate endDate, String siteName, List<Integer> hiddenDays)
 	{
 		List<CalendarEvent> calendarEvents = new ArrayList<>();
 
@@ -108,23 +113,20 @@ public class Appointment
 				LocalDateTime startDateTime =
 						LocalDateTime.of(details.getDate(), details.getStartTime());
 
+				int dayValue = startDateTime.getDayOfWeek().getValue() % 7;
+				if (hiddenDays.contains(dayValue))
+				{
+					// don't include appointments on hidden days
+					continue;
+				}
+
 				// Add an extra minute because oscar stores the endtime minus a minute
+				// set the seconds to 0 to prevent overlap issues
 				LocalDateTime endDateTime =
-						LocalDateTime.of(details.getDate(), details.getEndTime()).plusMinutes(1);
+						LocalDateTime.of(details.getDate(), details.getEndTime()).plusMinutes(1).withSecond(0);
 
 
 				String rawStatus = details.getStatus();
-				String status = null;
-				String statusModifier = null;
-				if(rawStatus != null && rawStatus.length() > 0)
-				{
-					status = rawStatus.substring(0, 1);
-
-					if(rawStatus.length() > 1)
-					{
-						statusModifier = rawStatus.substring(1,2);
-					}
-				}
 
 				String province = OscarProperties.getInstance().getBillingTypeUpperCase();
 				String defaultView = OscarProperties.getInstance().getProperty("default_view");
@@ -138,6 +140,7 @@ public class Appointment
 					rdohip = SxmlMisc.getXmlContent(StringUtils.trimToEmpty(details.getFamilyDoctor()),"rdohip");
 					rdohip = rdohip !=null ? rdohip : null;
 				}
+				boolean isSelfBooked = org.oscarehr.common.model.Appointment.BookingSource.MYOSCAR_SELF_BOOKING.name().equals(details.getBookingSource());
 
 				CalendarAppointment appointment = new CalendarAppointment(
 						details.getAppointmentNo(),
@@ -158,21 +161,28 @@ public class Appointment
 						getStatusModifier(rawStatus),
 						null,
 						details.getReason(),
+						details.getReasonCode(),
 						details.getNotes(),
 						null,
 						details.getLocation(),
 						details.getType(),
 						details.getResources(),
 						details.getUrgency(),
-						false,
+						details.getName().equals(org.oscarehr.common.model.Appointment.DONOTBOOK),
+						isSelfBooked,
 						false,
 						null
 				);
+				// for the case where appointments are saved with a name but no demographic
+				if((appointment.getDemographicNo() == null || appointment.getDemographicNo() == 0) && details.getName() != null)
+				{
+					appointment.setAppointmentName(details.getName());
+				}
 
 				calendarEvents.add(new CalendarEvent(
 					startDateTime,
 					endDateTime,
-					details.getColor(),
+					details.getJunoColor(),
 					null,
 					"text-dark",       // TODO remove?
 					providerId, // TODO remove?

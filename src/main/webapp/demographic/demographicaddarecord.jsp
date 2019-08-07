@@ -146,6 +146,8 @@
 				demographic.setChartNo(request.getParameter("chart_no"));
 				demographic.setProviderNo(StringUtils.trimToNull(request.getParameter("staff")));
 				demographic.setSex(request.getParameter("sex"));
+				demographic.setNameOfMother(StringUtils.trimToNull(request.getParameter("nameOfMother")));
+				demographic.setNameOfFather(StringUtils.trimToNull(request.getParameter("nameOfFather")));
 
 				year = StringUtils.trimToNull(request.getParameter("end_date_year"));
 				month = StringUtils.trimToNull(request.getParameter("end_date_month"));

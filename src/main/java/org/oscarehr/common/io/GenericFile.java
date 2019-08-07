@@ -244,19 +244,12 @@ public class GenericFile
 	{
 		return new FileOutputStream(this.javaFile);
 	}
+
 	public String getContentType() throws IOException
 	{
-		String contentType;
-		if(isValid)
-		{
-			contentType = GenericFile.getContentType(javaFile);
-		}
-		else
-		{
-			contentType = getInvalidContentType();
-		}
-		return contentType;
+		return GenericFile.getContentType(javaFile);
 	}
+
 	public int getPageCount() throws IOException
 	{
 		return 0;

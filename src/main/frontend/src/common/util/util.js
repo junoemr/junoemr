@@ -61,8 +61,13 @@ Juno.Common.Util.formatTime = function formatTime(d) {
 	return d;
 };
 
-Juno.Common.Util.formatMomentDate = function formatMomentDate(d) {
-	return d.format(Juno.Common.Util.settings.date_format);
+Juno.Common.Util.formatMomentDate = function formatMomentDate(d, format)
+{
+	if (!format)
+	{
+		format = Juno.Common.Util.settings.date_format;
+	}
+	return d.format(format);
 };
 
 Juno.Common.Util.formatMomentTime = function formatMomentTime(d, format) {
@@ -88,7 +93,7 @@ Juno.Common.Util.getTimeMoment = function getTimeMoment(time_string)
 
 Juno.Common.Util.getDateMomentFromComponents = function getDateMomentFromComponents(year_string, month_string, day_string)
 {
-	return moment.utc({year: year_string, month: month_string, day: day_string});
+	return moment.utc({year: year_string, month: (Number(month_string)-1), day: day_string});
 };
 
 Juno.Common.Util.getDateAndTimeMoment = function getCombinedMoment(dateString, timeString)
@@ -128,6 +133,23 @@ Juno.Common.Util.validateTimeString = function validateTimeString(
 	{
 		var moment = Juno.Common.Util.getTimeMoment(timeString);
 		if (!moment.isValid())
+		{
+			displayErrors.add_field_error(field, fieldDisplayName + 'is invalid');
+		}
+	}
+	else if (required)
+	{
+		displayErrors.add_field_error(field, fieldDisplayName + 'is required');
+	}
+};
+Juno.Common.Util.validateIntegerString = function validateInputString(
+	inputString, displayErrors, field, fieldDisplayName, required, nonNegative, nonZero)
+{
+	if (!Juno.Common.Util.isBlank(inputString))
+	{
+		if (!Juno.Common.Util.isIntegerString(inputString) ||
+			(nonNegative && Number(inputString) < 0) ||
+			(nonZero && Number(inputString) === 0))
 		{
 			displayErrors.add_field_error(field, fieldDisplayName + 'is invalid');
 		}

@@ -779,9 +779,9 @@ public class DemographicManager {
 			demographic.setLastUpdateDate(new Date());
 		}
 
-		if (demographic.getProviderNo() == null)
+		if (StringUtils.isBlank(demographic.getProviderNo()))
 		{
-			demographic.setProviderNo("");
+			demographic.setProviderNo(null);
 		}
 
 	}
@@ -974,4 +974,10 @@ public class DemographicManager {
 
 		return true;
 	}
+
+	public Demographic getDemographicByHealthNumber(String healthNumber)
+	{
+		return this.demographicDao.getDemographicByHealthNumber(healthNumber);
+	}
+
 }

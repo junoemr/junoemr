@@ -326,6 +326,7 @@ public class ClinicaidAPIService
 			data.put("referral_last_name", StringUtils.trimToEmpty(referral_last_name));
 			data.put("diagnostic_code", StringUtils.trimToEmpty(dx_codes));
 			data.put("address", StringUtils.trimToEmpty(demo.getAddress()));
+			data.put("appointment_site", StringUtils.trimToEmpty(request.getParameter("appointment_site")));
 
 			// In Oscar, Newborns are denoted with the Mother's PHN and version Code 66
 			// Before sending to Clinicaid, we will remove the version code

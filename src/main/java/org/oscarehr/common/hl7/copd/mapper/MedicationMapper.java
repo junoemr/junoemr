@@ -264,7 +264,7 @@ public class MedicationMapper extends AbstractMapper
 	public boolean allowSubstitutions(int rep)
 	{
 		String subsCode = provider.getMEDS(rep).getRXO().getRxo9_AllowSubstitutions().getValue();
-		return (subsCode.equalsIgnoreCase("Y"));
+		return subsCode != null && (subsCode.equalsIgnoreCase("Y"));
 	}
 
 	public Double getRequestedDispenseAmount(int rep)

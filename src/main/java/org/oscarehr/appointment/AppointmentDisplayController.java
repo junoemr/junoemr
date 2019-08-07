@@ -175,6 +175,11 @@ public class AppointmentDisplayController
 			appointment.getBookingSource());
 	}
 
+	public boolean isVirtual()
+	{
+		return appointment.isVirtual();
+	}
+
 	public boolean isMultisitesEnabled()
 	{
 		return multisitesEnabled;
@@ -465,7 +470,8 @@ public class AppointmentDisplayController
 				"&apptProvider_no=" + scheduleProviderNo +
 				"&appointment_date=" + appointment.getDate().format(dateFormatter) +
 				"&start_time=" + appointment.getStartTime().format(timeFormatterWithSeconds) +
-				"&bNewForm=1" + referralNoParameter;
+				"&bNewForm=1" + referralNoParameter +
+				"&appointment_site=" + appointment.getLocation();
 		}
 		catch(UnsupportedEncodingException e)
 		{

@@ -24,39 +24,86 @@
 
 */
 
+import {ScheduleApi} from "../../generated/api/ScheduleApi";
+import {AppointmentApi} from "../../generated/api/AppointmentApi";
+
 angular.module('PatientList').controller('PatientList.PatientListController', [
 
+	'$rootScope',
 	'$scope',
+	'$q',
 	'$http',
+	'$httpParamSerializer',
 	'$state',
 	'$uibModal',
 	'angularUtil',
 	'Navigation',
 	'personaService',
-	'providerService',
-	'patientListState',
 	'scheduleService',
-	'reportingService',
+	'providerService',
 
 	function(
+		$rootScope,
 		$scope,
+		$q,
 		$http,
+		$httpParamSerializer,
 		$state,
 		$uibModal,
 		angularUtil,
 		Navigation,
 		personaService,
-		providerService,
-		patientListState,
 		scheduleService,
-		reportingService)
+		providerService)
 	{
 
 		var controller = this;
-		controller.sidebar = Navigation;
-		controller.showFilter = true;
-		controller.patientListConfig = {};
+		controller.initialized = false;
 
+		controller.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
+			'../ws/rs');
+		controller.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
+			'../ws/rs');
+
+		controller.tabEnum = Object.freeze({
+			appointments:0,
+			recent:1,
+		});
+		controller.activeTab = controller.tabEnum.appointments;
+		controller.activePatientList = [];
+
+		//for filter box
+		controller.query = '';
+		controller.datepickerSelectedDate = null;
+
+		controller.refreshSettings = {
+			timerVariable: null,
+			defaultAutoRefreshMinutes: 3,
+			preferredAutoRefreshMinutes: null
+		};
+		controller.eventStatusOptions = [];
+
+		controller.init = function()
+		{
+			scheduleService.loadEventStatuses().then(
+				function success() {
+					controller.eventStatusOptions = scheduleService.eventStatuses;
+
+					controller.datepickerSelectedDate = Juno.Common.Util.formatMomentDate(moment());
+					controller.changeTab(controller.activeTab);
+
+					controller.loadWatches();
+					controller.initListAutoRefresh();
+					controller.initialized = true;
+				}
+			);
+		};
+
+		controller.changeTab = function changeTab(tabId)
+		{
+			controller.activeTab = tabId;
+			controller.refresh();
+		};
 
 		controller.goToRecord = function goToRecord(patient)
 		{
@@ -73,34 +120,17 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 					if (angularUtil.inMobileView())
 					{
 						controller.hidePatientList();
-						console.log('hiding patientlist');
 					}
 				}
 				$state.go('record.summary', params);
 			}
 		};
 
-		//for filter box
-		controller.query = '';
-
-
-		controller.isActive = function isActive(temp)
+		$scope.$on('togglePatientListFilter', function(event, data)
 		{
-			if (controller.currenttab === null)
-			{
-				return false;
-			}
-			return temp === controller.currenttab.id;
-		};
-
-		controller.isMoreActive = function isMoreActive(temp)
-		{
-			if (controller.currentmoretab === null)
-			{
-				return false;
-			}
-			return temp === controller.currentmoretab.id;
-		};
+			console.log("received a togglePatientListFilter event:" + data);
+			controller.showFilter = data;
+		});
 
 		controller.showPatientList = function showPatientList()
 		{
@@ -112,112 +142,89 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			$scope.$emit('configureShowPatientList', false);
 		};
 
-		controller.changeMoreTab = function changeMoreTab(moreTabItemsIndex, filter)
+		controller.isRecentPatientView = function()
 		{
-			var beforeChangeTab = controller.currentmoretab;
-			controller.currentmoretab = controller.moreTabItems[moreTabItemsIndex];
-
-			controller.showFilter = true;
-			controller.currenttab = null;
-			controller.refresh(filter);
+			return (controller.activeTab === controller.tabEnum.recent);
+		};
+		controller.isAppointmentPatientView = function()
+		{
+			return (controller.activeTab === controller.tabEnum.appointments);
 		};
 
-		controller.changeTab = function changeTab(tabItemIndex, filter)
+		controller.refreshRecentPatientList = function()
 		{
-			if(controller.currenttab !== patientListState.tabItems[tabItemIndex])
-			{
-				controller.currenttab = patientListState.tabItems[tabItemIndex];
-				controller.showFilter = true;
-				controller.currentmoretab = null;
-				controller.refresh(filter);
-			}
-		};
+			var deferred = $q.defer();
 
-		controller.getMoreTabClass = function getMoreTabClass(id)
-		{
-			if (controller.currentmoretab != null && id == controller.currentmoretab.id)
-			{
-				return "more-tab-highlight";
-			}
-			return "";
-		};
-
-		controller.currentPage = 0;
-		controller.pageSize = 8;
-		controller.patients = null;
-
-		controller.numberOfPages = function numberOfPages()
-		{
-			if (controller.nPages == null || controller.nPages == 0)
-			{
-				return 1;
-			}
-			return controller.nPages;
-		};
-
-
-		$scope.$on('updatePatientListPagination', function(event, data)
-		{
-			console.log('updatePatientListPagination=' + data);
-			controller.nPages = Math.ceil(data / controller.pageSize);
-			console.log('nPages=' + controller.nPages);
-		});
-
-
-		controller.changePage = function changePage(pageNum)
-		{
-			controller.currentPage = pageNum;
-			//broadcast the change page
-			$scope.$broadcast('updatePatientList',
-			{
-				currentPage: controller.currentPage,
-				pageSize: controller.pageSize
-			});
-		};
-
-		$scope.$on('togglePatientListFilter', function(event, data)
-		{
-			console.log("received a togglePatientListFilter event:" + data);
-			controller.showFilter = data;
-		});
-
-
-		controller.process = function process(tab, filter)
-		{
-			tab.serviceMethod().then(
-				function success(resultList)
+			providerService.getRecentPatientList().then(
+				function success(results)
 				{
-					controller.patients = resultList;
-
-					controller.nPages = 1;
-					if (controller.patients != null && controller.patients.length > 0)
-					{
-						controller.nPages = Math.ceil(controller.patients.length / controller.pageSize);
-					}
-
-					controller.template = tab.template;
-					Navigation.load(controller.template);
-					controller.changePage(0);
+					controller.activePatientList = results;
+					deferred.resolve(controller.activePatientList);
 				},
-				function error(error)
+				function error(errors)
 				{
-					alert('error loading data for patient list:' + error);
+					console.log(errors);
+					deferred.reject();
+				});
+			return deferred.promise;
+		};
+
+		controller.refreshAppointmentPatientList = function()
+		{
+			var deferred = $q.defer();
+
+			controller.scheduleApi.getAppointmentsForDay(controller.datepickerSelectedDate).then(
+				function success(results)
+				{
+					controller.activePatientList = results.data.body;
+					deferred.resolve(controller.activePatientList);
+				},
+				function error(errors)
+				{
+					console.log(errors);
+					deferred.reject();
+				});
+
+			return deferred.promise;
+		};
+		controller.updateAppointmentStatus = function(appointment)
+		{
+			var deferred = $q.defer();
+			controller.appointmentApi.setStatus(appointment.appointmentNo, appointment.status).then(
+				function success(result)
+				{
+					$rootScope.$broadcast('schedule:refreshEvents');
+					deferred.resolve(result);
 				}
 			);
+
+			return deferred.promise;
 		};
 
 		controller.refresh = function refresh(filter)
 		{
+			var deferred = $q.defer();
 
-			if (controller.currenttab != null)
+			if(controller.isRecentPatientView())
 			{
-				controller.process(controller.currenttab, filter);
+				controller.refreshRecentPatientList().then(
+					function success()
+					{
+						deferred.resolve();
+					}
+				);
 			}
-			if (controller.currentmoretab != null)
+			else if(controller.isAppointmentPatientView())
 			{
-				controller.process(controller.currentmoretab, filter);
+				controller.refreshAppointmentPatientList().then(
+					function success()
+					{
+						deferred.resolve();
+					}
+				);
 			}
 
+			return deferred.promise;
 		};
 
 		$scope.$on('juno:patientListRefresh', function()
@@ -225,127 +232,71 @@ angular.module('PatientList').controller('PatientList.PatientListController', [
 			controller.refresh();
 		});
 
-		providerService.getRecentPatientList().then(
-			function success(results)
-			{
-				controller.recentPatientList = results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-		personaService.getPatientListConfig().then(
-			function success(results)
-			{
-				controller.patientListConfig = results;
-				controller.pageSize = controller.patientListConfig.numberOfApptstoShow;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-
-
-		controller.getTabItems = function getTabItems()
+		controller.stepForward = function()
 		{
-			return patientListState.tabItems;
+			// this value has a watch on it so no need to refresh here
+			controller.datepickerSelectedDate = Juno.Common.Util.formatMomentDate(
+				Juno.Common.Util.getDateMoment(controller.datepickerSelectedDate).add(1, 'days'));
+		};
+		controller.stepBack = function()
+		{
+			// this value has a watch on it so no need to refresh here
+			controller.datepickerSelectedDate = Juno.Common.Util.formatMomentDate(
+				Juno.Common.Util.getDateMoment(controller.datepickerSelectedDate).add(-1, 'days'));
 		};
 
-		controller.manageConfiguration = function manageConfiguration()
+		controller.isInitialized = function isInitialized()
 		{
-			var modalInstance = $uibModal.open(
-			{
-				templateUrl: 'src/patientlist/patientListConfiguration.jsp',
-				controller: 'PatientList.PatientListConfigController as patientListConfigCtrl',
-				backdrop: false,
-				size: 'lg',
-				resolve:
-				{
-					config: function()
-					{
-						return controller.patientListConfig;
-					}
-				}
-			});
-
-			modalInstance.result.then(
-				function success(results)
-				{
-					personaService.setPatientListConfig(results).then(
-						function success(results)
-						{
-							controller.patientListConfig = results;
-							controller.pageSize = controller.patientListConfig.numberOfApptstoShow;
-							$scope.$emit('updatePatientListPagination', controller.patients.length);
-						},
-						function error(errors)
-						{
-							console.log(errors);
-						});
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
+			return controller.initialized;
 		};
 
-		patientListState.tabItems = [
+		controller.initListAutoRefresh = function initListAutoRefresh()
+		{
+			var deferred = $q.defer();
+
+			// if there is already a refresh set up, stop it
+			var refresh = controller.refreshSettings.timerVariable;
+			if(refresh !== null)
 			{
-				id: 0,
-				label: "Appts.",
-				template: "src/patientlist/patientList1.jsp",
-				serviceMethod: function ()
-				{
-					// this gets overwritten by the appointmentListController, when it sets specific dates
-					return scheduleService.getAppointments('today').then(
-						function success(results)
-						{
-							return results.patients;
-						}
-					);
-				}
-			},
-			{
-				id: 1,
-				label: "Recent",
-				template: "src/patientlist/recent.jsp",
-				serviceMethod: function ()
-				{
-					return providerService.getRecentPatientList().then(
-						function success(results)
-						{
-							controller.recentPatientList = results;
-							return results;
-						}
-					);
-				}
+				clearInterval(refresh);
 			}
-		];
-		controller.moreTabItems = [
+
+			// get the refresh interval from preferences, or use default
+			var minutes = controller.refreshSettings.preferredAutoRefreshMinutes;
+			if(!Juno.Common.Util.exists(minutes) || !Juno.Common.Util.isIntegerString(minutes))
 			{
-				id: 0,
-				label: "Patient Sets",
-				template: "src/patientlist/demographicSets.jsp",
-				serviceMethod: function ()
-				{
-					return reportingService.getDemographicSetList().then(
-						function success(results)
-						{
-							return results.content;
-						}
-					);
-				}
-			},
-			{
-				id: 1,
-				label: "Caseload",
-				template: "src/patientlist/program.jsp",
-				serviceMethod: function ()
-				{
-					return Promise.resolve([]);
-				}
+				minutes = controller.refreshSettings.defaultAutoRefreshMinutes;
 			}
-		];
-		controller.changeTab(0);
+			else
+			{
+				minutes = parseInt(minutes);
+			}
+
+			if(minutes > 0)
+			{
+				// start the auto refresh and save its ID to global state
+				controller.refreshSettings.timerVariable = setInterval(controller.refresh, minutes * 60 * 1000);
+			}
+			deferred.resolve();
+
+			return deferred.promise;
+		};
+
+		//=========================================================================
+		// Watches
+		//=========================================================================/
+
+		controller.loadWatches = function loadWatches()
+		{
+			$scope.$watch('patientListCtrl.datepickerSelectedDate', function (newValue, oldValue)
+			{
+				if (oldValue !== newValue)
+				{
+					controller.refresh();
+				}
+			});
+		};
+
+		controller.init();
 	}
 ]);

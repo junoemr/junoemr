@@ -46,6 +46,7 @@ public class AppointmentDetails
 	private String urgency;
 	private String statusTitle;
 	private String color;
+	private String junoColor;
 	private String iconImage;
 	private Integer shortLetterColour;
 	private String shortLetters;
@@ -63,6 +64,7 @@ public class AppointmentDetails
 	private LocalDate birthday;
 	private boolean hasTicklers;
 	private String ticklerMessages;
+	private boolean isVirtual;
 
 	public AppointmentDetails(
 		Integer appointmentNo,
@@ -83,6 +85,7 @@ public class AppointmentDetails
 		String urgency,
 		String statusTitle,
 		String color,
+		String junoColor,
 		String iconImage,
 		Integer shortLetterColour,
 		String shortLetters,
@@ -99,7 +102,8 @@ public class AppointmentDetails
 		String colorProperty,
 		LocalDate birthday,
 		boolean hasTicklers,
-		String ticklerMessages
+		String ticklerMessages,
+		boolean isVirtual
 	)
 	{
 		this.appointmentNo = appointmentNo;
@@ -120,6 +124,7 @@ public class AppointmentDetails
 		this.urgency = urgency;
 		this.statusTitle = statusTitle;
 		this.color = color;
+		this.junoColor = junoColor;
 		this.iconImage = iconImage;
 		this.shortLetters = shortLetters;
 		this.shortLetterColour = shortLetterColour;
@@ -137,6 +142,7 @@ public class AppointmentDetails
 		this.birthday = birthday;
 		this.hasTicklers = hasTicklers;
 		this.ticklerMessages = ticklerMessages;
+		this.isVirtual = isVirtual;
 	}
 
 	public Integer getAppointmentNo()
@@ -229,6 +235,16 @@ public class AppointmentDetails
 		return color;
 	}
 
+	public String getJunoColor()
+	{
+		return junoColor;
+	}
+
+	public void setJunoColor(String junoColor)
+	{
+		this.junoColor = junoColor;
+	}
+
 	public String getIconImage()
 	{
 		return iconImage;
@@ -292,6 +308,10 @@ public class AppointmentDetails
 	public boolean hasTicklers()
 	{
 		return hasTicklers;
+	}
+	public boolean isVirtual()
+	{
+		return isVirtual;
 	}
 
 	public String getTicklerMessages()

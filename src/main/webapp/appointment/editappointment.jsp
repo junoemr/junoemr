@@ -915,6 +915,35 @@
 								   width="25">
 						</div>
 					</li>
+
+					<% if(org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() ) { %>
+
+					<li class="weak row">
+						<div class="label">Virtual:</div>
+						<div class="input">
+								<input type="checkbox" name="isVirtual"
+												<%= appt.isVirtual() ? "checked='checked'" : "" %>/>
+								<% if(appt.isVirtual()) { %>
+								&nbsp;
+								&nbsp;
+								&nbsp;
+								&nbsp;
+								<a href="#"
+									 onClick='popupPage(800, 1280,
+													 "../telehealth/myhealthaccess.do?method=startTelehealth&" +
+													 "demographicNo=<%=appt.getDemographicNo()%>&" +
+													 "siteName=<%=appt.getLocation()%>");return false;'
+									 title="Telehealth">Initiate Appt</a>
+
+								<% } %>
+						</div>
+						<div class="space">&nbsp;</div>
+						<div class="label"></div>
+						<div class="input"></div>
+					</li>
+
+					<% } %>
+
 					<li class="weak row">
 						<div class="label">Creator:</div>
 						<div class="input">

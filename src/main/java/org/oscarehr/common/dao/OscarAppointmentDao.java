@@ -802,8 +802,10 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  a.bookingSource,\n" +
 				"  a.status,\n" +
 				"  a.urgency,\n" +
+				"  a.isVirtual,\n" +
 				"  aps.description,\n" +
 				"  aps.color,\n" +
+				"  aps.juno_color,\n" +
 				"  aps.icon,\n" +
 				"  aps.short_letter_colour,\n" +
 				"  aps.short_letters,\n" +
@@ -859,8 +861,10 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  a.bookingSource,\n" +
 				"  a.status,\n" +
 				"  a.urgency,\n" +
+				"  a.isVirtual,\n" +
 				"  aps.description,\n" +
 				"  aps.color,\n" +
+				"  aps.juno_color,\n" +
 				"  aps.icon,\n" +
 				"  aps.short_letter_colour,\n" +
 				"  aps.short_letters,\n" +
@@ -914,8 +918,11 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 			String bookingSource = (String) result[index++];
 			String status = (String) result[index++];
 			String urgency = (String) result[index++];
+			Byte isVirtualResult = (Byte) result[index++];
+			boolean isVirtual = (Byte.toUnsignedInt(isVirtualResult) == 1);
 			String statusTitle = (String) result[index++];
 			String color = (String) result[index++];
+			String junoColor = (String) result[index++];
 			String iconImage = (String) result[index++];
 			Integer shortLetterColour = (Integer) result[index++];
 			String shortLetters = (String) result[index++];
@@ -998,6 +1005,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				urgency,
 				statusTitle,
 				color,
+				junoColor,
 				iconImage,
 				shortLetterColour,
 				shortLetters,
@@ -1014,7 +1022,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				colorProperty,
 				birthday,
 				hasTicklers,
-				ticklerMessages
+				ticklerMessages,
+				isVirtual
 			));
 		}
 

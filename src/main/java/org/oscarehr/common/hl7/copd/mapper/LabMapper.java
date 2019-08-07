@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_LAB;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.common.hl7.copd.writer.JunoCoPDLabWriter;
+import org.oscarehr.demographicImport.service.CoPDImportService;
 import oscar.util.ConversionUtils;
 
 import java.io.IOException;
@@ -39,9 +40,9 @@ import java.util.Map;
 
 public class LabMapper extends AbstractMapper
 {
-	public LabMapper(ZPD_ZTR message, int providerRep)
+	public LabMapper(ZPD_ZTR message, int providerRep, CoPDImportService.IMPORT_SOURCE importSource)
 	{
-		super(message, providerRep);
+		super(message, providerRep, importSource);
 	}
 
 	public int getNumLabs()
@@ -87,7 +88,7 @@ public class LabMapper extends AbstractMapper
 			List<ZPD_ZTR_LAB> labObservationList = entry.getValue();
 			String labDate = getLabDate(labObservationList.get(0)); // use the first OBR result date as the lab date
 
-			JunoCoPDLabWriter labWriter = new JunoCoPDLabWriter(message, accessionNo, labDate, labObservationList);
+			JunoCoPDLabWriter labWriter = new JunoCoPDLabWriter(message, accessionNo, labDate, labObservationList, importSource);
 			String labHl7 = labWriter.encode().replaceAll("\\\\R\\\\crlf\\\\R\\\\", "\n");
 
 			labMessages.add(labHl7);

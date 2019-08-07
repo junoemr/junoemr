@@ -1,0 +1,99 @@
+
+#patient-list-template {
+
+	.btn-aside-container {
+		position:absolute;
+		left: 0;
+		z-index: 1000;
+	}
+
+	.patient-list-header {
+		@extend %juno-page-header;
+		border-right: $primary-hover 8px solid;
+		.form-control {
+			@include juno-form-colour-scheme-dark;
+		}
+	}
+
+	.patient-list-content {
+		height: calc(100vh - #{$primary-navbar-height} - #{$page-header-height});
+
+		#patient-list-nav {
+			$margin-height: 4px;
+			@include juno-tab-md(calc(#{$page-tabs-height} - #{$margin-height}));
+			@include juno-tab-color-scheme-primary;
+			@include juno-font-tab;
+			border-right: $primary-hover 8px solid !important;
+			li a {
+				margin-top: $margin-height;
+				margin-left: $margin-height;
+				margin-right: $margin-height;
+			}
+		}
+
+		.content-controller {
+			@extend %juno-content-control;
+			height: $page-subheader-height;
+			border-right: $grey-07 8px solid;
+			.form-control {
+				background-color: $white;
+			}
+
+			$input-height: $form-input-height;
+			.btn-icon {
+				width: $input-height;
+				height: $input-height;
+				&.visible {
+					background-color: $white;
+				}
+				.icon {
+					width: 20px;
+					height: 20px;
+				}
+			}
+			.form-inline {
+				button:focus {
+					outline: none;
+				}
+				.form-group {
+					margin-left: 8px;
+				}
+				.form-group:first-child {
+					margin-left: 0
+				}
+			}
+		}
+		.content-display {
+			@extend %juno-primary-view-pane-tabs-subheader;
+			border-right: $grey-07 8px solid;
+
+			.list-group {
+				.list-group-item {
+					padding: 0;
+					border-top: 0;
+					border-left: 0;
+					border-right: 0;
+					border-bottom: 2px solid $grey-08;
+
+					.list-group-clickable {
+						padding: 10px 15px;
+					}
+				}
+			}
+		}
+	}
+}
+
+#left-aside-hidden {
+	position: fixed;
+	top: $primary-navbar-height;
+	bottom: 0;
+	left: 0;
+	z-index: 1000;
+	display: block;
+	overflow-x: hidden;
+	padding-left: 0;
+	padding-right: 0;
+	background-color: $grey-07;
+	width: $left-aside-width-collapsed;
+}

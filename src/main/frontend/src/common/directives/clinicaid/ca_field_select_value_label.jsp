@@ -4,10 +4,11 @@
 		 title="{{title_string}}"
 		 ng-hide="hide">
 
-	<label for="input-{{name}}"
-				 class="{{label_size}} control-label"
-				 title="{{hint}}">
-		{{title}}:
+	<label ng-if="no_label != 'true'"
+	       for="input-{{name}}"
+	       class="{{label_size}} control-label"
+	       title="{{hint}}">
+		{{title}}
 	</label>
 
 	<div class="{{input_size}}">

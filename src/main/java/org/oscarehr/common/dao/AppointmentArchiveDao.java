@@ -36,13 +36,15 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class AppointmentArchiveDao extends AbstractDao<AppointmentArchive> {
-
-	public AppointmentArchiveDao() {
+public class AppointmentArchiveDao extends AbstractDao<AppointmentArchive>
+{
+	public AppointmentArchiveDao()
+	{
 		super(AppointmentArchive.class);
 	}
 
-	public AppointmentArchive archiveAppointment(Appointment appointment) {
+	public AppointmentArchive archiveAppointment(Appointment appointment)
+	{
 		AppointmentArchive aa = new AppointmentArchive();
 		BeanUtils.copyProperties(appointment, aa, new String[]{"id"});
 		aa.setAppointmentNo(appointment.getId());
@@ -53,13 +55,27 @@ public class AppointmentArchiveDao extends AbstractDao<AppointmentArchive> {
 	/**
 	 * @return results ordered by lastUpdateDate
 	 */
-	public List<AppointmentArchive> findByUpdateDate(Date updatedAfterThisDateExclusive, int itemsToReturn) {
+	public List<AppointmentArchive> findByUpdateDate(Date updatedAfterThisDateExclusive, int itemsToReturn)
+	{
 		String sqlCommand = "select x from "+modelClass.getSimpleName()+" x where x.updateDateTime>?1 order by x.updateDateTime";
 
 		Query query = entityManager.createQuery(sqlCommand);
 		query.setParameter(1, updatedAfterThisDateExclusive);
 		setLimit(query, itemsToReturn);
 		
+		@SuppressWarnings("unchecked")
+		List<AppointmentArchive> results = query.getResultList();
+		return (results);
+	}
+
+	public List<AppointmentArchive> findByAppointmentId(Integer id, int limit, int offset)
+	{
+		String sqlCommand = "select x from " + modelClass.getSimpleName() + " x where x.appointmentNo =:id order by x.updateDateTime";
+
+		Query query = entityManager.createQuery(sqlCommand);
+		query.setParameter("id", id);
+		setLimit(query, offset, limit);
+
 		@SuppressWarnings("unchecked")
 		List<AppointmentArchive> results = query.getResultList();
 		return (results);

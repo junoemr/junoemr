@@ -112,6 +112,22 @@ public class PDFFile extends GenericFile
 		return numOfPage;
 	}
 
+	@Override
+	public String getContentType() throws IOException
+	{
+		String contentType;
+		if(isValid)
+		{
+			contentType = GenericFile.getContentType(javaFile);
+		}
+		else
+		{
+			contentType = getInvalidContentType();
+		}
+		return contentType;
+	}
+
+
 	private File ghostscriptReEncode() throws IOException,InterruptedException
 	{
 		logger.info("BEGIN PDF RE-ENCODING");

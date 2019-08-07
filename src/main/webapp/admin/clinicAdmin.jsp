@@ -143,6 +143,12 @@
                                 </label>
                                 <html:text property="clinic.clinicDelimFax"/>
                             </div>
+                            <div class="input-field">
+                                <label for="clinic.clinicEmail">
+                                    Email
+                                </label>
+                                <html:text property="clinic.clinicEmail"/>
+                            </div>
                         </div>
                         <div class="address" id="billing-fields">
                             <div class="title">
@@ -200,19 +206,6 @@
 
                         <div class="input-field flex-fill-row">
                             <input id="watermark-toggle" <% if (RxWatermarkService.isWatermarkEnabled()) {%>checked<%}%> type="checkbox">
-                            <script>
-                                let toggle = $('#watermark-toggle');
-                                toggle.bootstrapToggle({
-                                    width: 50,
-                                    height: 20,
-                                    size: 'small'
-                                });
-                                toggle.change(function() {
-                                    let enabled = jQuery(this).prop('checked');
-                                    toggleWatermarkFields(enabled);
-                                    enableWatermark(enabled);
-                                })
-                            </script>
                         </div>
                         <div class="watermark-fields" id="watermark-input-form">
                             <div class="watermark-input-field flex-fill-row">
@@ -230,6 +223,12 @@
                                 <input id="watermark-submit-upload" class="submit-button" style="display:flex; flex: 0 1 auto; margin-right: 10px" type="submit" value="Upload">
                                 <input id="watermark-submit-delete" class="submit-button" style="display:flex; flex: 0 1 auto;" type="submit" value="Delete">
                             </div>
+                            <div class="watermark-input-field flex-fill-row" style="margin-top: 20px;">
+                                <label><b>Watermark Position</b></label>
+                                <div class="watermark-background-selector">
+                                <input id="watermark-background-toggle" <% if (!RxWatermarkService.isWatermarkBackground()) {%>checked<%}%> type="checkbox" data-toggle="toggle" data-on="Foreground" data-off="Background">
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </fieldset>
@@ -241,6 +240,34 @@
         const billingCheckbox = document.querySelector('#billingCheckbox');
         const billingFields = document.querySelector('#billing-fields');
         const addressFields = document.querySelector('#address-fields');
+
+        // setup toggle switches
+
+        // watermark on / off toggle
+        let toggle = $('#watermark-toggle');
+        toggle.bootstrapToggle({
+            width: 50,
+            height: 20,
+            size: 'small'
+        });
+        toggle.change(function() {
+            let enabled = jQuery(this).prop('checked');
+            toggleWatermarkFields(enabled);
+            enableWatermark(enabled);
+        })
+
+        // watermark position toggle
+        let backgroundToggle = $('#watermark-background-toggle');
+        backgroundToggle.bootstrapToggle({
+            width: 90,
+            height: 20,
+            size: 'small'
+        });
+        backgroundToggle.change(function() {
+            let state = !jQuery(this).prop('checked');
+            setWatermarkBackground(state);
+        })
+
 
         function showBilling(showBilling) {
             if (showBilling) {
@@ -280,7 +307,29 @@
                     enable: enable
                 },
                 success: function() {
-                    console.log("JOB DONE");
+                    console.log("watermark on");
+                }
+            });
+        }
+
+        function setWatermarkBackground(isBackground)
+        {
+            jQuery.ajax({
+                url: "../RxWatermark.do",
+                type: "post",
+                data: {
+                    method: "setWatermarkBackground",
+                    isBackground: isBackground
+                },
+                success: function() {
+                    if (isBackground)
+                    {
+                        console.log("watermark background");
+                    }
+                    else
+                    {
+                        console.log("watermark foreground");
+                    }
                 }
             });
         }

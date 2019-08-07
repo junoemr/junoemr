@@ -23,10 +23,6 @@
 
 package oscar.util;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -34,6 +30,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -41,6 +38,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 public class ConversionUtilsTest
 {
@@ -681,6 +682,18 @@ public class ConversionUtilsTest
 	}
 
 	@Test
+	public void padDateTimeString_EmptyString_ExpectSameString()
+	{
+		Assert.assertEquals("", ConversionUtils.padDateTimeString(""));
+	}
+
+	@Test
+	public void padDateTimeString_Null_ExpectEmptyString()
+	{
+		Assert.assertEquals("", ConversionUtils.padDateTimeString(null));
+	}
+
+	@Test
 	public void padDateString_SingleDigitMonth_ExpectPaddedString()
 	{
 		Assert.assertEquals("2019-04-03", ConversionUtils.padDateString("2019-4-03"));
@@ -1109,5 +1122,28 @@ public class ConversionUtilsTest
 		Assert.assertNotSame(timeToCombine.getYear(), combined.getYear());
 		Assert.assertNotSame(timeToCombine.getMonth(), combined.getMonth());
 		Assert.assertNotSame(timeToCombine.getDate(), combined.getDate());
+	}
+
+	@Test
+	public void toNullableLocalTime_TimeString_ExpectNull()
+	{
+		String dateString = "";
+		assertThat(null, is(ConversionUtils.toNullableLocalTime(dateString)));
+	}
+
+	@Test
+	public void toLocalTime_TimeString_ExpectLocalTime()
+	{
+		String dateString = "09:30:00";
+		LocalTime expectedTime = LocalTime.of(9, 30, 0);
+		assertThat(expectedTime, is(ConversionUtils.toLocalTime(dateString)));
+	}
+
+	@Test
+	public void toLocalTime_TimeStringSpecifiedFormatter_ExpectLocalTime()
+	{
+		String dateString = "21:45:00";
+		LocalTime expectedTime = LocalTime.of(21, 45, 0);
+		assertThat(expectedTime, is(ConversionUtils.toLocalTime(dateString, DateTimeFormatter.ISO_TIME)));
 	}
 }
