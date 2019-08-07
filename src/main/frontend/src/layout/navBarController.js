@@ -64,10 +64,10 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		var controller = this;
 
 		// Controller-level variables to contain intervals
-		var unAckInterval;
-		var unreadMessageInterval;
-		var overdueTicklerInterval;
-		var activeConsultationInterval;
+		controller.unAckInterval = undefined;
+		controller.unreadMessageInterval = undefined;
+		controller.overdueTicklerInterval = undefined;
+		controller.activeConsultationInterval = undefined;
 
 		controller.intervalLength = 60000 * 5;
 
@@ -163,7 +163,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 
 					if (!angular.isDefined(unAckInterval))
 					{
-						unAckInterval = $interval(function()
+						controller.unAckInterval = $interval(function()
 						{
 							controller.getUnAckLabDocCount();
 						}, controller.intervalLength);
@@ -171,7 +171,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 
 					if (!angular.isDefined(unreadMessageInterval))
 					{
-						unreadMessageInterval = $interval(function()
+						controller.unreadMessageInterval = $interval(function()
 						{
 							controller.getUnreadMessageCount();
 						}, controller.intervalLength);
@@ -179,7 +179,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 
 					if (!angular.isDefined(overdueTicklerInterval))
 					{
-						overdueTicklerInterval = $interval(function()
+						controller.overdueTicklerInterval = $interval(function()
 						{
 							controller.getOverdueTicklerCount();
 						}, controller.intervalLength);
@@ -187,7 +187,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 
 					if (!angular.isDefined(activeConsultationInterval))
 					{
-						activeConsultationInterval = $interval(function()
+						controller.activeConsultationInterval = $interval(function()
 						{
 							controller.getActiveConsultationCount();
 						}, controller.intervalLength);
@@ -253,50 +253,54 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		// Need to do this so that requests aren't going off in the background after leaving new UI
 		controller.cancelIntervals = function cancelIntervals()
 		{
-			if (angular.isDefined(unAckInterval))
+			if (angular.isDefined(controller.unAckInterval))
 			{
-				$interval.cancel(unAckInterval);
-				unAckInterval = undefined;
+				$interval.cancel(controller.unAckInterval);
+				controller.unAckInterval = undefined;
 			}
 
-			if (angular.isDefined(unreadMessageInterval))
+			if (angular.isDefined(controller.unreadMessageInterval))
 			{
-				$interval.cancel(unreadMessageInterval);
-				unreadMessageInterval = undefined;
+				$interval.cancel(controller.unreadMessageInterval);
+				controller.unreadMessageInterval = undefined;
 			}
 
-			if (angular.isDefined(overdueTicklerInterval))
+			if (angular.isDefined(controller.overdueTicklerInterval))
 			{
-				$interval.cancel(overdueTicklerInterval);
-				overdueTicklerInterval = undefined;
+				$interval.cancel(controller.overdueTicklerInterval);
+				controller.overdueTicklerInterval = undefined;
 			}
 
-			if (angular.isDefined(activeConsultationInterval))
+			if (angular.isDefined(controller.activeConsultationInterval))
 			{
-				$interval.cancel(activeConsultationInterval);
-				activeConsultationInterval = undefined;
+				$interval.cancel(controller.activeConsultationInterval);
+				controller.activeConsultationInterval = undefined;
 			}
 		};
 
 		/**
 		 * Used to generically update count for various elements.
-		 * @param label label we want to display an updated count for
-		 * @return associated value the controller has stored, or 0 if we don't recognize label
+		 * @param item Item object with label we want to display an updated count for
+		 * @return associated value the controller has stored, or 0 if we don't recognize item's label
 		 */
-		controller.getCountForLabel = function getCountForLabel(label)
+		controller.getCountForLabel = function getCountForLabel(item)
 		{
-			if (label === "Inbox")
+			if (item.label === "Inbox")
 			{
+				item.labelCount = controller.unAckLabDocTotal;
 				return controller.unAckLabDocTotal;
 			}
-			else if (label === "Ticklers")
+			else if (item.label === "Ticklers")
 			{
+				item.labelCount = controller.ticklerTotal;
 				return controller.ticklerTotal;
 			}
-			else if (label === "Consultations")
+			else if (item.label === "Consultations")
 			{
+				item.labelCount = controller.activeConsultationTotal;
 				return controller.activeConsultationTotal;
 			}
+			item.labelCount = 0;
 			return 0;
 		};
 

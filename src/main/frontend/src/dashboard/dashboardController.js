@@ -55,7 +55,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
         var controller = this;
 
         // Intervals for periodic updates
-        var dashboardInterval;
+        controller.dashboardInterval = undefined;
 
         //header
         controller.displayDate = function displayDate()
@@ -421,7 +421,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
             if (!angular.isDefined(dashboardInterval))
             {
-                dashboardInterval = $interval(function()
+                controller.dashboardInterval = $interval(function()
                 {
                     controller.updateDashboard();
                 }, controller.intervalLength);
@@ -562,7 +562,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
             if (angular.isDefined(dashboardInterval))
             {
                 $interval.cancel(dashboardInterval);
-                dashboardInterval = undefined;
+                controller.dashboardInterval = undefined;
             }
         })
     }
