@@ -328,13 +328,14 @@ angular.module('Layout').controller('Layout.NavBarController', [
 
 		controller.getActiveConsultationCount = function getActiveConsultationCount()
 		{
-			consultService.searchRequests(
+			consultService.getTotalRequests(
 				{
 					search: 'status=1'
 				}).then(
 					function success(results)
 					{
-						controller.activeConsultationTotal = results.meta.total;
+						console.log(results);
+						controller.activeConsultationTotal = results.data;
 					},
 					function error(errors)
 					{

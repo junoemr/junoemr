@@ -58,6 +58,27 @@ angular.module("Common.Services").service("consultService", [
 			return deferred.promise;
 		};
 
+		service.getTotalRequests = function getTotalRequests(search)
+		{
+			var deferred = $q.defer();
+
+			var config = Juno.Common.ServiceHelper.configHeaders();
+			config.params = search;
+
+			junoHttp.get(service.apiPath + 'getTotalRequests', config).then(
+				function success(results)
+				{
+					deferred.resolve(results);
+				},
+				function error(errors)
+				{
+					console.log("consultService::getTotalRequests error", errors);
+					deferred.reject("An error occurred while getting total number of consult requests");
+				});
+
+			return deferred.promise;
+		};
+
 		service.getRequest = function getRequest(requestId)
 		{
 			var deferred = $q.defer();
