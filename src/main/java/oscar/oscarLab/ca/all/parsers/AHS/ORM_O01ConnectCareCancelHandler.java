@@ -24,8 +24,13 @@ package oscar.oscarLab.ca.all.parsers.AHS;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.model.v23.datatype.CX;
+import ca.uhn.hl7v2.model.v23.message.ORM_O01;
+import org.apache.commons.lang3.tuple.Pair;
 import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORM_O01MessageHandler;
+
+import java.util.ArrayList;
 
 public abstract class ORM_O01ConnectCareCancelHandler extends ORM_O01MessageHandler
 {
@@ -66,6 +71,65 @@ public abstract class ORM_O01ConnectCareCancelHandler extends ORM_O01MessageHand
 	{
 		return true;
 	}
+
+	/* ======================== PID =============================== */
+
+	@Override
+	public String getHealthNum()
+	{
+		ArrayList<Pair<String, String>> patientIds = getPatientIdentificationList(false);
+		for (Pair<String, String> id : patientIds)
+		{
+			if (id.getLeft().equalsIgnoreCase("PHN"))
+			{
+				return id.getRight();
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Connect Care labs send more than just health card number, they can also send, EPI, ABH, NWT, BKR
+	 * @param appendNamespace - if true append namespace to end of identifier
+	 * @return - list of paris patient identification <id type , id + assigning authority >
+	 */
+	public ArrayList<Pair<String, String>> getPatientIdentificationList(boolean appendNamespace)
+	{
+		ArrayList<Pair<String, String>> ids = new ArrayList<Pair<String, String>>();
+		if (message instanceof ORM_O01)
+		{
+			ORM_O01 msg = (ORM_O01) message;
+			for (int i =0; i < msg.getPATIENT().getPID().getPatientIDInternalIDReps(); i ++)
+			{
+				CX id = msg.getPATIENT().getPID().getPatientIDInternalID(i);
+				if (id.getAssigningAuthority().getNamespaceID().getValue() != null && id.getID().getValue() != null &&
+						id.getIdentifierTypeCode().getValue() != null)
+				{
+					String idString = id.getID().getValue();
+					if (appendNamespace)
+					{
+						idString += " " + id.getAssigningAuthority().getNamespaceID().getValue();
+					}
+					ids.add(Pair.of(id.getIdentifierTypeCode().getValue(), idString));
+				}
+			}
+			return ids;
+		}
+		else
+		{
+			return new ArrayList<Pair<String, String>>();
+		}
+	}
+
+	/**
+	 *  call getPatientIdentificationList default behavior of appending namespace
+	 * @return - list of paris patient identification <id type , id + assigning authority >
+	 */
+	public ArrayList<Pair<String, String>> getPatientIdentificationList()
+	{
+		return getPatientIdentificationList(true);
+	}
+
 
 	/* ======================== OBX =============================== */
 	/**
@@ -190,7 +254,7 @@ public abstract class ORM_O01ConnectCareCancelHandler extends ORM_O01MessageHand
 	/**
 	 * no comments should be displayed on cancel messages (as per guidance from connect care)
 	 * @param i - obr rep
-	 * @return
+	 * @return - always zero
 	 */
 	@Override
 	public int 	getOBRCommentCount(int i)

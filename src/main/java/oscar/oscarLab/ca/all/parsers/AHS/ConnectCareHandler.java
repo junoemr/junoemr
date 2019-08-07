@@ -92,9 +92,10 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 
 	/**
 	 * Connect Care labs send more than just health card number, they can also send, EPI, ABH, NWT, BKR
+	 * @param appendNamespace - if true append namespace to end of identifier
 	 * @return - list of paris patient identification <id type , id + assigning authority >
 	 */
-	public ArrayList<Pair<String, String>> getPatientIdentificationList()
+	public ArrayList<Pair<String, String>> getPatientIdentificationList(boolean appendNamespace)
 	{
 		ArrayList<Pair<String, String>> ids = new ArrayList<Pair<String, String>>();
 		if (message instanceof ORU_R01)
@@ -106,7 +107,12 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 				if (id.getAssigningAuthority().getNamespaceID().getValue() != null && id.getID().getValue() != null &&
 					id.getIdentifierTypeCode().getValue() != null)
 				{
-					ids.add(Pair.of(id.getIdentifierTypeCode().getValue(), id.getID().getValue() + " " + id.getAssigningAuthority().getNamespaceID().getValue()));
+					String idString = id.getID().getValue();
+					if (appendNamespace)
+					{
+						idString += " " + id.getAssigningAuthority().getNamespaceID().getValue();
+					}
+					ids.add(Pair.of(id.getIdentifierTypeCode().getValue(), idString));
 				}
 			}
 			return ids;
@@ -115,6 +121,15 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 		{
 			return new ArrayList<Pair<String, String>>();
 		}
+	}
+
+	/**
+	 *  call getPatientIdentificationList default behavior of appending namespace
+	 * @return - list of paris patient identification <id type , id + assigning authority >
+	 */
+	public ArrayList<Pair<String, String>> getPatientIdentificationList()
+	{
+		return getPatientIdentificationList(true);
 	}
 
 	@Override

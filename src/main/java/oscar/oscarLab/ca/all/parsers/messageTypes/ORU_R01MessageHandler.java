@@ -467,6 +467,10 @@ public abstract class ORU_R01MessageHandler extends MessageHandler
 	@Override
 	public String getTimeStamp(int i, int j)
 	{
+		if (i < 0 || j < 0)
+		{// some fun peaces of code like to ask for negative values
+			return null;
+		}
 		return formatDateTime(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-14"));
 	}
 

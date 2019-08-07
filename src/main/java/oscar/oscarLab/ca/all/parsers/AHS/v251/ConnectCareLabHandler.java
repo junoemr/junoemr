@@ -72,7 +72,15 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 	@Override
 	public String getHealthNum()
 	{
-		return get("/.PID-3(2)-1");
+		ArrayList<Pair<String, String>> patientIds = getPatientIdentificationList(false);
+		for (Pair<String, String> id : patientIds)
+		{
+			if (id.getLeft().equalsIgnoreCase("PHN"))
+			{
+				return id.getRight();
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -104,10 +112,11 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 	/**
 	 * Connect Care labs send more than just health card number, they can also send, EPI, ABH, NWT, BKR
 	 * An overload of the implementation is required because this handler uses ORU_R01 v 2.5.1 message
+	 * @param appendNamespace - if true append namespace to end of identifier
 	 * @return - list of paris patient identification <id type , id + assigning authority >
 	 */
 	@Override
-	public ArrayList<Pair<String, String>> getPatientIdentificationList()
+	public ArrayList<Pair<String, String>> getPatientIdentificationList(boolean appendNamespace)
 	{
 		ArrayList<Pair<String, String>> ids = new ArrayList<Pair<String, String>>();
 		if (message instanceof org.oscarehr.common.hl7.AHS.model.v251.message.ORU_R01)
@@ -121,7 +130,12 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 					if (id.getAssigningAuthority().getNamespaceID().getValue() != null && id.getIDNumber().getValue() != null &&
 							id.getIdentifierTypeCode().getValue() != null)
 					{
-						ids.add(Pair.of(id.getIdentifierTypeCode().getValue(), id.getIDNumber().getValue() + " " + id.getAssigningAuthority().getNamespaceID().getValue()));
+						String idString = id.getIDNumber().getValue();
+						if (appendNamespace)
+						{
+							idString += " " + id.getAssigningAuthority().getNamespaceID().getValue();
+						}
+						ids.add(Pair.of(id.getIdentifierTypeCode().getValue(), idString));
 					}
 				}
 				return ids;

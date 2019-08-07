@@ -176,6 +176,10 @@ public final class Factory {
 			{
 				handler = new ConnectCareCardiologyCancelHandler(msg);
 			}
+			else if (ConnectCareLabCancelHandler.handlerTypeMatch(msg))
+			{
+				handler = new  ConnectCareLabCancelHandler(msg);
+			}
 		}
 		else if (mshSplit[8].equals("MDM^T02"))
 		{

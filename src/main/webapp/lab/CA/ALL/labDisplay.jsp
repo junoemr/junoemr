@@ -1434,7 +1434,8 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						}
                            
                            for ( j=0; j < OBRCount; j++){
-
+                           	   // true if obr contains atleast one obx
+                           	   boolean obrHasContent = false;
                                boolean obrFlag = false;
                                int obxCount = handler.getOBXCount(j);
                                for (k=0; k < obxCount; k++){
@@ -1472,6 +1473,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                     if (!fail && b1 && b2 && b3){ // <<--  DNS only needed for MDS messages
 
+									obrHasContent = true;
                                    	String obrName = handler.getOBRName(j);
                                    	b1 = !obrFlag && !obrName.equals("");
                                    	b2 = !(obxName.contains(obrName));
@@ -1913,43 +1915,47 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                }
 
-                               if (handler.hasSpecimenSegment(j))
-                               {
-                               	    for (int s = 0; s < handler.getSpecimenCount(j); s ++)
-                                    {
-                                        if (handler.hasExtendedSpecimenDescription(j, s))
-                                        {
-                                        	%>
-                                                <tr>
-                                                    <td><bean:message key="oscarMDS.segmentDisplay.specimen"/><%=" " + handler.getSpecimenType(j, s)%> </td>
-													<td colspan="3"><%=handler.getSpecimenExtendedDescription(j, s)%></td>
-                                                </tr>
-                                            <%
-                                        }
-                                        else
+                               if (obrHasContent)
+							   {
+								   if (handler.hasSpecimenSegment(j))
+								   {
+										for (int s = 0; s < handler.getSpecimenCount(j); s ++)
 										{
-											%>
-											   <tr>
-												   <td><bean:message key="oscarMDS.segmentDisplay.specimen"/> <%=handler.getSpecimenType(j, s)%></td>
-												   <td colspan="3"><bean:message key="oscarMDS.segmentDisplay.site"/><%=" " + handler.getSpecimenSite(j, s) + " "%>
-													   <bean:message key="oscarMDS.segmentDisplay.collected"/><%=" " + handler.getSpecimenCollectionDateTime(j, s) + " "%>
-													   <bean:message key="oscarMDS.segmentDisplay.received"/><%=" " + handler.getSpecimenReceivedDateTime(j, s)%></td>
-											   </tr>
-										   <%
+											if (handler.hasExtendedSpecimenDescription(j, s))
+											{
+												%>
+													<tr>
+														<td><bean:message key="oscarMDS.segmentDisplay.specimen"/><%=" " + handler.getSpecimenType(j, s)%> </td>
+														<td colspan="3"><%=handler.getSpecimenExtendedDescription(j, s)%></td>
+													</tr>
+												<%
+											}
+											else
+											{
+												%>
+												   <tr>
+													   <td><bean:message key="oscarMDS.segmentDisplay.specimen"/> <%=handler.getSpecimenType(j, s)%></td>
+													   <td colspan="3"><bean:message key="oscarMDS.segmentDisplay.site"/><%=" " + handler.getSpecimenSite(j, s) + " "%>
+														   <bean:message key="oscarMDS.segmentDisplay.collected"/><%=" " + handler.getSpecimenCollectionDateTime(j, s) + " "%>
+														   <bean:message key="oscarMDS.segmentDisplay.received"/><%=" " + handler.getSpecimenReceivedDateTime(j, s)%></td>
+												   </tr>
+											   <%
+											}
 										}
-                                    }
-                               }
+								   }
 
-                               if (handler.getPerformingOrganizationName(j, 0) != null && handler.getPerformingOrganizationAddress(j, 0) != null &&
-                                    handler.getAssignedPatientLocation() != null)
-                               {
-                               %>
-                               <tr>
-                                   <td><bean:message key="oscarMDS.segmentDisplay.location"/> <%=" " +handler.getAssignedPatientLocation()%></td>
-                                   <td colspan="3"><%=handler.getPerformingOrganizationName(j, 0) + " " + handler.getPerformingOrganizationAddress(j, 0)%></td>
-                               </tr>
+								   if (handler.getPerformingOrganizationName(j, 0) != null && handler.getPerformingOrganizationAddress(j, 0) != null &&
+										handler.getAssignedPatientLocation() != null)
+								   {
+								   %>
+								   <tr>
+									   <td><bean:message key="oscarMDS.segmentDisplay.location"/> <%=" " +handler.getAssignedPatientLocation()%></td>
+									   <td colspan="3"><%=handler.getPerformingOrganizationName(j, 0) + " " + handler.getPerformingOrganizationAddress(j, 0)%></td>
+								   </tr>
 
-                               <%  }
+								   <%
+								   }
+							   }
                            //}
 
 

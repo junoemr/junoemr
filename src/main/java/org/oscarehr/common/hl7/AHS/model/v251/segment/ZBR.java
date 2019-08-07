@@ -49,6 +49,19 @@ public class ZBR extends AbstractSegment
 		}
 	}
 
+	public int getZBR2Reps()
+	{
+		try
+		{
+			return getField(2).length;
+		}
+		catch (HL7Exception e)
+		{
+			MiscUtils.getLogger().error("Could not get ZBR 2 Reps with error: " + e.getMessage(), e);
+		}
+		return 0;
+	}
+
 	public int getZBR3Reps()
 	{
 		try

@@ -390,6 +390,8 @@ public class LabPDFCreator extends PdfPageEventHelper {
 		{
 			for (int j = 0; j < obrCount; j++)
 			{
+				// true if the obr contains at least one line of content
+				boolean obrHasContent = false;
 				boolean obrFlag = false;
 				int obxCount = handler.getOBXCount(j);
 				for (int k = 0; k < obxCount; k++)
@@ -415,6 +417,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 								(handler.getMsgType().equals("EPSILON") && header.equals(handler.getOBXIdentifier(j,k)) && !obxName.equals("")) 
 								|| (handler.getMsgType().equals("PFHT") && !obxName.equals("") && header.equals(handler.getObservationHeader(j,k))))
 						{ // <<-- DNS only needed for MDS messages
+							obrHasContent = true;
 							String obrName = handler.getOBRName(j);
 							boolean obxCountBool = ((isTypeCLS && obxCount > 0 ) || obxCount > 1);
 
@@ -764,66 +767,69 @@ public class LabPDFCreator extends PdfPageEventHelper {
 					}
 				}
 
-				// and specimen description
-				if (handler.hasSpecimenSegment(j))
+				if (obrHasContent)
 				{
-					for (int s = 0; s < handler.getSpecimenCount(j); s ++)
+					// and specimen description
+					if (handler.hasSpecimenSegment(j))
 					{
-						if (handler.hasExtendedSpecimenDescription(j, s))
+						for (int s = 0; s < handler.getSpecimenCount(j); s++)
 						{
-							cell.setColspan(1);
-							cell.setPhrase(new Phrase("Specimen: " + handler.getSpecimenType(j, s), font));
-							table.addCell(cell);
+							int oldColSpan = cell.getColspan();
+							if (handler.hasExtendedSpecimenDescription(j, s))
+							{
+								cell.setColspan(1);
+								cell.setPhrase(new Phrase("Specimen: " + handler.getSpecimenType(j, s), font));
+								table.addCell(cell);
 
-							if (isUnstructuredDoc)
+								if (isUnstructuredDoc)
+								{
+									cell.setColspan(2);
+								} else
+								{
+									cell.setColspan(6);
+								}
+								cell.setPhrase(new Phrase(handler.getSpecimenExtendedDescription(j, s), font));
+								table.addCell(cell);
+							} else
 							{
-								cell.setColspan(2);
+								cell.setColspan(1);
+								cell.setPhrase(new Phrase("Specimen: " + handler.getSpecimenType(j, s), font));
+								table.addCell(cell);
+
+								if (isUnstructuredDoc)
+								{
+									cell.setColspan(2);
+								} else
+								{
+									cell.setColspan(6);
+								}
+								cell.setPhrase(new Phrase(" " + handler.getSpecimenSite(j, s) + " Collected: " + handler.getSpecimenCollectionDateTime(j, s) +
+										" Received: " + handler.getSpecimenReceivedDateTime(j, s), font));
+								table.addCell(cell);
 							}
-							else
-							{
-								cell.setColspan(6);
-							}
-							cell.setPhrase(new Phrase(handler.getSpecimenExtendedDescription(j, s), font));
-							table.addCell(cell);
+							cell.setColspan(oldColSpan);
 						}
-						else
+					}
+
+					if (handler.getPerformingOrganizationName(j, 0) != null && handler.getPerformingOrganizationAddress(j, 0) != null &&
+							handler.getAssignedPatientLocation() != null)
+					{
+						int oldColSpan = cell.getColspan();
+						cell.setColspan(1);
+						cell.setPhrase(new Phrase("Location: " + handler.getAssignedPatientLocation(), font));
+						table.addCell(cell);
+
+						if (isUnstructuredDoc)
 						{
-							cell.setColspan(1);
-							cell.setPhrase(new Phrase("Specimen: " + handler.getSpecimenType(j, s), font));
-							table.addCell(cell);
-
-							if (isUnstructuredDoc)
-							{
-								cell.setColspan(2);
-							}
-							else
-							{
-								cell.setColspan(6);
-							}
-							cell.setPhrase(new Phrase(" " + handler.getSpecimenSite(j, s) + " Collected: " + handler.getSpecimenCollectionDateTime(j, s) +
-									" Received: " + handler.getSpecimenReceivedDateTime(j, s), font));
-							table.addCell(cell);
+							cell.setColspan(2);
+						} else
+						{
+							cell.setColspan(6);
 						}
+						cell.setPhrase(new Phrase(handler.getPerformingOrganizationName(j, 0) + " " + handler.getPerformingOrganizationAddress(j, 0), font));
+						table.addCell(cell);
+						cell.setColspan(oldColSpan);
 					}
-				}
-
-				if (handler.getPerformingOrganizationName(j, 0) != null && handler.getPerformingOrganizationAddress(j, 0) != null &&
-						handler.getAssignedPatientLocation() != null)
-				{
-					cell.setColspan(1);
-					cell.setPhrase(new Phrase("Location: " + handler.getAssignedPatientLocation(), font));
-					table.addCell(cell);
-
-					if (isUnstructuredDoc)
-					{
-						cell.setColspan(2);
-					}
-					else
-					{
-						cell.setColspan(6);
-					}
-					cell.setPhrase(new Phrase(handler.getPerformingOrganizationName(j, 0) + " " + handler.getPerformingOrganizationAddress(j, 0), font));
-					table.addCell(cell);
 				}
 
 			} // for (j)
