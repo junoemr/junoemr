@@ -205,29 +205,21 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		int offset = perPage * (page - 1);
 		int resultTotal;
 
-		try
-		{
-			filter.setDemographicNo(demographicNo);
-			filter.setMrpNo(mrpNo);
-			filter.setStatus(status);
-			filter.setStartIndex(offset);
-			filter.setNumToReturn(perPage);
-			filter.setReferralStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(referralStartDateString)));
-			filter.setReferralEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(referralEndDate)));
-			filter.setAppointmentStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(appointmentStartDate)));
-			filter.setAppointmentEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(appointmentEndDate)));
-			filter.setTeam(team);
+		filter.setDemographicNo(demographicNo);
+		filter.setMrpNo(mrpNo);
+		filter.setStatus(status);
+		filter.setStartIndex(offset);
+		filter.setNumToReturn(perPage);
+		filter.setReferralStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(referralStartDateString)));
+		filter.setReferralEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(referralEndDate)));
+		filter.setAppointmentStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(appointmentStartDate)));
+		filter.setAppointmentEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(appointmentEndDate)));
+		filter.setTeam(team);
 
-			filter.setSortMode(ConsultationRequestSearchFilter.SORTMODE.valueOf(sortColumn));
-			filter.setSortDir(ConsultationRequestSearchFilter.SORTDIR.valueOf(sortDirection));
+		filter.setSortMode(ConsultationRequestSearchFilter.SORTMODE.valueOf(sortColumn));
+		filter.setSortDir(ConsultationRequestSearchFilter.SORTDIR.valueOf(sortDirection));
 
-			resultTotal = consultationManager.getConsultationCount(filter);
-		}
-		catch (Exception e)
-		{
-			logger.error("Unknown search error", e);
-			return RestResponse.errorResponse("Search Error");
-		}
+		resultTotal = consultationManager.getConsultationCount(filter);
 
 		return RestResponse.successResponse(resultTotal);
 	}
