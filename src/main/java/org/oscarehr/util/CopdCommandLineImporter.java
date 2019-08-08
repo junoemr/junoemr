@@ -188,7 +188,6 @@ public class CopdCommandLineImporter
 	/**
 	 * load spring beans.
 	 * @param propertiesFileName the name of the oscar properties file to use during loading
-	 * @return
 	 * @throws IOException
 	 */
 	public static ClassPathXmlApplicationContext loadSpring(String propertiesFileName) throws IOException{

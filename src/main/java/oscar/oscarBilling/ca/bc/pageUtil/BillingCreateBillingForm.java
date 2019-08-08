@@ -769,7 +769,6 @@ public final class BillingCreateBillingForm extends ActionForm {
 
   /**
    * get the oin pay patient flag
-   * @return
    */
   public String getOin_insurer_pay_patient()
   {
