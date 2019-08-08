@@ -1850,20 +1850,17 @@ import java.util.zip.ZipInputStream;
                         notes = appArray[i].getAppointmentNotes();
                     }
                     String apptStatus = appArray[i].getAppointmentStatus();
-                    if (apptStatus!=null) {
-                        for (int j=1; j<allStatus.length; j++) {
-                            String msg = getResources(request).getMessage(allTitle[j]);
-                            if (apptStatus.trim().equalsIgnoreCase(msg)) {
-                                status = allStatus[j];
-                                apptStatus = null;
-                                break;
-                            }
+                    for (int j=1; j<allStatus.length; j++) {
+                        MiscUtils.getLogger().info(allTitle[j] + " ==? " + apptStatus);
+                        if (allTitle[j].equalsIgnoreCase(org.apache.commons.lang.StringUtils.trimToEmpty(apptStatus))) {
+                            status = allStatus[j];
+                            apptStatus = null;
+                            break;
                         }
-                        if (StringUtils.empty(status)) {
-                        	status = allStatus[0];
+                    }
+                    if (StringUtils.empty(status)) {
+                        status = allStatus[0];
 //                        	err_note.add("Cannot map appointment status ["+apptStatus+"]. Appointment Status set to [To Do]");
-                        }
-
                     }
 
                     reason = StringUtils.noNull(appArray[i].getAppointmentPurpose());
@@ -1887,7 +1884,7 @@ import java.util.zip.ZipInputStream;
                     appt.setType("");
                     appt.setLocation("");
                     appt.setResources("");
-                    appt.setCreator("");
+                    appt.setCreator(admProviderNo);
                     appt.setLastUpdateUser(admProviderNo);
                     appt.setNotes(notes);
                     appt.setReason(reason);
