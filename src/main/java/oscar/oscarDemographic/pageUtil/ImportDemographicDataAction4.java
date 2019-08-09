@@ -1375,8 +1375,9 @@ import java.util.zip.ZipInputStream;
                 String duration, quantity, dosage, special;
                 for (int i=0; i<medArray.length; i++) {
                     Drug drug = new Drug();
-                    drug.setCreateDate(new Date());
-                    drug.setWrittenDate(dateTimeFPtoDate(medArray[i].getPrescriptionWrittenDate(), timeShiftInDays));
+                    Date writtenDate = dateTimeFPtoDate(medArray[i].getPrescriptionWrittenDate(), timeShiftInDays);
+                    drug.setCreateDate(writtenDate);
+                    drug.setWrittenDate(writtenDate);
                     String writtenDateFormat = dateFPGetPartial(medArray[i].getPrescriptionWrittenDate());
 
                     drug.setRxDate(dateFPtoDate(medArray[i].getStartDate(), timeShiftInDays));
