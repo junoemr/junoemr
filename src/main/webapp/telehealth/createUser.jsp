@@ -26,9 +26,36 @@
 <html>
 <head>
 		<title>MyHealthAccess Create User</title>
+    <link rel="stylesheet" type="text/css" href="myhealthaccess.css">
 </head>
 <body>
-- You do not currently have a linked myhealthaccess account.
+<div class="mha-container">
+    <div class="left"></div>
+    <div class="right">
+        <div class="mha-content">
+        <h3>Create a MyHealthAccess account</h3>
+        <p>
+            It looks like you don't have a MyHealthAccess account.
+            Lets create one and connect it with your Juno EMR provider
+        </p>
+        <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=createUser" method="post">
+            <input type="hidden" id="demographicNo" name="demographicNo" value="<%=request.getParameter("demographicNo")%>"/>
+            <input type="hidden" id="siteName" name="siteName" value="<%=request.getParameter("siteName")%>"/>
+            <div class="mha-input">
+                <label for="email">Email address</label>
+                <input type="text" id="email" name="email"/>
+            </div>
+            <div class="mha-button-container">
+                <button type="submit" class="primary">Sign up</button>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<!--         - You do not currently have a linked myhealthaccess account.
 <br>
 - Fill out a valid email address to create an account.
 <br>
@@ -39,17 +66,4 @@
 - You may optionally set a password to log directly into MHA
 <br>
 - In the future this Juno account will auto log into this MHA account
-<br>
-<form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=createUser" method="post">
-		<input type="hidden" id="demographicNo" name="demographicNo" value="<%=request.getParameter("demographicNo")%>"/>
-		<input type="hidden" id="siteName" name="siteName" value="<%=request.getParameter("siteName")%>"/>
-
-        Email: <input type="text" id="email" name="email"/> <br>
-        Password: <input type="password" id="password" name="password"/> <br>
-        Confirm Password: <input type="password" id="password_confirmation" name="password_confirmation"/> <br>
-
-    <button type="submit">Submit</button>
-</form>
-</body>
-</html>
-
+<br> -->

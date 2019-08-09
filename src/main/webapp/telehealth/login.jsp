@@ -26,45 +26,51 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-		<title>MyHealthAccess Login</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MyHealthAccess Login</title>
+    <link rel="stylesheet" type="text/css" href="myhealthaccess.css">
 </head>
 <body>
-- This Juno user has a MHA account, but has not been authenticated from Juno yet
-<br>
-- Authenticate once, and in the future Juno will Auto log into MHA
-<br>
-<% if(request.getParameter("errorMessage") != null && !request.getParameter("errorMessage").isEmpty())
-{
-%>
 
-<br>
-<strong><%= request.getParameter("errorMessage") %></strong>
-<br>
-<br>
-
-<%
-}
-%>
-
-<form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=login" method="post">
-		<input
-						type="hidden"
-						id="demographicNo"
-						name="demographicNo"
-						value="<%=request.getParameter("demographicNo")%>"
-		/>
-		<input
-						type="hidden"
-						id="siteName"
-						name="siteName"
-						value="<%=request.getParameter("siteName")%>"
-		/>
-        Email
-		<input type="text" id="email" name="email" value="<%=email%>"/>
-
-        Password
-		<input type="password" id="password" name="password"/>
-		<button type="submit">Submit</button>
-</form>
+<div class="mha-container">
+    <div class="left"></div>
+    <div class="right">
+        <div class="mha-content">
+            <% if(request.getParameter("errorMessage") != null && !request.getParameter("errorMessage").isEmpty())
+            {
+            %>
+                <br>
+                <strong><%= request.getParameter("errorMessage") %></strong>
+                <br>
+            <%
+                }
+            %>
+            <h3>Connect your MyHealthAccess Account</h3>
+            <p>
+                It looks like you have a MyHealthAccess account, but you haven't authenticated it from your Juno EMR.
+                Log in, and we'll complete the connection.
+            </p>
+            <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=login" method="post">
+                <input type="hidden" name="demographicNo" value="<%=request.getParameter("demographicNo")%>"/>
+                <input type="hidden" name="siteName" value="<%=request.getParameter("siteName")%>"/>
+                <div class="mha-input">
+                    <label for="email">Email address</label>
+                    <input type="text" id="email" name="email" value="<%=email%>"/>
+                </div>
+                <div class="mha-input">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password"/>
+                </div>
+                <div class="mha-button-container">
+                    <button type="submit" class="primary">Log on</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 </body>
 </html>
+
+<!--         - This Juno user has a MHA account, but has not been authenticated from Juno yet
+<br>
+- Authenticate once, and in the future Juno will Auto log into MHA --!>

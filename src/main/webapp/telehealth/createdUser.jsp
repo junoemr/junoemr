@@ -28,11 +28,29 @@
 		<title>MyHealthAccess User Created</title>
 </head>
 <body>
-- User is created
-- Goto email to confirm your address
-- Click button to continue to MHA after email confirmed
-- This page will never show again
+<div class="mha-container">
+    <div class="left"></div>
+    <div class="right">
+        <div class="mha-content">
+            <h3>Almost done</h3>
+            <p>
+                We just need you to go to your inbox at {{email address}} and click the link in your MyHealthAccess
+                registration email to confirm your account.  After you've confirmed, click the continue button below.
+            </p>
+            <p>Don't worry, you will only need to do this once to complete linking your new MyHealthAccess account</p>
+            <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=createdUser" method="post">
+                <div class="mha-button-container">
+                    <button type="submit" class="primary">Continue to Telehealth</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 </body>
 </html>
+<!--- User is created
+- Goto email to confirm your address
+- Click button to continue to MHA after email confirmed
+- This page will never show again -->
 
 

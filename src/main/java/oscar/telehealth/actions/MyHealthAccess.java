@@ -35,8 +35,8 @@ import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserAccessTokenTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserTo1;
+import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
-import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
@@ -45,12 +45,14 @@ import org.oscarehr.util.SpringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
 public class MyHealthAccess extends DispatchAction
 {
 	private MyHealthAccessService myHealthAccessService = SpringUtils.getBean(MyHealthAccessService.class);
-	private ClinicService clinicService = SpringUtils.getBean(ClinicService.class);
 	private DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
 	private ProviderData loggedInProvider;
 	private Security loggedInUser;
@@ -140,7 +142,7 @@ public class MyHealthAccess extends DispatchAction
 			loggedInUser.setMyHealthAccessLoginToken(loginToken.getToken());
 		}
 
-		myHealthAccessURL += myHealthAccessURL + "#token=" + loginToken.getToken();
+		myHealthAccessURL = myHealthAccessURL + "#token=" + loginToken.getToken();
 
 		ActionRedirect myHealthAccessRedirectAction = new ActionRedirect();
 		myHealthAccessRedirectAction.setPath(myHealthAccessURL);
@@ -148,23 +150,21 @@ public class MyHealthAccess extends DispatchAction
 		return myHealthAccessRedirectAction;
 	}
 
-	/*public ActionForward login(ActionMapping mapping, ActionForm form,
-	                           HttpServletRequest request, HttpServletResponse response) throws NoSuchAlgorithmException,
-	                                                                IOException,
-	                                                                KeyManagementException
+	public ActionForward login(ActionMapping mapping, ActionForm form,
+	                           HttpServletRequest request, HttpServletResponse response)
+			throws NoSuchAlgorithmException, IOException, KeyManagementException
 	{
+
+		// TODO: This sets the long token
 
 		setLoggedInData(request);
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
-		ClinicUserAccessTokenTo1 myHealthAccessAuthToken;
+
+		Site site = getSite(request);
 		try
 		{
-			myHealthAccessAuthToken = myHealthAccessService.getAuthToken(loggedInUser,
-					getSite(request),
-					remoteUser.getMyhealthaccesID(),
-					email,
-					password);
+			 myHealthAccessService.getAuthToken(site, remoteUser, loggedInUser, email, password);
 		}
 		catch (BaseException e)
 		{
@@ -179,8 +179,14 @@ public class MyHealthAccess extends DispatchAction
 			}
 			throw e;
 		}
-		return pushToTeleHealth(myHealthAccessAuthToken, mapping, form, request, response);
-	}*/
+
+		String myHealthAccessURL = myHealthAccessService.buildTeleHealthRedirectURL(
+				remoteUser,
+				getDemographic(request),
+				site);
+
+		return pushToMyHealthAccess(myHealthAccessURL, getSite(request));
+	}
 
 
 /*	public ActionForward pushToTeleHealth(

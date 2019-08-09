@@ -102,8 +102,8 @@ public class ErrorHandler <T> extends DefaultResponseErrorHandler
 			{
 				throw new DuplicateRecordException("Duplicate MyHealthAccess record for key found");
 			}
-
-			throw e;
 		}
+
+		throw e;
 	}
 }

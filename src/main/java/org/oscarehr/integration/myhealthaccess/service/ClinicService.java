@@ -27,6 +27,7 @@ import org.oscarehr.integration.myhealthaccess.ErrorHandler;
 import org.oscarehr.integration.myhealthaccess.dto.BaseErrorTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserAccessTokenTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateTo1;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserTo1;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
 import org.springframework.http.HttpMethod;
@@ -123,6 +124,24 @@ public class ClinicService extends BaseService
 
 
 		return loginToken;
+	}
+
+	public ClinicUserAccessTokenTo1 getAuthToken(String clinicID, String myHealthAccessUserID, String remoteID, String email, String password)
+	{
+		ClinicUserAccessTokenTo1 accessToken = null;
+		try
+		{
+			String endpoint = concatEndpointStrings(clinicEndPoint, "/" + clinicID + "/user/" + myHealthAccessUserID + "/get_access_token");
+			ClinicUserLoginTo1 loginBody = new ClinicUserLoginTo1(email, password);
+			loginBody.setRemoteID(remoteID);
+
+			accessToken = executeRequest(endpoint, HttpMethod.POST, loginBody, ClinicUserAccessTokenTo1.class, BaseErrorTo1.class);
+		}
+		catch (BaseException e) {
+			ErrorHandler.handleError(e);
+		}
+
+		return accessToken;
 	}
 
 /*	public ClinicUserAccessTokenTo1 getLoginToken(String clinicID, String myHealthAccessUserID, String email,

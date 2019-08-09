@@ -1,0 +1,70 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.mha-container {
+    display: flex;
+    height: 100%;
+}
+
+.mha-content {
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.mha-input {
+    display: flex;
+    flex-direction: column;
+}
+
+.mha-button-container {
+    padding-top: 16px;
+}
+
+label {
+    font-size: 14px;
+    padding-left: 14px;
+    height: 32px;
+    line-height: 2.29;
+}
+
+input {
+    width: 128px;
+    height: 56px;
+    border-radius: 8px;
+    border: solid 1px #c7cdd9;
+    background-color: #ffffff;
+    padding-left: 24px;
+    padding-right: 8px;
+    font-size: 16px;
+    min-width: 328px;
+}
+
+button {
+    min-width: 144px;
+    height: 40px;
+    border-radius: 8px;
+    padding: 8px 24px;
+    border: solid 1px;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.primary {
+    background-color: #476bb3;
+    border-color: #3c5a96;
+    color: #ffffff;
+}
+
+.left {
+    background-color: #476bb3;
+    width: 50%;
+}
+
+.right {
+    width: 50%;
+    display: flex;
+    align-items: center;
+}

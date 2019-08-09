@@ -40,8 +40,11 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
 import oscar.util.StringUtils;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
 @Service("telehealth.service.MyHealthAccessService")
 @Transactional
@@ -108,6 +111,7 @@ public class MyHealthAccessService
 				loggedInProvider.getLastName()
 		);
 
+		// TODO This is an icky side effect that should be dealt with one level up. Create a response dto containing the token
 		loggedInUser.setMyHealthAccessAuthToken(newUser.getAccessToken());
 		persistToken(loggedInUser, newUser.getAccessToken());
 
@@ -120,26 +124,22 @@ public class MyHealthAccessService
 		return clinicService.getLoginToken(getClinicID(site), remoteUser.getMyhealthaccesID(), authToken);
 	}
 
-/*	public ClinicUserAccessTokenTo1 getAuthToken(
-			Security loggedInUser,
-			Site site,
-			String myHealthAccessUserID,
-			String email,
-			String password) throws NoSuchAlgorithmException, IOException, KeyManagementException
+	public ClinicUserAccessTokenTo1 getAuthToken(Site site, ClinicUserTo1 remoteUser, Security loggedInUser, String email, String password) throws NoSuchAlgorithmException, IOException, KeyManagementException
 	{
-		ClinicUserAccessTokenTo1 myHealthAccessAuthToken = clinicService.getLoginToken(
+		ClinicUserAccessTokenTo1 myHealthAccessAuthToken = clinicService.getAuthToken(
 				getClinicID(site),
-				myHealthAccessUserID,
+				remoteUser.getMyhealthaccesID(),
+				Integer.toString(loggedInUser.getId()),
 				email,
-				password,
-				Integer.toString(loggedInUser.getId())
-		);
+				password);
 
+
+		// TODO this should be dealt with one level up
 		loggedInUser.setMyHealthAccessAuthToken(myHealthAccessAuthToken.getToken());
 		persistToken(loggedInUser, myHealthAccessAuthToken.getToken());
 
 		return myHealthAccessAuthToken;
-	}*/
+	}
 
 	public static String getClinicID(Site site)
 	{
