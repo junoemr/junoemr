@@ -110,15 +110,12 @@ public class MyHealthAccess extends DispatchAction
 			ClinicUserTo1 newUser = myHealthAccessService.createUser(loggedInUser, loggedInProvider, email, getSite(request));
 			this.remoteUser = newUser;
 
-			Demographic patient = getDemographic(request);
-			Site site = getSite(request);
-			// TODO make sure that the demographic and site both exist at this point
-			String myHealthAccessURL = myHealthAccessService.buildTeleHealthRedirectURL(
-					remoteUser,
-					patient,
-					site);
+			ActionRedirect confirmUserAction = new ActionRedirect(mapping.findForward("confirmUser"));
+			confirmUserAction.addParameter("demographicNo", request.getParameter("demographicNo"));
+			confirmUserAction.addParameter("siteName", request.getParameter("siteName"));
+			confirmUserAction.addParameter("email", email);
 
-			return pushToMyHealthAccess(myHealthAccessURL, site);
+			return confirmUserAction;
 		}
 		catch (Exception e)     // TODO:  Record already exists exception
 		{
@@ -180,45 +177,30 @@ public class MyHealthAccess extends DispatchAction
 			throw e;
 		}
 
+		Demographic patient = getDemographic(request);
+
 		String myHealthAccessURL = myHealthAccessService.buildTeleHealthRedirectURL(
 				remoteUser,
-				getDemographic(request),
+				patient,
 				site);
 
 		return pushToMyHealthAccess(myHealthAccessURL, getSite(request));
 	}
 
-
-/*	public ActionForward pushToTeleHealth(
-			ClinicUserAccessTokenTo1 myHealthAccessAuthToken,
-			ActionMapping mapping,
-			ActionForm form,
-			HttpServletRequest request,
-			HttpServletResponse response) throws UnsupportedEncodingException
+	public ActionForward confirmUser(ActionMapping mapping, ActionForm form,
+	                                   HttpServletRequest request, HttpServletResponse response)
+			throws UnsupportedEncodingException
 	{
-		MiscUtils.getLogger().error("LOGGING IN!");
-		Demographic patient = getDemographic(request);
-//		if (patient == null)
-//		{
-//			ActionRedirect errorAction = new ActionRedirect(mapping.findForward("error"));
-//			errorAction.addParameter(
-//					"errorMessage",
-//					"Failed to find patient record");
-//			return errorAction;
-//		}
-
 		Site site = getSite(request);
+		Demographic patient = getDemographic(request);
+
 		String myHealthAccessURL = myHealthAccessService.buildTeleHealthRedirectURL(
-				myHealthAccessAuthToken,
 				remoteUser,
 				patient,
 				site);
 
-		ActionRedirect myHealthAccessRedirectAction = new ActionRedirect();
-		myHealthAccessRedirectAction.setPath(myHealthAccessURL);
-		myHealthAccessRedirectAction.setRedirect(true);
-		return myHealthAccessRedirectAction;*/
-/*	}*/
+		return pushToMyHealthAccess(myHealthAccessURL, getSite(request));
+	}
 
 	private Demographic getDemographic(HttpServletRequest request)
 	{

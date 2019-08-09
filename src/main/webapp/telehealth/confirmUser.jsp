@@ -25,7 +25,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-		<title>MyHealthAccess User Created</title>
+    <title>MyHealthAccess User Confirmation</title>
+    <link rel="stylesheet" type="text/css" href="myhealthaccess.css">
 </head>
 <body>
 <div class="mha-container">
@@ -34,11 +35,11 @@
         <div class="mha-content">
             <h3>Almost done</h3>
             <p>
-                We just need you to go to your inbox at {{email address}} and click the link in your MyHealthAccess
+                We just need you to go to your inbox at <span class="bold"><%=request.getParameter("email")%></span> and click the link in your MyHealthAccess
                 registration email to confirm your account.  After you've confirmed, click the continue button below.
             </p>
             <p>Don't worry, you will only need to do this once to complete linking your new MyHealthAccess account</p>
-            <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=createdUser" method="post">
+            <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=confirmUser" method="post">
                 <div class="mha-button-container">
                     <button type="submit" class="primary">Continue to Telehealth</button>
                 </div>
