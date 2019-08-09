@@ -64,11 +64,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		var controller = this;
 
 		// Controller-level variables to contain intervals
-		controller.unAckInterval = undefined;
-		controller.unreadMessageInterval = undefined;
-		controller.overdueTicklerInterval = undefined;
-		controller.activeConsultationInterval = undefined;
-
+		controller.updateInterval = undefined;
 		controller.intervalLength = 60000 * 5;
 
 		//=========================================================================
@@ -152,46 +148,21 @@ angular.module('Layout').controller('Layout.NavBarController', [
 
 					controller.unreadMessagesCount = results.unreadMessagesCount;
 					controller.unreadPatientMessagesCount = results.unreadPatientMessagesCount;
-					controller.getUnAckLabDocCount();
-					controller.getUnreadMessageCount();
-					controller.getOverdueTicklerCount();
-					controller.getActiveConsultationCount();
+					controller.updateCounts();
 					controller.demographicSearchDropDownItems = results.menus.patientSearchMenu.items;
 					controller.menuItems = results.menus.menu.items;
 					controller.userMenuItems = results.menus.userMenu.items;
 					controller.messengerMenu = results.menus.messengerMenu.items;
 
-					if (!angular.isDefined(unAckInterval))
+
+					if (!angular.isDefined(controller.updateInterval))
 					{
-						controller.unAckInterval = $interval(function()
+						controller.updateInterval = $interval(function()
 						{
-							controller.getUnAckLabDocCount();
+							controller.updateCounts();
 						}, controller.intervalLength);
 					}
 
-					if (!angular.isDefined(unreadMessageInterval))
-					{
-						controller.unreadMessageInterval = $interval(function()
-						{
-							controller.getUnreadMessageCount();
-						}, controller.intervalLength);
-					}
-
-					if (!angular.isDefined(overdueTicklerInterval))
-					{
-						controller.overdueTicklerInterval = $interval(function()
-						{
-							controller.getOverdueTicklerCount();
-						}, controller.intervalLength);
-					}
-
-					if (!angular.isDefined(activeConsultationInterval))
-					{
-						controller.activeConsultationInterval = $interval(function()
-						{
-							controller.getActiveConsultationCount();
-						}, controller.intervalLength);
-					}
 				},
 				function error(errors)
 				{
@@ -253,29 +224,22 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		// Need to do this so that requests aren't going off in the background after leaving new UI
 		controller.cancelIntervals = function cancelIntervals()
 		{
-			if (angular.isDefined(controller.unAckInterval))
+			if (angular.isDefined(controller.updateInterval))
 			{
-				$interval.cancel(controller.unAckInterval);
-				controller.unAckInterval = undefined;
+				$interval.cancel(controller.updateInterval);
+				controller.updateInterval = undefined;
 			}
+		};
 
-			if (angular.isDefined(controller.unreadMessageInterval))
-			{
-				$interval.cancel(controller.unreadMessageInterval);
-				controller.unreadMessageInterval = undefined;
-			}
-
-			if (angular.isDefined(controller.overdueTicklerInterval))
-			{
-				$interval.cancel(controller.overdueTicklerInterval);
-				controller.overdueTicklerInterval = undefined;
-			}
-
-			if (angular.isDefined(controller.activeConsultationInterval))
-			{
-				$interval.cancel(controller.activeConsultationInterval);
-				controller.activeConsultationInterval = undefined;
-			}
+		/**
+		 * Wrapper for all of the functions that we want to periodically get updated counts for.
+		 */
+		controller.updateCounts = function updateCounts()
+		{
+			controller.getUnAckLabDocCount();
+			controller.getUnreadMessageCount();
+			controller.getOverdueTicklerCount();
+			controller.getActiveConsultationCount();
 		};
 
 		/**
