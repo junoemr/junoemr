@@ -71,6 +71,7 @@ public final class AppointmentTransfer {
 	private String remarks;
 	private String urgency;
 	private BookingSource bookingSource;
+	private boolean isVirtual;
 
 	public Integer getId() {
 		return (id);
@@ -247,6 +248,14 @@ public final class AppointmentTransfer {
 	public void setBookingSource(BookingSource bookingSource) {
     	this.bookingSource = bookingSource;
     }
+
+	public boolean getIsVirtual() {
+		return (isVirtual);
+	}
+
+	public void setIsVirtual(boolean isVirtual) {
+		this.isVirtual = isVirtual;
+	}
 
 	public Appointment copyTo(Appointment appointment) {
 

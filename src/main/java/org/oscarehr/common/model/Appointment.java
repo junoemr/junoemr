@@ -349,7 +349,7 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 		this.urgency = urgency;
 	}
 
-	public boolean isVirtual()
+	public boolean getIsVirtual()
 	{
 		return isVirtual;
 	}
