@@ -360,6 +360,19 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			return (controller.selectedScheduleView === controller.scheduleViewEnum.schedule);
 		};
+		$scope.isAgendaDayView = function()
+		{
+			return ( $scope.isAgendaView() && $scope.getCalendarViewName() === controller.calendarViewEnum.agendaDay)
+		};
+		$scope.isAgendaWeekView = function()
+		{
+			return ( $scope.isAgendaView() && $scope.getCalendarViewName() === controller.calendarViewEnum.agendaWeek)
+		};
+		$scope.isAgendaMonthView = function()
+		{
+			return ( $scope.isAgendaView() && $scope.getCalendarViewName() === controller.calendarViewEnum.agendaMonth)
+		};
+
 
 		//=========================================================================
 		// Private methods
@@ -509,6 +522,14 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			var deferred = $q.defer();
 
+			if($scope.isAgendaWeekView())
+			{
+				// full calendar likes to ask for a subset of the week days when hidden days are set,
+				// but we need to always ask for the whole week here so that we know what days to hide
+				end = angular.copy(start).endOf('week');
+				start = angular.copy(start).startOf('week');
+			}
+
 			// Get date strings to pass to the backend.  The calendar provides datetime that describe
 			// and inclusive start time and exclusive end time, so one second is removed from
 			// the end time to convert to the correct date.
@@ -528,6 +549,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			).then(
 				function (results)
 				{
+					console.info('================== load events ===================');
+					var hasVisibleSchedules = results.data.body.visibleSchedules;
+					$scope.showNoResources = !hasVisibleSchedules;
+					$scope.uiConfig.calendar.hiddenDays = [];
+
 					if (selectedSchedule.identifierType === controller.scheduleTypeEnum.group)
 					{
 						var providerNos = results.data.body.providerIdList;
@@ -539,9 +565,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						// always show day view in resource mode
 						$scope.uiConfig.calendar.defaultView = controller.calendarViewEnum.agendaDay;
 						$scope.calendarViewName = controller.calendarViewEnum.agendaDay;
-
-						$scope.showNoResources = (providerNos.length === 0);
-						$scope.uiConfig.calendar.hiddenDays = [];
 					}
 					else
 					{
@@ -550,18 +573,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						$scope.calendarViewName = $scope.getCalendarViewName();
 						$scope.uiConfig.calendar.resources = false;
 
-						$scope.showNoResources = false;
-						$scope.uiConfig.calendar.hiddenDays = [];
-
 						var hiddenDays = results.data.body.hiddenDaysList;
-						if(hiddenDays.length === 7)
-						{
-							// hiding all days causes an error in fullCalendar, so instead hide the calendar with the no schedules screen
-							$scope.showNoResources = true;
-						}
 						// only hide days in week/month views. limiting day view causes re-fetch errors when changing to week view
-						else if ($scope.calendarViewName === controller.calendarViewEnum.agendaWeek
-							  || $scope.calendarViewName === controller.calendarViewEnum.agendaMonth)
+						// hiding all days causes an error in fullCalendar, rely on the no schedules screen to hide it
+						if (hiddenDays.length !== 7 && ($scope.isAgendaWeekView() || $scope.isAgendaMonthView()))
 						{
 							$scope.uiConfig.calendar.hiddenDays = hiddenDays; // hide days without schedules
 						}
