@@ -87,6 +87,12 @@
 	overflow-y: hidden;
 	overflow-x: auto;
 
+	.info-message-container {
+		.alert {
+			margin: 0;
+			padding: 6px;
+		}
+	}
 	.calendar-loading
 	{
 		position: absolute;

@@ -19,6 +19,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 	'securityService',
 	'scheduleService',
 	'uiCalendarConfig',
+	'errorsService',
 	'globalStateService',
 
 	function (
@@ -36,6 +37,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		securityService,
 		scheduleService,
 		uiCalendarConfig,
+		messagesFactory,
 		globalStateService
 	)
 	{
@@ -64,6 +66,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.calendarName = 'cpCalendar';
 		$scope.initialized = false;
 		$scope.calendarLoading = false;
+		$scope.displayMessages = messagesFactory.factory();
 
 		$scope.uiConfig = {};
 		$scope.uiConfigApplied = {
@@ -316,9 +319,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						{
 							controller.selectedScheduleView = view;
 							$scope.refetchEvents();
+						},
+						function failure()
+						{
+							$scope.displayMessages.add_standard_error("Failed to update provider setting");
 						}
 					);
-
 			}
 		};
 
@@ -586,8 +592,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 					deferred.resolve(results.data.body);
 				},
-				function (results)
+				function failure(results)
 				{
+					$scope.displayMessages.add_standard_error("Failed to load events");
 					deferred.reject(results.data.body);
 				}
 			);
@@ -636,12 +643,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			if (editMode)
 			{
 				this.appointmentApi.updateAppointment(calendarAppointment).then(
-					function (result)
+					function success(result)
 					{
 						deferred.resolve(result.data);
 					},
-					function (result)
+					function failure(result)
 					{
+						$scope.displayMessages.add_standard_error("Failed to update appointment");
 						deferred.reject(result.data);
 					}
 				);
@@ -649,12 +657,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			else
 			{
 				$scope.appointmentApi.addAppointment(calendarAppointment).then(
-					function (result)
+					function success(result)
 					{
 						deferred.resolve(result.data);
 					},
-					function (result)
+					function failure(result)
 					{
+						$scope.displayMessages.add_standard_error("Failed to add appointment");
 						deferred.reject(result.data);
 					}
 				);
@@ -683,7 +692,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					deferred.resolve(data.body);
 				},
-				function success(data)
+				function failure(data)
 				{
 					deferred.reject(data.body);
 				}
@@ -750,13 +759,14 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			var deferred = $q.defer();
 
 			$scope.appointmentApi.deleteAppointment(appointmentNo).then(
-				function (result)
+				function success(result)
 				{
 					deferred.resolve(result.data);
 
 				},
-				function (result)
+				function failure(result)
 				{
+					$scope.displayMessages.add_standard_error("Failed to delete appointment");
 					deferred.reject(result.data);
 				}
 			);
@@ -795,9 +805,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 					$scope.setCalendarLoading(false);
 				},
-				function failure(response)
+				function failure()
 				{
-
+					$scope.displayMessages.add_standard_error("Failed to update status");
 				}
 			);
 		};
@@ -1343,7 +1353,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					controller.moveEventSuccess(eventData, calEvent);
 					$scope.setCalendarLoading(false);
 
-				}, function error(errors)
+				},
+				function error(errors)
 				{
 					console.log('failed to save event', errors);
 
@@ -1374,7 +1385,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					controller.moveEventSuccess(eventData, calEvent);
 					$scope.setCalendarLoading(false);
 
-				}, function error(errors)
+				},
+				function error(errors)
 				{
 					console.log('failed to resize event', errors);
 
@@ -1399,6 +1411,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					{
 						controller.providerSettings.siteSelected = $scope.selectedSiteName;
 						$scope.refetchEvents();
+					},
+					function failure()
+					{
+						$scope.displayMessages.add_standard_error("Failed to update provider setting");
 					}
 				);
 		};
@@ -1431,6 +1447,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 							$scope.setCalendarResources(false);
 						}
 						$scope.refetchEvents();
+					},
+					function failure()
+					{
+						$scope.displayMessages.add_standard_error("Failed to update provider setting");
 					}
 				);
 		};
@@ -1453,6 +1473,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						// ensure the selected date doesn't change on events refresh
 						$scope.uiConfig.calendar.defaultDate = $scope.calendar().fullCalendar('getDate');
 						$scope.applyUiConfig($scope.uiConfig);
+					},
+					function failure()
+					{
+						$scope.displayMessages.add_standard_error("Failed to update provider setting");
 					}
 				);
 		};
@@ -1484,8 +1508,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						$scope.scheduleOptions.push(scheduleData);
 					}
 					deferred.resolve(results);
-				});
-
+				},
+				function failure(results)
+				{
+					$scope.displayMessages.add_standard_error("Failed to load schedule groups");
+					deferred.reject(results);
+				}
+			);
 			return deferred.promise;
 		};
 
@@ -1508,6 +1537,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						};
 					}
 					deferred.resolve($scope.resourceOptionHash);
+				},
+				function failure()
+				{
+					$scope.displayMessages.add_standard_error("Failed to load resource hash");
+					deferred.reject($scope.resourceOptionHash);
 				}
 			);
 
@@ -1573,6 +1607,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					var enabled = rawResults.data.body;
 					$scope.sitesEnabled = enabled;
 					deferred.resolve(enabled);
+				},
+				function failure(results)
+				{
+					$scope.displayMessages.add_standard_error("Failed to load sites enabled");
+					deferred.reject(results.data.body);
 				}
 			);
 
@@ -1600,6 +1639,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						}
 					}
 					deferred.resolve(out);
+				},
+				function failure(results)
+				{
+					$scope.displayMessages.add_standard_error("Failed to load sites");
+					deferred.reject(results);
 				}
 			);
 
@@ -1625,7 +1669,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 					$scope.availabilityTypes = availabilityTypes;
 					deferred.resolve(availabilityTypes);
-				});
+				},
+				function failure(results)
+				{
+					$scope.displayMessages.add_standard_error("Failed to load availablity types");
+					deferred.reject(results.data.body);
+				}
+			);
 
 			return deferred.promise;
 		};

@@ -186,6 +186,13 @@
 					</div>
 				</div>
 			</div>
+
+			<div class="info-message-container">
+				<ca-info-messages
+						ca-errors-object="displayMessages"
+						ca-prepend-name-to-field-errors="false">
+				</ca-info-messages>
+			</div>
 			<div
 					id="ca-calendar"
 					class="calendar"
