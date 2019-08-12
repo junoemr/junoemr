@@ -112,19 +112,19 @@ public class MyHealthAccessService
 		);
 
 		// TODO This is an icky side effect that should be dealt with one level up. Create a response dto containing the token
-		loggedInUser.setMyHealthAccessAuthToken(newUser.getAccessToken());
+		loggedInUser.setMyHealthAccessLongToken(newUser.getAccessToken());
 		persistToken(loggedInUser, newUser.getAccessToken());
 
 		return newUser;
 	}
 
-	public ClinicUserAccessTokenTo1 getLoginToken(Site site, ClinicUserTo1 remoteUser, Security loggedInUser)
+	public ClinicUserAccessTokenTo1 getShortToken(Site site, ClinicUserTo1 remoteUser, Security loggedInUser)
 	{
-		ClinicUserAccessTokenTo1 authToken = loggedInUser.getMyHealthAccessAuthToken();
+		ClinicUserAccessTokenTo1 authToken = loggedInUser.getMyHealthAccessLongToken();
 		return clinicService.getLoginToken(getClinicID(site), remoteUser.getMyhealthaccesID(), authToken);
 	}
 
-	public ClinicUserAccessTokenTo1 getAuthToken(Site site, ClinicUserTo1 remoteUser, Security loggedInUser, String email, String password) throws NoSuchAlgorithmException, IOException, KeyManagementException
+	public ClinicUserAccessTokenTo1 getLongToken(Site site, ClinicUserTo1 remoteUser, Security loggedInUser, String email, String password) throws NoSuchAlgorithmException, IOException, KeyManagementException
 	{
 		ClinicUserAccessTokenTo1 myHealthAccessAuthToken = clinicService.getAuthToken(
 				getClinicID(site),
@@ -135,7 +135,7 @@ public class MyHealthAccessService
 
 
 		// TODO this should be dealt with one level up
-		loggedInUser.setMyHealthAccessAuthToken(myHealthAccessAuthToken.getToken());
+		loggedInUser.setMyHealthAccessLongToken(myHealthAccessAuthToken.getToken());
 		persistToken(loggedInUser, myHealthAccessAuthToken.getToken());
 
 		return myHealthAccessAuthToken;
@@ -165,7 +165,7 @@ public class MyHealthAccessService
 	private void persistToken(Security loggedInUser, String token)
 	{
 		Security securityRecord = securityDao.find(loggedInUser.getId());
-		securityRecord.setMyHealthAccessAuthToken(token);
+		securityRecord.setMyHealthAccessLongToken(token);
 		securityDao.persist(securityRecord);
 	}
 }

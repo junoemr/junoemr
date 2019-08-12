@@ -144,7 +144,7 @@ public class ClinicService extends BaseService
 		return accessToken;
 	}
 
-/*	public ClinicUserAccessTokenTo1 getLoginToken(String clinicID, String myHealthAccessUserID, String email,
+/*	public ClinicUserAccessTokenTo1 getShortToken(String clinicID, String myHealthAccessUserID, String email,
 	                                              String password, String oscarUserID) throws IOException,
 	                                                                                          NoSuchAlgorithmException,
 	                                                                                          KeyManagementException

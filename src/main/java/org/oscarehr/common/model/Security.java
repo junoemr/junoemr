@@ -80,10 +80,10 @@ public class Security extends AbstractModel<Integer> {
 	private Boolean forcePasswordReset = true;
 
 	@Column(name = "myhealthaccess_auth_token")
-	private String myHealthAccessAuthToken;
+	private String myHealthAccessLongToken;
 
 	@Transient
-	private String myHealthAccessLoginToken;
+	private String myHealthAccessShortToken = null;
 
 	/** default constructor */
 	public Security() {
@@ -206,40 +206,40 @@ public class Security extends AbstractModel<Integer> {
 		this.id = id;
 	}
 
-	public ClinicUserAccessTokenTo1 getMyHealthAccessAuthToken()
+	public ClinicUserAccessTokenTo1 getMyHealthAccessLongToken()
 	{
-		if(this.myHealthAccessAuthToken == null || this.myHealthAccessAuthToken.isEmpty())
+		if(this.myHealthAccessLongToken == null || this.myHealthAccessLongToken.isEmpty())
 		{
 			return null;
 		}
 
 		ClinicUserAccessTokenTo1 accessTokenTo = new ClinicUserAccessTokenTo1();
-		accessTokenTo.setToken(this.myHealthAccessAuthToken);
+		accessTokenTo.setToken(this.myHealthAccessLongToken);
 
 		return accessTokenTo;
 	}
 
-	public void setMyHealthAccessAuthToken(String myHealthAccessAuthToken)
+	public void setMyHealthAccessLongToken(String myHealthAccessAuthToken)
 	{
-		this.myHealthAccessAuthToken = myHealthAccessAuthToken;
+		this.myHealthAccessLongToken = myHealthAccessAuthToken;
 	}
 
-	public ClinicUserAccessTokenTo1 getMyHealthAccessLoginToken()
+	public ClinicUserAccessTokenTo1 getMyHealthAccessShortToken()
 	{
-		if(this.myHealthAccessLoginToken == null || this.myHealthAccessLoginToken.isEmpty())
+		if(this.myHealthAccessShortToken == null || this.myHealthAccessShortToken.isEmpty())
 		{
 			return null;
 		}
 
 		ClinicUserAccessTokenTo1 accessTokenTo = new ClinicUserAccessTokenTo1();
-		accessTokenTo.setToken(this.myHealthAccessLoginToken);
+		accessTokenTo.setToken(this.myHealthAccessShortToken);
 
 		return accessTokenTo;
 	}
 
-	public void setMyHealthAccessLoginToken(String myHealthAccessLoginToken)
+	public void setMyHealthAccessShortToken(String myHealthAccessShortToken)
 	{
-		this.myHealthAccessLoginToken = myHealthAccessLoginToken;
+		this.myHealthAccessShortToken = myHealthAccessShortToken;
 	}
 
 	/**

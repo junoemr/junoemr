@@ -36,7 +36,9 @@ import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserAccessTokenTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserTo1;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
+import org.oscarehr.integration.myhealthaccess.exception.DuplicateRecordException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
+import org.oscarehr.integration.myhealthaccess.model.MHAUserToken;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
@@ -63,14 +65,11 @@ public class MyHealthAccess extends DispatchAction
 	{
 		try
 		{
-			MiscUtils.getLogger().error("Set logged in data");
 			setLoggedInData(request);
 			fetchRemoteUser(request);
 		}
 		catch (RecordNotFoundException e)
 		{
-			MiscUtils.getLogger().error("Couldn't find user. Creating...");
-
 			ActionRedirect createUserRedirect = new ActionRedirect(mapping.findForward("createUser"));
 			createUserRedirect.addParameter("demographicNo", request.getParameter("demographicNo"));
 			createUserRedirect.addParameter("siteName", request.getParameter("siteName"));
@@ -78,37 +77,32 @@ public class MyHealthAccess extends DispatchAction
 			return createUserRedirect;
 		}
 
-		ClinicUserAccessTokenTo1 myHealthAccessAuthToken = loggedInUser.getMyHealthAccessAuthToken();
+		MHAUserToken longToken = MHAUserToken.decodeToken(loggedInUser.getMyHealthAccessLongToken());
 
-		// TODO check expiry
-		if (myHealthAccessAuthToken == null)
+		if (longToken == null || longToken.isExpired())
 		{
-			MiscUtils.getLogger().error("token null or expired");
 			ActionRedirect loginAction = new ActionRedirect(mapping.findForward("pushLogin"));
 			loginAction.addParameter("demographicNo", request.getParameter("demographicNo"));
 			loginAction.addParameter("siteName", request.getParameter("siteName"));
-			return loginAction;     // get a new long token
+			return loginAction;
 		}
 
 		Demographic patient = getDemographic(request);
 		Site site = getSite(request);
 
-		String myHealthAccessURL = myHealthAccessService.buildTeleHealthRedirectURL(
-				remoteUser,
-				patient,
-				site);
+		String endpoint = myHealthAccessService.buildTeleHealthRedirectURL(remoteUser, patient, site);
 
-		return pushToMyHealthAccess(myHealthAccessURL, site);
+		return pushToMyHealthAccess(endpoint, site);
 	}
 
-	public ActionForward createUser(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	public ActionForward createUser(ActionMapping mapping, ActionForm form,
+	                                HttpServletRequest request, HttpServletResponse response)
 	{
 		String email = request.getParameter("email");
 
 		try
 		{
-			ClinicUserTo1 newUser = myHealthAccessService.createUser(loggedInUser, loggedInProvider, email, getSite(request));
-			this.remoteUser = newUser;
+			remoteUser = myHealthAccessService.createUser(loggedInUser, loggedInProvider, email, getSite(request));
 
 			ActionRedirect confirmUserAction = new ActionRedirect(mapping.findForward("confirmUser"));
 			confirmUserAction.addParameter("demographicNo", request.getParameter("demographicNo"));
@@ -117,7 +111,7 @@ public class MyHealthAccess extends DispatchAction
 
 			return confirmUserAction;
 		}
-		catch (Exception e)     // TODO:  Record already exists exception
+		catch (DuplicateRecordException e)     // TODO:  Check correct exception thrown
 		{
 			myHealthAccessService.getUserByEmail(email, getSite(request));
 
@@ -132,14 +126,14 @@ public class MyHealthAccess extends DispatchAction
 
 	private ActionForward pushToMyHealthAccess(String myHealthAccessURL, Site site)
 	{
-		ClinicUserAccessTokenTo1 loginToken = loggedInUser.getMyHealthAccessLoginToken();
-		if (loginToken == null)  // TODO: check expiry
+		MHAUserToken shortToken = MHAUserToken.decodeToken(loggedInUser.getMyHealthAccessShortToken());
+
+		if (shortToken == null || shortToken.isExpired() || !shortToken.getClinicUserID().equals(remoteUser.getMyhealthaccesID()))
 		{
-			loginToken = myHealthAccessService.getLoginToken(site, remoteUser, loggedInUser);
-			loggedInUser.setMyHealthAccessLoginToken(loginToken.getToken());
+			fetchNewShortToken(site);
 		}
 
-		myHealthAccessURL = myHealthAccessURL + "#token=" + loginToken.getToken();
+		myHealthAccessURL = myHealthAccessURL + "#token=" + loggedInUser.getMyHealthAccessShortToken().getToken();
 
 		ActionRedirect myHealthAccessRedirectAction = new ActionRedirect();
 		myHealthAccessRedirectAction.setPath(myHealthAccessURL);
@@ -147,21 +141,25 @@ public class MyHealthAccess extends DispatchAction
 		return myHealthAccessRedirectAction;
 	}
 
+	private void fetchNewShortToken(Site site)
+	{
+		ClinicUserAccessTokenTo1 shortToken = myHealthAccessService.getShortToken(site, remoteUser, loggedInUser);
+		loggedInUser.setMyHealthAccessShortToken(shortToken.getToken());
+	}
+
 	public ActionForward login(ActionMapping mapping, ActionForm form,
 	                           HttpServletRequest request, HttpServletResponse response)
 			throws NoSuchAlgorithmException, IOException, KeyManagementException
 	{
-
-		// TODO: This sets the long token
-
 		setLoggedInData(request);
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
 
 		Site site = getSite(request);
+
 		try
 		{
-			 myHealthAccessService.getAuthToken(site, remoteUser, loggedInUser, email, password);
+			 myHealthAccessService.getLongToken(site, remoteUser, loggedInUser, email, password);
 		}
 		catch (BaseException e)
 		{
@@ -174,6 +172,7 @@ public class MyHealthAccess extends DispatchAction
 				loginAction.addParameter("errorMessage", "Failed to authenticate");
 				return loginAction;
 			}
+
 			throw e;
 		}
 
