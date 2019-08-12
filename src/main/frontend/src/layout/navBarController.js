@@ -65,7 +65,8 @@ angular.module('Layout').controller('Layout.NavBarController', [
 
 		// Controller-level variables to contain intervals
 		controller.updateInterval = undefined;
-		controller.intervalLength = 60000 * 5;
+		controller.messageInterval = undefined;
+		controller.baseIntervalLength = 60000;
 
 		//=========================================================================
 		// Initialization
@@ -149,6 +150,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 					controller.unreadMessagesCount = results.unreadMessagesCount;
 					controller.unreadPatientMessagesCount = results.unreadPatientMessagesCount;
 					controller.updateCounts();
+					controller.getUnreadMessageCount();
 					controller.demographicSearchDropDownItems = results.menus.patientSearchMenu.items;
 					controller.menuItems = results.menus.menu.items;
 					controller.userMenuItems = results.menus.userMenu.items;
@@ -160,7 +162,16 @@ angular.module('Layout').controller('Layout.NavBarController', [
 						controller.updateInterval = $interval(function()
 						{
 							controller.updateCounts();
-						}, controller.intervalLength);
+						}, controller.baseIntervalLength * 5);
+					}
+
+					// Separated into its own interval so that it can be updated more frequently
+					if (!angular.isDefined(controller.messageInterval))
+					{
+						controller.messageInterval = $interval(function()
+						{
+							controller.getUnreadMessageCount();
+						}, controller.baseIntervalLength);
 					}
 
 				},
@@ -229,6 +240,12 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				$interval.cancel(controller.updateInterval);
 				controller.updateInterval = undefined;
 			}
+
+			if (angular.isDefined(controller.messageInterval))
+			{
+				$interval.cancel(controller.messageInterval);
+				controller.messageInterval = undefined;
+			}
 		};
 
 		/**
@@ -237,7 +254,6 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		controller.updateCounts = function updateCounts()
 		{
 			controller.getUnAckLabDocCount();
-			controller.getUnreadMessageCount();
 			controller.getOverdueTicklerCount();
 			controller.getActiveConsultationCount();
 		};

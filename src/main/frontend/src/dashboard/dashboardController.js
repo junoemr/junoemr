@@ -419,7 +419,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
                 controller.updateDashboard();
             }
 
-            if (!angular.isDefined(dashboardInterval))
+            if (!angular.isDefined(controller.dashboardInterval))
             {
                 controller.dashboardInterval = $interval(function()
                 {
