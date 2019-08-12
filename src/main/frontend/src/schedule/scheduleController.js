@@ -66,6 +66,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.calendarName = 'cpCalendar';
 		$scope.initialized = false;
 		$scope.calendarLoading = false;
+		$scope.customLoading = false;
 		$scope.displayMessages = messagesFactory.factory();
 
 		$scope.uiConfig = {};
@@ -445,6 +446,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			$scope.calendarLoading = isLoading;
 		};
+		$scope.setCustomLoading = function setCustomLoading(isLoading)
+		{
+			$scope.customLoading = isLoading;
+		};
 
 		$scope.setEventSources = function setEventSources()
 		{
@@ -528,6 +533,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			var deferred = $q.defer();
 
+			$scope.setCustomLoading(true);
 			if($scope.isAgendaWeekView())
 			{
 				// full calendar likes to ask for a subset of the week days when hidden days are set,
@@ -590,6 +596,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					$scope.applyUiConfig($scope.uiConfig);
 					$scope.events = results.data.body.eventList;
 
+					$scope.setCustomLoading(false);
 					deferred.resolve(results.data.body);
 				},
 				function failure(results)

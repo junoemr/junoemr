@@ -162,7 +162,7 @@
 		>
 			<%-- ng-hide on the calendar causes event render issues,
 				 so zero state is shown by rendering content on top of an empty calendar and removing scroll bars --%>
-			<div class="zero-state-message" ng-show="showNoResources && isInitialized() && !calendarLoading">
+			<div class="zero-state-message" ng-show="showNoResources && isInitialized()">
 				<h1 ng-show="isResourceView() && (selectedSiteName == null || (selectedSiteName != null && isScheduleView()))">
 					No Providers Scheduled
 				</h1>
@@ -177,10 +177,19 @@
 				</h1>
 			</div>
 			<div class="loading-screen flex-row flex-grow justify-content-center"
-			     ng-show="calendarLoading || !isInitialized()"
+			     ng-show="customLoading || !isInitialized()"
 			>
 				<div class="flex-column justify-content-center vertical-align">
 					<h1>Loading...</h1>
+					<div class="loading-dot-container">
+						<div class="dot-pulse"></div>
+					</div>
+				</div>
+			</div>
+			<div class="loading-screen-small flex-row flex-grow justify-content-center"
+			     ng-show="calendarLoading && !customLoading"
+			>
+				<div class="flex-column justify-content-center vertical-align">
 					<div class="loading-dot-container">
 						<div class="dot-pulse"></div>
 					</div>

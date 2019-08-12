@@ -326,6 +326,12 @@
 		height: 100%;
 		background-color: rgba(0,0,0,0.1);
 	}
+	.loading-screen-small {
+		position: absolute;
+		right: 16px;
+		bottom: 0;
+		z-index: 8;
+	}
 	&.no-scroll {
 		overflow: hidden;
 	}
