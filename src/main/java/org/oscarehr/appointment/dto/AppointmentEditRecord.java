@@ -34,6 +34,7 @@ public class AppointmentEditRecord
 	private LocalDateTime updateDateTime;
 	private LocalDateTime  createDateTime;
 	private String lastUpdateUser;
+	private String updateUserDisplayName;
 	private String creator;
 
 	public Integer getId()
@@ -64,6 +65,16 @@ public class AppointmentEditRecord
 	public void setProviderNo(String providerNo)
 	{
 		this.providerNo = providerNo;
+	}
+
+	public String getUpdateUserDisplayName()
+	{
+		return updateUserDisplayName;
+	}
+
+	public void setUpdateUserDisplayName(String updateUserDisplayName)
+	{
+		this.updateUserDisplayName = updateUserDisplayName;
 	}
 
 	public LocalDateTime getAppointmentDate()

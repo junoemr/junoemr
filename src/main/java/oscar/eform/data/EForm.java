@@ -563,6 +563,11 @@ public class EForm extends EFormBase {
 		this.formDate = UtilDateUtilities.DateToString(new Date(), "yyyy-MM-dd");
 	}
 
+	public List<String> checkMeasurements(List<String> names, List<String> values)
+	{
+		return WriteNewMeasurements.validateMeasurements(names, values);
+	}
+
 	public ActionMessages setMeasurements(List<String> names, List<String> values) {
 		return (WriteNewMeasurements.addMeasurements(names, values, this.demographicNo, this.providerNo));
 	}

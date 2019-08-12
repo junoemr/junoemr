@@ -1,7 +1,7 @@
 // global styles
 
 h1,h2,h3,h4,h5,h6 {
-	font-family: Arial, Helvetica, sans-serif;
+	@include juno-font-default;
 }
 h1,h2,h3 {
 	font-weight: bold;
@@ -25,6 +25,9 @@ h1,h2,h3 {
 }
 .align-items-baseline {
 	align-items: baseline;
+}
+.justify-content-center {
+	justify-content: center;
 }
 .justify-content-evenly {
 	justify-content: space-evenly;
@@ -92,7 +95,7 @@ a,.clickable {
 }
 
 .blue-text {
-	color: $primary-blue-text;
+	color: $primary;
 }
 
 .highlight,

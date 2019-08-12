@@ -31,12 +31,10 @@
 
 	<div ng-show="isSchedulingEnabled()">
 		<div class="flex-column flex-grow schedule-page-header">
-			<div ng-show="!isInitialized()">
-				<p>Loading...</p>
-			</div>
-			<div ng-show="isInitialized()"
-			     class="schedule-options flex-row flex-grow align-items-center">
-				<div class="form-inline flex-grow">
+			<div class="schedule-options flex-row flex-grow align-items-center">
+				<h5 ng-show="!isInitialized()">Loading...</h5>
+
+				<div ng-show="isInitialized()" class="form-inline flex-grow">
 					<div class="pull-left">
 						<div class="form-group cal-step-button-group">
 							<div class="form-group">
@@ -82,7 +80,7 @@
 							        class="form-control"
 							        ng-change="onScheduleChanged()"
 							        ng-model="selectedSchedule"
-							        ng-options="option as option.name for option in getScheduleOptions()">
+							        ng-options="option as option.label for option in getScheduleOptions()">
 							</select>
 						</div>
 						<div class="form-group"
@@ -104,24 +102,47 @@
 							<div class="btn-group" role="group" ng-show="isAgendaView()">
 								<button type="button"
 								        class="btn btn-sm"
-								        ng-class=" { 'btn-addon': viewName() != 'agendaDay', 'btn-primary': viewName() == 'agendaDay' } "
+								        ng-class=" { 'btn-addon': getCalendarViewName() !== scheduleController.calendarViewEnum.agendaDay,
+								                     'btn-primary': getCalendarViewName() === scheduleController.calendarViewEnum.agendaDay }"
 								        viewName="agendaDay"
-								        ng-click="changeView('agendaDay')">
+								        ng-click="changeCalendarView(scheduleController.calendarViewEnum.agendaDay)">
 									Day
 								</button>
 								<button type="button"
 								        class="btn btn-sm"
-								        ng-class=" { 'btn-addon': viewName() != 'agendaWeek', 'btn-primary': viewName() == 'agendaWeek' } "
+								        ng-class=" { 'btn-addon': getCalendarViewName() !== scheduleController.calendarViewEnum.agendaWeek,
+								                     'btn-primary': getCalendarViewName() === scheduleController.calendarViewEnum.agendaWeek }"
 								        viewName="agendaWeek"
-								        ng-click="changeView('agendaWeek')">
+								        ng-click="changeCalendarView(scheduleController.calendarViewEnum.agendaWeek)">
 									Week
 								</button>
 								<button type="button"
 								        class="btn btn-sm"
-								        ng-class=" { 'btn-addon': viewName() != 'month', 'btn-primary': viewName() == 'month' } "
+								        ng-class=" { 'btn-addon': getCalendarViewName() !== scheduleController.calendarViewEnum.agendaMonth,
+								                     'btn-primary': getCalendarViewName() === scheduleController.calendarViewEnum.agendaMonth }"
 								        viewName="month"
-								        ng-click="changeView('month')">
+								        ng-click="changeCalendarView(scheduleController.calendarViewEnum.agendaMonth)">
 									Month
+								</button>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="btn-group" role="group">
+								<button type="button"
+								        class="btn btn-sm"
+								        title="Do not hide unscheduled days and providers"
+								        ng-class=" { 'btn-addon': isScheduleView(),
+								                     'btn-primary': !isScheduleView() }"
+								        ng-click="scheduleController.changeScheduleView(scheduleController.scheduleViewEnum.all)">
+									All
+								</button>
+								<button type="button"
+								        class="btn btn-sm"
+								        title="Hide unscheduled days and providers"
+								        ng-class=" { 'btn-addon': !isScheduleView(),
+								                     'btn-primary': isScheduleView() }"
+								        ng-click="scheduleController.changeScheduleView(scheduleController.scheduleViewEnum.schedule)">
+									Scheduled
 								</button>
 							</div>
 						</div>
@@ -136,7 +157,24 @@
 				</div>
 			</div>
 		</div>
-		<div class="schedule-page-content">
+		<div class="schedule-page-content"
+		     ng-class="{ 'no-scroll' : showNoResources}"
+		>
+			<%-- ng-hide on the calendar causes event render issues,
+				 so zero state is shown by rendering content on top of an empty calendar and removing scroll bars --%>
+			<div class="zero-state-message" ng-show="showNoResources && isInitialized() && !calendarLoading">
+				<h1>No Providers Scheduled</h1>
+			</div>
+			<div class="loading-screen flex-row flex-grow justify-content-center"
+			     ng-show="calendarLoading || !isInitialized()"
+			>
+				<div class="flex-column justify-content-center vertical-align">
+					<h1>Loading...</h1>
+					<div class="loading-dot-container">
+						<div class="dot-pulse"></div>
+					</div>
+				</div>
+			</div>
 			<div
 					id="ca-calendar"
 					class="calendar"
@@ -146,5 +184,6 @@
 					ng-enabled="initialized"
 			></div>
 		</div>
+
 	</div>
 </div>

@@ -20,19 +20,20 @@
 // TODO: pre-existing CSS files, need to be reorganized
 @import "navbar-fixed-top";
 @import "index";
-@import "directives/date_picker";
-@import "directives/time_picker";
 @import "forms";
 @import "buttons";
 @import "modal"; // Style copied from clinicaid for schedule.
+@import "directives/date_picker";
+@import "directives/time_picker";
 @import "directives/toggle-switch";
 @import "directives/juno-checkbox";
 @import "directives/juno-select";
+@import "directives/juno-typeahead";
+@import "directives/juno-loading";
 // Section-specific things
 @import "../src/layout/leftAside";
 @import "../src/help/support";
 @import "../src/schedule/schedule";
-@import "directives/juno-typeahead";
 @import "../src/dashboard/dashboard";
 @import "../src/patient/patient";
 @import "../src/report/reports";

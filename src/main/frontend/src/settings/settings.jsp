@@ -197,9 +197,30 @@
 						<label>Period:</label>
 						<input ng-model="settingsCtrl.pref.period" placeholder="Period" class="form-control" type="text">
 					</div>
+					<ca-field-select
+							class="col-sm-6"
+							ca-name="settings-schedule-groupNo"
+							ca-title="Group No"
+							ca-template="label"
+							ca-model="settingsCtrl.pref.groupNo"
+							ca-options="settingsCtrl.scheduleOptions"
+					>
+					</ca-field-select>
+					<ca-field-select
+							class="col-sm-6"
+							<%--ca-hide="!eventController.sitesEnabled"--%>
+							ca-name="settings-schedule-site"
+							ca-title="Site"
+							ca-template="label"
+							ca-model="settingsCtrl.pref.siteSelected"
+							ca-options="settingsCtrl.siteOptions"
+							ca-empty-option="true"
+					>
+					</ca-field-select>
+
 					<div class="form-group col-sm-6">
-						<label>Group No:</label>
-						<input ng-model="settingsCtrl.pref.groupNo" placeholder="Group No" class="form-control" type="text">
+						<label>Length of patient name to display on appointment screen:</label>
+						<input ng-model="settingsCtrl.pref.patientNameLength" placeholder="Length" class="form-control" type="text">
 					</div>
 					<div class="form-group col-sm-6">
 						<label>Length of link and form names to display on appointment screen:</label>
@@ -221,7 +242,7 @@
 
 					<div class="form-group col-sm-6">
 						<label>Encounter Forms to display on appointment screen</label>
-						<div>
+						<div style="height:10em;border:solid grey 1px;overflow:auto;white-space:nowrap">
 							<span ng-repeat="f in settingsCtrl.encounterForms">
 								<input type="checkbox" ng-model="f.checked" ng-change="settingsCtrl.selectEncounterForms()" >{{f.formName}}<br/>
 							</span>

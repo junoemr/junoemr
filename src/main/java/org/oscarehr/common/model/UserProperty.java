@@ -68,7 +68,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String OFFICIAL_LAST_NAME="official_last_name";
     public static final String OFFICIAL_OLIS_IDTYPE="official_olis_idtype";
     public static final String OSCAR_MSG_RECVD="oscarMsgRecvd";
-    
+
     
     //added to user properties with new interface
     public static final String FAX = "fax";
@@ -78,6 +78,8 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String SCHEDULE_START_HOUR = "schedule.start_hour";
     public static final String SCHEDULE_END_HOUR = "schedule.end_hour";
     public static final String SCHEDULE_PERIOD = "schedule.period";
+    public static final String SCHEDULE_SITE = "schedule.site";
+    public static final String SCHEDULE_VIEW = "schedule.view";
     public static final String MYGROUP_NO = "mygroup_no";
     public static final String NEW_CME = "new_cme";
     public static final String ENCOUNTER_FORM_LENGTH = "encounter.form_length";
@@ -85,6 +87,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String EFORM_NAME = "encounter.eform_name";
     public static final String RX_SHOW_QR_CODE = "rx_show_qr_code";
     public static final String ENABLE_RX_WATERMARK = "enable_rx_watermark";
+    public static final String IS_BACKGROUND_RX_WATERMARK = "is_background_rx_watermark";
     public static final String MYMEDS = "mymeds";
     public static final String NEW_TICKLER_WARNING_WINDOW = "new_tickler_warning_window";
     public static final String CAISI_DEFAULT_PMM = "caisi.default_pmm";

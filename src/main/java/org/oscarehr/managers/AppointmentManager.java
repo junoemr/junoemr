@@ -25,6 +25,7 @@ package org.oscarehr.managers;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.appointment.dao.AppointmentStatusDao;
+import org.oscarehr.appointment.dto.AppointmentEditRecord;
 import org.oscarehr.appointment.model.AppointmentStatusList;
 import org.oscarehr.common.dao.AppointmentArchiveDao;
 import org.oscarehr.common.dao.LookupListDao;
@@ -34,18 +35,23 @@ import org.oscarehr.common.model.AppointmentArchive;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.common.model.LookupList;
 import org.oscarehr.common.model.LookupListItem;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
+import org.springframework.transaction.annotation.Transactional;
+import oscar.util.ConversionUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Service
+@Transactional
 public class AppointmentManager {
 
 	protected Logger logger = MiscUtils.getLogger();
@@ -216,7 +222,8 @@ public class AppointmentManager {
 
 		appointmentDao.merge(appointment);
 
-		return appointment.getStatus();
+		// return status without modifier
+		return appointment.getAppointmentStatus();
 	}
 
 	public Appointment getAppointment(LoggedInInfo loggedInInfo, int apptNo) {
@@ -227,19 +234,84 @@ public class AppointmentManager {
 		return appt;
 	}
 
-	public Appointment updateAppointmentStatus(LoggedInInfo loggedInInfo, int apptNo, String status) {
-		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null)) {
+	public Appointment updateAppointmentStatus(LoggedInInfo loggedInInfo, int apptNo, String status)
+	{
+		if(!securityInfoManager.hasPrivilege(loggedInInfo, "_appointment", "w", null))
+		{
 			throw new RuntimeException("Access Denied");
 		}
-		
+
 		Appointment appt = appointmentDao.find(apptNo);
-		if (appt != null) {
-			appointmentArchiveDao.archiveAppointment(appt);	
-		
+		if(appt != null)
+		{
+			appointmentArchiveDao.archiveAppointment(appt);
+
+			String rawStatus = appt.getStatus();
+			String statusModifier = "";
+			if(rawStatus != null && rawStatus.length() > 1)
+			{
+				statusModifier = rawStatus.substring(1,2);
+			}
+			status = status + statusModifier;
+
 			appt.setStatus(status);
 		}
 		appointmentDao.merge(appt);
 		return appt;
+	}
+
+	public List<AppointmentEditRecord> getAppointmentEdits(Integer appointmentNo)
+	{
+		List<AppointmentArchive> archiveList = appointmentArchiveDao.findByAppointmentId(appointmentNo, 100, 0);
+		List<AppointmentEditRecord> editList = new ArrayList<>(archiveList.size() + 1);
+
+		for(AppointmentArchive archive : archiveList)
+		{
+			AppointmentEditRecord editRecord = new AppointmentEditRecord();
+
+			editRecord.setId(archive.getId());
+			editRecord.setAppointmentNo(archive.getAppointmentNo());
+			editRecord.setDemographicNo(archive.getDemographicNo());
+			editRecord.setCreator(archive.getCreator());
+			editRecord.setProviderNo(archive.getProviderNo());
+			editRecord.setLastUpdateUser(archive.getLastUpdateUser());
+			editRecord.setCreateDateTime(ConversionUtils.toLocalDateTime(archive.getCreateDateTime()));
+			editRecord.setUpdateDateTime(ConversionUtils.toLocalDateTime(archive.getUpdateDateTime()));
+			editRecord.setAppointmentDate(
+					LocalDateTime.of(ConversionUtils.toLocalDateTime(archive.getAppointmentDate()).toLocalDate(),
+							ConversionUtils.toLocalDateTime(archive.getStartTime()).toLocalTime())
+			);
+
+			ProviderData lastUpdateProvider = archive.getLastUpdateUserRecord();
+			editRecord.setUpdateUserDisplayName(lastUpdateProvider.getDisplayName());
+
+			editList.add(editRecord);
+		}
+
+		//include the appointment record as the latest revision
+		Appointment currentRecord = appointmentDao.find(appointmentNo);
+		AppointmentEditRecord editRecord = new AppointmentEditRecord();
+
+		editRecord.setId(0); // no archive id //TODO ???
+		editRecord.setAppointmentNo(currentRecord.getId());
+		editRecord.setDemographicNo(currentRecord.getDemographicNo());
+		editRecord.setCreator(currentRecord.getCreator());
+		editRecord.setProviderNo(currentRecord.getProviderNo());
+		editRecord.setLastUpdateUser(currentRecord.getLastUpdateUser());
+		editRecord.setCreateDateTime(ConversionUtils.toLocalDateTime(currentRecord.getCreateDateTime()));
+		editRecord.setUpdateDateTime(ConversionUtils.toLocalDateTime(currentRecord.getUpdateDateTime()));
+		editRecord.setAppointmentDate(
+				LocalDateTime.of(ConversionUtils.toLocalDateTime(currentRecord.getAppointmentDate()).toLocalDate(),
+						ConversionUtils.toLocalDateTime(currentRecord.getStartTime()).toLocalTime())
+		);
+
+		ProviderData lastUpdateProvider = currentRecord.getLastUpdateUserRecord();
+		editRecord.setUpdateUserDisplayName(lastUpdateProvider.getDisplayName());
+
+		editList.add(editRecord);
+
+
+		return editList;
 	}
 
 	

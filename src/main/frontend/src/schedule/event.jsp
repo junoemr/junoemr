@@ -485,8 +485,8 @@
 						   class="list-group-item">
 
 							<div>
-								<span ng-if="$last">Provider {{record.creator}} created appointment on {{record.formattedCreateDate}} at {{record.formattedCreateTime}}</span>
-								<span ng-if="!$last">Provider {{record.lastUpdateUser}} updated appointment on {{record.formattedUpdateDate}} at {{record.formattedUpdateTime}}</span>
+								<span ng-if="$first">{{record.updateUserDisplayName}} created appointment on {{record.formattedCreateDate}} at {{record.formattedCreateTime}}</span>
+								<span ng-if="!$first">{{record.updateUserDisplayName}} updated appointment on {{record.formattedUpdateDate}} at {{record.formattedUpdateTime}}</span>
 							</div>
 						</span>
 					</div>
@@ -497,6 +497,16 @@
 
 	<div class="modal-footer">
 		<div class="bottom-buttons">
+			<div class="pull-left">
+				<button
+						type="button"
+						class="btn btn-danger"
+						ng-show="eventController.hasAppointmentId()"
+						juno-confirm-click="eventController.del()"
+						juno-confirm-message="Are you sure you want to delete this appointment?"
+						ng-disabled="isWorking()">Delete
+				</button>
+			</div>
 			<div class="pull-right">
 				<button
 						type="button"

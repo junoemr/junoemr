@@ -1,6 +1,7 @@
 import {AppointmentApi} from '../../generated/api/AppointmentApi';
 import {ScheduleApi} from '../../generated/api/ScheduleApi';
 import {SitesApi} from '../../generated/api/SitesApi';
+import {ProviderPreferenceApi} from '../../generated/api/ProviderPreferenceApi';
 
 angular.module('Schedule').controller('Schedule.ScheduleController', [
 
@@ -13,10 +14,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 	'$state',
 	'loadedSettings',
 	'providerService',
+	'providersService',
 	'focusService',
 	'securityService',
 	'scheduleService',
 	'uiCalendarConfig',
+	'globalStateService',
 
 	function (
 		$scope,
@@ -28,10 +31,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$state,
 		loadedSettings,
 		providerService,
+		providersService,
 		focusService,
 		securityService,
 		scheduleService,
-		uiCalendarConfig
+		uiCalendarConfig,
+		globalStateService
 	)
 	{
 		let controller = this;
@@ -46,6 +51,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.sitesApi = new SitesApi($http, $httpParamSerializer,
 			'../ws/rs');
 
+		$scope.providerPreferenceApi = new ProviderPreferenceApi($http, $httpParamSerializer,
+			'../ws/rs');
+
 		controller.providerSettings = loadedSettings;
 		controller.calendarMinColumnWidth = 250;
 
@@ -58,25 +66,20 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.calendarLoading = false;
 
 		$scope.uiConfig = {};
-		$scope.uiConfigApplied = {};
+		$scope.uiConfigApplied = {
+			calendar: {}
+		};
 		$scope.eventSources = [];
-		$scope.selectedSchedule = null;
-		$scope.selectedSiteName = null;
-		$scope.selectedTimeInterval = null;
 
-		// cpCalendar control object.  The cpCalendar directive puts its control API methods in
-		// this object.
+		// cpCalendar control object.  The cpCalendar directive puts its control API methods in this object.
 		$scope.cpCalendarControl = {};
 
-
 		// Parameters from directive controller
-
-
-		$scope.schedules = [];
 		$scope.scheduleOptions = [];
-		$scope.resourceOptions = [];
-		$scope.siteOptions = [];
-		$scope.defaultEventColor = "#333";
+		$scope.resourceOptionHash = {};
+		$scope.selectedResources = false;
+		$scope.showNoResources = false;
+
 		$scope.timeIntervalOptions = [
 			{
 				label: '5 min intervals',
@@ -100,25 +103,39 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}];
 		$scope.defaultTimeInterval = $scope.timeIntervalOptions[2].value;
 		$scope.selectedTimeInterval = $scope.defaultTimeInterval;
+		$scope.scheduleTimeInterval = null;
+
 		$scope.selectedSlotLabelInterval = {hours: 1};
-		$scope.defaultCalendarView = 'agendaDay';
 		$scope.availabilityTypes = {};
-		$scope.resourceOptionHash = {};
 		$scope.events = [];
 		$scope.scheduleTemplates = {};
 		$scope.sites = {};
+		$scope.siteOptions = [];
 		$scope.sitesEnabled = false;
+		$scope.selectedSiteName = null;
 
 		$scope.openingDialog = false;
 		$scope.dialog = null;
 
-
 		// Global State parameters
-		$scope.defaultDate = null;
-		$scope.selectedDate = null;
-		$scope.scheduleViewName = null;
-		$scope.scheduleDefault = null;
-		$scope.scheduleTimeInterval = null;
+		controller.calendarViewEnum = Object.freeze({
+			agendaDay: 'agendaDay',
+			agendaWeek: 'agendaWeek',
+			agendaMonth: 'month',
+		});
+		$scope.calendarViewDefault = controller.calendarViewEnum.agendaDay;
+		$scope.calendarViewName = null;
+
+		controller.scheduleViewEnum = Object.freeze({
+			schedule: 'schedule',
+			all: 'all',
+		});
+		controller.selectedScheduleView = controller.scheduleViewEnum.all;
+		controller.scheduleTypeEnum = Object.freeze({
+			group: 'GROUP',
+			provider: 'PROVIDER',
+		});
+		$scope.selectedSchedule = null;
 
 		controller.refreshSettings = {
 			timerVariable: null,
@@ -126,11 +143,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			preferredAutoRefreshMinutes: null
 		};
 
+		$scope.defaultDate = globalStateService.global_settings.schedule.date_selected;
 		$scope.datepickerSelectedDate = null;
 
 		$scope.init = function init()
 		{
-			$scope.uiConfig.calendar.defaultView = $scope.calendarViewName();
+			$scope.uiConfig.calendar.defaultView = $scope.getCalendarViewName();
 
 			$scope.loadAvailabilityTypes().then(function ()
 			{
@@ -138,14 +156,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					$scope.loadScheduleOptions().then(function ()
 					{
-						$scope.loadSiteOptions().then(function ()
+						controller.loadResourceHash().then(function ()
 						{
-							$scope.loadDefaultSelections();
-
-							$scope.loadSelectedSchedules().then(function ()
+							$scope.loadSiteOptions().then(function ()
 							{
-								$scope.setCalendarResources();
-
+								$scope.loadDefaultSelections();
 								$scope.setEventSources();
 
 								controller.initEventsAutoRefresh();
@@ -181,11 +196,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			return $scope.initialized && Juno.Common.Util.exists($scope.calendar());
 		};
 
-		$scope.hasSchedules = function hasSchedules()
-		{
-			return $scope.schedules.length > 0;
-		};
-
 		$scope.hasSites = function hasSites()
 		{
 			return $scope.sitesEnabled;
@@ -203,21 +213,21 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.getSiteOptions = function getSiteOptions()
 		{
-			if (!angular.isDefined($scope.selectedSite) || $scope.selectedSite === null)
-			{
-				$scope.selectedSite = $scope.siteOptions[0];
-			}
-
 			return $scope.siteOptions;
 		};
 
-		$scope.viewName = function viewName()
+		$scope.getCalendarViewName = function calendarViewName()
 		{
-			var viewName = $scope.scheduleViewName;
+			var viewName = $scope.calendarViewName;
 
 			if (!Juno.Common.Util.exists(viewName))
 			{
-				viewName = $scope.defaultCalendarView;
+				viewName = globalStateService.global_settings.schedule.view_selected;
+				if (!Juno.Common.Util.exists(viewName))
+				{
+					viewName = $scope.calendarViewDefault;
+				}
+				return viewName;
 			}
 
 			return viewName;
@@ -225,21 +235,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.calendarEvents = function calendarEvents(start, end, timezone, callback)
 		{
-			// load the events for each of the loaded schedules
-			var promise_array = [];
-			for (var i = 0; i < $scope.schedules.length; i++)
-			{
-				promise_array.push(
-					$scope.loadScheduleEvents(
-						$scope.schedules[i].uuid, $scope.selectedSiteName, start, end));
-			}
-
-			// once all the events are loaded, concat them together and callback
-			$q.all(promise_array).then(
-				function success(results_array)
+			$scope.loadScheduleEvents($scope.selectedSchedule, $scope.selectedSiteName, start, end).then(
+				function success()
 				{
-					$scope.events = Array.prototype.concat.apply([], results_array);
-
 					try
 					{
 						callback($scope.events);
@@ -254,11 +252,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.showTimeIntervals = function showTimeIntervals()
 		{
-			return $scope.viewName() !== 'month';
+			return $scope.getCalendarViewName() !== controller.calendarViewEnum.agendaMonth;
 		};
 
 		controller.changeToSchedule = function (resourceId, view)
 		{
+			$scope.selectedSchedule = null;
 			var scheduleOptions = $scope.getScheduleOptions();
 
 			for (var i = 0; i < scheduleOptions.length; i++)
@@ -270,35 +269,56 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				}
 			}
 
-			//TODO prevent the double schedule loading calls
+			// set the selected schedule to an object not in the options list.
+			// this will show as an empty option when selected, but will be removed once de-selected.
+			// this allows selection of inactive providers schedules
+			if($scope.selectedSchedule === null)
+			{
+				var scheduleData = $scope.resourceOptionHash[resourceId];
+
+				scheduleData.label = scheduleData.title;
+				scheduleData.uuid = scheduleData.id;
+				scheduleData.value = scheduleData.id;
+				scheduleData.identifier = scheduleData.id;
+				scheduleData.identifierType = controller.scheduleTypeEnum.provider;
+				scheduleData.providerNos = [resourceId];
+
+				$scope.selectedSchedule = scheduleData;
+			}
+
+			$scope.calendarViewName = view;
 			$scope.onScheduleChanged();
-			$scope.changeView(view);
 		};
 
-		$scope.changeView = function changeView(view)
+		/* changes the calender view
+		view must be one of agendaDay, agendaWeek, agendaMonth enum values*/
+		$scope.changeCalendarView = function changeCalendarView(view)
 		{
-			// if switching to or from resourceDay view, need to update schedules
-			var reload_schedules = false;
-			if (view === 'resourceDay' || $scope.scheduleViewName === 'resourceDay')
+			if ($scope.calendarViewName !== view)
 			{
-				reload_schedules = true;
-			}
+				// save the new view to global state so it gets picked up in rendering
+				$scope.calendarViewName = view;
+				globalStateService.global_settings.schedule.view_selected = $scope.calendarViewName;
 
-			// save the new view to global state so it gets picked up in rendering
-			$scope.scheduleViewName = view;
-
-			if (reload_schedules)
-			{
-				$scope.loadSelectedSchedules().then(
-					function success()
-					{
-						$scope.setCalendarResources();
-						$scope.updateCalendarView();
-					});
+				$scope.calendar().fullCalendar('changeView', $scope.getCalendarViewName());
 			}
-			else
+		};
+
+		/* chances the schedule view type
+		* must be one of the all or schedule enum values*/
+		controller.changeScheduleView = function (view)
+		{
+			if (controller.selectedScheduleView !== view)
 			{
-				$scope.updateCalendarView();
+				$scope.providerPreferenceApi.updateProviderSetting(securityService.getUser().providerNo, "schedule.view", view)
+					.then(
+						function success()
+						{
+							controller.selectedScheduleView = view;
+							$scope.refetchEvents();
+						}
+					);
+
 			}
 		};
 
@@ -309,42 +329,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.stepForward = function stepForward()
 		{
 			$scope.calendar().fullCalendar('next');
-		};
-
-		$scope.showLegend = function showLegend()
-		{
-			// if already opening a dialog or have one open, ignore and return
-			if ($scope.openingDialog || $scope.dialog)
-			{
-				return;
-			}
-			$scope.openingDialog = true;
-
-			var data = {
-				event_statuses: scheduleService.eventStatuses,
-				availability_types: $scope.availabilityTypes
-			};
-
-			$scope.dialog = $uibModal.open({
-				animation: false,
-				backdrop: 'static',
-				controller: 'Schedule.LegendController',
-				templateUrl: 'code/schedule/legend.html',
-				resolve: {
-					data: function ()
-					{
-						return data
-					}
-				}
-			});
-
-			// when the dialog closes clear the variable
-			$scope.dialog.closed.then(function ()
-			{
-				$scope.dialog = null;
-			});
-
-			$scope.openingDialog = false;
 		};
 
 		$scope.refetchEvents = function refetchEvents()
@@ -359,12 +343,22 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.changeDate = function changeDate(date)
 		{
+			globalStateService.global_settings.schedule.date_selected = date;
+			$scope.uiConfig.calendar.defaultDate = date;
 			$scope.calendar().fullCalendar('gotoDate', date);
 		};
 
 		$scope.isAgendaView = function isAgendaView()
 		{
-			return ($scope.viewName() != 'resourceDay')
+			return ($scope.uiConfigApplied.calendar.resources === null || $scope.uiConfigApplied.calendar.resources === false)
+		};
+		$scope.isResourceView = function isResourceView()
+		{
+			return ($scope.uiConfigApplied.calendar.resources !== null && $scope.uiConfigApplied.calendar.resources !== false)
+		};
+		$scope.isScheduleView = function ()
+		{
+			return (controller.selectedScheduleView === controller.scheduleViewEnum.schedule);
 		};
 
 		//=========================================================================
@@ -402,166 +396,35 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			return null;
 		};
 
+		controller.getSelectedScheduleView = function ()
+		{
+			var preference = controller.providerSettings.viewSelected;
+			if (Juno.Common.Util.exists(preference) && (preference === controller.scheduleViewEnum.schedule))
+			{
+				return controller.scheduleViewEnum.schedule;
+			}
+			return controller.scheduleViewEnum.all;
+		};
+
+		controller.getSelectedSite = function ()
+		{
+			var preference = controller.providerSettings.siteSelected;
+			if (Juno.Common.Util.exists(preference))
+			{
+				return preference;
+			}
+			return null;
+		};
+
 		controller.hasPatientSelected = function hasPatientSelected(calEvent)
 		{
 			return Juno.Common.Util.exists(calEvent.data.demographicNo)
 				&& Number(calEvent.data.demographicNo) > 0;
 		};
 
-		$scope.loadSelectedSchedules = function loadSelectedSchedules()
-		{
-			var deferred = $q.defer();
-
-			var promiseArray = [];
-
-			if (
-				Juno.Common.Util.exists($scope.selectedSchedule.providerNos) &&
-				angular.isArray($scope.selectedSchedule.providerNos)
-			)
-			{
-				// TODO: this is really gross and I don't like it
-				// Potentially put this in the calendarApiAdapter
-				angular.forEach($scope.selectedSchedule.providerNos, function (providerNo)
-				{
-					promiseArray.push($scope.loadSchedule(providerNo.toString()));
-				});
-
-				if ($scope.selectedSchedule.providerNos.length > 1)
-				{
-					// Set the calendar to resource mode.  All of these values need to be set.
-					$scope.selectedResources = $scope.buildSelectedResources($scope.selectedSchedule.providerNos);
-					$scope.uiConfig.calendar.resources = $scope.selectedResources;
-					$scope.uiConfig.calendar.defaultView = "resourceDay";
-
-					// save the new view to global state so it gets picked up in rendering
-					$scope.scheduleViewName = 'resourceDay';
-					$scope.updateCalendarView();
-				}
-				else
-				{
-					// Reset everything to single-provider view mode
-					$scope.uiConfig.calendar.defaultView = "agendaDay";
-					$scope.scheduleViewName = 'agendaDay';
-					$scope.uiConfig.calendar.resources = false;
-				}
-
-				$scope.applyUiConfig($scope.uiConfig);
-			}
-			else if (
-				$scope.viewName() !== 'resourceDay' &&
-				$scope.selectedSchedule !== null
-			)
-			{
-				promiseArray.push(
-					$scope.loadSchedule($scope.selectedSchedule.uuid));
-			}
-			else
-			{
-				angular.forEach($scope.selectedResources, function (selected)
-				{
-					promiseArray.push($scope.loadSchedule(selected.uuid));
-				});
-			}
-
-			// Loop through the schedules added above and add them to the schedule list.
-			$q.all(promiseArray).then(
-				function success(resultsArray)
-				{
-					$scope.schedules = [];
-					for (var i = 0; i < resultsArray.length; i++)
-					{
-						$scope.schedules[i] = resultsArray[i].data;
-					}
-					deferred.resolve(resultsArray);
-				}, function error(errors)
-				{
-					console.log('errors');
-				});
-
-			return deferred.promise;
-		};
-
-		$scope.loadSchedule = function loadSchedule(providerId)
-		{
-			var deferred = $q.defer();
-
-			// TODO: fill up availabilities and relations, or figure out how to show that info without them
-			var schedule = {
-				uuid: providerId,
-				availabilities: [], // TODO: figure out if these have a Juno equivalent, I don't think
-			                        // TODO: they do.  They are things like holidays and vacation days
-				relations: [],
-				events: []
-			};
-
-			deferred.resolve({data: schedule});
-
-			return deferred.promise;
-		};
-
-		$scope.updateCalendarView = function updateCalendarView()
-		{
-			$scope.uiConfig.calendar.defaultView = $scope.calendarViewName();
-			$scope.applyUiConfig($scope.uiConfig);
-		};
-
-		// This gets the view name, but if it's resourceDay, it will get agendaDay.
-		// TODO Not sure why this works this way.  Maybe it uses it to get a day of events for each
-		//      resource in the resource list?
-		$scope.calendarViewName = function calendarViewName()
-		{
-			var view = $scope.viewName();
-			if (view == 'resourceDay')
-			{
-				view = 'agendaDay';
-			}
-			return view;
-		};
-
 		$scope.setCalendarLoading = function setCalendarLoading(isLoading)
 		{
 			$scope.calendarLoading = isLoading;
-		};
-
-		$scope.getLoadedSchedule = function getLoadedSchedule(uuid)
-		{
-			var schedule = null;
-			for (var i = 0; i < $scope.schedules.length; i++)
-			{
-				if ($scope.schedules[i].uuid === uuid)
-				{
-					schedule = $scope.schedules[i];
-					break;
-				}
-			}
-			return schedule;
-		};
-
-		// TODO: change this, perhaps?  It is getting the resource details from the groups
-		$scope.buildSelectedResources = function buildSelectedResources(providerNos)
-		{
-			var selectedResources = [];
-
-			for (var i = 0; i < providerNos.length; i++)
-			{
-				selectedResources.push($scope.resourceOptionHash[providerNos[i]]);
-			}
-
-			return selectedResources;
-		};
-
-		$scope.setCalendarResources = function setCalendarResources()
-		{
-			if ($scope.viewName() === 'resourceDay')
-			{
-				$scope.uiConfig.calendar.resources = $scope.selectedResources;
-			}
-			else
-			{
-				$scope.uiConfig.calendar.resources = false;
-			}
-
-			$scope.applyUiConfig($scope.uiConfig);
 		};
 
 		$scope.setEventSources = function setEventSources()
@@ -577,47 +440,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.timeIntervalMinutes = function timeIntervalMinutes()
 		{
 			return parseInt($scope.selectedTimeInterval.split(":")[1]);
-		};
-
-		$scope.loadAvailabilityTypes = function loadAvailabilityTypes()
-		{
-			var deferred = $q.defer();
-			var availabilityTypes = {};
-
-			$scope.scheduleApi.getScheduleTemplateCodes().then(
-				function success(rawResults)
-				{
-					var results = rawResults.data.body;
-					for (var i = 0; i < results.length; i++)
-					{
-						var result = results[i];
-
-						availabilityTypes[result.code] = angular.copy(result);
-					}
-
-					$scope.availabilityTypes = availabilityTypes;
-					deferred.resolve(availabilityTypes);
-				});
-
-			return deferred.promise;
-		};
-
-		$scope.loadDefaultSelections = function loadDefaultSelections()
-		{
-			$scope.selectedSchedule = $scope.getSelectedSchedule($scope.scheduleOptions);
-
-			//$scope.selectedResources = $scope.getSelectedResources($scope.resourceOptions);
-
-			$scope.selectedTimeInterval = $scope.getSelectedTimeInterval(
-				$scope.timeIntervalOptions, $scope.defaultTimeInterval);
-			$scope.uiConfig.calendar.slotDuration = $scope.selectedTimeInterval;
-			$scope.uiConfig.calendar.slotLabelInterval = $scope.selectedSlotLabelInterval;
-
-			$scope.uiConfig.calendar.minTime = $scope.getScheduleMinTime();
-			$scope.uiConfig.calendar.maxTime = $scope.getScheduleMaxTime();
-
-			// scroll so that one hour ago is the top of the calendar
-			$scope.uiConfig.calendar.scrollTime = moment().subtract(1, 'hours').format('HH:mm:ss');
 		};
 
 		$scope.getSelectedTimeInterval = function getSelectedTimeInterval(
@@ -683,7 +505,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			return timeStr;
 		};
 
-		$scope.loadScheduleEvents = function loadScheduleEvents(providerId, siteName, start, end)
+		$scope.loadScheduleEvents = function loadScheduleEvents(selectedSchedule, siteName, start, end)
 		{
 			var deferred = $q.defer();
 
@@ -693,8 +515,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			var startDateString = start.format(Juno.Common.Util.settings.date_format);
 			var endDateString = end.subtract(1, 'seconds').format(Juno.Common.Util.settings.date_format);
 
-			$scope.scheduleApi.getCalendarEvents(
-				providerId,
+			$scope.scheduleApi.getCalendarSchedule(
+				selectedSchedule.identifier,
+				selectedSchedule.identifierType,
+				$scope.isScheduleView(),
 				startDateString,
 				endDateString,
 				$scope.getScheduleMinTime(),
@@ -704,6 +528,47 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			).then(
 				function (results)
 				{
+					if (selectedSchedule.identifierType === controller.scheduleTypeEnum.group)
+					{
+						var providerNos = results.data.body.providerIdList;
+
+						// Set the calendar to resource mode.  All of these values need to be set.
+						$scope.selectedResources = controller.buildSelectedResources(providerNos);
+						$scope.uiConfig.calendar.resources = $scope.selectedResources;
+
+						// always show day view in resource mode
+						$scope.uiConfig.calendar.defaultView = controller.calendarViewEnum.agendaDay;
+						$scope.calendarViewName = controller.calendarViewEnum.agendaDay;
+
+						$scope.showNoResources = (providerNos.length === 0);
+						$scope.uiConfig.calendar.hiddenDays = [];
+					}
+					else
+					{
+						// Reset everything to single-provider view mode
+						$scope.uiConfig.calendar.defaultView = $scope.getCalendarViewName();
+						$scope.calendarViewName = $scope.getCalendarViewName();
+						$scope.uiConfig.calendar.resources = false;
+
+						$scope.showNoResources = false;
+						$scope.uiConfig.calendar.hiddenDays = [];
+
+						var hiddenDays = results.data.body.hiddenDaysList;
+						if(hiddenDays.length === 7)
+						{
+							// hiding all days causes an error in fullCalendar, so instead hide the calendar with the no schedules screen
+							$scope.showNoResources = true;
+						}
+						// only hide days in week/month views. limiting day view causes re-fetch errors when changing to week view
+						else if ($scope.calendarViewName === controller.calendarViewEnum.agendaWeek
+							  || $scope.calendarViewName === controller.calendarViewEnum.agendaMonth)
+						{
+							$scope.uiConfig.calendar.hiddenDays = hiddenDays; // hide days without schedules
+						}
+					}
+					$scope.applyUiConfig($scope.uiConfig);
+					$scope.events = results.data.body.eventList;
+
 					deferred.resolve(results.data.body);
 				},
 				function (results)
@@ -713,6 +578,40 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			);
 
 			return deferred.promise;
+		};
+
+		// TODO: change this, perhaps?  It is getting the resource details from the groups
+		controller.buildSelectedResources = function buildSelectedResources(providerNos)
+		{
+			var selectedResources = [];
+
+			for (var i = 0; i < providerNos.length; i++)
+			{
+				var resourceOption = $scope.resourceOptionHash[providerNos[i]];
+				if (resourceOption)
+				{
+					selectedResources.push(resourceOption);
+				}
+				else
+				{
+					console.warn('Attempt to load invalid resource id: ' + providerNos[i]);
+				}
+			}
+
+			return selectedResources;
+		};
+		$scope.setCalendarResources = function setCalendarResources(resourceView)
+		{
+			if (resourceView)
+			{
+				$scope.uiConfig.calendar.resources = $scope.selectedResources;
+			}
+			else
+			{
+				$scope.uiConfig.calendar.resources = false;
+			}
+
+			$scope.applyUiConfig($scope.uiConfig);
 		};
 
 		$scope.saveEvent = function saveEvent(editMode, calendarAppointment)
@@ -811,7 +710,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			var status = (results || {}).status;
 
-			if (status == 'SUCCESS')
+			if (status === 'SUCCESS')
 			{
 				return true;
 			}
@@ -901,7 +800,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				eventElement.html(require('./view-event.html'));
 
 				let statusElem = eventElement.find('.icon-status');
+				let labelElem = eventElement.find('.event-label');
 				let detailElem = eventElement.find('.event-details');
+				let selfBookElem = eventElement.find('.self-book-indicator');
 
 				// var eventSiteHtml = '';
 				// var eventSite = $scope.sites[event.data.site];
@@ -918,7 +819,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let eventStatus = scheduleService.eventStatuses[event.data.eventStatusCode];
 				if (Juno.Common.Util.exists(eventStatus))
 				{
-					statusElem.attr("title", Juno.Common.Util.escapeHtml(eventStatus.name));
+					statusElem.attr("title", eventStatus.name);
 
 					if (Juno.Common.Util.exists(eventStatus.icon))
 					{
@@ -927,7 +828,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					}
 					else
 					{
-						statusElem.text(Juno.Common.Util.escapeHtml(eventStatus.displayLetter));
+						statusElem.text(eventStatus.displayLetter);
 					}
 
 					if (Juno.Common.Util.exists(eventStatus.sortOrder))
@@ -951,27 +852,28 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				}
 				else if (!Juno.Common.Util.isBlank(event.data.demographicName))
 				{
-					eventName = Juno.Common.Util.escapeHtml(event.data.demographicName);
+					eventName = event.data.demographicName;
 				}
 				else if (!Juno.Common.Util.isBlank(event.data.appointmentName))
 				{
-					eventName = Juno.Common.Util.escapeHtml(event.data.appointmentName);
+					eventName = event.data.appointmentName;
 				}
 
 				if (!Juno.Common.Util.isBlank(event.data.reason))
 				{
-					eventReason = Juno.Common.Util.escapeHtml(event.data.reason);
+					eventReason = event.data.reason;
 				}
 				if (!Juno.Common.Util.isBlank(event.data.notes))
 				{
-					eventNotes = Juno.Common.Util.escapeHtml(event.data.notes);
+					eventNotes = event.data.notes;
 				}
 
-				var detailText = eventName;
-				if(!Juno.Common.Util.isBlank(eventReason))
+				var detailText = "";
+				if (!Juno.Common.Util.isBlank(eventReason))
 				{
-					detailText += " (" + eventReason + ")";
+					detailText += "(" + eventReason + ")";
 				}
+				labelElem.text(eventName);
 				detailElem.text(detailText);
 
 				let eventTitle = eventName + "\n" +
@@ -986,12 +888,19 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					linkElements.hide();
 				}
 
-				var maxNameLengthProp = controller.providerSettings.appointmentScreenLinkNameDisplayLength;
+				// mark self booked appointments
+				if(Juno.Common.Util.exists(event.data.tagSelfBooked) && event.data.tagSelfBooked)
+				{
+					selfBookElem.addClass('visible');
+					selfBookElem.attr("title", "Self Booked");
+				}
+
+				var maxNameLengthProp = controller.providerSettings.patientNameLength;
 				if (Juno.Common.Util.exists(maxNameLengthProp)
 					&& Juno.Common.Util.isIntegerString(maxNameLengthProp)
 					&& Number(maxNameLengthProp) > 0)
 				{
-					detailElem.css(
+					labelElem.css(
 						{
 							'max-width': maxNameLengthProp + 'ch',
 							'text-overflow': 'clip',
@@ -1004,13 +913,20 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			else //background events (appointment slots)
 			{
 				element.html(require('./view-backgroundEvent.html'));
+				var scheduleCodeElement = element.find(".background-event-schedulecode");
+
 				if (Juno.Common.Util.exists(event.color))
 				{
-					element.find(".background-event-schedulecode").css("background-color", Juno.Common.Util.escapeHtml(event.color))
+					scheduleCodeElement.css("background-color", event.color)
 				}
 				if (Juno.Common.Util.exists(event.scheduleTemplateCode))
 				{
-					element.find(".background-event-schedulecode").text(event.scheduleTemplateCode);
+					scheduleCodeElement.text(event.scheduleTemplateCode);
+
+					if (Juno.Common.Util.exists(event.availabilityType.name))
+					{
+						scheduleCodeElement.attr("title", event.availabilityType.name);
+					}
 				}
 				if (Juno.Common.Util.exists(event.start) && event.start.minute() === 0) // on the hour
 				{
@@ -1022,11 +938,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.onViewRender = function onViewRender(view, element)
 		{
-			if ($scope.isInitialized() && $scope.calendar())
+			if ($scope.isInitialized())
 			{
-				$scope.selectedDate = moment(Juno.Common.Util.formatMomentDate(
-					moment($scope.calendar().fullCalendar('getDate'))));
-				$scope.datepickerSelectedDate = Juno.Common.Util.formatMomentDate($scope.selectedDate);
+				$scope.datepickerSelectedDate = Juno.Common.Util.formatMomentDate(moment($scope.calendar().fullCalendar('getDate')));
 			}
 
 			// Voodoo to set the resource view column width from https://stackoverflow.com/a/39297864
@@ -1068,12 +982,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			else if ($(jsEvent.target).is(".onclick-week-view"))
 			{
 				console.info("onclick-week-view clicked");
-				controller.changeToSchedule(resourceId, 'agendaWeek');
+				controller.changeToSchedule(resourceId, controller.calendarViewEnum.agendaWeek);
 			}
 			else if ($(jsEvent.target).is(".onclick-month-view"))
 			{
 				console.info("onclick-month-view clicked");
-				controller.changeToSchedule(resourceId, 'month');
+				controller.changeToSchedule(resourceId, controller.calendarViewEnum.agendaMonth);
 			}
 		};
 
@@ -1105,136 +1019,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 		};
 
-		$scope.openCreateEventDialog = function openCreateEventDialog(
-			start, end, jsEvent, view, resource)
-		{
-			// XXX: share as much code as possible with edit event
-			if (!securityService.hasPermission('scheduling_create'))
-			{
-				return;
-			}
-
-			// if already opening a dialog or have one open, ignore and return
-			if ($scope.openingDialog || $scope.dialog)
-			{
-				return;
-			}
-			$scope.openingDialog = true;
-
-			var scheduleUuid = null;
-			var displayName = "";
-			if (Juno.Common.Util.exists(resource))
-			{
-				scheduleUuid = resource.id;
-				displayName = resource.display_name;
-			}
-			else if ($scope.selectedSchedule !== null)
-			{
-				scheduleUuid = $scope.selectedSchedule.uuid;
-			}
-
-			var schedule = $scope.getLoadedSchedule(scheduleUuid);
-			if (schedule !== null)
-			{
-				//var defaultEventStatus = schedule.new_event_status_uuid;
-
-				var modalSchedule = angular.copy(schedule);
-				modalSchedule.display_name = displayName;
-
-				var data = {
-					schedule: modalSchedule,
-					defaultEventStatus: 't', //defaultEventStatus,
-					startTime: start,
-					endTime: end,
-					timeInterval: $scope.timeIntervalMinutes(),
-					scheduleTemplates: $scope.scheduleTemplates,
-					availabilityTypes: $scope.availabilityTypes,
-					sites: $scope.sites,
-					events: $scope.events,
-					eventData: {}
-				};
-
-				$scope.dialog = $uibModal.open({
-					animation: false,
-					backdrop: 'static',
-					controller: 'Schedule.EventController as eventController',
-					templateUrl: 'src/schedule/event.jsp',
-					resolve: {
-						type: [function ()
-						{
-							return 'create_edit_event'
-						}],
-						label: [function ()
-						{
-							return 'Appointment'
-						}],
-						parentScope: [function ()
-						{
-							return $scope
-						}],
-						data: [function ()
-						{
-							return data
-						}],
-						editMode: [function ()
-						{
-							return false
-						}],
-						keyBinding: [function ()
-						{
-							return {
-								bindKeyGlobal: function ()
-								{
-								}
-							}
-						}],
-						focus: [function ()
-						{
-							return focusService
-						}],
-					},
-					windowClass: "juno-modal",
-				});
-
-				$scope.dialog.result.catch(function (res)
-				{
-					if (!(res === 'cancel' || res === 'escape key press'))
-					{
-						throw res;
-					}
-				});
-
-				// when the dialog closes clear the variable
-				$scope.dialog.closed.then(function ()
-				{
-					$scope.dialog = null;
-				});
-			}
-
-			$scope.openingDialog = false;
-		};
-
-		// XXX: make this work
-		$scope.openPatientDialog = function openPatientDialog(editModeCallback, onSaveCallback,
-		                                                      loadErrorLinkPatientFn)
-		{
-			//global_state.enable_keyboard_shortcuts = false;
-
-			return this.$uibModal.open({
-				animation: false,
-				backdrop: 'static',
-				size: 'lg',
-				controller: 'Invoice.Common.Patient.FormController',
-				templateUrl: 'code/invoice/common/patient/quick_form.html',
-				resolve: {
-					edit_mode: editModeCallback,
-					on_save_callback: onSaveCallback,
-					load_error_link_patient_fn: loadErrorLinkPatientFn
-				}
-			});
-		};
-
-
 		controller.openEncounterPage = function (calEvent)
 		{
 			if (calEvent.data.demographicNo !== 0)
@@ -1259,7 +1043,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				window.open(scheduleService.getEncounterLink(params));
 			}
 		};
-		controller.openBillingPage = function(calEvent)
+		controller.openBillingPage = function (calEvent)
 		{
 			if (calEvent.data.demographicNo !== 0)
 			{
@@ -1288,23 +1072,17 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				window.open(scheduleService.getBillingLink(params));
 			}
 		};
-		controller.openMasterRecord = function(calEvent)
+		controller.openMasterRecord = function (calEvent)
 		{
 			if (calEvent.data.demographicNo !== 0)
 			{
 				var params = {
 					demographicNo: calEvent.data.demographicNo
 				};
-
-				if (angular.isDefined(calEvent.data.appointmentNo))
-				{
-					params.appointmentNo = calEvent.data.appointmentNo;
-					params.encType = "face to face encounter with client";
-				}
-				$state.go('record.summary', params);
+				$state.go('record.details', params);
 			}
 		};
-		controller.openRxPage = function(calEvent)
+		controller.openRxPage = function (calEvent)
 		{
 			if (calEvent.data.demographicNo !== 0)
 			{
@@ -1314,6 +1092,121 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				};
 				window.open(scheduleService.getRxLink(params));
 			}
+		};
+
+		controller.openDaysheet = function (resourceId)
+		{
+			var formattedDate = $scope.datepickerSelectedDate;
+			var win = window.open('../report/reportdaysheet.jsp' +
+				'?dsmode=all' +
+				'&provider_no=' + encodeURIComponent(resourceId) +
+				'&sdate=' + encodeURIComponent(formattedDate) +
+				'&edate=' + encodeURIComponent(formattedDate),
+				'daysheet', 'height=700,width=1024,scrollbars=1');
+			win.focus();
+		};
+
+
+		$scope.openCreateEventDialog = function openCreateEventDialog(
+			start, end, jsEvent, view, resource)
+		{
+			// XXX: share as much code as possible with edit event
+			if (!securityService.hasPermission('scheduling_create'))
+			{
+				return;
+			}
+
+			// if already opening a dialog or have one open, ignore and return
+			if ($scope.openingDialog || $scope.dialog)
+			{
+				return;
+			}
+			$scope.openingDialog = true;
+
+			var scheduleUuid = null;
+			var displayName = "";
+			if (Juno.Common.Util.exists(resource))
+			{
+				scheduleUuid = resource.id;
+				displayName = resource.display_name;
+			}
+			else if ($scope.selectedSchedule !== null)
+			{
+				scheduleUuid = $scope.selectedSchedule.uuid;
+			}
+
+			var data = {
+				schedule: {
+					uuid: scheduleUuid,
+					display_name: displayName
+				},
+				defaultEventStatus: 't', //defaultEventStatus,
+				startTime: start,
+				endTime: end,
+				timeInterval: $scope.timeIntervalMinutes(),
+				scheduleTemplates: $scope.scheduleTemplates,
+				availabilityTypes: $scope.availabilityTypes,
+				sites: $scope.sites,
+				events: $scope.events,
+				eventData: {}
+			};
+
+			$scope.dialog = $uibModal.open({
+				animation: false,
+				backdrop: 'static',
+				controller: 'Schedule.EventController as eventController',
+				templateUrl: 'src/schedule/event.jsp',
+				resolve: {
+					type: [function ()
+					{
+						return 'create_edit_event'
+					}],
+					label: [function ()
+					{
+						return 'Appointment'
+					}],
+					parentScope: [function ()
+					{
+						return $scope
+					}],
+					data: [function ()
+					{
+						return data
+					}],
+					editMode: [function ()
+					{
+						return false
+					}],
+					keyBinding: [function ()
+					{
+						return {
+							bindKeyGlobal: function ()
+							{
+							}
+						}
+					}],
+					focus: [function ()
+					{
+						return focusService
+					}],
+				},
+				windowClass: "juno-modal",
+			});
+
+			$scope.dialog.result.catch(function (res)
+			{
+				if (!(res === 'cancel' || res === 'escape key press'))
+				{
+					throw res;
+				}
+			});
+
+			// when the dialog closes clear the variable
+			$scope.dialog.closed.then(function ()
+			{
+				$scope.dialog = null;
+			});
+			$scope.openingDialog = false;
 		};
 
 		$scope.openEditEventDialog = function openEditEventDialog(calEvent)
@@ -1339,83 +1232,76 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				displayName = '';
 			}
 
-			var schedule = $scope.getLoadedSchedule(scheduleUuid);
+			var data = {
+				schedule: {
+					uuid: scheduleUuid,
+					display_name: displayName
+				},
+				defaultEventStatus: null, //defaultEventStatus,
+				startTime: calEvent.start,
+				endTime: calEvent.end,
+				timeInterval: $scope.timeIntervalMinutes(),
+				availabilityTypes: $scope.availabilityTypes,
+				sites: $scope.sites,
+				events: $scope.events,
+				eventData: calEvent.data
+			};
 
-			if (schedule !== null)
-			{
-				//var defaultEventStatus = schedule.new_event_status_uuid;
-
-				var modalSchedule = angular.copy(schedule);
-				modalSchedule.display_name = displayName;
-
-				var data = {
-					schedule: modalSchedule,
-					defaultEventStatus: null, //defaultEventStatus,
-					startTime: calEvent.start,
-					endTime: calEvent.end,
-					timeInterval: $scope.timeIntervalMinutes(),
-					availabilityTypes: $scope.availabilityTypes,
-					sites: $scope.sites,
-					events: $scope.events,
-					eventData: calEvent.data
-				};
-
-				$scope.dialog = $uibModal.open({
-					animation: false,
-					backdrop: 'static',
-					controller: 'Schedule.EventController as eventController',
-					templateUrl: 'src/schedule/event.jsp',
-					resolve: {
-						type: [function ()
-						{
-							return 'create_edit_event'
-						}],
-						label: [function ()
-						{
-							return 'Appointment'
-						}],
-						parentScope: [function ()
-						{
-							return $scope
-						}],
-						data: [function ()
-						{
-							return data
-						}],
-						editMode: [function ()
-						{
-							return true
-						}],
-						keyBinding: [function ()
-						{
-							return {
-								bindKeyGlobal: function ()
-								{
-								}
-							}
-						}],
-						focus: [function ()
-						{
-							return focusService
-						}],
-					},
-					windowClass: "juno-modal",
-				});
-
-				$scope.dialog.result.catch(function (res)
-				{
-					if (!(res === 'cancel' || res === 'escape key press'))
+			$scope.dialog = $uibModal.open({
+				animation: false,
+				backdrop: 'static',
+				controller: 'Schedule.EventController as eventController',
+				templateUrl: 'src/schedule/event.jsp',
+				resolve: {
+					type: [function ()
 					{
-						throw res;
-					}
-				});
+						return 'create_edit_event'
+					}],
+					label: [function ()
+					{
+						return 'Appointment'
+					}],
+					parentScope: [function ()
+					{
+						return $scope
+					}],
+					data: [function ()
+					{
+						return data
+					}],
+					editMode: [function ()
+					{
+						return true
+					}],
+					keyBinding: [function ()
+					{
+						return {
+							bindKeyGlobal: function ()
+							{
+							}
+						}
+					}],
+					focus: [function ()
+					{
+						return focusService
+					}],
+				},
+				windowClass: "juno-modal",
+			});
 
-				// when the dialog closes clear the variable
-				$scope.dialog.closed.then(function ()
+			$scope.dialog.result.catch(function (res)
+			{
+				if (!(res === 'cancel' || res === 'escape key press'))
 				{
-					$scope.dialog = null;
-				});
-			}
+					throw res;
+				}
+			});
+
+			// when the dialog closes clear the variable
+			$scope.dialog.closed.then(function ()
+			{
+				$scope.dialog = null;
+			});
 
 			$scope.openingDialog = false;
 		};
@@ -1486,43 +1372,74 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.onSiteChanged = function onSiteChanged()
 		{
-			return $scope.onScheduleChanged();
+			var selectedSiteName = $scope.selectedSiteName;
+			if (!Juno.Common.Util.exists(selectedSiteName))
+			{
+				$scope.selectedSiteName = null;
+			}
+
+			$scope.providerPreferenceApi.updateProviderSetting(securityService.getUser().providerNo, "schedule.site", $scope.selectedSiteName)
+				.then(
+					function success()
+					{
+						controller.providerSettings.siteSelected = $scope.selectedSiteName;
+						$scope.refetchEvents();
+					}
+				);
 		};
 
 		$scope.onScheduleChanged = function onScheduleChanged()
 		{
 			var selectedSchedule = $scope.selectedSchedule;
-			var selectedSiteName = $scope.selectedSiteName;
 
 			if (!Juno.Common.Util.exists(selectedSchedule))
 			{
 				return;
 			}
 
-			if (Juno.Common.Util.exists(selectedSiteName))
-			{
-				$scope.selectedSiteName = selectedSiteName;
-			}
-			else
-			{
-				$scope.selectedSiteName = null;
-			}
+			$scope.providerPreferenceApi.updateProviderSetting(securityService.getUser().providerNo, "myGroupNo", selectedSchedule.identifier)
+				.then(
+					function success()
+					{
+						controller.providerSettings.groupNo = selectedSchedule.identifier;
 
-			// reload the schedule and then events data, triggering a rerender
-			$scope.loadSelectedSchedules().then($scope.refetchEvents);
+						var isGroupSchedule = (selectedSchedule.identifierType === controller.scheduleTypeEnum.group);
+						if (isGroupSchedule)
+						{
+							$scope.uiConfig.calendar.defaultView = controller.calendarViewEnum.agendaDay;
+							$scope.setCalendarResources(true);
+						}
+						else
+						{
+							$scope.calendarViewName = $scope.getCalendarViewName();
+							$scope.uiConfig.calendar.defaultView = $scope.getCalendarViewName();
+							$scope.setCalendarResources(false);
+						}
+						$scope.refetchEvents();
+					}
+				);
 		};
 
 		$scope.onTimeIntervalChanged = function onTimeIntervalChanged()
 		{
 			$scope.scheduleTimeInterval = $scope.selectedTimeInterval;
+			var intervalInMin = $scope.scheduleTimeInterval.split(':')[1];
 
-			// updating the config will automatically trigger an events refresh
-			$scope.uiConfig.calendar.slotDuration = $scope.selectedTimeInterval;
-			$scope.uiConfig.calendar.slotLabelInterval = $scope.selectedSlotLabelInterval;
+			$scope.providerPreferenceApi.updateProviderSetting(securityService.getUser().providerNo, "everyMin", intervalInMin)
+				.then(
+					function success()
+					{
+						controller.providerSettings.period = Number(intervalInMin);
 
-			// ensure the selected date doesn't change on events refresh
-			$scope.uiConfig.calendar.defaultDate = $scope.calendar().fullCalendar('getDate');
-			$scope.applyUiConfig($scope.uiConfig);
+						// updating the config will automatically trigger an events refresh
+						$scope.uiConfig.calendar.slotDuration = $scope.selectedTimeInterval;
+						$scope.uiConfig.calendar.slotLabelInterval = $scope.selectedSlotLabelInterval;
+
+						// ensure the selected date doesn't change on events refresh
+						$scope.uiConfig.calendar.defaultDate = $scope.calendar().fullCalendar('getDate');
+						$scope.applyUiConfig($scope.uiConfig);
+					}
+				);
 		};
 
 
@@ -1532,8 +1449,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		// Loads the schedule dropdown options from the API.  Sets the following:
 		// $scope.schedule_options - the array used to build the schedule selection dropdown.
-		// $scope.resourceOptionHash - table to look up schedule information by providerNo.  This is
-		//                               used to create the resource view headers.
 		$scope.loadScheduleOptions = function loadScheduleOptions()
 		{
 			var deferred = $q.defer();
@@ -1552,30 +1467,34 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						results[i].value = results[i].identifier;
 
 						$scope.scheduleOptions.push(scheduleData);
-
-						// Get the possible resources by inferring that the group is a provider
-						// by checking if the array has one entry and matches the identifier
-						// Also uses fields specific to Juno.
-						// TODO: CHANGE THIS!!
-						if (
-							angular.isArray(scheduleData.providerNos) &&
-							scheduleData.providerNos.length == 1 &&
-							scheduleData.providerNos[0].toString() == scheduleData.identifier
-						)
-						{
-							var providerNo = scheduleData.providerNos[0];
-
-							$scope.resourceOptionHash[providerNo] = {
-								'id': providerNo,
-								'uuid': providerNo,
-								'name': providerNo,
-								'title': scheduleData.name,
-								'display_name': scheduleData.name
-							};
-						}
 					}
 					deferred.resolve(results);
 				});
+
+			return deferred.promise;
+		};
+
+		// $scope.resourceOptionHash - table to look up schedule information by providerNo.  This is
+		//                             used to create the resource view headers.
+		controller.loadResourceHash = function ()
+		{
+			var deferred = $q.defer();
+
+			providersService.getAll().then(
+				function success(results)
+				{
+					for (var i = 0; i < results.length; i++)
+					{
+						var providerNo = Number(results[i].providerNo);
+						$scope.resourceOptionHash[providerNo] = {
+							'id': providerNo,
+							'title': results[i].name,
+							'display_name': results[i].name
+						};
+					}
+					deferred.resolve($scope.resourceOptionHash);
+				}
+			);
 
 			return deferred.promise;
 		};
@@ -1672,18 +1591,47 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			return deferred.promise;
 		};
 
-		controller.openDaysheet = function (resourceId)
+
+		$scope.loadAvailabilityTypes = function loadAvailabilityTypes()
 		{
-			var formattedDate = Juno.Common.Util.formatMomentDate($scope.selectedDate);
-			var win = window.open('../report/reportdaysheet.jsp' +
-				'?dsmode=all' +
-				'&provider_no=' + encodeURIComponent(resourceId) +
-				'&sdate=' + encodeURIComponent(formattedDate) +
-				'&edate=' + encodeURIComponent(formattedDate),
-				'daysheet', 'height=700,width=1024,scrollbars=1');
-			win.focus();
+			var deferred = $q.defer();
+			var availabilityTypes = {};
+
+			$scope.scheduleApi.getScheduleTemplateCodes().then(
+				function success(rawResults)
+				{
+					var results = rawResults.data.body;
+					for (var i = 0; i < results.length; i++)
+					{
+						var result = results[i];
+
+						availabilityTypes[result.code] = angular.copy(result);
+					}
+
+					$scope.availabilityTypes = availabilityTypes;
+					deferred.resolve(availabilityTypes);
+				});
+
+			return deferred.promise;
 		};
 
+		$scope.loadDefaultSelections = function loadDefaultSelections()
+		{
+			$scope.selectedSchedule = $scope.getSelectedSchedule($scope.scheduleOptions);
+			$scope.selectedSiteName = controller.getSelectedSite();
+			controller.selectedScheduleView = controller.getSelectedScheduleView();
+
+			$scope.selectedTimeInterval = $scope.getSelectedTimeInterval(
+				$scope.timeIntervalOptions, $scope.defaultTimeInterval);
+			$scope.uiConfig.calendar.slotDuration = $scope.selectedTimeInterval;
+			$scope.uiConfig.calendar.slotLabelInterval = $scope.selectedSlotLabelInterval;
+
+			$scope.uiConfig.calendar.minTime = $scope.getScheduleMinTime();
+			$scope.uiConfig.calendar.maxTime = $scope.getScheduleMaxTime();
+
+			// scroll so that one hour ago is the top of the calendar
+			$scope.uiConfig.calendar.scrollTime = moment().subtract(1, 'hours').format('HH:mm:ss');
+		};
 
 		//=========================================================================
 		// Watches
@@ -1691,15 +1639,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		controller.loadWatches = function loadWatches()
 		{
-			$scope.$watch('selectedDate', function (newValue, oldValue)
-			{
-				// avoid running first time this fires during initialization
-				if (newValue !== oldValue)
-				{
-					$scope.changeDate(newValue);
-				}
-			});
-
 			$scope.$watch('datepickerSelectedDate', function (newValue, oldValue)
 			{
 				if (newValue !== oldValue)
@@ -1770,19 +1709,37 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		// Any changes to this array need to be applied by calling applyUiConfig()
 		$scope.uiConfig = {
 			calendar: {
-				height: 'auto', //$scope.get_schedule_height(),
+				height: 'parent',
 				nowIndicator: true,
 				header: false,
+				columnHeader: true,
+				views: {
+					day: {
+						columnHeaderFormat: 'dddd MMMM Do'
+					},
+					week: {
+						columnHeaderFormat: 'dddd MMM Do'
+					},
+					month: {
+						columnHeaderFormat: 'dddd'
+					},
+				},
+				hiddenDays: [],
 
 				allDaySlot: false,
+				agendaEventMinHeight: 18,
 
 				defaultView: null,
 				defaultDate: $scope.defaultDate,
 				slotDuration: $scope.selectedTimeInterval,
 				snapDuration: '00:05:00',
 				slotLabelInterval: $scope.selectedSlotLabelInterval,
-				slotLabelFormat: 'h:mm A',
+				slotLabelFormat: 'h A',
 				slotEventOverlap: false,
+				lazyFetching: false, //for dev use
+
+				resources: false, // contains the resource hash properties for each schedule in group view
+				resourceOrder: 'id', // display order for multiple schedules, relies on a resource hash property
 
 				loading: $scope.setCalendarLoading,
 

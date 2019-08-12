@@ -10,7 +10,7 @@
 
 .schedule-page-header {
 	@extend %juno-page-header;
-	@include juno-font-label;
+	//@include juno-font-label;
 
 	select {
 		@include juno-select(16px);
@@ -18,14 +18,14 @@
 	}
 
 	.schedule-options {
-		padding: 12px;
+		padding: 6px;
 
 		$input-height: $form-input-height;
 
 		.form-inline {
 			.btn {
-				font-weight: bold;
 				height: $input-height;
+				font-weight: bold;
 
 				&.btn-addon {
 					@include juno-button-colour-scheme($white, $primary-hover, $primary-hover);
@@ -51,9 +51,9 @@
 				@include juno-form-colour-scheme-dark;
 			}
 
-			input,select {
-				font-weight: bold;
-			}
+			//input,select {
+				//font-weight: bold;
+			//}
 			label {
 				margin-right: 5px;
 			}
@@ -68,7 +68,7 @@
 			}
 			.cal-step-button-group {
 				.form-group {
-					margin-left: 10px;
+					margin-left: 4px;
 				}
 			}
 		}
@@ -83,6 +83,9 @@
 .schedule-page-content {
 	@extend %juno-primary-view-pane;
 	@include juno-page-margin-none;
+	position: relative;
+	overflow-y: hidden;
+	overflow-x: auto;
 
 	.calendar-loading
 	{
@@ -91,7 +94,6 @@
 		top: 65px;
 	}
 	.calendar {
-		font-family: "Arial", "Helvetica", sans-serif;
 		.fc-toolbar {
 			h2 {
 				font-size: 1.571em;
@@ -109,10 +111,6 @@
 				width: 100%;
 			}
 
-			// hide the vertical scrollbar when the schedule is too tall
-			.fc-scroller {
-				overflow: visible !important;
-			}
 			// hide the highlight area selection. hidden so that it does not look like a draggable appointment can be made
 			// remove if the start time/end time go back to relying on the selected area
 			.fc-highlight {
@@ -120,9 +118,9 @@
 			}
 			// adjust style for left hand time column
 			.fc-time {
-				font-size: 11px;
-				font-weight: bold;
+				@include juno-font-label;
 				background-color: $grey-08;
+				color: $grey-01;
 				span {
 					padding-right: 4px;
 				}
@@ -135,8 +133,11 @@
 				/* styling for normal events */
 				.fc-event {
 					cursor: pointer;
+					background-color: $grey-04; // shows for invalid color codes
 					border: 1px solid $white !important;
 					border-radius: 8px;
+					display: flex;
+					align-items: center;
 
 					// remove white opacity filter on events
 					.fc-bg {
@@ -147,62 +148,71 @@
 					.fc-resizer {
 						height: 3px;
 					}
+					.fc-content {
+						width: 100%;
 
-					.schedule-event {
-						display: flex;
-						padding: 0;
-						margin: 0;
-						font-size: 10px;
-						font-weight: normal;
-						color: $white;
-
-						$button-size: 16px;
-
-						.btn-event-link {
-							background: transparent;
-							border: 0;
-							width: $button-size;
-							min-width: $button-size;
-							height: $button-size;
-							font-weight: bold;
-							color: $white;
-							padding: 0;
-							&:hover {
-								background-color: rgba(0, 0, 0, 0.2);
-								border-radius: 50%;
-							}
-						}
-						.event-blk {
+						.schedule-event {
 							display: flex;
-							align-items: center;
-							justify-content: flex-start;
-						}
-						.event-blk-label {
-							flex-grow: 1;
-							font-weight: bold;
-						}
-						.btn-icon {
-							width: $button-size;
-							height: $button-size;
-							.icon {
+							padding: 0;
+							margin: 0;
+							font-size: 12px;
+							font-weight: normal;
+							color: $grey-01;
+
+							$button-size: 16px;
+
+							.btn-event-link {
+								background: transparent;
+								border: 0;
+								width: $button-size;
+								min-width: $button-size;
+								height: $button-size;
+								color: $grey-01;
+								padding: 0;
+								&:hover {
+									background-color: rgba(255, 255, 255, 0.2);
+									border-radius: 50%;
+								}
+							}
+							.event-blk {
+								display: flex;
+								align-items: start;
+								justify-content: flex-start;
+							}
+							.event-blk-label {
+								flex-grow: 1;
+								font-weight: bold;
+							}
+							.btn-icon {
 								width: $button-size;
 								height: $button-size;
+								.icon {
+									width: $button-size;
+									height: $button-size;
+								}
+								&:hover {
+									background-color: rgba(255, 255, 255, 0.2);
+									border-radius: 50%;
+								}
 							}
-							&:hover {
-								background-color: rgba(0, 0, 0, 0.2);
+							.event-status {
+								margin-left: 8px;
+							}
+							.event-tags {
+								display: inline-block;
+								text-align: center;
+								margin: 0 4px;
+							}
+							.event-label, .event-details {
+								margin-left: 3px;
+							}
+							.self-book-indicator.visible {
+								width: 12px;
+								height: 12px;
+								background-color: $white;
 								border-radius: 50%;
+								margin: 2px;
 							}
-						}
-						.event-status {
-							margin-left: 8px;
-						}
-						.event-tags {
-							display: inline-block;
-							text-align: center;
-							margin: 0 4px;
-						}
-						.event-details {
-							margin-left: 3px;
 						}
 					}
 				}
@@ -216,18 +226,15 @@
 					flex-grow: 1;
 					display: flex;
 					.background-event-schedulecode {
+						@include juno-font-label;
+						text-align: center;
+						font-weight: bold;
 						float: right;
 						width: $scheduleCodeWidth;
 						height: 100%;
-						text-align: center;
-						font-weight: bold;
-						font-style: normal;
-						font-stretch: normal;
-						color: $white;
+						color: $grey-01;
 						background-color: $grey-06;
-						line-height: normal;
-						letter-spacing: normal;
-						padding: 0;
+						padding: 2px 0;
 
 						&.hour-marker {
 							border-top: 1px solid $grey-05;
@@ -246,7 +253,7 @@
 			}
 			/* Remove that awful yellow color from today */
 			.fc-today {
-				opacity: 0;
+				background-color: transparent;
 			}
 			.fc-head-container {
 				border: 0;
@@ -257,9 +264,10 @@
 
 					.column-ctl-root {
 						@include juno-font-tab;
+						font-weight: bold;
 						background-color: $white;
 						display: flex;
-						height: $page-tabs-height;
+						height: $page-tabs-height-alt;
 						padding: 0 10px;
 
 						.column-ctl {
@@ -276,7 +284,10 @@
 				}
 				/* styling for the day/week/month view column-control headers */
 				.fc-day-header {
-					height: $page-tabs-height;
+					@include juno-font-tab;
+					font-weight: bold;
+					height: $page-tabs-height-alt;
+					vertical-align: middle;
 				}
 			}
 			.fc-axis {
@@ -291,6 +302,26 @@
 				background-color: $white;
 			}
 		}
+	}
+	.zero-state-message {
+		text-align: center;
+		position: absolute;
+		top: 0;
+		z-index: 9;
+		width: 100%;
+		height: 100%;
+		background-color: $white;
+	}
+	.loading-screen {
+		position: absolute;
+		top: 0;
+		z-index: 9;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0,0,0,0.1);
+	}
+	&.no-scroll {
+		overflow: hidden;
 	}
 }
 
@@ -323,7 +354,6 @@
 			}
 		}
 		.modal-ctl-buttons {
-			//width: 80px;
 			padding: 6px;
 			align-items: center;
 			justify-content: space-between;
@@ -418,36 +448,9 @@
 				background-color: $grey-08;
 				padding: 12px;
 			}
-		}
-	}
-}
 
-
-.schedule-daysheet {
-
-	table {
-
-		font-size: 0.929em;
-
-		@media print {
-			font-size: 0.643em;
-		}
-
-		thead tr th,
-		tbody tr td {
-
-			&.time, &.status, &.patient {
-				width: 1px;
-				white-space: nowrap;
-			}
-
-			&.text {
-				@include overflow-ellipsis;
-				max-width: 1px;
-
-				&.text-truncated {
-					@include overflow-ellipsis-nowrap;
-				}
+			.directive-juno-typeahead {
+				@include juno-tab-lg(56px);
 			}
 		}
 	}

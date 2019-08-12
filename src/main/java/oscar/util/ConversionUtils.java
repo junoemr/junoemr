@@ -467,6 +467,11 @@ public class ConversionUtils {
 	 */
 	public static String padDateTimeString(String dateTimeString)
 	{
+		if (dateTimeString == null || dateTimeString.isEmpty())
+		{
+			return "";
+		}
+
 		Matcher match;
 		try
 		{

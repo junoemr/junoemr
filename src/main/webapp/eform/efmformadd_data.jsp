@@ -26,24 +26,28 @@
 
 <%@ page import="oscar.eform.data.EForm"%>
 <%@taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<script language=javascript type='text/javascript'>
+  function hideDiv() {
+    if (document.getElementById) { // DOM3 = IE5, NS6
+      document.getElementById('hideshow').style.display = 'none';
+    }
+    else {
+      if (document.layers) { // Netscape 4
+        document.hideshow.display = 'none';
+      }
+      else { // IE 4
+        document.all.hideshow.style.display = 'none';
+      }
+    }
+  }
+</script>
+
+
 <%
   if (request.getAttribute("page_errors") != null) {
 %>
-<script language=javascript type='text/javascript'>
-function hideDiv() {
-    if (document.getElementById) { // DOM3 = IE5, NS6
-        document.getElementById('hideshow').style.display = 'none';
-    }
-    else {
-        if (document.layers) { // Netscape 4
-            document.hideshow.display = 'none';
-        }
-        else { // IE 4
-            document.all.hideshow.style.display = 'none';
-        }
-    }
-}
-</script>
 <div id="hideshow" style="position: relative; z-index: 999;"><a
 	href="javascript:hideDiv()">Hide Errors</a> <font
 	style="font-size: 10px; font-color: darkred;"> <html:errors /> </font></div>

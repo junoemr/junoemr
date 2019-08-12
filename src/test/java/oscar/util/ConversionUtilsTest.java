@@ -682,6 +682,18 @@ public class ConversionUtilsTest
 	}
 
 	@Test
+	public void padDateTimeString_EmptyString_ExpectSameString()
+	{
+		Assert.assertEquals("", ConversionUtils.padDateTimeString(""));
+	}
+
+	@Test
+	public void padDateTimeString_Null_ExpectEmptyString()
+	{
+		Assert.assertEquals("", ConversionUtils.padDateTimeString(null));
+	}
+
+	@Test
 	public void padDateString_SingleDigitMonth_ExpectPaddedString()
 	{
 		Assert.assertEquals("2019-04-03", ConversionUtils.padDateString("2019-4-03"));
