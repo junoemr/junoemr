@@ -66,7 +66,9 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		// Controller-level variables to contain intervals
 		controller.updateInterval = undefined;
 		controller.messageInterval = undefined;
-		controller.baseIntervalLength = 60000;
+		// Interval takes update times in ms, so 60s * 1000 * num_minutes
+		controller.intervalLengthOneMinute = 60000;
+		controller.intervalLengthFiveMinutes = 60000 * 5;
 
 		//=========================================================================
 		// Initialization
@@ -162,7 +164,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 						controller.updateInterval = $interval(function()
 						{
 							controller.updateCounts();
-						}, controller.baseIntervalLength * 5);
+						}, controller.intervalLengthFiveMinutes);
 					}
 
 					// Separated into its own interval so that it can be updated more frequently
@@ -171,7 +173,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 						controller.messageInterval = $interval(function()
 						{
 							controller.getUnreadMessageCount();
-						}, controller.baseIntervalLength);
+						}, controller.intervalLengthOneMinute);
 					}
 
 				},
