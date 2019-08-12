@@ -25,8 +25,12 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
+<div class="tickler-page-header"
+     ng-if="!ticklerListCtrl.inDemographicView()">
+	<!-- TODO -->
+</div>
 <div ng-show="ticklerListCtrl.ticklerReadAccess" class="col-xs-12" id="tickler-list-page">
- 	
+
 	<form name="searchForm" id="search-form" class="noprint">
 		<div class="row search-filters">
 			<div class="col-lg-2 col-sm-4 col-xs-6">

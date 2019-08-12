@@ -543,4 +543,13 @@ Varicella Immunoglobulin	VarIg
 		layout="injection"
 		showIfMinRecordNum="1" />
 
+	<item
+		resultDesc=""
+		desc="Digital Rectal Exam"
+		name="DRE"
+		healthCanadaType="DRE"
+		layout="PAPMAM"
+		link="https://www.cancer.ca/en/cancer-information/diagnosis-and-treatment/tests-and-procedures/digital-rectal-exam/?region=bc"
+		showIfMinRecordNum="1" />
+
 </preventions>

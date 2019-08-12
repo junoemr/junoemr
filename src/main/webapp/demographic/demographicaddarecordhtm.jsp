@@ -1121,18 +1121,34 @@ function ignoreDuplicates() {
 
 
     <tr valign="top">
-	<td  id="sinNoLbl" align="right"><b><bean:message key="demographic.demographicaddrecordhtm.msgSIN"/>:</b> </td>
-	<td id="sinNoCell" align="left"  >
-	    <input type="text" name="sin">
-	</td>
+		<td id="sinNoLbl" align="right">
+			<b><bean:message key="demographic.demographicaddrecordhtm.msgSIN"/>:</b>
+		</td>
+		<td id="sinNoCell" align="left">
+			<input type="text" name="sin">
+		</td>
 
-
-	<td  id="cytologyLbl" align="right"><b> <bean:message key="demographic.demographicaddrecordhtm.cytolNum"/>:</b> </td>
-	<td id="cytologyCell" align="left"  >
-	    <input type="text" name="cytolNum">
-
-	</td>
+		<td id="cytologyLbl" align="right">
+			<b> <bean:message key="demographic.demographicaddrecordhtm.cytolNum"/>:</b>
+		</td>
+		<td id="cytologyCell" align="left">
+			<input type="text" name="cytolNum">
+		</td>
     </tr>
+	<tr>
+		<td id="nameOfMotherLabel" align="right">
+			<b><bean:message key="demographic.demographicaddrecordhtm.formMotherName"/>:</b>
+		</td>
+		<td id="nameOfMotherCell" align="left">
+			<input type="text" maxlength="32" name="nameOfMother" id="nameOfMother" value="">
+		</td>
+		<td id="nameOfFatherLabel" align="right">
+			<b><bean:message key="demographic.demographicaddrecordhtm.formFatherName"/>:</b>
+		</td>
+		<td id="nameOfFatherCell" align="left">
+			<input type="text" maxlength="32" name="nameOfFather" id="nameOfFather" value="">
+		</td>
+	</tr>
     <tr valign="top">
       <td id="demoDoctorLbl" align="right"><b><% if(oscarProps.getProperty("demographicLabelDoctor") != null) { out.print(oscarProps.getProperty("demographicLabelDoctor","")); } else { %>
                                                 <bean:message key="demographic.demographicaddrecordhtm.formDoctor"/><% } %>

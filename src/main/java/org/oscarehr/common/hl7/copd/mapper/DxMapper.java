@@ -80,7 +80,7 @@ public class DxMapper extends AbstractMapper
 	public String getDiagnosisCodeId(int rep) throws HL7Exception
 	{
 		String dxCode = provider.getZPB(rep).getZpb4_diagnosisCode().getCe1_Identifier().getValue();
-		return dxCode.replaceAll("\\.", "");
+		return dxCode != null ? dxCode.replaceAll("\\.", "") : null;
 	}
 
 	public String getDiagnosisCodeText(int rep) throws HL7Exception

@@ -360,7 +360,13 @@ public class SchemaUtils
 						if (tableInfo.next())
 						{
 							Statement stmt = c.createStatement();
-							stmt.executeUpdate("CREATE TABLE " + tableName + "_maventest" + " ENGINE = " + tableInfo.getString(2) + " SELECT * FROM " + tableName);
+							String tableEngine = "";
+							if (tableInfo.getString(2) != null)
+							{
+								tableEngine = " ENGINE = " + tableInfo.getString(2);
+							}
+
+							stmt.executeUpdate("CREATE TABLE " + tableName + "_maventest" + tableEngine + " SELECT * FROM " + tableName);
 							//stmt.executeUpdate("alter table "+ tableName + " rename to " + tableName + "_maventest");
 
 							stmt.close();

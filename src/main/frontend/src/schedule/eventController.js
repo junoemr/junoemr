@@ -5,37 +5,52 @@
 // Calendar Event Controller
 //=========================================================================/
 
+import {ScheduleApi} from "../../generated/api/ScheduleApi";
+import {AppointmentApi} from "../../generated/api/AppointmentApi";
+
 angular.module('Schedule').controller('Schedule.EventController', [
 
-		'$scope',
-		'$q',
-		'$timeout',
-		'$state',
-		'$uibModal',
-		'$uibModalInstance',
-
-		'errorsService',
-
-		'demographicService',
-		'securityService',
-		'keyBinding',
-		'focus',
-		'type', 'parentScope', 'label', 'editMode', 'data',
+	'$scope',
+	'$q',
+	'$http',
+	'$httpParamSerializer',
+	'$timeout',
+	'$state',
+	'$uibModal',
+	'$uibModalInstance',
+	'errorsService',
+	'demographicService',
+	'providerService',
+	'securityService',
+	'scheduleService',
+	'keyBinding',
+	'focus',
+	'type', 'parentScope', 'label', 'editMode', 'data',
 
 	function (
-		$scope, $q, $timeout, $state, $uibModal, $uibModalInstance,
-
+		$scope,
+		$q,
+		$http,
+		$httpParamSerializer,
+		$timeout, $state, $uibModal, $uibModalInstance,
 		messagesFactory,
-
 		demographicService,
+		providerService,
 		securityService,
+		scheduleService,
 		keyBinding,
 		focus,
 		type, parentScope, label, editMode, data
 	)
 {
 	$scope.parentScope = parentScope;
+	let controller = this;
 
+	$scope.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
+		'../ws/rs');
+
+	$scope.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
+		'../ws/rs');
 
 	//=========================================================================
 	// Access Control
@@ -45,6 +60,17 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	//=========================================================================
 	// Local scope variables
 	//=========================================================================/
+
+	controller.useOldEchart = true; //TODO load from a setting?
+	controller.tabEnum = Object.freeze({
+		appointment:0,
+		reoccurring:1,
+		history:2
+	});
+	controller.activeTab = controller.tabEnum.appointment;
+
+	controller.appointmentTypeList = [];
+	controller.reasonCodeList = [];
 
 	$scope.label = label;
 	$scope.editMode = editMode;
@@ -57,27 +83,60 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	$scope.eventData = {
 		startDate: null,
 		startTime: null,
-		endDate: null,
-		endTime: null,
 		reason: null,
-		notes: null
+		reasonCode: null,
+		notes: null,
+		type: null,
+		duration: null,
+		doNotBook: false,
+		critical: false,
+		site: null,
 	};
 
-	$scope.timeInterval = data.timeInterval;
+	controller.repeatBooking =
+	{
+		periodOptions: [
+			{
+				label: 'days',
+				value: 'days'
+			},
+			{
+				label: 'weeks',
+				value: 'weeks'
+			},
+			{
+				label: 'months',
+				value: 'months'
+			},
+		]
+	};
+	controller.repeatBookingData = {
+		units: null,
+		period: controller.repeatBooking.periodOptions[0].value,
+		endDate: null
+	};
+	controller.eventHistory = [];
 
-	$scope.lastEventLength = null;
+	$scope.timeInterval = data.timeInterval;
 
 	$scope.patientTypeahead = {};
 	$scope.autocompleteValues = {};
 
 	$scope.activeTemplateEvents = [];
 
-	$scope.eventStatuses = $scope.parentScope.eventStatuses;
+	controller.eventStatuses = scheduleService.eventStatuses;
+
 	$scope.eventStatusOptions = [];
-	$scope.selectedEventStatus = null;
+	controller.selectedEventStatus = null;
 	$scope.defaultEventStatus = null;
 
-	$scope.selectedSiteName = null;
+	// filter site options to only include valid sites.
+	controller.siteOptions = $scope.parentScope.siteOptions.filter(function(value, index, arr)
+	{
+		return (value.uuid != null);
+	});
+
+	controller.sitesEnabled = $scope.parentScope.hasSites();
 
 	$scope.timepickerFormat = "h:mm A";
 
@@ -92,32 +151,63 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	$scope.initialized = false;
 	$scope.working = false;
 
-	$scope.demographicModel = {
+	controller.isDoubleBook = false;
+	controller.isDoubleBookPrevented = false;
+
+	controller.providerModel = {
+		providerNo: null,
+		firstName: null,
+		lastName: null,
+		displayName: "",
+		title: null,
+		loadData: function loadData(id)
+		{
+			var model = this;
+			model.providerNo = id;
+			providerService.getProvider(id).then(
+				function success(results)
+				{
+					model.firstName = results.firstName;
+					model.lastName = results.lastName;
+					model.title = 'Dr.'; //results.title;
+					model.displayName = Juno.Common.Util.toTrimmedString(model.title) + ' ' +
+						Juno.Common.Util.toTrimmedString(model.firstName) + ' ' +
+						Juno.Common.Util.toTrimmedString(model.lastName);
+				}
+			);
+		}
+	};
+
+	controller.demographicModel = {
 		demographicNo: null,
-		fullName: null,
-		hasPhoto: true,
-		patientPhotoUrl: '/imageRenderingServlet?source=local_client&clientId=0',
-		data: {
+		data: {},
+		displayData: {
 			birthDate: null,
-			healthNumber: null,
-			ontarioVersionCode: null,
-			phoneNumberPrimary: null
+			fullName: null,
+			hasPhoto: true,
+			patientPhotoUrl: '/imageRenderingServlet?source=local_client&clientId=0',
+			addressLine: null,
 		},
+
 		clear: function clear()
 		{
 			this.demographicNo = null;
-			this.fullName = null;
-			this.patientPhotoUrl = '/imageRenderingServlet?source=local_client&clientId=0';
-			this.data.birthDate = null;
-			this.data.healthNumber = null;
-			this.data.ontarioVersionCode = null;
-			this.data.phoneNumberPrimary = null;
+			this.data = {};
+			this.displayData = {
+				birthDate: null,
+				fullName: null,
+				hasPhoto: true,
+				patientPhotoUrl: '/imageRenderingServlet?source=local_client&clientId=0',
+				addressLine: null,
+			};
 		},
 		fillData: function fillData(data)
 		{
+			this.data = data;
+
 			this.demographicNo = data.demographicNo;
-			this.fullName = Juno.Common.Util.formatName(data.firstName, data.lastName);
-			this.patientPhotoUrl = '/imageRenderingServlet?source=local_client&clientId=' + (data.demographicNo? data.demographicNo: 0);
+			this.displayData.fullName = Juno.Common.Util.formatName(data.firstName, data.lastName);
+			this.displayData.patientPhotoUrl = '/imageRenderingServlet?source=local_client&clientId=' + (data.demographicNo? data.demographicNo: 0);
 
 			var dateOfBirth = null;
 			if(Juno.Common.Util.exists(data.dob))
@@ -130,13 +220,43 @@ angular.module('Schedule').controller('Schedule.EventController', [
 				dateOfBirth = Juno.Common.Util.getDateMomentFromComponents(
 					data.dobYear, data.dobMonth, data.dobDay);
 			}
-			this.data.birthDate = Juno.Common.Util.formatMomentDate(dateOfBirth);
+			this.displayData.birthDate = Juno.Common.Util.formatMomentDate(dateOfBirth);
 
+			if(Juno.Common.Util.exists(data.address))
+			{
+				this.displayData.addressLine =
+					Juno.Common.Util.noNull(data.address.address) + ' ' +
+					Juno.Common.Util.noNull(data.address.city) + ' ' +
+					Juno.Common.Util.noNull(data.address.province) + ' ' +
+					Juno.Common.Util.noNull(data.address.postal);
+			}
+		},
+		loadData: function loadData(demographicNo)
+		{
+			var deferred = $q.defer();
 
-			this.data.healthNumber = data.hin;
-			// XXX: no version code when loaded from autocomplete?  Does that matter?
-			this.data.ontarioVersionCode = data.ver;
-			this.data.phoneNumberPrimary = data.phone;
+			if (Juno.Common.Util.exists(demographicNo) && demographicNo !== 0)
+			{
+				demographicService.getDemographic(demographicNo).then(
+					function (data)
+					{
+						controller.demographicModel.fillData(data);
+						deferred.resolve();
+					},
+					function (errors)
+					{
+						console.log('error initializing patient autocomplete', errors);
+						controller.demographicModel.clear();
+						deferred.resolve();
+					});
+			}
+			else
+			{
+				controller.demographicModel.clear();
+				deferred.resolve();
+			}
+
+			return deferred.promise;
 		},
 		uploadPhoto: function uploadPhoto(file){}
 	};
@@ -145,7 +265,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	// Init
 	//=========================================================================/
 
-	$scope.init = function init()
+	controller.init = function init()
 	{
 		if (!securityService.hasPermission('scheduling_create'))
 		{
@@ -155,93 +275,93 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			});
 		}
 
-		$scope.demographicModel.clear();
+		controller.loadAppointmentReasons();
+		controller.loadAppointmentTypes();
+		controller.providerModel.loadData(data.schedule.uuid);
 
 		var momentStart = data.startTime;
 		var momentEnd = data.endTime;
-
 		$scope.eventData.startTime = Juno.Common.Util.formatMomentTime(momentStart, $scope.timepickerFormat);
-		$scope.eventData.endTime = Juno.Common.Util.formatMomentTime(momentEnd, $scope.timepickerFormat);
 		$scope.eventData.startDate = Juno.Common.Util.formatMomentDate(momentStart);
-		$scope.eventData.endDate = Juno.Common.Util.formatMomentDate(momentEnd);
-
-		$scope.lastEventLength = momentEnd.diff(momentStart, 'minutes');
 
 		// maintain a list of the 'active' templates based on start time
 		$scope.setActiveTemplateEvents();
 
-		//$scope.eventStatusOptions.push("");
-		for(var key in $scope.eventStatuses)
+		for(var key in controller.eventStatuses)
 		{
-			if($scope.eventStatuses.hasOwnProperty(key))
+			if(controller.eventStatuses.hasOwnProperty(key))
 			{
-				$scope.eventStatusOptions.push($scope.eventStatuses[key]);
+				$scope.eventStatusOptions.push(controller.eventStatuses[key]);
 			}
 		}
 		$scope.defaultEventStatus = data.defaultEventStatus;
-		$scope.setSelectedEventStatus(data.eventData.eventStatusCode);
-
+		controller.setSelectedEventStatus(data.eventData.eventStatusCode);
 
 		if(editMode)
 		{
 			$scope.eventUuid = data.eventData.appointmentNo;
 			$scope.eventData.reason = data.eventData.reason;
 			$scope.eventData.notes = data.eventData.notes;
+			$scope.eventData.type = data.eventData.type;
+			$scope.eventData.reasonCode = data.eventData.reasonCode;
+			$scope.eventData.doNotBook = data.eventData.doNotBook;
+			$scope.eventData.critical = data.eventData.urgency === 'critical';
+			$scope.eventData.duration = momentEnd.diff(momentStart, 'minutes');
+			$scope.eventData.site = data.eventData.site;
+
+			controller.checkEventConflicts(); // uses the eventData
 
 			// either load the patient data and init the autocomplete
 			// or ensure the patient model is clear
-			$scope.initPatientAutocomplete(data.eventData.demographicNo).then(function() {
-				$scope.initialized = true;
-			});
-			$scope.selectedSiteName = data.eventData.site;
+			controller.demographicModel.loadData(data.eventData.demographicNo).then(
+				function success()
+				{
+					if ($scope.isPatientSelected())
+					{
+						$scope.patientTypeahead = controller.demographicModel.data;
+					}
+					else
+					{
+						// to initialize typeahead value without a selected demographic model
+						$scope.patientTypeahead.isTypeaheadSearchQuery = true;
+						$scope.patientTypeahead.searchQuery = data.eventData.appointmentName;
+					}
+
+					$timeout(controller.loadWatches);
+					$scope.initialized = true;
+				});
+			controller.loadAppointmentHistory($scope.eventUuid);
 		}
 		else
 		{
 			// create mode: adjust the end date (if needed)
 			// and clear the patient model
-			$scope.adjustEndDatetime();
-			$scope.demographicModel.clear();
+			controller.demographicModel.clear();
+			$scope.eventData.site = $scope.parentScope.selectedSiteName;
+			// set the default site selection if the current one is invalid
+			if(controller.sitesEnabled && !controller.isValidSiteValue($scope.eventData.site))
+			{
+				$scope.eventData.site = controller.siteOptions[0].value;
+			}
 
-			// autofocus the patient field
+			controller.setTimeAndDurationByTemplate($scope.activeTemplateEvents[0], parentScope.timeIntervalMinutes());
+
 			focus.element("#input-patient");
 
+			controller.checkEventConflicts(); // uses the eventData
+
+			$timeout(controller.loadWatches);
 			$scope.initialized = true;
 		}
+
+		controller.changeTab(controller.tabEnum.appointment);
 	};
-
-	$scope.initPatientAutocomplete = function initPatientAutocomplete(demographicNo)
-	{
-		var deferred = $q.defer();
-
-		if(Juno.Common.Util.exists(demographicNo) && demographicNo != 0)
-		{
-			demographicService.getDemographic(demographicNo).then(function(data)
-			{
-				$scope.patientTypeahead = data;
-				deferred.resolve();
-			},
-			function(errors)
-			{
-				console.log('error initializing patient autocomplete', errors);
-				$scope.demographicModel.clear();
-				deferred.resolve();
-			});
-		}
-		else
-		{
-			$scope.demographicModel.clear();
-			deferred.resolve();
-		}
-
-		return deferred.promise;
-	};
-
 
 	//=========================================================================
 	// Private methods
 	//=========================================================================/
 
-	$scope.setSelectedEventStatus = function setSelectedEventStatus(selectedCode)
+	controller.setSelectedEventStatus = function setSelectedEventStatus(selectedCode)
 	{
 		var eventStatusCode = $scope.defaultEventStatus;
 
@@ -251,13 +371,13 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		}
 
 		if(!Juno.Common.Util.exists(eventStatusCode) ||
-			!Juno.Common.Util.exists($scope.eventStatuses[eventStatusCode]))
+			!Juno.Common.Util.exists(controller.eventStatuses[eventStatusCode]))
 		{
 			// if not set or found just pick the first one
 			eventStatusCode = $scope.eventStatusOptions[0].displayLetter;
 		}
 
-		$scope.selectedEventStatus = $scope.eventStatuses[eventStatusCode];
+		controller.selectedEventStatus = eventStatusCode;
 	};
 
 	// Make a list of the types of appointments available for this appointment
@@ -266,30 +386,36 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		// Get templates that happen during the time period
 		var momentStart = Juno.Common.Util.getDateAndTimeMoment(
 			$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
-		var momentEnd = Juno.Common.Util.getDateAndTimeMoment(
-			$scope.eventData.endDate, $scope.formattedTime($scope.eventData.endTime));
-
 		var activeEvents = [];
 
 		// Loop through the events for this day
 		for(var i = 0; i < data.events.length; i++)
 		{
-			if(data.events[i].rendering != "background" || data.events[i].resourceId != $scope.schedule.uuid)
+			// filter events that should not be checked (non-background, wrong schedule, etc.)
+			if(data.events[i].rendering !== "background" || data.events[i].resourceId != $scope.schedule.uuid)
 			{
 				continue;
 			}
 
 			var event = angular.copy(data.events[i]);
 
-			// if start time is before event end time or if end time is after event start
+			// if start time is between event start and end
 			event.start = Juno.Common.Util.getDatetimeNoTimezoneMoment(event.start);
 			event.end = Juno.Common.Util.getDatetimeNoTimezoneMoment(event.end);
 
-			if(momentStart.isValid() && momentEnd.isValid() &&
-				event.start.isValid() && event.end.isValid() &&
-				momentStart.isBefore(event.end) && momentEnd.isAfter(event.start))
+			if(momentStart.isValid() && event.start.isValid() && event.end.isValid() &&
+				momentStart.isBefore(event.end) && momentStart.isSameOrAfter(event.start))
 			{
-				event.availabilityType = data.availabilityTypes[event.scheduleTemplateCode];
+				//TODO refactor availability type lists
+				var extendedAvailabilityType = data.availabilityTypes[event.scheduleTemplateCode];
+				if(Juno.Common.Util.exists(extendedAvailabilityType))
+				{
+					event.availabilityType = extendedAvailabilityType;
+				}
+				else
+				{
+					event.availabilityType.duration = event.availabilityType.preferredEventLengthMinutes;
+				}
 				activeEvents.push(event);
 			}
 		}
@@ -297,43 +423,186 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		$scope.activeTemplateEvents = activeEvents;
 	};
 
-	$scope.adjustEndDatetime = function adjustEndDatetime(lengthMinutes)
+	controller.setTimeAndDurationByTemplate = function setTimeAndDurationByTemplate(templateEvent, defaultDuration)
 	{
-		// adjusts the end time to the specified length or
-		// adjusts to keep the event length the same as it last was
-
-		var momentStart = Juno.Common.Util.getDateAndTimeMoment(
-			$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
-
-		if(momentStart.isValid())
+		var duration = defaultDuration;
+		if(Juno.Common.Util.exists(templateEvent) && Juno.Common.Util.exists(templateEvent.availabilityType))
 		{
-			var newEventLength = Juno.Common.Util.exists(lengthMinutes) ?
-				lengthMinutes : $scope.lastEventLength;
+			$scope.eventData.startTime = Juno.Common.Util.formatMomentTime(templateEvent.start, $scope.timepickerFormat);
 
-			var momentEnd = momentStart.add(newEventLength, 'minutes');
-
-			$scope.eventData.endDate = Juno.Common.Util.formatMomentDate(momentEnd);
-			$scope.eventData.endTime = Juno.Common.Util.formatMomentTime(momentEnd, $scope.timepickerFormat);
-		}
-	};
-
-	$scope.updateLastEventLength = function updateLastEventLength()
-	{
-		// saves the current event length, if the date/times are valid
-
-		var momentStart = Juno.Common.Util.getDateAndTimeMoment(
-			$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
-		var momentEnd = Juno.Common.Util.getDateAndTimeMoment(
-			$scope.eventData.endDate, $scope.formattedTime($scope.eventData.endTime));
-
-		if(momentStart.isValid() && momentEnd.isValid())
-		{
-			var eventLength = momentEnd.diff(momentStart, 'minutes');
-			if(eventLength > 0)
+			var templateDuration = templateEvent.availabilityType.duration;
+			if(Juno.Common.Util.exists(templateDuration)
+				&& Juno.Common.Util.isIntegerString(templateDuration))
 			{
-				$scope.lastEventLength = eventLength;
+				duration = templateDuration;
 			}
 		}
+		$scope.eventData.duration = duration;
+	};
+
+	controller.loadAppointmentReasons = function loadAppointmentReasons()
+	{
+		var deferred = $q.defer();
+
+		$scope.scheduleApi.getAppointmentReasons().then(
+			function success(rawResults)
+			{
+				var results = rawResults.data.body;
+				var out = [];
+				if(angular.isArray(results))
+				{
+					for(var i = 0; i < results.length; i++)
+					{
+						out.push({
+							label: results[i].label,
+							value: results[i].id,
+						});
+					}
+				}
+				controller.reasonCodeList = out;
+
+				// set the default selected option
+				if(!Juno.Common.Util.exists($scope.eventData.reasonCode))
+				{
+					$scope.eventData.reasonCode = controller.reasonCodeList[0].value;
+				}
+				deferred.resolve(controller.reasonCodeList);
+			});
+
+		return deferred.promise;
+	};
+
+	controller.loadAppointmentTypes = function loadAppointmentTypes()
+	{
+		var deferred = $q.defer();
+
+		$scope.scheduleApi.getAppointmentTypes().then(
+			function success(rawResults)
+			{
+				var results = rawResults.data.body;
+				var out = [];
+				if(angular.isArray(results))
+				{
+					for(var i = 0; i < results.length; i++)
+					{
+						out.push({
+							label: results[i].name,
+							value: results[i].name,
+							data: {
+								id: results[i].id,
+								location: results[i].location,
+								duration: results[i].duration,
+								notes: results[i].notes,
+								reason: results[i].reason,
+								resources: results[i].resources,
+							}
+						});
+					}
+				}
+				controller.appointmentTypeList = out;
+				deferred.resolve(controller.appointmentTypeList);
+			});
+
+		return deferred.promise;
+	};
+	controller.getTypeDataByTypeValue = function(typeValue)
+	{
+		var data = {};
+		for(var i=0; i < controller.appointmentTypeList.length; i++)
+		{
+			if(controller.appointmentTypeList[i].value === typeValue)
+			{
+				data = controller.appointmentTypeList[i].data;
+				break;
+			}
+		}
+		return data;
+	};
+
+	controller.checkEventConflicts = function()
+	{
+		//TODO a better way to access the modal content window
+		var modalContent = $(".modal-content");
+
+		// Get templates that happen during the time period
+		var momentStart = Juno.Common.Util.getDateAndTimeMoment(
+			$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
+		var momentEnd = controller.calculateEndTime();
+
+		controller.isDoubleBook = false;
+		controller.isDoubleBookPrevented = false;
+		modalContent.removeClass("double-book double-book-prevented");
+
+		if(momentStart.isValid() && momentEnd.isValid() && momentStart.isSameOrBefore(momentEnd))
+		{
+			// Loop through the events for this day
+			for (var i = 0; i < data.events.length; i++)
+			{
+				var event = data.events[i];
+
+				// filter events that should not be checked (background, wrong schedule, etc.)
+				if (event.rendering === "background"
+					|| event.resourceId != $scope.schedule.uuid
+					|| $scope.eventUuid == event.data.appointmentNo)
+				{
+					continue;
+				}
+
+
+				// if start time is between event start and end
+				var eventStart = Juno.Common.Util.getDatetimeNoTimezoneMoment(event.start);
+				var eventEnd = Juno.Common.Util.getDatetimeNoTimezoneMoment(event.end);
+				var eventDoNotBook = event.data.doNotBook;
+
+				if (eventStart.isValid() && eventEnd.isValid() &&
+					((momentStart.isSameOrAfter(eventStart) && momentStart.isBefore(eventEnd)) ||
+					(momentEnd.isAfter(eventStart) && momentEnd.isSameOrBefore(eventEnd))))
+				{
+					controller.isDoubleBook = true;
+					if (eventDoNotBook)
+					{
+						controller.isDoubleBookPrevented = true;
+						break;
+					}
+				}
+			}
+
+			if (controller.isDoubleBookPrevented)
+			{
+				modalContent.addClass("double-book-prevented");
+			}
+			else if (controller.isDoubleBook)
+			{
+				modalContent.addClass("double-book");
+			}
+		}
+		else
+		{
+			console.warn("unable to check double booking, invalid event time/duration", momentStart, momentEnd);
+		}
+	};
+	controller.loadAppointmentHistory = function(appointmentId)
+	{
+		var deferred = $q.defer();
+
+		$scope.appointmentApi.getEditHistory(appointmentId).then(
+			function success(results)
+			{
+				controller.eventHistory = results.data.body;
+
+				for(var i=0; i< controller.eventHistory.length; i++)
+				{
+					controller.eventHistory[i].formattedUpdateDate = Juno.Common.Util.formatMomentDate(moment(controller.eventHistory[i].updateDateTime));
+					controller.eventHistory[i].formattedCreateDate = Juno.Common.Util.formatMomentDate(moment(controller.eventHistory[i].createDateTime));
+
+					controller.eventHistory[i].formattedUpdateTime = Juno.Common.Util.formatMomentTime(moment(controller.eventHistory[i].updateDateTime));
+					controller.eventHistory[i].formattedCreateTime = Juno.Common.Util.formatMomentTime(moment(controller.eventHistory[i].createDateTime));
+				}
+				deferred.resolve(controller.eventHistory);
+			}
+		);
+
+		return deferred.promise;
 	};
 
 	$scope.validateForm = function validateForm()
@@ -341,30 +610,23 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		$scope.displayMessages.clear();
 
 		Juno.Common.Util.validateDateString($scope.eventData.startDate,
-			$scope.displayMessages, 'startDate', 'Start Time', true);
+			$scope.displayMessages, 'startDate', 'Session Date', true);
 
 		Juno.Common.Util.validateTimeString($scope.formattedTime($scope.eventData.startTime),
 			$scope.displayMessages, 'startTime', 'Start Time', true);
 
-		Juno.Common.Util.validateDateString($scope.eventData.endDate,
-			$scope.displayMessages, 'endDate', 'End Time', true);
+		Juno.Common.Util.validateIntegerString($scope.eventData.duration,
+			$scope.displayMessages, 'duration', 'Duration', true, true, true);
 
-		Juno.Common.Util.validateTimeString($scope.formattedTime($scope.eventData.endTime),
-			$scope.displayMessages, 'endTime', 'End Time', true);
+		Juno.Common.Util.validateIntegerString(controller.repeatBookingData.units,
+			$scope.displayMessages, 'repeatUnits', 'Repeat Units', false, true, false);
 
-		// if all the date/time fields look good, validate range
-		if(!$scope.displayMessages.has_errors())
+		Juno.Common.Util.validateDateString(controller.repeatBookingData.endDate,
+			$scope.displayMessages, 'repeatEndDate', 'Repeat End Date', false);
+
+		if(controller.sitesEnabled && !controller.isValidSiteValue($scope.eventData.site))
 		{
-			var startDatetime = Juno.Common.Util.getDateAndTimeMoment(
-				$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
-			var endDatetime = Juno.Common.Util.getDateAndTimeMoment(
-				$scope.eventData.endDate, $scope.formattedTime($scope.eventData.endTime));
-
-			if(endDatetime.isSame(startDatetime) ||
-				endDatetime.isBefore(startDatetime))
-			{
-				$scope.displayMessages.addStandardError("The appointment must end after it starts");
-			}
+			$scope.displayMessages.add_field_error('site', "A valid site must be selected");
 		}
 
 		return !$scope.displayMessages.has_errors();
@@ -377,9 +639,11 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		var startDatetime = Juno.Common.Util.getDateAndTimeMoment(
 				$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
 
-		var endDatetime = Juno.Common.Util.getDateAndTimeMoment(
-				$scope.eventData.endDate, $scope.formattedTime($scope.eventData.endTime));
+		var endDatetime = controller.calculateEndTime();
 
+		var demographicNo = ($scope.eventData.doNotBook)? null : controller.demographicModel.demographicNo;
+		var appointmentName = (demographicNo == null && Juno.Common.Util.exists($scope.patientTypeahead.searchQuery))?
+			$scope.patientTypeahead.searchQuery : null;
 
 		parentScope.saveEvent(
 			editMode,
@@ -387,12 +651,17 @@ angular.module('Schedule').controller('Schedule.EventController', [
 				appointmentNo: $scope.eventUuid,
 				startTime: startDatetime,
 				endTime: endDatetime,
+				type: $scope.eventData.type,
 				reason: $scope.eventData.reason,
+				reasonCode: $scope.eventData.reasonCode,
 				notes: $scope.eventData.notes,
 				providerNo: $scope.schedule.uuid,
-				eventStatusCode: $scope.selectedEventStatus.displayLetter,
-				demographicNo: $scope.demographicModel.demographicNo,
-				site: $scope.selectedSiteName
+				eventStatusCode: controller.selectedEventStatus,
+				demographicNo: demographicNo,
+				appointmentName: appointmentName,
+				site: $scope.eventData.site,
+				doNotBook: $scope.eventData.doNotBook,
+				urgency: (($scope.eventData.critical)? 'critical' : null),
 			}
 		).then(
 			function(results)
@@ -437,65 +706,72 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		return time_str.replace(/ /g,'');
 	};
 
+	controller.calculateEndTime = function calculateEndTime()
+	{
+		var momentStart = Juno.Common.Util.getDateAndTimeMoment(
+				$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
+		return momentStart.add($scope.eventData.duration, 'minutes');
+	};
+
 	$scope.loadPatientFromTypeahead = function loadPatientFromTypeahead(patientTypeahead)
 	{
-		$scope.demographicModel.fillData(patientTypeahead);
+		controller.demographicModel.loadData(patientTypeahead.demographicNo);
+	};
+
+	controller.autofillDataFromType = function(typeValue)
+	{
+		var typeData = controller.getTypeDataByTypeValue(typeValue);
+
+		if(Juno.Common.Util.exists(typeData.duration) &&
+			typeData.duration > 0)
+		{
+			$scope.eventData.duration = typeData.duration;
+		}
+		if(Juno.Common.Util.exists(typeData.location) &&
+			controller.isValidSiteValue(typeData.location))
+		{
+			$scope.eventData.site = typeData.location;
+		}
+		if(Juno.Common.Util.exists(typeData.notes) &&
+			!Juno.Common.Util.isBlank(typeData.notes))
+		{
+			$scope.eventData.notes = typeData.notes;
+		}
+		if(Juno.Common.Util.exists(typeData.reason) &&
+			!Juno.Common.Util.isBlank(typeData.reason))
+		{
+			$scope.eventData.reason = typeData.reason;
+		}
 	};
 
 	//=========================================================================
 	// Watches
 	//=========================================================================/
 
-	// when the start date is changed,
-	// update the active template events
-	$scope.$watch('startDate', function(newStartDate, oldStartDate)
+	controller.loadWatches = function loadWatches()
 	{
-		// avoid running first time this fires during initialization
-		if(newStartDate !== oldStartDate)
+		$scope.$watch('patientTypeahead', function(newValue, oldValue)
 		{
-			$scope.setActiveTemplateEvents();
-			$scope.adjustEndDatetime();
-		}
-	});
-
-	// when the start time is changed,
-	// update the active template events and adjust the end time
-	$scope.$watch('startTime', function(newStartTime, oldStartTime)
-	{
-		// avoid running first time this fires during initialization
-		if(newStartTime !== oldStartTime)
+			if(newValue != oldValue)
+			{
+				$scope.loadPatientFromTypeahead($scope.patientTypeahead);
+			}
+		}, true);
+		$scope.$watch('[eventData.startTime, eventData.duration]', function(newValue, oldValue)
 		{
-			$scope.setActiveTemplateEvents();
-			$scope.adjustEndDatetime();
-		}
-	});
-
-	// when the end date is changed, track the event length
-	$scope.$watch('endDate', function(newEndDate, oldEndDate)
-	{
-		// avoid running first time this fires during initialization
-		if(newEndDate !== oldEndDate)
+			if(newValue != oldValue)
+			{
+				controller.checkEventConflicts();
+			}
+		});
+		$scope.$watch('eventData.type', function(newValue, oldValue)
 		{
-			$scope.setActiveTemplateEvents();
-			$scope.updateLastEventLength();
-		}
-	});
-
-	// when the end time is changed, track the event length
-	$scope.$watch('endTime', function(newEndTime, oldEndTime)
-	{
-		// avoid running first time this fires during initialization
-		if(newEndTime !== oldEndTime)
-		{
-			$scope.setActiveTemplateEvents();
-			$scope.updateLastEventLength();
-		}
-	});
-
-	$scope.$watch('patientTypeahead', function()
-	{
-		$scope.loadPatientFromTypeahead($scope.patientTypeahead);
-	});
+			if(newValue != oldValue)
+			{
+				controller.autofillDataFromType(newValue);
+			}
+		});
+	};
 
 	//=========================================================================
 	// Public methods
@@ -509,8 +785,8 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		}
 		$scope.preview_patient_image = file;
 		$scope.new_photo = true;
-		$scope.demographicModel.hasPhoto = true;
-		$scope.demographicModel.uploadPhoto(file);
+		controller.demographicModel.hasPhoto = true;
+		controller.demographicModel.uploadPhoto(file);
 	};
 
 	$scope.isWorking = function isWorking()
@@ -525,30 +801,49 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	$scope.isPatientSelected = function isPatientSelected()
 	{
-		return Juno.Common.Util.exists($scope.demographicModel.demographicNo);
+		return Juno.Common.Util.exists(controller.demographicModel.demographicNo);
+	};
+	controller.hasAppointmentId = function hasAppointmentId()
+	{
+		return Juno.Common.Util.exists($scope.eventUuid);
 	};
 
 	$scope.hasSites = function hasSites()
 	{
-		return (parentScope.siteOptions.length > 0)
-	}
+		return (controller.siteOptions.length > 0)
+	};
+	controller.isValidSiteValue = function(valueToTest)
+	{
+		for(var i=0; i < controller.siteOptions.length; i++)
+		{
+			if(controller.siteOptions[i].value === valueToTest)
+			{
+				return true;
+			}
+		}
+		return false;
+	};
+
+	controller.changeTab = function changeTab(tabId)
+	{
+		controller.activeTab = tabId;
+	};
+	controller.isTabActive = function(tabId)
+	{
+		return (tabId === controller.activeTab);
+	};
 
 	$scope.clearPatient = function clearPatient()
 	{
 		$scope.autocompleteValues.patient = null;
-		$scope.demographicModel.clear();
+		controller.demographicModel.clear();
 	};
 
-	$scope.setEventLength = function setEventLength(minutes)
-	{
-		$scope.adjustEndDatetime(minutes);
-	};
-
-	$scope.save = function save()
+	controller.save = function save()
 	{
 		if(!$scope.validateForm())
 		{
-				return false;
+			return false;
 		}
 
 		$scope.working = true;
@@ -568,7 +863,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		});
 	};
 
-	$scope.del = function del()
+	controller.del = function del()
 	{
 		$scope.working = true;
 		$scope.deleteEvent().then(function()
@@ -583,12 +878,12 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		});
 	};
 
-	$scope.cancel = function cancel()
+	controller.cancel = function cancel()
 	{
 		$uibModalInstance.dismiss('cancel');
 	};
 
-	$scope.saveAndBill = function saveAndBill()
+	controller.saveAndBill = function saveAndBill()
 	{
 		if(!$scope.validateForm())
 		{
@@ -604,7 +899,97 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			$scope.parentScope.openCreateInvoice(
 				$scope.eventUuid,
 				$scope.schedule.uuid,
-				$scope.demographicModel.demographicNo);
+				controller.demographicModel.demographicNo);
+		}, function()
+		{
+			$scope.displayMessages.add_generic_fatal_error();
+			$scope.working = false;
+		});
+	};
+
+	controller.saveAndPrint = function saveAndPrint()
+	{
+		if(!$scope.validateForm())
+		{
+			return false;
+		}
+
+		$scope.working = true;
+		$scope.saveEvent().then(function(response)
+		{
+			$scope.parentScope.refetchEvents();
+			$uibModalInstance.close();
+			$scope.working = false;
+
+			if (Juno.Common.Util.exists(response) &&
+				Juno.Common.Util.exists(response.body) &&
+				Juno.Common.Util.exists(response.body.appointmentNo))
+			{
+				var win = window.open('../appointment/appointmentcontrol.jsp' +
+					'?displaymode=PrintCard' +
+					'&appointment_no=' + encodeURIComponent(response.body.appointmentNo),
+					'printappointmentcard', 'height=700,width=1024,scrollbars=1');
+				win.focus();
+			}
+			else
+			{
+				console.error('invalid response data', response);
+			}
+		}, function()
+		{
+			$scope.displayMessages.add_generic_fatal_error();
+			$scope.working = false;
+		});
+	};
+	controller.saveAndReceipt = function saveAndPrint()
+	{
+		if(!$scope.validateForm())
+		{
+			return false;
+		}
+
+		$scope.working = true;
+		$scope.saveEvent().then(function(response)
+		{
+			$scope.parentScope.refetchEvents();
+			$uibModalInstance.close();
+			$scope.working = false;
+
+			if (Juno.Common.Util.exists(response) &&
+				Juno.Common.Util.exists(response.body) &&
+				Juno.Common.Util.exists(response.body.appointmentNo))
+			{
+				var win = window.open('../appointment/printappointment.jsp' +
+					'?appointment_no=' + encodeURIComponent(response.body.appointmentNo),
+					'printappointment', 'height=700,width=1024,scrollbars=1');
+				win.focus();
+			}
+			else
+			{
+				console.error('invalid response data', response);
+			}
+
+		}, function()
+		{
+			$scope.displayMessages.add_generic_fatal_error();
+			$scope.working = false;
+		});
+	};
+	controller.saveDoNotBook = function saveDoNotBook()
+	{
+		if(!$scope.validateForm())
+		{
+			return false;
+		}
+
+		$scope.working = true;
+		$scope.clearPatient();
+		$scope.eventData.doNotBook = true;
+		$scope.saveEvent().then(function()
+		{
+			$scope.parentScope.refetchEvents();
+			$uibModalInstance.close();
+			$scope.working = false;
 		}, function()
 		{
 			$scope.displayMessages.add_generic_fatal_error();
@@ -629,7 +1014,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	$scope.modify_patient = function modify_patient()
 	{
-		if(!$scope.demographicModel.demographicNo)
+		if(!$scope.isPatientSelected())
 		{
 			return;
 		}
@@ -646,38 +1031,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	$scope.onPatientModalSave = function onPatientModalSave(demographicNo)
 	{
 		// load the newly created/updated patient
-		$scope.demographicModel.demographicNo = demographicNo;
-		$scope.initPatientAutocomplete();
-	};
-
-	$scope.searchPatients = function searchPatients(term)
-	{
-		var search = {
-			type: 'Name',
-			'term': term,
-			status: 'active',
-			integrator: false,
-			outofdomain: true
-		};
-		return demographicsService.search(search, 0, 25).then(
-			function(results)
-			{
-				var resp = [];
-				for (var x = 0; x < results.content.length; x++)
-				{
-					resp.push(
-						{
-							demographicNo: results.content[x].demographicNo,
-							name: Juno.Common.Util.formatName(
-								results.content[x].firstName, results.content[x].lastName)
-						});
-				}
-				return resp;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
+		controller.demographicModel.loadData(demographicNo); //TODO why?
 	};
 
 	$scope.newDemographic = function newDemographic(size)
@@ -696,7 +1050,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 				console.log(results);
 				console.log('patient #: ', results.demographicNo);
 
-				$scope.initPatientAutocomplete(results.demographicNo)
+				controller.demographicModel.loadData(results.demographicNo);
 			},
 			function error(errors)
 			{
@@ -705,6 +1059,95 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			});
 
 		console.log($('#myModal'));
+	};
+
+	controller.openEncounterPage = function()
+	{
+		if ($scope.isPatientSelected())
+		{
+			if(controller.useOldEchart)
+			{
+				var params = {
+					providerNo: controller.providerModel.providerNo,
+					curProviderNo:  data.eventData.userProviderNo,
+					demographicNo: controller.demographicModel.demographicNo,
+					userName: "",
+					reason: $scope.eventData.reason,
+					curDate: Juno.Common.Util.formatMomentDate(moment()),
+					providerview:  data.eventData.userProviderNo,
+
+					appointmentNo: $scope.eventUuid,
+					appointmentDate: $scope.eventData.startDate,
+					startTime: $scope.eventData.startTime,
+					status: controller.selectedEventStatus,
+					apptProvider_no: controller.providerModel.providerNo,
+					encType: "face to face encounter with client",
+				};
+				window.open(scheduleService.getEncounterLink(params));
+			}
+			else
+			{
+				var params = {
+					demographicNo: controller.demographicModel.demographicNo,
+				};
+				if (angular.isDefined($scope.eventUuid))
+				{
+					params.appointmentNo = $scope.eventUuid;
+					params.encType = "face to face encounter with client";
+				}
+				$state.go('record.summary', params);
+			}
+			controller.cancel();
+		}
+	};
+	controller.openBillingPage = function()
+	{
+		if ($scope.isPatientSelected() && Juno.Common.Util.exists($scope.eventUuid))
+		{
+			var params = {
+				demographic_no: controller.demographicModel.demographicNo,
+				demographic_name: controller.demographicModel.fullName,
+				providerNo: controller.providerModel.providerNo,
+				providerview: controller.providerModel.providerNo,
+				user_no: data.eventData.userProviderNo,
+
+				billRegion: data.eventData.billingRegion,
+				billForm: data.eventData.billingForm,
+				hotclick: "",
+				bNewForm: 1,
+
+				apptProvider_no: controller.providerModel.providerNo,
+				appointment_no: $scope.eventUuid,
+				appointmentDate: $scope.eventData.startDate,
+				status: controller.selectedEventStatus,
+				start_time: $scope.eventData.startTime,
+
+				referral_no_1: "",
+			};
+			window.open(scheduleService.getBillingLink(params));
+			controller.cancel();
+		}
+	};
+	controller.openMasterRecord = function()
+	{
+		if ($scope.isPatientSelected())
+		{
+			var params = {
+				demographicNo: controller.demographicModel.demographicNo,
+			};
+			$state.go('record.details', params);
+			controller.cancel();
+		}
+	};
+
+	controller.openRxWindow = function()
+	{
+		var params = {
+			demographicNo: controller.demographicModel.demographicNo,
+			providerNo: controller.providerModel.providerNo,
+		};
+		window.open(scheduleService.getRxLink(params));
+		controller.cancel();
 	};
 
 

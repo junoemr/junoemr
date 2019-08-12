@@ -69,15 +69,24 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 	{
 		logger.info(t);
 
-		Demographic demographic = demographicDao.getDemographicById(t.getDemographicNo());
+		Demographic demographic = null;
+		if(t.getDemographicNo() != null && t.getDemographicNo() > 0)
+		{
+			demographic = demographicDao.getDemographicById(t.getDemographicNo());
+		}
 
 		// Copy the defaults from the old frontend
 		int demographicNo = 0;
-		String demographicName = "";
+		String name = "";
 		if (demographic != null)
 		{
 			demographicNo = demographic.getDemographicNo();
-			demographicName = demographic.getDisplayName();
+			name = demographic.getDisplayName();
+		}
+		// sometimes a name string is set without aq demographic (appts without attached demographic)
+		else if (t.getAppointmentName() != null)
+		{
+			name = t.getAppointmentName();
 		}
 
 		Date adjustedAppointmentDate =
@@ -96,15 +105,24 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		appointment.setAppointmentDate(adjustedAppointmentDate);
 		appointment.setStartTime(adjustedStartDate);
 		appointment.setEndTime(adjustedEndDate);
-		appointment.setName(demographicName);
 		appointment.setDemographicNo(demographicNo);
 		appointment.setNotes(t.getNotes());
 		appointment.setReason(t.getReason());
+		appointment.setReasonCode(t.getReasonCode());
 		appointment.setLocation(t.getSite());
 		appointment.setStatus(t.getEventStatusCode());
 		appointment.setResources(t.getResources());
 		appointment.setUrgency(t.getUrgency());
 		appointment.setType(t.getType());
+
+		if(t.isDoNotBook())
+		{
+			appointment.setName(Appointment.DONOTBOOK);
+		}
+		else
+		{
+			appointment.setName(name);
+		}
 
 
 		//String resources = StringUtils.transformNullInEmptyString(t.getResources());
@@ -197,6 +215,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		appointment.setProgramId(t.getProgramId());
 		appointment.setNotes(t.getNotes());
 		appointment.setReason(t.getReason());
+		appointment.setReasonCode(t.getReasonCode());
 		appointment.setLocation(t.getLocation());
 		appointment.setResources(resources);
 		appointment.setType(type);
@@ -211,14 +230,17 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		appointment.setUrgency(urgency);
 		appointment.setCreatorSecurityId(t.getCreatorSecurityId());
 		appointment.setBookingSource(t.getBookingSource());
-		appointment.setReasonCode(t.getReasonCode());
 
 		return appointment;
     }
 
 	public CalendarAppointment getAsCalendarAppointment(Appointment appointment)
 	{
-		Demographic demographic = demographicDao.getDemographicById(appointment.getDemographicNo());
+		Demographic demographic = null;
+		if(appointment.getDemographicNo() > 0)
+		{
+			demographic = demographicDao.getDemographicById(appointment.getDemographicNo());
+		}
 
 		LocalDate birthDate = null;
 		String displayName = null;
@@ -233,6 +255,13 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 			demographicNo = demographic.getDemographicNo();
 		}
 
+		// set appointment name if the demographic is not assigned
+		String appointmentName = null;
+		if(appointment.getName() != null && appointment.getName().isEmpty())
+		{
+			appointmentName = appointment.getName();
+		}
+
 		CalendarAppointment calendarAppointment = new CalendarAppointment();
 		calendarAppointment.setAppointmentNo(appointment.getId());
 		calendarAppointment.setDemographicDob(birthDate);
@@ -241,16 +270,19 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		calendarAppointment.setDemographicNo(demographicNo);
 		calendarAppointment.setProviderNo(Integer.parseInt(appointment.getProviderNo())); //TODO make this a string
 		calendarAppointment.setStartTime(ConversionUtils.toLocalDateTime(appointment.getStartTime()));
-		calendarAppointment.setEndTime(ConversionUtils.toLocalDateTime(appointment.getStartTime()).plusMinutes(1));
+		calendarAppointment.setEndTime(ConversionUtils.toLocalDateTime(appointment.getEndTime()).plusMinutes(1));
 		calendarAppointment.setEventStatusCode(appointment.getStatus());
 		calendarAppointment.setEventStatusModifier(appointment.getAppointmentStatusModifier());
 		calendarAppointment.setReason(appointment.getReason());
+		calendarAppointment.setReasonCode(appointment.getReasonCode());
 		calendarAppointment.setNotes(appointment.getNotes());
 		calendarAppointment.setType(appointment.getType());
 		calendarAppointment.setResources(appointment.getResources());
 		calendarAppointment.setSite(appointment.getLocation());
 		calendarAppointment.setTagSelfBooked(false);
 		calendarAppointment.setTagSelfCancelled(false);
+		calendarAppointment.setDoNotBook(appointment.getName().equals(Appointment.DONOTBOOK));
+		calendarAppointment.setAppointmentName(appointmentName);
 
 		return calendarAppointment;
 	}

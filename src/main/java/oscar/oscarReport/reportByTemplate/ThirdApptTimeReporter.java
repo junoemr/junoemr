@@ -24,42 +24,45 @@
 
 package oscar.oscarReport.reportByTemplate;
 
+import org.apache.commons.beanutils.BeanComparator;
+import org.apache.commons.collections.comparators.ReverseComparator;
+import org.oscarehr.common.dao.OscarAppointmentDao;
+import org.oscarehr.common.model.Appointment;
+import org.oscarehr.report.reportByTemplate.service.ReportByTemplateService;
+import org.oscarehr.schedule.dao.ScheduleTemplateDao;
+import org.oscarehr.schedule.model.ScheduleDate;
+import org.oscarehr.schedule.model.ScheduleTemplate;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import oscar.util.ConversionUtils;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.collections.comparators.ReverseComparator;
-import org.oscarehr.common.dao.OscarAppointmentDao;
-import org.oscarehr.schedule.dao.ScheduleTemplateDao;
-import org.oscarehr.common.model.Appointment;
-import org.oscarehr.schedule.model.ScheduleDate;
-import org.oscarehr.schedule.model.ScheduleTemplate;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.util.ConversionUtils;
-
 /**
  *
  * @author rjonasz
  */
-public class ThirdApptTimeReporter implements Reporter{
-    
-    /**
-     * Creates a new instance of UnusedMinutesReporter
-     */
-    public ThirdApptTimeReporter() {
-    }
-    
-    @SuppressWarnings("unchecked")
-    public boolean generateReport( HttpServletRequest request ) {
-        String templateId = request.getParameter("templateId");
-        ReportObject curReport = (new ReportManager()).getReportTemplateNoParam(templateId);
-        String date_from = request.getParameter("date_from");
+public class ThirdApptTimeReporter implements Reporter
+{
+	private static final ReportByTemplateService reportByTemplateService = SpringUtils.getBean(ReportByTemplateService.class);
+
+	/**
+	 * Creates a new instance of UnusedMinutesReporter
+	 */
+	public ThirdApptTimeReporter()
+	{
+	}
+
+	@SuppressWarnings("unchecked")
+	public boolean generateReport(HttpServletRequest request)
+	{
+	    String templateId = request.getParameter("templateId");
+	    ReportObject curReport = reportByTemplateService.getAsLegacyReport(Integer.parseInt(templateId), false);
+	    String date_from = request.getParameter("date_from");
         
         String tmp = request.getParameter("scheduleSymbols:list");
         String[] schedSymbols = null;

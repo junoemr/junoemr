@@ -1,0 +1,90 @@
+
+@mixin juno-page-margin($margin-size)
+{
+	margin-left: $margin-size;
+	margin-right: $margin-size;
+}
+@mixin juno-page-padding($padding-size-h: 0, $padding-size-v: 0)
+{
+	padding-left: $padding-size-h;
+	padding-right: $padding-size-h;
+	padding-top: $padding-size-v;
+}
+
+
+@mixin juno-page-margin-default
+{
+	@include juno-page-margin(30px);
+}
+@mixin juno-page-margin-none
+{
+	@include juno-page-margin(0);
+}
+
+@mixin juno-page-padding-default
+{
+	@include juno-page-padding(30px, 12px);
+}
+@mixin juno-page-padding-none
+{
+	@include juno-page-padding(0, 0);
+}
+
+/*
+Include this to add breakpoints to the given element.
+Apply a break point class to show the element at device sizes larger than the given break point.
+	Example: breakpoint-lg-visible class will be visible for devices larger than the $break-lg size
+	breakpoint-sm-visible classes will be hidden for mobile, but visible for anything larger
+
+	exclusive classes will only be visible in the specific range
+	Example: breakpoint-lg-visible-exclusive is visible for devices larger than the $break-lg size
+	breakpoint-sm-visible-exclusive will be hidden for mobile and devices larger than $break-md, but visible for sizes between the two
+*/
+@mixin juno-breakpoints($break-lg, $break-md, $break-sm)
+{
+	@media(min-width: $break-lg) {
+		.breakpoint-md-visible-exclusive,.breakpoint-sm-visible-exclusive,.breakpoint-mb-visible-exclusive {
+			display: none !important;
+		}
+	}
+
+	// device width less than the large break point gets this applied
+	@media(max-width: $break-lg) {
+		.breakpoint-lg-visible {
+			display: none !important;
+		}
+
+		.breakpoint-md-visible-exclusive {
+			display: block !important;
+		}
+		.breakpoint-lg-visible-exclusive,.breakpoint-sm-visible-exclusive,.breakpoint-mb-visible-exclusive {
+			display: none !important;
+		}
+	}
+	// device width less than the medium break point gets this applied
+	@media(max-width: $break-md) {
+		.breakpoint-md-visible {
+			display: none !important;
+		}
+
+		.breakpoint-sm-visible-exclusive {
+			display: block !important;
+		}
+		.breakpoint-lg-visible-exclusive,.breakpoint-md-visible-exclusive,.breakpoint-mb-visible-exclusive {
+			display: none !important;
+		}
+	}
+	// device width less than the small break point gets this applied
+	@media(max-width: $break-sm) {
+		.breakpoint-sm-visible {
+			display: none !important;
+		}
+
+		.breakpoint-mb-visible-exclusive {
+			display: block !important;
+		}
+		.breakpoint-lg-visible-exclusive,.breakpoint-md-visible-exclusive,.breakpoint-sm-visible-exclusive {
+			display: none !important;
+		}
+	}
+}

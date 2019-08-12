@@ -49,11 +49,17 @@ import java.util.Date;
 @Table(name = "appointment")
 public class Appointment extends AbstractModel<Integer> implements Serializable {
 
+	public static final String CANCELLED = "C";
+	public static final String BILLED = "B";
+	public static final String NO_SHOW = "N";
+
 	public enum BookingSource
 	{
 		OSCAR,
 		MYOSCAR_SELF_BOOKING
 	}
+
+	public static final String DONOTBOOK = "Do_Not_Book";
 
 	public static final int DEFAULT_REASON_CODE = 17;
 
@@ -115,6 +121,7 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 
 	private String remarks;
 	private String urgency;
+	private boolean isVirtual;
 	private Integer creatorSecurityId;
 	
 	@Enumerated(EnumType.STRING)
@@ -327,6 +334,16 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 
 	public void setUrgency(String urgency) {
 		this.urgency = urgency;
+	}
+
+	public boolean isVirtual()
+	{
+		return isVirtual;
+	}
+
+	public void setIsVirtual(boolean isVirtual)
+	{
+		this.isVirtual = isVirtual;
 	}
 
 	public Integer getCreatorSecurityId() {

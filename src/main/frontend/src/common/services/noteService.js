@@ -27,10 +27,12 @@
  */
 angular.module("Common.Services").service("noteService", [
 	'$http',
+	'$httpParamSerializer',
 	'$q',
 	'junoHttp',
 	function(
 		$http,
+		$httpParamSerializer,
 		$q,
 		junoHttp)
 	{
@@ -44,12 +46,15 @@ angular.module("Common.Services").service("noteService", [
 
 			var config = Juno.Common.ServiceHelper.configHeaders();
 			config.params = {
-				offset: encodeURIComponent(offset),
-				numToReturn: encodeURIComponent(numberToReturn),
 				noteConfig: noteConfig
 			};
 
-			junoHttp.post(service.apiPath + '/' + encodeURIComponent(demographicNo) + '/all', config).then(
+			let urlParams = {
+				'offset': offset,
+				'numberToReturn': numberToReturn
+			};
+
+			junoHttp.post(service.apiPath + '/' + encodeURIComponent(demographicNo) + '/all?' + $httpParamSerializer(urlParams), config).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);

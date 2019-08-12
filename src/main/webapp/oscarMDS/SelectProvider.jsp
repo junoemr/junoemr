@@ -92,6 +92,13 @@
 				self.opener.document.forms[frm].favorites.value = fwdFavorites;
 				self.opener.forwardDocument(docId);
 			}
+			else if (labDisplay == "preview")
+			{
+				frm += "_" + docId;
+				self.opener.document.forms[frm].selectedProviders.value = fwdProviders;
+				self.opener.document.forms[frm].favorites.value = fwdFavorites;
+				self.opener.forwardLab(docId);
+			}
 			else if (isListView != "null" && isListView == true)
 			{
 				self.opener.document.forms[frm].selectedProviders.value = fwdProviders;

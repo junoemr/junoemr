@@ -50,6 +50,9 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			scope.addButtonTitle = '@junoAddButtonTitle';
 
+			scope.iconLeft = '=junoIconLeft';
+			scope.iconRight = '=junoIconRight';
+
 			return scope;
 		};
 
@@ -115,6 +118,21 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 				return angular.isFunction($scope.onAddFn());
 			};
 
+			$scope.hasIcon = function hasIcon()
+			{
+				return $scope.hasLeftIcon() || $scope.hasRightIcon();
+			};
+
+			$scope.hasLeftIcon = function hasLeftIcon()
+			{
+				return $scope.iconLeft === true;
+			};
+
+			$scope.hasRightIcon = function hasRightIcon()
+			{
+				return $scope.iconRight === true;
+			};
+
 			$scope.hasTemplateUrl = function hasTemplateUrl()
 			{
 				return Juno.Common.Util.exists($scope.optionsTemplateUrl);
@@ -127,9 +145,6 @@ angular.module("Common.Directives").service("typeaheadHelper", [
 
 			$scope.formatMatch = function formatMatch($model)
 			{
-				console.log("- Formatting Match -------------");
-				console.log($model);
-				console.log("--------------------------------");
 				if (!Juno.Common.Util.exists($model))
 				{
 					return null;

@@ -8,16 +8,17 @@ angular.module('Help').controller('Help.SupportController', [
 		$http)
 	{
 
+		//TODO load this dynamically
 		$scope.ospInfo = {
-			name: 'OscarHost.ca',
+			name: 'JunoEMR.com',
 			phone: '250-900-7373',
-			contact: 'Oscarhost Support',
-			email: 'support@oscarhost.ca',
-			url: 'https://help.oscarhost.ca'
+			contact: 'Juno EMR Support',
+			email: 'support@junoemr.com',
+			url: 'https://help.junoemr.com'
 		};
 
 		$scope.buildInfo = {
-			versionDisplayName: '15-Beta',
+			versionDisplayName: 'Juno',
 			version: 'master-0000'
 		};
 	}

@@ -13,6 +13,8 @@ angular.module('Common').directive(
 	var scope = angular.copy(helper.default_scope);
 
 	scope.minute_step = '=caMinuteStep';
+	scope.no_label = '@caNoLabel';
+	scope.disable_widget = '=caDisableWidget';
 
 	/* These are all available for the timepicker, but are not wired up yet
 	 scope.input_size = '@caInputSize';
@@ -41,7 +43,10 @@ angular.module('Common').directive(
 		$scope.picker_container = null;
 		$scope.toggle_widget = function toggle_widget()
 		{
-			$scope.picker_container.timepicker('showWidget');
+			if(!$scope.disable_widget)
+			{
+				$scope.picker_container.timepicker('showWidget');
+			}
 		};
 
 		$timeout(function()
@@ -51,6 +56,7 @@ angular.module('Common').directive(
 				{
 					defaultTime: false,
 					minuteStep: $scope.minute_step,
+					template: ($scope.disable_widget)? false: 'dropdown',
 					//disableFocus: true,
 					//showInputs: false,
 					icons: {
