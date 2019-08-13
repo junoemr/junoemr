@@ -19,10 +19,15 @@
 
 		/* When the checkbox is checked, add a background */
 		&:checked + .checkmark {
-			display: inline-block;
-			background: url($icon-checked) no-repeat, $primary;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 			background-size: 100%;
 			border: solid 1px $primary-hover;
+			background-color: $primary;
+			.icon {
+				color: $white;
+			}
 		}
 	}
 	/* style a custom checkbox */
@@ -35,6 +40,10 @@
 		cursor: pointer;
 		margin: 0;
 		padding: 0;
+		.icon {
+			font-size: 20px;
+			color: transparent;
+		}
 	}
 }
 

@@ -2,28 +2,12 @@
 @import '../fonts/JunoIcons/stylesheet.css';
 
 $images-root: '../images/';
-$images-appt-status: '../images/appointmentStatus/';
 
-$icon-modal-close: $images-root + 'icon-16-window-close.svg';
-$icon-modal-min: $images-root + 'icon-16-window-min.svg';
-$icon-modal-max: $images-root + 'icon-16-window-max.svg';
-
-$icon-checked: $images-root + 'icon-16-check-white.svg';
 $icon-logo: $images-root + 'logo.svg';
-
-$icon-up: $images-root + 'icon-16-arrow-up.svg';
-$icon-up-white: $images-root + 'icon-16-arrow-down-white.svg';
 $icon-down: $images-root + 'icon-16-arrow-down.svg';
 $icon-down-white: $images-root + 'icon-16-arrow-down-white.svg';
-$icon-left: $images-root + 'icon-16-arrow-left.svg';
-$icon-left-white: $images-root + 'icon-16-arrow-left-white.svg';
-$icon-right: $images-root + 'icon-16-arrow-right.svg';
-$icon-right-white: $images-root + 'icon-16-arrow-right-white.svg';
 
-/* add the icon class + a icon specific class with the background url
- * add sizing + non-standard stuff in the page specific stylesheets */
 .icon {
-
 }
 .icon-logo {
 	background-image: url($icon-logo);

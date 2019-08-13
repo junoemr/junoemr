@@ -59,16 +59,10 @@ div.datepicker.datepicker-dropdown
 	{
 		background-color: $white;
 		text-shadow: none;
-
 		color: $grey-03;
 
-		th.prev {
-			color: transparent;
-			background: url($icon-left) 50% center no-repeat;
-		}
-		th.next {
-			color: transparent;
-			background: url($icon-right) 50% center no-repeat;
+		th.prev, th.next {
+			color: $primary;
 		}
 		th.prev:hover, th.next:hover, th.datepicker-switch:hover {
 			background-color: $grey-07;
