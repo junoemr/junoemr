@@ -34,7 +34,7 @@
 	<div class="form-group btn-aside-container">
 		<button class="btn btn-icon btn-aside"
 				ng-click="bodyCtrl.toggleShowPatientList()">
-			<span class="icon icon-aside"></span>
+			<i class="icon icon-aside-open"></i>
 		</button>
 	</div>
 
@@ -71,14 +71,14 @@
 						<button class="btn btn-icon visible"
 								ng-disabled="patientListCtrl.isRecentPatientView()"
 								ng-click="patientListCtrl.stepBack()">
-							<span class="icon icon-left"></span>
+							<i class="icon icon-arrow-left"></i>
 						</button>
 					</div>
 					<div class="form-group">
 						<button class="btn btn-icon visible"
 								ng-disabled="patientListCtrl.isRecentPatientView()"
 								ng-click="patientListCtrl.stepForward()">
-							<span class="icon icon-right"></span>
+							<i class="icon icon-arrow-right"></i>
 						</button>
 					</div>
 					<div class="form-group">
@@ -93,8 +93,9 @@
 					</div>
 					<div class="form-group">
 						<button class="btn btn-icon"
+								title="Refresh patient list"
 								ng-click="patientListCtrl.refresh()">
-							<span class="icon icon-refresh"></span>
+							<i class="icon icon-refresh"></i>
 						</button>
 					</div>
 				</div>

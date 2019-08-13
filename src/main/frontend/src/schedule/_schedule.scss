@@ -37,8 +37,8 @@
 					width: $input-height;
 					background-color: $primary-hover;
 					.icon {
-						width: 16px;
-						height: 16px;
+						font-size: 16px;
+						color: $white;
 					}
 				}
 			}
@@ -50,10 +50,6 @@
 			.form-control {
 				@include juno-form-colour-scheme-dark;
 			}
-
-			//input,select {
-				//font-weight: bold;
-			//}
 			label {
 				margin-right: 5px;
 			}
@@ -193,8 +189,9 @@
 								width: $button-size;
 								height: $button-size;
 								.icon {
-									width: $button-size;
-									height: $button-size;
+									font-size: $button-size;
+									//width: $button-size;
+									//height: $button-size;
 								}
 								&:hover {
 									background-color: rgba(255, 255, 255, 0.2);
@@ -282,9 +279,11 @@
 							justify-content: space-evenly;
 						}
 						.icon {
-							width: 16px;
-							height: 16px;
-							margin: 8px;
+							font-size: 24px;
+							color: $primary;
+							&:hover {
+								cursor: pointer;
+							}
 						}
 					}
 				}
@@ -379,12 +378,12 @@
 			}
 		}
 		.icon-modal-ctl {
-			width: 16px;
-			height: 16px;
+			font-size: 24px;
+			color: $primary;
 		}
 		.icon-modal-add-appt {
-			width: 40px;
-			height: 40px;
+			font-size: 40px;
+			color: $white;
 		}
 	}
 
@@ -462,7 +461,7 @@
 			}
 
 			.directive-juno-typeahead {
-				@include juno-tab-lg(56px);
+				@include juno-tab-lg(64px);
 			}
 		}
 	}

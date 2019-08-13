@@ -45,7 +45,7 @@ li.cpp-note-list:last-child {
 	.btn-icon {
 		width: $primary-navbar-height;
 		height: $primary-navbar-height;
-		.icon {
+		.icon-logo {
 			width: 48px;
 			height: 16px;
 		}
@@ -79,8 +79,8 @@ li.cpp-note-list:last-child {
 					background-color: $white;
 					border: 1px solid $grey-06;
 					.icon {
-						width: 16px;
-						height: 16px;
+						font-size: 20px;
+						color: $grey-01;
 					}
 				}
 			}
@@ -90,18 +90,26 @@ li.cpp-note-list:last-child {
 	.navbar-right-menu {
 		height: $primary-navbar-height;
 
+		.btn-icon {
+			width: 24px;
+			height: 24px;
+		}
+		.icon {
+			font-size: 18px;
+			color: $white;
+		}
+
 		span {
 			padding: 2px;
-		}
-		.fa {
-			color: $white;
 		}
 		.dropdown-toggle {
 			color: $white;
 		}
 		.dropdown-menu {
-			top: auto;
 			@include juno-tab-sm(24px);
+			left: initial;
+			right: 16px;
+			top: $primary-navbar-height;
 		}
 	}
 }

@@ -3,15 +3,17 @@
 .directive-juno-typeahead {
 	position: relative;
 
-	.glyphicon {
+	.icon {
 		position: absolute;
 		padding: 0 10px;
 		pointer-events: none;
 		color: $grey-01;
+		font-size: 16px;
+		height: 100%;
 	}
 	/* align icon */
 	&.left-addon {
-		.glyphicon {
+		.icon {
 			left: 0;
 		}
 		input {
@@ -19,7 +21,7 @@
 		}
 	}
 	&.right-addon {
-		.glyphicon {
+		.icon {
 			right: 0;
 		}
 		input {

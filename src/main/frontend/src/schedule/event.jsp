@@ -25,7 +25,7 @@
 <div class="schedule-modal">
 	<div class="modal-header">
 		<div class="modal-title">
-			<span class="icon icon-modal-add-appt"></span>
+			<i class="icon icon-modal-add-appt icon-calendar-add"></i>
 			<div class="align-baseline">
 				<h3 ng-hide="editMode">Add {{label}}</h3>
 				<h3 ng-show="editMode">Modify {{label}}</h3>
@@ -53,14 +53,10 @@
 					<span class="">Rx</span>
 				</button>
 			</div>
-			<%--<button type="button" class="close" aria-label="Maximaze">--%>
-				<%--<a class="icon icon-modal-ctl icon-modal-max"></a>--%>
-			<%--</button>--%>
-			<%--<button type="button" class="close" aria-label="Minimize">--%>
-				<%--<a class="icon icon-modal-ctl icon-modal-min"></a>--%>
-			<%--</button>--%>
-			<button type="button" class="close" aria-label="Close" ng-click="eventController.cancel()">
-				<a class="icon icon-modal-ctl icon-modal-close"></a>
+			<button type="button" class="btn btn-icon" aria-label="Close"
+			        ng-click="eventController.cancel()"
+			        title="Cancel">
+				<i class="icon icon-modal-ctl icon-close"></i>
 			</button>
 		</div>
 	</div>

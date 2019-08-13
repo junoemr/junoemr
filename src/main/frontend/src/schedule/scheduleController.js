@@ -856,7 +856,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					if (Juno.Common.Util.exists(eventStatus.icon))
 					{
 						// class matches the icon name without the extension
-						statusElem.addClass("icon-status-" + eventStatus.icon.substr(0, eventStatus.icon.indexOf('.')));
+						statusElem.addClass("icon-" + eventStatus.icon.substr(0, eventStatus.icon.indexOf('.')));
 					}
 					else
 					{

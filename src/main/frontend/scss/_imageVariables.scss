@@ -1,4 +1,6 @@
 
+@import '../fonts/JunoIcons/stylesheet.css';
+
 $images-root: '../images/';
 $images-appt-status: '../images/appointmentStatus/';
 
@@ -7,19 +9,7 @@ $icon-modal-min: $images-root + 'icon-16-window-min.svg';
 $icon-modal-max: $images-root + 'icon-16-window-max.svg';
 
 $icon-checked: $images-root + 'icon-16-check-white.svg';
-$icon-add-appt: $images-root + 'icon-48-add-appintment.svg';
-$icon-user-search: $images-root + 'icon-16-search-user.svg';
-$icon-refresh: $images-root + 'icon-16-refresh.svg';
-$icon-refresh-white: $images-root + 'icon-16-refresh-white.svg';
-$icon-daysheet-blue: $images-root + 'cal-daysheetblue.svg';
-$icon-search-blue: $images-root + 'cal-searchblue.svg';
-$icon-week-view-blue: $images-root + 'cal-weekblue.svg';
-$icon-month-view-blue: $images-root + 'cal-monthblue.svg';
 $icon-logo: $images-root + 'logo.svg';
-$icon-add: $images-root + 'icon-16-add.svg';
-$icon-phone: $images-root + 'icon-16-phone-white.svg';
-$icon-aside: $images-root + 'icon-48-aside.svg';
-$icon-setting: $images-root + 'icon-48-setting.svg';
 
 $icon-up: $images-root + 'icon-16-arrow-up.svg';
 $icon-up-white: $images-root + 'icon-16-arrow-down-white.svg';
@@ -30,163 +20,14 @@ $icon-left-white: $images-root + 'icon-16-arrow-left-white.svg';
 $icon-right: $images-root + 'icon-16-arrow-right.svg';
 $icon-right-white: $images-root + 'icon-16-arrow-right-white.svg';
 
-$icon-status-starbill: $images-appt-status + 'icon-48-todo.svg';
-$icon-status-todo: $images-appt-status + 'icon-48-folder.svg';
-$icon-status-here: $images-appt-status + 'icon-48-user.svg';
-$icon-status-picked: $images-appt-status + 'icon-48-picked.svg';
-$icon-status-empty: $images-appt-status + 'icon-48-empty-room.svg';
-$icon-status-noshow: $images-appt-status + 'icon-48-noshow.svg';
-$icon-status-cancel: $images-appt-status + 'icon-48-cancel.svg';
-$icon-status-billed: $images-appt-status + 'icon-48-check.svg';
-
-$icon-status-1: $images-appt-status + 'icon-48-number-1.svg';
-$icon-status-2: $images-appt-status + 'icon-48-number-2.svg';
-$icon-status-3: $images-appt-status + 'icon-48-number-3.svg';
-$icon-status-4: $images-appt-status + 'icon-48-number-4.svg';
-$icon-status-5: $images-appt-status + 'icon-48-number-5.svg';
-$icon-status-6: $images-appt-status + 'icon-48-number-6.svg';
-$icon-status-7: $images-appt-status + 'icon-48-number-7.svg';
-$icon-status-8: $images-appt-status + 'icon-48-number-8.svg';
-$icon-status-9: $images-appt-status + 'icon-48-number-9.svg';
-$icon-status-10: $images-appt-status + 'icon-48-number-10.svg';
-$icon-status-11: $images-appt-status + 'icon-48-number-11.svg';
-$icon-status-12: $images-appt-status + 'icon-48-number-12.svg';
-
 /* add the icon class + a icon specific class with the background url
  * add sizing + non-standard stuff in the page specific stylesheets */
 .icon {
-	display: inline-block;
-	background-size: 100%;
-	background-position: center;
-	background-repeat: no-repeat;
-}
 
+}
 .icon-logo {
 	background-image: url($icon-logo);
 }
-.icon-aside {
-	background-image: url($icon-aside);
-}
-.icon-setting {
-	background-image: url($icon-setting);
-}
 .icon-down {
 	background-image: url($icon-down);
-}
-.icon-down-white {
-	background-image: url($icon-down-white);
-}
-.icon-left {
-	background-image: url($icon-left);
-}
-.icon-left-white {
-	background-image: url($icon-left-white);
-}
-.icon-right {
-	background-image: url($icon-right);
-}
-.icon-right-white {
-	background-image: url($icon-right-white);
-}
-.icon-add {
-	background-image: url($icon-add);
-}
-.icon-phone {
-	background-image: url($icon-phone);
-}
-.icon-refresh {
-	background-image: url($icon-refresh);
-}
-.icon-refresh-white {
-	background-image: url($icon-refresh-white);
-}
-.icon-daysheet {
-	background-image: url($icon-daysheet-blue);
-}
-.icon-search {
-	background-image: url($icon-search-blue);
-}
-.icon-week-view {
-	background-image: url($icon-week-view-blue);
-}
-.icon-month-view {
-	background-image: url($icon-month-view-blue);
-}
-.icon-user-search {
-	background-image: url($icon-user-search);
-}
-
-/* modal images */
-.icon-modal-close {
-	background-image: url($icon-modal-close);
-}
-.icon-modal-min {
-	background-image: url($icon-modal-min);
-}
-.icon-modal-max {
-	background-image: url($icon-modal-max);
-}
-.icon-modal-add-appt {
-	background-image: url($icon-add-appt);
-}
-
-
-/* appointment status icons */
-.icon-status-starbill {
-	background-image: url($icon-status-starbill);
-}
-.icon-status-todo {
-	background-image: url($icon-status-todo);
-}
-.icon-status-here {
-	background-image: url($icon-status-here);
-}
-.icon-status-picked {
-	background-image: url($icon-status-picked);
-}
-.icon-status-empty {
-	background-image: url($icon-status-empty);
-}
-.icon-status-noshow {
-	background-image: url($icon-status-noshow);
-}
-.icon-status-cancel {
-	background-image: url($icon-status-cancel);
-}
-.icon-status-billed {
-	background-image: url($icon-status-billed);
-}
-
-.icon-status-1 {
-	background-image: url($icon-status-1);
-}
-.icon-status-2 {
-	background-image: url($icon-status-2);
-}
-.icon-status-3 {
-	background-image: url($icon-status-3);
-}
-.icon-status-4 {
-	background-image: url($icon-status-4);
-}
-.icon-status-5 {
-	background-image: url($icon-status-5);
-}
-.icon-status-6 {
-	background-image: url($icon-status-6);
-}
-.icon-status-7 {
-	background-image: url($icon-status-7);
-}
-.icon-status-8 {
-	background-image: url($icon-status-8);
-}
-.icon-status-9 {
-	background-image: url($icon-status-9);
-}
-.icon-status-10 {
-	background-image: url($icon-status-10);
-}
-.icon-status-11 {
-	background-image: url($icon-status-11);
 }

@@ -63,22 +63,9 @@
 		-webkit-appearance: none;
 		-moz-appearance: none;
 		outline: none;
-	}
 
-
-	// special aside open/close button style
-	&.btn-aside {
-		width: $page-header-height;
-		height: $page-header-height;
-		background-color: #3c5a96;
-		border-radius: 0;
-		border: 1px solid transparent;
-		&:focus {
-			outline: 1px solid transparent !important;
-		}
-		.icon {
-			width: 40px;
-			height: 40px;
+		&:hover,&:focus {
+			color: inherit;
 		}
 	}
 

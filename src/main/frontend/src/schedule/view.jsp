@@ -41,14 +41,14 @@
 								<button class="btn btn-icon"
 								        title="Previous Day"
 								        ng-click="stepBack()">
-									<span class="icon icon-left-white"></span>
+									<i class="icon icon-arrow-left"></i>
 								</button>
 							</div>
 							<div class="form-group">
 								<button class="btn btn-icon"
 								        title="Next Day"
 								        ng-click="stepForward()">
-									<span class="icon icon-right-white"></span>
+									<i class="icon icon-arrow-right"></i>
 								</button>
 							</div>
 						</div>
@@ -150,7 +150,7 @@
 							<button class="btn btn-icon"
 							        title="Refresh Appointments"
 							        ng-click="refetchEvents()">
-								<span class="icon icon-refresh-white"></span>
+								<i class="icon icon-refresh"></i>
 							</button>
 						</div>
 					</div>

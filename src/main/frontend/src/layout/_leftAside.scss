@@ -5,6 +5,21 @@
 		position:absolute;
 		left: 0;
 		z-index: 1000;
+
+		.btn-aside {
+			width: $page-header-height;
+			height: $page-header-height;
+			background-color: #3c5a96;
+			border-radius: 0;
+			border: 1px solid transparent;
+			&:focus {
+				outline: 1px solid transparent !important;
+			}
+			.icon {
+				font-size: 32px;
+				color: $white;
+			}
+		}
 	}
 
 	.patient-list-header {
@@ -47,8 +62,8 @@
 					background-color: $white;
 				}
 				.icon {
-					width: 20px;
-					height: 20px;
+					font-size: 16px;
+					color: $primary;
 				}
 			}
 			.form-inline {
