@@ -42,6 +42,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import java.util.Date;
 
 @Entity
@@ -100,6 +101,7 @@ public class AppointmentArchive extends AbstractModel<Integer>  {
 	@Column(name="lastupdateuser")
 	private String lastUpdateUser;
 
+	@Transient
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="lastupdateuser", referencedColumnName="provider_no", insertable=false, updatable=false)
 	private ProviderData lastUpdateUserRecord;
