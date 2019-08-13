@@ -83,7 +83,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			controller.unAckLabDocTotal = 0;
 			controller.unreadMessageTotal = 0;
 			controller.demographicSearch = null;
-			controller.activeTeams = null;
+			controller.consultationTeamWarning = "All Teams";
 			// measured in months
 			controller.consultationLookbackPeriod = 1;
 
@@ -140,17 +140,6 @@ angular.module('Layout').controller('Layout.NavBarController', [
 					console.log(errors);
 				});
 
-			providerService.getActiveTeams().then(
-				function success(results)
-				{
-					controller.activeTeams = results;
-				},
-				function error(errors)
-				{
-					console.log("navBarController::providerService.getActiveTeams", errors);
-				}
-			);
-
 			providerService.getSettings().then(
 				function success(results)
 				{
@@ -158,6 +147,13 @@ angular.module('Layout').controller('Layout.NavBarController', [
 					{
 						controller.consultationLookbackPeriod = results.consultationTimePeriodWarning;
 					}
+
+					// If we get any result back that isn't -1, need to filter consultation count by the given team
+					if (results.consultationTeamWarning !== "-1")
+					{
+						controller.consultationTeamWarning = results.consultationTeamWarning
+					}
+					console.log("providerService::getSettings", results);
 				},
 				function error(errors)
 				{
@@ -366,12 +362,13 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		{
 			// Any consultations that should have ended after this point but haven't need to be alerted for
 			var endDate = moment().subtract(controller.consultationLookbackPeriod, "months").toISOString();
+
 			consultService.getTotalRequests(
 				{
 					invertStatus: true,
 					referralEndDate: endDate,
 					status: '4',
-					teams: 'All Teams' // still needs to change
+					team: controller.consultationTeamWarning
 				}).then(
 					function success(results)
 					{
