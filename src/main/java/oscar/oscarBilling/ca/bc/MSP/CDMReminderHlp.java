@@ -3,7 +3,9 @@ package oscar.oscarBilling.ca.bc.MSP;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -55,26 +57,65 @@ public class CDMReminderHlp {
         //if the specified patient has one one the specified chronic diseases
         if (cdmCode.equals(dxcode)) {
           /*
-           * Check If the associated service code was billed in the past calendar year
+          check if a conflicting code has already been billed
            */
-          int daysPast = lgc.daysSinceCodeLastBilled(demoNo, cdmServiceCode);
-          if (daysPast > 365) {
-            GregorianCalendar cal = new GregorianCalendar();
-            cal.add(Calendar.DAY_OF_YEAR,-daysPast);
-            java.util.Date dateLastBilled = cal.getTime();
-            SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yy");
-            String newfmt = formatter.format(dateLastBilled);
-            String message = remString + " " + cdmServiceCode + " - Last Billed On: " + newfmt;
-            crt.createTickler(loggedInInfo, demoNo, provNo, message);
+          boolean conflict = false;
+          List<String> conflictServiceCodes = getConflictingServiceCodes(cdmServiceCode);
+          for (String conflictCode : conflictServiceCodes)
+          {
+            if (lgc.daysSinceCodeLastBilled(demoNo, conflictCode) <= 365 && lgc.daysSinceCodeLastBilled(demoNo, conflictCode) != -1)
+            {
+              conflict = true;
+              break;
+            }
           }
-          else if (daysPast < 0) {
-            String message =
-                remString + " " + cdmServiceCode + " - Never billed for this patient";
-            crt.createTickler(loggedInInfo, demoNo, provNo, message);
+
+          if (!conflict)
+          {
+            /*
+             * Check If the associated service code was billed in the past calendar year
+             */
+            int daysPast = lgc.daysSinceCodeLastBilled(demoNo, cdmServiceCode);
+            if (daysPast > 365)
+            {
+              GregorianCalendar cal = new GregorianCalendar();
+              cal.add(Calendar.DAY_OF_YEAR, -daysPast);
+              java.util.Date dateLastBilled = cal.getTime();
+              SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yy");
+              String newfmt = formatter.format(dateLastBilled);
+              String message = remString + " " + cdmServiceCode + " - Last Billed On: " + newfmt;
+              crt.createTickler(loggedInInfo, demoNo, provNo, message);
+            } else if (daysPast < 0)
+            {
+              String message =
+                      remString + " " + cdmServiceCode + " - Never billed for this patient";
+              crt.createTickler(loggedInInfo, demoNo, provNo, message);
+            }
           }
         }
       }
     }
+  }
+
+  /**
+   * get a list of service codes that conflict with the given service code, i.e. you cannot bill both.
+   * @param serviceCode - the service code you whish to get conflicts for.
+   * @return - list of conflicting service codes
+   */
+  private List<String> getConflictingServiceCodes(String serviceCode)
+  {
+    ArrayList<String> conflicts = new ArrayList<>();
+    String cdmRulesQry =
+            "SELECT serviceCode,conditionCode FROM billing_service_code_conditions";
+    List<String[]> cdmRules = SqlUtils.getQueryResultsList(cdmRulesQry);
+    for (String[] cdmRule : cdmRules)
+    {
+      if (cdmRule[0].equals(serviceCode))
+      {
+        conflicts.add(cdmRule[1]);
+      }
+    }
+    return conflicts;
   }
 
   private List<String> extractPatientNos(List<String[]> cdmPatients) {
