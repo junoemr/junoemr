@@ -42,6 +42,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 	'consultService',
 	'inboxService',
 	'messageService',
+	'providerService',
 	'ticklerService',
 
 	function(
@@ -59,6 +60,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		consultService,
 		inboxService,
 		messageService,
+		providerService,
 		ticklerService)
 	{
 		var controller = this;
@@ -81,6 +83,9 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			controller.unAckLabDocTotal = 0;
 			controller.unreadMessageTotal = 0;
 			controller.demographicSearch = null;
+			controller.activeTeams = null;
+			// measured in months
+			controller.consultationLookbackPeriod = 1;
 
 			billingService.getBillingRegion().then(
 				function success(results)
@@ -134,6 +139,31 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				{
 					console.log(errors);
 				});
+
+			providerService.getActiveTeams().then(
+				function success(results)
+				{
+					controller.activeTeams = results;
+				},
+				function error(errors)
+				{
+					console.log("navBarController::providerService.getActiveTeams", errors);
+				}
+			);
+
+			providerService.getSettings().then(
+				function success(results)
+				{
+					if (results.consultationTimePeriodWarning > 0)
+					{
+						controller.consultationLookbackPeriod = results.consultationTimePeriodWarning;
+					}
+				},
+				function error(errors)
+				{
+					console.log("Error: ", errors);
+				}
+			);
 
 			personaService.getNavBar().then(
 				function success(results)
@@ -334,9 +364,14 @@ angular.module('Layout').controller('Layout.NavBarController', [
 
 		controller.getActiveConsultationCount = function getActiveConsultationCount()
 		{
+			// Any consultations that should have ended after this point but haven't need to be alerted for
+			var endDate = moment().subtract(controller.consultationLookbackPeriod, "months").toISOString();
 			consultService.getTotalRequests(
 				{
-					search: 'status=1'
+					invertStatus: true,
+					referralEndDate: endDate,
+					status: '4',
+					teams: 'All Teams' // still needs to change
 				}).then(
 					function success(results)
 					{

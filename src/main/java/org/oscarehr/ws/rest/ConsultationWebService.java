@@ -192,7 +192,8 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			@QueryParam("appointmentEndDate") String appointmentEndDate,
 			@QueryParam("team") String team,
 			@QueryParam("sortColumn") @DefaultValue("ReferralDate") String sortColumn,
-			@QueryParam("sortDirection") @DefaultValue("desc") String sortDirection
+			@QueryParam("sortDirection") @DefaultValue("desc") String sortDirection,
+			@QueryParam("invertStatus") boolean invertStatus
 			)
 	{
 		ConsultationRequestSearchFilter filter = new ConsultationRequestSearchFilter();
@@ -215,6 +216,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		filter.setAppointmentStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(appointmentStartDate)));
 		filter.setAppointmentEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(appointmentEndDate)));
 		filter.setTeam(team);
+		filter.setInvertStatus(invertStatus);
 
 		filter.setSortMode(ConsultationRequestSearchFilter.SORTMODE.valueOf(sortColumn));
 		filter.setSortDir(ConsultationRequestSearchFilter.SORTDIR.valueOf(sortDirection));

@@ -50,6 +50,7 @@ public class ConsultationRequestSearchFilter {
 	private SORTDIR sortDir = SORTDIR.desc;
 	private int startIndex;
 	private int numToReturn;
+	private Boolean invertStatus;
 
 	
 	public Integer getId() {
@@ -136,7 +137,14 @@ public class ConsultationRequestSearchFilter {
 	public void setNumToReturn(int numToReturn) {
 		this.numToReturn = numToReturn;
 	}
-	
+	public Boolean getInvertStatus()
+	{
+		return invertStatus;
+	}
+	public void setInvertStatus(Boolean status)
+	{
+		this.invertStatus = status;
+	}
 	
 	
 }

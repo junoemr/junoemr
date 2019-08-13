@@ -183,7 +183,14 @@ public class ConsultRequestDao extends AbstractDao<ConsultationRequest>
 		}
 		
 		if (filter.getStatus()!=null) {
-			sql.append("and cr.status = '" + filter.getStatus() + "' ");
+			if (filter.getInvertStatus() != null && filter.getInvertStatus())
+			{
+				sql.append("and cr.status != '" + filter.getStatus() + "' ");
+			}
+			else
+			{
+				sql.append("and cr.status = '" + filter.getStatus() + "' ");
+			}
 		} else {
 			sql.append("and cr.status!=4 and cr.status!=5 and cr.status!=7 ");
 		}
@@ -239,7 +246,6 @@ public class ConsultRequestDao extends AbstractDao<ConsultationRequest>
 		  
 		
 		  sql.append(orderBy);
-		  
 		return sql.toString();
 	}
 }

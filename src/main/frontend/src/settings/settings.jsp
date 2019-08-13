@@ -511,7 +511,7 @@
 			<div class="row" ng-show="settingsCtrl.currentTab.path == 'consults'">
 				<div class="col-lg-4 col-sm-6 md-margin-top">
 					<div class="form-group col-sm-12">
-						<label>Consultation Cutoff Time Warning:</label>
+						<label>Consultation Cutoff Time Warning (in months):</label>
 						<input ng-model="settingsCtrl.pref.consultationTimePeriodWarning" placeholder="Cutoff Time Warning" class="form-control" type="text">
 					</div>
 					<div class="form-group col-sm-12">
