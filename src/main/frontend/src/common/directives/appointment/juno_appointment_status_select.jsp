@@ -16,7 +16,7 @@
 			<div class="icon-wrapper">
 				<button class="btn btn-icon"
 					ng-click="button_change_fn()">
-					<span class="icon icon-status"></span>
+					<i class="icon icon-status"></i>
 				</button>
 			</div>
 			<select type="text"

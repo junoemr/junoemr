@@ -5,10 +5,10 @@
   .fax-config-body {
 	.account-list {
 	  padding: 5px;
-	  background-color: $white;
+	  background-color: $color-neutral-white;
 	  .account-item {
-		background-color: $grey-08;
-		border: 2px $grey-05;
+		background-color: $color-neutral-lightest;
+		border: 2px $color-neutral-light-grey;
 		padding: 10px;
 
 		display: flex;
@@ -43,11 +43,11 @@
 }
 .faxEditModal {
   .modal-content {
-	background-color: $primary;
+	background-color: $color-primary-base;
   }
   .modal-body {
 	padding:30px;
-	background-color: $white;
+	background-color: $color-neutral-white;
 	input {
 	  &.ng-invalid {
 		background-color: $input-color-invalid-background;
@@ -75,7 +75,7 @@
 		.info-icon {
 		  position: absolute;
 		  font-size: 14px;
-		  color: $info-icon-color;
+		  color: $color-blue-light;
 		}
 	  }
 	  .flex-row-label {
@@ -90,7 +90,7 @@
 	.glyphicon {
 	  font-size: 25px;
 	  &.unknown {
-		color: $grey-03;
+		color: $color-neutral-dark;
 	  }
 	  &.success {
 		color: $semantic-success-base;
@@ -101,10 +101,10 @@
 	}
   }
   .modal-header {
-	color: $white;
+	color: $color-neutral-white;
   }
   .modal-footer {
-	background-color: $grey-07;
+	background-color: $color-neutral-lighter;
 	padding-top: 20px;
 	padding-bottom: 20px;
   }
@@ -122,16 +122,16 @@
 	li {
 	  a {
 		color: black;
-		background-color: $grey-07;
+		background-color: $color-neutral-lighter;
 		&:hover, &:focus {
-		  background-color: $grey-04;
+		  background-color: $color-neutral-grey;
 		  border-color: transparent;
 		}
 	  }
 	  .active {
 		a {
 		  color: black;
-		  background-color: $white;
+		  background-color: $color-neutral-white;
 		  border-color: black;
 		  border-bottom-color:transparent;
 		}
