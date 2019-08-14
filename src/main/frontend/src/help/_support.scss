@@ -5,12 +5,12 @@
 	h2,h4 {
 		margin: 0;
 		small {
-			color: $grey-08;
+			color: $color-neutral-lightest;
 		}
 	}
 	.experimental {
-		color: $grey-08;
-		background-color: $red;
+		color: $color-neutral-lightest;
+		background-color: $color-red-base;
 	}
 }
 .support-content {

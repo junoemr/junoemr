@@ -19,6 +19,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 	'securityService',
 	'scheduleService',
 	'uiCalendarConfig',
+	'errorsService',
 	'globalStateService',
 
 	function (
@@ -36,6 +37,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		securityService,
 		scheduleService,
 		uiCalendarConfig,
+		messagesFactory,
 		globalStateService
 	)
 	{
@@ -64,6 +66,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.calendarName = 'cpCalendar';
 		$scope.initialized = false;
 		$scope.calendarLoading = false;
+		$scope.customLoading = false;
+		$scope.displayMessages = messagesFactory.factory();
 
 		$scope.uiConfig = {};
 		$scope.uiConfigApplied = {
@@ -316,9 +320,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						{
 							controller.selectedScheduleView = view;
 							$scope.refetchEvents();
+						},
+						function failure()
+						{
+							$scope.displayMessages.add_standard_error("Failed to update provider setting");
 						}
 					);
-
 			}
 		};
 
@@ -360,6 +367,19 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			return (controller.selectedScheduleView === controller.scheduleViewEnum.schedule);
 		};
+		$scope.isAgendaDayView = function()
+		{
+			return ( $scope.isAgendaView() && $scope.getCalendarViewName() === controller.calendarViewEnum.agendaDay)
+		};
+		$scope.isAgendaWeekView = function()
+		{
+			return ( $scope.isAgendaView() && $scope.getCalendarViewName() === controller.calendarViewEnum.agendaWeek)
+		};
+		$scope.isAgendaMonthView = function()
+		{
+			return ( $scope.isAgendaView() && $scope.getCalendarViewName() === controller.calendarViewEnum.agendaMonth)
+		};
+
 
 		//=========================================================================
 		// Private methods
@@ -425,6 +445,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.setCalendarLoading = function setCalendarLoading(isLoading)
 		{
 			$scope.calendarLoading = isLoading;
+		};
+		$scope.setCustomLoading = function setCustomLoading(isLoading)
+		{
+			$scope.customLoading = isLoading;
 		};
 
 		$scope.setEventSources = function setEventSources()
@@ -509,6 +533,15 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			var deferred = $q.defer();
 
+			$scope.setCustomLoading(true);
+			if($scope.isAgendaWeekView())
+			{
+				// full calendar likes to ask for a subset of the week days when hidden days are set,
+				// but we need to always ask for the whole week here so that we know what days to hide
+				end = angular.copy(start).endOf('week');
+				start = angular.copy(start).startOf('week');
+			}
+
 			// Get date strings to pass to the backend.  The calendar provides datetime that describe
 			// and inclusive start time and exclusive end time, so one second is removed from
 			// the end time to convert to the correct date.
@@ -528,6 +561,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			).then(
 				function (results)
 				{
+					console.info('================== load events ===================');
+					var hasVisibleSchedules = results.data.body.visibleSchedules;
+					$scope.showNoResources = !hasVisibleSchedules;
+					$scope.uiConfig.calendar.hiddenDays = [];
+
 					if (selectedSchedule.identifierType === controller.scheduleTypeEnum.group)
 					{
 						var providerNos = results.data.body.providerIdList;
@@ -539,9 +577,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						// always show day view in resource mode
 						$scope.uiConfig.calendar.defaultView = controller.calendarViewEnum.agendaDay;
 						$scope.calendarViewName = controller.calendarViewEnum.agendaDay;
-
-						$scope.showNoResources = (providerNos.length === 0);
-						$scope.uiConfig.calendar.hiddenDays = [];
 					}
 					else
 					{
@@ -550,18 +585,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						$scope.calendarViewName = $scope.getCalendarViewName();
 						$scope.uiConfig.calendar.resources = false;
 
-						$scope.showNoResources = false;
-						$scope.uiConfig.calendar.hiddenDays = [];
-
 						var hiddenDays = results.data.body.hiddenDaysList;
-						if(hiddenDays.length === 7)
-						{
-							// hiding all days causes an error in fullCalendar, so instead hide the calendar with the no schedules screen
-							$scope.showNoResources = true;
-						}
 						// only hide days in week/month views. limiting day view causes re-fetch errors when changing to week view
-						else if ($scope.calendarViewName === controller.calendarViewEnum.agendaWeek
-							  || $scope.calendarViewName === controller.calendarViewEnum.agendaMonth)
+						// hiding all days causes an error in fullCalendar, rely on the no schedules screen to hide it
+						if (hiddenDays.length !== 7 && ($scope.isAgendaWeekView() || $scope.isAgendaMonthView()))
 						{
 							$scope.uiConfig.calendar.hiddenDays = hiddenDays; // hide days without schedules
 						}
@@ -569,10 +596,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					$scope.applyUiConfig($scope.uiConfig);
 					$scope.events = results.data.body.eventList;
 
+					$scope.setCustomLoading(false);
 					deferred.resolve(results.data.body);
 				},
-				function (results)
+				function failure(results)
 				{
+					$scope.displayMessages.add_standard_error("Failed to load events");
 					deferred.reject(results.data.body);
 				}
 			);
@@ -621,12 +650,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			if (editMode)
 			{
 				this.appointmentApi.updateAppointment(calendarAppointment).then(
-					function (result)
+					function success(result)
 					{
 						deferred.resolve(result.data);
 					},
-					function (result)
+					function failure(result)
 					{
+						$scope.displayMessages.add_standard_error("Failed to update appointment");
 						deferred.reject(result.data);
 					}
 				);
@@ -634,12 +664,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			else
 			{
 				$scope.appointmentApi.addAppointment(calendarAppointment).then(
-					function (result)
+					function success(result)
 					{
 						deferred.resolve(result.data);
 					},
-					function (result)
+					function failure(result)
 					{
+						$scope.displayMessages.add_standard_error("Failed to add appointment");
 						deferred.reject(result.data);
 					}
 				);
@@ -668,7 +699,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					deferred.resolve(data.body);
 				},
-				function success(data)
+				function failure(data)
 				{
 					deferred.reject(data.body);
 				}
@@ -735,13 +766,14 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			var deferred = $q.defer();
 
 			$scope.appointmentApi.deleteAppointment(appointmentNo).then(
-				function (result)
+				function success(result)
 				{
 					deferred.resolve(result.data);
 
 				},
-				function (result)
+				function failure(result)
 				{
+					$scope.displayMessages.add_standard_error("Failed to delete appointment");
 					deferred.reject(result.data);
 				}
 			);
@@ -780,9 +812,9 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 					$scope.setCalendarLoading(false);
 				},
-				function failure(response)
+				function failure()
 				{
-
+					$scope.displayMessages.add_standard_error("Failed to update status");
 				}
 			);
 		};
@@ -824,7 +856,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					if (Juno.Common.Util.exists(eventStatus.icon))
 					{
 						// class matches the icon name without the extension
-						statusElem.addClass("icon-status-" + eventStatus.icon.substr(0, eventStatus.icon.indexOf('.')));
+						statusElem.addClass("icon-" + eventStatus.icon.substr(0, eventStatus.icon.indexOf('.')));
 					}
 					else
 					{
@@ -1328,7 +1360,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					controller.moveEventSuccess(eventData, calEvent);
 					$scope.setCalendarLoading(false);
 
-				}, function error(errors)
+				},
+				function error(errors)
 				{
 					console.log('failed to save event', errors);
 
@@ -1359,7 +1392,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					controller.moveEventSuccess(eventData, calEvent);
 					$scope.setCalendarLoading(false);
 
-				}, function error(errors)
+				},
+				function error(errors)
 				{
 					console.log('failed to resize event', errors);
 
@@ -1384,6 +1418,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					{
 						controller.providerSettings.siteSelected = $scope.selectedSiteName;
 						$scope.refetchEvents();
+					},
+					function failure()
+					{
+						$scope.displayMessages.add_standard_error("Failed to update provider setting");
 					}
 				);
 		};
@@ -1416,6 +1454,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 							$scope.setCalendarResources(false);
 						}
 						$scope.refetchEvents();
+					},
+					function failure()
+					{
+						$scope.displayMessages.add_standard_error("Failed to update provider setting");
 					}
 				);
 		};
@@ -1438,6 +1480,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						// ensure the selected date doesn't change on events refresh
 						$scope.uiConfig.calendar.defaultDate = $scope.calendar().fullCalendar('getDate');
 						$scope.applyUiConfig($scope.uiConfig);
+					},
+					function failure()
+					{
+						$scope.displayMessages.add_standard_error("Failed to update provider setting");
 					}
 				);
 		};
@@ -1469,8 +1515,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						$scope.scheduleOptions.push(scheduleData);
 					}
 					deferred.resolve(results);
-				});
-
+				},
+				function failure(results)
+				{
+					$scope.displayMessages.add_standard_error("Failed to load schedule groups");
+					deferred.reject(results);
+				}
+			);
 			return deferred.promise;
 		};
 
@@ -1493,6 +1544,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						};
 					}
 					deferred.resolve($scope.resourceOptionHash);
+				},
+				function failure()
+				{
+					$scope.displayMessages.add_standard_error("Failed to load resource hash");
+					deferred.reject($scope.resourceOptionHash);
 				}
 			);
 
@@ -1558,6 +1614,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					var enabled = rawResults.data.body;
 					$scope.sitesEnabled = enabled;
 					deferred.resolve(enabled);
+				},
+				function failure(results)
+				{
+					$scope.displayMessages.add_standard_error("Failed to load sites enabled");
+					deferred.reject(results.data.body);
 				}
 			);
 
@@ -1585,6 +1646,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						}
 					}
 					deferred.resolve(out);
+				},
+				function failure(results)
+				{
+					$scope.displayMessages.add_standard_error("Failed to load sites");
+					deferred.reject(results);
 				}
 			);
 
@@ -1610,7 +1676,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 					$scope.availabilityTypes = availabilityTypes;
 					deferred.resolve(availabilityTypes);
-				});
+				},
+				function failure(results)
+				{
+					$scope.displayMessages.add_standard_error("Failed to load availablity types");
+					deferred.reject(results.data.body);
+				}
+			);
 
 			return deferred.promise;
 		};

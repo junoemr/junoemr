@@ -599,6 +599,7 @@ public class Schedule
 		List<CalendarEvent> allCalendarEvents;
 		List<Integer> hiddenDaysList;
 		List<String> providerIdList;
+		boolean visibleSchedules = false;
 
 		if(siteName == null || isProviderAssignedToSite(siteName, String.valueOf(providerId)))
 		{
@@ -648,6 +649,10 @@ public class Schedule
 					{
 						hiddenDaysList.add(i);
 					}
+					else if(daysWithSchedules[i] == 1)
+					{
+						visibleSchedules = true;
+					}
 				}
 
 				// Get appointments for this provider/date range
@@ -659,6 +664,7 @@ public class Schedule
 				allCalendarEvents = getCalendarEvents(session, providerId,
 						startDate, endDate, startTime, endTime, siteName, siteId, slotDurationInMin);
 				hiddenDaysList = new ArrayList<>(0); //always empty for all view
+				visibleSchedules = true;
 			}
 		}
 		else //provider not available with this site, return nothing.
@@ -666,6 +672,7 @@ public class Schedule
 			allCalendarEvents = new ArrayList<>(0);
 			hiddenDaysList = Arrays.asList(0,1,2,3,4,5,6); //hide all the days (for consistency)
 			providerIdList = new ArrayList<>(0);
+			visibleSchedules = false;
 		}
 
 		CalendarSchedule calendarSchedule = new CalendarSchedule();
@@ -674,6 +681,7 @@ public class Schedule
 		calendarSchedule.setProviderIdList(providerIdList);
 		calendarSchedule.setEventList(allCalendarEvents);
 		calendarSchedule.setPreferredSlotDuration(slotDurationInMin);
+		calendarSchedule.setVisibleSchedules(visibleSchedules);
 		calendarSchedule.setHiddenDaysList(hiddenDaysList);
 
 		return calendarSchedule;
@@ -765,6 +773,7 @@ public class Schedule
 
 		calendarSchedule.setGroupName(groupName);
 		calendarSchedule.setProviderIdList(providerIdList);
+		calendarSchedule.setVisibleSchedules(!providerIdList.isEmpty());
 		calendarSchedule.setEventList(allCalendarEvents);
 		calendarSchedule.setPreferredSlotDuration(5); //TODO calculate based on lowest common slot size
 		calendarSchedule.setHiddenDaysList(new ArrayList<>(0)); // always empty in group view

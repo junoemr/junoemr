@@ -20,7 +20,9 @@
 					 ng-focus="focus_fn()"
 					 ng-change="change_fn()"
 					 tabindex="{{tab_index}}"/>
-		<label for="input-{{name}}" class="form-control checkmark"></label>
+		<label for="input-{{name}}" class="form-control checkmark">
+			<i class="icon icon-check"></i>
+		</label>
 	</div>
 
 </div>

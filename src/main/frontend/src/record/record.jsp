@@ -26,7 +26,7 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <div id="patient-record-page">
 	<div class="flex-row align-items-center patient-record-header">
-		<div class="flex-row align-items-baseline">
+		<div class="flex-row align-items-center">
 			<h3 class="patient-header-name" ng-cloak>
 				{{recordCtrl.demographic.lastName}}, {{recordCtrl.demographic.firstName}}
 				<span ng-show="recordCtrl.demographic.alias">({{recordCtrl.demographic.alias}})</span>
@@ -46,7 +46,7 @@
 					<%--<bean:message key="Appointment.msgTelephone"/>:--%>
 				<%--</span>--%>
 			</h5>
-			<span class="icon icon-phone"></span>
+			<i class="icon icon-phone-square"></i>
 			<h5 class="patient-header-info">
 				{{recordCtrl.demographic.phone}}
 			</h5>
