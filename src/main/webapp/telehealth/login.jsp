@@ -47,8 +47,11 @@
             %>
             <h3>Connect your MyHealthAccess Account</h3>
             <p>
-                It looks like you have a MyHealthAccess account, but you haven't authenticated it from your Juno EMR.
-                Log in, and we'll complete the connection.
+                It looks like you have a MyHealthAccess account, but your credentials have expired or you haven't
+                yet established a connection to your Juno EMR.
+            </p>
+            <p>
+                Log in, and we'll link your Juno EMR and MyHealthAccess accounts.
             </p>
             <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=login" method="post">
                 <input type="hidden" name="siteName" value="<%=request.getParameter("siteName")%>"/>
@@ -71,7 +74,3 @@
 </div>
 </body>
 </html>
-
-<!--         - This Juno user has a MHA account, but has not been authenticated from Juno yet
-<br>
-- Authenticate once, and in the future Juno will Auto log into MHA --!>

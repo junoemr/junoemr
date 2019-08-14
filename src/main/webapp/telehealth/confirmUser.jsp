@@ -52,9 +52,5 @@
 </div>
 </body>
 </html>
-<!--- User is created
-- Goto email to confirm your address
-- Click button to continue to MHA after email confirmed
-- This page will never show again -->
 
 

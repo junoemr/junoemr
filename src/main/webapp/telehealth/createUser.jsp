@@ -54,16 +54,3 @@
 </div>
 </body>
 </html>
-
-<!--         - You do not currently have a linked myhealthaccess account.
-<br>
-- Fill out a valid email address to create an account.
-<br>
-- If an account already exists with this email, forward to the login.jsp page to link account
-<br>
-- You will get an email sent with a confirmation link
-<br>
-- You may optionally set a password to log directly into MHA
-<br>
-- In the future this Juno account will auto log into this MHA account
-<br> -->
