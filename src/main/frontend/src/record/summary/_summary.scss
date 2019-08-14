@@ -77,7 +77,7 @@
 
 	.note-list {
 		.note-in-edit {
-			box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px $primary;
+			box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px $color-primary-base;
 			outline: 0 none;
 		}
 		padding: 5px;
@@ -114,16 +114,16 @@
 
 .notesModal {
 	.modal-content {
-		background-color: $primary;
+		background-color: $color-primary-base;
 	}
 	.modal-body {
-		background-color: $white;
+		background-color: $color-neutral-white;
 	}
 	.modal-header {
-		color: $white;
+		color: $color-neutral-white;
 	}
 	.modal-footer {
-		background-color: $grey-07;
+		background-color: $color-neutral-lighter;
 		padding-top: 20px;
 		padding-bottom: 20px;
 	}

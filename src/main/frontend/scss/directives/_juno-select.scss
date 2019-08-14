@@ -14,7 +14,7 @@
 		border: 0;
 		border-radius: 0;
 		box-shadow: transparent 0 0 0 0;
-		color: $grey-01;
+		color: $color-neutral-darkest;
 		&:focus {
 			outline: 0;
 			-webkit-box-shadow: none;
@@ -34,7 +34,7 @@
 			width: $icon-size;
 			height: $icon-size;
 			.icon {
-				color: $grey-01;
+				color: $color-neutral-darkest;
 				font-size: $icon-size;
 			}
 		}

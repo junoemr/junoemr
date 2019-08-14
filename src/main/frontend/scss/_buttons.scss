@@ -34,19 +34,19 @@
 	}
 
 	&.btn-default,&.btn-addon {
-		@include juno-button-colour-scheme($primary, $white, $grey-06);
+		@include juno-button-colour-scheme($color-primary-base, $color-neutral-white, $color-neutral-light);
 	}
 	&.btn-primary {
-		@include juno-button-colour-scheme($white, $primary, $primary-hover);
+		@include juno-button-colour-scheme($color-neutral-white, $color-primary-base, $color-primary-dark);
 	}
 	&.btn-success {
-		@include juno-button-colour-scheme($white, $green, $green-hover);
+		@include juno-button-colour-scheme($color-neutral-white, $color-lime-base, $color-lime-dark);
 	}
 	&.btn-warning {
-		@include juno-button-colour-scheme($white, $yellow, $yellow-hover);
+		@include juno-button-colour-scheme($color-neutral-white, $color-yellow-base, $color-yellow-dark);
 	}
 	&.btn-danger {
-		@include juno-button-colour-scheme($white, $red, $red-hover);
+		@include juno-button-colour-scheme($color-neutral-white, $color-red-base, $color-red-dark);
 	}
 
 
@@ -73,18 +73,18 @@
 	&.btn-warning-static {
 		background-color: $btn-warning-bg;
 		cursor: default;
-		color: $white;
+		color: $color-neutral-white;
 
 		&:focus,
 		&:visited,
 		&:hover {
-			color: $white;
+			color: $color-neutral-white;
 		}
 		&:active {
 			-moz-box-shadow:    inset 0 0 0 $btn-warning-bg;
 			-webkit-box-shadow: inset 0 0 0 $btn-warning-bg;
 			box-shadow:         inset 0 0 0 $btn-warning-bg;
-			color: $white;
+			color: $color-neutral-white;
 		}
 	}
 }

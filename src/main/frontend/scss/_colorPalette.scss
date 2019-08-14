@@ -1,77 +1,120 @@
 
 // Colour Palette
-$primary: #455899;
-$primary-hover: #394980;
-$primary-active: #546499;
-$primary-50: rgba(71,107,179,.50);
-$primary-30: rgba(71,107,179,.30);
-$secondary: #5cb8cc;
-$secondary-hover: #4fb4c4;
-$secondary-50: rgba(67,174,191,.50);
-$secondary-30: rgba(67,174,191,.30);
-$variant: #f77f6f;
+$color-primary-darkest: #1a2033;
+$color-primary-darker: #1f2e59;
+$color-primary-dark: #384d8c;
+$color-primary-base: #455899;
+$color-primary-light: #6680cc;
+$color-primary-lighter: #8aa1e6;
+$color-primary-lightest: #bfcfff;
 
-$grey-01: #393e4d;
-$grey-02: #525866;
-$grey-03: #6c7380;
-$grey-04: #acb2bf;
-$grey-05: #cacfd9;
-$grey-06: #dfe3eb;
-$grey-07: #e6eaf2;
-$grey-08: #f2f5fa;
-$white: #ffffff;
+$color-neutral-black: #242833;
+$color-neutral-darkest: #262933;
+$color-neutral-darker: #393e4d;
+$color-neutral-dark: #585f73;
+$color-neutral-dark-grey: #70778c;
+$color-neutral-grey: #8f95a8;
+$color-neutral-light-grey: #b5bac9;
+$color-neutral-light: #d0d5e3;
+$color-neutral-lighter: #e6e9f2;
+$color-neutral-lightest: #f5f6fa;
+$color-neutral-white: #ffffff;
 
-$green:         rgba(102, 166, 0, 1);
-$green-hover:   rgba(102, 166, 0, 1);
-$green-50:      rgba(110, 179, 0, .50);
-$green-30:      rgba(110, 179, 0, .30);
-$yellow:        rgba(230, 176, 0, 1);
-$yellow-hover:  rgba(214, 164, 0, 1);
-$yellow-50:     rgba(240, 184, 0, .50);
-$yellow-30:     rgba(240, 184, 0, .30);
-$orange:        rgba(240, 110, 0, 1);
-$orange-hover:  rgba(214, 99, 0, 1);
-$orange-50:     rgba(240, 110, 0, .50);
-$orange-50:     rgba(240, 110, 0, .30);
-$red:           rgba(204, 0, 0, 1);
-$red-hover:     rgba(179, 0, 0, 1);
-$red-50:        rgba(204, 0, 0, .50);
-$red-30:        rgba(204, 0, 0, .30);
-$purple:        rgba(100, 55, 222, 1);
-$purple-hover:  rgba(92, 51, 204, 1);
-$purple-50:     rgba(104, 57, 230, 0.5);
-$purple-30:     rgba(104, 57, 230, 0.3);
-$grape: #ac32c7;
-$grape-hover: #9a2db3;
-$grape-50:      rgba(177, 51, 204, 0.5);
-$grape-30:      rgba(177, 51, 204, 0.3);
-$pink: #cc3367;
-$pink-hover: #b32d5a;
-$pink-50:       rgba(204, 51, 103, 0.5);
-$pink-30:       rgba(204, 51, 103, 0.3);
-$brown: #75592f;
-$brown-hover: #5c4625;
-$brown-50:      rgba(117, 89, 47, 0.5);
-$brown-30:      rgba(117, 89, 47, 0.3);
-$light-navy-blue: #334c7f;
-$elevation:     rgba(10, 24, 51, 0.1);
+$color-red-darkest: #401616;
+$color-red-darker: #661a1a;
+$color-red-dark: #991f1f;
+$color-red-base: #cc2929;
+$color-red-light: #e65c5c;
+$color-red-light: #e68a8a;
+$color-red-light: #ffcccc;
 
-$btn-primary:       #476bb3;
-$btn-primary-hover: #3c5a96;
-$btn-secondary:		#59ccde;
-$btn-secondary-hover: #4fb4c4;
-$btn-green:         #66a600;
-$btn-green-hover:   #5e9900;
-$btn-yellow:        #e6b000;
-$btn-yellow-hover:  #d6a400;
-$btn-orange:        #f06e00;
-$btn-orange-hover:  #d66300;
-$btn-red:           #cc0000;
-$btn-red-hover:     #b30000;
-$btn-grey:          #f5f7fa;
-$btn-grey-hover:    #dfe3eb;
-$btn-white:         #ffffff;
-$btn-white-hover:   #dfe3eb;
+$color-orange-darkest: #4d2a08;
+$color-orange-darker: #80460d;
+$color-orange-dark: #b36212;
+$color-orange-base: #e67e17;
+$color-orange-light: #e69545;
+$color-orange-lighter: #f2b679;
+$color-orange-lightest: #ffd9b3;
+
+$color-yellow-darkest: #4d420f;
+$color-yellow-darker: #806e19;
+$color-yellow-dark: #b39b24;
+$color-yellow-base: #e6c72e;
+$color-yellow-light: #e6cf5c;
+$color-yellow-lighter: #f2e291;
+$color-yellow-lightest: #fff7cc;
+
+$color-lime-darkest: #243811;
+$color-lime-darker: #406619;
+$color-lime-dark: #609926;
+$color-lime-base: #80cc33;
+$color-lime-light: #a6e667;
+$color-lime-lighter: #bde695;
+$color-lime-lightest: #e6ffcc;
+
+$color-green-darkest: #0d3313;
+$color-green-darker: #1a6626;
+$color-green-dark: #238c35;
+$color-green-base: #30bf48;
+$color-green-light: #62d975;
+$color-green-lighter: #95e6a3;
+$color-green-lightest: #ccffd4;
+
+$color-teal-darkest: #0d3326;
+$color-teal-darker: #165943;
+$color-teal-dark: #238c69;
+$color-teal-base: #30bf8f;
+$color-teal-light: #62d9b1;
+$color-teal-lighter: #95e6cb;
+$color-teal-lightest: #ccffee;
+
+$color-cyan-darkest: #0d3333;
+$color-cyan-darker: #165959;
+$color-cyan-dark: #238c8c;
+$color-cyan-base: #30bfbf;
+$color-cyan-light: #62d9d9;
+$color-cyan-lighter: #95e6e6;
+$color-cyan-lightest: #ccffff;
+
+$color-blue-darkest: #102f40;
+$color-blue-darker: #164259;
+$color-blue-dark: #23678c;
+$color-blue-base: #308dbf;
+$color-blue-light: #62afd9;
+$color-blue-lighter: #8ac5e6;
+$color-blue-lightest: #ccedff;
+
+$color-indigo-darkest: #1a2040;
+$color-indigo-darker: #1f2b66;
+$color-indigo-dark: #263999;
+$color-indigo-base: #334dcc;
+$color-indigo-light: #5c73e6;
+$color-indigo-lighter: #8a99e6;
+$color-indigo-lightest: #ccd5ff;
+
+$color-violet-darkest: #231b4d;
+$color-violet-darker: #302080;
+$color-violet-dark: #432db3;
+$color-violet-base: #5639e6;
+$color-violet-light: #7c67e6;
+$color-violet-lighter: #ac9df2;
+$color-violet-lightest: #d4ccff;
+
+$color-grape-darkest: #301640;
+$color-grape-darker: #4b1f66;
+$color-grape-dark: #6d2699;
+$color-grape-base: #9133cc;
+$color-grape-light: #a15ccc;
+$color-grape-lighter: #c795e6;
+$color-grape-lightest: #ebccff;
+
+$color-pink-darkest: #401624;
+$color-pink-darker: #661933;
+$color-pink-dark: #99264d;
+$color-pink-base: #cc3366;
+$color-pink-light: #e66791;
+$color-pink-lighter: #e6a1b8;
+$color-pink-lightest: #ffccdd;
 
 $semantic-info-base: #7381b2;
 $semantic-info-light: #cfd4e6;
@@ -82,16 +125,12 @@ $semantic-warning-light: #fff2e6;
 $semantic-error-base: #e67d73;
 $semantic-error-light: #fff3f2;
 
-	// OLD names, use above
-$secondary-blue: #15417a;
-$secondary-hover-blue: #386fc1;
-
+// OLD names, use above
 // Imported from Clinicaid (schedule + datepicker stuff)
 $color-btn-addon-bg: #FFF;
 $color-btn-addon-text: #333;
 $color-btn-addon-border: #CCC;
 
-$info-icon-color: rgb(30, 144, 255);
 $color-info-box-top-bg: #555;
 $color-info-box-top-text: #FFF;
 $color-info-box-top-border: #999;
