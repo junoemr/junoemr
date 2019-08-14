@@ -183,7 +183,7 @@ public class ConsultRequestDao extends AbstractDao<ConsultationRequest>
 		}
 		
 		if (filter.getStatus()!=null) {
-			if (filter.getInvertStatus() != null && filter.getInvertStatus())
+			if (filter.getInvertStatus())
 			{
 				sql.append("and cr.status != '" + filter.getStatus() + "' ");
 			}

@@ -153,7 +153,6 @@ angular.module('Layout').controller('Layout.NavBarController', [
 					{
 						controller.consultationTeamWarning = results.consultationTeamWarning
 					}
-					console.log("providerService::getSettings", results);
 				},
 				function error(errors)
 				{
