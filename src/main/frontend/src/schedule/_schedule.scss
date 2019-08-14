@@ -31,7 +31,7 @@
 					@include juno-button-colour-scheme($color-neutral-white, $color-primary-dark, $color-primary-dark);
 				}
 				&.btn-primary {
-					@include juno-button-colour-scheme($color-neutral-white, $color-neutral-darkest, $color-neutral-darkest);
+					@include juno-button-colour-scheme($color-neutral-white, $color-neutral-darker, $color-neutral-darker);
 				}
 				&.btn-icon {
 					width: $input-height;

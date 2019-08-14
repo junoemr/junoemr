@@ -71,7 +71,7 @@ li.cpp-note-list:last-child {
 					height: $input-size;
 					padding-top: 0;
 					padding-bottom: 0;
-					color: $color-neutral-darkest;
+					color: $color-neutral-darker;
 				}
 				.btn-visible {
 					height: $input-size;
@@ -80,7 +80,7 @@ li.cpp-note-list:last-child {
 					border: 1px solid $color-neutral-light;
 					.icon {
 						font-size: 20px;
-						color: $color-neutral-darkest;
+						color: $color-neutral-darker;
 					}
 				}
 			}
