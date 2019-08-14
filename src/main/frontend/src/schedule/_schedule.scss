@@ -28,32 +28,28 @@
 				font-weight: bold;
 
 				&.btn-addon {
-					@include juno-button-colour-scheme($white, $primary-hover, $primary-hover);
+					@include juno-button-colour-scheme($color-neutral-white, $color-primary-dark, $color-primary-dark);
 				}
 				&.btn-primary {
-					@include juno-button-colour-scheme($white, $grey-01, $grey-01);
+					@include juno-button-colour-scheme($color-neutral-white, $color-neutral-darkest, $color-neutral-darkest);
 				}
 				&.btn-icon {
 					width: $input-height;
-					background-color: $primary-hover;
+					background-color: $color-primary-dark;
 					.icon {
-						width: 16px;
-						height: 16px;
+						font-size: 16px;
+						color: $color-neutral-white;
 					}
 				}
 			}
 			.divider-vertical {
-				background-color: $primary-hover;
+				background-color: $color-primary-dark;
 				width: 2px;
 				height: calc(#{$input-height} * 0.75);
 			}
 			.form-control {
 				@include juno-form-colour-scheme-dark;
 			}
-
-			//input,select {
-				//font-weight: bold;
-			//}
 			label {
 				margin-right: 5px;
 			}
@@ -84,8 +80,15 @@
 	@extend %juno-primary-view-pane;
 	@include juno-page-margin-none;
 	position: relative;
-	overflow: hidden;
+	overflow-y: hidden;
+	overflow-x: auto;
 
+	.info-message-container {
+		.alert {
+			margin: 0;
+			padding: 6px;
+		}
+	}
 	.calendar-loading
 	{
 		position: absolute;
@@ -118,8 +121,8 @@
 			// adjust style for left hand time column
 			.fc-time {
 				@include juno-font-label;
-				background-color: $grey-08;
-				color: $grey-01;
+				background-color: $color-neutral-lightest;
+				color: $color-neutral-darkest;
 				span {
 					padding-right: 4px;
 				}
@@ -132,8 +135,8 @@
 				/* styling for normal events */
 				.fc-event {
 					cursor: pointer;
-					background-color: $grey-04; // shows for invalid color codes
-					border: 1px solid $white !important;
+					background-color: $color-neutral-grey; // shows for invalid color codes
+					border: 1px solid $color-neutral-white !important;
 					border-radius: 8px;
 					display: flex;
 					align-items: center;
@@ -156,7 +159,7 @@
 							margin: 0;
 							font-size: 12px;
 							font-weight: normal;
-							color: $grey-01;
+							color: $color-neutral-darkest;
 
 							$button-size: 16px;
 
@@ -166,7 +169,7 @@
 								width: $button-size;
 								min-width: $button-size;
 								height: $button-size;
-								color: $grey-01;
+								color: $color-neutral-darkest;
 								padding: 0;
 								&:hover {
 									background-color: rgba(255, 255, 255, 0.2);
@@ -186,8 +189,9 @@
 								width: $button-size;
 								height: $button-size;
 								.icon {
-									width: $button-size;
-									height: $button-size;
+									font-size: $button-size;
+									//width: $button-size;
+									//height: $button-size;
 								}
 								&:hover {
 									background-color: rgba(255, 255, 255, 0.2);
@@ -208,7 +212,7 @@
 							.self-book-indicator.visible {
 								width: 12px;
 								height: 12px;
-								background-color: $white;
+								background-color: $color-neutral-white;
 								border-radius: 50%;
 								margin: 2px;
 							}
@@ -231,21 +235,21 @@
 						float: right;
 						width: $scheduleCodeWidth;
 						height: 100%;
-						color: $grey-01;
-						background-color: $grey-06;
+						color: $color-neutral-darkest;
+						background-color: $color-neutral-light;
 						padding: 2px 0;
 
 						&.hour-marker {
-							border-top: 1px solid $grey-05;
+							border-top: 1px solid $color-neutral-light-grey;
 						}
 					}
 					.background-event-body {
 						flex-grow: 1;
-						background-color: $white;
-						border-top: 1px solid $grey-07;
+						background-color: $color-neutral-white;
+						border-top: 1px solid $color-neutral-lighter;
 
 						&.hour-marker {
-							border-top: 1px solid $grey-05;
+							border-top: 1px solid $color-neutral-light-grey;
 						}
 					}
 				}
@@ -264,7 +268,7 @@
 					.column-ctl-root {
 						@include juno-font-tab;
 						font-weight: bold;
-						background-color: $white;
+						background-color: $color-neutral-white;
 						display: flex;
 						height: $page-tabs-height-alt;
 						padding: 0 10px;
@@ -275,9 +279,11 @@
 							justify-content: space-evenly;
 						}
 						.icon {
-							width: 16px;
-							height: 16px;
-							margin: 8px;
+							font-size: 18px;
+							color: $color-primary-base;
+							&:hover {
+								cursor: pointer;
+							}
 						}
 					}
 				}
@@ -295,10 +301,10 @@
 			}
 			/* solid border lines separating empty cells */
 			.fc-time-grid .fc-slats .fc-minor td {
-				border-top: 1px solid $grey-07;
+				border-top: 1px solid $color-neutral-lighter;
 			}
 			.calendar-background {
-				background-color: $white;
+				background-color: $color-neutral-white;
 			}
 		}
 	}
@@ -309,7 +315,7 @@
 		z-index: 9;
 		width: 100%;
 		height: 100%;
-		background-color: $white;
+		background-color: $color-neutral-white;
 	}
 	.loading-screen {
 		position: absolute;
@@ -318,6 +324,12 @@
 		width: 100%;
 		height: 100%;
 		background-color: rgba(0,0,0,0.1);
+	}
+	.loading-screen-small {
+		position: absolute;
+		right: 16px;
+		bottom: 0;
+		z-index: 8;
 	}
 	&.no-scroll {
 		overflow: hidden;
@@ -366,12 +378,12 @@
 			}
 		}
 		.icon-modal-ctl {
-			width: 16px;
-			height: 16px;
+			font-size: 24px;
+			color: $color-primary-base;
 		}
 		.icon-modal-add-appt {
-			width: 40px;
-			height: 40px;
+			font-size: 40px;
+			color: $color-neutral-white;
 		}
 	}
 
@@ -398,7 +410,7 @@
 			height: $alert-container-height;
 		}
 		.alert-message {
-			color: $red;
+			color: $color-red-base;
 			@include juno-font-label;
 		}
 		.info-frame-container {
@@ -406,8 +418,8 @@
 			.demographic-info-frame {
 				height: 144px;
 				margin-bottom: 12px;
-				background-color: $grey-08;
-				border: solid 1px $grey-07;
+				background-color: $color-neutral-lightest;
+				border: solid 1px $color-neutral-lighter;
 				border-radius: 8px;
 				padding: 14px;
 
@@ -416,11 +428,11 @@
 
 					label {
 						font-size: 9px;
-						color: $grey-03;
+						color: $color-neutral-dark;
 					}
 					span {
 						@include juno-font-label;
-						color: $grey-02;
+						color: $color-neutral-darker;
 					}
 				}
 			}
@@ -444,8 +456,12 @@
 			}
 
 			.edit-history-header {
-				background-color: $grey-08;
+				background-color: $color-neutral-lightest;
 				padding: 12px;
+			}
+
+			.directive-juno-typeahead {
+				@include juno-tab-lg(64px);
 			}
 		}
 	}

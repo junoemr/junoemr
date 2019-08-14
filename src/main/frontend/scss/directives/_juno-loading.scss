@@ -31,9 +31,9 @@
 		width: $dot-size;
 		height: $dot-size;
 		border-radius: $dot-half-size;
-		background-color: $primary;
-		color: $primary;
-		box-shadow: $constant2 0 0 $dot-half-size-neg $primary;
+		background-color: $color-primary-base;
+		color: $color-primary-base;
+		box-shadow: $constant2 0 0 $dot-half-size-neg $color-primary-base;
 		animation: dotPulse 1.5s infinite linear;
 		animation-delay: .25s;
 
@@ -45,18 +45,18 @@
 			width: $dot-size;
 			height: $dot-size;
 			border-radius: $dot-half-size;
-			background-color: $primary;
-			color: $primary;
+			background-color: $color-primary-base;
+			color: $color-primary-base;
 		}
 
 		&::before {
-			box-shadow: $constant1 0 0 $dot-half-size-neg $primary;
+			box-shadow: $constant1 0 0 $dot-half-size-neg $color-primary-base;
 			animation: dotPulseBefore 1.5s infinite linear;
 			animation-delay: 0s;
 		}
 
 		&::after {
-			box-shadow: $constant3 0 0 $dot-half-size-neg $primary;
+			box-shadow: $constant3 0 0 $dot-half-size-neg $color-primary-base;
 			animation: dotPulseAfter 1.5s infinite linear;
 			animation-delay: .5s;
 		}
@@ -64,40 +64,40 @@
 
 	@keyframes dotPulseBefore {
 		0% {
-			box-shadow: $constant1 0 0 $dot-half-size-neg $primary;
+			box-shadow: $constant1 0 0 $dot-half-size-neg $color-primary-base;
 		}
 		30% {
-			box-shadow: $constant1 0 0 $dot-20-per $primary;
+			box-shadow: $constant1 0 0 $dot-20-per $color-primary-base;
 		}
 		60%,
 		100% {
-			box-shadow: $constant1 0 0 $dot-half-size-neg $primary;
+			box-shadow: $constant1 0 0 $dot-half-size-neg $color-primary-base;
 		}
 	}
 
 	@keyframes dotPulse {
 		0% {
-			box-shadow: $constant2 0 0 $dot-half-size-neg $primary;
+			box-shadow: $constant2 0 0 $dot-half-size-neg $color-primary-base;
 		}
 		30% {
-			box-shadow: $constant2 0 0 $dot-20-per $primary;
+			box-shadow: $constant2 0 0 $dot-20-per $color-primary-base;
 		}
 		60%,
 		100% {
-			box-shadow: $constant2 0 0 $dot-half-size-neg $primary;
+			box-shadow: $constant2 0 0 $dot-half-size-neg $color-primary-base;
 		}
 	}
 
 	@keyframes dotPulseAfter {
 		0% {
-			box-shadow: $constant3 0 0 $dot-half-size-neg $primary;
+			box-shadow: $constant3 0 0 $dot-half-size-neg $color-primary-base;
 		}
 		30% {
-			box-shadow: $constant3 0 0 $dot-20-per $primary;
+			box-shadow: $constant3 0 0 $dot-20-per $color-primary-base;
 		}
 		60%,
 		100% {
-			box-shadow: $constant3 0 0 $dot-half-size-neg $primary;
+			box-shadow: $constant3 0 0 $dot-half-size-neg $color-primary-base;
 		}
 	}
 }

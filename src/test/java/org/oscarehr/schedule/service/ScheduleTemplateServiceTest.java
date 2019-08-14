@@ -69,11 +69,12 @@ public class ScheduleTemplateServiceTest
 		LocalTime scheduleEndTime = LocalTime.of(9, 0);
 		Integer defaultSlotLengthMin = 15;
 		RangeMap<LocalTime, ScheduleSlot> mockData = TreeRangeMap.create();
+		Integer siteId = null;
 
-		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date)).thenReturn(null);
-		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId)).thenReturn(mockData);
+		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date, siteId)).thenReturn(null);
+		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId, siteId)).thenReturn(mockData);
 
-		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, defaultSlotLengthMin);
+		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, siteId, defaultSlotLengthMin);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 0), defaultSlotLengthMin, providerId));
@@ -93,6 +94,7 @@ public class ScheduleTemplateServiceTest
 		LocalTime scheduleEndTime = LocalTime.of(9, 0);
 		Integer defaultSlotLengthMin = 15;//min
 		RangeMap<LocalTime, ScheduleSlot> mockData = TreeRangeMap.create();
+		Integer siteId = null;
 
 		LocalTime time1 = LocalTime.of(8,0,0);
 		mockData.put(Range.closedOpen(time1, time1.plus(Duration.ofMinutes(15))),
@@ -107,8 +109,8 @@ public class ScheduleTemplateServiceTest
 						1
 				));
 
-		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date)).thenReturn(defaultSlotLengthMin);
-		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId)).thenReturn(mockData);
+		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date, siteId)).thenReturn(defaultSlotLengthMin);
+		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId, siteId)).thenReturn(mockData);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
@@ -121,7 +123,7 @@ public class ScheduleTemplateServiceTest
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 30), defaultSlotLengthMin, providerId));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 45), defaultSlotLengthMin, providerId));
 
-		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, defaultSlotLengthMin);
+		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, siteId, defaultSlotLengthMin);
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -135,6 +137,7 @@ public class ScheduleTemplateServiceTest
 		LocalTime scheduleEndTime = LocalTime.of(9, 0);
 		Integer scheduleSlotLength = 15;//min
 		RangeMap<LocalTime, ScheduleSlot> mockData = TreeRangeMap.create();
+		Integer siteId = null;
 
 		LocalTime time1 = LocalTime.of(8,0,0);
 		mockData.put(Range.closedOpen(time1, time1.plus(Duration.ofMinutes(15))),
@@ -162,8 +165,8 @@ public class ScheduleTemplateServiceTest
 						1
 				));
 
-		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date)).thenReturn(scheduleSlotLength);
-		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId)).thenReturn(mockData);
+		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date, siteId)).thenReturn(scheduleSlotLength);
+		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId, siteId)).thenReturn(mockData);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
@@ -180,7 +183,7 @@ public class ScheduleTemplateServiceTest
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 30), scheduleSlotLength, providerId));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 45), scheduleSlotLength, providerId));
 
-		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, scheduleSlotLength);
+		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, siteId, scheduleSlotLength);
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -194,6 +197,7 @@ public class ScheduleTemplateServiceTest
 		LocalTime scheduleEndTime = LocalTime.of(9, 0);
 		Integer scheduleSlotLength = 15;//min
 		RangeMap<LocalTime, ScheduleSlot> mockData = TreeRangeMap.create();
+		Integer siteId = null;
 
 		LocalTime time1 = LocalTime.of(8,0,0);
 		mockData.put(Range.closedOpen(time1, time1.plus(Duration.ofMinutes(15))),
@@ -234,8 +238,8 @@ public class ScheduleTemplateServiceTest
 						1
 				));
 
-		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date)).thenReturn(scheduleSlotLength);
-		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId)).thenReturn(mockData);
+		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date, siteId)).thenReturn(scheduleSlotLength);
+		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId, siteId)).thenReturn(mockData);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
@@ -256,7 +260,7 @@ public class ScheduleTemplateServiceTest
 				"juno-color3", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code3", availabilityType3, null));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 45), scheduleSlotLength, providerId));
 
-		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, scheduleSlotLength);
+		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, siteId, scheduleSlotLength);
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -270,6 +274,7 @@ public class ScheduleTemplateServiceTest
 		LocalTime scheduleEndTime = LocalTime.of(9, 0);
 		Integer scheduleSlotLength = 15;//min
 		RangeMap<LocalTime, ScheduleSlot> mockData = TreeRangeMap.create();
+		Integer siteId = null;
 
 		LocalTime time1 = LocalTime.of(8,0,0);
 		mockData.put(Range.closedOpen(time1, time1.plus(Duration.ofMinutes(15))),
@@ -323,8 +328,8 @@ public class ScheduleTemplateServiceTest
 						1
 				));
 
-		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date)).thenReturn(scheduleSlotLength);
-		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId)).thenReturn(mockData);
+		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date, siteId)).thenReturn(scheduleSlotLength);
+		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId, siteId)).thenReturn(mockData);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
@@ -341,7 +346,7 @@ public class ScheduleTemplateServiceTest
 				"juno-color3", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code3", availabilityType3, null));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 8, 45), scheduleSlotLength, providerId));
 
-		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, scheduleSlotLength);
+		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, siteId, scheduleSlotLength);
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -355,6 +360,7 @@ public class ScheduleTemplateServiceTest
 		LocalTime scheduleEndTime = LocalTime.of(9, 0);
 		Integer scheduleSlotLength = 15;//min
 		RangeMap<LocalTime, ScheduleSlot> mockData = TreeRangeMap.create();
+		Integer siteId = null;
 
 		LocalTime time1 = LocalTime.of(8,15,0);
 		mockData.put(Range.closedOpen(time1, time1.plus(Duration.ofMinutes(15))),
@@ -382,8 +388,8 @@ public class ScheduleTemplateServiceTest
 						1
 				));
 
-		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date)).thenReturn(scheduleSlotLength);
-		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId)).thenReturn(mockData);
+		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date, siteId)).thenReturn(scheduleSlotLength);
+		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId, siteId)).thenReturn(mockData);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
@@ -400,7 +406,7 @@ public class ScheduleTemplateServiceTest
 				LocalDateTime.of(2018, 1, 1, 9, 0),
 				"juno-color2", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code2", availabilityType2, null));
 
-		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, scheduleSlotLength);
+		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, siteId, scheduleSlotLength);
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -414,6 +420,7 @@ public class ScheduleTemplateServiceTest
 		LocalTime scheduleEndTime = LocalTime.of(9, 15);
 		Integer scheduleSlotLength = 15;//min
 		RangeMap<LocalTime, ScheduleSlot> mockData = TreeRangeMap.create();
+		Integer siteId = null;
 
 		LocalTime time1 = LocalTime.of(8,0,0);
 		mockData.put(Range.closedOpen(time1, time1.plus(Duration.ofMinutes(15))),
@@ -479,8 +486,8 @@ public class ScheduleTemplateServiceTest
 						1
 				));
 
-		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date)).thenReturn(scheduleSlotLength);
-		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId)).thenReturn(mockData);
+		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date, siteId)).thenReturn(scheduleSlotLength);
+		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId, siteId)).thenReturn(mockData);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
@@ -498,7 +505,7 @@ public class ScheduleTemplateServiceTest
 				"juno-color4", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code4", availabilityType4, null));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 9, 0), scheduleSlotLength, providerId));
 
-		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, scheduleSlotLength);
+		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, siteId, scheduleSlotLength);
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -512,6 +519,7 @@ public class ScheduleTemplateServiceTest
 		LocalTime scheduleEndTime = LocalTime.of(9, 15);
 		Integer scheduleSlotLength = 15;//min
 		RangeMap<LocalTime, ScheduleSlot> mockData = TreeRangeMap.create();
+		Integer siteId = null;
 
 		LocalTime time1 = LocalTime.of(8,0,0);
 		mockData.put(Range.closedOpen(time1, time1.plus(Duration.ofMinutes(15))),
@@ -577,8 +585,8 @@ public class ScheduleTemplateServiceTest
 						1
 				));
 
-		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date)).thenReturn(scheduleSlotLength);
-		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId)).thenReturn(mockData);
+		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date, siteId)).thenReturn(scheduleSlotLength);
+		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId, siteId)).thenReturn(mockData);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
@@ -600,7 +608,7 @@ public class ScheduleTemplateServiceTest
 				"juno-color4", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code4", availabilityType4, null));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 9, 0), scheduleSlotLength, providerId));
 
-		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, scheduleSlotLength);
+		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, siteId, scheduleSlotLength);
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}
@@ -614,6 +622,7 @@ public class ScheduleTemplateServiceTest
 		LocalTime scheduleEndTime = LocalTime.of(10, 0);
 		Integer scheduleSlotLength = 15;//min
 		RangeMap<LocalTime, ScheduleSlot> mockData = TreeRangeMap.create();
+		Integer siteId = null;
 
 		LocalTime time1 = LocalTime.of(8,0,0);
 		mockData.put(Range.closedOpen(time1, time1.plus(Duration.ofMinutes(15))),
@@ -715,8 +724,8 @@ public class ScheduleTemplateServiceTest
 						1
 				));
 
-		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date)).thenReturn(scheduleSlotLength);
-		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId)).thenReturn(mockData);
+		Mockito.when(scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date, siteId)).thenReturn(scheduleSlotLength);
+		Mockito.when(scheduleTemplateDao.findScheduleSlots(date, providerId, siteId)).thenReturn(mockData);
 
 		List<CalendarEvent> expectedResult = new ArrayList<>();
 
@@ -750,7 +759,7 @@ public class ScheduleTemplateServiceTest
 				"juno-color3", CalendarEvent.RENDERING_BACKGROUND, null, providerId, "code3", availabilityType3, null));
 		expectedResult.add(createFakeCalendarEvent(LocalDateTime.of(2018, 1, 1, 9, 45), scheduleSlotLength, providerId));
 
-		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, scheduleSlotLength);
+		List<CalendarEvent> result = scheduleTemplateService.getCalendarEvents(providerId, date, scheduleStartTime, scheduleEndTime, siteId, scheduleSlotLength);
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
 	}

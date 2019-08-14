@@ -90,14 +90,14 @@
 							<button class="btn btn-icon btn-visible"
 							        title="<bean:message key="navbar.searchPatients" bundle="ui"/>"
 							        ng-click="navBarCtrl.onPatientSearch(null)">
-								<span class="icon icon-user-search"></span>
+								<i class="icon icon-user-search"></i>
 							</button>
 						</div>
 						<div class="form-group">
 							<button class="btn btn-icon btn-visible"
 							        title="<bean:message key="navbar.newPatient" bundle="ui"/>"
 							        ng-click="navBarCtrl.newDemographic()">
-								<span class="icon icon-add"></span>
+								<i class="icon icon-user-add"></i>
 							</button>
 						</div>
 					</form>
@@ -263,41 +263,96 @@
 
 				<div class="vertical-align pull-right navbar-right-menu">
 					<div class="nav navbar-text pull-right" ng-cloak>
-						<span>
-							<a ng-click="navBarCtrl.openScratchpad()"
-							   title="<bean:message key="navbar.scratchpad" bundle="ui"/>"
-							   class="hand-hover">
-								<span class="fa fa-pencil-square"></span>
-							</a>
-						</span>
-						<span ng-show="navBarCtrl.messageRights === true">
-								<a ng-click="navBarCtrl.openMessenger()"
-								   title="<bean:message key="navbar.messenger" bundle="ui"/>"
-								   class="hand-hover">
-									<span class="fa fa-envelope"></span>
-									<span ng-show="navBarCtrl.unreadMessageTotal > 0"
-									      class="badge badge-danger">{{navBarCtrl.unreadMessageTotal}}
-									</span>
-								</a>
+						<div class="flex-row">
+							<button class="btn btn-icon hand-hover"
+							        title="<bean:message key="navbar.scratchpad" bundle="ui"/>"
+							        ng-click="navBarCtrl.openScratchpad()">
+								<i class="icon icon-pencil-square"></i>
+							</button>
+
+							<button class="btn btn-icon hand-hover"
+							        title="<bean:message key="navbar.messenger" bundle="ui"/>"
+							        ng-click="navBarCtrl.openMessenger()">
+								<i class="icon icon-mail"></i>
+								<span ng-show="navBarCtrl.unreadMessageTotal > 0"
+								      class="badge badge-danger">{{navBarCtrl.unreadMessageTotal}}
+								</span>
 								<a ng-click="navBarCtrl.openMessenger(navBarCtrl.messengerMenu)"
 								   title="{{navBarCtrl.messengerMenu.label}}"
 								   class="hand-hover">{{navBarCtrl.messengerMenu.extra}}</a>
+							</button>
 
-								<span ng-if="!$last"></span>
-						</span>
-						<span class="dropdown-toggle hand-hover"
-						      data-toggle="dropdown"
-						      title="<bean:message key="navbar.user" bundle="ui"/>">
-								<span class="fa fa-user"></span>
-							{{navBarCtrl.me.firstName}}
-							</span>
-						<ul class="dropdown-menu" role="menu">
-							<li ng-repeat="item in navBarCtrl.userMenuItems">
-								<a ng-click="navBarCtrl.transition(item)"
-								   ng-class="{'more-tab-highlight':  navBarCtrl.isActive(item) }"
-								   class="hand-hover">{{item.label}}</a>
-							</li>
-						</ul>
+							<div class="flex-row justify-content-center align-items-center">
+
+								<%--<button class="btn btn-icon dropdown-toggle hand-hover"--%>
+								      <%--data-toggle="dropdown"--%>
+								      <%--title="<bean:message key="navbar.user" bundle="ui"/>">--%>
+									<%--<i class="icon icon-user-md"></i>--%>
+								<%--</button>--%>
+								<%--<span></span>--%>
+								<div class="dropdown-toggle hand-hover flex-row justify-content-center align-items-center"
+								      data-toggle="dropdown"
+								      title="<bean:message key="navbar.user" bundle="ui"/>">
+									<i class="icon icon-user-md"></i>
+									<span>
+									{{navBarCtrl.me.firstName}}
+									</span>
+								</div>
+
+								<ul class="dropdown-menu" role="menu">
+									<li ng-repeat="item in navBarCtrl.userMenuItems">
+										<a ng-click="navBarCtrl.transition(item)"
+										   ng-class="{'more-tab-highlight': navBarCtrl.isActive(item) }"
+										   class="hand-hover">{{item.label}}</a>
+									</li>
+								</ul>
+								<%--<ul class="dropdown-menu" role="menu">--%>
+									<%--<li ng-repeat="item in navBarCtrl.userMenuItems">--%>
+										<%--<a ng-click="navBarCtrl.transition(item)"--%>
+										   <%--ng-class="{'more-tab-highlight': navBarCtrl.isActive(item) }"--%>
+										   <%--class="hand-hover">{{item.label}}</a>--%>
+									<%--</li>--%>
+								<%--</ul>--%>
+							</div>
+
+						</div>
+
+
+						<%--<span>--%>
+							<%--<a ng-click="navBarCtrl.openScratchpad()"--%>
+							   <%--title="<bean:message key="navbar.scratchpad" bundle="ui"/>"--%>
+							   <%--class="hand-hover">--%>
+								<%--<span class="fa fa-pencil-square"></span>--%>
+							<%--</a>--%>
+						<%--</span>--%>
+						<%--<span ng-show="navBarCtrl.messageRights === true">--%>
+								<%--<a ng-click="navBarCtrl.openMessenger()"--%>
+								   <%--title="<bean:message key="navbar.messenger" bundle="ui"/>"--%>
+								   <%--class="hand-hover">--%>
+									<%--<span class="fa fa-envelope"></span>--%>
+									<%--<span ng-show="navBarCtrl.unreadMessageTotal > 0"--%>
+									      <%--class="badge badge-danger">{{navBarCtrl.unreadMessageTotal}}--%>
+									<%--</span>--%>
+								<%--</a>--%>
+								<%--<a ng-click="navBarCtrl.openMessenger(navBarCtrl.messengerMenu)"--%>
+								   <%--title="{{navBarCtrl.messengerMenu.label}}"--%>
+								   <%--class="hand-hover">{{navBarCtrl.messengerMenu.extra}}</a>--%>
+
+								<%--<span ng-if="!$last"></span>--%>
+						<%--</span>--%>
+						<%--<span class="dropdown-toggle hand-hover"--%>
+						      <%--data-toggle="dropdown"--%>
+						      <%--title="<bean:message key="navbar.user" bundle="ui"/>">--%>
+								<%--<span class="fa fa-user"></span>--%>
+								<%--{{navBarCtrl.me.firstName}}--%>
+							<%--</span>--%>
+						<%--<ul class="dropdown-menu" role="menu">--%>
+							<%--<li ng-repeat="item in navBarCtrl.userMenuItems">--%>
+								<%--<a ng-click="navBarCtrl.transition(item)"--%>
+								   <%--ng-class="{'more-tab-highlight': navBarCtrl.isActive(item) }"--%>
+								   <%--class="hand-hover">{{item.label}}</a>--%>
+							<%--</li>--%>
+						<%--</ul>--%>
 					</div>
 				</div>
 			</div>

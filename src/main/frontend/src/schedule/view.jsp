@@ -41,14 +41,14 @@
 								<button class="btn btn-icon"
 								        title="Previous Day"
 								        ng-click="stepBack()">
-									<span class="icon icon-left-white"></span>
+									<i class="icon icon-arrow-left"></i>
 								</button>
 							</div>
 							<div class="form-group">
 								<button class="btn btn-icon"
 								        title="Next Day"
 								        ng-click="stepForward()">
-									<span class="icon icon-right-white"></span>
+									<i class="icon icon-arrow-right"></i>
 								</button>
 							</div>
 						</div>
@@ -98,46 +98,28 @@
 					</div>
 
 					<div class="form-group pull-right">
-						<div class="form-group"  ng-show="isResourceView()">
-							<div class="btn-group" role="group">
-								<button type="button"
-								        class="btn btn-sm"
-								        ng-class=" { 'btn-addon': isScheduleView(),
-								                     'btn-primary': !isScheduleView() }"
-								        ng-click="scheduleController.changeScheduleView(scheduleController.scheduleViewEnum.all)">
-									All
-								</button>
-								<button type="button"
-								        class="btn btn-sm"
-								        ng-class=" { 'btn-addon': !isScheduleView(),
-								                     'btn-primary': isScheduleView() }"
-								        ng-click="scheduleController.changeScheduleView(scheduleController.scheduleViewEnum.schedule)">
-									Schedule
-								</button>
-							</div>
-						</div>
 						<div class="form-group">
 							<div class="btn-group" role="group" ng-show="isAgendaView()">
 								<button type="button"
 								        class="btn btn-sm"
-								        ng-class=" { 'btn-addon': getCalendarViewName() !== scheduleController.calendarViewEnum.agendaDay,
-								                     'btn-primary': getCalendarViewName() === scheduleController.calendarViewEnum.agendaDay }"
+								        ng-class=" { 'btn-addon': !isAgendaDayView(),
+								                     'btn-primary': isAgendaDayView() }"
 								        viewName="agendaDay"
 								        ng-click="changeCalendarView(scheduleController.calendarViewEnum.agendaDay)">
 									Day
 								</button>
 								<button type="button"
 								        class="btn btn-sm"
-								        ng-class=" { 'btn-addon': getCalendarViewName() !== scheduleController.calendarViewEnum.agendaWeek,
-								                     'btn-primary': getCalendarViewName() === scheduleController.calendarViewEnum.agendaWeek }"
+								        ng-class=" { 'btn-addon': !isAgendaWeekView(),
+								                     'btn-primary': isAgendaWeekView() }"
 								        viewName="agendaWeek"
 								        ng-click="changeCalendarView(scheduleController.calendarViewEnum.agendaWeek)">
 									Week
 								</button>
 								<button type="button"
 								        class="btn btn-sm"
-								        ng-class=" { 'btn-addon': getCalendarViewName() !== scheduleController.calendarViewEnum.agendaMonth,
-								                     'btn-primary': getCalendarViewName() === scheduleController.calendarViewEnum.agendaMonth }"
+								        ng-class=" { 'btn-addon': !isAgendaMonthView(),
+								                     'btn-primary': isAgendaMonthView() }"
 								        viewName="month"
 								        ng-click="changeCalendarView(scheduleController.calendarViewEnum.agendaMonth)">
 									Month
@@ -145,10 +127,30 @@
 							</div>
 						</div>
 						<div class="form-group">
+							<div class="btn-group" role="group">
+								<button type="button"
+								        class="btn btn-sm"
+								        title="Do not hide unscheduled days and providers"
+								        ng-class=" { 'btn-addon': isScheduleView(),
+								                     'btn-primary': !isScheduleView() }"
+								        ng-click="scheduleController.changeScheduleView(scheduleController.scheduleViewEnum.all)">
+									All
+								</button>
+								<button type="button"
+								        class="btn btn-sm"
+								        title="Hide unscheduled days and providers"
+								        ng-class=" { 'btn-addon': !isScheduleView(),
+								                     'btn-primary': isScheduleView() }"
+								        ng-click="scheduleController.changeScheduleView(scheduleController.scheduleViewEnum.schedule)">
+									Scheduled
+								</button>
+							</div>
+						</div>
+						<div class="form-group">
 							<button class="btn btn-icon"
 							        title="Refresh Appointments"
 							        ng-click="refetchEvents()">
-								<span class="icon icon-refresh-white"></span>
+								<i class="icon icon-refresh"></i>
 							</button>
 						</div>
 					</div>
@@ -160,11 +162,22 @@
 		>
 			<%-- ng-hide on the calendar causes event render issues,
 				 so zero state is shown by rendering content on top of an empty calendar and removing scroll bars --%>
-			<div class="zero-state-message" ng-show="showNoResources && isInitialized() && !calendarLoading">
-				<h1>No Providers Scheduled</h1>
+			<div class="zero-state-message" ng-show="showNoResources && isInitialized()">
+				<h1 ng-show="isResourceView() && (selectedSiteName == null || (selectedSiteName != null && isScheduleView()))">
+					No Providers Scheduled
+				</h1>
+				<h1 ng-show="isAgendaView() && (selectedSiteName == null || (selectedSiteName != null && isScheduleView()))">
+					Provider Not Scheduled
+				</h1>
+				<h1 ng-show="isResourceView() && selectedSiteName != null && !isScheduleView()">
+					No Providers Assigned to Site
+				</h1>
+				<h1 ng-show="isAgendaView() && selectedSiteName != null && !isScheduleView()">
+					Provider Not Assigned to Site
+				</h1>
 			</div>
 			<div class="loading-screen flex-row flex-grow justify-content-center"
-			     ng-show="calendarLoading || !isInitialized()"
+			     ng-show="customLoading || !isInitialized()"
 			>
 				<div class="flex-column justify-content-center vertical-align">
 					<h1>Loading...</h1>
@@ -172,6 +185,22 @@
 						<div class="dot-pulse"></div>
 					</div>
 				</div>
+			</div>
+			<div class="loading-screen-small flex-row flex-grow justify-content-center"
+			     ng-show="calendarLoading && !customLoading"
+			>
+				<div class="flex-column justify-content-center vertical-align">
+					<div class="loading-dot-container">
+						<div class="dot-pulse"></div>
+					</div>
+				</div>
+			</div>
+
+			<div class="info-message-container">
+				<ca-info-messages
+						ca-errors-object="displayMessages"
+						ca-prepend-name-to-field-errors="false">
+				</ca-info-messages>
 			</div>
 			<div
 					id="ca-calendar"

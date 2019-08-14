@@ -66,7 +66,7 @@
           ArrayList images = EFormUtil.listImages();
           request.setAttribute("images", images);
           for (int i=0; i<images.size(); i++) {
-              String fileURL="../eform/displayImage.do?imagefile="+images.get(i);
+              String fileURL="../eform/displayImage.do?imagefile="+ URLEncoder.encode(images.get(i).toString(), "UTF-8");
               //String fileURL="/OscarDocument/" + project_home + "/eform/images/"+images.get(i);
               String curimage = (String) images.get(i);
         	%>

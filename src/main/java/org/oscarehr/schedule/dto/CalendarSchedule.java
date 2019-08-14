@@ -32,6 +32,10 @@ public class CalendarSchedule
 
 	private List<String> providerIdList;
 
+	private List<Integer> hiddenDaysList;
+
+	private Boolean visibleSchedules;
+
 	//List of all calendar events combined
 	private List<CalendarEvent> eventList;
 
@@ -63,6 +67,26 @@ public class CalendarSchedule
 	public void setProviderIdList(List<String> providerIdList)
 	{
 		this.providerIdList = providerIdList;
+	}
+
+	public List<Integer> getHiddenDaysList()
+	{
+		return hiddenDaysList;
+	}
+
+	public void setHiddenDaysList(List<Integer> hiddenDaysList)
+	{
+		this.hiddenDaysList = hiddenDaysList;
+	}
+
+	public Boolean getVisibleSchedules()
+	{
+		return visibleSchedules;
+	}
+
+	public void setVisibleSchedules(Boolean visibleSchedules)
+	{
+		this.visibleSchedules = visibleSchedules;
 	}
 
 	public List<CalendarEvent> getEventList()
