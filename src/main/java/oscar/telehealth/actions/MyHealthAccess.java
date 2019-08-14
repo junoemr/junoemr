@@ -62,6 +62,7 @@ public class MyHealthAccess extends DispatchAction
 		try
 		{
 			ClinicUserTo1 remoteUser = fetchRemoteUser(request);
+			String remoteUserID = remoteUser.getMyhealthaccesID();
 
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 			Security loggedInUser = loggedInInfo.getLoggedInSecurity();
@@ -73,15 +74,19 @@ public class MyHealthAccess extends DispatchAction
 				ActionRedirect loginAction = new ActionRedirect(mapping.findForward("mhaLogin"));
 				loginAction.addParameter("siteName", request.getParameter("siteName"));
 				loginAction.addParameter("appt", request.getParameter("appt"));
-				loginAction.addParameter("remoteUser", remoteUser.getMyhealthaccesID());
+				loginAction.addParameter("remoteUser", remoteUserID);
 				return loginAction;
 			}
-
-			// TODO:  if the long token is close to expiring, we can fetch a new one and store it
 
 			Site site = getSite(request);
 			String appointmentNo = request.getParameter("appt");
 			String mhaRemoteID = remoteUser.getMyhealthaccesID();
+
+			if (longToken.expiresWithinDays(7))
+			{
+				MHAUserToken renewedToken = myHealthAccessService.renewLongToken(site, remoteUserID, loggedInUser);
+				persistToken(request.getSession(), loggedInUser, renewedToken.getToken());
+			}
 
 			String endpoint = myHealthAccessService.buildTeleHealthRedirectURL(mhaRemoteID, site, appointmentNo);
 
@@ -119,7 +124,7 @@ public class MyHealthAccess extends DispatchAction
 
 			return confirmUserAction;
 		}
-		catch (DuplicateRecordException e)     // TODO:  Check correct exception thrown
+		catch (DuplicateRecordException e)
 		{
 			ClinicUserTo1 remoteUser = myHealthAccessService.getUserByEmail(email, getSite(request));
 

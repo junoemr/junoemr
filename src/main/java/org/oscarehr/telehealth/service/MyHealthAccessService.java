@@ -135,6 +135,14 @@ public class MyHealthAccessService
 		return MHAUserToken.decodeToken(longToken);
 	}
 
+	public MHAUserToken renewLongToken(Site site, String remoteUserID, Security loggedInUser)
+	{
+		ClinicUserAccessTokenTo1 longToken = loggedInUser.getMyHealthAccessLongToken();
+		ClinicUserAccessTokenTo1 renewedToken = clinicService.renewAuthToken(getClinicID(site), remoteUserID, longToken);
+
+		return MHAUserToken.decodeToken(renewedToken);
+	}
+
 	public static String getClinicID(Site site)
 	{
 		String clinic_id;

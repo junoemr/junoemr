@@ -27,6 +27,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserAccessTokenTo1;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 public class MHAUserToken
@@ -90,5 +92,13 @@ public class MHAUserToken
 
 	public boolean isExpired() {
 		return new Date().after(this.expiryDate);
+	}
+
+	public boolean expiresWithinDays(int days)
+	{
+		Duration duration = Duration.of(days, ChronoUnit.DAYS);
+		Duration timeToExpire = Duration.between(new Date().toInstant(), expiryDate.toInstant());
+
+		return duration.compareTo(timeToExpire) >= 0;
 	}
 }

@@ -144,14 +144,23 @@ public class ClinicService extends BaseService
 		return accessToken;
 	}
 
-/*	public ClinicUserAccessTokenTo1 getShortToken(String clinicID, String myHealthAccessUserID, String email,
-	                                              String password, String oscarUserID) throws IOException,
-	                                                                                          NoSuchAlgorithmException,
-	                                                                                          KeyManagementException
+	public ClinicUserAccessTokenTo1 renewAuthToken(String clinicID, String mhaUserID, ClinicUserAccessTokenTo1 authToken)
 	{
-		String endPoint = concatEndpointStrings(clinicEndPoint, "/" + clinicID + "/user/" + myHealthAccessUserID + "/get_login_token?" + "remote_id=" + URLEncoder.encode(oscarUserID, "UTF-8"));
-		ClinicUserLoginTo1 userLogin = new ClinicUserLoginTo1(email, password);
-		return executeRequest(endPoint, HttpMethod.POST, userLogin,
-		                      ClinicUserAccessTokenTo1.class, BaseErrorTo1.class);
-	}*/
+		ClinicUserAccessTokenTo1 response = null;
+
+		final String renewEndpointRaw = "/%s/user/%s/renew_access_token";
+		try
+		{
+			String endpoint = concatEndpointStrings(clinicEndPoint, String.format(renewEndpointRaw, clinicID, mhaUserID));
+			String token = authToken.getToken();
+			response =  executeRequestWithToken(endpoint, HttpMethod.POST, token,
+			                                    null, ClinicUserAccessTokenTo1.class, BaseErrorTo1.class);
+		}
+		catch (BaseException e)
+		{
+			ErrorHandler.handleError(e);
+		}
+
+		return response;
+	}
 }
