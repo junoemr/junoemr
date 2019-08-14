@@ -39,7 +39,7 @@
 	}
 %>
 
-<%@page import="org.apache.commons.beanutils.BeanUtils"%>
+<%@page import="org.springframework.beans.BeanUtils"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="org.springframework.web.context.WebApplicationContext"%>
 <%@page import="org.oscarehr.caisi_integrator.ws.DemographicWs"%>
@@ -314,14 +314,14 @@ if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
     		appointment = (Appointment)obj;
     	}
     	if(obj instanceof AppointmentArchive) {
-    		appointmentArchive = (AppointmentArchive)obj;
-    		appointment = new Appointment();
-    		
-    		BeanUtils.copyProperties(appointment, appointmentArchive);
-    		appointment.setId(appointmentArchive.getAppointmentNo());
-    		
-    		deleted=true;
-    	}
+            appointmentArchive = (AppointmentArchive)obj;
+            appointment = new Appointment();
+
+            BeanUtils.copyProperties(appointmentArchive, appointment, new String[]{"lastUpdateUserRecord"});
+            appointment.setId(appointmentArchive.getAppointmentNo());
+
+            deleted=true;
+        }
       iRow++;
       
       if(iRow>iPageSize) break;
