@@ -63,9 +63,14 @@ public class MHAUserToken
 		return new MHAUserToken(transfer);
 	}
 
+	@Override
+	public final String toString() {
+		return this.token;
+	}
+
 	public String getToken()
 	{
-		return this.token;
+		return this.toString();
 	}
 
 	public String getClinicUserID()

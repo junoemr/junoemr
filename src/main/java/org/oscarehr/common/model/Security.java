@@ -37,7 +37,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 import java.util.Date;
 
 
@@ -81,9 +80,6 @@ public class Security extends AbstractModel<Integer> {
 
 	@Column(name = "myhealthaccess_auth_token")
 	private String myHealthAccessLongToken;
-
-	@Transient
-	private String myHealthAccessShortToken = null;
 
 	/** default constructor */
 	public Security() {
@@ -224,23 +220,6 @@ public class Security extends AbstractModel<Integer> {
 		this.myHealthAccessLongToken = myHealthAccessAuthToken;
 	}
 
-	public ClinicUserAccessTokenTo1 getMyHealthAccessShortToken()
-	{
-		if(this.myHealthAccessShortToken == null || this.myHealthAccessShortToken.isEmpty())
-		{
-			return null;
-		}
-
-		ClinicUserAccessTokenTo1 accessTokenTo = new ClinicUserAccessTokenTo1();
-		accessTokenTo.setToken(this.myHealthAccessShortToken);
-
-		return accessTokenTo;
-	}
-
-	public void setMyHealthAccessShortToken(String myHealthAccessShortToken)
-	{
-		this.myHealthAccessShortToken = myHealthAccessShortToken;
-	}
 
 	/**
 	 * @return true if inputed password equals password in the DB, false otherwise.

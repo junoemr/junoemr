@@ -51,8 +51,9 @@
                 Log in, and we'll complete the connection.
             </p>
             <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=login" method="post">
-                <input type="hidden" name="demographicNo" value="<%=request.getParameter("demographicNo")%>"/>
                 <input type="hidden" name="siteName" value="<%=request.getParameter("siteName")%>"/>
+                <input type="hidden" name="remoteUser" value="<%=request.getParameter("remoteUser")%>"/>
+                <input type="hidden" name="appt" value="<%=request.getParameter("appt")%>"/>
                 <div class="mha-input">
                     <label for="email">Email address</label>
                     <input type="text" id="email" name="email" value="<%=email%>"/>

@@ -39,8 +39,8 @@
             Lets create one and connect it with your Juno EMR provider
         </p>
         <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=createUser" method="post">
-            <input type="hidden" id="demographicNo" name="demographicNo" value="<%=request.getParameter("demographicNo")%>"/>
-            <input type="hidden" id="siteName" name="siteName" value="<%=request.getParameter("siteName")%>"/>
+            <input type="hidden" name="siteName" value="<%=request.getParameter("siteName")%>"/>
+            <input type="hidden" name="appt" value="<%=request.getParameter("appt")%>"/>
             <div class="mha-input">
                 <label for="email">Email address</label>
                 <input type="text" id="email" name="email"/>

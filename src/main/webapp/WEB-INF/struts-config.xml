@@ -1690,7 +1690,7 @@
 			<forward name="error" path="/billing/errorpage.jsp" redirect="true" />
 		</action>
         <action parameter="method" path="/telehealth/myhealthaccess" type="oscar.telehealth.actions.MyHealthAccess">
-            <forward name="pushLogin" path="/telehealth/login.jsp" />
+            <forward name="mhaLogin" path="/telehealth/login.jsp" />
             <forward name="createUser" path="/telehealth/createUser.jsp" />
             <forward name="confirmUser" path="/telehealth/confirmUser.jsp" />
         </action>

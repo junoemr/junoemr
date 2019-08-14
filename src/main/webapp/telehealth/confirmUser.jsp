@@ -40,6 +40,9 @@
             </p>
             <p>Don't worry, you will only need to do this once to complete linking your new MyHealthAccess account</p>
             <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=confirmUser" method="post">
+                <input type=hidden name="siteName" value="<%=request.getParameter("siteName")%>"/>
+                <input type=hidden name="appt" value="<%=request.getParameter("appt")%>"/>
+                <input type=hidden name="remoteUser" value="<%=request.getParameter("remoteUser")%>"/>
                 <div class="mha-button-container">
                     <button type="submit" class="primary">Continue to Telehealth</button>
                 </div>
