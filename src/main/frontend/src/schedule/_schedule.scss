@@ -242,6 +242,16 @@
 						&.hour-marker {
 							border-top: 1px solid $color-neutral-light-grey;
 						}
+						&.code-visible:after {
+							position: absolute;
+							top: 0;
+							left: 0;
+							width: $scheduleCodeWidth;
+							height: 100%;
+							content: " ";
+							background-color: $color-neutral-black;
+							opacity: 0.1;
+						}
 					}
 					.background-event-body {
 						flex-grow: 1;

@@ -951,13 +951,22 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					scheduleCodeElement.css("background-color", event.color)
 				}
-				if (Juno.Common.Util.exists(event.scheduleTemplateCode))
-				{
-					scheduleCodeElement.text(event.scheduleTemplateCode);
 
-					if (Juno.Common.Util.exists(event.availabilityType.name))
+				var availabilityType = event.availabilityType;
+				if(Juno.Common.Util.exists(availabilityType))
+				{
+					if (Juno.Common.Util.exists(availabilityType.systemCode))
 					{
-						scheduleCodeElement.attr("title", event.availabilityType.name);
+						if(availabilityType.systemCodeVisible)
+						{
+							scheduleCodeElement.text(availabilityType.systemCode);
+							// scheduleCodeElement.addClass("code-visible");
+						}
+
+						if (Juno.Common.Util.exists(availabilityType.name))
+						{
+							scheduleCodeElement.attr("title", availabilityType.name);
+						}
 					}
 				}
 				if (Juno.Common.Util.exists(event.start) && event.start.minute() === 0) // on the hour
