@@ -57,9 +57,12 @@ public class WCBTeleplanSubmission {
     public String getHtmlLine(WCB wcb,Billingmaster bm) {
         log.debug("WCB "+wcb+ " BM "+bm);
         return getHtmlLine(""+bm.getBillingmasterNo(),""+bm.getBillingNo(), wcb.getW_lname() + "," + wcb.getW_fname(), wcb.getW_phn(),dateFormat(wcb.getW_servicedate()), bm.getBillingCode(), bm.getBillAmount(), bm.getDxCode1(), "", "");
-
-
     }
+
+    public String getHtmlLine(Billingmaster bm)
+	{
+		return getHtmlLine(""+bm.getBillingmasterNo(),""+bm.getBillingNo(), "UNKNOWN", "UNKNOWN", "UNKNOWN", bm.getBillingCode(), bm.getBillAmount(), bm.getDxCode1(), "", "");
+	}
 
     public String getHtmlLine(String billingMasterNo, String invNo, String demoName, String phn, String serviceDate, String billingCode, String billAmount, String dx1, String dx2, String dx3) {
         String htmlContent =
