@@ -1,4 +1,4 @@
-<%--
+<%@ page import="org.oscarehr.dashboard.display.beans.DrilldownBean" %><%--
 
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
@@ -58,6 +58,7 @@
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/library/moment.js" ></script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/library/datetime-moment.js" ></script>
 	<script type="text/javascript" src="${ pageContext.request.contextPath }/dashboard/display/drilldownDisplayController.js" ></script>
+	<script type="text/javascript" src="${ pageContext.request.contextPath }/dashboard/display/drillDownBatchOperation.js" ></script>
 </head>
 <body>
 
@@ -91,7 +92,7 @@
 
 <div class="row content">
 
-	<h3>
+	<h3 id="drill_down_report_title">
 		<c:out value="${ drilldown.name }" />
 	</h3>
 	<hr />
@@ -157,12 +158,12 @@
 									<a href="#" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" role="button"
 							        	aria-haspopup="true" aria-expanded="false" id="ticklerMenuLink">
 							        	<span class="glyphicon glyphicon-check"></span>
-							        	Tickler
+							        	Batch Actions
 							        	<span class="caret"></span>
 							        </a>
 
 
-									<ul class="dropdown-menu" aria-labelledby="ticklerMenuLink">
+									<ul id="batch_operations_menu" class="dropdown-menu" aria-labelledby="ticklerMenuLink">
 										<li>
 											<a href="#" class="dropdown-item" id="selectAllDrilldown" title="Select all rows in the current view." >
 												Select All in View
@@ -178,6 +179,11 @@
 									    	<a href="/web/dashboard/display/AssignTickler.do" class="dropdown-item"
 									    		title="Assign Tickler to Checked Rows." id="assignTicklerChecked" >
 												Assign Tickler
+											</a>
+										</li>
+										<li id="batch_op_list_item_template" style="display:none;">
+											<a href="#">
+												<!-- filled by  -->
 											</a>
 										</li>
 									</ul>
@@ -258,7 +264,7 @@
 	</table>
 	<hr />
 	<h3>
-		&nbsp;
+
 	</h3>
 </div> <!--  end main content row -->
 
