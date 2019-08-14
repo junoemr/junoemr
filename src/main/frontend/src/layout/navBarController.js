@@ -83,7 +83,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			controller.unAckLabDocTotal = 0;
 			controller.unreadMessageTotal = 0;
 			controller.demographicSearch = null;
-			controller.consultationTeamWarning = "All Teams";
+			controller.consultationTeamWarning = "";
 			// measured in months
 			controller.consultationLookbackPeriod = 1;
 
@@ -151,7 +151,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 					// If we get any result back that isn't -1, need to filter consultation count by the given team
 					if (results.consultationTeamWarning !== "-1")
 					{
-						controller.consultationTeamWarning = results.consultationTeamWarning
+						controller.consultationTeamWarning = results.consultationTeamWarning;
 					}
 				},
 				function error(errors)
