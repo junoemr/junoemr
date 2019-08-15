@@ -26,9 +26,11 @@ package org.oscarehr.ws.rest;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.dx.service.DxResearchService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.transfer.batch.DemographicBatchDxUpdateTo1;
 import org.oscarehr.ws.rest.transfer.batch.DemographicBatchOperationTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -53,13 +55,18 @@ public class BatchOperationService extends AbstractServiceImpl
 	@Autowired
 	SecurityInfoManager securityInfoManager;
 
+	@Autowired
+	DxResearchService dxResearchService;
+
+	private static final String STANDARD_ERROR_STRING = "\"Error processing batch operation, with error: \"";
+
 	@POST
 	@Path("/deactivate_demographics")
 	@Consumes("application/json")
 	@Produces("application/json")
 	public RestResponse<Boolean> deactivateDemographics(DemographicBatchOperationTo1 demoTransfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, "_admin");
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
 		return changeDemographicStatuses(demoTransfer, org.oscarehr.common.model.Demographic.PatientStatus.IN.name());
 	}
 
@@ -69,7 +76,7 @@ public class BatchOperationService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestResponse<Boolean> activateDemographics(DemographicBatchOperationTo1 demoTransfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, "_admin");
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
 		return changeDemographicStatuses(demoTransfer, org.oscarehr.common.model.Demographic.PatientStatus.AC.name());
 	}
 
@@ -81,7 +88,7 @@ public class BatchOperationService extends AbstractServiceImpl
 	 */
 	private RestResponse<Boolean> changeDemographicStatuses(DemographicBatchOperationTo1 demoTransfer, String newStatus)
 	{
-		MiscUtils.getLogger().info("performing batch demographic status update to [" + newStatus + "] with params: " + demoTransfer);
+		MiscUtils.getLogger().info("Performing batch demographic status update to [" + newStatus + "] with params: " + demoTransfer);
 		try
 		{
 			for (Integer demoNo : demoTransfer.getDemographicNumbers())
@@ -97,7 +104,33 @@ public class BatchOperationService extends AbstractServiceImpl
 		{
 			MiscUtils.getLogger().error("Failed to batch update status to [" + newStatus + "] for demographics with error: " + e.getMessage(), e);
 			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_FAILURE, "Change Demographic Status: " + demoTransfer.toString());
-			return RestResponse.errorResponse("Error processing batch operation");
+			return RestResponse.errorResponse(STANDARD_ERROR_STRING + e.getMessage());
+		}
+	}
+
+	@POST
+	@Path("/set_dx_code")
+	@Consumes("application/json")
+	@Produces("application/json")
+	public RestResponse<Boolean> setDemographicDxCode(DemographicBatchDxUpdateTo1 demoTo1)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
+
+		MiscUtils.getLogger().info("Performing batch demographic dx code assignment: " + demoTo1.toString());
+		try
+		{
+			for (Integer demoNo : demoTo1.getDemographicNumbers())
+			{
+				dxResearchService.assignDxCodeToDemographic(demoNo, Integer.parseInt(getLoggedInInfo().getLoggedInProviderNo()), demoTo1.getDxCode(), demoTo1.getDxCodingSystem());
+			}
+			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), LogConst.ACTION_UPDATE, LogConst.CON_DISEASE_REG, LogConst.STATUS_SUCCESS, "Assign dx codes: " + demoTo1.toString());
+			return RestResponse.successResponse(true);
+		}
+		catch (Exception e)
+		{
+			MiscUtils.getLogger().error("Failed to batch update demographic Dx codes to [" + demoTo1.getDxCode() + "] with error: " + e.getMessage(), e);
+			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), LogConst.ACTION_UPDATE, LogConst.CON_DISEASE_REG, LogConst.STATUS_FAILURE, "Assign dx codes: " + demoTo1.toString());
+			return RestResponse.errorResponse(STANDARD_ERROR_STRING + e.getMessage());
 		}
 	}
 }

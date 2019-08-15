@@ -4,8 +4,9 @@ BatchOperations =
 		// ====================== general functionality ======================= //
 		OPERATION_TYPES:
 		{
-			DEACTIVATE_DEMO: "../../../ws/rs/batch/deactivate_demographics",
-			ACTIVATE_DEMO: "../../../ws/rs/batch/activate_demographics"
+			DEACTIVATE_DEMO: 	"../../../ws/rs/batch/deactivate_demographics",
+			ACTIVATE_DEMO: 		"../../../ws/rs/batch/activate_demographics",
+			ASSIGN_DX_CODE: 	"../../../ws/rs/batch/set_dx_code"
 		},
 
 		// maps report name to batch operation functions
@@ -161,6 +162,19 @@ BatchOperations =
 			}
 		},
 
+		// helper to keep dx code assignment names consistent
+		dxAssignNameTemplate: function (codeName, all)
+		{
+			if (all)
+			{
+				return "Assign " + codeName + "To All"
+			}
+			else
+			{
+				return "Assign " + codeName + " To Selected"
+			}
+		},
+
 		// ======================== batch operations ========================== //
 
 		deactivateSelectedDemographics: function ()
@@ -223,6 +237,49 @@ BatchOperations =
 					BatchOperations.showMessageForResponse(data);
 				});
 			}
+		},
+
+		// batch assign the specified dx code
+		assignDxCodeToDemographics: function (code, codingSystem, all)
+		{
+			let demos = [];
+			if (all)
+			{
+				demos = BatchOperations.getAllFilteredDemographics();
+			}
+			else
+			{
+				demos = BatchOperations.getCheckedDemographics();
+			}
+
+			if (demos.length > 0)
+			{
+				let ok = confirm("This will set Dx code [" + code + "] for, " + demos.length + " demographics in this report.\n Are you Sure?" );
+				if (ok)
+				{
+					let promise = BatchOperations.doBatchOperation(BatchOperations.OPERATION_TYPES.ASSIGN_DX_CODE, {
+						operation: "assign Dx code",
+						demographicNumbers: demos,
+						dxCode: code,
+						dxCodingSystem: codingSystem
+					});
+					promise.always(function (data){
+						BatchOperations.showMessageForResponse(data);
+					})
+				}
+			}
+			else
+			{
+				alert("Please select at least one demographic");
+			}
+		},
+
+		// generate a function closure for assignDxCodeToDemographics
+		assignDxCodeGenerator: function(code, codingSystem, all)
+		{
+			return function () {
+				BatchOperations.assignDxCodeToDemographics(code, codingSystem, all);
+			}
 		}
 	};
 
@@ -236,6 +293,10 @@ $(window).load(function ()
 			{func: BatchOperations.activateSelectedDemographics, 	name: "Activate Selected"},
 			{func: BatchOperations.deactivateAllDemographics, 		name: "Deactivate All"},
 			{func: BatchOperations.activateAllDemographics, 		name: "Activate All"}
+		],
+		"Consider Diabetes": [
+			{func: BatchOperations.assignDxCodeGenerator('250', 'icd9', false), name: BatchOperations.dxAssignNameTemplate("Diabetes", false)},
+			{func: BatchOperations.assignDxCodeGenerator('250', 'icd9', true), name: BatchOperations.dxAssignNameTemplate("Diabetes", true)}
 		]
 	}
 

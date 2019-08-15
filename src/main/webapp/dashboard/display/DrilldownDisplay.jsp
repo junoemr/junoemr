@@ -160,7 +160,7 @@
 		</a>
 
 
-		<ul id="batch_operations_menu" class="dropdown-menu" aria-labelledby="ticklerMenuLink">
+		<ul id="batch_operations_menu" class="dropdown-menu" aria-labelledby="ticklerMenuLink" style="text-align:left;">
 			<li>
 				<a href="#" class="dropdown-item" id="selectAllDrilldown" title="Select all rows in the current view." >
 					Select All in View
