@@ -306,15 +306,17 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 	{
 		List<String> appointmentTypeList = ScheduleCodeDurationTransfer.getAllTemplateCodes(scheduleCodeDurationTransfer);
 
-		if (startDate.isBefore(LocalDate.now()))
+		LocalDateTime startDateTime = LocalDateTime.of(startDate, LocalTime.MIDNIGHT);
+		LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.MAX);
+
+		if (startDateTime.isBefore(LocalDateTime.now()))
 		{
-			startDate = LocalDate.now();
+			startDateTime = LocalDateTime.now();
 		}
 
 		String sql = "SELECT STRAIGHT_JOIN\n" +
 				"  SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1) AS code_char,\n" +
-				"  sd.sdate AS appt_date,\n" +
-				"  SEC_TO_TIME(ROUND((24*60*60)*(n3.i + (10 * n2.i) + (100 * n1.i))/LENGTH(st.timecode))) AS appt_time,\n" +
+				"  CONCAT(sd.sdate, ' ', SEC_TO_TIME(ROUND((24*60*60)*(n3.i + (10 * n2.i) + (100 * n1.i))/LENGTH(st.timecode)))) as appt_datetime,\n"+
 				"  stc.code,\n" +
 				"  CAST(COALESCE(stc.duration, ((24*60)/LENGTH(st.timecode))) AS integer) AS duration\n" +
 				"FROM \n" +
@@ -329,14 +331,14 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"  ON BINARY stc.code = SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1)\n" +
 				"WHERE sd.status = 'A'\n" +
 				"AND stc.code IN (:appointmentTypes) \n" +
-				"AND sd.sdate BETWEEN :minDate AND :maxDate\n" +
+				"AND CONCAT(sd.sdate, ' ', SEC_TO_TIME(ROUND((24*60*60)*(n3.i + (10 * n2.i) + (100 * n1.i))/LENGTH(st.timecode)))) BETWEEN :startDateTime AND :endDateTime\n" +
 				"AND sd.provider_no = :providerNo\n" +
 				"AND (n3.i + (10 * n2.i) + (100 * n1.i)) < LENGTH(st.timecode)\n" +
 				"ORDER BY sd.sdate, (n3.i + (10 * n2.i) + (100 * n1.i));";
 
 		Query query = entityManager.createNativeQuery(sql);
-		query.setParameter("minDate", java.sql.Date.valueOf(startDate), TemporalType.DATE);
-		query.setParameter("maxDate", java.sql.Date.valueOf(endDate), TemporalType.DATE);
+		query.setParameter("startDateTime", java.sql.Timestamp.valueOf(startDateTime), TemporalType.TIMESTAMP);
+		query.setParameter("endDateTime", java.sql.Timestamp.valueOf(endDateTime), TemporalType.TIMESTAMP);
 		query.setParameter("providerNo", providerNo);
 		query.setParameter("appointmentTypes", appointmentTypeList);
 		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
@@ -351,12 +353,11 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 
 		for (Object[] result : results)
 		{
-			java.sql.Date date = (java.sql.Date) result[1];
-			java.sql.Time time = (java.sql.Time) result[2];
-			char templateCode = (char) result[3];
-			Long length = ((BigInteger)result[4]).longValueExact();
+			java.sql.Timestamp timestamp = java.sql.Timestamp.valueOf((String) result[1]);
+			char templateCode = (char) result[2];
+			Long length = ((BigInteger)result[3]).longValueExact();
 
-			ScheduleSearchResult ssr = new ScheduleSearchResult(date, time, templateCode, length, providerNo);
+			ScheduleSearchResult ssr = new ScheduleSearchResult(timestamp, templateCode, length, providerNo);
 
 			possibleSlots.addLast(ssr);
 		}
