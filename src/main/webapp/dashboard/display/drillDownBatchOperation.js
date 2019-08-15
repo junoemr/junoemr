@@ -39,10 +39,10 @@ BatchOperations =
 
 		getReportActions: function (reportName)
 		{
-			let actionName = BatchOperations.REPORT_NAME_ACTION_MAPPING[reportName];
-			if (actionName !== undefined)
+			let action = BatchOperations.REPORT_NAME_ACTION_MAPPING[reportName];
+			if (action !== undefined)
 			{
-				return actionName;
+				return action;
 			} else
 			{
 				return undefined;
