@@ -1,4 +1,4 @@
-<%--
+<%@ page import="oscar.OscarProperties" %><%--
 
     Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
@@ -22,13 +22,24 @@
     Canada
 
 --%>
-<% String email = request.getParameter("email") == null ? "" : request.getParameter("email"); %>
+<%
+    String email = request.getParameter("email") == null ? "" : request.getParameter("email");
+    OscarProperties oscarProps = OscarProperties.getInstance();
+
+    String MHA_PROTOCOL = oscarProps.getProperty("myhealthaccess_protocol");
+    String MHA_DOMAIN = oscarProps.getProperty("myhealthaccess_domain");
+    String MHA_ENDPOINT = "/clinic_users/password/new";
+
+    String passwordResetPathURL = MHA_PROTOCOL + "://" + MHA_DOMAIN + MHA_ENDPOINT;
+%>
+
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
     <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MyHealthAccess Login</title>
-    <link rel="stylesheet" type="text/css" href="myhealthaccess.css">
+    <link rel="stylesheet" type="text/css" href="css/myhealthaccess.css">
 </head>
 <body>
 
@@ -48,8 +59,7 @@
             <h3>Connect your MyHealthAccess Account</h3>
             <p>
                 It looks like you have a MyHealthAccess account, but your credentials have expired or you haven't
-                yet established a connection to your Juno EMR.
-            </p>
+                yet established a connection to your Juno EMR.</p>
             <p>
                 Log in, and we'll link your Juno EMR and MyHealthAccess accounts.
             </p>
@@ -66,8 +76,10 @@
                     <input type="password" id="password" name="password"/>
                 </div>
                 <div class="mha-button-container">
-                    <button type="submit" class="primary">Log on</button>
+                    <button type="submit" class="primary">Login</button>
+                    <a href="<%=passwordResetPathURL%>">Forgot password?</a>
                 </div>
+
             </form>
         </div>
     </div>

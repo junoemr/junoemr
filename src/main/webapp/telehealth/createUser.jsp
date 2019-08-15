@@ -26,7 +26,7 @@
 <html>
 <head>
 		<title>MyHealthAccess Create User</title>
-    <link rel="stylesheet" type="text/css" href="myhealthaccess.css">
+    <link rel="stylesheet" type="text/css" href="css/myhealthaccess.css">
 </head>
 <body>
 <div class="mha-container">

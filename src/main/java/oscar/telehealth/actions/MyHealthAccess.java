@@ -75,6 +75,7 @@ public class MyHealthAccess extends DispatchAction
 				loginAction.addParameter("siteName", request.getParameter("siteName"));
 				loginAction.addParameter("appt", request.getParameter("appt"));
 				loginAction.addParameter("remoteUser", remoteUserID);
+
 				return loginAction;
 			}
 
