@@ -36,7 +36,7 @@ public interface AppointmentStatusMgr {
     public List<AppointmentStatus> getAllActiveStatus();
     public AppointmentStatus getStatus(int ID);
     public void changeStatus(int ID, int iActive);
-	public void modifyStatus(int ID, String strDesc, String strColor);
+	public void modifyStatus(int ID, String strDesc, String strColor, String strJunoColor);
     public List<String> checkStatusUsuage(List<AppointmentStatus> allStatus);
     public void reset();
 }

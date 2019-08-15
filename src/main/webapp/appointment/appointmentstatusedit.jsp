@@ -51,7 +51,17 @@
 	        }
 	      });
 	    
-	   $('#colorpicker').colorPicker('setColor',$('#old_color').val());
+	   $('#apptColor').colorPicker('setColor',$('#old_color').val());
+
+
+		$('#apptJunoColor').colorPicker({
+			format:'hex',
+			colorChange: function(e, ui) {
+				$('#apptJunoColor').val(ui.color);
+			}
+		});
+
+		$('#apptJunoColor').colorPicker('setColor',$('#old_juno_color').val());
 
 	});
 </script>
@@ -69,27 +79,52 @@
 		<tr>
 			<td class="tdLabel"><bean:message
 				key="admin.appt.status.mgr.label.status" />:</td>
-			<td><html:text readonly="true" property="apptStatus" size="40" /></td>
+			<td colspan="3"><html:text readonly="true" property="apptStatus" size="40" /></td>
 		</tr>
 		<tr>
 			<td class="tdLabel"><bean:message
 				key="admin.appt.status.mgr.label.desc" />:</td>
-			<td><html:text property="apptDesc" size="40" /></td>
+			<td colspan="3"><html:text property="apptDesc" size="40" /></td>
 		</tr>
 		<tr>
-			<td class="tdLabel"><bean:message
-				key="admin.appt.status.mgr.label.oldcolor" />:</td>
-			<td><html:text readonly="true" styleId="old_color" property="apptOldColor" size="40" />
-			</td>
-		</tr>
-		<tr>
-			<td class="tdLabel"><bean:message
-				key="admin.appt.status.mgr.label.newcolor" />:</td>
 			<td>
-				<input id="apptColor" name="apptColor" value="" size="20" />
-				
+				<table>
+					<tr>
+						<td class="tdLabel"><bean:message
+								key="admin.appt.status.mgr.label.oldcolor" />:</td>
+						<td><html:text readonly="true" styleId="old_color" property="apptOldColor" size="20" />
+						</td>
+					</tr>
+					<tr>
+						<td class="tdLabel"><bean:message
+								key="admin.appt.status.mgr.label.newcolor" />:</td>
+						<td>
+							<input id="apptColor" name="apptColor" value="" size="20" />
+						</td>
+					</tr>
+				</table>
 			</td>
+			<td>
+				<table>
+					<tr>
+						<td class="tdLabel"><bean:message
+								key="admin.appt.status.mgr.label.oldJunoColor" />:</td>
+						<td><html:text readonly="false" styleId="old_juno_color" property="apptOldJunoColor" size="20" />
+						</td>
+					</tr>
+					<tr>
+						<td class="tdLabel"><bean:message
+								key="admin.appt.status.mgr.label.newJunoColor" />:</td>
+						<td>
+							<input id="apptJunoColor" name="apptJunoColor" value="#000000" size="20" />
+						</td>
+					</tr>
+				</table>
+			</td>
+
 		</tr>
+
+
 
 		<div id="list_entries"></div>
 		<tr>
