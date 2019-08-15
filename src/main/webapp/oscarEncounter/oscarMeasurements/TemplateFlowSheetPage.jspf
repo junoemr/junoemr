@@ -192,6 +192,28 @@
 	{
 		self.opener.location.reload();
 	}
+
+	function pasteToEncounterNote(noteTxt)
+    {
+        if (isEchartOriginal())
+        {
+            self.opener.pasteToEncounterNote(noteTxt);
+        }
+    }
+
+    function isEchartOriginal()
+    {
+        if (opener != null)
+        {
+            parentUUID = opener.getEChartUUID();
+            myUUID = "<%=request.getParameter("echartUUID")%>";
+            return myUUID === parentUUID;
+        }
+        else
+        {
+            return false;
+        }
+    }
 </script>
 <oscar:customInterface name="renal" section="diab"/>
 			

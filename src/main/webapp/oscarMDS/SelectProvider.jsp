@@ -23,142 +23,146 @@
     Ontario, Canada
 
 --%>
-<%@include file="/casemgmt/taglibs.jsp"%>
-<%@ page import="oscar.oscarProvider.data.ProviderData, java.util.ArrayList,java.util.Map, java.util.List, org.oscarehr.util.SpringUtils"%>
-<%@ page import="org.oscarehr.common.dao.ProviderLabRoutingFavoritesDao, org.oscarehr.common.model.ProviderLabRoutingFavorite" %>
-<%@ page import="org.oscarehr.PMmodule.dao.ProviderDao, org.oscarehr.common.model.Provider" %>
+<%@ include file="/casemgmt/taglibs.jsp" %>
+<%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
+<%@ page import="org.oscarehr.common.dao.ProviderLabRoutingFavoritesDao" %>
+<%@ page import="org.oscarehr.common.model.Provider" %>
+<%@ page import="org.oscarehr.common.model.ProviderLabRoutingFavorite" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="java.util.List" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" scope="request"/>
 <html>
 <head>
-<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<title><bean:message key="oscarMDS.selectProvider.title" /></title>
-<script type="text/javascript" src="../share/javascript/prototype.js"></script>
-        <script type="text/javascript" src="../share/javascript/effects.js"></script>
-        <script type="text/javascript" src="../share/javascript/controls.js"></script>
+	<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	<title><bean:message key="oscarMDS.selectProvider.title"/></title>
+	<script type="text/javascript" src="../share/javascript/prototype.js"></script>
+	<script type="text/javascript" src="../share/javascript/effects.js"></script>
+	<script type="text/javascript" src="../share/javascript/controls.js"></script>
 
-        <script type="text/javascript" src="../share/yui/js/yahoo-dom-event.js"></script>
-        <script type="text/javascript" src="../share/yui/js/connection-min.js"></script>
-        <script type="text/javascript" src="../share/yui/js/animation-min.js"></script>
-        <script type="text/javascript" src="../share/yui/js/datasource-min.js"></script>
-        <script type="text/javascript" src="../share/yui/js/autocomplete-min.js"></script>
-        <script type="text/javascript" src="../js/demographicProviderAutocomplete.js"></script>
+	<script type="text/javascript" src="../share/yui/js/yahoo-dom-event.js"></script>
+	<script type="text/javascript" src="../share/yui/js/connection-min.js"></script>
+	<script type="text/javascript" src="../share/yui/js/animation-min.js"></script>
+	<script type="text/javascript" src="../share/yui/js/datasource-min.js"></script>
+	<script type="text/javascript" src="../share/yui/js/autocomplete-min.js"></script>
+	<script type="text/javascript" src="../js/demographicProviderAutocomplete.js"></script>
 
-        <link rel="stylesheet" type="text/css" href="../share/yui/css/fonts-min.css"/>
-        <link rel="stylesheet" type="text/css" href="../share/yui/css/autocomplete.css"/>
-        <link rel="stylesheet" type="text/css" media="all" href="../share/css/demographicProviderAutocomplete.css"  />
+	<link rel="stylesheet" type="text/css" href="../share/yui/css/fonts-min.css"/>
+	<link rel="stylesheet" type="text/css" href="../share/yui/css/autocomplete.css"/>
+	<link rel="stylesheet" type="text/css" media="all" href="../share/css/demographicProviderAutocomplete.css"/>
 
-</head>
+	<script type="text/javascript">
+		function prepSubmit()
+		{
 
-<script type="text/javascript">
-function prepSubmit() {
-
-  	var fwdProviders = "";
-  	var fwdFavorites = "";
-
-
-    for (i=0; i < $("fwdProviders").options.length; i++) {
-
-           if (fwdProviders != "") {
-           	fwdProviders = fwdProviders + ",";
-           }
-
-           fwdProviders = fwdProviders + $("fwdProviders").options[i].value;
-    }
-
-	for (i=0; i < $("favorites").options.length; i++) {
-
-           if (fwdFavorites != "") {
-           	fwdFavorites = fwdFavorites + ",";
-           }
-
-           fwdFavorites = fwdFavorites + $("favorites").options[i].value;
-       }
-
-	var isListView = <%=request.getParameter("isListView")%>;
-	var docId = '<%=request.getParameter("docId")%>';
-	var labDisplay = '<%=request.getParameter("labDisplay")%>';
-	var frm = "reassignForm";
-	
-	if( docId != "null" && labDisplay == "null" ) {
-		frm += "_" + docId;	
-		self.opener.document.forms[frm].selectedProviders.value = fwdProviders;
-	    self.opener.document.forms[frm].favorites.value = fwdFavorites;
-	    self.opener.forwardDocument(docId);
-	}
-	else if( isListView != "null" && isListView == true ){
-		self.opener.document.forms[frm].selectedProviders.value = fwdProviders;
-    	self.opener.document.forms[frm].favorites.value = fwdFavorites;
-    	self.opener.ForwardSelectedRows();
-	}
-	else {		
-		frm += "_" + docId;						
-		self.opener.document.forms[frm].selectedProviders.value = fwdProviders;
-    	self.opener.document.forms[frm].favorites.value = fwdFavorites;
-    	self.opener.document.forms[frm].submit();
-	}
-	
-    self.close();
-
-}
+			var fwdProviders = "";
+			var fwdFavorites = "";
 
 
-/*function pageLoad() {
-var url = "<c:out value="${ctx}"/>/provider/SearchProvider.do";
+			for (let i = 0; i < $("fwdProviders").options.length; i++)
+			{
 
-new Ajax.Autocompleter("autocompleteProvider", "providerList", url, {
-	  paramName: "value",
-	  minChars: 2,
-	  indicator: 'working',
-	});
+				if (fwdProviders != "")
+				{
+					fwdProviders = fwdProviders + ",";
+				}
 
+				fwdProviders = fwdProviders + $("fwdProviders").options[i].value;
+			}
 
-};
-*/
+			for (let i = 0; i < $("favorites").options.length; i++)
+			{
 
-</script>
+				if (fwdFavorites != "")
+				{
+					fwdFavorites = fwdFavorites + ",";
+				}
+
+				fwdFavorites = fwdFavorites + $("favorites").options[i].value;
+			}
+
+			var isListView = <%=request.getParameter("isListView")%>;
+			var docId = '<%=request.getParameter("docId")%>';
+			var labDisplay = '<%=request.getParameter("labDisplay")%>';
+			var frm = "reassignForm";
+
+			if (docId != "null" && labDisplay == "null")
+			{
+				frm += "_" + docId;
+				self.opener.document.forms[frm].selectedProviders.value = fwdProviders;
+				self.opener.document.forms[frm].favorites.value = fwdFavorites;
+				self.opener.forwardDocument(docId);
+			}
+			else if (labDisplay == "preview")
+			{
+				frm += "_" + docId;
+				self.opener.document.forms[frm].selectedProviders.value = fwdProviders;
+				self.opener.document.forms[frm].favorites.value = fwdFavorites;
+				self.opener.forwardLab(docId);
+			}
+			else if (isListView != "null" && isListView == true)
+			{
+				self.opener.document.forms[frm].selectedProviders.value = fwdProviders;
+				self.opener.document.forms[frm].favorites.value = fwdFavorites;
+				self.opener.ForwardSelectedRows();
+			}
+			else
+			{
+				frm += "_" + docId;
+				self.opener.document.forms[frm].selectedProviders.value = fwdProviders;
+				self.opener.document.forms[frm].favorites.value = fwdFavorites;
+				self.opener.document.forms[frm].submit();
+			}
+
+			self.close();
+
+		}
+
+	</script>
 </head>
 <body>
 <form name="providerSelectForm">
-<p style="text-align:center; background-color:#9999CC; border-color:#CCCCFF #6666CC #6666CC #CCCCFF;
+	<p style="text-align:center; background-color:#9999CC; border-color:#CCCCFF #6666CC #6666CC #CCCCFF;
 border-left:thin solid #CCCCFF; border-right:thin solid #6666CC; border-style:solid; border-width:thin; color:white;
 font-weight:bold;">
-<bean:message key="oscarMDS.forward.msgInstruction1"/>
-</p>
-<div style="text-align:center;">
-    <input id="autocompleteprov" type="text">
-    <div id="autocomplete_choicesprov" class="autocomplete"></div>
-</div>
-<div style="float:right;">
-	Forward List<br>
-	<select id="fwdProviders" size="5" style="width:250px;" multiple="multiple" ondblclick="removeProvider(this);"></select>
-</div>
-<div style="float:right; margin:30px 30px 30px 30px;">
-	<input type="button" value=">>" onclick="copyProvider('fwdProviders','favorites');"><br>
-	<input type="button" value="<<" onclick="copyProvider('favorites','fwdProviders');">
-</div>
-<div>
-	Favorites<br>
-	<select id="favorites" size="5" style="width:250px;" multiple="multiple" ondblclick="removeProvider(this);">
-	<%
-	ProviderLabRoutingFavoritesDao favDao = (ProviderLabRoutingFavoritesDao)SpringUtils.getBean("ProviderLabRoutingFavoritesDao");
-	String user = (String)request.getSession().getAttribute("user");
-	ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
+		<bean:message key="oscarMDS.forward.msgInstruction1"/>
+	</p>
+	<div style="text-align:center;">
+		<input id="autocompleteprov" type="text">
+		<div id="autocomplete_choicesprov" class="autocomplete"></div>
+	</div>
+	<div style="float:right;">
+		Forward List<br>
+		<select id="fwdProviders" size="5" style="width:250px;" multiple="multiple" ondblclick="removeProvider(this);"></select>
+	</div>
+	<div style="float:right; margin:30px 30px 30px 30px;">
+		<input type="button" value=">>" onclick="copyProvider('fwdProviders','favorites');"><br>
+		<input type="button" value="<<" onclick="copyProvider('favorites','fwdProviders');">
+	</div>
+	<div>
+		Favorites<br>
+		<select id="favorites" size="5" style="width:250px;" multiple="multiple" ondblclick="removeProvider(this);">
+			<%
+				ProviderLabRoutingFavoritesDao favDao = (ProviderLabRoutingFavoritesDao) SpringUtils.getBean("ProviderLabRoutingFavoritesDao");
+				String user = (String) request.getSession().getAttribute("user");
+				ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
 
-	List<ProviderLabRoutingFavorite>currentFavorites = favDao.findFavorites(user);
-	for( ProviderLabRoutingFavorite fav : currentFavorites) {
-		Provider prov = providerDao.getProvider(fav.getRoute_to_provider_no());
-	%>
-		<option id="<%=prov.getProviderNo()%>" value="<%=prov.getProviderNo()%>"><%=prov.getFormattedName()%></option>
-	<%
-	}
-	%>
+				List<ProviderLabRoutingFavorite> currentFavorites = favDao.findFavorites(user);
+				for(ProviderLabRoutingFavorite fav : currentFavorites)
+				{
+					Provider prov = providerDao.getProvider(fav.getRoute_to_provider_no());
+			%>
+			<option id="<%=prov.getProviderNo()%>" value="<%=prov.getProviderNo()%>"><%=prov.getFormattedName()%>
+			</option>
+			<%
+				}
+			%>
 
-	</select>
-</div>
-<div style="text-align:center;">
-	<p><bean:message key="oscarMDS.forward.msgInstruction2"/></p>
-	<input type="button" value="Submit" onclick="prepSubmit();return false;">
-</div>
+		</select>
+	</div>
+	<div style="text-align:center;">
+		<p><bean:message key="oscarMDS.forward.msgInstruction2"/></p>
+		<input type="button" value="Submit" onclick="prepSubmit();return false;">
+	</div>
 </form>
 <script type="text/javascript">
 YAHOO.example.BasicRemote = function() {

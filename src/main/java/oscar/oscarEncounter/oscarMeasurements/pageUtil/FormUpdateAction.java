@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.GenericValidator;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -120,7 +121,7 @@ public class FormUpdateAction extends Action {
 	        FlowSheetItem item =  mFlowsheet.getFlowSheetItem(measure);
 					
 	               mFlowsheet.getMeasurementFlowSheetInfo(measure);
-					EctMeasurementTypesBean mtypeBean = mType.getMeasurementType(measure);
+	               EctMeasurementTypesBean mtypeBean = mFlowsheet.getFlowsheetMeasurement(measure);
 
 					String name = h2.get("display_name").toString().replaceAll("\\W","");
 					String displayName=h2.get("display_name").toString();
@@ -153,7 +154,7 @@ public class FormUpdateAction extends Action {
 							
 							
 						
-						valid = doInput(item, mtypeBean, mFlowsheet, mtypeBean.getType(), mtypeBean.getMeasuringInstrc(), request.getParameter(name), comment, date, apptNo, request);
+						valid = doInput(item, mtypeBean, mFlowsheet, mtypeBean.getType(), StringUtils.trimToEmpty(mtypeBean.getMeasuringInstrc()), request.getParameter(name), comment, date, apptNo, request);
 						
 												
 						if (!valid) {
@@ -277,6 +278,7 @@ public class FormUpdateAction extends Action {
 		Double dMin = 0.0;
 		Integer iMax = 0;
 		Integer iMin = 0;
+		Boolean isDate = false;
 
 		List<Validations> vs = ectValidation.getValidationType(inputType, mInstructions);
 		ectValidation.getRegCharacterExp();
@@ -290,6 +292,7 @@ public class FormUpdateAction extends Action {
 			iMax = v.getMaxLength();
 			iMin = v.getMinLength();
 			regExp = v.getRegularExp();
+			isDate = v.isDate() == null ? false : v.isDate();
 		}
 
 		String inputTypeDisplay = mtypeBean.getTypeDisplayName();
@@ -321,6 +324,11 @@ public class FormUpdateAction extends Action {
 		}
 		if (!ectValidation.isValidBloodPressure(regExp, inputValue)) {
 			errors.add(inputValueName, new ActionMessage("error.bloodPressure"));
+			valid = false;
+		}
+		if (isDate && !ectValidation.isDate(inputValue) && inputValue.compareTo("") != 0) {
+			errors.add(inputValueName, new ActionMessage("errors.invalidDate", inputTypeDisplay));
+			saveErrors(request, errors);
 			valid = false;
 		}
 		if (!ectValidation.isDate(dateObserved) && inputValue.compareTo("") != 0) {

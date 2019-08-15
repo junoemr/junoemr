@@ -25,37 +25,48 @@ package org.oscarehr.common.model;
 
 import org.oscarehr.common.annotation.SiteLocation;
 import org.oscarehr.common.listeners.BeanValidationEventListener;
-
-import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
+import org.oscarehr.provider.model.ProviderData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
 
 @Entity
 @EntityListeners(BeanValidationEventListener.class)
 @Table(name = "appointment")
 public class Appointment extends AbstractModel<Integer> implements Serializable {
 
+	public static final String CANCELLED = "C";
+	public static final String BILLED = "B";
+	public static final String NO_SHOW = "N";
+
 	public enum BookingSource
 	{
 		OSCAR,
 		MYOSCAR_SELF_BOOKING
 	}
-	
+
+	public static final String DONOTBOOK = "Do_Not_Book";
+
+	public static final int DEFAULT_REASON_CODE = 17;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "appointment_no")
@@ -112,8 +123,13 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	@Column(name = "lastupdateuser")
 	private String lastUpdateUser;
 
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="lastupdateuser", referencedColumnName="provider_no", insertable=false, updatable=false)
+	private ProviderData lastUpdateUserRecord;
+
 	private String remarks;
 	private String urgency;
+	private boolean isVirtual;
 	private Integer creatorSecurityId;
 	
 	@Enumerated(EnumType.STRING)
@@ -245,6 +261,26 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 		return status;
 	}
 
+	public String getAppointmentStatus()
+	{
+		if(status != null && status.length() > 0)
+		{
+			return status.substring(0, 1);
+		}
+
+		return null;
+	}
+
+	public String getAppointmentStatusModifier()
+	{
+		if(status != null && status.length() > 1)
+		{
+			return status.substring(1,2);
+		}
+
+		return null;
+	}
+
 	public void setStatus(String status) {
 		this.status = status;
 	}
@@ -281,6 +317,11 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 		this.lastUpdateUser = lastUpdateUser;
 	}
 
+	public ProviderData getLastUpdateUserRecord()
+	{
+		return lastUpdateUserRecord;
+	}
+
 	public String getRemarks() {
 		return remarks;
 	}
@@ -306,6 +347,16 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 
 	public void setUrgency(String urgency) {
 		this.urgency = urgency;
+	}
+
+	public boolean getIsVirtual()
+	{
+		return isVirtual;
+	}
+
+	public void setIsVirtual(boolean isVirtual)
+	{
+		this.isVirtual = isVirtual;
 	}
 
 	public Integer getCreatorSecurityId() {

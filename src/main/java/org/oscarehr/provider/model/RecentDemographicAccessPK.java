@@ -26,6 +26,7 @@ package org.oscarehr.provider.model;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Embeddable
 public class RecentDemographicAccessPK implements Serializable
@@ -78,5 +79,11 @@ public class RecentDemographicAccessPK implements Serializable
 			return (demographicNo.equals(pk.demographicNo) && providerNo.equals(pk.providerNo));
 		}
 		return false;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(demographicNo, providerNo);
 	}
 }

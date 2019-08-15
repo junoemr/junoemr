@@ -6,6 +6,7 @@
 
 <suppressions>
 	<suppress checks="RegexpMultiline" files="MSHSegment.java" lines="50" />
+	<suppress checks="RegexpMultiline" files="OpenApiSpecBuilder.java" lines="47,48" />
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="oscar_15.creation_db.2017.02.23.sql" />
 	<!--
 	<suppress checks="RegexpMultiline" files="ResponseDefaultsFilter.java" lines="54" />
@@ -13,5 +14,8 @@
 	 -->
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="2017-06-14.addSnomedCoreTable.sql" />
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="2018-02-08.change_log_tables_to_MyISAM.sql" />
+	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="SQLReporter.java" />
+	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="RptByExampleData.java" />
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="2018-11-29.add_dashboard_tables.sql" />
+	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="2019-03-06.gad7_phq9_measurements.sql" />
 </suppressions>

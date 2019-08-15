@@ -38,6 +38,8 @@
 <%@page import="java.util.Hashtable"%>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="java.time.LocalDateTime" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
@@ -65,7 +67,7 @@
 	EctMeasurementTypeBeanHandler mType = new EctMeasurementTypeBeanHandler();
 
 	String provider = (String) session.getValue("user");
-	String prevDate = UtilDateUtilities.getToday("yyyy-MM-dd H:mm");
+	String prevDate = ConversionUtils.toDateTimeNoSecString(LocalDateTime.now());
 %>
 
 
@@ -156,6 +158,22 @@
 			}
 
 		}
+
+		function validateSubmit()
+        {
+            if (opener !== undefined)
+            {
+                if (!opener.isEchartOriginal())
+                {
+                    if (!confirm("<bean:message key="oscarEncounter.oscarMeasurements.Measurements.msgParentChanged.start"/>" +
+                        "<oscar:nameage demographicNo="<%=demographic_no%>"/> <bean:message key="oscarEncounter.oscarMeasurements.Measurements.msgParentChanged.end"/> "))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
 	</SCRIPT>
 
 	<style type="text/css">
@@ -291,7 +309,7 @@
             <td valign="top" class="MainTableRightColumn">
                <html:errors/>
                <% String val = "";
-                  String saveAction = "/oscarEncounter/Measurements2";
+                  String saveAction = "/oscarEncounter/Measurements2?pasteEncounterNote=true";
                   String comment = "";
                   Hashtable h = null;
                   if ( id != null ) {
@@ -330,7 +348,7 @@
 			%>
             <!-- END of Master Calendar Input -->
 
-               <html:form action="<%=saveAction%>" styleId="measurementForm" >
+               <html:form action="<%=saveAction%>" styleId="measurementForm" onsubmit="return validateSubmit()">
 
                <input type="hidden" name="value(numType)" value="<%=measurements.length%>"/>
                <input type="hidden" name="value(groupName)" value=""/>
@@ -348,7 +366,7 @@
                     measurement = measurements[i];
                     Map h2 = mFlowsheet.getMeasurementFlowSheetInfo(measurement);
 
-                EctMeasurementTypesBean mtypeBean = mType.getMeasurementType(measurement);
+                EctMeasurementTypesBean mtypeBean = mFlowsheet.getFlowsheetMeasurement(measurement);
                 if(ectMeasurementsForm != null && !ectMeasurementsForm.isEmpty()){
 
                    h = new Hashtable(ectMeasurementsForm.values);

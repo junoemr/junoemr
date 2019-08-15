@@ -35,10 +35,11 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.to.model.NewAppointmentTo1;
+import oscar.util.StringUtils;
 
 /**
  * Conversion from the web's mininal new appt. This converter adds some defaults.
- * 
+ *
  * @author marc
  *
  */
@@ -69,13 +70,24 @@ public class NewAppointmentConverter extends AbstractConverter<Appointment, NewA
 		}
 
 		Demographic demographic = demographicDao.getDemographicById(t.getDemographicNo());
-		if (demographic == null) {
-			throw new ConversionException("Unable to find patient");
+
+		// Copy the defaults from the old frontend
+		int demographicNo = 0;
+		String demographicName = "";
+		if (demographic != null)
+		{
+			demographicNo = demographic.getDemographicNo();
+			demographicName = demographic.getFormattedName();
 		}
-		d.setName(demographic.getFormattedName());
+
+		String resources = StringUtils.transformNullInEmptyString(t.getResources());
+		String type = StringUtils.transformNullInEmptyString(t.getType());
+		String urgency = StringUtils.transformNullInEmptyString(t.getUrgency());
+
+		d.setName(demographicName);
 		d.setCreateDateTime(new Date());
 		d.setCreator(loggedInInfo.getLoggedInProviderNo());
-		d.setDemographicNo(t.getDemographicNo());
+		d.setDemographicNo(demographicNo);
 		d.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		d.setLocation(t.getLocation());
 		d.setNotes(t.getNotes());
@@ -83,10 +95,10 @@ public class NewAppointmentConverter extends AbstractConverter<Appointment, NewA
 		d.setProviderNo(t.getProviderNo());
 		d.setReason(t.getReason());
 		d.setRemarks("");
-		d.setResources(t.getResources());
+		d.setResources(resources);
 		d.setStatus(t.getStatus());
-		d.setType(t.getType());
-		d.setUrgency(t.getUrgency());
+		d.setType(type);
+		d.setUrgency(urgency);
 		d.setUpdateDateTime(d.getCreateDateTime());
 		//This looks sketchy, but 17=Others
 		d.setReasonCode(17);

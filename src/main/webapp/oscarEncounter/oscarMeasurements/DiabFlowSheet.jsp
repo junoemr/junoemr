@@ -9,19 +9,35 @@
 
 --%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<% long startTime = System.currentTimeMillis(); %>
 <%@page contentType="text/html"%>
-<%@page import="oscar.oscarDemographic.data.*,java.util.*,oscar.oscarPrevention.*,oscar.oscarEncounter.oscarMeasurements.*,oscar.oscarEncounter.oscarMeasurements.bean.*,java.net.*, oscar.oscarRx.util.*"%>
-<%@page import="org.springframework.web.context.support.WebApplicationContextUtils,oscar.log.*"%>
-<%@page import="org.springframework.web.context.WebApplicationContext,oscar.oscarResearch.oscarDxResearch.bean.*"%>
-<%@page import="org.oscarehr.common.dao.FlowSheetCustomizationDao,org.oscarehr.common.model.FlowSheetCustomization"%>
-<%@page import="org.oscarehr.common.dao.FlowSheetDrugDao,org.oscarehr.common.model.FlowSheetDrug"%>
-<%@page import="org.oscarehr.common.dao.UserPropertyDAO,org.oscarehr.common.model.UserProperty"%>
+<%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@page import="org.springframework.web.context.WebApplicationContext"%>
+<%@page import="org.oscarehr.common.dao.FlowSheetCustomizationDao"%>
+<%@page import="org.oscarehr.common.model.FlowSheetCustomization"%>
 
 <%@page import="org.oscarehr.allergy.dao.AllergyDao"%>
 <%@page import="org.oscarehr.allergy.model.Allergy"%>
 <%@page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="static org.caisi.comp.web.WebComponentUtil.getServletContext" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.MeasurementInfo" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.FlowSheetItem" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean" %>
+<%@ page import="oscar.log.LogAction" %>
+<%@ page import="oscar.log.LogConst" %>
+<%@ page import="oscar.oscarRx.util.RxUtil" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="oscar.util.ConversionUtils" %>
 
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
@@ -31,66 +47,66 @@
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 
 <%
-    if(session.getValue("user") == null) response.sendRedirect("../../logout.jsp");
-    //int demographic_no = Integer.parseInt(request.getParameter("demographic_no"));
-    if(session.getAttribute("userrole") == null )  response.sendRedirect("../logout.jsp");
-    String project = request.getContextPath();
-    String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-    String demographic_no = request.getParameter("demographic_no");
-    String providerNo = (String) session.getAttribute("user");
-    String temp = "diab3";
+	if (session.getAttribute("user") == null)
+	{
+		response.sendRedirect("../../logout.jsp");
+	}
+	if (session.getAttribute("userrole") == null)
+	{
+		response.sendRedirect("../logout.jsp");
+	}
+	String project = request.getContextPath();
+	String roleName$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
+	String demographic_no = request.getParameter("demographic_no");
+	String temp = "diab3";
 	String uuid = request.getParameter("uuid");
 	String UUIDParamStr = "&uuid="+ StringUtils.trimToEmpty(uuid);
 
-    AllergyDao allergyDao = (AllergyDao)SpringUtils.getBean("allergyDao");
+	AllergyDao allergyDao = (AllergyDao)SpringUtils.getBean("allergyDao");
 %>
 <oscar:oscarPropertiesCheck property="SPEC3" value="yes">
     <security:oscarSec roleName="<%=roleName$%>" objectName="_flowsheet" rights="r" reverse="<%=true%>">
         "You have no right to access this page!"
-        <%
-         LogAction.addLog((String) session.getAttribute("user"), LogConst.NORIGHT+LogConst.ACTION_READ, LogConst.CON_FLOWSHEET,  temp , request.getRemoteAddr(),demographic_no);
-        response.sendRedirect("../../noRights.html"); %>
+		<%
+			LogAction.addLogEntry((String) session.getAttribute("user"),
+					LogConst.NORIGHT+LogConst.ACTION_READ,
+					LogConst.CON_FLOWSHEET,
+					temp,
+					request.getRemoteAddr(),
+					demographic_no);
+			response.sendRedirect("../../noRights.html");
+		%>
     </security:oscarSec>
 </oscar:oscarPropertiesCheck>
 
 
 <%
-boolean dsProblems = false;
+	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 
+	FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
+	List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( temp,(String) session.getAttribute("user"),Integer.parseInt(demographic_no));
 
-WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+	MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
+	MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(temp,custList);
 
-FlowSheetCustomizationDao flowSheetCustomizationDao = (FlowSheetCustomizationDao) ctx.getBean("flowSheetCustomizationDao");
-FlowSheetDrugDao flowSheetDrugDao = (FlowSheetDrugDao) ctx.getBean("flowSheetDrugDao");
+	MeasurementInfo mi = new MeasurementInfo(demographic_no);
+	List<String> measurementLs = mFlowsheet.getMeasurementList();
+	ArrayList<String> measurements = new ArrayList(measurementLs);
 
-List<FlowSheetCustomization> custList = flowSheetCustomizationDao.getFlowSheetCustomizations( temp,(String) session.getAttribute("user"),Integer.parseInt(demographic_no));
+	mi.getMeasurements(measurements);
 
-////Start
-MeasurementTemplateFlowSheetConfig templateConfig = MeasurementTemplateFlowSheetConfig.getInstance();
+	mFlowsheet.getMessages(mi);
 
+	ArrayList recList = mi.getList();
 
-MeasurementFlowSheet mFlowsheet = templateConfig.getFlowSheet(temp,custList);
+	mFlowsheet.sortToCurrentOrder(recList);
+	StringBuilder recListBuffer = new StringBuilder();
+	for (int i = 0; i < recList.size(); i++)
+	{
+		recListBuffer.append("&amp;measurement="+response.encodeURL( (String) recList.get(i)));
+	}
 
-MeasurementInfo mi = new MeasurementInfo(demographic_no);
-List<String> measurementLs = mFlowsheet.getMeasurementList();
-ArrayList<String> measurements = new ArrayList(measurementLs);
-long startTimeToGetM = System.currentTimeMillis();
-
-mi.getMeasurements(measurements);
-
-mFlowsheet.getMessages(mi);
-
-ArrayList recList = mi.getList();
-
-mFlowsheet.sortToCurrentOrder(recList);
-StringBuilder recListBuffer = new StringBuilder();
-for(int i = 0; i < recList.size(); i++){
-    recListBuffer.append("&amp;measurement="+response.encodeURL( (String) recList.get(i)));
-}
-
-String flowSheet = mFlowsheet.getDisplayName();
-ArrayList<String> warnings = mi.getWarnings();
-ArrayList<String> recomendations = mi.getRecommendations();
+	String flowSheet = mFlowsheet.getDisplayName();
 %>
 
 <html>
@@ -124,19 +140,6 @@ ArrayList<String> recomendations = mi.getRecommendations();
     		$('.xsparkline').sparkline(vals2,{type:"line", lineColor:"#f00", fillColor:"", spotRadius:"0", spotColor:"", composite:"true"});
     	});
     </script>
-    
-<script>
-	function getDemographicNo() {
-		return '<%=demographic_no%>';
-	}
-	function getContextPath() {
-		return '<%=request.getContextPath()%>';
-	}
-	function refreshEncounter()
-	{
-		return '';
-	}
-</script>
 
 	<oscar:customInterface name="renal" section="indicators"/>
 
@@ -198,8 +201,6 @@ ArrayList<String> recomendations = mi.getRecommendations();
 	}
 
 	$(document).ready(function() {
-
-		var sliderTimeout;
 
 		$("#highlightSlider").slider({
 			value: 0,
@@ -365,31 +366,6 @@ ArrayList<String> recomendations = mi.getRecommendations();
 	<link rel="stylesheet" type="text/css" href="<%=request.getContextPath() %>/share/css/jquery-ui-1.8.15.custom.draggable.slider.css" />
 	<style type="text/css" media="all">
 
-
-		.highlight .title .uiBarBtn {
-			background: #A5A5A5;
-		}
-
-		.highlight .title .uiBarBtn:hover {
-			color: #656565;
-			background: white;
-		}
-
-		.uiBarBtn {
-			position: relative;
-			float: right;
-			line-height: 8px;
-			border-radius: 2px;
-			background: #656565;
-			color: white;
-			font-weight: bold;
-			font-size: 12px;
-			cursor: pointer;
-			padding: 2px;
-			top: -1px;
-			margin-left: 4px;
-		}
-
 		.highlightTime {
 			background-color: yellow;
 		}
@@ -406,15 +382,6 @@ ArrayList<String> recomendations = mi.getRecommendations();
 			padding: 4px;
 			margin-bottom: 4px;
 			cursor: default;
-		}
-
-		.ui-slider-horizontal {
-			height: 0.5em;
-		}
-
-		.ui-slider .ui-slider-handle {
-			height: 0.95em;
-			width: 0.95em;
 		}
 
 		a {
@@ -509,10 +476,6 @@ ArrayList<String> recomendations = mi.getRecommendations();
 			vertical-align: text-top;
 		}
 
-		.rowheader2 {
-			text-align: right;
-		}
-
 		.header {
 			font-weight: bold;
 		}
@@ -525,32 +488,32 @@ ArrayList<String> recomendations = mi.getRecommendations();
 
 
 
-#measurement-view{
-display:none;
-position:fixed;
-top:80px;
-width:600px;
+#measurement-view {
+	display:none;
+	position:fixed;
+	top:80px;
+	width:600px;
 
-text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-padding:10px;
-left: 50%;
-margin-left: -300px;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+	padding:10px;
+	left: 50%;
+	margin-left: -300px;
 
-color: #333;
-background-color: #f5f5f5;
-border-color: #eed3d7;
-font-family:"Arial";
+	color: #333;
+	background-color: #f5f5f5;
+	border-color: #eed3d7;
+	font-family:"Arial";
 
-border: 1px solid #fbeed5;
--webkit-border-radius: 4px;
--moz-border-radius: 4px;
-border-radius: 4px;
+	border: 1px solid #fbeed5;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
 
--moz-box-shadow: 3px 3px 4px #444;
--webkit-box-shadow: 3px 3px 4px #444;
-box-shadow: 3px 3px 4px #444;
--ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#444444')";
-filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#444444');
+	-moz-box-shadow: 3px 3px 4px #444;
+	-webkit-box-shadow: 3px 3px 4px #444;
+	box-shadow: 3px 3px 4px #444;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#444444')";
+	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#444444');
 }
 
 #measurement-view{
@@ -590,12 +553,6 @@ filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Colo
 }
 
 .btn:active,
-.btn.active {
-  background-image: none;
-  outline: 0;
-  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-          box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-}
 
 .btn-danger {
   color: #ffffff;
@@ -606,37 +563,17 @@ filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Colo
 .btn-danger:hover,
 .btn-danger:focus,
 .btn-danger:active,
-.btn-danger.active,
-.open .dropdown-toggle.btn-danger {
-  color: #ffffff;
-  background-color: #d2322d;
-  border-color: #ac2925;
-}
 
 .btn-danger:active,
-.btn-danger.active,
-.open .dropdown-toggle.btn-danger {
-  background-image: none;
-}
 
-.btn-danger.disabled,
 .btn-danger[disabled],
 fieldset[disabled] .btn-danger,
-.btn-danger.disabled:hover,
 .btn-danger[disabled]:hover,
 fieldset[disabled] .btn-danger:hover,
-.btn-danger.disabled:focus,
 .btn-danger[disabled]:focus,
 fieldset[disabled] .btn-danger:focus,
-.btn-danger.disabled:active,
 .btn-danger[disabled]:active,
 fieldset[disabled] .btn-danger:active,
-.btn-danger.disabled.active,
-.btn-danger[disabled].active,
-fieldset[disabled] .btn-danger.active {
-  background-color: #d9534f;
-  border-color: #d43f3a;
-}
 
 .btn-primary {
   color: #ffffff;
@@ -647,129 +584,138 @@ fieldset[disabled] .btn-danger.active {
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:active,
-.btn-primary.active,
-.open .dropdown-toggle.btn-primary {
-  color: #ffffff;
-  background-color: #3276b1;
-  border-color: #285e8e;
-}
 
 .btn-primary:active,
-.btn-primary.active,
-.open .dropdown-toggle.btn-primary {
-  background-image: none;
-}
 
-.btn-primary.disabled,
 .btn-primary[disabled],
 fieldset[disabled] .btn-primary,
-.btn-primary.disabled:hover,
 .btn-primary[disabled]:hover,
 fieldset[disabled] .btn-primary:hover,
-.btn-primary.disabled:focus,
 .btn-primary[disabled]:focus,
 fieldset[disabled] .btn-primary:focus,
-.btn-primary.disabled:active,
 .btn-primary[disabled]:active,
-fieldset[disabled] .btn-primary:active,
-.btn-primary.disabled.active,
-.btn-primary[disabled].active,
-fieldset[disabled] .btn-primary.active {
-  background-color: #428bca;
-  border-color: #357ebd;
-}
-
+fieldset[disabled] .btn-primary:active
 	</style>
 
 </head>
 
 <%
-String[] demographicParam = new String[1];
-demographicParam[0] = demographic_no;
+	String[] demographicParam = new String[1];
+	demographicParam[0] = demographic_no;
 
-String remindersQuery = "intake_reminders";
-List<Map<String,Object>> remindersResult = oscarSuperManager.find("providerDao", remindersQuery, demographicParam);
-String remindersList = (!remindersResult.isEmpty() && remindersResult.get(0).get("note")!=null) ? remindersResult.get(0).get("note").toString() : "";
-if (remindersResult.size() > 1) {
-	for (int i=1; i<remindersResult.size(); i++) {
-		remindersList += ",<br/>" + remindersResult.get(i).get("note").toString();
+	String remindersQuery = "intake_reminders";
+	List<Map<String,Object>> remindersResult = oscarSuperManager.find("providerDao", remindersQuery, demographicParam);
+	String remindersList = "";
+	if (!remindersResult.isEmpty() && remindersResult.get(0).get("note")!=null)
+	{
+		remindersList = remindersResult.get(0).get("note").toString();
 	}
-}
 
-List<Allergy> allergies = allergyDao.findActiveAllergiesOrderByDescription(Integer.parseInt(demographic_no));
-String allergiesList="";
-for(int x=0;x<allergies.size();x++) {
-	if(x!=0) {
-		allergiesList += ",<br/>";
+	if (remindersResult.size() > 1)
+	{
+		for (int i = 1; i < remindersResult.size(); i++)
+		{
+			remindersList += ",<br/>" + remindersResult.get(i).get("note").toString();
+		}
 	}
-	Allergy allergy = allergies.get(x);
-	allergiesList += allergy.getDescription();
-}
 
-String curUser_no = (String) session.getAttribute("user");
-
-String medicationsQuery = "intake_medications";
-List<Map<String,Object>> medicationsResult = oscarSuperManager.find("providerDao", medicationsQuery, demographicParam);
-String medicationsList = "";
-if (!medicationsResult.isEmpty()) {
-	for (int i=0; i<medicationsResult.size(); i++) {
-		if (i != 0) {
-			medicationsList += ",<br/>";
+	List<Allergy> allergies = allergyDao.findActiveAllergiesOrderByDescription(Integer.parseInt(demographic_no));
+	String allergiesList = "";
+	for (int x = 0;x < allergies.size(); x++)
+	{
+		if (x != 0)
+		{
+			allergiesList += ",<br/>";
 		}
+		Allergy allergy = allergies.get(x);
+		allergiesList += allergy.getDescription();
+	}
 
-		if (medicationsResult.get(i).get("customName")!=null && !medicationsResult.get(i).get("customName").toString().equals("null")) {
-			medicationsList += medicationsResult.get(i).get("customName").toString();
-		} else if (Integer.parseInt(medicationsResult.get(i).get("GCN_SEQNO").toString())==0) {
-			medicationsList += "Unknown";
-		} else {
-			medicationsList += medicationsResult.get(i).get("BN").toString();
-		}
+	String curUser_no = (String) session.getAttribute("user");
 
-		medicationsList += " " + RxUtil.FloatToString(Float.parseFloat(medicationsResult.get(i).get("takemin").toString()));
-		if (!medicationsResult.get(i).get("takemin").toString().equals(medicationsResult.get(i).get("takemax").toString())) {
-			medicationsList += "-" + RxUtil.FloatToString(Float.parseFloat(medicationsResult.get(i).get("takemax").toString()));
-		}
+	String medicationsQuery = "intake_medications";
+	List<Map<String,Object>> medicationsResult = oscarSuperManager.find("providerDao", medicationsQuery, demographicParam);
+	String medicationsList = "";
+	if (!medicationsResult.isEmpty())
+	{
+		for (int i=0; i<medicationsResult.size(); i++)
+		{
+			if (i != 0)
+			{
+				medicationsList += ",<br/>";
+			}
 
-		if (medicationsResult.get(i).get("freqcode")!=null) {
-			medicationsList += " " + medicationsResult.get(i).get("freqcode").toString();
-		}
+			if (medicationsResult.get(i).get("customName")!=null &&
+					!medicationsResult.get(i).get("customName").toString().equals("null"))
+			{
+				medicationsList += medicationsResult.get(i).get("customName").toString();
+			}
+			else if (Integer.parseInt(medicationsResult.get(i).get("GCN_SEQNO").toString()) == 0)
+			{
+				medicationsList += "Unknown";
+			}
+			else
+			{
+				medicationsList += medicationsResult.get(i).get("BN").toString();
+			}
 
-		if (medicationsResult.get(i).get("prn").toString().equals("1")) {
-			medicationsList += " PRN";
-		}
+			medicationsList += " " + RxUtil.FloatToString(Float.parseFloat(medicationsResult.get(i).get("takemin").toString()));
+			if (!medicationsResult.get(i).get("takemin").toString().equals(medicationsResult.get(i).get("takemax").toString()))
+			{
+				medicationsList += "-" + RxUtil.FloatToString(Float.parseFloat(medicationsResult.get(i).get("takemax").toString()));
+			}
 
-		if (medicationsResult.get(i).get("duration") != null && !medicationsResult.get(i).get("duration").toString().equals("null")) {
-			medicationsList += " " + medicationsResult.get(i).get("duration").toString();
-			if (medicationsResult.get(i).get("durunit")!=null) {
-				if (medicationsResult.get(i).get("durunit").toString().equals("D")) {
-					medicationsList += " Day";
-				} else if (medicationsResult.get(i).get("durunit").toString().equals("W")) {
-					medicationsList += " Week";
-				} else if (medicationsResult.get(i).get("durunit").toString().equals("M")) {
-					medicationsList += " Month";
+			if (medicationsResult.get(i).get("freqcode") != null)
+			{
+				medicationsList += " " + medicationsResult.get(i).get("freqcode").toString();
+			}
+
+			if (medicationsResult.get(i).get("prn").toString().equals("1"))
+			{
+				medicationsList += " PRN";
+			}
+
+			if (medicationsResult.get(i).get("duration") != null &&
+					!medicationsResult.get(i).get("duration").toString().equals("null"))
+			{
+				medicationsList += " " + medicationsResult.get(i).get("duration").toString();
+				if (medicationsResult.get(i).get("durunit") != null)
+				{
+					if (medicationsResult.get(i).get("durunit").toString().equals("D"))
+					{
+						medicationsList += " Day";
+					}
+					else if (medicationsResult.get(i).get("durunit").toString().equals("W"))
+					{
+						medicationsList += " Week";
+					}
+					else if (medicationsResult.get(i).get("durunit").toString().equals("M"))
+					{
+						medicationsList += " Month";
+					}
 				}
 			}
-		}
 
-		if (medicationsResult.get(i).get("duration")!=null && !medicationsResult.get(i).get("duration").toString().equals("null") && !medicationsResult.get(i).get("duration").toString().equals("") && Integer.parseInt(medicationsResult.get(i).get("duration").toString())>1) {
-			medicationsList += "s";
-		}
+			if (medicationsResult.get(i).get("duration")!=null &&
+					!medicationsResult.get(i).get("duration").toString().equals("null") &&
+					!medicationsResult.get(i).get("duration").toString().equals("") &&
+					Integer.parseInt(medicationsResult.get(i).get("duration").toString()) > 1)
+			{
+				medicationsList += "s";
+			}
 
-		medicationsList += "  " + medicationsResult.get(i).get("quantity").toString() + " Qty  Repeats: ";
+			medicationsList += "  " + medicationsResult.get(i).get("quantity").toString() + " Qty  Repeats: ";
 
-		medicationsList += medicationsResult.get(i).get("repeat").toString();
+			medicationsList += medicationsResult.get(i).get("repeat").toString();
 
-		if (medicationsResult.get(i).get("repeat").toString().equals("1")) {
-			medicationsList += " No subs";
+			if (medicationsResult.get(i).get("repeat").toString().equals("1"))
+			{
+				medicationsList += " No subs";
+			}
 		}
 	}
-}
 
-java.util.Calendar calender = java.util.Calendar.getInstance();
-String day =  Integer.toString(calender.get(java.util.Calendar.DAY_OF_MONTH));
-String month =  Integer.toString(calender.get(java.util.Calendar.MONTH)+1);
-String year = Integer.toString(calender.get(java.util.Calendar.YEAR));
-String date = year+"-"+month+"-"+day;
+	String date = ConversionUtils.toDateString(LocalDate.now(), ConversionUtils.DEFAULT_DATE_PATTERN);
 %>
 
 <body>
@@ -786,12 +732,13 @@ String date = year+"-"+month+"-"+day;
 	<%
 	int numPrev;
 
-	if (request.getParameter("numPrev") == null) {
+	if (request.getParameter("numPrev") == null)
+	{
 		numPrev = 9;
-		%> <%
-	} else {
+	}
+	else
+	{
 		numPrev = Integer.parseInt(request.getParameter("numPrev"));
-		%> <%
 	}
 	%>
 
@@ -848,7 +795,8 @@ String date = year+"-"+month+"-"+day;
     List<MeasurementTemplateFlowSheetConfig.Node>nodes = mFlowsheet.getItemHeirarchy();
     String measure;
 
-    for (int i = 0; i < nodes.size(); i++) {
+    for (int i = 0; i < nodes.size(); i++)
+    {
     	MeasurementTemplateFlowSheetConfig.Node node = nodes.get(i);
     	FlowSheetItem item = node.flowSheetItem;
     	FlowSheetItem header = item;
@@ -865,29 +813,32 @@ String date = year+"-"+month+"-"+day;
     	</tr>
     	<%
     	String currentSection = item.getDisplayName();
-    	for (int j = 0; j < node.children.size(); j++) {
-    		MeasurementTemplateFlowSheetConfig.Node child = node.children.get(j);
-    		if (child.children == null && child.flowSheetItem != null) {
-    			item = child.flowSheetItem;
+		for (int j = 0; j < node.children.size(); j++)
+		{
+			MeasurementTemplateFlowSheetConfig.Node child = node.children.get(j);
+			if (child.children == null && child.flowSheetItem != null)
+			{
+				item = child.flowSheetItem;
 
-    			measure = item.getItemName();
-				Map h2 = mFlowsheet.getMeasurementFlowSheetInfo(measure);
+				measure = item.getItemName();
+				Map flowSheetInfo = mFlowsheet.getMeasurementFlowSheetInfo(measure);
 
+				if (flowSheetInfo.get("measurement_type") != null)
+				{
+					ArrayList<EctMeasurementsDataBean> alist = mi.getMeasurementData(measure);
+					HashMap<String,String> measureMap = new HashMap<String,String>();
+					EctMeasurementTypesBean mtypeBean = mType.getMeasurementType(measure);
 
-	            if (h2.get("measurement_type") != null ){
-	            	ArrayList<EctMeasurementsDataBean> alist = mi.getMeasurementData(measure);
-		            HashMap<String,String> h = new HashMap<String,String>();
-		            EctMeasurementTypesBean mtypeBean = mType.getMeasurementType(measure);
-
-		            if(mtypeBean!=null) {
-		                h.put("name",mtypeBean.getTypeDisplayName());
-		                h.put("desc",mtypeBean.getTypeDesc());
-		            }
+					if (mtypeBean!=null)
+					{
+						measureMap.put("name",mtypeBean.getTypeDisplayName());
+						measureMap.put("desc",mtypeBean.getTypeDesc());
+					}
 
 					int measurementData = 0;
-					if(h.get("name") != null)
+					if (measureMap.get("name") != null)
 					{
-						measurementData = Math.abs(h.get("name").hashCode());
+						measurementData = Math.abs(measureMap.get("name").hashCode());
 					}
 
 	    		%>
@@ -906,14 +857,14 @@ String date = year+"-"+month+"-"+day;
 
 					<td class="inputData">
 					<%//This part here grabs the type of input %>
-					<% if ( mtypeBean != null && mtypeBean.getValidationName() != null && mtypeBean.getValidationName().equals("Yes/No")){ %>
-	                           <input type="radio" name="<%=name%>" value="Yes">Yes
-	                           <input type="radio" name="<%=name%>" value="No">No
-	                           <input type="radio" name="<%=name%>" style="display:none;" value="">
+					<%if (mtypeBean != null && mtypeBean.getValidationName() != null && mtypeBean.getValidationName().equals("Yes/No")){ %>
+	                           <input type="radio" name=<%=name%> value="Yes"">Yes
+	                           <input type="radio" name=<%=name%> value="No"">No
+	                           <input type="radio" name=<%=name%> style="display:none;"" value="">
 	                           <input type="button" onclick="document.mainForm.<%=name%>[2].checked = true;" value="Clear">
 	                 <%}else{%>
-	                       <input type="text" id="<%=name%>" name="<%=name%>" size="14"
-	                       	<% if (name.equals("Weight") || name.equals("Height") ){ %> onchange="calcBMI();" onkeyup="calcBMI();"<%}%>
+	                       <input type="text" id="<%=name%>" name=<%=name%> size=14
+	                        <% if (name.equals("Weight") || name.equals("Height")) { %> onchange="calcBMI();" onkeyup="calcBMI();"<%}%>
 	                       	<% if (name.equals("Weight")){ %> title="Double click to automatically convert from lbs to kg" onDblClick="wtEnglish2Metric(this); calcBMI();"<%}%>
 	                       	<% if (name.equals("Height")){ %> title="Double click to automatically convert from feet and inches to cm" onDblClick="htEnglish2Metric(this); calcBMI();"<%}%>
 	                       	<% if (name.equals("BMI")){ %> title="Double click to automatically calculate BMI from height and weight" onDblClick="calcBMI();"<%}%>
@@ -924,37 +875,49 @@ String date = year+"-"+month+"-"+day;
 					</td>
 
 					<td class="comments">
-						<input type="text" size="15" name="<%=name + "_comments"%>" />
-						<input type="hidden" name="<%=name%>_note" id="<%=name%>_note" value="addtonote">
+						<input type="text" size="15" name=<%=name + "_comments"%> />
+						<input type="hidden" name=<%=name + "_note"%> id="<%=name%>_note"" value="addtonote">
 					</td>
 
 					<%
 					Iterator<EctMeasurementsDataBean> alistIterator = alist.iterator();
-					Iterator<EctMeasurementsDataBean> graphIterator = alist.iterator();
     				HashMap<String,String> hdata;
     				EctMeasurementsDataBean mdb;
     				%>
 
 					<td class="graph">
-					<%if(h2.get("graphable") != null && ((String) h2.get("graphable")).equals("yes")){%>
-			            <%if (alist != null && alist.size() > 1) {
-			            boolean sep = false;
-			            	String mInstr = null;
-			            	boolean differentInstr=false;
-			            	for(int x=0;x<alist.size();x++) {
-			            		String tmp = alist.get(x).getMeasuringInstrc();
-			            		if(mInstr==null)
-			            			mInstr = tmp;
-			            		if(mInstr != null && !mInstr.equals(tmp)) {
-			            			differentInstr=true;
-			            			break;
-			            		}
-			            	}
-			            	
-			            	String onclick="";
-			            	if(!differentInstr) {
-			            		onclick="onclick=\"popup(465,635,'../../servlet/oscar.oscarEncounter.oscarMeasurements.pageUtil.ScatterPlotChartServlet?type="+h2.get("measurement_type")+"&mInstrc="+mInstr+"&demographicNo="+demographic_no+"');\"";
-			            	}
+					<%
+						if (flowSheetInfo.get("graphable") != null && ((String) flowSheetInfo.get("graphable")).equals("yes"))
+						{
+							if (alist != null && alist.size() > 1)
+							{
+								String mInstr = null;
+								boolean differentInstr=false;
+								for (int x = 0;x < alist.size(); x++)
+								{
+									String tmp = alist.get(x).getMeasuringInstrc();
+									if (mInstr==null)
+									{
+										mInstr = tmp;
+									}
+									if (mInstr != null && !mInstr.equals(tmp))
+									{
+										differentInstr=true;
+										break;
+									}
+								}
+
+							String onclick="";
+							if (!differentInstr)
+							{
+								onclick="onclick=\"popup(465,635,'../../servlet/oscar.oscarEncounter.oscarMeasurements.pageUtil.ScatterPlotChartServlet?type="
+										+ flowSheetInfo.get("measurement_type")
+										+ "&mInstrc="
+										+ mInstr
+										+ "&demographicNo="
+										+ demographic_no
+										+"');\"";
+							}
 			            %>
 			               	<span  <%=onclick %> class="inlinesparkline" values="
 			               	 <%=alist.get(alist.size()-1).getDataField()%>
@@ -969,62 +932,85 @@ String date = year+"-"+month+"-"+day;
 			               	 <%}%>
 			               	 "></span>
 			            <%}%>
-		           <%} else if ( mtypeBean != null && mtypeBean.getValidationName() != null && mtypeBean.getValidationName().equals("Yes/No")){
-		           		if (alist !=null && alist.size() > 0) {
-		           			if (alist.get(0).getDataField().equalsIgnoreCase("Yes")) { %>
-		           				<span class="checkmarksparkline" values="2,1,2,3"></span>
-		           			<%} else if (alist.get(0).getDataField().equalsIgnoreCase("No")) { %>
-		           				<span class="xsparkline"></span>
-		           			<%
-		           			}
-		           		}
-		           	} else if (name.equals("BP")) {
-		           		if (alist != null && alist.size() > 1) {
-		           			
-		           			String mInstr = null;
-			            	boolean differentInstr=false;
-			            	for(int x=0;x<alist.size();x++) {
-			            		String tmp = alist.get(x).getMeasuringInstrc();
-			            		if(mInstr==null)
-			            			mInstr = tmp;
-			            		if(mInstr != null && !mInstr.equals(tmp)) {
-			            			differentInstr=true;
-			            			break;
-			            		}
-			            	}
-			            	
-			            	String onclick="";
-			            	if(!differentInstr) {
-			            		onclick="onclick=\"popup(465,635,'../../servlet/oscar.oscarEncounter.oscarMeasurements.pageUtil.ScatterPlotChartServlet?type="+h2.get("measurement_type")+"&mInstrc="+mInstr+"&demographicNo="+demographic_no+"');\"";
-			            	}
-		           			
-		           			List<String> first = new ArrayList<String>();
-		           			List<String> second = new ArrayList<String>();
-		           			for (int x=alist.size()-1; x>=0; x--){
-		           				if (alist.get(x) != null && alist.get(x).getDataField() != null && !alist.get(x).getDataField().equals("")) {
-			           				String[] parsed = alist.get(x).getDataField().split("/");
-			           				first.add(parsed[0]);
-			           				second.add(parsed[1]);
-		           				} else {
-		           					first.add("null");
-		           					second.add("null");
-		           				}
-		           			} %>
-		           			<span <%=onclick %> class="bpline"></span>
-		           			<script type="text/javascript">
-		           				var first = new Array();
-		           				var second = new Array();
+		           <%
+						}
+						else if ( mtypeBean != null && mtypeBean.getValidationName() != null && mtypeBean.getValidationName().equals("Yes/No"))
+						{
+							if (alist !=null && alist.size() > 0)
+							{
+								if (alist.get(0).getDataField().equalsIgnoreCase("Yes")) { %>
+									<span class="checkmarksparkline" values="2,1,2,3"></span>
+								<%} else if (alist.get(0).getDataField().equalsIgnoreCase("No")) { %>
+									<span class="xsparkline"></span>
+								<%
+								}
+							}
+						}
+						else if (name.equals("BP"))
+						{
+							if (alist != null && alist.size() > 1)
+							{
 
-		           				<%for (int x = 0; x < first.size(); x++) {%>
-		           					first[<%=x%>] = "<%=first.get(x)%>";
-		           					second[<%=x%>] = "<%=second.get(x)%>";
-		           				<%}%>
+								String mInstr = null;
+								boolean differentInstr=false;
+								for(int x=0;x<alist.size();x++)
+								{
+									String tmp = alist.get(x).getMeasuringInstrc();
+									if(mInstr==null)
+									{
+										mInstr = tmp;
+									}
+									if(mInstr != null && !mInstr.equals(tmp))
+									{
+										differentInstr=true;
+										break;
+									}
+								}
 
-		           				$('.bpline').sparkline(first,{width:"42px", type:"line", lineColor:"#00f", fillColor:"#cdf", spotRadius:"0", spotColor:"", chartRangeMin:"0", chartRangeMax:"200"});
-		           				$('.bpline').sparkline(second,{composite:"true", type:"line", lineColor:"#040", fillColor:"#7d7", spotRadius:"0", spotColor:"", chartRangeMin:"0", chartRangeMax:"200"});
-		           			</script>
-		           		<%}
-		           	} %>
+								String onclick="";
+								if (!differentInstr)
+								{
+									onclick="onclick=\"popup(465,635,'../../servlet/oscar.oscarEncounter.oscarMeasurements.pageUtil.ScatterPlotChartServlet?type="
+											+ flowSheetInfo.get("measurement_type")
+											+ "&mInstrc="
+											+ mInstr
+											+ "&demographicNo="
+											+ demographic_no
+											+ "');\"";
+								}
+
+								List<String> first = new ArrayList<String>();
+								List<String> second = new ArrayList<String>();
+								for (int x=alist.size()-1; x>=0; x--)
+								{
+									if (alist.get(x) != null && alist.get(x).getDataField() != null &&
+											!alist.get(x).getDataField().equals(""))
+									{
+										String[] parsed = alist.get(x).getDataField().split("/");
+										first.add(parsed[0]);
+										second.add(parsed[1]);
+									}
+									else
+									{
+										first.add("null");
+										second.add("null");
+									}
+								} %>
+								<span <%=onclick %> class="bpline"></span>
+								<script type="text/javascript">
+									var first = new Array();
+									var second = new Array();
+
+									<%for (int x = 0; x < first.size(); x++) {%>
+										first[<%=x%>] = "<%=first.get(x)%>";
+										second[<%=x%>] = "<%=second.get(x)%>";
+									<%}%>
+
+									$('.bpline').sparkline(first,{width:"42px", type:"line", lineColor:"#00f", fillColor:"#cdf", spotRadius:"0", spotColor:"", chartRangeMin:"0", chartRangeMax:"200"});
+									$('.bpline').sparkline(second,{composite:"true", type:"line", lineColor:"#040", fillColor:"#7d7", spotRadius:"0", spotColor:"", chartRangeMin:"0", chartRangeMax:"200"});
+								</script>
+							<%}
+						} %>
 					</td>
 
     					<td class="last">
@@ -1038,22 +1024,31 @@ String date = year+"-"+month+"-"+day;
    							hdata.put("prevention_date",mdb.getDateObserved());
    							hdata.put("comments",mdb.getComments());
    							hdata.put("unixTime", Long.toString(mdb.getDateEnteredAsDate().getTime()));
-   						%>
+							hdata.put("type", mdb.getType());
+							String editPage = request.getContextPath()
+									+ "/oscarEncounter/oscarMeasurements/AddMeasurementData.jsp"
+									+ "?measurement=" + response.encodeURL(measure)
+									+ "&demographic_no=" + demographic_no
+									+ "&template=" + URLEncoder.encode(temp, "UTF-8") + UUIDParamStr
+									+ "&id=" + mdb.getId();
+						%>
 
-					<div itemtime="<%=hdata.get("unixTime")%>" class="recentBlock measurements" id="mView-<%=hdata.get("id")%>">
-
+					<div itemtime="<%=hdata.get("unixTime")%>"
+						 class="recentBlock measurements"
+						 id="mView-<%=hdata.get("id")%>"
+						 onclick="popupPage(660, 900, '<%=editPage%>')">
 					<b><%=hdata.get("data")%></b>; <%=hdata.get("prevention_date")%> <br>
 					<b>
 					<%=hdata.get("comments")%>
 					</b>
 					</div>
-					
+
 					<div id="mMessage-<%=hdata.get("id")%>" style="display:none;">
-					
+
 					<h1><%=name%>: <%=hdata.get("data")%></h1>
 					Date Observed: <%=hdata.get("prevention_date")%><br>
 					<%=hdata.get("comments")%><br>
-					
+
 
 					</div>
 					<%
@@ -1076,9 +1071,19 @@ String date = year+"-"+month+"-"+day;
 		                hdata.put("comments",mdb.getComments());
 		                hdata.put("id",""+mdb.getId());
 		            	hdata.put("unixTime", Long.toString(mdb.getDateEnteredAsDate().getTime()));
-		                %>
+						String editPage = request.getContextPath()
+								+ "/oscarEncounter/oscarMeasurements/AddMeasurementData.jsp"
+								+ "?measurement=" + response.encodeURL(measure)
+								+ "&demographic_no=" + demographic_no
+								+ "&template=" + URLEncoder.encode(temp, "UTF-8") + UUIDParamStr
+								+ "&id=" + mdb.getId();
 
-			        <div itemtime="<%=hdata.get("unixTime")%>" id="mView-<%=hdata.get("id")%>"  <%if (mdb.getIndicationColour()!=null) {%> <%}%> class="block measurements <%=name%>" >
+					%>
+
+			        <div itemtime="<%=hdata.get("unixTime")%>"
+						 id="mView-<%=hdata.get("id")%>"
+						 <%if (mdb.getIndicationColour()!=null) {%> <%}%>
+						 class="block measurements <%=name%>" onclick="popupPage(660, 900, '<%=editPage%>')">
 			                <%if (!hdata.get("data").equals("")) { %>
 			                <b><%=hdata.get("data")%></b>, <%=hdata.get("prevention_date")%><br>
 			                <%}else{ %>
@@ -1122,32 +1127,33 @@ String date = year+"-"+month+"-"+day;
     	}%>
     	
     	<tr id="<%=header.getDisplayName()%>_update">
-    	<td><input style="font-size:12;" type="submit" name="submit" value="Add" /></td>
-    	<td></td>
-    	<td></td>
-    	<td></td>
-    	<td></td>
-    	<td id="<%=header.getDisplayName()%>_update_comments" align="right" style="border-top: 1px solid #9d9d9d;">
-    	</td></tr>
+			<td><input style="font-size:12px;" type="submit" name="submit" value="Add" /></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td id="<%=header.getDisplayName()%>_update_comments" align="right" style="border-top: 1px solid #9d9d9d;"></td>
+		</tr>
     <%
-    	node = node.getNextSibling();
     }%>
 
-	<tr>
-	<th colspan="8" align="left">
-	<input style="margin-top: 0.2em; font-size:12;" type="submit" name="submit" value="Submit & Close" />
-	</th>
-	</tr>
+		<tr>
+			<th colspan="8" align="left">
+				<input style="margin-top: 0.2em; font-size:12px;" type="submit" name="submit" value="Submit & Close" />
+			</th>
+		</tr>
 
 	</table>
 	</form>
 
-
-<div id="measurement-view">
-<div id="measurement-view-message"> </div>
-<input type="hidden" name="deleteId" id="deleteId" value="">
-<p align='right'><button type='button' id="deleteButton" name='deleteButton' class='btn btn-danger'>Delete</button> <button type='button' id='close-message' name='close' class='btn btn-primary'>Close</button></p>
-</div>
+	<div id="measurement-view">
+		<div id="measurement-view-message"> </div>
+		<input type="hidden" name="deleteId" id="deleteId" value="">
+		<p align='right'>
+			<button type='button' id="deleteButton" name='deleteButton' class='btn btn-danger'>Delete</button>
+			<button type='button' id='close-message' name='close' class='btn btn-primary'>Close</button>
+		</p>
+	</div>
 
 
 

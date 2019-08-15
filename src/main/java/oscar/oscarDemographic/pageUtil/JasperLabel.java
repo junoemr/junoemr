@@ -34,7 +34,6 @@ public class JasperLabel
 
 	/**
 	 * getDefaultJasperLabelContext returns a default local jasper report context for PDF label creation.
-	 * @return
 	 */
 	static public LocalJasperReportsContext getDefaultJasperLabelContext()
 	{

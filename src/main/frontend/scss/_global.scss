@@ -1,0 +1,155 @@
+// global styles
+
+h1,h2,h3,h4,h5,h6 {
+	@include juno-font-default;
+}
+h1,h2,h3 {
+	font-weight: bold;
+}
+
+
+.hand-hover {
+	cursor: pointer;
+}
+
+.hand-hover:hover {
+	text-decoration: none;
+}
+
+.vertical-align {
+	display: flex;
+	align-items: center;
+}
+.align-items-center {
+	align-items: center;
+}
+.align-items-baseline {
+	align-items: baseline;
+}
+.justify-content-center {
+	justify-content: center;
+}
+.justify-content-evenly {
+	justify-content: space-evenly;
+}
+.justify-content-between {
+	justify-content: space-between;
+}
+
+.flex-row {
+	display: flex;
+	flex-direction: row;
+}
+.flex-column {
+	display: flex;
+	flex-direction: column;
+}
+.flex-grow {
+	flex-grow: 1;
+}
+.overflow-auto {
+	overflow: auto;
+}
+.overflow-hidden {
+	overflow: hidden;
+}
+
+.p-inline p {
+	display: inline-block;
+}
+
+.no-margin-top {
+	margin-top: 0;
+}
+
+.md-margin-top {
+	margin-top: $margin-md;
+}
+
+.no-margin-bottom {
+	margin-bottom: 0;
+}
+
+.no-padding {
+	padding: 0;
+}
+
+.no-margin {
+	margin: 0;
+}
+
+// Makes checkbox flush with input (as long as checkbox margin is 0)
+.big-checkbox {
+	height: 34px;
+	width: 34px;
+}
+
+.max-width {
+	width: 100%;
+}
+
+a,.clickable {
+	&:hover {
+		cursor: pointer;
+	}
+}
+
+.blue-text {
+	color: $color-primary-base;
+}
+
+.highlight,
+.highlight:hover {
+	color: $color-red-base;
+}
+
+.refused,
+.refused:hover {
+	color: #EAACAC;
+}
+
+.ineligible,
+.ineligible:hover {
+	color: $color-yellow-base;
+}
+
+.pending,
+.pending:hover {
+	color: $color-pink-base;
+}
+
+.abnormal-prev,
+.abnormal-prev:hover {
+	color: #FF4D4D;
+}
+
+.abnormal,
+.abnormal:hover {
+	color: $color-red-base;
+}
+
+/* page header css. page specific css should extend this */
+%juno-page-header {
+	height: $page-header-height;
+	color: $color-neutral-white;
+	background-color: $color-primary-base;
+	padding-left: $page-header-height;
+}
+
+%juno-content-control {
+	color: $color-neutral-darker;
+	background-color: $color-neutral-lightest;
+}
+
+%juno-primary-view-pane {
+	overflow: auto;
+	height: calc(100vh - #{$primary-navbar-height} - #{$page-header-height});
+}
+%juno-primary-view-pane-tabs {
+	overflow: auto;
+	height: calc(100vh - #{$primary-navbar-height} - #{$page-header-height} - #{$page-tabs-height});
+}
+%juno-primary-view-pane-tabs-subheader {
+	overflow: auto;
+	height: calc(100vh - #{$primary-navbar-height} - #{$page-header-height} - #{$page-tabs-height} - #{$page-subheader-height});
+}

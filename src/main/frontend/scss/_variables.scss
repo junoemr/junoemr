@@ -1,0 +1,37 @@
+// LESS variables for global use, imported first so can be referenced in bootstrap customization
+
+// Margins
+$margin-lg: 30px;
+$margin-md: 20px;
+$margin-sm: 10px;
+
+// Other
+$left-aside-width: 400px;
+$left-aside-width-collapsed: 0;
+
+$right-aside-width: 400px;
+$right-aside-width-collapsed: 0;
+
+$primary-navbar-height: 56px;
+$page-header-height: 48px;
+$page-tabs-height: 40px;
+$page-tabs-height-alt: 32px;
+$page-subheader-height: 56px;
+
+$modal-height: 560px;
+$modal-width: 960px;
+$modal-header-height: 64px;
+$modal-footer-height: 64px;
+
+$modal-border-space: 16px;
+
+$modal-body-height: calc(#{$modal-height} - #{$modal-header-height} - #{$modal-footer-height} - #{$modal-border-space});
+
+
+$form-input-height: 2.25em;
+
+// Media queries breakpoints
+// $screen-nav-lg-max: 1305px;
+$screen-nav-lg: 1540px;
+$screen-nav-md: 1290px;
+$screen-nav-sm: 768px; //matches the angular.js mobile check size, probably should not be changed

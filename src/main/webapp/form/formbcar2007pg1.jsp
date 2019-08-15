@@ -106,6 +106,14 @@ if (request.getParameter("view") != null && request.getParameter("view").equals(
 <!-- the following script defines the Calendar.setup helper function, which makes
        adding a calendar a matter of 1 or 2 lines of code. -->
 <script type="text/javascript" src="../share/calendar/calendar-setup.js"></script>
+
+<!-- Form submission helper scripts -->
+<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
+<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0.min.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath() %>/js/juno-jquery-plugin.js"></script>
+<script type="text/javascript" src="./OscarFormHelpers.js"></script>
+<link href= "<%= request.getContextPath() %>/share/javascript/jquery/jquery-ui-1.12.0/themes/smoothness/jquery-ui.min.css" rel="stylesheet">
+
 <html:base />
 <style type="text/css">
         <!--
@@ -267,16 +275,17 @@ function calcBMIMetric() {
         document.forms[0].target = "";
         document.forms[0].action = "/<%=project_home%>/form/formname.do" ;
 	}
+
     function onPrint() {
         document.forms[0].submit.value="print"; 
-        var ret = checkAllDates();
 
-        if(ret==true)
+        if(checkAllDates())
         {
             document.forms[0].action = "../form/createpdf?__title=British+Columbia+Antenatal+Record+Part+1&__cfgfile=bcar1PrintCfgPg1_2007&__template=bcar1_2007";
-            document.forms[0].target="_blank";            
+            document.forms[0].target="_blank";
+            return true;
         }
-        return ret;
+        return false;
     }
     function onPrint12() {
         document.forms[0].submit.value="printAll"; 
@@ -295,35 +304,39 @@ function calcBMIMetric() {
         return true;
     }
     function onPrintRisk() {
-        document.forms[0].submit.value="print"; 
-        var ret = checkAllDates();
-        if(ret==true)
+        document.forms[0].submit.value="print";
+        if(checkAllDates())
         {
             document.forms[0].action = "../form/createpdf?__title=British+Columbia+Antenatal+Record+Part+2&__cfgfile=bcar1PrintCfgPg2_2007&__template=bcarRisk_2007";
-            document.forms[0].target="_blank";            
+            document.forms[0].target="_blank";
+            return true;
         }
-        return ret;
+        return false;
     }
+
     function onSave() {
-        document.forms[0].submit.value="save";
-        var ret = checkAllDates();
-        if(ret==true)
+        if(checkAllDates() && confirm("Are you sure you wish to save this form?"))
         {
+            var $links = $('a:not([href^="javascript:"])');
+            Oscar.FormHelpers.disableLinks($links);
+            document.forms[0].submit.value="save";
             reset();
-            ret = confirm("Are you sure you want to save this form?");
+            return true;
         }
-        return ret;
+
+        return false;
     }
     
     function onSaveExit() {
         document.forms[0].submit.value="exit";
-        var ret = checkAllDates();
-        if(ret == true)
+
+        if(checkAllDates() && confirm("Are you sure you wish to save and close this window?"))
         {
             reset();
-            ret = confirm("Are you sure you wish to save and close this window?");
+            return true;
         }
-        return ret;
+
+        return false
     }
     function popupPage(varpage) {
         windowprops = "height=700,width=960"+
@@ -537,7 +550,28 @@ function calcAgeAtEDD(){
     }
 
 }
-                                                   </script>
+
+$(document).ready(function()
+{
+    var $form = $('#bcar2007pg1');
+    $form.juno_trackIsChanged();
+
+    var $links = $('a:not([href^="javascript:"])');
+    $.each($links, function()
+	{
+	    var $link = $(this);
+        Oscar.FormHelpers.alertDirtyBeforeLink($link, $form);
+	});
+
+	var $exitButtons = $('input[name="exitButton"]')
+    $.each($exitButtons, function()
+    {
+        var $exitButton = $(this);
+        Oscar.FormHelpers.alertDirtyBeforeClose($exitButton, $form);
+    });
+});
+
+</script>
 
 <body bgproperties="fixed" topmargin="0" leftmargin="1" rightmargin="1">
 <div ID="Langdiv" class="demo">
@@ -874,7 +908,7 @@ function calcAgeAtEDD(){
 @oscar.formDB Field="formEdited" Type="timestamp"  
 @oscar.formDB Field="c_lastVisited" Type="char(3)" 
 -->
-<html:form action="/form/formname">
+<html:form action="/form/formname" styleId="bcar2007pg1">
 	<input type="hidden" name="commonField" value="ar2_" />
 	<input type="hidden" name="c_lastVisited" value="pg1" />
 	<input type="hidden" name="demographic_no"
@@ -895,13 +929,11 @@ function calcAgeAtEDD(){
 			<td align="left">
 			<%
             if (!bView) {
-            %> <input type="submit" style="width: 40px;" value="Save"
-				onclick="javascript:return onSave();" /> <input type="submit"
-				value="Save and Exit" onclick="javascript:return onSaveExit();" /> <%
+            %> <input type="submit" name="saveButton" style="width: 40px;" value="Save" onclick="javascript:return onSave()"/>
+				<input type="submit" value="Save and Exit" onclick="javascript:return onSaveExit();" /> <%
             }
-            %> <input type="submit" style="width: 40px;" value="Exit"
-				onclick="javascript:return onExit();" /> <input type="submit"
-				style="width: 50px;" value="Print"
+            %> <input type="submit" name="exitButton" style="width: 40px;" value="Exit"/>
+				<input type="submit" style="width: 50px;" value="Print"
 				onclick="javascript:return onPrint();" /> <input type="submit"
 				style="width: 75px;" value="Print Risk"
 				onclick="javascript:return onPrintRisk();" /> <input type="submit"
@@ -2257,12 +2289,12 @@ function calcAgeAtEDD(){
             <%
             if (!bView) {
             %>
-            <input type="submit" style="width:40px;" value="Save" onclick="javascript:return onSave();" />
+            <input type="submit" name="saveButton" style="width:40px;" value="Save" onclick="javascript:return onSave()"/>
             <input type="submit" value="Save and Exit" onclick="javascript:return onSaveExit();"/>
             <%
             }
             %>
-            <input type="submit" style="width:40px;" value="Exit" onclick="javascript:return onExit();"/>
+            <input type="submit" style="width:40px;" name="exitButton" value="Exit"/>
             <input type="submit" style="width:50px;" value="Print" onclick="javascript:return onPrint();"/>
             <input type="submit" style="width:75px;" value="Print Risk" onclick="javascript:return onPrintRisk();"/>
             <input type="submit" value="Print AR1 & AR2" onclick="javascript:return onPrint12();"/>

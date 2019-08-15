@@ -83,12 +83,14 @@ if(!authed) {
 <%@page import="oscar.oscarRx.data.RxProviderData" %>
 <%@page import="oscar.oscarRx.data.RxProviderData.Provider" %>
 <%@ page import="oscar.util.StringUtils" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.Collections" %>
-<%@ page import="java.util.List" %>
 <%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="oscar.util.ConversionUtils" %>
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 
 <html:html locale="true">
@@ -172,10 +174,10 @@ if(!authed) {
 	}
 	consultUtil.estActiveTeams();
 
-	boolean enableEmail = false;
+	boolean validPatientEmail = false;
 	if(demographic != null)
 	{
-		enableEmail = EmailUtilsOld.isValidEmailAddress(demographic.getEmail());
+		validPatientEmail = EmailUtilsOld.isValidEmailAddress(demographic.getEmail());
 	}
 
 	if (request.getParameter("error") != null)
@@ -186,12 +188,8 @@ if(!authed) {
     </SCRIPT>
 <%
 	}
-
-		java.util.Calendar calender = java.util.Calendar.getInstance();
-		String day = Integer.toString(calender.get(java.util.Calendar.DAY_OF_MONTH));
-		String mon = Integer.toString(calender.get(java.util.Calendar.MONTH) + 1);
-		String year = Integer.toString(calender.get(java.util.Calendar.YEAR));
-		String formattedDate = year + "-" + mon + "-" + day;
+	  	LocalDate localDate = LocalDate.now();
+		String formattedDate = ConversionUtils.toDateString(localDate);
 
 		OscarProperties props = OscarProperties.getInstance();
 		ConsultationServiceDao consultationServiceDao = SpringUtils.getBean(ConsultationServiceDao.class);
@@ -290,6 +288,11 @@ input.btn{
 
 .lab {
     color: #CC0099;
+	word-break: break-word;
+}
+
+.eform {
+	color: #008000;
 	word-break: break-word;
 }
 td.tite {
@@ -816,7 +819,7 @@ function rs(n,u,w,h,x){
 
 var DocPopup = null;
 function popup(location) {
-    DocPopup = window.open(location,"_blank","height=380,width=580");
+    DocPopup = window.open(location,"_blank","height=800,width=1280");
 
     if (DocPopup != null) {
         if (DocPopup.opener == null) {
@@ -1074,7 +1077,7 @@ function importFromEnct(reqInfo,txtArea)
 }
 
 
-
+// used by consultation attachments
 function updateAttached() {
     var t = setTimeout('fetchAttached()', 2000);
 }
@@ -1098,7 +1101,6 @@ function fetchAttached() {
                 }
 
             );
-
 }
 
 function addCCName(){
@@ -1270,18 +1272,6 @@ function showSignatureImage()
 	return true;
 }
 
-<%
-String userAgent = request.getHeader("User-Agent");
-String browserType = "";
-if (userAgent != null) {
-	if (userAgent.toLowerCase().contains("ipad")) {
-		browserType = "IPAD";
-	} else {
-		browserType = "ALL";
-	}
-}
-%>
-
 function requestSignature()
 {
 
@@ -1404,9 +1394,6 @@ var requestIdKey = "<%=signatureRequestId %>";
 
 	%>
 
-	<% if (!faxEnabled || !OscarProperties.getInstance().isPropertyActive("consultation_dynamic_labelling_enabled")) { %>
-	<input type="hidden" name="providerNo" value="<%=providerNo%>">
-	<% } %>
 	<input type="hidden" name="demographicNo" value="<%=demo%>">
 	<input type="hidden" name="requestId" value="<%=requestId%>">
 	<input type="hidden" name="documents" value="">
@@ -1593,15 +1580,10 @@ var requestIdKey = "<%=signatureRequestId %>";
 								else
 								{
 									%>
-									<% if (OscarProperties.getInstance().isPropertyActive("consultation_indivica_attachment_enabled")) { %>
-									<a href="#" onclick="popup('<rewrite:reWrite jspPage="attachConsultation2.jsp"/>?provNo=<%=consultUtil.providerNo%>&demo=<%=demo%>&requestId=<%=requestId%>');return false;">
-										<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.attachDoc" />
-									</a>
-									<% } else { %>
 									<a href="#" onclick="popup('<rewrite:reWrite jspPage="attachConsultation.jsp"/>?provNo=<%=consultUtil.providerNo%>&demo=<%=demo%>&requestId=<%=requestId%>');return false;">
 										<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.attachDoc" />
 									</a>
-									<% }
+									<%
 								}
 							%>
 							</td>
@@ -1618,7 +1600,9 @@ var requestIdKey = "<%=signatureRequestId %>";
 							<span class="doc"><bean:message
 								key="oscarEncounter.oscarConsultationRequest.AttachDoc.LegendDocs" /></span><br />
 							<span class="lab"><bean:message
-								key="oscarEncounter.oscarConsultationRequest.AttachDoc.LegendLabs" /></span>
+								key="oscarEncounter.oscarConsultationRequest.AttachDoc.LegendLabs" /></span><br />
+							<span class="eform"><bean:message
+								key="oscarEncounter.oscarConsultationRequest.AttachDoc.LegendEForms" /></span>
 							</td>
 						</tr>
 					</table>
@@ -1645,7 +1629,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 
             <% if (OscarProperties.getInstance().isPropertyActive("appointment_reminder_enabled")) { %>
               <input type="button"
-                <% if(!enableEmail) { %> disabled="disabled" <% } %>
+                <% if(!validPatientEmail) { %> disabled="disabled" <% } %>
                 name="updateAndEmailDetails"
                 value='<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailAppointmentTime"/>'
                 onclick="return checkForm('Update And Email Details','EctConsultationFormRequestForm');" />
@@ -1653,7 +1637,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 						<%
 							if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled"))
 							{
-								boolean disableNotification = !enableEmail;
+								boolean disableNotification = !validPatientEmail;
 								if (requestId != null)
 								{
 									ConsultationRequestDao consultationRequestDao = (ConsultationRequestDao) SpringUtils.getBean("consultationRequestDao");
@@ -1680,14 +1664,14 @@ var requestIdKey = "<%=signatureRequestId %>";
 						if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) {
 					%>
 						<input type="button"
-								<% if(!enableEmail) { %> disabled="disabled" <% } %>
+								<% if(!validPatientEmail) { %> disabled="disabled" <% } %>
 							   id="submitAndEmailNotification" name="submitAndEmailNotification"
 							   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailNotification"/>"
 							   onclick="return checkForm('Submit And Email Notification','EctConsultationFormRequestForm');" />
 					<% 	   }
 
 				    }
-						if(faxEnabled)
+						if(OscarProperties.getInstance().isPropertyActive("consultation_email_enabled"))
 						{
 							%>
 							<div>
@@ -1764,11 +1748,10 @@ var requestIdKey = "<%=signatureRequestId %>";
 					<td>
 
 					<table border=0 width="100%">
-						<% if (faxEnabled && OscarProperties.getInstance().isPropertyActive("consultation_dynamic_labelling_enabled")) { %>
 						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgAssociated2" />:</td>
 							<td align="right" class="tite1">
-								<html:select property="providerNo" onchange="switchProvider(this.value)">
+								<html:select property="providerNo">
 									<%
 										for (Provider p : prList) {
 											if (p.getProviderNo().compareTo("-1") != 0) {
@@ -1783,7 +1766,6 @@ var requestIdKey = "<%=signatureRequestId %>";
 								</html:select>
 							</td>
 						</tr>
-						<% } %>
 						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formRefDate" />:
 							</td>
@@ -2474,7 +2456,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 
             <% if (OscarProperties.getInstance().isPropertyActive("appointment_reminder_enabled")) { %>
               <input type="button"
-                <% if(!enableEmail) { %> disabled="disabled" <% } %>
+                <% if(!validPatientEmail) { %> disabled="disabled" <% } %>
                 name="updateAndEmailDetails"
                 value='<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailAppointmentTime"/>'
                 onclick="return checkForm('Update And Email Details','EctConsultationFormRequestForm');" />
@@ -2482,7 +2464,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 
 			<% if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) { %>
 			<input type="button"
-					<% if(!enableEmail) { %> disabled="disabled" <% } %>
+					<% if(!validPatientEmail) { %> disabled="disabled" <% } %>
 				   id="updateAndEmailNotification" name="updateAndEmailNotification"
 				   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnUpdateAndEmailNotification"/>"
 				   onclick="return checkForm('Update And Email Notification','EctConsultationFormRequestForm');" />
@@ -2504,7 +2486,7 @@ if (defaultSiteId!=0) aburl2+="&site="+defaultSiteId;
 						%>
 						<% if (OscarProperties.getInstance().isPropertyActive("consultation_notification_enabled")) { %>
 						<input type="button"
-								<% if(!enableEmail) { %> disabled="disabled" <% } %>
+								<% if(!validPatientEmail) { %> disabled="disabled" <% } %>
 							   id="submitAndEmailNotification" name="submitAndEmailNotification"
 							   value="<bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.btnSubmitAndEmailNotification"/>"
 							   onclick="return checkForm('Submit And Email Notification','EctConsultationFormRequestForm');" />

@@ -376,7 +376,43 @@
 			handleScroll(scroller);
 		}
 
-		function updateListView()
+		// reload the list view
+		function reloadListView()
+		{
+			let listView = jQuery("#listViewDocs").get()[0];
+			if (listView !== undefined)
+			{
+				let currentScrollPos = listView.scrollTop;
+
+				listView.innerHTML = "";
+				page = 1;
+				updateListView(function complete() {
+					let newListView = jQuery("#listViewDocs").get()[0];
+					if (newListView !== undefined)
+					{
+						newListView.scrollTop = currentScrollPos;
+					}
+				});
+			}
+		}
+
+		function reloadLabDoc(docId)
+		{
+			let labForm = jQuery("#labdoc_" + docId);
+			if (labForm.length !== 0)
+			{
+				let labURL = "../lab/CA/ALL/labDisplayAjax.jsp?segmentID=" + docId + "&demoName=foobar"
+						+ "&providerNo=" + providerNo + "&showLatest=true&searchProviderNo=" + providerNo
+                        + "&insertIntoPage=true";
+				jQuery.get(labURL,
+					function (data)
+					{
+						labForm.replaceWith(data);
+					});
+			}
+		}
+
+		function updateListView(completeCallback)
 		{
 			var query = getQuery();
 			if (page == 1) {
@@ -411,6 +447,7 @@
 					parameters: query,
 					insertion: Insertion.Bottom,
 					evalScripts: true,
+					onComplete: completeCallback,
 					onSuccess: function (transport)
 					{
 						loadingDocs = false;
@@ -442,6 +479,24 @@
 						jQuery("#listSwitcher").prop("disabled",false);
 					}
 				});
+		}
+
+		function forwardLab(docId)
+		{
+			var labform = 'form[name="reassignForm_' + docId + '"]';
+			var labQuery = jQuery(labform).serialize();
+
+			jQuery.ajax({
+				type: "POST",
+				url:  "<%= request.getContextPath()%>/oscarMDS/ReportReassign.do",
+				data: labQuery,
+				success: function (data) {
+					reloadLabDoc(docId);
+				},
+				error: function(jqXHR, err, exception) {
+					alert("Error " + jqXHR.status + " " + err);
+				}
+			});
 		}
 
 		function getQuery() {

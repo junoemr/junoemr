@@ -41,7 +41,6 @@ import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.service.AdmissionManager;
 import org.oscarehr.PMmodule.service.ProgramManager;
-import org.oscarehr.billing.CA.dao.GstControlDao;
 import org.oscarehr.casemgmt.dao.CaseManagementIssueDAO;
 import org.oscarehr.casemgmt.dao.CaseManagementNoteDAO;
 import org.oscarehr.casemgmt.dao.CaseManagementNoteExtDAO;
@@ -57,7 +56,6 @@ import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.casemgmt.service.CaseManagementPrint;
 import org.oscarehr.casemgmt.web.CaseManagementViewAction.IssueDisplay;
 import org.oscarehr.casemgmt.web.formbeans.CaseManagementEntryFormBean;
-import org.oscarehr.common.dao.BillingServiceDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.ProviderDefaultProgramDao;
@@ -70,16 +68,7 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderDefaultProgram;
 import org.oscarehr.common.model.ProviderPreference;
 import org.oscarehr.common.model.ResidentOscarMsg;
-import org.oscarehr.common.model.Tickler;
 import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
-import org.oscarehr.eyeform.dao.EyeFormDao;
-import org.oscarehr.eyeform.dao.EyeformFollowUpDao;
-import org.oscarehr.eyeform.dao.EyeformTestBookDao;
-import org.oscarehr.eyeform.dao.MacroDao;
-import org.oscarehr.eyeform.model.EyeForm;
-import org.oscarehr.eyeform.model.EyeformFollowUp;
-import org.oscarehr.eyeform.model.EyeformTestBook;
-import org.oscarehr.eyeform.model.Macro;
 import org.oscarehr.eyeform.web.FollowUpAction;
 import org.oscarehr.eyeform.web.ProcedureBookAction;
 import org.oscarehr.eyeform.web.TestBookAction;
@@ -92,13 +81,11 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SessionConstants;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WebUtils;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.WebApplicationContext;
 import oscar.OscarProperties;
 import oscar.appt.ApptStatusData;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
-import oscar.oscarBilling.ca.on.pageUtil.BillingSavePrep;
 import oscar.oscarEncounter.data.EctProgram;
 import oscar.oscarEncounter.pageUtil.EctSessionBean;
 import oscar.oscarSurveillance.SurveillanceMaster;
@@ -113,7 +100,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.lang.reflect.Array;
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -713,9 +699,9 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 	 * noteId
 	 * issueChange
 	 * archived
-	 * 
+	 *
 	 * session form caseManagementEntryForm + demoNo
-	 * 
+	 *
 	 */
 	public ActionForward issueNoteSave(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -1896,9 +1882,16 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 			Demographic demographic = demographicDao.getDemographic(demoNo);
 			//Should we get the billform based on the appointment provider or the demographic's provider?
-			ProviderPreference providerPreference = providerPreferenceDao.find(demographic.getProviderNo());
+			ProviderPreference providerPreference = null;
+			if (demographic.getProviderNo() != null)
+			{
+				providerPreference = providerPreferenceDao.find(demographic.getProviderNo());
+			}
 
-			if (providerPreference != null && !providerPreference.getDefaultServiceType().equals("no")) {
+			if (providerPreference != null &&
+					providerPreference.getDefaultServiceType() != null &&
+					!providerPreference.getDefaultServiceType().equals("no"))
+			{
 				defaultView = providerPreference.getDefaultServiceType();
 			}
 
@@ -2800,215 +2793,6 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		cmp.doPrint(loggedInInfo,demographicNo, printAllNotes,noteIds,printCPP,printRx,printLabs,cStartDate,cEndDate,request, response.getOutputStream());
 
 		return null;
-	}
-
-	public ActionForward runMacro(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		CaseManagementEntryFormBean cform = (CaseManagementEntryFormBean) form;
-		MacroDao macroDao = (MacroDao) SpringUtils.getBean("macroDao");
-		Macro macro = macroDao.find(Integer.parseInt(request.getParameter("macro.id")));
-		logger.debug("loaded macro " + macro.getLabel());
-		/*
-		boolean cppFromMeasurements = false;
-		String cpp = request.getParameter("cpp");
-		if (cpp != null && cpp.equals("measurements")) {
-			cppFromMeasurements = true;
-		}
-		*/
-		cform.setCaseNote_note(cform.getCaseNote_note() + "\n" + macro.getImpression());
-
-		ActionForward fwd = saveAndExit(mapping, form, request, response);
-
-		if (fwd.getName().equals("windowClose")) {
-			EyeFormDao eyeformDao = SpringUtils.getBean(EyeFormDao.class);
-			EyeForm eyeform = eyeformDao.getByAppointmentNo(Integer.parseInt(cform.getAppointmentNo()));
-			// load up the eyeform to set/unset checkboxes
-			if (macro.getDischargeFlag() != null && macro.getDischargeFlag().equals("dischargeFlag")) {
-				eyeform.setDischarge("true");
-			}
-			if (macro.getOptFlag() != null && macro.getOptFlag().equals("optFlag")) {
-				eyeform.setOpt("true");
-			}
-			if (macro.getStatFlag() != null && macro.getStatFlag().equals("statFlag")) {
-				eyeform.setStat("true");
-			}
-			eyeformDao.merge(eyeform);
-
-			// follow ups
-			EyeformFollowUpDao followUpDao = SpringUtils.getBean(EyeformFollowUpDao.class);
-			int followUpNo = macro.getFollowupNo();
-			String followUpUnit = macro.getFollowupUnit();
-			String followUpDr = macro.getFollowupDoctorId();
-			if (followUpNo > 0) {
-				EyeformFollowUp f = new EyeformFollowUp();
-				f.setAppointmentNo(Integer.parseInt(cform.getAppointmentNo()));
-				f.setDate(new Date());
-				f.setDemographicNo(Integer.parseInt(cform.getDemographicNo()));
-				f.setProvider(loggedInInfo.getLoggedInProvider());
-				f.setTimeframe(followUpUnit);
-				f.setTimespan(followUpNo);
-				f.setType("followup");
-				f.setUrgency("routine");
-				f.setFollowupProvider(followUpDr);
-				followUpDao.persist(f);
-			}
-
-			// tests
-			EyeformTestBookDao testDao = SpringUtils.getBean(EyeformTestBookDao.class);
-			String[] tests = macro.getTestRecords().split("\n");
-			for (String test : tests) {
-				String[] parts = test.trim().split("\\|");
-				if (parts.length == 3 || parts.length == 4) {
-					EyeformTestBook rec = new EyeformTestBook();
-					rec.setAppointmentNo(Integer.parseInt(cform.getAppointmentNo()));
-					if (parts.length == 4) rec.setComment(parts[3]);
-					else rec.setComment("");
-					rec.setDate(new Date());
-					rec.setDemographicNo(Integer.parseInt(cform.getDemographicNo()));
-					rec.setEye(parts[1]);
-					rec.setProvider(loggedInInfo.getLoggedInProviderNo());
-					// rec.setStatus(null);
-					rec.setTestname(parts[0]);
-					rec.setUrgency(parts[2]);
-					testDao.save(rec);
-				}
-			}
-
-			// send tickler
-			if (macro.getTicklerRecipient() != null && macro.getTicklerRecipient().length() > 0) {
-				Tickler t = new Tickler();
-				t.setCreator(loggedInInfo.getLoggedInProvider().getPractitionerNo());
-				t.setDemographicNo(Integer.parseInt(cform.getDemographicNo()));
-				t.setMessage(getMacroTicklerText(Integer.parseInt(cform.getAppointmentNo())));
-				t.setTaskAssignedTo(macro.getTicklerRecipient());
-				ticklerManager.addTickler(loggedInInfo, t);
-			}
-
-			// billing
-			if (macro.getBillingCodes() != null && macro.getBillingCodes().length() > 0) {
-				GstControlDao gstControlDao = (GstControlDao) SpringUtils.getBean("gstControlDao");
-				BillingServiceDao billingServiceDao = (BillingServiceDao) SpringUtils.getBean("billingServiceDao");
-				DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
-				Provider provider = loggedInInfo.getLoggedInProvider();
-				OscarAppointmentDao apptDao = (OscarAppointmentDao) SpringUtils.getBean("oscarAppointmentDao");
-
-				Appointment appt = null;
-				if (cform.getAppointmentNo() != null && cform.getAppointmentNo().length() > 0 && !cform.getAppointmentDate().equals("0")) {
-					appt = apptDao.find(Integer.parseInt(cform.getAppointmentNo()));
-				}
-
-				SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
-				String serviceDate = sf.format(new Date());
-
-				// create a mock httprequest to fill in the preset values
-				MockHttpServletRequest mockReq = new MockHttpServletRequest();
-				mockReq.addParameter("dxCode", macro.getBillingDxcode());
-				String[] bcodes = macro.getBillingCodes().replace("\r", "").split("\n");
-
-				BigDecimal btotal = new BigDecimal(0);
-				// must use 100.0 otherwise result will be an int
-				BigDecimal gstFactor = new BigDecimal(1 + gstControlDao.find(1).getGstPercent().intValue() / 100.0);
-				ArrayList<String[]> percentUnits = new ArrayList<String[]>();
-				for (int i = 0; i < bcodes.length; i++) {
-					if (StringUtils.isBlank(bcodes[i])) continue;
-					String[] codes = bcodes[i].split("\\|");
-					mockReq.addParameter("xserviceCode_" + i, codes[0]);
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-					Object[] priceg = billingServiceDao.getUnitPrice(codes[0], sdf.parse(serviceDate));
-					mockReq.addParameter("xserviceUnit_" + i, codes[1]);
-					String sliCode = OscarProperties.getInstance().getProperty("clinic_no");
-					if (codes.length == 3 && !codes[2].equals("NA")) {
-						sliCode = codes[2];
-					}
-					mockReq.addParameter("xsliCode_" + i, sliCode);
-					if (".00".equals(priceg[0])) {
-						percentUnits.add(codes);
-						mockReq.addParameter("percCodeSubtotal_" + i, (String) priceg[0]);
-						// skip to next as we deal with percentage later
-						continue;
-					}
-
-					// price is unit_price*unit*at_percent, but in macro we only assume at_percent=1
-					// as it's not possible to enter percent value for macros (1-click action).
-					BigDecimal price = new BigDecimal((String) priceg[0]).multiply(new BigDecimal(codes[1]));
-					if ((Boolean) priceg[1] == true) {
-						// add GST
-						price = price.multiply(gstFactor);
-					}
-					mockReq.addParameter("percCodeSubtotal_" + i, price.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
-					btotal = btotal.add(price).setScale(4, BigDecimal.ROUND_HALF_UP);
-
-				}
-				// now process percent codes
-				BigDecimal stotal = new BigDecimal(0);
-				for (String[] code : percentUnits) {
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-					String pct = billingServiceDao.getUnitPercentage(code[0], sdf.parse(serviceDate));
-					stotal = stotal.add(btotal.multiply(new BigDecimal(pct)));
-				}
-				btotal = btotal.add(stotal);
-				mockReq.addParameter("totalItem", "" + bcodes.length);
-				mockReq.addParameter("total", btotal.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString());
-
-				Demographic demo = demographicDao.getClientByDemographicNo(Integer.parseInt(cform.getDemographicNo()));
-				mockReq.setParameter("xml_billtype", macro.getBillingBilltype());
-				if (macro.getSliCode() == null || macro.getSliCode().equals("NA")) {
-					String value = OscarProperties.getInstance().getProperty("clinic_no", "");
-					mockReq.setParameter("xml_slicode", value);
-				} else {
-					mockReq.setParameter("xml_slicode", macro.getSliCode());
-				}
-				// mockReq.addParameter("xml_billtype", "ODP | Bill OHIP");
-				mockReq.addParameter("hin", demo.getHin());
-				mockReq.addParameter("ver", demo.getVer());
-				mockReq.addParameter("demographic_dob", demo.getDateOfBirth());
-				mockReq.addParameter("appointment_no", cform.getAppointmentNo());
-				mockReq.addParameter("demographic_name", demo.getLastName() + "," + demo.getFirstName());
-				mockReq.addParameter("sex", "F".equalsIgnoreCase(demo.getSex()) ? "2" : "1");
-				mockReq.addParameter("hc_type", demo.getHcType());
-				String referalNo = getRefNo(demo.getFamilyDoctor());
-				mockReq.addParameter("referralCode", referalNo);
-				mockReq.addParameter("xml_location", macro.getBillingVisitLocation()); // visit location
-				mockReq.addParameter("m_review", "N"); // manual review, always No
-				// as it's automated
-				mockReq.addParameter("clinic_no", oscar.OscarProperties.getInstance().getProperty("clinic_no", "").trim());
-				// clinic_location
-				mockReq.addParameter("demographic_no", cform.getDemographicNo());
-				mockReq.addParameter("service_date", serviceDate);
-				SimpleDateFormat tf = new SimpleDateFormat("HH:mm");
-				mockReq.addParameter("start_time", tf.format(new Date()));
-				mockReq.addParameter("submit", "Save");
-				mockReq.addParameter("comment", macro.getBillingComment());
-				mockReq.addParameter("xml_visittype", macro.getBillingVisitType());
-				mockReq.addParameter("xml_vdate", cform.getAppointmentDate());
-				mockReq.addParameter("apptProvider_no", appt == null ? "" : appt.getProviderNo());
-				mockReq.addParameter("xml_provider", provider.getProviderNo() + "|" + provider.getOhipNo());
-				mockReq.getSession().setAttribute("user", loggedInInfo.getLoggedInProviderNo());
-
-				BillingSavePrep bObj = new BillingSavePrep();
-				boolean ret = bObj.addABillingRecord(bObj.getBillingClaimObj(mockReq));
-				/*
-				 * not applicable in macro context if (mockReq.getParameter("xml_billtype").substring(0, 3).matches( BillingDataHlp.BILLINGMATCHSTRING_3RDPARTY)) { mockReq.addParameter("billto", macro.getBillingBillto()); mockReq.addParameter("remitto",
-				 * macro.getBillingRemitto()); mockReq.addParameter("gstBilledTotal", macro .getBillingGstBilledTotal()); mockReq.addParameter("payment", macro.getBillingPayment()); mockReq.addParameter("refund", macro.getBillingRefund());
-				 * mockReq.addParameter("gst", macro.getBillingGst()); mockReq.addParameter("payMethod", macro.getBillingPayMethod());
-				 *
-				 * bObj.addPrivateBillExtRecord(mockReq); }
-				 */
-				// int billingNo = bObj.getBillingId();
-
-				// update appt and close the page
-				if (ret) {
-					if (!cform.getAppointmentNo().equals("0")) {
-						String apptCurStatus = bObj.getApptStatus(cform.getAppointmentNo());
-						oscar.appt.ApptStatusData as = new oscar.appt.ApptStatusData();
-						String billStatus = as.billStatus(apptCurStatus);
-						bObj.updateApptStatus(cform.getAppointmentNo(), billStatus, cform.getProviderNo());
-					}
-				} else log.error("++++++++++++++ Failed to add billing codes");
-			}
-		}
-
-		return fwd;
 	}
 
 	public String getRefNo(String referal) {

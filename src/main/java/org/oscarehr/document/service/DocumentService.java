@@ -92,21 +92,9 @@ public class DocumentService
 	 */
 	public Document uploadNewDemographicDocument(Document document, GenericFile file, Integer demographicNo) throws IOException
 	{
-		file.moveToDocuments();
-
-		document = setDocumentProperties(document, file);
-		document = addDocumentModel(document);
-		if(demographicNo == null || demographicNo < 1)
-		{
-			// unassigned documents still get a link with id -1
-			createDemographicCtlLink(document, -1);
-		}
-		else
-		{
-			assignDocumentToDemographic(document, demographicNo);
-		}
-		logger.info("Uploaded Demographic Document " + document.getDocumentNo());
-		return document;
+		// force this file to be treated as valid, as validation is only performed for new files
+		file.forceSetValidation(true);
+		return uploadNewDemographicDocumentLogic(document, file, demographicNo);
 	}
 	/**
 	 * Create a new document from the given document model and a file input stream.
@@ -115,13 +103,23 @@ public class DocumentService
 	 * @param document - the un-persisted document model
 	 * @param fileInputStream - input stream
 	 * @param demographicNo - demographic id of the attached demographic
+	 * @param markValid - mark the file as valid, allowing file type inference.
 	 * @return - the persisted document model
 	 * @throws IOException
 	 */
-	public Document uploadNewDemographicDocument(Document document, InputStream fileInputStream, Integer demographicNo) throws IOException, InterruptedException
+	public Document uploadNewDemographicDocument(Document document, InputStream fileInputStream, Integer demographicNo, boolean markValid) throws IOException, InterruptedException
 	{
 		GenericFile file = FileFactory.createDocumentFile(fileInputStream, document.getDocfilename());
-		return uploadNewDemographicDocument(document, file, demographicNo);
+		if (markValid)
+		{
+			file.forceSetValidation(true);
+		}
+		return uploadNewDemographicDocumentLogic(document, file, demographicNo);
+	}
+
+	public Document uploadNewDemographicDocument(Document document, InputStream fileInputStream, Integer demographicNo) throws IOException, InterruptedException
+	{
+		return uploadNewDemographicDocument(document, fileInputStream, demographicNo, false);
 	}
 
 	public Document uploadNewDemographicDocument(Document document, InputStream fileInputStream) throws IOException, InterruptedException
@@ -142,6 +140,38 @@ public class DocumentService
 	 */
 	public Document uploadNewProviderDocument(Document document, GenericFile file, Integer providerNo) throws IOException
 	{
+		// force this file to be treated as valid, as validation is only performed for new files
+		file.forceSetValidation(true);
+		return uploadNewProviderDocumentLogic(document,file,providerNo);
+	}
+
+	public Document uploadNewProviderDocument(Document document, InputStream fileInputStream, Integer providerNo) throws IOException, InterruptedException
+	{
+		GenericFile file = FileFactory.createDocumentFile(fileInputStream, document.getDocfilename());
+		return uploadNewProviderDocumentLogic(document, file, providerNo);
+	}
+
+	private Document uploadNewDemographicDocumentLogic(Document document, GenericFile file, Integer demographicNo) throws IOException
+	{
+		file.moveToDocuments();
+
+		document = setDocumentProperties(document, file);
+		document = addDocumentModel(document);
+		if(demographicNo == null || demographicNo < 1)
+		{
+			// unassigned documents still get a link with id -1
+			createDemographicCtlLink(document, -1);
+		}
+		else
+		{
+			assignDocumentToDemographic(document, demographicNo);
+		}
+		logger.info("Uploaded Demographic Document " + document.getDocumentNo());
+		return document;
+	}
+
+	private Document uploadNewProviderDocumentLogic(Document document, GenericFile file, Integer providerNo) throws IOException
+	{
 		file.moveToDocuments();
 
 		document = setDocumentProperties(document, file);
@@ -157,11 +187,6 @@ public class DocumentService
 		}
 		logger.info("Uploaded Provider Document " + document.getDocumentNo());
 		return document;
-	}
-	public Document uploadNewProviderDocument(Document document, InputStream fileInputStream, Integer providerNo) throws IOException, InterruptedException
-	{
-		GenericFile file = FileFactory.createDocumentFile(fileInputStream, document.getDocfilename());
-		return uploadNewProviderDocument(document, file, providerNo);
 	}
 
 	/**
@@ -194,6 +219,8 @@ public class DocumentService
 		document.setDocfilename(file.getName());
 		document.setContenttype(file.getContentType());
 		document.setNumberofpages(file.getPageCount());
+		document.setEncodingError(file.hasBeenValidated() && !file.isValid());
+
 		return document;
 	}
 

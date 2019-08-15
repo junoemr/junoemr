@@ -28,11 +28,14 @@
 <%--This JSP is the 'view template XML' jsp from the report configuraiton screen--%>
 
 
-<%@ page
-	import="oscar.oscarReport.reportByTemplate.*, org.apache.commons.lang.StringEscapeUtils"%>
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
-<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
-<%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ page import="org.oscarehr.report.reportByTemplate.dao.ReportTemplatesDao" %>
+<%@ page import="org.oscarehr.report.reportByTemplate.service.ReportByTemplateService" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.oscarReport.reportByTemplate.ReportObject" %>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
+<%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
       boolean authed=true;
@@ -42,9 +45,23 @@
 	<%response.sendRedirect("../../securityError.jsp?type=_report&type=_admin.reporting&type=_admin");%>
 </security:oscarSec>
 <%
-if(!authed) {
-	return;
-}
+	if(!authed)
+	{
+		return;
+	}
+	ReportTemplatesDao reportTemplatesDao = SpringUtils.getBean(ReportTemplatesDao.class);
+	ReportByTemplateService reportByTemplateService = SpringUtils.getBean(ReportByTemplateService.class);
+
+	String templateid = request.getParameter("templateid");
+	if(templateid == null) templateid = (String) request.getAttribute("templateid");
+	if(templateid == null)
+	{
+		%>
+		<jsp:forward page="homePage.jsp"/>
+		<%
+	}
+	ReportObject curreport = reportByTemplateService.getAsLegacyReport(Integer.parseInt(templateid), false);
+	String xml = reportTemplatesDao.find(Integer.parseInt(templateid)).getTemplateXml();
 %>
 
 <html:html locale="true">
@@ -85,31 +102,27 @@ if(!authed) {
 		</td>
 	</tr>
 	<tr>
-		<%String templateid = request.getParameter("templateid");
-        if (templateid == null) templateid = (String) request.getAttribute("templateid");
-        if (templateid == null) { %>
-		<jsp:forward page="homePage.jsp" />
-		<%}
-        ReportObject curreport = (new ReportManager()).getReportTemplateNoParam(templateid);
-        String xml = (new ReportManager()).getTemplateXml(templateid);%>
-		<td class="MainTableLeftColumn" valign="top" width="160px;"><jsp:include
-			page="listTemplates.jsp">
-			<jsp:param name="templateviewid"
-				value="<%=curreport.getTemplateId()%>" />
-		</jsp:include></td>
+		<td class="MainTableLeftColumn" valign="top" width="160px;">
+			<jsp:include page="listTemplates.jsp">
+				<jsp:param name="templateviewid"
+				           value="<%=curreport.getTemplateId()%>"/>
+			</jsp:include>
+		</td>
 		<td class="MainTableRightColumn" valign="top">
-		<div class="reportTitle"><%=curreport.getTitle()%></div>
-		<div class="reportDescription"><%=curreport.getDescription()%></div>
-		<div class="xmlBorderDiv"><pre wrap="on"
-			style="font-size: 11px;"><%=StringEscapeUtils.escapeHtml(xml)%></pre>
-		</div>
-		
-		<div class="noprint" style="clear: left; float: left; margin-top: 15px;">
-			<input type="button" value="Back" onclick="javascript: history.go(-1);return false;"> 
-			<input type="button" value="Print" onclick="javascript: window.print();">
-			<input type="button" value="Edit Template" onclick="document.location='addEditTemplate.jsp?templateid=<%=templateid%>&opentext=1'">
-			<a href="exportTemplateAction.do?templateid=<%=templateid%>&name=<%=curreport.getTitle()%>" class="link">Export Template to K2A</a>
-		</div>
+			<div class="reportTitle"><%=curreport.getTitle()%>
+			</div>
+			<div class="reportDescription"><%=curreport.getDescription()%>
+			</div>
+			<div class="xmlBorderDiv"><pre wrap="on" style="font-size: 11px;">
+				<%=StringEscapeUtils.escapeHtml(xml)%></pre>
+			</div>
+
+			<div class="noprint" style="clear: left; float: left; margin-top: 15px;">
+				<input type="button" value="Back" onclick="javascript: history.go(-1);return false;">
+				<input type="button" value="Print" onclick="javascript: window.print();">
+				<input type="button" value="Edit Template" onclick="document.location='addEditTemplate.jsp?templateid=<%=templateid%>&opentext=1'">
+				<a href="exportTemplateAction.do?templateid=<%=templateid%>&name=<%=curreport.getTitle()%>" class="link">Export Template to K2A</a>
+			</div>
 		</td>
 	</tr>
 	<tr class="MainTableBottomRow">

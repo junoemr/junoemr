@@ -48,7 +48,6 @@ public class IntegratorConsentDaoTest extends DaoTestFixtures {
 
 	@Before
 	public void before() throws Exception {
-		this.beforeForInnoDB();
 		SchemaUtils.restoreTable("Facility","demographic","provider","DigitalSignature","IntegratorConsent");
 	}
 

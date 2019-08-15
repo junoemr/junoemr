@@ -99,11 +99,13 @@ public final class ProviderPreferencesUIBean {
 			}
 		}
 		
-		// default billing dxCode 
-		temp = StringUtils.trimToNull(request.getParameter("dxCode"));
-		if (temp != null) providerPreference.setDefaultDxCode(temp);
-		
-		
+		// default billing dxCode
+        temp = request.getParameter("dxCode");
+		if (temp != null)
+        {
+            providerPreference.setDefaultDxCode(StringUtils.trimToNull(temp));
+        }
+
 		// rest
 		temp = StringUtils.trimToNull(request.getParameter("start_hour"));
 		if (temp != null) providerPreference.setStartHour(Integer.parseInt(temp));
@@ -173,6 +175,13 @@ public final class ProviderPreferencesUIBean {
 		
 		temp = StringUtils.trimToNull(request.getParameter("erx_sso_url"));
 		if (temp != null) providerPreference.setERx_SSO_URL(temp);
+
+		temp = request.getParameter("appointmentReasonDisplayLevel");
+		if (temp != null)
+		{
+			ProviderPreference.AppointmentReasonDisplayLevel displayLevel = ProviderPreference.AppointmentReasonDisplayLevel.valueOf(temp);
+			providerPreference.setAppointmentReasonDisplayLevel(displayLevel);
+		}
 
 		providerPreferenceDao.merge(providerPreference);
 

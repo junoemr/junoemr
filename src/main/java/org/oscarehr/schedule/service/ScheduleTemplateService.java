@@ -24,12 +24,23 @@
 
 package org.oscarehr.schedule.service;
 
+import com.google.common.collect.RangeMap;
+import org.oscarehr.schedule.dao.ScheduleTemplateCodeDao;
 import org.oscarehr.schedule.dao.ScheduleTemplateDao;
+import org.oscarehr.schedule.dto.AvailabilityType;
+import org.oscarehr.schedule.dto.CalendarEvent;
+import org.oscarehr.schedule.dto.ScheduleSlot;
 import org.oscarehr.schedule.model.ScheduleTemplate;
+import org.oscarehr.schedule.model.ScheduleTemplateCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,6 +49,12 @@ public class ScheduleTemplateService
 {
 	@Autowired
 	ScheduleTemplateDao scheduleTemplateDao;
+	@Autowired
+	ScheduleTemplateCodeDao scheduleTemplateCodeDao;
+
+	private static final String NO_APPOINTMENT_CHARACTER = "_";
+	private static final String SCHEDULE_TEMPLATE_CLASSNAME= null;
+
 
 	/**
 	 * Find the public and private templates available to the provider.
@@ -51,5 +68,119 @@ public class ScheduleTemplateService
 
 		templateList.addAll(providerTemplates);
 		return templateList;
+	}
+
+	public List<ScheduleTemplateCode> getScheduleTemplateCodes()
+	{
+		return scheduleTemplateCodeDao.findAll();
+	}
+
+	public List<CalendarEvent> getCalendarEventsScheduleOnly(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, Integer siteId)
+	{
+		// get the schedule slot length, return null if no schedule is set
+		Integer scheduleSlotLength = scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date, siteId);
+		if(scheduleSlotLength != null)
+		{
+			return getAllCalendarEvents(providerId, date, startTime, endTime, siteId, scheduleSlotLength);
+		}
+		return null;
+	}
+
+	/**
+	 * Gets a list of schedule template slots and creates a list with adjacent slots of the same
+	 * type grouped together.  It basically converts from the Juno database format into the format
+	 * required for cp-calendar.  This is essentially doing a group by, but would end up being a
+	 * very hideous sql query if done that way.
+	 * @param date The day to get the schedule for
+	 * @param providerId The provider to get the schedule for
+	 * @return A list of CalendarEvent objects
+	 */
+	public List<CalendarEvent> getCalendarEvents(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, Integer siteId, int defaultSlotLengthInMin)
+	{
+		// get the schedule slot length, or use the default
+		Integer scheduleSlotLength = scheduleTemplateDao.getScheduleSlotLengthInMin(providerId, date, siteId);
+		if(scheduleSlotLength == null)
+		{
+			scheduleSlotLength = defaultSlotLengthInMin;
+		}
+		return getAllCalendarEvents(providerId, date, startTime, endTime, siteId, scheduleSlotLength);
+	}
+	private List<CalendarEvent> getAllCalendarEvents(Integer providerId, LocalDate date, LocalTime startTime, LocalTime endTime, Integer siteId, int scheduleSlotLength)
+	{
+		List<CalendarEvent> calendarEvents = new ArrayList<>();
+
+		// Get schedule slots
+		RangeMap<LocalTime, ScheduleSlot> scheduleSlots = scheduleTemplateDao.findScheduleSlots(date, providerId, siteId);
+
+		for(LocalTime slotTime = startTime; slotTime.isBefore(endTime); slotTime = plusNoWrap(slotTime, scheduleSlotLength))
+		{
+			LocalDateTime startDateTime = LocalDateTime.of(date, slotTime);
+			ScheduleSlot slot = scheduleSlots.get(slotTime);
+
+			/* add a fake event if there is no schedule slot at this time,
+			it is the no-appt slot marker, or the slot ends before the time period */
+			if(slot == null || NO_APPOINTMENT_CHARACTER.equals(slot.getCode()))
+			{
+				calendarEvents.add(createFakeCalendarEvent(startDateTime, scheduleSlotLength, providerId));
+			}
+			else
+			{
+				// Add this row because it is the last
+				calendarEvents.add(createCalendarEvent(slot, scheduleSlotLength, providerId));
+			}
+		}
+		return calendarEvents;
+	}
+
+	private LocalTime plusNoWrap(LocalTime time, int slotLengthInMinutes)
+	{
+		LocalTime outTime = time.plusMinutes(slotLengthInMinutes);
+
+		if(outTime.compareTo(time) == -1 || slotLengthInMinutes >= (24*60))
+		{
+			return LocalTime.MAX;
+		}
+
+		return outTime;
+	}
+
+	private CalendarEvent createFakeCalendarEvent(LocalDateTime startDateTime, int durationMin, int resourceId)
+	{
+		ScheduleSlot slot = new ScheduleSlot(
+				startDateTime,
+				null,
+				durationMin,
+				"No Schedule",
+				null,
+				null,
+				"N",
+				10);
+
+		return createCalendarEvent(slot, durationMin, resourceId);
+	}
+
+	private CalendarEvent createCalendarEvent(ScheduleSlot slot, int scheduleSlotLength, int resourceId)
+	{
+		// package up the event and add to the list
+		LocalDateTime startDateTime = slot.getAppointmentDateTime();
+		LocalDateTime endDateTime = startDateTime.plus(Duration.ofMinutes(scheduleSlotLength));
+
+		AvailabilityType availabilityType = new AvailabilityType(
+			slot.getJunoColor(),
+			slot.getDescription(),
+			slot.getDurationMinutes(),
+			slot.getCode()
+		);
+
+		return new CalendarEvent(
+				startDateTime,
+				endDateTime,
+				slot.getJunoColor(),
+				CalendarEvent.RENDERING_BACKGROUND,
+				SCHEDULE_TEMPLATE_CLASSNAME,
+				resourceId,
+				slot.getCode(),
+				availabilityType,
+				null);
 	}
 }

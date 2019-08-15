@@ -25,13 +25,12 @@
 
 package org.oscarehr.billing.CA.BC.dao;
 
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.oscarehr.billing.CA.BC.model.TeleplanS21;
 import org.oscarehr.common.dao.AbstractDao;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.List;
 
 @Repository
 public class TeleplanS21Dao extends AbstractDao<TeleplanS21>{
@@ -51,6 +50,17 @@ public class TeleplanS21Dao extends AbstractDao<TeleplanS21>{
 		
 		return results;
 	}
+
+	public List<TeleplanS21> findByFilename(String filename)
+	{
+		Query q = entityManager.createQuery("SELECT t from TeleplanS21 t WHERE t.fileName=:filename");
+		q.setParameter("filename", filename);
+
+		@SuppressWarnings("unchecked")
+		List<TeleplanS21> results = q.getResultList();
+
+		return results;
+	}
 	
 	public List<TeleplanS21> search_all_tahd(String excludeStatus) {
 		Query q = entityManager.createQuery("SELECT t from TeleplanS21 t WHERE t.status <> ? ORDER BY t.payment desc");
@@ -61,5 +71,25 @@ public class TeleplanS21Dao extends AbstractDao<TeleplanS21>{
 		List<TeleplanS21> results = q.getResultList();
 		
 		return results;
+	}
+
+	public List<TeleplanS21> findDuplicates(TeleplanS21 lineEntry)
+	{
+		Query q = entityManager.createQuery(
+				"SELECT t FROM TeleplanS21 t " +
+						"WHERE t.dataCentre = :dataCenter " +
+						"AND t.dataSeq = :sequenceNumber " +
+						"AND t.mspCtlNo = :mspInternal " +
+						"AND t.payment = :paymentDate " +
+						"AND t.amountPaid = :paidAmount " +
+						"AND t.amountBilled = :billedAmount " +
+						"ORDER BY t.id ASC");
+		q.setParameter("dataCenter", lineEntry.getDataCentre());
+		q.setParameter("sequenceNumber", lineEntry.getDataSeq());
+		q.setParameter("mspInternal", lineEntry.getMspCtlNo());
+		q.setParameter("paymentDate", lineEntry.getPayment());
+		q.setParameter("paidAmount", lineEntry.getAmountPaid());
+		q.setParameter("billedAmount", lineEntry.getAmountBilled());
+		return q.getResultList();
 	}
 }

@@ -24,115 +24,191 @@
 
 package oscar.oscarReport.reportByTemplate;
 
-import java.io.StringWriter;
-import java.sql.ResultSet;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.Ostermiller.util.CSVPrinter;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.model.Explain;
+import org.oscarehr.log.dao.LogReportByTemplateDao;
+import org.oscarehr.log.dao.LogReportByTemplateExplainDao;
+import org.oscarehr.log.model.LogReportByTemplate;
+import org.oscarehr.report.SQLReportHelper;
+import org.oscarehr.report.reportByTemplate.dao.ReportTemplatesDao;
+import org.oscarehr.report.reportByTemplate.exception.ReportByTemplateException;
+import org.oscarehr.report.reportByTemplate.service.ReportByTemplateService;
 import org.oscarehr.util.MiscUtils;
-
+import org.oscarehr.util.SpringUtils;
+import oscar.OscarProperties;
 import oscar.oscarDB.DBHandler;
 import oscar.oscarReport.data.RptResultStruct;
 import oscar.util.UtilMisc;
 
-import com.Ostermiller.util.CSVPrinter;
+import javax.persistence.PersistenceException;
+import javax.servlet.http.HttpServletRequest;
+import java.io.StringWriter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
 
 
 /**
  *
  * @author rjonasz
  */
-public class SQLReporter implements Reporter {
-    
-    /** Creates a new instance of SQLReporter */
-    public SQLReporter() {
-    }
-    
-    public boolean generateReport( HttpServletRequest request) {
-        String templateId = request.getParameter("templateId");
-        ReportObject curReport = (new ReportManager()).getReportTemplateNoParam(templateId);
-        Map parameterMap = request.getParameterMap();
-        
-        if(curReport.isSequence()) {
-        	return generateSequencedReport(request);
-        }
-        
-        String sql = curReport.getPreparedSQL(parameterMap);
-        if (sql == "" || sql == null) {
-            request.setAttribute("errormsg", "Error: Cannot find all parameters for the query.  Check the template.");
-            request.setAttribute("templateid", templateId);
-            return false;
-        }
-        ResultSet rs = null;
-        String rsHtml = "An SQL query error has occured";
-        String csv = "";
-        try {
-            
-            rs = DBHandler.GetSQL(sql);
-            rsHtml = RptResultStruct.getStructure2(rs);  //makes html from the result set
-            StringWriter swr = new StringWriter();
-            CSVPrinter csvp = new CSVPrinter(swr);
-            csvp.writeln(UtilMisc.getArrayFromResultSet(rs));
-            csv = swr.toString();
-            //csv = csv.replace("\\", "\"");  //natural quotes in the data create '\' characters in CSV, xls works fine
-                                              //this line fixes it but messes up XLS generation.
-            //csv = UtilMisc.getCSV(rs);
-        } catch (Exception sqe) {
-            MiscUtils.getLogger().error("Error", sqe);
-        }
-        request.getSession().setAttribute("csv", csv);
-        request.setAttribute("csv", csv);
-        request.setAttribute("sql", sql);
-        request.setAttribute("reportobject", curReport);
-        request.setAttribute("resultsethtml", rsHtml);
-        
-        return true;
-    }
-    
-    public boolean generateSequencedReport( HttpServletRequest request) {
-        String templateId = request.getParameter("templateId");
-        ReportObject curReport = (new ReportManager()).getReportTemplateNoParam(templateId);
-        Map parameterMap = request.getParameterMap();
-        
-        int x=0;
-        String sql = null;
-        while((sql = curReport.getPreparedSQL(x, parameterMap)) != null) {
-        	if (sql == "") {
-                request.setAttribute("errormsg", "Error: Cannot find all parameters for the query.  Check the template.");
-                request.setAttribute("templateid", templateId);
-                return false;
-            }
-        	
-            ResultSet rs = null;
-            String rsHtml = "An SQL query error has occured";
-            String csv = "";
-            try {
-                
-                rs = DBHandler.GetSQL(sql);
-                rsHtml = RptResultStruct.getStructure2(rs);  //makes html from the result set
-                StringWriter swr = new StringWriter();
-                CSVPrinter csvp = new CSVPrinter(swr);
-                csvp.writeln(UtilMisc.getArrayFromResultSet(rs));
-                csv = swr.toString();
-                
-                //request.getSession().setAttribute("csv", csv);
-                request.setAttribute("csv-"+x, csv);
-                request.setAttribute("sql-"+x, sql);
-                request.setAttribute("resultsethtml-"+x, rsHtml);
-          
-                
-                
-             } catch (Exception sqe) {
-                MiscUtils.getLogger().error("Error", sqe);
-            }
-            x++;
-        }
-        
-       request.setAttribute("sequenceLength", x); 
-       request.setAttribute("reportobject", curReport);
-        
-        return true;
-    }
+public class SQLReporter implements Reporter
+{
+
+	private static final Logger logger = MiscUtils.getLogger();
+	private static final OscarProperties properties = OscarProperties.getInstance();
+	private static final Long maxRows = Long.parseLong(properties.getProperty("report_by_template.max_rows"));
+	private static final Integer maxResults = Integer.parseInt(properties.getProperty("report_by_template.max_results"));
+	private static final Boolean enableQueryRestrictions = properties.isPropertyActive("report_by_template.enable_restrictions");
+	private static final Boolean enforceQueryRestrictions = properties.isPropertyActive("report_by_template.enforce_restrictions");
+
+	private static ReportByTemplateService reportByTemplateService = SpringUtils.getBean(ReportByTemplateService.class);
+	private static LogReportByTemplateDao logReportByTemplateDao = SpringUtils.getBean(LogReportByTemplateDao.class);
+	private static LogReportByTemplateExplainDao logReportByTemplateExplainDao = SpringUtils.getBean(LogReportByTemplateExplainDao.class);
+	private static ReportTemplatesDao rptTemplatesDao = SpringUtils.getBean(ReportTemplatesDao.class);
+
+	/**
+	 * Creates a new instance of SQLReporter
+	 */
+	public SQLReporter()
+	{
+	}
+
+	public boolean generateReport( HttpServletRequest request)
+	{
+		String templateIdStr = request.getParameter("templateId");
+		String providerNo = (String) request.getSession().getAttribute("user");
+
+		String rsHtml = "An SQL query error has occurred";
+		String csv = "";
+		String nativeSQL = "";
+		ReportObject curReport = null;
+
+		try
+		{
+			Integer templateId = Integer.parseInt(templateIdStr);
+			curReport = reportByTemplateService.getAsLegacyReport(templateId, true);
+			nativeSQL = reportByTemplateService.getTemplateSQL(templateId, request.getParameterMap());
+			logger.info("SQL: " + nativeSQL);
+
+			//TODO re-design or fully remove this new functionality??
+//			if(curReport.isSequence()) {
+//				return generateSequencedReport(request);
+//			}
+
+			if(nativeSQL == null || nativeSQL.trim().isEmpty())
+			{
+				request.setAttribute("errormsg", "Error: Cannot find all parameters for the query. Check the template.");
+				request.setAttribute("templateid", templateIdStr);
+				return false;
+			}
+
+			LogReportByTemplate logEntry = saveInitialLog(templateId, providerNo, nativeSQL);
+			if(enableQueryRestrictions)
+			{
+				//check for special exempt cases
+				String explainExemptSql = SQLReportHelper.getExplainSkippableQuery(nativeSQL);
+				if(explainExemptSql != null)
+				{
+					nativeSQL = explainExemptSql;
+				}
+				else
+				{
+					List<Explain> explainResultList = rptTemplatesDao.getExplainResultList(nativeSQL);
+					saveExplainResults(logEntry, explainResultList);
+
+					// admin verified reports bypass the maximum row limitations
+					if(enforceQueryRestrictions && !curReport.isSuperAdminVerified())
+					{
+						nativeSQL = SQLReportHelper.applyEnforcedLimit(nativeSQL, maxResults);
+						boolean allowRun = SQLReportHelper.allowQueryRun(explainResultList, maxRows);
+
+						if(!allowRun)
+						{
+							request.setAttribute("errormsg", "Error: The report examines more than the maximum " + maxRows + " rows");
+							request.setAttribute("explainResults", explainResultList);
+							request.setAttribute("templateid", templateIdStr);
+							return false;
+						}
+					}
+				}
+			}
+
+			//TODO use the entityManager sql equivalent. can't get the column headers until spring upgrade to 2.0 or higher
+			ResultSet rs = DBHandler.GetSQL(nativeSQL);
+			rsHtml = RptResultStruct.getStructure2(rs);  //makes html from the result set
+			StringWriter swr = new StringWriter();
+			CSVPrinter csvp = new CSVPrinter(swr);
+			csvp.writeln(UtilMisc.getArrayFromResultSet(rs));
+			csv = swr.toString();
+
+			rs.last();
+			long rowCount = new Integer(rs.getRow()).longValue();
+			updateLog(logEntry, rowCount);
+		}
+		// since users can write custom queries this error is expected and should not generate an error in the log
+		catch(ReportByTemplateException | SQLException e)
+		{
+			logger.warn("An Exception occurred while generating a report by template (from user defined query): " + e.getMessage());
+		}
+		catch(Exception sqe)
+		{
+			logger.error("Error", sqe);
+		}
+
+		request.getSession().setAttribute("csv", csv);
+		request.setAttribute("csv", csv);
+		request.setAttribute("sql", nativeSQL);
+		request.setAttribute("reportobject", curReport);
+		request.setAttribute("resultsethtml", rsHtml);
+
+		return true;
+	}
+
+	private void saveExplainResults(LogReportByTemplate logEntry, List<Explain> explainResultList)
+	{
+		try
+		{
+			logReportByTemplateExplainDao.persistAll(logEntry, explainResultList);
+		}
+		catch(PersistenceException e)
+		{
+			logger.error("Failed to persist ReportByExample explain results.", e);
+		}
+
+	}
+	private LogReportByTemplate saveInitialLog(Integer templateId, String providerNo, String querySql)
+	{
+		LogReportByTemplate logReportByTemplate = new LogReportByTemplate();
+		try
+		{
+			logReportByTemplate.setTemplateId(templateId);
+			logReportByTemplate.setProviderNo(providerNo);
+			logReportByTemplate.setQueryString(querySql);
+			logReportByTemplate.setDatetimeStart(new Date());
+			logReportByTemplateDao.persist(logReportByTemplate);
+		}
+		catch(PersistenceException e)
+		{
+			logger.error("Failed to persist initial ReportByTemplate Log entry.", e);
+		}
+
+		return logReportByTemplate;
+	}
+	private void updateLog(LogReportByTemplate logReportByTemplate, Long rowCount)
+	{
+		try
+		{
+			logReportByTemplate.setDatetimeEnd(new Date());
+			logReportByTemplate.setRowsReturned(rowCount);
+			logReportByTemplateDao.merge(logReportByTemplate);
+		}
+		catch(PersistenceException e)
+		{
+			logger.error("Failed to update ReportByTemplate Log entry.", e);
+		}
+	}
     
 }

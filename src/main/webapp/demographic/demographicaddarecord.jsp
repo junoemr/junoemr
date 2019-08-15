@@ -108,7 +108,6 @@
 		<form method="post" name="addappt">
 			<%
 				LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-
 				//If this is from adding appointment screen, then back to there
 				String fromAppt = request.getParameter("fromAppt");
 				String originalPage2 = request.getParameter("originalPage");
@@ -145,8 +144,10 @@
 				demographic.setPatientStatus(request.getParameter("patient_status"));
 				demographic.setDateJoined(MyDateFormat.getSysDate(request.getParameter("date_joined_year")+"-"+request.getParameter("date_joined_month")+"-"+request.getParameter("date_joined_date")));
 				demographic.setChartNo(request.getParameter("chart_no"));
-				demographic.setProviderNo(request.getParameter("staff"));
+				demographic.setProviderNo(StringUtils.trimToNull(request.getParameter("staff")));
 				demographic.setSex(request.getParameter("sex"));
+				demographic.setNameOfMother(StringUtils.trimToNull(request.getParameter("nameOfMother")));
+				demographic.setNameOfFather(StringUtils.trimToNull(request.getParameter("nameOfFather")));
 
 				year = StringUtils.trimToNull(request.getParameter("end_date_year"));
 				month = StringUtils.trimToNull(request.getParameter("end_date_month"));

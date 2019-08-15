@@ -1,0 +1,27 @@
+.tickler-page-header {
+	@extend %juno-page-header;
+}
+
+#tickler-list-page {
+	#search-form {
+		.search-filters>div {
+			margin-bottom: $margin-sm;
+		}
+		.search-buttons {
+			margin-top: $margin-md;
+			margin-bottom: $margin-md;
+		}
+	}
+}
+
+.tickler-table {
+	tbody {
+		text-align: center;
+	}
+}
+
+#tickler-edit-body {
+	.tickler-edit-comments-header {
+		margin-bottom: $margin-sm;
+	}
+}

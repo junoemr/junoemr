@@ -25,10 +25,12 @@
 
 package org.oscarehr.schedule.model;
 
+import org.hibernate.validator.constraints.Length;
 import org.oscarehr.common.model.AbstractModel;
 
 import java.util.Comparator;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -47,6 +49,10 @@ public class ScheduleTemplateCode extends AbstractModel<Integer>
 	private String description;
 	private String duration;
 	private String color;
+
+	@Length(min=7, max=7)
+	@Column(name="juno_color")
+	private String junoColor;
 	private String confirm;
 	private int bookinglimit;
 	
@@ -78,6 +84,16 @@ public class ScheduleTemplateCode extends AbstractModel<Integer>
 	public void setColor(String color) {
     	this.color = color;
     }
+
+	public String getJunoColor()
+	{
+		return junoColor;
+	}
+
+	public void setJunoColor(String junoColor)
+	{
+		this.junoColor = junoColor;
+	}
 
 	public String getConfirm() {
     	return confirm;

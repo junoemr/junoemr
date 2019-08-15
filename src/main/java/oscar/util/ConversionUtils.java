@@ -29,18 +29,29 @@ import org.oscarehr.util.MiscUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Yet another conversion utility class for bridging JPA entity to legacy schema mismatch. 
@@ -55,7 +66,10 @@ public class ConversionUtils {
 	
 	public static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
 	public static final String DEFAULT_TIME_PATTERN = "HH:mm:ss";
+	public static final String TIME_PATTERN_NO_SEC = "HH:mm";
 	public static final String DEFAULT_TS_PATTERN = "yyyy-MM-dd HH:mm:ss";
+
+	public static final String TS_NO_SEC_PATTERN = "yyyy-MM-dd H:mm";
 
 	private static final Long ZERO_LONG = new Long(0);
 	private static final Integer ZERO_INT = new Integer(0);
@@ -63,6 +77,9 @@ public class ConversionUtils {
 	private static final String ZERO_STRING = "0";
 
 	private static final long MS_IN_DAY = 1000 * 60 * 60 * 24;
+
+	private static final Pattern datePattern = Pattern.compile("(\\d{4})-(\\d{1,2})-(\\d{1,2})");
+	private static final Pattern dateTimePattern = Pattern.compile("(\\d{4})-(\\d{1,2})-(\\d{1,2})\\s(\\d{1,2})[:]?(\\d{1,2})?[:]?(\\d{1,2})?");
 
 	private ConversionUtils() {
 	}
@@ -88,11 +105,11 @@ public class ConversionUtils {
 	}
 
 	public static Date fromTimeStringNoSeconds(String timeString) {
-		return fromDateString(timeString, "HH:mm");
+		return fromDateString(timeString, TIME_PATTERN_NO_SEC);
 	}
 	
 	public static String toTimeStringNoSeconds(Date timeString) {
-		return toDateString(timeString, "HH:mm");
+		return toDateString(timeString, TIME_PATTERN_NO_SEC);
 	}
 
 	/**
@@ -229,6 +246,11 @@ public class ConversionUtils {
 		return toDateTimeString(date, DEFAULT_TS_PATTERN);
 	}
 
+	public static String toDateTimeNoSecString(LocalDateTime date)
+	{
+		return toDateTimeString(date, TS_NO_SEC_PATTERN);
+	}
+
 	/**
 	 * Parses the specified string as a Long instance. 
 	 * 
@@ -304,13 +326,21 @@ public class ConversionUtils {
 	 * @param str
 	 * 		String to be parsed
 	 * @return
-	 * 		Returns false for empty, null or 0 or true otherwise. 
+	 * 		Returns false for empty, null or 0.
+	 * 		Returns true only if the string is "1" or "true", false otherwise.
 	 */
 	public static boolean fromBoolString(String str) {
-		if (str == null || str.trim().isEmpty() || ZERO_STRING.equals(str)) {
+		if (!hasContent(str) || "0".equals(str))
+		{
 			return false;
 		}
-		return true;
+
+		return str.equals("1") || str.toLowerCase().equals("true");
+	}
+
+	public static boolean hasContent(String str)
+	{
+		return !(str == null || str.trim().isEmpty());
 	}
 
 	/**
@@ -342,8 +372,9 @@ public class ConversionUtils {
 	 * 		Returns the formatted string, or 0 for null value.
 	 */
 	public static String toDoubleString(Double d) {
-		if (d == null) {
-			return ZERO_STRING;
+		if (d == null)
+		{
+			return "0.0";
 		}
 		return d.toString();
 	}
@@ -372,23 +403,136 @@ public class ConversionUtils {
 		return (int) (timestamp / MS_IN_DAY);
 	}
 
-
-	public static Date coalesceTimeStampString(String dateString)
+	/**
+	 * Some date strings that we receive are sometimes missing leading zeroes, i.e:
+	 * - 2019-04-8
+	 * - 2019-4-08
+	 *
+	 * LocalDate can interpret these properly if we individually feed in the year, month, and day.
+	 *
+	 * @param dateString
+	 *		Date string of form like yyyy-MM-dd
+	 *		This input string is allowed to be missing leading zero on MM or dd.
+	 *		Note that LocalDate *could* fix a bad year (a year like 019 or 219)
+	 *		but allowing a year entry like these to be entered could cause more problems.
+	 * @return dateString
+	 *		Original dateString if it's already in good shape or parsing fails
+	 *		Otherwise return a new dateString of format yyyy-MM-dd
+	 */
+	public static String padDateString(String dateString)
 	{
-		return coalesceTimeStampString(dateString, DEFAULT_TS_PATTERN);
+		Matcher match;
+		try
+		{
+			match = datePattern.matcher(dateString);
+		}
+		catch (IllegalStateException ex)
+		{
+			return dateString;
+		}
+
+		if (match.matches())
+		{
+			try
+			{
+				int year = Integer.parseInt(match.group(1));
+				int month = Integer.parseInt(match.group(2));
+				int day = Integer.parseInt(match.group(3));
+
+				LocalDate desiredDate = LocalDate.of(year, month, day);
+				return desiredDate.toString();
+			}
+			catch (NumberFormatException | DateTimeParseException ex)
+			{
+				return dateString;
+			}
+		}
+
+		return dateString;
 	}
-	public static Date coalesceTimeStampString(String plain, String inFormat)
+
+	/**
+	 * Some datetime strings we receive are missing leading zeroes in one or
+	 * more of their fields. If we pull out the individual fields and feed them into
+	 * LocalDateTime we can reconstruct a properly formatted string for future needs.
+	 *
+	 * @param dateTimeString
+	 * 		Datetime string of format like yyyy-MM-dd hh:mm:ss
+	 * 		yyyy must be 4 digits. MM, dd, HH, mm can all be 1 or 2 digits.
+	 * 	    ss is optional and can be 1 or 2 digits.
+	 * @return
+	 * 		New dateTimeString of format yyyy-MM:dd hh:mm(:ss) if parsing was successful
+	 * 		If string couldn't be fit to the datetime format, attempt to fit it to yyyy-MM-dd and return that
+	 * 		If the internal call to try and fit to yyyy-MM-dd fails the user gets their original string back
+	 */
+	public static String padDateTimeString(String dateTimeString)
+	{
+		if (dateTimeString == null || dateTimeString.isEmpty())
+		{
+			return "";
+		}
+
+		Matcher match;
+		try
+		{
+			match = dateTimePattern.matcher(dateTimeString);
+		}
+		catch (IllegalStateException ex)
+		{
+			MiscUtils.getLogger().error("error matching: " + ex);
+			return dateTimeString;
+		}
+
+		if (match.matches())
+		{
+			try
+			{
+				int year = Integer.parseInt(match.group(1));
+				int month = Integer.parseInt(match.group(2));
+				int day = Integer.parseInt(match.group(3));
+				int hour = Integer.parseInt(match.group(4));
+				int minute = 0;
+				if (match.group(5) != null)
+				{
+					minute = Integer.parseInt(match.group(5));
+				}
+				int second = 0;
+				if (match.group(6) != null)
+				{
+					second = Integer.parseInt(match.group(6));
+				}
+				LocalDateTime desiredDate = LocalDateTime.of(year, month, day, hour, minute, second);
+				return desiredDate.toString().replace("T", " ");
+			}
+			catch (NumberFormatException | DateTimeParseException ex)
+			{
+				logger.warn("Error attempting to pad " + dateTimeString + ": " + ex);
+				return dateTimeString;
+			}
+		}
+		// Could have gotten a format of yyyy-MM-dd - try throwing it in the other pad function to be safe
+		return padDateString(dateTimeString);
+	}
+
+	public static Date getLegacyDateFromDateString(String dateString)
+	{
+		return getLegacyDateFromDateString(dateString, DEFAULT_TS_PATTERN);
+	}
+
+	public static Date getLegacyDateFromDateString(String dateString, String inFormat)
 	{
 		Date returnDate = null;
 
-		if(plain == null || plain.trim().isEmpty())
+		if (dateString == null || dateString.trim().isEmpty())
 		{
 			logger.warn("Cannot Coalesce a null/empty date string");
 			return returnDate;
 		}
 
-		if(inFormat.length() > plain.length())
-			inFormat = inFormat.substring(0, plain.length());
+		if (inFormat.length() > dateString.length())
+		{
+			inFormat = inFormat.substring(0, dateString.length());
+		}
 
 		try
 		{
@@ -401,11 +545,10 @@ public class ConversionUtils {
 					.parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
 					.toFormatter();
 
-			LocalDateTime parsedDate = LocalDateTime.parse(plain, customFormatter);
+			LocalDateTime parsedDate = LocalDateTime.parse(dateString, customFormatter);
+			returnDate = Date.from(parsedDate.toInstant(OffsetDateTime.now(ZoneId.systemDefault()).getOffset()));
 
-			returnDate = Date.from(parsedDate.toLocalDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
-
-			logger.debug("Coalesce " + plain + " to " + parsedDate.format(inFormatter));
+			logger.debug("Transform " + dateString + " to " + parsedDate.format(inFormatter));
 		}
 		catch(DateTimeException e)
 		{
@@ -414,6 +557,29 @@ public class ConversionUtils {
 		return returnDate;
 	}
 
+
+	public static LocalDateTime getLocalDateTimeFromSqlDateAndTime(java.sql.Date date, java.sql.Time time)
+	{
+		LocalDate localDate = date.toLocalDate();
+		LocalTime localTime = time.toLocalTime();
+		return LocalDateTime.of(localDate, localTime);
+	}
+
+	/**
+	 * Creates a list of dates.  Taken from http://www.baeldung.com/java-between-dates
+	 * @param startDate
+	 * @param endDate
+	 * @return An inclusive list of dates
+	 */
+	public static List<LocalDate> getDateList(LocalDate startDate, LocalDate endDate)
+	{
+		long numOfDaysBetween = ChronoUnit.DAYS.between(startDate, endDate) + 1;
+
+		return IntStream.iterate(0, i -> i + 1)
+			.limit(numOfDaysBetween)
+			.mapToObj(i -> startDate.plusDays(i))
+			.collect(Collectors.toList());
+	}
 
 	public static Date toNullableLegacyDate(LocalDate localDate)
 	{
@@ -438,26 +604,13 @@ public class ConversionUtils {
 
 	public static LocalDate toNullableLocalDate(String dateString)
 	{
-		if(dateString == null) return null;
-		return toZonedLocalDate(dateString);
+		if(dateString == null || dateString.isEmpty()) return null;
+		return toLocalDate(dateString);
 	}
-
 	public static LocalDate toNullableLocalDate(Date legacyDate)
 	{
 		if(legacyDate == null) return null;
 		return toZonedLocalDate(legacyDate);
-	}
-
-
-	public static LocalDate toZonedLocalDate(String dateString)
-	{
-		return toZonedLocalDate(dateString, DateTimeFormatter.ISO_DATE_TIME);
-	}
-
-	public static LocalDate toZonedLocalDate(String dateString, DateTimeFormatter dateTimeFormatter)
-	{
-		ZonedDateTime result = ZonedDateTime.parse(dateString, dateTimeFormatter);
-		return result.toLocalDate();
 	}
 	public static LocalDate toLocalDate(String dateString)
 	{
@@ -468,7 +621,16 @@ public class ConversionUtils {
 	{
 		return LocalDate.parse(dateString, dateTimeFormatter);
 	}
-
+	public static LocalDate toNullableZonedLocalDate(String dateString)
+	{
+		if(dateString == null) return null;
+		return toZonedLocalDate(dateString, DateTimeFormatter.ISO_DATE_TIME);
+	}
+	public static LocalDate toZonedLocalDate(String dateString, DateTimeFormatter dateTimeFormatter)
+	{
+		ZonedDateTime result = ZonedDateTime.parse(dateString, dateTimeFormatter);
+		return result.toLocalDate();
+	}
 	public static LocalDate toZonedLocalDate(Date legacyDate)
 	{
 		LocalDate date = Instant
@@ -504,5 +666,51 @@ public class ConversionUtils {
 		calendarA.set(Calendar.MILLISECOND, calendarB.get(Calendar.MILLISECOND));
 
 		return calendarA.getTime();
+	}
+
+	public static LocalDate dateStringToNullableLocalDate(String dateString)
+	{
+		if(dateString == null) return null;
+		return dateStringToLocalDate(dateString);
+	}
+
+	public static LocalDate dateStringToLocalDate(String dateString)
+	{
+		return LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE);
+	}
+
+	public static LocalDateTime truncateLocalDateTime(LocalDateTime dateTime, ChronoUnit timeUnit)
+	{
+		switch(timeUnit)
+		{
+			case HOURS:
+				return dateTime.truncatedTo(ChronoUnit.HOURS);
+			case DAYS:
+				return dateTime.truncatedTo(ChronoUnit.DAYS);
+			case WEEKS:
+				return dateTime.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY)).truncatedTo(ChronoUnit.DAYS);
+			case MONTHS:
+				return dateTime.with(TemporalAdjusters.firstDayOfMonth()).truncatedTo(ChronoUnit.DAYS);
+			case YEARS:
+				return dateTime.with(TemporalAdjusters.firstDayOfYear()).truncatedTo(ChronoUnit.DAYS);
+			default:
+				throw new UnsupportedTemporalTypeException("Unimplemented temporal type for truncation");
+		}
+	}
+
+	public static LocalTime toNullableLocalTime(String timeString)
+	{
+		if(timeString == null || timeString.isEmpty()) return null;
+		return toLocalTime(timeString);
+	}
+
+	public static LocalTime toLocalTime(String timeString)
+	{
+		return toLocalTime(timeString, DateTimeFormatter.ISO_TIME);
+	}
+
+	public static LocalTime toLocalTime(String timeString, DateTimeFormatter dateTimeFormatter)
+	{
+		return LocalTime.parse(timeString, dateTimeFormatter);
 	}
 }

@@ -22,16 +22,6 @@
  */
 package org.oscarehr.common.dao;
 
-import java.math.BigInteger;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import javax.persistence.PersistenceException;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -49,7 +39,6 @@ import org.hibernate.criterion.Restrictions;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.web.formbean.ClientListsReportFormBean;
 import org.oscarehr.PMmodule.web.formbean.ClientSearchFormBean;
-import org.oscarehr.common.DemographicSearchResultTransformer;
 import org.oscarehr.common.Gender;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.Admission;
@@ -58,20 +47,32 @@ import org.oscarehr.event.DemographicCreateEvent;
 import org.oscarehr.event.DemographicUpdateEvent;
 import org.oscarehr.integration.hl7.generators.HL7A04Generator;
 import org.oscarehr.util.DbConnectionFilter;
-import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.to.model.DemographicSearchRequest;
-import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.SEARCHMODE;
-import org.oscarehr.ws.rest.to.model.DemographicSearchRequest.STATUSMODE;
-import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
-
 import oscar.MyDateFormat;
 import oscar.OscarProperties;
 import oscar.util.SqlUtils;
+
+import javax.persistence.PersistenceException;
+import java.math.BigInteger;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * @deprecated use the jpa version instead
@@ -379,12 +380,14 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	public List<Demographic> searchDemographicByNameAndNotStatus(String searchStr, List<String> statuses, int limit, int offset, String providerNo, boolean outOfDomain) {
 		return searchDemographicByNameAndStatus(searchStr,statuses,limit,offset,providerNo,outOfDomain,true);
 	}
+
 	public List<Demographic> searchDemographicByNameAndStatus(String searchStr, List<String> statuses, int limit, int offset, String providerNo, boolean outOfDomain) {
 		return searchDemographicByNameAndStatus(searchStr,statuses,limit,offset,providerNo,outOfDomain,false);
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Demographic> searchDemographicByNameAndStatus(String searchStr, List<String> statuses, int limit, int offset, String providerNo, boolean outOfDomain,boolean ignoreStatuses) {
+	public List<Demographic> searchDemographicByNameAndStatus(String searchStr, List<String> statuses, int limit, int offset,
+															  String providerNo, boolean outOfDomain,boolean ignoreStatuses) {
 		List<Demographic> list = new ArrayList<Demographic>();
 		String queryString = "From Demographic d where d.LastName like :lastName ";
 
@@ -401,7 +404,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		if(providerNo != null && !outOfDomain) {
 			queryString += " AND d.id IN ("+ PROGRAM_DOMAIN_RESTRICTION+") ";
 		}
-		
+
 		Session session = this.getSession();
 		try {
 			Query q = session.createQuery(queryString);
@@ -1503,6 +1506,31 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 		}
 	}
 
+	public Demographic getDemographicByHealthNumber(String healthNumber)
+	{
+		String hql = "from Demographic d where d.Hin = :hin";
+
+		OscarProperties oscarProperties = OscarProperties.getInstance();
+		if (oscarProperties.isBritishColumbiaInstanceType())
+		{
+				hql += " and d.Ver != '66'";
+		}
+
+		Session session = this.getSession();
+		try
+		{
+			Query query = session.createQuery(hql);
+			query.setParameter("hin", healthNumber);
+
+			return (Demographic)query.uniqueResult();
+		}
+		finally
+		{
+			this.releaseSession(session);
+		}
+
+	}
+
 	public static class ClientListsReportResults {
 		public int demographicId;
 		public String firstName;
@@ -1990,55 +2018,7 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 
 		query.setMaxResults(itemsToReturn);
 	}
-	
-	public Integer searchPatientCount(LoggedInInfo loggedInInfo, DemographicSearchRequest searchRequest) {
-		Map<String,Object> params = new HashMap<String,Object>();
-		
-		String demographicQuery = generateDemographicSearchQuery(loggedInInfo,searchRequest,params, "count(*)");
-		 
-		log.info(demographicQuery);
-		
-		Session session = getSession();
-		try {
-			SQLQuery sqlQuery = session.createSQLQuery(demographicQuery);
-			for(String key:params.keySet()) {
-				sqlQuery.setParameter(key, params.get(key));
-				log.info(key +"="+params.get(key));
-			}
-			Integer result = ((BigInteger)sqlQuery.uniqueResult()).intValue();
-			return result;
-		} finally {
-			this.releaseSession(session);
-		}
-	}
-	
-	public List<DemographicSearchResult> searchPatients(LoggedInInfo loggedInInfo, DemographicSearchRequest searchRequest, int startIndex, int itemsToReturn) {
-		Map<String,Object> params = new HashMap<String,Object>();
-		
-		String demographicQuery = generateDemographicSearchQuery(loggedInInfo,searchRequest, params,
-				"d.demographic_no, d.last_name, d.first_name, d.chart_no, d.sex, d.provider_no, d.roster_status," +
-				" d.patient_status, d.phone, d.year_of_birth,d.month_of_birth,d.date_of_birth,p.last_name as providerLastName," +
-						"p.first_name as providerFirstName,d.hin,dm.merged_to");
 
-		Session session = getSession();
-		try {
-			SQLQuery sqlQuery = session.createSQLQuery(demographicQuery);
-
-			for(String key:params.keySet()) {
-				sqlQuery.setParameter(key, params.get(key));
-			}
-
-			sqlQuery.setFirstResult(startIndex);
-			DemographicSearchResultTransformer transformer = new DemographicSearchResultTransformer();
-			transformer.setDemographicDao(this);
-			sqlQuery.setResultTransformer(transformer);
-			setLimit(sqlQuery, itemsToReturn);
-
-			return sqlQuery.list();
-		} finally {
-			this.releaseSession(session);
-		}
-	}
 	/**
 	 * Split the given patient search string on ',' into an array of form {last_name,first_name}. 
 	 * The array is guaranteed to have length 1 if no first name is present or the first name trims to empty,
@@ -2063,150 +2043,6 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	  		lastfirst = new String[] {lastfirst[0],lastfirst[1]};
 	  	}
 		return lastfirst;
-	}
-
-	private String generateDemographicSearchQuery(LoggedInInfo loggedInInfo, DemographicSearchRequest searchRequest, Map<String,Object> params, String select) {
-		OscarProperties props = OscarProperties.getInstance();  
-
-		String keyword = searchRequest.getKeyword();
-		SEARCHMODE mode = searchRequest.getMode();
-		boolean exactMatchOnly = searchRequest.isExactMatch();
-
-		// Allow '*' in searches and treat it the same as the % wildcard
-		keyword = keyword.replace('*', '%');
-
-		String fieldName="";
-		String comparisonOperator = "like";
-		Boolean useUserWildcards = keyword.contains("%") || keyword.contains("_");
-
-
-		if(mode == SEARCHMODE.Address) {
-			fieldName="d.address";
-		}
-		else if(mode == SEARCHMODE.Phone) {
-			fieldName="d.phone";
-		}
-		else if(mode == SEARCHMODE.DemographicNo) {
-			fieldName="d.demographic_no";
-			// unless keyword uses wildcards look for an exact match
-			if (!useUserWildcards)
-			{
-				comparisonOperator = "=";
-			}
-		}
-		else if(mode == SEARCHMODE.HIN) {
-			fieldName="d.hin";
-		}
-		else if(mode == SEARCHMODE.DOB) {
-			// unless keyword uses wildcards look for an exact match
-			if (!useUserWildcards)
-			{
-				comparisonOperator = "=";
-			}
-			fieldName="d.year_of_birth " + comparisonOperator + " :year and d.month_of_birth " +
-					comparisonOperator + " :month and d.date_of_birth ";
-
-			String[] dateOfBirth = keyword.split("-");
-			String year = dateOfBirth.length > 0 ? dateOfBirth[0] : null;
-			String month = dateOfBirth.length > 1 ? dateOfBirth[1] : null;
-			String day = dateOfBirth.length > 2 ? dateOfBirth[2] : null;
-
-			params.put("year", year);
-			params.put("month", month);
-			keyword = day;
-
-		}
-		else if(mode == SEARCHMODE.ChartNo) {
-			fieldName="d.chart_no";
-		}
-		else if(mode == SEARCHMODE.Name) {
-		  	String[] lastfirst = splitPatientNames(keyword);
-		  	
-		  	keyword = lastfirst[0].trim();
-		  	fieldName="lower(d.last_name)";
-
-	        if (lastfirst.length > 1) {
-	        	params.put("extraKeyword", lastfirst[0].trim() + (useUserWildcards ? "" : "%"));
-				keyword = lastfirst[1].trim();
-	            fieldName += "like :extraKeyword and lower(d.first_name) ";
-	        }
-		}
-
-		if (useUserWildcards || exactMatchOnly ||
-				mode == SEARCHMODE.DemographicNo || mode == SEARCHMODE.DOB)
-		{
-			params.put("keyword", keyword);
-		} else if (mode == SEARCHMODE.Address || mode == SEARCHMODE.Phone)
-		{
-			params.put("keyword", "%" + keyword + "%");
-		} else
-		{
-			params.put("keyword", keyword + "%");
-		}
-
-		String patientStatusExpression="";
-
-		if (STATUSMODE.active.equals(searchRequest.getStatusMode()))
-		{
-			patientStatusExpression = " and d.patient_status not in (" + props.getProperty("inactive_statuses", "'IN','DE','IC', 'ID', 'MO', 'FI'") + ") ";
-		} else if (STATUSMODE.inactive.equals(searchRequest.getStatusMode()))
-		{
-			patientStatusExpression = " and d.patient_status in (" + props.getProperty("inactive_statuses", "'IN','DE','IC', 'ID', 'MO', 'FI'") + ") ";
-		}
-
-		String domainRestriction="";
-		if(!searchRequest.isOutOfDomain()) {
-		  domainRestriction = " and d.demographic_no in ( select distinct a.client_id from program_provider pp,admission a WHERE pp.program_id=a.program_id AND pp.provider_no=:providerNo ) ";
-		  params.put("providerNo", loggedInInfo.getLoggedInProviderNo());
-		}
-
-		String orderBy = " ORDER BY ";
-		String orderDir = (searchRequest.getSortDir() == null) ? "asc" : searchRequest.getSortDir().toString();
-
-		switch (searchRequest.getSortMode())
-		{
-			case Address:
-				orderBy += "d.address" + orderDir;
-				break;
-			case ChartNo:
-				orderBy += "d.chart_no " + orderDir;
-				break;
-			case DemographicNo:
-				orderBy += "d.demographic_no " + orderDir;
-				break;
-			case DOB:
-				orderBy += "year_of_birth " + orderDir + ",month_of_birth " + orderDir + ",date_of_birth " + orderDir;
-				break;
-			case Phone:
-				orderBy += "d.phone " + orderDir;
-				break;
-			case ProviderName:
-				orderBy += "p.last_name " + orderDir + ",p.first_name " + orderDir;
-				break;
-			case PatientStatus:
-				orderBy += "d.patient_status " + orderDir;
-				break;
-			case RosterStatus:
-				orderBy += "d.roster_status " + orderDir;
-				break;
-			case Sex:
-				orderBy += "d.sex " + orderDir;
-				break;
-			case HIN:
-				orderBy += "d.hin " + orderDir;
-				break;
-			case Name:
-			default:
-				orderBy += "d.last_name " + orderDir + ",d.first_name " + orderDir;
-				break;
-		}
-
-		return "select " + select + " " +
-				"from demographic d " +
-				"left join provider p on d.provider_no = p.provider_no " +
-				"left join demographic_merged dm on (d.demographic_no = dm.demographic_no AND dm.deleted = '0') " +
-				"where dm.id IS NULL AND " + fieldName + " " + comparisonOperator + " :keyword " +
-				patientStatusExpression + domainRestriction + orderBy;
 	}
 
 	public List<Demographic> getDemographics(List<Integer> demographicIds) {

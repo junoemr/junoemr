@@ -278,8 +278,22 @@ public class BillingDao extends AbstractDao<Billing> {
 	            "','" + MSPReconcile.SETTLED + "')";
 	      }
 	    }
-	    else {
-	      statusTypeClause += " like '" + statusType + "'";
+	    else
+		{
+	    	String[] statusTypes = new String[0];
+	    	if(statusType != null)
+			{
+				statusTypes = statusType.split(",");
+			}
+
+	    	if (statusTypes.length > 1)
+			{
+				statusTypeClause += " in ('" + String.join("','", statusTypes) + "')";
+			}
+	    	else
+			{
+				statusTypeClause += " like '" + statusType + "'";
+			}
 	    }
 	    //
 	    String p = " select b.billing_no, b.demographic_no, b.demographic_name, b.update_date, b.billingtype,"
@@ -297,7 +311,7 @@ public class BillingDao extends AbstractDao<Billing> {
 	        + demoQuery
 	        + billingType
 	        + " order by b.billing_date desc";
-	    
+
 	    Query query = entityManager.createNativeQuery(p);
 		return query.getResultList();
 	}
@@ -313,7 +327,7 @@ public class BillingDao extends AbstractDao<Billing> {
 
 	public List<Object[]> findOutstandingBills(Integer demographicNo, String billingType, List<String> statuses) {
 		String q = "FROM Billingmaster bm, Billing b " +
-				"WHERE bm.billingmasterNo = b.id " +
+				"WHERE bm.billingNo = b.id " +
 				"AND b.demographicNo = :dNo " +
 				(statuses.isEmpty() ? "" : "AND bm.billingstatus NOT IN ( :statuses ) ") +
 				"AND b.billingtype = :bType";

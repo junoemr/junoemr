@@ -1,27 +1,11 @@
 /**
- * Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
- * This software is published under the GPL GNU General Public License.
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * Copyright (c) 2008-2012 Indivica Inc.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- *
- * This software was written for the
- * Department of Family Medicine
- * McMaster University
- * Hamilton
- * Ontario, Canada
+ * This software is made available under the terms of the
+ * GNU General Public License, Version 2, 1991 (GPLv2).
+ * License details are available via "indivica.ca/gplv2"
+ * and "gnu.org/licenses/gpl-2.0.html".
  */
-
 
 /*
  * EctConsultationFormRequestPrintAction.java
@@ -32,57 +16,119 @@
 package oscar.oscarEncounter.oscarConsultationRequest.pageUtil;
 
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.lowagie.text.DocumentException;
+import com.sun.xml.messaging.saaj.util.ByteOutputStream;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tika.io.IOUtils;
+import org.oscarehr.common.exception.HtmlToPdfConversionException;
+import org.oscarehr.consultations.service.ConsultationAttachmentService;
+import org.oscarehr.consultations.service.ConsultationPDFCreationService;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import oscar.dms.EDoc;
+import oscar.oscarLab.ca.on.LabResultData;
+import oscar.util.UtilDateUtilities;
 
-import com.lowagie.text.DocumentException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * Convert submitted preventions into pdf and return file
  */
-public class EctConsultationFormRequestPrintAction extends Action {
+public class EctConsultationFormRequestPrintAction extends Action
+{
+	private static final Logger logger = MiscUtils.getLogger();
+	private static final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private static final ConsultationPDFCreationService consultationPDFCreationService = SpringUtils.getBean(ConsultationPDFCreationService.class);
+	private static final ConsultationAttachmentService consultationAttachmentService = SpringUtils.getBean(ConsultationAttachmentService.class);
     
-    private static final Logger logger = MiscUtils.getLogger();
-    private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-    
-    public EctConsultationFormRequestPrintAction() {
+    public EctConsultationFormRequestPrintAction()
+    {
     }
     
     @Override
-    public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response){
+    public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response)
+    {
     	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-    	
-    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_con", "r", null)) {
-			throw new SecurityException("missing required security object (_con)");
+
+	    String demographicNoStr = request.getParameter("demographicNo");
+	    Integer demographicNo = Integer.parseInt(demographicNoStr);
+	    String requestIdStr = (String) request.getAttribute("reqId");
+	    if(request.getParameter("reqId") != null)
+	    {
+		    requestIdStr = request.getParameter("reqId");
+	    }
+	    Integer requestId = Integer.parseInt(requestIdStr);
+
+	    securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.READ, demographicNo, "_con");
+
+		String error = "";
+		Exception exception = null;
+	    List<InputStream> streamList = new ArrayList<>();
+
+	    try
+		{
+			List<EDoc> attachedDocuments = consultationAttachmentService.getAttachedDocuments(loggedInInfo, demographicNo, requestId);
+			List<LabResultData> attachedLabs = consultationAttachmentService.getAttachedLabs(loggedInInfo, demographicNo, requestId);
+			List<EFormData> attachedEForms = consultationAttachmentService.getAttachedEForms(demographicNo, requestId);
+
+			streamList.add(consultationPDFCreationService.getConsultationRequestAsStream(request, loggedInInfo));
+			streamList.addAll(consultationPDFCreationService.toEDocInputStreams(request, attachedDocuments));
+			streamList.addAll(consultationPDFCreationService.toLabInputStreams(request, attachedLabs));
+			streamList.addAll(consultationPDFCreationService.toEFormInputStreams(request, attachedEForms));
+
+			ByteOutputStream bos = new ByteOutputStream();
+			consultationPDFCreationService.combineStreams(streamList, bos);
+
+			response.setContentType("application/pdf"); // octet-stream
+			response.setHeader(
+					"Content-Disposition",
+					"inline; filename=\"combinedPDF-"
+							+ UtilDateUtilities.getToday("yyyy-mm-dd.hh.mm.ss")
+							+ ".pdf\"");
+			response.getOutputStream().write(bos.getBytes(), 0, bos.getCount());
 		}
-    	
-        try {
-            EctConsultationFormRequestPrintPdf pdf = new EctConsultationFormRequestPrintPdf(request, response);
-            pdf.printPdf(loggedInInfo);
-        }catch(DocumentException de) {
-            logger.error("DocumentException occured insided EctConsultationFormRequestPrintAction", de);
-            request.setAttribute("printError", new Boolean(true));
-            return mapping.findForward("error");
-        }catch(IOException ioe) {
-            logger.error("IOException occured insided EctConsultationFormRequestPrintAction", ioe);
-            request.setAttribute("printError", new Boolean(true));
-            return mapping.findForward("error");
-        }
-        
-        return null;
-        
+		catch(HtmlToPdfConversionException ce)
+		{
+			error = "HtmlToPdfConversionException";
+			exception = ce;
+		}
+		catch(DocumentException de)
+		{
+			error = "DocumentException";
+			exception = de;
+		}
+		catch(IOException ioe)
+		{
+			error = "IOException";
+			exception = ioe;
+		}
+		finally
+		{
+			// Cleaning up InputStreams created for concatenation.
+			for (InputStream is : streamList)
+			{
+				IOUtils.closeQuietly(is);
+			}
+		}
+	    if(!error.isEmpty())
+	    {
+		    logger.error(error + " occurred inside ConsultationPrintAction", exception);
+		    request.setAttribute("printError", true);
+		    return mapping.findForward("error");
+	    }
+	    return null;
     }
 }

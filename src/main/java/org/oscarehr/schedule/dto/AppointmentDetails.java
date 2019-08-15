@@ -46,6 +46,7 @@ public class AppointmentDetails
 	private String urgency;
 	private String statusTitle;
 	private String color;
+	private String junoColor;
 	private String iconImage;
 	private Integer shortLetterColour;
 	private String shortLetters;
@@ -54,6 +55,7 @@ public class AppointmentDetails
 	private String ver;
 	private String hin;
 	private String chart_no;
+	private String familyDoctor;
 	private String rosterStatus;
 	private LocalDate hcRenewDate;
 	private String custNotes;
@@ -62,6 +64,7 @@ public class AppointmentDetails
 	private LocalDate birthday;
 	private boolean hasTicklers;
 	private String ticklerMessages;
+	private boolean isVirtual;
 
 	public AppointmentDetails(
 		Integer appointmentNo,
@@ -82,6 +85,7 @@ public class AppointmentDetails
 		String urgency,
 		String statusTitle,
 		String color,
+		String junoColor,
 		String iconImage,
 		Integer shortLetterColour,
 		String shortLetters,
@@ -90,6 +94,7 @@ public class AppointmentDetails
 		String ver,
 		String hin,
 		String chart_no,
+		String familyDoctor,
 		String rosterStatus,
 		LocalDate hcRenewDate,
 		String custNotes,
@@ -97,7 +102,8 @@ public class AppointmentDetails
 		String colorProperty,
 		LocalDate birthday,
 		boolean hasTicklers,
-		String ticklerMessages
+		String ticklerMessages,
+		boolean isVirtual
 	)
 	{
 		this.appointmentNo = appointmentNo;
@@ -118,6 +124,7 @@ public class AppointmentDetails
 		this.urgency = urgency;
 		this.statusTitle = statusTitle;
 		this.color = color;
+		this.junoColor = junoColor;
 		this.iconImage = iconImage;
 		this.shortLetters = shortLetters;
 		this.shortLetterColour = shortLetterColour;
@@ -126,6 +133,7 @@ public class AppointmentDetails
 		this.ver = ver;
 		this.hin = hin;
 		this.chart_no = chart_no;
+		this.familyDoctor = familyDoctor;
 		this.rosterStatus = rosterStatus;
 		this.hcRenewDate = hcRenewDate;
 		this.custNotes = custNotes;
@@ -134,6 +142,7 @@ public class AppointmentDetails
 		this.birthday = birthday;
 		this.hasTicklers = hasTicklers;
 		this.ticklerMessages = ticklerMessages;
+		this.isVirtual = isVirtual;
 	}
 
 	public Integer getAppointmentNo()
@@ -226,6 +235,16 @@ public class AppointmentDetails
 		return color;
 	}
 
+	public String getJunoColor()
+	{
+		return junoColor;
+	}
+
+	public void setJunoColor(String junoColor)
+	{
+		this.junoColor = junoColor;
+	}
+
 	public String getIconImage()
 	{
 		return iconImage;
@@ -290,6 +309,10 @@ public class AppointmentDetails
 	{
 		return hasTicklers;
 	}
+	public boolean isVirtual()
+	{
+		return isVirtual;
+	}
 
 	public String getTicklerMessages()
 	{
@@ -304,5 +327,10 @@ public class AppointmentDetails
 	public String getChart_no()
 	{
 		return chart_no;
+	}
+
+	public String getFamilyDoctor()
+	{
+		return familyDoctor;
 	}
 }

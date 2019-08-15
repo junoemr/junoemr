@@ -34,27 +34,29 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 public class PDFFile extends GenericFile
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final Set<String> allowedErrors = new HashSet<>();
 	private static final Pattern[] allowedWarningsGS = new Pattern[2];
+	private static final Pattern[] disallowedOutputGS = new Pattern[1];
 
 	static
 	{
 		allowedWarningsGS[0] = Pattern.compile(".*Missing glyph .* in the font .*", Pattern.CASE_INSENSITIVE);
 		allowedWarningsGS[1] = Pattern.compile(".*Failed to interpret TT instructions in font.*", Pattern.CASE_INSENSITIVE);
+
+		disallowedOutputGS[0] = Pattern.compile(".*Error reading a content stream\\. The page may be incomplete.*", Pattern.CASE_INSENSITIVE);
 	}
 
 	private OscarProperties oscarProperties = OscarProperties.getInstance();
 	private long maxMemoryUsage = oscarProperties.getPDFMaxMemUsage();
 
-	public PDFFile(File file) throws IOException
+	public PDFFile(File file)
 	{
 		super(file);
 	}
@@ -68,18 +70,18 @@ public class PDFFile extends GenericFile
 		}
 		return false;
 	}
-
-	@Override
-	public boolean validate() throws IOException, InterruptedException
+	private boolean isDisallowedOutput(String line)
 	{
-		this.isValid = pdfinfoValidation(javaFile);
-		if(!this.isValid)
+		for (Pattern pattern : disallowedOutputGS)
 		{
-			logger.error("Pdf Encoding Error: " + getReasonInvalid());
+			if (pattern.matcher(line).matches())
+			{
+				return true;
+			}
 		}
-		this.hasBeenValidated = true;
-		return this.isValid;
+		return false;
 	}
+
 	@Override
 	public void process() throws IOException, InterruptedException
 	{
@@ -97,9 +99,12 @@ public class PDFFile extends GenericFile
 
 		try
 		{
-			PDDocument document = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
-			numOfPage = document.getNumberOfPages();
-			document.close();
+			if(isValid)
+			{
+				PDDocument document = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+				numOfPage = document.getNumberOfPages();
+				document.close();
+			}
 		}
 		catch(InvalidPasswordException e)
 		{
@@ -109,46 +114,21 @@ public class PDFFile extends GenericFile
 		return numOfPage;
 	}
 
-	private boolean pdfinfoValidation(File file) throws IOException,InterruptedException
+	@Override
+	public String getContentType() throws IOException
 	{
-		logger.info("BEGIN PDF VALIDATION");
-		boolean isValid = true;
-		boolean isEncrypted = false;
-
-		String pdfInfo = props.getProperty("document.pdfinfo_path", "/usr/bin/pdfinfo");
-
-		String[] command = {pdfInfo, file.getPath()};
-		Process process = Runtime.getRuntime().exec(command);
-
-		BufferedReader in = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-		String line;
-
-		while((line = in.readLine()) != null)
+		String contentType;
+		if(isValid)
 		{
-			logger.warn("validator error line: " + line);
-			// if error is allowed and flag not already set to fail
-			isValid = (isValid && allowedErrors.contains(line.toLowerCase()));
-			isEncrypted = (line.toLowerCase().equals("command line error: incorrect password"));
-			this.reasonInvalid = (this.reasonInvalid == null)? line : this.reasonInvalid + ", " + line;
+			contentType = GenericFile.getContentType(javaFile);
 		}
-		process.waitFor();
-		in.close();
-
-		int exitValue = process.exitValue();
-		if (exitValue != 0)
+		else
 		{
-			if (isEncrypted)
-			{
-				isValid = true;
-			} else
-			{
-				isValid = false;
-			}
+			contentType = getInvalidContentType();
 		}
-
-		logger.info("Passed PDF Validation: " + isValid);
-		return isValid;
+		return contentType;
 	}
+
 
 	private File ghostscriptReEncode() throws IOException,InterruptedException
 	{
@@ -187,13 +167,28 @@ public class PDFFile extends GenericFile
 		String line;
 		String reasonInvalid = null;
 		String warnings = null;
+		LocalDateTime conversionStartTime = LocalDateTime.now();
+		boolean isTimeout = false;
+
 		while((line = stdout.readLine()) != null)
 		{
 			logger.warn("gs stdout: " + line);
 			warnings = (warnings == null)? line : warnings + ", " + line;
+
+			if(isDisallowedOutput(line))
+			{
+				reasonInvalid = (reasonInvalid == null)? line : reasonInvalid + ", " + line;
+			}
+
+			if (LocalDateTime.now().isAfter(conversionStartTime.plus(60, ChronoUnit.SECONDS)))
+			{
+				isTimeout = true;
+				break;
+			}
 		}
 
-		while((line = stderr.readLine()) != null)
+		// skip if timeout. because, reading stderr (can) block forever if we are in timeout
+		while(!isTimeout && (line = stderr.readLine()) != null)
 		{
 			logger.warn("gs stderr: " + line);
 
@@ -201,12 +196,30 @@ public class PDFFile extends GenericFile
 				continue;
 
 			reasonInvalid = (reasonInvalid == null)? line : reasonInvalid + ", " + line;
+
+			if (LocalDateTime.now().isAfter(conversionStartTime.plus(60, ChronoUnit.SECONDS)))
+			{
+				isTimeout = true;
+				break;
+			}
 		}
-		process.waitFor();
+
+		int exitValue = 0;
+		if (isTimeout)
+		{
+			process.destroyForcibly();
+			reasonInvalid = "Conversion Timed out";
+			exitValue = 124; // timeout
+		}
+		else
+		{
+			process.waitFor();
+			exitValue = process.exitValue();
+		}
+
 		stdout.close();
 		stderr.close();
 
-		int exitValue = process.exitValue();
 		if(exitValue == 0 && reasonInvalid == null && warnings != null)
 		{
 			// append the original file location to the log if there is unexpected output
@@ -218,30 +231,29 @@ public class PDFFile extends GenericFile
 
 		if(exitValue != 0 || reasonInvalid != null)
 		{
+			logger.warn("PDF failed to re-encode. Original used and flagged as invalid: " + javaFile.getName());
+			logger.warn("---------------------------------------------");
+
+			this.isValid = false;
+			this.reasonInvalid = "Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue;
+			this.moveFile(currentDir);
+			newPdf = javaFile;
+		}
+		else
+		{
+			// attempt to load the new pdf to ensure it is readable
 			try
 			{
-				PDDocument document = PDDocument.load(javaFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+				PDDocument document = PDDocument.load(newPdf, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
 				document.close();
-			} catch(InvalidPasswordException e)
-			{
-				logger.warn("Encrypted PDF. Cannot re-encode");
-				this.moveFile(currentDir);
-				newPdf = javaFile;
-				return newPdf;
+				this.isValid = true;
 			}
-
-			this.moveToCorrupt();
-			throw new RuntimeException("Ghost-script Error: " + reasonInvalid + ". ExitValue: " + exitValue);
+			catch(Exception e)
+			{
+				throw new RuntimeException("Failed to load re-encoded PDF: ", e);
+			}
 		}
-
-		try
-		{
-			PDDocument document = PDDocument.load(newPdf, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
-			document.close();
-		} catch(Exception e)
-		{
-			throw new RuntimeException("Failed to load re-encoded PDF: ", e);
-		}
+		this.hasBeenValidated = true;
 
 		logger.info("END PDF RE-ENCODING");
 		return newPdf;

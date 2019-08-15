@@ -627,8 +627,16 @@ public abstract class MessageHandler {
      */
     public String getOBXResult(int i, int j)
     {
-	    return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-5"));
+        return getOBXResult(i, j, 1);
     }
+
+	/**
+	 *  Return the result from the jth OBX segment at the kth component of the ith OBR group
+	 */
+	public String getOBXResult(int i, int j, int k)
+	{
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBSERVATION("+j+")/OBX-5-"+k));
+	}
 
 	/**
 	 *  Return the units from the jth OBX segment of the ith OBR group

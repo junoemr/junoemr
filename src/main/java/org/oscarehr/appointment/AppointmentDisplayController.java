@@ -34,6 +34,7 @@ import org.oscarehr.common.model.ProviderPreference;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.oscarehr.web.admin.ProviderPreferencesUIBean;
 import oscar.OscarProperties;
 import oscar.SxmlMisc;
 import oscar.util.UtilMisc;
@@ -172,6 +173,11 @@ public class AppointmentDisplayController
 	{
 		return Appointment.BookingSource.MYOSCAR_SELF_BOOKING.toString().equals(
 			appointment.getBookingSource());
+	}
+
+	public boolean isVirtual()
+	{
+		return appointment.isVirtual();
 	}
 
 	public boolean isMultisitesEnabled()
@@ -464,7 +470,8 @@ public class AppointmentDisplayController
 				"&apptProvider_no=" + scheduleProviderNo +
 				"&appointment_date=" + appointment.getDate().format(dateFormatter) +
 				"&start_time=" + appointment.getStartTime().format(timeFormatterWithSeconds) +
-				"&bNewForm=1" + referralNoParameter;
+				"&bNewForm=1" + referralNoParameter +
+				"&appointment_site=" + appointment.getLocation();
 		}
 		catch(UnsupportedEncodingException e)
 		{
@@ -540,13 +547,19 @@ public class AppointmentDisplayController
 	{
 		String out_string = "";
 
-		String reasonCodeName = getReasonCodeName();
-		if(!"".equals(reasonCodeName))
+		ProviderPreference prefs = ProviderPreferencesUIBean.getProviderPreference(this.sessionProviderNo);
+		// Not all providers will have a ProviderPreference, or an AppointmentReasonDisplayLevel until they save one to their profile.
+		// So we will consider nulls for each to be equivalent to the default value.
+		if (prefs == null || prefs.getAppointmentReasonDisplayLevel() == null || prefs.getAppointmentReasonDisplayLevel() == ProviderPreference.AppointmentReasonDisplayLevel.DEFAULT_ALL)
 		{
-			out_string = "&nbsp;" + reasonCodeName + " -";
+			String reasonCodeName = getReasonCodeName();
+			if (!"".equals(reasonCodeName))
+			{
+				out_string = "&nbsp;" + reasonCodeName + " -";
+			}
 		}
 
-		if(appointment.getReason() != null)
+		if (appointment.getReason() != null)
 		{
 			out_string += "&nbsp;" + StringEscapeUtils.escapeHtml(appointment.getReason());
 		}

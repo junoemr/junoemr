@@ -51,7 +51,6 @@ rx_fax_enabled=false
 consultation_fax_enabled=false
 eform_fax_enabled=false
 eform_generator_indivica_fax_enabled=false
-consultation_dynamic_labelling_enabled=false
 rx_enhance=true
 rx_signature_enabled=true
 consultation_signature_enabled=true
@@ -302,7 +301,6 @@ if [ "${triumvirate}" = "true" ] ; then
 	faxEnable=yes
 	consultation_fax_enabled=true
 	consultation_signature_enabled=true
-	consultation_dynamic_labelling_enabled=true
 	consultation_indivica_attachment_enabled=true
 
 	# Rx: fax functionality For rx requires flags: 

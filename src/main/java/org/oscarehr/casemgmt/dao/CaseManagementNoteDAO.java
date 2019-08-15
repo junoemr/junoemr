@@ -419,7 +419,10 @@ public class CaseManagementNoteDAO extends HibernateDaoSupport {
 			note.setUuid(uuid.toString());
 		}
 		note.setUpdate_date(new Date());
-		this.getHibernateTemplate().save(note);
+
+		// actually an insert. done this way to prevent Hibernate session error
+		note.setId(null);
+		this.getHibernateTemplate().merge(note);
 	}
 
 	public Object saveAndReturn(CaseManagementNote note) {

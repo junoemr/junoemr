@@ -25,7 +25,6 @@
 
 package org.oscarehr.document.web;
 
-import com.lowagie.text.pdf.PdfReader;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 import net.sf.json.JSONObject;
@@ -35,8 +34,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.jpedal.PdfDecoder;
-import org.jpedal.fonts.FontMappings;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
 import org.oscarehr.PMmodule.model.ProgramProvider;
@@ -79,8 +76,6 @@ import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.UtilDateUtilities;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -91,17 +86,16 @@ import java.awt.image.RenderedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -210,58 +204,66 @@ public class ManageDocumentAction extends DispatchAction {
 	}
 
 	public ActionForward removeLinkFromDocument(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
+	                                            HttpServletRequest request, HttpServletResponse response)
 	{
 		String docType = request.getParameter("docType");
 		String docId = request.getParameter("docId");
 		String providerNo = request.getParameter("providerNo");
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
-        	throw new SecurityException("missing required security object (_edoc)");
-        }
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		String logStatus = LogConst.STATUS_FAILURE;
+
+		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
 
 		try
 		{
 			try
 			{
 				providerInboxRoutingDAO.removeLinkFromDocument(Integer.parseInt(docId), providerNo);
+				logStatus = LogConst.STATUS_SUCCESS;
 			}
-			catch (SQLException e)
+			catch(SQLException e)
 			{
 				MiscUtils.getLogger().error("Failed to remove link from document.", e);
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to remove link from document.");
 			}
-			HashMap<String, List> hm = new HashMap<String, List>();
+			HashMap<String, List> hm = new HashMap<>();
 			hm.put("linkedProviders", providerInboxRoutingDAO.getProvidersWithRoutingForDocument(docType, Integer.parseInt(docId)));
 
 			JSONObject jsonObject = JSONObject.fromObject(hm);
 			response.getOutputStream().write(jsonObject.toString().getBytes());
 		}
-		catch (IOException e)
+		catch(IOException e)
 		{
 			MiscUtils.getLogger().error("Error writing response.", e);
 		}
+		LogAction.addLogEntry(loggedInProviderNo, null,
+				LogConst.ACTION_UNLINK, LogConst.CON_DOCUMENT, logStatus, docId, request.getRemoteAddr(), providerNo);
 
 		return null;
-	}	
-        public ActionForward refileDocumentAjax(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-	
+	}
+
+	public ActionForward refileDocumentAjax(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+
 		String documentId = request.getParameter("documentId");
 		String queueId = request.getParameter("queueId");
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "w", null)) {
-        	throw new SecurityException("missing required security object (_edoc)");
-                }
-                
-                try {
-                    EDocUtil.refileDocument(documentId,queueId);
-                } catch (Exception e) {
-                    MiscUtils.getLogger().error("Error", e);
-                }
-                return null;
-        }
+		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
 
-	private String getDemoName(LoggedInInfo loggedInInfo, String demog) {
+		try
+		{
+			EDocUtil.refileDocument(documentId, queueId);
+		}
+		catch(Exception e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+		}
+		return null;
+	}
+
+	private String getDemoName(LoggedInInfo loggedInInfo, String demog)
+	{
 		DemographicData demoD = new DemographicData();
 		org.oscarehr.common.model.Demographic demo = demoD.getDemographic(loggedInInfo, demog);
 		String demoName = demo.getLastName() + ", " + demo.getFirstName();
@@ -337,174 +339,156 @@ public class ManageDocumentAction extends DispatchAction {
 		return cacheDir;
 	}
 
-	private File hasCacheVersion2(Document d, Integer pageNum) {
-		File documentCacheDir = getDocumentCacheDir(oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR"));
-		File outfile = new File(documentCacheDir, d.getDocfilename() + "_" + pageNum + ".png");
-		if (!outfile.exists()) {
+	private File hasCacheVersion2(Document d, Integer pageNum)
+	{
+		File outfile = new File(GenericFile.DOCUMENT_BASE_DIR, d.getDocfilename() + "_" + pageNum + ".png");
+		if(!outfile.exists())
+		{
 			outfile = null;
 		}
 		return outfile;
 	}
 
-	public static void deleteCacheVersion(Document d, int pageNum) {
-		File documentCacheDir = getDocumentCacheDir(oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR"));
-		//pageNum=pageNum-1;
-		File outfile = new File(documentCacheDir,d.getDocfilename()+"_"+pageNum+".png");
-		if (outfile.exists()){
+	public static void deleteCacheVersion(Document d, int pageNum)
+	{
+		File outfile = new File(GenericFile.DOCUMENT_BASE_DIR, d.getDocfilename() + "_" + pageNum + ".png");
+		if(outfile.exists())
+		{
 			outfile.delete();
 		}
 	}
 
-	private File hasCacheVersion(Document d, int pageNum){
-		File documentCacheDir = getDocumentCacheDir(oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR"));
-		//pageNum= pageNum-1;
-		File outfile = new File(documentCacheDir,d.getDocfilename()+"_"+pageNum+".png");
-		if (!outfile.exists()){
+	private File hasCacheVersion(Document d, int pageNum)
+	{
+		File outfile = new File(GenericFile.DOCUMENT_BASE_DIR, d.getDocfilename() + "_" + pageNum + ".png");
+		if(!outfile.exists())
+		{
 			outfile = null;
 		}
 		return outfile;
 	}
 
-	public File createCacheVersion2(Document d, Integer pageNum) {
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		File documentDir = new File(docdownload);
-		File documentCacheDir = getDocumentCacheDir(docdownload);
-		logger.debug("Document Dir is a dir" + documentDir.isDirectory());
-		File file = new File(documentDir, d.getDocfilename());
-		PdfDecoder decode_pdf  = new PdfDecoder(true);
-		File ofile = null;
-		try {
-
-			FontMappings.setFontReplacements();
-
-			decode_pdf.useHiResScreenDisplay(true);
-
-			decode_pdf.setExtractionMode(0, 96, 96/72f);
-
-			FileInputStream is = new FileInputStream(file);
-
-			decode_pdf.openPdfFileFromInputStream(is, false);
-
-			BufferedImage image_to_save = decode_pdf.getPageAsImage(pageNum);
-
-
-
-			decode_pdf.getObjectStore().saveStoredImage( documentCacheDir.getCanonicalPath() + "/" + d.getDocfilename() + "_" + pageNum + ".png", image_to_save, true, false, "png");
-
-			decode_pdf.flushObjectValues(true);
-
-			decode_pdf.closePdfFile();
-
-			ofile = new File(documentCacheDir, d.getDocfilename() + "_" + pageNum + ".png");
-
-			if(OscarProperties.getInstance().isPropertyActive("INVERT_DARK_DOCUMENT_PREVIEWS")) {
-				correctImageFileColors(ofile);
+	public File createCacheVersion2(Document document, Integer pageNum)
+	{
+		File returnFile = null;
+		try
+		{
+			if(document.hasEncodingError())
+			{
+				returnFile = generatePdfPreviewUnavailableImage();
 			}
+			else
+			{
+				String docdownload = GenericFile.DOCUMENT_BASE_DIR;
+				File documentCacheDir = getDocumentCacheDir(docdownload);
 
-		}catch(Exception e) {
-			logger.error("Error decoding pdf file " + d.getDocfilename(), e);
-			decode_pdf.closePdfFile();
+				Path filePath = Paths.get(docdownload).resolve(document.getDocfilename());
+
+				returnFile = generatePdfPageImage(filePath.toString(),
+						Paths.get(documentCacheDir.getCanonicalPath()).resolve(document.getDocfilename() + "_" + pageNum + ".png").toString(), pageNum);
+			}
 		}
-
-		return ofile;
-
-		/*
-
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		File documentDir = new File(docdownload);
-		File documentCacheDir = getDocumentCacheDir(docdownload);
-		log.debug("Document Dir is a dir" + documentDir.isDirectory());
-
-		File file = new File(documentDir, d.getDocfilename());
-
-		RandomAccessFile raf = new RandomAccessFile(file, "r");
-		FileChannel channel = raf.getChannel();
-		ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-		PDFFile pdffile = new PDFFile(buf);
-		if(raf != null) raf.close();
-		if(channel != null) channel.close();
-		// long readfile = System.currentTimeMillis() - start;
-		// draw the first page to an image
-		PDFPage ppage = pdffile.getPage(pageNum);
-
-		log.debug("WIDTH " + (int) ppage.getBBox().getWidth() + " height " + (int) ppage.getBBox().getHeight());
-
-		// get the width and height for the doc at the default zoom
-		Rectangle rect = new Rectangle(0, 0, (int) ppage.getBBox().getWidth(), (int) ppage.getBBox().getHeight());
-
-		log.debug("generate the image");
-		Image img = ppage.getImage(rect.width, rect.height, // width & height
-		        rect, // clip rect
-		        null, // null for the ImageObserver
-		        true, // fill background with white
-		        true // block until drawing is done
-		        );
-
-		log.debug("about to Print to stream");
-		File outfile = new File(documentCacheDir, d.getDocfilename() + "_" + pageNum + ".png");
-
-		OutputStream outs = null;
-		try {
-			outs = new FileOutputStream(outfile);
-
-			RenderedImage rendImage = (RenderedImage) img;
-			ImageIO.write(rendImage, "png", outs);
-			outs.flush();
-		} finally {
-			if (outs != null) outs.close();
+		catch (IOException ioE)
+		{
+			MiscUtils.getLogger().error("IO Exception when resolving cache dir path: " + ioE.getMessage());
 		}
-		return outfile;
-*/
+		return returnFile;
 	}
 
-	public File createCacheVersion(Document d) throws Exception {
+	public File generatePdfPageImage(String inputPdfPath, String outputFilePath, Integer pageNum)
+	{
+		try
+		{
+			String gs = OscarProperties.getInstance().getProperty("document.ghostscript_path", "/usr/bin/gs");
+			String[] gsCmd = {gs, "-sDEVICE=png16m", "-dDownScaleFactor=4","-dFirstPage=" + pageNum, "-dLastPage=" + pageNum, "-o", outputFilePath, "-r384", inputPdfPath};
+			Process gsProc = Runtime.getRuntime().exec(gsCmd);
+			gsProc.waitFor();
 
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		File documentDir = new File(docdownload);
-		File documentCacheDir = getDocumentCacheDir(docdownload);
-		logger.debug("Document Dir is a dir" + documentDir.isDirectory());
+			if (gsProc.exitValue() != 0)
+			{
+				throw new RuntimeException("GhostScript exited with value [" + gsProc.exitValue() +"] expecting 0.");
+			}
 
-		File file = new File(documentDir, d.getDocfilename());
-
-		RandomAccessFile raf = new RandomAccessFile(file, "r");
-		FileChannel channel = raf.getChannel();
-		ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-		PDFFile pdffile = new PDFFile(buf);
-		if(raf != null) raf.close();
-		if(channel != null) channel.close();
-		// long readfile = System.currentTimeMillis() - start;
-		// draw the first page to an image
-		PDFPage ppage = pdffile.getPage(0);
-
-		logger.debug("WIDTH " + (int) ppage.getBBox().getWidth() + " height " + (int) ppage.getBBox().getHeight());
-
-		// get the width and height for the doc at the default zoom
-		Rectangle rect = new Rectangle(0, 0, (int) ppage.getBBox().getWidth(), (int) ppage.getBBox().getHeight());
-
-		logger.debug("generate the image");
-		Image img = ppage.getImage(rect.width, rect.height, // width & height
-		        rect, // clip rect
-		        null, // null for the ImageObserver
-		        true, // fill background with white
-		        true // block until drawing is done
-		        );
-
-		logger.debug("about to Print to stream");
-		File outfile = new File(documentCacheDir, d.getDocfilename() + ".png");
-
-		OutputStream outs = null;
-		try {
-			outs = new FileOutputStream(outfile);
-
-			RenderedImage rendImage = (RenderedImage) img;
-			ImageIO.write(rendImage, "png", outs);
-			outs.flush();
-		} finally {
-			if (outs != null) outs.close();
+			return new File(outputFilePath);
 		}
+		catch (Exception e)
+		{
+			MiscUtils.getLogger().warn("failed to convert page [" + pageNum + "] of pdf ["+ inputPdfPath +"] to png! with error: " + e.getMessage());
+			return generatePdfPreviewErrorImage();
+		}
+	}
 
-		return outfile;
+	private File generatePdfPreviewUnavailableImage()
+	{
+		final String errorHeader = "Preview Unavailable";
+		final String subHeader = "Preview generation for this document type is not supported";
+		return generatePdfDefaultPreviewImage(errorHeader, subHeader);
+	}
 
+	private File generatePdfPreviewErrorImage()
+	{
+		final String errorHeader = "Error generating PDF Preview";
+		final String subHeader = "Please contact Juno support.";
+		return generatePdfDefaultPreviewImage(errorHeader, subHeader);
+	}
+
+	private File generatePdfDefaultPreviewImage(final String headerText, final String subHeader)
+	{
+		final Integer errorImgWidth = 600;
+		final Integer errorImgHeight= 800;
+		final String  junoLogoPath = "/opt/oscarhost/oscarhost_maintenance/img/logo_juno_green.png";
+
+		try
+		{
+			File outFile = File.createTempFile("oscarError", ".png");
+			BufferedImage buffImg = new BufferedImage(errorImgWidth, errorImgHeight, BufferedImage.TYPE_INT_RGB);
+			Graphics2D g2d = buffImg.createGraphics();
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+			Font headerFont = new Font("Arial", Font.BOLD, 20);
+			FontMetrics headerFontMetric = g2d.getFontMetrics(headerFont);
+
+			Font bodyFont = new Font("Arial", Font.PLAIN, 12);
+			FontMetrics bodyFontMetric = g2d.getFontMetrics(bodyFont);
+
+			//draw image
+
+			//fill bg
+			g2d.setColor(Color.white);
+			g2d.fillRect(0, 0, errorImgWidth, errorImgHeight);
+
+			//error header
+			g2d.setFont(headerFont);
+			g2d.setColor(Color.darkGray);
+			int headerXInset = errorImgWidth/2 - headerFontMetric.stringWidth(headerText)/2;
+			g2d.drawString(headerText, headerXInset, 150);
+
+			//logo
+			try
+			{
+				Image junoLogo = ImageIO.read(new File(junoLogoPath));
+				g2d.drawImage(junoLogo,errorImgWidth/2 - ((BufferedImage) junoLogo).getWidth()/2 - 10, 10, Color.white, null);
+			}
+			catch (IOException ioE)
+			{
+				MiscUtils.getLogger().warn("could not open logo file with error: " + ioE.getMessage());
+			}
+
+			// main error msg
+			g2d.setFont(bodyFont);
+			g2d.setColor(Color.gray);
+			g2d.drawString(subHeader, headerXInset, 170);
+
+			g2d.dispose();
+			ImageIO.write(buffImg, "png", outFile);
+			return outFile;
+		}
+		catch (Exception e)
+		{
+			MiscUtils.getLogger().error("failed to generate error image! with error: " + e.getMessage());
+		}
+		return null;
 	}
 
 	public ActionForward showPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -522,7 +506,8 @@ public class ManageDocumentAction extends DispatchAction {
 			String doc_no = request.getParameter("doc_no");
 			logger.debug("Document No :" + doc_no);
 
-			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
+			LogAction.addLogEntry((String) request.getSession().getAttribute("user"),
+					LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
 
 			Document d = documentDao.getDocument(doc_no);
 			logger.debug("Document Name :" + d.getDocfilename());
@@ -565,61 +550,78 @@ public class ManageDocumentAction extends DispatchAction {
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "r", null)) {
         	throw new SecurityException("missing required security object (_edoc)");
         }
-		
+
 		logger.debug("in viewDocPage");
-		try {
+		try
+		{
 			String doc_no = request.getParameter("doc_no");
 			String pageNum = request.getParameter("curPage");
-			if (pageNum == null) {
+			if(pageNum == null)
+			{
 				pageNum = "0";
 			}
-			Integer pn = Integer.parseInt(pageNum);
+			Integer pageNumber = Integer.parseInt(pageNum);
 			logger.debug("Document No :" + doc_no);
-			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
+			LogAction.addLogEntry((String) request.getSession().getAttribute("user"),
+					LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
 
-			Document d = documentDao.getDocument(doc_no);
-			logger.debug("Document Name :" + d.getDocfilename());
-			String name = d.getDocfilename() + "_" + pn + ".png";
+			Document document = documentDao.getDocument(doc_no);
+			logger.debug("Document Name :" + document.getDocfilename());
+			String name = document.getDocfilename() + "_" + pageNumber + ".png";
 			logger.debug("name " + name);
 
-			File outfile = null;
-
-			outfile = hasCacheVersion2(d, pn);
-			if (outfile != null) {
+			File outfile = hasCacheVersion2(document, pageNumber);
+			if(outfile != null)
+			{
 				logger.debug("got doc from local cache   ");
-			} else {
-				outfile = createCacheVersion2(d, pn);
-				if (outfile != null) {
+			}
+			else
+			{
+				outfile = createCacheVersion2(document, pageNumber);
+				if(outfile != null)
+				{
 					logger.debug("create new doc  ");
 				}
 			}
 			response.setContentType("image/png");
 			ServletOutputStream outs = response.getOutputStream();
-			response.setHeader("Content-Disposition", "attachment;filename=\"" + d.getDocfilename() + "\"");
+			response.setHeader("Content-Disposition", "attachment;filename=\"" + document.getDocfilename() + "\"");
 
 			BufferedInputStream bfis = null;
-			try {
-				if (outfile != null) {
+			try
+			{
+				if(outfile != null)
+				{
 					bfis = new BufferedInputStream(new FileInputStream(outfile));
 					int data;
-					while ((data = bfis.read()) != -1) {
+					while((data = bfis.read()) != -1)
+					{
 						outs.write(data);
 						// outs.flush();
 					}
-				} else {
-					logger.info("Unable to retrieve content for " + d + ". This may indicate previous upload or save errors...");
 				}
-			} finally {
-				if (bfis!=null) {
+				else
+				{
+					logger.info("Unable to retrieve content for " + document + ". This may indicate previous upload or save errors...");
+				}
+			}
+			finally
+			{
+				if(bfis != null)
+				{
 					bfis.close();
 				}
 			}
 
 			outs.flush();
 			outs.close();
-		} catch (java.net.SocketException se) {
+		}
+		catch(java.net.SocketException se)
+		{
 			MiscUtils.getLogger().error("Error", se);
-		} catch (Exception e) {
+		}
+		catch(Exception e)
+		{
 			MiscUtils.getLogger().error("Error", e);
 		}
 		return null;
@@ -634,10 +636,10 @@ public class ManageDocumentAction extends DispatchAction {
 		String doc_no = request.getParameter("doc_no");
 		logger.debug("Document No :" + doc_no);
 
-		LogAction.addLogEntry((String) request.getSession().getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
+		LogAction.addLogEntry((String) request.getSession().getAttribute("user"),
+				LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
 
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		File documentDir = new File(docdownload);
+		File documentDir = new File(GenericFile.DOCUMENT_BASE_DIR);
 		logger.debug("Document Dir is a dir" + documentDir.isDirectory());
 
 		Document d = documentDao.getDocument(doc_no);
@@ -680,34 +682,6 @@ public class ManageDocumentAction extends DispatchAction {
 		outs.close();
 		return null;
 	}
-
-	public ActionForward getDocPageNumber(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "r", null)) {
-        	throw new SecurityException("missing required security object (_edoc)");
-        }
-		
-		String doc_no = request.getParameter("doc_no");
-		String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-		// File documentDir = new File(docdownload);
-		Document d = documentDao.getDocument(doc_no);
-		String filePath = docdownload + d.getDocfilename();
-
-		int numOfPage = 0;
-		try {
-			PdfReader reader = new PdfReader(filePath);
-			numOfPage = reader.getNumberOfPages();
-
-			HashMap hm = new HashMap();
-			hm.put("numOfPage", numOfPage);
-			JSONObject jsonObject = JSONObject.fromObject(hm);
-			response.getOutputStream().write(jsonObject.toString().getBytes());
-		} catch (IOException e) {
-			MiscUtils.getLogger().error("Error", e);
-		}
-
-		return null;// execute2(mapping, form, request, response);
-	}
 	
 	public ActionForward downloadCDS(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
@@ -731,17 +705,15 @@ public class ManageDocumentAction extends DispatchAction {
 		return null;
 	}
 
-	public ActionForward display(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public ActionForward display(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
+	{
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
-		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "r", null)) {
-        	throw new SecurityException("missing required security object (_edoc)");
-        }
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.READ, null, "_edoc");
 		
 		String temp = request.getParameter("remoteFacilityId");
 		Integer remoteFacilityId = null;
-		if(temp != null && !temp.trim().isEmpty())
+		if (temp != null && !temp.trim().isEmpty())
 		{
 			remoteFacilityId = Integer.parseInt(temp);
 		}
@@ -755,33 +727,38 @@ public class ManageDocumentAction extends DispatchAction {
 		String filename = null;
 
 		// local document
-		if (remoteFacilityId == null) {
+		if (remoteFacilityId == null)
+		{
 			CtlDocument ctld = ctlDocumentDao.getCtrlDocument(Integer.parseInt(doc_no));
 			Integer demographicNo = ctld.isDemographicDocument() ? ctld.getId().getModuleId() : null;
-			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), demographicNo, LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
+			LogAction.addLogEntry((String) request.getSession().getAttribute("user"), demographicNo,
+					LogConst.ACTION_READ, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS, doc_no, request.getRemoteAddr());
 
-			String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-
-			File documentDir = new File(docdownload);
+			File documentDir = new File(GenericFile.DOCUMENT_BASE_DIR);
 			logger.debug("Document Dir is a dir" + documentDir.isDirectory());
 
-			Document d = documentDao.getDocument(doc_no);
-			logger.debug("Document Name :" + d.getDocfilename());
+			Document document = documentDao.getDocument(doc_no);
+			logger.debug("Document Name :" + document.getDocfilename());
 
-			docxml = d.getDocxml();
-			contentType = d.getContenttype();
+			docxml = document.getDocxml();
+			contentType = document.getContenttype();
 
-			File file = new File(documentDir, d.getDocfilename());
-			filename = d.getDocfilename();
-                        
-                        if (contentType != null && !contentType.trim().equals("text/html")) {
-                            if (file.exists()) {
-                            	contentBytes = FileUtils.readFileToByteArray(file);
-                            } else {
-                            	throw new IllegalStateException("Local document doesn't exist for eDoc (ID " + d.getId() + "): " + file.getAbsolutePath());
-                            }
-                        }
-		} else // remote document
+			File file = new File(documentDir, document.getDocfilename());
+			filename = document.getDocfilename();
+
+			if (contentType != null && !contentType.trim().equals("text/html"))
+			{
+				if(file.exists())
+				{
+					contentBytes = FileUtils.readFileToByteArray(file);
+				}
+				else
+				{
+					throw new IllegalStateException("Local document doesn't exist for eDoc (ID " + document.getId() + "): " + file.getAbsolutePath());
+				}
+			}
+		}
+		else // remote document
 		{
 			FacilityIdIntegerCompositePk remotePk = new FacilityIdIntegerCompositePk();
 			remotePk.setIntegratorFacilityId(remoteFacilityId);
@@ -791,23 +768,31 @@ public class ManageDocumentAction extends DispatchAction {
 			CachedDemographicDocument remoteDocument = null;
 			CachedDemographicDocumentContents remoteDocumentContents = null;
 
-			try {
-				if (!CaisiIntegratorManager.isIntegratorOffline(request.getSession())){
+			try
+			{
+				if (!CaisiIntegratorManager.isIntegratorOffline(request.getSession()))
+				{
 					DemographicWs demographicWs = CaisiIntegratorManager.getDemographicWs(loggedInInfo, loggedInInfo.getCurrentFacility());
 					remoteDocument = demographicWs.getCachedDemographicDocument(remotePk);
 					remoteDocumentContents = demographicWs.getCachedDemographicDocumentContents(remotePk);
 				}
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				MiscUtils.getLogger().error("Unexpected error.", e);
 				CaisiIntegratorManager.checkForConnectionError(request.getSession(),e);
 			}
 
-			if(CaisiIntegratorManager.isIntegratorOffline(request.getSession())){
+			if (CaisiIntegratorManager.isIntegratorOffline(request.getSession()))
+			{
 				Integer demographicId = IntegratorFallBackManager.getDemographicNoFromRemoteDocument(loggedInInfo,remotePk);
 				MiscUtils.getLogger().debug("got demographic no from remote document "+demographicId);
 				List<CachedDemographicDocument> remoteDocuments = IntegratorFallBackManager.getRemoteDocuments(loggedInInfo,demographicId);
-				for(CachedDemographicDocument demographicDocument: remoteDocuments){
-					if(demographicDocument.getFacilityIntegerPk().getIntegratorFacilityId() == remotePk.getIntegratorFacilityId() && demographicDocument.getFacilityIntegerPk().getCaisiItemId() == remotePk.getCaisiItemId() ){
+				for(CachedDemographicDocument demographicDocument: remoteDocuments)
+				{
+					if(demographicDocument.getFacilityIntegerPk().getIntegratorFacilityId() == remotePk.getIntegratorFacilityId()
+							&& demographicDocument.getFacilityIntegerPk().getCaisiItemId() == remotePk.getCaisiItemId() )
+					{
 						remoteDocument = demographicDocument;
 						remoteDocumentContents = IntegratorFallBackManager.getRemoteDocument(loggedInInfo,demographicId, remotePk);
 						break;
@@ -816,14 +801,14 @@ public class ManageDocumentAction extends DispatchAction {
 				}
 			}
 
-
 			docxml = remoteDocument.getDocXml();
 			contentType = remoteDocument.getContentType();
 			filename = remoteDocument.getDocFilename();
 			contentBytes = remoteDocumentContents.getFileContents();
 		}
 
-		if (docxml != null && !docxml.trim().equals("")) {
+		if (docxml != null && !docxml.trim().equals(""))
+		{
 			ServletOutputStream outs = response.getOutputStream();
 			outs.write(docxml.getBytes());
 			outs.flush();
@@ -832,7 +817,8 @@ public class ManageDocumentAction extends DispatchAction {
 		}
 
 		// TODO: Right now this assumes it's a pdf which it shouldn't
-		if (contentType == null) {
+		if (contentType == null)
+		{
 			contentType = "application/pdf";
 		}
 
@@ -1066,31 +1052,6 @@ public class ManageDocumentAction extends DispatchAction {
         return null;
     }
 
-    public int countNumOfPages(String fileName) { // count number of pages in a pdf file
-        int numOfPage = 0;
-        String docdownload = oscar.OscarProperties.getInstance().getProperty("DOCUMENT_DIR");
-
-        if (!docdownload.endsWith(File.separator)) {
-            docdownload += File.separator;
-        }
-
-        String filePath = docdownload + fileName;
-        PdfReader reader = null;
-
-        try {
-            reader = new PdfReader(filePath);
-            numOfPage = reader.getNumberOfPages();
-
-        } catch (IOException e) {
-            MiscUtils.getLogger().error("Error", e);
-        } finally {
-            if (reader != null) {
-                reader.close();
-            }
-        }
-        return numOfPage;
-    }
-
     public ActionForward displayIncomingDocs(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
     	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_edoc", "r", null)) {
@@ -1177,157 +1138,21 @@ public class ManageDocumentAction extends DispatchAction {
         return null;
     }
 
-    public File createIncomingCacheVersion(String queueId, String pdfDir, String pdfName, Integer pageNum) throws Exception {
-
-
+    public File createIncomingCacheVersion(String queueId, String pdfDir, String pdfName, Integer pageNum)
+	{
         String incomingDocPath = IncomingDocUtil.getIncomingDocumentFilePath(queueId, pdfDir);
         File documentDir = new File(incomingDocPath);
         File documentCacheDir = getDocumentCacheDir(incomingDocPath);
         File file = new File(documentDir, pdfName);
 
-        PdfDecoder decode_pdf = new PdfDecoder(true);
-        File ofile = null;
-        FileInputStream is = null;
-        
-        try {
-
-            FontMappings.setFontReplacements();
-
-            decode_pdf.useHiResScreenDisplay(true);
-
-            decode_pdf.setExtractionMode(0, 96, 96 / 72f);
-
-            is = new FileInputStream(file);
-
-            decode_pdf.openPdfFileFromInputStream(is, false);
-
-            BufferedImage image_to_save = decode_pdf.getPageAsImage(pageNum);
-
-            decode_pdf.getObjectStore().saveStoredImage(documentCacheDir.getCanonicalPath() + "/" + pdfName + "_" + pageNum + ".png", image_to_save, true, false, "png");
-
-            decode_pdf.flushObjectValues(true);
-
-        } catch (Exception e) {
-            logger.error("Error decoding pdf file " + pdfDir + pdfName);
-        } finally {
-            if (decode_pdf != null) {
-                decode_pdf.closePdfFile();
-            }
-            if (is!=null) {
-                is.close();
-            }
-                
-        }
-        
-        ofile = new File(documentCacheDir, pdfName + "_" + pageNum + ".png");
-        
-        return ofile;
-
+        try
+		{
+			return generatePdfPageImage(file.getCanonicalPath(), Paths.get(documentCacheDir.getCanonicalPath()).resolve(pdfName + "_" + pageNum + ".png").toString(), pageNum);
+		}
+        catch (IOException ioE)
+		{
+			MiscUtils.getLogger().error("failed to resolve path name when creating pdf image with error: " + ioE.getMessage());
+		}
+        return null;
     }
-
-	/**
-	 * Oscarhost implemented fix to cases where image previews do not generate correctly, resulting in dark images with light writing.
-	 * This method attempts to correct for the error (with external library) by inverting the document colouring.
-	 * @param file - to be inverted
-	 */
-	private void correctImageFileColors(File file)
-	{
-		ImageInputStream inputStream = null;
-		try
-		{
-			inputStream = ImageIO.createImageInputStream(file);
-			Iterator iter = ImageIO.getImageReaders(inputStream);
-			int inversionRatio = Integer.parseInt(OscarProperties.getInstance().getProperty("INVERT_DOCUMENT_BW_RATIO", "10"));
-			int lightnessThreshold = 240; //rgb range 0-255
-			int darknessThreshold = 10; //rgb range 0-255
-
-			if (!iter.hasNext())
-			{
-				logger.warn("unable to load image file for color correction");
-				return;
-			}
-
-			ImageReader imageReader = (ImageReader) iter.next();
-			imageReader.setInput(inputStream);
-
-			BufferedImage image = imageReader.read(0);
-
-			int height = image.getHeight();
-			int width = image.getWidth();
-
-			int countWhitish = 0;
-			int countBlackish = 0;
-			for (int i = 0; i < width; i++)
-			{
-				for (int j = 0; j < height; j++)
-				{
-					int rgb = image.getRGB(i, j);
-					int brightness = getBrightness(rgb);
-
-					if (brightness > lightnessThreshold)
-					{
-						countWhitish++;
-					}
-					else if (brightness < darknessThreshold)
-					{
-						countBlackish++;
-					}
-				}
-			}
-
-			logger.info(String.format("White vs Black image ratio: %s/%s",
-					countWhitish, countBlackish));
-
-			if (countBlackish > (countWhitish * inversionRatio))
-			{
-				logger.info("inverting image");
-
-				for (int x = 0; x < width; x++)
-				{
-					for (int y = 0; y < height; y++)
-					{
-						int rgb = image.getRGB(x, y);
-						Color col = new Color(rgb, true);
-						col = new Color(
-								255 - col.getRed(),
-								255 - col.getGreen(),
-								255 - col.getBlue());
-						image.setRGB(x, y, col.getRGB());
-					}
-				}
-				ImageIO.write(image, "png", file);
-			}
-		}
-		catch (IOException e)
-		{
-			logger.error("error inverting image: " + e.getMessage(), e);
-		}
-		finally
-		{
-			if (inputStream != null)
-			{
-				try
-				{
-					inputStream.close();
-				}
-				catch (IOException e)
-				{
-					// do nothing.
-				}
-			}
-		}
-	}
-
-	private int getBrightness(int pixel)
-	{
-		int alpha = (pixel >> 24) & 0xff;
-		int red = (pixel >> 16) & 0xff;
-		int green = (pixel >> 8) & 0xff;
-		int blue = (pixel) & 0xff;
-
-		return (int) Math.sqrt(
-				red * red * .241 +
-				green * green * .691 +
-				blue * blue * .068);
-	}
 }

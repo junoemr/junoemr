@@ -1,0 +1,147 @@
+
+@mixin juno-form-colour-scheme($background-color, $border-color, $text-color, $placeholder-color, $dirty-color) {
+	background-color: $background-color;
+	border-color: $border-color;
+	color: $text-color;
+	&.ng-dirty {
+		background-color: $dirty-color;
+	}
+	&::placeholder {
+		color: $placeholder-color;
+	}
+}
+@mixin juno-form-colour-scheme-light {
+	@include juno-form-colour-scheme($color-neutral-lightest, $color-neutral-light, $color-neutral-dark, $color-neutral-dark, $color-neutral-white);
+}
+@mixin juno-form-colour-scheme-dark {
+	@include juno-form-colour-scheme($color-primary-dark, $color-primary-dark, $color-neutral-white, $color-neutral-light-grey, $color-primary-dark);
+}
+
+
+
+// bootstrap fonts look better on form elements
+input, button, select, textarea {
+	@include juno-font-input;
+}
+
+// don't resize textareas
+textarea {
+	max-width: 100%;
+	min-height: 35px;
+	resize: none;
+}
+
+// make same height as other inputs, unless inside a label
+input[type="radio"],
+input[type="checkbox"] {
+	margin: 7px 0 10px 0;
+}
+
+label {
+	@include juno-font-input(12px);
+	font-weight: 400;
+	color: $color-neutral-grey;
+
+	input[type="radio"],
+	input[type="checkbox"] {
+		margin: 4px 0 0;
+	}
+}
+
+.form-control {
+
+	@include juno-font-input(12px);
+	@include juno-form-colour-scheme-light;
+	width: 100%;
+	height: $form-input-height;
+	padding-left: 1em;
+	padding-right: 1em;
+	border-radius: 4px;
+	border-width: 1px;
+	transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+
+	// remove the blue glow
+	&:focus {
+		outline: 0;
+		-webkit-box-shadow: none;
+		box-shadow: none;
+	}
+}
+.form-control, output {
+	display: block;
+	line-height: 1.3;
+}
+.form-group {
+	margin-bottom: 8px;
+
+	// Displays a red asterisk next to form labels if they are marked as required
+	.required:after {
+		content: "*";
+		color: $color-red-base;
+	}
+}
+.input-group-addon {
+	padding: 6px 12px;
+	font-size: 13px;
+	font-weight: 400;
+	line-height: 1.3;
+	color: $color-neutral-white;
+	text-align: center;
+	background-color: $color-primary-base;
+	border: 1px solid $color-primary-dark;
+	border-radius: 4px;
+}
+
+// use to compact read-only forms vertically
+.form-compact .form-group,
+.form-group.form-group-compact {
+	margin-bottom: 0;
+}
+
+// make form-control-static the same height as input
+.form-control-static {
+	min-height: $input-height-base;
+}
+
+// for ca-field-date3 date in separate inputs
+.form-group {
+	.ca-field-date3 {
+		input.form-control {
+			display: inline-block;
+			margin-right: 3px;
+			&:last-of-type { margin-right: 0 }
+			&.yyyy { width: 50px; }
+			&.mmdd { width: 45px; }
+		}
+	}
+
+	&.form-group-sm {
+		.ca-field-date3 {
+			input.form-control {
+				&.yyyy { width: 42px; }
+				&.mmdd { width: 35px; }
+			}
+		}
+	}
+
+	textarea.no_scroll_bar {
+		overflow: hidden;
+	}
+
+	.textarea-char-counter {
+		margin-top: -20px;
+		margin-right: 5px;
+		float: right;
+	}
+}
+
+// for 'stacked labels' where the label is above the field in a form-horizontal
+.form-horizontal.stacked-labels {
+	.form-group {
+		margin-bottom: 5px;
+		.control-label {
+			text-align: left;
+		}
+	}
+}
+

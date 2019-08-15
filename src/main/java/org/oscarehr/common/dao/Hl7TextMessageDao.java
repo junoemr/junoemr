@@ -50,7 +50,7 @@ public class Hl7TextMessageDao extends AbstractDao<Hl7TextMessage> {
 	}
 	
 	public List<Hl7TextMessage> findByFileUploadCheckId(int id) {
-		Query query = entityManager.createQuery("select x from Hl7TextMessage x where x.fileUploadCheckId = ?");
+		Query query = entityManager.createQuery("select x from Hl7TextMessage x where x.fileUploadCheckId = ?1");
 		query.setParameter(1,id);
 		
 		@SuppressWarnings("unchecked")
@@ -72,4 +72,20 @@ public class Hl7TextMessageDao extends AbstractDao<Hl7TextMessage> {
 		
 		return result;
 	}
+
+	/**
+	 * get the type name of the Hl7 message
+	 * @param id id of the hl7 message
+	 * @return the type string for that message or empty string if no record found.
+	 */
+	public String getHl7TextMessageType(int id)
+	{
+		Hl7TextMessage txtMsg = this.find(id);
+		if (txtMsg != null)
+		{
+			return txtMsg.getType();
+		}
+		return "";
+	}
+
 }
