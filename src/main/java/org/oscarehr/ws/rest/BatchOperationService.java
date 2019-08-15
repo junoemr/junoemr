@@ -23,10 +23,17 @@
 
 package org.oscarehr.ws.rest;
 
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.transfer.batch.DemographicBatchOperationTransfer;
+import org.oscarehr.ws.rest.transfer.batch.DemographicBatchOperationTo1;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -37,31 +44,60 @@ import javax.ws.rs.Produces;
 @Component
 public class BatchOperationService extends AbstractServiceImpl
 {
+	@Autowired
+	DemographicDao demographicDao;
+
+	@Autowired
+	DemographicService demographicService;
+
+	@Autowired
+	SecurityInfoManager securityInfoManager;
+
 	@POST
-	@Path("/activate_deactivate_demographics")
+	@Path("/deactivate_demographics")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestResponse<Boolean> activateDeactivateDemographics(DemographicBatchOperationTransfer demoTransfer)
+	public RestResponse<Boolean> deactivateDemographics(DemographicBatchOperationTo1 demoTransfer)
 	{
-		if (demoTransfer.getOperation() == null || demoTransfer.getOperation().equals("deactivate"))
-		{
-			for (Integer demoNo : demoTransfer.getDemographicNumbers())
-			{
-				MiscUtils.getLogger().info("demographic would be deactivated: " + demoNo);
-			}
-		}
-		else if (demoTransfer.getOperation().equals("activate"))
-		{
-			for (Integer demoNo : demoTransfer.getDemographicNumbers())
-			{
-				MiscUtils.getLogger().info("demographic would be activated: " + demoNo);
-			}
-		}
-		else
-		{
-			return RestResponse.errorResponse("Unknown Batch Operation: " + demoTransfer.getOperation());
-		}
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, "_admin");
+		return changeDemographicStatuses(demoTransfer, org.oscarehr.common.model.Demographic.PatientStatus.IN.name());
+	}
 
-		return RestResponse.successResponse(true);
+	@POST
+	@Path("/activate_demographics")
+	@Consumes("application/json")
+	@Produces("application/json")
+	public RestResponse<Boolean> activateDemographics(DemographicBatchOperationTo1 demoTransfer)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, "_admin");
+		return changeDemographicStatuses(demoTransfer, org.oscarehr.common.model.Demographic.PatientStatus.AC.name());
+	}
+
+	/**
+	 * Batch update the status of demographics, while creating demographic archives and log entries
+	 * @param demoTransfer - a demographic transfer object containing the demographic numbers to update
+	 * @param newStatus - the status to which all demographics will be set
+	 * @return - a rest response indicating the result
+	 */
+	private RestResponse<Boolean> changeDemographicStatuses(DemographicBatchOperationTo1 demoTransfer, String newStatus)
+	{
+		MiscUtils.getLogger().info("performing batch demographic status update to [" + newStatus + "] with params: " + demoTransfer);
+		try
+		{
+			for (Integer demoNo : demoTransfer.getDemographicNumbers())
+			{
+				Demographic demo = demographicDao.find(demoNo);
+				demo.setPatientStatus(newStatus);
+				demographicService.updateDemographicRecord(demo);
+			}
+			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, "Change Demographic Status: " + demoTransfer.toString());
+			return RestResponse.successResponse(true);
+		}
+		catch (Exception e)
+		{
+			MiscUtils.getLogger().error("Failed to batch update status to [" + newStatus + "] for demographics with error: " + e.getMessage(), e);
+			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_FAILURE, "Change Demographic Status: " + demoTransfer.toString());
+			return RestResponse.errorResponse("Error processing batch operation");
+		}
 	}
 }

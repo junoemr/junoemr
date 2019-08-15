@@ -34,6 +34,7 @@ import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
@@ -354,5 +355,17 @@ public class DemographicService
 		DemographicArchive da = new DemographicArchive(demographic);
 		demographicArchiveDao.persist(da);
 		return da.getId();
+	}
+
+	/**
+	 * Apply a demographic update (save changes to demo + create a demographic archive record)
+	 * @param demo - the demographic to update.
+	 * @return - the updated demographic (un changed object, save that it has been persisted to the database)
+	 */
+	public Demographic updateDemographicRecord(Demographic demo)
+	{
+		archiveDemographicRecord(demo);
+		demographicDao.merge(demo);
+		return demo;
 	}
 }

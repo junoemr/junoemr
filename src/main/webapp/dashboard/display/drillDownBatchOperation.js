@@ -4,7 +4,8 @@ BatchOperations =
 		// ====================== general functionality ======================= //
 		OPERATION_TYPES:
 		{
-			DEACTIVATE_DEMO: "../../../ws/rs/batch/activate_deactivate_demographics"
+			DEACTIVATE_DEMO: "../../../ws/rs/batch/deactivate_demographics",
+			ACTIVATE_DEMO: "../../../ws/rs/batch/activate_demographics"
 		},
 
 		// maps report name to batch operation functions
@@ -13,12 +14,19 @@ BatchOperations =
 			// populated in the onload handler at bottom of file
 		},
 
+		// user message banner
+		BANNER_SUCCESS_COLOR: '#468847',
+		BANNER_SUCCESS_BG_COLOR: 'rgb(169, 225, 174)',
+		BANNER_ERROR_COLOR: '#fff6fb',
+		BANNER_ERROR_BG_COLOR: '#b93e37',
+		BANNER_FLASH_TIME: 4000,
+
 		// post batch operation to server and return promise
 		doBatchOperation: function (url, data)
 		{
 			if (url !== undefined)
 			{
-				$.ajax({
+				return $.ajax({
 					url: url,
 					type: "POST",
 					data: JSON.stringify(data),
@@ -96,20 +104,77 @@ BatchOperations =
 			return demographicNoList;
 		},
 
+		// show an success message to the user
+		showSuccessMessage: function ()
+		{
+			let batchBanner = $("#batch_operation_banner");
+			batchBanner.css("display", "flex");
+			batchBanner.css("opacity", "1.0");
+			batchBanner.css("color", BatchOperations.BANNER_SUCCESS_COLOR);
+			batchBanner.css("background-color", BatchOperations.BANNER_SUCCESS_BG_COLOR);
+			batchBanner.find("h4").html("Batch Operation Success!");
+
+			BatchOperations.hideMessageBanner(batchBanner);
+		},
+
+		// show an error message to the user
+		showErrorMessage: function (msg)
+		{
+			let batchBanner = $("#batch_operation_banner");
+			batchBanner.css("display", "flex");
+			batchBanner.css("opacity", "1.0");
+			batchBanner.css("color", BatchOperations.BANNER_ERROR_COLOR);
+			batchBanner.css("background-color", BatchOperations.BANNER_ERROR_BG_COLOR);
+			batchBanner.find("h4").html("Error: </br>" + msg);
+
+			BatchOperations.hideMessageBanner(batchBanner);
+		},
+
+		hideMessageBanner: function (batchBanner)
+		{
+			window.setTimeout(function () {
+				batchBanner.css("opacity", "0.0");
+			}, BatchOperations.BANNER_FLASH_TIME);
+
+			window.setTimeout(function () {
+				batchBanner.css("display", "none");
+			}, BatchOperations.BANNER_FLASH_TIME + 2000);
+		},
+
+		showMessageForResponse: function (data)
+		{
+			if (data.status === "SUCCESS")
+			{
+				BatchOperations.showSuccessMessage();
+			}
+			else if (data.status === "ERROR")
+			{
+				BatchOperations.showErrorMessage(data.error.message);
+			}
+			else if (data.status === 403)
+			{
+				BatchOperations.showErrorMessage(JSON.parse(data.responseText).error.message);
+			}
+			else
+			{
+				BatchOperations.showErrorMessage("Unknown status returned from server: " + data.status);
+			}
+		},
+
 		// ======================== batch operations ========================== //
 
 		deactivateSelectedDemographics: function ()
 		{
-			return BatchOperations.activateDeactivateSelectedDemographics(true);
+			return BatchOperations.activateDeactivateSelectedDemographics(true, BatchOperations.OPERATION_TYPES.DEACTIVATE_DEMO);
 		},
 
 		activateSelectedDemographics: function ()
 		{
-			return BatchOperations.activateDeactivateSelectedDemographics(false);
+			return BatchOperations.activateDeactivateSelectedDemographics(false, BatchOperations.OPERATION_TYPES.ACTIVATE_DEMO);
 		},
 
 		// deactivate all selected demographics
-		activateDeactivateSelectedDemographics: function (deactivate)
+		activateDeactivateSelectedDemographics: function (deactivate, url)
 		{
 			// do some thing
 			let deactivateDemographics = BatchOperations.getCheckedDemographics();
@@ -120,40 +185,46 @@ BatchOperations =
 			}
 			else
 			{
-				let ok = confirm("Demographics: \n" + deactivateDemographics + "\n will be set to " + (deactivate ? "inactive" : "active"));
+				let ok = confirm("Demographics: \n" + deactivateDemographics + "\nwill be set to " + (deactivate ? "inactive" : "active") + " \nAre you Sure?");
 				if (ok)
 				{
-					BatchOperations.doBatchOperation(BatchOperations.OPERATION_TYPES.DEACTIVATE_DEMO, {
+					let promise = BatchOperations.doBatchOperation(url, {
 						operation: deactivate ? "deactivate" : "activate",
 						demographicNumbers: deactivateDemographics
-					})
+					});
+					promise.always(function (data) {
+						BatchOperations.showMessageForResponse(data);
+					});
 				}
 			}
 		},
 
 		deactivateAllDemographics: function ()
 		{
-			BatchOperations.activateDeactivateAllDemographics(true);
+			BatchOperations.activateDeactivateAllDemographics(true, BatchOperations.OPERATION_TYPES.DEACTIVATE_DEMO);
 		},
 
 		activateAllDemographics: function ()
 		{
-			BatchOperations.activateDeactivateAllDemographics(false);
+			BatchOperations.activateDeactivateAllDemographics(false, BatchOperations.OPERATION_TYPES.ACTIVATE_DEMO);
 		},
 
-		activateDeactivateAllDemographics: function (deactivate)
+		activateDeactivateAllDemographics: function (deactivate, url)
 		{
 			let deactivateDemographics = BatchOperations.getAllFilteredDemographics();
-			let ok = confirm("This will set, " + (deactivate ? "inactive" : "active") + " ALL demographics in this report with respect to the currently applied filter");
+			let ok = confirm("This will set, " + (deactivate ? "inactive" : "active") + " ALL, " + deactivateDemographics.length + " demographics in this report with respect to the currently applied filter\nAre you Sure?");
 			if (ok)
 			{
-				BatchOperations.doBatchOperation(BatchOperations.OPERATION_TYPES.DEACTIVATE_DEMO, {
+				let promise = BatchOperations.doBatchOperation(url, {
 					operation: deactivate ? "deactivate" : "activate",
 					demographicNumbers: deactivateDemographics
 				});
+				promise.always(function (data) {
+					BatchOperations.showMessageForResponse(data);
+				});
 			}
 		}
-	}
+	};
 
 
 $(window).load(function ()

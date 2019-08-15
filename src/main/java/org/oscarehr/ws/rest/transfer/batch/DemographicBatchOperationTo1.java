@@ -24,7 +24,7 @@ package org.oscarehr.ws.rest.transfer.batch;
 
 import java.io.Serializable;
 
-public class DemographicBatchOperationTransfer implements Serializable
+public class DemographicBatchOperationTo1 implements Serializable
 {
 	private String 		operation;
 	private Integer[] 	demographicNumbers;
@@ -47,5 +47,17 @@ public class DemographicBatchOperationTransfer implements Serializable
 	public void setOperation(String operation)
 	{
 		this.operation = operation;
+	}
+
+
+	@Override
+	public String toString()
+	{
+		String outString = "Operation: " + operation + " demographic numbers: ";
+		for (Integer number : demographicNumbers)
+		{
+			outString += number +",";
+		}
+		return outString;
 	}
 }
