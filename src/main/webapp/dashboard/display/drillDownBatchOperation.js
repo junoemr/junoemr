@@ -280,6 +280,8 @@ $(window).load(function ()
 {
 	// populate the report name -> action mapping
 	BatchOperations.REPORT_NAME_ACTION_MAPPING = {
+
+		// Population - Panel 1
 		"Active Patients": [
 			{func: BatchOperations.activateDeactivateDemographicsGenerator(true,false), 		name: "Deactivate Selected"},
 			{func: BatchOperations.activateDeactivateDemographicsGenerator(false, false), 	name: "Activate Selected"},
@@ -287,27 +289,81 @@ $(window).load(function ()
 			{func: BatchOperations.activateDeactivateDemographicsGenerator(false, true), 		name: "Activate All"}
 		],
 
-		// CDM
+		// CDM - Panel 1
 		"Consider Diabetes": [
-			{func: BatchOperations.assignDxCodeGenerator('250', 'icd9', false), 		name: BatchOperations.dxAssignNameTemplate("Diabetes", false)},
-			{func: BatchOperations.assignDxCodeGenerator('250', 'icd9', true), 		name: BatchOperations.dxAssignNameTemplate("Diabetes", true)}
+			{func: BatchOperations.assignDxCodeGenerator('250', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Diabetes", false)},
+			{func: BatchOperations.assignDxCodeGenerator('250', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Diabetes", true)}
 		],
 		"Consider Hypertension": [
-			{func: BatchOperations.assignDxCodeGenerator('401', 'icd9', false), 		name: BatchOperations.dxAssignNameTemplate("Hypertension", false)},
-			{func: BatchOperations.assignDxCodeGenerator('401', 'icd9', true), 		name: BatchOperations.dxAssignNameTemplate("Hypertension", true)}
+			{func: BatchOperations.assignDxCodeGenerator('401', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Hypertension", false)},
+			{func: BatchOperations.assignDxCodeGenerator('401', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Hypertension", true)}
 		],
 		"Consider Heart Failure": [
-			{func: BatchOperations.assignDxCodeGenerator('428', 'icd9', false), 		name: BatchOperations.dxAssignNameTemplate("Heart Failure", false)},
-			{func: BatchOperations.assignDxCodeGenerator('428', 'icd9', true), 		name: BatchOperations.dxAssignNameTemplate("Heart Failure", true)}
+			{func: BatchOperations.assignDxCodeGenerator('428', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Heart Failure", false)},
+			{func: BatchOperations.assignDxCodeGenerator('428', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Heart Failure", true)}
 		],
 		"Consider Chronic Pain": [
-			{func: BatchOperations.assignDxCodeGenerator('338.2', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Chronic pain", false)},
-			{func: BatchOperations.assignDxCodeGenerator('338.2', 'icd9', true), 		name: BatchOperations.dxAssignNameTemplate("Chronic pain", true)}
+			{func: BatchOperations.assignDxCodeGenerator('338.2', 'icd9', false), name: BatchOperations.dxAssignNameTemplate("Chronic pain", false)},
+			{func: BatchOperations.assignDxCodeGenerator('338.2', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Chronic pain", true)}
 		],
 		"Consider COPD": [
-			{func: BatchOperations.assignDxCodeGenerator('unknown', '???', false),	name: BatchOperations.dxAssignNameTemplate("COPD", false)},
-			{func: BatchOperations.assignDxCodeGenerator('unknown', '???', true), 	name: BatchOperations.dxAssignNameTemplate("COPD", true)}
-		]
+			{func: BatchOperations.assignDxCodeGenerator('???', '???', false),	name: BatchOperations.dxAssignNameTemplate("COPD", false)},
+			{func: BatchOperations.assignDxCodeGenerator('???', '???', true), 	name: BatchOperations.dxAssignNameTemplate("COPD", true)}
+		],
+
+		// CDM - Panel 2
+		"Consider Chronic Liver Disease": [
+			{func: BatchOperations.assignDxCodeGenerator('571', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Chronic Liver Disease", false)},
+			{func: BatchOperations.assignDxCodeGenerator('571', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Chronic Liver Disease", true)}
+		],
+		"Consider Ischemic Cerebrovascular Disease": [
+			{func: BatchOperations.assignDxCodeGenerator('???', '???', false), 	name: BatchOperations.dxAssignNameTemplate("Ischemic Cerebrovascular Disease", false)},
+			{func: BatchOperations.assignDxCodeGenerator('???', '???', true), 	name: BatchOperations.dxAssignNameTemplate("Ischemic Cerebrovascular Disease", true)}
+		],
+		"Consider Ischemic Heart Disease": [
+			{func: BatchOperations.assignDxCodeGenerator('414', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Ischemic Heart Disease", false)},
+			{func: BatchOperations.assignDxCodeGenerator('414', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Ischemic Heart Disease", true)}
+		],
+		"Consider Advanced Care Planning": [
+			{func: BatchOperations.assignDxCodeGenerator('V66', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Advanced Care Planning", false)},
+			{func: BatchOperations.assignDxCodeGenerator('V66', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Advanced Care Planning", true)}
+		],
+		"Consider Frailty": [
+			{func: BatchOperations.assignDxCodeGenerator('???', '???', false), 	name: BatchOperations.dxAssignNameTemplate("Frailty", false)},
+			{func: BatchOperations.assignDxCodeGenerator('???', '???', true), 	name: BatchOperations.dxAssignNameTemplate("Frailty", true)}
+		],
+		"Consider Chronic Kidney Disease": [
+			{func: BatchOperations.assignDxCodeGenerator('585', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Chronic Kidney Disease", false)},
+			{func: BatchOperations.assignDxCodeGenerator('585', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Chronic Kidney Disease", true)}
+		],
+		"Consider Osteoarthritis": [
+			{func: BatchOperations.assignDxCodeGenerator('715', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Osteoarthritis", false)},
+			{func: BatchOperations.assignDxCodeGenerator('715', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Osteoarthritis", true)}
+		],
+
+		// CDM - Panel 3
+		"Consider Alcohol Dependence Syndrome": [
+			{func: BatchOperations.assignDxCodeGenerator('303', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Alcohol Dependence Syndrome", false)},
+			{func: BatchOperations.assignDxCodeGenerator('303', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Alcohol Dependence Syndrome", true)}
+		],
+		"Consider Depression": [
+			{func: BatchOperations.assignDxCodeGenerator('311', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Depression", false)},
+			{func: BatchOperations.assignDxCodeGenerator('311', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Depression", true)}
+		],
+		"Consider Anxiety": [
+			{func: BatchOperations.assignDxCodeGenerator('3000', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Anxiety", false)},
+			{func: BatchOperations.assignDxCodeGenerator('3000', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Anxiety", true)}
+		],
+		"Consider Dementia": [
+			{func: BatchOperations.assignDxCodeGenerator('290', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Dementia", false)},
+			{func: BatchOperations.assignDxCodeGenerator('290', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Dementia", true)}
+		],
+
+		// CDM - PSP-Reports
+		"Consider Drug Dependence Syndrome": [
+			{func: BatchOperations.assignDxCodeGenerator('304', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Drug Dependence Syndrome", false)},
+			{func: BatchOperations.assignDxCodeGenerator('304', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Drug Dependence Syndrome", true)}
+		],
 	};
 
 	BatchOperations.populateBatchActionListItems();
