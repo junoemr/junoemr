@@ -105,6 +105,40 @@ BatchOperations =
 			return demographicNoList;
 		},
 
+		// get demographics an confirm the run with the user.
+		// returns null if the run is to be aborted, else the demographic number are returned
+		getDemographics: function (all, actionMsg)
+		{
+			let demos = [];
+			if (all)
+			{
+				demos = BatchOperations.getAllFilteredDemographics();
+			}
+			else
+			{
+				demos = BatchOperations.getCheckedDemographics();
+			}
+
+			if (demos.length > 0)
+			{
+				let ok = false;
+				if (all)
+				{
+					ok = confirm("All " + demos.length + " Demographics " + actionMsg + " with respect to the currently applied filter\nAre you Sure?");
+				}
+				else
+				{
+					ok = confirm("Demographics: \n" + demos + "\n" + actionMsg +" \nAre you Sure?");
+				}
+				return ok ? demos : null;
+			}
+			else
+			{
+				alert("Please select at least one demographic");
+				return null;
+			}
+		},
+
 		// show an success message to the user
 		showSuccessMessage: function ()
 		{
@@ -177,61 +211,24 @@ BatchOperations =
 
 		// ======================== batch operations ========================== //
 
-		deactivateSelectedDemographics: function ()
+		// batch activate / deactivate demographics
+		activateDeactivateDemographics: function(deactivate, demos)
 		{
-			return BatchOperations.activateDeactivateSelectedDemographics(true, BatchOperations.OPERATION_TYPES.DEACTIVATE_DEMO);
-		},
-
-		activateSelectedDemographics: function ()
-		{
-			return BatchOperations.activateDeactivateSelectedDemographics(false, BatchOperations.OPERATION_TYPES.ACTIVATE_DEMO);
-		},
-
-		// deactivate all selected demographics
-		activateDeactivateSelectedDemographics: function (deactivate, url)
-		{
-			// do some thing
-			let deactivateDemographics = BatchOperations.getCheckedDemographics();
-
-			if (deactivateDemographics.length === 0)
+			if (deactivate)
 			{
-				alert("Please select at least one demographic");
+				let promise = BatchOperations.doBatchOperation(BatchOperations.OPERATION_TYPES.DEACTIVATE_DEMO, {
+					operation: "deactivate",
+					demographicNumbers: demos
+				});
+				promise.always(function (data) {
+					BatchOperations.showMessageForResponse(data);
+				});
 			}
 			else
 			{
-				let ok = confirm("Demographics: \n" + deactivateDemographics + "\nwill be set to " + (deactivate ? "inactive" : "active") + " \nAre you Sure?");
-				if (ok)
-				{
-					let promise = BatchOperations.doBatchOperation(url, {
-						operation: deactivate ? "deactivate" : "activate",
-						demographicNumbers: deactivateDemographics
-					});
-					promise.always(function (data) {
-						BatchOperations.showMessageForResponse(data);
-					});
-				}
-			}
-		},
-
-		deactivateAllDemographics: function ()
-		{
-			BatchOperations.activateDeactivateAllDemographics(true, BatchOperations.OPERATION_TYPES.DEACTIVATE_DEMO);
-		},
-
-		activateAllDemographics: function ()
-		{
-			BatchOperations.activateDeactivateAllDemographics(false, BatchOperations.OPERATION_TYPES.ACTIVATE_DEMO);
-		},
-
-		activateDeactivateAllDemographics: function (deactivate, url)
-		{
-			let deactivateDemographics = BatchOperations.getAllFilteredDemographics();
-			let ok = confirm("This will set, " + (deactivate ? "inactive" : "active") + " ALL, " + deactivateDemographics.length + " demographics in this report with respect to the currently applied filter\nAre you Sure?");
-			if (ok)
-			{
-				let promise = BatchOperations.doBatchOperation(url, {
-					operation: deactivate ? "deactivate" : "activate",
-					demographicNumbers: deactivateDemographics
+				let promise = BatchOperations.doBatchOperation(BatchOperations.OPERATION_TYPES.ACTIVATE_DEMO, {
+					operation: "activate",
+					demographicNumbers: demos
 				});
 				promise.always(function (data) {
 					BatchOperations.showMessageForResponse(data);
@@ -239,46 +236,41 @@ BatchOperations =
 			}
 		},
 
-		// batch assign the specified dx code
-		assignDxCodeToDemographics: function (code, codingSystem, all)
+		// generates a function closure for activateDeactivateDemographics
+		activateDeactivateDemographicsGenerator: function (deactivate, all)
 		{
-			let demos = [];
-			if (all)
-			{
-				demos = BatchOperations.getAllFilteredDemographics();
-			}
-			else
-			{
-				demos = BatchOperations.getCheckedDemographics();
-			}
-
-			if (demos.length > 0)
-			{
-				let ok = confirm("This will set Dx code [" + code + "] for, " + demos.length + " demographics in this report.\n Are you Sure?" );
-				if (ok)
+			return function () {
+				let demos = BatchOperations.getDemographics(all, "Will be set to status, " + (deactivate ? 'inactive' : 'active'));
+				if (demos != null)
 				{
-					let promise = BatchOperations.doBatchOperation(BatchOperations.OPERATION_TYPES.ASSIGN_DX_CODE, {
-						operation: "assign Dx code",
-						demographicNumbers: demos,
-						dxCode: code,
-						dxCodingSystem: codingSystem
-					});
-					promise.always(function (data){
-						BatchOperations.showMessageForResponse(data);
-					})
+					BatchOperations.activateDeactivateDemographics(deactivate, demos);
 				}
-			}
-			else
-			{
-				alert("Please select at least one demographic");
 			}
 		},
 
-		// generate a function closure for assignDxCodeToDemographics
+		// batch assign the specified dx code
+		assignDxCodeToDemographics: function (code, codingSystem, demos)
+		{
+			let promise = BatchOperations.doBatchOperation(BatchOperations.OPERATION_TYPES.ASSIGN_DX_CODE, {
+				operation: "assign Dx code",
+				demographicNumbers: demos,
+				dxCode: code,
+				dxCodingSystem: codingSystem
+			});
+			promise.always(function (data){
+				BatchOperations.showMessageForResponse(data);
+			})
+		},
+
+		// generates a function closure for assignDxCodeToDemographics
 		assignDxCodeGenerator: function(code, codingSystem, all)
 		{
 			return function () {
-				BatchOperations.assignDxCodeToDemographics(code, codingSystem, all);
+				let demos = BatchOperations.getDemographics(all, "Will be assigned Dx Code [" + code + "]");
+				if (demos != null)
+				{
+					BatchOperations.assignDxCodeToDemographics(code, codingSystem, demos);
+				}
 			}
 		}
 	};
@@ -289,16 +281,34 @@ $(window).load(function ()
 	// populate the report name -> action mapping
 	BatchOperations.REPORT_NAME_ACTION_MAPPING = {
 		"Active Patients": [
-			{func: BatchOperations.deactivateSelectedDemographics, 	name: "Deactivate Selected"},
-			{func: BatchOperations.activateSelectedDemographics, 	name: "Activate Selected"},
-			{func: BatchOperations.deactivateAllDemographics, 		name: "Deactivate All"},
-			{func: BatchOperations.activateAllDemographics, 		name: "Activate All"}
+			{func: BatchOperations.activateDeactivateDemographicsGenerator(true,false), 		name: "Deactivate Selected"},
+			{func: BatchOperations.activateDeactivateDemographicsGenerator(false, false), 	name: "Activate Selected"},
+			{func: BatchOperations.activateDeactivateDemographicsGenerator(true,true), 		name: "Deactivate All"},
+			{func: BatchOperations.activateDeactivateDemographicsGenerator(false, true), 		name: "Activate All"}
 		],
+
+		// CDM
 		"Consider Diabetes": [
-			{func: BatchOperations.assignDxCodeGenerator('250', 'icd9', false), name: BatchOperations.dxAssignNameTemplate("Diabetes", false)},
-			{func: BatchOperations.assignDxCodeGenerator('250', 'icd9', true), name: BatchOperations.dxAssignNameTemplate("Diabetes", true)}
+			{func: BatchOperations.assignDxCodeGenerator('250', 'icd9', false), 		name: BatchOperations.dxAssignNameTemplate("Diabetes", false)},
+			{func: BatchOperations.assignDxCodeGenerator('250', 'icd9', true), 		name: BatchOperations.dxAssignNameTemplate("Diabetes", true)}
+		],
+		"Consider Hypertension": [
+			{func: BatchOperations.assignDxCodeGenerator('401', 'icd9', false), 		name: BatchOperations.dxAssignNameTemplate("Hypertension", false)},
+			{func: BatchOperations.assignDxCodeGenerator('401', 'icd9', true), 		name: BatchOperations.dxAssignNameTemplate("Hypertension", true)}
+		],
+		"Consider Heart Failure": [
+			{func: BatchOperations.assignDxCodeGenerator('428', 'icd9', false), 		name: BatchOperations.dxAssignNameTemplate("Heart Failure", false)},
+			{func: BatchOperations.assignDxCodeGenerator('428', 'icd9', true), 		name: BatchOperations.dxAssignNameTemplate("Heart Failure", true)}
+		],
+		"Consider Chronic Pain": [
+			{func: BatchOperations.assignDxCodeGenerator('338.2', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Chronic pain", false)},
+			{func: BatchOperations.assignDxCodeGenerator('338.2', 'icd9', true), 		name: BatchOperations.dxAssignNameTemplate("Chronic pain", true)}
+		],
+		"Consider COPD": [
+			{func: BatchOperations.assignDxCodeGenerator('unknown', '???', false),	name: BatchOperations.dxAssignNameTemplate("COPD", false)},
+			{func: BatchOperations.assignDxCodeGenerator('unknown', '???', true), 	name: BatchOperations.dxAssignNameTemplate("COPD", true)}
 		]
-	}
+	};
 
 	BatchOperations.populateBatchActionListItems();
 })

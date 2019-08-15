@@ -29,6 +29,7 @@ import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import oscar.util.ConversionUtils;
 
 import java.util.Date;
@@ -40,6 +41,7 @@ public class DxResearchService
 	@Autowired
 	DxresearchDAO dxresearchDAO;
 
+	@Transactional
 	public void assignDxCodeToDemographic(Integer demographicNo, Integer providerNo, String dxCode, String codingSystem)
 	{
 		if (dxCode.compareTo("") != 0) {
