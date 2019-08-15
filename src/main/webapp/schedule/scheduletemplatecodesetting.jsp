@@ -34,6 +34,7 @@
 		java.util.Collections,
 		java.util.List"
 		errorPage="../appointment/errorpage.jsp" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 
@@ -59,6 +60,7 @@
 			code.setDescription(request.getParameter("description"));
 			code.setDuration(request.getParameter("duration"));
 			code.setColor(request.getParameter("color"));
+			code.setJunoColor(StringUtils.trimToNull(request.getParameter("junoColor")));
 			code.setConfirm(request.getParameter("confirm"));
 			code.setBookinglimit(Integer.parseInt(request.getParameter("bookinglimit")));
 			scheduleTemplateCodeDao.persist(code);
@@ -173,6 +175,7 @@
 			dataBean.setProperty("description", stc.getDescription() );
 			dataBean.setProperty("duration", stc.getDuration()==null?"":stc.getDuration() );
 			dataBean.setProperty("color", stc.getColor()==null?"":stc.getColor() );
+			dataBean.setProperty("junoColor", stc.getJunoColor()==null?"":stc.getJunoColor() );
 			dataBean.setProperty("confirm", stc.getConfirm()==null?"No":stc.getConfirm() );
             dataBean.setProperty("bookinglimit", String.valueOf(stc.getBookinglimit()));
 		}
@@ -205,17 +208,29 @@
 			</tr>
 			<tr bgcolor='ivory'>
 				<td><font color="red"><bean:message
-					key="schedule.scheduletemplatecodesetting.formColor" />:</font></td>
+						key="schedule.scheduletemplatecodesetting.formColor"/>:</font></td>
 				<td><input type="text" name="color" id="color" size="10" maxlength="10"
-					<%=bEdit?("value='"+dataBean.getProperty("color")+"'"):"value=''"%>> <a href="javascript:TCP.popup(document.forms['addtemplatecode'].elements['color']);"><img width="15" height="13" border="0" src="../images/sel.gif"></a>
-				<bean:message
-					key="schedule.scheduletemplatecodesetting.msgColorExample" /></td>
+						<%=bEdit?("value='"+dataBean.getProperty("color")+"'"):"value=''"%>>
+					<a href="javascript:TCP.popup(document.forms['addtemplatecode'].elements['color']);">
+						<img width="15" height="13" border="0" src="../images/sel.gif"></a>
+					<bean:message
+							key="schedule.scheduletemplatecodesetting.msgColorExample"/></td>
 			</tr>
-                        <tr bgcolor='ivory'>
+			<tr bgcolor='ivory'>
 				<td><font color="red"><bean:message
-					key="schedule.scheduletemplatecodesetting.formBookingLimit" />:</font></td>
+						key="schedule.scheduletemplatecodesetting.formJunoColor"/>:</font></td>
+				<td><input type="text" name="junoColor" id="junoColor" size="10" maxlength="10"
+						<%=bEdit?("value='"+dataBean.getProperty("junoColor")+"'"):"value=''"%>>
+					<a href="javascript:TCP.popup(document.forms['addtemplatecode'].elements['junoColor']);">
+						<img width="15" height="13" border="0" src="../images/sel.gif"></a>
+					<bean:message
+							key="schedule.scheduletemplatecodesetting.msgColorExample"/></td>
+			</tr>
+			<tr bgcolor='ivory'>
+				<td><font color="red"><bean:message
+						key="schedule.scheduletemplatecodesetting.formBookingLimit"/>:</font></td>
 				<td><input type="text" id="bookinglimit" name="bookinglimit" size="10"
-					<%=bEdit?("value='"+dataBean.getProperty("bookinglimit")+"'"):"value='1'"%>></td>
+						<%=bEdit?("value='"+dataBean.getProperty("bookinglimit")+"'"):"value='1'"%>></td>
 			</tr>
 			<tr bgcolor='ivory'>
 				<td><font color="red">Limit Type:</font></td>

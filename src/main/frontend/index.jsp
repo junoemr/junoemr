@@ -267,7 +267,7 @@
 							<button class="btn btn-icon hand-hover"
 							        title="<bean:message key="navbar.scratchpad" bundle="ui"/>"
 							        ng-click="navBarCtrl.openScratchpad()">
-								<i class="icon icon-pencil-square"></i>
+								<i class="icon icon-write"></i>
 							</button>
 
 							<button class="btn btn-icon hand-hover"
