@@ -26,9 +26,9 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.MDM_T02;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
-import oscar.oscarLab.ca.all.parsers.messageTypes.MDM_T08_T02MessageHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.MDM_T08_T02ConnectCareHandler;
 
-public class ConnectCareDocumentationAddHandler extends MDM_T08_T02MessageHandler
+public class ConnectCareDocumentationAddHandler extends MDM_T08_T02ConnectCareHandler
 {
 	public ConnectCareDocumentationAddHandler(Message msg) throws HL7Exception
 	{

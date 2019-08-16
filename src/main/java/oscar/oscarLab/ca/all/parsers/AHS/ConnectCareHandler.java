@@ -124,18 +124,30 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 	}
 
 	/**
+	 * pull patient health number from the patient identifier list
+	 * @return - the patients health number
+	 */
+	@Override
+	public String getHealthNum()
+	{
+		ArrayList<Pair<String, String>> patientIds = getPatientIdentificationList(false);
+		for (Pair<String, String> id : patientIds)
+		{
+			if (id.getLeft().equalsIgnoreCase("PHN") || id.getLeft().equalsIgnoreCase("ULI"))
+			{
+				return id.getRight();
+			}
+		}
+		return null;
+	}
+
+	/**
 	 *  call getPatientIdentificationList default behavior of appending namespace
 	 * @return - list of paris patient identification <id type , id + assigning authority >
 	 */
 	public ArrayList<Pair<String, String>> getPatientIdentificationList()
 	{
 		return getPatientIdentificationList(true);
-	}
-
-	@Override
-	public String getHealthNum()
-	{
-		return get("/.PID-3(1)-1");
 	}
 
 	@Override

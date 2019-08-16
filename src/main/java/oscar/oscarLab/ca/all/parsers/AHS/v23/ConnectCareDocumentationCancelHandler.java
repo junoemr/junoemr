@@ -24,10 +24,14 @@ package oscar.oscarLab.ca.all.parsers.AHS.v23;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.model.v23.datatype.CX;
 import ca.uhn.hl7v2.model.v23.message.MDM_T11;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
+import org.apache.commons.lang3.tuple.Pair;
 import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.parsers.messageTypes.MDM_T11MessageHandler;
+
+import java.util.ArrayList;
 
 public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 {
@@ -79,6 +83,58 @@ public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 	@Override
 	public void init(String hl7Body) throws HL7Exception
 	{
+	}
+	/* ================================= PID ============================== */
+
+	/**
+	 * Connect Care labs send more than just health card number, they can also send, EPI, ABH, NWT, BKR
+	 * @param appendNamespace - if true append namespace to end of identifier
+	 * @return - list of paris patient identification <id type , id + assigning authority >
+	 */
+	public ArrayList<Pair<String, String>> getPatientIdentificationList(boolean appendNamespace)
+	{
+		ArrayList<Pair<String, String>> ids = new ArrayList<Pair<String, String>>();
+		if (message instanceof MDM_T11)
+		{
+			MDM_T11 msg = (MDM_T11) message;
+			for (int i =0; i < msg.getPID().getPatientIDInternalIDReps(); i ++)
+			{
+				CX id = msg.getPID().getPatientIDInternalID(i);
+				if (id.getAssigningAuthority().getNamespaceID().getValue() != null && id.getID().getValue() != null &&
+						id.getIdentifierTypeCode().getValue() != null)
+				{
+					String idString = id.getID().getValue();
+					if (appendNamespace)
+					{
+						idString += " " + id.getAssigningAuthority().getNamespaceID().getValue();
+					}
+					ids.add(Pair.of(id.getIdentifierTypeCode().getValue(), idString));
+				}
+			}
+			return ids;
+		}
+		else
+		{
+			return new ArrayList<Pair<String, String>>();
+		}
+	}
+
+	/**
+	 * pull patient health number from the patient identifier list
+	 * @return - the patients health number
+	 */
+	@Override
+	public String getHealthNum()
+	{
+		ArrayList<Pair<String, String>> patientIds = getPatientIdentificationList(false);
+		for (Pair<String, String> id : patientIds)
+		{
+			if (id.getLeft().equalsIgnoreCase("PHN") || id.getLeft().equalsIgnoreCase("ULI"))
+			{
+				return id.getRight();
+			}
+		}
+		return null;
 	}
 
 	/* ================================= OBR ============================== */

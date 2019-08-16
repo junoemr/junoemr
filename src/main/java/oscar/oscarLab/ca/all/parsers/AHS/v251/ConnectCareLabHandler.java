@@ -69,20 +69,6 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 		super(msg);
 	}
 
-	@Override
-	public String getHealthNum()
-	{
-		ArrayList<Pair<String, String>> patientIds = getPatientIdentificationList(false);
-		for (Pair<String, String> id : patientIds)
-		{
-			if (id.getLeft().equalsIgnoreCase("PHN") || id.getLeft().equalsIgnoreCase("ULI"))
-			{
-				return id.getRight();
-			}
-		}
-		return null;
-	}
-
 	/**
 	 * get service date
 	 * @return the service date as a string
