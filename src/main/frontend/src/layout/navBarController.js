@@ -35,11 +35,15 @@ angular.module('Layout').controller('Layout.NavBarController', [
 	'$location',
 	'$state',
 	'$uibModal',
+	'$interval',
 	'securityService',
 	'personaService',
 	'billingService',
+	'consultService',
 	'inboxService',
 	'messageService',
+	'providerService',
+	'ticklerService',
 
 	function(
 		$rootScope,
@@ -49,13 +53,24 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		$location,
 		$state,
 		$uibModal,
+		$interval,
 		securityService,
 		personaService,
 		billingService,
+		consultService,
 		inboxService,
-		messageService)
+		messageService,
+		providerService,
+		ticklerService)
 	{
 		var controller = this;
+
+		// Controller-level variables to contain intervals
+		controller.updateInterval = undefined;
+		controller.messageInterval = undefined;
+		// Interval takes update times in ms, so 60s * 1000 * num_minutes
+		controller.intervalLengthOneMinute = 60000;
+		controller.intervalLengthFiveMinutes = 60000 * 5;
 
 		//=========================================================================
 		// Initialization
@@ -63,9 +78,14 @@ angular.module('Layout').controller('Layout.NavBarController', [
 
 		controller.init = function init()
 		{
+			controller.activeConsultationTotal = 0;
+			controller.ticklerTotal = 0;
 			controller.unAckLabDocTotal = 0;
 			controller.unreadMessageTotal = 0;
 			controller.demographicSearch = null;
+			controller.consultationTeamWarning = "";
+			// measured in months
+			controller.consultationLookbackPeriod = 1;
 
 			billingService.getBillingRegion().then(
 				function success(results)
@@ -120,6 +140,26 @@ angular.module('Layout').controller('Layout.NavBarController', [
 					console.log(errors);
 				});
 
+			providerService.getSettings().then(
+				function success(results)
+				{
+					if (results.consultationTimePeriodWarning > 0)
+					{
+						controller.consultationLookbackPeriod = results.consultationTimePeriodWarning;
+					}
+
+					// If we get any result back that isn't -1, need to filter consultation count by the given team
+					if (results.consultationTeamWarning !== "-1")
+					{
+						controller.consultationTeamWarning = results.consultationTeamWarning;
+					}
+				},
+				function error(errors)
+				{
+					console.log("Error: ", errors);
+				}
+			);
+
 			personaService.getNavBar().then(
 				function success(results)
 				{
@@ -136,12 +176,31 @@ angular.module('Layout').controller('Layout.NavBarController', [
 
 					controller.unreadMessagesCount = results.unreadMessagesCount;
 					controller.unreadPatientMessagesCount = results.unreadPatientMessagesCount;
-					controller.getUnAckLabDocCount();
+					controller.updateCounts();
 					controller.getUnreadMessageCount();
 					controller.demographicSearchDropDownItems = results.menus.patientSearchMenu.items;
 					controller.menuItems = results.menus.menu.items;
 					controller.userMenuItems = results.menus.userMenu.items;
 					controller.messengerMenu = results.menus.messengerMenu.items;
+
+
+					if (!angular.isDefined(controller.updateInterval))
+					{
+						controller.updateInterval = $interval(function()
+						{
+							controller.updateCounts();
+						}, controller.intervalLengthFiveMinutes);
+					}
+
+					// Separated into its own interval so that it can be updated more frequently
+					if (!angular.isDefined(controller.messageInterval))
+					{
+						controller.messageInterval = $interval(function()
+						{
+							controller.getUnreadMessageCount();
+						}, controller.intervalLengthOneMinute);
+					}
+
 				},
 				function error(errors)
 				{
@@ -190,9 +249,67 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				}
 			}, true);
 
+		// for intervals
+		$scope.$on('$destroy', function()
+		{
+			$scope.cancelIntervals();
+		});
+
 		//=========================================================================
 		// Methods
 		//=========================================================================
+
+		// Need to do this so that requests aren't going off in the background after leaving new UI
+		controller.cancelIntervals = function cancelIntervals()
+		{
+			if (angular.isDefined(controller.updateInterval))
+			{
+				$interval.cancel(controller.updateInterval);
+				controller.updateInterval = undefined;
+			}
+
+			if (angular.isDefined(controller.messageInterval))
+			{
+				$interval.cancel(controller.messageInterval);
+				controller.messageInterval = undefined;
+			}
+		};
+
+		/**
+		 * Wrapper for all of the functions that we want to periodically get updated counts for.
+		 */
+		controller.updateCounts = function updateCounts()
+		{
+			controller.getUnAckLabDocCount();
+			controller.getOverdueTicklerCount();
+			controller.getActiveConsultationCount();
+		};
+
+		/**
+		 * Used to generically update count for various elements.
+		 * @param item Item object with label we want to display an updated count for
+		 * @return associated value the controller has stored, or 0 if we don't recognize item's label
+		 */
+		controller.getCountForLabel = function getCountForLabel(item)
+		{
+			if (item.label === "Inbox")
+			{
+				item.labelCount = controller.unAckLabDocTotal;
+				return controller.unAckLabDocTotal;
+			}
+			else if (item.label === "Ticklers")
+			{
+				item.labelCount = controller.ticklerTotal;
+				return controller.ticklerTotal;
+			}
+			else if (item.label === "Consultations")
+			{
+				item.labelCount = controller.activeConsultationTotal;
+				return controller.activeConsultationTotal;
+			}
+			item.labelCount = 0;
+			return 0;
+		};
 
 		controller.getUnAckLabDocCount = function getUnAckLabDocCount()
 		{
@@ -219,6 +336,48 @@ angular.module('Layout').controller('Layout.NavBarController', [
 					console.log(errors);
 				});
 
+		};
+
+		controller.getOverdueTicklerCount = function getOverdueTicklerCount()
+		{
+			ticklerService.search(
+				{
+					status: 'A',
+					creator: controller.me.providerNo,
+					overdueOnly: 'property'
+				}, 0, 6).then(
+					function success(results)
+					{
+						controller.ticklerTotal = results.total;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					}
+				);
+		};
+
+		controller.getActiveConsultationCount = function getActiveConsultationCount()
+		{
+			// Any consultations that should have ended after this point but haven't need to be alerted for
+			var endDate = moment().subtract(controller.consultationLookbackPeriod, "months").toISOString();
+
+			consultService.getTotalRequests(
+				{
+					invertStatus: true,
+					referralEndDate: endDate,
+					status: '4',
+					team: controller.consultationTeamWarning
+				}).then(
+					function success(results)
+					{
+						controller.activeConsultationTotal = results.data;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					}
+				);
 		};
 
 		controller.getNavBar = function getNavBar()

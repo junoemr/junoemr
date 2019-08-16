@@ -111,8 +111,8 @@
 						<a href="javascript:void(0)"
 						   ng-if="!item.dropdown"
 						   ng-click="navBarCtrl.transition(item)">{{item.label}}
-							<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
-								  class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
+							<span ng-if="navBarCtrl.getCountForLabel(item) > 0"
+								  class="badge badge-danger">{{item.labelCount}}</span>
 						</a>
 
 						<a href="javascript:void(0)"
@@ -145,8 +145,8 @@
 						<a href="javascript:void(0)"
 						   ng-if="!item.dropdown"
 						   ng-click="navBarCtrl.transition(item)">{{item.label}}
-							<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
-								  class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
+							<span ng-if="navBarCtrl.getCountForLabel(item) > 0"
+								  class="badge badge-danger">{{item.labelCount}}</span>
 						</a>
 
 						<a href="javascript:void(0)"
@@ -204,8 +204,8 @@
 								<a href="javascript:void(0)"
 								   ng-if="!item.dropdown"
 								   ng-click="navBarCtrl.transition(item)">{{item.label}}
-									<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
-										  class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
+									<span ng-if="navBarCtrl.getCountForLabel(item) > 0"
+										  class="badge badge-danger">{{item.labelCount}}</span>
 								</a>
 
 								<a href="javascript:void(0)"
@@ -245,8 +245,8 @@
 								<a href="javascript:void(0)"
 								   ng-if="!item.dropdown"
 								   ng-click="navBarCtrl.transition(item)">{{item.label}}
-									<span ng-if="item.label=='Inbox' && navBarCtrl.unAckLabDocTotal > 0"
-									      class="badge badge-danger">{{navBarCtrl.unAckLabDocTotal}}</span>
+									<span ng-if="navBarCtrl.getCountForLabel(item) > 0"
+										  class="badge badge-danger">{{item.labelCount}}</span>
 								</a>
 
 								<a href="javascript:void(0)"
@@ -380,7 +380,6 @@
 		</div>
 	</div>
 </div>
-
 
 <script>
 
