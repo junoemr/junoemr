@@ -8,6 +8,14 @@ $color-primary-light: #6680cc;
 $color-primary-lighter: #8aa1e6;
 $color-primary-lightest: #bfcfff;
 
+$color-secondary-darkest: #2b331f;
+$color-secondary-darker: #3f591b;
+$color-secondary-dark: #588c0e;
+$color-secondary-base: #70b312;
+$color-secondary-light: #91cc3d;
+$color-secondary-lighter: #b6e673;
+$color-secondary-lightest: #e4ffbf;
+
 $color-neutral-black: #242833;
 $color-neutral-darkest: #262933;
 $color-neutral-darker: #393e4d;
@@ -25,8 +33,8 @@ $color-red-darker: #661a1a;
 $color-red-dark: #991f1f;
 $color-red-base: #cc2929;
 $color-red-light: #e65c5c;
-$color-red-light: #e68a8a;
-$color-red-light: #ffcccc;
+$color-red-lighter: #e68a8a;
+$color-red-lightest: #ffcccc;
 
 $color-orange-darkest: #4d2a08;
 $color-orange-darker: #80460d;
@@ -116,14 +124,15 @@ $color-pink-light: #e66791;
 $color-pink-lighter: #e6a1b8;
 $color-pink-lightest: #ffccdd;
 
-$semantic-info-base: #7381b2;
-$semantic-info-light: #cfd4e6;
-$semantic-success-base: #abd96c;
-$semantic-success-light: #d4d9ce;
-$semantic-warning-base: #ffb366;
-$semantic-warning-light: #fff2e6;
-$semantic-error-base: #e67d73;
-$semantic-error-light: #fff3f2;
+// colour variables based on the palette above
+$semantic-info-base: $color-primary-base;
+$semantic-info-light: $color-primary-lightest;
+$semantic-success-base: $color-secondary-base;
+$semantic-success-light: $color-secondary-lightest;
+$semantic-warning-base: $color-orange-base;
+$semantic-warning-light: $color-orange-lightest;
+$semantic-error-base: $color-red-base;
+$semantic-error-light: $color-red-lightest;
 
 // OLD names, use above
 // Imported from Clinicaid (schedule + datepicker stuff)

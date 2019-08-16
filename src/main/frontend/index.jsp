@@ -112,7 +112,12 @@
 						   ng-if="!item.dropdown"
 						   ng-click="navBarCtrl.transition(item)">{{item.label}}
 							<span ng-if="navBarCtrl.getCountForLabel(item) > 0"
-								  class="badge badge-danger">{{item.labelCount}}</span>
+								  class="badge badge-info">{{item.labelCount}}</span>
+							<button class="btn btn-icon unclaimed-inbox-button"
+							        ng-if="(item.label === 'Inbox') && (navBarCtrl.unclaimedCount > 0)"
+									ng-click="navBarCtrl.transition(item,'&providerNo=0&searchProviderNo=0&status=N'); $event.stopPropagation()">
+								<i class="icon icon-asterisk"></i>
+							</button>
 						</a>
 
 						<a href="javascript:void(0)"
@@ -138,15 +143,16 @@
 					<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.mediumNavItemFilter(false)"
 						ng-class="{'active': navBarCtrl.isActive(item) }">
 
-						<%--<a ng-click="navBarCtrl.transition(item)" data-toggle="tab" >{{item.label}}
-							<span ng-if="item.extra.length>0">({{item.extra}})</span>
-						</a>--%>
-
 						<a href="javascript:void(0)"
 						   ng-if="!item.dropdown"
 						   ng-click="navBarCtrl.transition(item)">{{item.label}}
 							<span ng-if="navBarCtrl.getCountForLabel(item) > 0"
-								  class="badge badge-danger">{{item.labelCount}}</span>
+								  class="badge badge-info">{{item.labelCount}}</span>
+							<button class="btn btn-icon unclaimed-inbox-button"
+							        ng-if="(item.label === 'Inbox') && (navBarCtrl.unclaimedCount > 0)"
+							        ng-click="navBarCtrl.transition(item,'&providerNo=0&searchProviderNo=0&status=N'); $event.stopPropagation()">
+								<i class="icon icon-asterisk"></i>
+							</button>
 						</a>
 
 						<a href="javascript:void(0)"
@@ -205,7 +211,12 @@
 								   ng-if="!item.dropdown"
 								   ng-click="navBarCtrl.transition(item)">{{item.label}}
 									<span ng-if="navBarCtrl.getCountForLabel(item) > 0"
-										  class="badge badge-danger">{{item.labelCount}}</span>
+										  class="badge badge-info">{{item.labelCount}}</span>
+									<button class="btn btn-icon unclaimed-inbox-button"
+									        ng-if="(item.label === 'Inbox') && (navBarCtrl.unclaimedCount > 0)"
+									        ng-click="navBarCtrl.transition(item,'&providerNo=0&searchProviderNo=0&status=N'); $event.stopPropagation()">
+										<i class="icon icon-asterisk"></i>
+									</button>
 								</a>
 
 								<a href="javascript:void(0)"
@@ -216,11 +227,6 @@
 									{{dropdownItem.label}}
 								</a>
 							</li>
-							<%--<li ng-repeat="item in navBarCtrl.moreMenuItems">
-								<a ng-class="{'active': isActive(item) }"
-									 ng-click="navBarCtrl.transition(item)">{{item.label}}
-								<span ng-if="item.extra.length>0" class="label">{{item.extra}}</span></a>
-							</li>--%>
 						</ul>
 					</li>
 				</ul>
@@ -261,6 +267,7 @@
 					</li>
 				</ul>
 
+				<!-- Nav Bar top right -->
 				<div class="vertical-align pull-right navbar-right-menu">
 					<div class="nav navbar-text pull-right" ng-cloak>
 						<div class="flex-row">
@@ -283,13 +290,6 @@
 							</button>
 
 							<div class="flex-row justify-content-center align-items-center">
-
-								<%--<button class="btn btn-icon dropdown-toggle hand-hover"--%>
-								      <%--data-toggle="dropdown"--%>
-								      <%--title="<bean:message key="navbar.user" bundle="ui"/>">--%>
-									<%--<i class="icon icon-user-md"></i>--%>
-								<%--</button>--%>
-								<%--<span></span>--%>
 								<div class="dropdown-toggle hand-hover flex-row justify-content-center align-items-center"
 								      data-toggle="dropdown"
 								      title="<bean:message key="navbar.user" bundle="ui"/>">
@@ -306,53 +306,8 @@
 										   class="hand-hover">{{item.label}}</a>
 									</li>
 								</ul>
-								<%--<ul class="dropdown-menu" role="menu">--%>
-									<%--<li ng-repeat="item in navBarCtrl.userMenuItems">--%>
-										<%--<a ng-click="navBarCtrl.transition(item)"--%>
-										   <%--ng-class="{'more-tab-highlight': navBarCtrl.isActive(item) }"--%>
-										   <%--class="hand-hover">{{item.label}}</a>--%>
-									<%--</li>--%>
-								<%--</ul>--%>
 							</div>
-
 						</div>
-
-
-						<%--<span>--%>
-							<%--<a ng-click="navBarCtrl.openScratchpad()"--%>
-							   <%--title="<bean:message key="navbar.scratchpad" bundle="ui"/>"--%>
-							   <%--class="hand-hover">--%>
-								<%--<span class="fa fa-pencil-square"></span>--%>
-							<%--</a>--%>
-						<%--</span>--%>
-						<%--<span ng-show="navBarCtrl.messageRights === true">--%>
-								<%--<a ng-click="navBarCtrl.openMessenger()"--%>
-								   <%--title="<bean:message key="navbar.messenger" bundle="ui"/>"--%>
-								   <%--class="hand-hover">--%>
-									<%--<span class="fa fa-envelope"></span>--%>
-									<%--<span ng-show="navBarCtrl.unreadMessageTotal > 0"--%>
-									      <%--class="badge badge-danger">{{navBarCtrl.unreadMessageTotal}}--%>
-									<%--</span>--%>
-								<%--</a>--%>
-								<%--<a ng-click="navBarCtrl.openMessenger(navBarCtrl.messengerMenu)"--%>
-								   <%--title="{{navBarCtrl.messengerMenu.label}}"--%>
-								   <%--class="hand-hover">{{navBarCtrl.messengerMenu.extra}}</a>--%>
-
-								<%--<span ng-if="!$last"></span>--%>
-						<%--</span>--%>
-						<%--<span class="dropdown-toggle hand-hover"--%>
-						      <%--data-toggle="dropdown"--%>
-						      <%--title="<bean:message key="navbar.user" bundle="ui"/>">--%>
-								<%--<span class="fa fa-user"></span>--%>
-								<%--{{navBarCtrl.me.firstName}}--%>
-							<%--</span>--%>
-						<%--<ul class="dropdown-menu" role="menu">--%>
-							<%--<li ng-repeat="item in navBarCtrl.userMenuItems">--%>
-								<%--<a ng-click="navBarCtrl.transition(item)"--%>
-								   <%--ng-class="{'more-tab-highlight': navBarCtrl.isActive(item) }"--%>
-								   <%--class="hand-hover">{{item.label}}</a>--%>
-							<%--</li>--%>
-						<%--</ul>--%>
 					</div>
 				</div>
 			</div>

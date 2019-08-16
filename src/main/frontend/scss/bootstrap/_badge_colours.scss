@@ -1,24 +1,24 @@
 /*css to add back colours for badges and make use of the colours*/
 .badge-default {
-  background-color: #999999;
+  background-color: $color-neutral-grey;
 }
 
 .badge-primary {
-  background-color: #428bca;
+  background-color: $color-primary-light;
 }
 
 .badge-success {
-  background-color: #5cb85c;
+  background-color: $semantic-success-base;
 }
 
 .badge-info {
-  background-color: #5bc0de;
+  background-color: $semantic-info-base;
 }
 
 .badge-warning {
-  background-color: #f0ad4e;
+  background-color: $semantic-warning-base;
 }
 
 .badge-danger {
-  background-color: #d9534f;
+  background-color: $semantic-error-base;
 }
