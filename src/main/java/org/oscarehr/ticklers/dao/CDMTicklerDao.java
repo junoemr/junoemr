@@ -45,7 +45,7 @@ import java.util.Set;
 public class CDMTicklerDao
 {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "persistenceUnit")
     private EntityManager entityManager;
 
     /**
@@ -61,28 +61,42 @@ public class CDMTicklerDao
     public List<CDMTicklerInfo> getCDMTicklerCreationInfo(Set<Integer> cdmDxCodes, Set<String> inactivePatientStatuses)
     {
         Query query = entityManager.createNativeQuery(
-         "SELECT d.demographic_no, d.provider_no, dxr.dxresearch_code, sc.serviceCode, bm.date, t.tickler_no " +
+         "SELECT d.demographic_no, d.provider_no, dxr.dxresearch_code, sc.serviceCode, bm.date, " +
+                 " t.tickler_no " +
             "FROM demographic d " +
             "JOIN dxresearch dxr " +
                 "ON d.demographic_no = dxr.demographic_no " +
                 "AND dxr.dxresearch_code IN (:cdmCodes) " +
                 "AND dxr.status = 'A' " +
-                "AND d.patient_status = NOT IN (:inactivePatientStatuses) " +
+                "AND d.patient_status NOT IN (:inactivePatientStatuses) " +
             "JOIN billing_cdm_service_codes sc " +
                 "ON dxr.dxresearch_code = sc.cdmCode " +
             "LEFT JOIN (" +
                 "SELECT demographic_no, billing_code, billingstatus, max(service_date) AS date " +
                 "FROM billingmaster " +
-                "GROUP BY demographic_no, billing_code, billingstatus" +
+                "WHERE billingstatus NOT IN ('D', 'R', 'F')" +
+                "GROUP BY demographic_no, billing_code, billingstatus " +
             ") bm " +
                 "ON d.demographic_no = bm.demographic_no " +
                 "AND bm.billing_code = sc.serviceCode " +
             "LEFT JOIN tickler t ON t.demographic_no = d.demographic_no " +
                 "AND t.message LIKE CONCAT('%', 'SERVICE CODE ', sc.serviceCode, '%') " +
                 "AND t.status = :ticklerStatus " +
-            "WHERE (billingstatus NOT IN ('D', 'R', 'F') " +
-                "AND (DATEDIFF(NOW(), bm.date) >= 365) OR bm.date IS NULL) " +
-                "AND t.tickler_no IS NULL");
+            "WHERE ((DATEDIFF(NOW(), bm.date) >= 365) OR bm.date IS NULL)" +
+                "AND t.tickler_no IS NULL " +
+                "AND NOT EXISTS (" +
+                    "SELECT * " +
+                    "FROM billing_service_code_conditions sc_con, " +
+                    "("+
+                        "SELECT demographic_no, billing_code, billingstatus, max(service_date) AS date " +
+                        "FROM billingmaster " +
+                        "GROUP BY demographic_no, billing_code, billingstatus " +
+                    ") bm2 " +
+                    "WHERE d.demographic_no = bm2.demographic_no " +
+                    "AND bm2.billing_code = sc_con.conditionCode " +
+                    "AND sc_con.serviceCode = sc.serviceCode " +
+                    "AND ((DATEDIFF(NOW(), bm2.date) <= 365) AND billingstatus NOT IN ('D', 'R', 'F')) " +
+            ")");
 
         query.setParameter("inactivePatientStatuses", inactivePatientStatuses);
         query.setParameter("cdmCodes", cdmDxCodes);
@@ -124,8 +138,20 @@ public class CDMTicklerDao
                 "ON t.demographic_no = d.demographic_no " +
                 "AND t.message LIKE CONCAT('%', 'SERVICE CODE ', sc.serviceCode, '%') " +
                 "AND t.status = :ticklerStatus " +
-            "WHERE billingstatus NOT IN ('D', 'R', 'F') " +
-            "AND DATEDIFF(NOW(), bm.date) < 365");
+            "WHERE (billingstatus NOT IN ('D', 'R', 'F') AND DATEDIFF(NOW(), bm.date) < 365) " +
+            "OR EXISTS (" +
+                   "SELECT * " +
+                   "FROM billing_service_code_conditions sc_con, " +
+                   "("+
+                       "SELECT demographic_no, billing_code, billingstatus, max(service_date) AS date " +
+                       "FROM billingmaster " +
+                       "GROUP BY demographic_no, billing_code, billingstatus " +
+                   ") bm2 " +
+                   "WHERE d.demographic_no = bm2.demographic_no " +
+                   "AND bm2.billing_code = sc_con.conditionCode " +
+                   "AND sc_con.serviceCode = sc.serviceCode " +
+                   "AND ((DATEDIFF(NOW(), bm2.date) <= 365) AND billingstatus NOT IN ('D', 'R', 'F')) " +
+           ")");
 
         query.setParameter("cdmTicklerDxCodes", cdmTicklerDxCodes);
         query.setParameter("ticklerStatus", Tickler.ACTIVE);
