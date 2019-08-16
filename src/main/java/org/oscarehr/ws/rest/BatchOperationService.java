@@ -103,8 +103,7 @@ public class BatchOperationService extends AbstractServiceImpl
 		catch (Exception e)
 		{
 			MiscUtils.getLogger().error("Failed to batch update status to [" + newStatus + "] for demographics with error: " + e.getMessage(), e);
-			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_FAILURE, "Change Demographic Status: " + demoTransfer.toString());
-			return RestResponse.errorResponse(STANDARD_ERROR_STRING + e.getMessage());
+			throw e;
 		}
 	}
 
@@ -129,8 +128,7 @@ public class BatchOperationService extends AbstractServiceImpl
 		catch (Exception e)
 		{
 			MiscUtils.getLogger().error("Failed to batch update demographic Dx codes to [" + demoTo1.getDxCode() + "] with error: " + e.getMessage(), e);
-			LogAction.addLogEntry(getLoggedInInfo().getLoggedInProviderNo(), LogConst.ACTION_UPDATE, LogConst.CON_DISEASE_REG, LogConst.STATUS_FAILURE, "Assign dx codes: " + demoTo1.toString());
-			return RestResponse.errorResponse(STANDARD_ERROR_STRING + e.getMessage());
+			throw e;
 		}
 	}
 }

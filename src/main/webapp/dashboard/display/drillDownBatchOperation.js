@@ -186,7 +186,7 @@ BatchOperations =
 			{
 				BatchOperations.showErrorMessage(data.error.message);
 			}
-			else if (data.status === 403)
+			else if (data.status === 403 || data.status === 500)
 			{
 				BatchOperations.showErrorMessage(JSON.parse(data.responseText).error.message);
 			}
