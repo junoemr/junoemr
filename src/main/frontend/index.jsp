@@ -273,7 +273,7 @@
 							<button class="btn btn-icon hand-hover"
 							        title="<bean:message key="navbar.messenger" bundle="ui"/>"
 							        ng-click="navBarCtrl.openMessenger()">
-								<i class="icon icon-mail"></i>
+								<i class="icon icon-chat"></i>
 								<span ng-show="navBarCtrl.unreadMessageTotal > 0"
 								      class="badge badge-danger">{{navBarCtrl.unreadMessageTotal}}
 								</span>

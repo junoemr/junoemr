@@ -62,24 +62,27 @@ li.cpp-note-list:last-child {
 
 				$input-size: 32px;
 				.form-control {
+					@include juno-form-colour-scheme-dark;
 					height: $input-size;
 					width: 304px;
-					background-color: $color-neutral-white;
-					border: 1px solid $color-neutral-light;
 				}
 				.btn {
 					height: $input-size;
 					padding-top: 0;
 					padding-bottom: 0;
-					color: $color-neutral-darker;
 				}
 				.btn-visible {
 					height: $input-size;
 					width: $input-size;
 					background-color: $color-neutral-white;
-					border: 1px solid $color-neutral-light;
+					border: 1px solid $color-neutral-lightest;
 					.icon {
 						font-size: 20px;
+						color: $color-neutral-darker;
+					}
+				}
+				.directive-juno-typeahead {
+					.icon {
 						color: $color-neutral-darker;
 					}
 				}

@@ -77,7 +77,7 @@
 }
 
 @mixin juno-tab-color-scheme-dark {
-	@include juno-tab-color-scheme($color-neutral-darker, $color-neutral-darker, $color-neutral-white,
+	@include juno-tab-color-scheme($color-neutral-darkest, $color-neutral-darkest, $color-neutral-white,
 			$color-primary-dark, $color-primary-base, $color-neutral-white);
 }
 

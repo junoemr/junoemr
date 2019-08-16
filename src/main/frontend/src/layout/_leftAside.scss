@@ -26,7 +26,7 @@
 		@extend %juno-page-header;
 		border-right: $color-primary-dark 8px solid;
 		.form-control {
-			@include juno-form-colour-scheme-dark;
+			@include juno-form-colour-scheme-blue;
 		}
 	}
 

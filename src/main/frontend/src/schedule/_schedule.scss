@@ -48,7 +48,7 @@
 				height: calc(#{$input-height} * 0.75);
 			}
 			.form-control {
-				@include juno-form-colour-scheme-dark;
+				@include juno-form-colour-scheme-blue;
 			}
 			label {
 				margin-right: 5px;
