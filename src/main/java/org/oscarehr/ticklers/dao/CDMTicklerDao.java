@@ -45,7 +45,7 @@ import java.util.Set;
 public class CDMTicklerDao
 {
 
-    @PersistenceContext
+	@PersistenceContext(unitName = "persistenceUnit")
     private EntityManager entityManager;
 
     /**
