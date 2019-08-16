@@ -80,7 +80,7 @@ public abstract class ORM_O01ConnectCareCancelHandler extends ORM_O01MessageHand
 		ArrayList<Pair<String, String>> patientIds = getPatientIdentificationList(false);
 		for (Pair<String, String> id : patientIds)
 		{
-			if (id.getLeft().equalsIgnoreCase("PHN"))
+			if (id.getLeft().equalsIgnoreCase("PHN") || id.getLeft().equalsIgnoreCase("ULI"))
 			{
 				return id.getRight();
 			}
@@ -119,6 +119,28 @@ public abstract class ORM_O01ConnectCareCancelHandler extends ORM_O01MessageHand
 		{
 			return new ArrayList<Pair<String, String>>();
 		}
+	}
+
+	/**
+	 * return additional fields,
+	 * - Patient ID \w assigning authority - all values
+	 * @return list of pairs <title, value>
+	 */
+	@Override
+	public ArrayList<Pair<String, String>> getExtendedPatientDescriptionFields()
+	{
+		ArrayList<Pair<String, String>> extDesc = new ArrayList<Pair<String, String>>();
+
+		// add additional patient ids
+		for (Pair<String, String> patientId : getPatientIdentificationList())
+		{
+			if (!patientId.getLeft().equalsIgnoreCase("ULI") && !patientId.getLeft().equalsIgnoreCase("PHN"))
+			{
+				extDesc.add(Pair.of(patientId.getLeft() + "# ", patientId.getRight()));
+			}
+		}
+
+		return extDesc;
 	}
 
 	/**

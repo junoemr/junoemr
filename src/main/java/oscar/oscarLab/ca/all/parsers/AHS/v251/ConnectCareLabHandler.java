@@ -75,7 +75,7 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 		ArrayList<Pair<String, String>> patientIds = getPatientIdentificationList(false);
 		for (Pair<String, String> id : patientIds)
 		{
-			if (id.getLeft().equalsIgnoreCase("PHN"))
+			if (id.getLeft().equalsIgnoreCase("PHN") || id.getLeft().equalsIgnoreCase("ULI"))
 			{
 				return id.getRight();
 			}

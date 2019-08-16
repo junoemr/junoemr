@@ -146,7 +146,7 @@ public class ConnectCareDiagnosticImagingHandler extends ConnectCareHandler
 		// add additional patient ids
 		for (Pair<String, String> patientId : getPatientIdentificationList())
 		{
-			if (!patientId.getLeft().equalsIgnoreCase("ULI"))
+			if (!patientId.getLeft().equalsIgnoreCase("ULI") && !patientId.getLeft().equalsIgnoreCase("PHN"))
 			{
 				extDesc.add(Pair.of(patientId.getLeft() + "# ", patientId.getRight()));
 			}
