@@ -124,6 +124,16 @@ public class ConnectCareDiagnosticImagingHandler extends ConnectCareHandler
 	}
 
 	/**
+	 * As per Connect Care Conformance guidance abnormal flag is to be ignored in this type of lab.
+	 * @return - always N
+	 */
+	@Override
+	public String getOBXAbnormalFlag( int i, int j)
+	{
+		return "N";
+	}
+
+	/**
 	 * return additional fields,
 	 * - Patient ID \w assigning authority - all values
 	 * @return list of pairs <title, value>
