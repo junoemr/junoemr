@@ -28,7 +28,7 @@ set the html structure up like this:
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: $grey-04;
+  background-color: $color-neutral-grey;
   -webkit-transition: .4s;
   transition: .4s;
 }
@@ -40,17 +40,17 @@ set the html structure up like this:
   width: 26px;
   left: 4px;
   bottom: 4px;
-  background-color: $white;
+  background-color: $color-neutral-white;
   -webkit-transition: .4s;
   transition: .4s;
 }
 
 input:checked + .slider {
-  background-color: $primary;
+  background-color: $color-primary-base;
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px $primary-hover;
+  box-shadow: 0 0 1px $color-primary-dark;
 }
 
 input:checked + .slider:before {

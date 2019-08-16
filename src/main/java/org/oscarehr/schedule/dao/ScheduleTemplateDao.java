@@ -164,6 +164,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"FROM scheduledate sd " +
 				"JOIN scheduletemplate st ON (sd.hour = st.name AND (sd.provider_no = st.provider_no OR st.provider_no = :publicCode ))\n" +
 				"WHERE sd.status = 'A'\n" +
+				"AND sd.available = :available\n" +
 				"AND sd.sdate = :scheduleDate\n" +
 				"AND sd.provider_no = :providerNo\n";
 		if(siteId != null)
@@ -174,6 +175,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter("scheduleDate", java.sql.Date.valueOf(date), TemporalType.DATE);
 		query.setParameter("providerNo", providerNo);
+		query.setParameter("available", 1);
 		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
 		if(siteId != null)
 		{
@@ -227,6 +229,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"LEFT JOIN scheduletemplatecode stc " +
 				"  ON BINARY stc.code = SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1)\n" +
 				"WHERE sd.status = 'A'\n" +
+				"AND sd.available = :available\n" +
 				"AND sd.sdate = :date\n" +
 				siteFilter +
 				"AND sd.provider_no = :providerNo\n" +
@@ -236,6 +239,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter("date", java.sql.Date.valueOf(date), TemporalType.DATE);
 		query.setParameter("providerNo", providerNo);
+		query.setParameter("available", 1);
 		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);
 		if(siteId != null)
 		{

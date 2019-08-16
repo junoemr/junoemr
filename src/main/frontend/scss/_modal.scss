@@ -11,16 +11,16 @@
 			-webkit-border-radius: 16px !important;
 			-moz-border-radius: 16px !important;
 			border-radius: 16px !important;
-			background: linear-gradient(-45deg, $white 50%, transparent 0) no-repeat 100% 100%,
-			linear-gradient(247deg, #5c8be8, $primary 30%, $primary 64%, #355085) no-repeat;
+			background: linear-gradient(-45deg, $color-neutral-white 50%, transparent 0) no-repeat 100% 100%,
+			linear-gradient(247deg, #5c8be8, $color-primary-base 30%, $color-primary-base 64%, #355085) no-repeat;
 
 			&.double-book {
-				background: linear-gradient(-45deg, $white 50%, transparent 0) no-repeat 100% 100%,
-				linear-gradient(247deg, $yellow, $yellow 30%, $yellow-hover 64%, $yellow-hover) no-repeat;
+				background: linear-gradient(-45deg, $color-neutral-white 50%, transparent 0) no-repeat 100% 100%,
+				linear-gradient(247deg, $color-yellow-base, $color-yellow-base 30%, $color-yellow-dark 64%, $color-yellow-dark) no-repeat;
 			}
 			&.double-book-prevented {
-				background: linear-gradient(-45deg, $white 50%, transparent 0) no-repeat 100% 100%,
-				linear-gradient(247deg, $orange, $orange 30%, $orange-hover 64%, $orange-hover) no-repeat;
+				background: linear-gradient(-45deg, $color-neutral-white 50%, transparent 0) no-repeat 100% 100%,
+				linear-gradient(247deg, $color-orange-base, $color-orange-base 30%, $color-orange-dark 64%, $color-orange-dark) no-repeat;
 			}
 
 			// header counts as modal top border, so don't apply the spacing to main content pane
@@ -31,14 +31,14 @@
 			}
 			.modal-body {
 				height: $modal-body-height;
-				background-color: $white;
+				background-color: $color-neutral-white;
 				border-radius: 16px 16px 0 0;
 				padding: 0;
 			}
 			.modal-footer {
 				height: $modal-footer-height;
 				border-radius: 0 0 16px 16px;
-				background-color: $white;
+				background-color: $color-neutral-white;
 				border: 0;
 				.btn {
 					width: 112px;
@@ -46,12 +46,12 @@
 
 					&.btn-primary {
 						&.double-book {
-							background-color: $yellow;
-							border-color: $yellow-hover;
+							background-color: $color-yellow-base;
+							border-color: $color-yellow-dark;
 						}
 						&.double-book-prevented {
-							background-color: $orange;
-							border-color: $orange-hover;
+							background-color: $color-orange-base;
+							border-color: $color-orange-dark;
 						}
 					}
 				}
@@ -79,7 +79,7 @@
 		font-stretch: normal;
 		line-height: 1.44;
 		letter-spacing: -0.7px;
-		color: $white;
+		color: $color-neutral-white;
 	}
 	h4 {
 		margin-top: 0;
@@ -91,6 +91,6 @@
 		font-stretch: normal;
 		line-height: 1.86;
 		letter-spacing: -0.6px;
-		color: $white;
+		color: $color-neutral-white;
 	}
 }

@@ -289,12 +289,12 @@
 			 $scope.datepicker = $('#' + date_picker_id).find('input');
 			 $scope.create_datepicker();
 
-			 $scope.datepicker.on('show', function(e) {
-
+			 $scope.datepicker.on('show', function (e)
+			 {
 				 // Show multi button only if this is a multi-date picker
 				 var dropdown = $(".datepicker.datepicker-dropdown");
 				 var footer = dropdown.find('tfoot');
-				 if($scope.use_multi_date == 'true')
+				 if ($scope.use_multi_date == 'true')
 				 {
 					 footer.replaceWith(buttons_html_with_picker);
 				 }
@@ -304,6 +304,11 @@
 				 }
 				 footer = dropdown.find('tfoot');
 				 $compile(footer.contents())($scope);
+
+				 // replace next/prev buttons with custom font icons
+				 dropdown.find(".next").html("").addClass("icon-arrow-right");
+				 dropdown.find(".prev").html("").addClass("icon-arrow-left");
+
 				 $scope.initialization_complete = true;
 			 })
 		 });

@@ -922,8 +922,8 @@
 						<div class="label">Virtual:</div>
 						<div class="input">
 								<input type="checkbox" name="isVirtual"
-												<%= appt.isVirtual() ? "checked='checked'" : "" %>/>
-								<% if(appt.isVirtual()) { %>
+												<%= appt.getIsVirtual() ? "checked='checked'" : "" %>/>
+								<% if(appt.getIsVirtual()) { %>
 								&nbsp;
 								&nbsp;
 								&nbsp;

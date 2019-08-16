@@ -283,7 +283,14 @@ public class AppointmentManager {
 			);
 
 			ProviderData lastUpdateProvider = archive.getLastUpdateUserRecord();
-			editRecord.setUpdateUserDisplayName(lastUpdateProvider.getDisplayName());
+			if (lastUpdateProvider != null)
+			{
+				editRecord.setUpdateUserDisplayName(lastUpdateProvider.getDisplayName());
+			}
+			else
+			{
+				editRecord.setUpdateUserDisplayName("Provider, Unknown");
+			}
 
 			editList.add(editRecord);
 		}

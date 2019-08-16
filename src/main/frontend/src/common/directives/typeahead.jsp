@@ -30,7 +30,7 @@
 		'right-addon': hasRightIcon()}"
      >
 	<i ng-if="hasIcon()"
-	   class="glyphicon glyphicon-search form-control-feedback"></i>
+	   class="icon icon-search form-control-feedback"></i>
 
 	<input ng-if="hasTemplateUrl()"
 	       type="text"
