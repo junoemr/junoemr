@@ -46,21 +46,16 @@ li.cpp-note-list:last-child {
 		width: $primary-navbar-height;
 		height: $primary-navbar-height;
 
-		&.unclaimed-inbox-button {
-			width: 20px;
-			height: 20px;
-			.icon {
-				color: $color-lime-base;
-				font-size: 20px;
-			}
-		}
 		.icon-logo {
 			width: 48px;
 			height: 16px;
 		}
 	}
 	.badge {
-		margin: 0 3px;
+		margin-left: 8px;
+		&.badge-custom {
+			background-color: $color-yellow-base;
+		}
 	}
 
 	.navbar-left {
@@ -103,27 +98,23 @@ li.cpp-note-list:last-child {
 	}
 	.navbar-right-menu {
 		height: $primary-navbar-height;
+		@include juno-tab-xxs(24px);
 
-		.btn-icon {
-			width: 24px;
-			height: 24px;
-			margin: 0 2px;
+		.badge {
+			margin-left: 0;
 		}
 		.icon {
-			font-size: 18px;
+			font-size: 20px;
 			color: $color-neutral-white;
-		}
-
-		span {
-			padding: 2px;
 		}
 		.dropdown-toggle {
 			color: $color-neutral-white;
 		}
 		.dropdown-menu {
 			@include juno-tab-sm(24px);
+			position: fixed;
 			left: initial;
-			right: 16px;
+			right: 0;
 			top: $primary-navbar-height;
 		}
 	}

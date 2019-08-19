@@ -58,8 +58,8 @@
 </head>
 
 <body ng-controller="Layout.BodyController as bodyCtrl"
-	  ng-init="bodyCtrl.init()"
-	  id="main-body">
+      ng-init="bodyCtrl.init()"
+      id="main-body">
 
 <!-- Navbar -->
 <div ng-controller="Layout.NavBarController as navBarCtrl"
@@ -106,18 +106,20 @@
 				<!-- Large view -->
 				<ul class="nav navbar-nav breakpoint-lg-visible-exclusive" ng-cloak>
 					<li ng-repeat="item in navBarCtrl.menuItems"
-						ng-class="{'active': navBarCtrl.isActive(item) }">
+					    ng-class="{'active': navBarCtrl.isActive(item) }">
 
 						<a href="javascript:void(0)"
 						   ng-if="!item.dropdown"
 						   ng-click="navBarCtrl.transition(item)">{{item.label}}
 							<span ng-if="navBarCtrl.getCountForLabel(item) > 0"
-								  class="badge badge-info">{{item.labelCount}}</span>
-							<button class="btn btn-icon unclaimed-inbox-button"
-							        ng-if="(item.label === 'Inbox') && (navBarCtrl.unclaimedCount > 0)"
-									ng-click="navBarCtrl.transition(item,'&providerNo=0&searchProviderNo=0&status=N'); $event.stopPropagation()">
-								<i class="icon icon-asterisk"></i>
-							</button>
+							      class="badge"
+							      ng-class="{ 'badge-success': (item.label === 'Inbox'),
+						                      'badge-warning': (item.label === 'Ticklers')}"
+							>{{item.labelCount}}</span>
+							<span class="unclaimed-inbox-button badge badge-custom"
+							      ng-if="(item.label === 'Inbox') && (navBarCtrl.unclaimedCount > 0)"
+							      ng-click="navBarCtrl.transition(item,'&providerNo=0&searchProviderNo=0&status=N'); $event.stopPropagation()"
+							>{{navBarCtrl.unclaimedCount}}</span>
 						</a>
 
 						<a href="javascript:void(0)"
@@ -128,8 +130,8 @@
 						</a>
 
 						<ul ng-if="item.dropdown"
-							class="dropdown-menu"
-							role="menu">
+						    class="dropdown-menu"
+						    role="menu">
 							<li ng-repeat="dropdownItem in item.dropdownItems">
 								<a href="javascript:void(0)"
 								   ng-click="navBarCtrl.transition(dropdownItem)">{{dropdownItem.label}}</a>
@@ -141,18 +143,20 @@
 				<!-- Medium view -->
 				<ul class="nav navbar-nav breakpoint-md-visible-exclusive" ng-cloak>
 					<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.mediumNavItemFilter(false)"
-						ng-class="{'active': navBarCtrl.isActive(item) }">
+					    ng-class="{'active': navBarCtrl.isActive(item) }">
 
 						<a href="javascript:void(0)"
 						   ng-if="!item.dropdown"
 						   ng-click="navBarCtrl.transition(item)">{{item.label}}
 							<span ng-if="navBarCtrl.getCountForLabel(item) > 0"
-								  class="badge badge-info">{{item.labelCount}}</span>
-							<button class="btn btn-icon unclaimed-inbox-button"
-							        ng-if="(item.label === 'Inbox') && (navBarCtrl.unclaimedCount > 0)"
-							        ng-click="navBarCtrl.transition(item,'&providerNo=0&searchProviderNo=0&status=N'); $event.stopPropagation()">
-								<i class="icon icon-asterisk"></i>
-							</button>
+							      class="badge"
+							      ng-class="{ 'badge-success': (item.label === 'Inbox'),
+						                      'badge-warning': (item.label === 'Ticklers')}"
+							>{{item.labelCount}}</span>
+							<span class="unclaimed-inbox-button badge badge-custom"
+							      ng-if="(item.label === 'Inbox') && (navBarCtrl.unclaimedCount > 0)"
+							      ng-click="navBarCtrl.transition(item,'&providerNo=0&searchProviderNo=0&status=N'); $event.stopPropagation()"
+							>{{navBarCtrl.unclaimedCount}}</span>
 						</a>
 
 						<a href="javascript:void(0)"
@@ -163,11 +167,11 @@
 						</a>
 
 						<ul ng-if="item.dropdown"
-							class="dropdown-menu"
-							role="menu">
+						    class="dropdown-menu"
+						    role="menu">
 							<li ng-repeat="dropdownItem in item.dropdownItems">
 								<a href="javascript:void(0)"
-								   ng-click="navBarCtrl.transition(dropdownItem)" >{{dropdownItem.label}}</a>
+								   ng-click="navBarCtrl.transition(dropdownItem)">{{dropdownItem.label}}</a>
 							</li>
 						</ul>
 					</li>
@@ -179,7 +183,7 @@
 
 						<ul class="dropdown-menu" role="menu">
 							<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.mediumNavItemFilter(true)"
-								ng-class="{'active': navBarCtrl.isActive(item) }">
+							    ng-class="{'active': navBarCtrl.isActive(item) }">
 								<a href="javascript:void(0)"
 
 								   ng-click="navBarCtrl.transition(item)" data-toggle="tab">{{item.label}}
@@ -193,7 +197,7 @@
 				<!--Small View-->
 				<ul class="nav navbar-nav breakpoint-sm-visible-exclusive" ng-cloak>
 					<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.smallNavItemFilter(false)"
-						ng-class="{'active': navBarCtrl.isActive(item) }">
+					    ng-class="{'active': navBarCtrl.isActive(item) }">
 						<a ng-click="navBarCtrl.transition(item)" data-toggle="tab">{{item.label}}
 							<span ng-if="item.extra.length>0">({{item.extra}})</span>
 						</a>
@@ -206,17 +210,19 @@
 
 						<ul class="dropdown-menu" role="menu">
 							<li ng-repeat="item in navBarCtrl.menuItems | filter: navBarCtrl.smallNavItemFilter(true)"
-								ng-class="{'active': navBarCtrl.isActive(item) }">
+							    ng-class="{'active': navBarCtrl.isActive(item) }">
 								<a href="javascript:void(0)"
 								   ng-if="!item.dropdown"
 								   ng-click="navBarCtrl.transition(item)">{{item.label}}
 									<span ng-if="navBarCtrl.getCountForLabel(item) > 0"
-										  class="badge badge-info">{{item.labelCount}}</span>
-									<button class="btn btn-icon unclaimed-inbox-button"
-									        ng-if="(item.label === 'Inbox') && (navBarCtrl.unclaimedCount > 0)"
-									        ng-click="navBarCtrl.transition(item,'&providerNo=0&searchProviderNo=0&status=N'); $event.stopPropagation()">
-										<i class="icon icon-asterisk"></i>
-									</button>
+									      class="badge"
+									      ng-class="{   'badge-success': (item.label === 'Inbox'),
+						                                'badge-warning': (item.label === 'Ticklers')}"
+									>{{item.labelCount}}</span>
+									<span class="unclaimed-inbox-button badge badge-custom"
+									      ng-if="(item.label === 'Inbox') && (navBarCtrl.unclaimedCount > 0)"
+									      ng-click="navBarCtrl.transition(item,'&providerNo=0&searchProviderNo=0&status=N'); $event.stopPropagation()"
+									>{{navBarCtrl.unclaimedCount}}</span>
 								</a>
 
 								<a href="javascript:void(0)"
@@ -252,7 +258,14 @@
 								   ng-if="!item.dropdown"
 								   ng-click="navBarCtrl.transition(item)">{{item.label}}
 									<span ng-if="navBarCtrl.getCountForLabel(item) > 0"
-										  class="badge badge-danger">{{item.labelCount}}</span>
+									      class="badge"
+									      ng-class="{ 'badge-success': (item.label === 'Inbox'),
+						                      'badge-warning': (item.label === 'Ticklers')}"
+									>{{item.labelCount}}</span>
+									<span class="unclaimed-inbox-button badge badge-custom"
+									      ng-if="(item.label === 'Inbox') && (navBarCtrl.unclaimedCount > 0)"
+									      ng-click="navBarCtrl.transition(item,'&providerNo=0&searchProviderNo=0&status=N'); $event.stopPropagation()"
+									>{{navBarCtrl.unclaimedCount}}</span>
 								</a>
 
 								<a href="javascript:void(0)"
@@ -269,46 +282,42 @@
 
 				<!-- Nav Bar top right -->
 				<div class="vertical-align pull-right navbar-right-menu">
-					<div class="nav navbar-text pull-right" ng-cloak>
-						<div class="flex-row">
-							<button class="btn btn-icon hand-hover"
-							        title="<bean:message key="navbar.scratchpad" bundle="ui"/>"
-							        ng-click="navBarCtrl.openScratchpad()">
+					<ul class="nav navbar-nav" ng-cloak>
+						<li>
+							<a class="flex-row justify-content-center align-items-center"
+							   title="<bean:message key="navbar.scratchpad" bundle="ui"/>"
+							   ng-click="navBarCtrl.openScratchpad()">
 								<i class="icon icon-write"></i>
-							</button>
-
-							<button class="btn btn-icon hand-hover"
-							        title="<bean:message key="navbar.messenger" bundle="ui"/>"
-							        ng-click="navBarCtrl.openMessenger()">
+							</a>
+						</li>
+						<li>
+							<a class="flex-row justify-content-center align-items-center"
+							   title="<bean:message key="navbar.messenger" bundle="ui"/>"
+							   ng-click="navBarCtrl.openMessenger()">
 								<i class="icon icon-chat"></i>
 								<span ng-show="navBarCtrl.unreadMessageTotal > 0"
 								      class="badge badge-danger">{{navBarCtrl.unreadMessageTotal}}
 								</span>
-								<a ng-click="navBarCtrl.openMessenger(navBarCtrl.messengerMenu)"
-								   title="{{navBarCtrl.messengerMenu.label}}"
-								   class="hand-hover">{{navBarCtrl.messengerMenu.extra}}</a>
-							</button>
-
-							<div class="flex-row justify-content-center align-items-center">
-								<div class="dropdown-toggle hand-hover flex-row justify-content-center align-items-center"
-								      data-toggle="dropdown"
-								      title="<bean:message key="navbar.user" bundle="ui"/>">
-									<i class="icon icon-user-md"></i>
-									<span>
+							</a>
+						</li>
+						<li>
+							<a class="dropdown-toggle flex-row justify-content-center align-items-center"
+							   title="<bean:message key="navbar.user" bundle="ui"/>"
+							   data-toggle="dropdown">
+								<i class="icon icon-user-md"></i>
+								<span>
 									{{navBarCtrl.me.firstName}}
-									</span>
-								</div>
-
-								<ul class="dropdown-menu" role="menu">
-									<li ng-repeat="item in navBarCtrl.userMenuItems">
-										<a ng-click="navBarCtrl.transition(item)"
-										   ng-class="{'more-tab-highlight': navBarCtrl.isActive(item) }"
-										   class="hand-hover">{{item.label}}</a>
-									</li>
-								</ul>
-							</div>
-						</div>
-					</div>
+								</span>
+							</a>
+							<ul class="dropdown-menu" role="menu">
+								<li ng-repeat="item in navBarCtrl.userMenuItems">
+									<a ng-click="navBarCtrl.transition(item)"
+									   ng-class="{'more-tab-highlight': navBarCtrl.isActive(item) }"
+									   class="hand-hover">{{item.label}}</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
 				</div>
 			</div>
 			<!--/.nav-collapse -->

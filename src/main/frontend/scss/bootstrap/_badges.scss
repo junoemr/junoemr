@@ -4,7 +4,7 @@
 }
 
 .badge-primary {
-  background-color: $color-primary-light;
+  background-color: $color-primary-base;
 }
 
 .badge-success {
@@ -21,4 +21,8 @@
 
 .badge-danger {
   background-color: $semantic-error-base;
+}
+
+.badge {
+  font-size: 10px;
 }

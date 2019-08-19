@@ -29,7 +29,9 @@
 	@include juno-tab-rounded($round-radius);
 }
 
-
+@mixin juno-tab-xxs($tabs-height) {
+	@include juno-tab($tabs-height, 2px, 6px, 4px);
+}
 @mixin juno-tab-sm($tabs-height) {
 	@include juno-tab($tabs-height, 4px, 12px, 8px);
 }
