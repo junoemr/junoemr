@@ -45,7 +45,7 @@ if(!authed) {
    String demoNO = request.getParameter("demographicNo");
    
    dxResearchBeanHandler dxResearchBeanHand = new dxResearchBeanHandler(demoNO);
-   Vector patientDx = dxResearchBeanHand.getDxResearchBeanVector();   
+   Vector patientDx = dxResearchBeanHand.getDxResearchBeans();
    
    String quickList = oscar.OscarProperties.getInstance().getProperty("DX_QUICK_LIST_DEFAULT");
    

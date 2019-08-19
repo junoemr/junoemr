@@ -563,4 +563,9 @@ public class OscarProperties extends Properties {
 	{
 		return isPropertyActive("juno_encounter.enabled");
 	}
+
+	public boolean isHealthcareTeamEnabled()
+	{
+		return isPropertyActive("DEMOGRAPHIC_PATIENT_HEALTH_CARE_TEAM");
+	}
 }

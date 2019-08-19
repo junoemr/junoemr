@@ -310,7 +310,7 @@ public class PapReport implements PreventionReport {
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
               log.debug("getting followup data for "+prd.demographicNo);
 
-              Collection followupData = measurementDataHandler.getMeasurementsDataVector();
+              Collection followupData = measurementDataHandler.getMeasurementsData();
               //NO Contact
 
               if ( followupData.size() == 0 ){
@@ -398,7 +398,7 @@ public class PapReport implements PreventionReport {
                 //prd.lastDate = "-----";
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
               log.debug("getting followup data for "+prd.demographicNo);
-              Collection followupData = measurementDataHandler.getMeasurementsDataVector();
+              Collection followupData = measurementDataHandler.getMeasurementsData();
               if ( followupData.size() > 0 ){
                   EctMeasurementsDataBean measurementData = (EctMeasurementsDataBean) followupData.iterator().next();
                   prd.lastFollowup = measurementData.getDateObservedAsDate();
@@ -413,7 +413,7 @@ public class PapReport implements PreventionReport {
                 //Do nothing
               EctMeasurementsDataBeanHandler measurementDataHandler = new EctMeasurementsDataBeanHandler(prd.demographicNo,measurementType);
               log.debug("getting followup data for "+prd.demographicNo);
-              Collection followupData = measurementDataHandler.getMeasurementsDataVector();
+              Collection followupData = measurementDataHandler.getMeasurementsData();
 
               if ( followupData.size() > 0 ){
                   EctMeasurementsDataBean measurementData = (EctMeasurementsDataBean) followupData.iterator().next();

@@ -24,6 +24,7 @@
 package org.oscarehr.casemgmt.dto;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 
 public class EncounterSectionNote
 {
@@ -35,6 +36,8 @@ public class EncounterSectionNote
 	private LocalDateTime observationDate;
 	private String noteIssuesString;
 	private String noteExtsString;
+	private String colour;
+	private String[] titleClasses;
 
 	public Integer getId()
 	{
@@ -114,5 +117,77 @@ public class EncounterSectionNote
 	public void setNoteExtsString(String noteExtsString)
 	{
 		this.noteExtsString = noteExtsString;
+	}
+
+	public String getColour()
+	{
+		return colour;
+	}
+
+	public void setColour(String colour)
+	{
+		this.colour = colour;
+	}
+
+	public String[] getTitleClasses()
+	{
+		return titleClasses;
+	}
+
+	public void setTitleClasses(String[] titleClasses)
+	{
+		this.titleClasses = titleClasses;
+	}
+
+	public boolean isColouredTitle()
+	{
+		return (this.titleClasses != null && this.titleClasses.length > 0);
+	}
+
+	public static int compare(Object o1, Object o2, boolean asc )
+	{
+		EncounterSectionNote i1 = (EncounterSectionNote)o1;
+		EncounterSectionNote i2 = (EncounterSectionNote)o2;
+		LocalDateTime d1 = i1.getUpdateDate();
+		LocalDateTime d2 = i2.getUpdateDate();
+
+		if( d1 == null && d2 != null )
+		{
+			return -1;
+		}
+		else if( d1 != null && d2 == null )
+		{
+			return 1;
+		}
+		else if( d1 == null && d2 == null )
+		{
+			return 0;
+		}
+		else
+		{
+			if (asc)
+			{
+				return -(i1.getUpdateDate().compareTo(i2.getUpdateDate()));
+			} else
+			{
+				return (i1.getUpdateDate().compareTo(i2.getUpdateDate()));
+			}
+		}
+	}
+
+	public static class SortChronologicAsc implements Comparator
+	{
+		public int compare( Object o1, Object o2 )
+		{
+			return EncounterSectionNote.compare(o1, o2, true);
+		}
+	}
+
+	public static class SortChronologic implements Comparator
+	{
+		public int compare( Object o1, Object o2 )
+		{
+			return EncounterSectionNote.compare(o1, o2, false);
+		}
 	}
 }

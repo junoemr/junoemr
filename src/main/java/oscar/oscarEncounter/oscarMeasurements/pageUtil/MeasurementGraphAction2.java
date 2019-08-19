@@ -169,7 +169,7 @@ public class MeasurementGraphAction2 extends Action {
 
     ArrayList<EctMeasurementsDataBean> getList(Integer demographicNo, String typeIdName) {
         EctMeasurementsDataBeanHandler ectMeasure = new EctMeasurementsDataBeanHandler(demographicNo, typeIdName);
-        Collection<EctMeasurementsDataBean> dataVector = ectMeasure.getMeasurementsDataVector();
+        Collection<EctMeasurementsDataBean> dataVector = ectMeasure.getMeasurementsData();
         ArrayList<EctMeasurementsDataBean> list = new ArrayList<EctMeasurementsDataBean>(dataVector);
         return list;
     }

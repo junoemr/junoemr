@@ -110,7 +110,7 @@ public class DroolsNumerator2 implements Numerator{
             RuleBase ruleBase = rcb.getRuleBase("rulesetName", list2);
 
 //            EctMeasurementsDataBeanHandler ect = new EctMeasurementsDataBeanHandler(demographicNo, measurement);
-//           Collection v = ect.getMeasurementsDataVector();
+//           Collection v = ect.getMeasurementsData();
 //           measurementList.add(new ArrayList(v));
 
             MeasurementDSHelper dshelper = new MeasurementDSHelper(loggedInInfo, demographicNo);

@@ -60,97 +60,13 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 		return this.getSingleResultOrNull(query);
 	}
 
-	public List<EncounterCPPNote> getCPPNotes(String demographicNo, long issueId)
+	public List<EncounterCPPNote> getCPPNotes(String demographicNo, String[] issueIds)
 	{
-/*		String sql = "select\n" +
-				"    note.note_id as noteId,\n" +
-				"    note.update_date as updateDate,\n" +
-				"    note.observation_date as observationDate,\n" +
-				"    note.demographic_no as demographicNo,\n" +
-				"    note.provider_no as providerNo,\n" +
-				"    note.note,\n" +
-				"    note.signed,\n" +
-				"    note.include_issue_innote as includeIssueInNote,\n" +
-				"    note.signing_provider_no as signingProviderNo,\n" +
-				"    note.encounter_type as encounterType,\n" +
-				"    note.billing_code as billingCode,\n" +
-				"    note.program_no as programNo,\n" +
-				"    note.reporter_caisi_role as reporterCaisiRole,\n" +
-				"    note.reporter_program_team as reporterProgramTeam,\n" +
-				"    note.history,\n" +
-				"    note.uuid,\n" +
-				"    note.password,\n" +
-				"    note.locked,\n" +
-				"    note.archived,\n" +
-				"    note.position,\n" +
-				"    note.appointmentNo,\n" +
-				"    note.hourOfEncounterTime,\n" +
-				"    note.minuteOfEncounterTime,\n" +
-				"    note.hourOfEncTransportationTime,\n" +
-				"    note.minuteOfEncTransportationTime,\n" +
-				"    (select count(cmn.uuid) from casemgmt_note cmn where cmn.uuid = note.uuid) as revision,\n" +
-				"    ext_startdate.date_value as extStartDate,\n" +
-				"    ext_resolutiondate.date_value as extResolutionDate,\n" +
-				"    ext_proceduredate.date_value as extProcedureDate,\n" +
-				"    ext_ageatonset.value as extAgeAtOnset,\n" +
-				"    ext_treatment.value as extTreatment,\n" +
-				"    ext_problemstatus.value as extProblemStatus,\n" +
-				"    ext_exposuredetail.value as extExposureDetail,\n" +
-				"    ext_relationship.value as extRelationship,\n" +
-				"    ext_lifestage.value as extLifeStage,\n" +
-				"    ext_hidecpp.value as extHideCpp,\n" +
-				"    ext_problemdescription.value as extProblemDescription\n" +
-				"from casemgmt_note note\n" +
-				"join casemgmt_issue_notes issue_notes\n" +
-				"          on note.note_id=issue_notes.note_id\n" +
-				"join casemgmt_issue issue\n" +
-				"          on issue_notes.id= issue.id\n" +
-				"              and issue.demographic_no = note.demographic_no\n" +
-				"left join casemgmt_note_ext ext_startdate\n" +
-				"          on ext_startdate.note_id = note.note_id\n" +
-				"              and ext_startdate.key_val = 'Start Date'\n" +
-				"left join casemgmt_note_ext ext_resolutiondate\n" +
-				"          on ext_resolutiondate.note_id = note.note_id\n" +
-				"              and ext_resolutiondate.key_val = 'Resolution Date'\n" +
-				"left join casemgmt_note_ext ext_proceduredate\n" +
-				"          on ext_proceduredate.note_id = note.note_id\n" +
-				"              and ext_proceduredate.key_val = 'Procedure Date'\n" +
-				"left join casemgmt_note_ext ext_ageatonset\n" +
-				"          on ext_ageatonset.note_id = note.note_id\n" +
-				"              and ext_ageatonset.key_val = 'Age at Onset'\n" +
-				"left join casemgmt_note_ext ext_treatment\n" +
-				"          on ext_treatment.note_id = note.note_id\n" +
-				"              and ext_treatment.key_val = 'Treatment'\n" +
-				"left join casemgmt_note_ext ext_problemstatus\n" +
-				"          on ext_problemstatus.note_id = note.note_id\n" +
-				"              and ext_problemstatus.key_val = 'Problem Status'\n" +
-				"left join casemgmt_note_ext ext_exposuredetail\n" +
-				"          on ext_exposuredetail.note_id = note.note_id\n" +
-				"              and ext_exposuredetail.key_val = 'Exposure Details'\n" +
-				"left join casemgmt_note_ext ext_relationship\n" +
-				"          on ext_relationship.note_id = note.note_id\n" +
-				"              and ext_relationship.key_val = 'Relationship'\n" +
-				"left join casemgmt_note_ext ext_lifestage\n" +
-				"          on ext_lifestage.note_id = note.note_id\n" +
-				"              and ext_lifestage.key_val = 'Life Stage'\n" +
-				"left join casemgmt_note_ext ext_hidecpp\n" +
-				"          on ext_hidecpp.note_id = note.note_id\n" +
-				"              and ext_hidecpp.key_val = 'Hide Cpp'\n" +
-				"left join casemgmt_note_ext ext_problemdescription\n" +
-				"          on ext_problemdescription.note_id = note.note_id\n" +
-				"              and ext_problemdescription.key_val = 'Problem Description'\n" +
-				"where (issue.issue_id = :issue_id)\n" +
-				"and note.demographic_no = :demographic_no\n" +
-				"and note.archived = 0\n" +
-				"and note.locked = 0\n" +
-				"and note.note_id=(\n" +
-				"  select\n" +
-				"    max(note_filter_.note_id)\n" +
-				"  from casemgmt_note note_filter_\n" +
-				"  where note.uuid=note_filter_.uuid\n" +
-				"  group by note_filter_.uuid\n" +
-				")\n" +
-				"order by note.position, note.observation_date desc";*/
+		List<String> issueClauses = new ArrayList<>();
+		for(int i = 0; i < issueIds.length; i++)
+		{
+			issueClauses.add("issue.issue_id = :issueId" + i);
+		}
 
 		String sql = "select\n" +
 				"    note.note_id as noteId,\n" +
@@ -212,7 +128,8 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"             and issue.demographic_no = note.demographic_no\n" +
 				"    join provider p\n" +
 				"         on p.provider_no = note.provider_no\n" +
-				"    where issue.issue_id = :issue_id \n" +
+				//"    where issue.issue_id = :issue_id \n" +
+				"where (" + String.join(" or ", issueClauses) + ")" +
 				"      and note.demographic_no = :demographic_no \n" +
 				"      and note.archived = 0\n" +
 				"      and note.locked = 0\n" +
@@ -259,12 +176,18 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"left join casemgmt_note_ext ext_problemdescription\n" +
 				"    on ext_problemdescription.note_id = note.note_id\n" +
 				"        and ext_problemdescription.key_val = 'Problem Description'\n" +
-				"where issue.issue_id = :issue_id \n" +
+				"where (" + String.join(" or ", issueClauses) + ")\n" +
 				"order by note.position, note.observation_date desc";
 
 
 		Query query = entityManager.createNativeQuery(sql);
-		query.setParameter("issue_id", issueId);
+
+		int count = 0;
+		for(String issueId: issueIds)
+		{
+			query.setParameter("issueId" + count, issueId);
+		}
+
 		query.setParameter("demographic_no", demographicNo);
 
 		List<Object[]> results = query.getResultList();

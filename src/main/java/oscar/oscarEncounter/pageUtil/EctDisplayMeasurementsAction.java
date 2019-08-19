@@ -217,7 +217,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 			Integer demo = Integer.valueOf(bean.getDemographicNo());
 			oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler hd = new oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler(demo);
 			oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean data;
-			Vector measureTypes = (Vector) hd.getMeasurementsDataVector();
+			Vector measureTypes = (Vector) hd.getMeasurementsData();
 			if (loggedInInfo.getCurrentFacility().isIntegratorEnabled()) {
 				EctMeasurementsDataBeanHandler.addRemoteMeasurementsTypes(loggedInInfo,measureTypes,demo);
 			}
@@ -231,7 +231,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 				hash = Math.abs(winName.hashCode());
 
 				hd = new oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler(demo, data.getType());
-				Vector measures = (Vector) hd.getMeasurementsDataVector();
+				Vector measures = (Vector) hd.getMeasurementsData();
 				if (loggedInInfo.getCurrentFacility().isIntegratorEnabled()) {
 					EctMeasurementsDataBeanHandler.addRemoteMeasurements(loggedInInfo,measures,data.getType(),demo);
 				}
@@ -276,7 +276,7 @@ public class EctDisplayMeasurementsAction extends EctDisplayAction {
 	 *truncate string to specified length so that measurements are always displayed
 	 *in a column
 	 */
-	public String padd(String str, String data) {
+	public static String padd(String str, String data) {
 		String tmp;
 		int overflow = str.length() + data.length() - MAX_LEN_TITLE;
 		//if we are over limit, truncate

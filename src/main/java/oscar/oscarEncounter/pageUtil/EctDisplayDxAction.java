@@ -72,7 +72,7 @@ public class EctDisplayDxAction extends EctDisplayAction {
         String serviceDateStr;
         Date date;
         dxResearchBeanHandler hd = new dxResearchBeanHandler(bean.demographicNo);
-        Vector diseases = hd.getDxResearchBeanVector();
+        Vector diseases = hd.getDxResearchBeans();
         
         for(int idx = 0; idx < diseases.size(); ++idx ) {
             NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();

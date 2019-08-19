@@ -21,13 +21,17 @@
  * Canada
  */
 
-package org.oscarehr.casemgmt.service.impl;
+package org.oscarehr.casemgmt.service;
 
+import org.drools.FactException;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
+import org.oscarehr.common.model.Demographic;
+import org.oscarehr.prevention.dao.PreventionDao;
+import org.oscarehr.prevention.dto.PreventionListData;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import oscar.oscarEncounter.pageUtil.NavBarDisplayDAO;
+import oscar.oscarDemographic.data.DemographicData;
 import oscar.oscarPrevention.Prevention;
 import oscar.oscarPrevention.PreventionDS;
 import oscar.oscarPrevention.PreventionData;
@@ -35,36 +39,31 @@ import oscar.oscarPrevention.PreventionDisplayConfig;
 import oscar.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
 @Service
-public class EncounterPreventionNoteService
+public class EncounterPreventionNoteService extends EncounterSectionService
 {
-	protected static final String ELLIPSES = "...";
-	protected static final int MAX_LEN_TITLE = 48;
-	protected static final int CROP_LEN_TITLE = 45;
-	protected static final int MAX_LEN_KEY = 12;
-	protected static final int CROP_LEN_KEY = 9;
-
 	@Autowired
 	PreventionDS pf;
 
-	public List<EncounterSectionNote> getPreventionNotes(LoggedInInfo loggedInInfo, String demographicNo)
-			throws Exception
+	@Autowired
+	PreventionDao preventionDao;
+
+	public List<EncounterSectionNote> getNotes(LoggedInInfo loggedInInfo, String roleName, String providerNo, String demographicNo, String appointmentNo, String programId)
+			throws FactException
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
 		//list warnings first as module items
 		Prevention p = PreventionData.getPrevention(loggedInInfo, Integer.valueOf(demographicNo));
-		//PreventionDS pf = SpringUtils.getBean(PreventionDS.class);//PreventionDS.getInstance();
 
 		// Might throw an exception
-		// XXX: make this exception better
+		// XXX: make this exception better (FactException)
 		pf.getMessages(p);
 
 		//now we list prevention modules as items
@@ -72,81 +71,104 @@ public class EncounterPreventionNoteService
 		ArrayList<HashMap<String,String>> prevList = pdc.getPreventions();
 		Map warningTable = p.getWarningMsgs();
 
+		Map<String, PreventionListData>	preventionListDataMap = preventionDao.getPreventionListData(demographicNo);
 
 
-		String highliteColour = "#FF0000";
-		String inelligibleColour = "#FF6600";
-		String pendingColour = "#FF00FF";
-		Date date = null;
-		ArrayList<NavBarDisplayDAO.Item> warnings = new ArrayList<NavBarDisplayDAO.Item>();
-		ArrayList<NavBarDisplayDAO.Item> items = new ArrayList<NavBarDisplayDAO.Item>();
-		String result;
-		for (int i = 0 ; i < prevList.size(); i++){
+		DemographicData dData = new DemographicData();
+		Demographic demographic = dData.getDemographic(loggedInInfo, demographicNo);
 
-			NavBarDisplayDAO.Item item = NavBarDisplayDAO.Item();
+		List<EncounterSectionNote> items = new ArrayList<>();
+		List<EncounterSectionNote> warnings = new ArrayList<>();
+
+		for (int i = 0 ; i < prevList.size(); i++)
+		{
+			EncounterSectionNote sectionNote = new EncounterSectionNote();
 
 			HashMap<String,String> h = prevList.get(i);
 			String prevName = h.get("name");
-			ArrayList<Map<String,Object>> alist = PreventionData.getPreventionData(loggedInInfo, prevName, Integer.valueOf(demographicNo));
-			Date demographicDateOfBirth=PreventionData.getDemographicDateOfBirth(loggedInInfo, Integer.valueOf(demographicNo));
-			PreventionData.addRemotePreventions(loggedInInfo, alist, Integer.valueOf(demographicNo),prevName,demographicDateOfBirth);
-			boolean show = pdc.display(loggedInInfo, h, demographicNo,alist.size());
-			if( show ) {
-				if( alist.size() > 0 ) {
-					Map<String,Object> hdata = alist.get(alist.size()-1);
-					Map<String,String> hExt = PreventionData.getPreventionKeyValues((String)hdata.get("id"));
-					result = hExt.get("result");
 
-					Object dateObj = hdata.get("prevention_date_asDate");
-					if(dateObj instanceof Date){
-						date = (Date) dateObj;
-					}else if(dateObj instanceof java.util.GregorianCalendar){
-						Calendar cal = (Calendar) dateObj;
-						date = cal.getTime();
-					}
+			PreventionListData preventionListData = preventionListDataMap.get(prevName);
 
-					item.setDate(date);
+			int preventionCount = 0;
+			if(preventionListData != null)
+			{
+				preventionCount = preventionListData.getPreventionCount();
+			}
 
-					if( hdata.get("refused") != null && hdata.get("refused").equals("2") ) {
-						item.setColour(inelligibleColour);
+
+			//ArrayList<Map<String,Object>> alist = PreventionData.getPreventionData(loggedInInfo, prevName, Integer.valueOf(demographicNo));
+
+			// alist - list of prevention details
+			// What is read:
+			// - alist.size()
+			// - last record (most recent)
+			//   - id
+			//   - prevention_date_asDate
+			//   - refused
+			// - last record ext
+			//   - result
+
+
+			// Ignore, integrator
+			//Date demographicDateOfBirth=PreventionData.getDemographicDateOfBirth(loggedInInfo, Integer.valueOf(demographicNo));
+			//PreventionData.addRemotePreventions(loggedInInfo, alist, Integer.valueOf(demographicNo),prevName,demographicDateOfBirth);
+
+			// Does a few things
+			// - Checks if it's hidden (this can be loaded before and checked quicker)
+			//    - property table, hide_prevention_item key
+			//    - Only hides if there are no preventions (alist.size() > 0)
+			// - Shows if it has more than the min threshold (showIfMinRecordNum)
+			// - Show if it meets the age requirements (based on min/max age being defined)
+			// - Show if there are no ages set but sex matches
+
+
+			boolean show = pdc.display(loggedInInfo, h, demographic, preventionCount);
+
+			if(show)
+			{
+				if( preventionCount > 0 )
+				{
+					sectionNote.setUpdateDate(preventionListData.getPreventionDate());
+
+					if(
+						preventionListData.getRefused() != null &&
+						preventionListData.getRefused().equals('2')
+					)
+					{
+						sectionNote.setColour(COLOUR_INELLIGIBLE);
 					}
-					else if( result != null && result.equalsIgnoreCase("pending") ) {
-						item.setColour(pendingColour);
+					else if(
+						preventionListData.getPreventionResult() != null &&
+						preventionListData.getPreventionResult().equalsIgnoreCase("pending")
+					)
+					{
+						sectionNote.setColour(COLOUR_PENDING);
 					}
-				}
-				else {
-					item.setDate(null);
 				}
 
 				String title = StringUtils.maxLenString(h.get("name"),  MAX_LEN_TITLE, CROP_LEN_TITLE, ELLIPSES);
-				item.setTitle(title);
-				item.setLinkTitle(h.get("desc"));
+				//item.setTitle(title);
+				//item.setLinkTitle(h.get("desc"));
 				//item.setURL(url);
+				sectionNote.setText(title);
 
 				//if there's a warning associated with this prevention set item apart
-				if( warningTable.containsKey(prevName) ){
-					item.setColour(highliteColour);
-					warnings.add(item);
+				if( warningTable.containsKey(prevName) )
+				{
+					sectionNote.setColour(COLOUR_HIGHLITE);
+					warnings.add(sectionNote);
 				}
-				else {
-					items.add(item);
+				else
+				{
+					items.add(sectionNote);
 				}
 			}
 		}
 
-		/*
-		//sort items without warnings chronologically
-		Dao.sortItems(items, NavBarDisplayDAO.DATESORT_ASC);
+		Collections.sort(items, new EncounterSectionNote.SortChronologicAsc());
 
-		//add warnings to Dao array first so they will be at top of list
-		for(int idx = 0; idx < warnings.size(); ++idx )
-			Dao.addItem(warnings.get(idx));
-
-		//now copy remaining sorted items
-		for(int idx = 0; idx < items.size(); ++idx)
-			Dao.addItem(items.get(idx));
-
-		 */
+		out.addAll(warnings);
+		out.addAll(items);
 
 		return out;
 	}

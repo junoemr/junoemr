@@ -44,7 +44,9 @@ public class EncounterCPPNoteService
 		// Get notes for that type
 		List<EncounterSectionNote> out = new ArrayList<>();
 
-		List<EncounterCPPNote> notes = caseManagementNoteDao.getCPPNotes(demographicNo, issueId);
+		String[] issueIds = new String[1];
+		issueIds[0] = Long.toString(issueId);
+		List<EncounterCPPNote> notes = caseManagementNoteDao.getCPPNotes(demographicNo, issueIds);
 
 		for(EncounterCPPNote note: notes)
 		{

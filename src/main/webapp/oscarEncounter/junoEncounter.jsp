@@ -485,10 +485,98 @@
 				return false;
 			}
 
+			function assembleMainChartParams(displayFullChart) {
+
+				var params = "method=edit&ajaxview=ajaxView&fullChart=" + displayFullChart;
+				<%
+				  Enumeration<String>enumerator = request.getParameterNames();
+				  String paramName, paramValue;
+				  while( enumerator.hasMoreElements() ) {
+					 paramName = enumerator.nextElement();
+					 if( paramName.equals("method") || paramName.equals("fullChart") ) {
+						 continue;
+					 }
+
+					 paramValue = request.getParameter(paramName);
+
+				 %>
+				params += "&<%=paramName%>=<%=URLEncoder.encode(StringUtils.transformNullInEmptyString(paramValue), "UTF-8")%>";
+				<%
+				 }
+			   %>
+
+				return params;
+			}
+
+			function scrollDownInnerBar()
+			{
+				$("encMainDiv").scrollTop = $("encMainDiv").scrollHeight;
+			}
+
+			function viewFullChart(ctx, displayFullChart)
+			{
+
+				var url = ctx + "/CaseManagementEntry.do";
+				var params = assembleMainChartParams(displayFullChart);
+
+				if (displayFullChart)
+				{
+					fullChart = "true";
+				}
+				else
+				{
+					fullChart = "false";
+				}
+
+				$("notCPP").update("Loading...");
+				var objAjax = new Ajax.Request(
+					url,
+					{
+						method: 'post',
+						postBody: params,
+						evalScripts: true,
+						onSuccess: function(request)
+						{
+							$("notCPP").update(request.responseText);
+							$("notCPP").style.height = "50%";
+							if (displayFullChart)
+							{
+								$("quickChart").innerHTML = quickChartMsg;
+								$("quickChart").onclick = function()
+								{
+									return viewFullChart(false);
+								}
+								scrollDownInnerBar();
+
+							}
+							else
+							{
+								$("quickChart").innerHTML = fullChartMsg;
+								$("quickChart").onclick = function()
+								{
+									return viewFullChart(true);
+								}
+								scrollDownInnerBar();
+							}
+						},
+						onFailure: function(request)
+						{
+							$("notCPP").update("Error: " + request.status + request.responseText);
+						}
+					}
+				);
+				return false;
+			}
+
 			function init() {
-/*
-				//scrollDownInnerBar();
-				viewFullChart(false);
+				var ctx = '<c:out value="${ctx}"/>';
+
+
+				// XXX: This is required to set some session state to make saving a note work.
+				//      I feel like this is a terrible idea and should be removed with predjudice.
+				//viewFullChart(ctx, false);
+
+				/*
 				showIssueNotes();
 
 				var navBars = new navBarLoader();
@@ -497,7 +585,7 @@
 				monitorNavBars(null);
 
 				Element.observe(window, "resize", monitorNavBars);
-*/
+				*/
 
 				if(!NiftyCheck()) {
 					return;
@@ -954,23 +1042,286 @@
 			<% } %>--%>
 
 			<div id="rightColLoader" style="width: 100%;">
-				<h3 style="width: 100%; background-color: #CCCCFF;">
-					<bean:message key="oscarEncounter.LeftNavBar.msgLoading"/></h3>
+
+				<c:forEach items="${junoEncounterForm.rightNoteSections}" var="sectionName" varStatus="loop">
+
+					<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}" />
+
+					<div class="leftBox" id="${sectionName}" style="display: block;">
+
+						<form style="display: none;" name="dummyForm" action="">
+							<input type="hidden" id="reloadDiv" name="reloadDiv" value="none" onchange="updateDiv();">
+						</form>
+
+						<div id='menuTitle${sectionName}' style="width: 10%; float: right; text-align: center;">
+							<h3 style="padding:0px; background-color: ${section.colour};">
+								<a href="javascript:void(0);" onclick="return false;">+</a>
+							</h3>
+						</div>
+
+						<div style="clear: left; float: left; width: 90%;">
+							<h3 style="width:100%; background-color: ${section.colour}">
+								<a href="#" onclick="return false;">
+									${section.title}
+								</a>
+							</h3>
+						</div>
+
+						<ul id="${sectionName}list">
+
+							<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}" />
+
+							<c:forEach items="${section.notes}" var="note" varStatus="loop">
+
+								<li style="overflow: hidden; clear:both; position:relative; display:block; white-space:nowrap; ">
+									<a border="0" style="text-decoration:none; width:7px; z-index: 100; background-color: white; position:relative; margin: 0px; padding-bottom: 0px;  vertical-align: bottom; display: inline; float: right; clear:both;"><img id="img${sectionName}1" src="/images/clear.gif">&nbsp;&nbsp;</a>
+									<span style=" z-index: 1; position:absolute; margin-right:10px; width:90%; overflow:hidden;  height:1.2em; white-space:nowrap; float:left; text-align:left; ">
+									<a
+											class="links"
+											style="color: ${note.colour};"
+											onmouseover="this.className='linkhover'"
+											onmouseout="this.className='links'"
+											href="#" onclick=""
+											title="Flu=Influenza vaccine"
+									>
+										<c:choose>
+											<c:when test="${note.colouredTitle}">
+												<span class="${fn:join(note.titleClasses, ' ')}">
+													<c:out value="${note.text}" />
+												</span>
+											</c:when>
+											<c:otherwise>
+												<c:out value="${note.text}" />
+											</c:otherwise>
+										</c:choose>
+									</a>
+								</span>
+									<span style="z-index: 100; background-color: #f3f3f3; overflow:hidden;   position:relative; height:1.2em; white-space:nowrap; float:right; text-align:right;">
+									<fmt:parseDate value="${note.updateDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedUpdateDate" />
+									<fmt:formatDate value="${parsedUpdateDate}" pattern="dd-MMM-yyyy" var="updateDate" />
+									...<a
+											class="links"
+											style="margin-right: 2px; color: ${note.colour};"
+											onmouseover="this.className='linkhover'"
+											onmouseout="this.className='links'"
+											href="#"
+											onclick="reloadWindows['prevention148'] = '/oscarEncounter/displayPrevention.do?hC=009999&amp;reloadURL=%2FoscarEncounter%2FdisplayPrevention.do%3FhC%3D009999&amp;numToDisplay=6&amp;cmd=preventions&amp;cmd=preventions';reloadWindows['prevention148div'] = 'preventions';popupPage(700,960,'prevention148', '/oscarPrevention/index.jsp?demographic_no=148');return false;; return false;"
+											title="DTaP=Diphtheria, Tetanus, Acellular Pertussis - pediatric"
+									>
+										<c:out value="${updateDate}" />
+									</a>
+								</span>
+								</li>
+
+							</c:forEach>
+						</ul>
+					</div>
+				</c:forEach>
+
+
+
 			</div>
 		</div>
 
 		<div id="leftNavBar" style="display: inline; float: left; width: 20%;">
 
-			<!--dummmy div to force browser to allocate space -->
-			<div id="leftColLoader" class="leftBox" style="width: 100%">
-				<h3 style="width: 100%; background-color: #996633;">
-					<a href="#" onclick="return false;"><bean:message key="oscarEncounter.LeftNavBar.msgLoading"/></a>
-				</h3>
-			</div>
+<%--			<div class="leftBox" id="preventions" style="display: block;">--%>
 
-			<form style="display: none;" name="dummyForm" action="">
-				<input type="hidden" id="reloadDiv" name="reloadDiv" value="none" onchange="updateDiv();">
-			</form>
+				<!--dummmy div to force browser to allocate space -->
+				<%--
+				<div id="leftColLoader" class="leftBox" style="width: 100%">
+					<h3 style="width: 100%; background-color: #996633;">
+						<a href="#" onclick="return false;"><bean:message key="oscarEncounter.LeftNavBar.msgLoading"/></a>
+					</h3>
+				</div>
+				--%>
+
+<%--				<form style="display: none;" name="dummyForm" action="">
+					<input type="hidden" id="reloadDiv" name="reloadDiv" value="none" onchange="updateDiv();">
+				</form>
+
+				<div id='menuTitlepreventions' style="width: 10%; float: right; text-align: center;">
+					<h3 style="padding:0px; background-color: #009999;">
+						<a href="javascript:void(0);" onclick="return false;">+</a>
+					</h3>
+				</div>
+
+				<div style="clear: left; float: left; width: 90%;">
+					<h3 style="width:100%; background-color: #009999">
+						<a href="#" onclick="return false;">
+							Preventions
+						</a>
+					</h3>
+				</div>
+
+				<ul id="preventionslist">--%>
+					<%--
+					// Example
+					<li style="overflow: hidden; clear:both; position:relative; display:block; white-space:nowrap; ">
+						<a border="0" style="text-decoration:none; width:7px; z-index: 100; background-color: white; position:relative; margin: 0px; padding-bottom: 0px;  vertical-align: bottom; display: inline; float: right; clear:both;"><img id="imgpreventions1" src="/images/clear.gif">&nbsp;&nbsp;</a>
+						<span style=" z-index: 1; position:absolute; margin-right:10px; width:90%; overflow:hidden;  height:1.2em; white-space:nowrap; float:left; text-align:left; ">
+						<a class="links" style="" onmouseover="this.className='linkhover'" onmouseout="this.className='links'" href="#" onclick="reloadWindows['prevention148'] = '/oscarEncounter/displayPrevention.do?hC=009999&amp;reloadURL=%2FoscarEncounter%2FdisplayPrevention.do%3FhC%3D009999&amp;numToDisplay=6&amp;cmd=preventions&amp;cmd=preventions';reloadWindows['prevention148div'] = 'preventions';popupPage(700,960,'prevention148', '/oscarPrevention/index.jsp?demographic_no=148');return false;; return false;" title="Flu=Influenza vaccine">
+							Flu
+						</a>
+						</span>
+					</li>
+					--%>
+
+<%--					<c:set var="sectionPrevention" scope="page" value="${junoEncounterForm.sections['Preventions']}" />
+
+					<c:forEach items="${sectionPrevention.notes}" var="note" varStatus="loop">
+
+						<li style="overflow: hidden; clear:both; position:relative; display:block; white-space:nowrap; ">
+							<a border="0" style="text-decoration:none; width:7px; z-index: 100; background-color: white; position:relative; margin: 0px; padding-bottom: 0px;  vertical-align: bottom; display: inline; float: right; clear:both;"><img id="imgpreventions1" src="/images/clear.gif">&nbsp;&nbsp;</a>
+							<span style=" z-index: 1; position:absolute; margin-right:10px; width:90%; overflow:hidden;  height:1.2em; white-space:nowrap; float:left; text-align:left; ">
+								<a class="links" style="" onmouseover="this.className='linkhover'" onmouseout="this.className='links'" href="#" onclick="" title="Flu=Influenza vaccine">
+									<c:out value="${note.text}" />
+								</a>
+							</span>
+							<c:if test="${note.updateDate != null}">
+								<fmt:parseDate value="${note.updateDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedUpdateDate" />
+								<fmt:formatDate value="${parsedUpdateDate}" pattern="dd-MMM-yyyy" var="updateDate" />
+								<span style="z-index: 100; background-color: #f3f3f3; overflow:hidden;   position:relative; height:1.2em; white-space:nowrap; float:right; text-align:right;">
+									...<a class="links" style="margin-right: 2px; color: ${note.colour}" onmouseover="this.className='linkhover'" onmouseout="this.className='links'" href="#" onclick="reloadWindows['prevention148'] = '/oscarEncounter/displayPrevention.do?hC=009999&amp;reloadURL=%2FoscarEncounter%2FdisplayPrevention.do%3FhC%3D009999&amp;numToDisplay=6&amp;cmd=preventions&amp;cmd=preventions';reloadWindows['prevention148div'] = 'preventions';popupPage(700,960,'prevention148', '/oscarPrevention/index.jsp?demographic_no=148');return false;; return false;" title="DTaP=Diphtheria, Tetanus, Acellular Pertussis - pediatric">
+										<c:out value="${updateDate}" />
+									</a>
+								</span>
+							</c:if>
+						</li>
+
+					</c:forEach>
+				</ul>
+			</div>--%>
+
+
+			<%--
+			<div class="leftBox" id="ticklers" style="display: block;">
+
+				<form style="display: none;" name="dummyForm" action="">
+					<input type="hidden" id="reloadDiv" name="reloadDiv" value="none" onchange="updateDiv();">
+				</form>
+
+				<div id='menuTitleticklers' style="width: 10%; float: right; text-align: center;">
+					<h3 style="padding:0px; background-color: #FF6600;">
+						<a href="javascript:void(0);" onclick="return false;">+</a>
+					</h3>
+				</div>
+
+				<div style="clear: left; float: left; width: 90%;">
+					<h3 style="width:100%; background-color: #FF6600">
+						<a href="#" onclick="return false;">
+							Tickler
+						</a>
+					</h3>
+				</div>
+
+				<ul id="ticklerslist">
+
+					<c:set var="section" scope="page" value="${junoEncounterForm.sections['Tickler']}" />
+
+					<c:forEach items="${section.notes}" var="note" varStatus="loop">
+
+						<li style="overflow: hidden; clear:both; position:relative; display:block; white-space:nowrap; ">
+							<a border="0" style="text-decoration:none; width:7px; z-index: 100; background-color: white; position:relative; margin: 0px; padding-bottom: 0px;  vertical-align: bottom; display: inline; float: right; clear:both;"><img id="imgticklers1" src="/images/clear.gif">&nbsp;&nbsp;</a>
+							<span style=" z-index: 1; position:absolute; margin-right:10px; width:90%; overflow:hidden;  height:1.2em; white-space:nowrap; float:left; text-align:left; ">
+								<a
+									class="links"
+									style="color: ${note.colour};"
+									onmouseover="this.className='linkhover'"
+									onmouseout="this.className='links'"
+									href="#" onclick=""
+									title="Flu=Influenza vaccine"
+								>
+									<c:out value="${note.text}" />
+								</a>
+							</span>
+							<span style="z-index: 100; background-color: #f3f3f3; overflow:hidden;   position:relative; height:1.2em; white-space:nowrap; float:right; text-align:right;">
+								<fmt:parseDate value="${note.updateDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedUpdateDate" />
+								<fmt:formatDate value="${parsedUpdateDate}" pattern="dd-MMM-yyyy" var="updateDate" />
+								...<a
+									class="links"
+									style="margin-right: 2px; color: ${note.colour};"
+									onmouseover="this.className='linkhover'"
+									onmouseout="this.className='links'"
+									href="#"
+									onclick="reloadWindows['prevention148'] = '/oscarEncounter/displayPrevention.do?hC=009999&amp;reloadURL=%2FoscarEncounter%2FdisplayPrevention.do%3FhC%3D009999&amp;numToDisplay=6&amp;cmd=preventions&amp;cmd=preventions';reloadWindows['prevention148div'] = 'preventions';popupPage(700,960,'prevention148', '/oscarPrevention/index.jsp?demographic_no=148');return false;; return false;"
+									title="DTaP=Diphtheria, Tetanus, Acellular Pertussis - pediatric"
+								   >
+									<c:out value="${updateDate}" />
+								</a>
+							</span>
+						</li>
+
+					</c:forEach>
+				</ul>
+			</div>
+			--%>
+
+			<c:forEach items="${junoEncounterForm.leftNoteSections}" var="sectionName" varStatus="loop">
+
+				<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}" />
+
+				<div class="leftBox" id="${sectionName}" style="display: block;">
+
+					<form style="display: none;" name="dummyForm" action="">
+						<input type="hidden" id="reloadDiv" name="reloadDiv" value="none" onchange="updateDiv();">
+					</form>
+
+					<div id='menuTitle${sectionName}' style="width: 10%; float: right; text-align: center;">
+						<h3 style="padding:0px; background-color: ${section.colour};">
+							<a href="javascript:void(0);" onclick="return false;">+</a>
+						</h3>
+					</div>
+
+					<div style="clear: left; float: left; width: 90%;">
+						<h3 style="width:100%; background-color: ${section.colour}">
+							<a href="#" onclick="return false;">
+								${section.title}
+							</a>
+						</h3>
+					</div>
+
+					<ul id="${sectionName}list">
+
+						<c:set var="section" scope="page" value="${junoEncounterForm.sections[sectionName]}" />
+
+						<c:forEach items="${section.notes}" var="note" varStatus="loop">
+
+							<li style="overflow: hidden; clear:both; position:relative; display:block; white-space:nowrap; ">
+								<a border="0" style="text-decoration:none; width:7px; z-index: 100; background-color: white; position:relative; margin: 0px; padding-bottom: 0px;  vertical-align: bottom; display: inline; float: right; clear:both;"><img id="img${sectionName}1" src="/images/clear.gif">&nbsp;&nbsp;</a>
+								<span style=" z-index: 1; position:absolute; margin-right:10px; width:90%; overflow:hidden;  height:1.2em; white-space:nowrap; float:left; text-align:left; ">
+									<a
+										class="links"
+										style="color: ${note.colour};"
+										onmouseover="this.className='linkhover'"
+										onmouseout="this.className='links'"
+										href="#" onclick=""
+										title="Flu=Influenza vaccine"
+									>
+										<c:out value="${note.text}" />
+									</a>
+								</span>
+								<span style="z-index: 100; background-color: #f3f3f3; overflow:hidden;   position:relative; height:1.2em; white-space:nowrap; float:right; text-align:right;">
+									<fmt:parseDate value="${note.updateDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedUpdateDate" />
+									<fmt:formatDate value="${parsedUpdateDate}" pattern="dd-MMM-yyyy" var="updateDate" />
+									...<a
+										class="links"
+										style="margin-right: 2px; color: ${note.colour};"
+										onmouseover="this.className='linkhover'"
+										onmouseout="this.className='links'"
+										href="#"
+										onclick="reloadWindows['prevention148'] = '/oscarEncounter/displayPrevention.do?hC=009999&amp;reloadURL=%2FoscarEncounter%2FdisplayPrevention.do%3FhC%3D009999&amp;numToDisplay=6&amp;cmd=preventions&amp;cmd=preventions';reloadWindows['prevention148div'] = 'preventions';popupPage(700,960,'prevention148', '/oscarPrevention/index.jsp?demographic_no=148');return false;; return false;"
+										title="DTaP=Diphtheria, Tetanus, Acellular Pertussis - pediatric"
+									>
+										<c:out value="${updateDate}" />
+									</a>
+								</span>
+							</li>
+
+						</c:forEach>
+					</ul>
+				</div>
+			</c:forEach>
 		</div>
 
 		<div id="content" style="display: inline; float: left; width: 60%; background-color: #CCCCFF;">
@@ -1011,12 +1362,27 @@
 
 
 							<div style="width: 10%; float: right; text-align: center;">
-								<h3 style="padding:0px; background-color:#996633">
-									<a href="#" title='Add Item' onclick="return showEdit(event,'${fn:escapeXml(section.title)}','',0,'','','','${fn:escapeXml(section.addUrl)}0', ${fn:length(section.notes)}, 0,'${fn:escapeXml(section.identUrl)}','${fn:escapeXml(section.cppIssues)}','','${fn:escapeXml(junoEncounterForm.header.demographicNo)}');">+</a>
+								<h3 style="padding:0px; background-color: ${section.colour}">
+									<a href="#" title='Add Item' onclick="return showEdit(
+										event,
+										'${fn:escapeXml(section.title)}',
+										'',
+										0,
+										'',
+										'',
+										'',
+										'${fn:escapeXml(section.addUrl)}0',
+										${fn:length(section.notes)},
+										0,
+										'${fn:escapeXml(section.identUrl)}',
+										'${fn:escapeXml(section.cppIssues)}',
+										'',
+										'${fn:escapeXml(junoEncounterForm.header.demographicNo
+									)}');">+</a>
 								</h3>
 							</div>
 							<div style="clear: left; float: left; width: 90%;">
-								<h3 style="width:100%; background-color:#996633">
+								<h3 style="width:100%; background-color: ${section.colour}">
 										<c:out value="${section.title}" />
 								</h3>
 							</div>
@@ -1043,9 +1409,10 @@
 														   '${observationDate}',
 														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${note.revision}</spring:escapeBody>',
 														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${note.text}</spring:escapeBody>',
-														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${requestScope.addUrl}${note.id}</spring:escapeBody>',
-														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${param.cmd}</spring:escapeBody>',
-														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${requestScope.identUrl}</spring:escapeBody>',
+														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${section.addUrl}${note.id}</spring:escapeBody>',
+													       ${fn:length(section.notes)},
+														   ${noteLoop.index},
+														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${section.identUrl}</spring:escapeBody>',
 														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${note.noteIssuesString}</spring:escapeBody>',
 														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${note.noteExtsString}</spring:escapeBody>',
 														   '<spring:escapeBody htmlEscape="true" javaScriptEscape="true">${param.demographicNo}</spring:escapeBody>',
@@ -1053,48 +1420,6 @@
 												   style="width:100%;overflow:scroll;" >
 													${fn:escapeXml(note.text)}
 												</a>
-												<%--
-												<a class="topLinks"
-												   onmouseover="this.className='topLinkhover'"
-												   onmouseout="this.className='topLinks'"
-												   title="Rev:${note.r} - Last update:<nested:write name="note" property="update_date" format="dd-MMM-yyyy"/>"
-												   id="listNote<nested:write name="note" property="id"/>"
-												   href="#"
-												   onclick="showEdit(
-												   		event,
-														'<bean-el:message key="${param.title}" />',
-														'<nested:write name="note" property="id"/>',
-														'<%=StringEscapeUtils.escapeJavaScript(editors.toString())%>',
-														'<nested:write name="note" property="observation_date" format="dd-MMM-yyyy"/>',
-														'<nested:write name="note" property="revision"/>',
-														'<%=noteTxt%>',
-														'<%=request.getAttribute("addUrl")%><nested:write name="note" property="id"/>',
-														'<c:out value="${param.cmd}"/>',
-														'<%=request.getAttribute("identUrl")%>',
-														'<%=strNoteIssues.toString()%>',
-														'<%=strNoteExts%>',
-														'<c:out value="${param.demographicNo}"/>'
-												   );return false;"
-												   style="width:100%;overflow:scroll;" >
-
-												<nested:write name="note" property="id"/>
-												<nested:write name="note" property="revision"/>
-												<nested:write name="note" property="update_date" format="dd-MMM-yyyy"/>
-												<nested:write name="note" property="observation_date" format="dd-MMM-yyyy"/>
-
-												<bean-el:message key="${param.title}" />
-												<%=StringEscapeUtils.escapeJavaScript(editors.toString())%>
-												<%=noteTxt%>
-												<%=request.getAttribute("addUrl")%>
-												<c:out value="${param.cmd}"/>
-												<%=request.getAttribute("identUrl")%>
-												<%=strNoteIssues.toString()%>
-												<%=strNoteExts%>
-												<c:out value="${param.demographicNo}"/>
-
-													${note.text}
-												</a>
-												--%>
 											</span>
 										</li>
 									</c:forEach>

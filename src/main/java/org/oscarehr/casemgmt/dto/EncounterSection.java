@@ -31,6 +31,7 @@ public class EncounterSection
 	private String cppIssues;
 	private String addUrl;
 	private String identUrl;
+	private String colour;
 	private List<EncounterSectionNote> notes;
 
 	public String getTitle()
@@ -71,6 +72,16 @@ public class EncounterSection
 	public void setIdentUrl(String identUrl)
 	{
 		this.identUrl = identUrl;
+	}
+
+	public String getColour()
+	{
+		return colour;
+	}
+
+	public void setColour(String colour)
+	{
+		this.colour = colour;
 	}
 
 	public List<EncounterSectionNote> getNotes()

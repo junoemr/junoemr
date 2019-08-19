@@ -27,7 +27,6 @@ package oscar.oscarEncounter.oscarMeasurements.bean;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -66,7 +65,8 @@ public class EctMeasurementsDataBeanHandler {
     }
 
     public boolean init(Integer demo) {
-        for(Object[] i : measurementDao.findMeasurementsAndTypes(demo)) {
+        for(Object[] i : measurementDao.findMeasurementsAndTypes(demo))
+        {
         	MeasurementType mt = (MeasurementType) i[1];
         	
             EctMeasurementsDataBean data = new EctMeasurementsDataBean();
@@ -136,7 +136,7 @@ public class EctMeasurementsDataBeanHandler {
         return true;
     }
 
-    public Collection<EctMeasurementsDataBean> getMeasurementsDataVector(){
+    public List<EctMeasurementsDataBean> getMeasurementsData(){
         return measurementsDataVector;
     }
 

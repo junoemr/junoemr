@@ -26,6 +26,7 @@ package org.oscarehr.casemgmt.web.formbeans;
 import org.apache.struts.action.ActionForm;
 import org.oscarehr.casemgmt.dto.EncounterHeader;
 import org.oscarehr.casemgmt.dto.EncounterSection;
+import org.oscarehr.ws.rest.to.model.SummaryTo1;
 
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,10 @@ public class JunoEncounterFormBean extends ActionForm
 	private EncounterHeader header = null;
 	private Map<String, EncounterSection> sections = null;
 	private List<String> cppNoteSections = null;
+	private List<String> leftNoteSections = null;
+	private List<String> rightNoteSections = null;
+
+	private List<SummaryTo1> leftSummaries = null;
 
 	public EncounterHeader getHeader()
 	{
@@ -64,5 +69,35 @@ public class JunoEncounterFormBean extends ActionForm
 	public void setCppNoteSections(List<String> cppNoteSections)
 	{
 		this.cppNoteSections = cppNoteSections;
+	}
+
+	public List<String> getLeftNoteSections()
+	{
+		return leftNoteSections;
+	}
+
+	public void setLeftNoteSections(List<String> leftNoteSections)
+	{
+		this.leftNoteSections = leftNoteSections;
+	}
+
+	public List<SummaryTo1> getLeftSummaries()
+	{
+		return leftSummaries;
+	}
+
+	public void setLeftSummaries(List<SummaryTo1> leftSummaries)
+	{
+		this.leftSummaries = leftSummaries;
+	}
+
+	public List<String> getRightNoteSections()
+	{
+		return rightNoteSections;
+	}
+
+	public void setRightNoteSections(List<String> rightNoteSections)
+	{
+		this.rightNoteSections = rightNoteSections;
 	}
 }

@@ -116,7 +116,7 @@
 					</security:oscarSec> 
 					
 				</tr>
-				<logic:iterate id="data" name="measurementsData" property="measurementsDataVector" indexId="ctr">
+				<logic:iterate id="data" name="measurementsData" property="measurementsData" indexId="ctr">
 					<logic:present name="data" property="remoteFacility">
 						<tr class="data" style="background-color:#ffcccc" >
 					</logic:present>

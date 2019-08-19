@@ -52,7 +52,7 @@ if(!authed) {
    }catch(Exception e){}   
       
    dxResearchBeanHandler dxResearchBeanHand = new dxResearchBeanHandler(demoNO);
-   Vector patientDx = dxResearchBeanHand.getDxResearchBeanVector();
+   Vector patientDx = dxResearchBeanHand.getDxResearchBeans();
    
    //dxQuickListItemsHandler dxList = new dxQuickListItemsHandler("List1");
    //Collection list = dxList.getDxQuickListItemsVectorNotInPatientsList(patientDx);

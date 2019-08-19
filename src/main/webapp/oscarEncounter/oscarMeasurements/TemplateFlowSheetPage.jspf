@@ -539,7 +539,7 @@ div.recommendations li{
             <%
 
                 dxResearchBeanHandler dxResearchBeanHand = new dxResearchBeanHandler(demographic_no);
-                Vector patientDx = dxResearchBeanHand.getDxResearchBeanVector();
+                Vector patientDx = dxResearchBeanHand.getDxResearchBeans();
 
                 int lim =15;
                 for ( int i = 0; i < patientDx.size(); i++){
