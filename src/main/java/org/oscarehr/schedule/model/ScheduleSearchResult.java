@@ -23,11 +23,8 @@
 
 package org.oscarehr.schedule.model;
 
-import java.sql.Date;
-import java.sql.Time;
-import java.time.LocalDate;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 public class ScheduleSearchResult implements Comparable<ScheduleSearchResult>
 {
@@ -37,16 +34,12 @@ public class ScheduleSearchResult implements Comparable<ScheduleSearchResult>
     public Long length;
     public String providerNo;
 
-    public ScheduleSearchResult(Date date, Time time, char templateCode, Long length, String providerNo)
+    public ScheduleSearchResult(Timestamp timestamp, char templateCode, Long length, String providerNo)
     {
         this.templateCode = templateCode;
         this.length = length;
         this.providerNo = providerNo;
-
-        LocalDate localDate = date.toLocalDate();
-        LocalTime localTime = time.toLocalTime();
-
-        this.dateTime = localDate.atTime(localTime);
+        this.dateTime = timestamp.toLocalDateTime();
     }
 
     @Override

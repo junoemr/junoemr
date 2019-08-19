@@ -252,6 +252,14 @@ public class ScheduleWs extends AbstractWs {
 		scheduleManager.updateAppointment(getLoggedInInfo(),appointment);
 	}
 
+	public void cancelAppointment(Integer appointmentId)
+	{
+		Appointment appointment = scheduleManager.getAppointment(getLoggedInInfo(), appointmentId);
+
+		appointment.setStatus(Appointment.CANCELLED);
+		scheduleManager.updateAppointment(getLoggedInInfo(), appointment);
+	}
+
 	/**
 	 * @deprecated you should use the method with the useGMTTime option
 	 */
