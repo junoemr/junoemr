@@ -112,11 +112,9 @@
 						   ng-if="!item.dropdown"
 						   ng-click="navBarCtrl.transition(item)">{{item.label}}
 							<span ng-if="navBarCtrl.getCountForLabel(item) > 0"
-							      class="badge"
-							      ng-class="{ 'badge-success': (item.label === 'Inbox'),
-						                      'badge-warning': (item.label === 'Ticklers')}"
+							      class="badge badge-danger"
 							>{{item.labelCount}}</span>
-							<span class="unclaimed-inbox-button badge badge-custom"
+							<span class="unclaimed-inbox-button badge badge-warning"
 							      ng-if="(item.label === 'Inbox') && (navBarCtrl.unclaimedCount > 0)"
 							      ng-click="navBarCtrl.transition(item,'&providerNo=0&searchProviderNo=0&status=N'); $event.stopPropagation()"
 							>{{navBarCtrl.unclaimedCount}}</span>
@@ -149,11 +147,9 @@
 						   ng-if="!item.dropdown"
 						   ng-click="navBarCtrl.transition(item)">{{item.label}}
 							<span ng-if="navBarCtrl.getCountForLabel(item) > 0"
-							      class="badge"
-							      ng-class="{ 'badge-success': (item.label === 'Inbox'),
-						                      'badge-warning': (item.label === 'Ticklers')}"
+							      class="badge badge-danger"
 							>{{item.labelCount}}</span>
-							<span class="unclaimed-inbox-button badge badge-custom"
+							<span class="unclaimed-inbox-button badge badge-warning"
 							      ng-if="(item.label === 'Inbox') && (navBarCtrl.unclaimedCount > 0)"
 							      ng-click="navBarCtrl.transition(item,'&providerNo=0&searchProviderNo=0&status=N'); $event.stopPropagation()"
 							>{{navBarCtrl.unclaimedCount}}</span>
@@ -215,11 +211,9 @@
 								   ng-if="!item.dropdown"
 								   ng-click="navBarCtrl.transition(item)">{{item.label}}
 									<span ng-if="navBarCtrl.getCountForLabel(item) > 0"
-									      class="badge"
-									      ng-class="{   'badge-success': (item.label === 'Inbox'),
-						                                'badge-warning': (item.label === 'Ticklers')}"
+									      class="badge badge-danger"
 									>{{item.labelCount}}</span>
-									<span class="unclaimed-inbox-button badge badge-custom"
+									<span class="unclaimed-inbox-button badge badge-warning"
 									      ng-if="(item.label === 'Inbox') && (navBarCtrl.unclaimedCount > 0)"
 									      ng-click="navBarCtrl.transition(item,'&providerNo=0&searchProviderNo=0&status=N'); $event.stopPropagation()"
 									>{{navBarCtrl.unclaimedCount}}</span>
@@ -258,11 +252,9 @@
 								   ng-if="!item.dropdown"
 								   ng-click="navBarCtrl.transition(item)">{{item.label}}
 									<span ng-if="navBarCtrl.getCountForLabel(item) > 0"
-									      class="badge"
-									      ng-class="{ 'badge-success': (item.label === 'Inbox'),
-						                      'badge-warning': (item.label === 'Ticklers')}"
+									      class="badge badge-danger"
 									>{{item.labelCount}}</span>
-									<span class="unclaimed-inbox-button badge badge-custom"
+									<span class="unclaimed-inbox-button badge badge-warning"
 									      ng-if="(item.label === 'Inbox') && (navBarCtrl.unclaimedCount > 0)"
 									      ng-click="navBarCtrl.transition(item,'&providerNo=0&searchProviderNo=0&status=N'); $event.stopPropagation()"
 									>{{navBarCtrl.unclaimedCount}}</span>
