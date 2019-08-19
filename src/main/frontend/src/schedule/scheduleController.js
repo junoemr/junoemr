@@ -905,8 +905,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					detailText += "(" + eventReason + ")";
 				}
-				labelElem.text(eventName);
-				detailElem.append(detailText);
 
 				let eventTitle = eventName + "\n" +
 					"Reason: " + eventReason + "\n" +
@@ -933,15 +931,14 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					&& Juno.Common.Util.isIntegerString(maxNameLengthProp)
 					&& Number(maxNameLengthProp) > 0)
 				{
-					labelElem.css(
-						{
-							'max-width': maxNameLengthProp + 'ch',
-							'text-overflow': 'clip',
-							'white-space': 'nowrap',
-							'overflow': 'hidden',
-						}
-					);
+					if(eventName.length > Number(maxNameLengthProp))
+					{
+						eventName = eventName.substring(0, Number(maxNameLengthProp));
+					}
 				}
+
+				labelElem.text(eventName);
+				detailElem.append(detailText);
 			}
 			else //background events (appointment slots)
 			{
