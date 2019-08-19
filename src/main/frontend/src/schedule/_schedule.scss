@@ -173,6 +173,11 @@
 								&.show-self-booked {
 									margin-right: 16px;
 								}
+								.inline-flex {
+									display: inline-flex;
+									align-items: baseline;
+								}
+
 								.self-book-indicator.visible {
 									position: absolute;
 									top: 0;
@@ -194,7 +199,6 @@
 
 									.event-label {
 										margin-left: 3px;
-										margin-right: 3px;
 										height: $button-size;
 										display: inline-block;
 									}
@@ -211,11 +215,10 @@
 										background-color: rgba(255, 255, 255, 0.2);
 										border-radius: 50%;
 									}
-									float: left;
 								}
 								.event-status {
 									margin-left: 8px;
-									float: left;
+									align-self: center;
 								}
 
 								.btn-icon {

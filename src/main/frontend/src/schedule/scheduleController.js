@@ -925,7 +925,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					selfBookElem.addClass('visible');
 					selfBookElem.attr("title", "Self Booked");
-					detailElem.addClass('show-self-booked');
+					detailElem.parent().addClass('show-self-booked');
 				}
 
 				var maxNameLengthProp = controller.providerSettings.patientNameLength;
