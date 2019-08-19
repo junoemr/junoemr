@@ -50,6 +50,7 @@ String userlastname = (String) session.getAttribute("userlastname");
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ResourceBundle" %>
+<%@ page import="java.time.LocalDate" %>
 
 <%
 	//preliminary JSP code
@@ -219,7 +220,17 @@ String userlastname = (String) session.getAttribute("userlastname");
 			                    printTitle = UNPRINTABLE_TITLE;
 			                    printAlt   = UNPRINTABLE_ALT;
 			                }
-				            date = ConversionUtils.toDateString(MyDateFormat.getCalendar(curDoc.getObservationDate()).getTime(), dateFormat);
+			                String dateString = curDoc.getObservationDate();
+			                if (dateString == null)
+			                {
+				                dateString = curDoc.getReviewDateTimeDate().toString();
+				                if (dateString == null || dateString.isEmpty())
+				                {
+				                    // If one or both of the document's dates are recorded as null, use today as failsafe
+				                    dateString = LocalDate.now().toString();
+				                }
+			                }
+			                date = ConversionUtils.toDateString(MyDateFormat.getCalendar(dateString).getTime(), dateFormat);
 			                truncatedDisplayName = StringUtils.maxLenString(curDoc.getDescription(),14,11,"");
 			                if (StringUtils.isNullOrEmpty(truncatedDisplayName))
 			                {
