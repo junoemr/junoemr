@@ -1,0 +1,131 @@
+
+.uib-datepicker-inline-wrapper {
+	display: inline-block;
+	min-height: 187px;
+}
+
+.uib-datepicker {
+
+	// custom colors for button styles used in the uib-datepicker
+
+	thead {
+
+		// override btn-default colors to match info-box header colors
+		.btn-default {
+			@include button-variant($color-info-box-top-text, $color-info-box-top-bg, lighten($color-info-box-top-bg, 10%));
+		}
+
+		// match info-box header colors
+		th {
+			//background-color: $color-info-box-top-bg;
+			//color: $color-info-box-top-text;
+			background-color: $color-neutral-white;
+			color: $color-neutral-light;
+		}
+	}
+
+	tbody {
+
+		// override btn-default colors
+		.btn-default {
+			//@include button-variant($color-btn-addon-text, $color-btn-addon-bg, $color-btn-addon-border);
+			//background-color: $white;
+			//color: $grey-06;
+		}
+
+		// override active style to be primary color
+		.btn-default:active, .btn-default.active, .btn-default.dropdown-toggle
+		{
+			background-color: $color-primary-base;
+			color: $color-neutral-white;
+			.text-info { color: $color-neutral-light; }
+		}
+	}
+
+	// square buttons, including days
+	.btn,
+	.btn-sm,
+	.btn-group-sm > .btn { border-radius: 0 }
+
+	// no focus ring after selecting a day
+	.uib-daypicker { outline: none !important; }
+}
+
+
+div.datepicker.datepicker-dropdown
+{
+	background-color: $color-neutral-white;
+	thead
+	{
+		background-color: $color-neutral-white;
+		text-shadow: none;
+		color: $color-neutral-dark;
+
+		th.prev, th.next {
+			color: $color-primary-base;
+		}
+		th.prev:hover, th.next:hover, th.datepicker-switch:hover {
+			background-color: $color-neutral-lighter;
+		}
+		th.dow
+		{
+			margin-bottom: 5px;
+			font-size: 10px;
+		}
+	}
+	tbody
+	{
+		background-color: white;
+		td.active, td.active:hover, span.month.active, span.month.active:hover, span.year.active,
+		span.year.active:hover
+		{
+			background-image: none;
+			background-color: $color-primary-base;
+			color: $color-neutral-white;
+		}
+
+		td.day
+		{
+			border-radius: 50%;
+			width: 32px;
+			height: 32px;
+			font-size: 12px;
+			color: $color-neutral-darker;
+
+			&.today {
+				background-color: $color-primary-lightest;
+				background-image: none;
+				&:hover {
+					background-color: $color-primary-lighter;
+				}
+			}
+			&.active {
+				background-color: $color-primary-base;
+				color: $color-neutral-white;
+				font-weight: bold;
+				&:hover {
+					background-color: $color-primary-dark;
+				}
+			}
+			&.old, &.new {
+				color: $color-neutral-grey;
+			}
+		}
+	}
+	tfoot
+	{
+		tr
+		{
+			th.active
+			{
+				background-color: $color-primary-base;
+				color: $color-neutral-white;
+				text-shadow: none;
+			}
+			th:hover
+			{
+				background-color: $color-neutral-lighter;
+			}
+		}
+	}
+}

@@ -77,11 +77,23 @@
 	ArrayList list = null;
 
 	DateMapComparator comparator = new DateMapComparator("collDate");
-	if (!(demographicNo == null || demographicNo.equals("null")))
+
+	int demographicNoAsNumber = 0;
+
+	try
+	{
+		demographicNoAsNumber = Integer.parseInt(demographicNo);
+	}
+	catch (NumberFormatException exception)
+	{
+		MiscUtils.getLogger().warn("Failed to parse '" + demographicNo + "' as an integer");
+	}
+
+	if (!(demographicNo == null || demographicNo.equals("null") || demographicNoAsNumber == 0))
 	{
 		if (remoteFacilityIdString == null)
 		{
-			list = CommonLabTestValues.findValuesForTest(labType, Integer.valueOf(demographicNo), testName, identifier);
+			list = CommonLabTestValues.findValuesForTest(labType, demographicNoAsNumber, testName, identifier);
 		}
 		else
 		{
@@ -100,6 +112,25 @@
 			MiscUtils.getLogger().error("Returning unsorted list.");
 		}
 	}
+
+	// Scriptlets are dumb and compute first before the invalid demographic logic actually triggers
+	// This would result in a 500 error if the demographic number given is invalid even with error checking
+	// Prefer pre-pulling desired demographic attrs before displaying
+	// instead of using a ternary every time we want to display a demographic field
+	String lastName = "";
+	String firstName = "";
+	String sex = "";
+	String dateOfBirth = "";
+	String age = "";
+
+	if (demographic != null)
+	{
+		lastName = demographic.getLastName();
+		firstName = demographic.getFirstName();
+		sex = demographic.getSex();
+		dateOfBirth = DemographicData.getDob(demographic, "-");
+		age = demographic.getAge();
+	}
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -114,18 +145,20 @@
 </head>
 <body>
 
+<script type="text/javascript" language="JavaScript">
+
   <%
-	  if(demographic == null)
+	  if(demographic == null || demographicNoAsNumber == 0)
 	  {
   %>
-  <script type="text/javascript" language="JavaScript">
 	  alert("The demographic number is not valid");
 	  window.close();
-  </script>
 
     <%
 	  }
 	%>
+</script>
+
 <form name="acknowledgeForm" method="post" action="../../../oscarMDS/UpdateStatus.do">
 
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -154,13 +187,13 @@
 													<td colspan="2" nowrap>
 													<div class="FieldData">
 														<strong><bean:message key="oscarMDS.segmentDisplay.formPatientName" />:</strong>
-														<%=demographic.getLastName()%>,<%=demographic.getFirstName()%>
+														<%=lastName%>,<%=firstName%>
 													</div>
 													</td>
 													<td colspan="2" nowrap>
 													<div class="FieldData">
 														<strong><bean:message key="oscarMDS.segmentDisplay.formSex" />: </strong>
-														<%=demographic.getSex()%>
+														<%=sex%>
 													</div>
 													</td>
 												</tr>
@@ -168,13 +201,13 @@
 													<td colspan="2" nowrap>
 													<div class="FieldData">
 														<strong><bean:message key="oscarMDS.segmentDisplay.formDateBirth" />: </strong>
-														<%=DemographicData.getDob(demographic,"-")%>
+														<%=dateOfBirth%>
 													</div>
 													</td>
 													<td colspan="2" nowrap>
 													<div class="FieldData">
 														<strong><bean:message key="oscarMDS.segmentDisplay.formAge" />: </strong>
-														<%=demographic.getAge()%>
+														<%=age%>
 													</div>
 													</td>
 												</tr>

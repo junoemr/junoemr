@@ -34,6 +34,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
@@ -112,6 +114,22 @@ public class PDFFile extends GenericFile
 		return numOfPage;
 	}
 
+	@Override
+	public String getContentType() throws IOException
+	{
+		String contentType;
+		if(isValid)
+		{
+			contentType = GenericFile.getContentType(javaFile);
+		}
+		else
+		{
+			contentType = getInvalidContentType();
+		}
+		return contentType;
+	}
+
+
 	private File ghostscriptReEncode() throws IOException,InterruptedException
 	{
 		logger.info("BEGIN PDF RE-ENCODING");
@@ -149,6 +167,9 @@ public class PDFFile extends GenericFile
 		String line;
 		String reasonInvalid = null;
 		String warnings = null;
+		LocalDateTime conversionStartTime = LocalDateTime.now();
+		boolean isTimeout = false;
+
 		while((line = stdout.readLine()) != null)
 		{
 			logger.warn("gs stdout: " + line);
@@ -158,9 +179,16 @@ public class PDFFile extends GenericFile
 			{
 				reasonInvalid = (reasonInvalid == null)? line : reasonInvalid + ", " + line;
 			}
+
+			if (LocalDateTime.now().isAfter(conversionStartTime.plus(60, ChronoUnit.SECONDS)))
+			{
+				isTimeout = true;
+				break;
+			}
 		}
 
-		while((line = stderr.readLine()) != null)
+		// skip if timeout. because, reading stderr (can) block forever if we are in timeout
+		while(!isTimeout && (line = stderr.readLine()) != null)
 		{
 			logger.warn("gs stderr: " + line);
 
@@ -168,12 +196,30 @@ public class PDFFile extends GenericFile
 				continue;
 
 			reasonInvalid = (reasonInvalid == null)? line : reasonInvalid + ", " + line;
+
+			if (LocalDateTime.now().isAfter(conversionStartTime.plus(60, ChronoUnit.SECONDS)))
+			{
+				isTimeout = true;
+				break;
+			}
 		}
-		process.waitFor();
+
+		int exitValue = 0;
+		if (isTimeout)
+		{
+			process.destroyForcibly();
+			reasonInvalid = "Conversion Timed out";
+			exitValue = 124; // timeout
+		}
+		else
+		{
+			process.waitFor();
+			exitValue = process.exitValue();
+		}
+
 		stdout.close();
 		stderr.close();
 
-		int exitValue = process.exitValue();
 		if(exitValue == 0 && reasonInvalid == null && warnings != null)
 		{
 			// append the original file location to the log if there is unexpected output

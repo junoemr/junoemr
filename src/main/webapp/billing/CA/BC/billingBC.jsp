@@ -51,7 +51,6 @@ if(!authed) {
 <%@page import="oscar.entities.PaymentType, oscar.oscarBilling.ca.bc.data.BillingFormData, oscar.oscarBilling.ca.bc.data.SupServiceCodeAssocDAO,oscar.oscarBilling.ca.bc.pageUtil.BillingAssociationPersistence,oscar.oscarBilling.ca.bc.pageUtil.BillingCreateBillingForm,oscar.oscarBilling.ca.bc.pageUtil.BillingSessionBean"%>
 <%@page import="oscar.oscarBilling.ca.bc.pageUtil.ServiceCodeAssociation" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.Calendar" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.GregorianCalendar" %>
 <%@ page import="java.util.HashMap" %>
@@ -60,6 +59,8 @@ if(!authed) {
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="oscar.oscarBilling.ca.bc.data.BillingPreference" %>
+<%@ page import="org.oscarehr.common.dao.ProviderPreferenceDao" %>
+<%@ page import="org.oscarehr.common.model.ProviderPreference" %>
 <%!
   public void fillDxcodeList(BillingFormData.BillingService[] servicelist, Map dxcodeList) {
     for (int i = 0; i < servicelist.length; i++) {
@@ -90,19 +91,64 @@ if(!authed) {
     }
     return out.toString();
   }
+
+  private void populateInitialDxCodeList(HttpServletRequest request, BillingCreateBillingForm form, String apptProviderNo, String userProviderNo)
+  {
+      String diag_code_1 = request.getParameter("diag_code_1");
+      String diag_code_2 = request.getParameter("diag_code_2");
+      String diag_code_3 = request.getParameter("diag_code_3");
+
+      if (diag_code_1 == null && diag_code_2 == null && diag_code_3 == null)
+      {
+          // Mirror what billing Ontario does.  Try the default dx code of the appt provider first, then the user's.
+          String defaultDxCode = getDefaultDxCode(apptProviderNo);
+          if (defaultDxCode == null)
+          {
+              defaultDxCode = getDefaultDxCode(userProviderNo);
+          }
+
+          if (defaultDxCode != null)
+          {
+              form.setXml_diagnostic_detail1(defaultDxCode);
+          }
+      }
+      else
+      {
+          if (diag_code_1 != null)
+          {
+              form.setXml_diagnostic_detail1(diag_code_1);
+          }
+          if (diag_code_2 != null)
+          {
+              form.setXml_diagnostic_detail2(diag_code_2);
+          }
+          if (diag_code_3 != null)
+          {
+              form.setXml_diagnostic_detail3(diag_code_3);
+          }
+      }
+  }
+
+  private String getDefaultDxCode(String providerNo)
+  {
+      ProviderPreferenceDao prefDao = SpringUtils.getBean(ProviderPreferenceDao.class);
+      ProviderPreference preference = prefDao.find(providerNo);
+
+      if (preference != null)
+      {
+          return preference.getDefaultDxCode();
+      }
+      else
+      {
+          return null;
+      }
+  }
 %>
 <%
-	OscarProperties oscarProperties = OscarProperties.getInstance();
+    OscarProperties oscarProperties = OscarProperties.getInstance();
 
-	int year = 0; //Integer.parseInt(request.getParameter("year"));
-	int month = 0; //Integer.parseInt(request.getParameter("month"));
-	//int day = now.get(Calendar.DATE);
-	int delta = 0; //request.getParameter("delta")==null?0:Integer.parseInt(request.getParameter("delta")); //add or minus month
 	GregorianCalendar now = new GregorianCalendar();
-	year = now.get(Calendar.YEAR);
-	month = now.get(Calendar.MONTH) + 1;
 	String sxml_location = "", sxml_provider = "", sxml_visittype = "";
-	String color = "", colorflag = "";
 	BillingSessionBean bean = (BillingSessionBean) pageContext.findAttribute("billingSessionBean");
 	oscar.oscarDemographic.data.DemographicData demoData = new oscar.oscarDemographic.data.DemographicData();
 	org.oscarehr.common.model.Demographic demo = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), bean.getPatientNo());
@@ -239,34 +285,26 @@ function codeEntered(svcCode)
 
 function addSvcCode(serviceCheckbox, svcCode)
 {
-	var myform = document.forms[0];
+	var billingForm = document.forms[0];
 
 	if (serviceCheckbox.checked)
 	{
-		if (myform.xml_other1.value == "")
+		if (!billingForm.xml_other1.value)
 		{
-			myform.xml_other1.value = svcCode;
-			var trayCode = getAssocCode(svcCode, trayAssocCodes);
-			if (trayCode != '')
-			{
-				myform.xml_other2.value = trayCode;
-			}
-			myform.xml_diagnostic_detail1.value = getAssocCode(svcCode, jsAssocCodes);
+			billingForm.xml_other1.value = svcCode;
+			linkServiceAssocCode(svcCode, billingForm.xml_other2);
+			linkDxAssocCode(svcCode, billingForm.xml_diagnostic_detail1);
 		}
-		else if (myform.xml_other2.value == "")
+		else if (!billingForm.xml_other2.value)
 		{
-			myform.xml_other2.value = svcCode;
-			var trayCode = getAssocCode(svcCode, trayAssocCodes);
-			if (trayCode != '')
-			{
-				myform.xml_other3.value = trayCode;
-			}
-			myform.xml_diagnostic_detail2.value = getAssocCode(svcCode, jsAssocCodes);
+            billingForm.xml_other2.value = svcCode;
+            linkServiceAssocCode(svcCode, billingForm.xml_other3);
+			linkDxAssocCode(svcCode, billingForm.xml_diagnostic_detail2);
 		}
-		else if (myform.xml_other3.value == "")
+		else if (!billingForm.xml_other3.value)
 		{
-			myform.xml_other3.value = svcCode;
-			myform.xml_diagnostic_detail3.value = getAssocCode(svcCode, jsAssocCodes);
+			billingForm.xml_other3.value = svcCode;
+			linkDxAssocCode(svcCode, billingForm.xml_diagnostic_detail3);
 		}
 		else
 		{
@@ -277,24 +315,40 @@ function addSvcCode(serviceCheckbox, svcCode)
 	}
 	else
 	{
-		if (myform.xml_other1.value == svcCode)
+		if (billingForm.xml_other1.value === svcCode)
 		{
-			myform.xml_other1.value = "";
-			myform.xml_other2.value = "";
-			myform.xml_diagnostic_detail1.value = "";
+			billingForm.xml_other1.value = "";
 		}
-		else if (myform.xml_other2.value == svcCode)
+		else if (billingForm.xml_other2.value === svcCode)
 		{
-			myform.xml_other2.value = "";
-			myform.xml_diagnostic_detail2.value = "";
+			billingForm.xml_other2.value = "";
 		}
-		else if (myform.xml_other3.value == svcCode)
+		else if (billingForm.xml_other3.value === svcCode)
 		{
-			myform.xml_other3.value = "";
-			myform.xml_diagnostic_detail3.value = "";
+			billingForm.xml_other3.value = "";
 		}
 	}
 	return true;
+}
+
+function linkServiceAssocCode(serviceCode, serviceCodeElement)
+{
+    var trayCode = getAssocCode(serviceCode, trayAssocCodes);
+
+    if (trayCode)
+    {
+        serviceCodeElement.value = trayCode;
+    }
+}
+
+function linkDxAssocCode(serviceCode, dxCodeElement)
+{
+    var assocCode = getAssocCode(serviceCode, jsAssocCodes);
+
+    if (assocCode)
+    {
+        dxCodeElement.value = assocCode;
+    }
 }
 
 function getAssocCode(svcCode, assocCodes)
@@ -929,10 +983,7 @@ if(wcbneeds != null){%>
 			thisForm.setXml_refer1(bean.getReferral1());
 		}
 
-	    // OHSUPORT-2883 - autofill diagnostic codes with specific values (from url)
-	    if ( request.getParameter("diag_code_1") != null ) { thisForm.setXml_diagnostic_detail1(request.getParameter("diag_code_1")); }
-	    if ( request.getParameter("diag_code_2") != null ) { thisForm.setXml_diagnostic_detail2(request.getParameter("diag_code_2")); }
-	    if ( request.getParameter("diag_code_3") != null ) { thisForm.setXml_diagnostic_detail3(request.getParameter("diag_code_3")); }
+		populateInitialDxCodeList(request, thisForm, bean.getApptProviderNo(), bean.getCreator());
 
 		// OHSUPORT-2883 - autofill other codes with specific values (from url)
 		if ( request.getParameter("other_code_1") != null ) { thisForm.setXml_other1(request.getParameter("other_code_1")); }
@@ -1002,6 +1053,10 @@ if(wcbneeds != null){%>
                   <html:option value="Pri">Private</html:option>
                   <html:option value="DONOTBILL">Do Not Bill</html:option>
                 </html:select>
+				<span>
+					<bean:message key="billing.insurer.pay_patient"/>
+					<html:checkbox property="oin_insurer_pay_patient"/>
+				</span>
             </td>
             <td width="33%">
                 <b>Clarification Code:</b>

@@ -154,10 +154,10 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			filter.setStatus(status);
 			filter.setStartIndex(offset);
 			filter.setNumToReturn(perPage);
-			filter.setReferralStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(referralStartDateString)));
-			filter.setReferralEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(referralEndDate)));
-			filter.setAppointmentStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(appointmentStartDate)));
-			filter.setAppointmentEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(appointmentEndDate)));
+			filter.setReferralStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(referralStartDateString)));
+			filter.setReferralEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(referralEndDate)));
+			filter.setAppointmentStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(appointmentStartDate)));
+			filter.setAppointmentEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(appointmentEndDate)));
 			filter.setTeam(team);
 
 			filter.setSortMode(ConsultationRequestSearchFilter.SORTMODE.valueOf(sortColumn));
@@ -176,7 +176,56 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		}
 		return RestSearchResponse.successResponse(resultList, page, perPage, resultTotal);
 	}
-	
+
+	@GET
+	@Path("/getTotalRequests")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Integer> getTotalRequests(
+			@QueryParam("demographicNo") Integer demographicNo,
+			@QueryParam("mrpNo") Integer mrpNo,
+			@QueryParam("status") Integer status,
+			@QueryParam("page") @DefaultValue("1") Integer page,
+			@QueryParam("perPage") @DefaultValue("10") Integer perPage,
+			@QueryParam("referralStartDate") String referralStartDateString,
+			@QueryParam("referralEndDate") String referralEndDate,
+			@QueryParam("appointmentStartDate") String appointmentStartDate,
+			@QueryParam("appointmentEndDate") String appointmentEndDate,
+			@QueryParam("team") String team,
+			@QueryParam("sortColumn") @DefaultValue("ReferralDate") String sortColumn,
+			@QueryParam("sortDirection") @DefaultValue("desc") String sortDirection,
+			@QueryParam("invertStatus") boolean invertStatus
+			)
+	{
+		ConsultationRequestSearchFilter filter = new ConsultationRequestSearchFilter();
+
+		if (page < 1)
+		{
+			page = 1;
+		}
+
+		int offset = perPage * (page - 1);
+		int resultTotal;
+
+		filter.setDemographicNo(demographicNo);
+		filter.setMrpNo(mrpNo);
+		filter.setStatus(status);
+		filter.setStartIndex(offset);
+		filter.setNumToReturn(perPage);
+		filter.setReferralStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(referralStartDateString)));
+		filter.setReferralEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(referralEndDate)));
+		filter.setAppointmentStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(appointmentStartDate)));
+		filter.setAppointmentEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(appointmentEndDate)));
+		filter.setTeam(team);
+		filter.setInvertStatus(invertStatus);
+
+		filter.setSortMode(ConsultationRequestSearchFilter.SORTMODE.valueOf(sortColumn));
+		filter.setSortDir(ConsultationRequestSearchFilter.SORTDIR.valueOf(sortDirection));
+
+		resultTotal = consultationManager.getConsultationCount(filter);
+
+		return RestResponse.successResponse(resultTotal);
+	}
+
 	@GET
 	@Path("/getRequest/{requestId}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -354,10 +403,10 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			filter.setStatus(status);
 			filter.setStartIndex(offset);
 			filter.setNumToReturn(perPage);
-			filter.setReferralStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(referralStartDateString)));
-			filter.setReferralEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(referralEndDate)));
-			filter.setAppointmentStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(appointmentStartDate)));
-			filter.setAppointmentEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableLocalDate(appointmentEndDate)));
+			filter.setReferralStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(referralStartDateString)));
+			filter.setReferralEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(referralEndDate)));
+			filter.setAppointmentStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(appointmentStartDate)));
+			filter.setAppointmentEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(appointmentEndDate)));
 			filter.setTeam(team);
 
 			filter.setSortMode(ConsultationResponseSearchFilter.SORTMODE.valueOf(sortColumn));

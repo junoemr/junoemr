@@ -168,6 +168,10 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private String newsletter;
 	@Column(name = "veteran_no")
 	private String veteranNo;
+	@Column(name = "name_of_mother")
+	private String nameOfMother;
+	@Column(name = "name_of_father")
+	private String nameOfFather;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "id")
 	private List<DemographicCust> demographicCust;
@@ -186,6 +190,28 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@JoinColumn(name="provider_no", insertable=false, updatable=false)
 	private ProviderData provider;
 
+	public static final String BC_NEWBORN_BILLING_CODE = "66";
+
+	public enum HC_TYPE
+	{
+		OT,
+		AB,
+		BC,
+		MB,
+		NB,
+		NL,
+		NT,
+		NS,
+		NU,
+		ON,
+		PE,
+		QC,
+		SK,
+		YT,
+		PP
+	}
+
+
 	/**
 	 * Determine if demographic is a newborn.  A demographic is a newborn if the HIN version code is 66 in BC, or
 	 * under a year old in all other cases.
@@ -194,8 +220,6 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	 */
 	public static boolean isNewBorn(LocalDate birthDate, String HINVersion)
 	{
-		final String BC_NEWBORN_BILLING_CODE = "66";
-
 		OscarProperties oscarProperties = OscarProperties.getInstance();
 
 		if (oscarProperties.isBritishColumbiaInstanceType())
@@ -244,6 +268,11 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public void setLastName(String lastName)
 	{
 		this.lastName = lastName;
+	}
+
+	public String getDisplayName()
+	{
+		return getFormattedName();
 	}
 
 	public String getFormattedName()
@@ -735,6 +764,26 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public void setVeteranNo(String veteranNo)
 	{
 		this.veteranNo = veteranNo;
+	}
+
+	public String getNameOfMother()
+	{
+		return nameOfMother;
+	}
+
+	public void setNameOfMother(String mother)
+	{
+		this.nameOfMother = mother;
+	}
+
+	public String getNameOfFather()
+	{
+		return nameOfFather;
+	}
+
+	public void setNameOfFather(String father)
+	{
+		this.nameOfFather = father;
 	}
 
 	public List<DemographicCust> getDemographicCust()

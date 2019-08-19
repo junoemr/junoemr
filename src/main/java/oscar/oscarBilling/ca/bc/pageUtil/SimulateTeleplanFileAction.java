@@ -90,7 +90,7 @@ public class SimulateTeleplanFileAction extends Action{
                 request.setAttribute("TeleplanHtmlFile", submission.getHtmlFile());
                 
             }catch(Exception e){
-                MiscUtils.getLogger().debug("Error: Teleplan Html File", e);
+                MiscUtils.getLogger().error("Error: Teleplan Html File", e);
             }
         }
         return mapping.findForward("success");

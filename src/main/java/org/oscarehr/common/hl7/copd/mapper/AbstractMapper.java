@@ -28,14 +28,13 @@ import org.oscarehr.common.hl7.copd.model.v24.group.ZPD_ZTR_PROVIDER;
 import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
 import org.oscarehr.demographicImport.service.CoPDImportService;
 import org.oscarehr.provider.model.ProviderData;
-import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
 import java.util.Date;
 
 public class AbstractMapper
 {
-	private static final Logger logger = MiscUtils.getLogger();
+	protected final Logger logger = Logger.getLogger(this.getClass());
 
 	protected final ZPD_ZTR message;
 	protected final ZPD_ZTR_PROVIDER provider;
@@ -74,6 +73,14 @@ public class AbstractMapper
 		{
 			return null;
 		}
+
+		//strip trailing time information, as we are only interested in the date.
+		//if this is not done SimpleDateFormater will produce incorrect date strings WITHOUT throwing exceptions
+		if (segmentValue.length() > 8)
+		{
+			segmentValue = segmentValue.substring(0, 8);
+		}
+
 		return ConversionUtils.fromDateString(segmentValue, "yyyyMMdd");
 	}
 

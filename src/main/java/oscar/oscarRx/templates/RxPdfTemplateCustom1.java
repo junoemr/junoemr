@@ -32,7 +32,10 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import com.lowagie.text.pdf.PdfContentByte;
+import org.oscarehr.rx.service.RxWatermarkService;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.PrescriptionQrCodeUIBean;
 
 import com.lowagie.text.Document;
@@ -110,8 +113,16 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 	protected void createRxPdf(Document document, PdfWriter writer) throws DocumentException {
 
 		PdfPTable mainTable = new PdfPTable(1);
-		mainTable.setExtendLastRow(true);//last cell will try to fill the page
+		mainTable.setExtendLastRow(false);//last cell will try to fill the page
+		mainTable.setTotalWidth(document.getPageSize().getWidth());
 		//mainTable.getDefaultCell().setPadding(10f);
+
+		// render background watermark
+		if (RxWatermarkService.isWatermarkEnabled() && RxWatermarkService.isWatermarkBackground())
+		{
+			PdfContentByte cb = writer.getDirectContent();
+			cb.addImage(createWaterMarkImage(document));
+		}
 
 		addToTable(mainTable, buildClinicHeader(), true);
 
@@ -122,6 +133,7 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		PdfPCell cell = new PdfPCell(buildPageFooter());
 		cell.setVerticalAlignment(Element.ALIGN_BOTTOM);
 		cell.setBorder(0);
+		cell.setFixedHeight(document.getPageSize().getHeight() - mainTable.getTotalHeight() - 36);//last cell will try to fill the page
 		mainTable.addCell(cell);
 
 		/*PdfPCell borderCell = new PdfPCell(mainTable);
@@ -130,6 +142,31 @@ public class RxPdfTemplateCustom1 extends RxPdfTemplate {
 		outerTable.addCell(borderCell);*/
 
 		document.add(mainTable);
+
+		// render foreground watermark
+		if (RxWatermarkService.isWatermarkEnabled() && !RxWatermarkService.isWatermarkBackground())
+		{
+			PdfContentByte cb = writer.getDirectContent();
+			cb.addImage(createWaterMarkImage(document));
+		}
+	}
+
+	protected Image createWaterMarkImage(Document document)
+	{
+		try
+		{
+			Image watermarkImg = Image.getInstance(RxWatermarkService.getWatermark().getFileObject().getAbsolutePath());
+			float scaleFactor = (document.getPageSize().getWidth()*0.8f)/watermarkImg.getWidth();
+			watermarkImg.scalePercent(scaleFactor*100f);
+			watermarkImg.setAbsolutePosition(document.getPageSize().getWidth()/2 - (watermarkImg.getWidth()*scaleFactor) / 2,
+					document.getPageSize().getHeight()/2 - (watermarkImg.getHeight()*scaleFactor) / 2);
+			return watermarkImg;
+		}
+		catch(Exception e)
+		{
+			MiscUtils.getLogger().error("error creating watermark image: " + e.getMessage(), e);
+		}
+		return null;
 	}
 
 	protected Image buildLogoImage() {

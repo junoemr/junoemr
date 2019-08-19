@@ -89,6 +89,8 @@ if(!authed) {
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.GregorianCalendar" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="oscar.util.ConversionUtils" %>
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 
 <html:html locale="true">
@@ -186,12 +188,8 @@ if(!authed) {
     </SCRIPT>
 <%
 	}
-
-		java.util.Calendar calender = java.util.Calendar.getInstance();
-		String day = Integer.toString(calender.get(java.util.Calendar.DAY_OF_MONTH));
-		String mon = Integer.toString(calender.get(java.util.Calendar.MONTH) + 1);
-		String year = Integer.toString(calender.get(java.util.Calendar.YEAR));
-		String formattedDate = year + "-" + mon + "-" + day;
+	  	LocalDate localDate = LocalDate.now();
+		String formattedDate = ConversionUtils.toDateString(localDate);
 
 		OscarProperties props = OscarProperties.getInstance();
 		ConsultationServiceDao consultationServiceDao = SpringUtils.getBean(ConsultationServiceDao.class);
@@ -1396,9 +1394,6 @@ var requestIdKey = "<%=signatureRequestId %>";
 
 	%>
 
-	<% if (!faxEnabled || !OscarProperties.getInstance().isPropertyActive("consultation_dynamic_labelling_enabled")) { %>
-	<input type="hidden" name="providerNo" value="<%=providerNo%>">
-	<% } %>
 	<input type="hidden" name="demographicNo" value="<%=demo%>">
 	<input type="hidden" name="requestId" value="<%=requestId%>">
 	<input type="hidden" name="documents" value="">
@@ -1753,11 +1748,10 @@ var requestIdKey = "<%=signatureRequestId %>";
 					<td>
 
 					<table border=0 width="100%">
-						<% if (faxEnabled && OscarProperties.getInstance().isPropertyActive("consultation_dynamic_labelling_enabled")) { %>
 						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.consultationFormPrint.msgAssociated2" />:</td>
 							<td align="right" class="tite1">
-								<html:select property="providerNo" onchange="switchProvider(this.value)">
+								<html:select property="providerNo">
 									<%
 										for (Provider p : prList) {
 											if (p.getProviderNo().compareTo("-1") != 0) {
@@ -1772,7 +1766,6 @@ var requestIdKey = "<%=signatureRequestId %>";
 								</html:select>
 							</td>
 						</tr>
-						<% } %>
 						<tr>
 							<td class="tite4"><bean:message key="oscarEncounter.oscarConsultationRequest.ConsultationFormRequest.formRefDate" />:
 							</td>

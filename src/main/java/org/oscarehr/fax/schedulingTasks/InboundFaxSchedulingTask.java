@@ -61,9 +61,7 @@ public class InboundFaxSchedulingTask
 	{
 		try
 		{
-			logger.info("Execute Inbound scheduling task! " + ConversionUtils.toDateTimeString(LocalDateTime.now()));
 			incomingFaxDownloadService.pullNewFaxes();
-			logger.info("Completed at " + ConversionUtils.toDateTimeString(LocalDateTime.now()) + ". Next Execution Time: " + getNextRunTime());
 		}
 		catch(IllegalStateException e)
 		{

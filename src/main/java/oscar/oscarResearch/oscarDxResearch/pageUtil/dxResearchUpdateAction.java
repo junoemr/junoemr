@@ -74,7 +74,7 @@ public class dxResearchUpdateAction extends Action {
 			if (status.equals("C") || status.equals("D")) {
 				research.setStatus(status.charAt(0));
 			} else if (status.equals("A") && startDate != null) {
-				research.setStartDate(new Date());
+				research.setStartDate(ConversionUtils.fromDateString(startDate));
 			}
 			research.setUpdateDate(new Date());
 			

@@ -212,6 +212,7 @@ public class AddEFormAction extends Action {
 						formOpenerMap, paramValueMap, eFormLink, getOverrideDate(dateOverrideValue));
 			}
 
+			List<String> unmappedWarnings = eFormService.checkUnmappedMeasurements(eForm, paramValueMap);
 
 			boolean sameForm = (eForm == null);
 			String fdid = (sameForm) ? oldFormDataId : eForm.getId().toString();
@@ -264,6 +265,14 @@ public class AddEFormAction extends Action {
 			{
 				MiscUtils.getLogger().error("Error while processing MatchManager.processEvent(Client)", e);
 			}
+
+			// If there were unmapped measurements, we want to redirect back to the main eForm page
+			if (!unmappedWarnings.isEmpty())
+			{
+				request.setAttribute("measurements_unsaved", unmappedWarnings);
+				return mapping.findForward("close");
+			}
+
 		}
 		catch(EFormMeasurementException e)
 		{

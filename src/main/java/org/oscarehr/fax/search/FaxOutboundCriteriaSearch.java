@@ -23,14 +23,18 @@
 package org.oscarehr.fax.search;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
+import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 {
@@ -48,6 +52,10 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 	private Long faxAccountId;
 	private LocalDate startDate;
 	private LocalDate endDate;
+	private Boolean archived;
+	private List<String> remoteStatusList;
+	private boolean includeExternalStatuses;
+	private FaxOutboxTransferOutbound.CombinedStatus combinedStatus;
 
 	private SORTMODE sortMode = SORTMODE.CreationDate;
 
@@ -80,10 +88,6 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 		{
 			criteria.add(Restrictions.eq("demographicNo", getDemographicNo()));
 		}
-		if(getStatus() != null)
-		{
-			criteria.add(Restrictions.eq("status", getStatus()));
-		}
 		if(getEndDate() != null)
 		{
 			criteria.add(Restrictions.le("createdAt", Timestamp.from(getEndDate().atTime(LocalTime.MAX).toInstant(ZoneOffset.UTC))));
@@ -92,6 +96,33 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 		{
 			criteria.add(Restrictions.ge("createdAt", Timestamp.from(getStartDate().atStartOfDay().toInstant(ZoneOffset.UTC))));
 		}
+		if(getArchived() != null)
+		{
+			criteria.add(Restrictions.eq("archived", getArchived()));
+		}
+
+		/* the combined status will override the individual status parameters */
+		if(combinedStatus != null)
+		{
+			criteria.add(getCombinedStatusCriteria(combinedStatus));
+		}
+		else
+		{
+			if(getStatus() != null)
+			{
+				criteria.add(Restrictions.eq("status", getStatus()));
+			}
+			if(getRemoteStatusList() != null && !getRemoteStatusList().isEmpty())
+			{
+				Criterion criterion = Restrictions.in("externalStatus", getRemoteStatusList());
+				if(!includeExternalStatuses)
+				{
+					criterion = Restrictions.or(Restrictions.not(criterion), Restrictions.isNull("externalStatus"));
+				}
+				criteria.add(criterion);
+			}
+		}
+
 		setOrderByCriteria(criteria);
 		return criteria;
 	}
@@ -104,6 +135,47 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 			case CreationDate:
 			default: criteria.addOrder(getOrder("createdAt")); break;
 		}
+	}
+
+	private Criterion getCombinedStatusCriteria(FaxOutboxTransferOutbound.CombinedStatus combinedStatus)
+	{
+		Criterion criterion = null;
+		switch(combinedStatus)
+		{
+			case ERROR:
+			{
+				criterion = Restrictions.eq("status", FaxOutbound.Status.ERROR); break;
+			}
+			case QUEUED:
+			{
+				criterion = Restrictions.eq("status", FaxOutbound.Status.QUEUED); break;
+			}
+			case IN_PROGRESS:
+			{
+				criterion = Restrictions.and(
+						Restrictions.eq("status", FaxOutbound.Status.SENT),
+						Restrictions.or(
+								Restrictions.not(Restrictions.in("externalStatus", SRFaxApiConnector.RESPONSE_STATUSES_FINAL)),
+								Restrictions.isNull("externalStatus")
+						)
+				); break;
+			}
+			case INTEGRATION_FAILED:
+			{
+				criterion = Restrictions.and(
+						Restrictions.eq("status", FaxOutbound.Status.SENT),
+						Restrictions.eq("externalStatus", SRFaxApiConnector.RESPONSE_STATUS_FAILED)
+				); break;
+			}
+			case INTEGRATION_SUCCESS:
+			{
+				criterion = Restrictions.and(
+						Restrictions.eq("status", FaxOutbound.Status.SENT),
+						Restrictions.eq("externalStatus", SRFaxApiConnector.RESPONSE_STATUS_SENT)
+				); break;
+			}
+		}
+		return criterion;
 	}
 
 	public String getSentTo()
@@ -184,5 +256,59 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 	public void setStartDate(LocalDate startDate)
 	{
 		this.startDate = startDate;
+	}
+
+	public Boolean getArchived()
+	{
+		return archived;
+	}
+
+	public void setArchived(Boolean archived)
+	{
+		this.archived = archived;
+	}
+
+	/**
+	 * the list of remote statuses values to filter.
+	 */
+	public List<String> getRemoteStatusList()
+	{
+		return remoteStatusList;
+	}
+
+	/**
+	 * set the list of remote statuses values to filter.
+	 * @param includeExternalStatuses
+	 * if true, results will be filtered to included only statuses in the given list.
+	 * if false, results will be filtered to exclude these statuses
+	 * this setting is ignored in the remote status list is not set or is empty
+	 */
+	public void setRemoteStatusList(List<String> remoteStatusList, boolean includeExternalStatuses)
+	{
+		this.remoteStatusList = remoteStatusList;
+		this.includeExternalStatuses = includeExternalStatuses;
+	}
+
+	/**
+	 * if true, results will be filtered to included only statuses in the given list.
+	 * if false, results will be filtered to exclude these statuses
+	 * this setting is ignored in the remote status list is not set or is empty
+	 */
+	public boolean isIncludeExternalStatuses()
+	{
+		return includeExternalStatuses;
+	}
+
+	/** set the combined status to filter on.
+	 * the combined status will override the individual (local and remote) status parameters
+	 */
+	public void setCombinedStatus(FaxOutboxTransferOutbound.CombinedStatus combinedStatus)
+	{
+		this.combinedStatus = combinedStatus;
+	}
+
+	public FaxOutboxTransferOutbound.CombinedStatus getCombinedStatus()
+	{
+		return combinedStatus;
 	}
 }

@@ -53,6 +53,11 @@ public class IsPropertiesOn {
 		return propertiesOn("multisites");
 	}
 
+	public static boolean isTelehealthEnabled() {
+		return propertiesOn("myhealthaccess_telehealth_enabled");
+	}
+
+
 	public static boolean isProviderFormalizeEnable() {
 		return propertiesOn("multioffice.formalize.provider.id");
 	}

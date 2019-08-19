@@ -24,7 +24,10 @@
 
 package org.oscarehr.common.model;
 
-import java.util.Date;
+import org.apache.log4j.Logger;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserAccessTokenTo1;
+import org.oscarehr.util.EncryptionUtils;
+import org.oscarehr.util.MiscUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,10 +37,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.log4j.Logger;
-import org.oscarehr.util.EncryptionUtils;
-import org.oscarehr.util.MiscUtils;
+import java.util.Date;
 
 
 @Entity
@@ -75,9 +75,11 @@ public class Security extends AbstractModel<Integer> {
 	@Column(name = "b_RemoteLockSet")
 	private Integer BRemotelockset;
 
-
 	@Column(name="forcePasswordReset")
 	private Boolean forcePasswordReset = true;
+
+	@Column(name = "myhealthaccess_auth_token")
+	private String myHealthAccessAuthToken;
 
 	/** default constructor */
 	public Security() {
@@ -199,8 +201,26 @@ public class Security extends AbstractModel<Integer> {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	
-	
+
+	public ClinicUserAccessTokenTo1 getMyHealthAccessAuthToken()
+	{
+		if(this.myHealthAccessAuthToken == null || this.myHealthAccessAuthToken.isEmpty())
+		{
+			return null;
+		}
+		MiscUtils.getLogger().error("this id: " + this.getId());
+		MiscUtils.getLogger().error("this token: " + this.myHealthAccessAuthToken);
+
+		ClinicUserAccessTokenTo1 accessTokenTo = new ClinicUserAccessTokenTo1();
+		accessTokenTo.setToken(this.myHealthAccessAuthToken);
+
+		return accessTokenTo;
+	}
+
+	public void setMyHealthAccessAuthToken(String myHealthAccessAuthToken)
+	{
+		this.myHealthAccessAuthToken = myHealthAccessAuthToken;
+	}
 
 	/**
 	 * @return true if inputed password equals password in the DB, false otherwise.

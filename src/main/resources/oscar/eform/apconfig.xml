@@ -214,6 +214,12 @@
 		<ap-output>${fax}</ap-output>
 	</databaseap>
 	<databaseap>
+		<ap-name>current_user_email</ap-name>
+		<ap-sql>SELECT provider.email FROM provider
+			WHERE provider.provider_no='${loggedInProvider}' </ap-sql>
+		<ap-output>${email}</ap-output>
+	</databaseap>
+	<databaseap>
 		<ap-name>current_logged_in_user_work_phone</ap-name>
 		<ap-sql>SELECT provider.work_phone FROM provider
 			WHERE provider.provider_no='${loggedInProvider}' </ap-sql>
@@ -246,6 +252,13 @@
 		<ap-name>current_logged_in_user_takno</ap-name>
 		<ap-sql>SELECT p.alberta_tak_no as takno FROM provider p WHERE
 			p.provider_no='${loggedInProvider}' </ap-sql>
+		<ap-output>${takno}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>appt_provider_takno</ap-name>
+		<ap-sql>SELECT p.alberta_tak_no AS takno FROM provider p JOIN appointment a ON p.provider_no=a.provider_no
+			WHERE a.appointment_no='${appt_no}'
+		</ap-sql>
 		<ap-output>${takno}</ap-output>
 	</databaseap>
 
@@ -542,6 +555,16 @@
 		<ap-sql>SELECT sin FROM demographic WHERE
 			demographic_no=${demographic}</ap-sql>
 		<ap-output>${sin}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>name_of_mother</ap-name>
+		<ap-sql>SELECT name_of_mother FROM demographic WHERE demographic_no=${demographic}</ap-sql>
+		<ap-output>${name_of_mother}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>name_of_father</ap-name>
+		<ap-sql>SELECT name_of_father FROM demographic WHERE demographic_no=${demographic}</ap-sql>
+		<ap-output>${name_of_father}</ap-output>
 	</databaseap>
 
 	<!-- OHSUPPORT-2712 licensed Marijuana Producers (requires custom database tables)-->
@@ -1148,8 +1171,16 @@
 	</databaseap>
 	<databaseap>
 		<ap-name>bcEDD</ap-name>
-		<ap-sql>SELECT c_EDD FROM formBCAR2012 f where
-			demographic_no=${demographic} order by ID desc limit 1;</ap-sql>
+		<ap-sql>SELECT bcar.c_EDD FROM
+			(select id, demographic_no, c_EDD, formEdited from formBCAR2007 UNION select id, demographic_no, c_EDD, formEdited from formBCAR2012) as bcar
+			where bcar.demographic_no=${demographic} order by bcar.formEdited desc limit 1;</ap-sql>
+		<ap-output>${c_EDD}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>bcEDD2</ap-name>
+		<ap-sql>SELECT DATE_FORMAT(bcar.c_EDD, '%d/%m/%Y') as c_EDD FROM
+			(select id, demographic_no, c_EDD, formEdited from formBCAR2007 UNION select id, demographic_no, c_EDD, formEdited from formBCAR2012) as bcar
+			where bcar.demographic_no=${demographic} order by bcar.formEdited desc limit 1;</ap-sql>
 		<ap-output>${c_EDD}</ap-output>
 	</databaseap>
 
@@ -1217,6 +1248,15 @@
 		<ap-output>${practitionerNo}</ap-output>
 	</databaseap>
 	<databaseap>
+		<ap-name>app_provider_email</ap-name>
+		<ap-sql>SELECT provider.email FROM provider JOIN
+			    appointment as appt
+				ON appt.provider_no=provider.provider_no
+				WHERE appt.appointment_no=${appt_no}
+		</ap-sql>
+		<ap-output>${email}</ap-output>
+	</databaseap>
+	<databaseap>
 		<ap-name>appt_provider_specialty</ap-name>
 		<ap-sql>SELECT provider.specialty FROM provider, appointment
 			WHERE appointment.appointment_no=${appt_no} AND
@@ -1264,6 +1304,15 @@
 			demographic.provider_no=provider.provider_no
 		</ap-sql>
 		<ap-output>${work_phone}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>doctor_email</ap-name>
+		<ap-sql>SELECT provider.email FROM provider JOIN
+				demographic as demo
+				ON provider.provider_no = demo.provider_no
+				WHERE demographic_no=${demographic}
+		</ap-sql>
+		<ap-output>${email}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>doctor_fax</ap-name>
@@ -1509,6 +1558,11 @@
 		<ap-name>clinic_fax</ap-name>
 		<ap-sql>SELECT clinic_fax FROM clinic</ap-sql>
 		<ap-output>${clinic_fax}</ap-output>
+	</databaseap>
+	<databaseap>
+		<ap-name>clinic_email</ap-name>
+		<ap-sql>SELECT email FROM clinic </ap-sql>
+		<ap-output>${email}</ap-output>
 	</databaseap>
 	<databaseap>
 		<ap-name>clinic_label</ap-name>

@@ -28,7 +28,6 @@ import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
-import org.oscarehr.fax.externalApi.srfax.result.GetFaxStatusResult;
 import org.oscarehr.fax.externalApi.srfax.result.GetUsageResult;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
 import org.oscarehr.fax.model.FaxAccount;
@@ -47,9 +46,7 @@ import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This service should be responsible for handling all logic around fax setup and configuration
@@ -106,62 +103,12 @@ public class FaxAccountService
 
 	public List<FaxOutboxTransferOutbound> getOutboxResults(FaxAccount faxAccount, FaxOutboundCriteriaSearch criteriaSearch)
 	{
-		SRFaxApiConnector apiConnector = new SRFaxApiConnector(faxAccount.getLoginId(), faxAccount.getLoginPassword());
-
-		// find the list of all outbound results based on the search criteria
 		List<FaxOutbound> outboundList = faxOutboundDao.criteriaSearch(criteriaSearch);
 
-		// filter out the results that were actually sent to srfax
-		List<String> referenceIdList = new ArrayList<>(outboundList.size());
-		for(FaxOutbound faxOutbound : outboundList)
-		{
-			// only include records with info that the remote fax account is expected to have a record of
-			if(faxOutbound.isLinkedWithRemoteAccount(faxAccount))
-			{
-				referenceIdList.add(String.valueOf(faxOutbound.getExternalReferenceId()));
-			}
-		}
-
-		Map<String, GetFaxStatusResult> statusResultMap = new HashMap<>(referenceIdList.size());
-		if(!referenceIdList.isEmpty())
-		{
-			// ask srfax for information on the outbound faxes that were successfully sent to srfax
-			ListWrapper<GetFaxStatusResult> resultList = apiConnector.getMultiFaxStatus(referenceIdList);
-			logger.debug(resultList);
-
-			// if the api response is a success, map the results
-			if(resultList.isSuccess())
-			{
-				for(GetFaxStatusResult result : resultList.getResult())
-				{
-					statusResultMap.put(result.getDetailsId(), result);
-				}
-			}
-			else
-			{
-				logger.warn("SRFAX API Connection Failure: " + resultList.getError());
-			}
-		}
-
-		// merge the local outbound fax results with the results from srfax into transfer objects
 		ArrayList<FaxOutboxTransferOutbound> transferList = new ArrayList<>(outboundList.size());
 		for(FaxOutbound faxOutbound : outboundList)
 		{
-			// set the locally available field info
-			FaxOutboxTransferOutbound transfer = FaxTransferConverter.getAsOutboxTransferObject(faxAccount, faxOutbound);
-
-			// add the data from srfax on relevant objects
-			if(faxOutbound.isStatusSent())
-			{
-				GetFaxStatusResult apiResult = statusResultMap.get(String.valueOf(faxOutbound.getExternalReferenceId()));
-				if(apiResult != null)
-				{
-					transfer.setIntegrationDateQueued(apiResult.getDateQueued());
-					transfer.setIntegrationDateSent(apiResult.getDateSent());
-					transfer.setIntegrationStatus(apiResult.getSentStatus());
-				}
-			}
-			transferList.add(transfer);
+			transferList.add(FaxTransferConverter.getAsOutboxTransferObject(faxAccount, faxOutbound));
 		}
 		return transferList;
 	}

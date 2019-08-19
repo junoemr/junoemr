@@ -28,6 +28,7 @@
 <head>
 	<title>PATIENT DETAIL INFO</title>
 	<link rel="stylesheet" href="../web.css"/>
+	<script type="text/javascript" src="../share/javascript/HealthCardParser.js"></script>
 	<script language="JavaScript">
 		function setfocus()
 		{
@@ -44,11 +45,25 @@
 				alert("Incorrect value provided for card number");
 				return false;
 			}
+			return true;
+			/*
+			 * We eventually want to insert the following code, but for now we need to
+			 * understand what types of cards are breaking our system.
+			 * Once we feel comfortable with the supported card types, re-add the following whitelist check.
 			else
 			{
-				return true;
-
+				if (Oscar.HealthCardParser.isWhitelisted(cardNo))
+				{
+					return true;
+				}
+				// Card is unsupported - clear data from card off screen before telling user error
+				document.getElementById("card_no").value = "";
+				alert("Card type not supported." +
+						"\nCurrently support is enabled for health cards from the following provinces:" +
+						"\n- BC, Ontario");
+				return false;
 			}
+			*/
 		}
 	</script>
 </head>
@@ -69,7 +84,7 @@
 			</td>
 
 			<td valign="middle" rowspan="2" ALIGN="left">
-				<input type="text" NAME="card_no" SIZE="60" MAXLENGTH="200">
+				<input type="text" NAME="card_no" id="card_no" SIZE="60" MAXLENGTH="200">
 				<INPUT TYPE="SUBMIT" NAME="displaymode" VALUE="Validate" SIZE="17"></td>
 		</tr>
 	</form>

@@ -65,11 +65,9 @@ public class PrintLabsAction extends Action{
     }
     
     public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response){
-        
-    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_lab", "r", null)) {
-			throw new SecurityException("missing required security object (_lab)");
-		}
-    	
+        String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+        securityInfoManager.requireOnePrivilege(providerNo, securityInfoManager.READ, null, "_lab");
+
         try {
             MessageHandler handler = Factory.getHandler(request.getParameter("segmentID"));
             if(handler.getHeaders().get(0).equals("CELLPATHR")){//if it is a VIHA RTF lab
@@ -84,15 +82,15 @@ public class PrintLabsAction extends Action{
 	            pdf.printPdf();
             }
         }catch(DocumentException de) {
-            logger.error("DocumentException occured insided PrintLabsAction", de);
+            logger.error("DocumentException occurred inside PrintLabsAction", de);
             request.setAttribute("printError", new Boolean(true));
             return mapping.findForward("error");
         }catch(IOException ioe) {
-            logger.error("IOException occured insided PrintLabsAction", ioe);
+            logger.error("IOException occurred inside PrintLabsAction", ioe);
             request.setAttribute("printError", new Boolean(true));
             return mapping.findForward("error");
         }catch(Exception e){
-            logger.error("Unknown Exception occured insided PrintLabsAction", e);
+            logger.error("Unknown Exception occurred inside PrintLabsAction", e);
             request.setAttribute("printError", new Boolean(true));
             return mapping.findForward("error");
         }

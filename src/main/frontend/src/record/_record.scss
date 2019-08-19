@@ -1,0 +1,128 @@
+#patient-record-page {
+	.patient-record-header {
+		@extend %juno-page-header;
+
+		.patient-header-name,.patient-header-info {
+			margin: 0;
+			padding: 0 6px;
+		}
+		.patient-header-name {
+			font-size: 20px;
+		}
+		.icon {
+			font-size: 20px;
+		}
+	}
+	#record-nav {
+
+		$border-bottom-size: 4px;
+		@include juno-tab-md(calc(#{$page-tabs-height} - #{$border-bottom-size}));
+		@include juno-tab-color-scheme-white($border-bottom-size);
+		@include juno-font-tab;
+
+		@include juno-breakpoints(1600px, $screen-nav-md, $screen-nav-sm);
+	}
+
+	.primary-content-window {
+		@extend %juno-primary-view-pane-tabs;
+		@include juno-page-padding-default;
+	}
+
+	.sub-nav {
+		.dropdown-menu {
+			background-color: #fff;
+			li {
+				a {
+					color: #636363;
+				}
+				a:hover {
+					background-color: #ebebeb;
+				}
+			}
+		}
+	}
+
+	@media (max-width: 1320px) {
+
+		.patient-header-name {
+			font-size: 26px
+		}
+	}
+
+	@media print {
+		.noprint {
+			display: none;
+		}
+		.patient-header-name {
+			font-size: 16px;
+		}
+	}
+
+	@media (min-width: 992px) {
+		.no-margin-left-md {
+			margin-left: 0;
+		}
+	}
+}
+#note-editor-container {
+	display: flex;
+	justify-content: center;
+	#note-editor,
+	#note-editor-minimized {
+		position: fixed;
+		bottom: 0; // top: auto !important; // Using !important to override the JqueryUI styling
+		z-index: 1040;
+	}
+
+	#note-editor-minimized {
+		background-color: $color-primary-darker;
+		padding: 0;
+		color: $color-neutral-white;
+		opacity: 0.5;
+		&:hover {
+			opacity: 1;
+		}
+	}
+
+	#note-editor {
+		background-color: $color-neutral-lighter;
+		/* pre-emptively set the left edge due to a weird jqueryui bug
+		in which the left edge is not set if the user resizes the element from the right before doing any other resizing actions.
+		This causes the element to expand from both sides when resizing to the right*/
+		left: 30%;
+		position: fixed;
+		top: auto !important;
+		bottom: 0;
+		#note-editor-header {
+			color: $color-neutral-white;
+			background-color: $color-primary-dark;
+			margin-bottom: $margin-md;
+			#note-editor-minimize-button {
+				&:hover {
+					span {
+						color: $color-primary-dark;
+					}
+				}
+			}
+		}
+		.row {
+			margin-bottom: $margin-sm;
+		}
+		.note-editor-textarea {
+			resize: none;
+			min-height: 50px;
+		}
+		#note-editor-enc-date {
+			padding-right: 0;
+			p {
+				margin: 0;
+			}
+		}
+	}
+
+	[uib-typeahead-popup].dropdown-menu {
+		/* Needs to be !important in order to override the inline styles set with ng-style.
+    	   We need to do this override to allow for dropup menuys */
+		top: auto !important;
+	}
+}

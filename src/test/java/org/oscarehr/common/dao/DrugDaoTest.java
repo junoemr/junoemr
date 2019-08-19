@@ -80,7 +80,7 @@ public class DrugDaoTest extends DaoTestFixtures {
 
 	@Test
 	public void testFindByParameter() {
-		List<Object[]> drugs = dao.findByParameter("demographic_no", "1");
+		List<Object[]> drugs = dao.findByParameter("BN", "1");
 		assertNotNull(drugs);
 	}
 

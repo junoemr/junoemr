@@ -634,6 +634,22 @@ private long getAppointmentRowSpan(
 		jQuery.noConflict();
 	</script>
 
+	<script type="text/javascript">
+
+		var billedAppointmentNos = [];
+
+		jQuery('a#billingLink').live('click', function(event) {
+			if (jQuery(event.target).hasClass("clicked"))
+			{
+				event.preventDefault();
+			}
+			jQuery(event.target).addClass("clicked");
+			setTimeout(function() {
+				jQuery(event.target).removeClass("clicked");
+			}, 200);
+		});
+	</script>
+
 	<script type="text/javascript" src="schedulePage.js.jsp"></script>
 
 
@@ -667,7 +683,7 @@ private long getAppointmentRowSpan(
 			popupPage(360,780,('../appointment/appointmentcontrol.jsp?displaymode=edit&dboperation=search&'+s));
 		}
 		function goFilpView(s) {
-			self.location.href = "../schedule/scheduleflipview.jsp?originalpage=../provider/providercontrol.jsp&startDate=<%=year+"-"+month+"-"+day%>" + "&provider_no="+s ;
+			self.location.href = "../schedule/scheduleflipview.jsp?originalpage=../provider/providercontrol.jsp&startDate=<%=year+"-"+month+"-"+day%>" + "&provider_no="+s +"&viewall=" + <%=viewall%> ;
 		}
 		function goWeekView(s) {
 			self.location.href = "providercontrol.jsp?year=<%=year%>&month=<%=month%>&day=<%=day%>&view=0&displaymode=day&dboperation=searchappointmentday&viewall=<%=viewall%>&provider_no="+s;
@@ -871,7 +887,7 @@ private long getAppointmentRowSpan(
 										} else {
 											jQuery("#k2a_new_notifications").text(returnVal);
 											jQuery("#K2ALink").click(function () {
-												var win = window.open("<%=request.getContextPath()%>/web/#!/k2aNotification",
+												var win = window.open("<%=request.getContextPath()%>/web/Know2actNotifications.jsp",
 													'appAuth', 'width=450,height=700,scrollbars=1');
 												win.focus();
 											});
@@ -880,6 +896,14 @@ private long getAppointmentRowSpan(
 							}
 							getK2AStatus();
 						</script>
+					</li>
+				</c:if>
+				<c:if test="<%= org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
+					<li id="admin2">
+						<a href="../telehealth/myhealthaccess.do?method=startTelehealth"
+							 id="myhealthaccess"
+							 title='MyHealthAccess'
+							 target="_blank">MyHealthAccess</a>
 					</li>
 				</c:if>
 
@@ -891,6 +915,7 @@ private long getAppointmentRowSpan(
 
 					<security:oscarSec roleName="<%=roleName$%>" objectName="_dashboardDisplay" rights="r">
 						<oscar:oscarPropertiesCheck property="enable_dashboards" value="true">
+						<oscar:oscarPropertiesCheck property="instance_type" value="BC">
 							<li id="dashboardList">
 								<div class="dropdown">
 									<a href="#" class="dashboardBtn">Dashboard</a>
@@ -903,6 +928,7 @@ private long getAppointmentRowSpan(
 									</div>
 								</div>
 							</li>
+						</oscar:oscarPropertiesCheck>
 						</oscar:oscarPropertiesCheck>
 					</security:oscarSec>
 
@@ -1321,7 +1347,7 @@ private long getAppointmentRowSpan(
 								.getResourceScheduleByProvider(mygroupno, selectedDate,
 									selectedSite, showForSure);
 						}
-						else if(".default".equals(mygroupno))
+						else if(("."+ResourceBundle.getBundle("oscarResources", request.getLocale()).getString("global.default")).equals(mygroupno))
 						{
 							// Always show the schedule because it will
 							resourceScheduleDTO = scheduleService
@@ -1830,7 +1856,25 @@ private long getAppointmentRowSpan(
 
 														</c:if>
 
-														<a class="apptLink" href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;"
+														<c:if test="<%= appointmentInfo.isVirtual() && org.oscarehr.common.IsPropertiesOn.isTelehealthEnabled() %>">
+																<a href="#"
+																	 onClick='popupPage(800, 1280,
+																					 "../telehealth/myhealthaccess.do?method=startTelehealth" +
+																					 "&demographicNo=${appointmentInfo.demographicNo}" +
+																					 "&siteName=${appointmentInfo.siteName}");return false;'
+																	 title="Telehealth">
+																		<img
+																						style="vertical-align: bottom"
+																						src="../images/icons/telehealth.svg"
+																						border="0"
+																						height="14px"
+																						title="Telehealth Appointment"
+																						alt="Tel"
+																		/>
+																</a>
+														</c:if>
+
+															<a class="apptLink" href=# onClick ="popupPage(535,860,'${appointmentInfo.appointmentURL}');return false;"
 
 															<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON_TOOLTIP" value="yes" defaultVal="true">
 																${appointmentInfo.appointmentLinkTitle}
@@ -1903,6 +1947,7 @@ private long getAppointmentRowSpan(
 																		</c:when>
 																		<c:otherwise>
 																			&#124; <a
+																				id="billingLink"
 																				href="${appointmentInfo.billLink}"
 																				target="_blank"
 																				title="<bean:message key="global.billingtag"/>"

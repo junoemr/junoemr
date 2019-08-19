@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.model.RestServiceLog;
+import org.oscarehr.log.model.RestServiceLog;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.common.annotation.MaskParameter;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;

@@ -25,6 +25,7 @@
 <%@page import="org.oscarehr.common.dao.ProviderPreferenceDao"%>
 <%@page import="org.oscarehr.common.model.ProviderPreference"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 
 
 <script type="text/javascript">
@@ -48,44 +49,40 @@
 </script>
 
 <%
-	String provider_no=null;
-	String defaultDxCode="";
-	
-	provider_no=request.getParameter("provider_no");
-	
-	ProviderPreferenceDao preferenceDao = (ProviderPreferenceDao) SpringUtils.getBean("providerPreferenceDao");	
-	ProviderPreference preference = null;	
-	preference=preferenceDao.find(provider_no);
-	if(preference!=null) {
+	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+	String providerNo = loggedInInfo.getLoggedInProviderNo();
+
+	ProviderPreferenceDao preferenceDao = (ProviderPreferenceDao) SpringUtils.getBean("providerPreferenceDao");
+	ProviderPreference preference = preferenceDao.find(providerNo);
+
+	String defaultDxCode;
+	if(preference != null && preference.getDefaultDxCode() != null)
+	{
 		defaultDxCode = preference.getDefaultDxCode();		
-	} 
-	if(defaultDxCode==null || "null".equalsIgnoreCase(defaultDxCode)) {
-		defaultDxCode="";
+	}
+	else
+	{
+	    defaultDxCode = "";
 	}
 %>
 
 
 
 <form id="preference_form" name="preference_form" action="preference_action.jsp" method="post">
-	<input type="hidden" name="provider_no" id="provider_no" value="<%=provider_no%>" />
-	<input type="hidden" name="new_tickler_warning_window" id="new_tickler_warning_window" value="<%=request.getParameter("new_tickler_warning_window")%>" />
-			
 	<table style="margin-left:auto;margin-right:auto;background-color:#f0f0f0;border-collapse:collapse">
-		
-		
 		<tr>
-		<td>Dx &nbsp;&nbsp;
-			 <input type="text" name="dxCode" size="5" maxlength="5" ondblClick="dxScriptAttach('dxCode')" onchange="changeCodeDesc();"
-					 value="<%=defaultDxCode%>" />
+			<td>
+				<label for="dxCode">Dx Code</label>
+			 	<input type="text" id="dxCode" name="dxCode" size="5" maxlength="5"
+					   ondblClick="dxScriptAttach('dxCode')" onchange="changeCodeDesc();" value="<%=defaultDxCode%>" />
 					<a href=# onclick="dxScriptAttach('dxCode');">Search</a>
-		</td>
+			</td>
 		</tr>
 		<tr>
-		<td>
-			<input type="submit" name="submit" value="Save"/>
-				&nbsp;&nbsp;&nbsp;&nbsp;				
-			<input type="button" name="close" value="Close" onclick="window.close()" />
-		</td>
+			<td>
+				<input type="submit" name="submit" value="Save"/>
+				<input type="button" name="close" value="Close" onclick="window.close()" />
+			</td>
 		</tr>
 	</table>
 	

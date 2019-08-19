@@ -23,23 +23,6 @@
  */
 package oscar.oscarBilling.ca.bc.MSP;
 
-import java.beans.BeanInfo;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.billing.CA.BC.dao.BillRecipientsDao;
@@ -62,7 +45,6 @@ import org.oscarehr.common.model.Billing;
 import org.oscarehr.common.model.BillingPaymentType;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.entities.Billingmaster;
 import oscar.entities.MSPBill;
 import oscar.entities.Provider;
@@ -75,6 +57,23 @@ import oscar.util.ConversionUtils;
 import oscar.util.SqlUtils;
 import oscar.util.StringUtils;
 import oscar.util.UtilMisc;
+
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Vector;
 
 public class MSPReconcile {
 	private static Logger log = MiscUtils.getLogger();
@@ -113,6 +112,25 @@ public class MSPReconcile {
 	public static final String BILLPATIENT = "P";
 	public static final String COLLECTION = "T";
 	public static final String PAIDPRIVATE = "A";
+
+	private static final ArrayList<String> BILL_STATUS_TYPES = new ArrayList<String>() {{
+		add(REJECTED);
+		add(NOTSUBMITTED);
+		add(SUBMITTED);
+		add(SETTLED);
+		add(DELETED);
+		add(HELD);
+		add(DATACENTERCHANGED);
+		add(PAIDWITHEXP);
+		add(REFUSED);
+		add(BADDEBT);
+		add(WCB);
+		add(CAPITATED);
+		add(DONOTBILL);
+		add(BILLPATIENT);
+		add(COLLECTION);
+		add(PAIDPRIVATE);
+	}};
 
 	private static Properties negValues = new Properties();
 	public static final String BILLTYPE_PRI = "Pri";
@@ -960,7 +978,7 @@ public class MSPReconcile {
 
 	/**
 	 * Updates the paymentMethod of the specified bill with the supplied paymentMethod code
-	 * @param billingNo String - The uid of the bill to be updated
+	 * @param billingMasterNo String - The uid of the bill to be updated
 	 * @param paymentMethod String - The paymentMethod code
 	 */
 	private void updatePaymentMethodHlp(String billingMasterNo, String paymentMethod) {
@@ -1016,61 +1034,40 @@ public class MSPReconcile {
 
 	}
 
-	public boolean updateStat(String stat, String billingNo) {
+	public boolean updateStat(String stat, String billingNo)
+	{
 		//get current status of bill
-		boolean updated = true;
-		String currStat = "";
-		String newStat = "";
-		
-		BillingmasterDAO bmDao = SpringUtils.getBean(BillingmasterDAO.class);
-		Billingmaster bm = bmDao.getBillingmaster(ConversionUtils.fromIntString(billingNo));
-
-		if (bm != null)
+		boolean updated = false;
+		if(!BILL_STATUS_TYPES.contains(stat))
 		{
-			currStat = bm.getBillingstatus();
+			throw new IllegalArgumentException("Invalid MSP status: " + stat);
 		}
-		
-		if (!currStat.equals(SETTLED))
+
+		Billingmaster bm = billingmasterDao.getBillingmaster(Integer.parseInt(billingNo));
+		if(bm != null)
 		{
-			switch (stat) {
-				case REJECTED:
-				case NOTSUBMITTED:
-				case SUBMITTED:
-				case SETTLED:
-				case DELETED:
-				case HELD:
-				case DATACENTERCHANGED:
-				case PAIDWITHEXP:
-				case BADDEBT:
-				case WCB:
-				case CAPITATED:
-				case DONOTBILL:
-				case BILLPATIENT:
-					newStat = stat;
+			if(SETTLED.equals(bm.getBillingstatus()))
+			{
+				MiscUtils.getLogger().debug("billing No " + billingNo + " is settled, will not be updated");
+			}
+			else
+			{
+				try
+				{
+					bm.setBillingstatus(stat);
+					billingmasterDao.update(bm);
+					dao.createBillingHistoryArchive(billingNo);
+					updated = true;
+				}
+				catch(Exception e)
+				{
+					MiscUtils.getLogger().error("Error", e);
+				}
 			}
 		}
-
 		else
 		{
-			updated = false;
-			MiscUtils.getLogger().debug("billing No " + billingNo + " is settled, will not be updated");
-		}
-		if (updated)
-		{
-			try
-			{
-
-				Billingmaster b = billingmasterDao.getBillingmaster(Integer.parseInt(billingNo));
-				if (b != null)
-				{
-					b.setBillingstatus(newStat);
-					billingmasterDao.update(b);
-					dao.createBillingHistoryArchive(billingNo);
-				}
-			} catch (Exception e)
-			{
-				MiscUtils.getLogger().error("Error", e);
-			}
+			MiscUtils.getLogger().error("Failed to update invoice status! Invoice id not found: " + billingNo);
 		}
 		return updated;
 	}

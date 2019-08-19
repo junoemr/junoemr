@@ -24,14 +24,13 @@
 
 package org.oscarehr.billing.CA.BC.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.oscarehr.billing.CA.BC.model.TeleplanS00;
 import org.oscarehr.common.dao.AbstractDao;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 public class TeleplanS00Dao extends AbstractDao<TeleplanS00> {
@@ -100,5 +99,55 @@ public class TeleplanS00Dao extends AbstractDao<TeleplanS00> {
 		q.setParameter(2, type);
 		q.setParameter(3, practitionerNo);
 		return q.getResultList();
+	}
+
+	public List<TeleplanS00> findDuplicates(TeleplanS00 lineEntry)
+	{
+		Query q = entityManager.createQuery(
+				"SELECT t FROM TeleplanS00 t " +
+						"WHERE t.s00Type = :s00Type " +
+						"AND t.dataCentre = :dataCenter " +
+						"AND t.dataSeq = :sequenceNumber " +
+						"AND t.mspCtlNo = :mspInternal " +
+						"AND t.officeNo = :officeNo " +
+						"AND t.practitionerNo = :practitionerNo " +
+						"AND t.payment = :paymentDate " +
+						"AND t.paidAmount = :paidAmount " +
+						"AND t.phn = :mspHin " +
+						"AND t.billNoServices = :billedNoServices " +
+						"AND t.billFeeSchedule = :billedServiceCode " +
+						"AND t.billAmount = :billedAmount " +
+						"AND t.exp1 = :explanatory1 " +
+						"AND t.exp2 = :explanatory2 " +
+						"AND t.exp3 = :explanatory3 " +
+						"AND t.ajc1 = :adjustmentCode1 " +
+						"AND t.ajc2 = :adjustmentCode2 " +
+						"AND t.ajc3 = :adjustmentCode3 " +
+						"ORDER BY t.id ASC");
+		q.setParameter("s00Type", lineEntry.getS00Type());
+		q.setParameter("dataCenter", lineEntry.getDataCentre());
+		q.setParameter("sequenceNumber", lineEntry.getDataSeq());
+		q.setParameter("mspInternal", lineEntry.getMspCtlNo());
+		q.setParameter("officeNo", lineEntry.getOfficeNo());
+		q.setParameter("practitionerNo", lineEntry.getPractitionerNo());
+		q.setParameter("paymentDate", lineEntry.getPayment());
+		q.setParameter("paidAmount", lineEntry.getPaidAmount());
+		q.setParameter("mspHin", lineEntry.getPhn());
+		q.setParameter("billedNoServices", lineEntry.getBillNoServices());
+		q.setParameter("billedServiceCode", lineEntry.getBillFeeSchedule());
+		q.setParameter("billedAmount", lineEntry.getBillAmount());
+		q.setParameter("explanatory1", lineEntry.getExp1());
+		q.setParameter("explanatory2", lineEntry.getExp2());
+		q.setParameter("explanatory3", lineEntry.getExp3());
+		q.setParameter("adjustmentCode1", lineEntry.getAjc1());
+		q.setParameter("adjustmentCode2", lineEntry.getAjc2());
+		q.setParameter("adjustmentCode3", lineEntry.getAjc3());
+
+		return q.getResultList();
+	}
+
+	public boolean isDuplicate(TeleplanS00 lineEntry)
+	{
+		return !findDuplicates(lineEntry).isEmpty();
 	}
 }

@@ -30,6 +30,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.billing.CA.BC.service.TeleplanRemittanceService;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
@@ -46,14 +48,16 @@ public class TeleplanRemittanceAction extends Action
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException
 	{
+		String filename = (String) request.getAttribute("filename");
 		try
 		{
-			String filename = (String) request.getAttribute("filename");
 			return teleplanRemittanceService.execute(mapping, filename);
 		}
 		catch(Exception e)
 		{
 			logger.error("Remittance Processing Error", e);
+			GenericFile file = FileFactory.getRemittanceFile(filename);
+			file.moveToBillingRemittanceFailed();
 		}
 		request.setAttribute("error", "An error has occurred while processing the remittance file");
 		return mapping.findForward("error");

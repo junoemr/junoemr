@@ -34,6 +34,7 @@ import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.ResourceStorage;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -52,13 +53,19 @@ public class E2ECreatorTest {
 			SchemaUtils.dropAndRecreateDatabase();
 		}
 		DaoTestFixtures.setupBeanFactory();
-		SchemaUtils.restoreTable("demographic");
+		SchemaUtils.restoreTable("demographic", "lst_gender", "admission",
+				"demographic_merged", "program", "health_safety", "provider", "providersite",
+				"site", "program_team","log", "Facility","demographicExt", "issue",
+				"casemgmt_issue", "ResourceStorage", "clinic",
+				"casemgmt_note", "preventions", "patientLabRouting", "drugs", "dxresearch",
+				"allergies", "measurements", "secRole");
 		demographicDao = SpringUtils.getBean(DemographicDao.class);
 
 		demographic = new Demographic();
 		EntityDataGenerator.generateTestDataForModelClass(demographic);
 		demographic.setDemographicNo(null);
 		demographic.setPatientStatus("AC");
+		demographic.setProviderNo(null);
 		demographicDao.save(demographic);
 	}
 

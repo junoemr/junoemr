@@ -108,12 +108,12 @@ public class SendFaxPDFAction extends DispatchAction {
 					        fileToFax.rename(faxFileName + ".pdf");
 
 					        transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicId, faxNo, FaxOutbound.FileType.DOCUMENT, fileToFax);
-					        if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
+					        if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR))
 					        {
 						        errorList.add("Failed to send fax. Check account settings. " +
 								        "Reason: " + transfer.getSystemStatusMessage());
 					        }
-					        else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED.name()))
+					        else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED))
 					        {
 						        errorList.add("Failed to send fax, it has been queued for automatic resend. " +
 								        "Reason: " + transfer.getSystemStatusMessage());

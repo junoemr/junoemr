@@ -39,6 +39,7 @@ import java.util.TreeMap;
 
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
+
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.Appointment;
@@ -57,22 +58,26 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 		super(Appointment.class);
 	}
 
-	public boolean checkForConflict(Appointment appt) {
+	/**
+	 * Check if the provided appointment conflicts with another appointment.  A conflict occurs if the provider has
+	 * another active appointment which occurs at any point during the provided appointment's time.
+	 *
+	 * @param appointment An appointment to check
+	 * @return true if a conflict is detected.
+	 */
+	public boolean checkForConflict(Appointment appointment) {
 		String sb = "select a from Appointment a where a.appointmentDate = ? and a.startTime >= ? and a.endTime <= ? and a.providerNo = ? and a.status != 'N' and a.status != 'C'";
 
 		Query query = entityManager.createQuery(sb);
 
-		query.setParameter(1, appt.getAppointmentDate());
-		query.setParameter(2, appt.getStartTime());
-		query.setParameter(3, appt.getEndTime());
-		query.setParameter(4, appt.getProviderNo());
+		query.setParameter(1, appointment.getAppointmentDate());
+		query.setParameter(2, appointment.getStartTime());
+		query.setParameter(3, appointment.getEndTime());
+		query.setParameter(4, appointment.getProviderNo());
 
-		
 		List<Facility> results = query.getResultList();
 
-		if (!results.isEmpty()) return true;
-
-		return false;
+		return !results.isEmpty();
 	}
 	
 	public List<Appointment> getAppointmentHistory(Integer demographicNo, Integer offset, Integer limit) {
@@ -189,7 +194,6 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 		return rs;
 	}
 
-
 	public List<Appointment> findByDateRangeAndProvider(Date startTime, Date endTime, String providerNo) {
 		String sql = "SELECT a FROM Appointment a WHERE a.appointmentDate >=? and a.appointmentDate < ? and providerNo = ?";
 
@@ -198,7 +202,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 		query.setParameter(2, endTime);
 		query.setParameter(3, providerNo);
 
-		
+
 		List<Appointment> rs = query.getResultList();
 
 		return rs;
@@ -611,7 +615,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 	}
     
     public List<Appointment> searchappointmentday(String providerNo, Date appointmentDate, Integer programId) {
-    	Query query = createQuery("appt", "appt.providerNo = :providerNo AND appt.appointmentDate = :appointmentDate AND appt.programId = :programId ORDER BY appt.startTime, appt.status DESC");
+    	Query query = createQuery("appointment", "appointment.providerNo = :providerNo AND appointment.appointmentDate = :appointmentDate AND appointment.programId = :programId ORDER BY appointment.startTime, appointment.status DESC");
     	query.setParameter("providerNo", providerNo);
         query.setParameter("appointmentDate", appointmentDate);
         query.setParameter("programId", programId);
@@ -775,6 +779,12 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 	public SortedMap<LocalTime, List<AppointmentDetails>> findAppointmentDetailsByDateAndProvider(
 		LocalDate date, Integer providerNo, String site)
 	{
+		return findAppointmentDetailsByDateAndProvider(date, date, providerNo, site);
+	}
+
+	public SortedMap<LocalTime, List<AppointmentDetails>> findAppointmentDetailsByDateAndProvider(
+		LocalDate startDate, LocalDate endDate, Integer providerNo, String site)
+	{
 		String sql = "SELECT\n" +
 				"  a.appointment_no,\n" +
 				"  a.demographic_no,\n" +
@@ -792,8 +802,10 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  a.bookingSource,\n" +
 				"  a.status,\n" +
 				"  a.urgency,\n" +
+				"  a.isVirtual,\n" +
 				"  aps.description,\n" +
 				"  aps.color,\n" +
+				"  aps.juno_color,\n" +
 				"  aps.icon,\n" +
 				"  aps.short_letter_colour,\n" +
 				"  aps.short_letters,\n" +
@@ -807,6 +819,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  d.date_of_birth,\n" +
 				"  d.hin,\n" +
 				"  d.chart_no,\n" +
+				"  d.family_doctor,\n" +
 				"  dc.content AS cust_notes,\n" +
 				"  dc.cust3 AS cust_alert,\n" +
 				"  p.value AS color_property,\n" +
@@ -822,7 +835,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  ON d.demographic_no = t.demographic_no \n" +
 				"  AND DATE(t.service_date) <= a.appointment_date \n" +
 				"  AND t.status = 'A'\n" +
-				"WHERE a.appointment_date = :date\n" +
+				"WHERE a.appointment_date >= :startDate\n" +
+				"AND a.appointment_date <= :endDate\n" +
 				"AND a.provider_no = :providerNo\n";
 
 				if(site != null)
@@ -847,8 +861,10 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  a.bookingSource,\n" +
 				"  a.status,\n" +
 				"  a.urgency,\n" +
+				"  a.isVirtual,\n" +
 				"  aps.description,\n" +
 				"  aps.color,\n" +
+				"  aps.juno_color,\n" +
 				"  aps.icon,\n" +
 				"  aps.short_letter_colour,\n" +
 				"  aps.short_letters,\n" +
@@ -862,6 +878,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  d.date_of_birth,\n" +
 				"  d.hin,\n" +
 				"  d.chart_no,\n" +
+				"  d.family_doctor,\n" +
 				"  dc.content,\n" +
 				"  dc.cust3,\n" +
 				"  p.value\n" +
@@ -869,7 +886,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter("property_name", UserPropertyDAO.COLOR_PROPERTY);
-		query.setParameter("date", java.sql.Date.valueOf(date), TemporalType.DATE);
+		query.setParameter("startDate", java.sql.Date.valueOf(startDate), TemporalType.DATE);
+		query.setParameter("endDate", java.sql.Date.valueOf(endDate), TemporalType.DATE);
 		query.setParameter("providerNo", providerNo);
 
 		if(site != null)
@@ -900,8 +918,11 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 			String bookingSource = (String) result[index++];
 			String status = (String) result[index++];
 			String urgency = (String) result[index++];
+			Byte isVirtualResult = (Byte) result[index++];
+			boolean isVirtual = (Byte.toUnsignedInt(isVirtualResult) == 1);
 			String statusTitle = (String) result[index++];
 			String color = (String) result[index++];
+			String junoColor = (String) result[index++];
 			String iconImage = (String) result[index++];
 			Integer shortLetterColour = (Integer) result[index++];
 			String shortLetters = (String) result[index++];
@@ -915,6 +936,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 			String dayOfBirth = (String) result[index++];
 			String hin = (String) result[index++];
 			String chartNo = (String) result[index++];
+			String familyDoctor = (String) result[index++];
 			String custNotes = (String) result[index++];
 			String custAlert = (String) result[index++];
 			String colorProperty = (String) result[index++];
@@ -983,6 +1005,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				urgency,
 				statusTitle,
 				color,
+				junoColor,
 				iconImage,
 				shortLetterColour,
 				shortLetters,
@@ -991,6 +1014,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				ver,
 				hin,
 				chartNo,
+				familyDoctor,
 				rosterStatus,
 				hcRenewDate,
 				custNotes,
@@ -998,10 +1022,87 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				colorProperty,
 				birthday,
 				hasTicklers,
-				ticklerMessages
+				ticklerMessages,
+				isVirtual
 			));
 		}
 
 		return appointmentDetails;
 	}
+
+	public List<Appointment> findPatientAppointmentsWithProvider(String demographicNo, String providerNo, LocalDate minDate, LocalDate maxDate)
+	{
+		String sql = "SELECT a FROM Appointment a\n" +
+					 "WHERE a.demographicNo = :demographicNo\n" +
+					 "AND a.providerNo = :providerNo\n" +
+	 				 "AND a.status != :cancelledStatus\n" +
+					 "AND a.appointmentDate BETWEEN :minDate AND :maxDate\n" +
+					 "ORDER BY a.appointmentDate, a.startTime";
+
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("demographicNo", Integer.parseInt(demographicNo));
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("minDate", java.sql.Date.valueOf(minDate));
+		query.setParameter("maxDate", java.sql.Date.valueOf(maxDate));
+		query.setParameter("cancelledStatus", Appointment.CANCELLED);
+
+		@SuppressWarnings("unchecked")
+		List<Appointment> results =  query.getResultList();
+
+		return results;
+	}
+
+	public Map<LocalDate, List<Appointment>> findProviderAppointmentsForMonth(String providerNo, LocalDate minDate, LocalDate maxDate)
+	{
+		Map<LocalDate, List<Appointment>> monthlyAppointments = new HashMap<>();
+
+		String sql = "SELECT a FROM Appointment a\n" +
+				"WHERE a.providerNo = :providerNo\n" +
+				"AND a.status != :cancelledStatus\n" +
+				"AND a.appointmentDate BETWEEN :minDate AND :maxDate\n" +
+				"ORDER BY a.appointmentDate, a.startTime";
+
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("minDate", java.sql.Date.valueOf(minDate));
+		query.setParameter("maxDate", java.sql.Date.valueOf(maxDate));
+		query.setParameter("cancelledStatus", Appointment.CANCELLED);
+
+		@SuppressWarnings("unchecked")
+		List<Appointment> results = query.getResultList();
+
+		for (Appointment appointment : results)
+		{
+			LocalDate appointmentDate = LocalDate.parse(appointment.getAppointmentDate().toString());
+
+			List<Appointment> dayAppointments = monthlyAppointments.get(appointmentDate);
+
+			if (dayAppointments == null)
+			{
+				dayAppointments = new ArrayList<>();
+			}
+
+			dayAppointments.add(appointment);
+
+			monthlyAppointments.put(appointmentDate, dayAppointments);
+		}
+
+		return monthlyAppointments;
+	}
+
+    public List<Appointment> findByDateRangeAndDemographic(LocalDate startDate, LocalDate endDate, Integer demographicNo)
+    {
+    	String sql = "SELECT a from Appointment a " +
+					 "WHERE a.demographicNo = :demographicNo " +
+					 "AND a.appointmentDate BETWEEN :startDate AND :endDate " +
+				     "AND a.status != :cancelledStatus";
+
+    	Query query = entityManager.createQuery(sql);
+    	query.setParameter("demographicNo", demographicNo);
+    	query.setParameter("startDate", java.sql.Date.valueOf(startDate));
+    	query.setParameter("endDate", java.sql.Date.valueOf(endDate));
+		query.setParameter("cancelledStatus", Appointment.CANCELLED);
+
+    	return query.getResultList();
+    }
 }

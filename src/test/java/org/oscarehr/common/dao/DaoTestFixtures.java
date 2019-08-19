@@ -47,17 +47,6 @@
 // -----------------------------------------------------------------------------------------------------------------------
 package org.oscarehr.common.dao;
 
-import static junit.framework.Assert.fail;
-
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
@@ -68,6 +57,17 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import static junit.framework.Assert.fail;
 
 public abstract class DaoTestFixtures
 {
@@ -84,8 +84,11 @@ public abstract class DaoTestFixtures
 		if(SpringUtils.beanFactory==null) {
 			oscar.OscarProperties p = oscar.OscarProperties.getInstance();
 			p.setProperty("db_name", ConfigUtils.getProperty("db_schema") + ConfigUtils.getProperty("db_schema_properties"));
+			p.setProperty("db_name_readonly", ConfigUtils.getProperty("db_schema") + ConfigUtils.getProperty("db_schema_properties"));
 			p.setProperty("db_username", ConfigUtils.getProperty("db_user"));
+			p.setProperty("db_username_readonly", ConfigUtils.getProperty("db_user_readonly"));
 			p.setProperty("db_password", ConfigUtils.getProperty("db_password"));
+			p.setProperty("db_password_readonly", ConfigUtils.getProperty("db_password_readonly"));
 			p.setProperty("db_uri", ConfigUtils.getProperty("db_url_prefix"));
 			p.setProperty("db_driver", ConfigUtils.getProperty("db_driver"));
 			ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
@@ -93,11 +96,6 @@ public abstract class DaoTestFixtures
 			context.refresh();
 			SpringUtils.beanFactory = context;
 		}
-	}
-	
-	public void beforeForInnoDB() throws Exception {
-		SchemaUtils.dropTable("IntegratorConsent","HnrDataValidation","ClientLink","IntegratorConsentComplexExitInterview",
-				"DigitalSignature","appointment","admission" ,"program","demographic");
 	}
 	
 	@BeforeClass
@@ -129,15 +127,15 @@ public abstract class DaoTestFixtures
 	@Test
 	public void doSimpleExceptionTest() {
 		List<String> excludeList = getSimpleExceptionTestExcludes();
-		
+
 		String daoClassName = this.getClass().getName().replaceAll("Test$", "");
 	
 		try {
 			Class clazz = Class.forName(daoClassName);
 			
 			Object daoObject = null;
-			
-			
+
+
 			for(Field f:this.getClass().getDeclaredFields()) {
 				if(f.getType().equals(clazz)) {
 					daoObject = f.get(this);
@@ -199,7 +197,7 @@ public abstract class DaoTestFixtures
 						}
 					}
 					if(invoke) {
-						//logger.info("invoking " + m.getName());
+						logger.info("invoking " + m.getName());
 						try {
 							m.invoke(daoObject, params);
 						}catch(Exception e) {
@@ -224,12 +222,12 @@ public abstract class DaoTestFixtures
 	 * @return
 	 * 		Returns a list of methods to be skipped during exception testing.
 	 */
-	protected List<String> getSimpleExceptionTestExcludes() {
+	protected List<String> getSimpleExceptionTestExcludes()
+	{
 	    String[] excludes = {"notify","notifyAll","remove","persist","merge","refresh","saveEntity","wait","equals",
-				"toString","hashCode","getClass","getModelClass","find","getCountAll","findAll","runNativeQuery","save","removeAll"};
-		List<String> excludeList = new ArrayList<String>();
-		excludeList.addAll(Arrays.asList(excludes));
-	    return excludeList;
+				"toString","hashCode","getClass","getModelClass","find","getCountAll","findAll",
+			    "runNativeQuery","getExplainResultList", "save","removeAll", "criteriaSearch", "criteriaSearchCount"
+	    };
+	    return new ArrayList<>(Arrays.asList(excludes));
     }
-
 }
