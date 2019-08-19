@@ -199,60 +199,100 @@ public class MeasurementGraphAction2 extends Action {
 	/**
 	 * Helper procedure to modify ranges that we know we can reinterpret.
 	 * @param range String to modify
-	 * @return modified string, or original string if we can't do anything with it
+	 * @return modified string if possible, original or empty string if string can't be modified
 	 */
-	private static String reformatRange(String range)
+	public static String reformatRange(String range)
 	{
-		// looks like "<= {num}"
-		if (range.contains("<="))
+		if (range == null || range.isEmpty())
 		{
-			return "0 - " + range.split("<=")[1];
+			return "";
 		}
 
-		// looks like "< {num}
-		if (range.contains("<"))
+		String[] rangeItems = {};
+
+		// Check if the range is already valid - if so return
+		if (range.contains("-"))
 		{
-			return "0 - " + range.split("<")[1];
+			rangeItems = range.split("-");
+			if (rangeItems.length == 2
+				&& !StringUtils.trim(rangeItems[0]).isEmpty()
+				&& !StringUtils.trim(rangeItems[1]).isEmpty())
+			{
+				return range;
+			}
+		}
+
+
+		// looks like "<= {num}" or "{num} <="
+		if (range.contains(" <= "))
+		{
+			rangeItems = range.split("<=");
+			if (rangeItems.length == 2)
+			{
+				return "0 - " + StringUtils.trim(rangeItems[1]);
+			}
+			return "0 - " + StringUtils.trim(rangeItems[0]);
+		}
+
+		// looks like "< {num}" or "{num} <"
+		if (range.contains(" < "))
+		{
+			rangeItems = range.split("<");
+			if (rangeItems.length == 2 && !StringUtils.trim(rangeItems[1]).isEmpty())
+			{
+				return "0 - " + StringUtils.trim(rangeItems[1]);
+			}
+			return "0 - " + StringUtils.trim(rangeItems[0]);
 		}
 
 		// looks like " - {num}"
 		if (range.contains("-") && StringUtils.trimToEmpty(range.split("-")[0]).isEmpty())
 		{
-			return "0 " + range;
+			return "0 - " + StringUtils.trim(range.split("-")[1]);
 		}
 
 		// All of the following cases will go with the heuristic of [lowerBound, lowerBound*2.0]
 		try
 		{
 			final double upperBoundMagnitude = 2.0;
-			// ">= {num}"
-			if (range.contains(">="))
-			{
-				double lowerBound = Double.parseDouble(range.split(">=")[1]);
-				return lowerBound + " - " + (lowerBound * upperBoundMagnitude);
-			}
+			double lowerBound;
+			double upperBound;
 
-			// "> {num}"
-			if (range.contains(">"))
-			{
-				double lowerBound = Double.parseDouble(range.split(">")[1]);
-				return lowerBound + " - " + (lowerBound * upperBoundMagnitude);
-			}
-
-			// initially "- {num}", reinterpreted to be like "> num "
+			// initially "{num} -", reinterpreted to be like "> {num}"
 			if (range.contains("-") && range.split("-").length == 1)
 			{
-				double lowerBound = Double.parseDouble(range.split("-")[0]);
+				lowerBound = Double.parseDouble(range.split("-")[0]);
 				return lowerBound + " - " + (lowerBound * upperBoundMagnitude);
 			}
+
+			if (range.contains(">="))
+			{
+				// ">= {num}"
+				rangeItems = range.split(">=");
+			}
+			else if (range.contains(">"))
+			{
+				// "> {num}"
+				rangeItems = range.split(">");
+			}
+
+			if (rangeItems.length == 2)
+			{
+				lowerBound = Double.parseDouble(rangeItems[1]);
+				upperBound = lowerBound * upperBoundMagnitude;
+			}
+			else
+			{
+				upperBound = Double.parseDouble(rangeItems[0]);
+				lowerBound = upperBound / upperBoundMagnitude;
+			}
+			return lowerBound + " - " + upperBound;
 		}
 		catch (Exception e)
 		{
 			MiscUtils.getLogger().error("Error: " + e);
 			return range;
 		}
-
-		return range;
 	}
 
 	/**

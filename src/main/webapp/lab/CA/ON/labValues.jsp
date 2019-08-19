@@ -248,7 +248,7 @@
 						}
 
 						// Try casting result and referenceRange to double - if it works, we can graph
-						if (hashMap.get("result") != null && hashMap.get("range") != null)
+						if (canGraph && hashMap.get("result") != null && hashMap.get("range") != null)
 						{
 							try
 							{
