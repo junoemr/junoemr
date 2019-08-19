@@ -906,7 +906,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					detailText += "(" + eventReason + ")";
 				}
 				labelElem.text(eventName);
-				detailElem.text(detailText);
+				detailElem.append(detailText);
 
 				let eventTitle = eventName + "\n" +
 					"Reason: " + eventReason + "\n" +
@@ -925,6 +925,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					selfBookElem.addClass('visible');
 					selfBookElem.attr("title", "Self Booked");
+					detailElem.addClass('show-self-booked');
 				}
 
 				var maxNameLengthProp = controller.providerSettings.patientNameLength;
