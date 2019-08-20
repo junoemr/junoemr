@@ -307,18 +307,14 @@ $(window).load(function ()
 			{func: BatchOperations.assignDxCodeGenerator('338.2', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Chronic pain", true)}
 		],
 		"Consider COPD": [
-			{func: BatchOperations.assignDxCodeGenerator('???', '???', false),	name: BatchOperations.dxAssignNameTemplate("COPD", false)},
-			{func: BatchOperations.assignDxCodeGenerator('???', '???', true), 	name: BatchOperations.dxAssignNameTemplate("COPD", true)}
+			{func: BatchOperations.assignDxCodeGenerator('496', 'icd9', false),	name: BatchOperations.dxAssignNameTemplate("COPD", false)},
+			{func: BatchOperations.assignDxCodeGenerator('496', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("COPD", true)}
 		],
 
 		// CDM - Panel 2
 		"Consider Chronic Liver Disease": [
 			{func: BatchOperations.assignDxCodeGenerator('571', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Chronic Liver Disease", false)},
 			{func: BatchOperations.assignDxCodeGenerator('571', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Chronic Liver Disease", true)}
-		],
-		"Consider Ischemic Cerebrovascular Disease": [
-			{func: BatchOperations.assignDxCodeGenerator('???', '???', false), 	name: BatchOperations.dxAssignNameTemplate("Ischemic Cerebrovascular Disease", false)},
-			{func: BatchOperations.assignDxCodeGenerator('???', '???', true), 	name: BatchOperations.dxAssignNameTemplate("Ischemic Cerebrovascular Disease", true)}
 		],
 		"Consider Ischemic Heart Disease": [
 			{func: BatchOperations.assignDxCodeGenerator('414', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Ischemic Heart Disease", false)},
@@ -329,8 +325,8 @@ $(window).load(function ()
 			{func: BatchOperations.assignDxCodeGenerator('V66', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Advanced Care Planning", true)}
 		],
 		"Consider Frailty": [
-			{func: BatchOperations.assignDxCodeGenerator('???', '???', false), 	name: BatchOperations.dxAssignNameTemplate("Frailty", false)},
-			{func: BatchOperations.assignDxCodeGenerator('???', '???', true), 	name: BatchOperations.dxAssignNameTemplate("Frailty", true)}
+			{func: BatchOperations.assignDxCodeGenerator('V15', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Frailty", false)},
+			{func: BatchOperations.assignDxCodeGenerator('V15', 'icd9', true), 	name: BatchOperations.dxAssignNameTemplate("Frailty", true)}
 		],
 		"Consider Chronic Kidney Disease": [
 			{func: BatchOperations.assignDxCodeGenerator('585', 'icd9', false), 	name: BatchOperations.dxAssignNameTemplate("Chronic Kidney Disease", false)},
