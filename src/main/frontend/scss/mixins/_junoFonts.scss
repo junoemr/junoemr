@@ -9,6 +9,11 @@
     font-stretch: normal;
     line-height: normal;
     letter-spacing: normal;
+
+	/* prevent this mixin from killing font awesome icons */
+    .fa {
+        font-family: FontAwesome;
+    }
 }
 @mixin juno-font-button($font-size: 12px, $weight : normal, $line-height: normal)
 {
@@ -19,6 +24,11 @@
     line-height: $line-height;
     letter-spacing: normal;
     font-size: $font-size;
+
+	/* prevent this mixin from killing font awesome icons */
+    .fa {
+        font-family: FontAwesome;
+    }
 }
 
 @mixin juno-font-default-size($font-size)
