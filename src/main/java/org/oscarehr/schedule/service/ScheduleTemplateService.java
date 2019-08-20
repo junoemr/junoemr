@@ -111,23 +111,34 @@ public class ScheduleTemplateService
 
 		// Get schedule slots
 		RangeMap<LocalTime, ScheduleSlot> scheduleSlots = scheduleTemplateDao.findScheduleSlots(date, providerId, siteId);
+		String prevCode = null;
 
 		for(LocalTime slotTime = startTime; slotTime.isBefore(endTime); slotTime = plusNoWrap(slotTime, scheduleSlotLength))
 		{
 			LocalDateTime startDateTime = LocalDateTime.of(date, slotTime);
 			ScheduleSlot slot = scheduleSlots.get(slotTime);
 
+			CalendarEvent event;
+			boolean visibleCode = false;
+
 			/* add a fake event if there is no schedule slot at this time,
 			it is the no-appt slot marker, or the slot ends before the time period */
 			if(slot == null || NO_APPOINTMENT_CHARACTER.equals(slot.getCode()))
 			{
-				calendarEvents.add(createFakeCalendarEvent(startDateTime, scheduleSlotLength, providerId));
+				event = createFakeCalendarEvent(startDateTime, scheduleSlotLength, providerId);
 			}
 			else
 			{
 				// Add this row because it is the last
-				calendarEvents.add(createCalendarEvent(slot, scheduleSlotLength, providerId));
+				event = createCalendarEvent(slot, scheduleSlotLength, providerId);
+				visibleCode = (prevCode == null || !prevCode.equals(event.getAvailabilityType().getSystemCode()));
 			}
+
+			// if the code changes, set it to be visible. this allows the calendar to display codes once for repeated types
+			event.getAvailabilityType().setSystemCodeVisible(visibleCode);
+			prevCode = event.getAvailabilityType().getSystemCode();
+
+			calendarEvents.add(event);
 		}
 		return calendarEvents;
 	}

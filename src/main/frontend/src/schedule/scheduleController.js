@@ -905,8 +905,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					detailText += "(" + eventReason + ")";
 				}
-				labelElem.text(eventName);
-				detailElem.text(detailText);
 
 				let eventTitle = eventName + "\n" +
 					"Reason: " + eventReason + "\n" +
@@ -925,6 +923,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					selfBookElem.addClass('visible');
 					selfBookElem.attr("title", "Self Booked");
+					detailElem.parent().addClass('show-self-booked');
 				}
 
 				var maxNameLengthProp = controller.providerSettings.patientNameLength;
@@ -932,15 +931,14 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					&& Juno.Common.Util.isIntegerString(maxNameLengthProp)
 					&& Number(maxNameLengthProp) > 0)
 				{
-					labelElem.css(
-						{
-							'max-width': maxNameLengthProp + 'ch',
-							'text-overflow': 'clip',
-							'white-space': 'nowrap',
-							'overflow': 'hidden',
-						}
-					);
+					if(eventName.length > Number(maxNameLengthProp))
+					{
+						eventName = eventName.substring(0, Number(maxNameLengthProp));
+					}
 				}
+
+				labelElem.text(eventName);
+				detailElem.append(detailText);
 			}
 			else //background events (appointment slots)
 			{
@@ -951,13 +949,22 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				{
 					scheduleCodeElement.css("background-color", event.color)
 				}
-				if (Juno.Common.Util.exists(event.scheduleTemplateCode))
-				{
-					scheduleCodeElement.text(event.scheduleTemplateCode);
 
-					if (Juno.Common.Util.exists(event.availabilityType.name))
+				var availabilityType = event.availabilityType;
+				if(Juno.Common.Util.exists(availabilityType))
+				{
+					if (Juno.Common.Util.exists(availabilityType.systemCode))
 					{
-						scheduleCodeElement.attr("title", event.availabilityType.name);
+						if(availabilityType.systemCodeVisible)
+						{
+							scheduleCodeElement.text(availabilityType.systemCode);
+							// scheduleCodeElement.addClass("code-visible");
+						}
+
+						if (Juno.Common.Util.exists(availabilityType.name))
+						{
+							scheduleCodeElement.attr("title", availabilityType.name);
+						}
 					}
 				}
 				if (Juno.Common.Util.exists(event.start) && event.start.minute() === 0) // on the hour

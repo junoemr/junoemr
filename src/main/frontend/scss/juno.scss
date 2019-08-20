@@ -10,7 +10,7 @@
 @import "bootstrap/bootstrap_variables";
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 @import "bootstrap/dropdown";
-@import "bootstrap/badge_colours";
+@import "bootstrap/badges";
 // UIB overrides
 @import "directives/uib-datepicker";
 // bootstrap-timepicker does not provide a CSS file so compile as SCSS
@@ -19,10 +19,10 @@
 @import "global";
 // TODO: pre-existing CSS files, need to be reorganized
 @import "navbar-fixed-top";
-@import "index";
 @import "forms";
 @import "buttons";
 @import "modal"; // Style copied from clinicaid for schedule.
+@import "index";
 @import "directives/date_picker";
 @import "directives/time_picker";
 @import "directives/toggle-switch";

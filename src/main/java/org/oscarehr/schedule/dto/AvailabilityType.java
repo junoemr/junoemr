@@ -30,6 +30,7 @@ public class AvailabilityType
 	private String name;
 	private Integer preferredEventLengthMinutes;
 	private String systemCode;
+	private Boolean systemCodeVisible;
 
 	public AvailabilityType(String color, String name, Integer preferredEventLengthMinutes,
 		String systemCode)
@@ -38,6 +39,7 @@ public class AvailabilityType
 		this.name = name;
 		this.preferredEventLengthMinutes = preferredEventLengthMinutes;
 		this.systemCode = systemCode;
+		this.systemCodeVisible = false;
 	}
 
 	public String getColor()
@@ -58,6 +60,16 @@ public class AvailabilityType
 	public String getSystemCode()
 	{
 		return systemCode;
+	}
+
+	public Boolean getSystemCodeVisible()
+	{
+		return systemCodeVisible;
+	}
+
+	public void setSystemCodeVisible(Boolean systemCodeVisible)
+	{
+		this.systemCodeVisible = systemCodeVisible;
 	}
 
 	@Override

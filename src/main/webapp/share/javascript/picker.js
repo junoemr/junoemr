@@ -10,7 +10,7 @@ var TCP = new TColorPicker();
 
 function TCPopup(field, palette) {
 	this.field = field;
-	this.initPalette = !palette || palette > 3 ? 0 : palette;
+	this.initPalette = !palette || palette > 4 ? 0 : palette;
 	var w = 194, h = 400,
 	move = screen ? 
 		',left=' + ((screen.width - w) >> 1) + ',top=' + ((screen.height - h) >> 1) : '', 
@@ -21,6 +21,9 @@ function TCPopup(field, palette) {
 
 function TCBuildCell (R, G, B, w, h) {
 	return '<td bgcolor="#' + this.dec2hex((R << 16) + (G << 8) + B) + '"><a href="javascript:P.S(\'' + this.dec2hex((R << 16) + (G << 8) + B) + '\')" onmouseover="P.P(\'' + this.dec2hex((R << 16) + (G << 8) + B) + '\')">&nbsp;&nbsp;</a></td>';
+}
+function TCBuildCell2 (colorCode) {
+	return '<td bgcolor="#' + colorCode + '"><a href="javascript:P.S(\'' + colorCode + '\')" onmouseover="P.P(\'' + colorCode + '\')"></a></td>';
 }
 
 function TCSelect(c) {
@@ -108,6 +111,37 @@ function TCGenerateGray() {
 	return s
 }
 
+function TCGenerateJuno() {
+	var html = '';
+
+	var colorCodeArray = [
+		//darkest, darker,  dark,   base,    light,   lighter,  lightest
+		['401616','661a1a','991f1f','cc2929','e65c5c','e68a8a','ffcccc'], //red
+		['4d2a08','80460d','b36212','e67e17','e69545','f2b679','ffd9b3'], //orange
+		['4d420f','806e19','b39b24','e6c72e','e6cf5c','f2e291','fff7cc'], //yellow
+		['243811','406619','609926','80cc33','a6e667','bde695','e6ffcc'], //lime
+		['0d3313','1a6626','238c35','30bf48','62d975','95e6a3','ccffd4'], //green
+		['0d3326','165943','238c69','30bf8f','62d9b1','95e6cb','ccffee'], //teal
+		['0d3333','165959','238c8c','30bfbf','62d9d9','95e6e6','ccffff'], //cyan
+		['102f40','164259','23678c','308dbf','62afd9','8ac5e6','ccedff'], //blue
+		['1a2040','1f2b66','263999','334dcc','5c73e6','8a99e6','ccd5ff'], //indigo
+		['231b4d','302080','432db3','5639e6','7c67e6','ac9df2','d4ccff'], //violet
+		['301640','4b1f66','6d2699','9133cc','a15ccc','c795e6','ebccff'], //grape
+		['401624','661933','99264d','cc3366','e66791','e6a1b8','ffccdd'], //pink
+	];
+
+	for(var i = 0; i < colorCodeArray.length; i++)
+	{
+		html += "<tr>";
+		for(var j=0; j < colorCodeArray[i].length; j++)
+		{
+			html += this.bldCell2(colorCodeArray[i][j]);
+		}
+		html += "</tr>";
+	}
+	return html;
+}
+
 function TCDec2Hex(v) {
 	v = v.toString(16);
 	for(; v.length < 6; v = '0' + v);
@@ -120,10 +154,11 @@ function TCChgMode(v) {
 }
 
 function TColorPicker(field) {
-	this.build0 = TCGenerateSafe;
-	this.build1 = TCGenerateWind;
-	this.build2 = TCGenerateGray;
-	this.build3 = TCGenerateMac;
+	this.build0 = TCGenerateJuno;
+	this.build1 = TCGenerateSafe;
+	this.build2 = TCGenerateWind;
+	this.build3 = TCGenerateGray;
+	this.build4 = TCGenerateMac;
 	this.show = document.layers ? 
 		function (div) { this.divs[div].visibility = 'show' } :
 		function (div) { this.divs[div].visibility = 'visible' };
@@ -138,6 +173,7 @@ function TColorPicker(field) {
 	this.draw    = TCDraw;
 	this.dec2hex = TCDec2Hex;
 	this.bldCell = TCBuildCell;
+	this.bldCell2 = TCBuildCell2;
 	this.divs = [];
 }
 
@@ -149,13 +185,25 @@ function TCDraw(o_win, o_doc) {
 		'layer visibility=hidden top=54 left=5 width=182' : 
 		'div style=visibility:hidden;position:absolute;left:6px;top:54px;width:182px;height:0',
 	s_tag_openS  = o_doc.layers ? 'layer top=32 left=6' : 'div',
-	s_tag_close  = o_doc.layers ? 'layer' : 'div'
+	s_tag_close  = o_doc.layers ? 'layer' : 'div';
 		
-	this.doc.write('<' + s_tag_openS + ' id=sam name=sam><table cellpadding=0 cellspacing=0 border=1 width=181 align=center class=bd><tr><td align=center height=18><div id="samp"><font face=Tahoma size=2>sample <font color=white>sample</font></font></div></td></tr></table></' + s_tag_close + '>');
+	this.doc.write('<' + s_tag_openS + ' id=sam name=sam>' +
+		'<table cellpadding=0 cellspacing=0 border=1 align=center class=bd>' +
+			'<tr>' +
+			'<td align=center>' +
+			'<div id="samp">' +
+			'<font face=Tahoma size=2>sample ' +
+			'<font color=white>sample</font>' +
+			'</font>' +
+			'</div>' +
+			'</td>' +
+			'</tr>' +
+		'</table>' +
+		'</' + s_tag_close + '>');
 	this.sample = o_doc.layers ? o_doc.layers['sam'] : 
-		o_doc.getElementById ? o_doc.getElementById('sam').style : o_doc.all['sam'].style
+		o_doc.getElementById ? o_doc.getElementById('sam').style : o_doc.all['sam'].style;
 
-	for (var k = 0; k < 4; k ++) {
+	for (var k = 0; k < 5; k ++) {
 		this.doc.write('<' + s_tag_openT + ' id="p' + k + '" name="p' + k + '"><table cellpadding=0 cellspacing=0 border=1 align=center>' + this['build' + k]() + '</table></' + s_tag_close + '>');
 		this.divs[k] = o_doc.layers 
 			? o_doc.layers['p' + k] : o_doc.all 

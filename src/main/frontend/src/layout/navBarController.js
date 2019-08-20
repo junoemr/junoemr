@@ -81,6 +81,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			controller.activeConsultationTotal = 0;
 			controller.ticklerTotal = 0;
 			controller.unAckLabDocTotal = 0;
+			controller.unclaimedCount = 0;
 			controller.unreadMessageTotal = 0;
 			controller.demographicSearch = null;
 			controller.consultationTeamWarning = "";
@@ -283,6 +284,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			controller.getUnAckLabDocCount();
 			controller.getOverdueTicklerCount();
 			controller.getActiveConsultationCount();
+			controller.getUnclaimedInboxCount();
 		};
 
 		/**
@@ -292,23 +294,20 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		 */
 		controller.getCountForLabel = function getCountForLabel(item)
 		{
+			item.labelCount = 0;
 			if (item.label === "Inbox")
 			{
 				item.labelCount = controller.unAckLabDocTotal;
-				return controller.unAckLabDocTotal;
 			}
 			else if (item.label === "Ticklers")
 			{
 				item.labelCount = controller.ticklerTotal;
-				return controller.ticklerTotal;
 			}
 			else if (item.label === "Consultations")
 			{
 				item.labelCount = controller.activeConsultationTotal;
-				return controller.activeConsultationTotal;
 			}
-			item.labelCount = 0;
-			return 0;
+			return item.labelCount;
 		};
 
 		controller.getUnAckLabDocCount = function getUnAckLabDocCount()
@@ -322,6 +321,20 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				{
 					console.log(errors);
 				});
+		};
+		controller.getUnclaimedInboxCount = function()
+		{
+
+			inboxService.getInboxCountByStatus(0,"N").then(
+				function success(results)
+				{
+					controller.unclaimedCount = results;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				}
+			);
 		};
 
 		controller.getUnreadMessageCount = function getUnreadMessageCount()
@@ -449,7 +462,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		};
 
 		//to help ng-clicks on buttons
-		controller.transition = function transition(item)
+		controller.transition = function transition(item, extraParams)
 		{
 			var newWindow;
 
@@ -488,6 +501,11 @@ angular.module('Layout').controller('Layout.NavBarController', [
 					{
 						$state.go(item.state);
 					});
+				}
+
+				if(angular.isDefined(extraParams))
+				{
+					url += extraParams;
 				}
 
 				if (url !== "" && wname !== "")
