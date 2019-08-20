@@ -67,7 +67,7 @@ public class CDMTicklerDao
                 "ON d.demographic_no = dxr.demographic_no " +
                 "AND dxr.dxresearch_code IN (:cdmCodes) " +
                 "AND dxr.status = 'A' " +
-                "AND d.patient_status = NOT IN (:inactivePatientStatuses) " +
+                "AND d.patient_status NOT IN (:inactivePatientStatuses) " +
             "JOIN billing_cdm_service_codes sc " +
                 "ON dxr.dxresearch_code = sc.cdmCode " +
             "LEFT JOIN (" +
