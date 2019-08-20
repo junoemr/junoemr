@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -91,6 +93,12 @@ public class MeasurementGraphAction2 extends Action {
 
 	private static Logger log = MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+
+	// This is somewhat ugly. In words:
+	// - match the character(s) defining how the range is meant to be interpreted
+	// - match any positive or negative number with optional decimals (may not exist)
+	// - match the number following the range delimiter (may or may not exist)
+	private static Pattern rangePattern = Pattern.compile("[+-]?(\\d*.?\\d*)?[\\s]?(<=|>=|<|>|-)[\\s]?[+-]?(\\d*.?\\d*)?");
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -208,91 +216,66 @@ public class MeasurementGraphAction2 extends Action {
 			return "";
 		}
 
-		String[] rangeItems = {};
+		Matcher match;
+		final double upperBoundMagnitude = 2.0;
 
-		// Check if the range is already valid - if so return
-		if (range.contains("-"))
-		{
-			rangeItems = range.split("-");
-			if (rangeItems.length == 2
-				&& !StringUtils.trim(rangeItems[0]).isEmpty()
-				&& !StringUtils.trim(rangeItems[1]).isEmpty())
-			{
-				return range;
-			}
-		}
-
-
-		// looks like "<= {num}" or "{num} <="
-		if (range.contains(" <= "))
-		{
-			rangeItems = range.split("<=");
-			if (rangeItems.length == 2)
-			{
-				return "0 - " + StringUtils.trim(rangeItems[1]);
-			}
-			return "0 - " + StringUtils.trim(rangeItems[0]);
-		}
-
-		// looks like "< {num}" or "{num} <"
-		if (range.contains(" < "))
-		{
-			rangeItems = range.split("<");
-			if (rangeItems.length == 2 && !StringUtils.trim(rangeItems[1]).isEmpty())
-			{
-				return "0 - " + StringUtils.trim(rangeItems[1]);
-			}
-			return "0 - " + StringUtils.trim(rangeItems[0]);
-		}
-
-		// looks like " - {num}"
-		if (range.contains("-") && StringUtils.trimToEmpty(range.split("-")[0]).isEmpty())
-		{
-			return "0 - " + StringUtils.trim(range.split("-")[1]);
-		}
-
-		// All of the following cases will go with the heuristic of [lowerBound, lowerBound*2.0]
 		try
 		{
-			final double upperBoundMagnitude = 2.0;
-			double lowerBound;
-			double upperBound;
-
-			// initially "{num} -", reinterpreted to be like "> {num}"
-			if (range.contains("-") && range.split("-").length == 1)
-			{
-				lowerBound = Double.parseDouble(range.split("-")[0]);
-				return lowerBound + " - " + (lowerBound * upperBoundMagnitude);
-			}
-
-			if (range.contains(">="))
-			{
-				// ">= {num}"
-				rangeItems = range.split(">=");
-			}
-			else if (range.contains(">"))
-			{
-				// "> {num}"
-				rangeItems = range.split(">");
-			}
-
-			if (rangeItems.length == 2)
-			{
-				lowerBound = Double.parseDouble(rangeItems[1]);
-				upperBound = lowerBound * upperBoundMagnitude;
-			}
-			else
-			{
-				upperBound = Double.parseDouble(rangeItems[0]);
-				lowerBound = upperBound / upperBoundMagnitude;
-			}
-			return lowerBound + " - " + upperBound;
+			match = rangePattern.matcher(range);
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
-			MiscUtils.getLogger().error("Error: " + e);
+			MiscUtils.getLogger().error("Error when matching range " + range, ex);
 			return range;
 		}
+
+		if (match.matches())
+		{
+			try
+			{
+				String lowerBound = StringUtils.trimToEmpty(match.group(1));
+				String delimiter = StringUtils.trimToEmpty(match.group(2));
+				String upperBound = StringUtils.trimToEmpty(match.group(3));
+				if (lowerBound.isEmpty())
+				{
+					switch(delimiter)
+					{
+						case "-":
+						case "<":
+						case "<=":
+							return "0 - " + upperBound;
+						case ">":
+						case ">=":
+							return Double.parseDouble(upperBound) + " - " + Double.parseDouble(upperBound)*upperBoundMagnitude;
+					}
+				}
+				else if (upperBound.isEmpty())
+				{
+					switch (delimiter)
+					{
+						case ">":
+						case ">=":
+						case "<":
+							return "0 - " + lowerBound;
+						case "-":
+						case "<=":
+							return Double.parseDouble(lowerBound) + " - " + Double.parseDouble(lowerBound)*upperBoundMagnitude;
+					}
+				}
+				else if (delimiter.equals("-"))
+				{
+					// kind of a base case -- if neither upper nor lower bound is empty and it has proper delimiter, we done
+					return range;
+				}
+			}
+			catch (Exception e)
+			{
+				MiscUtils.getLogger().warn("Unhandled error: " + e);
+			}
+		}
+		// no match, no idea how we got here
+		MiscUtils.getLogger().warn("Following string did not match graphing range pattern: '" + range + "'");
+		return range;
 	}
 
 	/**

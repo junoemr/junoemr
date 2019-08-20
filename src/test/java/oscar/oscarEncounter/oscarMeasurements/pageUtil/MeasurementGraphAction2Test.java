@@ -70,9 +70,9 @@ public class MeasurementGraphAction2Test
 	}
 
 	@Test
-	public void reformatRange_numberLessThanEqualTo_expectSameString()
+	public void reformatRange_numberLessThanEqualTo_expectRangeString()
 	{
-		Assert.assertEquals("2 <=", MeasurementGraphAction2.reformatRange("2 <="));
+		Assert.assertEquals("2.0 - 4.0", MeasurementGraphAction2.reformatRange("2 <="));
 	}
 
 	@Test
@@ -108,7 +108,7 @@ public class MeasurementGraphAction2Test
 	@Test
 	public void reformatRange_numberGreaterThanEqualTo_expectRangeString()
 	{
-		Assert.assertEquals("1.0 - 2.0", MeasurementGraphAction2.reformatRange("2 >="));
+		Assert.assertEquals("0 - 2", MeasurementGraphAction2.reformatRange("2 >="));
 	}
 
 	@Test
@@ -126,7 +126,7 @@ public class MeasurementGraphAction2Test
 	@Test
 	public void reformatRange_numberGreaterThan_expectRangeString()
 	{
-		Assert.assertEquals("1.0 - 2.0", MeasurementGraphAction2.reformatRange("2 >"));
+		Assert.assertEquals("0 - 2", MeasurementGraphAction2.reformatRange("2 >"));
 	}
 
 	@Test
