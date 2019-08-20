@@ -66,7 +66,7 @@ public class PATHL7Handler extends MessageHandler
 
     private static Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
 
-	private static List<String> labDocuments = Arrays.asList("BLOODBANKT","CELLPATH","CELLPATHR","CYTO", "DIAG IMAGE","MICRO3T", "MICROGCMT","MICROGRT", "MICROBCT","TRANSCRIP", "NOTIF", "BCCASMP", "BCCACSP");
+	private static List<String> labDocuments = Arrays.asList("BLOODBANKT","CELLPATH","CELLPATHR","CYTO", "DIAG IMAGE","MICRO3T", "MICROGCMT","MICROGRT", "MICROBCT","TRANSCRIP", "NOTIF", "BCCASMP", "BCCACSP", "CYTOGEN");
 	public static final String VIHARTF = "CELLPATHR";
 
     /** Creates a new instance of CMLHandler */
