@@ -86,14 +86,15 @@ public class CDMTicklerDao
                 "AND t.tickler_no IS NULL " +
                 "AND NOT EXISTS (" +
                     "SELECT * " +
-                    "FROM billing_service_code_conditions sc_con, " +
+                    "FROM billing_service_code_conditions sc_con " +
+                    "JOIN " +
                     "("+
                         "SELECT demographic_no, billing_code, billingstatus, max(service_date) AS date " +
                         "FROM billingmaster " +
                         "GROUP BY demographic_no, billing_code, billingstatus " +
                     ") bm2 " +
+                    "ON sc_con.conditionCode = bm2.billing_code " +
                     "WHERE d.demographic_no = bm2.demographic_no " +
-                    "AND bm2.billing_code = sc_con.conditionCode " +
                     "AND sc_con.serviceCode = sc.serviceCode " +
                     "AND ((DATEDIFF(NOW(), bm2.date) <= 365) AND billingstatus NOT IN ('D', 'R', 'F')) " +
             ")");
@@ -141,14 +142,15 @@ public class CDMTicklerDao
             "WHERE (billingstatus NOT IN ('D', 'R', 'F') AND DATEDIFF(NOW(), bm.date) < 365) " +
             "OR EXISTS (" +
                    "SELECT * " +
-                   "FROM billing_service_code_conditions sc_con, " +
+                   "FROM billing_service_code_conditions sc_con " +
+                   "JOIN " +
                    "("+
                        "SELECT demographic_no, billing_code, billingstatus, max(service_date) AS date " +
                        "FROM billingmaster " +
                        "GROUP BY demographic_no, billing_code, billingstatus " +
                    ") bm2 " +
+                   "ON bm2.billing_code = sc_con.conditionCode " +
                    "WHERE d.demographic_no = bm2.demographic_no " +
-                   "AND bm2.billing_code = sc_con.conditionCode " +
                    "AND sc_con.serviceCode = sc.serviceCode " +
                    "AND ((DATEDIFF(NOW(), bm2.date) <= 365) AND billingstatus NOT IN ('D', 'R', 'F')) " +
            ")");
