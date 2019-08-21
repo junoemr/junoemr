@@ -38,10 +38,14 @@ import java.util.Map;
 
 public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 {
+	/**
+	 * map connect care status codes to internal status codes as per, IMG OUT – Status Table [3101] in
+	 * "HL7 Message Processing Guidelines Appendix.pdf"
+	 */
 	private static final Map<String, Hl7TextInfo.REPORT_STATUS> orderStatusMap = new HashMap<String,  Hl7TextInfo.REPORT_STATUS>();
 	static
 	{
-		orderStatusMap.put("P", 	Hl7TextInfo.REPORT_STATUS.P);
+		orderStatusMap.put("P", 	Hl7TextInfo.REPORT_STATUS.E);
 		orderStatusMap.put("PA",	Hl7TextInfo.REPORT_STATUS.E);
 		orderStatusMap.put("A", 	Hl7TextInfo.REPORT_STATUS.F);
 		orderStatusMap.put("F", 	Hl7TextInfo.REPORT_STATUS.F);
