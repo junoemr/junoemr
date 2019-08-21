@@ -9,14 +9,19 @@
 
 --%>
 
-<%@ page import="java.util.*, java.sql.*, oscar.*, oscar.oscarRx.util.*, oscar.util.*" errorPage="errorpage.jsp"%>
-<%@ page import="org.oscarehr.common.dao.MeasurementDao" %>
-<%@ page import="org.oscarehr.common.model.Measurement" %>
-<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.common.dao.DemographicDao,
+                 org.oscarehr.common.dao.MeasurementDao,
+                 org.oscarehr.common.model.Demographic,
+                 org.oscarehr.common.model.Measurement,
+                 org.oscarehr.util.SpringUtils"
+         errorPage="errorpage.jsp"%>
+<%@ page import="oscar.OscarProperties" %>
+<%@ page import="oscar.oscarRx.util.RxUtil" %>
+<%@ page import="oscar.util.UtilDateUtilities" %>
 <%@ include file="/common/webAppContextAndSuperMgr.jsp"%>
 
-<%@ page import="org.oscarehr.common.dao.DemographicDao" %>
-<%@ page import="org.oscarehr.common.model.Demographic" %>
+<%@ page import="java.util.GregorianCalendar" %>
+<%@ page import="java.util.List" %>
 
 
 <%
@@ -24,7 +29,7 @@
 	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 %>
 
-<%@page import="oscar.OscarProperties" %>
+<%@page import="java.util.Map" %>
 
 
 <%!

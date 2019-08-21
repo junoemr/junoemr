@@ -195,9 +195,13 @@
 									display: inline-block;
 								}
 								.event-blk-label {
-									font-weight: bold;
 									height: $button-size;
-
+									&.event-form-link {
+										margin-left: 2px;
+									}
+									.bold {
+										font-weight: bold;
+									}
 									.event-label {
 										margin-left: 3px;
 										height: $button-size;

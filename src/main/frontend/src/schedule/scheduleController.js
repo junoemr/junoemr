@@ -15,6 +15,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 	'loadedSettings',
 	'providerService',
 	'providersService',
+	'eFormService',
 	'focusService',
 	'securityService',
 	'scheduleService',
@@ -33,6 +34,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		loadedSettings,
 		providerService,
 		providersService,
+		eFormService,
 		focusService,
 		securityService,
 		scheduleService,
@@ -58,6 +60,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		controller.providerSettings = loadedSettings;
 		controller.calendarMinColumnWidth = 250;
+
+		// console.info(loadedSettings);
 
 		//=========================================================================
 		// Local scope variables
@@ -150,6 +154,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		$scope.defaultDate = globalStateService.global_settings.schedule.date_selected;
 		$scope.datepickerSelectedDate = null;
 
+		controller.formLinks = {
+			enabled: true,
+			maxLength: 5,
+			formNameMap: {},
+			eFormNameMap: {}
+		};
+
 		$scope.init = function init()
 		{
 			$scope.uiConfig.calendar.defaultView = $scope.getCalendarViewName();
@@ -164,15 +175,18 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						{
 							$scope.loadSiteOptions().then(function ()
 							{
-								$scope.loadDefaultSelections();
-								$scope.setEventSources();
+								controller.loadFormLinkData().then(function ()
+								{
+									$scope.loadDefaultSelections();
+									$scope.setEventSources();
 
-								controller.initEventsAutoRefresh();
+									controller.initEventsAutoRefresh();
 
-								$scope.applyUiConfig($scope.uiConfig);
+									$scope.applyUiConfig($scope.uiConfig);
 
-								controller.loadWatches();
-								$scope.initialized = true;
+									controller.loadWatches();
+									$scope.initialized = true;
+								});
 							});
 						});
 					});
@@ -561,7 +575,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			).then(
 				function (results)
 				{
-					console.info('================== load events ===================');
+					// console.info('================== load events ===================');
 					var hasVisibleSchedules = results.data.body.visibleSchedules;
 					$scope.showNoResources = !hasVisibleSchedules;
 					$scope.uiConfig.calendar.hiddenDays = [];
@@ -835,17 +849,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				let labelElem = eventElement.find('.event-label');
 				let detailElem = eventElement.find('.event-details');
 				let selfBookElem = eventElement.find('.self-book-indicator');
-
-				// var eventSiteHtml = '';
 				// var eventSite = $scope.sites[event.data.site];
-
-				// if(Juno.Common.Util.exists(eventSite))
-				// {
-				// 	eventSiteHtml += "<span style='background-color: " + eventSite.color + "'>&nbsp;</span>"
-				// }
-
-
-				// var eventStatusHtml = '';
 
 				/* set up status icon + color/hover etc. */
 				let eventStatus = scheduleService.eventStatuses[event.data.eventStatusCode];
@@ -939,6 +943,63 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 				labelElem.text(eventName);
 				detailElem.append(detailText);
+
+				/* generate html links for forms/eForms based off the provider settings */
+				if(controller.formLinks.enabled && controller.hasPatientSelected(event))
+				{
+					let formContainerElem = eventElement.find('.inline-flex');
+
+					var formNames = controller.providerSettings.appointmentScreenForms;
+					var eFormIds = controller.providerSettings.appointmentScreenEforms;
+
+					/* generate form links */
+					if(Juno.Common.Util.exists(formNames))
+					{
+						for(var i=0; i< formNames.length; i++)
+						{
+							var displayName = controller.formLinks.formNameMap[formNames[i]] || "NA";
+							var shortName = displayName;
+							if(shortName.length > controller.formLinks.maxLength)
+							{
+								shortName = shortName.substring(0, controller.formLinks.maxLength);
+							}
+
+							formContainerElem.append($("<div>", {
+								class: "event-item event-blk-label event-form-link",
+							}).append($("<a>", {
+								class: "event-label onclick-open-form",
+								text: shortName,
+								title: displayName,
+								'data-id': formNames[i]
+							})));
+						}
+					}
+
+					/* generate eForm links */
+					if(Juno.Common.Util.exists(eFormIds))
+					{
+						for(var i=0; i< eFormIds.length; i++)
+						{
+							var displayName = controller.formLinks.eFormNameMap[eFormIds[i]] || "NA";
+							var shortName = displayName;
+							if(shortName.length > controller.formLinks.maxLength)
+							{
+								shortName = shortName.substring(0, controller.formLinks.maxLength);
+							}
+
+							formContainerElem.append($("<div>", {
+								class: "event-item event-blk-label event-form-link",
+							}).append($("<a>", {
+								class: "event-label onclick-open-eform",
+								text: shortName,
+								title: displayName,
+								'data-id': eFormIds[i]
+							})));
+						}
+					}
+
+				}
+
 			}
 			else //background events (appointment slots)
 			{
@@ -1037,25 +1098,34 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		$scope.onEventClick = function onEventClick(calEvent, jsEvent, view)
 		{
-			if ($(jsEvent.target).is(".onclick-event-status:not(.disabled)"))
+			var $target = $(jsEvent.target);
+			if ($target.is(".onclick-event-status:not(.disabled)"))
 			{
 				$scope.rotateEventStatus(calEvent);
 			}
-			else if ($(jsEvent.target).is(".onclick-event-encounter:not(.disabled)"))
+			else if ($target.is(".onclick-event-encounter:not(.disabled)"))
 			{
 				controller.openEncounterPage(calEvent);
 			}
-			else if ($(jsEvent.target).is(".onclick-event-invoice:not(.disabled)"))
+			else if ($target.is(".onclick-event-invoice:not(.disabled)"))
 			{
 				controller.openBillingPage(calEvent);
 			}
-			else if ($(jsEvent.target).is(".onclick-event-demographic:not(.disabled)"))
+			else if ($target.is(".onclick-event-demographic:not(.disabled)"))
 			{
 				controller.openMasterRecord(calEvent);
 			}
-			else if ($(jsEvent.target).is(".onclick-event-rx:not(.disabled)"))
+			else if ($target.is(".onclick-event-rx:not(.disabled)"))
 			{
 				controller.openRxPage(calEvent);
+			}
+			else if ($target.is(".onclick-open-form"))
+			{
+				controller.openFormLink($target.attr('data-id'), calEvent.data.demographicNo, calEvent.data.appointmentNo);
+			}
+			else if ($target.is(".onclick-open-eform"))
+			{
+				controller.openEFormLink($target.attr('data-id'), calEvent.data.demographicNo, calEvent.data.appointmentNo);
 			}
 			else
 			{
@@ -1063,7 +1133,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 		};
 
-		controller.openEncounterPage = function (calEvent)
+		controller.openEncounterPage = function openEncounterPage(calEvent)
 		{
 			if (calEvent.data.demographicNo !== 0)
 			{
@@ -1087,7 +1157,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				window.open(scheduleService.getEncounterLink(params));
 			}
 		};
-		controller.openBillingPage = function (calEvent)
+		controller.openBillingPage = function openBillingPage(calEvent)
 		{
 			if (calEvent.data.demographicNo !== 0)
 			{
@@ -1116,7 +1186,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				window.open(scheduleService.getBillingLink(params));
 			}
 		};
-		controller.openMasterRecord = function (calEvent)
+		controller.openMasterRecord = function openMasterRecord(calEvent)
 		{
 			if (calEvent.data.demographicNo !== 0)
 			{
@@ -1126,7 +1196,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				$state.go('record.details', params);
 			}
 		};
-		controller.openRxPage = function (calEvent)
+		controller.openRxPage = function openRxPage(calEvent)
 		{
 			if (calEvent.data.demographicNo !== 0)
 			{
@@ -1138,7 +1208,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			}
 		};
 
-		controller.openDaysheet = function (resourceId)
+		controller.openDaysheet = function openDaysheet(resourceId)
 		{
 			var formattedDate = $scope.datepickerSelectedDate;
 			var win = window.open('../report/reportdaysheet.jsp' +
@@ -1147,6 +1217,35 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				'&sdate=' + encodeURIComponent(formattedDate) +
 				'&edate=' + encodeURIComponent(formattedDate),
 				'daysheet', 'height=700,width=1024,scrollbars=1');
+			win.focus();
+		};
+
+		controller.openFormLink = function openFormLink(formName, demographicNo, appointmentNo)
+		{
+			var url = "../form/forwardshortcutname.jsp" +
+				"?formname=" + encodeURIComponent(formName) +
+				"&demographic_no="+ encodeURIComponent(demographicNo) +
+				"&appointmentNo="+ encodeURIComponent(appointmentNo);
+
+			if(formName === "__intakeForm")
+			{
+				url = "../provider/formIntake.jsp?demographic_no=" + encodeURIComponent(demographicNo);
+			}
+
+			var win = window.open(url,
+				"Form_"+ encodeURIComponent(demographicNo) +"_" + encodeURIComponent(formName),
+				'height=700,width=1024,scrollbars=1');
+			win.focus();
+		};
+		controller.openEFormLink = function openEFormLink(eFormId, demographicNo, appointmentNo)
+		{
+			var url = "../eform/efmformadd_data.jsp" +
+				"?fid=" + encodeURIComponent(eFormId) +
+				"&demographic_no="+ encodeURIComponent(demographicNo) +
+				"&appointment=" + encodeURIComponent(appointmentNo);
+			var win = window.open(url,
+				"Eform_"+ encodeURIComponent(demographicNo) +"_" + encodeURIComponent(eFormId),
+				'height=700,width=1024,scrollbars=1');
 			win.focus();
 		};
 
@@ -1539,7 +1638,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		// $scope.resourceOptionHash - table to look up schedule information by providerNo.  This is
 		//                             used to create the resource view headers.
-		controller.loadResourceHash = function ()
+		controller.loadResourceHash = function loadResourceHash()
 		{
 			var deferred = $q.defer();
 
@@ -1616,7 +1715,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			return deferred.promise;
 		};
 
-		controller.loadSitesEnabled = function ()
+		controller.loadSitesEnabled = function loadSitesEnabled()
 		{
 			var deferred = $q.defer();
 
@@ -1696,6 +1795,56 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				}
 			);
 
+			return deferred.promise;
+		};
+
+		controller.loadFormLinkData = function loadFormLinkData()
+		{
+			var deferred = $q.defer();
+			if(controller.formLinks.enabled)
+			{
+				for(var i=0; i< controller.providerSettings.appointmentScreenEforms.length; i++)
+				{
+					var eFormId = controller.providerSettings.appointmentScreenEforms[i];
+					controller.loadEformData(eFormId).then(
+						function success(response)
+						{
+							var id = response.data.id;
+							var name = response.data.formName;
+							controller.formLinks.eFormNameMap[id] = name;
+						}
+					);
+				}
+
+				for(var i=0; i< controller.providerSettings.appointmentScreenForms.length; i++)
+				{
+					var formId = controller.providerSettings.appointmentScreenForms[i];
+					controller.formLinks.formNameMap[formId] = formId;
+				}
+
+				if(true) //TODO if intake form enabled
+				{
+					controller.formLinks.formNameMap['__intakeForm'] = "Intake Form";
+				}
+			}
+			deferred.resolve();
+
+			return deferred.promise;
+		};
+		controller.loadEformData = function loadEFormData(eFormId)
+		{
+			var deferred = $q.defer();
+			eFormService.loadEForm(eFormId).then(
+				function success(data)
+				{
+					deferred.resolve(data);
+				},
+				function failure(data)
+				{
+					$scope.displayMessages.add_standard_error("Failed to load eform " + eFormId);
+					deferred.reject(data);
+				}
+			);
 			return deferred.promise;
 		};
 
