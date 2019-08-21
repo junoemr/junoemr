@@ -34,7 +34,6 @@ import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.model.ProviderData;
-import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
