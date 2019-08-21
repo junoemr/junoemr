@@ -7,6 +7,13 @@ h1,h2,h3 {
 	font-weight: bold;
 }
 
+a {
+	color: $color-neutral-darker;
+	&:hover {
+		color: $color-primary-base;
+	}
+}
+
 
 .hand-hover {
 	cursor: pointer;

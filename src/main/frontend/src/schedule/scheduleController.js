@@ -1018,6 +1018,11 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			{
 				console.info("onclick-search clicked");
 			}
+			else if ($(jsEvent.target).is(".onclick-day-view"))
+			{
+				console.info("onclick-day-view clicked");
+				controller.changeToSchedule(resourceId, controller.calendarViewEnum.agendaDay);
+			}
 			else if ($(jsEvent.target).is(".onclick-week-view"))
 			{
 				console.info("onclick-week-view clicked");
