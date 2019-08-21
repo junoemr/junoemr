@@ -44,8 +44,7 @@ import java.util.Set;
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class CDMTicklerDao
 {
-
-    @PersistenceContext(unitName = "persistenceUnit")
+	@PersistenceContext(unitName = "persistenceUnit")
     private EntityManager entityManager;
 
     /**

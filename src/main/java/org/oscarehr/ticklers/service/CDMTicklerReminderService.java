@@ -97,7 +97,7 @@ public class CDMTicklerReminderService implements ServletContextListener
 
         initializeSecurity();
 
-        if (properties.isBritishColumbiaInstanceType())
+        if (properties.isBritishColumbiaInstanceType() && properties.hasProperty("ALERT_POLL_FREQUENCY"))
         {
             Long pollingFrequencyMs = Long.parseLong(properties.getProperty("ALERT_POLL_FREQUENCY"));
 
@@ -105,7 +105,11 @@ public class CDMTicklerReminderService implements ServletContextListener
             {
                 Set<Integer> cdmDxCodes = getCDMDxCodes();
                 Set<String> inactiveStatuses = getInactivePatientStatuses();
-                scheduler.scheduleAtFixedRate(new ProcessTicklersAsyncJob(cdmDxCodes, inactiveStatuses), 1000L, pollingFrequencyMs, TimeUnit.MILLISECONDS);
+                scheduler.scheduleAtFixedRate(
+                		new ProcessTicklersAsyncJob(cdmDxCodes, inactiveStatuses),
+		                1000L,
+		                pollingFrequencyMs,
+		                TimeUnit.MILLISECONDS);
             }
         }
     }
@@ -222,10 +226,16 @@ public class CDMTicklerReminderService implements ServletContextListener
      */
     private Set<String> getInactivePatientStatuses()
     {
-        String statuses = (String) properties.get("inactive_statuses");
-        return new HashSet<>(Arrays.asList(statuses.split(",")));
-    }
+	    String statuses = (String) properties.get("inactive_statuses");
 
+	    if (statuses != null)
+	    {
+	    	statuses = statuses.replace("'", "");
+		    return new HashSet<>(Arrays.asList(statuses.split(",")));
+	    }
+
+	    return new HashSet<>();
+    }
 
     /**
      * Create reminder ticklers for CDM billings if the billing has never been done, or if no billing has occured
