@@ -105,9 +105,9 @@ BatchOperations =
 			return demographicNoList;
 		},
 
-		// get demographics an confirm the run with the user.
-		// returns null if the run is to be aborted, else the demographic number are returned
-		getDemographics: function (all, actionMsg)
+		// get demographics
+		// returns null if the run is to be aborted, else the demographic numbers are returned
+		getDemographics: function (all)
 		{
 			let demos = [];
 			if (all)
@@ -121,16 +121,7 @@ BatchOperations =
 
 			if (demos.length > 0)
 			{
-				let ok = false;
-				if (all)
-				{
-					ok = confirm("All " + demos.length + " Demographics " + actionMsg + " with respect to the currently applied filter\nAre you Sure?");
-				}
-				else
-				{
-					ok = confirm("Demographics: \n" + demos + "\n" + actionMsg +" \nAre you Sure?");
-				}
-				return ok ? demos : null;
+				return demos;
 			}
 			else
 			{
@@ -161,8 +152,6 @@ BatchOperations =
 			batchBanner.css("color", BatchOperations.BANNER_ERROR_COLOR);
 			batchBanner.css("background-color", BatchOperations.BANNER_ERROR_BG_COLOR);
 			batchBanner.find("h4").html("Error: </br>" + msg);
-
-			BatchOperations.hideMessageBanner(batchBanner);
 		},
 
 		hideMessageBanner: function (batchBanner)
@@ -186,7 +175,11 @@ BatchOperations =
 			{
 				BatchOperations.showErrorMessage(data.error.message);
 			}
-			else if (data.status === 403 || data.status === 500)
+			else if (data.status === 403)
+			{
+				BatchOperations.showErrorMessage("You do not have sufficient privileges to execute that action. Please contact an administrator.");
+			}
+			else if (data.status === 500)
 			{
 				BatchOperations.showErrorMessage(JSON.parse(data.responseText).error.message);
 			}
@@ -240,10 +233,14 @@ BatchOperations =
 		activateDeactivateDemographicsGenerator: function (deactivate, all)
 		{
 			return function () {
-				let demos = BatchOperations.getDemographics(all, "Will be set to status, " + (deactivate ? 'inactive' : 'active'));
+				let demos = BatchOperations.getDemographics(all);
 				if (demos != null)
 				{
-					BatchOperations.activateDeactivateDemographics(deactivate, demos);
+					let ok = confirm(demos.length + " Demographics will have their status set to " + (deactivate ? "inactive" : "active") +". \nYou cannot undue this action. Are you sure?");
+					if (ok)
+					{
+						BatchOperations.activateDeactivateDemographics(deactivate, demos);
+					}
 				}
 			}
 		},
@@ -266,10 +263,14 @@ BatchOperations =
 		assignDxCodeGenerator: function(code, codingSystem, all)
 		{
 			return function () {
-				let demos = BatchOperations.getDemographics(all, "Will be assigned Dx Code [" + code + "]");
+				let demos = BatchOperations.getDemographics(all);
 				if (demos != null)
 				{
-					BatchOperations.assignDxCodeToDemographics(code, codingSystem, demos);
+					let ok = confirm(demos.length + " Demographics will be assigned Dx Code [" + code +"]\nYou cannot undue this action. Are you sure?");
+					if (ok)
+					{
+						BatchOperations.assignDxCodeToDemographics(code, codingSystem, demos);
+					}
 				}
 			}
 		}
