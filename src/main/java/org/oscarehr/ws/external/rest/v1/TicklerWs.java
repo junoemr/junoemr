@@ -26,6 +26,7 @@ package org.oscarehr.ws.external.rest.v1;
 import io.swagger.v3.oas.annotations.Operation;
 import org.oscarehr.common.dao.TicklerDao;
 import org.oscarehr.common.model.Tickler;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.rest.v1.transfer.tickler.TicklerTransferInbound;
@@ -53,11 +54,17 @@ public class TicklerWs extends AbstractExternalRestWs
 	@Autowired
 	TicklerDao ticklerDao;
 
+	@Autowired
+	private SecurityInfoManager securityInfoManager;
+
 	@GET
 	@Path("/{id}")
 	@Operation(summary = "Retrieve a tickler by id")
 	public RestResponse<TicklerTransferOutbound> getTickler(@PathParam("id") Integer id)
 	{
+		String providerNoStr = getOAuthProviderNo();
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.READ, null, "_tickler");
+
 		try
 		{
 			Tickler tickler = ticklerDao.find(id);
@@ -76,6 +83,9 @@ public class TicklerWs extends AbstractExternalRestWs
 	@Operation(summary = "Update the specified tickler")
 	public RestResponse<TicklerTransferOutbound> updateTickler(@PathParam("id") Integer id, TicklerTransferInbound ticklerIn)
 	{
+		String providerNoStr = getOAuthProviderNo();
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_tickler");
+
 		try
 		{
 			Tickler tickler = ticklerDao.find(id);
@@ -95,6 +105,9 @@ public class TicklerWs extends AbstractExternalRestWs
 	@Operation(summary="Create a new tickler")
 	public RestResponse<TicklerTransferOutbound> createTickler(TicklerTransferInbound ticklerIn)
 	{
+		String providerNoStr = getOAuthProviderNo();
+		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_tickler");
+
 		try
 		{
 			Tickler tickler = ticklerIn.toTickler();
