@@ -242,12 +242,12 @@
 					<div class="form-group col-sm-6">
 						<label>Enable Intake Form</label>
 						<div class="controls">
-							<label class="checkbox-inline" for="radioh-0">
-								<input ng-model="settingsCtrl.pref.intakeFormEnabled" ng-value="true" id="radioh-0" type="radio">
+							<label class="checkbox-inline" for="radio-intake-0">
+								<input ng-model="settingsCtrl.pref.intakeFormEnabled" ng-value="true" id="radio-intake-0" type="radio">
 								Enable
 							</label>
-							<label class="checkbox-inline" for="radioh-1">
-								<input ng-model="settingsCtrl.pref.intakeFormEnabled" ng-value="false" id="radioh-1" type="radio">
+							<label class="checkbox-inline" for="radio-intake-1">
+								<input ng-model="settingsCtrl.pref.intakeFormEnabled" ng-value="false" id="radio-intake-1" type="radio">
 								Disable
 							</label>
 						</div>

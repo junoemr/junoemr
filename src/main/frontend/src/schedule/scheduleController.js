@@ -61,8 +61,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		controller.providerSettings = loadedSettings;
 		controller.calendarMinColumnWidth = 250;
 
-		console.info(loadedSettings);
-
 		//=========================================================================
 		// Local scope variables
 		//=========================================================================/
