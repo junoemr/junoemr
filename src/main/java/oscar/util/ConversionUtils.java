@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -597,6 +598,7 @@ public class ConversionUtils {
 		if(localDateTime == null) return null;
 		return toLegacyDateTime(localDateTime);
 	}
+
 	public static Date toLegacyDateTime(LocalDateTime localDateTime)
 	{
 		return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
@@ -607,11 +609,13 @@ public class ConversionUtils {
 		if(dateString == null || dateString.isEmpty()) return null;
 		return toLocalDate(dateString);
 	}
+
 	public static LocalDate toNullableLocalDate(Date legacyDate)
 	{
 		if(legacyDate == null) return null;
 		return toZonedLocalDate(legacyDate);
 	}
+
 	public static LocalDate toLocalDate(String dateString)
 	{
 		return toLocalDate(dateString, DateTimeFormatter.ISO_DATE);
@@ -621,16 +625,19 @@ public class ConversionUtils {
 	{
 		return LocalDate.parse(dateString, dateTimeFormatter);
 	}
+
 	public static LocalDate toNullableZonedLocalDate(String dateString)
 	{
 		if(dateString == null) return null;
 		return toZonedLocalDate(dateString, DateTimeFormatter.ISO_DATE_TIME);
 	}
+
 	public static LocalDate toZonedLocalDate(String dateString, DateTimeFormatter dateTimeFormatter)
 	{
 		ZonedDateTime result = ZonedDateTime.parse(dateString, dateTimeFormatter);
 		return result.toLocalDate();
 	}
+
 	public static LocalDate toZonedLocalDate(Date legacyDate)
 	{
 		LocalDate date = Instant
@@ -642,11 +649,13 @@ public class ConversionUtils {
 				.toLocalDate();
 		return date;
 	}
+
 	public static LocalDateTime toNullableLocalDateTime(Date legacyDate)
 	{
 		if(legacyDate == null) return null;
 		return toLocalDateTime(legacyDate);
 	}
+
 	public static LocalDateTime toLocalDateTime(Date legacyDate)
 	{
 		return new java.sql.Timestamp(legacyDate.getTime()).toLocalDateTime();
@@ -712,5 +721,15 @@ public class ConversionUtils {
 	public static LocalTime toLocalTime(String timeString, DateTimeFormatter dateTimeFormatter)
 	{
 		return LocalTime.parse(timeString, dateTimeFormatter);
+	}
+
+	/**
+	 * convert a datetime object to a sql timestamp.
+	 * @param dateTime - the date time object to convert
+	 * @return - a timestamp
+	 */
+	public static java.sql.Timestamp toTimestamp(LocalDateTime dateTime)
+	{
+		return java.sql.Timestamp.from(dateTime.toInstant(TimeZone.getDefault().toZoneId().getRules().getOffset(dateTime)));
 	}
 }
