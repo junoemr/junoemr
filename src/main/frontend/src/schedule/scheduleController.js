@@ -15,7 +15,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 	'loadedSettings',
 	'providerService',
 	'providersService',
-	'eFormService',
+	'formService',
 	'focusService',
 	'securityService',
 	'scheduleService',
@@ -34,7 +34,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		loadedSettings,
 		providerService,
 		providersService,
-		eFormService,
+		formService,
 		focusService,
 		securityService,
 		scheduleService,
@@ -61,7 +61,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		controller.providerSettings = loadedSettings;
 		controller.calendarMinColumnWidth = 250;
 
-		console.info(loadedSettings);
+		// console.info(loadedSettings);
 
 		//=========================================================================
 		// Local scope variables
@@ -839,6 +839,24 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		// Event Handlers
 		//=========================================================================/
 
+		controller.buildEventLink = function buildEventLink($rootElem, map, className)
+		{
+			for(var id in map)
+			{
+				var displayName = map[id] || "NA";
+				var shortName = Juno.Common.Util.trimToLength(displayName, controller.formLinks.maxLength);
+
+				$rootElem.append($("<div>", {
+					class: "event-item event-blk-label event-form-link",
+				}).append($("<a>", {
+					class: "event-label " + className,
+					text: shortName,
+					title: displayName,
+					'data-id': id
+				})));
+			}
+		};
+
 		$scope.onEventRender = function onEventRender(event, element, view)
 		{
 			// appointment event type
@@ -947,55 +965,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				if(controller.formLinks.enabled && controller.hasPatientSelected(event))
 				{
 					let formContainerElem = eventElement.find('.inline-flex');
-
 					/* generate form links */
-					for(var id in controller.formLinks.formNameMap)
-					{
-						var displayName = controller.formLinks.formNameMap[id] || "NA";
-						var shortName = Juno.Common.Util.trimToLength(displayName, controller.formLinks.maxLength);
-
-						formContainerElem.append($("<div>", {
-							class: "event-item event-blk-label event-form-link",
-						}).append($("<a>", {
-							class: "event-label onclick-open-form",
-							text: shortName,
-							title: displayName,
-							'data-id': id
-						})));
-					}
-
+					controller.buildEventLink(formContainerElem, controller.formLinks.formNameMap, "onclick-open-form");
 					/* generate eForm links */
-					for(var id in controller.formLinks.eFormNameMap)
-					{
-						var displayName = controller.formLinks.eFormNameMap[id] || "NA";
-						var shortName = Juno.Common.Util.trimToLength(displayName, controller.formLinks.maxLength);
-
-						formContainerElem.append($("<div>", {
-							class: "event-item event-blk-label event-form-link",
-						}).append($("<a>", {
-							class: "event-label onclick-open-eform",
-							text: shortName,
-							title: displayName,
-							'data-id': id
-						})));
-					}
-
+					controller.buildEventLink(formContainerElem, controller.formLinks.eFormNameMap, "onclick-open-eform");
 					/* generate quick links */
-					for(var id in controller.formLinks.quickLinkMap)
-					{
-						var displayName = controller.formLinks.quickLinkMap[id] || "NA";
-						var shortName = Juno.Common.Util.trimToLength(displayName, controller.formLinks.maxLength);
-
-						formContainerElem.append($("<div>", {
-							class: "event-item event-blk-label event-form-link",
-						}).append($("<a>", {
-							class: "event-label onclick-open-quicklink",
-							text: shortName,
-							title: displayName,
-							'data-id': id
-						})));
-					}
-
+					controller.buildEventLink(formContainerElem, controller.formLinks.quickLinkMap, "onclick-open-quicklink");
 				}
 
 			}
@@ -1252,12 +1227,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		};
 		controller.openQuickLink = function openQuickLink(url, demographicNo, appointmentNo)
 		{
-			console.info(url);
 			if(!url.startsWith("http://") || !url.startsWith("https://"))
 			{
 				url = "https://" + url;
 			}
-
 			var win = window.open(url,
 				"quickLink_"+ url,
 				'height=700,width=1024,scrollbars=1');
@@ -1827,20 +1800,32 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				}
 
 				var eFormIds = controller.providerSettings.appointmentScreenEforms;
-				if(Juno.Common.Util.exists(eFormIds))
+				if(Juno.Common.Util.exists(eFormIds) && eFormIds.length > 0)
 				{
-					for (var i = 0; i < eFormIds.length; i++)
-					{
-						var eFormId = eFormIds[i]; //TODO don't need to load the whole eform, and could do a batch get
-						controller.loadEformData(eFormId).then(
-							function success(response)
+					formService.getAllEForms().then(
+						function success(eFormList)
+						{
+							for (var i = 0; i < eFormList.length; i++)
 							{
-								var id = response.data.id;
-								var name = response.data.formName;
-								controller.formLinks.eFormNameMap[id] = name;
+								var id = eFormList[i].id;
+								if(eFormIds.includes(id))
+								{
+									var name = eFormList[i].formName;
+									controller.formLinks.eFormNameMap[id] = name;
+								}
 							}
-						);
-					}
+							deferred.resolve();
+						},
+						function failure()
+						{
+							$scope.displayMessages.add_standard_error("Failed to load eform data");
+							deferred.reject();
+						}
+					);
+				}
+				else
+				{
+					deferred.resolve();
 				}
 
 				var formIds = controller.providerSettings.appointmentScreenForms;
@@ -1868,8 +1853,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					}
 				}
 			}
-			deferred.resolve(); //TODO resolve when all eforms loaded?
-
 			return deferred.promise;
 		};
 		controller.loadEformData = function loadEFormData(eFormId)
