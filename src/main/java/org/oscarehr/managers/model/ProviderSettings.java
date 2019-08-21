@@ -144,6 +144,8 @@ public class ProviderSettings {
 	private boolean disableBornPrompts;
 
 	private Integer patientNameLength;
+
+	private boolean intakeFormEnabled;
 	
 	
 
@@ -691,5 +693,15 @@ public class ProviderSettings {
 	public void setPatientNameLength(Integer patientNameLength)
 	{
 		this.patientNameLength = patientNameLength;
+	}
+
+	public boolean isIntakeFormEnabled()
+	{
+		return intakeFormEnabled;
+	}
+
+	public void setIntakeFormEnabled(boolean intakeFormEnabled)
+	{
+		this.intakeFormEnabled = intakeFormEnabled;
 	}
 }

@@ -61,7 +61,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		controller.providerSettings = loadedSettings;
 		controller.calendarMinColumnWidth = 250;
 
-		// console.info(loadedSettings);
+		console.info(loadedSettings);
 
 		//=========================================================================
 		// Local scope variables
@@ -160,7 +160,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			formNameMap: {},
 			eFormNameMap: {},
 			quickLinkMap: {},
-			linkIntakeForm: false
 		};
 
 		$scope.init = function init()
@@ -1837,7 +1836,8 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						controller.formLinks.formNameMap[formId] = formId;
 					}
 				}
-				if(controller.formLinks.linkIntakeForm)
+				var enableIntakeForm = controller.providerSettings.intakeFormEnabled;
+				if(Juno.Common.Util.exists(enableIntakeForm) && enableIntakeForm)
 				{
 					controller.formLinks.formNameMap['__intakeForm'] = "Intake Form";
 				}

@@ -41,6 +41,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import oscar.OscarProperties;
 import oscar.log.LogAction;
 
 import java.util.ArrayList;
@@ -260,6 +261,14 @@ public class ProviderManager2 {
 				settings.setPatientNameLength(Integer.parseInt(patientNameLengthStr));
 			}
 		}
+
+		// default to the legacy properties file setting
+		boolean intakeFormEnabled = OscarProperties.getInstance().isAppointmentIntakeFormEnabled();
+		if(map.get(UserProperty.INTAKE_FORM_ENABLED) != null)
+		{
+			intakeFormEnabled = "yes".equals(map.get(UserProperty.INTAKE_FORM_ENABLED).getValue());
+		}
+		settings.setIntakeFormEnabled(intakeFormEnabled);
 
 		//custom summary display
 		//NEW
@@ -741,7 +750,10 @@ public class ProviderManager2 {
 		p = getMappedOrNewProperty(map, UserProperty.PATIENT_NAME_LENGTH, providerNo);
 		Integer patientNameLength = settings.getPatientNameLength();
 		p.setValue((patientNameLength == null)? null : String.valueOf(patientNameLength));
-	
+
+		p = getMappedOrNewProperty(map, UserProperty.INTAKE_FORM_ENABLED, providerNo);
+		p.setValue(settings.isIntakeFormEnabled()?"yes":"no");
+
 		if(map.get("rx_use_rx3") != null) {
 			settings.setUseRx3("yes".equals(map.get("rx_use_rx3").getValue())?true:false);
 		}

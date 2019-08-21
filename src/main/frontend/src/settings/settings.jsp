@@ -239,6 +239,19 @@
 							</label>
 						</div>
 					</div>
+					<div class="form-group col-sm-6">
+						<label>Enable Intake Form</label>
+						<div class="controls">
+							<label class="checkbox-inline" for="radioh-0">
+								<input ng-model="settingsCtrl.pref.intakeFormEnabled" ng-value="true" id="radioh-0" type="radio">
+								Enable
+							</label>
+							<label class="checkbox-inline" for="radioh-1">
+								<input ng-model="settingsCtrl.pref.intakeFormEnabled" ng-value="false" id="radioh-1" type="radio">
+								Disable
+							</label>
+						</div>
+					</div>
 
 					<div class="form-group col-sm-6">
 						<label>Encounter Forms to display on appointment screen</label>
