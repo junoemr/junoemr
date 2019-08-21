@@ -68,7 +68,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Admin.Integration.Fax'
 ]);
 
-oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', "$provide", function($stateProvider, $urlRouterProvider, $httpProvider)
+oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $urlRouterProvider, $httpProvider)
 {
 	//
 	// For any unmatched url, redirect to /state1
