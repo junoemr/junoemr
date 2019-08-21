@@ -61,7 +61,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		controller.providerSettings = loadedSettings;
 		controller.calendarMinColumnWidth = 250;
 
-		// console.info(loadedSettings);
+		console.info(loadedSettings);
 
 		//=========================================================================
 		// Local scope variables
@@ -159,6 +159,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			maxLength: 2,
 			formNameMap: {},
 			eFormNameMap: {},
+			quickLinkMap: {},
 			linkIntakeForm: false
 		};
 
@@ -176,7 +177,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						{
 							$scope.loadSiteOptions().then(function ()
 							{
-								controller.loadFormLinkData().then(function ()
+								controller.loadExtraLinkData().then(function ()
 								{
 									$scope.loadDefaultSelections();
 									$scope.setEventSources();
@@ -979,6 +980,22 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						})));
 					}
 
+					/* generate quick links */
+					for(var id in controller.formLinks.quickLinkMap)
+					{
+						var displayName = controller.formLinks.quickLinkMap[id] || "NA";
+						var shortName = Juno.Common.Util.trimToLength(displayName, controller.formLinks.maxLength);
+
+						formContainerElem.append($("<div>", {
+							class: "event-item event-blk-label event-form-link",
+						}).append($("<a>", {
+							class: "event-label onclick-open-quicklink",
+							text: shortName,
+							title: displayName,
+							'data-id': id
+						})));
+					}
+
 				}
 
 			}
@@ -1108,6 +1125,10 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			{
 				controller.openEFormLink($target.attr('data-id'), calEvent.data.demographicNo, calEvent.data.appointmentNo);
 			}
+			else if ($target.is(".onclick-open-quicklink"))
+			{
+				controller.openQuickLink($target.attr('data-id'), calEvent.data.demographicNo, calEvent.data.appointmentNo);
+			}
 			else
 			{
 				$scope.openEditEventDialog(calEvent);
@@ -1226,6 +1247,19 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				"&appointment=" + encodeURIComponent(appointmentNo);
 			var win = window.open(url,
 				"Eform_"+ encodeURIComponent(demographicNo) +"_" + encodeURIComponent(eFormId),
+				'height=700,width=1024,scrollbars=1');
+			win.focus();
+		};
+		controller.openQuickLink = function openQuickLink(url, demographicNo, appointmentNo)
+		{
+			console.info(url);
+			if(!url.startsWith("http://") || !url.startsWith("https://"))
+			{
+				url = "https://" + url;
+			}
+
+			var win = window.open(url,
+				"quickLink_"+ url,
 				'height=700,width=1024,scrollbars=1');
 			win.focus();
 		};
@@ -1779,7 +1813,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			return deferred.promise;
 		};
 
-		controller.loadFormLinkData = function loadFormLinkData()
+		controller.loadExtraLinkData = function loadExtraLinkData()
 		{
 			var deferred = $q.defer();
 			if(controller.formLinks.enabled)
@@ -1810,7 +1844,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				}
 
 				var formIds = controller.providerSettings.appointmentScreenForms;
-				if(Juno.Common.Util.exists(eFormIds))
+				if(Juno.Common.Util.exists(formIds))
 				{
 					for(var i=0; i< formIds.length; i++)
 					{
@@ -1821,6 +1855,17 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				if(controller.formLinks.linkIntakeForm)
 				{
 					controller.formLinks.formNameMap['__intakeForm'] = "Intake Form";
+				}
+
+				var quickLinkIds = controller.providerSettings.appointmentScreenQuickLinks;
+				if(Juno.Common.Util.exists(quickLinkIds))
+				{
+					for(var i=0; i< quickLinkIds.length; i++)
+					{
+						var linkName = quickLinkIds[i].name;
+						var linkUrl = quickLinkIds[i].url;
+						controller.formLinks.quickLinkMap[linkUrl] = linkName;
+					}
 				}
 			}
 			deferred.resolve(); //TODO resolve when all eforms loaded?
