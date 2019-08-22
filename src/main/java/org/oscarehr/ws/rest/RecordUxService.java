@@ -276,7 +276,7 @@ public class RecordUxService extends AbstractServiceImpl {
 			}
 			
 			if( (securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.forms", "r", null) || securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.eforms", "r", null)) && preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ASSESSMENTS_POS)  ){
-				summaryList.add(new SummaryTo1("Assessments",count++,SummaryTo1.ASSESSMENTS_CODE));
+				summaryList.add(new SummaryTo1("Forms",count++,SummaryTo1.FORMS_CODE));
 			}
 		}
 		return summaryList;
@@ -295,7 +295,7 @@ public class RecordUxService extends AbstractServiceImpl {
         result.put("medhx","issueNoteSummary"); 
 		result.put("socfamhx","issueNoteSummary"); 		
 		result.put("reminders","issueNoteSummary");
-		result.put("assessments","formsSummary");
+		result.put("forms","formsSummary");
 		result.put("outgoing","formsSummary");	
 		result.put("sochx","issueNoteSummary"); 
 		result.put("famhx","issueNoteSummary"); 
