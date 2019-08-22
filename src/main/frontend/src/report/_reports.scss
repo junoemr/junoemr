@@ -22,9 +22,9 @@
 		overflow: hidden;
 
 		.report-selection {
+			@include juno-page-padding-default;
 			overflow: auto;
 			width: 340px;
-			@include juno-page-padding-default;
 			background-color: $color-neutral-lightest;
 			border-right: $color-neutral-lighter 8px solid;
 
@@ -35,12 +35,17 @@
 				&:hover {
 					background-color: $color-neutral-lighter;
 				}
+				.numberLabel {
+					min-width: 24px;
+					font-weight: bold;
+					border-radius: 50%;
+				}
 			}
 		}
 		.report-display {
+			@include juno-page-padding-default;
 			flex-grow: 1;
 			overflow: auto;
-			@include juno-page-padding-default;
 		}
 	}
 }
