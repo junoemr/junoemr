@@ -93,7 +93,25 @@ String demographicNo = request.getParameter("demographicNo")!=null?request.getPa
 
 boolean adminAccess = false;
 %>
-
+<%!
+// sorting modes
+enum SORT_MODE {
+    INVOICE_NO,
+    SEQ_NO,
+    APP_DATE,
+    TYPE,
+    PATIENT,
+    PRACT,
+    STAT,
+    FEE_CODE,
+    QTY,
+    AMT,
+    PAID,
+    OWED,
+    DX_CODE,
+    MSGS
+}
+%>
 
 <security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.billing" rights="r" reverse="<%=false%>" >
     <% adminAccess = true; %>
@@ -367,9 +385,9 @@ function billTypeOnly(showEle){
 
 function sortResults(sortBy)
 {
-    if (document.serviceform.sortBy.value === sortBy)
+    if (document.serviceform.sortBy.value === sortBy && document.serviceform.reverseSort.value === 'false')
     {
-        document.serviceform.reverseSort.value = document.serviceform.reverseSort.value === 'true' ? 'false' : 'true';
+        document.serviceform.reverseSort.value = 'true';
     }
     else
     {
@@ -432,7 +450,7 @@ if("true".equals(readonly)){
 	<input type="hidden" name="filterPatient" value="<%=readonly%>"/>
 
     <!---- sorting params ----->
-    <input type="hidden" name="sortBy" value="<%=request.getParameter("sortBy") == null ? "INVOICE_NO" : request.getParameter("sortBy")%>"/>
+    <input type="hidden" name="sortBy" value="<%=request.getParameter("sortBy") == null ? SORT_MODE.INVOICE_NO.name() : request.getParameter("sortBy")%>"/>
     <input type="hidden" name="reverseSort" value="<%=request.getParameter("reverseSort") == null ? "false" : request.getParameter("reverseSort")%>"/>
 
 	<input type="hidden" name="lastName" value="<%=request.getParameter("lastName")%>"/>
@@ -555,32 +573,31 @@ billTypes = "%";
 
 </form>
 </div><!-- row well-->
-
 <div class="row">
 <input class="btn pull-right hidden-print" type='button' name='print' value='Print' onClick='window.print()'>
 <table class="table table-striped  table-condensed">
 <thead>
 	<tr>
-    <th align="center" title="INVOICE #" ><a href="javascript:;" onclick="sortResults('INVOICE_NO');">INVOICE # </a></th>
-        <th align="center" title="LINE #" ><a href="javascript:;" onclick="sortResults('SEQ_NO')">SEQ # </a></th>
-        <th align="center" title="APP. DATE"><a href="javascript:;" onclick="sortResults('APP_DATE')">APP. DATE</a></th>
-        <th align="center" title="TYPE" ><a href="javascript:;" onclick="sortResults('TYPE')">TYPE</a></th>
+    <th align="center" title="INVOICE #" ><a href="javascript:;" onclick="sortResults('<%=SORT_MODE.INVOICE_NO.name()%>');">INVOICE # </a></th>
+        <th align="center" title="LINE #" ><a href="javascript:;" onclick="sortResults('<%=SORT_MODE.SEQ_NO.name()%>')">SEQ # </a></th>
+        <th align="center" title="APP. DATE"><a href="javascript:;" onclick="sortResults('<%=SORT_MODE.APP_DATE.name()%>')">APP. DATE</a></th>
+        <th align="center" title="TYPE" ><a href="javascript:;" onclick="sortResults('<%=SORT_MODE.TYPE.name()%>')">TYPE</a></th>
 	<%
 		if(!"true".equals(readonly)){
 	%>
-        <th align="center" title="PATIENT" ><a href="javascript:;" onclick="sortResults('PATIENT')">PATIENT</a></th>
+        <th align="center" title="PATIENT" ><a href="javascript:;" onclick="sortResults('<%=SORT_MODE.PATIENT.name()%>')">PATIENT</a></th>
 	<%}%>
-        <th align="center" title="PRACT" ><a href="javascript:;" onclick="sortResults('PRACT')">PRACT.</a></th>
-        <th align="center" title="Status"><a href="javascript:;" onclick="sortResults('STAT')">STAT</a></th>
+        <th align="center" title="PRACT" ><a href="javascript:;" onclick="sortResults('<%=SORT_MODE.PRACT.name()%>')">PRACT.</a></th>
+        <th align="center" title="Status"><a href="javascript:;" onclick="sortResults('<%=SORT_MODE.STAT.name()%>')">STAT</a></th>
 
 
-        <th align="center" title="Fee Code"><a href="javascript:;" onclick="sortResults('FEE_CODE')">FEE CODE</a></th>
-        <th align="center" title="QTY"><a href="javascript:;" onclick="sortResults('QTY')">QTY</a></th>
-        <th align="center" title="Amount Billed"><a href="javascript:;" onclick="sortResults('AMT')">AMT</a></th>
-        <th align="center" title="Amount Paid"  ><a href="javascript:;" onclick="sortResults('PAID')">PAID</a></th>
-        <th align="center"><a href="javascript:;" onclick="sortResults('OWED')">OWED</a></th>
-        <th align="center"><a href="javascript:;" onclick="sortResults('DX_CODE')">DX CODE</a></th>
-    <th align="center">MSGS</th>
+        <th align="center" title="Fee Code"><a href="javascript:;" onclick="sortResults('<%=SORT_MODE.FEE_CODE.name()%>')">FEE CODE</a></th>
+        <th align="center" title="QTY"><a href="javascript:;" onclick="sortResults('<%=SORT_MODE.QTY.name()%>')">QTY</a></th>
+        <th align="center" title="Amount Billed"><a href="javascript:;" onclick="sortResults('<%=SORT_MODE.AMT.name()%>')">AMT</a></th>
+        <th align="center" title="Amount Paid"  ><a href="javascript:;" onclick="sortResults('<%=SORT_MODE.PAID.name()%>')">PAID</a></th>
+        <th align="center"><a href="javascript:;" onclick="sortResults('<%=SORT_MODE.OWED.name()%>')">OWED</a></th>
+        <th align="center"><a href="javascript:;" onclick="sortResults('<%=SORT_MODE.DX_CODE.name()%>')">DX CODE</a></th>
+        <th align="center"><a href="javascript:;" onclick="sortResults('<%=SORT_MODE.MSGS.name()%>')">MSGS</a></th>
   </tr>
 </thead>
    <tbody>
@@ -769,14 +786,17 @@ String isRejected(String billingNo,Properties p,boolean wcb){
 List<MSPReconcile.Bill> getBillsFromSearch(MSPReconcile.BillSearch bsearch, HttpServletRequest request)
 {
     List<MSPReconcile.Bill> bills = (List<MSPReconcile.Bill>)(List<?>)bsearch.list;
-    sortBills(bills,request.getParameter("sortBy"),Boolean.parseBoolean(request.getParameter("reverseSort")));
+    final Properties p2 = bsearch.getCurrentErrorMessages();
+    sortBills(bills,p2,request.getParameter("sortBy"),Boolean.parseBoolean(request.getParameter("reverseSort")));
     return bills;
 }
 
 
-void sortBills(List<MSPReconcile.Bill> bills, final String sortMode, final boolean reverse)
+void sortBills(List<MSPReconcile.Bill> bills, final Properties p2, final String sortMode, final boolean reverse)
 {
     final MSPReconcile msp = new MSPReconcile();
+    final Properties p = msp.currentC12Records();
+
     Comparator comparator = new Comparator<MSPReconcile.Bill>()
     {
         @Override
@@ -786,115 +806,131 @@ void sortBills(List<MSPReconcile.Bill> bills, final String sortMode, final boole
             {
                 return 0;
             }
-            else if (sortMode.equals("INVOICE_NO"))
-            {
-                try
-                {
-                    int billingNoT1 = Integer.parseInt(t1.billing_no);
-                    int billingNoO = Integer.parseInt(o.billing_no);
-                    return reverse ? (billingNoT1 - billingNoO) : (billingNoO - billingNoT1);
-                }
-                catch (NumberFormatException e)
-                {
-                    return 0;
-                }
-            }
-            else if (sortMode.equals("SEQ_NO"))
-            {
-                try
-                {
-                    int seqNumT1 = Integer.parseInt(t1.seqNum);
-                    int seqNumO = Integer.parseInt(o.seqNum);
-                    return reverse ? seqNumT1 - seqNumO : seqNumO - seqNumT1;
-                }
-                catch (NumberFormatException e)
-                {
-                    return 0;
-                }
-            }
-            else if (sortMode.equals("APP_DATE"))
-            {
-                String apptDateT1 = StringUtils.trimToEmpty(t1.apptDate);
-                String apptDateO  = StringUtils.trimToEmpty(o.apptDate);
-                return reverse ? apptDateT1.compareTo(apptDateO) : apptDateO.compareTo(apptDateT1);
-            }
-            else if (sortMode.equals("TYPE"))
-            {
-                String billingTypeT1 = StringUtils.trimToEmpty(t1.billingtype);
-                String billingTypeO  = StringUtils.trimToEmpty(o.billingtype);
-                return reverse ? billingTypeT1.compareTo(billingTypeO) : billingTypeO.compareTo(billingTypeT1);
-            }
-            else if (sortMode.equals("PATIENT"))
-            {
-                String demoNameT1 = StringUtils.trimToEmpty(t1.demoName);
-                String demoNameO  = StringUtils.trimToEmpty(o.demoName);
-                return reverse ? demoNameT1.compareTo(demoNameO) : demoNameO.compareTo(demoNameT1);
-            }
-            else if (sortMode.equals("PRACT"))
-            {
-                String providerT1 = StringUtils.trimToEmpty(t1.providerLastName + "," + t1.providerFirstName);
-                String providerO  = StringUtils.trimToEmpty(o.providerLastName + "," + o.providerFirstName);
-                return reverse ? providerT1.compareTo(providerO) : providerO.compareTo(providerT1);
-            }
-            else if (sortMode.equals("STAT"))
-            {
-                String statusT1 = StringUtils.trimToEmpty(msp.getStatusDesc(t1.reason));
-                String statusO  = StringUtils.trimToEmpty(msp.getStatusDesc(o.reason));
-                return reverse ? statusT1.compareTo(statusO) : statusO.compareTo(statusT1);
-            }
-            else if (sortMode.equals("FEE_CODE"))
-            {
-                String feeCodeT1 = StringUtils.trimToEmpty(t1.code);
-                String feeCodeO  = StringUtils.trimToEmpty(o.code);
-                return reverse ? feeCodeT1.compareTo(feeCodeO) : feeCodeO.compareTo(feeCodeT1);
-            }
-            else if (sortMode.equals("QTY"))
-            {
-                try
-                {
-                    Float quantityT1 = Float.parseFloat(t1.quantity);
-                    Float quantityO = Float.parseFloat(o.quantity);
-                    return reverse ? quantityT1.compareTo(quantityO) : quantityO.compareTo(quantityT1);
-                }
-                catch (NumberFormatException e)
-                {
-                    return 0;
-                }
-            }
-            else if (sortMode.equals("AMT"))
-            {
-                try
-                {
-                    Float amountT1 = Float.parseFloat(t1.amount);
-                    Float amountO  = Float.parseFloat(o.amount);
-                    return reverse ? amountT1.compareTo(amountO) : amountO.compareTo(amountT1);
-                }
-                catch (NumberFormatException e)
-                {
-                    return 0;
-                }
-            }
-            else if (sortMode.equals("PAID"))
-            {
-                Double paidT1 = msp.getAmountPaid(t1.billMasterNo,t1.billingtype);
-                Double paidO  = msp.getAmountPaid(o.billMasterNo, o.billingtype);
-                return reverse ? paidT1.compareTo(paidO) : paidO.compareTo(paidT1);
-            }
-            else if (sortMode.equals("OWED"))
-            {
-                Double owedT1 = msp.getAmountOwing(t1.billMasterNo,t1.amount,t1.billingtype);
-                Double owedO  = msp.getAmountOwing(o.billMasterNo,o.amount,o.billingtype);
-                return reverse ? owedT1.compareTo(owedO) : owedO.compareTo(owedT1);
-            }
-            else if (sortMode.equals("DX_CODE"))
-            {
-                String dxT1 = StringUtils.trimToEmpty(t1.dx1);
-                String dxO  = StringUtils.trimToEmpty(o.dx1);
-                return reverse ? dxT1.compareTo(dxO) : dxO.compareTo(dxT1);
-            }
             else
             {
-                return 0;
+                SORT_MODE sortModeEnum = SORT_MODE.valueOf(sortMode);
+
+                switch (sortModeEnum)
+                {
+                    case INVOICE_NO:
+                    {
+                        try
+                        {
+                            int billingNoT1 = Integer.parseInt(t1.billing_no);
+                            int billingNoO = Integer.parseInt(o.billing_no);
+                            return reverse ? (billingNoT1 - billingNoO) : (billingNoO - billingNoT1);
+                        } catch (NumberFormatException e)
+                        {
+                            return 0;
+                        }
+                    }
+                    case SEQ_NO:
+                    {
+                        try
+                        {
+                            int seqNumT1 = Integer.parseInt(t1.seqNum);
+                            int seqNumO = Integer.parseInt(o.seqNum);
+                            return reverse ? seqNumT1 - seqNumO : seqNumO - seqNumT1;
+                        } catch (NumberFormatException e)
+                        {
+                            return 0;
+                        }
+                    }
+                    case APP_DATE:
+                    {
+                        String apptDateT1 = StringUtils.trimToEmpty(t1.apptDate);
+                        String apptDateO = StringUtils.trimToEmpty(o.apptDate);
+                        return reverse ? apptDateT1.compareTo(apptDateO) : apptDateO.compareTo(apptDateT1);
+                    }
+                    case TYPE:
+                    {
+                        String billingTypeT1 = StringUtils.trimToEmpty(t1.billingtype);
+                        String billingTypeO = StringUtils.trimToEmpty(o.billingtype);
+                        return reverse ? billingTypeT1.compareTo(billingTypeO) : billingTypeO.compareTo(billingTypeT1);
+                    }
+                    case PATIENT:
+                    {
+                        String demoNameT1 = StringUtils.trimToEmpty(t1.demoName);
+                        String demoNameO = StringUtils.trimToEmpty(o.demoName);
+                        return reverse ? demoNameT1.compareTo(demoNameO) : demoNameO.compareTo(demoNameT1);
+                    }
+                    case PRACT:
+                    {
+                        String providerT1 = StringUtils.trimToEmpty(t1.providerLastName + "," + t1.providerFirstName);
+                        String providerO = StringUtils.trimToEmpty(o.providerLastName + "," + o.providerFirstName);
+                        return reverse ? providerT1.compareTo(providerO) : providerO.compareTo(providerT1);
+                    }
+                    case STAT:
+                    {
+                        String statusT1 = StringUtils.trimToEmpty(msp.getStatusDesc(t1.reason));
+                        String statusO = StringUtils.trimToEmpty(msp.getStatusDesc(o.reason));
+                        return reverse ? statusT1.compareTo(statusO) : statusO.compareTo(statusT1);
+                    }
+                    case FEE_CODE:
+                    {
+                        String feeCodeT1 = StringUtils.trimToEmpty(t1.code);
+                        String feeCodeO = StringUtils.trimToEmpty(o.code);
+                        return reverse ? feeCodeT1.compareTo(feeCodeO) : feeCodeO.compareTo(feeCodeT1);
+                    }
+                    case QTY:
+                    {
+                        try
+                        {
+                            Float quantityT1 = Float.parseFloat(t1.quantity);
+                            Float quantityO = Float.parseFloat(o.quantity);
+                            return reverse ? quantityT1.compareTo(quantityO) : quantityO.compareTo(quantityT1);
+                        } catch (NumberFormatException e)
+                        {
+                            return 0;
+                        }
+                    }
+                    case AMT:
+                    {
+                        try
+                        {
+                            Float amountT1 = Float.parseFloat(t1.amount);
+                            Float amountO = Float.parseFloat(o.amount);
+                            return reverse ? amountT1.compareTo(amountO) : amountO.compareTo(amountT1);
+                        } catch (NumberFormatException e)
+                        {
+                            return 0;
+                        }
+                    }
+                    case PAID:
+                    {
+                        Double paidT1 = msp.getAmountPaid(t1.billMasterNo, t1.billingtype);
+                        Double paidO = msp.getAmountPaid(o.billMasterNo, o.billingtype);
+                        return reverse ? paidT1.compareTo(paidO) : paidO.compareTo(paidT1);
+                    }
+                    case OWED:
+                    {
+                        Double owedT1 = msp.getAmountOwing(t1.billMasterNo, t1.amount, t1.billingtype);
+                        Double owedO = msp.getAmountOwing(o.billMasterNo, o.amount, o.billingtype);
+                        return reverse ? owedT1.compareTo(owedO) : owedO.compareTo(owedT1);
+                    }
+                    case DX_CODE:
+                    {
+                        String dxT1 = StringUtils.trimToEmpty(t1.dx1);
+                        String dxO = StringUtils.trimToEmpty(o.dx1);
+                        return reverse ? dxT1.compareTo(dxO) : dxO.compareTo(dxT1);
+                    }
+                    case MSGS:
+                    {
+                        String reject1T1 = StringUtils.trimToEmpty(p.getProperty(t1.billMasterNo));
+                        String reject1O  = StringUtils.trimToEmpty(p.getProperty(o.billMasterNo));
+
+                        String reject2T1 = StringUtils.trimToEmpty(p2.getProperty(t1.billMasterNo));
+                        String reject2O  = StringUtils.trimToEmpty(p2.getProperty(o.billMasterNo));
+
+                        String rejectStrT1 = reject1T1 + reject2T1;
+                        String rejectStrO  = reject1O  + reject2O;
+                        return reverse ? rejectStrT1.compareTo(rejectStrO) : rejectStrO.compareTo(rejectStrT1);
+                    }
+                    default:
+                    {
+                        return 0;
+                    }
+                }
             }
         }
     };
