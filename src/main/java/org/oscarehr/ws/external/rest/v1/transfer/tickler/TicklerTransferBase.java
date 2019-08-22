@@ -23,15 +23,19 @@
 package org.oscarehr.ws.external.rest.v1.transfer.tickler;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.sun.istack.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ws.validator.DemographicNoConstraint;
+import org.oscarehr.ws.validator.ProviderNoConstraint;
+import org.oscarehr.ws.validator.StringValueConstraint;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -41,27 +45,47 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
 public abstract class TicklerTransferBase implements Serializable
 {
-	private Integer id;
+	@NotNull
+	@Size(max=10)
+	@DemographicNoConstraint(allowNull = false)
+	@Schema(description="The demographic number to which this tickler pertains")
 	private Integer demographicNo;
+
+	@Size(max=11)
+	@Schema(description="The program that the tickler is in")
 	private Integer programId;
+
+	@NotNull
+	@Schema(description="The ticklers message")
 	private String message;
+
+	@NotNull
+	@Size(max=1)
+	@Schema(description="The status of the tickler, Ex: 'A' for active, 'D' for deleted")
+	@StringValueConstraint(allows = {"A", "C", "D"})
 	private Tickler.STATUS status;
-	private Date updateDate;
+
+	@NotNull
+	@Schema(description = "The date after which the tickler becomes 'overdue'")
 	private Date serviceDate;
+
+	@ProviderNoConstraint(allowNull = false)
+	@Size(max=6)
+	@Schema(description = "The provider number for the creator of the tickler")
 	private String creator;
+
+	@Schema(description = "The priority fo the tickler.")
+	@StringValueConstraint(allows = {"High", "Low", "Normal"})
 	private Tickler.PRIORITY priority;
+
+	@NotNull
+	@ProviderNoConstraint(allowNull = false)
+	@Size(max=255)
+	@Schema(description = "The provider number of the provider that the tickler is assigned to")
 	private String taskAssignedTo;
+
+	@Schema(description = "The category of the tickler")
 	private Integer categoryId;
-
-	public Integer getId()
-	{
-		return id;
-	}
-
-	public void setId(Integer id)
-	{
-		this.id = id;
-	}
 
 	public Integer getDemographicNo()
 	{
@@ -101,16 +125,6 @@ public abstract class TicklerTransferBase implements Serializable
 	public void setStatus(Tickler.STATUS status)
 	{
 		this.status = status;
-	}
-
-	public Date getUpdateDate()
-	{
-		return updateDate;
-	}
-
-	public void setUpdateDate(Date updateDate)
-	{
-		this.updateDate = updateDate;
 	}
 
 	public Date getServiceDate()
@@ -167,11 +181,10 @@ public abstract class TicklerTransferBase implements Serializable
 	 * get a new tickler model object from this transfer object.
 	 * @return - a new tickler model.
 	 */
-	public Tickler toTickler() throws IllegalAccessException, InvocationTargetException
+	public Tickler toTickler()
 	{
 		Tickler t = new Tickler();
-		String [] ignore = {"id"};
-		BeanUtils.copyProperties(this, t, ignore);
+		BeanUtils.copyProperties(this, t);
 		return t;
 	}
 

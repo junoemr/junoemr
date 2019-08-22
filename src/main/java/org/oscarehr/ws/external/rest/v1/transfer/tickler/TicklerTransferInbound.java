@@ -37,12 +37,12 @@ public class TicklerTransferInbound extends TicklerTransferBase
 {
 	public TicklerTransferInbound() {}
 
-	public TicklerTransferInbound(Tickler tickler) throws IllegalAccessException, InvocationTargetException
+	public TicklerTransferInbound(Tickler tickler)
 	{
 		BeanUtils.copyProperties(tickler, this);
 	}
 
-	public Tickler copyToTickler(Tickler t) throws IllegalAccessException, InvocationTargetException
+	public Tickler copyToTickler(Tickler t)
 	{
 		BeanUtils.copyProperties(this, t, getNullPropertyNames(this));
 		return t;

@@ -29,16 +29,43 @@ import org.springframework.beans.BeanUtils;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 
 @XmlRootElement
 @Schema(description = "Tickler data transfer object, outbound")
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
 public class TicklerTransferOutbound extends TicklerTransferBase
 {
+	@Schema(description = "The id of the tickler")
+	private Integer id;
+
+	@Schema(description = "The last update date of the tickler")
+	private Date updateDate;
+
 	public TicklerTransferOutbound() {}
 
-	public TicklerTransferOutbound(Tickler tickler) throws IllegalAccessException, InvocationTargetException
+	public TicklerTransferOutbound(Tickler tickler)
 	{
 		BeanUtils.copyProperties(tickler, this);
+	}
+
+	public Integer getId()
+	{
+		return id;
+	}
+
+	public void setId(Integer id)
+	{
+		this.id = id;
+	}
+
+	public Date getUpdateDate()
+	{
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate)
+	{
+		this.updateDate = updateDate;
 	}
 }

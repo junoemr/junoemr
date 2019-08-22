@@ -24,12 +24,14 @@
 
 package org.oscarehr.ticklers.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.oscarehr.common.PaginationQuery;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.ticklers.web.TicklerQuery;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.ws.external.rest.v1.transfer.tickler.TicklerTransferInbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -66,4 +68,74 @@ public class TicklerService {
 				
 		return results;
 	}
+
+	/**
+	 * create a new tickler
+	 * @param tickler - the tickler to create
+	 * @return - the new tickler
+	 * @throws RuntimeException - if a required tickler field is missing
+	 */
+	public Tickler createTickler(Tickler tickler) throws RuntimeException
+	{
+		if (tickler.getId() != null)
+		{// id must be null to create new tickler
+			tickler.setId(null);
+		}
+
+		validateTickler(tickler);
+		TicklerDao.persist(tickler);
+		return tickler;
+	}
+
+	/**
+	 * update a tickler record.
+	 * @param tickler - tickler to update
+	 * @return - the updated tickler
+	 * @throws RuntimeException - if a required tickler field is missing
+	 */
+	public Tickler updateTickler(Tickler tickler) throws RuntimeException
+	{
+		validateTickler(tickler);
+		tickler.setUpdateDate(new Date());
+
+		TicklerDao.merge(tickler);
+		return tickler;
+	}
+
+	/**
+	 * ensure that a tickler is configured correctly and set default values on null fields
+	 * @param tickler - the tickler to validate
+	 * @return - the validated tickler
+	 * @throws RuntimeException - if a required tickler field is missing
+	 */
+	private Tickler validateTickler(Tickler tickler) throws RuntimeException
+	{
+		if (tickler.getDemographicNo() == null)
+		{
+			throw new RuntimeException("Demographic number is required for tickler");
+		}
+		if (tickler.getStatus() == null)
+		{
+			tickler.setStatus(Tickler.STATUS.A);
+		}
+		if (tickler.getUpdateDate() == null)
+		{
+			tickler.setUpdateDate(new Date());
+		}
+		if (tickler.getServiceDate() == null)
+		{
+			throw new RuntimeException("Service date is required for tickler");
+		}
+		if (tickler.getCreator() == null)
+		{
+			throw new RuntimeException("Creator number is required for tickler");
+		}
+		if (tickler.getTaskAssignedTo() == null)
+		{
+			throw new RuntimeException("Assigned number is required for tickler");
+		}
+
+		return tickler;
+	}
+
 }

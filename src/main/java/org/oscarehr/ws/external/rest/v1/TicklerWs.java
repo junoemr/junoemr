@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.oscarehr.common.dao.TicklerDao;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.ticklers.service.TicklerService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.rest.v1.transfer.tickler.TicklerTransferInbound;
@@ -53,6 +54,9 @@ public class TicklerWs extends AbstractExternalRestWs
 {
 	@Autowired
 	TicklerDao ticklerDao;
+
+	@Autowired
+	TicklerService ticklerService;
 
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
@@ -86,18 +90,12 @@ public class TicklerWs extends AbstractExternalRestWs
 		String providerNoStr = getOAuthProviderNo();
 		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_tickler");
 
-		try
-		{
-			Tickler tickler = ticklerDao.find(id);
-			tickler = ticklerIn.copyToTickler(tickler);
-			ticklerDao.merge(tickler);
-			return RestResponse.successResponse(new TicklerTransferOutbound(tickler));
-		}
-		catch (Exception e)
-		{
-			MiscUtils.getLogger().error("Error updating tickler [" + id + "]: " + e.getMessage(), e);
-			throw new RuntimeException("Error updating tickler [" + id + "]: " + e.getMessage(), e);
-		}
+		Tickler tickler = ticklerDao.find(id);
+		tickler = ticklerIn.copyToTickler(tickler);
+
+		ticklerService.updateTickler(tickler);
+		return RestResponse.successResponse(new TicklerTransferOutbound(tickler));
+
 	}
 
 	@POST
@@ -108,19 +106,10 @@ public class TicklerWs extends AbstractExternalRestWs
 		String providerNoStr = getOAuthProviderNo();
 		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_tickler");
 
-		try
-		{
-			Tickler tickler = ticklerIn.toTickler();
-			tickler.setUpdateDate(new Date());
-			tickler.setCreator(getOAuthProviderNo());
+		Tickler tickler = ticklerIn.toTickler();
+		tickler.setCreator(getOAuthProviderNo());
 
-			ticklerDao.persist(tickler);
-			return RestResponse.successResponse(new TicklerTransferOutbound(tickler));
-		}
-		catch (Exception e)
-		{
-			MiscUtils.getLogger().error("Error creating new tickler: " + e.getMessage(), e);
-			throw new RuntimeException("Error creating new tickler: " + e.getMessage(), e);
-		}
+		ticklerService.createTickler(tickler);
+		return RestResponse.successResponse(new TicklerTransferOutbound(tickler));
 	}
 }
