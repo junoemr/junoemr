@@ -24,18 +24,15 @@
 
 --%>
 <div id="settings-page">
-	<div class="row settings-header">
-		<div class="col-xs-6">
-			<!-- <h1>Personalize OSCAR</h1> -->
-			<h2>User Settings</h2>
+	<div class="settings-header">
+		<div class="flex-row flex-grow align-items-center">
+			<h3>User Settings</h3>
 		</div>
-		<div class="col-xs-6">
-			<p class="bg-danger pull-right">
-				<button type="button" class="btn btn-default btn-lg" 
-					onClick="window.open('../provider/providerpreference.jsp?provider_no=999998','prefs','width=715,height=680,scrollbars=yes')">
+		<div class="pull-right control-right">
+			<button type="button" class="btn btn-default btn-lg"
+			        onClick="window.open('../provider/providerpreference.jsp?provider_no=999998','prefs','width=715,height=680,scrollbars=yes')">
 				<span class="glyphicon glyphicon-cog"></span> Open Classic Preferences
 			</button>
-			</p>
 		</div>
 	</div>
 
