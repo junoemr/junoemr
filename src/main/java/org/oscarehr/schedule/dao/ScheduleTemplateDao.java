@@ -314,31 +314,29 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 			startDateTime = LocalDateTime.now();
 		}
 
-		String sql = "SELECT STRAIGHT_JOIN\n" +
-				"  SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1) AS code_char,\n" +
-				"  CONCAT(sd.sdate, ' ', SEC_TO_TIME(ROUND((24*60*60)*(n3.i + (10 * n2.i) + (100 * n1.i))/LENGTH(st.timecode)))) as appt_datetime,\n"+
+		String sql = "SELECT\n" +
+				"  SUBSTRING(st.timecode, seq+1, 1) AS code_char,\n" +
+				"  CONCAT(sd.sdate, ' ', SEC_TO_TIME(ROUND((24*60*60)*seq/LENGTH(st.timecode)))) as appt_datetime,\n"+
 				"  stc.code,\n" +
 				"  CAST(COALESCE(stc.duration, ((24*60)/LENGTH(st.timecode))) AS integer) AS duration\n" +
 				"FROM \n" +
-				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2) as n1    \n" +
-				"    CROSS JOIN \n" +
-				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n2     \n" +
-				"    CROSS JOIN \n" +
-				"    (SELECT 0 as i UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) as n3 \n" +
-				"CROSS JOIN scheduledate sd\n" +
-				"JOIN scheduletemplate st ON (sd.hour = st.name AND (sd.provider_no = st.provider_no OR st.provider_no = :publicCode ))\n" +
-				"LEFT JOIN scheduletemplatecode stc " +
-				"  ON BINARY stc.code = SUBSTRING(st.timecode, (n3.i + (10 * n2.i) + (100 * n1.i))+1, 1)\n" +
-				"WHERE sd.status = 'A'\n" +
-				"AND stc.code IN (:appointmentTypes) \n" +
-				"AND CONCAT(sd.sdate, ' ', SEC_TO_TIME(ROUND((24*60*60)*(n3.i + (10 * n2.i) + (100 * n1.i))/LENGTH(st.timecode)))) BETWEEN :startDateTime AND :endDateTime\n" +
-				"AND sd.provider_no = :providerNo\n" +
-				"AND (n3.i + (10 * n2.i) + (100 * n1.i)) < LENGTH(st.timecode)\n" +
-				"ORDER BY sd.sdate, (n3.i + (10 * n2.i) + (100 * n1.i));";
+				"(SELECT * FROM scheduledate " +
+				"	WHERE sdate BETWEEN :startDate AND :endDate " +
+				"	AND provider_no = :providerNo" +
+				"	AND status = 'A') as sd\n" +
+				"CROSS JOIN (SELECT * from seq_1_to_299) as num\n" +
+				"JOIN scheduletemplate st ON (sd.hour = st.name AND sd.provider_no IN (:providerNo, :publicCode))\n" +
+				"LEFT JOIN scheduletemplatecode stc ON BINARY stc.code = SUBSTRING(st.timecode, seq+1, 1)\n" +
+				"WHERE stc.code IN (:appointmentTypes)\n" +
+				"AND CONCAT(sd.sdate, ' ', SEC_TO_TIME(ROUND((24*60*60)*seq/LENGTH(st.timecode)))) BETWEEN :startDateTime AND :endDateTime\n" +
+				"AND seq < LENGTH(st.timecode)\n" +
+				"ORDER BY sd.sdate, seq";
 
 		Query query = entityManager.createNativeQuery(sql);
 		query.setParameter("startDateTime", java.sql.Timestamp.valueOf(startDateTime), TemporalType.TIMESTAMP);
 		query.setParameter("endDateTime", java.sql.Timestamp.valueOf(endDateTime), TemporalType.TIMESTAMP);
+		query.setParameter("startDate", java.sql.Date.valueOf(startDate), TemporalType.DATE);
+		query.setParameter("endDate", java.sql.Date.valueOf(endDate), TemporalType.DATE);
 		query.setParameter("providerNo", providerNo);
 		query.setParameter("appointmentTypes", appointmentTypeList);
 		query.setParameter("publicCode", DODGY_FAKE_PROVIDER_NO_USED_TO_HOLD_PUBLIC_TEMPLATES);

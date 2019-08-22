@@ -355,4 +355,16 @@ public class DemographicService
 		demographicArchiveDao.persist(da);
 		return da.getId();
 	}
+
+	/**
+	 * Apply a demographic update (save changes to demo + create a demographic archive record)
+	 * @param demo - the demographic to update.
+	 * @return - the updated demographic (un changed object, save that it has been persisted to the database)
+	 */
+	public Demographic updateDemographicRecord(Demographic demo)
+	{
+		archiveDemographicRecord(demo);
+		demographicDao.merge(demo);
+		return demo;
+	}
 }
