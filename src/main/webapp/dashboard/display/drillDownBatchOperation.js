@@ -236,7 +236,7 @@ BatchOperations =
 				let demos = BatchOperations.getDemographics(all);
 				if (demos != null)
 				{
-					let ok = confirm(demos.length + " Demographics will have their status set to " + (deactivate ? "inactive" : "active") +". \nYou cannot undue this action. Are you sure?");
+					let ok = confirm(demos.length + " Patients will have their status set to " + (deactivate ? "inactive" : "active") +". \nYou cannot undo this action. Are you sure you would like to proceed?");
 					if (ok)
 					{
 						BatchOperations.activateDeactivateDemographics(deactivate, demos);
@@ -266,7 +266,7 @@ BatchOperations =
 				let demos = BatchOperations.getDemographics(all);
 				if (demos != null)
 				{
-					let ok = confirm(demos.length + " Demographics will be assigned Dx Code [" + code +"]\nYou cannot undue this action. Are you sure?");
+					let ok = confirm(demos.length + " Patients will be assigned Dx Code [" + code +"]\nYou cannot undo this action. Are you sure you would like to proceed?");
 					if (ok)
 					{
 						BatchOperations.assignDxCodeToDemographics(code, codingSystem, demos);
