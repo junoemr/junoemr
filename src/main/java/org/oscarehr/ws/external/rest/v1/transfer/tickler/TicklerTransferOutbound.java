@@ -28,7 +28,6 @@ import org.oscarehr.common.model.Tickler;
 import org.springframework.beans.BeanUtils;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 
 @XmlRootElement
