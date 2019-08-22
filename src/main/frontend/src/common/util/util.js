@@ -247,6 +247,10 @@ Juno.Common.Util.isIntegerString = function isIntegerString(string)
 
 	return false;
 };
+Juno.Common.Util.isNumber = function isNumber(object)
+{
+	return typeof object === "number";
+};
 
 Juno.Common.Util.escapeHtml = function escapeHtml(str)
 {
@@ -281,4 +285,14 @@ Juno.Common.Util.formatName = function formatName(firstName, lastName)
 	}
 
 	return lastName + ', ' + firstName;
+};
+
+Juno.Common.Util.trimToLength = function trimToLength(string, maxLength)
+{
+	var shortString = string;
+	if(shortString.length > maxLength)
+	{
+		shortString = shortString.substring(0, maxLength);
+	}
+	return shortString;
 };
