@@ -50,6 +50,7 @@ String userlastname = (String) session.getAttribute("userlastname");
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ResourceBundle" %>
+<%@ page import="java.time.LocalDate" %>
 
 <%
 	//preliminary JSP code
@@ -185,7 +186,7 @@ String userlastname = (String) session.getAttribute("userlastname");
 			            String printTitle;
 			            String printImage;
 			            String printAlt;
-			            String date;
+			            String date = "No Date";
 			            String truncatedDisplayName;
 			            for(EDoc curDoc : allDocuments)
 			            {
@@ -219,7 +220,11 @@ String userlastname = (String) session.getAttribute("userlastname");
 			                    printTitle = UNPRINTABLE_TITLE;
 			                    printAlt   = UNPRINTABLE_ALT;
 			                }
-				            date = ConversionUtils.toDateString(MyDateFormat.getCalendar(curDoc.getObservationDate()).getTime(), dateFormat);
+			                String dateString = org.apache.commons.lang.StringUtils.trimToNull(curDoc.getObservationDate());
+			                if (dateString != null)
+			                {
+			                    date = ConversionUtils.toDateString(MyDateFormat.getCalendar(dateString).getTime(), dateFormat);
+			                }
 			                truncatedDisplayName = StringUtils.maxLenString(curDoc.getDescription(),14,11,"");
 			                if (StringUtils.isNullOrEmpty(truncatedDisplayName))
 			                {
