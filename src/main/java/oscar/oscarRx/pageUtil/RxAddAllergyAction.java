@@ -39,6 +39,7 @@ import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarRx.data.RxDrugData;
 import oscar.oscarRx.data.RxPatientData;
+import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -82,16 +83,16 @@ public final class RxAddAllergyAction extends Action
 
 		if(startDate.length() >= 8 && getCharOccur(startDate, '-') == 2)
 		{
-			allergy.setStartDate(oscar.oscarRx.util.RxUtil.StringToDate(startDate, "yyyy-MM-dd"));
+			allergy.setStartDate(ConversionUtils.fromDateString(startDate, "yyyy-MM-dd"));
 		}
 		else if(startDate.length() >= 6 && getCharOccur(startDate, '-') >= 1)
 		{
-			allergy.setStartDate(oscar.oscarRx.util.RxUtil.StringToDate(startDate, "yyyy-MM"));
+			allergy.setStartDate(ConversionUtils.fromDateString(startDate, "yyyy-MM"));
 			allergy.setStartDateFormat(PartialDate.YEARMONTH);
 		}
 		else if(startDate.length() >= 4)
 		{
-			allergy.setStartDate(oscar.oscarRx.util.RxUtil.StringToDate(startDate, "yyyy"));
+			allergy.setStartDate(ConversionUtils.fromDateString(startDate, "yyyy"));
 			allergy.setStartDateFormat(PartialDate.YEARONLY);
 		}
 		allergy.setAgeOfOnset(ageOfOnset);

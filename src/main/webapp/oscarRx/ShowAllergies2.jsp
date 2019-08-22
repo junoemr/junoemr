@@ -77,8 +77,29 @@
 	<head>
 		<title><bean:message key="EditAllergies.title" /></title>
 
-		<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
+		<script type="text/javascript" src="<%=request.getContextPath()%>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
 		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+		<script type="text/javascript" src="<%= request.getContextPath() %>/js/moment.min.js"></script>
+
+		<script type="text/javascript">
+			function validateAllergySubmit()
+			{
+				var startDate = ($("#startDate").val());
+				startDate = moment(startDate, "YYYY-MM-DD");
+				var validDate = startDate.isValid();
+
+				if (!validDate)
+				{
+					alert("Invalid date in Start Date. Please use one of the following formats:" +
+						"\nyyyy-mm-dd" +
+						"\nyyyy-mm" +
+						"\nyyyy");
+				}
+
+				return validDate;
+			}
+		</script>
+
 		<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/css/allergies.css">
 		<style type="text/css">
 			.ajax-loader {
@@ -318,13 +339,20 @@
 
 			//--> Render response html
 			function renderSearchResults(html, id) {
-
 				if( id instanceof Array ) {
 					$.each(id, function(i, val){
 						$(val).replaceWith( jQuery(val, html) );
 					});
 				} else {
 					$(id).replaceWith( jQuery(id, html) );
+				}
+
+				// This is really gross. The replacement operations(s) above are already doing similar replacement
+				// If or when we rework the search to return JSON instead of HTML we can do a proper length check on input data
+				// This replacement is specifically intended for searching drugref, when we get zero results back.
+				if (id === "#searchResultsContainer" && $("div.LeftMargin > div").length === 0)
+				{
+					$("div.LeftMargin").append("<div>Search returned no results. Revise your search and try again.</div>")
 				}
 
 				$('.ajax-loader').removeClass('ajax-loader');
@@ -345,16 +373,29 @@
 			}
 
 			//--> Checkboxes for search allergy criteria
+			// To have the 'all' checkbox function properly, we need to visually toggle the checkbox
+			// as well as get the DOM to recognize that we're toggling the checkbox.
 			function typeSelect()
 			{
+				var typeBrand = $("#typeBrandName");
+				typeBrand.checked = true;
 				document.getElementById("typeBrandName").checked = true;
-				document.getElementById("inputBrandName").checked = true;
+				toggleInput('inputBrandName', typeBrand);
+
+				var typeGeneric = $("#typeGenericName");
+				typeGeneric.checked = true;
 				document.getElementById("typeGenericName").checked = true;
-				document.getElementById("inputGenericName").checked = true;
+				toggleInput('inputGenericName', typeGeneric);
+
+				var typeIngredient = $("#typeIngredient");
+				typeIngredient.checked = true;
 				document.getElementById("typeIngredient").checked = true;
-				document.getElementById("inputIngredient").checked = true;
+				toggleInput('inputIngredient', typeIngredient);
+
+				var typeDrugClass = $("#typeDrugClass");
+				typeDrugClass.checked = true;
 				document.getElementById("typeDrugClass").checked = true;
-				document.getElementById("inputDrugClass").checked = true;
+				toggleInput('inputDrugClass', typeDrugClass);
 			}
 
 			function toggleInput(input, parentBox)
@@ -371,14 +412,25 @@
 
 			function typeClear()
 			{
+				var typeBrand = $("#typeBrandName");
+				typeBrand.checked = false;
 				document.getElementById("typeBrandName").checked = false;
-				document.getElementById("inputBrandName").checked = false;
+				toggleInput('inputBrandName', typeBrand);
+
+				var typeGeneric = $("#typeGenericName");
+				typeGeneric.checked = false;
 				document.getElementById("typeGenericName").checked = false;
-				document.getElementById("inputGenericName").checked = false;
+				toggleInput('inputGenericName', typeGeneric);
+
+				var typeIngredient = $("#typeIngredient");
+				typeIngredient.checked = false;
 				document.getElementById("typeIngredient").checked = false;
-				document.getElementById("inputIngredient").checked = false;
+				toggleInput('inputIngredient', typeIngredient);
+
+				var typeDrugClass = $("#typeDrugClass");
+				typeDrugClass.checked = false;
 				document.getElementById("typeDrugClass").checked = false;
-				document.getElementById("inputDrugClass").checked = false;
+				toggleInput('inputDrugClass', typeDrugClass);
 			}
 
 			function addCustomAllergy()
@@ -597,7 +649,6 @@
 												<td><b>Entry Date</b></td>
 												<td><b>Description</b></td>
 												<td><b>Allergy Type</b></td>
-												<td><b>Type Code</b></td>
 												<td><b>Severity</b></td>
 												<td><b>Onset of Reaction</b></td>
 												<td><b>Reaction</b></td>
@@ -694,7 +745,6 @@
 												<td><%=entryDate==null ? "" : entryDate %></td>
 												<td <%=title%> ><%=allergy.getDescription() %></td>
 												<td><%=allergy.getTypeDesc() %></td>
-												<td><%=allergy.getTypeCode() == 0 ? "<i>&lt;Not Set&gt;</i>" : ""%><%=allergy.getTypeCode() == 0 ? "*" : "" %></td>
 												<td bgcolor="<%=sevColour%>"><%=allergy.getSeverityOfReactionDesc() %></td>
 												<td><%=allergy.getOnSetOfReactionDesc() %></td>
 												<td><%=allergy.getReaction() == null ? "" : allergy.getReaction()%></td>

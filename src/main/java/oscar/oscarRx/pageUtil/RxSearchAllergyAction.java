@@ -184,7 +184,7 @@ public final class RxSearchAllergyAction extends Action {
                         }
                     }
 
-                    if (!inFlatList)
+                    if (!inFlatList && listKey != null)
                     {
                         flatList.put(listKey, allergies[i]);
                     }

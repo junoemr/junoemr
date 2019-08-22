@@ -26,7 +26,6 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
-<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
@@ -81,9 +80,9 @@
 	<table border="0" cellpadding="0" cellspacing="0"
 		   style="border-collapse: collapse" bordercolor="#111111" width="100%"
 		   id="AutoNumber1" height="100%">
-		<%@ include file="TopLinks.jsp"%><!-- Row One included here-->
+		<%@ include file="TopLinks.jsp"%>
 		<tr>
-			<%@ include file="SideLinksNoEditFavorites2.jsp"%><!-- <td></td>Side Bar File --->
+			<%@ include file="SideLinksNoEditFavorites2.jsp"%>
 			<td width="100%" style="border-left: 2px solid #A9A9A9;" height="100%"
 				valign="top">
 				<table cellpadding="0" cellspacing="2"
@@ -91,11 +90,11 @@
 					   height="100%">
 					<tr>
 						<td width="0%" valign="top">
-							<div class="DivCCBreadCrumbs"><a href="SearchDrug3.jsp"> <bean:message
-									key="SearchDrug.title" /></a>&nbsp;&gt;&nbsp; <a
-									href="ShowAllergies2.jsp"> <bean:message
-									key="EditAllergies.title" /></a>&nbsp;&gt;&nbsp; <b><bean:message
-									key="AddReaction.title" /></b></div>
+							<div class="DivCCBreadCrumbs">
+								<a href="SearchDrug3.jsp"> <bean:message key="SearchDrug.title" /></a>&nbsp;&gt;&nbsp;
+								<a href="ShowAllergies2.jsp"> <bean:message key="EditAllergies.title" /></a>&nbsp;&gt;&nbsp;
+								<b><bean:message key="AddReaction.title" /></b>
+							</div>
 						</td>
 					</tr>
 					<!----Start new rows here-->
@@ -107,7 +106,7 @@
 					</tr>
 					<tr>
 						<td id="addAllergyDialogue">
-							<html:form action="/oscarRx/addAllergy2" focus="reactionDescription">
+							<html:form action="/oscarRx/addAllergy2" focus="reactionDescription" onsubmit="return validateAllergySubmit();">
 							<table>
 								<tr id="addReactionSubheading">
 									<td>
@@ -117,7 +116,7 @@
 								<tr valign="center">
 									<td>
 										<span class="label">Comment: </span>
-										<html:textarea property="reactionDescription" cols="40" rows="3" value="${allergy.description}" />
+										<html:textarea property="reactionDescription" cols="40" rows="3" value="${allergy.reaction}" />
 										<html:hidden property="ID" value="<%=allergyId%>" />
 										<html:hidden property="name" value="<%=name%>" />
 										<html:hidden property="type" value="<%=type%>" />
@@ -126,11 +125,13 @@
 								</tr>
 
 								<tr valign="center">
-									<td ><span class="label">Start Date:</span>
-										<html:text property="startDate" size="10" maxlength="10"
-												   value="<%=ConversionUtils.toDateString(allergyToArchive.getStartDate(), ConversionUtils.DEFAULT_DATE_PATTERN)%>">
-										</html:text>
-										(yyyy-mm-dd OR yyyy-mm OR yyyy)</td>
+									<td>
+										<span class="label">Start Date:</span>
+										<input id="startDate"
+											   name="startDate"
+											   value="<%=ConversionUtils.toDateString(allergyToArchive.getStartDate(), ConversionUtils.DEFAULT_DATE_PATTERN)%>">
+										<label for="startDate">(yyyy-mm-dd OR yyyy-mm OR yyyy)</label>
+									</td>
 								</tr>
 
 								<tr valign="center">
@@ -192,7 +193,7 @@
 
 								<tr>
 									<td >
-										<html:submit property="submit" value="Add Allergy" styleClass="ControlPushButton" />
+										<input type="submit" value="Add Allergy">
 										<input type=button class="ControlPushButton" id="cancelAddReactionButton"
 											onclick="window.location='ShowAllergies2.jsp?demographicNo=<%=sessionBean.getDemographicNo() %>'"
 											value="Cancel" />

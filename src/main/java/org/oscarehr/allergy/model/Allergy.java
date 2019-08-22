@@ -443,7 +443,7 @@ public class Allergy extends AbstractModel<Integer>
 		{
 			return ONSET_DESC_SLOW;
 		}
-		return ONSET_DESC_UNKNOWN + " " + onsetCode;
+		return ONSET_DESC_UNKNOWN;
 	 }
 
     public String getTypeDesc() {
@@ -524,7 +524,7 @@ public class Allergy extends AbstractModel<Integer>
 			return SEVERITY_DESC_SEVERE;
 		}
 
-		return(SEVERITY_DESC_UNKNOWN + " " + severityCode);
+		return SEVERITY_DESC_UNKNOWN;
 	}
 
     public String getAuditString() {
