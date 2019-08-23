@@ -36,9 +36,10 @@
 					background-color: $color-neutral-lighter;
 				}
 				.numberLabel {
+					float: left;
 					min-width: 24px;
+					margin-right: 4px;
 					font-weight: bold;
-					border-radius: 50%;
 				}
 			}
 		}

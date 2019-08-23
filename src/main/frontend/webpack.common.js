@@ -307,12 +307,9 @@ module.exports = {
 			'./src/report/reportBadAppointmentSheetController.js',
 			'./src/report/reportDaySheetController.js',
 			'./src/report/reportEdbListController.js',
-			'./src/report/reportFollowUpIntakeController.js',
 			'./src/report/reportNoShowAppointmentSheetController.js',
 			'./src/report/reportOldPatientsController.js',
 			'./src/report/reportPatientChartListController.js',
-			'./src/report/reportRegistrationIntakeController.js',
-			'./src/report/reportSHMentalHealthController.js',
 
 			'./src/document/module.js',
 			'./src/document/documentsController.js',

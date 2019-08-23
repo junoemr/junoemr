@@ -154,40 +154,6 @@ angular.module('Report').controller('Report.ReportsController', [
 				templateUrl: 'src/report/report_iframe.jsp',
 				iframeUrl: '../oscarReport/reportByTemplate/homePage.jsp'
 			},
-			{
-				name: 'General Forms',
-				group: 'CAISI',
-				templateUrl: 'src/report/report_iframe.jsp',
-				iframeUrl: '../PMmodule/ClientManager.do?method=getGeneralFormsReport'
-			},
-			{
-				name: 'Registration Intake',
-				group: 'CAISI',
-				templateUrl: 'src/report/report_registration_intake.jsp'
-			},
-			{
-				name: 'Follow-up Intake',
-				group: 'CAISI',
-				templateUrl: 'src/report/report_followup_intake.jsp'
-			},
-			{
-				name: 'Activity Report',
-				group: 'CAISI',
-				templateUrl: 'src/report/report_iframe.jsp',
-				iframeUrl: '../PMmodule/Reports/ProgramActivityReport.do'
-			},
-			{
-				name: 'UCF Report',
-				group: 'CAISI',
-				templateUrl: 'src/report/report_iframe.jsp',
-				iframeUrl: '../SurveyManager.do?method=reportForm'
-			},
-			{
-				name: 'SH Mental Health Report',
-				group: 'CAISI',
-				templateUrl: 'src/report/report_sh_mental_health.jsp'
-			},
-
 		];
 
 		controller.init = function init()
