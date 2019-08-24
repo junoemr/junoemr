@@ -46,4 +46,8 @@
 @import "../src/admin/integration/know2act/Know2act";
 @import "../src/admin/integration/fax/fax";
 @import "../src/record/forms/forms";
-
+@import "../src/record/forms/components/groupSelector/groupSelector";
+@import "../src/record/forms/components/views/completedView/completedView";
+@import "../src/record/forms/components/views/addView/addView";
+@import "../src/record/forms/components/views/revisionsView/revisionsView";
+@import "../src/record/forms/components/views/deletedView/deletedView";

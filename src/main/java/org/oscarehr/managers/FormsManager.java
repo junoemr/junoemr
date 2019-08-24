@@ -35,6 +35,7 @@ import org.oscarehr.common.dao.EncounterFormDao;
 import org.oscarehr.eform.model.EForm;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.common.model.EncounterForm;
+import org.oscarehr.eform.service.EFormDataService;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,9 @@ public class FormsManager {
 	
 	@Autowired
 	private EncounterFormDao encounterFormDao;
+
+	@Autowired
+	EFormDataService eFormDataService;
 
 	public static final String EFORM = "eform"; 
 	public static final String FORM = "form";
@@ -103,7 +107,21 @@ public class FormsManager {
 
 		return (results);
     }
-    
+
+	/**
+	 * return eform revisions for the given demographic
+	 * @param demographicId - the demographic you whish to get eform revisions for
+	 * @return - a list of eform data objects. each being a revision of an eform.
+	 */
+	public List<EFormData> getEFormRevisionsInstances(Integer demographicId)
+	{
+		return eFormDataDao.findInstancedVersionsByDemographicId(demographicId, null, null, false);
+	}
+
+	public List<EFormData> getDeletedEFormInstances(Integer demographicId)
+	{
+		return eFormDataDao.findInstancedByDemographicId(demographicId, null, null, false);
+	}
     
     public List<String> getGroupNames(){
     	return eFormGroupDao.getGroupNames();

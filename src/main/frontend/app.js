@@ -387,22 +387,45 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 			templateUrl: 'src/record/forms/forms.jsp',
 			controller: 'Record.Forms.FormController as formCtrl',
 			params: {
-				formListId: 0
+				viewState: FORM_CONTROLLER_STATES.COMPLETED
 			}
 		})
-		.state('record.forms.view',
-		{
-			url: '/view/:type/:id?name',
-			templateUrl: 'src/record/forms/forms.jsp',
-			params: { name: { dynamic: true } },
-			controller: 'Record.Forms.FormController as formCtrl'
-		})
+		.state('record.forms.completed',
+			{
+				url: '/completed',
+				templateUrl: 'src/record/forms/forms.jsp',
+				controller: 'Record.Forms.FormController as formCtrl',
+				params: {
+					viewState: FORM_CONTROLLER_STATES.COMPLETED
+				}
+			})
 		.state('record.forms.add',
+			{
+				url: '/add',
+				templateUrl: 'src/record/forms/forms.jsp',
+				controller: 'Record.Forms.FormController as formCtrl',
+				params: {
+					viewState: FORM_CONTROLLER_STATES.ADD
+				}
+			})
+		.state('record.forms.revisions',
 		{
-			url: '/add/:type/:id',
+			url: '/revisions',
 			templateUrl: 'src/record/forms/forms.jsp',
-			controller: 'Record.Forms.FormController as formCtrl'
+			controller: 'Record.Forms.FormController as formCtrl',
+			params: {
+				viewState: FORM_CONTROLLER_STATES.REVISION
+			}
 		})
+		.state('record.forms.deleted',
+			{
+				url: '/deleted',
+				templateUrl: 'src/record/forms/forms.jsp',
+				controller: 'Record.Forms.FormController as formCtrl',
+				params: {
+					viewState: FORM_CONTROLLER_STATES.DELETED
+				}
+			})
 		.state('record.consultRequests',
 		{
 			url: '/consults',
