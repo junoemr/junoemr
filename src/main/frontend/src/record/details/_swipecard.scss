@@ -1,0 +1,56 @@
+
+.swipecard-modal {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+
+	.modal-header {
+		display: flex;
+		align-items: center;
+		flex-direction: row;
+		justify-content: space-between;
+		border-bottom: 0;
+
+		.modal-title {
+			display: flex;
+			flex-grow: 1;
+			flex-direction: row;
+			align-items: center;
+			.align-baseline {
+				display: flex;
+				flex-grow: 1;
+				flex-direction: row;
+				align-items: baseline;
+				h4 {
+					padding: 0 16px;
+				}
+			}
+		}
+		.modal-ctl-buttons {
+			padding: 6px;
+			align-items: center;
+			justify-content: space-between;
+			display: flex;
+
+			.modal-patient-links {
+				margin-right: 20px;
+				.btn {
+					width: 28px;
+				}
+			}
+		}
+		.icon-modal-ctl {
+			font-size: 24px;
+			color: $color-primary-base;
+		}
+		.icon-modal-header {
+			font-size: 40px;
+			color: $color-neutral-white;
+		}
+	}
+	.modal-body {
+		.form-horizontal {
+			padding: 0 $modal-border-space $modal-border-space $modal-border-space;
+		}
+	}
+}

@@ -106,6 +106,12 @@
 							<div class="btn-group">
 								<button type="button" class="btn btn-default" ng-click="detailsCtrl.exportDemographic()"><bean:message key="export"/></button>
 							</div>
+
+						</div>
+						<div class="btn-group">
+							<button type="button" class="btn btn-success"
+							        ng-click="detailsCtrl.openSwipecardModal()">
+								Swipe Health Card</button>
 						</div>
 					</div>
 					<div class=" col-sm-2 col-xs-12 pull-right">
@@ -122,19 +128,19 @@
 	</div>
 	<div class="row">
 		<div class="col-md-10 col-lg-8 ">
-			<button type="button" class="btn {{detailsCtrl.page.readyForSwipe}}" 
-				ng-show="detailsCtrl.page.workflowEnhance" 
-				ng-click="detailsCtrl.setSwipeReady()" 
-				title="Click for Card Swipe">
-				{{detailsCtrl.page.swipecardMsg}}
-			</button>
-			<input type="text" id="swipecard" title="<bean:message key="web.record.details.clickCardSwipe"/>" 
-				ng-model="detailsCtrl.page.swipecard" 
-				ng-show="detailsCtrl.page.workflowEnhance" 
-				ng-focus="detailsCtrl.setSwipeReady()" 
-				ng-blur="detailsCtrl.setSwipeReady('off')" 
-				ng-keypress="detailsCtrl.healthCardHandler($event.keyCode)" 
-			/>
+			<%--<button type="button" class="btn {{detailsCtrl.page.readyForSwipe}}" --%>
+				<%--ng-show="detailsCtrl.page.workflowEnhance" --%>
+				<%--ng-click="detailsCtrl.setSwipeReady()" --%>
+				<%--title="Click for Card Swipe">--%>
+				<%--{{detailsCtrl.page.swipecardMsg}}--%>
+			<%--</button>--%>
+			<%--<input type="text" id="swipecard" title="<bean:message key="web.record.details.clickCardSwipe"/>" --%>
+				<%--ng-model="detailsCtrl.page.swipecard" --%>
+				<%--ng-show="detailsCtrl.page.workflowEnhance" --%>
+				<%--ng-focus="detailsCtrl.setSwipeReady()" --%>
+				<%--ng-blur="detailsCtrl.setSwipeReady('off')" --%>
+				<%--ng-keypress="detailsCtrl.healthCardHandler($event.keyCode)" --%>
+			<%--/>--%>
 
 			<div id="pd1" ng-click="detailsCtrl.checkAction($event)" ng-keypress="detailsCtrl.checkAction($event)">
 				
@@ -149,23 +155,23 @@
 					<label class="col-md-2 control-label required" title="Required Field">
 						<bean:message key="demographic.demographiceditdemographic.formLastName"/> 
 					</label>
-					<div class="col-md-4">
+					<div class="col-md-4"
+					     ng-class="{'has-warning': detailsCtrl.displayMessages.field_warnings()['lastName']}">
 						<input type="text" class="form-control form-control-details" 
 							placeholder="Family Name" title="Family Name" 
 							ng-model="detailsCtrl.page.demo.lastName" 
-							ng-change="detailsCtrl.formatLastName()" 
-							style="background-color:{{detailsCtrl.page.lastNameColor}}"
+							ng-change="detailsCtrl.formatLastName()"
 						/>
 					</div>
 					<label class="col-md-2 control-label required" title="Required Field">
 						<bean:message key="demographic.demographiceditdemographic.formFirstName"/> 
 					</label>
-					<div class="col-md-4">
+					<div class="col-md-4"
+					     ng-class="{'has-warning': detailsCtrl.displayMessages.field_warnings()['firstName']}">
 						<input type="text" class="form-control form-control-details" 
 							placeholder="First Name" title="First Name" 
 							ng-model="detailsCtrl.page.demo.firstName" 
-							ng-change="detailsCtrl.formatFirstName()" 
-							style="background-color:{{detailsCtrl.page.firstNameColor}}"
+							ng-change="detailsCtrl.formatFirstName()"
 						/>
 					</div>
 				</div>
@@ -174,7 +180,8 @@
 					<label class="col-md-2 control-label required" title="Required Field">
 						<bean:message key="web.record.details.dateOfBirth" /> 	
 					</label>
-					<div class="col-md-4">
+					<div class="col-md-4"
+					     ng-class="{'has-warning': detailsCtrl.displayMessages.field_warnings()['dob']}">
 						<div class="input-group vertical-align">
 							<input id="details-dob-year" type="text" placeholder="YYYY"
 								   title="Birthday Year" class="form-control form-control-details"
@@ -187,6 +194,7 @@
 								ng-model="detailsCtrl.page.demo.dobMonth"
 								ng-change="detailsCtrl.checkDate('DobM')"
 								ng-blur="detailsCtrl.formatDate('DobM')"
+							    <%--ng-class="{'has-warning': detailsCtrl.displayMessages.field_warnings()['dob']}"--%>
 							/>
 							<input id="details-dob-day" type="text" placeholder="DD"
 								title="Birthday Day"
@@ -194,6 +202,7 @@
 								ng-model="detailsCtrl.page.demo.dobDay"
 								ng-change="detailsCtrl.checkDate('DobD')"
 								ng-blur="detailsCtrl.formatDate('DobD')"
+							    <%--ng-class="{'has-warning': detailsCtrl.displayMessages.field_warnings()['dob']}"--%>
 							/>
 							<div>&nbsp;
 								(<span ng-if="!detailsCtrl.isNaN(detailsCtrl.page.demo.age)">{{detailsCtrl.page.demo.age}}y</span>)
@@ -205,11 +214,13 @@
 					<label class="col-md-2 control-label required" title="Required Field">
 						<bean:message key="demographic.demographiceditdemographic.formSex"/> 
 					</label>
-					<div class="col-md-4">
+					<div class="col-md-4"
+					     ng-class="{'has-warning': detailsCtrl.displayMessages.field_warnings()['sex']}"
+					>
 						<select class="form-control form-control-details" title="Sex"
 								ng-model="detailsCtrl.page.demo.sex"
 								ng-options="sexes.value as sexes.label for sexes in detailsCtrl.page.genders"
-						/>
+						></select>
 					</div>
 				</div>
 				
@@ -315,7 +326,9 @@
 
 				<div class="form-group">
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formAddr"/></label>
-					<div class="col-md-4">
+					<div class="col-md-4"
+					     ng-class="{'has-warning': detailsCtrl.displayMessages.field_warnings()['address']}"
+					>
 						<input type="text" placeholder="<bean:message key="demographic.demographiceditdemographic.formAddr"/>" 
 							title="<bean:message key="demographic.demographiceditdemographic.formAddr"/>" 
 							class="form-control form-control-details" 
@@ -324,7 +337,9 @@
 					</div>
 
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formCity"/></label>
-					<div class="col-md-4">
+					<div class="col-md-4"
+					     ng-class="{'has-warning': detailsCtrl.displayMessages.field_warnings()['city']}"
+					>
 						<input type="text" class="form-control form-control-details" 
 							placeholder="<bean:message key="demographic.demographiceditdemographic.formCity"/>" 
 							title="<bean:message key="demographic.demographiceditdemographic.formCity"/>" 
@@ -335,16 +350,21 @@
 
 				<div class="form-group">
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formProcvince"/></label>
-					<div class="col-md-4">
+					<div class="col-md-4"
+					     ng-class="{'has-warning': detailsCtrl.displayMessages.field_warnings()['province']}"
+					>
 						<select class="form-control form-control-details" 
 								title="<bean:message key="demographic.demographiceditdemographic.formProcvince"/>" 
 								ng-model="detailsCtrl.page.demo.address.province" 
-								ng-options="pv.value as pv.label for pv in detailsCtrl.page.provinces">
+								ng-options="pv.value as pv.label for pv in detailsCtrl.page.provinces"
+						>
 							<option value="">--</option>
 						</select>
 					</div>
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formPostal"/></label>
-					<div class="col-md-4">
+					<div class="col-md-4"
+					     ng-class="{'has-warning': detailsCtrl.displayMessages.field_warnings()['postal']}"
+					>
 						<input type="text" class="form-control form-control-details" 
 							placeholder="<bean:message key="demographic.demographiceditdemographic.formPostal"/>" 
 							title="<bean:message key="demographic.demographiceditdemographic.formPostal"/>" 
@@ -479,70 +499,64 @@
 					</label>
 					<div class="col-md-4">
 						<div class="input-group">
-							<input type="text" class="form-control form-control-details" 
-								placeholder="<bean:message key="demographic.demographiceditdemographic.msgHealthIns"/>" 
-								title="<bean:message key="demographic.demographiceditdemographic.msgHealthIns"/>" 
-								ng-model="detailsCtrl.page.demo.hin" 
-								ng-change="detailsCtrl.checkHin()" 
-								style="width:70%"
-							/>
-							<input type="text" class="form-control form-control-details" 
-								placeholder="<bean:message key="demographic.demographiceditdemographic.formVer"/>" 
-								title="HIN Version" 
-								ng-model="detailsCtrl.page.demo.ver" 
-								ng-change="detailsCtrl.checkHinVer()" 
-								style="width:30%; background-color:{{detailsCtrl.page.verColor}}"
-							/>
+							<div ng-class="{'has-warning': detailsCtrl.displayMessages.field_warnings()['hin']}"
+							>
+								<input type="text" class="form-control form-control-details"
+								       placeholder="<bean:message key="demographic.demographiceditdemographic.msgHealthIns"/>"
+								       title="<bean:message key="demographic.demographiceditdemographic.msgHealthIns"/>"
+								       ng-model="detailsCtrl.page.demo.hin"
+								       ng-change="detailsCtrl.checkHin()"
+								       style="width:70%"
+								/>
+							</div>
+							<div ng-class="{'has-warning': detailsCtrl.displayMessages.field_warnings()['ver']}">
+								<input type="text" class="form-control form-control-details"
+							            placeholder="<bean:message key="demographic.demographiceditdemographic.formVer"/>"
+							            title="HIN Version"
+							            ng-model="detailsCtrl.page.demo.ver"
+							            ng-change="detailsCtrl.checkHinVer()"
+							            style="width:30%;"
+								/>
+							</div>
 						</div>
 					</div>
 
 					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formHCType"/></label>
-					<div class="col-md-4">
+					<div class="col-md-4"
+					     ng-class="{'has-warning': detailsCtrl.displayMessages.field_warnings()['hcType']}"
+					>
 						<select class="form-control form-control-details" title="Health Card Type" 
 								ng-model="detailsCtrl.page.demo.hcType" 
-								ng-options="hct.value as hct.label for hct in detailsCtrl.page.provinces" 
-								style="background-color:{{detailsCtrl.page.hcTypeColor}}">
+								ng-options="hct.value as hct.label for hct in detailsCtrl.page.provinces"
+							>
 							<option value="" >--</option>
 						</select>
 					</div>
 				</div>
-				<div class="form-group">
-					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formEFFDate"/></label>
-					<div class="col-md-4">
-						<%--<input id="effDate"--%>
-							   <%--ng-model="detailsCtrl.page.demo.effDate"--%>
-							   <%--&lt;%&ndash;ng-model-options="{timezone: 'utc'}"&ndash;%&gt;--%>
-							<%--type="date"--%>
-							<%--class="form-control form-control-details" --%>
-							<%--title="Health Card Effective Date"--%>
-							<%--datepicker-popup="yyyy-MM-dd" --%>
-							<%--datepicker-append-to-body="true" --%>
-							<%--is-open="detailsCtrl.page.effDatePicker"--%>
-							<%--ng-click="detailsCtrl.page.effDatePicker = true"--%>
-							<%--placeholder="YYYY-MM-DD"--%>
-							<%--style="background-color:{{detailsCtrl.page.effDateColor}}"--%>
-							<%--ng-change="detailsCtrl.preventManualEffDate()"--%>
-						<%--/>--%>
-						<juno-datepicker-popup  juno-model="detailsCtrl.page.demo.effDate" show-icon="true" type="Input"> </juno-datepicker-popup>
-
+				<div class="row">
+					<div class="col-md-6">
+						<ca-field-date
+								ca-title="<bean:message key="demographic.demographiceditdemographic.formEFFDate"/>"
+								ca-label-size="col-md-4 control-label"
+								ca-input-size="col-md-8"
+								ca-date-picker-id="effDatePicker"
+								ca-name="effDatePicker"
+								ca-model="detailsCtrl.page.demo.effDate"
+								ca-warning="detailsCtrl.displayMessages.field_warnings()['effDate']"
+								ca-orientation="auto"
+						></ca-field-date>
 					</div>
-
-					<label class="col-md-2 control-label"><bean:message key="demographic.demographiceditdemographic.formHCRenewDate"/></label>
-					<div class="col-md-4">
-						<%--<input id="hcRenewDate" ng-model="detailsCtrl.page.demo.hcRenewDate" --%>
-							<%--type="date"--%>
-							<%--class="form-control form-control-details" --%>
-							<%--title="Health Card Renew Date" --%>
-							<%--datepicker-popup="yyyy-MM-dd" --%>
-							<%--datepicker-append-to-body="true" --%>
-							<%--is-open="detailsCtrl.page.hcRenewDatePicker" --%>
-							<%--ng-click="detailsCtrl.page.hcRenewDatePicker = true" --%>
-							<%--placeholder="YYYY-MM-DD" --%>
-							<%--style="background-color:{{detailsCtrl.page.hcRenewDateColor}}" --%>
-							<%--ng-change="detailsCtrl.preventManualHcRenewDate()"--%>
-						<%--/>--%>
-						<juno-datepicker-popup  juno-model="detailsCtrl.page.demo.hcRenewDate" show-icon="true" type="Input"> </juno-datepicker-popup>
-
+					<div class="col-md-6">
+						<ca-field-date
+								ca-title="<bean:message key="demographic.demographiceditdemographic.formHCRenewDate"/>"
+								ca-label-size="col-md-4 control-label"
+								ca-input-size="col-md-8"
+								ca-date-picker-id="hcRenewDatePicker"
+								ca-name="hcRenewDatePicker"
+								ca-model="detailsCtrl.page.demo.hcRenewDate"
+								ca-warning="detailsCtrl.displayMessages.field_warnings()['endDate']"
+								ca-orientation="auto"
+						></ca-field-date>
 					</div>
 				</div>
 			</div>

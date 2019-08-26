@@ -255,6 +255,7 @@ module.exports = {
 			'./src/record/forms/formsController.js',
 			'./src/record/details/module.js',
 			'./src/record/details/detailsController.js',
+			'./src/record/details/swipecardController.js',
 			'./src/record/phr/module.js',
 			'./src/record/phr/phrController.js',
 

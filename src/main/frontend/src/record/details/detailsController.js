@@ -31,8 +31,10 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'$stateParams',
 	'$state',
 	'$window',
+	'$uibModal',
 	'demographicService',
 	'demographicsService',
+	'errorsService',
 	'providersService',
 	'patientDetailStatusService',
 	'securityService',
@@ -47,8 +49,10 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		$stateParams,
 		$state,
 		$window,
+		$uibModal,
 		demographicService,
 		demographicsService,
+		messagesFactory,
 		providersService,
 		patientDetailStatusService,
 		securityService,
@@ -85,6 +89,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		var paperChartArchivedDate0;
 
 		controller.properties = $scope.$parent.recordCtrl.properties;
+		controller.displayMessages = messagesFactory.factory();
 
 		controller.init = function init()
 		{
@@ -486,6 +491,123 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			controller.page.demo.firstName = controller.page.demo.firstName.toUpperCase();
 		};
 
+		controller.openSwipecardModal = function openSwipecardModal()
+		{
+			var modalInstance = $uibModal.open(
+				{
+					templateUrl: 'src/record/details/swipecard.jsp',
+					controller: 'Record.Details.SwipecardController as swipecardController',
+					backdrop: 'static',
+					windowClass: 'juno-modal',
+				});
+			modalInstance.result.then(
+				// the object passed back on closing
+				function success(cardInfo)
+				{
+					console.info(cardInfo);
+					controller.fillDataFromSwipecard(cardInfo.data);
+				},
+				function error(errors)
+				{
+					// do nothing on dismissal
+				});
+		};
+		controller.fillDataFromSwipecard = function fillDataFromSwipecard(cardData)
+		{
+			controller.displayMessages.clear();
+
+			if (!Juno.Common.Util.isBlank(cardData.province))
+			{
+				controller.page.demo.address.province = cardData.province;
+				controller.page.demo.hcType = cardData.province;
+				controller.displayMessages.add_field_warning('province', "Province Changed");
+				controller.displayMessages.add_field_warning('hcType', "Health Card Type Changed");
+			}
+			if (!Juno.Common.Util.isBlank(cardData.lastName))
+			{
+				controller.page.demo.lastName = cardData.lastName;
+				controller.displayMessages.add_field_warning('lastName', "Last Name Changed");
+			}
+			if (!Juno.Common.Util.isBlank(cardData.firstName))
+			{
+				controller.page.demo.firstName = cardData.firstName;
+				controller.displayMessages.add_field_warning('firstName', "First Name Changed");
+			}
+			if (!Juno.Common.Util.isBlank(cardData.hin))
+			{
+				controller.page.demo.hin = cardData.hin;
+				controller.displayMessages.add_field_warning('hin', "HIN Changed");
+			}
+			if (!Juno.Common.Util.isBlank(cardData.versionCode))
+			{
+				controller.page.demo.ver = cardData.versionCode;
+				controller.displayMessages.add_field_warning('ver', "Version Code Changed");
+			}
+			if (!Juno.Common.Util.isBlank(cardData.sex))
+			{
+				controller.page.demo.sex = cardData.sex;
+				controller.displayMessages.add_field_warning('sex', "Sex Changed");
+			}
+			if (Oscar.HealthCardParser.validateDate(cardData.dobYear, cardData.dobMonth, cardData.dobDay))
+			{
+				controller.page.demo.dobYear = cardData.dobYear;
+				controller.page.demo.dobMonth = cardData.dobMonth;
+				controller.page.demo.dobDay = cardData.dobDay;
+				controller.displayMessages.add_field_warning('dob', "Date of Birth Changed");
+			}
+			if (Oscar.HealthCardParser.validateDate(cardData.effYear, cardData.effMonth, cardData.effDay))
+			{
+				controller.page.demo.effDate = Juno.Common.Util.formatMomentDate(
+					Juno.Common.Util.getDateMomentFromComponents(cardData.effYear, cardData.effMonth, cardData.effDay));
+				controller.displayMessages.add_field_warning('effDate', "Effective Date Changed");
+			}
+			if (Oscar.HealthCardParser.validateDate(cardData.endYear, cardData.endMonth, cardData.endDay))
+			{
+				var expireDate = Juno.Common.Util.getDateMomentFromComponents(cardData.endYear, cardData.endMonth, cardData.endDay);
+
+				controller.page.demo.hcRenewDate = Juno.Common.Util.formatMomentDate(expireDate);
+				controller.displayMessages.add_field_warning('endDate', "Hin End Date Changed");
+
+				var now = moment();
+				if(now.isAfter(expireDate))
+				{
+					controller.displayMessages.add_field_warning('endDate', "Health Card Expired");
+				}
+			}
+
+			if (!Juno.Common.Util.isBlank(cardData.address))
+			{
+				controller.page.demo.address.address = cardData.address;
+				controller.displayMessages.add_field_warning('address', "Address Changed");
+			}
+			if (!Juno.Common.Util.isBlank(cardData.city))
+			{
+				controller.page.demo.address.city = cardData.city;
+				controller.displayMessages.add_field_warning('city', "City Changed");
+			}
+			if (!Juno.Common.Util.isBlank(cardData.postal))
+			{
+				controller.page.demo.address.postal = cardData.postal;
+				controller.displayMessages.add_field_warning('postal', "Postal Code Changed");
+			}
+		};
+
+		// controller.fillData = function fillData(model, value, validationFn)
+		// {
+		// 	if(!Juno.Common.Util.isBlank(value))
+		// 	{
+		// 		let validFormData = true;
+		// 		if(typeof validationFn === "function")
+		// 		{
+		// 			validFormData = validationFn(value);
+		// 		}
+		// 		if(validFormData)
+		// 		{
+		// 			return value;
+		// 		}
+		// 	}
+		// 	return model;
+		// };
 
 		// //calculate age
 		// var now = new Date();
@@ -657,7 +779,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					controller.page.hcRenewDateColor = colorAttn;
 				}
 			}
-		}
+		};
 
 		//HCValidation
 		controller.validateHC = function validateHC()
@@ -682,7 +804,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				{
 					console.log(errors);
 				});
-		}
+		};
 
 		//manage hin/hinVer entries
 		controller.checkHin = function checkHin()
@@ -694,7 +816,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 			hin0 = controller.page.demo.hin;
 			controller.page.HCValidation = null;
-		}
+		};
 		controller.checkHinVer = function checkHinVer()
 		{
 			if (controller.page.demo.hcType == "ON")
@@ -704,7 +826,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				controller.page.demo.ver = controller.page.demo.ver.toUpperCase();
 			}
 			ver0 = controller.page.demo.ver;
-		}
+		};
 
 		//manage date entries
 		controller.checkDate = function checkDate(id)
@@ -760,7 +882,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				}
 			}
 			return true;
-		}
+		};
 
 		controller.isPostalComplete = function isPostalComplete()
 		{
@@ -824,7 +946,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 			alert("Invalid email address");
 			return false;
-		}
+		};
 
 		//check Chart No (length)
 		controller.checkChartNo = function checkChartNo()
@@ -836,7 +958,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 			if (controller.page.demo.chartNo.length > 10) controller.page.demo.chartNo = chartNo0;
 			else chartNo0 = controller.page.demo.chartNo;
-		}
+		};
 
 		//check Cytology Number
 		controller.checkCytoNum = function checkCytoNum()
@@ -907,7 +1029,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				}
 				sin0 = controller.page.demo.sin;
 			}
-		}
+		};
 
 		controller.validateSin = function validateSin()
 		{
@@ -926,54 +1048,54 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 			alert("Invalid SIN #");
 			return false;
-		}
+		};
 
 		//prevent manual input dates
 		controller.preventManualEffDate = function preventManualEffDate()
 		{
 			if (controller.page.demo.effDate == null) controller.page.demo.effDate = effDate0;
 			else effDate0 = controller.page.demo.effDate;
-		}
+		};
 		controller.preventManualHcRenewDate = function preventManualHcRenewDate()
 		{
 			if (controller.page.demo.hcRenewDate == null) controller.page.demo.hcRenewDate = hcRenewDate0;
 			else hcRenewDate0 = controller.page.demo.hcRenewDate;
-		}
+		};
 		controller.preventManualRosterDate = function preventManualRosterDate()
 		{
 			if (controller.page.demo.rosterDate == null) controller.page.demo.rosterDate = rosterDate0;
 			else rosterDate0 = controller.page.demo.rosterDate;
-		}
+		};
 		controller.preventManualRosterTerminationDate = function preventManualRosterTerminationDate()
 		{
 			if (controller.page.demo.rosterTerminationDate == null) controller.page.demo.rosterTerminationDate = rosterTerminationDate0;
 			else rosterTerminationDate0 = controller.page.demo.rosterTerminationDate;
-		}
+		};
 		controller.preventManualPatientStatusDate = function preventManualPatientStatusDate()
 		{
 			if (controller.page.demo.patientStatusDate == null) controller.page.demo.patientStatusDate = patientStatusDate0;
 			else patientStatusDate0 = controller.page.demo.patientStatusDate;
-		}
+		};
 		controller.preventManualDateJoined = function preventManualDateJoined()
 		{
 			if (controller.page.demo.dateJoined == null) controller.page.demo.dateJoined = dateJoined0;
 			else dateJoined0 = controller.page.demo.dateJoined;
-		}
+		};
 		controller.preventManualEndDate = function preventManualEndDate()
 		{
 			if (controller.page.demo.endDate == null) controller.page.demo.endDate = endDate0;
 			else endDate0 = controller.page.demo.endDate;
-		}
+		};
 		controller.preventManualOnWaitingListSinceDate = function preventManualOnWaitingListSinceDate()
 		{
 			if (controller.page.demo.onWaitingListSinceDate == null) controller.page.demo.onWaitingListSinceDate = onWaitingListSinceDate0;
 			else onWaitingListSinceDate0 = controller.page.demo.onWaitingListSinceDate;
-		}
+		};
 		controller.preventManualPaperChartArchivedDate = function preventManualPaperChartArchivedDate()
 		{
 			if (controller.page.demo.scrPaperChartArchivedDate == null) controller.page.demo.scrPaperChartArchivedDate = paperChartArchivedDate0;
 			else paperChartArchivedDate0 = controller.page.demo.scrPaperChartArchivedDate;
-		}
+		};
 
 		//show/hide items
 		// TODO: FIGURE OUT BETTER WAY TO SYNCHRONIZE THIS WITH DEMOGRAPHIC LOADING
@@ -1376,6 +1498,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.save = function save()
 		{
 			controller.page.saving = true;
+			controller.displayMessages.clear();
 
 			//check required fields
 			if (controller.page.demo.lastName == null || controller.page.demo.lastName == "")
