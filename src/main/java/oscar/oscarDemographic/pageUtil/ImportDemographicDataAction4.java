@@ -237,6 +237,7 @@ import java.util.zip.ZipInputStream;
         ArrayList<String> warnings = new ArrayList<String>();
         ArrayList<String[]> logs = new ArrayList<String[]>();
         File importLog = null;
+        String defaultSite = frm.getDefaultSite();
 
 	try {
             InputStream is = imp.getInputStream();
@@ -264,7 +265,7 @@ import java.util.zip.ZipInputStream;
                         OutputStream out = new FileOutputStream(ofile);
                         while ((len=in.read(buf)) > 0) out.write(buf,0,len);
                         out.close();
-                        logs.add(importXML(LoggedInInfo.getLoggedInInfoFromSession(request) , ofile, warnings, request,frm.getTimeshiftInDays(),students,courseId));
+                        logs.add(importXML(LoggedInInfo.getLoggedInInfoFromSession(request) , ofile, warnings, request,frm.getTimeshiftInDays(),students,courseId, defaultSite));
                         importNo++;
                         demographicNo=null;
                     }
@@ -280,7 +281,7 @@ import java.util.zip.ZipInputStream;
                 Util.cleanFile(ifile);
 
             } else if (matchFileExt(ifile, "xml")) {
-                logs.add(importXML(LoggedInInfo.getLoggedInInfoFromSession(request), ifile, warnings, request,frm.getTimeshiftInDays(),students,courseId));
+                logs.add(importXML(LoggedInInfo.getLoggedInInfoFromSession(request), ifile, warnings, request,frm.getTimeshiftInDays(),students,courseId, defaultSite));
                 demographicNo=null;
                 importLog = makeImportLog(logs, tmpDir);
             } else {
@@ -290,7 +291,8 @@ import java.util.zip.ZipInputStream;
 	} catch (Exception e) {
             warnings.add("Error processing file: " + imp.getFileName());
             logger.error("Error", e);
-	}
+            importLog = makeImportLog(logs, tmpDir);
+    }
 
         //channel warnings and importlog to browser
         request.setAttribute("warnings",warnings);
@@ -300,9 +302,9 @@ import java.util.zip.ZipInputStream;
         return mapping.findForward("success");
     }
 
-    String[] importXML(LoggedInInfo loggedInInfo, String xmlFile, ArrayList<String> warnings, HttpServletRequest request, int timeShiftInDays,List<Provider> students, int courseId) throws SQLException, Exception {
+    String[] importXML(LoggedInInfo loggedInInfo, String xmlFile, ArrayList<String> warnings, HttpServletRequest request, int timeShiftInDays,List<Provider> students, int courseId, String defaultSite) throws SQLException, Exception {
         if(students == null || students.isEmpty()) {
-            return importXML(loggedInInfo, xmlFile,warnings,request,timeShiftInDays,null,null,0);
+            return importXMLForProvider(loggedInInfo, xmlFile,warnings,request,timeShiftInDays,null,null,0, defaultSite);
         }
 
         List<String> logs = new ArrayList<String>();
@@ -317,7 +319,7 @@ import java.util.zip.ZipInputStream;
             }
             Program p = programManager.getProgram(pid);
 
-            String[] result = importXML(loggedInInfo, xmlFile,warnings,request,timeShiftInDays,student,p,courseId);
+            String[] result = importXMLForProvider(loggedInInfo, xmlFile,warnings,request,timeShiftInDays,student,p,courseId, defaultSite);
             logs.addAll(convertLog(result));
         }
         return logs.toArray(new String[logs.size()]);
@@ -331,7 +333,7 @@ import java.util.zip.ZipInputStream;
 
 
 
-    String[] importXML(LoggedInInfo loggedInInfo, String xmlFile, ArrayList<String> warnings, HttpServletRequest request, int timeShiftInDays, Provider student, Program admitTo, int courseId) throws SQLException, Exception {
+    String[] importXMLForProvider(LoggedInInfo loggedInInfo, String xmlFile, ArrayList<String> warnings, HttpServletRequest request, int timeShiftInDays, Provider student, Program admitTo, int courseId, String defaultSite) throws SQLException, Exception {
         ArrayList<String> err_demo = new ArrayList<String>(); //errors: duplicate demographics
         ArrayList<String> err_data = new ArrayList<String>(); //errors: discrete data
         ArrayList<String> err_summ = new ArrayList<String>(); //errors: summary
@@ -1852,7 +1854,6 @@ import java.util.zip.ZipInputStream;
                     }
                     String apptStatus = appArray[i].getAppointmentStatus();
                     for (int j=1; j<allStatus.length; j++) {
-                        MiscUtils.getLogger().info(allTitle[j] + " ==? " + apptStatus);
                         if (allTitle[j].equalsIgnoreCase(org.apache.commons.lang.StringUtils.trimToEmpty(apptStatus))) {
                             status = allStatus[j];
                             apptStatus = null;
@@ -1861,7 +1862,6 @@ import java.util.zip.ZipInputStream;
                     }
                     if (StringUtils.empty(status)) {
                         status = allStatus[0];
-//                        	err_note.add("Cannot map appointment status ["+apptStatus+"]. Appointment Status set to [To Do]");
                     }
 
                     reason = StringUtils.noNull(appArray[i].getAppointmentPurpose());
@@ -1884,6 +1884,10 @@ import java.util.zip.ZipInputStream;
                     appt.setDemographicNo(Integer.parseInt(demographicNo));
                     appt.setCreator(admProviderNo);
                     appt.setLastUpdateUser(admProviderNo);
+                    if (defaultSite != null && !defaultSite.isEmpty())
+                    {
+                        appt.setLocation(defaultSite);
+                    }
                     appt.setNotes(notes);
                     appt.setReason(reason);
                     appt.setStatus(status);
@@ -2296,7 +2300,7 @@ import java.util.zip.ZipInputStream;
                 out.newLine();
                 out.write(fillUp("",'-',tableWidth)); out.newLine();
 
-                for (int i=0; i<importNo; i++) {
+                for (int i=0; i < demo.size(); i++) {
                     Integer id = entries.get(PATIENTID+i);
                     if (id==null) id = 0;
                     out.write(fillUp(id.toString(), ' ', column1.length()));

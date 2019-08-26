@@ -37,7 +37,8 @@ public class ImportDemographicDataForm extends ActionForm {
    boolean matchProviderNames = true;
    int timeshiftInDays;
    String courseId;
-   
+   // Multisite setting to determine which site to associate items with by default
+   private String defaultSite;
 
    public ImportDemographicDataForm() {
    
@@ -83,6 +84,14 @@ public class ImportDemographicDataForm extends ActionForm {
 		this.courseId = courseId;
 	}
 
+	public String getDefaultSite()
+	{
+		return defaultSite;
+	}
 
-	
+	public void setDefaultSite(String defaultSite)
+	{
+		this.defaultSite = defaultSite;
+	}
+
 }
