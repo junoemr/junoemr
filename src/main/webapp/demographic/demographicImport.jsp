@@ -62,7 +62,7 @@
 	}
 	List<Site> sites = null;
 
-	boolean multisites = "on".equals(OscarProperties.getInstance().getProperty("multisites"));
+	boolean multisites = OscarProperties.getInstance().isMultisiteEnabled();
 	if (multisites)
 	{
 		SiteDao siteDao = SpringUtils.getBean(SiteDao.class);
