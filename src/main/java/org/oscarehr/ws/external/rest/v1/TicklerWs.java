@@ -36,6 +36,7 @@ import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -84,7 +85,7 @@ public class TicklerWs extends AbstractExternalRestWs
 	@PUT
 	@Path("/{id}")
 	@Operation(summary = "Update the specified tickler")
-	public RestResponse<TicklerTransferOutbound> updateTickler(@PathParam("id") Integer id, TicklerTransferInbound ticklerIn)
+	public RestResponse<TicklerTransferOutbound> updateTickler(@PathParam("id") Integer id, @Valid TicklerTransferInbound ticklerIn)
 	{
 		String providerNoStr = getOAuthProviderNo();
 		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_tickler");
@@ -100,7 +101,7 @@ public class TicklerWs extends AbstractExternalRestWs
 	@POST
 	@Path("/")
 	@Operation(summary="Create a new tickler")
-	public RestResponse<TicklerTransferOutbound> createTickler(TicklerTransferInbound ticklerIn)
+	public RestResponse<TicklerTransferOutbound> createTickler( @Valid TicklerTransferInbound ticklerIn)
 	{
 		String providerNoStr = getOAuthProviderNo();
 		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_tickler");

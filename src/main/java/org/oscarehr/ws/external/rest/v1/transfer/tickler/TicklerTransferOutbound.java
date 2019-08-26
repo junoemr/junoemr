@@ -26,9 +26,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.oscarehr.common.model.Tickler;
 import org.springframework.beans.BeanUtils;
+import oscar.util.ConversionUtils;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @XmlRootElement
 @Schema(description = "Tickler data transfer object, outbound")
@@ -39,13 +40,17 @@ public class TicklerTransferOutbound extends TicklerTransferBase
 	private Integer id;
 
 	@Schema(description = "The last update date of the tickler")
-	private Date updateDate;
+	private LocalDateTime updateDate;
 
 	public TicklerTransferOutbound() {}
 
 	public TicklerTransferOutbound(Tickler tickler)
 	{
-		BeanUtils.copyProperties(tickler, this);
+		String [] ignore = {"updateDate", "serviceDate"};
+		BeanUtils.copyProperties(tickler, this, ignore);
+		//dates do not copy properly, do manually
+		setServiceDate(ConversionUtils.toLocalDateTime(tickler.getServiceDate()));
+		setUpdateDate(ConversionUtils.toLocalDateTime(tickler.getUpdateDate()));
 	}
 
 	public Integer getId()
@@ -58,12 +63,12 @@ public class TicklerTransferOutbound extends TicklerTransferBase
 		this.id = id;
 	}
 
-	public Date getUpdateDate()
+	public LocalDateTime getUpdateDate()
 	{
 		return updateDate;
 	}
 
-	public void setUpdateDate(Date updateDate)
+	public void setUpdateDate(LocalDateTime updateDate)
 	{
 		this.updateDate = updateDate;
 	}

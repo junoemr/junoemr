@@ -28,15 +28,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.ws.validator.DemographicNoConstraint;
 import org.oscarehr.ws.validator.ProviderNoConstraint;
-import org.oscarehr.ws.validator.StringValueConstraint;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
+import oscar.util.ConversionUtils;
 
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,12 +46,10 @@ import java.util.Set;
 public abstract class TicklerTransferBase implements Serializable
 {
 	@NotNull
-	@Size(max=10)
 	@DemographicNoConstraint(allowNull = false)
 	@Schema(description="The demographic number to which this tickler pertains")
 	private Integer demographicNo;
 
-	@Size(max=11)
 	@Schema(description="The program that the tickler is in")
 	private Integer programId;
 
@@ -60,22 +58,19 @@ public abstract class TicklerTransferBase implements Serializable
 	private String message;
 
 	@NotNull
-	@Size(max=1)
-	@Schema(description="The status of the tickler, Ex: 'A' for active, 'D' for deleted")
-	@StringValueConstraint(allows = {"A", "C", "D"})
+	@Schema(description="The status of the tickler, Ex: 'A' for active, 'D' for deleted", allowableValues = {"A", "C", "D"}, example = "A")
 	private Tickler.STATUS status;
 
 	@NotNull
 	@Schema(description = "The date after which the tickler becomes 'overdue'")
-	private Date serviceDate;
+	private LocalDateTime serviceDate;
 
 	@ProviderNoConstraint(allowNull = false)
 	@Size(max=6)
 	@Schema(description = "The provider number for the creator of the tickler")
 	private String creator;
 
-	@Schema(description = "The priority fo the tickler.")
-	@StringValueConstraint(allows = {"High", "Low", "Normal"})
+	@Schema(description = "The priority fo the tickler.", allowableValues = {"High", "Low", "Normal"}, example="Normal")
 	private Tickler.PRIORITY priority;
 
 	@NotNull
@@ -127,12 +122,12 @@ public abstract class TicklerTransferBase implements Serializable
 		this.status = status;
 	}
 
-	public Date getServiceDate()
+	public LocalDateTime getServiceDate()
 	{
 		return serviceDate;
 	}
 
-	public void setServiceDate(Date serviceDate)
+	public void setServiceDate(LocalDateTime serviceDate)
 	{
 		this.serviceDate = serviceDate;
 	}
@@ -184,7 +179,10 @@ public abstract class TicklerTransferBase implements Serializable
 	public Tickler toTickler()
 	{
 		Tickler t = new Tickler();
-		BeanUtils.copyProperties(this, t);
+		String [] ignore = {"serviceDate"};
+		BeanUtils.copyProperties(this, t, ignore);
+		//dates do not copy properly, copy manually
+		t.setServiceDate(ConversionUtils.toNullableLegacyDateTime(getServiceDate()));
 		return t;
 	}
 

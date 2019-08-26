@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.oscarehr.common.model.Tickler;
 import org.springframework.beans.BeanUtils;
+import oscar.util.ConversionUtils;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -44,6 +45,12 @@ public class TicklerTransferInbound extends TicklerTransferBase
 	public Tickler copyToTickler(Tickler t)
 	{
 		BeanUtils.copyProperties(this, t, getNullPropertyNames(this));
+		//dates will not copy properly, must do manual copy
+		if (this.getServiceDate() != null)
+		{
+			t.setServiceDate(ConversionUtils.toLegacyDateTime(this.getServiceDate()));
+		}
+
 		return t;
 	}
 }
