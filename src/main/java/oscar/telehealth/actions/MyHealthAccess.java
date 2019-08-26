@@ -28,191 +28,181 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
 import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.common.model.Site;
-import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.integration.myhealthaccess.dto.ClinicUserAccessTokenTo1;
+import org.oscarehr.integration.myhealthaccess.dto.ClinicUserCreateTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserTo1;
 import org.oscarehr.integration.myhealthaccess.exception.BaseException;
+import org.oscarehr.integration.myhealthaccess.exception.DuplicateRecordException;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
-import org.oscarehr.integration.myhealthaccess.service.ClinicService;
+import org.oscarehr.integration.myhealthaccess.model.MHAUserToken;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
 public class MyHealthAccess extends DispatchAction
 {
-	private MyHealthAccessService myHealthAccessService =
-			SpringUtils.getBean(MyHealthAccessService.class);
-	private ClinicService clinicService = SpringUtils.getBean(ClinicService.class);
-	private DemographicDao demographicDao =
-			(DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+	private static MyHealthAccessService myHealthAccessService = SpringUtils.getBean(MyHealthAccessService.class);
+	private static SecurityDao securityDao = SpringUtils.getBean(SecurityDao.class);
 
-	private ProviderData loggedInProvider;
-	private Security loggedInUser;
-	private ClinicUserTo1 remoteUser;
-
-	public ActionForward startTelehealth(ActionMapping mapping,
-										 ActionForm form,
-										 HttpServletRequest request,
-										 HttpServletResponse response) throws UnsupportedEncodingException
+	public ActionForward startTelehealth(ActionMapping mapping, ActionForm form,
+	                                     HttpServletRequest request, HttpServletResponse response)
 	{
-		MiscUtils.getLogger().error("Start Telehealth!");
 		try
 		{
-			MiscUtils.getLogger().error("Set logged in data");
-			setLoggedInData(request);
-		} catch (RecordNotFoundException e)
+			ClinicUserTo1 remoteUser = fetchRemoteUser(request);
+			String remoteUserID = remoteUser.getMyhealthaccesID();
+
+			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+			Security loggedInUser = loggedInInfo.getLoggedInSecurity();
+
+			MHAUserToken longToken = MHAUserToken.decodeToken(loggedInUser.getMyHealthAccessLongToken());
+
+			if (longToken == null || longToken.isExpired())
+			{
+				ActionRedirect loginAction = new ActionRedirect(mapping.findForward("mhaLogin"));
+				loginAction.addParameter("siteName", request.getParameter("siteName"));
+				loginAction.addParameter("appt", request.getParameter("appt"));
+				loginAction.addParameter("remoteUser", remoteUserID);
+
+				return loginAction;
+			}
+
+			Site site = getSite(request);
+			String appointmentNo = request.getParameter("appt");
+			String mhaRemoteID = remoteUser.getMyhealthaccesID();
+
+			if (longToken.expiresWithinDays(7))
+			{
+				MHAUserToken renewedToken = myHealthAccessService.renewLongToken(site, remoteUserID, loggedInUser);
+				persistToken(request.getSession(), loggedInUser, renewedToken.getToken());
+			}
+
+			String endpoint = myHealthAccessService.buildTeleHealthRedirectURL(mhaRemoteID, site, appointmentNo);
+
+			return pushToMyHealthAccess(endpoint, site, mhaRemoteID, loggedInUser);
+		}
+		catch (RecordNotFoundException e)
 		{
-			MiscUtils.getLogger().error("Couldn't find user. Creating...");
-			ActionRedirect createUserAction =
-					new ActionRedirect(mapping.findForward("createUser"));
-			createUserAction.addParameter(
-					"demographicNo", request.getParameter("demographicNo"));
+			ActionRedirect createUserAction = new ActionRedirect(mapping.findForward("createUser"));
 			createUserAction.addParameter("siteName", request.getParameter("siteName"));
+			createUserAction.addParameter("appt", request.getParameter("appt"));
+
 			return createUserAction;
 		}
+	}
 
-		MiscUtils.getLogger().error("Got logged in data");
+	public ActionForward createUser(ActionMapping mapping, ActionForm form,
+	                                HttpServletRequest request, HttpServletResponse response)
+	{
+		String email = request.getParameter("email");
 
-		ClinicUserAccessTokenTo1 myHealthAccessAuthToken = loggedInUser.getMyHealthAccessAuthToken();
-		if (myHealthAccessAuthToken == null || myHealthAccessAuthToken.isExpired())
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		ProviderData loggedInProvider = loggedInInfo.getLoggedInProvider().getProvider();
+		Security loggedInUser = loggedInInfo.getLoggedInSecurity();
+
+		try
 		{
-			MiscUtils.getLogger().error("token null or expired");
-			ActionRedirect loginAction = new ActionRedirect(mapping.findForward("pushLogin"));
-			loginAction.addParameter(
-					"demographicNo", request.getParameter("demographicNo"));
+			ClinicUserCreateTo1 remoteUser = myHealthAccessService.createUser(loggedInUser, loggedInProvider, email, getSite(request));
+			persistToken(request.getSession(), loggedInUser, remoteUser.getAccessToken());
+
+			ActionRedirect confirmUserAction = new ActionRedirect(mapping.findForward("confirmUser"));
+			confirmUserAction.addParameter("siteName", request.getParameter("siteName"));
+			confirmUserAction.addParameter("appt", request.getParameter("appt"));
+			confirmUserAction.addParameter("email", email);
+			confirmUserAction.addParameter("remoteUser", remoteUser.getMyhealthaccesID());
+
+			return confirmUserAction;
+		}
+		catch (DuplicateRecordException e)
+		{
+			ClinicUserTo1 remoteUser = myHealthAccessService.getUserByEmail(email, getSite(request));
+
+			ActionRedirect loginAction = new ActionRedirect(mapping.findForward("mhaLogin"));
 			loginAction.addParameter("siteName", request.getParameter("siteName"));
+			loginAction.addParameter("appt", request.getParameter("appt"));
+			loginAction.addParameter("email", email);
+			loginAction.addParameter("remoteUser", remoteUser.getMyhealthaccesID());
+
 			return loginAction;
 		}
-
-		return pushLogin(myHealthAccessAuthToken, mapping, form, request, response);
 	}
 
-	public ActionForward createUser(ActionMapping mapping,
-									ActionForm form,
-									HttpServletRequest request,
-									HttpServletResponse response)
+	public ActionForward confirmUser(ActionMapping mapping, ActionForm form,
+	                                 HttpServletRequest request, HttpServletResponse response)
 	{
-		String email = request.getParameter("email");
-		MiscUtils.getLogger().error("Create User with email: " + email);
+		Site site = getSite(request);
+		String appointmentNo = request.getParameter("appt");
+		String remoteUser = request.getParameter("remoteUser");
 
-		ClinicUserTo1 clinicUser = null;
-		try
-		{
-			clinicUser = myHealthAccessService.getUserByEmail(email, getSite(request));
-		} catch (RecordNotFoundException e)
-		{
-			// CREATE USER if not exists
-			clinicUser = myHealthAccessService.createUser(
-					loggedInUser, loggedInProvider, email, getSite(request));
-			ActionRedirect createdUserAction =
-					new ActionRedirect(mapping.findForward("createdUser"));
-			createdUserAction.addParameter(
-					"demographicNo", request.getParameter("demographicNo"));
-			createdUserAction.addParameter("siteName", request.getParameter("siteName"));
-			return createdUserAction;
-		}
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		Security loggedInUser = loggedInInfo.getLoggedInSecurity();
 
-		ActionRedirect loginAction =
-				new ActionRedirect(mapping.findForward("pushLogin"));
-		loginAction.addParameter(
-				"demographicNo", request.getParameter("demographicNo"));
-		loginAction.addParameter("siteName", request.getParameter("siteName"));
-		loginAction.addParameter("email", email);
-		return loginAction;
+		String endpoint = myHealthAccessService.buildTeleHealthRedirectURL(remoteUser, site, appointmentNo);
+
+		return pushToMyHealthAccess(endpoint, getSite(request), remoteUser, loggedInUser);
 	}
 
-	public ActionForward login(ActionMapping mapping,
-							   ActionForm form,
-							   HttpServletRequest request,
-							   HttpServletResponse response) throws
-			NoSuchAlgorithmException,
-			IOException,
-			KeyManagementException
+	public ActionForward login(ActionMapping mapping, ActionForm form,
+	                           HttpServletRequest request, HttpServletResponse response)
+			throws NoSuchAlgorithmException, IOException, KeyManagementException
 	{
-
-		setLoggedInData(request);
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
-		ClinicUserAccessTokenTo1 myHealthAccessAuthToken;
+
+		Site site = getSite(request);
+
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		Security loggedInUser = loggedInInfo.getLoggedInSecurity();
+		String remoteUser = request.getParameter("remoteUser");
+
 		try
 		{
-			myHealthAccessAuthToken = myHealthAccessService.getLoginToken(
-					loggedInUser,
-					getSite(request),
-					remoteUser.getMyhealthaccesID(),
-					email,
-					password);
-		} catch (BaseException e)
+			MHAUserToken longToken = myHealthAccessService.getLongToken(site, remoteUser, loggedInUser, email, password);
+			persistToken(request.getSession(), loggedInUser, longToken.getToken());
+		}
+		catch (BaseException e)
 		{
 			if (e.getErrorObject().hasAuthError())
 			{
-				ActionRedirect loginAction =
-						new ActionRedirect(mapping.findForward("pushLogin"));
-				loginAction.addParameter(
-						"demographicNo", request.getParameter("demographicNo"));
+				ActionRedirect loginAction = new ActionRedirect(mapping.findForward("mhaLogin"));
 				loginAction.addParameter("siteName", request.getParameter("siteName"));
 				loginAction.addParameter("email", email);
+				loginAction.addParameter("appt", request.getParameter("appt"));
 				loginAction.addParameter("errorMessage", "Failed to authenticate");
 				return loginAction;
 			}
+
 			throw e;
 		}
-		return pushLogin(myHealthAccessAuthToken, mapping, form, request, response);
+
+		String appointmentNo = request.getParameter("appt");
+		String endpoint = myHealthAccessService.buildTeleHealthRedirectURL(remoteUser, site, appointmentNo);
+
+		return pushToMyHealthAccess(endpoint, getSite(request), remoteUser, loggedInUser);
 	}
 
-
-	public ActionForward pushLogin(
-			ClinicUserAccessTokenTo1 myHealthAccessAuthToken,
-			ActionMapping mapping,
-			ActionForm form,
-			HttpServletRequest request,
-			HttpServletResponse response) throws UnsupportedEncodingException
+	private ActionForward pushToMyHealthAccess(String myHealthAccessURL, Site site, String remoteUser, Security loggedInUser)
 	{
-		MiscUtils.getLogger().error("LOGGING IN!");
-		Demographic patient = getDemographic(request);
-//		if (patient == null)
-//		{
-//			ActionRedirect errorAction = new ActionRedirect(mapping.findForward("error"));
-//			errorAction.addParameter(
-//					"errorMessage",
-//					"Failed to find patient record");
-//			return errorAction;
-//		}
+		MHAUserToken shortToken = myHealthAccessService.getShortToken(site, remoteUser, loggedInUser);
 
-		Site site = getSite(request);
-		String myHealthAccessURL = myHealthAccessService.buildTeleHealthRedirectURL(
-				myHealthAccessAuthToken,
-				remoteUser,
-				patient,
-				site);
+		myHealthAccessURL = myHealthAccessURL + "#token=" + URLEncoder.encode(shortToken.getToken());
 
 		ActionRedirect myHealthAccessRedirectAction = new ActionRedirect();
 		myHealthAccessRedirectAction.setPath(myHealthAccessURL);
 		myHealthAccessRedirectAction.setRedirect(true);
 		return myHealthAccessRedirectAction;
-	}
-
-	private Demographic getDemographic(HttpServletRequest request)
-	{
-		String demographicNo = request.getParameter("demographicNo");
-		if(demographicNo == null || demographicNo.isEmpty())
-		{
-			return null;
-		}
-		return demographicDao.find(Integer.parseInt(demographicNo));
 	}
 
 	private Site getSite(HttpServletRequest request)
@@ -227,26 +217,39 @@ public class MyHealthAccess extends DispatchAction
 		return siteDao.findByName(siteName);
 	}
 
-	private void setLoggedInData(HttpServletRequest request)
+	private ClinicUserTo1 fetchRemoteUser(HttpServletRequest request)
 	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		loggedInProvider = loggedInInfo.getLoggedInProvider().getProvider();
-		loggedInUser = loggedInInfo.getLoggedInSecurity();
-		MiscUtils.getLogger().error("Logged in user: " + Integer.toString(loggedInUser.getId()));
+		Security loggedInUser = loggedInInfo.getLoggedInSecurity();
+
 		try
 		{
-			remoteUser = myHealthAccessService.getLinkedUser(loggedInUser, getSite(request));
-		} catch (RecordNotFoundException e)
+			return myHealthAccessService.getLinkedUser(loggedInUser, getSite(request));
+		}
+
+		catch (RecordNotFoundException e)
 		{
 			String email = request.getParameter("email");
+
 			if (email != null && !email.isEmpty())
 			{
-				remoteUser = myHealthAccessService.getUserByEmail(email, getSite(request));
-			} else
+				return myHealthAccessService.getUserByEmail(email, getSite(request));
+			}
+			else
 			{
 				throw e;
 			}
 		}
-		MiscUtils.getLogger().error("LInked user: " + remoteUser.getMyhealthaccesID());
+	}
+
+	private void persistToken(HttpSession session, Security loggedInUser, String token)
+	{
+		Security securityRecord = securityDao.find(loggedInUser.getId());
+		securityRecord.setMyHealthAccessLongToken(token);
+		securityDao.merge(securityRecord);
+
+		LoggedInInfo currentUser = LoggedInInfo.getLoggedInInfoFromSession(session);
+		currentUser.getLoggedInSecurity().setMyHealthAccessLongToken(token);
+		LoggedInInfo.setLoggedInInfoIntoSession(session, currentUser);
 	}
 }

@@ -25,52 +25,19 @@ package org.oscarehr.integration.myhealthaccess.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.io.Serializable;
-
-public class ClinicUserLoginTo1 implements Serializable
+public class ClinicUserCreateTo1 extends ClinicUserTo1
 {
-	@JsonProperty(value="email", required=true)
-	private String email;
 
-	@JsonProperty(value="password", required=true)
-	private String password;
+	@JsonProperty(value="access_token")
+	String accessToken;
 
-	@JsonProperty("remote_id")
-	private String remoteID;
-
-	public ClinicUserLoginTo1(String email, String password)
+	public String getAccessToken()
 	{
-		this.email = email;
-		this.password = password;
+		return accessToken;
 	}
 
-	public String getEmail()
+	public void setAccessToken(String accessToken)
 	{
-		return email;
-	}
-
-	public void setEmail(String email)
-	{
-		this.email = email;
-	}
-
-	public String getPassword()
-	{
-		return password;
-	}
-
-	public void setPassword(String password)
-	{
-		this.password = password;
-	}
-
-	public String getRemoteID()
-	{
-		return remoteID;
-	}
-
-	public void setRemoteID(String remoteId)
-	{
-		this.remoteID = remoteId;
+		this.accessToken = accessToken;
 	}
 }
