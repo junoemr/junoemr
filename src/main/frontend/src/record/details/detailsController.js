@@ -348,7 +348,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					controller.page.demo.age = Juno.Common.Util.calcAge(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
 					controller.formatLastName(); //done on page load
 					controller.formatFirstName(); //done on page load
-					controller.setSwipeReady(); //done on page load
 					controller.validateHCSave();
 				},
 				function error(errors)
@@ -362,6 +361,25 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		controller.initDemographicVars = function initDemographicVars()
 		{
+			var effDateMoment = moment(controller.page.demo.effDate);
+			if(effDateMoment.isValid())
+			{
+				controller.page.demo.effDate = Juno.Common.Util.formatMomentDate(effDateMoment);
+			}
+			else
+			{
+				controller.page.demo.effDate = null;
+			}
+			var hcRenewDateMoment = moment(controller.page.demo.hcRenewDate);
+			if(hcRenewDateMoment.isValid())
+			{
+				controller.page.demo.hcRenewDate = Juno.Common.Util.formatMomentDate(hcRenewDateMoment);
+			}
+			else
+			{
+				controller.page.demo.hcRenewDate = null;
+			}
+
 			phoneNum["C"] = controller.page.demo.scrCellPhone;
 			phoneNum["H"] = controller.page.demo.scrHomePhone;
 			phoneNum["W"] = controller.page.demo.scrWorkPhone;
@@ -421,7 +439,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			{
 				event.preventDefault();
 				event.stopPropagation();
-				controller.setSwipeReady();
 			}
 		};
 
@@ -504,7 +521,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				// the object passed back on closing
 				function success(cardInfo)
 				{
-					console.info(cardInfo);
+					// console.info(cardInfo);
 					controller.fillDataFromSwipecard(cardInfo.data);
 				},
 				function error(errors)
@@ -527,11 +544,13 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			{
 				controller.page.demo.lastName = cardData.lastName;
 				controller.displayMessages.add_field_warning('lastName', "Last Name Changed");
+				controller.formatLastName();
 			}
 			if (!Juno.Common.Util.isBlank(cardData.firstName))
 			{
 				controller.page.demo.firstName = cardData.firstName;
 				controller.displayMessages.add_field_warning('firstName', "First Name Changed");
+				controller.formatFirstName();
 			}
 			if (!Juno.Common.Util.isBlank(cardData.hin))
 			{
@@ -592,198 +611,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 		};
 
-		// controller.fillData = function fillData(model, value, validationFn)
-		// {
-		// 	if(!Juno.Common.Util.isBlank(value))
-		// 	{
-		// 		let validFormData = true;
-		// 		if(typeof validationFn === "function")
-		// 		{
-		// 			validFormData = validationFn(value);
-		// 		}
-		// 		if(validFormData)
-		// 		{
-		// 			return value;
-		// 		}
-		// 	}
-		// 	return model;
-		// };
-
-		// //calculate age
-		// var now = new Date();
-		// controller.calculateAge = function calculateAge()
-		// {
-		// 	controller.page.demo.age = now.getFullYear() - controller.page.demo.dobYear;
-		// 	if (now.getMonth() < controller.page.demo.dobMonth - 1) controller.page.demo.age--;
-		// 	else if (now.getMonth() == controller.page.demo.dobMonth - 1 && now.getDate() < controller.page.demo.dobDay) controller.page.demo.age--;
-		// };
-		//
-		// controller.calculateAge(); //done on page load
-
-		//set ready for swipe card
-		controller.setSwipeReady = function setSwipeReady(status)
-		{
-			if (status == "off")
-			{
-				controller.page.readyForSwipe = "";
-				controller.page.swipecardMsg = "Click for Card Swipe";
-			}
-			else if (status == "done")
-			{
-				controller.page.readyForSwipe = "btn-primary";
-			}
-			else
-			{
-				controller.page.readyForSwipe = "btn-success";
-				controller.page.swipecardMsg = "Ready for Card Swipe";
-				controller.page.swipecard = "";
-			}
-		};
-
-		//Health card verification
-		controller.healthCardHandler = function healthCardHandler(keycode)
-		{
-			if (keycode == 13)
-			{ //carriage-return
-				var swipeCardData = controller.page.swipecard;
-				controller.page.swipecard = "";
-
-				if (swipeCardData.substring(0, 3) == "%E?")
-				{ //swipe card error
-					alert("Error reading card");
-				}
-				else
-				{
-					if (swipeCardData.substring(2, 8) == "610054")
-					{ //Ontario
-						hcParts["issuer"] = "ON";
-						hcParts["hin"] = swipeCardData.substring(8, 18);
-
-						var namePos = swipeCardData.indexOf("^") + 1;
-						var endNamePos = swipeCardData.indexOf("^", namePos);
-						hcParts["fullName"] = swipeCardData.substring(namePos, endNamePos);
-						hcParts["lastName"] = hcParts["fullName"].split("/")[0];
-						hcParts["firstName"] = hcParts["fullName"].split("/")[1].trim();
-
-						hcParts["sex"] = swipeCardData.substring(endNamePos + 8, endNamePos + 9);
-						hcParts["dob"] = swipeCardData.substring(endNamePos + 9, endNamePos + 17);
-						hcParts["hinExp"] = swipeCardData.substring(endNamePos + 1, endNamePos + 5) + hcParts["dob"].substring(6, 8);
-						hcParts["hinVer"] = swipeCardData.substring(endNamePos + 17, endNamePos + 19);
-						hcParts["firstNameShort"] = swipeCardData.substring(endNamePos + 19, endNamePos + 24);
-						hcParts["issueDate"] = swipeCardData.substring(endNamePos + 24, endNamePos + 30);
-						hcParts["lang"] = swipeCardData.substring(endNamePos + 30, endNamePos + 32);
-
-						if (!isNumber(hcParts["dob"]))
-						{
-							hcParts["dob"] = null;
-							hcParts["hinExp"] = null;
-						}
-						if (!isNumber(hcParts["hinExp"]))
-						{
-							hcParts["hinExp"] = null;
-						}
-						if (!isNumber(hcParts["issueDate"]))
-						{
-							hcParts["issueDate"] = null;
-						}
-
-						controller.setSwipeReady("done");
-						controller.healthCardUpdateDemographics();
-					}
-					else
-					{
-						alert("Not Ontario Health Card");
-					}
-					controller.validateHC(); //Run HCValidation
-				}
-			}
-		};
-
-		controller.healthCardUpdateDemographics = function healthCardUpdateDemographics()
-		{
-			var now = new Date();
-			if (controller.page.demo.hcType != hcParts["issuer"])
-			{
-				controller.page.demo.hcType = hcParts["issuer"];
-				controller.page.hcTypeColor = colorAttn;
-			}
-			if (controller.page.demo.lastName != hcParts["lastName"])
-			{
-				controller.page.demo.lastName = hcParts["lastName"];
-				controller.page.lastNameColor = colorAttn;
-			}
-			if (controller.page.demo.firstName != hcParts["firstName"])
-			{
-				controller.page.demo.firstName = hcParts["firstName"];
-				controller.page.firstNameColor = colorAttn;
-			}
-			if (isNumber(hcParts["hin"]) && controller.page.demo.hin != hcParts["hin"])
-			{
-				controller.page.demo.hin = hcParts["hin"];
-				controller.page.hinColor = colorAttn;
-			}
-			if (controller.page.demo.ver != hcParts["hinVer"])
-			{
-				controller.page.demo.ver = hcParts["hinVer"];
-				controller.page.verColor = colorAttn;
-			}
-			var hcSex = hcParts["sex"] == 1 ? "M" : (hcParts["sex"] == 2 ? "F" : null);
-			if (hcSex != null && controller.page.demo.sex != hcSex)
-			{
-				controller.page.demo.sex = hcSex;
-				controller.page.sexColor = colorAttn;
-			}
-			var dateParts = {};
-			if (hcParts["dob"] != null)
-			{
-				dateParts["year"] = hcParts["dob"].substring(0, 4);
-				dateParts["month"] = hcParts["dob"].substring(4, 6);
-				dateParts["day"] = hcParts["dob"].substring(6);
-				if (controller.page.demo.dobYear != dateParts["year"])
-				{
-					controller.page.demo.dobYear = dateParts["year"];
-					controller.page.dobYearColor = colorAttn;
-				}
-				if (controller.page.demo.dobMonth != dateParts["month"])
-				{
-					controller.page.demo.dobMonth = dateParts["month"];
-					controller.page.dobMonthColor = colorAttn;
-				}
-				if (controller.page.demo.dobDay != dateParts["day"])
-				{
-					controller.page.demo.dobDay = dateParts["day"];
-					controller.page.dobDayColor = colorAttn;
-				}
-			}
-			if (hcParts["issueDate"] != null)
-			{
-				var swipeDate = "20" + hcParts["issueDate"].substring(0, 2) + "-" + hcParts["issueDate"].substring(2, 4) + "-" + hcParts["issueDate"].substring(4);
-				if (controller.page.demo.effDate != swipeDate)
-				{
-					controller.page.demo.effDate = swipeDate;
-					controller.page.effDateColor = colorAttn;
-				}
-			}
-			if (hcParts["hinExp"] != null)
-			{
-				var swipeDate = "20" + hcParts["hinExp"].substring(0, 2) + "-" + hcParts["hinExp"].substring(2, 4) + "-" + hcParts["hinExp"].substring(4);
-				if (controller.page.demo.hcRenewDate != swipeDate)
-				{
-					controller.page.demo.hcRenewDate = swipeDate;
-					controller.page.hcRenewDateColor = colorAttn;
-				}
-				var hinExpDate = buildDate("20" + hcParts["hinExp"].substring(0, 2), hcParts["hinExp"].substring(2, 4), hcParts["hinExp"].substring(4));
-				if (hinExpDate != null && now > hinExpDate)
-				{
-					alert("This health card has expired!");
-					controller.page.hcRenewDateColor = colorAttn;
-				}
-			}
-		};
-
 		//HCValidation
 		controller.validateHC = function validateHC()
 		{
+			controller.displayMessages.remove_field_error('hin');
+
 			if (controller.page.demo.hcType != "ON" || controller.page.demo.hin == null || controller.page.demo.hin == "") return;
 			if (controller.page.demo.ver == null) controller.page.demo.ver = "";
 			patientDetailStatusService.validateHC(controller.page.demo.hin, controller.page.demo.ver).then(
@@ -798,6 +630,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					{
 						controller.page.HCValidation = results.valid ? "valid" : "invalid";
 						controller.page.swipecardMsg = results.responseDescription + " (" + results.responseCode + ")";
+					}
+
+					if(!results.valid)
+					{
+						controller.displayMessages.add_field_error('hin', controller.page.swipecardMsg);
 					}
 				},
 				function error(errors)

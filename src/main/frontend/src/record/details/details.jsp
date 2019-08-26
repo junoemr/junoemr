@@ -128,20 +128,6 @@
 	</div>
 	<div class="row">
 		<div class="col-md-10 col-lg-8 ">
-			<%--<button type="button" class="btn {{detailsCtrl.page.readyForSwipe}}" --%>
-				<%--ng-show="detailsCtrl.page.workflowEnhance" --%>
-				<%--ng-click="detailsCtrl.setSwipeReady()" --%>
-				<%--title="Click for Card Swipe">--%>
-				<%--{{detailsCtrl.page.swipecardMsg}}--%>
-			<%--</button>--%>
-			<%--<input type="text" id="swipecard" title="<bean:message key="web.record.details.clickCardSwipe"/>" --%>
-				<%--ng-model="detailsCtrl.page.swipecard" --%>
-				<%--ng-show="detailsCtrl.page.workflowEnhance" --%>
-				<%--ng-focus="detailsCtrl.setSwipeReady()" --%>
-				<%--ng-blur="detailsCtrl.setSwipeReady('off')" --%>
-				<%--ng-keypress="detailsCtrl.healthCardHandler($event.keyCode)" --%>
-			<%--/>--%>
-
 			<div id="pd1" ng-click="detailsCtrl.checkAction($event)" ng-keypress="detailsCtrl.checkAction($event)">
 				
 			<div class="form-horizontal">
@@ -542,7 +528,7 @@
 								ca-date-picker-id="effDatePicker"
 								ca-name="effDatePicker"
 								ca-model="detailsCtrl.page.demo.effDate"
-								ca-warning="detailsCtrl.displayMessages.field_warnings()['effDate']"
+								ca-warning="{{detailsCtrl.displayMessages.field_warnings()['effDate']}}"
 								ca-orientation="auto"
 						></ca-field-date>
 					</div>
@@ -554,7 +540,7 @@
 								ca-date-picker-id="hcRenewDatePicker"
 								ca-name="hcRenewDatePicker"
 								ca-model="detailsCtrl.page.demo.hcRenewDate"
-								ca-warning="detailsCtrl.displayMessages.field_warnings()['endDate']"
+								ca-warning="{{detailsCtrl.displayMessages.field_warnings()['endDate']}}"
 								ca-orientation="auto"
 						></ca-field-date>
 					</div>
