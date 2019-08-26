@@ -95,30 +95,6 @@ label {
 		content: "*";
 		color: $color-red-base;
 	}
-
-	//// colour error input fields
-	//.has-error input {
-	//	color: $color-red-dark;
-	//	background-color: $color-red-lightest;
-	//}
-	//// colour warning input fields
-	//.has-warning input, input.has-warning {
-	//	color: $color-neutral-darker;
-	//	background-color: $color-yellow-lighter;
-	//}
-}
-
-.has-error .help-block,
-.has-error .control-label,
-.has-error .radio,
-.has-error .checkbox,
-.has-error .radio-inline,
-.has-error .checkbox-inline,
-.has-error.radio label,
-.has-error.checkbox label,
-.has-error.radio-inline label,
-.has-error.checkbox-inline label {
-
 }
 
 .input-group-addon {
