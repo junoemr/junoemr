@@ -56,7 +56,6 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Report',
 	'Patient',
 	'Patient.Search',
-	'PatientList',
 	'Inbox',
 	'Help',
 	'Document',

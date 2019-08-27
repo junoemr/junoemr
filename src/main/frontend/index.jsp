@@ -67,12 +67,13 @@
 	<!-- main content pane -->
 	<div class="flex-column" id="index-content">
 		<div class="flex-row flex-grow">
-			<div id="content-left-pane"
-			     ng-class="{
-						'expanded': bodyCtrl.showPatientList,
-						'collapsed': !bodyCtrl.showPatientList }"
-			     ng-include="'src/layout/leftAside.jsp'">
-			</div>
+			<left-aside
+					id="content-left-pane"
+					ng-class="{
+							'expanded': bodyCtrl.showPatientList,
+							'collapsed': !bodyCtrl.showPatientList }"
+					expand-on="bodyCtrl.showPatientList">
+			</left-aside>
 			<div id="content-center-pane"
 			     class="flex-grow overflow-hidden"
 			     ui-view

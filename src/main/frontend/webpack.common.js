@@ -233,6 +233,7 @@ module.exports = {
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',
 			'./src/layout/primaryNavComponent.js',
+			'./src/layout/leftAsideComponent.js',
 
 			'./src/patient/module.js',
 			'./src/patient/newPatientController.js',
@@ -240,9 +241,6 @@ module.exports = {
 			'./src/dashboard/module.js',
 			'./src/dashboard/dashboardController.js',
 			'./src/dashboard/ticklerConfigureController.js',
-
-			'./src/patientlist/module.js',
-			'./src/patientlist/patientListController.js',
 
 			'./src/record/module.js',
 			'./src/record/recordController.js',
