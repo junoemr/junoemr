@@ -232,7 +232,7 @@ module.exports = {
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',
-			'./src/layout/navBarController.js',
+			'./src/layout/primaryNavComponent.js',
 
 			'./src/patient/module.js',
 			'./src/patient/newPatientController.js',

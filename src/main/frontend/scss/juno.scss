@@ -31,6 +31,7 @@
 @import "directives/juno-typeahead";
 @import "directives/juno-loading";
 // Section-specific things
+@import "../src/layout/primaryNav";
 @import "../src/layout/leftAside";
 @import "../src/help/support";
 @import "../src/schedule/schedule";

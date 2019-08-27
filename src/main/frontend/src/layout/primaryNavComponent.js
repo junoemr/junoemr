@@ -1,97 +1,55 @@
-'use strict';
 
-/*
-
-    Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
-    This software is published under the GPL GNU General Public License.
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public License
-    as published by the Free Software Foundation; either version 2
-    of the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
-    This software was written for the
-    Department of Family Medicine
-    McMaster University
-    Hamilton
-    Ontario, Canada
-
-*/
-
-angular.module('Layout').controller('Layout.NavBarController', [
-
-	'$rootScope',
-	'$scope',
-	'$q',
-	'$timeout',
-	'$location',
-	'$state',
-	'$uibModal',
-	'$interval',
-	'securityService',
-	'personaService',
-	'billingService',
-	'consultService',
-	'inboxService',
-	'messageService',
-	'providerService',
-	'ticklerService',
-
-	function(
-		$rootScope,
-		$scope,
-		$q,
-		$timeout,
-		$location,
-		$state,
-		$uibModal,
-		$interval,
-		securityService,
-		personaService,
-		billingService,
-		consultService,
-		inboxService,
-		messageService,
-		providerService,
-		ticklerService)
+angular.module('Layout').component("primaryNavigation", {
+	bindings: {},
+	templateUrl: "src/layout/primaryNav.jsp",
+	controller: function($rootScope,
+	                     $scope,
+	                     $q,
+	                     $timeout,
+	                     $location,
+	                     $state,
+	                     $uibModal,
+	                     $interval,
+	                     securityService,
+	                     personaService,
+	                     billingService,
+	                     consultService,
+	                     inboxService,
+	                     messageService,
+	                     providerService,
+	                     ticklerService)
 	{
-		var controller = this;
+		var ctrl = this;
+
+		ctrl.me = null;
 
 		// Controller-level variables to contain intervals
-		controller.updateInterval = undefined;
-		controller.messageInterval = undefined;
+		ctrl.updateInterval = undefined;
+		ctrl.messageInterval = undefined;
 		// Interval takes update times in ms, so 60s * 1000 * num_minutes
-		controller.intervalLengthOneMinute = 60000;
-		controller.intervalLengthFiveMinutes = 60000 * 5;
+		ctrl.intervalLengthOneMinute = 60000;
+		ctrl.intervalLengthFiveMinutes = 60000 * 5;
 
 		//=========================================================================
 		// Initialization
 		//=========================================================================
 
-		controller.init = function init()
+		ctrl.init = function init()
 		{
-			controller.activeConsultationTotal = 0;
-			controller.ticklerTotal = 0;
-			controller.unAckLabDocTotal = 0;
-			controller.unclaimedCount = 0;
-			controller.unreadMessageTotal = 0;
-			controller.demographicSearch = null;
-			controller.consultationTeamWarning = "";
+			ctrl.activeConsultationTotal = 0;
+			ctrl.ticklerTotal = 0;
+			ctrl.unAckLabDocTotal = 0;
+			ctrl.unclaimedCount = 0;
+			ctrl.unreadMessageTotal = 0;
+			ctrl.demographicSearch = null;
+			ctrl.consultationTeamWarning = "";
 			// measured in months
-			controller.consultationLookbackPeriod = 1;
+			ctrl.consultationLookbackPeriod = 1;
 
 			billingService.getBillingRegion().then(
 				function success(results)
 				{
-					controller.billRegion = results.message;
+					ctrl.billRegion = results.message;
 				},
 				function error(errors)
 				{
@@ -99,28 +57,28 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				});
 
 			securityService.hasRights(
-			{
-				items: [
 				{
-					objectName: '_search',
-					privilege: 'r'
-				},
-				{
-					objectName: '_demographic',
-					privilege: 'w'
-				},
-				{
-					objectName: '_msg',
-					privilege: 'r'
-				}]
-			}).then(
+					items: [
+						{
+							objectName: '_search',
+							privilege: 'r'
+						},
+						{
+							objectName: '_demographic',
+							privilege: 'w'
+						},
+						{
+							objectName: '_msg',
+							privilege: 'r'
+						}]
+				}).then(
 				function success(results)
 				{
 					if (results.content !== null)
 					{
-						controller.searchRights = results.content[0];
-						controller.newDemographicRights = results.content[1];
-						controller.messageRights = results.content[2];
+						ctrl.searchRights = results.content[0];
+						ctrl.newDemographicRights = results.content[1];
+						ctrl.messageRights = results.content[2];
 					}
 				},
 				function error(errors)
@@ -133,7 +91,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				{
 					if (results.menus)
 					{
-						controller.dashboardMenu = results.menus.menu;
+						ctrl.dashboardMenu = results.menus.menu;
 					}
 				},
 				function error(errors)
@@ -146,13 +104,13 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				{
 					if (results.consultationTimePeriodWarning > 0)
 					{
-						controller.consultationLookbackPeriod = results.consultationTimePeriodWarning;
+						ctrl.consultationLookbackPeriod = results.consultationTimePeriodWarning;
 					}
 
 					// If we get any result back that isn't -1, need to filter consultation count by the given team
 					if (results.consultationTeamWarning !== "-1")
 					{
-						controller.consultationTeamWarning = results.consultationTeamWarning;
+						ctrl.consultationTeamWarning = results.consultationTeamWarning;
 					}
 				},
 				function error(errors)
@@ -164,42 +122,42 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			personaService.getNavBar().then(
 				function success(results)
 				{
-					controller.currentProgram = results.currentProgram.program;
+					ctrl.currentProgram = results.currentProgram.program;
 
 					if (results.programDomain.program instanceof Array)
 					{
-						controller.programDomain = results.programDomain.program;
+						ctrl.programDomain = results.programDomain.program;
 					}
 					else
 					{
-						controller.programDomain = [results.programDomain.program];
+						ctrl.programDomain = [results.programDomain.program];
 					}
 
-					controller.unreadMessagesCount = results.unreadMessagesCount;
-					controller.unreadPatientMessagesCount = results.unreadPatientMessagesCount;
-					controller.updateCounts();
-					controller.getUnreadMessageCount();
-					controller.demographicSearchDropDownItems = results.menus.patientSearchMenu.items;
-					controller.menuItems = results.menus.menu.items;
-					controller.userMenuItems = results.menus.userMenu.items;
-					controller.messengerMenu = results.menus.messengerMenu.items;
+					ctrl.unreadMessagesCount = results.unreadMessagesCount;
+					ctrl.unreadPatientMessagesCount = results.unreadPatientMessagesCount;
+					ctrl.updateCounts();
+					ctrl.getUnreadMessageCount();
+					ctrl.demographicSearchDropDownItems = results.menus.patientSearchMenu.items;
+					ctrl.menuItems = results.menus.menu.items;
+					ctrl.userMenuItems = results.menus.userMenu.items;
+					ctrl.messengerMenu = results.menus.messengerMenu.items;
 
 
-					if (!angular.isDefined(controller.updateInterval))
+					if (!angular.isDefined(ctrl.updateInterval))
 					{
-						controller.updateInterval = $interval(function()
+						ctrl.updateInterval = $interval(function()
 						{
-							controller.updateCounts();
-						}, controller.intervalLengthFiveMinutes);
+							ctrl.updateCounts();
+						}, ctrl.intervalLengthFiveMinutes);
 					}
 
 					// Separated into its own interval so that it can be updated more frequently
-					if (!angular.isDefined(controller.messageInterval))
+					if (!angular.isDefined(ctrl.messageInterval))
 					{
-						controller.messageInterval = $interval(function()
+						ctrl.messageInterval = $interval(function()
 						{
-							controller.getUnreadMessageCount();
-						}, controller.intervalLengthOneMinute);
+							ctrl.getUnreadMessageCount();
+						}, ctrl.intervalLengthOneMinute);
 					}
 
 				},
@@ -221,13 +179,13 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			},
 			function(newVal)
 			{
-				controller.me = newVal;
+				ctrl.me = newVal;
 			},
 			true);
 
 		$scope.$watch(function()
 			{
-				return controller.demographicSearch;
+				return ctrl.demographicSearch;
 			},
 			function(new_value)
 			{
@@ -237,16 +195,16 @@ angular.module('Layout').controller('Layout.NavBarController', [
 					if (new_value.moreResults)
 					{
 						// the 'more results' option was selected
-						controller.goToPatientSearch(new_value.searchQuery);
+						ctrl.goToPatientSearch(new_value.searchQuery);
 					}
 					else
 					{
 						// patient was selected
-						controller.goToPatientRecord(new_value.demographicNo);
+						ctrl.goToPatientRecord(new_value.demographicNo);
 					}
 
 					// clear the selection
-					controller.demographicSearch = null;
+					ctrl.demographicSearch = null;
 				}
 			}, true);
 
@@ -261,30 +219,30 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		//=========================================================================
 
 		// Need to do this so that requests aren't going off in the background after leaving new UI
-		controller.cancelIntervals = function cancelIntervals()
+		ctrl.cancelIntervals = function cancelIntervals()
 		{
-			if (angular.isDefined(controller.updateInterval))
+			if (angular.isDefined(ctrl.updateInterval))
 			{
-				$interval.cancel(controller.updateInterval);
-				controller.updateInterval = undefined;
+				$interval.cancel(ctrl.updateInterval);
+				ctrl.updateInterval = undefined;
 			}
 
-			if (angular.isDefined(controller.messageInterval))
+			if (angular.isDefined(ctrl.messageInterval))
 			{
-				$interval.cancel(controller.messageInterval);
-				controller.messageInterval = undefined;
+				$interval.cancel(ctrl.messageInterval);
+				ctrl.messageInterval = undefined;
 			}
 		};
 
 		/**
 		 * Wrapper for all of the functions that we want to periodically get updated counts for.
 		 */
-		controller.updateCounts = function updateCounts()
+		ctrl.updateCounts = function updateCounts()
 		{
-			controller.getUnAckLabDocCount();
-			controller.getOverdueTicklerCount();
-			controller.getActiveConsultationCount();
-			controller.getUnclaimedInboxCount();
+			ctrl.getUnAckLabDocCount();
+			ctrl.getOverdueTicklerCount();
+			ctrl.getActiveConsultationCount();
+			ctrl.getUnclaimedInboxCount();
 		};
 
 		/**
@@ -292,43 +250,43 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		 * @param item Item object with label we want to display an updated count for
 		 * @return associated value the controller has stored, or 0 if we don't recognize item's label
 		 */
-		controller.getCountForLabel = function getCountForLabel(item)
+		ctrl.getCountForLabel = function getCountForLabel(item)
 		{
 			item.labelCount = 0;
 			if (item.label === "Inbox")
 			{
-				item.labelCount = controller.unAckLabDocTotal;
+				item.labelCount = ctrl.unAckLabDocTotal;
 			}
 			else if (item.label === "Ticklers")
 			{
-				item.labelCount = controller.ticklerTotal;
+				item.labelCount = ctrl.ticklerTotal;
 			}
 			else if (item.label === "Consultations")
 			{
-				item.labelCount = controller.activeConsultationTotal;
+				item.labelCount = ctrl.activeConsultationTotal;
 			}
 			return item.labelCount;
 		};
 
-		controller.getUnAckLabDocCount = function getUnAckLabDocCount()
+		ctrl.getUnAckLabDocCount = function getUnAckLabDocCount()
 		{
 			inboxService.getUnAckLabDocCount().then(
 				function success(results)
 				{
-					controller.unAckLabDocTotal = results;
+					ctrl.unAckLabDocTotal = results;
 				},
 				function error(errors)
 				{
 					console.log(errors);
 				});
 		};
-		controller.getUnclaimedInboxCount = function()
+		ctrl.getUnclaimedInboxCount = function()
 		{
 
 			inboxService.getInboxCountByStatus(0,"N").then(
 				function success(results)
 				{
-					controller.unclaimedCount = results;
+					ctrl.unclaimedCount = results;
 				},
 				function error(errors)
 				{
@@ -337,12 +295,12 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			);
 		};
 
-		controller.getUnreadMessageCount = function getUnreadMessageCount()
+		ctrl.getUnreadMessageCount = function getUnreadMessageCount()
 		{
 			messageService.getUnreadCount().then(
 				function success(results)
 				{
-					controller.unreadMessageTotal = results;
+					ctrl.unreadMessageTotal = results;
 				},
 				function error(errors)
 				{
@@ -351,69 +309,69 @@ angular.module('Layout').controller('Layout.NavBarController', [
 
 		};
 
-		controller.getOverdueTicklerCount = function getOverdueTicklerCount()
+		ctrl.getOverdueTicklerCount = function getOverdueTicklerCount()
 		{
 			ticklerService.search(
 				{
 					status: 'A',
-					creator: controller.me.providerNo,
+					creator: ctrl.me.providerNo,
 					overdueOnly: 'property'
 				}, 0, 6).then(
-					function success(results)
-					{
-						controller.ticklerTotal = results.total;
-					},
-					function error(errors)
-					{
-						console.log(errors);
-					}
-				);
+				function success(results)
+				{
+					ctrl.ticklerTotal = results.total;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				}
+			);
 		};
 
-		controller.getActiveConsultationCount = function getActiveConsultationCount()
+		ctrl.getActiveConsultationCount = function getActiveConsultationCount()
 		{
 			// Any consultations that should have ended after this point but haven't need to be alerted for
-			var endDate = moment().subtract(controller.consultationLookbackPeriod, "months").toISOString();
+			var endDate = moment().subtract(ctrl.consultationLookbackPeriod, "months").toISOString();
 
 			consultService.getTotalRequests(
 				{
 					invertStatus: true,
 					referralEndDate: endDate,
 					status: '4',
-					team: controller.consultationTeamWarning
+					team: ctrl.consultationTeamWarning
 				}).then(
-					function success(results)
-					{
-						controller.activeConsultationTotal = results.data;
-					},
-					function error(errors)
-					{
-						console.log(errors);
-					}
-				);
+				function success(results)
+				{
+					ctrl.activeConsultationTotal = results.data;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				}
+			);
 		};
 
-		controller.getNavBar = function getNavBar()
+		ctrl.getNavBar = function getNavBar()
 		{
 			personaService.getNavBar().then(
 				function success(results)
 				{
-					controller.currentProgram = results.currentProgram.program;
+					ctrl.currentProgram = results.currentProgram.program;
 					if (results.programDomain.program instanceof Array)
 					{
-						controller.programDomain = results.programDomain.program;
+						ctrl.programDomain = results.programDomain.program;
 					}
 					else
 					{
-						controller.programDomain = [results.programDomain.program];
+						ctrl.programDomain = [results.programDomain.program];
 					}
 
-					controller.unreadMessagesCount = results.unreadMessagesCount;
-					controller.unreadPatientMessagesCount = results.unreadPatientMessagesCount;
-					controller.demographicSearchDropDownItems = results.menus.patientSearchMenu.items;
-					controller.menuItems = results.menus.menu.items;
-					controller.userMenuItems = results.menus.userMenu.items;
-					controller.messengerMenu = results.menus.messengerMenu.items;
+					ctrl.unreadMessagesCount = results.unreadMessagesCount;
+					ctrl.unreadPatientMessagesCount = results.unreadPatientMessagesCount;
+					ctrl.demographicSearchDropDownItems = results.menus.patientSearchMenu.items;
+					ctrl.menuItems = results.menus.menu.items;
+					ctrl.userMenuItems = results.menus.userMenu.items;
+					ctrl.messengerMenu = results.menus.messengerMenu.items;
 				},
 				function error(errors)
 				{
@@ -422,47 +380,47 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		};
 
 		// when patient typeahead search button is clicked
-		controller.onPatientSearch = function onPatientSearch(search)
+		ctrl.onPatientSearch = function onPatientSearch(search)
 		{
 			if (search === null)
 			{
-				controller.goToPatientSearch();
+				ctrl.goToPatientSearch();
 
 			}
 			else if (search.isTypeaheadSearchQuery) // should only happen when search isTypeaheadSearchQuery
 			{
-				controller.goToPatientSearch(search.searchQuery);
+				ctrl.goToPatientSearch(search.searchQuery);
 			}
 
 			// clear the selection
-			controller.demographicSearch = null;
+			ctrl.demographicSearch = null;
 		};
 
-		controller.goToPatientSearch = function goToPatientSearch(search)
+		ctrl.goToPatientSearch = function goToPatientSearch(search)
 		{
 			$state.go('search',
-			{
-				term: search
-			},
-			{
-				reload: 'search'
-			});
+				{
+					term: search
+				},
+				{
+					reload: 'search'
+				});
 		};
 
-		controller.goToPatientRecord = function goToPatientRecord(demographicNo)
+		ctrl.goToPatientRecord = function goToPatientRecord(demographicNo)
 		{
 			$state.go('record.details',
-			{
-				demographicNo: demographicNo,
-				hideNote: true
-			},
-			{
-				reload: 'record.details'
-			});
+				{
+					demographicNo: demographicNo,
+					hideNote: true
+				},
+				{
+					reload: 'record.details'
+				});
 		};
 
 		//to help ng-clicks on buttons
-		controller.transition = function transition(item, extraParams)
+		ctrl.transition = function transition(item, extraParams)
 		{
 			var newWindow;
 
@@ -492,7 +450,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				else if (item.label === "eDocs")
 				{
 					url = "../dms/documentReport.jsp?function=provider&functionid=" +
-						encodeURIComponent(controller.me.providerNo);
+						encodeURIComponent(ctrl.me.providerNo);
 					wname = "edocView";
 				}
 				else
@@ -560,21 +518,21 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			}
 		};
 
-		controller.loadClassicUi = function()
+		ctrl.loadClassicUi = function()
 		{
 			window.location = "../provider/providercontrol.jsp";
 		};
 
-		controller.openMessenger = function(item)
+		ctrl.openMessenger = function(item)
 		{
-			if (controller.me != null)
+			if (ctrl.me != null)
 			{
 				if (angular.isDefined(item) &&
 					angular.isDefined(item.url) &&
 					item.url === 'phr')
 				{
 					window.open('../phr/PhrMessage.do?method=viewMessages',
-						'INDIVOMESSENGER' + encodeURIComponent(controller.me.providerNo),
+						'INDIVOMESSENGER' + encodeURIComponent(ctrl.me.providerNo),
 						'height=700,width=1024,scrollbars=1');
 				}
 				else if (angular.isDefined(item) &&
@@ -600,28 +558,28 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				{
 					// by default open classic messenger
 					window.open('../oscarMessenger/DisplayMessages.do?providerNo=' +
-						encodeURIComponent(controller.me.providerNo),
+						encodeURIComponent(ctrl.me.providerNo),
 						'msgs', 'height=700,width=1024,scrollbars=1');
 				}
 			}
 		};
 
-		controller.openScratchpad = function ()
+		ctrl.openScratchpad = function ()
 		{
 			var win = window.open('../scratch/index.jsp',
 				'scratch', 'height=700,width=1024,scrollbars=1');
 			win.focus();
 		};
 
-		controller.newDemographic = function newDemographic(size)
+		ctrl.newDemographic = function newDemographic(size)
 		{
 			var modalInstance = $uibModal.open(
-			{
-				templateUrl: 'src/patient/newPatient.jsp',
-				controller: 'Patient.NewPatientController as newPatientCtrl',
-				backdrop: 'static',
-				size: size
-			});
+				{
+					templateUrl: 'src/patient/newPatient.jsp',
+					controller: 'Patient.NewPatientController as newPatientCtrl',
+					backdrop: 'static',
+					size: size
+				});
 
 			modalInstance.result.then(
 				function success(results)
@@ -645,17 +603,17 @@ angular.module('Layout').controller('Layout.NavBarController', [
 			console.log($('#myModal'));
 		};
 
-		controller.isActive = function(tab)
+		ctrl.isActive = function(tab)
 		{
 			return ($state.current.name === tab.state);
 		};
 
-		controller.changeProgram = function changeProgram(programId)
+		ctrl.changeProgram = function changeProgram(programId)
 		{
 			personaService.setCurrentProgram(programId).then(
 				function success(results)
 				{
-					controller.getNavBar();
+					ctrl.getNavBar();
 				},
 				function error(errors)
 				{
@@ -666,7 +624,7 @@ angular.module('Layout').controller('Layout.NavBarController', [
 		// For some reason Angular does not allow for the evaluation of the inverse of custom filters, thus, we have the the following masterpiece
 		// If inverse === false, return true if the given item is supposed to be shown outside the 'more' dropdown on the medium view
 		// If inverse === true, return the inverse of the above statement,
-		controller.navItemFilter = function navItemFilter(labelsToShow, inverse)
+		ctrl.navItemFilter = function navItemFilter(labelsToShow, inverse)
 		{
 			return function(item)
 			{
@@ -679,17 +637,17 @@ angular.module('Layout').controller('Layout.NavBarController', [
 				return filterValue;
 			};
 		};
-		controller.mediumNavItemFilter = function mediumNavItemFilter(inverse)
+		ctrl.mediumNavItemFilter = function mediumNavItemFilter(inverse)
 		{
-			return controller.navItemFilter(['Dashboard', 'Schedule', 'Inbox', 'Consultations', 'Ticklers'], inverse);
+			return ctrl.navItemFilter(['Dashboard', 'Schedule', 'Inbox', 'Consultations', 'Ticklers'], inverse);
 		};
-		controller.smallNavItemFilter = function smallNavItemFilter(inverse)
+		ctrl.smallNavItemFilter = function smallNavItemFilter(inverse)
 		{
-			return controller.navItemFilter(['Dashboard'], inverse);
+			return ctrl.navItemFilter(['Dashboard'], inverse);
 		};
-		controller.mobileNavItemFilter = function mobileNavItemFilter(inverse)
+		ctrl.mobileNavItemFilter = function mobileNavItemFilter(inverse)
 		{
-			return controller.navItemFilter([], inverse);
+			return ctrl.navItemFilter([], inverse);
 		};
 	}
-]);
+});
