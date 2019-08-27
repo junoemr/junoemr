@@ -223,6 +223,10 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 		{
 			return getString(super.getOBXName(i, j) + ": " + getOBXAbnormalFlag(i, j));
 		}
+		else if (getOBXContentType(i, j) == OBX_CONTENT_TYPE.STRUCTURED_NUMERIC)
+		{
+			return getOBXResult(i, j, 1) + getOBXResult(i, j, 2) + getOBXResult(i, j, 3) + getOBXResult(i, j, 4);
+		}
 		else if (hasZBR() && getOBXValueType(i, j).equals(CWE.class.getSimpleName()))
 		{
 			return getOBXResult(i, j, 2);
@@ -248,6 +252,10 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 			{
 				return OBX_CONTENT_TYPE.PDF;
 			}
+		}
+		else if (getOBXValueType(i, j).equals("SN"))
+		{
+			return OBX_CONTENT_TYPE.STRUCTURED_NUMERIC;
 		}
 		else if (isOBRSusceptibility(i))
 		{

@@ -66,6 +66,7 @@ public abstract class MessageHandler
 		UNKNOWN,
 		TEXT,
 		SUSCEPTIBILITY,
+		STRUCTURED_NUMERIC,
 		PDF
 	}
 
