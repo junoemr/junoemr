@@ -644,8 +644,10 @@
 						</label>
 					</div>
 				</div>
-				<ng-include ng-if="settingsCtrl.pref.summaryItemCustomDisplay" src="'settings/partials/patientSummaryItems.html'"></ng-include>
-				</div>
+				<patient-summary-items
+						ng-if="settingsCtrl.pref.summaryItemCustomDisplay"
+						pref="settingsCtrl.pref"
+				></patient-summary-items>
 				<div class="col-md-3 pull-right col-xs-12">
 					<h4>Classic Encounter Preferences:</h4>
 					<div class="well">

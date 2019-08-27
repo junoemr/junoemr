@@ -319,6 +319,7 @@ module.exports = {
 			'./src/settings/settingsController.js',
 			'./src/settings/changePasswordController.js',
 			'./src/settings/quickLinkController.js',
+			'./src/settings/summaryItemSettingsController.js',
 
 			'./src/help/module.js',
 			'./src/help/supportController.js',

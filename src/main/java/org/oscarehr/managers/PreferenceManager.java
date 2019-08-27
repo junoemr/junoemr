@@ -93,25 +93,35 @@ public class PreferenceManager {
 	
 	
 	public boolean displaySummaryItem(LoggedInInfo loggedInInfo, String item){
-		if(isCustomSummaryEnabled(loggedInInfo)){			
+		if(isCustomSummaryEnabled(loggedInInfo))
+		{
 			List<Property> results = providerManager.getProviderProperties(loggedInInfo, loggedInInfo.getLoggedInProviderNo(), item);
-			
-			if(results.size()>0){
+
+			if(results.size() > 0)
+			{
 				String value = null;
-				
-				for(Property result:results){
+
+				for(Property result : results)
+				{
 					value = result.getValue();
 				}
-				
-				if(value.isEmpty() || value.equals("off")){
-					return false;	
+
+				if(value.isEmpty() || value.equals("off"))
+				{
+					return false;
 				}
-			}else{
+			}
+			else
+			{
 				//check if the old cpp position property exist
-				return isOldCppPosition(loggedInInfo, item);					
+				return isOldCppPosition(loggedInInfo, item);
 			}
 		}
-		
+		// default these to false instead
+		else if(DS_SUPPORT_POS.equals(item))
+		{
+			return false;
+		}
 		return true;
 	}
 	
