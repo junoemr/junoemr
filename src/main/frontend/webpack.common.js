@@ -229,12 +229,13 @@ module.exports = {
 			'./src/common/directives/clinicaid/scroll.js',
 			'./src/common/directives/clinicaid/zero_pad.js',
 
+			'./src/common/components/module.js',
+			'./src/common/components/modalComponent.js',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',
 			'./src/layout/primaryNavComponent.js',
 			'./src/layout/leftAsideComponent.js',
-			'./src/layout/modalComponent.js',
 
 			'./src/patient/module.js',
 			'./src/patient/newPatientController.js',

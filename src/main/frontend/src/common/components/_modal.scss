@@ -12,15 +12,15 @@
 			-moz-border-radius: 16px !important;
 			border-radius: 16px !important;
 			background: linear-gradient(-45deg, $color-neutral-white 50%, transparent 0) no-repeat 100% 100%,
-			linear-gradient(247deg, #5c8be8, $color-primary-base 30%, $color-primary-base 64%, #355085) no-repeat;
+			linear-gradient(247deg, $color-primary-light, $color-primary-base 30%, $color-primary-base 64%, $color-primary-dark) no-repeat;
 
 			&.double-book {
 				background: linear-gradient(-45deg, $color-neutral-white 50%, transparent 0) no-repeat 100% 100%,
-				linear-gradient(247deg, $color-yellow-base, $color-yellow-base 30%, $color-yellow-dark 64%, $color-yellow-dark) no-repeat;
+				linear-gradient(247deg, $color-yellow-light, $color-yellow-base 30%, $color-yellow-dark 64%, $color-yellow-darker) no-repeat;
 			}
 			&.double-book-prevented {
 				background: linear-gradient(-45deg, $color-neutral-white 50%, transparent 0) no-repeat 100% 100%,
-				linear-gradient(247deg, $color-orange-base, $color-orange-base 30%, $color-orange-dark 64%, $color-orange-dark) no-repeat;
+				linear-gradient(247deg, $color-orange-light, $color-orange-base 30%, $color-orange-dark 64%, $color-orange-darker) no-repeat;
 			}
 
 			// header counts as modal top border, so don't apply the spacing to main content pane

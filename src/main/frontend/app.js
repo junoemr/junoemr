@@ -42,6 +42,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Common.Services',
 	'Common.Filters',
 	'Common.Directives',
+	'Common.Components',
 	'Common.Util',
 	'Layout',
 	'Tickler',
