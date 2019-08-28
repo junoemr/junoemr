@@ -355,6 +355,8 @@ public class MeasurementGraphAction2 extends Action {
 				nameSet = true;
 			}
 			String mdbResult = (String)mdb.get("result");
+			mdbResult = mdbResult.replaceAll("<>=", "");
+
 			newSeries.addOrUpdate(new Day((Date) mdb.get("collDateDate")), Double.parseDouble(mdbResult));
 
 			if (mdb.get("range") != null)

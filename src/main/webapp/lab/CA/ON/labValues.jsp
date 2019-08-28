@@ -283,12 +283,15 @@
 						// Try casting result and referenceRange to double - if it works, we can graph
 						if (canGraph && hashMap.get("result") != null && hashMap.get("range") != null)
 						{
+							String result = (String)hashMap.get("result");
 							try
 							{
-								Double.parseDouble((String) hashMap.get("result"));
+								result = result.replaceAll("<|>|=", "");
+								Double.parseDouble(result);
 							}
 							catch (NumberFormatException ex)
 							{
+								MiscUtils.getLogger().warn("Cannot graph '" + result + "':" + ex);
 								canGraph = false;
 							}
 
