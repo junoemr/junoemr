@@ -407,27 +407,27 @@
 		}
 		.info-frame-container {
 			height: 160px;
-			.demographic-info-frame {
-				height: 144px;
-				margin-bottom: 12px;
-				background-color: $color-neutral-lightest;
-				border: solid 1px $color-neutral-lighter;
-				border-radius: 8px;
-				padding: 14px;
-
-				.form-group {
-					margin: 0;
-
-					label {
-						font-size: 9px;
-						color: $color-neutral-dark;
-					}
-					span {
-						@include juno-font-label;
-						color: $color-neutral-darker;
-					}
-				}
-			}
+			//.demographic-info-frame {
+			//	height: 144px;
+			//	margin-bottom: 12px;
+			//	background-color: $color-neutral-lightest;
+			//	border: solid 1px $color-neutral-lighter;
+			//	border-radius: 8px;
+			//	padding: 14px;
+			//
+			//	.form-group {
+			//		margin: 0;
+			//
+			//		label {
+			//			font-size: 9px;
+			//			color: $color-neutral-dark;
+			//		}
+			//		span {
+			//			@include juno-font-label;
+			//			color: $color-neutral-darker;
+			//		}
+			//	}
+			//}
 		}
 		.tab-pane {
 			padding: 0 $modal-border-space $modal-border-space $modal-border-space;

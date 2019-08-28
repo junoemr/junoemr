@@ -24,10 +24,93 @@
  */
 
 angular.module('Patient').component('demographicCard', {
-	bindings: {},
+	bindings: {
+		demographicModel: '<'
+	},
 	templateUrl: "src/patient/demographicCard.jsp",
-	controller: function ()
+	controller: function ($scope)
 	{
+		var ctrl = this;
 
+		ctrl.model = {
+			demographicNo: null,
+			// data stores the raw demographic model
+			data: {},
+			// display data is built using the raw data model
+			displayData: {
+				birthDate: null,
+				fullName: null,
+				addressLine: null,
+				hasPhoto: false,
+				patientPhotoUrl: '/imageRenderingServlet?source=local_client&clientId=0',
+			},
+		};
+		ctrl.init = function init()
+		{
+			ctrl.fillDisplayData(ctrl.demographicModel);
+			ctrl.loadWatches();
+		};
+
+		ctrl.fillDisplayData = function fillDisplayData(demographicDataModel)
+		{
+			if(Juno.Common.Util.exists(demographicDataModel))
+			{
+				ctrl.model.data = demographicDataModel;
+
+				ctrl.model.demographicNo = demographicDataModel.demographicNo;
+				ctrl.model.displayData.fullName = Juno.Common.Util.formatName(demographicDataModel.firstName, demographicDataModel.lastName);
+				ctrl.model.displayData.patientPhotoUrl = '/imageRenderingServlet?source=local_client&clientId=' +
+					(demographicDataModel.demographicNo ? demographicDataModel.demographicNo : 0);
+
+				var dateOfBirth = null;
+				if (Juno.Common.Util.exists(demographicDataModel.dob))
+				{
+					// XXX: Perhaps put this in util?  Is this date format common for juno?
+					dateOfBirth = moment(demographicDataModel.dob, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
+				}
+				else
+				{
+					dateOfBirth = Juno.Common.Util.getDateMomentFromComponents(
+						demographicDataModel.dobYear, demographicDataModel.dobMonth, demographicDataModel.dobDay);
+				}
+				ctrl.model.displayData.birthDate = Juno.Common.Util.formatMomentDate(dateOfBirth);
+
+				if (Juno.Common.Util.exists(demographicDataModel.address))
+				{
+					ctrl.model.displayData.addressLine =
+						Juno.Common.Util.noNull(demographicDataModel.address.address) + ' ' +
+						Juno.Common.Util.noNull(demographicDataModel.address.city) + ' ' +
+						Juno.Common.Util.noNull(demographicDataModel.address.province) + ' ' +
+						Juno.Common.Util.noNull(demographicDataModel.address.postal);
+				}
+			}
+			else //clear the data model
+			{
+				ctrl.model = {
+					demographicNo: null,
+					data: {},
+					displayData: {
+						birthDate: null,
+						fullName: null,
+						addressLine: null,
+						hasPhoto: false,
+						patientPhotoUrl: '/imageRenderingServlet?source=local_client&clientId=0',
+					},
+				};
+			}
+		};
+
+		ctrl.loadWatches = function loadWatches()
+		{
+			$scope.$watch('$ctrl.demographicModel', function (newValue, oldValue)
+			{
+				if (newValue !== oldValue)
+				{
+					ctrl.fillDisplayData(newValue)
+				}
+			}, true);
+		};
+
+		ctrl.$onInit = ctrl.init();
 	}
 });

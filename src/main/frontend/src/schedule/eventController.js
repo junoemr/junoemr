@@ -181,55 +181,16 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	controller.demographicModel = {
 		demographicNo: null,
 		data: {},
-		displayData: {
-			birthDate: null,
-			fullName: null,
-			hasPhoto: true,
-			patientPhotoUrl: '/imageRenderingServlet?source=local_client&clientId=0',
-			addressLine: null,
-		},
 
 		clear: function clear()
 		{
 			this.demographicNo = null;
 			this.data = {};
-			this.displayData = {
-				birthDate: null,
-				fullName: null,
-				hasPhoto: true,
-				patientPhotoUrl: '/imageRenderingServlet?source=local_client&clientId=0',
-				addressLine: null,
-			};
 		},
 		fillData: function fillData(data)
 		{
 			this.data = data;
-
 			this.demographicNo = data.demographicNo;
-			this.displayData.fullName = Juno.Common.Util.formatName(data.firstName, data.lastName);
-			this.displayData.patientPhotoUrl = '/imageRenderingServlet?source=local_client&clientId=' + (data.demographicNo? data.demographicNo: 0);
-
-			var dateOfBirth = null;
-			if(Juno.Common.Util.exists(data.dob))
-			{
-				// XXX: Perhaps put this in util?  Is this date format common for juno?
-				dateOfBirth = moment(data.dob, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
-			}
-			else
-			{
-				dateOfBirth = Juno.Common.Util.getDateMomentFromComponents(
-					data.dobYear, data.dobMonth, data.dobDay);
-			}
-			this.displayData.birthDate = Juno.Common.Util.formatMomentDate(dateOfBirth);
-
-			if(Juno.Common.Util.exists(data.address))
-			{
-				this.displayData.addressLine =
-					Juno.Common.Util.noNull(data.address.address) + ' ' +
-					Juno.Common.Util.noNull(data.address.city) + ' ' +
-					Juno.Common.Util.noNull(data.address.province) + ' ' +
-					Juno.Common.Util.noNull(data.address.postal);
-			}
 		},
 		loadData: function loadData(demographicNo)
 		{
@@ -258,7 +219,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 			return deferred.promise;
 		},
-		uploadPhoto: function uploadPhoto(file){}
 	};
 
 	//=========================================================================
@@ -780,18 +740,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	//=========================================================================
 	// Public methods
 	//=========================================================================/
-
-	$scope.loadedNewPhoto = function loadedNewPhoto(file, event)
-	{
-		if(file == null)
-		{
-			return;
-		}
-		$scope.preview_patient_image = file;
-		$scope.new_photo = true;
-		controller.demographicModel.hasPhoto = true;
-		controller.demographicModel.uploadPhoto(file);
-	};
 
 	$scope.isWorking = function isWorking()
 	{

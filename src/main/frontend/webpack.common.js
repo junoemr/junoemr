@@ -239,6 +239,7 @@ module.exports = {
 
 			'./src/patient/module.js',
 			'./src/patient/newPatientController.js',
+			'./src/patient/demographicCardComponent.js',
 
 			'./src/dashboard/module.js',
 			'./src/dashboard/dashboardController.js',
