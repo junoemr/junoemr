@@ -29,9 +29,14 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.document.model.Document;
 import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.labs.dao.Hl7DocumentLinkDao;
+import org.oscarehr.labs.model.Hl7DocumentLink;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -55,6 +60,8 @@ import java.util.List;
 public class ConsultationPDFCreationService
 {
 	private static final Logger logger = MiscUtils.getLogger();
+	private static Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
+	private static DocumentDao documentDao = SpringUtils.getBean(DocumentDao.class);
 
 	public List<InputStream> toEDocInputStreams(HttpServletRequest request, List<EDoc> attachedDocuments) throws IOException, DocumentException
 	{
@@ -92,20 +99,35 @@ public class ConsultationPDFCreationService
 
 	public List<InputStream> toLabInputStreams(HttpServletRequest request, List<LabResultData> attachedLabs) throws IOException, DocumentException
 	{
-		List<InputStream> streamList = new ArrayList<>(attachedLabs.size());
+		List<InputStream> streamList = new ArrayList<>();
 		// Iterating over requested labs.
 		for(LabResultData lab : attachedLabs)
 		{
 			// Storing the lab in PDF format inside a byte stream.
-			ByteOutputStream bos = new ByteOutputStream();
-			LabPDFCreator labPDFCreator = new LabPDFCreator(bos, lab.segmentID, null);
-			labPDFCreator.printPdf();
+			int labNo = Integer.parseInt(lab.segmentID);
+			List<Hl7DocumentLink> possibleDocs = hl7DocumentLinkDao.getDocumentsForLab(labNo);
+			if (possibleDocs != null)
+			{
+				// Embedded PDFs need to be treated as documents for printing purposes
+				for (Hl7DocumentLink doc : possibleDocs)
+				{
+					Document embeddedDoc = documentDao.find(doc.getDocumentNo());
+					GenericFile file = FileFactory.getDocumentFile(embeddedDoc.getDocfilename());
+					streamList.add(file.asFileInputStream());
+				}
+			}
+			else
+			{
+				ByteOutputStream bos = new ByteOutputStream();
+				LabPDFCreator labPDFCreator = new LabPDFCreator(bos, lab.segmentID, null);
+				labPDFCreator.printPdf();
 
-			// Transferring PDF to an input stream to be concatenated with
-			// the rest of the documents.
-			byte[] buffer = bos.getBytes();
-			streamList.add(new ByteInputStream(buffer, bos.getCount()));
-			bos.close();
+				// Transferring PDF to an input stream to be concatenated with
+				// the rest of the documents.
+				byte[] buffer = bos.getBytes();
+				streamList.add(new ByteInputStream(buffer, bos.getCount()));
+				bos.close();
+			}
 		}
 		return streamList;
 	}
