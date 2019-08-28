@@ -22,7 +22,7 @@
 	Canada
 
 --%>
-<div class="juno-modal">
+<div class="juno-modal-root">
 	<div class="modal-header">
 		<div ng-transclude="title" class="modal-title"></div>
 		<div ng-transclude="ctlButtons" class="modal-ctl-buttons"></div>

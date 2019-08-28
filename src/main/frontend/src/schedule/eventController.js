@@ -119,7 +119,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	$scope.timeInterval = data.timeInterval;
 
-	$scope.patientTypeahead = {};
+	controller.patientTypeahead = {};
 	$scope.autocompleteValues = {};
 
 	$scope.activeTemplateEvents = [];
@@ -319,13 +319,13 @@ angular.module('Schedule').controller('Schedule.EventController', [
 				{
 					if ($scope.isPatientSelected())
 					{
-						$scope.patientTypeahead = controller.demographicModel.data;
+						controller.patientTypeahead = controller.demographicModel.data;
 					}
 					else
 					{
 						// to initialize typeahead value without a selected demographic model
-						$scope.patientTypeahead.isTypeaheadSearchQuery = true;
-						$scope.patientTypeahead.searchQuery = data.eventData.appointmentName;
+						controller.patientTypeahead.isTypeaheadSearchQuery = true;
+						controller.patientTypeahead.searchQuery = data.eventData.appointmentName;
 					}
 
 					$timeout(controller.loadWatches);
@@ -645,8 +645,8 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		var endDatetime = controller.calculateEndTime();
 
 		var demographicNo = ($scope.eventData.doNotBook)? null : controller.demographicModel.demographicNo;
-		var appointmentName = (demographicNo == null && Juno.Common.Util.exists($scope.patientTypeahead.searchQuery))?
-			$scope.patientTypeahead.searchQuery : null;
+		var appointmentName = (demographicNo == null && Juno.Common.Util.exists(controller.patientTypeahead.searchQuery))?
+			controller.patientTypeahead.searchQuery : null;
 
 		parentScope.saveEvent(
 			editMode,
@@ -754,11 +754,11 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 	controller.loadWatches = function loadWatches()
 	{
-		$scope.$watch('patientTypeahead', function(newValue, oldValue)
+		$scope.$watch('eventController.patientTypeahead', function(newValue, oldValue)
 		{
 			if(newValue != oldValue)
 			{
-				$scope.loadPatientFromTypeahead($scope.patientTypeahead);
+				$scope.loadPatientFromTypeahead(controller.patientTypeahead);
 			}
 		}, true);
 		$scope.$watch('[eventData.startTime, eventData.duration]', function(newValue, oldValue)
