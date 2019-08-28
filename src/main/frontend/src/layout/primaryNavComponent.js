@@ -2,22 +2,39 @@
 angular.module('Layout').component("primaryNavigation", {
 	bindings: {},
 	templateUrl: "src/layout/primaryNav.jsp",
-	controller: function($rootScope,
-	                     $scope,
-	                     $q,
-	                     $timeout,
-	                     $location,
-	                     $state,
-	                     $uibModal,
-	                     $interval,
-	                     securityService,
-	                     personaService,
-	                     billingService,
-	                     consultService,
-	                     inboxService,
-	                     messageService,
-	                     providerService,
-	                     ticklerService)
+	controller: [
+		"$rootScope",
+		"$scope",
+		"$q",
+		"$timeout",
+		"$location",
+		"$state",
+		"$uibModal",
+		"$interval",
+		"securityService",
+		"personaService",
+		"billingService",
+		"consultService",
+		"inboxService",
+		"messageService",
+		"providerService",
+		"ticklerService",
+		function ($rootScope,
+		          $scope,
+		          $q,
+		          $timeout,
+		          $location,
+		          $state,
+		          $uibModal,
+		          $interval,
+		          securityService,
+		          personaService,
+		          billingService,
+		          consultService,
+		          inboxService,
+		          messageService,
+		          providerService,
+		          ticklerService)
 	{
 		var ctrl = this;
 
@@ -649,5 +666,5 @@ angular.module('Layout').component("primaryNavigation", {
 		{
 			return ctrl.navItemFilter([], inverse);
 		};
-	}
+	}]
 });

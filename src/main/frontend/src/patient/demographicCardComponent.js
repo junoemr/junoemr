@@ -28,7 +28,7 @@ angular.module('Patient').component('demographicCard', {
 		demographicModel: '<'
 	},
 	templateUrl: "src/patient/demographicCard.jsp",
-	controller: function ($scope)
+	controller: ["$scope", function ($scope)
 	{
 		var ctrl = this;
 
@@ -112,5 +112,5 @@ angular.module('Patient').component('demographicCard', {
 		};
 
 		ctrl.$onInit = ctrl.init();
-	}
+	}]
 });

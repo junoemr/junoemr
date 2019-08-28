@@ -32,16 +32,26 @@ angular.module('Layout').component('leftAside', {
 		expandOn: "="
 	},
 	templateUrl: "src/layout/leftAside.jsp",
-	controller: function (
-		$rootScope,
-		$scope,
-		$q,
-		$http,
-		$httpParamSerializer,
-		$state,
-		angularUtil,
-		scheduleService,
-		providerService)
+	controller: [
+		"$rootScope",
+		"$scope",
+		"$q",
+		"$http",
+		"$httpParamSerializer",
+		"$state",
+		"angularUtil",
+		"scheduleService",
+		"providerService",
+		function (
+			$rootScope,
+			$scope,
+			$q,
+			$http,
+			$httpParamSerializer,
+			$state,
+			angularUtil,
+			scheduleService,
+			providerService)
 	{
 
 		var ctrl = this;
@@ -281,5 +291,5 @@ angular.module('Layout').component('leftAside', {
 		};
 
 		ctrl.$onInit = ctrl.init();
-	}
+	}]
 });
