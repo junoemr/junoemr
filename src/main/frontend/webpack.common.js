@@ -234,6 +234,7 @@ module.exports = {
 			'./src/layout/bodyController.js',
 			'./src/layout/primaryNavComponent.js',
 			'./src/layout/leftAsideComponent.js',
+			'./src/layout/modalComponent.js',
 
 			'./src/patient/module.js',
 			'./src/patient/newPatientController.js',
