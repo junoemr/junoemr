@@ -36,8 +36,8 @@ import org.oscarehr.labs.dao.Hl7DocumentLinkDao;
 import org.oscarehr.labs.model.Hl7DocumentLink;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,8 +60,10 @@ import java.util.List;
 public class ConsultationPDFCreationService
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private static Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
-	private static DocumentDao documentDao = SpringUtils.getBean(DocumentDao.class);
+	@Autowired
+	private Hl7DocumentLinkDao hl7DocumentLinkDao;
+	@Autowired
+	private DocumentDao documentDao;
 
 	public List<InputStream> toEDocInputStreams(HttpServletRequest request, List<EDoc> attachedDocuments) throws IOException, DocumentException
 	{
