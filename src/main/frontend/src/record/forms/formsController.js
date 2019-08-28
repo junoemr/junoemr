@@ -33,6 +33,8 @@ FORM_CONTROLLER_STATES = {
 	MANAGE: 	4,
 }
 
+FORM_CONTROLLER_GROUP_SELECT_ALL = -1;
+
 angular.module('Record.Forms').controller('Record.Forms.FormController', [
 
 	'$scope',
@@ -58,7 +60,6 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		user,
 		securityService)
 	{
-
 		var controller = this;
 
 		console.log("form ctrl ", $stateParams, $state);
@@ -68,9 +69,13 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 
 		controller.viewState = $stateParams.viewState;
 
+		controller.groupSelection = FORM_CONTROLLER_GROUP_SELECT_ALL;
+		controller.groupSelectedForms = null;
+
 		$scope.viewState = $stateParams.viewState;
 		$scope.FORM_CONTROLLER_STATES = FORM_CONTROLLER_STATES;
 		$scope.demographicNo = $stateParams.demographicNo;
+		$scope.formSearchStr = "";
 
 		console.log("Loading Form Controller in state: " + controller.viewState);
 
@@ -201,9 +206,34 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		};
 
 		// called on group change
-		$scope.onGroupChange = function (groupId)
+		$scope.onGroupChange = function (groupId, selectedForms)
 		{
 			console.log("new group: " + groupId);
+			controller.groupSelection = groupId;
+			controller.groupSelectedForms = selectedForms;
+		};
+
+		// filter forms for display
+		$scope.onFilterForms = function (form, index, array)
+		{
+			// filter on group
+			let foundInGroup = true;
+			if (controller.groupSelection !== FORM_CONTROLLER_GROUP_SELECT_ALL)
+			{
+				let found = controller.groupSelectedForms.find(function (selectedItem) {
+					return selectedItem.id === form.formId
+				});
+				foundInGroup = (found !== undefined && found !== null);
+			}
+
+			// filter on search string
+			let foundInSearch = true;
+			if ($scope.formSearchStr.length > 0)
+			{
+				foundInSearch = form.name.search("^" + $scope.formSearchStr+".*") !== -1;
+			}
+
+			return foundInGroup && foundInSearch;
 		};
 
 		// form display list

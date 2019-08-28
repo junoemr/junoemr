@@ -27,7 +27,7 @@
 			<h2><bean:message key="forms.title.form.library" bundle="ui"/></h2>
 		</div>
 		<div class="col-md-9" style="background-color:green;">
-			<h2>Search Box... Mode: {{viewState}} </h2>
+			<input ng-model="formSearchStr">
 		</div>
 	</div>
 	<div class="row">
@@ -35,14 +35,14 @@
 			<div class="container-fluid">
 				<mode-selector-component mode-change="onModeChange(mode)"></mode-selector-component>
 				<hr>
-				<group-selector-component group-change="onGroupChange(groupId)"></group-selector-component>
+				<group-selector-component group-change="onGroupChange(groupId, selectedForms)"></group-selector-component>
 			</div>
 		</div>
 		<div class="col-md-9" style="background-color:lightblue;">
-			<add-view-component ng-if="viewState === FORM_CONTROLLER_STATES.ADD" form-list="displayFormList" demographic-no="demographicNo"></add-view-component>
-			<completed-view-component ng-if="viewState === FORM_CONTROLLER_STATES.COMPLETED" form-list="displayFormList" demographic-no="demographicNo"></completed-view-component>
-			<revisions-view-component ng-if="viewState === FORM_CONTROLLER_STATES.REVISION" form-list="displayFormList" demographic-no="demographicNo"></revisions-view-component>
-			<deleted-view-component ng-if="viewState === FORM_CONTROLLER_STATES.DELETED" form-list="displayFormList" demographic-no="demographicNo"></deleted-view-component>
+			<add-view-component ng-if="viewState === FORM_CONTROLLER_STATES.ADD" form-list="displayFormList" demographic-no="demographicNo" filter-forms="onFilterForms(form, index, array)"></add-view-component>
+			<completed-view-component ng-if="viewState === FORM_CONTROLLER_STATES.COMPLETED" form-list="displayFormList" demographic-no="demographicNo" filter-forms="onFilterForms(form, index, array)"></completed-view-component>
+			<revisions-view-component ng-if="viewState === FORM_CONTROLLER_STATES.REVISION" form-list="displayFormList" demographic-no="demographicNo" filter-forms="onFilterForms(form, index, array)"></revisions-view-component>
+			<deleted-view-component ng-if="viewState === FORM_CONTROLLER_STATES.DELETED" form-list="displayFormList" demographic-no="demographicNo" filter-forms="onFilterForms(form, index, array)"></deleted-view-component>
 		</div>
 	</div>
 </div>

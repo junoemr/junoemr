@@ -25,7 +25,8 @@ angular.module('Record.Forms').component('revisionsViewComponent', {
 	templateUrl: 'src/record/forms/components/views/revisionsView/revisionsView.jsp',
 	bindings: {
 		demographicNo: '<',
-		formList: '='
+		formList: '=',
+		filterForms: '&',
 	},
 	controller: function (formService)
 	{
@@ -35,5 +36,10 @@ angular.module('Record.Forms').component('revisionsViewComponent', {
 		{
 			formService.openEFormInstancePopup(ctrl.demographicNo, id);
 		}
+
+		ctrl.doFilterForms = function(form, index, array)
+		{
+			return ctrl.filterForms({form:form, index:index, array:array});
+		};
 	}
 });

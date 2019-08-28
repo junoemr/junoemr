@@ -30,9 +30,11 @@ angular.module('Record.Forms').component('groupSelectorComponent', {
 	controller: function (formService) {
 		let ctrl = this;
 
-		ctrl.onGroupChange = function (groupId)
+		ctrl.FORM_CONTROLLER_GROUP_SELECT_ALL = FORM_CONTROLLER_GROUP_SELECT_ALL;
+
+		ctrl.onGroupChange = function (groupId, selectedItems)
 		{
-			ctrl.groupChange({groupId: groupId});
+			ctrl.groupChange({groupId: groupId, selectedForms: selectedItems});
 		};
 
 		ctrl.groups = [];

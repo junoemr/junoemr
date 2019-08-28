@@ -25,7 +25,8 @@ angular.module('Record.Forms').component('completedViewComponent', {
 	templateUrl: 'src/record/forms/components/views/completedView/completedView.jsp',
 	bindings: {
 		demographicNo: '<',
-		formList: '='
+		formList: '=',
+		filterForms: '&',
 	},
 	controller: function (formService) {
 		let ctrl = this;
@@ -47,10 +48,15 @@ angular.module('Record.Forms').component('completedViewComponent', {
 					}
 				)
 			}
-		}
+		};
 
 		ctrl.openForm = function (id)
 		{
 			formService.openEFormInstancePopup(ctrl.demographicNo, id);
-		}
+		};
+
+		ctrl.doFilterForms = function(form, index, array)
+		{
+			return ctrl.filterForms({form:form, index:index, array:array});
+		};
 	}});

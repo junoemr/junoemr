@@ -42,7 +42,7 @@
 	</div>
 
 	<!--list-->
-	<div class="row content-row" ng-repeat=" form in $ctrl.formList">
+	<div class="row content-row" ng-repeat=" form in $ctrl.formList | filter:$ctrl.doFilterForms">
 		<div class="col-md-3" style="background-color: #38a1bb;">
 			<a href="javascript:;" ng-click="$ctrl.openForm(form.id)">{{form.name}}</a>
 		</div>

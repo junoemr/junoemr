@@ -24,7 +24,8 @@ angular.module('Record.Forms').component('deletedViewComponent', {
 	templateUrl: 'src/record/forms/components/views/deletedView/deletedView.jsp',
 	bindings: {
 		demographicNo: '<',
-		formList: '='
+		formList: '=',
+		filterForms: '&',
 	},
 	controller: function (formService)
 	{
@@ -54,6 +55,11 @@ angular.module('Record.Forms').component('deletedViewComponent', {
 					}
 				)
 			}
+		};
+
+		ctrl.doFilterForms = function(form, index, array)
+		{
+			return ctrl.filterForms({form:form, index:index, array:array});
 		};
 	}
 });
