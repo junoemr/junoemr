@@ -514,7 +514,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			});
 
 	// redirect to login page on 401 error.
-	$httpProvider.interceptors.push(function($q) {
+	$httpProvider.interceptors.push(['$q', function($q) {
 		return {
 			'responseError': function(rejection) {
 				if (rejection.status === 401 && rejection.data === "<error>Not authorized</error>")
@@ -524,7 +524,7 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 				return $q.reject(rejection);
 			}
 		};
-	});
+	}]);
 }]);
 
 
