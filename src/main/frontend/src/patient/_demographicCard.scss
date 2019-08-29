@@ -1,20 +1,23 @@
 
 .demographic-card {
-	height: 144px;
-	background-color: $color-neutral-lightest;
-	border: solid 1px $color-neutral-lighter;
+	height: 152px;
 	border-radius: 8px;
-	padding: 14px;
+	background-color: $color-neutral-lightest;
+	border: solid 1px $color-neutral-light;
+	padding: 8px 0;
+	overflow: auto;
 
 	.form-group {
 		margin: 0;
+		align-items: baseline !important;
 
 		label {
-			font-size: 9px;
-			color: $color-neutral-dark;
+			@include juno-font-label(10px);
+			color: $color-neutral-grey;
+			padding: 4px 2px;
 		}
 		span {
-			@include juno-font-label;
+			@include juno-font-input(12px);
 			color: $color-neutral-darker;
 		}
 	}

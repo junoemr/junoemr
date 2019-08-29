@@ -23,101 +23,81 @@
 
 --%>
 
-<div class="demographic-card">
-	<div class="form-row">
-		<div class="col-sm-8">
-			<!-- patient dob -->
-			<div class="form-group">
-				<label class="control-label col-sm-2">
-					Born:
-				</label>
-				<div class="col-sm-10">
-					<span class="form-control-static input-sm">
-						{{ $ctrl.model.displayData.birthDate }}
+<div class="demographic-card flex-column align-items-center justify-content-center">
+	<div class="form-horizontal">
+		<!-- patient dob -->
+		<div class="form-group">
+			<label class="control-label col-sm-2">
+				Born:
+			</label>
+			<div class="col-sm-10">
+				<span class="form-control-static input-sm">
+					{{ $ctrl.model.displayData.birthDate }}
+				</span>
+			</div>
+		</div>
+		<!-- gender -->
+		<div class="form-group">
+			<label class="control-label col-sm-2">
+				Sex:
+			</label>
+			<div class="col-sm-10">
+				<span class="form-control-static input-sm">
+					{{ $ctrl.model.data.sex }}
+				</span>
+			</div>
+		</div>
+		<!-- patient hin -->
+		<div class="form-group">
+			<label class="control-label col-sm-2">
+				HIN:
+			</label>
+			<div class="col-sm-10">
+				<span class="form-control-static">
+					<span class="patient-health-number" ng-if="$ctrl.model.data.hin">
+						{{$ctrl.model.data.hin}}
+						{{$ctrl.model.data.ver}}
 					</span>
-				</div>
+					<%--<button type="button"--%>
+					        <%--aria-label="Check Eligibility"--%>
+					        <%--title="{{$ctrl.model.eligibilityText}}"--%>
+					        <%--class="btn"--%>
+					        <%--ng-class="{--%>
+											<%--'btn-addon': ($ctrl.model.checkingEligibility || $ctrl.model.eligibility == null) && !$ctrl.model.pollingEligibility,--%>
+											<%--'btn-warning': $ctrl.model.pollingEligibility,--%>
+											<%--'btn-success': $ctrl.model.eligibility == 'eligible',--%>
+											<%--'btn-danger': $ctrl.model.eligibility == 'ineligible' }"--%>
+					        <%--ng-click="$ctrl.model.getEligibility(true, true)">--%>
+						<%--<i class="fa fa-user" aria-hidden="true"></i>--%>
+					<%--</button>--%>
+				</span>
 			</div>
 		</div>
-		<div class="col-sm-4">
-			<!-- gender -->
-			<div class="form-group">
-				<label class="control-label col-sm-2">
-					Sex:
-				</label>
-				<div class="col-sm-8">
-					<span class="form-control-static input-sm">
-						{{ $ctrl.model.data.sex }}
-					</span>
-				</div>
+		<!-- patient address -->
+		<div class="form-group">
+			<label class="control-label col-sm-2">
+				Address:
+			</label>
+			<div class="col-sm-10">
+				<span class="form-control-static">{{$ctrl.model.displayData.addressLine}}</span>
 			</div>
 		</div>
-	</div>
-	<div class="form-row">
-		<div class="col-sm-12">
-			<!-- patient hin -->
-			<div class="form-group">
-				<label class="control-label col-sm-1">
-					HIN#:
-				</label>
-				<div class="col-sm-11">
-					<span class="form-control-static">
-						<span class="patient-health-number" ng-if="$ctrl.model.data.hin">
-							{{$ctrl.model.data.hin}}
-							{{$ctrl.model.data.ver}}
-						</span>
-						<%--<button type="button"--%>
-						        <%--aria-label="Check Eligibility"--%>
-						        <%--title="{{$ctrl.model.eligibilityText}}"--%>
-						        <%--class="btn"--%>
-						        <%--ng-class="{--%>
-												<%--'btn-addon': ($ctrl.model.checkingEligibility || $ctrl.model.eligibility == null) && !$ctrl.model.pollingEligibility,--%>
-												<%--'btn-warning': $ctrl.model.pollingEligibility,--%>
-												<%--'btn-success': $ctrl.model.eligibility == 'eligible',--%>
-												<%--'btn-danger': $ctrl.model.eligibility == 'ineligible' }"--%>
-						        <%--ng-click="$ctrl.model.getEligibility(true, true)">--%>
-							<%--<i class="fa fa-user" aria-hidden="true"></i>--%>
-						<%--</button>--%>
-					</span>
-				</div>
+		<!-- patient phone -->
+		<div class="form-group">
+			<label class="control-label col-sm-2">
+				Phone:
+			</label>
+			<div class="col-sm-10">
+				<span class="form-control-static">{{$ctrl.model.data.phone}}</span>
 			</div>
 		</div>
-	</div>
-	<div class="form-row">
-		<div class="col-sm-12">
-			<!-- patient address -->
-			<div class="form-group">
-				<label class="control-label col-sm-1">
-					Address:
-				</label>
-				<div class="col-sm-11">
-					<span class="form-control-static">{{$ctrl.model.displayData.addressLine}}</span>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="form-row">
-		<div class="col-sm-12">
-			<!-- patient phone -->
-			<div class="form-group">
-				<label class="control-label col-sm-1">
-					Phone:
-				</label>
-				<div class="col-sm-11">
-					<span class="form-control-static">{{$ctrl.model.data.phone}}</span>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="form-row">
-		<div class="col-sm-12">
-			<!-- patient email -->
-			<div class="form-group">
-				<label class="control-label col-sm-1">
-					Email:
-				</label>
-				<div class="col-sm-11">
-					<span class="form-control-static">{{$ctrl.model.data.email}}</span>
-				</div>
+		<!-- patient email -->
+		<div class="form-group">
+			<label class="control-label col-sm-2">
+				Email:
+			</label>
+			<div class="col-sm-10">
+				<span class="form-control-static">{{$ctrl.model.data.email}}</span>
 			</div>
 		</div>
 	</div>
