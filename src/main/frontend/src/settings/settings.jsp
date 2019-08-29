@@ -644,6 +644,7 @@
 						</label>
 					</div>
 				</div>
+				</div>
 				<patient-summary-items
 						ng-if="settingsCtrl.pref.summaryItemCustomDisplay"
 						pref="settingsCtrl.pref"
