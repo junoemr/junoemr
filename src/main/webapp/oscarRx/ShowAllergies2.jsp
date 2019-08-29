@@ -79,14 +79,22 @@
 
 		<script type="text/javascript" src="<%=request.getContextPath()%>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
 		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-		<script type="text/javascript" src="<%= request.getContextPath() %>/js/moment.min.js"></script>
 
 		<script type="text/javascript">
 			function validateAllergySubmit()
 			{
-				var startDate = ($("#startDate").val());
-				startDate = moment(startDate, "YYYY-MM-DD");
-				var validDate = startDate.isValid();
+				var startDateSelector = $("#startDate");
+				var startDate = startDateSelector.val().split("-");
+
+				var validDate = startDate[0].length === 4;
+
+				while (validDate && startDate.length < 3)
+				{
+					startDate.push("01");
+				}
+
+				// Use default JS date library, moment.js is too liberal with formatting anything as a date
+				validDate = !isNaN(Date.parse(startDate[0] + "-" + startDate[1] + "-" + startDate[2]));
 
 				if (!validDate)
 				{
