@@ -52,6 +52,24 @@ angular.module("Common.Services").service("formService", [
 			return deferred.promise;
 		};
 
+		service.genericFormGet = function genericFormGet(url)
+		{
+			var deferred = $q.defer();
+			$http.get(url,
+				Juno.Common.ServiceHelper.configHeaders()).then(
+				function success(results)
+				{
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("formService::getAllFormsByHeading error", errors);
+					deferred.reject("An error occurred while fetching forms");
+				});
+
+			return deferred.promise;
+		};
+
 		service.getAllEncounterForms = function getAllEncounterForms()
 		{
 			var deferred = $q.defer();
@@ -91,24 +109,24 @@ angular.module("Common.Services").service("formService", [
 		// get all completed form instances for the given demographic
 		service.getCompletedEncounterForms = function getCompletedEncounterForms(demographicNo)
 		{
-			return service.getAllFormsByHeading(demographicNo, 'Completed');
+			return service.genericFormGet(service.apiPath + "/" + encodeURIComponent(demographicNo) + "/all/completed")
 		};
 
 		// get all forms that can be added to the given demographic
 		service.getAddForms = function getAddForms(demographicNo)
 		{
-			return service.getAllFormsByHeading(demographicNo, 'Add');
+			return service.genericFormGet(service.apiPath + "/allForms")
 		};
 
 		// get all form revisions for the given demographic
 		service.getRevisionForms = function (demographicNo)
 		{
-			return service.getAllFormsByHeading(demographicNo, 'Revisions')
+			return service.genericFormGet(service.apiPath + "/" + encodeURIComponent(demographicNo) + "/all/revisions")
 		};
 
 		service.getDeletedForms = function (demographicNo)
 		{
-			return service.getAllFormsByHeading(demographicNo, 'Deleted');
+			return service.genericFormGet(service.apiPath + "/" + encodeURIComponent(demographicNo) + "/all/deleted")
 		};
 
 		service.getAllEForms = function getAllEForms()
@@ -253,6 +271,31 @@ angular.module("Common.Services").service("formService", [
 		{
 			let url = '../eform/efmshowform_data.jsp?fdid=' + fdid + '&demographic_no=' + demographicNo + '&appointment=null';
 			window.open(url,'popUpWindow','height=500,width=700,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+		};
+
+		service.openFormPopup = function (providerNo, demographicNo, appointmentNo, url)
+		{
+			if (appointmentNo === undefined)
+			{
+				appointmentNo = "";
+			}
+
+			url = url + encodeURIComponent(demographicNo) + "&formId=0&provNo=" + encodeURIComponent(providerNo) + "&parentAjaxId=forms&appointmentNo=" + encodeURIComponent(appointmentNo);
+			window.open(url,
+				'popUpWindow','height=500,width=700,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+		};
+
+		service.openFormInstancePopup = function(formName, demographicNo, appointmentNo, id)
+		{
+			if (appointmentNo === undefined)
+			{
+				appointmentNo = "";
+			}
+
+			let url = "../form/forwardshortcutname.jsp?formname=" + encodeURIComponent(formName) + "&demographic_no=" + encodeURIComponent(demographicNo) +
+				"&appointmentNo=" + encodeURIComponent(appointmentNo) + "&formId=" + encodeURIComponent(id);
+			window.open(url,
+				'popUpWindow','height=500,width=700,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
 		};
 
 

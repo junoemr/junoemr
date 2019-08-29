@@ -31,9 +31,28 @@ FORM_CONTROLLER_STATES = {
 	REVISION: 	2,
 	DELETED: 	3,
 	MANAGE: 	4,
-}
+};
 
-FORM_CONTROLLER_GROUP_SELECT_ALL = -1;
+// modes by which the form list can be sorted
+FORM_CONTROLLER_SORT_MODES = {
+	FORM_NAME: "name",
+	ADDITIONAL: "subject",
+	MOD_DATE: "date",
+	CREATE_DATE: "createDate"
+};
+
+// types of forms
+FORM_CONTROLLER_FORM_TYPES = {
+	EFORM: 'eform',
+	FORM: 'form'
+};
+
+// special filter groups
+FORM_CONTROLLER_SPECIAL_GROUPS = {
+	SELECT_ALL: -1,
+	SELECT_EFORM: -2,
+	SELECT_FORM: -3
+};
 
 angular.module('Record.Forms').controller('Record.Forms.FormController', [
 
@@ -66,16 +85,21 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.providerNo = user.providerNo;
+		controller.appointmentNo = $stateParams.appointmentNo;
 
 		controller.viewState = $stateParams.viewState;
 
-		controller.groupSelection = FORM_CONTROLLER_GROUP_SELECT_ALL;
+		controller.groupSelection = FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL;
 		controller.groupSelectedForms = null;
 
 		$scope.viewState = $stateParams.viewState;
 		$scope.FORM_CONTROLLER_STATES = FORM_CONTROLLER_STATES;
-		$scope.demographicNo = $stateParams.demographicNo;
 		$scope.formSearchStr = "";
+
+		$scope.demographicNo = $stateParams.demographicNo;
+		$scope.providerNo = controller.providerNo;
+		$scope.appointmentNo = $stateParams.appointmentNo;
+
 
 		console.log("Loading Form Controller in state: " + controller.viewState);
 
@@ -109,7 +133,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 			},
 			function error(errors)
 			{
-				console.log(errors);
+				console.error(errors);
 		});
 
 		// fill form list with completed forms
@@ -119,7 +143,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 				function success(results)
 				{
 					$scope.displayFormList = Juno.Common.Util.toArray(results.list);
-					console.log(results);
+					controller.ensureSubjectNotNull($scope.displayFormList);
 				},
 				function error(errors)
 				{
@@ -135,7 +159,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 				function success(results)
 				{
 					$scope.displayFormList = Juno.Common.Util.toArray(results.list);
-					console.log(results);
+					controller.ensureSubjectNotNull($scope.displayFormList);
 				},
 				function error(errors)
 				{
@@ -151,7 +175,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 				function success(results)
 				{
 					$scope.displayFormList = Juno.Common.Util.toArray(results.list);
-					console.log(results);
+					controller.ensureSubjectNotNull($scope.displayFormList);
 				},
 				function error(errors)
 				{
@@ -167,7 +191,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 				function success(results)
 				{
 					$scope.displayFormList = Juno.Common.Util.toArray(results.list);
-					console.log(results);
+					controller.ensureSubjectNotNull($scope.displayFormList);
 				},
 				function error(errors)
 				{
@@ -176,10 +200,21 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 			);
 		};
 
+		// null subject values do no sort well. force them to empty string
+		controller.ensureSubjectNotNull = function (formList)
+		{
+			formList.forEach(function (form)
+			{
+				if (form.subject === null)
+				{
+					form.subject = '';
+				}
+			});
+		};
+
 		// called on mode change
 		$scope.onModeChange = function (mode)
 		{
-			console.log("new mode: " + mode);
 			$scope.viewState = mode;
 
 			switch (mode)
@@ -208,7 +243,6 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		// called on group change
 		$scope.onGroupChange = function (groupId, selectedForms)
 		{
-			console.log("new group: " + groupId);
 			controller.groupSelection = groupId;
 			controller.groupSelectedForms = selectedForms;
 		};
@@ -218,19 +252,31 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		{
 			// filter on group
 			let foundInGroup = true;
-			if (controller.groupSelection !== FORM_CONTROLLER_GROUP_SELECT_ALL)
+
+			switch(controller.groupSelection)
 			{
-				let found = controller.groupSelectedForms.find(function (selectedItem) {
-					return selectedItem.id === form.formId
-				});
-				foundInGroup = (found !== undefined && found !== null);
+				case FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL:
+					foundInGroup = true;
+					break;
+				case FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_FORM:
+					foundInGroup = form.type === FORM_CONTROLLER_FORM_TYPES.FORM;
+					break;
+				case FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_EFORM:
+					foundInGroup = form.type === FORM_CONTROLLER_FORM_TYPES.EFORM;
+					break;
+				default:
+					let found = controller.groupSelectedForms.find(function (selectedItem) {
+						return selectedItem.id === form.formId
+					});
+					foundInGroup = (found !== undefined && found !== null);
+					break;
 			}
 
 			// filter on search string
 			let foundInSearch = true;
 			if ($scope.formSearchStr.length > 0)
 			{
-				foundInSearch = form.name.search("^" + $scope.formSearchStr+".*") !== -1;
+				foundInSearch = form.name.toUpperCase().search("^" + $scope.formSearchStr.toUpperCase()+".*") !== -1;
 			}
 
 			return foundInGroup && foundInSearch;

@@ -24,13 +24,13 @@
 	<!--header-->
 	<div class="row">
 		<div class="col-md-3" style="background-color: #38a1bb;">
-			<h4>Form Name</h4>
+			<h4><a href="javascript:" ng-click="$ctrl.doSort($ctrl.SORT_MODES.FORM_NAME)">Form Name</a></h4>
 		</div>
 		<div class="col-md-4" style="background-color: #2f83ff;">
-			<h4>Additional Information</h4>
+			<h4><a href="javascript:" ng-click="$ctrl.doSort($ctrl.SORT_MODES.ADDITIONAL)">Additional Information</a></h4>
 		</div>
 		<div class="col-md-3" style="background-color: #38a1bb;">
-			<h4>Modified Date</h4>
+			<h4><a href="javascript:" ng-click="$ctrl.doSort($ctrl.SORT_MODES.MOD_DATE)">Modified Date</a></h4>
 		</div>
 		<div class="col-md-2" style="background-color: #2f83ff;">
 			<h4>Action</h4>
@@ -41,7 +41,7 @@
 	</div>
 
 	<!--list-->
-	<div class="row content-row" ng-repeat=" form in $ctrl.formList | filter:$ctrl.doFilterForms">
+	<div class="row content-row" ng-repeat=" form in $ctrl.formList | filter:$ctrl.doFilterForms | orderBy:$ctrl.sortMode:$ctrl.reverseSort">
 		<div class="col-md-3" style="background-color: #38a1bb;">
 			<a href="javascript:;" ng-click="$ctrl.openForm(form.id)">{{form.name}}</a>
 		</div>
@@ -49,7 +49,7 @@
 			{{form.subject}}
 		</div>
 		<div class="col-md-3" style="background-color: #38a1bb;">
-			{{form.date}}
+			{{form.date | date:'yyyy-MM-dd'}}
 		</div>
 		<div class="col-md-2" style="background-color: #2f83ff;">
 			<a href="javascript:;" ng-click="$ctrl.restoreForm(form.id, form.type)"><u>Restore</u></a>

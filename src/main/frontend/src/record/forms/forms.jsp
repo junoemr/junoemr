@@ -27,7 +27,15 @@
 			<h2><bean:message key="forms.title.form.library" bundle="ui"/></h2>
 		</div>
 		<div class="col-md-9" style="background-color:green;">
-			<input ng-model="formSearchStr">
+			<ca-field-text
+					ca-name="form-search"
+					ca-title="Form Search"
+					ca-input-size="col-md-4"
+					ca-label-size="col-md-1"
+					ca-model="formSearchStr"
+					ca-error="{{displayMessages.field_errors()['repeatUnits']}}"
+					ca-rows="1">
+			</ca-field-text>
 		</div>
 	</div>
 	<div class="row">
@@ -39,8 +47,10 @@
 			</div>
 		</div>
 		<div class="col-md-9" style="background-color:lightblue;">
-			<add-view-component ng-if="viewState === FORM_CONTROLLER_STATES.ADD" form-list="displayFormList" demographic-no="demographicNo" filter-forms="onFilterForms(form, index, array)"></add-view-component>
-			<completed-view-component ng-if="viewState === FORM_CONTROLLER_STATES.COMPLETED" form-list="displayFormList" demographic-no="demographicNo" filter-forms="onFilterForms(form, index, array)"></completed-view-component>
+			<add-view-component ng-if="viewState === FORM_CONTROLLER_STATES.ADD" form-list="displayFormList" demographic-no="demographicNo" provider-no="providerNo" appointment-no="appointmentNo"
+								filter-forms="onFilterForms(form, index, array)"></add-view-component>
+			<completed-view-component ng-if="viewState === FORM_CONTROLLER_STATES.COMPLETED" form-list="displayFormList" demographic-no="demographicNo" appointment-no="appointmentNo"
+									  filter-forms="onFilterForms(form, index, array)"></completed-view-component>
 			<revisions-view-component ng-if="viewState === FORM_CONTROLLER_STATES.REVISION" form-list="displayFormList" demographic-no="demographicNo" filter-forms="onFilterForms(form, index, array)"></revisions-view-component>
 			<deleted-view-component ng-if="viewState === FORM_CONTROLLER_STATES.DELETED" form-list="displayFormList" demographic-no="demographicNo" filter-forms="onFilterForms(form, index, array)"></deleted-view-component>
 		</div>

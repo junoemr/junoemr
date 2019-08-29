@@ -25,21 +25,47 @@ angular.module('Record.Forms').component('addViewComponent', {
 	templateUrl: 'src/record/forms/components/views/addView/addView.jsp',
 	bindings: {
 		demographicNo: '<',
+		providerNo: '<',
+		appointmentNo: '<',
 		formList: '=',
 		filterForms: '&',
 	},
-	controller: function (formService)
+	controller:[ 'formService', '$scope', function (formService, $scope)
 	{
 		let ctrl = this;
 
-		ctrl.openForm = function (id)
+		$scope.SORT_MODES = FORM_CONTROLLER_SORT_MODES;
+		$scope.FORM_CONTROLLER_FORM_TYPES = FORM_CONTROLLER_FORM_TYPES;
+
+		ctrl.sortMode = FORM_CONTROLLER_SORT_MODES.FORM_NAME;
+		ctrl.reverseSort = false;
+
+		ctrl.openEForm = function (id)
 		{
 			formService.openEFormPopup(ctrl.demographicNo, id);
-		}
+		};
+
+		ctrl.openForm = function (url)
+		{
+			formService.openFormPopup(ctrl.providerNo, ctrl.demographicNo, ctrl.appointmentNo, url);
+		};
 
 		ctrl.doFilterForms = function(form, index, array)
 		{
 			return ctrl.filterForms({form:form, index:index, array:array});
 		};
-	}
+
+		ctrl.doSort = function(mode)
+		{
+			if (mode === ctrl.sortMode)
+			{
+				ctrl.reverseSort = !ctrl.reverseSort;
+			}
+			else
+			{
+				ctrl.reverseSort = false;
+			}
+			ctrl.sortMode = mode;
+		};
+	}]
 });

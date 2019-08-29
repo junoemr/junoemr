@@ -26,5 +26,5 @@
 	<div><a href="javascript:;" ng-click="$ctrl.onModeChange($ctrl.FORM_CONTROLLER_STATES.COMPLETED)">Completed Forms</a></div>
 	<div><a href="javascript:;" ng-click="$ctrl.onModeChange($ctrl.FORM_CONTROLLER_STATES.REVISION)">From Revisions</a></div>
 	<div><a href="javascript:;" ng-click="$ctrl.onModeChange($ctrl.FORM_CONTROLLER_STATES.DELETED)">Deleted Forms</a></div>
-	<div><a href="javascript:;" ng-click="$ctrl.onModeChange($ctrl.FORM_CONTROLLER_STATES.MANAGE)">Manage Forms</a></div>
+	<div><a href="javascript:;" ng-click="$ctrl.openManageForms()">Manage Forms</a></div>
 </div>

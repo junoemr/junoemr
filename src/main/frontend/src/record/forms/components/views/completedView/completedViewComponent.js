@@ -25,11 +25,18 @@ angular.module('Record.Forms').component('completedViewComponent', {
 	templateUrl: 'src/record/forms/components/views/completedView/completedView.jsp',
 	bindings: {
 		demographicNo: '<',
+		appointmentNo: '<',
 		formList: '=',
 		filterForms: '&',
 	},
-	controller: function (formService) {
+	controller: ['formService', '$scope', function (formService, $scope) {
 		let ctrl = this;
+
+		$scope.FORM_CONTROLLER_FORM_TYPES = FORM_CONTROLLER_FORM_TYPES;
+		$scope.SORT_MODES = FORM_CONTROLLER_SORT_MODES;
+
+		ctrl.sortMode = FORM_CONTROLLER_SORT_MODES.FORM_NAME;
+		ctrl.reverseSort = false;
 
 		ctrl.deleteForm = function (id, type)
 		{
@@ -50,13 +57,31 @@ angular.module('Record.Forms').component('completedViewComponent', {
 			}
 		};
 
-		ctrl.openForm = function (id)
+		ctrl.openEForm = function (id)
 		{
 			formService.openEFormInstancePopup(ctrl.demographicNo, id);
+		};
+
+		ctrl.openForm = function (formName, id)
+		{
+			formService.openFormInstancePopup(formName, ctrl.demographicNo, ctrl.appointmentNo, id);
 		};
 
 		ctrl.doFilterForms = function(form, index, array)
 		{
 			return ctrl.filterForms({form:form, index:index, array:array});
 		};
-	}});
+
+		ctrl.doSort = function(mode)
+		{
+			if (mode === ctrl.sortMode)
+			{
+				ctrl.reverseSort = !ctrl.reverseSort;
+			}
+			else
+			{
+				ctrl.reverseSort = false;
+			}
+			ctrl.sortMode = mode;
+		};
+}]});

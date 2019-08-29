@@ -25,8 +25,15 @@ package org.oscarehr.managers;
 
 
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.eform.dao.EFormDao.EFormSortOrder;
 import org.oscarehr.eform.dao.EFormDataDao;
@@ -37,9 +44,14 @@ import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.common.model.EncounterForm;
 import org.oscarehr.eform.service.EFormDataService;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.to.model.FormTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import oscar.log.LogAction;
+import oscar.oscarEncounter.data.EctFormData;
 
 /**
  * 
@@ -47,6 +59,7 @@ import oscar.log.LogAction;
  *
  */
 @Service
+@Transactional
 public class FormsManager {
 	   
 	
@@ -118,6 +131,11 @@ public class FormsManager {
 		return eFormDataDao.findInstancedVersionsByDemographicId(demographicId, null, null, false);
 	}
 
+	/**
+	 * get all delete eform instances
+	 * @param demographicId - demographic no
+	 * @return - deleted eform instances
+	 */
 	public List<EFormData> getDeletedEFormInstances(Integer demographicId)
 	{
 		return eFormDataDao.findInstancedByDemographicId(demographicId, null, null, false);
@@ -162,6 +180,61 @@ public class FormsManager {
 		List<EncounterForm> results = encounterFormDao.findAllNotHidden();
 		Collections.sort(results, EncounterForm.FORM_NAME_COMPARATOR);
 		return (results);
+	}
+
+	/**
+	 * get completed encounter froms for the demographic
+	 * @param loggedInInfo - logged in info
+	 * @param demographicNo - demographic
+	 * @return - list of encounter froms
+	 */
+	public List<EctFormData.PatientForm> getCompletedEncounterForms(LoggedInInfo loggedInInfo, String demographicNo)
+	{
+		return getPatientEncounterForms(loggedInInfo, demographicNo, true);
+	}
+
+	/**
+	 * get all encounter from revisions for the demographic
+	 * @param loggedInInfo - logged in info
+	 * @param demographicNo - demographic
+	 * @return - list of encounter froms
+	 */
+	public List<EctFormData.PatientForm> getEncounterFormRevisions(LoggedInInfo loggedInInfo, String demographicNo)
+	{
+		return getPatientEncounterForms(loggedInInfo, demographicNo, false);
+	}
+
+	/**
+	 * get patient encounter froms
+	 * @param loggedInInfo - logged in info
+	 * @param demographicNo - demographic
+	 * @param onlyMostRecent - if true only the most recent version will be returned
+	 * @return - patient encounters
+	 */
+	public List<EctFormData.PatientForm> getPatientEncounterForms(LoggedInInfo loggedInInfo, String demographicNo, boolean onlyMostRecent)
+	{
+		List<EctFormData.PatientForm> outList = new ArrayList<>();
+
+		List<EncounterForm> encounterForms = getAllEncounterForms();
+
+		for (EncounterForm encounterForm : encounterForms) {
+			String table = StringUtils.trimToNull(encounterForm.getFormTable());
+			if (table != null) {
+
+				EctFormData.PatientForm[] pforms = EctFormData.getPatientFormsFromLocalAndRemote(loggedInInfo, demographicNo, table);
+				for(EctFormData.PatientForm form : pforms)
+				{
+					form.formName = encounterForm.getFormName();
+					outList.add(form);
+
+					if (onlyMostRecent)
+					{
+						break;
+					}
+				}
+			}
+		}
+		return outList;
 	}
 	
 }

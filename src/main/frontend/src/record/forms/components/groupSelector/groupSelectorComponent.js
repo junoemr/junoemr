@@ -27,10 +27,10 @@ angular.module('Record.Forms').component('groupSelectorComponent', {
 	bindings: {
 		groupChange: '&'
 	},
-	controller: function (formService) {
+	controller: ['formService', function (formService) {
 		let ctrl = this;
 
-		ctrl.FORM_CONTROLLER_GROUP_SELECT_ALL = FORM_CONTROLLER_GROUP_SELECT_ALL;
+		ctrl.FORM_CONTROLLER_SPECIAL_GROUPS = FORM_CONTROLLER_SPECIAL_GROUPS;
 
 		ctrl.onGroupChange = function (groupId, selectedItems)
 		{
@@ -47,5 +47,11 @@ angular.module('Record.Forms').component('groupSelectorComponent', {
 				console.error("Failed to fetch groups");
 			}
 		);
-	}
+
+		ctrl.showEditPopup = function()
+		{
+			window.open("../administration/?show=Forms&load=Groups"
+				,'popUpWindow','height=700,width=1000,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+		}
+	}]
 });

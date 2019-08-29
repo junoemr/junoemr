@@ -23,14 +23,20 @@
 <div id="group-selector-component" class="row" style="background-color:orange;">
 	<h3>View Group:</h3>
 	<h4>
-		<a href="javascript:;" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_GROUP_SELECT_ALL, null)">Show All</a>
+		<a href="javascript:" style="color:red;" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL, null)">Show All</a>
+	</h4>
+	<h4>
+		<a href="javascript:" style="color:red;" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_EFORM, null)">Show eForms</a>
+	</h4>
+	<h4>
+		<a href="javascript:" style="color:red;" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_FORM, null)">Show Forms</a>
 	</h4>
 	<div class="container-fluid">
 		<div class="row" ng-repeat="group in $ctrl.groups">
-			<a href="javascript:;" ng-click="$ctrl.onGroupChange(group.id, group.summaryItem)">{{group.displayName}}</a>
+			<a href="javascript:" ng-click="$ctrl.onGroupChange(group.id, group.summaryItem)">{{group.displayName}}</a>
 		</div>
 	</div>
 	<h4>
-		<a>Edit Groups</a>
+		<a href="javascript:" ng-click="$ctrl.showEditPopup()">Edit Groups</a>
 	</h4>
 </div>
