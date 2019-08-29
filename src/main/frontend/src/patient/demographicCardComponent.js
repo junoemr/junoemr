@@ -25,10 +25,10 @@
 
 angular.module('Patient').component('demographicCard', {
 	bindings: {
-		demographicModel: '<'
+		demographicModel: '<',
 	},
 	templateUrl: "src/patient/demographicCard.jsp",
-	controller: ["$scope", function ($scope)
+	controller: [function ()
 	{
 		var ctrl = this;
 
@@ -45,10 +45,18 @@ angular.module('Patient').component('demographicCard', {
 				patientPhotoUrl: '/imageRenderingServlet?source=local_client&clientId=0',
 			},
 		};
-		ctrl.init = function init()
+		ctrl.$onInit = function()
 		{
 			ctrl.fillDisplayData(ctrl.demographicModel);
-			ctrl.loadWatches();
+		};
+
+		ctrl.$onChanges = function(bindingHash)
+		{
+			// bindingsHash only has data for changed bindings, so check for object existance
+			if(Juno.Common.Util.exists(bindingHash.demographicModel))
+			{
+				ctrl.fillDisplayData(bindingHash.demographicModel.currentValue);
+			}
 		};
 
 		ctrl.fillDisplayData = function fillDisplayData(demographicDataModel)
@@ -99,18 +107,5 @@ angular.module('Patient').component('demographicCard', {
 				};
 			}
 		};
-
-		ctrl.loadWatches = function loadWatches()
-		{
-			$scope.$watch('$ctrl.demographicModel', function (newValue, oldValue)
-			{
-				if (newValue !== oldValue)
-				{
-					ctrl.fillDisplayData(newValue)
-				}
-			}, true);
-		};
-
-		ctrl.$onInit = ctrl.init();
 	}]
 });
