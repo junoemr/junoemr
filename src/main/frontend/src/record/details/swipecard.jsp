@@ -57,6 +57,7 @@
 							ca-title="Card Data"
 							ca-name="card-data"
 							ca-model="swipecardController.cardDataString"
+							ca-keypress-enter="swipecardController.onEnterKeyDown()"
 					>
 					</ca-field-text>
 				</div>
