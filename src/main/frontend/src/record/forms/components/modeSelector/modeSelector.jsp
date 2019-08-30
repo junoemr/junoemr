@@ -25,9 +25,6 @@
 	<nav>
 		<ul>
 			<li class="library-list-item">
-				<a href="javascript:" ng-click="$ctrl.onModeChange($ctrl.FORM_CONTROLLER_STATES.ADD)" ng-class="$ctrl.viewState === $ctrl.FORM_CONTROLLER_STATES.ADD ? 'selected' : ''">Add Form</a>
-			</li>
-			<li class="library-list-item">
 				<a href="javascript:" ng-click="$ctrl.onModeChange($ctrl.FORM_CONTROLLER_STATES.COMPLETED)" ng-class="$ctrl.viewState === $ctrl.FORM_CONTROLLER_STATES.COMPLETED ? 'selected' : ''">Completed Forms</a>
 			</li>
 			<li class="library-list-item">

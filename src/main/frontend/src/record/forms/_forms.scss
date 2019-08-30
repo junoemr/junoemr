@@ -8,10 +8,22 @@
 
   .left-button-group {
     margin-top: 20px;
+    margin-bottom: 30px;
 
     .btn {
       margin-left: 8px;
     }
+  }
+
+  .options-panel {
+    position: fixed;
+    min-width: 300px;
+    width: 300px;
+  }
+
+  .options-panel-place-holder {
+    min-width: 300px;
+    width: 300px;
   }
 
   a {

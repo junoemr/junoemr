@@ -21,29 +21,31 @@
  * Canada
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<div id="forms-page" class="container-fluid">
-	<div class="row">
-		<div class="col-md-3 form-library-title" >
-			<h2 class="form-heading"><bean:message key="forms.title.form.library" bundle="ui"/></h2>
+<div id="forms-page" class="container-fluid flex-row">
+	<div class="options-panel-place-holder">
+		<div class=" options-panel">
+			<div class="col-md-12 form-library-title" >
+				<h2 class="form-heading"><bean:message key="forms.title.form.library" bundle="ui"/></h2>
+			</div>
+			<div class="col-md-12" >
+				<div class="container-fluid">
+					<input type="text" class="form-control search-query" ng-model="formCtrl.formSearchStr" placeholder="Filter Forms">
+					<mode-selector-component mode-change="onModeChange(mode)" view-state="formCtrl.viewState"></mode-selector-component>
+					<hr>
+					<group-selector-component group-change="onGroupChange(groupId, selectedForms)" group-selection="formCtrl.groupSelection"></group-selector-component>
+				</div>
+			</div>
 		</div>
-		<div class="col-md-9">
+	</div>
+	<div class="col-md-10">
+		<div class="col-md-12">
 			<div class="col-md-12 flex-row-reverse left-button-group" >
 				<button class="btn btn-primary" ng-click="onModeChange(FORM_CONTROLLER_STATES.ADD)">Add Form</button>
 				<button class="btn btn-outline" ng-click="formCtrl.openManageForms()">Manage Forms</button>
 				<button class="btn btn-outline" ng-click="formCtrl.showEditPopup()">Edit Groups</button>
 			</div>
 		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-2" >
-			<div class="container-fluid">
-				<input type="text" class="form-control search-query" ng-model="formCtrl.formSearchStr" placeholder="Filter Forms">
-				<mode-selector-component mode-change="onModeChange(mode)" view-state="formCtrl.viewState"></mode-selector-component>
-				<hr>
-				<group-selector-component group-change="onGroupChange(groupId, selectedForms)" group-selection="formCtrl.groupSelection"></group-selector-component>
-			</div>
-		</div>
-		<div class="col-md-10">
+		<div class="col-md-12">
 			<add-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.ADD" form-list="displayFormList" demographic-no="formCtrl.demographicNo"
 								provider-no="formCtrl.providerNo" appointment-no="formCtrl.appointmentNo" filter-forms="onFilterForms(form, index, array)"></add-view-component>
 			<completed-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.COMPLETED" form-list="displayFormList" demographic-no="formCtrl.demographicNo"
