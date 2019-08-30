@@ -20,23 +20,27 @@
 * Victoria, British Columbia
 * Canada
 --%>
-<div id="group-selector-component" class="row" style="background-color:orange;">
+<div id="group-selector-component">
 	<h3>View Group:</h3>
-	<h4>
-		<a href="javascript:" style="color:red;" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL, null)">Show All</a>
-	</h4>
-	<h4>
-		<a href="javascript:" style="color:red;" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_EFORM, null)">Show eForms</a>
-	</h4>
-	<h4>
-		<a href="javascript:" style="color:red;" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_FORM, null)">Show Forms</a>
-	</h4>
-	<div class="container-fluid">
-		<div class="row" ng-repeat="group in $ctrl.groups">
-			<a href="javascript:" ng-click="$ctrl.onGroupChange(group.id, group.summaryItem)">{{group.displayName}}</a>
+	<div class="group-list-item" ng-class="$ctrl.styleListItems($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL)">
+		<a href="javascript:" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL, null)">Show All</a>
+		<i class="icon icon-chevron-right" ng-if="$ctrl.groupSelection === $ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL"></i>
+	</div>
+	<div class="group-list-item" ng-class="$ctrl.styleListItems($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_EFORM)">
+		<a href="javascript:" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_EFORM, null)">Show eForms</a>
+		<i class="icon icon-chevron-right" ng-if="$ctrl.groupSelection === $ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_EFORM"></i>
+	</div>
+	<div class="group-list-item" ng-class="$ctrl.styleListItems($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_FORM)">
+		<a href="javascript:" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_FORM, null)">Show Forms</a>
+		<i class="icon icon-chevron-right" ng-if="$ctrl.groupSelection === $ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_FORM"></i>
+	</div>
+	<div class="container-fluid user-groups-section">
+		<div class="row group-list-item" ng-repeat="group in $ctrl.groups">
+			<div ng-class="$ctrl.styleListItems(group.id)">
+				<a href="javascript:" ng-click="$ctrl.onGroupChange(group.id, group.summaryItem)">{{group.displayName}}</a>
+				<i class="icon icon-chevron-right" ng-if="$ctrl.groupSelection === group.id"></i>
+			</div>
 		</div>
 	</div>
-	<h4>
-		<a href="javascript:" ng-click="$ctrl.showEditPopup()">Edit Groups</a>
-	</h4>
+	<div class="group-list-item"><a href="javascript:" ng-click="$ctrl.showEditPopup()">Edit Groups</a></div>
 </div>

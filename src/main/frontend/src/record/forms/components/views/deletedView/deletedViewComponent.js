@@ -27,13 +27,11 @@ angular.module('Record.Forms').component('deletedViewComponent', {
 		formList: '=',
 		filterForms: '&',
 	},
-	controller: ['formService', function (formService)
+	controller: ['formService', 'NgTableParams', function (formService, NgTableParams)
 	{
 		let ctrl = this;
 
 		ctrl.sortMode = FORM_CONTROLLER_SORT_MODES.FORM_NAME;
-		ctrl.SORT_MODES = FORM_CONTROLLER_SORT_MODES;
-		ctrl.reverseSort = false;
 
 		ctrl.openForm = function (id)
 		{
@@ -66,17 +64,21 @@ angular.module('Record.Forms').component('deletedViewComponent', {
 			return ctrl.filterForms({form:form, index:index, array:array});
 		};
 
-		ctrl.doSort = function(mode)
-		{
-			if (mode === ctrl.sortMode)
+		ctrl.tableParams = new NgTableParams(
 			{
-				ctrl.reverseSort = !ctrl.reverseSort;
-			}
-			else
+				page: 1, // show first page
+				count: -1, // unlimited
+				sorting:
+					{
+						name: 'asc',
+					}
+			},
 			{
-				ctrl.reverseSort = false;
+				// called when sort order changes
+				getData: function(params) {
+					ctrl.sortMode = params.orderBy();
+				}
 			}
-			ctrl.sortMode = mode;
-		};
+		);
 	}]
 });

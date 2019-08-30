@@ -23,30 +23,22 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <div id="forms-page" class="container-fluid">
 	<div class="row">
-		<div class="col-md-3" style="background-color:red;">
-			<h2><bean:message key="forms.title.form.library" bundle="ui"/></h2>
+		<div class="col-md-3 form-library-title" >
+			<h2 class="form-heading"><bean:message key="forms.title.form.library" bundle="ui"/></h2>
 		</div>
-		<div class="col-md-9" style="background-color:green;">
-			<ca-field-text
-					ca-name="form-search"
-					ca-title="Form Search"
-					ca-input-size="col-md-4"
-					ca-label-size="col-md-1"
-					ca-model="formSearchStr"
-					ca-error="{{displayMessages.field_errors()['repeatUnits']}}"
-					ca-rows="1">
-			</ca-field-text>
+		<div class="col-md-9" >
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-md-3" style="background-color:red;">
+		<div class="col-md-2" >
 			<div class="container-fluid">
-				<mode-selector-component mode-change="onModeChange(mode)"></mode-selector-component>
+				<input type="text" class="form-control search-query" ng-model="formSearchStr" placeholder="Filter Forms">
+				<mode-selector-component mode-change="onModeChange(mode)" view-state="viewState"></mode-selector-component>
 				<hr>
-				<group-selector-component group-change="onGroupChange(groupId, selectedForms)"></group-selector-component>
+				<group-selector-component group-change="onGroupChange(groupId, selectedForms)" group-selection="formCtrl.groupSelection"></group-selector-component>
 			</div>
 		</div>
-		<div class="col-md-9" style="background-color:lightblue;">
+		<div class="col-md-9">
 			<add-view-component ng-if="viewState === FORM_CONTROLLER_STATES.ADD" form-list="displayFormList" demographic-no="demographicNo" provider-no="providerNo" appointment-no="appointmentNo"
 								filter-forms="onFilterForms(form, index, array)"></add-view-component>
 			<completed-view-component ng-if="viewState === FORM_CONTROLLER_STATES.COMPLETED" form-list="displayFormList" demographic-no="demographicNo" appointment-no="appointmentNo"

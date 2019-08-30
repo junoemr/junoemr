@@ -24,7 +24,8 @@
 angular.module('Record.Forms').component('modeSelectorComponent', {
 	templateUrl: 'src/record/forms/components/modeSelector/modeSelector.jsp',
 	bindings: {
-		modeChange: '&'
+		modeChange: '&',
+		viewState: '<'
 	},
 	controller: function () {
 		let ctrl = this;
@@ -40,5 +41,14 @@ angular.module('Record.Forms').component('modeSelectorComponent', {
 			window.open("../administration/?show=Forms"
 				,'popUpWindow','height=700,width=1000,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
 		};
+
+		ctrl.styleListItems = function (state)
+		{
+			if (ctrl.viewState === state)
+			{
+				return 'list-item-selected';
+			}
+			return 'list-item-not-selected';
+		}
 	}
 });

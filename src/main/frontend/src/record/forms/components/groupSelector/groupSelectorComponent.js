@@ -25,7 +25,8 @@
 angular.module('Record.Forms').component('groupSelectorComponent', {
 	templateUrl: 'src/record/forms/components/groupSelector/groupSelector.jsp',
 	bindings: {
-		groupChange: '&'
+		groupChange: '&',
+		groupSelection: '<'
 	},
 	controller: ['formService', function (formService) {
 		let ctrl = this;
@@ -41,7 +42,6 @@ angular.module('Record.Forms').component('groupSelectorComponent', {
 		formService.getFormGroups().then(
 			function success(results) {
 				ctrl.groups = results;
-				console.log(results);
 			},
 			function error(results) {
 				console.error("Failed to fetch groups");
@@ -52,6 +52,15 @@ angular.module('Record.Forms').component('groupSelectorComponent', {
 		{
 			window.open("../administration/?show=Forms&load=Groups"
 				,'popUpWindow','height=700,width=1000,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
-		}
+		};
+
+		ctrl.styleListItems = function (state)
+		{
+			if (ctrl.groupSelection === state)
+			{
+				return 'list-item-selected';
+			}
+			return 'list-item-not-selected';
+		};
 	}]
 });

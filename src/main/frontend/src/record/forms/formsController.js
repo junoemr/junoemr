@@ -66,6 +66,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 	'formService',
 	'user',
 	'securityService',
+	'NgTableParams',
 
 	function(
 		$scope,
@@ -77,11 +78,10 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		demo,
 		formService,
 		user,
-		securityService)
+		securityService,
+		NgTableParams)
 	{
 		var controller = this;
-
-		console.log("form ctrl ", $stateParams, $state);
 
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.providerNo = user.providerNo;
@@ -92,6 +92,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		controller.groupSelection = FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL;
 		controller.groupSelectedForms = null;
 
+		//TODO clean this up
 		$scope.viewState = $stateParams.viewState;
 		$scope.FORM_CONTROLLER_STATES = FORM_CONTROLLER_STATES;
 		$scope.formSearchStr = "";
@@ -99,9 +100,6 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		$scope.demographicNo = $stateParams.demographicNo;
 		$scope.providerNo = controller.providerNo;
 		$scope.appointmentNo = $stateParams.appointmentNo;
-
-
-		console.log("Loading Form Controller in state: " + controller.viewState);
 
 		securityService.hasRights(
 		{

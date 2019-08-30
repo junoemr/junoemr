@@ -30,15 +30,12 @@ angular.module('Record.Forms').component('addViewComponent', {
 		formList: '=',
 		filterForms: '&',
 	},
-	controller:[ 'formService', '$scope', function (formService, $scope)
+	controller:[ 'formService', '$scope', 'NgTableParams', function (formService, $scope, NgTableParams)
 	{
 		let ctrl = this;
 
-		$scope.SORT_MODES = FORM_CONTROLLER_SORT_MODES;
 		$scope.FORM_CONTROLLER_FORM_TYPES = FORM_CONTROLLER_FORM_TYPES;
-
 		ctrl.sortMode = FORM_CONTROLLER_SORT_MODES.FORM_NAME;
-		ctrl.reverseSort = false;
 
 		ctrl.openEForm = function (id)
 		{
@@ -55,17 +52,20 @@ angular.module('Record.Forms').component('addViewComponent', {
 			return ctrl.filterForms({form:form, index:index, array:array});
 		};
 
-		ctrl.doSort = function(mode)
+		ctrl.tableParams = new NgTableParams(
 		{
-			if (mode === ctrl.sortMode)
-			{
-				ctrl.reverseSort = !ctrl.reverseSort;
+			page: 1, // show first page
+			count: -1, // unlimited
+			sorting:
+				{
+					name: 'asc',
+				}
+		},
+		{
+			// called when sort order changes
+			getData: function(params) {
+				ctrl.sortMode = params.orderBy();
 			}
-			else
-			{
-				ctrl.reverseSort = false;
-			}
-			ctrl.sortMode = mode;
-		};
+		});
 	}]
 });

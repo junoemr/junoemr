@@ -22,34 +22,22 @@
 --%>
 
 <div id="add-view-component" class="container-fluid">
-	<!--header-->
-	<div class="row">
-		<div class="col-md-3" style="background-color: #38a1bb;">
-			<h4><a href="javascript:" ng-click="$ctrl.doSort(SORT_MODES.FORM_NAME)">Form Name</a></h4>
-		</div>
-		<div class="col-md-6" style="background-color: #2f83ff;">
-			<h4><a href="javascript:" ng-click="$ctrl.doSort(SORT_MODES.ADDITIONAL)">Additional Information</a></h4>
-		</div>
-		<div class="col-md-3" style="background-color: #38a1bb;">
-			<h4><a href="javascript:" ng-click="$ctrl.doSort(SORT_MODES.MOD_DATE)">Modified Date</a></h4>
-		</div>
-	</div>
-	<div class="row">
-		<hr>
-	</div>
-
-	<!--list-->
-	<div class="row content-row" ng-repeat=" form in $ctrl.formList | filter:$ctrl.doFilterForms | orderBy:$ctrl.sortMode:$ctrl.reverseSort">
-		<div class="col-md-3" style="background-color: #38a1bb;">
-			<a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.EFORM" ng-click="$ctrl.openEForm(form.formId)">{{form.name}}</a>
-			<a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.FORM" ng-click="$ctrl.openForm(form.subject)">{{form.name}}</a>
-		</div>
-		<div class="col-md-6" style="background-color: #2f83ff;">
-			<span ng-if="form.type === 'eform'">{{form.subject}}</span>
-			<span ng-if="form.type === 'form'"></span>
-		</div>
-		<div class="col-md-3" style="background-color: #38a1bb;">
-			{{form.date | date:'yyyy-MM-dd'}}
-		</div>
-	</div>
+	<table ng-table="$ctrl.tableParams" show-filter="false" class="table table-striped table-bordered">
+		<!--list-->
+		<tbody>
+			<tr ng-repeat=" form in $ctrl.formList | filter:$ctrl.doFilterForms  | orderBy:$ctrl.sortMode">
+				<td class="col-md-3" title="'Form Name'" sortable="'name'">
+					<a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.EFORM" ng-click="$ctrl.openEForm(form.formId)">{{form.name}}</a>
+					<a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.FORM" ng-click="$ctrl.openForm(form.subject)">{{form.name}}</a>
+				</td>
+				<td class="col-md-6" title="'Additional Information'" sortable="'subject'">
+					<span ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.EFORM">{{form.subject}}</span>
+					<span ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.FORM"></span>
+				</td>
+				<td class="col-md-3" title="'Modified Date'" sortable="'date'">
+					{{form.date | date:'yyyy-MM-dd'}}
+				</td>
+			</tr>
+		</tbody>
+	</table>
 </div>

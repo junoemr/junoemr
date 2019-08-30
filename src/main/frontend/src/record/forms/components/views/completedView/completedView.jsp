@@ -22,39 +22,24 @@
 --%>
 
 <div id="completed-view-component" class="container-fluid">
-	<!--header-->
-	<div class="row">
-		<div class="col-md-3" style="background-color: #38a1bb;">
-			<h4><a href="javascript:" ng-click="$ctrl.doSort(SORT_MODES.FORM_NAME)">Form Name</a></h4>
-		</div>
-		<div class="col-md-4" style="background-color: #2f83ff;">
-			<h4><a href="javascript:" ng-click="$ctrl.doSort(SORT_MODES.ADDITIONAL)">Additional Information</a></h4>
-		</div>
-		<div class="col-md-3" style="background-color: #38a1bb;">
-			<h4><a href="javascript:" ng-click="$ctrl.doSort(SORT_MODES.MOD_DATE)">Modified Date</a></h4>
-		</div>
-		<div class="col-md-2" style="background-color: #2f83ff;">
-			<h4>Action</h4>
-		</div>
-	</div>
-	<div class="row">
-		<hr>
-	</div>
+	<table ng-table="$ctrl.tableParams" show-filter="false" class="table table-striped table-bordered">
 
-	<!--list-->
-	<div class="row content-row" ng-repeat=" form in $ctrl.formList | filter:$ctrl.doFilterForms | orderBy:$ctrl.sortMode:$ctrl.reverseSort">
-		<div class="col-md-3" style="background-color: #38a1bb;">
-			<a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.EFORM" ng-click="$ctrl.openEForm(form.id)">{{form.name}}</a>
-			<a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.FORM" ng-click="$ctrl.openForm(form.name, form.id)">{{form.name}}</a>
-		</div>
-		<div class="col-md-4" style="background-color: #2f83ff;">
-			{{form.subject}}
-		</div>
-		<div class="col-md-3" style="background-color: #38a1bb;">
-			{{form.date | date:'yyyy-MM-dd'}}
-		</div>
-		<div class="col-md-2" style="background-color: #2f83ff;">
-			<a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.EFORM" ng-click="$ctrl.deleteForm(form.id, form.type)"><u>delete</u></a>
-		</div>
-	</div>
+	<tbody>
+		<tr ng-repeat=" form in $ctrl.formList | filter:$ctrl.doFilterForms | orderBy:$ctrl.sortMode">
+			<td class="col-md-3" title="'Form Name'" sortable="'name'">
+				<a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.EFORM" ng-click="$ctrl.openEForm(form.id)">{{form.name}}</a>
+				<a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.FORM" ng-click="$ctrl.openForm(form.name, form.id)">{{form.name}}</a>
+			</td>
+			<td class="col-md-4" title="'Additional Information'" sortable="'subject'">
+				{{form.subject}}
+			</td>
+			<td class="col-md-3" title="'Modified Date'" sortable="'date'">
+				{{form.date | date:'yyyy-MM-dd'}}
+			</td>
+			<td class="col-md-2" title="'Action'">
+				<a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.EFORM" ng-click="$ctrl.deleteForm(form.id, form.type)"><u>delete</u></a>
+			</td>
+		</tr>
+	</tbody>
+	</table>
 </div>
