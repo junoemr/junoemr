@@ -28,7 +28,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -49,7 +48,6 @@ import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.app.AppOAuth1Config;
 import org.oscarehr.app.OAuth1Utils;
@@ -66,7 +64,6 @@ import org.oscarehr.common.model.EncounterForm;
 import org.oscarehr.eform.service.EFormDataService;
 import org.oscarehr.managers.FormsManager;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -88,7 +85,6 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.eform.EFormExportZip;
 import oscar.oscarEncounter.data.EctFormData;
 import oscar.oscarProvider.data.ProviderMyOscarIdData;
-import oscar.util.ConversionUtils;
 
 
 /**

@@ -2,4 +2,12 @@
   .content-row {
     margin-bottom: 10px;
   }
+
+  .restore-link {
+    color: $color-lime-darker;
+  }
+
+  .restore-link:hover {
+    color: darken($color-lime-darker, 10%);
+  }
 }

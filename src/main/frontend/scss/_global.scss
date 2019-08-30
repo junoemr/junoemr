@@ -47,6 +47,10 @@ a {
 	display: flex;
 	flex-direction: row;
 }
+.flex-row-reverse {
+	display: flex;
+	flex-direction: row-reverse;
+}
 .flex-column {
 	display: flex;
 	flex-direction: column;

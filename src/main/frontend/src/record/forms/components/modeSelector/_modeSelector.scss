@@ -1,8 +1,12 @@
 #mode-selector-component {
   margin-top: 20px;
 
-  .library-list-item {
-    padding-top: 2px;
-    padding-bottom: 2px;
+  ul {
+    list-style-type:none;
+    padding-left: 0;
+  }
+
+  .selected {
+    background-color: $color-neutral-lighter;
   }
 }

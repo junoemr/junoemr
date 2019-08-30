@@ -25,12 +25,9 @@ package org.oscarehr.managers;
 
 
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -44,9 +41,6 @@ import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.common.model.EncounterForm;
 import org.oscarehr.eform.service.EFormDataService;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.to.model.FormTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

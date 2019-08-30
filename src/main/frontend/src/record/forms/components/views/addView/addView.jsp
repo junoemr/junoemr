@@ -27,8 +27,8 @@
 		<tbody>
 			<tr ng-repeat=" form in $ctrl.formList | filter:$ctrl.doFilterForms  | orderBy:$ctrl.sortMode">
 				<td class="col-md-3" title="'Form Name'" sortable="'name'">
-					<a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.EFORM" ng-click="$ctrl.openEForm(form.formId)">{{form.name}}</a>
-					<a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.FORM" ng-click="$ctrl.openForm(form.subject)">{{form.name}}</a>
+					<u><a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.EFORM" ng-click="$ctrl.openEForm(form.formId)">{{form.name}}</a></u>
+					<u><a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.FORM" ng-click="$ctrl.openForm(form.subject)">{{form.name}}</a></u>
 				</td>
 				<td class="col-md-6" title="'Additional Information'" sortable="'subject'">
 					<span ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.EFORM">{{form.subject}}</span>

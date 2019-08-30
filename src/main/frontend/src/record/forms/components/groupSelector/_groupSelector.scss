@@ -1,4 +1,9 @@
 #group-selector-component {
+
+  .section-heading {
+    color: $color-primary-dark
+  }
+
   h3 {
     margin-top: 0px;
   }
@@ -12,5 +17,14 @@
     margin-left: 16px;
     margin-top: 5px;
     margin-bottom: 5px;
+  }
+
+  ul {
+    list-style-type:none;
+    padding-left: 0;
+  }
+
+  .selected {
+    background-color: $color-neutral-lighter;
   }
 }

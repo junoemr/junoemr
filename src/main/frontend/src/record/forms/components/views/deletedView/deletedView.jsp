@@ -25,7 +25,7 @@
 		<tbody>
 			<tr ng-repeat="form in $ctrl.formList | filter:$ctrl.doFilterForms | orderBy:$ctrl.sortMode">
 				<td class="col-md-3" title="'Form Name'" sortable="'name'">
-					<a href="javascript:" ng-click="$ctrl.openForm(form.id)">{{form.name}}</a>
+					<u><a href="javascript:" ng-click="$ctrl.openForm(form.id)">{{form.name}}</a></u>
 				</td>
 				<td class="col-md-4" title="'Additional Information'" sortable="'subject'">
 					{{form.subject}}
@@ -34,7 +34,7 @@
 					{{form.date | date:'yyyy-MM-dd'}}
 				</td>
 				<td class="col-md-2" title="'Action'">
-					<a href="javascript:" ng-click="$ctrl.restoreForm(form.id, form.type)"><u>Restore</u></a>
+					<a class="restore-link" href="javascript:" ng-click="$ctrl.restoreForm(form.id, form.type)"><u>Restore</u></a>
 				</td>
 			</tr>
 		</tbody>

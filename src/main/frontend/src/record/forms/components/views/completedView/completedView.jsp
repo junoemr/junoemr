@@ -26,8 +26,8 @@
 		<tbody>
 			<tr ng-repeat=" form in $ctrl.formList | filter:$ctrl.doFilterForms | orderBy:$ctrl.sortMode">
 				<td class="col-md-3" title="'Form Name'" sortable="'name'">
-					<a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.EFORM" ng-click="$ctrl.openEForm(form.id)">{{form.name}}</a>
-					<a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.FORM" ng-click="$ctrl.openForm(form.name, form.id)">{{form.name}}</a>
+					<u><a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.EFORM" ng-click="$ctrl.openEForm(form.id)">{{form.name}}</a></u>
+					<u><a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.FORM" ng-click="$ctrl.openForm(form.name, form.id)">{{form.name}}</a></u>
 				</td>
 				<td class="col-md-4" title="'Additional Information'" sortable="'subject'">
 					{{form.subject}}
@@ -36,7 +36,7 @@
 					{{form.date | date:'yyyy-MM-dd'}}
 				</td>
 				<td class="col-md-2" title="'Action'">
-					<a href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.EFORM" ng-click="$ctrl.deleteForm(form.id, form.type)"><u>delete</u></a>
+					<a class="delete-link" href="javascript:" ng-if="form.type === FORM_CONTROLLER_FORM_TYPES.EFORM" ng-click="$ctrl.deleteForm(form.id, form.type)"><u>delete</u></a>
 				</td>
 			</tr>
 		</tbody>

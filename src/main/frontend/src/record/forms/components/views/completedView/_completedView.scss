@@ -2,4 +2,12 @@
   .content-row {
     margin-bottom: 10px;
   }
+
+  .delete-link {
+    color: $color-red-base;
+  }
+
+  .delete-link:hover {
+    color: darken($color-red-base, 10%);
+  }
 }

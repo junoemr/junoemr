@@ -274,6 +274,18 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 			return foundInGroup && foundInSearch;
 		};
 
+		controller.openManageForms = function ()
+		{
+			window.open("../administration/?show=Forms"
+				,'popUpWindow','height=700,width=1200,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no');
+		};
+
+		controller.showEditPopup = function()
+		{
+			window.open("../administration/?show=Forms&load=Groups"
+				,'popUpWindow','height=700,width=1200,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no');
+		};
+
 		// form display list
 		$scope.displayFormList = [];
 

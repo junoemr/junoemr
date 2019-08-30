@@ -21,26 +21,29 @@
 * Canada
 --%>
 <div id="group-selector-component">
-	<h3>View Group:</h3>
-	<div class="group-list-item" ng-class="$ctrl.styleListItems($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL)">
-		<a href="javascript:" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL, null)">Show All</a>
-		<i class="icon icon-chevron-right" ng-if="$ctrl.groupSelection === $ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL"></i>
-	</div>
-	<div class="group-list-item" ng-class="$ctrl.styleListItems($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_EFORM)">
-		<a href="javascript:" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_EFORM, null)">Show eForms</a>
-		<i class="icon icon-chevron-right" ng-if="$ctrl.groupSelection === $ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_EFORM"></i>
-	</div>
-	<div class="group-list-item" ng-class="$ctrl.styleListItems($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_FORM)">
-		<a href="javascript:" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_FORM, null)">Show Forms</a>
-		<i class="icon icon-chevron-right" ng-if="$ctrl.groupSelection === $ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_FORM"></i>
-	</div>
-	<div class="container-fluid user-groups-section">
-		<div class="row group-list-item" ng-repeat="group in $ctrl.groups">
-			<div ng-class="$ctrl.styleListItems(group.id)">
-				<a href="javascript:" ng-click="$ctrl.onGroupChange(group.id, group.summaryItem)">{{group.displayName}}</a>
-				<i class="icon icon-chevron-right" ng-if="$ctrl.groupSelection === group.id"></i>
-			</div>
-		</div>
-	</div>
-	<div class="group-list-item"><a href="javascript:" ng-click="$ctrl.showEditPopup()">Edit Groups</a></div>
+	<h3 class="section-heading">View Group</h3>
+	<nav>
+		<ul>
+			<li class="group-list-item">
+				<a href="javascript:" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL, null)"
+				   ng-class="$ctrl.groupSelection === $ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL ? 'selected' : ''">Show All</a>
+			</li>
+			<li class="group-list-item">
+				<a href="javascript:" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_EFORM, null)"
+				   ng-class="$ctrl.groupSelection === $ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_EFORM ? 'selected' : ''">Show eForms</a>
+			</li>
+			<li class="group-list-item">
+				<a href="javascript:" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_FORM, null)"
+				   ng-class="$ctrl.groupSelection === $ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_FORM ? 'selected' : ''">Show Forms</a>
+			</li>
+			<li class="container-fluid user-groups-section">
+				<ul class="row group-list-item" ng-repeat="group in $ctrl.groups">
+					<li >
+						<a href="javascript:" ng-click="$ctrl.onGroupChange(group.id, group.summaryItem)"
+						   ng-class="$ctrl.groupSelection === group.id ? 'selected' : ''">{{group.displayName}}</a>
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</nav>
 </div>
