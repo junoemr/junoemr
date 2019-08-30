@@ -207,7 +207,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			if (obj !== null)
 			{
 				obj.module.editorNames = note.editorNames;
-				controller.gotoState(obj.note, obj.module, obj.note.id);
+				controller.gotoState(obj.note, obj.module);
 				return;
 			}
 		};
@@ -595,8 +595,9 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		};
 
 
-		controller.gotoState = function gotoState(item, mod, itemId)
+		controller.gotoState = function gotoState(item, mod)
 		{
+			console.info('go to state', item, mod, item.id);
 			if (item == "add")
 			{
 				controller.editGroupedNotes('md', mod, null);
@@ -605,7 +606,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			else if (item.action == 'add' && item.type == 'dx_reg')
 			{
 
-				controller.editGroupedNotes('lg', mod, itemId);
+				controller.editGroupedNotes('lg', mod, item.id);
 
 			}
 			else if (item.type == 'lab' || item.type == 'document' || item.type == 'rx' || item.type == 'allergy' || item.type == 'prevention' || item.type == 'dsguideline')
@@ -635,7 +636,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 			else if (item.action == 'action')
 			{
-				controller.editGroupedNotes('lg', mod, itemId);
+				controller.editGroupedNotes('lg', mod, item.id);
 
 			}
 			else
@@ -734,6 +735,36 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			note.isSelected = !note.isSelected;
 		};
 
+		controller.onSummaryModAdd = function onSummaryModAdd(module)
+		{
+			if (module.summaryCode === 'othermeds' ||
+				module.summaryCode === 'ongoingconcerns' ||
+				module.summaryCode === 'medhx' ||
+				module.summaryCode === 'sochx' ||
+				module.summaryCode === 'famhx' ||
+				module.summaryCode === 'reminders' ||
+				module.summaryCode === 'riskfactors' ||
+				module.summaryCode === 'riskfactors')
+			{
+				controller.gotoState('add', module);
+			}
+			else if (module.summaryCode === 'meds')
+			{
+				controller.openRx(controller.demographicNo);
+			}
+			else if (module.summaryCode === 'allergies')
+			{
+				controller.openAllergies(controller.demographicNo);
+			}
+			else if (module.summaryCode === 'forms')
+			{
+				controller.openForms();
+			}
+			else if (module.summaryCode === 'preventions')
+			{
+				controller.openPreventions(controller.demographicNo);
+			}
+		}
 	}
 ]);
 
