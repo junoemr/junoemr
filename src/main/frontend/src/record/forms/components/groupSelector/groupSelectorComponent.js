@@ -51,7 +51,7 @@ angular.module('Record.Forms').component('groupSelectorComponent', {
 		ctrl.showEditPopup = function()
 		{
 			window.open("../administration/?show=Forms&load=Groups"
-				,'popUpWindow','height=700,width=1000,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+				,'popUpWindow','height=700,width=1200,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no');
 		};
 
 		ctrl.styleListItems = function (state)
