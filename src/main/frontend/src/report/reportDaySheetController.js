@@ -17,8 +17,8 @@ angular.module('Report').controller('Report.ReportDaySheetController', [
 		controller.params = {
 			providerNo: '',
 			type: '',
-			startDate: new Date(),
-			endDate: new Date(),
+			startDate: Juno.Common.Util.formatMomentDate(moment()),
+			endDate: Juno.Common.Util.formatMomentDate(moment()),
 			startTime: null,
 			endTime: null
 		};
@@ -107,8 +107,8 @@ angular.module('Report').controller('Report.ReportDaySheetController', [
 			controller.params = {
 				providerNo: '',
 				type: '',
-				startDate: new Date(),
-				endDate: new Date(),
+				startDate: Juno.Common.Util.formatMomentDate(moment()),
+				endDate: Juno.Common.Util.formatMomentDate(moment()),
 				startTime: null,
 				endTime: null
 			};

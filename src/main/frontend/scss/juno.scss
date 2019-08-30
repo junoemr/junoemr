@@ -21,7 +21,6 @@
 @import "navbar-fixed-top";
 @import "forms";
 @import "buttons";
-@import "modal"; // Style copied from clinicaid for schedule.
 @import "index";
 @import "directives/date_picker";
 @import "directives/time_picker";
@@ -30,15 +29,19 @@
 @import "directives/juno-select";
 @import "directives/juno-typeahead";
 @import "directives/juno-loading";
+@import "../src/common/components/modal";
 // Section-specific things
+@import "../src/layout/primaryNav";
 @import "../src/layout/leftAside";
 @import "../src/help/support";
 @import "../src/schedule/schedule";
 @import "../src/dashboard/dashboard";
 @import "../src/patient/patient";
+@import "../src/patient/demographicCard";
 @import "../src/report/reports";
 @import "../src/record/record";
 @import "../src/record/details/details";
+@import "../src/record/details/swipecard";
 @import "../src/record/summary/summary";
 @import "../src/settings/settings";
 @import "../src/tickler/tickler";

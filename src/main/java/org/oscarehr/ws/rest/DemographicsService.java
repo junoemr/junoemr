@@ -80,11 +80,9 @@ public class DemographicsService extends AbstractServiceImpl
 	private SecurityInfoManager securityInfoManager;
 
 	/**
-	 * Search demographics - used by navigation of OSCAR webapp
+	 * quick search demographics, performs an OR on the restrictions rather than an AND.
+	 * this provides more result matches but with less accuracy on which field is wanted
 	 *
-	 * Currently supports LastName[,FirstName] and address searches.
-	 *
-	 * @param query
 	 * @return
 	 * 		Returns data for the demographic provided
 	 */
@@ -107,25 +105,34 @@ public class DemographicsService extends AbstractServiceImpl
 			return RestSearchResponse.errorResponse("No Query Parameter Sent");
 		}
 
-		DemographicService.SEARCH_MODE searchMode = DemographicService.SEARCH_MODE.name;
-		if (query.startsWith("addr:"))
+		// set up the criteria
+		DemographicCriteriaSearch criteriaSearch = new DemographicCriteriaSearch();
+		criteriaSearch.setStatusMode(DemographicCriteriaSearch.STATUS_MODE.active);
+		criteriaSearch.setJunctionTypeOR();
+		criteriaSearch.setMatchModeStart();
+		criteriaSearch.setSortDirAscending();
+
+		if (query.contains("*"))
 		{
-			searchMode = DemographicService.SEARCH_MODE.address;
-			query = query.substring("addr:".length());
-		}
-		else if (query.startsWith("chartNo:"))
-		{
-			searchMode = DemographicService.SEARCH_MODE.chart_no;
-			query = query.substring("chartNo:".length());
+			criteriaSearch.setCustomWildcardsEnabled(true);
 		}
 
-		// set up the search criteria
-		DemographicCriteriaSearch searchQuery = demographicService.buildDemographicSearch(query, searchMode,
-				DemographicService.STATUS_MODE.active,
-				DemographicCriteriaSearch.SORT_MODE.DemographicName);
-		searchQuery.setSortDirAscending();
+		String [] names = query.split(",");
+		if (names.length >= 2)
+		{
+			// first and last name searching case. force an and on the name filter
+			criteriaSearch.setFirstName(names[1].trim());
+			criteriaSearch.setForceConjoinOnNames(true);
+		}
+		else
+		{
+			criteriaSearch.setFirstName(names[0].trim());
+		}
 
-		return getSearchResponse(searchQuery, page, perPage);
+		criteriaSearch.setLastName(names[0].trim());
+		criteriaSearch.setHin(query.trim());
+
+		return getSearchResponse(criteriaSearch, page, perPage);
 	}
 
 	@GET

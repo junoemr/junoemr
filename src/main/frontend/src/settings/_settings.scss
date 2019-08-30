@@ -4,6 +4,12 @@
 	}
 	.settings-header {
 		@extend %juno-page-header;
+
+		display: flex;
+		align-items: center;
+		.control-right {
+			padding: 0 8px;
+		}
 	}
 
 	.settings-nav {
