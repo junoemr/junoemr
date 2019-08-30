@@ -862,23 +862,24 @@ import java.util.zip.ZipInputStream;
             //PERSONAL HISTORY
             PersonalHistory[] pHist = patientRec.getPersonalHistoryArray();
             logger.info("IMPORT PERSONAL HISTORY: " + pHist.length + " entries found");
-            for (int i=0; i<pHist.length; i++) {
-                if (i==0) scmi = getCMIssue("SocHistory");
+            final String historyPrefix = "<cds:CategorySummaryLine xmlns:cds=\"cds\" xmlns:cdsd=\"cds_dt\">[Personal History]:";
+            final String historySuffix = "</cds:CategorySummaryLine>";
+            for (int i=0; i<pHist.length; i++)
+            {
+                if (i == 0)
+                {
+                    scmi = getCMIssue("SocHistory");
+                }
                 CaseManagementNote cmNote = prepareCMNote(programId, null);
                 cmNote.setIssues(scmi);
 
-                String history = org.apache.commons.lang.StringUtils.trimToNull(pHist[i].toString());
+                String history = org.apache.commons.lang.StringUtils.trimToNull(pHist[i].toString())
+                        .replace(historyPrefix, "")
+                        .replace(historySuffix, "");
 
                 cmNote.setNote(history);
                 caseManagementManager.saveNoteSimple(cmNote);
                 addOneEntry(PERSONALHISTORY);
-
-                //to dumpsite
-                /*residual = Util.addLine("imported.cms4.2011.06", residual);
-                Long hostNoteId = cmNote.getId();
-                cmNote = prepareCMNote("2",null);
-                cmNote.setNote(residual);
-                saveLinkNote(hostNoteId, cmNote);*/
             }
 
             //FAMILY HISTORY
