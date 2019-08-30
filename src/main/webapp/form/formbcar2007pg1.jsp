@@ -320,6 +320,7 @@ function calcBMIMetric() {
             var $links = $('a:not([href^="javascript:"])');
             Oscar.FormHelpers.disableLinks($links);
             document.forms[0].submit.value="save";
+            Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
             reset();
             return true;
         }

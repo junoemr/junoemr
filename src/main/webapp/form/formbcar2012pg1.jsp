@@ -95,7 +95,11 @@ if (request.getParameter("view") != null && request.getParameter("view").equals(
 
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
-<script type="text/javascript" >
+
+	<!-- Scripts to help with submission of forms -->
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+
+	<script type="text/javascript" >
 
 
 function showHideBox(layerName, iState) { // 1 visible, 0 hidden
@@ -264,6 +268,7 @@ function calcBMIMetric() {
     }
     function onSave() {
         document.forms[0].submit.value="save";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret==true)
         {

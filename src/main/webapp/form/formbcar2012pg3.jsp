@@ -96,6 +96,10 @@ if (props.getProperty("ar2_age", "").equals("") ) 	props.setProperty("ar2_age", 
 <% response.setHeader("Cache-Control","no-cache");%>
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+
+    <!-- Scripts to help with submission of forms -->
+    <script type="text/javascript" src="OscarFormHelpers.js"></script>
+
     <title>Antenatal Record 2</title>
     <html:base/>
     <link rel="stylesheet" type="text/css" href="<%=bView?"bcArStyleView.css" : "bcAr2007Style.css"%>">
@@ -353,6 +357,7 @@ function calcBMIMetric() {
         document.forms[0].submit.value="save";
         var ret = checkAllDates();
         ret = checkAllNumber();
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         if(ret==true) {
             reset();
             ret = confirm("Are you sure you want to save this form?");
@@ -369,6 +374,7 @@ function calcBMIMetric() {
         document.forms[0].submit.value="exit";
         var ret = checkAllDates();
         ret = checkAllNumber();
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         if(ret == true) {
             reset();
             ret = confirm("Are you sure you wish to save and close this window?");
