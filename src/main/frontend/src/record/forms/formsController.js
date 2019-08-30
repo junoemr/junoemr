@@ -83,23 +83,17 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 	{
 		var controller = this;
 
+		$scope.FORM_CONTROLLER_STATES = FORM_CONTROLLER_STATES;
+
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.providerNo = user.providerNo;
 		controller.appointmentNo = $stateParams.appointmentNo;
 
 		controller.viewState = $stateParams.viewState;
+		controller.formSearchStr = "";
 
 		controller.groupSelection = FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL;
 		controller.groupSelectedForms = null;
-
-		//TODO clean this up
-		$scope.viewState = $stateParams.viewState;
-		$scope.FORM_CONTROLLER_STATES = FORM_CONTROLLER_STATES;
-		$scope.formSearchStr = "";
-
-		$scope.demographicNo = $stateParams.demographicNo;
-		$scope.providerNo = controller.providerNo;
-		$scope.appointmentNo = $stateParams.appointmentNo;
 
 		securityService.hasRights(
 		{
@@ -213,7 +207,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		// called on mode change
 		$scope.onModeChange = function (mode)
 		{
-			$scope.viewState = mode;
+			controller.viewState = mode;
 
 			switch (mode)
 			{
@@ -272,9 +266,9 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 
 			// filter on search string
 			let foundInSearch = true;
-			if ($scope.formSearchStr.length > 0)
+			if (controller.formSearchStr.length > 0)
 			{
-				foundInSearch = form.name.toUpperCase().search("^" + $scope.formSearchStr.toUpperCase()+".*") !== -1;
+				foundInSearch = form.name.toUpperCase().search("^" + controller.formSearchStr.toUpperCase()+".*") !== -1;
 			}
 
 			return foundInGroup && foundInSearch;

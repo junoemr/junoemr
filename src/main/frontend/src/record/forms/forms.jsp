@@ -32,19 +32,21 @@
 	<div class="row">
 		<div class="col-md-2" >
 			<div class="container-fluid">
-				<input type="text" class="form-control search-query" ng-model="formSearchStr" placeholder="Filter Forms">
-				<mode-selector-component mode-change="onModeChange(mode)" view-state="viewState"></mode-selector-component>
+				<input type="text" class="form-control search-query" ng-model="formCtrl.formSearchStr" placeholder="Filter Forms">
+				<mode-selector-component mode-change="onModeChange(mode)" view-state="formCtrl.viewState"></mode-selector-component>
 				<hr>
 				<group-selector-component group-change="onGroupChange(groupId, selectedForms)" group-selection="formCtrl.groupSelection"></group-selector-component>
 			</div>
 		</div>
 		<div class="col-md-9">
-			<add-view-component ng-if="viewState === FORM_CONTROLLER_STATES.ADD" form-list="displayFormList" demographic-no="demographicNo" provider-no="providerNo" appointment-no="appointmentNo"
-								filter-forms="onFilterForms(form, index, array)"></add-view-component>
-			<completed-view-component ng-if="viewState === FORM_CONTROLLER_STATES.COMPLETED" form-list="displayFormList" demographic-no="demographicNo" appointment-no="appointmentNo"
-									  filter-forms="onFilterForms(form, index, array)"></completed-view-component>
-			<revisions-view-component ng-if="viewState === FORM_CONTROLLER_STATES.REVISION" form-list="displayFormList" demographic-no="demographicNo" filter-forms="onFilterForms(form, index, array)"></revisions-view-component>
-			<deleted-view-component ng-if="viewState === FORM_CONTROLLER_STATES.DELETED" form-list="displayFormList" demographic-no="demographicNo" filter-forms="onFilterForms(form, index, array)"></deleted-view-component>
+			<add-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.ADD" form-list="displayFormList" demographic-no="formCtrl.demographicNo"
+								provider-no="formCtrl.providerNo" appointment-no="formCtrl.appointmentNo" filter-forms="onFilterForms(form, index, array)"></add-view-component>
+			<completed-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.COMPLETED" form-list="displayFormList" demographic-no="formCtrl.demographicNo"
+									  appointment-no="formCtrl.appointmentNo" filter-forms="onFilterForms(form, index, array)"></completed-view-component>
+			<revisions-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.REVISION" form-list="displayFormList" demographic-no="formCtrl.demographicNo"
+									  filter-forms="onFilterForms(form, index, array)"></revisions-view-component>
+			<deleted-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.DELETED" form-list="displayFormList" demographic-no="formCtrl.demographicNo"
+									filter-forms="onFilterForms(form, index, array)"></deleted-view-component>
 		</div>
 	</div>
 </div>
