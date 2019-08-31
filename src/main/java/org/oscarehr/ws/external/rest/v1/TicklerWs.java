@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.Valid;
+import javax.validation.ValidationException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -90,6 +91,11 @@ public class TicklerWs extends AbstractExternalRestWs
 		String providerNoStr = getOAuthProviderNo();
 		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_tickler");
 
+		if (ticklerIn == null)
+		{
+			throw new ValidationException("Tickler definition required");
+		}
+
 		Tickler tickler = ticklerDao.find(id);
 		tickler = ticklerIn.copyToTickler(tickler);
 
@@ -106,8 +112,17 @@ public class TicklerWs extends AbstractExternalRestWs
 		String providerNoStr = getOAuthProviderNo();
 		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_tickler");
 
+		if (ticklerIn == null)
+		{
+			throw new ValidationException("Tickler definition required");
+		}
+
 		Tickler tickler = ticklerIn.toTickler();
-		tickler.setCreator(getOAuthProviderNo());
+
+		if (ticklerIn.getCreator() == null)
+		{
+			tickler.setCreator(getOAuthProviderNo());
+		}
 
 		ticklerService.createTickler(tickler);
 		return RestResponse.successResponse(new TicklerTransferOutbound(tickler));

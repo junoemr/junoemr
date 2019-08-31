@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.oscarehr.common.PaginationQuery;
+import org.oscarehr.common.dao.TicklerCategoryDao;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.ticklers.web.TicklerQuery;
 import org.oscarehr.util.LoggedInInfo;
@@ -36,10 +37,15 @@ import org.springframework.stereotype.Component;
 
 import oscar.log.LogAction;
 
+import javax.validation.ValidationException;
+
 @Component
 public class TicklerService {
 	@Autowired
 	private TicklersDao TicklerDao;
+
+	@Autowired
+	private TicklerCategoryDao ticklerCategoryDao;
 
 	/**
 	 * Use to get ticklers count for pagination display
@@ -72,9 +78,9 @@ public class TicklerService {
 	 * create a new tickler
 	 * @param tickler - the tickler to create
 	 * @return - the new tickler
-	 * @throws RuntimeException - if a required tickler field is missing
+	 * @throws ValidationException - if a required tickler field is missing
 	 */
-	public Tickler createTickler(Tickler tickler) throws RuntimeException
+	public Tickler createTickler(Tickler tickler) throws ValidationException
 	{
 		if (tickler.getId() != null)
 		{// id must be null to create new tickler
@@ -90,9 +96,9 @@ public class TicklerService {
 	 * update a tickler record.
 	 * @param tickler - tickler to update
 	 * @return - the updated tickler
-	 * @throws RuntimeException - if a required tickler field is missing
+	 * @throws ValidationException - if a required tickler field is missing
 	 */
-	public Tickler updateTickler(Tickler tickler) throws RuntimeException
+	public Tickler updateTickler(Tickler tickler) throws ValidationException
 	{
 		validateTickler(tickler);
 		tickler.setUpdateDate(new Date());
@@ -105,13 +111,13 @@ public class TicklerService {
 	 * ensure that a tickler is configured correctly and set default values on null fields
 	 * @param tickler - the tickler to validate
 	 * @return - the validated tickler
-	 * @throws RuntimeException - if a required tickler field is missing
+	 * @throws ValidationException - if a required tickler field is missing
 	 */
-	private Tickler validateTickler(Tickler tickler) throws RuntimeException
+	private Tickler validateTickler(Tickler tickler) throws ValidationException
 	{
 		if (tickler.getDemographicNo() == null)
 		{
-			throw new RuntimeException("Demographic number is required for tickler");
+			throw new ValidationException("Demographic number is required for tickler");
 		}
 		if (tickler.getStatus() == null)
 		{
@@ -123,18 +129,23 @@ public class TicklerService {
 		}
 		if (tickler.getServiceDate() == null)
 		{
-			throw new RuntimeException("Service date is required for tickler");
+			throw new ValidationException("Service date is required for tickler");
 		}
 		if (tickler.getCreator() == null)
 		{
-			throw new RuntimeException("Creator number is required for tickler");
+			throw new ValidationException("Creator number is required for tickler");
 		}
 		if (tickler.getTaskAssignedTo() == null)
 		{
-			throw new RuntimeException("Assigned number is required for tickler");
+			throw new ValidationException("Assigned number is required for tickler");
+		}
+		if (tickler.getCategoryId() != null && ticklerCategoryDao.find(tickler.getCategoryId()) == null)
+		{
+			throw new ValidationException("Tickler category id is not valid");
 		}
 
 		return tickler;
 	}
+
 
 }
