@@ -46,14 +46,21 @@
 			</div>
 		</div>
 		<div class="col-md-12">
-			<add-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.ADD" form-list="displayFormList" demographic-no="formCtrl.demographicNo"
-								provider-no="formCtrl.providerNo" appointment-no="formCtrl.appointmentNo" filter-forms="onFilterForms(form, index, array)"></add-view-component>
-			<completed-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.COMPLETED" form-list="displayFormList" demographic-no="formCtrl.demographicNo"
-									  appointment-no="formCtrl.appointmentNo" filter-forms="onFilterForms(form, index, array)"></completed-view-component>
-			<revisions-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.REVISION" form-list="displayFormList" demographic-no="formCtrl.demographicNo"
-									  filter-forms="onFilterForms(form, index, array)"></revisions-view-component>
-			<deleted-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.DELETED" form-list="displayFormList" demographic-no="formCtrl.demographicNo"
-									filter-forms="onFilterForms(form, index, array)"></deleted-view-component>
+			<form-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.ADD" form-list="displayFormList"
+								 provider-no="formCtrl.providerNo" filter-forms="onFilterForms(form, index, array)"
+								 view-state="FORM_CONTROLLER_STATES.ADD" instanced-forms="false"></form-view-component>
+
+			<form-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.COMPLETED" form-list="displayFormList"
+								 provider-no="formCtrl.providerNo" filter-forms="onFilterForms(form, index, array)"
+								 view-state="FORM_CONTROLLER_STATES.COMPLETED" instanced-forms="true"></form-view-component>
+
+			<form-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.REVISION" form-list="displayFormList"
+								 provider-no="formCtrl.providerNo" filter-forms="onFilterForms(form, index, array)"
+								 view-state="FORM_CONTROLLER_STATES.REVISION" instanced-forms="true"></form-view-component>
+
+			<form-view-component ng-if="formCtrl.viewState === FORM_CONTROLLER_STATES.DELETED" form-list="displayFormList"
+								 provider-no="formCtrl.providerNo" filter-forms="onFilterForms(form, index, array)"
+								 view-state="FORM_CONTROLLER_STATES.DELETED" instanced-forms="true"></form-view-component>
 		</div>
 	</div>
 </div>
