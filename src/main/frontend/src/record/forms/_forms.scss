@@ -1,5 +1,7 @@
 #forms-page {
   @include juno-font-default-size(12px);
+  @include juno-tab-md(16px);
+  @include juno-tab-color-scheme-white;
 
   .form-library-title {
     color: $color-primary-dark;
@@ -12,6 +14,7 @@
     padding-right: 0;
 
     .btn {
+      width: 100px;
       margin-left: 8px;
     }
   }
@@ -52,7 +55,4 @@
   .list-item-not-selected {
     background-color: inherit;
   }
-
-  @include juno-tab-md(16px);
-  @include juno-tab-color-scheme-white;
 }

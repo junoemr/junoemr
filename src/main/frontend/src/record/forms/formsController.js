@@ -67,6 +67,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 	'user',
 	'securityService',
 	'NgTableParams',
+	'$uibModal',
 
 	function(
 		$scope,
@@ -79,7 +80,8 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		formService,
 		user,
 		securityService,
-		NgTableParams)
+		NgTableParams,
+		$uibModal)
 	{
 		var controller = this;
 
@@ -94,6 +96,9 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 
 		controller.groupSelection = FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL;
 		controller.groupSelectedForms = null;
+
+		// form display list
+		$scope.displayFormList = [];
 
 		securityService.hasRights(
 		{
@@ -205,7 +210,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		};
 
 		// called on mode change
-		$scope.onModeChange = function (mode)
+		controller.onModeChange = function (mode)
 		{
 			controller.viewState = mode;
 
@@ -233,7 +238,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		};
 
 		// called on group change
-		$scope.onGroupChange = function (groupId, selectedForms)
+		controller.onGroupChange = function (groupId, selectedForms)
 		{
 			controller.groupSelection = groupId;
 			controller.groupSelectedForms = selectedForms;
@@ -286,8 +291,27 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 				,'popUpWindow','height=700,width=1200,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no');
 		};
 
-		// form display list
-		$scope.displayFormList = [];
+
+		controller.openAddFormsModal = function()
+		{
+			var modalInstance = $uibModal.open(
+				{
+					templateUrl: 'src/record/forms/modal/addFormsModal.jsp',
+					controller: 'Record.Forms.AddFormsModalController as addFormsModalCtrl',
+					backdrop: 'static',
+					windowClass: 'juno-modal',
+					resolve: {
+						providerNo: function ()
+						{
+							return controller.providerNo;
+						}
+					}
+				});
+			modalInstance.result.finally(function ()
+			{
+				controller.onModeChange(controller.viewState);
+			});
+		};
 
 		switch (controller.viewState)
 		{

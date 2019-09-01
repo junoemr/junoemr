@@ -1,4 +1,8 @@
 #group-selector-component {
+  nav {
+    overflow-y: scroll;
+    max-height: 350px;
+  }
 
   .section-heading {
     color: $color-primary-dark

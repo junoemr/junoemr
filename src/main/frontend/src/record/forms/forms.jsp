@@ -30,9 +30,9 @@
 			<div class="col-md-12" >
 				<div class="container-fluid">
 					<input type="text" class="form-control search-query" ng-model="formCtrl.formSearchStr" placeholder="Filter Forms">
-					<mode-selector-component mode-change="onModeChange(mode)" view-state="formCtrl.viewState"></mode-selector-component>
+					<mode-selector-component mode-change="formCtrl.onModeChange(mode)" view-state="formCtrl.viewState"></mode-selector-component>
 					<hr>
-					<group-selector-component group-change="onGroupChange(groupId, selectedForms)" group-selection="formCtrl.groupSelection"></group-selector-component>
+					<group-selector-component group-change="formCtrl.onGroupChange(groupId, selectedForms)" group-selection="formCtrl.groupSelection"></group-selector-component>
 				</div>
 			</div>
 		</div>
@@ -40,7 +40,7 @@
 	<div class="col-md-10">
 		<div class="col-md-12">
 			<div class="col-md-12 flex-row-reverse left-button-group" >
-				<button class="btn btn-primary" ng-click="onModeChange(FORM_CONTROLLER_STATES.ADD)">Add Form</button>
+				<button class="btn btn-primary" ng-click="formCtrl.openAddFormsModal()">Add Form</button>
 				<button class="btn btn-outline" ng-click="formCtrl.openManageForms()">Manage Forms</button>
 				<button class="btn btn-outline" ng-click="formCtrl.showEditPopup()">Edit Groups</button>
 			</div>
