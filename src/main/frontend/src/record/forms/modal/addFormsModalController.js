@@ -22,111 +22,112 @@
 */
 angular.module('Record.Forms').controller('Record.Forms.AddFormsModalController', [
 
-    '$scope',
-    '$http',
-    '$location',
-    '$stateParams',
-    '$state',
-    'formService',
-    'providerNo',
-    '$uibModal',
-    '$uibModalInstance',
+	'$scope',
+	'$http',
+	'$location',
+	'$stateParams',
+	'$state',
+	'formService',
+	'providerNo',
+	'$uibModal',
+	'$uibModalInstance',
 
-    function(
-        $scope,
-        $http,
-        $location,
-        $stateParams,
-        $state,
-        formService,
-        providerNo,
-        $uibModal,
-        $uibModalInstance)
-    {
-        let controller = this;
+	function (
+			$scope,
+			$http,
+			$location,
+			$stateParams,
+			$state,
+			formService,
+			providerNo,
+			$uibModal,
+			$uibModalInstance)
+	{
+		let controller = this;
 
-        $scope.displayFormList = []
+		$scope.displayFormList = []
 
-        controller.providerNo = providerNo;
-        controller.groupSelection = FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL;
-        controller.groupSelectedForms = null;
-        controller.formSearchStr = '';
+		controller.providerNo = providerNo;
+		controller.groupSelection = FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL;
+		controller.groupSelectedForms = null;
+		controller.formSearchStr = '';
 
-        // fill form list with all forms (so that the user can add them to the patients chart).
-        controller.getFormsToAdd = function ()
-        {
-            formService.getAddForms($stateParams.demographicNo).then(
-                function success(results)
-                {
-                    $scope.displayFormList = Juno.Common.Util.toArray(results.list);
-                    controller.ensureSubjectNotNull($scope.displayFormList);
-                },
-                function error(errors)
-                {
-                    console.error(errors);
-                }
-            );
-        };
+		// fill form list with all forms (so that the user can add them to the patients chart).
+		controller.getFormsToAdd = function ()
+		{
+			formService.getAddForms($stateParams.demographicNo).then(
+					function success(results)
+					{
+						$scope.displayFormList = Juno.Common.Util.toArray(results.list);
+						controller.ensureSubjectNotNull($scope.displayFormList);
+					},
+					function error(errors)
+					{
+						console.error(errors);
+					}
+			);
+		};
 
-        // null subject values do no sort well. force them to empty string
-        controller.ensureSubjectNotNull = function (formList)
-        {
-            formList.forEach(function (form)
-            {
-                if (form.subject === null)
-                {
-                    form.subject = '';
-                }
-            });
-        };
+		// null subject values do no sort well. force them to empty string
+		controller.ensureSubjectNotNull = function (formList)
+		{
+			formList.forEach(function (form)
+			{
+				if (form.subject === null)
+				{
+					form.subject = '';
+				}
+			});
+		};
 
-        // called on group change
-        controller.onGroupChange = function (groupId, selectedForms)
-        {
-            controller.groupSelection = groupId;
-            controller.groupSelectedForms = selectedForms;
-        };
+		// called on group change
+		controller.onGroupChange = function (groupId, selectedForms)
+		{
+			controller.groupSelection = groupId;
+			controller.groupSelectedForms = selectedForms;
+		};
 
-        // filter forms for display
-        controller.onFilterForms = function (form, index, array)
-        {
-            // filter on group
-            let foundInGroup = true;
+		// filter forms for display
+		controller.onFilterForms = function (form, index, array)
+		{
+			// filter on group
+			let foundInGroup = true;
 
-            switch(controller.groupSelection)
-            {
-                case FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL:
-                    foundInGroup = true;
-                    break;
-                case FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_FORM:
-                    foundInGroup = form.type === FORM_CONTROLLER_FORM_TYPES.FORM;
-                    break;
-                case FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_EFORM:
-                    foundInGroup = form.type === FORM_CONTROLLER_FORM_TYPES.EFORM;
-                    break;
-                default:
-                    let found = controller.groupSelectedForms.find(function (selectedItem) {
-                        return selectedItem.id === form.formId
-                    });
-                    foundInGroup = (found !== undefined && found !== null);
-                    break;
-            }
+			switch (controller.groupSelection)
+			{
+				case FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL:
+					foundInGroup = true;
+					break;
+				case FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_FORM:
+					foundInGroup = form.type === FORM_CONTROLLER_FORM_TYPES.FORM;
+					break;
+				case FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_EFORM:
+					foundInGroup = form.type === FORM_CONTROLLER_FORM_TYPES.EFORM;
+					break;
+				default:
+					let found = controller.groupSelectedForms.find(function (selectedItem)
+					{
+						return selectedItem.id === form.formId
+					});
+					foundInGroup = (found !== undefined && found !== null);
+					break;
+			}
 
-            // filter on search string
-            let foundInSearch = true;
-            if (controller.formSearchStr.length > 0)
-            {
-                foundInSearch = form.name.toUpperCase().search("^" + controller.formSearchStr.toUpperCase()+".*") !== -1;
-            }
+			// filter on search string
+			let foundInSearch = true;
+			if (controller.formSearchStr.length > 0)
+			{
+				foundInSearch = form.name.toUpperCase().search("^" + controller.formSearchStr.toUpperCase() + ".*") !== -1;
+			}
 
-            return foundInGroup && foundInSearch;
-        };
+			return foundInGroup && foundInSearch;
+		};
 
-        controller.close = function cancel()
-        {
-            $uibModalInstance.close(null);
-        };
+		controller.close = function cancel()
+		{
+			$uibModalInstance.close(null);
+		};
 
-        controller.getFormsToAdd();
-    }
+		controller.getFormsToAdd();
+	}
 ]);

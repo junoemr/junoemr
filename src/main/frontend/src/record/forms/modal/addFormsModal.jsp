@@ -21,33 +21,39 @@
 * Canada
 --%>
 <juno-modal id="add-forms-modal">
-    <modal-title>
-        <h2>Add Forms</h2>
-    </modal-title>
-    <modal-ctl-buttons>
-        <button type="button" class="btn btn-icon" aria-label="Close"
-                ng-click="addFormsModalCtrl.close()"
-                title="Cancel">
-            <i class="icon icon-modal-ctl icon-close"></i>
-        </button>
-    </modal-ctl-buttons>
-    <modal-body>
-        <div class="flex-row">
-            <div class="container-fluid group-select-panel-placeholder">
-                <div class="container-fluid group-select-panel">
-                    <input type="text" class="form-control search-query" ng-model="addFormsModalCtrl.formSearchStr" placeholder="Filter Forms">
-                    <group-selector-component group-change="addFormsModalCtrl.onGroupChange(groupId, selectedForms)"
-                                              group-selection="addFormsModalCtrl.groupSelection"></group-selector-component>
-                </div>
-            </div>
-            <div class="col-md-10">
-                <form-view-component form-list="displayFormList"
-                                     provider-no="addFormsModalCtrl.providerNo" filter-forms="addFormsModalCtrl.onFilterForms(form, index, array)"
-                                     view-state="FORM_CONTROLLER_STATES.ADD" instanced-forms="false"></form-view-component>
-            </div>
-        </div>
-    </modal-body>
-    <modal-footer>
-        <button class="btn btn-primary" ng-click="addFormsModalCtrl.close()">Done</button>
-    </modal-footer>
+	<modal-title>
+		<h2>Add Forms</h2>
+	</modal-title>
+
+	<modal-ctl-buttons>
+		<button type="button" class="btn btn-icon" aria-label="Close"
+						ng-click="addFormsModalCtrl.close()"
+						title="Cancel">
+			<i class="icon icon-modal-ctl icon-close"></i>
+		</button>
+	</modal-ctl-buttons>
+
+	<modal-body>
+		<div class="flex-row">
+			<div class="container-fluid group-select-panel-placeholder">
+				<div class="container-fluid group-select-panel">
+					<input type="text" class="form-control search-query" ng-model="addFormsModalCtrl.formSearchStr"
+								 placeholder="Filter Forms">
+					<group-selector-component group-change="addFormsModalCtrl.onGroupChange(groupId, selectedForms)"
+																		group-selection="addFormsModalCtrl.groupSelection"></group-selector-component>
+				</div>
+			</div>
+			<div class="col-md-10">
+				<form-view-component form-list="displayFormList"
+														 provider-no="addFormsModalCtrl.providerNo"
+														 filter-forms="addFormsModalCtrl.onFilterForms(form, index, array)"
+														 view-state="FORM_CONTROLLER_STATES.ADD"
+														 instanced-forms="false"></form-view-component>
+			</div>
+		</div>
+	</modal-body>
+
+	<modal-footer>
+		<button class="btn btn-primary" ng-click="addFormsModalCtrl.close()">Done</button>
+	</modal-footer>
 </juno-modal>

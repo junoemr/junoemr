@@ -134,13 +134,13 @@ angular.module('Record.Forms').component('formViewComponent', {
 
             switch (ctrl.viewState) {
                 case FORM_CONTROLLER_STATES.COMPLETED:
-                    ctrl.cols.push({title: 'Action', field: 'delete', visible: true, displayClass: 'col-md-2'})
+                    ctrl.cols.push({title: 'Action', field: 'delete', visible: true, displayClass: 'col-md-1'})
                     break;
                 case FORM_CONTROLLER_STATES.REVISION:
                     ctrl.cols.push({title: 'Creation Date', field: 'createDate', sortable: 'createDate', visible: true, displayClass: 'col-md-2'})
                     break;
                 case FORM_CONTROLLER_STATES.DELETED:
-                    ctrl.cols.push({title: 'Action', field: 'restore', visible: true, displayClass: 'col-md-2'})
+                    ctrl.cols.push({title: 'Action', field: 'restore', visible: true, displayClass: 'col-md-1'})
                     break;
 
             }

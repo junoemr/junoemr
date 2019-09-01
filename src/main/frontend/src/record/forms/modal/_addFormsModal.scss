@@ -1,37 +1,37 @@
 #add-forms-modal {
-  @include juno-font-default-size(12px);
-  @include juno-tab-md(16px);
-  @include juno-tab-color-scheme-white;
+	@include juno-font-default-size(12px);
+	@include juno-tab-md(16px);
+	@include juno-tab-color-scheme-white;
 
-  .modal-body {
-    overflow-y:scroll;
-    max-height: 450px;
-  }
+	.modal-body {
+		overflow-y: scroll;
+		max-height: 450px;
+	}
 
-  .modal-title {
-    h2 {
-      color: white;
-    }
-  }
+	.modal-title {
+		h2 {
+			color: white;
+		}
+	}
 
-  .modal-footer {
-    text-align: center;
-  }
+	.modal-footer {
+		text-align: center;
+	}
 
-  .search-query {
-    display: inline-block;
-    width: 170px;
-    margin-bottom: 16px;
-  }
+	.search-query {
+		display: inline-block;
+		width: 170px;
+		margin-bottom: 16px;
+	}
 
-  .group-select-panel-placeholder {
-    min-width: 200px;
-    width: 200px;
-  }
+	.group-select-panel-placeholder {
+		min-width: 200px;
+		width: 200px;
+	}
 
-  .group-select-panel {
-    position: fixed;
-    min-width: 200px;
-    width: 200px;
-  }
+	.group-select-panel {
+		position: fixed;
+		min-width: 200px;
+		width: 200px;
+	}
 }
