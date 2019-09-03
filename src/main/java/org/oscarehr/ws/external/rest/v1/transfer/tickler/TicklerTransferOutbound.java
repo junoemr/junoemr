@@ -40,7 +40,7 @@ public class TicklerTransferOutbound extends TicklerTransferBase
 	private Integer id;
 
 	@Schema(description = "The last update date of the tickler")
-	private LocalDateTime updateDate;
+	private LocalDateTime updateDateTime;
 
 	public TicklerTransferOutbound() {}
 
@@ -49,8 +49,8 @@ public class TicklerTransferOutbound extends TicklerTransferBase
 		String [] ignore = {"updateDate", "serviceDate"};
 		BeanUtils.copyProperties(tickler, this, ignore);
 		//dates do not copy properly, do manually
-		setServiceDate(ConversionUtils.toLocalDateTime(tickler.getServiceDate()));
-		setUpdateDate(ConversionUtils.toLocalDateTime(tickler.getUpdateDate()));
+		setServiceDateTime(ConversionUtils.toLocalDateTime(tickler.getServiceDate()));
+		setUpdateDateTime(ConversionUtils.toLocalDateTime(tickler.getUpdateDate()));
 	}
 
 	public Integer getId()
@@ -63,13 +63,13 @@ public class TicklerTransferOutbound extends TicklerTransferBase
 		this.id = id;
 	}
 
-	public LocalDateTime getUpdateDate()
+	public LocalDateTime getUpdateDateTime()
 	{
-		return updateDate;
+		return updateDateTime;
 	}
 
-	public void setUpdateDate(LocalDateTime updateDate)
+	public void setUpdateDateTime(LocalDateTime updateDateTime)
 	{
-		this.updateDate = updateDate;
+		this.updateDateTime = updateDateTime;
 	}
 }

@@ -27,6 +27,7 @@ package org.oscarehr.ticklers.service;
 import java.util.Date;
 import java.util.List;
 
+import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.PaginationQuery;
 import org.oscarehr.common.dao.TicklerCategoryDao;
 import org.oscarehr.common.model.Tickler;
@@ -46,6 +47,9 @@ public class TicklerService {
 
 	@Autowired
 	private TicklerCategoryDao ticklerCategoryDao;
+
+	@Autowired
+	private ProgramManager programManager;
 
 	/**
 	 * Use to get ticklers count for pagination display
@@ -87,7 +91,10 @@ public class TicklerService {
 			tickler.setId(null);
 		}
 
-		validateTickler(tickler);
+		//force program id to oscar default
+		tickler.setProgramId(programManager.getDefaultProgramId());
+
+		validateAndDefaultTickler(tickler);
 		TicklerDao.persist(tickler);
 		return tickler;
 	}
@@ -100,7 +107,7 @@ public class TicklerService {
 	 */
 	public Tickler updateTickler(Tickler tickler) throws ValidationException
 	{
-		validateTickler(tickler);
+		validateAndDefaultTickler(tickler);
 		tickler.setUpdateDate(new Date());
 
 		TicklerDao.merge(tickler);
@@ -113,7 +120,7 @@ public class TicklerService {
 	 * @return - the validated tickler
 	 * @throws ValidationException - if a required tickler field is missing
 	 */
-	private Tickler validateTickler(Tickler tickler) throws ValidationException
+	private Tickler validateAndDefaultTickler(Tickler tickler) throws ValidationException
 	{
 		if (tickler.getDemographicNo() == null)
 		{

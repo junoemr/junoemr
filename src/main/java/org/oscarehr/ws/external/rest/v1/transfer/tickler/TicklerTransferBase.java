@@ -50,9 +50,6 @@ public abstract class TicklerTransferBase implements Serializable
 	@Schema(description="The demographic number to which this tickler pertains")
 	private Integer demographicNo;
 
-	@Schema(description="The program that the tickler is in")
-	private Integer programId;
-
 	@NotNull
 	@Schema(description="The ticklers message")
 	private String message;
@@ -63,7 +60,7 @@ public abstract class TicklerTransferBase implements Serializable
 
 	@NotNull
 	@Schema(description = "The date after which the tickler becomes 'overdue'")
-	private LocalDateTime serviceDate;
+	private LocalDateTime serviceDateTime;
 
 	@ProviderNoConstraint(allowNull = false)
 	@Size(max=6)
@@ -92,16 +89,6 @@ public abstract class TicklerTransferBase implements Serializable
 		this.demographicNo = demographicNo;
 	}
 
-	public Integer getProgramId()
-	{
-		return programId;
-	}
-
-	public void setProgramId(Integer programId)
-	{
-		this.programId = programId;
-	}
-
 	public String getMessage()
 	{
 		return message;
@@ -122,14 +109,14 @@ public abstract class TicklerTransferBase implements Serializable
 		this.status = status;
 	}
 
-	public LocalDateTime getServiceDate()
+	public LocalDateTime getServiceDateTime()
 	{
-		return serviceDate;
+		return serviceDateTime;
 	}
 
-	public void setServiceDate(LocalDateTime serviceDate)
+	public void setServiceDateTime(LocalDateTime serviceDateTime)
 	{
-		this.serviceDate = serviceDate;
+		this.serviceDateTime = serviceDateTime;
 	}
 
 	public String getCreator()
@@ -182,7 +169,7 @@ public abstract class TicklerTransferBase implements Serializable
 		String [] ignore = {"serviceDate"};
 		BeanUtils.copyProperties(this, t, ignore);
 		//dates do not copy properly, copy manually
-		t.setServiceDate(ConversionUtils.toNullableLegacyDateTime(getServiceDate()));
+		t.setServiceDate(ConversionUtils.toNullableLegacyDateTime(getServiceDateTime()));
 		return t;
 	}
 

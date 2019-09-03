@@ -46,9 +46,9 @@ public class TicklerTransferInbound extends TicklerTransferBase
 	{
 		BeanUtils.copyProperties(this, t, getNullPropertyNames(this));
 		//dates will not copy properly, must do manual copy
-		if (this.getServiceDate() != null)
+		if (this.getServiceDateTime() != null)
 		{
-			t.setServiceDate(ConversionUtils.toLegacyDateTime(this.getServiceDate()));
+			t.setServiceDate(ConversionUtils.toLegacyDateTime(this.getServiceDateTime()));
 		}
 
 		return t;
