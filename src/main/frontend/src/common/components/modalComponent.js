@@ -24,7 +24,9 @@
  */
 
 angular.module('Common.Components').component('junoModal', {
-	bindings: {},
+	bindings: {
+		hideFooter: '<'
+	},
 	templateUrl: "src/common/components/modalTemplate.jsp",
 	transclude: {
 		'title': '?modalTitle',

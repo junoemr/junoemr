@@ -98,6 +98,12 @@
 						height: 100%;
 					}
 				}
+
+				.modal-body.no-footer {
+					height: $modal-body-no-footer-height;
+					border-radius: 16px 0 0 16px;
+				}
+
 				.modal-footer {
 					height: $modal-footer-height;
 					border-radius: 0 0 16px 16px;

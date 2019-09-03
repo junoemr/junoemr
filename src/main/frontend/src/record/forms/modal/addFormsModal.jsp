@@ -20,9 +20,9 @@
 * Victoria, British Columbia
 * Canada
 --%>
-<juno-modal id="add-forms-modal">
+<juno-modal id="add-forms-modal" hide-footer="true">
 	<modal-title>
-		<h2>Add Forms</h2>
+		<h3>Add Forms</h3>
 	</modal-title>
 
 	<modal-ctl-buttons>
@@ -34,7 +34,7 @@
 	</modal-ctl-buttons>
 
 	<modal-body>
-		<div class="flex-row">
+		<div class="modal-content-area flex-row">
 			<div class="container-fluid group-select-panel-placeholder">
 				<div class="container-fluid group-select-panel">
 					<input type="text" class="form-control search-query" ng-model="addFormsModalCtrl.formSearchStr"
@@ -52,8 +52,4 @@
 			</div>
 		</div>
 	</modal-body>
-
-	<modal-footer>
-		<button class="btn btn-primary" ng-click="addFormsModalCtrl.close()">Done</button>
-	</modal-footer>
 </juno-modal>

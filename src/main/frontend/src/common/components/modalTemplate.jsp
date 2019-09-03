@@ -27,6 +27,6 @@
 		<div ng-transclude="title" class="modal-title"></div>
 		<div ng-transclude="ctlButtons" class="modal-ctl-buttons"></div>
 	</div>
-	<div ng-transclude="body" class="modal-body"></div>
-	<div ng-transclude="footer" class="modal-footer"></div>
+	<div ng-transclude="body" class="modal-body" ng-class="$ctrl.hideFooter ? 'no-footer' : ''"></div>
+	<div ng-transclude="footer" class="modal-footer" ng-if="!$ctrl.hideFooter"></div>
 </div>

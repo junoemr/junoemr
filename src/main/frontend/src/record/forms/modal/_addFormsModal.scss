@@ -3,9 +3,12 @@
 	@include juno-tab-md(16px);
 	@include juno-tab-color-scheme-white;
 
-	.modal-body {
-		overflow-y: scroll;
-		max-height: 450px;
+	.modal-content-area {
+		height: calc(100% - 16px);
+		overflow-y: auto;
+
+		margin-bottom: 8px;
+		margin-top: 8px;
 	}
 
 	.modal-title {
