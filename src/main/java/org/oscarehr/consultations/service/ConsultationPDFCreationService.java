@@ -105,6 +105,16 @@ public class ConsultationPDFCreationService
 		// Iterating over requested labs.
 		for(LabResultData lab : attachedLabs)
 		{
+			// First, display meta-information regarding the lab in question
+			ByteOutputStream bos = new ByteOutputStream();
+			LabPDFCreator labPDFCreator = new LabPDFCreator(bos, lab.segmentID, null);
+			labPDFCreator.printPdf();
+			// Transferring PDF to an input stream to be concatenated with
+			// the rest of the documents.
+			byte[] buffer = bos.getBytes();
+			streamList.add(new ByteInputStream(buffer, bos.getCount()));
+			bos.close();
+
 			// Storing the lab in PDF format inside a byte stream.
 			int labNo = Integer.parseInt(lab.segmentID);
 			List<Hl7DocumentLink> possibleDocs = hl7DocumentLinkDao.getDocumentsForLab(labNo);
@@ -117,18 +127,6 @@ public class ConsultationPDFCreationService
 					GenericFile file = FileFactory.getDocumentFile(embeddedDoc.getDocfilename());
 					streamList.add(file.asFileInputStream());
 				}
-			}
-			else
-			{
-				ByteOutputStream bos = new ByteOutputStream();
-				LabPDFCreator labPDFCreator = new LabPDFCreator(bos, lab.segmentID, null);
-				labPDFCreator.printPdf();
-
-				// Transferring PDF to an input stream to be concatenated with
-				// the rest of the documents.
-				byte[] buffer = bos.getBytes();
-				streamList.add(new ByteInputStream(buffer, bos.getCount()));
-				bos.close();
 			}
 		}
 		return streamList;

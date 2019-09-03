@@ -258,9 +258,11 @@ public class LabPDFCreator extends PdfPageEventHelper {
 	private void addLabCategory(String header, MessageHandler extraHandler) throws DocumentException {
 		MessageHandler handler = (extraHandler != null) ? extraHandler : this.handler;
 		boolean isUnstructuredDoc;
-
-		if (handler.getMsgType().equals("PATHL7")) {
-			isUnstructuredDoc = ((PATHL7Handler) handler).unstructuredDocCheck(header);
+		boolean hasEmbeddedPDF;
+		if (handler.getMsgType().equals("PATHL7"))
+		{
+			hasEmbeddedPDF = ((PATHL7Handler)handler).hasEmbeddedPDF();
+			isUnstructuredDoc = ((PATHL7Handler) handler).unstructuredDocCheck(header) || hasEmbeddedPDF;
 		}
 		else
 		{
