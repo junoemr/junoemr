@@ -370,58 +370,17 @@
 }
 
 /* schedule specific modal styling */
-.schedule-modal {
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-
+#schedule-modal {
 	.modal-header {
-		display: flex;
-		align-items: center;
-		flex-direction: row;
-		justify-content: space-between;
-		border-bottom: 0;
-
-		.modal-title {
-			display: flex;
-			flex-grow: 1;
-			flex-direction: row;
-			align-items: center;
-			.align-baseline {
-				display: flex;
-				flex-grow: 1;
-				flex-direction: row;
-				align-items: baseline;
-				h4 {
-					padding: 0 16px;
-				}
+		.modal-patient-links {
+			margin-right: 20px;
+			.btn {
+				width: 28px;
 			}
-		}
-		.modal-ctl-buttons {
-			padding: 6px;
-			align-items: center;
-			justify-content: space-between;
-			display: flex;
-
-			.modal-patient-links {
-				margin-right: 20px;
-				.btn {
-					width: 28px;
-				}
-			}
-		}
-		.icon-modal-ctl {
-			font-size: 24px;
-			color: $color-primary-base;
-		}
-		.icon-modal-add-appt {
-			font-size: 40px;
-			color: $color-neutral-white;
 		}
 	}
 
-	.modal-body {
-
+	modal-body {
 		$tabs-height: $page-tabs-height;
 		$alert-container-height: 40px;
 		@include juno-tab-lg($tabs-height);
@@ -448,27 +407,27 @@
 		}
 		.info-frame-container {
 			height: 160px;
-			.demographic-info-frame {
-				height: 144px;
-				margin-bottom: 12px;
-				background-color: $color-neutral-lightest;
-				border: solid 1px $color-neutral-lighter;
-				border-radius: 8px;
-				padding: 14px;
-
-				.form-group {
-					margin: 0;
-
-					label {
-						font-size: 9px;
-						color: $color-neutral-dark;
-					}
-					span {
-						@include juno-font-label;
-						color: $color-neutral-darker;
-					}
-				}
-			}
+			//.demographic-info-frame {
+			//	height: 144px;
+			//	margin-bottom: 12px;
+			//	background-color: $color-neutral-lightest;
+			//	border: solid 1px $color-neutral-lighter;
+			//	border-radius: 8px;
+			//	padding: 14px;
+			//
+			//	.form-group {
+			//		margin: 0;
+			//
+			//		label {
+			//			font-size: 9px;
+			//			color: $color-neutral-dark;
+			//		}
+			//		span {
+			//			@include juno-font-label;
+			//			color: $color-neutral-darker;
+			//		}
+			//	}
+			//}
 		}
 		.tab-pane {
 			padding: 0 $modal-border-space $modal-border-space $modal-border-space;
@@ -497,5 +456,8 @@
 				@include juno-tab-lg(64px);
 			}
 		}
+	}
+	.form-control-static {
+		min-height: 10px;
 	}
 }

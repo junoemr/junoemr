@@ -1,6 +1,6 @@
 
 <div class="form-group {{form_group_class}}"
-		 ng-class="{ 'has-error': error_message}"
+		 ng-class="{ 'has-error': error_message, 'has-warning': warning_message}"
 		 title="{{error_message}}"
 		 ng-hide="hide">
 

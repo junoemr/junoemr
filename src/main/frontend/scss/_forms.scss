@@ -11,7 +11,7 @@
 	}
 }
 @mixin juno-form-colour-scheme-light {
-	@include juno-form-colour-scheme($color-neutral-lightest, $color-neutral-light, $color-neutral-dark, $color-neutral-dark, $color-neutral-white);
+	@include juno-form-colour-scheme($color-neutral-lightest, $color-neutral-light, $color-neutral-dark, $color-neutral-grey, $color-neutral-white);
 }
 @mixin juno-form-colour-scheme-blue {
 	@include juno-form-colour-scheme($color-primary-dark, $color-primary-dark, $color-neutral-white, $color-neutral-light-grey, $color-primary-dark);
@@ -19,8 +19,6 @@
 @mixin juno-form-colour-scheme-dark {
 	@include juno-form-colour-scheme($color-neutral-lightest, $color-neutral-light, $color-neutral-darker, $color-neutral-darker, $color-neutral-white);
 }
-
-
 
 
 // bootstrap fonts look better on form elements
@@ -49,6 +47,20 @@ label {
 	input[type="radio"],
 	input[type="checkbox"] {
 		margin: 4px 0 0;
+	}
+}
+
+.has-error {
+	@include form-control-validation($color-red-darker, $color-red-light, $color-red-lighter);
+	.form-control {
+		background-color: $color-red-lighter;
+	}
+}
+.has-warning {
+	@include form-control-validation($color-yellow-darkest, $color-yellow-light, $color-yellow-lighter);
+	.form-control {
+		color: $color-neutral-darker;
+		background-color: $color-yellow-lighter;
 	}
 }
 
@@ -84,6 +96,7 @@ label {
 		color: $color-red-base;
 	}
 }
+
 .input-group-addon {
 	padding: 6px 12px;
 	font-size: 13px;
