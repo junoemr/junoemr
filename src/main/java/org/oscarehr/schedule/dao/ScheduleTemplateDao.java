@@ -325,7 +325,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"	AND provider_no = :providerNo" +
 				"	AND status = 'A') as sd\n" +
 				"CROSS JOIN (SELECT * from seq_1_to_299) as num\n" +
-				"JOIN scheduletemplate st ON (sd.hour = st.name AND sd.provider_no IN (:providerNo, :publicCode))\n" +
+				"JOIN scheduletemplate st ON (st.name = sd.hour AND st.provider_no IN (:providerNo, :publicCode))\n" +
 				"LEFT JOIN scheduletemplatecode stc ON BINARY stc.code = SUBSTRING(st.timecode, seq+1, 1)\n" +
 				"WHERE stc.code IN (:appointmentTypes)\n" +
 				"AND CONCAT(sd.sdate, ' ', SEC_TO_TIME(ROUND((24*60*60)*seq/LENGTH(st.timecode)))) BETWEEN :startDateTime AND :endDateTime\n" +
