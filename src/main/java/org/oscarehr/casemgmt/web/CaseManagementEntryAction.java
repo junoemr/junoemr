@@ -1859,7 +1859,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		if (toBill != null && toBill.equalsIgnoreCase("true")) {
 			String region = cform.getBillRegion();
 			String appointmentNo = cform.getAppointmentNo();
-			String name = this.getDemoName(demoNo);
+			String name = this.getDemoNameLastFirst(demoNo);
 			String date = cform.getAppointmentDate();
 			String start_time = cform.getStart_time();
 			String apptProvider = cform.getApptProvider();
@@ -3191,5 +3191,13 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			}
 		}
 		return programSet;
+	}
+
+	private String getDemoNameLastFirst(String demoNo)
+	{
+		if (demoNo == null) {
+			return "";
+		}
+		return caseManagementMgr.getDemoLastName(demoNo) + ", " + caseManagementMgr.getDemoFirstName(demoNo);
 	}
 }

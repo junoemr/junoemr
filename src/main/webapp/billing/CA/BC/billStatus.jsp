@@ -662,7 +662,7 @@ billTypes = "%";
 	<%
 		if(!"true".equals(readonly)){
 	%>
-   <td align="center"><a href="javascript: setDemographic('<%=b.demoNo%>');"><%=b.demoName%></a></td>
+   <td align="center"><a href="javascript: setDemographic('<%=b.demoNo%>');"><%=StringUtils.trimToEmpty(b.demoName).toUpperCase()%></a></td>
 	<%}%>
 	<td align="center"><%=b.providerLastName%>,<%=b.providerFirstName%></td>
 	 <td align="center" title="<%=msp.getStatusDesc(b.reason)%>" ><%=msp.getStatusDesc(b.reason)==null?"&nbsp":msp.getStatusDesc(b.reason)%></td>
@@ -850,8 +850,8 @@ void sortBills(List<MSPReconcile.Bill> bills, final Properties p2, final String 
                     }
                     case PATIENT:
                     {
-                        String demoNameT1 = StringUtils.trimToEmpty(t1.demoName);
-                        String demoNameO = StringUtils.trimToEmpty(o.demoName);
+                        String demoNameT1 = StringUtils.trimToEmpty(t1.demoName).toUpperCase();
+                        String demoNameO = StringUtils.trimToEmpty(o.demoName).toUpperCase();
                         return reverse ? demoNameT1.compareTo(demoNameO) : demoNameO.compareTo(demoNameT1);
                     }
                     case PRACT:
