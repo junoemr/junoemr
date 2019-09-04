@@ -139,11 +139,34 @@ form {
     margin-bottom: 10px;
 }
 
+.rx-settings-panel {
+    display: flex;
+}
+
+.rx-settings-panel h3 {
+    font-size: 14pt;
+    text-align: center;
+}
+
 .rx-fields {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+}
+
+#rx-general-success-msg {
+    margin-top: 8px;
+    display: none;
+    color: darkgreen;
+    text-align: center;
+}
+
+#rx-general-error-msg {
+    margin-top: 8px;
+    display: none;
+    color: darkred;
+    text-align: center;
 }
 
 .flex-fill-row {

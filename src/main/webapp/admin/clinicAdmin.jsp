@@ -205,40 +205,38 @@
     <div id="clinic">
         <div class="clinic-details">
             <div class="clinic-info">
-                <fieldset>
+                <fieldset class="rx-settings-panel">
                     <legend>Rx Settings</legend>
                     <form  id="rx-form" action="../RxSettings.do" method="POST">
+                        <h3>General Settings</h3>
+                        <hr>
                         <input id="rx-settings-action" name="method" type="hidden" value="setSettings">
                         <div class="rx-fields">
                             <div class="input-field">
                                 <label>Rx Promo Text</label>
-                                    <%
-                                        UserProperty promoProp = userPropertyDAO.getProp(UserProperty.RX_PROMO_TEXT);
-                                        String promoText = "";
-                                        if (promoProp != null)
-                                        {
-                                            promoText = promoProp.getValue();
-                                        }
-                                    %>
-                                    <input name="rx_promo_text" type="text" value="<%=promoText%>">
+                                <%
+                                    UserProperty promoProp = userPropertyDAO.getProp(UserProperty.RX_PROMO_TEXT);
+                                    String promoText = "";
+                                    if (promoProp != null)
+                                    {
+                                        promoText = promoProp.getValue();
+                                    }
+                                %>
+                                <input name="rx_promo_text" type="text" value="<%=promoText%>">
                             </div>
 
                             <div class="submit flex-fill-row">
                                 <input class="submit-button" type="submit" value="Update">
                             </div>
+                            <div class="flex-fill-row">
+                                <span id="rx-general-success-msg">Settings updated</span>
+                                <span id="rx-general-error-msg">Error updating settings</span>
+                            </div>
                         </div>
                     </form>
-                </fieldset>
-            </div>
-        </div>
-    </div>
-
-    <div id="clinic">
-        <div class="clinic-details">
-            <div class="clinic-info">
-                <fieldset>
-                    <legend>Prescription Watermark</legend>
                     <form action="../RxWatermark.do" method="POST" enctype="multipart/form-data" id="watermark-form">
+                        <h3>Rx Watermark</h3>
+                        <hr>
                         <input id="watermark-upload-action" type="hidden" name="method" value="setWatermark">
 
                         <div class="input-field flex-fill-row">
@@ -428,7 +426,12 @@
                 contentType: false,
                 processData: false,
                 success: function() {
-                    console.log("WIN");
+                    jQuery("#rx-general-success-msg").css('display', 'block');
+                    jQuery("#rx-general-error-msg").css('display', 'none');
+                },
+                error: function () {
+                    jQuery("#rx-general-error-msg").css('display', 'block');
+                    jQuery("#rx-general-success-msg").css('display', 'none');
                 }
             })
         }
