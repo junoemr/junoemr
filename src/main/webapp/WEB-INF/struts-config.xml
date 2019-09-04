@@ -2877,6 +2877,9 @@
 		<action path="/RxWatermark" name="FrmForm" type="org.oscarehr.rx.web.RxWatermarkAction" parameter="method">
 		</action>
 
+		<action path="/RxSettings" name="FrmForm" type="org.oscarehr.rx.web.RxSettingsAction" parameter="method">
+		</action>
+
      <action path="/consults/Consultations" type="org.oscarehr.consultations.ConsultationAction">
       </action>
 		     

@@ -139,6 +139,13 @@ form {
     margin-bottom: 10px;
 }
 
+.rx-fields {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
 .flex-fill-row {
     flex: 0 0 100%;
 }
