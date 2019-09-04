@@ -114,6 +114,7 @@
 <title>Antenatal Record 2</title>
 <html:base />
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
 <link rel="stylesheet" type="text/css" href="<%=bView?"arStyleView.css" : "arStyle.css"%>">
 <link rel="stylesheet" type="text/css" media="all" href="../share/calendar/calendar.css" title="win2k-cold-1" />
 <script type="text/javascript" src="../share/calendar/calendar.js"></script>
@@ -708,6 +709,7 @@ function onPrint2() {
         document.forms[0].action = "/<%=project_home%>/form/formname.do" ;
 	}
     function onPrint() {
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         document.forms[0].submit.value="print"; 
         var ret = checkAllDates();
         if(ret==true)
@@ -875,7 +877,8 @@ function onPrint2() {
         }
 
     }
-    function onSave() {    	
+    function onSave() {
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         document.forms[0].submit.value="save";
         var ret = checkAllDates();
         var ret1 = validate();
@@ -888,6 +891,7 @@ function onPrint2() {
     }
     
     function onSaveExit() {
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         document.forms[0].submit.value="exit";
         var ret = checkAllDates();
         var ret1 = validate();
@@ -906,6 +910,7 @@ function onPrint2() {
         var ret = checkAllDates();
         if(ret==true && ret1==true)
         {
+            Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
             reset();
             ret = confirm("Are you sure you want to save this form?");
             if(ret) {

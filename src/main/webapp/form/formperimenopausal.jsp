@@ -47,6 +47,9 @@
 <html:html locale="true">
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+	<!-- Helper scripts for submission -->
+	<script type="text/javascript" src="OscarFormHelpers.js"></script>
+	<script src="<%= request.getContextPath() %>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
 <title>Peri Menopausal</title>
 <link rel="stylesheet" type="text/css" href="periMenopausalStyle.css">
 <link rel="stylesheet" type="text/css" media="print" href="print.css">
@@ -87,6 +90,7 @@ TABLE {
     }
     function onSave() {
         document.forms[0].submit.value="save";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret==true)
         {
@@ -97,6 +101,7 @@ TABLE {
     
     function onSaveExit() {
         document.forms[0].submit.value="exit";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         var ret = checkAllDates();
         if(ret == true)
         {

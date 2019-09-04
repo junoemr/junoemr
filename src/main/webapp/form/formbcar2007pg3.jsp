@@ -314,8 +314,8 @@ function calcBMIMetric() {
 	}
 
     function onPrint() {
-        document.forms[0].submit.value="print"; 
-
+        document.forms[0].submit.value="print";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         if(checkAllDates())
         {            
             document.forms[0].action = "../form/createpdf?__title=British+Columbia+Antenatal+Record+Part+2&__cfgfile=bcar2PrintCfgPg2_2007&__cfgGraphicFile=bcar2PrintGraphCfgPg1_2007&__template=bcar2_2007";
@@ -328,8 +328,8 @@ function calcBMIMetric() {
     }
 
     function onPrint12() {
-        document.forms[0].submit.value="printAll"; 
-                
+        document.forms[0].submit.value="printAll";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         document.forms[0].action = "../form/formname.do?__title=British+Columbia+Antenatal+Record&__cfgfile=bcar1PrintCfgPg1_2007&__cfgfile=bcar2PrintCfgPg1_2007&__cfgGraphicFile=bcar2PrintGraphCfgPg1_2007&__cfgGraphicFile1=bcar2PrintGraphCfgPg1_2007&__graphicPage=2<%= props.getProperty("pg3_date1", "") == "" ? "&__template=bcarARs2_2007&__numPages=2" : "&__cfgGraphicFile2=bcar2PrintGraphCfgPg1_2007&__cfgfile=bcar2PrintCfgPg2_2007&__graphicPage=3&__template=bcarARs1_2007&__numPages=3" %>";
         document.forms[0].target="_blank";            
         
@@ -337,8 +337,8 @@ function calcBMIMetric() {
     }
 
     function onPrintAll() {
-        document.forms[0].submit.value="printAll"; 
-                
+        document.forms[0].submit.value="printAll";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         document.forms[0].action = "../form/formname.do?__title=British+Columbia+Antenatal+Record&__cfgfile=bcar1PrintCfgPg1_2007&__cfgfile=bcar2PrintCfgPg1_2007&__cfgGraphicFile=bcar2PrintGraphCfgPg1_2007&__cfgGraphicFile1=bcar2PrintGraphCfgPg1_2007&__graphicPage=2<%= props.getProperty("pg3_date1", "") == "" ? "&__cfgfile=bcar1PrintCfgPg2_2007&__cfgfile=bcar2PrintCfgScores_2007&__template=bcarAll2_2007&__numPages=2" : "&__cfgGraphicFile2=bcar2PrintGraphCfgPg1_2007&__cfgfile=bcar2PrintCfgPg2_2007&__graphicPage=3&__cfgfile=bcar1PrintCfgPg2_2007&__cfgfile=bcar2PrintCfgScores_2007&__template=bcarAll1_2007&__numPages=3" %>";
         document.forms[0].target="_blank";            
         
@@ -375,6 +375,7 @@ function calcBMIMetric() {
 
     function onSaveExit() {
         document.forms[0].submit.value="exit";
+        Oscar.FormHelpers.forceSubmitUncheckedCheckboxes();
         if(checkAllDates() && checkAllNumber()) {
             reset();
             return confirm("Are you sure you wish to save and close this window?");

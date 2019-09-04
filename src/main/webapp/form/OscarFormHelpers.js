@@ -130,16 +130,19 @@ Oscar.FormHelpers.createConfirmDirtyState = function createConfirmDirtyState()
 Oscar.FormHelpers.forceSubmitUncheckedCheckboxes = function forceSubmitUncheckedCheckboxes()
 {
     var checkboxes = $("input:checkbox");
-    for (var i = 0; i < checkboxes.length; i++)
+    if (checkboxes !== null)
     {
-        if (!checkboxes[i].checked)
+        for (var i = 0; i < checkboxes.length; i++)
         {
-            $('<input>').attr({
-                type: 'hidden',
-                id: checkboxes[i].name + '' + i,
-                name: checkboxes[i].name,
-                value: ''
-            }).appendTo('form');
+            if (!checkboxes[i].checked)
+            {
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: checkboxes[i].name + '' + i,
+                    name: checkboxes[i].name,
+                    value: ''
+                }).appendTo('form');
+            }
         }
     }
 };
