@@ -70,16 +70,18 @@ public class TicklerWs extends AbstractExternalRestWs
 		String providerNoStr = getOAuthProviderNo();
 		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.READ, null, "_tickler");
 
-		try
+		if (id == null)
 		{
-			Tickler tickler = ticklerDao.find(id);
-			return RestResponse.successResponse(new TicklerTransferOutbound(tickler));
+			throw new ValidationException("Tickler id cannot be null");
 		}
-		catch (Exception e)
+
+		Tickler tickler = ticklerDao.find(id);
+		if (tickler == null)
 		{
-			MiscUtils.getLogger().error("Error getting tickler [" + id + "]: " + e.getMessage(), e);
-			throw new RuntimeException("Error getting tickler [" + id + "]: " + e.getMessage(), e);
+			throw new ValidationException("Tickler for id [" + id + "] not found");
 		}
+
+		return RestResponse.successResponse(new TicklerTransferOutbound(tickler));
 	}
 
 
@@ -95,10 +97,18 @@ public class TicklerWs extends AbstractExternalRestWs
 		{
 			throw new ValidationException("Tickler definition required");
 		}
+		if (id == null)
+		{
+			throw new ValidationException("Tickler id cannot be null");
+		}
 
 		Tickler tickler = ticklerDao.find(id);
-		tickler = ticklerIn.copyToTickler(tickler);
+		if(tickler == null)
+		{
+			throw new ValidationException("Tickler for id [" + id + "] not found");
+		}
 
+		tickler = ticklerIn.copyToTickler(tickler);
 		ticklerService.updateTickler(tickler);
 		return RestResponse.successResponse(new TicklerTransferOutbound(tickler));
 
