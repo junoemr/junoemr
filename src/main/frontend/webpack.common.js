@@ -253,6 +253,8 @@ module.exports = {
 			'./src/record/summary/groupNotesController.js',
 			'./src/record/summary/saveWarningController.js',
 			'./src/record/summary/summaryModuleComponent.js',
+			'./src/record/summary/encounterNoteComponent.js',
+			'./src/record/summary/encounterNoteListComponent.js',
 			'./src/record/forms/module.js',
 			'./src/record/forms/formsController.js',
 			'./src/record/details/module.js',

@@ -66,7 +66,6 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		diseaseRegistryService.getIssueQuickLists().then(
 			function success(results)
 			{
-				console.log(results);
 				controller.page.quickLists = results;
 			},
 			function error(errors)
@@ -161,7 +160,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 						action = itemId;
 						controller.setAvailablePositions();
 
-						controller.removeEditingNoteFlag();
+						// controller.removeEditingNoteFlag();
 
 						if (controller.groupNotesForm.encounterNote.position < 1)
 						{
@@ -264,7 +263,7 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			noteService.saveIssueNote($stateParams.demographicNo, controller.groupNotesForm).then(
 				function success(results)
 				{
-					$uibModalInstance.dismiss('cancel');
+					$uibModalInstance.close(controller.groupNotesForm.encounterNote);
 					$state.transitionTo($state.current, $stateParams, {
 						reload: false,
 						inherit: false,
@@ -297,64 +296,64 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 		/*
 		 * handle concurrent note edit - EditingNoteFlag
 		 */
-		controller.doSetEditingNoteFlag = function doSetEditingNoteFlag()
-		{
-			noteService.setEditingNoteFlag(editingNoteId, user.providerNo).then(
-				function success(results)
-				{
-					if (!results.success)
-					{
-						if (results.message == "Parameter error") alert("Parameter Error: noteUUID[" + editingNoteId + "] userId[" + user.providerNo + "]");
-						else alert("Warning! Another user is editing this note now.");
-					}
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-		};
+		// controller.doSetEditingNoteFlag = function doSetEditingNoteFlag()
+		// {
+		// 	noteService.setEditingNoteFlag(editingNoteId, user.providerNo).then(
+		// 		function success(results)
+		// 		{
+		// 			if (!results.success)
+		// 			{
+		// 				if (results.message == "Parameter error") alert("Parameter Error: noteUUID[" + editingNoteId + "] userId[" + user.providerNo + "]");
+		// 				else alert("Warning! Another user is editing this note now.");
+		// 			}
+		// 		},
+		// 		function error(errors)
+		// 		{
+		// 			console.log(errors);
+		// 		});
+		// };
 
-		controller.setEditingNoteFlag = function setEditingNoteFlag()
-		{
-			if (controller.groupNotesForm.encounterNote.uuid == null) return;
+		// controller.setEditingNoteFlag = function setEditingNoteFlag()
+		// {
+		// 	if (controller.groupNotesForm.encounterNote.uuid == null) return;
+		//
+		// 	controller.removeEditingNoteFlag(); //remove any previous flag actions
+		// 	editingNoteId = controller.groupNotesForm.encounterNote.uuid;
+		//
+		// 	itvSet = $interval(controller.doSetEditingNoteFlag(), 30000); //set flag every 5 min
+		// 	itvCheck = $interval(function()
+		// 	{
+		// 		noteService.checkEditNoteNew(editingNoteId, user.providerNo).then(
+		// 			function success(results)
+		// 			{
+		// 				if (!results.success)
+		// 				{ //someone else wants to edit this note
+		// 					alert("Warning! Another user tries to edit this note. Your update may be replaced by later revision(s).");
+		//
+		// 					//cancel 10sec check after 1st time warning when another user tries to edit this note
+		// 					$interval.cancel(itvCheck);
+		// 					itvCheck = null;
+		// 				}
+		// 			},
+		// 			function error(errors)
+		// 			{
+		// 				console.log(errors);
+		// 			});
+		// 	}, 10000); //check for new edit every 10 sec
+		// };
 
-			controller.removeEditingNoteFlag(); //remove any previous flag actions
-			editingNoteId = controller.groupNotesForm.encounterNote.uuid;
-
-			itvSet = $interval(controller.doSetEditingNoteFlag(), 30000); //set flag every 5 min
-			itvCheck = $interval(function()
-			{
-				noteService.checkEditNoteNew(editingNoteId, user.providerNo).then(
-					function success(results)
-					{
-						if (!results.success)
-						{ //someone else wants to edit this note
-							alert("Warning! Another user tries to edit this note. Your update may be replaced by later revision(s).");
-
-							//cancel 10sec check after 1st time warning when another user tries to edit this note
-							$interval.cancel(itvCheck);
-							itvCheck = null;
-						}
-					},
-					function error(errors)
-					{
-						console.log(errors);
-					});
-			}, 10000); //check for new edit every 10 sec
-		};
-
-		controller.removeEditingNoteFlag = function removeEditingNoteFlag()
-		{
-			if (editingNoteId != null)
-			{
-				noteService.removeEditingNoteFlag(editingNoteId, user.providerNo);
-				$interval.cancel(itvSet);
-				$interval.cancel(itvCheck);
-				itvSet = null;
-				itvCheck = null;
-				editingNoteId = null;
-			}
-		};
+		// controller.removeEditingNoteFlag = function removeEditingNoteFlag()
+		// {
+		// 	if (editingNoteId != null)
+		// 	{
+		// 		noteService.removeEditingNoteFlag(editingNoteId, user.providerNo);
+		// 		$interval.cancel(itvSet);
+		// 		$interval.cancel(itvCheck);
+		// 		itvSet = null;
+		// 		itvCheck = null;
+		// 		editingNoteId = null;
+		// 	}
+		// };
 
 
 		controller.removeIssue = function removeIssue(i)

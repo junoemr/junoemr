@@ -57,7 +57,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		var controller = this;
 
-
 		controller.page = {};
 		controller.page.columnOne = {};
 		controller.page.columnOne.modules = {};
@@ -66,15 +65,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		controller.page.columnThree.modules = {};
 		controller.page.selectedNotes = [];
 
-		controller.page.notes = {};
 		controller.index = 0;
-		controller.page.notes = {};
-		controller.page.notes.notelist = [];
 		controller.busy = false;
-		controller.page.noteFilter = {};
-		controller.page.currentFilter = 'none';
-		controller.page.onlyNotes = false; // Filter for only showing encounter notes
-		controller.page.onlyMine = false; // Filter for only showing notes the current user has created/edited
 
 		controller.demographicNo = $stateParams.demographicNo;
 
@@ -117,14 +109,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 		};
 
-		controller.openRevisionHistory = function openRevisionHistory(note)
-		{
-			//var rnd = Math.round(Math.random() * 1000);
-			win = "revision";
-			var url = "../CaseManagementEntry.do?method=notehistory&noteId=" + note.noteId;
-			window.open(url, win, "scrollbars=yes, location=no, width=647, height=600", "");
-		};
-
 		controller.openRx = function openRx(demoNo)
 		{
 			win = "Rx" + demoNo;
@@ -153,46 +137,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			// open forms tab with "Library" list selected
 			$state.go('record.forms', {formListId: 1});
 		};
-
-		//Note display functions
-		controller.addMoreItems = function addMoreItems()
-		{
-			if (controller.busy) return;
-
-			controller.busy = true;
-
-			noteService.getNotesFrom($stateParams.demographicNo, controller.index, 20, controller.page.noteFilter).then(
-				function success(results)
-				{
-					if (angular.isDefined(results.notelist))
-					{
-						//controller.page.notes = data;
-						if (results.notelist instanceof Array)
-						{
-							for (var i = 0; i < results.notelist.length; i++)
-							{
-								controller.page.notes.notelist.push(results.notelist[i]);
-							}
-						}
-						else
-						{
-							controller.page.notes.notelist.push(results.notelist);
-						}
-						controller.index = controller.page.notes.notelist.length;
-					}
-					controller.busy = false;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-					controller.error = errors;
-					controller.busy = false;
-				}
-			);
-
-		};
-
-		controller.addMoreItems();
 
 		controller.editNote = function editNote(note)
 		{
@@ -236,17 +180,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		controller.page.currentEditNote = {};
 
-		controller.isNoteBeingEdited = function isNoteBeingEdited(note)
-		{
-
-			if (note.uuid === controller.page.currentEditNote.uuid && note.uuid !== null)
-			{
-				return true;
-			}
-
-			return false;
-		};
-
 		$rootScope.$on('currentlyEditingNote', function(event, data)
 		{
 			controller.page.currentEditNote = data;
@@ -278,202 +211,12 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			controller.index = controller.page.notes.notelist.length;
 		});
 
-		// Check if note regular note, if not, we must either display the group note edit window or have no edit option
-		controller.isRegularNote = function isRegularNote(note)
-		{
-			if (note.document || note.rxAnnotation || note.eformData || note.encounterForm || note.invoice || note.ticklerNote || note.cpp)
-			{
-				return false;
-			}
-
-			return true;
-		};
-
-		//Note display functions
-		controller.setColor = function setColor(note)
-		{
-			if (note.eformData)
-			{
-				return {
-					'border-left-color': '#DFF0D8',
-				};
-			}
-			else if (note.document)
-			{
-				return {
-					'border-left-color': '#617CB2',
-				};
-			}
-			else if (note.rxAnnotation)
-			{
-				return {
-					'border-left-color': '#D3D3D3',
-				};
-			}
-			else if (note.encounterForm)
-			{
-				return {
-					'border-left-color': '#BCAD75',
-				};
-			}
-			else if (note.invoice)
-			{
-				return {
-					'border-left-color': '##FF7272',
-				};
-			}
-			else if (note.ticklerNote)
-			{
-				return {
-					'border-left-color': '#FFA96F',
-				};
-			}
-			else if (note.cpp)
-			{
-				return {
-					'border-left-color': '#9B8166',
-				};
-			}
-		};
-
-		controller.showNoteHeader = function showNoteHeader(note)
-		{
-			if (controller.page.onlyNotes)
-			{
-				if (note.document || note.rxAnnotation || note.eformData || note.encounterForm || note.invoice || note.ticklerNote || note.cpp)
-				{
-					return false;
-				}
-			}
-			return true;
-		};
-
-		controller.showNote = function showNote(note)
-		{
-			if (controller.page.onlyNotes)
-			{
-				if (note.document || note.rxAnnotation || note.eformData || note.encounterForm || note.invoice || note.ticklerNote || note.cpp)
-				{
-					return false;
-				}
-			}
-
-			if(controller.page.onlyMine)
-			{
-				// Hide note if the current user is not in the list of editors.
-				// TODO: Decide later if we want to filter based on this rather than the author alone
-				// if (!Juno.Common.Util.isInArray(user.formattedName, note.editorNames))
-				// 	return false;
-
-				// Hide the note if the current user's provder number does not match that of the note author
-				if (user.providerNo !== note.providerNo)
-					return false;
-			}
-			return !note.deleted;
-		};
-
-		controller.getNoteHeader = function firstLine(noteObj)
-		{
-			return  noteObj.note.trim().split('\n')[0]; // First line of the note text, split by newline
-		};
-
 		controller.trackerUrl = "";
 
 		controller.getTrackerUrl = function getTrackerUrl(demographicNo)
 		{
 			controller.trackerUrl = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo + '&numEle=4&tracker=slim';
 		};
-
-		controller.toggleList = function toggleList(mod)
-		{
-
-			// If all the items are displayed, reset displaySize to 5 (min), else, show all the items
-			if (mod.displaySize >= mod.summaryItem.length)
-			{
-				mod.displaySize = 5;
-			}
-			else
-			{
-				mod.displaySize = mod.summaryItem.length;
-			}
-		};
-
-		controller.showMoreItems = function showMoreItems(mod)
-		{
-
-			if (!angular.isDefined(mod.summaryItem))
-			{
-				return false;
-			}
-
-			if (mod.summaryItem.length == 0)
-			{
-				return false;
-			}
-
-			return true;
-		};
-
-		// Return true if a given section is expanded, otherwise return false
-		controller.isSectionExpanded = function isSectionExpanded(mod)
-		{
-			if (mod.displaySize > 5)
-			{
-				return true;
-			}
-
-			return false;
-		};
-
-		// Return true if a given section is empty, otherwise return false
-		controller.isSectionEmpty = function isSectionEmpty(mod)
-		{
-			if (mod.summaryItem.length <= 5)
-			{
-				return true;
-			}
-
-			return false;
-		};
-
-		// Returns true if the given note is an unsigned encounter note
-		controller.isUnsignedEncounterNote = function isUnsignedEncounterNote(note)
-		{
-			return (!note.isSigned && !note.cpp && !note.document && !note.ticklerNote && !note.eformData);
-		};
-
-		// controller.showMoreItemsSymbol = function(mod)
-		// {
-		// 	if (!angular.isDefined(mod.summaryItem))
-		// 	{
-		// 		return "";
-		// 	}
-
-		// 	if ((mod.displaySize < mod.summaryItem.length) && mod.displaySize == initialDisplayLimit)
-		// 	{
-		// 		return "glyphicon glyphicon-chevron-down hand-hover pull-right";
-		// 	}
-		// 	else if ((mod.displaySize == mod.summaryItem.length) && mod.displaySize != initialDisplayLimit)
-		// 	{
-		// 		return "glyphicon glyphicon-chevron-up hand-hover pull-right";
-		// 	}
-		// 	else if (mod.summaryItem.length <= initialDisplayLimit)
-		// 	{
-		// 		return "glyphicon glyphicon-chevron-down glyphicon-chevron-down-disabled pull-right";
-		// 	}
-		// 	else
-		// 	{
-		// 		return "";
-		// 	}
-
-		// 	if (controller.isSectionExpanded(mod))
-		// 	{
-		// 		return "glyphicon glyphicon-chevron-up hand-hover pull-right";
-		// 	}
-
-		// 	return "glyphicon glyphicon-chevron-down hand-hover pull-right";
-
-		// };
 
 		function getLeftItems()
 		{
@@ -541,10 +284,59 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 		}
 
+		controller.onEditCpp = function(note, successCallback, dismissCallback)
+		{
+			var obj = controller.findGroupNote(note);
+			if (obj === null)
+			{
+				return;
+			}
+
+			var modalInstance = $uibModal.open(
+				{
+					templateUrl: 'src/record/summary/groupNotes.jsp',
+					controller: 'Record.Summary.GroupNotesController as groupNotesCtrl',
+					backdrop: 'static',
+					windowClass: 'notesModal',
+					size: 'lg',
+					resolve:
+						{
+							mod: function()
+							{
+								return obj.module;
+							},
+							action: function()
+							{
+								return 0;
+							},
+							user: function()
+							{
+								return user;
+							},
+							note: function()
+							{
+								return note;
+							}
+						}
+				});
+
+			modalInstance.result.then(successCallback, dismissCallback);
+		};
+
+		controller.bubbleUpEditNoteCallback = function bubbleUpEditNoteCallback(note, successCallback, dismissCallback)
+		{
+			//TODO open record controller note edit
+			controller.onEditNote({
+				note: note,
+				successCallback: successCallback,
+				dismissCallback: dismissCallback
+			});
+		};
 
 		controller.editGroupedNotes = function editGroupedNotes(size, mod, action)
 		{
 
+			console.info(size, mod, action);
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'src/record/summary/groupNotes.jsp',
@@ -597,7 +389,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		controller.gotoState = function gotoState(item, mod)
 		{
-			console.info('go to state', item, mod, item.id);
 			if (item == "add")
 			{
 				controller.editGroupedNotes('md', mod, null);
@@ -767,8 +558,3 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		}
 	}
 ]);
-
-
-var itvSet = null;
-var itvCheck = null;
-var editingNoteId = null;

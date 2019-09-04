@@ -1,0 +1,80 @@
+.encounter-note-list-base
+{
+	.note-list-filters {
+
+	}
+
+	.encounter-note-container {
+		border: 1px solid $color-neutral-light;
+		border-radius: 5px;
+		margin-bottom: 20px;
+		border-left-width: 10px;
+
+		&.note-type-eform {
+			border-left-color: $color-lime-lighter;
+		}
+		&.note-type-document {
+			border-left-color: $color-indigo-lighter;
+		}
+		&.note-type-rx {
+			border-left-color: $color-neutral-dark;
+		}
+		&.note-type-enc-form {
+			border-left-color: $color-yellow-dark;
+		}
+		&.note-type-invoice {
+			border-left-color: $color-pink-lighter;
+		}
+		&.note-type-tickler {
+			border-left-color: $color-orange-lighter;
+		}
+		&.note-type-cpp {
+			border-left-color: $color-orange-darker;
+		}
+
+		.note-header {
+			background-color: $color-neutral-lightest;
+			h6 {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.note-header-info {
+				color: $color-neutral-darker;
+				padding-left: 10px;
+				.note-header-title {
+					color: $color-primary-base;
+					margin-left: 5px;
+				}
+			}
+
+			.note-header-buttons {
+				padding-right: 5px;
+			}
+
+			.icon {
+				font-size: 24px;
+				color: $color-primary-dark;
+			}
+		}
+		.note-body {
+			padding: 10px 10px 0 10px;
+			p {
+				white-space: pre-wrap;
+				overflow-x: auto;
+			}
+		}
+		.note-footer {
+			/*border-top: 1px solid #e9e9e9;*/
+			font-size: 11px;
+
+			.note-footer-right {
+				text-align: right;
+			}
+
+			p {
+				margin: 0;
+			}
+		}
+	}
+}

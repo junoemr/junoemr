@@ -76,107 +76,12 @@
 			<div class="col-md-12 note-list">
 				<div class="tab-content">
 					<div class="tab-pane active" id="all">
-						<div id="note-list-filters">
-							<label class="checkbox-inline">
-								<input type="checkbox"
-									   ng-model="summaryCtrl.page.onlyMine"
-									   value="">
-								Just Mine
-							</label>
-							<label class="checkbox-inline">
-								<input type="checkbox"
-									   ng-model="summaryCtrl.page.onlyNotes"
-									   value="">
-								Just Encounter Notes
-							</label>
-						</div>
-						<div 	infinite-scroll="summaryCtrl.addMoreItems()"
-								infinite-scroll-distance="2"
-								infinite-scroll-use-document-bottom="true">
-
-							<div class="note-container col-xs-12 note"
-								 ng-repeat="note in summaryCtrl.page.notes.notelist"
-								 ng-class="{'note-in-edit': summaryCtrl.isNoteBeingEdited(note)}"
-								 ng-style="summaryCtrl.setColor(note)"
-								 ng-show="summaryCtrl.showNote(note)">
-								<div class="row note-header vertical-align" ng-show="summaryCtrl.showNoteHeader(note)" >
-									<div class="col-lg-9 col-md-7 col-xs-8 pull-left note-header-info vertical-align">
-										<h6>{{note.observationDate | date : 'dd-MMM-yyyy'}}
-											<span class="note-header-title" style="word-break: break-all">{{summaryCtrl.getNoteHeader(note)}}</span>
-										</h6>
-									</div>
-									<div class="col-lg-3 col-md-5 col-xs-4 pull-right text-right note-header-buttons">
-										<button class="btn btn-xs btn-warning-static"
-												ng-show="summaryCtrl.isUnsignedEncounterNote(note)"
-												title="This note is unsigned!">
-											<span class="fa fa-exclamation-triangle"></span>
-										</button>
-										<button class="btn btn-primary btn-xs"
-												ng-click="summaryCtrl.editNote(note)"
-												ng-show="note.editable && summaryCtrl.isRegularNote(note)">
-											Edit
-										</button>
-										<button class="btn btn-primary btn-xs"
-												ng-click="summaryCtrl.editGroupNote(note)"
-												ng-show="note.editable && note.cpp && !note.archived && !note.ticklerNote">
-											Edit
-										</button>
-										<button class="btn btn-primary btn-xs"
-												ng-click="summaryCtrl.viewEform(note.noteId)"
-												ng-show="note.eformData">
-											View
-										</button>
-										<button class="btn btn-primary btn-xs"
-										        ng-click="summaryCtrl.viewDocument(note.documentId)"
-										        ng-show="note.document">
-											View
-										</button>
-										<button class="btn disabled btn-xs" ng-show="note.archived == true">Archived</button>
-										<%--<input type="checkbox" ng-model="note.isSelected"/> --%>
-										<button class="btn btn-default btn-xs"
-												ng-click="summaryCtrl.toggleIsSelectedForPrint(note)"
-												ng-class="{'btn-success': note.isSelected, 'btn-default': !note.isSelected }"
-												title="Add note to print list">
-											<span class="fa fa-print" aria-hidden="true"></span>
-										</button>
-									</div>
-								</div>
-								<div class="row note-body"
-									 ng-show="summaryCtrl.showNote(note)"
-									 ng-hide="note.cpp==true || note.document==true || note.eformData == true">
-									<p>{{note.note}}</p>
-									<hr class="note-divider">
-								</div>
-
-								<div class="row note-footer"
-									 ng-show="summaryCtrl.showNote(note)"
-									 ng-hide="note.document==true || note.eformData == true">
-									<div class="col-md-7">
-										<div class="p-inline">
-											<p class="text-muted"><bean:message key="oscarEncounter.editors.title"/>:</p>
-											<p>{{note.editorNames}}</p>
-										</div>
-
-										<div class="p-inline">
-											<p class="text-muted"><bean:message key="oscarEncounter.assignedIssues.title"/>:</p>
-											<p>{{note.issueDescriptions}}</p>
-										</div>
-									</div>
-
-									<div class="col-md-5 note-footer-right">
-										<div class="p-inline">
-											<p class="text-muted"><bean:message key="oscarEncounter.noteRev.title"/>:</p>
-											<a ng-click="summaryCtrl.openRevisionHistory(note)" class="hand-hover">{{note.revision}}</a>
-										</div>
-
-										<div class="p-inline">
-											<p class="text-muted"><bean:message key="oscarEncounter.encType.title"/>:</p>
-											<p>{{note.encounterType}}</p>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
+						<encounter-note-list
+								user-id="user.providerNo"
+								on-edit-cpp="summaryCtrl.onEditCpp(note, successCallback, dismissCallback)"
+								on-edit-note="summaryCtrl.bubbleUpEditNoteCallback(note, successCallback, dismissCallback)"
+						>
+						</encounter-note-list>
 					</div>
 
 					<div class="tab-pane" id="tracker">

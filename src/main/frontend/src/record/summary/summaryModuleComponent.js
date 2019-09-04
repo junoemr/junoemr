@@ -71,7 +71,6 @@ angular.module('Record.Summary').component('summaryModule', {
 			{
 				ctrl.enableFilter = bindingHash.enableFilter.currentValue;
 			}
-			console.info(bindingHash.module.currentValue);
 		};
 
 		ctrl.itemCallback = function itemCallback(item)
