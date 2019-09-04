@@ -28,7 +28,6 @@ import org.oscarehr.common.dao.TicklerDao;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.ticklers.service.TicklerService;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.rest.v1.transfer.tickler.TicklerTransferInbound;
 import org.oscarehr.ws.external.rest.v1.transfer.tickler.TicklerTransferOutbound;
