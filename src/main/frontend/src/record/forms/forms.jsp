@@ -25,7 +25,7 @@
 	<div class="options-panel-place-holder">
 		<div class=" options-panel">
 			<div class="col-md-12 form-library-title" >
-				<h2 class="form-heading"><bean:message key="forms.title.form.library" bundle="ui"/></h2>
+				<h2 class="form-heading">Patient Forms</h2>
 			</div>
 			<div class="col-md-12" >
 				<div class="container-fluid">

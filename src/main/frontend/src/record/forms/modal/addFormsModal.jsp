@@ -22,7 +22,7 @@
 --%>
 <juno-modal id="add-forms-modal" hide-footer="true">
 	<modal-title>
-		<h3>Add Forms</h3>
+		<h3>Form Library</h3>
 	</modal-title>
 
 	<modal-ctl-buttons>
@@ -38,7 +38,7 @@
 			<div class="container-fluid group-select-panel-placeholder">
 				<div class="container-fluid group-select-panel">
 					<input type="text" class="form-control search-query" ng-model="addFormsModalCtrl.formSearchStr"
-								 placeholder="Filter Forms">
+								 placeholder="Search">
 					<group-selector-component group-change="addFormsModalCtrl.onGroupChange(groupId, selectedForms)"
 																		group-selection="addFormsModalCtrl.groupSelection"></group-selector-component>
 				</div>

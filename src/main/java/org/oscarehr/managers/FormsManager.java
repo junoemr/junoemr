@@ -215,7 +215,8 @@ public class FormsManager {
 			String table = StringUtils.trimToNull(encounterForm.getFormTable());
 			if (table != null) {
 
-				EctFormData.PatientForm[] pforms = EctFormData.getPatientFormsFromLocalAndRemote(loggedInInfo, demographicNo, table);
+				EctFormData.PatientForm[] pforms = EctFormData.getPatientForms(demographicNo, table);
+
 				for(EctFormData.PatientForm form : pforms)
 				{
 					form.formName = encounterForm.getFormName();

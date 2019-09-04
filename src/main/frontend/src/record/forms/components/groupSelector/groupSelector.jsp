@@ -21,7 +21,7 @@
 * Canada
 --%>
 <div id="group-selector-component">
-	<h3 class="section-heading">View Group</h3>
+	<h4 class="section-heading">Filter List</h4>
 	<nav>
 		<ul>
 			<li class="group-list-item">
