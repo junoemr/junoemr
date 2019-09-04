@@ -254,7 +254,6 @@ module.exports = {
 			'./src/record/summary/saveWarningController.js',
 			'./src/record/forms/module.js',
 			'./src/record/forms/formsController.js',
-			'./src/record/forms/modal/addFormsModalController.js',
 			'./src/record/forms/components/formView/formViewComponent.js',
 			'./src/record/forms/components/modeSelector/modeSelectorComponent.js',
 			'./src/record/forms/components/groupSelector/groupSelectorComponent.js',
