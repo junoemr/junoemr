@@ -21,20 +21,12 @@
 * Canada
 --%>
 <div id="group-selector-component">
-	<h4 class="section-heading">Filter List</h4>
+	<h4 class="section-heading">Form Groups</h4>
 	<nav>
 		<ul>
 			<li class="group-list-item">
 				<a href="javascript:" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL, null)"
 				   ng-class="$ctrl.groupSelection === $ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_ALL ? 'selected' : ''">Show All</a>
-			</li>
-			<li class="group-list-item">
-				<a href="javascript:" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_EFORM, null)"
-				   ng-class="$ctrl.groupSelection === $ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_EFORM ? 'selected' : ''">Show eForms</a>
-			</li>
-			<li class="group-list-item">
-				<a href="javascript:" ng-click="$ctrl.onGroupChange($ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_FORM, null)"
-				   ng-class="$ctrl.groupSelection === $ctrl.FORM_CONTROLLER_SPECIAL_GROUPS.SELECT_FORM ? 'selected' : ''">Show Forms</a>
 			</li>
 			<li class="container-fluid user-groups-section">
 				<ul class="row group-list-item" ng-repeat="group in $ctrl.groups">

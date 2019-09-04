@@ -273,7 +273,7 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 			let foundInSearch = true;
 			if (controller.formSearchStr.length > 0)
 			{
-				foundInSearch = form.name.toUpperCase().search("^" + controller.formSearchStr.toUpperCase()+".*") !== -1;
+				foundInSearch = form.name.toUpperCase().search(".*" + controller.formSearchStr.toUpperCase()+".*") !== -1;
 			}
 
 			return foundInGroup && foundInSearch;
@@ -289,28 +289,6 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		{
 			window.open("../administration/?show=Forms&load=Groups"
 				,'popUpWindow','height=700,width=1200,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no');
-		};
-
-
-		controller.openAddFormsModal = function()
-		{
-			var modalInstance = $uibModal.open(
-				{
-					templateUrl: 'src/record/forms/modal/addFormsModal.jsp',
-					controller: 'Record.Forms.AddFormsModalController as addFormsModalCtrl',
-					backdrop: 'static',
-					windowClass: 'juno-modal',
-					resolve: {
-						providerNo: function ()
-						{
-							return controller.providerNo;
-						}
-					}
-				});
-			modalInstance.result.finally(function ()
-			{
-				controller.onModeChange(controller.viewState);
-			});
 		};
 
 		switch (controller.viewState)

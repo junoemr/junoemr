@@ -38,6 +38,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 	'noteService',
 	'summaryService',
 	'securityService',
+	'formService',
 
 	function(
 		$rootScope,
@@ -52,7 +53,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		user,
 		noteService,
 		summaryService,
-		securityService)
+		securityService,
+		formService)
 	{
 
 		var controller = this;
@@ -148,10 +150,15 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			return false;
 		};
 
-		controller.openForms = function openForms()
+		controller.openAddForms = function openForms()
 		{
 			// open forms tab with "Library" list selected
-			$state.go('record.forms', {formListId: 1});
+			$state.go('record.forms.add');
+		};
+
+		controller.openCompletedForms = function()
+		{
+			$state.go('record.forms.completed');
 		};
 
 		//Note display functions
@@ -632,6 +639,10 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 				window.open(item.action, win, "scrollbars=yes, location=no, width=900, height=600", "");
 				return false;
+			}
+			else if (item.type === 'eform')
+			{
+				formService.openEFormInstancePopup($stateParams.demographicNo, item.id);
 			}
 			else if (item.action == 'action')
 			{

@@ -1,6 +1,4 @@
 #mode-selector-component {
-	margin-top: 20px;
-
 	ul {
 		list-style-type: none;
 		padding-left: 0;
@@ -8,5 +6,10 @@
 
 	.selected {
 		background-color: $color-neutral-lighter;
+	}
+
+	.form-library-button {
+		padding-left: 2em;
+		padding-bottom: 1em;
 	}
 }

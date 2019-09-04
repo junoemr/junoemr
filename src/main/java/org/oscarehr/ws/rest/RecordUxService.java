@@ -132,7 +132,7 @@ public class RecordUxService extends AbstractServiceImpl {
 		}
 		
 		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.forms", "r", null) || securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.eforms", "r", null)) {
-			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Forms", Arrays.asList("record.forms", "record.forms.completed", "record.forms.revisions", "record.forms.deleted")));
+			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Forms", Arrays.asList("record.forms", "record.forms.completed", "record.forms.revisions", "record.forms.deleted", "record.forms.add")));
 		}
 		
 		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.viewTickler", "r", null)) {

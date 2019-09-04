@@ -390,6 +390,15 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 				viewState: FORM_CONTROLLER_STATES.COMPLETED
 			}
 		})
+		.state('record.forms.add',
+			{
+				url: '/add',
+				templateUrl: 'src/record/forms/forms.jsp',
+				controller: 'Record.Forms.FormController as formCtrl',
+				params: {
+					viewState: FORM_CONTROLLER_STATES.ADD
+				}
+			})
 		.state('record.forms.completed',
 			{
 				url: '/completed',

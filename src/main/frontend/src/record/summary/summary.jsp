@@ -36,8 +36,11 @@
 		<div class="col-md-3 col-sm-4 col-xs-12" id="summary-section-left">
 			<fieldset class="module-list" ng-repeat="mod in summaryCtrl.page.columnOne.modules">
 				<div class="row vertical-align">
-					<div class="col-xs-8">
-						<h5 class="summary-section-heading">
+					<div class="col-xs-8" ng-switch="mod.summaryCode">
+						<a class="summary-section-heading" ng-click="summaryCtrl.openCompletedForms()" ng-switch-when="forms">
+							{{mod.displayName}}
+						</a>
+						<h5 class="summary-section-heading" ng-switch-default>
 							{{mod.displayName}}
 						</h5>
 					</div>
@@ -75,7 +78,7 @@
 						</button>
 
 						<button class="btn btn-xs btn-success pull-right"
-								ng-click="summaryCtrl.openForms()"
+								ng-click="summaryCtrl.openAddForms()"
 								ng-if="mod.summaryCode=='forms'">
 							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
 						</button>

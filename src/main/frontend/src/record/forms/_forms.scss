@@ -5,19 +5,29 @@
 
 	.form-library-title {
 		color: $color-primary-dark;
-		margin-bottom: 20px;
+		margin-bottom: 18px;
 	}
 
-	.left-button-group {
-		margin-top: 20px;
+	@mixin top-bar-padding {
+		margin-top: 24px;
 		margin-bottom: 30px;
 		padding-right: 0;
+		padding-left: 0;
+	}
 
+	.left-header-group {
+		@include top-bar-padding
+	}
+
+	.right-header-group {
+		@include top-bar-padding;
 		.btn {
 			width: 100px;
 			margin-left: 8px;
 		}
 	}
+
+
 
 	.options-panel {
 		position: fixed;
