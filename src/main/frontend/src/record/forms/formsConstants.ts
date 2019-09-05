@@ -20,32 +20,33 @@
 * Victoria, British Columbia
 * Canada
 */
-import {FORM_CONTROLLER_SPECIAL_GROUPS} from '../../formsConstants'
 
-angular.module('Record.Forms').component('groupSelectorComponent', {
-	templateUrl: 'src/record/forms/components/groupSelector/groupSelector.jsp',
-	bindings: {
-		groupChange: '&',
-		groupSelection: '<'
-	},
-	controller: ['formService', function (formService) {
-		let ctrl = this;
+export enum FORM_CONTROLLER_STATES
+{
+		ADD0,
+		COMPLETED,
+		REVISION,
+		DELETED,
+		MANAGE,
+}
 
-		ctrl.FORM_CONTROLLER_SPECIAL_GROUPS = FORM_CONTROLLER_SPECIAL_GROUPS;
+export enum FORM_CONTROLLER_SORT_MODES
+{
+	FORM_NAME = "name",
+	ADDITIONAL ="subject",
+	MOD_DATE = "date",
+	CREATE_DATE = "createDate"
+}
 
-		ctrl.onGroupChange = function (groupId, selectedItems)
-		{
-			ctrl.groupChange({groupId: groupId, selectedForms: selectedItems});
-		};
+export enum FORM_CONTROLLER_FORM_TYPES
+{
+	EFORM = 'eform',
+	FORM ='form'
+}
 
-		ctrl.groups = [];
-		formService.getFormGroups().then(
-			function success(results) {
-				ctrl.groups = results;
-			},
-			function error(results) {
-				console.error("Failed to fetch groups");
-			}
-		);
-	}]
-});
+export enum FORM_CONTROLLER_SPECIAL_GROUPS
+{
+	SELECT_ALL = -1,
+	SELECT_EFORM = -2,
+	SELECT_FORM = -3
+}

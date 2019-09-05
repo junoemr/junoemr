@@ -178,34 +178,31 @@ public class FormsManager {
 
 	/**
 	 * get completed encounter froms for the demographic
-	 * @param loggedInInfo - logged in info
 	 * @param demographicNo - demographic
 	 * @return - list of encounter froms
 	 */
-	public List<EctFormData.PatientForm> getCompletedEncounterForms(LoggedInInfo loggedInInfo, String demographicNo)
+	public List<EctFormData.PatientForm> getCompletedEncounterForms(String demographicNo)
 	{
-		return getPatientEncounterForms(loggedInInfo, demographicNo, true);
+		return getPatientEncounterForms(demographicNo, true);
 	}
 
 	/**
 	 * get all encounter from revisions for the demographic
-	 * @param loggedInInfo - logged in info
 	 * @param demographicNo - demographic
 	 * @return - list of encounter froms
 	 */
-	public List<EctFormData.PatientForm> getEncounterFormRevisions(LoggedInInfo loggedInInfo, String demographicNo)
+	public List<EctFormData.PatientForm> getEncounterFormRevisions(String demographicNo)
 	{
-		return getPatientEncounterForms(loggedInInfo, demographicNo, false);
+		return getPatientEncounterForms(demographicNo, false);
 	}
 
 	/**
 	 * get patient encounter froms
-	 * @param loggedInInfo - logged in info
 	 * @param demographicNo - demographic
 	 * @param onlyMostRecent - if true only the most recent version will be returned
 	 * @return - patient encounters
 	 */
-	public List<EctFormData.PatientForm> getPatientEncounterForms(LoggedInInfo loggedInInfo, String demographicNo, boolean onlyMostRecent)
+	public List<EctFormData.PatientForm> getPatientEncounterForms(String demographicNo, boolean onlyMostRecent)
 	{
 		List<EctFormData.PatientForm> outList = new ArrayList<>();
 

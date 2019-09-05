@@ -23,36 +23,7 @@
     Ontario, Canada
 
 */
-
-// view states that the form controller can be in
-FORM_CONTROLLER_STATES = {
-	ADD: 		0,
-	COMPLETED: 	1,
-	REVISION: 	2,
-	DELETED: 	3,
-	MANAGE: 	4,
-};
-
-// modes by which the form list can be sorted
-FORM_CONTROLLER_SORT_MODES = {
-	FORM_NAME: "name",
-	ADDITIONAL: "subject",
-	MOD_DATE: "date",
-	CREATE_DATE: "createDate"
-};
-
-// types of forms
-FORM_CONTROLLER_FORM_TYPES = {
-	EFORM: 'eform',
-	FORM: 'form'
-};
-
-// special filter groups
-FORM_CONTROLLER_SPECIAL_GROUPS = {
-	SELECT_ALL: -1,
-	SELECT_EFORM: -2,
-	SELECT_FORM: -3
-};
+import {FORM_CONTROLLER_STATES, FORM_CONTROLLER_FORM_TYPES, FORM_CONTROLLER_SPECIAL_GROUPS} from "./formsConstants";
 
 angular.module('Record.Forms').controller('Record.Forms.FormController', [
 

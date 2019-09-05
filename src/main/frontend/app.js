@@ -26,6 +26,7 @@ require('ngstorage');
 require('pym.js');
 require('./scss/juno.scss');
 require('font-awesome/css/font-awesome.min.css');
+import {FORM_CONTROLLER_STATES} from "./src/record/forms/formsConstants";
 
 
 var oscarApp = angular.module('oscarProviderViewModule', [

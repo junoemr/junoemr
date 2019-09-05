@@ -20,6 +20,7 @@
 * Victoria, British Columbia
 * Canada
 */
+import {FORM_CONTROLLER_STATES} from "../../formsConstants";
 
 angular.module('Record.Forms').component('modeSelectorComponent', {
 	templateUrl: 'src/record/forms/components/modeSelector/modeSelector.jsp',

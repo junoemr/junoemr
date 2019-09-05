@@ -20,6 +20,8 @@
 * Victoria, British Columbia
 * Canada
 */
+import {FORM_CONTROLLER_STATES, FORM_CONTROLLER_SORT_MODES, FORM_CONTROLLER_FORM_TYPES} from "../../formsConstants";
+
 angular.module('Record.Forms').component('formViewComponent', {
     templateUrl: 'src/record/forms/components/formView/formView.jsp',
     bindings: {

@@ -36,6 +36,13 @@ angular.module('Common.Components').component('junoModal', {
 	},
 	controller: function ()
 	{
-
+		let ctrl = this;
+		ctrl.$onInit = function ()
+		{
+			if (ctrl.hideFooter === undefined)
+			{
+				ctrl.hideFooter = false;
+			}
+		};
 	}
 });

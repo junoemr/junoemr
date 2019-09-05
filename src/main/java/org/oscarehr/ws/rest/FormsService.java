@@ -173,7 +173,7 @@ public class FormsService extends AbstractServiceImpl {
 		populateFormListTo1WithEForms(formListTo1, completedEforms, demographicNo);
 
 		// get forms
-		List<EctFormData.PatientForm> patientForms = formsManager.getCompletedEncounterForms(getLoggedInInfo(), demographicNo.toString());
+		List<EctFormData.PatientForm> patientForms = formsManager.getCompletedEncounterForms(demographicNo.toString());
 		populateFormListTo1WithPatientForms(formListTo1, patientForms, demographicNo);
 
 		return formListTo1;
@@ -196,7 +196,7 @@ public class FormsService extends AbstractServiceImpl {
 		populateFormListTo1WithEForms(formListTo1, eformRevisions, demographicNo);
 
 		// get forms
-		List<EctFormData.PatientForm> patientForms = formsManager.getEncounterFormRevisions(getLoggedInInfo(), demographicNo.toString());
+		List<EctFormData.PatientForm> patientForms = formsManager.getEncounterFormRevisions(demographicNo.toString());
 		populateFormListTo1WithPatientForms(formListTo1, patientForms, demographicNo);
 
 		return formListTo1;
