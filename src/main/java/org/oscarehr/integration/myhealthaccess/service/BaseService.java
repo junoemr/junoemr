@@ -98,6 +98,16 @@ public class BaseService extends org.oscarehr.integration.BaseService
 		return executeRequest(endPoint, method, headers, body, responseClass, errorClass);
 	}
 
+	protected <S, T, U> T executeRequestWithToken(String endPoint, HttpMethod method, String token, S body, Class<T> responseClass, Class<U> errorClass)
+	{
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.set("X-API-Key", CLINIC_API_KEY);
+		headers.set("X-Auth-Token", token);
+
+		return executeRequest(endPoint, method, headers, body, responseClass, errorClass);
+	}
+
 	protected <T, U> T executeRequest(String endPoint, HttpMethod method,
 								   Class<T> responseClass, Class<U> errorClass)
 	{

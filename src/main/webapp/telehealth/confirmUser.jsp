@@ -25,7 +25,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-		<title>MyHealthAccess Create User</title>
+    <title>MyHealthAccess User Confirmation</title>
     <link rel="stylesheet" type="text/css" href="css/myhealthaccess.css">
 </head>
 <body>
@@ -33,24 +33,24 @@
     <div class="left"></div>
     <div class="right">
         <div class="mha-content">
-        <h3>Create a MyHealthAccess account</h3>
-        <p>
-            It looks like you don't have a MyHealthAccess account.
-            Lets create one and connect it with your Juno EMR provider
-        </p>
-        <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=createUser" method="post">
-            <input type="hidden" name="siteName" value="<%=request.getParameter("siteName")%>"/>
-            <input type="hidden" name="appt" value="<%=request.getParameter("appt")%>"/>
-            <div class="mha-input">
-                <label for="email">Email address</label>
-                <input type="text" id="email" name="email"/>
-            </div>
-            <div class="mha-button-container">
-                <button type="submit" class="primary">Sign up</button>
-            </div>
-        </form>
+            <h3>Almost done</h3>
+            <p>
+                We just need you to go to your inbox at <span class="bold"><%=request.getParameter("email")%></span> and click the link in your MyHealthAccess
+                registration email to confirm your account.  After you've confirmed, click the continue button below.
+            </p>
+            <p>Don't worry, you will only need to do this once to complete linking your new MyHealthAccess account</p>
+            <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=confirmUser" method="post">
+                <input type=hidden name="siteName" value="<%=request.getParameter("siteName")%>"/>
+                <input type=hidden name="appt" value="<%=request.getParameter("appt")%>"/>
+                <input type=hidden name="remoteUser" value="<%=request.getParameter("remoteUser")%>"/>
+                <div class="mha-button-container">
+                    <button type="submit" class="primary">Continue to Telehealth</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 </body>
 </html>
+
+

@@ -1861,7 +1861,8 @@ private long getAppointmentRowSpan(
 																	 onClick='popupPage(800, 1280,
 																					 "../telehealth/myhealthaccess.do?method=startTelehealth" +
 																					 "&demographicNo=${appointmentInfo.demographicNo}" +
-																					 "&siteName=${appointmentInfo.siteName}");return false;'
+																					 "&siteName=${appointmentInfo.siteName}" +
+                                                                                     "&appt=${appointmentInfo.appointmentNo}");return false;'
 																	 title="Telehealth">
 																		<img
 																						style="vertical-align: bottom"
