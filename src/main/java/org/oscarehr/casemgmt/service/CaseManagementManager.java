@@ -982,29 +982,28 @@ public class CaseManagementManager {
 	}
 
 	/**
-	 * get the demographic's first name
+	 * get the demographic's display name
 	 * @param demoNo - demographic no
-	 * @return first name of demographic
+	 * @return display name of demographic
 	 */
-	public String getDemoFirstName(String demoNo)
+	public String getDemoDisplayName(String demoNo)
 	{
-		Demographic dg = demographicDao.getClientByDemographicNo(new Integer(demoNo));
-		if (dg == null) return "";
-		else return dg.getFirstName();
-	}
+		if (demoNo == null)
+		{
+			return "";
+		}
 
-	/**
-	 * get the demographic's last name
-	 * @param demoNo - demographic no
-	 * @return last name of demographic
-	 */
-	public String getDemoLastName(String demoNo)
-	{
 		Demographic dg = demographicDao.getClientByDemographicNo(new Integer(demoNo));
-		if (dg == null) return "";
-		else return dg.getLastName();
-	}
 
+		if (dg == null)
+		{
+			return "";
+		}
+		else
+		{
+			return dg.getDisplayName();
+		}
+	}
 
 	public String getDemoGender(String demoNo) {
 		String gender = "";
