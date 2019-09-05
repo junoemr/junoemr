@@ -24,6 +24,7 @@
  */
 
 angular.module('Record.Summary').component('encounterNote', {
+	templateUrl: "src/record/summary/encounterNoteTemplate.jsp",
 	bindings: {
 		note: '<',
 		onEditCpp: '&',
@@ -31,7 +32,6 @@ angular.module('Record.Summary').component('encounterNote', {
 
 		minimized: '<',
 	},
-	templateUrl: "src/record/summary/encounterNoteTemplate.jsp",
 	controller: [
 		'$scope',
 		'$state',
@@ -76,14 +76,13 @@ angular.module('Record.Summary').component('encounterNote', {
 
 		ctrl.viewButtonClick = function viewButtonClick()
 		{
-			console.info(ctrl.note.eformData, ctrl.note.document, ctrl.note);
-			if(ctrl.note.eformData)
+			if(ctrl.note.eformData && ctrl.note.eformDataId)
 			{
-				ctrl.viewEform();
+				ctrl.viewEform(ctrl.note.eformDataId);
 			}
-			else if(ctrl.note.document)
+			else if(ctrl.note.document && ctrl.note.documentId)
 			{
-				ctrl.viewDocument();
+				ctrl.viewDocument(ctrl.note.documentId);
 			}
 		};
 
@@ -141,8 +140,6 @@ angular.module('Record.Summary').component('encounterNote', {
 				}
 			}
 		};
-
-
 
 		// -----------------------------------------------------------------------------------------------------
 
@@ -209,27 +206,12 @@ angular.module('Record.Summary').component('encounterNote', {
 		};
 		ctrl.viewDocument = function viewDocument(documentId)
 		{
-			// get only document summary items
-			let itemArray = summaryLists['incoming'].summaryItem;
-			let item = null;
-
-			// find the summary item that matches the document id
-			for (let i=0; i < itemArray.length; i++)
-			{
-				if(itemArray[i].id === documentId) {
-					item = itemArray[i];
-					break;
-				}
-			}
-
-			// if we found a matching document, open it
-			if(item != null) {
-				controller.gotoState(item);
-			}
-			else
-			{
-				console.error("item not linked to valid document id:" + documentId);
-			}
+			var win = "revision";
+			var url = "../dms/showDocument.jsp" +
+				"?inWindow=true" +
+				"&segmentID=" + documentId +
+				"&status=A";
+			window.open(url, win, "scrollbars=yes, location=no, width=647, height=600", "");
 		};
 
 	}]

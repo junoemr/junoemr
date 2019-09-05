@@ -50,6 +50,8 @@ import org.oscarehr.casemgmt.web.NoteDisplayLocal;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
+import org.oscarehr.eform.dao.EFormDataDao;
+import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -200,6 +202,12 @@ public class NotesService extends AbstractServiceImpl {
 					isDeleted = (Document.STATUS_DELETED == doc.getStatus());
 					note.setDocumentId(doc.getId());
 				}
+			}
+
+			if(nd.isEformData())
+			{
+				//TODO why is the note id fake and also the eform id???
+				note.setEformDataId(nd.getNoteId());
 			}
 
 			note.setNoteId(nd.getNoteId());
