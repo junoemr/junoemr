@@ -69,7 +69,7 @@ public class MyHealthAccessService
 			}
 			else
 			{
-				final String baseTelehealthURL = "telehealth/clinic/%s/appointment/%s/provider";
+				final String baseTelehealthURL = "/provider/clinic/%s/telehealth/appointment/%s/";
 				redirectUrl = URLEncoder.encode(String.format(baseTelehealthURL, getClinicID(site), appointmentNo), "UTF-8");
 			}
 
