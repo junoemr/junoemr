@@ -148,7 +148,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			return false;
 		};
 
-		controller.openAssessments = function openAssessments()
+		controller.openForms = function openForms()
 		{
 			// open forms tab with "Library" list selected
 			$state.go('record.forms', {formListId: 1});

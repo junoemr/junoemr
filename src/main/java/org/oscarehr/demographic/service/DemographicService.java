@@ -148,7 +148,7 @@ public class DemographicService
 		{
 			demoCS.setMatchModeStart();
 			String [] names = keyword.split(",");
-			if (names.length == 2)
+			if (names.length >= 2)
 			{
 				demoCS.setFirstName(names[1].trim());
 				demoCS.setLastName(names[0].trim());

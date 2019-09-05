@@ -286,7 +286,7 @@ public final class MessageUploader {
 							for (int k = 1; k <= referenceStrings.length; k++)
 							{
 								String embeddedPdf = messageHandler.getOBXResult(i, j, k);
-								if (embeddedPdf.startsWith(pdfPrefix))
+								if (embeddedPdf.startsWith(PATHL7Handler.embeddedPdfPrefix))
 								{
 									MiscUtils.getLogger().info("Found embedded PDF in lab upload, pulling it out");
 									hasPDF = true;
@@ -309,7 +309,7 @@ public final class MessageUploader {
 						String fileName = "-" + accessionNum + ".pdf";
 						// Replace original PDF string with meta info to prevent saving > 500k char strings in table
 						docId = createDocumentFromEmbeddedPDF(pdf, fileName);
-						hl7Body = hl7Body.replace(pdf, "embedded_doc_id_" + docId);
+						hl7Body = hl7Body.replace(pdf, PATHL7Handler.pdfReplacement + docId);
 						if (docId <= 0)
 						{
 							throw new ParseException("did not save embedded lab document correctly", 0);

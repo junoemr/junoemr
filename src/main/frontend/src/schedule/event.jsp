@@ -22,46 +22,44 @@
 	Canada
 
 --%>
-<div class="schedule-modal">
-	<div class="modal-header">
-		<div class="modal-title">
-			<i class="icon icon-modal-add-appt icon-calendar-add"></i>
-			<div class="align-baseline">
-				<h3 ng-hide="editMode">Add {{label}}</h3>
-				<h3 ng-show="editMode">Modify {{label}}</h3>
-				<h4>with {{eventController.providerModel.displayName}}</h4>
-			</div>
+<juno-modal id="schedule-modal">
+	<modal-title>
+		<i class="icon icon-modal-header icon-calendar-add"></i>
+		<div class="align-baseline">
+			<h3 ng-hide="editMode">Add {{label}}</h3>
+			<h3 ng-show="editMode">Modify {{label}}</h3>
+			<h4>with {{eventController.providerModel.displayName}}</h4>
 		</div>
-		<div class="modal-ctl-buttons">
-			<div class="modal-patient-links"
-			     ng-show="isPatientSelected()">
-				<button type="button" class="btn btn-xs btn-default"
-				        ng-click="eventController.openEncounterPage()">
-					<span class="">E</span>
-				</button>
-				<button type="button" class="btn btn-xs btn-default"
-				        ng-disabled="!eventController.hasAppointmentId()"
-				        ng-click="eventController.openBillingPage()">
-					<span class="">B</span>
-				</button>
-				<button type="button" class="btn btn-xs btn-default"
-				        ng-click="eventController.openMasterRecord()">
-					<span class="">M</span>
-				</button>
-				<button type="button" class="btn btn-xs btn-default"
-				        ng-click="eventController.openRxWindow()">
-					<span class="">Rx</span>
-				</button>
-			</div>
-			<button type="button" class="btn btn-icon" aria-label="Close"
-			        ng-click="eventController.cancel()"
-			        title="Cancel">
-				<i class="icon icon-modal-ctl icon-close"></i>
+	</modal-title>
+	<modal-ctl-buttons>
+		<div class="modal-patient-links"
+		     ng-show="isPatientSelected()">
+			<button type="button" class="btn btn-xs btn-default"
+			        ng-click="eventController.openEncounterPage()">
+				<span class="">E</span>
+			</button>
+			<button type="button" class="btn btn-xs btn-default"
+			        ng-disabled="!eventController.hasAppointmentId()"
+			        ng-click="eventController.openBillingPage()">
+				<span class="">B</span>
+			</button>
+			<button type="button" class="btn btn-xs btn-default"
+			        ng-click="eventController.openMasterRecord()">
+				<span class="">M</span>
+			</button>
+			<button type="button" class="btn btn-xs btn-default"
+			        ng-click="eventController.openRxWindow()">
+				<span class="">Rx</span>
 			</button>
 		</div>
-	</div>
+		<button type="button" class="btn btn-icon" aria-label="Close"
+		        ng-click="eventController.cancel()"
+		        title="Cancel">
+			<i class="icon icon-modal-ctl icon-close"></i>
+		</button>
+	</modal-ctl-buttons>
 
-	<div class="modal-body">
+	<modal-body>
 		<div class="tabs-heading">
 			<ul class="nav nav-tabs round-top">
 				<li class="active">
@@ -125,7 +123,7 @@
 									<juno-patient-search-typeahead
 											id="input-patient"
 											class="col-md-10"
-											juno-model="patientTypeahead"
+											juno-model="eventController.patientTypeahead"
 									>
 									</juno-patient-search-typeahead>
 								</div>
@@ -186,105 +184,9 @@
 								     ng-show="isPatientSelected()">
 									<label class="col-md-2">Demographic</label>
 									<div class="col-md-10">
-										<div class="demographic-info-frame">
-											<div class="form-row">
-											<div class="col-sm-8">
-												<!-- patient dob -->
-												<div class="form-group">
-													<label class="control-label col-sm-2">
-														Born:
-													</label>
-													<div class="col-sm-10">
-														<span class="form-control-static input-sm">
-															{{ eventController.demographicModel.displayData.birthDate }}
-														</span>
-													</div>
-												</div>
-											</div>
-											<div class="col-sm-4">
-												<!-- gender -->
-												<div class="form-group">
-													<label class="control-label col-sm-2">
-														Sex:
-													</label>
-													<div class="col-sm-8">
-														<span class="form-control-static input-sm">
-															{{ eventController.demographicModel.data.sex }}
-														</span>
-													</div>
-												</div>
-											</div>
-										</div>
-											<div class="form-row">
-												<div class="col-sm-12">
-													<!-- patient hin -->
-													<div class="form-group">
-														<label class="control-label col-sm-1">
-															HIN#:
-														</label>
-														<div class="col-sm-11">
-															<span class="form-control-static">
-																<span class="patient-health-number" ng-if="eventController.demographicModel.data.hin">
-																	{{eventController.demographicModel.data.hin}}
-																	{{eventController.demographicModel.data.ver}}
-																</span>
-																<%--<button type="button"--%>
-																        <%--aria-label="Check Eligibility"--%>
-																        <%--title="{{eventController.demographicModel.eligibilityText}}"--%>
-																        <%--class="btn"--%>
-																        <%--ng-class="{--%>
-																						<%--'btn-addon': (eventController.demographicModel.checkingEligibility || eventController.demographicModel.eligibility == null) && !eventController.demographicModel.pollingEligibility,--%>
-																						<%--'btn-warning': eventController.demographicModel.pollingEligibility,--%>
-																						<%--'btn-success': eventController.demographicModel.eligibility == 'eligible',--%>
-																						<%--'btn-danger': eventController.demographicModel.eligibility == 'ineligible' }"--%>
-																        <%--ng-click="eventController.demographicModel.getEligibility(true, true)">--%>
-																	<%--<i class="fa fa-user" aria-hidden="true"></i>--%>
-																<%--</button>--%>
-															</span>
-														</div>
-													</div>
-												</div>
-											</div>
-											<div class="form-row">
-												<div class="col-sm-12">
-													<!-- patient address -->
-													<div class="form-group">
-														<label class="control-label col-sm-1">
-															Address:
-														</label>
-														<div class="col-sm-11">
-															<span class="form-control-static">{{eventController.demographicModel.displayData.addressLine}}</span>
-														</div>
-													</div>
-												</div>
-											</div>
-											<div class="form-row">
-												<div class="col-sm-12">
-													<!-- patient phone -->
-													<div class="form-group">
-														<label class="control-label col-sm-1">
-															Phone:
-														</label>
-														<div class="col-sm-11">
-															<span class="form-control-static">{{eventController.demographicModel.data.phone}}</span>
-														</div>
-													</div>
-												</div>
-											</div>
-											<div class="form-row">
-												<div class="col-sm-12">
-													<!-- patient email -->
-													<div class="form-group">
-														<label class="control-label col-sm-1">
-															Email:
-														</label>
-														<div class="col-sm-11">
-															<span class="form-control-static">{{eventController.demographicModel.data.email}}</span>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
+										<demographic-card
+												demographic-model="eventController.demographicModel.data">
+										</demographic-card>
 									</div>
 								</div>
 							</div>
@@ -489,87 +391,85 @@
 				</div>
 			</div>
 		</form>
-	</div>
+	</modal-body>
 
-	<div class="modal-footer">
-		<div class="bottom-buttons">
-			<div class="pull-left">
-				<button
-						type="button"
-						class="btn btn-danger"
-						ng-show="eventController.hasAppointmentId()"
-						juno-confirm-click="eventController.del()"
-						juno-confirm-message="Are you sure you want to delete this appointment?"
-						ng-disabled="isWorking()">Delete
-				</button>
-			</div>
-			<div class="pull-right">
-				<button
-						type="button"
-						class="btn btn-default"
-						ng-click="eventController.saveDoNotBook()"
-						ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Do Not Book
-				</button>
-
-				<button
-						type="button"
-						class="btn btn-default"
-						ng-click="eventController.saveAndReceipt()"
-						ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Receipt
-				</button>
-
-				<button
-						type="button"
-						class="btn btn-default"
-						tooltip-placement="top"
-						tooltip-append-to-body="true"
-						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
-						ng-click="eventController.saveAndPrint()"
-						ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Print
-				</button>
-
-				<button
-						type="submit"
-						class="btn btn-primary"
-						tooltip-placement="top"
-						tooltip-append-to-body="true"
-						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
-						ng-show="!editMode"
-						ng-click="eventController.save()"
-						ng-class="{
-							'double-book': (eventController.isDoubleBook && !eventController.isDoubleBookPrevented),
-						    'double-book-prevented':eventController.isDoubleBookPrevented}"
-						ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Create
-				</button>
-
-				<button
-						type="submit"
-						class="btn btn-primary"
-						tooltip-placement="top"
-						tooltip-append-to-body="true"
-						uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
-						ng-show="editMode"
-						ng-click="eventController.save()"
-						ng-class="{
-							'double-book': (eventController.isDoubleBook && !eventController.isDoubleBookPrevented),
-						    'double-book-prevented':eventController.isDoubleBookPrevented}"
-						ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Modify
-				</button>
-
-				<%--<button--%>
-						<%--type="button"--%>
-						<%--class="btn btn-primary"--%>
-						<%--tooltip-placement="top"--%>
-						<%--tooltip-append-to-body="true"--%>
-						<%--uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+shift+enter')}}"--%>
-						<%--ng-click="eventController.saveAndBill()"--%>
-						<%--ng-show="numInvoices == 0"--%>
-						<%--ng-disabled="isWorking()">Modify &amp; Bill--%>
-				<%--</button>--%>
-
-			</div>
+	<modal-footer>
+		<div class="pull-left">
+			<button
+					type="button"
+					class="btn btn-danger"
+					ng-show="eventController.hasAppointmentId()"
+					juno-confirm-click="eventController.del()"
+					juno-confirm-message="Are you sure you want to delete this appointment?"
+					ng-disabled="isWorking()">Delete
+			</button>
 		</div>
-	</div>
+		<div class="pull-right">
+			<button
+					type="button"
+					class="btn btn-default"
+					ng-click="eventController.saveDoNotBook()"
+					ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Do Not Book
+			</button>
+
+			<button
+					type="button"
+					class="btn btn-default"
+					ng-click="eventController.saveAndReceipt()"
+					ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Receipt
+			</button>
+
+			<button
+					type="button"
+					class="btn btn-default"
+					tooltip-placement="top"
+					tooltip-append-to-body="true"
+					uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
+					ng-click="eventController.saveAndPrint()"
+					ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Print
+			</button>
+
+			<button
+					type="submit"
+					class="btn btn-primary"
+					tooltip-placement="top"
+					tooltip-append-to-body="true"
+					uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
+					ng-show="!editMode"
+					ng-click="eventController.save()"
+					ng-class="{
+						'double-book': (eventController.isDoubleBook && !eventController.isDoubleBookPrevented),
+					    'double-book-prevented':eventController.isDoubleBookPrevented}"
+					ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Create
+			</button>
+
+			<button
+					type="submit"
+					class="btn btn-primary"
+					tooltip-placement="top"
+					tooltip-append-to-body="true"
+					uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
+					ng-show="editMode"
+					ng-click="eventController.save()"
+					ng-class="{
+						'double-book': (eventController.isDoubleBook && !eventController.isDoubleBookPrevented),
+					    'double-book-prevented':eventController.isDoubleBookPrevented}"
+					ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Modify
+			</button>
+
+			<%--<button--%>
+					<%--type="button"--%>
+					<%--class="btn btn-primary"--%>
+					<%--tooltip-placement="top"--%>
+					<%--tooltip-append-to-body="true"--%>
+					<%--uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+shift+enter')}}"--%>
+					<%--ng-click="eventController.saveAndBill()"--%>
+					<%--ng-show="numInvoices == 0"--%>
+					<%--ng-disabled="isWorking()">Modify &amp; Bill--%>
+			<%--</button>--%>
+
+		</div>
+	</modal-footer>
 	<div id="start-time-auto-wrapper"></div>
 	<div id="end-time-auto-wrapper"></div>
-</div>
+</juno-modal>

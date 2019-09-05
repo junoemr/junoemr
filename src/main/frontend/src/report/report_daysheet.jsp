@@ -64,25 +64,26 @@
 						   class="form-control"/>
 				</div>
 
-				<div class="form-group"  ng-show="reportDaySheetCtrl.params.type == 'all' ||
-				reportDaySheetCtrl.params.type == 'all-nr' || reportDaySheetCtrl.params.type == 'new' ||
-				 reportDaySheetCtrl.params.type == 'lab' || params.type == 'billing' || params.type == 'tab'">
-					<label for="startDate">Start Date</label>
-					<input ng-model="reportDaySheetCtrl.params.startDate"
-						   type="date"
-						   id="startDate"
-						   name="startDate"
-						   class="form-control"
-						   placeholder="">
+				<div ng-show="reportDaySheetCtrl.params.type == 'all' ||
+								 reportDaySheetCtrl.params.type == 'all-nr' ||
+								 reportDaySheetCtrl.params.type == 'new' ||
+			                     reportDaySheetCtrl.params.type == 'lab' || params.type == 'billing' || params.type == 'tab'">
+					<ca-field-date
+							ca-title="Start Date"
+							ca-date-picker-id="daysheet-startDate"
+							ca-name="daysheet-startDate"
+							ca-model="reportDaySheetCtrl.params.startDate"
+							ca-orientation="auto"
+					></ca-field-date>
 				</div>
-				<div class="form-group"  ng-show="reportDaySheetCtrl.params.type == 'all' || reportDaySheetCtrl.params.type== 'all-nr'">
-					<label for="endDate">End Date</label>
-					<input ng-model="reportDaySheetCtrl.params.endDate"
-						   type="date"
-						   id="endDate"
-						   name="endDate"
-						   class="form-control"
-						   placeholder="">
+				<div ng-show="reportDaySheetCtrl.params.type == 'all' || reportDaySheetCtrl.params.type== 'all-nr'">
+					<ca-field-date
+							ca-title="End Date"
+							ca-date-picker-id="daysheet-endDate"
+							ca-name="daysheet-endDate"
+							ca-model="reportDaySheetCtrl.params.endDate"
+							ca-orientation="auto"
+					></ca-field-date>
 				</div>
 			</div>
 

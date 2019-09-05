@@ -1,0 +1,84 @@
+
+#primary-navigation {
+
+	height: $primary-navbar-height;
+	@include juno-tab-md($primary-navbar-height);
+	@include juno-tab-color-scheme-dark;
+	@include juno-font-tab;
+
+	@include juno-breakpoints($screen-nav-lg, $screen-nav-md, 870px);
+
+	.btn-icon {
+		width: $primary-navbar-height;
+		height: $primary-navbar-height;
+
+		.icon-logo {
+			width: 48px;
+			height: 16px;
+		}
+	}
+	.badge {
+		margin-left: 8px;
+	}
+
+	.navbar-left {
+		.patient-search-form {
+			height: $primary-navbar-height;
+			padding: 0 24px;
+
+			.form-group {
+				margin-bottom: 0;
+				padding: 0 4px;
+
+				$input-size: 32px;
+				.form-control {
+					@include juno-form-colour-scheme-dark;
+					height: $input-size;
+					width: 304px;
+				}
+				.btn {
+					height: $input-size;
+					padding-top: 0;
+					padding-bottom: 0;
+				}
+				.btn-visible {
+					height: $input-size;
+					width: $input-size;
+					background-color: $color-neutral-white;
+					border: 1px solid $color-neutral-lightest;
+					.icon {
+						font-size: 20px;
+						color: $color-neutral-darker;
+					}
+				}
+				.directive-juno-typeahead {
+					.icon {
+						color: $color-neutral-darker;
+					}
+				}
+			}
+		}
+	}
+	.navbar-right-menu {
+		height: $primary-navbar-height;
+		@include juno-tab-xxs(24px);
+
+		.badge {
+			margin-left: 0;
+		}
+		.icon {
+			font-size: 20px;
+			color: $color-neutral-white;
+		}
+		.dropdown-toggle {
+			color: $color-neutral-white;
+		}
+		.dropdown-menu {
+			@include juno-tab-sm(24px);
+			position: fixed;
+			left: initial;
+			right: 0;
+			top: $primary-navbar-height;
+		}
+	}
+}

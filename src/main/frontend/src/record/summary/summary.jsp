@@ -49,7 +49,7 @@
 						</button>
 
 						<%--<a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" ng-click="gotoState('add', mod)" ng-disabled="page.cannotAdd" 
-							ng-hide="mod.summaryCode=='meds' || mod.summaryCode=='assessments' || mod.summaryCode=='allergies' || mod.summaryCode=='preventions' || page.cannotAdd">
+							ng-hide="mod.summaryCode=='meds' || mod.summaryCode=='forms' || mod.summaryCode=='allergies' || mod.summaryCode=='preventions' || page.cannotAdd">
 								Add <span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>
 						</a>--%>
 
@@ -75,13 +75,13 @@
 						</button>
 
 						<button class="btn btn-xs btn-success pull-right"
-								ng-click="summaryCtrl.openAssessments()"
-								ng-if="mod.summaryCode=='assessments'">
+								ng-click="summaryCtrl.openForms()"
+								ng-if="mod.summaryCode=='forms'">
 							Add <%--<span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>--%>
 						</button>
 
 						<%--<a href="#/record/{{summaryCtrl.demographicNo}}/forms" class="btn btn-xs btn-success pull-right" 
-							ng-if="mod.summaryCode=='assessments'">
+							ng-if="mod.summaryCode=='forms'">
 							Add <span class="glyphicon glyphicon-plus-sign" title="{{mod.summaryCode}}"></span>
 						</a>--%>
 					</div>
@@ -100,10 +100,10 @@
 						</a>
 					</li>
 					<%--<a href="#" class="text-muted add-summary" ng-if="mod.summaryItem==null" ng-click="openPreventions(demographicNo)" ng-show="mod.summaryCode=='preventions'"><bean:message key="global.btnAdd"/> {{mod.displayName}}</a>
-					<a href="#" class="text-muted add-summary" ng-if="mod.summaryItem==null" ng-click="gotoState('add', mod)" ng-hide="mod.summaryCode=='meds' || mod.summaryCode=='assessments' || mod.summaryCode=='allergies' || mod.summaryCode=='preventions' || page.cannotAdd"><bean:message key="global.btnAdd"/> {{mod.displayName}}</a>
+					<a href="#" class="text-muted add-summary" ng-if="mod.summaryItem==null" ng-click="gotoState('add', mod)" ng-hide="mod.summaryCode=='meds' || mod.summaryCode=='forms' || mod.summaryCode=='allergies' || mod.summaryCode=='preventions' || page.cannotAdd"><bean:message key="global.btnAdd"/> {{mod.displayName}}</a>
 					<a href="#" class="text-muted add-summary" ng-if="mod.summaryItem==null" ng-click="openRx(demographicNo)" ng-show="mod.summaryCode=='meds'"><bean:message key="global.btnAdd"/> {{mod.displayName}}</a>
 					<a href="#" class="text-muted add-summary" ng-if="mod.summaryItem==null" ng-click="openAllergies(demographicNo)" ng-show="mod.summaryCode=='allergies'"><bean:message key="global.btnAdd"/> {{mod.displayName}}</a>
-					<a href="#/record/{{demographicNo}}/forms" class="text-muted add-summary" ng-if="mod.summaryItem==null" ng-show="mod.summaryCode=='assessments'"><bean:message key="global.btnAdd"/> {{mod.displayName}}</a>--%>
+					<a href="#/record/{{demographicNo}}/forms" class="text-muted add-summary" ng-if="mod.summaryItem==null" ng-show="mod.summaryCode=='forms'"><bean:message key="global.btnAdd"/> {{mod.displayName}}</a>--%>
 				</ul>
 				<span class="glyphicon hand-hover pull-right glyphicon-chevron-up"
 					  ng-click="summaryCtrl.toggleList(mod)"

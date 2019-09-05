@@ -16,7 +16,7 @@ angular.module('Report').controller('Report.ReportNoShowAppointmentSheetControll
 
 		controller.params = {
 			providerNo: '',
-			startDate: new Date()
+			startDate: Juno.Common.Util.formatMomentDate(moment()),
 		};
 
 		controller.searchProviders = function searchProviders(val)

@@ -23,7 +23,9 @@
 package org.oscarehr.common.search;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 public abstract class AbstractCriteriaSearch
 {
@@ -32,9 +34,17 @@ public abstract class AbstractCriteriaSearch
 		asc, desc
 	}
 
+	// determine criteria join mode ('AND' filter criteria vs 'OR' filter criteria)
+	public enum JUNCTION_TYPE
+	{
+		conjunction, //AND
+		disjunction // OR
+	}
+
 	private int limit = 100;
 	private int offset = 0;
 	private SORTDIR sortDir = SORTDIR.asc;
+	private JUNCTION_TYPE junctionType = JUNCTION_TYPE.conjunction;
 
 	public abstract Criteria setCriteriaProperties(Criteria criteria);
 
@@ -81,5 +91,28 @@ public abstract class AbstractCriteriaSearch
 	protected Order getOrder(String propertyName)
 	{
 		return (SORTDIR.asc.equals(sortDir))? Order.asc(propertyName) : Order.desc(propertyName);
+	}
+	protected Junction getEmptyJunction()
+	{
+		return (getJunctionType() == JUNCTION_TYPE.disjunction)? Restrictions.disjunction() : Restrictions.conjunction();
+	}
+
+	public JUNCTION_TYPE getJunctionType()
+	{
+		return junctionType;
+	}
+
+	public void setJunctionType(JUNCTION_TYPE junctionType)
+	{
+		this.junctionType = junctionType;
+	}
+
+	public void setJunctionTypeAND()
+	{
+		this.setJunctionType(JUNCTION_TYPE.conjunction);
+	}
+	public void setJunctionTypeOR()
+	{
+		this.setJunctionType(JUNCTION_TYPE.disjunction);
 	}
 }
