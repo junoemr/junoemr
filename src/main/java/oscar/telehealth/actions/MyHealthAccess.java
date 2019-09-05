@@ -23,6 +23,7 @@
 
 package oscar.telehealth.actions;
 
+import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -41,6 +42,7 @@ import org.oscarehr.integration.myhealthaccess.model.MHAUserToken;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.telehealth.service.MyHealthAccessService;
 import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,6 +57,7 @@ public class MyHealthAccess extends DispatchAction
 {
 	private static MyHealthAccessService myHealthAccessService = SpringUtils.getBean(MyHealthAccessService.class);
 	private static SecurityDao securityDao = SpringUtils.getBean(SecurityDao.class);
+	private static final Logger logger = MiscUtils.getLogger();
 
 	public ActionForward startTelehealth(ActionMapping mapping, ActionForm form,
 	                                     HttpServletRequest request, HttpServletResponse response)
@@ -172,16 +175,19 @@ public class MyHealthAccess extends DispatchAction
 			MHAUserToken longToken = myHealthAccessService.getLongToken(site, remoteUser, loggedInUser, email, password);
 			persistToken(request.getSession(), loggedInUser, longToken.getToken());
 		}
+		catch (RecordNotFoundException e)
+		{
+			logger.info("Invalid MHA API key for loggedInUser: " + loggedInUser.getProviderNo());
+			ActionRedirect loginAction = new ActionRedirect(mapping.findForward("mhaLogin"));
+			return redoLoginActionWithError(loginAction, request, "Invalid API key.  Please contact support");
+		}
 		catch (BaseException e)
 		{
 			if (e.getErrorObject().hasAuthError())
 			{
+				logger.info("Invalid credentials for MHA user: " + request.getParameter("email"));
 				ActionRedirect loginAction = new ActionRedirect(mapping.findForward("mhaLogin"));
-				loginAction.addParameter("siteName", request.getParameter("siteName"));
-				loginAction.addParameter("email", email);
-				loginAction.addParameter("appt", request.getParameter("appt"));
-				loginAction.addParameter("errorMessage", "Failed to authenticate");
-				return loginAction;
+				return redoLoginActionWithError(loginAction, request, "Failed to authenticate");
 			}
 
 			throw e;
@@ -191,6 +197,15 @@ public class MyHealthAccess extends DispatchAction
 		String endpoint = myHealthAccessService.buildTeleHealthRedirectURL(remoteUser, site, appointmentNo);
 
 		return pushToMyHealthAccess(endpoint, getSite(request), remoteUser, loggedInUser);
+	}
+
+	private ActionRedirect redoLoginActionWithError(ActionRedirect loginAction, HttpServletRequest request, String errorMessage)
+	{
+		loginAction.addParameter("siteName", request.getParameter("siteName"));
+		loginAction.addParameter("email", errorMessage);
+		loginAction.addParameter("appt", request.getParameter("appt"));
+		loginAction.addParameter("errorMessage", errorMessage);
+		return loginAction;
 	}
 
 	private ActionForward pushToMyHealthAccess(String myHealthAccessURL, Site site, String remoteUser, Security loggedInUser)
