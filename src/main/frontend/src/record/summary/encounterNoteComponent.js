@@ -108,6 +108,7 @@ angular.module('Record.Summary').component('encounterNote', {
 							console.info('callback success', updatedNote);
 							// clear the existing properties and replace with the updated ones
 							angular.copy(updatedNote, ctrl.note);
+							ctrl.note.revision = Number(ctrl.note.revision) + 1;
 						},
 						dismissCallback: function dismissCallback(reason)
 						{
@@ -130,6 +131,7 @@ angular.module('Record.Summary').component('encounterNote', {
 							console.info('callback success', updatedNote);
 							// clear the existing properties and replace with the updated ones
 							angular.copy(updatedNote, ctrl.note);
+							ctrl.note.revision = Number(ctrl.note.revision) + 1;
 						},
 						dismissCallback: function dismissCallback(reason)
 						{

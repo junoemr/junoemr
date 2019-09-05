@@ -31,9 +31,11 @@ angular.module('Record.Summary').component('encounterNoteList', {
 	},
 	templateUrl: "src/record/summary/encounterNoteListTemplate.jsp",
 	controller: [
+		'$scope',
 		'$stateParams',
 		'noteService',
-		function ($stateParams,
+		function ($scope,
+		          $stateParams,
 		          noteService)
 	{
 		var ctrl = this;
@@ -48,18 +50,16 @@ angular.module('Record.Summary').component('encounterNoteList', {
 			};
 
 			ctrl.noteList = [];
-
-			ctrl.page = {
-				currentEditNote: {},
-			};
+			ctrl.openNote = {};
+			ctrl.index = 0;
 
 			// set default binding values
 			ctrl.userId =  ctrl.userId || null;
 			ctrl.onEditCpp =  ctrl.onEditCpp || null;
 			ctrl.onEditNote =  ctrl.onEditNote || null;
 
+			// force load the first set of notes
 			ctrl.addMoreItems();
-
 		};
 
 		ctrl.$onChanges = function(bindingHash)
@@ -81,12 +81,47 @@ angular.module('Record.Summary').component('encounterNoteList', {
 		};
 		ctrl.bubbleUpEditNoteCallback = function bubbleUpEditNoteCallback(note, successCallback, dismissCallback)
 		{
+			//This is a temporary way to hook emits into the old record controller note editing.
+			//TODO remove this once the edit note is refactored
+			ctrl.openNote = {
+				noteId: note.noteId,
+				successCallback: successCallback,
+				dismissCallback: dismissCallback,
+			};
 			ctrl.onEditNote({
 				note: note,
 				successCallback: successCallback,
 				dismissCallback: dismissCallback
 			});
 		};
+
+		$scope.$on('noteSaved', function(event, updatedNote)
+		{
+			var updateExisting = Juno.Common.Util.exists(ctrl.openNote.noteId) && Number(ctrl.openNote.noteId) > 0;
+
+			if(updateExisting) //Edit note
+			{
+				if (angular.isFunction(ctrl.openNote.successCallback))
+				{
+					ctrl.openNote.successCallback(updatedNote);
+					ctrl.openNote = {};
+				}
+			}
+			else // add new note
+			{
+				updatedNote.revision = 1;
+				ctrl.noteList.unshift(updatedNote);
+			}
+		});
+
+		$scope.$on('stopEditingNote', function()
+		{
+			if(angular.isFunction(ctrl.openNote.dismissCallback))
+			{
+				ctrl.openNote.dismissCallback();
+				ctrl.openNote = {};
+			}
+		});
 
 		// -----------------------------------------------------------------------------------------------------
 
@@ -121,12 +156,11 @@ angular.module('Record.Summary').component('encounterNoteList', {
 
 			ctrl.busy = true;
 
-			noteService.getNotesFrom($stateParams.demographicNo, ctrl.index, 20, ctrl.page.noteFilter).then(
+			noteService.getNotesFrom($stateParams.demographicNo, ctrl.index, 20, {}).then(
 				function success(results)
 				{
 					if (angular.isDefined(results.notelist))
 					{
-						//controller.page.notes = data;
 						if (results.notelist instanceof Array)
 						{
 							for (var i = 0; i < results.notelist.length; i++)

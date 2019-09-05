@@ -138,11 +138,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			$state.go('record.forms', {formListId: 1});
 		};
 
-		controller.editNote = function editNote(note)
-		{
-			$rootScope.$emit('loadNoteForEdit', note);
-		};
-
 		// Call the findGroupNote function and search for the given note, if found, open the groupNote editor
 		controller.editGroupNote = function editGroupNote(note)
 		{
@@ -178,38 +173,11 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			return null;
 		};
 
-		controller.page.currentEditNote = {};
-
-		$rootScope.$on('currentlyEditingNote', function(event, data)
+		controller.bubbleUpEditNoteCallback = function bubbleUpEditNoteCallback(note, successCallback, dismissCallback)
 		{
-			controller.page.currentEditNote = data;
-		});
-
-		// TODO
-		$rootScope.$on('stopEditingNote', function()
-		{
-			controller.page.currentEditNote = {};
-		});
-
-		$rootScope.$on('noteSaved', function(event, data)
-		{
-			var noteFound = false;
-			for (var notecount = 0; notecount < controller.page.notes.notelist.length; notecount++)
-			{
-				if (data.uuid == controller.page.notes.notelist[notecount].uuid)
-				{
-					controller.page.notes.notelist[notecount] = data;
-					noteFound = true;
-					break;
-				}
-			}
-
-			if (noteFound == false)
-			{
-				controller.page.notes.notelist.unshift(data);
-			}
-			controller.index = controller.page.notes.notelist.length;
-		});
+			//TODO open record controller note edit without emit?
+			$scope.$emit('loadNoteForEdit', note);
+		};
 
 		controller.trackerUrl = "";
 
@@ -321,16 +289,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				});
 
 			modalInstance.result.then(successCallback, dismissCallback);
-		};
-
-		controller.bubbleUpEditNoteCallback = function bubbleUpEditNoteCallback(note, successCallback, dismissCallback)
-		{
-			//TODO open record controller note edit
-			controller.onEditNote({
-				note: note,
-				successCallback: successCallback,
-				dismissCallback: dismissCallback
-			});
 		};
 
 		controller.editGroupedNotes = function editGroupedNotes(size, mod, action)

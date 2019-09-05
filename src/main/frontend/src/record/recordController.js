@@ -341,7 +341,7 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			console.log('CANCELLING EDIT');
 			controller.page.encounterNote = null;
-			$rootScope.$emit('stopEditingNote');
+			$scope.$broadcast('stopEditingNote');
 			skipTmpSave = true;
 			controller.getCurrentNote(false);
 			controller.removeEditingNoteFlag();
@@ -379,7 +379,7 @@ angular.module('Record').controller('Record.RecordController', [
 				function success(results)
 				{
 					controller.page.isNoteSaved = true;
-					$rootScope.$emit('noteSaved', results);
+					$scope.$broadcast('noteSaved', results);
 					skipTmpSave = true;
 					controller.page.encounterNote = results;
 					controller.$storage.hideNote = true;
@@ -501,7 +501,7 @@ angular.module('Record').controller('Record.RecordController', [
 					controller.page.encounterNote = results;
 					controller.page.initNote = results.note; //compare this with current note content to determine tmpsave or not
 					controller.getIssueNote();
-					$rootScope.$emit('currentlyEditingNote', controller.page.encounterNote);
+					$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
 					controller.initAppendNoteEditor();
 					controller.initObservationDate();
 				},
@@ -515,7 +515,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.editNote = function editNote(note)
 		{
-			$rootScope.$emit('', note);
+			$scope.$broadcast('', note);
 		};
 
 		$rootScope.$on('loadNoteForEdit', function(event, data)
@@ -532,7 +532,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 			//Need to check if note has been saved yet.
 			controller.$storage.hideNote = false;
-			$rootScope.$emit('currentlyEditingNote', controller.page.encounterNote);
+			$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
 
 			controller.removeEditingNoteFlag();
 		});
