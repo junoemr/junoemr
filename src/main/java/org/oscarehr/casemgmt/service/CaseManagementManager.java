@@ -2049,7 +2049,6 @@ private String updateApptStatus(String status, String type) {
 	public CaseManagementNote saveCaseManagementNote(LoggedInInfo loggedInInfo, CaseManagementNote note,List<CaseManagementIssue> issuelist,CaseManagementCPP cpp,String ongoing,boolean verify,Locale locale,Date now,CaseManagementNote annotationNote,String userName,String user,String remoteAddr,String lastSavedNoteString) throws Exception {
 		ProgramManager programManager = (ProgramManager) SpringUtils.getBean("programManager");
 		AdmissionManager admissionManager = (AdmissionManager) SpringUtils.getBean("admissionManager");	
-		
 
 		Long old_note_id = note.getId(); // saved for use with annotation
 
@@ -2064,14 +2063,18 @@ private String updateApptStatus(String status, String type) {
 			newNote = true;
 		}
 
-		try {
-			role = String.valueOf((programManager.getProgramProvider(note.getProviderNo(), note.getProgram_no())).getRole().getId());
-		} catch (Exception e) {
-			role = "0";
+		ProgramProvider programProvider = programManager.getProgramProvider(note.getProviderNo(), note.getProgram_no());
+		if (programProvider != null && programProvider.getRole() != null)
+		{
+			role = String.valueOf(programProvider.getRole().getId());
 		}
-		/*
-		 * if(session.getAttribute("archiveView")!="true") note.setReporter_caisi_role(role); else note.setReporter_caisi_role("1");
-		 */
+		else
+		{
+			// If something went wrong in trying to get the provider's role, fall back to whatever note had before
+			MiscUtils.getLogger().error("Check that the program_number '" + note.getProgram_no() + "' is correct for note with id: " + note.getId());
+			role = note.getReporter_caisi_role();
+		}
+
 		note.setReporter_caisi_role(role);
 
 		try {
