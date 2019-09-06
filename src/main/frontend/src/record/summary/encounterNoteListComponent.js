@@ -27,6 +27,7 @@ angular.module('Record.Summary').component('encounterNoteList', {
 	templateUrl: "src/record/summary/encounterNoteListTemplate.jsp",
 	bindings: {
 		userId: '<', // current user provider number
+		selectedNoteHash: '=',
 		onEditCpp: '&',
 		onEditNote: '&',
 	},
@@ -51,17 +52,17 @@ angular.module('Record.Summary').component('encounterNoteList', {
 
 			ctrl.noteList = [];
 			ctrl.openNote = {};
+
+
 			ctrl.index = 0;
 			ctrl.busy = false;
 			ctrl.moreNotes = true;
 
 			// set default binding values
 			ctrl.userId =  ctrl.userId || null;
+			ctrl.selectedNoteHash = ctrl.selectedNoteHash || {};
 			ctrl.onEditCpp =  ctrl.onEditCpp || null;
 			ctrl.onEditNote =  ctrl.onEditNote || null;
-
-			// force load the first set of notes
-			// ctrl.addMoreItems();
 		};
 
 		ctrl.$onChanges = function(bindingHash)
@@ -124,6 +125,18 @@ angular.module('Record.Summary').component('encounterNoteList', {
 				ctrl.openNote = {};
 			}
 		});
+
+		ctrl.onSelectionStateChange = function onSelectionStateChange(note, selected)
+		{
+			if(selected)
+			{
+				ctrl.selectedNoteHash[note.noteId] = note;
+			}
+			else
+			{
+				delete ctrl.selectedNoteHash[note.noteId];
+			}
+		};
 
 		// -----------------------------------------------------------------------------------------------------
 

@@ -3,13 +3,13 @@
 
 <div class="form-horizontal col-lg-12 encounter-note-container"
      ng-class="{
+            'note-type-cpp': ($ctrl.note.cpp && !$ctrl.note.ticklerNote),
             'note-type-eform': $ctrl.note.eformData,
             'note-type-document': $ctrl.note.document,
             'note-type-rx': $ctrl.note.rxAnnotation,
             'note-type-enc-form': $ctrl.note.encounterForm,
             'note-type-invoice': $ctrl.note.invoice,
             'note-type-tickler': $ctrl.note.ticklerNote,
-            'note-type-cpp': $ctrl.note.cpp,
 
             'note-in-edit' : $ctrl.inOpenEdit
      }"
@@ -48,8 +48,12 @@
 					Archived
 				</button>
 				<button class="btn btn-default btn-xs"
-				        ng-click="$ctrl.toggleIsSelectedForPrint(note)"
-				        ng-class="{'btn-success': $ctrl.note.isSelected, 'btn-default': !$ctrl.note.isSelected }"
+				        ng-disabled="!$ctrl.note.noteId"
+				        ng-click="$ctrl.toggleIsSelectedForPrint()"
+				        ng-class="{
+				            'btn-success': $ctrl.selectedForPrint,
+				            'btn-default': !$ctrl.selectedForPrint
+				         }"
 				        title="Add note to print list">
 					<span class="fa fa-print" aria-hidden="true"></span>
 				</button>

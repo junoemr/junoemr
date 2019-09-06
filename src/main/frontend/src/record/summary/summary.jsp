@@ -66,7 +66,7 @@
 					</li>
 					<li class="pull-right">
 						<button class="btn btn-sm btn-primary"
-								ng-click="summaryCtrl.showPrintModal(summaryCtrl.page.notes.notelist)">
+								ng-click="summaryCtrl.showPrintModal()">
 							<span class="fa fa-print"></span>
 							Print
 						</button>
@@ -80,6 +80,7 @@
 								user-id="user.providerNo"
 								on-edit-cpp="summaryCtrl.onEditCpp(note, successCallback, dismissCallback)"
 								on-edit-note="summaryCtrl.bubbleUpEditNoteCallback(note, successCallback, dismissCallback)"
+								selected-note-hash="summaryCtrl.page.selectedNoteHash"
 						>
 						</encounter-note-list>
 					</div>

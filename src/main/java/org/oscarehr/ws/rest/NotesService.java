@@ -191,6 +191,8 @@ public class NotesService extends AbstractServiceImpl {
 		for(NoteDisplay nd : result.getNotes())
 		{
 			NoteTo1 note = new NoteTo1();
+			note.setNoteId(nd.getNoteId());
+
 			boolean isDeleted = false;
 			if(nd.isDocument()) {
 				Document doc = getDocumentByNoteId(nd.getNoteId().longValue());
@@ -204,9 +206,9 @@ public class NotesService extends AbstractServiceImpl {
 			{
 				//TODO why is the note id fake and also the eform id???
 				note.setEformDataId(nd.getNoteId());
+				note.setNoteId(null);
 			}
 
-			note.setNoteId(nd.getNoteId());
 			note.setArchived(nd.isArchived());
 			note.setIsSigned(nd.isSigned());
 			note.setIsEditable(nd.isEditable());

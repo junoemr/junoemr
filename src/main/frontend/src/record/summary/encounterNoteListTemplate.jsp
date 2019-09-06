@@ -56,6 +56,7 @@
 						note="note"
 						on-edit-cpp="$ctrl.bubbleUpEditCppCallback(note, successCallback, dismissCallback)"
 						on-edit-note="$ctrl.bubbleUpEditNoteCallback(note, successCallback, dismissCallback)"
+						on-toggle-select="$ctrl.onSelectionStateChange(note, selected)"
 				>
 				</encounter-note>
 			</div>

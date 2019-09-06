@@ -29,8 +29,10 @@ angular.module('Record.Summary').component('encounterNote', {
 		note: '<',
 		onEditCpp: '&',
 		onEditNote: '&',
+		onToggleSelect: '&',
 
 		minimized: '<',
+		selectedForPrint: '<',
 	},
 	controller: [
 		'$scope',
@@ -51,8 +53,10 @@ angular.module('Record.Summary').component('encounterNote', {
 			ctrl.note =  ctrl.note || {};
 			ctrl.onEditCpp =  ctrl.onEditCpp || null;
 			ctrl.onEditNote =  ctrl.onEditNote || null;
+			ctrl.onToggleSelect =  ctrl.onToggleSelect || null;
 
 			ctrl.minimized = ctrl.minimized || false;
+			ctrl.selectedForPrint = ctrl.selectedForPrint || false;
 		};
 
 		ctrl.$onChanges = function(bindingHash)
@@ -154,6 +158,22 @@ angular.module('Record.Summary').component('encounterNote', {
 		ctrl.isNoteExpanded = function isNoteExpanded()
 		{
 			return !ctrl.isNoteMinimized();
+		};
+
+		ctrl.toggleIsSelectedForPrint = function toggleIsSelectedForPrint()
+		{
+			ctrl.selectedForPrint = !ctrl.selectedForPrint;
+			if(angular.isFunction(ctrl.onToggleSelect))
+			{
+				ctrl.onToggleSelect({
+					note: ctrl.note,
+					selected: ctrl.selectedForPrint,
+				});
+			}
+		};
+		ctrl.isSelectedForPrint = function isSelectedForPrint()
+		{
+			return ctrl.selectedForPrint;
 		};
 
 		ctrl.getNoteHeader = function firstLine()

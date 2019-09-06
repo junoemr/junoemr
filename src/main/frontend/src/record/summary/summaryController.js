@@ -63,7 +63,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		controller.page.columnThree = {};
 		controller.page.columnThree.modules = {};
-		controller.page.selectedNotes = [];
+		controller.page.selectedNoteHash = {};
 
 		controller.index = 0;
 		controller.busy = false;
@@ -326,22 +326,11 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 					getLeftItems();
 					getRightItems();
 				},
-				function error(errors)
+				function dismiss(errors)
 				{
-					if (editingNoteId != null)
-					{
-						noteService.removeEditingNoteFlag(editingNoteId, user.providerNo);
-						$interval.cancel(itvSet);
-						itvSet = null;
-						$interval.cancel(itvCheck);
-						itvCheck = null;
-						editingNoteId = null;
-					}
-					console.log(errors);
-
-					getLeftItems();
-					getRightItems();
-				});
+					// do nothing
+				}
+			);
 		};
 
 
@@ -443,26 +432,33 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		};
 
 
-		controller.showPrintModal = function showPrintModal(mod, action)
+		controller.showPrintModal = function showPrintModal()
 		{
-			var size = 'lg';
+			console.info(controller.page.selectedNoteHash);
+
+			var selectedNoteList = [];
+
+			Object.keys(controller.page.selectedNoteHash).forEach(function (key) {
+				var note = controller.page.selectedNoteHash[key];
+
+				selectedNoteList.push(note);
+				// iteration code
+			});
+
+			console.info(selectedNoteList);
+
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'src/record/print.jsp',
 				controller: 'Record.Summary.RecordPrintController as recordPrintCtrl',
 				backdrop: 'static',
-				size: size,
+				size: 'lg',
 				resolve:
 				{
-					mod: function()
+					selectedNoteList: function()
 					{
-						return mod;
+						return selectedNoteList;
 					},
-
-					action: function()
-					{
-						return action;
-					}
 				}
 			});
 
@@ -476,12 +472,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				{
 					console.log(errors);
 				});
-		};
-
-		// Toggle whether the note is selected for printing
-		controller.toggleIsSelectedForPrint = function toggleIsSelectedForPrint(note)
-		{
-			note.isSelected = !note.isSelected;
 		};
 
 		controller.onSummaryModAdd = function onSummaryModAdd(module)
