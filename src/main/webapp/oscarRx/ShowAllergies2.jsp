@@ -83,8 +83,10 @@
 		<script type="text/javascript">
 			/**
 			 * Called as part of AddReaction2.jsp's onsubmit for adding or modifying an allergy.
-			 * Validation logic to check that any non-empty input into the start date field looks like a date.
-			 * @return {boolean}
+			 * Validation logic to check for the following:
+			 * - that any non-empty input into the start date field looks like a date.
+			 * - that any non-empty input into age of onset is a positive integer
+			 * @return true if both of the above conditions are satisfied, false otherwise
 			 */
 			function validateAllergySubmit()
 			{
@@ -98,7 +100,6 @@
 				}
 
 				var validDate = startDate[0].length === 4;
-
 				while (validDate && startDate.length < 3)
 				{
 					startDate.push("01");
@@ -115,7 +116,21 @@
 						"\nyyyy");
 				}
 
-				return validDate;
+				// Somewhat ugly by directly checking against a regex. Alternative is to cast the string
+				// to an integer and then check all of the cases where the conversion could have gone wrong
+				// and that it's a positive number
+				// Previous validation allowed for any string that was, at most, 4 chars. Enforcing that here too
+				var ageOfOnset = $("#ageOfOnset").val();
+				var validAge = ageOfOnset.length === 0 || /^(0|[1-9]\d{0,3})$/.test(ageOfOnset);
+				if (!validAge)
+				{
+					alert("Invalid value in Age of Onset. Check that your age of onset value is one of the following:" +
+						"\n- is empty" +
+						"\n- is 0" +
+						"\n- is a positive number");
+				}
+
+				return validDate && validAge;
 			}
 		</script>
 

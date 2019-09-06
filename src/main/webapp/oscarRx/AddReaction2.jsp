@@ -162,8 +162,12 @@
 
 								<tr valign="center">
 									<td>
-										<span class="label">Age Of Onset:</span>
-										<html:text property="ageOfOnset" size="4" maxlength="4" value="${allergy.ageOfOnset}" />
+										<span class="label">
+											<label for="ageOfOnset">Age Of Onset:</label>
+										</span>
+										<input id="ageOfOnset"
+											   name="ageOfOnset"
+											   value="${allergy.ageOfOnset}"/>
 									</td>
 								</tr>
 
