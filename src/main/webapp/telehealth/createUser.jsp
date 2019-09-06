@@ -25,7 +25,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-		<title>MyHealthAccess Create User</title>
+    <title>MyHealthAccess Create User</title>
     <link rel="stylesheet" type="text/css" href="css/myhealthaccess.css">
 </head>
 <body>
@@ -33,22 +33,31 @@
     <div class="left"></div>
     <div class="right">
         <div class="mha-content">
-        <h3>Create a MyHealthAccess account</h3>
-        <p>
-            It looks like you don't have a MyHealthAccess account.
-            Lets create one and connect it with your Juno EMR provider
-        </p>
-        <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=createUser" method="post">
-            <input type="hidden" name="siteName" value="<%=request.getParameter("siteName")%>"/>
-            <input type="hidden" name="appt" value="<%=request.getParameter("appt")%>"/>
-            <div class="mha-input">
-                <label for="email">Email address</label>
-                <input type="text" id="email" name="email"/>
-            </div>
-            <div class="mha-button-container">
-                <button type="submit" class="primary">Sign up</button>
-            </div>
-        </form>
+            <% if(request.getParameter("errorMessage") != null && !request.getParameter("errorMessage").isEmpty())
+            {
+            %>
+            <br>
+            <span class="red"><strong><%= request.getParameter("errorMessage") %></strong></span>
+            <br>
+            <%
+                }
+            %>
+            <h3>Create a MyHealthAccess account</h3>
+            <p>
+                It looks like you don't have a MyHealthAccess account.
+                Lets create one and connect it with your Juno EMR provider
+            </p>
+            <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=createUser" method="post">
+                <input type="hidden" name="siteName" value="<%=request.getParameter("siteName")%>"/>
+                <input type="hidden" name="appt" value="<%=request.getParameter("appt")%>"/>
+                <div class="mha-input">
+                    <label for="email">Email address</label>
+                    <input type="text" id="email" name="email"/>
+                </div>
+                <div class="mha-button-container">
+                    <button type="submit" class="primary">Sign up</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

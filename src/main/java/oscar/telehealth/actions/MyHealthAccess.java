@@ -48,10 +48,7 @@ import org.oscarehr.util.SpringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.net.URLEncoder;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 
 public class MyHealthAccess extends DispatchAction
 {
@@ -140,6 +137,13 @@ public class MyHealthAccess extends DispatchAction
 
 			return loginAction;
 		}
+		catch (RecordNotFoundException e)
+		{
+			ActionRedirect createUserAction = new ActionRedirect(mapping.findForward("createUser"));
+			createUserAction.addParameter("email", email);
+			createUserAction.addParameter("errorMessage", "Invalid API key.  Please contact support");
+			return createUserAction;
+		}
 	}
 
 	public ActionForward confirmUser(ActionMapping mapping, ActionForm form,
@@ -159,7 +163,6 @@ public class MyHealthAccess extends DispatchAction
 
 	public ActionForward login(ActionMapping mapping, ActionForm form,
 	                           HttpServletRequest request, HttpServletResponse response)
-			throws NoSuchAlgorithmException, IOException, KeyManagementException
 	{
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
@@ -202,7 +205,7 @@ public class MyHealthAccess extends DispatchAction
 	private ActionRedirect redoLoginActionWithError(ActionRedirect loginAction, HttpServletRequest request, String errorMessage)
 	{
 		loginAction.addParameter("siteName", request.getParameter("siteName"));
-		loginAction.addParameter("email", errorMessage);
+		loginAction.addParameter("email", request.getParameter("email"));
 		loginAction.addParameter("appt", request.getParameter("appt"));
 		loginAction.addParameter("errorMessage", errorMessage);
 		return loginAction;

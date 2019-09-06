@@ -46,12 +46,12 @@
 <div class="mha-container">
     <div class="left"></div>
     <div class="right">
-        <div class="mha-content red">
+        <div class="mha-content">
             <% if(request.getParameter("errorMessage") != null && !request.getParameter("errorMessage").isEmpty())
             {
             %>
                 <br>
-                <strong><%= request.getParameter("errorMessage") %></strong>
+                <span class="red"><strong><%= request.getParameter("errorMessage") %></strong></span>
                 <br>
             <%
                 }
