@@ -1,8 +1,11 @@
 .encounter-note-list-base
 {
-	$filters-height: 140px;
 	.note-list-filters {
-		height: $filters-height;
+		background-color: $color-neutral-lightest;
+		border: 1px solid $color-neutral-light;
+		border-radius: 16px;
+		padding: 4px 8px;
+		margin-bottom: 4px;
 	}
 	.note-list-body {
 	}
@@ -10,8 +13,11 @@
 	.encounter-note-container {
 		border: 1px solid $color-neutral-light;
 		border-radius: 5px;
-		margin-bottom: 20px;
+		margin-bottom: 10px;
 		border-left-width: 10px;
+
+		@include juno-font-label(12px);
+		color: $color-neutral-darker;
 
 		&.note-type-eform {
 			border-left-color: $color-lime-lighter;
@@ -35,6 +41,11 @@
 			border-left-color: $color-orange-darker;
 		}
 
+		&.note-in-edit {
+			box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px $color-primary-base;
+			outline: 0 none;
+		}
+
 		.note-header {
 			background-color: $color-neutral-lightest;
 			h6 {
@@ -45,14 +56,18 @@
 			.note-header-info {
 				color: $color-neutral-darker;
 				padding-left: 10px;
+				overflow: hidden;
+
 				.note-header-title {
 					color: $color-primary-base;
 					margin-left: 5px;
 				}
 			}
-
 			.note-header-buttons {
 				padding-right: 5px;
+				button {
+					margin: 0 2px;
+				}
 			}
 
 			.icon {
@@ -66,9 +81,11 @@
 				white-space: pre-wrap;
 				overflow-x: auto;
 			}
+			.note-divider {
+				margin-bottom: 2px;
+			}
 		}
 		.note-footer {
-			/*border-top: 1px solid #e9e9e9;*/
 			font-size: 11px;
 
 			.note-footer-right {

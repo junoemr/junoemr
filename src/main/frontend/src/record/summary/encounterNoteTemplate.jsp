@@ -15,46 +15,44 @@
      }"
 >
 	<div class="row note-header">
-		<div class="col-md-12">
-			<div class="col-lg-9 col-md-7 col-xs-8 pull-left note-header-info vertical-align">
+		<div class="flex-row vertical-align justify-content-between note-header-info">
+			<div class="flex-row justify-content-evenly">
 				<h6>{{$ctrl.note.observationDate | date : 'dd-MMM-yyyy'}}
 					<span class="note-header-title" style="word-break: break-all">{{$ctrl.getNoteHeader()}}</span>
 				</h6>
 			</div>
-			<div class="col-lg-3 col-md-5 col-xs-4 note-header-buttons">
-				<div class="vertical-align pull-right">
-					<button class="btn btn-icon"
-					        ng-show="$ctrl.allowNoteExpansion()"
-					        ng-click="$ctrl.toggleMinimizeNote()">
-						<i class="icon icon-chevron-down" ng-if="$ctrl.minimized"></i>
-						<i class="icon icon-chevron-up" ng-if="!$ctrl.minimized"></i>
-					</button>
-					<button class="btn btn-xs btn-warning-static"
-					        ng-show="$ctrl.isUnsignedEncounterNote()"
-					        title="This note is unsigned!">
-						<span class="fa fa-exclamation-triangle"></span>
-					</button>
-					<button class="btn btn-primary btn-xs"
-					        ng-click="$ctrl.viewButtonClick()"
-					        ng-show="$ctrl.showNoteViewButton()">
-						View
-					</button>
-					<button class="btn btn-primary btn-xs"
-					        ng-click="$ctrl.editButtonClick()"
-					        ng-show="$ctrl.showNoteEditButton()">
-						Edit
-					</button>
-					<button class="btn disabled btn-xs"
-					        ng-show="$ctrl.note.archived == true">
-						Archived
-					</button>
-					<button class="btn btn-default btn-xs"
-					        ng-click="$ctrl.toggleIsSelectedForPrint(note)"
-					        ng-class="{'btn-success': $ctrl.note.isSelected, 'btn-default': !$ctrl.note.isSelected }"
-					        title="Add note to print list">
-						<span class="fa fa-print" aria-hidden="true"></span>
-					</button>
-				</div>
+			<div class="flex-row justify-content-evenly note-header-buttons">
+				<button class="btn btn-icon"
+				        ng-show="$ctrl.allowNoteExpansion()"
+				        ng-click="$ctrl.toggleMinimizeNote()">
+					<i class="icon icon-chevron-down" ng-if="$ctrl.minimized"></i>
+					<i class="icon icon-chevron-up" ng-if="!$ctrl.minimized"></i>
+				</button>
+				<button class="btn btn-xs btn-warning-static"
+				        ng-show="$ctrl.isUnsignedEncounterNote()"
+				        title="This note is unsigned!">
+					<span class="fa fa-exclamation-triangle"></span>
+				</button>
+				<button class="btn btn-primary btn-xs"
+				        ng-click="$ctrl.viewButtonClick()"
+				        ng-show="$ctrl.showNoteViewButton()">
+					View
+				</button>
+				<button class="btn btn-primary btn-xs"
+				        ng-click="$ctrl.editButtonClick()"
+				        ng-show="$ctrl.showNoteEditButton()">
+					Edit
+				</button>
+				<button class="btn disabled btn-xs"
+				        ng-show="$ctrl.note.archived == true">
+					Archived
+				</button>
+				<button class="btn btn-default btn-xs"
+				        ng-click="$ctrl.toggleIsSelectedForPrint(note)"
+				        ng-class="{'btn-success': $ctrl.note.isSelected, 'btn-default': !$ctrl.note.isSelected }"
+				        title="Add note to print list">
+					<span class="fa fa-print" aria-hidden="true"></span>
+				</button>
 			</div>
 		</div>
 	</div>

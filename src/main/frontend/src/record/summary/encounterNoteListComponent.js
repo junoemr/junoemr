@@ -61,7 +61,7 @@ angular.module('Record.Summary').component('encounterNoteList', {
 			ctrl.onEditNote =  ctrl.onEditNote || null;
 
 			// force load the first set of notes
-			ctrl.addMoreItems();
+			// ctrl.addMoreItems();
 		};
 
 		ctrl.$onChanges = function(bindingHash)
@@ -158,7 +158,7 @@ angular.module('Record.Summary').component('encounterNoteList', {
 
 			ctrl.busy = true;
 
-			noteService.getNotesFrom($stateParams.demographicNo, ctrl.index, 10, {}).then(
+			noteService.getNotesFrom($stateParams.demographicNo, ctrl.index, 20, {}).then(
 				function success(results)
 				{
 					if (angular.isDefined(results.notelist))

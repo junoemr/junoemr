@@ -52,7 +52,7 @@
 			<div class="col-sm-12 summary-tabs"
 				 ng-click="summaryCtrl.checkAction($event)"
 				 ng-keypress="summaryCtrl.checkAction($event)">
-				<ul class="nav nav-tabs">
+				<ul class="nav nav-tabs round-top">
 					<li class="active">
 						<a data-target="#all" data-toggle="tab" class="hand-hover">Notes</a>
 					</li>
