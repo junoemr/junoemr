@@ -81,10 +81,21 @@
 		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 
 		<script type="text/javascript">
+			/**
+			 * Called as part of AddReaction2.jsp's onsubmit for adding or modifying an allergy.
+			 * Validation logic to check that any non-empty input into the start date field looks like a date.
+			 * @return {boolean}
+			 */
 			function validateAllergySubmit()
 			{
 				var startDateSelector = $("#startDate");
 				var startDate = startDateSelector.val().split("-");
+
+				// Not adding a date is valid behavior
+				if (startDate[0].length === 0)
+				{
+					return true;
+				}
 
 				var validDate = startDate[0].length === 4;
 
@@ -861,13 +872,13 @@
 								<tr id="allergySearchCriteriaRow">
 									<td>
 										<div id="allergySearchSelectors">
-											<input type="checkbox" name="typeDrugClass" id="typeDrugClass" onchange="toggleInput('inputDrugClass', this)"/>
+											<input type="checkbox" checked name="typeDrugClass" id="typeDrugClass" onchange="toggleInput('inputDrugClass', this)"/>
 											<label for="typeDrugClass" >Drug Classes</label>
 											<input type="checkbox" name="typeIngredient" id="typeIngredient" onchange="toggleInput('inputIngredient', this)"/>
 											<label for="typeIngredient" >Ingredients</label>
-											<input type="checkbox" name="typeGenericName" id="typeGenericName" onchange="toggleInput('inputGenericName', this)"/>
+											<input type="checkbox" checked name="typeGenericName" id="typeGenericName" onchange="toggleInput('inputGenericName', this)"/>
 											<label for="typeGenericName" >Generic Names</label>
-											<input type="checkbox" name="typeBrandName" id="typeBrandName" onchange="toggleInput('inputBrandName', this)"/>
+											<input type="checkbox" checked name="typeBrandName" id="typeBrandName" onchange="toggleInput('inputBrandName', this)"/>
 											<label for="typeBrandName" >Brand Names</label>
 											<input type="checkbox" name="typeSelectAll" id="typeSelectAll" />
 											<label for="typeSelectAll" >All</label>

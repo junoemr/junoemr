@@ -55,4 +55,15 @@ public class AllergyService
 
 		return allergy;
 	}
+
+	/**
+	 * Wrapper for updating an old allergy entry.
+	 * Handles updating the allergy as well as any associated partial_date entry.
+	 * @param allergy allergy model to update
+	 */
+	public void update(Allergy allergy)
+	{
+		allergyDao.merge(allergy);
+		partialDateDao.setPartialDate(PartialDate.ALLERGIES, allergy.getId(), PartialDate.ALLERGIES_STARTDATE, allergy.getStartDateFormat());
+	}
 }

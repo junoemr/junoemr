@@ -26,7 +26,9 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
-<%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="org.oscarehr.common.dao.PartialDateDao" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.common.model.PartialDate" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
 	String roleName2$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -70,6 +72,30 @@
 			{
 				allergyToArchive = new Allergy();
 			}
+
+			PartialDateDao partialDateDao = SpringUtils.getBean(PartialDateDao.class);
+			String startDate = "";
+			if (allergyToArchive.getStartDate() != null)
+			{
+				startDate = partialDateDao.getDatePartial(allergyToArchive.getStartDate(),
+						PartialDate.ALLERGIES,
+						allergyToArchive.getAllergyId(),
+						PartialDate.ALLERGIES_STARTDATE);
+			}
+
+			String submitHelpText = "Add Allergy";
+			if (allergyToArchive.getId() != null)
+			{
+				if (allergyToArchive.getArchived())
+				{
+					submitHelpText = "Reactivate Allergy";
+				}
+				else
+				{
+					submitHelpText = "Modify Allergy";
+				}
+			}
+
 			request.setAttribute("allergy", allergyToArchive);
 		%>
 
@@ -115,7 +141,7 @@
 								</tr>
 								<tr valign="center">
 									<td>
-										<span class="label">Comment: </span>
+										<span class="label">Reaction: </span>
 										<html:textarea property="reactionDescription" cols="40" rows="3" value="${allergy.reaction}" />
 										<html:hidden property="ID" value="<%=allergyId%>" />
 										<html:hidden property="name" value="<%=name%>" />
@@ -129,7 +155,7 @@
 										<span class="label">Start Date:</span>
 										<input id="startDate"
 											   name="startDate"
-											   value="<%=ConversionUtils.toDateString(allergyToArchive.getStartDate(), ConversionUtils.DEFAULT_DATE_PATTERN)%>">
+											   value="<%=startDate%>">
 										<label for="startDate">(yyyy-mm-dd OR yyyy-mm OR yyyy)</label>
 									</td>
 								</tr>
@@ -193,7 +219,7 @@
 
 								<tr>
 									<td >
-										<input type="submit" value="Add Allergy">
+										<input type="submit" value="<%=submitHelpText%>">
 										<input type=button class="ControlPushButton" id="cancelAddReactionButton"
 											onclick="window.location='ShowAllergies2.jsp?demographicNo=<%=sessionBean.getDemographicNo() %>'"
 											value="Cancel" />

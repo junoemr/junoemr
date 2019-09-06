@@ -30,6 +30,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.allergy.model.Allergy;
+import org.oscarehr.allergy.service.AllergyService;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -48,6 +49,7 @@ import javax.servlet.http.HttpServletResponse;
 public final class RxAddAllergyAction extends Action
 {
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private AllergyService allergyService = (AllergyService)SpringUtils.getBean("allergy.service.AllergyService");
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
@@ -67,15 +69,16 @@ public final class RxAddAllergyAction extends Action
 		String lifeStage = request.getParameter("lifeStage");
 
 		String allergyToArchive = request.getParameter("allergyToArchive");
+		RxPatientData.Patient patient = (RxPatientData.Patient) request.getSession().getAttribute("Patient");
+
 		int oldAllergyId = 0;
+		Allergy allergy = new Allergy();
 		if (allergyToArchive != null && !allergyToArchive.isEmpty())
 		{
 			oldAllergyId = Integer.parseInt(allergyToArchive);
+			allergy = patient.getAllergy(oldAllergyId);
 		}
 
-		RxPatientData.Patient patient = (RxPatientData.Patient) request.getSession().getAttribute("Patient");
-
-		Allergy allergy = new Allergy();
 		allergy.setDrugrefId(String.valueOf(id));
 		allergy.setDescription(name);
 		allergy.setTypeCode(Integer.parseInt(type));
@@ -117,27 +120,29 @@ public final class RxAddAllergyAction extends Action
 		allergy.setDemographicNo(patient.getDemographicNo());
 		allergy.setArchived(false);
 
-		allergy = patient.addAllergy(oscar.oscarRx.util.RxUtil.Today(), allergy);
-
 		String ip = request.getRemoteAddr();
-		LogAction.addLog((String)request.getSession().getAttribute("user"),
-				LogConst.ACTION_ADD,
-				LogConst.CON_ALLERGY,
-				"" + allergy.getAllergyId(),
-				ip,
-				"" + patient.getDemographicNo(),
-				allergy.getAuditString());
 
 		if (oldAllergyId > 0)
 		{
-			patient.deleteAllergy(oldAllergyId);
+			allergyService.update(allergy);
 			LogAction.addLog((String)request.getSession().getAttribute("user"),
-					LogConst.ACTION_DELETE,
+					LogConst.ACTION_UPDATE,
 					LogConst.CON_ALLERGY,
 					"" + oldAllergyId,
 					ip,
-					"" + patient.getDemographicNo(),
+					"" + allergy.getDemographicNo(),
 					patient.getAllergy(oldAllergyId).getAuditString());
+		}
+		else
+		{
+			allergy = allergyService.addNewAllergy(allergy);
+			LogAction.addLog((String)request.getSession().getAttribute("user"),
+					LogConst.ACTION_ADD,
+					LogConst.CON_ALLERGY,
+					"" + allergy.getAllergyId(),
+					ip,
+					"" + allergy.getDemographicNo(),
+					allergy.getAuditString());
 		}
 
 		return (mapping.findForward("success"));
