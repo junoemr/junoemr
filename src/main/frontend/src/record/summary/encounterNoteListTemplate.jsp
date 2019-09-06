@@ -1,42 +1,67 @@
 <div class="encounter-note-list-base flex-column">
-	<div class="note-list-filters form-horizontal">
-		<div class="row">
-			<div class="col-md-5">
-				<div class="row">
-					<div class="col-md-6">
-						<ca-field-boolean
-								ca-name="check-filter-basic-notes"
-								ca-title="Just Encounter Notes"
-								ca-label-size="col-md-9"
-								ca-input-size="col-md-3"
-								ca-model="$ctrl.filter.onlyNotes"
-								ca-template="juno"
-						>
-						</ca-field-boolean>
-					</div>
-					<div class="col-md-6">
-						<ca-field-boolean
-								ca-name="check-filter-my-notes"
-								ca-title="Just Mine"
-								ca-label-size="col-md-9"
-								ca-input-size="col-md-3"
-								ca-model="$ctrl.filter.onlyMine"
-								ca-template="juno"
-						>
-						</ca-field-boolean>
+	<div class="note-list-header">
+		<a class="flex-row expand-filters-bar"
+		   ng-click="$ctrl.toggleShowFilters()"
+		   title="Show/Hide note filters"
+		>
+			<div class="flex-row vertical-align flex-grow justify-content-between">
+				<i class="icon icon-filter"></i>
+				<span>Filter Encounter Notes</span>
+				<i class="icon icon-chevron-down" ng-if="!$ctrl.showFilters"></i>
+				<i class="icon icon-chevron-up" ng-if="$ctrl.showFilters"></i>
+			</div>
+		</a>
+		<div class="note-list-filters form-horizontal" ng-show="$ctrl.showFilters">
+			<div class="row">
+				<div class="col-md-10">
+					<div class="row">
+						<div class="col-md-6">
+							<ca-field-boolean
+									ca-name="check-filter-basic-notes"
+									ca-title="Just Encounter Notes"
+									ca-label-size="col-md-9"
+									ca-input-size="col-md-3"
+									ca-model="$ctrl.filter.onlyNotes"
+									ca-template="juno"
+							>
+							</ca-field-boolean>
+						</div>
+						<div class="col-md-6">
+							<ca-field-boolean
+									ca-name="check-filter-my-notes"
+									ca-title="Just Mine"
+									ca-label-size="col-md-9"
+									ca-input-size="col-md-3"
+									ca-model="$ctrl.filter.onlyMine"
+									ca-template="juno"
+							>
+							</ca-field-boolean>
+						</div>
 					</div>
 				</div>
+				<div class="col-md-2">
+				</div>
 			</div>
-			<div class="col-md-7">
-				<ca-field-text
-						ca-name="encounter-note-filter"
-						ca-title="Filter"
-						ca-label-size="col-md-2"
-						ca-input-size="col-md-10"
-						ca-model="$ctrl.filter.textFilter"
-						ca-rows="1"
-				>
-				</ca-field-text>
+			<div class="row">
+				<div class="col-md-10">
+					<ca-field-text
+							ca-name="encounter-note-filter"
+							ca-title="Text"
+							ca-label-size="col-md-2"
+							ca-input-size="col-md-10"
+							ca-model="$ctrl.filter.textFilter"
+							ca-rows="1"
+					>
+					</ca-field-text>
+				</div>
+				<div class="col-md-2">
+					<div class="form-group">
+						<button class="btn btn-xs btn-primary"
+								ng-click="$ctrl.clearFilters()">
+							Clear All
+						</button>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

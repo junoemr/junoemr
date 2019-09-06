@@ -69,6 +69,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		controller.busy = false;
 
 		controller.demographicNo = $stateParams.demographicNo;
+		controller.user = user;
 
 		//get access rights
 		securityService.hasRight("_eChart", "r", $stateParams.demographicNo).then(
@@ -279,7 +280,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 							},
 							user: function()
 							{
-								return user;
+								return controller.user;
 							},
 							note: function()
 							{
@@ -314,7 +315,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 					},
 					user: function()
 					{
-						return user;
+						return controller.user;
 					}
 				}
 			});

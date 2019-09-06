@@ -49,6 +49,7 @@ angular.module('Record.Summary').component('encounterNoteList', {
 				onlyMine: false,
 				textFilter: null,
 			};
+			ctrl.showFilters = true;
 
 			ctrl.noteList = [];
 			ctrl.openNote = {};
@@ -140,6 +141,17 @@ angular.module('Record.Summary').component('encounterNoteList', {
 
 		// -----------------------------------------------------------------------------------------------------
 
+		ctrl.toggleShowFilters = function toggleShowFilters()
+		{
+			ctrl.showFilters = !ctrl.showFilters;
+		};
+		ctrl.clearFilters = function clearFilters()
+		{
+			ctrl.filter.onlyMine = false;
+			ctrl.filter.onlyNotes = false;
+			ctrl.filter.textFilter = null;
+		};
+
 		ctrl.showNote = function showNote(note)
 		{
 			if (ctrl.filter.onlyNotes)
@@ -160,6 +172,11 @@ angular.module('Record.Summary').component('encounterNoteList', {
 				// Hide the note if the current user's provder number does not match that of the note author
 				if (ctrl.userId !== note.providerNo)
 					return false;
+			}
+			if(!Juno.Common.Util.isBlank(ctrl.filter.textFilter) &&
+				(!note.note.toLowerCase().includes(ctrl.filter.textFilter.toLowerCase())))
+			{
+				return false;
 			}
 			return !note.deleted;
 		};
@@ -204,6 +221,13 @@ angular.module('Record.Summary').component('encounterNoteList', {
 			);
 
 		};
+
+		ctrl.refresh = function refresh()
+		{
+			ctrl.index = 0;
+			ctrl.noteList = [];
+			ctrl.addMoreItems();
+		}
 
 	}]
 });

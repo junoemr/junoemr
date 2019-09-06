@@ -77,7 +77,7 @@
 				<div class="tab-content">
 					<div class="tab-pane active" id="all">
 						<encounter-note-list
-								user-id="user.providerNo"
+								user-id="summaryCtrl.user.providerNo"
 								on-edit-cpp="summaryCtrl.onEditCpp(note, successCallback, dismissCallback)"
 								on-edit-note="summaryCtrl.bubbleUpEditNoteCallback(note, successCallback, dismissCallback)"
 								selected-note-hash="summaryCtrl.page.selectedNoteHash"

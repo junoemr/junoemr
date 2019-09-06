@@ -11,9 +11,6 @@
 		border-bottom-color: $color-neutral-lighter;
 	}
 
-	.note-list {
-		padding: 5px;
-	}
 	.summary-tabs {
 		@include juno-tab-md($page-tabs-height-alt);
 		@include juno-tab-color-scheme-white(4px);
