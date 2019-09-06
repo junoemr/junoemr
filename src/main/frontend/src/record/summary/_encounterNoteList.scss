@@ -1,7 +1,10 @@
 .encounter-note-list-base
 {
+	$filters-height: 140px;
 	.note-list-filters {
-
+		height: $filters-height;
+	}
+	.note-list-body {
 	}
 
 	.encounter-note-container {

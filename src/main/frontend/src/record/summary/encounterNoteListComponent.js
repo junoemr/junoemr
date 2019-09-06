@@ -24,12 +24,12 @@
  */
 
 angular.module('Record.Summary').component('encounterNoteList', {
+	templateUrl: "src/record/summary/encounterNoteListTemplate.jsp",
 	bindings: {
 		userId: '<', // current user provider number
 		onEditCpp: '&',
 		onEditNote: '&',
 	},
-	templateUrl: "src/record/summary/encounterNoteListTemplate.jsp",
 	controller: [
 		'$scope',
 		'$stateParams',
@@ -52,6 +52,8 @@ angular.module('Record.Summary').component('encounterNoteList', {
 			ctrl.noteList = [];
 			ctrl.openNote = {};
 			ctrl.index = 0;
+			ctrl.busy = false;
+			ctrl.moreNotes = true;
 
 			// set default binding values
 			ctrl.userId =  ctrl.userId || null;
@@ -156,7 +158,7 @@ angular.module('Record.Summary').component('encounterNoteList', {
 
 			ctrl.busy = true;
 
-			noteService.getNotesFrom($stateParams.demographicNo, ctrl.index, 20, {}).then(
+			noteService.getNotesFrom($stateParams.demographicNo, ctrl.index, 10, {}).then(
 				function success(results)
 				{
 					if (angular.isDefined(results.notelist))
@@ -173,6 +175,10 @@ angular.module('Record.Summary').component('encounterNoteList', {
 							ctrl.noteList.push(results.notelist);
 						}
 						ctrl.index = ctrl.noteList.length;
+					}
+					if(angular.isDefined(results.moreNotes))
+					{
+						ctrl.moreNotes = results.moreNotes;
 					}
 					ctrl.busy = false;
 				},

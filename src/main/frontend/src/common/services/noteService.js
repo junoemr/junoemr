@@ -46,15 +46,12 @@ angular.module("Common.Services").service("noteService", [
 
 			var config = Juno.Common.ServiceHelper.configHeaders();
 			config.params = {
-				noteConfig: noteConfig
-			};
-
-			let urlParams = {
+				// noteConfig: noteConfig,
 				'offset': offset,
-				'numberToReturn': numberToReturn
+				'numToReturn': numberToReturn
 			};
 
-			junoHttp.post(service.apiPath + '/' + encodeURIComponent(demographicNo) + '/all?' + $httpParamSerializer(urlParams), config).then(
+			junoHttp.get(service.apiPath + '/' + encodeURIComponent(demographicNo) + '/all', config).then(
 				function success(results)
 				{
 					deferred.resolve(results.data);

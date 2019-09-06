@@ -50,8 +50,6 @@ import org.oscarehr.casemgmt.web.NoteDisplayLocal;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
-import org.oscarehr.eform.dao.EFormDataDao;
-import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -132,14 +130,12 @@ public class NotesService extends AbstractServiceImpl {
 	private DocumentDao documentDao;
 	
 	
-	@POST
+	@GET
 	@Path("/{demographicNo}/all")
 	@Produces("application/json")
-	@Consumes("application/json")
 	public RestResponse<NoteSelectionTo1> getNotesWithFilter(@PathParam("demographicNo") Integer demographicNo,
 	                                                         @QueryParam("numToReturn") @DefaultValue("20") Integer numToReturn,
-	                                                         @QueryParam("offset") @DefaultValue("0") Integer offset,
-	                                                         JSONObject jsonobject)
+	                                                         @QueryParam("offset") @DefaultValue("0") Integer offset)
 	{
 		NoteSelectionTo1 returnResult = new NoteSelectionTo1();
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
@@ -183,10 +179,10 @@ public class NotesService extends AbstractServiceImpl {
 		{
 			criteria.setProgramId(programId);
 		}
-
-		processJsonArray(jsonobject, "filterRoles", criteria.getRoles());
-		processJsonArray(jsonobject, "filterProviders", criteria.getProviders());
-		processJsonArray(jsonobject, "filterIssues", criteria.getIssues());
+//
+//		processJsonArray(jsonobject, "filterRoles", criteria.getRoles());
+//		processJsonArray(jsonobject, "filterProviders", criteria.getProviders());
+//		processJsonArray(jsonobject, "filterIssues", criteria.getIssues());
 
 		NoteSelectionResult result = noteService.findNotes(loggedInInfo, criteria);
 
