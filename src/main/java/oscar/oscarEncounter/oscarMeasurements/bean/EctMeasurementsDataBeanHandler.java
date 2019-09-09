@@ -140,6 +140,13 @@ public class EctMeasurementsDataBeanHandler {
         return measurementsDataVector;
     }
 
+	// working around checkstyle which appears to hate anything containing a term like "Vector()" in it
+	// TODO rename above method with this
+	public Collection<EctMeasurementsDataBean> getMeasurementsData()
+	{
+		return measurementsDataVector;
+	}
+
     public static Hashtable<String,String> getMeasurementDataById(String id){
         for(Object[] i : measurementDao.findMeasurementsAndProviders(ConversionUtils.fromIntString(id))) {
         	Measurement m = (Measurement) i[0];

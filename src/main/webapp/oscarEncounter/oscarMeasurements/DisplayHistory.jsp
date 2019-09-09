@@ -31,15 +31,48 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
-<%@ page import="oscar.oscarEncounter.pageUtil.*"%>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.pageUtil.*"%>
-<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.*"%>
-<%@ page import="java.util.Vector"%>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler" %>
+<%@ page import="oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 
 <%
-    String demo = ((Integer) request.getAttribute("demographicNo")).toString();	
+	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+
+	String demo = "";
+	if (request.getAttribute("demographicNo") != null)
+	{
+		demo = ((Integer) request.getAttribute("demographicNo")).toString();
+	}
+	else if (request.getParameter("demographicNo") != null)
+	{
+		demo = request.getParameter("demographicNo");
+	}
+
+	// not sure if we only ever check via param
+	String type = request.getParameter("type");
+	if (type == null || type.isEmpty())
+	{
+		type = request.getAttribute("type").toString();
+	}
+
+
+	// If this attribute hasn't been added to the session yet, we need to add it to the session
+	// Note: this only occurs on a first pass of the system before a user's loaded an encounter page.
+	// The moment a user loads an encounter page, everything is fine and this will be skipped
+	if (request.getSession().getAttribute("measurementsData") == null && type != null && !type.isEmpty())
+	{
+		// rethink the direct read here
+		EctMeasurementsDataBeanHandler handler = new EctMeasurementsDataBeanHandler(Integer.parseInt(demo), type);
+		List<EctMeasurementsDataBean> measurements = (List<EctMeasurementsDataBean>)handler.getMeasurementsData();
+		EctMeasurementsDataBeanHandler.addRemoteMeasurements(loggedInInfo, measurements, type, Integer.parseInt(demo));
+		// Now that we have the measurements, toss em in to the request and continue on like the page normally would
+		request.setAttribute("measurementsData", handler);
+		request.setAttribute("type", type);
+	}
+
 %>
 
 <html:html locale="true">
