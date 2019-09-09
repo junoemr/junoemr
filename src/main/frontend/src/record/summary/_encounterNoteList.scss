@@ -30,7 +30,11 @@
 			border: 1px solid $color-neutral-light;
 			border-top: none;
 			border-radius: 0 0 $common-border-radius $common-border-radius;
-			padding: 4px 8px;
+			padding: 8px 8px 0 8px;
+
+			.btn {
+				height: $form-input-height; // match the input height
+			}
 		}
 	}
 
@@ -38,13 +42,10 @@
 
 		// styling for the note component
 		.encounter-note-container {
-			//border: 1px solid $color-neutral-light;
-			//border-radius: 6px;
 			margin-bottom: 10px;
 			border-left: 8px solid $color-neutral-light;
 			border-top-left-radius: $common-border-radius;
 			border-bottom-left-radius: $common-border-radius;
-			//border-left-width: 10px;
 
 			@include juno-font-label(12px);
 			color: $color-neutral-darker;

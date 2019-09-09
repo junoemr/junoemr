@@ -13,53 +13,49 @@
 		</a>
 		<div class="note-list-filters form-horizontal" ng-show="$ctrl.showFilters">
 			<div class="row">
-				<div class="col-md-10">
-					<div class="row">
-						<div class="col-md-6">
-							<ca-field-boolean
-									ca-name="check-filter-basic-notes"
-									ca-title="Just Encounter Notes"
-									ca-label-size="col-md-9"
-									ca-input-size="col-md-3"
-									ca-model="$ctrl.filter.onlyNotes"
-									ca-template="juno"
-							>
-							</ca-field-boolean>
-						</div>
-						<div class="col-md-6">
-							<ca-field-boolean
-									ca-name="check-filter-my-notes"
-									ca-title="Just Mine"
-									ca-label-size="col-md-9"
-									ca-input-size="col-md-3"
-									ca-model="$ctrl.filter.onlyMine"
-									ca-template="juno"
-							>
-							</ca-field-boolean>
-						</div>
-					</div>
+				<div class="col-md-3">
+					<ca-field-boolean
+							ca-name="check-filter-basic-notes"
+							ca-title="Just Encounter Notes"
+							ca-label-size="col-md-9"
+							ca-input-size="col-md-3"
+							ca-model="$ctrl.filter.onlyNotes"
+							ca-template="juno"
+					>
+					</ca-field-boolean>
 				</div>
-				<div class="col-md-2">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-10">
+				<div class="col-md-9">
 					<ca-field-text
 							ca-name="encounter-note-filter"
 							ca-title="Text"
-							ca-label-size="col-md-2"
-							ca-input-size="col-md-10"
+							ca-label-size="col-md-1"
+							ca-input-size="col-md-11"
 							ca-model="$ctrl.filter.textFilter"
 							ca-rows="1"
 					>
 					</ca-field-text>
 				</div>
-				<div class="col-md-2">
-					<div class="form-group">
-						<button class="btn btn-xs btn-primary"
-								ng-click="$ctrl.clearFilters()">
-							Clear All
-						</button>
+			</div>
+			<div class="row">
+				<div class="col-md-3">
+					<ca-field-boolean
+							ca-name="check-filter-my-notes"
+							ca-title="Just Mine"
+							ca-label-size="col-md-9"
+							ca-input-size="col-md-3"
+							ca-model="$ctrl.filter.onlyMine"
+							ca-template="juno"
+					>
+					</ca-field-boolean>
+				</div>
+				<div class="col-md-9">
+					<div class="col-md-12">
+						<div class="form-group pull-right">
+							<button class="btn btn-sm btn-primary"
+									ng-click="$ctrl.clearFilters()">
+								Clear Filters
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
