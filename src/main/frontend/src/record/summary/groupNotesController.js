@@ -271,12 +271,12 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			controller.groupNotesForm.encounterNote.encounterType = "";
 			controller.groupNotesForm.encounterNote.encounterTime = "";
 			controller.groupNotesForm.encounterNote.assignedIssues = controller.groupNotesForm.assignedCMIssues;
-			controller.groupNotesForm.encounterNote.summaryCode = controller.page.code; //'ongoingconcerns';
+			controller.groupNotesForm.encounterNote.summaryCode = controller.page.code;
 
 			noteService.saveIssueNote($stateParams.demographicNo, controller.groupNotesForm).then(
 				function success(results)
 				{
-					$uibModalInstance.close(controller.groupNotesForm.encounterNote);
+					$uibModalInstance.close(results.body);
 					$state.transitionTo($state.current, $stateParams, {
 						reload: false,
 						inherit: false,

@@ -71,6 +71,13 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.user = user;
 
+		// store functions in child components that this controller can access.
+		controller.componentFn = {
+			encNoteList: {
+				refresh: null
+			}
+		};
+
 		//get access rights
 		securityService.hasRight("_eChart", "r", $stateParams.demographicNo).then(
 			function success(results)
@@ -137,19 +144,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		{
 			// open forms tab with "Library" list selected
 			$state.go('record.forms', {formListId: 1});
-		};
-
-		// Call the findGroupNote function and search for the given note, if found, open the groupNote editor
-		controller.editGroupNote = function editGroupNote(note)
-		{
-			var obj = controller.findGroupNote(note);
-
-			if (obj !== null)
-			{
-				obj.module.editorNames = note.editorNames;
-				controller.gotoState(obj.note, obj.module);
-				return;
-			}
 		};
 
 		// There is probably a better way of doing this
@@ -292,10 +286,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			modalInstance.result.then(successCallback, dismissCallback);
 		};
 
-		controller.editGroupedNotes = function editGroupedNotes(size, mod, action)
+		controller.editGroupedNotes = function editGroupedNotes(size, mod, action, successCallback, dismissCallback)
 		{
-
-			console.info(size, mod, action);
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'src/record/summary/groupNotes.jsp',
@@ -320,32 +312,46 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				}
 			});
 
+
 			modalInstance.result.then(
 				function success(results)
 				{
-					console.log(results);
+					// trigger the callback
+					if(angular.isFunction(successCallback))
+					{
+						successCallback(results);
+					}
+
+					// refresh the main note list
+					if(angular.isFunction(controller.componentFn.encNoteList.refresh))
+					{
+						controller.componentFn.encNoteList.refresh();
+					}
 					getLeftItems();
 					getRightItems();
 				},
-				function dismiss(errors)
+				function dismiss(reason)
 				{
-					// do nothing
+					if (angular.isFunction(dismissCallback))
+					{
+						dismissCallback(reason);
+					}
 				}
 			);
 		};
 
-
-		controller.gotoState = function gotoState(item, mod)
+		//TODO I would really like to refactor this out
+		controller.gotoState = function gotoState(item, mod, successCallback, dismissCallback)
 		{
 			if (item == "add")
 			{
-				controller.editGroupedNotes('md', mod, null);
+				controller.editGroupedNotes('md', mod, null, successCallback, dismissCallback);
 
 			}
 			else if (item.action == 'add' && item.type == 'dx_reg')
 			{
 
-				controller.editGroupedNotes('lg', mod, item.id);
+				controller.editGroupedNotes('lg', mod, item.id, successCallback, dismissCallback);
 
 			}
 			else if (item.type == 'lab' || item.type == 'document' || item.type == 'rx' || item.type == 'allergy' || item.type == 'prevention' || item.type == 'dsguideline')
@@ -375,7 +381,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 			else if (item.action == 'action')
 			{
-				controller.editGroupedNotes('lg', mod, item.id);
+				controller.editGroupedNotes('lg', mod, item.id, successCallback, dismissCallback);
 
 			}
 			else
@@ -475,7 +481,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				});
 		};
 
-		controller.onSummaryModAdd = function onSummaryModAdd(module)
+		controller.onSummaryModAdd = function onSummaryModAdd(module, successCallback, dismissCallback)
 		{
 			if (module.summaryCode === 'othermeds' ||
 				module.summaryCode === 'ongoingconcerns' ||
@@ -483,10 +489,9 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				module.summaryCode === 'sochx' ||
 				module.summaryCode === 'famhx' ||
 				module.summaryCode === 'reminders' ||
-				module.summaryCode === 'riskfactors' ||
 				module.summaryCode === 'riskfactors')
 			{
-				controller.gotoState('add', module);
+				controller.editGroupedNotes('md', module, null, successCallback, dismissCallback);
 			}
 			else if (module.summaryCode === 'meds')
 			{
@@ -504,6 +509,12 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			{
 				controller.openPreventions(controller.demographicNo);
 			}
+		};
+
+		// called when a child component is initialized. this allows the controller to call select child methods
+		controller.registerEncNoteListFunctions = function(refresh)
+		{
+			controller.componentFn.encNoteList.refresh = refresh;
 		}
 	}
 ]);

@@ -38,9 +38,9 @@
 				<summary-module
 						module="mod"
 						item-display-count="mod.displaySize"
-						onclick-item="summaryCtrl.gotoState(item, module)"
+						onclick-item="summaryCtrl.gotoState(item, module, successCallback, dismissCallback)"
 						enable-add-button="true"
-						onclick-add="summaryCtrl.onSummaryModAdd(module)"
+						onclick-add="summaryCtrl.onSummaryModAdd(module, successCallback, dismissCallback)"
 				>
 				</summary-module>
 			</fieldset>
@@ -81,6 +81,7 @@
 								on-edit-cpp="summaryCtrl.onEditCpp(note, successCallback, dismissCallback)"
 								on-edit-note="summaryCtrl.bubbleUpEditNoteCallback(note, successCallback, dismissCallback)"
 								selected-note-hash="summaryCtrl.page.selectedNoteHash"
+								register-functions="summaryCtrl.registerEncNoteListFunctions(refresh)"
 						>
 						</encounter-note-list>
 					</div>
@@ -107,7 +108,7 @@
 				<summary-module
 						module="mod"
 						item-display-count="mod.displaySize"
-						onclick-item="summaryCtrl.gotoState(item, module)"
+						onclick-item="summaryCtrl.gotoState(item, module, successCallback, dismissCallback)"
 						enable-filter="true"
 				>
 				</summary-module>

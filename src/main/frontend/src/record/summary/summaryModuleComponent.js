@@ -24,6 +24,7 @@
  */
 
 angular.module('Record.Summary').component('summaryModule', {
+	templateUrl: "src/record/summary/summaryModuleTemplate.jsp",
 	bindings: {
 		module: '<',
 		itemDisplayCount: '<', // how many list items to display before requiring expansion
@@ -34,7 +35,6 @@ angular.module('Record.Summary').component('summaryModule', {
 		enableFilter: '<',
 		enableAddButton: '<',
 	},
-	templateUrl: "src/record/summary/summaryModuleTemplate.jsp",
 	controller: [function ()
 	{
 		var ctrl = this;
@@ -50,6 +50,8 @@ angular.module('Record.Summary').component('summaryModule', {
 			ctrl.enableFilter = ctrl.enableFilter || false;
 			ctrl.enableAddButton = ctrl.enableAddButton || false;
 			ctrl.maxItemNameLength = ctrl.maxItemNameLength || 34;
+			ctrl.onclickItem = ctrl.onclickItem || null;
+			ctrl.onclickAdd = ctrl.onclickAdd || null;
 		};
 
 		ctrl.$onChanges = function(bindingHash)
@@ -78,12 +80,28 @@ angular.module('Record.Summary').component('summaryModule', {
 			ctrl.onclickItem({
 				'module': ctrl.module,
 				'item': item,
+				successCallback: function (newItem)
+				{
+					//TODO could update to the item list here instead of refresh in parent controller
+				},
+				dismissCallback: function (reason)
+				{
+					//do nothing
+				}
 			});
 		};
 		ctrl.addBtnCallback = function addBtnCallback()
 		{
 			ctrl.onclickAdd({
 				'module': ctrl.module,
+				successCallback: function (newItem)
+				{
+					//TODO could add to the item list here instead of refresh in parent controller
+				},
+				dismissCallback: function (reason)
+				{
+					//do nothing
+				}
 			});
 		};
 

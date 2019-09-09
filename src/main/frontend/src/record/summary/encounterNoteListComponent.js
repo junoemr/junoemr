@@ -30,6 +30,7 @@ angular.module('Record.Summary').component('encounterNoteList', {
 		selectedNoteHash: '=',
 		onEditCpp: '&',
 		onEditNote: '&',
+		registerFunctions: '&',
 	},
 	controller: [
 		'$scope',
@@ -64,14 +65,14 @@ angular.module('Record.Summary').component('encounterNoteList', {
 			ctrl.selectedNoteHash = ctrl.selectedNoteHash || {};
 			ctrl.onEditCpp =  ctrl.onEditCpp || null;
 			ctrl.onEditNote =  ctrl.onEditNote || null;
-		};
+			ctrl.registerFunctions = ctrl.registerFunctions || null;
 
-		ctrl.$onChanges = function(bindingHash)
-		{
-			// bindingsHash only has data for changed bindings, so check for object existance
-			if(Juno.Common.Util.exists(bindingHash.noteList))
+			// call this method with functions that the parent is allowed to call.
+			if (angular.isFunction(ctrl.registerFunctions))
 			{
-				// ctrl.noteList = bindingHash.noteList.currentValue;
+				ctrl.registerFunctions({
+					refresh: ctrl.refresh
+				});
 			}
 		};
 
@@ -214,7 +215,7 @@ angular.module('Record.Summary').component('encounterNoteList', {
 				},
 				function error(errors)
 				{
-					console.log(errors);
+					console.error(errors);
 					ctrl.error = errors;
 					ctrl.busy = false;
 				}
@@ -226,6 +227,7 @@ angular.module('Record.Summary').component('encounterNoteList', {
 		{
 			ctrl.index = 0;
 			ctrl.noteList = [];
+			ctrl.moreNotes = true;
 			ctrl.addMoreItems();
 		}
 
