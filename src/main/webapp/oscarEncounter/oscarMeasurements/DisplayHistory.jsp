@@ -60,15 +60,14 @@
 
 
 	// If this attribute hasn't been added to the session yet, we need to add it to the session
-	// Note: this only occurs on a first pass of the system before a user's loaded an encounter page.
+	// NOTE: this only occurs on a first pass of the system before a user's loaded an encounter page.
 	// The moment a user loads an encounter page, everything is fine and this will be skipped
 	if (request.getSession().getAttribute("measurementsData") == null && type != null && !type.isEmpty())
 	{
-		// rethink the direct read here
 		EctMeasurementsDataBeanHandler handler = new EctMeasurementsDataBeanHandler(Integer.parseInt(demo), type);
 		List<EctMeasurementsDataBean> measurements = (List<EctMeasurementsDataBean>)handler.getMeasurementsData();
 		EctMeasurementsDataBeanHandler.addRemoteMeasurements(loggedInInfo, measurements, type, Integer.parseInt(demo));
-		// Now that we have the measurements, toss em in to the request and continue on like the page normally would
+		// Now that we have the measurements, toss them in to the request and continue on like the page normally would
 		request.setAttribute("measurementsData", handler);
 		request.setAttribute("type", type);
 	}
@@ -203,7 +202,7 @@
 				<tr>
 					<td><input type="button" name="Button"
 						value="List Old Measurements Index"
-						onClick="javascript: popupPage(300,800,'SetupHistoryIndex.do')"></td>
+						onClick="javascript: popupPage(300,800,'<%=request.getContextPath()%>/oscarEncounter/oscarMeasurements/HistoryIndex.jsp?demographicNo=<%=demo%>')"></td>
 					<td><input type="button" name="Button"
 						value="<bean:message key="global.btnPrint"/>"
 						onClick="window.print()"></td>
