@@ -92,6 +92,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.$storage = $localStorage; // Define persistent storage
 		controller.recordtabs2 = [];
+		controller.working = false;
 
 		controller.init = function init()
 		{
@@ -322,6 +323,10 @@ angular.module('Record').controller('Record.RecordController', [
 		});
 		//////		
 
+		controller.isWorking = function isWorking()
+		{
+			return controller.working;
+		};
 
 		// Note Input Logic
 		controller.toggleNote = function toggleNote()
@@ -357,12 +362,19 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.saveNote = function saveNote()
 		{
+			if(controller.isWorking())
+			{
+				return;
+			}
 			// Don't let users save an empty note
 			if (controller.page.encounterNote.note.length === 0)
 			{
 				alert("Can't save a blank note!"); // Placeholder error handling
 				return;
 			}
+
+			controller.working = true;
+
 			// Check if this is a new note, if it isn't, we don't want to overwrite the existing observationDate
 			// Need to find a better way of preventing this date overwrite
 			controller.page.encounterNote.assignedIssues = controller.page.assignedCMIssues;
@@ -385,22 +397,32 @@ angular.module('Record').controller('Record.RecordController', [
 					controller.$storage.hideNote = true;
 					controller.getCurrentNote(false);
 					controller.page.assignedCMIssues = [];
+					controller.working = false;
 				},
 				function error(errors)
 				{
 					console.log(errors);
+					controller.working = false;
 				});
 			controller.removeEditingNoteFlag();
 		};
 
 		controller.saveSignNote = function saveSignNote()
 		{
+			if(controller.isWorking())
+			{
+				return;
+			}
 			controller.page.encounterNote.isSigned = true;
 			controller.saveNote();
 		};
 
 		controller.saveSignVerifyNote = function saveSignVerifyNote()
 		{
+			if(controller.isWorking())
+			{
+				return;
+			}
 			controller.page.encounterNote.isVerified = true;
 			controller.page.encounterNote.isSigned = true;
 			controller.saveNote();
@@ -439,6 +461,10 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.saveSignBillNote = function saveSignBillNote()
 		{
+			if(controller.isWorking())
+			{
+				return;
+			}
 			controller.page.encounterNote.isSigned = true;
 			controller.saveNote();
 
