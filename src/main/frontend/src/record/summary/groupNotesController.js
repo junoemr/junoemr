@@ -46,6 +46,8 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 			position: 1
 		};
 
+		controller.working = false;
+
 
 		//set hidden which can can move out of hidden to $scope values
 		var now = new Date();
@@ -113,6 +115,11 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 				event.preventDefault();
 				event.stopPropagation();
 			}
+		};
+
+		controller.isWorking = function isWorking()
+		{
+			return controller.working;
 		};
 
 		displayIssueId = function displayIssueId(issueCode)
@@ -245,6 +252,12 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 
 		controller.saveGroupNotes = function saveGroupNotes()
 		{
+			if(controller.isWorking())
+			{
+				return;
+			}
+			controller.working = true;
+
 			if (controller.groupNotesForm.encounterNote.noteId == null)
 			{
 				controller.groupNotesForm.encounterNote.noteId = 0;
@@ -269,11 +282,12 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 						inherit: false,
 						notify: true
 					});
-
+					controller.working = false;
 				},
 				function error(errors)
 				{
 					console.log(errors);
+					controller.working = false;
 				});
 		};
 
@@ -367,6 +381,10 @@ angular.module('Record.Summary').controller('Record.Summary.GroupNotesController
 
 		controller.archiveGroupNotes = function archiveGroupNotes()
 		{
+			if(controller.isWorking())
+			{
+				return;
+			}
 			//controller.master = angular.copy(controller.groupNotesForm);
 			controller.groupNotesForm.encounterNote.archived = true;
 			controller.saveGroupNotes();
