@@ -55,8 +55,8 @@
 				<button class="btn btn-icon"
 				        ng-disabled="!$ctrl.allowNoteExpansion()"
 				        ng-click="$ctrl.toggleMinimizeNote()">
-					<i class="icon icon-chevron-down" ng-if="$ctrl.minimized"></i>
-					<i class="icon icon-chevron-up" ng-if="!$ctrl.minimized"></i>
+					<i class="icon icon-chevron-down" ng-if="$ctrl.minimized || !$ctrl.allowNoteExpansion()"></i>
+					<i class="icon icon-chevron-up" ng-if="!$ctrl.minimized && $ctrl.allowNoteExpansion()"></i>
 				</button>
 			</div>
 		</div>

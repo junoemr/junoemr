@@ -36,11 +36,14 @@ angular.module('Record.Summary').component('encounterNoteList', {
 		'$scope',
 		'$stateParams',
 		'noteService',
+		'providerService',
 		function ($scope,
 		          $stateParams,
-		          noteService)
+		          noteService,
+		          providerService)
 	{
 		var ctrl = this;
+
 
 		ctrl.$onInit = function()
 		{
@@ -66,6 +69,13 @@ angular.module('Record.Summary').component('encounterNoteList', {
 			ctrl.onEditCpp =  ctrl.onEditCpp || null;
 			ctrl.onEditNote =  ctrl.onEditNote || null;
 			ctrl.registerFunctions = ctrl.registerFunctions || null;
+
+			providerService.getSettings().then(
+				function success(results)
+				{
+					ctrl.providerSettings = results;
+				}
+			);
 
 			// call this method with functions that the parent is allowed to call.
 			if (angular.isFunction(ctrl.registerFunctions))
@@ -180,6 +190,22 @@ angular.module('Record.Summary').component('encounterNoteList', {
 				return false;
 			}
 			return !note.deleted;
+		};
+
+		ctrl.setNoteMinimized = function setNoteMinimized(note)
+		{
+			var cmeNoteDate = ctrl.providerSettings.cmeNoteDate;
+			var minimizeNote = false;
+
+			// if the note observation date is before the cutoff, minimize the note
+			if(Juno.Common.Util.exists(cmeNoteDate) && Juno.Common.Util.isIntegerString(cmeNoteDate))
+			{
+				// the property stores a negative number, so add to get a past date
+				var cutoffDate = moment().add(cmeNoteDate, 'months');
+				var noteDate = moment(note.observationDate);
+				minimizeNote = (cutoffDate.isAfter(noteDate, 'days'));
+			}
+			return minimizeNote;
 		};
 
 		//Note display functions

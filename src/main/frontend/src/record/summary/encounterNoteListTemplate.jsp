@@ -78,6 +78,7 @@
 						on-edit-cpp="$ctrl.bubbleUpEditCppCallback(note, successCallback, dismissCallback)"
 						on-edit-note="$ctrl.bubbleUpEditNoteCallback(note, successCallback, dismissCallback)"
 						on-toggle-select="$ctrl.onSelectionStateChange(note, selected)"
+						minimized="$ctrl.setNoteMinimized(note)"
 				>
 				</encounter-note>
 			</div>
