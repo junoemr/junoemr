@@ -34,7 +34,7 @@
 
 	<div class="row" ng-show="summaryCtrl.page.canRead === true">
 		<div class="col-md-3 col-sm-4 col-xs-12" id="summary-section-left">
-			<fieldset class="module-list" ng-repeat="mod in summaryCtrl.page.columnOne.modules">
+			<div class="module-list" ng-repeat="mod in summaryCtrl.page.columnOne.modules">
 				<summary-module
 						module="mod"
 						item-display-count="mod.displaySize"
@@ -43,7 +43,7 @@
 						onclick-add="summaryCtrl.onSummaryModAdd(module, successCallback, dismissCallback)"
 				>
 				</summary-module>
-			</fieldset>
+			</div>
 		</div>
 
 		<div class="col-md-6 col-sm-7 col-xs-10 col-sm-offset-0 col-xs-offset-1"
@@ -104,7 +104,7 @@
 			 id="summary-section-right"
 			 ng-click="summaryCtrl.checkAction($event)"
 			 ng-keypress="summaryCtrl.checkAction($event)">
-			<fieldset ng-repeat="mod in summaryCtrl.page.columnThree.modules">
+			<div ng-repeat="mod in summaryCtrl.page.columnThree.modules">
 				<summary-module
 						module="mod"
 						item-display-count="mod.displaySize"
@@ -112,7 +112,7 @@
 						enable-filter="true"
 				>
 				</summary-module>
-			</fieldset>
+			</div>
 		</div>
 	</div>
 </div>

@@ -7,8 +7,8 @@
 			<div class="flex-row vertical-align flex-grow justify-content-between">
 				<i class="icon icon-filter"></i>
 				<span>Filter Encounter Notes</span>
-				<i class="icon icon-chevron-down" ng-if="!$ctrl.showFilters"></i>
-				<i class="icon icon-chevron-up" ng-if="$ctrl.showFilters"></i>
+				<i class="icon icon-view-off" ng-if="!$ctrl.showFilters"></i>
+				<i class="icon icon-view" ng-if="$ctrl.showFilters"></i>
 			</div>
 		</a>
 		<div class="note-list-filters form-horizontal" ng-show="$ctrl.showFilters">
@@ -51,7 +51,7 @@
 				<div class="col-md-9">
 					<div class="col-md-12">
 						<div class="form-group pull-right">
-							<button class="btn btn-sm btn-primary"
+							<button class="btn btn-sm btn-default"
 									ng-click="$ctrl.clearFilters()">
 								Clear Filters
 							</button>

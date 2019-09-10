@@ -2,12 +2,13 @@
 <div class="summary-module-base form-horizontal">
 	<div class="summary-module-header">
 		<div class="flex-row align-items-center">
-			<h4 class="flex-grow">{{$ctrl.module.displayName}}</h4>
+			<h5 class="flex-grow title">{{$ctrl.module.displayName}}</h5>
 			<button ng-if="$ctrl.enableAddButton"
-					class="btn btn-xs btn-success btn-add pull-right"
+					class="btn btn-xs btn-primary-inverted btn-add"
 			        ng-click="$ctrl.addBtnCallback()"
 			>
 				Add
+				<i class="icon icon-plus-circle"></i>
 			</button>
 		</div>
 		<ca-field-text
