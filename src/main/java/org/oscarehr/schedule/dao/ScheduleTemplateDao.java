@@ -342,7 +342,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"    FROM \n" +
 				"    (\n" +
 				"      SELECT * FROM scheduledate\n" +
-				"      WHERE sdate BETWEEN :startDateTime AND :endDateTime\n" +
+				"      WHERE sdate BETWEEN :startDate AND :endDateTime\n" +
 				"      AND provider_no = :providerNo\n" +
 				"      AND status = 'A'\n" +
 				"    ) as sd\n" +
@@ -362,6 +362,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"    AND appt.start_time < (appointment_slots.start_time + INTERVAL duration MINUTE) AND SEC_TO_TIME(CEIL(TIME_TO_SEC(appt.end_time) / 300 ) * 300) > appointment_slots.start_time\n" +
 				"\n" +
 				"  WHERE appt.appointment_no is null\n" +
+				"  AND appointment_slots.start_datetime >= :startDateTime \n" +
 				"  GROUP BY 1,2,3,4,5,6,7,8\n" +
 				"  ORDER BY appointment_slots.start_datetime\n" +
 				"\n";
@@ -434,16 +435,17 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 					addSlotFitsSQL +
 				"\n) AS slots_with_end_slots \n " +
 				"where \n" +
-				"( \n" +
-				"  (\n" +
-				"    FLOOR\n" +
-				"    (\n" +
-				"      TIME_TO_SEC(slots_with_end_slots.start_time) / (slots_with_end_slots.duration * 60)\n" +
-				"    ) * slots_with_end_slots.duration * 60\n" +
-				"  ) = TIME_TO_SEC(slots_with_end_slots.start_time) \n" +
-				"\n" +
-				"  OR slots_with_end_slots.is_start_slot \n" +
-				") AND slots_with_end_slots.slot_fits\n";
+				" slots_with_end_slots.slot_fits\n";
+//				"( \n" +
+//				"  (\n" +
+//				"    FLOOR\n" +
+//				"    (\n" +
+//				"      TIME_TO_SEC(slots_with_end_slots.start_time) / (slots_with_end_slots.duration * 60)\n" +
+//				"    ) * slots_with_end_slots.duration * 60\n" +
+//				"  ) = TIME_TO_SEC(slots_with_end_slots.start_time) \n" +
+//				"\n" +
+//				"  OR slots_with_end_slots.is_start_slot \n" +
+//				") AND slots_with_end_slots.slot_fits\n";
 
 
 
