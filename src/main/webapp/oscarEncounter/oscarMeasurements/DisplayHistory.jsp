@@ -41,12 +41,8 @@
 <%
 	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
-	String demo = "";
-	if (request.getAttribute("demographicNo") != null)
-	{
-		demo = ((Integer) request.getAttribute("demographicNo")).toString();
-	}
-	else if (request.getParameter("demographicNo") != null)
+	String demo = (String)request.getAttribute("demographicNo");
+	if (demo == null || demo.isEmpty())
 	{
 		demo = request.getParameter("demographicNo");
 	}
@@ -63,7 +59,7 @@
 	if (request.getSession().getAttribute("measurementsData") == null && type != null && !type.isEmpty())
 	{
 		EctMeasurementsDataBeanHandler handler = new EctMeasurementsDataBeanHandler(Integer.parseInt(demo), type);
-		List<EctMeasurementsDataBean> measurements = (List<EctMeasurementsDataBean>)handler.getMeasurementsData();
+		List<EctMeasurementsDataBean> measurements = (List<EctMeasurementsDataBean>)handler.getMeasurementsDataVector();
 		EctMeasurementsDataBeanHandler.addRemoteMeasurements(loggedInInfo, measurements, type, Integer.parseInt(demo));
 		// Now that we have the measurements, toss them in to the request and continue on like the page normally would
 		request.setAttribute("measurementsData", handler);
