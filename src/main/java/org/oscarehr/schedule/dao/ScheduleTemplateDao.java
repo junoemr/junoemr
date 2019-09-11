@@ -327,7 +327,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"   appointment_slots.start_time_offset,\n" +
 				"   appointment_slots.duration,\n" +
 				"   appointment_slots.start_datetime + INTERVAL " +
-				"     appointment_slots.duration MINUTE AS end_time,\n" +
+				"     appointment_slots.start_time_offset MINUTE AS end_time,\n" +
 				"   GROUP_CONCAT(appt.appointment_no SEPARATOR ',') AS ids\n" +
 				"  FROM\n" +
 				"  (\n" +
@@ -366,7 +366,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"    appt.appointment_date = appointment_slots.slot_date\n" +
 				"    AND appt.provider_no = :providerNo \n" +
 				"    AND appt.start_time < (appointment_slots.start_time + \n" +
-				"      INTERVAL duration MINUTE) \n" +
+				"      INTERVAL start_time_offset MINUTE) \n" +
 				"    AND SEC_TO_TIME(CEIL(TIME_TO_SEC(appt.end_time) / 300 ) * 300) > \n " +
 				"      appointment_slots.start_time\n" +
 				"\n" +
