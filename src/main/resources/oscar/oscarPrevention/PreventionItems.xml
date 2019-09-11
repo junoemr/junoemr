@@ -560,4 +560,12 @@ Varicella Immunoglobulin	VarIg
 		layout="PAPMAM"
 		showIfMinRecordNum="1" />
 
+	<item
+		resultDesc=""
+		desc="Fecal Immunochemical Test"
+		name="FIT"
+		healthCanadaType="FIT"
+		layout="PAPMAM"
+		showIfMinRecordNum="1" />
+
 </preventions>
