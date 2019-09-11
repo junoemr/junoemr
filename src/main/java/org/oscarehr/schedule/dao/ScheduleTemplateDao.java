@@ -326,14 +326,16 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"   appointment_slots.start_time,\n" +
 				"   appointment_slots.start_time_offset,\n" +
 				"   appointment_slots.duration,\n" +
-				"   appointment_slots.start_datetime + INTERVAL appointment_slots.start_time_offset MINUTE AS end_time,\n" +
+				"   appointment_slots.start_datetime + INTERVAL " +
+				"     appointment_slots.duration MINUTE AS end_time,\n" +
 				"   GROUP_CONCAT(appt.appointment_no SEPARATOR ',') AS ids\n" +
 				"  FROM\n" +
 				"  (\n" +
 				"    SELECT\n" +
 				"      SUBSTRING(st.timecode, seq + 1, 1) AS code_char,\n" +
 				"      sd.sdate AS slot_date,\n" +
-				"      CONCAT(sd.sdate, ' ', SEC_TO_TIME(ROUND((24*60*60)*seq/LENGTH(st.timecode)))) as start_datetime,\n" +
+				"      CONCAT(sd.sdate, ' ', SEC_TO_TIME(ROUND( \n " +
+				"        (24 * 60 * 60) * seq / LENGTH(st.timecode)))) as start_datetime,\n" +
 				"      SEC_TO_TIME(ROUND((24*60*60)*seq/LENGTH(st.timecode))) as start_time,\n" +
 				"      ROUND((24*60) / LENGTH(st.timecode)) as start_time_offset,\n" +
 				"      stc.code,\n" +
@@ -347,19 +349,26 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"      AND status = 'A'\n" +
 				"    ) as sd\n" +
 				"    CROSS JOIN (SELECT * from seq_1_to_299) as num\n" +
-				"    JOIN scheduletemplate st ON (st.name = sd.hour AND st.provider_no IN (:providerNo, :publicCode))\n" +
-				"    LEFT JOIN scheduletemplatecode stc ON BINARY stc.code = SUBSTRING(st.timecode, seq + 1, 1)\n" +
+				"    JOIN scheduletemplate st ON (st.name = sd.hour \n " +
+				"      AND st.provider_no IN (:providerNo, :publicCode))\n" +
+				"    LEFT JOIN scheduletemplatecode stc ON BINARY stc.code = \n " +
+				"      SUBSTRING(st.timecode, seq + 1, 1)\n" +
 				"    WHERE stc.code IN (:appointmentTypes)\n" +
-				"    AND CONCAT(sd.sdate, ' ', SEC_TO_TIME(ROUND((24*60*60)*seq/LENGTH(st.timecode)))) \n " +
-				"    BETWEEN :startDate AND (:endDate + INTERVAL 1 DAY)\n" +
+				"    AND CONCAT(sd.sdate, ' ', SEC_TO_TIME(ROUND( \n " +
+				"      (24 * 60 * 60) * seq / LENGTH(st.timecode)))) \n " +
+				"      BETWEEN :startDate AND (:endDate + INTERVAL 1 DAY)\n" +
 				"    AND seq < LENGTH(st.timecode)\n" +
 				"  ) AS appointment_slots\n" +
 				"\n" +
-				"  # Join appointments onto slots to exclude any slots that are already taken\n" +
+
+				// Join appointments onto slots to exclude any slots that are already taken
 				"  LEFT JOIN appointment appt ON\n" +
 				"    appt.appointment_date = appointment_slots.slot_date\n" +
 				"    AND appt.provider_no = :providerNo \n" +
-				"    AND appt.start_time < (appointment_slots.start_time + INTERVAL duration MINUTE) AND SEC_TO_TIME(CEIL(TIME_TO_SEC(appt.end_time) / 300 ) * 300) > appointment_slots.start_time\n" +
+				"    AND appt.start_time < (appointment_slots.start_time + \n" +
+				"      INTERVAL duration MINUTE) \n" +
+				"    AND SEC_TO_TIME(CEIL(TIME_TO_SEC(appt.end_time) / 300 ) * 300) > \n " +
+				"      appointment_slots.start_time\n" +
 				"\n" +
 				"  WHERE appt.appointment_no is null\n" +
 				"  AND appointment_slots.start_datetime >= :startDateTime \n" +
@@ -383,7 +392,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 					getSlotsSql +
 				") AS slots \n" +
 
-				//" self join to get first slot in a series of slots\n" +
+				// self join to get first slot in a series of slots
 				"LEFT JOIN \n" +
 				"(\n" +
 					getSlotsSql +
@@ -393,7 +402,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"  INTERVAL slots.start_time_offset MINUTE\n" +
 				"\n" +
 
-				//" self join to get last slot in a series of slots\n" +
+				// self join to get last slot in a series of slots
 				"LEFT JOIN \n" +
 				"(\n" +
 					getSlotsSql +
@@ -419,6 +428,8 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 					addStartEndSlotSQL +
 				") AS possible_slots " +
 				"\n" +
+
+				// self join to get distance from nearest end slot in the future
 				"LEFT JOIN \n" +
 				"(\n" +
 					addStartEndSlotSQL +
