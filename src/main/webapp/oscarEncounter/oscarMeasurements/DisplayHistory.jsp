@@ -41,8 +41,14 @@
 <%
 	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
-	String demo = (String)request.getAttribute("demographicNo");
-	if (demo == null || demo.isEmpty())
+	String demo = "";
+
+	if (request.getAttribute("demographicNo") != null)
+	{
+		demo = String.valueOf(request.getAttribute("demographicNo"));
+	}
+
+	if (demo.isEmpty())
 	{
 		demo = request.getParameter("demographicNo");
 	}
