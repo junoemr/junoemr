@@ -57,10 +57,9 @@ public class MsgHandleMessagesAction extends Action {
 		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_msg", "r", null)) {
 			throw new SecurityException("missing required security object (_msg)");
 		}
-		
+
 		// Extract attributes we will need
-		MsgSessionBean bean = (MsgSessionBean) request.getSession().getAttribute("msgSessionBean");
-		String providerNo = bean.getProviderNo();
+		String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 		MsgHandleMessagesForm frm = (MsgHandleMessagesForm) form;
 		String messageNo = frm.getMessageNo();
 		String demographicNo = frm.getDemographic_no();

@@ -59,9 +59,6 @@ public class MsgProceedAction extends Action {
 		String id;
 		String demoId;
 
-		oscar.oscarMessenger.pageUtil.MsgSessionBean bean;
-		bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean) request.getSession().getAttribute("msgSessionBean");
-
 		demoId = frm.getDemoId();
 		id = frm.getId();
 
@@ -73,14 +70,13 @@ public class MsgProceedAction extends Action {
 			RemoteAttachments ra = new RemoteAttachments();
 			ra.setDemographicNo(Integer.parseInt(demoId));
 			ra.setMessageId(Integer.parseInt(id));
-			ra.setSavedBy(bean.getUserName());
+			ra.setSavedBy(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProvider().getDisplayName());
 			ra.setDate(new Date());
 			ra.setTime(new Date());
 			dao.persist(ra);
 			request.setAttribute("confMessage", "2");
 		}
 
-		bean.nullAttachment();
 
 		return (mapping.findForward("success"));
 	}

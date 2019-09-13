@@ -68,13 +68,7 @@ public class MsgViewMessageAction extends Action {
         // Extract attributes we will need
         
 
-        oscar.oscarMessenger.pageUtil.MsgSessionBean bean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)request.getSession().getAttribute("msgSessionBean");
         String providerNo= LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-        if(bean!=null)
-            providerNo = bean.getProviderNo();
-        else
-            MiscUtils.getLogger().debug("MsgSessionBean is null");
-        
         String messageNo = request.getParameter("messageID");  
         String messagePosition = request.getParameter("messagePosition");
         String linkMsgDemo = request.getParameter("linkMsgDemo");           
