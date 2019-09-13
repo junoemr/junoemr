@@ -1,5 +1,6 @@
 <div class="encounter-note-list-base flex-column">
-	<div class="note-list-header">
+	<div class="note-list-header"
+	     ng-if="$ctrl.enableFilterHeader">
 		<a class="flex-row expand-filters-bar"
 		   ng-click="$ctrl.toggleShowFilters()"
 		   title="Show/Hide note filters"

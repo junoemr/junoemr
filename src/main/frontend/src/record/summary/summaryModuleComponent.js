@@ -39,6 +39,8 @@ angular.module('Record.Summary').component('summaryModule', {
 	{
 		var ctrl = this;
 
+		ctrl.displayDateFormat = Juno.Common.Util.DisplaySettings.dateFormat;
+
 		ctrl.$onInit = function()
 		{
 			// initialize internal variables

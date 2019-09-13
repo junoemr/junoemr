@@ -71,12 +71,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.user = user;
 
-		// store functions in child components that this controller can access.
-		controller.componentFn = {
-			encNoteList: {
-				refresh: null
-			}
-		};
+		// store the child component refresh function so that this controller can trigger it.
+		controller.noteListComponentRefreshFunction = null;
 
 		//get access rights
 		securityService.hasRight("_eChart", "r", $stateParams.demographicNo).then(
@@ -323,9 +319,9 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 					}
 
 					// refresh the main note list
-					if(angular.isFunction(controller.componentFn.encNoteList.refresh))
+					if(angular.isFunction(controller.noteListComponentRefreshFunction))
 					{
-						controller.componentFn.encNoteList.refresh();
+						controller.noteListComponentRefreshFunction();
 					}
 					getLeftItems();
 					getRightItems();
@@ -514,7 +510,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		// called when a child component is initialized. this allows the controller to call select child methods
 		controller.registerEncNoteListFunctions = function(refresh)
 		{
-			controller.componentFn.encNoteList.refresh = refresh;
+			controller.noteListComponentRefreshFunction = refresh;
 		}
 	}
 ]);

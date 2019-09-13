@@ -44,6 +44,8 @@ angular.module('Record.Summary').component('encounterNote', {
 	{
 		var ctrl = this;
 
+		ctrl.displayDateFormat = Object.freeze(Juno.Common.Util.DisplaySettings.dateFormat);
+
 		ctrl.$onInit = function()
 		{
 			// initialize internal variables

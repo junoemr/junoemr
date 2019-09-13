@@ -53,6 +53,7 @@ angular.module('Record.Summary').component('encounterNoteList', {
 				onlyMine: false,
 				textFilter: null,
 			};
+			ctrl.enableFilterHeader = false; // temporarily remove the filters as they are still being developed
 			ctrl.showFilters = true;
 
 			ctrl.noteList = [];
