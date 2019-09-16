@@ -77,6 +77,7 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="java.util.SortedMap" %>
+<%@ page import="org.oscarehr.common.model.Appointment" %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties" scope="session" />
 <jsp:useBean id="appointmentInfo" class="org.oscarehr.appointment.AppointmentDisplayController" scope="page" />
@@ -1392,7 +1393,27 @@ private long getAppointmentRowSpan(
 									int appointmentCount = 0;
 									for(List<AppointmentDetails> appointmentDetailsList: schedule.getAppointments().values())
 									{
-										appointmentCount += appointmentDetailsList.size();
+
+										for(AppointmentDetails appointmentDetails : appointmentDetailsList)
+										{
+
+											/**
+											 *for ticket OHSUPPORT-6840, we have to count again at the high level
+											 * because customers will need the Do_Not_Book appointments for their record,
+											 * so just loop and ignore them (Do_Not_Book appointments) to satisfy the ticket
+											 */
+
+											if("DO_NOT_BOOK".compareToIgnoreCase(appointmentDetails.getName())==0)
+											{
+												continue;
+											}
+											else
+											{
+												appointmentCount++;
+											}
+
+										}
+
 									}
 								%>
 								<span style="padding-right: 3px;">(<%= appointmentCount %>)</span>
@@ -2074,9 +2095,26 @@ private long getAppointmentRowSpan(
 								if (showApptCountForProvider)
 								{
 									int appointmentCount = 0;
+
 									for(List<AppointmentDetails> appointmentDetailsList: schedule.getAppointments().values())
 									{
-										appointmentCount += appointmentDetailsList.size();
+										for(AppointmentDetails appointmentDetails : appointmentDetailsList)
+										{
+
+											/**
+											 *for ticket OHSUPPORT-6840, we have to count again at the high level
+											 * because customers will need the Do_Not_Book appointments for their record,
+											 * so just loop and ignore them (Do_Not_Book appointments) to satisfy the ticket
+											 */
+											if("DO_NOT_BOOK".compareToIgnoreCase(appointmentDetails.getName())==0)
+											{
+												continue;
+											}
+											else
+											{
+												appointmentCount++;
+											}
+										}
 									}
 									%>
 									<span style="padding-right: 3px;">(<%= appointmentCount %>)</span>
