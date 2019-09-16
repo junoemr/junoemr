@@ -1402,7 +1402,7 @@ private long getAppointmentRowSpan(
 											 * on the top of the schedule page
 											 */
 
-											if(Appointment.DONOTBOOK.compareToIgnoreCase(appointmentDetails.getName())==0)
+											if(Appointment.DONOTBOOK.compareToIgnoreCase(appointmentDetails.getName()) == 0)
 											{
 												continue;
 											}
@@ -2103,7 +2103,7 @@ private long getAppointmentRowSpan(
 											 *.Do_Not_Book type appointments shall not been count for appointment total
 											 * on the top of the schedule page
 											 */
-											if(Appointment.DONOTBOOK.compareToIgnoreCase(appointmentDetails.getName())==0)
+											if(Appointment.DONOTBOOK.compareToIgnoreCase(appointmentDetails.getName()) == 0)
 											{
 												continue;
 											}
