@@ -1397,10 +1397,9 @@ private long getAppointmentRowSpan(
 										for(AppointmentDetails appointmentDetails : appointmentDetailsList)
 										{
 
-											/**
-											 *for ticket OHSUPPORT-6840, we have to count again at the high level
-											 * because customers will need the Do_Not_Book appointments for their record,
-											 * so just loop and ignore them (Do_Not_Book appointments) to satisfy the ticket
+											/*
+											 *.Do_Not_Book type appointments shall not been count for appointment total
+											 * on the top of the schedule page
 											 */
 
 											if(Appointment.DONOTBOOK.compareToIgnoreCase(appointmentDetails.getName())==0)
@@ -2099,10 +2098,10 @@ private long getAppointmentRowSpan(
 										for(AppointmentDetails appointmentDetails : appointmentDetailsList)
 										{
 
-											/**
-											 *for ticket OHSUPPORT-6840, we have to count again at the high level
-											 * because customers will need the Do_Not_Book appointments for their record,
-											 * so just loop and ignore them (Do_Not_Book appointments) to satisfy the ticket
+
+											/*
+											 *.Do_Not_Book type appointments shall not been count for appointment total
+											 * on the top of the schedule page
 											 */
 											if(Appointment.DONOTBOOK.compareToIgnoreCase(appointmentDetails.getName())==0)
 											{
