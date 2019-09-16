@@ -66,8 +66,6 @@ public class MsgViewMessageAction extends Action {
 		}
     	
         // Extract attributes we will need
-        
-
         String providerNo= LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
         String messageNo = request.getParameter("messageID");  
         String messagePosition = request.getParameter("messagePosition");

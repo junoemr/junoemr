@@ -129,10 +129,12 @@ height:100% !important;
 
 		// clear documents
 		$("form[name='msgCreateMessageForm']").find("input[name='attachments']").remove();
+		$("form[name='msgCreateMessageForm']").find("input[name='attachmentTitles']").remove();
 		// add documents to form for submission.
 		attachments.forEach(function (attach){
 			$("form[name='msgCreateMessageForm']").append(
-				"<input type='hidden' name='attachments' value='" + encodeURIComponent(attach.src) + "'>"
+				"<input type='hidden' name='attachments' value='" + encodeURIComponent(attach.src) + "'>" +
+				"<input type='hidden' name='attachmentTitles' value='" + encodeURIComponent(attach.title) + "'>"
 			)
 		});
 	}
@@ -415,11 +417,11 @@ function popupAttachDemo(demographic){ // open a new popup window
 						<td>
 						<table class=messButtonsA cellspacing=0 cellpadding=3>
 							<tr>
-								<td class="messengerButtonsA"><html:link
-									page="/oscarMessenger/ClearMessage.do"
-									styleClass="messengerButtons">
-									<bean:message key="oscarMessenger.CreateMessage.btnClear" />
-								</html:link></td>
+								<td class="messengerButtonsA">
+									<a href="javascript:" class="messengerButtons" onclick="location.reload()">
+										<bean:message key="oscarMessenger.CreateMessage.btnClear" />
+									</a>
+								</td>
 							</tr>
 						</table>
 						</td>

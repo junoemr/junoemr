@@ -32,6 +32,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.oscarehr.e2e.constant.Constants;
 import oscar.util.Doc2PDF;
 
 import java.net.URLDecoder;
@@ -40,6 +41,7 @@ public final class MsgCreateMessageForm extends ActionForm {
     
     private String[] provider;
     private String[] attachments;
+    private String[] attachmentTitles;
     private String message,subject;
     private String demographic_no;
     
@@ -83,6 +85,16 @@ public final class MsgCreateMessageForm extends ActionForm {
     public void setAttachments(String[] attachments)
     {
         this.attachments = attachments;
+    }
+
+    public String[] getAttachmentTitles()
+    {
+        return attachmentTitles;
+    }
+
+    public void setAttachmentTitles(String[] attachmentTitles)
+    {
+        this.attachmentTitles = attachmentTitles;
     }
 
     /**
@@ -170,13 +182,18 @@ public final class MsgCreateMessageForm extends ActionForm {
      */
     public String getAttachmentXml(HttpServletRequest request)
     {
-        if (attachments != null)
+        if (attachments != null && attachmentTitles != null)
         {
-            String attachmentXML = "";
-            for (String attach : attachments)
+            if (attachments.length != attachmentTitles.length)
             {
-                String attachBin = Doc2PDF.parseString2Bin(request, null, "<HTML>" + URLDecoder.decode(attach) + "</HTML>");
-                attachmentXML += " " + getPDFStartTag(attachments.length) + getStatusTag("OK") + getPDFTitleTag("CHANGE ME") + getContentTag(attachBin) + getPDFEndTag();
+                throw new RuntimeException("The number of attachments [" + attachments.length + "] does not match the number of attachment titles [" + attachmentTitles.length + "]");
+            }
+
+            String attachmentXML = "";
+            for(int i =0; i < attachments.length; i++)
+            {
+                String attachBin = Doc2PDF.parseString2Bin(request, null, "<HTML>" + URLDecoder.decode(attachments[i]) + "</HTML>");
+                attachmentXML += " " + getPDFStartTag(attachments.length) + getStatusTag("OK") + getPDFTitleTag(URLDecoder.decode(attachmentTitles[i])) + getContentTag(attachBin) + getPDFEndTag();
             }
             return attachmentXML;
         }

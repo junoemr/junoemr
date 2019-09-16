@@ -27,7 +27,7 @@
 <%@ page
 	import="oscar.oscarMessenger.docxfer.send.*,oscar.oscarMessenger.docxfer.util.*, 
                 oscar.oscarEncounter.data.*, oscar.oscarEncounter.pageUtil.EctSessionBean, oscar.oscarRx.pageUtil.RxSessionBean,
-                oscar.oscarRx.data.RxPatientData, oscar.oscarMessenger.pageUtil.MsgSessionBean, oscar.oscarDemographic.data.*"%>
+                oscar.oscarRx.data.RxPatientData, oscar.oscarDemographic.data.*"%>
     
 <%@ page import=" java.util.*, org.w3c.dom.*, java.sql.*, oscar.*, java.text.*, java.lang.*,java.net.*" errorPage="../appointment/errorpage.jsp"%>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
@@ -80,8 +80,6 @@ int indexCount = 0;
 
 EctSessionBean bean = new EctSessionBean();
 bean.demographicNo = demographic_no;
-
-oscar.oscarMessenger.pageUtil.MsgSessionBean MsgSessionBean = (oscar.oscarMessenger.pageUtil.MsgSessionBean)request.getSession().getAttribute("msgSessionBean");
 
 request.getSession().setAttribute("EctSessionBean",bean);          
 
