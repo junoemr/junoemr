@@ -981,6 +981,30 @@ public class CaseManagementManager {
 		else return dg.getFirstName() + " " + dg.getLastName();
 	}
 
+	/**
+	 * get the demographic's display name
+	 * @param demoNo - demographic no
+	 * @return display name of demographic
+	 */
+	public String getDemoDisplayName(String demoNo)
+	{
+		if (demoNo == null)
+		{
+			return "";
+		}
+
+		Demographic dg = demographicDao.getClientByDemographicNo(new Integer(demoNo));
+
+		if (dg == null)
+		{
+			return "";
+		}
+		else
+		{
+			return dg.getDisplayName();
+		}
+	}
+
 	public String getDemoGender(String demoNo) {
 		String gender = "";
 

@@ -1060,7 +1060,7 @@ if(wLReadonly.equals("")){
 					}
 				%>
 				<td><a
-					href="../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(defaultBillingView)%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t<%=referral_no_parameter%>"
+					href="../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(defaultBillingView)%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName()) + URLEncoder.encode(", ") + URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t<%=referral_no_parameter%>"
 					target="_blank"
 					title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></td>
 			</tr>
