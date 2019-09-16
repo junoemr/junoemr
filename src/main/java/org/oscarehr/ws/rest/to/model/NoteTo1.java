@@ -50,6 +50,7 @@ public class NoteTo1 implements Serializable{
 	private String roleName;
 	private Integer remoteFacilityId;
 	private Integer documentId;
+	private Integer eformDataId;
 	private String uuid;
 	private Boolean hasHistory;
 	private Boolean locked;
@@ -185,6 +186,16 @@ public class NoteTo1 implements Serializable{
 	public void setDocumentId(Integer documentId)
 	{
 		this.documentId = documentId;
+	}
+
+	public Integer getEformDataId()
+	{
+		return eformDataId;
+	}
+
+	public void setEformDataId(Integer eformDataId)
+	{
+		this.eformDataId = eformDataId;
 	}
 
 	public String getUuid() {
