@@ -1403,7 +1403,7 @@ private long getAppointmentRowSpan(
 											 * so just loop and ignore them (Do_Not_Book appointments) to satisfy the ticket
 											 */
 
-											if("DO_NOT_BOOK".compareToIgnoreCase(appointmentDetails.getName())==0)
+											if(Appointment.DONOTBOOK.compareToIgnoreCase(appointmentDetails.getName())==0)
 											{
 												continue;
 											}
@@ -2106,7 +2106,7 @@ private long getAppointmentRowSpan(
 											 * because customers will need the Do_Not_Book appointments for their record,
 											 * so just loop and ignore them (Do_Not_Book appointments) to satisfy the ticket
 											 */
-											if("DO_NOT_BOOK".compareToIgnoreCase(appointmentDetails.getName())==0)
+											if(Appointment.DONOTBOOK.compareToIgnoreCase(appointmentDetails.getName())==0)
 											{
 												continue;
 											}
