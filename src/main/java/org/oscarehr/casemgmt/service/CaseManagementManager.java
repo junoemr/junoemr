@@ -50,6 +50,7 @@ import org.oscarehr.PMmodule.dao.ProgramProviderDAO;
 import org.oscarehr.PMmodule.dao.ProgramQueueDao;
 import org.oscarehr.PMmodule.model.AccessType;
 import org.oscarehr.PMmodule.model.DefaultRoleAccess;
+import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramAccess;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.model.ProgramQueue;
@@ -2057,10 +2058,8 @@ private String updateApptStatus(String status, String type) {
 		String role = null;
 		String team = null;
 
-		boolean newNote = false;
 		if (note.getCreate_date() == null) {
 			note.setCreate_date(now);
-			newNote = true;
 		}
 
 		ProgramProvider programProvider = programManager.getProgramProvider(note.getProviderNo(), note.getProgram_no());
@@ -2070,8 +2069,18 @@ private String updateApptStatus(String status, String type) {
 		}
 		else
 		{
+			// Attempt to read the provider's associated program ID so we can correct the note.
+			// This is less for the note itself and more of a work-around for casemgmt_tmpsave matching behaviour
+			List<Program> programs = programManager.getActiveProgramDomain(note.getProviderNo());
+			if (programs.size() >= 1)
+			{
+				MiscUtils.getLogger().warn("Attempting to reassign program_no for note_id " + note.getId() + " based off provider record");
+				String newProgram = Integer.toString(programs.get(0).getId());
+				MiscUtils.getLogger().warn("Reassigning '" + note.getProgram_no() + "' to '" + newProgram + "'");
+				note.setProgram_no(newProgram);
+			}
+
 			// If something went wrong in trying to get the provider's role, fall back to whatever note had before
-			MiscUtils.getLogger().error("Check that the program_number '" + note.getProgram_no() + "' is correct for note with id: " + note.getId());
 			role = note.getReporter_caisi_role();
 		}
 
