@@ -273,6 +273,7 @@ module.exports = {
 			'./src/schedule/module.js',
 			'./src/schedule/scheduleController.js',
 			'./src/schedule/eventController.js',
+			'./src/schedule/scheduleSearchComponent.js',
 			'./src/schedule/scheduleService.js',
 
 			'./src/admin/module.js',

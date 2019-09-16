@@ -1048,6 +1048,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			else if ($(jsEvent.target).is(".onclick-search"))
 			{
 				console.info("onclick-search clicked");
+				controller.openScheduleSearchDialog(resourceId);
 			}
 			else if ($(jsEvent.target).is(".onclick-day-view"))
 			{
@@ -1430,6 +1431,71 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			{
 				$scope.dialog = null;
 			});
+
+			$scope.openingDialog = false;
+		};
+
+		controller.openScheduleSearchDialog = function openScheduleSearchDialog(resourceId)
+		{
+			$scope.openingDialog = true;
+
+			var schedule = {};
+
+			var selectedUuid = controller.providerSettings.groupNo;
+			if (Juno.Common.Util.exists(selectedUuid))
+			{
+				// only choose it if it can be found in the options list
+				for (var i = 0; i < $scope.scheduleOptions.length; i++)
+				{
+					if (selectedUuid === $scope.scheduleOptions[i].uuid)
+					{
+						schedule = $scope.scheduleOptions[i];
+					}
+				}
+			}
+
+			console.info('schedule', schedule);
+
+
+
+
+
+			$scope.dialog = $uibModal.open({
+				animation: false,
+				backdrop: 'static',
+				component: 'scheduleSearch',
+				resolve: {
+					providerId: function ()
+					{
+						return resourceId;
+					},
+					scheduleStartTime: function ()
+					{
+						return $scope.getScheduleMinTime();
+					},
+					scheduleEndTime: function ()
+					{
+						return $scope.getScheduleMaxTime();
+					},
+					eventList: function ()
+					{
+						return $scope.events;
+					},
+				},
+				windowClass: "juno-modal",
+			});
+			$scope.dialog.result.then(
+				function onClose(calEvent)
+				{
+					console.info('closed', calEvent);
+					$scope.dialog = null;
+					$scope.openEditEventDialog(calEvent);
+				},
+				function onDismiss(data)
+				{
+					console.info('dismiss', data);
+					$scope.dialog = null;
+				});
 
 			$scope.openingDialog = false;
 		};

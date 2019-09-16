@@ -18,12 +18,12 @@ $page-tabs-height: 40px;
 $page-tabs-height-alt: 32px;
 $page-subheader-height: 56px;
 
-$modal-height: 560px;
-$modal-width: 960px;
+$modal-height: 512px;
+$modal-width: 800px;
 $modal-header-height: 64px;
 $modal-footer-height: 64px;
 
-$modal-border-space: 16px;
+$modal-border-space: 8px;
 
 $modal-body-height: calc(#{$modal-height} - #{$modal-header-height} - #{$modal-footer-height} - #{$modal-border-space});
 
