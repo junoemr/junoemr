@@ -57,26 +57,22 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		var controller = this;
 
-
 		controller.page = {};
 		controller.page.columnOne = {};
 		controller.page.columnOne.modules = {};
 
 		controller.page.columnThree = {};
 		controller.page.columnThree.modules = {};
-		controller.page.selectedNotes = [];
+		controller.page.selectedNoteHash = {};
 
-		controller.page.notes = {};
 		controller.index = 0;
-		controller.page.notes = {};
-		controller.page.notes.notelist = [];
 		controller.busy = false;
-		controller.page.noteFilter = {};
-		controller.page.currentFilter = 'none';
-		controller.page.onlyNotes = false; // Filter for only showing encounter notes
-		controller.page.onlyMine = false; // Filter for only showing notes the current user has created/edited
 
 		controller.demographicNo = $stateParams.demographicNo;
+		controller.user = user;
+
+		// store the child component refresh function so that this controller can trigger it.
+		controller.noteListComponentRefreshFunction = null;
 
 		//get access rights
 		securityService.hasRight("_eChart", "r", $stateParams.demographicNo).then(
@@ -117,14 +113,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 		};
 
-		controller.openRevisionHistory = function openRevisionHistory(note)
-		{
-			//var rnd = Math.round(Math.random() * 1000);
-			win = "revision";
-			var url = "../CaseManagementEntry.do?method=notehistory&noteId=" + note.noteId;
-			window.open(url, win, "scrollbars=yes, location=no, width=647, height=600", "");
-		};
-
 		controller.openRx = function openRx(demoNo)
 		{
 			win = "Rx" + demoNo;
@@ -154,64 +142,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			$state.go('record.forms', {formListId: 1});
 		};
 
-		//Note display functions
-		controller.addMoreItems = function addMoreItems()
-		{
-			if (controller.busy) return;
-
-			controller.busy = true;
-
-			noteService.getNotesFrom($stateParams.demographicNo, controller.index, 20, controller.page.noteFilter).then(
-				function success(results)
-				{
-					if (angular.isDefined(results.notelist))
-					{
-						//controller.page.notes = data;
-						if (results.notelist instanceof Array)
-						{
-							for (var i = 0; i < results.notelist.length; i++)
-							{
-								controller.page.notes.notelist.push(results.notelist[i]);
-							}
-						}
-						else
-						{
-							controller.page.notes.notelist.push(results.notelist);
-						}
-						controller.index = controller.page.notes.notelist.length;
-					}
-					controller.busy = false;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-					controller.error = errors;
-					controller.busy = false;
-				}
-			);
-
-		};
-
-		controller.addMoreItems();
-
-		controller.editNote = function editNote(note)
-		{
-			$rootScope.$emit('loadNoteForEdit', note);
-		};
-
-		// Call the findGroupNote function and search for the given note, if found, open the groupNote editor
-		controller.editGroupNote = function editGroupNote(note)
-		{
-			var obj = controller.findGroupNote(note);
-
-			if (obj !== null)
-			{
-				obj.module.editorNames = note.editorNames;
-				controller.gotoState(obj.note, obj.module, obj.note.id);
-				return;
-			}
-		};
-
 		// There is probably a better way of doing this
 		controller.findGroupNote = function findGroupNote(note)
 		{
@@ -234,147 +164,10 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			return null;
 		};
 
-		controller.page.currentEditNote = {};
-
-		controller.isNoteBeingEdited = function isNoteBeingEdited(note)
+		controller.bubbleUpEditNoteCallback = function bubbleUpEditNoteCallback(note, successCallback, dismissCallback)
 		{
-
-			if (note.uuid === controller.page.currentEditNote.uuid && note.uuid !== null)
-			{
-				return true;
-			}
-
-			return false;
-		};
-
-		$rootScope.$on('currentlyEditingNote', function(event, data)
-		{
-			controller.page.currentEditNote = data;
-		});
-
-		// TODO
-		$rootScope.$on('stopEditingNote', function()
-		{
-			controller.page.currentEditNote = {};
-		});
-
-		$rootScope.$on('noteSaved', function(event, data)
-		{
-			var noteFound = false;
-			for (var notecount = 0; notecount < controller.page.notes.notelist.length; notecount++)
-			{
-				if (data.uuid == controller.page.notes.notelist[notecount].uuid)
-				{
-					controller.page.notes.notelist[notecount] = data;
-					noteFound = true;
-					break;
-				}
-			}
-
-			if (noteFound == false)
-			{
-				controller.page.notes.notelist.unshift(data);
-			}
-			controller.index = controller.page.notes.notelist.length;
-		});
-
-		// Check if note regular note, if not, we must either display the group note edit window or have no edit option
-		controller.isRegularNote = function isRegularNote(note)
-		{
-			if (note.document || note.rxAnnotation || note.eformData || note.encounterForm || note.invoice || note.ticklerNote || note.cpp)
-			{
-				return false;
-			}
-
-			return true;
-		};
-
-		//Note display functions
-		controller.setColor = function setColor(note)
-		{
-			if (note.eformData)
-			{
-				return {
-					'border-left-color': '#DFF0D8',
-				};
-			}
-			else if (note.document)
-			{
-				return {
-					'border-left-color': '#617CB2',
-				};
-			}
-			else if (note.rxAnnotation)
-			{
-				return {
-					'border-left-color': '#D3D3D3',
-				};
-			}
-			else if (note.encounterForm)
-			{
-				return {
-					'border-left-color': '#BCAD75',
-				};
-			}
-			else if (note.invoice)
-			{
-				return {
-					'border-left-color': '##FF7272',
-				};
-			}
-			else if (note.ticklerNote)
-			{
-				return {
-					'border-left-color': '#FFA96F',
-				};
-			}
-			else if (note.cpp)
-			{
-				return {
-					'border-left-color': '#9B8166',
-				};
-			}
-		};
-
-		controller.showNoteHeader = function showNoteHeader(note)
-		{
-			if (controller.page.onlyNotes)
-			{
-				if (note.document || note.rxAnnotation || note.eformData || note.encounterForm || note.invoice || note.ticklerNote || note.cpp)
-				{
-					return false;
-				}
-			}
-			return true;
-		};
-
-		controller.showNote = function showNote(note)
-		{
-			if (controller.page.onlyNotes)
-			{
-				if (note.document || note.rxAnnotation || note.eformData || note.encounterForm || note.invoice || note.ticklerNote || note.cpp)
-				{
-					return false;
-				}
-			}
-
-			if(controller.page.onlyMine)
-			{
-				// Hide note if the current user is not in the list of editors.
-				// TODO: Decide later if we want to filter based on this rather than the author alone
-				// if (!Juno.Common.Util.isInArray(user.formattedName, note.editorNames))
-				// 	return false;
-
-				// Hide the note if the current user's provder number does not match that of the note author
-				if (user.providerNo !== note.providerNo)
-					return false;
-			}
-			return !note.deleted;
-		};
-
-		controller.getNoteHeader = function firstLine(noteObj)
-		{
-			return  noteObj.note.trim().split('\n')[0]; // First line of the note text, split by newline
+			//TODO open record controller note edit without emit?
+			$scope.$emit('loadNoteForEdit', note);
 		};
 
 		controller.trackerUrl = "";
@@ -383,97 +176,6 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		{
 			controller.trackerUrl = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo + '&numEle=4&tracker=slim';
 		};
-
-		controller.toggleList = function toggleList(mod)
-		{
-
-			// If all the items are displayed, reset displaySize to 5 (min), else, show all the items
-			if (mod.displaySize >= mod.summaryItem.length)
-			{
-				mod.displaySize = 5;
-			}
-			else
-			{
-				mod.displaySize = mod.summaryItem.length;
-			}
-		};
-
-		controller.showMoreItems = function showMoreItems(mod)
-		{
-
-			if (!angular.isDefined(mod.summaryItem))
-			{
-				return false;
-			}
-
-			if (mod.summaryItem.length == 0)
-			{
-				return false;
-			}
-
-			return true;
-		};
-
-		// Return true if a given section is expanded, otherwise return false
-		controller.isSectionExpanded = function isSectionExpanded(mod)
-		{
-			if (mod.displaySize > 5)
-			{
-				return true;
-			}
-
-			return false;
-		};
-
-		// Return true if a given section is empty, otherwise return false
-		controller.isSectionEmpty = function isSectionEmpty(mod)
-		{
-			if (mod.summaryItem.length <= 5)
-			{
-				return true;
-			}
-
-			return false;
-		};
-
-		// Returns true if the given note is an unsigned encounter note
-		controller.isUnsignedEncounterNote = function isUnsignedEncounterNote(note)
-		{
-			return (!note.isSigned && !note.cpp && !note.document && !note.ticklerNote && !note.eformData);
-		};
-
-		// controller.showMoreItemsSymbol = function(mod)
-		// {
-		// 	if (!angular.isDefined(mod.summaryItem))
-		// 	{
-		// 		return "";
-		// 	}
-
-		// 	if ((mod.displaySize < mod.summaryItem.length) && mod.displaySize == initialDisplayLimit)
-		// 	{
-		// 		return "glyphicon glyphicon-chevron-down hand-hover pull-right";
-		// 	}
-		// 	else if ((mod.displaySize == mod.summaryItem.length) && mod.displaySize != initialDisplayLimit)
-		// 	{
-		// 		return "glyphicon glyphicon-chevron-up hand-hover pull-right";
-		// 	}
-		// 	else if (mod.summaryItem.length <= initialDisplayLimit)
-		// 	{
-		// 		return "glyphicon glyphicon-chevron-down glyphicon-chevron-down-disabled pull-right";
-		// 	}
-		// 	else
-		// 	{
-		// 		return "";
-		// 	}
-
-		// 	if (controller.isSectionExpanded(mod))
-		// 	{
-		// 		return "glyphicon glyphicon-chevron-up hand-hover pull-right";
-		// 	}
-
-		// 	return "glyphicon glyphicon-chevron-down hand-hover pull-right";
-
-		// };
 
 		function getLeftItems()
 		{
@@ -541,10 +243,47 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 		}
 
-
-		controller.editGroupedNotes = function editGroupedNotes(size, mod, action)
+		controller.onEditCpp = function(note, successCallback, dismissCallback)
 		{
+			var obj = controller.findGroupNote(note);
+			if (obj === null)
+			{
+				return;
+			}
 
+			var modalInstance = $uibModal.open(
+				{
+					templateUrl: 'src/record/summary/groupNotes.jsp',
+					controller: 'Record.Summary.GroupNotesController as groupNotesCtrl',
+					backdrop: 'static',
+					windowClass: 'notesModal',
+					size: 'lg',
+					resolve:
+						{
+							mod: function()
+							{
+								return obj.module;
+							},
+							action: function()
+							{
+								return 0;
+							},
+							user: function()
+							{
+								return controller.user;
+							},
+							note: function()
+							{
+								return note;
+							}
+						}
+				});
+
+			modalInstance.result.then(successCallback, dismissCallback);
+		};
+
+		controller.editGroupedNotes = function editGroupedNotes(size, mod, action, successCallback, dismissCallback)
+		{
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'src/record/summary/groupNotes.jsp',
@@ -564,48 +303,51 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 					},
 					user: function()
 					{
-						return user;
+						return controller.user;
 					}
 				}
 			});
 
+
 			modalInstance.result.then(
 				function success(results)
 				{
-					console.log(results);
+					// trigger the callback
+					if(angular.isFunction(successCallback))
+					{
+						successCallback(results);
+					}
+
+					// refresh the main note list
+					if(angular.isFunction(controller.noteListComponentRefreshFunction))
+					{
+						controller.noteListComponentRefreshFunction();
+					}
 					getLeftItems();
 					getRightItems();
 				},
-				function error(errors)
+				function dismiss(reason)
 				{
-					if (editingNoteId != null)
+					if (angular.isFunction(dismissCallback))
 					{
-						noteService.removeEditingNoteFlag(editingNoteId, user.providerNo);
-						$interval.cancel(itvSet);
-						itvSet = null;
-						$interval.cancel(itvCheck);
-						itvCheck = null;
-						editingNoteId = null;
+						dismissCallback(reason);
 					}
-					console.log(errors);
-
-					getLeftItems();
-					getRightItems();
-				});
+				}
+			);
 		};
 
-
-		controller.gotoState = function gotoState(item, mod, itemId)
+		//TODO I would really like to refactor this out
+		controller.gotoState = function gotoState(item, mod, successCallback, dismissCallback)
 		{
 			if (item == "add")
 			{
-				controller.editGroupedNotes('md', mod, null);
+				controller.editGroupedNotes('md', mod, null, successCallback, dismissCallback);
 
 			}
 			else if (item.action == 'add' && item.type == 'dx_reg')
 			{
 
-				controller.editGroupedNotes('lg', mod, itemId);
+				controller.editGroupedNotes('lg', mod, item.id, successCallback, dismissCallback);
 
 			}
 			else if (item.type == 'lab' || item.type == 'document' || item.type == 'rx' || item.type == 'allergy' || item.type == 'prevention' || item.type == 'dsguideline')
@@ -635,7 +377,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 			else if (item.action == 'action')
 			{
-				controller.editGroupedNotes('lg', mod, itemId);
+				controller.editGroupedNotes('lg', mod, item.id, successCallback, dismissCallback);
 
 			}
 			else
@@ -693,26 +435,33 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		};
 
 
-		controller.showPrintModal = function showPrintModal(mod, action)
+		controller.showPrintModal = function showPrintModal()
 		{
-			var size = 'lg';
+			console.info(controller.page.selectedNoteHash);
+
+			var selectedNoteList = [];
+
+			Object.keys(controller.page.selectedNoteHash).forEach(function (key) {
+				var note = controller.page.selectedNoteHash[key];
+
+				selectedNoteList.push(note);
+				// iteration code
+			});
+
+			console.info(selectedNoteList);
+
 			var modalInstance = $uibModal.open(
 			{
 				templateUrl: 'src/record/print.jsp',
 				controller: 'Record.Summary.RecordPrintController as recordPrintCtrl',
 				backdrop: 'static',
-				size: size,
+				size: 'lg',
 				resolve:
 				{
-					mod: function()
+					selectedNoteList: function()
 					{
-						return mod;
+						return selectedNoteList;
 					},
-
-					action: function()
-					{
-						return action;
-					}
 				}
 			});
 
@@ -728,16 +477,40 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				});
 		};
 
-		// Toggle whether the note is selected for printing
-		controller.toggleIsSelectedForPrint = function toggleIsSelectedForPrint(note)
+		controller.onSummaryModAdd = function onSummaryModAdd(module, successCallback, dismissCallback)
 		{
-			note.isSelected = !note.isSelected;
+			if (module.summaryCode === 'othermeds' ||
+				module.summaryCode === 'ongoingconcerns' ||
+				module.summaryCode === 'medhx' ||
+				module.summaryCode === 'sochx' ||
+				module.summaryCode === 'famhx' ||
+				module.summaryCode === 'reminders' ||
+				module.summaryCode === 'riskfactors')
+			{
+				controller.editGroupedNotes('md', module, null, successCallback, dismissCallback);
+			}
+			else if (module.summaryCode === 'meds')
+			{
+				controller.openRx(controller.demographicNo);
+			}
+			else if (module.summaryCode === 'allergies')
+			{
+				controller.openAllergies(controller.demographicNo);
+			}
+			else if (module.summaryCode === 'forms')
+			{
+				controller.openForms();
+			}
+			else if (module.summaryCode === 'preventions')
+			{
+				controller.openPreventions(controller.demographicNo);
+			}
 		};
 
+		// called when a child component is initialized. this allows the controller to call select child methods
+		controller.registerEncNoteListFunctions = function(refresh)
+		{
+			controller.noteListComponentRefreshFunction = refresh;
+		}
 	}
 ]);
-
-
-var itvSet = null;
-var itvCheck = null;
-var editingNoteId = null;

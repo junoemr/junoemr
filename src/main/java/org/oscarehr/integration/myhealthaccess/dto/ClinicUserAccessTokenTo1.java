@@ -31,7 +31,7 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClinicUserAccessTokenTo1 implements Serializable
 {
-	@JsonProperty("token")
+	@JsonProperty("access_token")
 	private String token;
 
 	public String getToken()
@@ -42,11 +42,5 @@ public class ClinicUserAccessTokenTo1 implements Serializable
 	public void setToken(String token)
 	{
 		this.token = token;
-	}
-
-	public boolean isExpired()
-	{
-		// TODO check JWT expire time
-		return token == null;
 	}
 }

@@ -1,0 +1,41 @@
+.summary-module-base {
+
+	.summary-module-header {
+		.title {
+			color: $color-primary-base;
+			font-weight: bold;
+		}
+		.btn-add {
+			display: flex;
+			padding-right: 0;
+			.icon {
+				font-size: 18px;
+			}
+		}
+	}
+
+	.summary-module-body {
+		ul {
+			list-style-type: none;
+			padding-inline-start: 6px;
+		}
+		a {
+			color: $color-neutral-dark;
+		}
+		.abnormal {
+			color: $color-red-base;
+		}
+
+	}
+	.summary-module-footer {
+		display: flex;
+		justify-content: flex-end;
+		.show-all-button {
+			.icon {
+				font-size: 16px;
+				color: $color-primary-base;
+			}
+		}
+	}
+
+}
