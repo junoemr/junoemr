@@ -1407,10 +1407,8 @@ private long getAppointmentRowSpan(
 											{
 												continue;
 											}
-											else
-											{
-												appointmentCount++;
-											}
+
+											appointmentCount++;
 
 										}
 
@@ -1813,7 +1811,7 @@ private long getAppointmentRowSpan(
 															{
 														%>
 																<%=StringEscapeUtils.escapeHtml(appointmentInfo.getReason())%>
-														<% 	} 
+														<% 	}
 														} else
 														{%>
 															<!--Inline display of reason -->
@@ -2110,10 +2108,8 @@ private long getAppointmentRowSpan(
 											{
 												continue;
 											}
-											else
-											{
-												appointmentCount++;
-											}
+
+											appointmentCount++;
 										}
 									}
 									%>
