@@ -24,6 +24,13 @@
 
 --%>
 
+<%--
+	This file (so far) seems to be a non-used, duplicated functionality file of the its
+	working version 'scheduletemplateapplying.jsp'. To make oscar work safely,
+	We shall modify this file regards to the modifications made at 'scheduletemplateapplying.jsp'
+
+--%>
+
 <%
   
   String weekdaytag[] = {"SUN","MON","TUE","WED","THU","FRI","SAT"};
@@ -143,13 +150,33 @@ function addDataString1() {
 	  return true;
 	}
 }
+
+
+function disableBtnAfterSubmissionToPreventMultiSubmission()
+{
+
+	var isInputWeekDaysOK = addDataString();
+
+	var isInputDateRangeOK = addDataString1();
+
+	if(isInputWeekDaysOK === true && isInputDateRangeOK === true)
+	{
+		document.getElementById("submitBTNID").disabled = true;
+		return true;
+	}
+
+	return false;
+
+}
+
+
 //-->
 </script>
 </head>
 <body bgcolor="ivory" bgproperties="fixed" onLoad="setfocus()"
 	topmargin="0" leftmargin="0" rightmargin="0">
 <form method="post" name="schedule" action="schedulecreatedate.jsp"
-	onSubmit="addDataString();return(addDataString1())">
+	onSubmit="return(disableBtnAfterSubmissionToPreventMultiSubmission())">
 
 <table border="0" width="100%">
 	<tr>
@@ -393,7 +420,7 @@ function addDataString1() {
 				<div align="right"><input type="hidden" name="provider_no"
 					value="<%=request.getParameter("provider_no")%>"> <input
 					type="hidden" name="available" value="1"> <input
-					type="submit" name="Submit" value=" Next "> <input
+					type="submit" name="Submit" value=" Next " id ="submitBTNID"> <input
 					type="button" name="Cancel" value="Cancel" onClick="window.close()">
 				</div>
 				</td>

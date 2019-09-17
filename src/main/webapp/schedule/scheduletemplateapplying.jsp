@@ -381,6 +381,24 @@ function addDataString1() {
             alert("<bean:message key="schedule.scheduletemplateapplying.msgDateOrder"/>");
             return false;
         }
+	return true;
+}
+
+function disableBtnAfterSubmissionToPreventMultiSubmission()
+{
+
+	var isInputWeekDaysOK = <%=bAlternate||bOrigAlt?"addDataStringB();":""%>addDataString();
+
+	var isInputDateRangeOK = addDataString1();
+
+	if(isInputWeekDaysOK === true && isInputDateRangeOK === true)
+	{
+		document.getElementById("submitBTNID").disabled = true;
+		return true;
+	}
+
+	return false;
+
 }
 //-->
 </script>
@@ -414,8 +432,9 @@ function addDataString1() {
 	%>
 <body bgcolor="ivory" bgproperties="fixed" onLoad="setfocus()"
 	topmargin="0" leftmargin="0" rightmargin="0">
+
 <form method="post" name="schedule" action="schedulecreatedate.jsp"
-	onSubmit="<%=bAlternate||bOrigAlt?"addDataStringB();":""%>addDataString();return(addDataString1())">
+	  onSubmit="return(disableBtnAfterSubmissionToPreventMultiSubmission())">
 
 <table border="0" width="100%">
 	<!-- <tr>
@@ -898,7 +917,7 @@ function tranbuttonb7_click() {
 						<input type="hidden" name="provider_no" value="<%=request.getParameter("provider_no")%>">
 						<input type="hidden" name="available" value="<%=bAlternate||bOrigAlt?"A":"1"%>">
 						<input type="hidden" name="Submit" value=" Next ">
-						<input type="submit" value='<bean:message key="schedule.scheduletemplateapplying.btnNext"/>'>
+						<input type="submit" value='<bean:message key="schedule.scheduletemplateapplying.btnNext"/>' id ="submitBTNID">
 					<%}%>
 				</div>
 				</td>
