@@ -152,16 +152,33 @@ function addDataString1() {
 }
 
 
-function disableBtnAfterSubmissionToPreventMultiSubmission()
-{
 
+function inputValidation()
+{
 	var isInputWeekDaysOK = addDataString();
 
 	var isInputDateRangeOK = addDataString1();
 
 	if(isInputWeekDaysOK === true && isInputDateRangeOK === true)
 	{
-		document.getElementById("submitBTNID").disabled = true;
+		return true;
+	}
+
+	return false;
+}
+
+
+function disableBtnToPreventMultiSubmission()
+{
+	document.getElementById("submitBTNID").disabled = true;
+}
+
+function submission()
+{
+
+	if(inputValidation() === true)
+	{
+		disableBtnToPreventMultiSubmission();
 		return true;
 	}
 
@@ -170,13 +187,15 @@ function disableBtnAfterSubmissionToPreventMultiSubmission()
 }
 
 
+
+
 //-->
 </script>
 </head>
 <body bgcolor="ivory" bgproperties="fixed" onLoad="setfocus()"
 	topmargin="0" leftmargin="0" rightmargin="0">
 <form method="post" name="schedule" action="schedulecreatedate.jsp"
-	onSubmit="return(disableBtnAfterSubmissionToPreventMultiSubmission())">
+	onSubmit="return(submission())">
 
 <table border="0" width="100%">
 	<tr>

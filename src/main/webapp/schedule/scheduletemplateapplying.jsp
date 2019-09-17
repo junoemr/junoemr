@@ -384,22 +384,52 @@ function addDataString1() {
 	return true;
 }
 
-function disableBtnAfterSubmissionToPreventMultiSubmission()
+function inputValidation()
 {
-
-	var isInputWeekDaysOK = <%=bAlternate||bOrigAlt?"addDataStringB();":""%>addDataString();
+	var isInputWeekDaysOK = addDataString();
 
 	var isInputDateRangeOK = addDataString1();
 
 	if(isInputWeekDaysOK === true && isInputDateRangeOK === true)
 	{
-		document.getElementById("submitBTNID").disabled = true;
 		return true;
 	}
 
 	return false;
-
 }
+
+
+function disableBtnToPreventMultiSubmission()
+{
+	document.getElementById("submitBTNID").disabled = true;
+}
+
+function submission()
+{
+	/*
+		the following two line and one 'if statement' is from the legacy code.
+	 */
+	var isAlternateChecked = <%=  bAlternate %>;
+	var isOriginalAlternate = <%= bOrigAlt %>;
+
+	if(isAlternateChecked  && isOriginalAlternate )
+	{
+		addDataStringB();
+	}
+
+
+	if(inputValidation() === true)
+	{
+		disableBtnToPreventMultiSubmission();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
 //-->
 </script>
 </head>
@@ -434,7 +464,7 @@ function disableBtnAfterSubmissionToPreventMultiSubmission()
 	topmargin="0" leftmargin="0" rightmargin="0">
 
 <form method="post" name="schedule" action="schedulecreatedate.jsp"
-	  onSubmit="return(disableBtnAfterSubmissionToPreventMultiSubmission())">
+	  onSubmit="return(submission())">
 
 <table border="0" width="100%">
 	<!-- <tr>
