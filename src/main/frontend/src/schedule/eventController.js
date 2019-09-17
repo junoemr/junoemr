@@ -64,8 +64,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	controller.useOldEchart = true; //TODO load from a setting?
 	controller.tabEnum = Object.freeze({
 		appointment:0,
-		reoccurring:1,
-		history:2
+		history:1,
 	});
 	controller.activeTab = controller.tabEnum.appointment;
 

@@ -66,11 +66,6 @@
 					<a class="round-top-left" data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.appointment);">
 						Appointment</a>
 				</li>
-				<!-- tab temporarily removed -->
-				<%--<li>--%>
-					<%--<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.reoccurring);">--%>
-						<%--Reoccurring</a>--%>
-				<%--</li>--%>
 				<li>
 					<a data-toggle="tab" ng-click="eventController.changeTab(eventController.tabEnum.history);">
 						History
@@ -91,11 +86,10 @@
 			</div>
 
 			<div id="tabAppointmentEdit" class="tab-pane"
-			     ng-show="eventController.isTabActive(eventController.tabEnum.appointment)
-						|| eventController.isTabActive(eventController.tabEnum.reoccurring)">
+			     ng-show="eventController.isTabActive(eventController.tabEnum.appointment)">
 
 				<div ng-show="!isInitialized() || isWorking()" ng-include="'src/common/spinner.jsp'"></div>
-				<div ng-show="isInitialized() && !isWorking()" class="row">
+				<div ng-show="isInitialized() && !isWorking()">
 					<div class="tab-bar-inputs form-horizontal">
 						<div class="col-sm-5">
 						</div>
@@ -111,226 +105,154 @@
 							</juno-appointment-status-select>
 						</div>
 					</div>
-					<div class="col-md-12 form-horizontal">
-						<div class="row">
-							<div class="col-md-6">
-								<!-- patient search -->
-								<div class="form-group" title="Patient"
-								     ng-hide="eventData.doNotBook">
-									<label for="input-patient" class="col-md-2">
-										Patient
-									</label>
-									<juno-patient-search-typeahead
-											id="input-patient"
-											class="col-md-10"
-											juno-model="eventController.patientTypeahead"
-									>
-									</juno-patient-search-typeahead>
-								</div>
-								<div class="form-group" title="Patient"
-								     ng-show="eventData.doNotBook">
-									<label for="input-patient-dnb" class="col-md-2">
-										Patient
-									</label>
-									<div class="col-md-10">
-										<input type="text"
-										       id="input-patient-dnb"
-										       ng-readonly="true"
-										       class="form-control"
-										       value="Do Not Book"
-										/>
-									</div>
+					<div>
+						<div class="form-row">
+							<!-- patient search -->
+							<div class="form-group col-md-6" title="Patient"
+							     ng-hide="eventData.doNotBook">
+								<label for="input-patient">
+									Patient
+								</label>
+								<juno-patient-search-typeahead
+										id="input-patient"
+										juno-icon-right="true"
+										juno-model="eventController.patientTypeahead"
+								>
+								</juno-patient-search-typeahead>
+							</div>
+							<div class="form-group col-md-6" title="Patient"
+							     ng-show="eventData.doNotBook">
+								<label for="input-patient-dnb">
+									Patient
+								</label>
+								<div>
+									<input type="text"
+									       id="input-patient-dnb"
+									       ng-readonly="true"
+									       class="form-control"
+									       value="Do Not Book"
+									/>
 								</div>
 							</div>
+							<!-- patient type/critical -->
 							<div class="col-md-6">
-								<!-- patient type/critical -->
-								<div class="form-group">
-									<label class="col-md-2">Type</label>
-									<div class="col-md-10">
-										<div class="row">
-											<div class="col-md-8">
-												<ca-field-select
-														ca-name="type"
-														ca-template="label"
-														ca-no-label="true"
-														ca-input-size="col-md-12"
-														ca-model="eventData.type"
-														ca-options="eventController.appointmentTypeList"
-														ca-empty-option="true"
-												>
-												</ca-field-select>
-											</div>
-											<div class="col-md-4">
-												<ca-field-boolean
-														ca-name="check-critical"
-														ca-title="Critical"
-														ca-label-size="col-md-5"
-														ca-input-size="col-md-7"
-														ca-model="eventData.critical"
-														ca-template="juno"
-												>
-												</ca-field-boolean>
-											</div>
+								<div class="row">
+									<div class="col-md-8">
+										<ca-field-select
+												ca-name="type"
+												ca-title="Appointment Type"
+												ca-template="label"
+												ca-model="eventData.type"
+												ca-options="eventController.appointmentTypeList"
+												ca-empty-option="true"
+										>
+										</ca-field-select>
+									</div>
+									<div class="col-md-4">
+										<div class="form-group">
+											<label class="control-label">&nbsp</label>
+											<ca-field-boolean
+													ca-name="check-critical"
+													ca-title="Critical"
+													ca-label-size="col-md-6"
+													ca-input-size="col-md-6"
+													ca-model="eventData.critical"
+													ca-template="juno"
+											>
+											</ca-field-boolean>
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-						<div class="row">
-							<div class="col-md-6 info-frame-container"
-							     ng-show="eventController.isTabActive(eventController.tabEnum.appointment)">
-								<!-- patient details display -->
-								<div class="form-group label-top"
+						<div class="form-row">
+							<div class="form-group col-md-6">
+								<div class="info-frame-container"
 								     ng-show="isPatientSelected()">
-									<label class="col-md-2">Demographic</label>
-									<div class="col-md-10">
+									<label>Demographic</label>
+									<div>
 										<demographic-card
 												demographic-model="eventController.demographicModel.data">
 										</demographic-card>
 									</div>
 								</div>
 							</div>
-							<!-- repeat booking units/period -->
-							<div class="col-md-6"
-							     ng-show="eventController.isTabActive(eventController.tabEnum.reoccurring)">
-								<div class="form-group">
-									<label class="col-md-2">Repeat</label>
-									<div class="col-md-10">
-										<div class="row">
-											<div class="col-md-4">
-												<ca-field-text
-														ca-name="repeat-units"
-														ca-title="Repeat"
-														ca-no-label="true"
-														ca-input-size="col-md-12"
-														ca-model="eventController.repeatBookingData.units"
-														ca-error="{{displayMessages.field_errors()['repeatUnits']}}"
-														ca-rows="1"
-												>
-												</ca-field-text>
-											</div>
-											<div class="col-md-6">
-												<ca-field-select
-														ca-name="repeat-period"
-														ca-title="period"
-														ca-template="label"
-														ca-no-label="true"
-														ca-input-size="col-md-12"
-														ca-model="eventController.repeatBookingData.period"
-														ca-options="eventController.repeatBooking.periodOptions"
-												>
-												</ca-field-select>
-											</div>
-										</div>
+							<div class="col-md-6">
+								<div class="row">
+									<div class="col-md-5">
+										<ca-field-date
+												ca-title="Date"
+												ca-date-picker-id="select-date"
+												ca-name="startDate"
+												ca-model="eventData.startDate"
+												ca-error="{{displayMessages.field_errors()['startDate']}}"
+												ca-orientation="auto"
+										></ca-field-date>
+									</div>
+									<div class="col-md-4">
+										<ca-field-time
+												ca-title="Time"
+												ca-name="startTime"
+												ca-model="eventData.startTime"
+												ca-error="{{displayMessages.field_errors()['startTime']}}"
+												ca-template="no_button"
+												ca-disable-widget="true"
+												ca-minute-step="parentScope.timeIntervalMinutes()">
+										</ca-field-time>
+									</div>
+									<div class="col-md-3">
+										<ca-field-text
+												ca-title="Duration"
+												ca-name="duration"
+												ca-model="eventData.duration"
+												ca-error="{{displayMessages.field_errors()['duration']}}"
+												ca-rows="1">
+										</ca-field-text>
 									</div>
 								</div>
-							</div>
-							<div class="col-md-6">
-								<!-- date and time info/options -->
-								<div class="form-group label-top">
-									<label class="col-md-2">Session Date</label>
-									<div class="col-md-10">
-										<div class="row">
-											<div class="col-md-12">
-												<ca-field-date
-														ca-input-size="col-md-12"
-														ca-no-label="true"
-														ca-date-picker-id="select-date"
-														ca-name="startDate"
-														ca-model="eventData.startDate"
-														ca-error="{{displayMessages.field_errors()['startDate']}}"
-														ca-orientation="auto"
-												></ca-field-date>
-											</div>
-										</div>
-										<div class="row">
-											<div class="col-md-6">
-												<ca-field-text
-														ca-label-size="col-md-4"
-														ca-input-size="col-md-8"
-														ca-title="Duration"
-														ca-name="duration"
-														ca-model="eventData.duration"
-														ca-error="{{displayMessages.field_errors()['duration']}}"
-														ca-rows="1">
-												</ca-field-text>
-											</div>
-
-											<div class="col-md-6">
-												<ca-field-time
-														ca-label-size="col-md-4"
-														ca-input-size="col-md-8"
-														ca-title="Time"
-														ca-name="startTime"
-														ca-model="eventData.startTime"
-														ca-error="{{displayMessages.field_errors()['startTime']}}"
-														ca-template="no_button"
-														ca-disable-widget="true"
-														ca-minute-step="parentScope.timeIntervalMinutes()">
-												</ca-field-time>
-											</div>
-										</div>
+								<div class="row">
+									<div class="col-md-8">
+										<!-- reason type -->
+										<ca-field-select
+												ca-template="label"
+												ca-name="reason-code"
+												ca-title="Reason Type"
+												ca-model="eventData.reasonCode"
+												ca-options="eventController.reasonCodeList"
+												ca-empty-option="false"
+										>
+										</ca-field-select>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-8">
+										<!-- location/site -->
+										<ca-field-select
+												ca-hide="!eventController.sitesEnabled"
+												ca-name="site"
+												ca-title="Site"
+												ca-template="label"
+												ca-model="eventData.site"
+												ca-error="{{displayMessages.field_errors()['site']}}"
+												ca-options="eventController.siteOptions"
+										>
+										</ca-field-select>
 									</div>
 								</div>
 							</div>
 						</div>
-						<div class="row"
-						     ng-show="eventController.isTabActive(eventController.tabEnum.appointment)">
+						<div class="form-row">
 							<!-- show patient alerts -->
-							<div class="col-md-6">
-								<div class="form-group">
-									<label class="col-md-2">
-									</label>
-									<div class="col-md-10">
-										<span class="form-control-static alert-message">{{eventController.demographicModel.data.alert}}</span>
-									</div>
-								</div>
-							</div>
-							<!-- show additional alerts -->
-							<div class="col-md-6">
+							<div class="col-md-12">
+								<span class="form-control-static alert-message">{{eventController.demographicModel.data.alert}}</span>
 							</div>
 						</div>
-						<div class="row"
-						     ng-show="eventController.isTabActive(eventController.tabEnum.appointment)">
-							<div class="col-md-6">
-								<!-- location/site -->
-								<ca-field-select
-										ca-hide="!eventController.sitesEnabled"
-										ca-name="site"
-										ca-title="Site"
-										ca-template="label"
-										ca-label-size="col-md-2"
-										ca-input-size="col-md-10"
-										ca-model="eventData.site"
-										ca-error="{{displayMessages.field_errors()['site']}}"
-										ca-options="eventController.siteOptions"
-								>
-								</ca-field-select>
-							</div>
-							<div class="col-md-6">
-								<!-- reason type -->
-								<ca-field-select
-										ca-template="label"
-										ca-label-size="col-md-2"
-										ca-input-size="col-md-10"
-										ca-name="reason-code"
-										ca-title="Reason Type"
-										ca-model="eventData.reasonCode"
-										ca-options="eventController.reasonCodeList"
-										ca-empty-option="false"
-								>
-								</ca-field-select>
-							</div>
-						</div>
-						<div class="row"
-						     ng-show="eventController.isTabActive(eventController.tabEnum.appointment)">
+						<div class="form-row">
 							<div class="col-md-6">
 								<!-- notes selection-->
 								<ca-field-text
 										ca-name="notes"
 										ca-title="Notes"
-										ca-label-size="col-md-2"
-										ca-input-size="col-md-10"
 										ca-model="eventData.notes"
 										ca-rows="1"
 								>
@@ -339,34 +261,11 @@
 							<div class="col-md-6">
 								<!-- reason -->
 								<ca-field-text
-										ca-label-size="col-md-2"
-										ca-input-size="col-md-10"
 										ca-title="Reason"
 										ca-name="event_reason"
 										ca-model="eventData.reason"
 										ca-rows="1">
 								</ca-field-text>
-							</div>
-						</div>
-
-						<!-- repeat booking units/period -->
-						<div class="row"
-						     ng-show="eventController.isTabActive(eventController.tabEnum.reoccurring)">
-							<div class="col-md-6">
-								<div class="form-group">
-									<label class="col-md-2">Ends</label>
-									<div class="col-md-10">
-										<ca-field-date
-												ca-input-size="col-md-12"
-												ca-no-label="true"
-												ca-date-picker-id="repeat-select-end-date"
-												ca-name="endDate"
-												ca-model="eventController.repeatBookingData.endDate"
-												ca-error="{{displayMessages.field_errors()['repeatEndDate']}}"
-												ca-orientation="auto"
-										></ca-field-date>
-									</div>
-								</div>
 							</div>
 						</div>
 					</div>

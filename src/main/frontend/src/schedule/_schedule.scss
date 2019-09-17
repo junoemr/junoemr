@@ -382,21 +382,13 @@
 
 	modal-body {
 		$tabs-height: $page-tabs-height;
-		$alert-container-height: 40px;
+		$alert-container-height: 10px;
 		@include juno-tab-lg($tabs-height);
-		@include juno-tab-color-scheme-light;
+		@include juno-tab-color-scheme-white(2px);
 		@include juno-font-tab;
 
 		.form-group {
-			display: flex;
 			align-items: center;
-
-			&.label-top {
-				align-items: flex-start;
-				& > label {
-					margin-top: 8px;
-				}
-			}
 		}
 		.alert-container {
 			height: $alert-container-height;
@@ -433,6 +425,9 @@
 
 			.directive-juno-typeahead {
 				@include juno-tab-lg(64px);
+				.icon {
+					color: $color-primary-base;
+				}
 			}
 		}
 	}
