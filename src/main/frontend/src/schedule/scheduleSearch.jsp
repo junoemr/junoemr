@@ -48,7 +48,7 @@
 						ca-title="Provider"
 						ca-model="$ctrl.search.provider"
 						ca-options="$ctrl.providerList"
-						ca-empty-option="false"
+						ca-empty-option="true"
 				>
 				</ca-field-select>
 				<ca-field-select
@@ -73,7 +73,7 @@
 
 				<div class="form-group">
 					<label class="control-label">Time of Day</label>
-					<div class="row">
+					<div class="row vertical-align">
 						<ca-field-select
 								ca-template="bare"
 								ca-name="search-start-time"
@@ -98,7 +98,27 @@
 			</div>
 			<div class="pane result-pane flex-grow">
 				<h4 class="pane-header">Search Results</h4>
-				<div></div>
+				<div ng-if="$ctrl.resultList.length > 0">
+					<table ng-table="resultTable">
+						<tr ng-repeat="result in $ctrl.resultList" ng-click="$ctrl.addAppointment(result)">
+							<td data-title="'Date'">
+								{{ result.scheduleSlot.appointmentDateTime | date : $ctrl.formattedDate}}
+							</td>
+							<td data-title="'Time'">
+								{{ result.scheduleSlot.appointmentDateTime | date : $ctrl.formattedTime}}
+							</td>
+							<td data-title="'Provider'">
+								{{ result.provider.name}}
+							</td>
+							<td class="appt-code"
+							    style="background-color: {{result.scheduleSlot.junoColor}}"
+							    ng-attr-title="{{result.scheduleSlot.description}}"
+							>
+								{{ result.scheduleSlot.code}}
+							</td>
+						</tr>
+					</table>
+				</div>
 			</div>
 		</div>
 	</modal-body>
@@ -112,7 +132,7 @@
 		<button
 				type="button"
 				class="btn btn-primary"
-				ng-click="$ctrl.search()"
+				ng-click="$ctrl.searchSchedules()"
 				ng-disabled="$ctrl.isWorking()">Search
 		</button>
 	</modal-footer>

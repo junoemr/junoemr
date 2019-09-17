@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
@@ -47,14 +48,14 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
 public class NextAppointmentSearchHelper {
-	static final int MAX_DAYS_TO_SEARCH = 180;
+	private static final int MAX_DAYS_TO_SEARCH = 180;
 
-	static Logger logger = MiscUtils.getLogger();
-	static ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");			 	
-	static ScheduleDateDao scheduleDateDao = (ScheduleDateDao)SpringUtils.getBean("scheduleDateDao");
-	static ScheduleTemplateDao scheduleTemplateDao = (ScheduleTemplateDao)SpringUtils.getBean("scheduleTemplateDao");
-	static ScheduleTemplateCodeDao scheduleTemplateCodeDao = (ScheduleTemplateCodeDao)SpringUtils.getBean("scheduleTemplateCodeDao");
-	static OscarAppointmentDao oscarAppointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
+	private static Logger logger = MiscUtils.getLogger();
+	private static ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
+	private static ScheduleDateDao scheduleDateDao = (ScheduleDateDao)SpringUtils.getBean("scheduleDateDao");
+	private static ScheduleTemplateDao scheduleTemplateDao = (ScheduleTemplateDao)SpringUtils.getBean("scheduleTemplateDao");
+	private static ScheduleTemplateCodeDao scheduleTemplateCodeDao = (ScheduleTemplateCodeDao)SpringUtils.getBean("scheduleTemplateCodeDao");
+	private static OscarAppointmentDao oscarAppointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
 	
 	/**
 	 * Search against schedule for next appointment.
@@ -136,26 +137,37 @@ public class NextAppointmentSearchHelper {
 	 * @return an array of integer values (1 - 7) representing days of the week to search.
 	 * Where 1=Sunday and 7=Saturday
 	 */
-	private static ArrayList<Integer> getDaysOfWeek(NextAppointmentSearchBean searchBean) {
+	private static ArrayList<Integer> getDaysOfWeek(NextAppointmentSearchBean searchBean)
+	{
 		ArrayList<Integer> daysOfTheWeek = new ArrayList<Integer>();
-		
-		if(!searchBean.getDayOfWeek().isEmpty() && searchBean.getDayOfWeek().equals("daily")) {
+
+		String dayOfWeek = searchBean.getDayOfWeek();
+		if("daily".equals(dayOfWeek))
+		{
 			// Add all days of the week except Saturday(7) & Sunday(1)
-			for(int i=2; i<=6; i++) {
+			for(int i = 2; i <= 6; i++)
+			{
 				daysOfTheWeek.add(i);
 			}
 		}
-		else {
-			try {
+		else if(StringUtils.isNumeric(dayOfWeek) && StringUtils.isNotEmpty(dayOfWeek))
+		{
+			try
+			{
 				daysOfTheWeek.add(Integer.parseInt(searchBean.getDayOfWeek()));
 			}
-			catch (NumberFormatException e) {
+			catch(NumberFormatException e)
+			{
 				logger.error("Error", e);
-				
-				// all days of the week 1 -7
-				for(int i=1; i<=7; i++) {
-					daysOfTheWeek.add(i);
-				}
+			}
+		}
+
+		if(daysOfTheWeek.isEmpty())
+		{
+			// all days of the week 1 -7
+			for(int i = 1; i <= 7; i++)
+			{
+				daysOfTheWeek.add(i);
 			}
 		}
 		return daysOfTheWeek;
@@ -167,7 +179,6 @@ public class NextAppointmentSearchHelper {
 	 * @param templateName
 	 * @param day
 	 * @param searchBean
-	 * @return
 	 */
 	private static List<NextAppointmentSearchResult> searchTemplate(String providerNo, String templateName, Date day, NextAppointmentSearchBean searchBean) {
 		
@@ -215,21 +226,24 @@ public class NextAppointmentSearchHelper {
 							continue;
 						}
 					}
-					
+
+					//TODO pre-load all templates once into map or cache etc.
+					ScheduleTemplateCode templateCode = scheduleTemplateCodeDao.getByCode(slot);
+
 					//TODO: is there a default appt length somewhere?					
 					int duration = 15;
-					if(searchBean.getCode().length()>0) {
-						//load the template code
-						ScheduleTemplateCode stc = scheduleTemplateCodeDao.getByCode(searchBean.getCode().charAt(0));
-						if(stc == null) {
-							logger.error("Error - ScheduleTemplateCode not found!!!");
-							continue;
-						}
-						//check the duration						
-						if(stc.getDuration() != null && stc.getDuration().length()>0 ) {
-							duration = Integer.parseInt(stc.getDuration());
-						}
+					//load the template code
+					if(templateCode == null)
+					{
+						logger.error("Error - ScheduleTemplateCode '" + slot + "' not found!!!");
+						continue;
 					}
+					//check the duration
+					if(templateCode.getDuration() != null && templateCode.getDuration().length() > 0)
+					{
+						duration = Integer.parseInt(templateCode.getDuration());
+					}
+
 					
 					//ready to check appointments
 					//logger.info("schedule availability found at hour " + hour + ", min = " + min + " duration = " + duration);
@@ -243,18 +257,21 @@ public class NextAppointmentSearchHelper {
 					appointmentCal.set(Calendar.MILLISECOND, 0);
 					
 					// skip time slots that are in the past
-					if ( currentTimeCal.after(appointmentCal) ) {
+					if(currentTimeCal.after(appointmentCal))
+					{
 						continue;
 					}
-					if(checkAvailability(appointmentCal.getTime(), duration, providerNo)) {
+					if(checkAvailability(appointmentCal.getTime(), duration, providerNo))
+					{
 						//logger.info("spot available at " + cal2.getTime() + " for " + duration + " mins with provider " + providerNo);
 						NextAppointmentSearchResult result = new NextAppointmentSearchResult();
 						result.setProviderNo(providerNo);
 						result.setProvider(providerDao.getProvider(providerNo));
 						result.setDate(appointmentCal.getTime());
 						result.setDuration(duration);
+						result.setScheduleTemplateCode(templateCode);
 						results.add(result);
-					} 
+					}
 				}
 			}
 		}

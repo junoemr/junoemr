@@ -1454,12 +1454,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				}
 			}
 
-			console.info('schedule', schedule);
-
-
-
-
-
 			$scope.dialog = $uibModal.open({
 				animation: false,
 				backdrop: 'static',
@@ -1485,15 +1479,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				windowClass: "juno-modal",
 			});
 			$scope.dialog.result.then(
-				function onClose(calEvent)
+				function onClose(data)
 				{
-					console.info('closed', calEvent);
 					$scope.dialog = null;
-					$scope.openEditEventDialog(calEvent);
+					$scope.openCreateEventDialog(data.start, data.end, null, null, data.resource);
 				},
 				function onDismiss(data)
 				{
-					console.info('dismiss', data);
 					$scope.dialog = null;
 				});
 

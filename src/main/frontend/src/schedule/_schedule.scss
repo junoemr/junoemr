@@ -444,6 +444,7 @@
 #schedule-search-modal {
 
 	$search-pane-width: 272px;
+	@include juno-font-default-size(12px);
 
 	.modal-body {
 		background: linear-gradient(90deg, $color-neutral-lighter $search-pane-width, $color-neutral-white 0), no-repeat 100% 100%;
@@ -466,7 +467,39 @@
 					}
 				}
 				&.result-pane {
+					table {
+						width: 100%;
+						text-align: center;
 
+						border-collapse: separate;
+						border: solid $color-neutral-lighter 1px;
+						border-radius: 6px;
+						-moz-border-radius: 6px;
+
+						.appt-code {
+							width: 16px;
+						}
+
+						th {
+							background-color: $color-neutral-lightest;
+							border-top: none;
+							font-weight: normal;
+						}
+						th,td {
+							padding: 9px 0;
+							border-left: solid $color-neutral-lightest 1px;
+						}
+						td {
+							cursor: pointer;
+						}
+
+						td:first-child, th:first-child {
+							border-left: none;
+						}
+						tr:hover {
+							background-color: $color-primary-lightest;
+						}
+					}
 				}
 			}
 		}

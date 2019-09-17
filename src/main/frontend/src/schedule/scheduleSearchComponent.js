@@ -48,6 +48,9 @@ angular.module('Schedule').component('scheduleSearch', {
 		ctrl.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
 			'../ws/rs');
 
+		ctrl.formattedDate = Juno.Common.Util.DisplaySettings.dateFormat;
+		ctrl.formattedTime = Juno.Common.Util.DisplaySettings.timeFormat;
+
 		ctrl.$onInit = function()
 		{
 			ctrl.search = {
@@ -57,6 +60,8 @@ angular.module('Schedule').component('scheduleSearch', {
 				endTime: ctrl.resolve.scheduleEndTime,
 				appointmentCode: null,
 			};
+
+			ctrl.resultList = [];
 
 			ctrl.providerList = [];
 			ctrl.loadProviderList();
@@ -70,32 +75,36 @@ angular.module('Schedule').component('scheduleSearch', {
 					value: null,
 				},
 				{
-					label: "Monday",
-					value: 0,
-				},
-				{
-					label: "Tuesday",
-					value: 1,
-				},
-				{
-					label: "Wednesday",
-					value: 2,
-				},
-				{
-					label: "Thursday",
-					value: 3,
-				},
-				{
-					label: "Friday",
-					value: 4,
-				},
-				{
-					label: "Saturday",
-					value: 5,
+					label: "Any Weekday",
+					value: "daily",
 				},
 				{
 					label: "Sunday",
+					value: 1,
+				},
+				{
+					label: "Monday",
+					value: 2,
+				},
+				{
+					label: "Tuesday",
+					value: 3,
+				},
+				{
+					label: "Wednesday",
+					value: 4,
+				},
+				{
+					label: "Thursday",
+					value: 5,
+				},
+				{
+					label: "Friday",
 					value: 6,
+				},
+				{
+					label: "Saturday",
+					value: 7,
 				},
 			];
 
@@ -103,7 +112,7 @@ angular.module('Schedule').component('scheduleSearch', {
 			for(var i=0; i< 24; i++)
 			{
 				var timeObj = {
-					label: (i<12)? (i===0?12:i)+" am" : ((i-12)===0?12:(i-12))+" pm",
+					label: (i<12)? (i===0?12:i)+" am" : (((i-12)===0)? 12:(i-12))+" pm",
 					value: Juno.Common.Util.pad0(i) + ":00"
 				};
 				ctrl.timeList.push(timeObj);
@@ -118,9 +127,23 @@ angular.module('Schedule').component('scheduleSearch', {
 			ctrl.modalInstance.dismiss("cancel");
 		};
 
-		ctrl.addAppointment = function cancel(calEvent)
+		ctrl.addAppointment = function cancel(result)
 		{
-			ctrl.modalInstance.close(calEvent);
+			var scheduleSlot = result.scheduleSlot;
+			var provider = result.provider;
+
+			var startTime = moment(scheduleSlot.appointmentDateTime);
+			var endTime = angular.copy(startTime).add(scheduleSlot.durationMinutes, 'minutes');
+			var resource = {
+				id: provider.providerNo,
+				display_name: provider.name
+			};
+
+			ctrl.modalInstance.close({
+				start:startTime,
+				end: endTime,
+				resource: resource
+			});
 		};
 
 		ctrl.reset = function reset()
@@ -132,11 +155,36 @@ angular.module('Schedule').component('scheduleSearch', {
 				endTime: ctrl.resolve.scheduleEndTime,
 				appointmentCode: null,
 			};
+			ctrl.resultList = [];
 		};
 
-		ctrl.search = function search()
+		ctrl.searchSchedules = function searchSchedules()
 		{
+			var deferred = $q.defer();
+			ctrl.working = true;
 
+			ctrl.scheduleApi.searchAvailable(
+				ctrl.search.provider,
+				ctrl.search.dayOfWeek,
+				ctrl.search.startTime,
+				ctrl.search.endTime,
+				ctrl.search.appointmentCode,
+				8,
+			).then(
+				function success(results)
+				{
+					ctrl.resultList = results.data.body;
+					ctrl.working = false;
+					deferred.resolve(results.data.body);
+				},
+				function failure(errors)
+				{
+					console.error(errors);
+					ctrl.working = false;
+					deferred.reject();
+				}
+			);
+			return deferred;
 		};
 
 		ctrl.isWorking = function isWorking()
@@ -173,7 +221,6 @@ angular.module('Schedule').component('scheduleSearch', {
 			ctrl.scheduleApi.getScheduleTemplateCodes().then(
 				function success(result)
 				{
-					console.info(result);
 					var codeList = result.data.body;
 					ctrl.appointmentCodeList = codeList.map(code => (
 						{
