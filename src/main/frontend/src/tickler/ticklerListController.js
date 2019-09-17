@@ -64,7 +64,8 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 					//object which represents all the filters, initialize status.
 					controller.search = {
-						status: 'A'
+						status: 'A',
+						serviceEndDate: moment().startOf('day').toDate()
 					};
 
 
