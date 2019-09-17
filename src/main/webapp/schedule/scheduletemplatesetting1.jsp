@@ -159,16 +159,12 @@ function inputValidation()
 
 	var isInputDateRangeOK = addDataString1();
 
-	if(isInputWeekDaysOK === true && isInputDateRangeOK === true)
-	{
-		return true;
-	}
+	return isInputWeekDaysOK === true && isInputDateRangeOK === true;
 
-	return false;
 }
 
 
-function disableBtnToPreventMultiSubmission()
+function disableSubmitButton()
 {
 	document.getElementById("submitBTNID").disabled = true;
 }
@@ -178,7 +174,8 @@ function submission()
 
 	if(inputValidation() === true)
 	{
-		disableBtnToPreventMultiSubmission();
+		//prevent spam hitting submission, only allow one submission.
+		disableSubmitButton();
 		return true;
 	}
 
