@@ -1111,6 +1111,18 @@ public class EFormUtil {
 	public static String removeQuotes(String s) {
 		if (StringUtils.isBlank(s)) return s;
 
+		if (s.length() <= 1)
+		{
+			if (s.equals("'") || s.equals("\""))
+			{
+				return "";
+			}
+			else
+			{
+				return s;
+			}
+		}
+
 		s = s.trim();
 		if (StringUtils.isBlank(s)) return s;
 
