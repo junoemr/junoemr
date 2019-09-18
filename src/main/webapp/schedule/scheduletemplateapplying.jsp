@@ -418,10 +418,9 @@ function submission()
 		disableSubmitButton();
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+
+	return false;
+
 }
 
 
