@@ -10,7 +10,6 @@
 
 .schedule-page-header {
 	@extend %juno-page-header;
-	//@include juno-font-label;
 
 	select {
 		@include juno-select(16px);
@@ -462,65 +461,11 @@
 					}
 				}
 				&.result-pane {
-					table {
-						$border-color: $color-neutral-light;
+					@include juno-table-default(6px);
 
-						width: 100%;
-						text-align: center;
-						border-collapse: separate;
-						color: $color-neutral-darker;
-
-						.appt-code {
-							width: 16px;
-							color: $color-neutral-darker;
-							border-left: 0;
-						}
-
-						th,td {
-							padding: 11px 0;
-							border-left: solid $border-color 1px;
-						}
-						th {
-							background-color: $color-neutral-lighter;
-							border-top: solid $border-color 1px;
-							font-weight: normal;
-
-							&:first-child {
-								border-top-left-radius: 6px;
-							}
-							&:last-child {
-								border-top-right-radius: 6px;
-								border-right: solid $border-color 1px;
-							}
-						}
-						td {
-							cursor: pointer;
-							&:last-child {
-								border-right: solid $border-color 1px;
-							}
-						}
-
-						tr {
-							&:last-child {
-								td {
-									border-bottom: solid $border-color 1px;
-									&:first-child {
-										border-bottom-left-radius: 6px;
-									}
-									&:last-child {
-										border-bottom-right-radius: 6px;
-									}
-								}
-							}
-							&:nth-child(even) {
-								background-color: $color-neutral-lightest;
-							}
-							&:hover {
-								background-color: $color-primary-lightest;
-								border-color: $color-primary-lighter;
-							}
-						}
-
+					.appt-code {
+						width: 16px;
+						border-left: 0;
 					}
 					.zero-state {
 						color: $color-neutral-darker;
