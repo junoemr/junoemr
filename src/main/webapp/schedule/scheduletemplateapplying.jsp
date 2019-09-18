@@ -405,10 +405,10 @@ function submission()
 
 	//the following two line and one 'if statement' is from the legacy code.
 
-	var isAlternateChecked = <%=  bAlternate %>;
+	var isAlternateChecked = "<%=  bAlternate %>";
 	var isOriginalAlternate = <%= bOrigAlt %>;
 
-	if(isAlternateChecked  && isOriginalAlternate )
+	if(isAlternateChecked === "true"  || isOriginalAlternate === "true")
 	{
 		addDataStringB();
 	}
