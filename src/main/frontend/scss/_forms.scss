@@ -11,7 +11,7 @@
 	}
 }
 @mixin juno-form-colour-scheme-light {
-	@include juno-form-colour-scheme($color-neutral-lightest, $color-neutral-light, $color-neutral-dark, $color-neutral-grey, $color-neutral-white);
+	@include juno-form-colour-scheme($color-neutral-lightest, $color-neutral-light, $color-neutral-darker, $color-neutral-grey, $color-neutral-white);
 }
 @mixin juno-form-colour-scheme-blue {
 	@include juno-form-colour-scheme($color-primary-dark, $color-primary-dark, $color-neutral-white, $color-neutral-light-grey, $color-primary-dark);

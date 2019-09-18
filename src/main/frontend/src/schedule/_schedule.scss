@@ -463,37 +463,67 @@
 				}
 				&.result-pane {
 					table {
+						$border-color: $color-neutral-light;
+
 						width: 100%;
 						text-align: center;
-
 						border-collapse: separate;
-						border: solid $color-neutral-lighter 1px;
-						border-radius: 6px;
-						-moz-border-radius: 6px;
+						color: $color-neutral-darker;
 
 						.appt-code {
 							width: 16px;
+							color: $color-neutral-darker;
+							border-left: 0;
 						}
 
-						th {
-							background-color: $color-neutral-lightest;
-							border-top: none;
-							font-weight: normal;
-						}
 						th,td {
-							padding: 9px 0;
-							border-left: solid $color-neutral-lightest 1px;
+							padding: 11px 0;
+							border-left: solid $border-color 1px;
+						}
+						th {
+							background-color: $color-neutral-lighter;
+							border-top: solid $border-color 1px;
+							font-weight: normal;
+
+							&:first-child {
+								border-top-left-radius: 6px;
+							}
+							&:last-child {
+								border-top-right-radius: 6px;
+								border-right: solid $border-color 1px;
+							}
 						}
 						td {
 							cursor: pointer;
+							&:last-child {
+								border-right: solid $border-color 1px;
+							}
 						}
 
-						td:first-child, th:first-child {
-							border-left: none;
+						tr {
+							&:last-child {
+								td {
+									border-bottom: solid $border-color 1px;
+									&:first-child {
+										border-bottom-left-radius: 6px;
+									}
+									&:last-child {
+										border-bottom-right-radius: 6px;
+									}
+								}
+							}
+							&:nth-child(even) {
+								background-color: $color-neutral-lightest;
+							}
+							&:hover {
+								background-color: $color-primary-lightest;
+								border-color: $color-primary-lighter;
+							}
 						}
-						tr:hover {
-							background-color: $color-primary-lightest;
-						}
+
+					}
+					.zero-state {
+						color: $color-neutral-darker;
 					}
 				}
 			}

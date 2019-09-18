@@ -1439,45 +1439,28 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		{
 			$scope.openingDialog = true;
 
-			var schedule = {};
-
-			var selectedUuid = controller.providerSettings.groupNo;
-			if (Juno.Common.Util.exists(selectedUuid))
-			{
-				// only choose it if it can be found in the options list
-				for (var i = 0; i < $scope.scheduleOptions.length; i++)
+			$scope.dialog = $uibModal.open(
 				{
-					if (selectedUuid === $scope.scheduleOptions[i].uuid)
-					{
-						schedule = $scope.scheduleOptions[i];
-					}
+					animation: false,
+					backdrop: 'static',
+					component: 'scheduleSearch',
+					resolve: {
+						providerId: function ()
+						{
+							return resourceId;
+						},
+						scheduleStartTime: function ()
+						{
+							return $scope.getScheduleMinTime();
+						},
+						scheduleEndTime: function ()
+						{
+							return $scope.getScheduleMaxTime();
+						},
+					},
+					windowClass: "juno-modal",
 				}
-			}
-
-			$scope.dialog = $uibModal.open({
-				animation: false,
-				backdrop: 'static',
-				component: 'scheduleSearch',
-				resolve: {
-					providerId: function ()
-					{
-						return resourceId;
-					},
-					scheduleStartTime: function ()
-					{
-						return $scope.getScheduleMinTime();
-					},
-					scheduleEndTime: function ()
-					{
-						return $scope.getScheduleMaxTime();
-					},
-					eventList: function ()
-					{
-						return $scope.events;
-					},
-				},
-				windowClass: "juno-modal",
-			});
+			);
 			$scope.dialog.result.then(
 				function onClose(data)
 				{

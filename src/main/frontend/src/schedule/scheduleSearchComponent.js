@@ -60,6 +60,7 @@ angular.module('Schedule').component('scheduleSearch', {
 				endTime: ctrl.resolve.scheduleEndTime,
 				appointmentCode: null,
 			};
+			ctrl.clean = true;
 
 			ctrl.resultList = [];
 
@@ -156,6 +157,7 @@ angular.module('Schedule').component('scheduleSearch', {
 				appointmentCode: null,
 			};
 			ctrl.resultList = [];
+			ctrl.clean = true;
 		};
 
 		ctrl.searchSchedules = function searchSchedules()
@@ -175,6 +177,7 @@ angular.module('Schedule').component('scheduleSearch', {
 				{
 					ctrl.resultList = results.data.body;
 					ctrl.working = false;
+					ctrl.clean = false;
 					deferred.resolve(results.data.body);
 				},
 				function failure(errors)
@@ -225,7 +228,7 @@ angular.module('Schedule').component('scheduleSearch', {
 					ctrl.appointmentCodeList = codeList.map(code => (
 						{
 							value: code.code,
-							label: code.description
+							label: "(" + code.code + ") " + code.description
 						}));
 					deferred.resolve(ctrl.appointmentCodeList);
 				},

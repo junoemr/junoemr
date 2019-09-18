@@ -170,11 +170,9 @@
 								<div class="info-frame-container"
 								     ng-show="isPatientSelected()">
 									<label>Demographic</label>
-									<div>
-										<demographic-card
-												demographic-model="eventController.demographicModel.data">
-										</demographic-card>
-									</div>
+									<demographic-card
+											demographic-model="eventController.demographicModel.data">
+									</demographic-card>
 								</div>
 							</div>
 							<div class="col-md-6">

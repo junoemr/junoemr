@@ -49,6 +49,7 @@
 						ca-model="$ctrl.search.provider"
 						ca-options="$ctrl.providerList"
 						ca-empty-option="true"
+						ca-text-placeholder="Any"
 				>
 				</ca-field-select>
 				<ca-field-select
@@ -58,6 +59,7 @@
 						ca-model="$ctrl.search.appointmentCode"
 						ca-options="$ctrl.appointmentCodeList"
 						ca-empty-option="true"
+						ca-text-placeholder="Any"
 				>
 				</ca-field-select>
 				<div class="divider"></div>
@@ -110,7 +112,7 @@
 							<td data-title="'Provider'">
 								{{ result.provider.name}}
 							</td>
-							<td class="appt-code"
+							<td class="appt-code" header-class="'appt-code'"
 							    style="background-color: {{result.scheduleSlot.junoColor}}"
 							    ng-attr-title="{{result.scheduleSlot.description}}"
 							>
@@ -118,6 +120,9 @@
 							</td>
 						</tr>
 					</table>
+				</div>
+				<div ng-if="($ctrl.resultList.length <= 0 && !$ctrl.clean)">
+					<h4 class="zero-state">No Available Schedule Times</h4>
 				</div>
 			</div>
 		</div>
