@@ -403,16 +403,14 @@ function disableSubmitButton()
 function submission()
 {
 
-	//the following two line and one 'if statement' is from the legacy code.
+	//the following one line and one 'if statement' is from the legacy code.
 
 	var isAlternateChecked = "<%=  bAlternate %>";
-	var isOriginalAlternate = <%= bOrigAlt %>;
 
-	if(isAlternateChecked === "true"  || isOriginalAlternate === "true")
+	if(isAlternateChecked === "true" )
 	{
 		addDataStringB();
 	}
-
 
 	if(inputValidation() === true)
 	{
