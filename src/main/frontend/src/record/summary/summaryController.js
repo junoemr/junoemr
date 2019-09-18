@@ -510,12 +510,25 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 			else if (module.summaryCode === 'forms')
 			{
-				controller.openForms();
+				controller.openAddForms();
 			}
 			else if (module.summaryCode === 'preventions')
 			{
 				controller.openPreventions(controller.demographicNo);
 			}
+		};
+
+		controller.onSummaryModClickTitle = function (module)
+		{
+			if (module.summaryCode === "forms")
+			{
+				controller.openCompletedForms()
+			}
+		};
+
+		controller.isModTitleClickable = function(module)
+		{
+			return module.summaryCode === "forms";
 		};
 
 		// called when a child component is initialized. this allows the controller to call select child methods

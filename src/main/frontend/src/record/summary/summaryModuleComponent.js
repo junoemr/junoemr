@@ -31,6 +31,8 @@ angular.module('Record.Summary').component('summaryModule', {
 		maxItemNameLength: '<',
 		onclickItem: '&', //callback function
 		onclickAdd: '&', //callback function
+		onclickTitle: '&?', //callback function, called when user clicks the title
+		clickableTitle: '<', //true means title is clickable
 
 		enableFilter: '<',
 		enableAddButton: '<',
@@ -51,9 +53,11 @@ angular.module('Record.Summary').component('summaryModule', {
 			ctrl.itemDisplayCount = ctrl.itemDisplayCount || 5;
 			ctrl.enableFilter = ctrl.enableFilter || false;
 			ctrl.enableAddButton = ctrl.enableAddButton || false;
+			ctrl.clickableTitle = ctrl.clickableTitle || false;
 			ctrl.maxItemNameLength = ctrl.maxItemNameLength || 34;
 			ctrl.onclickItem = ctrl.onclickItem || null;
 			ctrl.onclickAdd = ctrl.onclickAdd || null;
+			ctrl.onclickTitle = ctrl.onclickTitle || null;
 		};
 
 		ctrl.$onChanges = function(bindingHash)
@@ -105,6 +109,14 @@ angular.module('Record.Summary').component('summaryModule', {
 					//do nothing
 				}
 			});
+		};
+
+		ctrl.clickTitleCallback = function ()
+		{
+			if (ctrl.onclickTitle !== null)
+			{
+				ctrl.onclickTitle({'module': ctrl.module});
+			}
 		};
 
 		ctrl.toggleShowAllItems = function toggleShowAllItems()
