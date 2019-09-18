@@ -15,6 +15,10 @@ Juno.Common.Util.settings = {
 	dayofweek_format: "dddd"
 };
 
+Juno.Common.Util.DisplaySettings = {
+	dateFormat: "yyyy-MM-dd",
+};
+
 Juno.Common.Util.exists = function exists(object) {
 	// not undefined and not null
 	return angular.isDefined(object) && object !== null;

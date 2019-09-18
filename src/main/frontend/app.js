@@ -69,7 +69,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Admin.Integration.Fax'
 ]);
 
-oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider)
+oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $urlRouterProvider, $httpProvider)
 {
 	//
 	// For any unmatched url, redirect to /state1
@@ -535,10 +535,22 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvider
 				url: '/faxSendReceive',
 				templateUrl: 'src/admin/integration/fax/faxSendReceive.jsp',
 				controller: 'Admin.Integration.Fax.FaxSendReceiveController as faxSendReceiveController'
-			})
-	;
+			});
 
+	// redirect to login page on 401 error.
+	$httpProvider.interceptors.push(['$q', function($q) {
+		return {
+			'responseError': function(rejection) {
+				if (rejection.status === 401 && rejection.data === "<error>Not authorized</error>")
+				{ // reload will cause server to redirect
+					location.reload();
+				}
+				return $q.reject(rejection);
+			}
+		};
+	}]);
 }]);
+
 
 // For debugging purposes
 /*
