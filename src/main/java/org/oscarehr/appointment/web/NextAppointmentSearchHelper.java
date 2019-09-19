@@ -106,17 +106,22 @@ public class NextAppointmentSearchHelper {
 			lastSdCal.setTime(scheduleDateList.get(0).getDate());
 		}
 		int templatesUsed = 0;
-		for(ScheduleDate sd : scheduleDateList) {
-			results.addAll(searchTemplate(sd.getProviderNo(), sd.getHour(), sd.getDate(), searchBean));
-			templatesUsed++;
+		for(ScheduleDate sd : scheduleDateList)
+		{
+			sdCal.setTime(sd.getDate());
+
 			/* since each DB result can have multiple openings, we can skip the later ones if there are 
 			 * more than the max amount being displayed. Can't do this with multiple providers since this causes
-			 * only a single provider to show up; because all free times were from the first template loaded.*/
-			sdCal.setTime(sd.getDate());
-			if( !(searchAllProviders && lastSdCal.get(Calendar.DAY_OF_YEAR) != sdCal.get(Calendar.DAY_OF_YEAR)) 
-					&& results.size() >= searchBean.getNumResults()) {
+			 * only a single provider to show up; because all free times were from the first template loaded.
+			 * With multiple providers, we can perform the check when the day changes, */
+			if((!searchAllProviders || lastSdCal.get(Calendar.DAY_OF_YEAR) != sdCal.get(Calendar.DAY_OF_YEAR))
+					&& results.size() >= searchBean.getNumResults())
+			{
 				break;
 			}
+			results.addAll(searchTemplate(sd.getProviderNo(), sd.getHour(), sd.getDate(), searchBean));
+			templatesUsed++;
+
 			lastSdCal.setTime(sd.getDate());
 		}
 		logger.info(templatesUsed + " schedule templates searched.");
