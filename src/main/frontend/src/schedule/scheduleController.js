@@ -1235,107 +1235,23 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			win.focus();
 		};
 
-
-		$scope.openCreateEventDialog = function openCreateEventDialog(
-			start, end, jsEvent, view, resource)
+		$scope.openCreateEventDialog = function openCreateEventDialog(start, end, jsEvent, view, resource)
 		{
-			// XXX: share as much code as possible with edit event
 			if (!securityService.hasPermission('scheduling_create'))
 			{
 				return;
 			}
 
-			// if already opening a dialog or have one open, ignore and return
-			if ($scope.openingDialog || $scope.dialog)
-			{
-				return;
-			}
-			$scope.openingDialog = true;
-
 			var scheduleUuid = null;
-			var displayName = "";
 			if (Juno.Common.Util.exists(resource))
 			{
 				scheduleUuid = resource.id;
-				displayName = resource.display_name;
 			}
 			else if ($scope.selectedSchedule !== null)
 			{
 				scheduleUuid = $scope.selectedSchedule.uuid;
 			}
-
-			var data = {
-				schedule: {
-					uuid: scheduleUuid,
-					display_name: displayName
-				},
-				defaultEventStatus: 't', //defaultEventStatus,
-				startTime: start,
-				endTime: end,
-				timeInterval: $scope.timeIntervalMinutes(),
-				scheduleTemplates: $scope.scheduleTemplates,
-				availabilityTypes: $scope.availabilityTypes,
-				sites: $scope.sites,
-				events: $scope.events,
-				eventData: {}
-			};
-
-			$scope.dialog = $uibModal.open({
-				animation: false,
-				backdrop: 'static',
-				controller: 'Schedule.EventController as eventController',
-				templateUrl: 'src/schedule/event.jsp',
-				resolve: {
-					type: [function ()
-					{
-						return 'create_edit_event'
-					}],
-					label: [function ()
-					{
-						return 'Appointment'
-					}],
-					parentScope: [function ()
-					{
-						return $scope
-					}],
-					data: [function ()
-					{
-						return data
-					}],
-					editMode: [function ()
-					{
-						return false
-					}],
-					keyBinding: [function ()
-					{
-						return {
-							bindKeyGlobal: function ()
-							{
-							}
-						}
-					}],
-					focus: [function ()
-					{
-						return focusService
-					}],
-				},
-				windowClass: "juno-modal",
-			});
-
-			$scope.dialog.result.catch(function (res)
-			{
-				if (!(res === 'cancel' || res === 'escape key press'))
-				{
-					throw res;
-				}
-			});
-
-			// when the dialog closes clear the variable
-			$scope.dialog.closed.then(function ()
-			{
-				$scope.dialog = null;
-			});
-			$scope.openingDialog = false;
+			controller.openAppointmentDialog(false, scheduleUuid, start, end, {});
 		};
 
 		$scope.openEditEventDialog = function openEditEventDialog(calEvent)
@@ -1344,36 +1260,28 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			{
 				return;
 			}
+			controller.openAppointmentDialog(true, calEvent.resourceId, calEvent.start, calEvent.end, calEvent.data);
+		};
 
+		controller.openAppointmentDialog = function openAppointmentDialog(isEditMode, scheduleUuid, start, end, calEventData)
+		{
 			// if already opening a dialog or have one open, ignore and return
 			if ($scope.openingDialog || $scope.dialog)
 			{
 				return;
 			}
-
 			$scope.openingDialog = true;
 
-			var scheduleUuid = calEvent.resourceId;
-			var displayName = calEvent.data.demographicName;
-
-			if (displayName == null)
-			{
-				displayName = '';
-			}
-
 			var data = {
-				schedule: {
-					uuid: scheduleUuid,
-					display_name: displayName
-				},
-				defaultEventStatus: null, //defaultEventStatus,
-				startTime: calEvent.start,
-				endTime: calEvent.end,
+				scheduleId: scheduleUuid,
+				startTime: start,
+				endTime: end,
+				defaultEventStatus: 't',
 				timeInterval: $scope.timeIntervalMinutes(),
 				availabilityTypes: $scope.availabilityTypes,
 				sites: $scope.sites,
 				events: $scope.events,
-				eventData: calEvent.data
+				eventData: calEventData
 			};
 
 			$scope.dialog = $uibModal.open({
@@ -1381,26 +1289,19 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				backdrop: 'static',
 				controller: 'Schedule.EventController as eventController',
 				templateUrl: 'src/schedule/event.jsp',
+				windowClass: "juno-modal",
 				resolve: {
-					type: [function ()
-					{
-						return 'create_edit_event'
-					}],
-					label: [function ()
-					{
-						return 'Appointment'
-					}],
 					parentScope: [function ()
 					{
-						return $scope
+						return $scope;
 					}],
 					data: [function ()
 					{
-						return data
+						return data;
 					}],
 					editMode: [function ()
 					{
-						return true
+						return isEditMode;
 					}],
 					keyBinding: [function ()
 					{
@@ -1412,31 +1313,31 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					}],
 					focus: [function ()
 					{
-						return focusService
+						return focusService;
 					}],
 				},
-				windowClass: "juno-modal",
 			});
 
-			$scope.dialog.result.catch(function (res)
-			{
-				if (!(res === 'cancel' || res === 'escape key press'))
+			$scope.dialog.result.then(
+				function onClose(data)
 				{
-					throw res;
+					$scope.dialog = null;
+				},
+				function onDismiss(data)
+				{
+					$scope.dialog = null;
 				}
-			});
-
-			// when the dialog closes clear the variable
-			$scope.dialog.closed.then(function ()
-			{
-				$scope.dialog = null;
-			});
-
+			);
 			$scope.openingDialog = false;
 		};
 
 		controller.openScheduleSearchDialog = function openScheduleSearchDialog(resourceId)
 		{
+			if (!securityService.hasPermission('scheduling_create'))
+			{
+				return;
+			}
+
 			$scope.openingDialog = true;
 
 			$scope.dialog = $uibModal.open(
@@ -1444,6 +1345,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					animation: false,
 					backdrop: 'static',
 					component: 'scheduleSearch',
+					windowClass: "juno-modal",
 					resolve: {
 						providerId: function ()
 						{
@@ -1458,14 +1360,13 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 							return $scope.getScheduleMaxTime();
 						},
 					},
-					windowClass: "juno-modal",
 				}
 			);
 			$scope.dialog.result.then(
 				function onClose(data)
 				{
 					$scope.dialog = null;
-					$scope.openCreateEventDialog(data.start, data.end, null, null, data.resource);
+					controller.openAppointmentDialog(false, data.resourceId, data.start, data.end, {});
 				},
 				function onDismiss(data)
 				{

@@ -135,15 +135,12 @@ angular.module('Schedule').component('scheduleSearch', {
 
 			var startTime = moment(scheduleSlot.appointmentDateTime);
 			var endTime = angular.copy(startTime).add(scheduleSlot.durationMinutes, 'minutes');
-			var resource = {
-				id: provider.providerNo,
-				display_name: provider.name
-			};
+			var resourceId = provider.providerNo;
 
 			ctrl.modalInstance.close({
 				start:startTime,
 				end: endTime,
-				resource: resource
+				resourceId: resourceId
 			});
 		};
 

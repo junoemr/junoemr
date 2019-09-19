@@ -25,7 +25,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	'scheduleService',
 	'keyBinding',
 	'focus',
-	'type', 'parentScope', 'label', 'editMode', 'data',
+	'parentScope', 'editMode', 'data',
 
 	function (
 		$scope,
@@ -40,7 +40,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		scheduleService,
 		keyBinding,
 		focus,
-		type, parentScope, label, editMode, data
+		parentScope, editMode, data
 	)
 {
 	$scope.parentScope = parentScope;
@@ -71,13 +71,12 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	controller.appointmentTypeList = [];
 	controller.reasonCodeList = [];
 
-	$scope.label = label;
 	$scope.editMode = editMode;
 
 	$scope.keyBinding = keyBinding;
 	$scope.eventUuid = null;
 
-	$scope.schedule = data.schedule;
+	$scope.scheduleId = data.scheduleId;
 
 	$scope.eventData = {
 		startDate: null,
@@ -236,7 +235,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 		controller.loadAppointmentReasons();
 		controller.loadAppointmentTypes();
-		controller.providerModel.loadData(data.schedule.uuid);
+		controller.providerModel.loadData(data.scheduleId);
 
 		var momentStart = data.startTime;
 		var momentEnd = data.endTime;
@@ -352,7 +351,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		for(var i = 0; i < data.events.length; i++)
 		{
 			// filter events that should not be checked (non-background, wrong schedule, etc.)
-			if(data.events[i].rendering !== "background" || data.events[i].resourceId != $scope.schedule.uuid)
+			if(data.events[i].rendering !== "background" || data.events[i].resourceId != $scope.scheduleId)
 			{
 				continue;
 			}
@@ -502,7 +501,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 
 				// filter events that should not be checked (background, wrong schedule, etc.)
 				if (event.rendering === "background"
-					|| event.resourceId != $scope.schedule.uuid
+					|| event.resourceId != $scope.scheduleId
 					|| $scope.eventUuid == event.data.appointmentNo)
 				{
 					continue;
@@ -617,7 +616,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 				reason: $scope.eventData.reason,
 				reasonCode: $scope.eventData.reasonCode,
 				notes: $scope.eventData.notes,
-				providerNo: $scope.schedule.uuid,
+				providerNo: $scope.scheduleId,
 				eventStatusCode: controller.selectedEventStatus,
 				eventStatusModifier: $scope.eventData.eventStatusModifier,
 				demographicNo: demographicNo,
@@ -853,7 +852,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			$scope.working = false;
 			$scope.parentScope.openCreateInvoice(
 				$scope.eventUuid,
-				$scope.schedule.uuid,
+				$scope.scheduleId,
 				controller.demographicModel.demographicNo);
 		}, function()
 		{
