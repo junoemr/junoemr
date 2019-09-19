@@ -774,6 +774,10 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		}
 		return false;
 	};
+	controller.showPatientChartLinks = function showPatientChartLinks()
+	{
+		return (controller.hasAppointmentId() && $scope.isPatientSelected());
+	};
 
 	controller.changeTab = function changeTab(tabId)
 	{

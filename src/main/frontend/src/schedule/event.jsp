@@ -32,26 +32,6 @@
 		</div>
 	</modal-title>
 	<modal-ctl-buttons>
-		<div class="modal-patient-links"
-		     ng-show="isPatientSelected()">
-			<button type="button" class="btn btn-xs btn-default"
-			        ng-click="eventController.openEncounterPage()">
-				<span class="">E</span>
-			</button>
-			<button type="button" class="btn btn-xs btn-default"
-			        ng-disabled="!eventController.hasAppointmentId()"
-			        ng-click="eventController.openBillingPage()">
-				<span class="">B</span>
-			</button>
-			<button type="button" class="btn btn-xs btn-default"
-			        ng-click="eventController.openMasterRecord()">
-				<span class="">M</span>
-			</button>
-			<button type="button" class="btn btn-xs btn-default"
-			        ng-click="eventController.openRxWindow()">
-				<span class="">Rx</span>
-			</button>
-		</div>
 		<button type="button" class="btn btn-icon" aria-label="Close"
 		        ng-click="eventController.cancel()"
 		        title="Cancel">
@@ -88,12 +68,12 @@
 			<div id="tabAppointmentEdit" class="tab-pane"
 			     ng-show="eventController.isTabActive(eventController.tabEnum.appointment)">
 
-				<div ng-show="!isInitialized() || isWorking()" ng-include="'src/common/spinner.jsp'"></div>
+				<div ng-show="!isInitialized() || isWorking()"
+				     ng-include="'src/common/spinner.jsp'">
+				</div>
 				<div ng-show="isInitialized() && !isWorking()">
-					<div class="tab-bar-inputs form-horizontal">
-						<div class="col-sm-5">
-						</div>
-						<div class="col-sm-7">
+					<div class="tab-bar-inputs form-row">
+						<div class="col-sm-8 pull-right">
 							<juno-appointment-status-select
 									ca-name="event-appt-status"
 									ca-no-label="true"
@@ -110,19 +90,47 @@
 							<!-- patient search -->
 							<div class="form-group col-md-6" title="Patient"
 							     ng-hide="eventData.doNotBook">
-								<label for="input-patient">
-									Patient
-								</label>
-								<juno-patient-search-typeahead
-										id="input-patient"
-										juno-icon-right="true"
-										juno-model="eventController.patientTypeahead"
-								>
-								</juno-patient-search-typeahead>
+								<div class="row">
+									<div ng-class="{'col-md-8': eventController.showPatientChartLinks(),
+									                'col-md-12': !eventController.showPatientChartLinks() }">
+										<label class="control-label"
+										       for="input-patient">
+											Patient
+										</label>
+										<juno-patient-search-typeahead
+												id="input-patient"
+												juno-icon-right="true"
+												juno-model="eventController.patientTypeahead"
+										>
+										</juno-patient-search-typeahead>
+									</div>
+									<div class="col-md-4 lower-content padding-left-0"
+									     ng-if="eventController.showPatientChartLinks()">
+										<div class="btn-group modal-patient-links pull-right">
+											<button type="button" class="btn btn-default"
+											        ng-click="eventController.openEncounterPage()">
+												<span>E</span>
+											</button>
+											<button type="button" class="btn btn-default"
+											        ng-click="eventController.openBillingPage()">
+												<span>B</span>
+											</button>
+											<button type="button" class="btn btn-default"
+											        ng-click="eventController.openMasterRecord()">
+												<span>M</span>
+											</button>
+											<button type="button" class="btn btn-default"
+											        ng-click="eventController.openRxWindow()">
+												<span>Rx</span>
+											</button>
+										</div>
+									</div>
+								</div>
 							</div>
 							<div class="form-group col-md-6" title="Patient"
 							     ng-show="eventData.doNotBook">
-								<label for="input-patient-dnb">
+								<label class="control-label"
+								       for="input-patient-dnb">
 									Patient
 								</label>
 								<div>
@@ -148,34 +156,31 @@
 										>
 										</ca-field-select>
 									</div>
-									<div class="col-md-4">
-										<div class="form-group">
-											<label class="control-label">&nbsp</label>
-											<ca-field-boolean
-													ca-name="check-critical"
-													ca-title="Critical"
-													ca-label-size="col-md-6"
-													ca-input-size="col-md-6"
-													ca-model="eventData.critical"
-													ca-template="juno"
-											>
-											</ca-field-boolean>
-										</div>
+									<div class="col-md-4 lower-content">
+										<ca-field-boolean
+												ca-form-group-class="vertical-align"
+												ca-name="check-critical"
+												ca-title="Critical"
+												ca-label-size="col-md-6"
+												ca-input-size="col-md-6"
+												ca-model="eventData.critical"
+												ca-template="juno"
+										>
+										</ca-field-boolean>
 									</div>
 								</div>
 							</div>
 						</div>
 						<div class="form-row">
-							<div class="form-group col-md-6">
-								<div class="info-frame-container"
-								     ng-show="isPatientSelected()">
-									<label>Demographic</label>
+							<div class="form-group col-md-6 info-frame-container">
+								<div ng-show="isPatientSelected()">
+									<label class="control-label">Demographic</label>
 									<demographic-card
 											demographic-model="eventController.demographicModel.data">
 									</demographic-card>
 								</div>
 							</div>
-							<div class="col-md-6">
+							<div class="col-md-6 lower-content">
 								<div class="row">
 									<div class="col-md-5">
 										<ca-field-date
@@ -187,7 +192,7 @@
 												ca-orientation="auto"
 										></ca-field-date>
 									</div>
-									<div class="col-md-4">
+									<div class="col-md-4 padding-left-0">
 										<ca-field-time
 												ca-title="Time"
 												ca-name="startTime"
@@ -198,7 +203,7 @@
 												ca-minute-step="parentScope.timeIntervalMinutes()">
 										</ca-field-time>
 									</div>
-									<div class="col-md-3">
+									<div class="col-md-3 padding-left-0">
 										<ca-field-text
 												ca-title="Duration"
 												ca-name="duration"
@@ -209,7 +214,7 @@
 									</div>
 								</div>
 								<div class="row">
-									<div class="col-md-8">
+									<div class="col-md-6">
 										<!-- reason type -->
 										<ca-field-select
 												ca-template="label"
@@ -221,9 +226,7 @@
 										>
 										</ca-field-select>
 									</div>
-								</div>
-								<div class="row">
-									<div class="col-md-8">
+									<div class="col-md-6 padding-left-0">
 										<!-- location/site -->
 										<ca-field-select
 												ca-hide="!eventController.sitesEnabled"
