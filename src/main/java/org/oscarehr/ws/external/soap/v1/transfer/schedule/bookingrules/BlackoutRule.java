@@ -25,7 +25,6 @@ package org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules;
 
 import org.json.simple.JSONObject;
 import org.oscarehr.common.model.Appointment;
-import org.oscarehr.schedule.model.ScheduleSearchResult;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDateTime;
@@ -36,6 +35,9 @@ import java.time.temporal.ChronoUnit;
  */
 public class BlackoutRule extends BookingRule
 {
+	static final Integer DEFAULT_AMOUNT = 0;
+	static final ChronoUnit DEFAULT_TIME_PERIOD = ChronoUnit.DAYS;
+
     private Integer amount;
     private ChronoUnit timePeriod;
 
@@ -46,16 +48,18 @@ public class BlackoutRule extends BookingRule
         this.timePeriod = timePeriod;
     }
 
-    @Override
-    public Boolean isViolated(Appointment appointment)
+	BlackoutRule()
+	{
+		super(BookingRuleType.BOOKING_BLACKOUT, PERIOD_TYPE_BLACKOUT_NOW_UNTIL_DAY);
+		this.amount = DEFAULT_AMOUNT;
+		this.timePeriod = DEFAULT_TIME_PERIOD;
+	}
+
+
+	@Override
+	public Boolean isViolated(Appointment appointment)
     {
         return isBeforeBlackOutEnds(ConversionUtils.toLocalDateTime(appointment.getAppointmentDate()));
-    }
-
-    @Override
-    public Boolean isViolated(ScheduleSearchResult result)
-    {
-        return isBeforeBlackOutEnds(result.dateTime);
     }
 
     @Override
@@ -68,9 +72,16 @@ public class BlackoutRule extends BookingRule
         return json;
     }
 
-    private Boolean isBeforeBlackOutEnds(LocalDateTime dateTime)
+    public LocalDateTime getBlackoutTime()
+	{
+		return ConversionUtils.truncateLocalDateTime(
+				LocalDateTime.now().plus(amount, timePeriod), timePeriod);
+	}
+
+	private Boolean isBeforeBlackOutEnds(LocalDateTime dateTime)
     {
-        LocalDateTime cutoff = ConversionUtils.truncateLocalDateTime(LocalDateTime.now(),timePeriod).plus(amount, timePeriod);
+        LocalDateTime cutoff = ConversionUtils.truncateLocalDateTime(
+        		LocalDateTime.now(),timePeriod).plus(amount, timePeriod);
 
         return dateTime.isBefore(cutoff);
     }
