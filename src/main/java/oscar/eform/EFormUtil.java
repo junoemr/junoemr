@@ -1110,26 +1110,14 @@ public class EFormUtil {
 
 	public static String removeQuotes(String s) {
 		if (StringUtils.isBlank(s)) return s;
-
-		if (s.length() <= 1)
-		{
-			if (s.equals("'") || s.equals("\""))
-			{
-				return "";
-			}
-			else
-			{
-				return s;
-			}
-		}
-
+		
 		s = s.trim();
 		if (StringUtils.isBlank(s)) return s;
 
-		if (s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') s = s.substring(1, s.length() - 1);
+		if (s.length() > 1 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') s = s.substring(1, s.length() - 1);
 		if (StringUtils.isBlank(s)) return s;
 
-		if (s.charAt(0) == '\'' && s.charAt(s.length() - 1) == '\'') s = s.substring(1, s.length() - 1);
+		if (s.length() > 1 && s.charAt(0) == '\'' && s.charAt(s.length() - 1) == '\'') s = s.substring(1, s.length() - 1);
 		return s.trim();
 	}
 

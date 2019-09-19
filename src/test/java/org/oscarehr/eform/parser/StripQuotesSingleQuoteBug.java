@@ -71,14 +71,20 @@ public class StripQuotesSingleQuoteBug
 								"<div name=\"quote\">\n</div>",
 								Arrays.asList("quote"),
 								Arrays.asList("'"),
-								"<div name=\"quote\" value=\"\" >\n</div>"
+								"<div name=\"quote\" value=\"'\" >\n</div>"
 						},
 						{
 								"<div name=\"quote\">\n</div>",
 								Arrays.asList("quote"),
 								Arrays.asList("'fizbang'"),
 								"<div name=\"quote\" value=\"fizbang\" >\n</div>"
-						}
+						},
+						{
+								"<div name=\"quote\">\n</div>",
+								Arrays.asList("quote"),
+								Arrays.asList("\"'\""),
+								"<div name=\"quote\" value=\"'\" >\n</div>"
+						},
 				});
 	}
 
