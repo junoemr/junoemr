@@ -1108,6 +1108,11 @@ public class EFormUtil {
 		return text.indexOf(phrase, start);
 	}
 
+	/**
+	 * removes external quotes around string. ex: "fizbang" -> fizbang. or 'foobar' -> foobar.
+	 * @param s - string to strip quotes from
+	 * @return - the string with the quotes stripped.
+	 */
 	public static String removeQuotes(String s) {
 		if (StringUtils.isBlank(s)) return s;
 		

@@ -40,7 +40,7 @@ import java.util.List;
 	Test a bug, where the user enters single quotes in to their string. This causes html parsing errors.
  */
 @RunWith(Parameterized.class)
-public class StripQuotesSingleQuoteBug
+public class RemoveQuotesTest
 {
 	private String inputHtml;
 	private String expectHtml;
@@ -48,7 +48,7 @@ public class StripQuotesSingleQuoteBug
 	private List<String> allValues;
 
 
-	public StripQuotesSingleQuoteBug(String html, List<String> allNames, List<String> allValues, String expectHtml)
+	public RemoveQuotesTest(String html, List<String> allNames, List<String> allValues, String expectHtml)
 	{
 		this.inputHtml = html;
 		this.expectHtml = expectHtml;
