@@ -146,14 +146,14 @@ angular.module('Record').controller('Record.RecordController', [
 			if (Juno.Common.Util.isDefinedAndNotNull(temp.state))
 			{
 				if(Juno.Common.Util.isDefinedAndNotNull(temp.demoId)){
-					$state.go(temp.state,
+					$state.go(temp.state[0],
 						{
 							demographicNo: temp.demoId
 						});
 				}
 				else
 				{
-					$state.go(temp.state);
+					$state.go(temp.state[0]);
 				}
 			}
 			else if (angular.isDefined(temp.url))
@@ -177,7 +177,7 @@ angular.module('Record').controller('Record.RecordController', [
 			if(Juno.Common.Util.isDefinedAndNotNull($state.current.name) &&
 				Juno.Common.Util.isDefinedAndNotNull(tab.state))
 			{
-				return ($state.current.name === tab.state);
+				return (tab.state.includes($state.current.name));
 			}
 
 			return false;
