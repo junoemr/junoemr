@@ -115,12 +115,8 @@ angular.module('Schedule').controller('Schedule.EventController', [
 	};
 	controller.eventHistory = [];
 
-	$scope.timeInterval = data.timeInterval;
-
 	controller.patientTypeahead = {};
 	$scope.autocompleteValues = {};
-
-	$scope.activeTemplateEvents = [];
 
 	controller.eventStatuses = scheduleService.eventStatuses;
 
@@ -242,9 +238,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		$scope.eventData.startTime = Juno.Common.Util.formatMomentTime(momentStart, $scope.timepickerFormat);
 		$scope.eventData.startDate = Juno.Common.Util.formatMomentDate(momentStart);
 
-		// maintain a list of the 'active' templates based on start time
-		$scope.setActiveTemplateEvents();
-
 		for(var key in controller.eventStatuses)
 		{
 			if(controller.eventStatuses.hasOwnProperty(key))
@@ -255,6 +248,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		$scope.defaultEventStatus = data.defaultEventStatus;
 		controller.setSelectedEventStatus(data.eventData.eventStatusCode);
 		$scope.eventData.eventStatusModifier = data.eventData.eventStatusModifier;
+		$scope.eventData.duration = momentEnd.diff(momentStart, 'minutes');
 
 		if(editMode)
 		{
@@ -265,7 +259,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 			$scope.eventData.reasonCode = data.eventData.reasonCode;
 			$scope.eventData.doNotBook = data.eventData.doNotBook;
 			$scope.eventData.critical = data.eventData.urgency === 'critical';
-			$scope.eventData.duration = momentEnd.diff(momentStart, 'minutes');
 			$scope.eventData.site = data.eventData.site;
 
 			controller.checkEventConflicts(); // uses the eventData
@@ -291,10 +284,9 @@ angular.module('Schedule').controller('Schedule.EventController', [
 				});
 			controller.loadAppointmentHistory($scope.eventUuid);
 		}
-		else
+		else //create new
 		{
-			// create mode: adjust the end date (if needed)
-			// and clear the patient model
+			// clear the patient model
 			controller.demographicModel.clear();
 			$scope.eventData.site = $scope.parentScope.selectedSiteName;
 			// set the default site selection if the current one is invalid
@@ -303,10 +295,7 @@ angular.module('Schedule').controller('Schedule.EventController', [
 				$scope.eventData.site = controller.siteOptions[0].value;
 			}
 
-			controller.setTimeAndDurationByTemplate($scope.activeTemplateEvents[0], parentScope.timeIntervalMinutes());
-
 			focus.element("#input-patient");
-
 			controller.checkEventConflicts(); // uses the eventData
 
 			$timeout(controller.loadWatches);
@@ -337,66 +326,6 @@ angular.module('Schedule').controller('Schedule.EventController', [
 		}
 
 		controller.selectedEventStatus = eventStatusCode;
-	};
-
-	// Make a list of the types of appointments available for this appointment
-	$scope.setActiveTemplateEvents = function setActiveTemplateEvents()
-	{
-		// Get templates that happen during the time period
-		var momentStart = Juno.Common.Util.getDateAndTimeMoment(
-			$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
-		var activeEvents = [];
-
-		// Loop through the events for this day
-		for(var i = 0; i < data.events.length; i++)
-		{
-			// filter events that should not be checked (non-background, wrong schedule, etc.)
-			if(data.events[i].rendering !== "background" || data.events[i].resourceId != $scope.scheduleId)
-			{
-				continue;
-			}
-
-			var event = angular.copy(data.events[i]);
-
-			// if start time is between event start and end
-			event.start = Juno.Common.Util.getDatetimeNoTimezoneMoment(event.start);
-			event.end = Juno.Common.Util.getDatetimeNoTimezoneMoment(event.end);
-
-			if(momentStart.isValid() && event.start.isValid() && event.end.isValid() &&
-				momentStart.isBefore(event.end) && momentStart.isSameOrAfter(event.start))
-			{
-				//TODO refactor availability type lists
-				var extendedAvailabilityType = data.availabilityTypes[event.scheduleTemplateCode];
-				if(Juno.Common.Util.exists(extendedAvailabilityType))
-				{
-					event.availabilityType = extendedAvailabilityType;
-				}
-				else
-				{
-					event.availabilityType.duration = event.availabilityType.preferredEventLengthMinutes;
-				}
-				activeEvents.push(event);
-			}
-		}
-
-		$scope.activeTemplateEvents = activeEvents;
-	};
-
-	controller.setTimeAndDurationByTemplate = function setTimeAndDurationByTemplate(templateEvent, defaultDuration)
-	{
-		var duration = defaultDuration;
-		if(Juno.Common.Util.exists(templateEvent) && Juno.Common.Util.exists(templateEvent.availabilityType))
-		{
-			$scope.eventData.startTime = Juno.Common.Util.formatMomentTime(templateEvent.start, $scope.timepickerFormat);
-
-			var templateDuration = templateEvent.availabilityType.duration;
-			if(Juno.Common.Util.exists(templateDuration)
-				&& Juno.Common.Util.isIntegerString(templateDuration))
-			{
-				duration = templateDuration;
-			}
-		}
-		$scope.eventData.duration = duration;
 	};
 
 	controller.loadAppointmentReasons = function loadAppointmentReasons()

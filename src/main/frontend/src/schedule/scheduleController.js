@@ -1235,6 +1235,46 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			win.focus();
 		};
 
+		// Make a list of the types of appointments available for this moment
+		$scope.getActiveTemplateEvents = function getActiveTemplateEvents(momentStart, eventList, scheduleId)
+		{
+			// Get templates that happen during the time period
+			var activeEvents = [];
+
+			// Loop through the events for this day
+			for(var i = 0; i < eventList.length; i++)
+			{
+				// filter events that should not be checked (non-background, wrong schedule, etc.)
+				if(eventList[i].rendering !== "background" || eventList[i].resourceId !== scheduleId)
+				{
+					continue;
+				}
+
+				var event = angular.copy(eventList[i]);
+
+				// if start time is between event start and end
+				event.start = Juno.Common.Util.getDatetimeNoTimezoneMoment(event.start);
+				event.end = Juno.Common.Util.getDatetimeNoTimezoneMoment(event.end);
+
+				if(momentStart.isValid() && event.start.isValid() && event.end.isValid() &&
+					momentStart.isBefore(event.end) && momentStart.isSameOrAfter(event.start))
+				{
+					//TODO refactor availability type lists
+					var extendedAvailabilityType = $scope.availabilityTypes[event.scheduleTemplateCode];
+					if(Juno.Common.Util.exists(extendedAvailabilityType))
+					{
+						event.availabilityType = extendedAvailabilityType;
+					}
+					else
+					{
+						event.availabilityType.duration = event.availabilityType.preferredEventLengthMinutes;
+					}
+					activeEvents.push(event);
+				}
+			}
+			return activeEvents;
+		};
+
 		$scope.openCreateEventDialog = function openCreateEventDialog(start, end, jsEvent, view, resource)
 		{
 			if (!securityService.hasPermission('scheduling_create'))
@@ -1251,6 +1291,24 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			{
 				scheduleUuid = $scope.selectedSchedule.uuid;
 			}
+
+			var activeTemplateList = $scope.getActiveTemplateEvents(start, $scope.events, Number(scheduleUuid));
+			var templateEvent = activeTemplateList[0];
+
+			var duration = $scope.timeIntervalMinutes();
+			if(Juno.Common.Util.exists(templateEvent) && Juno.Common.Util.exists(templateEvent.availabilityType))
+			{
+				start = templateEvent.start;
+
+				var templateDuration = templateEvent.availabilityType.duration;
+				if(Juno.Common.Util.exists(templateDuration)
+					&& Juno.Common.Util.isIntegerString(templateDuration))
+				{
+					duration = templateDuration;
+				}
+			}
+			end = angular.copy(start).add(duration, 'minutes');
+
 			controller.openAppointmentDialog(false, scheduleUuid, start, end, {});
 		};
 
@@ -1278,7 +1336,6 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 				endTime: end,
 				defaultEventStatus: 't',
 				timeInterval: $scope.timeIntervalMinutes(),
-				availabilityTypes: $scope.availabilityTypes,
 				sites: $scope.sites,
 				events: $scope.events,
 				eventData: calEventData

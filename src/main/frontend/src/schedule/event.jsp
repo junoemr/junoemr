@@ -26,8 +26,8 @@
 	<modal-title>
 		<i class="icon icon-modal-header icon-calendar-add"></i>
 		<div class="align-baseline">
-			<h3 ng-hide="editMode">Add {{label}}</h3>
-			<h3 ng-show="editMode">Modify {{label}}</h3>
+			<h3 ng-hide="editMode">Add Appointment</h3>
+			<h3 ng-show="editMode">Modify Appointment</h3>
 			<h4>with {{eventController.providerModel.displayName}}</h4>
 		</div>
 	</modal-title>
