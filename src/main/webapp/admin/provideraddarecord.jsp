@@ -65,6 +65,15 @@
 <%@page import="org.oscarehr.common.model.ProviderSite"%>
 <%@page import="org.oscarehr.common.model.ProviderSitePK"%>
 <%@page import="org.oscarehr.common.dao.ProviderSiteDao"%>
+<%@ page import="org.springframework.beans.factory.annotation.Autowired" %>
+<%@ page import="org.oscarehr.PMmodule.service.ProgramManager" %>
+<%@ page import="org.oscarehr.PMmodule.model.ProgramProvider" %>
+<%@ page import="org.oscarehr.PMmodule.dao.ProgramProviderDAO" %>
+<%@ page import="org.oscarehr.common.dao.SecRoleDao" %>
+<%@ page import="org.oscarehr.common.model.SecRole" %>
+<%@ page import="static org.oscarehr.common.model.Provider.PROVIDER_TYPE_DOCTOR" %>
+<%@ page import="org.oscarehr.PMmodule.dao.SecUserRoleDao" %>
+<%@ page import="org.oscarehr.PMmodule.model.SecUserRole" %>
 <%
 	ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
 	ProviderSiteDao providerSiteDao = SpringUtils.getBean(ProviderSiteDao.class);
@@ -196,10 +205,59 @@ DBPreparedHandler dbObj = new DBPreparedHandler();
   if(providerDao.providerExists(provider.getProviderNo())) {
 	  isOk=false;
 	  alreadyExists=true;
-  } else {
-  	providerDao.saveProvider(provider);
- 	 isOk=true;
   }
+  	else
+	{
+		providerDao.saveProvider(provider);
+ 	 	isOk=true;
+
+ 	 	// make newly added provider by default a 'doctor' and 'primary' role
+
+		boolean providerStatus = provider.getStatus().equals("1");
+
+		ProgramManager programManager = SpringUtils.getBean(ProgramManager.class);
+		long programId = programManager.getDefaultProgramId();
+
+
+ 	 	int providerNo = Integer.parseInt(provider.getProviderNo());
+
+
+		SecRoleDao secRoleDao = SpringUtils.getBean(SecRoleDao.class);
+		int roleId = -1000;
+		String roleName = "";
+		List<SecRole> secRoles = secRoleDao.findAll();
+		for(SecRole secRole: secRoles)
+		{
+			if(secRole.getName().equalsIgnoreCase(PROVIDER_TYPE_DOCTOR))
+			{
+				roleName = secRole.getName();
+				roleId = secRole.getId();
+				break;
+			}
+		}
+
+
+		//assign to primary role
+		ProgramProvider programProvider = new ProgramProvider();
+		ProgramProviderDAO programProviderDao = SpringUtils.getBean(ProgramProviderDAO.class);
+
+		programProvider.setProgramId(programId);
+		programProvider.setProviderNo(String.valueOf(providerNo));
+		programProvider.setRoleId((long)roleId);
+
+		programProviderDao.saveProgramProvider(programProvider);
+
+
+		SecUserRoleDao secUserRoleDao = SpringUtils.getBean(SecUserRoleDao.class);
+		SecUserRole secUserRole = new SecUserRole();
+
+		secUserRole.setProviderNo(String.valueOf(providerNo));
+		secUserRole.setRoleName(roleName);
+		secUserRole.setActive(providerStatus);
+
+		secUserRoleDao.save(secUserRole);
+
+	}
 
 if (isOk && org.oscarehr.common.IsPropertiesOn.isMultisitesEnable()) {
 	String[] sites = request.getParameterValues("sites");
