@@ -2,7 +2,10 @@
 <div class="summary-module-base form-horizontal">
 	<div class="summary-module-header">
 		<div class="flex-row align-items-center">
-			<h5 class="flex-grow title">{{$ctrl.module.displayName}}</h5>
+			<div ng-switch="$ctrl.clickableTitle" class="flex-grow title">
+				<h5 class="flex-grow title" ng-switch-when="false">{{$ctrl.module.displayName}}</h5>
+				<h5 class="flex-grow title" ng-switch-when="true"><a href="javascript:" ng-click="$ctrl.clickTitleCallback()">{{$ctrl.module.displayName}}</a></h5>
+			</div>
 			<button ng-if="$ctrl.enableAddButton"
 					class="btn btn-xs btn-primary-inverted btn-add"
 			        ng-click="$ctrl.addBtnCallback()"

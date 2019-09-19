@@ -38,6 +38,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 	'noteService',
 	'summaryService',
 	'securityService',
+	'formService',
 
 	function(
 		$rootScope,
@@ -52,7 +53,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		user,
 		noteService,
 		summaryService,
-		securityService)
+		securityService,
+		formService)
 	{
 
 		var controller = this;
@@ -136,10 +138,15 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			return false;
 		};
 
-		controller.openForms = function openForms()
+		controller.openAddForms = function openForms()
 		{
 			// open forms tab with "Library" list selected
-			$state.go('record.forms', {formListId: 1});
+			$state.go('record.forms.add');
+		};
+
+		controller.openCompletedForms = function()
+		{
+			$state.go('record.forms.completed');
 		};
 
 		// There is probably a better way of doing this
@@ -375,6 +382,10 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				window.open(item.action, win, "scrollbars=yes, location=no, width=900, height=600", "");
 				return false;
 			}
+			else if (item.type === 'eform')
+			{
+				formService.openEFormInstancePopup($stateParams.demographicNo, item.id);
+			}
 			else if (item.action == 'action')
 			{
 				controller.editGroupedNotes('lg', mod, item.id, successCallback, dismissCallback);
@@ -499,12 +510,25 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 			else if (module.summaryCode === 'forms')
 			{
-				controller.openForms();
+				controller.openAddForms();
 			}
 			else if (module.summaryCode === 'preventions')
 			{
 				controller.openPreventions(controller.demographicNo);
 			}
+		};
+
+		controller.onSummaryModClickTitle = function (module)
+		{
+			if (module.summaryCode === "forms")
+			{
+				controller.openCompletedForms()
+			}
+		};
+
+		controller.isModTitleClickable = function(module)
+		{
+			return module.summaryCode === "forms";
 		};
 
 		// called when a child component is initialized. this allows the controller to call select child methods

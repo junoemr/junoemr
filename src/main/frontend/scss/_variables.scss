@@ -26,6 +26,7 @@ $modal-footer-height: 64px;
 $modal-border-space: 8px;
 
 $modal-body-height: calc(#{$modal-height} - #{$modal-header-height} - #{$modal-footer-height} - #{$modal-border-space});
+$modal-body-no-footer-height: calc(#{$modal-height} - #{$modal-header-height} - #{$modal-border-space});
 
 
 $form-input-height: 32px;

@@ -1,0 +1,17 @@
+.form-view-component {
+	.delete-link {
+		color: $color-red-base;
+	}
+
+	.delete-link:hover {
+		color: darken($color-red-base, 10%);
+	}
+
+	.restore-link {
+		color: $color-lime-darker;
+	}
+
+	.restore-link:hover {
+		color: darken($color-lime-darker, 10%);
+	}
+}

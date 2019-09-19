@@ -921,6 +921,7 @@ public class EForm extends EFormBase {
 		int attrKeyStart = currIndex;
 		int attrKeyEnd = currIndex;
 		boolean inQuotes = false;
+		boolean isDoubleQuotes = false;
 		while(currIndex < html.length())
 		{
 			if (!inQuotes && html.charAt(currIndex) == ' ')
@@ -935,11 +936,21 @@ public class EForm extends EFormBase {
 			{
 				attrKeyEnd = currIndex;
 			}
-			else if (!inQuotes && (html.charAt(currIndex) == '"' || html.charAt(currIndex) == '\''))
+			else if (!inQuotes && html.charAt(currIndex) == '"' )
 			{
 				inQuotes = true;
+				isDoubleQuotes = true;
 			}
-			else if (inQuotes && (html.charAt(currIndex) == '"' || html.charAt(currIndex) == '\''))
+			else if (!inQuotes && html.charAt(currIndex) == '\'')
+			{
+				inQuotes = true;
+				isDoubleQuotes = false;
+			}
+			else if (inQuotes && html.charAt(currIndex) == '"' && isDoubleQuotes)
+			{
+				inQuotes = false;
+			}
+			else if (inQuotes &&  html.charAt(currIndex) == '\'' && !isDoubleQuotes)
 			{
 				inQuotes = false;
 			}

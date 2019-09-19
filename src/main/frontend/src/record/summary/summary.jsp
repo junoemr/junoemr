@@ -41,6 +41,8 @@
 						onclick-item="summaryCtrl.gotoState(item, module, successCallback, dismissCallback)"
 						enable-add-button="true"
 						onclick-add="summaryCtrl.onSummaryModAdd(module, successCallback, dismissCallback)"
+						onclick-title="summaryCtrl.onSummaryModClickTitle(module)"
+						clickable-title="summaryCtrl.isModTitleClickable(mod)"
 				>
 				</summary-module>
 			</div>
@@ -109,6 +111,8 @@
 						module="mod"
 						item-display-count="mod.displaySize"
 						onclick-item="summaryCtrl.gotoState(item, module, successCallback, dismissCallback)"
+						onclick-title="summaryCtrl.onSummaryModClickTitle(module)"
+						clickable-title="summaryCtrl.isModTitleClickable(mod)"
 						enable-filter="true"
 				>
 				</summary-module>

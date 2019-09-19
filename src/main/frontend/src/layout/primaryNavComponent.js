@@ -474,7 +474,7 @@ angular.module('Layout').component("primaryNavigation", {
 				{
 					$timeout(function()
 					{
-						$state.go(item.state);
+						$state.go(item.state[0]);
 					});
 				}
 
@@ -622,7 +622,7 @@ angular.module('Layout').component("primaryNavigation", {
 
 		ctrl.isActive = function(tab)
 		{
-			return ($state.current.name === tab.state);
+			return ($state.current.name === (tab.state != null ? tab.state[0] : null));
 		};
 
 		ctrl.changeProgram = function changeProgram(programId)

@@ -24,7 +24,9 @@
  */
 
 angular.module('Common.Components').component('junoModal', {
-	bindings: {},
+	bindings: {
+		hideFooter: '<'
+	},
 	templateUrl: "src/common/components/modalTemplate.jsp",
 	transclude: {
 		'title': '?modalTitle',
@@ -34,6 +36,13 @@ angular.module('Common.Components').component('junoModal', {
 	},
 	controller: function ()
 	{
-
+		let ctrl = this;
+		ctrl.$onInit = function ()
+		{
+			if (ctrl.hideFooter === undefined)
+			{
+				ctrl.hideFooter = false;
+			}
+		};
 	}
 });
