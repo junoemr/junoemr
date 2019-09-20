@@ -145,6 +145,7 @@ public final class RxAddAllergyAction extends Action
 					allergy.getAuditString());
 		}
 
+		request.setAttribute("demographicNo", allergy.getDemographicNo());
 		return (mapping.findForward("success"));
 	}
 

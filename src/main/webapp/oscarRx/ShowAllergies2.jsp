@@ -39,6 +39,10 @@
 <%@page import="org.oscarehr.common.model.PartialDate" %>
 <%@ page import="oscar.oscarRx.pageUtil.RxSessionBean" %>
 <%@ page import="org.oscarehr.casemgmt.model.CaseManagementNoteLink" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicDao" %>
+<%@ page import="org.oscarehr.demographic.model.Demographic" %>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="java.time.Period" %>
 
 <%
 	String roleName2$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
@@ -52,10 +56,9 @@
 	if(!authenticated) {
 		return;
 	}
-%>
 
-<%
 	PartialDateDao partialDateDao = (PartialDateDao) SpringUtils.getBean("partialDateDao");
+	DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
 %>
 
 <logic:notPresent name="RxSessionBean" scope="session">
@@ -72,6 +75,27 @@
 	RxSessionBean sessionBean = (RxSessionBean)pageContext.findAttribute("sessionBean");
 	String annotation_display = CaseManagementNoteLink.DISP_ALLERGY;
 	com.quatro.service.security.SecurityManager securityManager = new com.quatro.service.security.SecurityManager();
+
+	String demographicNo = request.getParameter("demographicNo");
+
+	if (demographicNo == null)
+	{
+		demographicNo = (String)session.getAttribute("demographicNo");
+	}
+	else
+	{
+		session.setAttribute("demographicNo", demographicNo);
+	}
+
+	if (demographicNo == null || demographicNo.equals("null"))
+	{
+		demographicNo = String.valueOf(sessionBean.getDemographicNo());
+	}
+
+	Demographic demographic = demographicDao.find(Integer.parseInt(demographicNo));
+	String demoBirthday = demographic.getDateOfBirth().toString();
+	int demoAge = Period.between(demographic.getDateOfBirth(), LocalDate.now()).getYears();
+
 %>
 <html:html locale="true">
 	<head>
@@ -79,34 +103,39 @@
 
 		<script type="text/javascript" src="<%=request.getContextPath()%>/share/javascript/jquery/jquery-2.2.4.min.js"></script>
 		<script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
+		<script type="text/javascript" src="<%=request.getContextPath()%>/js/moment.min.js"></script>
+		<script type="text/javascript" src="<%=request.getContextPath()%>/oscarRx/JunoAllergyHelpers.js"></script>
 
 		<script type="text/javascript">
 			/**
 			 * Called as part of AddReaction2.jsp's onsubmit for adding or modifying an allergy.
-			 * Validation logic to check for the following:
-			 * - that any non-empty input into the start date field looks like a date.
-			 * - that any non-empty input into age of onset is a positive integer
-			 * @return true if both of the above conditions are satisfied, false otherwise
+			 * Validation logic for checking that inputted dates and ages make sense for the patient.
+			 * Also checks to see if the user is attempting to add an allergy that already exists.
+			 * @return boolean
 			 */
 			function validateAllergySubmit()
 			{
 				var startDateSelector = $("#startDate");
 				var startDate = startDateSelector.val().split("-");
 
-				// Not adding a date is valid behavior
+				var validDate = true;
+
 				if (startDate[0].length === 0)
 				{
-					return true;
+					// Not adding a date is valid behaviour
 				}
-
-				var validDate = startDate[0].length === 4;
-				while (validDate && startDate.length < 3)
+				// Not adding a date is valid behavior
+				else if (startDate[0].length === 4)
 				{
-					startDate.push("01");
-				}
+					while (validDate && startDate.length < 3)
+					{
+						startDate.push("01");
+					}
 
-				// Use default JS date library, moment.js is too liberal with formatting anything as a date
-				validDate = !isNaN(Date.parse(startDate[0] + "-" + startDate[1] + "-" + startDate[2]));
+					startDate = startDate[0] + "-" + startDate[1] + "-" + startDate[2];
+					// Use default JS date library, moment.js is too liberal with formatting anything as a date
+					validDate = moment(startDate).isValid();
+				}
 
 				if (!validDate)
 				{
@@ -114,6 +143,26 @@
 						"\nyyyy-mm-dd" +
 						"\nyyyy-mm" +
 						"\nyyyy");
+					return false;
+				}
+
+				var lifestage = $("#lifeStage").children("option:selected").val();
+
+				if (startDate[0].length > 0 && !validateStartDate("<%=demoBirthday%>", startDate, lifestage))
+				{
+					return false;
+				}
+
+				var drugrefId = $("#drugrefId").val();
+				var typeCode = $("#type").val();
+				var drugName = $("#drugName").val();
+
+				var isDuplicate = Juno.AllergyHelpers.isDuplicateAllergy(<%=demographicNo%>, drugrefId, typeCode, drugName);
+
+				if (isDuplicate)
+				{
+					alert("You're attempting to add an allergy that is already active!");
+					return false;
 				}
 
 				// Somewhat ugly by directly checking against a regex. Alternative is to cast the string
@@ -129,8 +178,46 @@
 						"\n- is 0" +
 						"\n- is a positive number");
 				}
+				else if (parseInt(ageOfOnset) > <%=demoAge%>)
+				{
+					alert("Input age of onset is greater than the patient's age!");
+					validAge = false;
+				}
 
 				return validDate && validAge;
+			}
+
+			/**
+			 * Given a (possibly estimated) start date for the allergy, check the following:
+			 * - that it is after their birthday
+			 * - that it fits within the date range defined by the inputted lifestage
+			 */
+			function validateStartDate(birthday, startDate, lifestage)
+			{
+				if (startDate !== 0 && startDate.length > 0)
+				{
+					if (birthday > startDate)
+					{
+						alert("Start date entered does not align with what the demographic's birth date is recorded as." +
+							"\nExpected start date to occur after: " + birthday);
+						return false;
+					}
+
+					var validDate = Juno.AllergyHelpers.checkDateAgainstLifestage(lifestage, birthday, startDate);
+					if (!validDate)
+					{
+						var lowerDate = Juno.AllergyHelpers.getLowerBoundLifestageDate(lifestage, birthday).toISOString().split("T")[0];
+						var upperDate = Juno.AllergyHelpers.getUpperBoundLifestageDate(lifestage, birthday).toISOString().split("T")[0];
+						alert("The start date doesn't match with the life stage and birth date of the patient. " +
+							"\nIf they were in the " + Juno.AllergyHelpers.getLifestageName(lifestage) + " lifestage, then " +
+							"the start date should fall between the following dates: " +
+							"\n - " + lowerDate +
+							"\n - " + upperDate);
+						return false;
+					}
+
+				}
+				return true;
 			}
 		</script>
 
@@ -573,23 +660,6 @@
 							<span class="view_menu">View:
 
 						<%
-
-							String demoNo=request.getParameter("demographicNo");
-
-							if (demoNo == null)
-							{
-								demoNo = (String)session.getAttribute("demographicNo");
-							}
-							else
-							{
-								session.setAttribute("demographicNo", demoNo);
-							}
-
-							if (demoNo == null || demoNo.equals("null"))
-							{
-								demoNo = String.valueOf(sessionBean.getDemographicNo());
-							}
-
 							String strView = request.getParameter("view");
 							if (strView == null)
 							{
@@ -606,7 +676,7 @@
 								}
 								else
 								{
-									out.print("<span class='view_menu'><a href='ShowAllergies2.jsp?demographicNo=" + demoNo + "&view=" + navItem + "'>");
+									out.print("<span class='view_menu'><a href='ShowAllergies2.jsp?demographicNo=" + demographicNo + "&view=" + navItem + "'>");
 									out.print(navItem);
 									out.print("</a></span>");
 								}
@@ -625,11 +695,11 @@
 								if (MyOscarUtils.isMyOscarEnabled((String) session.getAttribute("user")))
 								{
 									MyOscarLoggedInInfo myOscarLoggedInInfo=MyOscarLoggedInInfo.getLoggedInInfo(session);
-									boolean enabledMyOscarButton=MyOscarUtils.isMyOscarSendButtonEnabled(myOscarLoggedInInfo, Integer.valueOf(demoNo));
+									boolean enabledMyOscarButton=MyOscarUtils.isMyOscarSendButtonEnabled(myOscarLoggedInInfo, Integer.valueOf(demographicNo));
 									if (enabledMyOscarButton)
 									{
 										String sendDataPath = request.getContextPath() + "/phr/send_medicaldata_to_myoscar.jsp?"
-												+ "demographicId=" + demoNo + "&"
+												+ "demographicId=" + demographicNo + "&"
 												+ "medicalDataType=Allergies" + "&"
 												+ "parentPage=" + request.getRequestURI();
 							%>
@@ -822,7 +892,7 @@
 													%>
 													<a href="#"
 													   class="deleteAllergyLink"
-													   id="deleteAllergy:<%=labelAction%>_ID=<%=allergy.getAllergyId() %>&demographicNo=<%=demoNo %>&action=<%=actionPath %>">
+													   id="deleteAllergy:<%=labelAction%>_ID=<%=allergy.getAllergyId() %>&demographicNo=<%=demographicNo%>&action=<%=actionPath %>">
 														<%=labelAction%></a>
 
 													|

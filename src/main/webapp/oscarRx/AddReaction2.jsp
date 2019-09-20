@@ -143,9 +143,9 @@
 									<td>
 										<span class="label">Reaction: </span>
 										<html:textarea property="reactionDescription" cols="40" rows="3" value="${allergy.reaction}" />
-										<html:hidden property="ID" value="<%=allergyId%>" />
-										<html:hidden property="name" value="<%=name%>" />
-										<html:hidden property="type" value="<%=type%>" />
+										<input type="hidden" name="ID" id="drugrefId" value="<%=allergyId%>">
+										<input type="hidden" name="name" id="drugName" value="<%=name%>">
+										<input type="hidden" name="type" id="type" value="<%=type%>">
 										<html:hidden property="allergyToArchive" value="${allergy.id}" />
 									</td>
 								</tr>
@@ -174,18 +174,30 @@
 
 								<tr valign="center">
 									<td> <span class="label"><bean:message key="oscarEncounter.lifestage.title"/>:</span>
-										<html:select property="lifeStage">
-											<c:if test="${allergy != null}">
-												<html:option value="${allergy.lifeStage}">${allergy.lifeStageDesc}</html:option>
-											</c:if>
-											<c:forTokens items=",N,I,C,T,A" delims="," var="item">
-												<c:if test="${allergy.lifeStage != item}">
-													<html:option value="${item}">
-														${allergy.getDescForLifeStageCode(item, pageContext.response.locale)}
-													</html:option>
-												</c:if>
-											</c:forTokens>
-										</html:select>
+										<select property="lifeStage" name="lifeStage" id="lifeStage">
+											<%
+												// This exists in this form for a few reasons:
+												// - we need to select the value of the lifeStage to be able to validate input later
+												// - when we pull out an older entry to modify it, we should be pre-selecting the option that was recorded before
+												// - we don't want to duplicate the option being selected
+												String[] lifestageCodes = {"", "N", "I", "C", "T", "A"};
+												for (String code : lifestageCodes)
+												{
+													if (code.equals(allergyToArchive.getLifeStage()))
+													{
+											%>
+											<option value="<%=code%>" selected><%=allergyToArchive.getDescForLifeStageCode(code, pageContext.getResponse().getLocale())%></option>
+											<%
+													}
+													else
+													{
+											%>
+											<option value="<%=code%>"><%=allergyToArchive.getDescForLifeStageCode(code, pageContext.getResponse().getLocale())%></option>
+											<%
+													}
+												}
+											%>
+										</select>
 									</td>
 								</tr>
 								<tr valign="center">
@@ -259,7 +271,7 @@
 			<td width="100%" height="0%" colspan="2">&nbsp;</td>
 		</tr>
 		<tr>
-			<td width="100%" height="0%" style="padding: 5" bgcolor="#DCDCDC"
+			<td width="100%" height="0%" style="padding: 5px" bgcolor="#DCDCDC"
 				colspan="2"></td>
 		</tr>
 	</table>
