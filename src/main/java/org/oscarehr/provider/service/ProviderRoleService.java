@@ -41,6 +41,7 @@ import java.util.List;
 @Transactional
 public class ProviderRoleService
 {
+
 	@Autowired
 	SecRoleDao securityRoleDao;
 
@@ -59,14 +60,47 @@ public class ProviderRoleService
 	@Autowired
 	RecycleBinDao recycleBinDao;
 
+
+	/**
+	 * set Default Role For Newly added Provider so users can use their new provider account conveniently
+	 * without manully assign a role.
+	 *
+	 * @param providerID, of the newly added provider
+	 * @param roleName, from the property file 'default_provider_role_name'
+	 * @param status, is this provider active or not
+	 */
+
+	public boolean setDefaultRoleForNewProvider(Integer providerID, String roleName, int status)
+	{
+		Secuserrole secUserRole = new Secuserrole();
+
+		boolean isDefaultRoleNameExist = setPrimaryRole(providerID, roleName);
+
+		if(!isDefaultRoleNameExist)
+		{
+			return false;
+		}
+
+		addRole(secUserRole,providerID, roleName, status);
+
+		return true;
+	}
+
 	/**
 	 * Assign a primary role to the provider
 	 * @param providerId - provider record id
 	 * @param roleName - name of the role to assign
+	 * @return - if no role in the table match property file's default role, return false;
 	 */
-	public void setPrimaryRole(Integer providerId, String roleName)
+	public boolean setPrimaryRole(Integer providerId, String roleName)
 	{
 		SecRole secRole = securityRoleDao.findByName(roleName);
+
+		// not roleName in the table that matching default roleName from property file
+		if(secRole == null)
+		{
+			return false;
+		}
 
 		Long roleId = secRole.getId().longValue();
 		Long caisiProgram = new Long(programManager.getDefaultProgramId());
@@ -85,15 +119,25 @@ public class ProviderRoleService
 			programProvider.setRoleId(roleId);
 			programProviderDao.saveProgramProvider(programProvider);
 		}
+
+		return true;
+	}
+
+
+	private void addRole(Secuserrole secUserRole,Integer roleProviderId, String roleName, int activeStatus)
+	{
+
+		secUserRole.setProviderNo(String.valueOf(roleProviderId));
+		secUserRole.setRoleName(roleName);
+		secUserRole.setActiveyn(activeStatus);
+		secUserRoleDao.save(secUserRole);
 	}
 
 	public Secuserrole addRole(Integer roleProviderId, String roleName)
 	{
 		Secuserrole secUserRole = new Secuserrole();
-		secUserRole.setProviderNo(String.valueOf(roleProviderId));
-		secUserRole.setRoleName(roleName);
-		secUserRole.setActiveyn(1);
-		secUserRoleDao.save(secUserRole);
+
+		addRole(secUserRole,roleProviderId,roleName,1);
 
 		Long caisiProgram = new Long(programManager.getDefaultProgramId());
 		ProgramProvider programProvider = programProviderDao.getProgramProvider(String.valueOf(roleProviderId), caisiProgram);
@@ -149,5 +193,20 @@ public class ProviderRoleService
 	public boolean validRoleName(String roleName)
 	{
 		return (secRoleDao.findByName(roleName) != null);
+	}
+
+	private int getDoctorRoleNo(String doctorRoleName)
+	{
+		int roleId = -1000;
+		List<SecRole> secRoles = secRoleDao.findAll();
+		for(SecRole secRole: secRoles)
+		{
+			if(secRole.getName().equalsIgnoreCase(doctorRoleName))
+			{
+				roleId = secRole.getId();
+				break;
+			}
+		}
+		return roleId;
 	}
 }

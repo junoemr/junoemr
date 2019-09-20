@@ -74,6 +74,7 @@
 <%@ page import="static org.oscarehr.common.model.Provider.PROVIDER_TYPE_DOCTOR" %>
 <%@ page import="org.oscarehr.PMmodule.dao.SecUserRoleDao" %>
 <%@ page import="org.oscarehr.PMmodule.model.SecUserRole" %>
+<%@ page import="org.oscarehr.provider.service.ProviderRoleService" %>
 <%
 	ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
 	ProviderSiteDao providerSiteDao = SpringUtils.getBean(ProviderSiteDao.class);
@@ -196,7 +197,9 @@ if (!org.oscarehr.common.IsPropertiesOn.isProviderFormalizeEnable() || isProvide
 
 DBPreparedHandler dbObj = new DBPreparedHandler();
 
-  // check if the provider no need to be auto generated
+boolean isDefaultRoleNameExist = true;
+
+	// check if the provider no need to be auto generated
   if (OscarProperties.getInstance().isProviderNoAuto())
   {
   	provider.setProviderNo(dbObj.getNewProviderNo());
@@ -213,49 +216,17 @@ DBPreparedHandler dbObj = new DBPreparedHandler();
 
  	 	// make newly added provider by default a 'doctor' and 'primary' role
 
-		boolean providerStatus = provider.getStatus().equals("1");
-
-		ProgramManager programManager = SpringUtils.getBean(ProgramManager.class);
-		long programId = programManager.getDefaultProgramId();
-
+		int providerStatus = Integer.parseInt(provider.getStatus());
 
  	 	int providerNo = Integer.parseInt(provider.getProviderNo());
 
+		String providerDefaultRoleName = OscarProperties.getInstance().getProperty("default_provider_role_name");
 
-		SecRoleDao secRoleDao = SpringUtils.getBean(SecRoleDao.class);
-		int roleId = -1000;
-		String roleName = "";
-		List<SecRole> secRoles = secRoleDao.findAll();
-		for(SecRole secRole: secRoles)
-		{
-			if(secRole.getName().equalsIgnoreCase(PROVIDER_TYPE_DOCTOR))
-			{
-				roleName = secRole.getName();
-				roleId = secRole.getId();
-				break;
-			}
-		}
+		ProviderRoleService providerRoleService = SpringUtils.getBean(ProviderRoleService.class);
 
+		isDefaultRoleNameExist =
+				providerRoleService.setDefaultRoleForNewProvider(providerNo,providerDefaultRoleName, providerStatus);
 
-		//assign to primary role
-		ProgramProvider programProvider = new ProgramProvider();
-		ProgramProviderDAO programProviderDao = SpringUtils.getBean(ProgramProviderDAO.class);
-
-		programProvider.setProgramId(programId);
-		programProvider.setProviderNo(String.valueOf(providerNo));
-		programProvider.setRoleId((long)roleId);
-
-		programProviderDao.saveProgramProvider(programProvider);
-
-
-		SecUserRoleDao secUserRoleDao = SpringUtils.getBean(SecUserRoleDao.class);
-		SecUserRole secUserRole = new SecUserRole();
-
-		secUserRole.setProviderNo(String.valueOf(providerNo));
-		secUserRole.setRoleName(roleName);
-		secUserRole.setActive(providerStatus);
-
-		secUserRoleDao.save(secUserRole);
 
 	}
 
@@ -280,7 +251,21 @@ if (isOk) {
 %>
 <h1><bean:message key="admin.provideraddrecord.msgAdditionSuccess" />
 </h1>
-<%
+	<%
+		/*
+			if default role name 'doctor' not exist, add the record to provider table,
+		 	but let user know that they will need to assign role manually
+		 */
+	  if(!isDefaultRoleNameExist)
+	  {
+	%>
+		<h3 style="color:red">
+			<bean:message key="admin.provideraddrecord.msgNoDefaultRoleName" />
+		</h3>
+	<%
+	  }
+
+
   } else {
 %>
 <h1><bean:message key="admin.provideraddrecord.msgAdditionFailure" /></h1>
@@ -290,6 +275,7 @@ if (isOk) {
 	}
 
   }
+
 }
 else {
 		if 	(!isProviderFormalize) {
