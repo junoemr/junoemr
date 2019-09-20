@@ -1344,8 +1344,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 			$scope.dialog = $uibModal.open({
 				animation: false,
 				backdrop: 'static',
-				controller: 'Schedule.EventController as eventController',
-				templateUrl: 'src/schedule/event.jsp',
+				component: "eventComponent",
 				windowClass: "juno-modal",
 				resolve: {
 					parentScope: [function ()

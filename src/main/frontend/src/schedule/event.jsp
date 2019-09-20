@@ -26,8 +26,8 @@
 	<modal-title>
 		<i class="icon icon-modal-header icon-calendar-add"></i>
 		<div class="align-baseline">
-			<h3 ng-hide="editMode">Add Appointment</h3>
-			<h3 ng-show="editMode">Modify Appointment</h3>
+			<h3 ng-hide="eventController.editMode">Add Appointment</h3>
+			<h3 ng-show="eventController.editMode">Modify Appointment</h3>
 			<h4>with {{eventController.providerModel.displayName}}</h4>
 		</div>
 	</modal-title>
@@ -54,7 +54,7 @@
 			</ul>
 		</div>
 		<form class="tabs-body"
-		      ng-submit="save()" ng-init="eventController.init()">
+		      ng-submit="save()">
 			<div class="alert-container">
 				<div class="row">
 					<ca-info-messages
@@ -324,7 +324,7 @@
 					class="btn btn-default"
 					tooltip-placement="top"
 					tooltip-append-to-body="true"
-					uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
+					uib-tooltip="{{eventController.keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
 					ng-click="eventController.saveAndPrint()"
 					ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Print
 			</button>
@@ -334,8 +334,8 @@
 					class="btn btn-primary"
 					tooltip-placement="top"
 					tooltip-append-to-body="true"
-					uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
-					ng-show="!editMode"
+					uib-tooltip="{{eventController.keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
+					ng-show="!eventController.editMode"
 					ng-click="eventController.save()"
 					ng-class="{
 						'double-book': (eventController.isDoubleBook && !eventController.isDoubleBookPrevented),
@@ -348,8 +348,8 @@
 					class="btn btn-primary"
 					tooltip-placement="top"
 					tooltip-append-to-body="true"
-					uib-tooltip="{{keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
-					ng-show="editMode"
+					uib-tooltip="{{eventController.keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
+					ng-show="eventController.editMode"
 					ng-click="eventController.save()"
 					ng-class="{
 						'double-book': (eventController.isDoubleBook && !eventController.isDoubleBookPrevented),
