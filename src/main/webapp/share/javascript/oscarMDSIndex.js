@@ -1609,7 +1609,14 @@ function updateDocumentAndNext(eleId){//save doc info
 						$('saved'+num).value='true';
 						$("msgBtn_"+num).onclick = function() { popup(700,960, contextPath +'/oscarMessenger/SendDemoMessage.do?demographic_no='+patientId,'msg'); };
 						//Hide document						
-						Effect.BlindUp('labdoc_'+num);											
+						Effect.BlindUp('labdoc_'+num, function () {
+							// notify event handlers of scroll
+							let interId = window.setInterval(function ()
+							{
+								window.clearInterval(interId);
+								jQuery("#docViews").trigger("scroll");
+							}, 100);
+						});
 						updateDocStatusInQueue(num);
 						var success= updateGlobalDataAndSideNav(num,patientId);
 						if(success){
