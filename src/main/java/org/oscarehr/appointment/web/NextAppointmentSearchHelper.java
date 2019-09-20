@@ -29,7 +29,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -97,7 +99,9 @@ public class NextAppointmentSearchHelper {
 		Date currentTime = c.getTime();
 		c.add(Calendar.DAY_OF_MONTH, MAX_DAYS_TO_SEARCH);
 		List<ScheduleDate> scheduleDateList = scheduleDateDao.findByProviderListAndDateRange(providerNos, currentTime, c.getTime(), maxResults, daysOfWeek);
-		
+
+		Map<String, ScheduleTemplateCode> codeList = getScheduleCodeMap(searchBean);
+
 		/* the calendar comparison is a hack to ensure all provider templates for each day are loaded before checking the break condition.
 		 * this ensures all templates are included when sorting by appointment time. only effects multiple provider search results */
 		Calendar sdCal = Calendar.getInstance();
@@ -119,7 +123,7 @@ public class NextAppointmentSearchHelper {
 			{
 				break;
 			}
-			results.addAll(searchTemplate(sd.getProviderNo(), sd.getHour(), sd.getDate(), searchBean));
+			results.addAll(searchTemplate(sd.getProviderNo(), sd.getHour(), sd.getDate(), searchBean, codeList));
 			templatesUsed++;
 
 			lastSdCal.setTime(sd.getDate());
@@ -185,8 +189,12 @@ public class NextAppointmentSearchHelper {
 	 * @param day
 	 * @param searchBean
 	 */
-	private static List<NextAppointmentSearchResult> searchTemplate(String providerNo, String templateName, Date day, NextAppointmentSearchBean searchBean) {
-		
+	private static List<NextAppointmentSearchResult> searchTemplate(String providerNo,
+	                                                                String templateName,
+	                                                                Date day,
+	                                                                NextAppointmentSearchBean searchBean,
+	                                                                Map<String, ScheduleTemplateCode> codeList)
+	{
 		//we have a schedule..lets check what template to use
 		ScheduleTemplate template = scheduleTemplateDao.find(new ScheduleTemplatePrimaryKey(providerNo,templateName));
 		
@@ -199,11 +207,16 @@ public class NextAppointmentSearchHelper {
 			logger.warn("no template found for provider " + providerNo + " and template name '" + templateName + "'");
 			return new ArrayList<NextAppointmentSearchResult>();
 		}
-		return formatTemplateResults(providerNo, template, day, searchBean);
+		return formatTemplateResults(providerNo, template, day, searchBean, codeList);
 	}
 	
-	private static List<NextAppointmentSearchResult> formatTemplateResults(String providerNo, ScheduleTemplate template, Date day, NextAppointmentSearchBean searchBean) {
-		List<NextAppointmentSearchResult> results = new ArrayList<NextAppointmentSearchResult>();
+	private static List<NextAppointmentSearchResult> formatTemplateResults(String providerNo,
+	                                                                       ScheduleTemplate template,
+	                                                                       Date day,
+	                                                                       NextAppointmentSearchBean searchBean,
+	                                                                       Map<String, ScheduleTemplateCode> codeList)
+	{
+		List<NextAppointmentSearchResult> results = new ArrayList<>();
 		
 		String timecode = template.getTimecode();   //length=96
 		int slotsPerHour = (timecode.length()/24);  //4
@@ -223,17 +236,18 @@ public class NextAppointmentSearchHelper {
 					continue;
 				}
 				//logger.info("currently at position " + x + " which is hour " + hour + " and min " + min);
-				if(slot != '_') {
+				if(slot != '_')
+				{
 					//filter by code
-					if(searchBean.getCode().length()>0) {
-						if(slot != searchBean.getCode().charAt(0)) {
+					if(!searchBean.getCode().isEmpty())
+					{
+						if(slot != searchBean.getCode().charAt(0))
+						{
 							logger.debug("skipping because code doesn't match, slot=" + slot + ",code=" + searchBean.getCode().charAt(0) + ".");
 							continue;
 						}
 					}
-
-					//TODO pre-load all templates once into map or cache etc.
-					ScheduleTemplateCode templateCode = scheduleTemplateCodeDao.getByCode(slot);
+					ScheduleTemplateCode templateCode = codeList.get(String.valueOf(slot));
 
 					//TODO: is there a default appt length somewhere?					
 					int duration = 15;
@@ -281,6 +295,30 @@ public class NextAppointmentSearchHelper {
 			}
 		}
 		return results;
+	}
+
+	private static Map<String, ScheduleTemplateCode> getScheduleCodeMap(NextAppointmentSearchBean searchBean)
+	{
+		Map<String, ScheduleTemplateCode> codeMap;
+		if(searchBean.getCode().isEmpty()) // search any code
+		{
+			// pre load all template codes into a map
+			List<ScheduleTemplateCode> codeList = scheduleTemplateCodeDao.findTemplateCodes();
+			codeMap = new HashMap<>(codeList.size());
+			for(ScheduleTemplateCode templateCode : codeList)
+			{
+				codeMap.put(String.valueOf(templateCode.getCode()), templateCode);
+			}
+		}
+		else // search specific code
+		{
+			// pre load the specific code into the map
+			ScheduleTemplateCode templateCode = scheduleTemplateCodeDao.findByCode(searchBean.getCode());
+			codeMap = new HashMap<>(1);
+			codeMap.put(String.valueOf(templateCode.getCode()), templateCode);
+		}
+
+		return codeMap;
 	}
 	
     private static boolean checkAvailability(Date date, int duration, String providerNo) {
