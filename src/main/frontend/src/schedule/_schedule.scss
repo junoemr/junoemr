@@ -474,6 +474,11 @@
 						width: 16px;
 						border-left: 0;
 					}
+					.loading-indicator-container {
+						position: absolute;
+						bottom: 0;
+						right: 0;
+					}
 					.zero-state {
 						color: $color-neutral-darker;
 					}

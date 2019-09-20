@@ -1,9 +1,13 @@
+
+.loading-message {
+	text-align: center;
+}
+
 /**
  * ==============================================
  * Dot Pulse
  * ==============================================
  */
-
 .loading-dot-container {
 	$dot-size: 20px;
 	$dot-half-size: calc(#{$dot-size}/2);

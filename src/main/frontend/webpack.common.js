@@ -231,6 +231,8 @@ module.exports = {
 
 			'./src/common/components/module.js',
 			'./src/common/components/modalComponent.js',
+			'./src/common/components/loadingIndicatorComponent.js',
+			'./src/common/components/zeroStateDisplayComponent.js',
 
 			'./src/layout/module.js',
 			'./src/layout/bodyController.js',

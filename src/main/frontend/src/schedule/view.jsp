@@ -180,19 +180,17 @@
 			     ng-show="customLoading || !isInitialized()"
 			>
 				<div class="flex-column justify-content-center vertical-align">
-					<h1>Loading...</h1>
-					<div class="loading-dot-container">
-						<div class="dot-pulse"></div>
-					</div>
+					<juno-loading-indicator
+						message="Loading">
+					</juno-loading-indicator>
 				</div>
 			</div>
 			<div class="loading-screen-small flex-row flex-grow justify-content-center"
 			     ng-show="calendarLoading && !customLoading"
 			>
 				<div class="flex-column justify-content-center vertical-align">
-					<div class="loading-dot-container">
-						<div class="dot-pulse"></div>
-					</div>
+					<juno-loading-indicator>
+					</juno-loading-indicator>
 				</div>
 			</div>
 

@@ -29,8 +29,9 @@
 @import "directives/juno-checkbox";
 @import "directives/juno-select";
 @import "directives/juno-typeahead";
-@import "directives/juno-loading";
+@import "../src/common/components/junoLoadingIndicator";
 @import "../src/common/components/modal";
+@import "../src/common/components/zeroStateDisplay";
 // Section-specific things
 @import "../src/layout/primaryNav";
 @import "../src/layout/leftAside";

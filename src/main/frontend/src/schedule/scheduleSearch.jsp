@@ -98,9 +98,9 @@
 					</div>
 				</div>
 			</div>
-			<div class="pane result-pane flex-grow">
+			<div class="pane result-pane flex-column flex-grow">
 				<h4 class="pane-header">Search Results</h4>
-				<div ng-if="$ctrl.resultList.length > 0">
+				<div ng-if="( !$ctrl.isWorking() && $ctrl.resultList.length > 0)">
 					<table ng-table="resultTable">
 						<tr ng-repeat="result in $ctrl.resultList" ng-click="$ctrl.addAppointment(result)">
 							<td data-title="'Date'">
@@ -121,8 +121,21 @@
 						</tr>
 					</table>
 				</div>
-				<div ng-if="($ctrl.resultList.length <= 0 && !$ctrl.clean)">
-					<h4 class="zero-state">No Available Schedule Times</h4>
+				<div class="loading-indicator-container"
+				     ng-if="$ctrl.isWorking()"
+				>
+					<juno-loading-indicator>
+					</juno-loading-indicator>
+				</div>
+				<div class="flex-grow"
+				     ng-if="(!$ctrl.isWorking() && $ctrl.resultList.length <= 0 && !$ctrl.clean)">
+					<juno-zero-state-display
+							message="No Available Schedule Times"
+					>
+						<content>
+							<i class="zero-state-image image-zero-state-calendar"></i>
+						</content>
+					</juno-zero-state-display>
 				</div>
 			</div>
 		</div>
