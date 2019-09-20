@@ -65,9 +65,12 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 					//object which represents all the filters, initialize status.
 					controller.search = {
 						status: 'A',
-						serviceEndDate: moment().startOf('day').toDate()
 					};
 
+					if ($state.current.name === 'ticklers')
+					{// only default to current day for serviceEndDate on the global tickler page.
+						controller.search.serviceEndDate = moment().startOf('day').toDate();
+					}
 
 					controller.tableParams = new NgTableParams(
 					{
