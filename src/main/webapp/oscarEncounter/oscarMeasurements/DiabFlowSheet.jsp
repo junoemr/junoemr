@@ -1139,7 +1139,7 @@ fieldset[disabled] .btn-primary:active
 
 		<tr>
 			<th colspan="8" align="left">
-				<input style="margin-top: 0.2em; font-size:12px;" type="submit" name="submit" value="Submit & Close" />
+				<input id="submit-btn" style="margin-top: 0.2em; font-size:12px;" type="submit" onsubmit="$('#submit-btn').disable()" name="submit" value="Submit & Close" />
 			</th>
 		</tr>
 
