@@ -22,7 +22,9 @@
 	Canada
 
 --%>
-<juno-modal id="schedule-search-modal">
+<juno-modal id="schedule-search-modal"
+            show-loading="$ctrl.isWorking()"
+>
 	<modal-title>
 		<i class="icon icon-modal-header icon-calendar-search"></i>
 		<div class="align-baseline">
@@ -120,12 +122,6 @@
 							</td>
 						</tr>
 					</table>
-				</div>
-				<div class="loading-indicator-container"
-				     ng-if="$ctrl.isWorking()"
-				>
-					<juno-loading-indicator>
-					</juno-loading-indicator>
 				</div>
 				<div class="flex-grow"
 				     ng-if="(!$ctrl.isWorking() && $ctrl.resultList.length <= 0 && !$ctrl.clean)">

@@ -10,7 +10,15 @@ $icon-down-white: $images-root + 'icon-16-chevron-down-white.png';
 $image-zero-state-background: $images-root + 'zero-state-background.svg';
 $image-zero-state-calendar: $images-root + 'zero-state-calendar.svg';
 
-.icon {
+$image-spinner: $images-root + 'spinner.gif';
+
+.bg-image {
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
 }
 .icon-logo {
 	background-image: url($icon-logo);
@@ -24,4 +32,7 @@ $image-zero-state-calendar: $images-root + 'zero-state-calendar.svg';
 }
 .image-zero-state-calendar {
 	background-image: url($image-zero-state-calendar);
+}
+.image-spinner {
+	background-image: url($image-spinner);
 }

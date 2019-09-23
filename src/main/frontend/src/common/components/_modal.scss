@@ -134,6 +134,23 @@
 						}
 					}
 				}
+				.loading-indicator-container {
+					position: absolute;
+					right: 0;
+					bottom: 0;
+					padding-right: $modal-border-space;
+
+					height: 24px;
+
+					.loading-spinner-container {
+						width: 24px;
+						height: 24px;
+					}
+					.loading-message {
+						font-size: 12px;
+						margin: 0;
+					}
+				}
 			}
 		}
 	}

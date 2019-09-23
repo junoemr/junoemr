@@ -26,6 +26,8 @@
 angular.module('Common.Components').component('junoLoadingIndicator', {
 	bindings: {
 		message: '@',
+		messageAlignment: '@',
+		indicatorType: '@',
 	},
 	templateUrl: "src/common/components/loadingIndicatorTemplate.jsp",
 	controller: function ()
@@ -33,7 +35,19 @@ angular.module('Common.Components').component('junoLoadingIndicator', {
 		let ctrl = this;
 		ctrl.$onInit = function ()
 		{
+			console.info(ctrl.messageAlignment);
 			ctrl.message = ctrl.message || null;
+			ctrl.messageAlignment = ctrl.messageAlignment || 'vertical';
+			ctrl.indicatorType = ctrl.indicatorType || 'spinner';
+		};
+
+		ctrl.isAlignmentVertical = function ()
+		{
+			return (ctrl.messageAlignment === 'V' || ctrl.messageAlignment === 'vertical');
+		};
+		ctrl.isAlignmentHorizontal = function ()
+		{
+			return (ctrl.messageAlignment === 'H' || ctrl.messageAlignment === 'horizontal');
 		};
 	}
 });

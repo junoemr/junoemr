@@ -181,7 +181,8 @@
 			>
 				<div class="flex-column justify-content-center vertical-align">
 					<juno-loading-indicator
-						message="Loading">
+						message="Loading"
+						indicator-type="dot-pulse">
 					</juno-loading-indicator>
 				</div>
 			</div>
@@ -189,7 +190,8 @@
 			     ng-show="calendarLoading && !customLoading"
 			>
 				<div class="flex-column justify-content-center vertical-align">
-					<juno-loading-indicator>
+					<juno-loading-indicator
+						indicator-type="dot-pulse">
 					</juno-loading-indicator>
 				</div>
 			</div>
