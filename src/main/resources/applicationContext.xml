@@ -200,6 +200,7 @@
 		<property name="dxDao" ref="DxDao" />
 	</bean>
 
+	<bean id="DxResearchService" class="org.oscarehr.dx.service.DxResearchService" />
 	<bean id="ClientImageManager" class="org.oscarehr.casemgmt.service.ClientImageManager" autowire="byName" />
 	<bean id="programManager" class="org.oscarehr.PMmodule.service.ProgramManager" autowire="byName">
 		<property name="enabled" value="${pmm.refer.temporaryAdmission.enabled}" />

@@ -23,26 +23,24 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.inbox.InboxManagerResponse;
 import org.oscarehr.managers.InboxManager;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.to.InboxResponse;
 import org.oscarehr.ws.rest.to.model.InboxTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import oscar.oscarLab.ca.on.LabResultData;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Path("/inbox")
 @Component("inboxService")
@@ -50,7 +48,10 @@ public class InboxService extends AbstractServiceImpl {
 
 	@Autowired
 	private InboxManager inboxManager;
-	
+
+	@Autowired
+	private ProviderLabRoutingDao providerLabRoutingDao;
+
 	@GET
 	@Path("/mine")
 	@Produces("application/json")
@@ -113,9 +114,15 @@ public class InboxService extends AbstractServiceImpl {
 		LoggedInInfo loggedInInfo=getLoggedInInfo();
 		String providerNo=loggedInInfo.getLoggedInProviderNo();
 		
-		ProviderLabRoutingDao dao = SpringUtils.getBean(ProviderLabRoutingDao.class);
-		int count = dao.findByProviderNo(providerNo, "N").size();
-		
-		return count;
+		return providerLabRoutingDao.findByProviderNo(providerNo, "N").size();
+	}
+
+	@GET
+	@Path("/{providerId}/{reportStatus}/count")
+	@Produces("application/json")
+	public int getInboxReportsCount(@PathParam("providerId") String providerNo,
+	                                @PathParam("reportStatus") String reportStatus)
+	{
+		return providerLabRoutingDao.findByProviderNo(providerNo, reportStatus).size();
 	}
 }

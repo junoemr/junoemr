@@ -25,6 +25,7 @@ package org.oscarehr.ws.rest.to.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -61,20 +62,24 @@ public class MenuTo1 implements Serializable {
 		item.setId(id);
 		item.setLabel(label);
 		item.setExtra(extra);
-		item.setState(state);
+		item.setState(Arrays.asList(state));
 		
 		getItems().add(item);
 		
 		return this;
 	}
-	 
+
 	public MenuTo1 addNewWindow(Integer id, String label, String extra, String url) {
+		return addNewWindow(id, label, extra, url, true);
+	}
+
+	public MenuTo1 addNewWindow(Integer id, String label, String extra, String url, boolean openNewWindow) {
 		MenuItemTo1 item = new MenuItemTo1();
 		item.setId(id);
 		item.setLabel(label);
 		item.setExtra(extra);
 		item.setUrl(url);
-		item.setOpenNewWindow(true);
+		item.setOpenNewWindow(openNewWindow);
 
 		getItems().add(item);
 

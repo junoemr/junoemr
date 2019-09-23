@@ -5,13 +5,28 @@
 		position:absolute;
 		left: 0;
 		z-index: 1000;
+
+		.btn-aside {
+			width: $page-header-height;
+			height: $page-header-height;
+			background-color: #3c5a96;
+			border-radius: 0;
+			border: 1px solid transparent;
+			&:focus {
+				outline: 1px solid transparent !important;
+			}
+			.icon {
+				font-size: 32px;
+				color: $color-neutral-white;
+			}
+		}
 	}
 
 	.patient-list-header {
 		@extend %juno-page-header;
-		border-right: $primary-hover 8px solid;
+		border-right: $color-primary-dark 8px solid;
 		.form-control {
-			@include juno-form-colour-scheme-dark;
+			@include juno-form-colour-scheme-blue;
 		}
 	}
 
@@ -23,7 +38,7 @@
 			@include juno-tab-md(calc(#{$page-tabs-height} - #{$margin-height}));
 			@include juno-tab-color-scheme-primary;
 			@include juno-font-tab;
-			border-right: $primary-hover 8px solid !important;
+			border-right: $color-primary-dark 8px solid !important;
 			li a {
 				margin-top: $margin-height;
 				margin-left: $margin-height;
@@ -34,9 +49,9 @@
 		.content-controller {
 			@extend %juno-content-control;
 			height: $page-subheader-height;
-			border-right: $grey-07 8px solid;
+			border-right: $color-neutral-lighter 8px solid;
 			.form-control {
-				background-color: $white;
+				background-color: $color-neutral-white;
 			}
 
 			$input-height: $form-input-height;
@@ -44,11 +59,11 @@
 				width: $input-height;
 				height: $input-height;
 				&.visible {
-					background-color: $white;
+					background-color: $color-neutral-white;
 				}
 				.icon {
-					width: 20px;
-					height: 20px;
+					font-size: 16px;
+					color: $color-primary-base;
 				}
 			}
 			.form-inline {
@@ -65,7 +80,7 @@
 		}
 		.content-display {
 			@extend %juno-primary-view-pane-tabs-subheader;
-			border-right: $grey-07 8px solid;
+			border-right: $color-neutral-lighter 8px solid;
 
 			.list-group {
 				.list-group-item {
@@ -73,7 +88,7 @@
 					border-top: 0;
 					border-left: 0;
 					border-right: 0;
-					border-bottom: 2px solid $grey-08;
+					border-bottom: 2px solid $color-neutral-lightest;
 
 					.list-group-clickable {
 						padding: 10px 15px;
@@ -94,6 +109,6 @@
 	overflow-x: hidden;
 	padding-left: 0;
 	padding-right: 0;
-	background-color: $grey-07;
+	background-color: $color-neutral-lighter;
 	width: $left-aside-width-collapsed;
 }

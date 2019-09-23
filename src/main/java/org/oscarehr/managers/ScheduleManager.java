@@ -216,6 +216,7 @@ public class ScheduleManager {
 
 	public void updateAppointment(LoggedInInfo loggedInInfo, Appointment appointment) {
 		// generate archive object
+		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		oscarAppointmentDao.archiveAppointment(appointment.getId());
 
 		// save new changes

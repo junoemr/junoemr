@@ -148,7 +148,7 @@ public class DemographicService
 		{
 			demoCS.setMatchModeStart();
 			String [] names = keyword.split(",");
-			if (names.length == 2)
+			if (names.length >= 2)
 			{
 				demoCS.setFirstName(names[1].trim());
 				demoCS.setLastName(names[0].trim());
@@ -354,5 +354,17 @@ public class DemographicService
 		DemographicArchive da = new DemographicArchive(demographic);
 		demographicArchiveDao.persist(da);
 		return da.getId();
+	}
+
+	/**
+	 * Apply a demographic update (save changes to demo + create a demographic archive record)
+	 * @param demo - the demographic to update.
+	 * @return - the updated demographic (un changed object, save that it has been persisted to the database)
+	 */
+	public Demographic updateDemographicRecord(Demographic demo)
+	{
+		archiveDemographicRecord(demo);
+		demographicDao.merge(demo);
+		return demo;
 	}
 }

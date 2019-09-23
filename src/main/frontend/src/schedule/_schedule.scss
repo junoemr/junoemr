@@ -28,32 +28,28 @@
 				font-weight: bold;
 
 				&.btn-addon {
-					@include juno-button-colour-scheme($white, $primary-hover, $primary-hover);
+					@include juno-button-colour-scheme($color-neutral-white, $color-primary-dark, $color-primary-dark);
 				}
 				&.btn-primary {
-					@include juno-button-colour-scheme($white, $grey-01, $grey-01);
+					@include juno-button-colour-scheme($color-neutral-white, $color-neutral-darker, $color-neutral-darker);
 				}
 				&.btn-icon {
 					width: $input-height;
-					background-color: $primary-hover;
+					background-color: $color-primary-dark;
 					.icon {
-						width: 16px;
-						height: 16px;
+						font-size: 16px;
+						color: $color-neutral-white;
 					}
 				}
 			}
 			.divider-vertical {
-				background-color: $primary-hover;
+				background-color: $color-primary-dark;
 				width: 2px;
 				height: calc(#{$input-height} * 0.75);
 			}
 			.form-control {
-				@include juno-form-colour-scheme-dark;
+				@include juno-form-colour-scheme-blue;
 			}
-
-			//input,select {
-				//font-weight: bold;
-			//}
 			label {
 				margin-right: 5px;
 			}
@@ -87,6 +83,12 @@
 	overflow-y: hidden;
 	overflow-x: auto;
 
+	.info-message-container {
+		.alert {
+			margin: 0;
+			padding: 6px;
+		}
+	}
 	.calendar-loading
 	{
 		position: absolute;
@@ -119,8 +121,8 @@
 			// adjust style for left hand time column
 			.fc-time {
 				@include juno-font-label;
-				background-color: $grey-08;
-				color: $grey-01;
+				background-color: $color-neutral-lightest;
+				color: $color-neutral-darkest;
 				span {
 					padding-right: 4px;
 				}
@@ -133,8 +135,8 @@
 				/* styling for normal events */
 				.fc-event {
 					cursor: pointer;
-					background-color: $grey-04; // shows for invalid color codes
-					border: 1px solid $white !important;
+					background-color: $color-neutral-grey; // shows for invalid color codes
+					border: 1px solid $color-neutral-white !important;
 					border-radius: 8px;
 					display: flex;
 					align-items: center;
@@ -150,6 +152,7 @@
 					}
 					.fc-content {
 						width: 100%;
+						height: 100%;
 
 						.schedule-event {
 							display: flex;
@@ -157,61 +160,84 @@
 							margin: 0;
 							font-size: 12px;
 							font-weight: normal;
-							color: $grey-01;
+							color: $color-neutral-darkest;
 
 							$button-size: 16px;
 
-							.btn-event-link {
-								background: transparent;
-								border: 0;
-								width: $button-size;
-								min-width: $button-size;
-								height: $button-size;
-								color: $grey-01;
-								padding: 0;
-								&:hover {
-									background-color: rgba(255, 255, 255, 0.2);
-									border-radius: 50%;
+							.event-block {
+								display: inline-block;
+								vertical-align: top;
+								overflow: hidden;
+								margin-right: 4px;
+
+								&.show-self-booked {
+									margin-right: 16px;
 								}
-							}
-							.event-blk {
-								display: flex;
-								align-items: start;
-								justify-content: flex-start;
-							}
-							.event-blk-label {
-								flex-grow: 1;
-								font-weight: bold;
-							}
-							.btn-icon {
-								width: $button-size;
-								height: $button-size;
-								.icon {
+								.inline-flex {
+									display: inline-flex;
+									align-items: baseline;
+									flex-wrap: wrap;
+								}
+
+								.self-book-indicator.visible {
+									position: absolute;
+									top: 0;
+									right: 0;
+
+									width: 12px;
+									height: 12px;
+									background-color: $color-neutral-white;
+									border-radius: 50%;
+									margin: 2px;
+								}
+
+								.event-item {
+									display: inline-block;
+								}
+								.event-blk-label {
+									height: $button-size;
+									&.event-form-link {
+										margin-left: 2px;
+									}
+									.bold {
+										font-weight: bold;
+									}
+									.event-label {
+										margin-left: 3px;
+										height: $button-size;
+										display: inline-block;
+									}
+								}
+								.btn-event-link {
+									background: transparent;
+									border: 0;
+									width: $button-size;
+									min-width: $button-size;
+									height: $button-size;
+									color: $color-neutral-darkest;
+									padding: 0;
+									&:hover {
+										background-color: rgba(255, 255, 255, 0.2);
+										border-radius: 50%;
+									}
+								}
+								.event-status {
+									margin-left: 8px;
+									align-self: center;
+								}
+
+								.btn-icon {
 									width: $button-size;
 									height: $button-size;
+
+									.icon {
+										font-size: $button-size;
+									}
+									&:hover {
+										background-color: rgba(255, 255, 255, 0.2);
+										border-radius: 50%;
+									}
 								}
-								&:hover {
-									background-color: rgba(255, 255, 255, 0.2);
-									border-radius: 50%;
-								}
-							}
-							.event-status {
-								margin-left: 8px;
-							}
-							.event-tags {
-								display: inline-block;
-								text-align: center;
-								margin: 0 4px;
-							}
-							.event-label, .event-details {
-								margin-left: 3px;
-							}
-							.self-book-indicator.visible {
-								width: 12px;
-								height: 12px;
-								background-color: $white;
-								border-radius: 50%;
-								margin: 2px;
 							}
 						}
 					}
@@ -232,21 +258,31 @@
 						float: right;
 						width: $scheduleCodeWidth;
 						height: 100%;
-						color: $grey-01;
-						background-color: $grey-06;
+						color: $color-neutral-darkest;
+						background-color: $color-neutral-light;
 						padding: 2px 0;
 
 						&.hour-marker {
-							border-top: 1px solid $grey-05;
+							border-top: 1px solid $color-neutral-light-grey;
+						}
+						&.code-visible:after {
+							position: absolute;
+							top: 0;
+							left: 0;
+							width: $scheduleCodeWidth;
+							height: 100%;
+							content: " ";
+							background-color: $color-neutral-black;
+							opacity: 0.1;
 						}
 					}
 					.background-event-body {
 						flex-grow: 1;
-						background-color: $white;
-						border-top: 1px solid $grey-07;
+						background-color: $color-neutral-white;
+						border-top: 1px solid $color-neutral-lighter;
 
 						&.hour-marker {
-							border-top: 1px solid $grey-05;
+							border-top: 1px solid $color-neutral-light-grey;
 						}
 					}
 				}
@@ -265,7 +301,7 @@
 					.column-ctl-root {
 						@include juno-font-tab;
 						font-weight: bold;
-						background-color: $white;
+						background-color: $color-neutral-white;
 						display: flex;
 						height: $page-tabs-height-alt;
 						padding: 0 10px;
@@ -276,9 +312,11 @@
 							justify-content: space-evenly;
 						}
 						.icon {
-							width: 16px;
-							height: 16px;
-							margin: 8px;
+							font-size: 18px;
+							color: $color-primary-base;
+							&:hover {
+								cursor: pointer;
+							}
 						}
 					}
 				}
@@ -296,10 +334,10 @@
 			}
 			/* solid border lines separating empty cells */
 			.fc-time-grid .fc-slats .fc-minor td {
-				border-top: 1px solid $grey-07;
+				border-top: 1px solid $color-neutral-lighter;
 			}
 			.calendar-background {
-				background-color: $white;
+				background-color: $color-neutral-white;
 			}
 		}
 	}
@@ -310,7 +348,7 @@
 		z-index: 9;
 		width: 100%;
 		height: 100%;
-		background-color: $white;
+		background-color: $color-neutral-white;
 	}
 	.loading-screen {
 		position: absolute;
@@ -320,64 +358,29 @@
 		height: 100%;
 		background-color: rgba(0,0,0,0.1);
 	}
+	.loading-screen-small {
+		position: absolute;
+		right: 16px;
+		bottom: 0;
+		z-index: 8;
+	}
 	&.no-scroll {
 		overflow: hidden;
 	}
 }
 
 /* schedule specific modal styling */
-.schedule-modal {
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-
+#schedule-modal {
 	.modal-header {
-		display: flex;
-		align-items: center;
-		flex-direction: row;
-		justify-content: space-between;
-		border-bottom: 0;
-
-		.modal-title {
-			display: flex;
-			flex-grow: 1;
-			flex-direction: row;
-			align-items: center;
-			.align-baseline {
-				display: flex;
-				flex-grow: 1;
-				flex-direction: row;
-				align-items: baseline;
-				h4 {
-					padding: 0 16px;
-				}
+		.modal-patient-links {
+			margin-right: 20px;
+			.btn {
+				width: 28px;
 			}
-		}
-		.modal-ctl-buttons {
-			padding: 6px;
-			align-items: center;
-			justify-content: space-between;
-			display: flex;
-
-			.modal-patient-links {
-				margin-right: 20px;
-				.btn {
-					width: 28px;
-				}
-			}
-		}
-		.icon-modal-ctl {
-			width: 16px;
-			height: 16px;
-		}
-		.icon-modal-add-appt {
-			width: 40px;
-			height: 40px;
 		}
 	}
 
-	.modal-body {
-
+	modal-body {
 		$tabs-height: $page-tabs-height;
 		$alert-container-height: 40px;
 		@include juno-tab-lg($tabs-height);
@@ -399,32 +402,32 @@
 			height: $alert-container-height;
 		}
 		.alert-message {
-			color: $red;
+			color: $color-red-base;
 			@include juno-font-label;
 		}
 		.info-frame-container {
 			height: 160px;
-			.demographic-info-frame {
-				height: 144px;
-				margin-bottom: 12px;
-				background-color: $grey-08;
-				border: solid 1px $grey-07;
-				border-radius: 8px;
-				padding: 14px;
-
-				.form-group {
-					margin: 0;
-
-					label {
-						font-size: 9px;
-						color: $grey-03;
-					}
-					span {
-						@include juno-font-label;
-						color: $grey-02;
-					}
-				}
-			}
+			//.demographic-info-frame {
+			//	height: 144px;
+			//	margin-bottom: 12px;
+			//	background-color: $color-neutral-lightest;
+			//	border: solid 1px $color-neutral-lighter;
+			//	border-radius: 8px;
+			//	padding: 14px;
+			//
+			//	.form-group {
+			//		margin: 0;
+			//
+			//		label {
+			//			font-size: 9px;
+			//			color: $color-neutral-dark;
+			//		}
+			//		span {
+			//			@include juno-font-label;
+			//			color: $color-neutral-darker;
+			//		}
+			//	}
+			//}
 		}
 		.tab-pane {
 			padding: 0 $modal-border-space $modal-border-space $modal-border-space;
@@ -445,13 +448,16 @@
 			}
 
 			.edit-history-header {
-				background-color: $grey-08;
+				background-color: $color-neutral-lightest;
 				padding: 12px;
 			}
 
 			.directive-juno-typeahead {
-				@include juno-tab-lg(56px);
+				@include juno-tab-lg(64px);
 			}
 		}
+	}
+	.form-control-static {
+		min-height: 10px;
 	}
 }

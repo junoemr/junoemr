@@ -24,9 +24,12 @@
 
 package org.oscarehr.ticklers.service;
 
+import java.util.Date;
 import java.util.List;
 
+import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.PaginationQuery;
+import org.oscarehr.common.dao.TicklerCategoryDao;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.ticklers.web.TicklerQuery;
 import org.oscarehr.util.LoggedInInfo;
@@ -35,10 +38,18 @@ import org.springframework.stereotype.Component;
 
 import oscar.log.LogAction;
 
+import javax.validation.ValidationException;
+
 @Component
 public class TicklerService {
 	@Autowired
 	private TicklersDao TicklerDao;
+
+	@Autowired
+	private TicklerCategoryDao ticklerCategoryDao;
+
+	@Autowired
+	private ProgramManager programManager;
 
 	/**
 	 * Use to get ticklers count for pagination display
@@ -66,4 +77,82 @@ public class TicklerService {
 				
 		return results;
 	}
+
+	/**
+	 * create a new tickler
+	 * @param tickler - the tickler to create
+	 * @return - the new tickler
+	 * @throws ValidationException - if a required tickler field is missing
+	 */
+	public Tickler createTickler(Tickler tickler) throws ValidationException
+	{
+		if (tickler.getId() != null)
+		{// id must be null to create new tickler
+			tickler.setId(null);
+		}
+
+		//force program id to oscar default
+		tickler.setProgramId(programManager.getDefaultProgramId());
+
+		validateAndDefaultTickler(tickler);
+		TicklerDao.persist(tickler);
+		return tickler;
+	}
+
+	/**
+	 * update a tickler record.
+	 * @param tickler - tickler to update
+	 * @return - the updated tickler
+	 * @throws ValidationException - if a required tickler field is missing
+	 */
+	public Tickler updateTickler(Tickler tickler) throws ValidationException
+	{
+		validateAndDefaultTickler(tickler);
+		tickler.setUpdateDate(new Date());
+
+		TicklerDao.merge(tickler);
+		return tickler;
+	}
+
+	/**
+	 * ensure that a tickler is configured correctly and set default values on null fields
+	 * @param tickler - the tickler to validate
+	 * @return - the validated tickler
+	 * @throws ValidationException - if a required tickler field is missing
+	 */
+	private Tickler validateAndDefaultTickler(Tickler tickler) throws ValidationException
+	{
+		if (tickler.getDemographicNo() == null)
+		{
+			throw new ValidationException("Demographic number is required for tickler");
+		}
+		if (tickler.getStatus() == null)
+		{
+			tickler.setStatus(Tickler.STATUS.A);
+		}
+		if (tickler.getUpdateDate() == null)
+		{
+			tickler.setUpdateDate(new Date());
+		}
+		if (tickler.getServiceDate() == null)
+		{
+			throw new ValidationException("Service date is required for tickler");
+		}
+		if (tickler.getCreator() == null)
+		{
+			throw new ValidationException("Creator number is required for tickler");
+		}
+		if (tickler.getTaskAssignedTo() == null)
+		{
+			throw new ValidationException("Assigned number is required for tickler");
+		}
+		if (tickler.getCategoryId() != null && ticklerCategoryDao.find(tickler.getCategoryId()) == null)
+		{
+			throw new ValidationException("Tickler category id is not valid");
+		}
+
+		return tickler;
+	}
+
+
 }

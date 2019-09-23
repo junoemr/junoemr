@@ -116,6 +116,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String UPLOAD_INCOMING_DOCUMENT_FOLDER="upload_incoming_document_folder";
     public static final String HIDE_OLD_ECHART_LINK_IN_APPT="hide_old_echart_link_in_appointment";
     public static final String DISABLE_BORN_PROMPTS = "disable_born_prompts";
+    public static final String INTAKE_FORM_ENABLED = "intake_form_enabled";
 
     
     public static final String DEFAULT_PRINTER_PDF_LABEL="default_printer_pdf_label";

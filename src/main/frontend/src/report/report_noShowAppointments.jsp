@@ -39,14 +39,13 @@
 					   class="form-control"/>
 
 			</div>
-			<div class="form-group">
-				<label for="startDate">Start Date</label>
-				<input ng-model="reportNoShowAppointmentSheetCtrl.params.startDate"
-					   type="date"
-					   id="startDate"
-					   name="startDate"
-					   class="form-control">
-			</div>
+			<ca-field-date
+					ca-title="Start Date"
+					ca-date-picker-id="noshow-appts-startDate"
+					ca-name="noshow-appts-startDate"
+					ca-model="reportNoShowAppointmentSheetCtrl.params.startDate"
+					ca-orientation="auto"
+			></ca-field-date>
 
 			<button type="submit" class="btn btn-default" ng-click="reportNoShowAppointmentSheetCtrl.generateReport()">Generate Report</button>
 		</form>

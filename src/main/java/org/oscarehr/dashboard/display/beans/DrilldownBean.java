@@ -29,7 +29,7 @@ import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.oscarehr.dashboard.query.Column;
 
 public class DrilldownBean extends AbstractDataDisplayBean {
-	
+
 	private List<Column> displayColumns;
 	private List<String[]> table;
 

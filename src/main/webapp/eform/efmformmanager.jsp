@@ -176,7 +176,7 @@ $(function ()  {
 
 	  String escapedFileName = StringEscapeUtils.escapeHtml4(StringUtils.trimToEmpty((String) curForm.get("formFileName")));
 	  String escapedFormName = StringEscapeUtils.escapeHtml4((String) curForm.get("formName"));
-	  String escapedFormSubject = StringEscapeUtils.escapeHtml4((String) curForm.get("formSubject"));
+	  String escapedFormSubject = StringEscapeUtils.escapeHtml4(StringUtils.trimToEmpty((String) curForm.get("formSubject")));
 
 	  // Don't show roletype if it's null
 	  if(roleType == null)

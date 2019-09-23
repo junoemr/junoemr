@@ -25,11 +25,10 @@ package org.oscarehr.securityLog.search;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
+import oscar.util.ConversionUtils;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 public class SecurityLogCriteriaSearch extends AbstractCriteriaSearch
@@ -75,11 +74,11 @@ public class SecurityLogCriteriaSearch extends AbstractCriteriaSearch
 
 		if(getEndDate() != null)
 		{
-			criteria.add(Restrictions.le("created", Timestamp.from(getEndDate().atTime(LocalTime.MAX).toInstant(ZoneOffset.UTC))));
+			criteria.add(Restrictions.le("created", ConversionUtils.toTimestamp(getEndDate().atTime(LocalTime.MAX))));
 		}
 		if(getStartDate() != null)
 		{
-			criteria.add(Restrictions.ge("created", Timestamp.from(getStartDate().atStartOfDay().toInstant(ZoneOffset.UTC))));
+			criteria.add(Restrictions.ge("created", ConversionUtils.toTimestamp(getStartDate().atStartOfDay())));
 		}
 
 		if(getProviderIdFilterList() != null)

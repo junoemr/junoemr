@@ -24,18 +24,15 @@
 
 --%>
 <div id="settings-page">
-	<div class="row settings-header">
-		<div class="col-xs-6">
-			<!-- <h1>Personalize OSCAR</h1> -->
-			<h2>User Settings</h2>
+	<div class="settings-header">
+		<div class="flex-row flex-grow align-items-center">
+			<h3>User Settings</h3>
 		</div>
-		<div class="col-xs-6">
-			<p class="bg-danger pull-right">
-				<button type="button" class="btn btn-default btn-lg" 
-					onClick="window.open('../provider/providerpreference.jsp?provider_no=999998','prefs','width=715,height=680,scrollbars=yes')">
+		<div class="pull-right control-right">
+			<button type="button" class="btn btn-default btn-lg"
+			        onClick="window.open('../provider/providerpreference.jsp?provider_no=999998','prefs','width=715,height=680,scrollbars=yes')">
 				<span class="glyphicon glyphicon-cog"></span> Open Classic Preferences
 			</button>
-			</p>
 		</div>
 	</div>
 
@@ -235,6 +232,19 @@
 							</label>
 							<label class="checkbox-inline" for="radioh-1">
 								<input ng-model="settingsCtrl.pref.hideOldEchartLinkInAppointment" ng-value="false" id="radioh-1" type="radio">
+								Disable
+							</label>
+						</div>
+					</div>
+					<div class="form-group col-sm-6">
+						<label>Enable Intake Form</label>
+						<div class="controls">
+							<label class="checkbox-inline" for="radio-intake-0">
+								<input ng-model="settingsCtrl.pref.intakeFormEnabled" ng-value="true" id="radio-intake-0" type="radio">
+								Enable
+							</label>
+							<label class="checkbox-inline" for="radio-intake-1">
+								<input ng-model="settingsCtrl.pref.intakeFormEnabled" ng-value="false" id="radio-intake-1" type="radio">
 								Disable
 							</label>
 						</div>
@@ -511,7 +521,7 @@
 			<div class="row" ng-show="settingsCtrl.currentTab.path == 'consults'">
 				<div class="col-lg-4 col-sm-6 md-margin-top">
 					<div class="form-group col-sm-12">
-						<label>Consultation Cutoff Time Warning:</label>
+						<label>Consultation Cutoff Time Warning (in months):</label>
 						<input ng-model="settingsCtrl.pref.consultationTimePeriodWarning" placeholder="Cutoff Time Warning" class="form-control" type="text">
 					</div>
 					<div class="form-group col-sm-12">
@@ -634,8 +644,11 @@
 						</label>
 					</div>
 				</div>
-				<ng-include ng-if="settingsCtrl.pref.summaryItemCustomDisplay" src="'settings/partials/patientSummaryItems.html'"></ng-include>
 				</div>
+				<patient-summary-items
+						ng-if="settingsCtrl.pref.summaryItemCustomDisplay"
+						pref="settingsCtrl.pref"
+				></patient-summary-items>
 				<div class="col-md-3 pull-right col-xs-12">
 					<h4>Classic Encounter Preferences:</h4>
 					<div class="well">

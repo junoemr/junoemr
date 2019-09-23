@@ -8,101 +8,12 @@
 	}
 	.module-list {
 		border-bottom: 1px solid;
-		border-bottom-color: #e9e9e9;
-		.glyphicon-chevron-up, .glyphicon-chevron-down {
-			margin-bottom: $margin-sm;
-		}
-	}
-	.note-list {
-		// overflow-y: auto;
-		// height: 70vh;
-		padding-top: 5px;
-	}
-	.well-note {
-		border-color: #d2d2d2;
-		box-shadow: 0 1px 0 #cfcfcf;
-		border-radius: 3px;
-		/*not sure if this will stay*/
-		max-height: 200px;
-		overflow-y: auto;
-	}
-	.note-container {
-		.note-header {
-			background-color: #f4f4f4;
-			h6 {
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
-			}
-			.note-header-info {
-				color: #636363;
-				padding-left: 10px;
-				.note-header-title {
-					color: #3963c2;
-					margin-left: 5px;
-				}
-			}
-
-			.note-header-buttons {
-				padding-right: 5px;
-			}
-		}
-		.note-body {
-			padding: 10px 10px 0 10px;
-			p {
-				white-space: pre-wrap;
-				overflow-x: auto;
-			}
-		}
-		.note-footer {
-			/*border-top: 1px solid #e9e9e9;*/
-			font-size: 11px;
-
-			.note-footer-right {
-				text-align: right;
-			}
-
-			p {
-				margin: 0;
-			}
-		}
+		border-bottom-color: $color-neutral-lighter;
 	}
 
-	.note {
-		border: 1px solid #e9e9e9;
-		border-radius: 5px;
-		margin-bottom: 20px;
-		border-left-width: 10px;
-	}
-
-	.note-list {
-		.note-in-edit {
-			box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px $primary;
-			outline: 0 none;
-		}
-		padding: 5px;
-	}
-
-	legend {
-		/*color: #636363;*/
-		color: #3963c2;
-		font-size: 16px;
-		a {
-			color: #636363;
-			font-size: 13px;
-		}
-	}
-	.summary-section-heading {
-		color: #1c56af;
-		font-weight: bold;
-	}
-
-	.note-divider {
-		margin-bottom: 4px;
-	}
 	.summary-tabs {
-		margin-bottom: $margin-sm;
-		padding: 0;
+		@include juno-tab-md($page-tabs-height-alt);
+		@include juno-tab-color-scheme-white(4px);
 	}
 	#note-list-filters {
 		margin-bottom: $margin-sm;
@@ -114,16 +25,16 @@
 
 .notesModal {
 	.modal-content {
-		background-color: $primary;
+		background-color: $color-primary-base;
 	}
 	.modal-body {
-		background-color: $white;
+		background-color: $color-neutral-white;
 	}
 	.modal-header {
-		color: $white;
+		color: $color-neutral-white;
 	}
 	.modal-footer {
-		background-color: $grey-07;
+		background-color: $color-neutral-lighter;
 		padding-top: 20px;
 		padding-bottom: 20px;
 	}

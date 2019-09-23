@@ -25,38 +25,41 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-		<title>MyHealthAccess Create User</title>
+    <title>MyHealthAccess Create User</title>
+    <link rel="stylesheet" type="text/css" href="css/myhealthaccess.css">
 </head>
 <body>
-- You do not currently have a linked myhealthaccess account.
-<br>
-- Fill out a valid email address to create an account.
-<br>
-- If an account already exists with this email, forward to the login.jsp page to link account
-<br>
-- You will get an email sent with a confirmation link
-<br>
-- You may optionally set a password to log directly into MHA
-<br>
-- In the future this Juno account will auto log into this MHA account
-<br>
-<form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=createUser" method="post">
-		<input
-						type="hidden"
-						id="demographicNo"
-						name="demographicNo"
-						value="<%=request.getParameter("demographicNo")%>"
-		/>
-		<input
-						type="hidden"
-						id="siteName"
-						name="siteName"
-						value="<%=request.getParameter("siteName")%>"
-		/>
-		Email: <input type="text" id="email" name="email"/> <br>
-		Email Confirm: <input type="text" id="emailConfirm" name="emailConfirm"/> <br>
-		<button type="submit">Submit</button>
-</form>
+<div class="mha-container">
+    <div class="left"></div>
+    <div class="right">
+        <div class="mha-content">
+            <% if(request.getParameter("errorMessage") != null && !request.getParameter("errorMessage").isEmpty())
+            {
+            %>
+            <br>
+            <span class="red"><strong><%= request.getParameter("errorMessage") %></strong></span>
+            <br>
+            <%
+                }
+            %>
+            <h3>Create a MyHealthAccess account</h3>
+            <p>
+                It looks like you don't have a MyHealthAccess account.
+                Lets create one and connect it with your Juno EMR provider
+            </p>
+            <form action="<%= request.getContextPath() %>/telehealth/myhealthaccess.do?method=createUser" method="post">
+                <input type="hidden" name="siteName" value="<%=request.getParameter("siteName")%>"/>
+                <input type="hidden" name="appt" value="<%=request.getParameter("appt")%>"/>
+                <div class="mha-input">
+                    <label for="email">Email address</label>
+                    <input type="text" id="email" name="email"/>
+                </div>
+                <div class="mha-button-container">
+                    <button type="submit" class="primary">Sign up</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 </body>
 </html>
-

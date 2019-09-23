@@ -61,6 +61,7 @@ import org.json.simple.parser.JSONParser;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -142,6 +143,7 @@ public class ScheduleWs extends AbstractWs {
 																		  String demographicNo,
 																		  String jsonRules)
 	{
+		MiscUtils.getLogger().warn("Start Service: " + LocalDateTime.now().toString());
 		HashMap<String, DayTimeSlots[]> scheduleTransfer = new HashMap<>();
 		List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = new ArrayList<>();
 
@@ -155,12 +157,24 @@ public class ScheduleWs extends AbstractWs {
 				String templateCode = (String) templateDurationJson.get("schedule_template_id");
 				Long duration = (Long) templateDurationJson.get("appointment_duration");
 
-				ScheduleCodeDurationTransfer scheduleDurationTransfer = new ScheduleCodeDurationTransfer(templateCode, duration.intValue());
+				ScheduleCodeDurationTransfer scheduleDurationTransfer =
+						new ScheduleCodeDurationTransfer(templateCode, duration.intValue());
 				scheduleDurationTransfers.add(scheduleDurationTransfer);
 			}
 
-			List<BookingRule> bookingRules = BookingRuleFactory.createBookingRuleList(Integer.valueOf(demographicNo), jsonRules);
-			ProviderScheduleTransfer providerScheduleTransfer = scheduleTemplateDao.getValidProviderScheduleSlots(providerNo, startDate, endDate, scheduleDurationTransfers, demographicNo, bookingRules);
+			List<BookingRule> bookingRules = BookingRuleFactory.createBookingRuleList(
+							Integer.valueOf(demographicNo), jsonRules);
+
+			ProviderScheduleTransfer providerScheduleTransfer =
+					scheduleTemplateDao.getValidProviderScheduleSlots2(
+							providerNo,
+							startDate,
+							endDate,
+							scheduleDurationTransfers,
+							demographicNo,
+							bookingRules
+					);
+
 			scheduleTransfer = providerScheduleTransfer.toTransfer();
 		}
 		catch(ParseException e)
@@ -168,6 +182,7 @@ public class ScheduleWs extends AbstractWs {
 			MiscUtils.getLogger().error("Exception: " + e);
 		}
 
+		MiscUtils.getLogger().warn("END Service: " + LocalDateTime.now().toString());
 		return scheduleTransfer;
 	}
 
@@ -250,6 +265,14 @@ public class ScheduleWs extends AbstractWs {
 
 		appointmentTransfer.copyTo(appointment);
 		scheduleManager.updateAppointment(getLoggedInInfo(),appointment);
+	}
+
+	public void cancelAppointment(Integer appointmentId)
+	{
+		Appointment appointment = scheduleManager.getAppointment(getLoggedInInfo(), appointmentId);
+
+		appointment.setStatus(Appointment.CANCELLED);
+		scheduleManager.updateAppointment(getLoggedInInfo(), appointment);
 	}
 
 	/**

@@ -36,6 +36,7 @@ import java.util.ResourceBundle;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -45,6 +46,7 @@ import javax.ws.rs.core.MediaType;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.app.AppOAuth1Config;
@@ -59,7 +61,9 @@ import org.oscarehr.common.model.Demographic;
 import org.oscarehr.eform.model.EForm;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.common.model.EncounterForm;
+import org.oscarehr.eform.service.EFormDataService;
 import org.oscarehr.managers.FormsManager;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -77,6 +81,7 @@ import org.oscarehr.ws.rest.to.model.SummaryTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import org.springframework.transaction.annotation.Transactional;
 import oscar.eform.EFormExportZip;
 import oscar.oscarEncounter.data.EctFormData;
 import oscar.oscarProvider.data.ProviderMyOscarIdData;
@@ -87,14 +92,27 @@ import oscar.oscarProvider.data.ProviderMyOscarIdData;
  */
 @Path("/forms")
 @Component("formsService")
+@Transactional
 public class FormsService extends AbstractServiceImpl {
 	Logger logger = MiscUtils.getLogger();
+
+	public enum FORM_TYPE
+	{
+		EFORM,
+		FORM
+	}
 	
 	@Autowired
 	private FormsManager formsManager;
 	
 	@Autowired
 	private AppDefinitionDao appDefinitionDao;
+
+	@Autowired
+	EFormDataService eFormDataService;
+
+	@Autowired
+	SecurityInfoManager securityInfoManager;
 	
 	@GET
 	@Path("/{demographicNo}/all")
@@ -102,21 +120,23 @@ public class FormsService extends AbstractServiceImpl {
 	public FormListTo1 getFormsForHeading(@PathParam("demographicNo") Integer demographicNo ,@QueryParam("heading") String heading){
 		FormListTo1 formListTo1 = new FormListTo1();
 		if(heading.equals("Completed")){
-			List<EFormData> completedEforms = formsManager.findByDemographicId(getLoggedInInfo(),demographicNo);
+			List<EFormData> completedEforms = formsManager.findInstancedByDemographicId(getLoggedInInfo(),demographicNo);
 			Collections.sort(completedEforms, Collections.reverseOrder(EFormData.FORM_DATE_COMPARATOR));
-			
-			for(EFormData eformData: completedEforms){	
-				int id = eformData.getId();
-				int formId = eformData.getFormId();
-				String name = eformData.getFormName();
-				String subject = eformData.getSubject();
-				String status = eformData.getSubject();
-				Date date = eformData.getFormDate();
-				Boolean showLatestFormOnly = eformData.isShowLatestFormOnly();
-				formListTo1.add(FormTo1.create(id, demographicNo, formId, FormsManager.EFORM, name, subject, status, date, showLatestFormOnly));
-			}
-			
-		}else{  // Only two options right now.  Need to change this anyways
+			populateFormListTo1WithEForms(formListTo1, completedEforms, demographicNo);
+		}
+		else if (heading.equals("Revisions"))
+		{
+			List<EFormData> eformRevisions = formsManager.getEFormRevisionsInstances(demographicNo);
+			Collections.sort(eformRevisions, Collections.reverseOrder(EFormData.FORM_DATE_COMPARATOR));
+			populateFormListTo1WithEForms(formListTo1, eformRevisions, demographicNo);
+		}
+		else if (heading.equals("Deleted"))
+		{
+			List<EFormData> eformRevisions = formsManager.getDeletedEFormInstances(demographicNo);
+			Collections.sort(eformRevisions, Collections.reverseOrder(EFormData.FORM_DATE_COMPARATOR));
+			populateFormListTo1WithEForms(formListTo1, eformRevisions, demographicNo);
+		}
+		else if (heading.equals("Add")){  // Only two options right now.  Need to change this anyways
 			List<EForm> eforms =  formsManager.findByStatus(getLoggedInInfo(),true, null);  //This will have to change to accommodate forms too.
 			Collections.sort(eforms,EForm.FORM_NAME_COMPARATOR);
 			for(EForm eform : eforms){
@@ -124,11 +144,112 @@ public class FormsService extends AbstractServiceImpl {
 				String name = eform.getFormName();
 				String subject = eform.getSubject();
 				String status = null;
-				Date date = null;
+				Date date = eform.getFormDate();
 				Boolean showLatestFormOnly = eform.isShowLatestFormOnly();
-				formListTo1.add(FormTo1.create(null, demographicNo, formId, FormsManager.EFORM, name, subject, status, date, showLatestFormOnly));
+				formListTo1.add(FormTo1.create(null, demographicNo, formId, FormsManager.EFORM, name, subject, status, date, null, showLatestFormOnly));
 			}
 		}
+		else
+		{
+			throw new NotImplementedException("Requested Heading is not implemented");
+		}
+		return formListTo1;
+	}
+
+	/**
+	 * get all completed forms for the given demographic
+	 * @param demographicNo - demographic
+	 * @return - list of completed froms
+	 */
+	@GET
+	@Path("/{demographicNo}/all/completed")
+	@Produces("application/json")
+	public FormListTo1 getAllCompletedForms(@PathParam("demographicNo") Integer demographicNo)
+	{
+		FormListTo1 formListTo1 = new FormListTo1();
+
+		// get eforms
+		List<EFormData> completedEforms = formsManager.findInstancedByDemographicId(getLoggedInInfo(),demographicNo);
+		populateFormListTo1WithEForms(formListTo1, completedEforms, demographicNo);
+
+		// get forms
+		List<EctFormData.PatientForm> patientForms = formsManager.getCompletedEncounterForms(demographicNo.toString());
+		populateFormListTo1WithPatientForms(formListTo1, patientForms, demographicNo);
+
+		return formListTo1;
+	}
+
+	/**
+	 * get all revisions of all forms for the given demographic
+	 * @param demographicNo - demographic
+	 * @return - list of form revisions
+	 */
+	@GET
+	@Path("/{demographicNo}/all/revisions")
+	@Produces("application/json")
+	public FormListTo1 getAllFormRevisions(@PathParam("demographicNo") Integer demographicNo)
+	{
+		FormListTo1 formListTo1 = new FormListTo1();
+
+		// get eforms
+		List<EFormData> eformRevisions = formsManager.getEFormRevisionsInstances(demographicNo);
+		populateFormListTo1WithEForms(formListTo1, eformRevisions, demographicNo);
+
+		// get forms
+		List<EctFormData.PatientForm> patientForms = formsManager.getEncounterFormRevisions(demographicNo.toString());
+		populateFormListTo1WithPatientForms(formListTo1, patientForms, demographicNo);
+
+		return formListTo1;
+	}
+
+	/**
+	 * get all delete froms for the given demographic
+	 * @param demographicNo - demographic number
+	 * @return - deleted from list
+	 */
+	@GET
+	@Path("/{demographicNo}/all/deleted")
+	@Produces("application/json")
+	public FormListTo1 getAllDeletedForms(@PathParam("demographicNo") Integer demographicNo)
+	{
+		FormListTo1 formListTo1 = new FormListTo1();
+
+		List<EFormData> eformRevisions = formsManager.getDeletedEFormInstances(demographicNo);
+		populateFormListTo1WithEForms(formListTo1, eformRevisions, demographicNo);
+
+		return formListTo1;
+	}
+
+	/**
+	 * get all forms available for addition to demographics.
+	 * @return - all forms
+	 */
+	@GET
+	@Path("/allForms")
+	@Produces("application/json")
+	public FormListTo1 getAllNewForms()
+	{
+		FormListTo1 formListTo1 = new FormListTo1();
+
+		// get eforms
+		List<EForm> eforms = formsManager.findByStatus(getLoggedInInfo(), true, null);
+		for(EForm eform : eforms){
+			int formId = eform.getId();
+			formListTo1.add(FormTo1.create(null, 0, formId, FormsManager.EFORM,
+					eform.getFormName(), eform.getSubject(), null, eform.getFormDate(), null, eform.isShowLatestFormOnly()));
+		}
+
+		// get forms
+		List<EncounterForm> forms = formsManager.getAllEncounterForms();
+		for(EncounterForm form : forms)
+		{
+			if (!form.isHidden())
+			{
+				formListTo1.add(FormTo1.create(null, 0, 0, FormsManager.FORM,
+						form.getFormName(), form.getFormValue(), null, null, null, true));
+			}
+		}
+
 		return formListTo1;
 	}
 
@@ -164,6 +285,48 @@ public class FormsService extends AbstractServiceImpl {
 		return response;
 
 	}
+
+	@PUT
+	@Path("/delete/{id}")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public RestResponse<Boolean> deleteForm(@PathParam("id") Integer id, @QueryParam("type") String type)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), "W", null, "_eform");
+
+		FORM_TYPE fType = FORM_TYPE.valueOf(type.toUpperCase());
+		if (fType == FORM_TYPE.EFORM)
+		{
+			eFormDataService.deleteEForm(id);
+		}
+		else if (fType == FORM_TYPE.FORM)
+		{
+			throw new NotImplementedException("not implemented yet");
+		}
+
+		return RestResponse.successResponse(true);
+	}
+
+	@PUT
+	@Path("/restore/{id}")
+	@Produces("application/json")
+	@Consumes("application/json")
+	public RestResponse<Boolean> restoreForm(@PathParam("id") Integer id, @QueryParam("type") String type)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), "W", null, "_eform");
+
+		FORM_TYPE fType = FORM_TYPE.valueOf(type.toUpperCase());
+		if (fType == FORM_TYPE.EFORM)
+		{
+			eFormDataService.restoreEForm(id);
+		}
+		else if (fType == FORM_TYPE.FORM)
+		{
+			throw new NotImplementedException("not implemented yet");
+		}
+
+		return RestResponse.successResponse(true);
+	}
 	
 		
 	@GET
@@ -198,7 +361,7 @@ public class FormsService extends AbstractServiceImpl {
 						date = null;
 					}
 
-					formList.add(FormTo1.create(null, Integer.parseInt(demographicNo), formId, FormsManager.FORM, name, null, null, date, false ));
+					formList.add(FormTo1.create(null, Integer.parseInt(demographicNo), formId, FormsManager.FORM, name, null, null, date, null,false ));
 
 				}
 
@@ -351,5 +514,53 @@ public class FormsService extends AbstractServiceImpl {
 		} catch(Exception e) {
 			return null;
 		}
+	}
+
+	/**
+	 * populate a FormListTo1 with EFormData
+	 * @param formList - the form list to populate
+	 * @param eforms - the eform data to put in the list
+	 * @param demographicNo - demographic
+	 * @return - a populated FormListTo1
+	 */
+	private FormListTo1 populateFormListTo1WithEForms(FormListTo1 formList, List<EFormData> eforms, Integer demographicNo)
+	{
+		for(EFormData eformData: eforms)
+		{
+			int id = eformData.getId();
+			int formId = eformData.getFormId();
+			String name = eformData.getFormName();
+			String subject = eformData.getSubject();
+			String status = eformData.getSubject();
+			Date date = eformData.getFormDate();
+			Date createDate = null;
+			if (eformData.getEFormInstance() != null)
+			{
+				createDate = eformData.getEFormInstance().getCreatedAt();
+			}
+			Boolean showLatestFormOnly = eformData.isShowLatestFormOnly();
+			formList.add(FormTo1.create(id, demographicNo, formId, FormsManager.EFORM, name, subject,
+					status, date, createDate, showLatestFormOnly));
+		}
+
+		return formList;
+	}
+
+	/**
+	 * populate a FormListTo1 with PatientForm data
+	 * @param formList - form list to populate
+	 * @param patientForms - patient forms to use for population
+	 * @param demographicNo - demographic
+	 * @return - a filled in FormListTo1
+	 */
+	private FormListTo1 populateFormListTo1WithPatientForms(FormListTo1 formList, List<EctFormData.PatientForm> patientForms, Integer demographicNo)
+	{
+		for (EctFormData.PatientForm form : patientForms)
+		{
+			formList.add(FormTo1.create(Integer.parseInt(form.getFormId()), demographicNo, 0, FormsManager.FORM, form.getFormName(), null, null,
+					form.edited, form.created,false ));
+		}
+
+		return formList;
 	}
 }
