@@ -26,6 +26,10 @@ import com.lowagie.text.DocumentException;
 import com.sun.xml.messaging.saaj.util.ByteInputStream;
 import com.sun.xml.messaging.saaj.util.ByteOutputStream;
 import org.apache.log4j.Logger;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
@@ -41,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationPDFCreator;
 import oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ImagePDFCreator;
@@ -49,6 +54,8 @@ import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ConcatPDF;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -59,6 +66,8 @@ import java.util.List;
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class ConsultationPDFCreationService
 {
+	private long maxMemoryUsage = OscarProperties.getInstance().getPDFMaxMemUsage();
+
 	private static final Logger logger = MiscUtils.getLogger();
 	@Autowired
 	private Hl7DocumentLinkDao hl7DocumentLinkDao;
@@ -99,34 +108,69 @@ public class ConsultationPDFCreationService
 		return streamList;
 	}
 
-	public List<InputStream> toLabInputStreams(HttpServletRequest request, List<LabResultData> attachedLabs) throws IOException, DocumentException
+	/**
+	 * For every lab, attach either a PDF interpretation of the lab to the consultation
+	 * or the contents of any associated embedded documents to the lab.
+	 * @param attachedLabs list of labs to attach
+	 * @return a list of input streams for the PDF content we're attaching to the consultation printout
+	 */
+	public List<InputStream> toLabInputStreams(List<LabResultData> attachedLabs) throws IOException, DocumentException
 	{
 		List<InputStream> streamList = new ArrayList<>();
-		// Iterating over requested labs.
 		for(LabResultData lab : attachedLabs)
 		{
-			// First, display meta-information regarding the lab in question
-			ByteOutputStream bos = new ByteOutputStream();
-			LabPDFCreator labPDFCreator = new LabPDFCreator(bos, lab.segmentID, null);
-			labPDFCreator.printPdf();
-			// Transferring PDF to an input stream to be concatenated with
-			// the rest of the documents.
-			byte[] buffer = bos.getBytes();
-			streamList.add(new ByteInputStream(buffer, bos.getCount()));
-			bos.close();
-
-			// Storing the lab in PDF format inside a byte stream.
 			int labNo = Integer.parseInt(lab.segmentID);
 			List<Hl7DocumentLink> possibleDocs = hl7DocumentLinkDao.getDocumentsForLab(labNo);
-			if (possibleDocs != null)
+			if (possibleDocs != null && !possibleDocs.isEmpty())
 			{
 				// Embedded PDFs need to be treated as documents for printing purposes
 				for (Hl7DocumentLink doc : possibleDocs)
 				{
 					Document embeddedDoc = documentDao.find(doc.getDocumentNo());
-					GenericFile file = FileFactory.getDocumentFile(embeddedDoc.getDocfilename());
-					streamList.add(file.asFileInputStream());
+					if ("application/pdf".equals(embeddedDoc.getContenttype()))
+					{
+						// The orientation of each page within the embedded PDFs is not guaranteed to be portrait.
+						// To change orientation for all pages to be portrait, operate on a copy of the file
+						GenericFile origFile = FileFactory.getDocumentFile(embeddedDoc.getDocfilename());
+						GenericFile copiedFile = FileFactory.copy(origFile);
+						File pdfFile = copiedFile.getFileObject();
+
+						PDDocument pdf = PDDocument.load(pdfFile, MemoryUsageSetting.setupMainMemoryOnly(maxMemoryUsage));
+						// To change orientation, we need to operate on each page of the PDF individually
+						for (PDPage page : pdf.getPages())
+						{
+							PDRectangle mediaBox = page.getMediaBox();
+							if (mediaBox.getWidth() > mediaBox.getHeight())
+							{
+								page.setRotation(page.getRotation() + 90);
+							}
+
+						}
+						// Save the temporary PDF changes
+						pdf.save(pdfFile);
+						pdf.close();
+						streamList.add(new FileInputStream(pdfFile));
+						// We no longer need the temp file once the changes are in memory as an InputStream
+						copiedFile.deleteFile();
+					}
+					else
+					{
+						logger.error("Error with loading document with ID " + embeddedDoc.getId()
+								+ " via lab with ID " + labNo
+								+ ". Check content type and that the document can be opened");
+					}
 				}
+			}
+			else
+			{
+				ByteOutputStream bos = new ByteOutputStream();
+				LabPDFCreator labPDFCreator = new LabPDFCreator(bos, lab.segmentID, null);
+				labPDFCreator.printPdf();
+				// Transferring PDF to an input stream to be concatenated with
+				// the rest of the documents.
+				byte[] buffer = bos.getBytes();
+				streamList.add(new ByteInputStream(buffer, bos.getCount()));
+				bos.close();
 			}
 		}
 		return streamList;
