@@ -32,7 +32,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.oscarehr.e2e.constant.Constants;
 import oscar.util.Doc2PDF;
 
 import java.net.URLDecoder;

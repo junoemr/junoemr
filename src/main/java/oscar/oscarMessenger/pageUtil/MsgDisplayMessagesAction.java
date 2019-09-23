@@ -36,8 +36,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.common.dao.MessageListDao;
 import org.oscarehr.common.model.MessageList;
-import org.oscarehr.common.model.Provider;
-import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
