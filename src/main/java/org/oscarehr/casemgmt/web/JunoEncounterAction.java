@@ -47,6 +47,7 @@ import org.oscarehr.casemgmt.service.EncounterPreventionNoteService;
 import org.oscarehr.casemgmt.service.EncounterTeamService;
 import org.oscarehr.casemgmt.service.EncounterTicklerService;
 import org.oscarehr.casemgmt.service.EncounterUnresolvedIssueService;
+import org.oscarehr.casemgmt.web.formbeans.CaseManagementEntryFormBean;
 import org.oscarehr.casemgmt.web.formbeans.JunoEncounterFormBean;
 import org.oscarehr.encounterNote.dao.IssueDao;
 import org.oscarehr.encounterNote.model.Issue;
@@ -192,6 +193,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 		}
 
 
+
 		String user = (String) session.getAttribute("user");
 
 		String appointmentNo = request.getParameter("appointmentNo");
@@ -205,6 +207,16 @@ public class JunoEncounterAction extends DispatchActionSupport
 		EctProgram prgrmMgr = new EctProgram(session);
 		String programId = prgrmMgr.getProgram(user);
 
+		// XXX: setting this because I'm using ChartNotes.jsp to get the chart notes.  I don't want
+		//      this to be here.
+		session.setAttribute("case_program_id", programId);
+
+		//oscar.oscarEncounter.pageUtil.EctSessionBean bean = null;
+		String beanName = "casemgmt_oscar_bean" + encounterSessionBean.demographicNo;
+		session.setAttribute(beanName, encounterSessionBean);
+
+		String frmName = "caseManagementEntryForm" + encounterSessionBean.demographicNo;
+		CaseManagementEntryFormBean cform = (CaseManagementEntryFormBean)session.getAttribute(frmName);
 
 		// Get data for the header
 		junoEncounterForm.setHeader(

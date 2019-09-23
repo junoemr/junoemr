@@ -181,6 +181,7 @@ public class DefaultNoteService implements NoteService {
 		logger.debug("FETCHED " + eForms.size() + " EFORMS META IN " + (System.currentTimeMillis() - intTime) + "ms");
 		intTime = System.currentTimeMillis();
 
+		// TODO: speed up
 		ArrayList<PatientForm> allPatientForms = EctFormData.getGroupedPatientFormsFromAllTables(demographicId);
 		for (PatientForm patientForm : allPatientForms) {
 			EChartNoteEntry e = new EChartNoteEntry();
@@ -296,6 +297,7 @@ public class DefaultNoteService implements NoteService {
 				}
 			}
 
+			// TODO: speed this up
 			List<CaseManagementNote> localNotes = caseManagementNoteDao.getNotes(localNoteIds);
 
 			logger.debug("FETCHED " + localNotes.size() + " NOTES IN " + (System.currentTimeMillis() - intTime) + "ms");
@@ -323,8 +325,10 @@ public class DefaultNoteService implements NoteService {
 			logger.debug("FETCHED " + invoices.size() + " INVOICES IN " + (System.currentTimeMillis() - intTime) + "ms");
 			intTime = System.currentTimeMillis();
 
+			// TODO: speed this up
 			caseManagementManager.getEditors(localNotes);
 
+			// TODO: speed up NoteDisplayLocal init
 			for (EChartNoteEntry entry : slice) {
 				if (entry.getType().equals("local_note")) {
 					notesToDisplay.add(new NoteDisplayLocal(loggedInInfo, findNote((Long) entry.getId(), localNotes)));

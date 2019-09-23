@@ -840,6 +840,9 @@
 		</action>
 		<action name="junoEncounterForm" scope="request" parameter="method" path="/oscarEncounter/junoEncounter" type="org.springframework.web.struts.DelegatingActionProxy">
 			<forward name="view" path="/oscarEncounter/junoEncounter.jsp" />
+<!--
+			<forward name="view" path="/oscarEncounter/junoEncounter.jsp" />
+-->
 			<forward name="error" path="/casemgmt/error.jsp" />
 		</action>
 		<!--

@@ -51,7 +51,7 @@ public class EncounterService
 	WebApplicationContext appContext;
 
 	public EncounterHeader getEncounterHeader(
-			String user,
+			String providerNo,
 			String roleName,
 			String demographicNo,
 			String familyDoctorNo,
@@ -75,7 +75,7 @@ public class EncounterService
 
 		// User Colour
 
-		ProviderColourUpdater colourUpdater = new ProviderColourUpdater(user);
+		ProviderColourUpdater colourUpdater = new ProviderColourUpdater(providerNo);
 		String userColour = colourUpdater.getColour();
 
 		if( userColour == null || userColour.length() == 0 )
@@ -148,6 +148,8 @@ public class EncounterService
 
 		encounterHeader.setDemographicNo(demographicNo);
 
+		encounterHeader.setProviderNo(providerNo);
+
 		encounterHeader.setPatientFirstName(patientFirstName);
 		encounterHeader.setPatientLastName(patientLastName);
 		encounterHeader.setPatientSex(patientSex);
@@ -196,6 +198,30 @@ public class EncounterService
 		encounterHeader.setImageMissingPlaceholderUrl(contextPath + ClientImage.imageMissingPlaceholderUrl);
 
 		return encounterHeader;
+	}
+
+	public String getEncounterNotes(
+
+	)
+	{
+		/*
+		EncounterNotes notes = new EncounterNotes();
+
+		Set<Provider> providers = (Set<Provider>)request.getAttribute("providers");
+
+		String providerNo;
+		Provider prov;
+		Iterator<Provider> iter = providers.iterator();
+		while (iter.hasNext())
+		{
+			prov = iter.next();
+			providerNo = prov.getProviderNo();
+			%>
+				<li><html:multibox property="filter_providers" value="<%=providerNo%>" onclick="filterCheckBox(this)"></html:multibox><%=prov.getFormattedName()%></li>
+			<%
+		}
+		 */
+		return null;
 	}
 
 	private String getEChartLinks()

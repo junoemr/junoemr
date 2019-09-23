@@ -34,6 +34,7 @@ public class EncounterHeader
 	private String windowName;
 	private String demographicUrl;
 	private String demographicNo;
+	private String providerNo;
 	private String patientFirstName;
 	private String patientLastName;
 	private String patientSex;
@@ -141,6 +142,16 @@ public class EncounterHeader
 	public void setDemographicNo(String demographicNo)
 	{
 		this.demographicNo = demographicNo;
+	}
+
+	public String getProviderNo()
+	{
+		return providerNo;
+	}
+
+	public void setProviderNo(String providerNo)
+	{
+		this.providerNo = providerNo;
 	}
 
 	public String getPatientFirstName()

@@ -25,6 +25,7 @@ package org.oscarehr.casemgmt.web.formbeans;
 
 import org.apache.struts.action.ActionForm;
 import org.oscarehr.casemgmt.dto.EncounterHeader;
+import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.ws.rest.to.model.SummaryTo1;
 
@@ -34,6 +35,7 @@ import java.util.Map;
 public class JunoEncounterFormBean extends ActionForm
 {
 	private EncounterHeader header = null;
+	private EncounterNotes notes = null;
 	private Map<String, EncounterSection> sections = null;
 	private List<String> cppNoteSections = null;
 	private List<String> leftNoteSections = null;
@@ -49,6 +51,16 @@ public class JunoEncounterFormBean extends ActionForm
 	public void setHeader(EncounterHeader header)
 	{
 		this.header = header;
+	}
+
+	public EncounterNotes getNotes()
+	{
+		return notes;
+	}
+
+	public void setNotes(EncounterNotes notes)
+	{
+		this.notes = notes;
 	}
 
 	public Map<String, EncounterSection> getSections()

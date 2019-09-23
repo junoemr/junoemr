@@ -162,7 +162,11 @@ public class NotesService extends AbstractServiceImpl {
 		{
 			logger.info("skipping domain check..provider is a moderator");
 		}
-		else if(!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo) && !caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo))
+		else if(
+			// TODO: speed this up
+			!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo) &&
+			!caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo)
+		)
 		{
 			return RestResponse.errorResponse("Domain Error");
 		}
@@ -198,6 +202,7 @@ public class NotesService extends AbstractServiceImpl {
 		{
 			NoteTo1 note = new NoteTo1();
 			boolean isDeleted = false;
+			// TODO: speed this up
 			if(nd.isDocument()) {
 				Document doc = getDocumentByNoteId(nd.getNoteId().longValue());
 				if(doc != null) {

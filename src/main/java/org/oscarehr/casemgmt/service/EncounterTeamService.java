@@ -35,7 +35,6 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import oscar.OscarProperties;
 import oscar.util.StringUtils;
 
 import java.util.ArrayList;

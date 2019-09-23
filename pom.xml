@@ -1536,14 +1536,16 @@
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
+<!--
 					<compilerArgs>
-						<arg>--add-modules</arg>
+						<arg>&#45;&#45;add-modules</arg>
 						<arg>java.se.ee</arg>
-						<arg>--add-modules</arg>
+						<arg>&#45;&#45;add-modules</arg>
 						<arg>jdk.xml.ws</arg>
-						<arg>--add-modules</arg>
+						<arg>&#45;&#45;add-modules</arg>
 						<arg>jdk.xml.bind</arg>
 					</compilerArgs>
+-->
 <!--					<compilerArguments>
 						<compilerArgument>&#45;&#45;add-modules</compilerArgument>
 						<compilerArgument>java.se.ee</compilerArgument>
